@@ -261,6 +261,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 96d9239c1823f47068e4ab24fb27f8fd
+    m_Address: Assets/ThirdParty/Fonts/Fira_Sans_Condensed/FiraSansCondensed-Regular.ttf
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 97d7e590715d24b7ab420ad274465588
     m_Address: Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Generic
       Magic and Impacts/RPG3_Generic_SubtleWhoosh04.wav
@@ -423,6 +428,11 @@ MonoBehaviour:
   - m_GUID: e46e89594c1b24d50939d221c4c6ec69
     m_Address: Assets/ThirdParty/Hovl Studio/AAA Projectiles Vol 1/Prefabs/Dreamtides/Projectile
       6 blue fire.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e7dd9d305ed9f438cbcb40d969ad4634
+    m_Address: Assets/ThirdParty/Fonts/Fira_Sans_Condensed/FiraSansCondensed.asset
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0

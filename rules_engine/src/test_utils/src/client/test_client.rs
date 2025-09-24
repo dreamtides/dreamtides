@@ -102,6 +102,7 @@ impl TestClient {
                     },
                     Command::DisplayEnemyMessage(_) => {}
                     Command::PlayStudioAnimation(_) => {}
+                    Command::PlayMecanimAnimation(_) => {}
                     Command::SetCardTrail(_) => {}
                     Command::ShuffleVoidIntoDeck(_) => {}
                     Command::UpdateScreenOverlay(overlay) => {
@@ -109,6 +110,7 @@ impl TestClient {
                             interface.screen_overlay = overlay.screen_overlay;
                         }
                     }
+                    Command::AnchorToScreenPosition(..) => {}
                 }
             }
         }

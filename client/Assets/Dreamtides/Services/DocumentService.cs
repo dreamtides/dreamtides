@@ -17,6 +17,7 @@ namespace Dreamtides.Services
     UIDocument _document = null!;
     IMasonElement _infoZoom = null!;
     IMasonElement _screenOverlay = null!;
+    IMasonElement _screenAnchoredNode = null!;
     IMasonElement _effectPreviewOverlay = null!;
 
     public FlexNode? CurrentScreenOverlayNode { get; private set; }
@@ -30,6 +31,7 @@ namespace Dreamtides.Services
       _document.rootVisualElement.Clear();
       AddChild("InfoZoomContainer", out _infoZoom);
       AddChild("ScreenOverlay", out _screenOverlay);
+      AddChild("ScreenAnchoredNode", out _screenAnchoredNode);
       AddChild("EffectPreviewOverlay", out _effectPreviewOverlay);
     }
 
@@ -120,6 +122,48 @@ namespace Dreamtides.Services
     public void ClearInfoZoom()
     {
       Reconcile(ref _infoZoom, new FlexNode());
+    }
+
+    [SerializeField]
+    Transform _tmpPosition = null!;
+
+    public void RenderScreenAnchoredNode(AnchorToScreenPositionCommand command)
+    {
+      var position = TransformPositionToElementPosition(_tmpPosition, Camera.main);
+      var node = Mason.Row(
+        "ScreenAnchorPosition",
+        new FlexStyle
+        {
+          Position = FlexPosition.Absolute,
+          Inset = new FlexInsets() { Left = Mason.Px(position.x), Top = Mason.Px(position.y) },
+        },
+        command.Node
+      );
+
+      Reconcile(ref _screenAnchoredNode, node);
+    }
+
+    Vector2 TransformPositionToElementPosition(Transform transform, Camera camera)
+    {
+      // Convert a world-space transform position into UI Toolkit panel coordinates.
+      // 1. World -> Screen (bottom-left origin, pixels)
+      // 2. Screen -> Element (top-left origin, scaled logical pixels) using existing helper
+      // If the point is behind the camera (z < 0) we return an off-screen sentinel.
+      if (transform == null || camera == null)
+      {
+        return Vector2.zero;
+      }
+
+      var screenPoint3 = camera.WorldToScreenPoint(transform.position);
+
+      // Behind camera: z will be negative. Return a large negative coordinate to signify hidden.
+      if (screenPoint3.z < 0f)
+      {
+        return new Vector2(-10000f, -10000f);
+      }
+
+      var screenPoint2 = new Vector2(screenPoint3.x, screenPoint3.y);
+      return ScreenPositionToElementPosition(screenPoint2);
     }
 
     public DimensionGroup GetSafeArea()

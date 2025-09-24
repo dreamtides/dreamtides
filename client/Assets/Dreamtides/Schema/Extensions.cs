@@ -12,7 +12,7 @@ namespace Dreamtides.Schema
     public float ToSeconds() => MillisecondsValue / 1000f;
   }
 
-  public partial struct ActionUnion
+  public partial struct OnClickUnion
   {
     public GameAction? ToGameAction()
     {
@@ -26,10 +26,10 @@ namespace Dreamtides.Schema
         Enum = Enum,
         GameActionClass = new()
         {
-          DebugAction = ActionClass?.DebugAction,
-          BattleAction = ActionClass?.BattleAction,
-          BattleDisplayAction = ActionClass?.BattleDisplayAction,
-          Undo = ActionClass?.Undo,
+          DebugAction = OnClickClass?.DebugAction,
+          BattleAction = OnClickClass?.BattleAction,
+          BattleDisplayAction = OnClickClass?.BattleDisplayAction,
+          Undo = OnClickClass?.Undo,
         },
       };
     }

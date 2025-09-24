@@ -1,6 +1,7 @@
 #nullable enable
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using DG.Tweening;
 using Dreamtides.Components;
@@ -18,6 +19,9 @@ namespace Dreamtides.Services
 
     [SerializeField]
     ObjectLayout _tmpMerchantPositionLayout = null!;
+
+    [SerializeField]
+    MecanimAnimator _tmpMerchantAnimator = null!;
 
     [SerializeField]
     CanvasGroup _closeButton = null!;
@@ -59,6 +63,11 @@ namespace Dreamtides.Services
         {
           _closeButton.gameObject.SetActive(false);
         });
+    }
+
+    public IEnumerator HandlePlayMecanimAnimation(PlayMecanimAnimationCommand command)
+    {
+      return _tmpMerchantAnimator.PlayAnimation(command);
     }
 
     public ObjectLayout SiteDeckLayout(Guid siteId)

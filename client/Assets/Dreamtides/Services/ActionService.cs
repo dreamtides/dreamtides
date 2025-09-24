@@ -758,6 +758,16 @@ namespace Dreamtides.Services
           Registry.StudioService.PlayStudioAnimation(command.PlayStudioAnimation);
         }
 
+        if (command.PlayMecanimAnimation != null)
+        {
+          Registry.LoggingService.Log("ActionService", "Applying command: PlayMecanimAnimation");
+          coroutines.Add(
+            StartCoroutine(
+              Registry.DreamscapeService.HandlePlayMecanimAnimation(command.PlayMecanimAnimation)
+            )
+          );
+        }
+
         if (command.SetCardTrail != null)
         {
           Registry.LoggingService.Log("ActionService", "Applying command: SetCardTrail");
@@ -778,6 +788,12 @@ namespace Dreamtides.Services
         {
           Registry.LoggingService.Log("ActionService", "Applying command: UpdateScreenOverlay");
           Registry.DocumentService.RenderScreenOverlay(command.UpdateScreenOverlay.ScreenOverlay);
+        }
+
+        if (command.AnchorToScreenPosition != null)
+        {
+          Registry.LoggingService.Log("ActionService", "Applying command: AnchorToScreenPosition");
+          Registry.DocumentService.RenderScreenAnchoredNode(command.AnchorToScreenPosition);
         }
       }
 
@@ -826,6 +842,8 @@ namespace Dreamtides.Services
             commandNames.Add("PlayAudioClip");
           if (command.PlayStudioAnimation != null)
             commandNames.Add("PlayStudioAnimation");
+          if (command.PlayMecanimAnimation != null)
+            commandNames.Add("PlayMecanimAnimation");
           if (command.SetCardTrail != null)
             commandNames.Add("SetCardTrail");
           if (command.ShuffleVoidIntoDeck != null)

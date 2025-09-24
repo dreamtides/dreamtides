@@ -390,14 +390,17 @@ namespace Dreamtides.Prototype
       }
     }
 
-    ActionUnion BuildDebugOnClick(string cardId, string scenario) =>
-      new ActionClass
+    OnClickUnion BuildDebugOnClick(string cardId, string scenario) =>
+      new OnClickUnion
       {
-        DebugAction = new DebugAction
+        OnClickClass = new OnClickClass
         {
-          DebugActionClass = new DebugActionClass
+          DebugAction = new DebugAction
           {
-            ApplyTestScenarioAction = $@"{scenario}/{cardId}",
+            DebugActionClass = new DebugActionClass
+            {
+              ApplyTestScenarioAction = $@"{scenario}/{cardId}",
+            },
           },
         },
       };

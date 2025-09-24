@@ -4,6 +4,7 @@ use core_data::display_types::{
     AudioClipAddress, EffectAddress, MaterialAddress, Milliseconds, ProjectileAddress,
     StudioAnimation,
 };
+use core_data::identifiers::SiteId;
 use core_data::numerics::{Energy, Points};
 use masonry::flex_node::FlexNode;
 use masonry::flex_style::FlexVector3;
@@ -77,9 +78,11 @@ pub enum Command {
     DisplayDreamwellActivation(DisplayDreamwellActivationCommand),
     DisplayEnemyMessage(DisplayEnemyMessageCommand),
     PlayStudioAnimation(PlayStudioAnimationCommand),
+    PlayMecanimAnimation(PlayMecanimAnimationCommand),
     SetCardTrail(SetCardTrailCommand),
     ShuffleVoidIntoDeck(ShuffleVoidIntoDeckCommand),
     UpdateScreenOverlay(Box<UpdateScreenOverlayCommand>),
+    AnchorToScreenPosition(Box<AnchorToScreenPositionCommand>),
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
@@ -292,6 +295,14 @@ pub struct PlayStudioAnimationCommand {
     pub exit_animation: Option<StudioAnimation>,
 }
 
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct PlayMecanimAnimationCommand {
+    pub site_id: SiteId,
+    pub enter_animation: Option<StudioAnimation>,
+    pub animation: StudioAnimation,
+    pub exit_animation: Option<StudioAnimation>,
+}
+
 #[derive(Copy, Clone, Debug, Serialize, Deserialize, JsonSchema)]
 pub enum StudioType {
     UserStatus,
@@ -318,6 +329,12 @@ pub struct UpdateScreenOverlayCommand {
     pub screen_overlay: Option<FlexNode>,
 }
 
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct AnchorToScreenPositionCommand {
+    pub node: Option<FlexNode>,
+    pub anchor: ScreenAnchor,
+}
+
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema, Eq, PartialEq)]
 pub enum GameObjectId {
     CardId(ClientCardId),
@@ -332,4 +349,9 @@ pub enum GameMessageType {
     EnemyTurn,
     Victory,
     Defeat,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema, Eq, PartialEq)]
+pub enum ScreenAnchor {
+    SiteCharacter(SiteId),
 }

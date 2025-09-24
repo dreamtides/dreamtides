@@ -292,6 +292,9 @@ namespace Dreamtides.Schema
         [JsonProperty("PlayStudioAnimation", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public PlayStudioAnimationCommand PlayStudioAnimation { get; set; }
 
+        [JsonProperty("PlayMecanimAnimation", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public PlayMecanimAnimationCommand PlayMecanimAnimation { get; set; }
+
         [JsonProperty("SetCardTrail", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public SetCardTrailCommand SetCardTrail { get; set; }
 
@@ -300,6 +303,943 @@ namespace Dreamtides.Schema
 
         [JsonProperty("UpdateScreenOverlay", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public UpdateScreenOverlayCommand UpdateScreenOverlay { get; set; }
+
+        [JsonProperty("AnchorToScreenPosition", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public AnchorToScreenPositionCommand AnchorToScreenPosition { get; set; }
+    }
+
+    public partial class AnchorToScreenPositionCommand
+    {
+        [JsonProperty("anchor", Required = Required.Always)]
+        public ScreenAnchor Anchor { get; set; }
+
+        [JsonProperty("node")]
+        public FlexNode Node { get; set; }
+    }
+
+    public partial class ScreenAnchor
+    {
+        [JsonProperty("SiteCharacter", Required = Required.Always)]
+        public Guid SiteCharacter { get; set; }
+    }
+
+    public partial class DraggableNode
+    {
+        [JsonProperty("custom_drag_indicator")]
+        public FlexNode CustomDragIndicator { get; set; }
+
+        [JsonProperty("drop_target_identifiers", Required = Required.Always)]
+        public List<string> DropTargetIdentifiers { get; set; }
+
+        [JsonProperty("hide_indicator_children", Required = Required.Always)]
+        public List<string> HideIndicatorChildren { get; set; }
+
+        [JsonProperty("horizontal_drag_start_distance")]
+        public long? HorizontalDragStartDistance { get; set; }
+
+        [JsonProperty("on_drag_detected")]
+        public OnClickUnion? OnDragDetected { get; set; }
+
+        [JsonProperty("on_drop")]
+        public OnClickUnion? OnDrop { get; set; }
+
+        [JsonProperty("over_target_indicator")]
+        public FlexNode OverTargetIndicator { get; set; }
+
+        [JsonProperty("remove_original")]
+        public bool? RemoveOriginal { get; set; }
+    }
+
+    public partial class NodeType
+    {
+        [JsonProperty("Text", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public TextNode Text { get; set; }
+
+        [JsonProperty("ScrollViewNode", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public ScrollViewNode ScrollViewNode { get; set; }
+
+        [JsonProperty("DraggableNode", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public DraggableNode DraggableNode { get; set; }
+
+        [JsonProperty("TextFieldNode", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public TextFieldNode TextFieldNode { get; set; }
+
+        [JsonProperty("SliderNode", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public SliderNode SliderNode { get; set; }
+    }
+
+    public partial class FlexNode
+    {
+        [JsonProperty("children", Required = Required.Always)]
+        public List<FlexNode> Children { get; set; }
+
+        [JsonProperty("event_handlers")]
+        public EventHandlers EventHandlers { get; set; }
+
+        [JsonProperty("hover_style")]
+        public FlexStyle HoverStyle { get; set; }
+
+        [JsonProperty("name")]
+        public string Name { get; set; }
+
+        [JsonProperty("node_type")]
+        public NodeType NodeType { get; set; }
+
+        /// <summary>
+        /// Style to apply to the element when it is first attached to a panel.
+        /// </summary>
+        [JsonProperty("on_attach_style")]
+        public FlexStyle OnAttachStyle { get; set; }
+
+        /// <summary>
+        /// How long to keep the `on_attach_style` applied.
+        ///
+        /// If not specified, the style will be applied indefinitely.
+        /// </summary>
+        [JsonProperty("on_attach_style_duration")]
+        public Milliseconds OnAttachStyleDuration { get; set; }
+
+        [JsonProperty("pressed_style")]
+        public FlexStyle PressedStyle { get; set; }
+
+        [JsonProperty("style")]
+        public FlexStyle Style { get; set; }
+    }
+
+    public partial class OnClickClass
+    {
+        [JsonProperty("DebugAction", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public DebugAction? DebugAction { get; set; }
+
+        [JsonProperty("BattleAction", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public BattleAction? BattleAction { get; set; }
+
+        [JsonProperty("BattleDisplayAction", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public BattleDisplayAction? BattleDisplayAction { get; set; }
+
+        [JsonProperty("Undo", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public PlayerName? Undo { get; set; }
+    }
+
+    /// <summary>
+    /// Developer action
+    ///
+    /// Play a card in the user's hand using the standard play action.
+    ///
+    /// Play a card in the user's void using the lowest-cost ability.
+    ///
+    /// Activate a character's ability by character ID, prompting for ability
+    /// selection if multiple exist.
+    ///
+    /// Select a character as a target
+    ///
+    /// Select a card on the stack as a target
+    ///
+    /// Select a card in a void as a target
+    ///
+    /// Select a card in hand as a target
+    ///
+    /// Select a choice at a given index position in response to a prompt.
+    ///
+    /// Pick an amount of energy to pay as an additional cost to play a card.
+    ///
+    /// Sets the position of a card in a card order selector.
+    ///
+    /// Select a modal effect choice for an effect or item on the stack
+    ///
+    /// Select which activated ability to activate from a character
+    /// </summary>
+    public partial class BattleActionClass
+    {
+        [JsonProperty("Debug", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public DebugBattleAction? Debug { get; set; }
+
+        [JsonProperty("PlayCardFromHand", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public long? PlayCardFromHand { get; set; }
+
+        [JsonProperty("PlayCardFromVoid", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public long? PlayCardFromVoid { get; set; }
+
+        [JsonProperty("ActivateAbilityForCharacter", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public long? ActivateAbilityForCharacter { get; set; }
+
+        [JsonProperty("SelectCharacterTarget", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public long? SelectCharacterTarget { get; set; }
+
+        [JsonProperty("SelectStackCardTarget", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public long? SelectStackCardTarget { get; set; }
+
+        [JsonProperty("SelectVoidCardTarget", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public long? SelectVoidCardTarget { get; set; }
+
+        [JsonProperty("SelectHandCardTarget", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public long? SelectHandCardTarget { get; set; }
+
+        [JsonProperty("SelectPromptChoice", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public long? SelectPromptChoice { get; set; }
+
+        [JsonProperty("SelectEnergyAdditionalCost", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public long? SelectEnergyAdditionalCost { get; set; }
+
+        [JsonProperty("SelectOrderForDeckCard", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public DeckCardSelectedOrder SelectOrderForDeckCard { get; set; }
+
+        [JsonProperty("SelectModalEffectChoice", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public long? SelectModalEffectChoice { get; set; }
+
+        [JsonProperty("SelectActivatedAbilityChoice", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public long? SelectActivatedAbilityChoice { get; set; }
+    }
+
+    /// <summary>
+    /// Draw a card
+    ///
+    /// Set the energy of the player
+    ///
+    /// Set the points total of the player
+    ///
+    /// Set the produced energy of the player
+    ///
+    /// Set the spark bonus of the player
+    ///
+    /// Add a specific card to hand
+    ///
+    /// Add a specific card to battlefield
+    ///
+    /// Add a specific card to void
+    ///
+    /// Move all cards from hand to deck
+    ///
+    /// Set the number of cards remaining in a player's deck. All other cards
+    /// are moved to the void.
+    ///
+    /// Play a card for the opponent, with prompt choices
+    ///
+    /// Sets the `next_index` for the dreamwell to draw the card with the
+    /// indicated definition ID. Panics if this card is not present in the
+    /// dreamwell.
+    /// </summary>
+    public partial class DebugBattleActionClass
+    {
+        [JsonProperty("DrawCard", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public DrawCard DrawCard { get; set; }
+
+        [JsonProperty("SetEnergy", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public SetEnergy SetEnergy { get; set; }
+
+        [JsonProperty("SetPoints", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public SetPoints SetPoints { get; set; }
+
+        [JsonProperty("SetProducedEnergy", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public SetProducedEnergy SetProducedEnergy { get; set; }
+
+        [JsonProperty("SetSparkBonus", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public SetSparkBonus SetSparkBonus { get; set; }
+
+        [JsonProperty("AddCardToHand", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public AddCardToHand AddCardToHand { get; set; }
+
+        [JsonProperty("AddCardToBattlefield", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public AddCardToBattlefield AddCardToBattlefield { get; set; }
+
+        [JsonProperty("AddCardToVoid", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public AddCardToVoid AddCardToVoid { get; set; }
+
+        [JsonProperty("MoveHandToDeck", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public MoveHandToDeck MoveHandToDeck { get; set; }
+
+        [JsonProperty("SetCardsRemainingInDeck", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public SetCardsRemainingInDeck SetCardsRemainingInDeck { get; set; }
+
+        [JsonProperty("OpponentPlayCard", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public OpponentPlayCard OpponentPlayCard { get; set; }
+
+        [JsonProperty("SetNextDreamwellCard", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public SetNextDreamwellCard SetNextDreamwellCard { get; set; }
+    }
+
+    public partial class AddCardToBattlefield
+    {
+        [JsonProperty("card", Required = Required.Always)]
+        public Guid Card { get; set; }
+
+        [JsonProperty("player", Required = Required.Always)]
+        public PlayerName Player { get; set; }
+    }
+
+    public partial class AddCardToHand
+    {
+        [JsonProperty("card", Required = Required.Always)]
+        public Guid Card { get; set; }
+
+        [JsonProperty("player", Required = Required.Always)]
+        public PlayerName Player { get; set; }
+    }
+
+    public partial class AddCardToVoid
+    {
+        [JsonProperty("card", Required = Required.Always)]
+        public Guid Card { get; set; }
+
+        [JsonProperty("player", Required = Required.Always)]
+        public PlayerName Player { get; set; }
+    }
+
+    public partial class DrawCard
+    {
+        [JsonProperty("player", Required = Required.Always)]
+        public PlayerName Player { get; set; }
+    }
+
+    public partial class MoveHandToDeck
+    {
+        [JsonProperty("player", Required = Required.Always)]
+        public PlayerName Player { get; set; }
+    }
+
+    public partial class OpponentPlayCard
+    {
+        [JsonProperty("card", Required = Required.Always)]
+        public Guid Card { get; set; }
+    }
+
+    public partial class SetCardsRemainingInDeck
+    {
+        [JsonProperty("cards", Required = Required.Always)]
+        public long Cards { get; set; }
+
+        [JsonProperty("player", Required = Required.Always)]
+        public PlayerName Player { get; set; }
+    }
+
+    public partial class SetEnergy
+    {
+        [JsonProperty("energy", Required = Required.Always)]
+        public long Energy { get; set; }
+
+        [JsonProperty("player", Required = Required.Always)]
+        public PlayerName Player { get; set; }
+    }
+
+    public partial class SetNextDreamwellCard
+    {
+        [JsonProperty("base_card_id", Required = Required.Always)]
+        public Guid BaseCardId { get; set; }
+    }
+
+    public partial class SetPoints
+    {
+        [JsonProperty("player", Required = Required.Always)]
+        public PlayerName Player { get; set; }
+
+        [JsonProperty("points", Required = Required.Always)]
+        public long Points { get; set; }
+    }
+
+    public partial class SetProducedEnergy
+    {
+        [JsonProperty("energy", Required = Required.Always)]
+        public long Energy { get; set; }
+
+        [JsonProperty("player", Required = Required.Always)]
+        public PlayerName Player { get; set; }
+    }
+
+    public partial class SetSparkBonus
+    {
+        [JsonProperty("player", Required = Required.Always)]
+        public PlayerName Player { get; set; }
+
+        [JsonProperty("spark", Required = Required.Always)]
+        public long Spark { get; set; }
+    }
+
+    public partial class DeckCardSelectedOrder
+    {
+        [JsonProperty("card_id", Required = Required.Always)]
+        public long CardId { get; set; }
+
+        [JsonProperty("target", Required = Required.Always)]
+        public CardOrderSelectionTarget Target { get; set; }
+    }
+
+    public partial class CardOrderSelectionTargetClass
+    {
+        [JsonProperty("Deck", Required = Required.Always)]
+        public long Deck { get; set; }
+    }
+
+    /// <summary>
+    /// Sets the selected amount of energy to pay as an additional cost to play
+    /// a card.
+    ///
+    /// Opens a panel based on its address.
+    /// </summary>
+    public partial class BattleDisplayActionClass
+    {
+        [JsonProperty("BrowseCards", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public CardBrowserType? BrowseCards { get; set; }
+
+        [JsonProperty("SetSelectedEnergyAdditionalCost", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public long? SetSelectedEnergyAdditionalCost { get; set; }
+
+        [JsonProperty("OpenPanel", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public PanelAddress? OpenPanel { get; set; }
+    }
+
+    public partial class PanelAddressClass
+    {
+        [JsonProperty("ViewLogs", Required = Required.AllowNull)]
+        public string ViewLogs { get; set; }
+    }
+
+    public partial class DebugActionClass
+    {
+        [JsonProperty("ApplyTestScenarioAction", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public string ApplyTestScenarioAction { get; set; }
+
+        [JsonProperty("RestartBattleWithDecks", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public RestartBattleWithDecks RestartBattleWithDecks { get; set; }
+
+        [JsonProperty("SetOpponentAgent", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public GameAi? SetOpponentAgent { get; set; }
+
+        [JsonProperty("ApplyActionList", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public List<DebugBattleAction> ApplyActionList { get; set; }
+
+        [JsonProperty("CloseCurrentPanelApplyAction", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public DebugBattleAction? CloseCurrentPanelApplyAction { get; set; }
+
+        [JsonProperty("PerformOpponentAction", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public BattleAction? PerformOpponentAction { get; set; }
+    }
+
+    public partial class RestartBattleWithDecks
+    {
+        [JsonProperty("one", Required = Required.Always)]
+        public TestDeckName One { get; set; }
+
+        [JsonProperty("two", Required = Required.Always)]
+        public TestDeckName Two { get; set; }
+    }
+
+    public partial class ScrollViewNode
+    {
+        [JsonProperty("elasticity")]
+        public double? Elasticity { get; set; }
+
+        [JsonProperty("horizontal_page_size")]
+        public double? HorizontalPageSize { get; set; }
+
+        [JsonProperty("horizontal_scroll_bar")]
+        public ScrollBar HorizontalScrollBar { get; set; }
+
+        [JsonProperty("horizontal_scroll_bar_visibility")]
+        public ScrollBarVisibility? HorizontalScrollBarVisibility { get; set; }
+
+        [JsonProperty("mouse_wheel_scroll_size")]
+        public double? MouseWheelScrollSize { get; set; }
+
+        [JsonProperty("scroll_deceleration_rate")]
+        public double? ScrollDecelerationRate { get; set; }
+
+        [JsonProperty("touch_scroll_behavior")]
+        public TouchScrollBehavior? TouchScrollBehavior { get; set; }
+
+        [JsonProperty("vertical_page_size")]
+        public double? VerticalPageSize { get; set; }
+
+        [JsonProperty("vertical_scroll_bar")]
+        public ScrollBar VerticalScrollBar { get; set; }
+
+        [JsonProperty("vertical_scroll_bar_visibility")]
+        public ScrollBarVisibility? VerticalScrollBarVisibility { get; set; }
+    }
+
+    public partial class ScrollBar
+    {
+        [JsonProperty("style")]
+        public FlexStyle Style { get; set; }
+    }
+
+    public partial class FlexStyle
+    {
+        [JsonProperty("align_content")]
+        public FlexAlign? AlignContent { get; set; }
+
+        [JsonProperty("align_items")]
+        public FlexAlign? AlignItems { get; set; }
+
+        [JsonProperty("align_self")]
+        public FlexAlign? AlignSelf { get; set; }
+
+        [JsonProperty("background_color")]
+        public DisplayColor BackgroundColor { get; set; }
+
+        [JsonProperty("background_image")]
+        public SpriteAddress BackgroundImage { get; set; }
+
+        [JsonProperty("background_image_tint_color")]
+        public DisplayColor BackgroundImageTintColor { get; set; }
+
+        [JsonProperty("border_color")]
+        public BorderColor BorderColor { get; set; }
+
+        [JsonProperty("border_radius")]
+        public BorderRadius BorderRadius { get; set; }
+
+        [JsonProperty("border_width")]
+        public BorderWidth BorderWidth { get; set; }
+
+        [JsonProperty("color")]
+        public DisplayColor Color { get; set; }
+
+        [JsonProperty("display")]
+        public FlexDisplayStyle? Display { get; set; }
+
+        [JsonProperty("flex_basis")]
+        public Dimension FlexBasis { get; set; }
+
+        [JsonProperty("flex_direction")]
+        public FlexDirection? FlexDirection { get; set; }
+
+        [JsonProperty("flex_grow")]
+        public double? FlexGrow { get; set; }
+
+        [JsonProperty("flex_shrink")]
+        public double? FlexShrink { get; set; }
+
+        [JsonProperty("font")]
+        public FontAddress Font { get; set; }
+
+        [JsonProperty("font_size")]
+        public Dimension FontSize { get; set; }
+
+        [JsonProperty("font_style")]
+        public FontStyle? FontStyle { get; set; }
+
+        [JsonProperty("height")]
+        public Dimension Height { get; set; }
+
+        [JsonProperty("image_slice")]
+        public ImageSlice ImageSlice { get; set; }
+
+        [JsonProperty("inset")]
+        public FlexInsets Inset { get; set; }
+
+        [JsonProperty("justify_content")]
+        public FlexJustify? JustifyContent { get; set; }
+
+        [JsonProperty("letter_spacing")]
+        public Dimension LetterSpacing { get; set; }
+
+        [JsonProperty("margin")]
+        public DimensionGroup Margin { get; set; }
+
+        [JsonProperty("max_height")]
+        public Dimension MaxHeight { get; set; }
+
+        [JsonProperty("max_width")]
+        public Dimension MaxWidth { get; set; }
+
+        [JsonProperty("min_height")]
+        public Dimension MinHeight { get; set; }
+
+        [JsonProperty("min_width")]
+        public Dimension MinWidth { get; set; }
+
+        [JsonProperty("opacity")]
+        public double? Opacity { get; set; }
+
+        [JsonProperty("overflow")]
+        public FlexVisibility? Overflow { get; set; }
+
+        [JsonProperty("overflow_clip_box")]
+        public OverflowClipBox? OverflowClipBox { get; set; }
+
+        [JsonProperty("padding")]
+        public DimensionGroup Padding { get; set; }
+
+        [JsonProperty("paragraph_spacing")]
+        public Dimension ParagraphSpacing { get; set; }
+
+        [JsonProperty("picking_mode")]
+        public FlexPickingMode? PickingMode { get; set; }
+
+        [JsonProperty("position")]
+        public FlexPosition? Position { get; set; }
+
+        [JsonProperty("rotate")]
+        public FlexRotate Rotate { get; set; }
+
+        [JsonProperty("scale")]
+        public FlexScale Scale { get; set; }
+
+        [JsonProperty("text_align")]
+        public TextAlign? TextAlign { get; set; }
+
+        [JsonProperty("text_outline_color")]
+        public DisplayColor TextOutlineColor { get; set; }
+
+        [JsonProperty("text_outline_width")]
+        public double? TextOutlineWidth { get; set; }
+
+        [JsonProperty("text_overflow")]
+        public TextOverflow? TextOverflow { get; set; }
+
+        [JsonProperty("text_overflow_position")]
+        public TextOverflowPosition? TextOverflowPosition { get; set; }
+
+        [JsonProperty("text_shadow")]
+        public TextShadow TextShadow { get; set; }
+
+        [JsonProperty("transform_origin")]
+        public FlexTranslate TransformOrigin { get; set; }
+
+        [JsonProperty("transition_delays", Required = Required.Always)]
+        public List<Milliseconds> TransitionDelays { get; set; }
+
+        [JsonProperty("transition_durations", Required = Required.Always)]
+        public List<Milliseconds> TransitionDurations { get; set; }
+
+        [JsonProperty("transition_easing_modes", Required = Required.Always)]
+        public List<EasingMode> TransitionEasingModes { get; set; }
+
+        [JsonProperty("transition_properties", Required = Required.Always)]
+        public List<string> TransitionProperties { get; set; }
+
+        [JsonProperty("translate")]
+        public FlexTranslate Translate { get; set; }
+
+        [JsonProperty("visibility")]
+        public FlexVisibility? Visibility { get; set; }
+
+        [JsonProperty("white_space")]
+        public WhiteSpace? WhiteSpace { get; set; }
+
+        [JsonProperty("width")]
+        public Dimension Width { get; set; }
+
+        [JsonProperty("word_spacing")]
+        public Dimension WordSpacing { get; set; }
+
+        [JsonProperty("wrap")]
+        public FlexWrap? Wrap { get; set; }
+    }
+
+    /// <summary>
+    /// Represents a color with the given RGBA values represented as floats in the
+    /// 0-1 range.
+    ///
+    /// The color to use for the dissolve effect.
+    /// </summary>
+    public partial class DisplayColor
+    {
+        [JsonProperty("alpha", Required = Required.Always)]
+        public double Alpha { get; set; }
+
+        [JsonProperty("blue", Required = Required.Always)]
+        public double Blue { get; set; }
+
+        [JsonProperty("green", Required = Required.Always)]
+        public double Green { get; set; }
+
+        [JsonProperty("red", Required = Required.Always)]
+        public double Red { get; set; }
+    }
+
+    public partial class SpriteAddress
+    {
+        [JsonProperty("sprite", Required = Required.Always)]
+        public string Sprite { get; set; }
+    }
+
+    public partial class BorderColor
+    {
+        [JsonProperty("bottom", Required = Required.Always)]
+        public DisplayColor Bottom { get; set; }
+
+        [JsonProperty("left", Required = Required.Always)]
+        public DisplayColor Left { get; set; }
+
+        [JsonProperty("right", Required = Required.Always)]
+        public DisplayColor Right { get; set; }
+
+        [JsonProperty("top", Required = Required.Always)]
+        public DisplayColor Top { get; set; }
+    }
+
+    public partial class BorderRadius
+    {
+        [JsonProperty("bottom_left", Required = Required.Always)]
+        public Dimension BottomLeft { get; set; }
+
+        [JsonProperty("bottom_right", Required = Required.Always)]
+        public Dimension BottomRight { get; set; }
+
+        [JsonProperty("top_left", Required = Required.Always)]
+        public Dimension TopLeft { get; set; }
+
+        [JsonProperty("top_right", Required = Required.Always)]
+        public Dimension TopRight { get; set; }
+    }
+
+    public partial class Dimension
+    {
+        [JsonProperty("unit", Required = Required.Always)]
+        public DimensionUnit Unit { get; set; }
+
+        [JsonProperty("value", Required = Required.Always)]
+        public double Value { get; set; }
+    }
+
+    public partial class BorderWidth
+    {
+        [JsonProperty("bottom", Required = Required.Always)]
+        public double Bottom { get; set; }
+
+        [JsonProperty("left", Required = Required.Always)]
+        public double Left { get; set; }
+
+        [JsonProperty("right", Required = Required.Always)]
+        public double Right { get; set; }
+
+        [JsonProperty("top", Required = Required.Always)]
+        public double Top { get; set; }
+    }
+
+    public partial class FontAddress
+    {
+        [JsonProperty("font", Required = Required.Always)]
+        public string Font { get; set; }
+    }
+
+    public partial class ImageSlice
+    {
+        [JsonProperty("bottom", Required = Required.Always)]
+        public long Bottom { get; set; }
+
+        [JsonProperty("left", Required = Required.Always)]
+        public long Left { get; set; }
+
+        [JsonProperty("right", Required = Required.Always)]
+        public long Right { get; set; }
+
+        [JsonProperty("top", Required = Required.Always)]
+        public long Top { get; set; }
+    }
+
+    public partial class FlexInsets
+    {
+        [JsonProperty("bottom")]
+        public Dimension Bottom { get; set; }
+
+        [JsonProperty("left")]
+        public Dimension Left { get; set; }
+
+        [JsonProperty("right")]
+        public Dimension Right { get; set; }
+
+        [JsonProperty("top")]
+        public Dimension Top { get; set; }
+    }
+
+    public partial class DimensionGroup
+    {
+        [JsonProperty("bottom", Required = Required.Always)]
+        public Dimension Bottom { get; set; }
+
+        [JsonProperty("left", Required = Required.Always)]
+        public Dimension Left { get; set; }
+
+        [JsonProperty("right", Required = Required.Always)]
+        public Dimension Right { get; set; }
+
+        [JsonProperty("top", Required = Required.Always)]
+        public Dimension Top { get; set; }
+    }
+
+    public partial class FlexRotate
+    {
+        [JsonProperty("degrees", Required = Required.Always)]
+        public double Degrees { get; set; }
+    }
+
+    public partial class FlexScale
+    {
+        [JsonProperty("amount", Required = Required.Always)]
+        public FlexVector3 Amount { get; set; }
+    }
+
+    /// <summary>
+    /// Local scale to apply to this effect
+    /// </summary>
+    public partial class FlexVector3
+    {
+        [JsonProperty("x", Required = Required.Always)]
+        public double X { get; set; }
+
+        [JsonProperty("y", Required = Required.Always)]
+        public double Y { get; set; }
+
+        [JsonProperty("z", Required = Required.Always)]
+        public double Z { get; set; }
+    }
+
+    public partial class TextShadow
+    {
+        [JsonProperty("blur_radius", Required = Required.Always)]
+        public double BlurRadius { get; set; }
+
+        [JsonProperty("color", Required = Required.Always)]
+        public DisplayColor Color { get; set; }
+
+        [JsonProperty("offset", Required = Required.Always)]
+        public FlexVector2 Offset { get; set; }
+    }
+
+    public partial class FlexVector2
+    {
+        [JsonProperty("x", Required = Required.Always)]
+        public double X { get; set; }
+
+        [JsonProperty("y", Required = Required.Always)]
+        public double Y { get; set; }
+    }
+
+    public partial class FlexTranslate
+    {
+        [JsonProperty("x", Required = Required.Always)]
+        public Dimension X { get; set; }
+
+        [JsonProperty("y", Required = Required.Always)]
+        public Dimension Y { get; set; }
+
+        [JsonProperty("z", Required = Required.Always)]
+        public double Z { get; set; }
+    }
+
+    /// <summary>
+    /// How long to wait before continuing with animations.
+    ///
+    /// How long to pause before continuing with animations.
+    ///
+    /// Time used by some animations to display each card before moving it to
+    /// final destination.
+    ///
+    /// Should be less than stagger_interval for best results.
+    ///
+    /// Time to wait between moving subsequent cards.
+    /// </summary>
+    public partial class Milliseconds
+    {
+        [JsonProperty("milliseconds_value", Required = Required.Always)]
+        public long MillisecondsValue { get; set; }
+    }
+
+    public partial class SliderNode
+    {
+        [JsonProperty("direction")]
+        public SliderDirection? Direction { get; set; }
+
+        [JsonProperty("drag_container_style")]
+        public FlexStyle DragContainerStyle { get; set; }
+
+        [JsonProperty("dragger_border_style")]
+        public FlexStyle DraggerBorderStyle { get; set; }
+
+        [JsonProperty("dragger_style")]
+        public FlexStyle DraggerStyle { get; set; }
+
+        [JsonProperty("high_value")]
+        public double? HighValue { get; set; }
+
+        [JsonProperty("initial_value")]
+        public double? InitialValue { get; set; }
+
+        [JsonProperty("inverted")]
+        public bool? Inverted { get; set; }
+
+        [JsonProperty("label")]
+        public string Label { get; set; }
+
+        [JsonProperty("label_style")]
+        public FlexStyle LabelStyle { get; set; }
+
+        [JsonProperty("low_value")]
+        public double? LowValue { get; set; }
+
+        [JsonProperty("page_size")]
+        public double? PageSize { get; set; }
+
+        [JsonProperty("preference_key")]
+        public string PreferenceKey { get; set; }
+
+        [JsonProperty("show_input_field")]
+        public bool? ShowInputField { get; set; }
+
+        [JsonProperty("tracker_style")]
+        public FlexStyle TrackerStyle { get; set; }
+    }
+
+    public partial class TextNode
+    {
+        [JsonProperty("label", Required = Required.Always)]
+        public string Label { get; set; }
+    }
+
+    public partial class TextFieldNode
+    {
+        [JsonProperty("double_click_selects_word")]
+        public bool? DoubleClickSelectsWord { get; set; }
+
+        [JsonProperty("global_identifier")]
+        public string GlobalIdentifier { get; set; }
+
+        [JsonProperty("initial_text")]
+        public string InitialText { get; set; }
+
+        [JsonProperty("is_password_field")]
+        public bool? IsPasswordField { get; set; }
+
+        [JsonProperty("is_read_only")]
+        public bool? IsReadOnly { get; set; }
+
+        [JsonProperty("mask_character")]
+        public string MaskCharacter { get; set; }
+
+        [JsonProperty("max_length")]
+        public long? MaxLength { get; set; }
+
+        [JsonProperty("multiline")]
+        public bool? Multiline { get; set; }
+
+        [JsonProperty("triple_click_selects_line")]
+        public bool? TripleClickSelectsLine { get; set; }
+    }
+
+    public partial class EventHandlers
+    {
+        [JsonProperty("on_click")]
+        public OnClickUnion? OnClick { get; set; }
+
+        [JsonProperty("on_field_changed")]
+        public OnClickUnion? OnFieldChanged { get; set; }
+
+        [JsonProperty("on_long_press")]
+        public OnClickUnion? OnLongPress { get; set; }
+
+        [JsonProperty("on_mouse_down")]
+        public OnClickUnion? OnMouseDown { get; set; }
+
+        [JsonProperty("on_mouse_enter")]
+        public OnClickUnion? OnMouseEnter { get; set; }
+
+        [JsonProperty("on_mouse_leave")]
+        public OnClickUnion? OnMouseLeave { get; set; }
+
+        [JsonProperty("on_mouse_up")]
+        public OnClickUnion? OnMouseUp { get; set; }
     }
 
     public partial class DisplayDreamwellActivationCommand
@@ -372,45 +1312,12 @@ namespace Dreamtides.Schema
     }
 
     /// <summary>
-    /// How long to wait before continuing with animations.
-    ///
-    /// How long to pause before continuing with animations.
-    ///
-    /// Time used by some animations to display each card before moving it to
-    /// final destination.
-    ///
-    /// Should be less than stagger_interval for best results.
-    ///
-    /// Time to wait between moving subsequent cards.
-    /// </summary>
-    public partial class Milliseconds
-    {
-        [JsonProperty("milliseconds_value", Required = Required.Always)]
-        public long MillisecondsValue { get; set; }
-    }
-
-    /// <summary>
     /// The effect to display.
     /// </summary>
     public partial class EffectAddress
     {
         [JsonProperty("effect", Required = Required.Always)]
         public string Effect { get; set; }
-    }
-
-    /// <summary>
-    /// Local scale to apply to this effect
-    /// </summary>
-    public partial class FlexVector3
-    {
-        [JsonProperty("x", Required = Required.Always)]
-        public double X { get; set; }
-
-        [JsonProperty("y", Required = Required.Always)]
-        public double Y { get; set; }
-
-        [JsonProperty("z", Required = Required.Always)]
-        public double Z { get; set; }
     }
 
     /// <summary>
@@ -504,27 +1411,6 @@ namespace Dreamtides.Schema
         /// </summary>
         [JsonProperty("target", Required = Required.Always)]
         public string Target { get; set; }
-    }
-
-    /// <summary>
-    /// Represents a color with the given RGBA values represented as floats in the
-    /// 0-1 range.
-    ///
-    /// The color to use for the dissolve effect.
-    /// </summary>
-    public partial class DisplayColor
-    {
-        [JsonProperty("alpha", Required = Required.Always)]
-        public double Alpha { get; set; }
-
-        [JsonProperty("blue", Required = Required.Always)]
-        public double Blue { get; set; }
-
-        [JsonProperty("green", Required = Required.Always)]
-        public double Green { get; set; }
-
-        [JsonProperty("red", Required = Required.Always)]
-        public double Red { get; set; }
     }
 
     /// <summary>
@@ -874,7 +1760,7 @@ namespace Dreamtides.Schema
         /// played.
         /// </summary>
         [JsonProperty("can_play")]
-        public ActionUnion? CanPlay { get; set; }
+        public OnClickUnion? CanPlay { get; set; }
 
         /// <summary>
         /// If this card can currently be dragged within a Card Order Selector, the
@@ -887,7 +1773,7 @@ namespace Dreamtides.Schema
         /// Action to perform when this card is clicked.
         /// </summary>
         [JsonProperty("on_click")]
-        public ActionUnion? OnClick { get; set; }
+        public OnClickUnion? OnClick { get; set; }
 
         /// <summary>
         /// Sound to play when this card is played.
@@ -900,323 +1786,6 @@ namespace Dreamtides.Schema
         /// </summary>
         [JsonProperty("play_effect_preview")]
         public BattlePreviewView PlayEffectPreview { get; set; }
-    }
-
-    public partial class ActionClass
-    {
-        [JsonProperty("DebugAction", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public DebugAction? DebugAction { get; set; }
-
-        [JsonProperty("BattleAction", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public BattleAction? BattleAction { get; set; }
-
-        [JsonProperty("BattleDisplayAction", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public BattleDisplayAction? BattleDisplayAction { get; set; }
-
-        [JsonProperty("Undo", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public PlayerName? Undo { get; set; }
-    }
-
-    /// <summary>
-    /// Developer action
-    ///
-    /// Play a card in the user's hand using the standard play action.
-    ///
-    /// Play a card in the user's void using the lowest-cost ability.
-    ///
-    /// Activate a character's ability by character ID, prompting for ability
-    /// selection if multiple exist.
-    ///
-    /// Select a character as a target
-    ///
-    /// Select a card on the stack as a target
-    ///
-    /// Select a card in a void as a target
-    ///
-    /// Select a card in hand as a target
-    ///
-    /// Select a choice at a given index position in response to a prompt.
-    ///
-    /// Pick an amount of energy to pay as an additional cost to play a card.
-    ///
-    /// Sets the position of a card in a card order selector.
-    ///
-    /// Select a modal effect choice for an effect or item on the stack
-    ///
-    /// Select which activated ability to activate from a character
-    /// </summary>
-    public partial class BattleActionClass
-    {
-        [JsonProperty("Debug", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public DebugBattleAction? Debug { get; set; }
-
-        [JsonProperty("PlayCardFromHand", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public long? PlayCardFromHand { get; set; }
-
-        [JsonProperty("PlayCardFromVoid", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public long? PlayCardFromVoid { get; set; }
-
-        [JsonProperty("ActivateAbilityForCharacter", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public long? ActivateAbilityForCharacter { get; set; }
-
-        [JsonProperty("SelectCharacterTarget", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public long? SelectCharacterTarget { get; set; }
-
-        [JsonProperty("SelectStackCardTarget", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public long? SelectStackCardTarget { get; set; }
-
-        [JsonProperty("SelectVoidCardTarget", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public long? SelectVoidCardTarget { get; set; }
-
-        [JsonProperty("SelectHandCardTarget", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public long? SelectHandCardTarget { get; set; }
-
-        [JsonProperty("SelectPromptChoice", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public long? SelectPromptChoice { get; set; }
-
-        [JsonProperty("SelectEnergyAdditionalCost", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public long? SelectEnergyAdditionalCost { get; set; }
-
-        [JsonProperty("SelectOrderForDeckCard", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public DeckCardSelectedOrder SelectOrderForDeckCard { get; set; }
-
-        [JsonProperty("SelectModalEffectChoice", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public long? SelectModalEffectChoice { get; set; }
-
-        [JsonProperty("SelectActivatedAbilityChoice", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public long? SelectActivatedAbilityChoice { get; set; }
-    }
-
-    /// <summary>
-    /// Draw a card
-    ///
-    /// Set the energy of the player
-    ///
-    /// Set the points total of the player
-    ///
-    /// Set the produced energy of the player
-    ///
-    /// Set the spark bonus of the player
-    ///
-    /// Add a specific card to hand
-    ///
-    /// Add a specific card to battlefield
-    ///
-    /// Add a specific card to void
-    ///
-    /// Move all cards from hand to deck
-    ///
-    /// Set the number of cards remaining in a player's deck. All other cards
-    /// are moved to the void.
-    ///
-    /// Play a card for the opponent, with prompt choices
-    ///
-    /// Sets the `next_index` for the dreamwell to draw the card with the
-    /// indicated definition ID. Panics if this card is not present in the
-    /// dreamwell.
-    /// </summary>
-    public partial class DebugBattleActionClass
-    {
-        [JsonProperty("DrawCard", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public DrawCard DrawCard { get; set; }
-
-        [JsonProperty("SetEnergy", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public SetEnergy SetEnergy { get; set; }
-
-        [JsonProperty("SetPoints", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public SetPoints SetPoints { get; set; }
-
-        [JsonProperty("SetProducedEnergy", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public SetProducedEnergy SetProducedEnergy { get; set; }
-
-        [JsonProperty("SetSparkBonus", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public SetSparkBonus SetSparkBonus { get; set; }
-
-        [JsonProperty("AddCardToHand", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public AddCardToHand AddCardToHand { get; set; }
-
-        [JsonProperty("AddCardToBattlefield", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public AddCardToBattlefield AddCardToBattlefield { get; set; }
-
-        [JsonProperty("AddCardToVoid", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public AddCardToVoid AddCardToVoid { get; set; }
-
-        [JsonProperty("MoveHandToDeck", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public MoveHandToDeck MoveHandToDeck { get; set; }
-
-        [JsonProperty("SetCardsRemainingInDeck", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public SetCardsRemainingInDeck SetCardsRemainingInDeck { get; set; }
-
-        [JsonProperty("OpponentPlayCard", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public OpponentPlayCard OpponentPlayCard { get; set; }
-
-        [JsonProperty("SetNextDreamwellCard", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public SetNextDreamwellCard SetNextDreamwellCard { get; set; }
-    }
-
-    public partial class AddCardToBattlefield
-    {
-        [JsonProperty("card", Required = Required.Always)]
-        public Guid Card { get; set; }
-
-        [JsonProperty("player", Required = Required.Always)]
-        public PlayerName Player { get; set; }
-    }
-
-    public partial class AddCardToHand
-    {
-        [JsonProperty("card", Required = Required.Always)]
-        public Guid Card { get; set; }
-
-        [JsonProperty("player", Required = Required.Always)]
-        public PlayerName Player { get; set; }
-    }
-
-    public partial class AddCardToVoid
-    {
-        [JsonProperty("card", Required = Required.Always)]
-        public Guid Card { get; set; }
-
-        [JsonProperty("player", Required = Required.Always)]
-        public PlayerName Player { get; set; }
-    }
-
-    public partial class DrawCard
-    {
-        [JsonProperty("player", Required = Required.Always)]
-        public PlayerName Player { get; set; }
-    }
-
-    public partial class MoveHandToDeck
-    {
-        [JsonProperty("player", Required = Required.Always)]
-        public PlayerName Player { get; set; }
-    }
-
-    public partial class OpponentPlayCard
-    {
-        [JsonProperty("card", Required = Required.Always)]
-        public Guid Card { get; set; }
-    }
-
-    public partial class SetCardsRemainingInDeck
-    {
-        [JsonProperty("cards", Required = Required.Always)]
-        public long Cards { get; set; }
-
-        [JsonProperty("player", Required = Required.Always)]
-        public PlayerName Player { get; set; }
-    }
-
-    public partial class SetEnergy
-    {
-        [JsonProperty("energy", Required = Required.Always)]
-        public long Energy { get; set; }
-
-        [JsonProperty("player", Required = Required.Always)]
-        public PlayerName Player { get; set; }
-    }
-
-    public partial class SetNextDreamwellCard
-    {
-        [JsonProperty("base_card_id", Required = Required.Always)]
-        public Guid BaseCardId { get; set; }
-    }
-
-    public partial class SetPoints
-    {
-        [JsonProperty("player", Required = Required.Always)]
-        public PlayerName Player { get; set; }
-
-        [JsonProperty("points", Required = Required.Always)]
-        public long Points { get; set; }
-    }
-
-    public partial class SetProducedEnergy
-    {
-        [JsonProperty("energy", Required = Required.Always)]
-        public long Energy { get; set; }
-
-        [JsonProperty("player", Required = Required.Always)]
-        public PlayerName Player { get; set; }
-    }
-
-    public partial class SetSparkBonus
-    {
-        [JsonProperty("player", Required = Required.Always)]
-        public PlayerName Player { get; set; }
-
-        [JsonProperty("spark", Required = Required.Always)]
-        public long Spark { get; set; }
-    }
-
-    public partial class DeckCardSelectedOrder
-    {
-        [JsonProperty("card_id", Required = Required.Always)]
-        public long CardId { get; set; }
-
-        [JsonProperty("target", Required = Required.Always)]
-        public CardOrderSelectionTarget Target { get; set; }
-    }
-
-    public partial class CardOrderSelectionTargetClass
-    {
-        [JsonProperty("Deck", Required = Required.Always)]
-        public long Deck { get; set; }
-    }
-
-    /// <summary>
-    /// Sets the selected amount of energy to pay as an additional cost to play
-    /// a card.
-    ///
-    /// Opens a panel based on its address.
-    /// </summary>
-    public partial class BattleDisplayActionClass
-    {
-        [JsonProperty("BrowseCards", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public CardBrowserType? BrowseCards { get; set; }
-
-        [JsonProperty("SetSelectedEnergyAdditionalCost", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public long? SetSelectedEnergyAdditionalCost { get; set; }
-
-        [JsonProperty("OpenPanel", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public PanelAddress? OpenPanel { get; set; }
-    }
-
-    public partial class PanelAddressClass
-    {
-        [JsonProperty("ViewLogs", Required = Required.AllowNull)]
-        public string ViewLogs { get; set; }
-    }
-
-    public partial class DebugActionClass
-    {
-        [JsonProperty("ApplyTestScenarioAction", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public string ApplyTestScenarioAction { get; set; }
-
-        [JsonProperty("RestartBattleWithDecks", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public RestartBattleWithDecks RestartBattleWithDecks { get; set; }
-
-        [JsonProperty("SetOpponentAgent", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public GameAi? SetOpponentAgent { get; set; }
-
-        [JsonProperty("ApplyActionList", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public List<DebugBattleAction> ApplyActionList { get; set; }
-
-        [JsonProperty("CloseCurrentPanelApplyAction", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public DebugBattleAction? CloseCurrentPanelApplyAction { get; set; }
-
-        [JsonProperty("PerformOpponentAction", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public BattleAction? PerformOpponentAction { get; set; }
-    }
-
-    public partial class RestartBattleWithDecks
-    {
-        [JsonProperty("one", Required = Required.Always)]
-        public TestDeckName One { get; set; }
-
-        [JsonProperty("two", Required = Required.Always)]
-        public TestDeckName Two { get; set; }
     }
 
     /// <summary>
@@ -1302,554 +1871,6 @@ namespace Dreamtides.Schema
         /// </summary>
         [JsonProperty("total_spark")]
         public long? TotalSpark { get; set; }
-    }
-
-    public partial class DraggableNode
-    {
-        [JsonProperty("custom_drag_indicator")]
-        public FlexNode CustomDragIndicator { get; set; }
-
-        [JsonProperty("drop_target_identifiers", Required = Required.Always)]
-        public List<string> DropTargetIdentifiers { get; set; }
-
-        [JsonProperty("hide_indicator_children", Required = Required.Always)]
-        public List<string> HideIndicatorChildren { get; set; }
-
-        [JsonProperty("horizontal_drag_start_distance")]
-        public long? HorizontalDragStartDistance { get; set; }
-
-        [JsonProperty("on_drag_detected")]
-        public ActionUnion? OnDragDetected { get; set; }
-
-        [JsonProperty("on_drop")]
-        public ActionUnion? OnDrop { get; set; }
-
-        [JsonProperty("over_target_indicator")]
-        public FlexNode OverTargetIndicator { get; set; }
-
-        [JsonProperty("remove_original")]
-        public bool? RemoveOriginal { get; set; }
-    }
-
-    public partial class NodeType
-    {
-        [JsonProperty("Text", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public TextNode Text { get; set; }
-
-        [JsonProperty("ScrollViewNode", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public ScrollViewNode ScrollViewNode { get; set; }
-
-        [JsonProperty("DraggableNode", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public DraggableNode DraggableNode { get; set; }
-
-        [JsonProperty("TextFieldNode", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public TextFieldNode TextFieldNode { get; set; }
-
-        [JsonProperty("SliderNode", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public SliderNode SliderNode { get; set; }
-    }
-
-    public partial class FlexNode
-    {
-        [JsonProperty("children", Required = Required.Always)]
-        public List<FlexNode> Children { get; set; }
-
-        [JsonProperty("event_handlers")]
-        public EventHandlers EventHandlers { get; set; }
-
-        [JsonProperty("hover_style")]
-        public FlexStyle HoverStyle { get; set; }
-
-        [JsonProperty("name")]
-        public string Name { get; set; }
-
-        [JsonProperty("node_type")]
-        public NodeType NodeType { get; set; }
-
-        /// <summary>
-        /// Style to apply to the element when it is first attached to a panel.
-        /// </summary>
-        [JsonProperty("on_attach_style")]
-        public FlexStyle OnAttachStyle { get; set; }
-
-        /// <summary>
-        /// How long to keep the `on_attach_style` applied.
-        ///
-        /// If not specified, the style will be applied indefinitely.
-        /// </summary>
-        [JsonProperty("on_attach_style_duration")]
-        public Milliseconds OnAttachStyleDuration { get; set; }
-
-        [JsonProperty("pressed_style")]
-        public FlexStyle PressedStyle { get; set; }
-
-        [JsonProperty("style")]
-        public FlexStyle Style { get; set; }
-    }
-
-    public partial class ScrollViewNode
-    {
-        [JsonProperty("elasticity")]
-        public double? Elasticity { get; set; }
-
-        [JsonProperty("horizontal_page_size")]
-        public double? HorizontalPageSize { get; set; }
-
-        [JsonProperty("horizontal_scroll_bar")]
-        public ScrollBar HorizontalScrollBar { get; set; }
-
-        [JsonProperty("horizontal_scroll_bar_visibility")]
-        public ScrollBarVisibility? HorizontalScrollBarVisibility { get; set; }
-
-        [JsonProperty("mouse_wheel_scroll_size")]
-        public double? MouseWheelScrollSize { get; set; }
-
-        [JsonProperty("scroll_deceleration_rate")]
-        public double? ScrollDecelerationRate { get; set; }
-
-        [JsonProperty("touch_scroll_behavior")]
-        public TouchScrollBehavior? TouchScrollBehavior { get; set; }
-
-        [JsonProperty("vertical_page_size")]
-        public double? VerticalPageSize { get; set; }
-
-        [JsonProperty("vertical_scroll_bar")]
-        public ScrollBar VerticalScrollBar { get; set; }
-
-        [JsonProperty("vertical_scroll_bar_visibility")]
-        public ScrollBarVisibility? VerticalScrollBarVisibility { get; set; }
-    }
-
-    public partial class ScrollBar
-    {
-        [JsonProperty("style")]
-        public FlexStyle Style { get; set; }
-    }
-
-    public partial class FlexStyle
-    {
-        [JsonProperty("align_content")]
-        public FlexAlign? AlignContent { get; set; }
-
-        [JsonProperty("align_items")]
-        public FlexAlign? AlignItems { get; set; }
-
-        [JsonProperty("align_self")]
-        public FlexAlign? AlignSelf { get; set; }
-
-        [JsonProperty("background_color")]
-        public DisplayColor BackgroundColor { get; set; }
-
-        [JsonProperty("background_image")]
-        public SpriteAddress BackgroundImage { get; set; }
-
-        [JsonProperty("background_image_tint_color")]
-        public DisplayColor BackgroundImageTintColor { get; set; }
-
-        [JsonProperty("border_color")]
-        public BorderColor BorderColor { get; set; }
-
-        [JsonProperty("border_radius")]
-        public BorderRadius BorderRadius { get; set; }
-
-        [JsonProperty("border_width")]
-        public BorderWidth BorderWidth { get; set; }
-
-        [JsonProperty("color")]
-        public DisplayColor Color { get; set; }
-
-        [JsonProperty("display")]
-        public FlexDisplayStyle? Display { get; set; }
-
-        [JsonProperty("flex_basis")]
-        public Dimension FlexBasis { get; set; }
-
-        [JsonProperty("flex_direction")]
-        public FlexDirection? FlexDirection { get; set; }
-
-        [JsonProperty("flex_grow")]
-        public double? FlexGrow { get; set; }
-
-        [JsonProperty("flex_shrink")]
-        public double? FlexShrink { get; set; }
-
-        [JsonProperty("font")]
-        public FontAddress Font { get; set; }
-
-        [JsonProperty("font_size")]
-        public Dimension FontSize { get; set; }
-
-        [JsonProperty("font_style")]
-        public FontStyle? FontStyle { get; set; }
-
-        [JsonProperty("height")]
-        public Dimension Height { get; set; }
-
-        [JsonProperty("image_slice")]
-        public ImageSlice ImageSlice { get; set; }
-
-        [JsonProperty("inset")]
-        public FlexInsets Inset { get; set; }
-
-        [JsonProperty("justify_content")]
-        public FlexJustify? JustifyContent { get; set; }
-
-        [JsonProperty("letter_spacing")]
-        public Dimension LetterSpacing { get; set; }
-
-        [JsonProperty("margin")]
-        public DimensionGroup Margin { get; set; }
-
-        [JsonProperty("max_height")]
-        public Dimension MaxHeight { get; set; }
-
-        [JsonProperty("max_width")]
-        public Dimension MaxWidth { get; set; }
-
-        [JsonProperty("min_height")]
-        public Dimension MinHeight { get; set; }
-
-        [JsonProperty("min_width")]
-        public Dimension MinWidth { get; set; }
-
-        [JsonProperty("opacity")]
-        public double? Opacity { get; set; }
-
-        [JsonProperty("overflow")]
-        public FlexVisibility? Overflow { get; set; }
-
-        [JsonProperty("overflow_clip_box")]
-        public OverflowClipBox? OverflowClipBox { get; set; }
-
-        [JsonProperty("padding")]
-        public DimensionGroup Padding { get; set; }
-
-        [JsonProperty("paragraph_spacing")]
-        public Dimension ParagraphSpacing { get; set; }
-
-        [JsonProperty("picking_mode")]
-        public FlexPickingMode? PickingMode { get; set; }
-
-        [JsonProperty("position")]
-        public FlexPosition? Position { get; set; }
-
-        [JsonProperty("rotate")]
-        public FlexRotate Rotate { get; set; }
-
-        [JsonProperty("scale")]
-        public FlexScale Scale { get; set; }
-
-        [JsonProperty("text_align")]
-        public TextAlign? TextAlign { get; set; }
-
-        [JsonProperty("text_outline_color")]
-        public DisplayColor TextOutlineColor { get; set; }
-
-        [JsonProperty("text_outline_width")]
-        public double? TextOutlineWidth { get; set; }
-
-        [JsonProperty("text_overflow")]
-        public TextOverflow? TextOverflow { get; set; }
-
-        [JsonProperty("text_overflow_position")]
-        public TextOverflowPosition? TextOverflowPosition { get; set; }
-
-        [JsonProperty("text_shadow")]
-        public TextShadow TextShadow { get; set; }
-
-        [JsonProperty("transform_origin")]
-        public FlexTranslate TransformOrigin { get; set; }
-
-        [JsonProperty("transition_delays", Required = Required.Always)]
-        public List<Milliseconds> TransitionDelays { get; set; }
-
-        [JsonProperty("transition_durations", Required = Required.Always)]
-        public List<Milliseconds> TransitionDurations { get; set; }
-
-        [JsonProperty("transition_easing_modes", Required = Required.Always)]
-        public List<EasingMode> TransitionEasingModes { get; set; }
-
-        [JsonProperty("transition_properties", Required = Required.Always)]
-        public List<string> TransitionProperties { get; set; }
-
-        [JsonProperty("translate")]
-        public FlexTranslate Translate { get; set; }
-
-        [JsonProperty("visibility")]
-        public FlexVisibility? Visibility { get; set; }
-
-        [JsonProperty("white_space")]
-        public WhiteSpace? WhiteSpace { get; set; }
-
-        [JsonProperty("width")]
-        public Dimension Width { get; set; }
-
-        [JsonProperty("word_spacing")]
-        public Dimension WordSpacing { get; set; }
-
-        [JsonProperty("wrap")]
-        public FlexWrap? Wrap { get; set; }
-    }
-
-    public partial class SpriteAddress
-    {
-        [JsonProperty("sprite", Required = Required.Always)]
-        public string Sprite { get; set; }
-    }
-
-    public partial class BorderColor
-    {
-        [JsonProperty("bottom", Required = Required.Always)]
-        public DisplayColor Bottom { get; set; }
-
-        [JsonProperty("left", Required = Required.Always)]
-        public DisplayColor Left { get; set; }
-
-        [JsonProperty("right", Required = Required.Always)]
-        public DisplayColor Right { get; set; }
-
-        [JsonProperty("top", Required = Required.Always)]
-        public DisplayColor Top { get; set; }
-    }
-
-    public partial class BorderRadius
-    {
-        [JsonProperty("bottom_left", Required = Required.Always)]
-        public Dimension BottomLeft { get; set; }
-
-        [JsonProperty("bottom_right", Required = Required.Always)]
-        public Dimension BottomRight { get; set; }
-
-        [JsonProperty("top_left", Required = Required.Always)]
-        public Dimension TopLeft { get; set; }
-
-        [JsonProperty("top_right", Required = Required.Always)]
-        public Dimension TopRight { get; set; }
-    }
-
-    public partial class Dimension
-    {
-        [JsonProperty("unit", Required = Required.Always)]
-        public DimensionUnit Unit { get; set; }
-
-        [JsonProperty("value", Required = Required.Always)]
-        public double Value { get; set; }
-    }
-
-    public partial class BorderWidth
-    {
-        [JsonProperty("bottom", Required = Required.Always)]
-        public double Bottom { get; set; }
-
-        [JsonProperty("left", Required = Required.Always)]
-        public double Left { get; set; }
-
-        [JsonProperty("right", Required = Required.Always)]
-        public double Right { get; set; }
-
-        [JsonProperty("top", Required = Required.Always)]
-        public double Top { get; set; }
-    }
-
-    public partial class FontAddress
-    {
-        [JsonProperty("font", Required = Required.Always)]
-        public string Font { get; set; }
-    }
-
-    public partial class ImageSlice
-    {
-        [JsonProperty("bottom", Required = Required.Always)]
-        public long Bottom { get; set; }
-
-        [JsonProperty("left", Required = Required.Always)]
-        public long Left { get; set; }
-
-        [JsonProperty("right", Required = Required.Always)]
-        public long Right { get; set; }
-
-        [JsonProperty("top", Required = Required.Always)]
-        public long Top { get; set; }
-    }
-
-    public partial class FlexInsets
-    {
-        [JsonProperty("bottom")]
-        public Dimension Bottom { get; set; }
-
-        [JsonProperty("left")]
-        public Dimension Left { get; set; }
-
-        [JsonProperty("right")]
-        public Dimension Right { get; set; }
-
-        [JsonProperty("top")]
-        public Dimension Top { get; set; }
-    }
-
-    public partial class DimensionGroup
-    {
-        [JsonProperty("bottom", Required = Required.Always)]
-        public Dimension Bottom { get; set; }
-
-        [JsonProperty("left", Required = Required.Always)]
-        public Dimension Left { get; set; }
-
-        [JsonProperty("right", Required = Required.Always)]
-        public Dimension Right { get; set; }
-
-        [JsonProperty("top", Required = Required.Always)]
-        public Dimension Top { get; set; }
-    }
-
-    public partial class FlexRotate
-    {
-        [JsonProperty("degrees", Required = Required.Always)]
-        public double Degrees { get; set; }
-    }
-
-    public partial class FlexScale
-    {
-        [JsonProperty("amount", Required = Required.Always)]
-        public FlexVector3 Amount { get; set; }
-    }
-
-    public partial class TextShadow
-    {
-        [JsonProperty("blur_radius", Required = Required.Always)]
-        public double BlurRadius { get; set; }
-
-        [JsonProperty("color", Required = Required.Always)]
-        public DisplayColor Color { get; set; }
-
-        [JsonProperty("offset", Required = Required.Always)]
-        public FlexVector2 Offset { get; set; }
-    }
-
-    public partial class FlexVector2
-    {
-        [JsonProperty("x", Required = Required.Always)]
-        public double X { get; set; }
-
-        [JsonProperty("y", Required = Required.Always)]
-        public double Y { get; set; }
-    }
-
-    public partial class FlexTranslate
-    {
-        [JsonProperty("x", Required = Required.Always)]
-        public Dimension X { get; set; }
-
-        [JsonProperty("y", Required = Required.Always)]
-        public Dimension Y { get; set; }
-
-        [JsonProperty("z", Required = Required.Always)]
-        public double Z { get; set; }
-    }
-
-    public partial class SliderNode
-    {
-        [JsonProperty("direction")]
-        public SliderDirection? Direction { get; set; }
-
-        [JsonProperty("drag_container_style")]
-        public FlexStyle DragContainerStyle { get; set; }
-
-        [JsonProperty("dragger_border_style")]
-        public FlexStyle DraggerBorderStyle { get; set; }
-
-        [JsonProperty("dragger_style")]
-        public FlexStyle DraggerStyle { get; set; }
-
-        [JsonProperty("high_value")]
-        public double? HighValue { get; set; }
-
-        [JsonProperty("initial_value")]
-        public double? InitialValue { get; set; }
-
-        [JsonProperty("inverted")]
-        public bool? Inverted { get; set; }
-
-        [JsonProperty("label")]
-        public string Label { get; set; }
-
-        [JsonProperty("label_style")]
-        public FlexStyle LabelStyle { get; set; }
-
-        [JsonProperty("low_value")]
-        public double? LowValue { get; set; }
-
-        [JsonProperty("page_size")]
-        public double? PageSize { get; set; }
-
-        [JsonProperty("preference_key")]
-        public string PreferenceKey { get; set; }
-
-        [JsonProperty("show_input_field")]
-        public bool? ShowInputField { get; set; }
-
-        [JsonProperty("tracker_style")]
-        public FlexStyle TrackerStyle { get; set; }
-    }
-
-    public partial class TextNode
-    {
-        [JsonProperty("label", Required = Required.Always)]
-        public string Label { get; set; }
-    }
-
-    public partial class TextFieldNode
-    {
-        [JsonProperty("double_click_selects_word")]
-        public bool? DoubleClickSelectsWord { get; set; }
-
-        [JsonProperty("global_identifier")]
-        public string GlobalIdentifier { get; set; }
-
-        [JsonProperty("initial_text")]
-        public string InitialText { get; set; }
-
-        [JsonProperty("is_password_field")]
-        public bool? IsPasswordField { get; set; }
-
-        [JsonProperty("is_read_only")]
-        public bool? IsReadOnly { get; set; }
-
-        [JsonProperty("mask_character")]
-        public string MaskCharacter { get; set; }
-
-        [JsonProperty("max_length")]
-        public long? MaxLength { get; set; }
-
-        [JsonProperty("multiline")]
-        public bool? Multiline { get; set; }
-
-        [JsonProperty("triple_click_selects_line")]
-        public bool? TripleClickSelectsLine { get; set; }
-    }
-
-    public partial class EventHandlers
-    {
-        [JsonProperty("on_click")]
-        public ActionUnion? OnClick { get; set; }
-
-        [JsonProperty("on_field_changed")]
-        public ActionUnion? OnFieldChanged { get; set; }
-
-        [JsonProperty("on_long_press")]
-        public ActionUnion? OnLongPress { get; set; }
-
-        [JsonProperty("on_mouse_down")]
-        public ActionUnion? OnMouseDown { get; set; }
-
-        [JsonProperty("on_mouse_enter")]
-        public ActionUnion? OnMouseEnter { get; set; }
-
-        [JsonProperty("on_mouse_leave")]
-        public ActionUnion? OnMouseLeave { get; set; }
-
-        [JsonProperty("on_mouse_up")]
-        public ActionUnion? OnMouseUp { get; set; }
     }
 
     /// <summary>
@@ -1938,6 +1959,27 @@ namespace Dreamtides.Schema
         public AudioClipAddress Sound { get; set; }
     }
 
+    public partial class PlayMecanimAnimationCommand
+    {
+        [JsonProperty("animation", Required = Required.Always)]
+        public StudioAnimation Animation { get; set; }
+
+        [JsonProperty("enter_animation")]
+        public StudioAnimation EnterAnimation { get; set; }
+
+        [JsonProperty("exit_animation")]
+        public StudioAnimation ExitAnimation { get; set; }
+
+        [JsonProperty("site_id", Required = Required.Always)]
+        public Guid SiteId { get; set; }
+    }
+
+    public partial class StudioAnimation
+    {
+        [JsonProperty("name", Required = Required.Always)]
+        public string Name { get; set; }
+    }
+
     public partial class PlayStudioAnimationCommand
     {
         [JsonProperty("animation", Required = Required.Always)]
@@ -1951,12 +1993,6 @@ namespace Dreamtides.Schema
 
         [JsonProperty("studio_type", Required = Required.Always)]
         public StudioType StudioType { get; set; }
-    }
-
-    public partial class StudioAnimation
-    {
-        [JsonProperty("name", Required = Required.Always)]
-        public string Name { get; set; }
     }
 
     public partial class SetCardTrailCommand
@@ -2201,7 +2237,7 @@ namespace Dreamtides.Schema
         /// button will appear disabled.
         /// </summary>
         [JsonProperty("action")]
-        public ActionUnion? Action { get; set; }
+        public OnClickUnion? Action { get; set; }
 
         [JsonProperty("label", Required = Required.Always)]
         public string Label { get; set; }
@@ -2215,7 +2251,7 @@ namespace Dreamtides.Schema
         /// If None is provided, no close button should be shown.
         /// </summary>
         [JsonProperty("close_button")]
-        public ActionUnion? CloseButton { get; set; }
+        public OnClickUnion? CloseButton { get; set; }
     }
 
     public partial class CardOrderSelectorView
@@ -2394,76 +2430,6 @@ namespace Dreamtides.Schema
 
     public enum GameAiEnum { AlwaysPanic, FirstAvailableAction, RandomAction, WaitFiveSeconds };
 
-    /// <summary>
-    /// Represents a player within the context of the display layer.
-    ///
-    /// The "viewer" is always the player operating the game client, this may
-    /// correspond to either of the actual players in the game.
-    ///
-    /// The player to display the judgment animation for.
-    ///
-    /// The player to display the dreamwell activation for.
-    /// </summary>
-    public enum DisplayPlayer { Enemy, User };
-
-    public enum GameMessageType { Defeat, EnemyTurn, Victory, YourTurn };
-
-    /// <summary>
-    /// Object position used in interface elements like the deck viewer which
-    /// don't rely on game positioning.
-    ///
-    /// Object is not visible.
-    ///
-    /// Position for cards to be shown to the user immediately after they're
-    /// drawn.
-    ///
-    /// Object is being displayed in a card browser, e.g. to select from a list
-    /// of cards while searching
-    ///
-    /// Object is in a temporary holding space for cards in hand while resolving
-    /// some other 'play card' ability.
-    ///
-    /// Object is in a position to display itself as part of a dreamwell
-    /// activation.
-    ///
-    /// Object describes a game modifier or ongoing game effect
-    ///
-    /// Object is in the on-screen storage area, used to hold objects at a small
-    /// size when they're not being focused on, e.g. when the user hides a
-    /// card browser to get a better view of the battlefield.
-    ///
-    /// User deck displayed in the quest view
-    ///
-    /// Object is being displayed as a potential draft pick choice
-    ///
-    /// Object is being displayed in the shop interface
-    /// </summary>
-    public enum PositionEnum { Browser, Default, DraftPickDisplay, Drawn, DreamwellActivation, GameModifier, HandStorage, Offscreen, OnScreenStorage, QuestDeck, ShopDisplay };
-
-    /// <summary>
-    /// Auto-generated discriminant enum variants
-    /// </summary>
-    public enum CardOrderSelectionTargetDiscriminants { Deck, Void };
-
-    public enum StackType { Default, TargetingBothBattlefields, TargetingEnemyBattlefield, TargetingUserBattlefield };
-
-    /// <summary>
-    /// Animation to perform when moving cards
-    /// </summary>
-    public enum MoveCardsCustomAnimation { HideShopLayout, MoveToQuestDeckOrDestroy, ShowAtDrawnCardsPosition, ShowInDraftPickLayout, ShowInShopLayout };
-
-    /// <summary>
-    /// Face up/face down state for this card
-    ///
-    /// Whether a card is face-down or face-up
-    /// </summary>
-    public enum CardFacing { FaceDown, FaceUp };
-
-    /// <summary>
-    /// Represents the general category of card being displayed.
-    /// </summary>
-    public enum CardPrefab { Character, Dreamsign, Dreamwell, Enemy, Event, IconCard, Identity, Token };
-
     public enum GameActionEnum { NoOp };
 
     /// <summary>
@@ -2548,6 +2514,76 @@ namespace Dreamtides.Schema
 
     public enum SliderDirection { Horizontal, Vertical };
 
+    /// <summary>
+    /// Represents a player within the context of the display layer.
+    ///
+    /// The "viewer" is always the player operating the game client, this may
+    /// correspond to either of the actual players in the game.
+    ///
+    /// The player to display the judgment animation for.
+    ///
+    /// The player to display the dreamwell activation for.
+    /// </summary>
+    public enum DisplayPlayer { Enemy, User };
+
+    public enum GameMessageType { Defeat, EnemyTurn, Victory, YourTurn };
+
+    /// <summary>
+    /// Object position used in interface elements like the deck viewer which
+    /// don't rely on game positioning.
+    ///
+    /// Object is not visible.
+    ///
+    /// Position for cards to be shown to the user immediately after they're
+    /// drawn.
+    ///
+    /// Object is being displayed in a card browser, e.g. to select from a list
+    /// of cards while searching
+    ///
+    /// Object is in a temporary holding space for cards in hand while resolving
+    /// some other 'play card' ability.
+    ///
+    /// Object is in a position to display itself as part of a dreamwell
+    /// activation.
+    ///
+    /// Object describes a game modifier or ongoing game effect
+    ///
+    /// Object is in the on-screen storage area, used to hold objects at a small
+    /// size when they're not being focused on, e.g. when the user hides a
+    /// card browser to get a better view of the battlefield.
+    ///
+    /// User deck displayed in the quest view
+    ///
+    /// Object is being displayed as a potential draft pick choice
+    ///
+    /// Object is being displayed in the shop interface
+    /// </summary>
+    public enum PositionEnum { Browser, Default, DraftPickDisplay, Drawn, DreamwellActivation, GameModifier, HandStorage, Offscreen, OnScreenStorage, QuestDeck, ShopDisplay };
+
+    /// <summary>
+    /// Auto-generated discriminant enum variants
+    /// </summary>
+    public enum CardOrderSelectionTargetDiscriminants { Deck, Void };
+
+    public enum StackType { Default, TargetingBothBattlefields, TargetingEnemyBattlefield, TargetingUserBattlefield };
+
+    /// <summary>
+    /// Animation to perform when moving cards
+    /// </summary>
+    public enum MoveCardsCustomAnimation { HideShopLayout, MoveToQuestDeckOrDestroy, ShowAtDrawnCardsPosition, ShowInDraftPickLayout, ShowInShopLayout };
+
+    /// <summary>
+    /// Face up/face down state for this card
+    ///
+    /// Whether a card is face-down or face-up
+    /// </summary>
+    public enum CardFacing { FaceDown, FaceUp };
+
+    /// <summary>
+    /// Represents the general category of card being displayed.
+    /// </summary>
+    public enum CardPrefab { Character, Dreamsign, Dreamwell, Enemy, Event, IconCard, Identity, Token };
+
     public enum StudioType { EnemyIdentityCard, EnemyStatus, UserIdentityCard, UserStatus };
 
     public enum ArrowStyle { Blue, Green, Red };
@@ -2578,22 +2614,6 @@ namespace Dreamtides.Schema
 
         public static implicit operator GameAi(GameAiEnum Enum) => new GameAi { Enum = Enum };
         public static implicit operator GameAi(GameAiClass GameAiClass) => new GameAi { GameAiClass = GameAiClass };
-    }
-
-    /// <summary>
-    /// Position category
-    ///
-    /// Possible types of display positions
-    ///
-    /// Destination position to move the cards to
-    /// </summary>
-    public partial struct Position
-    {
-        public PositionEnum? Enum;
-        public PositionClass PositionClass;
-
-        public static implicit operator Position(PositionEnum Enum) => new Position { Enum = Enum };
-        public static implicit operator Position(PositionClass PositionClass) => new Position { PositionClass = PositionClass };
     }
 
     public partial struct DebugBattleAction
@@ -2659,14 +2679,30 @@ namespace Dreamtides.Schema
         public static implicit operator DebugAction(DebugActionEnum Enum) => new DebugAction { Enum = Enum };
     }
 
-    public partial struct ActionUnion
+    public partial struct OnClickUnion
     {
-        public ActionClass ActionClass;
         public GameActionEnum? Enum;
+        public OnClickClass OnClickClass;
 
-        public static implicit operator ActionUnion(ActionClass ActionClass) => new ActionUnion { ActionClass = ActionClass };
-        public static implicit operator ActionUnion(GameActionEnum Enum) => new ActionUnion { Enum = Enum };
-        public bool IsNull => ActionClass == null && Enum == null;
+        public static implicit operator OnClickUnion(GameActionEnum Enum) => new OnClickUnion { Enum = Enum };
+        public static implicit operator OnClickUnion(OnClickClass OnClickClass) => new OnClickUnion { OnClickClass = OnClickClass };
+        public bool IsNull => OnClickClass == null && Enum == null;
+    }
+
+    /// <summary>
+    /// Position category
+    ///
+    /// Possible types of display positions
+    ///
+    /// Destination position to move the cards to
+    /// </summary>
+    public partial struct Position
+    {
+        public PositionEnum? Enum;
+        public PositionClass PositionClass;
+
+        public static implicit operator Position(PositionEnum Enum) => new Position { Enum = Enum };
+        public static implicit operator Position(PositionClass PositionClass) => new Position { PositionClass = PositionClass };
     }
 
     /// <summary>
@@ -2718,16 +2754,7 @@ namespace Dreamtides.Schema
                 DreamwellCardIdListConverter.Singleton,
                 GameAiConverter.Singleton,
                 GameAiEnumConverter.Singleton,
-                DisplayPlayerConverter.Singleton,
-                GameMessageTypeConverter.Singleton,
-                PositionConverter.Singleton,
-                CardOrderSelectionTargetDiscriminantsConverter.Singleton,
-                StackTypeConverter.Singleton,
-                PositionEnumConverter.Singleton,
-                MoveCardsCustomAnimationConverter.Singleton,
-                CardFacingConverter.Singleton,
-                CardPrefabConverter.Singleton,
-                ActionUnionConverter.Singleton,
+                OnClickUnionConverter.Singleton,
                 BattleActionConverter.Singleton,
                 DebugBattleActionConverter.Singleton,
                 PlayerNameConverter.Singleton,
@@ -2762,6 +2789,15 @@ namespace Dreamtides.Schema
                 ScrollBarVisibilityConverter.Singleton,
                 TouchScrollBehaviorConverter.Singleton,
                 SliderDirectionConverter.Singleton,
+                DisplayPlayerConverter.Singleton,
+                GameMessageTypeConverter.Singleton,
+                PositionConverter.Singleton,
+                CardOrderSelectionTargetDiscriminantsConverter.Singleton,
+                StackTypeConverter.Singleton,
+                PositionEnumConverter.Singleton,
+                MoveCardsCustomAnimationConverter.Singleton,
+                CardFacingConverter.Singleton,
+                CardPrefabConverter.Singleton,
                 StudioTypeConverter.Singleton,
                 ArrowStyleConverter.Singleton,
                 DisplayedTurnIndicatorConverter.Singleton,
@@ -3101,569 +3137,34 @@ namespace Dreamtides.Schema
         public static readonly GameAiEnumConverter Singleton = new GameAiEnumConverter();
     }
 
-    internal class DisplayPlayerConverter : JsonConverter
+    internal class OnClickUnionConverter : JsonConverter
     {
-        public override bool CanConvert(Type t) => t == typeof(DisplayPlayer) || t == typeof(DisplayPlayer?);
-
-        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
-        {
-            if (reader.TokenType == JsonToken.Null) return null;
-            var value = serializer.Deserialize<string>(reader);
-            switch (value)
-            {
-                case "Enemy":
-                    return DisplayPlayer.Enemy;
-                case "User":
-                    return DisplayPlayer.User;
-            }
-            throw new Exception("Cannot unmarshal type DisplayPlayer");
-        }
-
-        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
-        {
-            if (untypedValue == null)
-            {
-                serializer.Serialize(writer, null);
-                return;
-            }
-            var value = (DisplayPlayer)untypedValue;
-            switch (value)
-            {
-                case DisplayPlayer.Enemy:
-                    serializer.Serialize(writer, "Enemy");
-                    return;
-                case DisplayPlayer.User:
-                    serializer.Serialize(writer, "User");
-                    return;
-            }
-            throw new Exception("Cannot marshal type DisplayPlayer");
-        }
-
-        public static readonly DisplayPlayerConverter Singleton = new DisplayPlayerConverter();
-    }
-
-    internal class GameMessageTypeConverter : JsonConverter
-    {
-        public override bool CanConvert(Type t) => t == typeof(GameMessageType) || t == typeof(GameMessageType?);
-
-        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
-        {
-            if (reader.TokenType == JsonToken.Null) return null;
-            var value = serializer.Deserialize<string>(reader);
-            switch (value)
-            {
-                case "Defeat":
-                    return GameMessageType.Defeat;
-                case "EnemyTurn":
-                    return GameMessageType.EnemyTurn;
-                case "Victory":
-                    return GameMessageType.Victory;
-                case "YourTurn":
-                    return GameMessageType.YourTurn;
-            }
-            throw new Exception("Cannot unmarshal type GameMessageType");
-        }
-
-        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
-        {
-            if (untypedValue == null)
-            {
-                serializer.Serialize(writer, null);
-                return;
-            }
-            var value = (GameMessageType)untypedValue;
-            switch (value)
-            {
-                case GameMessageType.Defeat:
-                    serializer.Serialize(writer, "Defeat");
-                    return;
-                case GameMessageType.EnemyTurn:
-                    serializer.Serialize(writer, "EnemyTurn");
-                    return;
-                case GameMessageType.Victory:
-                    serializer.Serialize(writer, "Victory");
-                    return;
-                case GameMessageType.YourTurn:
-                    serializer.Serialize(writer, "YourTurn");
-                    return;
-            }
-            throw new Exception("Cannot marshal type GameMessageType");
-        }
-
-        public static readonly GameMessageTypeConverter Singleton = new GameMessageTypeConverter();
-    }
-
-    internal class PositionConverter : JsonConverter
-    {
-        public override bool CanConvert(Type t) => t == typeof(Position) || t == typeof(Position?);
-
-        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
-        {
-            switch (reader.TokenType)
-            {
-                case JsonToken.String:
-                case JsonToken.Date:
-                    var stringValue = serializer.Deserialize<string>(reader);
-                    switch (stringValue)
-                    {
-                        case "Browser":
-                            return new Position { Enum = PositionEnum.Browser };
-                        case "Default":
-                            return new Position { Enum = PositionEnum.Default };
-                        case "DraftPickDisplay":
-                            return new Position { Enum = PositionEnum.DraftPickDisplay };
-                        case "Drawn":
-                            return new Position { Enum = PositionEnum.Drawn };
-                        case "DreamwellActivation":
-                            return new Position { Enum = PositionEnum.DreamwellActivation };
-                        case "GameModifier":
-                            return new Position { Enum = PositionEnum.GameModifier };
-                        case "HandStorage":
-                            return new Position { Enum = PositionEnum.HandStorage };
-                        case "Offscreen":
-                            return new Position { Enum = PositionEnum.Offscreen };
-                        case "OnScreenStorage":
-                            return new Position { Enum = PositionEnum.OnScreenStorage };
-                        case "QuestDeck":
-                            return new Position { Enum = PositionEnum.QuestDeck };
-                        case "ShopDisplay":
-                            return new Position { Enum = PositionEnum.ShopDisplay };
-                    }
-                    break;
-                case JsonToken.StartObject:
-                    var objectValue = serializer.Deserialize<PositionClass>(reader);
-                    return new Position { PositionClass = objectValue };
-            }
-            throw new Exception("Cannot unmarshal type Position");
-        }
-
-        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
-        {
-            var value = (Position)untypedValue;
-            if (value.Enum != null)
-            {
-                switch (value.Enum)
-                {
-                    case PositionEnum.Browser:
-                        serializer.Serialize(writer, "Browser");
-                        return;
-                    case PositionEnum.Default:
-                        serializer.Serialize(writer, "Default");
-                        return;
-                    case PositionEnum.DraftPickDisplay:
-                        serializer.Serialize(writer, "DraftPickDisplay");
-                        return;
-                    case PositionEnum.Drawn:
-                        serializer.Serialize(writer, "Drawn");
-                        return;
-                    case PositionEnum.DreamwellActivation:
-                        serializer.Serialize(writer, "DreamwellActivation");
-                        return;
-                    case PositionEnum.GameModifier:
-                        serializer.Serialize(writer, "GameModifier");
-                        return;
-                    case PositionEnum.HandStorage:
-                        serializer.Serialize(writer, "HandStorage");
-                        return;
-                    case PositionEnum.Offscreen:
-                        serializer.Serialize(writer, "Offscreen");
-                        return;
-                    case PositionEnum.OnScreenStorage:
-                        serializer.Serialize(writer, "OnScreenStorage");
-                        return;
-                    case PositionEnum.QuestDeck:
-                        serializer.Serialize(writer, "QuestDeck");
-                        return;
-                    case PositionEnum.ShopDisplay:
-                        serializer.Serialize(writer, "ShopDisplay");
-                        return;
-                }
-            }
-            if (value.PositionClass != null)
-            {
-                serializer.Serialize(writer, value.PositionClass);
-                return;
-            }
-            throw new Exception("Cannot marshal type Position");
-        }
-
-        public static readonly PositionConverter Singleton = new PositionConverter();
-    }
-
-    internal class CardOrderSelectionTargetDiscriminantsConverter : JsonConverter
-    {
-        public override bool CanConvert(Type t) => t == typeof(CardOrderSelectionTargetDiscriminants) || t == typeof(CardOrderSelectionTargetDiscriminants?);
-
-        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
-        {
-            if (reader.TokenType == JsonToken.Null) return null;
-            var value = serializer.Deserialize<string>(reader);
-            switch (value)
-            {
-                case "Deck":
-                    return CardOrderSelectionTargetDiscriminants.Deck;
-                case "Void":
-                    return CardOrderSelectionTargetDiscriminants.Void;
-            }
-            throw new Exception("Cannot unmarshal type CardOrderSelectionTargetDiscriminants");
-        }
-
-        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
-        {
-            if (untypedValue == null)
-            {
-                serializer.Serialize(writer, null);
-                return;
-            }
-            var value = (CardOrderSelectionTargetDiscriminants)untypedValue;
-            switch (value)
-            {
-                case CardOrderSelectionTargetDiscriminants.Deck:
-                    serializer.Serialize(writer, "Deck");
-                    return;
-                case CardOrderSelectionTargetDiscriminants.Void:
-                    serializer.Serialize(writer, "Void");
-                    return;
-            }
-            throw new Exception("Cannot marshal type CardOrderSelectionTargetDiscriminants");
-        }
-
-        public static readonly CardOrderSelectionTargetDiscriminantsConverter Singleton = new CardOrderSelectionTargetDiscriminantsConverter();
-    }
-
-    internal class StackTypeConverter : JsonConverter
-    {
-        public override bool CanConvert(Type t) => t == typeof(StackType) || t == typeof(StackType?);
-
-        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
-        {
-            if (reader.TokenType == JsonToken.Null) return null;
-            var value = serializer.Deserialize<string>(reader);
-            switch (value)
-            {
-                case "Default":
-                    return StackType.Default;
-                case "TargetingBothBattlefields":
-                    return StackType.TargetingBothBattlefields;
-                case "TargetingEnemyBattlefield":
-                    return StackType.TargetingEnemyBattlefield;
-                case "TargetingUserBattlefield":
-                    return StackType.TargetingUserBattlefield;
-            }
-            throw new Exception("Cannot unmarshal type StackType");
-        }
-
-        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
-        {
-            if (untypedValue == null)
-            {
-                serializer.Serialize(writer, null);
-                return;
-            }
-            var value = (StackType)untypedValue;
-            switch (value)
-            {
-                case StackType.Default:
-                    serializer.Serialize(writer, "Default");
-                    return;
-                case StackType.TargetingBothBattlefields:
-                    serializer.Serialize(writer, "TargetingBothBattlefields");
-                    return;
-                case StackType.TargetingEnemyBattlefield:
-                    serializer.Serialize(writer, "TargetingEnemyBattlefield");
-                    return;
-                case StackType.TargetingUserBattlefield:
-                    serializer.Serialize(writer, "TargetingUserBattlefield");
-                    return;
-            }
-            throw new Exception("Cannot marshal type StackType");
-        }
-
-        public static readonly StackTypeConverter Singleton = new StackTypeConverter();
-    }
-
-    internal class PositionEnumConverter : JsonConverter
-    {
-        public override bool CanConvert(Type t) => t == typeof(PositionEnum) || t == typeof(PositionEnum?);
-
-        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
-        {
-            if (reader.TokenType == JsonToken.Null) return null;
-            var value = serializer.Deserialize<string>(reader);
-            switch (value)
-            {
-                case "Browser":
-                    return PositionEnum.Browser;
-                case "Default":
-                    return PositionEnum.Default;
-                case "DraftPickDisplay":
-                    return PositionEnum.DraftPickDisplay;
-                case "Drawn":
-                    return PositionEnum.Drawn;
-                case "DreamwellActivation":
-                    return PositionEnum.DreamwellActivation;
-                case "GameModifier":
-                    return PositionEnum.GameModifier;
-                case "HandStorage":
-                    return PositionEnum.HandStorage;
-                case "Offscreen":
-                    return PositionEnum.Offscreen;
-                case "OnScreenStorage":
-                    return PositionEnum.OnScreenStorage;
-                case "QuestDeck":
-                    return PositionEnum.QuestDeck;
-                case "ShopDisplay":
-                    return PositionEnum.ShopDisplay;
-            }
-            throw new Exception("Cannot unmarshal type PositionEnum");
-        }
-
-        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
-        {
-            if (untypedValue == null)
-            {
-                serializer.Serialize(writer, null);
-                return;
-            }
-            var value = (PositionEnum)untypedValue;
-            switch (value)
-            {
-                case PositionEnum.Browser:
-                    serializer.Serialize(writer, "Browser");
-                    return;
-                case PositionEnum.Default:
-                    serializer.Serialize(writer, "Default");
-                    return;
-                case PositionEnum.DraftPickDisplay:
-                    serializer.Serialize(writer, "DraftPickDisplay");
-                    return;
-                case PositionEnum.Drawn:
-                    serializer.Serialize(writer, "Drawn");
-                    return;
-                case PositionEnum.DreamwellActivation:
-                    serializer.Serialize(writer, "DreamwellActivation");
-                    return;
-                case PositionEnum.GameModifier:
-                    serializer.Serialize(writer, "GameModifier");
-                    return;
-                case PositionEnum.HandStorage:
-                    serializer.Serialize(writer, "HandStorage");
-                    return;
-                case PositionEnum.Offscreen:
-                    serializer.Serialize(writer, "Offscreen");
-                    return;
-                case PositionEnum.OnScreenStorage:
-                    serializer.Serialize(writer, "OnScreenStorage");
-                    return;
-                case PositionEnum.QuestDeck:
-                    serializer.Serialize(writer, "QuestDeck");
-                    return;
-                case PositionEnum.ShopDisplay:
-                    serializer.Serialize(writer, "ShopDisplay");
-                    return;
-            }
-            throw new Exception("Cannot marshal type PositionEnum");
-        }
-
-        public static readonly PositionEnumConverter Singleton = new PositionEnumConverter();
-    }
-
-    internal class MoveCardsCustomAnimationConverter : JsonConverter
-    {
-        public override bool CanConvert(Type t) => t == typeof(MoveCardsCustomAnimation) || t == typeof(MoveCardsCustomAnimation?);
-
-        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
-        {
-            if (reader.TokenType == JsonToken.Null) return null;
-            var value = serializer.Deserialize<string>(reader);
-            switch (value)
-            {
-                case "HideShopLayout":
-                    return MoveCardsCustomAnimation.HideShopLayout;
-                case "MoveToQuestDeckOrDestroy":
-                    return MoveCardsCustomAnimation.MoveToQuestDeckOrDestroy;
-                case "ShowAtDrawnCardsPosition":
-                    return MoveCardsCustomAnimation.ShowAtDrawnCardsPosition;
-                case "ShowInDraftPickLayout":
-                    return MoveCardsCustomAnimation.ShowInDraftPickLayout;
-                case "ShowInShopLayout":
-                    return MoveCardsCustomAnimation.ShowInShopLayout;
-            }
-            throw new Exception("Cannot unmarshal type MoveCardsCustomAnimation");
-        }
-
-        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
-        {
-            if (untypedValue == null)
-            {
-                serializer.Serialize(writer, null);
-                return;
-            }
-            var value = (MoveCardsCustomAnimation)untypedValue;
-            switch (value)
-            {
-                case MoveCardsCustomAnimation.HideShopLayout:
-                    serializer.Serialize(writer, "HideShopLayout");
-                    return;
-                case MoveCardsCustomAnimation.MoveToQuestDeckOrDestroy:
-                    serializer.Serialize(writer, "MoveToQuestDeckOrDestroy");
-                    return;
-                case MoveCardsCustomAnimation.ShowAtDrawnCardsPosition:
-                    serializer.Serialize(writer, "ShowAtDrawnCardsPosition");
-                    return;
-                case MoveCardsCustomAnimation.ShowInDraftPickLayout:
-                    serializer.Serialize(writer, "ShowInDraftPickLayout");
-                    return;
-                case MoveCardsCustomAnimation.ShowInShopLayout:
-                    serializer.Serialize(writer, "ShowInShopLayout");
-                    return;
-            }
-            throw new Exception("Cannot marshal type MoveCardsCustomAnimation");
-        }
-
-        public static readonly MoveCardsCustomAnimationConverter Singleton = new MoveCardsCustomAnimationConverter();
-    }
-
-    internal class CardFacingConverter : JsonConverter
-    {
-        public override bool CanConvert(Type t) => t == typeof(CardFacing) || t == typeof(CardFacing?);
-
-        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
-        {
-            if (reader.TokenType == JsonToken.Null) return null;
-            var value = serializer.Deserialize<string>(reader);
-            switch (value)
-            {
-                case "FaceDown":
-                    return CardFacing.FaceDown;
-                case "FaceUp":
-                    return CardFacing.FaceUp;
-            }
-            throw new Exception("Cannot unmarshal type CardFacing");
-        }
-
-        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
-        {
-            if (untypedValue == null)
-            {
-                serializer.Serialize(writer, null);
-                return;
-            }
-            var value = (CardFacing)untypedValue;
-            switch (value)
-            {
-                case CardFacing.FaceDown:
-                    serializer.Serialize(writer, "FaceDown");
-                    return;
-                case CardFacing.FaceUp:
-                    serializer.Serialize(writer, "FaceUp");
-                    return;
-            }
-            throw new Exception("Cannot marshal type CardFacing");
-        }
-
-        public static readonly CardFacingConverter Singleton = new CardFacingConverter();
-    }
-
-    internal class CardPrefabConverter : JsonConverter
-    {
-        public override bool CanConvert(Type t) => t == typeof(CardPrefab) || t == typeof(CardPrefab?);
-
-        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
-        {
-            if (reader.TokenType == JsonToken.Null) return null;
-            var value = serializer.Deserialize<string>(reader);
-            switch (value)
-            {
-                case "Character":
-                    return CardPrefab.Character;
-                case "Dreamsign":
-                    return CardPrefab.Dreamsign;
-                case "Dreamwell":
-                    return CardPrefab.Dreamwell;
-                case "Enemy":
-                    return CardPrefab.Enemy;
-                case "Event":
-                    return CardPrefab.Event;
-                case "IconCard":
-                    return CardPrefab.IconCard;
-                case "Identity":
-                    return CardPrefab.Identity;
-                case "Token":
-                    return CardPrefab.Token;
-            }
-            throw new Exception("Cannot unmarshal type CardPrefab");
-        }
-
-        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
-        {
-            if (untypedValue == null)
-            {
-                serializer.Serialize(writer, null);
-                return;
-            }
-            var value = (CardPrefab)untypedValue;
-            switch (value)
-            {
-                case CardPrefab.Character:
-                    serializer.Serialize(writer, "Character");
-                    return;
-                case CardPrefab.Dreamsign:
-                    serializer.Serialize(writer, "Dreamsign");
-                    return;
-                case CardPrefab.Dreamwell:
-                    serializer.Serialize(writer, "Dreamwell");
-                    return;
-                case CardPrefab.Enemy:
-                    serializer.Serialize(writer, "Enemy");
-                    return;
-                case CardPrefab.Event:
-                    serializer.Serialize(writer, "Event");
-                    return;
-                case CardPrefab.IconCard:
-                    serializer.Serialize(writer, "IconCard");
-                    return;
-                case CardPrefab.Identity:
-                    serializer.Serialize(writer, "Identity");
-                    return;
-                case CardPrefab.Token:
-                    serializer.Serialize(writer, "Token");
-                    return;
-            }
-            throw new Exception("Cannot marshal type CardPrefab");
-        }
-
-        public static readonly CardPrefabConverter Singleton = new CardPrefabConverter();
-    }
-
-    internal class ActionUnionConverter : JsonConverter
-    {
-        public override bool CanConvert(Type t) => t == typeof(ActionUnion) || t == typeof(ActionUnion?);
+        public override bool CanConvert(Type t) => t == typeof(OnClickUnion) || t == typeof(OnClickUnion?);
 
         public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
         {
             switch (reader.TokenType)
             {
                 case JsonToken.Null:
-                    return new ActionUnion { };
+                    return new OnClickUnion { };
                 case JsonToken.String:
                 case JsonToken.Date:
                     var stringValue = serializer.Deserialize<string>(reader);
                     if (stringValue == "NoOp")
                     {
-                        return new ActionUnion { Enum = GameActionEnum.NoOp };
+                        return new OnClickUnion { Enum = GameActionEnum.NoOp };
                     }
                     break;
                 case JsonToken.StartObject:
-                    var objectValue = serializer.Deserialize<ActionClass>(reader);
-                    return new ActionUnion { ActionClass = objectValue };
+                    var objectValue = serializer.Deserialize<OnClickClass>(reader);
+                    return new OnClickUnion { OnClickClass = objectValue };
             }
-            throw new Exception("Cannot unmarshal type ActionUnion");
+            throw new Exception("Cannot unmarshal type OnClickUnion");
         }
 
         public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
         {
-            var value = (ActionUnion)untypedValue;
+            var value = (OnClickUnion)untypedValue;
             if (value.IsNull)
             {
                 serializer.Serialize(writer, null);
@@ -3677,15 +3178,15 @@ namespace Dreamtides.Schema
                     return;
                 }
             }
-            if (value.ActionClass != null)
+            if (value.OnClickClass != null)
             {
-                serializer.Serialize(writer, value.ActionClass);
+                serializer.Serialize(writer, value.OnClickClass);
                 return;
             }
-            throw new Exception("Cannot marshal type ActionUnion");
+            throw new Exception("Cannot marshal type OnClickUnion");
         }
 
-        public static readonly ActionUnionConverter Singleton = new ActionUnionConverter();
+        public static readonly OnClickUnionConverter Singleton = new OnClickUnionConverter();
     }
 
     internal class BattleActionConverter : JsonConverter
@@ -5451,6 +4952,541 @@ namespace Dreamtides.Schema
         }
 
         public static readonly SliderDirectionConverter Singleton = new SliderDirectionConverter();
+    }
+
+    internal class DisplayPlayerConverter : JsonConverter
+    {
+        public override bool CanConvert(Type t) => t == typeof(DisplayPlayer) || t == typeof(DisplayPlayer?);
+
+        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
+        {
+            if (reader.TokenType == JsonToken.Null) return null;
+            var value = serializer.Deserialize<string>(reader);
+            switch (value)
+            {
+                case "Enemy":
+                    return DisplayPlayer.Enemy;
+                case "User":
+                    return DisplayPlayer.User;
+            }
+            throw new Exception("Cannot unmarshal type DisplayPlayer");
+        }
+
+        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
+        {
+            if (untypedValue == null)
+            {
+                serializer.Serialize(writer, null);
+                return;
+            }
+            var value = (DisplayPlayer)untypedValue;
+            switch (value)
+            {
+                case DisplayPlayer.Enemy:
+                    serializer.Serialize(writer, "Enemy");
+                    return;
+                case DisplayPlayer.User:
+                    serializer.Serialize(writer, "User");
+                    return;
+            }
+            throw new Exception("Cannot marshal type DisplayPlayer");
+        }
+
+        public static readonly DisplayPlayerConverter Singleton = new DisplayPlayerConverter();
+    }
+
+    internal class GameMessageTypeConverter : JsonConverter
+    {
+        public override bool CanConvert(Type t) => t == typeof(GameMessageType) || t == typeof(GameMessageType?);
+
+        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
+        {
+            if (reader.TokenType == JsonToken.Null) return null;
+            var value = serializer.Deserialize<string>(reader);
+            switch (value)
+            {
+                case "Defeat":
+                    return GameMessageType.Defeat;
+                case "EnemyTurn":
+                    return GameMessageType.EnemyTurn;
+                case "Victory":
+                    return GameMessageType.Victory;
+                case "YourTurn":
+                    return GameMessageType.YourTurn;
+            }
+            throw new Exception("Cannot unmarshal type GameMessageType");
+        }
+
+        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
+        {
+            if (untypedValue == null)
+            {
+                serializer.Serialize(writer, null);
+                return;
+            }
+            var value = (GameMessageType)untypedValue;
+            switch (value)
+            {
+                case GameMessageType.Defeat:
+                    serializer.Serialize(writer, "Defeat");
+                    return;
+                case GameMessageType.EnemyTurn:
+                    serializer.Serialize(writer, "EnemyTurn");
+                    return;
+                case GameMessageType.Victory:
+                    serializer.Serialize(writer, "Victory");
+                    return;
+                case GameMessageType.YourTurn:
+                    serializer.Serialize(writer, "YourTurn");
+                    return;
+            }
+            throw new Exception("Cannot marshal type GameMessageType");
+        }
+
+        public static readonly GameMessageTypeConverter Singleton = new GameMessageTypeConverter();
+    }
+
+    internal class PositionConverter : JsonConverter
+    {
+        public override bool CanConvert(Type t) => t == typeof(Position) || t == typeof(Position?);
+
+        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
+        {
+            switch (reader.TokenType)
+            {
+                case JsonToken.String:
+                case JsonToken.Date:
+                    var stringValue = serializer.Deserialize<string>(reader);
+                    switch (stringValue)
+                    {
+                        case "Browser":
+                            return new Position { Enum = PositionEnum.Browser };
+                        case "Default":
+                            return new Position { Enum = PositionEnum.Default };
+                        case "DraftPickDisplay":
+                            return new Position { Enum = PositionEnum.DraftPickDisplay };
+                        case "Drawn":
+                            return new Position { Enum = PositionEnum.Drawn };
+                        case "DreamwellActivation":
+                            return new Position { Enum = PositionEnum.DreamwellActivation };
+                        case "GameModifier":
+                            return new Position { Enum = PositionEnum.GameModifier };
+                        case "HandStorage":
+                            return new Position { Enum = PositionEnum.HandStorage };
+                        case "Offscreen":
+                            return new Position { Enum = PositionEnum.Offscreen };
+                        case "OnScreenStorage":
+                            return new Position { Enum = PositionEnum.OnScreenStorage };
+                        case "QuestDeck":
+                            return new Position { Enum = PositionEnum.QuestDeck };
+                        case "ShopDisplay":
+                            return new Position { Enum = PositionEnum.ShopDisplay };
+                    }
+                    break;
+                case JsonToken.StartObject:
+                    var objectValue = serializer.Deserialize<PositionClass>(reader);
+                    return new Position { PositionClass = objectValue };
+            }
+            throw new Exception("Cannot unmarshal type Position");
+        }
+
+        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
+        {
+            var value = (Position)untypedValue;
+            if (value.Enum != null)
+            {
+                switch (value.Enum)
+                {
+                    case PositionEnum.Browser:
+                        serializer.Serialize(writer, "Browser");
+                        return;
+                    case PositionEnum.Default:
+                        serializer.Serialize(writer, "Default");
+                        return;
+                    case PositionEnum.DraftPickDisplay:
+                        serializer.Serialize(writer, "DraftPickDisplay");
+                        return;
+                    case PositionEnum.Drawn:
+                        serializer.Serialize(writer, "Drawn");
+                        return;
+                    case PositionEnum.DreamwellActivation:
+                        serializer.Serialize(writer, "DreamwellActivation");
+                        return;
+                    case PositionEnum.GameModifier:
+                        serializer.Serialize(writer, "GameModifier");
+                        return;
+                    case PositionEnum.HandStorage:
+                        serializer.Serialize(writer, "HandStorage");
+                        return;
+                    case PositionEnum.Offscreen:
+                        serializer.Serialize(writer, "Offscreen");
+                        return;
+                    case PositionEnum.OnScreenStorage:
+                        serializer.Serialize(writer, "OnScreenStorage");
+                        return;
+                    case PositionEnum.QuestDeck:
+                        serializer.Serialize(writer, "QuestDeck");
+                        return;
+                    case PositionEnum.ShopDisplay:
+                        serializer.Serialize(writer, "ShopDisplay");
+                        return;
+                }
+            }
+            if (value.PositionClass != null)
+            {
+                serializer.Serialize(writer, value.PositionClass);
+                return;
+            }
+            throw new Exception("Cannot marshal type Position");
+        }
+
+        public static readonly PositionConverter Singleton = new PositionConverter();
+    }
+
+    internal class CardOrderSelectionTargetDiscriminantsConverter : JsonConverter
+    {
+        public override bool CanConvert(Type t) => t == typeof(CardOrderSelectionTargetDiscriminants) || t == typeof(CardOrderSelectionTargetDiscriminants?);
+
+        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
+        {
+            if (reader.TokenType == JsonToken.Null) return null;
+            var value = serializer.Deserialize<string>(reader);
+            switch (value)
+            {
+                case "Deck":
+                    return CardOrderSelectionTargetDiscriminants.Deck;
+                case "Void":
+                    return CardOrderSelectionTargetDiscriminants.Void;
+            }
+            throw new Exception("Cannot unmarshal type CardOrderSelectionTargetDiscriminants");
+        }
+
+        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
+        {
+            if (untypedValue == null)
+            {
+                serializer.Serialize(writer, null);
+                return;
+            }
+            var value = (CardOrderSelectionTargetDiscriminants)untypedValue;
+            switch (value)
+            {
+                case CardOrderSelectionTargetDiscriminants.Deck:
+                    serializer.Serialize(writer, "Deck");
+                    return;
+                case CardOrderSelectionTargetDiscriminants.Void:
+                    serializer.Serialize(writer, "Void");
+                    return;
+            }
+            throw new Exception("Cannot marshal type CardOrderSelectionTargetDiscriminants");
+        }
+
+        public static readonly CardOrderSelectionTargetDiscriminantsConverter Singleton = new CardOrderSelectionTargetDiscriminantsConverter();
+    }
+
+    internal class StackTypeConverter : JsonConverter
+    {
+        public override bool CanConvert(Type t) => t == typeof(StackType) || t == typeof(StackType?);
+
+        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
+        {
+            if (reader.TokenType == JsonToken.Null) return null;
+            var value = serializer.Deserialize<string>(reader);
+            switch (value)
+            {
+                case "Default":
+                    return StackType.Default;
+                case "TargetingBothBattlefields":
+                    return StackType.TargetingBothBattlefields;
+                case "TargetingEnemyBattlefield":
+                    return StackType.TargetingEnemyBattlefield;
+                case "TargetingUserBattlefield":
+                    return StackType.TargetingUserBattlefield;
+            }
+            throw new Exception("Cannot unmarshal type StackType");
+        }
+
+        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
+        {
+            if (untypedValue == null)
+            {
+                serializer.Serialize(writer, null);
+                return;
+            }
+            var value = (StackType)untypedValue;
+            switch (value)
+            {
+                case StackType.Default:
+                    serializer.Serialize(writer, "Default");
+                    return;
+                case StackType.TargetingBothBattlefields:
+                    serializer.Serialize(writer, "TargetingBothBattlefields");
+                    return;
+                case StackType.TargetingEnemyBattlefield:
+                    serializer.Serialize(writer, "TargetingEnemyBattlefield");
+                    return;
+                case StackType.TargetingUserBattlefield:
+                    serializer.Serialize(writer, "TargetingUserBattlefield");
+                    return;
+            }
+            throw new Exception("Cannot marshal type StackType");
+        }
+
+        public static readonly StackTypeConverter Singleton = new StackTypeConverter();
+    }
+
+    internal class PositionEnumConverter : JsonConverter
+    {
+        public override bool CanConvert(Type t) => t == typeof(PositionEnum) || t == typeof(PositionEnum?);
+
+        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
+        {
+            if (reader.TokenType == JsonToken.Null) return null;
+            var value = serializer.Deserialize<string>(reader);
+            switch (value)
+            {
+                case "Browser":
+                    return PositionEnum.Browser;
+                case "Default":
+                    return PositionEnum.Default;
+                case "DraftPickDisplay":
+                    return PositionEnum.DraftPickDisplay;
+                case "Drawn":
+                    return PositionEnum.Drawn;
+                case "DreamwellActivation":
+                    return PositionEnum.DreamwellActivation;
+                case "GameModifier":
+                    return PositionEnum.GameModifier;
+                case "HandStorage":
+                    return PositionEnum.HandStorage;
+                case "Offscreen":
+                    return PositionEnum.Offscreen;
+                case "OnScreenStorage":
+                    return PositionEnum.OnScreenStorage;
+                case "QuestDeck":
+                    return PositionEnum.QuestDeck;
+                case "ShopDisplay":
+                    return PositionEnum.ShopDisplay;
+            }
+            throw new Exception("Cannot unmarshal type PositionEnum");
+        }
+
+        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
+        {
+            if (untypedValue == null)
+            {
+                serializer.Serialize(writer, null);
+                return;
+            }
+            var value = (PositionEnum)untypedValue;
+            switch (value)
+            {
+                case PositionEnum.Browser:
+                    serializer.Serialize(writer, "Browser");
+                    return;
+                case PositionEnum.Default:
+                    serializer.Serialize(writer, "Default");
+                    return;
+                case PositionEnum.DraftPickDisplay:
+                    serializer.Serialize(writer, "DraftPickDisplay");
+                    return;
+                case PositionEnum.Drawn:
+                    serializer.Serialize(writer, "Drawn");
+                    return;
+                case PositionEnum.DreamwellActivation:
+                    serializer.Serialize(writer, "DreamwellActivation");
+                    return;
+                case PositionEnum.GameModifier:
+                    serializer.Serialize(writer, "GameModifier");
+                    return;
+                case PositionEnum.HandStorage:
+                    serializer.Serialize(writer, "HandStorage");
+                    return;
+                case PositionEnum.Offscreen:
+                    serializer.Serialize(writer, "Offscreen");
+                    return;
+                case PositionEnum.OnScreenStorage:
+                    serializer.Serialize(writer, "OnScreenStorage");
+                    return;
+                case PositionEnum.QuestDeck:
+                    serializer.Serialize(writer, "QuestDeck");
+                    return;
+                case PositionEnum.ShopDisplay:
+                    serializer.Serialize(writer, "ShopDisplay");
+                    return;
+            }
+            throw new Exception("Cannot marshal type PositionEnum");
+        }
+
+        public static readonly PositionEnumConverter Singleton = new PositionEnumConverter();
+    }
+
+    internal class MoveCardsCustomAnimationConverter : JsonConverter
+    {
+        public override bool CanConvert(Type t) => t == typeof(MoveCardsCustomAnimation) || t == typeof(MoveCardsCustomAnimation?);
+
+        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
+        {
+            if (reader.TokenType == JsonToken.Null) return null;
+            var value = serializer.Deserialize<string>(reader);
+            switch (value)
+            {
+                case "HideShopLayout":
+                    return MoveCardsCustomAnimation.HideShopLayout;
+                case "MoveToQuestDeckOrDestroy":
+                    return MoveCardsCustomAnimation.MoveToQuestDeckOrDestroy;
+                case "ShowAtDrawnCardsPosition":
+                    return MoveCardsCustomAnimation.ShowAtDrawnCardsPosition;
+                case "ShowInDraftPickLayout":
+                    return MoveCardsCustomAnimation.ShowInDraftPickLayout;
+                case "ShowInShopLayout":
+                    return MoveCardsCustomAnimation.ShowInShopLayout;
+            }
+            throw new Exception("Cannot unmarshal type MoveCardsCustomAnimation");
+        }
+
+        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
+        {
+            if (untypedValue == null)
+            {
+                serializer.Serialize(writer, null);
+                return;
+            }
+            var value = (MoveCardsCustomAnimation)untypedValue;
+            switch (value)
+            {
+                case MoveCardsCustomAnimation.HideShopLayout:
+                    serializer.Serialize(writer, "HideShopLayout");
+                    return;
+                case MoveCardsCustomAnimation.MoveToQuestDeckOrDestroy:
+                    serializer.Serialize(writer, "MoveToQuestDeckOrDestroy");
+                    return;
+                case MoveCardsCustomAnimation.ShowAtDrawnCardsPosition:
+                    serializer.Serialize(writer, "ShowAtDrawnCardsPosition");
+                    return;
+                case MoveCardsCustomAnimation.ShowInDraftPickLayout:
+                    serializer.Serialize(writer, "ShowInDraftPickLayout");
+                    return;
+                case MoveCardsCustomAnimation.ShowInShopLayout:
+                    serializer.Serialize(writer, "ShowInShopLayout");
+                    return;
+            }
+            throw new Exception("Cannot marshal type MoveCardsCustomAnimation");
+        }
+
+        public static readonly MoveCardsCustomAnimationConverter Singleton = new MoveCardsCustomAnimationConverter();
+    }
+
+    internal class CardFacingConverter : JsonConverter
+    {
+        public override bool CanConvert(Type t) => t == typeof(CardFacing) || t == typeof(CardFacing?);
+
+        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
+        {
+            if (reader.TokenType == JsonToken.Null) return null;
+            var value = serializer.Deserialize<string>(reader);
+            switch (value)
+            {
+                case "FaceDown":
+                    return CardFacing.FaceDown;
+                case "FaceUp":
+                    return CardFacing.FaceUp;
+            }
+            throw new Exception("Cannot unmarshal type CardFacing");
+        }
+
+        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
+        {
+            if (untypedValue == null)
+            {
+                serializer.Serialize(writer, null);
+                return;
+            }
+            var value = (CardFacing)untypedValue;
+            switch (value)
+            {
+                case CardFacing.FaceDown:
+                    serializer.Serialize(writer, "FaceDown");
+                    return;
+                case CardFacing.FaceUp:
+                    serializer.Serialize(writer, "FaceUp");
+                    return;
+            }
+            throw new Exception("Cannot marshal type CardFacing");
+        }
+
+        public static readonly CardFacingConverter Singleton = new CardFacingConverter();
+    }
+
+    internal class CardPrefabConverter : JsonConverter
+    {
+        public override bool CanConvert(Type t) => t == typeof(CardPrefab) || t == typeof(CardPrefab?);
+
+        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
+        {
+            if (reader.TokenType == JsonToken.Null) return null;
+            var value = serializer.Deserialize<string>(reader);
+            switch (value)
+            {
+                case "Character":
+                    return CardPrefab.Character;
+                case "Dreamsign":
+                    return CardPrefab.Dreamsign;
+                case "Dreamwell":
+                    return CardPrefab.Dreamwell;
+                case "Enemy":
+                    return CardPrefab.Enemy;
+                case "Event":
+                    return CardPrefab.Event;
+                case "IconCard":
+                    return CardPrefab.IconCard;
+                case "Identity":
+                    return CardPrefab.Identity;
+                case "Token":
+                    return CardPrefab.Token;
+            }
+            throw new Exception("Cannot unmarshal type CardPrefab");
+        }
+
+        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
+        {
+            if (untypedValue == null)
+            {
+                serializer.Serialize(writer, null);
+                return;
+            }
+            var value = (CardPrefab)untypedValue;
+            switch (value)
+            {
+                case CardPrefab.Character:
+                    serializer.Serialize(writer, "Character");
+                    return;
+                case CardPrefab.Dreamsign:
+                    serializer.Serialize(writer, "Dreamsign");
+                    return;
+                case CardPrefab.Dreamwell:
+                    serializer.Serialize(writer, "Dreamwell");
+                    return;
+                case CardPrefab.Enemy:
+                    serializer.Serialize(writer, "Enemy");
+                    return;
+                case CardPrefab.Event:
+                    serializer.Serialize(writer, "Event");
+                    return;
+                case CardPrefab.IconCard:
+                    serializer.Serialize(writer, "IconCard");
+                    return;
+                case CardPrefab.Identity:
+                    serializer.Serialize(writer, "Identity");
+                    return;
+                case CardPrefab.Token:
+                    serializer.Serialize(writer, "Token");
+                    return;
+            }
+            throw new Exception("Cannot marshal type CardPrefab");
+        }
+
+        public static readonly CardPrefabConverter Singleton = new CardPrefabConverter();
     }
 
     internal class StudioTypeConverter : JsonConverter

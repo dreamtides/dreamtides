@@ -5,6 +5,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Dreamtides.Buttons;
+using Dreamtides.Masonry;
 using Dreamtides.Prototype;
 using Dreamtides.Schema;
 using Dreamtides.Services;
@@ -581,8 +582,27 @@ public class PrototypeQuest : Service
       StaggerInterval = new Milliseconds { MillisecondsValue = 50 },
     };
 
+    StartCoroutine(
+      Registry.DreamscapeService.HandlePlayMecanimAnimation(
+        new PlayMecanimAnimationCommand
+        {
+          Animation = new StudioAnimation { Name = "IDL_HandsOnHips_Base_Loop" },
+          EnterAnimation = new StudioAnimation { Name = "IDL_HandsOnHips_Base_Enter" },
+          SiteId = Guid.NewGuid(),
+        }
+      )
+    );
+
     yield return StartCoroutine(
       Registry.CardAnimationService.HandleMoveCardsWithCustomAnimation(customAnimation)
+    );
+
+    Registry.DocumentService.RenderScreenAnchoredNode(
+      new AnchorToScreenPositionCommand()
+      {
+        Node = ShopMerchantDialog(),
+        Anchor = new ScreenAnchor { SiteCharacter = Guid.NewGuid() },
+      }
     );
 
     yield return StartCoroutine(
@@ -686,4 +706,27 @@ public class PrototypeQuest : Service
       Revealed = null,
       RevealedToOpponents = false,
     };
+
+  static FlexNode ShopMerchantDialog()
+  {
+    var style = new FlexStyle
+    {
+      BackgroundColor = Mason.MakeColor(Color.black, 0.9f),
+      BorderRadius = Mason.AllBordersRadiusDip(4),
+      Padding = Mason.AllPx(4),
+      Color = Mason.MakeColor(Color.white),
+      FontSize = Mason.Px(8),
+      Font = new FontAddress
+      {
+        Font = "Assets/ThirdParty/Fonts/Fira_Sans_Condensed/FiraSansCondensed-Regular.ttf",
+      },
+      TextAlign = TextAlign.MiddleCenter,
+      AlignItems = FlexAlign.Center,
+      JustifyContent = FlexJustify.Center,
+      WhiteSpace = WhiteSpace.Normal,
+      MaxWidth = Mason.Px(100),
+    };
+
+    return Mason.Text("Cooked up some good grub for ya, huh!", style);
+  }
 }
