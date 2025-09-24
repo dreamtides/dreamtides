@@ -2462,7 +2462,7 @@ namespace Dreamtides.Schema
     /// <summary>
     /// Represents the general category of card being displayed.
     /// </summary>
-    public enum CardPrefab { Character, Dreamsign, Dreamwell, Enemy, Event, Identity, Token };
+    public enum CardPrefab { Character, Dreamsign, Dreamwell, Enemy, Event, IconCard, Identity, Token };
 
     public enum GameActionEnum { NoOp };
 
@@ -3585,6 +3585,8 @@ namespace Dreamtides.Schema
                     return CardPrefab.Enemy;
                 case "Event":
                     return CardPrefab.Event;
+                case "IconCard":
+                    return CardPrefab.IconCard;
                 case "Identity":
                     return CardPrefab.Identity;
                 case "Token":
@@ -3617,6 +3619,9 @@ namespace Dreamtides.Schema
                     return;
                 case CardPrefab.Event:
                     serializer.Serialize(writer, "Event");
+                    return;
+                case CardPrefab.IconCard:
+                    serializer.Serialize(writer, "IconCard");
                     return;
                 case CardPrefab.Identity:
                     serializer.Serialize(writer, "Identity");

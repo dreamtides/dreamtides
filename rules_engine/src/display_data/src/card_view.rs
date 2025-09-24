@@ -183,4 +183,5 @@ pub enum CardPrefab {
     Dreamwell,
     Enemy,
     Dreamsign,
+    IconCard,
 }

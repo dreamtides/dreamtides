@@ -312,6 +312,16 @@ public class PrototypeQuest : Service
     _shopOverrides.Add(
       new CardOverride
       {
+        Index = 3,
+        Name = "\ufc51",
+        SpritePath = "",
+        Rules = "Reroll",
+        Prefab = CardPrefab.IconCard,
+      }
+    );
+    _shopOverrides.Add(
+      new CardOverride
+      {
         Index = 4,
         SpritePath = "Assets/ThirdParty/AngelinaAvgustova/WitchCraftIcons/PNG/hourglass.png",
         Prefab = CardPrefab.Dreamsign,

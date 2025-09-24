@@ -37,6 +37,9 @@ namespace Dreamtides.Services
     [SerializeField]
     Card _dreamsignPrefab = null!;
 
+    [SerializeField]
+    Card _iconCardPrefab = null!;
+
     Dictionary<string, Card> Cards { get; } = new();
 
     public Card GetCard(string id) => Errors.CheckNotNull(Cards[id]);
@@ -95,6 +98,7 @@ namespace Dreamtides.Services
             CardPrefab.Dreamsign => ComponentUtils.Instantiate(_dreamsignPrefab),
             CardPrefab.Event => ComponentUtils.Instantiate(_eventCardPrefab),
             CardPrefab.Identity => ComponentUtils.Instantiate(_identityCardPrefab),
+            CardPrefab.IconCard => ComponentUtils.Instantiate(_iconCardPrefab),
             _ => ComponentUtils.Instantiate(_cardPrefab),
           };
 
