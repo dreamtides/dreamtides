@@ -290,7 +290,7 @@ namespace Dreamtides.Schema
         public DisplayEnemyMessageCommand DisplayEnemyMessage { get; set; }
 
         [JsonProperty("PlayStudioAnimation", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public PlayMecanimAnimationCommand PlayStudioAnimation { get; set; }
+        public PlayStudioAnimationCommand PlayStudioAnimation { get; set; }
 
         [JsonProperty("SetCardTrail", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public SetCardTrailCommand SetCardTrail { get; set; }
@@ -1938,34 +1938,25 @@ namespace Dreamtides.Schema
         public AudioClipAddress Sound { get; set; }
     }
 
-    public partial class PlayMecanimAnimationCommand
+    public partial class PlayStudioAnimationCommand
     {
         [JsonProperty("animation", Required = Required.Always)]
         public StudioAnimation Animation { get; set; }
-
-        [JsonProperty("animation_target", Required = Required.Always)]
-        public MecanimAnimationTarget AnimationTarget { get; set; }
 
         [JsonProperty("enter_animation")]
         public StudioAnimation EnterAnimation { get; set; }
 
         [JsonProperty("exit_animation")]
         public StudioAnimation ExitAnimation { get; set; }
+
+        [JsonProperty("studio_type", Required = Required.Always)]
+        public StudioType StudioType { get; set; }
     }
 
     public partial class StudioAnimation
     {
         [JsonProperty("name", Required = Required.Always)]
         public string Name { get; set; }
-    }
-
-    public partial class MecanimAnimationTarget
-    {
-        [JsonProperty("SiteCharacter", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public Guid? SiteCharacter { get; set; }
-
-        [JsonProperty("Studio", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public StudioType? Studio { get; set; }
     }
 
     public partial class SetCardTrailCommand

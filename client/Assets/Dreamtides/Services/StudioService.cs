@@ -68,14 +68,9 @@ namespace Dreamtides.Services
       _activeSessions[type] = session;
     }
 
-    public void PlayStudioAnimation(PlayMecanimAnimationCommand command)
+    public void PlayStudioAnimation(PlayStudioAnimationCommand command)
     {
-      if (
-        _activeSessions.TryGetValue(
-          Errors.CheckNotNull(command.AnimationTarget.Studio),
-          out var session
-        )
-      )
+      if (_activeSessions.TryGetValue(command.StudioType, out var session))
       {
         if (session.AnimationSequence != null)
         {
@@ -97,7 +92,7 @@ namespace Dreamtides.Services
 
     private IEnumerator PlayAnimationSequence(
       CaptureSession session,
-      PlayMecanimAnimationCommand command
+      PlayStudioAnimationCommand command
     )
     {
       var animator = session.Subject.GetComponent<Animator>();

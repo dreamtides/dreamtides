@@ -203,7 +203,7 @@ namespace Dreamtides.Tests
       foreach (var displayable in Registry.Layout.DefaultStack.Objects)
       {
         var card = ComponentUtils.Get<Card>(displayable);
-        AssertIsOnscreen(Errors.CheckNotNull(card._costBackground), $"Energy Cost of {card.Id}");
+        AssertIsOnscreen(card._costBackground, $"Energy Cost of {card.Id}");
       }
 
       AssertPrimaryActionButtonIsVisible();
