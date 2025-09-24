@@ -65,7 +65,7 @@ namespace Dreamtides.Tests
         // With 5 cards in hand, all of them should be visible on screen. Beyond
         // this point we switch to scroll bars in some UI configurations.
         var card = ComponentUtils.Get<Card>(displayable);
-        AssertIsOnscreen(card._costBackground, $"Energy Cost of {card.Id}");
+        AssertIsOnscreen(Errors.CheckNotNull(card._costBackground), $"Energy Cost of {card.Id}");
       }
 
       yield return EndTest();

@@ -131,9 +131,9 @@ namespace Dreamtides.Components
         var randomIndex = Random.Range(0, _animations.Count);
         var animConfig = _animations[randomIndex];
 
-        var command = new PlayStudioAnimationCommand
+        var command = new PlayMecanimAnimationCommand
         {
-          StudioType = _studioType,
+          AnimationTarget = new MecanimAnimationTarget { Studio = _studioType },
           Animation = new StudioAnimation { Name = animConfig.MainAnimation },
         };
 
@@ -160,9 +160,9 @@ namespace Dreamtides.Components
           yield return new WaitForSeconds(animationDuration);
         }
 
-        var returnToBaseCommand = new PlayStudioAnimationCommand
+        var returnToBaseCommand = new PlayMecanimAnimationCommand
         {
-          StudioType = _studioType,
+          AnimationTarget = new MecanimAnimationTarget { Studio = _studioType },
           Animation = new StudioAnimation { Name = "IDL_Base" },
         };
         _studioService?.PlayStudioAnimation(returnToBaseCommand);

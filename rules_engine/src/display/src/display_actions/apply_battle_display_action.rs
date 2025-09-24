@@ -5,7 +5,9 @@ use core_data::identifiers::UserId;
 use core_data::numerics::Energy;
 use core_data::types::PlayerName;
 use display_data::battle_view::DisplayPlayer;
-use display_data::command::{Command, CommandSequence, PlayStudioAnimationCommand, StudioType};
+use display_data::command::{
+    Command, CommandSequence, MecanimAnimationTarget, PlayMecanimAnimationCommand, StudioType,
+};
 use display_data::object_position::Position;
 use state_provider::display_state_provider::DisplayStateProvider;
 
@@ -66,8 +68,8 @@ fn browse_cards(card_browser: CardBrowserType, builder: &mut ResponseBuilder) {
         CardBrowserType::UserVoid => Position::InVoid(DisplayPlayer::User),
         CardBrowserType::EnemyVoid => Position::InVoid(DisplayPlayer::Enemy),
         CardBrowserType::UserStatus => {
-            builder.push(Command::PlayStudioAnimation(PlayStudioAnimationCommand {
-                studio_type: StudioType::UserIdentityCard,
+            builder.push(Command::PlayStudioAnimation(PlayMecanimAnimationCommand {
+                animation_target: MecanimAnimationTarget::Studio(StudioType::UserIdentityCard),
                 enter_animation: Some(StudioAnimation::new("IDL_ArmsFolded_Casual_Enter")),
                 animation: StudioAnimation::new("IDL_ArmsFolded_Casual_Loop"),
                 exit_animation: Some(StudioAnimation::new("IDL_ArmsFolded_Casual_Exit")),
@@ -75,8 +77,8 @@ fn browse_cards(card_browser: CardBrowserType, builder: &mut ResponseBuilder) {
             Position::InPlayerStatus(DisplayPlayer::User)
         }
         CardBrowserType::EnemyStatus => {
-            builder.push(Command::PlayStudioAnimation(PlayStudioAnimationCommand {
-                studio_type: StudioType::EnemyIdentityCard,
+            builder.push(Command::PlayStudioAnimation(PlayMecanimAnimationCommand {
+                animation_target: MecanimAnimationTarget::Studio(StudioType::EnemyIdentityCard),
                 enter_animation: Some(StudioAnimation::new("IDL_ArmsFolded_Casual_Enter")),
                 animation: StudioAnimation::new("IDL_ArmsFolded_Casual_Loop"),
                 exit_animation: Some(StudioAnimation::new("IDL_ArmsFolded_Casual_Exit")),

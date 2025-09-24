@@ -4,6 +4,7 @@ use core_data::display_types::{
     AudioClipAddress, EffectAddress, MaterialAddress, Milliseconds, ProjectileAddress,
     StudioAnimation,
 };
+use core_data::identifiers::SiteId;
 use core_data::numerics::{Energy, Points};
 use masonry::flex_node::FlexNode;
 use masonry::flex_style::FlexVector3;
@@ -76,7 +77,7 @@ pub enum Command {
     DisplayJudgment(DisplayJudgmentCommand),
     DisplayDreamwellActivation(DisplayDreamwellActivationCommand),
     DisplayEnemyMessage(DisplayEnemyMessageCommand),
-    PlayStudioAnimation(PlayStudioAnimationCommand),
+    PlayStudioAnimation(PlayMecanimAnimationCommand),
     SetCardTrail(SetCardTrailCommand),
     ShuffleVoidIntoDeck(ShuffleVoidIntoDeckCommand),
     UpdateScreenOverlay(Box<UpdateScreenOverlayCommand>),
@@ -285,11 +286,17 @@ pub struct DisplayEnemyMessageCommand {
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
-pub struct PlayStudioAnimationCommand {
-    pub studio_type: StudioType,
+pub struct PlayMecanimAnimationCommand {
+    pub animation_target: MecanimAnimationTarget,
     pub enter_animation: Option<StudioAnimation>,
     pub animation: StudioAnimation,
     pub exit_animation: Option<StudioAnimation>,
+}
+
+#[derive(Copy, Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub enum MecanimAnimationTarget {
+    SiteCharacter(SiteId),
+    Studio(StudioType),
 }
 
 #[derive(Copy, Clone, Debug, Serialize, Deserialize, JsonSchema)]
