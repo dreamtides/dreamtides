@@ -2,6 +2,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using Codice.Client.Common.TreeGrouper;
 using Dreamtides.Layout;
 using Dreamtides.Masonry;
 using Dreamtides.Schema;
@@ -129,6 +130,12 @@ namespace Dreamtides.Services
 
     public void RenderScreenAnchoredNode(AnchorToScreenPositionCommand command)
     {
+      if (command.Node == null)
+      {
+        Reconcile(ref _screenAnchoredNode, new FlexNode());
+        return;
+      }
+
       var position = TransformPositionToElementPosition(_tmpPosition, Camera.main);
       var node = Mason.Row(
         "ScreenAnchorPosition",

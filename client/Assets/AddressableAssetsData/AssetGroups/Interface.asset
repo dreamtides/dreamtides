@@ -25,6 +25,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 96d9239c1823f47068e4ab24fb27f8fd
+    m_Address: Assets/ThirdParty/Fonts/Fira_Sans_Condensed/FiraSansCondensed-Regular.ttf
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: a8718c122ebb2894396b81ec9ba4fb4e
     m_Address: Assets/ThirdParty/Poneti/ClassicFantasyRPG_UI/ARTWORKS/UIelements/Buttons/Medium/Button_Gray.png
     m_ReadOnly: 0

@@ -36,6 +36,10 @@ namespace Dreamtides.Masonry
       {
         result = new NodeLabel();
       }
+      else if (node.NodeType?.TypewriterTextNode != null)
+      {
+        result = new NodeTypewriterText();
+      }
       else if (node.NodeType?.ScrollViewNode != null)
       {
         result = new NodeScrollView();
@@ -67,6 +71,14 @@ namespace Dreamtides.Masonry
       if (node.NodeType?.Text != null)
       {
         ApplyText((NodeLabel)element, node.NodeType.Text);
+      }
+      else if (node.NodeType?.TypewriterTextNode != null)
+      {
+        TypewriterText.Apply(
+          registry,
+          (NodeTypewriterText)element,
+          node.NodeType.TypewriterTextNode
+        );
       }
       else if (node.NodeType?.ScrollViewNode != null)
       {

@@ -133,6 +133,10 @@ public class PrototypeQuest : Service
       FocusMapCamera();
       Registry.DreamscapeService.HideShop();
       StartCoroutine(HideShopSequence());
+      Registry.DocumentService.RenderScreenAnchoredNode(
+        new AnchorToScreenPositionCommand() { Node = null }
+      );
+
       return;
     }
 
@@ -586,8 +590,10 @@ public class PrototypeQuest : Service
       Registry.DreamscapeService.HandlePlayMecanimAnimation(
         new PlayMecanimAnimationCommand
         {
-          Animation = new StudioAnimation { Name = "IDL_HandsOnHips_Base_Loop" },
-          EnterAnimation = new StudioAnimation { Name = "IDL_HandsOnHips_Base_Enter" },
+          Animation = new StudioAnimation { Name = "IDL_Wave_Small_Loop" },
+          EnterAnimation = new StudioAnimation { Name = "IDL_Wave_Small_Enter" },
+          ExitAnimation = new StudioAnimation { Name = "IDL_Wave_Small_Exit" },
+          ExitAfterLoops = 2,
           SiteId = Guid.NewGuid(),
         }
       )
@@ -720,13 +726,20 @@ public class PrototypeQuest : Service
       {
         Font = "Assets/ThirdParty/Fonts/Fira_Sans_Condensed/FiraSansCondensed-Regular.ttf",
       },
-      TextAlign = TextAlign.MiddleCenter,
+      TextAlign = TextAlign.MiddleLeft,
       AlignItems = FlexAlign.Center,
       JustifyContent = FlexJustify.Center,
       WhiteSpace = WhiteSpace.Normal,
       MaxWidth = Mason.Px(100),
     };
 
-    return Mason.Text("Cooked up some good grub for ya, huh!", style);
+    return Mason.TypewriterText(
+      "Cooked up some good grub for ya!",
+      style,
+      new AudioClipAddress
+      {
+        AudioClip = "Assets/ThirdParty/Cafofo/Fantasy Interface Sounds/UI Tight 01.wav",
+      }
+    );
   }
 }

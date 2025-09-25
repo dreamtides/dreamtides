@@ -1,5 +1,5 @@
 use action_data::game_action_data::GameAction;
-use core_data::display_types::Milliseconds;
+use core_data::display_types::{AudioClipAddress, Milliseconds};
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
@@ -119,8 +119,16 @@ pub struct TextNode {
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct TypewriterTextNode {
+    pub label: String,
+    pub character_delay: Milliseconds,
+    pub sound_effect: Option<AudioClipAddress>,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
 pub enum NodeType {
     Text(TextNode),
+    TypewriterTextNode(TypewriterTextNode),
     ScrollViewNode(Box<ScrollViewNode>),
     DraggableNode(DraggableNode),
     TextFieldNode(TextFieldNode),

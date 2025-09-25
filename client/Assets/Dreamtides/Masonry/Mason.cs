@@ -151,6 +151,25 @@ namespace Dreamtides.Masonry
         Style = style,
       };
 
+    public static FlexNode TypewriterText(
+      string label,
+      FlexStyle style,
+      AudioClipAddress? soundEffect = null
+    ) =>
+      new()
+      {
+        NodeType = new NodeType
+        {
+          TypewriterTextNode = new TypewriterTextNode
+          {
+            Label = label,
+            CharacterDelay = new Milliseconds { MillisecondsValue = 10 },
+            SoundEffect = soundEffect,
+          },
+        },
+        Style = style,
+      };
+
     public static FlexScale Scale(float amount) => Scale(amount, amount);
 
     public static FlexScale Scale(float x, float y) =>

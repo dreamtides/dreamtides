@@ -301,6 +301,9 @@ pub struct PlayMecanimAnimationCommand {
     pub enter_animation: Option<StudioAnimation>,
     pub animation: StudioAnimation,
     pub exit_animation: Option<StudioAnimation>,
+
+    /// Optionally, exit the animation after a certain number of loops.
+    pub exit_after_loops: Option<u32>,
 }
 
 #[derive(Copy, Clone, Debug, Serialize, Deserialize, JsonSchema)]

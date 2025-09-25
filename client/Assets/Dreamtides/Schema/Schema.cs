@@ -355,6 +355,9 @@ namespace Dreamtides.Schema
         [JsonProperty("Text", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public TextNode Text { get; set; }
 
+        [JsonProperty("TypewriterTextNode", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public TypewriterTextNode TypewriterTextNode { get; set; }
+
         [JsonProperty("ScrollViewNode", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public ScrollViewNode ScrollViewNode { get; set; }
 
@@ -1218,6 +1221,27 @@ namespace Dreamtides.Schema
         public bool? TripleClickSelectsLine { get; set; }
     }
 
+    public partial class TypewriterTextNode
+    {
+        [JsonProperty("character_delay", Required = Required.Always)]
+        public Milliseconds CharacterDelay { get; set; }
+
+        [JsonProperty("label", Required = Required.Always)]
+        public string Label { get; set; }
+
+        [JsonProperty("sound_effect")]
+        public AudioClipAddress SoundEffect { get; set; }
+    }
+
+    /// <summary>
+    /// Sound to play
+    /// </summary>
+    public partial class AudioClipAddress
+    {
+        [JsonProperty("audio_clip", Required = Required.Always)]
+        public string AudioClip { get; set; }
+    }
+
     public partial class EventHandlers
     {
         [JsonProperty("on_click")]
@@ -1318,15 +1342,6 @@ namespace Dreamtides.Schema
     {
         [JsonProperty("effect", Required = Required.Always)]
         public string Effect { get; set; }
-    }
-
-    /// <summary>
-    /// Sound to play
-    /// </summary>
-    public partial class AudioClipAddress
-    {
-        [JsonProperty("audio_clip", Required = Required.Always)]
-        public string AudioClip { get; set; }
     }
 
     /// <summary>
@@ -1966,6 +1981,12 @@ namespace Dreamtides.Schema
 
         [JsonProperty("enter_animation")]
         public StudioAnimation EnterAnimation { get; set; }
+
+        /// <summary>
+        /// Optionally, exit the animation after a certain number of loops.
+        /// </summary>
+        [JsonProperty("exit_after_loops")]
+        public long? ExitAfterLoops { get; set; }
 
         [JsonProperty("exit_animation")]
         public StudioAnimation ExitAnimation { get; set; }
