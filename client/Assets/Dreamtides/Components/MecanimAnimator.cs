@@ -22,23 +22,34 @@ namespace Dreamtides.Components
     {
       if (_currentPrimaryAnimation != null && _currentExitAnimation != null)
       {
-        _animator.CrossFadeInFixedTime(_currentExitAnimation.Name, DefaultBlendDuration);
-        // Use clip length directly because state info may still reference the previous state for a frame or two.
-        var exitAnimationLength = GetClipLength(_currentExitAnimation.Name);
-        // Wait the full clip length (the cross-fade itself overlaps with prior state).
-        yield return new WaitForSeconds(Mathf.Max(0f, exitAnimationLength));
+        string priorExitState = _currentExitAnimation.Name;
+        _animator.CrossFadeInFixedTime(priorExitState, DefaultBlendDuration);
+        yield return WaitForStateToBecomeActive(priorExitState, 0.5f);
+        var exitInfo = GetStateInfoIfActive(priorExitState);
+        if (exitInfo.HasValue)
+        {
+          // We already blended into this state; subtract blend so timing overlaps.
+          var wait = Mathf.Max(0f, exitInfo.Value.length - DefaultBlendDuration);
+          if (wait > 0f)
+          {
+            yield return new WaitForSeconds(wait);
+          }
+        }
       }
 
       if (command.EnterAnimation != null)
       {
-        _animator.CrossFadeInFixedTime(command.EnterAnimation.Name, DefaultBlendDuration);
-        var enterAnimationLength = GetClipLength(command.EnterAnimation.Name);
-        // We want to start the looping animation right as (or slightly before) the enter finishes.
-        // Subtract the blend duration so the tail of enter blends into loop start.
-        var wait = Mathf.Max(0f, enterAnimationLength - DefaultBlendDuration);
-        if (wait > 0f)
+        string enterState = command.EnterAnimation.Name;
+        _animator.CrossFadeInFixedTime(enterState, DefaultBlendDuration);
+        yield return WaitForStateToBecomeActive(enterState, 0.5f);
+        var enterInfo = GetStateInfoIfActive(enterState);
+        if (enterInfo.HasValue)
         {
-          yield return new WaitForSeconds(wait);
+          var wait = Mathf.Max(0f, enterInfo.Value.length - DefaultBlendDuration);
+          if (wait > 0f)
+          {
+            yield return new WaitForSeconds(wait);
+          }
         }
       }
 
@@ -73,9 +84,18 @@ namespace Dreamtides.Components
 
         if (command.ExitAnimation != null)
         {
-          _animator.CrossFadeInFixedTime(command.ExitAnimation.Name, DefaultBlendDuration);
-          var exitLength = GetClipLength(command.ExitAnimation.Name);
-          yield return new WaitForSeconds(Mathf.Max(0f, exitLength));
+          string exitState = command.ExitAnimation.Name;
+          _animator.CrossFadeInFixedTime(exitState, DefaultBlendDuration);
+          yield return WaitForStateToBecomeActive(exitState, 0.5f);
+          var eInfo = GetStateInfoIfActive(exitState);
+          if (eInfo.HasValue)
+          {
+            var wait = Mathf.Max(0f, eInfo.Value.length - DefaultBlendDuration);
+            if (wait > 0f)
+            {
+              yield return new WaitForSeconds(wait);
+            }
+          }
         }
 
         // Blend smoothly back to idle.
@@ -85,23 +105,43 @@ namespace Dreamtides.Components
       }
     }
 
-    float GetClipLength(string clipName)
+    // Wait until the specified state is either the current or the next state.
+    IEnumerator WaitForStateToBecomeActive(string stateName, float timeoutSeconds)
     {
-      if (_animator.runtimeAnimatorController == null)
+      int targetShortHash = Animator.StringToHash(stateName);
+      float elapsed = 0f;
+      while (elapsed < timeoutSeconds)
       {
-        return 0f;
-      }
-      foreach (var clip in _animator.runtimeAnimatorController.animationClips)
-      {
-        if (clip != null && clip.name == clipName)
+        var current = _animator.GetCurrentAnimatorStateInfo(0);
+        if (current.shortNameHash == targetShortHash || current.IsName(stateName))
         {
-          return clip.length;
+          yield break;
         }
+        var next = _animator.GetNextAnimatorStateInfo(0);
+        if (next.shortNameHash == targetShortHash || next.IsName(stateName))
+        {
+          yield break;
+        }
+        elapsed += Time.deltaTime;
+        yield return null;
       }
-      Debug.LogWarning(
-        $"MecanimAnimator: Could not find clip '{clipName}' in controller; defaulting length 0."
-      );
-      return 0f;
+      Debug.LogWarning($"MecanimAnimator: Timed out waiting for state '{stateName}' to activate.");
+    }
+
+    AnimatorStateInfo? GetStateInfoIfActive(string stateName)
+    {
+      int targetShortHash = Animator.StringToHash(stateName);
+      var current = _animator.GetCurrentAnimatorStateInfo(0);
+      if (current.shortNameHash == targetShortHash || current.IsName(stateName))
+      {
+        return current;
+      }
+      var next = _animator.GetNextAnimatorStateInfo(0);
+      if (next.shortNameHash == targetShortHash || next.IsName(stateName))
+      {
+        return next;
+      }
+      return null;
     }
   }
 }
