@@ -336,6 +336,10 @@ pub struct UpdateScreenOverlayCommand {
 pub struct AnchorToScreenPositionCommand {
     pub node: Option<FlexNode>,
     pub anchor: ScreenAnchor,
+
+    /// If provided, this element will be faded out and removed from the
+    /// hierarchy after this duration.
+    pub show_duration: Option<Milliseconds>,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema, Eq, PartialEq)]

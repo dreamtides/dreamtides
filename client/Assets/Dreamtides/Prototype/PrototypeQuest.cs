@@ -608,6 +608,7 @@ public class PrototypeQuest : Service
       {
         Node = ShopMerchantDialog(),
         Anchor = new ScreenAnchor { SiteCharacter = Guid.NewGuid() },
+        ShowDuration = new Milliseconds { MillisecondsValue = 5000 },
       }
     );
 
@@ -736,6 +737,7 @@ public class PrototypeQuest : Service
     return Mason.TypewriterText(
       "Cooked up some good grub for ya!",
       style,
+      30,
       new AudioClipAddress
       {
         AudioClip = "Assets/ThirdParty/Cafofo/Fantasy Interface Sounds/UI Tight 01.wav",

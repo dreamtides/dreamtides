@@ -315,6 +315,13 @@ namespace Dreamtides.Schema
 
         [JsonProperty("node")]
         public FlexNode Node { get; set; }
+
+        /// <summary>
+        /// If provided, this element will be faded out and removed from the
+        /// hierarchy after this duration.
+        /// </summary>
+        [JsonProperty("show_duration")]
+        public Milliseconds ShowDuration { get; set; }
     }
 
     public partial class ScreenAnchor

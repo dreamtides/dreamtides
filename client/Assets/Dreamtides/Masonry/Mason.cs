@@ -154,6 +154,7 @@ namespace Dreamtides.Masonry
     public static FlexNode TypewriterText(
       string label,
       FlexStyle style,
+      long characterDelayMilliseconds,
       AudioClipAddress? soundEffect = null
     ) =>
       new()
@@ -163,7 +164,7 @@ namespace Dreamtides.Masonry
           TypewriterTextNode = new TypewriterTextNode
           {
             Label = label,
-            CharacterDelay = new Milliseconds { MillisecondsValue = 10 },
+            CharacterDelay = new Milliseconds { MillisecondsValue = characterDelayMilliseconds },
             SoundEffect = soundEffect,
           },
         },

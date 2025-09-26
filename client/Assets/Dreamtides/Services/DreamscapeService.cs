@@ -21,6 +21,9 @@ namespace Dreamtides.Services
     ObjectLayout _tmpMerchantPositionLayout = null!;
 
     [SerializeField]
+    Transform _tmpMerchantSpeechPosition = null!;
+
+    [SerializeField]
     MecanimAnimator _tmpMerchantAnimator = null!;
 
     [SerializeField]
@@ -78,6 +81,11 @@ namespace Dreamtides.Services
     public ObjectLayout MerchantPositionLayout(Guid merchantId)
     {
       return _tmpMerchantPositionLayout;
+    }
+
+    public Transform CharacterScreenAnchorPosition(Guid merchantId)
+    {
+      return _tmpMerchantSpeechPosition;
     }
   }
 }

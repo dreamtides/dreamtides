@@ -1,8 +1,8 @@
 #nullable enable
 
+using System;
+using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using Codice.Client.Common.TreeGrouper;
 using Dreamtides.Layout;
 using Dreamtides.Masonry;
 using Dreamtides.Schema;
@@ -20,6 +20,9 @@ namespace Dreamtides.Services
     IMasonElement _screenOverlay = null!;
     IMasonElement _screenAnchoredNode = null!;
     IMasonElement _effectPreviewOverlay = null!;
+    Coroutine? _screenAnchorAutoHideCoroutine;
+
+    const float ScreenAnchorFadeDurationSeconds = 0.3f;
 
     public FlexNode? CurrentScreenOverlayNode { get; private set; }
 
@@ -125,18 +128,23 @@ namespace Dreamtides.Services
       Reconcile(ref _infoZoom, new FlexNode());
     }
 
-    [SerializeField]
-    Transform _tmpPosition = null!;
-
     public void RenderScreenAnchoredNode(AnchorToScreenPositionCommand command)
     {
       if (command.Node == null)
       {
         Reconcile(ref _screenAnchoredNode, new FlexNode());
+        if (_screenAnchorAutoHideCoroutine != null)
+        {
+          StopCoroutine(_screenAnchorAutoHideCoroutine);
+          _screenAnchorAutoHideCoroutine = null;
+        }
         return;
       }
 
-      var position = TransformPositionToElementPosition(_tmpPosition, Camera.main);
+      var position = TransformPositionToElementPosition(
+        TransformForScreenAnchor(command.Anchor),
+        Camera.main
+      );
       var node = Mason.Row(
         "ScreenAnchorPosition",
         new FlexStyle
@@ -148,6 +156,63 @@ namespace Dreamtides.Services
       );
 
       Reconcile(ref _screenAnchoredNode, node);
+
+      if (command.ShowDuration != null && command.ShowDuration.MillisecondsValue > 0)
+      {
+        StartAutoHideScreenAnchor(command.ShowDuration.ToSeconds());
+      }
+    }
+
+    void StartAutoHideScreenAnchor(float delaySeconds)
+    {
+      if (_screenAnchorAutoHideCoroutine != null)
+      {
+        StopCoroutine(_screenAnchorAutoHideCoroutine);
+      }
+      _screenAnchorAutoHideCoroutine = StartCoroutine(ScreenAnchorAutoHideCoroutine(delaySeconds));
+    }
+
+    IEnumerator ScreenAnchorAutoHideCoroutine(float delaySeconds)
+    {
+      var elementAtSchedule = _screenAnchoredNode;
+      yield return new WaitForSeconds(delaySeconds);
+
+      // If another render replaced this node, abort.
+      if (elementAtSchedule != _screenAnchoredNode)
+      {
+        yield break;
+      }
+
+      var ve = elementAtSchedule.Self;
+      var startingOpacity = ve.resolvedStyle.opacity;
+      var elapsed = 0f;
+      while (elapsed < ScreenAnchorFadeDurationSeconds)
+      {
+        if (elementAtSchedule != _screenAnchoredNode)
+        {
+          yield break;
+        }
+        var t = elapsed / ScreenAnchorFadeDurationSeconds;
+        ve.style.opacity = Mathf.Lerp(startingOpacity, 0f, t);
+        elapsed += Time.deltaTime;
+        yield return null;
+      }
+
+      if (elementAtSchedule == _screenAnchoredNode)
+      {
+        ve.style.opacity = 0f;
+        Reconcile(ref _screenAnchoredNode, new FlexNode());
+      }
+    }
+
+    Transform TransformForScreenAnchor(ScreenAnchor anchor)
+    {
+      if (anchor.SiteCharacter != null)
+      {
+        return Registry.DreamscapeService.CharacterScreenAnchorPosition(anchor.SiteCharacter);
+      }
+
+      throw new InvalidOperationException($"Unknown screen anchor: {anchor}");
     }
 
     Vector2 TransformPositionToElementPosition(Transform transform, Camera camera)
@@ -163,7 +228,6 @@ namespace Dreamtides.Services
 
       var screenPoint3 = camera.WorldToScreenPoint(transform.position);
 
-      // Behind camera: z will be negative. Return a large negative coordinate to signify hidden.
       if (screenPoint3.z < 0f)
       {
         return new Vector2(-10000f, -10000f);
