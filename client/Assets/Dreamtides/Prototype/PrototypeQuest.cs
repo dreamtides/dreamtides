@@ -718,10 +718,12 @@ public class PrototypeQuest : Service
   {
     var style = new FlexStyle
     {
-      BackgroundColor = Mason.MakeColor(Color.black, 0.9f),
+      BackgroundColor = Mason.MakeColor(Color.black),
       BorderRadius = Mason.AllBordersRadiusDip(4),
       Padding = Mason.AllPx(4),
+      Inset = Mason.InsetPx(top: -8f, left: 6f),
       Color = Mason.MakeColor(Color.white),
+      Position = FlexPosition.Absolute,
       FontSize = Mason.Px(8),
       Font = new FontAddress
       {
@@ -734,14 +736,38 @@ public class PrototypeQuest : Service
       MaxWidth = Mason.Px(100),
     };
 
-    return Mason.TypewriterText(
-      "Cooked up some good grub for ya!",
+    var arrowTip = Mason.Column(
+      "ArrowPoint",
+      new FlexStyle
+      {
+        Width = Mason.Px(9),
+        Height = Mason.Px(11.5f),
+        Position = FlexPosition.Absolute,
+        Inset = Mason.InsetPx(top: 0f, left: 0f),
+        AlignItems = FlexAlign.Center,
+        JustifyContent = FlexJustify.Center,
+        BackgroundImage = new SpriteAddress
+        {
+          Sprite = "Assets/ThirdParty/GameAssets/speech_bubble_tip.png",
+        },
+      }
+    );
+
+    var text = Mason.TypewriterText(
+      "Cooked up some nice grub for ya!",
       style,
       30,
       new AudioClipAddress
       {
         AudioClip = "Assets/ThirdParty/Cafofo/Fantasy Interface Sounds/UI Tight 01.wav",
       }
+    );
+
+    return Mason.Row(
+      "ShopMerchantDialog",
+      new FlexStyle { AlignItems = FlexAlign.FlexEnd, JustifyContent = FlexJustify.FlexStart },
+      arrowTip,
+      text
     );
   }
 }

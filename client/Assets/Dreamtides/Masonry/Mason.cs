@@ -43,6 +43,20 @@ namespace Dreamtides.Masonry
         Left = Px(left),
       };
 
+    public static FlexInsets InsetPx(
+      float? top = null,
+      float? right = null,
+      float? bottom = null,
+      float? left = null
+    ) =>
+      new()
+      {
+        Top = top is not null ? Px(top.Value) : null,
+        Right = right is not null ? Px(right.Value) : null,
+        Bottom = bottom is not null ? Px(bottom.Value) : null,
+        Left = left is not null ? Px(left.Value) : null,
+      };
+
     public static DisplayColor MakeColor(string hexString)
     {
       if (ColorUtility.TryParseHtmlString(hexString, out var color))

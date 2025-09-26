@@ -293,6 +293,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 9bcedde9e1baf4770aec35212aed2c11
+    m_Address: Assets/ThirdParty/GameAssets/speech_bubble_tip.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 9c1aee3bcc1e0431a97b0c28e41e60e3
     m_Address: Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Generic
       Magic and Impacts/RPG3_Generic_SubtleWhoosh02.wav
