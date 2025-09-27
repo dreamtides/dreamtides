@@ -56,7 +56,7 @@ namespace Dreamtides.Animations
     }
 
     IEnumerator MoveCardToDraftPick(
-      DraftPickObjectLayout draftLayout,
+      SitePickObjectLayout draftLayout,
       Card card,
       CardView cardView,
       int targetIndex,

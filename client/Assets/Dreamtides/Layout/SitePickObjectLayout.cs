@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Dreamtides.Layout
 {
-  public sealed class DraftPickObjectLayout : StandardObjectLayout
+  public sealed class SitePickObjectLayout : StandardObjectLayout
   {
     [SerializeField]
     Registry _registry = null!;
@@ -22,6 +22,9 @@ namespace Dreamtides.Layout
     [SerializeField]
     float _cardHeight;
 
+    [SerializeField]
+    bool _forceTwoRows;
+
     public override Vector3 CalculateObjectPosition(int index, int count)
     {
       var isLandscape = _registry.IsLandscape;
@@ -29,7 +32,7 @@ namespace Dreamtides.Layout
       {
         return transform.position;
       }
-      else if (isLandscape)
+      else if (isLandscape && !_forceTwoRows)
       {
         var localX = ComputeHorizontalOffset(index, count, _horizontalSpacing);
         return transform.position + transform.right * localX;

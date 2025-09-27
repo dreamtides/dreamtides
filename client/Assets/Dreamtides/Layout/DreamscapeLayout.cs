@@ -12,8 +12,8 @@ namespace Dreamtides.Layout
     public ObjectLayout QuestDeck => Check(_questDeck);
 
     [SerializeField]
-    DraftPickObjectLayout _draftPickLayout = null!;
-    public DraftPickObjectLayout DraftPickLayout => Check(_draftPickLayout);
+    SitePickObjectLayout _draftPickLayout = null!;
+    public SitePickObjectLayout DraftPickLayout => Check(_draftPickLayout);
 
     [SerializeField]
     ObjectLayout _destroyedQuestCards = null!;
