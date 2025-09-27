@@ -590,11 +590,11 @@ public class PrototypeQuest : Service
       Registry.DreamscapeService.HandlePlayMecanimAnimation(
         new PlayMecanimAnimationCommand
         {
-          Animation = new StudioAnimation { Name = "IDL_Wave_Small_Loop" },
-          EnterAnimation = new StudioAnimation { Name = "IDL_Wave_Small_Enter" },
-          ExitAnimation = new StudioAnimation { Name = "IDL_Wave_Small_Exit" },
-          ExitAfterLoops = 2,
           SiteId = Guid.NewGuid(),
+          Parameters = new List<MecanimParameter>
+          {
+            new MecanimParameter { TriggerParam = new TriggerParam { Name = "WaveSmall" } },
+          },
         }
       )
     );

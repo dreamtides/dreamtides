@@ -298,12 +298,15 @@ pub struct PlayStudioAnimationCommand {
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
 pub struct PlayMecanimAnimationCommand {
     pub site_id: SiteId,
-    pub enter_animation: Option<StudioAnimation>,
-    pub animation: StudioAnimation,
-    pub exit_animation: Option<StudioAnimation>,
+    pub parameters: Vec<MecanimParameter>,
+}
 
-    /// Optionally, exit the animation after a certain number of loops.
-    pub exit_after_loops: Option<u32>,
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub enum MecanimParameter {
+    TriggerParam { name: String },
+    BoolParam { name: String, value: bool },
+    IntParam { name: String, value: i32 },
+    FloatParam { name: String, value: f32 },
 }
 
 #[derive(Copy, Clone, Debug, Serialize, Deserialize, JsonSchema)]

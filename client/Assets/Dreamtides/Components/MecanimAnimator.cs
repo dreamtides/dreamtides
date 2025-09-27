@@ -20,128 +20,30 @@ namespace Dreamtides.Components
 
     public IEnumerator PlayAnimation(PlayMecanimAnimationCommand command)
     {
-      if (_currentPrimaryAnimation != null && _currentExitAnimation != null)
+      foreach (var param in command.Parameters)
       {
-        string priorExitState = _currentExitAnimation.Name;
-        _animator.CrossFadeInFixedTime(priorExitState, DefaultBlendDuration);
-        yield return WaitForStateToBecomeActive(priorExitState, 0.5f);
-        var exitInfo = GetStateInfoIfActive(priorExitState);
-        if (exitInfo.HasValue)
+        if (param.TriggerParam != null)
         {
-          // We already blended into this state; subtract blend so timing overlaps.
-          var wait = Mathf.Max(0f, exitInfo.Value.length - DefaultBlendDuration);
-          if (wait > 0f)
-          {
-            yield return new WaitForSeconds(wait);
-          }
-        }
-      }
-
-      if (command.EnterAnimation != null)
-      {
-        string enterState = command.EnterAnimation.Name;
-        _animator.CrossFadeInFixedTime(enterState, DefaultBlendDuration);
-        yield return WaitForStateToBecomeActive(enterState, 0.5f);
-        var enterInfo = GetStateInfoIfActive(enterState);
-        if (enterInfo.HasValue)
-        {
-          var wait = Mathf.Max(0f, enterInfo.Value.length - DefaultBlendDuration);
-          if (wait > 0f)
-          {
-            yield return new WaitForSeconds(wait);
-          }
-        }
-      }
-
-      _animator.CrossFadeInFixedTime(command.Animation.Name, DefaultBlendDuration);
-
-      _currentPrimaryAnimation = command.Animation.Name;
-      _currentExitAnimation = command.ExitAnimation;
-
-      // If we have an ExitAfterLoops directive, count completed loops and then play exit + idle.
-      if (command.ExitAfterLoops.HasValue && command.ExitAfterLoops.Value > 0)
-      {
-        var targetLoops = command.ExitAfterLoops.Value;
-        var stateInfo = _animator.GetCurrentAnimatorStateInfo(0);
-        long completedLoops = 0;
-        int lastLoopIndex = Mathf.FloorToInt(stateInfo.normalizedTime);
-        while (completedLoops < targetLoops)
-        {
-          yield return null;
-          stateInfo = _animator.GetCurrentAnimatorStateInfo(0);
-          int loopIndex = Mathf.FloorToInt(stateInfo.normalizedTime);
-          if (loopIndex > lastLoopIndex)
-          {
-            completedLoops += loopIndex - lastLoopIndex;
-            lastLoopIndex = loopIndex;
-          }
-
-          if (!stateInfo.loop && stateInfo.normalizedTime >= 1f)
-          {
-            break;
-          }
+          _animator.SetTrigger(param.TriggerParam.Name);
         }
 
-        if (command.ExitAnimation != null)
+        if (param.BoolParam != null)
         {
-          string exitState = command.ExitAnimation.Name;
-          _animator.CrossFadeInFixedTime(exitState, DefaultBlendDuration);
-          yield return WaitForStateToBecomeActive(exitState, 0.5f);
-          var eInfo = GetStateInfoIfActive(exitState);
-          if (eInfo.HasValue)
-          {
-            var wait = Mathf.Max(0f, eInfo.Value.length - DefaultBlendDuration);
-            if (wait > 0f)
-            {
-              yield return new WaitForSeconds(wait);
-            }
-          }
+          _animator.SetBool(param.BoolParam.Name, param.BoolParam.Value);
         }
 
-        // Blend smoothly back to idle.
-        _animator.CrossFadeInFixedTime(IdleHash, DefaultBlendDuration);
-        _currentPrimaryAnimation = null;
-        _currentExitAnimation = null;
-      }
-    }
-
-    // Wait until the specified state is either the current or the next state.
-    IEnumerator WaitForStateToBecomeActive(string stateName, float timeoutSeconds)
-    {
-      int targetShortHash = Animator.StringToHash(stateName);
-      float elapsed = 0f;
-      while (elapsed < timeoutSeconds)
-      {
-        var current = _animator.GetCurrentAnimatorStateInfo(0);
-        if (current.shortNameHash == targetShortHash || current.IsName(stateName))
+        if (param.IntParam != null)
         {
-          yield break;
+          _animator.SetInteger(param.IntParam.Name, (int)param.IntParam.Value);
         }
-        var next = _animator.GetNextAnimatorStateInfo(0);
-        if (next.shortNameHash == targetShortHash || next.IsName(stateName))
-        {
-          yield break;
-        }
-        elapsed += Time.deltaTime;
-        yield return null;
-      }
-      Debug.LogWarning($"MecanimAnimator: Timed out waiting for state '{stateName}' to activate.");
-    }
 
-    AnimatorStateInfo? GetStateInfoIfActive(string stateName)
-    {
-      int targetShortHash = Animator.StringToHash(stateName);
-      var current = _animator.GetCurrentAnimatorStateInfo(0);
-      if (current.shortNameHash == targetShortHash || current.IsName(stateName))
-      {
-        return current;
+        if (param.FloatParam != null)
+        {
+          _animator.SetFloat(param.FloatParam.Name, (float)param.FloatParam.Value);
+        }
       }
-      var next = _animator.GetNextAnimatorStateInfo(0);
-      if (next.shortNameHash == targetShortHash || next.IsName(stateName))
-      {
-        return next;
-      }
-      return null;
+      _animator.SetTrigger("WaveSmall");
+      yield break;
     }
   }
 }

@@ -1983,26 +1983,56 @@ namespace Dreamtides.Schema
 
     public partial class PlayMecanimAnimationCommand
     {
-        [JsonProperty("animation", Required = Required.Always)]
-        public StudioAnimation Animation { get; set; }
-
-        [JsonProperty("enter_animation")]
-        public StudioAnimation EnterAnimation { get; set; }
-
-        /// <summary>
-        /// Optionally, exit the animation after a certain number of loops.
-        /// </summary>
-        [JsonProperty("exit_after_loops")]
-        public long? ExitAfterLoops { get; set; }
-
-        [JsonProperty("exit_animation")]
-        public StudioAnimation ExitAnimation { get; set; }
+        [JsonProperty("parameters", Required = Required.Always)]
+        public List<MecanimParameter> Parameters { get; set; }
 
         [JsonProperty("site_id", Required = Required.Always)]
         public Guid SiteId { get; set; }
     }
 
-    public partial class StudioAnimation
+    public partial class MecanimParameter
+    {
+        [JsonProperty("TriggerParam", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public TriggerParam TriggerParam { get; set; }
+
+        [JsonProperty("BoolParam", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public BoolParam BoolParam { get; set; }
+
+        [JsonProperty("IntParam", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public IntParam IntParam { get; set; }
+
+        [JsonProperty("FloatParam", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public FloatParam FloatParam { get; set; }
+    }
+
+    public partial class BoolParam
+    {
+        [JsonProperty("name", Required = Required.Always)]
+        public string Name { get; set; }
+
+        [JsonProperty("value", Required = Required.Always)]
+        public bool Value { get; set; }
+    }
+
+    public partial class FloatParam
+    {
+        [JsonProperty("name", Required = Required.Always)]
+        public string Name { get; set; }
+
+        [JsonProperty("value", Required = Required.Always)]
+        public double Value { get; set; }
+    }
+
+    public partial class IntParam
+    {
+        [JsonProperty("name", Required = Required.Always)]
+        public string Name { get; set; }
+
+        [JsonProperty("value", Required = Required.Always)]
+        public long Value { get; set; }
+    }
+
+    public partial class TriggerParam
     {
         [JsonProperty("name", Required = Required.Always)]
         public string Name { get; set; }
@@ -2021,6 +2051,12 @@ namespace Dreamtides.Schema
 
         [JsonProperty("studio_type", Required = Required.Always)]
         public StudioType StudioType { get; set; }
+    }
+
+    public partial class StudioAnimation
+    {
+        [JsonProperty("name", Required = Required.Always)]
+        public string Name { get; set; }
     }
 
     public partial class SetCardTrailCommand
