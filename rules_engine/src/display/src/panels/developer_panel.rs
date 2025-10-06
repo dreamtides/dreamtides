@@ -105,10 +105,19 @@ impl Component for DeveloperPanel {
                         )
                         .child(
                             DebugButton::builder()
-                                .label("Core 11")
+                                .label("Bench 1")
                                 .action(DebugAction::RestartBattleWithDecks {
                                     one: TestDeckName::Benchmark1,
                                     two: TestDeckName::Benchmark1,
+                                })
+                                .build(),
+                        )
+                        .child(
+                            DebugButton::builder()
+                                .label("Core 11")
+                                .action(DebugAction::RestartBattleWithDecks {
+                                    one: TestDeckName::Core11,
+                                    two: TestDeckName::Core11,
                                 })
                                 .build(),
                         )

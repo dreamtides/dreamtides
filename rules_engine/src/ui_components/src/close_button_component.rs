@@ -7,6 +7,7 @@ use masonry::flex_style::{FlexScale, FlexStyle};
 
 use crate::box_component::BoxComponent;
 use crate::component::Component;
+use crate::icon;
 use crate::text_component::TextComponent;
 use crate::typography::Typography;
 
@@ -43,7 +44,7 @@ impl Component for CloseButtonComponent {
                 .on_click(GameAction::BattleDisplayAction(BattleDisplayAction::CloseCurrentPanel))
                 .child(
                     TextComponent::builder()
-                        .text("\u{f00d}")
+                        .text(icon::XMARK)
                         .typography(Typography::ButtonLabel)
                         .build(),
                 )

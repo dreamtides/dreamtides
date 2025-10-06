@@ -312,10 +312,11 @@ fn void_card_token_view(
             .position(ObjectPosition { position, sorting_key: hand_sorting_key })
             .image(card_rendering::card_image(battle, card_id))
             .name(card_rendering::card_name(battle, card_id))
+            .card_type(format!("{} Reclaim Ability", icon::FAST))
             .cost(
                 from_void_with_cost
                     .map(|cost| cost.cost.to_string())
-                    .unwrap_or_else(|| format!("<size=50%>{}</size>", icon::NON_NUMERIC)),
+                    .unwrap_or_else(|| icon::NON_NUMERIC.to_string()),
             )
             .maybe_spark(
                 card_properties::base_spark(battle, card_id).map(|spark| spark.to_string()),
