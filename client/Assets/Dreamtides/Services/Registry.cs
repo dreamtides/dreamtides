@@ -227,7 +227,7 @@ namespace Dreamtides.Services
       Layout.DecrementActionButton.gameObject.SetActive(battleMode);
       foreach (var button in Layout.GetComponentsInChildren<CardBrowserButton>())
       {
-        button.gameObject.SetActive(false);
+        button.gameObject.SetActive(battleMode);
       }
     }
   }
