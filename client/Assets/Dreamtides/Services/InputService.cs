@@ -89,7 +89,7 @@ namespace Dreamtides.Services
 
     public IInputProvider InputProvider { get; set; } = null!;
 
-    protected override void OnInitialize(TestConfiguration? testConfiguration)
+    protected override void OnInitialize(GameMode _mode, TestConfiguration? testConfiguration)
     {
       InputProvider = new UnityInputProvider(Registry);
     }

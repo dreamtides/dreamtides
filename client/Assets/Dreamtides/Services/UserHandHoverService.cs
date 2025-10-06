@@ -46,7 +46,7 @@ namespace Dreamtides.Services
     readonly Dictionary<string, CardAnimationState> _animationStates = new();
     float _lastRecoveryCheck;
 
-    protected override void OnInitialize(TestConfiguration? testConfiguration)
+    protected override void OnInitialize(GameMode _mode, TestConfiguration? testConfiguration)
     {
       _isTest = testConfiguration != null;
     }

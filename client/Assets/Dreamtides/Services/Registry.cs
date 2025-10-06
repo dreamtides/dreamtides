@@ -133,6 +133,7 @@ namespace Dreamtides.Services
 
     void Awake()
     {
+      var mode = (GameMode)PlayerPrefs.GetInt(PlayerPrefKeys.SelectedPlayMode, (int)GameMode.Quest);
       var testConfiguration = TestConfiguration;
 
       if (testConfiguration != null)
@@ -142,13 +143,13 @@ namespace Dreamtides.Services
       }
       else
       {
-        Debug.Log($"Starting Dreamtides");
+        Debug.Log($"Starting Dreamtides with game mode {mode}");
       }
 
-      StartCoroutine(DelayedAwake(testConfiguration));
+      StartCoroutine(DelayedAwake(mode, testConfiguration));
     }
 
-    IEnumerator DelayedAwake(TestConfiguration? testConfiguration)
+    IEnumerator DelayedAwake(GameMode mode, TestConfiguration? testConfiguration)
     {
       yield return new WaitForEndOfFrame();
       yield return new WaitForEndOfFrame();
@@ -156,7 +157,7 @@ namespace Dreamtides.Services
       yield return new WaitForEndOfFrame();
       yield return new WaitForEndOfFrame();
 
-      RunAwake(GameMode.Quest, testConfiguration);
+      RunAwake(mode, testConfiguration);
     }
 
     void RunAwake(GameMode mode, TestConfiguration? testConfiguration)
@@ -180,7 +181,7 @@ namespace Dreamtides.Services
 
       foreach (var service in GetComponentsInChildren<Service>())
       {
-        service.Initialize(this, testConfiguration);
+        service.Initialize(this, mode, testConfiguration);
       }
     }
 

@@ -101,7 +101,7 @@ public class PrototypeQuest : Service
     }
   }
 
-  protected override void OnInitialize(TestConfiguration? testConfiguration)
+  protected override void OnInitialize(GameMode _mode, TestConfiguration? testConfiguration)
   {
     StartCoroutine(
       CreateOrUpdateCards(

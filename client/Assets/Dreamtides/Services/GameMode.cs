@@ -4,8 +4,8 @@ namespace Dreamtides.Services
 {
   public enum GameMode
   {
-    MainMenu,
-    Battle,
-    Quest,
+    MainMenu = 0,
+    Battle = 1,
+    Quest = 2,
   }
 }

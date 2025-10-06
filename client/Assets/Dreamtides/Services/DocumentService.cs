@@ -30,7 +30,7 @@ namespace Dreamtides.Services
 
     public bool HasOpenPanels { get; set; } = false;
 
-    protected override void OnInitialize(TestConfiguration? testConfiguration)
+    protected override void OnInitialize(GameMode _mode, TestConfiguration? testConfiguration)
     {
       _document.rootVisualElement.Clear();
       AddChild("InfoZoomContainer", out _infoZoom);

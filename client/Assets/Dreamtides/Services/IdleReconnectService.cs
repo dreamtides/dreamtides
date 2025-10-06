@@ -12,7 +12,7 @@ namespace Dreamtides.Services
     float _lastReconnectTime = float.NegativeInfinity;
     float _lastActivityTime;
 
-    protected override void OnInitialize(TestConfiguration? testConfiguration)
+    protected override void OnInitialize(GameMode _mode, TestConfiguration? testConfiguration)
     {
       _hasInitialized = true;
       _testConfiguration = testConfiguration;

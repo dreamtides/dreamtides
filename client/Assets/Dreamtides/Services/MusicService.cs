@@ -22,7 +22,7 @@ namespace Dreamtides.Services
     int _currentTrackIndex = -1;
     bool _isTransitioning = false;
 
-    protected override void OnInitialize(TestConfiguration? testConfiguration)
+    protected override void OnInitialize(GameMode _mode, TestConfiguration? testConfiguration)
     {
       if (testConfiguration == null)
       {

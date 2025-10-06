@@ -22,7 +22,7 @@ namespace Dreamtides.Services
     private const float SPAN_TIMEOUT_SECONDS = 10f;
     private bool _emittingToUnityConsole;
 
-    protected override void OnInitialize(TestConfiguration? testConfiguration)
+    protected override void OnInitialize(GameMode _mode, TestConfiguration? testConfiguration)
     {
       Application.logMessageReceived += OnUnityLogMessageReceived;
     }

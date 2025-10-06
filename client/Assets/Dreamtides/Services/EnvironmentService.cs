@@ -11,9 +11,10 @@ namespace Dreamtides.Services
     [SerializeField]
     List<GameEnvironment> _environments = null!;
 
-    protected override void OnInitialize(TestConfiguration? testConfiguration)
+    protected override void OnInitialize(GameMode _mode, TestConfiguration? testConfiguration)
     {
       var randomIndex = testConfiguration != null ? 0 : Random.Range(0, _environments.Count);
+      Debug.Log("Activating environment index: " + randomIndex);
       _environments[randomIndex].Activate(Registry);
     }
   }

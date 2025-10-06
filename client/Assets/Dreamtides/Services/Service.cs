@@ -11,13 +11,13 @@ namespace Dreamtides.Services
     public Registry Registry =>
       _registry ?? throw new InvalidOperationException($"{name} not initialized!");
 
-    public void Initialize(Registry registry, TestConfiguration? testConfiguration)
+    public void Initialize(Registry registry, GameMode mode, TestConfiguration? testConfiguration)
     {
       _registry = registry;
-      OnInitialize(testConfiguration);
+      OnInitialize(mode, testConfiguration);
     }
 
-    protected virtual void OnInitialize(TestConfiguration? testConfiguration) { }
+    protected virtual void OnInitialize(GameMode mode, TestConfiguration? testConfiguration) { }
 
     public void Update()
     {
