@@ -9,6 +9,9 @@ namespace Dreamtides.Layout
 {
   public class PlayerStatusDisplay : StandardObjectLayout
   {
+    const string EnergyIcon = "\ufa1f";
+    const string PointsIcon = "\ufb43";
+
     [SerializeField]
     BattlefieldNumber _energy = null!;
 
@@ -74,14 +77,14 @@ namespace Dreamtides.Layout
     {
       _producedEnergy = producedEnergy;
       _energy.SetText(
-        $"{currentEnergy}/{producedEnergy} <color=#00838F><voffset=0.1em>\uf7e4</voffset></color>",
+        $"{currentEnergy}/{producedEnergy}<color=#00838F>{EnergyIcon}</color>",
         animate
       );
     }
 
     public void SetScore(long score, bool animate = true)
     {
-      _score.SetText($"{score} <voffset=0.1em><size=80%>\uf5a2</size></voffset>", animate);
+      _score.SetText($"{score}<size=80%>{PointsIcon}</size>", animate);
     }
 
     public void SetTotalSpark(long totalSpark, bool animate = true)
@@ -94,14 +97,14 @@ namespace Dreamtides.Layout
       if (preview.Energy != null)
       {
         string energyText =
-          $"{preview.Energy}/{preview.ProducedEnergy ?? _producedEnergy} "
-          + "<color=#00838F><voffset=0.1em>\uf7e4</voffset></color>";
+          $"{preview.Energy}/{preview.ProducedEnergy ?? _producedEnergy}"
+          + $"<color=#00838F>{EnergyIcon}</color>";
         Energy.SetPreviewText(energyText, previewTextColor);
       }
 
       if (preview.Score != null)
       {
-        string scoreText = $"{preview.Score} <voffset=0.1em><size=80%>\uf5a2</size></voffset>";
+        string scoreText = $"{preview.Score}<size=80%>{PointsIcon}</size>";
         Score.SetPreviewText(scoreText, previewTextColor);
       }
 
