@@ -2,6 +2,7 @@
 
 namespace Dreamtides.Layout
 {
+  using Dreamtides.Components;
   using Dreamtides.Utils;
   using UnityEngine;
 

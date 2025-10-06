@@ -1,5 +1,6 @@
 #nullable enable
 
+using Dreamtides.Components;
 using Dreamtides.Schema;
 using Dreamtides.Services;
 using UnityEngine;

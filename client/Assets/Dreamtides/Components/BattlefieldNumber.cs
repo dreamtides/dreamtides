@@ -8,7 +8,7 @@ using UnityEngine;
 
 [assembly: InternalsVisibleTo("Dreamtides.Tests")]
 
-namespace Dreamtides
+namespace Dreamtides.Components
 {
   public class BattlefieldNumber : MonoBehaviour
   {

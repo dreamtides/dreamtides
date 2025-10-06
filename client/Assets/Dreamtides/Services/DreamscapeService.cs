@@ -15,6 +15,9 @@ namespace Dreamtides.Services
   public class DreamscapeService : Service
   {
     [SerializeField]
+    Camera _questCamera = null!;
+
+    [SerializeField]
     ObjectLayout _tmpSiteDeckLayout = null!;
 
     [SerializeField]
@@ -29,7 +32,30 @@ namespace Dreamtides.Services
     [SerializeField]
     CanvasGroup _closeButton = null!;
 
+    [SerializeField]
+    RectTransform _siteButtons = null!;
+
+    [SerializeField]
+    List<Dreamscape> _dreamscapes = new();
+
     public CanvasGroup CloseButton => Errors.CheckNotNull(_closeButton);
+
+    public Camera QuestCamera => Errors.CheckNotNull(_questCamera);
+
+    protected override void OnInitialize(GameMode mode, TestConfiguration? testConfiguration)
+    {
+      const int index = 0;
+      if (mode == GameMode.Quest)
+      {
+        _dreamscapes[index].gameObject.SetActive(true);
+        _siteButtons.gameObject.SetActive(true);
+      }
+      else
+      {
+        _dreamscapes[index].gameObject.SetActive(false);
+        _siteButtons.gameObject.SetActive(false);
+      }
+    }
 
     public void ApplyLayouts(Sequence? sequence)
     {

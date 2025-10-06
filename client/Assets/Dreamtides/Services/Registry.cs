@@ -20,6 +20,9 @@ namespace Dreamtides.Services
     GameLayout? _landscapeLayout;
     bool _isLandscape = false;
 
+    [SerializeField]
+    GameMode _currentGameMode;
+
     public bool IsLandscape => _isLandscape;
 
     public bool IsMobileDevice => UnityEngine.Device.Application.isMobilePlatform;
@@ -131,9 +134,24 @@ namespace Dreamtides.Services
     PrototypeQuest? _prototypeQuest;
     public PrototypeQuest PrototypeQuest => Check(_prototypeQuest);
 
+    public Camera CurrentCamera()
+    {
+      if (_currentGameMode == GameMode.Battle)
+      {
+        return Layout.MainCamera;
+      }
+      else
+      {
+        return DreamscapeService.QuestCamera;
+      }
+    }
+
+    public AudioSource MusicAudioSource() => ComponentUtils.Get<AudioSource>(CurrentCamera());
+
     void Awake()
     {
-      var mode = (GameMode)PlayerPrefs.GetInt(PlayerPrefKeys.SelectedPlayMode, (int)GameMode.Quest);
+      _currentGameMode = (GameMode)
+        PlayerPrefs.GetInt(PlayerPrefKeys.SelectedPlayMode, (int)GameMode.Quest);
       var testConfiguration = TestConfiguration;
 
       if (testConfiguration != null)
@@ -143,10 +161,10 @@ namespace Dreamtides.Services
       }
       else
       {
-        Debug.Log($"Starting Dreamtides with game mode {mode}");
+        Debug.Log($"Starting Dreamtides with game mode {_currentGameMode}");
       }
 
-      StartCoroutine(DelayedAwake(mode, testConfiguration));
+      StartCoroutine(DelayedAwake(_currentGameMode, testConfiguration));
     }
 
     IEnumerator DelayedAwake(GameMode mode, TestConfiguration? testConfiguration)
@@ -197,6 +215,8 @@ namespace Dreamtides.Services
         battleCamera.AdjustFieldOfView();
       }
 
+      Layout.MainCamera.gameObject.SetActive(battleMode);
+      DreamscapeService.QuestCamera.gameObject.SetActive(!battleMode);
       Layout.UserStatusDisplay.TotalSpark.gameObject.SetActive(battleMode);
       Layout.UserStatusDisplay.gameObject.SetActive(battleMode);
       Layout.EnemyStatusDisplay.TotalSpark.gameObject.SetActive(battleMode);

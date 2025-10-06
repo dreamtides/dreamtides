@@ -3,51 +3,54 @@
 using DG.Tweening;
 using UnityEngine;
 
-public class BrowserBackground : MonoBehaviour
+namespace Dreamtides.Components
 {
-  [SerializeField]
-  SpriteRenderer _overlay = null!;
-  bool _isVisible = false;
-
-  public bool IsVisible => _isVisible;
-
-  public void Show(float alpha, Sequence? sequence)
+  public class BrowserBackground : MonoBehaviour
   {
-    if (_isVisible)
-    {
-      return;
-    }
+    [SerializeField]
+    SpriteRenderer _overlay = null!;
+    bool _isVisible = false;
 
-    _isVisible = true;
-    _overlay.enabled = true;
-    _overlay.color = Color.clear;
+    public bool IsVisible => _isVisible;
 
-    if (sequence != null)
+    public void Show(float alpha, Sequence? sequence)
     {
-      sequence.Insert(0, _overlay.DOBlendableColor(new Color(0, 0, 0, alpha), 0.3f));
-    }
-    else
-    {
-      _overlay.color = new Color(0, 0, 0, alpha);
-    }
-  }
+      if (_isVisible)
+      {
+        return;
+      }
 
-  public void Hide(Sequence? sequence)
-  {
-    if (!_isVisible)
-    {
-      return;
-    }
-
-    if (sequence != null)
-    {
-      sequence
-        .Insert(0, _overlay.DOBlendableColor(Color.clear, 0.3f))
-        .AppendCallback(() => _isVisible = false);
-    }
-    else
-    {
+      _isVisible = true;
+      _overlay.enabled = true;
       _overlay.color = Color.clear;
+
+      if (sequence != null)
+      {
+        sequence.Insert(0, _overlay.DOBlendableColor(new Color(0, 0, 0, alpha), 0.3f));
+      }
+      else
+      {
+        _overlay.color = new Color(0, 0, 0, alpha);
+      }
+    }
+
+    public void Hide(Sequence? sequence)
+    {
+      if (!_isVisible)
+      {
+        return;
+      }
+
+      if (sequence != null)
+      {
+        sequence
+          .Insert(0, _overlay.DOBlendableColor(Color.clear, 0.3f))
+          .AppendCallback(() => _isVisible = false);
+      }
+      else
+      {
+        _overlay.color = Color.clear;
+      }
     }
   }
 }

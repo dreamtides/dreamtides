@@ -22,11 +22,14 @@ namespace Dreamtides.Services
     int _currentTrackIndex = -1;
     bool _isTransitioning = false;
 
+    AudioSource _audioSource = null!;
+
     protected override void OnInitialize(GameMode _mode, TestConfiguration? testConfiguration)
     {
       if (testConfiguration == null)
       {
         // Don't play music in tests
+        _audioSource = Registry.MusicAudioSource();
         ShufflePlaylist();
         PlayNextTrack();
       }
@@ -34,12 +37,12 @@ namespace Dreamtides.Services
 
     public void Mute()
     {
-      Registry.Layout.MusicAudioSource.volume = 0;
+      _audioSource.volume = 0;
     }
 
     public void Unmute()
     {
-      Registry.Layout.MusicAudioSource.volume = 1;
+      _audioSource.volume = 1;
     }
 
     void ShufflePlaylist()
@@ -71,12 +74,11 @@ namespace Dreamtides.Services
 
     protected override void OnUpdate()
     {
-      if (!_isTransitioning && Registry.Layout.MusicAudioSource.clip != null)
+      if (!_isTransitioning && _audioSource.clip != null)
       {
         var shouldTransition =
-          !Registry.Layout.MusicAudioSource.isPlaying
-          || Registry.Layout.MusicAudioSource.time
-            >= Registry.Layout.MusicAudioSource.clip.length - _crossFadeDuration;
+          !_audioSource.isPlaying
+          || _audioSource.time >= _audioSource.clip.length - _crossFadeDuration;
 
         if (shouldTransition)
         {
@@ -88,32 +90,24 @@ namespace Dreamtides.Services
 
     IEnumerator CrossfadeToTrack(AudioClip nextTrack)
     {
-      float startVolume = Registry.Layout.MusicAudioSource.volume;
+      float startVolume = _audioSource.volume;
       float elapsed = 0;
 
-      while (elapsed < _crossFadeDuration && Registry.Layout.MusicAudioSource.isPlaying)
+      while (elapsed < _crossFadeDuration && _audioSource.isPlaying)
       {
         elapsed += Time.deltaTime;
-        Registry.Layout.MusicAudioSource.volume = Mathf.Lerp(
-          startVolume,
-          0,
-          elapsed / _crossFadeDuration
-        );
+        _audioSource.volume = Mathf.Lerp(startVolume, 0, elapsed / _crossFadeDuration);
         yield return null;
       }
 
-      Registry.Layout.MusicAudioSource.clip = nextTrack;
-      Registry.Layout.MusicAudioSource.Play();
+      _audioSource.clip = nextTrack;
+      _audioSource.Play();
       elapsed = 0;
 
       while (elapsed < _crossFadeDuration)
       {
         elapsed += Time.deltaTime;
-        Registry.Layout.MusicAudioSource.volume = Mathf.Lerp(
-          0,
-          startVolume,
-          elapsed / _crossFadeDuration
-        );
+        _audioSource.volume = Mathf.Lerp(0, startVolume, elapsed / _crossFadeDuration);
         yield return null;
       }
 

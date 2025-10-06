@@ -47,6 +47,7 @@ namespace Dreamtides.Editors
     private static void SetQuest()
     {
       PlayModeSelection.Current = GameMode.Quest;
+      Debug.Log($"Set play mode to {PlayModeSelection.Current}");
       UpdateChecks();
     }
 
@@ -61,6 +62,7 @@ namespace Dreamtides.Editors
     private static void SetBattle()
     {
       PlayModeSelection.Current = GameMode.Battle;
+      Debug.Log($"Set play mode to {PlayModeSelection.Current}");
       UpdateChecks();
     }
 
