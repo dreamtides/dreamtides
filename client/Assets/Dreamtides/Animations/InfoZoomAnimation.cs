@@ -38,7 +38,9 @@ namespace Dreamtides.Animations
         ClearInfoZoomIcons();
       }
 
-      var shouldShowOnLeft = service.Registry.InputService.PointerPosition().x > Screen.width / 2.0;
+      var shouldShowOnLeft = service.Registry.IsLandscape
+        ? false
+        : service.Registry.InputService.PointerPosition().x > Screen.width / 2.0;
 
       if (!shouldShowOnLeft)
       {
