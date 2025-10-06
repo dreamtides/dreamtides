@@ -34,7 +34,7 @@ pub const EYE_ICON: StringId = StringId(uuid!("ad291414-914c-4039-8f8f-8902b752b
 /// Eye icon with slash through it
 pub const EYE_SLASH_ICON: StringId = StringId(uuid!("2ca2c1dd-20f7-410b-9f5d-ce313a2d9175"));
 
-/// "Star of life" icon used to represent non-numeric costs
+/// "Star" icon used to represent non-numeric costs
 pub const ASTERISK_ICON: StringId = StringId(uuid!("fd603588-7ab8-48c8-93b0-2bf6afc59325"));
 
 /// Formatting that appears before keywords
