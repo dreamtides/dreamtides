@@ -38,6 +38,9 @@ namespace Dreamtides.Services
     [SerializeField]
     List<Dreamscape> _dreamscapes = new();
 
+    [SerializeField]
+    RectTransform _debugQuestButtons = null!;
+
     public CanvasGroup CloseButton => Errors.CheckNotNull(_closeButton);
 
     public Camera QuestCamera => Errors.CheckNotNull(_questCamera);
@@ -49,11 +52,13 @@ namespace Dreamtides.Services
       {
         _dreamscapes[index].gameObject.SetActive(true);
         _siteButtons.gameObject.SetActive(true);
+        _debugQuestButtons.gameObject.SetActive(true);
       }
       else
       {
         _dreamscapes[index].gameObject.SetActive(false);
         _siteButtons.gameObject.SetActive(false);
+        _debugQuestButtons.gameObject.SetActive(false);
       }
     }
 

@@ -228,7 +228,7 @@ namespace Dreamtides.Services
 
       if (!found)
       {
-        LogError($"EndSpan called with '{name}' but span was not found in stack");
+        LogWarning($"EndSpan called with '{name}' but span was not found in stack");
         foreach (var span in spansToClose.AsEnumerable().Reverse())
         {
           _spanStack.Push(span);

@@ -73,17 +73,17 @@ namespace Dreamtides.Services
     /// </summary>
     public Guid? LastResponseReceived { get; private set; }
 
-    protected override void OnInitialize(GameMode _mode, TestConfiguration? testConfiguration)
+    protected override void OnInitialize(GameMode mode, TestConfiguration? testConfiguration)
     {
       Connected = false;
       _lastActionTime = Time.time;
       _integrationTestId = testConfiguration?.IntegrationTestId;
       _enemyId = Guid.NewGuid();
 
-      StartCoroutine(InitializeAsync());
+      StartCoroutine(InitializeAsync(mode));
     }
 
-    IEnumerator InitializeAsync()
+    IEnumerator InitializeAsync(GameMode mode)
     {
       yield return new WaitForEndOfFrame();
       _metadata = new Metadata
@@ -92,7 +92,7 @@ namespace Dreamtides.Services
         IntegrationTestId = _integrationTestId,
       };
 
-      if (!_disableConnectOnStart)
+      if (!_disableConnectOnStart && mode == GameMode.Battle)
       {
         yield return PerformConnect(isReconnect: false, startLoggingSpan: true);
       }
