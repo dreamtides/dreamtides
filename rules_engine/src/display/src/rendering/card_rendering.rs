@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
-use ability_data::ability::{DisplayedAbility, DisplayedAbilityEffect};
-use ability_data::effect::ModelEffectChoiceIndex;
+use ability_data::ability::{Ability, DisplayedAbility, DisplayedAbilityEffect};
+use ability_data::effect::{Effect, ModelEffectChoiceIndex};
 use action_data::game_action_data::GameAction;
 use battle_queries::battle_card_queries::{card, card_properties, valid_target_queries};
 use battle_queries::legal_action_queries::legal_actions;
@@ -88,14 +88,21 @@ fn revealed_card_view(builder: &ResponseBuilder, context: &CardViewContext) -> R
         outline_and_selection_action(battle, &legal_actions, card_id, builder.act_for_player());
     let ControllerAndZone { controller, .. } = positions::controller_and_zone(battle, card_id);
 
+    // Get the cost to display
+    let cost = if let Some(stack_item) = battle.cards.stack_item(StackCardId(card_id))
+        && let Some(ModelEffectChoiceIndex(index)) = stack_item.modal_choice
+    {
+        selected_modal_energy_cost(battle, card_id, index).map(|e| e.to_string())
+    } else if card_properties::base_energy_cost(battle, card_id).is_some() {
+        Some(card_properties::converted_energy_cost(battle, card_id).to_string())
+    } else {
+        Some(builder.string(string_id::ASTERISK_ICON))
+    };
+
     RevealedCardView {
         image: DisplayImage::Sprite(card_image(battle, card_id)),
         name: card_name(battle, card_id),
-        cost: if card_properties::base_energy_cost(battle, card_id).is_some() {
-            Some(card_properties::converted_energy_cost(battle, card_id).to_string())
-        } else {
-            Some(builder.string(string_id::ASTERISK_ICON))
-        },
+        cost,
         produced: None,
         spark: card_properties::spark(battle, controller, CharacterId(card_id))
             .or_else(|| card_properties::base_spark(battle, card_id))
@@ -542,4 +549,41 @@ fn targeting_color(
     } else {
         display_color::RED_500
     }
+}
+
+/// Extracts all modal effect choices from a card's displayed abilities
+fn selected_modal_energy_cost(battle: &BattleState, card_id: CardId, index: usize) -> Option<u32> {
+    let definition = card::get_definition(battle, card_id);
+
+    let mut current_index = 0usize;
+
+    for ability in &definition.abilities {
+        match ability {
+            Ability::Event(event) => {
+                if let Effect::Modal(choices) = &event.effect {
+                    if index < current_index + choices.len() {
+                        let local_index = index - current_index;
+                        if let Some(choice) = choices.get(local_index) {
+                            return Some(choice.energy_cost.0);
+                        }
+                    }
+                    current_index += choices.len();
+                }
+            }
+            Ability::Activated(activated) => {
+                if let Effect::Modal(choices) = &activated.effect {
+                    if index < current_index + choices.len() {
+                        let local_index = index - current_index;
+                        if let Some(choice) = choices.get(local_index) {
+                            return Some(choice.energy_cost.0);
+                        }
+                    }
+                    current_index += choices.len();
+                }
+            }
+            _ => {}
+        }
+    }
+
+    None
 }

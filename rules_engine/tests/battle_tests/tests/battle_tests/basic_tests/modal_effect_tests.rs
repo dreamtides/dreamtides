@@ -326,3 +326,44 @@ fn modal_effect_choices_only_visible_to_prompted_player() {
     let enemy_browser_cards = s.enemy_client.cards.browser_cards();
     assert_eq!(enemy_browser_cards.len(), 0, "Enemy should not see any modal choice cards");
 }
+
+#[test]
+fn modal_card_on_stack_displays_selected_mode_cost() {
+    let mut s = TestBattle::builder().user(TestPlayer::builder().energy(99).build()).connect();
+
+    // Switch to enemy turn and give enemy a fast card so they can respond
+    s.end_turn_remove_opponent_hand(DisplayPlayer::User);
+    s.add_to_hand(DisplayPlayer::User, test_card::TEST_COUNTERSPELL);
+
+    // Enemy plays modal card
+    let modal_card_id =
+        s.add_to_hand(DisplayPlayer::Enemy, test_card::TEST_MODAL_DRAW_ONE_OR_DRAW_TWO);
+    s.play_card_from_hand(DisplayPlayer::Enemy, &modal_card_id);
+
+    // Select the "Draw 2" option which costs 3 energy
+    let browser_cards = s.enemy_client.cards.browser_cards();
+    let draw_two_card_id = browser_cards.cards[1].id.clone();
+    s.click_card(DisplayPlayer::Enemy, &draw_two_card_id);
+
+    // Check that the card is on the stack (user can see it)
+    let stack_cards = s.user_client.cards.stack_cards();
+    assert_eq!(stack_cards.len(), 1, "Modal card should be on stack");
+
+    let stack_card = stack_cards.iter().next().expect("stack card should exist");
+
+    // Verify the card displays the cost of the selected mode (3) not "NON_NUMERIC"
+    assert_eq!(
+        stack_card.revealed().cost,
+        Some("3".to_string()),
+        "Stack card should show the cost of the selected modal choice (3), not NON_NUMERIC"
+    );
+
+    // Also verify the rules text is correct for the selected mode
+    let rules_text = &stack_card.revealed().rules_text;
+    assert!(
+        rules_text.contains("Draw 2") || rules_text.contains("draw 2"),
+        "Stack card should show the rules text of the selected modal choice: {rules_text}"
+    );
+
+    test_helpers::assert_clients_identical(&s);
+}
