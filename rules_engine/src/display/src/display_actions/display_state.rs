@@ -55,7 +55,7 @@ pub fn set_overlay_hidden(builder: &ResponseBuilder, hidden: bool) {
     });
 }
 
-/// Gets whether the prominent overlay is currently hidden.
-pub fn is_overlay_hidden(builder: &ResponseBuilder) -> bool {
+/// Gets whether the battlefield is currently shown.
+pub fn is_battlefield_shown(builder: &ResponseBuilder) -> bool {
     builder.get_display_state().overlay_hidden
 }

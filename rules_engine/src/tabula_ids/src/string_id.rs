@@ -168,10 +168,12 @@ pub const DECREMENT_ENERGY_PROMPT_BUTTON: StringId =
     StringId(uuid!("5632f153-07d7-41de-bc85-5864f5578d73"));
 
 /// Button to hide the stack and view the battlefield
-pub const HIDE_STACK_BUTTON: StringId = StringId(uuid!("bec6ea4b-55b9-4eb9-8173-9dd4f03eaf05"));
+pub const SHOW_BATTLEFIELD_BUTTON: StringId =
+    StringId(uuid!("bec6ea4b-55b9-4eb9-8173-9dd4f03eaf05"));
 
 /// Button to show the stack after hiding it
-pub const SHOW_STACK_BUTTON: StringId = StringId(uuid!("e2cbff72-868a-4be2-a13a-37815ce0a5f2"));
+pub const HIDE_BATTLEFIELD_BUTTON: StringId =
+    StringId(uuid!("e2cbff72-868a-4be2-a13a-37815ce0a5f2"));
 
 /// Addition to card rules text showing how much energy was spent on a card with
 /// a variable energy cost

@@ -36,7 +36,7 @@ pub fn trigger_card_view(
     trigger: &TriggerAnimation,
 ) -> CardView {
     let current_stack = positions::current_stack_type(builder, battle);
-    let stack_position = if display_state::is_overlay_hidden(builder) {
+    let stack_position = if display_state::is_battlefield_shown(builder) {
         Position::OnScreenStorage
     } else {
         Position::OnStack(current_stack)
@@ -149,7 +149,7 @@ pub fn activated_ability_card_view_on_stack(
     let current_stack = positions::current_stack_type(builder, battle);
     let base_position = Position::OnStack(current_stack);
     let stack_position = ObjectPosition {
-        position: if display_state::is_overlay_hidden(builder) {
+        position: if display_state::is_battlefield_shown(builder) {
             Position::OnScreenStorage
         } else {
             base_position
@@ -205,7 +205,7 @@ fn activated_ability_card_view(
         }
     };
     let position = if matches!(position.position, Position::OnStack(_))
-        && display_state::is_overlay_hidden(builder)
+        && display_state::is_battlefield_shown(builder)
     {
         ObjectPosition { position: Position::OnScreenStorage, sorting_key: position.sorting_key }
     } else {

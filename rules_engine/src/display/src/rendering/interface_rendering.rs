@@ -56,7 +56,7 @@ pub fn interface_view(builder: &ResponseBuilder, battle: &BattleState) -> Interf
 
     let overlay_builder = overlay_builder()
         .child(render_prompt_message(builder, battle))
-        .child(render_hide_overlay_button(builder, battle))
+        .child(render_show_battlefield_button(builder, battle))
         .child(
             current_panel_address
                 .map(|address| panel_rendering::render_panel(address, builder, battle)),
@@ -303,7 +303,7 @@ fn overlay_builder() -> BoxComponentBuilder<Named> {
     )
 }
 
-fn render_hide_overlay_button(
+fn render_show_battlefield_button(
     builder: &ResponseBuilder,
     battle: &BattleState,
 ) -> Option<impl Component> {
@@ -322,15 +322,11 @@ fn render_hide_overlay_button(
         return None;
     }
 
-    let label = if display_state::is_overlay_hidden(builder) {
-        builder.string(string_id::SHOW_STACK_BUTTON)
-    } else {
-        builder.string(string_id::HIDE_STACK_BUTTON)
-    };
+    let label = builder.string(string_id::SHOW_BATTLEFIELD_BUTTON);
 
     Some(
         BoxComponent::builder()
-            .name("Hide Overlay Button Container")
+            .name("Show Battlefield Button Container")
             .style(
                 FlexStyle::builder()
                     .position(FlexPosition::Absolute)
@@ -362,7 +358,7 @@ fn can_undo(builder: &ResponseBuilder, battle: &BattleState) -> bool {
 
 fn card_browser_view(builder: &ResponseBuilder) -> Option<CardBrowserView> {
     if display_state::get_card_browser_source(builder).is_some()
-        && !display_state::is_overlay_hidden(builder)
+        && !display_state::is_battlefield_shown(builder)
     {
         Some(CardBrowserView {
             close_button: Some(GameAction::BattleDisplayAction(
@@ -378,7 +374,7 @@ fn card_order_selector_view(
     builder: &ResponseBuilder,
     battle: &BattleState,
 ) -> Option<CardOrderSelectorView> {
-    if display_state::is_overlay_hidden(builder) {
+    if display_state::is_battlefield_shown(builder) {
         return None;
     }
     if let Some(prompt) = battle.prompts.front()

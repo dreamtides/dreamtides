@@ -19,7 +19,7 @@ pub fn object_position(
     base_object_position: ObjectPosition,
 ) -> ObjectPosition {
     let position = for_prompt_source(builder, battle, card_id, base_object_position.position);
-    let position = for_hidden_stack(builder, position);
+    let position = for_hidden_overlay(builder, position);
     let position = for_stack_during_prompt(battle, position);
     let object_position = for_top_of_deck(battle, card_id, ObjectPosition {
         position,
@@ -55,7 +55,7 @@ fn for_prompt_source(
 /// Returns the position for a card in the browser, if it is the current
 /// browser.
 pub fn for_browser(builder: &ResponseBuilder, position: Position) -> Position {
-    if display_state::is_overlay_hidden(builder) {
+    if display_state::is_battlefield_shown(builder) {
         return position;
     }
     if let Some(browser_source) = apply_battle_display_action::current_browser_source(builder)
@@ -83,8 +83,8 @@ fn for_stack_during_prompt(battle: &BattleState, position: Position) -> Position
 }
 
 /// Returns the position for a card if the stack is hidden.
-fn for_hidden_stack(builder: &ResponseBuilder, position: Position) -> Position {
-    if display_state::is_overlay_hidden(builder) && matches!(position, Position::OnStack(_)) {
+fn for_hidden_overlay(builder: &ResponseBuilder, position: Position) -> Position {
+    if display_state::is_battlefield_shown(builder) && matches!(position, Position::OnStack(_)) {
         Position::OnScreenStorage
     } else {
         position
@@ -122,7 +122,7 @@ fn for_card_order_browser(
     card_id: CardId,
     base_object_position: ObjectPosition,
 ) -> ObjectPosition {
-    if display_state::is_overlay_hidden(builder) {
+    if display_state::is_battlefield_shown(builder) {
         return base_object_position;
     }
     if let Some(prompt) = battle.prompts.front()
@@ -166,7 +166,7 @@ fn for_void_card_browser(
     battle: &BattleState,
     base_object_position: ObjectPosition,
 ) -> ObjectPosition {
-    if display_state::is_overlay_hidden(builder) {
+    if display_state::is_battlefield_shown(builder) {
         return base_object_position;
     }
     if let Some(prompt) = battle.prompts.front()
@@ -182,25 +182,6 @@ fn for_void_card_browser(
     }
     base_object_position
 }
-
-// fn for_hand_card_browser(
-//     builder: &ResponseBuilder,
-//     battle: &BattleState,
-//     base_object_position: ObjectPosition,
-// ) -> ObjectPosition {
-//     if let Some(prompt) = battle.prompts.front()
-//         && prompt.player == builder.act_for_player()
-//         && let PromptType::ChooseHandCards(_) = &prompt.prompt_type
-//         && let Position::InHand(hand_player) = base_object_position.position
-//         && hand_player == builder.to_display_player(prompt.player)
-//     {
-//         return ObjectPosition {
-//             position: Position::Browser,
-//             sorting_key: base_object_position.sorting_key,
-//         };
-//     }
-//     base_object_position
-// }
 
 fn for_void_card_targeting(
     battle: &BattleState,

@@ -104,6 +104,6 @@ pub fn current_browser_source(builder: &ResponseBuilder) -> Option<Position> {
 
 /// Toggles the visibility of the stack.
 fn toggle_stack_visibility(builder: &ResponseBuilder) {
-    let current = display_state::is_overlay_hidden(builder);
+    let current = display_state::is_battlefield_shown(builder);
     display_state::set_overlay_hidden(builder, !current);
 }
