@@ -205,6 +205,14 @@ namespace Dreamtides.Services
       {
         service.Initialize(this, mode, testConfiguration);
       }
+
+      foreach (var element in FindObjectsByType<SceneElement>(FindObjectsInactive.Exclude, FindObjectsSortMode.None))
+      {
+        if (element.gameObject.scene == gameObject.scene)
+        {
+          element.Initialize(this, mode, testConfiguration);
+        }
+      }
     }
 
     T Check<T>(T? value)
