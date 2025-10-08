@@ -30,6 +30,10 @@ namespace Dreamtides.Services
     public GameLayout Layout => IsLandscape ? Check(_landscapeLayout) : Check(_portraitLayout);
 
     [SerializeField]
+    RectTransform _canvasSafeArea = null!;
+    public RectTransform CanvasSafeArea => Check(_canvasSafeArea);
+
+    [SerializeField]
     DreamscapeLayout? _dreamscapeLayout;
     public DreamscapeLayout DreamscapeLayout => Check(_dreamscapeLayout);
 
