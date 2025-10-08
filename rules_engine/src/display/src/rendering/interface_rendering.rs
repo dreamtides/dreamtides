@@ -7,6 +7,7 @@ use battle_queries::legal_action_queries::legal_actions_data::{ForPlayer, LegalA
 use battle_queries::panic_with;
 use battle_state::actions::battle_actions::BattleAction;
 use battle_state::battle::battle_state::BattleState;
+use battle_state::battle::battle_turn_phase::BattleTurnPhase;
 use battle_state::core::effect_source::CardSource;
 use battle_state::prompt_types::prompt_data::{PromptData, PromptType};
 use core_data::numerics::Energy;
@@ -318,11 +319,16 @@ fn render_show_battlefield_button(
         .map(|p| matches!(p.prompt_type, PromptType::SelectDeckCardOrder { .. }))
         .unwrap_or(false);
     let has_browser = display_state::get_card_browser_source(builder).is_some();
-    if !(has_stack || has_card_order_selector_prompt || has_browser) {
+    let has_active_dreamwell_card = has_active_dreamwell_card(battle);
+    if !(has_stack || has_card_order_selector_prompt || has_browser || has_active_dreamwell_card) {
         return None;
     }
 
-    let label = builder.string(string_id::SHOW_BATTLEFIELD_BUTTON);
+    let label = if display_state::is_battlefield_shown(builder) {
+        builder.string(string_id::HIDE_BATTLEFIELD_BUTTON)
+    } else {
+        builder.string(string_id::SHOW_BATTLEFIELD_BUTTON)
+    };
 
     Some(
         BoxComponent::builder()
@@ -384,4 +390,9 @@ fn card_order_selector_view(
     } else {
         None
     }
+}
+
+fn has_active_dreamwell_card(battle: &BattleState) -> bool {
+    battle.phase == BattleTurnPhase::Dreamwell
+        && battle.ability_state.until_end_of_turn.active_dreamwell_card.is_some()
 }

@@ -12,6 +12,7 @@ use tabula_ids::string_id;
 
 use crate::core::adapter;
 use crate::core::response_builder::ResponseBuilder;
+use crate::display_actions::display_state;
 use crate::rendering::card_rendering;
 
 /// Returns [CardView]s for all cards present in the dreamwell.
@@ -32,18 +33,25 @@ fn dreamwell_card_view(
     let client_id = adapter::battle_dreamwell_card_id(card_id);
     let player = builder.to_display_player(builder.display_for_player());
 
+    let base_position = if battle.phase == BattleTurnPhase::Dreamwell
+        && battle.ability_state.until_end_of_turn.active_dreamwell_card == Some(card_id)
+    {
+        Position::DreamwellActivation
+    } else {
+        Position::InDreamwell(player)
+    };
+
+    let position = if display_state::is_battlefield_shown(builder)
+        && base_position == Position::DreamwellActivation
+    {
+        Position::OnScreenStorage
+    } else {
+        base_position
+    };
+
     CardView {
         id: client_id,
-        position: ObjectPosition {
-            position: if battle.phase == BattleTurnPhase::Dreamwell
-                && battle.ability_state.until_end_of_turn.active_dreamwell_card == Some(card_id)
-            {
-                Position::DreamwellActivation
-            } else {
-                Position::InDreamwell(player)
-            },
-            sorting_key: Into::<usize>::into(card_id) as u32,
-        },
+        position: ObjectPosition { position, sorting_key: Into::<usize>::into(card_id) as u32 },
         revealed: Some(RevealedCardView {
             image: DisplayImage::Sprite(card.definition.image.clone()),
             name: card.definition.displayed_name.clone(),

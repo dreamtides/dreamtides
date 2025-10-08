@@ -346,13 +346,13 @@
       "id": "bec6ea4b-55b9-4eb9-8173-9dd4f03eaf05",
       "name": "show-battlefield-button",
       "description": "Button to hide the stack and view the battlefield",
-      "en_us": "{eye-icon}"
+      "en_us": "{eye-slash-icon}"
     },
     {
       "id": "e2cbff72-868a-4be2-a13a-37815ce0a5f2",
       "name": "hide-battlefield-button",
       "description": "Button to show the stack after hiding it",
-      "en_us": "{eye-slash-icon}"
+      "en_us": "{eye-icon}"
     },
     {
       "id": "1231c8b5-de17-4cf3-b45d-f42d62143916",

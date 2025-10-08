@@ -5,6 +5,7 @@ use core_data::types::PlayerName;
 use display_data::battle_view::DisplayPlayer;
 use display_data::card_view::CardPrefab;
 use display_data::object_position::Position;
+use tabula_ids::card_lists::DreamwellCardIdList;
 use tabula_ids::test_card;
 use test_utils::battle::test_battle::TestBattle;
 use test_utils::battle::test_player::TestPlayer;
@@ -508,4 +509,64 @@ fn hide_overlay_does_not_hide_hand_ability_tokens() {
     let storage_tokens: Vec<_> =
         storage_list.iter().filter(|c| c.view.prefab == CardPrefab::Token).collect();
     assert!(storage_tokens.is_empty(), "no hand ability tokens should move to on screen storage");
+}
+
+#[test]
+fn toggle_battlefield_visibility_hides_and_shows_dreamwell_card() {
+    let mut s =
+        TestBattle::builder().with_dreamwell(DreamwellCardIdList::TestDreamwellBasic5).connect();
+
+    s.add_to_hand(DisplayPlayer::User, test_card::TEST_VANILLA_CHARACTER);
+    s.end_turn_remove_opponent_hand(DisplayPlayer::User);
+    s.set_next_dreamwell_card(DisplayPlayer::Enemy, test_card::DREAMWELL_DRAW_DISCARD);
+    s.perform_enemy_action(BattleAction::EndTurn);
+
+    let dreamwell_cards = s.user_client.cards.cards_at_position(&Position::DreamwellActivation);
+    assert_eq!(
+        dreamwell_cards.len(),
+        1,
+        "dreamwell card should be at DreamwellActivation position"
+    );
+    let dreamwell_card = dreamwell_cards.get(0).expect("dreamwell card exists");
+    assert_eq!(
+        dreamwell_card.view.prefab,
+        CardPrefab::Dreamwell,
+        "card should be a dreamwell card"
+    );
+    assert_eq!(
+        s.user_client.cards.cards_at_position(&Position::OnScreenStorage).len(),
+        0,
+        "on screen storage should be empty initially"
+    );
+
+    s.perform_user_action(BattleDisplayAction::ToggleStackVisibility);
+
+    assert_eq!(
+        s.user_client.cards.cards_at_position(&Position::DreamwellActivation).len(),
+        0,
+        "dreamwell card should be hidden from DreamwellActivation position"
+    );
+    let storage_cards = s.user_client.cards.cards_at_position(&Position::OnScreenStorage);
+    assert_eq!(storage_cards.len(), 1, "dreamwell card should be in on screen storage");
+    let stored_card = storage_cards.get(0).expect("stored card exists");
+    assert_eq!(
+        stored_card.view.prefab,
+        CardPrefab::Dreamwell,
+        "stored card should be the dreamwell card"
+    );
+
+    s.perform_user_action(BattleDisplayAction::ToggleStackVisibility);
+
+    let dreamwell_cards_after =
+        s.user_client.cards.cards_at_position(&Position::DreamwellActivation);
+    assert_eq!(
+        dreamwell_cards_after.len(),
+        1,
+        "dreamwell card should be back at DreamwellActivation position"
+    );
+    assert_eq!(
+        s.user_client.cards.cards_at_position(&Position::OnScreenStorage).len(),
+        0,
+        "on screen storage should be empty after showing dreamwell card again"
+    );
 }
