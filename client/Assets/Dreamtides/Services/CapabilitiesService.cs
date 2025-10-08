@@ -41,6 +41,7 @@ namespace Dreamtides.Services
         case GameContext.Battlefield:
         case GameContext.Stack:
         case GameContext.GameModifiers:
+        case GameContext.OnScreenStorage:
           return !AnyBrowserOpen();
         case GameContext.Hand:
           return position.PositionClass?.InHand == DisplayPlayer.Enemy;
