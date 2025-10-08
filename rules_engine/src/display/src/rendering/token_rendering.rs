@@ -52,6 +52,7 @@ pub fn trigger_card_view(
             })
             .image(card_rendering::card_image(battle, character_card_id))
             .name(card_rendering::card_name(battle, character_card_id))
+            .card_type(builder.string(string_id::TOKEN_TYPE_TRIGGERED_ABILITY))
             .rules_text(card_rendering::ability_token_text(
                 builder,
                 &definition,
@@ -176,6 +177,7 @@ fn activated_ability_card_view(
         .find(|data| data.ability_number == ability.ability_number)
         .expect("Ability not found");
 
+    let is_fast = ability_data.ability.is_fast();
     let action = BattleAction::ActivateAbilityForCharacter(ability.character_id);
     let activate_action = Some(GameAction::BattleAction(action));
     let cost = ability_data.ability.costs.iter().find_map(|cost| match cost {
@@ -217,7 +219,11 @@ fn activated_ability_card_view(
             .image(card_rendering::card_image(battle, character_card_id))
             .name(ability_name)
             .maybe_cost(cost.map(|cost| cost.to_string()))
-            .maybe_card_type(Some("Activated Ability".to_string()))
+            .card_type(format!(
+                "{} {}",
+                if is_fast { format!("{} ", icon::FAST) } else { "".to_string() },
+                builder.string(string_id::TOKEN_TYPE_ACTIVATED_ABILITY)
+            ))
             .rules_text(card_rendering::ability_token_text(
                 builder,
                 &definition,
@@ -312,7 +318,11 @@ fn void_card_token_view(
             .position(ObjectPosition { position, sorting_key: hand_sorting_key })
             .image(card_rendering::card_image(battle, card_id))
             .name(card_rendering::card_name(battle, card_id))
-            .card_type(format!("{} Reclaim Ability", icon::FAST))
+            .card_type(format!(
+                "{} {}",
+                icon::FAST,
+                builder.string(string_id::TOKEN_TYPE_RECLAIM_ABILITY)
+            ))
             .cost(
                 from_void_with_cost
                     .map(|cost| cost.cost.to_string())

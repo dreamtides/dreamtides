@@ -312,3 +312,15 @@ pub const HELP_TEXT_RECLAIM_WITHOUT_COST: StringId =
 /// Info zoom help text, displayed on a tooltip to describe card abilities
 pub const HELP_TEXT_RECLAIM_WITH_COST: StringId =
     StringId(uuid!("7b13a745-c94b-437c-bc2d-73c64b479147"));
+
+/// Card type for an activated ability card
+pub const TOKEN_TYPE_ACTIVATED_ABILITY: StringId =
+    StringId(uuid!("cf017f6f-7cc5-4b40-8819-25ec7fb5acd2"));
+
+/// Card type for a triggered ability card
+pub const TOKEN_TYPE_TRIGGERED_ABILITY: StringId =
+    StringId(uuid!("f4fe91cb-3bb9-4b58-9949-6652a388c0c8"));
+
+/// Card type for a reclaim ability card
+pub const TOKEN_TYPE_RECLAIM_ABILITY: StringId =
+    StringId(uuid!("1dd37348-a684-4f5f-a8e3-87ecb7354c85"));

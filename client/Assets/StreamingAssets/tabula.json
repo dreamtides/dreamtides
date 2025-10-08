@@ -599,6 +599,24 @@
       "name": "help-text-reclaim-with-cost",
       "description": "Info zoom help text, displayed on a tooltip to describe card abilities",
       "en_us": "{keyword}Reclaim{end-keyword} {$e}{e}: You may play this card from your void for {$e}{e}, then banish it."
+    },
+    {
+      "id": "cf017f6f-7cc5-4b40-8819-25ec7fb5acd2",
+      "name": "token-type-activated-ability",
+      "description": "Card type for an activated ability card",
+      "en_us": "Activated Ability"
+    },
+    {
+      "id": "f4fe91cb-3bb9-4b58-9949-6652a388c0c8",
+      "name": "token-type-triggered-ability",
+      "description": "Card type for a triggered ability card",
+      "en_us": "Triggered Ability"
+    },
+    {
+      "id": "1dd37348-a684-4f5f-a8e3-87ecb7354c85",
+      "name": "token-type-reclaim-ability",
+      "description": "Card type for a reclaim ability card",
+      "en_us": "Reclaim Ability"
     }
   ],
   "cards": [
