@@ -83,10 +83,7 @@ namespace Dreamtides.Layout
     bool _ignoreSafeArea = false;
 
     bool _validationInitialized = false;
-    SceneElementScreenAnchor _prevAnchor;
-    float _prevXOffset;
-    float _prevYOffset;
-    float _prevDistance;
+
     SceneElementScreenAnchor _prevLandscapeAnchor;
     float _prevLandscapeXOffset;
     float _prevLandscapeYOffset;
@@ -128,7 +125,14 @@ namespace Dreamtides.Layout
       return new Vector2(centerX, centerY);
     }
 
-    static Vector3 ComputeWorldPosition(Camera camera, Rect rect, SceneElementScreenAnchor anchor, float xOffset, float yOffset, float distance)
+    static Vector3 ComputeWorldPosition(
+      Camera camera,
+      Rect rect,
+      SceneElementScreenAnchor anchor,
+      float xOffset,
+      float yOffset,
+      float distance
+    )
     {
       var anchorPoint = AnchorToScreenPoint(rect, anchor);
       var screenPoint = new Vector3(anchorPoint.x + xOffset, anchorPoint.y + yOffset, distance);
@@ -143,7 +147,8 @@ namespace Dreamtides.Layout
     static Rect ComputeSafeAreaScreenRect(RectTransform safeArea)
     {
       var canvas = safeArea.GetComponentInParent<Canvas>();
-      var pixelRect = canvas != null ? canvas.pixelRect : new Rect(0f, 0f, Screen.width, Screen.height);
+      var pixelRect =
+        canvas != null ? canvas.pixelRect : new Rect(0f, 0f, Screen.width, Screen.height);
       var min = safeArea.anchorMin;
       var max = safeArea.anchorMax;
       var xMin = pixelRect.x + pixelRect.width * min.x;
@@ -157,10 +162,6 @@ namespace Dreamtides.Layout
     {
       if (!_validationInitialized)
       {
-        _prevAnchor = _anchor;
-        _prevXOffset = _xOffset;
-        _prevYOffset = _yOffset;
-        _prevDistance = _distanceFromCamera;
         _prevLandscapeAnchor = _landscapeAnchor;
         _prevLandscapeXOffset = _landscapeXOffset;
         _prevLandscapeYOffset = _landscapeYOffset;
@@ -203,10 +204,6 @@ namespace Dreamtides.Layout
         _landscapeDistanceFromCamera = 0f;
       }
 
-      _prevAnchor = _anchor;
-      _prevXOffset = _xOffset;
-      _prevYOffset = _yOffset;
-      _prevDistance = _distanceFromCamera;
       _prevLandscapeAnchor = _landscapeAnchor;
       _prevLandscapeXOffset = _landscapeXOffset;
       _prevLandscapeYOffset = _landscapeYOffset;
@@ -233,10 +230,15 @@ namespace Dreamtides.Layout
       var anchor = isLandscape && _useLandscapeAnchor ? _landscapeAnchor : _anchor;
       var xOffset = isLandscape && _useLandscapeXOffset ? _landscapeXOffset : _xOffset;
       var yOffset = isLandscape && _useLandscapeYOffset ? _landscapeYOffset : _yOffset;
-      var distance = isLandscape && _useLandscapeDistanceFromCamera ? _landscapeDistanceFromCamera : _distanceFromCamera;
+      var distance =
+        isLandscape && _useLandscapeDistanceFromCamera
+          ? _landscapeDistanceFromCamera
+          : _distanceFromCamera;
 
       var camera = Registry.MainCamera;
-      var rect = _ignoreSafeArea ? ComputeFullScreenRect() : ComputeSafeAreaScreenRect(Registry.CanvasSafeArea);
+      var rect = _ignoreSafeArea
+        ? ComputeFullScreenRect()
+        : ComputeSafeAreaScreenRect(Registry.CanvasSafeArea);
       var world = ComputeWorldPosition(camera, rect, anchor, xOffset, yOffset, distance);
       transform.position = world;
     }
@@ -244,10 +246,15 @@ namespace Dreamtides.Layout
 #if UNITY_EDITOR
     void OnDrawGizmos()
     {
-      var camera = Application.isPlaying ? Registry.MainCamera : (Camera.main != null ? Camera.main : Camera.current);
+      var camera = Application.isPlaying
+        ? Registry.MainCamera
+        : (Camera.main != null ? Camera.main : Camera.current);
       if (camera == null)
       {
-        var cams = Object.FindObjectsByType<Camera>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+        var cams = Object.FindObjectsByType<Camera>(
+          FindObjectsInactive.Include,
+          FindObjectsSortMode.None
+        );
         if (cams.Length == 0)
         {
           return;
@@ -258,8 +265,17 @@ namespace Dreamtides.Layout
       var anchor = isLandscape && _useLandscapeAnchor ? _landscapeAnchor : _anchor;
       var xOffset = isLandscape && _useLandscapeXOffset ? _landscapeXOffset : _xOffset;
       var yOffset = isLandscape && _useLandscapeYOffset ? _landscapeYOffset : _yOffset;
-      var distance = isLandscape && _useLandscapeDistanceFromCamera ? _landscapeDistanceFromCamera : _distanceFromCamera;
-      var rect = Application.isPlaying ? (_ignoreSafeArea ? ComputeFullScreenRect() : ComputeSafeAreaScreenRect(Registry.CanvasSafeArea)) : ComputeFullScreenRect();
+      var distance =
+        isLandscape && _useLandscapeDistanceFromCamera
+          ? _landscapeDistanceFromCamera
+          : _distanceFromCamera;
+      var rect = Application.isPlaying
+        ? (
+          _ignoreSafeArea
+            ? ComputeFullScreenRect()
+            : ComputeSafeAreaScreenRect(Registry.CanvasSafeArea)
+        )
+        : ComputeFullScreenRect();
       var baseWorld = ComputeWorldPosition(camera, rect, anchor, 0f, 0f, distance);
       var world = ComputeWorldPosition(camera, rect, anchor, xOffset, yOffset, distance);
       Gizmos.color = Color.yellow;
@@ -285,7 +301,10 @@ namespace Dreamtides.Layout
       var anchor = isLandscape && _useLandscapeAnchor ? _landscapeAnchor : _anchor;
       var xOffset = isLandscape && _useLandscapeXOffset ? _landscapeXOffset : _xOffset;
       var yOffset = isLandscape && _useLandscapeYOffset ? _landscapeYOffset : _yOffset;
-      var distance = isLandscape && _useLandscapeDistanceFromCamera ? _landscapeDistanceFromCamera : _distanceFromCamera;
+      var distance =
+        isLandscape && _useLandscapeDistanceFromCamera
+          ? _landscapeDistanceFromCamera
+          : _distanceFromCamera;
       var rect = ComputeFullScreenRect();
       var camera = Camera.main != null ? Camera.main : Camera.current;
       if (camera == null)
