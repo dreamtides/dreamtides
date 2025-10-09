@@ -29,7 +29,7 @@ namespace Dreamtides.Services
       if (testConfiguration == null)
       {
         // Don't play music in tests
-        _audioSource = Registry.MusicAudioSource();
+        _audioSource = Registry.MusicAudioSource;
         ShufflePlaylist();
         PlayNextTrack();
       }

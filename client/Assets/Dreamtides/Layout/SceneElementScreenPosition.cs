@@ -235,7 +235,7 @@ namespace Dreamtides.Layout
       var yOffset = isLandscape && _useLandscapeYOffset ? _landscapeYOffset : _yOffset;
       var distance = isLandscape && _useLandscapeDistanceFromCamera ? _landscapeDistanceFromCamera : _distanceFromCamera;
 
-      var camera = Registry.CurrentCamera();
+      var camera = Registry.MainCamera;
       var rect = _ignoreSafeArea ? ComputeFullScreenRect() : ComputeSafeAreaScreenRect(Registry.CanvasSafeArea);
       var world = ComputeWorldPosition(camera, rect, anchor, xOffset, yOffset, distance);
       transform.position = world;
@@ -244,7 +244,7 @@ namespace Dreamtides.Layout
 #if UNITY_EDITOR
     void OnDrawGizmos()
     {
-      var camera = Application.isPlaying ? Registry.CurrentCamera() : (Camera.main != null ? Camera.main : Camera.current);
+      var camera = Application.isPlaying ? Registry.MainCamera : (Camera.main != null ? Camera.main : Camera.current);
       if (camera == null)
       {
         var cams = Object.FindObjectsByType<Camera>(FindObjectsInactive.Include, FindObjectsSortMode.None);

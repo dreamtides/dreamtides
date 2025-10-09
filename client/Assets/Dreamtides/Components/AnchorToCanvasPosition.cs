@@ -39,7 +39,7 @@ namespace Dreamtides.Components
       }
 
       var screenPoint = TransformUtils.RectTransformToScreenSpace(_rectTransform).center;
-      var anchor = _registry.Layout.MainCamera.ScreenToWorldPoint(
+      var anchor = _registry.MainCamera.ScreenToWorldPoint(
         new Vector3(screenPoint.x, screenPoint.y, _distanceFromCamera)
       );
 

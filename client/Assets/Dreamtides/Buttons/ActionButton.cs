@@ -264,7 +264,7 @@ namespace Dreamtides.Buttons
 
       _currentAnimation?.Kill();
       Vector3 directionFromCamera = (
-        transform.position - _registry.Layout.MainCamera.transform.position
+        transform.position - _registry.MainCamera.transform.position
       ).normalized;
       Vector3 targetPosition = transform.position + directionFromCamera * _moveDistance;
       _currentAnimation = TweenUtils.Sequence("ButtonPressAnimation");

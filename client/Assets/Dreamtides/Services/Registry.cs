@@ -30,8 +30,23 @@ namespace Dreamtides.Services
     public GameLayout Layout => IsLandscape ? Check(_landscapeLayout) : Check(_portraitLayout);
 
     [SerializeField]
+    Camera _mainCamera = null!;
+    public Camera MainCamera => Check(_mainCamera);
+
+    [SerializeField]
+    GameCamera _cameraAdjuster = null!;
+
+    [SerializeField]
     RectTransform _canvasSafeArea = null!;
     public RectTransform CanvasSafeArea => Check(_canvasSafeArea);
+
+    [SerializeField]
+    AudioSource _mainAudioSource = null!;
+    public AudioSource MainAudioSource => Check(_mainAudioSource);
+
+    [SerializeField]
+    AudioSource _musicAudioSource = null!;
+    public AudioSource MusicAudioSource => Check(_musicAudioSource);
 
     [SerializeField]
     DreamscapeLayout? _dreamscapeLayout;
@@ -138,20 +153,6 @@ namespace Dreamtides.Services
     PrototypeQuest? _prototypeQuest;
     public PrototypeQuest PrototypeQuest => Check(_prototypeQuest);
 
-    public Camera CurrentCamera()
-    {
-      if (_currentGameMode == GameMode.Battle)
-      {
-        return Layout.MainCamera;
-      }
-      else
-      {
-        return DreamscapeService.QuestCamera;
-      }
-    }
-
-    public AudioSource MusicAudioSource() => ComponentUtils.Get<AudioSource>(CurrentCamera());
-
     void Awake()
     {
       _currentGameMode = (GameMode)
@@ -223,12 +224,11 @@ namespace Dreamtides.Services
       var battleMode = mode == GameMode.Battle;
       if (battleMode)
       {
-        var battleCamera = ComponentUtils.Get<GameCamera>(Layout.MainCamera);
-        battleCamera.AdjustFieldOfView();
+        _cameraAdjuster.AdjustFieldOfView();
+        MainCamera.transform.position = Layout.CameraPosition.position;
+        MainCamera.transform.rotation = Layout.CameraPosition.rotation;
       }
 
-      Layout.MainCamera.gameObject.SetActive(battleMode);
-      DreamscapeService.QuestCamera.gameObject.SetActive(!battleMode);
       Layout.UserStatusDisplay.TotalSpark.gameObject.SetActive(battleMode);
       Layout.UserStatusDisplay.gameObject.SetActive(battleMode);
       Layout.EnemyStatusDisplay.TotalSpark.gameObject.SetActive(battleMode);

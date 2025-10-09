@@ -16,7 +16,7 @@ namespace Dreamtides.TestUtils
 
     public static IEnumerator ClickOn(Registry registry, Displayable target)
     {
-      var screenPosition = registry.Layout.MainCamera.WorldToScreenPoint(target.transform.position);
+      var screenPosition = registry.MainCamera.WorldToScreenPoint(target.transform.position);
       registry.InputService.InputProvider = new TestClickInputProvider(target, screenPosition);
       yield return new WaitForSeconds(0.2f);
       yield return registry.TestHelperService.WaitForIdle(IntegrationTest.TimeoutSeconds);

@@ -10,16 +10,8 @@ namespace Dreamtides.Layout
   public class GameLayout : MonoBehaviour
   {
     [SerializeField]
-    Camera? _mainCamera;
-    public Camera MainCamera => Check(_mainCamera);
-
-    [SerializeField]
-    AudioSource? _mainAudioSource;
-    public AudioSource MainAudioSource => Check(_mainAudioSource);
-
-    [SerializeField]
-    AudioSource? _musicAudioSource;
-    public AudioSource MusicAudioSource => Check(_musicAudioSource);
+    Transform? _cameraPosition;
+    public Transform CameraPosition => Check(_cameraPosition);
 
     [SerializeField]
     UserHandLayout? _userHand;

@@ -43,18 +43,18 @@ namespace Dreamtides.Services
     {
       if (testConfiguration != null)
       {
-        Registry.Layout.MainAudioSource.volume = 0.0f;
+        Registry.MainAudioSource.volume = 0.0f;
       }
     }
 
     public void Play(AudioClip clip)
     {
-      Registry.Layout.MainAudioSource.PlayOneShot(clip);
+      Registry.MainAudioSource.PlayOneShot(clip);
     }
 
     public void Play(AudioClipAddress clipAddress)
     {
-      Registry.Layout.MainAudioSource.PlayOneShot(Registry.AssetService.GetAudioClip(clipAddress));
+      Registry.MainAudioSource.PlayOneShot(Registry.AssetService.GetAudioClip(clipAddress));
     }
 
     public void PlayCardSound()

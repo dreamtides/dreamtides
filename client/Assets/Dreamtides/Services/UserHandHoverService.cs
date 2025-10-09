@@ -113,7 +113,7 @@ namespace Dreamtides.Services
             continue;
           }
 
-          var screenTargetPosition = Registry.Layout.MainCamera.WorldToScreenPoint(
+          var screenTargetPosition = Registry.MainCamera.WorldToScreenPoint(
             targetPosition.Value
           );
           var distance = Vector2.Distance(
@@ -156,7 +156,7 @@ namespace Dreamtides.Services
             continue;
           }
 
-          var screenZ = Registry.Layout.MainCamera.WorldToScreenPoint(targetPosition.Value).z;
+          var screenZ = Registry.MainCamera.WorldToScreenPoint(targetPosition.Value).z;
           var worldPointerPosition = Registry.InputService.WorldPointerPosition(screenZ);
           var distance = Vector3.Distance(worldPointerPosition, targetPosition.Value);
 

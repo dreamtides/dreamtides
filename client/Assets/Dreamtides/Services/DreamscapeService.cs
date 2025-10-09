@@ -15,9 +15,6 @@ namespace Dreamtides.Services
   public class DreamscapeService : Service
   {
     [SerializeField]
-    Camera _questCamera = null!;
-
-    [SerializeField]
     ObjectLayout _tmpSiteDeckLayout = null!;
 
     [SerializeField]
@@ -42,8 +39,6 @@ namespace Dreamtides.Services
     RectTransform _debugQuestButtons = null!;
 
     public CanvasGroup CloseButton => Errors.CheckNotNull(_closeButton);
-
-    public Camera QuestCamera => Errors.CheckNotNull(_questCamera);
 
     protected override void OnInitialize(GameMode mode, TestConfiguration? testConfiguration)
     {

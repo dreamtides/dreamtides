@@ -18,8 +18,8 @@ namespace Dreamtides.TestUtils
 
     public static IEnumerator DragTo(Registry registry, Displayable source, Displayable target)
     {
-      var startPosition = registry.Layout.MainCamera.WorldToScreenPoint(source.transform.position);
-      var endPosition = registry.Layout.MainCamera.WorldToScreenPoint(target.transform.position);
+      var startPosition = registry.MainCamera.WorldToScreenPoint(source.transform.position);
+      var endPosition = registry.MainCamera.WorldToScreenPoint(target.transform.position);
       registry.InputService.InputProvider = new TestDragInputProvider(
         source,
         startPosition,

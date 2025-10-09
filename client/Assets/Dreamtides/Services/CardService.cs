@@ -221,7 +221,7 @@ namespace Dreamtides.Services
     /// </summary>
     public void MoveTowardsCamera(MonoBehaviour component, float distance)
     {
-      var towardsCameraDirection = -Registry.Layout.MainCamera.transform.forward;
+      var towardsCameraDirection = -Registry.MainCamera.transform.forward;
       component.transform.position += towardsCameraDirection * distance;
     }
 

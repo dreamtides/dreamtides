@@ -52,7 +52,7 @@ namespace Dreamtides.Services
     {
       var allowedContexts = _registry.DocumentService.AllowedContextForClicks();
       var tapScreenPosition = PointerPosition();
-      var ray = _registry.Layout.MainCamera.ScreenPointToRay(tapScreenPosition);
+      var ray = _registry.MainCamera.ScreenPointToRay(tapScreenPosition);
       var hits = Physics.RaycastAll(
         ray,
         maxDistance: 256,
@@ -109,7 +109,7 @@ namespace Dreamtides.Services
     public Vector3 WorldPointerPosition(float screenZ)
     {
       var tapScreenPosition = InputProvider.PointerPosition();
-      return Registry.Layout.MainCamera.ScreenToWorldPoint(
+      return Registry.MainCamera.ScreenToWorldPoint(
         new Vector3(tapScreenPosition.x, tapScreenPosition.y, screenZ)
       );
     }

@@ -254,7 +254,7 @@ namespace Dreamtides.TestUtils
 
       foreach (var corner in corners)
       {
-        var viewportPos = Registry.Layout.MainCamera.WorldToViewportPoint(corner);
+        var viewportPos = Registry.MainCamera.WorldToViewportPoint(corner);
 
         var errorMessage =
           message ?? $"BoxCollider corner at {corner} is outside viewport: {viewportPos}";
@@ -288,7 +288,7 @@ namespace Dreamtides.TestUtils
 
       foreach (var corner in corners)
       {
-        var viewportPos = Registry.Layout.MainCamera.WorldToViewportPoint(corner);
+        var viewportPos = Registry.MainCamera.WorldToViewportPoint(corner);
 
         if (
           !(
@@ -360,8 +360,8 @@ namespace Dreamtides.TestUtils
       var colliderParent = sprite.GetComponentInParent<Collider>();
       var ofParent = colliderParent ? $" of {colliderParent.gameObject.name}" : "";
 
-      var screenPoint = Registry.Layout.MainCamera.WorldToScreenPoint(spriteCenter);
-      var ray = Registry.Layout.MainCamera.ScreenPointToRay(screenPoint);
+      var screenPoint = Registry.MainCamera.WorldToScreenPoint(spriteCenter);
+      var ray = Registry.MainCamera.ScreenPointToRay(screenPoint);
 
       var hits = Physics.RaycastAll(ray);
 

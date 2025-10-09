@@ -87,7 +87,7 @@ namespace Dreamtides.Services
       {
         var hit = Registry.AssetPoolService.Create(_hitEffectPrefab, actorSparkTotal.position);
         var rotation = Quaternion.LookRotation(
-          transform.position - Registry.Layout.MainCamera.transform.position
+          transform.position - Registry.MainCamera.transform.position
         );
         hit.transform.rotation = rotation;
         hit.transform.localScale = 5f * Vector3.one;
