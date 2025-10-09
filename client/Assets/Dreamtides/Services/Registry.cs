@@ -163,6 +163,7 @@ namespace Dreamtides.Services
       {
         // Note: Test screen resolution is not correct on Awake() frame
         Debug.Log($"Starting integration test {testConfiguration.IntegrationTestId}");
+        _currentGameMode = GameMode.Battle;
       }
       else
       {
