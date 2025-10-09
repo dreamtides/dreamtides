@@ -74,7 +74,7 @@ namespace Dreamtides.Services
 
     protected override void OnUpdate()
     {
-      if (!_isTransitioning && _audioSource.clip != null)
+      if (!_isTransitioning && _audioSource && _audioSource.clip != null)
       {
         var shouldTransition =
           !_audioSource.isPlaying

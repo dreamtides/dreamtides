@@ -7,22 +7,16 @@ namespace Dreamtides.Components
   public class GameCamera : MonoBehaviour
   {
     [SerializeField]
-    Transform _topLeft = null!;
-
-    [SerializeField]
-    Transform _bottomLeft = null!;
-
-    [SerializeField]
     float _zoomInThreshold = 0.18f;
 
     [SerializeField]
     Camera _camera = null!;
 
-    public void AdjustFieldOfView()
+    public void AdjustFieldOfView(BattleCameraBounds bounds)
     {
       for (int i = 0; i < 25; i++)
       {
-        var bottomLeft = _camera.WorldToViewportPoint(_bottomLeft.position);
+        var bottomLeft = _camera.WorldToViewportPoint(bounds.BottomLeftAnchor.position);
         if (bottomLeft.x > _zoomInThreshold)
         {
           _camera.fieldOfView -= 1;
@@ -31,7 +25,7 @@ namespace Dreamtides.Components
 
       for (int i = 0; i < 25; i++)
       {
-        var topLeft = _camera.WorldToViewportPoint(_topLeft.position);
+        var topLeft = _camera.WorldToViewportPoint(bounds.TopLeftAnchor.position);
         if (topLeft.x > _zoomInThreshold)
         {
           _camera.fieldOfView -= 1;
@@ -40,7 +34,7 @@ namespace Dreamtides.Components
 
       for (int i = 0; i < 25; i++)
       {
-        var bottomLeft = _camera.WorldToViewportPoint(_bottomLeft.position);
+        var bottomLeft = _camera.WorldToViewportPoint(bounds.BottomLeftAnchor.position);
         if (bottomLeft.x < 0 || bottomLeft.y < 0)
         {
           _camera.fieldOfView += 1;
@@ -49,7 +43,7 @@ namespace Dreamtides.Components
 
       for (int i = 0; i < 25; i++)
       {
-        var topLeft = _camera.WorldToViewportPoint(_topLeft.position);
+        var topLeft = _camera.WorldToViewportPoint(bounds.TopLeftAnchor.position);
         if (topLeft.x < 0 || topLeft.y < 0)
         {
           _camera.fieldOfView += 1;

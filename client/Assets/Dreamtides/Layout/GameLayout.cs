@@ -14,6 +14,10 @@ namespace Dreamtides.Layout
     public Transform CameraPosition => Check(_cameraPosition);
 
     [SerializeField]
+    BattleCameraBounds? _battleCameraBounds;
+    public BattleCameraBounds BattleCameraBounds => Check(_battleCameraBounds);
+
+    [SerializeField]
     UserHandLayout? _userHand;
     public UserHandLayout UserHand => Check(_userHand);
 

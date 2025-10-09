@@ -200,33 +200,39 @@ namespace Dreamtides.Services
       }
 
       Application.targetFrameRate = 60;
-      ToggleGameObjectForMode(mode);
 
       foreach (var service in GetComponentsInChildren<Service>())
       {
         service.Initialize(this, mode, testConfiguration);
       }
 
-      foreach (var element in FindObjectsByType<SceneElement>(FindObjectsInactive.Exclude, FindObjectsSortMode.None))
+      foreach (
+        var element in FindObjectsByType<SceneElement>(
+          FindObjectsInactive.Exclude,
+          FindObjectsSortMode.None
+        )
+      )
       {
         if (element.gameObject.scene == gameObject.scene)
         {
           element.Initialize(this, mode, testConfiguration);
         }
       }
+
+      ToggleGameObjectsForMode(mode);
     }
 
     T Check<T>(T? value)
       where T : Object => Errors.CheckNotNull(value, $"{typeof(T).Name} not initialized");
 
-    void ToggleGameObjectForMode(GameMode mode)
+    void ToggleGameObjectsForMode(GameMode mode)
     {
       var battleMode = mode == GameMode.Battle;
       if (battleMode)
       {
-        _cameraAdjuster.AdjustFieldOfView();
         MainCamera.transform.position = Layout.CameraPosition.position;
         MainCamera.transform.rotation = Layout.CameraPosition.rotation;
+        _cameraAdjuster.AdjustFieldOfView(Layout.BattleCameraBounds);
       }
 
       Layout.UserStatusDisplay.TotalSpark.gameObject.SetActive(battleMode);
