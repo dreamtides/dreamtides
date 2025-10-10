@@ -19,6 +19,8 @@ namespace Dreamtides.Layout
     [SerializeField]
     bool _debugUpdateContinuously = false;
 
+    bool _shouldFireBecameNonEmptyAfterNextLayoutAnimation;
+
     /// <summary>
     /// If true, the layout will update continuously.
     /// </summary>
@@ -35,6 +37,8 @@ namespace Dreamtides.Layout
     public override void Add(Displayable displayable)
     {
       Errors.CheckNotNull(displayable);
+
+      var wasEmpty = _objects.Count == 0;
 
       if (!_objects.Contains(displayable))
       {
@@ -53,6 +57,11 @@ namespace Dreamtides.Layout
       }
 
       SortObjects();
+
+      if (wasEmpty && Objects.Count > 0)
+      {
+        _shouldFireBecameNonEmptyAfterNextLayoutAnimation = true;
+      }
     }
 
     /// <summary>Adds a range of objects to this ObjectLayout</summary>
@@ -99,7 +108,22 @@ namespace Dreamtides.Layout
       {
         ApplyLayoutToObject(_objects[i], i, _objects.Count, sequence);
       }
+
+      if (_shouldFireBecameNonEmptyAfterNextLayoutAnimation && sequence != null)
+      {
+        sequence.AppendCallback(() =>
+        {
+          _shouldFireBecameNonEmptyAfterNextLayoutAnimation = false;
+          OnBecameNonEmpty();
+        });
+      }
     }
+
+    /// <summary>
+    /// Invoked after adding objects when the count of objects in this layout
+    /// changes from being zero to being nonzero.
+    /// </summary>
+    protected virtual void OnBecameNonEmpty() { }
 
     /// <summary>
     /// Calculates the position of the object at the given index in the layout.

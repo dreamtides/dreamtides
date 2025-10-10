@@ -68,9 +68,6 @@ namespace Dreamtides.Services
 
     public void ShowShopWithCards(List<Card> cards)
     {
-      _closeButton.gameObject.SetActive(true);
-      TweenUtils.FadeInCanvasGroup(_closeButton);
-
       foreach (var card in cards)
       {
         card.CardActionButton.gameObject.SetActive(true);

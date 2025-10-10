@@ -40,7 +40,10 @@ namespace Dreamtides.Layout
 #if UNITY_EDITOR
     void Reset()
     {
-      var registries = FindObjectsByType<Registry>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+      var registries = FindObjectsByType<Registry>(
+        FindObjectsInactive.Include,
+        FindObjectsSortMode.None
+      );
       var currentScene = gameObject.scene;
       var count = 0;
       var found = (Registry)null!;

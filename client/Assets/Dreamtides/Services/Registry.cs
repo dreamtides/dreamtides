@@ -37,6 +37,10 @@ namespace Dreamtides.Services
     GameCamera _cameraAdjuster = null!;
 
     [SerializeField]
+    Canvas _canvas = null!;
+    public Canvas Canvas => Check(_canvas);
+
+    [SerializeField]
     RectTransform _canvasSafeArea = null!;
     public RectTransform CanvasSafeArea => Check(_canvasSafeArea);
 
