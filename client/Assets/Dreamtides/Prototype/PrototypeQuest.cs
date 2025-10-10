@@ -145,21 +145,30 @@ public class PrototypeQuest : Service
     {
       return;
     }
-    if (parts[0] != "draft-pick")
-    {
-      return;
-    }
+    var action = parts[0];
     var clickedId = parts[1];
-    if (_currentDraftPickIds == null || _currentDraftPickIds.Count != 4)
+    if (action == "draft-pick")
     {
+      if (_currentDraftPickIds == null || _currentDraftPickIds.Count != 4)
+      {
+        return;
+      }
+      if (!_currentDraftPickIds.Contains(clickedId))
+      {
+        return;
+      }
+      StartCoroutine(ResolveDraftPick(clickedId));
       return;
     }
-    if (!_currentDraftPickIds.Contains(clickedId))
+    if (action == "shop-pick")
     {
+      if (_currentShopDisplayIds == null || !_currentShopDisplayIds.Contains(clickedId))
+      {
+        return;
+      }
+      StartCoroutine(ResolveShopPick(clickedId));
       return;
     }
-
-    StartCoroutine(ResolveDraftPick(clickedId));
   }
 
   IEnumerator ResolveDraftPick(string clickedId)
@@ -251,6 +260,55 @@ public class PrototypeQuest : Service
       _currentDraftPickIds.Clear();
       FocusMapCamera();
     }
+  }
+
+  IEnumerator ResolveShopPick(string clickedId)
+  {
+    var cardsForAnimation = new List<CardView>(1);
+    var card = Registry.CardService.GetCard(clickedId);
+    var source = card.CardView;
+    var sorting = Registry.DreamscapeLayout.QuestDeck.Objects.Count;
+    cardsForAnimation.Add(
+      CloneCardViewWithPosition(source, new Position { Enum = PositionEnum.QuestDeck }, sorting)
+    );
+
+    var command = new MoveCardsWithCustomAnimationCommand
+    {
+      Animation = MoveCardsCustomAnimation.MoveToQuestDeckOrDestroy,
+      Cards = cardsForAnimation,
+      Destination = new Position { Enum = PositionEnum.QuestDeck },
+      PauseDuration = new Milliseconds { MillisecondsValue = 300 },
+      StaggerInterval = new Milliseconds { MillisecondsValue = 100 },
+    };
+
+    yield return StartCoroutine(
+      Registry.CardAnimationService.HandleMoveCardsWithCustomAnimation(command)
+    );
+
+    var allIds = Registry.CardService.GetCardIds().ToList();
+    var updateCards = new List<CardView>(allIds.Count);
+    foreach (var id in allIds)
+    {
+      var c = Registry.CardService.GetCard(id);
+      var s = c.CardView;
+      if (id == clickedId)
+      {
+        var srt = Registry.DreamscapeLayout.QuestDeck.Objects.Count;
+        updateCards.Add(
+          CloneCardViewWithPositionHidden(s, new Position { Enum = PositionEnum.QuestDeck }, srt)
+        );
+      }
+      else
+      {
+        updateCards.Add(s);
+      }
+    }
+
+    var update = new UpdateQuestCommand { Quest = new QuestView { Cards = updateCards } };
+    yield return Registry.CardService.HandleUpdateQuestCommand(update);
+
+    _prototypeCards.UpdateGroupCards("shop", updateCards);
+    _currentShopDisplayIds.Remove(clickedId);
   }
 
   public void FocusSpaceCameraFar()
@@ -569,7 +627,7 @@ public class PrototypeQuest : Service
         },
         Revealed = true,
         GroupKey = "shop",
-        OnClickDebugScenario = "shop-display",
+        OnClickDebugScenario = "shop-pick",
         Overrides = _shopOverrides,
       }
     );
@@ -624,7 +682,7 @@ public class PrototypeQuest : Service
           },
           Revealed = true,
           GroupKey = "shop",
-          OnClickDebugScenario = "shop-display",
+          OnClickDebugScenario = "shop-pick",
         }
       )
     );
