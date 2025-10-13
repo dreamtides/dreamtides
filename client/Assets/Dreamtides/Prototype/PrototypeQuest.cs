@@ -305,7 +305,8 @@ public class PrototypeQuest : Service
     }
 
     var update = new UpdateQuestCommand { Quest = new QuestView { Cards = updateCards } };
-    yield return Registry.CardService.HandleUpdateQuestCommand(update);
+    var sequence = TweenUtils.Sequence("UpdateQuest");
+    yield return Registry.CardService.HandleUpdateQuestCommand(update, sequence);
 
     _prototypeCards.UpdateGroupCards("shop", updateCards);
     _currentShopDisplayIds.Remove(clickedId);
