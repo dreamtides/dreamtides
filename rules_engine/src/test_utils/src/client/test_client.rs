@@ -245,11 +245,6 @@ impl TestClient {
             {
                 actions.push(action.clone());
             }
-            if let Some(button) = &interface.bottom_right_button
-                && let Some(action) = &button.action
-            {
-                actions.push(action.clone());
-            }
         }
 
         // Collect actions from cards (sorted by card ID for deterministic order)

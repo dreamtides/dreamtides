@@ -34,18 +34,18 @@ namespace Dreamtides.Buttons
 
     public CanvasGroup CanvasGroup => _canvasGroup;
 
-    public void OnClick()
-    {
-      if (_view?.Action != null)
-      {
-        var currentTime = Time.time;
-        if (currentTime - _lastClickTime >= 0.5f)
-        {
-          _lastClickTime = currentTime;
-          _registry.ActionService.PerformAction(_view.Action?.ToGameAction());
-        }
-      }
-    }
+    // public void OnClick()
+    // {
+    //   if (_view?.Action != null)
+    //   {
+    //     var currentTime = Time.time;
+    //     if (currentTime - _lastClickTime >= 0.5f)
+    //     {
+    //       _lastClickTime = currentTime;
+    //       _registry.ActionService.PerformAction(_view.Action?.ToGameAction());
+    //     }
+    //   }
+    // }
 
     public void SetView(ButtonView? view)
     {

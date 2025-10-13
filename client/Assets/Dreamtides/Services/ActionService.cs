@@ -593,9 +593,6 @@ namespace Dreamtides.Services
           Registry.Layout.DevButton.SetView(command.UpdateBattle.Battle.Interface?.DevButton);
           Registry.Layout.CloseBrowserButton.CloseAction =
             command.UpdateBattle.Battle.Interface?.Browser?.CloseButton?.ToGameAction();
-          Registry.BottomRightButton.SetView(
-            command.UpdateBattle.Battle.Interface?.BottomRightButton
-          );
           coroutines.Add(
             StartCoroutine(
               Registry.CardService.HandleUpdateBattleCommand(

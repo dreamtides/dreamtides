@@ -84,7 +84,6 @@ pub fn interface_view(builder: &ResponseBuilder, battle: &BattleState) -> Interf
         }),
         browser: card_browser_view(builder),
         card_order_selector: card_order_selector_view(builder, battle),
-        bottom_right_button: None,
     }
 }
 

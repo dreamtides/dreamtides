@@ -98,9 +98,6 @@ pub struct InterfaceView {
 
     /// Options for display of the card order selector
     pub card_order_selector: Option<CardOrderSelectorView>,
-
-    /// Button most often used for toggling the visibility of card browsers.
-    pub bottom_right_button: Option<ButtonView>,
 }
 
 #[derive(Clone, Debug, Eq, PartialEq, Hash, Serialize, Deserialize, JsonSchema)]

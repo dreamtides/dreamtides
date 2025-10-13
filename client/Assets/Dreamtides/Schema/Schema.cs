@@ -1778,6 +1778,12 @@ namespace Dreamtides.Schema
     public partial class CardActions
     {
         /// <summary>
+        /// Button to display below this card.
+        /// </summary>
+        [JsonProperty("button_attachment")]
+        public ButtonView ButtonAttachment { get; set; }
+
+        /// <summary>
         /// If this card can currently be played from hand, an action to invoke when
         /// played.
         /// </summary>
@@ -1808,6 +1814,22 @@ namespace Dreamtides.Schema
         /// </summary>
         [JsonProperty("play_effect_preview")]
         public BattlePreviewView PlayEffectPreview { get; set; }
+    }
+
+    /// <summary>
+    /// Button to perform some game action
+    /// </summary>
+    public partial class ButtonView
+    {
+        /// <summary>
+        /// Action to perform when the button is clicked. If None is provided, the
+        /// button will appear disabled.
+        /// </summary>
+        [JsonProperty("action")]
+        public OnClickUnion? Action { get; set; }
+
+        [JsonProperty("label", Required = Required.Always)]
+        public string Label { get; set; }
     }
 
     /// <summary>
@@ -2216,12 +2238,6 @@ namespace Dreamtides.Schema
     public partial class InterfaceView
     {
         /// <summary>
-        /// Button most often used for toggling the visibility of card browsers.
-        /// </summary>
-        [JsonProperty("bottom_right_button")]
-        public ButtonView BottomRightButton { get; set; }
-
-        /// <summary>
         /// Options for displaying the card browser
         /// </summary>
         [JsonProperty("browser")]
@@ -2289,22 +2305,6 @@ namespace Dreamtides.Schema
         /// </summary>
         [JsonProperty("undo_button")]
         public ButtonView UndoButton { get; set; }
-    }
-
-    /// <summary>
-    /// Button to perform some game action
-    /// </summary>
-    public partial class ButtonView
-    {
-        /// <summary>
-        /// Action to perform when the button is clicked. If None is provided, the
-        /// button will appear disabled.
-        /// </summary>
-        [JsonProperty("action")]
-        public OnClickUnion? Action { get; set; }
-
-        [JsonProperty("label", Required = Required.Always)]
-        public string Label { get; set; }
     }
 
     public partial class CardBrowserView

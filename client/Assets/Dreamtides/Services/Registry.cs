@@ -138,10 +138,6 @@ namespace Dreamtides.Services
     public StudioService StudioService => Check(_studioService);
 
     [SerializeField]
-    ControlledButton? _bottomRightButton;
-    public ControlledButton BottomRightButton => Check(_bottomRightButton);
-
-    [SerializeField]
     UserHandHoverService? _userHandHoverService;
     public UserHandHoverService UserHandHoverService => Check(_userHandHoverService);
 

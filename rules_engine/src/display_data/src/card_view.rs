@@ -7,7 +7,7 @@ use masonry::flex_node::FlexNode;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
-use crate::battle_view::BattlePreviewView;
+use crate::battle_view::{BattlePreviewView, ButtonView};
 use crate::command::StudioType;
 use crate::object_position::ObjectPosition;
 
@@ -145,6 +145,9 @@ pub struct CardActions {
 
     /// Preview of the battle state after this card is played.
     pub play_effect_preview: Option<BattlePreviewView>,
+
+    /// Button to display below this card.
+    pub button_attachment: Option<ButtonView>,
 }
 
 #[derive(Clone, Default, Debug, Serialize, Deserialize, JsonSchema)]

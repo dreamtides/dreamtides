@@ -74,15 +74,6 @@ impl TestInterfaceView {
             .unwrap_or_default()
     }
 
-    /// Get text from the bottom right button
-    pub fn bottom_right_button_text(&self) -> String {
-        self.view
-            .as_ref()
-            .and_then(|v| v.bottom_right_button.as_ref())
-            .map(|button| button.label.clone())
-            .unwrap_or_default()
-    }
-
     /// Check if screen overlay contains the given substring
     pub fn screen_overlay_contains(&self, substring: &str) -> bool {
         self.screen_overlay_text().contains(substring)
@@ -116,11 +107,6 @@ impl TestInterfaceView {
     /// Check if undo button contains the given substring
     pub fn undo_button_contains(&self, substring: &str) -> bool {
         self.undo_button_text().contains(substring)
-    }
-
-    /// Check if bottom right button contains the given substring
-    pub fn bottom_right_button_contains(&self, substring: &str) -> bool {
-        self.bottom_right_button_text().contains(substring)
     }
 }
 
