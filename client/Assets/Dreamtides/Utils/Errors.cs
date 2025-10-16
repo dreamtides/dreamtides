@@ -34,13 +34,13 @@ namespace Dreamtides.Utils
       return value.Value;
     }
 
-    public static T CheckNotDefault<T>(T value)
+    public static T CheckNotDefault<T>(T value, string? message = null)
       where T : Enum
     {
       if (Equals(value, default(T)))
       {
         throw new ArgumentException(
-          $"Expected enum value of type {typeof(T).FullName} to have a non-default value."
+          $"Expected enum value of type {typeof(T).FullName} to have a non-default value. {message}"
         );
       }
 

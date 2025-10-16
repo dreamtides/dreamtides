@@ -51,6 +51,10 @@ namespace Dreamtides.Prototype
     // When provided, attach a card on-click action that triggers a debug test scenario
     // with this string. Action path: action.Value.GameActionClass?.DebugAction?.DebugActionClass?.ApplyTestScenarioAction
     public string? OnClickDebugScenario { get; set; }
+
+    public string? ButtonAttachmentLabel { get; set; }
+
+    public string? ButtonAttachmentDebugScenario { get; set; }
   }
 
   public class PrototypeCards
@@ -105,16 +109,13 @@ namespace Dreamtides.Prototype
           request.OutlineColorHex,
           prefabOverride
         );
-        // Apply revealed data overrides after creation (if revealed)
         if (request.Revealed && card.Revealed != null && cardOv != null)
         {
           ApplyRevealedOverrides(card.Revealed, cardOv);
         }
-        if (request.Revealed && request.OnClickDebugScenario != null && card.Revealed != null)
+        if (request.Revealed && card.Revealed != null)
         {
-          EnsureActions(card.Revealed);
-          var cardId = card.Id; // use actual id to avoid mismatches if ordering changes
-          card.Revealed.Actions.OnClick = BuildDebugOnClick(cardId, request.OnClickDebugScenario);
+          ConfigureCardActionsIfRequested(card.Revealed, card.Id, request);
         }
         cache.Add(card);
       }
@@ -152,19 +153,9 @@ namespace Dreamtides.Prototype
             ApplyRevealedOverrides(existing.Revealed, cardOv);
           }
 
-          // Wire up on-click debug scenario for updated cards when requested
-          if (request.OnClickDebugScenario != null)
+          if (existing.Revealed != null)
           {
-            if (existing.Revealed == null)
-            {
-              existing.Revealed = BuildRevealed(templateForUpdate, request.OutlineColorHex);
-            }
-            EnsureActions(existing.Revealed);
-            var cardId = existing.Id; // do not recompute by index; cache may be rotated
-            existing.Revealed.Actions.OnClick = BuildDebugOnClick(
-              cardId,
-              request.OnClickDebugScenario
-            );
+            ConfigureCardActionsIfRequested(existing.Revealed, existing.Id, request);
           }
         }
         else // !revealed
@@ -404,6 +395,34 @@ namespace Dreamtides.Prototype
           },
         },
       };
+
+    ButtonView BuildButtonAttachment(string cardId, string label, string? scenario) =>
+      new ButtonView
+      {
+        Label = label,
+        Action = scenario != null ? BuildDebugOnClick(cardId, scenario) : null,
+      };
+
+    void ConfigureCardActionsIfRequested(
+      RevealedCardView revealed,
+      string cardId,
+      CreateOrUpdateCardsRequest request
+    )
+    {
+      EnsureActions(revealed);
+      if (request.OnClickDebugScenario != null)
+      {
+        revealed.Actions.OnClick = BuildDebugOnClick(cardId, request.OnClickDebugScenario);
+      }
+      if (request.ButtonAttachmentLabel != null || request.ButtonAttachmentDebugScenario != null)
+      {
+        revealed.Actions.ButtonAttachment = BuildButtonAttachment(
+          cardId,
+          request.ButtonAttachmentLabel ?? string.Empty,
+          request.ButtonAttachmentDebugScenario
+        );
+      }
+    }
 
     ObjectPosition ClonePositionWithSorting(ObjectPosition basePosition, int sortingKey) =>
       new() { Position = basePosition.Position, SortingKey = sortingKey };

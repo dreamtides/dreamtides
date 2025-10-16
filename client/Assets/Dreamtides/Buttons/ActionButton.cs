@@ -61,6 +61,7 @@ namespace Dreamtides.Buttons
 
     [SerializeField]
     Vector3 _originalTextLocalScale;
+
     Sequence? _currentAnimation;
     Sequence? _hideSequence;
     GameAction? _action;
@@ -77,7 +78,10 @@ namespace Dreamtides.Buttons
     bool _hasRestoredAfterIdle = false;
 
     private readonly Color _enabledColor = Color.white;
+
     private readonly Color _disabledColor = new Color(0.7f, 0.7f, 0.7f); // Gray
+
+    public SpriteRenderer Background => _background;
 
     protected override void OnStart()
     {
@@ -123,8 +127,13 @@ namespace Dreamtides.Buttons
       _background.material = _action != null ? _originalMaterial : _noOutlineMaterial;
     }
 
-    public void SetView(ButtonView? view, Milliseconds? showOnIdleDuration = null)
+    public void SetView(
+      ButtonView? view,
+      Milliseconds? showOnIdleDuration = null,
+      Registry? registry = null
+    )
     {
+      _registry = registry ?? _registry;
       MaybeInitialize();
       _lastSetViewTime = Time.time;
       MarkInteraction();

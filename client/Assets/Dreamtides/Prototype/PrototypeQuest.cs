@@ -416,6 +416,8 @@ public class PrototypeQuest : Service
           Revealed = true,
           GroupKey = "shop",
           Overrides = _shopOverrides,
+          ButtonAttachmentLabel = "Buy",
+          ButtonAttachmentDebugScenario = "shop-pick",
         }
       )
     );
@@ -608,7 +610,7 @@ public class PrototypeQuest : Service
 
   IEnumerator RunShopDisplaySequence()
   {
-    // Ensure the custom image override for card #5 persists during display
+    // Ensure the custom image override for card #4 persists during display
     const string hourglassPath =
       "Assets/ThirdParty/AngelinaAvgustova/WitchCraftIcons/PNG/hourglass.png";
     if (_shopOverrides == null)
@@ -628,8 +630,9 @@ public class PrototypeQuest : Service
         },
         Revealed = true,
         GroupKey = "shop",
-        OnClickDebugScenario = "shop-pick",
         Overrides = _shopOverrides,
+        ButtonAttachmentLabel = "Buy",
+        ButtonAttachmentDebugScenario = "shop-pick",
       }
     );
     _currentShopDisplayIds = allCards.Take(6).Select(cv => cv.Id).ToList();
@@ -683,7 +686,8 @@ public class PrototypeQuest : Service
           },
           Revealed = true,
           GroupKey = "shop",
-          OnClickDebugScenario = "shop-pick",
+          ButtonAttachmentLabel = "Buy",
+          ButtonAttachmentDebugScenario = "shop-pick",
         }
       )
     );

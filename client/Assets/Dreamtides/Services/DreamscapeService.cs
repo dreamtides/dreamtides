@@ -70,8 +70,8 @@ namespace Dreamtides.Services
     {
       foreach (var card in cards)
       {
-        card.CardActionButton.gameObject.SetActive(true);
-        TweenUtils.FadeInSprite(card.CardActionButton);
+        // card.CardActionButton.gameObject.SetActive(true);
+        // TweenUtils.FadeInSprite(card.CardActionButton.Background);
 
         if (card.SpriteCardContentProtection)
         {

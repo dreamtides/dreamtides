@@ -4,6 +4,7 @@ using System;
 using System.Collections;
 using System.Runtime.CompilerServices;
 using DG.Tweening;
+using Dreamtides.Buttons;
 using Dreamtides.Layout;
 using Dreamtides.Masonry;
 using Dreamtides.Schema;
@@ -106,7 +107,7 @@ namespace Dreamtides.Components
     internal GameObject? _cardTrail;
 
     [SerializeField]
-    internal SpriteRenderer _cardActionButton = null!;
+    internal ActionButton _cardActionButton = null!;
 
     [SerializeField]
     internal SpriteRenderer? _spriteCardContentProtection;
@@ -139,7 +140,7 @@ namespace Dreamtides.Components
 
     public ObjectLayout ContainedObjects => Errors.CheckNotNull(_containedObjects);
 
-    public SpriteRenderer CardActionButton => Errors.CheckNotNull(_cardActionButton);
+    public ActionButton CardActionButton => Errors.CheckNotNull(_cardActionButton);
 
     public SpriteRenderer? SpriteCardContentProtection => _spriteCardContentProtection;
 
@@ -471,6 +472,17 @@ namespace Dreamtides.Components
         Destroy(_loopingEffect);
         _loopingEffect = null;
         _loopingEffectAddress = null;
+      }
+
+      if (revealed.Actions?.ButtonAttachment != null)
+      {
+        _cardActionButton.gameObject.SetActive(true);
+        _cardActionButton.GameContext = GameContext;
+        _cardActionButton.SetView(revealed.Actions.ButtonAttachment, registry: _registry);
+      }
+      else
+      {
+        _cardActionButton.gameObject.SetActive(false);
       }
     }
 

@@ -121,7 +121,11 @@ namespace Dreamtides.Layout
 
     public GameContext GameContext
     {
-      get => Errors.CheckNotDefault(_internalGameContext);
+      get =>
+        Errors.CheckNotDefault(
+          _internalGameContext,
+          $"internalGameContext not initialized for {name}"
+        );
       set
       {
         Errors.CheckNotDefault(value);
