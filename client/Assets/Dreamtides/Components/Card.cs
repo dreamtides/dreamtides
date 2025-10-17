@@ -107,7 +107,7 @@ namespace Dreamtides.Components
     internal GameObject? _cardTrail;
 
     [SerializeField]
-    internal ActionButton _cardActionButton = null!;
+    internal DisplayableButton _buttonAttachment = null!;
 
     [SerializeField]
     internal SpriteRenderer? _spriteCardContentProtection;
@@ -139,8 +139,6 @@ namespace Dreamtides.Components
     public string Id => CardView.ClientId();
 
     public ObjectLayout ContainedObjects => Errors.CheckNotNull(_containedObjects);
-
-    public ActionButton CardActionButton => Errors.CheckNotNull(_cardActionButton);
 
     public SpriteRenderer? SpriteCardContentProtection => _spriteCardContentProtection;
 
@@ -476,13 +474,13 @@ namespace Dreamtides.Components
 
       if (revealed.Actions?.ButtonAttachment != null)
       {
-        _cardActionButton.gameObject.SetActive(true);
-        _cardActionButton.GameContext = GameContext;
-        _cardActionButton.SetView(revealed.Actions.ButtonAttachment, registry: _registry);
+        _buttonAttachment.gameObject.SetActive(true);
+        _buttonAttachment.GameContext = GameContext;
+        _buttonAttachment.SetView(_registry, revealed.Actions.ButtonAttachment);
       }
       else
       {
-        _cardActionButton.gameObject.SetActive(false);
+        _buttonAttachment.gameObject.SetActive(false);
       }
     }
 

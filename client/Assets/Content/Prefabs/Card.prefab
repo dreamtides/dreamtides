@@ -394,6 +394,38 @@ Transform:
   - {fileID: 3613664795001027156}
   m_Father: {fileID: 238212233877956}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &305248578440801658
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 673746885012273028}
+  m_Layer: 0
+  m_Name: ButtonAttachmentPosition
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &673746885012273028
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 305248578440801658}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: -3, z: 0}
+  m_LocalScale: {x: 0.25, y: 0.25, z: 0.25}
+  m_ConstrainProportionsScale: 1
+  m_Children:
+  - {fileID: 5773335668843788102}
+  m_Father: {fileID: 238212233877956}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &469940756883870029
 GameObject:
   m_ObjectHideFlags: 0
@@ -2675,7 +2707,7 @@ Transform:
   - {fileID: 1332052378211390788}
   - {fileID: 3031101844611411820}
   - {fileID: 2108056794715672860}
-  - {fileID: 5773335668843788102}
+  - {fileID: 673746885012273028}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &8215946370556705966
@@ -2723,7 +2755,7 @@ MonoBehaviour:
   _battlefieldCardInfoZoomIcons: {fileID: 7893135063858599996}
   _loopingEffect: {fileID: 0}
   _cardTrail: {fileID: 0}
-  _cardActionButton: {fileID: 6487692780118639792}
+  _buttonAttachment: {fileID: 2471953870254378096}
   _spriteCardContentProtection: {fileID: 5065014120444495370}
 --- !u!65 &5680000531262599633
 BoxCollider:
@@ -5140,10 +5172,10 @@ GameObject:
   m_Component:
   - component: {fileID: 5773335668843788102}
   - component: {fileID: 4951089527072644307}
-  - component: {fileID: 6487692780118639792}
   - component: {fileID: 8544040532784100925}
+  - component: {fileID: 2471953870254378096}
   m_Layer: 0
-  m_Name: ActionButton
+  m_Name: ButtonAttachment
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5157,13 +5189,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8524624294963116771}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -3, z: 0}
-  m_LocalScale: {x: 0.25, y: 0.25, z: 0.25}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 4903434555395087383}
-  m_Father: {fileID: 238212233877956}
+  m_Father: {fileID: 673746885012273028}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &4951089527072644307
 SpriteRenderer:
@@ -5223,37 +5255,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &6487692780118639792
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8524624294963116771}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6ec872cc55e9d475196fcd9b4aa653d5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Dreamtides::Dreamtides.Buttons.ActionButton
-  _projectileSourcePosition: {fileID: 0}
-  _displayEffectPosition: {fileID: 0}
-  _sortingGroup: {fileID: 0}
-  _internalGameContext: 0
-  _registry: {fileID: 0}
-  _background: {fileID: 4951089527072644307}
-  _text: {fileID: 7663178124141926042}
-  _noOutlineMaterial: {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
-  _animationDuration: 0.1
-  _moveDistance: 0.3
-  _onClickSound: {fileID: 8300000, guid: b0a890dd89d7e7145a043327b4bb9589, type: 3}
-  _fadeDuration: 0.3
-  _collider: {fileID: 8544040532784100925}
-  _debounceDelayMilliseconds: 500
-  _originalPosition: {x: 0, y: 0, z: 0}
-  _originalColor: {r: 0, g: 0, b: 0, a: 0}
-  _originalMaterial: {fileID: 0}
-  _originalBackgroundLocalScale: {x: 0, y: 0, z: 0}
-  _originalTextLocalScale: {x: 0, y: 0, z: 0}
 --- !u!65 &8544040532784100925
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -5275,6 +5276,31 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 9.88, y: 4.08, z: 0.2}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &2471953870254378096
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8524624294963116771}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 025a9ff38eb6a4f6a812d01ac4a86a75, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Dreamtides::Dreamtides.Buttons.DisplayableButton
+  _projectileSourcePosition: {fileID: 0}
+  _displayEffectPosition: {fileID: 0}
+  _sortingGroup: {fileID: 0}
+  _internalGameContext: 0
+  _registry: {fileID: 0}
+  _background: {fileID: 4951089527072644307}
+  _text: {fileID: 7663178124141926042}
+  _noOutlineMaterial: {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
+  _animationDuration: 0.1
+  _onPressScale: 0.97
+  _onClickSound: {fileID: 8300000, guid: b0a890dd89d7e7145a043327b4bb9589, type: 3}
+  _collider: {fileID: 8544040532784100925}
+  _debounceDelayMilliseconds: 500
 --- !u!1 &8587368038365441787
 GameObject:
   m_ObjectHideFlags: 0
