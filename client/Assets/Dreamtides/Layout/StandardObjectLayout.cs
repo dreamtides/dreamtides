@@ -76,6 +76,10 @@ namespace Dreamtides.Layout
         displayable.Parent = null;
         _objects.Remove(displayable);
         SortObjects();
+        if (_objects.Count == 0)
+        {
+          OnBecameEmpty();
+        }
       }
     }
 
@@ -84,6 +88,10 @@ namespace Dreamtides.Layout
     {
       _objects.RemoveAt(index);
       SortObjects();
+      if (_objects.Count == 0)
+      {
+        OnBecameEmpty();
+      }
     }
 
     /// <summary>
@@ -106,7 +114,8 @@ namespace Dreamtides.Layout
     {
       for (var i = 0; i < _objects.Count; ++i)
       {
-        ApplyLayoutToObject(_objects[i], i, _objects.Count, sequence);
+        var layoutIndex = GetLayoutIndexOverride(_objects[i], i, _objects.Count);
+        ApplyLayoutToObject(_objects[i], layoutIndex, _objects.Count, sequence);
       }
 
       if (_shouldFireBecameNonEmptyAfterNextLayoutAnimation && sequence != null)
@@ -124,6 +133,12 @@ namespace Dreamtides.Layout
     /// changes from being zero to being nonzero.
     /// </summary>
     protected virtual void OnBecameNonEmpty() { }
+
+    /// <summary>
+    /// Invoked after removing objects when the count of objects in this layout
+    /// changes from being nonzero to being zero.
+    /// </summary>
+    protected virtual void OnBecameEmpty() { }
 
     /// <summary>
     /// Calculates the position of the object at the given index in the layout.
@@ -153,6 +168,12 @@ namespace Dreamtides.Layout
     /// Calculates the sorting order of the object at the given index in the layout.
     /// </summary>
     protected virtual int SortingOrder(int index, int count) => index;
+
+    /// <summary>
+    /// Override the layout index for the given object.
+    /// </summary>
+    protected virtual int GetLayoutIndexOverride(Displayable displayable, int index, int count) =>
+      index;
 
     protected void Update()
     {

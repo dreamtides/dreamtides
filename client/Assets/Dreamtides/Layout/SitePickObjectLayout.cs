@@ -1,5 +1,6 @@
 #nullable enable
 
+using System.Collections.Generic;
 using Dreamtides.Services;
 using Dreamtides.Utils;
 using UnityEngine;
@@ -35,9 +36,20 @@ namespace Dreamtides.Layout
     [SerializeField]
     Vector2 _closeButtonCanvasOffsetLandscape;
 
+    [SerializeField]
+    bool _preserveLayoutOnRemoval;
+
+    int? _preservedInitialCount;
+    readonly Dictionary<Displayable, int> _displayableToIndex = new();
+    int _nextSlotIndex;
+
     protected override void OnBecameNonEmpty()
     {
       var count = Objects.Count;
+      if (_preserveLayoutOnRemoval && _preservedInitialCount == null)
+      {
+        _preservedInitialCount = count;
+      }
       if (!_closeSiteButton)
       {
         return;
@@ -73,22 +85,30 @@ namespace Dreamtides.Layout
       _closeSiteButton.anchoredPosition = new Vector2(parentLocal.x, parentLocal.y) + offset;
     }
 
+    protected override void OnBecameEmpty()
+    {
+      _preservedInitialCount = null;
+      _displayableToIndex.Clear();
+      _nextSlotIndex = 0;
+    }
+
     public override Vector3 CalculateObjectPosition(int index, int count)
     {
       var isLandscape = _registry.IsLandscape;
-      if (count <= 0)
+      var effectiveCount = GetEffectiveCount(count);
+      if (effectiveCount <= 0)
       {
         return transform.position;
       }
       else if (isLandscape && !_forceTwoRows)
       {
-        var localX = ComputeHorizontalOffset(index, count, _horizontalSpacing);
+        var localX = ComputeHorizontalOffset(index, effectiveCount, _horizontalSpacing);
         return transform.position + transform.right * localX;
       }
       else
       {
-        var topRowCount = (count + 1) / 2;
-        var bottomRowCount = count - topRowCount;
+        var topRowCount = (effectiveCount + 1) / 2;
+        var bottomRowCount = effectiveCount - topRowCount;
 
         var isTopRow = index < topRowCount;
         var indexInRow = isTopRow ? index : index - topRowCount;
@@ -97,7 +117,7 @@ namespace Dreamtides.Layout
         var localX = ComputeHorizontalOffset(indexInRow, rowCount, _horizontalSpacing);
 
         float localY =
-          count <= 1 ? 0f : (isTopRow ? _verticalSpacing / 2f : -_verticalSpacing / 2f);
+          effectiveCount <= 1 ? 0f : (isTopRow ? _verticalSpacing / 2f : -_verticalSpacing / 2f);
 
         return transform.position + transform.right * localX + transform.up * localY;
       }
@@ -107,6 +127,23 @@ namespace Dreamtides.Layout
       transform.rotation.eulerAngles;
 
     public override float? CalculateObjectScale(int index, int count) => transform.localScale.x;
+
+    protected override int GetLayoutIndexOverride(Displayable displayable, int index, int count)
+    {
+      if (!_preserveLayoutOnRemoval)
+      {
+        return index;
+      }
+
+      if (!_displayableToIndex.TryGetValue(displayable, out var slot))
+      {
+        _displayableToIndex[displayable] = _nextSlotIndex;
+        slot = _nextSlotIndex;
+        _nextSlotIndex += 1;
+      }
+
+      return slot;
+    }
 
     static float ComputeHorizontalOffset(int indexInRow, int rowCount, float spacing)
     {
@@ -133,6 +170,19 @@ namespace Dreamtides.Layout
       Gizmos.DrawSphere(center + (right * halfLayoutX + upAxis * halfLayoutY), 0.15f);
       Gizmos.DrawSphere(center + (-right * halfLayoutX - upAxis * halfLayoutY), 0.15f);
       Gizmos.DrawSphere(center + (right * halfLayoutX - upAxis * halfLayoutY), 0.15f);
+    }
+
+    int GetEffectiveCount(int count)
+    {
+      if (
+        _preserveLayoutOnRemoval
+        && _preservedInitialCount != null
+        && count < _preservedInitialCount.Value
+      )
+      {
+        return _preservedInitialCount.Value;
+      }
+      return count;
     }
   }
 }
