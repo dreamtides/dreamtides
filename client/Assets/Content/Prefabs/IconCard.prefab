@@ -8,6 +8,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 531683895169470100, guid: b7ccb88832e2e4cc7953df6f5a1ae9e7, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 991770671225374536, guid: b7ccb88832e2e4cc7953df6f5a1ae9e7, type: 3}
       propertyPath: m_text
       value: \ufc51
@@ -110,11 +114,27 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2113947992678514213, guid: b7ccb88832e2e4cc7953df6f5a1ae9e7, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -0.21
+      value: -0.11
       objectReference: {fileID: 0}
     - target: {fileID: 3453508578889210149, guid: b7ccb88832e2e4cc7953df6f5a1ae9e7, type: 3}
       propertyPath: m_IsActive
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4615044809301547582, guid: b7ccb88832e2e4cc7953df6f5a1ae9e7, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 1.8215
+      objectReference: {fileID: 0}
+    - target: {fileID: 4615044809301547582, guid: b7ccb88832e2e4cc7953df6f5a1ae9e7, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 0.3567
+      objectReference: {fileID: 0}
+    - target: {fileID: 4615044809301547582, guid: b7ccb88832e2e4cc7953df6f5a1ae9e7, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0.0325
+      objectReference: {fileID: 0}
+    - target: {fileID: 4615044809301547582, guid: b7ccb88832e2e4cc7953df6f5a1ae9e7, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -0.88
       objectReference: {fileID: 0}
     - target: {fileID: 4853821959078779194, guid: b7ccb88832e2e4cc7953df6f5a1ae9e7, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
@@ -127,6 +147,22 @@ PrefabInstance:
     - target: {fileID: 5714747169809993105, guid: b7ccb88832e2e4cc7953df6f5a1ae9e7, type: 3}
       propertyPath: m_IsActive
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7732207780987752412, guid: b7ccb88832e2e4cc7953df6f5a1ae9e7, type: 3}
+      propertyPath: m_text
+      value: Restock
+      objectReference: {fileID: 0}
+    - target: {fileID: 7732207780987752412, guid: b7ccb88832e2e4cc7953df6f5a1ae9e7, type: 3}
+      propertyPath: m_fontSize
+      value: 2.65
+      objectReference: {fileID: 0}
+    - target: {fileID: 7732207780987752412, guid: b7ccb88832e2e4cc7953df6f5a1ae9e7, type: 3}
+      propertyPath: m_fontSizeMax
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 7732207780987752412, guid: b7ccb88832e2e4cc7953df6f5a1ae9e7, type: 3}
+      propertyPath: m_HorizontalAlignment
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 8707689270430807145, guid: b7ccb88832e2e4cc7953df6f5a1ae9e7, type: 3}
       propertyPath: m_IsActive

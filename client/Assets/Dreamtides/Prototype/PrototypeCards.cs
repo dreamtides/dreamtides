@@ -29,6 +29,7 @@ namespace Dreamtides.Prototype
     public string? Spark { get; set; }
     public string? Produced { get; set; }
     public string? OutlineColorHex { get; set; }
+    public string? ButtonAttachmentLabel { get; set; }
   }
 
   public class CreateOrUpdateCardsRequest
@@ -115,7 +116,7 @@ namespace Dreamtides.Prototype
         }
         if (request.Revealed && card.Revealed != null)
         {
-          ConfigureCardActionsIfRequested(card.Revealed, card.Id, request);
+          ConfigureCardActionsIfRequested(card.Revealed, card.Id, request, cardOv);
         }
         cache.Add(card);
       }
@@ -155,7 +156,7 @@ namespace Dreamtides.Prototype
 
           if (existing.Revealed != null)
           {
-            ConfigureCardActionsIfRequested(existing.Revealed, existing.Id, request);
+            ConfigureCardActionsIfRequested(existing.Revealed, existing.Id, request, cardOv);
           }
         }
         else // !revealed
@@ -406,7 +407,8 @@ namespace Dreamtides.Prototype
     void ConfigureCardActionsIfRequested(
       RevealedCardView revealed,
       string cardId,
-      CreateOrUpdateCardsRequest request
+      CreateOrUpdateCardsRequest request,
+      CardOverride? overrideForIndex
     )
     {
       EnsureActions(revealed);
@@ -414,11 +416,12 @@ namespace Dreamtides.Prototype
       {
         revealed.Actions.OnClick = BuildDebugOnClick(cardId, request.OnClickDebugScenario);
       }
-      if (request.ButtonAttachmentLabel != null || request.ButtonAttachmentDebugScenario != null)
+      var label = overrideForIndex?.ButtonAttachmentLabel ?? request.ButtonAttachmentLabel;
+      if (label != null || request.ButtonAttachmentDebugScenario != null)
       {
         revealed.Actions.ButtonAttachment = BuildButtonAttachment(
           cardId,
-          request.ButtonAttachmentLabel ?? string.Empty,
+          label ?? string.Empty,
           request.ButtonAttachmentDebugScenario
         );
       }

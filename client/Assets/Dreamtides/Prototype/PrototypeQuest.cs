@@ -374,13 +374,24 @@ public class PrototypeQuest : Service
     // Remove any prior override for index 4 then add our image override
     _shopOverrides.RemoveAll(o => o.Index == 4);
     _shopOverrides.Add(
+      new CardOverride { Index = 0, ButtonAttachmentLabel = "550<voffset=-0.17em>\ufcec</voffset>" }
+    );
+    _shopOverrides.Add(
+      new CardOverride { Index = 1, ButtonAttachmentLabel = "200<voffset=-0.17em>\ufcec</voffset>" }
+    );
+    _shopOverrides.Add(
+      new CardOverride { Index = 2, ButtonAttachmentLabel = "300<voffset=-0.17em>\ufcec</voffset>" }
+    );
+    _shopOverrides.Add(
       new CardOverride
       {
         Index = 3,
         Name = "\ufc51",
         SpritePath = "",
-        Rules = "Reroll",
+        Rules = "Restock",
         Prefab = CardPrefab.IconCard,
+        CardType = "Restock",
+        ButtonAttachmentLabel = "100<voffset=-0.17em>\ufcec</voffset>",
       }
     );
     _shopOverrides.Add(
@@ -389,6 +400,7 @@ public class PrototypeQuest : Service
         Index = 4,
         SpritePath = "Assets/ThirdParty/AngelinaAvgustova/WitchCraftIcons/PNG/hourglass.png",
         Prefab = CardPrefab.Dreamsign,
+        ButtonAttachmentLabel = "200<voffset=-0.17em>\ufcec</voffset>",
       }
     );
     _shopOverrides.Add(
@@ -397,6 +409,7 @@ public class PrototypeQuest : Service
         Index = 5,
         SpritePath = "Assets/ThirdParty/AngelinaAvgustova/WitchCraftIcons/PNG/goldfeather.png",
         Prefab = CardPrefab.Dreamsign,
+        ButtonAttachmentLabel = "600<voffset=-0.17em>\ufcec</voffset>",
       }
     );
 
@@ -416,7 +429,6 @@ public class PrototypeQuest : Service
           Revealed = true,
           GroupKey = "shop",
           Overrides = _shopOverrides,
-          ButtonAttachmentLabel = "Buy",
           ButtonAttachmentDebugScenario = "shop-pick",
         }
       )
@@ -617,8 +629,22 @@ public class PrototypeQuest : Service
     {
       _shopOverrides = new List<CardOverride>();
     }
-    _shopOverrides.RemoveAll(o => o.Index == 4);
-    _shopOverrides.Add(new CardOverride { Index = 4, SpritePath = hourglassPath });
+    var idx4 = _shopOverrides.FindIndex(o => o.Index == 4);
+    if (idx4 >= 0)
+    {
+      _shopOverrides[idx4].SpritePath = hourglassPath;
+    }
+    else
+    {
+      _shopOverrides.Add(
+        new CardOverride
+        {
+          Index = 4,
+          SpritePath = hourglassPath,
+          ButtonAttachmentLabel = "200<voffset=-0.17em>\ufcec</voffset>",
+        }
+      );
+    }
     var allCards = _prototypeCards.CreateOrUpdateCards(
       new CreateOrUpdateCardsRequest
       {
@@ -631,7 +657,7 @@ public class PrototypeQuest : Service
         Revealed = true,
         GroupKey = "shop",
         Overrides = _shopOverrides,
-        ButtonAttachmentLabel = "Buy",
+        ButtonAttachmentLabel = null,
         ButtonAttachmentDebugScenario = "shop-pick",
       }
     );
@@ -686,7 +712,7 @@ public class PrototypeQuest : Service
           },
           Revealed = true,
           GroupKey = "shop",
-          ButtonAttachmentLabel = "Buy",
+          Overrides = _shopOverrides,
           ButtonAttachmentDebugScenario = "shop-pick",
         }
       )
