@@ -50,6 +50,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 44c9dcc25fd594457842e22d1058317b
+    m_Address: Assets/ThirdParty/AngelinaAvgustova/WitchCraftIcons/PNG/outline_hourglass.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 4f4cab2ed010a4fff963a1b19fa5d75e
     m_Address: Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1282908322.png
     m_ReadOnly: 0
@@ -67,6 +72,11 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 5f7ed86fdd8504b519c75ee6902e2bf1
     m_Address: Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1200949264.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 624c77b5704324bcd9e4a49f4613bcf4
+    m_Address: Assets/ThirdParty/AngelinaAvgustova/WitchCraftIcons/PNG/outline_goldfeather.png
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0

@@ -398,7 +398,8 @@ public class PrototypeQuest : Service
       new CardOverride
       {
         Index = 4,
-        SpritePath = "Assets/ThirdParty/AngelinaAvgustova/WitchCraftIcons/PNG/hourglass.png",
+        SpritePath =
+          "Assets/ThirdParty/AngelinaAvgustova/WitchCraftIcons/PNG/outline_hourglass.png",
         Prefab = CardPrefab.Dreamsign,
         ButtonAttachmentLabel = "200<voffset=-0.17em>\ufcec</voffset>",
       }
@@ -407,7 +408,8 @@ public class PrototypeQuest : Service
       new CardOverride
       {
         Index = 5,
-        SpritePath = "Assets/ThirdParty/AngelinaAvgustova/WitchCraftIcons/PNG/goldfeather.png",
+        SpritePath =
+          "Assets/ThirdParty/AngelinaAvgustova/WitchCraftIcons/PNG/outline_goldfeather.png",
         Prefab = CardPrefab.Dreamsign,
         ButtonAttachmentLabel = "600<voffset=-0.17em>\ufcec</voffset>",
       }
@@ -624,7 +626,7 @@ public class PrototypeQuest : Service
   {
     // Ensure the custom image override for card #4 persists during display
     const string hourglassPath =
-      "Assets/ThirdParty/AngelinaAvgustova/WitchCraftIcons/PNG/hourglass.png";
+      "Assets/ThirdParty/AngelinaAvgustova/WitchCraftIcons/PNG/outline_hourglass.png";
     if (_shopOverrides == null)
     {
       _shopOverrides = new List<CardOverride>();
