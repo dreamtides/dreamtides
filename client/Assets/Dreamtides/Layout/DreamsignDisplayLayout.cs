@@ -38,10 +38,21 @@ namespace Dreamtides.Layout
       return transform.position + transform.right * localX + transform.up * localY;
     }
 
-    public override Vector3? CalculateObjectRotation(int index, int count) =>
-      transform.rotation.eulerAngles;
+    public override Vector3? CalculateObjectRotation(int index, int count) => Vector3.zero;
 
-    public override float? CalculateObjectScale(int index, int count) => transform.localScale.x;
+    public override float? CalculateObjectScale(int index, int count) => 1.0f;
+
+    protected override void OnUpdate()
+    {
+      for (var i = 0; i < Objects.Count; ++i)
+      {
+        var displayable = Objects[i];
+        if (displayable && displayable.transform.parent != transform)
+        {
+          displayable.transform.SetParent(transform, worldPositionStays: true);
+        }
+      }
+    }
 
     void OnDrawGizmosSelected()
     {
