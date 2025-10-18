@@ -267,16 +267,36 @@ public class PrototypeQuest : Service
     var cardsForAnimation = new List<CardView>(1);
     var card = Registry.CardService.GetCard(clickedId);
     var source = card.CardView;
-    var sorting = Registry.DreamscapeLayout.QuestDeck.Objects.Count;
-    cardsForAnimation.Add(
-      CloneCardViewWithPosition(source, new Position { Enum = PositionEnum.QuestDeck }, sorting)
-    );
+    var isDreamsign = source.Prefab == CardPrefab.Dreamsign;
+    if (isDreamsign)
+    {
+      var sorting = Registry.DreamscapeLayout.DreamsignDisplay.Objects.Count;
+      cardsForAnimation.Add(
+        CloneCardViewWithPosition(
+          source,
+          new Position { Enum = PositionEnum.DreamsignDisplay },
+          sorting
+        )
+      );
+    }
+    else
+    {
+      var sorting = Registry.DreamscapeLayout.QuestDeck.Objects.Count;
+      cardsForAnimation.Add(
+        CloneCardViewWithPosition(source, new Position { Enum = PositionEnum.QuestDeck }, sorting)
+      );
+    }
 
     var command = new MoveCardsWithCustomAnimationCommand
     {
-      Animation = MoveCardsCustomAnimation.MoveToQuestDeckOrDestroy,
+      Animation = isDreamsign
+        ? MoveCardsCustomAnimation.MoveToDreamsignDisplayOrDestroy
+        : MoveCardsCustomAnimation.MoveToQuestDeckOrDestroy,
       Cards = cardsForAnimation,
-      Destination = new Position { Enum = PositionEnum.QuestDeck },
+      Destination = new Position
+      {
+        Enum = isDreamsign ? PositionEnum.DreamsignDisplay : PositionEnum.QuestDeck,
+      },
       PauseDuration = new Milliseconds { MillisecondsValue = 300 },
       StaggerInterval = new Milliseconds { MillisecondsValue = 100 },
     };
@@ -293,10 +313,20 @@ public class PrototypeQuest : Service
       var s = c.CardView;
       if (id == clickedId)
       {
-        var srt = Registry.DreamscapeLayout.QuestDeck.Objects.Count;
-        updateCards.Add(
-          CloneCardViewWithPositionHidden(s, new Position { Enum = PositionEnum.QuestDeck }, srt)
-        );
+        if (isDreamsign)
+        {
+          var srt = Registry.DreamscapeLayout.DreamsignDisplay.Objects.Count;
+          updateCards.Add(
+            CloneCardViewWithPosition(s, new Position { Enum = PositionEnum.DreamsignDisplay }, srt)
+          );
+        }
+        else
+        {
+          var srt = Registry.DreamscapeLayout.QuestDeck.Objects.Count;
+          updateCards.Add(
+            CloneCardViewWithPositionHidden(s, new Position { Enum = PositionEnum.QuestDeck }, srt)
+          );
+        }
       }
       else
       {

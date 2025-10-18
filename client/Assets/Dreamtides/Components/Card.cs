@@ -112,6 +112,9 @@ namespace Dreamtides.Components
     [SerializeField]
     internal SpriteRenderer? _spriteCardContentProtection;
 
+    [SerializeField]
+    internal float _cardColliderHeight = 4f;
+
     bool _isRevealed = false;
     internal Registry _registry = null!;
     CardView _cardView = null!;
@@ -761,7 +764,7 @@ namespace Dreamtides.Components
           _sparkBackground.gameObject.SetActive(CardView.Revealed?.Spark != null);
         }
         _cardCollider.center = new Vector3(0, -0.5f, 0);
-        _cardCollider.size = new Vector3(2.5f, 4f, 0.1f);
+        _cardCollider.size = new Vector3(2.5f, _cardColliderHeight, 0.1f);
         _cardFrame.gameObject.SetActive(true);
       }
     }

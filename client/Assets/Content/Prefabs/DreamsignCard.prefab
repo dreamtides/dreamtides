@@ -134,11 +134,11 @@ PrefabInstance:
       objectReference: {fileID: 21300000, guid: 44c9dcc25fd594457842e22d1058317b, type: 3}
     - target: {fileID: 5680000531262599633, guid: dd6008076c4484dbda8c385e712d05aa, type: 3}
       propertyPath: m_Size.y
-      value: 3.5
+      value: 2.5
       objectReference: {fileID: 0}
     - target: {fileID: 5680000531262599633, guid: dd6008076c4484dbda8c385e712d05aa, type: 3}
       propertyPath: m_Center.y
-      value: -0.75
+      value: -0.5
       objectReference: {fileID: 0}
     - target: {fileID: 5773335668843788102, guid: dd6008076c4484dbda8c385e712d05aa, type: 3}
       propertyPath: m_LocalPosition.y
@@ -191,6 +191,10 @@ PrefabInstance:
     - target: {fileID: 8215946370556705966, guid: dd6008076c4484dbda8c385e712d05aa, type: 3}
       propertyPath: _sparkBackground
       value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 8215946370556705966, guid: dd6008076c4484dbda8c385e712d05aa, type: 3}
+      propertyPath: _cardColliderHeight
+      value: 2.5
       objectReference: {fileID: 0}
     - target: {fileID: 8215946370556705966, guid: dd6008076c4484dbda8c385e712d05aa, type: 3}
       propertyPath: _spriteCardContentProtection

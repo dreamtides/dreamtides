@@ -25,6 +25,7 @@ namespace Dreamtides.Services
     ShuffleVoidIntoDeckAnimation _shuffleVoidIntoDeck = new();
     InfoZoomAnimation _infoZoom = new();
     MoveToQuestDeckOrDestroyAnimation _moveToQuestDeckOrDestroy = new();
+    MoveToDreamsignDisplayOrDestroyAnimation _moveToDreamsignDisplayOrDestroy = new();
 
     public bool IsPointerDownOnCard { get; set; } = false;
 
@@ -49,6 +50,8 @@ namespace Dreamtides.Services
           return _showInShopLayout.HandleHide(command, this);
         case MoveCardsCustomAnimation.MoveToQuestDeckOrDestroy:
           return _moveToQuestDeckOrDestroy.Handle(command, this);
+        case MoveCardsCustomAnimation.MoveToDreamsignDisplayOrDestroy:
+          return _moveToDreamsignDisplayOrDestroy.Handle(command, this);
         default:
           throw new IndexOutOfRangeException($"Unhandled animation type: {command.Animation}");
       }

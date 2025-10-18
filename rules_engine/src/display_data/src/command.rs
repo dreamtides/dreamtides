@@ -232,6 +232,7 @@ pub enum MoveCardsCustomAnimation {
     ShowInShopLayout,
     HideShopLayout,
     MoveToQuestDeckOrDestroy,
+    MoveToDreamsignDisplayOrDestroy,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
