@@ -347,6 +347,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: aade39466c9e247939c6f34d16539f09
+    m_Address: Assets/ThirdParty/GameAssets/Icons/outline_refresh-cw.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: afac0004d7e9c4ff1a71ff1a0e9aacec
     m_Address: Assets/ThirdParty/Hovl Studio/Magic circles/Dreamtides/Magic circle
       9.prefab

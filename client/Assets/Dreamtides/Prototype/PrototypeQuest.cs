@@ -386,8 +386,8 @@ public class PrototypeQuest : Service
       new CardOverride
       {
         Index = 3,
-        Name = "\ufc51",
-        SpritePath = "",
+        Name = "Restock",
+        SpritePath = "Assets/ThirdParty/GameAssets/Icons/outline_refresh-cw.png",
         Rules = "Restock",
         Prefab = CardPrefab.IconCard,
         CardType = "Restock",
