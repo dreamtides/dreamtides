@@ -29,8 +29,8 @@ namespace Dreamtides.Layout
     public StandardObjectLayout ShopLayout => Check(_shopLayout);
 
     [SerializeField]
-    BrowserBackground _dreamscapeBackgroundOverlay = null!;
-    public BrowserBackground DreamscapeBackgroundOverlay => Check(_dreamscapeBackgroundOverlay);
+    StandardObjectLayout _dreamsignDisplay = null!;
+    public StandardObjectLayout DreamsignDisplay => Check(_dreamsignDisplay);
 
     T Check<T>(T? value)
       where T : Object => Errors.CheckNotNull(value, $"{typeof(T).Name} not initialized");

@@ -60,6 +60,38 @@ namespace Dreamtides.Prototype
 
   public class PrototypeCards
   {
+    public PrototypeCards()
+    {
+      var dreamsigns = new List<CardView>(4)
+      {
+        BuildDreamsignCardView(
+          BuildId("dreamsigns", 0),
+          "Hourglass",
+          "Assets/ThirdParty/AngelinaAvgustova/WitchCraftIcons/PNG/outline_hourglass.png",
+          0
+        ),
+        BuildDreamsignCardView(
+          BuildId("dreamsigns", 1),
+          "Garlic",
+          "Assets/ThirdParty/AngelinaAvgustova/WitchCraftIcons/PNG/outline_garlic.png",
+          1
+        ),
+        BuildDreamsignCardView(
+          BuildId("dreamsigns", 2),
+          "Claw",
+          "Assets/ThirdParty/AngelinaAvgustova/WitchCraftIcons/PNG/outline_claw.png",
+          2
+        ),
+        BuildDreamsignCardView(
+          BuildId("dreamsigns", 3),
+          "Tooth",
+          "Assets/ThirdParty/AngelinaAvgustova/WitchCraftIcons/PNG/outline_tooth.png",
+          3
+        ),
+      };
+      _groupCaches["dreamsigns"] = dreamsigns;
+    }
+
     /// <summary>
     /// Per-group deterministic card creation and updates.
     /// - Maintains an independent cache for each <paramref name="groupKey"/> (e.g., "quest", "draft").
@@ -434,6 +466,36 @@ namespace Dreamtides.Prototype
       $"Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_{imageNumber}.png";
 
     string BuildId(string groupKey, int index) => $"{groupKey}-{index + 1}";
+
+    CardView BuildDreamsignCardView(string id, string name, string spritePath, int sortingKey) =>
+      new CardView
+      {
+        Backless = true,
+        CardFacing = CardFacing.FaceUp,
+        Id = id,
+        Position = new ObjectPosition
+        {
+          Position = new Position { Enum = PositionEnum.DreamsignDisplay },
+          SortingKey = sortingKey,
+        },
+        Prefab = CardPrefab.Dreamsign,
+        Revealed = new RevealedCardView
+        {
+          Actions = new CardActions(),
+          CardType = string.Empty,
+          Cost = null,
+          Effects = new CardEffects(),
+          Image = new DisplayImage { Sprite = new SpriteAddress { Sprite = spritePath } },
+          InfoZoomData = null,
+          IsFast = false,
+          Name = name,
+          OutlineColor = null,
+          Produced = null,
+          RulesText = string.Empty,
+          Spark = null,
+        },
+        RevealedToOpponents = false,
+      };
 
     int StableHash(string s)
     {

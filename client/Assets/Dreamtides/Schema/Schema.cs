@@ -2618,11 +2618,13 @@ namespace Dreamtides.Schema
     ///
     /// User deck displayed in the quest view
     ///
+    /// Dreamsigns owned by the player in a quest
+    ///
     /// Object is being displayed as a potential draft pick choice
     ///
     /// Object is being displayed in the shop interface
     /// </summary>
-    public enum PositionEnum { Browser, Default, DraftPickDisplay, Drawn, DreamwellActivation, GameModifier, HandStorage, Offscreen, OnScreenStorage, QuestDeck, ShopDisplay };
+    public enum PositionEnum { Browser, Default, DraftPickDisplay, Drawn, DreamsignDisplay, DreamwellActivation, GameModifier, HandStorage, Offscreen, OnScreenStorage, QuestDeck, ShopDisplay };
 
     /// <summary>
     /// Auto-generated discriminant enum variants
@@ -5131,6 +5133,8 @@ namespace Dreamtides.Schema
                             return new Position { Enum = PositionEnum.DraftPickDisplay };
                         case "Drawn":
                             return new Position { Enum = PositionEnum.Drawn };
+                        case "DreamsignDisplay":
+                            return new Position { Enum = PositionEnum.DreamsignDisplay };
                         case "DreamwellActivation":
                             return new Position { Enum = PositionEnum.DreamwellActivation };
                         case "GameModifier":
@@ -5172,6 +5176,9 @@ namespace Dreamtides.Schema
                         return;
                     case PositionEnum.Drawn:
                         serializer.Serialize(writer, "Drawn");
+                        return;
+                    case PositionEnum.DreamsignDisplay:
+                        serializer.Serialize(writer, "DreamsignDisplay");
                         return;
                     case PositionEnum.DreamwellActivation:
                         serializer.Serialize(writer, "DreamwellActivation");
@@ -5317,6 +5324,8 @@ namespace Dreamtides.Schema
                     return PositionEnum.DraftPickDisplay;
                 case "Drawn":
                     return PositionEnum.Drawn;
+                case "DreamsignDisplay":
+                    return PositionEnum.DreamsignDisplay;
                 case "DreamwellActivation":
                     return PositionEnum.DreamwellActivation;
                 case "GameModifier":
@@ -5356,6 +5365,9 @@ namespace Dreamtides.Schema
                     return;
                 case PositionEnum.Drawn:
                     serializer.Serialize(writer, "Drawn");
+                    return;
+                case PositionEnum.DreamsignDisplay:
+                    serializer.Serialize(writer, "DreamsignDisplay");
                     return;
                 case PositionEnum.DreamwellActivation:
                     serializer.Serialize(writer, "DreamwellActivation");

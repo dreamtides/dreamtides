@@ -60,6 +60,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 50606491debc84b159a7be3ad53eaa24
+    m_Address: Assets/ThirdParty/AngelinaAvgustova/WitchCraftIcons/PNG/outline_garlic.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 53a98bf68a1f442a7bfcf32372c89eed
     m_Address: Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_2123360837.png
     m_ReadOnly: 0
@@ -150,6 +155,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d659e8a547c854817ada24cd32202848
+    m_Address: Assets/ThirdParty/AngelinaAvgustova/WitchCraftIcons/PNG/outline_tooth.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: e279243d2b40043ef9aa4e7ab6fde553
     m_Address: Assets/ThirdParty/GameAssets/CardImages/Standard/2269064817.png
     m_ReadOnly: 0
@@ -167,6 +177,11 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: e8da2e685b68a4813961f0409f5135e9
     m_Address: Assets/ThirdParty/GameAssets/CardImages/Standard/2269064809.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ec508cb169073427db3732ef6c391cbc
+    m_Address: Assets/ThirdParty/AngelinaAvgustova/WitchCraftIcons/PNG/outline_claw.png
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0

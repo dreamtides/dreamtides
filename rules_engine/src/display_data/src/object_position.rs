@@ -102,6 +102,9 @@ pub enum Position {
     /// User deck displayed in the quest view
     QuestDeck,
 
+    /// Dreamsigns owned by the player in a quest
+    DreamsignDisplay,
+
     /// Object is in a deck of cards displayed at a given dreamscape site, e.g.
     /// before being drafted.
     SiteDeck(SiteId),
