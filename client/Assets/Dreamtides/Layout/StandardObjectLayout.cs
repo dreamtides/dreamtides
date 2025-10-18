@@ -101,6 +101,7 @@ namespace Dreamtides.Layout
     /// </summary>
     public override void ApplyTargetTransform(Displayable target, Sequence? sequence = null)
     {
+      OnBeforeApplyLayout();
       ApplyLayoutToObject(target, _objects.Count, _objects.Count + 1, sequence);
     }
 
@@ -112,6 +113,7 @@ namespace Dreamtides.Layout
     /// </summary>
     public override void ApplyLayout(Sequence? sequence = null)
     {
+      OnBeforeApplyLayout();
       for (var i = 0; i < _objects.Count; ++i)
       {
         var layoutIndex = GetLayoutIndexOverride(_objects[i], i, _objects.Count);
@@ -126,7 +128,19 @@ namespace Dreamtides.Layout
           OnBecameNonEmpty();
         });
       }
+
+      OnAppliedLayout();
     }
+
+    /// <summary>
+    /// Invoked before applying the layout to the objects.
+    /// </summary>
+    protected virtual void OnBeforeApplyLayout() { }
+
+    /// <summary>
+    /// Invoked after applying the layout to the objects.
+    /// </summary>
+    protected virtual void OnAppliedLayout() { }
 
     /// <summary>
     /// Invoked after adding objects when the count of objects in this layout

@@ -103,7 +103,12 @@ public class PrototypeQuest : Service
 
   protected override void OnInitialize(GameMode _mode, TestConfiguration? testConfiguration)
   {
-    StartCoroutine(
+    StartCoroutine(InitializeQuestSequence());
+  }
+
+  IEnumerator InitializeQuestSequence()
+  {
+    yield return StartCoroutine(
       CreateOrUpdateCards(
         new CreateOrUpdateCardsRequest
         {
@@ -115,7 +120,60 @@ public class PrototypeQuest : Service
           },
           Revealed = false,
           GroupKey = "quest",
-        }
+        },
+        animate: false
+      )
+    );
+
+    yield return StartCoroutine(
+      CreateOrUpdateCards(
+        new CreateOrUpdateCardsRequest
+        {
+          Count = 4,
+          Position = new ObjectPosition
+          {
+            Position = new Position { Enum = PositionEnum.DreamsignDisplay },
+            SortingKey = 1,
+          },
+          Revealed = true,
+          GroupKey = "dreamsigns",
+          Overrides = new List<CardOverride>
+          {
+            new CardOverride
+            {
+              Index = 0,
+              Prefab = CardPrefab.Dreamsign,
+              Name = "Hourglass",
+              SpritePath =
+                "Assets/ThirdParty/AngelinaAvgustova/WitchCraftIcons/PNG/outline_hourglass.png",
+            },
+            new CardOverride
+            {
+              Index = 1,
+              Prefab = CardPrefab.Dreamsign,
+              Name = "Garlic",
+              SpritePath =
+                "Assets/ThirdParty/AngelinaAvgustova/WitchCraftIcons/PNG/outline_garlic.png",
+            },
+            new CardOverride
+            {
+              Index = 2,
+              Prefab = CardPrefab.Dreamsign,
+              Name = "Claw",
+              SpritePath =
+                "Assets/ThirdParty/AngelinaAvgustova/WitchCraftIcons/PNG/outline_claw.png",
+            },
+            new CardOverride
+            {
+              Index = 3,
+              Prefab = CardPrefab.Dreamsign,
+              Name = "Tooth",
+              SpritePath =
+                "Assets/ThirdParty/AngelinaAvgustova/WitchCraftIcons/PNG/outline_tooth.png",
+            },
+          },
+        },
+        animate: false
       )
     );
   }
@@ -599,13 +657,13 @@ public class PrototypeQuest : Service
     _siteButtonsActivationCoroutine = null;
   }
 
-  IEnumerator CreateOrUpdateCards(CreateOrUpdateCardsRequest request)
+  IEnumerator CreateOrUpdateCards(CreateOrUpdateCardsRequest request, bool animate = true)
   {
     var cards = _prototypeCards.CreateOrUpdateCards(request);
     var command = new UpdateQuestCommand { Quest = new QuestView { Cards = cards } };
 
     var sequence = TweenUtils.Sequence("UpdateQuest");
-    return Registry.CardService.HandleUpdateQuestCommand(command, sequence);
+    return Registry.CardService.HandleUpdateQuestCommand(command, animate ? sequence : null);
   }
 
   IEnumerator RunDraftPickSequence()

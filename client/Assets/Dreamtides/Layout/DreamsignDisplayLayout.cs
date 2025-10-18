@@ -42,7 +42,12 @@ namespace Dreamtides.Layout
 
     public override float? CalculateObjectScale(int index, int count) => 1.0f;
 
-    protected override void OnUpdate()
+    protected override void OnAppliedLayout()
+    {
+      Debug.Log($"OnAppliedLayout {name} {Objects.Count}");
+    }
+
+    protected override void OnBeforeApplyLayout()
     {
       for (var i = 0; i < Objects.Count; ++i)
       {
