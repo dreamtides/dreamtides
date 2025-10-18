@@ -316,9 +316,16 @@ public class PrototypeQuest : Service
         if (isDreamsign)
         {
           var srt = Registry.DreamscapeLayout.DreamsignDisplay.Objects.Count;
-          updateCards.Add(
-            CloneCardViewWithPosition(s, new Position { Enum = PositionEnum.DreamsignDisplay }, srt)
+          var cv = CloneCardViewWithPosition(
+            s,
+            new Position { Enum = PositionEnum.DreamsignDisplay },
+            srt
           );
+          if (cv.Revealed != null && cv.Revealed.Actions != null)
+          {
+            cv.Revealed.Actions.ButtonAttachment = null;
+          }
+          updateCards.Add(cv);
         }
         else
         {
