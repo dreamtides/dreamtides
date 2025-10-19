@@ -418,13 +418,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 305248578440801658}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: -3, z: 0}
   m_LocalScale: {x: 0.25, y: 0.25, z: 0.25}
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 5773335668843788102}
-  m_Father: {fileID: 238212233877956}
+  m_Father: {fileID: 5304334944730395346}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &469940756883870029
 GameObject:
@@ -1521,6 +1521,7 @@ Transform:
   - {fileID: 2644275538384758301}
   - {fileID: 5917491927986151857}
   - {fileID: 8205798512481610377}
+  - {fileID: 673746885012273028}
   m_Father: {fileID: 238212233877956}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!210 &6069954923991036801
@@ -2707,7 +2708,6 @@ Transform:
   - {fileID: 1332052378211390788}
   - {fileID: 3031101844611411820}
   - {fileID: 2108056794715672860}
-  - {fileID: 673746885012273028}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &8215946370556705966
@@ -2757,6 +2757,7 @@ MonoBehaviour:
   _cardTrail: {fileID: 0}
   _buttonAttachment: {fileID: 2471953870254378096}
   _spriteCardContentProtection: {fileID: 5065014120444495370}
+  _cardColliderHeight: 4
 --- !u!65 &5680000531262599633
 BoxCollider:
   m_ObjectHideFlags: 0
