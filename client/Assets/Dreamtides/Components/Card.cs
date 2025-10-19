@@ -205,6 +205,14 @@ namespace Dreamtides.Components
       );
     }
 
+    /// <summary>
+    /// Hides the button attachment until the next Render() call.
+    /// </summary>
+    public void HideButtonAttachmentUntilNextRender()
+    {
+      _buttonAttachment.gameObject.SetActive(false);
+    }
+
     public IEnumerator StartDissolve(DissolveCardCommand command)
     {
       _isDissolved = true;

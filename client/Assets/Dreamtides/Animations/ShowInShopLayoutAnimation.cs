@@ -22,6 +22,10 @@ namespace Dreamtides.Animations
       var shopLayout = service.Registry.DreamscapeLayout.ShopLayout;
       var cardViews = command.Cards;
       var cards = cardViews.Select(cv => service.Registry.CardService.GetCard(cv.Id)).ToList();
+      for (int i = 0; i < cards.Count; i++)
+      {
+        cards[i].HideButtonAttachmentUntilNextRender();
+      }
       var stagger = command.StaggerInterval.ToSeconds();
 
       service.Registry.DreamscapeService.ShowShopWithCards(cards);
@@ -57,6 +61,10 @@ namespace Dreamtides.Animations
       var shopLayout = service.Registry.DreamscapeLayout.ShopLayout;
       var cardViews = command.Cards;
       var cards = cardViews.Select(cv => service.Registry.CardService.GetCard(cv.Id)).ToList();
+      for (int i = 0; i < cards.Count; i++)
+      {
+        cards[i].HideButtonAttachmentUntilNextRender();
+      }
       var stagger = command.StaggerInterval.ToSeconds();
 
       for (int i = 0; i < cards.Count; ++i)
@@ -80,10 +88,7 @@ namespace Dreamtides.Animations
     IEnumerator ScaleCardDownInPlace(Card card)
     {
       var seq = TweenUtils.Sequence("ShopScaleDown");
-      seq.Insert(
-        0,
-        card.transform.DOScale(Vector3.one * 0.01f, TweenUtils.MoveAnimationDurationSeconds)
-      );
+      seq.Insert(0, card.transform.DOScale(0, TweenUtils.MoveAnimationDurationSeconds));
       yield return seq.WaitForCompletion();
     }
 

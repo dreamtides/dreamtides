@@ -325,6 +325,12 @@ public class PrototypeQuest : Service
     var cardsForAnimation = new List<CardView>(1);
     var card = Registry.CardService.GetCard(clickedId);
     var source = card.CardView;
+    var isRestock = source.Revealed != null && source.Revealed.CardType == "Restock";
+    if (isRestock)
+    {
+      yield return StartCoroutine(RestockShopSequence());
+      yield break;
+    }
     var isDreamsign = source.Prefab == CardPrefab.Dreamsign;
     if (isDreamsign)
     {
@@ -405,6 +411,37 @@ public class PrototypeQuest : Service
 
     _prototypeCards.UpdateGroupCards("shop", updateCards);
     _currentShopDisplayIds.Remove(clickedId);
+  }
+
+  IEnumerator RestockShopSequence()
+  {
+    yield return StartCoroutine(HideShopSequence());
+
+    var allIds = Registry.CardService.GetCardIds().ToList();
+    var updateCards = new List<CardView>(allIds.Count);
+    foreach (var id in allIds)
+    {
+      var c = Registry.CardService.GetCard(id);
+      var s = c.CardView;
+      if (_currentShopDisplayIds.Contains(id))
+      {
+        updateCards.Add(
+          CloneCardViewWithPositionHidden(s, new Position { Enum = PositionEnum.Offscreen }, 0)
+        );
+      }
+      else
+      {
+        updateCards.Add(s);
+      }
+    }
+
+    var update = new UpdateQuestCommand { Quest = new QuestView { Cards = updateCards } };
+    yield return Registry.CardService.HandleUpdateQuestCommand(update);
+
+    _prototypeCards.UpdateGroupCards("shop", updateCards);
+    _prototypeCards.AdvanceGroupWindow("shop", 6);
+
+    yield return StartCoroutine(RunShopDisplaySequence());
   }
 
   public void FocusSpaceCameraFar()
