@@ -55,8 +55,12 @@ namespace Dreamtides.Layout
         return;
       }
 
+      var wasActive = _closeSiteButton.gameObject.activeSelf;
       _closeSiteButton.gameObject.SetActive(true);
-      TweenUtils.FadeInCanvasGroup(ComponentUtils.Get<CanvasGroup>(_closeSiteButton));
+      if (!wasActive)
+      {
+        TweenUtils.FadeInCanvasGroup(ComponentUtils.Get<CanvasGroup>(_closeSiteButton));
+      }
 
       var canvas = _registry.Canvas;
       var isLandscape = _registry.IsLandscape;
