@@ -25,7 +25,7 @@ namespace Dreamtides.Layout
         return transform.position;
       }
 
-      var scale = transform.localScale.x;
+      var scale = transform.lossyScale.x;
       var hs = _horizontalSpacing * scale;
       var vs = _verticalSpacing * scale;
 
@@ -58,7 +58,7 @@ namespace Dreamtides.Layout
     {
       Gizmos.color = Color.blue;
       var center = transform.position;
-      var s = transform.localScale.x;
+      var s = transform.lossyScale.x;
       var halfLayoutX = _cardWidth * s / 2f + _horizontalSpacing * s / 2f;
       var halfLayoutY = _cardHeight * s / 2f + _verticalSpacing * s / 2f;
 
