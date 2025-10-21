@@ -9,9 +9,9 @@ namespace Dreamtides.Components
   public sealed class CardTrail : MonoBehaviour
   {
     float _initializedAt;
-    float _durationSeconds;
+    float? _durationSeconds;
 
-    public void Initialize(float durationSeconds)
+    public void Initialize(float? durationSeconds = null)
     {
       _initializedAt = Time.time;
       _durationSeconds = durationSeconds;
@@ -27,7 +27,7 @@ namespace Dreamtides.Components
 
     void Update()
     {
-      if (Time.time - _initializedAt > _durationSeconds)
+      if (_durationSeconds != null && Time.time - _initializedAt > _durationSeconds.Value)
       {
         Destroy(gameObject);
       }

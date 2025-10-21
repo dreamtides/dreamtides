@@ -379,20 +379,32 @@ namespace Dreamtides.Components
       }
     }
 
-    public void SetCardTrail(ProjectileAddress trailAddress, float durationSeconds)
+    public void SetCardTrail(ProjectileAddress trailAddress, float? durationSeconds = null)
     {
       if (_cardTrail)
       {
         Destroy(_cardTrail);
       }
 
-      var trail = _registry.AssetService.GetProjectilePrefab(trailAddress);
-      _cardTrail = Instantiate(trail.gameObject);
+      var trail = ComponentUtils.Instantiate(
+        _registry.AssetService.GetProjectilePrefab(trailAddress)
+      );
+      _cardTrail = trail.gameObject;
       _cardTrail.transform.SetParent(_cardTrailPosition, worldPositionStays: false);
       _cardTrail.transform.localPosition = Vector3.zero;
       _cardTrail.transform.localRotation = Quaternion.identity;
+
       var trailComponent = _cardTrail.AddComponent<CardTrail>();
       trailComponent.Initialize(durationSeconds);
+    }
+
+    public void ClearCardTrail()
+    {
+      if (_cardTrail)
+      {
+        Destroy(_cardTrail);
+        _cardTrail = null;
+      }
     }
 
     void RenderRevealedCardView(RevealedCardView revealed)

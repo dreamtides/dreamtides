@@ -66,6 +66,7 @@ pub fn render(
                         stagger_interval: Milliseconds::new(500),
                         pause_duration: Milliseconds::new(300),
                         destination: Position::InHand(DisplayPlayer::User),
+                        card_tail: None,
                     },
                 ));
             }
@@ -175,6 +176,7 @@ pub fn render(
                         stagger_interval: Milliseconds::new(500),
                         pause_duration: Milliseconds::new(300),
                         destination: Position::InVoid(builder.to_display_player(*player)),
+                        card_tail: None,
                     },
                 ));
             }

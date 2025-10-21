@@ -42,12 +42,21 @@ namespace Dreamtides.Animations
           destroyedQuestCardsLayout,
           stagger,
           service,
+          command.CardTail,
           () => destroyDone = true
         )
       );
 
       service.StartCoroutine(
-        DisplayFlow(toDisplay, dreamsignLayout, pause, stagger, service, () => displayDone = true)
+        DisplayFlow(
+          toDisplay,
+          dreamsignLayout,
+          pause,
+          stagger,
+          service,
+          command.CardTail,
+          () => displayDone = true
+        )
       );
 
       yield return new WaitUntil(() => destroyDone && displayDone);
@@ -58,6 +67,7 @@ namespace Dreamtides.Animations
       ObjectLayout destroyedLayout,
       float stagger,
       CardAnimationService service,
+      ProjectileAddress? cardTail,
       System.Action onDone
     )
     {
@@ -90,6 +100,7 @@ namespace Dreamtides.Animations
       float pause,
       float stagger,
       CardAnimationService service,
+      ProjectileAddress? cardTail,
       System.Action onDone
     )
     {
@@ -101,12 +112,22 @@ namespace Dreamtides.Animations
         var card = service.Registry.CardService.GetCard(cardView.Id);
         card.SortingKey = (int)cardView.Position.SortingKey;
 
+        if (cardTail != null)
+        {
+          card.SetCardTrail(cardTail, TweenUtils.MoveAnimationDurationSeconds);
+        }
+
         card.transform.SetParent(dreamsignLayout.transform, worldPositionStays: true);
 
         var addSeq = TweenUtils.Sequence("DreamsignDisplayAdd");
         dreamsignLayout.Add(card);
         dreamsignLayout.ApplyLayout(addSeq);
         yield return addSeq.WaitForCompletion();
+
+        if (cardTail != null)
+        {
+          card.ClearCardTrail();
+        }
       }
 
       onDone();

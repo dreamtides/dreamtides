@@ -222,6 +222,9 @@ pub struct MoveCardsWithCustomAnimationCommand {
 
     /// Destination position to move the cards to
     pub destination: Position,
+
+    /// If provided, a card tail will be displayed on the moving cards.
+    pub card_tail: Option<ProjectileAddress>,
 }
 
 /// Animation to perform when moving cards

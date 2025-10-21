@@ -70,8 +70,6 @@ namespace Dreamtides.Components
 
       if (_flash)
       {
-        //var flash = registry.AssetPoolService.Create(_flash,
-        //transform.position);
         _flash.transform.position = transform.position;
         _flash.gameObject.SetActive(true);
         _flash.transform.rotation = rotation;
@@ -96,7 +94,6 @@ namespace Dreamtides.Components
 
       if (_hit)
       {
-        // hit = registry.AssetPoolService.Create(_hit, transform.position);
         _hit.transform.position = transform.position;
         _hit.gameObject.SetActive(true);
         _hit.transform.rotation = rotation;

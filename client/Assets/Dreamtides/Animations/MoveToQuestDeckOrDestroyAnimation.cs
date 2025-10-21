@@ -41,12 +41,21 @@ namespace Dreamtides.Animations
           destroyedQuestCardsLayout,
           stagger,
           service,
+          command.CardTail,
           () => destroyDone = true
         )
       );
 
       service.StartCoroutine(
-        QuestDeckFlow(toQuestDeck, questDeckLayout, pause, stagger, service, () => questDone = true)
+        QuestDeckFlow(
+          toQuestDeck,
+          questDeckLayout,
+          pause,
+          stagger,
+          service,
+          command.CardTail,
+          () => questDone = true
+        )
       );
 
       yield return new WaitUntil(() => destroyDone && questDone);
@@ -57,6 +66,7 @@ namespace Dreamtides.Animations
       ObjectLayout destroyedLayout,
       float stagger,
       CardAnimationService service,
+      ProjectileAddress? cardTail,
       System.Action onDone
     )
     {
@@ -89,6 +99,7 @@ namespace Dreamtides.Animations
       float pause,
       float stagger,
       CardAnimationService service,
+      ProjectileAddress? cardTail,
       System.Action onDone
     )
     {
@@ -101,6 +112,12 @@ namespace Dreamtides.Animations
         var moveSeq = TweenUtils.Sequence("QuestDeckMoveAbove");
         card.SortingKey = (int)cardView.Position.SortingKey;
         var anchor = service.Registry.DreamscapeLayout.AboveQuestDeck;
+
+        if (cardTail != null)
+        {
+          card.SetCardTrail(cardTail);
+        }
+
         moveSeq.Insert(
           0,
           card.transform.DOMove(anchor.position, TweenUtils.MoveAnimationDurationSeconds)
@@ -120,6 +137,11 @@ namespace Dreamtides.Animations
         yield return moveSeq.WaitForCompletion();
 
         service.Registry.SoundService.Play(service.MoveToQuestDeckSound);
+
+        if (cardTail != null)
+        {
+          card.ClearCardTrail();
+        }
 
         var flipSeq = TweenUtils.Sequence("QuestDeckFlip");
         card.TurnFaceDown(flipSeq);

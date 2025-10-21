@@ -1592,6 +1592,12 @@ namespace Dreamtides.Schema
         public MoveCardsCustomAnimation Animation { get; set; }
 
         /// <summary>
+        /// If provided, a card tail will be displayed on the moving cards.
+        /// </summary>
+        [JsonProperty("card_tail")]
+        public ProjectileAddress CardTail { get; set; }
+
+        /// <summary>
         /// Cards to move. Must already be present in the game.
         /// </summary>
         [JsonProperty("cards", Required = Required.Always)]

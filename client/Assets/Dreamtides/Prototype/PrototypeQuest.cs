@@ -363,6 +363,11 @@ public class PrototypeQuest : Service
       },
       PauseDuration = new Milliseconds { MillisecondsValue = 300 },
       StaggerInterval = new Milliseconds { MillisecondsValue = 100 },
+      CardTail = new ProjectileAddress
+      {
+        Projectile =
+          "Assets/ThirdParty/Hovl Studio/AAA Projectiles Vol 1/Prefabs/Dreamtides/Projectile 26 blue diamond.prefab",
+      },
     };
 
     yield return StartCoroutine(
