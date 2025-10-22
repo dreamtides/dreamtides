@@ -42,7 +42,6 @@ namespace Dreamtides.Animations
           destroyedQuestCardsLayout,
           stagger,
           service,
-          command.CardTail,
           () => destroyDone = true
         )
       );
@@ -67,7 +66,6 @@ namespace Dreamtides.Animations
       ObjectLayout destroyedLayout,
       float stagger,
       CardAnimationService service,
-      ProjectileAddress? cardTail,
       System.Action onDone
     )
     {
@@ -78,7 +76,6 @@ namespace Dreamtides.Animations
         var cardView = toDestroy[i];
         var card = service.Registry.CardService.GetCard(cardView.Id);
         card.SortingKey = (int)cardView.Position.SortingKey;
-        card.TurnFaceDown(TweenUtils.Sequence("DestroyQuestCardFlip"));
       }
 
       yield return new WaitForSeconds(0.3f);
@@ -112,10 +109,20 @@ namespace Dreamtides.Animations
         var card = service.Registry.CardService.GetCard(cardView.Id);
         card.SortingKey = (int)cardView.Position.SortingKey;
 
+        var originalScale = card.transform.localScale;
+        var originalPosition = card.transform.position;
+
         if (cardTail != null)
         {
-          card.SetCardTrail(cardTail, TweenUtils.MoveAnimationDurationSeconds);
+          card.SetCardTrail(cardTail);
         }
+
+        var initialSeq = TweenUtils.Sequence("DreamsignDisplayInitial");
+        var durationSeconds = 0.2f;
+        initialSeq.Append(
+          card.transform.DOScale(originalScale * 0.5f, durationSeconds).SetEase(Ease.OutQuad)
+        );
+        yield return initialSeq.WaitForCompletion();
 
         card.transform.SetParent(dreamsignLayout.transform, worldPositionStays: true);
 
