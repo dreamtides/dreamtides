@@ -144,6 +144,8 @@ namespace Dreamtides.Prototype
         }
         // Keep prefab consistent via effective overrides (which include Dreamsign indices)
         existing.Prefab = cardOv?.Prefab ?? templateForUpdate.Prefab;
+        existing.Backless =
+          existing.Prefab == CardPrefab.Dreamsign || existing.Prefab == CardPrefab.IconCard;
         if (request.Revealed)
         {
           if (existing.Revealed == null)
@@ -347,7 +349,9 @@ namespace Dreamtides.Prototype
     ) =>
       new()
       {
-        Backless = false,
+        Backless =
+          (overridePrefab ?? t.Prefab) == CardPrefab.Dreamsign
+          || (overridePrefab ?? t.Prefab) == CardPrefab.IconCard,
         CardFacing = revealed ? CardFacing.FaceUp : CardFacing.FaceDown,
         Id = BuildId(groupKey, sortIndex),
         Position = objectPosition,

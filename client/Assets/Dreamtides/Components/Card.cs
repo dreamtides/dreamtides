@@ -495,7 +495,7 @@ namespace Dreamtides.Components
         _loopingEffectAddress = null;
       }
 
-      if (revealed.Actions?.ButtonAttachment != null)
+      if (revealed.Actions?.ButtonAttachment != null && HasGameContext)
       {
         _buttonAttachment.gameObject.SetActive(true);
         _buttonAttachment.GameContext = GameContext;
