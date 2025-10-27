@@ -26,6 +26,9 @@ namespace Dreamtides.Components
     internal Transform _battlefieldCardFront = null!;
 
     [SerializeField]
+    internal CanvasCard _canvasCard = null!;
+
+    [SerializeField]
     internal TextMeshPro _name = null!;
 
     [SerializeField]
@@ -411,6 +414,8 @@ namespace Dreamtides.Components
     {
       _isRevealed = true;
       ToggleActiveElements();
+      _canvasCard.RenderRevealedCardView(revealed);
+
       _name.text = revealed.Name;
       _rulesText.text = revealed.RulesText;
       if (_costBackground)
