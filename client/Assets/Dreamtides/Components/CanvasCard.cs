@@ -214,47 +214,48 @@ namespace Dreamtides.Components
 
       var corners = new Vector3[8];
       var sources = new Renderer?[] { card._cardFrame, card._cardImage };
-      foreach (var r in sources)
+      foreach (var childRenderer in sources)
       {
-        if (r == null)
+        if (childRenderer == null)
         {
           continue;
         }
-        var b = r.bounds;
-        var c = b.center;
-        var e = b.extents;
 
-        corners[0] = c + new Vector3(e.x, e.y, e.z);
-        corners[1] = c + new Vector3(e.x, e.y, -e.z);
-        corners[2] = c + new Vector3(e.x, -e.y, e.z);
-        corners[3] = c + new Vector3(e.x, -e.y, -e.z);
-        corners[4] = c + new Vector3(-e.x, e.y, e.z);
-        corners[5] = c + new Vector3(-e.x, e.y, -e.z);
-        corners[6] = c + new Vector3(-e.x, -e.y, e.z);
-        corners[7] = c + new Vector3(-e.x, -e.y, -e.z);
+        var childBounds = childRenderer.bounds;
+        var childCenter = childBounds.center;
+        var childExtents = childBounds.extents;
+
+        corners[0] = childCenter + new Vector3(childExtents.x, childExtents.y, childExtents.z);
+        corners[1] = childCenter + new Vector3(childExtents.x, childExtents.y, -childExtents.z);
+        corners[2] = childCenter + new Vector3(childExtents.x, -childExtents.y, childExtents.z);
+        corners[3] = childCenter + new Vector3(childExtents.x, -childExtents.y, -childExtents.z);
+        corners[4] = childCenter + new Vector3(-childExtents.x, childExtents.y, childExtents.z);
+        corners[5] = childCenter + new Vector3(-childExtents.x, childExtents.y, -childExtents.z);
+        corners[6] = childCenter + new Vector3(-childExtents.x, -childExtents.y, childExtents.z);
+        corners[7] = childCenter + new Vector3(-childExtents.x, -childExtents.y, -childExtents.z);
 
         for (var i = 0; i < corners.Length; i++)
         {
-          var sp = mainCamera.WorldToScreenPoint(corners[i]);
-          if (sp.z < 0)
+          var screenPoint = mainCamera.WorldToScreenPoint(corners[i]);
+          if (screenPoint.z < 0)
           {
             continue;
           }
-          if (sp.x < minX)
+          if (screenPoint.x < minX)
           {
-            minX = sp.x;
+            minX = screenPoint.x;
           }
-          if (sp.x > maxX)
+          if (screenPoint.x > maxX)
           {
-            maxX = sp.x;
+            maxX = screenPoint.x;
           }
-          if (sp.y < minY)
+          if (screenPoint.y < minY)
           {
-            minY = sp.y;
+            minY = screenPoint.y;
           }
-          if (sp.y > maxY)
+          if (screenPoint.y > maxY)
           {
-            maxY = sp.y;
+            maxY = screenPoint.y;
           }
         }
       }
