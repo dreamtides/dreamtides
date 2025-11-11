@@ -16,12 +16,6 @@ namespace Dreamtides.Components
     RectTransform _root = null!;
 
     [SerializeField]
-    Image _cardImage = null!;
-
-    [SerializeField]
-    Image _cardFrame = null!;
-
-    [SerializeField]
     TextMeshProUGUI _cardName = null!;
 
     [SerializeField]
