@@ -2,7 +2,6 @@
 
 namespace Dreamtides.Layout
 {
-  using Dreamtides.Components;
   using Dreamtides.Utils;
   using UnityEngine;
 
@@ -31,6 +30,14 @@ namespace Dreamtides.Layout
     [SerializeField]
     StandardObjectLayout _dreamsignDisplay = null!;
     public StandardObjectLayout DreamsignDisplay => Check(_dreamsignDisplay);
+
+    [SerializeField]
+    StandardObjectLayout _journeyChoiceDisplay = null!;
+    public StandardObjectLayout JourneyChoiceDisplay => Check(_journeyChoiceDisplay);
+
+    [SerializeField]
+    StandardObjectLayout _temptingOfferDisplay = null!;
+    public StandardObjectLayout TemptingOfferDisplay => Check(_temptingOfferDisplay);
 
     T Check<T>(T? value)
       where T : Object => Errors.CheckNotNull(value, $"{typeof(T).Name} not initialized");

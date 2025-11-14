@@ -62,6 +62,8 @@ namespace Dreamtides.Services
       Registry.DreamscapeLayout.DraftPickLayout.ApplyLayout(sequence);
       Registry.DreamscapeLayout.ShopLayout.ApplyLayout(sequence);
       Registry.DreamscapeLayout.DreamsignDisplay.ApplyLayout(sequence);
+      Registry.DreamscapeLayout.JourneyChoiceDisplay.ApplyLayout(sequence);
+      Registry.DreamscapeLayout.TemptingOfferDisplay.ApplyLayout(sequence);
 
       _tmpSiteDeckLayout.ApplyLayout(sequence);
       _tmpMerchantPositionLayout.ApplyLayout(sequence);

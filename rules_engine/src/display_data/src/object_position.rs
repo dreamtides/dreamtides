@@ -118,6 +118,12 @@ pub enum Position {
 
     /// Object is being displayed in the shop interface
     ShopDisplay,
+
+    /// Object is being displayed as an option in a journey choice.
+    JourneyDisplay,
+
+    /// Object is being displayed as an option in a tempting offer choice.
+    TemptingOfferDisplay(TemptingOfferType),
 }
 
 #[derive(
@@ -128,4 +134,12 @@ pub enum StackType {
     TargetingUserBattlefield,
     TargetingEnemyBattlefield,
     TargetingBothBattlefields,
+}
+
+#[derive(
+    Copy, Clone, Debug, Eq, PartialEq, Hash, Serialize, Deserialize, Ord, PartialOrd, JsonSchema,
+)]
+pub enum TemptingOfferType {
+    Journey,
+    Cost,
 }

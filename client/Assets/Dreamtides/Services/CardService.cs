@@ -40,6 +40,12 @@ namespace Dreamtides.Services
     [SerializeField]
     Card _iconCardPrefab = null!;
 
+    [SerializeField]
+    Card _journeyCardPrefab = null!;
+
+    [SerializeField]
+    Card _offerCostCardPrefab = null!;
+
     Dictionary<string, Card> Cards { get; } = new();
 
     public Card GetCard(string id) => Errors.CheckNotNull(Cards[id]);
@@ -99,6 +105,8 @@ namespace Dreamtides.Services
             CardPrefab.Event => ComponentUtils.Instantiate(_eventCardPrefab),
             CardPrefab.Identity => ComponentUtils.Instantiate(_identityCardPrefab),
             CardPrefab.IconCard => ComponentUtils.Instantiate(_iconCardPrefab),
+            CardPrefab.Journey => ComponentUtils.Instantiate(_journeyCardPrefab),
+            CardPrefab.OfferCost => ComponentUtils.Instantiate(_offerCostCardPrefab),
             _ => ComponentUtils.Instantiate(_cardPrefab),
           };
 
@@ -380,6 +388,11 @@ namespace Dreamtides.Services
         return Registry.DreamscapeLayout.DreamsignDisplay;
       }
 
+      if (position.Enum == PositionEnum.JourneyDisplay)
+      {
+        return Registry.DreamscapeLayout.JourneyChoiceDisplay;
+      }
+
       if (position.PositionClass == null)
       {
         throw new InvalidOperationException($"Unknown layout position enum: ${position.Enum}");
@@ -502,6 +515,11 @@ namespace Dreamtides.Services
       if (position.PositionClass.MerchantWares is { } merchantWares)
       {
         return Registry.DreamscapeService.MerchantPositionLayout(merchantWares);
+      }
+
+      if (position.PositionClass.TemptingOfferDisplay is { } _)
+      {
+        return Registry.DreamscapeLayout.TemptingOfferDisplay;
       }
 
       var json = JsonConvert.SerializeObject(position.PositionClass);

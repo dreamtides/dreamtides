@@ -187,4 +187,6 @@ pub enum CardPrefab {
     Enemy,
     Dreamsign,
     IconCard,
+    Journey,
+    OfferCost,
 }

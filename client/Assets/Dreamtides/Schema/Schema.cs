@@ -1537,6 +1537,8 @@ namespace Dreamtides.Schema
     ///
     /// Object is being displayed in the possession of a merchant at a given
     /// dreamscape site (prior to animation to the shop display).
+    ///
+    /// Object is being displayed as an option in a tempting offer choice.
     /// </summary>
     public partial class PositionClass
     {
@@ -1578,6 +1580,9 @@ namespace Dreamtides.Schema
 
         [JsonProperty("MerchantWares", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public Guid? MerchantWares { get; set; }
+
+        [JsonProperty("TemptingOfferDisplay", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public TemptingOfferType? TemptingOfferDisplay { get; set; }
     }
 
     public partial class ProjectileAddress
@@ -2629,8 +2634,10 @@ namespace Dreamtides.Schema
     /// Object is being displayed as a potential draft pick choice
     ///
     /// Object is being displayed in the shop interface
+    ///
+    /// Object is being displayed as an option in a journey choice.
     /// </summary>
-    public enum PositionEnum { Browser, Default, DraftPickDisplay, Drawn, DreamsignDisplay, DreamwellActivation, GameModifier, HandStorage, Offscreen, OnScreenStorage, QuestDeck, ShopDisplay };
+    public enum PositionEnum { Browser, Default, DraftPickDisplay, Drawn, DreamsignDisplay, DreamwellActivation, GameModifier, HandStorage, JourneyDisplay, Offscreen, OnScreenStorage, QuestDeck, ShopDisplay };
 
     /// <summary>
     /// Auto-generated discriminant enum variants
@@ -2638,6 +2645,8 @@ namespace Dreamtides.Schema
     public enum CardOrderSelectionTargetDiscriminants { Deck, Void };
 
     public enum StackType { Default, TargetingBothBattlefields, TargetingEnemyBattlefield, TargetingUserBattlefield };
+
+    public enum TemptingOfferType { Cost, Journey };
 
     /// <summary>
     /// Animation to perform when moving cards
@@ -2654,7 +2663,7 @@ namespace Dreamtides.Schema
     /// <summary>
     /// Represents the general category of card being displayed.
     /// </summary>
-    public enum CardPrefab { Character, Dreamsign, Dreamwell, Enemy, Event, IconCard, Identity, Token };
+    public enum CardPrefab { Character, Dreamsign, Dreamwell, Enemy, Event, IconCard, Identity, Journey, OfferCost, Token };
 
     public enum StudioType { EnemyIdentityCard, EnemyStatus, UserIdentityCard, UserStatus };
 
@@ -2866,6 +2875,7 @@ namespace Dreamtides.Schema
                 PositionConverter.Singleton,
                 CardOrderSelectionTargetDiscriminantsConverter.Singleton,
                 StackTypeConverter.Singleton,
+                TemptingOfferTypeConverter.Singleton,
                 PositionEnumConverter.Singleton,
                 MoveCardsCustomAnimationConverter.Singleton,
                 CardFacingConverter.Singleton,
@@ -5147,6 +5157,8 @@ namespace Dreamtides.Schema
                             return new Position { Enum = PositionEnum.GameModifier };
                         case "HandStorage":
                             return new Position { Enum = PositionEnum.HandStorage };
+                        case "JourneyDisplay":
+                            return new Position { Enum = PositionEnum.JourneyDisplay };
                         case "Offscreen":
                             return new Position { Enum = PositionEnum.Offscreen };
                         case "OnScreenStorage":
@@ -5194,6 +5206,9 @@ namespace Dreamtides.Schema
                         return;
                     case PositionEnum.HandStorage:
                         serializer.Serialize(writer, "HandStorage");
+                        return;
+                    case PositionEnum.JourneyDisplay:
+                        serializer.Serialize(writer, "JourneyDisplay");
                         return;
                     case PositionEnum.Offscreen:
                         serializer.Serialize(writer, "Offscreen");
@@ -5312,6 +5327,47 @@ namespace Dreamtides.Schema
         public static readonly StackTypeConverter Singleton = new StackTypeConverter();
     }
 
+    internal class TemptingOfferTypeConverter : JsonConverter
+    {
+        public override bool CanConvert(Type t) => t == typeof(TemptingOfferType) || t == typeof(TemptingOfferType?);
+
+        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
+        {
+            if (reader.TokenType == JsonToken.Null) return null;
+            var value = serializer.Deserialize<string>(reader);
+            switch (value)
+            {
+                case "Cost":
+                    return TemptingOfferType.Cost;
+                case "Journey":
+                    return TemptingOfferType.Journey;
+            }
+            throw new Exception("Cannot unmarshal type TemptingOfferType");
+        }
+
+        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
+        {
+            if (untypedValue == null)
+            {
+                serializer.Serialize(writer, null);
+                return;
+            }
+            var value = (TemptingOfferType)untypedValue;
+            switch (value)
+            {
+                case TemptingOfferType.Cost:
+                    serializer.Serialize(writer, "Cost");
+                    return;
+                case TemptingOfferType.Journey:
+                    serializer.Serialize(writer, "Journey");
+                    return;
+            }
+            throw new Exception("Cannot marshal type TemptingOfferType");
+        }
+
+        public static readonly TemptingOfferTypeConverter Singleton = new TemptingOfferTypeConverter();
+    }
+
     internal class PositionEnumConverter : JsonConverter
     {
         public override bool CanConvert(Type t) => t == typeof(PositionEnum) || t == typeof(PositionEnum?);
@@ -5338,6 +5394,8 @@ namespace Dreamtides.Schema
                     return PositionEnum.GameModifier;
                 case "HandStorage":
                     return PositionEnum.HandStorage;
+                case "JourneyDisplay":
+                    return PositionEnum.JourneyDisplay;
                 case "Offscreen":
                     return PositionEnum.Offscreen;
                 case "OnScreenStorage":
@@ -5383,6 +5441,9 @@ namespace Dreamtides.Schema
                     return;
                 case PositionEnum.HandStorage:
                     serializer.Serialize(writer, "HandStorage");
+                    return;
+                case PositionEnum.JourneyDisplay:
+                    serializer.Serialize(writer, "JourneyDisplay");
                     return;
                 case PositionEnum.Offscreen:
                     serializer.Serialize(writer, "Offscreen");
@@ -5529,6 +5590,10 @@ namespace Dreamtides.Schema
                     return CardPrefab.IconCard;
                 case "Identity":
                     return CardPrefab.Identity;
+                case "Journey":
+                    return CardPrefab.Journey;
+                case "OfferCost":
+                    return CardPrefab.OfferCost;
                 case "Token":
                     return CardPrefab.Token;
             }
@@ -5565,6 +5630,12 @@ namespace Dreamtides.Schema
                     return;
                 case CardPrefab.Identity:
                     serializer.Serialize(writer, "Identity");
+                    return;
+                case CardPrefab.Journey:
+                    serializer.Serialize(writer, "Journey");
+                    return;
+                case CardPrefab.OfferCost:
+                    serializer.Serialize(writer, "OfferCost");
                     return;
                 case CardPrefab.Token:
                     serializer.Serialize(writer, "Token");
