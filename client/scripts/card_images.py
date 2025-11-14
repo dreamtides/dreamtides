@@ -1,26 +1,32 @@
 #!/usr/bin/env python3
-"""
+
+r"""
 Usage:
   python run.py --input /path/to/input --output /path/to/output [--verbose]
 
 Input images should be 1000px tall.
 
 Example Usage:
-    ./client/scripts/resize.py \\
+
+    ./client/scripts/resize.py \
         --input client/Assets/ThirdParty/GameAssets/SourceImages/Standard
-    ./client/scripts/card_images.py \\ 
-        --input client/Assets/ThirdParty/GameAssets/SourceImages/Standard \\
-        --output client/Assets/ThirdParty/GameAssets/CardImages/Standard \\
+    ./client/scripts/card_images.py \
+        --input client/Assets/ThirdParty/GameAssets/SourceImages/Standard \
+        --output client/Assets/ThirdParty/GameAssets/CardImages/Standard \
         -r 45
 
-Example Usage:
-    ./client/scripts/resize.py \\
+    ./client/scripts/resize.py \
         --input client/Assets/ThirdParty/GameAssets/SourceImages/Dreamwell
-    ./client/scripts/card_images.py \\ 
-        --input client/Assets/ThirdParty/GameAssets/SourceImages/Dreamwell \\
-        --output client/Assets/ThirdParty/GameAssets/CardImages/Dreamwell \\
-        --landscape \\ 
+    ./client/scripts/card_images.py \
+        --input client/Assets/ThirdParty/GameAssets/SourceImages/Dreamwell \
+        --output client/Assets/ThirdParty/GameAssets/CardImages/Dreamwell \
+        --landscape \
         -r 45
+
+    ./client/scripts/card_images.py \
+        --input client/Assets/ThirdParty/GameAssets/SourceImages/Circular \
+        --output client/Assets/ThirdParty/GameAssets/CardImages/Circular \
+        --circle       
 """
  
 import os
@@ -43,7 +49,7 @@ def get_image_dimensions(image_path, verbose=False):
     
     dimensions = result.stdout.strip().split('x')
     return int(dimensions[0]), int(dimensions[1])
-
+ 
 def create_rounded_rectangle_mask(width, height, output_path, corner_radius=45, verbose=False):
     """Create a rounded rectangle mask with the specified dimensions."""
     log(f"Creating rounded rectangle mask with dimensions {width}x{height} and corner radius {corner_radius}", verbose)
@@ -54,7 +60,18 @@ def create_rounded_rectangle_mask(width, height, output_path, corner_radius=45, 
         output_path
     ], check=True)
 
-def process_image(image_file, output_file, corner_radius=45, verbose=False, landscape=False):
+def create_circle_mask(diameter, output_path, verbose=False):
+    """Create a circular mask with the specified diameter."""
+    log(f"Creating circle mask with diameter {diameter}", verbose)
+    center = diameter / 2
+    subprocess.run([
+        "magick", "-size", f"{diameter}x{diameter}", "xc:none",
+        "-fill", "white",
+        "-draw", f"circle {center},{center} {center},{diameter - 1}",
+        output_path
+    ], check=True)
+
+def process_image(image_file, output_file, corner_radius=45, verbose=False, landscape=False, circle=False):
     """Process a single image file, adding rounded corners and resizing."""
     log(f"Processing: {image_file}", verbose)
     
@@ -65,7 +82,9 @@ def process_image(image_file, output_file, corner_radius=45, verbose=False, land
     if orig_height != 1000:
         raise ValueError(f"Error: Image {image_file} height is {orig_height}px. All images must be exactly 1000px tall.")
     
-    if landscape:
+    if circle:
+        target_width = orig_height
+    elif landscape:
         target_width = int(orig_height * 1.6)
     else:
         target_width = int(orig_height / 1.15)
@@ -90,10 +109,13 @@ def process_image(image_file, output_file, corner_radius=45, verbose=False, land
         # Double-check the dimensions of the output file to ensure proper mask creation
         resized_width, resized_height = get_image_dimensions(resized_file, verbose)
         
-        # Create a rounded rectangle mask with the same dimensions as the resized image
-        create_rounded_rectangle_mask(resized_width, resized_height, mask_file, corner_radius, verbose)
+        if circle:
+            create_circle_mask(resized_width, mask_file, verbose)
+        else:
+            create_rounded_rectangle_mask(resized_width, resized_height, mask_file, corner_radius, verbose)
         
-        log(f"Step 2: Applying rounded rectangle mask", verbose)
+        mask_label = "circle" if circle else "rounded rectangle"
+        log(f"Step 2: Applying {mask_label} mask", verbose)
         # Apply the mask to create rounded corners
         subprocess.run([
             "magick",
@@ -111,6 +133,7 @@ def main():
     parser.add_argument('--corner-radius', '-r', type=int, default=45, help='Corner radius for rounded rectangle (default: 45)')
     parser.add_argument('--verbose', '-v', action='store_true', help='Enable verbose logging')
     parser.add_argument('--landscape', '-l', action='store_true', help='Crop to 16:10 aspect ratio')
+    parser.add_argument('--circle', '-c', action='store_true', help='Crop output to a circle')
     
     # Parse arguments
     args = parser.parse_args()
@@ -120,6 +143,10 @@ def main():
     corner_radius = args.corner_radius
     verbose = args.verbose
     landscape = args.landscape
+    circle = args.circle
+
+    if circle and landscape:
+        parser.error("--circle cannot be combined with --landscape")
 
     # Count of processed files
     processed_count = 0
@@ -151,7 +178,7 @@ def main():
                 
                 try:
                     # Process the image
-                    process_image(image_file, output_file, corner_radius, verbose, landscape)
+                    process_image(image_file, output_file, corner_radius, verbose, landscape, circle)
                     processed_count += 1
                 except ValueError as e:
                     print(e)
