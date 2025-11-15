@@ -101,7 +101,7 @@ namespace Dreamtides.Services
       return _tmpSiteDeckLayout;
     }
 
-    public ObjectLayout MerchantPositionLayout(Guid merchantId)
+    public ObjectLayout SiteNpcLayout(Guid siteId)
     {
       return _tmpMerchantPositionLayout;
     }

@@ -223,13 +223,14 @@ pub struct MoveCardsWithCustomAnimationCommand {
     /// Destination position to move the cards to
     pub destination: Position,
 
-    /// If provided, a card tail will be displayed on the moving cards.
-    pub card_tail: Option<ProjectileAddress>,
+    /// If provided, a card trail will be displayed on the moving cards.
+    pub card_trail: Option<ProjectileAddress>,
 }
 
 /// Animation to perform when moving cards
 #[derive(Clone, Copy, Debug, Serialize, Deserialize, JsonSchema)]
 pub enum MoveCardsCustomAnimation {
+    DefaultAnimation,
     ShowAtDrawnCardsPosition,
     ShowInDraftPickLayout,
     ShowInShopLayout,

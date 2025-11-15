@@ -110,9 +110,9 @@ pub enum Position {
     /// before being drafted.
     SiteDeck(SiteId),
 
-    /// Object is being displayed in the possession of a merchant at a given
-    /// dreamscape site (prior to animation to the shop display).
-    MerchantWares(SiteId),
+    /// Object is being displayed in the possession of an NPC at a given
+    /// dreamscape site (prior to animation to the display), e.g. a merchant.
+    SiteNpc(SiteId),
 
     /// Object is being displayed as a potential draft pick choice
     DraftPickDisplay,

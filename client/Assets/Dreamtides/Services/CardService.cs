@@ -512,9 +512,9 @@ namespace Dreamtides.Services
         return Registry.DreamscapeService.SiteDeckLayout(siteDeck);
       }
 
-      if (position.PositionClass.MerchantWares is { } merchantWares)
+      if (position.PositionClass.SiteNpc is { } siteNpc)
       {
-        return Registry.DreamscapeService.MerchantPositionLayout(merchantWares);
+        return Registry.DreamscapeService.SiteNpcLayout(siteNpc);
       }
 
       if (position.PositionClass.TemptingOfferDisplay is { } _)

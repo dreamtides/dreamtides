@@ -1535,8 +1535,8 @@ namespace Dreamtides.Schema
     /// Object is in a deck of cards displayed at a given dreamscape site, e.g.
     /// before being drafted.
     ///
-    /// Object is being displayed in the possession of a merchant at a given
-    /// dreamscape site (prior to animation to the shop display).
+    /// Object is being displayed in the possession of an NPC at a given
+    /// dreamscape site (prior to animation to the display), e.g. a merchant.
     ///
     /// Object is being displayed as an option in a tempting offer choice.
     /// </summary>
@@ -1578,8 +1578,8 @@ namespace Dreamtides.Schema
         [JsonProperty("SiteDeck", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public Guid? SiteDeck { get; set; }
 
-        [JsonProperty("MerchantWares", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public Guid? MerchantWares { get; set; }
+        [JsonProperty("SiteNpc", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public Guid? SiteNpc { get; set; }
 
         [JsonProperty("TemptingOfferDisplay", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public TemptingOfferPosition TemptingOfferDisplay { get; set; }
@@ -1606,10 +1606,10 @@ namespace Dreamtides.Schema
         public MoveCardsCustomAnimation Animation { get; set; }
 
         /// <summary>
-        /// If provided, a card tail will be displayed on the moving cards.
+        /// If provided, a card trail will be displayed on the moving cards.
         /// </summary>
-        [JsonProperty("card_tail")]
-        public ProjectileAddress CardTail { get; set; }
+        [JsonProperty("card_trail")]
+        public ProjectileAddress CardTrail { get; set; }
 
         /// <summary>
         /// Cards to move. Must already be present in the game.
@@ -2707,7 +2707,7 @@ namespace Dreamtides.Schema
     /// <summary>
     /// Animation to perform when moving cards
     /// </summary>
-    public enum MoveCardsCustomAnimation { HideShopLayout, MoveToDreamsignDisplayOrDestroy, MoveToQuestDeckOrDestroy, ShowAtDrawnCardsPosition, ShowInDraftPickLayout, ShowInShopLayout };
+    public enum MoveCardsCustomAnimation { DefaultAnimation, HideShopLayout, MoveToDreamsignDisplayOrDestroy, MoveToQuestDeckOrDestroy, ShowAtDrawnCardsPosition, ShowInDraftPickLayout, ShowInShopLayout };
 
     /// <summary>
     /// Face up/face down state for this card
@@ -5532,6 +5532,8 @@ namespace Dreamtides.Schema
             var value = serializer.Deserialize<string>(reader);
             switch (value)
             {
+                case "DefaultAnimation":
+                    return MoveCardsCustomAnimation.DefaultAnimation;
                 case "HideShopLayout":
                     return MoveCardsCustomAnimation.HideShopLayout;
                 case "MoveToDreamsignDisplayOrDestroy":
@@ -5558,6 +5560,9 @@ namespace Dreamtides.Schema
             var value = (MoveCardsCustomAnimation)untypedValue;
             switch (value)
             {
+                case MoveCardsCustomAnimation.DefaultAnimation:
+                    serializer.Serialize(writer, "DefaultAnimation");
+                    return;
                 case MoveCardsCustomAnimation.HideShopLayout:
                     serializer.Serialize(writer, "HideShopLayout");
                     return;

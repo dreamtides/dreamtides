@@ -53,7 +53,7 @@ namespace Dreamtides.Animations
           pause,
           stagger,
           service,
-          command.CardTail,
+          command.CardTrail,
           () => displayDone = true
         )
       );
@@ -97,7 +97,7 @@ namespace Dreamtides.Animations
       float pause,
       float stagger,
       CardAnimationService service,
-      ProjectileAddress? cardTail,
+      ProjectileAddress? cardTrail,
       System.Action onDone
     )
     {
@@ -110,11 +110,10 @@ namespace Dreamtides.Animations
         card.SortingKey = (int)cardView.Position.SortingKey;
 
         var originalScale = card.transform.localScale;
-        var originalPosition = card.transform.position;
 
-        if (cardTail != null)
+        if (cardTrail != null)
         {
-          card.SetCardTrail(cardTail);
+          card.SetCardTrail(cardTrail);
         }
 
         var initialSeq = TweenUtils.Sequence("DreamsignDisplayInitial");
@@ -131,7 +130,7 @@ namespace Dreamtides.Animations
         dreamsignLayout.ApplyLayout(addSeq);
         yield return addSeq.WaitForCompletion();
 
-        if (cardTail != null)
+        if (cardTrail != null)
         {
           card.ClearCardTrail();
         }

@@ -363,7 +363,7 @@ public class PrototypeQuest : Service
       },
       PauseDuration = new Milliseconds { MillisecondsValue = 300 },
       StaggerInterval = new Milliseconds { MillisecondsValue = 100 },
-      CardTail = new ProjectileAddress
+      CardTrail = new ProjectileAddress
       {
         Projectile =
           "Assets/ThirdParty/Hovl Studio/AAA Projectiles Vol 1/Prefabs/Dreamtides/Projectile 26 blue diamond.prefab",
@@ -561,7 +561,7 @@ public class PrototypeQuest : Service
           {
             Position = new Position
             {
-              PositionClass = new PositionClass { MerchantWares = Guid.NewGuid() },
+              PositionClass = new PositionClass { SiteNpc = Guid.NewGuid() },
             },
             SortingKey = 1,
           },

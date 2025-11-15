@@ -19,6 +19,7 @@ namespace Dreamtides.Services
     AudioClip _moveToQuestDeckSound = null!;
     public AudioClip MoveToQuestDeckSound => _moveToQuestDeckSound;
 
+    MoveCardsDefaultAnimation _moveCardsDefault = new();
     DrawUserCardsAnimation _drawUserCards = new();
     ShowAsDraftPickAnimation _showAsDraftPick = new();
     ShowInShopLayoutAnimation _showInShopLayout = new();
@@ -40,6 +41,8 @@ namespace Dreamtides.Services
     {
       switch (command.Animation)
       {
+        case MoveCardsCustomAnimation.DefaultAnimation:
+          return _moveCardsDefault.Handle(command, this);
         case MoveCardsCustomAnimation.ShowAtDrawnCardsPosition:
           return _drawUserCards.Handle(command, this);
         case MoveCardsCustomAnimation.ShowInDraftPickLayout:

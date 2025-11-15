@@ -41,7 +41,7 @@ namespace Dreamtides.Animations
           destroyedQuestCardsLayout,
           stagger,
           service,
-          command.CardTail,
+          command.CardTrail,
           () => destroyDone = true
         )
       );
@@ -53,7 +53,7 @@ namespace Dreamtides.Animations
           pause,
           stagger,
           service,
-          command.CardTail,
+          command.CardTrail,
           () => questDone = true
         )
       );

@@ -1,5 +1,6 @@
 #nullable enable
 
+using System;
 using System.Collections;
 using System.Linq;
 using DG.Tweening;
@@ -12,19 +13,27 @@ using UnityEngine;
 
 namespace Dreamtides.Animations
 {
-  public class ShowAsDraftPickAnimation
+  public class MoveCardsDefaultAnimation
   {
     public IEnumerator Handle(
       MoveCardsWithCustomAnimationCommand command,
       CardAnimationService service
     )
     {
-      var draftLayout = service.Registry.DreamscapeLayout.DraftPickLayout;
+      var targetLayout =
+        service.Registry.CardService.LayoutForPosition(command.Destination) as StandardObjectLayout;
+      if (targetLayout is null)
+      {
+        throw new InvalidOperationException(
+          $"Target layout is not a standard object layout: ${command.Destination}"
+        );
+      }
+
       var cardViews = command.Cards;
       var cards = cardViews.Select(cv => service.Registry.CardService.GetCard(cv.Id)).ToList();
       var stagger = command.StaggerInterval.ToSeconds();
 
-      var existingCount = draftLayout.Objects.Count;
+      var existingCount = targetLayout.Objects.Count;
       var finalCount = existingCount + cards.Count;
       for (int i = 0; i < cards.Count; ++i)
       {
@@ -34,7 +43,7 @@ namespace Dreamtides.Animations
         if (i < cards.Count - 1)
         {
           service.StartCoroutine(
-            MoveCardToDraftPick(draftLayout, card, cardView, targetIndex, finalCount, service)
+            MoveCardToDestination(targetLayout, card, cardView, targetIndex, finalCount, service)
           );
           if (stagger > 0)
           {
@@ -43,8 +52,8 @@ namespace Dreamtides.Animations
         }
         else
         {
-          yield return MoveCardToDraftPick(
-            draftLayout,
+          yield return MoveCardToDestination(
+            targetLayout,
             card,
             cardView,
             targetIndex,
@@ -55,8 +64,8 @@ namespace Dreamtides.Animations
       }
     }
 
-    IEnumerator MoveCardToDraftPick(
-      SitePickObjectLayout draftLayout,
+    IEnumerator MoveCardToDestination(
+      StandardObjectLayout targetLayout,
       Card card,
       CardView cardView,
       int targetIndex,
@@ -68,16 +77,16 @@ namespace Dreamtides.Animations
       {
         card.Parent.RemoveIfPresent(card);
       }
-      var targetPosition = draftLayout.CalculateObjectPosition(targetIndex, finalCount);
+      var targetPosition = targetLayout.CalculateObjectPosition(targetIndex, finalCount);
       var rotationEuler =
-        draftLayout.CalculateObjectRotation(targetIndex, finalCount)
-        ?? draftLayout.transform.rotation.eulerAngles;
+        targetLayout.CalculateObjectRotation(targetIndex, finalCount)
+        ?? targetLayout.transform.rotation.eulerAngles;
       var targetRotation = Quaternion.Euler(rotationEuler);
       var targetScale =
-        draftLayout.CalculateObjectScale(targetIndex, finalCount)
-        ?? draftLayout.transform.localScale.x;
+        targetLayout.CalculateObjectScale(targetIndex, finalCount)
+        ?? targetLayout.transform.localScale.x;
       service.Registry.SoundService.PlayDrawCardSound();
-      var seq = TweenUtils.Sequence("DraftPickMove");
+      var seq = TweenUtils.Sequence("MoveToDestination");
       card.SortingKey = (int)cardView.Position.SortingKey;
       card.Render(service.Registry, cardView, seq);
       seq.Insert(0, card.transform.DOMove(targetPosition, TweenUtils.MoveAnimationDurationSeconds));

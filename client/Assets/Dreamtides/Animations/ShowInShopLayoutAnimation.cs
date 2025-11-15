@@ -122,7 +122,6 @@ namespace Dreamtides.Animations
 
       service.Registry.SoundService.PlayDrawCardSound();
 
-      // Create a sequence to coordinate flip/render effects and the scale-up only
       var seq = TweenUtils.Sequence("ShopScale");
       card.SortingKey = (int)cardView.Position.SortingKey;
       card.Render(service.Registry, cardView, seq);
