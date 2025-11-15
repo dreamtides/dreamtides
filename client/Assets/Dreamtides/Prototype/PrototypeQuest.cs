@@ -73,6 +73,10 @@ public class PrototypeQuest : Service
   [SerializeField]
   List<SiteButton> _siteButtons = null!;
 
+  public static readonly Guid DraftSiteId = Guid.NewGuid();
+  public static readonly Guid ShopSiteId = Guid.NewGuid();
+  public static readonly Guid TemptingOfferSiteId = Guid.NewGuid();
+
   Coroutine? _siteButtonsActivationCoroutine;
   PrototypeCards _prototypeCards = new PrototypeCards();
   List<string> _currentDraftPickIds = new List<string>(4);
@@ -478,7 +482,7 @@ public class PrototypeQuest : Service
           {
             Position = new Position
             {
-              PositionClass = new PositionClass { SiteDeck = Guid.NewGuid() },
+              PositionClass = new PositionClass { SiteDeck = DraftSiteId },
             },
             SortingKey = 1,
           },
@@ -559,10 +563,7 @@ public class PrototypeQuest : Service
           Count = 6,
           Position = new ObjectPosition
           {
-            Position = new Position
-            {
-              PositionClass = new PositionClass { SiteNpc = Guid.NewGuid() },
-            },
+            Position = new Position { PositionClass = new PositionClass { SiteNpc = ShopSiteId } },
             SortingKey = 1,
           },
           Revealed = true,
@@ -587,8 +588,38 @@ public class PrototypeQuest : Service
 
   public void FocusEventCamera()
   {
-    StartCoroutine(ShowTemptingOfferCards());
-    ResetPrioritiesAndTrack(_eventTrackingTarget, false);
+    const string groupKey = "tempting-offer";
+    const string spritePath =
+      "Assets/ThirdParty/GameAssets/CardImages/Circular/shutterstock_1486924805.png";
+    _prototypeCards.ResetGroup(groupKey);
+    StartCoroutine(
+      CreateOrUpdateCards(
+        new CreateOrUpdateCardsRequest
+        {
+          Count = 4,
+          Position = new ObjectPosition
+          {
+            Position = new Position
+            {
+              PositionClass = new PositionClass { SiteNpc = TemptingOfferSiteId },
+            },
+            SortingKey = 1,
+          },
+          Revealed = true,
+          GroupKey = groupKey,
+          Overrides = BuildTemptingOfferOverrides(spritePath),
+        }
+      )
+    );
+
+    ResetPrioritiesAndTrack(
+      _eventTrackingTarget,
+      false,
+      () =>
+      {
+        StartCoroutine(ShowTemptingOfferCards());
+      }
+    );
     _eventCamera.Priority = 10;
   }
 
@@ -818,7 +849,7 @@ public class PrototypeQuest : Service
       Registry.DreamscapeService.HandlePlayMecanimAnimation(
         new PlayMecanimAnimationCommand
         {
-          SiteId = Guid.NewGuid(),
+          SiteId = ShopSiteId,
           Parameters = new List<MecanimParameter>
           {
             new MecanimParameter { TriggerParam = new TriggerParam { Name = "WaveSmall" } },
@@ -835,7 +866,7 @@ public class PrototypeQuest : Service
       new AnchorToScreenPositionCommand()
       {
         Node = ShopMerchantDialog(),
-        Anchor = new ScreenAnchor { SiteCharacter = Guid.NewGuid() },
+        Anchor = new ScreenAnchor { SiteCharacter = ShopSiteId },
         ShowDuration = new Milliseconds { MillisecondsValue = 5000 },
       }
     );
@@ -876,8 +907,7 @@ public class PrototypeQuest : Service
     const string groupKey = "tempting-offer";
     const string spritePath =
       "Assets/ThirdParty/GameAssets/CardImages/Circular/shutterstock_1486924805.png";
-    _prototypeCards.ResetGroup(groupKey);
-    var cards = _prototypeCards.CreateOrUpdateCards(
+    var allCards = _prototypeCards.CreateOrUpdateCards(
       new CreateOrUpdateCardsRequest
       {
         Count = 4,
@@ -897,9 +927,51 @@ public class PrototypeQuest : Service
         Overrides = BuildTemptingOfferOverrides(spritePath),
       }
     );
-    ApplyTemptingOfferPresentation(cards, groupKey, spritePath);
-    var command = new UpdateQuestCommand { Quest = new QuestView { Cards = cards } };
-    yield return Registry.CardService.HandleUpdateQuestCommand(command);
+    ApplyTemptingOfferPresentation(allCards, groupKey, spritePath);
+
+    yield return new WaitForSeconds(0.3f);
+
+    var defaultAnimation = new MoveCardsWithCustomAnimationCommand
+    {
+      Animation = MoveCardsCustomAnimation.DefaultAnimation,
+      Cards = allCards.Take(4).ToList(),
+      Destination = new Position
+      {
+        PositionClass = new PositionClass
+        {
+          TemptingOfferDisplay = BuildTemptingOfferPosition(0, TemptingOfferType.Cost),
+        },
+      },
+      PauseDuration = new Milliseconds { MillisecondsValue = 0 },
+      StaggerInterval = new Milliseconds { MillisecondsValue = 50 },
+    };
+
+    yield return StartCoroutine(
+      Registry.CardAnimationService.HandleMoveCardsWithCustomAnimation(defaultAnimation)
+    );
+
+    yield return StartCoroutine(
+      CreateOrUpdateCards(
+        new CreateOrUpdateCardsRequest
+        {
+          Count = 4,
+          Position = new ObjectPosition
+          {
+            Position = new Position
+            {
+              PositionClass = new PositionClass
+              {
+                TemptingOfferDisplay = BuildTemptingOfferPosition(0, TemptingOfferType.Cost),
+              },
+            },
+            SortingKey = 1,
+          },
+          Revealed = true,
+          GroupKey = groupKey,
+          Overrides = BuildTemptingOfferOverrides(spritePath),
+        }
+      )
+    );
   }
 
   static List<CardOverride> BuildTemptingOfferOverrides(string spritePath)

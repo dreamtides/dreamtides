@@ -21,6 +21,9 @@ namespace Dreamtides.Services
     ObjectLayout _tmpMerchantPositionLayout = null!;
 
     [SerializeField]
+    ObjectLayout _tmpTemptingOfferNpcLayout = null!;
+
+    [SerializeField]
     Transform _tmpMerchantSpeechPosition = null!;
 
     [SerializeField]
@@ -98,12 +101,27 @@ namespace Dreamtides.Services
 
     public ObjectLayout SiteDeckLayout(Guid siteId)
     {
-      return _tmpSiteDeckLayout;
+      if (siteId == PrototypeQuest.DraftSiteId)
+      {
+        return _tmpSiteDeckLayout;
+      }
+
+      throw new InvalidOperationException($"Unknown site id: ${siteId}");
     }
 
     public ObjectLayout SiteNpcLayout(Guid siteId)
     {
-      return _tmpMerchantPositionLayout;
+      if (siteId == PrototypeQuest.ShopSiteId)
+      {
+        return _tmpMerchantPositionLayout;
+      }
+
+      if (siteId == PrototypeQuest.TemptingOfferSiteId)
+      {
+        return _tmpTemptingOfferNpcLayout;
+      }
+
+      throw new InvalidOperationException($"Unknown site id: ${siteId}");
     }
 
     public Transform CharacterScreenAnchorPosition(Guid merchantId)
