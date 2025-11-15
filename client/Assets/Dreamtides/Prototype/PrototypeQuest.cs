@@ -202,6 +202,16 @@ public class PrototypeQuest : Service
       return;
     }
 
+    if (name == "closeTemptingOffer")
+    {
+      FocusMapCamera();
+      Registry.DocumentService.RenderScreenAnchoredNode(
+        new AnchorToScreenPositionCommand() { Node = null }
+      );
+
+      return;
+    }
+
     var parts = name.Split('/');
     if (parts.Length != 2)
     {
@@ -982,6 +992,21 @@ public class PrototypeQuest : Service
         }
       )
     );
+
+    var button = Registry.DreamscapeService.CloseButton.GetComponent<CloseBrowserButton>();
+    button.CloseAction = new GameAction
+    {
+      GameActionClass = new GameActionClass
+      {
+        DebugAction = new DebugAction
+        {
+          DebugActionClass = new DebugActionClass
+          {
+            ApplyTestScenarioAction = $"closeTemptingOffer",
+          },
+        },
+      },
+    };
   }
 
   static List<CardOverride> BuildTemptingOfferOverrides(string[] spritePaths)

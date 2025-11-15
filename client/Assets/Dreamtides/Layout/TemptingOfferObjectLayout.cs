@@ -74,13 +74,11 @@ namespace Dreamtides.Layout
 
     protected override void OnBecameNonEmpty()
     {
-      UpdateCloseButtonState();
       PositionAcceptButtons();
     }
 
     protected override void OnBecameEmpty()
     {
-      HideCloseButton();
       for (var i = 0; i < _acceptButtons.Count; i++)
       {
         _acceptButtons[i].gameObject.SetActive(false);
@@ -90,7 +88,6 @@ namespace Dreamtides.Layout
     protected override void OnAppliedLayout()
     {
       base.OnAppliedLayout();
-      UpdateCloseButtonState();
       PositionAcceptButtons();
     }
 
@@ -113,61 +110,6 @@ namespace Dreamtides.Layout
       transform.rotation.eulerAngles;
 
     public override float? CalculateObjectScale(int index, int count) => transform.localScale.x;
-
-    void UpdateCloseButtonState()
-    {
-      if (!_closeOfferButton)
-      {
-        return;
-      }
-      if (Objects.Count == 0)
-      {
-        _closeOfferButton.gameObject.SetActive(false);
-        return;
-      }
-      var wasActive = _closeOfferButton.gameObject.activeSelf;
-      _closeOfferButton.gameObject.SetActive(true);
-      if (!wasActive)
-      {
-        TweenUtils.FadeInCanvasGroup(ComponentUtils.Get<CanvasGroup>(_closeOfferButton));
-      }
-      PositionCloseButton();
-    }
-
-    void PositionCloseButton()
-    {
-      if (!_closeOfferButton || Objects.Count == 0)
-      {
-        return;
-      }
-      var anchorIndex = Mathf.Min(Objects.Count - 1, ObjectsPerRow - 1);
-      var target = Objects[anchorIndex];
-      var targetWorld = target.transform.position;
-      var screenPoint = _registry.MainCamera.WorldToScreenPoint(targetWorld);
-      var canvas = _registry.Canvas;
-      var rootRect = canvas.GetComponent<RectTransform>();
-      RectTransformUtility.ScreenPointToLocalPointInRectangle(
-        rootRect,
-        screenPoint,
-        null,
-        out var rootLocal
-      );
-      var worldOnCanvas = rootRect.TransformPoint(rootLocal);
-      var parent = _closeOfferButton.parent as RectTransform ?? rootRect;
-      var parentLocal = parent.InverseTransformPoint(worldOnCanvas);
-      var offset = _registry.IsLandscape
-        ? _closeButtonCanvasOffsetLandscape
-        : _closeButtonCanvasOffsetPortrait;
-      _closeOfferButton.anchoredPosition = new Vector2(parentLocal.x, parentLocal.y) + offset;
-    }
-
-    void HideCloseButton()
-    {
-      if (_closeOfferButton)
-      {
-        _closeOfferButton.gameObject.SetActive(false);
-      }
-    }
 
     void PositionAcceptButtons()
     {
