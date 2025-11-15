@@ -5,6 +5,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::battle_view::DisplayPlayer;
 use crate::card_view::ClientCardId;
+use crate::quest_view::TemptingOfferNumber;
 
 /// Represents the position of some object in the UI
 #[derive(Clone, Debug, Eq, PartialEq, Hash, Serialize, Deserialize, JsonSchema)]
@@ -123,7 +124,7 @@ pub enum Position {
     JourneyDisplay,
 
     /// Object is being displayed as an option in a tempting offer choice.
-    TemptingOfferDisplay(TemptingOfferType),
+    TemptingOfferDisplay(TemptingOfferPosition),
 }
 
 #[derive(
@@ -134,6 +135,14 @@ pub enum StackType {
     TargetingUserBattlefield,
     TargetingEnemyBattlefield,
     TargetingBothBattlefields,
+}
+
+#[derive(
+    Clone, Debug, Eq, PartialEq, Hash, Serialize, Deserialize, Ord, PartialOrd, JsonSchema,
+)]
+pub struct TemptingOfferPosition {
+    pub number: TemptingOfferNumber,
+    pub offer_type: TemptingOfferType,
 }
 
 #[derive(

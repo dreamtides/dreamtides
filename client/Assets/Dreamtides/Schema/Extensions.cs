@@ -12,6 +12,10 @@ namespace Dreamtides.Schema
     public float ToSeconds() => MillisecondsValue / 1000f;
   }
 
+  /// <summary>
+  /// QuickType randomly changes the name of this struct whenver it feels like
+  /// it. Often you can fix it by introducing a wrapper struct.
+  /// </summary>
   public partial struct OnClickUnion
   {
     public GameAction? ToGameAction()

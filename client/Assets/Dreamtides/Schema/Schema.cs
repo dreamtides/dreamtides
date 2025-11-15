@@ -1582,7 +1582,16 @@ namespace Dreamtides.Schema
         public Guid? MerchantWares { get; set; }
 
         [JsonProperty("TemptingOfferDisplay", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public TemptingOfferType? TemptingOfferDisplay { get; set; }
+        public TemptingOfferPosition TemptingOfferDisplay { get; set; }
+    }
+
+    public partial class TemptingOfferPosition
+    {
+        [JsonProperty("number", Required = Required.Always)]
+        public long Number { get; set; }
+
+        [JsonProperty("offer_type", Required = Required.Always)]
+        public TemptingOfferType OfferType { get; set; }
     }
 
     public partial class ProjectileAddress
@@ -1829,6 +1838,8 @@ namespace Dreamtides.Schema
 
     /// <summary>
     /// Button to perform some game action
+    ///
+    /// Button to display to accept this offer.
     /// </summary>
     public partial class ButtonView
     {
@@ -2398,6 +2409,12 @@ namespace Dreamtides.Schema
         /// </summary>
         [JsonProperty("sites", Required = Required.Always)]
         public List<SiteView> Sites { get; set; }
+
+        /// <summary>
+        /// State for the 'tempting offer' view.
+        /// </summary>
+        [JsonProperty("tempting_offer")]
+        public TemptingOfferView TemptingOffer { get; set; }
     }
 
     /// <summary>
@@ -2416,6 +2433,60 @@ namespace Dreamtides.Schema
         /// </summary>
         [JsonProperty("id", Required = Required.Always)]
         public Guid Id { get; set; }
+    }
+
+    public partial class TemptingOfferView
+    {
+        /// <summary>
+        /// Offers to display to the player.
+        /// </summary>
+        [JsonProperty("actions", Required = Required.Always)]
+        public List<TemptingOfferAction> Actions { get; set; }
+
+        /// <summary>
+        /// Action to perform when the close button is clicked.
+        /// </summary>
+        [JsonProperty("close_button")]
+        public CloseButtonView CloseButton { get; set; }
+    }
+
+    public partial class TemptingOfferAction
+    {
+        /// <summary>
+        /// Button to display to accept this offer.
+        /// </summary>
+        [JsonProperty("button", Required = Required.Always)]
+        public ButtonView Button { get; set; }
+
+        /// <summary>
+        /// Identifier for this offer
+        /// </summary>
+        [JsonProperty("number", Required = Required.Always)]
+        public long Number { get; set; }
+    }
+
+    public partial class CloseButtonView
+    {
+        /// <summary>
+        /// Action to perform when the close button is clicked.
+        /// </summary>
+        [JsonProperty("action", Required = Required.Always)]
+        public GameAction Action { get; set; }
+    }
+
+    public partial class GameActionClass
+    {
+        [JsonProperty("DebugAction", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public DebugAction? DebugAction { get; set; }
+
+        [JsonProperty("BattleAction", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public BattleAction? BattleAction { get; set; }
+
+        [JsonProperty("BattleDisplayAction", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public BattleDisplayAction? BattleDisplayAction { get; set; }
+
+        [JsonProperty("Undo", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public PlayerName? Undo { get; set; }
     }
 
     public partial class UpdateScreenOverlayCommand
@@ -2448,21 +2519,6 @@ namespace Dreamtides.Schema
         /// </summary>
         [JsonProperty("save_file_id")]
         public Guid? SaveFileId { get; set; }
-    }
-
-    public partial class GameActionClass
-    {
-        [JsonProperty("DebugAction", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public DebugAction? DebugAction { get; set; }
-
-        [JsonProperty("BattleAction", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public BattleAction? BattleAction { get; set; }
-
-        [JsonProperty("BattleDisplayAction", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public BattleDisplayAction? BattleDisplayAction { get; set; }
-
-        [JsonProperty("Undo", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public PlayerName? Undo { get; set; }
     }
 
     public partial class PerformActionResponse
@@ -2801,6 +2857,8 @@ namespace Dreamtides.Schema
 
     /// <summary>
     /// All possible user interface actions
+    ///
+    /// Action to perform when the close button is clicked.
     /// </summary>
     public partial struct GameAction
     {

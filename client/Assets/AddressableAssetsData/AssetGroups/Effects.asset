@@ -402,6 +402,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: c86f4daba62544f8497c824aeea4caa5
+    m_Address: Assets/ThirdParty/GameAssets/CardImages/Circular/shutterstock_1486924805.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: ccf902395bea54bedba5e58057d491e2
     m_Address: Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Plasma Magic/RPG3_PlasmaMagic_MediumImpact01.wav
     m_ReadOnly: 0

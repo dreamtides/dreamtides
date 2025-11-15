@@ -587,6 +587,7 @@ public class PrototypeQuest : Service
 
   public void FocusEventCamera()
   {
+    StartCoroutine(ShowTemptingOfferCards());
     ResetPrioritiesAndTrack(_eventTrackingTarget, false);
     _eventCamera.Priority = 10;
   }
@@ -868,6 +869,153 @@ public class PrototypeQuest : Service
         },
       },
     };
+  }
+
+  IEnumerator ShowTemptingOfferCards()
+  {
+    const string groupKey = "tempting-offer";
+    const string spritePath =
+      "Assets/ThirdParty/GameAssets/CardImages/Circular/shutterstock_1486924805.png";
+    _prototypeCards.ResetGroup(groupKey);
+    var cards = _prototypeCards.CreateOrUpdateCards(
+      new CreateOrUpdateCardsRequest
+      {
+        Count = 4,
+        Position = new ObjectPosition
+        {
+          Position = new Position
+          {
+            PositionClass = new PositionClass
+            {
+              TemptingOfferDisplay = BuildTemptingOfferPosition(0, TemptingOfferType.Cost),
+            },
+          },
+          SortingKey = 1,
+        },
+        Revealed = true,
+        GroupKey = groupKey,
+        Overrides = BuildTemptingOfferOverrides(spritePath),
+      }
+    );
+    ApplyTemptingOfferPresentation(cards, groupKey, spritePath);
+    var command = new UpdateQuestCommand { Quest = new QuestView { Cards = cards } };
+    yield return Registry.CardService.HandleUpdateQuestCommand(command);
+  }
+
+  static List<CardOverride> BuildTemptingOfferOverrides(string spritePath)
+  {
+    var overrides = new List<CardOverride>();
+    overrides.Add(
+      new CardOverride
+      {
+        Index = 0,
+        Prefab = CardPrefab.Journey,
+        Name = "Journey",
+        Rules = string.Empty,
+        CardType = string.Empty,
+        IsFast = false,
+        SpritePath = spritePath,
+      }
+    );
+    overrides.Add(
+      new CardOverride
+      {
+        Index = 1,
+        Prefab = CardPrefab.OfferCost,
+        Name = "Cost",
+        Rules = string.Empty,
+        CardType = string.Empty,
+        IsFast = false,
+        SpritePath = spritePath,
+      }
+    );
+    overrides.Add(
+      new CardOverride
+      {
+        Index = 2,
+        Prefab = CardPrefab.Journey,
+        Name = "Journey",
+        Rules = string.Empty,
+        CardType = string.Empty,
+        IsFast = false,
+        SpritePath = spritePath,
+      }
+    );
+    overrides.Add(
+      new CardOverride
+      {
+        Index = 3,
+        Prefab = CardPrefab.OfferCost,
+        Name = "Cost",
+        Rules = string.Empty,
+        CardType = string.Empty,
+        IsFast = false,
+        SpritePath = spritePath,
+      }
+    );
+    return overrides;
+  }
+
+  void ApplyTemptingOfferPresentation(List<CardView> cards, string groupKey, string spritePath)
+  {
+    var groupCards = cards.Where(cv => cv.Id.StartsWith($"{groupKey}-")).Take(4).ToList();
+    for (var i = 0; i < groupCards.Count; i++)
+    {
+      var type = i % 2 == 0 ? TemptingOfferType.Journey : TemptingOfferType.Cost;
+      var name = type == TemptingOfferType.Cost ? "Cost" : "Journey";
+      ConfigureTemptingOfferCard(groupCards[i], name, type, spritePath, i);
+    }
+  }
+
+  static TemptingOfferPosition BuildTemptingOfferPosition(
+    int sortingKey,
+    TemptingOfferType displayType
+  )
+  {
+    var offerNumber = sortingKey / 2;
+    return new TemptingOfferPosition { Number = offerNumber, OfferType = displayType };
+  }
+
+  static void ConfigureTemptingOfferCard(
+    CardView card,
+    string name,
+    TemptingOfferType displayType,
+    string spritePath,
+    int sortingKey
+  )
+  {
+    card.Backless = true;
+    card.CardFacing = CardFacing.FaceUp;
+    card.Position = new ObjectPosition
+    {
+      Position = new Position
+      {
+        PositionClass = new PositionClass
+        {
+          TemptingOfferDisplay = BuildTemptingOfferPosition(sortingKey, displayType),
+        },
+      },
+      SortingKey = sortingKey,
+    };
+    if (card.Revealed != null)
+    {
+      card.Revealed.Name = name;
+      card.Revealed.CardType = string.Empty;
+      card.Revealed.Cost = null;
+      card.Revealed.Produced = null;
+      card.Revealed.RulesText = string.Empty;
+      card.Revealed.Spark = null;
+      card.Revealed.IsFast = false;
+      card.Revealed.Image = new DisplayImage { Sprite = new SpriteAddress { Sprite = spritePath } };
+      card.Revealed.OutlineColor = null;
+      card.Revealed.Actions = card.Revealed.Actions ?? new CardActions();
+      card.Revealed.Actions.ButtonAttachment = null;
+      card.Revealed.Actions.CanPlay = null;
+      card.Revealed.Actions.CanSelectOrder = null;
+      card.Revealed.Actions.OnClick = null;
+      card.Revealed.Actions.OnPlaySound = null;
+      card.Revealed.Actions.PlayEffectPreview = null;
+    }
   }
 
   IEnumerator HideShopSequence()
