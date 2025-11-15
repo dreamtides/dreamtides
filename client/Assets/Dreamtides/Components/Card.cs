@@ -769,7 +769,9 @@ namespace Dreamtides.Components
       {
         _cardBack.gameObject.SetActive(false);
         _cardFront.gameObject.SetActive(false);
-        _battlefieldOutline.gameObject.SetActive(GameContext != GameContext.DiscardPile);
+        _battlefieldOutline.gameObject.SetActive(
+          !CardView.Backless && GameContext != GameContext.DiscardPile
+        );
         _battlefieldCardFront.gameObject.SetActive(true);
         _battlefieldSparkBackground.gameObject.SetActive(
           GameContext != GameContext.DiscardPile && CardView.Revealed?.Spark != null

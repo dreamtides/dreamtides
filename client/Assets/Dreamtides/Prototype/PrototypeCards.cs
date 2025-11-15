@@ -144,8 +144,7 @@ namespace Dreamtides.Prototype
         }
         // Keep prefab consistent via effective overrides (which include Dreamsign indices)
         existing.Prefab = cardOv?.Prefab ?? templateForUpdate.Prefab;
-        existing.Backless =
-          existing.Prefab == CardPrefab.Dreamsign || existing.Prefab == CardPrefab.IconCard;
+        existing.Backless = IsBacklessPrefab(existing.Prefab);
         if (request.Revealed)
         {
           if (existing.Revealed == null)
@@ -191,6 +190,12 @@ namespace Dreamtides.Prototype
     }
 
     #region Helpers
+
+    static bool IsBacklessPrefab(CardPrefab prefab) =>
+      prefab == CardPrefab.Dreamsign
+      || prefab == CardPrefab.IconCard
+      || prefab == CardPrefab.Journey
+      || prefab == CardPrefab.OfferCost;
 
     // Minimal template info needed to fabricate a revealed card view.
     class CardTemplate
@@ -349,9 +354,7 @@ namespace Dreamtides.Prototype
     ) =>
       new()
       {
-        Backless =
-          (overridePrefab ?? t.Prefab) == CardPrefab.Dreamsign
-          || (overridePrefab ?? t.Prefab) == CardPrefab.IconCard,
+        Backless = IsBacklessPrefab(overridePrefab ?? t.Prefab),
         CardFacing = revealed ? CardFacing.FaceUp : CardFacing.FaceDown,
         Id = BuildId(groupKey, sortIndex),
         Position = objectPosition,
