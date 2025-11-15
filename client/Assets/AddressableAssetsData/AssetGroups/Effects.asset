@@ -130,6 +130,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 534296ef877b741038c988f25ad1ac0c
+    m_Address: Assets/ThirdParty/GameAssets/CardImages/Circular/shutterstock_2421338077.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 53ae895634a174dd7b8cab0225e9db66
     m_Address: Assets/ThirdParty/Hovl Studio/AAA Projectiles Vol 1/Prefabs/Dreamtides/Projectile
       16 fire.prefab
@@ -422,6 +427,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d55735c3ccd0147ab80abd6874f875f1
+    m_Address: Assets/ThirdParty/GameAssets/CardImages/Circular/shutterstock_2155438699.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: d95f78e19394048d88a81bba1531de7f
     m_Address: Assets/ThirdParty/Hovl Studio/AAA Projectiles Vol 1/Prefabs/Dreamtides/Projectile
       23 cube.prefab
@@ -482,6 +492,11 @@ MonoBehaviour:
   - m_GUID: f81e1efcfddfc4189871f260d3194537
     m_Address: Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Generic
       Magic and Impacts/RPG3_Magic_LowWhoosh01.wav
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: fcc3433749c124c898fa14e5b41c91fa
+    m_Address: Assets/ThirdParty/GameAssets/CardImages/Circular/shutterstock_2419795157.png
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0

@@ -589,8 +589,13 @@ public class PrototypeQuest : Service
   public void FocusEventCamera()
   {
     const string groupKey = "tempting-offer";
-    const string spritePath =
-      "Assets/ThirdParty/GameAssets/CardImages/Circular/shutterstock_1486924805.png";
+    var spritePaths = new[]
+    {
+      "Assets/ThirdParty/GameAssets/CardImages/Circular/shutterstock_2155438699.png",
+      "Assets/ThirdParty/GameAssets/CardImages/Circular/shutterstock_1486924805.png",
+      "Assets/ThirdParty/GameAssets/CardImages/Circular/shutterstock_2421338077.png",
+      "Assets/ThirdParty/GameAssets/CardImages/Circular/shutterstock_2419795157.png",
+    };
     _prototypeCards.ResetGroup(groupKey);
     StartCoroutine(
       CreateOrUpdateCards(
@@ -607,7 +612,7 @@ public class PrototypeQuest : Service
           },
           Revealed = true,
           GroupKey = groupKey,
-          Overrides = BuildTemptingOfferOverrides(spritePath),
+          Overrides = BuildTemptingOfferOverrides(spritePaths),
         }
       )
     );
@@ -905,8 +910,13 @@ public class PrototypeQuest : Service
   IEnumerator ShowTemptingOfferCards()
   {
     const string groupKey = "tempting-offer";
-    const string spritePath =
-      "Assets/ThirdParty/GameAssets/CardImages/Circular/shutterstock_1486924805.png";
+    var spritePaths = new[]
+    {
+      "Assets/ThirdParty/GameAssets/CardImages/Circular/shutterstock_2155438699.png",
+      "Assets/ThirdParty/GameAssets/CardImages/Circular/shutterstock_1486924805.png",
+      "Assets/ThirdParty/GameAssets/CardImages/Circular/shutterstock_2421338077.png",
+      "Assets/ThirdParty/GameAssets/CardImages/Circular/shutterstock_2419795157.png",
+    };
     var allCards = _prototypeCards.CreateOrUpdateCards(
       new CreateOrUpdateCardsRequest
       {
@@ -924,10 +934,10 @@ public class PrototypeQuest : Service
         },
         Revealed = true,
         GroupKey = groupKey,
-        Overrides = BuildTemptingOfferOverrides(spritePath),
+        Overrides = BuildTemptingOfferOverrides(spritePaths),
       }
     );
-    ApplyTemptingOfferPresentation(allCards, groupKey, spritePath);
+    ApplyTemptingOfferPresentation(allCards, groupKey, spritePaths);
 
     yield return new WaitForSeconds(0.3f);
 
@@ -968,13 +978,13 @@ public class PrototypeQuest : Service
           },
           Revealed = true,
           GroupKey = groupKey,
-          Overrides = BuildTemptingOfferOverrides(spritePath),
+          Overrides = BuildTemptingOfferOverrides(spritePaths),
         }
       )
     );
   }
 
-  static List<CardOverride> BuildTemptingOfferOverrides(string spritePath)
+  static List<CardOverride> BuildTemptingOfferOverrides(string[] spritePaths)
   {
     var overrides = new List<CardOverride>();
     overrides.Add(
@@ -986,7 +996,7 @@ public class PrototypeQuest : Service
         Rules = string.Empty,
         CardType = string.Empty,
         IsFast = false,
-        SpritePath = spritePath,
+        SpritePath = spritePaths[0],
       }
     );
     overrides.Add(
@@ -998,7 +1008,7 @@ public class PrototypeQuest : Service
         Rules = string.Empty,
         CardType = string.Empty,
         IsFast = false,
-        SpritePath = spritePath,
+        SpritePath = spritePaths[1],
       }
     );
     overrides.Add(
@@ -1010,7 +1020,7 @@ public class PrototypeQuest : Service
         Rules = string.Empty,
         CardType = string.Empty,
         IsFast = false,
-        SpritePath = spritePath,
+        SpritePath = spritePaths[2],
       }
     );
     overrides.Add(
@@ -1022,20 +1032,20 @@ public class PrototypeQuest : Service
         Rules = string.Empty,
         CardType = string.Empty,
         IsFast = false,
-        SpritePath = spritePath,
+        SpritePath = spritePaths[3],
       }
     );
     return overrides;
   }
 
-  void ApplyTemptingOfferPresentation(List<CardView> cards, string groupKey, string spritePath)
+  void ApplyTemptingOfferPresentation(List<CardView> cards, string groupKey, string[] spritePaths)
   {
     var groupCards = cards.Where(cv => cv.Id.StartsWith($"{groupKey}-")).Take(4).ToList();
     for (var i = 0; i < groupCards.Count; i++)
     {
       var type = i % 2 == 0 ? TemptingOfferType.Journey : TemptingOfferType.Cost;
       var name = type == TemptingOfferType.Cost ? "Cost" : "Journey";
-      ConfigureTemptingOfferCard(groupCards[i], name, type, spritePath, i);
+      ConfigureTemptingOfferCard(groupCards[i], name, type, spritePaths[i], i);
     }
   }
 
