@@ -84,7 +84,7 @@ namespace Dreamtides.Services
       }
     }
 
-    public void HideShop()
+    public void HideCloseSiteButton()
     {
       TweenUtils
         .FadeOutCanvasGroup(_closeButton)

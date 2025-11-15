@@ -143,8 +143,8 @@ namespace Dreamtides.Layout
     protected virtual void OnAppliedLayout() { }
 
     /// <summary>
-    /// Invoked after adding objects when the count of objects in this layout
-    /// changes from being zero to being nonzero.
+    /// Invoked after the 'add objects' animation completes when the count of
+    /// objects in this layout changes from being zero to being nonzero.
     /// </summary>
     protected virtual void OnBecameNonEmpty() { }
 

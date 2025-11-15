@@ -21,6 +21,10 @@ pub struct QuestView {
     /// Sites which can be visited within the currently-active dreamscape.
     pub sites: Vec<SiteView>,
 
+    /// If present, a button should be displayed to exit the currently open
+    /// site.
+    pub close_site_button: Option<CloseButtonView>,
+
     /// State for the 'tempting offer' view.
     pub tempting_offer: Option<TemptingOfferView>,
 }
@@ -37,9 +41,6 @@ pub struct SiteView {
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
 pub struct TemptingOfferView {
-    /// Action to perform when the close button is clicked.
-    pub close_button: Option<CloseButtonView>,
-
     /// Offers to display to the player.
     pub actions: Vec<TemptingOfferAction>,
 }

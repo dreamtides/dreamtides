@@ -193,8 +193,7 @@ public class PrototypeQuest : Service
     {
       _currentShopDisplayIds.Clear();
       FocusMapCamera();
-      Registry.DreamscapeService.HideShop();
-      StartCoroutine(HideShopSequence());
+      Registry.DreamscapeService.HideCloseSiteButton();
       Registry.DocumentService.RenderScreenAnchoredNode(
         new AnchorToScreenPositionCommand() { Node = null }
       );
@@ -205,6 +204,7 @@ public class PrototypeQuest : Service
     if (name == "closeTemptingOffer")
     {
       FocusMapCamera();
+      Registry.DreamscapeService.HideCloseSiteButton();
       Registry.DocumentService.RenderScreenAnchoredNode(
         new AnchorToScreenPositionCommand() { Node = null }
       );

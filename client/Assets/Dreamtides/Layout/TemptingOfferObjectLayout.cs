@@ -4,46 +4,20 @@ using System.Collections.Generic;
 using Dreamtides.Buttons;
 using Dreamtides.Components;
 using Dreamtides.Schema;
-using Dreamtides.Services;
-using Dreamtides.Utils;
 using UnityEngine;
 
 namespace Dreamtides.Layout
 {
-  public sealed class TemptingOfferObjectLayout : StandardObjectLayout
+  public sealed class TemptingOfferObjectLayout : SitePickObjectLayout
   {
     const int ObjectsPerRow = 2;
     const string DefaultButtonLabel = "Accept";
-
-    [SerializeField]
-    Registry _registry = null!;
-
-    [SerializeField]
-    float _horizontalSpacing;
-
-    [SerializeField]
-    float _verticalSpacing;
 
     [SerializeField]
     float _buttonVerticalOffset;
 
     [SerializeField]
     float _buttonDepthOffset;
-
-    [SerializeField]
-    float _cardWidth;
-
-    [SerializeField]
-    float _cardHeight;
-
-    [SerializeField]
-    RectTransform? _closeOfferButton;
-
-    [SerializeField]
-    Vector2 _closeButtonCanvasOffsetPortrait;
-
-    [SerializeField]
-    Vector2 _closeButtonCanvasOffsetLandscape;
 
     [SerializeField]
     DisplayableButton _acceptButtonPrefab = null!;
@@ -74,11 +48,13 @@ namespace Dreamtides.Layout
 
     protected override void OnBecameNonEmpty()
     {
+      base.OnBecameNonEmpty();
       PositionAcceptButtons();
     }
 
     protected override void OnBecameEmpty()
     {
+      base.OnBecameEmpty();
       for (var i = 0; i < _acceptButtons.Count; i++)
       {
         _acceptButtons[i].gameObject.SetActive(false);
@@ -93,27 +69,23 @@ namespace Dreamtides.Layout
 
     public override Vector3 CalculateObjectPosition(int index, int count)
     {
-      if (count <= 0)
+      var effectiveCount = GetEffectiveCount(count);
+      if (effectiveCount <= 0)
       {
         return transform.position;
       }
-      var rowCount = GetRowCount(count);
+      var rowCount = GetRowCount(effectiveCount);
       var rowIndex = index / ObjectsPerRow;
       var columnIndex = index % ObjectsPerRow;
-      var rowItemCount = GetRowItemCount(rowIndex, count);
+      var rowItemCount = GetRowItemCount(rowIndex, effectiveCount);
       var localX = GetHorizontalOffset(columnIndex, rowItemCount);
       var localY = GetVerticalOffset(rowIndex, rowCount);
       return transform.position + transform.right * localX + transform.up * localY;
     }
 
-    public override Vector3? CalculateObjectRotation(int index, int count) =>
-      transform.rotation.eulerAngles;
-
-    public override float? CalculateObjectScale(int index, int count) => transform.localScale.x;
-
     void PositionAcceptButtons()
     {
-      var rowCount = GetRowCount(Objects.Count);
+      var rowCount = GetRowCount(GetEffectiveCount(Objects.Count));
       if (_acceptButtonPrefab && _acceptButtons.Count < rowCount)
       {
         EnsureButtonInstances(rowCount);
@@ -133,7 +105,7 @@ namespace Dreamtides.Layout
         button.transform.SetPositionAndRotation(buttonPosition, transform.rotation);
         var offerNumber = GetOfferNumberForRow(rowIndex);
         var view = ResolveButtonView(offerNumber);
-        button.SetView(_registry, view);
+        button.SetView(Registry, view);
       }
     }
 
@@ -171,7 +143,7 @@ namespace Dreamtides.Layout
       {
         return 0f;
       }
-      return columnIndex == 0 ? -_horizontalSpacing / 2f : _horizontalSpacing / 2f;
+      return columnIndex == 0 ? -HorizontalSpacing / 2f : HorizontalSpacing / 2f;
     }
 
     float GetVerticalOffset(int rowIndex, int rowCount)
@@ -180,8 +152,8 @@ namespace Dreamtides.Layout
       {
         return 0f;
       }
-      var totalHeight = _verticalSpacing * (rowCount - 1);
-      return totalHeight / 2f - rowIndex * _verticalSpacing;
+      var totalHeight = VerticalSpacing * (rowCount - 1);
+      return totalHeight / 2f - rowIndex * VerticalSpacing;
     }
 
     Vector3 CalculateRowCenter(int rowIndex, int rowCount)
@@ -225,8 +197,8 @@ namespace Dreamtides.Layout
     {
       Gizmos.color = Color.blue;
       var center = transform.position;
-      var halfLayoutX = _cardWidth / 2f + _horizontalSpacing / 2f;
-      var halfLayoutY = _cardHeight / 2f + _verticalSpacing / 2f;
+      var halfLayoutX = CardWidth / 2f + HorizontalSpacing / 2f;
+      var halfLayoutY = CardHeight / 2f + VerticalSpacing / 2f;
       var right = transform.right;
       var upAxis = transform.up;
       Gizmos.DrawSphere(center, 0.15f);

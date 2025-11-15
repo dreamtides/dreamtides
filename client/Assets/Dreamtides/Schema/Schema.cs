@@ -2393,6 +2393,13 @@ namespace Dreamtides.Schema
         public List<CardView> Cards { get; set; }
 
         /// <summary>
+        /// If present, a button should be displayed to exit the currently open
+        /// site.
+        /// </summary>
+        [JsonProperty("close_site_button")]
+        public CloseButtonView CloseSiteButton { get; set; }
+
+        /// <summary>
         /// Unique identifier for this quest
         /// </summary>
         [JsonProperty("id", Required = Required.Always)]
@@ -2415,6 +2422,30 @@ namespace Dreamtides.Schema
         /// </summary>
         [JsonProperty("tempting_offer")]
         public TemptingOfferView TemptingOffer { get; set; }
+    }
+
+    public partial class CloseButtonView
+    {
+        /// <summary>
+        /// Action to perform when the close button is clicked.
+        /// </summary>
+        [JsonProperty("action", Required = Required.Always)]
+        public GameAction Action { get; set; }
+    }
+
+    public partial class GameActionClass
+    {
+        [JsonProperty("DebugAction", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public DebugAction? DebugAction { get; set; }
+
+        [JsonProperty("BattleAction", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public BattleAction? BattleAction { get; set; }
+
+        [JsonProperty("BattleDisplayAction", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public BattleDisplayAction? BattleDisplayAction { get; set; }
+
+        [JsonProperty("Undo", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public PlayerName? Undo { get; set; }
     }
 
     /// <summary>
@@ -2442,12 +2473,6 @@ namespace Dreamtides.Schema
         /// </summary>
         [JsonProperty("actions", Required = Required.Always)]
         public List<TemptingOfferAction> Actions { get; set; }
-
-        /// <summary>
-        /// Action to perform when the close button is clicked.
-        /// </summary>
-        [JsonProperty("close_button")]
-        public CloseButtonView CloseButton { get; set; }
     }
 
     public partial class TemptingOfferAction
@@ -2463,30 +2488,6 @@ namespace Dreamtides.Schema
         /// </summary>
         [JsonProperty("number", Required = Required.Always)]
         public long Number { get; set; }
-    }
-
-    public partial class CloseButtonView
-    {
-        /// <summary>
-        /// Action to perform when the close button is clicked.
-        /// </summary>
-        [JsonProperty("action", Required = Required.Always)]
-        public GameAction Action { get; set; }
-    }
-
-    public partial class GameActionClass
-    {
-        [JsonProperty("DebugAction", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public DebugAction? DebugAction { get; set; }
-
-        [JsonProperty("BattleAction", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public BattleAction? BattleAction { get; set; }
-
-        [JsonProperty("BattleDisplayAction", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public BattleDisplayAction? BattleDisplayAction { get; set; }
-
-        [JsonProperty("Undo", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public PlayerName? Undo { get; set; }
     }
 
     public partial class UpdateScreenOverlayCommand

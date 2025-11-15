@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace Dreamtides.Layout
 {
-  public sealed class SitePickObjectLayout : StandardObjectLayout
+  public class SitePickObjectLayout : StandardObjectLayout
   {
     [SerializeField]
     Registry _registry = null!;
@@ -43,6 +43,12 @@ namespace Dreamtides.Layout
     readonly Dictionary<Displayable, int> _displayableToIndex = new();
     int _nextSlotIndex;
 
+    protected Registry Registry => _registry;
+    protected float HorizontalSpacing => _horizontalSpacing;
+    protected float VerticalSpacing => _verticalSpacing;
+    protected float CardWidth => _cardWidth;
+    protected float CardHeight => _cardHeight;
+
     protected override void OnBecameNonEmpty()
     {
       var count = Objects.Count;
@@ -50,43 +56,8 @@ namespace Dreamtides.Layout
       {
         _preservedInitialCount = count;
       }
-      if (!_closeSiteButton)
-      {
-        return;
-      }
 
-      var wasActive = _closeSiteButton.gameObject.activeSelf;
-      _closeSiteButton.gameObject.SetActive(true);
-      if (!wasActive)
-      {
-        TweenUtils.FadeInCanvasGroup(ComponentUtils.Get<CanvasGroup>(_closeSiteButton));
-      }
-
-      var canvas = _registry.Canvas;
-      var isLandscape = _registry.IsLandscape;
-      var topRowCount = isLandscape && !_forceTwoRows ? count : (count + 1) / 2;
-      var topRightIndex = isLandscape && !_forceTwoRows ? count - 1 : topRowCount - 1;
-
-      var target = Objects[topRightIndex];
-      var targetWorld = target.transform.position;
-
-      var screenPoint = _registry.MainCamera.WorldToScreenPoint(targetWorld);
-
-      var rootRect = canvas.GetComponent<RectTransform>();
-      RectTransformUtility.ScreenPointToLocalPointInRectangle(
-        rootRect,
-        screenPoint,
-        null,
-        out var rootLocal
-      );
-
-      var worldOnCanvas = rootRect.TransformPoint(rootLocal);
-      var parent = _closeSiteButton.parent as RectTransform ?? rootRect;
-      var parentLocal = parent.InverseTransformPoint(worldOnCanvas);
-      var offset = _registry.IsLandscape
-        ? _closeButtonCanvasOffsetLandscape
-        : _closeButtonCanvasOffsetPortrait;
-      _closeSiteButton.anchoredPosition = new Vector2(parentLocal.x, parentLocal.y) + offset;
+      PositionCloseButtonInTopRightCorner();
     }
 
     protected override void OnBecameEmpty()
@@ -159,6 +130,49 @@ namespace Dreamtides.Layout
       return -totalWidth / 2f + indexInRow * spacing;
     }
 
+    void PositionCloseButtonInTopRightCorner()
+    {
+      var count = Objects.Count;
+
+      if (!_closeSiteButton)
+      {
+        return;
+      }
+
+      var wasActive = _closeSiteButton.gameObject.activeSelf;
+      _closeSiteButton.gameObject.SetActive(true);
+      if (!wasActive)
+      {
+        TweenUtils.FadeInCanvasGroup(ComponentUtils.Get<CanvasGroup>(_closeSiteButton));
+      }
+
+      var canvas = _registry.Canvas;
+      var isLandscape = _registry.IsLandscape;
+      var topRowCount = isLandscape && !_forceTwoRows ? count : (count + 1) / 2;
+      var topRightIndex = isLandscape && !_forceTwoRows ? count - 1 : topRowCount - 1;
+
+      var target = Objects[topRightIndex];
+      var targetWorld = target.transform.position;
+
+      var screenPoint = _registry.MainCamera.WorldToScreenPoint(targetWorld);
+
+      var rootRect = canvas.GetComponent<RectTransform>();
+      RectTransformUtility.ScreenPointToLocalPointInRectangle(
+        rootRect,
+        screenPoint,
+        null,
+        out var rootLocal
+      );
+
+      var worldOnCanvas = rootRect.TransformPoint(rootLocal);
+      var parent = _closeSiteButton.parent as RectTransform ?? rootRect;
+      var parentLocal = parent.InverseTransformPoint(worldOnCanvas);
+      var offset = _registry.IsLandscape
+        ? _closeButtonCanvasOffsetLandscape
+        : _closeButtonCanvasOffsetPortrait;
+      _closeSiteButton.anchoredPosition = new Vector2(parentLocal.x, parentLocal.y) + offset;
+    }
+
     void OnDrawGizmosSelected()
     {
       Gizmos.color = Color.blue;
@@ -176,7 +190,7 @@ namespace Dreamtides.Layout
       Gizmos.DrawSphere(center + (right * halfLayoutX - upAxis * halfLayoutY), 0.15f);
     }
 
-    int GetEffectiveCount(int count)
+    protected int GetEffectiveCount(int count)
     {
       if (
         _preserveLayoutOnRemoval
