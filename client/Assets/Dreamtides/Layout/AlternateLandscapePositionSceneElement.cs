@@ -27,6 +27,7 @@ namespace Dreamtides.Layout
       if (_debugUpdateContinuously && Registry.IsLandscape)
       {
         transform.position = _landscapePosition.position;
+        transform.rotation = _landscapePosition.rotation;
       }
     }
   }

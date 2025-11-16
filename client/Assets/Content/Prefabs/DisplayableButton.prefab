@@ -191,6 +191,7 @@ GameObject:
   - component: {fileID: 661081774845420466}
   - component: {fileID: 4971014345050651156}
   - component: {fileID: 9101506922300430554}
+  - component: {fileID: 6646447676344439976}
   m_Layer: 0
   m_Name: DisplayableButton
   m_TagString: Untagged
@@ -318,3 +319,16 @@ MonoBehaviour:
   _onClickSound: {fileID: 8300000, guid: b0a890dd89d7e7145a043327b4bb9589, type: 3}
   _collider: {fileID: 4971014345050651156}
   _debounceDelayMilliseconds: 500
+--- !u!114 &6646447676344439976
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7445475183496564013}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9759a954d17ef433b809b76238ccb912, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Dreamtides::Dreamtides.Layout.StaticGameContext
+  _startingContext: 8
