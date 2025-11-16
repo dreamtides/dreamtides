@@ -76,6 +76,11 @@ public class PrototypeQuest : Service
   public static readonly Guid DraftSiteId = Guid.NewGuid();
   public static readonly Guid ShopSiteId = Guid.NewGuid();
   public static readonly Guid TemptingOfferSiteId = Guid.NewGuid();
+  const string TemptingOfferGroupKey = "tempting-offer";
+  const string TemptingOfferScenarioName = "tempting-offer";
+  const string TemptingOfferButtonLabel = "Accept";
+  const int TemptingOfferCardsPerOffer = 2;
+  const int TemptingOfferMaxOffers = 2;
 
   Coroutine? _siteButtonsActivationCoroutine;
   PrototypeCards _prototypeCards = new PrototypeCards();
@@ -239,6 +244,18 @@ public class PrototypeQuest : Service
         return;
       }
       StartCoroutine(ResolveShopPick(clickedId));
+      return;
+    }
+    if (action == TemptingOfferScenarioName)
+    {
+      if (int.TryParse(clickedId, out var offerNumber))
+      {
+        Debug.Log($"Tempting offer accepted for option {offerNumber}");
+      }
+      else
+      {
+        Debug.Log($"Tempting offer accepted: {clickedId}");
+      }
       return;
     }
   }
@@ -598,7 +615,6 @@ public class PrototypeQuest : Service
 
   public void FocusEventCamera()
   {
-    const string groupKey = "tempting-offer";
     var spritePaths = new[]
     {
       "Assets/ThirdParty/GameAssets/CardImages/Circular/shutterstock_2155438699.png",
@@ -606,7 +622,7 @@ public class PrototypeQuest : Service
       "Assets/ThirdParty/GameAssets/CardImages/Circular/shutterstock_2421338077.png",
       "Assets/ThirdParty/GameAssets/CardImages/Circular/shutterstock_2419795157.png",
     };
-    _prototypeCards.ResetGroup(groupKey);
+    _prototypeCards.ResetGroup(TemptingOfferGroupKey);
     StartCoroutine(
       CreateOrUpdateCards(
         new CreateOrUpdateCardsRequest
@@ -621,7 +637,7 @@ public class PrototypeQuest : Service
             SortingKey = 1,
           },
           Revealed = true,
-          GroupKey = groupKey,
+          GroupKey = TemptingOfferGroupKey,
           Overrides = BuildTemptingOfferOverrides(spritePaths),
         }
       )
@@ -749,7 +765,13 @@ public class PrototypeQuest : Service
   IEnumerator CreateOrUpdateCards(CreateOrUpdateCardsRequest request, bool animate = true)
   {
     var cards = _prototypeCards.CreateOrUpdateCards(request);
-    var command = new UpdateQuestCommand { Quest = new QuestView { Cards = cards } };
+    var quest = new QuestView { Cards = cards };
+    var temptingOffer = BuildTemptingOfferView(request);
+    if (temptingOffer != null)
+    {
+      quest.TemptingOffer = temptingOffer;
+    }
+    var command = new UpdateQuestCommand { Quest = quest };
 
     var sequence = TweenUtils.Sequence("UpdateQuest");
     return Registry.CardService.HandleUpdateQuestCommand(command, animate ? sequence : null);
@@ -919,7 +941,6 @@ public class PrototypeQuest : Service
 
   IEnumerator ShowTemptingOfferCards()
   {
-    const string groupKey = "tempting-offer";
     var spritePaths = new[]
     {
       "Assets/ThirdParty/GameAssets/CardImages/Circular/shutterstock_2155438699.png",
@@ -943,11 +964,11 @@ public class PrototypeQuest : Service
           SortingKey = 1,
         },
         Revealed = true,
-        GroupKey = groupKey,
+        GroupKey = TemptingOfferGroupKey,
         Overrides = BuildTemptingOfferOverrides(spritePaths),
       }
     );
-    ApplyTemptingOfferPresentation(allCards, groupKey, spritePaths);
+    ApplyTemptingOfferPresentation(allCards, TemptingOfferGroupKey, spritePaths);
 
     yield return new WaitForSeconds(0.3f);
 
@@ -987,7 +1008,7 @@ public class PrototypeQuest : Service
             SortingKey = 1,
           },
           Revealed = true,
-          GroupKey = groupKey,
+          GroupKey = TemptingOfferGroupKey,
           Overrides = BuildTemptingOfferOverrides(spritePaths),
         }
       )
@@ -1124,6 +1145,58 @@ public class PrototypeQuest : Service
       card.Revealed.Actions.PlayEffectPreview = null;
     }
   }
+
+  TemptingOfferView? BuildTemptingOfferView(CreateOrUpdateCardsRequest request)
+  {
+    if (request.GroupKey != TemptingOfferGroupKey)
+    {
+      return null;
+    }
+    var offerCount = Math.Min(
+      TemptingOfferMaxOffers,
+      Math.Max(0, (request.Count + TemptingOfferCardsPerOffer - 1) / TemptingOfferCardsPerOffer)
+    );
+    if (offerCount == 0)
+    {
+      return null;
+    }
+    var actions = BuildTemptingOfferActions(offerCount);
+    return new TemptingOfferView { Actions = actions };
+  }
+
+  List<TemptingOfferAction> BuildTemptingOfferActions(int offerCount)
+  {
+    var actions = new List<TemptingOfferAction>(offerCount);
+    for (var number = 0; number < offerCount; number++)
+    {
+      actions.Add(
+        new TemptingOfferAction { Number = number, Button = BuildTemptingOfferButton(number) }
+      );
+    }
+    return actions;
+  }
+
+  ButtonView BuildTemptingOfferButton(int offerNumber) =>
+    new ButtonView
+    {
+      Label = TemptingOfferButtonLabel,
+      Action = BuildTemptingOfferOnClick(offerNumber),
+    };
+
+  OnClickUnion BuildTemptingOfferOnClick(int offerNumber) =>
+    new OnClickUnion
+    {
+      OnClickClass = new OnClickClass
+      {
+        DebugAction = new DebugAction
+        {
+          DebugActionClass = new DebugActionClass
+          {
+            ApplyTestScenarioAction = $"{TemptingOfferScenarioName}/{offerNumber}",
+          },
+        },
+      },
+    };
 
   IEnumerator HideShopSequence()
   {

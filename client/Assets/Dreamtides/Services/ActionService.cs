@@ -634,6 +634,9 @@ namespace Dreamtides.Services
           Registry.Layout.DevButton.SetView(command.UpdateQuest.Quest.Interface?.DevButton);
           Registry.Layout.CloseBrowserButton.CloseAction =
             command.UpdateQuest.Quest.Interface?.Browser?.CloseButton?.ToGameAction();
+          Registry.DreamscapeLayout.TemptingOfferDisplay.SetOfferActions(
+            command.UpdateQuest.Quest.TemptingOffer?.Actions
+          );
           coroutines.Add(
             StartCoroutine(
               Registry.CardService.HandleUpdateQuestCommand(

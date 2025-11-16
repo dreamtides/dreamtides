@@ -22,9 +22,6 @@ namespace Dreamtides.Layout
     [SerializeField]
     DisplayableButton _acceptButtonPrefab = null!;
 
-    [SerializeField]
-    Transform? _buttonContainer;
-
     readonly List<DisplayableButton> _acceptButtons = new();
     readonly Dictionary<long, ButtonView> _buttonViewsByOfferNumber = new();
     readonly ButtonView _defaultButtonView = new() { Label = DefaultButtonLabel };
@@ -43,7 +40,6 @@ namespace Dreamtides.Layout
           }
         }
       }
-      PositionAcceptButtons();
     }
 
     protected override void OnBecameNonEmpty()
@@ -64,7 +60,6 @@ namespace Dreamtides.Layout
     protected override void OnAppliedLayout()
     {
       base.OnAppliedLayout();
-      PositionAcceptButtons();
     }
 
     public override Vector3 CalculateObjectPosition(int index, int count)
@@ -111,11 +106,9 @@ namespace Dreamtides.Layout
 
     void EnsureButtonInstances(int requiredCount)
     {
-      var parent = _buttonContainer ? _buttonContainer : transform;
       while (_acceptButtons.Count < requiredCount)
       {
-        var button = Instantiate(_acceptButtonPrefab, parent);
-        button.ExcludeFromLayout = true;
+        var button = Instantiate(_acceptButtonPrefab, transform);
         button.gameObject.SetActive(false);
         _acceptButtons.Add(button);
       }

@@ -36,8 +36,8 @@ namespace Dreamtides.Layout
     public StandardObjectLayout JourneyChoiceDisplay => Check(_journeyChoiceDisplay);
 
     [SerializeField]
-    StandardObjectLayout _temptingOfferDisplay = null!;
-    public StandardObjectLayout TemptingOfferDisplay => Check(_temptingOfferDisplay);
+    TemptingOfferObjectLayout _temptingOfferDisplay = null!;
+    public TemptingOfferObjectLayout TemptingOfferDisplay => Check(_temptingOfferDisplay);
 
     T Check<T>(T? value)
       where T : Object => Errors.CheckNotNull(value, $"{typeof(T).Name} not initialized");
