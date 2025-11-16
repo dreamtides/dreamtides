@@ -259,6 +259,7 @@ public class PrototypeQuest : Service
     {
       FocusMapCamera();
       Registry.DreamscapeService.HideCloseSiteButton();
+      Registry.DreamscapeLayout.TemptingOfferDisplay.HideAcceptButtons();
       Registry.DocumentService.RenderScreenAnchoredNode(
         new AnchorToScreenPositionCommand() { Node = null }
       );
@@ -482,8 +483,12 @@ public class PrototypeQuest : Service
     }
     var command = new UpdateQuestCommand { Quest = quest };
 
-    var sequence = TweenUtils.Sequence("UpdateQuest");
-    return Registry.CardService.HandleUpdateQuestCommand(command, animate ? sequence : null);
+    var coroutines = new List<Coroutine>();
+    Registry.DreamscapeService.HandleUpdateQuestCommand(command, coroutines, animate);
+    foreach (var coroutine in coroutines)
+    {
+      yield return coroutine;
+    }
   }
 
   void ApplyPendingShopOverrides()

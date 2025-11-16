@@ -148,6 +148,8 @@ namespace Dreamtides.Components
 
     public SpriteRenderer? SpriteCardContentProtection => _spriteCardContentProtection;
 
+    public DisplayableButton ButtonAttachment => _buttonAttachment;
+
     public void Render(Registry registry, CardView view, Sequence? sequence = null)
     {
       var name = view.Revealed?.Name.Replace("\n", " ") ?? "Hidden Card";

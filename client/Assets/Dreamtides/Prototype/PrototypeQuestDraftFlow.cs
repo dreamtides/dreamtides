@@ -123,7 +123,7 @@ public class PrototypeQuestDraftFlow
     }
 
     var update = new UpdateQuestCommand { Quest = new QuestView { Cards = updateCards } };
-    yield return _registry.CardService.HandleUpdateQuestCommand(update);
+    yield return _registry.CardService.HandleUpdateQuestCards(update);
 
     _prototypeCards.UpdateGroupCards("draft", updateCards);
     _prototypeCards.AdvanceGroupWindow("draft", 4);

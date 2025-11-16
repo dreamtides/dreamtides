@@ -62,10 +62,7 @@ namespace Dreamtides.Services
       return ApplyUpdate(command.Battle.Cards, command.UpdateSound, sequence);
     }
 
-    public IEnumerator HandleUpdateQuestCommand(
-      UpdateQuestCommand command,
-      Sequence? sequence = null
-    )
+    public IEnumerator HandleUpdateQuestCards(UpdateQuestCommand command, Sequence? sequence = null)
     {
       return ApplyUpdate(command.Quest.Cards, command.UpdateSound, sequence);
     }

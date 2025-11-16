@@ -622,28 +622,10 @@ namespace Dreamtides.Services
         if (command.UpdateQuest != null)
         {
           Registry.LoggingService.Log("ActionService", "Applying command: UpdateQuest");
-          Registry.DocumentService.RenderScreenOverlay(
-            command.UpdateQuest.Quest.Interface?.ScreenOverlay
-          );
-          Registry.Layout.CardOrderSelector.View = command
-            .UpdateQuest
-            .Quest
-            .Interface
-            ?.CardOrderSelector;
-          Registry.Layout.UndoButton.SetView(command.UpdateQuest.Quest.Interface?.UndoButton);
-          Registry.Layout.DevButton.SetView(command.UpdateQuest.Quest.Interface?.DevButton);
-          Registry.Layout.CloseBrowserButton.CloseAction =
-            command.UpdateQuest.Quest.Interface?.Browser?.CloseButton?.ToGameAction();
-          Registry.DreamscapeLayout.TemptingOfferDisplay.SetOfferActions(
-            command.UpdateQuest.Quest.TemptingOffer?.Actions
-          );
-          coroutines.Add(
-            StartCoroutine(
-              Registry.CardService.HandleUpdateQuestCommand(
-                command.UpdateQuest,
-                animate ? TweenUtils.Sequence("UpdateQuest") : null
-              )
-            )
+          Registry.DreamscapeService.HandleUpdateQuestCommand(
+            command.UpdateQuest,
+            coroutines,
+            animate
           );
         }
 

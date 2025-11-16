@@ -306,7 +306,7 @@ public class PrototypeQuestShopFlow
 
     var update = new UpdateQuestCommand { Quest = new QuestView { Cards = updateCards } };
     var sequence = TweenUtils.Sequence("UpdateQuest");
-    yield return _registry.CardService.HandleUpdateQuestCommand(update, sequence);
+    yield return _registry.CardService.HandleUpdateQuestCards(update, sequence);
 
     _prototypeCards.UpdateGroupCards(ShopGroupKey, updateCards);
     _currentShopDisplayIds.Remove(clickedId);
@@ -339,7 +339,7 @@ public class PrototypeQuestShopFlow
     }
 
     var update = new UpdateQuestCommand { Quest = new QuestView { Cards = updateCards } };
-    yield return _registry.CardService.HandleUpdateQuestCommand(update);
+    yield return _registry.CardService.HandleUpdateQuestCards(update);
 
     _prototypeCards.UpdateGroupCards(ShopGroupKey, updateCards);
     _prototypeCards.AdvanceGroupWindow(ShopGroupKey, 6);

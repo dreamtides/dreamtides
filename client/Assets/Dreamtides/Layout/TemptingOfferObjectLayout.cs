@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Dreamtides.Buttons;
 using Dreamtides.Components;
 using Dreamtides.Schema;
+using Dreamtides.Utils;
 using UnityEngine;
 
 namespace Dreamtides.Layout
@@ -14,10 +15,10 @@ namespace Dreamtides.Layout
     const string DefaultButtonLabel = "Accept";
 
     [SerializeField]
-    float _buttonVerticalOffset;
+    Vector2 _acceptButtonOffset;
 
     [SerializeField]
-    float _buttonDepthOffset;
+    float _acceptButtonScale = 0.25f;
 
     [SerializeField]
     DisplayableButton _acceptButtonPrefab = null!;
@@ -39,6 +40,14 @@ namespace Dreamtides.Layout
             _buttonViewsByOfferNumber[action.Number] = action.Button;
           }
         }
+      }
+    }
+
+    public void HideAcceptButtons()
+    {
+      for (var i = 0; i < _acceptButtons.Count; i++)
+      {
+        _acceptButtons[i].gameObject.SetActive(false);
       }
     }
 
@@ -94,13 +103,17 @@ namespace Dreamtides.Layout
         {
           continue;
         }
-        var rowCenter = CalculateRowCenter(rowIndex, rowCount);
-        var buttonPosition =
-          rowCenter - transform.up * _buttonVerticalOffset + transform.forward * _buttonDepthOffset;
-        button.transform.SetPositionAndRotation(buttonPosition, transform.rotation);
+        var referenceTransform = Errors.CheckNotNull(GetReferenceButtonTransform(rowIndex));
+        button.transform.SetPositionAndRotation(
+          referenceTransform.position,
+          referenceTransform.rotation
+        );
+        var offset = transform.right * _acceptButtonOffset.x + transform.up * _acceptButtonOffset.y;
+        button.transform.position += offset;
         var offerNumber = GetOfferNumberForRow(rowIndex);
         var view = ResolveButtonView(offerNumber);
         button.SetView(Registry, view);
+        button.transform.localScale = _acceptButtonScale * Vector3.one;
       }
     }
 
@@ -149,12 +162,6 @@ namespace Dreamtides.Layout
       return totalHeight / 2f - rowIndex * VerticalSpacing;
     }
 
-    Vector3 CalculateRowCenter(int rowIndex, int rowCount)
-    {
-      var localY = GetVerticalOffset(rowIndex, rowCount);
-      return transform.position + transform.up * localY;
-    }
-
     long? GetOfferNumberForRow(int rowIndex)
     {
       var objectIndex = rowIndex * ObjectsPerRow;
@@ -172,6 +179,21 @@ namespace Dreamtides.Layout
         return offerPosition?.Number;
       }
       return null;
+    }
+
+    Transform? GetReferenceButtonTransform(int rowIndex)
+    {
+      var objectIndex = rowIndex * ObjectsPerRow;
+      if (objectIndex >= Objects.Count)
+      {
+        return null;
+      }
+      if (Objects[objectIndex] is not Card card)
+      {
+        return null;
+      }
+      var attachment = card.ButtonAttachment;
+      return attachment != null ? attachment.transform : null;
     }
 
     ButtonView ResolveButtonView(long? offerNumber)

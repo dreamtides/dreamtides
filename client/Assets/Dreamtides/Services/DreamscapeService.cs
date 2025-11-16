@@ -60,6 +60,31 @@ namespace Dreamtides.Services
       }
     }
 
+    public void HandleUpdateQuestCommand(
+      UpdateQuestCommand command,
+      List<Coroutine> coroutines,
+      bool animate
+    )
+    {
+      Registry.DocumentService.RenderScreenOverlay(command.Quest.Interface?.ScreenOverlay);
+      Registry.Layout.CardOrderSelector.View = command.Quest.Interface?.CardOrderSelector;
+      Registry.Layout.UndoButton.SetView(command.Quest.Interface?.UndoButton);
+      Registry.Layout.DevButton.SetView(command.Quest.Interface?.DevButton);
+      Registry.Layout.CloseBrowserButton.CloseAction =
+        command.Quest.Interface?.Browser?.CloseButton?.ToGameAction();
+      Registry.DreamscapeLayout.TemptingOfferDisplay.SetOfferActions(
+        command.Quest.TemptingOffer?.Actions
+      );
+      coroutines.Add(
+        StartCoroutine(
+          Registry.CardService.HandleUpdateQuestCards(
+            command,
+            animate ? TweenUtils.Sequence("UpdateQuest") : null
+          )
+        )
+      );
+    }
+
     public void ApplyLayouts(Sequence? sequence)
     {
       Registry.DreamscapeLayout.DraftPickLayout.ApplyLayout(sequence);
