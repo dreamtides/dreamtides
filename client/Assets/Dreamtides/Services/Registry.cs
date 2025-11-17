@@ -1,6 +1,7 @@
 #nullable enable
 
 using System.Collections;
+using System.Collections.Generic;
 using Dreamtides.Buttons;
 using Dreamtides.Components;
 using Dreamtides.Layout;
@@ -181,10 +182,10 @@ namespace Dreamtides.Services
       yield return new WaitForEndOfFrame();
       yield return new WaitForEndOfFrame();
 
-      RunAwake(mode, testConfiguration);
+      yield return RunAwake(mode, testConfiguration);
     }
 
-    void RunAwake(GameMode mode, TestConfiguration? testConfiguration)
+    IEnumerator RunAwake(GameMode mode, TestConfiguration? testConfiguration)
     {
       var width = UnityEngine.Device.Screen.width;
       var height = UnityEngine.Device.Screen.height;
@@ -211,7 +212,7 @@ namespace Dreamtides.Services
       {
         if (element.gameObject.scene == gameObject.scene)
         {
-          element.Initialize(this, mode, testConfiguration);
+          element.Initialize(this, mode, testConfiguration, fromRegistry: true);
         }
       }
 
@@ -234,6 +235,30 @@ namespace Dreamtides.Services
       }
 
       ToggleGameObjectsForMode(mode);
+
+      yield return new WaitForEndOfFrame();
+
+      var startCoroutines = new List<Coroutine>();
+      foreach (
+        var element in FindObjectsByType<Displayable>(
+          FindObjectsInactive.Exclude,
+          FindObjectsSortMode.None
+        )
+      )
+      {
+        if (element.gameObject.scene == gameObject.scene)
+        {
+          var routine = element.StartFromRegistry();
+          if (routine != null)
+          {
+            startCoroutines.Add(StartCoroutine(routine));
+          }
+        }
+      }
+      foreach (var coroutine in startCoroutines)
+      {
+        yield return coroutine;
+      }
     }
 
     T Check<T>(T? value)

@@ -54,6 +54,15 @@ namespace Dreamtides.Layout
       }
     }
 
+    protected override void OnStart()
+    {
+      var targetScale = Registry.IsLandscape ? _landscapeScaleOverride : 1.0f;
+      if (!Mathf.Approximately(transform.localScale.x, targetScale))
+      {
+        transform.localScale = Vector3.one * targetScale;
+      }
+    }
+
     protected override void OnBecameNonEmpty()
     {
       base.OnBecameNonEmpty();
@@ -66,26 +75,6 @@ namespace Dreamtides.Layout
       for (var i = 0; i < _acceptButtons.Count; i++)
       {
         _acceptButtons[i].gameObject.SetActive(false);
-      }
-    }
-
-    protected override void OnAppliedLayout()
-    {
-      base.OnAppliedLayout();
-      UpdateLayoutScale();
-    }
-
-    protected override void OnUpdateObjectLayout()
-    {
-      UpdateLayoutScale();
-    }
-
-    void UpdateLayoutScale()
-    {
-      var targetScale = Registry.IsLandscape ? _landscapeScaleOverride : 1.0f;
-      if (!Mathf.Approximately(transform.localScale.x, targetScale))
-      {
-        transform.localScale = Vector3.one * targetScale;
       }
     }
 

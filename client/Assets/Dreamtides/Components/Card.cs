@@ -152,6 +152,11 @@ namespace Dreamtides.Components
     protected override void OnInitialize()
     {
       _buttonAttachment.Initialize(this);
+
+      if (_containedObjects)
+      {
+        _containedObjects.Initialize(this);
+      }
     }
 
     public void Render(CardView view, Sequence? sequence = null)

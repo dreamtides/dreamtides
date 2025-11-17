@@ -1,6 +1,7 @@
 #nullable enable
 
 using System;
+using System.Collections;
 using Dreamtides.Services;
 using Dreamtides.Utils;
 using UnityEngine;
@@ -39,7 +40,12 @@ namespace Dreamtides.Layout
         ? _testConfiguration
         : throw new InvalidOperationException($"{name} not initialized!");
 
-    public void Initialize(Registry registry, GameMode mode, TestConfiguration? testConfiguration)
+    public void Initialize(
+      Registry registry,
+      GameMode mode,
+      TestConfiguration? testConfiguration,
+      bool fromRegistry = false
+    )
     {
       if (_initialized)
       {
@@ -51,6 +57,11 @@ namespace Dreamtides.Layout
       _mode = mode;
       _testConfiguration = testConfiguration;
       OnInitialize();
+
+      if (!fromRegistry && gameObject.activeInHierarchy)
+      {
+        StartCoroutine(StartAsync());
+      }
     }
 
     public void Initialize(Displayable displayable)
@@ -59,12 +70,50 @@ namespace Dreamtides.Layout
     }
 
     /// <summary>
+    /// Invoked at start after all objects are initialized.
+    /// </summary>
+    public IEnumerator? StartFromRegistry()
+    {
+      if (!_initialized)
+      {
+        throw new InvalidOperationException($"{name} not initialized!");
+      }
+
+      OnStart();
+      return OnStartAsync();
+    }
+
+    /// <summary>
     /// Do not override or hide this method. Use <see cref="OnInitialize"/>
     /// instead.
     /// </summary>
     public void Start() { }
 
+    /// <summary>
+    /// Invoked when the object is initialized.
+    /// </summary>
     protected virtual void OnInitialize() { }
+
+    IEnumerator StartAsync()
+    {
+      yield return new WaitForEndOfFrame();
+      OnStart();
+      var routine = OnStartAsync();
+      if (routine != null)
+      {
+        yield return routine;
+      }
+    }
+
+    /// <summary>
+    /// Invoked at start after all objects are initialized.
+    /// </summary>
+    protected virtual void OnStart() { }
+
+    /// <summary>
+    /// Invoked as a couroutine at start after all objects are initialized.
+    /// </summary>
+    protected virtual IEnumerator? OnStartAsync() => null;
 
     /// <summary>
     /// If true, this object will not be modified by the layout system.
