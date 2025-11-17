@@ -9,9 +9,6 @@ namespace Dreamtides.Layout
   public class ScrollableUserHandLayout : StandardObjectLayout
   {
     [SerializeField]
-    Registry _registry = null!;
-
-    [SerializeField]
     float _offset;
 
     [SerializeField]
@@ -39,12 +36,12 @@ namespace Dreamtides.Layout
       _previousScrollAmount = 0;
     }
 
-    protected override void OnUpdate()
+    protected override void OnUpdateObjectLayout()
     {
       if (Objects.Count > 0)
       {
         _scrollbar.gameObject.SetActive(
-          Objects.Count > WindowSize() && !_registry.CardAnimationService.IsPointerDownOnCard
+          Objects.Count > WindowSize() && !Registry.CardAnimationService.IsPointerDownOnCard
         );
         _scrollbar.size = (float)WindowSize() / Objects.Count;
 

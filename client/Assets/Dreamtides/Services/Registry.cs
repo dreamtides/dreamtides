@@ -202,6 +202,19 @@ namespace Dreamtides.Services
 
       Application.targetFrameRate = 60;
 
+      foreach (
+        var element in FindObjectsByType<Displayable>(
+          FindObjectsInactive.Include,
+          FindObjectsSortMode.None
+        )
+      )
+      {
+        if (element.gameObject.scene == gameObject.scene)
+        {
+          element.Initialize(this, mode, testConfiguration);
+        }
+      }
+
       foreach (var service in GetComponentsInChildren<Service>())
       {
         service.Initialize(this, mode, testConfiguration);

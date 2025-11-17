@@ -48,7 +48,7 @@ namespace Dreamtides.Animations
       var sequence = TweenUtils.Sequence("DrawUserCard");
       var moveDuration = 0.3f;
       card.SortingKey = (int)cardView.Position.SortingKey;
-      card.Render(service.Registry, cardView, sequence);
+      card.Render(cardView, sequence);
       card.GameContext = GameContext.DrawnCards;
       sequence.Insert(
         0,

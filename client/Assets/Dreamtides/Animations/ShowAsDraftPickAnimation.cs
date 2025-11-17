@@ -79,7 +79,7 @@ namespace Dreamtides.Animations
       service.Registry.SoundService.PlayDrawCardSound();
       var seq = TweenUtils.Sequence("DraftPickMove");
       card.SortingKey = (int)cardView.Position.SortingKey;
-      card.Render(service.Registry, cardView, seq);
+      card.Render(cardView, seq);
       seq.Insert(0, card.transform.DOMove(targetPosition, TweenUtils.MoveAnimationDurationSeconds));
       seq.Insert(
         0,

@@ -124,7 +124,7 @@ namespace Dreamtides.Animations
 
       var seq = TweenUtils.Sequence("ShopScale");
       card.SortingKey = (int)cardView.Position.SortingKey;
-      card.Render(service.Registry, cardView, seq);
+      card.Render(cardView, seq);
 
       // Animate only the scale from 0.01 to the layout's target scale
       seq.Insert(

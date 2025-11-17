@@ -21,11 +21,6 @@ namespace Dreamtides.Layout
     [SerializeField]
     protected bool _isOpen = false;
 
-    [SerializeField]
-    Registry _registry = null!;
-
-    protected Registry Registry => Errors.CheckNotNull(_registry);
-
     public bool IsOpen => _isOpen;
 
     public virtual void Show(Registry registry, Sequence? sequence)

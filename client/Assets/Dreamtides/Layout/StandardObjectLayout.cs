@@ -189,17 +189,17 @@ namespace Dreamtides.Layout
     protected virtual int GetLayoutIndexOverride(Displayable displayable, int index, int count) =>
       index;
 
-    protected void Update()
+    protected sealed override void OnUpdate()
     {
       if (_debugUpdateContinuously)
       {
         ApplyLayout();
       }
 
-      OnUpdate();
+      OnUpdateObjectLayout();
     }
 
-    protected virtual void OnUpdate() { }
+    protected virtual void OnUpdateObjectLayout() { }
 
     void ApplyLayoutToObject(
       Displayable displayable,

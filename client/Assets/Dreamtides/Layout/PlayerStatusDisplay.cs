@@ -40,9 +40,6 @@ namespace Dreamtides.Layout
     GameObject _testCharacterPrefab = null!;
 
     [SerializeField]
-    Registry _registry = null!;
-
-    [SerializeField]
     StudioType _studioType;
 
     long _producedEnergy;
@@ -53,11 +50,11 @@ namespace Dreamtides.Layout
     public BattlefieldNumber Score => _score;
     public BattlefieldNumber TotalSpark => _totalSpark;
 
-    protected override void OnStart()
+    protected override void OnInitialize()
     {
       _sparkBackgroundRenderer = _totalSpark.GetComponent<Renderer>();
       _sparkBackgroundMaterial = _sparkBackgroundRenderer.material;
-      _registry.StudioService.CaptureSubject(_studioType, _testCharacterPrefab, _characterImage);
+      Registry.StudioService.CaptureSubject(_studioType, _testCharacterPrefab, _characterImage);
     }
 
     public void UpdatePlayerView(PlayerView playerView, bool animate)

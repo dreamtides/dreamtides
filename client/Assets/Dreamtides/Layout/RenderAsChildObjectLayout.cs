@@ -143,7 +143,7 @@ namespace Dreamtides.Layout
     /// </summary>
     float? CalculateObjectScale(int index, int count) => 1.0f;
 
-    void Update()
+    protected override void OnUpdate()
     {
       if (_debugUpdateContinuously)
       {

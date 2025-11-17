@@ -75,9 +75,8 @@ namespace Dreamtides.Layout
       UpdateLayoutScale();
     }
 
-    protected override void OnUpdate()
+    protected override void OnUpdateObjectLayout()
     {
-      base.OnUpdate();
       UpdateLayoutScale();
     }
 
@@ -131,7 +130,7 @@ namespace Dreamtides.Layout
         button.transform.position += offset;
         var offerNumber = GetOfferNumberForRow(rowIndex);
         var view = ResolveButtonView(offerNumber);
-        button.SetView(Registry, view);
+        button.SetView(view);
         button.transform.localScale = _acceptButtonScale * Vector3.one;
       }
     }
@@ -141,6 +140,7 @@ namespace Dreamtides.Layout
       while (_acceptButtons.Count < requiredCount)
       {
         var button = Instantiate(_acceptButtonPrefab, transform);
+        button.Initialize(this);
         button.gameObject.SetActive(false);
         _acceptButtons.Add(button);
       }

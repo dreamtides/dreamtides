@@ -11,9 +11,6 @@ namespace Dreamtides.Components
   public class CardBrowserButton : Displayable
   {
     [SerializeField]
-    Registry _registry = null!;
-
-    [SerializeField]
     CardBrowserType _type;
 
     public override bool CanHandleMouseEvents() => true;
@@ -25,7 +22,7 @@ namespace Dreamtides.Components
         return;
       }
 
-      _registry.SoundService.PlayClickSound();
+      Registry.SoundService.PlayClickSound();
       var action = new GameAction
       {
         GameActionClass = new()
@@ -33,7 +30,7 @@ namespace Dreamtides.Components
           BattleDisplayAction = new() { BattleDisplayActionClass = new() { BrowseCards = _type } },
         },
       };
-      _registry.ActionService.PerformAction(action);
+      Registry.ActionService.PerformAction(action);
     }
 
     bool IsEmpty()
@@ -41,13 +38,13 @@ namespace Dreamtides.Components
       switch (_type)
       {
         case CardBrowserType.UserDeck:
-          return _registry.Layout.UserDeck.Objects.Count == 0;
+          return Registry.Layout.UserDeck.Objects.Count == 0;
         case CardBrowserType.EnemyDeck:
-          return _registry.Layout.EnemyDeck.Objects.Count == 0;
+          return Registry.Layout.EnemyDeck.Objects.Count == 0;
         case CardBrowserType.UserVoid:
-          return _registry.Layout.UserVoid.Objects.Count == 0;
+          return Registry.Layout.UserVoid.Objects.Count == 0;
         case CardBrowserType.EnemyVoid:
-          return _registry.Layout.EnemyVoid.Objects.Count == 0;
+          return Registry.Layout.EnemyVoid.Objects.Count == 0;
         case CardBrowserType.UserStatus:
           return false;
         case CardBrowserType.EnemyStatus:

@@ -13,9 +13,6 @@ namespace Dreamtides.Buttons
   public sealed class DisplayableButton : Displayable
   {
     [SerializeField]
-    internal Registry _registry = null!;
-
-    [SerializeField]
     internal SpriteRenderer _background = null!;
 
     [SerializeField]
@@ -52,14 +49,13 @@ namespace Dreamtides.Buttons
     private readonly Color _enabledColor = Color.white;
     private readonly Color _disabledColor = new Color(0.7f, 0.7f, 0.7f);
 
-    protected override void OnStart()
+    protected override void OnInitialize()
     {
       _collider.enabled = _isVisible;
     }
 
-    public void SetView(Registry registry, ButtonView? view)
+    public void SetView(ButtonView? view)
     {
-      _registry = registry;
       ResetPressVisualStateImmediate();
       _awaitingNextSetView = false;
 
@@ -108,14 +104,14 @@ namespace Dreamtides.Buttons
       var currentTime = Time.time;
       if (currentTime - _lastClickTime < (_debounceDelayMilliseconds / 1000f))
       {
-        _registry.LoggingService.LogWarning(
+        Registry.LoggingService.LogWarning(
           $"Ignoring click <{_debounceDelayMilliseconds}ms after previous"
         );
         _ignoreClick = true;
         return;
       }
 
-      _registry.SoundService.Play(_onClickSound);
+      Registry.SoundService.Play(_onClickSound);
       _lastClickTime = currentTime;
 
       _currentAnimation?.Kill();
@@ -170,7 +166,7 @@ namespace Dreamtides.Buttons
 
       if (isSameObject)
       {
-        _registry.ActionService.PerformAction(_action);
+        Registry.ActionService.PerformAction(_action);
       }
 
       _isPressed = false;

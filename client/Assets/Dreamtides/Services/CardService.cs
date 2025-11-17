@@ -106,6 +106,7 @@ namespace Dreamtides.Services
             CardPrefab.OfferCost => ComponentUtils.Instantiate(_offerCostCardPrefab),
             _ => ComponentUtils.Instantiate(_cardPrefab),
           };
+          card.Initialize(Registry, Mode, TestConfiguration);
 
           if (cardView.CreatePosition != null)
           {
@@ -125,7 +126,7 @@ namespace Dreamtides.Services
         }
 
         card.SortingKey = (int)cardView.Position.SortingKey;
-        card.Render(Registry, cardView, sequence);
+        card.Render(cardView, sequence);
         layout.Add(card);
       }
 

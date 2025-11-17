@@ -102,7 +102,7 @@ namespace Dreamtides.Layout
     public override Vector3? CalculateObjectRotation(int index, int count) =>
       transform.rotation.eulerAngles;
 
-    protected override void OnUpdate()
+    protected override void OnUpdateObjectLayout()
     {
       if (_isOpen)
       {

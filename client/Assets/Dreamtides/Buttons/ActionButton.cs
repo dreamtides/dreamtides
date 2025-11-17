@@ -17,9 +17,6 @@ namespace Dreamtides.Buttons
   public sealed class ActionButton : Displayable
   {
     [SerializeField]
-    internal Registry _registry = null!;
-
-    [SerializeField]
     internal SpriteRenderer _background = null!;
 
     [SerializeField]
@@ -72,7 +69,7 @@ namespace Dreamtides.Buttons
     private bool _isAnimating = false;
     float _lastClickTime = -1f;
     bool _ignoreClick = false;
-    bool _initialized = false;
+    bool _buttonSetUp = false;
     float _lastInteractionTime = 0f;
     float _lastIdlePollTime = 0f;
     bool _hasRestoredAfterIdle = false;
@@ -83,7 +80,7 @@ namespace Dreamtides.Buttons
 
     public SpriteRenderer Background => _background;
 
-    protected override void OnStart()
+    protected override void OnInitialize()
     {
       _originalMaterial = _background.material;
       _collider.enabled = _isVisible;
@@ -91,7 +88,7 @@ namespace Dreamtides.Buttons
       _lastIdlePollTime = Time.time;
     }
 
-    private void Update()
+    protected override void OnUpdate()
     {
       if (_pendingView != null && _showOnIdleDuration.HasValue && _lastSetViewTime.HasValue)
       {
@@ -109,7 +106,7 @@ namespace Dreamtides.Buttons
         if (
           !_hasRestoredAfterIdle
           && now - _lastInteractionTime >= 1f
-          && _initialized
+          && _buttonSetUp
           && !_isAnimating
         )
         {
@@ -127,14 +124,9 @@ namespace Dreamtides.Buttons
       _background.material = _action != null ? _originalMaterial : _noOutlineMaterial;
     }
 
-    public void SetView(
-      ButtonView? view,
-      Milliseconds? showOnIdleDuration = null,
-      Registry? registry = null
-    )
+    public void SetView(ButtonView? view, Milliseconds? showOnIdleDuration = null)
     {
-      _registry = registry ?? _registry;
-      MaybeInitialize();
+      MaybeRunSetup();
       _lastSetViewTime = Time.time;
       MarkInteraction();
 
@@ -256,24 +248,24 @@ namespace Dreamtides.Buttons
       MarkInteraction();
       if (_action == null)
         return;
-      MaybeInitialize();
+      MaybeRunSetup();
 
       var currentTime = Time.time;
       if (currentTime - _lastClickTime < (_debounceDelayMilliseconds / 1000f))
       {
-        _registry.LoggingService.LogWarning(
+        Registry.LoggingService.LogWarning(
           $"Ignoring click <{_debounceDelayMilliseconds}ms after previous"
         );
         _ignoreClick = true;
         return;
       }
 
-      _registry.SoundService.Play(_onClickSound);
+      Registry.SoundService.Play(_onClickSound);
       _lastClickTime = currentTime;
 
       _currentAnimation?.Kill();
       Vector3 directionFromCamera = (
-        transform.position - _registry.MainCamera.transform.position
+        transform.position - Registry.MainCamera.transform.position
       ).normalized;
       Vector3 targetPosition = transform.position + directionFromCamera * _moveDistance;
       _currentAnimation = TweenUtils.Sequence("ButtonPressAnimation");
@@ -301,13 +293,13 @@ namespace Dreamtides.Buttons
       _currentAnimation.Insert(0, _background.DOColor(_originalColor, _animationDuration));
       if (isSameObject)
       {
-        _registry.ActionService.PerformAction(_action);
+        Registry.ActionService.PerformAction(_action);
       }
     }
 
-    private void MaybeInitialize()
+    private void MaybeRunSetup()
     {
-      if (_initialized)
+      if (_buttonSetUp)
       {
         return;
       }
@@ -317,7 +309,7 @@ namespace Dreamtides.Buttons
       _originalBackgroundLocalScale = _background.transform.localScale;
       _originalTextLocalScale = _text.transform.localScale;
       UpdateButtonColors();
-      _initialized = true;
+      _buttonSetUp = true;
     }
 
     private void RestoreDefaults()

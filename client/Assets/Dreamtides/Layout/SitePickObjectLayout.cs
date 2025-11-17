@@ -10,9 +10,6 @@ namespace Dreamtides.Layout
   public class SitePickObjectLayout : StandardObjectLayout
   {
     [SerializeField]
-    Registry _registry = null!;
-
-    [SerializeField]
     float _horizontalSpacing;
 
     [SerializeField]
@@ -43,7 +40,6 @@ namespace Dreamtides.Layout
     readonly Dictionary<Displayable, int> _displayableToIndex = new();
     int _nextSlotIndex;
 
-    protected Registry Registry => _registry;
     protected float HorizontalSpacing => _horizontalSpacing;
     protected float VerticalSpacing => _verticalSpacing;
     protected float CardWidth => _cardWidth;
@@ -69,7 +65,7 @@ namespace Dreamtides.Layout
 
     public override Vector3 CalculateObjectPosition(int index, int count)
     {
-      var isLandscape = _registry.IsLandscape;
+      var isLandscape = Registry.IsLandscape;
       var effectiveCount = GetEffectiveCount(count);
       if (effectiveCount <= 0)
       {
@@ -146,15 +142,15 @@ namespace Dreamtides.Layout
         TweenUtils.FadeInCanvasGroup(ComponentUtils.Get<CanvasGroup>(_closeSiteButton));
       }
 
-      var canvas = _registry.Canvas;
-      var isLandscape = _registry.IsLandscape;
+      var canvas = Registry.Canvas;
+      var isLandscape = Registry.IsLandscape;
       var topRowCount = isLandscape && !_forceTwoRows ? count : (count + 1) / 2;
       var topRightIndex = isLandscape && !_forceTwoRows ? count - 1 : topRowCount - 1;
 
       var target = Objects[topRightIndex];
       var targetWorld = target.transform.position;
 
-      var screenPoint = _registry.MainCamera.WorldToScreenPoint(targetWorld);
+      var screenPoint = Registry.MainCamera.WorldToScreenPoint(targetWorld);
 
       var rootRect = canvas.GetComponent<RectTransform>();
       RectTransformUtility.ScreenPointToLocalPointInRectangle(
@@ -167,7 +163,7 @@ namespace Dreamtides.Layout
       var worldOnCanvas = rootRect.TransformPoint(rootLocal);
       var parent = _closeSiteButton.parent as RectTransform ?? rootRect;
       var parentLocal = parent.InverseTransformPoint(worldOnCanvas);
-      var offset = _registry.IsLandscape
+      var offset = Registry.IsLandscape
         ? _closeButtonCanvasOffsetLandscape
         : _closeButtonCanvasOffsetPortrait;
       _closeSiteButton.anchoredPosition = new Vector2(parentLocal.x, parentLocal.y) + offset;

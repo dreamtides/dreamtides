@@ -119,7 +119,6 @@ namespace Dreamtides.Components
     internal float _cardColliderHeight = 4f;
 
     bool _isRevealed = false;
-    internal Registry _registry = null!;
     CardView _cardView = null!;
     float _dragStartScreenZ;
     Vector3 _dragStartPosition;
@@ -150,10 +149,14 @@ namespace Dreamtides.Components
 
     public DisplayableButton ButtonAttachment => _buttonAttachment;
 
-    public void Render(Registry registry, CardView view, Sequence? sequence = null)
+    protected override void OnInitialize()
+    {
+      _buttonAttachment.Initialize(this);
+    }
+
+    public void Render(CardView view, Sequence? sequence = null)
     {
       var name = view.Revealed?.Name.Replace("\n", " ") ?? "Hidden Card";
-      _registry = registry;
       _cardView = view;
       gameObject.name = $"[{Id}] {name}";
 
@@ -223,7 +226,7 @@ namespace Dreamtides.Components
       _isDissolved = true;
       ToggleActiveElements();
 
-      yield return StartCoroutine(_cardImageDissolve.StartDissolve(_registry, command));
+      yield return StartCoroutine(_cardImageDissolve.StartDissolve(Registry, command));
 
       if (command.Reverse)
       {
@@ -310,7 +313,6 @@ namespace Dreamtides.Components
       result.gameObject.name = "[IZ]" + gameObject.name;
       result._cardView = CardView;
       result._outline.enabled = false;
-      result._registry = _registry;
       result._isRevealed = _isRevealed;
       result.Parent = null;
       result.GameContext = GameContext.InfoZoom;
@@ -342,7 +344,7 @@ namespace Dreamtides.Components
       }
     }
 
-    void Update()
+    protected override void OnUpdate()
     {
       _outline.gameObject.SetActive(
         CanPlay() || CanSelectOrder() || CardView.Revealed?.OutlineColor != null
@@ -392,7 +394,7 @@ namespace Dreamtides.Components
       }
 
       var trail = ComponentUtils.Instantiate(
-        _registry.AssetService.GetProjectilePrefab(trailAddress)
+        Registry.AssetService.GetProjectilePrefab(trailAddress)
       );
       _cardTrail = trail.gameObject;
       _cardTrail.transform.SetParent(_cardTrailPosition, worldPositionStays: false);
@@ -440,13 +442,13 @@ namespace Dreamtides.Components
 
       if (_cardImage is SpriteRenderer spriteRenderer && revealed.Image.Sprite != null)
       {
-        spriteRenderer.sprite = _registry.AssetService.GetSprite(revealed.Image.Sprite);
+        spriteRenderer.sprite = Registry.AssetService.GetSprite(revealed.Image.Sprite);
       }
       else if (_cardImage is MeshRenderer meshRenderer && revealed.Image.Prefab != null)
       {
-        var prefab = _registry.AssetService.GetPrefab(revealed.Image.Prefab.Prefab);
-        _registry.StudioService.EndCapture(revealed.Image.Prefab.StudioType);
-        _registry.StudioService.CaptureSubject(
+        var prefab = Registry.AssetService.GetPrefab(revealed.Image.Prefab.Prefab);
+        Registry.StudioService.EndCapture(revealed.Image.Prefab.StudioType);
+        Registry.StudioService.CaptureSubject(
           revealed.Image.Prefab.StudioType,
           prefab,
           meshRenderer,
@@ -455,12 +457,12 @@ namespace Dreamtides.Components
       }
       else
       {
-        _registry.LoggingService.LogError($"Card has no valid image", ("id", Id));
+        Registry.LoggingService.LogError($"Card has no valid image", ("id", Id));
       }
 
       if (revealed.Image.Sprite is { } sprite)
       {
-        _battlefieldCardImage.sprite = _registry.AssetService.GetSprite(sprite);
+        _battlefieldCardImage.sprite = Registry.AssetService.GetSprite(sprite);
       }
 
       _outline.material.SetInt("_Seed", UnityEngine.Random.Range(0, 9999));
@@ -485,10 +487,7 @@ namespace Dreamtides.Components
           Destroy(_loopingEffect);
           _loopingEffectAddress = revealed.Effects.LoopingEffect;
           _loopingEffect = ComponentUtils
-            .Instantiate(
-              _registry.AssetService.GetEffectPrefab(_loopingEffectAddress),
-              Vector3.zero
-            )
+            .Instantiate(Registry.AssetService.GetEffectPrefab(_loopingEffectAddress), Vector3.zero)
             .gameObject;
           _loopingEffect.transform.SetParent(transform, worldPositionStays: false);
           // TODO: Figure out correct rotation for looping effect.
@@ -506,7 +505,7 @@ namespace Dreamtides.Components
       {
         _buttonAttachment.gameObject.SetActive(true);
         _buttonAttachment.GameContext = GameContext;
-        _buttonAttachment.SetView(_registry, revealed.Actions.ButtonAttachment);
+        _buttonAttachment.SetView(revealed.Actions.ButtonAttachment);
       }
       else
       {
@@ -536,43 +535,43 @@ namespace Dreamtides.Components
       _draggedToClearThreshold = false;
       _draggedToPlayThreshold = false;
       _distanceDragged = 0;
-      _registry.CardAnimationService.IsPointerDownOnCard = true;
+      Registry.CardAnimationService.IsPointerDownOnCard = true;
 
       if (
-        _registry.IsMobileDevice
+        Registry.IsMobileDevice
         && GameContext == GameContext.Hand
         && CardView.Position.Position.PositionClass?.InHand == DisplayPlayer.User
         && CardView.Revealed?.Actions?.OnClick?.ToGameAction() == null
-        && !_registry.CapabilitiesService.AnyBrowserOpen()
+        && !Registry.CapabilitiesService.AnyBrowserOpen()
       )
       {
         // Jump to large size when in user hand on mobile
         transform.position = MobileHandCardJumpPosition();
         transform.rotation = Quaternion.Euler(Constants.CameraXAngle, 0, 0);
-        _registry.CardAnimationService.DisplayInfoZoom(this, forCardInHand: true);
+        Registry.CardAnimationService.DisplayInfoZoom(this, forCardInHand: true);
       }
       else if (
-        !_registry.IsMobileDevice
+        !Registry.IsMobileDevice
         && GameContext == GameContext.Hand
         && CardView.Position.Position.PositionClass?.InHand == DisplayPlayer.User
-        && !_registry.CapabilitiesService.AnyBrowserOpen()
+        && !Registry.CapabilitiesService.AnyBrowserOpen()
       )
       {
-        var jumpPosition = _registry.UserHandHoverService.CalculateJumpPosition(this);
+        var jumpPosition = Registry.UserHandHoverService.CalculateJumpPosition(this);
         if (jumpPosition != null)
         {
           transform.position = jumpPosition.Value;
           transform.rotation = Quaternion.Euler(Constants.CameraXAngle, 0, 0);
         }
-        _registry.CardAnimationService.DisplayInfoZoom(this, forCardInHand: true);
+        Registry.CardAnimationService.DisplayInfoZoom(this, forCardInHand: true);
       }
       else if (
-        _registry.CapabilitiesService.CanInfoZoom(GameContext, CardView.Position.Position)
+        Registry.CapabilitiesService.CanInfoZoom(GameContext, CardView.Position.Position)
         && CardView.Revealed != null
         && !_draggedToClearThreshold
       )
       {
-        _registry.CardAnimationService.DisplayInfoZoom(this, forCardInHand: false);
+        Registry.CardAnimationService.DisplayInfoZoom(this, forCardInHand: false);
       }
 
       if (CanPlay() || CanSelectOrder())
@@ -580,7 +579,7 @@ namespace Dreamtides.Components
         _isDraggingFromHand =
           GameContext == GameContext.Hand || GameContext == GameContext.Hovering;
         _isDraggingForOrdering = CanSelectOrder();
-        _registry.SoundService.PlayCardSound();
+        Registry.SoundService.PlayCardSound();
         GameContext = GameContext.Dragging;
 
         if (Parent)
@@ -589,10 +588,10 @@ namespace Dreamtides.Components
         }
 
         _dragStartScreenZ = Camera.main.WorldToScreenPoint(gameObject.transform.position).z;
-        _dragStartPosition = _registry.InputService.WorldPointerPosition(_dragStartScreenZ);
+        _dragStartPosition = Registry.InputService.WorldPointerPosition(_dragStartScreenZ);
         _dragOffset = gameObject.transform.position - _dragStartPosition;
       }
-      else if (GameContext == GameContext.Hand && !_registry.CapabilitiesService.AnyBrowserOpen())
+      else if (GameContext == GameContext.Hand && !Registry.CapabilitiesService.AnyBrowserOpen())
       {
         GameContext = GameContext.Hovering;
       }
@@ -605,12 +604,12 @@ namespace Dreamtides.Components
         return;
       }
 
-      var mousePositionInStartingPlane = _registry.InputService.WorldPointerPosition(
+      var mousePositionInStartingPlane = Registry.InputService.WorldPointerPosition(
         _dragStartScreenZ
       );
       _distanceDragged = Vector2.Distance(mousePositionInStartingPlane, _dragStartPosition);
 
-      if (_isDraggingForOrdering || _registry.IsLandscape)
+      if (_isDraggingForOrdering || Registry.IsLandscape)
       {
         transform.position = mousePositionInStartingPlane + _dragOffset;
       }
@@ -622,20 +621,20 @@ namespace Dreamtides.Components
         if (_distanceDragged > playThreshold || _draggedToPlayThreshold)
         {
           _draggedToPlayThreshold = true;
-          transform.position = _registry.InputService.WorldPointerPosition(20f);
+          transform.position = Registry.InputService.WorldPointerPosition(20f);
         }
         else
         {
           float t = Mathf.Clamp01(_distanceDragged / playThreshold);
           Vector3 startPosition = _dragOffset + mousePositionInStartingPlane;
-          Vector3 endPosition = _registry.InputService.WorldPointerPosition(20f);
+          Vector3 endPosition = Registry.InputService.WorldPointerPosition(20f);
           transform.position = Vector3.Lerp(startPosition, endPosition, t);
         }
       }
 
       if (_distanceDragged > 0.25f)
       {
-        _registry.CardAnimationService.ClearInfoZoom();
+        Registry.CardAnimationService.ClearInfoZoom();
         _draggedToClearThreshold = true;
       }
 
@@ -646,16 +645,16 @@ namespace Dreamtides.Components
           && !_isDraggingForOrdering
         )
         {
-          _registry.CardEffectPreviewService.DisplayBattlePreview(playEffectPreview);
+          Registry.CardEffectPreviewService.DisplayBattlePreview(playEffectPreview);
         }
       }
     }
 
     public override void MouseUp(bool isSameObject)
     {
-      _registry.SoundService.PlayCardSound();
-      _registry.CardAnimationService.ClearInfoZoom();
-      _registry.CardAnimationService.IsPointerDownOnCard = false;
+      Registry.SoundService.PlayCardSound();
+      Registry.CardAnimationService.ClearInfoZoom();
+      Registry.CardAnimationService.IsPointerDownOnCard = false;
 
       if (
         CardView.Revealed?.Actions?.OnClick is { } onClick
@@ -663,14 +662,14 @@ namespace Dreamtides.Components
         && (Time.time - _lastMouseDownTime < 1f)
       )
       {
-        _registry.ActionService.PerformAction(onClick.ToGameAction());
+        Registry.ActionService.PerformAction(onClick.ToGameAction());
       }
 
       if (_isDraggingForOrdering)
       {
         _isDraggingFromHand = false;
         _isDraggingForOrdering = false;
-        _registry.SoundService.PlayCardSound();
+        Registry.SoundService.PlayCardSound();
         var action = new GameAction
         {
           GameActionClass = new()
@@ -680,7 +679,7 @@ namespace Dreamtides.Components
               BattleActionClass = new()
               {
                 SelectOrderForDeckCard =
-                  _registry.Layout.CardOrderSelector.SelectCardOrderWithinDisplay(
+                  Registry.Layout.CardOrderSelector.SelectCardOrderWithinDisplay(
                     transform,
                     Errors.CheckNotNull(CardView.Revealed?.Actions?.CanSelectOrder)
                   ),
@@ -689,13 +688,13 @@ namespace Dreamtides.Components
           },
         };
 
-        _registry.ActionService.PerformAction(action);
+        Registry.ActionService.PerformAction(action);
       }
       else if (ShouldReturnToPreviousParentOnRelease())
       {
-        _registry.CardEffectPreviewService.ClearBattlePreview();
-        _registry.CardService.AddToParent(this);
-        _registry.CardService.RunAnimations(() =>
+        Registry.CardEffectPreviewService.ClearBattlePreview();
+        Registry.CardService.AddToParent(this);
+        Registry.CardService.RunAnimations(() =>
         {
           _isDraggingFromHand = false;
         });
@@ -705,13 +704,13 @@ namespace Dreamtides.Components
         _isDraggingFromHand = false;
         if (CardView.Revealed?.Actions?.OnPlaySound is { } onPlaySound)
         {
-          _registry.SoundService.Play(onPlaySound);
+          Registry.SoundService.Play(onPlaySound);
         }
         else
         {
-          _registry.SoundService.PlayWhooshSound();
+          Registry.SoundService.PlayWhooshSound();
         }
-        _registry.ActionService.PerformAction(
+        Registry.ActionService.PerformAction(
           Errors.CheckNotNull(CardView.Revealed?.Actions?.CanPlay?.ToGameAction())
         );
       }
@@ -720,7 +719,7 @@ namespace Dreamtides.Components
     public override void MouseHoverStart()
     {
       if (
-        _registry.CapabilitiesService.CanInfoZoom(GameContext, CardView.Position.Position)
+        Registry.CapabilitiesService.CanInfoZoom(GameContext, CardView.Position.Position)
         && CardView.Revealed != null
         && GameContext != GameContext.Hovering
       )
@@ -734,7 +733,7 @@ namespace Dreamtides.Components
     {
       if (Time.time - _hoverStartTime > 0.15f && _hoveringForInfoZoom && !_longHoverFired)
       {
-        _registry.CardAnimationService.DisplayInfoZoom(this, forCardInHand: false);
+        Registry.CardAnimationService.DisplayInfoZoom(this, forCardInHand: false);
         _longHoverFired = true;
       }
     }
@@ -743,7 +742,7 @@ namespace Dreamtides.Components
     {
       if (_hoveringForInfoZoom)
       {
-        _registry.CardAnimationService.ClearInfoZoom();
+        Registry.CardAnimationService.ClearInfoZoom();
         _hoveringForInfoZoom = false;
         _longHoverFired = false;
       }
@@ -802,13 +801,13 @@ namespace Dreamtides.Components
     {
       // Keep card above user's finger on mobile so they can read it.
       var screenZ = Camera.main.WorldToScreenPoint(gameObject.transform.position).z;
-      var worldPosition = _registry.InputService.WorldPointerPosition(screenZ);
+      var worldPosition = Registry.InputService.WorldPointerPosition(screenZ);
       var offset = gameObject.transform.position - worldPosition;
       var target = transform.position + new Vector3(0, 3, Mathf.Max(1.75f, 3.25f - offset.z));
       target.x = Mathf.Clamp(
         target.x,
-        _registry.Layout.InfoZoomLeft.position.x,
-        _registry.Layout.InfoZoomRight.position.x
+        Registry.Layout.InfoZoomLeft.position.x,
+        Registry.Layout.InfoZoomRight.position.x
       );
       target.y = Mathf.Clamp(target.y, 20f, 25f);
       target.z = Mathf.Clamp(target.z, -25f, -20f);
@@ -825,7 +824,7 @@ namespace Dreamtides.Components
         return true;
       }
 
-      var mousePosition = _registry.InputService.WorldPointerPosition(_dragStartScreenZ);
+      var mousePosition = Registry.InputService.WorldPointerPosition(_dragStartScreenZ);
       var zDistance = mousePosition.z - _dragStartPosition.z;
       return zDistance < 1f;
     }
@@ -833,7 +832,7 @@ namespace Dreamtides.Components
     bool CanPlay() =>
       CardView.Revealed?.Actions.CanPlay is { } canPlay
       && !canPlay.IsNull
-      && _registry.CapabilitiesService.CanPlayCards()
+      && Registry.CapabilitiesService.CanPlayCards()
       && (GameContext == GameContext.Hand || GameContext == GameContext.Hovering);
 
     bool CanSelectOrder() =>

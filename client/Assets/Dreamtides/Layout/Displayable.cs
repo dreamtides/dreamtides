@@ -1,5 +1,7 @@
 #nullable enable
 
+using System;
+using Dreamtides.Services;
 using Dreamtides.Utils;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -19,7 +21,50 @@ namespace Dreamtides.Layout
 
     [SerializeField]
     GameContext _internalGameContext;
+
     ObjectLayout? _parent;
+    bool _initialized;
+    Registry _registry = null!;
+    GameMode _mode = GameMode.MainMenu;
+    TestConfiguration? _testConfiguration;
+
+    protected Registry Registry =>
+      _initialized ? _registry : throw new InvalidOperationException($"{name} not initialized!");
+
+    protected GameMode Mode =>
+      _initialized ? _mode : throw new InvalidOperationException($"{name} not initialized!");
+
+    protected TestConfiguration? TestConfiguration =>
+      _initialized
+        ? _testConfiguration
+        : throw new InvalidOperationException($"{name} not initialized!");
+
+    public void Initialize(Registry registry, GameMode mode, TestConfiguration? testConfiguration)
+    {
+      if (_initialized)
+      {
+        throw new InvalidOperationException($"{name} already initialized!");
+      }
+
+      _initialized = true;
+      _registry = registry;
+      _mode = mode;
+      _testConfiguration = testConfiguration;
+      OnInitialize();
+    }
+
+    public void Initialize(Displayable displayable)
+    {
+      Initialize(displayable.Registry, displayable.Mode, displayable.TestConfiguration);
+    }
+
+    /// <summary>
+    /// Do not override or hide this method. Use <see cref="OnInitialize"/>
+    /// instead.
+    /// </summary>
+    public void Start() { }
+
+    protected virtual void OnInitialize() { }
 
     /// <summary>
     /// If true, this object will not be modified by the layout system.
@@ -72,15 +117,18 @@ namespace Dreamtides.Layout
     /// </summary>
     public SortingGroup? SortingGroup => _sortingGroup;
 
-    protected void Start()
+    public void Update()
     {
-      OnStart();
+      if (_initialized)
+      {
+        OnUpdate();
+      }
     }
 
     /// <summary>
-    /// Invoked when the displayable is created.
+    /// Invoked every frame once the object is initialized.
     /// </summary>
-    protected virtual void OnStart() { }
+    protected virtual void OnUpdate() { }
 
     /// <summary>
     /// Should return true if this game object can currently handle a MouseDown or MouseHoverStart event.
@@ -146,5 +194,40 @@ namespace Dreamtides.Layout
     public bool HasGameContext => _internalGameContext != GameContext.Unspecified;
 
     protected virtual void OnSetGameContext(GameContext oldContext, GameContext newContext) { }
+
+#if UNITY_EDITOR
+    void Reset()
+    {
+      var registries = FindObjectsByType<Registry>(
+        FindObjectsInactive.Include,
+        FindObjectsSortMode.None
+      );
+      var currentScene = gameObject.scene;
+      var count = 0;
+      var found = (Registry)null!;
+      foreach (var r in registries)
+      {
+        if (r.gameObject.scene == currentScene)
+        {
+          count++;
+          found = r;
+          if (count > 1)
+          {
+            break;
+          }
+        }
+      }
+      if (count == 1)
+      {
+        _registry = found;
+        return;
+      }
+      if (count == 0)
+      {
+        throw new InvalidOperationException("No Registry found in this scene.");
+      }
+      throw new InvalidOperationException("Multiple Registry components found in this scene.");
+    }
+#endif
   }
 }
