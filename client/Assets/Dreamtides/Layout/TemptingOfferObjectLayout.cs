@@ -21,6 +21,9 @@ namespace Dreamtides.Layout
     float _acceptButtonScale = 0.25f;
 
     [SerializeField]
+    float _landscapeScaleOverride = 1.0f;
+
+    [SerializeField]
     DisplayableButton _acceptButtonPrefab = null!;
 
     readonly List<DisplayableButton> _acceptButtons = new();
@@ -69,6 +72,22 @@ namespace Dreamtides.Layout
     protected override void OnAppliedLayout()
     {
       base.OnAppliedLayout();
+      UpdateLayoutScale();
+    }
+
+    protected override void OnUpdate()
+    {
+      base.OnUpdate();
+      UpdateLayoutScale();
+    }
+
+    void UpdateLayoutScale()
+    {
+      var targetScale = Registry.IsLandscape ? _landscapeScaleOverride : 1.0f;
+      if (!Mathf.Approximately(transform.localScale.x, targetScale))
+      {
+        transform.localScale = Vector3.one * targetScale;
+      }
     }
 
     public override Vector3 CalculateObjectPosition(int index, int count)
