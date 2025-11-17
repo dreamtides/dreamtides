@@ -24,11 +24,35 @@ namespace Dreamtides.Layout
     float _landscapeScaleOverride = 1.0f;
 
     [SerializeField]
+    float _landscapeHorizontalSpacingOverride = 0f;
+
+    [SerializeField]
+    float _landscapeVerticalSpacingOverride = 0f;
+
+    [SerializeField]
+    Vector2 _landscapeAcceptButtonOffset;
+
+    [SerializeField]
     DisplayableButton _acceptButtonPrefab = null!;
 
     readonly List<DisplayableButton> _acceptButtons = new();
     readonly Dictionary<long, ButtonView> _buttonViewsByOfferNumber = new();
     readonly ButtonView _defaultButtonView = new() { Label = DefaultButtonLabel };
+
+    float EffectiveHorizontalSpacing =>
+      IsLandscape() && _landscapeHorizontalSpacingOverride > 0f
+        ? _landscapeHorizontalSpacingOverride
+        : HorizontalSpacing;
+
+    float EffectiveVerticalSpacing =>
+      IsLandscape() && _landscapeVerticalSpacingOverride > 0f
+        ? _landscapeVerticalSpacingOverride
+        : VerticalSpacing;
+
+    Vector2 EffectiveAcceptButtonOffset =>
+      IsLandscape() && _landscapeAcceptButtonOffset != Vector2.zero
+        ? _landscapeAcceptButtonOffset
+        : _acceptButtonOffset;
 
     public void SetOfferActions(IReadOnlyList<TemptingOfferAction>? actions)
     {
@@ -56,7 +80,7 @@ namespace Dreamtides.Layout
 
     protected override void OnStart()
     {
-      var targetScale = Registry.IsLandscape ? _landscapeScaleOverride : 1.0f;
+      var targetScale = IsLandscape() ? _landscapeScaleOverride : 1.0f;
       if (!Mathf.Approximately(transform.localScale.x, targetScale))
       {
         transform.localScale = Vector3.one * targetScale;
@@ -115,7 +139,9 @@ namespace Dreamtides.Layout
           referenceTransform.position,
           referenceTransform.rotation
         );
-        var offset = transform.right * _acceptButtonOffset.x + transform.up * _acceptButtonOffset.y;
+        var offset =
+          transform.right * EffectiveAcceptButtonOffset.x
+          + transform.up * EffectiveAcceptButtonOffset.y;
         button.transform.position += offset;
         var offerNumber = GetOfferNumberForRow(rowIndex);
         var view = ResolveButtonView(offerNumber);
@@ -157,7 +183,7 @@ namespace Dreamtides.Layout
       {
         return 0f;
       }
-      return columnIndex == 0 ? -HorizontalSpacing / 2f : HorizontalSpacing / 2f;
+      return columnIndex == 0 ? -EffectiveHorizontalSpacing / 2f : EffectiveHorizontalSpacing / 2f;
     }
 
     float GetVerticalOffset(int rowIndex, int rowCount)
@@ -166,8 +192,8 @@ namespace Dreamtides.Layout
       {
         return 0f;
       }
-      var totalHeight = VerticalSpacing * (rowCount - 1);
-      return totalHeight / 2f - rowIndex * VerticalSpacing;
+      var totalHeight = EffectiveVerticalSpacing * (rowCount - 1);
+      return totalHeight / 2f - rowIndex * EffectiveVerticalSpacing;
     }
 
     long? GetOfferNumberForRow(int rowIndex)
@@ -220,8 +246,8 @@ namespace Dreamtides.Layout
     {
       Gizmos.color = Color.blue;
       var center = transform.position;
-      var halfLayoutX = CardWidth / 2f + HorizontalSpacing / 2f;
-      var halfLayoutY = CardHeight / 2f + VerticalSpacing / 2f;
+      var halfLayoutX = CardWidth / 2f + EffectiveHorizontalSpacing / 2f;
+      var halfLayoutY = CardHeight / 2f + EffectiveVerticalSpacing / 2f;
       var right = transform.right;
       var upAxis = transform.up;
       Gizmos.DrawSphere(center, 0.15f);

@@ -242,6 +242,14 @@ namespace Dreamtides.Layout
 
     public bool HasGameContext => _internalGameContext != GameContext.Unspecified;
 
+    public bool IsLandscape() =>
+      Application.isPlaying && _initialized ? Registry.IsLandscape : Screen.width > Screen.height;
+
+    public bool IsMobileDevice() =>
+      Application.isPlaying && _initialized
+        ? Registry.IsMobileDevice
+        : UnityEngine.Device.Application.isMobilePlatform;
+
     protected virtual void OnSetGameContext(GameContext oldContext, GameContext newContext) { }
 
 #if UNITY_EDITOR
