@@ -147,8 +147,9 @@ namespace Dreamtides.Layout
         button.transform.position += offset;
         var offerNumber = GetOfferNumberForRow(rowIndex);
         var view = ResolveButtonView(offerNumber);
+        var targetScale = _acceptButtonScale * Vector3.one;
+        button.SetDefaultScale(targetScale);
         button.SetView(view);
-        button.transform.localScale = _acceptButtonScale * Vector3.one;
       }
     }
 

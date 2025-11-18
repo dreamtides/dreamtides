@@ -45,6 +45,7 @@ namespace Dreamtides.Buttons
     bool _ignoreClick = false;
     Material? _materialBeforePress;
     bool _awaitingNextSetView = false;
+    Vector3 _defaultScale = Vector3.one;
 
     private readonly Color _enabledColor = Color.white;
     private readonly Color _disabledColor = new Color(0.7f, 0.7f, 0.7f);
@@ -52,6 +53,13 @@ namespace Dreamtides.Buttons
     protected override void OnInitialize()
     {
       _collider.enabled = _isVisible;
+      _defaultScale = transform.localScale;
+    }
+
+    public void SetDefaultScale(Vector3 scale)
+    {
+      _defaultScale = scale;
+      transform.localScale = scale;
     }
 
     public void SetView(ButtonView? view)
@@ -120,7 +128,8 @@ namespace Dreamtides.Buttons
       _materialBeforePress = _background.material;
       _background.material = _noOutlineMaterial;
       _currentAnimation = TweenUtils.Sequence("DisplayableButtonPress");
-      _currentAnimation.Insert(0, transform.DOScale(_onPressScale, _animationDuration));
+      var targetScale = _defaultScale * _onPressScale;
+      _currentAnimation.Insert(0, transform.DOScale(targetScale, _animationDuration));
       _currentAnimation.OnComplete(() => _isAnimating = false);
     }
 
@@ -151,7 +160,7 @@ namespace Dreamtides.Buttons
       _currentAnimation?.Kill();
       _isAnimating = true;
       _currentAnimation = TweenUtils.Sequence("DisplayableButtonRelease");
-      _currentAnimation.Insert(0, transform.DOScale(1f, _animationDuration));
+      _currentAnimation.Insert(0, transform.DOScale(_defaultScale, _animationDuration));
       _currentAnimation.Insert(0, _background.DOFade(0f, _animationDuration));
       _currentAnimation.Insert(0, _text.DOFade(0f, _animationDuration));
       _currentAnimation.OnComplete(() =>
@@ -175,7 +184,7 @@ namespace Dreamtides.Buttons
     void ResetPressVisualStateImmediate()
     {
       _currentAnimation?.Kill();
-      transform.localScale = Vector3.one;
+      transform.localScale = _defaultScale;
       if (_materialBeforePress != null)
       {
         _background.material = _materialBeforePress;
