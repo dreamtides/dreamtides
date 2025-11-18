@@ -28,10 +28,10 @@ namespace Dreamtides.Layout
     RectTransform? _closeSiteButton;
 
     [SerializeField]
-    Vector2 _closeButtonCanvasOffsetPortrait;
+    Vector2 _portraitCloseButtonOffset;
 
     [SerializeField]
-    Vector2 _closeButtonCanvasOffsetLandscape;
+    Vector2 _landscapeCloseButtonOffset;
 
     [SerializeField]
     bool _preserveLayoutOnRemoval;
@@ -61,6 +61,14 @@ namespace Dreamtides.Layout
       _preservedInitialCount = null;
       _displayableToIndex.Clear();
       _nextSlotIndex = 0;
+    }
+
+    protected override void OnUpdateObjectLayout()
+    {
+      if (DebugUpdateContinuously)
+      {
+        PositionCloseButtonInTopRightCorner();
+      }
     }
 
     public override Vector3 CalculateObjectPosition(int index, int count)
@@ -128,9 +136,7 @@ namespace Dreamtides.Layout
 
     void PositionCloseButtonInTopRightCorner()
     {
-      var count = Objects.Count;
-
-      if (!_closeSiteButton)
+      if (!_closeSiteButton || Objects.Count == 0)
       {
         return;
       }
@@ -142,31 +148,117 @@ namespace Dreamtides.Layout
         TweenUtils.FadeInCanvasGroup(ComponentUtils.Get<CanvasGroup>(_closeSiteButton));
       }
 
+      var camera = Registry.MainCamera;
+      if (!camera)
+      {
+        return;
+      }
+
+      var anchor = Objects[Objects.Count - 1].transform.position;
+      if (TryGetTopRightColliderCenter(camera, out var colliderCenter))
+      {
+        anchor = colliderCenter;
+      }
+
+      var worldTarget = GetCloseButtonWorldPosition(anchor);
       var canvas = Registry.Canvas;
-      var isLandscape = Registry.IsLandscape;
-      var topRowCount = isLandscape && !_forceTwoRows ? count : (count + 1) / 2;
-      var topRightIndex = isLandscape && !_forceTwoRows ? count - 1 : topRowCount - 1;
-
-      var target = Objects[topRightIndex];
-      var targetWorld = target.transform.position;
-
-      var screenPoint = Registry.MainCamera.WorldToScreenPoint(targetWorld);
-
       var rootRect = canvas.GetComponent<RectTransform>();
-      RectTransformUtility.ScreenPointToLocalPointInRectangle(
-        rootRect,
-        screenPoint,
-        null,
-        out var rootLocal
-      );
+      if (
+        !RectTransformUtility.ScreenPointToLocalPointInRectangle(
+          rootRect,
+          camera.WorldToScreenPoint(worldTarget),
+          null,
+          out var rootLocal
+        )
+      )
+      {
+        return;
+      }
 
-      var worldOnCanvas = rootRect.TransformPoint(rootLocal);
+      var halfSize = GetButtonHalfSizeInRootSpace(rootRect, _closeSiteButton);
+      var clampedRootLocal = ClampToCanvasBounds(rootLocal, rootRect.rect, halfSize);
+      var worldOnCanvas = rootRect.TransformPoint(
+        new Vector3(clampedRootLocal.x, clampedRootLocal.y, 0f)
+      );
       var parent = _closeSiteButton.parent as RectTransform ?? rootRect;
       var parentLocal = parent.InverseTransformPoint(worldOnCanvas);
-      var offset = Registry.IsLandscape
-        ? _closeButtonCanvasOffsetLandscape
-        : _closeButtonCanvasOffsetPortrait;
-      _closeSiteButton.anchoredPosition = new Vector2(parentLocal.x, parentLocal.y) + offset;
+      _closeSiteButton.anchoredPosition = new Vector2(parentLocal.x, parentLocal.y);
+    }
+
+    Vector3 GetCloseButtonWorldPosition(Vector3 anchor)
+    {
+      var offset = Registry.IsLandscape ? _landscapeCloseButtonOffset : _portraitCloseButtonOffset;
+      var worldOffset = transform.right * offset.x + transform.up * offset.y;
+      return anchor + worldOffset;
+    }
+
+    static Vector2 ClampToCanvasBounds(Vector2 rootLocal, Rect rect, Vector2 halfSize)
+    {
+      var minX = rect.xMin + halfSize.x;
+      var maxX = rect.xMax - halfSize.x;
+      var minY = rect.yMin + halfSize.y;
+      var maxY = rect.yMax - halfSize.y;
+      if (maxX < minX)
+      {
+        var midX = (rect.xMin + rect.xMax) * 0.5f;
+        minX = midX;
+        maxX = midX;
+      }
+      if (maxY < minY)
+      {
+        var midY = (rect.yMin + rect.yMax) * 0.5f;
+        minY = midY;
+        maxY = midY;
+      }
+      var x = Mathf.Clamp(rootLocal.x, minX, maxX);
+      var y = Mathf.Clamp(rootLocal.y, minY, maxY);
+      return new Vector2(x, y);
+    }
+
+    static Vector2 GetButtonHalfSizeInRootSpace(RectTransform root, RectTransform button)
+    {
+      var bounds = RectTransformUtility.CalculateRelativeRectTransformBounds(root, button);
+      return new Vector2(bounds.extents.x, bounds.extents.y);
+    }
+
+    bool TryGetTopRightColliderCenter(Camera camera, out Vector3 center)
+    {
+      const float verticalTolerance = 0.1f;
+      var found = false;
+      var bestViewport = Vector2.zero;
+      var bestCenter = Vector3.zero;
+      foreach (var displayable in Objects)
+      {
+        var colliders = displayable.GetComponentsInChildren<BoxCollider>(true);
+        foreach (var collider in colliders)
+        {
+          if (!collider || !collider.enabled)
+          {
+            continue;
+          }
+          var worldCenter = collider.bounds.center;
+          var viewport = camera.WorldToViewportPoint(worldCenter);
+          if (viewport.z <= 0f)
+          {
+            continue;
+          }
+          if (
+            !found
+            || viewport.y > bestViewport.y + verticalTolerance
+            || (
+              Mathf.Abs(viewport.y - bestViewport.y) <= verticalTolerance
+              && viewport.x > bestViewport.x
+            )
+          )
+          {
+            bestViewport = new Vector2(viewport.x, viewport.y);
+            bestCenter = worldCenter;
+            found = true;
+          }
+        }
+      }
+      center = bestCenter;
+      return found;
     }
 
     void OnDrawGizmosSelected()

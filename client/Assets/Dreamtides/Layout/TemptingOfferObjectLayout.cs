@@ -80,10 +80,12 @@ namespace Dreamtides.Layout
 
     protected override void OnStart()
     {
-      var targetScale = IsLandscape() ? _landscapeScaleOverride : 1.0f;
-      if (!Mathf.Approximately(transform.localScale.x, targetScale))
+      if (IsLandscape() && _landscapeScaleOverride > 0f)
       {
-        transform.localScale = Vector3.one * targetScale;
+        if (!Mathf.Approximately(transform.localScale.x, _landscapeScaleOverride))
+        {
+          transform.localScale = Vector3.one * _landscapeScaleOverride;
+        }
       }
     }
 
