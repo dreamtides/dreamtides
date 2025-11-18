@@ -437,7 +437,66 @@ namespace Dreamtides.Prototype
     }
 
     ObjectPosition ClonePositionWithSorting(ObjectPosition basePosition, int sortingKey) =>
-      new() { Position = basePosition.Position, SortingKey = sortingKey };
+      new()
+      {
+        Position = ClonePosition(basePosition.Position, sortingKey),
+        SortingKey = sortingKey,
+      };
+
+    Position ClonePosition(Position basePosition, int sortingKey)
+    {
+      if (basePosition.Enum != null)
+      {
+        return new Position { Enum = basePosition.Enum };
+      }
+      if (basePosition.PositionClass != null)
+      {
+        return new Position
+        {
+          PositionClass = ClonePositionClass(basePosition.PositionClass, sortingKey),
+        };
+      }
+      return new Position();
+    }
+
+    PositionClass ClonePositionClass(PositionClass baseClass, int sortingKey)
+    {
+      var clone = new PositionClass
+      {
+        OnStack = baseClass.OnStack,
+        InHand = baseClass.InHand,
+        InDeck = baseClass.InDeck,
+        InVoid = baseClass.InVoid,
+        InBanished = baseClass.InBanished,
+        OnBattlefield = baseClass.OnBattlefield,
+        InPlayerStatus = baseClass.InPlayerStatus,
+        CardOrderSelector = baseClass.CardOrderSelector,
+        InDreamwell = baseClass.InDreamwell,
+        HiddenWithinCard = baseClass.HiddenWithinCard,
+        AboveVoid = baseClass.AboveVoid,
+        SiteDeck = baseClass.SiteDeck,
+        SiteNpc = baseClass.SiteNpc,
+        TemptingOfferDisplay = CloneTemptingOfferPosition(
+          baseClass.TemptingOfferDisplay,
+          sortingKey
+        ),
+      };
+      return clone;
+    }
+
+    TemptingOfferPosition? CloneTemptingOfferPosition(
+      TemptingOfferPosition? basePosition,
+      int sortingKey
+    )
+    {
+      if (basePosition == null)
+      {
+        return null;
+      }
+      var offerType = sortingKey % 2 == 0 ? TemptingOfferType.Journey : TemptingOfferType.Cost;
+      var offerNumber = sortingKey / 2;
+      return new TemptingOfferPosition { Number = offerNumber, OfferType = offerType };
+    }
 
     string BuildSpritePath(long imageNumber) =>
       $"Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_{imageNumber}.png";
