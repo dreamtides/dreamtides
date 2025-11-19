@@ -523,7 +523,7 @@ public class PrototypeQuestTemptingOfferFlow
         Actions = new CardActions(),
         CardType = "Event",
         Cost = "2",
-        Effects = new CardEffects(),
+        Effects = new CardEffects { Dissolved = true },
         Image = new DisplayImage
         {
           Sprite = new SpriteAddress

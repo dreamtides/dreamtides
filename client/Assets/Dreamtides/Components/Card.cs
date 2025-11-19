@@ -773,13 +773,13 @@ namespace Dreamtides.Components
       else if (_isDissolved)
       {
         _cardBack.gameObject.SetActive(false);
-        _cardFront.gameObject.SetActive(!GameContext.IsBattlefieldContext());
-        _battlefieldCardFront.gameObject.SetActive(GameContext.IsBattlefieldContext());
-        _cardFrame.gameObject.SetActive(!GameContext.IsBattlefieldContext());
+        _cardFront.gameObject.SetActive(!BattlefieldMode());
+        _battlefieldCardFront.gameObject.SetActive(BattlefieldMode());
+        _cardFrame.gameObject.SetActive(!BattlefieldMode());
         _battlefieldSparkBackground.gameObject.SetActive(false);
         _battlefieldOutline.gameObject.SetActive(false);
       }
-      else if (HasGameContext && GameContext.IsBattlefieldContext())
+      else if (BattlefieldMode())
       {
         _cardBack.gameObject.SetActive(false);
         _cardFront.gameObject.SetActive(false);
@@ -809,6 +809,8 @@ namespace Dreamtides.Components
         _cardFrame.gameObject.SetActive(true);
       }
     }
+
+    bool BattlefieldMode() => HasGameContext && GameContext.IsBattlefieldContext();
 
     Vector3 MobileHandCardJumpPosition()
     {

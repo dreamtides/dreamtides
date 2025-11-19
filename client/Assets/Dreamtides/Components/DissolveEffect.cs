@@ -16,6 +16,7 @@ namespace Dreamtides.Components
 
     [SerializeField]
     Material _originalMaterial = null!;
+
     bool _running = false;
     float _clipValue = 0;
     bool _reverse = false;
