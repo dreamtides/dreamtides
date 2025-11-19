@@ -353,6 +353,8 @@ public class PrototypeQuestTemptingOfferFlow
       yield break;
     }
     var update = new UpdateQuestCommand { Quest = new QuestView { Cards = updateCards } };
+    _registry.DreamscapeService.HideCloseSiteButton();
+    _registry.DreamscapeLayout.TemptingOfferDisplay.HideAcceptButtons();
     var sequence = TweenUtils.Sequence("TemptingOfferJourneyResolution");
     sequence.OnComplete(() => ApplyJourneyDissolve(journeyCardId));
     yield return _registry.CardService.HandleUpdateQuestCards(update, sequence);
