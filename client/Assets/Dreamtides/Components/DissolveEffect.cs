@@ -5,18 +5,15 @@ using AmazingAssets.AdvancedDissolve;
 using Dreamtides.Masonry;
 using Dreamtides.Schema;
 using Dreamtides.Services;
+using Dreamtides.Utils;
 using UnityEngine;
 
 namespace Dreamtides.Components
 {
   public class DissolveEffect : MonoBehaviour
   {
-    [SerializeField]
     Renderer _target = null!;
-
-    [SerializeField]
-    Material _originalMaterial = null!;
-
+    Material? _originalMaterial;
     bool _running = false;
     float _clipValue = 0;
     bool _reverse = false;
@@ -25,6 +22,12 @@ namespace Dreamtides.Components
     AudioClipAddress? _sound;
     bool _soundPlayed = false;
 
+    public void Initialize()
+    {
+      _target = ComponentUtils.Get<Renderer>(gameObject);
+      _originalMaterial = _target.material;
+    }
+
     public IEnumerator StartDissolve(Registry registry, DissolveCardCommand command)
     {
       _reverse = command.Reverse;
@@ -32,11 +35,6 @@ namespace Dreamtides.Components
       _registry = registry;
       _sound = command.Sound;
       _soundPlayed = false;
-
-      if (!_reverse)
-      {
-        _originalMaterial = _target.material;
-      }
 
       var material = Instantiate(registry.AssetService.GetMaterial(command.Material));
       material.mainTexture = _target.material.mainTexture;

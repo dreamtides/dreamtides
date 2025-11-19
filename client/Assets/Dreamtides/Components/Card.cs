@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using DG.Tweening;
 using Dreamtides.Buttons;
@@ -45,12 +46,6 @@ namespace Dreamtides.Components
 
     [SerializeField]
     internal SpriteRenderer _battlefieldCardImage = null!;
-
-    [SerializeField]
-    internal DissolveEffect _cardImageDissolve = null!;
-
-    [SerializeField]
-    internal DissolveEffect? _battlefieldFrameDissolve = null!;
 
     [SerializeField]
     internal BoxCollider _cardCollider = null!;
@@ -234,11 +229,24 @@ namespace Dreamtides.Components
       _isDissolved = true;
       ToggleActiveElements();
 
-      if (_battlefieldFrameDissolve)
+      var coroutines = new List<Coroutine>();
+      foreach (var renderer in GetComponentsInChildren<Renderer>())
       {
-        StartCoroutine(_battlefieldFrameDissolve.StartDissolve(Registry, command));
+        if (renderer.gameObject.activeInHierarchy && renderer.enabled)
+        {
+          var effect = renderer.GetComponent<DissolveEffect>();
+          if (!effect)
+          {
+            effect = renderer.gameObject.AddComponent<DissolveEffect>();
+            effect.Initialize();
+          }
+          coroutines.Add(StartCoroutine(effect.StartDissolve(Registry, command)));
+        }
       }
-      yield return StartCoroutine(_cardImageDissolve.StartDissolve(Registry, command));
+      foreach (var coroutine in coroutines)
+      {
+        yield return coroutine;
+      }
 
       if (command.Reverse)
       {
