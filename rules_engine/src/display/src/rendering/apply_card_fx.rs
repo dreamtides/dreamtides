@@ -257,6 +257,7 @@ fn dissolve_targets(
             .material(material.clone())
             .color(color)
             .reverse(reverse)
+            .keep_dissolve_material(false)
             .build();
         cmd.sound = row.dissolve_sound.as_ref().map(|v| v.as_ref().clone());
         if reverse {

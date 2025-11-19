@@ -469,7 +469,6 @@ namespace Dreamtides.Components
     void RenderRevealedCardView(RevealedCardView revealed)
     {
       _isRevealed = true;
-      _isDissolved = revealed.Effects?.Dissolved ?? false;
       ToggleActiveElements();
       _canvasCard.RenderRevealedCardView(revealed);
 

@@ -328,22 +328,25 @@ public class PrototypeQuestTemptingOfferFlow
 
   IEnumerator PlayDissolve(string cardId, bool reverse)
   {
-    var dissolveCommand = new DissolveCardCommand
+    var dissolveCommand = BuildReverseDissolveCommand(cardId, reverse);
+    yield return _registry.EffectService.HandleDissolveCommand(dissolveCommand);
+  }
+
+  DissolveCardCommand BuildReverseDissolveCommand(string cardId, bool reverse) =>
+    new DissolveCardCommand
     {
       Color = Mason.MakeColor("#FFC107"),
       Material = new MaterialAddress { Material = "Assets/Content/Dissolves/Dissolve15.mat" },
       Reverse = reverse,
       DissolveSpeed = 1f,
-      KeepDissolveMaterial = true,
       Sound = new AudioClipAddress
       {
         AudioClip =
           "Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Fire Magic/RPG3_FireMagicBall_LightImpact03.wav",
       },
       Target = cardId,
+      KeepDissolveMaterial = true,
     };
-    yield return _registry.EffectService.HandleDissolveCommand(dissolveCommand);
-  }
 
   IEnumerator ResolveTemptingOfferSelection(int offerNumber)
   {
@@ -378,10 +381,10 @@ public class PrototypeQuestTemptingOfferFlow
       };
       yield return _registry.CardService.HandleUpdateQuestCards(postUpdate);
       _prototypeCards.UpdateGroupCards(TemptingOfferGroupKey, postDissolveUpdate);
-      if (!string.IsNullOrEmpty(immolateCardId))
-      {
-        yield return PlayImmolateReverseDissolve(immolateCardId);
-      }
+      //   if (!string.IsNullOrEmpty(immolateCardId))
+      //   {
+      //     yield return PlayImmolateReverseDissolve(immolateCardId);
+      //   }
     }
   }
 
@@ -549,7 +552,10 @@ public class PrototypeQuestTemptingOfferFlow
         Actions = new CardActions(),
         CardType = "Event",
         Cost = "2",
-        Effects = new CardEffects { Dissolved = true },
+        Effects = new CardEffects
+        {
+          ReverseDissolveOnAppear = BuildReverseDissolveCommand(cardId, true),
+        },
         Image = new DisplayImage
         {
           Sprite = new SpriteAddress

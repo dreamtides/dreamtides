@@ -1970,12 +1970,6 @@ namespace Dreamtides.Schema
     public partial class CardEffects
     {
         /// <summary>
-        /// True if this card is currently hidden in the 'dissolved' state.
-        /// </summary>
-        [JsonProperty("dissolved", Required = Required.Always)]
-        public bool Dissolved { get; set; }
-
-        /// <summary>
         /// Ongoing visual effect to display for this card.
         ///
         /// If a previous effect with a different address is present, it will be
@@ -1984,6 +1978,14 @@ namespace Dreamtides.Schema
         /// </summary>
         [JsonProperty("looping_effect")]
         public EffectAddress LoopingEffect { get; set; }
+
+        /// <summary>
+        /// If provided, this card will play a 'fade in' reverse dissolve animation
+        /// when it is first created, using the provided dissolve command. The
+        /// 'target' of the command will be ignored.
+        /// </summary>
+        [JsonProperty("reverse_dissolve_on_appear")]
+        public DissolveCardCommand ReverseDissolveOnAppear { get; set; }
     }
 
     /// <summary>

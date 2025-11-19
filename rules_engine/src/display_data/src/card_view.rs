@@ -8,7 +8,7 @@ use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
 use crate::battle_view::{BattlePreviewView, ButtonView};
-use crate::command::StudioType;
+use crate::command::{DissolveCardCommand, StudioType};
 use crate::object_position::ObjectPosition;
 
 pub type ClientCardId = String;
@@ -159,8 +159,10 @@ pub struct CardEffects {
     /// is present, this will be ignored.
     pub looping_effect: Option<EffectAddress>,
 
-    /// True if this card is currently hidden in the 'dissolved' state.
-    pub dissolved: bool,
+    /// If provided, this card will play a 'fade in' reverse dissolve animation
+    /// when it is first created, using the provided dissolve command. The
+    /// 'target' of the command will be ignored.
+    pub reverse_dissolve_on_appear: Option<DissolveCardCommand>,
 }
 
 #[derive(Clone, Default, Debug, Serialize, Deserialize, JsonSchema)]
