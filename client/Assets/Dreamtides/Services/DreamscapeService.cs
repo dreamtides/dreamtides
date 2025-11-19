@@ -88,6 +88,7 @@ namespace Dreamtides.Services
     public void ApplyLayouts(Sequence? sequence)
     {
       Registry.DreamscapeLayout.DraftPickLayout.ApplyLayout(sequence);
+      Registry.DreamscapeLayout.DestroyedQuestCards.ApplyLayout(sequence);
       Registry.DreamscapeLayout.ShopLayout.ApplyLayout(sequence);
       Registry.DreamscapeLayout.DreamsignDisplay.ApplyLayout(sequence);
       Registry.DreamscapeLayout.JourneyChoiceDisplay.ApplyLayout(sequence);

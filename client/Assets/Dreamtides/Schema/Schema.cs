@@ -2686,6 +2686,9 @@ namespace Dreamtides.Schema
     ///
     /// User deck displayed in the quest view
     ///
+    /// Object is hidden after being destroyed during a quest, for example when
+    /// not selected for a draft pick.
+    ///
     /// Dreamsigns owned by the player in a quest
     ///
     /// Object is being displayed as a potential draft pick choice
@@ -2698,7 +2701,7 @@ namespace Dreamtides.Schema
     /// currently active quest. Similar to a card being on the stack during a
     /// battle.
     /// </summary>
-    public enum PositionEnum { Browser, Default, DraftPickDisplay, Drawn, DreamsignDisplay, DreamwellActivation, GameModifier, HandStorage, JourneyDisplay, Offscreen, OnScreenStorage, QuestDeck, QuestEffect, ShopDisplay };
+    public enum PositionEnum { Browser, Default, DestroyedQuestCards, DraftPickDisplay, Drawn, DreamsignDisplay, DreamwellActivation, GameModifier, HandStorage, JourneyDisplay, Offscreen, OnScreenStorage, QuestDeck, QuestEffect, ShopDisplay };
 
     /// <summary>
     /// Auto-generated discriminant enum variants
@@ -5208,6 +5211,8 @@ namespace Dreamtides.Schema
                             return new Position { Enum = PositionEnum.Browser };
                         case "Default":
                             return new Position { Enum = PositionEnum.Default };
+                        case "DestroyedQuestCards":
+                            return new Position { Enum = PositionEnum.DestroyedQuestCards };
                         case "DraftPickDisplay":
                             return new Position { Enum = PositionEnum.DraftPickDisplay };
                         case "Drawn":
@@ -5253,6 +5258,9 @@ namespace Dreamtides.Schema
                         return;
                     case PositionEnum.Default:
                         serializer.Serialize(writer, "Default");
+                        return;
+                    case PositionEnum.DestroyedQuestCards:
+                        serializer.Serialize(writer, "DestroyedQuestCards");
                         return;
                     case PositionEnum.DraftPickDisplay:
                         serializer.Serialize(writer, "DraftPickDisplay");
@@ -5450,6 +5458,8 @@ namespace Dreamtides.Schema
                     return PositionEnum.Browser;
                 case "Default":
                     return PositionEnum.Default;
+                case "DestroyedQuestCards":
+                    return PositionEnum.DestroyedQuestCards;
                 case "DraftPickDisplay":
                     return PositionEnum.DraftPickDisplay;
                 case "Drawn":
@@ -5493,6 +5503,9 @@ namespace Dreamtides.Schema
                     return;
                 case PositionEnum.Default:
                     serializer.Serialize(writer, "Default");
+                    return;
+                case PositionEnum.DestroyedQuestCards:
+                    serializer.Serialize(writer, "DestroyedQuestCards");
                     return;
                 case PositionEnum.DraftPickDisplay:
                     serializer.Serialize(writer, "DraftPickDisplay");

@@ -381,6 +381,11 @@ namespace Dreamtides.Services
         return Registry.Layout.Offscreen;
       }
 
+      if (position.Enum == PositionEnum.DestroyedQuestCards)
+      {
+        return Registry.DreamscapeLayout.DestroyedQuestCards;
+      }
+
       if (position.Enum == PositionEnum.DreamsignDisplay)
       {
         return Registry.DreamscapeLayout.DreamsignDisplay;

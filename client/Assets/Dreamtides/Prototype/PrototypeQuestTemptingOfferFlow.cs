@@ -348,7 +348,7 @@ public class PrototypeQuestTemptingOfferFlow
       Debug.LogWarning($"Unable to determine journey card for tempting offer {offerNumber}");
       yield break;
     }
-    if (!TryBuildJourneyQuestUpdate(journeyCardId, out var updateCards))
+    if (!TryBuildJourneyQuestUpdate(journeyCardId, offerNumber, out var updateCards))
     {
       yield break;
     }
@@ -361,7 +361,11 @@ public class PrototypeQuestTemptingOfferFlow
     _prototypeCards.UpdateGroupCards(TemptingOfferGroupKey, updateCards);
   }
 
-  bool TryBuildJourneyQuestUpdate(string journeyCardId, out List<CardView> updateCards)
+  bool TryBuildJourneyQuestUpdate(
+    string journeyCardId,
+    int selectedOfferNumber,
+    out List<CardView> updateCards
+  )
   {
     updateCards = new List<CardView>();
     var existing = _registry.CardService.GetCardIfExists(journeyCardId);
@@ -371,6 +375,8 @@ public class PrototypeQuestTemptingOfferFlow
       return false;
     }
     var allIds = _registry.CardService.GetCardIds().ToList();
+    var destroyedBase = _registry.DreamscapeLayout.DestroyedQuestCards.Objects.Count;
+    var destroyedOffset = 0;
     var sortingKey = _registry.DreamscapeLayout.QuestEffectPosition.Objects.Count;
     updateCards = new List<CardView>(allIds.Count);
     foreach (var id in allIds)
@@ -387,6 +393,21 @@ public class PrototypeQuestTemptingOfferFlow
           )
         );
       }
+      else if (
+        TryGetTemptingOfferIndex(id, out var cardIndex)
+        && GetOfferNumber(cardIndex) != selectedOfferNumber
+      )
+      {
+        var destroyedSorting = destroyedBase + destroyedOffset;
+        destroyedOffset++;
+        updateCards.Add(
+          PrototypeQuestCardViewFactory.CloneCardViewWithPosition(
+            source,
+            new Position { Enum = PositionEnum.DestroyedQuestCards },
+            destroyedSorting
+          )
+        );
+      }
       else
       {
         updateCards.Add(source);
@@ -394,4 +415,23 @@ public class PrototypeQuestTemptingOfferFlow
     }
     return true;
   }
+
+  bool TryGetTemptingOfferIndex(string cardId, out int index)
+  {
+    index = -1;
+    var prefix = $"{TemptingOfferGroupKey}-";
+    if (!cardId.StartsWith(prefix, StringComparison.Ordinal))
+    {
+      return false;
+    }
+    var suffix = cardId.Substring(prefix.Length);
+    if (!int.TryParse(suffix, out var parsed) || parsed <= 0)
+    {
+      return false;
+    }
+    index = parsed - 1;
+    return true;
+  }
+
+  static int GetOfferNumber(int cardIndex) => cardIndex / TemptingOfferCardsPerOffer;
 }

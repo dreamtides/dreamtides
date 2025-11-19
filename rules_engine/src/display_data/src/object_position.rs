@@ -103,6 +103,10 @@ pub enum Position {
     /// User deck displayed in the quest view
     QuestDeck,
 
+    /// Object is hidden after being destroyed during a quest, for example when
+    /// not selected for a draft pick.
+    DestroyedQuestCards,
+
     /// Dreamsigns owned by the player in a quest
     DreamsignDisplay,
 
