@@ -388,7 +388,13 @@ public class PrototypeQuestTemptingOfferFlow
         updateCards.Add(
           PrototypeQuestCardViewFactory.CloneCardViewWithPosition(
             source,
-            new Position { Enum = PositionEnum.QuestEffect },
+            new Position
+            {
+              PositionClass = new PositionClass
+              {
+                QuestEffect = QuestEffectCardType.BattlefieldCard,
+              },
+            },
             sortingKey
           )
         );
@@ -407,7 +413,7 @@ public class PrototypeQuestTemptingOfferFlow
             {
               PositionClass = new PositionClass
               {
-                DestroyedQuestCards = DestroyedQuestCardsType.BattlefieldCard,
+                DestroyedQuestCards = QuestEffectCardType.BattlefieldCard,
               },
             },
             destroyedSorting

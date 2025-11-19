@@ -391,11 +391,6 @@ namespace Dreamtides.Services
         return Registry.DreamscapeLayout.JourneyChoiceDisplay;
       }
 
-      if (position.Enum == PositionEnum.QuestEffect)
-      {
-        return Registry.DreamscapeLayout.QuestEffectPosition;
-      }
-
       if (position.PositionClass == null)
       {
         throw new InvalidOperationException($"Unknown layout position enum: ${position.Enum}");
@@ -529,11 +524,23 @@ namespace Dreamtides.Services
       {
         return destroyedQuestCards switch
         {
-          DestroyedQuestCardsType.BattlefieldCard => Registry
+          QuestEffectCardType.FullCard => Registry.DreamscapeLayout.DestroyedQuestCards,
+          QuestEffectCardType.BattlefieldCard => Registry
             .DreamscapeLayout
             .DestroyedQuestCardsBattlefield,
-          DestroyedQuestCardsType.FullCard => Registry.DreamscapeLayout.DestroyedQuestCards,
           _ => throw Errors.UnknownEnumValue(destroyedQuestCards),
+        };
+      }
+
+      if (position.PositionClass.QuestEffect is { } questEffect)
+      {
+        return questEffect switch
+        {
+          QuestEffectCardType.FullCard => Registry.DreamscapeLayout.QuestEffectPosition,
+          QuestEffectCardType.BattlefieldCard => Registry
+            .DreamscapeLayout
+            .QuestEffectBattlefieldPosition,
+          _ => throw Errors.UnknownEnumValue(questEffect),
         };
       }
 

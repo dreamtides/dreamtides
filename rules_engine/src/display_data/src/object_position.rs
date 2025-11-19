@@ -105,7 +105,7 @@ pub enum Position {
 
     /// Object is hidden after being destroyed during a quest, for example when
     /// not selected for a draft pick.
-    DestroyedQuestCards(DestroyedQuestCardsType),
+    DestroyedQuestCards(QuestEffectCardType),
 
     /// Dreamsigns owned by the player in a quest
     DreamsignDisplay,
@@ -133,7 +133,7 @@ pub enum Position {
     /// Object is being displayed prominently, applying an effect to the
     /// currently active quest. Similar to a card being on the stack during a
     /// battle.
-    QuestEffect,
+    QuestEffect(QuestEffectCardType),
 }
 
 #[derive(
@@ -157,7 +157,7 @@ pub struct TemptingOfferPosition {
 #[derive(
     Copy, Clone, Debug, Eq, PartialEq, Hash, Serialize, Deserialize, Ord, PartialOrd, JsonSchema,
 )]
-pub enum DestroyedQuestCardsType {
+pub enum QuestEffectCardType {
     FullCard,
     BattlefieldCard,
 }

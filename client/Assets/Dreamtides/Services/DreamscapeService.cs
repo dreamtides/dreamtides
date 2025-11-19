@@ -95,6 +95,7 @@ namespace Dreamtides.Services
       Registry.DreamscapeLayout.JourneyChoiceDisplay.ApplyLayout(sequence);
       Registry.DreamscapeLayout.TemptingOfferDisplay.ApplyLayout(sequence);
       Registry.DreamscapeLayout.QuestEffectPosition.ApplyLayout(sequence);
+      Registry.DreamscapeLayout.QuestEffectBattlefieldPosition.ApplyLayout(sequence);
 
       _tmpSiteDeckLayout.ApplyLayout(sequence);
       _tmpMerchantPositionLayout.ApplyLayout(sequence);
