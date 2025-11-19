@@ -4,10 +4,12 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using DG.Tweening;
 using Dreamtides.Masonry;
 using Dreamtides.Prototype;
 using Dreamtides.Schema;
 using Dreamtides.Services;
+using Dreamtides.Utils;
 using UnityEngine;
 
 public class PrototypeQuestTemptingOfferFlow
@@ -50,7 +52,7 @@ public class PrototypeQuestTemptingOfferFlow
     if (int.TryParse(clickedId, out var offerNumber))
     {
       Debug.Log($"Tempting offer accepted for option {offerNumber}");
-      TryDissolveJourneyCard(offerNumber);
+      _registry.StartCoroutine(ResolveTemptingOfferSelection(offerNumber));
     }
     else
     {
@@ -309,17 +311,6 @@ public class PrototypeQuestTemptingOfferFlow
     }
   }
 
-  void TryDissolveJourneyCard(int offerNumber)
-  {
-    var journeyCardId = GetJourneyCardId(offerNumber);
-    if (journeyCardId == null)
-    {
-      Debug.LogWarning($"Unable to find journey card for tempting offer {offerNumber}");
-      return;
-    }
-    ApplyJourneyDissolve(journeyCardId);
-  }
-
   string? GetJourneyCardId(int offerNumber)
   {
     if (offerNumber < 0 || offerNumber >= TemptingOfferMaxOffers)
@@ -347,5 +338,58 @@ public class PrototypeQuestTemptingOfferFlow
     _registry.EffectService.StartCoroutine(
       _registry.EffectService.HandleDissolveCommand(dissolveCommand)
     );
+  }
+
+  IEnumerator ResolveTemptingOfferSelection(int offerNumber)
+  {
+    var journeyCardId = GetJourneyCardId(offerNumber);
+    if (journeyCardId == null)
+    {
+      Debug.LogWarning($"Unable to determine journey card for tempting offer {offerNumber}");
+      yield break;
+    }
+    if (!TryBuildJourneyQuestUpdate(journeyCardId, out var updateCards))
+    {
+      yield break;
+    }
+    var update = new UpdateQuestCommand { Quest = new QuestView { Cards = updateCards } };
+    var sequence = TweenUtils.Sequence("TemptingOfferJourneyResolution");
+    sequence.OnComplete(() => ApplyJourneyDissolve(journeyCardId));
+    yield return _registry.CardService.HandleUpdateQuestCards(update, sequence);
+    _prototypeCards.UpdateGroupCards(TemptingOfferGroupKey, updateCards);
+  }
+
+  bool TryBuildJourneyQuestUpdate(string journeyCardId, out List<CardView> updateCards)
+  {
+    updateCards = new List<CardView>();
+    var existing = _registry.CardService.GetCardIfExists(journeyCardId);
+    if (existing == null)
+    {
+      Debug.LogWarning($"Unable to find journey card with id {journeyCardId}");
+      return false;
+    }
+    var allIds = _registry.CardService.GetCardIds().ToList();
+    var sortingKey = _registry.DreamscapeLayout.QuestEffectPosition.Objects.Count;
+    updateCards = new List<CardView>(allIds.Count);
+    foreach (var id in allIds)
+    {
+      var card = _registry.CardService.GetCard(id);
+      var source = card.CardView;
+      if (id == journeyCardId)
+      {
+        updateCards.Add(
+          PrototypeQuestCardViewFactory.CloneCardViewWithPosition(
+            source,
+            new Position { Enum = PositionEnum.QuestEffect },
+            sortingKey
+          )
+        );
+      }
+      else
+      {
+        updateCards.Add(source);
+      }
+    }
+    return true;
   }
 }

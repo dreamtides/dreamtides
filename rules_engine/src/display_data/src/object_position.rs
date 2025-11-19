@@ -125,6 +125,11 @@ pub enum Position {
 
     /// Object is being displayed as an option in a tempting offer choice.
     TemptingOfferDisplay(TemptingOfferPosition),
+
+    /// Object is being displayed prominently, applying an effect to the
+    /// currently active quest. Similar to a card being on the stack during a
+    /// battle.
+    QuestEffect,
 }
 
 #[derive(

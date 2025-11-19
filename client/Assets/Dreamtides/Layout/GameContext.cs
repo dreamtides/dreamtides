@@ -17,6 +17,7 @@ namespace Dreamtides.Layout
     Hidden = 1,
     BattlefieldBackground = 4,
     Battlefield = 8,
+    BattlefieldEffect = 10,
     PlayerStatus = 12,
     Deck = 15,
     DiscardPile = 20,
@@ -50,6 +51,7 @@ namespace Dreamtides.Layout
         GameContext.Hidden => SortingLayer.NameToID("Hidden"),
         GameContext.BattlefieldBackground => SortingLayer.NameToID("BattlefieldBackground"),
         GameContext.Battlefield => SortingLayer.NameToID("Battlefield"),
+        GameContext.BattlefieldEffect => SortingLayer.NameToID("BattlefieldEffect"),
         GameContext.PlayerStatus => SortingLayer.NameToID("PlayerStatus"),
         GameContext.Deck => SortingLayer.NameToID("Deck"),
         GameContext.DiscardPile => SortingLayer.NameToID("DiscardPile"),
@@ -80,6 +82,7 @@ namespace Dreamtides.Layout
       {
         GameContext.BattlefieldBackground => true,
         GameContext.Battlefield => true,
+        GameContext.BattlefieldEffect => true,
         GameContext.DiscardPile => true,
         GameContext.GameModifiers => true,
         _ => false,

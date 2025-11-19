@@ -50,6 +50,9 @@ TagManager:
   - name: Battlefield
     uniqueID: 2479077583
     locked: 0
+  - name: BattlefieldEffect
+    uniqueID: 2228269869
+    locked: 0
   - name: PlayerStatus
     uniqueID: 2074638925
     locked: 0

@@ -39,6 +39,10 @@ namespace Dreamtides.Layout
     TemptingOfferObjectLayout _temptingOfferDisplay = null!;
     public TemptingOfferObjectLayout TemptingOfferDisplay => Check(_temptingOfferDisplay);
 
+    [SerializeField]
+    ObjectLayout _questEffectPosition = null!;
+    public ObjectLayout QuestEffectPosition => Check(_questEffectPosition);
+
     T Check<T>(T? value)
       where T : Object => Errors.CheckNotNull(value, $"{typeof(T).Name} not initialized");
   }

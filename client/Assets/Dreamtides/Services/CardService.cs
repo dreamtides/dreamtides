@@ -391,6 +391,11 @@ namespace Dreamtides.Services
         return Registry.DreamscapeLayout.JourneyChoiceDisplay;
       }
 
+      if (position.Enum == PositionEnum.QuestEffect)
+      {
+        return Registry.DreamscapeLayout.QuestEffectPosition;
+      }
+
       if (position.PositionClass == null)
       {
         throw new InvalidOperationException($"Unknown layout position enum: ${position.Enum}");
