@@ -324,8 +324,6 @@ public class PrototypeQuestTemptingOfferFlow
   IEnumerator PlayJourneyDissolve(string journeyCardId) =>
     PlayDissolve(journeyCardId, reverse: false);
 
-  IEnumerator PlayImmolateReverseDissolve(string cardId) => PlayDissolve(cardId, reverse: true);
-
   IEnumerator PlayDissolve(string cardId, bool reverse)
   {
     var dissolveCommand = BuildReverseDissolveCommand(cardId, reverse);
@@ -385,10 +383,6 @@ public class PrototypeQuestTemptingOfferFlow
       };
       yield return _registry.CardService.HandleUpdateQuestCards(postUpdate);
       _prototypeCards.UpdateGroupCards(TemptingOfferGroupKey, postDissolveUpdate);
-      //   if (!string.IsNullOrEmpty(immolateCardId))
-      //   {
-      //     yield return PlayImmolateReverseDissolve(immolateCardId);
-      //   }
     }
   }
 
