@@ -429,6 +429,7 @@ namespace Dreamtides.Components
     void RenderRevealedCardView(RevealedCardView revealed)
     {
       _isRevealed = true;
+      _isDissolved = revealed.Effects?.Dissolved ?? false;
       ToggleActiveElements();
       _canvasCard.RenderRevealedCardView(revealed);
 
@@ -491,7 +492,7 @@ namespace Dreamtides.Components
         _battlefieldOutline.color = MasonRenderer.ToUnityColor(revealed.OutlineColor);
       }
 
-      if (revealed.Effects.LoopingEffect != null)
+      if (revealed.Effects?.LoopingEffect != null)
       {
         if (_loopingEffectAddress != revealed.Effects.LoopingEffect)
         {

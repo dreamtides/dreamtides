@@ -75,7 +75,7 @@ pub fn apply_effect(
 
 /// Returns the persistent visual effects for a given card.
 pub fn persistent_card_effects(battle: &BattleState, card_id: CardId) -> CardEffects {
-    CardEffects { looping_effect: looping_card_effect(battle, card_id) }
+    CardEffects { looping_effect: looping_card_effect(battle, card_id), ..Default::default() }
 }
 
 /// Returns true if the given card has applied the 'anchored' effect.

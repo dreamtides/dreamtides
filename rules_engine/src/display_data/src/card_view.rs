@@ -158,6 +158,9 @@ pub struct CardEffects {
     /// destroyed before adding this effect. If an effect with the same address
     /// is present, this will be ignored.
     pub looping_effect: Option<EffectAddress>,
+
+    /// True if this card is currently hidden in the 'dissolved' state.
+    pub dissolved: bool,
 }
 
 #[derive(Clone, Default, Debug, Serialize, Deserialize, JsonSchema)]

@@ -321,7 +321,7 @@ public class PrototypeQuestTemptingOfferFlow
     return $"{TemptingOfferGroupKey}-{index + 1}";
   }
 
-  void ApplyJourneyDissolve(string journeyCardId)
+  IEnumerator PlayJourneyDissolve(string journeyCardId)
   {
     var dissolveCommand = new DissolveCardCommand
     {
@@ -335,9 +335,7 @@ public class PrototypeQuestTemptingOfferFlow
       },
       Target = journeyCardId,
     };
-    _registry.EffectService.StartCoroutine(
-      _registry.EffectService.HandleDissolveCommand(dissolveCommand)
-    );
+    yield return _registry.EffectService.HandleDissolveCommand(dissolveCommand);
   }
 
   IEnumerator ResolveTemptingOfferSelection(int offerNumber)
@@ -356,9 +354,18 @@ public class PrototypeQuestTemptingOfferFlow
     _registry.DreamscapeService.HideCloseSiteButton();
     _registry.DreamscapeLayout.TemptingOfferDisplay.HideAcceptButtons();
     var sequence = TweenUtils.Sequence("TemptingOfferJourneyResolution");
-    sequence.OnComplete(() => ApplyJourneyDissolve(journeyCardId));
     yield return _registry.CardService.HandleUpdateQuestCards(update, sequence);
     _prototypeCards.UpdateGroupCards(TemptingOfferGroupKey, updateCards);
+    yield return PlayJourneyDissolve(journeyCardId);
+    if (TryBuildPostDissolveQuestUpdate(journeyCardId, out var postDissolveUpdate))
+    {
+      var postUpdate = new UpdateQuestCommand
+      {
+        Quest = new QuestView { Cards = postDissolveUpdate },
+      };
+      yield return _registry.CardService.HandleUpdateQuestCards(postUpdate);
+      _prototypeCards.UpdateGroupCards(TemptingOfferGroupKey, postDissolveUpdate);
+    }
   }
 
   bool TryBuildJourneyQuestUpdate(
@@ -375,9 +382,9 @@ public class PrototypeQuestTemptingOfferFlow
       return false;
     }
     var allIds = _registry.CardService.GetCardIds().ToList();
-    var destroyedBase = _registry.DreamscapeLayout.DestroyedQuestCards.Objects.Count;
+    var destroyedBase = _registry.DreamscapeLayout.DestroyedQuestCardsBattlefield.Objects.Count;
     var destroyedOffset = 0;
-    var sortingKey = _registry.DreamscapeLayout.QuestEffectPosition.Objects.Count;
+    var sortingKey = _registry.DreamscapeLayout.QuestEffectBattlefieldPosition.Objects.Count;
     updateCards = new List<CardView>(allIds.Count);
     foreach (var id in allIds)
     {
@@ -446,4 +453,93 @@ public class PrototypeQuestTemptingOfferFlow
   }
 
   static int GetOfferNumber(int cardIndex) => cardIndex / TemptingOfferCardsPerOffer;
+
+  bool TryBuildPostDissolveQuestUpdate(string journeyCardId, out List<CardView> updateCards)
+  {
+    var existing = _registry.CardService.GetCardIfExists(journeyCardId);
+    if (existing == null)
+    {
+      Debug.LogWarning($"Unable to find journey card with id {journeyCardId} after dissolve");
+      updateCards = new List<CardView>();
+      return false;
+    }
+    var allIds = _registry.CardService.GetCardIds().ToList();
+    var destroyedBase = _registry.DreamscapeLayout.DestroyedQuestCardsBattlefield.Objects.Count;
+    var destroyedOffset = 0;
+    updateCards = new List<CardView>(allIds.Count + 1);
+    foreach (var id in allIds)
+    {
+      var card = _registry.CardService.GetCard(id);
+      var source = card.CardView;
+      if (id == journeyCardId)
+      {
+        var destroyedSorting = destroyedBase + destroyedOffset;
+        destroyedOffset++;
+        updateCards.Add(
+          PrototypeQuestCardViewFactory.CloneCardViewWithPosition(
+            source,
+            new Position
+            {
+              PositionClass = new PositionClass
+              {
+                DestroyedQuestCards = QuestEffectCardType.BattlefieldCard,
+              },
+            },
+            destroyedSorting
+          )
+        );
+      }
+      else
+      {
+        updateCards.Add(source);
+      }
+    }
+    var questEffectSorting = _registry.DreamscapeLayout.QuestEffectPosition.Objects.Count;
+    updateCards.Add(BuildImmolateQuestEffectCard(questEffectSorting));
+    return true;
+  }
+
+  CardView BuildImmolateQuestEffectCard(int sortingKey)
+  {
+    return new CardView
+    {
+      Backless = false,
+      CardFacing = CardFacing.FaceUp,
+      CreatePosition = null,
+      CreateSound = null,
+      DestroyPosition = null,
+      Id = $"quest-effect-immolate-{Guid.NewGuid():N}",
+      Position = new ObjectPosition
+      {
+        Position = new Position
+        {
+          PositionClass = new PositionClass { QuestEffect = QuestEffectCardType.FullCard },
+        },
+        SortingKey = sortingKey,
+      },
+      Prefab = CardPrefab.Event,
+      Revealed = new RevealedCardView
+      {
+        Actions = new CardActions(),
+        CardType = "Event",
+        Cost = "2",
+        Effects = new CardEffects(),
+        Image = new DisplayImage
+        {
+          Sprite = new SpriteAddress
+          {
+            Sprite = "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1907487244.png",
+          },
+        },
+        InfoZoomData = null,
+        IsFast = true,
+        Name = "Immolate",
+        OutlineColor = null,
+        Produced = null,
+        RulesText = "{Dissolve} an enemy character.",
+        Spark = null,
+      },
+      RevealedToOpponents = false,
+    };
+  }
 }

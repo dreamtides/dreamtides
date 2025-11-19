@@ -1958,6 +1958,12 @@ namespace Dreamtides.Schema
     public partial class CardEffects
     {
         /// <summary>
+        /// True if this card is currently hidden in the 'dissolved' state.
+        /// </summary>
+        [JsonProperty("dissolved", Required = Required.Always)]
+        public bool Dissolved { get; set; }
+
+        /// <summary>
         /// Ongoing visual effect to display for this card.
         ///
         /// If a previous effect with a different address is present, it will be
