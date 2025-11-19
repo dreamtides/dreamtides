@@ -332,10 +332,14 @@ public class PrototypeQuestTemptingOfferFlow
     yield return _registry.EffectService.HandleDissolveCommand(dissolveCommand);
   }
 
-  DissolveCardCommand BuildReverseDissolveCommand(string cardId, bool reverse) =>
+  DissolveCardCommand BuildReverseDissolveCommand(
+    string cardId,
+    bool reverse,
+    string color = "#FFC107"
+  ) =>
     new DissolveCardCommand
     {
-      Color = Mason.MakeColor("#FFC107"),
+      Color = Mason.MakeColor(color),
       Material = new MaterialAddress { Material = "Assets/Content/Dissolves/Dissolve15.mat" },
       Reverse = reverse,
       DissolveSpeed = 1f,
@@ -554,7 +558,7 @@ public class PrototypeQuestTemptingOfferFlow
         Cost = "2",
         Effects = new CardEffects
         {
-          ReverseDissolveOnAppear = BuildReverseDissolveCommand(cardId, true),
+          ReverseDissolveOnAppear = BuildReverseDissolveCommand(cardId, true, "#81D4FA"),
         },
         Image = new DisplayImage
         {

@@ -134,6 +134,7 @@ namespace Dreamtides.Components
     float _hoverStartTime;
     bool _hoveringForInfoZoom;
     bool _longHoverFired;
+    bool _reverseDissolveOnAppearPlayed;
 
     public CardView CardView => Errors.CheckNotNull(_cardView);
 
@@ -249,14 +250,6 @@ namespace Dreamtides.Components
         }
       }
 
-      foreach (var textMeshPro in textMeshProComponents)
-      {
-        if (textMeshPro != null)
-        {
-          textMeshPro.DOFade(1f, fadeDuration);
-        }
-      }
-
       var coroutines = new List<Coroutine>();
       foreach (var renderer in GetComponentsInChildren<Renderer>())
       {
@@ -275,6 +268,17 @@ namespace Dreamtides.Components
           coroutines.Add(StartCoroutine(effect.StartDissolve(Registry, command)));
         }
       }
+
+      yield return new WaitForSeconds(0.3f);
+
+      foreach (var textMeshPro in textMeshProComponents)
+      {
+        if (textMeshPro != null)
+        {
+          textMeshPro.DOFade(1f, fadeDuration);
+        }
+      }
+
       foreach (var coroutine in coroutines)
       {
         yield return coroutine;
@@ -562,6 +566,12 @@ namespace Dreamtides.Components
       else
       {
         _buttonAttachment.gameObject.SetActive(false);
+      }
+
+      if (revealed.Effects?.ReverseDissolveOnAppear != null && !_reverseDissolveOnAppearPlayed)
+      {
+        _reverseDissolveOnAppearPlayed = true;
+        StartCoroutine(StartDissolve(revealed.Effects.ReverseDissolveOnAppear));
       }
     }
 
