@@ -373,7 +373,7 @@ public class PrototypeQuestTemptingOfferFlow
       TryBuildPostDissolveQuestUpdate(
         journeyCardId,
         out var postDissolveUpdate,
-        out var immolateCardId
+        out var immolateCardIds
       )
     )
     {
@@ -475,10 +475,10 @@ public class PrototypeQuestTemptingOfferFlow
   bool TryBuildPostDissolveQuestUpdate(
     string journeyCardId,
     out List<CardView> updateCards,
-    out string? spawnedImmolateCardId
+    out List<string> spawnedImmolateCardIds
   )
   {
-    spawnedImmolateCardId = null;
+    spawnedImmolateCardIds = new List<string>();
     var existing = _registry.CardService.GetCardIfExists(journeyCardId);
     if (existing == null)
     {
@@ -518,9 +518,15 @@ public class PrototypeQuestTemptingOfferFlow
       }
     }
     var questEffectSorting = _registry.DreamscapeLayout.QuestEffectPosition.Objects.Count;
-    var immolateCard = BuildImmolateQuestEffectCard(questEffectSorting, out var immolateCardId);
-    spawnedImmolateCardId = immolateCardId;
-    updateCards.Add(immolateCard);
+    for (var i = 0; i < 3; i++)
+    {
+      var immolateCard = BuildImmolateQuestEffectCard(
+        questEffectSorting + i,
+        out var immolateCardId
+      );
+      spawnedImmolateCardIds.Add(immolateCardId);
+      updateCards.Add(immolateCard);
+    }
     return true;
   }
 

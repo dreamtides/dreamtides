@@ -127,5 +127,3 @@ namespace Dreamtides.Layout
     }
   }
 }
-
-
