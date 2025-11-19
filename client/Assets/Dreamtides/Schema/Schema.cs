@@ -1408,6 +1408,18 @@ namespace Dreamtides.Schema
         public double? DissolveSpeed { get; set; }
 
         /// <summary>
+        /// If true, the original material will NOT be restored after the dissolve
+        /// effect completes, and the dissolve material will be used permanently.
+        ///
+        /// Only applicable if 'reverse' is true. This prevents the visual
+        /// transition between the two materials, since they have slightly different
+        /// color rendering (sprite vs world space). Use this when applying a
+        /// reverse dissolve to a card rendering in sprite mode.
+        /// </summary>
+        [JsonProperty("keep_dissolve_material", Required = Required.Always)]
+        public bool KeepDissolveMaterial { get; set; }
+
+        /// <summary>
         /// The material to use for the dissolve effect.
         /// </summary>
         [JsonProperty("material", Required = Required.Always)]

@@ -227,12 +227,44 @@ namespace Dreamtides.Components
     public IEnumerator StartDissolve(DissolveCardCommand command)
     {
       _isDissolved = true;
+      if (_sparkBackground)
+      {
+        _sparkBackground.enabled = false;
+      }
+
       ToggleActiveElements();
+
+      var dissolveSpeed = (float)(command.DissolveSpeed ?? 1f);
+      var fadeDuration = 1f / dissolveSpeed;
+
+      var textMeshProComponents = new List<TextMeshPro>();
+      foreach (var textMeshPro in GetComponentsInChildren<TextMeshPro>())
+      {
+        if (textMeshPro.gameObject.activeInHierarchy)
+        {
+          textMeshProComponents.Add(textMeshPro);
+          var color = textMeshPro.color;
+          color.a = 0f;
+          textMeshPro.color = color;
+        }
+      }
+
+      foreach (var textMeshPro in textMeshProComponents)
+      {
+        if (textMeshPro != null)
+        {
+          textMeshPro.DOFade(1f, fadeDuration);
+        }
+      }
 
       var coroutines = new List<Coroutine>();
       foreach (var renderer in GetComponentsInChildren<Renderer>())
       {
-        if (renderer.gameObject.activeInHierarchy && renderer.enabled)
+        if (
+          renderer.gameObject.activeInHierarchy
+          && renderer.enabled
+          && !renderer.GetComponent<TextMeshPro>()
+        )
         {
           var effect = renderer.GetComponent<DissolveEffect>();
           if (!effect)

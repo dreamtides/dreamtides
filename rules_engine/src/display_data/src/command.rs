@@ -175,6 +175,16 @@ pub struct DissolveCardCommand {
 
     /// Sound to play
     pub sound: Option<AudioClipAddress>,
+
+    /// If true, the original material will NOT be restored after the dissolve
+    /// effect completes, and the dissolve material will be used permanently.
+    ///
+    /// Only applicable if 'reverse' is true. This prevents the visual
+    /// transition between the two materials, since they have slightly different
+    /// color rendering (sprite vs world space). Use this when applying a
+    /// reverse dissolve to a card rendering in sprite mode.
+    #[builder(default)]
+    pub keep_dissolve_material: bool,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]

@@ -21,6 +21,7 @@ namespace Dreamtides.Components
     Registry? _registry;
     AudioClipAddress? _sound;
     bool _soundPlayed = false;
+    bool _keepDissolveMaterial = false;
 
     public void Initialize()
     {
@@ -36,6 +37,7 @@ namespace Dreamtides.Components
       _sound = command.Sound;
       _soundPlayed = false;
       _clipValue = _reverse ? 1f : 0f;
+      _keepDissolveMaterial = command.KeepDissolveMaterial;
 
       var material = Instantiate(registry.AssetService.GetMaterial(command.Material));
       material.mainTexture = _target.material.mainTexture;
@@ -92,7 +94,7 @@ namespace Dreamtides.Components
 
       if (_clipValue >= 1 || _clipValue <= 0)
       {
-        if (_reverse)
+        if (_reverse && !_keepDissolveMaterial)
         {
           _target.material = _originalMaterial;
         }

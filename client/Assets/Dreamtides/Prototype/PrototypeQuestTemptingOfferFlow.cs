@@ -321,20 +321,26 @@ public class PrototypeQuestTemptingOfferFlow
     return $"{TemptingOfferGroupKey}-{index + 1}";
   }
 
-  IEnumerator PlayJourneyDissolve(string journeyCardId)
+  IEnumerator PlayJourneyDissolve(string journeyCardId) =>
+    PlayDissolve(journeyCardId, reverse: false);
+
+  IEnumerator PlayImmolateReverseDissolve(string cardId) => PlayDissolve(cardId, reverse: true);
+
+  IEnumerator PlayDissolve(string cardId, bool reverse)
   {
     var dissolveCommand = new DissolveCardCommand
     {
       Color = Mason.MakeColor("#FFC107"),
       Material = new MaterialAddress { Material = "Assets/Content/Dissolves/Dissolve15.mat" },
-      Reverse = false,
+      Reverse = reverse,
       DissolveSpeed = 1f,
+      KeepDissolveMaterial = true,
       Sound = new AudioClipAddress
       {
         AudioClip =
           "Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Fire Magic/RPG3_FireMagicBall_LightImpact03.wav",
       },
-      Target = journeyCardId,
+      Target = cardId,
     };
     yield return _registry.EffectService.HandleDissolveCommand(dissolveCommand);
   }
@@ -358,16 +364,25 @@ public class PrototypeQuestTemptingOfferFlow
     yield return _registry.CardService.HandleUpdateQuestCards(update, sequence);
     _prototypeCards.UpdateGroupCards(TemptingOfferGroupKey, updateCards);
     yield return PlayJourneyDissolve(journeyCardId);
-    // if (TryBuildPostDissolveQuestUpdate(journeyCardId, out var
-    // postDissolveUpdate))
-    // {
-    //   var postUpdate = new UpdateQuestCommand
-    //   {
-    //     Quest = new QuestView { Cards = postDissolveUpdate },
-    //   };
-    //   yield return _registry.CardService.HandleUpdateQuestCards(postUpdate);
-    //   _prototypeCards.UpdateGroupCards(TemptingOfferGroupKey, postDissolveUpdate);
-    // }
+    if (
+      TryBuildPostDissolveQuestUpdate(
+        journeyCardId,
+        out var postDissolveUpdate,
+        out var immolateCardId
+      )
+    )
+    {
+      var postUpdate = new UpdateQuestCommand
+      {
+        Quest = new QuestView { Cards = postDissolveUpdate },
+      };
+      yield return _registry.CardService.HandleUpdateQuestCards(postUpdate);
+      _prototypeCards.UpdateGroupCards(TemptingOfferGroupKey, postDissolveUpdate);
+      if (!string.IsNullOrEmpty(immolateCardId))
+      {
+        yield return PlayImmolateReverseDissolve(immolateCardId);
+      }
+    }
   }
 
   bool TryBuildJourneyQuestUpdate(
@@ -456,8 +471,13 @@ public class PrototypeQuestTemptingOfferFlow
 
   static int GetOfferNumber(int cardIndex) => cardIndex / TemptingOfferCardsPerOffer;
 
-  bool TryBuildPostDissolveQuestUpdate(string journeyCardId, out List<CardView> updateCards)
+  bool TryBuildPostDissolveQuestUpdate(
+    string journeyCardId,
+    out List<CardView> updateCards,
+    out string? spawnedImmolateCardId
+  )
   {
+    spawnedImmolateCardId = null;
     var existing = _registry.CardService.GetCardIfExists(journeyCardId);
     if (existing == null)
     {
@@ -497,12 +517,16 @@ public class PrototypeQuestTemptingOfferFlow
       }
     }
     var questEffectSorting = _registry.DreamscapeLayout.QuestEffectPosition.Objects.Count;
-    updateCards.Add(BuildImmolateQuestEffectCard(questEffectSorting));
+    var immolateCard = BuildImmolateQuestEffectCard(questEffectSorting, out var immolateCardId);
+    spawnedImmolateCardId = immolateCardId;
+    updateCards.Add(immolateCard);
     return true;
   }
 
-  CardView BuildImmolateQuestEffectCard(int sortingKey)
+  CardView BuildImmolateQuestEffectCard(int sortingKey, out string cardId)
   {
+    var generatedId = $"quest-effect-immolate-{Guid.NewGuid():N}";
+    cardId = generatedId;
     return new CardView
     {
       Backless = false,
@@ -510,7 +534,7 @@ public class PrototypeQuestTemptingOfferFlow
       CreatePosition = null,
       CreateSound = null,
       DestroyPosition = null,
-      Id = $"quest-effect-immolate-{Guid.NewGuid():N}",
+      Id = generatedId,
       Position = new ObjectPosition
       {
         Position = new Position
