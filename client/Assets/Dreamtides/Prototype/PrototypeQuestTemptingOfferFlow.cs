@@ -333,7 +333,8 @@ public class PrototypeQuestTemptingOfferFlow
   DissolveCardCommand BuildReverseDissolveCommand(
     string cardId,
     bool reverse,
-    string color = "#FFC107"
+    string color = "#FFC107",
+    long startDelay = 0
   ) =>
     new DissolveCardCommand
     {
@@ -347,6 +348,7 @@ public class PrototypeQuestTemptingOfferFlow
           "Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Fire Magic/RPG3_FireMagicBall_LightImpact03.wav",
       },
       Target = cardId,
+      StartDelay = new Milliseconds { MillisecondsValue = startDelay },
       KeepDissolveMaterial = true,
     };
 
@@ -522,7 +524,8 @@ public class PrototypeQuestTemptingOfferFlow
     {
       var immolateCard = BuildImmolateQuestEffectCard(
         questEffectSorting + i,
-        out var immolateCardId
+        out var immolateCardId,
+        startDelay: i * 300
       );
       spawnedImmolateCardIds.Add(immolateCardId);
       updateCards.Add(immolateCard);
@@ -530,7 +533,7 @@ public class PrototypeQuestTemptingOfferFlow
     return true;
   }
 
-  CardView BuildImmolateQuestEffectCard(int sortingKey, out string cardId)
+  CardView BuildImmolateQuestEffectCard(int sortingKey, out string cardId, long startDelay = 0)
   {
     var generatedId = $"quest-effect-immolate-{Guid.NewGuid():N}";
     cardId = generatedId;
@@ -558,7 +561,12 @@ public class PrototypeQuestTemptingOfferFlow
         Cost = "2",
         Effects = new CardEffects
         {
-          ReverseDissolveOnAppear = BuildReverseDissolveCommand(cardId, true, "#81D4FA"),
+          ReverseDissolveOnAppear = BuildReverseDissolveCommand(
+            cardId,
+            true,
+            "#81D4FA",
+            startDelay
+          ),
         },
         Image = new DisplayImage
         {

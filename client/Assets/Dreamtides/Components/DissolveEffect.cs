@@ -22,6 +22,7 @@ namespace Dreamtides.Components
     AudioClipAddress? _sound;
     bool _soundPlayed = false;
     bool _keepDissolveMaterial = false;
+    float _delayRemaining = 0f;
 
     public void Initialize()
     {
@@ -38,6 +39,7 @@ namespace Dreamtides.Components
       _soundPlayed = false;
       _clipValue = _reverse ? 1f : 0f;
       _keepDissolveMaterial = command.KeepDissolveMaterial;
+      _delayRemaining = command.StartDelay != null ? command.StartDelay.ToSeconds() : 0f;
 
       var material = Instantiate(registry.AssetService.GetMaterial(command.Material));
       material.mainTexture = _target.material.mainTexture;
@@ -71,6 +73,12 @@ namespace Dreamtides.Components
     {
       if (!_running)
       {
+        return;
+      }
+
+      if (_delayRemaining > 0f)
+      {
+        _delayRemaining -= Time.deltaTime;
         return;
       }
 

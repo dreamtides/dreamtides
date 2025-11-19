@@ -1438,6 +1438,12 @@ namespace Dreamtides.Schema
         public AudioClipAddress Sound { get; set; }
 
         /// <summary>
+        /// The delay before starting the dissolve effect.
+        /// </summary>
+        [JsonProperty("start_delay")]
+        public Milliseconds StartDelay { get; set; }
+
+        /// <summary>
         /// The card to dissolve.
         ///
         /// Once a card is dissolved, it will be invisible until a reverse dissolve

@@ -176,6 +176,9 @@ pub struct DissolveCardCommand {
     /// Sound to play
     pub sound: Option<AudioClipAddress>,
 
+    /// The delay before starting the dissolve effect.
+    pub start_delay: Option<Milliseconds>,
+
     /// If true, the original material will NOT be restored after the dissolve
     /// effect completes, and the dissolve material will be used permanently.
     ///
