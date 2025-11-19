@@ -381,11 +381,6 @@ namespace Dreamtides.Services
         return Registry.Layout.Offscreen;
       }
 
-      if (position.Enum == PositionEnum.DestroyedQuestCards)
-      {
-        return Registry.DreamscapeLayout.DestroyedQuestCards;
-      }
-
       if (position.Enum == PositionEnum.DreamsignDisplay)
       {
         return Registry.DreamscapeLayout.DreamsignDisplay;
@@ -528,6 +523,18 @@ namespace Dreamtides.Services
       if (position.PositionClass.TemptingOfferDisplay is { } _)
       {
         return Registry.DreamscapeLayout.TemptingOfferDisplay;
+      }
+
+      if (position.PositionClass.DestroyedQuestCards is { } destroyedQuestCards)
+      {
+        return destroyedQuestCards switch
+        {
+          DestroyedQuestCardsType.BattlefieldCard => Registry
+            .DreamscapeLayout
+            .DestroyedQuestCardsBattlefield,
+          DestroyedQuestCardsType.FullCard => Registry.DreamscapeLayout.DestroyedQuestCards,
+          _ => throw Errors.UnknownEnumValue(destroyedQuestCards),
+        };
       }
 
       var json = JsonConvert.SerializeObject(position.PositionClass);

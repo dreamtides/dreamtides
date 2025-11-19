@@ -105,7 +105,7 @@ pub enum Position {
 
     /// Object is hidden after being destroyed during a quest, for example when
     /// not selected for a draft pick.
-    DestroyedQuestCards,
+    DestroyedQuestCards(DestroyedQuestCardsType),
 
     /// Dreamsigns owned by the player in a quest
     DreamsignDisplay,
@@ -152,6 +152,14 @@ pub enum StackType {
 pub struct TemptingOfferPosition {
     pub number: TemptingOfferNumber,
     pub offer_type: TemptingOfferType,
+}
+
+#[derive(
+    Copy, Clone, Debug, Eq, PartialEq, Hash, Serialize, Deserialize, Ord, PartialOrd, JsonSchema,
+)]
+pub enum DestroyedQuestCardsType {
+    FullCard,
+    BattlefieldCard,
 }
 
 #[derive(

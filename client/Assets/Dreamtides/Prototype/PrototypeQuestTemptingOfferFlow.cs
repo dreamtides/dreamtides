@@ -403,7 +403,13 @@ public class PrototypeQuestTemptingOfferFlow
         updateCards.Add(
           PrototypeQuestCardViewFactory.CloneCardViewWithPosition(
             source,
-            new Position { Enum = PositionEnum.DestroyedQuestCards },
+            new Position
+            {
+              PositionClass = new PositionClass
+              {
+                DestroyedQuestCards = DestroyedQuestCardsType.BattlefieldCard,
+              },
+            },
             destroyedSorting
           )
         );
