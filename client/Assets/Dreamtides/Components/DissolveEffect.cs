@@ -35,6 +35,7 @@ namespace Dreamtides.Components
       _registry = registry;
       _sound = command.Sound;
       _soundPlayed = false;
+      _clipValue = _reverse ? 1f : 0f;
 
       var material = Instantiate(registry.AssetService.GetMaterial(command.Material));
       material.mainTexture = _target.material.mainTexture;

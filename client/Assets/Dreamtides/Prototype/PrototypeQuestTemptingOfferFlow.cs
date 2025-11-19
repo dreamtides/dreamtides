@@ -328,6 +328,7 @@ public class PrototypeQuestTemptingOfferFlow
       Color = Mason.MakeColor("#FFC107"),
       Material = new MaterialAddress { Material = "Assets/Content/Dissolves/Dissolve15.mat" },
       Reverse = false,
+      DissolveSpeed = 1f,
       Sound = new AudioClipAddress
       {
         AudioClip =
@@ -357,15 +358,16 @@ public class PrototypeQuestTemptingOfferFlow
     yield return _registry.CardService.HandleUpdateQuestCards(update, sequence);
     _prototypeCards.UpdateGroupCards(TemptingOfferGroupKey, updateCards);
     yield return PlayJourneyDissolve(journeyCardId);
-    if (TryBuildPostDissolveQuestUpdate(journeyCardId, out var postDissolveUpdate))
-    {
-      var postUpdate = new UpdateQuestCommand
-      {
-        Quest = new QuestView { Cards = postDissolveUpdate },
-      };
-      yield return _registry.CardService.HandleUpdateQuestCards(postUpdate);
-      _prototypeCards.UpdateGroupCards(TemptingOfferGroupKey, postDissolveUpdate);
-    }
+    // if (TryBuildPostDissolveQuestUpdate(journeyCardId, out var
+    // postDissolveUpdate))
+    // {
+    //   var postUpdate = new UpdateQuestCommand
+    //   {
+    //     Quest = new QuestView { Cards = postDissolveUpdate },
+    //   };
+    //   yield return _registry.CardService.HandleUpdateQuestCards(postUpdate);
+    //   _prototypeCards.UpdateGroupCards(TemptingOfferGroupKey, postDissolveUpdate);
+    // }
   }
 
   bool TryBuildJourneyQuestUpdate(
