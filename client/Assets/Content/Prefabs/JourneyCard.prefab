@@ -177,6 +177,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: JourneyCard
       objectReference: {fileID: 0}
+    - target: {fileID: 8215946370556705966, guid: dd6008076c4484dbda8c385e712d05aa, type: 3}
+      propertyPath: _battlefieldFrameDissolve
+      value: 
+      objectReference: {fileID: 7798249585677699218}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects:

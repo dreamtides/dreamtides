@@ -50,6 +50,9 @@ namespace Dreamtides.Components
     internal DissolveEffect _cardImageDissolve = null!;
 
     [SerializeField]
+    internal DissolveEffect? _battlefieldFrameDissolve = null!;
+
+    [SerializeField]
     internal BoxCollider _cardCollider = null!;
 
     [SerializeField]
@@ -231,6 +234,10 @@ namespace Dreamtides.Components
       _isDissolved = true;
       ToggleActiveElements();
 
+      if (_battlefieldFrameDissolve)
+      {
+        StartCoroutine(_battlefieldFrameDissolve.StartDissolve(Registry, command));
+      }
       yield return StartCoroutine(_cardImageDissolve.StartDissolve(Registry, command));
 
       if (command.Reverse)

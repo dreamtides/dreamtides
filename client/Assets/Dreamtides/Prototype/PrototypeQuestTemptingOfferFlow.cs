@@ -4,6 +4,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Dreamtides.Masonry;
 using Dreamtides.Prototype;
 using Dreamtides.Schema;
 using Dreamtides.Services;
@@ -49,6 +50,7 @@ public class PrototypeQuestTemptingOfferFlow
     if (int.TryParse(clickedId, out var offerNumber))
     {
       Debug.Log($"Tempting offer accepted for option {offerNumber}");
+      TryDissolveJourneyCard(offerNumber);
     }
     else
     {
@@ -305,5 +307,45 @@ public class PrototypeQuestTemptingOfferFlow
       card.Revealed.Actions.OnPlaySound = null;
       card.Revealed.Actions.PlayEffectPreview = null;
     }
+  }
+
+  void TryDissolveJourneyCard(int offerNumber)
+  {
+    var journeyCardId = GetJourneyCardId(offerNumber);
+    if (journeyCardId == null)
+    {
+      Debug.LogWarning($"Unable to find journey card for tempting offer {offerNumber}");
+      return;
+    }
+    ApplyJourneyDissolve(journeyCardId);
+  }
+
+  string? GetJourneyCardId(int offerNumber)
+  {
+    if (offerNumber < 0 || offerNumber >= TemptingOfferMaxOffers)
+    {
+      return null;
+    }
+    var index = offerNumber * TemptingOfferCardsPerOffer;
+    return $"{TemptingOfferGroupKey}-{index + 1}";
+  }
+
+  void ApplyJourneyDissolve(string journeyCardId)
+  {
+    var dissolveCommand = new DissolveCardCommand
+    {
+      Color = Mason.MakeColor("#FFC107"),
+      Material = new MaterialAddress { Material = "Assets/Content/Dissolves/Dissolve15.mat" },
+      Reverse = false,
+      Sound = new AudioClipAddress
+      {
+        AudioClip =
+          "Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Fire Magic/RPG3_FireMagicBall_LightImpact03.wav",
+      },
+      Target = journeyCardId,
+    };
+    _registry.EffectService.StartCoroutine(
+      _registry.EffectService.HandleDissolveCommand(dissolveCommand)
+    );
   }
 }
