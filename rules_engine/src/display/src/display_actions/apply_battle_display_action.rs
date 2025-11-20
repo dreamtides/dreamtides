@@ -83,6 +83,7 @@ fn browse_cards(card_browser: CardBrowserType, builder: &mut ResponseBuilder) {
             }));
             Position::InPlayerStatus(DisplayPlayer::Enemy)
         }
+        CardBrowserType::QuestDeck => todo!("Implement quest deck browser"),
     };
 
     display_state::set_card_browser_source(builder, Some(source_position));

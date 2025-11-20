@@ -55,17 +55,6 @@ namespace Dreamtides.Services
         ? source.ProjectileSourcePosition
         : source.transform;
 
-      if (source.GameContext.IsBattlefieldContext())
-      {
-        // Enlarge before firing
-        // yield return TweenUtils.Sequence("EnlargeBeforeFiring")
-        //   .Insert(0, source.transform.DORotate(new Vector3(280, 0, 0), 0.2f))
-        //   .Insert(0,
-        //     source.transform.DOMove(
-        //       Vector3.MoveTowards(source.transform.position, Registry.Layout.MainCamera.transform.position, 20f), 0.2f))
-        //   .WaitForCompletion();
-      }
-
       var projectile = Registry.AssetPoolService.Create(
         Registry.AssetService.GetProjectilePrefab(command.Projectile),
         projectileSourcePosition.position
@@ -82,13 +71,6 @@ namespace Dreamtides.Services
           )
         )
         .Insert(0.1f, source.transform.DOMove(startPosition, 0.1f));
-
-      if (source.GameContext.IsBattlefieldContext())
-      {
-        // throwSequence
-        //   .Insert(0.8f, source.transform.DOMove(originalPosition, 0.1f))
-        //   .Insert(0.8f, source.transform.DORotate(originalRotation, 0.1f));
-      }
 
       yield return projectile.Fire(
         Registry,

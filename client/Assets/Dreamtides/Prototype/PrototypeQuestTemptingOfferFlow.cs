@@ -4,7 +4,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using DG.Tweening;
 using Dreamtides.Masonry;
 using Dreamtides.Prototype;
 using Dreamtides.Schema;
@@ -323,16 +322,31 @@ public class PrototypeQuestTemptingOfferFlow
     return $"{TemptingOfferGroupKey}-{index + 1}";
   }
 
+  string? GetCostCardId(int offerNumber)
+  {
+    if (offerNumber < 0 || offerNumber >= TemptingOfferMaxOffers)
+    {
+      return null;
+    }
+    var index = offerNumber * TemptingOfferCardsPerOffer + 1;
+    return $"{TemptingOfferGroupKey}-{index + 1}";
+  }
+
   IEnumerator PlayJourneyDissolve(string journeyCardId) =>
     PlayDissolve(journeyCardId, reverse: false);
 
-  IEnumerator PlayDissolve(string cardId, bool reverse)
+  IEnumerator PlayDissolve(
+    string cardId,
+    bool reverse,
+    string color = "#FFC107",
+    long startDelay = 0
+  )
   {
-    var dissolveCommand = BuildReverseDissolveCommand(cardId, reverse);
+    var dissolveCommand = BuildDissolveCommand(cardId, reverse, color, startDelay);
     yield return _registry.EffectService.HandleDissolveCommand(dissolveCommand);
   }
 
-  DissolveCardCommand BuildReverseDissolveCommand(
+  DissolveCardCommand BuildDissolveCommand(
     string cardId,
     bool reverse,
     string color = "#FFC107",
@@ -361,6 +375,11 @@ public class PrototypeQuestTemptingOfferFlow
     {
       Debug.LogWarning($"Unable to determine journey card for tempting offer {offerNumber}");
       yield break;
+    }
+    var costCardId = GetCostCardId(offerNumber);
+    if (costCardId == null)
+    {
+      Debug.LogWarning($"Unable to determine cost card for tempting offer {offerNumber}");
     }
     if (!TryBuildJourneyQuestUpdate(journeyCardId, offerNumber, out var updateCards))
     {
@@ -394,6 +413,10 @@ public class PrototypeQuestTemptingOfferFlow
           (maxReverseDissolveDelayMs / 1000f) + ImmolateReverseDissolveDurationSeconds;
         yield return new WaitForSeconds(totalWaitSeconds);
         yield return MoveImmolateCardsToQuestDeck(immolateCardIds);
+      }
+      if (!string.IsNullOrEmpty(costCardId))
+      {
+        yield return BringCostCardForwardAndDissolve(costCardId);
       }
     }
   }
@@ -578,12 +601,7 @@ public class PrototypeQuestTemptingOfferFlow
         Cost = "2",
         Effects = new CardEffects
         {
-          ReverseDissolveOnAppear = BuildReverseDissolveCommand(
-            cardId,
-            true,
-            "#81D4FA",
-            startDelay
-          ),
+          ReverseDissolveOnAppear = BuildDissolveCommand(cardId, true, "#81D4FA", startDelay),
         },
         Image = new DisplayImage
         {
@@ -602,6 +620,26 @@ public class PrototypeQuestTemptingOfferFlow
       },
       RevealedToOpponents = false,
     };
+  }
+
+  IEnumerator BringCostCardForwardAndDissolve(string costCardId)
+  {
+    if (!TryBuildCostQuestUpdate(costCardId, out var updateCards))
+    {
+      yield break;
+    }
+    var update = new UpdateQuestCommand { Quest = new QuestView { Cards = updateCards } };
+    var sequence = TweenUtils.Sequence("TemptingOfferCostAdvance");
+    yield return _registry.CardService.HandleUpdateQuestCards(update, sequence);
+    _prototypeCards.UpdateGroupCards(TemptingOfferGroupKey, updateCards);
+    yield return FireCostProjectile(costCardId);
+    yield return PlayDissolve(costCardId, false, "#B39DDB");
+    if (TryBuildCostPostDissolveUpdate(costCardId, out var postUpdateCards))
+    {
+      var postUpdate = new UpdateQuestCommand { Quest = new QuestView { Cards = postUpdateCards } };
+      yield return _registry.CardService.HandleUpdateQuestCards(postUpdate);
+      _prototypeCards.UpdateGroupCards(TemptingOfferGroupKey, postUpdateCards);
+    }
   }
 
   IEnumerator MoveImmolateCardsToQuestDeck(List<string> immolateCardIds)
@@ -650,5 +688,114 @@ public class PrototypeQuestTemptingOfferFlow
     var update = new UpdateQuestCommand { Quest = new QuestView { Cards = updateCards } };
     yield return _registry.CardService.HandleUpdateQuestCards(update);
     _prototypeCards.UpdateGroupCards(TemptingOfferGroupKey, updateCards);
+  }
+
+  IEnumerator FireCostProjectile(string costCardId)
+  {
+    var command = new FireProjectileCommand
+    {
+      HideOnHit = false,
+      Projectile = new ProjectileAddress
+      {
+        Projectile =
+          "Assets/ThirdParty/Hovl Studio/AAA Projectiles Vol 1/Prefabs/Dreamtides/Projectile 6 blue fire.prefab",
+      },
+      SourceId = new GameObjectId { CardId = costCardId },
+      TargetId = new GameObjectId { QuestObject = QuestObjectId.EssenceTotal },
+      FireSound = new AudioClipAddress
+      {
+        AudioClip =
+          "Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Water Magic/RPG3_WaterMagic_Cast01.wav",
+      },
+      ImpactSound = new AudioClipAddress
+      {
+        AudioClip =
+          "Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Water Magic/RPG3_WaterMagic_Impact03.wav",
+      },
+      TravelDuration = new Milliseconds { MillisecondsValue = 600 },
+    };
+    yield return _registry.EffectService.HandleFireProjectileCommand(command);
+  }
+
+  bool TryBuildCostQuestUpdate(string costCardId, out List<CardView> updateCards)
+  {
+    updateCards = new List<CardView>();
+    var existing = _registry.CardService.GetCardIfExists(costCardId);
+    if (existing == null)
+    {
+      Debug.LogWarning($"Unable to find cost card with id {costCardId}");
+      return false;
+    }
+    var allIds = _registry.CardService.GetCardIds().ToList();
+    var sortingKey = _registry.DreamscapeLayout.QuestEffectBattlefieldPosition.Objects.Count;
+    updateCards = new List<CardView>(allIds.Count);
+    foreach (var id in allIds)
+    {
+      var card = _registry.CardService.GetCard(id);
+      var source = card.CardView;
+      if (id == costCardId)
+      {
+        updateCards.Add(
+          PrototypeQuestCardViewFactory.CloneCardViewWithPosition(
+            source,
+            new Position
+            {
+              PositionClass = new PositionClass
+              {
+                QuestEffect = QuestEffectCardType.BattlefieldCard,
+              },
+            },
+            sortingKey
+          )
+        );
+      }
+      else
+      {
+        updateCards.Add(source);
+      }
+    }
+    return true;
+  }
+
+  bool TryBuildCostPostDissolveUpdate(string costCardId, out List<CardView> updateCards)
+  {
+    updateCards = new List<CardView>();
+    var existing = _registry.CardService.GetCardIfExists(costCardId);
+    if (existing == null)
+    {
+      Debug.LogWarning($"Unable to find cost card with id {costCardId} after dissolve");
+      return false;
+    }
+    var allIds = _registry.CardService.GetCardIds().ToList();
+    var destroyedBase = _registry.DreamscapeLayout.DestroyedQuestCardsBattlefield.Objects.Count;
+    var destroyedOffset = 0;
+    updateCards = new List<CardView>(allIds.Count);
+    foreach (var id in allIds)
+    {
+      var card = _registry.CardService.GetCard(id);
+      var source = card.CardView;
+      if (id == costCardId)
+      {
+        updateCards.Add(
+          PrototypeQuestCardViewFactory.CloneCardViewWithPosition(
+            source,
+            new Position
+            {
+              PositionClass = new PositionClass
+              {
+                DestroyedQuestCards = QuestEffectCardType.BattlefieldCard,
+              },
+            },
+            destroyedBase + destroyedOffset
+          )
+        );
+        destroyedOffset++;
+      }
+      else
+      {
+        updateCards.Add(source);
+      }
+    }
+    return true;
   }
 }

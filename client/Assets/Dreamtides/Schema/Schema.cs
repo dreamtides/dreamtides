@@ -1367,6 +1367,9 @@ namespace Dreamtides.Schema
 
         [JsonProperty("Avatar", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public DisplayPlayer? Avatar { get; set; }
+
+        [JsonProperty("QuestObject", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public QuestObjectId? QuestObject { get; set; }
     }
 
     public partial class DisplayEnemyMessageCommand
@@ -2641,7 +2644,7 @@ namespace Dreamtides.Schema
     /// </summary>
     public enum BattleDisplayActionEnum { CloseCardBrowser, CloseCurrentPanel, ToggleStackVisibility };
 
-    public enum CardBrowserType { EnemyDeck, EnemyStatus, EnemyVoid, UserDeck, UserStatus, UserVoid };
+    public enum CardBrowserType { EnemyDeck, EnemyStatus, EnemyVoid, QuestDeck, UserDeck, UserStatus, UserVoid };
 
     public enum PanelAddressEnum { AddCardToHand, Developer, PlayOpponentCard, SetOpponentAgent };
 
@@ -2696,6 +2699,8 @@ namespace Dreamtides.Schema
     /// The player to display the dreamwell activation for.
     /// </summary>
     public enum DisplayPlayer { Enemy, User };
+
+    public enum QuestObjectId { EssenceTotal, QuestDeck };
 
     public enum GameMessageType { Defeat, EnemyTurn, Victory, YourTurn };
 
@@ -2979,6 +2984,7 @@ namespace Dreamtides.Schema
                 TouchScrollBehaviorConverter.Singleton,
                 SliderDirectionConverter.Singleton,
                 DisplayPlayerConverter.Singleton,
+                QuestObjectIdConverter.Singleton,
                 GameMessageTypeConverter.Singleton,
                 PositionConverter.Singleton,
                 CardOrderSelectionTargetDiscriminantsConverter.Singleton,
@@ -3795,6 +3801,8 @@ namespace Dreamtides.Schema
                     return CardBrowserType.EnemyStatus;
                 case "EnemyVoid":
                     return CardBrowserType.EnemyVoid;
+                case "QuestDeck":
+                    return CardBrowserType.QuestDeck;
                 case "UserDeck":
                     return CardBrowserType.UserDeck;
                 case "UserStatus":
@@ -3823,6 +3831,9 @@ namespace Dreamtides.Schema
                     return;
                 case CardBrowserType.EnemyVoid:
                     serializer.Serialize(writer, "EnemyVoid");
+                    return;
+                case CardBrowserType.QuestDeck:
+                    serializer.Serialize(writer, "QuestDeck");
                     return;
                 case CardBrowserType.UserDeck:
                     serializer.Serialize(writer, "UserDeck");
@@ -5184,6 +5195,47 @@ namespace Dreamtides.Schema
         }
 
         public static readonly DisplayPlayerConverter Singleton = new DisplayPlayerConverter();
+    }
+
+    internal class QuestObjectIdConverter : JsonConverter
+    {
+        public override bool CanConvert(Type t) => t == typeof(QuestObjectId) || t == typeof(QuestObjectId?);
+
+        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
+        {
+            if (reader.TokenType == JsonToken.Null) return null;
+            var value = serializer.Deserialize<string>(reader);
+            switch (value)
+            {
+                case "EssenceTotal":
+                    return QuestObjectId.EssenceTotal;
+                case "QuestDeck":
+                    return QuestObjectId.QuestDeck;
+            }
+            throw new Exception("Cannot unmarshal type QuestObjectId");
+        }
+
+        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
+        {
+            if (untypedValue == null)
+            {
+                serializer.Serialize(writer, null);
+                return;
+            }
+            var value = (QuestObjectId)untypedValue;
+            switch (value)
+            {
+                case QuestObjectId.EssenceTotal:
+                    serializer.Serialize(writer, "EssenceTotal");
+                    return;
+                case QuestObjectId.QuestDeck:
+                    serializer.Serialize(writer, "QuestDeck");
+                    return;
+            }
+            throw new Exception("Cannot marshal type QuestObjectId");
+        }
+
+        public static readonly QuestObjectIdConverter Singleton = new QuestObjectIdConverter();
     }
 
     internal class GameMessageTypeConverter : JsonConverter

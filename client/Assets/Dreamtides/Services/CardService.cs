@@ -187,6 +187,16 @@ namespace Dreamtides.Services
         };
       }
 
+      if (id.QuestObject is { } questObject)
+      {
+        return questObject switch
+        {
+          QuestObjectId.EssenceTotal => Registry.DreamscapeLayout.EssenceTotalWorldPosition,
+          QuestObjectId.QuestDeck => Registry.DreamscapeLayout.QuestDeck,
+          _ => throw Errors.UnknownEnumValue(questObject),
+        };
+      }
+
       return GetCard(Errors.CheckNotNull(id.CardId));
     }
 

@@ -1,8 +1,8 @@
 #nullable enable
 
-using UnityEngine;
+using Dreamtides.Layout;
 
 namespace Dreamtides.Buttons
 {
-  public class SiteButton : MonoBehaviour { }
+  public class SiteButton : Displayable { }
 }

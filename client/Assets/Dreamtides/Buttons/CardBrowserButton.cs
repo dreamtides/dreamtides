@@ -49,6 +49,8 @@ namespace Dreamtides.Components
           return false;
         case CardBrowserType.EnemyStatus:
           return false;
+        case CardBrowserType.QuestDeck:
+          return false;
         default:
           throw Errors.UnknownEnumValue(_type);
       }

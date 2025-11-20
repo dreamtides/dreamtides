@@ -377,6 +377,13 @@ pub enum GameObjectId {
     Deck(DisplayPlayer),
     Void(DisplayPlayer),
     Avatar(DisplayPlayer),
+    QuestObject(QuestObjectId),
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema, Eq, PartialEq)]
+pub enum QuestObjectId {
+    EssenceTotal,
+    QuestDeck,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema, Eq, PartialEq)]

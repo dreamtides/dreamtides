@@ -51,6 +51,10 @@ namespace Dreamtides.Layout
     ObjectLayout _questEffectBattlefieldPosition = null!;
     public ObjectLayout QuestEffectBattlefieldPosition => Check(_questEffectBattlefieldPosition);
 
+    [SerializeField]
+    Displayable _essenceTotalWorldPosition = null!;
+    public Displayable EssenceTotalWorldPosition => Check(_essenceTotalWorldPosition);
+
     T Check<T>(T? value)
       where T : Object => Errors.CheckNotNull(value, $"{typeof(T).Name} not initialized");
   }

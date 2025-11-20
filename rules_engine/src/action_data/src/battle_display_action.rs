@@ -33,4 +33,5 @@ pub enum CardBrowserType {
     EnemyVoid,
     UserStatus,
     EnemyStatus,
+    QuestDeck,
 }
