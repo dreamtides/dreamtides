@@ -83,8 +83,8 @@ public class PrototypeQuestDraftFlow
       Animation = MoveCardsCustomAnimation.MoveToQuestDeckOrDestroy,
       Cards = cardsForAnimation,
       Destination = new Position { Enum = PositionEnum.QuestDeck },
-      PauseDuration = new Milliseconds { MillisecondsValue = 300 },
-      StaggerInterval = new Milliseconds { MillisecondsValue = 100 },
+      PauseDuration = new Milliseconds { MillisecondsValue = 0 },
+      StaggerInterval = new Milliseconds { MillisecondsValue = 0 },
     };
 
     yield return _registry.CardAnimationService.HandleMoveCardsWithCustomAnimation(command);

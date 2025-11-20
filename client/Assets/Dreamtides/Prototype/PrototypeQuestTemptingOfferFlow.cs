@@ -21,7 +21,6 @@ public class PrototypeQuestTemptingOfferFlow
   const int TemptingOfferMaxOffers = 2;
   const int ImmolateReverseDissolveDelayStepMs = 300;
   const float ImmolateReverseDissolveDurationSeconds = 1f;
-  const float ImmolatePostDissolveDelaySeconds = 0.5f;
 
   readonly Registry _registry;
   readonly PrototypeCards _prototypeCards;
@@ -392,9 +391,7 @@ public class PrototypeQuestTemptingOfferFlow
       if (immolateCardIds.Count > 0)
       {
         var totalWaitSeconds =
-          (maxReverseDissolveDelayMs / 1000f)
-          + ImmolateReverseDissolveDurationSeconds
-          + ImmolatePostDissolveDelaySeconds;
+          (maxReverseDissolveDelayMs / 1000f) + ImmolateReverseDissolveDurationSeconds;
         yield return new WaitForSeconds(totalWaitSeconds);
         yield return MoveImmolateCardsToQuestDeck(immolateCardIds);
       }
@@ -645,8 +642,8 @@ public class PrototypeQuestTemptingOfferFlow
       Animation = MoveCardsCustomAnimation.MoveToQuestDeckOrDestroy,
       Cards = questDeckClones,
       Destination = new Position { Enum = PositionEnum.QuestDeck },
-      PauseDuration = new Milliseconds { MillisecondsValue = 300 },
-      StaggerInterval = new Milliseconds { MillisecondsValue = 100 },
+      PauseDuration = new Milliseconds { MillisecondsValue = 0 },
+      StaggerInterval = new Milliseconds { MillisecondsValue = 500 },
     };
     yield return _registry.CardAnimationService.HandleMoveCardsWithCustomAnimation(command);
 

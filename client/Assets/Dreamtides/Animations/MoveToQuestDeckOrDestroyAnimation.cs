@@ -72,23 +72,24 @@ namespace Dreamtides.Animations
     {
       service.Registry.SoundService.Play(service.FlipCardSound);
 
-      for (int i = 0; i < toDestroy.Count; ++i)
+      if (toDestroy.Count == 0)
       {
-        var cardView = toDestroy[i];
-        var card = service.Registry.CardService.GetCard(cardView.Id);
-        card.SortingKey = (int)cardView.Position.SortingKey;
-        card.TurnFaceDown(TweenUtils.Sequence("DestroyQuestCardFlip"));
+        onDone();
+        yield break;
       }
 
-      yield return new WaitForSeconds(0.3f);
+      var completed = 0;
 
       for (int i = 0; i < toDestroy.Count; ++i)
       {
+        var delay = i * stagger;
         var cardView = toDestroy[i];
-        var card = service.Registry.CardService.GetCard(cardView.Id);
-        destroyedLayout.Add(card);
-        destroyedLayout.ApplyLayout(TweenUtils.Sequence("DestroyQuestCardMove"));
+        service.StartCoroutine(
+          DestroySingleCardFlow(cardView, destroyedLayout, delay, service, () => completed++)
+        );
       }
+
+      yield return new WaitUntil(() => completed == toDestroy.Count);
 
       onDone();
     }
@@ -105,56 +106,122 @@ namespace Dreamtides.Animations
     {
       yield return new WaitForSeconds(0.3f);
 
-      for (int i = 0; i < toQuestDeck.Count; ++i)
+      if (toQuestDeck.Count == 0)
       {
-        var cardView = toQuestDeck[i];
-        var card = service.Registry.CardService.GetCard(cardView.Id);
-        Debug.Log($"Moving to quest deck: cardView: {card.name}");
-        var moveSeq = TweenUtils.Sequence("QuestDeckMoveAbove");
-        card.SortingKey = (int)cardView.Position.SortingKey;
-        var anchor = service.Registry.DreamscapeLayout.AboveQuestDeck;
-
-        if (cardTrail != null)
-        {
-          card.SetCardTrail(cardTrail);
-        }
-
-        moveSeq.Insert(
-          0,
-          card.transform.DOMove(anchor.position, TweenUtils.MoveAnimationDurationSeconds)
-        );
-        moveSeq.Insert(
-          0,
-          card.transform.DORotateQuaternion(
-            anchor.rotation,
-            TweenUtils.MoveAnimationDurationSeconds
-          )
-        );
-        moveSeq.Insert(
-          0,
-          card.transform.DOScale(anchor.localScale, TweenUtils.MoveAnimationDurationSeconds)
-        );
-
-        yield return moveSeq.WaitForCompletion();
-
-        service.Registry.SoundService.Play(service.MoveToQuestDeckSound);
-
-        if (cardTrail != null)
-        {
-          card.ClearCardTrail();
-        }
-
-        var flipSeq = TweenUtils.Sequence("QuestDeckFlip");
-        card.TurnFaceDown(flipSeq);
-        yield return flipSeq.WaitForCompletion();
-
-        var addSeq = TweenUtils.Sequence("QuestDeckAdd");
-        questDeckLayout.Add(card);
-        questDeckLayout.ApplyLayout(addSeq);
-        yield return addSeq.WaitForCompletion();
+        onDone();
+        yield break;
       }
 
+      var completed = 0;
+
+      for (int i = 0; i < toQuestDeck.Count; ++i)
+      {
+        var delay = i * stagger;
+        var cardView = toQuestDeck[i];
+        service.StartCoroutine(
+          QuestDeckSingleCardFlow(
+            cardView,
+            questDeckLayout,
+            pause,
+            delay,
+            service,
+            cardTrail,
+            () => completed++
+          )
+        );
+      }
+
+      yield return new WaitUntil(() => completed == toQuestDeck.Count);
+
       onDone();
+    }
+
+    IEnumerator DestroySingleCardFlow(
+      CardView cardView,
+      ObjectLayout destroyedLayout,
+      float startDelay,
+      CardAnimationService service,
+      System.Action onCardDone
+    )
+    {
+      if (startDelay > 0)
+      {
+        yield return new WaitForSeconds(startDelay);
+      }
+
+      var card = service.Registry.CardService.GetCard(cardView.Id);
+      card.SortingKey = (int)cardView.Position.SortingKey;
+      card.TurnFaceDown(TweenUtils.Sequence("DestroyQuestCardFlip"));
+      yield return new WaitForSeconds(0.3f);
+      var moveSeq = TweenUtils.Sequence("DestroyQuestCardMove");
+      destroyedLayout.Add(card);
+      destroyedLayout.ApplyLayout(moveSeq);
+      yield return moveSeq.WaitForCompletion();
+      onCardDone();
+    }
+
+    IEnumerator QuestDeckSingleCardFlow(
+      CardView cardView,
+      ObjectLayout questDeckLayout,
+      float pause,
+      float startDelay,
+      CardAnimationService service,
+      ProjectileAddress? cardTrail,
+      System.Action onCardDone
+    )
+    {
+      if (startDelay > 0)
+      {
+        yield return new WaitForSeconds(startDelay);
+      }
+
+      var card = service.Registry.CardService.GetCard(cardView.Id);
+      var moveSeq = TweenUtils.Sequence("QuestDeckMoveAbove");
+      card.SortingKey = (int)cardView.Position.SortingKey;
+      var anchor = service.Registry.DreamscapeLayout.AboveQuestDeck;
+
+      if (cardTrail != null)
+      {
+        card.SetCardTrail(cardTrail);
+      }
+
+      moveSeq.Insert(
+        0,
+        card.transform.DOMove(anchor.position, TweenUtils.MoveAnimationDurationSeconds)
+      );
+      moveSeq.Insert(
+        0,
+        card.transform.DORotateQuaternion(anchor.rotation, TweenUtils.MoveAnimationDurationSeconds)
+      );
+      moveSeq.Insert(
+        0,
+        card.transform.DOScale(anchor.localScale, TweenUtils.MoveAnimationDurationSeconds)
+      );
+
+      yield return moveSeq.WaitForCompletion();
+
+      service.Registry.SoundService.Play(service.MoveToQuestDeckSound);
+
+      if (cardTrail != null)
+      {
+        card.ClearCardTrail();
+      }
+
+      if (pause > 0)
+      {
+        yield return new WaitForSeconds(pause);
+      }
+
+      var flipSeq = TweenUtils.Sequence("QuestDeckFlip");
+      card.TurnFaceDown(flipSeq);
+      yield return flipSeq.WaitForCompletion();
+
+      var addSeq = TweenUtils.Sequence("QuestDeckAdd");
+      questDeckLayout.Add(card);
+      questDeckLayout.ApplyLayout(addSeq);
+      yield return addSeq.WaitForCompletion();
+
+      onCardDone();
     }
   }
 }
