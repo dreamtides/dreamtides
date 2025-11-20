@@ -1488,6 +1488,9 @@ namespace Dreamtides.Schema
         [JsonProperty("projectile", Required = Required.Always)]
         public ProjectileAddress Projectile { get; set; }
 
+        [JsonProperty("scale_override")]
+        public double? ScaleOverride { get; set; }
+
         [JsonProperty("source_id", Required = Required.Always)]
         public GameObjectId SourceId { get; set; }
 

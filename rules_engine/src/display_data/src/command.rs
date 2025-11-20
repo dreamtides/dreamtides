@@ -144,6 +144,9 @@ pub struct FireProjectileCommand {
     // During to wait for the project's impact effect before continuing
     pub wait_duration: Option<Milliseconds>,
 
+    // If provided, the projectile will be scaled to this value.
+    pub scale_override: Option<f64>,
+
     // If true, the target will be hidden after being hit during the
     // 'wait_duration' and before jumping to 'jump_to_position'.
     #[builder(default)]

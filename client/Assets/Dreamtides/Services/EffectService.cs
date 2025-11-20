@@ -79,7 +79,10 @@ namespace Dreamtides.Services
         command.AdditionalHit,
         command.AdditionalHitDelay,
         command.FireSound,
-        command.ImpactSound
+        command.ImpactSound,
+        onHit: null,
+        mute: false,
+        scaleOverride: command.ScaleOverride.HasValue ? (float?)command.ScaleOverride.Value : null
       );
 
       if (command.HideOnHit)

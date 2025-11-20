@@ -713,6 +713,7 @@ public class PrototypeQuestTemptingOfferFlow
           "Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Water Magic/RPG3_WaterMagic_Impact03.wav",
       },
       TravelDuration = new Milliseconds { MillisecondsValue = 600 },
+      ScaleOverride = 1.0f,
     };
     yield return _registry.EffectService.HandleFireProjectileCommand(command);
   }

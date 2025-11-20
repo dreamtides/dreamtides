@@ -50,7 +50,8 @@ namespace Dreamtides.Components
       AudioClipAddress? fireSound = null,
       AudioClipAddress? impactSound = null,
       Action? onHit = null,
-      bool mute = false
+      bool mute = false,
+      float? scaleOverride = null
     )
     {
       if (_flash)
@@ -64,7 +65,8 @@ namespace Dreamtides.Components
         _hit.transform.parent = null;
       }
 
-      transform.localScale = _scale * Vector3.one;
+      var scale = scaleOverride ?? _scale;
+      transform.localScale = scale * Vector3.one;
       transform.LookAt(target);
       var rotation = Quaternion.LookRotation(transform.position - target.position);
 
@@ -73,7 +75,7 @@ namespace Dreamtides.Components
         _flash.transform.position = transform.position;
         _flash.gameObject.SetActive(true);
         _flash.transform.rotation = rotation;
-        _flash.transform.localScale = _scale * Vector3.one;
+        _flash.transform.localScale = scale * Vector3.one;
       }
 
       if (fireSound != null)
@@ -97,7 +99,7 @@ namespace Dreamtides.Components
         _hit.transform.position = transform.position;
         _hit.gameObject.SetActive(true);
         _hit.transform.rotation = rotation;
-        _hit.transform.localScale = _scale * Vector3.one;
+        _hit.transform.localScale = scale * Vector3.one;
         _hit.gameObject.SetActive(true);
       }
 
