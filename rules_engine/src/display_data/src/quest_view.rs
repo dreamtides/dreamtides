@@ -1,5 +1,6 @@
 use action_data::game_action_data::GameAction;
 use core_data::identifiers::{QuestId, SiteId};
+use core_data::numerics::Essence;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
@@ -20,6 +21,9 @@ pub struct QuestView {
 
     /// Sites which can be visited within the currently-active dreamscape.
     pub sites: Vec<SiteView>,
+
+    /// Total essence available to the player.
+    pub essence_total: Essence,
 
     /// If present, a button should be displayed to exit the currently open
     /// site.

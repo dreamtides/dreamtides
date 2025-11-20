@@ -2445,6 +2445,12 @@ namespace Dreamtides.Schema
         public CloseButtonView CloseSiteButton { get; set; }
 
         /// <summary>
+        /// Total essence available to the player.
+        /// </summary>
+        [JsonProperty("essence_total", Required = Required.Always)]
+        public long EssenceTotal { get; set; }
+
+        /// <summary>
         /// Unique identifier for this quest
         /// </summary>
         [JsonProperty("id", Required = Required.Always)]

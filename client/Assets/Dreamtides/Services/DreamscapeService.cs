@@ -66,6 +66,8 @@ namespace Dreamtides.Services
       bool animate
     )
     {
+      var essenceTotal = command.Quest.EssenceTotal > 0 ? command.Quest.EssenceTotal : 550;
+      Registry.DreamscapeLayout.EssenceTotal.SetValue(essenceTotal.ToString(), true);
       Registry.DocumentService.RenderScreenOverlay(command.Quest.Interface?.ScreenOverlay);
       Registry.Layout.CardOrderSelector.View = command.Quest.Interface?.CardOrderSelector;
       Registry.Layout.UndoButton.SetView(command.Quest.Interface?.UndoButton);

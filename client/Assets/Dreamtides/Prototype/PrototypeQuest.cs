@@ -475,7 +475,7 @@ public class PrototypeQuest : Service
   IEnumerator CreateOrUpdateCards(CreateOrUpdateCardsRequest request, bool animate = true)
   {
     var cards = _prototypeCards.CreateOrUpdateCards(request);
-    var quest = new QuestView { Cards = cards };
+    var quest = new QuestView { Cards = cards, EssenceTotal = 75 };
     var temptingOffer = _temptingOfferFlow.BuildTemptingOfferView(request);
     if (temptingOffer != null)
     {

@@ -2,6 +2,7 @@
 
 namespace Dreamtides.Layout
 {
+  using Dreamtides.Components;
   using Dreamtides.Utils;
   using UnityEngine;
 
@@ -10,6 +11,10 @@ namespace Dreamtides.Layout
     [SerializeField]
     ObjectLayout _questDeck = null!;
     public ObjectLayout QuestDeck => Check(_questDeck);
+
+    [SerializeField]
+    EssenceTotal _essenceTotal = null!;
+    public EssenceTotal EssenceTotal => Check(_essenceTotal);
 
     [SerializeField]
     SitePickObjectLayout _draftPickLayout = null!;
