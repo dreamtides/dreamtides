@@ -99,7 +99,7 @@ namespace Dreamtides.Animations
       float pause,
       float stagger,
       CardAnimationService service,
-      ProjectileAddress? cardTail,
+      ProjectileAddress? cardTrail,
       System.Action onDone
     )
     {
@@ -109,13 +109,14 @@ namespace Dreamtides.Animations
       {
         var cardView = toQuestDeck[i];
         var card = service.Registry.CardService.GetCard(cardView.Id);
+        Debug.Log($"Moving to quest deck: cardView: {card.name}");
         var moveSeq = TweenUtils.Sequence("QuestDeckMoveAbove");
         card.SortingKey = (int)cardView.Position.SortingKey;
         var anchor = service.Registry.DreamscapeLayout.AboveQuestDeck;
 
-        if (cardTail != null)
+        if (cardTrail != null)
         {
-          card.SetCardTrail(cardTail);
+          card.SetCardTrail(cardTrail);
         }
 
         moveSeq.Insert(
@@ -138,7 +139,7 @@ namespace Dreamtides.Animations
 
         service.Registry.SoundService.Play(service.MoveToQuestDeckSound);
 
-        if (cardTail != null)
+        if (cardTrail != null)
         {
           card.ClearCardTrail();
         }

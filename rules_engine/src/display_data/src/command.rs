@@ -248,7 +248,15 @@ pub enum MoveCardsCustomAnimation {
     ShowInDraftPickLayout,
     ShowInShopLayout,
     HideShopLayout,
+
+    /// Animates card views in `cards` to the quest deck if they are specified
+    /// as being in the quest deck position. Animates all other views in `cards`
+    /// to the destroyed position.
     MoveToQuestDeckOrDestroy,
+
+    /// Animates card views in `cards` to the dreamsign display if they are
+    /// specified as being in the dreamsign display position. Animates all
+    /// other views in `cards` to the destroyed position.
     MoveToDreamsignDisplayOrDestroy,
 }
 

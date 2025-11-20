@@ -2748,6 +2748,14 @@ namespace Dreamtides.Schema
 
     /// <summary>
     /// Animation to perform when moving cards
+    ///
+    /// Animates card views in `cards` to the quest deck if they are specified
+    /// as being in the quest deck position. Animates all other views in `cards`
+    /// to the destroyed position.
+    ///
+    /// Animates card views in `cards` to the dreamsign display if they are
+    /// specified as being in the dreamsign display position. Animates all
+    /// other views in `cards` to the destroyed position.
     /// </summary>
     public enum MoveCardsCustomAnimation { DefaultAnimation, HideShopLayout, MoveToDreamsignDisplayOrDestroy, MoveToQuestDeckOrDestroy, ShowAtDrawnCardsPosition, ShowInDraftPickLayout, ShowInShopLayout };
 

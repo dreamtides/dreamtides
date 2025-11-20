@@ -19,6 +19,9 @@ public class PrototypeQuestTemptingOfferFlow
   const string TemptingOfferButtonLabel = "Accept";
   const int TemptingOfferCardsPerOffer = 2;
   const int TemptingOfferMaxOffers = 2;
+  const int ImmolateReverseDissolveDelayStepMs = 300;
+  const float ImmolateReverseDissolveDurationSeconds = 1f;
+  const float ImmolatePostDissolveDelaySeconds = 0.5f;
 
   readonly Registry _registry;
   readonly PrototypeCards _prototypeCards;
@@ -375,7 +378,8 @@ public class PrototypeQuestTemptingOfferFlow
       TryBuildPostDissolveQuestUpdate(
         journeyCardId,
         out var postDissolveUpdate,
-        out var immolateCardIds
+        out var immolateCardIds,
+        out var maxReverseDissolveDelayMs
       )
     )
     {
@@ -385,6 +389,15 @@ public class PrototypeQuestTemptingOfferFlow
       };
       yield return _registry.CardService.HandleUpdateQuestCards(postUpdate);
       _prototypeCards.UpdateGroupCards(TemptingOfferGroupKey, postDissolveUpdate);
+      if (immolateCardIds.Count > 0)
+      {
+        var totalWaitSeconds =
+          (maxReverseDissolveDelayMs / 1000f)
+          + ImmolateReverseDissolveDurationSeconds
+          + ImmolatePostDissolveDelaySeconds;
+        yield return new WaitForSeconds(totalWaitSeconds);
+        yield return MoveImmolateCardsToQuestDeck(immolateCardIds);
+      }
     }
   }
 
@@ -477,10 +490,12 @@ public class PrototypeQuestTemptingOfferFlow
   bool TryBuildPostDissolveQuestUpdate(
     string journeyCardId,
     out List<CardView> updateCards,
-    out List<string> spawnedImmolateCardIds
+    out List<string> spawnedImmolateCardIds,
+    out long maxReverseDissolveDelayMs
   )
   {
     spawnedImmolateCardIds = new List<string>();
+    maxReverseDissolveDelayMs = 0;
     var existing = _registry.CardService.GetCardIfExists(journeyCardId);
     if (existing == null)
     {
@@ -522,10 +537,15 @@ public class PrototypeQuestTemptingOfferFlow
     var questEffectSorting = _registry.DreamscapeLayout.QuestEffectPosition.Objects.Count;
     for (var i = 0; i < 3; i++)
     {
+      var startDelay = i * ImmolateReverseDissolveDelayStepMs;
+      if (startDelay > maxReverseDissolveDelayMs)
+      {
+        maxReverseDissolveDelayMs = startDelay;
+      }
       var immolateCard = BuildImmolateQuestEffectCard(
         questEffectSorting + i,
         out var immolateCardId,
-        startDelay: i * 300
+        startDelay: startDelay
       );
       spawnedImmolateCardIds.Add(immolateCardId);
       updateCards.Add(immolateCard);
@@ -585,5 +605,53 @@ public class PrototypeQuestTemptingOfferFlow
       },
       RevealedToOpponents = false,
     };
+  }
+
+  IEnumerator MoveImmolateCardsToQuestDeck(List<string> immolateCardIds)
+  {
+    var allIds = _registry.CardService.GetCardIds().ToList();
+    var updateCards = new List<CardView>(allIds.Count);
+    var immolateSet = immolateCardIds.ToHashSet();
+    var deckBase = _registry.DreamscapeLayout.QuestDeck.Objects.Count;
+    var deckOffset = 0;
+    var questDeckClones = new List<CardView>();
+    foreach (var id in allIds)
+    {
+      var card = _registry.CardService.GetCard(id);
+      var source = card.CardView;
+      if (immolateSet.Contains(id))
+      {
+        var clone = PrototypeQuestCardViewFactory.CloneCardViewWithPositionHidden(
+          source,
+          new Position { Enum = PositionEnum.QuestDeck },
+          deckBase + deckOffset
+        );
+        updateCards.Add(clone);
+        questDeckClones.Add(clone);
+        deckOffset++;
+      }
+      else
+      {
+        updateCards.Add(source);
+      }
+    }
+    if (questDeckClones.Count == 0)
+    {
+      yield break;
+    }
+
+    var command = new MoveCardsWithCustomAnimationCommand
+    {
+      Animation = MoveCardsCustomAnimation.MoveToQuestDeckOrDestroy,
+      Cards = questDeckClones,
+      Destination = new Position { Enum = PositionEnum.QuestDeck },
+      PauseDuration = new Milliseconds { MillisecondsValue = 300 },
+      StaggerInterval = new Milliseconds { MillisecondsValue = 100 },
+    };
+    yield return _registry.CardAnimationService.HandleMoveCardsWithCustomAnimation(command);
+
+    var update = new UpdateQuestCommand { Quest = new QuestView { Cards = updateCards } };
+    yield return _registry.CardService.HandleUpdateQuestCards(update);
+    _prototypeCards.UpdateGroupCards(TemptingOfferGroupKey, updateCards);
   }
 }
