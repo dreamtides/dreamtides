@@ -28,7 +28,7 @@ namespace Dreamtides.Tests.Components
       {
         new Vector3(0f, 0f, 12f),
         new Vector3(1.5f, -0.5f, 18f),
-        new Vector3(-2f, 3f, 40f)
+        new Vector3(-2f, 3f, 40f),
       };
 
       foreach (var localPoint in localPoints)
@@ -56,7 +56,7 @@ namespace Dreamtides.Tests.Components
       {
         new Vector3(0f, 0f, -5f),
         new Vector3(-1f, 2f, -12f),
-        new Vector3(3f, -4f, -25f)
+        new Vector3(3f, -4f, -25f),
       };
 
       foreach (var localPoint in localPoints)
@@ -86,5 +86,3 @@ namespace Dreamtides.Tests.Components
     }
   }
 }
-
-

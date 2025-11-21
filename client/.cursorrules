@@ -3,3 +3,11 @@ Please begin every response with "Sure!".
 Please DO NOT include any comments in generated source code.
 
 Please always use "var" in C# code instead of explicit types.
+
+You can format source code via "just fmt-csharp" on the command line from any
+working directory, please don't try to manually resolve formatting problems.
+
+You can run unit tests via "just unity-test-rsync" on the command line from 
+any working directory. This runs the tests in a separate Unity instance via
+rsync to prevent conflicts with the running editor. It takes around 3 minutes
+to complete.

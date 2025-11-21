@@ -80,9 +80,7 @@ namespace Dreamtides.Animations
         var infoAnchor = shouldShowOnLeft
           ? service.Registry.Layout.SupplementalCardInfoLeft
           : service.Registry.Layout.SupplementalCardInfoRight;
-        var screenPosition = service.Registry.MainCamera.WorldToScreenPoint(
-          infoAnchor.position
-        );
+        var screenPosition = service.Registry.MainCamera.WorldToScreenPoint(infoAnchor.position);
         var width = Mathf.Min(
           275f,
           service.Registry.DocumentService.ScreenPxToElementPx(Screen.width / 2.2f)
