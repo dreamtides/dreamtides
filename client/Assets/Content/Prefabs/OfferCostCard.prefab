@@ -8,6 +8,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2286569670905650521, guid: 08284e307285342a29a202270d0ee3c0, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: 956f170d4003142f585286aad1a939de, type: 3}
     - target: {fileID: 3095936710867677539, guid: 08284e307285342a29a202270d0ee3c0, type: 3}
       propertyPath: m_Name
       value: OfferCostCardFrame

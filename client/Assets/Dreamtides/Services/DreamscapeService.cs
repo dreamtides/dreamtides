@@ -91,13 +91,11 @@ namespace Dreamtides.Services
     {
       Registry.DreamscapeLayout.DraftPickLayout.ApplyLayout(sequence);
       Registry.DreamscapeLayout.DestroyedQuestCards.ApplyLayout(sequence);
-      Registry.DreamscapeLayout.DestroyedQuestCardsBattlefield.ApplyLayout(sequence);
       Registry.DreamscapeLayout.ShopLayout.ApplyLayout(sequence);
       Registry.DreamscapeLayout.DreamsignDisplay.ApplyLayout(sequence);
       Registry.DreamscapeLayout.JourneyChoiceDisplay.ApplyLayout(sequence);
       Registry.DreamscapeLayout.TemptingOfferDisplay.ApplyLayout(sequence);
       Registry.DreamscapeLayout.QuestEffectPosition.ApplyLayout(sequence);
-      Registry.DreamscapeLayout.QuestEffectBattlefieldPosition.ApplyLayout(sequence);
 
       _tmpSiteDeckLayout.ApplyLayout(sequence);
       _tmpMerchantPositionLayout.ApplyLayout(sequence);

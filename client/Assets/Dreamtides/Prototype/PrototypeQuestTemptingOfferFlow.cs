@@ -435,9 +435,9 @@ public class PrototypeQuestTemptingOfferFlow
       return false;
     }
     var allIds = _registry.CardService.GetCardIds().ToList();
-    var destroyedBase = _registry.DreamscapeLayout.DestroyedQuestCardsBattlefield.Objects.Count;
+    var destroyedBase = _registry.DreamscapeLayout.DestroyedQuestCards.Objects.Count;
     var destroyedOffset = 0;
-    var sortingKey = _registry.DreamscapeLayout.QuestEffectBattlefieldPosition.Objects.Count;
+    var sortingKey = _registry.DreamscapeLayout.QuestEffectPosition.Objects.Count;
     updateCards = new List<CardView>(allIds.Count);
     foreach (var id in allIds)
     {
@@ -450,10 +450,7 @@ public class PrototypeQuestTemptingOfferFlow
             source,
             new Position
             {
-              PositionClass = new PositionClass
-              {
-                QuestEffect = QuestEffectCardType.BattlefieldCard,
-              },
+              PositionClass = new PositionClass { QuestEffect = QuestEffectCardType.FullCard },
             },
             sortingKey
           )
@@ -473,7 +470,7 @@ public class PrototypeQuestTemptingOfferFlow
             {
               PositionClass = new PositionClass
               {
-                DestroyedQuestCards = QuestEffectCardType.BattlefieldCard,
+                DestroyedQuestCards = QuestEffectCardType.FullCard,
               },
             },
             destroyedSorting
@@ -524,7 +521,7 @@ public class PrototypeQuestTemptingOfferFlow
       return false;
     }
     var allIds = _registry.CardService.GetCardIds().ToList();
-    var destroyedBase = _registry.DreamscapeLayout.DestroyedQuestCardsBattlefield.Objects.Count;
+    var destroyedBase = _registry.DreamscapeLayout.DestroyedQuestCards.Objects.Count;
     var destroyedOffset = 0;
     updateCards = new List<CardView>(allIds.Count + 1);
     foreach (var id in allIds)
@@ -542,7 +539,7 @@ public class PrototypeQuestTemptingOfferFlow
             {
               PositionClass = new PositionClass
               {
-                DestroyedQuestCards = QuestEffectCardType.BattlefieldCard,
+                DestroyedQuestCards = QuestEffectCardType.FullCard,
               },
             },
             destroyedSorting
@@ -728,7 +725,7 @@ public class PrototypeQuestTemptingOfferFlow
       return false;
     }
     var allIds = _registry.CardService.GetCardIds().ToList();
-    var sortingKey = _registry.DreamscapeLayout.QuestEffectBattlefieldPosition.Objects.Count;
+    var sortingKey = _registry.DreamscapeLayout.QuestEffectPosition.Objects.Count;
     updateCards = new List<CardView>(allIds.Count);
     foreach (var id in allIds)
     {
@@ -741,10 +738,7 @@ public class PrototypeQuestTemptingOfferFlow
             source,
             new Position
             {
-              PositionClass = new PositionClass
-              {
-                QuestEffect = QuestEffectCardType.BattlefieldCard,
-              },
+              PositionClass = new PositionClass { QuestEffect = QuestEffectCardType.FullCard },
             },
             sortingKey
           )
@@ -768,7 +762,7 @@ public class PrototypeQuestTemptingOfferFlow
       return false;
     }
     var allIds = _registry.CardService.GetCardIds().ToList();
-    var destroyedBase = _registry.DreamscapeLayout.DestroyedQuestCardsBattlefield.Objects.Count;
+    var destroyedBase = _registry.DreamscapeLayout.DestroyedQuestCards.Objects.Count;
     var destroyedOffset = 0;
     updateCards = new List<CardView>(allIds.Count);
     foreach (var id in allIds)
@@ -784,7 +778,7 @@ public class PrototypeQuestTemptingOfferFlow
             {
               PositionClass = new PositionClass
               {
-                DestroyedQuestCards = QuestEffectCardType.BattlefieldCard,
+                DestroyedQuestCards = QuestEffectCardType.FullCard,
               },
             },
             destroyedBase + destroyedOffset

@@ -25,10 +25,6 @@ namespace Dreamtides.Layout
     public ObjectLayout DestroyedQuestCards => Check(_destroyedQuestCards);
 
     [SerializeField]
-    ObjectLayout _destroyedQuestCardsBattlefield = null!;
-    public ObjectLayout DestroyedQuestCardsBattlefield => Check(_destroyedQuestCardsBattlefield);
-
-    [SerializeField]
     Transform _aboveQuestDeck = null!;
     public Transform AboveQuestDeck => Check(_aboveQuestDeck);
 
@@ -51,10 +47,6 @@ namespace Dreamtides.Layout
     [SerializeField]
     ObjectLayout _questEffectPosition = null!;
     public ObjectLayout QuestEffectPosition => Check(_questEffectPosition);
-
-    [SerializeField]
-    ObjectLayout _questEffectBattlefieldPosition = null!;
-    public ObjectLayout QuestEffectBattlefieldPosition => Check(_questEffectBattlefieldPosition);
 
     [SerializeField]
     Displayable _essenceTotalWorldPosition = null!;

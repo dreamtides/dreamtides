@@ -535,9 +535,7 @@ namespace Dreamtides.Services
         return destroyedQuestCards switch
         {
           QuestEffectCardType.FullCard => Registry.DreamscapeLayout.DestroyedQuestCards,
-          QuestEffectCardType.BattlefieldCard => Registry
-            .DreamscapeLayout
-            .DestroyedQuestCardsBattlefield,
+          QuestEffectCardType.BattlefieldCard => Registry.DreamscapeLayout.DestroyedQuestCards,
           _ => throw Errors.UnknownEnumValue(destroyedQuestCards),
         };
       }
@@ -547,9 +545,7 @@ namespace Dreamtides.Services
         return questEffect switch
         {
           QuestEffectCardType.FullCard => Registry.DreamscapeLayout.QuestEffectPosition,
-          QuestEffectCardType.BattlefieldCard => Registry
-            .DreamscapeLayout
-            .QuestEffectBattlefieldPosition,
+          QuestEffectCardType.BattlefieldCard => Registry.DreamscapeLayout.QuestEffectPosition,
           _ => throw Errors.UnknownEnumValue(questEffect),
         };
       }
