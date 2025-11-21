@@ -19,6 +19,12 @@ namespace Dreamtides.Layout
     [SerializeField]
     float _maxScale = 1f;
 
+    [SerializeField]
+    int _minScaleThresholdPortrait = 4;
+
+    [SerializeField]
+    int _minScaleThresholdLandscape = 8;
+
     public override Vector3 CalculateObjectPosition(int index, int count)
     {
       if (count <= 0)
@@ -45,13 +51,13 @@ namespace Dreamtides.Layout
       }
 
       var camera = Registry.MainCamera;
-      var requested = Mathf.Max(_horizontalSpacing, 0f);
+      var scale = EvaluateScale(count);
+      var requested = Mathf.Max(_horizontalSpacing * scale, 0f);
       if (!camera)
       {
         return requested;
       }
 
-      var scale = EvaluateScale(count);
       if (SpacingFitsViewport(requested, count, scale, camera))
       {
         return requested;
@@ -82,12 +88,13 @@ namespace Dreamtides.Layout
         return _maxScale;
       }
 
-      if (count >= 4)
+      var threshold = IsLandscape() ? _minScaleThresholdLandscape : _minScaleThresholdPortrait;
+      if (count >= threshold)
       {
         return _minScale;
       }
 
-      var t = Mathf.InverseLerp(1f, 4f, count);
+      var t = Mathf.InverseLerp(1f, threshold, count);
       return Mathf.Lerp(_maxScale, _minScale, t);
     }
 
