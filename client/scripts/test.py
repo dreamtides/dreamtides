@@ -199,7 +199,7 @@ def main():
         "-batchmode",
         f"-projectPath", str(project_path),
         f"-testResults", test_results,
-        "-testPlatform", "PlayMode",
+        "-testPlatform", "EditMode",
         f"-logFile", log_file
     ]
 

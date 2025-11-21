@@ -2,6 +2,10 @@ set positional-arguments
 
 code-review: check-format build workspace-lints clippy test check-docs unity-tests
 
+# Run this before pushing
+code-review-rsync: rsync-for-review
+    cd ~/dreamtides_tests && just code-review || (osascript -e 'display dialog "Review failed" with icon stop'; exit 1)
+
 review: check-format build workspace-lints clippy test
 
 check:
@@ -196,7 +200,7 @@ check-format:
 check-docs:
     RUSTDOCFLAGS="-D rustdoc::broken-intra-doc-links -D rustdoc::private-intra-doc-links -D rustdoc::bare-urls" cargo doc --manifest-path rules_engine/Cargo.toml --all
 
-unity-tests: mac-plugin
+unity-tests:
     ./client/scripts/test.py
 
 outdated:
@@ -301,10 +305,7 @@ rsync-third-party:
     cp justfile ~/dreamtides_tests/
     echo $'\a'
 
-code-review-rsync: rsync-for-review
-    cd ~/dreamtides_tests && just code-review || (osascript -e 'display dialog "Review failed" with icon stop'; exit 1)
-
-unity-test-rsync: rsync-for-review
+nity-test-rsync: rsync-for-review
     cd ~/dreamtides_tests && just unity-tests
 
 regenerate-test-battles:
