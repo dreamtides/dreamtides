@@ -2,11 +2,13 @@
 
 using System.Collections;
 using System.Collections.Generic;
-using Dreamtides.Buttons;
+using System.Runtime.CompilerServices;
 using Dreamtides.Components;
 using Dreamtides.Layout;
 using Dreamtides.Utils;
 using UnityEngine;
+
+[assembly: InternalsVisibleTo("Dreamtides.Tests")]
 
 namespace Dreamtides.Services
 {
@@ -15,10 +17,11 @@ namespace Dreamtides.Services
     public static TestConfiguration? TestConfiguration { get; set; }
 
     [SerializeField]
-    GameLayout? _portraitLayout;
+    internal GameLayout? _portraitLayout;
 
     [SerializeField]
-    GameLayout? _landscapeLayout;
+    internal GameLayout? _landscapeLayout;
+
     bool _isLandscape = false;
 
     [SerializeField]
@@ -33,6 +36,8 @@ namespace Dreamtides.Services
     [SerializeField]
     Camera _mainCamera = null!;
     public Camera MainCamera => Check(_mainCamera);
+
+    public IGameViewport GameViewport { get; private set; } = null!;
 
     [SerializeField]
     GameCamera _cameraAdjuster = null!;
@@ -156,39 +161,43 @@ namespace Dreamtides.Services
 
     void Awake()
     {
-      _currentGameMode = (GameMode)
-        PlayerPrefs.GetInt(PlayerPrefKeys.SelectedPlayMode, (int)GameMode.Quest);
-      var testConfiguration = TestConfiguration;
+      StartCoroutine(RunAwake());
+    }
+
+    public IEnumerator RunAwake(
+      GameMode? mode = null,
+      TestConfiguration? testConfiguration = null,
+      Vector2? resolutionOverride = null,
+      IGameViewport? gameViewport = null
+    )
+    {
+      _currentGameMode =
+        mode ?? (GameMode)PlayerPrefs.GetInt(PlayerPrefKeys.SelectedPlayMode, (int)GameMode.Quest);
+      GameViewport = gameViewport ?? new RealCamera(MainCamera);
 
       if (testConfiguration != null)
       {
-        // Note: Test screen resolution is not correct on Awake() frame
-        Debug.Log($"Starting integration test {testConfiguration.IntegrationTestId}");
-        _currentGameMode = GameMode.Battle;
+        Debug.Log($"Starting test {testConfiguration.TestId}");
       }
       else
       {
         Debug.Log($"Starting Dreamtides with game mode {_currentGameMode}");
       }
 
-      StartCoroutine(DelayedAwake(_currentGameMode, testConfiguration));
+      yield return new WaitForEndOfFrame();
+      yield return InitializeAll(_currentGameMode, testConfiguration, resolutionOverride);
     }
 
-    IEnumerator DelayedAwake(GameMode mode, TestConfiguration? testConfiguration)
+    IEnumerator InitializeAll(
+      GameMode mode,
+      TestConfiguration? testConfiguration,
+      Vector2? resolutionOverride = null
+    )
     {
-      yield return new WaitForEndOfFrame();
-      yield return new WaitForEndOfFrame();
-      yield return new WaitForEndOfFrame();
-      yield return new WaitForEndOfFrame();
-      yield return new WaitForEndOfFrame();
-
-      yield return RunAwake(mode, testConfiguration);
-    }
-
-    IEnumerator RunAwake(GameMode mode, TestConfiguration? testConfiguration)
-    {
-      var width = UnityEngine.Device.Screen.width;
-      var height = UnityEngine.Device.Screen.height;
+      // Need to use this fully-qualified API to have it work in Device
+      // Simulator.
+      var width = resolutionOverride?.x ?? UnityEngine.Device.Screen.width;
+      var height = resolutionOverride?.y ?? UnityEngine.Device.Screen.height;
       _isLandscape = width > height;
       if (_isLandscape)
       {
@@ -234,7 +243,10 @@ namespace Dreamtides.Services
         }
       }
 
-      ToggleGameObjectsForMode(mode);
+      if (testConfiguration == null)
+      {
+        TempToggleGameObjectsForMode(mode);
+      }
 
       yield return new WaitForEndOfFrame();
 
@@ -264,8 +276,11 @@ namespace Dreamtides.Services
     T Check<T>(T? value)
       where T : Object => Errors.CheckNotNull(value, $"{typeof(T).Name} not initialized");
 
-    void ToggleGameObjectsForMode(GameMode mode)
+    void TempToggleGameObjectsForMode(GameMode mode)
     {
+      // In the future we need to run all this logic after connecting to the
+      // rules engine, this is just a temporary solution for prototyping.
+
       var battleMode = mode == GameMode.Battle;
       if (battleMode)
       {

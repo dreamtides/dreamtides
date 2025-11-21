@@ -77,7 +77,7 @@ namespace Dreamtides.Services
     {
       Connected = false;
       _lastActionTime = Time.time;
-      _integrationTestId = testConfiguration?.IntegrationTestId;
+      _integrationTestId = testConfiguration?.TestId;
       _enemyId = Guid.NewGuid();
 
       StartCoroutine(InitializeAsync(mode));

@@ -113,9 +113,7 @@ namespace Dreamtides.Services
             continue;
           }
 
-          var screenTargetPosition = Registry.MainCamera.WorldToScreenPoint(
-            targetPosition.Value
-          );
+          var screenTargetPosition = Registry.MainCamera.WorldToScreenPoint(targetPosition.Value);
           var distance = Vector2.Distance(
             pointerPosition,
             new Vector2(screenTargetPosition.x, screenTargetPosition.y)

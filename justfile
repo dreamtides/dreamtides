@@ -305,7 +305,7 @@ rsync-third-party:
     cp justfile ~/dreamtides_tests/
     echo $'\a'
 
-nity-test-rsync: rsync-for-review
+unity-test-rsync: rsync-for-review
     cd ~/dreamtides_tests && just unity-tests
 
 regenerate-test-battles:

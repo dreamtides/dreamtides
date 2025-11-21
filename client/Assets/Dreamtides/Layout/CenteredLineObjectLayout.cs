@@ -1,5 +1,6 @@
 #nullable enable
 
+using Dreamtides.Components;
 using Dreamtides.Services;
 using UnityEngine;
 
@@ -50,15 +51,11 @@ namespace Dreamtides.Layout
         return 0f;
       }
 
-      var camera = Registry.MainCamera;
+      var gameViewport = Registry.GameViewport;
       var scale = EvaluateScale(count);
       var requested = Mathf.Max(_horizontalSpacing * scale, 0f);
-      if (!camera)
-      {
-        return requested;
-      }
 
-      if (SpacingFitsViewport(requested, count, scale, camera))
+      if (SpacingFitsViewport(requested, count, scale, gameViewport))
       {
         return requested;
       }
@@ -68,7 +65,7 @@ namespace Dreamtides.Layout
       for (var i = 0; i < 12; ++i)
       {
         var mid = (minSpacing + maxSpacing) * 0.5f;
-        if (SpacingFitsViewport(mid, count, scale, camera))
+        if (SpacingFitsViewport(mid, count, scale, gameViewport))
         {
           minSpacing = mid;
         }
@@ -98,7 +95,7 @@ namespace Dreamtides.Layout
       return Mathf.Lerp(_maxScale, _minScale, t);
     }
 
-    bool SpacingFitsViewport(float spacing, int count, float scale, Camera camera)
+    bool SpacingFitsViewport(float spacing, int count, float scale, IGameViewport gameViewport)
     {
       if (count <= 0)
       {
@@ -113,7 +110,10 @@ namespace Dreamtides.Layout
         var center = transform.position + transform.right * offset;
         var leftEdge = center - halfWidthVector;
         var rightEdge = center + halfWidthVector;
-        if (!IsPointWithinViewport(leftEdge, camera) || !IsPointWithinViewport(rightEdge, camera))
+        if (
+          !IsPointWithinViewport(leftEdge, gameViewport)
+          || !IsPointWithinViewport(rightEdge, gameViewport)
+        )
         {
           return false;
         }
@@ -122,9 +122,9 @@ namespace Dreamtides.Layout
       return true;
     }
 
-    static bool IsPointWithinViewport(Vector3 point, Camera camera)
+    static bool IsPointWithinViewport(Vector3 point, IGameViewport gameViewport)
     {
-      var viewport = camera.WorldToViewportPoint(point);
+      var viewport = gameViewport.WorldToViewportPoint(point);
       if (viewport.z <= 0f)
       {
         return false;

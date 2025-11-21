@@ -6,11 +6,11 @@ namespace Dreamtides.Services
 {
   public class TestConfiguration
   {
-    public Guid IntegrationTestId { get; }
+    public Guid TestId { get; }
 
-    public TestConfiguration(Guid integrationTestId)
+    public TestConfiguration(Guid testId)
     {
-      IntegrationTestId = integrationTestId;
+      TestId = testId;
     }
   }
 }
