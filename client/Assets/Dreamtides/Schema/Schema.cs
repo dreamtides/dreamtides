@@ -1556,9 +1556,6 @@ namespace Dreamtides.Schema
     /// Object is above the void, used to display void cards which are currently
     /// being targeted.
     ///
-    /// Object is hidden after being destroyed during a quest, for example when
-    /// not selected for a draft pick.
-    ///
     /// Object is in a deck of cards displayed at a given dreamscape site, e.g.
     /// before being drafted.
     ///
@@ -1566,10 +1563,6 @@ namespace Dreamtides.Schema
     /// dreamscape site (prior to animation to the display), e.g. a merchant.
     ///
     /// Object is being displayed as an option in a tempting offer choice.
-    ///
-    /// Object is being displayed prominently, applying an effect to the
-    /// currently active quest. Similar to a card being on the stack during a
-    /// battle.
     /// </summary>
     public partial class PositionClass
     {
@@ -1606,9 +1599,6 @@ namespace Dreamtides.Schema
         [JsonProperty("AboveVoid", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public DisplayPlayer? AboveVoid { get; set; }
 
-        [JsonProperty("DestroyedQuestCards", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public QuestEffectCardType? DestroyedQuestCards { get; set; }
-
         [JsonProperty("SiteDeck", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public Guid? SiteDeck { get; set; }
 
@@ -1617,9 +1607,6 @@ namespace Dreamtides.Schema
 
         [JsonProperty("TemptingOfferDisplay", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public TemptingOfferPosition TemptingOfferDisplay { get; set; }
-
-        [JsonProperty("QuestEffect", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public QuestEffectCardType? QuestEffect { get; set; }
     }
 
     public partial class TemptingOfferPosition
@@ -2739,6 +2726,9 @@ namespace Dreamtides.Schema
     ///
     /// User deck displayed in the quest view
     ///
+    /// Object is hidden after being destroyed during a quest, for example when
+    /// not selected for a draft pick.
+    ///
     /// Dreamsigns owned by the player in a quest
     ///
     /// Object is being displayed as a potential draft pick choice
@@ -2746,15 +2736,17 @@ namespace Dreamtides.Schema
     /// Object is being displayed in the shop interface
     ///
     /// Object is being displayed as an option in a journey choice.
+    ///
+    /// Object is being displayed prominently, applying an effect to the
+    /// currently active quest. Similar to a card being on the stack during a
+    /// battle.
     /// </summary>
-    public enum PositionEnum { Browser, Default, DraftPickDisplay, Drawn, DreamsignDisplay, DreamwellActivation, GameModifier, HandStorage, JourneyDisplay, Offscreen, OnScreenStorage, QuestDeck, ShopDisplay };
+    public enum PositionEnum { Browser, Default, DestroyedQuestCards, DraftPickDisplay, Drawn, DreamsignDisplay, DreamwellActivation, GameModifier, HandStorage, JourneyDisplay, Offscreen, OnScreenStorage, QuestDeck, QuestEffect, ShopDisplay };
 
     /// <summary>
     /// Auto-generated discriminant enum variants
     /// </summary>
     public enum CardOrderSelectionTargetDiscriminants { Deck, Void };
-
-    public enum QuestEffectCardType { BattlefieldCard, FullCard };
 
     public enum StackType { Default, TargetingBothBattlefields, TargetingEnemyBattlefield, TargetingUserBattlefield };
 
@@ -2997,7 +2989,6 @@ namespace Dreamtides.Schema
                 GameMessageTypeConverter.Singleton,
                 PositionConverter.Singleton,
                 CardOrderSelectionTargetDiscriminantsConverter.Singleton,
-                QuestEffectCardTypeConverter.Singleton,
                 StackTypeConverter.Singleton,
                 TemptingOfferTypeConverter.Singleton,
                 PositionEnumConverter.Singleton,
@@ -5315,6 +5306,8 @@ namespace Dreamtides.Schema
                             return new Position { Enum = PositionEnum.Browser };
                         case "Default":
                             return new Position { Enum = PositionEnum.Default };
+                        case "DestroyedQuestCards":
+                            return new Position { Enum = PositionEnum.DestroyedQuestCards };
                         case "DraftPickDisplay":
                             return new Position { Enum = PositionEnum.DraftPickDisplay };
                         case "Drawn":
@@ -5335,6 +5328,8 @@ namespace Dreamtides.Schema
                             return new Position { Enum = PositionEnum.OnScreenStorage };
                         case "QuestDeck":
                             return new Position { Enum = PositionEnum.QuestDeck };
+                        case "QuestEffect":
+                            return new Position { Enum = PositionEnum.QuestEffect };
                         case "ShopDisplay":
                             return new Position { Enum = PositionEnum.ShopDisplay };
                     }
@@ -5358,6 +5353,9 @@ namespace Dreamtides.Schema
                         return;
                     case PositionEnum.Default:
                         serializer.Serialize(writer, "Default");
+                        return;
+                    case PositionEnum.DestroyedQuestCards:
+                        serializer.Serialize(writer, "DestroyedQuestCards");
                         return;
                     case PositionEnum.DraftPickDisplay:
                         serializer.Serialize(writer, "DraftPickDisplay");
@@ -5388,6 +5386,9 @@ namespace Dreamtides.Schema
                         return;
                     case PositionEnum.QuestDeck:
                         serializer.Serialize(writer, "QuestDeck");
+                        return;
+                    case PositionEnum.QuestEffect:
+                        serializer.Serialize(writer, "QuestEffect");
                         return;
                     case PositionEnum.ShopDisplay:
                         serializer.Serialize(writer, "ShopDisplay");
@@ -5444,47 +5445,6 @@ namespace Dreamtides.Schema
         }
 
         public static readonly CardOrderSelectionTargetDiscriminantsConverter Singleton = new CardOrderSelectionTargetDiscriminantsConverter();
-    }
-
-    internal class QuestEffectCardTypeConverter : JsonConverter
-    {
-        public override bool CanConvert(Type t) => t == typeof(QuestEffectCardType) || t == typeof(QuestEffectCardType?);
-
-        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
-        {
-            if (reader.TokenType == JsonToken.Null) return null;
-            var value = serializer.Deserialize<string>(reader);
-            switch (value)
-            {
-                case "BattlefieldCard":
-                    return QuestEffectCardType.BattlefieldCard;
-                case "FullCard":
-                    return QuestEffectCardType.FullCard;
-            }
-            throw new Exception("Cannot unmarshal type QuestEffectCardType");
-        }
-
-        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
-        {
-            if (untypedValue == null)
-            {
-                serializer.Serialize(writer, null);
-                return;
-            }
-            var value = (QuestEffectCardType)untypedValue;
-            switch (value)
-            {
-                case QuestEffectCardType.BattlefieldCard:
-                    serializer.Serialize(writer, "BattlefieldCard");
-                    return;
-                case QuestEffectCardType.FullCard:
-                    serializer.Serialize(writer, "FullCard");
-                    return;
-            }
-            throw new Exception("Cannot marshal type QuestEffectCardType");
-        }
-
-        public static readonly QuestEffectCardTypeConverter Singleton = new QuestEffectCardTypeConverter();
     }
 
     internal class StackTypeConverter : JsonConverter
@@ -5593,6 +5553,8 @@ namespace Dreamtides.Schema
                     return PositionEnum.Browser;
                 case "Default":
                     return PositionEnum.Default;
+                case "DestroyedQuestCards":
+                    return PositionEnum.DestroyedQuestCards;
                 case "DraftPickDisplay":
                     return PositionEnum.DraftPickDisplay;
                 case "Drawn":
@@ -5613,6 +5575,8 @@ namespace Dreamtides.Schema
                     return PositionEnum.OnScreenStorage;
                 case "QuestDeck":
                     return PositionEnum.QuestDeck;
+                case "QuestEffect":
+                    return PositionEnum.QuestEffect;
                 case "ShopDisplay":
                     return PositionEnum.ShopDisplay;
             }
@@ -5634,6 +5598,9 @@ namespace Dreamtides.Schema
                     return;
                 case PositionEnum.Default:
                     serializer.Serialize(writer, "Default");
+                    return;
+                case PositionEnum.DestroyedQuestCards:
+                    serializer.Serialize(writer, "DestroyedQuestCards");
                     return;
                 case PositionEnum.DraftPickDisplay:
                     serializer.Serialize(writer, "DraftPickDisplay");
@@ -5664,6 +5631,9 @@ namespace Dreamtides.Schema
                     return;
                 case PositionEnum.QuestDeck:
                     serializer.Serialize(writer, "QuestDeck");
+                    return;
+                case PositionEnum.QuestEffect:
+                    serializer.Serialize(writer, "QuestEffect");
                     return;
                 case PositionEnum.ShopDisplay:
                     serializer.Serialize(writer, "ShopDisplay");

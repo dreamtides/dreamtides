@@ -401,6 +401,16 @@ namespace Dreamtides.Services
         return Registry.DreamscapeLayout.JourneyChoiceDisplay;
       }
 
+      if (position.Enum == PositionEnum.QuestEffect)
+      {
+        return Registry.DreamscapeLayout.QuestEffectPosition;
+      }
+
+      if (position.Enum == PositionEnum.DestroyedQuestCards)
+      {
+        return Registry.DreamscapeLayout.DestroyedQuestCards;
+      }
+
       if (position.PositionClass == null)
       {
         throw new InvalidOperationException($"Unknown layout position enum: ${position.Enum}");
@@ -528,26 +538,6 @@ namespace Dreamtides.Services
       if (position.PositionClass.TemptingOfferDisplay is { } _)
       {
         return Registry.DreamscapeLayout.TemptingOfferDisplay;
-      }
-
-      if (position.PositionClass.DestroyedQuestCards is { } destroyedQuestCards)
-      {
-        return destroyedQuestCards switch
-        {
-          QuestEffectCardType.FullCard => Registry.DreamscapeLayout.DestroyedQuestCards,
-          QuestEffectCardType.BattlefieldCard => Registry.DreamscapeLayout.DestroyedQuestCards,
-          _ => throw Errors.UnknownEnumValue(destroyedQuestCards),
-        };
-      }
-
-      if (position.PositionClass.QuestEffect is { } questEffect)
-      {
-        return questEffect switch
-        {
-          QuestEffectCardType.FullCard => Registry.DreamscapeLayout.QuestEffectPosition,
-          QuestEffectCardType.BattlefieldCard => Registry.DreamscapeLayout.QuestEffectPosition,
-          _ => throw Errors.UnknownEnumValue(questEffect),
-        };
       }
 
       var json = JsonConvert.SerializeObject(position.PositionClass);

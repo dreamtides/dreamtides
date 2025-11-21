@@ -448,10 +448,7 @@ public class PrototypeQuestTemptingOfferFlow
         updateCards.Add(
           PrototypeQuestCardViewFactory.CloneCardViewWithPosition(
             source,
-            new Position
-            {
-              PositionClass = new PositionClass { QuestEffect = QuestEffectCardType.FullCard },
-            },
+            new Position { Enum = PositionEnum.QuestEffect },
             sortingKey
           )
         );
@@ -466,13 +463,7 @@ public class PrototypeQuestTemptingOfferFlow
         updateCards.Add(
           PrototypeQuestCardViewFactory.CloneCardViewWithPosition(
             source,
-            new Position
-            {
-              PositionClass = new PositionClass
-              {
-                DestroyedQuestCards = QuestEffectCardType.FullCard,
-              },
-            },
+            new Position { Enum = PositionEnum.DestroyedQuestCards },
             destroyedSorting
           )
         );
@@ -535,13 +526,7 @@ public class PrototypeQuestTemptingOfferFlow
         updateCards.Add(
           PrototypeQuestCardViewFactory.CloneCardViewWithPosition(
             source,
-            new Position
-            {
-              PositionClass = new PositionClass
-              {
-                DestroyedQuestCards = QuestEffectCardType.FullCard,
-              },
-            },
+            new Position { Enum = PositionEnum.DestroyedQuestCards },
             destroyedSorting
           )
         );
@@ -584,10 +569,7 @@ public class PrototypeQuestTemptingOfferFlow
       Id = generatedId,
       Position = new ObjectPosition
       {
-        Position = new Position
-        {
-          PositionClass = new PositionClass { QuestEffect = QuestEffectCardType.FullCard },
-        },
+        Position = new Position { Enum = PositionEnum.QuestEffect },
         SortingKey = sortingKey,
       },
       Prefab = CardPrefab.Event,
@@ -736,10 +718,7 @@ public class PrototypeQuestTemptingOfferFlow
         updateCards.Add(
           PrototypeQuestCardViewFactory.CloneCardViewWithPosition(
             source,
-            new Position
-            {
-              PositionClass = new PositionClass { QuestEffect = QuestEffectCardType.FullCard },
-            },
+            new Position { Enum = PositionEnum.QuestEffect },
             sortingKey
           )
         );
@@ -774,13 +753,7 @@ public class PrototypeQuestTemptingOfferFlow
         updateCards.Add(
           PrototypeQuestCardViewFactory.CloneCardViewWithPosition(
             source,
-            new Position
-            {
-              PositionClass = new PositionClass
-              {
-                DestroyedQuestCards = QuestEffectCardType.FullCard,
-              },
-            },
+            new Position { Enum = PositionEnum.DestroyedQuestCards },
             destroyedBase + destroyedOffset
           )
         );
