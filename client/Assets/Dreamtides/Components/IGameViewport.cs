@@ -12,6 +12,10 @@ namespace Dreamtides.Components
   public interface IGameViewport
   {
     Vector3 WorldToViewportPoint(Vector3 worldPosition);
+
+    Vector3 WorldToScreenPoint(Vector3 worldPosition);
+
+    Vector3 ScreenToWorldPoint(Vector3 position);
   }
 
   public sealed class RealCamera : IGameViewport
@@ -25,7 +29,17 @@ namespace Dreamtides.Components
 
     public Vector3 WorldToViewportPoint(Vector3 worldPosition)
     {
-      return Camera.main.WorldToViewportPoint(worldPosition);
+      return _camera.WorldToViewportPoint(worldPosition);
+    }
+
+    public Vector3 WorldToScreenPoint(Vector3 worldPosition)
+    {
+      return _camera.WorldToScreenPoint(worldPosition);
+    }
+
+    public Vector3 ScreenToWorldPoint(Vector3 position)
+    {
+      return _camera.ScreenToWorldPoint(position);
     }
   }
 
@@ -36,6 +50,7 @@ namespace Dreamtides.Components
   public sealed class FakeCamera : IGameViewport
   {
     readonly Transform _cameraTransform;
+    readonly Vector2 _screenResolution;
     readonly float _aspectRatio;
     readonly float _tanHalfVerticalFov;
 
@@ -52,6 +67,7 @@ namespace Dreamtides.Components
       }
 
       _cameraTransform = cameraTransform;
+      _screenResolution = screenResolution;
 
       if (fieldOfView <= 0f || fieldOfView >= 180f)
       {
@@ -71,6 +87,31 @@ namespace Dreamtides.Components
       var x = xNormalized * 0.5f + 0.5f;
       var y = yNormalized * 0.5f + 0.5f;
       return new Vector3(x, y, viewPosition.z);
+    }
+
+    public Vector3 WorldToScreenPoint(Vector3 worldPosition)
+    {
+      var viewPosition = _cameraTransform.InverseTransformPoint(worldPosition);
+      var denominator = viewPosition.z * _tanHalfVerticalFov;
+      var xNormalized = viewPosition.x / (denominator * _aspectRatio);
+      var yNormalized = viewPosition.y / denominator;
+      var x = (xNormalized * 0.5f + 0.5f) * _screenResolution.x;
+      var y = (yNormalized * 0.5f + 0.5f) * _screenResolution.y;
+      return new Vector3(x, y, viewPosition.z);
+    }
+
+    public Vector3 ScreenToWorldPoint(Vector3 position)
+    {
+      var viewportX = position.x / _screenResolution.x;
+      var viewportY = position.y / _screenResolution.y;
+      var xNormalized = (viewportX - 0.5f) * 2f;
+      var yNormalized = (viewportY - 0.5f) * 2f;
+      var z = position.z;
+      var denominator = z * _tanHalfVerticalFov;
+      var localX = xNormalized * denominator * _aspectRatio;
+      var localY = yNormalized * denominator;
+      var localPoint = new Vector3(localX, localY, z);
+      return _cameraTransform.TransformPoint(localPoint);
     }
   }
 }
