@@ -46,6 +46,7 @@ namespace Dreamtides.Tests.TestUtils
     protected static FakeViewport CreateViewport(
       GameViewResolution resolution,
       Transform cameraTransform,
+      RectTransform canvasRootRect,
       Vector2? safeAreaMinimumAnchor = null,
       Vector2? safeAreaMaximumAnchor = null,
       Rect? canvasPixelRect = null
@@ -57,6 +58,7 @@ namespace Dreamtides.Tests.TestUtils
         size,
         cameraTransform,
         60f,
+        canvasRootRect,
         rect,
         safeAreaMinimumAnchor,
         safeAreaMaximumAnchor
@@ -67,13 +69,16 @@ namespace Dreamtides.Tests.TestUtils
       GameViewResolution resolution,
       Vector2? safeAreaMinimumAnchor = null,
       Vector2? safeAreaMaximumAnchor = null,
-      Rect? canvasPixelRect = null
+      Rect? canvasPixelRect = null,
+      RectTransform? canvasRootRect = null
     )
     {
       var camera = CreateGameObject().transform;
+      canvasRootRect ??= CreateGameObject().AddComponent<RectTransform>();
       return CreateViewport(
         resolution,
         camera,
+        canvasRootRect,
         safeAreaMinimumAnchor,
         safeAreaMaximumAnchor,
         canvasPixelRect

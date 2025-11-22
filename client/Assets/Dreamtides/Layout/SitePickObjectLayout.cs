@@ -73,7 +73,7 @@ namespace Dreamtides.Layout
 
     public override Vector3 CalculateObjectPosition(int index, int count)
     {
-      var isLandscape = Registry.IsLandscape;
+      var isLandscape = Registry.GameViewport.IsLandscape;
       var effectiveCount = GetEffectiveCount(count);
       if (effectiveCount <= 0)
       {
@@ -148,25 +148,18 @@ namespace Dreamtides.Layout
         TweenUtils.FadeInCanvasGroup(ComponentUtils.Get<CanvasGroup>(_closeSiteButton));
       }
 
-      var camera = Registry.MainCamera;
-      if (!camera)
-      {
-        return;
-      }
-
       var anchor = Objects[Objects.Count - 1].transform.position;
-      if (TryGetTopRightColliderCenter(camera, out var colliderCenter))
+      if (TryGetTopRightColliderCenter(out var colliderCenter))
       {
         anchor = colliderCenter;
       }
 
       var worldTarget = GetCloseButtonWorldPosition(anchor);
-      var canvas = Registry.Canvas;
-      var rootRect = canvas.GetComponent<RectTransform>();
+      var rootRect = Registry.GameViewport.CanvasRootRect;
       if (
         !RectTransformUtility.ScreenPointToLocalPointInRectangle(
           rootRect,
-          camera.WorldToScreenPoint(worldTarget),
+          Registry.GameViewport.WorldToScreenPoint(worldTarget),
           null,
           out var rootLocal
         )
@@ -180,14 +173,19 @@ namespace Dreamtides.Layout
       var worldOnCanvas = rootRect.TransformPoint(
         new Vector3(clampedRootLocal.x, clampedRootLocal.y, 0f)
       );
-      var parent = _closeSiteButton.parent as RectTransform ?? rootRect;
-      var parentLocal = parent.InverseTransformPoint(worldOnCanvas);
-      _closeSiteButton.anchoredPosition = new Vector2(parentLocal.x, parentLocal.y);
+      var parent = _closeSiteButton.parent;
+      if (parent)
+      {
+        var parentLocal = parent.InverseTransformPoint(worldOnCanvas);
+        _closeSiteButton.anchoredPosition = new Vector2(parentLocal.x, parentLocal.y);
+      }
     }
 
     Vector3 GetCloseButtonWorldPosition(Vector3 anchor)
     {
-      var offset = Registry.IsLandscape ? _landscapeCloseButtonOffset : _portraitCloseButtonOffset;
+      var offset = Registry.GameViewport.IsLandscape
+        ? _landscapeCloseButtonOffset
+        : _portraitCloseButtonOffset;
       var worldOffset = transform.right * offset.x + transform.up * offset.y;
       return anchor + worldOffset;
     }
@@ -221,7 +219,7 @@ namespace Dreamtides.Layout
       return new Vector2(bounds.extents.x, bounds.extents.y);
     }
 
-    bool TryGetTopRightColliderCenter(Camera camera, out Vector3 center)
+    bool TryGetTopRightColliderCenter(out Vector3 center)
     {
       const float verticalTolerance = 0.1f;
       var found = false;
@@ -237,7 +235,7 @@ namespace Dreamtides.Layout
             continue;
           }
           var worldCenter = collider.bounds.center;
-          var viewport = camera.WorldToViewportPoint(worldCenter);
+          var viewport = Registry.GameViewport.WorldToViewportPoint(worldCenter);
           if (viewport.z <= 0f)
           {
             continue;

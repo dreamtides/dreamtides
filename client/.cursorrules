@@ -7,6 +7,10 @@ then private.
 
 Please always use "var" in C# code instead of explicit types.
 
+Code should not directly access the camera, screen bounds, or canvas rect. Instead,
+please use Registry.GameViewport to get an IGameViewport instance which abstracts
+out this information.
+
 You can format source code via "just fmt-csharp" on the command line from any
 working directory, please don't try to manually resolve formatting problems.
 

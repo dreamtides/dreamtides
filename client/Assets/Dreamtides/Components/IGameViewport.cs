@@ -47,6 +47,8 @@ namespace Dreamtides.Components
     Vector3 WorldToScreenPoint(Vector3 worldPosition);
 
     Vector3 ScreenToWorldPoint(Vector3 position);
+
+    RectTransform CanvasRootRect { get; }
   }
 
   public sealed class RealViewport : IGameViewport
@@ -55,18 +57,31 @@ namespace Dreamtides.Components
     readonly Camera _camera;
     readonly Canvas _canvas;
     readonly RectTransform _canvasSafeArea;
+    readonly RectTransform _canvasRootRect;
 
-    RealViewport(bool isLandscape, Camera camera, Canvas canvas, RectTransform canvasSafeArea)
+    RealViewport(
+      bool isLandscape,
+      Camera camera,
+      Canvas canvas,
+      RectTransform canvasSafeArea,
+      RectTransform canvasRootRect
+    )
     {
       _isLandscape = isLandscape;
       _camera = camera;
       _canvas = canvas;
       _canvasSafeArea = canvasSafeArea;
+      _canvasRootRect = canvasRootRect;
     }
 
     public RealViewport(Registry registry)
-      : this(registry.IsLandscape, registry.MainCamera, registry.Canvas, registry.CanvasSafeArea)
-    { }
+      : this(
+        registry.IsLandscape,
+        registry.MainCamera,
+        registry.Canvas,
+        registry.CanvasSafeArea,
+        registry.Canvas.GetComponent<RectTransform>()
+      ) { }
 
     public static RealViewport? CreateForEditor()
     {
@@ -96,7 +111,8 @@ namespace Dreamtides.Components
       safeArea.anchorMin = Vector2.zero;
       safeArea.anchorMax = Vector2.one;
 
-      return new RealViewport(Screen.width > Screen.height, camera, canvas, safeArea);
+      var rootRect = canvas.GetComponent<RectTransform>();
+      return new RealViewport(Screen.width > Screen.height, camera, canvas, safeArea, rootRect);
     }
 
     public bool IsLandscape => _isLandscape;
@@ -125,6 +141,8 @@ namespace Dreamtides.Components
     {
       return _camera.ScreenToWorldPoint(position);
     }
+
+    public RectTransform CanvasRootRect => _canvasRootRect;
   }
 
   /// <summary>
@@ -140,11 +158,13 @@ namespace Dreamtides.Components
     readonly Rect _canvasPixelRect;
     readonly Vector2 _safeAreaMinimumAnchor;
     readonly Vector2 _safeAreaMaximumAnchor;
+    readonly RectTransform _canvasRootRect;
 
     public FakeViewport(
       Vector2 screenResolution,
       Transform cameraTransform,
       float fieldOfView,
+      RectTransform canvasRootRect,
       Rect? canvasPixelRect = null,
       Vector2? safeAreaMinimumAnchor = null,
       Vector2? safeAreaMaximumAnchor = null
@@ -158,6 +178,11 @@ namespace Dreamtides.Components
       if (cameraTransform == null)
       {
         throw new ArgumentNullException(nameof(cameraTransform));
+      }
+
+      if (canvasRootRect == null)
+      {
+        throw new ArgumentNullException(nameof(canvasRootRect));
       }
 
       _cameraTransform = cameraTransform;
@@ -174,6 +199,7 @@ namespace Dreamtides.Components
         canvasPixelRect ?? new Rect(0f, 0f, screenResolution.x, screenResolution.y);
       _safeAreaMinimumAnchor = safeAreaMinimumAnchor ?? Vector2.zero;
       _safeAreaMaximumAnchor = safeAreaMaximumAnchor ?? Vector2.one;
+      _canvasRootRect = canvasRootRect;
     }
 
     public bool IsLandscape => _screenResolution.x > _screenResolution.y;
@@ -223,5 +249,7 @@ namespace Dreamtides.Components
       var localPoint = new Vector3(localX, localY, z);
       return _cameraTransform.TransformPoint(localPoint);
     }
+
+    public RectTransform CanvasRootRect => _canvasRootRect;
   }
 }
