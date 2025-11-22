@@ -34,8 +34,8 @@ namespace Dreamtides.Tests.TestUtils
       _registry._portraitLayout = _portraitLayout;
       _registry._landscapeLayout = _landscapeLayout;
       _testConfiguration = new TestConfiguration(Guid.NewGuid());
-      var fakeCamera = new FakeCamera(resolution.AsVector(), _registry.transform, 60f);
-      return _registry.RunAwake(_gameMode, _testConfiguration, resolution.AsVector(), fakeCamera);
+      var fakeViewport = new FakeViewport(resolution.AsVector(), _registry.transform, 60f);
+      return _registry.RunAwake(_gameMode, _testConfiguration, fakeViewport);
     }
 
     [TearDown]

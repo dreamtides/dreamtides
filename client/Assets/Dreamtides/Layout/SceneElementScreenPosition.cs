@@ -1,5 +1,6 @@
 #nullable enable
 
+using Dreamtides.Components;
 using Dreamtides.Services;
 using UnityEngine;
 
@@ -126,7 +127,7 @@ namespace Dreamtides.Layout
     }
 
     static Vector3 ComputeWorldPosition(
-      Camera camera,
+      IGameViewport gameViewport,
       Rect rect,
       SceneElementScreenAnchor anchor,
       float xOffset,
@@ -136,21 +137,19 @@ namespace Dreamtides.Layout
     {
       var anchorPoint = AnchorToScreenPoint(rect, anchor);
       var screenPoint = new Vector3(anchorPoint.x + xOffset, anchorPoint.y + yOffset, distance);
-      return camera.ScreenToWorldPoint(screenPoint);
+      return gameViewport.ScreenToWorldPoint(screenPoint);
     }
 
-    static Rect ComputeFullScreenRect()
+    static Rect ComputeFullScreenRect(IGameViewport gameViewport)
     {
-      return new Rect(0f, 0f, Screen.width, Screen.height);
+      return new Rect(0f, 0f, gameViewport.ScreenWidth, gameViewport.ScreenHeight);
     }
 
-    static Rect ComputeSafeAreaScreenRect(RectTransform safeArea)
+    Rect ComputeSafeAreaScreenRect(IGameViewport gameViewport)
     {
-      var canvas = safeArea.GetComponentInParent<Canvas>();
-      var pixelRect =
-        canvas != null ? canvas.pixelRect : new Rect(0f, 0f, Screen.width, Screen.height);
-      var min = safeArea.anchorMin;
-      var max = safeArea.anchorMax;
+      var pixelRect = gameViewport.CanvasPixelRect;
+      var min = gameViewport.SafeAreaMinimumAnchor;
+      var max = gameViewport.SafeAreaMaximumAnchor;
       var xMin = pixelRect.x + pixelRect.width * min.x;
       var xMax = pixelRect.x + pixelRect.width * max.x;
       var yMin = pixelRect.y + pixelRect.height * min.y;
@@ -226,7 +225,8 @@ namespace Dreamtides.Layout
         gameObject.SetActive(true);
       }
 
-      var isLandscape = Registry.IsLandscape;
+      var viewport = Registry.GameViewport;
+      var isLandscape = viewport.IsLandscape;
       var anchor = isLandscape && _useLandscapeAnchor ? _landscapeAnchor : _anchor;
       var xOffset = isLandscape && _useLandscapeXOffset ? _landscapeXOffset : _xOffset;
       var yOffset = isLandscape && _useLandscapeYOffset ? _landscapeYOffset : _yOffset;
@@ -235,33 +235,25 @@ namespace Dreamtides.Layout
           ? _landscapeDistanceFromCamera
           : _distanceFromCamera;
 
-      var camera = Registry.MainCamera;
       var rect = _ignoreSafeArea
-        ? ComputeFullScreenRect()
-        : ComputeSafeAreaScreenRect(Registry.CanvasSafeArea);
-      var world = ComputeWorldPosition(camera, rect, anchor, xOffset, yOffset, distance);
+        ? ComputeFullScreenRect(viewport)
+        : ComputeSafeAreaScreenRect(viewport);
+      var world = ComputeWorldPosition(viewport, rect, anchor, xOffset, yOffset, distance);
       transform.position = world;
     }
 
 #if UNITY_EDITOR
     void OnDrawGizmos()
     {
-      var camera = Application.isPlaying
-        ? Registry.MainCamera
-        : (Camera.main != null ? Camera.main : Camera.current);
-      if (camera == null)
+      var viewport = Application.isPlaying
+        ? new RealViewport(Registry)
+        : RealViewport.CreateForEditor();
+      if (viewport == null)
       {
-        var cams = Object.FindObjectsByType<Camera>(
-          FindObjectsInactive.Include,
-          FindObjectsSortMode.None
-        );
-        if (cams.Length == 0)
-        {
-          return;
-        }
-        camera = cams[0];
+        return;
       }
-      var isLandscape = Application.isPlaying ? Registry.IsLandscape : Screen.width > Screen.height;
+
+      var isLandscape = viewport.IsLandscape;
       var anchor = isLandscape && _useLandscapeAnchor ? _landscapeAnchor : _anchor;
       var xOffset = isLandscape && _useLandscapeXOffset ? _landscapeXOffset : _xOffset;
       var yOffset = isLandscape && _useLandscapeYOffset ? _landscapeYOffset : _yOffset;
@@ -270,20 +262,16 @@ namespace Dreamtides.Layout
           ? _landscapeDistanceFromCamera
           : _distanceFromCamera;
       var rect = Application.isPlaying
-        ? (
-          _ignoreSafeArea
-            ? ComputeFullScreenRect()
-            : ComputeSafeAreaScreenRect(Registry.CanvasSafeArea)
-        )
-        : ComputeFullScreenRect();
-      var baseWorld = ComputeWorldPosition(camera, rect, anchor, 0f, 0f, distance);
-      var world = ComputeWorldPosition(camera, rect, anchor, xOffset, yOffset, distance);
+        ? (_ignoreSafeArea ? ComputeFullScreenRect(viewport) : ComputeSafeAreaScreenRect(viewport))
+        : ComputeFullScreenRect(viewport);
+      var baseWorld = ComputeWorldPosition(viewport, rect, anchor, 0f, 0f, distance);
+      var world = ComputeWorldPosition(viewport, rect, anchor, xOffset, yOffset, distance);
       Gizmos.color = Color.yellow;
       Gizmos.DrawSphere(baseWorld, 0.05f);
-      var bl = camera.ScreenToWorldPoint(new Vector3(rect.xMin, rect.yMin, distance));
-      var br = camera.ScreenToWorldPoint(new Vector3(rect.xMax, rect.yMin, distance));
-      var tl = camera.ScreenToWorldPoint(new Vector3(rect.xMin, rect.yMax, distance));
-      var tr = camera.ScreenToWorldPoint(new Vector3(rect.xMax, rect.yMax, distance));
+      var bl = viewport.ScreenToWorldPoint(new Vector3(rect.xMin, rect.yMin, distance));
+      var br = viewport.ScreenToWorldPoint(new Vector3(rect.xMax, rect.yMin, distance));
+      var tl = viewport.ScreenToWorldPoint(new Vector3(rect.xMin, rect.yMax, distance));
+      var tr = viewport.ScreenToWorldPoint(new Vector3(rect.xMax, rect.yMax, distance));
       Gizmos.DrawSphere(bl, 0.05f);
       Gizmos.DrawSphere(br, 0.05f);
       Gizmos.DrawSphere(tl, 0.05f);
@@ -305,19 +293,11 @@ namespace Dreamtides.Layout
         isLandscape && _useLandscapeDistanceFromCamera
           ? _landscapeDistanceFromCamera
           : _distanceFromCamera;
-      var rect = ComputeFullScreenRect();
-      var camera = Camera.main != null ? Camera.main : Camera.current;
-      if (camera == null)
+      var viewport = RealViewport.CreateForEditor();
+      if (viewport != null)
       {
-        var cams = FindObjectsByType<Camera>(FindObjectsInactive.Include, FindObjectsSortMode.None);
-        if (cams.Length > 0)
-        {
-          camera = cams[0];
-        }
-      }
-      if (camera != null)
-      {
-        var world = ComputeWorldPosition(camera, rect, anchor, xOffset, yOffset, distance);
+        var rect = ComputeFullScreenRect(viewport);
+        var world = ComputeWorldPosition(viewport, rect, anchor, xOffset, yOffset, distance);
         transform.position = world;
       }
     }

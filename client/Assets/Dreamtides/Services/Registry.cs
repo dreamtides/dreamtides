@@ -167,13 +167,23 @@ namespace Dreamtides.Services
     public IEnumerator RunAwake(
       GameMode? mode = null,
       TestConfiguration? testConfiguration = null,
-      Vector2? resolutionOverride = null,
       IGameViewport? gameViewport = null
     )
     {
       _currentGameMode =
         mode ?? (GameMode)PlayerPrefs.GetInt(PlayerPrefKeys.SelectedPlayMode, (int)GameMode.Quest);
-      GameViewport = gameViewport ?? new RealCamera(MainCamera);
+      // Need to use this fully-qualified UnityEngine.Device.Screen API to have
+      // it work in Device Simulator.
+      var width = gameViewport?.ScreenWidth ?? UnityEngine.Device.Screen.width;
+      var height = gameViewport?.ScreenHeight ?? UnityEngine.Device.Screen.height;
+      _isLandscape = width > height;
+      GameViewport = gameViewport ?? new RealViewport(this);
+      Debug.Log($"Canvas pixel rect: {GameViewport.CanvasPixelRect}");
+      Debug.Log($"Safe area minimum anchor: {GameViewport.SafeAreaMinimumAnchor}");
+      Debug.Log($"Safe area maximum anchor: {GameViewport.SafeAreaMaximumAnchor}");
+      Debug.Log($"Screen width: {GameViewport.ScreenWidth}");
+      Debug.Log($"Screen height: {GameViewport.ScreenHeight}");
+      Debug.Log($"Is landscape: {GameViewport.IsLandscape}");
 
       if (testConfiguration != null)
       {
@@ -185,20 +195,15 @@ namespace Dreamtides.Services
       }
 
       yield return new WaitForEndOfFrame();
-      yield return InitializeAll(_currentGameMode, testConfiguration, resolutionOverride);
+      yield return InitializeAll(_currentGameMode, testConfiguration, gameViewport);
     }
 
     IEnumerator InitializeAll(
       GameMode mode,
       TestConfiguration? testConfiguration,
-      Vector2? resolutionOverride = null
+      IGameViewport? gameViewport
     )
     {
-      // Need to use this fully-qualified API to have it work in Device
-      // Simulator.
-      var width = resolutionOverride?.x ?? UnityEngine.Device.Screen.width;
-      var height = resolutionOverride?.y ?? UnityEngine.Device.Screen.height;
-      _isLandscape = width > height;
       if (_isLandscape)
       {
         Check(_portraitLayout).gameObject.SetActive(false);

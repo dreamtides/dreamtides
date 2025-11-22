@@ -1,6 +1,7 @@
 #nullable enable
 
 using System;
+using Dreamtides.Services;
 using UnityEngine;
 
 namespace Dreamtides.Components
@@ -11,6 +12,36 @@ namespace Dreamtides.Components
   /// </summary>
   public interface IGameViewport
   {
+    /// <summary>
+    /// Returns true if the viewport is in landscape mode.
+    /// </summary>
+    bool IsLandscape { get; }
+
+    /// <summary>
+    /// Returns the width of the viewport in screen pixels.
+    /// </summary>
+    float ScreenWidth { get; }
+
+    /// <summary>
+    /// Returns the height of the viewport in screen pixels.
+    /// </summary>
+    float ScreenHeight { get; }
+
+    /// <summary>
+    /// Get the render rect for the Canvas.
+    /// </summary>
+    Rect CanvasPixelRect { get; }
+
+    /// <summary>
+    /// Get the minimum anchor for the screen safe area.
+    /// </summary>
+    Vector2 SafeAreaMinimumAnchor { get; }
+
+    /// <summary>
+    /// Get the maximum anchor for the screen safe area.
+    /// </summary>
+    Vector2 SafeAreaMaximumAnchor { get; }
+
     Vector3 WorldToViewportPoint(Vector3 worldPosition);
 
     Vector3 WorldToScreenPoint(Vector3 worldPosition);
@@ -18,14 +49,67 @@ namespace Dreamtides.Components
     Vector3 ScreenToWorldPoint(Vector3 position);
   }
 
-  public sealed class RealCamera : IGameViewport
+  public sealed class RealViewport : IGameViewport
   {
+    readonly bool _isLandscape;
     readonly Camera _camera;
+    readonly Canvas _canvas;
+    readonly RectTransform _canvasSafeArea;
 
-    public RealCamera(Camera camera)
+    RealViewport(bool isLandscape, Camera camera, Canvas canvas, RectTransform canvasSafeArea)
     {
+      _isLandscape = isLandscape;
       _camera = camera;
+      _canvas = canvas;
+      _canvasSafeArea = canvasSafeArea;
     }
+
+    public RealViewport(Registry registry)
+      : this(registry.IsLandscape, registry.MainCamera, registry.Canvas, registry.CanvasSafeArea)
+    { }
+
+    public static RealViewport? CreateForEditor()
+    {
+      var camera =
+        Camera.main
+        ?? UnityEngine.Object.FindFirstObjectByType<Camera>(FindObjectsInactive.Include);
+      if (camera == null)
+      {
+        Debug.LogWarning("Unable to find a Camera in the scene.");
+        return null;
+      }
+
+      var canvas = UnityEngine.Object.FindFirstObjectByType<Canvas>(FindObjectsInactive.Include);
+      if (canvas == null)
+      {
+        Debug.LogWarning("Unable to find a Canvas in the scene.");
+        return null;
+      }
+
+      var safeArea = canvas.GetComponent<RectTransform>();
+      if (safeArea == null)
+      {
+        Debug.LogWarning("Canvas is missing a RectTransform component.");
+        return null;
+      }
+
+      safeArea.anchorMin = Vector2.zero;
+      safeArea.anchorMax = Vector2.one;
+
+      return new RealViewport(Screen.width > Screen.height, camera, canvas, safeArea);
+    }
+
+    public bool IsLandscape => _isLandscape;
+
+    public float ScreenWidth => Screen.width;
+
+    public float ScreenHeight => Screen.height;
+
+    public Vector2 SafeAreaMinimumAnchor => _canvasSafeArea.anchorMin;
+
+    public Vector2 SafeAreaMaximumAnchor => _canvasSafeArea.anchorMax;
+
+    public Rect CanvasPixelRect => _canvas.pixelRect;
 
     public Vector3 WorldToViewportPoint(Vector3 worldPosition)
     {
@@ -47,14 +131,14 @@ namespace Dreamtides.Components
   /// A fake camera that can be used in unit tests to simulate different screen
   /// resolutions.
   /// </summary>
-  public sealed class FakeCamera : IGameViewport
+  public sealed class FakeViewport : IGameViewport
   {
     readonly Transform _cameraTransform;
     readonly Vector2 _screenResolution;
     readonly float _aspectRatio;
     readonly float _tanHalfVerticalFov;
 
-    public FakeCamera(Vector2 screenResolution, Transform cameraTransform, float fieldOfView)
+    public FakeViewport(Vector2 screenResolution, Transform cameraTransform, float fieldOfView)
     {
       if (screenResolution.x <= 0f || screenResolution.y <= 0f)
       {
@@ -77,6 +161,18 @@ namespace Dreamtides.Components
       _aspectRatio = screenResolution.x / screenResolution.y;
       _tanHalfVerticalFov = Mathf.Tan(fieldOfView * Mathf.Deg2Rad * 0.5f);
     }
+
+    public bool IsLandscape => _screenResolution.x > _screenResolution.y;
+
+    public float ScreenWidth => _screenResolution.x;
+
+    public float ScreenHeight => _screenResolution.y;
+
+    public Vector2 SafeAreaMinimumAnchor => Vector2.zero;
+
+    public Vector2 SafeAreaMaximumAnchor => Vector2.one;
+
+    public Rect CanvasPixelRect => new Rect(0f, 0f, _screenResolution.x, _screenResolution.y);
 
     public Vector3 WorldToViewportPoint(Vector3 worldPosition)
     {
