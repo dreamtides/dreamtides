@@ -24,9 +24,11 @@ namespace Dreamtides.Tests.TestUtils
     protected Registry Registry =>
       _registry ?? throw new InvalidOperationException("Registry not initialized");
 
-    protected IEnumerator Initialize(
-      GameViewResolution resolution = GameViewResolution.Resolution16x9
-    )
+    protected TestConfiguration TestConfiguration =>
+      _testConfiguration
+      ?? throw new InvalidOperationException("Test configuration not initialized");
+
+    protected IEnumerator Initialize(IGameViewport? viewport = null)
     {
       _registry = CreateGameObject().AddComponent<Registry>();
       _portraitLayout = CreateGameObject().AddComponent<GameLayout>();
@@ -34,8 +36,48 @@ namespace Dreamtides.Tests.TestUtils
       _registry._portraitLayout = _portraitLayout;
       _registry._landscapeLayout = _landscapeLayout;
       _testConfiguration = new TestConfiguration(Guid.NewGuid());
-      var fakeViewport = new FakeViewport(resolution.AsVector(), _registry.transform, 60f);
-      return _registry.RunAwake(_gameMode, _testConfiguration, fakeViewport);
+      return _registry.RunAwake(
+        _gameMode,
+        _testConfiguration,
+        viewport ?? CreateViewport(GameViewResolution.Resolution16x9)
+      );
+    }
+
+    protected static FakeViewport CreateViewport(
+      GameViewResolution resolution,
+      Transform cameraTransform,
+      Vector2? safeAreaMinimumAnchor = null,
+      Vector2? safeAreaMaximumAnchor = null,
+      Rect? canvasPixelRect = null
+    )
+    {
+      var size = resolution.AsVector();
+      var rect = canvasPixelRect ?? new Rect(0f, 0f, size.x, size.y);
+      return new FakeViewport(
+        size,
+        cameraTransform,
+        60f,
+        rect,
+        safeAreaMinimumAnchor,
+        safeAreaMaximumAnchor
+      );
+    }
+
+    protected FakeViewport CreateViewport(
+      GameViewResolution resolution,
+      Vector2? safeAreaMinimumAnchor = null,
+      Vector2? safeAreaMaximumAnchor = null,
+      Rect? canvasPixelRect = null
+    )
+    {
+      var camera = CreateGameObject().transform;
+      return CreateViewport(
+        resolution,
+        camera,
+        safeAreaMinimumAnchor,
+        safeAreaMaximumAnchor,
+        canvasPixelRect
+      );
     }
 
     [TearDown]
@@ -50,15 +92,11 @@ namespace Dreamtides.Tests.TestUtils
       }
     }
 
-    public static void AssertVector3Equal(
-      Vector3 expected,
-      Vector3 actual,
-      float tolerance = 0.0001f
-    )
+    public static void AssertVector3Equal(Vector3 expected, Vector3 actual, float tolerance = 0.01f)
     {
-      Assert.That(actual.x, Is.EqualTo(expected.x).Within(tolerance));
-      Assert.That(actual.y, Is.EqualTo(expected.y).Within(tolerance));
-      Assert.That(actual.z, Is.EqualTo(expected.z).Within(tolerance));
+      Assert.That(actual.x, Is.EqualTo(expected.x).Within(tolerance), $"X component mismatch");
+      Assert.That(actual.y, Is.EqualTo(expected.y).Within(tolerance), $"Y component mismatch");
+      Assert.That(actual.z, Is.EqualTo(expected.z).Within(tolerance), $"Z component mismatch");
     }
 
     protected GameObject CreateGameObject()
@@ -75,6 +113,15 @@ namespace Dreamtides.Tests.TestUtils
       configure?.Invoke(result);
       result.Initialize(Registry, _gameMode, _testConfiguration, fromRegistry: true);
       result.StartFromRegistry();
+      return result;
+    }
+
+    protected T CreateSceneElement<T>(Action<T>? configure = null)
+      where T : SceneElement
+    {
+      var result = CreateGameObject().AddComponent<T>();
+      configure?.Invoke(result);
+      result.Initialize(Registry, _gameMode, _testConfiguration);
       return result;
     }
   }

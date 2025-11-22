@@ -137,8 +137,18 @@ namespace Dreamtides.Components
     readonly Vector2 _screenResolution;
     readonly float _aspectRatio;
     readonly float _tanHalfVerticalFov;
+    readonly Rect _canvasPixelRect;
+    readonly Vector2 _safeAreaMinimumAnchor;
+    readonly Vector2 _safeAreaMaximumAnchor;
 
-    public FakeViewport(Vector2 screenResolution, Transform cameraTransform, float fieldOfView)
+    public FakeViewport(
+      Vector2 screenResolution,
+      Transform cameraTransform,
+      float fieldOfView,
+      Rect? canvasPixelRect = null,
+      Vector2? safeAreaMinimumAnchor = null,
+      Vector2? safeAreaMaximumAnchor = null
+    )
     {
       if (screenResolution.x <= 0f || screenResolution.y <= 0f)
       {
@@ -160,6 +170,10 @@ namespace Dreamtides.Components
 
       _aspectRatio = screenResolution.x / screenResolution.y;
       _tanHalfVerticalFov = Mathf.Tan(fieldOfView * Mathf.Deg2Rad * 0.5f);
+      _canvasPixelRect =
+        canvasPixelRect ?? new Rect(0f, 0f, screenResolution.x, screenResolution.y);
+      _safeAreaMinimumAnchor = safeAreaMinimumAnchor ?? Vector2.zero;
+      _safeAreaMaximumAnchor = safeAreaMaximumAnchor ?? Vector2.one;
     }
 
     public bool IsLandscape => _screenResolution.x > _screenResolution.y;
@@ -168,11 +182,11 @@ namespace Dreamtides.Components
 
     public float ScreenHeight => _screenResolution.y;
 
-    public Vector2 SafeAreaMinimumAnchor => Vector2.zero;
+    public Vector2 SafeAreaMinimumAnchor => _safeAreaMinimumAnchor;
 
-    public Vector2 SafeAreaMaximumAnchor => Vector2.one;
+    public Vector2 SafeAreaMaximumAnchor => _safeAreaMaximumAnchor;
 
-    public Rect CanvasPixelRect => new Rect(0f, 0f, _screenResolution.x, _screenResolution.y);
+    public Rect CanvasPixelRect => _canvasPixelRect;
 
     public Vector3 WorldToViewportPoint(Vector3 worldPosition)
     {
@@ -191,9 +205,9 @@ namespace Dreamtides.Components
       var denominator = viewPosition.z * _tanHalfVerticalFov;
       var xNormalized = viewPosition.x / (denominator * _aspectRatio);
       var yNormalized = viewPosition.y / denominator;
-      var x = (xNormalized * 0.5f + 0.5f) * _screenResolution.x;
-      var y = (yNormalized * 0.5f + 0.5f) * _screenResolution.y;
-      return new Vector3(x, y, viewPosition.z);
+      var screenX = (xNormalized * 0.5f + 0.5f) * _screenResolution.x;
+      var screenY = (yNormalized * 0.5f + 0.5f) * _screenResolution.y;
+      return new Vector3(screenX, screenY, viewPosition.z);
     }
 
     public Vector3 ScreenToWorldPoint(Vector3 position)

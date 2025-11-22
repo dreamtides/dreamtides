@@ -2,6 +2,9 @@ Please begin every response with "Sure!".
 
 Please DO NOT include any comments in generated source code.
 
+Please put public members at the top of files, then protected,
+then private.
+
 Please always use "var" in C# code instead of explicit types.
 
 You can format source code via "just fmt-csharp" on the command line from any
@@ -12,6 +15,17 @@ any working directory. This runs the tests in a separate Unity instance via
 rsync to prevent conflicts with the running editor. It takes around 3 minutes
 to complete.
 
+Test output is written to ~/dreamtides_tests/client/test_output/results.xml,
+although this is a very large file and will likely need to be searcehd via
+grep or similar tools
+
 It is NOT TRUE that "Unity play-mode tests require the editor" prevents you
 from running these tests, they should be run via the command line after
 completing all tasks.
+
+When creating tests, please modify any serialized fields you need to be 
+"internal" and then add [assembly: InternalsVisibleTo("Dreamtides.Tests")],
+do not attempt to set them via reflection.A
+
+When writing tests, put the tests at the top of the file and helpers as
+private elements at the bottom of the file.

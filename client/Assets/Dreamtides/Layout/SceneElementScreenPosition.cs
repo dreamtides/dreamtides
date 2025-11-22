@@ -1,8 +1,11 @@
 #nullable enable
 
+using System.Runtime.CompilerServices;
 using Dreamtides.Components;
 using Dreamtides.Services;
 using UnityEngine;
+
+[assembly: InternalsVisibleTo("Dreamtides.Tests")]
 
 namespace Dreamtides.Layout
 {
@@ -42,46 +45,46 @@ namespace Dreamtides.Layout
   public class SceneElementScreenPosition : SceneElement
   {
     [SerializeField]
-    GameMode _gameMode = GameMode.Quest;
+    internal GameMode _gameMode = GameMode.Quest;
 
     [SerializeField]
-    SceneElementScreenAnchor _anchor = SceneElementScreenAnchor.MiddleCenter;
+    internal SceneElementScreenAnchor _anchor = SceneElementScreenAnchor.MiddleCenter;
 
     [SerializeField]
-    float _xOffset = 0;
+    internal float _xOffset = 0;
 
     [SerializeField]
-    float _yOffset = 0;
+    internal float _yOffset = 0;
 
     [SerializeField]
-    float _distanceFromCamera = 5;
+    internal float _distanceFromCamera = 5;
 
     [SerializeField]
-    SceneElementScreenAnchor _landscapeAnchor = SceneElementScreenAnchor.MiddleCenter;
+    internal SceneElementScreenAnchor _landscapeAnchor = SceneElementScreenAnchor.MiddleCenter;
 
     [SerializeField]
-    float _landscapeXOffset = 0;
+    internal float _landscapeXOffset = 0;
 
     [SerializeField]
-    float _landscapeYOffset = 0;
+    internal float _landscapeYOffset = 0;
 
     [SerializeField]
-    float _landscapeDistanceFromCamera = 0;
+    internal float _landscapeDistanceFromCamera = 0;
 
     [SerializeField]
-    bool _useLandscapeAnchor = false;
+    internal bool _useLandscapeAnchor = false;
 
     [SerializeField]
-    bool _useLandscapeXOffset = false;
+    internal bool _useLandscapeXOffset = false;
 
     [SerializeField]
-    bool _useLandscapeYOffset = false;
+    internal bool _useLandscapeYOffset = false;
 
     [SerializeField]
-    bool _useLandscapeDistanceFromCamera = false;
+    internal bool _useLandscapeDistanceFromCamera = false;
 
     [SerializeField]
-    bool _ignoreSafeArea = false;
+    internal bool _ignoreSafeArea = false;
 
     bool _validationInitialized = false;
 
@@ -209,7 +212,7 @@ namespace Dreamtides.Layout
       _prevLandscapeDistance = _landscapeDistanceFromCamera;
     }
 
-    protected override void OnUpdate(GameMode mode, TestConfiguration? testConfiguration)
+    public override void OnUpdate(GameMode mode, TestConfiguration? testConfiguration)
     {
       if (mode != _gameMode)
       {

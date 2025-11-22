@@ -178,18 +178,8 @@ namespace Dreamtides.Services
       var height = gameViewport?.ScreenHeight ?? UnityEngine.Device.Screen.height;
       _isLandscape = width > height;
       GameViewport = gameViewport ?? new RealViewport(this);
-      Debug.Log($"Canvas pixel rect: {GameViewport.CanvasPixelRect}");
-      Debug.Log($"Safe area minimum anchor: {GameViewport.SafeAreaMinimumAnchor}");
-      Debug.Log($"Safe area maximum anchor: {GameViewport.SafeAreaMaximumAnchor}");
-      Debug.Log($"Screen width: {GameViewport.ScreenWidth}");
-      Debug.Log($"Screen height: {GameViewport.ScreenHeight}");
-      Debug.Log($"Is landscape: {GameViewport.IsLandscape}");
 
-      if (testConfiguration != null)
-      {
-        Debug.Log($"Starting test {testConfiguration.TestId}");
-      }
-      else
+      if (testConfiguration == null)
       {
         Debug.Log($"Starting Dreamtides with game mode {_currentGameMode}");
       }

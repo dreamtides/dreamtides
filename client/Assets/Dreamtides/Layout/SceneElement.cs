@@ -35,7 +35,7 @@ namespace Dreamtides.Layout
       }
     }
 
-    protected virtual void OnUpdate(GameMode mode, TestConfiguration? testConfiguration) { }
+    public virtual void OnUpdate(GameMode mode, TestConfiguration? testConfiguration) { }
 
 #if UNITY_EDITOR
     void Reset()

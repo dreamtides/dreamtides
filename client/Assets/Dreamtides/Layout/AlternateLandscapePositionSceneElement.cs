@@ -22,7 +22,7 @@ namespace Dreamtides.Layout
       }
     }
 
-    protected override void OnUpdate(GameMode mode, TestConfiguration? testConfiguration)
+    public override void OnUpdate(GameMode mode, TestConfiguration? testConfiguration)
     {
       if (_debugUpdateContinuously && Registry.IsLandscape)
       {
