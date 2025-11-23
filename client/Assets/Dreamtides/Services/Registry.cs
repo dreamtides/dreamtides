@@ -25,7 +25,7 @@ namespace Dreamtides.Services
     bool _isLandscape = false;
 
     [SerializeField]
-    GameMode _currentGameMode;
+    internal GameMode _currentGameMode;
 
     public bool IsLandscape => _isLandscape;
 
@@ -34,129 +34,129 @@ namespace Dreamtides.Services
     public GameLayout Layout => IsLandscape ? Check(_landscapeLayout) : Check(_portraitLayout);
 
     [SerializeField]
-    Camera _mainCamera = null!;
+    internal Camera _mainCamera = null!;
     public Camera MainCamera => Check(_mainCamera);
 
     public IGameViewport GameViewport { get; private set; } = null!;
 
     [SerializeField]
-    GameCamera _cameraAdjuster = null!;
+    internal GameCamera _cameraAdjuster = null!;
 
     [SerializeField]
-    Canvas _canvas = null!;
+    internal Canvas _canvas = null!;
     public Canvas Canvas => Check(_canvas);
 
     [SerializeField]
-    RectTransform _canvasSafeArea = null!;
+    internal RectTransform _canvasSafeArea = null!;
     public RectTransform CanvasSafeArea => Check(_canvasSafeArea);
 
     [SerializeField]
-    AudioSource _mainAudioSource = null!;
+    internal AudioSource _mainAudioSource = null!;
     public AudioSource MainAudioSource => Check(_mainAudioSource);
 
     [SerializeField]
-    AudioSource _musicAudioSource = null!;
+    internal AudioSource _musicAudioSource = null!;
     public AudioSource MusicAudioSource => Check(_musicAudioSource);
 
     [SerializeField]
-    DreamscapeLayout? _dreamscapeLayout;
+    internal DreamscapeLayout? _dreamscapeLayout;
     public DreamscapeLayout DreamscapeLayout => Check(_dreamscapeLayout);
 
     [SerializeField]
-    CardService? _cardService;
+    internal CardService? _cardService;
     public CardService CardService => Check(_cardService);
 
     [SerializeField]
-    ActionService? _actionService;
+    internal ActionService? _actionService;
     public ActionService ActionService => Check(_actionService);
 
     [SerializeField]
-    InputService? _inputService;
+    internal InputService? _inputService;
     public InputService InputService => Check(_inputService);
 
     [SerializeField]
-    DocumentService? _documentService;
+    internal DocumentService? _documentService;
     public DocumentService DocumentService => Check(_documentService);
 
     [SerializeField]
-    CapabilitiesService? _capabilitiesService;
+    internal CapabilitiesService? _capabilitiesService;
     public CapabilitiesService CapabilitiesService => Check(_capabilitiesService);
 
     [SerializeField]
-    SoundService? _soundService;
+    internal SoundService? _soundService;
     public SoundService SoundService => Check(_soundService);
 
     [SerializeField]
-    CardAnimationService? _cardAnimationService;
+    internal CardAnimationService? _cardAnimationService;
     public CardAnimationService CardAnimationService => Check(_cardAnimationService);
 
     [SerializeField]
-    SettingsService? _settingsService;
+    internal SettingsService? _settingsService;
     public SettingsService SettingsService => Check(_settingsService);
 
     [SerializeField]
-    AssetService? _assetService;
+    internal AssetService? _assetService;
     public AssetService AssetService => Check(_assetService);
 
     [SerializeField]
-    AssetPoolService? _assetPoolService;
+    internal AssetPoolService? _assetPoolService;
     public AssetPoolService AssetPoolService => Check(_assetPoolService);
 
     [SerializeField]
-    EffectService? _effectService;
+    internal EffectService? _effectService;
     public EffectService EffectService => Check(_effectService);
 
     [SerializeField]
-    MusicService? _musicService;
+    internal MusicService? _musicService;
     public MusicService MusicService => Check(_musicService);
 
     [SerializeField]
-    EnvironmentService? _environmentService;
+    internal EnvironmentService? _environmentService;
     public EnvironmentService EnvironmentService => Check(_environmentService);
 
     [SerializeField]
-    JudgmentService? _judgmentService;
+    internal JudgmentService? _judgmentService;
     public JudgmentService JudgmentService => Check(_judgmentService);
 
     [SerializeField]
-    DreamwellActivationService? _dreamwellActivationService;
+    internal DreamwellActivationService? _dreamwellActivationService;
     public DreamwellActivationService DreamwellActivationService =>
       Check(_dreamwellActivationService);
 
     [SerializeField]
-    ArrowService? _arrowService;
+    internal ArrowService? _arrowService;
     public ArrowService ArrowService => Check(_arrowService);
 
     [SerializeField]
-    CardEffectPreviewService? _cardEffectPreviewService;
+    internal CardEffectPreviewService? _cardEffectPreviewService;
     public CardEffectPreviewService CardEffectPreviewService => Check(_cardEffectPreviewService);
 
     [SerializeField]
-    TestHelperService? _testHelperService;
+    internal TestHelperService? _testHelperService;
     public TestHelperService TestHelperService => Check(_testHelperService);
 
     [SerializeField]
-    LoggingService? _loggingService;
+    internal LoggingService? _loggingService;
     public LoggingService LoggingService => Check(_loggingService);
 
     [SerializeField]
-    StudioService? _studioService;
+    internal StudioService? _studioService;
     public StudioService StudioService => Check(_studioService);
 
     [SerializeField]
-    UserHandHoverService? _userHandHoverService;
+    internal UserHandHoverService? _userHandHoverService;
     public UserHandHoverService UserHandHoverService => Check(_userHandHoverService);
 
     [SerializeField]
-    IdleReconnectService? _idleReconnectService;
+    internal IdleReconnectService? _idleReconnectService;
     public IdleReconnectService IdleReconnectService => Check(_idleReconnectService);
 
     [SerializeField]
-    DreamscapeService _dreamscapeService = null!;
+    internal DreamscapeService _dreamscapeService = null!;
     public DreamscapeService DreamscapeService => Check(_dreamscapeService);
 
     [SerializeField]
-    PrototypeQuest? _prototypeQuest;
+    internal PrototypeQuest? _prototypeQuest;
     public PrototypeQuest PrototypeQuest => Check(_prototypeQuest);
 
     void Awake()
