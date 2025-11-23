@@ -1,30 +1,33 @@
 #nullable enable
 
+using System.Runtime.CompilerServices;
 using Dreamtides.Components;
 using Dreamtides.Services;
 using UnityEngine;
+
+[assembly: InternalsVisibleTo("Dreamtides.Tests")]
 
 namespace Dreamtides.Layout
 {
   public class CenteredLineObjectLayout : StandardObjectLayout
   {
     [SerializeField]
-    float _horizontalSpacing = 0.75f;
+    internal float _horizontalSpacing = 0.75f;
 
     [SerializeField]
-    float _cardWidth = 1f;
+    internal float _cardWidth = 1f;
 
     [SerializeField]
-    float _minScale = 0.85f;
+    internal float _minScale = 0.85f;
 
     [SerializeField]
-    float _maxScale = 1f;
+    internal float _maxScale = 1f;
 
     [SerializeField]
-    int _minScaleThresholdPortrait = 4;
+    internal int _minScaleThresholdPortrait = 4;
 
     [SerializeField]
-    int _minScaleThresholdLandscape = 8;
+    internal int _minScaleThresholdLandscape = 8;
 
     public override Vector3 CalculateObjectPosition(int index, int count)
     {
