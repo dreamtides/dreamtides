@@ -1,11 +1,14 @@
 #nullable enable
 
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using Dreamtides.Buttons;
 using Dreamtides.Components;
 using Dreamtides.Schema;
 using Dreamtides.Utils;
 using UnityEngine;
+
+[assembly: InternalsVisibleTo("Dreamtides.Tests")]
 
 namespace Dreamtides.Layout
 {
@@ -15,25 +18,25 @@ namespace Dreamtides.Layout
     const string DefaultButtonLabel = "Accept";
 
     [SerializeField]
-    Vector2 _acceptButtonOffset;
+    internal Vector2 _acceptButtonOffset;
 
     [SerializeField]
-    float _acceptButtonScale = 0.25f;
+    internal float _acceptButtonScale = 0.25f;
 
     [SerializeField]
-    float _landscapeScaleOverride = 1.0f;
+    internal float _landscapeScaleOverride = 1.0f;
 
     [SerializeField]
-    float _landscapeHorizontalSpacingOverride = 0f;
+    internal float _landscapeHorizontalSpacingOverride = 0f;
 
     [SerializeField]
-    float _landscapeVerticalSpacingOverride = 0f;
+    internal float _landscapeVerticalSpacingOverride = 0f;
 
     [SerializeField]
-    Vector2 _landscapeAcceptButtonOffset;
+    internal Vector2 _landscapeAcceptButtonOffset;
 
     [SerializeField]
-    DisplayableButton _acceptButtonPrefab = null!;
+    internal DisplayableButton _acceptButtonPrefab = null!;
 
     readonly List<DisplayableButton> _acceptButtons = new();
     readonly Dictionary<long, ButtonView> _buttonViewsByOfferNumber = new();

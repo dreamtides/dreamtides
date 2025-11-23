@@ -1,5 +1,6 @@
 #nullable enable
 
+using System.Runtime.CompilerServices;
 using DG.Tweening;
 using Dreamtides.Layout;
 using Dreamtides.Schema;
@@ -7,6 +8,8 @@ using Dreamtides.Services;
 using Dreamtides.Utils;
 using TMPro;
 using UnityEngine;
+
+[assembly: InternalsVisibleTo("Dreamtides.Tests")]
 
 namespace Dreamtides.Buttons
 {
