@@ -22,6 +22,7 @@ namespace Dreamtides.Tests.TestUtils
     GameLayout? _landscapeLayout;
     GameMode _gameMode = GameMode.Quest;
     TestConfiguration? _testConfiguration;
+    FakeSoundService? _fakeSoundService;
 
     protected Registry Registry =>
       _registry ?? throw new InvalidOperationException("Registry not initialized");
@@ -30,9 +31,15 @@ namespace Dreamtides.Tests.TestUtils
       _testConfiguration
       ?? throw new InvalidOperationException("Test configuration not initialized");
 
+    protected FakeSoundService FakeSoundService =>
+      _fakeSoundService ?? throw new InvalidOperationException("FakeSoundService not initialized");
+
     protected IEnumerator Initialize(IGameViewport? viewport = null)
     {
-      _registry = CreateGameObject().AddComponent<Registry>();
+      var registryObject = CreateGameObject();
+      _registry = registryObject.AddComponent<Registry>();
+      _fakeSoundService = registryObject.AddComponent<FakeSoundService>();
+      _registry._soundService = _fakeSoundService;
       _portraitLayout = CreateGameObject().AddComponent<GameLayout>();
       _landscapeLayout = CreateGameObject().AddComponent<GameLayout>();
       _registry._portraitLayout = _portraitLayout;
