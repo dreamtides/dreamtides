@@ -12,7 +12,19 @@ using UnityEngine.Networking;
 
 namespace Dreamtides.Services
 {
-  public class ActionService : Service
+  public abstract class ActionService : Service
+  {
+    public abstract bool Connected { get; protected set; }
+    public abstract float LastActionTime { get; }
+    public abstract bool IsProcessingCommands { get; }
+    public abstract bool LastResponseIncremental { get; protected set; }
+    public abstract Guid? LastResponseReceived { get; protected set; }
+    public abstract void PerformAction(GameAction? action, Guid? requestIdentifier = null);
+    public abstract void Log(ClientLogRequest request);
+    public abstract void TriggerReconnect();
+  }
+
+  public class ActionServiceImpl : ActionService
   {
     [SerializeField]
     bool _disableConnectOnStart;
@@ -49,29 +61,29 @@ namespace Dreamtides.Services
       Application.isEditor
       && (_integrationTestId == null || !Application.dataPath.Contains("dreamtides_tests"));
 
-    public bool Connected { get; private set; }
+    public override bool Connected { get; protected set; }
 
     /// <summary>
     /// The time of the last action performed by the user.
     /// </summary>
-    public float LastActionTime => _lastActionTime;
+    public override float LastActionTime => _lastActionTime;
 
     /// <summary>
     /// Whether the action service is currently processing rules engine
     /// commands.
     /// </summary>
-    public bool IsProcessingCommands => _isProcessingCommands;
+    public override bool IsProcessingCommands => _isProcessingCommands;
 
     /// <summary>
     /// Whether the last poll response was an 'incremental' response.
     /// </summary>
-    public bool LastResponseIncremental { get; private set; }
+    public override bool LastResponseIncremental { get; protected set; }
 
     /// <summary>
     /// Returns the Request ID of the last request for which a 'final' poll
     /// response was received.
     /// </summary>
-    public Guid? LastResponseReceived { get; private set; }
+    public override Guid? LastResponseReceived { get; protected set; }
 
     protected override void OnInitialize(GameMode mode, TestConfiguration? testConfiguration)
     {
@@ -129,7 +141,7 @@ namespace Dreamtides.Services
       }
     }
 
-    public void PerformAction(GameAction? action, Guid? requestIdentifier = null)
+    public override void PerformAction(GameAction? action, Guid? requestIdentifier = null)
     {
       if (action == null)
       {
@@ -199,7 +211,7 @@ namespace Dreamtides.Services
     /// <summary>
     /// Log a client message to the server.
     /// </summary>
-    public void Log(ClientLogRequest request)
+    public override void Log(ClientLogRequest request)
     {
       if (UseDevServer)
       {
@@ -211,7 +223,7 @@ namespace Dreamtides.Services
       }
     }
 
-    public void TriggerReconnect()
+    public override void TriggerReconnect()
     {
       if (_metadata == null)
         return;
