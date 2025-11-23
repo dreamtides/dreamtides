@@ -40,6 +40,7 @@ namespace Dreamtides.Tests.TestUtils
       _registry = registryObject.AddComponent<Registry>();
       _fakeSoundService = registryObject.AddComponent<FakeSoundService>();
       _registry._soundService = _fakeSoundService;
+      _registry._loggingService = registryObject.AddComponent<FakeLoggingService>();
       _portraitLayout = CreateGameObject().AddComponent<GameLayout>();
       _landscapeLayout = CreateGameObject().AddComponent<GameLayout>();
       _registry._portraitLayout = _portraitLayout;
