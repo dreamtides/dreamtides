@@ -7,7 +7,75 @@ using UnityEngine;
 
 namespace Dreamtides.Services
 {
-  public class LoggingService : Service
+  public abstract class LoggingService : Service
+  {
+    public abstract void StartSpan(LogSpanName name);
+    public abstract void Log(string message);
+    public abstract void Log(string className, string message);
+    public abstract void Log(string message, Dictionary<string, string> arguments);
+    public abstract void Log(
+      string className,
+      string message,
+      Dictionary<string, string> arguments
+    );
+    public abstract void Log(string message, params (string key, string value)[] keyValuePairs);
+    public abstract void Log(
+      string className,
+      string message,
+      params (string key, string value)[] keyValuePairs
+    );
+    public abstract void LogInfo(string message);
+    public abstract void LogInfo(string className, string message);
+    public abstract void LogInfo(string message, Dictionary<string, string> arguments);
+    public abstract void LogInfo(
+      string className,
+      string message,
+      Dictionary<string, string> arguments
+    );
+    public abstract void LogInfo(string message, params (string key, string value)[] keyValuePairs);
+    public abstract void LogInfo(
+      string className,
+      string message,
+      params (string key, string value)[] keyValuePairs
+    );
+    public abstract void LogError(string message);
+    public abstract void LogError(string className, string message);
+    public abstract void LogError(string message, Dictionary<string, string> arguments);
+    public abstract void LogError(
+      string className,
+      string message,
+      Dictionary<string, string> arguments
+    );
+    public abstract void LogError(
+      string message,
+      params (string key, string value)[] keyValuePairs
+    );
+    public abstract void LogError(
+      string className,
+      string message,
+      params (string key, string value)[] keyValuePairs
+    );
+    public abstract void LogWarning(string message);
+    public abstract void LogWarning(string className, string message);
+    public abstract void LogWarning(string message, Dictionary<string, string> arguments);
+    public abstract void LogWarning(
+      string className,
+      string message,
+      Dictionary<string, string> arguments
+    );
+    public abstract void LogWarning(
+      string message,
+      params (string key, string value)[] keyValuePairs
+    );
+    public abstract void LogWarning(
+      string className,
+      string message,
+      params (string key, string value)[] keyValuePairs
+    );
+    public abstract void EndSpan(LogSpanName name);
+  }
+
+  public class LoggingServiceImpl : LoggingService
   {
     private class ActiveSpan
     {
@@ -56,39 +124,39 @@ namespace Dreamtides.Services
       }
     }
 
-    public void StartSpan(LogSpanName name)
+    public override void StartSpan(LogSpanName name)
     {
       var span = new ActiveSpan { Name = name, LastLogTime = Time.time };
       _spanStack.Push(span);
     }
 
-    public void Log(string message)
+    public override void Log(string message)
     {
       AddLogEntry(Schema.LogType.Debug, message, new Dictionary<string, string>());
     }
 
-    public void Log(string className, string message)
+    public override void Log(string className, string message)
     {
       AddLogEntry(Schema.LogType.Debug, message, new Dictionary<string, string>(), className);
     }
 
-    public void Log(string message, Dictionary<string, string> arguments)
+    public override void Log(string message, Dictionary<string, string> arguments)
     {
       AddLogEntry(Schema.LogType.Debug, message, arguments);
     }
 
-    public void Log(string className, string message, Dictionary<string, string> arguments)
+    public override void Log(string className, string message, Dictionary<string, string> arguments)
     {
       AddLogEntry(Schema.LogType.Debug, message, arguments, className);
     }
 
-    public void Log(string message, params (string key, string value)[] keyValuePairs)
+    public override void Log(string message, params (string key, string value)[] keyValuePairs)
     {
       var arguments = keyValuePairs.ToDictionary(kvp => kvp.key, kvp => kvp.value);
       AddLogEntry(Schema.LogType.Debug, message, arguments);
     }
 
-    public void Log(
+    public override void Log(
       string className,
       string message,
       params (string key, string value)[] keyValuePairs
@@ -98,33 +166,37 @@ namespace Dreamtides.Services
       AddLogEntry(Schema.LogType.Debug, message, arguments, className);
     }
 
-    public void LogInfo(string message)
+    public override void LogInfo(string message)
     {
       AddLogEntry(Schema.LogType.Info, message, new Dictionary<string, string>());
     }
 
-    public void LogInfo(string className, string message)
+    public override void LogInfo(string className, string message)
     {
       AddLogEntry(Schema.LogType.Info, message, new Dictionary<string, string>(), className);
     }
 
-    public void LogInfo(string message, Dictionary<string, string> arguments)
+    public override void LogInfo(string message, Dictionary<string, string> arguments)
     {
       AddLogEntry(Schema.LogType.Info, message, arguments);
     }
 
-    public void LogInfo(string className, string message, Dictionary<string, string> arguments)
+    public override void LogInfo(
+      string className,
+      string message,
+      Dictionary<string, string> arguments
+    )
     {
       AddLogEntry(Schema.LogType.Info, message, arguments, className);
     }
 
-    public void LogInfo(string message, params (string key, string value)[] keyValuePairs)
+    public override void LogInfo(string message, params (string key, string value)[] keyValuePairs)
     {
       var arguments = keyValuePairs.ToDictionary(kvp => kvp.key, kvp => kvp.value);
       AddLogEntry(Schema.LogType.Info, message, arguments);
     }
 
-    public void LogInfo(
+    public override void LogInfo(
       string className,
       string message,
       params (string key, string value)[] keyValuePairs
@@ -134,33 +206,37 @@ namespace Dreamtides.Services
       AddLogEntry(Schema.LogType.Info, message, arguments, className);
     }
 
-    public void LogError(string message)
+    public override void LogError(string message)
     {
       AddLogEntry(Schema.LogType.Error, message, new Dictionary<string, string>());
     }
 
-    public void LogError(string className, string message)
+    public override void LogError(string className, string message)
     {
       AddLogEntry(Schema.LogType.Error, message, new Dictionary<string, string>(), className);
     }
 
-    public void LogError(string message, Dictionary<string, string> arguments)
+    public override void LogError(string message, Dictionary<string, string> arguments)
     {
       AddLogEntry(Schema.LogType.Error, message, arguments);
     }
 
-    public void LogError(string className, string message, Dictionary<string, string> arguments)
+    public override void LogError(
+      string className,
+      string message,
+      Dictionary<string, string> arguments
+    )
     {
       AddLogEntry(Schema.LogType.Error, message, arguments, className);
     }
 
-    public void LogError(string message, params (string key, string value)[] keyValuePairs)
+    public override void LogError(string message, params (string key, string value)[] keyValuePairs)
     {
       var arguments = keyValuePairs.ToDictionary(kvp => kvp.key, kvp => kvp.value);
       AddLogEntry(Schema.LogType.Error, message, arguments);
     }
 
-    public void LogError(
+    public override void LogError(
       string className,
       string message,
       params (string key, string value)[] keyValuePairs
@@ -170,33 +246,40 @@ namespace Dreamtides.Services
       AddLogEntry(Schema.LogType.Error, message, arguments, className);
     }
 
-    public void LogWarning(string message)
+    public override void LogWarning(string message)
     {
       AddLogEntry(Schema.LogType.Warning, message, new Dictionary<string, string>());
     }
 
-    public void LogWarning(string className, string message)
+    public override void LogWarning(string className, string message)
     {
       AddLogEntry(Schema.LogType.Warning, message, new Dictionary<string, string>(), className);
     }
 
-    public void LogWarning(string message, Dictionary<string, string> arguments)
+    public override void LogWarning(string message, Dictionary<string, string> arguments)
     {
       AddLogEntry(Schema.LogType.Warning, message, arguments);
     }
 
-    public void LogWarning(string className, string message, Dictionary<string, string> arguments)
+    public override void LogWarning(
+      string className,
+      string message,
+      Dictionary<string, string> arguments
+    )
     {
       AddLogEntry(Schema.LogType.Warning, message, arguments, className);
     }
 
-    public void LogWarning(string message, params (string key, string value)[] keyValuePairs)
+    public override void LogWarning(
+      string message,
+      params (string key, string value)[] keyValuePairs
+    )
     {
       var arguments = keyValuePairs.ToDictionary(kvp => kvp.key, kvp => kvp.value);
       AddLogEntry(Schema.LogType.Warning, message, arguments);
     }
 
-    public void LogWarning(
+    public override void LogWarning(
       string className,
       string message,
       params (string key, string value)[] keyValuePairs
@@ -206,7 +289,7 @@ namespace Dreamtides.Services
       AddLogEntry(Schema.LogType.Warning, message, arguments, className);
     }
 
-    public void EndSpan(LogSpanName name)
+    public override void EndSpan(LogSpanName name)
     {
       if (_spanStack.Count == 0)
         return;
