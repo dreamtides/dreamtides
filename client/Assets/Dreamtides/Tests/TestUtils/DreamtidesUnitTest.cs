@@ -11,6 +11,8 @@ using UnityEngine;
 
 namespace Dreamtides.Tests.TestUtils
 {
+  public class TestDisplayable : Displayable { }
+
   public abstract class DreamtidesUnitTest
   {
     readonly List<GameObject> _createdObjects = new();
@@ -128,6 +130,11 @@ namespace Dreamtides.Tests.TestUtils
       configure?.Invoke(result);
       result.Initialize(Registry, _gameMode, _testConfiguration);
       return result;
+    }
+
+    protected TestDisplayable CreateDisplayable()
+    {
+      return CreateSceneObject<TestDisplayable>();
     }
   }
 }

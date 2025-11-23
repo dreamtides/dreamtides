@@ -33,3 +33,10 @@ do not attempt to set them via reflection.A
 
 When writing tests, put the tests at the top of the file and helpers as
 private elements at the bottom of the file.
+
+Please do not use reflection in unit tests. Instead, follow the pattern of
+adding "internal" to methods we need to call
+
+Please include argument labels for integer and booleans literals when invoking
+methods. Example: CreateTestLayout(horizontalSpacing: 12.0, forceTwoRows: false).
+Labels are not required when passing variables.

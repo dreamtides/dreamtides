@@ -120,13 +120,21 @@ namespace Dreamtides.Layout
         ApplyLayoutToObject(_objects[i], layoutIndex, _objects.Count, sequence);
       }
 
-      if (_shouldFireBecameNonEmptyAfterNextLayoutAnimation && sequence != null)
+      if (_shouldFireBecameNonEmptyAfterNextLayoutAnimation)
       {
-        sequence.AppendCallback(() =>
+        if (sequence != null)
+        {
+          sequence.AppendCallback(() =>
+          {
+            _shouldFireBecameNonEmptyAfterNextLayoutAnimation = false;
+            OnBecameNonEmpty();
+          });
+        }
+        else
         {
           _shouldFireBecameNonEmptyAfterNextLayoutAnimation = false;
           OnBecameNonEmpty();
-        });
+        }
       }
 
       OnAppliedLayout();

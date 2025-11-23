@@ -1,40 +1,43 @@
 #nullable enable
 
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using Dreamtides.Services;
 using Dreamtides.Utils;
 using UnityEngine;
+
+[assembly: InternalsVisibleTo("Dreamtides.Tests")]
 
 namespace Dreamtides.Layout
 {
   public class SitePickObjectLayout : StandardObjectLayout
   {
     [SerializeField]
-    float _horizontalSpacing;
+    internal float _horizontalSpacing;
 
     [SerializeField]
-    float _verticalSpacing;
+    internal float _verticalSpacing;
 
     [SerializeField]
-    float _cardWidth;
+    internal float _cardWidth;
 
     [SerializeField]
-    float _cardHeight;
+    internal float _cardHeight;
 
     [SerializeField]
-    bool _forceTwoRows;
+    internal bool _forceTwoRows;
 
     [SerializeField]
-    RectTransform? _closeSiteButton;
+    internal RectTransform? _closeSiteButton;
 
     [SerializeField]
-    Vector2 _portraitCloseButtonOffset;
+    internal Vector2 _portraitCloseButtonOffset;
 
     [SerializeField]
-    Vector2 _landscapeCloseButtonOffset;
+    internal Vector2 _landscapeCloseButtonOffset;
 
     [SerializeField]
-    bool _preserveLayoutOnRemoval;
+    internal bool _preserveLayoutOnRemoval;
 
     int? _preservedInitialCount;
     readonly Dictionary<Displayable, int> _displayableToIndex = new();
