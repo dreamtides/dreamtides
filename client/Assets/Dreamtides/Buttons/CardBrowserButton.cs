@@ -23,11 +23,21 @@ namespace Dreamtides.Components
       }
 
       Registry.SoundService.PlayClickSound();
+      // var action = new GameAction
+      // {
+      //   GameActionClass = new()
+      //   {
+      //     BattleDisplayAction = new() { BattleDisplayActionClass = new() { BrowseCards = _type } },
+      //   },
+      // };
       var action = new GameAction
       {
         GameActionClass = new()
         {
-          BattleDisplayAction = new() { BattleDisplayActionClass = new() { BrowseCards = _type } },
+          DebugAction = new()
+          {
+            DebugActionClass = new() { ApplyTestScenarioAction = "browseQuestDeck" },
+          },
         },
       };
       Registry.ActionService.PerformAction(action);

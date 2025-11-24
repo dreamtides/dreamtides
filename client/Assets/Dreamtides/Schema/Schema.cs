@@ -2726,6 +2726,8 @@ namespace Dreamtides.Schema
     ///
     /// User deck displayed in the quest view
     ///
+    /// Quest deck is open, showing all cards in a large scrollable format.
+    ///
     /// Object is hidden after being destroyed during a quest, for example when
     /// not selected for a draft pick.
     ///
@@ -2741,7 +2743,7 @@ namespace Dreamtides.Schema
     /// currently active quest. Similar to a card being on the stack during a
     /// battle.
     /// </summary>
-    public enum PositionEnum { Browser, Default, DestroyedQuestCards, DraftPickDisplay, Drawn, DreamsignDisplay, DreamwellActivation, GameModifier, HandStorage, JourneyDisplay, Offscreen, OnScreenStorage, QuestDeck, QuestEffect, ShopDisplay };
+    public enum PositionEnum { Browser, Default, DestroyedQuestCards, DraftPickDisplay, Drawn, DreamsignDisplay, DreamwellActivation, GameModifier, HandStorage, JourneyDisplay, Offscreen, OnScreenStorage, QuestDeck, QuestDeckBrowser, QuestEffect, ShopDisplay };
 
     /// <summary>
     /// Auto-generated discriminant enum variants
@@ -5328,6 +5330,8 @@ namespace Dreamtides.Schema
                             return new Position { Enum = PositionEnum.OnScreenStorage };
                         case "QuestDeck":
                             return new Position { Enum = PositionEnum.QuestDeck };
+                        case "QuestDeckBrowser":
+                            return new Position { Enum = PositionEnum.QuestDeckBrowser };
                         case "QuestEffect":
                             return new Position { Enum = PositionEnum.QuestEffect };
                         case "ShopDisplay":
@@ -5386,6 +5390,9 @@ namespace Dreamtides.Schema
                         return;
                     case PositionEnum.QuestDeck:
                         serializer.Serialize(writer, "QuestDeck");
+                        return;
+                    case PositionEnum.QuestDeckBrowser:
+                        serializer.Serialize(writer, "QuestDeckBrowser");
                         return;
                     case PositionEnum.QuestEffect:
                         serializer.Serialize(writer, "QuestEffect");
@@ -5575,6 +5582,8 @@ namespace Dreamtides.Schema
                     return PositionEnum.OnScreenStorage;
                 case "QuestDeck":
                     return PositionEnum.QuestDeck;
+                case "QuestDeckBrowser":
+                    return PositionEnum.QuestDeckBrowser;
                 case "QuestEffect":
                     return PositionEnum.QuestEffect;
                 case "ShopDisplay":
@@ -5631,6 +5640,9 @@ namespace Dreamtides.Schema
                     return;
                 case PositionEnum.QuestDeck:
                     serializer.Serialize(writer, "QuestDeck");
+                    return;
+                case PositionEnum.QuestDeckBrowser:
+                    serializer.Serialize(writer, "QuestDeckBrowser");
                     return;
                 case PositionEnum.QuestEffect:
                     serializer.Serialize(writer, "QuestEffect");

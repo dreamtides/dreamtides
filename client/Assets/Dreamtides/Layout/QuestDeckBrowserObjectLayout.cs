@@ -125,16 +125,16 @@ namespace Dreamtides.Layout
       _content.sizeDelta = new Vector2(_content.sizeDelta.x, totalHeight);
     }
 
-    protected override IEnumerator? OnStartAsync()
-    {
-      yield return new WaitForSeconds(0.5f);
-      var cards = FindObjectsByType<Card>(FindObjectsSortMode.None);
-      foreach (var card in cards)
-      {
-        card.transform.SetParent(null);
-      }
-      AddRange(cards);
-    }
+    // protected override IEnumerator? OnStartAsync()
+    // {
+    //   yield return new WaitForSeconds(0.5f);
+    //   var cards = FindObjectsByType<Card>(FindObjectsSortMode.None);
+    //   foreach (var card in cards)
+    //   {
+    //     card.transform.SetParent(null);
+    //   }
+    //   AddRange(cards);
+    // }
 
     protected override void OnUpdateObjectLayout()
     {

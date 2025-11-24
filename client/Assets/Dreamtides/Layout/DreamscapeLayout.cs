@@ -13,6 +13,10 @@ namespace Dreamtides.Layout
     public ObjectLayout QuestDeck => Check(_questDeck);
 
     [SerializeField]
+    QuestDeckBrowserObjectLayout _questDeckBrowser = null!;
+    public QuestDeckBrowserObjectLayout QuestDeckBrowser => Check(_questDeckBrowser);
+
+    [SerializeField]
     EssenceTotal _essenceTotal = null!;
     public EssenceTotal EssenceTotal => Check(_essenceTotal);
 

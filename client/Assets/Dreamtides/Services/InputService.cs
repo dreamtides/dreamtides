@@ -9,6 +9,13 @@ using UnityEngine.InputSystem;
 
 namespace Dreamtides.Services
 {
+  public enum MouseEventType
+  {
+    MouseDown,
+    MouseUp,
+    MouseHover,
+  }
+
   public interface IInputProvider
   {
     /// <summary>
@@ -23,7 +30,7 @@ namespace Dreamtides.Services
     /// </summary>
     Vector2 PointerPosition();
 
-    Displayable? ObjectAtPointerPosition();
+    Displayable? ObjectAtPointerPosition(MouseEventType eventType);
   }
 
   public class UnityInputProvider : IInputProvider
@@ -48,7 +55,7 @@ namespace Dreamtides.Services
     // window for device simulation.
     public bool IsPointerPressed() => _clickAction.IsPressed();
 
-    public Displayable? ObjectAtPointerPosition()
+    public Displayable? ObjectAtPointerPosition(MouseEventType eventType)
     {
       var allowedContexts = _registry.DocumentService.AllowedContextForClicks();
       var tapScreenPosition = PointerPosition();
@@ -133,7 +140,7 @@ namespace Dreamtides.Services
         case false when _lastClicked:
           var last = _lastClicked;
           _lastClicked = null;
-          var objectAtClickPosition = InputProvider.ObjectAtPointerPosition();
+          var objectAtClickPosition = InputProvider.ObjectAtPointerPosition(MouseEventType.MouseUp);
           last.MouseUp(objectAtClickPosition == last);
           break;
       }
@@ -146,7 +153,7 @@ namespace Dreamtides.Services
         return;
       }
 
-      var current = InputProvider.ObjectAtPointerPosition();
+      var current = InputProvider.ObjectAtPointerPosition(MouseEventType.MouseHover);
       if (current && !_lastHovered)
       {
         current.MouseHoverStart();
@@ -179,7 +186,7 @@ namespace Dreamtides.Services
         return null;
       }
 
-      var fired = InputProvider.ObjectAtPointerPosition();
+      var fired = InputProvider.ObjectAtPointerPosition(MouseEventType.MouseDown);
       if (fired)
       {
         fired.MouseDown();

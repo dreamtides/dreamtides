@@ -376,6 +376,11 @@ namespace Dreamtides.Services
         return Registry.DreamscapeLayout.QuestDeck;
       }
 
+      if (position.Enum == PositionEnum.QuestDeckBrowser)
+      {
+        return Registry.DreamscapeLayout.QuestDeckBrowser;
+      }
+
       if (position.Enum == PositionEnum.DraftPickDisplay)
       {
         return Registry.DreamscapeLayout.DraftPickLayout;

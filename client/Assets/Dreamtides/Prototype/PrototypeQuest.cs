@@ -242,6 +242,12 @@ public class PrototypeQuest : Service
       return;
     }
 
+    if (name == "browseQuestDeck")
+    {
+      StartCoroutine(BrowseQuestDeck());
+      return;
+    }
+
     if (name == "closeShop")
     {
       EnsureFlowsInitialized();
@@ -298,6 +304,34 @@ public class PrototypeQuest : Service
       _temptingOfferFlow.HandleTemptingOfferSelection(clickedId);
       return;
     }
+  }
+
+  IEnumerator BrowseQuestDeck()
+  {
+    var questDeckLayout = Registry.DreamscapeLayout.QuestDeck;
+    var cardCount = questDeckLayout.Objects.Count;
+    if (cardCount == 0)
+    {
+      yield break;
+    }
+
+    yield return StartCoroutine(
+      CreateOrUpdateCards(
+        new CreateOrUpdateCardsRequest
+        {
+          Count = cardCount,
+          Position = new ObjectPosition
+          {
+            Position = new Position { Enum = PositionEnum.QuestDeckBrowser },
+            SortingKey = 0,
+          },
+          Revealed = true,
+          GroupKey = "quest",
+          OutlineColorHex = _outlineColorHex,
+        },
+        animate: true
+      )
+    );
   }
 
   public void FocusSpaceCameraFar()

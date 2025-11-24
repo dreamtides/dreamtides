@@ -103,6 +103,9 @@ pub enum Position {
     /// User deck displayed in the quest view
     QuestDeck,
 
+    /// Quest deck is open, showing all cards in a large scrollable format.
+    QuestDeckBrowser,
+
     /// Object is hidden after being destroyed during a quest, for example when
     /// not selected for a draft pick.
     DestroyedQuestCards,
