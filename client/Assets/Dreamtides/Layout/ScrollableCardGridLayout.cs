@@ -81,7 +81,7 @@ namespace Dreamtides.Layout
       SetCards(cards.ToList());
     }
 
-    void LateUpdate()
+    void Update()
     {
       if (_cards.Count > 0)
       {
