@@ -17,12 +17,6 @@ namespace Dreamtides.Layout
     internal Sprite _sprite = null!;
 
     [SerializeField]
-    internal Canvas _canvas = null!;
-
-    [SerializeField]
-    internal Camera _camera = null!;
-
-    [SerializeField]
     internal RectTransform _content = null!;
 
     [SerializeField]
@@ -58,12 +52,9 @@ namespace Dreamtides.Layout
       Canvas.ForceUpdateCanvases();
 
       var rectTransform = _rectangles[index];
-      var canvasCamera =
-        _canvas.renderMode == RenderMode.ScreenSpaceCamera ? _canvas.worldCamera : null;
 
       GetRectangleScreenBounds(
         rectTransform,
-        canvasCamera,
         out var minX,
         out var maxX,
         out var minY,
@@ -72,7 +63,7 @@ namespace Dreamtides.Layout
 
       var screenCenter = new Vector2((minX + maxX) * 0.5f, (minY + maxY) * 0.5f);
 
-      var worldCenter = _camera.ScreenToWorldPoint(
+      var worldCenter = Registry.GameViewport.ScreenToWorldPoint(
         new Vector3(screenCenter.x, screenCenter.y, _worldSpaceDepth)
       );
 
@@ -155,7 +146,6 @@ namespace Dreamtides.Layout
 
     void GetRectangleScreenBounds(
       RectTransform rectTransform,
-      Camera? canvasCamera,
       out float minX,
       out float maxX,
       out float minY,
@@ -172,21 +162,7 @@ namespace Dreamtides.Layout
 
       foreach (var corner in corners)
       {
-        Vector2 screenPoint;
-
-        if (_canvas.renderMode == RenderMode.ScreenSpaceOverlay)
-        {
-          screenPoint = corner;
-        }
-        else if (canvasCamera != null)
-        {
-          screenPoint = RectTransformUtility.WorldToScreenPoint(canvasCamera, corner);
-        }
-        else
-        {
-          screenPoint = RectTransformUtility.WorldToScreenPoint(_camera, corner);
-        }
-
+        var screenPoint = corner;
         minX = Mathf.Min(minX, screenPoint.x);
         maxX = Mathf.Max(maxX, screenPoint.x);
         minY = Mathf.Min(minY, screenPoint.y);
