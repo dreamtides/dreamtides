@@ -315,23 +315,34 @@ public class PrototypeQuest : Service
       yield break;
     }
 
-    yield return StartCoroutine(
-      CreateOrUpdateCards(
-        new CreateOrUpdateCardsRequest
-        {
-          Count = cardCount,
-          Position = new ObjectPosition
-          {
-            Position = new Position { Enum = PositionEnum.QuestDeckBrowser },
-            SortingKey = 0,
-          },
-          Revealed = true,
-          GroupKey = "quest",
-          OutlineColorHex = _outlineColorHex,
-        },
-        animate: true
-      )
-    );
+    var request = new CreateOrUpdateCardsRequest
+    {
+      Count = cardCount,
+      Position = new ObjectPosition
+      {
+        Position = new Position { Enum = PositionEnum.QuestDeckBrowser },
+        SortingKey = 0,
+      },
+      Revealed = true,
+      GroupKey = "quest",
+      OutlineColorHex = _outlineColorHex,
+    };
+
+    var allCards = _prototypeCards.CreateOrUpdateCards(request);
+    var questCards = allCards.Take(cardCount).ToList();
+
+    var animation = new MoveCardsWithCustomAnimationCommand
+    {
+      Animation = MoveCardsCustomAnimation.DefaultAnimation,
+      Cards = questCards,
+      Destination = new Position { Enum = PositionEnum.QuestDeckBrowser },
+      PauseDuration = new Milliseconds { MillisecondsValue = 0 },
+      StaggerInterval = new Milliseconds { MillisecondsValue = 0 },
+    };
+
+    yield return Registry.CardAnimationService.HandleMoveCardsWithCustomAnimation(animation);
+
+    yield return StartCoroutine(CreateOrUpdateCards(request, animate: true));
   }
 
   public void FocusSpaceCameraFar()

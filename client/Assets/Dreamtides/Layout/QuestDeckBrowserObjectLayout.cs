@@ -1,10 +1,10 @@
 #nullable enable
 
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.CompilerServices;
+using DG.Tweening;
 using Dreamtides.Components;
+using Dreamtides.Utils;
 using UnityEngine;
 
 [assembly: InternalsVisibleTo("Dreamtides.Tests")]
@@ -40,7 +40,43 @@ namespace Dreamtides.Layout
     [SerializeField]
     internal Vector2 _worldSpaceOffset;
 
+    [SerializeField]
+    internal Transform _worldSpaceParent = null!;
+
     List<RectTransform> _rectangles = new();
+
+    public override void Add(Displayable displayable)
+    {
+      base.Add(displayable);
+
+      if (_worldSpaceParent != null && displayable.transform.parent != _worldSpaceParent)
+      {
+        displayable.transform.SetParent(_worldSpaceParent, worldPositionStays: true);
+      }
+    }
+
+    public override void RemoveIfPresent(Displayable? displayable)
+    {
+      if (displayable && displayable.transform.parent == _worldSpaceParent)
+      {
+        displayable.transform.SetParent(null, worldPositionStays: true);
+      }
+
+      base.RemoveIfPresent(displayable);
+    }
+
+    public override void ApplyTargetTransform(Displayable target, Sequence? sequence = null)
+    {
+      ApplyLayoutToObjectLocal(target, Objects.Count, Objects.Count + 1, sequence);
+    }
+
+    public override void ApplyLayout(Sequence? sequence = null)
+    {
+      for (var i = 0; i < Objects.Count; ++i)
+      {
+        ApplyLayoutToObjectLocal(Objects[i], i, Objects.Count, sequence);
+      }
+    }
 
     public override Vector3 CalculateObjectPosition(int index, int count)
     {
@@ -67,7 +103,19 @@ namespace Dreamtides.Layout
         new Vector3(screenCenter.x, screenCenter.y, _worldSpaceDepth)
       );
 
-      return worldCenter + new Vector3(_worldSpaceOffset.x, _worldSpaceOffset.y, z: 0);
+      var worldPosition = worldCenter + new Vector3(_worldSpaceOffset.x, _worldSpaceOffset.y, z: 0);
+
+      if (_worldSpaceParent != null)
+      {
+        return _worldSpaceParent.InverseTransformPoint(worldPosition);
+      }
+
+      return worldPosition;
+    }
+
+    public override Vector3? CalculateObjectRotation(int index, int count)
+    {
+      return Vector3.zero;
     }
 
     public override float? CalculateObjectScale(int index, int count)
@@ -125,17 +173,6 @@ namespace Dreamtides.Layout
       _content.sizeDelta = new Vector2(_content.sizeDelta.x, totalHeight);
     }
 
-    // protected override IEnumerator? OnStartAsync()
-    // {
-    //   yield return new WaitForSeconds(0.5f);
-    //   var cards = FindObjectsByType<Card>(FindObjectsSortMode.None);
-    //   foreach (var card in cards)
-    //   {
-    //     card.transform.SetParent(null);
-    //   }
-    //   AddRange(cards);
-    // }
-
     protected override void OnUpdateObjectLayout()
     {
       if (Objects.Count > 0)
@@ -143,6 +180,101 @@ namespace Dreamtides.Layout
         ApplyLayout();
       }
     }
+
+    void ApplyLayoutToObjectLocal(
+      Displayable displayable,
+      int index,
+      int count,
+      Sequence? sequence = null
+    )
+    {
+      if (displayable.ExcludeFromLayout)
+      {
+        return;
+      }
+
+      const float duration = TweenUtils.MoveAnimationDurationSeconds;
+      var localPosition = CalculateObjectPosition(index, count);
+      var localRotation = CalculateObjectRotation(index, count);
+      var localScale = CalculateObjectScale(index, count) ?? displayable.DefaultScale;
+
+      if (_worldSpaceParent != null && displayable.transform.parent != _worldSpaceParent)
+      {
+        displayable.transform.SetParent(_worldSpaceParent, worldPositionStays: true);
+      }
+
+      if (IsEquivalent(displayable, localPosition, localRotation, localScale))
+      {
+        return;
+      }
+
+      if (sequence != null)
+      {
+        sequence.Insert(atPosition: 0, displayable.transform.DOLocalMove(localPosition, duration));
+      }
+      else
+      {
+        displayable.transform.localPosition = localPosition;
+      }
+
+      if (localRotation is { } euler)
+      {
+        if (sequence != null)
+        {
+          sequence.Insert(atPosition: 0, displayable.transform.DOLocalRotate(euler, duration));
+        }
+        else
+        {
+          displayable.transform.localEulerAngles = euler;
+        }
+      }
+
+      if (sequence != null)
+      {
+        sequence.Insert(
+          atPosition: 0,
+          displayable.transform.DOScale(Vector3.one * localScale, duration)
+        );
+      }
+      else
+      {
+        displayable.transform.localScale = Vector3.one * localScale;
+      }
+    }
+
+    bool IsEquivalent(
+      Displayable displayable,
+      Vector3 localPosition,
+      Vector3? localRotation,
+      float localScale
+    )
+    {
+      if (Vector3.Distance(displayable.transform.localPosition, localPosition) > 0.01f)
+      {
+        return false;
+      }
+
+      if (
+        localRotation != null
+        && Vector3.Distance(
+          EulerAngleDistance(displayable.transform.localEulerAngles, localRotation.Value),
+          Vector3.zero
+        ) > 0.01f
+      )
+      {
+        return false;
+      }
+
+      if (Vector3.Distance(displayable.transform.localScale, localScale * Vector3.one) > 0.01f)
+      {
+        return false;
+      }
+
+      return true;
+    }
+
+    Vector3 EulerAngleDistance(Vector3 a, Vector3 b) =>
+      new(Mathf.DeltaAngle(a.x, b.x), Mathf.DeltaAngle(a.y, b.y), Mathf.DeltaAngle(a.z, b.z));
 
     void GetRectangleScreenBounds(
       RectTransform rectTransform,
