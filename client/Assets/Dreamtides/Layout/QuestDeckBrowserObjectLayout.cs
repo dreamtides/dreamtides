@@ -11,7 +11,7 @@ using UnityEngine;
 
 namespace Dreamtides.Layout
 {
-  public class QuestDeckBrowserObjectLayout : MonoBehaviour
+  public class QuestDeckBrowserObjectLayout : StandardObjectLayout
   {
     [SerializeField]
     internal Sprite _sprite = null!;
@@ -46,21 +46,45 @@ namespace Dreamtides.Layout
     [SerializeField]
     internal Vector2 _worldSpaceOffset;
 
-    Dictionary<Card, RectTransform> _cardToRectangle = new();
-    List<Card> _cards = new();
     List<RectTransform> _rectangles = new();
 
-    public void SetCards(List<Card> cards)
+    public override Vector3 CalculateObjectPosition(int index, int count)
     {
-      _cards = cards;
-      _cardToRectangle.Clear();
-      for (var i = 0; i < Mathf.Min(cards.Count, _rectangles.Count); i++)
+      if (index < 0 || index >= _rectangles.Count)
       {
-        _cardToRectangle[cards[i]] = _rectangles[i];
+        return Vector3.zero;
       }
+
+      Canvas.ForceUpdateCanvases();
+
+      var rectTransform = _rectangles[index];
+      var canvasCamera =
+        _canvas.renderMode == RenderMode.ScreenSpaceCamera ? _canvas.worldCamera : null;
+
+      GetRectangleScreenBounds(
+        rectTransform,
+        canvasCamera,
+        out var minX,
+        out var maxX,
+        out var minY,
+        out var maxY
+      );
+
+      var screenCenter = new Vector2((minX + maxX) * 0.5f, (minY + maxY) * 0.5f);
+
+      var worldCenter = _camera.ScreenToWorldPoint(
+        new Vector3(screenCenter.x, screenCenter.y, _worldSpaceDepth)
+      );
+
+      return worldCenter + new Vector3(_worldSpaceOffset.x, _worldSpaceOffset.y, z: 0);
     }
 
-    void Start()
+    public override float? CalculateObjectScale(int index, int count)
+    {
+      return _cardScale;
+    }
+
+    protected override void OnStart()
     {
       Canvas.ForceUpdateCanvases();
 
@@ -108,11 +132,9 @@ namespace Dreamtides.Layout
 
       var totalHeight = (rows * _cardHeight) + ((rows - 1) * _cardSpacing) + (2 * _cardSpacing);
       _content.sizeDelta = new Vector2(_content.sizeDelta.x, totalHeight);
-
-      StartCoroutine(StartAsync());
     }
 
-    IEnumerator StartAsync()
+    protected override IEnumerator? OnStartAsync()
     {
       yield return new WaitForSeconds(0.5f);
       var cards = FindObjectsByType<Card>(FindObjectsSortMode.None);
@@ -120,52 +142,14 @@ namespace Dreamtides.Layout
       {
         card.transform.SetParent(null);
       }
-      SetCards(cards.ToList());
+      AddRange(cards);
     }
 
-    void Update()
+    protected override void OnUpdateObjectLayout()
     {
-      if (_cards.Count > 0)
+      if (Objects.Count > 0)
       {
-        UpdateCardPositions();
-      }
-    }
-
-    void UpdateCardPositions()
-    {
-      Canvas.ForceUpdateCanvases();
-
-      var canvasCamera =
-        _canvas.renderMode == RenderMode.ScreenSpaceCamera ? _canvas.worldCamera : null;
-
-      foreach (var kvp in _cardToRectangle)
-      {
-        var card = kvp.Key;
-        var rectTransform = kvp.Value;
-
-        if (card == null || rectTransform == null)
-        {
-          continue;
-        }
-
-        GetRectangleScreenBounds(
-          rectTransform,
-          canvasCamera,
-          out var minX,
-          out var maxX,
-          out var minY,
-          out var maxY
-        );
-
-        var screenCenter = new Vector2((minX + maxX) * 0.5f, (minY + maxY) * 0.5f);
-
-        var worldCenter = _camera.ScreenToWorldPoint(
-          new Vector3(screenCenter.x, screenCenter.y, _worldSpaceDepth)
-        );
-
-        card.transform.position =
-          worldCenter + new Vector3(_worldSpaceOffset.x, _worldSpaceOffset.y, z: 0);
-        card.transform.localScale = Vector3.one * _cardScale;
+        ApplyLayout();
       }
     }
 
