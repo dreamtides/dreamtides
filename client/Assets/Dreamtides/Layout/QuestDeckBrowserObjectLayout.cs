@@ -78,6 +78,7 @@ namespace Dreamtides.Layout
       }
 
       SortObjects();
+      EnsureRectangleCount(_objects.Count);
     }
 
     public override void AddRange(IEnumerable<Displayable> displayables) =>
@@ -96,6 +97,7 @@ namespace Dreamtides.Layout
 
         _objects.Remove(displayable);
         SortObjects();
+        EnsureRectangleCount(_objects.Count);
       }
     }
 
@@ -157,7 +159,15 @@ namespace Dreamtides.Layout
       return _cardScale;
     }
 
-    protected override void OnStart()
+    protected override void OnUpdate()
+    {
+      if (_objects.Count > 0)
+      {
+        ApplyLayout();
+      }
+    }
+
+    public void EnsureRectangleCount(int targetCount)
     {
       Canvas.ForceUpdateCanvases();
 
@@ -166,54 +176,48 @@ namespace Dreamtides.Layout
         1,
         Mathf.FloorToInt((viewportWidth + _cardSpacing) / (_cardWidth + _cardSpacing))
       );
-      var rows = Mathf.CeilToInt(50f / columns);
-
       var totalRowWidth = (columns * _cardWidth) + ((columns - 1) * _cardSpacing);
       var horizontalOffset = (viewportWidth - totalRowWidth) * 0.5f;
 
-      var currentX = horizontalOffset;
-      var currentY = -_cardSpacing;
-      var itemsCreated = 0;
-
-      for (var row = 0; row < rows; row++)
+      while (_rectangles.Count < targetCount)
       {
-        for (var col = 0; col < columns && itemsCreated < 50; col++)
-        {
-          var imageObject = new GameObject($"Card_{itemsCreated}");
-          imageObject.transform.SetParent(_content, worldPositionStays: false);
+        var index = _rectangles.Count;
+        var row = index / columns;
+        var col = index % columns;
 
-          var image = imageObject.AddComponent<UnityEngine.UI.Image>();
-          image.sprite = _sprite;
-          image.color = _tintColor;
+        var currentX = horizontalOffset + (col * (_cardWidth + _cardSpacing));
+        var currentY = -_cardSpacing - (row * (_cardHeight + _cardSpacing));
 
-          var rectTransform = imageObject.GetComponent<RectTransform>();
-          rectTransform.anchorMin = new Vector2(x: 0, y: 1);
-          rectTransform.anchorMax = new Vector2(x: 0, y: 1);
-          rectTransform.pivot = new Vector2(x: 0, y: 1);
-          rectTransform.sizeDelta = new Vector2(_cardWidth, _cardHeight);
-          rectTransform.anchoredPosition = new Vector2(currentX, currentY);
+        var imageObject = new GameObject($"Card_{index}");
+        imageObject.transform.SetParent(_content, worldPositionStays: false);
 
-          _rectangles.Add(rectTransform);
+        var image = imageObject.AddComponent<UnityEngine.UI.Image>();
+        image.sprite = _sprite;
+        image.color = _tintColor;
 
-          currentX += _cardWidth + _cardSpacing;
-          itemsCreated++;
-        }
+        var rectTransform = imageObject.GetComponent<RectTransform>();
+        rectTransform.anchorMin = new Vector2(x: 0, y: 1);
+        rectTransform.anchorMax = new Vector2(x: 0, y: 1);
+        rectTransform.pivot = new Vector2(x: 0, y: 1);
+        rectTransform.sizeDelta = new Vector2(_cardWidth, _cardHeight);
+        rectTransform.anchoredPosition = new Vector2(currentX, currentY);
 
-        currentX = horizontalOffset;
-        currentY -= _cardHeight + _cardSpacing;
+        _rectangles.Add(rectTransform);
       }
 
-      var totalHeight = (rows * _cardHeight) + ((rows - 1) * _cardSpacing) + (2 * _cardSpacing);
+      while (_rectangles.Count > targetCount)
+      {
+        var lastIndex = _rectangles.Count - 1;
+        var rectToRemove = _rectangles[lastIndex];
+        _rectangles.RemoveAt(lastIndex);
+        Object.Destroy(rectToRemove.gameObject);
+      }
+
+      var rows = Mathf.CeilToInt((float)targetCount / columns);
+      var totalHeight =
+        (rows * _cardHeight) + (Mathf.Max(0, rows - 1) * _cardSpacing) + (2 * _cardSpacing);
       _content.sizeDelta = new Vector2(_content.sizeDelta.x, totalHeight);
     }
-
-    // protected override void OnUpdate()
-    // {
-    //   if (_objects.Count > 0)
-    //   {
-    //     ApplyLayout();
-    //   }
-    // }
 
     void SortObjects()
     {

@@ -28,6 +28,8 @@ namespace Dreamtides.Animations
       var stagger = command.StaggerInterval.ToSeconds();
 
       var finalCount = cards.Count;
+      browserLayout.EnsureRectangleCount(finalCount);
+
       for (var i = 0; i < cards.Count; ++i)
       {
         var card = cards[i];
