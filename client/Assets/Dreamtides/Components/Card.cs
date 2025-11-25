@@ -752,7 +752,7 @@ namespace Dreamtides.Components
 
         Registry.ActionService.PerformAction(action);
       }
-      else if (ShouldReturnToPreviousParentOnRelease())
+      else if (_isDraggingFromHand && ShouldReturnToPreviousParentOnRelease())
       {
         Registry.CardEffectPreviewService.ClearBattlePreview();
         Registry.CardService.AddToParent(this);
