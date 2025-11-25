@@ -102,7 +102,7 @@ namespace Dreamtides.Animations
       var intermediateWorldPos = viewport.ScreenToWorldPoint(intermediateScreenPos);
 
       var initialScale = card.transform.localScale;
-      var intermediateScale = initialScale * 3f;
+      var intermediateScale = initialScale * 5f;
 
       var phase1Seq = TweenUtils.Sequence("OpenBrowserPhase1");
       phase1Seq.Insert(0, card.transform.DOMove(intermediateWorldPos, PhaseDurationSeconds));
@@ -113,17 +113,6 @@ namespace Dreamtides.Animations
       phase1Seq.Insert(0, card.transform.DOScale(intermediateScale, PhaseDurationSeconds));
 
       yield return phase1Seq.WaitForCompletion();
-
-      var phase2Seq = TweenUtils.Sequence("OpenBrowserPhase2");
-      phase2Seq.Insert(0, card.transform.DOMove(targetWorldPosition, PhaseDurationSeconds));
-      phase2Seq.Insert(
-        0,
-        card.transform.DOScale(Vector3.one * targetLocalScale, PhaseDurationSeconds)
-      );
-
-      yield return phase2Seq.WaitForCompletion();
-
-      browserLayout.Add(card);
     }
   }
 }
