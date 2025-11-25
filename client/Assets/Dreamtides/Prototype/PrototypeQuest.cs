@@ -8,7 +8,6 @@ using Dreamtides.Buttons;
 using Dreamtides.Prototype;
 using Dreamtides.Schema;
 using Dreamtides.Services;
-using Dreamtides.Utils;
 using HighlightPlus;
 using Unity.Cinemachine;
 using UnityEngine;
@@ -331,16 +330,16 @@ public class PrototypeQuest : Service
     var allCards = _prototypeCards.CreateOrUpdateCards(request);
     var questCards = allCards.Take(cardCount).ToList();
 
-    var animation = new MoveCardsWithCustomAnimationCommand
-    {
-      Animation = MoveCardsCustomAnimation.DefaultAnimation,
-      Cards = questCards,
-      Destination = new Position { Enum = PositionEnum.QuestDeckBrowser },
-      PauseDuration = new Milliseconds { MillisecondsValue = 0 },
-      StaggerInterval = new Milliseconds { MillisecondsValue = 0 },
-    };
+    // var animation = new MoveCardsWithCustomAnimationCommand
+    // {
+    //   Animation = MoveCardsCustomAnimation.DefaultAnimation,
+    //   Cards = questCards,
+    //   Destination = new Position { Enum = PositionEnum.QuestDeckBrowser },
+    //   PauseDuration = new Milliseconds { MillisecondsValue = 0 },
+    //   StaggerInterval = new Milliseconds { MillisecondsValue = 0 },
+    // };
 
-    yield return Registry.CardAnimationService.HandleMoveCardsWithCustomAnimation(animation);
+    // yield return Registry.CardAnimationService.HandleMoveCardsWithCustomAnimation(animation);
 
     yield return StartCoroutine(CreateOrUpdateCards(request, animate: true));
   }

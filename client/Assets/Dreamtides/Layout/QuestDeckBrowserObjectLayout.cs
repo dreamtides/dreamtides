@@ -1,9 +1,9 @@
 #nullable enable
 
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using DG.Tweening;
-using Dreamtides.Components;
 using Dreamtides.Utils;
 using UnityEngine;
 
@@ -11,7 +11,7 @@ using UnityEngine;
 
 namespace Dreamtides.Layout
 {
-  public class QuestDeckBrowserObjectLayout : StandardObjectLayout
+  public class QuestDeckBrowserObjectLayout : ObjectLayout
   {
     [SerializeField]
     internal Sprite _sprite = null!;
@@ -43,42 +43,74 @@ namespace Dreamtides.Layout
     [SerializeField]
     internal Transform _worldSpaceParent = null!;
 
+    [SerializeField]
+    List<Displayable> _objects = new();
+
     List<RectTransform> _rectangles = new();
+
+    public override IReadOnlyList<Displayable> Objects => _objects.AsReadOnly();
 
     public override void Add(Displayable displayable)
     {
-      base.Add(displayable);
+      Errors.CheckNotNull(displayable);
+
+      if (!_objects.Contains(displayable))
+      {
+        if (displayable.Parent)
+        {
+          displayable.Parent.RemoveIfPresent(displayable);
+        }
+
+        displayable.Parent = this;
+        _objects.Add(displayable);
+      }
+
+      if (!displayable.ExcludeFromLayout)
+      {
+        displayable.GameContext = GameContext;
+      }
 
       if (_worldSpaceParent != null && displayable.transform.parent != _worldSpaceParent)
       {
         displayable.transform.SetParent(_worldSpaceParent, worldPositionStays: true);
       }
+
+      SortObjects();
     }
+
+    public override void AddRange(IEnumerable<Displayable> displayables) =>
+      displayables.ToList().ForEach(Add);
 
     public override void RemoveIfPresent(Displayable? displayable)
     {
-      if (displayable && displayable.transform.parent == _worldSpaceParent)
+      if (displayable)
       {
-        displayable.transform.SetParent(null, worldPositionStays: true);
-      }
+        displayable.Parent = null;
 
-      base.RemoveIfPresent(displayable);
+        if (displayable.transform.parent == _worldSpaceParent)
+        {
+          displayable.transform.SetParent(null, worldPositionStays: true);
+        }
+
+        _objects.Remove(displayable);
+        SortObjects();
+      }
     }
 
     public override void ApplyTargetTransform(Displayable target, Sequence? sequence = null)
     {
-      ApplyLayoutToObjectLocal(target, Objects.Count, Objects.Count + 1, sequence);
+      ApplyLayoutToObjectLocal(target, _objects.Count, _objects.Count + 1, sequence);
     }
 
     public override void ApplyLayout(Sequence? sequence = null)
     {
-      for (var i = 0; i < Objects.Count; ++i)
+      for (var i = 0; i < _objects.Count; ++i)
       {
-        ApplyLayoutToObjectLocal(Objects[i], i, Objects.Count, sequence);
+        ApplyLayoutToObjectLocal(_objects[i], i, _objects.Count, sequence);
       }
     }
 
-    public override Vector3 CalculateObjectPosition(int index, int count)
+    public Vector3 CalculateObjectPosition(int index, int count)
     {
       if (index < 0 || index >= _rectangles.Count)
       {
@@ -113,12 +145,12 @@ namespace Dreamtides.Layout
       return worldPosition;
     }
 
-    public override Vector3? CalculateObjectRotation(int index, int count)
+    public Vector3? CalculateObjectRotation(int index, int count)
     {
       return Vector3.zero;
     }
 
-    public override float? CalculateObjectScale(int index, int count)
+    public float? CalculateObjectScale(int index, int count)
     {
       return _cardScale;
     }
@@ -173,12 +205,17 @@ namespace Dreamtides.Layout
       _content.sizeDelta = new Vector2(_content.sizeDelta.x, totalHeight);
     }
 
-    protected override void OnUpdateObjectLayout()
+    protected override void OnUpdate()
     {
-      if (Objects.Count > 0)
+      if (_objects.Count > 0)
       {
         ApplyLayout();
       }
+    }
+
+    void SortObjects()
+    {
+      _objects.Sort((a, b) => a.SortingKey.CompareTo(b.SortingKey));
     }
 
     void ApplyLayoutToObjectLocal(
