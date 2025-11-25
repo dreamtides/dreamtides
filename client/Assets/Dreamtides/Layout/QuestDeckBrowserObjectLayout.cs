@@ -39,7 +39,7 @@ namespace Dreamtides.Layout
     internal float _cardSpacing;
 
     [SerializeField]
-    internal Color _tintColor;
+    internal bool _enableDebugOutline;
 
     [SerializeField]
     internal float _worldSpaceDepth = 15f;
@@ -225,7 +225,7 @@ namespace Dreamtides.Layout
 
         var image = imageObject.AddComponent<UnityEngine.UI.Image>();
         image.sprite = _sprite;
-        image.color = _tintColor;
+        image.color = _enableDebugOutline ? Color.white : Color.clear;
 
         var rectTransform = imageObject.GetComponent<RectTransform>();
         rectTransform.anchorMin = new Vector2(x: 0, y: 1);
@@ -392,6 +392,18 @@ namespace Dreamtides.Layout
         maxX = Mathf.Max(maxX, screenPoint.x);
         minY = Mathf.Min(minY, screenPoint.y);
         maxY = Mathf.Max(maxY, screenPoint.y);
+      }
+    }
+
+    void OnValidate()
+    {
+      var color = _enableDebugOutline ? Color.white : Color.clear;
+      foreach (var rect in _rectangles)
+      {
+        if (rect != null && rect.TryGetComponent<UnityEngine.UI.Image>(out var image))
+        {
+          image.color = color;
+        }
       }
     }
   }
