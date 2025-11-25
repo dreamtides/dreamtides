@@ -2765,7 +2765,7 @@ namespace Dreamtides.Schema
     /// specified as being in the dreamsign display position. Animates all
     /// other views in `cards` to the destroyed position.
     /// </summary>
-    public enum MoveCardsCustomAnimation { DefaultAnimation, HideShopLayout, MoveToDreamsignDisplayOrDestroy, MoveToQuestDeckOrDestroy, OpenQuestDeckBrowser, ShowAtDrawnCardsPosition, ShowInDraftPickLayout, ShowInShopLayout };
+    public enum MoveCardsCustomAnimation { DefaultAnimation, HideShopLayout, MoveToDreamsignDisplayOrDestroy, MoveToQuestDeckOrDestroy, ShowAtDrawnCardsPosition, ShowInDraftPickLayout, ShowInShopLayout };
 
     /// <summary>
     /// Face up/face down state for this card
@@ -5675,8 +5675,6 @@ namespace Dreamtides.Schema
                     return MoveCardsCustomAnimation.MoveToDreamsignDisplayOrDestroy;
                 case "MoveToQuestDeckOrDestroy":
                     return MoveCardsCustomAnimation.MoveToQuestDeckOrDestroy;
-                case "OpenQuestDeckBrowser":
-                    return MoveCardsCustomAnimation.OpenQuestDeckBrowser;
                 case "ShowAtDrawnCardsPosition":
                     return MoveCardsCustomAnimation.ShowAtDrawnCardsPosition;
                 case "ShowInDraftPickLayout":
@@ -5708,9 +5706,6 @@ namespace Dreamtides.Schema
                     return;
                 case MoveCardsCustomAnimation.MoveToQuestDeckOrDestroy:
                     serializer.Serialize(writer, "MoveToQuestDeckOrDestroy");
-                    return;
-                case MoveCardsCustomAnimation.OpenQuestDeckBrowser:
-                    serializer.Serialize(writer, "OpenQuestDeckBrowser");
                     return;
                 case MoveCardsCustomAnimation.ShowAtDrawnCardsPosition:
                     serializer.Serialize(writer, "ShowAtDrawnCardsPosition");
