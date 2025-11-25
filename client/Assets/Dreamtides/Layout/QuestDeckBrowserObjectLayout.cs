@@ -20,6 +20,12 @@ namespace Dreamtides.Layout
     internal RectTransform _content = null!;
 
     [SerializeField]
+    internal CanvasGroup _scrollbarCanvasGroup = null!;
+
+    [SerializeField]
+    internal float _scrollbarFadeDuration = 0.2f;
+
+    [SerializeField]
     internal float _cardWidth;
 
     [SerializeField]
@@ -49,6 +55,7 @@ namespace Dreamtides.Layout
     List<Displayable> _objects = new();
 
     List<RectTransform> _rectangles = new();
+    Tweener? _scrollbarFadeTween;
 
     public override IReadOnlyList<Displayable> Objects => _objects.AsReadOnly();
 
@@ -79,6 +86,7 @@ namespace Dreamtides.Layout
 
       SortObjects();
       EnsureRectangleCount(_objects.Count);
+      UpdateScrollbarVisibility();
     }
 
     public override void AddRange(IEnumerable<Displayable> displayables) =>
@@ -98,6 +106,7 @@ namespace Dreamtides.Layout
         _objects.Remove(displayable);
         SortObjects();
         EnsureRectangleCount(_objects.Count);
+        UpdateScrollbarVisibility();
       }
     }
 
@@ -217,6 +226,24 @@ namespace Dreamtides.Layout
       var totalHeight =
         (rows * _cardHeight) + (Mathf.Max(0, rows - 1) * _cardSpacing) + (2 * _cardSpacing);
       _content.sizeDelta = new Vector2(_content.sizeDelta.x, totalHeight);
+    }
+
+    void UpdateScrollbarVisibility()
+    {
+      if (_scrollbarCanvasGroup == null)
+      {
+        return;
+      }
+
+      var targetAlpha = _objects.Count > 0 ? 1f : 0f;
+
+      if (Mathf.Approximately(_scrollbarCanvasGroup.alpha, targetAlpha))
+      {
+        return;
+      }
+
+      _scrollbarFadeTween?.Kill();
+      _scrollbarFadeTween = _scrollbarCanvasGroup.DOFade(targetAlpha, _scrollbarFadeDuration);
     }
 
     void SortObjects()

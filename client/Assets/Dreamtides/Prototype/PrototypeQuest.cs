@@ -314,6 +314,8 @@ public class PrototypeQuest : Service
       yield break;
     }
 
+    SetSiteButtonsActive(false);
+
     var request = new CreateOrUpdateCardsRequest
     {
       Count = cardCount,
