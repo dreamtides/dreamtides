@@ -43,6 +43,8 @@ namespace Dreamtides.Layout
     [SerializeField]
     internal Transform _worldSpaceParent = null!;
 
+    public Transform WorldSpaceParent => _worldSpaceParent;
+
     [SerializeField]
     List<Displayable> _objects = new();
 

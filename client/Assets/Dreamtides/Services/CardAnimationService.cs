@@ -27,6 +27,7 @@ namespace Dreamtides.Services
     InfoZoomAnimation _infoZoom = new();
     MoveToQuestDeckOrDestroyAnimation _moveToQuestDeckOrDestroy = new();
     MoveToDreamsignDisplayOrDestroyAnimation _moveToDreamsignDisplayOrDestroy = new();
+    OpenQuestDeckBrowserAnimation _openQuestDeckBrowser = new();
 
     public bool IsPointerDownOnCard { get; set; } = false;
 
@@ -55,6 +56,8 @@ namespace Dreamtides.Services
           return _moveToQuestDeckOrDestroy.Handle(command, this);
         case MoveCardsCustomAnimation.MoveToDreamsignDisplayOrDestroy:
           return _moveToDreamsignDisplayOrDestroy.Handle(command, this);
+        case MoveCardsCustomAnimation.OpenQuestDeckBrowser:
+          return _openQuestDeckBrowser.Handle(command, this);
         default:
           throw new IndexOutOfRangeException($"Unhandled animation type: {command.Animation}");
       }
