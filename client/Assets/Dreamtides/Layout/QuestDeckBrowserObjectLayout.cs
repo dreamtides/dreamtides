@@ -205,13 +205,13 @@ namespace Dreamtides.Layout
       _content.sizeDelta = new Vector2(_content.sizeDelta.x, totalHeight);
     }
 
-    protected override void OnUpdate()
-    {
-      if (_objects.Count > 0)
-      {
-        ApplyLayout();
-      }
-    }
+    // protected override void OnUpdate()
+    // {
+    //   if (_objects.Count > 0)
+    //   {
+    //     ApplyLayout();
+    //   }
+    // }
 
     void SortObjects()
     {
