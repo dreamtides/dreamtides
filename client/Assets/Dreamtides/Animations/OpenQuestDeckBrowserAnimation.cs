@@ -99,12 +99,16 @@ namespace Dreamtides.Animations
       );
       var intermediateWorldPos = viewport.ScreenToWorldPoint(intermediateScreenPos);
 
+      var initialScale = card.transform.localScale;
+      var intermediateScale = initialScale * 3f;
+
       var phase1Seq = TweenUtils.Sequence("OpenBrowserPhase1");
       phase1Seq.Insert(0, card.transform.DOMove(intermediateWorldPos, PhaseDurationSeconds));
       phase1Seq.Insert(
         0,
         card.transform.DORotateQuaternion(targetWorldRotation, PhaseDurationSeconds)
       );
+      phase1Seq.Insert(0, card.transform.DOScale(intermediateScale, PhaseDurationSeconds));
 
       yield return phase1Seq.WaitForCompletion();
 
