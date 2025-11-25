@@ -6,15 +6,20 @@ namespace Dreamtides.Layout
   using Dreamtides.Utils;
   using UnityEngine;
 
-  public class DreamscapeLayout : MonoBehaviour
+  public class DreamscapeLayout : Displayable
   {
     [SerializeField]
     ObjectLayout _questDeck = null!;
     public ObjectLayout QuestDeck => Check(_questDeck);
 
     [SerializeField]
-    QuestDeckBrowserObjectLayout _questDeckBrowser = null!;
-    public QuestDeckBrowserObjectLayout QuestDeckBrowser => Check(_questDeckBrowser);
+    QuestDeckBrowserObjectLayout _questDeckBrowserPortrait = null!;
+
+    [SerializeField]
+    QuestDeckBrowserObjectLayout _questDeckBrowserLandscape = null!;
+
+    public QuestDeckBrowserObjectLayout QuestDeckBrowser =>
+      Registry.IsLandscape ? Check(_questDeckBrowserLandscape) : Check(_questDeckBrowserPortrait);
 
     [SerializeField]
     EssenceTotal _essenceTotal = null!;

@@ -168,7 +168,7 @@ public class PrototypeQuest : Service
       CreateOrUpdateCards(
         new CreateOrUpdateCardsRequest
         {
-          Count = 23,
+          Count = 43,
           Position = new ObjectPosition
           {
             Position = new Position { Enum = PositionEnum.QuestDeck },
