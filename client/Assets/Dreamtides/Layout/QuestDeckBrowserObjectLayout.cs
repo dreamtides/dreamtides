@@ -57,6 +57,14 @@ namespace Dreamtides.Layout
     List<RectTransform> _rectangles = new();
     Tweener? _scrollbarFadeTween;
 
+    protected override void OnStart()
+    {
+      if (_objects.Count == 0)
+      {
+        gameObject.SetActive(false);
+      }
+    }
+
     public override IReadOnlyList<Displayable> Objects => _objects.AsReadOnly();
 
     public override void Add(Displayable displayable)
@@ -84,6 +92,7 @@ namespace Dreamtides.Layout
         displayable.transform.SetParent(_worldSpaceParent, worldPositionStays: true);
       }
 
+      gameObject.SetActive(true);
       SortObjects();
       EnsureRectangleCount(_objects.Count);
       UpdateScrollbarVisibility();
@@ -104,6 +113,11 @@ namespace Dreamtides.Layout
         }
 
         _objects.Remove(displayable);
+        if (_objects.Count == 0)
+        {
+          gameObject.SetActive(false);
+        }
+
         SortObjects();
         EnsureRectangleCount(_objects.Count);
         UpdateScrollbarVisibility();

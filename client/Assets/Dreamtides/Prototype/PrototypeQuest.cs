@@ -326,7 +326,6 @@ public class PrototypeQuest : Service
       },
       Revealed = true,
       GroupKey = "quest",
-      OutlineColorHex = _outlineColorHex,
     };
 
     var allCards = _prototypeCards.CreateOrUpdateCards(request);
