@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using DG.Tweening;
+using Dreamtides.Schema;
 using Dreamtides.Utils;
 using UnityEngine;
 
@@ -24,6 +25,9 @@ namespace Dreamtides.Layout
 
     [SerializeField]
     internal float _scrollbarFadeDuration = 0.2f;
+
+    [SerializeField]
+    internal CloseBrowserButton _closeButton = null!;
 
     [SerializeField]
     internal float _cardWidth;
@@ -100,6 +104,11 @@ namespace Dreamtides.Layout
 
     public override void AddRange(IEnumerable<Displayable> displayables) =>
       displayables.ToList().ForEach(Add);
+
+    public void SetCloseButtonAction(GameAction? action)
+    {
+      _closeButton.CloseAction = action;
+    }
 
     public override void RemoveIfPresent(Displayable? displayable)
     {

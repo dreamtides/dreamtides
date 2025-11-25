@@ -236,6 +236,8 @@ public class PrototypeQuest : Service
 
   public void OnDebugScenarioAction(string name)
   {
+    Debug.Log($"OnDebugScenarioAction: {name}");
+
     if (string.IsNullOrEmpty(name))
     {
       return;
@@ -244,6 +246,12 @@ public class PrototypeQuest : Service
     if (name == "browseQuestDeck")
     {
       StartCoroutine(BrowseQuestDeck());
+      return;
+    }
+
+    if (name == "closeQuestDeck")
+    {
+      StartCoroutine(CloseQuestDeck());
       return;
     }
 
@@ -328,21 +336,50 @@ public class PrototypeQuest : Service
       GroupKey = "quest",
     };
 
-    var allCards = _prototypeCards.CreateOrUpdateCards(request);
-    var questCards = allCards.Take(cardCount).ToList();
-
-    // var animation = new MoveCardsWithCustomAnimationCommand
-    // {
-    //   Animation = MoveCardsCustomAnimation.OpenQuestDeckBrowser,
-    //   Cards = questCards,
-    //   Destination = new Position { Enum = PositionEnum.QuestDeckBrowser },
-    //   PauseDuration = new Milliseconds { MillisecondsValue = 0 },
-    //   StaggerInterval = new Milliseconds { MillisecondsValue = 0 },
-    // };
-
-    // yield return Registry.CardAnimationService.HandleMoveCardsWithCustomAnimation(animation);
-
+    _prototypeCards.CreateOrUpdateCards(request);
     yield return StartCoroutine(CreateOrUpdateCards(request, animate: true));
+
+    Registry.DreamscapeLayout.QuestDeckBrowser.SetCloseButtonAction(
+      new GameAction
+      {
+        GameActionClass = new GameActionClass
+        {
+          DebugAction = new DebugAction
+          {
+            DebugActionClass = new DebugActionClass { ApplyTestScenarioAction = "closeQuestDeck" },
+          },
+        },
+      }
+    );
+  }
+
+  IEnumerator CloseQuestDeck()
+  {
+    var browserLayout = Registry.DreamscapeLayout.QuestDeckBrowser;
+    var cardCount = browserLayout.Objects.Count;
+    if (cardCount == 0)
+    {
+      yield break;
+    }
+
+    browserLayout.SetCloseButtonAction(null);
+
+    var request = new CreateOrUpdateCardsRequest
+    {
+      Count = cardCount,
+      Position = new ObjectPosition
+      {
+        Position = new Position { Enum = PositionEnum.QuestDeck },
+        SortingKey = 1,
+      },
+      Revealed = false,
+      GroupKey = "quest",
+    };
+
+    _prototypeCards.CreateOrUpdateCards(request);
+    yield return StartCoroutine(CreateOrUpdateCards(request, animate: true));
+
+    SetSiteButtonsActive(true);
   }
 
   public void FocusSpaceCameraFar()
