@@ -81,8 +81,8 @@ MeshRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_GlobalIlluminationMeshLod: 0
-  m_SortingLayerID: -1217040737
-  m_SortingLayer: 16
+  m_SortingLayerID: 1402573125
+  m_SortingLayer: 10
   m_SortingOrder: 50
   m_AdditionalVertexStreams: {fileID: 0}
 --- !u!114 &9158763627570936377
@@ -259,8 +259,8 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_GlobalIlluminationMeshLod: 0
-  m_SortingLayerID: -1217040737
-  m_SortingLayer: 16
+  m_SortingLayerID: 1402573125
+  m_SortingLayer: 10
   m_SortingOrder: 0
   m_Sprite: {fileID: 21300000, guid: f44b526f2fb1640a793a22ee682d23d5, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -310,7 +310,6 @@ MonoBehaviour:
   _displayEffectPosition: {fileID: 0}
   _sortingGroup: {fileID: 0}
   _internalGameContext: 0
-  _registry: {fileID: 0}
   _background: {fileID: 661081774845420466}
   _text: {fileID: 9158763627570936377}
   _noOutlineMaterial: {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}

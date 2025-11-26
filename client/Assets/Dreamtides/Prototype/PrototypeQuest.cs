@@ -521,7 +521,10 @@ public class PrototypeQuest : Service
   void SetSiteButtonsActive(bool active)
   {
     if (_siteButtons == null)
+    {
       return;
+    }
+
     foreach (var button in _siteButtons)
     {
       if (button != null)
@@ -537,6 +540,8 @@ public class PrototypeQuest : Service
         effect.highlighted = active;
       }
     }
+
+    Registry.DreamscapeService.CloseButton.gameObject.SetActive(active);
   }
 
   IEnumerator WaitForTransitionThen(Action afterBlend)

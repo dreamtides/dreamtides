@@ -110,8 +110,8 @@ namespace Dreamtides.Layout
     public CardBrowser Browser => Check(_browser);
 
     [SerializeField]
-    BrowserBackground _browserBackground = null!;
-    public BrowserBackground BrowserBackground => Check(_browserBackground);
+    BackgroundOverlay _browserBackground = null!;
+    public BackgroundOverlay BrowserBackground => Check(_browserBackground);
 
     [SerializeField]
     ObjectLayout? _userDreamwell;

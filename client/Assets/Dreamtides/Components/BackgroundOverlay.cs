@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Dreamtides.Components
 {
-  public class BrowserBackground : MonoBehaviour
+  public class BackgroundOverlay : MonoBehaviour
   {
     [SerializeField]
     SpriteRenderer _overlay = null!;

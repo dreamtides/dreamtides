@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using DG.Tweening;
+using Dreamtides.Components;
 using Dreamtides.Schema;
 using Dreamtides.Utils;
 using UnityEngine;
@@ -53,6 +54,9 @@ namespace Dreamtides.Layout
     [SerializeField]
     internal Transform _worldSpaceParent = null!;
 
+    [SerializeField]
+    internal BackgroundOverlay _backgroundOverlay = null!;
+
     public Transform WorldSpaceParent => _worldSpaceParent;
 
     [SerializeField]
@@ -74,6 +78,8 @@ namespace Dreamtides.Layout
     public override void Add(Displayable displayable)
     {
       Errors.CheckNotNull(displayable);
+
+      var wasEmpty = _objects.Count == 0;
 
       if (!_objects.Contains(displayable))
       {
@@ -100,6 +106,12 @@ namespace Dreamtides.Layout
       SortObjects();
       EnsureRectangleCount(_objects.Count);
       UpdateScrollbarVisibility();
+
+      if (wasEmpty && _objects.Count > 0 && _backgroundOverlay != null)
+      {
+        var sequence = DOTween.Sequence();
+        _backgroundOverlay.Show(alpha: 0.9f, sequence);
+      }
     }
 
     public override void AddRange(IEnumerable<Displayable> displayables) =>
@@ -125,6 +137,12 @@ namespace Dreamtides.Layout
         if (_objects.Count == 0)
         {
           gameObject.SetActive(false);
+
+          if (_backgroundOverlay != null)
+          {
+            var sequence = DOTween.Sequence();
+            _backgroundOverlay.Hide(sequence);
+          }
         }
 
         SortObjects();
