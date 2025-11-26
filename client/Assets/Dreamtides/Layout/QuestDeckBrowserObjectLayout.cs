@@ -111,6 +111,7 @@ namespace Dreamtides.Layout
       {
         var sequence = DOTween.Sequence();
         _backgroundOverlay.Show(alpha: 0.9f, sequence);
+        Registry.DreamscapeLayout.EssenceTotal.gameObject.SetActive(false);
       }
     }
 
@@ -142,6 +143,7 @@ namespace Dreamtides.Layout
           {
             var sequence = DOTween.Sequence();
             _backgroundOverlay.Hide(sequence);
+            Registry.DreamscapeLayout.EssenceTotal.gameObject.SetActive(true);
           }
         }
 
