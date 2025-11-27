@@ -8,6 +8,7 @@ using Dreamtides.Components;
 using Dreamtides.Schema;
 using Dreamtides.Utils;
 using UnityEngine;
+using UnityEngine.UI;
 
 [assembly: InternalsVisibleTo("Dreamtides.Tests")]
 
@@ -29,6 +30,9 @@ namespace Dreamtides.Layout
 
     [SerializeField]
     internal CloseBrowserButton _closeButton = null!;
+
+    [SerializeField]
+    internal GameObject _filterButton = null!;
 
     [SerializeField]
     internal float _cardWidth;
@@ -56,6 +60,9 @@ namespace Dreamtides.Layout
 
     [SerializeField]
     internal BackgroundOverlay _backgroundOverlay = null!;
+
+    [SerializeField]
+    internal Image _canvasBackgroundOverlay = null!;
 
     public Transform WorldSpaceParent => _worldSpaceParent;
 
@@ -103,6 +110,10 @@ namespace Dreamtides.Layout
       }
 
       gameObject.SetActive(true);
+      if (_filterButton != null)
+      {
+        _filterButton.SetActive(true);
+      }
       SortObjects();
       EnsureRectangleCount(_objects.Count);
       UpdateScrollbarVisibility();
@@ -110,7 +121,18 @@ namespace Dreamtides.Layout
       if (wasEmpty && _objects.Count > 0 && _backgroundOverlay != null)
       {
         var sequence = DOTween.Sequence();
-        _backgroundOverlay.Show(alpha: 0.9f, sequence);
+        _backgroundOverlay.Show(alpha: 1f, sequence);
+
+        if (_canvasBackgroundOverlay != null)
+        {
+          _canvasBackgroundOverlay.color = new Color(0, 0, 0, 0);
+          sequence.Insert(
+            atPosition: 0,
+            _canvasBackgroundOverlay.DOFade(endValue: 1f, duration: 0.6f)
+          );
+        }
+
+        Registry.DocumentService.FadeOutMainButtons(sequence);
         Registry.DreamscapeLayout.EssenceTotal.gameObject.SetActive(false);
       }
     }
@@ -138,11 +160,25 @@ namespace Dreamtides.Layout
         if (_objects.Count == 0)
         {
           gameObject.SetActive(false);
+          if (_filterButton != null)
+          {
+            _filterButton.SetActive(false);
+          }
 
           if (_backgroundOverlay != null)
           {
             var sequence = DOTween.Sequence();
             _backgroundOverlay.Hide(sequence);
+
+            if (_canvasBackgroundOverlay != null)
+            {
+              sequence.Insert(
+                atPosition: 0,
+                _canvasBackgroundOverlay.DOFade(endValue: 0f, duration: 0.6f)
+              );
+            }
+
+            Registry.DocumentService.FadeInMainButtons(sequence);
             Registry.DreamscapeLayout.EssenceTotal.gameObject.SetActive(true);
           }
         }

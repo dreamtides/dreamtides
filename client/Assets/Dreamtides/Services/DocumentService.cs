@@ -3,9 +3,12 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using DG.Tweening;
+using Dreamtides.Buttons;
 using Dreamtides.Layout;
 using Dreamtides.Masonry;
 using Dreamtides.Schema;
+using Dreamtides.Utils;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UIElements;
@@ -21,6 +24,22 @@ namespace Dreamtides.Services
     IMasonElement _screenAnchoredNode = null!;
     IMasonElement _effectPreviewOverlay = null!;
     Coroutine? _screenAnchorAutoHideCoroutine;
+
+    [SerializeField]
+    ControlledButton _menuButton = null!;
+    public ControlledButton MenuButton => _menuButton;
+
+    [SerializeField]
+    ControlledButton _undoButton = null!;
+    public ControlledButton UndoButton => _undoButton;
+
+    [SerializeField]
+    ControlledButton _devButton = null!;
+    public ControlledButton DevButton => _devButton;
+
+    [SerializeField]
+    ControlledButton _bugButton = null!;
+    public ControlledButton BugButton => _bugButton;
 
     const float ScreenAnchorFadeDurationSeconds = 0.3f;
 
@@ -106,6 +125,35 @@ namespace Dreamtides.Services
         ScreenPxToElementPx(screenPosition.x),
         ScreenPxToElementPx(Screen.height - screenPosition.y)
       );
+
+    /// <summary>
+    /// Sets the active state of the main buttons in the document.
+    /// </summary>
+    public void SetMainButtonsActive(bool active)
+    {
+      _menuButton.gameObject.SetActive(active);
+      _undoButton.gameObject.SetActive(active);
+      _devButton.gameObject.SetActive(active);
+      _bugButton.gameObject.SetActive(active);
+    }
+
+    public void FadeOutMainButtons(Sequence sequence)
+    {
+      sequence.Insert(atPosition: 0, TweenUtils.FadeOutCanvasGroup(_menuButton.CanvasGroup));
+      sequence.Insert(atPosition: 0, TweenUtils.FadeOutCanvasGroup(_undoButton.CanvasGroup));
+      sequence.Insert(atPosition: 0, TweenUtils.FadeOutCanvasGroup(_devButton.CanvasGroup));
+      sequence.Insert(atPosition: 0, TweenUtils.FadeOutCanvasGroup(_bugButton.CanvasGroup));
+      sequence.AppendCallback(() => SetMainButtonsActive(active: false));
+    }
+
+    public void FadeInMainButtons(Sequence sequence)
+    {
+      SetMainButtonsActive(active: true);
+      sequence.Insert(atPosition: 0, TweenUtils.FadeInCanvasGroup(_menuButton.CanvasGroup));
+      sequence.Insert(atPosition: 0, TweenUtils.FadeInCanvasGroup(_undoButton.CanvasGroup));
+      sequence.Insert(atPosition: 0, TweenUtils.FadeInCanvasGroup(_devButton.CanvasGroup));
+      sequence.Insert(atPosition: 0, TweenUtils.FadeInCanvasGroup(_bugButton.CanvasGroup));
+    }
 
     public void RenderScreenOverlay(FlexNode? node)
     {
