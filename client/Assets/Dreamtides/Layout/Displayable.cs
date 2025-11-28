@@ -2,26 +2,29 @@
 
 using System;
 using System.Collections;
+using System.Runtime.CompilerServices;
 using Dreamtides.Services;
 using Dreamtides.Utils;
 using UnityEngine;
 using UnityEngine.Rendering;
+
+[assembly: InternalsVisibleTo("Dreamtides.Tests")]
 
 namespace Dreamtides.Layout
 {
   public abstract class Displayable : MonoBehaviour
   {
     [SerializeField]
-    Transform? _projectileSourcePosition;
+    internal Transform? _projectileSourcePosition;
 
     [SerializeField]
-    Transform? _displayEffectPosition;
+    internal Transform? _displayEffectPosition;
 
     [SerializeField]
-    SortingGroup? _sortingGroup;
+    internal SortingGroup? _sortingGroup;
 
     [SerializeField]
-    GameContext _internalGameContext;
+    internal GameContext _internalGameContext;
 
     ObjectLayout? _parent;
     bool _initialized;

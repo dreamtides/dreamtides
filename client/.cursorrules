@@ -20,7 +20,7 @@ rsync to prevent conflicts with the running editor. It takes around 3 minutes
 to complete.
 
 Test output is written to ~/dreamtides_tests/client/test_output/results.xml,
-although this is a very large file and will likely need to be searcehd via
+although this is a very large file and will likely need to be searched via
 grep or similar tools
 
 You can typically find output for a single test via a command like
@@ -35,7 +35,7 @@ completing all tasks.
 
 When creating tests, please modify any serialized fields you need to be 
 "internal" and then add [assembly: InternalsVisibleTo("Dreamtides.Tests")],
-do not attempt to set them via reflection.A
+do not attempt to set them via reflection.
 
 When writing tests, put the tests at the top of the file and helpers as
 private elements at the bottom of the file.

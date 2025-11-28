@@ -72,9 +72,7 @@ namespace Dreamtides.Layout
 
     public Transform WorldSpaceParent => _worldSpaceParent;
 
-    [SerializeField]
     List<Displayable> _objects = new();
-
     List<RectTransform> _rectangles = new();
     Tweener? _scrollbarFadeTween;
 
