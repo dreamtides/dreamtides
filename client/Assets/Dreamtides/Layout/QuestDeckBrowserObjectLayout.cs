@@ -64,6 +64,12 @@ namespace Dreamtides.Layout
     [SerializeField]
     internal Image _canvasBackgroundOverlay = null!;
 
+    [SerializeField]
+    internal bool _disableInterfaceOnOpen;
+
+    [SerializeField]
+    internal float _backgroundOverlayOpacity = 1f;
+
     public Transform WorldSpaceParent => _worldSpaceParent;
 
     [SerializeField]
@@ -121,19 +127,22 @@ namespace Dreamtides.Layout
       if (wasEmpty && _objects.Count > 0 && _backgroundOverlay != null)
       {
         var sequence = DOTween.Sequence();
-        _backgroundOverlay.Show(alpha: 1f, sequence);
+        _backgroundOverlay.Show(alpha: _backgroundOverlayOpacity, sequence);
 
         if (_canvasBackgroundOverlay != null)
         {
           _canvasBackgroundOverlay.color = new Color(0, 0, 0, 0);
           sequence.Insert(
             atPosition: 0,
-            _canvasBackgroundOverlay.DOFade(endValue: 1f, duration: 0.6f)
+            _canvasBackgroundOverlay.DOFade(endValue: _backgroundOverlayOpacity, duration: 0.6f)
           );
         }
 
-        Registry.DocumentService.FadeOutMainButtons(sequence);
-        Registry.DreamscapeLayout.EssenceTotal.gameObject.SetActive(false);
+        if (_disableInterfaceOnOpen)
+        {
+          Registry.DocumentService.FadeOutMainButtons(sequence);
+          Registry.DreamscapeLayout.EssenceTotal.gameObject.SetActive(false);
+        }
       }
     }
 
@@ -178,8 +187,11 @@ namespace Dreamtides.Layout
               );
             }
 
-            Registry.DocumentService.FadeInMainButtons(sequence);
-            Registry.DreamscapeLayout.EssenceTotal.gameObject.SetActive(true);
+            if (_disableInterfaceOnOpen)
+            {
+              Registry.DocumentService.FadeInMainButtons(sequence);
+              Registry.DreamscapeLayout.EssenceTotal.gameObject.SetActive(true);
+            }
           }
         }
 
