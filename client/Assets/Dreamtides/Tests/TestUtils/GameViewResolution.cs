@@ -10,7 +10,7 @@ namespace Dreamtides.Tests.TestUtils
     Resolution16x9,
     Resolution16x10,
     Resolution21x9,
-    Resolution4x3,
+    Resolution3x2,
     Resolution5x4,
     Resolution32x9,
     ResolutionIPhone12,
@@ -29,16 +29,22 @@ namespace Dreamtides.Tests.TestUtils
       switch (resolution)
       {
         case GameViewResolution.Resolution16x9:
+          // 82.1% of steam users have this aspect ratio
           return new Vector2(1920, 1080);
         case GameViewResolution.Resolution16x10:
+          // 10.0% of steam users have this aspect ratio
           return new Vector2(2560, 1600);
         case GameViewResolution.Resolution21x9:
+          // 3.8% of steam users have this aspect ratio
           return new Vector2(3440, 1440);
-        case GameViewResolution.Resolution4x3:
-          return new Vector2(1600, 1200);
+        case GameViewResolution.Resolution3x2:
+          // 0.7% of steam users have this aspect ratio
+          return new Vector2(1470, 956);
         case GameViewResolution.Resolution5x4:
+          // 0.2% of steam users have this aspect ratio
           return new Vector2(1280, 1024);
         case GameViewResolution.Resolution32x9:
+          // 0.4% of steam users have this aspect ratio
           return new Vector2(5120, 1440);
         case GameViewResolution.ResolutionIPhone12:
           return new Vector2(1170, 2532);

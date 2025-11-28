@@ -82,6 +82,7 @@ public class PrototypeQuest : Service
   PrototypeQuestTemptingOfferFlow _temptingOfferFlow = null!;
   List<CardOverride>? _pendingShopOverrides;
   bool _hasPendingShopOverridesUpdate;
+  bool _closeButtonWasActiveBeforeBrowse;
 
   // Public API to configure arbitrary shop card overrides (index-based)
   public void ConfigureShopOverrides(params CardOverride[] overrides)
@@ -322,6 +323,11 @@ public class PrototypeQuest : Service
       yield break;
     }
 
+    _closeButtonWasActiveBeforeBrowse = Registry
+      .DreamscapeService
+      .CloseButton
+      .gameObject
+      .activeSelf;
     SetSiteButtonsActive(false);
 
     var request = new CreateOrUpdateCardsRequest
@@ -380,6 +386,10 @@ public class PrototypeQuest : Service
     yield return StartCoroutine(CreateOrUpdateCards(request, animate: true));
 
     SetSiteButtonsActive(true);
+    if (!_closeButtonWasActiveBeforeBrowse)
+    {
+      Registry.DreamscapeService.CloseButton.gameObject.SetActive(false);
+    }
   }
 
   public void FocusSpaceCameraFar()

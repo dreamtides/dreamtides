@@ -323,7 +323,7 @@ namespace Dreamtides.Tests.Layout
     [UnityTest]
     public IEnumerator OnUpdateWorksWithDifferentScreenResolution()
     {
-      var viewport = CreateViewport(GameViewResolution.Resolution4x3);
+      var viewport = CreateViewport(GameViewResolution.Resolution3x2);
       yield return Initialize(viewport);
       var element = CreateSceneElement<SceneElementScreenPosition>(e =>
       {
@@ -333,7 +333,7 @@ namespace Dreamtides.Tests.Layout
 
       element.OnUpdate(GameMode.Quest, TestConfiguration);
 
-      AssertVector3Equal(new Vector3(7.70f, 5.77f, 10f), element.transform.position);
+      AssertVector3Equal(new Vector3(8.88f, 5.77f, 10f), element.transform.position);
     }
 
     [UnityTest]
