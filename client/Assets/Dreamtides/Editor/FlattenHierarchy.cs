@@ -137,6 +137,8 @@ namespace Dreamtides.Editors
         current.GetComponent<MeshRenderer>() != null
         || current.GetComponent<SkinnedMeshRenderer>() != null
         || current.GetComponent<MeshFilter>() != null
+        || current.GetComponent<ParticleSystem>() != null
+        || current.GetComponent<ParticleSystemRenderer>() != null
       )
       {
         result.Add(current);
