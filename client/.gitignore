@@ -47,6 +47,7 @@ ExportedObj/
 *.svd
 *.pdb
 *.opendb
+*.private.0
 
 .vsconfig
 

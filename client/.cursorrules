@@ -20,7 +20,7 @@ rsync to prevent conflicts with the running editor. It takes around 3 minutes
 to complete.
 
 Test output is written to ~/dreamtides_tests/client/test_output/results.xml,
-although this is a very large file and will likely need to be searched via
+although this is a very large file and will likely need to be searcehd via
 grep or similar tools
 
 You can typically find output for a single test via a command like

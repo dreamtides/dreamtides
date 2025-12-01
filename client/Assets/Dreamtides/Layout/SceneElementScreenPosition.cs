@@ -246,7 +246,7 @@ namespace Dreamtides.Layout
     }
 
 #if UNITY_EDITOR
-    void OnDrawGizmos()
+    void OnDrawGizmosSelected()
     {
       var viewport = Application.isPlaying
         ? new RealViewport(Registry)
