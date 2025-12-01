@@ -20,15 +20,18 @@ namespace Dreamtides.EditorHelpers
 
     public void LogMostExpensiveRenderers()
     {
-      var renderers = transform.GetComponentsInChildren<Renderer>(includeInactive)
+      var renderers = transform
+        .GetComponentsInChildren<Renderer>(includeInactive)
         .Where(renderer => renderer != null && renderer.transform != transform)
         .Select(renderer => new RendererCost
         {
           Renderer = renderer,
           TriangleCount = CountTriangles(renderer),
+          Path = GetHierarchyPath(renderer.transform),
         })
         .Where(cost => cost.TriangleCount > 0)
         .OrderByDescending(cost => cost.TriangleCount)
+        .ThenBy(cost => cost.Path)
         .ToList();
 
       if (renderers.Count == 0)
@@ -43,14 +46,14 @@ namespace Dreamtides.EditorHelpers
 
       var resultCount = Mathf.Min(Mathf.Max(topCount, 1), renderers.Count);
       var lines = new List<string>();
-      lines.Add($"Top {resultCount} renderers under {name} by triangle count:");
+      lines.Add(
+        $"Top {resultCount} renderers under {name} ordered by triangle count (descending, includeInactive={includeInactive}):"
+      );
 
       for (var i = 0; i < resultCount; i++)
       {
         var cost = renderers[i];
-        lines.Add(
-          $"{i + 1}. {GetHierarchyPath(cost.Renderer.transform)} — {cost.TriangleCount} triangles"
-        );
+        lines.Add($"{i + 1}. {cost.Path} — {cost.TriangleCount} triangles");
       }
 
       Debug.Log(string.Join("\n", lines));
@@ -66,6 +69,7 @@ namespace Dreamtides.EditorHelpers
       var ranked = totals
         .Where(entry => entry.Key != null && entry.Value > 0)
         .OrderByDescending(entry => entry.Value)
+        .ThenBy(entry => GetHierarchyPath(entry.Key))
         .ToList();
 
       if (ranked.Count == 0)
@@ -80,7 +84,9 @@ namespace Dreamtides.EditorHelpers
 
       var resultCount = Mathf.Min(Mathf.Max(topCount, 1), ranked.Count);
       var lines = new List<string>();
-      lines.Add($"Top {resultCount} child hierarchies under {name} by total triangles:");
+      lines.Add(
+        $"Top {resultCount} child hierarchies under {name} ordered by total triangles (descending, includeInactive={includeInactive}):"
+      );
 
       for (var i = 0; i < resultCount; i++)
       {
@@ -136,7 +142,7 @@ namespace Dreamtides.EditorHelpers
 
     private int CountTriangles(Renderer renderer)
     {
-      Mesh mesh = null;
+      Mesh? mesh = null;
 
       var meshRenderer = renderer as MeshRenderer;
       if (meshRenderer != null)
@@ -200,6 +206,7 @@ namespace Dreamtides.EditorHelpers
     {
       public Renderer Renderer;
       public int TriangleCount;
+      public string Path;
     }
   }
 
