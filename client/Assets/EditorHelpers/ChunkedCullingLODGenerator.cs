@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-namespace Dreamtides.Editors
+namespace Dreamtides.EditorHelpers
 {
   [DisallowMultipleComponent]
   public class ChunkedCullingLODGenerator : MonoBehaviour
