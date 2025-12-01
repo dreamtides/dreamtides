@@ -60,7 +60,7 @@
         "temp/": true,
         "Temp/": true
     },
-    "dotnet.defaultSolution": "client.slnx",
+    "dotnet.defaultSolution": "client.sln",
     "dotrush.roslyn.projectOrSolutionFiles": [
         "/Users/dthurn/Documents/GoogleDrive/dreamtides/client/client.slnx"
     ]
