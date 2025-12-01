@@ -53,7 +53,9 @@ namespace Dreamtides.Editors
       Undo.SetCurrentGroupName("Delete Objects Outside Bounds");
 
       var allRootObjects = new List<GameObject>();
-      foreach (var root in UnityEngine.SceneManagement.SceneManager.GetActiveScene().GetRootGameObjects())
+      foreach (
+        var root in UnityEngine.SceneManagement.SceneManager.GetActiveScene().GetRootGameObjects()
+      )
       {
         allRootObjects.Add(root);
       }
@@ -94,6 +96,12 @@ namespace Dreamtides.Editors
     )
     {
       if (obj == preserveTransform || obj.IsChildOf(preserveTransform))
+      {
+        var kept = CountDescendants(obj);
+        return new ProcessResult { Kept = kept, Deleted = 0 };
+      }
+
+      if (ShouldPreserveObject(obj.gameObject))
       {
         var kept = CountDescendants(obj);
         return new ProcessResult { Kept = kept, Deleted = 0 };
@@ -141,6 +149,23 @@ namespace Dreamtides.Editors
       return count;
     }
 
+    private static bool ShouldPreserveObject(GameObject obj)
+    {
+      var camera = obj.GetComponent<Camera>();
+      if (camera != null && (camera == Camera.main || obj.CompareTag("MainCamera")))
+      {
+        return true;
+      }
+
+      var light = obj.GetComponent<Light>();
+      if (light != null && light.type == LightType.Directional)
+      {
+        return true;
+      }
+
+      return false;
+    }
+
     private static bool ShouldKeepObject(GameObject obj, Bounds bounds)
     {
       var hasBounds = false;
@@ -185,4 +210,3 @@ namespace Dreamtides.Editors
   }
 }
 #endif
-
