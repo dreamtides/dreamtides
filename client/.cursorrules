@@ -7,6 +7,8 @@ then private.
 
 Please always use "var" in C# code instead of explicit types.
 
+Do not run "just review" after making client changes.
+
 Code should not directly access the camera, screen bounds, or canvas rect. Instead,
 please use Registry.GameViewport to get an IGameViewport instance which abstracts
 out this information.
