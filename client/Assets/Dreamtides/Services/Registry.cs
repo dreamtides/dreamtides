@@ -2,6 +2,7 @@
 
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Runtime.CompilerServices;
 using Dreamtides.Components;
 using Dreamtides.Layout;
@@ -28,6 +29,9 @@ namespace Dreamtides.Services
 
     [SerializeField]
     internal GameMode _currentGameMode;
+
+    [SerializeField]
+    internal string _additionalScenePath = string.Empty;
 
     public bool IsLandscape => _isLandscape;
 
@@ -215,6 +219,9 @@ namespace Dreamtides.Services
 
       Application.targetFrameRate = 60;
 
+      var targetScenes = new List<Scene> { gameObject.scene };
+      yield return LoadAdditionalSceneIfNeeded(targetScenes);
+
       foreach (
         var element in FindObjectsByType<Displayable>(
           FindObjectsInactive.Include,
@@ -222,7 +229,7 @@ namespace Dreamtides.Services
         )
       )
       {
-        if (element.gameObject.scene == gameObject.scene)
+        if (targetScenes.Contains(element.gameObject.scene))
         {
           element.Initialize(this, mode, testConfiguration, fromRegistry: true);
         }
@@ -240,7 +247,7 @@ namespace Dreamtides.Services
         )
       )
       {
-        if (element.gameObject.scene == gameObject.scene)
+        if (targetScenes.Contains(element.gameObject.scene))
         {
           element.Initialize(this, mode, testConfiguration);
         }
@@ -261,7 +268,7 @@ namespace Dreamtides.Services
         )
       )
       {
-        if (element.gameObject.scene == gameObject.scene)
+        if (targetScenes.Contains(element.gameObject.scene))
         {
           var routine = element.StartFromRegistry();
           if (routine != null)
@@ -313,6 +320,61 @@ namespace Dreamtides.Services
       foreach (var coroutine in startCoroutines)
       {
         yield return coroutine;
+      }
+    }
+
+    IEnumerator LoadAdditionalSceneIfNeeded(List<Scene> targetScenes)
+    {
+      if (string.IsNullOrWhiteSpace(_additionalScenePath))
+      {
+        yield break;
+      }
+
+      if (!File.Exists(_additionalScenePath))
+      {
+        yield break;
+      }
+
+      var operation = SceneManager.LoadSceneAsync(_additionalScenePath, LoadSceneMode.Additive);
+      if (operation == null)
+      {
+        yield break;
+      }
+
+      yield return operation;
+
+      var scene = SceneManager.GetSceneByPath(_additionalScenePath);
+      if (!scene.IsValid())
+      {
+        yield break;
+      }
+
+      DisableEditingHelpers(scene);
+      targetScenes.Add(scene);
+    }
+
+    void DisableEditingHelpers(Scene scene)
+    {
+      var roots = scene.GetRootGameObjects();
+      foreach (var root in roots)
+      {
+        var cameras = root.GetComponentsInChildren<Camera>(true);
+        foreach (var camera in cameras)
+        {
+          if (camera.CompareTag("MainCamera"))
+          {
+            camera.gameObject.SetActive(false);
+          }
+        }
+
+        var lights = root.GetComponentsInChildren<Light>(true);
+        foreach (var light in lights)
+        {
+          if (light.type == LightType.Directional)
+          {
+            light.gameObject.SetActive(false);
+          }
+        }
       }
     }
 
