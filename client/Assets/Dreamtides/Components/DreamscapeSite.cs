@@ -14,6 +14,36 @@ namespace Dreamtides.Components
 
   public class DreamscapeSite : Displayable
   {
+    [SerializeField]
+    CinemachineCamera _targetScreenLeftCamera = null!;
+
+    [SerializeField]
+    CinemachineCamera _targetScreenRightCamera = null!;
+
+    [SerializeField]
+    CinemachineCamera _targetScreenTopCamera = null!;
+
+    [SerializeField]
+    LandscapeCameraTargetSide _landscapeCameraTargetSide = LandscapeCameraTargetSide.Left;
+
+    [SerializeField]
+    float _landscapeCameraDistanceModifier = 0f;
+
+    [SerializeField]
+    float _portraitCameraDistanceModifier = 0f;
+
+    [SerializeField]
+    bool _isActive = true;
+
+    bool _hasCameraDefaults;
+    Vector3 _targetScreenLeftBaseDirection;
+    Vector3 _targetScreenRightBaseDirection;
+    Vector3 _targetScreenTopBaseDirection;
+    float _targetScreenLeftBaseDistance;
+    float _targetScreenRightBaseDistance;
+    float _targetScreenTopBaseDistance;
+    CinemachineCamera? _activeCamera;
+
     public bool IsActive => _isActive;
 
     public void SetActive(bool isActive)
@@ -49,36 +79,6 @@ namespace Dreamtides.Components
       }
       ApplyCameraState();
     }
-
-    [SerializeField]
-    CinemachineCamera _targetScreenLeftCamera = null!;
-
-    [SerializeField]
-    CinemachineCamera _targetScreenRightCamera = null!;
-
-    [SerializeField]
-    CinemachineCamera _targetScreenTopCamera = null!;
-
-    [SerializeField]
-    LandscapeCameraTargetSide _landscapeCameraTargetSide = LandscapeCameraTargetSide.Left;
-
-    [SerializeField]
-    float _landscapeCameraDistanceModifier = 0f;
-
-    [SerializeField]
-    float _portraitCameraDistanceModifier = 0f;
-
-    [SerializeField]
-    bool _isActive = true;
-
-    bool _hasCameraDefaults;
-    Vector3 _targetScreenLeftBaseDirection;
-    Vector3 _targetScreenRightBaseDirection;
-    Vector3 _targetScreenTopBaseDirection;
-    float _targetScreenLeftBaseDistance;
-    float _targetScreenRightBaseDistance;
-    float _targetScreenTopBaseDistance;
-    CinemachineCamera? _activeCamera;
 
     void EnsureCameraDefaults()
     {
@@ -134,6 +134,7 @@ namespace Dreamtides.Components
           ? _targetScreenLeftCamera
           : _targetScreenRightCamera
         : _targetScreenTopCamera;
+      SetCameraTarget(activeCamera);
       if (_activeCamera != activeCamera)
       {
         SetActiveCamera(activeCamera);
@@ -177,6 +178,12 @@ namespace Dreamtides.Components
       _targetScreenRightCamera.Priority = 0;
       _targetScreenTopCamera.Priority = 0;
       _activeCamera = null;
+    }
+
+    void SetCameraTarget(CinemachineCamera activeCamera)
+    {
+      activeCamera.Follow = transform;
+      activeCamera.LookAt = transform;
     }
   }
 }
