@@ -2,8 +2,9 @@ Please begin every response with "Sure!".
 
 Please DO NOT include any comments in generated source code.
 
-Please put public members at the top of files, then protected,
-then private.
+Please put public methods at the top of files, then protected,
+then private. Private member *fields* & serialized fields
+always go at the top.
 
 Please always use "var" in C# code instead of explicit types.
 
