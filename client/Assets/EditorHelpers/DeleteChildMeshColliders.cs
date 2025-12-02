@@ -1,10 +1,10 @@
-#if UNITY_EDITOR
-
 #nullable enable
 
 using System.Collections.Generic;
-using UnityEditor;
 using UnityEngine;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace Dreamtides.EditorHelpers
 {
@@ -13,6 +13,7 @@ namespace Dreamtides.EditorHelpers
   {
     public void DeleteChildColliders()
     {
+#if UNITY_EDITOR
       var colliders = CollectTargets();
       if (colliders.Count == 0)
       {
@@ -42,6 +43,9 @@ namespace Dreamtides.EditorHelpers
       EditorUtility.SetDirty(this);
 
       Debug.Log($"Deleted {colliders.Count} 3D Collider components under {name}.");
+#else
+      Debug.LogWarning("DeleteChildMeshColliders is editor-only and is inactive at runtime.");
+#endif
     }
 
     [SerializeField]
@@ -71,6 +75,7 @@ namespace Dreamtides.EditorHelpers
     }
   }
 
+#if UNITY_EDITOR
   [CustomEditor(typeof(DeleteChildMeshColliders))]
   public class DeleteChildMeshCollidersEditor : Editor
   {
@@ -85,5 +90,5 @@ namespace Dreamtides.EditorHelpers
       }
     }
   }
-}
 #endif
+}

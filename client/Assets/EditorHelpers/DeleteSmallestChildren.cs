@@ -1,10 +1,10 @@
-#if UNITY_EDITOR
-
 #nullable enable
 
 using System.Collections.Generic;
-using UnityEditor;
 using UnityEngine;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace Dreamtides.EditorHelpers
 {
@@ -16,6 +16,7 @@ namespace Dreamtides.EditorHelpers
 
     public void DeleteSmallest()
     {
+#if UNITY_EDITOR
       var camera = Camera.main;
       if (camera == null)
       {
@@ -58,6 +59,9 @@ namespace Dreamtides.EditorHelpers
       Debug.Log(
         $"Deleted {deletedCount} child GameObjects under {name} with relative size <= {relativeSizeThreshold}."
       );
+#else
+      Debug.LogWarning("DeleteSmallestChildren is editor-only and is inactive at runtime.");
+#endif
     }
 
     private List<Transform> CollectDeletableChildren(Transform root, Camera camera)
@@ -205,6 +209,7 @@ namespace Dreamtides.EditorHelpers
     }
   }
 
+#if UNITY_EDITOR
   [CustomEditor(typeof(DeleteSmallestChildren))]
   public class DeleteSmallestChildrenEditor : Editor
   {
@@ -219,5 +224,5 @@ namespace Dreamtides.EditorHelpers
       }
     }
   }
-}
 #endif
+}

@@ -1,12 +1,12 @@
-#if UNITY_EDITOR
-
 #nullable enable
 
 using System.Collections.Generic;
 using Dreamtides.Components;
 using Dreamtides.Services;
-using UnityEditor;
 using UnityEngine;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace Dreamtides.EditorHelpers
 {
@@ -15,6 +15,7 @@ namespace Dreamtides.EditorHelpers
   {
     public void LogTriangleCount()
     {
+#if UNITY_EDITOR
       var viewport = ResolveViewport();
       if (viewport == null)
       {
@@ -45,10 +46,14 @@ namespace Dreamtides.EditorHelpers
       }
 
       Debug.Log(string.Join("\n", lines));
+#else
+      Debug.LogWarning("DeleteExpensiveChildren is editor-only and is inactive at runtime.");
+#endif
     }
 
     public void DeleteExpensive()
     {
+#if UNITY_EDITOR
       var viewport = ResolveViewport();
       if (viewport == null)
       {
@@ -108,6 +113,9 @@ namespace Dreamtides.EditorHelpers
       Debug.Log(
         $"DeleteExpensiveChildren on {name}: triangles {startingTriangles} -> {finalReport.TotalTriangles} (target {target})."
       );
+#else
+      Debug.LogWarning("DeleteExpensiveChildren is editor-only and is inactive at runtime.");
+#endif
     }
 
     [SerializeField]
@@ -660,6 +668,7 @@ namespace Dreamtides.EditorHelpers
     }
   }
 
+#if UNITY_EDITOR
   [CustomEditor(typeof(DeleteExpensiveChildren))]
   public class DeleteExpensiveChildrenEditor : Editor
   {
@@ -680,5 +689,5 @@ namespace Dreamtides.EditorHelpers
       }
     }
   }
-}
 #endif
+}

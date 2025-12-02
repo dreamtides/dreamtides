@@ -1,12 +1,12 @@
-#if UNITY_EDITOR
-
 #nullable enable
 
 using System.Collections.Generic;
 using Dreamtides.Components;
 using Dreamtides.Services;
-using UnityEditor;
 using UnityEngine;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace Dreamtides.EditorHelpers
 {
@@ -42,6 +42,7 @@ namespace Dreamtides.EditorHelpers
 
     public void LogImpostorPlan()
     {
+#if UNITY_EDITOR
       var viewport = ResolveViewport();
       if (viewport == null)
       {
@@ -71,10 +72,14 @@ namespace Dreamtides.EditorHelpers
       }
 
       Debug.Log(string.Join("\n", lines));
+#else
+      Debug.LogWarning("ImpostorExpensiveChildren is editor-only and is inactive at runtime.");
+#endif
     }
 
     public void ConvertToImpostors()
     {
+#if UNITY_EDITOR
       var viewport = ResolveViewport();
       if (viewport == null)
       {
@@ -118,7 +123,9 @@ namespace Dreamtides.EditorHelpers
         var success = AmplifyImpostorBaker.Bake(candidate.Transform.gameObject);
         if (!success)
         {
-          Debug.LogWarning($"ImpostorExpensiveChildren on {name}: failed to bake {GetHierarchyPath(candidate.Transform)}.");
+          Debug.LogWarning(
+            $"ImpostorExpensiveChildren on {name}: failed to bake {GetHierarchyPath(candidate.Transform)}."
+          );
         }
       }
 
@@ -129,6 +136,9 @@ namespace Dreamtides.EditorHelpers
       Debug.Log(
         $"ImpostorExpensiveChildren on {name}: triangles {startingTriangles} -> {finalReport.TotalTriangles}."
       );
+#else
+      Debug.LogWarning("ImpostorExpensiveChildren is editor-only and is inactive at runtime.");
+#endif
     }
 
     private HierarchyReport BuildHierarchyReport(Transform root, IGameViewport viewport)
@@ -643,6 +653,7 @@ namespace Dreamtides.EditorHelpers
     }
   }
 
+#if UNITY_EDITOR
   [CustomEditor(typeof(ImpostorExpensiveChildren))]
   public class ImpostorExpensiveChildrenEditor : Editor
   {
@@ -663,5 +674,5 @@ namespace Dreamtides.EditorHelpers
       }
     }
   }
-}
 #endif
+}

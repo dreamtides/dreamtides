@@ -1,11 +1,11 @@
-#if UNITY_EDITOR
-
 #nullable enable
 
 using System.Collections.Generic;
 using System.Linq;
-using UnityEditor;
 using UnityEngine;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace Dreamtides.EditorHelpers
 {
@@ -20,6 +20,9 @@ namespace Dreamtides.EditorHelpers
 
     public void LogMostExpensiveRenderers()
     {
+#if UNITY_EDITOR
+      var totals = new Dictionary<Transform, int>();
+      AccumulateTriangleCounts(transform, totals);
       var renderers = transform
         .GetComponentsInChildren<Renderer>(includeInactive)
         .Where(renderer => renderer != null && renderer.transform != transform)
@@ -47,7 +50,7 @@ namespace Dreamtides.EditorHelpers
       var resultCount = Mathf.Min(Mathf.Max(topCount, 1), renderers.Count);
       var lines = new List<string>();
       lines.Add(
-        $"Top {resultCount} renderers under {name} ordered by triangle count (descending, includeInactive={includeInactive}):"
+        $"Top {resultCount} renderers under {name} ordered by triangle count (descending, includeInactive={includeInactive}), total triangles={totals[transform]}:"
       );
 
       for (var i = 0; i < resultCount; i++)
@@ -57,12 +60,17 @@ namespace Dreamtides.EditorHelpers
       }
 
       Debug.Log(string.Join("\n", lines));
+#else
+      Debug.LogWarning("MostExpensiveChildren is editor-only and is inactive at runtime.");
+#endif
     }
 
     public void LogMostExpensiveGameObjects()
     {
+#if UNITY_EDITOR
       var totals = new Dictionary<Transform, int>();
       AccumulateTriangleCounts(transform, totals);
+      var rootTotal = totals.ContainsKey(transform) ? totals[transform] : 0;
 
       totals.Remove(transform);
 
@@ -85,7 +93,7 @@ namespace Dreamtides.EditorHelpers
       var resultCount = Mathf.Min(Mathf.Max(topCount, 1), ranked.Count);
       var lines = new List<string>();
       lines.Add(
-        $"Top {resultCount} child hierarchies under {name} ordered by total triangles (descending, includeInactive={includeInactive}):"
+        $"Top {resultCount} child hierarchies under {name} ordered by total triangles (descending, includeInactive={includeInactive}), total triangles={rootTotal}:"
       );
 
       for (var i = 0; i < resultCount; i++)
@@ -95,6 +103,9 @@ namespace Dreamtides.EditorHelpers
       }
 
       Debug.Log(string.Join("\n", lines));
+#else
+      Debug.LogWarning("MostExpensiveChildren is editor-only and is inactive at runtime.");
+#endif
     }
 
     private void AccumulateTriangleCounts(Transform current, Dictionary<Transform, int> totals)
@@ -210,6 +221,7 @@ namespace Dreamtides.EditorHelpers
     }
   }
 
+#if UNITY_EDITOR
   [CustomEditor(typeof(MostExpensiveChildren))]
   public class MostExpensiveChildrenEditor : Editor
   {
@@ -230,5 +242,5 @@ namespace Dreamtides.EditorHelpers
       }
     }
   }
-}
 #endif
+}

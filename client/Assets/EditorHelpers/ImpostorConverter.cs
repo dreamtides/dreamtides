@@ -1,16 +1,17 @@
-#if UNITY_EDITOR
-
 #nullable enable
 
 using System.Collections.Generic;
+using UnityEngine;
+#if UNITY_EDITOR
 using AmplifyImpostors;
 using Dreamtides.Components;
 using Dreamtides.Services;
 using UnityEditor;
-using UnityEngine;
+#endif
 
 namespace Dreamtides.EditorHelpers
 {
+#if UNITY_EDITOR
   [DisallowMultipleComponent]
   public class ImpostorConverter : MonoBehaviour
   {
@@ -88,8 +89,37 @@ namespace Dreamtides.EditorHelpers
     {
       CleanupNullTargets();
       var targets = conversionTargets;
+      var aggregates = new Dictionary<Transform, AggregateData>();
+      var rootAggregate = AccumulateAggregateData(transform, aggregates, new HashSet<Transform>());
+      var totalTriangles = 0;
+      var willSkip = 0;
+      var willConvert = 0;
+      for (var i = 0; i < targets.Count; i++)
+      {
+        var target = targets[i];
+        if (target == null)
+        {
+          continue;
+        }
+
+        if (aggregates.TryGetValue(target.transform, out var aggregate))
+        {
+          totalTriangles += aggregate.TriangleCount;
+        }
+
+        if (HasImpostor(target.transform))
+        {
+          willSkip++;
+        }
+        else
+        {
+          willConvert++;
+        }
+      }
       var lines = new List<string>();
-      lines.Add($"ImpostorConverter on {name}: {targets.Count} objects scheduled for impostors.");
+      lines.Add(
+        $"ImpostorConverter on {name}: {targets.Count} objects scheduled for impostors ({totalTriangles} triangles out of {rootAggregate.TriangleCount}), {willConvert} will convert, {willSkip} will be skipped."
+      );
       var preview = BuildTargetPreview(targets);
       if (preview.Count == 0)
       {
@@ -127,10 +157,26 @@ namespace Dreamtides.EditorHelpers
           continue;
         }
 
+        if (HasImpostor(target.transform))
+        {
+          Debug.Log(
+            $"ImpostorConverter on {name}: skipping already-converted {GetHierarchyPath(target.transform)}."
+          );
+          continue;
+        }
+
         var success = AmplifyImpostorBaker.Bake(target);
         if (!success)
         {
-          Debug.LogWarning($"ImpostorConverter on {name}: failed to bake {GetHierarchyPath(target.transform)}.");
+          Debug.LogWarning(
+            $"ImpostorConverter on {name}: failed to bake {GetHierarchyPath(target.transform)}."
+          );
+        }
+        else
+        {
+          Debug.Log(
+            $"ImpostorConverter on {name}: converted {GetHierarchyPath(target.transform)}."
+          );
         }
       }
 
@@ -663,17 +709,27 @@ namespace Dreamtides.EditorHelpers
     {
       if (string.IsNullOrEmpty(skipImpostorTag))
       {
-        return false;
+        return HasImpostor(candidate);
       }
 
       try
       {
-        return candidate.CompareTag(skipImpostorTag);
+        if (candidate.CompareTag(skipImpostorTag))
+        {
+          return true;
+        }
       }
       catch (UnityException)
       {
-        return false;
+        return HasImpostor(candidate);
       }
+
+      return HasImpostor(candidate);
+    }
+
+    private bool HasImpostor(Transform candidate)
+    {
+      return candidate.GetComponent<AmplifyImpostor>() != null;
     }
 
     private IGameViewport? ResolveViewport()
@@ -790,6 +846,44 @@ namespace Dreamtides.EditorHelpers
       }
     }
   }
-}
+#else
+  [DisallowMultipleComponent]
+  public class ImpostorConverter : MonoBehaviour
+  {
+    [SerializeField]
+    private List<GameObject> conversionTargets = new List<GameObject>();
 
+    [SerializeField]
+    private bool includeInactive = true;
+
+    [SerializeField]
+    private float triangleWeight = 1f;
+
+    [SerializeField]
+    private float screenSizeWeight = 1f;
+
+    [SerializeField]
+    private float particleWeight = 0.25f;
+
+    [SerializeField]
+    private float rendererWeight = 0.1f;
+
+    [SerializeField]
+    private float minimumScreenFraction = 0.0005f;
+
+    [SerializeField]
+    private float granularityPenalty = 0.5f;
+
+    [SerializeField]
+    private string skipImpostorTag = "SkipImpostor";
+
+    public void SuggestCandidates() { }
+
+    public void DryRun() { }
+
+    public void Convert() { }
+
+    public void RemoveImpostors() { }
+  }
 #endif
+}
