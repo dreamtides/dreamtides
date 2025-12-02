@@ -7,6 +7,7 @@ using Dreamtides.Components;
 using Dreamtides.Layout;
 using Dreamtides.Utils;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 [assembly: InternalsVisibleTo("Dreamtides.Tests")]
 
@@ -23,6 +24,7 @@ namespace Dreamtides.Services
     internal GameLayout? _landscapeLayout;
 
     bool _isLandscape = false;
+    TestConfiguration? _activeTestConfiguration;
 
     [SerializeField]
     internal GameMode _currentGameMode;
@@ -170,6 +172,7 @@ namespace Dreamtides.Services
       IGameViewport? gameViewport = null
     )
     {
+      _activeTestConfiguration = testConfiguration;
       _currentGameMode =
         mode ?? (GameMode)PlayerPrefs.GetInt(PlayerPrefKeys.SelectedPlayMode, (int)GameMode.Quest);
       // Need to use this fully-qualified UnityEngine.Device.Screen API to have
@@ -186,6 +189,11 @@ namespace Dreamtides.Services
 
       yield return new WaitForEndOfFrame();
       yield return InitializeAll(_currentGameMode, testConfiguration, gameViewport);
+    }
+
+    public Coroutine InitializeDisplayablesInScene(Scene scene)
+    {
+      return StartCoroutine(InitializeDisplayablesRoutine(scene));
     }
 
     IEnumerator InitializeAll(
@@ -254,6 +262,46 @@ namespace Dreamtides.Services
       )
       {
         if (element.gameObject.scene == gameObject.scene)
+        {
+          var routine = element.StartFromRegistry();
+          if (routine != null)
+          {
+            startCoroutines.Add(StartCoroutine(routine));
+          }
+        }
+      }
+      foreach (var coroutine in startCoroutines)
+      {
+        yield return coroutine;
+      }
+    }
+
+    IEnumerator InitializeDisplayablesRoutine(Scene scene)
+    {
+      foreach (
+        var element in FindObjectsByType<Displayable>(
+          FindObjectsInactive.Include,
+          FindObjectsSortMode.None
+        )
+      )
+      {
+        if (element.gameObject.scene == scene)
+        {
+          element.Initialize(this, _currentGameMode, _activeTestConfiguration, fromRegistry: true);
+        }
+      }
+
+      yield return new WaitForEndOfFrame();
+
+      var startCoroutines = new List<Coroutine>();
+      foreach (
+        var element in FindObjectsByType<Displayable>(
+          FindObjectsInactive.Exclude,
+          FindObjectsSortMode.None
+        )
+      )
+      {
+        if (element.gameObject.scene == scene)
         {
           var routine = element.StartFromRegistry();
           if (routine != null)

@@ -28,25 +28,31 @@ namespace Dreamtides.Editors
 
     void ActivateCamera()
     {
-      var targetCamera = ((DreamscapeMapCamera)target).Camera;
+      var mapCamera = (DreamscapeMapCamera)target;
+      var targetCamera = mapCamera.Camera;
       if (targetCamera == null)
       {
         return;
       }
-      var allCameras = FindObjectsByType<CinemachineCamera>(
+      mapCamera.FrameSites();
+      DeactivateSites();
+      var mapCameras = FindObjectsByType<DreamscapeMapCamera>(
         FindObjectsInactive.Include,
         FindObjectsSortMode.None
       );
-      foreach (var camera in allCameras)
+      foreach (var other in mapCameras)
       {
+        var otherCamera = other.Camera;
+        if (otherCamera == null)
+        {
+          continue;
+        }
         Undo.RecordObject(
-          camera,
-          camera == targetCamera
-            ? "Activate Dreamscape Map Camera"
-            : "Deactivate Dreamscape Map Camera"
+          otherCamera,
+          other == mapCamera ? "Activate Dreamscape Map Camera" : "Deactivate Dreamscape Map Camera"
         );
-        camera.Priority = camera == targetCamera ? 10 : 0;
-        EditorUtility.SetDirty(camera);
+        otherCamera.Priority = other == mapCamera ? 10 : 0;
+        EditorUtility.SetDirty(otherCamera);
       }
     }
 
@@ -62,6 +68,20 @@ namespace Dreamtides.Editors
           PlayModeValueSaver.SaveNow(mapCamera.Camera);
           PlayModeValueSaver.SaveNow(mapCamera.Camera.transform);
         }
+      }
+    }
+
+    void DeactivateSites()
+    {
+      var sites = FindObjectsByType<DreamscapeSite>(
+        FindObjectsInactive.Include,
+        FindObjectsSortMode.None
+      );
+      foreach (var site in sites)
+      {
+        Undo.RecordObject(site, "Deactivate Dreamscape Site");
+        site.SetActive(isActive: false);
+        EditorUtility.SetDirty(site);
       }
     }
   }
