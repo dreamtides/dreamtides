@@ -1,5 +1,6 @@
 #nullable enable
 
+using System.Collections;
 using Dreamtides.Layout;
 using Unity.Cinemachine;
 using UnityEngine;
@@ -35,6 +36,8 @@ namespace Dreamtides.Components
     [SerializeField]
     bool _isActive = true;
 
+    DreamscapeMapCamera? _mapCamera;
+    Coroutine? _activationRoutine;
     bool _hasCameraDefaults;
     Vector3 _targetScreenLeftBaseDirection;
     Vector3 _targetScreenRightBaseDirection;
@@ -52,10 +55,22 @@ namespace Dreamtides.Components
       _isActive = isActive;
       if (_isActive && _hasCameraDefaults)
       {
-        ApplyCameraState();
+        if (_activationRoutine != null)
+        {
+          StopCoroutine(_activationRoutine);
+        }
+        if (!TryStartFocusTransition())
+        {
+          ApplyCameraState();
+        }
       }
       else if (!_isActive)
       {
+        if (_activationRoutine != null)
+        {
+          StopCoroutine(_activationRoutine);
+          _activationRoutine = null;
+        }
         ResetCameraPriorities();
       }
     }
@@ -66,6 +81,11 @@ namespace Dreamtides.Components
       SetActive(isActive: true);
     }
 
+    public void SetMapCamera(DreamscapeMapCamera mapCamera)
+    {
+      _mapCamera = mapCamera;
+    }
+
     protected override void OnInitialize()
     {
       EnsureCameraDefaults();
@@ -74,6 +94,10 @@ namespace Dreamtides.Components
     protected override void OnUpdate()
     {
       if (!_isActive)
+      {
+        return;
+      }
+      if (_activationRoutine != null)
       {
         return;
       }
@@ -178,12 +202,37 @@ namespace Dreamtides.Components
       _targetScreenRightCamera.Priority = 0;
       _targetScreenTopCamera.Priority = 0;
       _activeCamera = null;
+      _activationRoutine = null;
     }
 
     void SetCameraTarget(CinemachineCamera activeCamera)
     {
       activeCamera.Follow = transform;
       activeCamera.LookAt = transform;
+    }
+
+    bool TryStartFocusTransition()
+    {
+      if (!Application.isPlaying)
+      {
+        return false;
+      }
+
+      var mapCamera = _mapCamera;
+      if (mapCamera == null || mapCamera.FocusSiteCamera == null)
+      {
+        return false;
+      }
+
+      _activationRoutine = StartCoroutine(FocusThenActivate(mapCamera));
+      return true;
+    }
+
+    IEnumerator FocusThenActivate(DreamscapeMapCamera mapCamera)
+    {
+      yield return mapCamera.FocusOnSite(this);
+      ApplyCameraState();
+      _activationRoutine = null;
     }
   }
 }

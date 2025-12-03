@@ -18,7 +18,10 @@ namespace Dreamtides.Components
     float _yRotation = 0f;
 
     [SerializeField]
-    CinemachineCamera _leaveSiteCamera = null!;
+    CinemachineCamera _focusSiteCamera = null!;
+
+    [SerializeField]
+    float _transitionWaitDuration = 1f;
 
     [SerializeField]
     List<DreamscapeSite> _sites = new();
@@ -27,8 +30,15 @@ namespace Dreamtides.Components
 
     public CinemachineCamera Camera => _camera;
 
+    public CinemachineCamera FocusSiteCamera => _focusSiteCamera;
+
     public void ActivateWithTransition()
     {
+      // All of this logic basically exists to make the site <-> map camera
+      // transition look slightly better. We use a two-camera setup so that the
+      // camera "pulls back" to the map view while keeping the site in focus.
+      // It's not really necessary, but I find it satisfying to watch.
+
       if (_camera == null)
       {
         return;
@@ -72,6 +82,7 @@ namespace Dreamtides.Components
         }
 
         _sites.Add(site);
+        site.SetMapCamera(this);
         if (!site.gameObject.scene.isLoaded || !site.gameObject.activeInHierarchy)
         {
           continue;
@@ -114,7 +125,7 @@ namespace Dreamtides.Components
       var position = bounds.center - rotation * (Vector3.forward * requiredDistance);
       SetLensFieldOfView();
       _camera.transform.SetPositionAndRotation(position, rotation);
-      SyncLeaveSitePosition();
+      SyncFocusSitePosition();
     }
 
     protected override void OnInitialize()
@@ -134,68 +145,92 @@ namespace Dreamtides.Components
       _camera.Lens = lens;
     }
 
+    public IEnumerator FocusOnSite(DreamscapeSite site)
+    {
+      if (_focusSiteCamera == null)
+      {
+        yield break;
+      }
+
+      SyncFocusSitePosition();
+      SetFocusSiteLens();
+      _focusSiteCamera.Follow = site.transform;
+      _focusSiteCamera.LookAt = site.transform;
+      AimFocusSiteCamera(site.transform);
+      var priority = Mathf.Max(_camera.Priority, _focusSiteCamera.Priority) + 1;
+      _focusSiteCamera.Priority = priority;
+      yield return new WaitForSeconds(_transitionWaitDuration);
+      _camera.Priority = 0;
+      _focusSiteCamera.Priority = 0;
+      SyncFocusSitePosition();
+    }
+
     IEnumerator TransitionToMap()
     {
-      // All of this logic basically exists to make the site -> map camera
-      // transition look slightly better. We use a two-camera setup so that the
-      // camera "pulls back" to the map view while keeping the site in focus.
-      // It's not really necessary, but I find it satisfying to watch.
-
-      var brain = ResolveBrain();
       var activeSite = GetActiveSite();
       var targetTransform = activeSite != null ? activeSite.transform : null;
-      if (_leaveSiteCamera == null || targetTransform == null)
+      if (_focusSiteCamera == null || targetTransform == null)
       {
         _camera.Priority = 10;
-        if (_leaveSiteCamera != null)
+        if (_focusSiteCamera != null)
         {
-          _leaveSiteCamera.Priority = 0;
+          _focusSiteCamera.Priority = 0;
         }
         DeactivateAllSites();
         _transitionRoutine = null;
         yield break;
       }
 
-      ConfigureLeaveSiteCamera(targetTransform, _camera.transform.position);
+      ConfigureFocusSiteCamera(targetTransform, _camera.transform.position);
       _camera.Priority = 0;
-      _leaveSiteCamera.Priority = 20;
-      yield return new WaitForSeconds(0.2f);
+      _focusSiteCamera.Priority = 20;
+      yield return new WaitForSeconds(_transitionWaitDuration);
       DeactivateAllSites();
       _camera.Priority = 21;
-      _leaveSiteCamera.Priority = 0;
-      yield return new WaitForSeconds(0.2f);
-      SyncLeaveSitePosition();
+      _focusSiteCamera.Priority = 0;
+      yield return new WaitForSeconds(_transitionWaitDuration);
+      SyncFocusSitePosition();
       _transitionRoutine = null;
     }
 
-    void ConfigureLeaveSiteCamera(Transform target, Vector3 mapPosition)
+    void ConfigureFocusSiteCamera(Transform target, Vector3 mapPosition)
     {
-      SetLeaveSiteLens();
-      _leaveSiteCamera.Follow = target;
-      _leaveSiteCamera.LookAt = target;
-      _leaveSiteCamera.transform.position = mapPosition;
-      var direction = target.position - mapPosition;
-      _leaveSiteCamera.transform.rotation =
-        direction.sqrMagnitude < Mathf.Epsilon
-          ? _camera.transform.rotation
-          : Quaternion.LookRotation(direction, Vector3.up);
+      SetFocusSiteLens();
+      _focusSiteCamera.Follow = target;
+      _focusSiteCamera.LookAt = target;
+      _focusSiteCamera.transform.position = mapPosition;
+      AimFocusSiteCamera(target);
     }
 
-    void SetLeaveSiteLens()
+    void SetFocusSiteLens()
     {
-      var lens = _leaveSiteCamera.Lens;
+      var lens = _focusSiteCamera.Lens;
       lens.FieldOfView = 60f;
-      _leaveSiteCamera.Lens = lens;
+      _focusSiteCamera.Lens = lens;
     }
 
-    void SyncLeaveSitePosition()
+    void SyncFocusSitePosition()
     {
-      if (_leaveSiteCamera == null)
+      if (_focusSiteCamera == null)
       {
         return;
       }
 
-      _leaveSiteCamera.transform.position = _camera.transform.position;
+      _focusSiteCamera.transform.position = _camera.transform.position;
+    }
+
+    void AimFocusSiteCamera(Transform target)
+    {
+      if (_focusSiteCamera == null)
+      {
+        return;
+      }
+
+      var direction = target.position - _focusSiteCamera.transform.position;
+      _focusSiteCamera.transform.rotation =
+        direction.sqrMagnitude < Mathf.Epsilon
+          ? _camera.transform.rotation
+          : Quaternion.LookRotation(direction, Vector3.up);
     }
 
     DreamscapeSite? GetActiveSite()
@@ -222,17 +257,6 @@ namespace Dreamtides.Components
           site.SetActive(false);
         }
       }
-    }
-
-    CinemachineBrain? ResolveBrain()
-    {
-      if (!Application.isPlaying)
-      {
-        return null;
-      }
-
-      var mainCamera = Registry.MainCamera;
-      return mainCamera != null ? mainCamera.GetComponent<CinemachineBrain>() : null;
     }
 
     IGameViewport? ResolveViewport() =>
