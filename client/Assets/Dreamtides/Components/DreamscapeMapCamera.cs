@@ -139,11 +139,10 @@ namespace Dreamtides.Components
 
     protected override void OnInitialize()
     {
-      FrameSites();
       ApplyBlendOverride();
     }
 
-    protected override void OnUpdate()
+    protected override void OnStart()
     {
       FrameSites();
     }
