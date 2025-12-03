@@ -11,6 +11,9 @@ namespace Dreamtides.Components
 {
   public class DreamscapeMapCamera : Displayable
   {
+    static DreamscapeMapCamera? _blendOwner;
+    static CinemachineCore.GetBlendOverrideDelegate? _previousBlendOverride;
+
     [SerializeField]
     CinemachineCamera _camera = null!;
 
@@ -21,7 +24,13 @@ namespace Dreamtides.Components
     CinemachineCamera _focusSiteCamera = null!;
 
     [SerializeField]
-    float _transitionWaitDuration = 1f;
+    float _toSiteTransitionWaitDuration = 1f;
+
+    [SerializeField]
+    float _fromSiteTransitionWaitDuration = 1f;
+
+    [SerializeField]
+    float _rotateBlendDuration = 0.3f;
 
     [SerializeField]
     List<DreamscapeSite> _sites = new();
@@ -131,6 +140,7 @@ namespace Dreamtides.Components
     protected override void OnInitialize()
     {
       FrameSites();
+      ApplyBlendOverride();
     }
 
     protected override void OnUpdate()
@@ -159,7 +169,7 @@ namespace Dreamtides.Components
       AimFocusSiteCamera(site.transform);
       var priority = Mathf.Max(_camera.Priority, _focusSiteCamera.Priority) + 1;
       _focusSiteCamera.Priority = priority;
-      yield return new WaitForSeconds(_transitionWaitDuration);
+      yield return new WaitForSeconds(_toSiteTransitionWaitDuration);
       _camera.Priority = 0;
       _focusSiteCamera.Priority = 0;
       SyncFocusSitePosition();
@@ -184,11 +194,11 @@ namespace Dreamtides.Components
       ConfigureFocusSiteCamera(targetTransform, _camera.transform.position);
       _camera.Priority = 0;
       _focusSiteCamera.Priority = 20;
-      yield return new WaitForSeconds(_transitionWaitDuration);
+      yield return new WaitForSeconds(_fromSiteTransitionWaitDuration);
       DeactivateAllSites();
       _camera.Priority = 21;
       _focusSiteCamera.Priority = 0;
-      yield return new WaitForSeconds(_transitionWaitDuration);
+      yield return new WaitForSeconds(_fromSiteTransitionWaitDuration);
       SyncFocusSitePosition();
       _transitionRoutine = null;
     }
@@ -219,6 +229,17 @@ namespace Dreamtides.Components
       _focusSiteCamera.transform.position = _camera.transform.position;
     }
 
+    void OnDestroy()
+    {
+      if (_blendOwner != this)
+      {
+        return;
+      }
+
+      CinemachineCore.GetBlendOverride = _previousBlendOverride;
+      _blendOwner = null;
+    }
+
     void AimFocusSiteCamera(Transform target)
     {
       if (_focusSiteCamera == null)
@@ -231,6 +252,44 @@ namespace Dreamtides.Components
         direction.sqrMagnitude < Mathf.Epsilon
           ? _camera.transform.rotation
           : Quaternion.LookRotation(direction, Vector3.up);
+    }
+
+    void ApplyBlendOverride()
+    {
+      if (_focusSiteCamera == null || _camera == null)
+      {
+        return;
+      }
+
+      _blendOwner = this;
+      _previousBlendOverride ??= CinemachineCore.GetBlendOverride;
+      CinemachineCore.GetBlendOverride = BlendOverride;
+    }
+
+    CinemachineBlendDefinition BlendOverride(
+      ICinemachineCamera from,
+      ICinemachineCamera to,
+      CinemachineBlendDefinition defaultBlend,
+      Object _owner
+    )
+    {
+      if (_blendOwner == this && IsFocusBlend(from, to))
+      {
+        return new CinemachineBlendDefinition(
+          CinemachineBlendDefinition.Styles.EaseInOut,
+          _rotateBlendDuration
+        );
+      }
+
+      return _previousBlendOverride != null
+        ? _previousBlendOverride(from, to, defaultBlend, _owner)
+        : defaultBlend;
+    }
+
+    bool IsFocusBlend(ICinemachineCamera from, ICinemachineCamera to)
+    {
+      return (ReferenceEquals(from, _focusSiteCamera) && ReferenceEquals(to, _camera))
+        || (ReferenceEquals(from, _camera) && ReferenceEquals(to, _focusSiteCamera));
     }
 
     DreamscapeSite? GetActiveSite()
