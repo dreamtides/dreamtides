@@ -1,7 +1,6 @@
 #nullable enable
 
 using Dreamtides.Components;
-using Unity.Cinemachine;
 using UnityEditor;
 using UnityEngine;
 
@@ -35,7 +34,6 @@ namespace Dreamtides.Editors
         return;
       }
       mapCamera.FrameSites();
-      DeactivateSites();
       var mapCameras = FindObjectsByType<DreamscapeMapCamera>(
         FindObjectsInactive.Include,
         FindObjectsSortMode.None
@@ -51,9 +49,10 @@ namespace Dreamtides.Editors
           otherCamera,
           other == mapCamera ? "Activate Dreamscape Map Camera" : "Deactivate Dreamscape Map Camera"
         );
-        otherCamera.Priority = other == mapCamera ? 10 : 0;
+        otherCamera.Priority = 0;
         EditorUtility.SetDirty(otherCamera);
       }
+      mapCamera.ActivateWithTransition();
     }
 
     void SaveValues()
@@ -68,20 +67,6 @@ namespace Dreamtides.Editors
           PlayModeValueSaver.SaveNow(mapCamera.Camera);
           PlayModeValueSaver.SaveNow(mapCamera.Camera.transform);
         }
-      }
-    }
-
-    void DeactivateSites()
-    {
-      var sites = FindObjectsByType<DreamscapeSite>(
-        FindObjectsInactive.Include,
-        FindObjectsSortMode.None
-      );
-      foreach (var site in sites)
-      {
-        Undo.RecordObject(site, "Deactivate Dreamscape Site");
-        site.SetActive(isActive: false);
-        EditorUtility.SetDirty(site);
       }
     }
   }
