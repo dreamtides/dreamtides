@@ -2,13 +2,18 @@
 
 using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 using System.Runtime.CompilerServices;
 using Dreamtides.Components;
 using Dreamtides.Layout;
 using Dreamtides.Utils;
 using UnityEngine;
+using UnityEngine.AddressableAssets;
+using UnityEngine.ResourceManagement.AsyncOperations;
+using UnityEngine.ResourceManagement.ResourceProviders;
 using UnityEngine.SceneManagement;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 [assembly: InternalsVisibleTo("Dreamtides.Tests")]
 
@@ -31,7 +36,7 @@ namespace Dreamtides.Services
     internal GameMode _currentGameMode;
 
     [SerializeField]
-    internal string _additionalScenePath = string.Empty;
+    internal AssetReference? _additionalSceneReference;
 
     public bool IsLandscape => _isLandscape;
 
@@ -206,6 +211,9 @@ namespace Dreamtides.Services
       IGameViewport? gameViewport
     )
     {
+      var targetScenes = new List<Scene> { gameObject.scene };
+      yield return LoadAdditionalSceneIfNeeded(targetScenes);
+
       if (_isLandscape)
       {
         Check(_portraitLayout).gameObject.SetActive(false);
@@ -218,9 +226,6 @@ namespace Dreamtides.Services
       }
 
       Application.targetFrameRate = 60;
-
-      var targetScenes = new List<Scene> { gameObject.scene };
-      yield return LoadAdditionalSceneIfNeeded(targetScenes);
 
       foreach (
         var element in FindObjectsByType<Displayable>(
@@ -325,33 +330,76 @@ namespace Dreamtides.Services
 
     IEnumerator LoadAdditionalSceneIfNeeded(List<Scene> targetScenes)
     {
-      if (string.IsNullOrWhiteSpace(_additionalScenePath))
+      if (_additionalSceneReference == null || !_additionalSceneReference.RuntimeKeyIsValid())
       {
         yield break;
       }
 
-      if (!File.Exists(_additionalScenePath))
+#if UNITY_EDITOR
+      if (SceneAlreadyLoaded(targetScenes))
       {
         yield break;
       }
+#endif
 
-      var operation = SceneManager.LoadSceneAsync(_additionalScenePath, LoadSceneMode.Additive);
-      if (operation == null)
+      var operation = Addressables.LoadSceneAsync(
+        _additionalSceneReference,
+        LoadSceneMode.Additive
+      );
+      if (!operation.IsValid())
       {
         yield break;
       }
 
       yield return operation;
 
-      var scene = SceneManager.GetSceneByPath(_additionalScenePath);
+      if (operation.Status != AsyncOperationStatus.Succeeded)
+      {
+        Addressables.Release(operation);
+        yield break;
+      }
+
+      var scene = operation.Result.Scene;
       if (!scene.IsValid())
       {
+        Addressables.UnloadSceneAsync(operation);
         yield break;
       }
 
       DisableEditingHelpers(scene);
       targetScenes.Add(scene);
     }
+
+#if UNITY_EDITOR
+    bool SceneAlreadyLoaded(List<Scene> targetScenes)
+    {
+      var path = AssetDatabase.GUIDToAssetPath(_additionalSceneReference!.AssetGUID);
+      if (string.IsNullOrEmpty(path))
+      {
+        return false;
+      }
+
+      for (var i = 0; i < SceneManager.sceneCount; i += 1)
+      {
+        var scene = SceneManager.GetSceneAt(i);
+        if (!scene.isLoaded)
+        {
+          continue;
+        }
+
+        if (scene.path != path)
+        {
+          continue;
+        }
+
+        DisableEditingHelpers(scene);
+        targetScenes.Add(scene);
+        return true;
+      }
+
+      return false;
+    }
+#endif
 
     void DisableEditingHelpers(Scene scene)
     {
