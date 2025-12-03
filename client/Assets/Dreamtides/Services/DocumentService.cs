@@ -26,20 +26,20 @@ namespace Dreamtides.Services
     Coroutine? _screenAnchorAutoHideCoroutine;
 
     [SerializeField]
-    ControlledButton _menuButton = null!;
-    public ControlledButton MenuButton => _menuButton;
+    CanvasButton _menuButton = null!;
+    public CanvasButton MenuButton => _menuButton;
 
     [SerializeField]
-    ControlledButton _undoButton = null!;
-    public ControlledButton UndoButton => _undoButton;
+    CanvasButton _undoButton = null!;
+    public CanvasButton UndoButton => _undoButton;
 
     [SerializeField]
-    ControlledButton _devButton = null!;
-    public ControlledButton DevButton => _devButton;
+    CanvasButton _devButton = null!;
+    public CanvasButton DevButton => _devButton;
 
     [SerializeField]
-    ControlledButton _bugButton = null!;
-    public ControlledButton BugButton => _bugButton;
+    CanvasButton _bugButton = null!;
+    public CanvasButton BugButton => _bugButton;
 
     const float ScreenAnchorFadeDurationSeconds = 0.3f;
 

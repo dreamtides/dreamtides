@@ -4,6 +4,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using DG.Tweening;
+using Dreamtides.Buttons;
 using Dreamtides.Components;
 using Dreamtides.Layout;
 using Dreamtides.Schema;
@@ -33,6 +34,9 @@ namespace Dreamtides.Services
     CanvasGroup _closeButton = null!;
 
     [SerializeField]
+    CanvasButton _siteButtonPrefab = null!;
+
+    [SerializeField]
     RectTransform _siteButtons = null!;
 
     [SerializeField]
@@ -42,6 +46,14 @@ namespace Dreamtides.Services
     RectTransform _debugQuestButtons = null!;
 
     public CanvasGroup CloseButton => Errors.CheckNotNull(_closeButton);
+
+    public CanvasButton CreateSiteButton()
+    {
+      var button = ComponentUtils.Instantiate(_siteButtonPrefab, Vector3.zero);
+      var rectTransform = ComponentUtils.Get<RectTransform>(button);
+      rectTransform.SetParent(Registry.CanvasSafeArea, false);
+      return button;
+    }
 
     protected override void OnInitialize(GameMode mode, TestConfiguration? testConfiguration)
     {

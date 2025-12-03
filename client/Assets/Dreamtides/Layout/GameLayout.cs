@@ -162,12 +162,12 @@ namespace Dreamtides.Layout
     public ActionButton DecrementActionButton => Check(_decrementActionButton);
 
     [SerializeField]
-    ControlledButton? _undoButton;
-    public ControlledButton UndoButton => Check(_undoButton);
+    CanvasButton? _undoButton;
+    public CanvasButton UndoButton => Check(_undoButton);
 
     [SerializeField]
-    ControlledButton? _devButton;
-    public ControlledButton DevButton => Check(_devButton);
+    CanvasButton? _devButton;
+    public CanvasButton DevButton => Check(_devButton);
 
     [SerializeField]
     EnemyMessage? _enemyMessage;
