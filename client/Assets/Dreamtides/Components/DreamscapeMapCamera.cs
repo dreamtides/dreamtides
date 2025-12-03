@@ -114,6 +114,7 @@ namespace Dreamtides.Components
       var position = bounds.center - rotation * (Vector3.forward * requiredDistance);
       SetLensFieldOfView();
       _camera.transform.SetPositionAndRotation(position, rotation);
+      SyncLeaveSitePosition();
     }
 
     protected override void OnInitialize()
@@ -158,26 +159,13 @@ namespace Dreamtides.Components
       ConfigureLeaveSiteCamera(targetTransform, _camera.transform.position);
       _camera.Priority = 0;
       _leaveSiteCamera.Priority = 20;
-      yield return WaitForBlend(brain);
+      yield return new WaitForSeconds(0.2f);
       DeactivateAllSites();
       _camera.Priority = 21;
       _leaveSiteCamera.Priority = 0;
-      yield return WaitForBlend(brain);
+      yield return new WaitForSeconds(0.2f);
+      SyncLeaveSitePosition();
       _transitionRoutine = null;
-    }
-
-    IEnumerator WaitForBlend(CinemachineBrain? brain)
-    {
-      yield return null;
-      if (brain == null)
-      {
-        yield break;
-      }
-
-      while (brain.IsBlending)
-      {
-        yield return null;
-      }
     }
 
     void ConfigureLeaveSiteCamera(Transform target, Vector3 mapPosition)
@@ -198,6 +186,16 @@ namespace Dreamtides.Components
       var lens = _leaveSiteCamera.Lens;
       lens.FieldOfView = 60f;
       _leaveSiteCamera.Lens = lens;
+    }
+
+    void SyncLeaveSitePosition()
+    {
+      if (_leaveSiteCamera == null)
+      {
+        return;
+      }
+
+      _leaveSiteCamera.transform.position = _camera.transform.position;
     }
 
     DreamscapeSite? GetActiveSite()
