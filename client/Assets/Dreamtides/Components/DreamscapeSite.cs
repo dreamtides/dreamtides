@@ -36,6 +36,9 @@ namespace Dreamtides.Components
     [SerializeField]
     bool _isActive = true;
 
+    [SerializeField]
+    string _buttonLabel = string.Empty;
+
     DreamscapeMapCamera? _mapCamera;
     Coroutine? _activationRoutine;
     bool _hasCameraDefaults;
@@ -48,6 +51,8 @@ namespace Dreamtides.Components
     CinemachineCamera? _activeCamera;
 
     public bool IsActive => _isActive;
+
+    public string ButtonLabel => _buttonLabel;
 
     public void SetActive(bool isActive)
     {

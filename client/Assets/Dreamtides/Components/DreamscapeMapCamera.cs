@@ -2,7 +2,9 @@
 
 using System.Collections;
 using System.Collections.Generic;
+using Dreamtides.Buttons;
 using Dreamtides.Layout;
+using Dreamtides.Schema;
 using Dreamtides.Services;
 using Unity.Cinemachine;
 using UnityEngine;
@@ -35,7 +37,10 @@ namespace Dreamtides.Components
     [SerializeField]
     List<DreamscapeSite> _sites = new();
 
+    readonly Dictionary<DreamscapeSite, CanvasButton> _siteButtonsBySite = new();
+
     Coroutine? _transitionRoutine;
+    Coroutine? _positionRoutine;
 
     public CinemachineCamera Camera => _camera;
 
@@ -135,6 +140,7 @@ namespace Dreamtides.Components
       SetLensFieldOfView();
       _camera.transform.SetPositionAndRotation(position, rotation);
       SyncFocusSitePosition();
+      PositionSiteButtons();
     }
 
     protected override void OnInitialize()
@@ -145,6 +151,9 @@ namespace Dreamtides.Components
     protected override void OnStart()
     {
       FrameSites();
+      EnsureSiteButtons();
+      PositionSiteButtons();
+      SchedulePositionSiteButtons();
     }
 
     void SetLensFieldOfView()
@@ -315,6 +324,97 @@ namespace Dreamtides.Components
           site.SetActive(false);
         }
       }
+    }
+
+    void EnsureSiteButtons()
+    {
+      if (_sites.Count == 0)
+      {
+        return;
+      }
+
+      var viewport = ResolveViewport();
+      if (viewport == null)
+      {
+        return;
+      }
+
+      var service = Registry.DreamscapeService;
+      for (var i = 0; i < _sites.Count; i++)
+      {
+        var site = _sites[i];
+        if (site == null)
+        {
+          continue;
+        }
+        if (!_siteButtonsBySite.TryGetValue(site, out var button))
+        {
+          button = service.CreateSiteButton();
+          _siteButtonsBySite[site] = button;
+        }
+        button.gameObject.SetActive(true);
+        button.SetView(new ButtonView { Action = GameActionEnum.NoOp, Label = site.ButtonLabel });
+      }
+    }
+
+    void PositionSiteButtons()
+    {
+      if (_sites.Count == 0)
+      {
+        return;
+      }
+
+      var viewport = ResolveViewport();
+      if (viewport == null)
+      {
+        return;
+      }
+
+      EnsureSiteButtons();
+      var worldPositions = new List<Vector3>(_sites.Count);
+      var buttonRects = new List<RectTransform>(_sites.Count);
+      for (var i = 0; i < _sites.Count; i++)
+      {
+        var site = _sites[i];
+        if (site == null)
+        {
+          continue;
+        }
+        if (!_siteButtonsBySite.TryGetValue(site, out var button))
+        {
+          continue;
+        }
+        worldPositions.Add(site.transform.position);
+        buttonRects.Add(button.GetComponent<RectTransform>());
+      }
+
+      if (worldPositions.Count == 0 || buttonRects.Count != worldPositions.Count)
+      {
+        return;
+      }
+
+      var positioner = new DreamscapeSiteButtonPositioner(viewport, Registry.CanvasSafeArea);
+      positioner.PositionButtons(worldPositions, buttonRects);
+    }
+
+    void SchedulePositionSiteButtons()
+    {
+      if (!Application.isPlaying)
+      {
+        return;
+      }
+      if (_positionRoutine != null)
+      {
+        StopCoroutine(_positionRoutine);
+      }
+      _positionRoutine = StartCoroutine(PositionSiteButtonsNextFrame());
+    }
+
+    IEnumerator PositionSiteButtonsNextFrame()
+    {
+      yield return new WaitForEndOfFrame();
+      PositionSiteButtons();
+      _positionRoutine = null;
     }
 
     IGameViewport? ResolveViewport() =>
