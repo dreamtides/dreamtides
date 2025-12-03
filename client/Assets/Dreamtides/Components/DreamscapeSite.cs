@@ -36,7 +36,7 @@ namespace Dreamtides.Components
     float _portraitCameraDistanceModifier = 0f;
 
     [SerializeField]
-    Guid _siteId = Guid.NewGuid();
+    string _siteId = Guid.NewGuid().ToString();
 
     [SerializeField]
     bool _isActive = true;
@@ -67,7 +67,17 @@ namespace Dreamtides.Components
 
     public string DebugClickAction => _debugClickAction;
 
-    public Guid SiteId => _siteId;
+    public Guid SiteId
+    {
+      get
+      {
+        if (Guid.TryParse(_siteId, out var parsed))
+        {
+          return parsed;
+        }
+        throw new InvalidOperationException($"Invalid site id string: {_siteId}");
+      }
+    }
 
     public ObjectLayout? CharacterOwnedObjects => _characterOwnedObjects;
 

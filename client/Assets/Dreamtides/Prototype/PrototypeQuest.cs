@@ -18,9 +18,11 @@ public class PrototypeQuest : Service
   [SerializeField]
   DreamscapeMapCamera _mapCamera = null!;
 
-  public static readonly Guid DraftSiteId = Guid.NewGuid();
-  public static readonly Guid ShopSiteId = Guid.NewGuid();
-  public static readonly Guid TemptingOfferSiteId = Guid.NewGuid();
+  public static readonly Guid DraftSiteId = Guid.Parse("117b9377-e0ab-4304-9f74-6d5b4fc5c778");
+  public static readonly Guid ShopSiteId = Guid.Parse("4ce46579-7d0c-455a-a404-628894cff331");
+  public static readonly Guid TemptingOfferSiteId = Guid.Parse(
+    "2d9b1d2c-6637-4930-b9fc-a70fa901d662"
+  );
 
   PrototypeCards _prototypeCards = new PrototypeCards();
   PrototypeQuestDraftFlow _draftFlow = null!;

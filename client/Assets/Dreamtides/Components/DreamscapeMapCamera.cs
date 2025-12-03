@@ -180,8 +180,7 @@ namespace Dreamtides.Components
       _focusSiteCamera.Follow = site.transform;
       _focusSiteCamera.LookAt = site.transform;
       AimFocusSiteCamera(site.transform);
-      var priority = Mathf.Max(_camera.Priority, _focusSiteCamera.Priority) + 1;
-      _focusSiteCamera.Priority = priority;
+      _focusSiteCamera.Priority = 0;
       _camera.Priority = 0;
       yield return new WaitForSeconds(_toSiteTransitionWaitDuration);
       SyncFocusSitePosition();
