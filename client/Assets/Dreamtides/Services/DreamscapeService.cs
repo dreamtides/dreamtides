@@ -19,9 +19,6 @@ namespace Dreamtides.Services
     ObjectLayout _tmpSiteDeckLayout = null!;
 
     [SerializeField]
-    ObjectLayout _tmpMerchantPositionLayout = null!;
-
-    [SerializeField]
     ObjectLayout _tmpTemptingOfferNpcLayout = null!;
 
     [SerializeField]
@@ -112,7 +109,7 @@ namespace Dreamtides.Services
       Registry.DreamscapeLayout.QuestEffectPosition.ApplyLayout(sequence);
 
       _tmpSiteDeckLayout.ApplyLayout(sequence);
-      _tmpMerchantPositionLayout.ApplyLayout(sequence);
+      ApplySiteOwnedLayouts(sequence);
     }
 
     public void ShowShopWithCards(List<Card> cards)
@@ -152,24 +149,53 @@ namespace Dreamtides.Services
       throw new InvalidOperationException($"Unknown site id: ${siteId}");
     }
 
-    public ObjectLayout SiteNpcLayout(Guid siteId)
+    public ObjectLayout SiteCharacterOwnedLayout(Guid siteId)
     {
-      if (siteId == PrototypeQuest.ShopSiteId)
-      {
-        return _tmpMerchantPositionLayout;
-      }
-
       if (siteId == PrototypeQuest.TemptingOfferSiteId)
       {
         return _tmpTemptingOfferNpcLayout;
       }
-
-      throw new InvalidOperationException($"Unknown site id: ${siteId}");
+      var site = FindSite(siteId);
+      return Errors.CheckNotNull(site.CharacterOwnedObjects);
     }
 
     public Transform CharacterScreenAnchorPosition(Guid merchantId)
     {
       return _tmpMerchantSpeechPosition;
+    }
+
+    DreamscapeSite FindSite(Guid siteId)
+    {
+      var sites = FindObjectsByType<DreamscapeSite>(
+        FindObjectsInactive.Exclude,
+        FindObjectsSortMode.None
+      );
+      for (var i = 0; i < sites.Length; i++)
+      {
+        var site = sites[i];
+        if (site != null && site.SiteId == siteId)
+        {
+          return site;
+        }
+      }
+      throw new InvalidOperationException($"Unknown site id: {siteId}");
+    }
+
+    void ApplySiteOwnedLayouts(Sequence? sequence)
+    {
+      var sites = FindObjectsByType<DreamscapeSite>(
+        FindObjectsInactive.Exclude,
+        FindObjectsSortMode.None
+      );
+      for (var i = 0; i < sites.Length; i++)
+      {
+        var site = sites[i];
+        var layout = site?.CharacterOwnedObjects;
+        if (layout != null)
+        {
+          layout.ApplyLayout(sequence);
+        }
+      }
     }
   }
 }

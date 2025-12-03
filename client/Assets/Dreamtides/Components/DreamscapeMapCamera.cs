@@ -41,10 +41,13 @@ namespace Dreamtides.Components
 
     Coroutine? _transitionRoutine;
     Coroutine? _positionRoutine;
+    bool _siteButtonsVisible;
 
     public CinemachineCamera Camera => _camera;
 
     public CinemachineCamera FocusSiteCamera => _focusSiteCamera;
+
+    public bool IsTransitioning => _transitionRoutine != null;
 
     public void ActivateWithTransition()
     {
@@ -59,6 +62,7 @@ namespace Dreamtides.Components
       }
 
       FrameSites();
+      HideSiteButtons();
       if (_transitionRoutine != null)
       {
         StopCoroutine(_transitionRoutine);
@@ -154,6 +158,7 @@ namespace Dreamtides.Components
       EnsureSiteButtons();
       PositionSiteButtons();
       SchedulePositionSiteButtons();
+      ShowSiteButtons();
     }
 
     void SetLensFieldOfView()
@@ -177,9 +182,8 @@ namespace Dreamtides.Components
       AimFocusSiteCamera(site.transform);
       var priority = Mathf.Max(_camera.Priority, _focusSiteCamera.Priority) + 1;
       _focusSiteCamera.Priority = priority;
-      yield return new WaitForSeconds(_toSiteTransitionWaitDuration);
       _camera.Priority = 0;
-      _focusSiteCamera.Priority = 0;
+      yield return new WaitForSeconds(_toSiteTransitionWaitDuration);
       SyncFocusSitePosition();
     }
 
@@ -208,6 +212,7 @@ namespace Dreamtides.Components
       _focusSiteCamera.Priority = 0;
       yield return new WaitForSeconds(_fromSiteTransitionWaitDuration);
       SyncFocusSitePosition();
+      ShowSiteButtons();
       _transitionRoutine = null;
     }
 
@@ -321,9 +326,52 @@ namespace Dreamtides.Components
         var site = _sites[i];
         if (site != null)
         {
-          site.SetActive(false);
+          site.SetActiveWithoutFocus(false);
         }
       }
+    }
+
+    public IEnumerator FocusSite(DreamscapeSite site)
+    {
+      HideSiteButtons();
+      site.SetActiveWithoutFocus(true);
+      yield return FocusOnSite(site);
+    }
+
+    public void HideSiteButtons()
+    {
+      if (!_siteButtonsVisible)
+      {
+        return;
+      }
+      _siteButtonsVisible = false;
+      foreach (var button in _siteButtonsBySite.Values)
+      {
+        if (button != null)
+        {
+          button.gameObject.SetActive(false);
+        }
+      }
+      Registry.DreamscapeService.CloseButton.gameObject.SetActive(false);
+    }
+
+    public void ShowSiteButtons()
+    {
+      if (_siteButtonsVisible)
+      {
+        return;
+      }
+      _siteButtonsVisible = true;
+      EnsureSiteButtons();
+      PositionSiteButtons();
+      foreach (var button in _siteButtonsBySite.Values)
+      {
+        if (button != null)
+        {
+          button.gameObject.SetActive(true);
+        }
+      }
+      Registry.DreamscapeService.CloseButton.gameObject.SetActive(true);
     }
 
     void EnsureSiteButtons()
@@ -351,9 +399,26 @@ namespace Dreamtides.Components
         {
           button = service.CreateSiteButton();
           _siteButtonsBySite[site] = button;
+          button.Initialize(Registry, Mode, TestConfiguration);
+          button.StartFromRegistry();
         }
         button.gameObject.SetActive(true);
-        button.SetView(new ButtonView { Action = GameActionEnum.NoOp, Label = site.ButtonLabel });
+        var action = string.IsNullOrEmpty(site.DebugClickAction)
+          ? new OnClickUnion { Enum = GameActionEnum.NoOp }
+          : new OnClickUnion
+          {
+            OnClickClass = new OnClickClass
+            {
+              DebugAction = new DebugAction
+              {
+                DebugActionClass = new DebugActionClass
+                {
+                  ApplyTestScenarioAction = site.DebugClickAction,
+                },
+              },
+            },
+          };
+        button.SetView(new ButtonView { Action = action, Label = site.ButtonLabel });
       }
     }
 

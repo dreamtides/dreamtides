@@ -4,12 +4,10 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Dreamtides.Buttons;
+using Dreamtides.Components;
 using Dreamtides.Prototype;
 using Dreamtides.Schema;
 using Dreamtides.Services;
-using HighlightPlus;
-using Unity.Cinemachine;
 using UnityEngine;
 
 public class PrototypeQuest : Service
@@ -18,71 +16,18 @@ public class PrototypeQuest : Service
   string _outlineColorHex = "#EF6C00";
 
   [SerializeField]
-  CinemachineBrain _brain = null!;
-
-  [SerializeField]
-  CinemachineCamera _spaceCameraFar = null!;
-
-  [SerializeField]
-  CinemachineCamera _spaceCameraNear = null!;
-
-  [SerializeField]
-  CinemachineCamera _mapCamera = null!;
-
-  [SerializeField]
-  CinemachineCamera _draftCamera = null!;
-
-  [SerializeField]
-  Transform _draftTrackingTarget = null!;
-
-  [SerializeField]
-  CinemachineCamera _shopCamera = null!;
-
-  [SerializeField]
-  Transform _shopTrackingTarget = null!;
-
-  [SerializeField]
-  CinemachineCamera _eventCamera = null!;
-
-  [SerializeField]
-  Transform _eventTrackingTarget = null!;
-
-  [SerializeField]
-  CinemachineCamera _essenceCamera = null!;
-
-  [SerializeField]
-  Transform _essenceTrackingTarget = null!;
-
-  [SerializeField]
-  CinemachineCamera _draft2Camera = null!;
-
-  [SerializeField]
-  Transform _draft2TrackingTarget = null!;
-
-  [SerializeField]
-  CinemachineCamera _battleCamera = null!;
-
-  [SerializeField]
-  Transform _battleTrackingTarget = null!;
-
-  [SerializeField]
-  List<HighlightEffect> _highlightEffects = null!;
-
-  [SerializeField]
-  List<SiteButton> _siteButtons = null!;
+  DreamscapeMapCamera _mapCamera = null!;
 
   public static readonly Guid DraftSiteId = Guid.NewGuid();
   public static readonly Guid ShopSiteId = Guid.NewGuid();
   public static readonly Guid TemptingOfferSiteId = Guid.NewGuid();
 
-  Coroutine? _siteButtonsActivationCoroutine;
   PrototypeCards _prototypeCards = new PrototypeCards();
   PrototypeQuestDraftFlow _draftFlow = null!;
   PrototypeQuestShopFlow _shopFlow = null!;
   PrototypeQuestTemptingOfferFlow _temptingOfferFlow = null!;
   List<CardOverride>? _pendingShopOverrides;
   bool _hasPendingShopOverridesUpdate;
-  bool _closeButtonWasActiveBeforeBrowse;
 
   // Public API to configure arbitrary shop card overrides (index-based)
   public void ConfigureShopOverrides(params CardOverride[] overrides)
@@ -105,15 +50,6 @@ public class PrototypeQuest : Service
     }
     _pendingShopOverrides = null;
     _hasPendingShopOverridesUpdate = true;
-  }
-
-  void Awake()
-  {
-    Application.targetFrameRate = 60;
-    if (_brain == null && Camera.main != null)
-    {
-      _brain = Camera.main.GetComponent<CinemachineBrain>();
-    }
   }
 
   void EnsureFlowsInitialized()
@@ -139,7 +75,7 @@ public class PrototypeQuest : Service
         registry,
         _prototypeCards,
         (request, animate) => CreateOrUpdateCards(request, animate),
-        FocusMapCamera,
+        () => StartCoroutine(ReturnToMap()),
         () => _outlineColorHex,
         DraftSiteId
       );
@@ -237,8 +173,6 @@ public class PrototypeQuest : Service
 
   public void OnDebugScenarioAction(string name)
   {
-    Debug.Log($"OnDebugScenarioAction: {name}");
-
     if (string.IsNullOrEmpty(name))
     {
       return;
@@ -260,7 +194,8 @@ public class PrototypeQuest : Service
     {
       EnsureFlowsInitialized();
       _shopFlow.ClearDisplayedCards();
-      FocusMapCamera();
+      DeactivateSite("FocusShopCamera");
+      StartCoroutine(ReturnToMap());
       Registry.DreamscapeService.HideCloseSiteButton();
       Registry.DocumentService.RenderScreenAnchoredNode(
         new AnchorToScreenPositionCommand() { Node = null }
@@ -271,7 +206,9 @@ public class PrototypeQuest : Service
 
     if (name == "closeTemptingOffer")
     {
-      FocusMapCamera();
+      EnsureFlowsInitialized();
+      DeactivateSite("FocusEventCamera");
+      StartCoroutine(ReturnToMap());
       Registry.DreamscapeService.HideCloseSiteButton();
       Registry.DreamscapeLayout.TemptingOfferDisplay.HideAcceptButtons();
       Registry.DocumentService.RenderScreenAnchoredNode(
@@ -279,6 +216,65 @@ public class PrototypeQuest : Service
       );
 
       return;
+    }
+
+    if (name == "FocusMapCamera")
+    {
+      StartCoroutine(ReturnToMap());
+      return;
+    }
+
+    if (name == "FocusDraftCamera")
+    {
+      StartCoroutine(
+        FocusSiteFlow(
+          "FocusDraftCamera",
+          () => _draftFlow.PrepareDraftDeck(),
+          () => _draftFlow.RunDraftPickSequence()
+        )
+      );
+      return;
+    }
+
+    if (name == "FocusShopCamera")
+    {
+      StartCoroutine(
+        FocusSiteFlow(
+          "FocusShopCamera",
+          () => _shopFlow.PrepareShopCards(),
+          () => _shopFlow.RunShopDisplaySequence()
+        )
+      );
+      return;
+    }
+
+    if (name == "FocusEventCamera")
+    {
+      StartCoroutine(
+        FocusSiteFlow(
+          "FocusEventCamera",
+          () => _temptingOfferFlow.PrepareTemptingOfferCards(),
+          () => _temptingOfferFlow.ShowTemptingOfferCards()
+        )
+      );
+      return;
+    }
+
+    if (name == "FocusEssenceCamera")
+    {
+      StartCoroutine(FocusSiteFlow("FocusEssenceCamera", null, null));
+      return;
+    }
+
+    if (name == "FocusDraft2Camera")
+    {
+      StartCoroutine(FocusSiteFlow("FocusDraft2Camera", null, null));
+      return;
+    }
+
+    if (name == "FocusBattleCamera")
+    {
+      StartCoroutine(FocusSiteFlow("FocusBattleCamera", null, null));
     }
 
     var parts = name.Split('/');
@@ -310,7 +306,79 @@ public class PrototypeQuest : Service
     if (_temptingOfferFlow.IsTemptingOfferAction(action))
     {
       _temptingOfferFlow.HandleTemptingOfferSelection(clickedId);
-      return;
+    }
+  }
+
+  DreamscapeSite? FindSiteForAction(string action)
+  {
+    var sites = FindObjectsByType<DreamscapeSite>(
+      FindObjectsInactive.Exclude,
+      FindObjectsSortMode.None
+    );
+    for (var i = 0; i < sites.Length; i++)
+    {
+      var site = sites[i];
+      if (site != null && site.DebugClickAction == action)
+      {
+        return site;
+      }
+    }
+    return null;
+  }
+
+  void DeactivateSite(string action)
+  {
+    var site = FindSiteForAction(action);
+    if (site == null)
+    {
+      throw new InvalidOperationException($"No site found for action {action}");
+    }
+    site.SetActiveWithoutFocus(false);
+  }
+
+  IEnumerator FocusSiteFlow(string action, Func<IEnumerator>? prepare, Func<IEnumerator>? onFocused)
+  {
+    EnsureFlowsInitialized();
+    var site = FindSiteForAction(action);
+    if (site == null)
+    {
+      throw new InvalidOperationException($"No site found for action {action}");
+    }
+    if (_mapCamera == null)
+    {
+      throw new InvalidOperationException("Map camera is not assigned.");
+    }
+    if (prepare != null)
+    {
+      var routine = prepare();
+      if (routine == null)
+      {
+        throw new InvalidOperationException($"Prepare routine missing for action {action}");
+      }
+      yield return StartCoroutine(routine);
+    }
+    yield return StartCoroutine(_mapCamera.FocusSite(site));
+    if (onFocused != null)
+    {
+      var routine = onFocused();
+      if (routine == null)
+      {
+        throw new InvalidOperationException($"OnFocused routine missing for action {action}");
+      }
+      yield return StartCoroutine(routine);
+    }
+  }
+
+  IEnumerator ReturnToMap()
+  {
+    if (_mapCamera == null)
+    {
+      throw new InvalidOperationException("Map camera is not assigned.");
+    }
+    _mapCamera.ActivateWithTransition();
+    while (_mapCamera.IsTransitioning)
+    {
+      yield return null;
     }
   }
 
@@ -323,12 +391,10 @@ public class PrototypeQuest : Service
       yield break;
     }
 
-    _closeButtonWasActiveBeforeBrowse = Registry
-      .DreamscapeService
-      .CloseButton
-      .gameObject
-      .activeSelf;
-    SetSiteButtonsActive(false);
+    if (_mapCamera != null)
+    {
+      _mapCamera.HideSiteButtons();
+    }
 
     var request = new CreateOrUpdateCardsRequest
     {
@@ -385,188 +451,10 @@ public class PrototypeQuest : Service
     _prototypeCards.CreateOrUpdateCards(request);
     yield return StartCoroutine(CreateOrUpdateCards(request, animate: true));
 
-    SetSiteButtonsActive(true);
-    if (!_closeButtonWasActiveBeforeBrowse)
+    if (_mapCamera != null)
     {
-      Registry.DreamscapeService.CloseButton.gameObject.SetActive(false);
+      _mapCamera.ShowSiteButtons();
     }
-  }
-
-  public void FocusSpaceCameraFar()
-  {
-    ResetPrioritiesAndTrack(null, false);
-    _spaceCameraFar.Priority = 10;
-  }
-
-  public void FocusSpaceCameraNear()
-  {
-    ResetPrioritiesAndTrack(null, false);
-    _spaceCameraNear.Priority = 10;
-  }
-
-  public void FocusMapCamera()
-  {
-    ResetPrioritiesAndTrack(null, true);
-    _mapCamera.Priority = 10;
-  }
-
-  public void FocusDraftCamera()
-  {
-    EnsureFlowsInitialized();
-    StartCoroutine(_draftFlow.PrepareDraftDeck());
-    ResetPrioritiesAndTrack(
-      _draftTrackingTarget,
-      false,
-      () =>
-      {
-        StartCoroutine(_draftFlow.RunDraftPickSequence());
-      }
-    );
-    _draftCamera.Priority = 10;
-  }
-
-  public void FocusShopCamera()
-  {
-    EnsureFlowsInitialized();
-    StartCoroutine(_shopFlow.PrepareShopCards());
-    ResetPrioritiesAndTrack(
-      _shopTrackingTarget,
-      false,
-      () =>
-      {
-        StartCoroutine(_shopFlow.RunShopDisplaySequence());
-      }
-    );
-
-    _shopCamera.Priority = 10;
-  }
-
-  public void FocusEventCamera()
-  {
-    EnsureFlowsInitialized();
-    StartCoroutine(_temptingOfferFlow.PrepareTemptingOfferCards());
-    ResetPrioritiesAndTrack(
-      _eventTrackingTarget,
-      false,
-      () =>
-      {
-        StartCoroutine(_temptingOfferFlow.ShowTemptingOfferCards());
-      }
-    );
-    _eventCamera.Priority = 10;
-  }
-
-  public void FocusEssenceCamera()
-  {
-    ResetPrioritiesAndTrack(_essenceTrackingTarget, false);
-    _essenceCamera.Priority = 10;
-  }
-
-  public void FocusDraft2Camera()
-  {
-    ResetPrioritiesAndTrack(_draft2TrackingTarget, false);
-    _draft2Camera.Priority = 10;
-  }
-
-  public void FocusBattleCamera()
-  {
-    ResetPrioritiesAndTrack(_battleTrackingTarget, false);
-    _battleCamera.Priority = 10;
-  }
-
-  void ResetPrioritiesAndTrack(
-    Transform? track,
-    bool showSiteButtons,
-    Action? onCameraMoveFinished = null
-  )
-  {
-    // Cancel any pending site-button activation and hide them immediately
-    if (_siteButtonsActivationCoroutine != null)
-    {
-      StopCoroutine(_siteButtonsActivationCoroutine);
-      _siteButtonsActivationCoroutine = null;
-    }
-
-    _spaceCameraFar.Priority = 0;
-    _spaceCameraNear.Priority = 0;
-    _mapCamera.Priority = 0;
-    _draftCamera.Priority = 0;
-    _shopCamera.Priority = 0;
-    _eventCamera.Priority = 0;
-    _essenceCamera.Priority = 0;
-    _draft2Camera.Priority = 0;
-    _battleCamera.Priority = 0;
-
-    SetSiteButtonsActive(false);
-
-    if (track)
-    {
-      _spaceCameraFar.Target.TrackingTarget = track;
-      _spaceCameraNear.Target.TrackingTarget = track;
-      _mapCamera.Target.TrackingTarget = track;
-      _draftCamera.Target.TrackingTarget = track;
-      _shopCamera.Target.TrackingTarget = track;
-      _eventCamera.Target.TrackingTarget = track;
-      _essenceCamera.Target.TrackingTarget = track;
-      _draft2Camera.Target.TrackingTarget = track;
-      _battleCamera.Target.TrackingTarget = track;
-    }
-
-    // Defer site button display and/or completion callback until after the blend/transition completes
-    if (showSiteButtons || onCameraMoveFinished != null)
-    {
-      _siteButtonsActivationCoroutine = StartCoroutine(
-        WaitForTransitionThen(() =>
-        {
-          if (showSiteButtons)
-          {
-            SetSiteButtonsActive(true);
-          }
-          onCameraMoveFinished?.Invoke();
-        })
-      );
-    }
-  }
-
-  void SetSiteButtonsActive(bool active)
-  {
-    if (_siteButtons == null)
-    {
-      return;
-    }
-
-    foreach (var button in _siteButtons)
-    {
-      if (button != null)
-      {
-        button.gameObject.SetActive(active);
-      }
-    }
-
-    foreach (var effect in _highlightEffects)
-    {
-      if (effect != null)
-      {
-        effect.highlighted = active;
-      }
-    }
-
-    Registry.DreamscapeService.CloseButton.gameObject.SetActive(active);
-  }
-
-  IEnumerator WaitForTransitionThen(Action afterBlend)
-  {
-    // Wait a frame so Cinemachine can start the blend
-    yield return null;
-    if (_brain != null)
-    {
-      while (_brain.IsBlending)
-      {
-        yield return null;
-      }
-    }
-    afterBlend?.Invoke();
-    _siteButtonsActivationCoroutine = null;
   }
 
   IEnumerator CreateOrUpdateCards(CreateOrUpdateCardsRequest request, bool animate = true)

@@ -1,7 +1,9 @@
 #nullable enable
 
+using System;
 using System.Collections;
 using Dreamtides.Layout;
+using Dreamtides.Services;
 using Unity.Cinemachine;
 using UnityEngine;
 
@@ -34,10 +36,19 @@ namespace Dreamtides.Components
     float _portraitCameraDistanceModifier = 0f;
 
     [SerializeField]
+    Guid _siteId = Guid.NewGuid();
+
+    [SerializeField]
     bool _isActive = true;
 
     [SerializeField]
     string _buttonLabel = string.Empty;
+
+    [SerializeField]
+    string _debugClickAction = string.Empty;
+
+    [SerializeField]
+    ObjectLayout? _characterOwnedObjects;
 
     DreamscapeMapCamera? _mapCamera;
     Coroutine? _activationRoutine;
@@ -53,6 +64,12 @@ namespace Dreamtides.Components
     public bool IsActive => _isActive;
 
     public string ButtonLabel => _buttonLabel;
+
+    public string DebugClickAction => _debugClickAction;
+
+    public Guid SiteId => _siteId;
+
+    public ObjectLayout? CharacterOwnedObjects => _characterOwnedObjects;
 
     public void SetActive(bool isActive)
     {
@@ -89,6 +106,25 @@ namespace Dreamtides.Components
     public void SetMapCamera(DreamscapeMapCamera mapCamera)
     {
       _mapCamera = mapCamera;
+    }
+
+    internal void SetActiveWithoutFocus(bool isActive)
+    {
+      EnsureCameraDefaults();
+      _isActive = isActive;
+      if (_isActive && _hasCameraDefaults)
+      {
+        ApplyCameraState();
+      }
+      else if (!_isActive)
+      {
+        if (_activationRoutine != null)
+        {
+          StopCoroutine(_activationRoutine);
+          _activationRoutine = null;
+        }
+        ResetCameraPriorities();
+      }
     }
 
     protected override void OnInitialize()
@@ -229,6 +265,7 @@ namespace Dreamtides.Components
         return false;
       }
 
+      mapCamera.HideSiteButtons();
       _activationRoutine = StartCoroutine(FocusThenActivate(mapCamera));
       return true;
     }

@@ -537,7 +537,7 @@ namespace Dreamtides.Services
 
       if (position.PositionClass.SiteNpc is { } siteNpc)
       {
-        return Registry.DreamscapeService.SiteNpcLayout(siteNpc);
+        return Registry.DreamscapeService.SiteCharacterOwnedLayout(siteNpc);
       }
 
       if (position.PositionClass.TemptingOfferDisplay is { } _)
