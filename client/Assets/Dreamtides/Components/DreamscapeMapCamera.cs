@@ -57,7 +57,7 @@ namespace Dreamtides.Components
       }
 
       var sites = FindObjectsByType<DreamscapeSite>(
-        FindObjectsInactive.Include,
+        FindObjectsInactive.Exclude,
         FindObjectsSortMode.None
       );
 
