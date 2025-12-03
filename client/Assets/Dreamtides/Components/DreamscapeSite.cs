@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections;
+using Dreamtides.Animations;
 using Dreamtides.Layout;
 using Dreamtides.Services;
 using Unity.Cinemachine;
@@ -50,6 +51,12 @@ namespace Dreamtides.Components
     [SerializeField]
     ObjectLayout? _characterOwnedObjects;
 
+    [SerializeField]
+    Transform _characterSpeechPosition = null!;
+
+    [SerializeField]
+    MecanimAnimator _characterAnimator = null!;
+
     DreamscapeMapCamera? _mapCamera;
     Coroutine? _activationRoutine;
     bool _hasCameraDefaults;
@@ -80,6 +87,10 @@ namespace Dreamtides.Components
     }
 
     public ObjectLayout? CharacterOwnedObjects => _characterOwnedObjects;
+
+    public Transform CharacterSpeechPosition => _characterSpeechPosition;
+
+    public MecanimAnimator CharacterAnimator => _characterAnimator;
 
     public void SetActive(bool isActive)
     {

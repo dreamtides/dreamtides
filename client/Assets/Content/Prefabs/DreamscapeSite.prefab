@@ -97,6 +97,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 4544532225486704286}
+  - {fileID: 3824390607779571145}
   - {fileID: 3228186663407755476}
   - {fileID: 3047104974621718026}
   - {fileID: 9083211337754327858}
@@ -125,10 +126,13 @@ MonoBehaviour:
   _landscapeCameraTargetSide: 0
   _landscapeCameraDistanceModifier: 0
   _portraitCameraDistanceModifier: 0
+  _siteId: f9049049-d923-4f36-9e99-d92650a21020
   _isActive: 0
   _buttonLabel: 
   _debugClickAction: 
   _characterOwnedObjects: {fileID: 3780478768706367561}
+  _characterSpeechPosition: {fileID: 3824390607779571145}
+  _characterAnimator: {fileID: 2049607664273054832}
 --- !u!1 &5498483509857837682
 GameObject:
   m_ObjectHideFlags: 0
@@ -346,6 +350,37 @@ MonoBehaviour:
       BarrelClipping: 0.25
       Anamorphism: 0
   BlendHint: 0
+--- !u!1 &6999279610083786070
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3824390607779571145}
+  m_Layer: 0
+  m_Name: CharacterSpeechBubblePosition
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3824390607779571145
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6999279610083786070}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.3, y: 1.561, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 5031337343486914852}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &7752359343866267052
 GameObject:
   m_ObjectHideFlags: 0
@@ -509,9 +544,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9e592afe68a2c483c8dc4efb5704e8f5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Dreamtides::Dreamtides.Components.MecanimAnimator
-  _animator: {fileID: 0}
+  _animator: {fileID: 7633961113495704804}
 --- !u!4 &4544532225486704286 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3018307872006529140, guid: 5e0e7c8c9d3d5dd4da2d66bbedbca832, type: 3}
+  m_PrefabInstance: {fileID: 1653459878423146218}
+  m_PrefabAsset: {fileID: 0}
+--- !u!95 &7633961113495704804 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 9152163059916814862, guid: 5e0e7c8c9d3d5dd4da2d66bbedbca832, type: 3}
   m_PrefabInstance: {fileID: 1653459878423146218}
   m_PrefabAsset: {fileID: 0}

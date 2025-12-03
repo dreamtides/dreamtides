@@ -22,12 +22,6 @@ namespace Dreamtides.Services
     ObjectLayout _tmpTemptingOfferNpcLayout = null!;
 
     [SerializeField]
-    Transform _tmpMerchantSpeechPosition = null!;
-
-    [SerializeField]
-    MecanimAnimator _tmpMerchantAnimator = null!;
-
-    [SerializeField]
     CanvasGroup _closeButton = null!;
 
     [SerializeField]
@@ -136,7 +130,9 @@ namespace Dreamtides.Services
 
     public IEnumerator HandlePlayMecanimAnimation(PlayMecanimAnimationCommand command)
     {
-      return _tmpMerchantAnimator.PlayAnimation(command);
+      var site = FindSite(command.SiteId);
+      var animator = Errors.CheckNotNull(site.CharacterAnimator);
+      return animator.PlayAnimation(command);
     }
 
     public ObjectLayout SiteDeckLayout(Guid siteId)
@@ -161,7 +157,8 @@ namespace Dreamtides.Services
 
     public Transform CharacterScreenAnchorPosition(Guid merchantId)
     {
-      return _tmpMerchantSpeechPosition;
+      var site = FindSite(merchantId);
+      return Errors.CheckNotNull(site.CharacterSpeechPosition);
     }
 
     DreamscapeSite FindSite(Guid siteId)
