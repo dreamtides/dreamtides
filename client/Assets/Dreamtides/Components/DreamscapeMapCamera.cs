@@ -38,10 +38,13 @@ namespace Dreamtides.Components
     List<DreamscapeSite> _sites = new();
 
     readonly Dictionary<DreamscapeSite, CanvasButton> _siteButtonsBySite = new();
+    readonly Dictionary<DreamscapeSite, Vector2> _siteButtonPositions = new();
 
     Coroutine? _transitionRoutine;
     Coroutine? _positionRoutine;
     bool _siteButtonsVisible;
+    bool _initialFramingComplete;
+    bool _hasCachedSiteButtonPositions;
 
     public CinemachineCamera Camera => _camera;
 
@@ -198,6 +201,9 @@ namespace Dreamtides.Components
           _focusSiteCamera.Priority = 0;
         }
         DeactivateAllSites();
+        yield return new WaitForSeconds(_fromSiteTransitionWaitDuration);
+        SyncFocusSitePosition();
+        ShowSiteButtons();
         _transitionRoutine = null;
         yield break;
       }
@@ -434,9 +440,27 @@ namespace Dreamtides.Components
         return;
       }
 
+      if (
+        _hasCachedSiteButtonPositions
+        && _siteButtonPositions.Count == _siteButtonsBySite.Count
+        && _siteButtonPositions.Count > 0
+      )
+      {
+        foreach (var kvp in _siteButtonPositions)
+        {
+          if (_siteButtonsBySite.TryGetValue(kvp.Key, out var cachedButton) && cachedButton != null)
+          {
+            var rect = cachedButton.GetComponent<RectTransform>();
+            rect.anchoredPosition = kvp.Value;
+          }
+        }
+        return;
+      }
+
       EnsureSiteButtons();
       var worldPositions = new List<Vector3>(_sites.Count);
       var buttonRects = new List<RectTransform>(_sites.Count);
+      var orderedSites = new List<DreamscapeSite>(_sites.Count);
       for (var i = 0; i < _sites.Count; i++)
       {
         var site = _sites[i];
@@ -450,15 +474,29 @@ namespace Dreamtides.Components
         }
         worldPositions.Add(site.transform.position);
         buttonRects.Add(button.GetComponent<RectTransform>());
+        orderedSites.Add(site);
       }
 
-      if (worldPositions.Count == 0 || buttonRects.Count != worldPositions.Count)
+      if (
+        worldPositions.Count == 0
+        || buttonRects.Count != worldPositions.Count
+        || orderedSites.Count != worldPositions.Count
+      )
       {
         return;
       }
 
       var positioner = new DreamscapeSiteButtonPositioner(viewport, Registry.CanvasSafeArea);
-      positioner.PositionButtons(worldPositions, buttonRects);
+      var resolved = positioner.PositionButtons(worldPositions, buttonRects);
+      if (!_initialFramingComplete)
+      {
+        return;
+      }
+      for (var i = 0; i < resolved.Count; i++)
+      {
+        _siteButtonPositions[orderedSites[i]] = resolved[i];
+      }
+      _hasCachedSiteButtonPositions = _siteButtonPositions.Count == orderedSites.Count;
     }
 
     void SchedulePositionSiteButtons()
@@ -477,6 +515,7 @@ namespace Dreamtides.Components
     IEnumerator PositionSiteButtonsNextFrame()
     {
       yield return new WaitForEndOfFrame();
+      _initialFramingComplete = true;
       PositionSiteButtons();
       _positionRoutine = null;
     }
