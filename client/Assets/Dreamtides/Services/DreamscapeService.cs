@@ -16,9 +16,6 @@ namespace Dreamtides.Services
   public class DreamscapeService : Service
   {
     [SerializeField]
-    ObjectLayout _tmpSiteDeckLayout = null!;
-
-    [SerializeField]
     ObjectLayout _tmpTemptingOfferNpcLayout = null!;
 
     [SerializeField]
@@ -101,8 +98,6 @@ namespace Dreamtides.Services
       Registry.DreamscapeLayout.JourneyChoiceDisplay.ApplyLayout(sequence);
       Registry.DreamscapeLayout.TemptingOfferDisplay.ApplyLayout(sequence);
       Registry.DreamscapeLayout.QuestEffectPosition.ApplyLayout(sequence);
-
-      _tmpSiteDeckLayout.ApplyLayout(sequence);
       ApplySiteOwnedLayouts(sequence);
     }
 
@@ -137,12 +132,8 @@ namespace Dreamtides.Services
 
     public ObjectLayout SiteDeckLayout(Guid siteId)
     {
-      if (siteId == PrototypeQuest.DraftSiteId)
-      {
-        return _tmpSiteDeckLayout;
-      }
-
-      throw new InvalidOperationException($"Unknown site id: ${siteId}");
+      var site = FindSite(siteId);
+      return site.SiteDeckLayout;
     }
 
     public ObjectLayout SiteCharacterOwnedLayout(Guid siteId)

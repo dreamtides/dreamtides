@@ -2,7 +2,6 @@
 
 using System;
 using System.Collections;
-using Dreamtides.Animations;
 using Dreamtides.Layout;
 using Dreamtides.Services;
 using Unity.Cinemachine;
@@ -28,6 +27,15 @@ namespace Dreamtides.Components
     CinemachineCamera _targetScreenTopCamera = null!;
 
     [SerializeField]
+    CinemachineCamera _targetDraftSiteCamera = null!;
+
+    [SerializeField]
+    GameObject _siteCharacter = null!;
+
+    [SerializeField]
+    bool _draftSite;
+
+    [SerializeField]
     LandscapeCameraTargetSide _landscapeCameraTargetSide = LandscapeCameraTargetSide.Left;
 
     [SerializeField]
@@ -49,7 +57,10 @@ namespace Dreamtides.Components
     string _debugClickAction = string.Empty;
 
     [SerializeField]
-    ObjectLayout? _characterOwnedObjects;
+    ObjectLayout _characterOwnedObjects = null!;
+
+    [SerializeField]
+    ObjectLayout _siteDeckLayout = null!;
 
     [SerializeField]
     Transform _characterSpeechPosition = null!;
@@ -66,6 +77,8 @@ namespace Dreamtides.Components
     float _targetScreenLeftBaseDistance;
     float _targetScreenRightBaseDistance;
     float _targetScreenTopBaseDistance;
+    Vector3 _targetDraftSiteBaseDirection;
+    float _targetDraftSiteBaseDistance;
     CinemachineCamera? _activeCamera;
 
     public bool IsActive => _isActive;
@@ -86,11 +99,18 @@ namespace Dreamtides.Components
       }
     }
 
-    public ObjectLayout? CharacterOwnedObjects => _characterOwnedObjects;
+    public ObjectLayout CharacterOwnedObjects => _characterOwnedObjects;
+
+    public ObjectLayout SiteDeckLayout => _siteDeckLayout;
 
     public Transform CharacterSpeechPosition => _characterSpeechPosition;
 
     public MecanimAnimator CharacterAnimator => _characterAnimator;
+
+    protected override void OnStart()
+    {
+      _siteCharacter.SetActive(!_draftSite);
+    }
 
     public void SetActive(bool isActive)
     {
@@ -187,6 +207,11 @@ namespace Dreamtides.Components
         out _targetScreenTopBaseDirection,
         out _targetScreenTopBaseDistance
       );
+      CacheCameraDefaults(
+        _targetDraftSiteCamera,
+        out _targetDraftSiteBaseDirection,
+        out _targetDraftSiteBaseDistance
+      );
       _hasCameraDefaults = true;
     }
 
@@ -194,6 +219,26 @@ namespace Dreamtides.Components
     {
       if (!_hasCameraDefaults)
       {
+        return;
+      }
+      if (_draftSite)
+      {
+        if (_targetDraftSiteCamera == null)
+        {
+          ResetCameraPriorities();
+          return;
+        }
+        ApplyDistanceModifier(
+          _targetDraftSiteCamera,
+          _targetDraftSiteBaseDirection,
+          _targetDraftSiteBaseDistance,
+          0f
+        );
+        SetCameraTarget(_targetDraftSiteCamera);
+        if (_activeCamera != _targetDraftSiteCamera)
+        {
+          SetActiveCamera(_targetDraftSiteCamera);
+        }
         return;
       }
       var viewport = Registry.GameViewport;
@@ -220,6 +265,11 @@ namespace Dreamtides.Components
           ? _targetScreenLeftCamera
           : _targetScreenRightCamera
         : _targetScreenTopCamera;
+      if (activeCamera == null)
+      {
+        ResetCameraPriorities();
+        return;
+      }
       SetCameraTarget(activeCamera);
       if (_activeCamera != activeCamera)
       {
@@ -233,6 +283,12 @@ namespace Dreamtides.Components
       out float baseDistance
     )
     {
+      if (camera == null)
+      {
+        baseDirection = Vector3.back;
+        baseDistance = 1f;
+        return;
+      }
       var localPosition = camera.transform.localPosition;
       baseDirection =
         localPosition.sqrMagnitude < Mathf.Epsilon ? Vector3.back : localPosition.normalized;
@@ -246,29 +302,63 @@ namespace Dreamtides.Components
       float modifier
     )
     {
+      if (camera == null)
+      {
+        return;
+      }
       var distance = Mathf.Max(0.01f, baseDistance + modifier);
       camera.transform.localPosition = baseDirection * distance;
     }
 
     void SetActiveCamera(CinemachineCamera activeCamera)
     {
-      _targetScreenLeftCamera.Priority = _targetScreenLeftCamera == activeCamera ? 10 : 0;
-      _targetScreenRightCamera.Priority = _targetScreenRightCamera == activeCamera ? 10 : 0;
-      _targetScreenTopCamera.Priority = _targetScreenTopCamera == activeCamera ? 10 : 0;
+      if (_targetScreenLeftCamera != null)
+      {
+        _targetScreenLeftCamera.Priority = _targetScreenLeftCamera == activeCamera ? 10 : 0;
+      }
+      if (_targetScreenRightCamera != null)
+      {
+        _targetScreenRightCamera.Priority = _targetScreenRightCamera == activeCamera ? 10 : 0;
+      }
+      if (_targetScreenTopCamera != null)
+      {
+        _targetScreenTopCamera.Priority = _targetScreenTopCamera == activeCamera ? 10 : 0;
+      }
+      if (_targetDraftSiteCamera != null)
+      {
+        _targetDraftSiteCamera.Priority = _targetDraftSiteCamera == activeCamera ? 10 : 0;
+      }
       _activeCamera = activeCamera;
     }
 
     void ResetCameraPriorities()
     {
-      _targetScreenLeftCamera.Priority = 0;
-      _targetScreenRightCamera.Priority = 0;
-      _targetScreenTopCamera.Priority = 0;
+      if (_targetScreenLeftCamera != null)
+      {
+        _targetScreenLeftCamera.Priority = 0;
+      }
+      if (_targetScreenRightCamera != null)
+      {
+        _targetScreenRightCamera.Priority = 0;
+      }
+      if (_targetScreenTopCamera != null)
+      {
+        _targetScreenTopCamera.Priority = 0;
+      }
+      if (_targetDraftSiteCamera != null)
+      {
+        _targetDraftSiteCamera.Priority = 0;
+      }
       _activeCamera = null;
       _activationRoutine = null;
     }
 
     void SetCameraTarget(CinemachineCamera activeCamera)
     {
+      if (activeCamera == null)
+      {
+        return;
+      }
       activeCamera.Follow = transform;
       activeCamera.LookAt = transform;
     }

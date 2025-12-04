@@ -49,3 +49,5 @@ adding "internal" to methods we need to call
 Please include argument labels for integer and booleans literals when invoking
 methods. Example: CreateTestLayout(horizontalSpacing: 12.0, forceTwoRows: false).
 Labels are not required when passing variables.
+
+Never modify Unity .unity scene files or .prefab files (e.g. Main.unity) when implementing changes.
