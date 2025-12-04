@@ -16,9 +16,6 @@ namespace Dreamtides.Services
   public class DreamscapeService : Service
   {
     [SerializeField]
-    ObjectLayout _tmpTemptingOfferNpcLayout = null!;
-
-    [SerializeField]
     CanvasGroup _closeButton = null!;
 
     [SerializeField]
@@ -138,10 +135,6 @@ namespace Dreamtides.Services
 
     public ObjectLayout SiteCharacterOwnedLayout(Guid siteId)
     {
-      if (siteId == PrototypeQuest.TemptingOfferSiteId)
-      {
-        return _tmpTemptingOfferNpcLayout;
-      }
       var site = FindSite(siteId);
       return Errors.CheckNotNull(site.CharacterOwnedObjects);
     }
