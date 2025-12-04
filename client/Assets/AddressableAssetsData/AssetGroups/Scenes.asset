@@ -15,6 +15,11 @@ MonoBehaviour:
   m_GroupName: Scenes
   m_GUID: 6dc320648746c45808d90b438b68077b
   m_SerializeEntries:
+  - m_GUID: 5ca397608bfab4ff3b0c77c54939fcf6
+    m_Address: Assets/ThirdParty/Synty/PolygonElvenRealm/Scenes/ElvenRealmCombined.unity
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 9928990c263ea444ca18b10f84527874
     m_Address: Assets/ThirdParty/Synty/PolygonElvenRealm/Scenes/ElvenRealm.unity
     m_ReadOnly: 0
