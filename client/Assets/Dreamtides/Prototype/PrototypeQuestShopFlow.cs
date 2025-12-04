@@ -117,7 +117,7 @@ public class PrototypeQuestShopFlow
       Overrides = _shopOverrides,
       ButtonAttachmentDebugScenario = "shop-pick",
     };
-    yield return _createOrUpdateCards(request, true);
+    yield return _createOrUpdateCards(request, false);
   }
 
   public IEnumerator RunShopDisplaySequence()
