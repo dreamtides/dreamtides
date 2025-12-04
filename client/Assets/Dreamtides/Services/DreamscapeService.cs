@@ -67,7 +67,22 @@ namespace Dreamtides.Services
       Registry.DreamscapeLayout.EssenceTotal.SetValue(essenceTotal.ToString(), true);
       Registry.DocumentService.RenderScreenOverlay(command.Quest.Interface?.ScreenOverlay);
       Registry.Layout.CardOrderSelector.View = command.Quest.Interface?.CardOrderSelector;
-      Registry.Layout.UndoButton.SetView(command.Quest.Interface?.UndoButton);
+      Registry.Layout.UndoButton.SetView(
+        new ButtonView
+        {
+          Action = new OnClickClass
+          {
+            DebugAction = new DebugAction
+            {
+              DebugActionClass = new DebugActionClass
+              {
+                ApplyTestScenarioAction = "FocusMapCamera",
+              },
+            },
+          },
+          Label = "U",
+        }
+      );
       Registry.Layout.DevButton.SetView(command.Quest.Interface?.DevButton);
       Registry.Layout.CloseBrowserButton.CloseAction =
         command.Quest.Interface?.Browser?.CloseButton?.ToGameAction();
