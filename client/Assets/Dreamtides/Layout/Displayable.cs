@@ -246,7 +246,7 @@ namespace Dreamtides.Layout
     public bool HasGameContext => _internalGameContext != GameContext.Unspecified;
 
     public bool IsLandscape() =>
-      Application.isPlaying && _initialized ? Registry.IsLandscape : Screen.width > Screen.height;
+      _initialized ? Registry.GameViewport.IsLandscape : Screen.width > Screen.height;
 
     public bool IsMobileDevice() =>
       Application.isPlaying && _initialized

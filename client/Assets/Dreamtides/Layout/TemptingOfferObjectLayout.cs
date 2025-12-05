@@ -24,12 +24,6 @@ namespace Dreamtides.Layout
     internal float _acceptButtonScale = 0.25f;
 
     [SerializeField]
-    internal float _landscapeScaleOverride = 1.0f;
-
-    [SerializeField]
-    internal float _landscapeHorizontalSpacingOverride = 0f;
-
-    [SerializeField]
     internal float _landscapeVerticalSpacingOverride = 0f;
 
     [SerializeField]
@@ -42,10 +36,7 @@ namespace Dreamtides.Layout
     readonly Dictionary<long, ButtonView> _buttonViewsByOfferNumber = new();
     readonly ButtonView _defaultButtonView = new() { Label = DefaultButtonLabel };
 
-    float EffectiveHorizontalSpacing =>
-      IsLandscape() && _landscapeHorizontalSpacingOverride > 0f
-        ? _landscapeHorizontalSpacingOverride
-        : HorizontalSpacing;
+    float EffectiveHorizontalSpacing => HorizontalSpacing();
 
     float EffectiveVerticalSpacing =>
       IsLandscape() && _landscapeVerticalSpacingOverride > 0f

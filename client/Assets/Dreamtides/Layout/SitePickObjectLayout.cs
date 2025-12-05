@@ -28,6 +28,12 @@ namespace Dreamtides.Layout
     internal bool _forceTwoRows;
 
     [SerializeField]
+    internal float _landscapeScaleOverride;
+
+    [SerializeField]
+    internal float _landscapeHorizontalSpacingOverride;
+
+    [SerializeField]
     internal RectTransform? _closeSiteButton;
 
     [SerializeField]
@@ -43,10 +49,58 @@ namespace Dreamtides.Layout
     readonly Dictionary<Displayable, int> _displayableToIndex = new();
     int _nextSlotIndex;
 
-    protected float HorizontalSpacing => _horizontalSpacing;
     protected float VerticalSpacing => _verticalSpacing;
     protected float CardWidth => _cardWidth;
     protected float CardHeight => _cardHeight;
+
+    public float HorizontalSpacing() =>
+      IsLandscape() && _landscapeHorizontalSpacingOverride > 0f
+        ? _landscapeHorizontalSpacingOverride
+        : _horizontalSpacing;
+
+    public override Vector3 CalculateObjectPosition(int index, int count)
+    {
+      var isLandscape = IsLandscape();
+      var horizontalSpacing = HorizontalSpacing();
+      var effectiveCount = GetEffectiveCount(count);
+      if (effectiveCount <= 0)
+      {
+        return transform.position;
+      }
+      else if (isLandscape && !_forceTwoRows)
+      {
+        var localX = ComputeHorizontalOffset(index, effectiveCount, horizontalSpacing);
+        return transform.position + transform.right * localX;
+      }
+      else
+      {
+        var topRowCount = (effectiveCount + 1) / 2;
+        var bottomRowCount = effectiveCount - topRowCount;
+
+        var isTopRow = index < topRowCount;
+        var indexInRow = isTopRow ? index : index - topRowCount;
+        var rowCount = isTopRow ? topRowCount : bottomRowCount;
+
+        var localX = ComputeHorizontalOffset(indexInRow, rowCount, horizontalSpacing);
+
+        float localY =
+          effectiveCount <= 1 ? 0f : (isTopRow ? _verticalSpacing / 2f : -_verticalSpacing / 2f);
+
+        return transform.position + transform.right * localX + transform.up * localY;
+      }
+    }
+
+    public override Vector3? CalculateObjectRotation(int index, int count) =>
+      transform.rotation.eulerAngles;
+
+    public override float? CalculateObjectScale(int index, int count)
+    {
+      if (IsLandscape() && _landscapeScaleOverride > 0f)
+      {
+        return _landscapeScaleOverride;
+      }
+      return transform.localScale.x;
+    }
 
     protected override void OnBecameNonEmpty()
     {
@@ -74,42 +128,6 @@ namespace Dreamtides.Layout
       }
     }
 
-    public override Vector3 CalculateObjectPosition(int index, int count)
-    {
-      var isLandscape = Registry.GameViewport.IsLandscape;
-      var effectiveCount = GetEffectiveCount(count);
-      if (effectiveCount <= 0)
-      {
-        return transform.position;
-      }
-      else if (isLandscape && !_forceTwoRows)
-      {
-        var localX = ComputeHorizontalOffset(index, effectiveCount, _horizontalSpacing);
-        return transform.position + transform.right * localX;
-      }
-      else
-      {
-        var topRowCount = (effectiveCount + 1) / 2;
-        var bottomRowCount = effectiveCount - topRowCount;
-
-        var isTopRow = index < topRowCount;
-        var indexInRow = isTopRow ? index : index - topRowCount;
-        var rowCount = isTopRow ? topRowCount : bottomRowCount;
-
-        var localX = ComputeHorizontalOffset(indexInRow, rowCount, _horizontalSpacing);
-
-        float localY =
-          effectiveCount <= 1 ? 0f : (isTopRow ? _verticalSpacing / 2f : -_verticalSpacing / 2f);
-
-        return transform.position + transform.right * localX + transform.up * localY;
-      }
-    }
-
-    public override Vector3? CalculateObjectRotation(int index, int count) =>
-      transform.rotation.eulerAngles;
-
-    public override float? CalculateObjectScale(int index, int count) => transform.localScale.x;
-
     protected override int GetLayoutIndexOverride(Displayable displayable, int index, int count)
     {
       if (!_preserveLayoutOnRemoval)
@@ -125,6 +143,19 @@ namespace Dreamtides.Layout
       }
 
       return slot;
+    }
+
+    protected int GetEffectiveCount(int count)
+    {
+      if (
+        _preserveLayoutOnRemoval
+        && _preservedInitialCount != null
+        && count < _preservedInitialCount.Value
+      )
+      {
+        return _preservedInitialCount.Value;
+      }
+      return count;
     }
 
     static float ComputeHorizontalOffset(int indexInRow, int rowCount, float spacing)
@@ -186,9 +217,7 @@ namespace Dreamtides.Layout
 
     Vector3 GetCloseButtonWorldPosition(Vector3 anchor)
     {
-      var offset = Registry.GameViewport.IsLandscape
-        ? _landscapeCloseButtonOffset
-        : _portraitCloseButtonOffset;
+      var offset = IsLandscape() ? _landscapeCloseButtonOffset : _portraitCloseButtonOffset;
       var worldOffset = transform.right * offset.x + transform.up * offset.y;
       return anchor + worldOffset;
     }
@@ -266,7 +295,7 @@ namespace Dreamtides.Layout
     {
       Gizmos.color = Color.blue;
       var center = transform.position;
-      var halfLayoutX = _cardWidth / 2f + _horizontalSpacing / 2f;
+      var halfLayoutX = _cardWidth / 2f + HorizontalSpacing() / 2f;
       var halfLayoutY = _cardHeight / 2f + _verticalSpacing / 2f;
 
       var right = transform.right;
@@ -277,19 +306,6 @@ namespace Dreamtides.Layout
       Gizmos.DrawSphere(center + (right * halfLayoutX + upAxis * halfLayoutY), 0.15f);
       Gizmos.DrawSphere(center + (-right * halfLayoutX - upAxis * halfLayoutY), 0.15f);
       Gizmos.DrawSphere(center + (right * halfLayoutX - upAxis * halfLayoutY), 0.15f);
-    }
-
-    protected int GetEffectiveCount(int count)
-    {
-      if (
-        _preserveLayoutOnRemoval
-        && _preservedInitialCount != null
-        && count < _preservedInitialCount.Value
-      )
-      {
-        return _preservedInitialCount.Value;
-      }
-      return count;
     }
   }
 }
