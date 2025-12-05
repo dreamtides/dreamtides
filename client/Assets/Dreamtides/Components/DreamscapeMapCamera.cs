@@ -241,6 +241,10 @@ namespace Dreamtides.Components
       _camera.Priority = MapPriority;
     }
 
+    /// <summary>
+    /// Builds a normalized viewport rect clamped by safe area anchors and configurable edge
+    /// insets for the current orientation.
+    /// </summary>
     Rect GetAllowedViewportRect(IGameViewport viewport)
     {
       var insets = viewport.IsLandscape ? _landscapeInsets : _portraitInsets;
@@ -380,6 +384,10 @@ namespace Dreamtides.Components
       }
     }
 
+    /// <summary>
+    /// Calculates required camera distance on a single axis (local x or y relative to the camera)
+    /// so the content spans within the allowed normalized viewport span.
+    /// </summary>
     static float DistanceForAxis(
       float axisValue,
       float axisDepth,

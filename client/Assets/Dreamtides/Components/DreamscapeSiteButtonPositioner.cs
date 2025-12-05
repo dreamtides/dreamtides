@@ -85,6 +85,9 @@ namespace Dreamtides.Components
       return resolved;
     }
 
+    /// <summary>
+    /// Converts the normalized allowed viewport rectangle into local safe area coordinates.
+    /// </summary>
     Rect GetAllowedLocalRect(Rect allowedViewportRect)
     {
       var canvasRect = _viewport.CanvasPixelRect;
@@ -121,6 +124,10 @@ namespace Dreamtides.Components
       return _safeArea.rect;
     }
 
+    /// <summary>
+    /// Projects a site position into local coordinates and offsets upward to sit above the site
+    /// within the allowed rect.
+    /// </summary>
     Vector2 GetDesiredPosition(Vector3 worldPosition, Vector2 halfSize, Rect allowedRect)
     {
       var screenPoint = _viewport.WorldToScreenPoint(worldPosition);
@@ -182,6 +189,10 @@ namespace Dreamtides.Components
       return indices;
     }
 
+    /// <summary>
+    /// Attempts to place a button near its desired location without overlapping prior placements
+    /// while clamping to the allowed rect.
+    /// </summary>
     Vector2 FindPosition(
       Vector2 desired,
       Vector2 halfSize,
@@ -280,6 +291,10 @@ namespace Dreamtides.Components
       return (candidate - desired).sqrMagnitude;
     }
 
+    /// <summary>
+    /// Proposes alternate candidate positions around an overlap using offsets that separate
+    /// button bounds.
+    /// </summary>
     static IEnumerable<Vector2> GenerateNeighborPositions(
       Vector2 candidate,
       Vector2 desired,
@@ -368,6 +383,9 @@ namespace Dreamtides.Components
       return new Vector2(x, y);
     }
 
+    /// <summary>
+    /// Falls back to a coarse grid scan across the allowed rect to find a non-overlapping slot.
+    /// </summary>
     Vector2? SearchGridForPosition(
       Vector2 desired,
       Vector2 halfSize,
