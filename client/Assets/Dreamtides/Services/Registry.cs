@@ -6,6 +6,7 @@ using System.Runtime.CompilerServices;
 using Dreamtides.Components;
 using Dreamtides.Layout;
 using Dreamtides.Utils;
+using Unity.Cinemachine;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
@@ -47,6 +48,10 @@ namespace Dreamtides.Services
     [SerializeField]
     internal Camera _mainCamera = null!;
     public Camera MainCamera => Check(_mainCamera);
+
+    [SerializeField]
+    internal CinemachineBrain _cinemachineBrain = null!;
+    public CinemachineBrain CinemachineBrain => Check(_cinemachineBrain);
 
     public IGameViewport GameViewport { get; private set; } = null!;
 

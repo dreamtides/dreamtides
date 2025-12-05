@@ -1,5 +1,6 @@
 #nullable enable
 
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Dreamtides.Buttons;
@@ -13,8 +14,10 @@ namespace Dreamtides.Components
 {
   public class DreamscapeMapCamera : Displayable
   {
-    static DreamscapeMapCamera? _blendOwner;
-    static CinemachineCore.GetBlendOverrideDelegate? _previousBlendOverride;
+    const int MapPriority = 70;
+    const int SitePriority = 80;
+    const int ReturnMapPriority = 90;
+    const float BlendTimeoutSeconds = 10f;
 
     [SerializeField]
     CinemachineCamera _camera = null!;
@@ -23,16 +26,24 @@ namespace Dreamtides.Components
     float _yRotation = 0f;
 
     [SerializeField]
-    CinemachineCamera _focusSiteCamera = null!;
+    AnimationCurve _mapToSiteBlendCurve = new(
+      new Keyframe(0f, 0f, 0f, 4f),
+      new Keyframe(0.2f, 0.85f, 0f, 0f),
+      new Keyframe(1f, 1f, 0f, 0f)
+    );
 
     [SerializeField]
-    float _toSiteTransitionWaitDuration = 1f;
+    AnimationCurve _siteToMapBlendCurve = new(
+      new Keyframe(0f, 0f, 0f, 0f),
+      new Keyframe(0.75f, 0.2f, 0f, 0f),
+      new Keyframe(1f, 1f, 0f, 0f)
+    );
 
     [SerializeField]
-    float _fromSiteTransitionWaitDuration = 1f;
+    float _mapToSiteBlendDuration = 2f;
 
     [SerializeField]
-    float _rotateBlendDuration = 0.3f;
+    float _siteToMapBlendDuration = 2f;
 
     [SerializeField]
     List<DreamscapeSite> _sites = new();
@@ -42,35 +53,36 @@ namespace Dreamtides.Components
 
     Coroutine? _transitionRoutine;
     Coroutine? _positionRoutine;
+    CinemachineBlenderSettings? _runtimeBlendSettings;
+    CinemachineBlenderSettings.CustomBlend[]? _baseCustomBlends;
     bool _siteButtonsVisible;
     bool _initialFramingComplete;
     bool _hasCachedSiteButtonPositions;
+    DreamscapeSite? _activeSite;
+    Transform? _defaultFollowTarget;
+    Transform? _defaultLookAtTarget;
 
     public CinemachineCamera Camera => _camera;
-
-    public CinemachineCamera FocusSiteCamera => _focusSiteCamera;
 
     public bool IsTransitioning => _transitionRoutine != null;
 
     public void ActivateWithTransition()
     {
-      // All of this logic basically exists to make the site <-> map camera
-      // transition look slightly better. We use a two-camera setup so that the
-      // camera "pulls back" to the map view while keeping the site in focus.
-      // It's not really necessary, but I find it satisfying to watch.
-
       if (_camera == null)
       {
-        return;
+        throw new InvalidOperationException("Map camera is not assigned.");
       }
 
-      FrameSites();
-      HideSiteButtons();
+      // All of this logic exists to make the site <-> map camera
+      // transition keep the site centered through the blend.
+      // It's not really necessary, but I find it satisfying to watch.
       if (_transitionRoutine != null)
       {
         StopCoroutine(_transitionRoutine);
       }
 
+      FrameSites();
+      HideSiteButtons();
       _transitionRoutine = StartCoroutine(TransitionToMap());
     }
 
@@ -78,15 +90,10 @@ namespace Dreamtides.Components
     {
       if (_camera == null)
       {
-        return;
+        throw new InvalidOperationException("Map camera is not assigned.");
       }
 
       var viewport = ResolveViewport();
-      if (viewport == null)
-      {
-        return;
-      }
-
       var sites = FindObjectsByType<DreamscapeSite>(
         FindObjectsInactive.Exclude,
         FindObjectsSortMode.None
@@ -103,7 +110,6 @@ namespace Dreamtides.Components
         }
 
         _sites.Add(site);
-        site.SetMapCamera(this);
         if (!site.gameObject.scene.isLoaded || !site.gameObject.activeInHierarchy)
         {
           continue;
@@ -114,7 +120,7 @@ namespace Dreamtides.Components
 
       if (positions.Count == 0)
       {
-        return;
+        throw new InvalidOperationException("No dreamscape sites found to frame.");
       }
 
       var bounds = new Bounds(positions[0], Vector3.zero);
@@ -146,201 +152,22 @@ namespace Dreamtides.Components
       var position = bounds.center - rotation * (Vector3.forward * requiredDistance);
       SetLensFieldOfView();
       _camera.transform.SetPositionAndRotation(position, rotation);
-      SyncFocusSitePosition();
       PositionSiteButtons();
-    }
-
-    protected override void OnInitialize()
-    {
-      ApplyBlendOverride();
-    }
-
-    protected override void OnStart()
-    {
-      FrameSites();
-      EnsureSiteButtons();
-      PositionSiteButtons();
-      SchedulePositionSiteButtons();
-      ShowSiteButtons();
-    }
-
-    void SetLensFieldOfView()
-    {
-      var lens = _camera.Lens;
-      lens.FieldOfView = 60f;
-      _camera.Lens = lens;
-    }
-
-    public IEnumerator FocusOnSite(DreamscapeSite site)
-    {
-      if (_focusSiteCamera == null)
-      {
-        yield break;
-      }
-
-      SyncFocusSitePosition();
-      SetFocusSiteLens();
-      _focusSiteCamera.Follow = site.transform;
-      _focusSiteCamera.LookAt = site.transform;
-      AimFocusSiteCamera(site.transform);
-      _focusSiteCamera.Priority = 0;
-      _camera.Priority = 0;
-      yield return new WaitForSeconds(_toSiteTransitionWaitDuration);
-      SyncFocusSitePosition();
-    }
-
-    IEnumerator TransitionToMap()
-    {
-      var activeSite = GetActiveSite();
-      var targetTransform = activeSite != null ? activeSite.transform : null;
-      if (_focusSiteCamera == null || targetTransform == null)
-      {
-        _camera.Priority = 10;
-        if (_focusSiteCamera != null)
-        {
-          _focusSiteCamera.Priority = 0;
-        }
-        DeactivateAllSites();
-        yield return new WaitForSeconds(_fromSiteTransitionWaitDuration);
-        SyncFocusSitePosition();
-        ShowSiteButtons();
-        _transitionRoutine = null;
-        yield break;
-      }
-
-      ConfigureFocusSiteCamera(targetTransform, _camera.transform.position);
-      _camera.Priority = 0;
-      _focusSiteCamera.Priority = 20;
-      yield return new WaitForSeconds(_fromSiteTransitionWaitDuration);
-      DeactivateAllSites();
-      _camera.Priority = 21;
-      _focusSiteCamera.Priority = 0;
-      yield return new WaitForSeconds(_fromSiteTransitionWaitDuration);
-      SyncFocusSitePosition();
-      ShowSiteButtons();
-      _transitionRoutine = null;
-    }
-
-    void ConfigureFocusSiteCamera(Transform target, Vector3 mapPosition)
-    {
-      SetFocusSiteLens();
-      _focusSiteCamera.Follow = target;
-      _focusSiteCamera.LookAt = target;
-      _focusSiteCamera.transform.position = mapPosition;
-      AimFocusSiteCamera(target);
-    }
-
-    void SetFocusSiteLens()
-    {
-      var lens = _focusSiteCamera.Lens;
-      lens.FieldOfView = 60f;
-      _focusSiteCamera.Lens = lens;
-    }
-
-    void SyncFocusSitePosition()
-    {
-      if (_focusSiteCamera == null)
-      {
-        return;
-      }
-
-      _focusSiteCamera.transform.position = _camera.transform.position;
-    }
-
-    void OnDestroy()
-    {
-      if (_blendOwner != this)
-      {
-        return;
-      }
-
-      CinemachineCore.GetBlendOverride = _previousBlendOverride;
-      _blendOwner = null;
-    }
-
-    void AimFocusSiteCamera(Transform target)
-    {
-      if (_focusSiteCamera == null)
-      {
-        return;
-      }
-
-      var direction = target.position - _focusSiteCamera.transform.position;
-      _focusSiteCamera.transform.rotation =
-        direction.sqrMagnitude < Mathf.Epsilon
-          ? _camera.transform.rotation
-          : Quaternion.LookRotation(direction, Vector3.up);
-    }
-
-    void ApplyBlendOverride()
-    {
-      if (_focusSiteCamera == null || _camera == null)
-      {
-        return;
-      }
-
-      _blendOwner = this;
-      _previousBlendOverride ??= CinemachineCore.GetBlendOverride;
-      CinemachineCore.GetBlendOverride = BlendOverride;
-    }
-
-    CinemachineBlendDefinition BlendOverride(
-      ICinemachineCamera from,
-      ICinemachineCamera to,
-      CinemachineBlendDefinition defaultBlend,
-      Object _owner
-    )
-    {
-      if (_blendOwner == this && IsFocusBlend(from, to))
-      {
-        return new CinemachineBlendDefinition(
-          CinemachineBlendDefinition.Styles.EaseInOut,
-          _rotateBlendDuration
-        );
-      }
-
-      return _previousBlendOverride != null
-        ? _previousBlendOverride(from, to, defaultBlend, _owner)
-        : defaultBlend;
-    }
-
-    bool IsFocusBlend(ICinemachineCamera from, ICinemachineCamera to)
-    {
-      return (ReferenceEquals(from, _focusSiteCamera) && ReferenceEquals(to, _camera))
-        || (ReferenceEquals(from, _camera) && ReferenceEquals(to, _focusSiteCamera));
-    }
-
-    DreamscapeSite? GetActiveSite()
-    {
-      for (var i = 0; i < _sites.Count; i++)
-      {
-        var site = _sites[i];
-        if (site != null && site.IsActive)
-        {
-          return site;
-        }
-      }
-
-      return null;
-    }
-
-    void DeactivateAllSites()
-    {
-      for (var i = 0; i < _sites.Count; i++)
-      {
-        var site = _sites[i];
-        if (site != null)
-        {
-          site.SetActiveWithoutFocus(false);
-        }
-      }
     }
 
     public IEnumerator FocusSite(DreamscapeSite site)
     {
+      if (site == null)
+      {
+        throw new InvalidOperationException("Site is required.");
+      }
       HideSiteButtons();
-      site.SetActiveWithoutFocus(true);
-      yield return FocusOnSite(site);
+      if (_transitionRoutine != null)
+      {
+        StopCoroutine(_transitionRoutine);
+      }
+      _transitionRoutine = StartCoroutine(TransitionToSite(site));
+      yield return _transitionRoutine;
     }
 
     public void HideSiteButtons()
@@ -379,15 +206,258 @@ namespace Dreamtides.Components
       Registry.DreamscapeService.CloseButton.gameObject.SetActive(true);
     }
 
-    void EnsureSiteButtons()
+    protected override void OnInitialize()
     {
-      if (_sites.Count == 0)
+      CacheDefaultTargets();
+      ValidateBlendCurves();
+    }
+
+    protected override void OnStart()
+    {
+      FrameSites();
+      EnsureSiteButtons();
+      PositionSiteButtons();
+      SchedulePositionSiteButtons();
+      ShowSiteButtons();
+      _camera.Priority = MapPriority;
+    }
+
+    void SetLensFieldOfView()
+    {
+      var lens = _camera.Lens;
+      lens.FieldOfView = 60f;
+      _camera.Lens = lens;
+    }
+
+    IEnumerator TransitionToSite(DreamscapeSite site)
+    {
+      var brain = ResolveBrain();
+      var viewport = ResolveViewport();
+      DeactivateOtherSites(site);
+      _activeSite = site;
+      var siteCamera = site.ActivateForViewport(viewport, SitePriority);
+      ApplyBlendSettings(siteCamera);
+      SetMapCameraFocus(site.transform);
+      _camera.Priority = MapPriority;
+      yield return WaitForBlend(brain, siteCamera);
+      _transitionRoutine = null;
+    }
+
+    IEnumerator TransitionToMap()
+    {
+      var brain = ResolveBrain();
+      var activeSite = GetActiveSite();
+      if (activeSite == null)
       {
-        return;
+        RestoreMapCameraFocus();
+        _camera.Priority = MapPriority;
+        ShowSiteButtons();
+        _transitionRoutine = null;
+        yield break;
       }
 
       var viewport = ResolveViewport();
-      if (viewport == null)
+      var siteCamera = activeSite.GetActiveCamera(viewport);
+      ApplyBlendSettings(siteCamera);
+      SetMapCameraFocus(activeSite.transform);
+      _camera.Priority = ReturnMapPriority;
+      yield return WaitForBlend(brain, _camera);
+      DeactivateAllSites();
+      RestoreMapCameraFocus();
+      _camera.Priority = MapPriority;
+      ShowSiteButtons();
+      _transitionRoutine = null;
+    }
+
+    CinemachineBrain ResolveBrain()
+    {
+      var brain = Registry.CinemachineBrain;
+      if (brain == null)
+      {
+        throw new InvalidOperationException("CinemachineBrain is not available.");
+      }
+      return brain;
+    }
+
+    void CacheDefaultTargets()
+    {
+      if (_camera == null)
+      {
+        throw new InvalidOperationException("Map camera is not assigned.");
+      }
+      _defaultFollowTarget = _camera.Follow;
+      _defaultLookAtTarget = _camera.LookAt;
+    }
+
+    void SetMapCameraFocus(Transform target)
+    {
+      if (target == null)
+      {
+        throw new InvalidOperationException("Focus target is required.");
+      }
+      _camera.Follow = target;
+      _camera.LookAt = target;
+    }
+
+    void RestoreMapCameraFocus()
+    {
+      _camera.Follow = _defaultFollowTarget;
+      _camera.LookAt = _defaultLookAtTarget;
+    }
+
+    void ValidateBlendCurves()
+    {
+      if (_mapToSiteBlendCurve == null)
+      {
+        throw new InvalidOperationException("Map to site blend curve is not set.");
+      }
+      if (_siteToMapBlendCurve == null)
+      {
+        throw new InvalidOperationException("Site to map blend curve is not set.");
+      }
+      if (_mapToSiteBlendDuration < Mathf.Epsilon)
+      {
+        throw new InvalidOperationException("Map to site blend duration must be positive.");
+      }
+      if (_siteToMapBlendDuration < Mathf.Epsilon)
+      {
+        throw new InvalidOperationException("Site to map blend duration must be positive.");
+      }
+    }
+
+    void ApplyBlendSettings(CinemachineCamera siteCamera)
+    {
+      if (siteCamera == null)
+      {
+        throw new InvalidOperationException("Site camera is not available.");
+      }
+      var brain = ResolveBrain();
+      _baseCustomBlends ??=
+        brain.CustomBlends != null && brain.CustomBlends.CustomBlends != null
+          ? (CinemachineBlenderSettings.CustomBlend[])brain.CustomBlends.CustomBlends.Clone()
+          : Array.Empty<CinemachineBlenderSettings.CustomBlend>();
+
+      var blends = new List<CinemachineBlenderSettings.CustomBlend>(_baseCustomBlends);
+      UpsertBlend(
+        blends,
+        _camera.Name,
+        siteCamera.Name,
+        CreateBlendDefinition(_mapToSiteBlendCurve, _mapToSiteBlendDuration)
+      );
+      UpsertBlend(
+        blends,
+        siteCamera.Name,
+        _camera.Name,
+        CreateBlendDefinition(_siteToMapBlendCurve, _siteToMapBlendDuration)
+      );
+
+      _runtimeBlendSettings ??= ScriptableObject.CreateInstance<CinemachineBlenderSettings>();
+      _runtimeBlendSettings.CustomBlends = blends.ToArray();
+      brain.CustomBlends = _runtimeBlendSettings;
+    }
+
+    static CinemachineBlendDefinition CreateBlendDefinition(AnimationCurve curve, float duration)
+    {
+      var definition = new CinemachineBlendDefinition(
+        CinemachineBlendDefinition.Styles.Custom,
+        duration
+      );
+      definition.CustomCurve = curve;
+      return definition;
+    }
+
+    static void UpsertBlend(
+      List<CinemachineBlenderSettings.CustomBlend> blends,
+      string from,
+      string to,
+      CinemachineBlendDefinition blend
+    )
+    {
+      var replacement = new CinemachineBlenderSettings.CustomBlend
+      {
+        From = from,
+        To = to,
+        Blend = blend,
+      };
+      var index = -1;
+      for (var i = 0; i < blends.Count; i++)
+      {
+        var existing = blends[i];
+        if (existing.From == from && existing.To == to)
+        {
+          index = i;
+          break;
+        }
+      }
+
+      if (index >= 0)
+      {
+        blends[index] = replacement;
+        return;
+      }
+      blends.Add(replacement);
+    }
+
+    IEnumerator WaitForBlend(CinemachineBrain brain, ICinemachineCamera target)
+    {
+      var elapsed = 0f;
+      while (brain.IsBlending || !CinemachineCore.IsLive(target))
+      {
+        elapsed += Time.deltaTime;
+        if (elapsed > BlendTimeoutSeconds)
+        {
+          throw new InvalidOperationException($"Camera blend to {target.Name} timed out.");
+        }
+        yield return null;
+      }
+    }
+
+    DreamscapeSite? GetActiveSite()
+    {
+      if (_activeSite != null && _activeSite.IsActive)
+      {
+        return _activeSite;
+      }
+      for (var i = 0; i < _sites.Count; i++)
+      {
+        var site = _sites[i];
+        if (site != null && site.IsActive)
+        {
+          return site;
+        }
+      }
+
+      return null;
+    }
+
+    void DeactivateAllSites()
+    {
+      for (var i = 0; i < _sites.Count; i++)
+      {
+        var site = _sites[i];
+        if (site != null)
+        {
+          site.Deactivate();
+        }
+      }
+      _activeSite = null;
+    }
+
+    void DeactivateOtherSites(DreamscapeSite site)
+    {
+      for (var i = 0; i < _sites.Count; i++)
+      {
+        var other = _sites[i];
+        if (other != null && other != site)
+        {
+          other.Deactivate();
+        }
+      }
+    }
+
+    void EnsureSiteButtons()
+    {
+      if (_sites.Count == 0)
       {
         return;
       }
@@ -437,7 +507,7 @@ namespace Dreamtides.Components
       var viewport = ResolveViewport();
       if (viewport == null)
       {
-        return;
+        throw new InvalidOperationException("Viewport is not available.");
       }
 
       if (
@@ -520,7 +590,10 @@ namespace Dreamtides.Components
       _positionRoutine = null;
     }
 
-    IGameViewport? ResolveViewport() =>
-      Application.isPlaying ? Registry.GameViewport : RealViewport.CreateForEditor();
+    IGameViewport ResolveViewport()
+    {
+      var viewport = Application.isPlaying ? Registry.GameViewport : RealViewport.CreateForEditor();
+      return viewport ?? throw new InvalidOperationException("Viewport is not available.");
+    }
   }
 }
