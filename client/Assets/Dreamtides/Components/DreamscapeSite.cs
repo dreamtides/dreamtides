@@ -1,7 +1,6 @@
 #nullable enable
 
 using System;
-using System.Collections;
 using Dreamtides.Layout;
 using Dreamtides.Services;
 using Unity.Cinemachine;
@@ -13,6 +12,30 @@ namespace Dreamtides.Components
   {
     Left,
     Right,
+  }
+
+  public readonly struct DreamscapeSiteCameraPose
+  {
+    public DreamscapeSiteCameraPose(
+      Vector3 position,
+      Quaternion rotation,
+      float fieldOfView,
+      Vector3 focusTarget
+    )
+    {
+      Position = position;
+      Rotation = rotation;
+      FieldOfView = fieldOfView;
+      FocusTarget = focusTarget;
+    }
+
+    public Vector3 Position { get; }
+
+    public Quaternion Rotation { get; }
+
+    public float FieldOfView { get; }
+
+    public Vector3 FocusTarget { get; }
   }
 
   public class DreamscapeSite : Displayable
@@ -68,8 +91,6 @@ namespace Dreamtides.Components
     [SerializeField]
     MecanimAnimator _characterAnimator = null!;
 
-    DreamscapeMapCamera? _mapCamera;
-    Coroutine? _activationRoutine;
     bool _hasCameraDefaults;
     Vector3 _targetScreenLeftBaseDirection;
     Vector3 _targetScreenRightBaseDirection;
@@ -79,7 +100,6 @@ namespace Dreamtides.Components
     float _targetScreenTopBaseDistance;
     Vector3 _targetDraftSiteBaseDirection;
     float _targetDraftSiteBaseDistance;
-    CinemachineCamera? _activeCamera;
 
     public bool IsActive => _isActive;
 
@@ -107,83 +127,48 @@ namespace Dreamtides.Components
 
     public MecanimAnimator CharacterAnimator => _characterAnimator;
 
-    protected override void OnStart()
+    public DreamscapeSiteCameraPose ResolveCameraPose(
+      IGameViewport viewport,
+      float fallbackFieldOfView
+    )
     {
-      _siteCharacter.SetActive(!_draftSite);
+      if (viewport == null)
+      {
+        throw new InvalidOperationException("Viewport is not available.");
+      }
+      if (_hasCameraDefaults)
+      {
+        return BuildCameraPose(viewport, fallbackFieldOfView);
+      }
+      EnsureCameraDefaults();
+      return BuildCameraPose(viewport, fallbackFieldOfView);
     }
 
     public void SetActive(bool isActive)
     {
       EnsureCameraDefaults();
       _isActive = isActive;
-      if (_isActive && _hasCameraDefaults)
-      {
-        if (_activationRoutine != null)
-        {
-          StopCoroutine(_activationRoutine);
-        }
-        if (!TryStartFocusTransition())
-        {
-          ApplyCameraState();
-        }
-      }
-      else if (!_isActive)
-      {
-        if (_activationRoutine != null)
-        {
-          StopCoroutine(_activationRoutine);
-          _activationRoutine = null;
-        }
-        ResetCameraPriorities();
-      }
     }
 
     public void Activate()
     {
-      EnsureCameraDefaults();
       SetActive(isActive: true);
-    }
-
-    public void SetMapCamera(DreamscapeMapCamera mapCamera)
-    {
-      _mapCamera = mapCamera;
     }
 
     internal void SetActiveWithoutFocus(bool isActive)
     {
-      EnsureCameraDefaults();
       _isActive = isActive;
-      if (_isActive && _hasCameraDefaults)
-      {
-        ApplyCameraState();
-      }
-      else if (!_isActive)
-      {
-        if (_activationRoutine != null)
-        {
-          StopCoroutine(_activationRoutine);
-          _activationRoutine = null;
-        }
-        ResetCameraPriorities();
-      }
     }
 
     protected override void OnInitialize()
     {
       EnsureCameraDefaults();
+      DisableAnchorCameras();
     }
 
-    protected override void OnUpdate()
+    protected override void OnStart()
     {
-      if (!_isActive)
-      {
-        return;
-      }
-      if (_activationRoutine != null)
-      {
-        return;
-      }
-      ApplyCameraState();
+      _siteCharacter.SetActive(!_draftSite);
     }
 
     void EnsureCameraDefaults()
@@ -207,74 +192,87 @@ namespace Dreamtides.Components
         out _targetScreenTopBaseDirection,
         out _targetScreenTopBaseDistance
       );
-      CacheCameraDefaults(
-        _targetDraftSiteCamera,
-        out _targetDraftSiteBaseDirection,
-        out _targetDraftSiteBaseDistance
-      );
+      if (_draftSite)
+      {
+        CacheCameraDefaults(
+          _targetDraftSiteCamera,
+          out _targetDraftSiteBaseDirection,
+          out _targetDraftSiteBaseDistance
+        );
+      }
       _hasCameraDefaults = true;
     }
 
-    void ApplyCameraState()
+    DreamscapeSiteCameraPose BuildCameraPose(IGameViewport viewport, float fallbackFieldOfView)
     {
-      if (!_hasCameraDefaults)
-      {
-        return;
-      }
+      var anchor = ResolveAnchor(viewport);
+      var distance = Mathf.Max(0.01f, anchor.Distance + anchor.DistanceModifier);
+      var localOffset = anchor.Direction * distance;
+      var worldPosition = transform.TransformPoint(localOffset);
+      var focusTarget = transform.position;
+      var rotation = BuildFocusRotation(worldPosition, focusTarget);
+      var fieldOfView =
+        anchor.Camera != null ? anchor.Camera.Lens.FieldOfView : Mathf.Max(1f, fallbackFieldOfView);
+      return new DreamscapeSiteCameraPose(worldPosition, rotation, fieldOfView, focusTarget);
+    }
+
+    CameraAnchor ResolveAnchor(IGameViewport viewport)
+    {
       if (_draftSite)
       {
         if (_targetDraftSiteCamera == null)
         {
-          ResetCameraPriorities();
-          return;
+          throw new InvalidOperationException("Draft site camera is missing.");
         }
-        ApplyDistanceModifier(
+        return new CameraAnchor(
           _targetDraftSiteCamera,
           _targetDraftSiteBaseDirection,
           _targetDraftSiteBaseDistance,
           0f
         );
-        SetCameraTarget(_targetDraftSiteCamera);
-        if (_activeCamera != _targetDraftSiteCamera)
-        {
-          SetActiveCamera(_targetDraftSiteCamera);
-        }
-        return;
       }
-      var viewport = Registry.GameViewport;
-      ApplyDistanceModifier(
-        _targetScreenLeftCamera,
-        _targetScreenLeftBaseDirection,
-        _targetScreenLeftBaseDistance,
-        _landscapeCameraDistanceModifier
-      );
-      ApplyDistanceModifier(
-        _targetScreenRightCamera,
-        _targetScreenRightBaseDirection,
-        _targetScreenRightBaseDistance,
-        _landscapeCameraDistanceModifier
-      );
-      ApplyDistanceModifier(
+      if (_targetScreenLeftCamera == null)
+      {
+        throw new InvalidOperationException("Left site camera is missing.");
+      }
+      if (_targetScreenRightCamera == null)
+      {
+        throw new InvalidOperationException("Right site camera is missing.");
+      }
+      if (_targetScreenTopCamera == null)
+      {
+        throw new InvalidOperationException("Top site camera is missing.");
+      }
+      if (viewport.IsLandscape)
+      {
+        return _landscapeCameraTargetSide == LandscapeCameraTargetSide.Left
+          ? new CameraAnchor(
+            _targetScreenLeftCamera,
+            _targetScreenLeftBaseDirection,
+            _targetScreenLeftBaseDistance,
+            _landscapeCameraDistanceModifier
+          )
+          : new CameraAnchor(
+            _targetScreenRightCamera,
+            _targetScreenRightBaseDirection,
+            _targetScreenRightBaseDistance,
+            _landscapeCameraDistanceModifier
+          );
+      }
+      return new CameraAnchor(
         _targetScreenTopCamera,
         _targetScreenTopBaseDirection,
         _targetScreenTopBaseDistance,
         _portraitCameraDistanceModifier
       );
-      var activeCamera = viewport.IsLandscape
-        ? _landscapeCameraTargetSide == LandscapeCameraTargetSide.Left
-          ? _targetScreenLeftCamera
-          : _targetScreenRightCamera
-        : _targetScreenTopCamera;
-      if (activeCamera == null)
-      {
-        ResetCameraPriorities();
-        return;
-      }
-      SetCameraTarget(activeCamera);
-      if (_activeCamera != activeCamera)
-      {
-        SetActiveCamera(activeCamera);
-      }
+    }
+
+    static Quaternion BuildFocusRotation(Vector3 cameraPosition, Vector3 focusTarget)
+    {
+      var direction = focusTarget - cameraPosition;
+      return direction.sqrMagnitude < Mathf.Epsilon
+        ? Quaternion.identity
+        : Quaternion.LookRotation(direction, Vector3.up);
     }
 
     static void CacheCameraDefaults(
@@ -285,9 +283,7 @@ namespace Dreamtides.Components
     {
       if (camera == null)
       {
-        baseDirection = Vector3.back;
-        baseDistance = 1f;
-        return;
+        throw new InvalidOperationException("Site camera anchor is not assigned.");
       }
       var localPosition = camera.transform.localPosition;
       baseDirection =
@@ -295,97 +291,49 @@ namespace Dreamtides.Components
       baseDistance = localPosition.magnitude;
     }
 
-    void ApplyDistanceModifier(
-      CinemachineCamera camera,
-      Vector3 baseDirection,
-      float baseDistance,
-      float modifier
-    )
+    void DisableAnchorCameras()
+    {
+      DisableCamera(_targetScreenLeftCamera);
+      DisableCamera(_targetScreenRightCamera);
+      DisableCamera(_targetScreenTopCamera);
+      if (_targetDraftSiteCamera != null)
+      {
+        DisableCamera(_targetDraftSiteCamera);
+      }
+    }
+
+    static void DisableCamera(CinemachineCamera camera)
     {
       if (camera == null)
       {
-        return;
+        throw new InvalidOperationException("Site camera anchor is not assigned.");
       }
-      var distance = Mathf.Max(0.01f, baseDistance + modifier);
-      camera.transform.localPosition = baseDirection * distance;
+      camera.Priority = -100;
+      camera.enabled = false;
     }
 
-    void SetActiveCamera(CinemachineCamera activeCamera)
+    readonly struct CameraAnchor
     {
-      if (_targetScreenLeftCamera != null)
+      public CameraAnchor(
+        CinemachineCamera camera,
+        Vector3 direction,
+        float distance,
+        float distanceModifier
+      )
       {
-        _targetScreenLeftCamera.Priority = _targetScreenLeftCamera == activeCamera ? 10 : 0;
-      }
-      if (_targetScreenRightCamera != null)
-      {
-        _targetScreenRightCamera.Priority = _targetScreenRightCamera == activeCamera ? 10 : 0;
-      }
-      if (_targetScreenTopCamera != null)
-      {
-        _targetScreenTopCamera.Priority = _targetScreenTopCamera == activeCamera ? 10 : 0;
-      }
-      if (_targetDraftSiteCamera != null)
-      {
-        _targetDraftSiteCamera.Priority = _targetDraftSiteCamera == activeCamera ? 10 : 0;
-      }
-      _activeCamera = activeCamera;
-    }
-
-    void ResetCameraPriorities()
-    {
-      if (_targetScreenLeftCamera != null)
-      {
-        _targetScreenLeftCamera.Priority = 0;
-      }
-      if (_targetScreenRightCamera != null)
-      {
-        _targetScreenRightCamera.Priority = 0;
-      }
-      if (_targetScreenTopCamera != null)
-      {
-        _targetScreenTopCamera.Priority = 0;
-      }
-      if (_targetDraftSiteCamera != null)
-      {
-        _targetDraftSiteCamera.Priority = 0;
-      }
-      _activeCamera = null;
-      _activationRoutine = null;
-    }
-
-    void SetCameraTarget(CinemachineCamera activeCamera)
-    {
-      if (activeCamera == null)
-      {
-        return;
-      }
-      activeCamera.Follow = transform;
-      activeCamera.LookAt = transform;
-    }
-
-    bool TryStartFocusTransition()
-    {
-      if (!Application.isPlaying)
-      {
-        return false;
+        Camera = camera;
+        Direction = direction;
+        Distance = distance;
+        DistanceModifier = distanceModifier;
       }
 
-      var mapCamera = _mapCamera;
-      if (mapCamera == null || mapCamera.FocusSiteCamera == null)
-      {
-        return false;
-      }
+      public CinemachineCamera Camera { get; }
 
-      mapCamera.HideSiteButtons();
-      _activationRoutine = StartCoroutine(FocusThenActivate(mapCamera));
-      return true;
-    }
+      public Vector3 Direction { get; }
 
-    IEnumerator FocusThenActivate(DreamscapeMapCamera mapCamera)
-    {
-      yield return mapCamera.FocusOnSite(this);
-      ApplyCameraState();
-      _activationRoutine = null;
+      public float Distance { get; }
+
+      public float DistanceModifier { get; }
     }
   }
 }
