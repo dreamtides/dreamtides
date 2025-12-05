@@ -184,7 +184,6 @@ namespace Dreamtides.Components
           button.gameObject.SetActive(false);
         }
       }
-      Registry.DreamscapeService.CloseButton.gameObject.SetActive(false);
     }
 
     public void ShowSiteButtons()
@@ -203,7 +202,6 @@ namespace Dreamtides.Components
           button.gameObject.SetActive(true);
         }
       }
-      Registry.DreamscapeService.CloseButton.gameObject.SetActive(true);
     }
 
     protected override void OnInitialize()
@@ -472,7 +470,7 @@ namespace Dreamtides.Components
         }
         if (!_siteButtonsBySite.TryGetValue(site, out var button))
         {
-          button = service.CreateSiteButton();
+          button = service.CreateOpenSiteButton();
           _siteButtonsBySite[site] = button;
           button.Initialize(Registry, Mode, TestConfiguration);
           button.StartFromRegistry();

@@ -16,7 +16,7 @@ namespace Dreamtides.Services
   public class DreamscapeService : Service
   {
     [SerializeField]
-    CanvasGroup _closeButton = null!;
+    CanvasGroup _closeSiteButton = null!;
 
     [SerializeField]
     CanvasButton _siteButtonPrefab = null!;
@@ -30,9 +30,9 @@ namespace Dreamtides.Services
     [SerializeField]
     RectTransform _debugQuestButtons = null!;
 
-    public CanvasGroup CloseButton => Errors.CheckNotNull(_closeButton);
+    public CanvasGroup CloseSiteButton => Errors.CheckNotNull(_closeSiteButton);
 
-    public CanvasButton CreateSiteButton()
+    public CanvasButton CreateOpenSiteButton()
     {
       var button = ComponentUtils.Instantiate(_siteButtonPrefab, Vector3.zero);
       var rectTransform = ComponentUtils.Get<RectTransform>(button);
@@ -128,10 +128,10 @@ namespace Dreamtides.Services
     public void HideCloseSiteButton()
     {
       TweenUtils
-        .FadeOutCanvasGroup(_closeButton)
+        .FadeOutCanvasGroup(_closeSiteButton)
         .OnComplete(() =>
         {
-          _closeButton.gameObject.SetActive(false);
+          _closeSiteButton.gameObject.SetActive(false);
         });
     }
 

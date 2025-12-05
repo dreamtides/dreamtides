@@ -195,13 +195,7 @@ public class PrototypeQuest : Service
     if (name == "closeShop")
     {
       EnsureFlowsInitialized();
-      _shopFlow.ClearDisplayedCards();
-      DeactivateSite("FocusShopCamera");
-      StartCoroutine(ReturnToMap());
-      Registry.DreamscapeService.HideCloseSiteButton();
-      Registry.DocumentService.RenderScreenAnchoredNode(
-        new AnchorToScreenPositionCommand() { Node = null }
-      );
+      StartCoroutine(CloseShop());
 
       return;
     }
@@ -209,13 +203,7 @@ public class PrototypeQuest : Service
     if (name == "closeTemptingOffer")
     {
       EnsureFlowsInitialized();
-      DeactivateSite("FocusEventCamera");
-      StartCoroutine(ReturnToMap());
-      Registry.DreamscapeService.HideCloseSiteButton();
-      Registry.DreamscapeLayout.TemptingOfferDisplay.HideAcceptButtons();
-      Registry.DocumentService.RenderScreenAnchoredNode(
-        new AnchorToScreenPositionCommand() { Node = null }
-      );
+      StartCoroutine(CloseTemptingOffer());
 
       return;
     }
@@ -309,6 +297,28 @@ public class PrototypeQuest : Service
     {
       _temptingOfferFlow.HandleTemptingOfferSelection(clickedId);
     }
+  }
+
+  IEnumerator CloseShop()
+  {
+    EnsureFlowsInitialized();
+    _shopFlow.ClearDisplayedCards();
+    Registry.DreamscapeService.HideCloseSiteButton();
+    Registry.DocumentService.RenderScreenAnchoredNode(
+      new AnchorToScreenPositionCommand() { Node = null }
+    );
+    yield return StartCoroutine(ReturnToMap());
+  }
+
+  IEnumerator CloseTemptingOffer()
+  {
+    EnsureFlowsInitialized();
+    Registry.DreamscapeService.HideCloseSiteButton();
+    Registry.DreamscapeLayout.TemptingOfferDisplay.HideAcceptButtons();
+    Registry.DocumentService.RenderScreenAnchoredNode(
+      new AnchorToScreenPositionCommand() { Node = null }
+    );
+    yield return StartCoroutine(ReturnToMap());
   }
 
   DreamscapeSite? FindSiteForAction(string action)

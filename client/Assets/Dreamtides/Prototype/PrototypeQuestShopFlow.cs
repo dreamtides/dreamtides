@@ -195,7 +195,7 @@ public class PrototypeQuestShopFlow
 
     yield return _createOrUpdateCards(request, true);
 
-    var button = _registry.DreamscapeService.CloseButton.GetComponent<CloseBrowserButton>();
+    var button = _registry.DreamscapeService.CloseSiteButton.GetComponent<CloseBrowserButton>();
     button.CloseAction = new GameAction
     {
       GameActionClass = new GameActionClass
