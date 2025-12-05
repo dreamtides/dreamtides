@@ -24,7 +24,8 @@ namespace Dreamtides.Components
 
     public IReadOnlyList<Vector2> PositionButtons(
       IReadOnlyList<Vector3> worldPositions,
-      IReadOnlyList<RectTransform> buttons
+      IReadOnlyList<RectTransform> buttons,
+      Rect allowedViewportRect
     )
     {
       if (worldPositions == null)
@@ -40,7 +41,7 @@ namespace Dreamtides.Components
       {
         throw new ArgumentException("Position and button counts must match.", nameof(buttons));
       }
-      var safeRect = _safeArea.rect;
+      var allowedRect = GetAllowedLocalRect(allowedViewportRect);
       var desiredPositions = new List<Vector2>(count);
       var halfSizes = new List<Vector2>(count);
       for (var i = 0; i < count; i++)
@@ -52,8 +53,8 @@ namespace Dreamtides.Components
         }
         var halfSize = GetHalfSize(button);
         halfSizes.Add(halfSize);
-        var desired = GetDesiredPosition(worldPositions[i], halfSize);
-        desiredPositions.Add(ClampToRect(desired, safeRect, halfSize));
+        var desired = GetDesiredPosition(worldPositions[i], halfSize, allowedRect);
+        desiredPositions.Add(ClampToRect(desired, allowedRect, halfSize));
       }
 
       var resolved = new Vector2[count];
@@ -67,7 +68,7 @@ namespace Dreamtides.Components
         var position = FindPosition(
           desiredPositions[index],
           halfSizes[index],
-          safeRect,
+          allowedRect,
           placedCenters,
           placedHalfSizes
         );
@@ -84,7 +85,43 @@ namespace Dreamtides.Components
       return resolved;
     }
 
-    Vector2 GetDesiredPosition(Vector3 worldPosition, Vector2 halfSize)
+    Rect GetAllowedLocalRect(Rect allowedViewportRect)
+    {
+      var canvasRect = _viewport.CanvasPixelRect;
+      var minScreen = new Vector2(
+        canvasRect.xMin + allowedViewportRect.xMin * canvasRect.width,
+        canvasRect.yMin + allowedViewportRect.yMin * canvasRect.height
+      );
+      var maxScreen = new Vector2(
+        canvasRect.xMin + allowedViewportRect.xMax * canvasRect.width,
+        canvasRect.yMin + allowedViewportRect.yMax * canvasRect.height
+      );
+      if (
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(
+          _safeArea,
+          minScreen,
+          null,
+          out var minLocal
+        )
+        && RectTransformUtility.ScreenPointToLocalPointInRectangle(
+          _safeArea,
+          maxScreen,
+          null,
+          out var maxLocal
+        )
+      )
+      {
+        var xMin = Mathf.Min(minLocal.x, maxLocal.x);
+        var xMax = Mathf.Max(minLocal.x, maxLocal.x);
+        var yMin = Mathf.Min(minLocal.y, maxLocal.y);
+        var yMax = Mathf.Max(minLocal.y, maxLocal.y);
+        return Rect.MinMaxRect(xMin, yMin, xMax, yMax);
+      }
+
+      return _safeArea.rect;
+    }
+
+    Vector2 GetDesiredPosition(Vector3 worldPosition, Vector2 halfSize, Rect allowedRect)
     {
       var screenPoint = _viewport.WorldToScreenPoint(worldPosition);
       if (
@@ -99,10 +136,9 @@ namespace Dreamtides.Components
         return new Vector2(local.x, local.y + halfSize.y);
       }
 
-      var safeRect = _safeArea.rect;
       var fallback = new Vector2(
-        (safeRect.xMin + safeRect.xMax) * 0.5f,
-        (safeRect.yMin + safeRect.yMax) * 0.5f + halfSize.y
+        (allowedRect.xMin + allowedRect.xMax) * 0.5f,
+        (allowedRect.yMin + allowedRect.yMax) * 0.5f + halfSize.y
       );
       return fallback;
     }
@@ -149,12 +185,12 @@ namespace Dreamtides.Components
     Vector2 FindPosition(
       Vector2 desired,
       Vector2 halfSize,
-      Rect safeRect,
+      Rect allowedRect,
       List<Vector2> placedCenters,
       List<Vector2> placedHalfSizes
     )
     {
-      var bestCandidate = ClampToRect(desired, safeRect, halfSize);
+      var bestCandidate = ClampToRect(desired, allowedRect, halfSize);
       var queue = new List<Vector2> { bestCandidate };
       var visited = new HashSet<QuantizedVector2>(new QuantizedVector2Comparer());
       while (queue.Count > 0 && visited.Count < MaxSearchIterations)
@@ -190,7 +226,7 @@ namespace Dreamtides.Components
             )
           )
           {
-            var clamped = ClampToRect(next, safeRect, halfSize);
+            var clamped = ClampToRect(next, allowedRect, halfSize);
             queue.Add(clamped);
           }
         }
@@ -199,7 +235,7 @@ namespace Dreamtides.Components
       var gridCandidate = SearchGridForPosition(
         desired,
         halfSize,
-        safeRect,
+        allowedRect,
         placedCenters,
         placedHalfSizes
       );
@@ -335,15 +371,15 @@ namespace Dreamtides.Components
     Vector2? SearchGridForPosition(
       Vector2 desired,
       Vector2 halfSize,
-      Rect safeRect,
+      Rect allowedRect,
       List<Vector2> placedCenters,
       List<Vector2> placedHalfSizes
     )
     {
-      var startX = safeRect.xMin + halfSize.x;
-      var endX = safeRect.xMax - halfSize.x;
-      var startY = safeRect.yMin + halfSize.y;
-      var endY = safeRect.yMax - halfSize.y;
+      var startX = allowedRect.xMin + halfSize.x;
+      var endX = allowedRect.xMax - halfSize.x;
+      var startY = allowedRect.yMin + halfSize.y;
+      var endY = allowedRect.yMax - halfSize.y;
       if (endX < startX || endY < startY)
       {
         return null;

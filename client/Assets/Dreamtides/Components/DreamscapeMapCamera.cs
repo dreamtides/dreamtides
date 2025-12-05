@@ -46,6 +46,12 @@ namespace Dreamtides.Components
     float _siteToMapBlendDuration = 2f;
 
     [SerializeField]
+    ScreenInsets _landscapeInsets;
+
+    [SerializeField]
+    ScreenInsets _portraitInsets;
+
+    [SerializeField]
     List<DreamscapeSite> _sites = new();
 
     readonly Dictionary<DreamscapeSite, CanvasButton> _siteButtonsBySite = new();
@@ -58,6 +64,8 @@ namespace Dreamtides.Components
     bool _siteButtonsVisible;
     bool _initialFramingComplete;
     bool _hasCachedSiteButtonPositions;
+    Rect _cachedAllowedViewportRect;
+    Vector2 _cachedSafeAreaSize;
     DreamscapeSite? _activeSite;
     Transform? _defaultFollowTarget;
     Transform? _defaultLookAtTarget;
@@ -130,6 +138,7 @@ namespace Dreamtides.Components
       }
 
       var rotation = Quaternion.Euler(50f, _yRotation, 0f);
+      var allowedViewportRect = GetAllowedViewportRect(viewport);
       var tanVertical = Mathf.Tan(Mathf.Deg2Rad * 30f);
       var aspect = Mathf.Approximately(viewport.ScreenHeight, 0f)
         ? 1f
@@ -141,8 +150,20 @@ namespace Dreamtides.Components
       for (var i = 0; i < positions.Count; i++)
       {
         var local = inverseRotation * (positions[i] - bounds.center);
-        var distanceForX = Mathf.Abs(local.x) / tanHorizontal - local.z;
-        var distanceForY = Mathf.Abs(local.y) / tanVertical - local.z;
+        var distanceForX = DistanceForAxis(
+          local.x,
+          local.z,
+          allowedViewportRect.xMin,
+          allowedViewportRect.xMax,
+          tanHorizontal
+        );
+        var distanceForY = DistanceForAxis(
+          local.y,
+          local.z,
+          allowedViewportRect.yMin,
+          allowedViewportRect.yMax,
+          tanVertical
+        );
         var distanceForDepth = -local.z;
         var needed = Mathf.Max(distanceForX, distanceForY, distanceForDepth, 0f);
         requiredDistance = Mathf.Max(requiredDistance, needed);
@@ -218,6 +239,42 @@ namespace Dreamtides.Components
       SchedulePositionSiteButtons();
       ShowSiteButtons();
       _camera.Priority = MapPriority;
+    }
+
+    Rect GetAllowedViewportRect(IGameViewport viewport)
+    {
+      var insets = viewport.IsLandscape ? _landscapeInsets : _portraitInsets;
+      var screenWidth = viewport.ScreenWidth;
+      var screenHeight = viewport.ScreenHeight;
+      if (screenWidth <= 0f || screenHeight <= 0f)
+      {
+        return new Rect(0f, 0f, 1f, 1f);
+      }
+
+      var left = Mathf.Clamp01(insets.Left / screenWidth);
+      var right = Mathf.Clamp01(insets.Right / screenWidth);
+      var bottom = Mathf.Clamp01(insets.Bottom / screenHeight);
+      var top = Mathf.Clamp01(insets.Top / screenHeight);
+
+      var minX = Mathf.Max(viewport.SafeAreaMinimumAnchor.x, left);
+      var maxX = Mathf.Min(viewport.SafeAreaMaximumAnchor.x, 1f - right);
+      var minY = Mathf.Max(viewport.SafeAreaMinimumAnchor.y, bottom);
+      var maxY = Mathf.Min(viewport.SafeAreaMaximumAnchor.y, 1f - top);
+
+      if (maxX < minX)
+      {
+        var midX = (minX + maxX) * 0.5f;
+        minX = midX;
+        maxX = midX;
+      }
+      if (maxY < minY)
+      {
+        var midY = (minY + maxY) * 0.5f;
+        minY = midY;
+        maxY = midY;
+      }
+
+      return Rect.MinMaxRect(minX, minY, maxX, maxY);
     }
 
     void SetLensFieldOfView()
@@ -321,6 +378,38 @@ namespace Dreamtides.Components
       {
         throw new InvalidOperationException("Site to map blend duration must be positive.");
       }
+    }
+
+    static float DistanceForAxis(
+      float axisValue,
+      float axisDepth,
+      float minNormalized,
+      float maxNormalized,
+      float tanHalfAngle
+    )
+    {
+      var spanPositive = Mathf.Max(maxNormalized - 0.5f, 0f);
+      var spanNegative = Mathf.Max(0.5f - minNormalized, 0f);
+      var positive = Mathf.Max(spanPositive, 0.0001f);
+      var negative = Mathf.Max(spanNegative, 0.0001f);
+      if (axisValue >= 0f)
+      {
+        return axisValue / (tanHalfAngle * 2f * positive) - axisDepth;
+      }
+      return -axisValue / (tanHalfAngle * 2f * negative) - axisDepth;
+    }
+
+    static bool AreRectsSimilar(Rect a, Rect b)
+    {
+      return Mathf.Approximately(a.xMin, b.xMin)
+        && Mathf.Approximately(a.xMax, b.xMax)
+        && Mathf.Approximately(a.yMin, b.yMin)
+        && Mathf.Approximately(a.yMax, b.yMax);
+    }
+
+    static bool AreVectorsSimilar(Vector2 a, Vector2 b)
+    {
+      return Mathf.Approximately(a.x, b.x) && Mathf.Approximately(a.y, b.y);
     }
 
     void ApplyBlendSettings(CinemachineCamera siteCamera)
@@ -508,10 +597,14 @@ namespace Dreamtides.Components
         throw new InvalidOperationException("Viewport is not available.");
       }
 
+      var allowedViewportRect = GetAllowedViewportRect(viewport);
+      var safeRect = Registry.CanvasSafeArea.rect;
       if (
         _hasCachedSiteButtonPositions
         && _siteButtonPositions.Count == _siteButtonsBySite.Count
         && _siteButtonPositions.Count > 0
+        && AreRectsSimilar(_cachedAllowedViewportRect, allowedViewportRect)
+        && AreVectorsSimilar(_cachedSafeAreaSize, safeRect.size)
       )
       {
         foreach (var kvp in _siteButtonPositions)
@@ -555,7 +648,7 @@ namespace Dreamtides.Components
       }
 
       var positioner = new DreamscapeSiteButtonPositioner(viewport, Registry.CanvasSafeArea);
-      var resolved = positioner.PositionButtons(worldPositions, buttonRects);
+      var resolved = positioner.PositionButtons(worldPositions, buttonRects, allowedViewportRect);
       if (!_initialFramingComplete)
       {
         return;
@@ -564,6 +657,8 @@ namespace Dreamtides.Components
       {
         _siteButtonPositions[orderedSites[i]] = resolved[i];
       }
+      _cachedAllowedViewportRect = allowedViewportRect;
+      _cachedSafeAreaSize = safeRect.size;
       _hasCachedSiteButtonPositions = _siteButtonPositions.Count == orderedSites.Count;
     }
 

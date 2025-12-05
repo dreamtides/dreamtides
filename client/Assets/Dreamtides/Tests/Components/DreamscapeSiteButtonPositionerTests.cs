@@ -31,6 +31,8 @@ namespace Dreamtides.Tests.Components
         viewport.SafeAreaMinimumAnchor,
         viewport.SafeAreaMaximumAnchor
       );
+      var allowedViewportRect = GetDefaultAllowedViewportRect(viewport);
+      var allowedLocalRect = GetAllowedLocalRect(viewport, safeArea, allowedViewportRect);
       var positioner = new DreamscapeSiteButtonPositioner(viewport, safeArea);
       var worldPositions = CreateWorldPositions(
         viewport,
@@ -44,9 +46,9 @@ namespace Dreamtides.Tests.Components
       );
       var buttons = CreateButtons(safeArea, worldPositions.Count, new Vector2(20f, 20f));
 
-      var positions = positioner.PositionButtons(worldPositions, buttons);
+      var positions = positioner.PositionButtons(worldPositions, buttons, allowedViewportRect);
 
-      AssertWithinBounds(positions, buttons, safeArea);
+      AssertWithinBounds(positions, buttons, safeArea, allowedLocalRect);
       AssertNoOverlap(positions, buttons, safeArea);
       yield return null;
     }
@@ -66,6 +68,7 @@ namespace Dreamtides.Tests.Components
         viewport.SafeAreaMinimumAnchor,
         viewport.SafeAreaMaximumAnchor
       );
+      var allowedViewportRect = GetDefaultAllowedViewportRect(viewport);
       var positioner = new DreamscapeSiteButtonPositioner(viewport, safeArea);
       var worldPositions = CreateWorldPositions(
         viewport,
@@ -73,8 +76,8 @@ namespace Dreamtides.Tests.Components
       );
       var buttons = CreateButtons(safeArea, worldPositions.Count, new Vector2(20f, 20f));
 
-      var first = positioner.PositionButtons(worldPositions, buttons);
-      var second = positioner.PositionButtons(worldPositions, buttons);
+      var first = positioner.PositionButtons(worldPositions, buttons, allowedViewportRect);
+      var second = positioner.PositionButtons(worldPositions, buttons, allowedViewportRect);
 
       AssertSequencesEqual(first, second);
       yield return null;
@@ -95,6 +98,7 @@ namespace Dreamtides.Tests.Components
         viewport.SafeAreaMinimumAnchor,
         viewport.SafeAreaMaximumAnchor
       );
+      var allowedViewportRect = GetDefaultAllowedViewportRect(viewport);
       var positioner = new DreamscapeSiteButtonPositioner(viewport, safeArea);
       var worldPositions = CreateWorldPositions(
         viewport,
@@ -102,12 +106,67 @@ namespace Dreamtides.Tests.Components
       );
       var buttons = CreateButtons(safeArea, worldPositions.Count, new Vector2(20f, 20f));
 
-      var positions = positioner.PositionButtons(worldPositions, buttons);
+      var positions = positioner.PositionButtons(worldPositions, buttons, allowedViewportRect);
       var anchors = GetProjectedAnchors(viewport, canvasRoot, safeArea, worldPositions);
       var halfSizes = GetHalfSizes(safeArea, buttons);
       for (var i = 0; i < positions.Count; i++)
       {
         Assert.That(positions[i].y, Is.GreaterThan(anchors[i].y + halfSizes[i].y - 0.001f));
+      }
+      yield return null;
+    }
+
+    [UnityTest]
+    public IEnumerator InsetsRestrictButtonPositions()
+    {
+      var canvasRoot = CreateCanvasRoot();
+      var viewport = CreateViewport(
+        GameViewResolution.Resolution16x9,
+        cameraTransform: CreateGameObject().transform,
+        canvasRootRect: canvasRoot,
+        canvasPixelRect: CreateCanvasPixelRect(GameViewResolution.Resolution16x9)
+      );
+      var safeArea = CreateSafeArea(
+        canvasRoot,
+        viewport.SafeAreaMinimumAnchor,
+        viewport.SafeAreaMaximumAnchor
+      );
+      var insets = new ScreenInsets
+      {
+        Top = 30f,
+        Left = 25f,
+        Bottom = 50f,
+        Right = 40f,
+      };
+      var allowedViewportRect = GetAllowedViewportRect(viewport, insets);
+      var allowedLocalRect = GetAllowedLocalRect(viewport, safeArea, allowedViewportRect);
+      var positioner = new DreamscapeSiteButtonPositioner(viewport, safeArea);
+      var worldPositions = CreateWorldPositions(
+        viewport,
+        new List<Vector2> { new Vector2(0.2f, 0.05f), new Vector2(0.8f, 0.95f) }
+      );
+      var buttons = CreateButtons(safeArea, worldPositions.Count, new Vector2(30f, 30f));
+
+      var positions = positioner.PositionButtons(worldPositions, buttons, allowedViewportRect);
+      var halfSizes = GetHalfSizes(safeArea, buttons);
+      for (var i = 0; i < positions.Count; i++)
+      {
+        Assert.That(
+          positions[i].x,
+          Is.GreaterThanOrEqualTo(allowedLocalRect.xMin + halfSizes[i].x - 0.001f)
+        );
+        Assert.That(
+          positions[i].x,
+          Is.LessThanOrEqualTo(allowedLocalRect.xMax - halfSizes[i].x + 0.001f)
+        );
+        Assert.That(
+          positions[i].y,
+          Is.GreaterThanOrEqualTo(allowedLocalRect.yMin + halfSizes[i].y - 0.001f)
+        );
+        Assert.That(
+          positions[i].y,
+          Is.LessThanOrEqualTo(allowedLocalRect.yMax - halfSizes[i].y + 0.001f)
+        );
       }
       yield return null;
     }
@@ -150,6 +209,86 @@ namespace Dreamtides.Tests.Components
       safeArea.pivot = new Vector2(0.5f, 0.5f);
       safeArea.localScale = Vector3.one;
       return safeArea;
+    }
+
+    Rect GetDefaultAllowedViewportRect(FakeViewport viewport)
+    {
+      return GetAllowedViewportRect(viewport, default);
+    }
+
+    Rect GetAllowedViewportRect(FakeViewport viewport, ScreenInsets insets)
+    {
+      var screenWidth = viewport.ScreenWidth;
+      var screenHeight = viewport.ScreenHeight;
+      if (screenWidth <= 0f || screenHeight <= 0f)
+      {
+        return new Rect(0f, 0f, 1f, 1f);
+      }
+
+      var left = Mathf.Clamp01(insets.Left / screenWidth);
+      var right = Mathf.Clamp01(insets.Right / screenWidth);
+      var bottom = Mathf.Clamp01(insets.Bottom / screenHeight);
+      var top = Mathf.Clamp01(insets.Top / screenHeight);
+
+      var minX = Mathf.Max(viewport.SafeAreaMinimumAnchor.x, left);
+      var maxX = Mathf.Min(viewport.SafeAreaMaximumAnchor.x, 1f - right);
+      var minY = Mathf.Max(viewport.SafeAreaMinimumAnchor.y, bottom);
+      var maxY = Mathf.Min(viewport.SafeAreaMaximumAnchor.y, 1f - top);
+
+      if (maxX < minX)
+      {
+        var midX = (minX + maxX) * 0.5f;
+        minX = midX;
+        maxX = midX;
+      }
+      if (maxY < minY)
+      {
+        var midY = (minY + maxY) * 0.5f;
+        minY = midY;
+        maxY = midY;
+      }
+
+      return Rect.MinMaxRect(minX, minY, maxX, maxY);
+    }
+
+    Rect GetAllowedLocalRect(
+      FakeViewport viewport,
+      RectTransform safeArea,
+      Rect allowedViewportRect
+    )
+    {
+      var canvasRect = viewport.CanvasPixelRect;
+      var minScreen = new Vector2(
+        canvasRect.xMin + allowedViewportRect.xMin * canvasRect.width,
+        canvasRect.yMin + allowedViewportRect.yMin * canvasRect.height
+      );
+      var maxScreen = new Vector2(
+        canvasRect.xMin + allowedViewportRect.xMax * canvasRect.width,
+        canvasRect.yMin + allowedViewportRect.yMax * canvasRect.height
+      );
+      if (
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(
+          safeArea,
+          minScreen,
+          null,
+          out var minLocal
+        )
+        && RectTransformUtility.ScreenPointToLocalPointInRectangle(
+          safeArea,
+          maxScreen,
+          null,
+          out var maxLocal
+        )
+      )
+      {
+        var xMin = Mathf.Min(minLocal.x, maxLocal.x);
+        var xMax = Mathf.Max(minLocal.x, maxLocal.x);
+        var yMin = Mathf.Min(minLocal.y, maxLocal.y);
+        var yMax = Mathf.Max(minLocal.y, maxLocal.y);
+        return Rect.MinMaxRect(xMin, yMin, xMax, yMax);
+      }
+
+      return safeArea.rect;
     }
 
     Rect CreateCanvasPixelRect(GameViewResolution resolution)
@@ -235,11 +374,12 @@ namespace Dreamtides.Tests.Components
     void AssertWithinBounds(
       IReadOnlyList<Vector2> positions,
       IReadOnlyList<RectTransform> buttons,
-      RectTransform safeArea
+      RectTransform parent,
+      Rect allowedRect
     )
     {
-      var halfSizes = GetHalfSizes(safeArea, buttons);
-      var rect = safeArea.rect;
+      var halfSizes = GetHalfSizes(parent, buttons);
+      var rect = allowedRect;
       for (var i = 0; i < positions.Count; i++)
       {
         var position = positions[i];
