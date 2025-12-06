@@ -5,6 +5,7 @@ namespace Dreamtides.Layout
   using Dreamtides.Buttons;
   using Dreamtides.Components;
   using Dreamtides.Utils;
+  using Unity.Cinemachine;
   using UnityEngine;
 
   public class GameLayout : MonoBehaviour
@@ -12,6 +13,10 @@ namespace Dreamtides.Layout
     [SerializeField]
     Transform? _cameraPosition;
     public Transform CameraPosition => Check(_cameraPosition);
+
+    [SerializeField]
+    CinemachineCamera? _battleCamera;
+    public CinemachineCamera BattleCamera => Check(_battleCamera);
 
     [SerializeField]
     BattleCameraBounds? _battleCameraBounds;

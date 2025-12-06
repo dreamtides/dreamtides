@@ -126,10 +126,7 @@ namespace Dreamtides.Components
       }
       _activePriority = priority;
       _isActive = true;
-      var camera = GetActiveCamera(viewport);
-      SetCameraPriority(camera, priority);
-      _activeCamera = camera;
-      return camera;
+      return UpdateActiveCamera(viewport);
     }
 
     internal void SetActiveWithoutFocus(bool isActive)
@@ -138,7 +135,7 @@ namespace Dreamtides.Components
       SetActiveInternal(isActive);
     }
 
-    internal CinemachineCamera GetActiveCamera(IGameViewport viewport)
+    protected internal virtual CinemachineCamera GetActiveCamera(IGameViewport viewport)
     {
       EnsureCameraDefaults();
       ApplyDistanceModifiers(viewport);
@@ -151,6 +148,7 @@ namespace Dreamtides.Components
     {
       _isActive = false;
       ResetCameraPriorities();
+      OnDeactivated();
     }
 
     protected override void OnInitialize()
@@ -160,15 +158,16 @@ namespace Dreamtides.Components
 
     protected override void OnStart()
     {
-      _siteCharacter.SetActive(!_draftSite);
+      if (HasSiteCharacter)
+      {
+        _siteCharacter.SetActive(ShouldShowSiteCharacter);
+      }
       EnsureCameraDefaults();
       SetCameraTargets();
       if (_isActive)
       {
         var viewport = Registry.GameViewport;
-        var camera = GetActiveCamera(viewport);
-        SetCameraPriority(camera, _activePriority);
-        _activeCamera = camera;
+        UpdateActiveCamera(viewport);
       }
     }
 
@@ -179,32 +178,21 @@ namespace Dreamtides.Components
         return;
       }
       var viewport = Registry.GameViewport;
-      var camera = GetActiveCamera(viewport);
-      if (_activeCamera != camera || camera.Priority != _activePriority)
-      {
-        SetCameraPriority(camera, _activePriority);
-        _activeCamera = camera;
-      }
+      UpdateActiveCamera(viewport);
     }
 
-    void SetActiveInternal(bool isActive)
-    {
-      EnsureCameraDefaults();
-      _isActive = isActive;
-      if (_isActive)
-      {
-        var viewport = Registry.GameViewport;
-        var camera = GetActiveCamera(viewport);
-        SetCameraPriority(camera, _activePriority);
-        _activeCamera = camera;
-      }
-      else
-      {
-        ResetCameraPriorities();
-      }
-    }
+    protected virtual bool HasSiteCharacter => true;
 
-    void EnsureCameraDefaults()
+    protected virtual bool ShouldShowSiteCharacter => !_draftSite;
+
+    protected virtual void OnActiveCameraChanged(
+      IGameViewport viewport,
+      CinemachineCamera camera
+    ) { }
+
+    protected virtual void OnDeactivated() { }
+
+    protected virtual void EnsureCameraDefaults()
     {
       if (_hasCameraDefaults)
       {
@@ -239,7 +227,7 @@ namespace Dreamtides.Components
       _hasCameraDefaults = true;
     }
 
-    void ApplyDistanceModifiers(IGameViewport viewport)
+    protected virtual void ApplyDistanceModifiers(IGameViewport viewport)
     {
       if (viewport == null)
       {
@@ -275,7 +263,7 @@ namespace Dreamtides.Components
       );
     }
 
-    CinemachineCamera ResolveCameraForViewport(IGameViewport viewport)
+    protected virtual CinemachineCamera ResolveCameraForViewport(IGameViewport viewport)
     {
       if (_draftSite)
       {
@@ -290,7 +278,7 @@ namespace Dreamtides.Components
       return RequireCamera(_targetScreenTopCamera, nameof(_targetScreenTopCamera));
     }
 
-    static void CacheCameraDefaults(
+    protected static void CacheCameraDefaults(
       CinemachineCamera camera,
       out Vector3 baseDirection,
       out float baseDistance
@@ -302,7 +290,7 @@ namespace Dreamtides.Components
       baseDistance = Mathf.Max(0.01f, localPosition.magnitude);
     }
 
-    void ApplyDistanceModifier(
+    protected static void ApplyDistanceModifier(
       CinemachineCamera camera,
       Vector3 baseDirection,
       float baseDistance,
@@ -313,12 +301,37 @@ namespace Dreamtides.Components
       camera.transform.localPosition = baseDirection * distance;
     }
 
-    void SetCameraPriority(CinemachineCamera camera, int priority)
+    protected virtual void SetCameraTargets()
     {
-      camera.Priority = priority;
+      if (_targetScreenLeftCamera != null)
+      {
+        SetCameraTarget(_targetScreenLeftCamera);
+      }
+      if (_targetScreenRightCamera != null)
+      {
+        SetCameraTarget(_targetScreenRightCamera);
+      }
+      if (_targetScreenTopCamera != null)
+      {
+        SetCameraTarget(_targetScreenTopCamera);
+      }
+      if (_targetDraftSiteCamera != null)
+      {
+        SetCameraTarget(_targetDraftSiteCamera);
+      }
     }
 
-    void ResetCameraPriorities()
+    protected virtual void SetCameraTarget(CinemachineCamera activeCamera)
+    {
+      if (activeCamera == null)
+      {
+        throw new InvalidOperationException($"Site {name} is missing a camera target.");
+      }
+      activeCamera.Follow = transform;
+      activeCamera.LookAt = transform;
+    }
+
+    protected virtual void ResetCameraPriorities()
     {
       if (_targetScreenLeftCamera != null)
       {
@@ -339,41 +352,48 @@ namespace Dreamtides.Components
       _activeCamera = null;
     }
 
-    void SetCameraTargets()
-    {
-      if (_targetScreenLeftCamera != null)
-      {
-        SetCameraTarget(_targetScreenLeftCamera);
-      }
-      if (_targetScreenRightCamera != null)
-      {
-        SetCameraTarget(_targetScreenRightCamera);
-      }
-      if (_targetScreenTopCamera != null)
-      {
-        SetCameraTarget(_targetScreenTopCamera);
-      }
-      if (_targetDraftSiteCamera != null)
-      {
-        SetCameraTarget(_targetDraftSiteCamera);
-      }
-    }
-
-    void SetCameraTarget(CinemachineCamera activeCamera)
-    {
-      if (activeCamera == null)
-      {
-        throw new InvalidOperationException($"Site {name} is missing a camera target.");
-      }
-      activeCamera.Follow = transform;
-      activeCamera.LookAt = transform;
-    }
-
-    CinemachineCamera RequireCamera(CinemachineCamera camera, string fieldName)
+    protected CinemachineCamera RequireCamera(CinemachineCamera camera, string fieldName)
     {
       if (camera == null)
       {
         throw new InvalidOperationException($"{name} is missing required camera {fieldName}.");
+      }
+      return camera;
+    }
+
+    void SetActiveInternal(bool isActive)
+    {
+      EnsureCameraDefaults();
+      _isActive = isActive;
+      if (_isActive)
+      {
+        var viewport = Registry.GameViewport;
+        UpdateActiveCamera(viewport);
+      }
+      else
+      {
+        ResetCameraPriorities();
+        OnDeactivated();
+      }
+    }
+
+    void SetCameraPriority(CinemachineCamera camera, int priority)
+    {
+      camera.Priority = priority;
+    }
+
+    CinemachineCamera UpdateActiveCamera(IGameViewport viewport)
+    {
+      var camera = GetActiveCamera(viewport);
+      var cameraChanged = _activeCamera != camera;
+      if (camera.Priority != _activePriority)
+      {
+        SetCameraPriority(camera, _activePriority);
+      }
+      if (cameraChanged)
+      {
+        _activeCamera = camera;
+        OnActiveCameraChanged(viewport, camera);
       }
       return camera;
     }
