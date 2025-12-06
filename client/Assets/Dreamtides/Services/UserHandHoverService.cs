@@ -214,7 +214,11 @@ namespace Dreamtides.Services
       {
         Card = card,
         JumpPosition = jumpPosition.Value,
-        JumpRotation = Quaternion.Euler(Constants.CameraXAngle, 0, 0),
+        JumpRotation = Quaternion.Euler(
+          Constants.CameraXAngle,
+          Registry.Layout.BattleYRotation(),
+          z: 0
+        ),
         CurrentTween = null,
         IsAnimatingToJump = false,
         AnimationProgress = 0f,

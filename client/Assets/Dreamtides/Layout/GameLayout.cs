@@ -194,6 +194,11 @@ namespace Dreamtides.Layout
     ObjectLayout? _aboveEnemyVoid;
     public ObjectLayout AboveEnemyVoid => Check(_aboveEnemyVoid);
 
+    /// <summary>
+    /// Returns the Y rotation to use for cards to be displayed in the battle.
+    /// </summary>
+    public float BattleYRotation() => BattleCamera.transform.eulerAngles.y;
+
     T Check<T>(T? value)
       where T : Object => Errors.CheckNotNull(value, $"{typeof(T).Name} not initialized");
   }

@@ -1,6 +1,7 @@
 #nullable enable
 
 using System;
+using Dreamtides.Services;
 using Dreamtides.Utils;
 using UnityEngine;
 
@@ -32,9 +33,6 @@ namespace Dreamtides.Layout
     [SerializeField]
     float _objectScale;
 
-    [SerializeField]
-    float _yRotation;
-
     public override Vector3 CalculateObjectPosition(int index, int count)
     {
       var curvePosition = CalculateCurvePosition(index, count);
@@ -47,7 +45,7 @@ namespace Dreamtides.Layout
       var curvePosition = CalculateCurvePosition(index, count);
       return new Vector3(
         x: Constants.CameraXAngle,
-        y: _yRotation,
+        y: Registry.Layout.BattleYRotation(),
         z: _zRotationAddition + _zRotationMultiplier * CalculateZRotation(curvePosition)
       );
     }
