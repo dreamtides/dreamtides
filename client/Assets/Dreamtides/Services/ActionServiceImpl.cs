@@ -226,17 +226,21 @@ namespace Dreamtides.Services
     public override void TriggerReconnect()
     {
       if (_metadata == null)
+      {
         return;
+      }
 
-      Debug.Log("Triggering idle reconnect");
-      Registry.LoggingService.Log("ActionService", "Triggering idle reconnect");
+      Debug.Log("Triggering reconnect");
+      Registry.LoggingService.Log("ActionService", "Triggering reconnect");
       StartCoroutine(PerformConnect(isReconnect: true, startLoggingSpan: false));
     }
 
     private IEnumerator PerformConnect(bool isReconnect, bool startLoggingSpan = false)
     {
       if (_metadata == null)
+      {
         yield break;
+      }
 
       var request = CreateConnectRequest();
       if (startLoggingSpan)
