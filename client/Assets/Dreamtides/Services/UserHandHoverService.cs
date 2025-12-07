@@ -234,12 +234,15 @@ namespace Dreamtides.Services
         return null;
       }
 
-      var horizontalPosition = Mathf.Clamp01((targetPosition.Value.x - 8f) / 14f);
+      var viewportPosition = Registry.MainCamera.WorldToViewportPoint(targetPosition.Value);
+      var horizontalPosition = Mathf.Clamp01(viewportPosition.x);
+
       var offset = Vector3.Lerp(
-        new Vector3(2f, 5.0f, 2f),
-        new Vector3(-2f, 5.0f, 2f),
+        new Vector3(4f, 5.0f, 2f),
+        new Vector3(-4f, 5.0f, 2f),
         horizontalPosition
       );
+
       var rotatedOffset = Quaternion.Euler(x: 0, Registry.Layout.BattleYRotation(), z: 0) * offset;
       return targetPosition.Value + rotatedOffset;
     }
