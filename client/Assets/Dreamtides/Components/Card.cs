@@ -613,9 +613,12 @@ namespace Dreamtides.Components
         && !Registry.CapabilitiesService.AnyBrowserOpen()
       )
       {
-        // Jump to large size when in user hand on mobile
         transform.position = MobileHandCardJumpPosition();
-        transform.rotation = Quaternion.Euler(Constants.CameraXAngle, 0, 0);
+        transform.rotation = Quaternion.Euler(
+          Constants.CameraXAngle,
+          Registry.Layout.BattleYRotation(),
+          z: 0
+        );
         Registry.CardAnimationService.DisplayInfoZoom(this, forCardInHand: true);
       }
       else if (
@@ -629,7 +632,11 @@ namespace Dreamtides.Components
         if (jumpPosition != null)
         {
           transform.position = jumpPosition.Value;
-          transform.rotation = Quaternion.Euler(Constants.CameraXAngle, 0, 0);
+          transform.rotation = Quaternion.Euler(
+            Constants.CameraXAngle,
+            Registry.Layout.BattleYRotation(),
+            z: 0
+          );
         }
         Registry.CardAnimationService.DisplayInfoZoom(this, forCardInHand: true);
       }
