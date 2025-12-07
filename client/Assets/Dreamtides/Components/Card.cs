@@ -42,7 +42,13 @@ namespace Dreamtides.Components
     internal Renderer _cardFrame = null!;
 
     [SerializeField]
+    internal Renderer _cardFrameBackground = null!;
+
+    [SerializeField]
     internal Renderer _cardImage = null!;
+
+    [SerializeField]
+    internal GameObject _shadowCaster = null!;
 
     [SerializeField]
     internal SpriteRenderer _battlefieldCardImage = null!;
@@ -857,6 +863,19 @@ namespace Dreamtides.Components
         _cardCollider.size = new Vector3(2.5f, _cardColliderHeight, 0.1f);
         _cardFrame.gameObject.SetActive(true);
       }
+
+      UpdateShadowCasting();
+    }
+
+    void UpdateShadowCasting()
+    {
+      var disableShadows =
+        CardView.Position.Position.Enum == PositionEnum.QuestDeck
+        || CardView.Position.Position.Enum == PositionEnum.DreamsignDisplay;
+      _shadowCaster.SetActive(!disableShadows);
+      _cardBack.shadowCastingMode = disableShadows
+        ? UnityEngine.Rendering.ShadowCastingMode.Off
+        : UnityEngine.Rendering.ShadowCastingMode.On;
     }
 
     bool BattlefieldMode() => HasGameContext && GameContext.IsBattlefieldContext();

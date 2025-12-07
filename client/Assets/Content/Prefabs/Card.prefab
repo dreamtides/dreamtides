@@ -2970,7 +2970,9 @@ MonoBehaviour:
   _rulesText: {fileID: 9119093439582104047}
   _typeText: {fileID: 1303211261265750374}
   _cardFrame: {fileID: 7304862604459217761}
+  _cardFrameBackground: {fileID: 0}
   _cardImage: {fileID: 5442503120378194473}
+  _shadowCaster: {fileID: 551648483260697378}
   _battlefieldCardImage: {fileID: 3051495475621405458}
   _cardCollider: {fileID: 5680000531262599633}
   _cardBack: {fileID: 2565455935476004323}
