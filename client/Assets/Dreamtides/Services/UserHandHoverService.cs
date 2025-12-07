@@ -235,8 +235,13 @@ namespace Dreamtides.Services
       }
 
       var horizontalPosition = Mathf.Clamp01((targetPosition.Value.x - 8f) / 14f);
-      return targetPosition.Value
-        + Vector3.Lerp(new Vector3(2f, 5.0f, 2f), new Vector3(-2f, 5.0f, 2f), horizontalPosition);
+      var offset = Vector3.Lerp(
+        new Vector3(2f, 5.0f, 2f),
+        new Vector3(-2f, 5.0f, 2f),
+        horizontalPosition
+      );
+      var rotatedOffset = Quaternion.Euler(x: 0, Registry.Layout.BattleYRotation(), z: 0) * offset;
+      return targetPosition.Value + rotatedOffset;
     }
 
     void AnimateCardToJump(CardAnimationState state)
