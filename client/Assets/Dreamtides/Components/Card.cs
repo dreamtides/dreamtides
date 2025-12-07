@@ -613,6 +613,7 @@ namespace Dreamtides.Components
         && !Registry.CapabilitiesService.AnyBrowserOpen()
       )
       {
+        // Jump to large size when in user hand on mobile
         transform.position = MobileHandCardJumpPosition();
         transform.rotation = Quaternion.Euler(
           Constants.CameraXAngle,
@@ -767,6 +768,7 @@ namespace Dreamtides.Components
       }
       else if (_isDraggingFromHand && ShouldReturnToPreviousParentOnRelease())
       {
+        Debug.Log("MouseUp: ShouldReturnToPreviousParentOnRelease");
         Registry.CardEffectPreviewService.ClearBattlePreview();
         Registry.CardService.AddToParent(this);
         Registry.CardService.RunAnimations(() =>
@@ -776,6 +778,7 @@ namespace Dreamtides.Components
       }
       else if (_isDraggingFromHand)
       {
+        Debug.Log("MouseUp: _isDraggingFromHand");
         _isDraggingFromHand = false;
         if (CardView.Revealed?.Actions?.OnPlaySound is { } onPlaySound)
         {
@@ -890,18 +893,17 @@ namespace Dreamtides.Components
     Vector3 MobileHandCardJumpPosition()
     {
       // Keep card above user's finger on mobile so they can read it.
-      var screenZ = Camera.main.WorldToScreenPoint(gameObject.transform.position).z;
-      var worldPosition = Registry.InputService.WorldPointerPosition(screenZ);
-      var offset = gameObject.transform.position - worldPosition;
-      var target = transform.position + new Vector3(0, 3, Mathf.Max(1.75f, 3.25f - offset.z));
-      target.x = Mathf.Clamp(
-        target.x,
-        Registry.Layout.InfoZoomLeft.position.x,
-        Registry.Layout.InfoZoomRight.position.x
+      var viewportPosition = Registry.MainCamera.WorldToViewportPoint(transform.position);
+      var horizontalPosition = Mathf.Clamp01(viewportPosition.x);
+
+      var offset = Vector3.Lerp(
+        new Vector3(4f, 5.0f, 2f),
+        new Vector3(-4f, 5.0f, 2f),
+        horizontalPosition
       );
-      target.y = Mathf.Clamp(target.y, 20f, 25f);
-      target.z = Mathf.Clamp(target.z, -25f, -20f);
-      return target;
+
+      var rotatedOffset = Quaternion.Euler(x: 0, Registry.Layout.BattleYRotation(), z: 0) * offset;
+      return transform.position + rotatedOffset;
     }
 
     bool ShouldReturnToPreviousParentOnRelease()
