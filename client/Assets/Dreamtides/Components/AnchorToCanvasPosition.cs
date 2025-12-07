@@ -1,6 +1,5 @@
 #nullable enable
 
-using System.Collections;
 using Dreamtides.Layout;
 using Dreamtides.Services;
 using Dreamtides.Utils;
@@ -28,14 +27,15 @@ namespace Dreamtides.Components
     [SerializeField]
     float _xOffset;
 
-    public IEnumerator Start()
+    int _frameCount;
+
+    void Update()
     {
-      if (Registry.TestConfiguration != null)
+      _frameCount++;
+
+      if (Registry.TestConfiguration != null && _frameCount < 3)
       {
-        // Hack: Screen resolution is not correct on first frame in tests. See
-        // note in Registry.cs.
-        yield return new WaitForEndOfFrame();
-        yield return new WaitForEndOfFrame();
+        return;
       }
 
       var screenPoint = TransformUtils.RectTransformToScreenSpace(_rectTransform).center;
@@ -43,17 +43,17 @@ namespace Dreamtides.Components
         new Vector3(screenPoint.x, screenPoint.y, _distanceFromCamera)
       );
 
+      var cameraRight = _registry.MainCamera.transform.right;
+      var offsetVector = cameraRight * _xOffset;
+
       if (_xCoordinateOnly)
       {
-        transform.position = new Vector3(
-          anchor.x + _xOffset,
-          transform.position.y,
-          transform.position.z
-        );
+        var newPosition = anchor + offsetVector;
+        transform.position = new Vector3(newPosition.x, transform.position.y, newPosition.z);
       }
       else
       {
-        transform.position = new Vector3(anchor.x + _xOffset, anchor.y, anchor.z);
+        transform.position = anchor + offsetVector;
       }
 
       if (GetComponent<ObjectLayout>() is { } layout)
