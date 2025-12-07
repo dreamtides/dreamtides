@@ -37,7 +37,7 @@ namespace Dreamtides.Layout
         index,
         count
       );
-      return _leftEdge.position + new Vector3(offset + _initialOffset, 0, 0);
+      return _leftEdge.position + transform.right * (offset + _initialOffset);
     }
 
     public override Vector3? CalculateObjectRotation(int index, int count) =>
@@ -49,9 +49,11 @@ namespace Dreamtides.Layout
     /// </summary>
     public DeckCardSelectedOrder SelectCardOrderWithinDisplay(Transform t, long cardId)
     {
-      var targetPosition = t.position.x;
+      var right = transform.right;
+      var targetPosition = Vector3.Dot(t.position, right);
+      var voidPosition = Vector3.Dot(_cardOrderSelectorVoid.transform.position, right);
 
-      if (targetPosition > _cardOrderSelectorVoid.transform.position.x - _cardWidth)
+      if (targetPosition > voidPosition - _cardWidth)
       {
         return new DeckCardSelectedOrder
         {
@@ -72,7 +74,8 @@ namespace Dreamtides.Layout
         };
       }
 
-      if (targetPosition < Objects[0].transform.position.x)
+      var firstObjectPosition = Vector3.Dot(Objects[0].transform.position, right);
+      if (targetPosition < firstObjectPosition)
       {
         return new DeckCardSelectedOrder
         {
@@ -84,7 +87,8 @@ namespace Dreamtides.Layout
         };
       }
 
-      if (targetPosition > Objects[Objects.Count - 1].transform.position.x)
+      var lastObjectPosition = Vector3.Dot(Objects[Objects.Count - 1].transform.position, right);
+      if (targetPosition > lastObjectPosition)
       {
         return new DeckCardSelectedOrder
         {
@@ -99,10 +103,10 @@ namespace Dreamtides.Layout
         };
       }
 
-      for (int i = 0; i < Objects.Count - 1; i++)
+      for (var i = 0; i < Objects.Count - 1; i++)
       {
-        var currentPosition = Objects[i].transform.position.x;
-        var nextPosition = Objects[i + 1].transform.position.x;
+        var currentPosition = Vector3.Dot(Objects[i].transform.position, right);
+        var nextPosition = Vector3.Dot(Objects[i + 1].transform.position, right);
 
         if (targetPosition >= currentPosition && targetPosition <= nextPosition)
         {
