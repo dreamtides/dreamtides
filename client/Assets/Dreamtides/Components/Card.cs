@@ -731,6 +731,7 @@ namespace Dreamtides.Components
       Registry.SoundService.PlayCardSound();
       Registry.CardAnimationService.ClearInfoZoom();
       Registry.CardAnimationService.IsPointerDownOnCard = false;
+      Debug.Log("MouseUp: isSameObject: " + isSameObject);
 
       if (
         CardView.Revealed?.Actions?.OnClick is { } onClick
@@ -903,7 +904,15 @@ namespace Dreamtides.Components
       );
 
       var rotatedOffset = Quaternion.Euler(x: 0, Registry.Layout.BattleYRotation(), z: 0) * offset;
-      return transform.position + rotatedOffset;
+      var target = transform.position + rotatedOffset;
+      target.x = Mathf.Clamp(
+        target.x,
+        Registry.Layout.InfoZoomLeft.position.x,
+        Registry.Layout.InfoZoomRight.position.x
+      );
+      target.y = Mathf.Clamp(target.y, 20f, 25f);
+      target.z = Mathf.Clamp(target.z, -25f, -20f);
+      return target;
     }
 
     bool ShouldReturnToPreviousParentOnRelease()
@@ -917,8 +926,11 @@ namespace Dreamtides.Components
       }
 
       var mousePosition = Registry.InputService.WorldPointerPosition(_dragStartScreenZ);
-      var zDistance = mousePosition.z - _dragStartPosition.z;
-      return zDistance < 1f;
+      var dragVector = mousePosition - _dragStartPosition;
+      var yRotation = Registry.Layout.BattleYRotation() * Mathf.Deg2Rad;
+      var forward = new Vector3(Mathf.Sin(yRotation), 0, Mathf.Cos(yRotation));
+      var forwardDistance = Vector3.Dot(dragVector, forward);
+      return forwardDistance < 1f;
     }
 
     bool CanPlay() =>
