@@ -53,6 +53,7 @@ namespace Dreamtides.Tests.TestUtils
       _landscapeLayout = GeneratedLandscapeGameLayout.Create(_createdObjects);
       _registry._portraitLayout = _portraitLayout;
       _registry._landscapeLayout = _landscapeLayout;
+      GeneratedSites.Create(_createdObjects);
       _testConfiguration = new TestConfiguration(Guid.NewGuid());
       return _registry.RunAwake(
         _gameMode,

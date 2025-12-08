@@ -1,51 +1,93 @@
 #nullable enable
 
-using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Reflection;
+using Dreamtides.Components;
 using Dreamtides.Layout;
 using UnityEditor;
 using UnityEngine;
-using Object = UnityEngine.Object;
+using UnityEngine.SceneManagement;
 
 namespace Dreamtides.Editors
 {
   public class GameLayoutCodeGenerator : EditorWindow
   {
-    const string OutputDirectory = "Assets/Dreamtides/Tests/TestUtils/";
-
-    static readonly HashSet<string> SkipFields = new()
-    {
-      "_registry",
-      "_objects",
-      "m_Script",
-      "m_GameObject",
-      "m_Enabled",
-      "m_ObjectHideFlags",
-    };
-
     GameLayout? _portraitLayout;
     GameLayout? _landscapeLayout;
     string _portraitClassName = "GeneratedPortraitGameLayout";
     string _landscapeClassName = "GeneratedLandscapeGameLayout";
-    readonly Dictionary<GameObject, string> _goVariables = new();
-    readonly Dictionary<Component, string> _componentVariables = new();
-    readonly HashSet<string> _usedVarNames = new();
 
-    [MenuItem("Tools/Generate GameLayout Test Code")]
+    GameObject? _sitesRoot;
+    string _sitesClassName = "GeneratedSites";
+
+    [MenuItem("Tools/Generate Test Code")]
     static void ShowWindow()
     {
-      GetWindow<GameLayoutCodeGenerator>("GameLayout Code Generator");
+      var window = GetWindow<GameLayoutCodeGenerator>("Test Code Generator");
+      window.AutoPopulateDefaults();
+    }
+
+    void AutoPopulateDefaults()
+    {
+      if (_portraitLayout == null)
+      {
+        _portraitLayout = FindRootGameLayout("PortraitLayout");
+      }
+
+      if (_landscapeLayout == null)
+      {
+        _landscapeLayout = FindRootGameLayout("LandscapeLayout");
+      }
+
+      if (_sitesRoot == null)
+      {
+        _sitesRoot = FindRootGameObject("Sites");
+      }
+    }
+
+    static GameLayout? FindRootGameLayout(string name)
+    {
+      var go = FindRootGameObject(name);
+      return go != null ? go.GetComponent<GameLayout>() : null;
+    }
+
+    static GameObject? FindRootGameObject(string name)
+    {
+      for (var i = 0; i < SceneManager.sceneCount; i++)
+      {
+        var scene = SceneManager.GetSceneAt(i);
+        if (!scene.isLoaded)
+        {
+          continue;
+        }
+
+        foreach (var rootGo in scene.GetRootGameObjects())
+        {
+          if (rootGo.name == name)
+          {
+            return rootGo;
+          }
+        }
+      }
+
+      return null;
     }
 
     void OnGUI()
     {
-      EditorGUILayout.LabelField("GameLayout Code Generator", EditorStyles.boldLabel);
+      EditorGUILayout.LabelField("Test Code Generator", EditorStyles.boldLabel);
+
+      DrawGameLayoutSection();
+      EditorGUILayout.Space(20);
+      DrawSitesSection();
+      EditorGUILayout.Space(20);
+      DrawGenerateButton();
+    }
+
+    void DrawGameLayoutSection()
+    {
+      EditorGUILayout.LabelField("Game Layouts", EditorStyles.boldLabel);
       EditorGUILayout.Space();
 
-      EditorGUILayout.LabelField("Portrait Layout", EditorStyles.boldLabel);
       _portraitLayout =
         EditorGUILayout.ObjectField(
           "Portrait GameLayout",
@@ -57,7 +99,6 @@ namespace Dreamtides.Editors
 
       EditorGUILayout.Space();
 
-      EditorGUILayout.LabelField("Landscape Layout", EditorStyles.boldLabel);
       _landscapeLayout =
         EditorGUILayout.ObjectField(
           "Landscape GameLayout",
@@ -66,12 +107,30 @@ namespace Dreamtides.Editors
           true
         ) as GameLayout;
       _landscapeClassName = EditorGUILayout.TextField("Landscape Class Name", _landscapeClassName);
+    }
 
+    void DrawSitesSection()
+    {
+      EditorGUILayout.LabelField("Sites", EditorStyles.boldLabel);
       EditorGUILayout.Space();
 
-      if (_portraitLayout == null && _landscapeLayout == null)
+      _sitesRoot =
+        EditorGUILayout.ObjectField("Sites Root GameObject", _sitesRoot, typeof(GameObject), true)
+        as GameObject;
+      _sitesClassName = EditorGUILayout.TextField("Sites Class Name", _sitesClassName);
+    }
+
+    void DrawGenerateButton()
+    {
+      var hasLayoutInput = _portraitLayout != null || _landscapeLayout != null;
+      var hasSitesInput = _sitesRoot != null;
+
+      if (!hasLayoutInput && !hasSitesInput)
       {
-        EditorGUILayout.HelpBox("Select at least one GameLayout from the scene.", MessageType.Info);
+        EditorGUILayout.HelpBox(
+          "Select at least one GameLayout or Sites Root from the scene.",
+          MessageType.Info
+        );
         return;
       }
 
@@ -87,29 +146,39 @@ namespace Dreamtides.Editors
         return;
       }
 
+      if (_sitesRoot != null && string.IsNullOrWhiteSpace(_sitesClassName))
+      {
+        EditorGUILayout.HelpBox("Please enter a sites class name.", MessageType.Warning);
+        return;
+      }
+
       if (GUILayout.Button("Generate Code"))
       {
         var generatedFiles = new List<string>();
 
         if (_portraitLayout != null)
         {
-          GenerateCode(_portraitLayout, _portraitClassName);
+          GenerateGameLayoutCode(_portraitLayout, _portraitClassName);
           generatedFiles.Add(_portraitClassName);
         }
 
         if (_landscapeLayout != null)
         {
-          GenerateCode(_landscapeLayout, _landscapeClassName);
+          GenerateGameLayoutCode(_landscapeLayout, _landscapeClassName);
           generatedFiles.Add(_landscapeClassName);
         }
 
-        Debug.Log(
-          $"Generated {generatedFiles.Count} layout files: {string.Join(", ", generatedFiles)}"
-        );
+        if (_sitesRoot != null)
+        {
+          GenerateSitesCode(_sitesRoot, _sitesClassName);
+          generatedFiles.Add(_sitesClassName);
+        }
+
+        Debug.Log($"Generated {generatedFiles.Count} files: {string.Join(", ", generatedFiles)}");
       }
     }
 
-    static bool IsSupportedComponent(Component component)
+    static bool IsGameLayoutSupportedComponent(Component component)
     {
       if (component == null)
       {
@@ -141,240 +210,21 @@ namespace Dreamtides.Editors
       return false;
     }
 
-    void GenerateCode(GameLayout layout, string className)
+    static bool IsSitesSupportedComponent(Component component)
     {
-      _goVariables.Clear();
-      _componentVariables.Clear();
-      _usedVarNames.Clear();
-
-      var builder = new CSharpCodeBuilder();
-
-      builder.Line("// AUTO-GENERATED CODE - DO NOT EDIT");
-      builder.Line($"// Generated from: {layout.gameObject.name}");
-      builder.Line($"// Generated at: {DateTime.Now:yyyy-MM-dd HH:mm:ss}");
-      builder.BlankLine();
-      builder.Line("#nullable enable");
-      builder.BlankLine();
-      builder.Using("System.Collections.Generic");
-      builder.Using("Dreamtides.Buttons");
-      builder.Using("Dreamtides.Components");
-      builder.Using("Dreamtides.Layout");
-      builder.Using("Dreamtides.Schema");
-      builder.Using("TMPro");
-      builder.Using("Unity.Cinemachine");
-      builder.Using("UnityEngine");
-      builder.Using("UnityEngine.UI");
-      builder.BlankLine();
-      builder.Namespace("Dreamtides.Tests.TestUtils");
-      builder.OpenBrace();
-
-      builder.Class(className);
-      builder.OpenBrace();
-
-      GenerateCreateMethod(builder, layout);
-
-      builder.CloseBrace();
-      builder.CloseBrace();
-
-      var code = builder.ToString();
-      var outputPath = $"{OutputDirectory}{className}.cs";
-      File.WriteAllText(outputPath, code);
-      AssetDatabase.Refresh();
-
-      Debug.Log($"Generated GameLayout code to {outputPath}");
-    }
-
-    void GenerateCreateMethod(CSharpCodeBuilder builder, GameLayout layout)
-    {
-      builder.Method("GameLayout", "Create", "List<GameObject> createdObjects", isStatic: true);
-      builder.OpenBrace();
-
-      var layoutVar = GenerateGameObjectAndComponents(
-        builder,
-        layout.gameObject,
-        "layout",
-        isRoot: true
-      );
-
-      GenerateChildReferences(builder, layout, layoutVar);
-
-      builder.BlankLine();
-      builder.Return(layoutVar);
-
-      builder.CloseBrace();
-    }
-
-    string GenerateGameObjectAndComponents(
-      CSharpCodeBuilder builder,
-      GameObject go,
-      string suggestedName,
-      bool isRoot = false
-    )
-    {
-      if (_goVariables.TryGetValue(go, out var existingGoVar))
+      if (component == null)
       {
-        var primaryComponent = GetPrimaryComponent(go);
-        if (
-          primaryComponent != null
-          && _componentVariables.TryGetValue(primaryComponent, out var existingCompVar)
-        )
-        {
-          return existingCompVar;
-        }
-        return existingGoVar.Replace("Go", "");
+        return false;
       }
 
-      var baseVarName = GenerateUniqueVarName(suggestedName);
-      var goVarName = baseVarName + "Go";
+      var type = component.GetType();
 
-      _goVariables[go] = goVarName;
-
-      builder.CreateGameObject(goVarName, go.name);
-      builder.Call("createdObjects", "Add", goVarName);
-
-      GenerateTransform(builder, go.transform, goVarName, isRoot);
-
-      var primaryComponentVar = GenerateComponentsOnGameObject(builder, go, goVarName, baseVarName);
-
-      return primaryComponentVar ?? baseVarName;
-    }
-
-    string? GenerateComponentsOnGameObject(
-      CSharpCodeBuilder builder,
-      GameObject go,
-      string goVarName,
-      string baseVarName
-    )
-    {
-      var components = go.GetComponents<Component>();
-      var supportedComponents = components.Where(IsSupportedComponent).ToList();
-
-      string? primaryVar = null;
-      var componentIndex = 0;
-
-      foreach (var component in supportedComponents)
-      {
-        var componentType = component.GetType();
-        string componentVar;
-
-        if (componentIndex == 0)
-        {
-          componentVar = baseVarName;
-        }
-        else
-        {
-          componentVar = GenerateUniqueVarName(baseVarName + componentType.Name);
-        }
-
-        _componentVariables[component] = componentVar;
-
-        builder.AddComponent(componentVar, goVarName, componentType.Name);
-        GenerateNonDefaultFields(builder, component, componentVar);
-
-        if (primaryVar == null)
-        {
-          primaryVar = componentVar;
-        }
-
-        componentIndex++;
-      }
-
-      return primaryVar;
-    }
-
-    Component? GetPrimaryComponent(GameObject go)
-    {
-      var components = go.GetComponents<Component>();
-      return components.FirstOrDefault(IsSupportedComponent);
-    }
-
-    void GenerateTransform(CSharpCodeBuilder builder, Transform t, string goVar, bool isRoot)
-    {
-      if (!isRoot && t.parent != null)
-      {
-        if (_goVariables.TryGetValue(t.parent.gameObject, out var parentGoVar))
-        {
-          builder.Call($"{goVar}.transform", "SetParent", $"{parentGoVar}.transform", "false");
-        }
-      }
-
-      if (t.localPosition != Vector3.zero)
-      {
-        builder.Assign(
-          $"{goVar}.transform.localPosition",
-          CSharpCodeBuilder.ToVector3(t.localPosition)
-        );
-      }
-
-      if (t.localRotation != Quaternion.identity)
-      {
-        builder.Assign(
-          $"{goVar}.transform.localRotation",
-          CSharpCodeBuilder.ToQuaternion(t.localRotation)
-        );
-      }
-
-      if (t.localScale != Vector3.one)
-      {
-        builder.Assign($"{goVar}.transform.localScale", CSharpCodeBuilder.ToVector3(t.localScale));
-      }
-    }
-
-    void GenerateNonDefaultFields(
-      CSharpCodeBuilder builder,
-      Component component,
-      string componentVar
-    )
-    {
-      var componentType = component.GetType();
-
-      var tempGo = new GameObject("__temp_default_check");
-      tempGo.hideFlags = HideFlags.HideAndDontSave;
-
-      try
-      {
-        var defaultComponent = tempGo.AddComponent(componentType);
-
-        var serializedActual = new SerializedObject(component);
-        var serializedDefault = new SerializedObject(defaultComponent);
-
-        var iterator = serializedActual.GetIterator();
-        var enterChildren = true;
-        while (iterator.NextVisible(enterChildren))
-        {
-          enterChildren = false;
-
-          if (ShouldSkipProperty(iterator))
-          {
-            continue;
-          }
-
-          var defaultProp = serializedDefault.FindProperty(iterator.propertyPath);
-          if (defaultProp == null)
-          {
-            continue;
-          }
-
-          if (!SerializedProperty.DataEquals(iterator, defaultProp))
-          {
-            GenerateFieldAssignment(builder, iterator, componentVar);
-          }
-        }
-      }
-      finally
-      {
-        DestroyImmediate(tempGo);
-      }
-    }
-
-    bool ShouldSkipProperty(SerializedProperty prop)
-    {
-      if (SkipFields.Contains(prop.name))
+      if (typeof(DreamscapeSite).IsAssignableFrom(type))
       {
         return true;
       }
 
-      if (prop.propertyPath.Contains("."))
+      if (typeof(ObjectLayout).IsAssignableFrom(type))
       {
         return true;
       }
@@ -382,404 +232,77 @@ namespace Dreamtides.Editors
       return false;
     }
 
-    void GenerateFieldAssignment(
-      CSharpCodeBuilder builder,
-      SerializedProperty prop,
-      string componentVar
-    )
+    static void GenerateGameLayoutCode(GameLayout layout, string className)
     {
-      var fieldName = prop.name;
-      var target = $"{componentVar}.{fieldName}";
+      var utils = new CodeGeneratorUtils(IsGameLayoutSupportedComponent);
+      var builder = CodeGeneratorUtils.CreateBuilder(layout.gameObject.name);
 
-      switch (prop.propertyType)
-      {
-        case SerializedPropertyType.Float:
-          builder.Assign(target, CSharpCodeBuilder.ToLiteral(prop.floatValue));
-          break;
+      builder.Class(className);
+      builder.OpenBrace();
 
-        case SerializedPropertyType.Integer:
-          builder.Assign(target, CSharpCodeBuilder.ToLiteral(prop.intValue));
-          break;
+      builder.Method("GameLayout", "Create", "List<GameObject> createdObjects", isStatic: true);
+      builder.OpenBrace();
 
-        case SerializedPropertyType.Boolean:
-          builder.Assign(target, CSharpCodeBuilder.ToLiteral(prop.boolValue));
-          break;
-
-        case SerializedPropertyType.String:
-          if (!string.IsNullOrEmpty(prop.stringValue))
-          {
-            builder.Assign(target, CSharpCodeBuilder.ToLiteral(prop.stringValue));
-          }
-          break;
-
-        case SerializedPropertyType.Enum:
-          var enumType = GetEnumType(prop);
-          if (
-            enumType != null
-            && prop.enumValueIndex >= 0
-            && prop.enumValueIndex < prop.enumNames.Length
-          )
-          {
-            var enumName = prop.enumNames[prop.enumValueIndex];
-            builder.Assign(target, $"{enumType.Name}.{enumName}");
-          }
-          break;
-
-        case SerializedPropertyType.Vector3:
-          builder.Assign(target, CSharpCodeBuilder.ToVector3(prop.vector3Value));
-          break;
-
-        case SerializedPropertyType.Color:
-          builder.Assign(target, CSharpCodeBuilder.ToColor(prop.colorValue));
-          break;
-
-        case SerializedPropertyType.ObjectReference:
-          break;
-      }
-    }
-
-    void GenerateChildReferences(CSharpCodeBuilder builder, GameLayout layout, string layoutVar)
-    {
-      var serialized = new SerializedObject(layout);
-      var iterator = serialized.GetIterator();
-      var enterChildren = true;
-
-      var childRefs = new List<(string fieldName, Object objRef)>();
-
-      while (iterator.NextVisible(enterChildren))
-      {
-        enterChildren = false;
-
-        if (iterator.propertyType != SerializedPropertyType.ObjectReference)
-        {
-          continue;
-        }
-
-        if (ShouldSkipProperty(iterator))
-        {
-          continue;
-        }
-
-        var objRef = iterator.objectReferenceValue;
-        if (objRef == null)
-        {
-          continue;
-        }
-
-        childRefs.Add((iterator.name, objRef));
-      }
-
-      foreach (var (fieldName, objRef) in childRefs)
-      {
-        GenerateChildReference(builder, objRef, layoutVar, fieldName);
-      }
-    }
-
-    void GenerateChildReference(
-      CSharpCodeBuilder builder,
-      Object objRef,
-      string parentVar,
-      string fieldName
-    )
-    {
-      GameObject? go = null;
-      Component? targetComponent = null;
-
-      if (objRef is Component c)
-      {
-        go = c.gameObject;
-        targetComponent = c;
-      }
-      else if (objRef is GameObject g)
-      {
-        go = g;
-      }
-      else if (objRef is Transform t)
-      {
-        go = t.gameObject;
-        targetComponent = t;
-      }
-      else
-      {
-        Debug.LogWarning($"Skipping unsupported asset reference: {fieldName} -> {objRef.name}");
-        return;
-      }
-
-      if (go == null)
-      {
-        return;
-      }
-
-      if (_goVariables.ContainsKey(go))
-      {
-        EnsureComponentExists(builder, go, targetComponent);
-        AssignExistingReference(builder, parentVar, fieldName, go, targetComponent);
-        return;
-      }
-
-      builder.BlankLine();
-
-      var childVar = GenerateGameObjectAndComponents(
+      var layoutVar = utils.GenerateGameObjectAndComponents(
         builder,
-        go,
-        SanitizeVarName(fieldName),
-        isRoot: false
+        layout.gameObject,
+        "layout",
+        isRoot: true
       );
 
-      EnsureComponentExists(builder, go, targetComponent);
+      utils.GenerateComponentReferences(builder, layout, layoutVar);
 
-      GenerateNestedChildReferences(builder, go, childVar);
+      builder.BlankLine();
+      builder.Return(layoutVar);
 
-      AssignExistingReference(builder, parentVar, fieldName, go, targetComponent);
+      builder.CloseBrace();
+      builder.CloseBrace();
+
+      CodeGeneratorUtils.WriteFile(builder, className);
     }
 
-    void EnsureComponentExists(CSharpCodeBuilder builder, GameObject go, Component? targetComponent)
+    static void GenerateSitesCode(GameObject sitesRoot, string className)
     {
-      if (targetComponent == null || targetComponent is Transform)
+      var utils = new CodeGeneratorUtils(IsSitesSupportedComponent);
+      var builder = CodeGeneratorUtils.CreateBuilder(sitesRoot.name);
+
+      builder.Class(className);
+      builder.OpenBrace();
+
+      builder.Method(
+        "List<DreamscapeSite>",
+        "Create",
+        "List<GameObject> createdObjects",
+        isStatic: true
+      );
+      builder.OpenBrace();
+
+      builder.Var("result", "new List<DreamscapeSite>()");
+      builder.BlankLine();
+
+      var siteComponents = sitesRoot.GetComponentsInChildren<DreamscapeSite>(includeInactive: true);
+
+      foreach (var site in siteComponents)
       {
-        return;
-      }
-
-      if (_componentVariables.ContainsKey(targetComponent))
-      {
-        return;
-      }
-
-      if (!_goVariables.TryGetValue(go, out var goVar))
-      {
-        return;
-      }
-
-      var componentType = targetComponent.GetType();
-      var componentVar = GenerateUniqueVarName(SanitizeVarName(componentType.Name));
-      _componentVariables[targetComponent] = componentVar;
-
-      builder.AddComponent(componentVar, goVar, componentType.Name);
-
-      if (IsUserDefinedComponent(targetComponent))
-      {
-        ProcessComponentChildReferences(builder, targetComponent, componentVar);
-      }
-    }
-
-    static bool IsUserDefinedComponent(Component component)
-    {
-      var ns = component.GetType().Namespace;
-      if (string.IsNullOrEmpty(ns))
-      {
-        return false;
-      }
-
-      return ns.StartsWith("Dreamtides");
-    }
-
-    void ProcessComponentChildReferences(
-      CSharpCodeBuilder builder,
-      Component component,
-      string componentVar
-    )
-    {
-      var serialized = new SerializedObject(component);
-      var iterator = serialized.GetIterator();
-      var enterChildren = true;
-
-      while (iterator.NextVisible(enterChildren))
-      {
-        enterChildren = false;
-
-        if (iterator.propertyType != SerializedPropertyType.ObjectReference)
-        {
-          continue;
-        }
-
-        if (ShouldSkipProperty(iterator))
-        {
-          continue;
-        }
-
-        var objRef = iterator.objectReferenceValue;
-        if (objRef == null)
-        {
-          continue;
-        }
-
-        GameObject? childGo = null;
-        Component? childComponent = null;
-
-        if (objRef is Component c)
-        {
-          childGo = c.gameObject;
-          childComponent = c;
-        }
-        else if (objRef is Transform t)
-        {
-          childGo = t.gameObject;
-          childComponent = t;
-        }
-
-        if (childGo == null)
-        {
-          continue;
-        }
-
-        if (!_goVariables.ContainsKey(childGo))
-        {
-          GenerateChildReference(builder, objRef, componentVar, iterator.name);
-        }
-        else
-        {
-          EnsureComponentExists(builder, childGo, childComponent);
-          AssignExistingReference(builder, componentVar, iterator.name, childGo, childComponent);
-        }
-      }
-    }
-
-    void GenerateNestedChildReferences(CSharpCodeBuilder builder, GameObject go, string goVar)
-    {
-      var components = go.GetComponents<Component>();
-      foreach (var component in components)
-      {
-        if (!IsSupportedComponent(component))
-        {
-          continue;
-        }
-
-        var serialized = new SerializedObject(component);
-        var iterator = serialized.GetIterator();
-        var enterChildren = true;
-
-        while (iterator.NextVisible(enterChildren))
-        {
-          enterChildren = false;
-
-          if (iterator.propertyType != SerializedPropertyType.ObjectReference)
-          {
-            continue;
-          }
-
-          if (ShouldSkipProperty(iterator))
-          {
-            continue;
-          }
-
-          var objRef = iterator.objectReferenceValue;
-          if (objRef == null)
-          {
-            continue;
-          }
-
-          GameObject? childGo = null;
-          if (objRef is Component c)
-          {
-            childGo = c.gameObject;
-          }
-          else if (objRef is Transform t)
-          {
-            childGo = t.gameObject;
-          }
-
-          if (childGo == null)
-          {
-            continue;
-          }
-
-          if (!_componentVariables.TryGetValue(component, out var compVar))
-          {
-            compVar = goVar;
-          }
-
-          if (!_goVariables.ContainsKey(childGo))
-          {
-            GenerateChildReference(builder, objRef, compVar, iterator.name);
-          }
-          else
-          {
-            AssignExistingReference(builder, compVar, iterator.name, childGo, objRef as Component);
-          }
-        }
-      }
-    }
-
-    void AssignExistingReference(
-      CSharpCodeBuilder builder,
-      string parentVar,
-      string fieldName,
-      GameObject go,
-      Component? targetComponent
-    )
-    {
-      var target = $"{parentVar}.{fieldName}";
-      var goVar = _goVariables[go];
-
-      if (targetComponent is Transform)
-      {
-        builder.Assign(target, $"{goVar}.transform");
-      }
-      else if (
-        targetComponent != null
-        && _componentVariables.TryGetValue(targetComponent, out var compVar)
-      )
-      {
-        builder.Assign(target, compVar);
-      }
-      else if (targetComponent != null)
-      {
-        var componentTypeName = targetComponent.GetType().Name;
-        builder.Assign(target, $"{goVar}.GetComponent<{componentTypeName}>()");
-      }
-      else
-      {
-        builder.Assign(target, goVar);
-      }
-    }
-
-    string GenerateUniqueVarName(string baseName)
-    {
-      var sanitized = SanitizeVarName(baseName);
-      var candidate = sanitized;
-      var counter = 1;
-
-      while (_usedVarNames.Contains(candidate))
-      {
-        candidate = sanitized + counter;
-        counter++;
-      }
-
-      _usedVarNames.Add(candidate);
-      return candidate;
-    }
-
-    static string SanitizeVarName(string name)
-    {
-      var result = name.TrimStart('_');
-      if (result.Length > 0)
-      {
-        result = char.ToLower(result[0]) + result.Substring(1);
-      }
-      return result;
-    }
-
-    static Type? GetEnumType(SerializedProperty prop)
-    {
-      var targetObject = prop.serializedObject.targetObject;
-      var targetType = targetObject.GetType();
-
-      while (targetType != null)
-      {
-        var field = targetType.GetField(
-          prop.name,
-          BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance
+        var siteVar = utils.GenerateGameObjectAndComponents(
+          builder,
+          site.gameObject,
+          CodeGeneratorUtils.SanitizeVarName(site.gameObject.name),
+          isRoot: true
         );
 
-        if (field != null && field.FieldType.IsEnum)
-        {
-          return field.FieldType;
-        }
+        utils.GenerateComponentReferences(builder, site, siteVar);
 
-        targetType = targetType.BaseType;
+        builder.Call("result", "Add", siteVar);
+        builder.BlankLine();
       }
 
-      return null;
+      builder.Return("result");
+
+      builder.CloseBrace();
+      builder.CloseBrace();
+
+      CodeGeneratorUtils.WriteFile(builder, className);
     }
   }
 }

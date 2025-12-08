@@ -1,6 +1,6 @@
 // AUTO-GENERATED CODE - DO NOT EDIT
 // Generated from: PortraitLayout
-// Generated at: 2025-12-08 07:09:47
+// Generated at: 2025-12-08 07:44:50
 
 #nullable enable
 
@@ -833,7 +833,7 @@ namespace Dreamtides.Tests.TestUtils
 
       var undoButtonGo = new GameObject("UndoButton");
       createdObjects.Add(undoButtonGo);
-      undoButtonGo.transform.localPosition = new Vector3(134.6001f, 194.7f, 0f);
+      undoButtonGo.transform.localPosition = new Vector3(340.1556f, 194.7f, 0f);
       var canvasButton = undoButtonGo.AddComponent<CanvasButton>();
       var canvasGroup = undoButtonGo.AddComponent<CanvasGroup>();
       canvasButton._canvasGroup = canvasGroup;

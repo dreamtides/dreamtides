@@ -100,7 +100,7 @@ namespace Dreamtides.Components
       var layout = anchor.parent;
       if (layout == null)
       {
-        throw new InvalidOperationException("Battle layout anchor is missing a parent.");
+        return;
       }
       var layoutRotation = transform.rotation * Quaternion.Inverse(anchor.localRotation);
       var layoutPosition = transform.position - layoutRotation * anchor.localPosition;
