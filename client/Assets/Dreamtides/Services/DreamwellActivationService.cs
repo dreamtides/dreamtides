@@ -65,10 +65,12 @@ namespace Dreamtides.Services
       var flipSequence = TweenUtils.Sequence("DreamwellActivationFlip");
       Registry.SoundService.Play(_revealSound);
 
-      var flippedAngles = new Vector3(150, 0, 0);
       // Now start the flip sequence
+      var targetRotation = Registry.Layout.DreamwellDisplay.rotation;
+      var flippedRotation = targetRotation * Quaternion.Euler(150, 0, 0);
+
       flipSequence
-        .Insert(0, card.transform.DOLocalRotate(flippedAngles, flipDuration))
+        .Insert(0, card.transform.DORotateQuaternion(flippedRotation, flipDuration))
         .InsertCallback(
           flipDuration,
           () =>
@@ -76,13 +78,7 @@ namespace Dreamtides.Services
             card.TurnFaceUp();
           }
         )
-        .Insert(
-          flipDuration,
-          card.transform.DOLocalRotate(
-            Registry.Layout.DreamwellDisplay.rotation.eulerAngles,
-            flipDuration
-          )
-        );
+        .Insert(flipDuration, card.transform.DORotateQuaternion(targetRotation, flipDuration));
 
       // Wait for both sequences to complete
       yield return moveSequence.WaitForCompletion();
