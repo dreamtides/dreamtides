@@ -217,7 +217,7 @@ namespace Dreamtides.Services
     )
     {
       var targetScenes = new List<Scene> { gameObject.scene };
-      yield return LoadAdditionalSceneIfNeeded(targetScenes);
+      yield return LoadAdditionalSceneIfNeeded(targetScenes, mode);
 
       if (_isLandscape)
       {
@@ -333,8 +333,13 @@ namespace Dreamtides.Services
       }
     }
 
-    IEnumerator LoadAdditionalSceneIfNeeded(List<Scene> targetScenes)
+    IEnumerator LoadAdditionalSceneIfNeeded(List<Scene> targetScenes, GameMode mode)
     {
+      if (mode == GameMode.Battle)
+      {
+        yield break;
+      }
+
       if (_additionalSceneReference == null || !_additionalSceneReference.RuntimeKeyIsValid())
       {
         yield break;
@@ -443,6 +448,7 @@ namespace Dreamtides.Services
       var battleMode = mode == GameMode.Battle;
       if (battleMode)
       {
+        CinemachineBrain.enabled = false;
         MainCamera.transform.position = Layout.CameraPosition.position;
         MainCamera.transform.rotation = Layout.CameraPosition.rotation;
         _cameraAdjuster.AdjustFieldOfView(Layout.BattleCameraBounds);

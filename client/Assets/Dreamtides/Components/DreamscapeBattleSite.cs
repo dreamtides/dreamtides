@@ -1,6 +1,7 @@
 #nullable enable
 
 using System;
+using Dreamtides.Services;
 using Unity.Cinemachine;
 using UnityEngine;
 
@@ -24,11 +25,19 @@ namespace Dreamtides.Components
 
     protected override void OnActiveCameraChanged(IGameViewport viewport, CinemachineCamera camera)
     {
+      if (Mode == GameMode.Battle)
+      {
+        return;
+      }
       AlignBattleLayout(viewport);
     }
 
     protected override void OnUpdate()
     {
+      if (Mode == GameMode.Battle)
+      {
+        return;
+      }
       base.OnUpdate();
       var viewport = Registry.GameViewport;
       if (!_debugUpdateContinuously && !IsActive)

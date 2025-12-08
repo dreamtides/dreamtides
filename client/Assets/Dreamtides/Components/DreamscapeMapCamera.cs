@@ -233,6 +233,10 @@ namespace Dreamtides.Components
 
     protected override void OnStart()
     {
+      if (Mode == GameMode.Battle)
+      {
+        return;
+      }
       FrameSites();
       EnsureSiteButtons();
       PositionSiteButtons();
