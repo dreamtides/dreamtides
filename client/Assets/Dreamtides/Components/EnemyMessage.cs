@@ -1,25 +1,28 @@
 #nullable enable
 
 using System.Collections;
+using System.Runtime.CompilerServices;
 using Dreamtides.Schema;
 using TMPro;
 using UnityEngine;
+
+[assembly: InternalsVisibleTo("Dreamtides.Tests")]
 
 namespace Dreamtides.Components
 {
   public class EnemyMessage : MonoBehaviour
   {
     [SerializeField]
-    SpriteRenderer _background = null!;
+    internal SpriteRenderer _background = null!;
 
     [SerializeField]
-    TextMeshPro _messageText = null!;
+    internal TextMeshPro _messageText = null!;
 
     [SerializeField]
-    float _fadeInDuration = 0.3f;
+    internal float _fadeInDuration = 0.3f;
 
     [SerializeField]
-    float _fadeOutDuration = 0.3f;
+    internal float _fadeOutDuration = 0.3f;
 
     private Coroutine? _activeCoroutine;
 

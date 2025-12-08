@@ -1,15 +1,18 @@
 #nullable enable
 
 using System.Collections;
+using System.Runtime.CompilerServices;
 using Dreamtides.Schema;
 using UnityEngine;
+
+[assembly: InternalsVisibleTo("Dreamtides.Tests")]
 
 namespace Dreamtides.Components
 {
   public class MecanimAnimator : MonoBehaviour
   {
     [SerializeField]
-    Animator _animator = null!;
+    internal Animator _animator = null!;
 
     const float DefaultBlendDuration = 0.3f;
 

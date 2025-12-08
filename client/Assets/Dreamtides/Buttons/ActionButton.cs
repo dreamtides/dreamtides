@@ -12,6 +12,8 @@ using UnityEngine.Serialization;
 
 [assembly: InternalsVisibleTo("Dreamtides.TestUtils")]
 
+[assembly: InternalsVisibleTo("Dreamtides.Tests")]
+
 namespace Dreamtides.Buttons
 {
   public sealed class ActionButton : Displayable
@@ -45,19 +47,19 @@ namespace Dreamtides.Buttons
     internal int _debounceDelayMilliseconds = 500;
 
     [SerializeField]
-    Vector3 _originalPosition;
+    internal Vector3 _originalPosition;
 
     [SerializeField]
-    Color _originalColor;
+    internal Color _originalColor;
 
     [SerializeField]
-    Material _originalMaterial = null!;
+    internal Material _originalMaterial = null!;
 
     [SerializeField]
-    Vector3 _originalBackgroundLocalScale;
+    internal Vector3 _originalBackgroundLocalScale;
 
     [SerializeField]
-    Vector3 _originalTextLocalScale;
+    internal Vector3 _originalTextLocalScale;
 
     Sequence? _currentAnimation;
     Sequence? _hideSequence;
@@ -82,7 +84,7 @@ namespace Dreamtides.Buttons
 
     protected override void OnInitialize()
     {
-      _originalMaterial = _background.material;
+      _originalMaterial = MaterialUtils.GetMaterial(_background);
       _collider.enabled = _isVisible;
       _lastInteractionTime = Time.time;
       _lastIdlePollTime = Time.time;

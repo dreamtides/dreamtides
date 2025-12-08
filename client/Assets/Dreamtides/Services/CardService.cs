@@ -4,6 +4,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using DG.Tweening;
 using Dreamtides.Components;
 using Dreamtides.Layout;
@@ -12,39 +13,41 @@ using Dreamtides.Utils;
 using Newtonsoft.Json;
 using UnityEngine;
 
+[assembly: InternalsVisibleTo("Dreamtides.Tests")]
+
 namespace Dreamtides.Services
 {
   public class CardService : Service
   {
     [SerializeField]
-    Card _cardPrefab = null!;
+    internal Card _cardPrefab = null!;
 
     [SerializeField]
-    Card _eventCardPrefab = null!;
+    internal Card _eventCardPrefab = null!;
 
     [SerializeField]
-    Card _tokenPrefab = null!;
+    internal Card _tokenPrefab = null!;
 
     [SerializeField]
-    Card _dreamwellPrefab = null!;
+    internal Card _dreamwellPrefab = null!;
 
     [SerializeField]
-    Card _identityCardPrefab = null!;
+    internal Card _identityCardPrefab = null!;
 
     [SerializeField]
-    Card _enemyPrefab = null!;
+    internal Card _enemyPrefab = null!;
 
     [SerializeField]
-    Card _dreamsignPrefab = null!;
+    internal Card _dreamsignPrefab = null!;
 
     [SerializeField]
-    Card _iconCardPrefab = null!;
+    internal Card _iconCardPrefab = null!;
 
     [SerializeField]
-    Card _journeyCardPrefab = null!;
+    internal Card _journeyCardPrefab = null!;
 
     [SerializeField]
-    Card _offerCostCardPrefab = null!;
+    internal Card _offerCostCardPrefab = null!;
 
     Dictionary<string, Card> Cards { get; } = new();
 

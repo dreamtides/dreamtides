@@ -14,13 +14,13 @@ namespace Dreamtides.Services
   public class ArrowService : Service
   {
     [SerializeField]
-    Arrow _redArrowPrefab = null!;
+    internal Arrow _redArrowPrefab = null!;
 
     [SerializeField]
-    Arrow _greenArrowPrefab = null!;
+    internal Arrow _greenArrowPrefab = null!;
 
     [SerializeField]
-    Arrow _blueArrowPrefab = null!;
+    internal Arrow _blueArrowPrefab = null!;
     internal readonly List<Arrow> _arrows = new();
 
     public void HandleDisplayArrows(List<DisplayArrow> arrows)

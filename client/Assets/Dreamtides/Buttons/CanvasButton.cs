@@ -1,5 +1,6 @@
 #nullable enable
 
+using System.Runtime.CompilerServices;
 using DG.Tweening;
 using Dreamtides.Layout;
 using Dreamtides.Schema;
@@ -8,24 +9,26 @@ using Dreamtides.Utils;
 using TMPro;
 using UnityEngine;
 
+[assembly: InternalsVisibleTo("Dreamtides.Tests")]
+
 namespace Dreamtides.Buttons
 {
   public class CanvasButton : Displayable
   {
     [SerializeField]
-    CanvasGroup _canvasGroup = null!;
+    internal CanvasGroup _canvasGroup = null!;
 
     [SerializeField]
-    bool _showing;
+    internal bool _showing;
 
     [SerializeField]
-    TextMeshProUGUI _text = null!;
+    internal TextMeshProUGUI _text = null!;
 
     [SerializeField]
-    Color _enabledTextColor = Color.white;
+    internal Color _enabledTextColor = Color.white;
 
     [SerializeField]
-    Color _disabledTextColor = new(0.55f, 0.55f, 0.55f, 1f);
+    internal Color _disabledTextColor = new(0.55f, 0.55f, 0.55f, 1f);
 
     ButtonView? _view;
     float _lastClickTime = -1f;

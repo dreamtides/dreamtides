@@ -1,40 +1,43 @@
 #nullable enable
 
+using System.Runtime.CompilerServices;
 using Dreamtides.Schema;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+
+[assembly: InternalsVisibleTo("Dreamtides.Tests")]
 
 namespace Dreamtides.Components
 {
   public class CanvasCard : MonoBehaviour
   {
     [SerializeField]
-    Canvas _canvas = null!;
+    internal Canvas _canvas = null!;
 
     [SerializeField]
-    RectTransform _root = null!;
+    internal RectTransform _root = null!;
 
     [SerializeField]
-    TextMeshProUGUI _cardName = null!;
+    internal TextMeshProUGUI _cardName = null!;
 
     [SerializeField]
-    TextMeshProUGUI _cardType = null!;
+    internal TextMeshProUGUI _cardType = null!;
 
     [SerializeField]
-    TextMeshProUGUI _rulesText = null!;
+    internal TextMeshProUGUI _rulesText = null!;
 
     [SerializeField]
-    Image _costBackground = null!;
+    internal Image _costBackground = null!;
 
     [SerializeField]
-    TextMeshProUGUI _costText = null!;
+    internal TextMeshProUGUI _costText = null!;
 
     [SerializeField]
-    Image _sparkBackground = null!;
+    internal Image _sparkBackground = null!;
 
     [SerializeField]
-    TextMeshProUGUI _sparkText = null!;
+    internal TextMeshProUGUI _sparkText = null!;
 
     /// <summary>
     /// Moves a card from world space to canvas space.

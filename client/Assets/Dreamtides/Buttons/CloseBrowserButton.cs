@@ -7,7 +7,7 @@ using UnityEngine;
 public class CloseBrowserButton : MonoBehaviour
 {
   [SerializeField]
-  Registry _registry = null!;
+  internal Registry _registry = null!;
 
   GameAction? _closeAction;
   public GameAction? CloseAction

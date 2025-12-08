@@ -1,15 +1,18 @@
 #nullable enable
 
 using System;
+using System.Runtime.CompilerServices;
 using Dreamtides.Services;
 using UnityEngine;
+
+[assembly: InternalsVisibleTo("Dreamtides.Tests")]
 
 namespace Dreamtides.Layout
 {
   public abstract class SceneElement : MonoBehaviour
   {
     [SerializeField]
-    Registry _registry = null!;
+    internal Registry _registry = null!;
 
     GameMode _mode = GameMode.Quest;
     TestConfiguration? _testConfiguration;

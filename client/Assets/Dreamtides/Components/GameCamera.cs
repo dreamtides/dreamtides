@@ -1,16 +1,19 @@
 #nullable enable
 
+using System.Runtime.CompilerServices;
 using UnityEngine;
+
+[assembly: InternalsVisibleTo("Dreamtides.Tests")]
 
 namespace Dreamtides.Components
 {
   public class GameCamera : MonoBehaviour
   {
     [SerializeField]
-    float _zoomInThreshold = 0.18f;
+    internal float _zoomInThreshold = 0.18f;
 
     [SerializeField]
-    Camera _camera = null!;
+    internal Camera _camera = null!;
 
     public void AdjustFieldOfView(BattleCameraBounds bounds)
     {

@@ -2,28 +2,31 @@
 
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using Dreamtides.Schema;
 using Dreamtides.Services;
 using UnityEngine;
+
+[assembly: InternalsVisibleTo("Dreamtides.Tests")]
 
 namespace Dreamtides.Components
 {
   public class PlayerStatusAnimations : MonoBehaviour
   {
     [SerializeField]
-    StudioType _studioType;
+    internal StudioType _studioType;
 
     [SerializeField]
-    Registry _registry = null!;
+    internal Registry _registry = null!;
 
     [SerializeField]
-    float _lowerBoundSeconds;
+    internal float _lowerBoundSeconds;
 
     [SerializeField]
-    float _upperBoundSeconds;
+    internal float _upperBoundSeconds;
 
     [SerializeField]
-    float _loopSeconds;
+    internal float _loopSeconds;
 
     StudioService? _studioService;
     Animator? _animator;

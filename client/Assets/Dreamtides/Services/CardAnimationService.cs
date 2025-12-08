@@ -2,21 +2,24 @@
 
 using System;
 using System.Collections;
+using System.Runtime.CompilerServices;
 using Dreamtides.Animations;
 using Dreamtides.Components;
 using Dreamtides.Schema;
 using UnityEngine;
+
+[assembly: InternalsVisibleTo("Dreamtides.Tests")]
 
 namespace Dreamtides.Services
 {
   public class CardAnimationService : Service
   {
     [SerializeField]
-    AudioClip _flipCardSound = null!;
+    internal AudioClip _flipCardSound = null!;
     public AudioClip FlipCardSound => _flipCardSound;
 
     [SerializeField]
-    AudioClip _moveToQuestDeckSound = null!;
+    internal AudioClip _moveToQuestDeckSound = null!;
     public AudioClip MoveToQuestDeckSound => _moveToQuestDeckSound;
 
     MoveCardsDefaultAnimation _moveCardsDefault = new();

@@ -1,39 +1,42 @@
 #nullable enable
 
 using System.Collections;
+using System.Runtime.CompilerServices;
 using DG.Tweening;
 using Dreamtides.Components;
 using Dreamtides.Schema;
 using Dreamtides.Utils;
 using UnityEngine;
 
+[assembly: InternalsVisibleTo("Dreamtides.Tests")]
+
 namespace Dreamtides.Services
 {
   public class JudgmentService : Service
   {
     [SerializeField]
-    float _durationMultiplier = 1f;
+    internal float _durationMultiplier = 1f;
 
     [SerializeField]
-    float _shakeStrength = 0.5f;
+    internal float _shakeStrength = 0.5f;
 
     [SerializeField]
-    int _shakeVibrato = 10;
+    internal int _shakeVibrato = 10;
 
     [SerializeField]
-    AudioClip _startSound = null!;
+    internal AudioClip _startSound = null!;
 
     [SerializeField]
-    AudioClip _windUpSound = null!;
+    internal AudioClip _windUpSound = null!;
 
     [SerializeField]
-    AudioClip _pointsSound = null!;
+    internal AudioClip _pointsSound = null!;
 
     [SerializeField]
-    TimedEffect _hitEffectPrefab = null!;
+    internal TimedEffect _hitEffectPrefab = null!;
 
     [SerializeField]
-    Projectile _scorePointsProjectilePrefab = null!;
+    internal Projectile _scorePointsProjectilePrefab = null!;
 
     public IEnumerator HandleDisplayJudgmentCommand(DisplayJudgmentCommand displayJudgment)
     {

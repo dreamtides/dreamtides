@@ -3,12 +3,15 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using Dreamtides.Buttons;
 using Dreamtides.Layout;
 using Dreamtides.Schema;
 using Dreamtides.Services;
 using Unity.Cinemachine;
 using UnityEngine;
+
+[assembly: InternalsVisibleTo("Dreamtides.Tests")]
 
 namespace Dreamtides.Components
 {
@@ -20,36 +23,36 @@ namespace Dreamtides.Components
     const float BlendTimeoutSeconds = 10f;
 
     [SerializeField]
-    CinemachineCamera _camera = null!;
+    internal CinemachineCamera _camera = null!;
 
     [SerializeField]
-    float _yRotation = 0f;
+    internal float _yRotation = 0f;
 
     [SerializeField]
-    AnimationCurve _mapToSiteBlendCurve = new(
+    internal AnimationCurve _mapToSiteBlendCurve = new(
       new Keyframe(0f, 0f, 0f, 4f),
       new Keyframe(0.2f, 0.85f, 0f, 0f),
       new Keyframe(1f, 1f, 0f, 0f)
     );
 
     [SerializeField]
-    AnimationCurve _siteToMapBlendCurve = new(
+    internal AnimationCurve _siteToMapBlendCurve = new(
       new Keyframe(0f, 0f, 0f, 0f),
       new Keyframe(0.75f, 0.2f, 0f, 0f),
       new Keyframe(1f, 1f, 0f, 0f)
     );
 
     [SerializeField]
-    float _mapToSiteBlendDuration = 2f;
+    internal float _mapToSiteBlendDuration = 2f;
 
     [SerializeField]
-    float _siteToMapBlendDuration = 2f;
+    internal float _siteToMapBlendDuration = 2f;
 
     [SerializeField]
-    ScreenInsets _landscapeInsets;
+    internal ScreenInsets _landscapeInsets;
 
     [SerializeField]
-    ScreenInsets _portraitInsets;
+    internal ScreenInsets _portraitInsets;
 
     [SerializeField]
     List<DreamscapeSite> _sites = new();

@@ -1,7 +1,10 @@
 #nullable enable
 
+using System.Runtime.CompilerServices;
 using TMPro;
 using UnityEngine;
+
+[assembly: InternalsVisibleTo("Dreamtides.Tests")]
 
 namespace Dreamtides.Components
 {
@@ -12,16 +15,16 @@ namespace Dreamtides.Components
   public class InfoZoomIcons : MonoBehaviour
   {
     [SerializeField]
-    TextMeshPro _top = null!;
+    internal TextMeshPro _top = null!;
 
     [SerializeField]
-    TextMeshPro _bottom = null!;
+    internal TextMeshPro _bottom = null!;
 
     [SerializeField]
-    TextMeshPro _left = null!;
+    internal TextMeshPro _left = null!;
 
     [SerializeField]
-    TextMeshPro _right = null!;
+    internal TextMeshPro _right = null!;
 
     public void SetText(string text, Color color)
     {

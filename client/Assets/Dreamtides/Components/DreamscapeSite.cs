@@ -1,10 +1,13 @@
 #nullable enable
 
 using System;
+using System.Runtime.CompilerServices;
 using Dreamtides.Layout;
 using Dreamtides.Services;
 using Unity.Cinemachine;
 using UnityEngine;
+
+[assembly: InternalsVisibleTo("Dreamtides.Tests")]
 
 namespace Dreamtides.Components
 {
@@ -17,55 +20,55 @@ namespace Dreamtides.Components
   public class DreamscapeSite : Displayable
   {
     [SerializeField]
-    CinemachineCamera _targetScreenLeftCamera = null!;
+    internal CinemachineCamera _targetScreenLeftCamera = null!;
 
     [SerializeField]
-    CinemachineCamera _targetScreenRightCamera = null!;
+    internal CinemachineCamera _targetScreenRightCamera = null!;
 
     [SerializeField]
-    CinemachineCamera _targetScreenTopCamera = null!;
+    internal CinemachineCamera _targetScreenTopCamera = null!;
 
     [SerializeField]
-    CinemachineCamera _targetDraftSiteCamera = null!;
+    internal CinemachineCamera _targetDraftSiteCamera = null!;
 
     [SerializeField]
-    GameObject _siteCharacter = null!;
+    internal GameObject _siteCharacter = null!;
 
     [SerializeField]
-    bool _draftSite;
+    internal bool _draftSite;
 
     [SerializeField]
-    LandscapeCameraTargetSide _landscapeCameraTargetSide = LandscapeCameraTargetSide.Left;
+    internal LandscapeCameraTargetSide _landscapeCameraTargetSide = LandscapeCameraTargetSide.Left;
 
     [SerializeField]
-    float _landscapeCameraDistanceModifier = 0f;
+    internal float _landscapeCameraDistanceModifier = 0f;
 
     [SerializeField]
-    float _portraitCameraDistanceModifier = 0f;
+    internal float _portraitCameraDistanceModifier = 0f;
 
     [SerializeField]
-    string _siteId = Guid.NewGuid().ToString();
+    internal string _siteId = Guid.NewGuid().ToString();
 
     [SerializeField]
-    bool _isActive = true;
+    internal bool _isActive = true;
 
     [SerializeField]
-    string _buttonLabel = string.Empty;
+    internal string _buttonLabel = string.Empty;
 
     [SerializeField]
-    string _debugClickAction = string.Empty;
+    internal string _debugClickAction = string.Empty;
 
     [SerializeField]
-    ObjectLayout _characterOwnedObjects = null!;
+    internal ObjectLayout _characterOwnedObjects = null!;
 
     [SerializeField]
-    ObjectLayout _siteDeckLayout = null!;
+    internal ObjectLayout _siteDeckLayout = null!;
 
     [SerializeField]
-    Transform _characterSpeechPosition = null!;
+    internal Transform _characterSpeechPosition = null!;
 
     [SerializeField]
-    MecanimAnimator _characterAnimator = null!;
+    internal MecanimAnimator _characterAnimator = null!;
 
     const int DefaultActivePriority = 60;
 

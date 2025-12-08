@@ -1,36 +1,39 @@
 #nullable enable
 
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 using UnityEngine.Rendering;
+
+[assembly: InternalsVisibleTo("Dreamtides.Tests")]
 
 namespace Dreamtides.Components
 {
   public sealed class Arrow : MonoBehaviour
   {
     [SerializeField]
-    float _pieceSize = 0.5f;
+    internal float _pieceSize = 0.5f;
 
     [SerializeField]
-    float _pieceFadeDistance = 0.35f;
+    internal float _pieceFadeDistance = 0.35f;
 
     [SerializeField]
-    GameObject _headPrefab = null!;
+    internal GameObject _headPrefab = null!;
 
     [SerializeField]
-    GameObject _piecePrefab = null!;
+    internal GameObject _piecePrefab = null!;
 
     [SerializeField]
-    Transform _source = null!;
+    internal Transform _source = null!;
 
     [SerializeField]
-    Transform _target = null!;
+    internal Transform _target = null!;
 
     [SerializeField]
-    float _radiusMultiplier = 1f;
+    internal float _radiusMultiplier = 1f;
 
     [SerializeField]
-    SortingGroup _sortingGroup = null!;
+    internal SortingGroup _sortingGroup = null!;
     Transform? _arrow;
 
     readonly List<Transform> _segments = new();

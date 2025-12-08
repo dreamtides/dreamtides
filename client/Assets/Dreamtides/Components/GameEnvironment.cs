@@ -1,17 +1,20 @@
 #nullable enable
 
+using System.Runtime.CompilerServices;
 using Dreamtides.Services;
 using UnityEngine;
+
+[assembly: InternalsVisibleTo("Dreamtides.Tests")]
 
 namespace Dreamtides.Components
 {
   public class GameEnvironment : MonoBehaviour
   {
     [SerializeField]
-    Transform _portrait = null!;
+    internal Transform _portrait = null!;
 
     [SerializeField]
-    Transform _landscape = null!;
+    internal Transform _landscape = null!;
 
     public void Activate(Registry registry)
     {

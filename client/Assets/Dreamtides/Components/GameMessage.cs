@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections;
+using System.Runtime.CompilerServices;
 using DG.Tweening;
 using Dreamtides.Schema;
 using Dreamtides.Services;
@@ -9,39 +10,41 @@ using Dreamtides.Utils;
 using TMPro;
 using UnityEngine;
 
+[assembly: InternalsVisibleTo("Dreamtides.Tests")]
+
 namespace Dreamtides.Components
 {
   [Serializable]
   public class MessageContent
   {
     [SerializeField]
-    GameObject _effect = null!;
+    internal GameObject _effect = null!;
     public GameObject Effect => _effect;
 
     [SerializeField]
-    TextMeshPro _text = null!;
+    internal TextMeshPro _text = null!;
     public TextMeshPro Text => _text;
   }
 
   public class GameMessage : MonoBehaviour
   {
     [SerializeField]
-    Registry _registry = null!;
+    internal Registry _registry = null!;
 
     [SerializeField]
-    Transform _top = null!;
+    internal Transform _top = null!;
 
     [SerializeField]
-    MessageContent _yourTurn = null!;
+    internal MessageContent _yourTurn = null!;
 
     [SerializeField]
-    MessageContent _enemyTurn = null!;
+    internal MessageContent _enemyTurn = null!;
 
     [SerializeField]
-    MessageContent _victory = null!;
+    internal MessageContent _victory = null!;
 
     [SerializeField]
-    MessageContent _defeat = null!;
+    internal MessageContent _defeat = null!;
 
     public IEnumerator Show(GameMessageType messageType)
     {

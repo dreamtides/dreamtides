@@ -1,22 +1,25 @@
 #nullable enable
 
+using System.Runtime.CompilerServices;
 using UnityEngine;
+
+[assembly: InternalsVisibleTo("Dreamtides.Tests")]
 
 namespace Dreamtides.Layout
 {
   public class StackingObjectLayout : StandardObjectLayout
   {
     [SerializeField]
-    float _offset;
+    internal float _offset;
 
     [SerializeField]
-    float _shrinkOffset;
+    internal float _shrinkOffset;
 
     [SerializeField]
-    int _shrinkOffsetThreshold;
+    internal int _shrinkOffsetThreshold;
 
     [SerializeField]
-    bool _stackRight;
+    internal bool _stackRight;
 
     public override Vector3 CalculateObjectPosition(int index, int count)
     {

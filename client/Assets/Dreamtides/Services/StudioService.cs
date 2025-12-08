@@ -3,20 +3,23 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using Dreamtides.Components;
 using Dreamtides.Schema;
 using Dreamtides.Utils;
 using UnityEngine;
+
+[assembly: InternalsVisibleTo("Dreamtides.Tests")]
 
 namespace Dreamtides.Services
 {
   public class StudioService : Service
   {
     [SerializeField]
-    Studio _studioPrefab = null!;
+    internal Studio _studioPrefab = null!;
 
     [SerializeField]
-    Transform _studioPosition = null!;
+    internal Transform _studioPosition = null!;
 
     private Dictionary<StudioType, CaptureSession> _activeSessions = new();
 

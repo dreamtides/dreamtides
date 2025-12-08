@@ -1,14 +1,17 @@
 #nullable enable
 
+using System.Runtime.CompilerServices;
 using DG.Tweening;
 using UnityEngine;
+
+[assembly: InternalsVisibleTo("Dreamtides.Tests")]
 
 namespace Dreamtides.Components
 {
   public class BackgroundOverlay : MonoBehaviour
   {
     [SerializeField]
-    SpriteRenderer _overlay = null!;
+    internal SpriteRenderer _overlay = null!;
     bool _isVisible = false;
 
     public bool IsVisible => _isVisible;

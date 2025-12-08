@@ -1,9 +1,12 @@
 #nullable enable
 
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using Dreamtides.Schema;
 using Dreamtides.Utils;
 using UnityEngine;
+
+[assembly: InternalsVisibleTo("Dreamtides.Tests")]
 
 namespace Dreamtides.Services
 {
@@ -41,16 +44,16 @@ namespace Dreamtides.Services
     List<AudioClip> _drawCardSounds = null!;
 
     [SerializeField]
-    AudioClip _yourTurnSound = null!;
+    internal AudioClip _yourTurnSound = null!;
 
     [SerializeField]
-    AudioClip _enemyTurnSound = null!;
+    internal AudioClip _enemyTurnSound = null!;
 
     [SerializeField]
-    AudioClip _victorySound = null!;
+    internal AudioClip _victorySound = null!;
 
     [SerializeField]
-    AudioClip _defeatSound = null!;
+    internal AudioClip _defeatSound = null!;
 
     protected override void OnInitialize(GameMode _mode, TestConfiguration? testConfiguration)
     {

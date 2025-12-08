@@ -14,10 +14,10 @@ using UnityEngine;
 public class PrototypeQuest : Service
 {
   [SerializeField]
-  string _outlineColorHex = "#EF6C00";
+  internal string _outlineColorHex = "#EF6C00";
 
   [SerializeField]
-  DreamscapeMapCamera _mapCamera = null!;
+  internal DreamscapeMapCamera _mapCamera = null!;
 
   public static readonly Guid DraftSiteId = Guid.Parse("117b9377-e0ab-4304-9f74-6d5b4fc5c778");
   public static readonly Guid ShopSiteId = Guid.Parse("4ce46579-7d0c-455a-a404-628894cff331");

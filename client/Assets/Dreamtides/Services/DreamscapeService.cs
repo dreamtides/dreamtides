@@ -3,6 +3,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using DG.Tweening;
 using Dreamtides.Buttons;
 using Dreamtides.Components;
@@ -11,24 +12,26 @@ using Dreamtides.Schema;
 using Dreamtides.Utils;
 using UnityEngine;
 
+[assembly: InternalsVisibleTo("Dreamtides.Tests")]
+
 namespace Dreamtides.Services
 {
   public class DreamscapeService : Service
   {
     [SerializeField]
-    CanvasGroup _closeSiteButton = null!;
+    internal CanvasGroup _closeSiteButton = null!;
 
     [SerializeField]
-    CanvasButton _siteButtonPrefab = null!;
+    internal CanvasButton _siteButtonPrefab = null!;
 
     [SerializeField]
-    RectTransform _siteButtons = null!;
+    internal RectTransform _siteButtons = null!;
 
     [SerializeField]
     List<Dreamscape> _dreamscapes = new();
 
     [SerializeField]
-    RectTransform _debugQuestButtons = null!;
+    internal RectTransform _debugQuestButtons = null!;
 
     public CanvasGroup CloseSiteButton => Errors.CheckNotNull(_closeSiteButton);
 

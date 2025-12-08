@@ -6,6 +6,8 @@ Please put public methods at the top of files, then protected,
 then private. Private member *fields* & serialized fields
 always go at the top.
 
+Always use braces after if/for/while/etc statements. Do not omit them in the single-statement case.
+
 Please always use "var" in C# code instead of explicit types.
 
 Do not run "just review" after making client changes.

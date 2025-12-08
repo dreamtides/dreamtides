@@ -4,11 +4,14 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using Dreamtides.Schema;
 using Dreamtides.Utils;
 using Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.Networking;
+
+[assembly: InternalsVisibleTo("Dreamtides.Tests")]
 
 namespace Dreamtides.Services
 {
@@ -27,7 +30,7 @@ namespace Dreamtides.Services
   public class ActionServiceImpl : ActionService
   {
     [SerializeField]
-    bool _disableConnectOnStart;
+    internal bool _disableConnectOnStart;
 
     private struct CommandBatch
     {

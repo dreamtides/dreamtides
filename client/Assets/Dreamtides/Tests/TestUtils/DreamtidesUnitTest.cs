@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using Dreamtides.Components;
 using Dreamtides.Layout;
 using Dreamtides.Services;
+using Dreamtides.TestFakes;
 using NUnit.Framework;
 using UnityEngine;
 
@@ -48,8 +49,8 @@ namespace Dreamtides.Tests.TestUtils
       _registry._loggingService = registryObject.AddComponent<FakeLoggingService>();
       _fakeActionService = registryObject.AddComponent<FakeActionService>();
       _registry._actionService = _fakeActionService;
-      _portraitLayout = CreateGameObject().AddComponent<GameLayout>();
-      _landscapeLayout = CreateGameObject().AddComponent<GameLayout>();
+      _portraitLayout = GeneratedPortraitGameLayout.Create(_createdObjects);
+      _landscapeLayout = GeneratedLandscapeGameLayout.Create(_createdObjects);
       _registry._portraitLayout = _portraitLayout;
       _registry._landscapeLayout = _landscapeLayout;
       _testConfiguration = new TestConfiguration(Guid.NewGuid());

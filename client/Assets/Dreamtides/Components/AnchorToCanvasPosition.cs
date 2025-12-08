@@ -1,31 +1,34 @@
 #nullable enable
 
+using System.Runtime.CompilerServices;
 using Dreamtides.Layout;
 using Dreamtides.Services;
 using Dreamtides.Utils;
 using UnityEngine;
+
+[assembly: InternalsVisibleTo("Dreamtides.Tests")]
 
 namespace Dreamtides.Components
 {
   public class AnchorToCanvasPosition : MonoBehaviour
   {
     [SerializeField]
-    Registry _registry = null!;
+    internal Registry _registry = null!;
 
     [SerializeField]
-    RectTransform _rectTransform = null!;
+    internal RectTransform _rectTransform = null!;
 
     [SerializeField]
-    float _distanceFromCamera = 10.0f;
+    internal float _distanceFromCamera = 10.0f;
 
     [SerializeField]
-    bool _xCoordinateOnly;
+    internal bool _xCoordinateOnly;
 
     [SerializeField]
-    ObjectLayout? _toUpdate;
+    internal ObjectLayout? _toUpdate;
 
     [SerializeField]
-    float _xOffset;
+    internal float _xOffset;
 
     int _frameCount;
 

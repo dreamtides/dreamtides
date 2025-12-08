@@ -3,11 +3,14 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using DG.Tweening;
 using Dreamtides.Schema;
 using Dreamtides.Services;
 using Dreamtides.Utils;
 using UnityEngine;
+
+[assembly: InternalsVisibleTo("Dreamtides.Tests")]
 
 namespace Dreamtides.Components
 {
@@ -15,7 +18,7 @@ namespace Dreamtides.Components
   public sealed class Projectile : MonoBehaviour
   {
     [SerializeField]
-    float _scale = 3f;
+    internal float _scale = 3f;
 
     [SerializeField]
     public TimedEffect? _flash;

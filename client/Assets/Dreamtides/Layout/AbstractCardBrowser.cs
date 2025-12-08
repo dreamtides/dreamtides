@@ -1,25 +1,28 @@
 #nullable enable
 
+using System.Runtime.CompilerServices;
 using DG.Tweening;
 using Dreamtides.Services;
 using Dreamtides.Utils;
 using UnityEngine;
+
+[assembly: InternalsVisibleTo("Dreamtides.Tests")]
 
 namespace Dreamtides.Layout
 {
   public abstract class AbstractCardBrowser : StandardObjectLayout
   {
     [SerializeField]
-    protected float _cardWidth = 2.5f;
+    protected internal float _cardWidth = 2.5f;
 
     [SerializeField]
-    protected Transform _leftEdge = null!;
+    protected internal Transform _leftEdge = null!;
 
     [SerializeField]
-    protected Transform _rightEdge = null!;
+    protected internal Transform _rightEdge = null!;
 
     [SerializeField]
-    protected bool _isOpen = false;
+    protected internal bool _isOpen = false;
 
     public bool IsOpen => _isOpen;
 

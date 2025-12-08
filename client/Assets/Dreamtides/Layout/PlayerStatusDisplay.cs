@@ -1,9 +1,13 @@
 #nullable enable
 
+using System.Runtime.CompilerServices;
 using Dreamtides.Components;
 using Dreamtides.Schema;
 using Dreamtides.Services;
+using Dreamtides.Utils;
 using UnityEngine;
+
+[assembly: InternalsVisibleTo("Dreamtides.Tests")]
 
 namespace Dreamtides.Layout
 {
@@ -13,34 +17,34 @@ namespace Dreamtides.Layout
     const string PointsIcon = "\ufb43";
 
     [SerializeField]
-    BattlefieldNumber _energy = null!;
+    internal BattlefieldNumber _energy = null!;
 
     [SerializeField]
-    BattlefieldNumber _score = null!;
+    internal BattlefieldNumber _score = null!;
 
     [SerializeField]
-    BattlefieldNumber _totalSpark = null!;
+    internal BattlefieldNumber _totalSpark = null!;
 
     [SerializeField]
-    GameObject _leftTurnIndicator = null!;
+    internal GameObject _leftTurnIndicator = null!;
 
     [SerializeField]
-    GameObject _rightTurnIndicator = null!;
+    internal GameObject _rightTurnIndicator = null!;
 
     [SerializeField]
-    Material _imminentVictorySparkBackgroundMaterial = null!;
+    internal Material _imminentVictorySparkBackgroundMaterial = null!;
 
     [SerializeField]
-    GameObject _imminentVictoryIndicator = null!;
+    internal GameObject _imminentVictoryIndicator = null!;
 
     [SerializeField]
-    MeshRenderer _characterImage = null!;
+    internal MeshRenderer _characterImage = null!;
 
     [SerializeField]
-    GameObject _testCharacterPrefab = null!;
+    internal GameObject _testCharacterPrefab = null!;
 
     [SerializeField]
-    StudioType _studioType;
+    internal StudioType _studioType;
 
     long _producedEnergy;
     Renderer _sparkBackgroundRenderer = null!;
@@ -53,8 +57,15 @@ namespace Dreamtides.Layout
     protected override void OnInitialize()
     {
       _sparkBackgroundRenderer = _totalSpark.GetComponent<Renderer>();
-      _sparkBackgroundMaterial = _sparkBackgroundRenderer.material;
-      Registry.StudioService.CaptureSubject(_studioType, _testCharacterPrefab, _characterImage);
+      if (_sparkBackgroundRenderer != null)
+      {
+        _sparkBackgroundMaterial = MaterialUtils.GetMaterial(_sparkBackgroundRenderer);
+      }
+
+      if (Application.isPlaying)
+      {
+        Registry.StudioService.CaptureSubject(_studioType, _testCharacterPrefab, _characterImage);
+      }
     }
 
     public void UpdatePlayerView(PlayerView playerView, bool animate)
@@ -64,9 +75,12 @@ namespace Dreamtides.Layout
       SetScore(playerView.Score, animate);
       _leftTurnIndicator.SetActive(playerView.TurnIndicator == DisplayedTurnIndicator.Left);
       _rightTurnIndicator.SetActive(playerView.TurnIndicator == DisplayedTurnIndicator.Right);
-      _sparkBackgroundRenderer.material = playerView.IsVictoryImminent
-        ? _imminentVictorySparkBackgroundMaterial
-        : _sparkBackgroundMaterial;
+      if (_sparkBackgroundRenderer != null)
+      {
+        _sparkBackgroundRenderer.material = playerView.IsVictoryImminent
+          ? _imminentVictorySparkBackgroundMaterial
+          : _sparkBackgroundMaterial;
+      }
       _imminentVictoryIndicator.SetActive(playerView.IsVictoryImminent);
     }
 

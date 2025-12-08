@@ -1,16 +1,19 @@
 #nullable enable
 
+using System.Runtime.CompilerServices;
 using UnityEngine;
+
+[assembly: InternalsVisibleTo("Dreamtides.Tests")]
 
 namespace Dreamtides.Layout
 {
   public class PileObjectLayout : StandardObjectLayout
   {
     [SerializeField]
-    float _singleElementY = 0.5f;
+    internal float _singleElementY = 0.5f;
 
     [SerializeField]
-    float _yMultiplier = 1.0f;
+    internal float _yMultiplier = 1.0f;
 
     public override Vector3 CalculateObjectPosition(int index, int count) =>
       new(

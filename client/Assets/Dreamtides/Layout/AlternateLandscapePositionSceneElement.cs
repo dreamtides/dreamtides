@@ -1,18 +1,21 @@
 #nullable enable
 
 using System;
+using System.Runtime.CompilerServices;
 using Dreamtides.Services;
 using UnityEngine;
+
+[assembly: InternalsVisibleTo("Dreamtides.Tests")]
 
 namespace Dreamtides.Layout
 {
   public class AlternateLandscapePositionSceneElement : SceneElement
   {
     [SerializeField]
-    Transform _landscapePosition = null!;
+    internal Transform _landscapePosition = null!;
 
     [SerializeField]
-    bool _debugUpdateContinuously;
+    internal bool _debugUpdateContinuously;
 
     protected override void OnInitialize(GameMode mode, TestConfiguration? testConfiguration)
     {

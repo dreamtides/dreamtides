@@ -1,26 +1,29 @@
 #nullable enable
 
 using System.Collections;
+using System.Runtime.CompilerServices;
 using DG.Tweening;
 using Dreamtides.Schema;
 using Dreamtides.Utils;
 using UnityEngine;
+
+[assembly: InternalsVisibleTo("Dreamtides.Tests")]
 
 namespace Dreamtides.Services
 {
   public class DreamwellActivationService : Service
   {
     [SerializeField]
-    float _displayPauseDurationSeconds;
+    internal float _displayPauseDurationSeconds;
 
     [SerializeField]
-    float _durationMultiplier = 1f;
+    internal float _durationMultiplier = 1f;
 
     [SerializeField]
-    AudioClip _startSound = null!;
+    internal AudioClip _startSound = null!;
 
     [SerializeField]
-    AudioClip _revealSound = null!;
+    internal AudioClip _revealSound = null!;
 
     public IEnumerator HandleDreamwellActivationCommand(DisplayDreamwellActivationCommand command)
     {

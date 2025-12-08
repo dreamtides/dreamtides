@@ -1,17 +1,20 @@
 #nullable enable
 
+using System.Runtime.CompilerServices;
 using UnityEngine;
+
+[assembly: InternalsVisibleTo("Dreamtides.Tests")]
 
 namespace Dreamtides.Components
 {
   public class BattleCameraBounds : MonoBehaviour
   {
     [SerializeField]
-    Transform _bottomLeftAnchor = null!;
+    internal Transform _bottomLeftAnchor = null!;
     public Transform BottomLeftAnchor => _bottomLeftAnchor;
 
     [SerializeField]
-    Transform _topLeftAnchor = null!;
+    internal Transform _topLeftAnchor = null!;
     public Transform TopLeftAnchor => _topLeftAnchor;
   }
 }

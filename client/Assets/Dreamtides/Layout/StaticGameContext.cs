@@ -1,6 +1,9 @@
 #nullable enable
 
+using System.Runtime.CompilerServices;
 using UnityEngine;
+
+[assembly: InternalsVisibleTo("Dreamtides.Tests")]
 
 namespace Dreamtides.Layout
 {
@@ -10,7 +13,7 @@ namespace Dreamtides.Layout
   public class StaticGameContext : MonoBehaviour
   {
     [SerializeField]
-    GameContext _startingContext;
+    internal GameContext _startingContext;
 
     void Start()
     {

@@ -1,17 +1,20 @@
 #nullable enable
 
+using System.Runtime.CompilerServices;
 using Dreamtides.Layout;
 using Dreamtides.Schema;
 using Dreamtides.Services;
 using Dreamtides.Utils;
 using UnityEngine;
 
+[assembly: InternalsVisibleTo("Dreamtides.Tests")]
+
 namespace Dreamtides.Components
 {
   public class CardBrowserButton : Displayable
   {
     [SerializeField]
-    CardBrowserType _type;
+    internal CardBrowserType _type;
 
     public override bool CanHandleMouseEvents() => true;
 

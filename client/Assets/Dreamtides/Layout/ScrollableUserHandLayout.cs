@@ -1,30 +1,33 @@
 #nullable enable
 
+using System.Runtime.CompilerServices;
 using Dreamtides.Services;
 using UnityEngine;
 using UnityEngine.UI;
+
+[assembly: InternalsVisibleTo("Dreamtides.Tests")]
 
 namespace Dreamtides.Layout
 {
   public class ScrollableUserHandLayout : StandardObjectLayout
   {
     [SerializeField]
-    float _offset;
+    internal float _offset;
 
     [SerializeField]
-    Scrollbar _scrollbar = null!;
+    internal Scrollbar _scrollbar = null!;
 
     [SerializeField]
-    float _cardWidth;
+    internal float _cardWidth;
 
     [SerializeField]
-    Transform _leftEdge = null!;
+    internal Transform _leftEdge = null!;
 
     [SerializeField]
-    Transform _rightEdge = null!;
+    internal Transform _rightEdge = null!;
 
     [SerializeField]
-    bool _hideWhenOutsideWindow;
+    internal bool _hideWhenOutsideWindow;
 
     private float _scrollAmount = 0f;
     private float _previousScrollAmount = 0f;

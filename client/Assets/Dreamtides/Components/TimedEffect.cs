@@ -2,7 +2,10 @@
 
 using System;
 using System.Collections;
+using System.Runtime.CompilerServices;
 using UnityEngine;
+
+[assembly: InternalsVisibleTo("Dreamtides.Tests")]
 
 namespace Dreamtides.Components
 {
@@ -10,10 +13,10 @@ namespace Dreamtides.Components
   public sealed class TimedEffect : MonoBehaviour
   {
     [SerializeField]
-    float _duration;
+    internal float _duration;
 
     [SerializeField]
-    bool _looping;
+    internal bool _looping;
     public Action? OnDisable { get; set; }
 
     void OnEnable()

@@ -1,18 +1,21 @@
 #nullable enable
+using System.Runtime.CompilerServices;
 using UnityEngine;
+
+[assembly: InternalsVisibleTo("Dreamtides.Tests")]
 
 namespace Dreamtides.Components
 {
   public sealed class Studio : MonoBehaviour
   {
     [SerializeField]
-    Camera _studioCamera = null!;
+    internal Camera _studioCamera = null!;
 
     [SerializeField]
-    Transform _subjectPosition = null!;
+    internal Transform _subjectPosition = null!;
 
     [SerializeField]
-    Transform _farSubjectPosition = null!;
+    internal Transform _farSubjectPosition = null!;
 
     public Camera StudioCamera => _studioCamera;
     public Transform SubjectPosition => _subjectPosition;

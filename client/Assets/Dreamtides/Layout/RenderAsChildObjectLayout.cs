@@ -2,9 +2,12 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using DG.Tweening;
 using Dreamtides.Utils;
 using UnityEngine;
+
+[assembly: InternalsVisibleTo("Dreamtides.Tests")]
 
 namespace Dreamtides.Layout
 {
@@ -22,14 +25,14 @@ namespace Dreamtides.Layout
     List<Displayable> _objects = new();
 
     [SerializeField]
-    bool _debugUpdateContinuously = false;
+    internal bool _debugUpdateContinuously = false;
 
     // Pile-like tuning (applied as LOCAL offsets relative to this transform)
     [SerializeField]
-    float _singleElementY = 0.5f;
+    internal float _singleElementY = 0.5f;
 
     [SerializeField]
-    float _yMultiplier = 1.0f;
+    internal float _yMultiplier = 1.0f;
 
     /// <summary>
     /// If true, the layout will update continuously.

@@ -3,6 +3,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using DG.Tweening;
 using Dreamtides.Buttons;
 using Dreamtides.Layout;
@@ -13,12 +14,14 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UIElements;
 
+[assembly: InternalsVisibleTo("Dreamtides.Tests")]
+
 namespace Dreamtides.Services
 {
   public class DocumentService : Service
   {
     [SerializeField]
-    UIDocument _document = null!;
+    internal UIDocument _document = null!;
     IMasonElement _infoZoom = null!;
     IMasonElement _screenOverlay = null!;
     IMasonElement _screenAnchoredNode = null!;
@@ -26,19 +29,19 @@ namespace Dreamtides.Services
     Coroutine? _screenAnchorAutoHideCoroutine;
 
     [SerializeField]
-    CanvasButton _menuButton = null!;
+    internal CanvasButton _menuButton = null!;
     public CanvasButton MenuButton => _menuButton;
 
     [SerializeField]
-    CanvasButton _undoButton = null!;
+    internal CanvasButton _undoButton = null!;
     public CanvasButton UndoButton => _undoButton;
 
     [SerializeField]
-    CanvasButton _devButton = null!;
+    internal CanvasButton _devButton = null!;
     public CanvasButton DevButton => _devButton;
 
     [SerializeField]
-    CanvasButton _bugButton = null!;
+    internal CanvasButton _bugButton = null!;
     public CanvasButton BugButton => _bugButton;
 
     const float ScreenAnchorFadeDurationSeconds = 0.3f;

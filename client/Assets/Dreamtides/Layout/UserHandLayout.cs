@@ -3,28 +3,31 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using DG.Tweening;
 using Dreamtides.Components;
 using UnityEngine;
+
+[assembly: InternalsVisibleTo("Dreamtides.Tests")]
 
 namespace Dreamtides.Layout
 {
   public class UserHandLayout : ObjectLayout
   {
     [SerializeField]
-    StandardObjectLayout _layout1 = null!;
+    internal StandardObjectLayout _layout1 = null!;
 
     [SerializeField]
-    StandardObjectLayout? _layout2;
+    internal StandardObjectLayout? _layout2;
 
     [SerializeField]
-    ScrollableUserHandLayout _scrollableHand = null!;
+    internal ScrollableUserHandLayout _scrollableHand = null!;
 
     [SerializeField]
-    int _useSecondLayoutAfter;
+    internal int _useSecondLayoutAfter;
 
     [SerializeField]
-    int _useBrowserAfter;
+    internal int _useBrowserAfter;
 
     public override IReadOnlyList<Displayable> Objects
     {

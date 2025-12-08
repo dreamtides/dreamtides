@@ -2,9 +2,12 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using DG.Tweening;
 using Dreamtides.Utils;
 using UnityEngine;
+
+[assembly: InternalsVisibleTo("Dreamtides.Tests")]
 
 namespace Dreamtides.Layout
 {
@@ -17,7 +20,7 @@ namespace Dreamtides.Layout
     List<Displayable> _objects = new();
 
     [SerializeField]
-    bool _debugUpdateContinuously = false;
+    internal bool _debugUpdateContinuously = false;
 
     bool _shouldFireBecameNonEmptyAfterNextLayoutAnimation;
 

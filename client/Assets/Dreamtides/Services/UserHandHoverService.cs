@@ -2,11 +2,14 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using DG.Tweening;
 using Dreamtides.Components;
 using Dreamtides.Layout;
 using Dreamtides.Utils;
 using UnityEngine;
+
+[assembly: InternalsVisibleTo("Dreamtides.Tests")]
 
 namespace Dreamtides.Services
 {
@@ -27,19 +30,19 @@ namespace Dreamtides.Services
     }
 
     [SerializeField]
-    float _hoverDistance = 2f;
+    internal float _hoverDistance = 2f;
 
     [SerializeField]
-    float _animateUpDuration = 0.1f;
+    internal float _animateUpDuration = 0.1f;
 
     [SerializeField]
-    float _animateDownDuration = 0.3f;
+    internal float _animateDownDuration = 0.3f;
 
     [SerializeField]
-    float _recoveryCheckInterval = 0.1f;
+    internal float _recoveryCheckInterval = 0.1f;
 
     [SerializeField]
-    float _debounceTime = 0.3f;
+    internal float _debounceTime = 0.3f;
     bool _isActive;
     bool _isTest;
     Card? _currentHoveredCard;

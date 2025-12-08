@@ -1,19 +1,22 @@
 #nullable enable
 
+using System.Runtime.CompilerServices;
 using UnityEngine;
+
+[assembly: InternalsVisibleTo("Dreamtides.Tests")]
 
 namespace Dreamtides.Layout
 {
   public class ForwardPileObjectLayout : StandardObjectLayout
   {
     [SerializeField]
-    float _singleElementOffset = 0.5f;
+    internal float _singleElementOffset = 0.5f;
 
     [SerializeField]
-    float _offsetMultiplier = 1.0f;
+    internal float _offsetMultiplier = 1.0f;
 
     [SerializeField]
-    bool _flip;
+    internal bool _flip;
 
     public override Vector3 CalculateObjectPosition(int index, int count) =>
       transform.position

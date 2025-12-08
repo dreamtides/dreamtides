@@ -1,31 +1,34 @@
 #nullable enable
 
+using System.Runtime.CompilerServices;
 using UnityEngine;
+
+[assembly: InternalsVisibleTo("Dreamtides.Tests")]
 
 namespace Dreamtides.Layout
 {
   public sealed class RectangularObjectLayout : StandardObjectLayout
   {
     [SerializeField]
-    float _width;
+    internal float _width;
 
     [SerializeField]
-    float _height;
+    internal float _height;
 
     [SerializeField]
-    float _itemHorizontalSpacing;
+    internal float _itemHorizontalSpacing;
 
     [SerializeField]
-    float _itemVerticalSpacing;
+    internal float _itemVerticalSpacing;
 
     [SerializeField]
-    float _itemWidth;
+    internal float _itemWidth;
 
     [SerializeField]
-    float _itemHeight;
+    internal float _itemHeight;
 
     [SerializeField]
-    int _rowCount;
+    internal int _rowCount;
 
     public override Vector3 CalculateObjectPosition(int index, int count) =>
       transform.position

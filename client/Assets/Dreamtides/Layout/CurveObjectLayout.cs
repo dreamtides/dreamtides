@@ -1,42 +1,45 @@
 #nullable enable
 
 using System;
+using System.Runtime.CompilerServices;
 using Dreamtides.Utils;
 using UnityEngine;
+
+[assembly: InternalsVisibleTo("Dreamtides.Tests")]
 
 namespace Dreamtides.Layout
 {
   public class CurveObjectLayout : StandardObjectLayout
   {
     [SerializeField]
-    int _zRotationAddition;
+    internal int _zRotationAddition;
 
     [SerializeField]
-    float _zRotationMultiplier;
+    internal float _zRotationMultiplier;
 
     [SerializeField]
-    Transform _controlPoint1 = null!;
+    internal Transform _controlPoint1 = null!;
 
     [SerializeField]
-    Transform _controlPoint2 = null!;
+    internal Transform _controlPoint2 = null!;
 
     [SerializeField]
-    Transform _controlPoint3 = null!;
+    internal Transform _controlPoint3 = null!;
 
     [SerializeField]
-    Transform _controlPoint4 = null!;
+    internal Transform _controlPoint4 = null!;
 
     [SerializeField]
-    float _gizmoRadius = 1.0f;
+    internal float _gizmoRadius = 1.0f;
 
     [SerializeField]
-    float _objectScale;
+    internal float _objectScale;
 
     [SerializeField]
-    float _yRotation;
+    internal float _yRotation;
 
     [SerializeField]
-    bool _portraitLayout;
+    internal bool _portraitLayout;
 
     public override Vector3 CalculateObjectPosition(int index, int count)
     {

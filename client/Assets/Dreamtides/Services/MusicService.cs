@@ -3,7 +3,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using UnityEngine;
+
+[assembly: InternalsVisibleTo("Dreamtides.Tests")]
 
 namespace Dreamtides.Services
 {
@@ -13,13 +16,13 @@ namespace Dreamtides.Services
     List<AudioClip> _tracks = null!;
 
     [SerializeField]
-    float _crossFadeDuration = 2f;
+    internal float _crossFadeDuration = 2f;
 
     [SerializeField]
     List<int> _shuffledIndices = new();
 
     [SerializeField]
-    int _currentTrackIndex = -1;
+    internal int _currentTrackIndex = -1;
     bool _isTransitioning = false;
 
     AudioSource _audioSource = null!;

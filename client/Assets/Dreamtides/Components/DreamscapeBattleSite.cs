@@ -1,25 +1,28 @@
 #nullable enable
 
 using System;
+using System.Runtime.CompilerServices;
 using Dreamtides.Services;
 using Unity.Cinemachine;
 using UnityEngine;
+
+[assembly: InternalsVisibleTo("Dreamtides.Tests")]
 
 namespace Dreamtides.Components
 {
   public class DreamscapeBattleSite : DreamscapeSite
   {
     [SerializeField]
-    Transform _portraitBattleLayoutAnchor = null!;
+    internal Transform _portraitBattleLayoutAnchor = null!;
 
     [SerializeField]
-    Transform _landscapeBattleLayoutAnchor = null!;
+    internal Transform _landscapeBattleLayoutAnchor = null!;
 
     bool _lastIsLandscape;
     bool _hasValidatedBattleCamera;
 
     [SerializeField]
-    bool _debugUpdateContinuously;
+    internal bool _debugUpdateContinuously;
 
     protected override bool HasSiteCharacter => false;
 

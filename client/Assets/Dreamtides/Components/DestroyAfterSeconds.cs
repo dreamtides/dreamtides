@@ -1,13 +1,16 @@
 #nullable enable
 
+using System.Runtime.CompilerServices;
 using UnityEngine;
+
+[assembly: InternalsVisibleTo("Dreamtides.Tests")]
 
 namespace Dreamtides.Components
 {
   public class DestroyAfterSeconds : MonoBehaviour
   {
     [SerializeField]
-    float _seconds = 1f;
+    internal float _seconds = 1f;
 
     void Start()
     {
