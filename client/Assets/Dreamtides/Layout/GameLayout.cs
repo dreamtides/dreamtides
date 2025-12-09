@@ -22,6 +22,10 @@ namespace Dreamtides.Layout
     public CinemachineCamera BattleCamera => Check(_battleCamera);
 
     [SerializeField]
+    internal GameObject? _contents;
+    public GameObject Contents => Check(_contents);
+
+    [SerializeField]
     internal BattleCameraBounds? _battleCameraBounds;
     public BattleCameraBounds BattleCameraBounds => Check(_battleCameraBounds);
 

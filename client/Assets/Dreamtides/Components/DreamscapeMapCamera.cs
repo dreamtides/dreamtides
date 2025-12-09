@@ -305,7 +305,9 @@ namespace Dreamtides.Components
       ApplyBlendSettings(siteCamera);
       SetMapCameraFocus(site.transform);
       _camera.Priority = MapPriority;
+      site.OnWillOpenSite();
       yield return WaitForBlend(brain, siteCamera);
+      site.OnOpenedSite();
       _transitionRoutine = null;
     }
 

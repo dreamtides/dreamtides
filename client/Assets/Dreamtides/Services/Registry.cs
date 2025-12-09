@@ -10,7 +10,6 @@ using Unity.Cinemachine;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
-using UnityEngine.ResourceManagement.ResourceProviders;
 using UnityEngine.SceneManagement;
 #if UNITY_EDITOR
 using UnityEditor;
@@ -221,13 +220,13 @@ namespace Dreamtides.Services
 
       if (_isLandscape)
       {
-        Check(_portraitLayout).gameObject.SetActive(false);
-        Check(_landscapeLayout).gameObject.SetActive(true);
+        Check(_portraitLayout).Contents.SetActive(false);
+        Check(_landscapeLayout).Contents.SetActive(true);
       }
       else
       {
-        Check(_portraitLayout).gameObject.SetActive(true);
-        Check(_landscapeLayout).gameObject.SetActive(false);
+        Check(_portraitLayout).Contents.SetActive(true);
+        Check(_landscapeLayout).Contents.SetActive(false);
       }
 
       Application.targetFrameRate = 60;
@@ -453,8 +452,7 @@ namespace Dreamtides.Services
       }
       else
       {
-        Debug.Log("TempToggleGameObjectsForMode: Battle mode, disabling layout");
-        Layout.gameObject.SetActive(false);
+        Layout.Contents.SetActive(false);
       }
     }
   }

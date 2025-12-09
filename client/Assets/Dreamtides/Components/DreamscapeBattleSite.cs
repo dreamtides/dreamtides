@@ -108,6 +108,11 @@ namespace Dreamtides.Components
       _lastIsLandscape = viewport.IsLandscape;
     }
 
+    public override void OnOpenedSite()
+    {
+      Registry.Layout.Contents.SetActive(true);
+    }
+
     CinemachineCamera ResolveBattleCamera()
     {
       return RequireCamera(Registry.Layout.BattleCamera, "BattleCamera");

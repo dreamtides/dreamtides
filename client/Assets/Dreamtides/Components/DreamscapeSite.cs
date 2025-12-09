@@ -195,6 +195,10 @@ namespace Dreamtides.Components
 
     protected virtual void OnDeactivated() { }
 
+    public virtual void OnWillOpenSite() { }
+
+    public virtual void OnOpenedSite() { }
+
     protected virtual void EnsureCameraDefaults()
     {
       if (_hasCameraDefaults)
