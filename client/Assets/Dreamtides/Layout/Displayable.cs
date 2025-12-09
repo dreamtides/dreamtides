@@ -284,7 +284,7 @@ namespace Dreamtides.Layout
       }
       if (count == 0)
       {
-        throw new InvalidOperationException("No Registry found in this scene.");
+        return;
       }
       throw new InvalidOperationException("Multiple Registry components found in this scene.");
     }

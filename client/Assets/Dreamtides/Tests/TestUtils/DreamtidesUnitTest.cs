@@ -42,21 +42,22 @@ namespace Dreamtides.Tests.TestUtils
 
     protected IEnumerator Initialize(IGameViewport? viewport = null)
     {
-      var registryObject = CreateGameObject();
-      _registry = registryObject.AddComponent<Registry>();
-      _fakeSoundService = registryObject.AddComponent<FakeSoundService>();
-      _registry._soundService = _fakeSoundService;
-      _registry._loggingService = registryObject.AddComponent<FakeLoggingService>();
-      _fakeActionService = registryObject.AddComponent<FakeActionService>();
-      _registry._actionService = _fakeActionService;
       var canvas = GeneratedCanvas.Create(_createdObjects);
-      _registry._canvas = canvas.Canvas;
       var mainCamera = GeneratedMainCamera.Create(_createdObjects);
-      _registry._cameraAdjuster = mainCamera.GameCamera;
       _portraitLayout = GeneratedPortraitGameLayout.Create(_createdObjects, canvas);
       _landscapeLayout = GeneratedLandscapeGameLayout.Create(_createdObjects, canvas);
-      _registry._portraitLayout = _portraitLayout;
-      _registry._landscapeLayout = _landscapeLayout;
+
+      var generatedRegistry = GeneratedRegistry.Create(
+        _createdObjects,
+        canvas,
+        mainCamera,
+        _portraitLayout,
+        _landscapeLayout
+      );
+      _registry = generatedRegistry.Registry;
+      _fakeSoundService = generatedRegistry.FakeSoundService;
+      _fakeActionService = generatedRegistry.FakeActionService;
+
       GeneratedSites.Create(_createdObjects);
       _testConfiguration = new TestConfiguration(Guid.NewGuid());
       return _registry.RunAwake(

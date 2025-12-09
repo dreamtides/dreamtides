@@ -54,6 +54,11 @@ namespace Dreamtides.Services
 
     protected override void OnInitialize(GameMode _mode, TestConfiguration? testConfiguration)
     {
+      if (_document == null)
+      {
+        return;
+      }
+
       _document.rootVisualElement.Clear();
       AddChild("InfoZoomContainer", out _infoZoom);
       AddChild("ScreenOverlay", out _screenOverlay);

@@ -1,8 +1,10 @@
 #nullable enable
 
+using System;
 using System.Collections.Generic;
 using Dreamtides.Components;
 using Dreamtides.Layout;
+using Dreamtides.Services;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -25,6 +27,21 @@ namespace Dreamtides.Editors
 
     Camera? _mainCamera;
     string _mainCameraClassName = "GeneratedMainCamera";
+
+    Registry? _registry;
+    string _registryClassName = "GeneratedRegistry";
+
+    static readonly Dictionary<Type, string?> ServicesToFake = new()
+    {
+      { typeof(ActionService), "FakeActionService" },
+      { typeof(SoundService), "FakeSoundService" },
+      { typeof(LoggingService), "FakeLoggingService" },
+      { typeof(StudioService), null },
+      { typeof(MusicService), null },
+      { typeof(IdleReconnectService), null },
+      { typeof(DreamscapeService), null },
+      { typeof(PrototypeQuest), null },
+    };
 
     [MenuItem("Tools/Generate Test Code")]
     static void ShowWindow()
@@ -59,6 +76,17 @@ namespace Dreamtides.Editors
       {
         _mainCamera = FindRootCamera("MainCamera");
       }
+
+      if (_registry == null)
+      {
+        _registry = FindRootRegistry("Registry");
+      }
+    }
+
+    static Registry? FindRootRegistry(string name)
+    {
+      var go = FindRootGameObject(name);
+      return go != null ? go.GetComponent<Registry>() : null;
     }
 
     static Camera? FindRootCamera(string name)
@@ -105,6 +133,8 @@ namespace Dreamtides.Editors
     {
       EditorGUILayout.LabelField("Test Code Generator", EditorStyles.boldLabel);
 
+      DrawRegistrySection();
+      EditorGUILayout.Space(20);
       DrawGameLayoutSection();
       EditorGUILayout.Space(20);
       DrawSitesSection();
@@ -114,6 +144,16 @@ namespace Dreamtides.Editors
       DrawMainCameraSection();
       EditorGUILayout.Space(20);
       DrawGenerateButton();
+    }
+
+    void DrawRegistrySection()
+    {
+      EditorGUILayout.LabelField("Registry", EditorStyles.boldLabel);
+      EditorGUILayout.Space();
+
+      _registry =
+        EditorGUILayout.ObjectField("Registry", _registry, typeof(Registry), true) as Registry;
+      _registryClassName = EditorGUILayout.TextField("Registry Class Name", _registryClassName);
     }
 
     void DrawGameLayoutSection()
@@ -181,13 +221,26 @@ namespace Dreamtides.Editors
       var hasSitesInput = _sitesRoot != null;
       var hasCanvasInput = _canvas != null;
       var hasMainCameraInput = _mainCamera != null;
+      var hasRegistryInput = _registry != null;
 
-      if (!hasLayoutInput && !hasSitesInput && !hasCanvasInput && !hasMainCameraInput)
+      if (
+        !hasLayoutInput
+        && !hasSitesInput
+        && !hasCanvasInput
+        && !hasMainCameraInput
+        && !hasRegistryInput
+      )
       {
         EditorGUILayout.HelpBox(
-          "Select at least one GameLayout, Sites Root, Canvas, or Main Camera from the scene.",
+          "Select at least one Registry, GameLayout, Sites Root, Canvas, or Main Camera from the scene.",
           MessageType.Info
         );
+        return;
+      }
+
+      if (_registry != null && string.IsNullOrWhiteSpace(_registryClassName))
+      {
+        EditorGUILayout.HelpBox("Please enter a registry class name.", MessageType.Warning);
         return;
       }
 
@@ -224,6 +277,12 @@ namespace Dreamtides.Editors
       if (GUILayout.Button("Generate Code"))
       {
         var generatedFiles = new List<string>();
+
+        if (_registry != null)
+        {
+          GenerateRegistryCode(_registry, _registryClassName);
+          generatedFiles.Add(_registryClassName);
+        }
 
         if (_canvas != null)
         {
@@ -590,6 +649,135 @@ namespace Dreamtides.Editors
 
         GenerateMainCameraChildren(builder, utils, child);
       }
+    }
+
+    static void GenerateRegistryCode(Registry registry, string className)
+    {
+      var builder = CodeGeneratorUtils.CreateBuilder(registry.gameObject.name);
+
+      builder.Using("Dreamtides.Services");
+      builder.Using("Dreamtides.TestFakes");
+      builder.BlankLine();
+
+      builder.Class(className);
+      builder.OpenBrace();
+
+      builder.Line("public Registry Registry { get; private set; } = null!;");
+      builder.Line("public FakeSoundService FakeSoundService { get; private set; } = null!;");
+      builder.Line("public FakeActionService FakeActionService { get; private set; } = null!;");
+      builder.BlankLine();
+
+      builder.Method(
+        className,
+        "Create",
+        "List<GameObject> createdObjects, GeneratedCanvas canvas, GeneratedMainCamera mainCamera, GameLayout portraitLayout, GameLayout landscapeLayout",
+        isStatic: true
+      );
+      builder.OpenBrace();
+
+      builder.Var("result", $"new {className}()");
+      builder.BlankLine();
+
+      builder.Var("registryGo", $"new GameObject(\"{registry.gameObject.name}\")");
+      builder.Call("createdObjects", "Add", "registryGo");
+      builder.Var("registryComponent", "registryGo.AddComponent<Registry>()");
+      builder.Assign("result.Registry", "registryComponent");
+      builder.BlankLine();
+
+      builder.Assign("registryComponent._canvas", "canvas.Canvas");
+      builder.Assign("registryComponent._cameraAdjuster", "mainCamera.GameCamera");
+      builder.Assign("registryComponent._portraitLayout", "portraitLayout");
+      builder.Assign("registryComponent._landscapeLayout", "landscapeLayout");
+      builder.BlankLine();
+
+      builder.Var("mainAudioSource", "registryGo.AddComponent<AudioSource>()");
+      builder.Assign("registryComponent._mainAudioSource", "mainAudioSource");
+      builder.Var("musicAudioSource", "registryGo.AddComponent<AudioSource>()");
+      builder.Assign("registryComponent._musicAudioSource", "musicAudioSource");
+      builder.BlankLine();
+
+      builder.Var("canvasSafeArea", "canvas.Canvas.GetComponentInChildren<RectTransform>()");
+      builder.Assign("registryComponent._canvasSafeArea", "canvasSafeArea");
+      builder.BlankLine();
+
+      var serialized = new SerializedObject(registry);
+      var iterator = serialized.GetIterator();
+      var enterChildren = true;
+
+      while (iterator.NextVisible(enterChildren))
+      {
+        enterChildren = false;
+
+        if (iterator.propertyType != SerializedPropertyType.ObjectReference)
+        {
+          continue;
+        }
+
+        var obj = iterator.objectReferenceValue;
+        if (obj == null)
+        {
+          continue;
+        }
+
+        if (obj is not Service service)
+        {
+          continue;
+        }
+
+        var serviceType = service.GetType();
+        var fieldName = iterator.name;
+
+        if (ServicesToFake.TryGetValue(serviceType, out var fakeClassName))
+        {
+          if (fakeClassName == null)
+          {
+            continue;
+          }
+
+          builder.Var(
+            CodeGeneratorUtils.SanitizeVarName(fieldName),
+            $"registryGo.AddComponent<{fakeClassName}>()"
+          );
+          builder.Assign(
+            $"registryComponent.{fieldName}",
+            CodeGeneratorUtils.SanitizeVarName(fieldName)
+          );
+
+          if (fakeClassName == "FakeSoundService")
+          {
+            builder.Assign(
+              "result.FakeSoundService",
+              CodeGeneratorUtils.SanitizeVarName(fieldName)
+            );
+          }
+          else if (fakeClassName == "FakeActionService")
+          {
+            builder.Assign(
+              "result.FakeActionService",
+              CodeGeneratorUtils.SanitizeVarName(fieldName)
+            );
+          }
+        }
+        else
+        {
+          builder.Var(
+            CodeGeneratorUtils.SanitizeVarName(fieldName),
+            $"registryGo.AddComponent<{serviceType.Name}>()"
+          );
+          builder.Assign(
+            $"registryComponent.{fieldName}",
+            CodeGeneratorUtils.SanitizeVarName(fieldName)
+          );
+        }
+      }
+
+      builder.BlankLine();
+      builder.Return("result");
+
+      builder.CloseBrace();
+      builder.CloseBrace();
+
+      CodeGeneratorUtils.WriteFile(builder, className);
     }
   }
 }
