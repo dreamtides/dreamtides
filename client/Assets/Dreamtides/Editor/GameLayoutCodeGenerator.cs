@@ -23,6 +23,9 @@ namespace Dreamtides.Editors
     Canvas? _canvas;
     string _canvasClassName = "GeneratedCanvas";
 
+    Camera? _mainCamera;
+    string _mainCameraClassName = "GeneratedMainCamera";
+
     [MenuItem("Tools/Generate Test Code")]
     static void ShowWindow()
     {
@@ -51,6 +54,17 @@ namespace Dreamtides.Editors
       {
         _canvas = FindRootCanvas("Canvas");
       }
+
+      if (_mainCamera == null)
+      {
+        _mainCamera = FindRootCamera("MainCamera");
+      }
+    }
+
+    static Camera? FindRootCamera(string name)
+    {
+      var go = FindRootGameObject(name);
+      return go != null ? go.GetComponent<Camera>() : null;
     }
 
     static Canvas? FindRootCanvas(string name)
@@ -96,6 +110,8 @@ namespace Dreamtides.Editors
       DrawSitesSection();
       EditorGUILayout.Space(20);
       DrawCanvasSection();
+      EditorGUILayout.Space(20);
+      DrawMainCameraSection();
       EditorGUILayout.Space(20);
       DrawGenerateButton();
     }
@@ -146,16 +162,30 @@ namespace Dreamtides.Editors
       _canvasClassName = EditorGUILayout.TextField("Canvas Class Name", _canvasClassName);
     }
 
+    void DrawMainCameraSection()
+    {
+      EditorGUILayout.LabelField("Main Camera", EditorStyles.boldLabel);
+      EditorGUILayout.Space();
+
+      _mainCamera =
+        EditorGUILayout.ObjectField("Main Camera", _mainCamera, typeof(Camera), true) as Camera;
+      _mainCameraClassName = EditorGUILayout.TextField(
+        "Main Camera Class Name",
+        _mainCameraClassName
+      );
+    }
+
     void DrawGenerateButton()
     {
       var hasLayoutInput = _portraitLayout != null || _landscapeLayout != null;
       var hasSitesInput = _sitesRoot != null;
       var hasCanvasInput = _canvas != null;
+      var hasMainCameraInput = _mainCamera != null;
 
-      if (!hasLayoutInput && !hasSitesInput && !hasCanvasInput)
+      if (!hasLayoutInput && !hasSitesInput && !hasCanvasInput && !hasMainCameraInput)
       {
         EditorGUILayout.HelpBox(
-          "Select at least one GameLayout, Sites Root, or Canvas from the scene.",
+          "Select at least one GameLayout, Sites Root, Canvas, or Main Camera from the scene.",
           MessageType.Info
         );
         return;
@@ -185,6 +215,12 @@ namespace Dreamtides.Editors
         return;
       }
 
+      if (_mainCamera != null && string.IsNullOrWhiteSpace(_mainCameraClassName))
+      {
+        EditorGUILayout.HelpBox("Please enter a main camera class name.", MessageType.Warning);
+        return;
+      }
+
       if (GUILayout.Button("Generate Code"))
       {
         var generatedFiles = new List<string>();
@@ -211,6 +247,12 @@ namespace Dreamtides.Editors
         {
           GenerateSitesCode(_sitesRoot, _sitesClassName);
           generatedFiles.Add(_sitesClassName);
+        }
+
+        if (_mainCamera != null)
+        {
+          GenerateMainCameraCode(_mainCamera, _mainCameraClassName);
+          generatedFiles.Add(_mainCameraClassName);
         }
 
         Debug.Log($"Generated {generatedFiles.Count} files: {string.Join(", ", generatedFiles)}");
@@ -291,6 +333,28 @@ namespace Dreamtides.Editors
       }
 
       if (type == typeof(GraphicRaycaster))
+      {
+        return true;
+      }
+
+      return false;
+    }
+
+    static bool IsMainCameraSupportedComponent(Component component)
+    {
+      if (component == null)
+      {
+        return false;
+      }
+
+      var type = component.GetType();
+
+      if (typeof(ObjectLayout).IsAssignableFrom(type))
+      {
+        return true;
+      }
+
+      if (type == typeof(GameCamera))
       {
         return true;
       }
@@ -463,6 +527,68 @@ namespace Dreamtides.Editors
         builder.Call("result.Objects", "Add", $"\"{childPath}\"", $"{childVar}Go");
 
         GenerateCanvasChildren(builder, utils, child, childPath);
+      }
+    }
+
+    static void GenerateMainCameraCode(Camera mainCamera, string className)
+    {
+      var utils = new CodeGeneratorUtils(IsMainCameraSupportedComponent);
+      var builder = CodeGeneratorUtils.CreateBuilder(mainCamera.gameObject.name);
+
+      builder.Class(className);
+      builder.OpenBrace();
+
+      builder.Line("public GameCamera GameCamera { get; private set; } = null!;");
+      builder.BlankLine();
+
+      builder.Method(className, "Create", "List<GameObject> createdObjects", isStatic: true);
+      builder.OpenBrace();
+
+      builder.Var("result", $"new {className}()");
+      builder.BlankLine();
+
+      var cameraGo = mainCamera.gameObject;
+      var cameraVar = utils.GenerateGameObjectAndComponents(
+        builder,
+        cameraGo,
+        "mainCamera",
+        isRoot: true
+      );
+
+      var gameCamera = cameraGo.GetComponent<GameCamera>();
+      if (gameCamera != null)
+      {
+        builder.Assign("result.GameCamera", $"{cameraVar}Go.GetComponent<GameCamera>()");
+      }
+
+      GenerateMainCameraChildren(builder, utils, cameraGo.transform);
+
+      builder.BlankLine();
+      builder.Return("result");
+
+      builder.CloseBrace();
+      builder.CloseBrace();
+
+      CodeGeneratorUtils.WriteFile(builder, className);
+    }
+
+    static void GenerateMainCameraChildren(
+      CSharpCodeBuilder builder,
+      CodeGeneratorUtils utils,
+      Transform parent
+    )
+    {
+      foreach (Transform child in parent)
+      {
+        builder.BlankLine();
+        utils.GenerateGameObjectAndComponents(
+          builder,
+          child.gameObject,
+          CodeGeneratorUtils.SanitizeVarName(child.gameObject.name),
+          isRoot: false
+        );
+
+        GenerateMainCameraChildren(builder, utils, child);
       }
     }
   }

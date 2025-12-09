@@ -51,6 +51,8 @@ namespace Dreamtides.Tests.TestUtils
       _registry._actionService = _fakeActionService;
       var canvas = GeneratedCanvas.Create(_createdObjects);
       _registry._canvas = canvas.Canvas;
+      var mainCamera = GeneratedMainCamera.Create(_createdObjects);
+      _registry._cameraAdjuster = mainCamera.GameCamera;
       _portraitLayout = GeneratedPortraitGameLayout.Create(_createdObjects, canvas);
       _landscapeLayout = GeneratedLandscapeGameLayout.Create(_createdObjects, canvas);
       _registry._portraitLayout = _portraitLayout;
