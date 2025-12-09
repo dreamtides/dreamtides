@@ -444,27 +444,17 @@ namespace Dreamtides.Services
     {
       // In the future we need to run all this logic after connecting to the
       // rules engine, this is just a temporary solution for prototyping.
-
-      var battleMode = mode == GameMode.Battle;
-      if (battleMode)
+      if (mode == GameMode.Battle)
       {
         CinemachineBrain.enabled = false;
         MainCamera.transform.position = Layout.CameraPosition.position;
         MainCamera.transform.rotation = Layout.CameraPosition.rotation;
         _cameraAdjuster.AdjustFieldOfView(Layout.BattleCameraBounds);
       }
-
-      Layout.UserStatusDisplay.TotalSpark.gameObject.SetActive(battleMode);
-      Layout.UserStatusDisplay.gameObject.SetActive(battleMode);
-      Layout.EnemyStatusDisplay.TotalSpark.gameObject.SetActive(battleMode);
-      Layout.EnemyStatusDisplay.gameObject.SetActive(battleMode);
-      Layout.PrimaryActionButton.gameObject.SetActive(battleMode);
-      Layout.SecondaryActionButton.gameObject.SetActive(battleMode);
-      Layout.IncrementActionButton.gameObject.SetActive(battleMode);
-      Layout.DecrementActionButton.gameObject.SetActive(battleMode);
-      foreach (var button in Layout.GetComponentsInChildren<CardBrowserButton>())
+      else
       {
-        button.gameObject.SetActive(battleMode);
+        Debug.Log("TempToggleGameObjectsForMode: Battle mode, disabling layout");
+        Layout.gameObject.SetActive(false);
       }
     }
   }
