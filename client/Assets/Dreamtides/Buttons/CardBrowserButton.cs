@@ -16,26 +16,45 @@ namespace Dreamtides.Components
     [SerializeField]
     internal CardBrowserType _type;
 
+    [SerializeField]
+    internal string? _debugActionOverride;
+
     public override bool CanHandleMouseEvents() => true;
 
     public override void MouseUp(bool isSameObject)
     {
+      Debug.Log("CardBrowserButton.MouseUp");
       if (!isSameObject || IsEmpty())
       {
         return;
       }
 
       Registry.SoundService.PlayClickSound();
-      var action = new GameAction
+      GameAction action;
+      if (!string.IsNullOrEmpty(_debugActionOverride))
       {
-        GameActionClass = new()
+        action = new GameAction
         {
-          DebugAction = new()
+          GameActionClass = new()
           {
-            DebugActionClass = new() { ApplyTestScenarioAction = "browseQuestDeck" },
+            DebugAction = new()
+            {
+              DebugActionClass = new() { ApplyTestScenarioAction = _debugActionOverride },
+            },
           },
-        },
-      };
+        };
+      }
+      else
+      {
+        action = new GameAction
+        {
+          GameActionClass = new()
+          {
+            BattleDisplayAction = new BattleDisplayActionClass { BrowseCards = _type },
+          },
+        };
+      }
+      Debug.Log("CardBrowserButton.MouseUp: Performing action: " + action);
       Registry.ActionService.PerformAction(action);
     }
 
