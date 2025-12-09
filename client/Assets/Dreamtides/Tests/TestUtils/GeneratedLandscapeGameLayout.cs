@@ -1,6 +1,6 @@
 // AUTO-GENERATED CODE - DO NOT EDIT
 // Generated from: LandscapeLayout
-// Generated at: 2025-12-09 07:15:27
+// Generated at: 2025-12-09 15:13:11
 
 #nullable enable
 
@@ -34,9 +34,14 @@ namespace Dreamtides.Tests.TestUtils
       var cinemachineCamera = cameraPositionGo.AddComponent<CinemachineCamera>();
       layout._battleCamera = cinemachineCamera;
 
+      var contentsGo = new GameObject("Contents");
+      createdObjects.Add(contentsGo);
+      contentsGo.transform.SetParent(layoutGo.transform, false);
+      layout._contents = contentsGo;
+
       var battleCameraBoundsGo = new GameObject("Bounds");
       createdObjects.Add(battleCameraBoundsGo);
-      battleCameraBoundsGo.transform.SetParent(layoutGo.transform, false);
+      battleCameraBoundsGo.transform.SetParent(contentsGo.transform, false);
       var battleCameraBounds1 = battleCameraBoundsGo.AddComponent<BattleCameraBounds>();
 
       var bottomLeftAnchorGo = new GameObject("BottomLeft");
@@ -55,7 +60,7 @@ namespace Dreamtides.Tests.TestUtils
 
       var userHandGo = new GameObject("UserHand");
       createdObjects.Add(userHandGo);
-      userHandGo.transform.SetParent(layoutGo.transform, false);
+      userHandGo.transform.SetParent(contentsGo.transform, false);
       var userHand = userHandGo.AddComponent<UserHandLayout>();
       userHand._useSecondLayoutAfter = 15;
       userHand._useBrowserAfter = 15;
@@ -126,7 +131,7 @@ namespace Dreamtides.Tests.TestUtils
 
       var enemyHandGo = new GameObject("EnemyHand");
       createdObjects.Add(enemyHandGo);
-      enemyHandGo.transform.SetParent(layoutGo.transform, false);
+      enemyHandGo.transform.SetParent(contentsGo.transform, false);
       enemyHandGo.transform.localPosition = new Vector3(10.71f, 2.5f, -15.8f);
       var enemyHand = enemyHandGo.AddComponent<StaticGameContext>();
       enemyHand._startingContext = GameContext.Hand;
@@ -159,7 +164,7 @@ namespace Dreamtides.Tests.TestUtils
 
       var userDeckGo = new GameObject("UserDeck");
       createdObjects.Add(userDeckGo);
-      userDeckGo.transform.SetParent(layoutGo.transform, false);
+      userDeckGo.transform.SetParent(contentsGo.transform, false);
       userDeckGo.transform.localPosition = new Vector3(-4f, 0f, -8f);
       userDeckGo.transform.localRotation = Quaternion.Euler(90f, 0f, 0f);
       var userDeck = userDeckGo.AddComponent<StaticGameContext>();
@@ -175,8 +180,8 @@ namespace Dreamtides.Tests.TestUtils
 
       var enemyDeckGo = new GameObject("EnemyDeck");
       createdObjects.Add(enemyDeckGo);
-      enemyDeckGo.transform.SetParent(layoutGo.transform, false);
-      enemyDeckGo.transform.localPosition = new Vector3(6.5f, 0f, -8f);
+      enemyDeckGo.transform.SetParent(contentsGo.transform, false);
+      enemyDeckGo.transform.localPosition = new Vector3(6.500002f, 0f, -8f);
       enemyDeckGo.transform.localRotation = Quaternion.Euler(90f, 0f, 0f);
       var enemyDeck = enemyDeckGo.AddComponent<StaticGameContext>();
       enemyDeck._startingContext = GameContext.Deck;
@@ -191,8 +196,8 @@ namespace Dreamtides.Tests.TestUtils
 
       var userBattlefieldGo = new GameObject("UserBattlefield");
       createdObjects.Add(userBattlefieldGo);
-      userBattlefieldGo.transform.SetParent(layoutGo.transform, false);
-      userBattlefieldGo.transform.localPosition = new Vector3(-0.75f, 1f, -16f);
+      userBattlefieldGo.transform.SetParent(contentsGo.transform, false);
+      userBattlefieldGo.transform.localPosition = new Vector3(-0.7500001f, 1f, -16f);
       userBattlefieldGo.transform.localRotation = Quaternion.Euler(90f, 90f, 0f);
       var userBattlefield = userBattlefieldGo.AddComponent<StaticGameContext>();
       userBattlefield._startingContext = GameContext.Battlefield;
@@ -205,7 +210,7 @@ namespace Dreamtides.Tests.TestUtils
 
       var enemyBattlefieldGo = new GameObject("EnemyBattlefield");
       createdObjects.Add(enemyBattlefieldGo);
-      enemyBattlefieldGo.transform.SetParent(layoutGo.transform, false);
+      enemyBattlefieldGo.transform.SetParent(contentsGo.transform, false);
       enemyBattlefieldGo.transform.localPosition = new Vector3(2.75f, 1f, -16f);
       enemyBattlefieldGo.transform.localRotation = Quaternion.Euler(90f, 90f, 0f);
       var enemyBattlefield = enemyBattlefieldGo.AddComponent<StaticGameContext>();
@@ -219,7 +224,7 @@ namespace Dreamtides.Tests.TestUtils
 
       var userVoidGo = new GameObject("UserVoid");
       createdObjects.Add(userVoidGo);
-      userVoidGo.transform.SetParent(layoutGo.transform, false);
+      userVoidGo.transform.SetParent(contentsGo.transform, false);
       userVoidGo.transform.localPosition = new Vector3(-4f, 0f, -23f);
       userVoidGo.transform.localRotation = Quaternion.Euler(90f, 90f, 0f);
       var userVoid = userVoidGo.AddComponent<StaticGameContext>();
@@ -229,8 +234,8 @@ namespace Dreamtides.Tests.TestUtils
 
       var enemyVoidGo = new GameObject("EnemyVoid");
       createdObjects.Add(enemyVoidGo);
-      enemyVoidGo.transform.SetParent(layoutGo.transform, false);
-      enemyVoidGo.transform.localPosition = new Vector3(6.5f, 0f, -23f);
+      enemyVoidGo.transform.SetParent(contentsGo.transform, false);
+      enemyVoidGo.transform.localPosition = new Vector3(6.500001f, 0f, -23f);
       enemyVoidGo.transform.localRotation = Quaternion.Euler(90f, 90f, 0f);
       var enemyVoid = enemyVoidGo.AddComponent<StaticGameContext>();
       enemyVoid._startingContext = GameContext.DiscardPile;
@@ -239,7 +244,7 @@ namespace Dreamtides.Tests.TestUtils
 
       var userStatusDisplayGo = new GameObject("UserStatus");
       createdObjects.Add(userStatusDisplayGo);
-      userStatusDisplayGo.transform.SetParent(layoutGo.transform, false);
+      userStatusDisplayGo.transform.SetParent(contentsGo.transform, false);
       userStatusDisplayGo.transform.localPosition = new Vector3(-4f, 1f, -16f);
       userStatusDisplayGo.transform.localRotation = Quaternion.Euler(0f, 90f, 0f);
       var userStatusDisplay = userStatusDisplayGo.AddComponent<StaticGameContext>();
@@ -304,8 +309,8 @@ namespace Dreamtides.Tests.TestUtils
 
       var totalSparkGo = new GameObject("UserSparkTotal");
       createdObjects.Add(totalSparkGo);
-      totalSparkGo.transform.SetParent(layoutGo.transform, false);
-      totalSparkGo.transform.localPosition = new Vector3(-0.22f, 0.5f, -1.9f);
+      totalSparkGo.transform.SetParent(contentsGo.transform, false);
+      totalSparkGo.transform.localPosition = new Vector3(-0.2199999f, 0.5f, -1.9f);
       totalSparkGo.transform.localRotation = Quaternion.Euler(90f, 90f, 0f);
       totalSparkGo.transform.localScale = new Vector3(2f, 2f, 2f);
       var battlefieldNumber2 = totalSparkGo.AddComponent<BattlefieldNumber>();
@@ -340,8 +345,8 @@ namespace Dreamtides.Tests.TestUtils
 
       var enemyStatusDisplayGo = new GameObject("EnemyStatus");
       createdObjects.Add(enemyStatusDisplayGo);
-      enemyStatusDisplayGo.transform.SetParent(layoutGo.transform, false);
-      enemyStatusDisplayGo.transform.localPosition = new Vector3(6.5f, 0.32f, -16f);
+      enemyStatusDisplayGo.transform.SetParent(contentsGo.transform, false);
+      enemyStatusDisplayGo.transform.localPosition = new Vector3(6.500002f, 0.32f, -16f);
       enemyStatusDisplayGo.transform.localRotation = Quaternion.Euler(0f, 90f, 0f);
       var enemyStatusDisplay = enemyStatusDisplayGo.AddComponent<StaticGameContext>();
       enemyStatusDisplay._startingContext = GameContext.PlayerStatus;
@@ -405,8 +410,8 @@ namespace Dreamtides.Tests.TestUtils
 
       var totalSpark1Go = new GameObject("EnemySparkTotal");
       createdObjects.Add(totalSpark1Go);
-      totalSpark1Go.transform.SetParent(layoutGo.transform, false);
-      totalSpark1Go.transform.localPosition = new Vector3(1.88f, 0.5f, -1.9f);
+      totalSpark1Go.transform.SetParent(contentsGo.transform, false);
+      totalSpark1Go.transform.localPosition = new Vector3(1.880001f, 0.5f, -1.900001f);
       totalSpark1Go.transform.localRotation = Quaternion.Euler(90f, 90f, 0f);
       totalSpark1Go.transform.localScale = new Vector3(2f, 2f, 2f);
       var battlefieldNumber5 = totalSpark1Go.AddComponent<BattlefieldNumber>();
@@ -441,7 +446,7 @@ namespace Dreamtides.Tests.TestUtils
 
       var offscreenGo = new GameObject("Offscreen");
       createdObjects.Add(offscreenGo);
-      offscreenGo.transform.SetParent(layoutGo.transform, false);
+      offscreenGo.transform.SetParent(contentsGo.transform, false);
       offscreenGo.transform.localPosition = new Vector3(100f, 100f, 100f);
       var offscreen = offscreenGo.AddComponent<PileObjectLayout>();
       var offscreenStaticGameContext = offscreenGo.AddComponent<StaticGameContext>();
@@ -515,8 +520,8 @@ namespace Dreamtides.Tests.TestUtils
 
       var battlefieldOverlayGo = new GameObject("BrowserBackground");
       createdObjects.Add(battlefieldOverlayGo);
-      battlefieldOverlayGo.transform.SetParent(layoutGo.transform, false);
-      battlefieldOverlayGo.transform.localPosition = new Vector3(16.38907f, 14.44898f, -16f);
+      battlefieldOverlayGo.transform.SetParent(contentsGo.transform, false);
+      battlefieldOverlayGo.transform.localPosition = new Vector3(16.38908f, 14.44898f, -16f);
       battlefieldOverlayGo.transform.localRotation = Quaternion.Euler(75f, 90f, 0f);
       battlefieldOverlayGo.transform.localScale = new Vector3(50f, 50f, 1f);
       var spriteRenderer = battlefieldOverlayGo.AddComponent<SpriteRenderer>();
@@ -564,7 +569,7 @@ namespace Dreamtides.Tests.TestUtils
 
       var browserGo = new GameObject("CardBrowser");
       createdObjects.Add(browserGo);
-      browserGo.transform.SetParent(layoutGo.transform, false);
+      browserGo.transform.SetParent(contentsGo.transform, false);
       browserGo.transform.localPosition = new Vector3(0f, 8f, -16f);
       browserGo.transform.localRotation = Quaternion.Euler(75f, 90f, 0f);
       var browser = browserGo.AddComponent<StaticGameContext>();
@@ -573,14 +578,14 @@ namespace Dreamtides.Tests.TestUtils
 
       var leftEdge1Go = new GameObject("CardBrowserLeft");
       createdObjects.Add(leftEdge1Go);
-      leftEdge1Go.transform.SetParent(layoutGo.transform, false);
+      leftEdge1Go.transform.SetParent(contentsGo.transform, false);
       leftEdge1Go.transform.localPosition = new Vector3(0f, 8f, -10f);
       leftEdge1Go.transform.localRotation = Quaternion.Euler(75f, 90f, 0f);
       browserCardBrowser._leftEdge = leftEdge1Go.transform;
 
       var rightEdge1Go = new GameObject("CardBrowserRight");
       createdObjects.Add(rightEdge1Go);
-      rightEdge1Go.transform.SetParent(layoutGo.transform, false);
+      rightEdge1Go.transform.SetParent(contentsGo.transform, false);
       rightEdge1Go.transform.localPosition = new Vector3(0f, 8f, -22f);
       rightEdge1Go.transform.localRotation = Quaternion.Euler(75f, 90f, 0f);
       browserCardBrowser._rightEdge = rightEdge1Go.transform;
@@ -608,7 +613,7 @@ namespace Dreamtides.Tests.TestUtils
 
       var userDreamwellGo = new GameObject("UserDreamwell");
       createdObjects.Add(userDreamwellGo);
-      userDreamwellGo.transform.SetParent(layoutGo.transform, false);
+      userDreamwellGo.transform.SetParent(contentsGo.transform, false);
       userDreamwellGo.transform.localPosition = new Vector3(-13f, 1f, -16f);
       userDreamwellGo.transform.localRotation = Quaternion.Euler(90f, 90f, 0f);
       var userDreamwell = userDreamwellGo.AddComponent<PileObjectLayout>();
@@ -618,7 +623,7 @@ namespace Dreamtides.Tests.TestUtils
 
       var enemyDreamwellGo = new GameObject("EnemyDreamwell");
       createdObjects.Add(enemyDreamwellGo);
-      enemyDreamwellGo.transform.SetParent(layoutGo.transform, false);
+      enemyDreamwellGo.transform.SetParent(contentsGo.transform, false);
       enemyDreamwellGo.transform.localPosition = new Vector3(12f, 1f, -16f);
       enemyDreamwellGo.transform.localRotation = Quaternion.Euler(90f, 90f, 0f);
       var enemyDreamwell = enemyDreamwellGo.AddComponent<PileObjectLayout>();
@@ -628,7 +633,7 @@ namespace Dreamtides.Tests.TestUtils
 
       var dreamwellActivationGo = new GameObject("DreamwellActivation");
       createdObjects.Add(dreamwellActivationGo);
-      dreamwellActivationGo.transform.SetParent(layoutGo.transform, false);
+      dreamwellActivationGo.transform.SetParent(contentsGo.transform, false);
       dreamwellActivationGo.transform.localPosition = new Vector3(0f, 5f, -16f);
       dreamwellActivationGo.transform.localRotation = Quaternion.Euler(90f, 90f, 0f);
       var dreamwellActivation = dreamwellActivationGo.AddComponent<PileObjectLayout>();
@@ -639,14 +644,14 @@ namespace Dreamtides.Tests.TestUtils
 
       var dreamwellDisplayGo = new GameObject("DreamwellDisplay");
       createdObjects.Add(dreamwellDisplayGo);
-      dreamwellDisplayGo.transform.SetParent(layoutGo.transform, false);
+      dreamwellDisplayGo.transform.SetParent(contentsGo.transform, false);
       dreamwellDisplayGo.transform.localPosition = new Vector3(-1.5f, 8f, -20f);
       dreamwellDisplayGo.transform.localRotation = Quaternion.Euler(75f, 90f, 0f);
       layout._dreamwellDisplay = dreamwellDisplayGo.transform;
 
       var cardOrderSelectorGo = new GameObject("CardOrderSelector");
       createdObjects.Add(cardOrderSelectorGo);
-      cardOrderSelectorGo.transform.SetParent(layoutGo.transform, false);
+      cardOrderSelectorGo.transform.SetParent(contentsGo.transform, false);
       cardOrderSelectorGo.transform.localPosition = new Vector3(0f, 8f, -16f);
       cardOrderSelectorGo.transform.localRotation = Quaternion.Euler(75f, 90f, 0f);
       var cardOrderSelector = cardOrderSelectorGo.AddComponent<StaticGameContext>();
@@ -682,8 +687,8 @@ namespace Dreamtides.Tests.TestUtils
 
       var gameModifiersDisplayGo = new GameObject("GameModifiersDisplay");
       createdObjects.Add(gameModifiersDisplayGo);
-      gameModifiersDisplayGo.transform.SetParent(layoutGo.transform, false);
-      gameModifiersDisplayGo.transform.localPosition = new Vector3(1.232612f, 8.31726f, -25.45282f);
+      gameModifiersDisplayGo.transform.SetParent(contentsGo.transform, false);
+      gameModifiersDisplayGo.transform.localPosition = new Vector3(1.232613f, 8.31726f, -25.45282f);
       gameModifiersDisplayGo.transform.localRotation = Quaternion.Euler(75f, 90f, 0f);
       gameModifiersDisplayGo.transform.localScale = new Vector3(0.3f, 0.3f, 0.3f);
       var gameModifiersDisplay = gameModifiersDisplayGo.AddComponent<CenteredObjectLayout>();
@@ -698,7 +703,7 @@ namespace Dreamtides.Tests.TestUtils
 
       var onScreenStorageGo = new GameObject("OnScreenStorage");
       createdObjects.Add(onScreenStorageGo);
-      onScreenStorageGo.transform.SetParent(layoutGo.transform, false);
+      onScreenStorageGo.transform.SetParent(contentsGo.transform, false);
       onScreenStorageGo.transform.localPosition = new Vector3(-2f, 1f, -29f);
       onScreenStorageGo.transform.localRotation = Quaternion.Euler(90f, 90f, 0f);
       onScreenStorageGo.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
@@ -854,7 +859,7 @@ namespace Dreamtides.Tests.TestUtils
 
       var thinkingIndicatorGo = new GameObject("ThinkingIndicator");
       createdObjects.Add(thinkingIndicatorGo);
-      thinkingIndicatorGo.transform.SetParent(layoutGo.transform, false);
+      thinkingIndicatorGo.transform.SetParent(contentsGo.transform, false);
       thinkingIndicatorGo.transform.localPosition = new Vector3(8f, 2.5f, -15.8f);
       thinkingIndicatorGo.transform.localRotation = Quaternion.Euler(0f, 90f, 0f);
       thinkingIndicatorGo.transform.localScale = new Vector3(0.2f, 0.2f, 0.2f);
@@ -868,7 +873,7 @@ namespace Dreamtides.Tests.TestUtils
 
       var aboveUserVoidGo = new GameObject("AboveUserVoid");
       createdObjects.Add(aboveUserVoidGo);
-      aboveUserVoidGo.transform.SetParent(layoutGo.transform, false);
+      aboveUserVoidGo.transform.SetParent(contentsGo.transform, false);
       aboveUserVoidGo.transform.localPosition = new Vector3(-3f, 1.5f, -22f);
       aboveUserVoidGo.transform.localRotation = Quaternion.Euler(75f, 90f, 0f);
       var aboveUserVoid = aboveUserVoidGo.AddComponent<StackingObjectLayout>();
@@ -882,7 +887,7 @@ namespace Dreamtides.Tests.TestUtils
 
       var aboveEnemyVoidGo = new GameObject("AboveEnemyVoid");
       createdObjects.Add(aboveEnemyVoidGo);
-      aboveEnemyVoidGo.transform.SetParent(layoutGo.transform, false);
+      aboveEnemyVoidGo.transform.SetParent(contentsGo.transform, false);
       aboveEnemyVoidGo.transform.localPosition = new Vector3(6f, 2f, -23f);
       aboveEnemyVoidGo.transform.localRotation = Quaternion.Euler(75f, 90f, 0f);
       var aboveEnemyVoid = aboveEnemyVoidGo.AddComponent<StackingObjectLayout>();
