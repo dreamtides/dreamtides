@@ -30,10 +30,18 @@ namespace Dreamtides.Editors
     readonly Dictionary<Component, string> _componentVariables = new();
     readonly HashSet<string> _usedVarNames = new();
     readonly Func<Component, bool> _isSupportedComponent;
+    readonly HashSet<GameObject> _canvasObjects;
 
     public CodeGeneratorUtils(Func<Component, bool> isSupportedComponent)
+      : this(isSupportedComponent, new HashSet<GameObject>()) { }
+
+    public CodeGeneratorUtils(
+      Func<Component, bool> isSupportedComponent,
+      HashSet<GameObject> canvasObjects
+    )
     {
       _isSupportedComponent = isSupportedComponent;
+      _canvasObjects = canvasObjects;
     }
 
     public void Clear()
@@ -149,6 +157,12 @@ namespace Dreamtides.Editors
         return;
       }
 
+      if (_canvasObjects.Contains(go))
+      {
+        GenerateCanvasObjectReference(builder, go, parentVar, fieldName, targetComponent);
+        return;
+      }
+
       if (_goVariables.ContainsKey(go))
       {
         EnsureComponentExists(builder, go, targetComponent);
@@ -170,6 +184,58 @@ namespace Dreamtides.Editors
       GenerateNestedChildReferences(builder, go, childVar);
 
       AssignExistingReference(builder, parentVar, fieldName, go, targetComponent);
+    }
+
+    void GenerateCanvasObjectReference(
+      CSharpCodeBuilder builder,
+      GameObject go,
+      string parentVar,
+      string fieldName,
+      Component? targetComponent
+    )
+    {
+      builder.BlankLine();
+      var goVarName = GenerateUniqueVarName(SanitizeVarName(fieldName)) + "Go";
+      var path = GetCanvasObjectPath(go);
+      builder.Var(goVarName, $"canvas?.Objects[\"{path}\"]");
+      _goVariables[go] = goVarName;
+
+      var target = $"{parentVar}.{fieldName}";
+
+      if (targetComponent == null)
+      {
+        builder.Line($"if ({goVarName} != null) {target} = {goVarName};");
+      }
+      else if (targetComponent is Transform)
+      {
+        builder.Line($"if ({goVarName} != null) {target} = {goVarName}.transform;");
+      }
+      else
+      {
+        var componentTypeName = targetComponent.GetType().Name;
+        builder.Line(
+          $"if ({goVarName} != null) {target} = {goVarName}.GetComponent<{componentTypeName}>();"
+        );
+      }
+    }
+
+    static string GetCanvasObjectPath(GameObject go)
+    {
+      var parts = new List<string>();
+      var current = go.transform;
+
+      while (current.parent != null && current.parent.GetComponent<Canvas>() == null)
+      {
+        parts.Insert(0, current.gameObject.name);
+        current = current.parent;
+      }
+
+      if (current.parent != null)
+      {
+        parts.Insert(0, current.gameObject.name);
+      }
+
+      return string.Join("/", parts);
     }
 
     public void GenerateComponentReferences(
@@ -272,25 +338,78 @@ namespace Dreamtides.Editors
         }
       }
 
-      if (t.localPosition != Vector3.zero)
+      if (t is RectTransform rt)
+      {
+        GenerateRectTransform(builder, rt, goVar);
+      }
+      else
+      {
+        if (t.localPosition != Vector3.zero)
+        {
+          builder.Assign(
+            $"{goVar}.transform.localPosition",
+            CSharpCodeBuilder.ToVector3(t.localPosition)
+          );
+        }
+
+        if (t.localRotation != Quaternion.identity)
+        {
+          builder.Assign(
+            $"{goVar}.transform.localRotation",
+            CSharpCodeBuilder.ToQuaternion(t.localRotation)
+          );
+        }
+
+        if (t.localScale != Vector3.one)
+        {
+          builder.Assign(
+            $"{goVar}.transform.localScale",
+            CSharpCodeBuilder.ToVector3(t.localScale)
+          );
+        }
+      }
+    }
+
+    void GenerateRectTransform(CSharpCodeBuilder builder, RectTransform rt, string goVar)
+    {
+      var rectVar = goVar + "Rect";
+      builder.AddComponent(rectVar, goVar, "RectTransform");
+
+      if (rt.anchorMin != Vector2.zero || rt.anchorMax != Vector2.one)
+      {
+        builder.Assign($"{rectVar}.anchorMin", CSharpCodeBuilder.ToVector2(rt.anchorMin));
+        builder.Assign($"{rectVar}.anchorMax", CSharpCodeBuilder.ToVector2(rt.anchorMax));
+      }
+
+      if (rt.pivot != new Vector2(0.5f, 0.5f))
+      {
+        builder.Assign($"{rectVar}.pivot", CSharpCodeBuilder.ToVector2(rt.pivot));
+      }
+
+      if (rt.anchoredPosition != Vector2.zero)
       {
         builder.Assign(
-          $"{goVar}.transform.localPosition",
-          CSharpCodeBuilder.ToVector3(t.localPosition)
+          $"{rectVar}.anchoredPosition",
+          CSharpCodeBuilder.ToVector2(rt.anchoredPosition)
         );
       }
 
-      if (t.localRotation != Quaternion.identity)
+      if (rt.sizeDelta != Vector2.zero)
+      {
+        builder.Assign($"{rectVar}.sizeDelta", CSharpCodeBuilder.ToVector2(rt.sizeDelta));
+      }
+
+      if (rt.localRotation != Quaternion.identity)
       {
         builder.Assign(
-          $"{goVar}.transform.localRotation",
-          CSharpCodeBuilder.ToQuaternion(t.localRotation)
+          $"{rectVar}.localRotation",
+          CSharpCodeBuilder.ToQuaternion(rt.localRotation)
         );
       }
 
-      if (t.localScale != Vector3.one)
+      if (rt.localScale != Vector3.one)
       {
-        builder.Assign($"{goVar}.transform.localScale", CSharpCodeBuilder.ToVector3(t.localScale));
+        builder.Assign($"{rectVar}.localScale", CSharpCodeBuilder.ToVector3(rt.localScale));
       }
     }
 
@@ -344,6 +463,11 @@ namespace Dreamtides.Editors
     static bool ShouldSkipProperty(SerializedProperty prop)
     {
       if (SkipFields.Contains(prop.name))
+      {
+        return true;
+      }
+
+      if (prop.name.StartsWith("m_"))
       {
         return true;
       }
@@ -630,11 +754,52 @@ namespace Dreamtides.Editors
 
     public static string SanitizeVarName(string name)
     {
-      var result = name.TrimStart('_');
-      if (result.Length > 0)
+      var sb = new System.Text.StringBuilder();
+      var capitalizeNext = false;
+
+      foreach (var c in name)
       {
-        result = char.ToLower(result[0]) + result.Substring(1);
+        if (char.IsLetterOrDigit(c))
+        {
+          if (sb.Length == 0)
+          {
+            sb.Append(char.ToLower(c));
+          }
+          else if (capitalizeNext)
+          {
+            sb.Append(char.ToUpper(c));
+            capitalizeNext = false;
+          }
+          else
+          {
+            sb.Append(c);
+          }
+        }
+        else if (c == '_')
+        {
+          if (sb.Length > 0)
+          {
+            capitalizeNext = true;
+          }
+        }
+        else
+        {
+          capitalizeNext = true;
+        }
       }
+
+      var result = sb.ToString();
+
+      if (result.Length == 0)
+      {
+        return "item";
+      }
+
+      if (char.IsDigit(result[0]))
+      {
+        result = "n" + result;
+      }
+
       return result;
     }
 

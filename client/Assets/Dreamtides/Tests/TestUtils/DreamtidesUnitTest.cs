@@ -49,8 +49,10 @@ namespace Dreamtides.Tests.TestUtils
       _registry._loggingService = registryObject.AddComponent<FakeLoggingService>();
       _fakeActionService = registryObject.AddComponent<FakeActionService>();
       _registry._actionService = _fakeActionService;
-      _portraitLayout = GeneratedPortraitGameLayout.Create(_createdObjects);
-      _landscapeLayout = GeneratedLandscapeGameLayout.Create(_createdObjects);
+      var canvas = GeneratedCanvas.Create(_createdObjects);
+      _registry._canvas = canvas.Canvas;
+      _portraitLayout = GeneratedPortraitGameLayout.Create(_createdObjects, canvas);
+      _landscapeLayout = GeneratedLandscapeGameLayout.Create(_createdObjects, canvas);
       _registry._portraitLayout = _portraitLayout;
       _registry._landscapeLayout = _landscapeLayout;
       GeneratedSites.Create(_createdObjects);

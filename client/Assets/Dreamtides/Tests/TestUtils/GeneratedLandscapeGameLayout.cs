@@ -1,6 +1,6 @@
 // AUTO-GENERATED CODE - DO NOT EDIT
 // Generated from: LandscapeLayout
-// Generated at: 2025-12-08 07:44:50
+// Generated at: 2025-12-09 06:39:15
 
 #nullable enable
 
@@ -18,7 +18,7 @@ namespace Dreamtides.Tests.TestUtils
 {
   public class GeneratedLandscapeGameLayout
   {
-    public static GameLayout Create(List<GameObject> createdObjects)
+    public static GameLayout Create(List<GameObject> createdObjects, GeneratedCanvas? canvas = null)
     {
       var layoutGo = new GameObject("LandscapeLayout");
       createdObjects.Add(layoutGo);
@@ -108,11 +108,9 @@ namespace Dreamtides.Tests.TestUtils
       scrollableHandScrollableUserHandLayout._cardWidth = 4f;
       scrollableHandScrollableUserHandLayout._hideWhenOutsideWindow = true;
 
-      var scrollbarGo = new GameObject("UserHandScrollbar");
-      createdObjects.Add(scrollbarGo);
-      scrollbarGo.transform.localPosition = new Vector3(0f, -115f, 0f);
-      var scrollbar1 = scrollbarGo.AddComponent<Scrollbar>();
-      scrollableHandScrollableUserHandLayout._scrollbar = scrollbar1;
+      var scrollbarGo = canvas?.Objects["SafeArea/UserHandScrollbar"];
+      if (scrollbarGo != null)
+        scrollableHandScrollableUserHandLayout._scrollbar = scrollbarGo.GetComponent<Scrollbar>();
 
       var leftEdgeGo = new GameObject("Left");
       createdObjects.Add(leftEdgeGo);
@@ -260,7 +258,11 @@ namespace Dreamtides.Tests.TestUtils
       var textGo = new GameObject("Text (TMP)");
       createdObjects.Add(textGo);
       textGo.transform.SetParent(energyGo.transform, false);
-      textGo.transform.localPosition = new Vector3(0.172f, 0f, -0.01f);
+      var textGoRect = textGo.AddComponent<RectTransform>();
+      textGoRect.anchorMin = new Vector2(0.5f, 0.5f);
+      textGoRect.anchorMax = new Vector2(0.5f, 0.5f);
+      textGoRect.anchoredPosition = new Vector2(0.172f, 0f);
+      textGoRect.sizeDelta = new Vector2(2.9698f, 0.9685f);
       var textMeshPro = textGo.AddComponent<TextMeshPro>();
       battlefieldNumber._text = textMeshPro;
 
@@ -283,7 +285,10 @@ namespace Dreamtides.Tests.TestUtils
       var text1Go = new GameObject("ScoreText");
       createdObjects.Add(text1Go);
       text1Go.transform.SetParent(scoreGo.transform, false);
-      text1Go.transform.localPosition = new Vector3(0f, 0f, -0.01f);
+      var text1GoRect = text1Go.AddComponent<RectTransform>();
+      text1GoRect.anchorMin = new Vector2(0.5f, 0.5f);
+      text1GoRect.anchorMax = new Vector2(0.5f, 0.5f);
+      text1GoRect.sizeDelta = new Vector2(2.9698f, 0.9685f);
       var textMeshPro1 = text1Go.AddComponent<TextMeshPro>();
       battlefieldNumber1._text = textMeshPro1;
 
@@ -308,7 +313,10 @@ namespace Dreamtides.Tests.TestUtils
       var text2Go = new GameObject("SparkText");
       createdObjects.Add(text2Go);
       text2Go.transform.SetParent(totalSparkGo.transform, false);
-      text2Go.transform.localPosition = new Vector3(0f, 0f, -0.1f);
+      var text2GoRect = text2Go.AddComponent<RectTransform>();
+      text2GoRect.anchorMin = new Vector2(0.5f, 0.5f);
+      text2GoRect.anchorMax = new Vector2(0.5f, 0.5f);
+      text2GoRect.sizeDelta = new Vector2(1f, 1f);
       var textMeshPro2 = text2Go.AddComponent<TextMeshPro>();
       battlefieldNumber2._text = textMeshPro2;
 
@@ -351,7 +359,11 @@ namespace Dreamtides.Tests.TestUtils
       var text3Go = new GameObject("Text (TMP)");
       createdObjects.Add(text3Go);
       text3Go.transform.SetParent(energy1Go.transform, false);
-      text3Go.transform.localPosition = new Vector3(0.172f, 0f, -0.01f);
+      var text3GoRect = text3Go.AddComponent<RectTransform>();
+      text3GoRect.anchorMin = new Vector2(0.5f, 0.5f);
+      text3GoRect.anchorMax = new Vector2(0.5f, 0.5f);
+      text3GoRect.anchoredPosition = new Vector2(0.172f, 0f);
+      text3GoRect.sizeDelta = new Vector2(2.9698f, 0.9685f);
       var textMeshPro3 = text3Go.AddComponent<TextMeshPro>();
       battlefieldNumber3._text = textMeshPro3;
 
@@ -374,7 +386,10 @@ namespace Dreamtides.Tests.TestUtils
       var text4Go = new GameObject("ScoreText");
       createdObjects.Add(text4Go);
       text4Go.transform.SetParent(score1Go.transform, false);
-      text4Go.transform.localPosition = new Vector3(0f, 0f, -0.01f);
+      var text4GoRect = text4Go.AddComponent<RectTransform>();
+      text4GoRect.anchorMin = new Vector2(0.5f, 0.5f);
+      text4GoRect.anchorMax = new Vector2(0.5f, 0.5f);
+      text4GoRect.sizeDelta = new Vector2(2.9698f, 0.9685f);
       var textMeshPro4 = text4Go.AddComponent<TextMeshPro>();
       battlefieldNumber4._text = textMeshPro4;
 
@@ -399,7 +414,10 @@ namespace Dreamtides.Tests.TestUtils
       var text5Go = new GameObject("SparkText");
       createdObjects.Add(text5Go);
       text5Go.transform.SetParent(totalSpark1Go.transform, false);
-      text5Go.transform.localPosition = new Vector3(0f, 0f, -0.1f);
+      var text5GoRect = text5Go.AddComponent<RectTransform>();
+      text5GoRect.anchorMin = new Vector2(0.5f, 0.5f);
+      text5GoRect.anchorMax = new Vector2(0.5f, 0.5f);
+      text5GoRect.sizeDelta = new Vector2(1f, 1f);
       var textMeshPro5 = text5Go.AddComponent<TextMeshPro>();
       battlefieldNumber5._text = textMeshPro5;
 
@@ -567,17 +585,15 @@ namespace Dreamtides.Tests.TestUtils
       rightEdge1Go.transform.localRotation = Quaternion.Euler(75f, 90f, 0f);
       browserCardBrowser._rightEdge = rightEdge1Go.transform;
 
-      var scrollbar2Go = new GameObject("CardBrowserScrollbarLandscape");
-      createdObjects.Add(scrollbar2Go);
-      scrollbar2Go.transform.localPosition = new Vector3(0f, -35f, 0f);
-      var scrollbar3 = scrollbar2Go.AddComponent<Scrollbar>();
-      browserCardBrowser._scrollbar = scrollbar3;
+      var scrollbar1Go = canvas?.Objects["SafeArea/CardBrowserScrollbarLandscape"];
+      if (scrollbar1Go != null)
+        browserCardBrowser._scrollbar = scrollbar1Go.GetComponent<Scrollbar>();
 
-      var closeButtonGo = new GameObject("CloseBrowserButtonLandscape");
-      createdObjects.Add(closeButtonGo);
-      closeButtonGo.transform.localPosition = new Vector3(-125f, 0f, 0f);
-      var closeBrowserButton = closeButtonGo.AddComponent<CloseBrowserButton>();
-      browserCardBrowser._closeButton = closeBrowserButton;
+      var closeButtonGo = canvas?.Objects[
+        "SafeArea/CardBrowserRightLandscape/CloseBrowserButtonLandscape"
+      ];
+      if (closeButtonGo != null)
+        browserCardBrowser._closeButton = closeButtonGo.GetComponent<CloseBrowserButton>();
 
       var largeCardPositionGo = new GameObject("LargeCardPosition");
       createdObjects.Add(largeCardPositionGo);
@@ -708,7 +724,11 @@ namespace Dreamtides.Tests.TestUtils
       var text6Go = new GameObject("Text (TMP)");
       createdObjects.Add(text6Go);
       text6Go.transform.SetParent(primaryActionButtonGo.transform, false);
-      text6Go.transform.localPosition = new Vector3(0.0112f, -0.0085f, 0f);
+      var text6GoRect = text6Go.AddComponent<RectTransform>();
+      text6GoRect.anchorMin = new Vector2(0.5f, 0.5f);
+      text6GoRect.anchorMax = new Vector2(0.5f, 0.5f);
+      text6GoRect.anchoredPosition = new Vector2(0.0112f, -0.0085f);
+      text6GoRect.sizeDelta = new Vector2(3.5002f, 1.0881f);
       var textMeshPro6 = text6Go.AddComponent<TextMeshPro>();
       actionButton._text = textMeshPro6;
       var boxCollider = primaryActionButtonGo.AddComponent<BoxCollider>();
@@ -733,7 +753,11 @@ namespace Dreamtides.Tests.TestUtils
       var text7Go = new GameObject("Text (TMP)");
       createdObjects.Add(text7Go);
       text7Go.transform.SetParent(secondaryActionButtonGo.transform, false);
-      text7Go.transform.localPosition = new Vector3(0.0112f, -0.0085f, 0f);
+      var text7GoRect = text7Go.AddComponent<RectTransform>();
+      text7GoRect.anchorMin = new Vector2(0.5f, 0.5f);
+      text7GoRect.anchorMax = new Vector2(0.5f, 0.5f);
+      text7GoRect.anchoredPosition = new Vector2(0.0112f, -0.0085f);
+      text7GoRect.sizeDelta = new Vector2(3.5002f, 1.0881f);
       var textMeshPro7 = text7Go.AddComponent<TextMeshPro>();
       actionButton1._text = textMeshPro7;
       var boxCollider1 = secondaryActionButtonGo.AddComponent<BoxCollider>();
@@ -758,7 +782,11 @@ namespace Dreamtides.Tests.TestUtils
       var text8Go = new GameObject("Text (TMP)");
       createdObjects.Add(text8Go);
       text8Go.transform.SetParent(incrementActionButtonGo.transform, false);
-      text8Go.transform.localPosition = new Vector3(0.0112f, -0.0085f, 0f);
+      var text8GoRect = text8Go.AddComponent<RectTransform>();
+      text8GoRect.anchorMin = new Vector2(0.5f, 0.5f);
+      text8GoRect.anchorMax = new Vector2(0.5f, 0.5f);
+      text8GoRect.anchoredPosition = new Vector2(0.0112f, -0.0085f);
+      text8GoRect.sizeDelta = new Vector2(3.5002f, 1.0881f);
       var textMeshPro8 = text8Go.AddComponent<TextMeshPro>();
       actionButton2._text = textMeshPro8;
       var boxCollider2 = incrementActionButtonGo.AddComponent<BoxCollider>();
@@ -783,42 +811,24 @@ namespace Dreamtides.Tests.TestUtils
       var text9Go = new GameObject("Text (TMP)");
       createdObjects.Add(text9Go);
       text9Go.transform.SetParent(decrementActionButtonGo.transform, false);
-      text9Go.transform.localPosition = new Vector3(0.0112f, -0.0085f, 0f);
+      var text9GoRect = text9Go.AddComponent<RectTransform>();
+      text9GoRect.anchorMin = new Vector2(0.5f, 0.5f);
+      text9GoRect.anchorMax = new Vector2(0.5f, 0.5f);
+      text9GoRect.anchoredPosition = new Vector2(0.0112f, -0.0085f);
+      text9GoRect.sizeDelta = new Vector2(3.5002f, 1.0881f);
       var textMeshPro9 = text9Go.AddComponent<TextMeshPro>();
       actionButton3._text = textMeshPro9;
       var boxCollider3 = decrementActionButtonGo.AddComponent<BoxCollider>();
       actionButton3._collider = boxCollider3;
       layout._decrementActionButton = actionButton3;
 
-      var undoButtonGo = new GameObject("UndoButton");
-      createdObjects.Add(undoButtonGo);
-      undoButtonGo.transform.localPosition = new Vector3(340.1556f, 194.7f, 0f);
-      var canvasButton = undoButtonGo.AddComponent<CanvasButton>();
-      var canvasGroup = undoButtonGo.AddComponent<CanvasGroup>();
-      canvasButton._canvasGroup = canvasGroup;
+      var undoButtonGo = canvas?.Objects["SafeArea/TopRight/UndoButton"];
+      if (undoButtonGo != null)
+        layout._undoButton = undoButtonGo.GetComponent<CanvasButton>();
 
-      var text10Go = new GameObject("Text (TMP)");
-      createdObjects.Add(text10Go);
-      text10Go.transform.SetParent(undoButtonGo.transform, false);
-      text10Go.transform.localPosition = new Vector3(-12.5f, -12.5f, 0f);
-      var textMeshProUGUI = text10Go.AddComponent<TextMeshProUGUI>();
-      canvasButton._text = textMeshProUGUI;
-      layout._undoButton = canvasButton;
-
-      var devButtonGo = new GameObject("DevButton");
-      createdObjects.Add(devButtonGo);
-      devButtonGo.transform.localPosition = new Vector3(8.6f, -35.7f, 0f);
-      var canvasButton1 = devButtonGo.AddComponent<CanvasButton>();
-      var canvasGroup1 = devButtonGo.AddComponent<CanvasGroup>();
-      canvasButton1._canvasGroup = canvasGroup1;
-
-      var text11Go = new GameObject("Text (TMP)");
-      createdObjects.Add(text11Go);
-      text11Go.transform.SetParent(devButtonGo.transform, false);
-      text11Go.transform.localPosition = new Vector3(14.32535f, -6.4387f, 0f);
-      var textMeshProUGUI1 = text11Go.AddComponent<TextMeshProUGUI>();
-      canvasButton1._text = textMeshProUGUI1;
-      layout._devButton = canvasButton1;
+      var devButtonGo = canvas?.Objects["SafeArea/TopLeft/DevButton"];
+      if (devButtonGo != null)
+        layout._devButton = devButtonGo.GetComponent<CanvasButton>();
 
       var enemyMessageGo = new GameObject("EnemyMessage");
       createdObjects.Add(enemyMessageGo);
@@ -833,7 +843,11 @@ namespace Dreamtides.Tests.TestUtils
       var messageTextGo = new GameObject("Text (TMP)");
       createdObjects.Add(messageTextGo);
       messageTextGo.transform.SetParent(enemyMessageGo.transform, false);
-      messageTextGo.transform.localPosition = new Vector3(0.0165f, -0.14f, 0f);
+      var messageTextGoRect = messageTextGo.AddComponent<RectTransform>();
+      messageTextGoRect.anchorMin = new Vector2(0.5f, 0.5f);
+      messageTextGoRect.anchorMax = new Vector2(0.5f, 0.5f);
+      messageTextGoRect.anchoredPosition = new Vector2(0.0165f, -0.14f);
+      messageTextGoRect.sizeDelta = new Vector2(4.6404f, 2f);
       var textMeshPro10 = messageTextGo.AddComponent<TextMeshPro>();
       enemyMessage1._messageText = textMeshPro10;
       layout._enemyMessage = enemyMessage1;
@@ -845,7 +859,12 @@ namespace Dreamtides.Tests.TestUtils
       thinkingIndicatorGo.transform.localRotation = Quaternion.Euler(0f, 90f, 0f);
       thinkingIndicatorGo.transform.localScale = new Vector3(0.2f, 0.2f, 0.2f);
       layout._thinkingIndicator = thinkingIndicatorGo;
-      layout._closeBrowserButton = closeBrowserButton;
+
+      var closeBrowserButtonGo = canvas?.Objects[
+        "SafeArea/CardBrowserRightLandscape/CloseBrowserButtonLandscape"
+      ];
+      if (closeBrowserButtonGo != null)
+        layout._closeBrowserButton = closeBrowserButtonGo.GetComponent<CloseBrowserButton>();
 
       var aboveUserVoidGo = new GameObject("AboveUserVoid");
       createdObjects.Add(aboveUserVoidGo);

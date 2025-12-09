@@ -149,6 +149,8 @@ namespace Dreamtides.Editors
 
     public static string ToLiteral(string value) => $"\"{EscapeString(value)}\"";
 
+    public static string ToVector2(Vector2 v) => $"new Vector2({ToLiteral(v.x)}, {ToLiteral(v.y)})";
+
     public static string ToVector3(Vector3 v) =>
       $"new Vector3({ToLiteral(v.x)}, {ToLiteral(v.y)}, {ToLiteral(v.z)})";
 

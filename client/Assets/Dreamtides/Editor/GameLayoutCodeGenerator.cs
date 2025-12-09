@@ -6,6 +6,7 @@ using Dreamtides.Layout;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 namespace Dreamtides.Editors
 {
@@ -18,6 +19,9 @@ namespace Dreamtides.Editors
 
     GameObject? _sitesRoot;
     string _sitesClassName = "GeneratedSites";
+
+    Canvas? _canvas;
+    string _canvasClassName = "GeneratedCanvas";
 
     [MenuItem("Tools/Generate Test Code")]
     static void ShowWindow()
@@ -42,6 +46,17 @@ namespace Dreamtides.Editors
       {
         _sitesRoot = FindRootGameObject("Sites");
       }
+
+      if (_canvas == null)
+      {
+        _canvas = FindRootCanvas("Canvas");
+      }
+    }
+
+    static Canvas? FindRootCanvas(string name)
+    {
+      var go = FindRootGameObject(name);
+      return go != null ? go.GetComponent<Canvas>() : null;
     }
 
     static GameLayout? FindRootGameLayout(string name)
@@ -79,6 +94,8 @@ namespace Dreamtides.Editors
       DrawGameLayoutSection();
       EditorGUILayout.Space(20);
       DrawSitesSection();
+      EditorGUILayout.Space(20);
+      DrawCanvasSection();
       EditorGUILayout.Space(20);
       DrawGenerateButton();
     }
@@ -120,15 +137,25 @@ namespace Dreamtides.Editors
       _sitesClassName = EditorGUILayout.TextField("Sites Class Name", _sitesClassName);
     }
 
+    void DrawCanvasSection()
+    {
+      EditorGUILayout.LabelField("Canvas", EditorStyles.boldLabel);
+      EditorGUILayout.Space();
+
+      _canvas = EditorGUILayout.ObjectField("Canvas", _canvas, typeof(Canvas), true) as Canvas;
+      _canvasClassName = EditorGUILayout.TextField("Canvas Class Name", _canvasClassName);
+    }
+
     void DrawGenerateButton()
     {
       var hasLayoutInput = _portraitLayout != null || _landscapeLayout != null;
       var hasSitesInput = _sitesRoot != null;
+      var hasCanvasInput = _canvas != null;
 
-      if (!hasLayoutInput && !hasSitesInput)
+      if (!hasLayoutInput && !hasSitesInput && !hasCanvasInput)
       {
         EditorGUILayout.HelpBox(
-          "Select at least one GameLayout or Sites Root from the scene.",
+          "Select at least one GameLayout, Sites Root, or Canvas from the scene.",
           MessageType.Info
         );
         return;
@@ -152,9 +179,21 @@ namespace Dreamtides.Editors
         return;
       }
 
+      if (_canvas != null && string.IsNullOrWhiteSpace(_canvasClassName))
+      {
+        EditorGUILayout.HelpBox("Please enter a canvas class name.", MessageType.Warning);
+        return;
+      }
+
       if (GUILayout.Button("Generate Code"))
       {
         var generatedFiles = new List<string>();
+
+        if (_canvas != null)
+        {
+          GenerateCanvasCode(_canvas, _canvasClassName);
+          generatedFiles.Add(_canvasClassName);
+        }
 
         if (_portraitLayout != null)
         {
@@ -232,15 +271,69 @@ namespace Dreamtides.Editors
       return false;
     }
 
-    static void GenerateGameLayoutCode(GameLayout layout, string className)
+    static bool IsCanvasSupportedComponent(Component component)
     {
-      var utils = new CodeGeneratorUtils(IsGameLayoutSupportedComponent);
+      if (component == null)
+      {
+        return false;
+      }
+
+      var type = component.GetType();
+
+      if (type == typeof(Canvas))
+      {
+        return true;
+      }
+
+      if (type == typeof(CanvasScaler))
+      {
+        return true;
+      }
+
+      if (type == typeof(GraphicRaycaster))
+      {
+        return true;
+      }
+
+      return false;
+    }
+
+    static HashSet<GameObject> GetCanvasDescendants(Canvas? canvas)
+    {
+      var result = new HashSet<GameObject>();
+      if (canvas == null)
+      {
+        return result;
+      }
+
+      CollectDescendants(canvas.transform, result);
+      return result;
+    }
+
+    static void CollectDescendants(Transform parent, HashSet<GameObject> result)
+    {
+      foreach (Transform child in parent)
+      {
+        result.Add(child.gameObject);
+        CollectDescendants(child, result);
+      }
+    }
+
+    void GenerateGameLayoutCode(GameLayout layout, string className)
+    {
+      var canvasObjects = GetCanvasDescendants(_canvas);
+      var utils = new CodeGeneratorUtils(IsGameLayoutSupportedComponent, canvasObjects);
       var builder = CodeGeneratorUtils.CreateBuilder(layout.gameObject.name);
 
       builder.Class(className);
       builder.OpenBrace();
 
-      builder.Method("GameLayout", "Create", "List<GameObject> createdObjects", isStatic: true);
+      builder.Method(
+        "GameLayout",
+        "Create",
+        "List<GameObject> createdObjects, GeneratedCanvas? canvas = null",
+        isStatic: true
+      );
       builder.OpenBrace();
 
       var layoutVar = utils.GenerateGameObjectAndComponents(
@@ -303,6 +396,74 @@ namespace Dreamtides.Editors
       builder.CloseBrace();
 
       CodeGeneratorUtils.WriteFile(builder, className);
+    }
+
+    static void GenerateCanvasCode(Canvas canvas, string className)
+    {
+      var utils = new CodeGeneratorUtils(IsCanvasSupportedComponent);
+      var builder = CodeGeneratorUtils.CreateBuilder(canvas.gameObject.name);
+
+      builder.Class(className);
+      builder.OpenBrace();
+
+      builder.Line("public Canvas Canvas { get; private set; } = null!;");
+      builder.Line(
+        "public Dictionary<string, GameObject> Objects { get; } = new Dictionary<string, GameObject>();"
+      );
+      builder.BlankLine();
+
+      builder.Method(className, "Create", "List<GameObject> createdObjects", isStatic: true);
+      builder.OpenBrace();
+
+      builder.Var("result", $"new {className}()");
+      builder.BlankLine();
+
+      var canvasGo = canvas.gameObject;
+      var canvasVar = utils.GenerateGameObjectAndComponents(
+        builder,
+        canvasGo,
+        "canvas",
+        isRoot: true
+      );
+
+      builder.Assign("result.Canvas", canvasVar);
+
+      GenerateCanvasChildren(builder, utils, canvasGo.transform, "");
+
+      builder.BlankLine();
+      builder.Return("result");
+
+      builder.CloseBrace();
+      builder.CloseBrace();
+
+      CodeGeneratorUtils.WriteFile(builder, className);
+    }
+
+    static void GenerateCanvasChildren(
+      CSharpCodeBuilder builder,
+      CodeGeneratorUtils utils,
+      Transform parent,
+      string parentPath
+    )
+    {
+      foreach (Transform child in parent)
+      {
+        var childPath = string.IsNullOrEmpty(parentPath)
+          ? child.gameObject.name
+          : $"{parentPath}/{child.gameObject.name}";
+
+        builder.BlankLine();
+        var childVar = utils.GenerateGameObjectAndComponents(
+          builder,
+          child.gameObject,
+          CodeGeneratorUtils.SanitizeVarName(child.gameObject.name),
+          isRoot: false
+        );
+
+        builder.Call("result.Objects", "Add", $"\"{childPath}\"", $"{childVar}Go");
+
+        GenerateCanvasChildren(builder, utils, child, childPath);
+      }
     }
   }
 }
