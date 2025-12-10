@@ -114,6 +114,7 @@ namespace Dreamtides.Services
       Registry.DreamscapeLayout.JourneyChoiceDisplay.ApplyLayout(sequence);
       Registry.DreamscapeLayout.TemptingOfferDisplay.ApplyLayout(sequence);
       Registry.DreamscapeLayout.QuestEffectPosition.ApplyLayout(sequence);
+      Registry.DreamscapeLayout.StartBattleLayout.ApplyLayout(sequence);
       ApplySiteOwnedLayouts(sequence);
     }
 

@@ -137,6 +137,10 @@ pub enum Position {
     /// currently active quest. Similar to a card being on the stack during a
     /// battle.
     QuestEffect,
+
+    /// Object is being displayed as one of the identity cards participating in
+    /// a battle.
+    InitiatingBattleIdentityCard,
 }
 
 #[derive(

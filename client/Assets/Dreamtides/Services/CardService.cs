@@ -414,6 +414,11 @@ namespace Dreamtides.Services
         return Registry.DreamscapeLayout.QuestEffectPosition;
       }
 
+      if (position.Enum == PositionEnum.InitiatingBattleIdentityCard)
+      {
+        return Registry.DreamscapeLayout.StartBattleLayout;
+      }
+
       if (position.Enum == PositionEnum.DestroyedQuestCards)
       {
         return Registry.DreamscapeLayout.DestroyedQuestCards;

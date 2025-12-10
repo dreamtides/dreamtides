@@ -61,6 +61,10 @@ namespace Dreamtides.Layout
     public ObjectLayout QuestEffectPosition => Check(_questEffectPosition);
 
     [SerializeField]
+    internal StartBattleObjectLayout _startBattleLayout = null!;
+    public StartBattleObjectLayout StartBattleLayout => Check(_startBattleLayout);
+
+    [SerializeField]
     internal Displayable _essenceTotalWorldPosition = null!;
     public Displayable EssenceTotalWorldPosition => Check(_essenceTotalWorldPosition);
 

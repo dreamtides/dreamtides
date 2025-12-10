@@ -47,7 +47,7 @@ public class PrototypeQuestBattleFlow
       Id = UserIdentityCardId,
       Position = new ObjectPosition
       {
-        Position = new Position { Enum = PositionEnum.QuestEffect },
+        Position = new Position { Enum = PositionEnum.InitiatingBattleIdentityCard },
         SortingKey = 0,
       },
       Prefab = CardPrefab.Identity,
@@ -92,7 +92,7 @@ public class PrototypeQuestBattleFlow
       Id = EnemyIdentityCardId,
       Position = new ObjectPosition
       {
-        Position = new Position { Enum = PositionEnum.QuestEffect },
+        Position = new Position { Enum = PositionEnum.InitiatingBattleIdentityCard },
         SortingKey = 1,
       },
       Prefab = CardPrefab.Identity,

@@ -2742,8 +2742,11 @@ namespace Dreamtides.Schema
     /// Object is being displayed prominently, applying an effect to the
     /// currently active quest. Similar to a card being on the stack during a
     /// battle.
+    ///
+    /// Object is being displayed as one of the identity cards participating in
+    /// a battle.
     /// </summary>
-    public enum PositionEnum { Browser, Default, DestroyedQuestCards, DraftPickDisplay, Drawn, DreamsignDisplay, DreamwellActivation, GameModifier, HandStorage, JourneyDisplay, Offscreen, OnScreenStorage, QuestDeck, QuestDeckBrowser, QuestEffect, ShopDisplay };
+    public enum PositionEnum { Browser, Default, DestroyedQuestCards, DraftPickDisplay, Drawn, DreamsignDisplay, DreamwellActivation, GameModifier, HandStorage, InitiatingBattleIdentityCard, JourneyDisplay, Offscreen, OnScreenStorage, QuestDeck, QuestDeckBrowser, QuestEffect, ShopDisplay };
 
     /// <summary>
     /// Auto-generated discriminant enum variants
@@ -5322,6 +5325,8 @@ namespace Dreamtides.Schema
                             return new Position { Enum = PositionEnum.GameModifier };
                         case "HandStorage":
                             return new Position { Enum = PositionEnum.HandStorage };
+                        case "InitiatingBattleIdentityCard":
+                            return new Position { Enum = PositionEnum.InitiatingBattleIdentityCard };
                         case "JourneyDisplay":
                             return new Position { Enum = PositionEnum.JourneyDisplay };
                         case "Offscreen":
@@ -5378,6 +5383,9 @@ namespace Dreamtides.Schema
                         return;
                     case PositionEnum.HandStorage:
                         serializer.Serialize(writer, "HandStorage");
+                        return;
+                    case PositionEnum.InitiatingBattleIdentityCard:
+                        serializer.Serialize(writer, "InitiatingBattleIdentityCard");
                         return;
                     case PositionEnum.JourneyDisplay:
                         serializer.Serialize(writer, "JourneyDisplay");
@@ -5574,6 +5582,8 @@ namespace Dreamtides.Schema
                     return PositionEnum.GameModifier;
                 case "HandStorage":
                     return PositionEnum.HandStorage;
+                case "InitiatingBattleIdentityCard":
+                    return PositionEnum.InitiatingBattleIdentityCard;
                 case "JourneyDisplay":
                     return PositionEnum.JourneyDisplay;
                 case "Offscreen":
@@ -5628,6 +5638,9 @@ namespace Dreamtides.Schema
                     return;
                 case PositionEnum.HandStorage:
                     serializer.Serialize(writer, "HandStorage");
+                    return;
+                case PositionEnum.InitiatingBattleIdentityCard:
+                    serializer.Serialize(writer, "InitiatingBattleIdentityCard");
                     return;
                 case PositionEnum.JourneyDisplay:
                     serializer.Serialize(writer, "JourneyDisplay");
