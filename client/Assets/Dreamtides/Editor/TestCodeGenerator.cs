@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using Dreamtides.Components;
 using Dreamtides.Layout;
 using Dreamtides.Services;
+using Dreamtides.Sites;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -359,7 +360,7 @@ namespace Dreamtides.Editors
 
       var type = component.GetType();
 
-      if (typeof(DreamscapeSite).IsAssignableFrom(type))
+      if (typeof(AbstractDreamscapeSite).IsAssignableFrom(type))
       {
         return true;
       }
@@ -482,21 +483,26 @@ namespace Dreamtides.Editors
       var utils = new CodeGeneratorUtils(IsSitesSupportedComponent);
       var builder = CodeGeneratorUtils.CreateBuilder(sitesRoot.name);
 
+      builder.Using("Dreamtides.Sites");
+      builder.BlankLine();
+
       builder.Class(className);
       builder.OpenBrace();
 
       builder.Method(
-        "List<DreamscapeSite>",
+        "List<AbstractDreamscapeSite>",
         "Create",
         "List<GameObject> createdObjects",
         isStatic: true
       );
       builder.OpenBrace();
 
-      builder.Var("result", "new List<DreamscapeSite>()");
+      builder.Var("result", "new List<AbstractDreamscapeSite>()");
       builder.BlankLine();
 
-      var siteComponents = sitesRoot.GetComponentsInChildren<DreamscapeSite>(includeInactive: true);
+      var siteComponents = sitesRoot.GetComponentsInChildren<AbstractDreamscapeSite>(
+        includeInactive: true
+      );
 
       foreach (var site in siteComponents)
       {

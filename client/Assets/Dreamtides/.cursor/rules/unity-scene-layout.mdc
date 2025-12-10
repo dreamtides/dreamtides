@@ -1,0 +1,194 @@
+---
+description: Describes the structure of the Unity project and main unity scene
+alwaysApply: false
+---
+
+# MAIN.UNITY SCENE HIERARCHY
+
+The Main.unity scene contains the core game structure. Below is a summary of the key
+GameObjects and their hierarchy. This mirrors what the Generated* test utilities create.
+
+## Top-Level Scene Objects
+
+```
+Registry                     # Service locator with all game services (CardService, ActionService, etc.)
+MainCamera                   # GameCamera component, controls camera positioning
+  ├─ MusicAudioSource
+  ├─ PostProcessing
+  ├─ DrawnCardsPosition      # PileObjectLayout for newly drawn cards
+  ├─ GameMessage             # Victory/Defeat/Judgment visual effects
+  │   ├─ Top
+  │   ├─ UserJudgment        # Magic circle effects for user judgment phase
+  │   ├─ EnemyJudgment       # Magic circle effects for enemy judgment phase
+  │   ├─ Victory             # Victory animation effects
+  │   └─ Defeat              # Defeat animation effects
+  ├─ QuestDeck               # RenderAsChildObjectLayout for quest deck display
+  │   ├─ Background
+  │   ├─ PointLight
+  │   ├─ AboveQuestDeck
+  │   ├─ DreamsignDisplay    # DreamsignDisplayLayout
+  │   └─ QuestDeckButton
+  ├─ EssenceTotalWorldPosition
+  ├─ DraftPickObjectLayout   # SitePickObjectLayout for draft card picks
+  ├─ ShopObjectLayout        # SitePickObjectLayout for shop purchases
+  ├─ TemptingOfferObjectLayout
+  ├─ JourneyObjectLayout
+  └─ QuestDeckBrowserWorldSpace
+MapCamera                    # Secondary camera for world map view
+DirectionalLight             # Main scene lighting
+Document                     # UI Toolkit document root
+Canvas                       # Unity UI Canvas (Screen Space)
+  └─ SafeArea                # RectTransform container respecting device safe areas
+      ├─ TopLeft             # Menu button, dev button, site buttons, info zoom positions
+      │   ├─ MenuButton
+      │   ├─ DevButton
+      │   ├─ InfoZoomLandscapeLeft
+      │   ├─ InfoZoomPortraitLeft
+      │   └─ SiteButtons     # Draft, Shop, Journey, Essence, Battle site buttons
+      ├─ TopCenter
+      ├─ TopRight            # Undo button, bug button, game modifier displays
+      │   ├─ UndoButton
+      │   ├─ BugButton
+      │   ├─ GameModifierDisplayPosition
+      │   ├─ InfoZoomLandscapeRight
+      │   └─ InfoZoomPortraitRight
+      ├─ SpeechBubble        # Character speech bubble UI
+      ├─ BottomLeft          # Essence display, camera buttons
+      │   ├─ EssenceDisplay
+      │   ├─ SpaceCameraFar
+      │   ├─ SpaceCameraNear
+      │   └─ MapCamera
+      ├─ BottomRight         # Quest deck position
+      ├─ BottomCenter
+      ├─ CardBrowserLeft/Right           # Portrait card browser positioning
+      ├─ CardBrowserLeftLandscape        # Landscape card browser positioning
+      ├─ CardBrowserRightLandscape
+      ├─ CloseBrowserButton
+      ├─ CloseSiteButton
+      ├─ CardBrowserScrollbarPortrait    # Horizontal scrollbar for portrait browser
+      ├─ CardBrowserScrollbarLandscape   # Horizontal scrollbar for landscape browser
+      ├─ UserHandScrollbar               # Scrollbar for large hands (10+ cards)
+      ├─ ActionButtonsPortrait           # Action button anchor for portrait mode
+      ├─ ActionButtonsLandscape          # Action button anchor for landscape mode
+      ├─ HandLeft/HandRight              # Hand card positioning anchors
+      ├─ QuestDeckBrowserPortrait        # ScrollView-based deck browser (portrait)
+      └─ QuestDeckBrowserLandscape       # ScrollView-based deck browser (landscape)
+```
+
+## PortraitLayout (BattleLayout)
+
+Used when device is in portrait orientation. Contains the 3D battle elements.
+
+```
+PortraitLayout               # BattleLayout component
+  ├─ PortraitBattleCamera    # CinemachineCamera for battle view
+  │   ├─ DrawnCardsPosition
+  │   └─ GameMessage
+  └─ Contents                # Container for all 3D battle elements
+      ├─ Bounds              # BattleCameraBounds with BottomLeft/TopLeft anchors
+      ├─ UserHand            # UserHandLayout with multiple layout modes
+      │   ├─ UserHandRow1    # CurveObjectLayout for 1-5 cards
+      │   ├─ UserHandRow2    # CurveObjectLayout for 6-9 cards (two rows)
+      │   └─ ScrollableHand  # ScrollableUserHandLayout for 10+ cards
+      ├─ EnemyHand           # EnemyHandLayout with bezier curve positioning
+      ├─ UserDeck            # PileObjectLayout with EffectPosition
+      ├─ EnemyDeck           # PileObjectLayout with EffectPosition
+      ├─ UserBattlefield     # RectangularObjectLayout for user's characters
+      ├─ EnemyBattlefield    # RectangularObjectLayout for enemy's characters
+      ├─ UserVoid            # PileObjectLayout (discard pile)
+      ├─ EnemyVoid           # PileObjectLayout (discard pile)
+      ├─ UserStatus          # PlayerStatusDisplay with Energy, Score, SparkTotal
+      │   ├─ Energy          # BattlefieldNumber with TimedEffect
+      │   ├─ Score           # BattlefieldNumber with TimedEffect
+      │   └─ Image           # Character portrait
+      ├─ UserSparkTotal      # BattlefieldNumber for total spark
+      ├─ EnemyStatus         # PlayerStatusDisplay (same structure as UserStatus)
+      ├─ EnemySparkTotal
+      ├─ Offscreen           # PileObjectLayout for hidden cards
+      ├─ DefaultStack        # StackingObjectLayout for the spell stack
+      ├─ TargetingUser       # StackingObjectLayout (stack when targeting user)
+      ├─ TargetingEnemy      # StackingObjectLayout (stack when targeting enemy)
+      ├─ TargetingBoth       # StackingObjectLayout (stack when targeting both)
+      ├─ BrowserBackground   # SpriteRenderer overlay for card browser
+      ├─ CardBrowser         # CardBrowser component
+      │   ├─ CardBrowserLeft
+      │   ├─ CardBrowserRight
+      │   ├─ LargeCardPosition
+      │   └─ TwoCardsPosition
+      ├─ UserDreamwell       # PileObjectLayout for dreamwell cards
+      ├─ EnemyDreamwell
+      ├─ DreamwellActivation # PileObjectLayout for dreamwell phase
+      ├─ DreamwellDisplay
+      ├─ CardOrderSelector   # CardOrderSelector for reordering cards
+      ├─ GameModifiersDisplay # CenteredObjectLayout for game modifier cards
+      ├─ OnScreenStorage     # PileObjectLayout for temporary card storage
+      ├─ PrimaryActionButton # ActionButton (Pass, Confirm, etc.)
+      ├─ SecondaryActionButton
+      ├─ IncrementButton     # ActionButton for +/- selections
+      ├─ DecrementButton
+      ├─ EnemyMessage        # EnemyMessage speech bubble component
+      ├─ ThinkingIndicator   # AI thinking animation position
+      ├─ AboveUserVoid       # StackingObjectLayout for cards above void
+      └─ AboveEnemyVoid
+  ├─ InfoZoomLeftContainer   # Position for zoomed card info (left side)
+  │   └─ LeftContainerSupplemental
+  └─ InfoZoomRightContainer  # Position for zoomed card info (right side)
+      └─ RightContainerSupplemental
+```
+
+## LandscapeLayout (BattleLayout)
+
+Used when device is in landscape orientation. Rotated 270° from portrait.
+
+```
+LandscapeLayout              # BattleLayout component (rotated 270° on Y axis)
+  ├─ LandscapeBattleCamera   # CinemachineCamera at (-5, 17, -16), rotated (75, 90, 0)
+  └─ Contents                # Same structure as PortraitLayout with different positions
+      ├─ Bounds
+      ├─ UserHand            # Uses LandscapeHandLayout instead of CurveObjectLayout
+      │   ├─ UserHandRow     # LandscapeHandLayout with curved positioning
+      │   └─ ScrollableHand
+      ├─ EnemyHand
+      ├─ UserBattlefield     # CenteredObjectLayout (horizontal row) instead of grid
+      ├─ EnemyBattlefield    # CenteredObjectLayout (horizontal row)
+      ├─ [... similar structure to Portrait ...]
+      └─ GameModifiersDisplay # CenteredObjectLayout with vertical: true
+```
+
+## Sites (DreamscapeSite)
+
+Interactive locations in the game world for quests/activities.
+
+```
+Sites                        # Parent container for all sites
+  ├─ DraftSite               # DreamscapeSite for card drafting
+  │   ├─ TargetScreenLeftCamera
+  │   ├─ TargetScreenRightCamera
+  │   ├─ TargetScreenTopCamera
+  │   ├─ TargetDraftSiteCamera
+  │   ├─ Character           # MecanimAnimator for NPC
+  │   ├─ CharacterOwnedObjects # PileObjectLayout
+  │   ├─ SiteDeck            # PileObjectLayout for site's deck
+  │   └─ CharacterSpeechBubblePosition
+  ├─ ShopSite                # DreamscapeSite for card shop
+  ├─ TemptingOfferSite       # DreamscapeSite for tempting offers
+  ├─ EssenceSite             # DreamscapeSite for essence activities
+  └─ BattleSite (DreamscapeBattleSite) # Main battle arena
+      ├─ PortraitBattleAnchor  # Anchor for portrait layout positioning
+      └─ LandscapeBattleAnchor # Anchor for landscape layout positioning
+
+StudioPosition               # Position for character/card studio renders
+<Additive Scene>             # Loaded environment/terrain scene
+```
+
+## Key Components
+
+- **BattleLayout**: Contains all battle UI elements, one for Portrait and one for Landscape
+- **UserHandLayout**: Manages card layout with multiple modes (curve, two-row, scrollable)
+- **CardBrowser**: Handles card browsing/selection with scrollbar integration
+- **PlayerStatusDisplay**: Shows player energy, score, spark with animated effects
+- **StackingObjectLayout**: Displays cards on the spell stack with offset positioning
+- **PileObjectLayout**: Simple pile/deck display with stacking
+- **CenteredObjectLayout**: Horizontal/vertical centered card layout
+- **ActionButton**: 3D button for game actions (Pass, Confirm, etc.)
+- **DreamscapeSite**: Interactive quest locations with cameras and NPC characters

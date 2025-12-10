@@ -3,12 +3,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using Dreamtides.Components;
+using Dreamtides.Sites;
 using UnityEditor;
 using UnityEngine;
 
 namespace Dreamtides.Editors
 {
-  [CustomEditor(typeof(DreamscapeSite))]
+  [CustomEditor(typeof(AbstractDreamscapeSite), editorForChildClasses: true)]
   public sealed class DreamscapeSiteEditor : Editor
   {
     public override void OnInspectorGUI()
@@ -16,8 +17,10 @@ namespace Dreamtides.Editors
       DrawDefaultInspector();
       if (GUILayout.Button("Activate"))
       {
-        var selectedSites = new HashSet<DreamscapeSite>(targets.Cast<DreamscapeSite>());
-        var allSites = FindObjectsByType<DreamscapeSite>(
+        var selectedSites = new HashSet<AbstractDreamscapeSite>(
+          targets.Cast<AbstractDreamscapeSite>()
+        );
+        var allSites = FindObjectsByType<AbstractDreamscapeSite>(
           FindObjectsInactive.Include,
           FindObjectsSortMode.None
         );
@@ -44,7 +47,7 @@ namespace Dreamtides.Editors
         {
           foreach (var editorTarget in targets)
           {
-            var dreamscapeSite = (DreamscapeSite)editorTarget;
+            var dreamscapeSite = (AbstractDreamscapeSite)editorTarget;
             PlayModeValueSaver.SaveNow(dreamscapeSite);
             PlayModeValueSaver.SaveNow(dreamscapeSite.transform);
           }

@@ -2,6 +2,7 @@
 
 using System.Collections.Generic;
 using Dreamtides.Components;
+using Dreamtides.Sites;
 using UnityEditor;
 using UnityEngine;
 
@@ -52,13 +53,14 @@ public static class PlayModeValueSaver
         continue;
       }
       Undo.RecordObject(originalObj, "Apply Play Mode Values");
-      var dreamscapeSite = originalObj as DreamscapeSite;
+      var characterSite = originalObj as CharacterSite;
+      var abstractSite = originalObj as AbstractDreamscapeSite;
       var targetScreenLeft = (Object?)null;
       var targetScreenRight = (Object?)null;
       var targetScreenTop = (Object?)null;
-      if (dreamscapeSite != null)
+      if (characterSite != null)
       {
-        var serialized = new SerializedObject(dreamscapeSite);
+        var serialized = new SerializedObject(characterSite);
         targetScreenLeft = serialized.FindProperty("_targetScreenLeftCamera").objectReferenceValue;
         targetScreenRight = serialized
           .FindProperty("_targetScreenRightCamera")
@@ -66,13 +68,23 @@ public static class PlayModeValueSaver
         targetScreenTop = serialized.FindProperty("_targetScreenTopCamera").objectReferenceValue;
       }
       EditorJsonUtility.FromJsonOverwrite(json, originalObj);
-      if (dreamscapeSite != null)
+      if (characterSite != null)
       {
-        var serialized = new SerializedObject(dreamscapeSite);
+        var serialized = new SerializedObject(characterSite);
         serialized.FindProperty("_targetScreenLeftCamera").objectReferenceValue = targetScreenLeft;
         serialized.FindProperty("_targetScreenRightCamera").objectReferenceValue =
           targetScreenRight;
         serialized.FindProperty("_targetScreenTopCamera").objectReferenceValue = targetScreenTop;
+        var isActiveProperty = serialized.FindProperty("_isActive");
+        if (isActiveProperty != null)
+        {
+          isActiveProperty.boolValue = false;
+        }
+        serialized.ApplyModifiedPropertiesWithoutUndo();
+      }
+      else if (abstractSite != null)
+      {
+        var serialized = new SerializedObject(abstractSite);
         var isActiveProperty = serialized.FindProperty("_isActive");
         if (isActiveProperty != null)
         {

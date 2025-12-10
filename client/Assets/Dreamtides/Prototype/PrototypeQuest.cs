@@ -9,6 +9,7 @@ using Dreamtides.Components;
 using Dreamtides.Prototype;
 using Dreamtides.Schema;
 using Dreamtides.Services;
+using Dreamtides.Sites;
 using UnityEngine;
 
 public class PrototypeQuest : Service
@@ -323,9 +324,9 @@ public class PrototypeQuest : Service
     yield return StartCoroutine(ReturnToMap());
   }
 
-  DreamscapeSite? FindSiteForAction(string action)
+  AbstractDreamscapeSite? FindSiteForAction(string action)
   {
-    var sites = FindObjectsByType<DreamscapeSite>(
+    var sites = FindObjectsByType<AbstractDreamscapeSite>(
       FindObjectsInactive.Exclude,
       FindObjectsSortMode.None
     );

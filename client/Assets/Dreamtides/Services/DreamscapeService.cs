@@ -9,6 +9,7 @@ using Dreamtides.Buttons;
 using Dreamtides.Components;
 using Dreamtides.Layout;
 using Dreamtides.Schema;
+using Dreamtides.Sites;
 using Dreamtides.Utils;
 using UnityEngine;
 
@@ -140,32 +141,32 @@ namespace Dreamtides.Services
 
     public IEnumerator HandlePlayMecanimAnimation(PlayMecanimAnimationCommand command)
     {
-      var site = FindSite(command.SiteId);
+      var site = FindCharacterSite(command.SiteId);
       var animator = Errors.CheckNotNull(site.CharacterAnimator);
       return animator.PlayAnimation(command);
     }
 
     public ObjectLayout SiteDeckLayout(Guid siteId)
     {
-      var site = FindSite(siteId);
+      var site = FindDraftSite(siteId);
       return site.SiteDeckLayout;
     }
 
     public ObjectLayout SiteCharacterOwnedLayout(Guid siteId)
     {
-      var site = FindSite(siteId);
+      var site = FindCharacterSite(siteId);
       return Errors.CheckNotNull(site.CharacterOwnedObjects);
     }
 
     public Transform CharacterScreenAnchorPosition(Guid merchantId)
     {
-      var site = FindSite(merchantId);
+      var site = FindCharacterSite(merchantId);
       return Errors.CheckNotNull(site.CharacterSpeechPosition);
     }
 
-    DreamscapeSite FindSite(Guid siteId)
+    CharacterSite FindCharacterSite(Guid siteId)
     {
-      var sites = FindObjectsByType<DreamscapeSite>(
+      var sites = FindObjectsByType<CharacterSite>(
         FindObjectsInactive.Exclude,
         FindObjectsSortMode.None
       );
@@ -177,12 +178,29 @@ namespace Dreamtides.Services
           return site;
         }
       }
-      throw new InvalidOperationException($"Unknown site id: {siteId}");
+      throw new InvalidOperationException($"Unknown character site id: {siteId}");
+    }
+
+    DraftSite FindDraftSite(Guid siteId)
+    {
+      var sites = FindObjectsByType<DraftSite>(
+        FindObjectsInactive.Exclude,
+        FindObjectsSortMode.None
+      );
+      for (var i = 0; i < sites.Length; i++)
+      {
+        var site = sites[i];
+        if (site != null && site.SiteId == siteId)
+        {
+          return site;
+        }
+      }
+      throw new InvalidOperationException($"Unknown draft site id: {siteId}");
     }
 
     void ApplySiteOwnedLayouts(Sequence? sequence)
     {
-      var sites = FindObjectsByType<DreamscapeSite>(
+      var sites = FindObjectsByType<CharacterSite>(
         FindObjectsInactive.Exclude,
         FindObjectsSortMode.None
       );

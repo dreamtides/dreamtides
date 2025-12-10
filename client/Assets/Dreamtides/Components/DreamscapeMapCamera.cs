@@ -8,6 +8,7 @@ using Dreamtides.Buttons;
 using Dreamtides.Layout;
 using Dreamtides.Schema;
 using Dreamtides.Services;
+using Dreamtides.Sites;
 using Unity.Cinemachine;
 using UnityEngine;
 
@@ -55,10 +56,10 @@ namespace Dreamtides.Components
     internal ScreenInsets _portraitInsets;
 
     [SerializeField]
-    List<DreamscapeSite> _sites = new();
+    List<AbstractDreamscapeSite> _sites = new();
 
-    readonly Dictionary<DreamscapeSite, CanvasButton> _siteButtonsBySite = new();
-    readonly Dictionary<DreamscapeSite, Vector2> _siteButtonPositions = new();
+    readonly Dictionary<AbstractDreamscapeSite, CanvasButton> _siteButtonsBySite = new();
+    readonly Dictionary<AbstractDreamscapeSite, Vector2> _siteButtonPositions = new();
 
     Coroutine? _transitionRoutine;
     Coroutine? _positionRoutine;
@@ -69,7 +70,7 @@ namespace Dreamtides.Components
     bool _hasCachedSiteButtonPositions;
     Rect _cachedAllowedViewportRect;
     Vector2 _cachedSafeAreaSize;
-    DreamscapeSite? _activeSite;
+    AbstractDreamscapeSite? _activeSite;
     Transform? _defaultFollowTarget;
     Transform? _defaultLookAtTarget;
 
@@ -105,7 +106,7 @@ namespace Dreamtides.Components
       }
 
       var viewport = ResolveViewport();
-      var sites = FindObjectsByType<DreamscapeSite>(
+      var sites = FindObjectsByType<AbstractDreamscapeSite>(
         FindObjectsInactive.Exclude,
         FindObjectsSortMode.None
       );
@@ -179,7 +180,7 @@ namespace Dreamtides.Components
       PositionSiteButtons();
     }
 
-    public IEnumerator FocusSite(DreamscapeSite site)
+    public IEnumerator FocusSite(AbstractDreamscapeSite site)
     {
       if (site == null)
       {
@@ -295,7 +296,7 @@ namespace Dreamtides.Components
       _camera.Lens = lens;
     }
 
-    IEnumerator TransitionToSite(DreamscapeSite site)
+    IEnumerator TransitionToSite(AbstractDreamscapeSite site)
     {
       var brain = ResolveBrain();
       var viewport = ResolveViewport();
@@ -516,7 +517,7 @@ namespace Dreamtides.Components
       }
     }
 
-    DreamscapeSite? GetActiveSite()
+    AbstractDreamscapeSite? GetActiveSite()
     {
       if (_activeSite != null && _activeSite.IsActive)
       {
@@ -547,7 +548,7 @@ namespace Dreamtides.Components
       _activeSite = null;
     }
 
-    void DeactivateOtherSites(DreamscapeSite site)
+    void DeactivateOtherSites(AbstractDreamscapeSite site)
     {
       for (var i = 0; i < _sites.Count; i++)
       {
@@ -638,7 +639,7 @@ namespace Dreamtides.Components
       EnsureSiteButtons();
       var worldPositions = new List<Vector3>(_sites.Count);
       var buttonRects = new List<RectTransform>(_sites.Count);
-      var orderedSites = new List<DreamscapeSite>(_sites.Count);
+      var orderedSites = new List<AbstractDreamscapeSite>(_sites.Count);
       for (var i = 0; i < _sites.Count; i++)
       {
         var site = _sites[i];
