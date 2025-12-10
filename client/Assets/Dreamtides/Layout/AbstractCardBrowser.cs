@@ -80,11 +80,14 @@ namespace Dreamtides.Layout
 
     protected virtual void OnHideComplete() { }
 
-    protected float TotalWidth() => Mathf.Abs(RightEdge() - LeftEdge());
+    protected float TotalWidth() => Vector3.Distance(_leftEdge.position, _rightEdge.position);
 
     protected float LeftEdge() => _leftEdge.position.x;
 
     protected float RightEdge() => _rightEdge.position.x;
+
+    protected Vector3 InterpolateEdgePosition(float normalizedPosition) =>
+      Vector3.Lerp(_leftEdge.position, _rightEdge.position, normalizedPosition);
 
     protected virtual void OnDrawGizmosSelected()
     {

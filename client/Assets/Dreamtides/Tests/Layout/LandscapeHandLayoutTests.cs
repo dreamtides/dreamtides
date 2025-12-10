@@ -485,5 +485,12 @@ namespace Dreamtides.Tests.Layout
       AssertCardsAreOnScreen(viewport, cards);
       AssertCardsAreHorizontallyOrdered(viewport, cards);
     }
+
+    LandscapeHandLayout GetLandscapeHandLayout()
+    {
+      var layout = (LandscapeHandLayout)LandscapeLayout.UserHand._layout1;
+      layout.GameContext = GameContext.Hand;
+      return layout;
+    }
   }
 }

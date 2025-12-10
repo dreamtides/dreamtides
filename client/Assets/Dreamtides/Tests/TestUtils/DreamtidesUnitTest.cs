@@ -292,12 +292,5 @@ namespace Dreamtides.Tests.TestUtils
         );
       }
     }
-
-    protected LandscapeHandLayout GetLandscapeHandLayout()
-    {
-      var layout = (LandscapeHandLayout)LandscapeLayout.UserHand._layout1;
-      layout.GameContext = GameContext.Hand;
-      return layout;
-    }
   }
 }
