@@ -1,0 +1,94 @@
+---
+description: Displayable base class and Registry initialization system
+globs:
+alwaysApply: false
+---
+
+# Displayable and Registry Initialization
+
+## Displayable Base Class
+
+`Displayable` is the abstract base class for all MonoBehaviours that participate
+in the layout system. It provides initialization lifecycle, mouse event handling,
+and integration with `GameContext` for sorting layers.
+
+**Key properties:**
+- `Registry` - Access to all services (throws if not initialized)
+- `Parent` - Logical ObjectLayout parent (NOT a transform parent)
+- `GameContext` - Controls sorting layer assignment
+- `SortingKey` - Order within a sorting layer via SortingGroup
+- `ExcludeFromLayout` - Skip this object during layout calculations
+
+**Lifecycle methods to override:**
+- `OnInitialize()` - Called during initialization phase
+- `OnStart()` - Called after all objects initialized (like Unity Start)
+- `OnStartAsync()` - Coroutine version of OnStart
+- `OnUpdate()` - Called every frame after initialization
+
+**Mouse event methods:**
+- `CanHandleMouseEvents()` - Return true to receive mouse events
+- `MouseDown()`, `MouseDrag()`, `MouseUp(bool isSameObject)`
+- `MouseHoverStart()`, `MouseHover()`, `MouseHoverEnd()`
+
+
+## Registry Initialization Flow
+
+`Registry` is the central service locator. On `Awake()`, it runs `InitializeAll`:
+
+1. **Determine orientation** - Sets `_isLandscape` based on screen dimensions
+2. **Load additional scenes** - Loads quest scene additively if in Quest mode
+3. **Activate correct layout** - Enables portrait or landscape GameLayout
+4. **Initialize Displayables** - Finds ALL `Displayable` in target scenes:
+   ```csharp
+   element.Initialize(this, mode, testConfiguration, fromRegistry: true);
+   ```
+5. **Initialize Services** - Finds child `Service` components and initializes
+6. **Initialize SceneElements** - Initializes active `SceneElement` objects
+7. **Wait one frame** - Allows Unity to process
+8. **Call StartFromRegistry()** - Invokes `OnStart` on all active Displayables
+
+
+## The `fromRegistry` Parameter
+
+When `Initialize()` is called with `fromRegistry: true`, the object skips
+starting its own coroutine for `OnStart`. Instead, Registry calls
+`StartFromRegistry()` on all objects after initialization completes.
+
+When `fromRegistry: false` (default), the object starts its own coroutine to
+call `OnStart` after `WaitForEndOfFrame`. This is for dynamically-created
+objects like Cards instantiated during gameplay.
+
+
+## Service vs Displayable
+
+- `Service` - For stateless managers (CardService, SoundService, etc.)
+  - Lives as child of Registry GameObject
+  - Initialized via `GetComponentsInChildren<Service>()`
+  - Has `Registry` property but no layout integration
+
+- `Displayable` - For visible game objects with transforms
+  - Can exist anywhere in scene hierarchy
+  - Found via `FindObjectsByType<Displayable>()`
+  - Integrates with ObjectLayout system
+
+
+## Creating New Displayables
+
+For prefabs instantiated at runtime:
+```csharp
+var obj = ComponentUtils.Instantiate(prefab);
+obj.Initialize(Registry, Mode, TestConfiguration);
+```
+
+Or copy from another Displayable:
+```csharp
+obj.Initialize(existingDisplayable);
+```
+
+
+## Key Files
+
+- `Displayable.cs` - Base class for layout-aware objects
+- `Service.cs` - Base class for service managers
+- `Registry.cs` - Service locator and initialization coordinator
+- `GameContext.cs` - Enum for sorting layer contexts

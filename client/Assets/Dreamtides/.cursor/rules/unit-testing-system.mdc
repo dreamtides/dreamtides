@@ -1,0 +1,83 @@
+---
+description: Unit testing infrastructure with DreamtidesUnitTest and IGameViewport
+globs:
+alwaysApply: false
+---
+
+# Unit Testing System
+
+We ONLY use Editor-mode Unity tests in this project.
+
+## DreamtidesUnitTest Base Class
+
+All unit tests extend `DreamtidesUnitTest`. Key methods:
+
+- `Initialize(IGameViewport?)` - Sets up Registry with generated scene objects
+- `CreateViewport(GameViewResolution)` - Creates a `FakeViewport` for testing
+- `CreateViewportForLandscapeLayout(resolution, gameLayoutYRotation?)` - Creates
+  viewport matching the landscape layout's camera position
+- `CreateTestCard()` / `CreateTestCards(count)` - Creates test card objects
+- `CreateSceneObject<T>()` - Creates and initializes a Displayable
+
+Tests are `[UnityTest]` coroutines that `yield return Initialize(viewport)`.
+
+
+## IGameViewport Abstraction
+
+**Always use `Registry.GameViewport` instead of directly accessing Camera,
+Screen, or Canvas.** This enables testing different screen resolutions.
+
+`IGameViewport` methods:
+- `WorldToViewportPoint()`, `WorldToScreenPoint()`, `ScreenToWorldPoint()`
+- `ScreenWidth`, `ScreenHeight`, `IsLandscape`
+- `SafeAreaMinimumAnchor`, `SafeAreaMaximumAnchor` (for device notches)
+
+Production uses `RealViewport` (wraps real Camera). Tests use `FakeViewport`
+which simulates camera projection mathematically.
+
+
+## Testing Different Resolutions
+
+Use `GameViewResolution` enum for common aspect ratios:
+- `Resolution16x9` - 82% of Steam users (1920x1080)
+- `Resolution21x9` - Ultrawide monitors
+- `Resolution16x10`, `Resolution3x2`, `Resolution5x4` - Various displays
+- `ResolutionIPhone12`, `ResolutionIPadPro12`, etc. - Mobile devices
+
+Test the same behavior across resolutions to catch layout edge cases. Make sure
+things are fully on-screen.
+
+
+## Testing Battle Layout Y Rotation
+
+The battle layout can be rotated (for visual variety). Test that cards remain
+visible at different rotations using `gameLayoutYRotation` parameter:
+
+```csharp
+viewport = CreateViewportForLandscapeLayout(
+    GameViewResolution.Resolution16x9,
+    gameLayoutYRotation: 120f
+);
+```
+
+Test at 0°, 90°, 120°, 180°, 270° to ensure layouts work at all angles.
+
+
+## Generated Scene Code
+
+Tests use auto-generated classes that create minimal scene hierarchies:
+- `GeneratedRegistry` - Creates Registry with fake services
+- `GeneratedLandscapeGameLayout` / `GeneratedPortraitGameLayout`
+- `GeneratedCanvas`, `GeneratedMainCamera`, `GeneratedSites`
+
+These are regenerated via Editor menu when scene structure changes.
+
+
+## Best Practices
+
+1. Create viewport BEFORE `Initialize()` to set screen dimensions
+2. Use that viewport again AFTER `Initialize()` using layout's camera position
+3. Use `AssertCardIsOnScreen(viewport, card)` to verify visibility
+4. Use `AssertCardsAreHorizontallyOrdered(viewport, cards)` for ordering
+5. Test multiple card counts (1, 3, 5, 7, 9, 15) to catch scaling issues
+6. Run tests via `just unity-test-rsync` from command line

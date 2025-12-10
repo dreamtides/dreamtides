@@ -1,0 +1,147 @@
+---
+description: ObjectLayout and StandardObjectLayout system for positioning cards in world space
+globs:
+alwaysApply: false
+---
+
+# ObjectLayout System
+
+This document describes the ObjectLayout system used for positioning cards and
+displayable objects in world space.
+
+
+## Core Architecture
+
+`ObjectLayout` is an abstract base class that stores a list of `Displayable`
+GameObjects and computes suggested position, rotation, and scale values for
+them. The primary implementation is `StandardObjectLayout`.
+
+Key methods on ObjectLayout:
+- `Add(Displayable)` - Adds an object to this layout
+- `RemoveIfPresent(Displayable)` - Removes an object from this layout
+- `ApplyLayout(Sequence?)` - Positions all children to their target transforms
+- `ApplyTargetTransform(Displayable, Sequence?)` - Positions a specific object
+  for creation/destruction animations
+
+
+## Critical: Children Are Not Transform Children
+
+**Object Layouts position cards in world space. They have "children" but these
+children ARE NOT child transforms of the layout.** Most object layouts position
+children in absolute terms with no parent transform relationship.
+
+The `Parent` property on `Displayable` is a *logical* parent for layout
+management purposes, NOT a Unity transform parent. When you call `Add()`, the
+displayable's transform hierarchy is unchanged - only the logical ownership is
+updated.
+
+The sole exception is `RenderAsChildObjectLayout`, which explicitly parents
+displayables under its own transform using `SetParent(transform)` and uses
+*local* position/rotation/scale instead of world space values.
+
+
+## Layout Updates Are Not Continuous
+
+**Most Object Layouts do not position children continuously.** Instead, they
+wait for `CardService.ApplyAllLayouts()` to be called. This method iterates
+through ALL registered layouts and calls `ApplyLayout()` on each one.
+
+When creating a new ObjectLayout, you MUST add it to `ApplyAllLayouts()` in
+`CardService.cs`.
+
+The exception is `_debugUpdateContinuously` which can be enabled on
+StandardObjectLayout for testing - when true, `ApplyLayout()` runs every frame
+in `OnUpdate()`.
+
+
+## Discovering Layouts via CardService
+
+Most commonly, ObjectLayouts are discovered via `LayoutForPosition()` on
+`CardService`. This method maps a `Position` schema object to the appropriate
+ObjectLayout.
+
+When the server sends card positions, CardService uses this to find the right
+layout and call `layout.Add(card)`.
+
+
+## StandardObjectLayout Implementation
+
+StandardObjectLayout provides the concrete implementation. Subclasses override:
+- `CalculateObjectPosition(int index, int count)` - Returns world position
+- `CalculateObjectRotation(int index, int count)` - Returns euler angles (optional)
+- `CalculateObjectScale(int index, int count)` - Returns uniform scale (optional)
+
+Examples:
+- `PileObjectLayout` - Stacks cards with Y offset based on index
+- `CurveObjectLayout` - Places cards along a bezier curve (used for hands)
+- `CenteredLineObjectLayout` - Places cards in a horizontal line
+- `RectangularObjectLayout` - Places cards in a 2D grid
+
+
+## Animation Integration
+
+Layouts integrate with DOTween for animations:
+
+1. **ApplyLayout with Sequence**: When a `Sequence` is passed to `ApplyLayout()`,
+   transforms are animated via DOTween instead of set immediately. The sequence
+   uses `Insert(0, ...)` to run all child animations in parallel.
+
+2. **Animation Services**: Custom animations (like `DreamwellActivationService`)
+   often bypass the layout system temporarily:
+   - Remove card from parent: `card.Parent.RemoveIfPresent(card)`
+   - Animate directly using DOTween
+   - Card gets re-added to a layout in subsequent update
+
+3. **CardAnimationService pattern**: Animation handlers typically:
+   - Get the target layout via `CardService.LayoutForPosition()`
+   - Calculate target position using layout's `CalculateObjectPosition()`
+   - Animate the card directly
+   - Add to layout after animation (or let next ApplyAllLayouts handle it)
+
+
+## CardService Update Flow
+
+When `HandleUpdateBattleCommand` is called:
+1. Iterate through all CardViews from the server
+2. For each card, find layout via `LayoutForObjectPosition(cardView.Position)`
+3. Create card if new, update if existing
+4. Call `layout.Add(card)` to establish logical parent
+5. Call `ApplyAllLayouts(sequence)` once after all cards processed
+6. Destroy cards no longer present
+
+This batching ensures layout calculations have correct counts before animating.
+
+
+## Key Files
+
+- `ObjectLayout.cs` - Abstract base class
+- `StandardObjectLayout.cs` - Primary implementation with animation support
+- `RenderAsChildObjectLayout.cs` - Exception that uses transform parenting
+- `CardService.cs` - `ApplyAllLayouts()` and `LayoutForPosition()`
+- `GameLayout.cs` - Holds references to all battle layout instances
+- `DreamscapeService.cs` - `ApplyLayouts()` for quest-related layouts
+
+
+## Common Patterns
+
+**Adding a displayable to a layout:**
+```csharp
+var layout = Registry.CardService.LayoutForPosition(position);
+layout.Add(card);
+Registry.CardService.ApplyAllLayouts(sequence);
+```
+
+**Custom animation then layout:**
+```csharp
+card.Parent.RemoveIfPresent(card);
+// ... custom DOTween animation ...
+layout.Add(card);
+layout.ApplyLayout(sequence);
+```
+
+**Creating a new layout type:**
+1. Extend `StandardObjectLayout`
+2. Override `CalculateObjectPosition()` at minimum
+3. Add serialized field reference in `GameLayout.cs` or similar
+4. Add `ApplyLayout()` call to `CardService.ApplyAllLayouts()`
+5. Add case to `LayoutForPosition()` if server needs to reference it
