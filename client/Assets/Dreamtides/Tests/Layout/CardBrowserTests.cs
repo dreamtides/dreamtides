@@ -106,13 +106,13 @@ namespace Dreamtides.Tests.Layout
     }
 
     [UnityTest]
-    public IEnumerator CardsAreVisibleWithGameLayoutYRotation0()
+    public IEnumerator CardsAreVisibleWithBattleLayoutYRotation0()
     {
       var viewport = CreateViewport(GameViewResolution.Resolution16x9);
       yield return Initialize(viewport);
       viewport = CreateViewportForLandscapeLayout(
         GameViewResolution.Resolution16x9,
-        gameLayoutYRotation: 0f
+        battleLayoutYRotation: 0f
       );
 
       var browser = GetCardBrowser();
@@ -128,13 +128,13 @@ namespace Dreamtides.Tests.Layout
     }
 
     [UnityTest]
-    public IEnumerator CardsAreVisibleWithGameLayoutYRotation90()
+    public IEnumerator CardsAreVisibleWithBattleLayoutYRotation90()
     {
       var viewport = CreateViewport(GameViewResolution.Resolution16x9);
       yield return Initialize(viewport);
       viewport = CreateViewportForLandscapeLayout(
         GameViewResolution.Resolution16x9,
-        gameLayoutYRotation: 90f
+        battleLayoutYRotation: 90f
       );
 
       var browser = GetCardBrowser();
@@ -150,7 +150,7 @@ namespace Dreamtides.Tests.Layout
     }
 
     [UnityTest]
-    public IEnumerator CardsAreVisibleWithGameLayoutYRotation120()
+    public IEnumerator CardsAreVisibleWithBattleLayoutYRotation120()
     {
       var viewport = CreateViewport(GameViewResolution.Resolution16x9);
       yield return Initialize(viewport);
@@ -172,13 +172,13 @@ namespace Dreamtides.Tests.Layout
     }
 
     [UnityTest]
-    public IEnumerator CardsAreVisibleWithGameLayoutYRotation180()
+    public IEnumerator CardsAreVisibleWithBattleLayoutYRotation180()
     {
       var viewport = CreateViewport(GameViewResolution.Resolution16x9);
       yield return Initialize(viewport);
       viewport = CreateViewportForLandscapeLayout(
         GameViewResolution.Resolution16x9,
-        gameLayoutYRotation: 180f
+        battleLayoutYRotation: 180f
       );
 
       var browser = GetCardBrowser();
@@ -194,13 +194,13 @@ namespace Dreamtides.Tests.Layout
     }
 
     [UnityTest]
-    public IEnumerator CardsAreVisibleWithGameLayoutYRotation270()
+    public IEnumerator CardsAreVisibleWithBattleLayoutYRotation270()
     {
       var viewport = CreateViewport(GameViewResolution.Resolution16x9);
       yield return Initialize(viewport);
       viewport = CreateViewportForLandscapeLayout(
         GameViewResolution.Resolution16x9,
-        gameLayoutYRotation: 270f
+        battleLayoutYRotation: 270f
       );
 
       var browser = GetCardBrowser();

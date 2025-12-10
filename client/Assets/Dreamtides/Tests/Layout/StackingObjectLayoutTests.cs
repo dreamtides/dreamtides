@@ -40,7 +40,7 @@ namespace Dreamtides.Tests.Layout
       yield return Initialize(viewport);
       viewport = CreateViewportForStackingLayout(
         GameViewResolution.Resolution16x9,
-        gameLayoutYRotation: 0f
+        battleLayoutYRotation: 0f
       );
 
       var layout = CreateStackingLayout(stackRight: true);
@@ -61,7 +61,7 @@ namespace Dreamtides.Tests.Layout
       yield return Initialize(viewport);
       viewport = CreateViewportForStackingLayout(
         GameViewResolution.Resolution16x9,
-        gameLayoutYRotation: 90f
+        battleLayoutYRotation: 90f
       );
 
       var layout = CreateStackingLayout(stackRight: true);
@@ -82,7 +82,7 @@ namespace Dreamtides.Tests.Layout
       yield return Initialize(viewport);
       viewport = CreateViewportForStackingLayout(
         GameViewResolution.Resolution16x9,
-        gameLayoutYRotation: 120f
+        battleLayoutYRotation: 120f
       );
 
       var layout = CreateStackingLayout(stackRight: true);
@@ -103,7 +103,7 @@ namespace Dreamtides.Tests.Layout
       yield return Initialize(viewport);
       viewport = CreateViewportForStackingLayout(
         GameViewResolution.Resolution16x9,
-        gameLayoutYRotation: 180f
+        battleLayoutYRotation: 180f
       );
 
       var layout = CreateStackingLayout(stackRight: true);
@@ -124,7 +124,7 @@ namespace Dreamtides.Tests.Layout
       yield return Initialize(viewport);
       viewport = CreateViewportForStackingLayout(
         GameViewResolution.Resolution16x9,
-        gameLayoutYRotation: 270f
+        battleLayoutYRotation: 270f
       );
 
       var layout = CreateStackingLayout(stackRight: true);
@@ -145,7 +145,7 @@ namespace Dreamtides.Tests.Layout
       yield return Initialize(viewport);
       viewport = CreateViewportForStackingLayout(
         GameViewResolution.Resolution16x9,
-        gameLayoutYRotation: 270f
+        battleLayoutYRotation: 270f
       );
 
       var layout = CreateStackingLayout(stackRight: true);
@@ -166,7 +166,7 @@ namespace Dreamtides.Tests.Layout
       yield return Initialize(viewport);
       viewport = CreateViewportForStackingLayout(
         GameViewResolution.Resolution16x9,
-        gameLayoutYRotation: 0f
+        battleLayoutYRotation: 0f
       );
 
       var layout = CreateStackingLayout(stackRight: false);
@@ -195,7 +195,7 @@ namespace Dreamtides.Tests.Layout
       yield return Initialize(viewport);
       viewport = CreateViewportForStackingLayout(
         GameViewResolution.Resolution16x9,
-        gameLayoutYRotation: 270f
+        battleLayoutYRotation: 270f
       );
 
       var layout = CreateStackingLayout(stackRight: false);
@@ -310,7 +310,7 @@ namespace Dreamtides.Tests.Layout
       yield return Initialize(viewport);
       viewport = CreateViewportForStackingLayout(
         GameViewResolution.Resolution21x9,
-        gameLayoutYRotation: 270f
+        battleLayoutYRotation: 270f
       );
 
       var layout = CreateStackingLayout(stackRight: true);
@@ -331,7 +331,7 @@ namespace Dreamtides.Tests.Layout
       yield return Initialize(viewport);
       viewport = CreateViewportForStackingLayout(
         GameViewResolution.Resolution32x9,
-        gameLayoutYRotation: 270f
+        battleLayoutYRotation: 270f
       );
 
       var layout = CreateStackingLayout(stackRight: true);
@@ -352,7 +352,7 @@ namespace Dreamtides.Tests.Layout
       yield return Initialize(viewport);
       viewport = CreateViewportForStackingLayout(
         GameViewResolution.Resolution16x10,
-        gameLayoutYRotation: 270f
+        battleLayoutYRotation: 270f
       );
 
       var layout = CreateStackingLayout(stackRight: true);
@@ -373,7 +373,7 @@ namespace Dreamtides.Tests.Layout
       yield return Initialize(viewport);
       viewport = CreateViewportForStackingLayout(
         GameViewResolution.Resolution3x2,
-        gameLayoutYRotation: 270f
+        battleLayoutYRotation: 270f
       );
 
       var layout = CreateStackingLayout(stackRight: true);
@@ -394,7 +394,7 @@ namespace Dreamtides.Tests.Layout
       yield return Initialize(viewport);
       viewport = CreateViewportForStackingLayout(
         GameViewResolution.Resolution5x4,
-        gameLayoutYRotation: 270f
+        battleLayoutYRotation: 270f
       );
 
       var layout = CreateStackingLayout(stackRight: true);
@@ -413,7 +413,10 @@ namespace Dreamtides.Tests.Layout
     {
       var viewport = CreateViewport(GameViewResolution.Resolution16x9);
       yield return Initialize(viewport);
-      CreateViewportForStackingLayout(GameViewResolution.Resolution16x9, gameLayoutYRotation: 120f);
+      CreateViewportForStackingLayout(
+        GameViewResolution.Resolution16x9,
+        battleLayoutYRotation: 120f
+      );
 
       var layout = CreateStackingLayout(stackRight: true);
       var card = CreateTestCard();
@@ -466,7 +469,7 @@ namespace Dreamtides.Tests.Layout
       yield return Initialize(viewport);
       viewport = CreateViewportForStackingLayout(
         GameViewResolution.Resolution16x9,
-        gameLayoutYRotation: 270f
+        battleLayoutYRotation: 270f
       );
 
       var layout = CreateStackingLayout(
@@ -492,7 +495,7 @@ namespace Dreamtides.Tests.Layout
       yield return Initialize(viewport);
       viewport = CreateViewportForStackingLayout(
         GameViewResolution.Resolution16x9,
-        gameLayoutYRotation: 270f
+        battleLayoutYRotation: 270f
       );
 
       var layout = CreateStackingLayout(stackRight: true, offset: 2f);
@@ -537,7 +540,10 @@ namespace Dreamtides.Tests.Layout
     {
       var viewport = CreateViewport(GameViewResolution.Resolution16x9);
       yield return Initialize(viewport);
-      CreateViewportForStackingLayout(GameViewResolution.Resolution16x9, gameLayoutYRotation: 90f);
+      CreateViewportForStackingLayout(
+        GameViewResolution.Resolution16x9,
+        battleLayoutYRotation: 90f
+      );
 
       var layout = CreateStackingLayout(stackRight: true, offset: 2f);
       var displayables = new TestDisplayable[3];
@@ -580,12 +586,12 @@ namespace Dreamtides.Tests.Layout
 
     FakeViewport CreateViewportForStackingLayout(
       GameViewResolution resolution,
-      float? gameLayoutYRotation = null
+      float? battleLayoutYRotation = null
     )
     {
-      if (gameLayoutYRotation.HasValue)
+      if (battleLayoutYRotation.HasValue)
       {
-        LandscapeLayout.transform.rotation = Quaternion.Euler(0f, gameLayoutYRotation.Value, 0f);
+        LandscapeLayout.transform.rotation = Quaternion.Euler(0f, battleLayoutYRotation.Value, 0f);
       }
 
       var cameraPosition = LandscapeLayout.CameraPosition;

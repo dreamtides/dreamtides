@@ -14,7 +14,7 @@ All unit tests extend `DreamtidesUnitTest`. Key methods:
 
 - `Initialize(IGameViewport?)` - Sets up Registry with generated scene objects
 - `CreateViewport(GameViewResolution)` - Creates a `FakeViewport` for testing
-- `CreateViewportForLandscapeLayout(resolution, gameLayoutYRotation?)` - Creates
+- `CreateViewportForLandscapeLayout(resolution, battleLayoutYRotation?)` - Creates
   viewport matching the landscape layout's camera position
 - `CreateTestCard()` / `CreateTestCards(count)` - Creates test card objects
 - `CreateSceneObject<T>()` - Creates and initializes a Displayable
@@ -51,12 +51,12 @@ things are fully on-screen.
 ## Testing Battle Layout Y Rotation
 
 The battle layout can be rotated (for visual variety). Test that cards remain
-visible at different rotations using `gameLayoutYRotation` parameter:
+visible at different rotations using `battleLayoutYRotation` parameter:
 
 ```csharp
 viewport = CreateViewportForLandscapeLayout(
     GameViewResolution.Resolution16x9,
-    gameLayoutYRotation: 120f
+    battleLayoutYRotation: 120f
 );
 ```
 
@@ -67,7 +67,7 @@ Test at 0°, 90°, 120°, 180°, 270° to ensure layouts work at all angles.
 
 Tests use auto-generated classes that create minimal scene hierarchies:
 - `GeneratedRegistry` - Creates Registry with fake services
-- `GeneratedLandscapeGameLayout` / `GeneratedPortraitGameLayout`
+- `GeneratedLandscapeBattleLayout` / `GeneratedPortraitBattleLayout`
 - `GeneratedCanvas`, `GeneratedMainCamera`, `GeneratedSites`
 
 These are regenerated via Editor menu when scene structure changes.

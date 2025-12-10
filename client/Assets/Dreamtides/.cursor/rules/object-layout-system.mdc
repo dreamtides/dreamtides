@@ -118,7 +118,7 @@ This batching ensures layout calculations have correct counts before animating.
 - `StandardObjectLayout.cs` - Primary implementation with animation support
 - `RenderAsChildObjectLayout.cs` - Exception that uses transform parenting
 - `CardService.cs` - `ApplyAllLayouts()` and `LayoutForPosition()`
-- `GameLayout.cs` - Holds references to all battle layout instances
+- `BattleLayout.cs` - Holds references to all battle layout instances
 - `DreamscapeService.cs` - `ApplyLayouts()` for quest-related layouts
 
 
@@ -142,6 +142,6 @@ layout.ApplyLayout(sequence);
 **Creating a new layout type:**
 1. Extend `StandardObjectLayout`
 2. Override `CalculateObjectPosition()` at minimum
-3. Add serialized field reference in `GameLayout.cs` or similar
+3. Add serialized field reference in `BattleLayout.cs` or similar
 4. Add `ApplyLayout()` call to `CardService.ApplyAllLayouts()`
 5. Add case to `LayoutForPosition()` if server needs to reference it

@@ -180,12 +180,12 @@ namespace Dreamtides.Tests.TestUtils
 
     protected FakeViewport CreateViewportForLandscapeLayout(
       GameViewResolution resolution,
-      float? gameLayoutYRotation = null
+      float? battleLayoutYRotation = null
     )
     {
-      if (gameLayoutYRotation.HasValue)
+      if (battleLayoutYRotation.HasValue)
       {
-        LandscapeLayout.transform.rotation = Quaternion.Euler(0f, gameLayoutYRotation.Value, 0f);
+        LandscapeLayout.transform.rotation = Quaternion.Euler(0f, battleLayoutYRotation.Value, 0f);
       }
 
       var cameraPosition = LandscapeLayout.CameraPosition;

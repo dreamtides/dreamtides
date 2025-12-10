@@ -37,7 +37,7 @@ and integration with `GameContext` for sorting layers.
 
 1. **Determine orientation** - Sets `_isLandscape` based on screen dimensions
 2. **Load additional scenes** - Loads quest scene additively if in Quest mode
-3. **Activate correct layout** - Enables portrait or landscape GameLayout
+3. **Activate correct layout** - Enables portrait or landscape BattleLayout
 4. **Initialize Displayables** - Finds ALL `Displayable` in target scenes:
    ```csharp
    element.Initialize(this, mode, testConfiguration, fromRegistry: true);
