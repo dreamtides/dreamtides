@@ -14,6 +14,19 @@ namespace Dreamtides.Tests.TestUtils
 {
   public class TestDisplayable : Displayable { }
 
+  public class TestCard : Displayable
+  {
+    internal BoxCollider _cardCollider = null!;
+    internal Transform _costSpritePosition = null!;
+
+    public BoxCollider CardCollider => _cardCollider;
+    public Transform CostSpritePosition => _costSpritePosition;
+
+    public Vector3 GetCardCenter() => transform.TransformPoint(_cardCollider.center);
+
+    public Vector3 GetCostSpriteWorldPosition() => _costSpritePosition.position;
+  }
+
   public abstract class DreamtidesUnitTest
   {
     readonly List<GameObject> _createdObjects = new();
@@ -28,6 +41,12 @@ namespace Dreamtides.Tests.TestUtils
 
     protected Registry Registry =>
       _registry ?? throw new InvalidOperationException("Registry not initialized");
+
+    protected GameLayout LandscapeLayout =>
+      _landscapeLayout ?? throw new InvalidOperationException("Landscape layout not initialized");
+
+    protected GameLayout PortraitLayout =>
+      _portraitLayout ?? throw new InvalidOperationException("Portrait layout not initialized");
 
     protected TestConfiguration TestConfiguration =>
       _testConfiguration
@@ -157,6 +176,128 @@ namespace Dreamtides.Tests.TestUtils
     protected TestDisplayable CreateDisplayable()
     {
       return CreateSceneObject<TestDisplayable>();
+    }
+
+    protected FakeViewport CreateViewportForLandscapeLayout(
+      GameViewResolution resolution,
+      float? gameLayoutYRotation = null
+    )
+    {
+      if (gameLayoutYRotation.HasValue)
+      {
+        LandscapeLayout.transform.rotation = Quaternion.Euler(0f, gameLayoutYRotation.Value, 0f);
+      }
+
+      var cameraPosition = LandscapeLayout.CameraPosition;
+      var cameraGo = CreateGameObject();
+      cameraGo.transform.position = cameraPosition.position;
+      cameraGo.transform.rotation = cameraPosition.rotation;
+
+      var canvasRootRect = CreateGameObject().AddComponent<RectTransform>();
+      return CreateViewport(resolution, cameraGo.transform, canvasRootRect);
+    }
+
+    protected TestCard CreateTestCard(
+      float colliderWidth = 2.5f,
+      float colliderHeight = 4f,
+      Vector3? costSpriteLocalPosition = null
+    )
+    {
+      var card = CreateSceneObject<TestCard>(c =>
+      {
+        var collider = c.gameObject.AddComponent<BoxCollider>();
+        collider.size = new Vector3(colliderWidth, colliderHeight, 0.1f);
+        collider.center = new Vector3(0f, -0.5f, 0f);
+        c._cardCollider = collider;
+
+        var costSpriteGo = new GameObject("CostSprite");
+        _createdObjects.Add(costSpriteGo);
+        costSpriteGo.transform.SetParent(c.transform, worldPositionStays: false);
+        costSpriteGo.transform.localPosition =
+          costSpriteLocalPosition ?? new Vector3(-1f, 1.5f, 0f);
+        c._costSpritePosition = costSpriteGo.transform;
+      });
+      return card;
+    }
+
+    protected TestCard[] CreateTestCards(
+      int count,
+      float colliderWidth = 2.5f,
+      float colliderHeight = 4f
+    )
+    {
+      var cards = new TestCard[count];
+      for (var i = 0; i < count; i++)
+      {
+        cards[i] = CreateTestCard(colliderWidth, colliderHeight);
+      }
+      return cards;
+    }
+
+    protected static void AssertPointIsOnScreen(
+      IGameViewport viewport,
+      Vector3 worldPosition,
+      string description
+    )
+    {
+      var viewportPoint = viewport.WorldToViewportPoint(worldPosition);
+      Assert.That(
+        viewportPoint.x,
+        Is.GreaterThanOrEqualTo(0f).And.LessThanOrEqualTo(1f),
+        $"{description} is off screen horizontally (viewport x={viewportPoint.x})"
+      );
+      Assert.That(
+        viewportPoint.y,
+        Is.GreaterThanOrEqualTo(0f).And.LessThanOrEqualTo(1f),
+        $"{description} is off screen vertically (viewport y={viewportPoint.y})"
+      );
+      Assert.That(
+        viewportPoint.z,
+        Is.GreaterThan(0f),
+        $"{description} is behind the camera (viewport z={viewportPoint.z})"
+      );
+    }
+
+    protected static void AssertCardIsOnScreen(IGameViewport viewport, TestCard card)
+    {
+      AssertPointIsOnScreen(viewport, card.GetCardCenter(), $"Card center ({card.name})");
+      AssertPointIsOnScreen(
+        viewport,
+        card.GetCostSpriteWorldPosition(),
+        $"Card cost sprite ({card.name})"
+      );
+    }
+
+    protected static void AssertCardsAreOnScreen(IGameViewport viewport, TestCard[] cards)
+    {
+      foreach (var card in cards)
+      {
+        AssertCardIsOnScreen(viewport, card);
+      }
+    }
+
+    protected static void AssertCardsAreHorizontallyOrdered(
+      IGameViewport viewport,
+      TestCard[] cards
+    )
+    {
+      for (var i = 0; i < cards.Length - 1; i++)
+      {
+        var screenPos1 = viewport.WorldToScreenPoint(cards[i].GetCardCenter());
+        var screenPos2 = viewport.WorldToScreenPoint(cards[i + 1].GetCardCenter());
+        Assert.That(
+          screenPos2.x,
+          Is.GreaterThan(screenPos1.x),
+          $"Card {i + 1} should be to the right of card {i} on screen"
+        );
+      }
+    }
+
+    protected LandscapeHandLayout GetLandscapeHandLayout()
+    {
+      var layout = (LandscapeHandLayout)LandscapeLayout.UserHand._layout1;
+      layout.GameContext = GameContext.Hand;
+      return layout;
     }
   }
 }
