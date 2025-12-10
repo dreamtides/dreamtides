@@ -1,6 +1,6 @@
 // AUTO-GENERATED CODE - DO NOT EDIT
 // Generated from: Sites
-// Generated at: 2025-12-10 07:01:27
+// Generated at: 2025-12-10 13:47:29
 
 #nullable enable
 
@@ -63,48 +63,24 @@ namespace Dreamtides.Tests.TestUtils
       var targetScreenLeftCameraGo = new GameObject("TargetScreenLeftCamera");
       createdObjects.Add(targetScreenLeftCameraGo);
       targetScreenLeftCameraGo.transform.SetParent(shopSiteGo.transform, false);
-      targetScreenLeftCameraGo.transform.localPosition = new Vector3(
-        -0.3461801f,
-        1.310676f,
-        3.389937f
-      );
-      targetScreenLeftCameraGo.transform.localRotation = Quaternion.Euler(
-        10.34058f,
-        206.0243f,
-        359.1393f
-      );
+      targetScreenLeftCameraGo.transform.localPosition = new Vector3(-0.3461801f, 1.310676f, 3.389937f);
+      targetScreenLeftCameraGo.transform.localRotation = Quaternion.Euler(10.34058f, 206.0243f, 359.1393f);
       var cinemachineCamera1 = targetScreenLeftCameraGo.AddComponent<CinemachineCamera>();
       shopSite._targetScreenLeftCamera = cinemachineCamera1;
 
       var targetScreenRightCameraGo = new GameObject("TargetScreenRightCamera");
       createdObjects.Add(targetScreenRightCameraGo);
       targetScreenRightCameraGo.transform.SetParent(shopSiteGo.transform, false);
-      targetScreenRightCameraGo.transform.localPosition = new Vector3(
-        -0.3056821f,
-        1.507511f,
-        3.579504f
-      );
-      targetScreenRightCameraGo.transform.localRotation = Quaternion.Euler(
-        10.58978f,
-        137.8022f,
-        358.3934f
-      );
+      targetScreenRightCameraGo.transform.localPosition = new Vector3(-0.3056821f, 1.507511f, 3.579504f);
+      targetScreenRightCameraGo.transform.localRotation = Quaternion.Euler(10.58978f, 137.8022f, 358.3934f);
       var cinemachineCamera2 = targetScreenRightCameraGo.AddComponent<CinemachineCamera>();
       shopSite._targetScreenRightCamera = cinemachineCamera2;
 
       var targetScreenTopCameraGo = new GameObject("TargetScreenTopCamera");
       createdObjects.Add(targetScreenTopCameraGo);
       targetScreenTopCameraGo.transform.SetParent(shopSiteGo.transform, false);
-      targetScreenTopCameraGo.transform.localPosition = new Vector3(
-        -0.1428564f,
-        0.9890453f,
-        2.744863f
-      );
-      targetScreenTopCameraGo.transform.localRotation = Quaternion.Euler(
-        6.642229f,
-        176.1051f,
-        358.5776f
-      );
+      targetScreenTopCameraGo.transform.localPosition = new Vector3(-0.1428564f, 0.9890453f, 2.744863f);
+      targetScreenTopCameraGo.transform.localRotation = Quaternion.Euler(6.642229f, 176.1051f, 358.5776f);
       var cinemachineCamera3 = targetScreenTopCameraGo.AddComponent<CinemachineCamera>();
       shopSite._targetScreenTopCamera = cinemachineCamera3;
 
@@ -137,11 +113,7 @@ namespace Dreamtides.Tests.TestUtils
       var temptingOfferSiteGo = new GameObject("TemptingOfferSite");
       createdObjects.Add(temptingOfferSiteGo);
       temptingOfferSiteGo.transform.localPosition = new Vector3(4.743646f, -0.775f, 4.335932f);
-      temptingOfferSiteGo.transform.localRotation = Quaternion.Euler(
-        0.8484089f,
-        71.72803f,
-        358.6395f
-      );
+      temptingOfferSiteGo.transform.localRotation = Quaternion.Euler(0.8484089f, 71.72803f, 358.6395f);
       var temptingOfferSite = temptingOfferSiteGo.AddComponent<CharacterSite>();
       temptingOfferSite._siteId = "2d9b1d2c-6637-4930-b9fc-a70fa901d662";
       temptingOfferSite._buttonLabel = "\\ufaf3";
@@ -151,48 +123,24 @@ namespace Dreamtides.Tests.TestUtils
       var targetScreenLeftCamera1Go = new GameObject("TargetScreenLeftCamera");
       createdObjects.Add(targetScreenLeftCamera1Go);
       targetScreenLeftCamera1Go.transform.SetParent(temptingOfferSiteGo.transform, false);
-      targetScreenLeftCamera1Go.transform.localPosition = new Vector3(
-        -0.3461801f,
-        1.310676f,
-        3.389937f
-      );
-      targetScreenLeftCamera1Go.transform.localRotation = Quaternion.Euler(
-        10.34058f,
-        206.0243f,
-        359.1393f
-      );
+      targetScreenLeftCamera1Go.transform.localPosition = new Vector3(-0.3461801f, 1.310676f, 3.389937f);
+      targetScreenLeftCamera1Go.transform.localRotation = Quaternion.Euler(10.34058f, 206.0243f, 359.1393f);
       var cinemachineCamera4 = targetScreenLeftCamera1Go.AddComponent<CinemachineCamera>();
       temptingOfferSite._targetScreenLeftCamera = cinemachineCamera4;
 
       var targetScreenRightCamera1Go = new GameObject("TargetScreenRightCamera");
       createdObjects.Add(targetScreenRightCamera1Go);
       targetScreenRightCamera1Go.transform.SetParent(temptingOfferSiteGo.transform, false);
-      targetScreenRightCamera1Go.transform.localPosition = new Vector3(
-        -0.3056821f,
-        1.507511f,
-        3.579504f
-      );
-      targetScreenRightCamera1Go.transform.localRotation = Quaternion.Euler(
-        10.58978f,
-        137.8022f,
-        358.3934f
-      );
+      targetScreenRightCamera1Go.transform.localPosition = new Vector3(-0.3056821f, 1.507511f, 3.579504f);
+      targetScreenRightCamera1Go.transform.localRotation = Quaternion.Euler(10.58978f, 137.8022f, 358.3934f);
       var cinemachineCamera5 = targetScreenRightCamera1Go.AddComponent<CinemachineCamera>();
       temptingOfferSite._targetScreenRightCamera = cinemachineCamera5;
 
       var targetScreenTopCamera1Go = new GameObject("TargetScreenTopCamera");
       createdObjects.Add(targetScreenTopCamera1Go);
       targetScreenTopCamera1Go.transform.SetParent(temptingOfferSiteGo.transform, false);
-      targetScreenTopCamera1Go.transform.localPosition = new Vector3(
-        -0.1428564f,
-        0.9890453f,
-        2.744863f
-      );
-      targetScreenTopCamera1Go.transform.localRotation = Quaternion.Euler(
-        6.642229f,
-        176.1051f,
-        358.5776f
-      );
+      targetScreenTopCamera1Go.transform.localPosition = new Vector3(-0.1428564f, 0.9890453f, 2.744863f);
+      targetScreenTopCamera1Go.transform.localRotation = Quaternion.Euler(6.642229f, 176.1051f, 358.5776f);
       var cinemachineCamera6 = targetScreenTopCamera1Go.AddComponent<CinemachineCamera>();
       temptingOfferSite._targetScreenTopCamera = cinemachineCamera6;
 
@@ -234,48 +182,24 @@ namespace Dreamtides.Tests.TestUtils
       var targetScreenLeftCamera2Go = new GameObject("TargetScreenLeftCamera");
       createdObjects.Add(targetScreenLeftCamera2Go);
       targetScreenLeftCamera2Go.transform.SetParent(essenceSiteGo.transform, false);
-      targetScreenLeftCamera2Go.transform.localPosition = new Vector3(
-        -0.3461801f,
-        1.310676f,
-        3.389937f
-      );
-      targetScreenLeftCamera2Go.transform.localRotation = Quaternion.Euler(
-        10.34058f,
-        206.0243f,
-        359.1393f
-      );
+      targetScreenLeftCamera2Go.transform.localPosition = new Vector3(-0.3461801f, 1.310676f, 3.389937f);
+      targetScreenLeftCamera2Go.transform.localRotation = Quaternion.Euler(10.34058f, 206.0243f, 359.1393f);
       var cinemachineCamera7 = targetScreenLeftCamera2Go.AddComponent<CinemachineCamera>();
       essenceSite._targetScreenLeftCamera = cinemachineCamera7;
 
       var targetScreenRightCamera2Go = new GameObject("TargetScreenRightCamera");
       createdObjects.Add(targetScreenRightCamera2Go);
       targetScreenRightCamera2Go.transform.SetParent(essenceSiteGo.transform, false);
-      targetScreenRightCamera2Go.transform.localPosition = new Vector3(
-        -0.3056821f,
-        1.507511f,
-        3.579504f
-      );
-      targetScreenRightCamera2Go.transform.localRotation = Quaternion.Euler(
-        10.58978f,
-        137.8022f,
-        358.3934f
-      );
+      targetScreenRightCamera2Go.transform.localPosition = new Vector3(-0.3056821f, 1.507511f, 3.579504f);
+      targetScreenRightCamera2Go.transform.localRotation = Quaternion.Euler(10.58978f, 137.8022f, 358.3934f);
       var cinemachineCamera8 = targetScreenRightCamera2Go.AddComponent<CinemachineCamera>();
       essenceSite._targetScreenRightCamera = cinemachineCamera8;
 
       var targetScreenTopCamera2Go = new GameObject("TargetScreenTopCamera");
       createdObjects.Add(targetScreenTopCamera2Go);
       targetScreenTopCamera2Go.transform.SetParent(essenceSiteGo.transform, false);
-      targetScreenTopCamera2Go.transform.localPosition = new Vector3(
-        -0.1428564f,
-        0.9890453f,
-        2.744863f
-      );
-      targetScreenTopCamera2Go.transform.localRotation = Quaternion.Euler(
-        6.642229f,
-        176.1051f,
-        358.5776f
-      );
+      targetScreenTopCamera2Go.transform.localPosition = new Vector3(-0.1428564f, 0.9890453f, 2.744863f);
+      targetScreenTopCamera2Go.transform.localRotation = Quaternion.Euler(6.642229f, 176.1051f, 358.5776f);
       var cinemachineCamera9 = targetScreenTopCamera2Go.AddComponent<CinemachineCamera>();
       essenceSite._targetScreenTopCamera = cinemachineCamera9;
 

@@ -1,6 +1,6 @@
 // AUTO-GENERATED CODE - DO NOT EDIT
 // Generated from: Registry
-// Generated at: 2025-12-10 07:01:25
+// Generated at: 2025-12-10 13:47:26
 
 #nullable enable
 
@@ -25,13 +25,7 @@ namespace Dreamtides.Tests.TestUtils
     public FakeSoundService FakeSoundService { get; private set; } = null!;
     public FakeActionService FakeActionService { get; private set; } = null!;
 
-    public static GeneratedRegistry Create(
-      List<GameObject> createdObjects,
-      GeneratedCanvas canvas,
-      GeneratedMainCamera mainCamera,
-      BattleLayout portraitLayout,
-      BattleLayout landscapeLayout
-    )
+    public static GeneratedRegistry Create(List<GameObject> createdObjects, GeneratedCanvas canvas, GeneratedMainCamera mainCamera, BattleLayout portraitLayout, BattleLayout landscapeLayout, DreamscapeLayout? dreamscapeLayout = null)
     {
       var result = new GeneratedRegistry();
 
@@ -44,6 +38,7 @@ namespace Dreamtides.Tests.TestUtils
       registryComponent._cameraAdjuster = mainCamera.GameCamera;
       registryComponent._portraitLayout = portraitLayout;
       registryComponent._landscapeLayout = landscapeLayout;
+      registryComponent._dreamscapeLayout = dreamscapeLayout;
 
       var mainAudioSource = registryGo.AddComponent<AudioSource>();
       registryComponent._mainAudioSource = mainAudioSource;

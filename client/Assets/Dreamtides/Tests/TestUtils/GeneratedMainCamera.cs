@@ -1,6 +1,6 @@
 // AUTO-GENERATED CODE - DO NOT EDIT
 // Generated from: MainCamera
-// Generated at: 2025-12-10 07:01:27
+// Generated at: 2025-12-10 13:47:29
 
 #nullable enable
 
@@ -241,11 +241,7 @@ namespace Dreamtides.Tests.TestUtils
       var dreamsignDisplayGo = new GameObject("DreamsignDisplay");
       createdObjects.Add(dreamsignDisplayGo);
       dreamsignDisplayGo.transform.SetParent(questDeckGo.transform, false);
-      dreamsignDisplayGo.transform.localPosition = new Vector3(
-        -3.166668f,
-        -0.2333552f,
-        2.384186E-05f
-      );
+      dreamsignDisplayGo.transform.localPosition = new Vector3(-3.166668f, -0.2333552f, 2.384186E-05f);
       dreamsignDisplayGo.transform.localScale = new Vector3(0.6666667f, 0.6666668f, 0.6666668f);
       var dreamsignDisplay = dreamsignDisplayGo.AddComponent<DreamsignDisplayLayout>();
       dreamsignDisplay._horizontalSpacing = 3f;
@@ -336,8 +332,7 @@ namespace Dreamtides.Tests.TestUtils
       temptingOfferObjectLayoutGo.transform.SetParent(mainCameraGo.transform, false);
       temptingOfferObjectLayoutGo.transform.localPosition = new Vector3(0f, 0f, 2.5f);
       temptingOfferObjectLayoutGo.transform.localScale = new Vector3(0.125f, 0.125f, 0.125f);
-      var temptingOfferObjectLayout =
-        temptingOfferObjectLayoutGo.AddComponent<TemptingOfferObjectLayout>();
+      var temptingOfferObjectLayout = temptingOfferObjectLayoutGo.AddComponent<TemptingOfferObjectLayout>();
       temptingOfferObjectLayout._horizontalSpacing = 0.5f;
       temptingOfferObjectLayout._verticalSpacing = 0.75f;
       temptingOfferObjectLayout._cardWidth = 2.5f;
@@ -370,6 +365,25 @@ namespace Dreamtides.Tests.TestUtils
       createdObjects.Add(worldSpaceBackgroundGo);
       worldSpaceBackgroundGo.transform.SetParent(questDeckBrowserWorldSpaceGo.transform, false);
       worldSpaceBackgroundGo.transform.localScale = new Vector3(100f, 100f, 1f);
+
+      var startBattleObjectLayoutGo = new GameObject("StartBattleObjectLayout");
+      createdObjects.Add(startBattleObjectLayoutGo);
+      startBattleObjectLayoutGo.transform.SetParent(mainCameraGo.transform, false);
+      startBattleObjectLayoutGo.transform.localPosition = new Vector3(0f, 0.5f, 2.75f);
+      var startBattleObjectLayout = startBattleObjectLayoutGo.AddComponent<StartBattleObjectLayout>();
+      startBattleObjectLayout._internalGameContext = GameContext.Interface;
+      startBattleObjectLayout._cardInwardOffset = 0.7f;
+      startBattleObjectLayout._cardScale = 0.45f;
+      startBattleObjectLayout._buttonVerticalOffset = -1.5f;
+      startBattleObjectLayout._buttonScale = 0.1f;
+
+      var vsTextGo = new GameObject("VsText");
+      createdObjects.Add(vsTextGo);
+      vsTextGo.transform.SetParent(startBattleObjectLayoutGo.transform, false);
+      var vsTextGoRect = vsTextGo.AddComponent<RectTransform>();
+      vsTextGoRect.anchorMin = new Vector2(0.5f, 0.5f);
+      vsTextGoRect.anchorMax = new Vector2(0.5f, 0.5f);
+      vsTextGoRect.sizeDelta = new Vector2(20f, 5f);
 
       return result;
     }

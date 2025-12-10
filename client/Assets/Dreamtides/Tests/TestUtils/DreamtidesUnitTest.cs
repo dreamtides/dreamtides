@@ -34,6 +34,7 @@ namespace Dreamtides.Tests.TestUtils
     Registry? _registry;
     BattleLayout? _portraitLayout;
     BattleLayout? _landscapeLayout;
+    GeneratedMainCamera? _mainCamera;
     GameMode _gameMode = GameMode.Quest;
     TestConfiguration? _testConfiguration;
     FakeSoundService? _fakeSoundService;
@@ -59,19 +60,24 @@ namespace Dreamtides.Tests.TestUtils
       _fakeActionService
       ?? throw new InvalidOperationException("FakeActionService not initialized");
 
+    protected GeneratedMainCamera MainCamera =>
+      _mainCamera ?? throw new InvalidOperationException("MainCamera not initialized");
+
     protected IEnumerator Initialize(IGameViewport? viewport = null)
     {
       var canvas = GeneratedCanvas.Create(_createdObjects);
-      var mainCamera = GeneratedMainCamera.Create(_createdObjects);
+      _mainCamera = GeneratedMainCamera.Create(_createdObjects);
       _portraitLayout = GeneratedPortraitBattleLayout.Create(_createdObjects, canvas);
       _landscapeLayout = GeneratedLandscapeBattleLayout.Create(_createdObjects, canvas);
+      var dreamscapeLayout = GeneratedDreamscapeLayout.Create(_createdObjects);
 
       var generatedRegistry = GeneratedRegistry.Create(
         _createdObjects,
         canvas,
-        mainCamera,
+        _mainCamera,
         _portraitLayout,
-        _landscapeLayout
+        _landscapeLayout,
+        dreamscapeLayout
       );
       _registry = generatedRegistry.Registry;
       _fakeSoundService = generatedRegistry.FakeSoundService;
@@ -290,6 +296,31 @@ namespace Dreamtides.Tests.TestUtils
           Is.GreaterThan(screenPos1.x),
           $"Card {i + 1} should be to the right of card {i} on screen"
         );
+      }
+    }
+
+    protected static void AssertCardBoxColliderIsOnScreen(
+      IGameViewport viewport,
+      TestCard card,
+      string cardDescription
+    )
+    {
+      var collider = card.CardCollider;
+      var bounds = collider.bounds;
+
+      var corners = new Vector3[8];
+      corners[0] = new Vector3(bounds.min.x, bounds.min.y, bounds.min.z);
+      corners[1] = new Vector3(bounds.min.x, bounds.min.y, bounds.max.z);
+      corners[2] = new Vector3(bounds.min.x, bounds.max.y, bounds.min.z);
+      corners[3] = new Vector3(bounds.min.x, bounds.max.y, bounds.max.z);
+      corners[4] = new Vector3(bounds.max.x, bounds.min.y, bounds.min.z);
+      corners[5] = new Vector3(bounds.max.x, bounds.min.y, bounds.max.z);
+      corners[6] = new Vector3(bounds.max.x, bounds.max.y, bounds.min.z);
+      corners[7] = new Vector3(bounds.max.x, bounds.max.y, bounds.max.z);
+
+      for (var i = 0; i < corners.Length; i++)
+      {
+        AssertPointIsOnScreen(viewport, corners[i], $"{cardDescription} box collider corner {i}");
       }
     }
   }

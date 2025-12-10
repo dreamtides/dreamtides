@@ -32,6 +32,9 @@ namespace Dreamtides.Editors
     Registry? _registry;
     string _registryClassName = "GeneratedRegistry";
 
+    DreamscapeLayout? _dreamscapeLayout;
+    string _dreamscapeLayoutClassName = "GeneratedDreamscapeLayout";
+
     static readonly Dictionary<Type, string?> ServicesToFake = new()
     {
       { typeof(ActionService), "FakeActionService" },
@@ -82,6 +85,26 @@ namespace Dreamtides.Editors
       {
         _registry = FindRootRegistry("Registry");
       }
+
+      if (_dreamscapeLayout == null)
+      {
+        _dreamscapeLayout = FindDreamscapeLayout();
+      }
+    }
+
+    static DreamscapeLayout? FindDreamscapeLayout()
+    {
+      foreach (
+        var layout in UnityEngine.Object.FindObjectsByType<DreamscapeLayout>(
+          FindObjectsInactive.Include,
+          FindObjectsSortMode.None
+        )
+      )
+      {
+        return layout;
+      }
+
+      return null;
     }
 
     static Registry? FindRootRegistry(string name)
@@ -138,6 +161,8 @@ namespace Dreamtides.Editors
       EditorGUILayout.Space(20);
       DrawBattleLayoutSection();
       EditorGUILayout.Space(20);
+      DrawDreamscapeLayoutSection();
+      EditorGUILayout.Space(20);
       DrawSitesSection();
       EditorGUILayout.Space(20);
       DrawCanvasSection();
@@ -183,6 +208,24 @@ namespace Dreamtides.Editors
       _landscapeClassName = EditorGUILayout.TextField("Landscape Class Name", _landscapeClassName);
     }
 
+    void DrawDreamscapeLayoutSection()
+    {
+      EditorGUILayout.LabelField("Dreamscape Layout", EditorStyles.boldLabel);
+      EditorGUILayout.Space();
+
+      _dreamscapeLayout =
+        EditorGUILayout.ObjectField(
+          "Dreamscape Layout",
+          _dreamscapeLayout,
+          typeof(DreamscapeLayout),
+          true
+        ) as DreamscapeLayout;
+      _dreamscapeLayoutClassName = EditorGUILayout.TextField(
+        "Dreamscape Layout Class Name",
+        _dreamscapeLayoutClassName
+      );
+    }
+
     void DrawSitesSection()
     {
       EditorGUILayout.LabelField("Sites", EditorStyles.boldLabel);
@@ -219,6 +262,7 @@ namespace Dreamtides.Editors
     void DrawGenerateButton()
     {
       var hasLayoutInput = _portraitLayout != null || _landscapeLayout != null;
+      var hasDreamscapeLayoutInput = _dreamscapeLayout != null;
       var hasSitesInput = _sitesRoot != null;
       var hasCanvasInput = _canvas != null;
       var hasMainCameraInput = _mainCamera != null;
@@ -226,6 +270,7 @@ namespace Dreamtides.Editors
 
       if (
         !hasLayoutInput
+        && !hasDreamscapeLayoutInput
         && !hasSitesInput
         && !hasCanvasInput
         && !hasMainCameraInput
@@ -254,6 +299,15 @@ namespace Dreamtides.Editors
       if (_landscapeLayout != null && string.IsNullOrWhiteSpace(_landscapeClassName))
       {
         EditorGUILayout.HelpBox("Please enter a landscape class name.", MessageType.Warning);
+        return;
+      }
+
+      if (_dreamscapeLayout != null && string.IsNullOrWhiteSpace(_dreamscapeLayoutClassName))
+      {
+        EditorGUILayout.HelpBox(
+          "Please enter a dreamscape layout class name.",
+          MessageType.Warning
+        );
         return;
       }
 
@@ -303,6 +357,12 @@ namespace Dreamtides.Editors
           generatedFiles.Add(_landscapeClassName);
         }
 
+        if (_dreamscapeLayout != null)
+        {
+          GenerateDreamscapeLayoutCode(_dreamscapeLayout, _dreamscapeLayoutClassName);
+          generatedFiles.Add(_dreamscapeLayoutClassName);
+        }
+
         if (_sitesRoot != null)
         {
           GenerateSitesCode(_sitesRoot, _sitesClassName);
@@ -344,6 +404,28 @@ namespace Dreamtides.Editors
       }
 
       if (type == typeof(CardOrderSelector))
+      {
+        return true;
+      }
+
+      return false;
+    }
+
+    static bool IsDreamscapeLayoutSupportedComponent(Component component)
+    {
+      if (component == null)
+      {
+        return false;
+      }
+
+      var type = component.GetType();
+
+      if (type == typeof(DreamscapeLayout))
+      {
+        return true;
+      }
+
+      if (typeof(ObjectLayout).IsAssignableFrom(type))
       {
         return true;
       }
@@ -456,6 +538,40 @@ namespace Dreamtides.Editors
         "BattleLayout",
         "Create",
         "List<GameObject> createdObjects, GeneratedCanvas? canvas = null",
+        isStatic: true
+      );
+      builder.OpenBrace();
+
+      var layoutVar = utils.GenerateGameObjectAndComponents(
+        builder,
+        layout.gameObject,
+        "layout",
+        isRoot: true
+      );
+
+      utils.GenerateComponentReferences(builder, layout, layoutVar);
+
+      builder.BlankLine();
+      builder.Return(layoutVar);
+
+      builder.CloseBrace();
+      builder.CloseBrace();
+
+      CodeGeneratorUtils.WriteFile(builder, className);
+    }
+
+    static void GenerateDreamscapeLayoutCode(DreamscapeLayout layout, string className)
+    {
+      var utils = new CodeGeneratorUtils(IsDreamscapeLayoutSupportedComponent);
+      var builder = CodeGeneratorUtils.CreateBuilder(layout.gameObject.name);
+
+      builder.Class(className);
+      builder.OpenBrace();
+
+      builder.Method(
+        "DreamscapeLayout",
+        "Create",
+        "List<GameObject> createdObjects",
         isStatic: true
       );
       builder.OpenBrace();
@@ -676,7 +792,7 @@ namespace Dreamtides.Editors
       builder.Method(
         className,
         "Create",
-        "List<GameObject> createdObjects, GeneratedCanvas canvas, GeneratedMainCamera mainCamera, BattleLayout portraitLayout, BattleLayout landscapeLayout",
+        "List<GameObject> createdObjects, GeneratedCanvas canvas, GeneratedMainCamera mainCamera, BattleLayout portraitLayout, BattleLayout landscapeLayout, DreamscapeLayout? dreamscapeLayout = null",
         isStatic: true
       );
       builder.OpenBrace();
@@ -694,6 +810,7 @@ namespace Dreamtides.Editors
       builder.Assign("registryComponent._cameraAdjuster", "mainCamera.GameCamera");
       builder.Assign("registryComponent._portraitLayout", "portraitLayout");
       builder.Assign("registryComponent._landscapeLayout", "landscapeLayout");
+      builder.Assign("registryComponent._dreamscapeLayout", "dreamscapeLayout");
       builder.BlankLine();
 
       builder.Var("mainAudioSource", "registryGo.AddComponent<AudioSource>()");

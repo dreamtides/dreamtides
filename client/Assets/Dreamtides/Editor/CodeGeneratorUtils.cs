@@ -206,6 +206,10 @@ namespace Dreamtides.Editors
       {
         builder.Line($"if ({goVarName} != null) {target} = {goVarName};");
       }
+      else if (targetComponent is RectTransform)
+      {
+        builder.Line($"if ({goVarName} != null) {target} = (RectTransform){goVarName}.transform;");
+      }
       else if (targetComponent is Transform)
       {
         builder.Line($"if ({goVarName} != null) {target} = {goVarName}.transform;");
@@ -714,7 +718,11 @@ namespace Dreamtides.Editors
       var target = $"{parentVar}.{fieldName}";
       var goVar = _goVariables[go];
 
-      if (targetComponent is Transform)
+      if (targetComponent is RectTransform)
+      {
+        builder.Assign(target, $"(RectTransform){goVar}.transform");
+      }
+      else if (targetComponent is Transform)
       {
         builder.Assign(target, $"{goVar}.transform");
       }
