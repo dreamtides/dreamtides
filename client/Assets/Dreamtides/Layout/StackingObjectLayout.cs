@@ -23,14 +23,10 @@ namespace Dreamtides.Layout
 
     public override Vector3 CalculateObjectPosition(int index, int count)
     {
-      var xOffset = _stackRight
+      var offsetAmount = _stackRight
         ? index * GetOffset(count)
         : (index - (count - 1)) * GetOffset(count);
-      return new Vector3(
-        transform.position.x + xOffset,
-        transform.position.y,
-        transform.position.z
-      );
+      return transform.position + transform.right * offsetAmount;
     }
 
     public override Vector3? CalculateObjectRotation(int index, int count) =>
