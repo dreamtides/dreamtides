@@ -12,12 +12,12 @@ using UnityEngine.UI;
 
 namespace Dreamtides.Editors
 {
-  public class GameLayoutCodeGenerator : EditorWindow
+  public class TestCodeGenerator : EditorWindow
   {
     BattleLayout? _portraitLayout;
     BattleLayout? _landscapeLayout;
-    string _portraitClassName = "GeneratedPortraitGameLayout";
-    string _landscapeClassName = "GeneratedLandscapeGameLayout";
+    string _portraitClassName = "GeneratedPortraitBattleLayout";
+    string _landscapeClassName = "GeneratedLandscapeBattleLayout";
 
     GameObject? _sitesRoot;
     string _sitesClassName = "GeneratedSites";
@@ -46,7 +46,7 @@ namespace Dreamtides.Editors
     [MenuItem("Tools/Generate Test Code")]
     static void ShowWindow()
     {
-      var window = GetWindow<GameLayoutCodeGenerator>("Test Code Generator");
+      var window = GetWindow<TestCodeGenerator>("Test Code Generator");
       window.AutoPopulateDefaults();
     }
 
@@ -54,12 +54,12 @@ namespace Dreamtides.Editors
     {
       if (_portraitLayout == null)
       {
-        _portraitLayout = FindRootGameLayout("PortraitLayout");
+        _portraitLayout = FindRootBattleLayout("PortraitBattleLayout");
       }
 
       if (_landscapeLayout == null)
       {
-        _landscapeLayout = FindRootGameLayout("LandscapeLayout");
+        _landscapeLayout = FindRootBattleLayout("LandscapeBattleLayout");
       }
 
       if (_sitesRoot == null)
@@ -101,7 +101,7 @@ namespace Dreamtides.Editors
       return go != null ? go.GetComponent<Canvas>() : null;
     }
 
-    static BattleLayout? FindRootGameLayout(string name)
+    static BattleLayout? FindRootBattleLayout(string name)
     {
       var go = FindRootGameObject(name);
       return go != null ? go.GetComponent<BattleLayout>() : null;
@@ -135,7 +135,7 @@ namespace Dreamtides.Editors
 
       DrawRegistrySection();
       EditorGUILayout.Space(20);
-      DrawGameLayoutSection();
+      DrawBattleLayoutSection();
       EditorGUILayout.Space(20);
       DrawSitesSection();
       EditorGUILayout.Space(20);
@@ -156,14 +156,14 @@ namespace Dreamtides.Editors
       _registryClassName = EditorGUILayout.TextField("Registry Class Name", _registryClassName);
     }
 
-    void DrawGameLayoutSection()
+    void DrawBattleLayoutSection()
     {
       EditorGUILayout.LabelField("Game Layouts", EditorStyles.boldLabel);
       EditorGUILayout.Space();
 
       _portraitLayout =
         EditorGUILayout.ObjectField(
-          "Portrait GameLayout",
+          "Portrait BattleLayout",
           _portraitLayout,
           typeof(BattleLayout),
           true
@@ -174,7 +174,7 @@ namespace Dreamtides.Editors
 
       _landscapeLayout =
         EditorGUILayout.ObjectField(
-          "Landscape GameLayout",
+          "Landscape BattleLayout",
           _landscapeLayout,
           typeof(BattleLayout),
           true
@@ -232,7 +232,7 @@ namespace Dreamtides.Editors
       )
       {
         EditorGUILayout.HelpBox(
-          "Select at least one Registry, GameLayout, Sites Root, Canvas, or Main Camera from the scene.",
+          "Select at least one Registry, BattleLayout, Sites Root, Canvas, or Main Camera from the scene.",
           MessageType.Info
         );
         return;
@@ -292,13 +292,13 @@ namespace Dreamtides.Editors
 
         if (_portraitLayout != null)
         {
-          GenerateGameLayoutCode(_portraitLayout, _portraitClassName);
+          GenerateBattleLayoutCode(_portraitLayout, _portraitClassName);
           generatedFiles.Add(_portraitClassName);
         }
 
         if (_landscapeLayout != null)
         {
-          GenerateGameLayoutCode(_landscapeLayout, _landscapeClassName);
+          GenerateBattleLayoutCode(_landscapeLayout, _landscapeClassName);
           generatedFiles.Add(_landscapeClassName);
         }
 
@@ -318,7 +318,7 @@ namespace Dreamtides.Editors
       }
     }
 
-    static bool IsGameLayoutSupportedComponent(Component component)
+    static bool IsBattleLayoutSupportedComponent(Component component)
     {
       if (component == null)
       {
@@ -442,17 +442,17 @@ namespace Dreamtides.Editors
       }
     }
 
-    void GenerateGameLayoutCode(BattleLayout layout, string className)
+    void GenerateBattleLayoutCode(BattleLayout layout, string className)
     {
       var canvasObjects = GetCanvasDescendants(_canvas);
-      var utils = new CodeGeneratorUtils(IsGameLayoutSupportedComponent, canvasObjects);
+      var utils = new CodeGeneratorUtils(IsBattleLayoutSupportedComponent, canvasObjects);
       var builder = CodeGeneratorUtils.CreateBuilder(layout.gameObject.name);
 
       builder.Class(className);
       builder.OpenBrace();
 
       builder.Method(
-        "GameLayout",
+        "BattleLayout",
         "Create",
         "List<GameObject> createdObjects, GeneratedCanvas? canvas = null",
         isStatic: true
@@ -670,7 +670,7 @@ namespace Dreamtides.Editors
       builder.Method(
         className,
         "Create",
-        "List<GameObject> createdObjects, GeneratedCanvas canvas, GeneratedMainCamera mainCamera, GameLayout portraitLayout, GameLayout landscapeLayout",
+        "List<GameObject> createdObjects, GeneratedCanvas canvas, GeneratedMainCamera mainCamera, BattleLayout portraitLayout, BattleLayout landscapeLayout",
         isStatic: true
       );
       builder.OpenBrace();

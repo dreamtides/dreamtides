@@ -1,6 +1,6 @@
 // AUTO-GENERATED CODE - DO NOT EDIT
 // Generated from: Canvas
-// Generated at: 2025-12-09 15:13:10
+// Generated at: 2025-12-10 06:28:55
 
 #nullable enable
 
@@ -544,9 +544,9 @@ namespace Dreamtides.Tests.TestUtils
       createdObjects.Add(cardBrowserLeftLandscapeGo);
       cardBrowserLeftLandscapeGo.transform.SetParent(safeAreaGo.transform, false);
       var cardBrowserLeftLandscapeGoRect = cardBrowserLeftLandscapeGo.AddComponent<RectTransform>();
-      cardBrowserLeftLandscapeGoRect.anchorMin = new Vector2(0f, 0.9f);
-      cardBrowserLeftLandscapeGoRect.anchorMax = new Vector2(0f, 0.9f);
-      cardBrowserLeftLandscapeGoRect.pivot = new Vector2(0f, 0.9f);
+      cardBrowserLeftLandscapeGoRect.anchorMin = new Vector2(0f, 0.6f);
+      cardBrowserLeftLandscapeGoRect.anchorMax = new Vector2(0f, 0.6f);
+      cardBrowserLeftLandscapeGoRect.pivot = new Vector2(0f, 0.6f);
       result.Objects.Add("SafeArea/CardBrowserLeftLandscape", cardBrowserLeftLandscapeGo);
 
       var cardBrowserRightGo = new GameObject("CardBrowserRight");
@@ -598,6 +598,7 @@ namespace Dreamtides.Tests.TestUtils
       cardBrowserRightLandscapeGoRect.anchorMin = new Vector2(1f, 0.9f);
       cardBrowserRightLandscapeGoRect.anchorMax = new Vector2(1f, 0.9f);
       cardBrowserRightLandscapeGoRect.pivot = new Vector2(1f, 0.9f);
+      cardBrowserRightLandscapeGoRect.anchoredPosition = new Vector2(0f, -120f);
       result.Objects.Add("SafeArea/CardBrowserRightLandscape", cardBrowserRightLandscapeGo);
 
       var closeBrowserButtonLandscapeGo = new GameObject("CloseBrowserButtonLandscape");
@@ -610,7 +611,7 @@ namespace Dreamtides.Tests.TestUtils
         closeBrowserButtonLandscapeGo.AddComponent<RectTransform>();
       closeBrowserButtonLandscapeGoRect.anchorMin = new Vector2(0.5f, 0.5f);
       closeBrowserButtonLandscapeGoRect.anchorMax = new Vector2(0.5f, 0.5f);
-      closeBrowserButtonLandscapeGoRect.anchoredPosition = new Vector2(-125f, 0f);
+      closeBrowserButtonLandscapeGoRect.anchoredPosition = new Vector2(-75f, 132f);
       closeBrowserButtonLandscapeGoRect.sizeDelta = new Vector2(40f, 40f);
       result.Objects.Add(
         "SafeArea/CardBrowserRightLandscape/CloseBrowserButtonLandscape",
@@ -690,7 +691,7 @@ namespace Dreamtides.Tests.TestUtils
         cardBrowserScrollbarLandscapeGo.AddComponent<RectTransform>();
       cardBrowserScrollbarLandscapeGoRect.anchorMin = new Vector2(0.5f, 0.5f);
       cardBrowserScrollbarLandscapeGoRect.anchorMax = new Vector2(0.5f, 0.5f);
-      cardBrowserScrollbarLandscapeGoRect.anchoredPosition = new Vector2(0f, -35f);
+      cardBrowserScrollbarLandscapeGoRect.anchoredPosition = new Vector2(0f, -95f);
       cardBrowserScrollbarLandscapeGoRect.sizeDelta = new Vector2(300f, 20f);
       result.Objects.Add("SafeArea/CardBrowserScrollbarLandscape", cardBrowserScrollbarLandscapeGo);
 

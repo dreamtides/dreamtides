@@ -1,6 +1,6 @@
 // AUTO-GENERATED CODE - DO NOT EDIT
 // Generated from: Registry
-// Generated at: 2025-12-09 15:13:09
+// Generated at: 2025-12-10 06:28:54
 
 #nullable enable
 

@@ -63,8 +63,8 @@ namespace Dreamtides.Tests.TestUtils
     {
       var canvas = GeneratedCanvas.Create(_createdObjects);
       var mainCamera = GeneratedMainCamera.Create(_createdObjects);
-      _portraitLayout = GeneratedPortraitGameLayout.Create(_createdObjects, canvas);
-      _landscapeLayout = GeneratedLandscapeGameLayout.Create(_createdObjects, canvas);
+      _portraitLayout = GeneratedPortraitBattleLayout.Create(_createdObjects, canvas);
+      _landscapeLayout = GeneratedLandscapeBattleLayout.Create(_createdObjects, canvas);
 
       var generatedRegistry = GeneratedRegistry.Create(
         _createdObjects,
