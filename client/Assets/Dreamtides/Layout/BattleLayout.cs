@@ -11,7 +11,7 @@ using UnityEngine;
 
 namespace Dreamtides.Layout
 {
-  public class GameLayout : MonoBehaviour
+  public class BattleLayout : MonoBehaviour
   {
     [SerializeField]
     internal Transform? _cameraPosition;

@@ -48,7 +48,7 @@ namespace Dreamtides.Layout
       var curvePosition = CalculateCurvePosition(index, count);
       return new Vector3(
         x: Constants.CameraXAngle,
-        y: Registry.Layout.BattleYRotation(),
+        y: Registry.BattleLayout.BattleYRotation(),
         z: _zRotationAddition + _zRotationMultiplier * CalculateZRotation(curvePosition)
       );
     }

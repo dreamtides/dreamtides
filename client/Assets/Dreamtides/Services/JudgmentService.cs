@@ -49,12 +49,12 @@ namespace Dreamtides.Services
         yield break;
       }
       var actorStatusDisplay = actorIsUser
-        ? Registry.Layout.UserStatusDisplay
-        : Registry.Layout.EnemyStatusDisplay;
+        ? Registry.BattleLayout.UserStatusDisplay
+        : Registry.BattleLayout.EnemyStatusDisplay;
       var actorSparkTotal = actorStatusDisplay.TotalSpark.transform;
       var opponentSparkTotal = actorIsUser
-        ? Registry.Layout.EnemyStatusDisplay.TotalSpark.transform
-        : Registry.Layout.UserStatusDisplay.TotalSpark.transform;
+        ? Registry.BattleLayout.EnemyStatusDisplay.TotalSpark.transform
+        : Registry.BattleLayout.UserStatusDisplay.TotalSpark.transform;
       Vector3 actorOriginalPos = actorSparkTotal.position;
       Vector3 opponentOriginalPos = opponentSparkTotal.position;
 

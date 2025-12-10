@@ -18,12 +18,15 @@ namespace Dreamtides.Tests.TestUtils
 {
   public class GeneratedLandscapeGameLayout
   {
-    public static GameLayout Create(List<GameObject> createdObjects, GeneratedCanvas? canvas = null)
+    public static BattleLayout Create(
+      List<GameObject> createdObjects,
+      GeneratedCanvas? canvas = null
+    )
     {
       var layoutGo = new GameObject("LandscapeLayout");
       createdObjects.Add(layoutGo);
       layoutGo.transform.localRotation = Quaternion.Euler(0f, 270f, 0f);
-      var layout = layoutGo.AddComponent<GameLayout>();
+      var layout = layoutGo.AddComponent<BattleLayout>();
 
       var cameraPositionGo = new GameObject("LandscapeBattleCamera");
       createdObjects.Add(cameraPositionGo);

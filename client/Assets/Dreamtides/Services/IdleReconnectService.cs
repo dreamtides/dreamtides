@@ -29,7 +29,7 @@ namespace Dreamtides.Services
       var thinking =
         !Registry.ActionService.IsProcessingCommands
         && Registry.ActionService.LastResponseIncremental;
-      Registry.Layout.ThinkingIndicator.SetActive(thinking);
+      Registry.BattleLayout.ThinkingIndicator.SetActive(thinking);
 
       var currentTime = Time.time;
       var hasActivity =

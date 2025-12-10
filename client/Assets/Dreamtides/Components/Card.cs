@@ -617,7 +617,7 @@ namespace Dreamtides.Components
         transform.position = MobileHandCardJumpPosition();
         transform.rotation = Quaternion.Euler(
           Constants.CameraXAngle,
-          Registry.Layout.BattleYRotation(),
+          Registry.BattleLayout.BattleYRotation(),
           z: 0
         );
         Registry.CardAnimationService.DisplayInfoZoom(this, forCardInHand: true);
@@ -635,7 +635,7 @@ namespace Dreamtides.Components
           transform.position = jumpPosition.Value;
           transform.rotation = Quaternion.Euler(
             Constants.CameraXAngle,
-            Registry.Layout.BattleYRotation(),
+            Registry.BattleLayout.BattleYRotation(),
             z: 0
           );
         }
@@ -756,7 +756,7 @@ namespace Dreamtides.Components
               BattleActionClass = new()
               {
                 SelectOrderForDeckCard =
-                  Registry.Layout.CardOrderSelector.SelectCardOrderWithinDisplay(
+                  Registry.BattleLayout.CardOrderSelector.SelectCardOrderWithinDisplay(
                     transform,
                     Errors.CheckNotNull(CardView.Revealed?.Actions?.CanSelectOrder)
                   ),
@@ -903,12 +903,13 @@ namespace Dreamtides.Components
         horizontalPosition
       );
 
-      var rotatedOffset = Quaternion.Euler(x: 0, Registry.Layout.BattleYRotation(), z: 0) * offset;
+      var rotatedOffset =
+        Quaternion.Euler(x: 0, Registry.BattleLayout.BattleYRotation(), z: 0) * offset;
       var target = transform.position + rotatedOffset;
       target.x = Mathf.Clamp(
         target.x,
-        Registry.Layout.InfoZoomLeft.position.x,
-        Registry.Layout.InfoZoomRight.position.x
+        Registry.BattleLayout.InfoZoomLeft.position.x,
+        Registry.BattleLayout.InfoZoomRight.position.x
       );
       target.y = Mathf.Clamp(target.y, 20f, 25f);
       target.z = Mathf.Clamp(target.z, -25f, -20f);
@@ -927,7 +928,7 @@ namespace Dreamtides.Components
 
       var mousePosition = Registry.InputService.WorldPointerPosition(_dragStartScreenZ);
       var dragVector = mousePosition - _dragStartPosition;
-      var yRotation = Registry.Layout.BattleYRotation() * Mathf.Deg2Rad;
+      var yRotation = Registry.BattleLayout.BattleYRotation() * Mathf.Deg2Rad;
       var forward = new Vector3(Mathf.Sin(yRotation), 0, Mathf.Cos(yRotation));
       var forwardDistance = Vector3.Dot(dragVector, forward);
       return forwardDistance < 1f;

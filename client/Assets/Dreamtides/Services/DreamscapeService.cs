@@ -69,8 +69,8 @@ namespace Dreamtides.Services
       var essenceTotal = command.Quest.EssenceTotal > 0 ? command.Quest.EssenceTotal : 550;
       Registry.DreamscapeLayout.EssenceTotal.SetValue(essenceTotal.ToString(), true);
       Registry.DocumentService.RenderScreenOverlay(command.Quest.Interface?.ScreenOverlay);
-      Registry.Layout.CardOrderSelector.View = command.Quest.Interface?.CardOrderSelector;
-      Registry.Layout.UndoButton.SetView(
+      Registry.BattleLayout.CardOrderSelector.View = command.Quest.Interface?.CardOrderSelector;
+      Registry.BattleLayout.UndoButton.SetView(
         new ButtonView
         {
           Action = new OnClickClass
@@ -86,8 +86,8 @@ namespace Dreamtides.Services
           Label = "U",
         }
       );
-      Registry.Layout.DevButton.SetView(command.Quest.Interface?.DevButton);
-      Registry.Layout.CloseBrowserButton.CloseAction =
+      Registry.BattleLayout.DevButton.SetView(command.Quest.Interface?.DevButton);
+      Registry.BattleLayout.CloseBrowserButton.CloseAction =
         command.Quest.Interface?.Browser?.CloseButton?.ToGameAction();
       Registry.DreamscapeLayout.TemptingOfferDisplay.SetOfferActions(
         command.Quest.TemptingOffer?.Actions

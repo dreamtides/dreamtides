@@ -164,8 +164,8 @@ namespace Dreamtides.Services
       {
         return deck switch
         {
-          DisplayPlayer.User => Registry.Layout.UserDeck,
-          DisplayPlayer.Enemy => Registry.Layout.EnemyDeck,
+          DisplayPlayer.User => Registry.BattleLayout.UserDeck,
+          DisplayPlayer.Enemy => Registry.BattleLayout.EnemyDeck,
           _ => throw Errors.UnknownEnumValue(deck),
         };
       }
@@ -174,8 +174,8 @@ namespace Dreamtides.Services
       {
         return voidPile switch
         {
-          DisplayPlayer.User => Registry.Layout.UserVoid,
-          DisplayPlayer.Enemy => Registry.Layout.EnemyVoid,
+          DisplayPlayer.User => Registry.BattleLayout.UserVoid,
+          DisplayPlayer.Enemy => Registry.BattleLayout.EnemyVoid,
           _ => throw Errors.UnknownEnumValue(voidPile),
         };
       }
@@ -184,8 +184,8 @@ namespace Dreamtides.Services
       {
         return avatar switch
         {
-          DisplayPlayer.User => Registry.Layout.UserStatusDisplay,
-          DisplayPlayer.Enemy => Registry.Layout.EnemyStatusDisplay,
+          DisplayPlayer.User => Registry.BattleLayout.UserStatusDisplay,
+          DisplayPlayer.Enemy => Registry.BattleLayout.EnemyStatusDisplay,
           _ => throw Errors.UnknownEnumValue(avatar),
         };
       }
@@ -254,52 +254,52 @@ namespace Dreamtides.Services
 
     void ApplyAllLayouts(Sequence? sequence)
     {
-      if (Registry.Layout.Browser.Objects.Count > 0)
+      if (Registry.BattleLayout.Browser.Objects.Count > 0)
       {
-        Registry.Layout.Browser.Show(Registry, sequence);
+        Registry.BattleLayout.Browser.Show(Registry, sequence);
       }
       else
       {
-        Registry.Layout.Browser.Hide(Registry, sequence);
+        Registry.BattleLayout.Browser.Hide(Registry, sequence);
       }
 
       if (
-        Registry.Layout.CardOrderSelector.Objects.Count > 0
-        || Registry.Layout.CardOrderSelectorVoid.Objects.Count > 0
+        Registry.BattleLayout.CardOrderSelector.Objects.Count > 0
+        || Registry.BattleLayout.CardOrderSelectorVoid.Objects.Count > 0
       )
       {
-        Registry.Layout.CardOrderSelector.Show(Registry, sequence);
+        Registry.BattleLayout.CardOrderSelector.Show(Registry, sequence);
       }
       else
       {
-        Registry.Layout.CardOrderSelector.Hide(Registry, sequence);
+        Registry.BattleLayout.CardOrderSelector.Hide(Registry, sequence);
       }
 
-      Registry.Layout.UserHand.ApplyLayout(sequence);
-      Registry.Layout.EnemyHand.ApplyLayout(sequence);
-      Registry.Layout.UserDeck.ApplyLayout(sequence);
-      Registry.Layout.EnemyDeck.ApplyLayout(sequence);
-      Registry.Layout.UserVoid.ApplyLayout(sequence);
-      Registry.Layout.EnemyVoid.ApplyLayout(sequence);
-      Registry.Layout.UserStatusDisplay.ApplyLayout(sequence);
-      Registry.Layout.EnemyStatusDisplay.ApplyLayout(sequence);
-      Registry.Layout.UserBattlefield.ApplyLayout(sequence);
-      Registry.Layout.EnemyBattlefield.ApplyLayout(sequence);
-      Registry.Layout.DrawnCardsPosition.ApplyLayout(sequence);
-      Registry.Layout.DefaultStack.ApplyLayout(sequence);
-      Registry.Layout.TargetingUserStack.ApplyLayout(sequence);
-      Registry.Layout.TargetingEnemyStack.ApplyLayout(sequence);
-      Registry.Layout.TargetingBothStack.ApplyLayout(sequence);
-      Registry.Layout.Browser.ApplyLayout(sequence);
-      Registry.Layout.UserDreamwell.ApplyLayout(sequence);
-      Registry.Layout.EnemyDreamwell.ApplyLayout(sequence);
-      Registry.Layout.DreamwellActivation.ApplyLayout(sequence);
-      Registry.Layout.CardOrderSelector.ApplyLayout(sequence);
-      Registry.Layout.CardOrderSelectorVoid.ApplyLayout(sequence);
-      Registry.Layout.GameModifiersDisplay.ApplyLayout(sequence);
-      Registry.Layout.OnScreenStorage.ApplyLayout(sequence);
-      Registry.Layout.AboveUserVoid.ApplyLayout(sequence);
-      Registry.Layout.AboveEnemyVoid.ApplyLayout(sequence);
+      Registry.BattleLayout.UserHand.ApplyLayout(sequence);
+      Registry.BattleLayout.EnemyHand.ApplyLayout(sequence);
+      Registry.BattleLayout.UserDeck.ApplyLayout(sequence);
+      Registry.BattleLayout.EnemyDeck.ApplyLayout(sequence);
+      Registry.BattleLayout.UserVoid.ApplyLayout(sequence);
+      Registry.BattleLayout.EnemyVoid.ApplyLayout(sequence);
+      Registry.BattleLayout.UserStatusDisplay.ApplyLayout(sequence);
+      Registry.BattleLayout.EnemyStatusDisplay.ApplyLayout(sequence);
+      Registry.BattleLayout.UserBattlefield.ApplyLayout(sequence);
+      Registry.BattleLayout.EnemyBattlefield.ApplyLayout(sequence);
+      Registry.BattleLayout.DrawnCardsPosition.ApplyLayout(sequence);
+      Registry.BattleLayout.DefaultStack.ApplyLayout(sequence);
+      Registry.BattleLayout.TargetingUserStack.ApplyLayout(sequence);
+      Registry.BattleLayout.TargetingEnemyStack.ApplyLayout(sequence);
+      Registry.BattleLayout.TargetingBothStack.ApplyLayout(sequence);
+      Registry.BattleLayout.Browser.ApplyLayout(sequence);
+      Registry.BattleLayout.UserDreamwell.ApplyLayout(sequence);
+      Registry.BattleLayout.EnemyDreamwell.ApplyLayout(sequence);
+      Registry.BattleLayout.DreamwellActivation.ApplyLayout(sequence);
+      Registry.BattleLayout.CardOrderSelector.ApplyLayout(sequence);
+      Registry.BattleLayout.CardOrderSelectorVoid.ApplyLayout(sequence);
+      Registry.BattleLayout.GameModifiersDisplay.ApplyLayout(sequence);
+      Registry.BattleLayout.OnScreenStorage.ApplyLayout(sequence);
+      Registry.BattleLayout.AboveUserVoid.ApplyLayout(sequence);
+      Registry.BattleLayout.AboveEnemyVoid.ApplyLayout(sequence);
 
       Registry.DreamscapeService.ApplyLayouts(sequence);
     }
@@ -351,27 +351,27 @@ namespace Dreamtides.Services
     {
       if (position.Enum == PositionEnum.Drawn)
       {
-        return Registry.Layout.DrawnCardsPosition;
+        return Registry.BattleLayout.DrawnCardsPosition;
       }
 
       if (position.Enum == PositionEnum.Browser)
       {
-        return Registry.Layout.Browser;
+        return Registry.BattleLayout.Browser;
       }
 
       if (position.Enum == PositionEnum.DreamwellActivation)
       {
-        return Registry.Layout.DreamwellActivation;
+        return Registry.BattleLayout.DreamwellActivation;
       }
 
       if (position.Enum == PositionEnum.GameModifier)
       {
-        return Registry.Layout.GameModifiersDisplay;
+        return Registry.BattleLayout.GameModifiersDisplay;
       }
 
       if (position.Enum == PositionEnum.OnScreenStorage)
       {
-        return Registry.Layout.OnScreenStorage;
+        return Registry.BattleLayout.OnScreenStorage;
       }
 
       if (position.Enum == PositionEnum.QuestDeck)
@@ -396,7 +396,7 @@ namespace Dreamtides.Services
 
       if (position.Enum == PositionEnum.Offscreen)
       {
-        return Registry.Layout.Offscreen;
+        return Registry.BattleLayout.Offscreen;
       }
 
       if (position.Enum == PositionEnum.DreamsignDisplay)
@@ -428,8 +428,8 @@ namespace Dreamtides.Services
       {
         return inHand switch
         {
-          DisplayPlayer.User => Registry.Layout.UserHand,
-          DisplayPlayer.Enemy => Registry.Layout.EnemyHand,
+          DisplayPlayer.User => Registry.BattleLayout.UserHand,
+          DisplayPlayer.Enemy => Registry.BattleLayout.EnemyHand,
           _ => throw Errors.UnknownEnumValue(inHand),
         };
       }
@@ -438,8 +438,8 @@ namespace Dreamtides.Services
       {
         return inDeck switch
         {
-          DisplayPlayer.User => Registry.Layout.UserDeck,
-          DisplayPlayer.Enemy => Registry.Layout.EnemyDeck,
+          DisplayPlayer.User => Registry.BattleLayout.UserDeck,
+          DisplayPlayer.Enemy => Registry.BattleLayout.EnemyDeck,
           _ => throw Errors.UnknownEnumValue(inDeck),
         };
       }
@@ -448,8 +448,8 @@ namespace Dreamtides.Services
       {
         return onBattlefield switch
         {
-          DisplayPlayer.User => Registry.Layout.UserBattlefield,
-          DisplayPlayer.Enemy => Registry.Layout.EnemyBattlefield,
+          DisplayPlayer.User => Registry.BattleLayout.UserBattlefield,
+          DisplayPlayer.Enemy => Registry.BattleLayout.EnemyBattlefield,
           _ => throw Errors.UnknownEnumValue(onBattlefield),
         };
       }
@@ -458,8 +458,8 @@ namespace Dreamtides.Services
       {
         return inVoid switch
         {
-          DisplayPlayer.User => Registry.Layout.UserVoid,
-          DisplayPlayer.Enemy => Registry.Layout.EnemyVoid,
+          DisplayPlayer.User => Registry.BattleLayout.UserVoid,
+          DisplayPlayer.Enemy => Registry.BattleLayout.EnemyVoid,
           _ => throw Errors.UnknownEnumValue(inVoid),
         };
       }
@@ -468,8 +468,8 @@ namespace Dreamtides.Services
       {
         return inPlayerStatus switch
         {
-          DisplayPlayer.User => Registry.Layout.UserStatusDisplay,
-          DisplayPlayer.Enemy => Registry.Layout.EnemyStatusDisplay,
+          DisplayPlayer.User => Registry.BattleLayout.UserStatusDisplay,
+          DisplayPlayer.Enemy => Registry.BattleLayout.EnemyStatusDisplay,
           _ => throw Errors.UnknownEnumValue(inPlayerStatus),
         };
       }
@@ -478,10 +478,10 @@ namespace Dreamtides.Services
       {
         return onStack switch
         {
-          StackType.Default => Registry.Layout.DefaultStack,
-          StackType.TargetingUserBattlefield => Registry.Layout.TargetingUserStack,
-          StackType.TargetingEnemyBattlefield => Registry.Layout.TargetingEnemyStack,
-          StackType.TargetingBothBattlefields => Registry.Layout.TargetingBothStack,
+          StackType.Default => Registry.BattleLayout.DefaultStack,
+          StackType.TargetingUserBattlefield => Registry.BattleLayout.TargetingUserStack,
+          StackType.TargetingEnemyBattlefield => Registry.BattleLayout.TargetingEnemyStack,
+          StackType.TargetingBothBattlefields => Registry.BattleLayout.TargetingBothStack,
           _ => throw Errors.UnknownEnumValue(onStack),
         };
       }
@@ -490,8 +490,8 @@ namespace Dreamtides.Services
       {
         return inDreamwell switch
         {
-          DisplayPlayer.User => Registry.Layout.UserDreamwell,
-          DisplayPlayer.Enemy => Registry.Layout.EnemyDreamwell,
+          DisplayPlayer.User => Registry.BattleLayout.UserDreamwell,
+          DisplayPlayer.Enemy => Registry.BattleLayout.EnemyDreamwell,
           _ => throw Errors.UnknownEnumValue(inDreamwell),
         };
       }
@@ -504,7 +504,7 @@ namespace Dreamtides.Services
         }
         else
         {
-          return Registry.Layout.Offscreen;
+          return Registry.BattleLayout.Offscreen;
         }
       }
 
@@ -512,23 +512,23 @@ namespace Dreamtides.Services
       {
         return cardOrderSelectorTarget switch
         {
-          CardOrderSelectionTargetDiscriminants.Deck => Registry.Layout.CardOrderSelector,
-          CardOrderSelectionTargetDiscriminants.Void => Registry.Layout.CardOrderSelectorVoid,
+          CardOrderSelectionTargetDiscriminants.Deck => Registry.BattleLayout.CardOrderSelector,
+          CardOrderSelectionTargetDiscriminants.Void => Registry.BattleLayout.CardOrderSelectorVoid,
           _ => throw Errors.UnknownEnumValue(cardOrderSelectorTarget),
         };
       }
 
       if (position.PositionClass.InBanished is { } _)
       {
-        return Registry.Layout.Offscreen;
+        return Registry.BattleLayout.Offscreen;
       }
 
       if (position.PositionClass.AboveVoid is { } aboveVoid)
       {
         return aboveVoid switch
         {
-          DisplayPlayer.User => Registry.Layout.AboveUserVoid,
-          DisplayPlayer.Enemy => Registry.Layout.AboveEnemyVoid,
+          DisplayPlayer.User => Registry.BattleLayout.AboveUserVoid,
+          DisplayPlayer.Enemy => Registry.BattleLayout.AboveEnemyVoid,
           _ => throw Errors.UnknownEnumValue(aboveVoid),
         };
       }

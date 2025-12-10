@@ -41,8 +41,11 @@ namespace Dreamtides.Services
         card.ApplyPreview(cardPreview, _previewTextColor);
       }
 
-      Registry.Layout.UserStatusDisplay.ApplyPlayerPreview(_current.User, _previewTextColor);
-      Registry.Layout.EnemyStatusDisplay.ApplyPlayerPreview(_current.Enemy, _previewTextColor);
+      Registry.BattleLayout.UserStatusDisplay.ApplyPlayerPreview(_current.User, _previewTextColor);
+      Registry.BattleLayout.EnemyStatusDisplay.ApplyPlayerPreview(
+        _current.Enemy,
+        _previewTextColor
+      );
 
       if (_current.PreviewMessage != null)
       {
@@ -63,8 +66,8 @@ namespace Dreamtides.Services
         card.ClearPreview();
       }
 
-      Registry.Layout.UserStatusDisplay.ClearPlayerPreview();
-      Registry.Layout.EnemyStatusDisplay.ClearPlayerPreview();
+      Registry.BattleLayout.UserStatusDisplay.ClearPlayerPreview();
+      Registry.BattleLayout.EnemyStatusDisplay.ClearPlayerPreview();
     }
   }
 }

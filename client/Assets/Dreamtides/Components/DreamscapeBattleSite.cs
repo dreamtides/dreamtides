@@ -110,12 +110,12 @@ namespace Dreamtides.Components
 
     public override void OnOpenedSite()
     {
-      Registry.Layout.Contents.SetActive(true);
+      Registry.BattleLayout.Contents.SetActive(true);
     }
 
     CinemachineCamera ResolveBattleCamera()
     {
-      return RequireCamera(Registry.Layout.BattleCamera, "BattleCamera");
+      return RequireCamera(Registry.BattleLayout.BattleCamera, "BattleCamera");
     }
 
     Transform ResolveBattleAnchor(IGameViewport viewport)

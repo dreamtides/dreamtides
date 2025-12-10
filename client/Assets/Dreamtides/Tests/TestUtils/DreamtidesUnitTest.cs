@@ -32,8 +32,8 @@ namespace Dreamtides.Tests.TestUtils
     readonly List<GameObject> _createdObjects = new();
 
     Registry? _registry;
-    GameLayout? _portraitLayout;
-    GameLayout? _landscapeLayout;
+    BattleLayout? _portraitLayout;
+    BattleLayout? _landscapeLayout;
     GameMode _gameMode = GameMode.Quest;
     TestConfiguration? _testConfiguration;
     FakeSoundService? _fakeSoundService;
@@ -42,10 +42,10 @@ namespace Dreamtides.Tests.TestUtils
     protected Registry Registry =>
       _registry ?? throw new InvalidOperationException("Registry not initialized");
 
-    protected GameLayout LandscapeLayout =>
+    protected BattleLayout LandscapeLayout =>
       _landscapeLayout ?? throw new InvalidOperationException("Landscape layout not initialized");
 
-    protected GameLayout PortraitLayout =>
+    protected BattleLayout PortraitLayout =>
       _portraitLayout ?? throw new InvalidOperationException("Portrait layout not initialized");
 
     protected TestConfiguration TestConfiguration =>

@@ -24,10 +24,10 @@ namespace Dreamtides.Services
     public static TestConfiguration? TestConfiguration { get; set; }
 
     [SerializeField]
-    internal GameLayout? _portraitLayout;
+    internal BattleLayout? _portraitLayout;
 
     [SerializeField]
-    internal GameLayout? _landscapeLayout;
+    internal BattleLayout? _landscapeLayout;
 
     bool _isLandscape = false;
     TestConfiguration? _activeTestConfiguration;
@@ -42,7 +42,8 @@ namespace Dreamtides.Services
 
     public bool IsMobileDevice => UnityEngine.Device.Application.isMobilePlatform;
 
-    public GameLayout Layout => IsLandscape ? Check(_landscapeLayout) : Check(_portraitLayout);
+    public BattleLayout BattleLayout =>
+      IsLandscape ? Check(_landscapeLayout) : Check(_portraitLayout);
 
     [SerializeField]
     internal Camera _mainCamera = null!;
@@ -446,13 +447,13 @@ namespace Dreamtides.Services
       if (mode == GameMode.Battle)
       {
         CinemachineBrain.enabled = false;
-        MainCamera.transform.position = Layout.CameraPosition.position;
-        MainCamera.transform.rotation = Layout.CameraPosition.rotation;
-        _cameraAdjuster.AdjustFieldOfView(Layout.BattleCameraBounds);
+        MainCamera.transform.position = BattleLayout.CameraPosition.position;
+        MainCamera.transform.rotation = BattleLayout.CameraPosition.rotation;
+        _cameraAdjuster.AdjustFieldOfView(BattleLayout.BattleCameraBounds);
       }
       else
       {
-        Layout.Contents.SetActive(false);
+        BattleLayout.Contents.SetActive(false);
       }
     }
   }

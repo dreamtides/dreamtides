@@ -44,7 +44,7 @@ namespace Dreamtides.Animations
 
       if (!shouldShowOnLeft)
       {
-        _hidCloseButton = service.Registry.Layout.Browser.SetCloseButtonVisible(false);
+        _hidCloseButton = service.Registry.BattleLayout.Browser.SetCloseButtonVisible(false);
       }
 
       if (!forCardInHand)
@@ -57,8 +57,8 @@ namespace Dreamtides.Animations
         }
 
         var anchor = shouldShowOnLeft
-          ? service.Registry.Layout.InfoZoomLeft
-          : service.Registry.Layout.InfoZoomRight;
+          ? service.Registry.BattleLayout.InfoZoomLeft
+          : service.Registry.BattleLayout.InfoZoomRight;
         _currentInfoZoom.transform.SetParent(anchor);
         _currentInfoZoom.transform.localPosition = Vector3.zero;
         _currentInfoZoom.transform.localScale = Vector3.one;
@@ -78,8 +78,8 @@ namespace Dreamtides.Animations
       if (card.CardView.Revealed?.InfoZoomData?.SupplementalCardInfo is { } info)
       {
         var infoAnchor = shouldShowOnLeft
-          ? service.Registry.Layout.SupplementalCardInfoLeft
-          : service.Registry.Layout.SupplementalCardInfoRight;
+          ? service.Registry.BattleLayout.SupplementalCardInfoLeft
+          : service.Registry.BattleLayout.SupplementalCardInfoRight;
         var screenPosition = service.Registry.MainCamera.WorldToScreenPoint(infoAnchor.position);
         var width = Mathf.Min(
           275f,
@@ -140,7 +140,7 @@ namespace Dreamtides.Animations
       service.Registry.DocumentService.ClearInfoZoom();
       if (_hidCloseButton)
       {
-        service.Registry.Layout.Browser.SetCloseButtonVisible(true);
+        service.Registry.BattleLayout.Browser.SetCloseButtonVisible(true);
         _hidCloseButton = false;
       }
 

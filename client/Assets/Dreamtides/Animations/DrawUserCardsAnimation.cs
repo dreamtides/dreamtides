@@ -53,7 +53,7 @@ namespace Dreamtides.Animations
       sequence.Insert(
         0,
         card.transform.DOMove(
-            service.Registry.Layout.DrawnCardsPosition.transform.position,
+            service.Registry.BattleLayout.DrawnCardsPosition.transform.position,
             moveDuration
           )
           .SetEase(Ease.OutCubic)
@@ -61,7 +61,7 @@ namespace Dreamtides.Animations
       sequence.Insert(
         0,
         card.transform.DORotateQuaternion(
-          service.Registry.Layout.DrawnCardsPosition.transform.rotation,
+          service.Registry.BattleLayout.DrawnCardsPosition.transform.rotation,
           moveDuration
         )
       );

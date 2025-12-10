@@ -37,7 +37,7 @@ namespace Dreamtides.Layout
       if (!_isOpen)
       {
         OnShowStart();
-        registry.Layout.BrowserBackground.Show(0.75f, sequence);
+        registry.BattleLayout.BrowserBackground.Show(0.75f, sequence);
         if (sequence != null)
         {
           sequence.AppendCallback(OnShow);
@@ -60,7 +60,7 @@ namespace Dreamtides.Layout
       if (_isOpen)
       {
         OnHideStart();
-        registry.Layout.BrowserBackground.Hide(sequence);
+        registry.BattleLayout.BrowserBackground.Hide(sequence);
         if (sequence != null)
         {
           sequence.AppendCallback(OnHidden);

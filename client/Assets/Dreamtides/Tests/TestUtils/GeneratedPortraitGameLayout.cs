@@ -18,11 +18,14 @@ namespace Dreamtides.Tests.TestUtils
 {
   public class GeneratedPortraitGameLayout
   {
-    public static GameLayout Create(List<GameObject> createdObjects, GeneratedCanvas? canvas = null)
+    public static BattleLayout Create(
+      List<GameObject> createdObjects,
+      GeneratedCanvas? canvas = null
+    )
     {
       var layoutGo = new GameObject("PortraitLayout");
       createdObjects.Add(layoutGo);
-      var layout = layoutGo.AddComponent<GameLayout>();
+      var layout = layoutGo.AddComponent<BattleLayout>();
 
       var cameraPositionGo = new GameObject("PortraitBattleCamera");
       createdObjects.Add(cameraPositionGo);

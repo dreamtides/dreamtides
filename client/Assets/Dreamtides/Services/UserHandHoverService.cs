@@ -96,7 +96,7 @@ namespace Dreamtides.Services
         return;
       }
 
-      var userHand = Registry.Layout.UserHand;
+      var userHand = Registry.BattleLayout.UserHand;
       if (userHand.Objects.Count == 0)
       {
         return;
@@ -141,7 +141,7 @@ namespace Dreamtides.Services
 
     bool ShouldActivateHover()
     {
-      var userHand = Registry.Layout.UserHand;
+      var userHand = Registry.BattleLayout.UserHand;
       if (userHand.Objects.Count == 0)
       {
         return false;
@@ -219,7 +219,7 @@ namespace Dreamtides.Services
         JumpPosition = jumpPosition.Value,
         JumpRotation = Quaternion.Euler(
           Constants.CameraXAngle,
-          Registry.Layout.BattleYRotation(),
+          Registry.BattleLayout.BattleYRotation(),
           z: 0
         ),
         CurrentTween = null,
@@ -231,7 +231,7 @@ namespace Dreamtides.Services
 
     public Vector3? CalculateJumpPosition(Card card)
     {
-      var targetPosition = Registry.Layout.UserHand.CalculateObjectPosition(card);
+      var targetPosition = Registry.BattleLayout.UserHand.CalculateObjectPosition(card);
       if (targetPosition == null)
       {
         return null;
@@ -246,7 +246,8 @@ namespace Dreamtides.Services
         horizontalPosition
       );
 
-      var rotatedOffset = Quaternion.Euler(x: 0, Registry.Layout.BattleYRotation(), z: 0) * offset;
+      var rotatedOffset =
+        Quaternion.Euler(x: 0, Registry.BattleLayout.BattleYRotation(), z: 0) * offset;
       return targetPosition.Value + rotatedOffset;
     }
 
@@ -310,8 +311,8 @@ namespace Dreamtides.Services
         state.CurrentTween.Kill();
       }
 
-      var originalPosition = Registry.Layout.UserHand.CalculateObjectPosition(state.Card);
-      var originalRotation = Registry.Layout.UserHand.CalculateObjectRotation(state.Card);
+      var originalPosition = Registry.BattleLayout.UserHand.CalculateObjectPosition(state.Card);
+      var originalRotation = Registry.BattleLayout.UserHand.CalculateObjectRotation(state.Card);
       if (originalPosition == null || originalRotation == null)
       {
         Registry.CardAnimationService.ClearInfoZoom();
@@ -376,7 +377,7 @@ namespace Dreamtides.Services
 
     void UpdateAllAnimations()
     {
-      var userHand = Registry.Layout.UserHand;
+      var userHand = Registry.BattleLayout.UserHand;
       var toRemove = new List<string>();
 
       foreach (var kvp in _animationStates)
@@ -436,7 +437,7 @@ namespace Dreamtides.Services
 
       _lastRecoveryCheck = Time.time;
 
-      var userHand = Registry.Layout.UserHand;
+      var userHand = Registry.BattleLayout.UserHand;
       if (userHand.Objects.Count == 0)
       {
         return;

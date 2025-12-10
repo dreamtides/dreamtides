@@ -93,7 +93,7 @@ namespace Dreamtides.Services
     /// </summary>
     public HashSet<GameContext>? AllowedContextForClicks()
     {
-      if (Registry.Layout.Browser.Objects.Count > 0)
+      if (Registry.BattleLayout.Browser.Objects.Count > 0)
       {
         return new HashSet<GameContext>
         {

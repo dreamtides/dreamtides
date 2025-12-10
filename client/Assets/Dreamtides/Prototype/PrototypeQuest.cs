@@ -386,7 +386,7 @@ public class PrototypeQuest : Service
   IEnumerator ApplyBattleStartupRoutine()
   {
     var registry = Registry;
-    var layout = registry.Layout;
+    var layout = registry.BattleLayout;
     var cameraPosition = layout.CameraPosition;
     registry.MainCamera.transform.SetPositionAndRotation(
       cameraPosition.position,

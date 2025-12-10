@@ -63,13 +63,13 @@ namespace Dreamtides.Components
       switch (_type)
       {
         case CardBrowserType.UserDeck:
-          return Registry.Layout.UserDeck.Objects.Count == 0;
+          return Registry.BattleLayout.UserDeck.Objects.Count == 0;
         case CardBrowserType.EnemyDeck:
-          return Registry.Layout.EnemyDeck.Objects.Count == 0;
+          return Registry.BattleLayout.EnemyDeck.Objects.Count == 0;
         case CardBrowserType.UserVoid:
-          return Registry.Layout.UserVoid.Objects.Count == 0;
+          return Registry.BattleLayout.UserVoid.Objects.Count == 0;
         case CardBrowserType.EnemyVoid:
-          return Registry.Layout.EnemyVoid.Objects.Count == 0;
+          return Registry.BattleLayout.EnemyVoid.Objects.Count == 0;
         case CardBrowserType.UserStatus:
           return false;
         case CardBrowserType.EnemyStatus:

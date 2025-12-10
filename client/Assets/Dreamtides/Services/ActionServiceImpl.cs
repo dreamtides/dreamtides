@@ -579,38 +579,40 @@ namespace Dreamtides.Services
         if (command.UpdateBattle != null)
         {
           Registry.LoggingService.Log("ActionService", "Applying command: UpdateBattle");
-          Registry.Layout.UserStatusDisplay.UpdatePlayerView(
+          Registry.BattleLayout.UserStatusDisplay.UpdatePlayerView(
             command.UpdateBattle.Battle.User,
             animate
           );
-          Registry.Layout.EnemyStatusDisplay.UpdatePlayerView(
+          Registry.BattleLayout.EnemyStatusDisplay.UpdatePlayerView(
             command.UpdateBattle.Battle.Enemy,
             animate
           );
           Registry.DocumentService.RenderScreenOverlay(
             command.UpdateBattle.Battle.Interface?.ScreenOverlay
           );
-          Registry.Layout.CardOrderSelector.View = command
+          Registry.BattleLayout.CardOrderSelector.View = command
             .UpdateBattle
             .Battle
             .Interface
             ?.CardOrderSelector;
-          Registry.Layout.PrimaryActionButton.SetView(
+          Registry.BattleLayout.PrimaryActionButton.SetView(
             command.UpdateBattle.Battle.Interface?.PrimaryActionButton,
             null
           );
-          Registry.Layout.SecondaryActionButton.SetView(
+          Registry.BattleLayout.SecondaryActionButton.SetView(
             command.UpdateBattle.Battle.Interface?.SecondaryActionButton
           );
-          Registry.Layout.IncrementActionButton.SetView(
+          Registry.BattleLayout.IncrementActionButton.SetView(
             command.UpdateBattle.Battle.Interface?.IncrementButton
           );
-          Registry.Layout.DecrementActionButton.SetView(
+          Registry.BattleLayout.DecrementActionButton.SetView(
             command.UpdateBattle.Battle.Interface?.DecrementButton
           );
-          Registry.Layout.UndoButton.SetView(command.UpdateBattle.Battle.Interface?.UndoButton);
-          Registry.Layout.DevButton.SetView(command.UpdateBattle.Battle.Interface?.DevButton);
-          Registry.Layout.CloseBrowserButton.CloseAction =
+          Registry.BattleLayout.UndoButton.SetView(
+            command.UpdateBattle.Battle.Interface?.UndoButton
+          );
+          Registry.BattleLayout.DevButton.SetView(command.UpdateBattle.Battle.Interface?.DevButton);
+          Registry.BattleLayout.CloseBrowserButton.CloseAction =
             command.UpdateBattle.Battle.Interface?.Browser?.CloseButton?.ToGameAction();
           coroutines.Add(
             StartCoroutine(
@@ -684,7 +686,7 @@ namespace Dreamtides.Services
             ("messageType", command.DisplayGameMessage.Value.ToString())
           );
           coroutines.Add(
-            StartCoroutine(Registry.Layout.GameMessage.Show(command.DisplayGameMessage.Value))
+            StartCoroutine(Registry.BattleLayout.GameMessage.Show(command.DisplayGameMessage.Value))
           );
         }
 
@@ -740,7 +742,7 @@ namespace Dreamtides.Services
         if (command.DisplayEnemyMessage != null)
         {
           Registry.LoggingService.Log("ActionService", "Applying command: DisplayEnemyMessage");
-          Registry.Layout.EnemyMessage.Show(command.DisplayEnemyMessage);
+          Registry.BattleLayout.EnemyMessage.Show(command.DisplayEnemyMessage);
         }
 
         if (command.PlayAudioClip != null)

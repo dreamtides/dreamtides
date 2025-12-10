@@ -49,12 +49,15 @@ namespace Dreamtides.Services
 
       moveSequence.Insert(
         0,
-        card.transform.DOMove(Registry.Layout.DreamwellDisplay.position, moveDuration)
+        card.transform.DOMove(Registry.BattleLayout.DreamwellDisplay.position, moveDuration)
           .SetEase(Ease.OutCubic)
       );
       moveSequence.Insert(
         0,
-        card.transform.DORotate(Registry.Layout.DreamwellDisplay.rotation.eulerAngles, moveDuration)
+        card.transform.DORotate(
+          Registry.BattleLayout.DreamwellDisplay.rotation.eulerAngles,
+          moveDuration
+        )
       );
 
       var flipDuration = TweenUtils.FlipAnimationDurationSeconds / 2f * _durationMultiplier;
@@ -69,7 +72,7 @@ namespace Dreamtides.Services
       Registry.SoundService.Play(_revealSound);
 
       // Now start the flip sequence
-      var targetRotation = Registry.Layout.DreamwellDisplay.rotation;
+      var targetRotation = Registry.BattleLayout.DreamwellDisplay.rotation;
       var flippedRotation = targetRotation * Quaternion.Euler(150, 0, 0);
 
       flipSequence

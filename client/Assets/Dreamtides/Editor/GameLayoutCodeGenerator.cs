@@ -14,8 +14,8 @@ namespace Dreamtides.Editors
 {
   public class GameLayoutCodeGenerator : EditorWindow
   {
-    GameLayout? _portraitLayout;
-    GameLayout? _landscapeLayout;
+    BattleLayout? _portraitLayout;
+    BattleLayout? _landscapeLayout;
     string _portraitClassName = "GeneratedPortraitGameLayout";
     string _landscapeClassName = "GeneratedLandscapeGameLayout";
 
@@ -101,10 +101,10 @@ namespace Dreamtides.Editors
       return go != null ? go.GetComponent<Canvas>() : null;
     }
 
-    static GameLayout? FindRootGameLayout(string name)
+    static BattleLayout? FindRootGameLayout(string name)
     {
       var go = FindRootGameObject(name);
-      return go != null ? go.GetComponent<GameLayout>() : null;
+      return go != null ? go.GetComponent<BattleLayout>() : null;
     }
 
     static GameObject? FindRootGameObject(string name)
@@ -165,9 +165,9 @@ namespace Dreamtides.Editors
         EditorGUILayout.ObjectField(
           "Portrait GameLayout",
           _portraitLayout,
-          typeof(GameLayout),
+          typeof(BattleLayout),
           true
-        ) as GameLayout;
+        ) as BattleLayout;
       _portraitClassName = EditorGUILayout.TextField("Portrait Class Name", _portraitClassName);
 
       EditorGUILayout.Space();
@@ -176,9 +176,9 @@ namespace Dreamtides.Editors
         EditorGUILayout.ObjectField(
           "Landscape GameLayout",
           _landscapeLayout,
-          typeof(GameLayout),
+          typeof(BattleLayout),
           true
-        ) as GameLayout;
+        ) as BattleLayout;
       _landscapeClassName = EditorGUILayout.TextField("Landscape Class Name", _landscapeClassName);
     }
 
@@ -327,7 +327,7 @@ namespace Dreamtides.Editors
 
       var type = component.GetType();
 
-      if (type == typeof(GameLayout))
+      if (type == typeof(BattleLayout))
       {
         return true;
       }
@@ -442,7 +442,7 @@ namespace Dreamtides.Editors
       }
     }
 
-    void GenerateGameLayoutCode(GameLayout layout, string className)
+    void GenerateGameLayoutCode(BattleLayout layout, string className)
     {
       var canvasObjects = GetCanvasDescendants(_canvas);
       var utils = new CodeGeneratorUtils(IsGameLayoutSupportedComponent, canvasObjects);

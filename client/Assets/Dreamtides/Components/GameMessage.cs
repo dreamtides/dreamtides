@@ -81,9 +81,9 @@ namespace Dreamtides.Components
 
       if (moveToTop)
       {
-        _registry.Layout.BattlefieldOverlay.gameObject.SetActive(true);
-        _registry.Layout.BattlefieldOverlay.color = new Color(0, 0, 0, 0);
-        _registry.Layout.BattlefieldOverlay.DOFade(1.0f, 0.3f);
+        _registry.BattleLayout.BattlefieldOverlay.gameObject.SetActive(true);
+        _registry.BattleLayout.BattlefieldOverlay.color = new Color(0, 0, 0, 0);
+        _registry.BattleLayout.BattlefieldOverlay.DOFade(1.0f, 0.3f);
         var sequence = TweenUtils
           .Sequence("MoveToTop")
           .Insert(0, content.Text.transform.DOMove(_top.position, 0.3f));

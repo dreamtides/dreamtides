@@ -29,8 +29,8 @@ namespace Dreamtides.Tests.TestUtils
       List<GameObject> createdObjects,
       GeneratedCanvas canvas,
       GeneratedMainCamera mainCamera,
-      GameLayout portraitLayout,
-      GameLayout landscapeLayout
+      BattleLayout portraitLayout,
+      BattleLayout landscapeLayout
     )
     {
       var result = new GeneratedRegistry();

@@ -7,14 +7,14 @@ namespace Dreamtides.Services
 {
   public class CapabilitiesService : Service
   {
-    public bool CanPlayCards() => !Registry.Layout.BrowserBackground.IsVisible;
+    public bool CanPlayCards() => !Registry.BattleLayout.BrowserBackground.IsVisible;
 
     /// <summary>
     /// Returns true if a card browser is currently open, e.g. to select a card
     /// or view the contents of the void.
     /// </summary>
     public bool AnyBrowserOpen() =>
-      Registry.Layout.Browser.IsOpen || Registry.Layout.CardOrderSelector.IsOpen;
+      Registry.BattleLayout.Browser.IsOpen || Registry.BattleLayout.CardOrderSelector.IsOpen;
 
     /// <summary>
     /// Can the user currently info zoom a card that exists in the provided
@@ -33,8 +33,8 @@ namespace Dreamtides.Services
       switch (gameContext)
       {
         case GameContext.Browser:
-          return Registry.Layout.Browser.Objects.Count > 1
-            || Registry.Layout.CardOrderSelector.Objects.Count > 1;
+          return Registry.BattleLayout.Browser.Objects.Count > 1
+            || Registry.BattleLayout.CardOrderSelector.Objects.Count > 1;
         case GameContext.BrowserOverlay:
         case GameContext.Dragging:
           return true;

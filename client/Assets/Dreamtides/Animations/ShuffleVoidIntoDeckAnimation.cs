@@ -18,10 +18,13 @@ namespace Dreamtides.Animations
     {
       var (source, destination) = command.Player switch
       {
-        DisplayPlayer.User => (service.Registry.Layout.UserVoid, service.Registry.Layout.UserDeck),
+        DisplayPlayer.User => (
+          service.Registry.BattleLayout.UserVoid,
+          service.Registry.BattleLayout.UserDeck
+        ),
         DisplayPlayer.Enemy => (
-          service.Registry.Layout.EnemyVoid,
-          service.Registry.Layout.EnemyDeck
+          service.Registry.BattleLayout.EnemyVoid,
+          service.Registry.BattleLayout.EnemyDeck
         ),
         _ => (null, null),
       };
@@ -106,8 +109,8 @@ namespace Dreamtides.Animations
         // 1) Move to drawn position.
         yield return CardAnimationUtils.MoveCardToPosition(
           card,
-          service.Registry.Layout.DrawnCardsPosition.transform.position,
-          service.Registry.Layout.DrawnCardsPosition.transform.rotation,
+          service.Registry.BattleLayout.DrawnCardsPosition.transform.position,
+          service.Registry.BattleLayout.DrawnCardsPosition.transform.rotation,
           legDuration
         );
 
