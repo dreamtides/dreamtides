@@ -105,7 +105,7 @@ namespace Dreamtides.Sites
 
     public override void OnOpenedSite()
     {
-      Registry.BattleLayout.Contents.SetActive(true);
+      // Registry.BattleLayout.Contents.SetActive(true);
     }
 
     void AlignBattleLayout(IGameViewport viewport)

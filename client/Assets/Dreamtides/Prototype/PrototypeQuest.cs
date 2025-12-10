@@ -4,7 +4,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Dreamtides.Buttons;
 using Dreamtides.Components;
 using Dreamtides.Prototype;
 using Dreamtides.Schema;
@@ -30,9 +29,9 @@ public class PrototypeQuest : Service
   PrototypeQuestDraftFlow _draftFlow = null!;
   PrototypeQuestShopFlow _shopFlow = null!;
   PrototypeQuestTemptingOfferFlow _temptingOfferFlow = null!;
+  PrototypeQuestBattleFlow _battleFlow = null!;
   List<CardOverride>? _pendingShopOverrides;
   bool _hasPendingShopOverridesUpdate;
-  bool _battleStartupApplied;
 
   // Public API to configure arbitrary shop card overrides (index-based)
   public void ConfigureShopOverrides(params CardOverride[] overrides)
@@ -59,12 +58,21 @@ public class PrototypeQuest : Service
 
   void EnsureFlowsInitialized()
   {
-    if (_draftFlow != null && _shopFlow != null && _temptingOfferFlow != null)
+    if (
+      _draftFlow != null
+      && _shopFlow != null
+      && _temptingOfferFlow != null
+      && _battleFlow != null
+    )
     {
       return;
     }
     var registry = Registry;
     var startCoroutine = new Func<IEnumerator, Coroutine>(StartCoroutine);
+    if (_battleFlow == null)
+    {
+      _battleFlow = new PrototypeQuestBattleFlow(registry);
+    }
     if (_temptingOfferFlow == null)
     {
       _temptingOfferFlow = new PrototypeQuestTemptingOfferFlow(
@@ -267,7 +275,10 @@ public class PrototypeQuest : Service
 
     if (name == "FocusBattleCamera")
     {
-      StartCoroutine(FocusSiteFlow("FocusBattleCamera", null, ApplyBattleStartupRoutine));
+      StartCoroutine(
+        FocusSiteFlow("FocusBattleCamera", null, () => _battleFlow.ApplyBattleStartupRoutine())
+      );
+      return;
     }
 
     var parts = name.Split('/');
@@ -382,38 +393,6 @@ public class PrototypeQuest : Service
       }
       yield return StartCoroutine(routine);
     }
-  }
-
-  IEnumerator ApplyBattleStartupRoutine()
-  {
-    var registry = Registry;
-    var layout = registry.BattleLayout;
-    var cameraPosition = layout.CameraPosition;
-    registry.MainCamera.transform.SetPositionAndRotation(
-      cameraPosition.position,
-      cameraPosition.rotation
-    );
-    registry._cameraAdjuster.AdjustFieldOfView(layout.BattleCameraBounds);
-    var active = true;
-    layout.UserStatusDisplay.TotalSpark.gameObject.SetActive(active);
-    layout.UserStatusDisplay.gameObject.SetActive(active);
-    layout.EnemyStatusDisplay.TotalSpark.gameObject.SetActive(active);
-    layout.EnemyStatusDisplay.gameObject.SetActive(active);
-    layout.PrimaryActionButton.gameObject.SetActive(active);
-    layout.SecondaryActionButton.gameObject.SetActive(active);
-    layout.IncrementActionButton.gameObject.SetActive(active);
-    layout.DecrementActionButton.gameObject.SetActive(active);
-    var browserButtons = layout.GetComponentsInChildren<CardBrowserButton>();
-    for (var i = 0; i < browserButtons.Length; i++)
-    {
-      browserButtons[i].gameObject.SetActive(active);
-    }
-    if (!_battleStartupApplied)
-    {
-      registry.ActionService.TriggerReconnect();
-      _battleStartupApplied = true;
-    }
-    yield break;
   }
 
   IEnumerator ReturnToMap()

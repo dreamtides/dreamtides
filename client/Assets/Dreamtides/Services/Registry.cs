@@ -58,6 +58,8 @@ namespace Dreamtides.Services
     [SerializeField]
     internal GameCamera _cameraAdjuster = null!;
 
+    public GameCamera CameraAdjuster => Check(_cameraAdjuster);
+
     [SerializeField]
     internal Canvas _canvas = null!;
     public Canvas Canvas => Check(_canvas);
