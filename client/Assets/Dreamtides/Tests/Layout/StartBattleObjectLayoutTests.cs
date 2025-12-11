@@ -1,7 +1,9 @@
 #nullable enable
 
 using System.Collections;
+using Dreamtides.Components;
 using Dreamtides.Layout;
+using Dreamtides.Schema;
 using Dreamtides.Services;
 using Dreamtides.Tests.TestUtils;
 using NUnit.Framework;
@@ -835,11 +837,376 @@ namespace Dreamtides.Tests.Layout
       Assert.That(card2.transform.position.x, Is.GreaterThan(layout.transform.position.x));
     }
 
+    [UnityTest]
+    public IEnumerator OneDreamsignLandscape16x9IsFullyOnScreen()
+    {
+      var viewport = CreateViewport(GameViewResolution.Resolution16x9);
+      yield return Initialize(viewport);
+      var layout = GetStartBattleLayout();
+
+      var identityCard1 = CreateTestCard();
+      var identityCard2 = CreateTestCard();
+      SetIdentityCardPosition(identityCard1, isUserSide: true);
+      SetIdentityCardPosition(identityCard2, isUserSide: false);
+
+      var dreamsign = CreateDreamsign(isUserSide: true);
+      layout.Add(identityCard1);
+      layout.Add(identityCard2);
+      layout.Add(dreamsign);
+      layout.ApplyLayout(sequence: null);
+
+      AssertDreamsignBoxColliderIsOnScreen(viewport, dreamsign, "User dreamsign 1");
+    }
+
+    [UnityTest]
+    public IEnumerator TwoDreamsignsLandscape16x9AreFullyOnScreen()
+    {
+      var viewport = CreateViewport(GameViewResolution.Resolution16x9);
+      yield return Initialize(viewport);
+      var layout = GetStartBattleLayout();
+
+      var identityCard1 = CreateTestCard();
+      var identityCard2 = CreateTestCard();
+      SetIdentityCardPosition(identityCard1, isUserSide: true);
+      SetIdentityCardPosition(identityCard2, isUserSide: false);
+
+      var dreamsign1 = CreateDreamsign(isUserSide: true);
+      var dreamsign2 = CreateDreamsign(isUserSide: true);
+      layout.Add(identityCard1);
+      layout.Add(identityCard2);
+      layout.Add(dreamsign1);
+      layout.Add(dreamsign2);
+      layout.ApplyLayout(sequence: null);
+
+      AssertDreamsignBoxColliderIsOnScreen(viewport, dreamsign1, "User dreamsign 1");
+      AssertDreamsignBoxColliderIsOnScreen(viewport, dreamsign2, "User dreamsign 2");
+    }
+
+    [UnityTest]
+    public IEnumerator ThreeDreamsignsLandscape16x9AreFullyOnScreen()
+    {
+      var viewport = CreateViewport(GameViewResolution.Resolution16x9);
+      yield return Initialize(viewport);
+      var layout = GetStartBattleLayout();
+
+      var identityCard1 = CreateTestCard();
+      var identityCard2 = CreateTestCard();
+      SetIdentityCardPosition(identityCard1, isUserSide: true);
+      SetIdentityCardPosition(identityCard2, isUserSide: false);
+
+      var dreamsign1 = CreateDreamsign(isUserSide: true);
+      var dreamsign2 = CreateDreamsign(isUserSide: true);
+      var dreamsign3 = CreateDreamsign(isUserSide: true);
+      layout.Add(identityCard1);
+      layout.Add(identityCard2);
+      layout.Add(dreamsign1);
+      layout.Add(dreamsign2);
+      layout.Add(dreamsign3);
+      layout.ApplyLayout(sequence: null);
+
+      AssertDreamsignBoxColliderIsOnScreen(viewport, dreamsign1, "User dreamsign 1");
+      AssertDreamsignBoxColliderIsOnScreen(viewport, dreamsign2, "User dreamsign 2");
+      AssertDreamsignBoxColliderIsOnScreen(viewport, dreamsign3, "User dreamsign 3");
+    }
+
+    [UnityTest]
+    public IEnumerator FourDreamsignsLandscape16x9AreFullyOnScreen()
+    {
+      var viewport = CreateViewport(GameViewResolution.Resolution16x9);
+      yield return Initialize(viewport);
+      var layout = GetStartBattleLayout();
+
+      var identityCard1 = CreateTestCard();
+      var identityCard2 = CreateTestCard();
+      SetIdentityCardPosition(identityCard1, isUserSide: true);
+      SetIdentityCardPosition(identityCard2, isUserSide: false);
+
+      var dreamsign1 = CreateDreamsign(isUserSide: true);
+      var dreamsign2 = CreateDreamsign(isUserSide: true);
+      var dreamsign3 = CreateDreamsign(isUserSide: true);
+      var dreamsign4 = CreateDreamsign(isUserSide: true);
+      layout.Add(identityCard1);
+      layout.Add(identityCard2);
+      layout.Add(dreamsign1);
+      layout.Add(dreamsign2);
+      layout.Add(dreamsign3);
+      layout.Add(dreamsign4);
+      layout.ApplyLayout(sequence: null);
+
+      AssertDreamsignBoxColliderIsOnScreen(viewport, dreamsign1, "User dreamsign 1");
+      AssertDreamsignBoxColliderIsOnScreen(viewport, dreamsign2, "User dreamsign 2");
+      AssertDreamsignBoxColliderIsOnScreen(viewport, dreamsign3, "User dreamsign 3");
+      AssertDreamsignBoxColliderIsOnScreen(viewport, dreamsign4, "User dreamsign 4");
+    }
+
+    [UnityTest]
+    public IEnumerator FourDreamsignsPortraitIPhone12AreFullyOnScreen()
+    {
+      var viewport = CreateViewport(GameViewResolution.ResolutionIPhone12);
+      yield return Initialize(viewport);
+      var layout = GetStartBattleLayout();
+
+      var identityCard1 = CreateTestCard();
+      var identityCard2 = CreateTestCard();
+      SetIdentityCardPosition(identityCard1, isUserSide: true);
+      SetIdentityCardPosition(identityCard2, isUserSide: false);
+
+      var dreamsign1 = CreateDreamsign(isUserSide: true);
+      var dreamsign2 = CreateDreamsign(isUserSide: true);
+      var dreamsign3 = CreateDreamsign(isUserSide: true);
+      var dreamsign4 = CreateDreamsign(isUserSide: true);
+      layout.Add(identityCard1);
+      layout.Add(identityCard2);
+      layout.Add(dreamsign1);
+      layout.Add(dreamsign2);
+      layout.Add(dreamsign3);
+      layout.Add(dreamsign4);
+      layout.ApplyLayout(sequence: null);
+
+      AssertDreamsignBoxColliderIsOnScreen(viewport, dreamsign1, "User dreamsign 1");
+      AssertDreamsignBoxColliderIsOnScreen(viewport, dreamsign2, "User dreamsign 2");
+      AssertDreamsignBoxColliderIsOnScreen(viewport, dreamsign3, "User dreamsign 3");
+      AssertDreamsignBoxColliderIsOnScreen(viewport, dreamsign4, "User dreamsign 4");
+    }
+
+    [UnityTest]
+    public IEnumerator FourDreamsignsPortraitIPhoneSEAreFullyOnScreen()
+    {
+      var viewport = CreateViewport(GameViewResolution.ResolutionIPhoneSE);
+      yield return Initialize(viewport);
+      var layout = GetStartBattleLayout();
+
+      var identityCard1 = CreateTestCard();
+      var identityCard2 = CreateTestCard();
+      SetIdentityCardPosition(identityCard1, isUserSide: true);
+      SetIdentityCardPosition(identityCard2, isUserSide: false);
+
+      var dreamsign1 = CreateDreamsign(isUserSide: true);
+      var dreamsign2 = CreateDreamsign(isUserSide: true);
+      var dreamsign3 = CreateDreamsign(isUserSide: true);
+      var dreamsign4 = CreateDreamsign(isUserSide: true);
+      layout.Add(identityCard1);
+      layout.Add(identityCard2);
+      layout.Add(dreamsign1);
+      layout.Add(dreamsign2);
+      layout.Add(dreamsign3);
+      layout.Add(dreamsign4);
+      layout.ApplyLayout(sequence: null);
+
+      AssertDreamsignBoxColliderIsOnScreen(viewport, dreamsign1, "User dreamsign 1");
+      AssertDreamsignBoxColliderIsOnScreen(viewport, dreamsign2, "User dreamsign 2");
+      AssertDreamsignBoxColliderIsOnScreen(viewport, dreamsign3, "User dreamsign 3");
+      AssertDreamsignBoxColliderIsOnScreen(viewport, dreamsign4, "User dreamsign 4");
+    }
+
+    [UnityTest]
+    public IEnumerator FourEnemyDreamsignsLandscape16x9AreFullyOnScreen()
+    {
+      var viewport = CreateViewport(GameViewResolution.Resolution16x9);
+      yield return Initialize(viewport);
+      var layout = GetStartBattleLayout();
+
+      var identityCard1 = CreateTestCard();
+      var identityCard2 = CreateTestCard();
+      SetIdentityCardPosition(identityCard1, isUserSide: true);
+      SetIdentityCardPosition(identityCard2, isUserSide: false);
+
+      var dreamsign1 = CreateDreamsign(isUserSide: false);
+      var dreamsign2 = CreateDreamsign(isUserSide: false);
+      var dreamsign3 = CreateDreamsign(isUserSide: false);
+      var dreamsign4 = CreateDreamsign(isUserSide: false);
+      layout.Add(identityCard1);
+      layout.Add(identityCard2);
+      layout.Add(dreamsign1);
+      layout.Add(dreamsign2);
+      layout.Add(dreamsign3);
+      layout.Add(dreamsign4);
+      layout.ApplyLayout(sequence: null);
+
+      AssertDreamsignBoxColliderIsOnScreen(viewport, dreamsign1, "Enemy dreamsign 1");
+      AssertDreamsignBoxColliderIsOnScreen(viewport, dreamsign2, "Enemy dreamsign 2");
+      AssertDreamsignBoxColliderIsOnScreen(viewport, dreamsign3, "Enemy dreamsign 3");
+      AssertDreamsignBoxColliderIsOnScreen(viewport, dreamsign4, "Enemy dreamsign 4");
+    }
+
+    [UnityTest]
+    public IEnumerator FourEnemyDreamsignsPortraitIPhone12AreFullyOnScreen()
+    {
+      var viewport = CreateViewport(GameViewResolution.ResolutionIPhone12);
+      yield return Initialize(viewport);
+      var layout = GetStartBattleLayout();
+
+      var identityCard1 = CreateTestCard();
+      var identityCard2 = CreateTestCard();
+      SetIdentityCardPosition(identityCard1, isUserSide: true);
+      SetIdentityCardPosition(identityCard2, isUserSide: false);
+
+      var dreamsign1 = CreateDreamsign(isUserSide: false);
+      var dreamsign2 = CreateDreamsign(isUserSide: false);
+      var dreamsign3 = CreateDreamsign(isUserSide: false);
+      var dreamsign4 = CreateDreamsign(isUserSide: false);
+      layout.Add(identityCard1);
+      layout.Add(identityCard2);
+      layout.Add(dreamsign1);
+      layout.Add(dreamsign2);
+      layout.Add(dreamsign3);
+      layout.Add(dreamsign4);
+      layout.ApplyLayout(sequence: null);
+
+      AssertDreamsignBoxColliderIsOnScreen(viewport, dreamsign1, "Enemy dreamsign 1");
+      AssertDreamsignBoxColliderIsOnScreen(viewport, dreamsign2, "Enemy dreamsign 2");
+      AssertDreamsignBoxColliderIsOnScreen(viewport, dreamsign3, "Enemy dreamsign 3");
+      AssertDreamsignBoxColliderIsOnScreen(viewport, dreamsign4, "Enemy dreamsign 4");
+    }
+
+    [UnityTest]
+    public IEnumerator BothSidesFourDreamsignsLandscape16x9AreFullyOnScreen()
+    {
+      var viewport = CreateViewport(GameViewResolution.Resolution16x9);
+      yield return Initialize(viewport);
+      var layout = GetStartBattleLayout();
+
+      var identityCard1 = CreateTestCard();
+      var identityCard2 = CreateTestCard();
+      SetIdentityCardPosition(identityCard1, isUserSide: true);
+      SetIdentityCardPosition(identityCard2, isUserSide: false);
+
+      var userDreamsign1 = CreateDreamsign(isUserSide: true);
+      var userDreamsign2 = CreateDreamsign(isUserSide: true);
+      var userDreamsign3 = CreateDreamsign(isUserSide: true);
+      var userDreamsign4 = CreateDreamsign(isUserSide: true);
+      var enemyDreamsign1 = CreateDreamsign(isUserSide: false);
+      var enemyDreamsign2 = CreateDreamsign(isUserSide: false);
+      var enemyDreamsign3 = CreateDreamsign(isUserSide: false);
+      var enemyDreamsign4 = CreateDreamsign(isUserSide: false);
+
+      layout.Add(identityCard1);
+      layout.Add(identityCard2);
+      layout.Add(userDreamsign1);
+      layout.Add(userDreamsign2);
+      layout.Add(userDreamsign3);
+      layout.Add(userDreamsign4);
+      layout.Add(enemyDreamsign1);
+      layout.Add(enemyDreamsign2);
+      layout.Add(enemyDreamsign3);
+      layout.Add(enemyDreamsign4);
+      layout.ApplyLayout(sequence: null);
+
+      AssertDreamsignBoxColliderIsOnScreen(viewport, userDreamsign1, "User dreamsign 1");
+      AssertDreamsignBoxColliderIsOnScreen(viewport, userDreamsign2, "User dreamsign 2");
+      AssertDreamsignBoxColliderIsOnScreen(viewport, userDreamsign3, "User dreamsign 3");
+      AssertDreamsignBoxColliderIsOnScreen(viewport, userDreamsign4, "User dreamsign 4");
+      AssertDreamsignBoxColliderIsOnScreen(viewport, enemyDreamsign1, "Enemy dreamsign 1");
+      AssertDreamsignBoxColliderIsOnScreen(viewport, enemyDreamsign2, "Enemy dreamsign 2");
+      AssertDreamsignBoxColliderIsOnScreen(viewport, enemyDreamsign3, "Enemy dreamsign 3");
+      AssertDreamsignBoxColliderIsOnScreen(viewport, enemyDreamsign4, "Enemy dreamsign 4");
+    }
+
+    [UnityTest]
+    public IEnumerator BothSidesFourDreamsignsPortraitIPhone12AreFullyOnScreen()
+    {
+      var viewport = CreateViewport(GameViewResolution.ResolutionIPhone12);
+      yield return Initialize(viewport);
+      var layout = GetStartBattleLayout();
+
+      var identityCard1 = CreateTestCard();
+      var identityCard2 = CreateTestCard();
+      SetIdentityCardPosition(identityCard1, isUserSide: true);
+      SetIdentityCardPosition(identityCard2, isUserSide: false);
+
+      var userDreamsign1 = CreateDreamsign(isUserSide: true);
+      var userDreamsign2 = CreateDreamsign(isUserSide: true);
+      var userDreamsign3 = CreateDreamsign(isUserSide: true);
+      var userDreamsign4 = CreateDreamsign(isUserSide: true);
+      var enemyDreamsign1 = CreateDreamsign(isUserSide: false);
+      var enemyDreamsign2 = CreateDreamsign(isUserSide: false);
+      var enemyDreamsign3 = CreateDreamsign(isUserSide: false);
+      var enemyDreamsign4 = CreateDreamsign(isUserSide: false);
+
+      layout.Add(identityCard1);
+      layout.Add(identityCard2);
+      layout.Add(userDreamsign1);
+      layout.Add(userDreamsign2);
+      layout.Add(userDreamsign3);
+      layout.Add(userDreamsign4);
+      layout.Add(enemyDreamsign1);
+      layout.Add(enemyDreamsign2);
+      layout.Add(enemyDreamsign3);
+      layout.Add(enemyDreamsign4);
+      layout.ApplyLayout(sequence: null);
+
+      AssertDreamsignBoxColliderIsOnScreen(viewport, userDreamsign1, "User dreamsign 1");
+      AssertDreamsignBoxColliderIsOnScreen(viewport, userDreamsign2, "User dreamsign 2");
+      AssertDreamsignBoxColliderIsOnScreen(viewport, userDreamsign3, "User dreamsign 3");
+      AssertDreamsignBoxColliderIsOnScreen(viewport, userDreamsign4, "User dreamsign 4");
+      AssertDreamsignBoxColliderIsOnScreen(viewport, enemyDreamsign1, "Enemy dreamsign 1");
+      AssertDreamsignBoxColliderIsOnScreen(viewport, enemyDreamsign2, "Enemy dreamsign 2");
+      AssertDreamsignBoxColliderIsOnScreen(viewport, enemyDreamsign3, "Enemy dreamsign 3");
+      AssertDreamsignBoxColliderIsOnScreen(viewport, enemyDreamsign4, "Enemy dreamsign 4");
+    }
+
     StartBattleObjectLayout GetStartBattleLayout()
     {
       var layout = Registry.DreamscapeLayout.StartBattleLayout;
       layout.GameContext = GameContext.Interface;
       return layout;
+    }
+
+    TestCard CreateDreamsign(bool isUserSide)
+    {
+      var dreamsign = CreateTestCard(colliderWidth: 2.5f, colliderHeight: 4f);
+      dreamsign.ObjectPosition = new ObjectPosition
+      {
+        Position = new PositionClass
+        {
+          StartBattleDisplay = isUserSide
+            ? StartBattleDisplayType.UserDreamsigns
+            : StartBattleDisplayType.EnemyDreamsigns,
+        },
+        SortingKey = 0,
+      };
+      return dreamsign;
+    }
+
+    void SetIdentityCardPosition(TestCard card, bool isUserSide)
+    {
+      card.ObjectPosition = new ObjectPosition
+      {
+        Position = new PositionClass
+        {
+          StartBattleDisplay = isUserSide
+            ? StartBattleDisplayType.UserIdentityCard
+            : StartBattleDisplayType.EnemyIdentityCard,
+        },
+        SortingKey = 0,
+      };
+    }
+
+    void AssertDreamsignBoxColliderIsOnScreen(
+      IGameViewport viewport,
+      TestCard dreamsign,
+      string description
+    )
+    {
+      var collider = dreamsign.CardCollider;
+      var center = collider.center;
+      var extents = collider.size * 0.5f;
+
+      var localCorners = new Vector3[8];
+      localCorners[0] = center + new Vector3(-extents.x, -extents.y, -extents.z);
+      localCorners[1] = center + new Vector3(-extents.x, -extents.y, extents.z);
+      localCorners[2] = center + new Vector3(-extents.x, extents.y, -extents.z);
+      localCorners[3] = center + new Vector3(-extents.x, extents.y, extents.z);
+      localCorners[4] = center + new Vector3(extents.x, -extents.y, -extents.z);
+      localCorners[5] = center + new Vector3(extents.x, -extents.y, extents.z);
+      localCorners[6] = center + new Vector3(extents.x, extents.y, -extents.z);
+      localCorners[7] = center + new Vector3(extents.x, extents.y, extents.z);
+
+      for (var i = 0; i < localCorners.Length; i++)
+      {
+        var worldCorner = dreamsign.transform.TransformPoint(localCorners[i]);
+        AssertPointIsOnScreen(viewport, worldCorner, $"{description} box collider corner {i}");
+      }
     }
   }
 }
