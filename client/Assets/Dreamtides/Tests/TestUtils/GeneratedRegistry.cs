@@ -1,6 +1,6 @@
 // AUTO-GENERATED CODE - DO NOT EDIT
 // Generated from: Registry
-// Generated at: 2025-12-10 13:47:26
+// Generated at: 2025-12-10 15:56:30
 
 #nullable enable
 
@@ -25,7 +25,14 @@ namespace Dreamtides.Tests.TestUtils
     public FakeSoundService FakeSoundService { get; private set; } = null!;
     public FakeActionService FakeActionService { get; private set; } = null!;
 
-    public static GeneratedRegistry Create(List<GameObject> createdObjects, GeneratedCanvas canvas, GeneratedMainCamera mainCamera, BattleLayout portraitLayout, BattleLayout landscapeLayout, DreamscapeLayout? dreamscapeLayout = null)
+    public static GeneratedRegistry Create(
+      List<GameObject> createdObjects,
+      GeneratedCanvas canvas,
+      GeneratedMainCamera mainCamera,
+      BattleLayout portraitLayout,
+      BattleLayout landscapeLayout,
+      DreamscapeLayout? dreamscapeLayout = null
+    )
     {
       var result = new GeneratedRegistry();
 

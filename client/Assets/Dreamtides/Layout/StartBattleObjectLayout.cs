@@ -16,7 +16,10 @@ namespace Dreamtides.Layout
     internal float _horizontalSpacing = 3f;
 
     [SerializeField]
-    internal float _cardInwardOffset = 0f;
+    internal float _cardInwardOffsetPortrait = 0f;
+
+    [SerializeField]
+    internal float _cardInwardOffsetLandscape = 0f;
 
     [SerializeField]
     internal float _cardWidth = 2.5f;
@@ -25,21 +28,44 @@ namespace Dreamtides.Layout
     internal float _cardHeight = 3.5f;
 
     [SerializeField]
-    internal float _cardScale = 1f;
+    internal float _cardScalePortrait = 1f;
+
+    [SerializeField]
+    internal float _cardScaleLandscape = 1f;
 
     [SerializeField]
     internal TextMeshPro? _vsText;
 
     [SerializeField]
+    internal float _vsTextFontSizePortrait = 2f;
+
+    [SerializeField]
+    internal float _vsTextFontSizeLandscape = 3f;
+
+    [SerializeField]
     internal DisplayableButton? _buttonPrefab;
 
     [SerializeField]
-    internal float _buttonVerticalOffset = -0.6f;
+    internal float _buttonVerticalOffsetPortrait = -0.6f;
 
     [SerializeField]
-    internal float _buttonScale = 0.15f;
+    internal float _buttonVerticalOffsetLandscape = -0.6f;
+
+    [SerializeField]
+    internal float _buttonScalePortrait = 0.15f;
+
+    [SerializeField]
+    internal float _buttonScaleLandscape = 0.15f;
 
     DisplayableButton? _buttonInstance;
+
+    float CardInwardOffset =>
+      IsLandscape() ? _cardInwardOffsetLandscape : _cardInwardOffsetPortrait;
+    float CardScale => IsLandscape() ? _cardScaleLandscape : _cardScalePortrait;
+    float VsTextFontSize => IsLandscape() ? _vsTextFontSizeLandscape : _vsTextFontSizePortrait;
+    float ButtonVerticalOffset =>
+      IsLandscape() ? _buttonVerticalOffsetLandscape : _buttonVerticalOffsetPortrait;
+    float ButtonScale => IsLandscape() ? _buttonScaleLandscape : _buttonScalePortrait;
 
     readonly ButtonView _defaultButtonView = new()
     {
@@ -92,14 +118,14 @@ namespace Dreamtides.Layout
 
       var isLeftCard = index == 0;
       var baseOffset = isLeftCard ? -_horizontalSpacing / 2f : _horizontalSpacing / 2f;
-      var inwardAdjustment = isLeftCard ? _cardInwardOffset : -_cardInwardOffset;
+      var inwardAdjustment = isLeftCard ? CardInwardOffset : -CardInwardOffset;
       return transform.position + transform.right * (baseOffset + inwardAdjustment);
     }
 
     public override Vector3? CalculateObjectRotation(int index, int count) =>
       transform.rotation.eulerAngles;
 
-    public override float? CalculateObjectScale(int index, int count) => _cardScale;
+    public override float? CalculateObjectScale(int index, int count) => CardScale;
 
     protected override void OnBecameNonEmpty()
     {
@@ -123,6 +149,7 @@ namespace Dreamtides.Layout
       if (DebugUpdateContinuously)
       {
         PositionVsText();
+        UpdateVsTextFontSize();
         PositionButton();
         UpdateButtonScale();
       }
@@ -138,7 +165,7 @@ namespace Dreamtides.Layout
       _buttonInstance = Instantiate(_buttonPrefab, transform);
       _buttonInstance.Initialize(this);
       _buttonInstance.gameObject.SetActive(false);
-      _buttonInstance.SetDefaultScale(Vector3.one * _buttonScale);
+      _buttonInstance.SetDefaultScale(Vector3.one * ButtonScale);
     }
 
     void PositionVsText()
@@ -158,7 +185,7 @@ namespace Dreamtides.Layout
         return;
       }
 
-      var buttonPosition = transform.position + transform.up * _buttonVerticalOffset;
+      var buttonPosition = transform.position + transform.up * ButtonVerticalOffset;
       _buttonInstance.transform.SetPositionAndRotation(buttonPosition, transform.rotation);
     }
 
@@ -166,6 +193,7 @@ namespace Dreamtides.Layout
     {
       if (_vsText)
       {
+        _vsText.fontSize = VsTextFontSize;
         _vsText.gameObject.SetActive(true);
       }
     }
@@ -175,6 +203,14 @@ namespace Dreamtides.Layout
       if (_vsText)
       {
         _vsText.gameObject.SetActive(false);
+      }
+    }
+
+    void UpdateVsTextFontSize()
+    {
+      if (_vsText)
+      {
+        _vsText.fontSize = VsTextFontSize;
       }
     }
 
@@ -195,7 +231,7 @@ namespace Dreamtides.Layout
         return;
       }
 
-      _buttonInstance.SetDefaultScale(Vector3.one * _buttonScale);
+      _buttonInstance.SetDefaultScale(Vector3.one * ButtonScale);
     }
 
     void OnDrawGizmosSelected()
@@ -209,8 +245,8 @@ namespace Dreamtides.Layout
 
       Gizmos.DrawSphere(center, 0.1f);
 
-      var leftCardCenter = -_horizontalSpacing / 2f + _cardInwardOffset;
-      var rightCardCenter = _horizontalSpacing / 2f - _cardInwardOffset;
+      var leftCardCenter = -_horizontalSpacing / 2f + CardInwardOffset;
+      var rightCardCenter = _horizontalSpacing / 2f - CardInwardOffset;
 
       Gizmos.DrawSphere(
         center + right * (leftCardCenter - halfCardWidth) + upAxis * halfCardHeight,
@@ -247,7 +283,7 @@ namespace Dreamtides.Layout
       );
 
       Gizmos.color = Color.yellow;
-      var buttonPos = center + upAxis * _buttonVerticalOffset;
+      var buttonPos = center + upAxis * ButtonVerticalOffset;
       Gizmos.DrawSphere(buttonPos, 0.1f);
     }
   }

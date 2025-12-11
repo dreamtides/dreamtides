@@ -1,6 +1,6 @@
 // AUTO-GENERATED CODE - DO NOT EDIT
 // Generated from: Registry
-// Generated at: 2025-12-10 13:47:28
+// Generated at: 2025-12-10 15:56:32
 
 #nullable enable
 
@@ -35,7 +35,8 @@ namespace Dreamtides.Tests.TestUtils
       var questDeckBrowserPortraitGo = new GameObject("QuestDeckBrowserPortrait");
       createdObjects.Add(questDeckBrowserPortraitGo);
       var questDeckBrowserPortraitGoRect = questDeckBrowserPortraitGo.AddComponent<RectTransform>();
-      var questDeckBrowserPortrait = questDeckBrowserPortraitGo.AddComponent<QuestDeckBrowserObjectLayout>();
+      var questDeckBrowserPortrait =
+        questDeckBrowserPortraitGo.AddComponent<QuestDeckBrowserObjectLayout>();
       questDeckBrowserPortrait._scrollbarFadeDuration = 0.3f;
       questDeckBrowserPortrait._cardWidth = 35f;
       questDeckBrowserPortrait._cardHeight = 52f;
@@ -63,7 +64,8 @@ namespace Dreamtides.Tests.TestUtils
       scrollbarCanvasGroupGoRect.sizeDelta = new Vector2(22f, 22f);
       var canvasGroup = scrollbarCanvasGroupGo.AddComponent<CanvasGroup>();
       questDeckBrowserPortrait._scrollbarCanvasGroup = canvasGroup;
-      questDeckBrowserPortrait._closeButton = scrollbarCanvasGroupGo.GetComponent<CloseBrowserButton>();
+      questDeckBrowserPortrait._closeButton =
+        scrollbarCanvasGroupGo.GetComponent<CloseBrowserButton>();
 
       var worldSpaceParentGo = new GameObject("QuestDeckBrowserWorldSpace");
       createdObjects.Add(worldSpaceParentGo);
@@ -89,8 +91,10 @@ namespace Dreamtides.Tests.TestUtils
 
       var questDeckBrowserLandscapeGo = new GameObject("QuestDeckBrowserLandscape");
       createdObjects.Add(questDeckBrowserLandscapeGo);
-      var questDeckBrowserLandscapeGoRect = questDeckBrowserLandscapeGo.AddComponent<RectTransform>();
-      var questDeckBrowserLandscape = questDeckBrowserLandscapeGo.AddComponent<QuestDeckBrowserObjectLayout>();
+      var questDeckBrowserLandscapeGoRect =
+        questDeckBrowserLandscapeGo.AddComponent<RectTransform>();
+      var questDeckBrowserLandscape =
+        questDeckBrowserLandscapeGo.AddComponent<QuestDeckBrowserObjectLayout>();
       questDeckBrowserLandscape._scrollbarFadeDuration = 0.5f;
       questDeckBrowserLandscape._cardWidth = 100f;
       questDeckBrowserLandscape._cardHeight = 160f;
@@ -214,7 +218,11 @@ namespace Dreamtides.Tests.TestUtils
       var dreamsignDisplayGo = new GameObject("DreamsignDisplay");
       createdObjects.Add(dreamsignDisplayGo);
       dreamsignDisplayGo.transform.SetParent(questDeckGo.transform, false);
-      dreamsignDisplayGo.transform.localPosition = new Vector3(-3.166668f, -0.2333552f, 2.384186E-05f);
+      dreamsignDisplayGo.transform.localPosition = new Vector3(
+        -3.166668f,
+        -0.2333552f,
+        2.384186E-05f
+      );
       dreamsignDisplayGo.transform.localScale = new Vector3(0.6666667f, 0.6666668f, 0.6666668f);
       var dreamsignDisplay = dreamsignDisplayGo.AddComponent<DreamsignDisplayLayout>();
       dreamsignDisplay._horizontalSpacing = 3f;
@@ -289,10 +297,14 @@ namespace Dreamtides.Tests.TestUtils
       startBattleLayoutGo.transform.localPosition = new Vector3(0f, 0.5f, 2.75f);
       var startBattleLayout = startBattleLayoutGo.AddComponent<StartBattleObjectLayout>();
       startBattleLayout._internalGameContext = GameContext.Interface;
-      startBattleLayout._cardInwardOffset = 0.7f;
-      startBattleLayout._cardScale = 0.45f;
-      startBattleLayout._buttonVerticalOffset = -1.5f;
-      startBattleLayout._buttonScale = 0.1f;
+      startBattleLayout._cardInwardOffsetPortrait = 1.15f;
+      startBattleLayout._cardInwardOffsetLandscape = 0.7f;
+      startBattleLayout._cardScalePortrait = 0.25f;
+      startBattleLayout._cardScaleLandscape = 0.45f;
+      startBattleLayout._buttonVerticalOffsetPortrait = -1.25f;
+      startBattleLayout._buttonVerticalOffsetLandscape = -1.5f;
+      startBattleLayout._buttonScalePortrait = 0.1f;
+      startBattleLayout._buttonScaleLandscape = 0.1f;
 
       var vsTextGo = new GameObject("VsText");
       createdObjects.Add(vsTextGo);

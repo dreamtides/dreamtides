@@ -1,6 +1,6 @@
 // AUTO-GENERATED CODE - DO NOT EDIT
 // Generated from: PortraitBattleLayout
-// Generated at: 2025-12-10 13:47:27
+// Generated at: 2025-12-10 15:56:31
 
 #nullable enable
 
@@ -18,7 +18,10 @@ namespace Dreamtides.Tests.TestUtils
 {
   public class GeneratedPortraitBattleLayout
   {
-    public static BattleLayout Create(List<GameObject> createdObjects, GeneratedCanvas? canvas = null)
+    public static BattleLayout Create(
+      List<GameObject> createdObjects,
+      GeneratedCanvas? canvas = null
+    )
     {
       var layoutGo = new GameObject("PortraitBattleLayout");
       createdObjects.Add(layoutGo);
@@ -143,12 +146,14 @@ namespace Dreamtides.Tests.TestUtils
       scrollableHandGo.transform.localPosition = new Vector3(1f, -7f, 16f);
       var scrollableHand = scrollableHandGo.AddComponent<StaticGameContext>();
       scrollableHand._startingContext = GameContext.Hand;
-      var scrollableHandScrollableUserHandLayout = scrollableHandGo.AddComponent<ScrollableUserHandLayout>();
+      var scrollableHandScrollableUserHandLayout =
+        scrollableHandGo.AddComponent<ScrollableUserHandLayout>();
       scrollableHandScrollableUserHandLayout._offset = 2f;
       scrollableHandScrollableUserHandLayout._cardWidth = 1.7f;
 
       var scrollbarGo = canvas?.Objects["SafeArea/UserHandScrollbar"];
-      if (scrollbarGo != null) scrollableHandScrollableUserHandLayout._scrollbar = scrollbarGo.GetComponent<Scrollbar>();
+      if (scrollbarGo != null)
+        scrollableHandScrollableUserHandLayout._scrollbar = scrollbarGo.GetComponent<Scrollbar>();
 
       var leftEdgeGo = new GameObject("Left");
       createdObjects.Add(leftEdgeGo);
@@ -289,7 +294,8 @@ namespace Dreamtides.Tests.TestUtils
       userStatusDisplayGo.transform.localScale = new Vector3(0.9f, 0.9f, 0.9f);
       var userStatusDisplay = userStatusDisplayGo.AddComponent<StaticGameContext>();
       userStatusDisplay._startingContext = GameContext.PlayerStatus;
-      var userStatusDisplayPlayerStatusDisplay = userStatusDisplayGo.AddComponent<PlayerStatusDisplay>();
+      var userStatusDisplayPlayerStatusDisplay =
+        userStatusDisplayGo.AddComponent<PlayerStatusDisplay>();
       userStatusDisplayPlayerStatusDisplay._studioType = StudioType.UserStatus;
 
       var energyGo = new GameObject("Energy");
@@ -390,7 +396,8 @@ namespace Dreamtides.Tests.TestUtils
       enemyStatusDisplayGo.transform.localScale = new Vector3(0.9f, 0.8999999f, 0.8999999f);
       var enemyStatusDisplay = enemyStatusDisplayGo.AddComponent<StaticGameContext>();
       enemyStatusDisplay._startingContext = GameContext.PlayerStatus;
-      var enemyStatusDisplayPlayerStatusDisplay = enemyStatusDisplayGo.AddComponent<PlayerStatusDisplay>();
+      var enemyStatusDisplayPlayerStatusDisplay =
+        enemyStatusDisplayGo.AddComponent<PlayerStatusDisplay>();
       enemyStatusDisplayPlayerStatusDisplay._studioType = StudioType.EnemyStatus;
 
       var energy1Go = new GameObject("Energy");
@@ -497,7 +504,8 @@ namespace Dreamtides.Tests.TestUtils
       drawnCardsPositionGo.transform.SetParent(cameraPositionGo.transform, false);
       drawnCardsPositionGo.transform.localPosition = new Vector3(1.29f, 0.65f, 10.21f);
       var drawnCardsPosition = drawnCardsPositionGo.AddComponent<PileObjectLayout>();
-      var drawnCardsPositionStaticGameContext = drawnCardsPositionGo.AddComponent<StaticGameContext>();
+      var drawnCardsPositionStaticGameContext =
+        drawnCardsPositionGo.AddComponent<StaticGameContext>();
       drawnCardsPositionStaticGameContext._startingContext = GameContext.DrawnCards;
       layout._drawnCardsPosition = drawnCardsPosition;
 
@@ -520,7 +528,8 @@ namespace Dreamtides.Tests.TestUtils
       targetingUserStackGo.transform.localScale = new Vector3(1.5f, 1.5f, 1.5f);
       var targetingUserStack = targetingUserStackGo.AddComponent<StaticGameContext>();
       targetingUserStack._startingContext = GameContext.Stack;
-      var targetingUserStackStackingObjectLayout = targetingUserStackGo.AddComponent<StackingObjectLayout>();
+      var targetingUserStackStackingObjectLayout =
+        targetingUserStackGo.AddComponent<StackingObjectLayout>();
       targetingUserStackStackingObjectLayout._offset = 1.5f;
       targetingUserStackStackingObjectLayout._shrinkOffset = 0.75f;
       targetingUserStackStackingObjectLayout._shrinkOffsetThreshold = 4;
@@ -533,7 +542,8 @@ namespace Dreamtides.Tests.TestUtils
       targetingEnemyStackGo.transform.localScale = new Vector3(1.5f, 1.5f, 1.5f);
       var targetingEnemyStack = targetingEnemyStackGo.AddComponent<StaticGameContext>();
       targetingEnemyStack._startingContext = GameContext.Stack;
-      var targetingEnemyStackStackingObjectLayout = targetingEnemyStackGo.AddComponent<StackingObjectLayout>();
+      var targetingEnemyStackStackingObjectLayout =
+        targetingEnemyStackGo.AddComponent<StackingObjectLayout>();
       targetingEnemyStackStackingObjectLayout._offset = 1.5f;
       targetingEnemyStackStackingObjectLayout._shrinkOffset = 0.75f;
       targetingEnemyStackStackingObjectLayout._shrinkOffsetThreshold = 4;
@@ -545,7 +555,8 @@ namespace Dreamtides.Tests.TestUtils
       targetingBothStackGo.transform.localRotation = Quaternion.Euler(74.99998f, 0f, 0f);
       var targetingBothStack = targetingBothStackGo.AddComponent<StaticGameContext>();
       targetingBothStack._startingContext = GameContext.Stack;
-      var targetingBothStackStackingObjectLayout = targetingBothStackGo.AddComponent<StackingObjectLayout>();
+      var targetingBothStackStackingObjectLayout =
+        targetingBothStackGo.AddComponent<StackingObjectLayout>();
       targetingBothStackStackingObjectLayout._offset = 1f;
       targetingBothStackStackingObjectLayout._shrinkOffset = 0.75f;
       targetingBothStackStackingObjectLayout._shrinkOffsetThreshold = 4;
@@ -622,10 +633,12 @@ namespace Dreamtides.Tests.TestUtils
       browserCardBrowser._rightEdge = rightEdge1Go.transform;
 
       var scrollbar1Go = canvas?.Objects["SafeArea/CardBrowserScrollbarPortrait"];
-      if (scrollbar1Go != null) browserCardBrowser._scrollbar = scrollbar1Go.GetComponent<Scrollbar>();
+      if (scrollbar1Go != null)
+        browserCardBrowser._scrollbar = scrollbar1Go.GetComponent<Scrollbar>();
 
       var closeButtonGo = canvas?.Objects["SafeArea/CardBrowserRight/CloseBrowserButton"];
-      if (closeButtonGo != null) browserCardBrowser._closeButton = closeButtonGo.GetComponent<CloseBrowserButton>();
+      if (closeButtonGo != null)
+        browserCardBrowser._closeButton = closeButtonGo.GetComponent<CloseBrowserButton>();
 
       var largeCardPositionGo = new GameObject("LargeCardPosition");
       createdObjects.Add(largeCardPositionGo);
@@ -669,7 +682,8 @@ namespace Dreamtides.Tests.TestUtils
       dreamwellActivationGo.transform.localPosition = new Vector3(0f, 5f, -15f);
       dreamwellActivationGo.transform.localRotation = Quaternion.Euler(90f, 0f, 0f);
       var dreamwellActivation = dreamwellActivationGo.AddComponent<PileObjectLayout>();
-      var dreamwellActivationStaticGameContext = dreamwellActivationGo.AddComponent<StaticGameContext>();
+      var dreamwellActivationStaticGameContext =
+        dreamwellActivationGo.AddComponent<StaticGameContext>();
       dreamwellActivationStaticGameContext._startingContext = GameContext.CardActivation;
       layout._dreamwellActivation = dreamwellActivation;
 
@@ -687,7 +701,8 @@ namespace Dreamtides.Tests.TestUtils
       cardOrderSelectorGo.transform.localRotation = Quaternion.Euler(74.99998f, 0f, 0f);
       var cardOrderSelector = cardOrderSelectorGo.AddComponent<StaticGameContext>();
       cardOrderSelector._startingContext = GameContext.Browser;
-      var cardOrderSelectorCardOrderSelector = cardOrderSelectorGo.AddComponent<CardOrderSelector>();
+      var cardOrderSelectorCardOrderSelector =
+        cardOrderSelectorGo.AddComponent<CardOrderSelector>();
       cardOrderSelectorCardOrderSelector._initialSpacing = -0.5f;
       cardOrderSelectorCardOrderSelector._initialOffset = 4.1f;
 
@@ -708,7 +723,8 @@ namespace Dreamtides.Tests.TestUtils
       cardOrderSelectorVoidGo.transform.SetParent(rightEdge2Go.transform, false);
       cardOrderSelectorVoidGo.transform.localPosition = new Vector3(-2f, -0.24f, -0.07f);
       var cardOrderSelectorVoid = cardOrderSelectorVoidGo.AddComponent<PileObjectLayout>();
-      var cardOrderSelectorVoidStaticGameContext = cardOrderSelectorVoidGo.AddComponent<StaticGameContext>();
+      var cardOrderSelectorVoidStaticGameContext =
+        cardOrderSelectorVoidGo.AddComponent<StaticGameContext>();
       cardOrderSelectorVoidStaticGameContext._startingContext = GameContext.Browser;
       cardOrderSelectorCardOrderSelector._cardOrderSelectorVoid = cardOrderSelectorVoid;
       layout._cardOrderSelector = cardOrderSelectorCardOrderSelector;
@@ -724,7 +740,8 @@ namespace Dreamtides.Tests.TestUtils
       gameModifiersDisplay._width = 5f;
       gameModifiersDisplay._initialSpacing = -0.5f;
       gameModifiersDisplay._cardSize = 2.5f;
-      var gameModifiersDisplayStaticGameContext = gameModifiersDisplayGo.AddComponent<StaticGameContext>();
+      var gameModifiersDisplayStaticGameContext =
+        gameModifiersDisplayGo.AddComponent<StaticGameContext>();
       gameModifiersDisplayStaticGameContext._startingContext = GameContext.GameModifiers;
       layout._gameModifiersDisplay = gameModifiersDisplay;
 
@@ -855,10 +872,12 @@ namespace Dreamtides.Tests.TestUtils
       layout._decrementActionButton = actionButton3;
 
       var undoButtonGo = canvas?.Objects["SafeArea/TopRight/UndoButton"];
-      if (undoButtonGo != null) layout._undoButton = undoButtonGo.GetComponent<CanvasButton>();
+      if (undoButtonGo != null)
+        layout._undoButton = undoButtonGo.GetComponent<CanvasButton>();
 
       var devButtonGo = canvas?.Objects["SafeArea/TopLeft/DevButton"];
-      if (devButtonGo != null) layout._devButton = devButtonGo.GetComponent<CanvasButton>();
+      if (devButtonGo != null)
+        layout._devButton = devButtonGo.GetComponent<CanvasButton>();
 
       var enemyMessageGo = new GameObject("EnemyMessage");
       createdObjects.Add(enemyMessageGo);
@@ -889,7 +908,8 @@ namespace Dreamtides.Tests.TestUtils
       layout._thinkingIndicator = thinkingIndicatorGo;
 
       var closeBrowserButtonGo = canvas?.Objects["SafeArea/CardBrowserRight/CloseBrowserButton"];
-      if (closeBrowserButtonGo != null) layout._closeBrowserButton = closeBrowserButtonGo.GetComponent<CloseBrowserButton>();
+      if (closeBrowserButtonGo != null)
+        layout._closeBrowserButton = closeBrowserButtonGo.GetComponent<CloseBrowserButton>();
 
       var aboveUserVoidGo = new GameObject("AboveUserVoid");
       createdObjects.Add(aboveUserVoidGo);

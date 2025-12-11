@@ -1,6 +1,6 @@
 // AUTO-GENERATED CODE - DO NOT EDIT
 // Generated from: Canvas
-// Generated at: 2025-12-10 13:47:27
+// Generated at: 2025-12-10 15:56:31
 
 #nullable enable
 
@@ -30,9 +30,9 @@ namespace Dreamtides.Tests.TestUtils
       var canvasGoRect = canvasGo.AddComponent<RectTransform>();
       canvasGoRect.anchorMin = new Vector2(0f, 0f);
       canvasGoRect.anchorMax = new Vector2(0f, 0f);
-      canvasGoRect.anchoredPosition = new Vector2(585f, 1266f);
-      canvasGoRect.sizeDelta = new Vector2(184.8341f, 400f);
-      canvasGoRect.localScale = new Vector3(6.33f, 6.33f, 6.33f);
+      canvasGoRect.anchoredPosition = new Vector2(960f, 540f);
+      canvasGoRect.sizeDelta = new Vector2(711.1111f, 400f);
+      canvasGoRect.localScale = new Vector3(2.7f, 2.7f, 2.7f);
       var canvas = canvasGo.AddComponent<Canvas>();
       var canvasCanvasScaler = canvasGo.AddComponent<CanvasScaler>();
       var canvasGraphicRaycaster = canvasGo.AddComponent<GraphicRaycaster>();
@@ -88,17 +88,35 @@ namespace Dreamtides.Tests.TestUtils
       var textTMP1GoRect = textTMP1Go.AddComponent<RectTransform>();
       result.Objects.Add("SafeArea/TopLeft/DevButton/Text (TMP)", textTMP1Go);
 
-      var tMPSubMeshUIFaSolid900SDFMaterialLiberationSansSDFAtlasGo = new GameObject("TMP SubMeshUI [fa-solid-900 SDF Material + LiberationSans SDF Atlas]");
+      var tMPSubMeshUIFaSolid900SDFMaterialLiberationSansSDFAtlasGo = new GameObject(
+        "TMP SubMeshUI [fa-solid-900 SDF Material + LiberationSans SDF Atlas]"
+      );
       createdObjects.Add(tMPSubMeshUIFaSolid900SDFMaterialLiberationSansSDFAtlasGo);
-      tMPSubMeshUIFaSolid900SDFMaterialLiberationSansSDFAtlasGo.transform.SetParent(textTMP1Go.transform, false);
-      var tMPSubMeshUIFaSolid900SDFMaterialLiberationSansSDFAtlasGoRect = tMPSubMeshUIFaSolid900SDFMaterialLiberationSansSDFAtlasGo.AddComponent<RectTransform>();
-      result.Objects.Add("SafeArea/TopLeft/DevButton/Text (TMP)/TMP SubMeshUI [fa-solid-900 SDF Material + LiberationSans SDF Atlas]", tMPSubMeshUIFaSolid900SDFMaterialLiberationSansSDFAtlasGo);
+      tMPSubMeshUIFaSolid900SDFMaterialLiberationSansSDFAtlasGo.transform.SetParent(
+        textTMP1Go.transform,
+        false
+      );
+      var tMPSubMeshUIFaSolid900SDFMaterialLiberationSansSDFAtlasGoRect =
+        tMPSubMeshUIFaSolid900SDFMaterialLiberationSansSDFAtlasGo.AddComponent<RectTransform>();
+      result.Objects.Add(
+        "SafeArea/TopLeft/DevButton/Text (TMP)/TMP SubMeshUI [fa-solid-900 SDF Material + LiberationSans SDF Atlas]",
+        tMPSubMeshUIFaSolid900SDFMaterialLiberationSansSDFAtlasGo
+      );
 
-      var tMPSubMeshUIFaSolid900SDFMaterialFontAwsomeAllAtlasGo = new GameObject("TMP SubMeshUI [fa-solid-900 SDF Material + font_awsome_all Atlas]");
+      var tMPSubMeshUIFaSolid900SDFMaterialFontAwsomeAllAtlasGo = new GameObject(
+        "TMP SubMeshUI [fa-solid-900 SDF Material + font_awsome_all Atlas]"
+      );
       createdObjects.Add(tMPSubMeshUIFaSolid900SDFMaterialFontAwsomeAllAtlasGo);
-      tMPSubMeshUIFaSolid900SDFMaterialFontAwsomeAllAtlasGo.transform.SetParent(textTMP1Go.transform, false);
-      var tMPSubMeshUIFaSolid900SDFMaterialFontAwsomeAllAtlasGoRect = tMPSubMeshUIFaSolid900SDFMaterialFontAwsomeAllAtlasGo.AddComponent<RectTransform>();
-      result.Objects.Add("SafeArea/TopLeft/DevButton/Text (TMP)/TMP SubMeshUI [fa-solid-900 SDF Material + font_awsome_all Atlas]", tMPSubMeshUIFaSolid900SDFMaterialFontAwsomeAllAtlasGo);
+      tMPSubMeshUIFaSolid900SDFMaterialFontAwsomeAllAtlasGo.transform.SetParent(
+        textTMP1Go.transform,
+        false
+      );
+      var tMPSubMeshUIFaSolid900SDFMaterialFontAwsomeAllAtlasGoRect =
+        tMPSubMeshUIFaSolid900SDFMaterialFontAwsomeAllAtlasGo.AddComponent<RectTransform>();
+      result.Objects.Add(
+        "SafeArea/TopLeft/DevButton/Text (TMP)/TMP SubMeshUI [fa-solid-900 SDF Material + font_awsome_all Atlas]",
+        tMPSubMeshUIFaSolid900SDFMaterialFontAwsomeAllAtlasGo
+      );
 
       var infoZoomLandscapeLeftGo = new GameObject("InfoZoomLandscapeLeft");
       createdObjects.Add(infoZoomLandscapeLeftGo);
@@ -293,30 +311,50 @@ namespace Dreamtides.Tests.TestUtils
       var textTMP9GoRect = textTMP9Go.AddComponent<RectTransform>();
       result.Objects.Add("SafeArea/TopRight/BugButton/Text (TMP)", textTMP9Go);
 
-      var tMPSubMeshUIFaSolid900SDFMaterialLiberationSansSDFAtlas1Go = new GameObject("TMP SubMeshUI [fa-solid-900 SDF Material + LiberationSans SDF Atlas]");
+      var tMPSubMeshUIFaSolid900SDFMaterialLiberationSansSDFAtlas1Go = new GameObject(
+        "TMP SubMeshUI [fa-solid-900 SDF Material + LiberationSans SDF Atlas]"
+      );
       createdObjects.Add(tMPSubMeshUIFaSolid900SDFMaterialLiberationSansSDFAtlas1Go);
-      tMPSubMeshUIFaSolid900SDFMaterialLiberationSansSDFAtlas1Go.transform.SetParent(textTMP9Go.transform, false);
-      var tMPSubMeshUIFaSolid900SDFMaterialLiberationSansSDFAtlas1GoRect = tMPSubMeshUIFaSolid900SDFMaterialLiberationSansSDFAtlas1Go.AddComponent<RectTransform>();
-      result.Objects.Add("SafeArea/TopRight/BugButton/Text (TMP)/TMP SubMeshUI [fa-solid-900 SDF Material + LiberationSans SDF Atlas]", tMPSubMeshUIFaSolid900SDFMaterialLiberationSansSDFAtlas1Go);
+      tMPSubMeshUIFaSolid900SDFMaterialLiberationSansSDFAtlas1Go.transform.SetParent(
+        textTMP9Go.transform,
+        false
+      );
+      var tMPSubMeshUIFaSolid900SDFMaterialLiberationSansSDFAtlas1GoRect =
+        tMPSubMeshUIFaSolid900SDFMaterialLiberationSansSDFAtlas1Go.AddComponent<RectTransform>();
+      result.Objects.Add(
+        "SafeArea/TopRight/BugButton/Text (TMP)/TMP SubMeshUI [fa-solid-900 SDF Material + LiberationSans SDF Atlas]",
+        tMPSubMeshUIFaSolid900SDFMaterialLiberationSansSDFAtlas1Go
+      );
 
       var gameModifierDisplayPositionGo = new GameObject("GameModifierDisplayPosition");
       createdObjects.Add(gameModifierDisplayPositionGo);
       gameModifierDisplayPositionGo.transform.SetParent(topRightGo.transform, false);
-      var gameModifierDisplayPositionGoRect = gameModifierDisplayPositionGo.AddComponent<RectTransform>();
+      var gameModifierDisplayPositionGoRect =
+        gameModifierDisplayPositionGo.AddComponent<RectTransform>();
       gameModifierDisplayPositionGoRect.anchorMin = new Vector2(0.5f, 0.5f);
       gameModifierDisplayPositionGoRect.anchorMax = new Vector2(0.5f, 0.5f);
       gameModifierDisplayPositionGoRect.anchoredPosition = new Vector2(-2.5f, -30f);
-      result.Objects.Add("SafeArea/TopRight/GameModifierDisplayPosition", gameModifierDisplayPositionGo);
+      result.Objects.Add(
+        "SafeArea/TopRight/GameModifierDisplayPosition",
+        gameModifierDisplayPositionGo
+      );
 
       var gameModifierDisplayLandscapeGo = new GameObject("GameModifierDisplayLandscape");
       createdObjects.Add(gameModifierDisplayLandscapeGo);
-      gameModifierDisplayLandscapeGo.transform.SetParent(gameModifierDisplayPositionGo.transform, false);
-      var gameModifierDisplayLandscapeGoRect = gameModifierDisplayLandscapeGo.AddComponent<RectTransform>();
+      gameModifierDisplayLandscapeGo.transform.SetParent(
+        gameModifierDisplayPositionGo.transform,
+        false
+      );
+      var gameModifierDisplayLandscapeGoRect =
+        gameModifierDisplayLandscapeGo.AddComponent<RectTransform>();
       gameModifierDisplayLandscapeGoRect.anchorMin = new Vector2(0.5f, 0.5f);
       gameModifierDisplayLandscapeGoRect.anchorMax = new Vector2(0.5f, 0.5f);
       gameModifierDisplayLandscapeGoRect.anchoredPosition = new Vector2(0f, -5f);
       gameModifierDisplayLandscapeGoRect.sizeDelta = new Vector2(100f, 100f);
-      result.Objects.Add("SafeArea/TopRight/GameModifierDisplayPosition/GameModifierDisplayLandscape", gameModifierDisplayLandscapeGo);
+      result.Objects.Add(
+        "SafeArea/TopRight/GameModifierDisplayPosition/GameModifierDisplayLandscape",
+        gameModifierDisplayLandscapeGo
+      );
 
       var infoZoomLandscapeRightGo = new GameObject("InfoZoomLandscapeRight");
       createdObjects.Add(infoZoomLandscapeRightGo);
@@ -555,7 +593,8 @@ namespace Dreamtides.Tests.TestUtils
       var cardBrowserRightLandscapeGo = new GameObject("CardBrowserRightLandscape");
       createdObjects.Add(cardBrowserRightLandscapeGo);
       cardBrowserRightLandscapeGo.transform.SetParent(safeAreaGo.transform, false);
-      var cardBrowserRightLandscapeGoRect = cardBrowserRightLandscapeGo.AddComponent<RectTransform>();
+      var cardBrowserRightLandscapeGoRect =
+        cardBrowserRightLandscapeGo.AddComponent<RectTransform>();
       cardBrowserRightLandscapeGoRect.anchorMin = new Vector2(1f, 0.9f);
       cardBrowserRightLandscapeGoRect.anchorMax = new Vector2(1f, 0.9f);
       cardBrowserRightLandscapeGoRect.pivot = new Vector2(1f, 0.9f);
@@ -564,24 +603,35 @@ namespace Dreamtides.Tests.TestUtils
 
       var closeBrowserButtonLandscapeGo = new GameObject("CloseBrowserButtonLandscape");
       createdObjects.Add(closeBrowserButtonLandscapeGo);
-      closeBrowserButtonLandscapeGo.transform.SetParent(cardBrowserRightLandscapeGo.transform, false);
-      var closeBrowserButtonLandscapeGoRect = closeBrowserButtonLandscapeGo.AddComponent<RectTransform>();
+      closeBrowserButtonLandscapeGo.transform.SetParent(
+        cardBrowserRightLandscapeGo.transform,
+        false
+      );
+      var closeBrowserButtonLandscapeGoRect =
+        closeBrowserButtonLandscapeGo.AddComponent<RectTransform>();
       closeBrowserButtonLandscapeGoRect.anchorMin = new Vector2(0.5f, 0.5f);
       closeBrowserButtonLandscapeGoRect.anchorMax = new Vector2(0.5f, 0.5f);
       closeBrowserButtonLandscapeGoRect.anchoredPosition = new Vector2(-75f, 132f);
       closeBrowserButtonLandscapeGoRect.sizeDelta = new Vector2(40f, 40f);
-      result.Objects.Add("SafeArea/CardBrowserRightLandscape/CloseBrowserButtonLandscape", closeBrowserButtonLandscapeGo);
+      result.Objects.Add(
+        "SafeArea/CardBrowserRightLandscape/CloseBrowserButtonLandscape",
+        closeBrowserButtonLandscapeGo
+      );
 
       var textTMP15Go = new GameObject("Text (TMP)");
       createdObjects.Add(textTMP15Go);
       textTMP15Go.transform.SetParent(closeBrowserButtonLandscapeGo.transform, false);
       var textTMP15GoRect = textTMP15Go.AddComponent<RectTransform>();
-      result.Objects.Add("SafeArea/CardBrowserRightLandscape/CloseBrowserButtonLandscape/Text (TMP)", textTMP15Go);
+      result.Objects.Add(
+        "SafeArea/CardBrowserRightLandscape/CloseBrowserButtonLandscape/Text (TMP)",
+        textTMP15Go
+      );
 
       var cardBrowserScrollbarPortraitGo = new GameObject("CardBrowserScrollbarPortrait");
       createdObjects.Add(cardBrowserScrollbarPortraitGo);
       cardBrowserScrollbarPortraitGo.transform.SetParent(safeAreaGo.transform, false);
-      var cardBrowserScrollbarPortraitGoRect = cardBrowserScrollbarPortraitGo.AddComponent<RectTransform>();
+      var cardBrowserScrollbarPortraitGoRect =
+        cardBrowserScrollbarPortraitGo.AddComponent<RectTransform>();
       cardBrowserScrollbarPortraitGoRect.anchorMin = new Vector2(0f, 0.5f);
       cardBrowserScrollbarPortraitGoRect.anchorMax = new Vector2(1f, 0.5f);
       cardBrowserScrollbarPortraitGoRect.anchoredPosition = new Vector2(0f, -30f);
@@ -629,12 +679,16 @@ namespace Dreamtides.Tests.TestUtils
       arrowsGoRect.anchorMin = new Vector2(0.5f, 0.5f);
       arrowsGoRect.anchorMax = new Vector2(0.5f, 0.5f);
       arrowsGoRect.sizeDelta = new Vector2(16f, 16f);
-      result.Objects.Add("SafeArea/CardBrowserScrollbarPortrait/Sliding Area/Handle/Arrows", arrowsGo);
+      result.Objects.Add(
+        "SafeArea/CardBrowserScrollbarPortrait/Sliding Area/Handle/Arrows",
+        arrowsGo
+      );
 
       var cardBrowserScrollbarLandscapeGo = new GameObject("CardBrowserScrollbarLandscape");
       createdObjects.Add(cardBrowserScrollbarLandscapeGo);
       cardBrowserScrollbarLandscapeGo.transform.SetParent(safeAreaGo.transform, false);
-      var cardBrowserScrollbarLandscapeGoRect = cardBrowserScrollbarLandscapeGo.AddComponent<RectTransform>();
+      var cardBrowserScrollbarLandscapeGoRect =
+        cardBrowserScrollbarLandscapeGo.AddComponent<RectTransform>();
       cardBrowserScrollbarLandscapeGoRect.anchorMin = new Vector2(0.5f, 0.5f);
       cardBrowserScrollbarLandscapeGoRect.anchorMax = new Vector2(0.5f, 0.5f);
       cardBrowserScrollbarLandscapeGoRect.anchoredPosition = new Vector2(0f, -95f);
@@ -682,7 +736,10 @@ namespace Dreamtides.Tests.TestUtils
       arrows1GoRect.anchorMin = new Vector2(0.5f, 0.5f);
       arrows1GoRect.anchorMax = new Vector2(0.5f, 0.5f);
       arrows1GoRect.sizeDelta = new Vector2(16f, 16f);
-      result.Objects.Add("SafeArea/CardBrowserScrollbarLandscape/Sliding Area/Handle/Arrows", arrows1Go);
+      result.Objects.Add(
+        "SafeArea/CardBrowserScrollbarLandscape/Sliding Area/Handle/Arrows",
+        arrows1Go
+      );
 
       var userHandScrollbarGo = new GameObject("UserHandScrollbar");
       createdObjects.Add(userHandScrollbarGo);
@@ -860,13 +917,19 @@ namespace Dreamtides.Tests.TestUtils
       closeBrowserButton1GoRect.pivot = new Vector2(1f, 0.5f);
       closeBrowserButton1GoRect.anchoredPosition = new Vector2(-6f, -3.9f);
       closeBrowserButton1GoRect.sizeDelta = new Vector2(22f, 22f);
-      result.Objects.Add("SafeArea/QuestDeckBrowserPortrait/ControlBar/CloseBrowserButton", closeBrowserButton1Go);
+      result.Objects.Add(
+        "SafeArea/QuestDeckBrowserPortrait/ControlBar/CloseBrowserButton",
+        closeBrowserButton1Go
+      );
 
       var textTMP16Go = new GameObject("Text (TMP)");
       createdObjects.Add(textTMP16Go);
       textTMP16Go.transform.SetParent(closeBrowserButton1Go.transform, false);
       var textTMP16GoRect = textTMP16Go.AddComponent<RectTransform>();
-      result.Objects.Add("SafeArea/QuestDeckBrowserPortrait/ControlBar/CloseBrowserButton/Text (TMP)", textTMP16Go);
+      result.Objects.Add(
+        "SafeArea/QuestDeckBrowserPortrait/ControlBar/CloseBrowserButton/Text (TMP)",
+        textTMP16Go
+      );
 
       var filterButtonGo = new GameObject("FilterButton");
       createdObjects.Add(filterButtonGo);
@@ -877,13 +940,19 @@ namespace Dreamtides.Tests.TestUtils
       filterButtonGoRect.pivot = new Vector2(1f, 0.5f);
       filterButtonGoRect.anchoredPosition = new Vector2(30f, -3.900002f);
       filterButtonGoRect.sizeDelta = new Vector2(22f, 22f);
-      result.Objects.Add("SafeArea/QuestDeckBrowserPortrait/ControlBar/FilterButton", filterButtonGo);
+      result.Objects.Add(
+        "SafeArea/QuestDeckBrowserPortrait/ControlBar/FilterButton",
+        filterButtonGo
+      );
 
       var textTMP17Go = new GameObject("Text (TMP)");
       createdObjects.Add(textTMP17Go);
       textTMP17Go.transform.SetParent(filterButtonGo.transform, false);
       var textTMP17GoRect = textTMP17Go.AddComponent<RectTransform>();
-      result.Objects.Add("SafeArea/QuestDeckBrowserPortrait/ControlBar/FilterButton/Text (TMP)", textTMP17Go);
+      result.Objects.Add(
+        "SafeArea/QuestDeckBrowserPortrait/ControlBar/FilterButton/Text (TMP)",
+        textTMP17Go
+      );
 
       var scrollViewGo = new GameObject("ScrollView");
       createdObjects.Add(scrollViewGo);
@@ -908,12 +977,16 @@ namespace Dreamtides.Tests.TestUtils
       contentGoRect.anchorMax = new Vector2(1f, 1f);
       contentGoRect.pivot = new Vector2(0f, 1f);
       contentGoRect.sizeDelta = new Vector2(0f, 300f);
-      result.Objects.Add("SafeArea/QuestDeckBrowserPortrait/ScrollView/Viewport/Content", contentGo);
+      result.Objects.Add(
+        "SafeArea/QuestDeckBrowserPortrait/ScrollView/Viewport/Content",
+        contentGo
+      );
 
       var questDeckBrowserLandscapeGo = new GameObject("QuestDeckBrowserLandscape");
       createdObjects.Add(questDeckBrowserLandscapeGo);
       questDeckBrowserLandscapeGo.transform.SetParent(safeAreaGo.transform, false);
-      var questDeckBrowserLandscapeGoRect = questDeckBrowserLandscapeGo.AddComponent<RectTransform>();
+      var questDeckBrowserLandscapeGoRect =
+        questDeckBrowserLandscapeGo.AddComponent<RectTransform>();
       result.Objects.Add("SafeArea/QuestDeckBrowserLandscape", questDeckBrowserLandscapeGo);
 
       var controlBar1Go = new GameObject("ControlBar");
@@ -935,13 +1008,19 @@ namespace Dreamtides.Tests.TestUtils
       closeBrowserButton2GoRect.pivot = new Vector2(1f, 0.5f);
       closeBrowserButton2GoRect.anchoredPosition = new Vector2(-22f, -10f);
       closeBrowserButton2GoRect.sizeDelta = new Vector2(22f, 22f);
-      result.Objects.Add("SafeArea/QuestDeckBrowserLandscape/ControlBar/CloseBrowserButton", closeBrowserButton2Go);
+      result.Objects.Add(
+        "SafeArea/QuestDeckBrowserLandscape/ControlBar/CloseBrowserButton",
+        closeBrowserButton2Go
+      );
 
       var textTMP18Go = new GameObject("Text (TMP)");
       createdObjects.Add(textTMP18Go);
       textTMP18Go.transform.SetParent(closeBrowserButton2Go.transform, false);
       var textTMP18GoRect = textTMP18Go.AddComponent<RectTransform>();
-      result.Objects.Add("SafeArea/QuestDeckBrowserLandscape/ControlBar/CloseBrowserButton/Text (TMP)", textTMP18Go);
+      result.Objects.Add(
+        "SafeArea/QuestDeckBrowserLandscape/ControlBar/CloseBrowserButton/Text (TMP)",
+        textTMP18Go
+      );
 
       var filterButton1Go = new GameObject("FilterButton");
       createdObjects.Add(filterButton1Go);
@@ -952,13 +1031,19 @@ namespace Dreamtides.Tests.TestUtils
       filterButton1GoRect.pivot = new Vector2(1f, 0.5f);
       filterButton1GoRect.anchoredPosition = new Vector2(-55f, -10f);
       filterButton1GoRect.sizeDelta = new Vector2(22f, 22f);
-      result.Objects.Add("SafeArea/QuestDeckBrowserLandscape/ControlBar/FilterButton", filterButton1Go);
+      result.Objects.Add(
+        "SafeArea/QuestDeckBrowserLandscape/ControlBar/FilterButton",
+        filterButton1Go
+      );
 
       var textTMP19Go = new GameObject("Text (TMP)");
       createdObjects.Add(textTMP19Go);
       textTMP19Go.transform.SetParent(filterButton1Go.transform, false);
       var textTMP19GoRect = textTMP19Go.AddComponent<RectTransform>();
-      result.Objects.Add("SafeArea/QuestDeckBrowserLandscape/ControlBar/FilterButton/Text (TMP)", textTMP19Go);
+      result.Objects.Add(
+        "SafeArea/QuestDeckBrowserLandscape/ControlBar/FilterButton/Text (TMP)",
+        textTMP19Go
+      );
 
       var scrollView1Go = new GameObject("ScrollView");
       createdObjects.Add(scrollView1Go);
@@ -985,7 +1070,10 @@ namespace Dreamtides.Tests.TestUtils
       content1GoRect.pivot = new Vector2(0f, 1f);
       content1GoRect.anchoredPosition = new Vector2(0f, -6.103516E-05f);
       content1GoRect.sizeDelta = new Vector2(-20f, 300f);
-      result.Objects.Add("SafeArea/QuestDeckBrowserLandscape/ScrollView/Viewport/Content", content1Go);
+      result.Objects.Add(
+        "SafeArea/QuestDeckBrowserLandscape/ScrollView/Viewport/Content",
+        content1Go
+      );
 
       var scrollbarVerticalGo = new GameObject("Scrollbar Vertical");
       createdObjects.Add(scrollbarVerticalGo);
@@ -995,7 +1083,10 @@ namespace Dreamtides.Tests.TestUtils
       scrollbarVerticalGoRect.anchorMax = new Vector2(1f, 1f);
       scrollbarVerticalGoRect.pivot = new Vector2(1f, 1f);
       scrollbarVerticalGoRect.sizeDelta = new Vector2(20f, -17f);
-      result.Objects.Add("SafeArea/QuestDeckBrowserLandscape/ScrollView/Scrollbar Vertical", scrollbarVerticalGo);
+      result.Objects.Add(
+        "SafeArea/QuestDeckBrowserLandscape/ScrollView/Scrollbar Vertical",
+        scrollbarVerticalGo
+      );
 
       var bar3Go = new GameObject("Bar");
       createdObjects.Add(bar3Go);
@@ -1004,7 +1095,10 @@ namespace Dreamtides.Tests.TestUtils
       bar3GoRect.anchorMin = new Vector2(0.5f, 0f);
       bar3GoRect.anchorMax = new Vector2(0.5f, 1f);
       bar3GoRect.sizeDelta = new Vector2(4f, 0f);
-      result.Objects.Add("SafeArea/QuestDeckBrowserLandscape/ScrollView/Scrollbar Vertical/Bar", bar3Go);
+      result.Objects.Add(
+        "SafeArea/QuestDeckBrowserLandscape/ScrollView/Scrollbar Vertical/Bar",
+        bar3Go
+      );
 
       var barHitSlop3Go = new GameObject("BarHitSlop");
       createdObjects.Add(barHitSlop3Go);
@@ -1013,21 +1107,30 @@ namespace Dreamtides.Tests.TestUtils
       barHitSlop3GoRect.anchorMin = new Vector2(0.5f, 0f);
       barHitSlop3GoRect.anchorMax = new Vector2(0.5f, 1f);
       barHitSlop3GoRect.sizeDelta = new Vector2(24f, 0f);
-      result.Objects.Add("SafeArea/QuestDeckBrowserLandscape/ScrollView/Scrollbar Vertical/BarHitSlop", barHitSlop3Go);
+      result.Objects.Add(
+        "SafeArea/QuestDeckBrowserLandscape/ScrollView/Scrollbar Vertical/BarHitSlop",
+        barHitSlop3Go
+      );
 
       var slidingArea3Go = new GameObject("Sliding Area");
       createdObjects.Add(slidingArea3Go);
       slidingArea3Go.transform.SetParent(scrollbarVerticalGo.transform, false);
       var slidingArea3GoRect = slidingArea3Go.AddComponent<RectTransform>();
       slidingArea3GoRect.sizeDelta = new Vector2(-20f, -20f);
-      result.Objects.Add("SafeArea/QuestDeckBrowserLandscape/ScrollView/Scrollbar Vertical/Sliding Area", slidingArea3Go);
+      result.Objects.Add(
+        "SafeArea/QuestDeckBrowserLandscape/ScrollView/Scrollbar Vertical/Sliding Area",
+        slidingArea3Go
+      );
 
       var handle3Go = new GameObject("Handle");
       createdObjects.Add(handle3Go);
       handle3Go.transform.SetParent(slidingArea3Go.transform, false);
       var handle3GoRect = handle3Go.AddComponent<RectTransform>();
       handle3GoRect.sizeDelta = new Vector2(20f, 20f);
-      result.Objects.Add("SafeArea/QuestDeckBrowserLandscape/ScrollView/Scrollbar Vertical/Sliding Area/Handle", handle3Go);
+      result.Objects.Add(
+        "SafeArea/QuestDeckBrowserLandscape/ScrollView/Scrollbar Vertical/Sliding Area/Handle",
+        handle3Go
+      );
 
       return result;
     }

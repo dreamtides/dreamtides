@@ -44,7 +44,7 @@ namespace Dreamtides.Tests.Layout
       layout.Add(card2);
       layout.ApplyLayout(sequence: null);
 
-      var expectedScale = layout._cardScale;
+      var expectedScale = layout._cardScaleLandscape;
       AssertVector3Equal(
         new Vector3(expectedScale, expectedScale, expectedScale),
         card1.transform.localScale
