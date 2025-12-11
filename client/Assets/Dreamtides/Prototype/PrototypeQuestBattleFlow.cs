@@ -12,6 +12,7 @@ public class PrototypeQuestBattleFlow
   const string UserIdentityCardId = "identity-user";
   const string EnemyIdentityCardId = "identity-enemy";
   const string UserDreamsignsGroupKey = "dreamsigns";
+  const string QuestDeckGroupKey = "quest";
 
   readonly Registry _registry;
   readonly PrototypeCards _prototypeCards;
@@ -36,6 +37,7 @@ public class PrototypeQuestBattleFlow
     var allCards = new List<CardView> { BuildUserIdentityCard(), BuildEnemyIdentityCard() };
     AddUserDreamsignsWithUpdatedPositions(allCards);
     AddEnemyDreamsigns(allCards);
+    allCards.AddRange(_prototypeCards.GetGroupCards(QuestDeckGroupKey));
 
     var command = new UpdateQuestCommand { Quest = new QuestView { Cards = allCards } };
     yield return _registry.CardService.HandleUpdateQuestCards(command);
