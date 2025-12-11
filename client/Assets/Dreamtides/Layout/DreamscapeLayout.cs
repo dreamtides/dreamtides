@@ -16,6 +16,10 @@ namespace Dreamtides.Layout
     public ObjectLayout QuestDeck => Check(_questDeck);
 
     [SerializeField]
+    internal ObjectLayout _questUserIdentityCard = null!;
+    public ObjectLayout QuestUserIdentityCard => Check(_questUserIdentityCard);
+
+    [SerializeField]
     internal QuestDeckBrowserObjectLayout _questDeckBrowserPortrait = null!;
 
     [SerializeField]

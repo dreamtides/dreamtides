@@ -380,6 +380,11 @@ namespace Dreamtides.Services
         return Registry.DreamscapeLayout.QuestDeck;
       }
 
+      if (position.Enum == PositionEnum.QuestUserIdentityCard)
+      {
+        return Registry.DreamscapeLayout.QuestUserIdentityCard;
+      }
+
       if (position.Enum == PositionEnum.QuestDeckBrowser)
       {
         return Registry.DreamscapeLayout.QuestDeckBrowser;

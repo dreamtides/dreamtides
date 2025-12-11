@@ -16,11 +16,27 @@ public class PrototypeQuestBattleFlow
 
   readonly Registry _registry;
   readonly PrototypeCards _prototypeCards;
+  CardView? _userIdentityCard;
 
   public PrototypeQuestBattleFlow(Registry registry, PrototypeCards prototypeCards)
   {
     _registry = registry;
     _prototypeCards = prototypeCards;
+  }
+
+  public CardView GetOrCreateQuestUserIdentityCard()
+  {
+    if (_userIdentityCard == null)
+    {
+      _userIdentityCard = BuildUserIdentityCard(
+        new ObjectPosition
+        {
+          Position = new Position { Enum = PositionEnum.QuestUserIdentityCard },
+          SortingKey = 0,
+        }
+      );
+    }
+    return _userIdentityCard;
   }
 
   public IEnumerator ApplyBattleStartupRoutine()
@@ -34,7 +50,20 @@ public class PrototypeQuestBattleFlow
     );
     _registry.CameraAdjuster.AdjustFieldOfView(layout.BattleCameraBounds);
 
-    var allCards = new List<CardView> { BuildUserIdentityCard(), BuildEnemyIdentityCard() };
+    var userIdentity = GetOrCreateQuestUserIdentityCard();
+    userIdentity.Position = new ObjectPosition
+    {
+      Position = new Position
+      {
+        PositionClass = new PositionClass
+        {
+          StartBattleDisplay = StartBattleDisplayType.UserIdentityCard,
+        },
+      },
+      SortingKey = 0,
+    };
+
+    var allCards = new List<CardView> { userIdentity, BuildEnemyIdentityCard() };
     AddUserDreamsignsWithUpdatedPositions(allCards);
     AddEnemyDreamsigns(allCards);
     allCards.AddRange(_prototypeCards.GetGroupCards(QuestDeckGroupKey));
@@ -116,7 +145,7 @@ public class PrototypeQuestBattleFlow
     };
   }
 
-  CardView BuildUserIdentityCard()
+  CardView BuildUserIdentityCard(ObjectPosition position)
   {
     return new CardView
     {
@@ -126,17 +155,7 @@ public class PrototypeQuestBattleFlow
       CreateSound = null,
       DestroyPosition = null,
       Id = UserIdentityCardId,
-      Position = new ObjectPosition
-      {
-        Position = new Position
-        {
-          PositionClass = new PositionClass
-          {
-            StartBattleDisplay = StartBattleDisplayType.UserIdentityCard,
-          },
-        },
-        SortingKey = 0,
-      },
+      Position = position,
       Prefab = CardPrefab.Identity,
       Revealed = new RevealedCardView
       {

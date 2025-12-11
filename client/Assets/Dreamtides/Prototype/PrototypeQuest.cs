@@ -182,6 +182,24 @@ public class PrototypeQuest : Service
         animate: false
       )
     );
+
+    yield return StartCoroutine(CreateUserIdentityCard(animate: false));
+  }
+
+  IEnumerator CreateUserIdentityCard(bool animate)
+  {
+    var identityCard = _battleFlow.GetOrCreateQuestUserIdentityCard();
+    var allCards = _prototypeCards.GetAllCards();
+    allCards.Add(identityCard);
+    var quest = new QuestView { Cards = allCards, EssenceTotal = 75 };
+    var command = new UpdateQuestCommand { Quest = quest };
+
+    var coroutines = new List<Coroutine>();
+    Registry.DreamscapeService.HandleUpdateQuestCommand(command, coroutines, animate);
+    foreach (var coroutine in coroutines)
+    {
+      yield return coroutine;
+    }
   }
 
   public void OnDebugScenarioAction(string name)

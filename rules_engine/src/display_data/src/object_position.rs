@@ -103,6 +103,9 @@ pub enum Position {
     /// User deck displayed in the quest view
     QuestDeck,
 
+    /// User identity card displayed in the quest view
+    QuestUserIdentityCard,
+
     /// Quest deck is open, showing all cards in a large scrollable format.
     QuestDeckBrowser,
 
