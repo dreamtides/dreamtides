@@ -299,33 +299,65 @@ namespace Dreamtides.Tests.TestUtils
       }
     }
 
-    protected static IEnumerator AssertCardBoxColliderIsOnScreen(
+    protected static void AssertCardBoxColliderIsOnScreen(
       IGameViewport viewport,
       TestCard card,
       string cardDescription
     )
     {
-      // BoxCollider bounds are not correctly updated until the end of the frame
-      // where the layout is applied.
-      yield return new WaitForEndOfFrame();
-
       var collider = card.CardCollider;
-      var bounds = collider.bounds;
-
-      var corners = new Vector3[8];
-      corners[0] = new Vector3(bounds.min.x, bounds.min.y, bounds.min.z);
-      corners[1] = new Vector3(bounds.min.x, bounds.min.y, bounds.max.z);
-      corners[2] = new Vector3(bounds.min.x, bounds.max.y, bounds.min.z);
-      corners[3] = new Vector3(bounds.min.x, bounds.max.y, bounds.max.z);
-      corners[4] = new Vector3(bounds.max.x, bounds.min.y, bounds.min.z);
-      corners[5] = new Vector3(bounds.max.x, bounds.min.y, bounds.max.z);
-      corners[6] = new Vector3(bounds.max.x, bounds.max.y, bounds.min.z);
-      corners[7] = new Vector3(bounds.max.x, bounds.max.y, bounds.max.z);
+      var corners = GetBoxColliderWorldCorners(collider);
 
       for (var i = 0; i < corners.Length; i++)
       {
         AssertPointIsOnScreen(viewport, corners[i], $"{cardDescription} box collider corner {i}");
       }
+    }
+
+    /// <summary>
+    /// Computes the world-space corners of a BoxCollider without using
+    /// BoxCollider.bounds.
+    ///
+    /// We cannot use BoxCollider.bounds in Edit mode tests because it returns
+    /// a world-space axis-aligned bounding box (AABB) that is computed by
+    /// Unity's physics engine during the physics simulation step. In Edit mode
+    /// tests, physics simulation does not run reliably, causing
+    /// non-deterministic behavior where the bounds may remain at the origin
+    /// even after the transform has been updated.
+    ///
+    /// Instead, this method manually computes world corners by:
+    /// 1. Using collider.center and collider.size (local-space properties
+    ///    that don't depend on physics)
+    /// 2. Computing the 8 local-space corners of the box
+    /// 3. Using Transform.TransformPoint() to convert each corner to world
+    ///    space
+    ///
+    /// Transform.TransformPoint() is deterministic and works immediately
+    /// without waiting for physics updates.
+    /// </summary>
+    static Vector3[] GetBoxColliderWorldCorners(BoxCollider collider)
+    {
+      var transform = collider.transform;
+      var center = collider.center;
+      var extents = collider.size * 0.5f;
+
+      var localCorners = new Vector3[8];
+      localCorners[0] = center + new Vector3(-extents.x, -extents.y, -extents.z);
+      localCorners[1] = center + new Vector3(-extents.x, -extents.y, extents.z);
+      localCorners[2] = center + new Vector3(-extents.x, extents.y, -extents.z);
+      localCorners[3] = center + new Vector3(-extents.x, extents.y, extents.z);
+      localCorners[4] = center + new Vector3(extents.x, -extents.y, -extents.z);
+      localCorners[5] = center + new Vector3(extents.x, -extents.y, extents.z);
+      localCorners[6] = center + new Vector3(extents.x, extents.y, -extents.z);
+      localCorners[7] = center + new Vector3(extents.x, extents.y, extents.z);
+
+      var worldCorners = new Vector3[8];
+      for (var i = 0; i < 8; i++)
+      {
+        worldCorners[i] = transform.TransformPoint(localCorners[i]);
+      }
+
+      return worldCorners;
     }
   }
 }

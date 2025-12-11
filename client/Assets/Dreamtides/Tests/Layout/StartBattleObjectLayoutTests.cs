@@ -85,8 +85,8 @@ namespace Dreamtides.Tests.Layout
       layout.Add(card2);
       layout.ApplyLayout(sequence: null);
 
-      yield return AssertCardBoxColliderIsOnScreen(viewport, card1, "Left card");
-      yield return AssertCardBoxColliderIsOnScreen(viewport, card2, "Right card");
+      AssertCardBoxColliderIsOnScreen(viewport, card1, "Left card");
+      AssertCardBoxColliderIsOnScreen(viewport, card2, "Right card");
     }
 
     StartBattleObjectLayout GetStartBattleLayout()
