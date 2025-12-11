@@ -72,7 +72,7 @@ namespace Dreamtides.Tests.Layout
       AssertVector3Equal(layout.transform.eulerAngles, card2.transform.eulerAngles);
     }
 
-    // [UnityTest]
+    [UnityTest]
     public IEnumerator TwoCardsInPortraitAreFullyOnScreen()
     {
       var viewport = CreateViewport(GameViewResolution.ResolutionIPhone12);
@@ -85,8 +85,8 @@ namespace Dreamtides.Tests.Layout
       layout.Add(card2);
       layout.ApplyLayout(sequence: null);
 
-      AssertCardBoxColliderIsOnScreen(viewport, card1, "Left card");
-      AssertCardBoxColliderIsOnScreen(viewport, card2, "Right card");
+      yield return AssertCardBoxColliderIsOnScreen(viewport, card1, "Left card");
+      yield return AssertCardBoxColliderIsOnScreen(viewport, card2, "Right card");
     }
 
     StartBattleObjectLayout GetStartBattleLayout()

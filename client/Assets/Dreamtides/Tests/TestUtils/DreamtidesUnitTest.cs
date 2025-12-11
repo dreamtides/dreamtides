@@ -299,12 +299,16 @@ namespace Dreamtides.Tests.TestUtils
       }
     }
 
-    protected static void AssertCardBoxColliderIsOnScreen(
+    protected static IEnumerator AssertCardBoxColliderIsOnScreen(
       IGameViewport viewport,
       TestCard card,
       string cardDescription
     )
     {
+      // BoxCollider bounds are not correctly updated until the end of the frame
+      // where the layout is applied.
+      yield return new WaitForEndOfFrame();
+
       var collider = card.CardCollider;
       var bounds = collider.bounds;
 
