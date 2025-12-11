@@ -8,6 +8,8 @@ alwaysApply: false
 
 We ONLY use Editor-mode Unity tests in this project.
 
+Do NOT use reflection in unit tests.
+
 ## DreamtidesUnitTest Base Class
 
 All unit tests extend `DreamtidesUnitTest`. Key methods:
@@ -36,13 +38,16 @@ Production uses `RealViewport` (wraps real Camera). Tests use `FakeViewport`
 which simulates camera projection mathematically.
 
 
+## Testing CardPositions
+
+You can use `AssertCardBoxColliderIsOnScreen` to verify that cards are being
+rendered on screen as part of tests. Most unit tests should be doing some
+amount of verification of this kind, especially to verify that things are
+not rendering offscreen on extreme screen resolutions.
+
 ## Testing Different Resolutions
 
-Use `GameViewResolution` enum for common aspect ratios:
-- `Resolution16x9` - 82% of Steam users (1920x1080)
-- `Resolution21x9` - Ultrawide monitors
-- `Resolution16x10`, `Resolution3x2`, `Resolution5x4` - Various displays
-- `ResolutionIPhone12`, `ResolutionIPadPro12`, etc. - Mobile devices
+Use `GameViewResolution` enum for common aspect ratios to test.
 
 Test the same behavior across resolutions to catch layout edge cases. Make sure
 things are fully on-screen.
