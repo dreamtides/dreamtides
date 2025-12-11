@@ -35,8 +35,9 @@ management purposes, NOT a Unity transform parent. When you call `Add()`, the
 displayable's transform hierarchy is unchanged - only the logical ownership is
 updated.
 
-The sole exception is `RenderAsChildObjectLayout`, which explicitly parents
-displayables under its own transform using `SetParent(transform)` and uses
+The exception is `RenderAsChildObjectLayout` (and its subclasses like
+`DreamsignDisplayLayout`),  which explicitly parent
+displayables under their own transform using `SetParent(transform)` and use
 *local* position/rotation/scale instead of world space values.
 
 
@@ -72,7 +73,7 @@ StandardObjectLayout provides the concrete implementation. Subclasses override:
 - `CalculateObjectScale(int index, int count)` - Returns uniform scale (optional)
 
 Examples:
-- `PileObjectLayout` - Stacks cards with Y offset based on index
+- `PileObjectLayout` - Stacks cards in world space along transform.forward
 - `CurveObjectLayout` - Places cards along a bezier curve (used for hands)
 - `CenteredLineObjectLayout` - Places cards in a horizontal line
 - `RectangularObjectLayout` - Places cards in a 2D grid
@@ -116,7 +117,8 @@ This batching ensures layout calculations have correct counts before animating.
 
 - `ObjectLayout.cs` - Abstract base class
 - `StandardObjectLayout.cs` - Primary implementation with animation support
-- `RenderAsChildObjectLayout.cs` - Exception that uses transform parenting
+- `RenderAsChildObjectLayout.cs` - Abstract base for layouts that use transform parenting
+- `QuestDeckObjectLayout.cs` - Concrete child layout for quest deck (pile-like stacking)
 - `CardService.cs` - `ApplyAllLayouts()` and `LayoutForPosition()`
 - `BattleLayout.cs` - Holds references to all battle layout instances
 - `DreamscapeService.cs` - `ApplyLayouts()` for quest-related layouts

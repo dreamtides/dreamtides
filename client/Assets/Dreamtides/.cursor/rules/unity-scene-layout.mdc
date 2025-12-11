@@ -22,7 +22,7 @@ MainCamera                   # GameCamera component, controls camera positioning
   │   ├─ EnemyJudgment       # Magic circle effects for enemy judgment phase
   │   ├─ Victory             # Victory animation effects
   │   └─ Defeat              # Defeat animation effects
-  ├─ QuestDeck               # RenderAsChildObjectLayout for quest deck display
+  ├─ QuestDeck               # QuestDeckObjectLayout for quest deck display
   │   ├─ Background
   │   ├─ PointLight
   │   ├─ AboveQuestDeck

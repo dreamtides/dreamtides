@@ -45,8 +45,8 @@ namespace Dreamtides.Layout
     public StandardObjectLayout ShopLayout => Check(_shopLayout);
 
     [SerializeField]
-    internal StandardObjectLayout _dreamsignDisplay = null!;
-    public StandardObjectLayout DreamsignDisplay => Check(_dreamsignDisplay);
+    internal DreamsignDisplayLayout _dreamsignDisplay = null!;
+    public DreamsignDisplayLayout DreamsignDisplay => Check(_dreamsignDisplay);
 
     [SerializeField]
     internal StandardObjectLayout _journeyChoiceDisplay = null!;

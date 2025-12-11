@@ -218,7 +218,7 @@ namespace Dreamtides.Tests.TestUtils
       questDeckGo.transform.SetParent(mainCameraGo.transform, false);
       questDeckGo.transform.localPosition = new Vector3(0.209f, -0.488f, 1f);
       questDeckGo.transform.localScale = new Vector3(0.03f, 0.03f, 0.03f);
-      var questDeck = questDeckGo.AddComponent<RenderAsChildObjectLayout>();
+      var questDeck = questDeckGo.AddComponent<QuestDeckObjectLayout>();
       questDeck._yMultiplier = 0.5f;
 
       var backgroundGo = new GameObject("Background");

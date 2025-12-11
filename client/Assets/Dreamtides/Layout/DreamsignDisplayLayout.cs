@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace Dreamtides.Layout
 {
-  public sealed class DreamsignDisplayLayout : StandardObjectLayout
+  public sealed class DreamsignDisplayLayout : RenderAsChildObjectLayout
   {
     [SerializeField]
     internal float _horizontalSpacing;
@@ -21,41 +21,25 @@ namespace Dreamtides.Layout
     [SerializeField]
     internal float _cardHeight;
 
-    public override Vector3 CalculateObjectPosition(int index, int count)
+    public override Vector3 CalculateObjectLocalPosition(int index, int count)
     {
       if (count <= 0)
       {
-        return transform.position;
+        return Vector3.zero;
       }
-
-      var scale = transform.lossyScale.x;
-      var hs = _horizontalSpacing * scale;
-      var vs = _verticalSpacing * scale;
 
       var column = index / 2;
       var row = index % 2;
 
-      var localX = -hs * column;
-      var localY = count <= 1 ? 0f : (row == 0 ? vs / 2f : -vs / 2f);
+      var localX = -_horizontalSpacing * column;
+      var localY = count <= 1 ? 0f : (row == 0 ? _verticalSpacing / 2f : -_verticalSpacing / 2f);
 
-      return transform.position + transform.right * localX + transform.up * localY;
+      return new Vector3(localX, localY, 0f);
     }
 
-    public override Vector3? CalculateObjectRotation(int index, int count) => Vector3.zero;
+    public override Vector3? CalculateObjectLocalRotation(int index, int count) => Vector3.zero;
 
-    public override float? CalculateObjectScale(int index, int count) => 1.0f;
-
-    protected override void OnBeforeApplyLayout()
-    {
-      for (var i = 0; i < Objects.Count; ++i)
-      {
-        var displayable = Objects[i];
-        if (displayable && displayable.transform.parent != transform)
-        {
-          displayable.transform.SetParent(transform, worldPositionStays: true);
-        }
-      }
-    }
+    public override float? CalculateObjectLocalScale(int index, int count) => 1.0f;
 
     void OnDrawGizmosSelected()
     {

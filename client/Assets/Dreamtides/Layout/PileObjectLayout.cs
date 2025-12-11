@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace Dreamtides.Layout
 {
-  public class PileObjectLayout : StandardObjectLayout
+  public sealed class PileObjectLayout : StandardObjectLayout
   {
     [SerializeField]
     internal float _singleElementY = 0.5f;
@@ -16,16 +16,12 @@ namespace Dreamtides.Layout
     internal float _yMultiplier = 1.0f;
 
     public override Vector3 CalculateObjectPosition(int index, int count) =>
-      new(
-        transform.position.x,
-        transform.position.y + (_yMultiplier * Mathf.Lerp(0f, 1f, YPosition(index, count))),
-        transform.position.z
-      );
+      transform.position
+      + transform.forward * (_yMultiplier * Mathf.Lerp(0f, 1f, YPosition(index, count)));
 
-    public override Vector3? CalculateObjectRotation(int index, int count) =>
-      transform.rotation.eulerAngles;
+    public override Vector3? CalculateObjectRotation(int index, int count) => transform.eulerAngles;
 
-    public override float? CalculateObjectScale(int index, int count) => transform.localScale.x;
+    public override float? CalculateObjectScale(int index, int count) => transform.lossyScale.x;
 
     float YPosition(int index, int count) =>
       count switch

@@ -16,10 +16,10 @@ namespace Dreamtides.Layout
   /// using local position/rotation/scale instead of world space.
   ///
   /// This mirrors the behavior of StandardObjectLayout but applies
-  /// movement with local transforms, and provides pile-like defaults
-  /// for position/rotation/scale in local space.
+  /// movement with local transforms, automatically parenting children
+  /// to this layout's transform.
   /// </summary>
-  public sealed class RenderAsChildObjectLayout : ObjectLayout
+  public abstract class RenderAsChildObjectLayout : ObjectLayout
   {
     [SerializeField]
     List<Displayable> _objects = new();
@@ -27,12 +27,7 @@ namespace Dreamtides.Layout
     [SerializeField]
     internal bool _debugUpdateContinuously = false;
 
-    // Pile-like tuning (applied as LOCAL offsets relative to this transform)
-    [SerializeField]
-    internal float _singleElementY = 0.5f;
-
-    [SerializeField]
-    internal float _yMultiplier = 1.0f;
+    bool _shouldFireBecameNonEmptyAfterNextLayoutAnimation;
 
     /// <summary>
     /// If true, the layout will update continuously.
@@ -51,6 +46,8 @@ namespace Dreamtides.Layout
     {
       Errors.CheckNotNull(displayable);
 
+      var wasEmpty = _objects.Count == 0;
+
       if (!_objects.Contains(displayable))
       {
         if (displayable.Parent)
@@ -59,7 +56,6 @@ namespace Dreamtides.Layout
         }
 
         displayable.Parent = this;
-        // Parent under this transform, preserve world space initially so we can animate to local target.
         displayable.transform.SetParent(transform, worldPositionStays: true);
         _objects.Add(displayable);
       }
@@ -70,6 +66,11 @@ namespace Dreamtides.Layout
       }
 
       SortObjects();
+
+      if (wasEmpty && Objects.Count > 0)
+      {
+        _shouldFireBecameNonEmptyAfterNextLayoutAnimation = true;
+      }
     }
 
     /// <summary>Adds a range of objects to this ObjectLayout</summary>
@@ -82,13 +83,16 @@ namespace Dreamtides.Layout
       if (displayable)
       {
         displayable.Parent = null;
-        // Detach from this transform if currently parented here
         if (displayable.transform.parent == transform)
         {
           displayable.transform.SetParent(null, worldPositionStays: true);
         }
         _objects.Remove(displayable);
         SortObjects();
+        if (_objects.Count == 0)
+        {
+          OnBecameEmpty();
+        }
       }
     }
 
@@ -103,6 +107,10 @@ namespace Dreamtides.Layout
       }
       _objects.RemoveAt(index);
       SortObjects();
+      if (_objects.Count == 0)
+      {
+        OnBecameEmpty();
+      }
     }
 
     /// <summary>
@@ -112,6 +120,7 @@ namespace Dreamtides.Layout
     /// </summary>
     public override void ApplyTargetTransform(Displayable target, Sequence? sequence = null)
     {
+      OnBeforeApplyLayout();
       ApplyLayoutToObject(target, _objects.Count, _objects.Count + 1, sequence);
     }
 
@@ -121,38 +130,98 @@ namespace Dreamtides.Layout
     /// </summary>
     public override void ApplyLayout(Sequence? sequence = null)
     {
+      OnBeforeApplyLayout();
       for (var i = 0; i < _objects.Count; ++i)
       {
-        ApplyLayoutToObject(_objects[i], i, _objects.Count, sequence);
+        var layoutIndex = GetLayoutIndexOverride(_objects[i], i, _objects.Count);
+        ApplyLayoutToObject(_objects[i], layoutIndex, _objects.Count, sequence);
       }
+
+      if (_shouldFireBecameNonEmptyAfterNextLayoutAnimation)
+      {
+        if (sequence != null)
+        {
+          sequence.AppendCallback(() =>
+          {
+            _shouldFireBecameNonEmptyAfterNextLayoutAnimation = false;
+            OnBecameNonEmpty();
+          });
+        }
+        else
+        {
+          _shouldFireBecameNonEmptyAfterNextLayoutAnimation = false;
+          OnBecameNonEmpty();
+        }
+      }
+
+      OnAppliedLayout();
     }
 
     /// <summary>
-    /// Calculates the LOCAL position of the object at the given index in the layout.
-    /// Defaults to a pile-like depth (Z-axis) distribution relative to this transform.
+    /// Invoked before applying the layout to the objects.
     /// </summary>
-    Vector3 CalculateObjectPosition(int index, int count) =>
-      new(0f, 0f, _yMultiplier * Mathf.Lerp(0f, 1f, YPosition(index, count)));
+    protected virtual void OnBeforeApplyLayout() { }
+
+    /// <summary>
+    /// Invoked after applying the layout to the objects.
+    /// </summary>
+    protected virtual void OnAppliedLayout() { }
+
+    /// <summary>
+    /// Invoked after the 'add objects' animation completes when the count of
+    /// objects in this layout changes from being zero to being nonzero.
+    /// </summary>
+    protected virtual void OnBecameNonEmpty() { }
+
+    /// <summary>
+    /// Invoked after removing objects when the count of objects in this layout
+    /// changes from being nonzero to being zero.
+    /// </summary>
+    protected virtual void OnBecameEmpty() { }
+
+    /// <summary>
+    /// Calculates the LOCAL position of the object at the given index in the layout.
+    /// </summary>
+    ///
+    /// Note that this may be invoked with index=0, count=0 to compute initial
+    /// object positions.
+    public abstract Vector3 CalculateObjectLocalPosition(int index, int count);
 
     /// <summary>
     /// Calculates the LOCAL rotation of the object at the given index in the layout.
     /// Returning Vector3.zero means the child matches this layout's rotation in world space.
     /// </summary>
-    Vector3? CalculateObjectRotation(int index, int count) => Vector3.zero;
+    ///
+    /// Note that this may be invoked with index=0, count=0 to compute initial
+    /// object rotations.
+    public virtual Vector3? CalculateObjectLocalRotation(int index, int count) => null;
 
     /// <summary>
     /// Calculates the LOCAL scale of the object at the given index.
     /// Returning 1.0f here causes world scale to match the layout's scale.
     /// </summary>
-    float? CalculateObjectScale(int index, int count) => 1.0f;
+    ///
+    /// Note that this may be invoked with index=0, count=0 to compute initial
+    /// object scales.
+    public virtual float? CalculateObjectLocalScale(int index, int count) => null;
 
-    protected override void OnUpdate()
+    /// <summary>
+    /// Override the layout index for the given object.
+    /// </summary>
+    protected virtual int GetLayoutIndexOverride(Displayable displayable, int index, int count) =>
+      index;
+
+    protected sealed override void OnUpdate()
     {
       if (_debugUpdateContinuously)
       {
         ApplyLayout();
       }
+
+      OnUpdateObjectLayout();
     }
+
+    protected virtual void OnUpdateObjectLayout() { }
 
     void ApplyLayoutToObject(
       Displayable displayable,
@@ -168,11 +237,10 @@ namespace Dreamtides.Layout
       }
 
       const float duration = TweenUtils.MoveAnimationDurationSeconds;
-      var localPosition = CalculateObjectPosition(index, count);
-      var localRotation = CalculateObjectRotation(index, count);
-      var localScale = CalculateObjectScale(index, count) ?? displayable.DefaultScale;
+      var localPosition = CalculateObjectLocalPosition(index, count);
+      var localRotation = CalculateObjectLocalRotation(index, count);
+      var localScale = CalculateObjectLocalScale(index, count) ?? displayable.DefaultScale;
 
-      // Ensure parenting under this layout
       if (displayable.transform.parent != transform)
       {
         displayable.transform.SetParent(transform, worldPositionStays: true);
@@ -180,7 +248,6 @@ namespace Dreamtides.Layout
 
       if (applyToChildren && displayable is ObjectLayout layout)
       {
-        // If this is a child layout, recursively animate its contained elements.
         ApplyLayoutToObject(layout, index, count, sequence: null, applyToChildren: false);
         if (sequence != null)
         {
@@ -273,19 +340,5 @@ namespace Dreamtides.Layout
 
     Vector3 EulerAngleDistance(Vector3 a, Vector3 b) =>
       new(Mathf.DeltaAngle(a.x, b.x), Mathf.DeltaAngle(a.y, b.y), Mathf.DeltaAngle(a.z, b.z));
-
-    float YPosition(int index, int count) =>
-      count switch
-      {
-        _ when index >= count => 0.65f,
-        0 => _singleElementY,
-        1 => _singleElementY,
-        2 => new[] { 0.4f, 0.6f }[index],
-        3 => new[] { 0.4f, 0.5f, 0.6f }[index],
-        4 => new[] { 0.40f, 0.45f, 0.50f, 0.55f }[index],
-        5 => new[] { 0.40f, 0.45f, 0.50f, 0.55f, 0.6f }[index],
-        6 => new[] { 0.40f, 0.45f, 0.50f, 0.55f, 0.6f, 0.65f }[index],
-        _ => index / ((float)count - 1),
-      };
   }
 }

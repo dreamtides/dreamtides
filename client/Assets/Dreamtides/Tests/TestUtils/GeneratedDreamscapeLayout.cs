@@ -28,7 +28,7 @@ namespace Dreamtides.Tests.TestUtils
       createdObjects.Add(questDeckGo);
       questDeckGo.transform.localPosition = new Vector3(0.209f, -0.488f, 1f);
       questDeckGo.transform.localScale = new Vector3(0.03f, 0.03f, 0.03f);
-      var questDeck = questDeckGo.AddComponent<RenderAsChildObjectLayout>();
+      var questDeck = questDeckGo.AddComponent<QuestDeckObjectLayout>();
       questDeck._yMultiplier = 0.5f;
       layout._questDeck = questDeck;
 
