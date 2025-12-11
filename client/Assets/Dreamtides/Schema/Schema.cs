@@ -1563,6 +1563,9 @@ namespace Dreamtides.Schema
     /// dreamscape site (prior to animation to the display), e.g. a merchant.
     ///
     /// Object is being displayed as an option in a tempting offer choice.
+    ///
+    /// Object is being displayed as one of the identity cards participating in
+    /// a battle.
     /// </summary>
     public partial class PositionClass
     {
@@ -1607,6 +1610,9 @@ namespace Dreamtides.Schema
 
         [JsonProperty("TemptingOfferDisplay", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public TemptingOfferPosition TemptingOfferDisplay { get; set; }
+
+        [JsonProperty("StartBattleDisplay", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public StartBattleDisplayType? StartBattleDisplay { get; set; }
     }
 
     public partial class TemptingOfferPosition
@@ -2742,11 +2748,8 @@ namespace Dreamtides.Schema
     /// Object is being displayed prominently, applying an effect to the
     /// currently active quest. Similar to a card being on the stack during a
     /// battle.
-    ///
-    /// Object is being displayed as one of the identity cards participating in
-    /// a battle.
     /// </summary>
-    public enum PositionEnum { Browser, Default, DestroyedQuestCards, DraftPickDisplay, Drawn, DreamsignDisplay, DreamwellActivation, GameModifier, HandStorage, InitiatingBattleIdentityCard, JourneyDisplay, Offscreen, OnScreenStorage, QuestDeck, QuestDeckBrowser, QuestEffect, ShopDisplay };
+    public enum PositionEnum { Browser, Default, DestroyedQuestCards, DraftPickDisplay, Drawn, DreamsignDisplay, DreamwellActivation, GameModifier, HandStorage, JourneyDisplay, Offscreen, OnScreenStorage, QuestDeck, QuestDeckBrowser, QuestEffect, ShopDisplay };
 
     /// <summary>
     /// Auto-generated discriminant enum variants
@@ -2754,6 +2757,8 @@ namespace Dreamtides.Schema
     public enum CardOrderSelectionTargetDiscriminants { Deck, Void };
 
     public enum StackType { Default, TargetingBothBattlefields, TargetingEnemyBattlefield, TargetingUserBattlefield };
+
+    public enum StartBattleDisplayType { EnemyDreamsigns, EnemyIdentityCard, UserDreamsigns, UserIdentityCard };
 
     public enum TemptingOfferType { Cost, Journey };
 
@@ -2995,6 +3000,7 @@ namespace Dreamtides.Schema
                 PositionConverter.Singleton,
                 CardOrderSelectionTargetDiscriminantsConverter.Singleton,
                 StackTypeConverter.Singleton,
+                StartBattleDisplayTypeConverter.Singleton,
                 TemptingOfferTypeConverter.Singleton,
                 PositionEnumConverter.Singleton,
                 MoveCardsCustomAnimationConverter.Singleton,
@@ -5325,8 +5331,6 @@ namespace Dreamtides.Schema
                             return new Position { Enum = PositionEnum.GameModifier };
                         case "HandStorage":
                             return new Position { Enum = PositionEnum.HandStorage };
-                        case "InitiatingBattleIdentityCard":
-                            return new Position { Enum = PositionEnum.InitiatingBattleIdentityCard };
                         case "JourneyDisplay":
                             return new Position { Enum = PositionEnum.JourneyDisplay };
                         case "Offscreen":
@@ -5383,9 +5387,6 @@ namespace Dreamtides.Schema
                         return;
                     case PositionEnum.HandStorage:
                         serializer.Serialize(writer, "HandStorage");
-                        return;
-                    case PositionEnum.InitiatingBattleIdentityCard:
-                        serializer.Serialize(writer, "InitiatingBattleIdentityCard");
                         return;
                     case PositionEnum.JourneyDisplay:
                         serializer.Serialize(writer, "JourneyDisplay");
@@ -5513,6 +5514,57 @@ namespace Dreamtides.Schema
         public static readonly StackTypeConverter Singleton = new StackTypeConverter();
     }
 
+    internal class StartBattleDisplayTypeConverter : JsonConverter
+    {
+        public override bool CanConvert(Type t) => t == typeof(StartBattleDisplayType) || t == typeof(StartBattleDisplayType?);
+
+        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
+        {
+            if (reader.TokenType == JsonToken.Null) return null;
+            var value = serializer.Deserialize<string>(reader);
+            switch (value)
+            {
+                case "EnemyDreamsigns":
+                    return StartBattleDisplayType.EnemyDreamsigns;
+                case "EnemyIdentityCard":
+                    return StartBattleDisplayType.EnemyIdentityCard;
+                case "UserDreamsigns":
+                    return StartBattleDisplayType.UserDreamsigns;
+                case "UserIdentityCard":
+                    return StartBattleDisplayType.UserIdentityCard;
+            }
+            throw new Exception("Cannot unmarshal type StartBattleDisplayType");
+        }
+
+        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
+        {
+            if (untypedValue == null)
+            {
+                serializer.Serialize(writer, null);
+                return;
+            }
+            var value = (StartBattleDisplayType)untypedValue;
+            switch (value)
+            {
+                case StartBattleDisplayType.EnemyDreamsigns:
+                    serializer.Serialize(writer, "EnemyDreamsigns");
+                    return;
+                case StartBattleDisplayType.EnemyIdentityCard:
+                    serializer.Serialize(writer, "EnemyIdentityCard");
+                    return;
+                case StartBattleDisplayType.UserDreamsigns:
+                    serializer.Serialize(writer, "UserDreamsigns");
+                    return;
+                case StartBattleDisplayType.UserIdentityCard:
+                    serializer.Serialize(writer, "UserIdentityCard");
+                    return;
+            }
+            throw new Exception("Cannot marshal type StartBattleDisplayType");
+        }
+
+        public static readonly StartBattleDisplayTypeConverter Singleton = new StartBattleDisplayTypeConverter();
+    }
+
     internal class TemptingOfferTypeConverter : JsonConverter
     {
         public override bool CanConvert(Type t) => t == typeof(TemptingOfferType) || t == typeof(TemptingOfferType?);
@@ -5582,8 +5634,6 @@ namespace Dreamtides.Schema
                     return PositionEnum.GameModifier;
                 case "HandStorage":
                     return PositionEnum.HandStorage;
-                case "InitiatingBattleIdentityCard":
-                    return PositionEnum.InitiatingBattleIdentityCard;
                 case "JourneyDisplay":
                     return PositionEnum.JourneyDisplay;
                 case "Offscreen":
@@ -5638,9 +5688,6 @@ namespace Dreamtides.Schema
                     return;
                 case PositionEnum.HandStorage:
                     serializer.Serialize(writer, "HandStorage");
-                    return;
-                case PositionEnum.InitiatingBattleIdentityCard:
-                    serializer.Serialize(writer, "InitiatingBattleIdentityCard");
                     return;
                 case PositionEnum.JourneyDisplay:
                     serializer.Serialize(writer, "JourneyDisplay");

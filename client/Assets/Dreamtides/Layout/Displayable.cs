@@ -3,6 +3,7 @@
 using System;
 using System.Collections;
 using System.Runtime.CompilerServices;
+using Dreamtides.Schema;
 using Dreamtides.Services;
 using Dreamtides.Utils;
 using UnityEngine;
@@ -27,6 +28,7 @@ namespace Dreamtides.Layout
     internal GameContext _internalGameContext;
 
     ObjectLayout? _parent;
+    ObjectPosition? _objectPosition;
     bool _initialized;
     Registry _registry = null!;
     GameMode _mode = GameMode.MainMenu;
@@ -150,6 +152,12 @@ namespace Dreamtides.Layout
     {
       get => _parent;
       set => _parent = value;
+    }
+
+    public ObjectPosition? ObjectPosition
+    {
+      get => _objectPosition;
+      set => _objectPosition = value;
     }
 
     public virtual float DefaultScale => 1.0f;

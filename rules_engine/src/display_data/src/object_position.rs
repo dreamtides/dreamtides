@@ -140,7 +140,7 @@ pub enum Position {
 
     /// Object is being displayed as one of the identity cards participating in
     /// a battle.
-    InitiatingBattleIdentityCard,
+    StartBattleDisplay(StartBattleDisplayType),
 }
 
 #[derive(
@@ -151,6 +151,16 @@ pub enum StackType {
     TargetingUserBattlefield,
     TargetingEnemyBattlefield,
     TargetingBothBattlefields,
+}
+
+#[derive(
+    Copy, Clone, Debug, Eq, PartialEq, Hash, Serialize, Deserialize, Ord, PartialOrd, JsonSchema,
+)]
+pub enum StartBattleDisplayType {
+    UserIdentityCard,
+    EnemyIdentityCard,
+    UserDreamsigns,
+    EnemyDreamsigns,
 }
 
 #[derive(

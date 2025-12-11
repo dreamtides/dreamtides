@@ -71,7 +71,7 @@ public class PrototypeQuest : Service
     var startCoroutine = new Func<IEnumerator, Coroutine>(StartCoroutine);
     if (_battleFlow == null)
     {
-      _battleFlow = new PrototypeQuestBattleFlow(registry);
+      _battleFlow = new PrototypeQuestBattleFlow(registry, _prototypeCards);
     }
     if (_temptingOfferFlow == null)
     {

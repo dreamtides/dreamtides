@@ -129,6 +129,7 @@ namespace Dreamtides.Services
         }
 
         card.SortingKey = (int)cardView.Position.SortingKey;
+        card.ObjectPosition = cardView.Position;
         card.Render(cardView, sequence);
         layout.Add(card);
       }
@@ -414,11 +415,6 @@ namespace Dreamtides.Services
         return Registry.DreamscapeLayout.QuestEffectPosition;
       }
 
-      if (position.Enum == PositionEnum.InitiatingBattleIdentityCard)
-      {
-        return Registry.DreamscapeLayout.StartBattleLayout;
-      }
-
       if (position.Enum == PositionEnum.DestroyedQuestCards)
       {
         return Registry.DreamscapeLayout.DestroyedQuestCards;
@@ -551,6 +547,11 @@ namespace Dreamtides.Services
       if (position.PositionClass.TemptingOfferDisplay is { } _)
       {
         return Registry.DreamscapeLayout.TemptingOfferDisplay;
+      }
+
+      if (position.PositionClass.StartBattleDisplay is { } _)
+      {
+        return Registry.DreamscapeLayout.StartBattleLayout;
       }
 
       var json = JsonConvert.SerializeObject(position.PositionClass);

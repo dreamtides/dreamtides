@@ -479,6 +479,7 @@ namespace Dreamtides.Prototype
           baseClass.TemptingOfferDisplay,
           sortingKey
         ),
+        StartBattleDisplay = baseClass.StartBattleDisplay,
       };
       return clone;
     }
@@ -687,6 +688,25 @@ namespace Dreamtides.Prototype
           }
         }
       }
+    }
+
+    public List<CardView> GetAllCards()
+    {
+      var result = new List<CardView>();
+      foreach (var kvp in _groupCaches)
+      {
+        result.AddRange(kvp.Value);
+      }
+      return result;
+    }
+
+    public List<CardView> GetGroupCards(string groupKey)
+    {
+      if (_groupCaches.TryGetValue(groupKey, out var cache))
+      {
+        return new List<CardView>(cache);
+      }
+      return new List<CardView>();
     }
 
     #endregion

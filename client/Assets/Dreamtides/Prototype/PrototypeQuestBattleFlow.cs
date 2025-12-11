@@ -1,8 +1,8 @@
 #nullable enable
 
-using System;
 using System.Collections;
 using System.Collections.Generic;
+using Dreamtides.Prototype;
 using Dreamtides.Schema;
 using Dreamtides.Services;
 using UnityEngine;
@@ -11,12 +11,15 @@ public class PrototypeQuestBattleFlow
 {
   const string UserIdentityCardId = "identity-user";
   const string EnemyIdentityCardId = "identity-enemy";
+  const string UserDreamsignsGroupKey = "dreamsigns";
 
   readonly Registry _registry;
+  readonly PrototypeCards _prototypeCards;
 
-  public PrototypeQuestBattleFlow(Registry registry)
+  public PrototypeQuestBattleFlow(Registry registry, PrototypeCards prototypeCards)
   {
     _registry = registry;
+    _prototypeCards = prototypeCards;
   }
 
   public IEnumerator ApplyBattleStartupRoutine()
@@ -30,9 +33,85 @@ public class PrototypeQuestBattleFlow
     );
     _registry.CameraAdjuster.AdjustFieldOfView(layout.BattleCameraBounds);
 
-    var identityCards = new List<CardView> { BuildUserIdentityCard(), BuildEnemyIdentityCard() };
-    var command = new UpdateQuestCommand { Quest = new QuestView { Cards = identityCards } };
+    var allCards = new List<CardView> { BuildUserIdentityCard(), BuildEnemyIdentityCard() };
+    AddUserDreamsignsWithUpdatedPositions(allCards);
+    AddEnemyDreamsigns(allCards);
+
+    var command = new UpdateQuestCommand { Quest = new QuestView { Cards = allCards } };
     yield return _registry.CardService.HandleUpdateQuestCards(command);
+  }
+
+  void AddUserDreamsignsWithUpdatedPositions(List<CardView> allCards)
+  {
+    var dreamsigns = _prototypeCards.GetGroupCards(UserDreamsignsGroupKey);
+    var sortingKey = 10;
+    foreach (var card in dreamsigns)
+    {
+      card.Position = new ObjectPosition
+      {
+        Position = new Position
+        {
+          PositionClass = new PositionClass
+          {
+            StartBattleDisplay = StartBattleDisplayType.UserDreamsigns,
+          },
+        },
+        SortingKey = sortingKey++,
+      };
+      allCards.Add(card);
+    }
+  }
+
+  void AddEnemyDreamsigns(List<CardView> allCards)
+  {
+    allCards.Add(BuildEnemyDreamsign("enemy-dreamsign-1", "Goldfeather", 20));
+    allCards.Add(BuildEnemyDreamsign("enemy-dreamsign-2", "Hourglass", 21));
+  }
+
+  CardView BuildEnemyDreamsign(string id, string name, int sortingKey)
+  {
+    var spriteName = name.ToLower();
+    return new CardView
+    {
+      Backless = true,
+      CardFacing = CardFacing.FaceUp,
+      Id = id,
+      Position = new ObjectPosition
+      {
+        Position = new Position
+        {
+          PositionClass = new PositionClass
+          {
+            StartBattleDisplay = StartBattleDisplayType.EnemyDreamsigns,
+          },
+        },
+        SortingKey = sortingKey,
+      },
+      Prefab = CardPrefab.Dreamsign,
+      Revealed = new RevealedCardView
+      {
+        Actions = new CardActions(),
+        CardType = "",
+        Cost = null,
+        Effects = new CardEffects(),
+        Image = new DisplayImage
+        {
+          Sprite = new SpriteAddress
+          {
+            Sprite =
+              $"Assets/ThirdParty/AngelinaAvgustova/WitchCraftIcons/PNG/outline_{spriteName}.png",
+          },
+        },
+        InfoZoomData = null,
+        IsFast = false,
+        Name = name,
+        OutlineColor = null,
+        Produced = null,
+        RulesText = "",
+        Spark = null,
+      },
+      RevealedToOpponents = true,
+    };
   }
 
   CardView BuildUserIdentityCard()
@@ -47,7 +126,13 @@ public class PrototypeQuestBattleFlow
       Id = UserIdentityCardId,
       Position = new ObjectPosition
       {
-        Position = new Position { Enum = PositionEnum.InitiatingBattleIdentityCard },
+        Position = new Position
+        {
+          PositionClass = new PositionClass
+          {
+            StartBattleDisplay = StartBattleDisplayType.UserIdentityCard,
+          },
+        },
         SortingKey = 0,
       },
       Prefab = CardPrefab.Identity,
@@ -92,7 +177,13 @@ public class PrototypeQuestBattleFlow
       Id = EnemyIdentityCardId,
       Position = new ObjectPosition
       {
-        Position = new Position { Enum = PositionEnum.InitiatingBattleIdentityCard },
+        Position = new Position
+        {
+          PositionClass = new PositionClass
+          {
+            StartBattleDisplay = StartBattleDisplayType.EnemyIdentityCard,
+          },
+        },
         SortingKey = 1,
       },
       Prefab = CardPrefab.Identity,
