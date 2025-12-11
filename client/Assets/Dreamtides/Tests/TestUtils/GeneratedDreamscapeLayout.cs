@@ -1,6 +1,6 @@
 // AUTO-GENERATED CODE - DO NOT EDIT
 // Generated from: Registry
-// Generated at: 2025-12-10 15:56:32
+// Generated at: 2025-12-11 06:45:14
 
 #nullable enable
 
@@ -24,7 +24,7 @@ namespace Dreamtides.Tests.TestUtils
       createdObjects.Add(layoutGo);
       var layout = layoutGo.AddComponent<DreamscapeLayout>();
 
-      var questDeckGo = new GameObject("QuestDeck");
+      var questDeckGo = new GameObject("QuestDeckObjectLayout");
       createdObjects.Add(questDeckGo);
       questDeckGo.transform.localPosition = new Vector3(0.209f, -0.488f, 1f);
       questDeckGo.transform.localScale = new Vector3(0.03f, 0.03f, 0.03f);
@@ -301,10 +301,20 @@ namespace Dreamtides.Tests.TestUtils
       startBattleLayout._cardInwardOffsetLandscape = 0.7f;
       startBattleLayout._cardScalePortrait = 0.25f;
       startBattleLayout._cardScaleLandscape = 0.45f;
-      startBattleLayout._buttonVerticalOffsetPortrait = -1.25f;
+      startBattleLayout._buttonVerticalOffsetPortrait = -1.5f;
       startBattleLayout._buttonVerticalOffsetLandscape = -1.5f;
       startBattleLayout._buttonScalePortrait = 0.1f;
       startBattleLayout._buttonScaleLandscape = 0.1f;
+      startBattleLayout._dreamsignScalePortrait = 0.1f;
+      startBattleLayout._dreamsignScaleLandscape = 0.15f;
+      startBattleLayout._dreamsignVerticalSpacingPortrait = 0.3f;
+      startBattleLayout._dreamsignVerticalSpacingLandscape = 0.45f;
+      startBattleLayout._dreamsignColumnSpacingPortrait = 0.3f;
+      startBattleLayout._dreamsignColumnSpacingLandscape = 0.45f;
+      startBattleLayout._dreamsignOutwardOffsetPortrait = 0.4f;
+      startBattleLayout._dreamsignOutwardOffsetLandscape = 0.3f;
+      startBattleLayout._dreamsignVerticalOffsetPortrait = -0.75f;
+      startBattleLayout._dreamsignVerticalOffsetLandscape = -0.1f;
 
       var vsTextGo = new GameObject("VsText");
       createdObjects.Add(vsTextGo);

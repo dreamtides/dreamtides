@@ -59,22 +59,40 @@ namespace Dreamtides.Layout
     internal float _buttonScaleLandscape = 0.15f;
 
     [SerializeField]
-    internal float _dreamsignScale = 0.25f;
+    internal float _dreamsignScalePortrait = 0.25f;
 
     [SerializeField]
-    internal float _dreamsignHorizontalSpacing = 0.8f;
+    internal float _dreamsignScaleLandscape = 0.25f;
 
     [SerializeField]
-    internal float _dreamsignVerticalSpacing = 1.0f;
+    internal float _dreamsignHorizontalSpacingPortrait = 0.8f;
 
     [SerializeField]
-    internal float _dreamsignColumnSpacing = 0.8f;
+    internal float _dreamsignHorizontalSpacingLandscape = 0.8f;
 
     [SerializeField]
-    internal float _dreamsignOutwardOffset = 1.5f;
+    internal float _dreamsignVerticalSpacingPortrait = 1.0f;
 
     [SerializeField]
-    internal float _dreamsignPortraitVerticalOffset = -2.5f;
+    internal float _dreamsignVerticalSpacingLandscape = 1.0f;
+
+    [SerializeField]
+    internal float _dreamsignColumnSpacingPortrait = 0.8f;
+
+    [SerializeField]
+    internal float _dreamsignColumnSpacingLandscape = 0.8f;
+
+    [SerializeField]
+    internal float _dreamsignOutwardOffsetPortrait = 1.5f;
+
+    [SerializeField]
+    internal float _dreamsignOutwardOffsetLandscape = 1.5f;
+
+    [SerializeField]
+    internal float _dreamsignVerticalOffsetPortrait = -2.5f;
+
+    [SerializeField]
+    internal float _dreamsignVerticalOffsetLandscape = 0f;
 
     DisplayableButton? _buttonInstance;
 
@@ -85,6 +103,15 @@ namespace Dreamtides.Layout
     float ButtonVerticalOffset =>
       IsLandscape() ? _buttonVerticalOffsetLandscape : _buttonVerticalOffsetPortrait;
     float ButtonScale => IsLandscape() ? _buttonScaleLandscape : _buttonScalePortrait;
+    float DreamsignScale => IsLandscape() ? _dreamsignScaleLandscape : _dreamsignScalePortrait;
+    float DreamsignVerticalSpacing =>
+      IsLandscape() ? _dreamsignVerticalSpacingLandscape : _dreamsignVerticalSpacingPortrait;
+    float DreamsignColumnSpacing =>
+      IsLandscape() ? _dreamsignColumnSpacingLandscape : _dreamsignColumnSpacingPortrait;
+    float DreamsignOutwardOffset =>
+      IsLandscape() ? _dreamsignOutwardOffsetLandscape : _dreamsignOutwardOffsetPortrait;
+    float DreamsignVerticalOffset =>
+      IsLandscape() ? _dreamsignVerticalOffsetLandscape : _dreamsignVerticalOffsetPortrait;
 
     readonly List<Displayable> _userDreamsigns = new();
     readonly List<Displayable> _enemyDreamsigns = new();
@@ -164,8 +191,8 @@ namespace Dreamtides.Layout
 
       return displayType.Value switch
       {
-        StartBattleDisplayType.UserDreamsigns => _dreamsignScale,
-        StartBattleDisplayType.EnemyDreamsigns => _dreamsignScale,
+        StartBattleDisplayType.UserDreamsigns => DreamsignScale,
+        StartBattleDisplayType.EnemyDreamsigns => DreamsignScale,
         _ => CardScale,
       };
     }
@@ -424,24 +451,24 @@ namespace Dreamtides.Layout
         ? -_horizontalSpacing / 2f + CardInwardOffset
         : _horizontalSpacing / 2f - CardInwardOffset;
 
-      var cardEdgeOffset = (_cardWidth * CardScale) / 2f + _dreamsignOutwardOffset;
+      var cardEdgeOffset = (_cardWidth * CardScale) / 2f + DreamsignOutwardOffset;
 
       float baseX;
       if (isUserSide)
       {
         baseX = identityCardX - cardEdgeOffset;
-        baseX -= column * _dreamsignColumnSpacing;
+        baseX -= column * DreamsignColumnSpacing;
       }
       else
       {
         baseX = identityCardX + cardEdgeOffset;
-        baseX += column * _dreamsignColumnSpacing;
+        baseX += column * DreamsignColumnSpacing;
       }
 
-      var totalHeight = (columnCount - 1) * _dreamsignVerticalSpacing;
-      var cardBottomY = -(_cardHeight * CardScale) / 2f;
+      var totalHeight = (columnCount - 1) * DreamsignVerticalSpacing;
+      var cardBottomY = -(_cardHeight * CardScale) / 2f + DreamsignVerticalOffset;
       var topY = cardBottomY + totalHeight;
-      var y = topY - rowInColumn * _dreamsignVerticalSpacing;
+      var y = topY - rowInColumn * DreamsignVerticalSpacing;
 
       return transform.position + transform.right * baseX + transform.up * y;
     }
@@ -457,12 +484,12 @@ namespace Dreamtides.Layout
         ? -_horizontalSpacing / 2f + CardInwardOffset
         : _horizontalSpacing / 2f - CardInwardOffset;
 
-      var columnOffset = (column == 0 ? -1 : 1) * _dreamsignColumnSpacing / 2f;
+      var columnOffset = (column == 0 ? -1 : 1) * DreamsignColumnSpacing / 2f;
       var x = identityCardX + columnOffset;
 
-      var baseY = _dreamsignPortraitVerticalOffset;
+      var baseY = DreamsignVerticalOffset;
       var topY = baseY;
-      var y = topY - rowInColumn * _dreamsignVerticalSpacing;
+      var y = topY - rowInColumn * DreamsignVerticalSpacing;
 
       return transform.position + transform.right * x + transform.up * y;
     }

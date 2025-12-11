@@ -1,6 +1,6 @@
 // AUTO-GENERATED CODE - DO NOT EDIT
 // Generated from: MainCamera
-// Generated at: 2025-12-10 15:56:33
+// Generated at: 2025-12-11 06:45:15
 
 #nullable enable
 
@@ -213,34 +213,34 @@ namespace Dreamtides.Tests.TestUtils
       smoke1Go.transform.SetParent(magicCircle331Go.transform, false);
       smoke1Go.transform.localPosition = new Vector3(0f, 0.5f, 0f);
 
-      var questDeckGo = new GameObject("QuestDeck");
-      createdObjects.Add(questDeckGo);
-      questDeckGo.transform.SetParent(mainCameraGo.transform, false);
-      questDeckGo.transform.localPosition = new Vector3(0.209f, -0.488f, 1f);
-      questDeckGo.transform.localScale = new Vector3(0.03f, 0.03f, 0.03f);
-      var questDeck = questDeckGo.AddComponent<QuestDeckObjectLayout>();
-      questDeck._yMultiplier = 0.5f;
+      var questDeckObjectLayoutGo = new GameObject("QuestDeckObjectLayout");
+      createdObjects.Add(questDeckObjectLayoutGo);
+      questDeckObjectLayoutGo.transform.SetParent(mainCameraGo.transform, false);
+      questDeckObjectLayoutGo.transform.localPosition = new Vector3(0.209f, -0.488f, 1f);
+      questDeckObjectLayoutGo.transform.localScale = new Vector3(0.03f, 0.03f, 0.03f);
+      var questDeckObjectLayout = questDeckObjectLayoutGo.AddComponent<QuestDeckObjectLayout>();
+      questDeckObjectLayout._yMultiplier = 0.5f;
 
       var backgroundGo = new GameObject("Background");
       createdObjects.Add(backgroundGo);
-      backgroundGo.transform.SetParent(questDeckGo.transform, false);
+      backgroundGo.transform.SetParent(questDeckObjectLayoutGo.transform, false);
       backgroundGo.transform.localPosition = new Vector3(0f, -0.39f, 0.32f);
       backgroundGo.transform.localScale = new Vector3(0.3512196f, 0.4547648f, 0.3f);
 
       var pointLightGo = new GameObject("Point Light");
       createdObjects.Add(pointLightGo);
-      pointLightGo.transform.SetParent(questDeckGo.transform, false);
+      pointLightGo.transform.SetParent(questDeckObjectLayoutGo.transform, false);
       pointLightGo.transform.localPosition = new Vector3(0f, 0f, -5f);
 
       var aboveQuestDeckGo = new GameObject("AboveQuestDeck");
       createdObjects.Add(aboveQuestDeckGo);
-      aboveQuestDeckGo.transform.SetParent(questDeckGo.transform, false);
+      aboveQuestDeckGo.transform.SetParent(questDeckObjectLayoutGo.transform, false);
       aboveQuestDeckGo.transform.localPosition = new Vector3(0f, 4.5f, 0f);
       aboveQuestDeckGo.transform.localScale = new Vector3(0.03f, 0.03f, 0.03f);
 
       var dreamsignDisplayGo = new GameObject("DreamsignDisplay");
       createdObjects.Add(dreamsignDisplayGo);
-      dreamsignDisplayGo.transform.SetParent(questDeckGo.transform, false);
+      dreamsignDisplayGo.transform.SetParent(questDeckObjectLayoutGo.transform, false);
       dreamsignDisplayGo.transform.localPosition = new Vector3(
         -3.166668f,
         -0.2333552f,
@@ -255,7 +255,7 @@ namespace Dreamtides.Tests.TestUtils
 
       var questDeckButtonGo = new GameObject("QuestDeckButton");
       createdObjects.Add(questDeckButtonGo);
-      questDeckButtonGo.transform.SetParent(questDeckGo.transform, false);
+      questDeckButtonGo.transform.SetParent(questDeckObjectLayoutGo.transform, false);
 
       var essenceTotalWorldPositionGo = new GameObject("EssenceTotalWorldPosition");
       createdObjects.Add(essenceTotalWorldPositionGo);
@@ -382,10 +382,20 @@ namespace Dreamtides.Tests.TestUtils
       startBattleObjectLayout._cardInwardOffsetLandscape = 0.7f;
       startBattleObjectLayout._cardScalePortrait = 0.25f;
       startBattleObjectLayout._cardScaleLandscape = 0.45f;
-      startBattleObjectLayout._buttonVerticalOffsetPortrait = -1.25f;
+      startBattleObjectLayout._buttonVerticalOffsetPortrait = -1.5f;
       startBattleObjectLayout._buttonVerticalOffsetLandscape = -1.5f;
       startBattleObjectLayout._buttonScalePortrait = 0.1f;
       startBattleObjectLayout._buttonScaleLandscape = 0.1f;
+      startBattleObjectLayout._dreamsignScalePortrait = 0.1f;
+      startBattleObjectLayout._dreamsignScaleLandscape = 0.15f;
+      startBattleObjectLayout._dreamsignVerticalSpacingPortrait = 0.3f;
+      startBattleObjectLayout._dreamsignVerticalSpacingLandscape = 0.45f;
+      startBattleObjectLayout._dreamsignColumnSpacingPortrait = 0.3f;
+      startBattleObjectLayout._dreamsignColumnSpacingLandscape = 0.45f;
+      startBattleObjectLayout._dreamsignOutwardOffsetPortrait = 0.4f;
+      startBattleObjectLayout._dreamsignOutwardOffsetLandscape = 0.3f;
+      startBattleObjectLayout._dreamsignVerticalOffsetPortrait = -0.75f;
+      startBattleObjectLayout._dreamsignVerticalOffsetLandscape = -0.1f;
 
       var vsTextGo = new GameObject("VsText");
       createdObjects.Add(vsTextGo);
