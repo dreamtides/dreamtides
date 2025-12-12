@@ -29,8 +29,13 @@ namespace Dreamtides.Layout
       Registry.IsLandscape ? Check(_questDeckBrowserLandscape) : Check(_questDeckBrowserPortrait);
 
     [SerializeField]
-    internal EssenceTotal _essenceTotal = null!;
-    public EssenceTotal EssenceTotal => Check(_essenceTotal);
+    internal EssenceTotal _essenceTotalPortrait = null!;
+
+    [SerializeField]
+    internal EssenceTotal _essenceTotalLandscape = null!;
+
+    public EssenceTotal EssenceTotal =>
+      Registry.IsLandscape ? Check(_essenceTotalLandscape) : Check(_essenceTotalPortrait);
 
     [SerializeField]
     internal SitePickObjectLayout _draftPickLayout = null!;

@@ -1,6 +1,7 @@
 #nullable enable
 
 using System.Runtime.CompilerServices;
+using Dreamtides.Layout;
 using Dreamtides.Utils;
 using TMPro;
 using UnityEngine;
@@ -9,13 +10,16 @@ using UnityEngine;
 
 namespace Dreamtides.Components
 {
-  public class EssenceTotal : MonoBehaviour
+  public class EssenceTotal : Displayable
   {
     [SerializeField]
     internal TextMeshProUGUI _text = null!;
 
     [SerializeField]
     internal TimedEffect _onChange = null!;
+
+    [SerializeField]
+    internal bool _landscapeMode;
 
     [SerializeField]
     internal string? _originalText;
@@ -26,9 +30,10 @@ namespace Dreamtides.Components
     [SerializeField]
     internal bool _activePreview;
 
-    void Start()
+    protected override void OnStart()
     {
       _originalColor = _text.color;
+      gameObject.SetActive(_landscapeMode == IsLandscape());
     }
 
     public void SetValue(string value, bool animate)

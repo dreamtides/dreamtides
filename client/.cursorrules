@@ -60,3 +60,5 @@ replace them with a stub implementation so we can re-run code generation via Tes
 
 Unity has its own system for null-checking subclasses of Component. You write null checks like `if (_battlefieldOutline) {}`
 without directly comparing to null
+
+If you need to determine whether the game is in portrait or landscape mode, all Displayables have an IsLandscape() method.
