@@ -188,7 +188,7 @@ public class PrototypeQuest : Service
 
   IEnumerator CreateUserIdentityCard(bool animate)
   {
-    var identityCard = _battleFlow.GetOrCreateQuestUserIdentityCard();
+    var identityCard = _battleFlow.GetOrCreateQuestUserIdentityCard(StudioType.UserStatus);
     var allCards = _prototypeCards.GetAllCards();
     allCards.Add(identityCard);
     var quest = new QuestView { Cards = allCards, EssenceTotal = 75 };

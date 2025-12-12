@@ -10,6 +10,7 @@ using UnityEngine;
 public class PrototypeQuestBattleFlow
 {
   const string UserIdentityCardId = "identity-user";
+  const string UserBattleIdentityCardId = "identity-user-battle";
   const string EnemyIdentityCardId = "identity-enemy";
   const string UserDreamsignsGroupKey = "dreamsigns";
   const string QuestDeckGroupKey = "quest";
@@ -24,7 +25,7 @@ public class PrototypeQuestBattleFlow
     _prototypeCards = prototypeCards;
   }
 
-  public CardView GetOrCreateQuestUserIdentityCard()
+  public CardView GetOrCreateQuestUserIdentityCard(StudioType studioType)
   {
     if (_userIdentityCard == null)
     {
@@ -33,7 +34,8 @@ public class PrototypeQuestBattleFlow
         {
           Position = new Position { Enum = PositionEnum.QuestUserIdentityCard },
           SortingKey = 0,
-        }
+        },
+        studioType
       );
     }
     return _userIdentityCard;
@@ -50,7 +52,7 @@ public class PrototypeQuestBattleFlow
     );
     _registry.CameraAdjuster.AdjustFieldOfView(layout.BattleCameraBounds);
 
-    var userIdentity = GetOrCreateQuestUserIdentityCard();
+    var userIdentity = BuildBattleUserIdentityCard();
     userIdentity.Position = new ObjectPosition
     {
       Position = new Position
@@ -145,7 +147,7 @@ public class PrototypeQuestBattleFlow
     };
   }
 
-  CardView BuildUserIdentityCard(ObjectPosition position)
+  CardView BuildUserIdentityCard(ObjectPosition position, StudioType studioType)
   {
     return new CardView
     {
@@ -156,6 +158,47 @@ public class PrototypeQuestBattleFlow
       DestroyPosition = null,
       Id = UserIdentityCardId,
       Position = position,
+      Prefab = CardPrefab.Identity,
+      Revealed = new RevealedCardView
+      {
+        Actions = new CardActions(),
+        CardType = "",
+        Cost = null,
+        Effects = new CardEffects(),
+        Image = new DisplayImage
+        {
+          Prefab = new DisplayPrefabImage
+          {
+            Prefab = new PrefabAddress
+            {
+              Prefab = "Assets/Content/Characters/PirateCaptain/PirateCaptain.prefab",
+            },
+            StudioType = studioType,
+          },
+        },
+        InfoZoomData = null,
+        IsFast = false,
+        Name = "Blackbeard",
+        OutlineColor = null,
+        Produced = null,
+        RulesText = "At the end of your turn, if you played no characters this turn, draw a card.",
+        Spark = null,
+      },
+      RevealedToOpponents = true,
+    };
+  }
+
+  CardView BuildBattleUserIdentityCard()
+  {
+    return new CardView
+    {
+      Backless = true,
+      CardFacing = CardFacing.FaceUp,
+      CreatePosition = null,
+      CreateSound = null,
+      DestroyPosition = null,
+      Id = UserBattleIdentityCardId,
+      Position = null,
       Prefab = CardPrefab.Identity,
       Revealed = new RevealedCardView
       {

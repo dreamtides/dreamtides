@@ -516,7 +516,6 @@ namespace Dreamtides.Components
       else if (_cardImage is MeshRenderer meshRenderer && revealed.Image.Prefab != null)
       {
         var prefab = Registry.AssetService.GetPrefab(revealed.Image.Prefab.Prefab);
-        Registry.StudioService.EndCapture(revealed.Image.Prefab.StudioType);
         Registry.StudioService.CaptureSubject(
           revealed.Image.Prefab.StudioType,
           prefab,
@@ -541,8 +540,8 @@ namespace Dreamtides.Components
         && revealed.Image.Prefab != null
       )
       {
+        Debug.Log("CaptureSubject: " + revealed.Image.Prefab.StudioType);
         var battlefieldPrefab = Registry.AssetService.GetPrefab(revealed.Image.Prefab.Prefab);
-        Registry.StudioService.EndCapture(revealed.Image.Prefab.StudioType);
         Registry.StudioService.CaptureSubject(
           revealed.Image.Prefab.StudioType,
           battlefieldPrefab,

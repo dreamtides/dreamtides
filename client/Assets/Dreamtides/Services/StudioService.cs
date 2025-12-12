@@ -21,8 +21,12 @@ namespace Dreamtides.Services
     [SerializeField]
     internal Transform _studioPosition = null!;
 
+    [SerializeField]
+    List<CaptureSession> _captureSessions = new();
+
     private Dictionary<StudioType, CaptureSession> _activeSessions = new();
 
+    [Serializable]
     private class CaptureSession
     {
       public Studio Studio = null!;
@@ -45,30 +49,63 @@ namespace Dreamtides.Services
       bool far = false
     )
     {
-      var studio = ComponentUtils.Instantiate(_studioPrefab);
-      var studioPosition = FindStudioPosition();
-      studio.transform.SetParent(_studioPosition);
-      studio.transform.position = studioPosition;
+      Debug.Log("CaptureSubject: " + type);
 
-      var renderTexture = new RenderTexture(1024, 1024, 24);
-      studio.StudioCamera.targetTexture = renderTexture;
-
-      var instance = Instantiate(prefab);
-      instance.transform.SetParent(far ? studio.FarSubjectPosition : studio.SubjectPosition);
-      instance.transform.localPosition = Vector3.zero;
-      instance.transform.localRotation = Quaternion.identity;
-
-      output.material.mainTexture = renderTexture;
-
-      var session = new CaptureSession
+      if (_activeSessions.TryGetValue(type, out var existingSession))
       {
-        Studio = studio,
-        Subject = instance,
-        RenderTexture = renderTexture,
-        StudioType = type,
-      };
+        if (existingSession.AnimationSequence != null)
+        {
+          StopCoroutine(existingSession.AnimationSequence);
+        }
 
-      _activeSessions[type] = session;
+        if (existingSession.Subject != null)
+        {
+          Destroy(existingSession.Subject);
+        }
+
+        var instance = Instantiate(prefab);
+        instance.transform.SetParent(
+          far ? existingSession.Studio.FarSubjectPosition : existingSession.Studio.SubjectPosition
+        );
+        instance.transform.localPosition = Vector3.zero;
+        instance.transform.localRotation = Quaternion.identity;
+
+        output.material.mainTexture = existingSession.RenderTexture;
+
+        existingSession.Subject = instance;
+        existingSession.CurrentPrimaryAnimation = null;
+        existingSession.CurrentExitAnimation = null;
+      }
+      else
+      {
+        var studio = ComponentUtils.Instantiate(_studioPrefab);
+        studio.StudioType = type;
+        studio.IsFar = far;
+        var studioPosition = FindStudioPosition();
+        studio.transform.SetParent(_studioPosition);
+        studio.transform.position = studioPosition;
+
+        var renderTexture = new RenderTexture(1024, 1024, 24);
+        studio.StudioCamera.targetTexture = renderTexture;
+
+        var instance = Instantiate(prefab);
+        instance.transform.SetParent(far ? studio.FarSubjectPosition : studio.SubjectPosition);
+        instance.transform.localPosition = Vector3.zero;
+        instance.transform.localRotation = Quaternion.identity;
+
+        output.material.mainTexture = renderTexture;
+
+        var session = new CaptureSession
+        {
+          Studio = studio,
+          Subject = instance,
+          RenderTexture = renderTexture,
+          StudioType = type,
+        };
+
+        _activeSessions[type] = session;
+        _captureSessions.Add(session);
+      }
     }
 
     public void PlayStudioAnimation(PlayStudioAnimationCommand command)
@@ -120,38 +157,6 @@ namespace Dreamtides.Services
       session.CurrentPrimaryAnimation = command.Animation.Name;
       session.CurrentExitAnimation = command.ExitAnimation;
       session.AnimationSequence = null;
-    }
-
-    /// <summary>
-    /// Ends a capture session for a MeshRenderer based on its instance ID.
-    /// </summary>
-    public void EndCapture(StudioType type)
-    {
-      if (_activeSessions.TryGetValue(type, out var session))
-      {
-        if (session.AnimationSequence != null)
-        {
-          StopCoroutine(session.AnimationSequence);
-        }
-
-        if (session.Studio != null)
-        {
-          Destroy(session.Studio.gameObject);
-        }
-
-        if (session.Subject != null)
-        {
-          Destroy(session.Subject);
-        }
-
-        if (session.RenderTexture != null)
-        {
-          session.RenderTexture.Release();
-          Destroy(session.RenderTexture);
-        }
-
-        _activeSessions.Remove(type);
-      }
     }
 
     private Vector3 FindStudioPosition()
