@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using Dreamtides.Buttons;
 using Dreamtides.Schema;
-using TMPro;
 using UnityEngine;
 
 [assembly: InternalsVisibleTo("Dreamtides.Tests")]
@@ -13,15 +12,6 @@ namespace Dreamtides.Layout
 {
   public sealed class StartBattleObjectLayout : StandardObjectLayout
   {
-    [SerializeField]
-    internal float _horizontalSpacing = 3f;
-
-    [SerializeField]
-    internal float _cardInwardOffsetPortrait = 0f;
-
-    [SerializeField]
-    internal float _cardInwardOffsetLandscape = 0f;
-
     [SerializeField]
     internal float _cardWidth = 2.5f;
 
@@ -33,15 +23,6 @@ namespace Dreamtides.Layout
 
     [SerializeField]
     internal float _cardScaleLandscape = 1f;
-
-    [SerializeField]
-    internal TextMeshPro? _vsText;
-
-    [SerializeField]
-    internal float _vsTextFontSizePortrait = 2f;
-
-    [SerializeField]
-    internal float _vsTextFontSizeLandscape = 3f;
 
     [SerializeField]
     internal DisplayableButton? _buttonPrefab;
@@ -83,23 +64,20 @@ namespace Dreamtides.Layout
     internal float _dreamsignColumnSpacingLandscape = 0.8f;
 
     [SerializeField]
-    internal float _dreamsignOutwardOffsetPortrait = 1.5f;
+    internal float _dreamsignOffsetFromIdentityPortrait = 2.5f;
 
     [SerializeField]
-    internal float _dreamsignOutwardOffsetLandscape = 1.5f;
+    internal float _dreamsignOffsetFromIdentityLandscape = 2.5f;
 
     [SerializeField]
-    internal float _dreamsignVerticalOffsetPortrait = -2.5f;
+    internal float _dreamsignVerticalOffsetPortrait = 0f;
 
     [SerializeField]
     internal float _dreamsignVerticalOffsetLandscape = 0f;
 
     DisplayableButton? _buttonInstance;
 
-    float CardInwardOffset =>
-      IsLandscape() ? _cardInwardOffsetLandscape : _cardInwardOffsetPortrait;
     float CardScale => IsLandscape() ? _cardScaleLandscape : _cardScalePortrait;
-    float VsTextFontSize => IsLandscape() ? _vsTextFontSizeLandscape : _vsTextFontSizePortrait;
     float ButtonVerticalOffset =>
       IsLandscape() ? _buttonVerticalOffsetLandscape : _buttonVerticalOffsetPortrait;
     float ButtonScale => IsLandscape() ? _buttonScaleLandscape : _buttonScalePortrait;
@@ -108,12 +86,11 @@ namespace Dreamtides.Layout
       IsLandscape() ? _dreamsignVerticalSpacingLandscape : _dreamsignVerticalSpacingPortrait;
     float DreamsignColumnSpacing =>
       IsLandscape() ? _dreamsignColumnSpacingLandscape : _dreamsignColumnSpacingPortrait;
-    float DreamsignOutwardOffset =>
-      IsLandscape() ? _dreamsignOutwardOffsetLandscape : _dreamsignOutwardOffsetPortrait;
+    float DreamsignOffsetFromIdentity =>
+      IsLandscape() ? _dreamsignOffsetFromIdentityLandscape : _dreamsignOffsetFromIdentityPortrait;
     float DreamsignVerticalOffset =>
       IsLandscape() ? _dreamsignVerticalOffsetLandscape : _dreamsignVerticalOffsetPortrait;
 
-    readonly List<Displayable> _userDreamsigns = new();
     readonly List<Displayable> _enemyDreamsigns = new();
 
     readonly ButtonView _defaultButtonView = new()
@@ -162,22 +139,14 @@ namespace Dreamtides.Layout
       var displayType = GetDisplayType(displayable);
       if (displayType == null)
       {
-        return CalculateIdentityCardPosition(index, count);
+        return transform.position;
       }
 
       return displayType.Value switch
       {
-        StartBattleDisplayType.UserIdentityCard => CalculateIdentityCardPosition(
-          index: 0,
-          identityCardCount: 2
-        ),
-        StartBattleDisplayType.EnemyIdentityCard => CalculateIdentityCardPosition(
-          index: 1,
-          identityCardCount: 2
-        ),
-        StartBattleDisplayType.UserDreamsigns => CalculateUserDreamsignPosition(displayable),
+        StartBattleDisplayType.EnemyIdentityCard => transform.position,
         StartBattleDisplayType.EnemyDreamsigns => CalculateEnemyDreamsignPosition(displayable),
-        _ => CalculateIdentityCardPosition(index, count),
+        _ => transform.position,
       };
     }
 
@@ -204,18 +173,13 @@ namespace Dreamtides.Layout
         return transform.position;
       }
 
-      if (count == 1)
-      {
-        return transform.position;
-      }
-
       var displayable = index < Objects.Count ? Objects[index] : null;
       if (displayable != null)
       {
         return CalculateObjectPositionForDisplayable(displayable, index, count);
       }
 
-      return CalculateIdentityCardPosition(index, identityCardCount: 2);
+      return transform.position;
     }
 
     public override Vector3? CalculateObjectRotation(int index, int count) =>
@@ -236,16 +200,13 @@ namespace Dreamtides.Layout
     {
       base.OnBecameNonEmpty();
       EnsureButtonInstance();
-      PositionVsText();
       PositionButton();
-      ShowVsText();
       ShowButton();
     }
 
     protected override void OnBecameEmpty()
     {
       base.OnBecameEmpty();
-      HideVsText();
       HideButton();
     }
 
@@ -253,8 +214,6 @@ namespace Dreamtides.Layout
     {
       if (DebugUpdateContinuously)
       {
-        PositionVsText();
-        UpdateVsTextFontSize();
         PositionButton();
         UpdateButtonScale();
       }
@@ -273,16 +232,6 @@ namespace Dreamtides.Layout
       _buttonInstance.SetDefaultScale(Vector3.one * ButtonScale);
     }
 
-    void PositionVsText()
-    {
-      if (!_vsText)
-      {
-        return;
-      }
-
-      _vsText.transform.SetPositionAndRotation(transform.position, transform.rotation);
-    }
-
     void PositionButton()
     {
       if (!_buttonInstance)
@@ -292,31 +241,6 @@ namespace Dreamtides.Layout
 
       var buttonPosition = transform.position + transform.up * ButtonVerticalOffset;
       _buttonInstance.transform.SetPositionAndRotation(buttonPosition, transform.rotation);
-    }
-
-    void ShowVsText()
-    {
-      if (_vsText)
-      {
-        _vsText.fontSize = VsTextFontSize;
-        _vsText.gameObject.SetActive(true);
-      }
-    }
-
-    void HideVsText()
-    {
-      if (_vsText)
-      {
-        _vsText.gameObject.SetActive(false);
-      }
-    }
-
-    void UpdateVsTextFontSize()
-    {
-      if (_vsText)
-      {
-        _vsText.fontSize = VsTextFontSize;
-      }
     }
 
     void UpdateButton()
@@ -346,17 +270,12 @@ namespace Dreamtides.Layout
 
     void CategorizeObjects()
     {
-      _userDreamsigns.Clear();
       _enemyDreamsigns.Clear();
 
       foreach (var obj in Objects)
       {
         var displayType = GetDisplayType(obj);
-        if (displayType == StartBattleDisplayType.UserDreamsigns)
-        {
-          _userDreamsigns.Add(obj);
-        }
-        else if (displayType == StartBattleDisplayType.EnemyDreamsigns)
+        if (displayType == StartBattleDisplayType.EnemyDreamsigns)
         {
           _enemyDreamsigns.Add(obj);
         }
@@ -368,30 +287,6 @@ namespace Dreamtides.Layout
       return displayable.ObjectPosition?.Position.PositionClass?.StartBattleDisplay;
     }
 
-    Vector3 CalculateIdentityCardPosition(int index, int identityCardCount)
-    {
-      if (identityCardCount <= 1)
-      {
-        return transform.position;
-      }
-
-      var isLeftCard = index == 0;
-      var baseOffset = isLeftCard ? -_horizontalSpacing / 2f : _horizontalSpacing / 2f;
-      var inwardAdjustment = isLeftCard ? CardInwardOffset : -CardInwardOffset;
-      return transform.position + transform.right * (baseOffset + inwardAdjustment);
-    }
-
-    Vector3 CalculateUserDreamsignPosition(Displayable displayable)
-    {
-      var indexInList = _userDreamsigns.IndexOf(displayable);
-      if (indexInList < 0)
-      {
-        indexInList = 0;
-      }
-
-      return CalculateDreamsignPosition(indexInList, _userDreamsigns.Count, isUserSide: true);
-    }
-
     Vector3 CalculateEnemyDreamsignPosition(Displayable displayable)
     {
       var indexInList = _enemyDreamsigns.IndexOf(displayable);
@@ -400,10 +295,10 @@ namespace Dreamtides.Layout
         indexInList = 0;
       }
 
-      return CalculateDreamsignPosition(indexInList, _enemyDreamsigns.Count, isUserSide: false);
+      return CalculateDreamsignPosition(indexInList, _enemyDreamsigns.Count);
     }
 
-    Vector3 CalculateDreamsignPosition(int index, int count, bool isUserSide)
+    Vector3 CalculateDreamsignPosition(int index, int count)
     {
       if (count <= 0)
       {
@@ -432,38 +327,19 @@ namespace Dreamtides.Layout
 
       if (IsLandscape())
       {
-        return CalculateDreamsignPositionLandscape(column, rowInColumn, columnCount, isUserSide);
+        return CalculateDreamsignPositionLandscape(column, rowInColumn, columnCount);
       }
       else
       {
-        return CalculateDreamsignPositionPortrait(column, rowInColumn, columnCount, isUserSide);
+        return CalculateDreamsignPositionPortrait(column, rowInColumn, columnCount);
       }
     }
 
-    Vector3 CalculateDreamsignPositionLandscape(
-      int column,
-      int rowInColumn,
-      int columnCount,
-      bool isUserSide
-    )
+    Vector3 CalculateDreamsignPositionLandscape(int column, int rowInColumn, int columnCount)
     {
-      var identityCardX = isUserSide
-        ? -_horizontalSpacing / 2f + CardInwardOffset
-        : _horizontalSpacing / 2f - CardInwardOffset;
-
-      var cardEdgeOffset = (_cardWidth * CardScale) / 2f + DreamsignOutwardOffset;
-
-      float baseX;
-      if (isUserSide)
-      {
-        baseX = identityCardX - cardEdgeOffset;
-        baseX -= column * DreamsignColumnSpacing;
-      }
-      else
-      {
-        baseX = identityCardX + cardEdgeOffset;
-        baseX += column * DreamsignColumnSpacing;
-      }
+      var cardEdgeOffset = (_cardWidth * CardScale) / 2f;
+      var baseX = cardEdgeOffset + DreamsignOffsetFromIdentity;
+      baseX += column * DreamsignColumnSpacing;
 
       var totalHeight = (columnCount - 1) * DreamsignVerticalSpacing;
       var cardBottomY = -(_cardHeight * CardScale) / 2f + DreamsignVerticalOffset;
@@ -473,19 +349,12 @@ namespace Dreamtides.Layout
       return transform.position + transform.right * baseX + transform.up * y;
     }
 
-    Vector3 CalculateDreamsignPositionPortrait(
-      int column,
-      int rowInColumn,
-      int columnCount,
-      bool isUserSide
-    )
+    Vector3 CalculateDreamsignPositionPortrait(int column, int rowInColumn, int columnCount)
     {
-      var identityCardX = isUserSide
-        ? -_horizontalSpacing / 2f + CardInwardOffset
-        : _horizontalSpacing / 2f - CardInwardOffset;
-
+      var cardEdgeOffset = (_cardWidth * CardScale) / 2f;
+      var baseX = cardEdgeOffset + DreamsignOffsetFromIdentity;
       var columnOffset = (column == 0 ? -1 : 1) * DreamsignColumnSpacing / 2f;
-      var x = identityCardX + columnOffset;
+      var x = baseX + columnOffset;
 
       var baseY = DreamsignVerticalOffset;
       var topY = baseY;
@@ -505,42 +374,10 @@ namespace Dreamtides.Layout
 
       Gizmos.DrawSphere(center, 0.1f);
 
-      var leftCardCenter = -_horizontalSpacing / 2f + CardInwardOffset;
-      var rightCardCenter = _horizontalSpacing / 2f - CardInwardOffset;
-
-      Gizmos.DrawSphere(
-        center + right * (leftCardCenter - halfCardWidth) + upAxis * halfCardHeight,
-        0.1f
-      );
-      Gizmos.DrawSphere(
-        center + right * (leftCardCenter + halfCardWidth) + upAxis * halfCardHeight,
-        0.1f
-      );
-      Gizmos.DrawSphere(
-        center + right * (leftCardCenter - halfCardWidth) - upAxis * halfCardHeight,
-        0.1f
-      );
-      Gizmos.DrawSphere(
-        center + right * (leftCardCenter + halfCardWidth) - upAxis * halfCardHeight,
-        0.1f
-      );
-
-      Gizmos.DrawSphere(
-        center + right * (rightCardCenter - halfCardWidth) + upAxis * halfCardHeight,
-        0.1f
-      );
-      Gizmos.DrawSphere(
-        center + right * (rightCardCenter + halfCardWidth) + upAxis * halfCardHeight,
-        0.1f
-      );
-      Gizmos.DrawSphere(
-        center + right * (rightCardCenter - halfCardWidth) - upAxis * halfCardHeight,
-        0.1f
-      );
-      Gizmos.DrawSphere(
-        center + right * (rightCardCenter + halfCardWidth) - upAxis * halfCardHeight,
-        0.1f
-      );
+      Gizmos.DrawSphere(center + right * (-halfCardWidth) + upAxis * halfCardHeight, 0.1f);
+      Gizmos.DrawSphere(center + right * (halfCardWidth) + upAxis * halfCardHeight, 0.1f);
+      Gizmos.DrawSphere(center + right * (-halfCardWidth) - upAxis * halfCardHeight, 0.1f);
+      Gizmos.DrawSphere(center + right * (halfCardWidth) - upAxis * halfCardHeight, 0.1f);
 
       Gizmos.color = Color.yellow;
       var buttonPos = center + upAxis * ButtonVerticalOffset;

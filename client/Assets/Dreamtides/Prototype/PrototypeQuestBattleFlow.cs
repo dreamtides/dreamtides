@@ -10,10 +10,9 @@ using UnityEngine;
 public class PrototypeQuestBattleFlow
 {
   const string UserIdentityCardId = "identity-user";
-  const string UserBattleIdentityCardId = "identity-user-battle";
   const string EnemyIdentityCardId = "identity-enemy";
-  const string UserDreamsignsGroupKey = "dreamsigns";
   const string QuestDeckGroupKey = "quest";
+  const string UserDreamsignsGroupKey = "dreamsigns";
 
   readonly Registry _registry;
   readonly PrototypeCards _prototypeCards;
@@ -51,103 +50,17 @@ public class PrototypeQuestBattleFlow
     );
     _registry.CameraAdjuster.AdjustFieldOfView(layout.BattleCameraBounds);
 
-    var userIdentity = BuildBattleUserIdentityCard();
-    userIdentity.Position = new ObjectPosition
-    {
-      Position = new Position
-      {
-        PositionClass = new PositionClass
-        {
-          StartBattleDisplay = StartBattleDisplayType.UserIdentityCard,
-        },
-      },
-      SortingKey = 0,
-    };
-
-    var allCards = new List<CardView> { userIdentity, BuildEnemyIdentityCard() };
+    var allCards = new List<CardView> { BuildEnemyIdentityCard() };
     if (_userIdentityCard != null)
     {
       allCards.Add(_userIdentityCard);
     }
-    AddUserDreamsignsWithUpdatedPositions(allCards);
-    AddEnemyDreamsigns(allCards);
+
     allCards.AddRange(_prototypeCards.GetGroupCards(QuestDeckGroupKey));
+    allCards.AddRange(_prototypeCards.GetGroupCards(UserDreamsignsGroupKey));
 
     var command = new UpdateQuestCommand { Quest = new QuestView { Cards = allCards } };
     yield return _registry.CardService.HandleUpdateQuestCards(command);
-  }
-
-  void AddUserDreamsignsWithUpdatedPositions(List<CardView> allCards)
-  {
-    var dreamsigns = _prototypeCards.GetGroupCards(UserDreamsignsGroupKey);
-    var sortingKey = 10;
-    foreach (var card in dreamsigns)
-    {
-      card.Position = new ObjectPosition
-      {
-        Position = new Position
-        {
-          PositionClass = new PositionClass
-          {
-            StartBattleDisplay = StartBattleDisplayType.UserDreamsigns,
-          },
-        },
-        SortingKey = sortingKey++,
-      };
-      allCards.Add(card);
-    }
-  }
-
-  void AddEnemyDreamsigns(List<CardView> allCards)
-  {
-    allCards.Add(BuildEnemyDreamsign("enemy-dreamsign-1", "Goldfeather", 20));
-    allCards.Add(BuildEnemyDreamsign("enemy-dreamsign-2", "Hourglass", 21));
-  }
-
-  CardView BuildEnemyDreamsign(string id, string name, int sortingKey)
-  {
-    var spriteName = name.ToLower();
-    return new CardView
-    {
-      Backless = true,
-      CardFacing = CardFacing.FaceUp,
-      Id = id,
-      Position = new ObjectPosition
-      {
-        Position = new Position
-        {
-          PositionClass = new PositionClass
-          {
-            StartBattleDisplay = StartBattleDisplayType.EnemyDreamsigns,
-          },
-        },
-        SortingKey = sortingKey,
-      },
-      Prefab = CardPrefab.Dreamsign,
-      Revealed = new RevealedCardView
-      {
-        Actions = new CardActions(),
-        CardType = "",
-        Cost = null,
-        Effects = new CardEffects(),
-        Image = new DisplayImage
-        {
-          Sprite = new SpriteAddress
-          {
-            Sprite =
-              $"Assets/ThirdParty/AngelinaAvgustova/WitchCraftIcons/PNG/outline_{spriteName}.png",
-          },
-        },
-        InfoZoomData = null,
-        IsFast = false,
-        Name = name,
-        OutlineColor = null,
-        Produced = null,
-        RulesText = "",
-        Spark = null,
-      },
-      RevealedToOpponents = true,
-    };
   }
 
   CardView BuildUserIdentityCard(ObjectPosition position, StudioType studioType)
@@ -177,47 +90,6 @@ public class PrototypeQuestBattleFlow
               Prefab = "Assets/Content/Characters/PirateCaptain/PirateCaptain.prefab",
             },
             StudioType = studioType,
-          },
-        },
-        InfoZoomData = null,
-        IsFast = false,
-        Name = "Blackbeard",
-        OutlineColor = null,
-        Produced = null,
-        RulesText = "At the end of your turn, if you played no characters this turn, draw a card.",
-        Spark = null,
-      },
-      RevealedToOpponents = true,
-    };
-  }
-
-  CardView BuildBattleUserIdentityCard()
-  {
-    return new CardView
-    {
-      Backless = true,
-      CardFacing = CardFacing.FaceUp,
-      CreatePosition = null,
-      CreateSound = null,
-      DestroyPosition = null,
-      Id = UserBattleIdentityCardId,
-      Position = null,
-      Prefab = CardPrefab.Identity,
-      Revealed = new RevealedCardView
-      {
-        Actions = new CardActions(),
-        CardType = "",
-        Cost = null,
-        Effects = new CardEffects(),
-        Image = new DisplayImage
-        {
-          Prefab = new DisplayPrefabImage
-          {
-            Prefab = new PrefabAddress
-            {
-              Prefab = "Assets/Content/Characters/PirateCaptain/PirateCaptain.prefab",
-            },
-            StudioType = StudioType.UserIdentityCard,
           },
         },
         InfoZoomData = null,

@@ -1,6 +1,6 @@
 // AUTO-GENERATED CODE - DO NOT EDIT
 // Generated from: Registry
-// Generated at: 2025-12-11 06:45:14
+// Generated at: 2025-12-12 13:52:38
 
 #nullable enable
 
@@ -31,6 +31,14 @@ namespace Dreamtides.Tests.TestUtils
       var questDeck = questDeckGo.AddComponent<QuestDeckObjectLayout>();
       questDeck._yMultiplier = 0.5f;
       layout._questDeck = questDeck;
+
+      var questUserIdentityCardGo = new GameObject("QuestUserIdentityCard");
+      createdObjects.Add(questUserIdentityCardGo);
+      questUserIdentityCardGo.transform.localPosition = new Vector3(0f, 0f, 1f);
+      questUserIdentityCardGo.transform.localScale = new Vector3(0.05f, 0.05f, 0.05f);
+      var questUserIdentityCard = questUserIdentityCardGo.AddComponent<QuestDeckObjectLayout>();
+      questUserIdentityCard._yMultiplier = 0.5f;
+      layout._questUserIdentityCard = questUserIdentityCard;
 
       var questDeckBrowserPortraitGo = new GameObject("QuestDeckBrowserPortrait");
       createdObjects.Add(questDeckBrowserPortraitGo);
@@ -142,58 +150,49 @@ namespace Dreamtides.Tests.TestUtils
       var essenceTotalPortraitGoRect = essenceTotalPortraitGo.AddComponent<RectTransform>();
       essenceTotalPortraitGoRect.anchorMin = new Vector2(0.5f, 0.5f);
       essenceTotalPortraitGoRect.anchorMax = new Vector2(0.5f, 0.5f);
-      essenceTotalPortraitGoRect.anchoredPosition = new Vector2(28.4f, 14.8f);
-      essenceTotalPortraitGoRect.sizeDelta = new Vector2(500f, 128f);
+      essenceTotalPortraitGoRect.anchoredPosition = new Vector2(2f, 25f);
+      essenceTotalPortraitGoRect.sizeDelta = new Vector2(50f, 50f);
       essenceTotalPortraitGoRect.localScale = new Vector3(0.1579779f, 0.1579779f, 0.1579779f);
-      var essenceTotalPortrait = essenceTotalPortraitGo.AddComponent<EssenceTotal>();
-      essenceTotalPortrait._landscapeMode = false;
+      var essenceTotal = essenceTotalPortraitGo.AddComponent<EssenceTotal>();
 
-      var textPortraitGo = new GameObject("EssenceText");
-      createdObjects.Add(textPortraitGo);
-      textPortraitGo.transform.SetParent(essenceTotalPortraitGo.transform, false);
-      var textPortraitGoRect = textPortraitGo.AddComponent<RectTransform>();
-      textPortraitGoRect.anchorMin = new Vector2(0.5f, 0.5f);
-      textPortraitGoRect.anchorMax = new Vector2(0.5f, 0.5f);
-      textPortraitGoRect.anchoredPosition = new Vector2(-52.3f, 0f);
-      textPortraitGoRect.sizeDelta = new Vector2(275.6726f, 100f);
-      var textMeshProUGUIPortrait = textPortraitGo.AddComponent<TextMeshProUGUI>();
-      essenceTotalPortrait._text = textMeshProUGUIPortrait;
+      var textGo = new GameObject("EssenceText");
+      createdObjects.Add(textGo);
+      textGo.transform.SetParent(essenceTotalPortraitGo.transform, false);
+      var textGoRect = textGo.AddComponent<RectTransform>();
+      textGoRect.anchorMin = new Vector2(0.5f, 0.5f);
+      textGoRect.anchorMax = new Vector2(0.5f, 0.5f);
+      textGoRect.sizeDelta = new Vector2(300f, 200f);
+      var textMeshProUGUI = textGo.AddComponent<TextMeshProUGUI>();
+      essenceTotal._text = textMeshProUGUI;
 
-      var onChangePortraitGo = new GameObject("EssenceTotalChangeEffect");
-      createdObjects.Add(onChangePortraitGo);
-      onChangePortraitGo.transform.localRotation = Quaternion.Euler(90f, 0f, 0f);
-      var timedEffectPortrait = onChangePortraitGo.AddComponent<TimedEffect>();
-      essenceTotalPortrait._onChange = timedEffectPortrait;
-      layout._essenceTotalPortrait = essenceTotalPortrait;
+      var onChangeGo = new GameObject("EssenceTotalChangeEffect");
+      createdObjects.Add(onChangeGo);
+      onChangeGo.transform.localRotation = Quaternion.Euler(90f, 0f, 0f);
+      var timedEffect = onChangeGo.AddComponent<TimedEffect>();
+      essenceTotal._onChange = timedEffect;
+      layout._essenceTotalPortrait = essenceTotal;
 
       var essenceTotalLandscapeGo = new GameObject("EssenceDisplayLandscape");
       createdObjects.Add(essenceTotalLandscapeGo);
       var essenceTotalLandscapeGoRect = essenceTotalLandscapeGo.AddComponent<RectTransform>();
       essenceTotalLandscapeGoRect.anchorMin = new Vector2(0.5f, 0.5f);
       essenceTotalLandscapeGoRect.anchorMax = new Vector2(0.5f, 0.5f);
-      essenceTotalLandscapeGoRect.anchoredPosition = new Vector2(28.4f, 14.8f);
-      essenceTotalLandscapeGoRect.sizeDelta = new Vector2(500f, 128f);
+      essenceTotalLandscapeGoRect.anchoredPosition = new Vector2(60f, -20f);
+      essenceTotalLandscapeGoRect.sizeDelta = new Vector2(50f, 50f);
       essenceTotalLandscapeGoRect.localScale = new Vector3(0.1579779f, 0.1579779f, 0.1579779f);
-      var essenceTotalLandscape = essenceTotalLandscapeGo.AddComponent<EssenceTotal>();
-      essenceTotalLandscape._landscapeMode = true;
+      var essenceTotal1 = essenceTotalLandscapeGo.AddComponent<EssenceTotal>();
 
-      var textLandscapeGo = new GameObject("EssenceText");
-      createdObjects.Add(textLandscapeGo);
-      textLandscapeGo.transform.SetParent(essenceTotalLandscapeGo.transform, false);
-      var textLandscapeGoRect = textLandscapeGo.AddComponent<RectTransform>();
-      textLandscapeGoRect.anchorMin = new Vector2(0.5f, 0.5f);
-      textLandscapeGoRect.anchorMax = new Vector2(0.5f, 0.5f);
-      textLandscapeGoRect.anchoredPosition = new Vector2(-52.3f, 0f);
-      textLandscapeGoRect.sizeDelta = new Vector2(275.6726f, 100f);
-      var textMeshProUGUILandscape = textLandscapeGo.AddComponent<TextMeshProUGUI>();
-      essenceTotalLandscape._text = textMeshProUGUILandscape;
-
-      var onChangeLandscapeGo = new GameObject("EssenceTotalChangeEffect");
-      createdObjects.Add(onChangeLandscapeGo);
-      onChangeLandscapeGo.transform.localRotation = Quaternion.Euler(90f, 0f, 0f);
-      var timedEffectLandscape = onChangeLandscapeGo.AddComponent<TimedEffect>();
-      essenceTotalLandscape._onChange = timedEffectLandscape;
-      layout._essenceTotalLandscape = essenceTotalLandscape;
+      var text1Go = new GameObject("EssenceText");
+      createdObjects.Add(text1Go);
+      text1Go.transform.SetParent(essenceTotalLandscapeGo.transform, false);
+      var text1GoRect = text1Go.AddComponent<RectTransform>();
+      text1GoRect.anchorMin = new Vector2(0.5f, 0.5f);
+      text1GoRect.anchorMax = new Vector2(0.5f, 0.5f);
+      text1GoRect.sizeDelta = new Vector2(300f, 200f);
+      var textMeshProUGUI1 = text1Go.AddComponent<TextMeshProUGUI>();
+      essenceTotal1._text = textMeshProUGUI1;
+      essenceTotal1._onChange = timedEffect;
+      layout._essenceTotalLandscape = essenceTotal1;
 
       var draftPickLayoutGo = new GameObject("DraftPickObjectLayout");
       createdObjects.Add(draftPickLayoutGo);
@@ -297,15 +296,15 @@ namespace Dreamtides.Tests.TestUtils
       var spriteRenderer1 = acceptButtonPrefabGo.AddComponent<SpriteRenderer>();
       displayableButton._background = spriteRenderer1;
 
-      var text1Go = new GameObject("ActionButtonText");
-      createdObjects.Add(text1Go);
-      text1Go.transform.SetParent(acceptButtonPrefabGo.transform, false);
-      var text1GoRect = text1Go.AddComponent<RectTransform>();
-      text1GoRect.anchorMin = new Vector2(0.5f, 0.5f);
-      text1GoRect.anchorMax = new Vector2(0.5f, 0.5f);
-      text1GoRect.anchoredPosition = new Vector2(-0.012f, -0.007f);
-      text1GoRect.sizeDelta = new Vector2(7.416f, 2.536f);
-      var textMeshPro = text1Go.AddComponent<TextMeshPro>();
+      var text2Go = new GameObject("ActionButtonText");
+      createdObjects.Add(text2Go);
+      text2Go.transform.SetParent(acceptButtonPrefabGo.transform, false);
+      var text2GoRect = text2Go.AddComponent<RectTransform>();
+      text2GoRect.anchorMin = new Vector2(0.5f, 0.5f);
+      text2GoRect.anchorMax = new Vector2(0.5f, 0.5f);
+      text2GoRect.anchoredPosition = new Vector2(-0.012f, -0.007f);
+      text2GoRect.sizeDelta = new Vector2(7.416f, 2.536f);
+      var textMeshPro = text2Go.AddComponent<TextMeshPro>();
       displayableButton._text = textMeshPro;
       var boxCollider = acceptButtonPrefabGo.AddComponent<BoxCollider>();
       displayableButton._collider = boxCollider;
@@ -327,8 +326,6 @@ namespace Dreamtides.Tests.TestUtils
       startBattleLayoutGo.transform.localPosition = new Vector3(0f, 0.5f, 2.75f);
       var startBattleLayout = startBattleLayoutGo.AddComponent<StartBattleObjectLayout>();
       startBattleLayout._internalGameContext = GameContext.Interface;
-      startBattleLayout._cardInwardOffsetPortrait = 1.15f;
-      startBattleLayout._cardInwardOffsetLandscape = 0.7f;
       startBattleLayout._cardScalePortrait = 0.25f;
       startBattleLayout._cardScaleLandscape = 0.45f;
       startBattleLayout._buttonVerticalOffsetPortrait = -1.5f;
@@ -341,20 +338,8 @@ namespace Dreamtides.Tests.TestUtils
       startBattleLayout._dreamsignVerticalSpacingLandscape = 0.45f;
       startBattleLayout._dreamsignColumnSpacingPortrait = 0.3f;
       startBattleLayout._dreamsignColumnSpacingLandscape = 0.45f;
-      startBattleLayout._dreamsignOutwardOffsetPortrait = 0.4f;
-      startBattleLayout._dreamsignOutwardOffsetLandscape = 0.3f;
       startBattleLayout._dreamsignVerticalOffsetPortrait = -0.75f;
       startBattleLayout._dreamsignVerticalOffsetLandscape = -0.1f;
-
-      var vsTextGo = new GameObject("VsText");
-      createdObjects.Add(vsTextGo);
-      vsTextGo.transform.SetParent(startBattleLayoutGo.transform, false);
-      var vsTextGoRect = vsTextGo.AddComponent<RectTransform>();
-      vsTextGoRect.anchorMin = new Vector2(0.5f, 0.5f);
-      vsTextGoRect.anchorMax = new Vector2(0.5f, 0.5f);
-      vsTextGoRect.sizeDelta = new Vector2(20f, 5f);
-      var textMeshPro1 = vsTextGo.AddComponent<TextMeshPro>();
-      startBattleLayout._vsText = textMeshPro1;
       startBattleLayout._buttonPrefab = displayableButton;
       layout._startBattleLayout = startBattleLayout;
 

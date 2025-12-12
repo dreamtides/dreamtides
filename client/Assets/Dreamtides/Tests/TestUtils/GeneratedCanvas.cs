@@ -1,6 +1,6 @@
 // AUTO-GENERATED CODE - DO NOT EDIT
 // Generated from: Canvas
-// Generated at: 2025-12-11 06:45:13
+// Generated at: 2025-12-12 13:52:36
 
 #nullable enable
 
@@ -30,9 +30,9 @@ namespace Dreamtides.Tests.TestUtils
       var canvasGoRect = canvasGo.AddComponent<RectTransform>();
       canvasGoRect.anchorMin = new Vector2(0f, 0f);
       canvasGoRect.anchorMax = new Vector2(0f, 0f);
-      canvasGoRect.anchoredPosition = new Vector2(960f, 540f);
-      canvasGoRect.sizeDelta = new Vector2(711.1111f, 400f);
-      canvasGoRect.localScale = new Vector3(2.7f, 2.7f, 2.7f);
+      canvasGoRect.anchoredPosition = new Vector2(759f, 457f);
+      canvasGoRect.sizeDelta = new Vector2(664.3326f, 400f);
+      canvasGoRect.localScale = new Vector3(2.285f, 2.285f, 2.285f);
       var canvas = canvasGo.AddComponent<Canvas>();
       var canvasCanvasScaler = canvasGo.AddComponent<CanvasScaler>();
       var canvasGraphicRaycaster = canvasGo.AddComponent<GraphicRaycaster>();
@@ -415,38 +415,114 @@ namespace Dreamtides.Tests.TestUtils
       bottomLeftGoRect.anchorMin = new Vector2(0f, 0f);
       bottomLeftGoRect.anchorMax = new Vector2(0f, 0f);
       bottomLeftGoRect.pivot = new Vector2(0f, 0f);
+      bottomLeftGoRect.sizeDelta = new Vector2(50f, 70f);
       result.Objects.Add("SafeArea/BottomLeft", bottomLeftGo);
 
-      var essenceDisplayGo = new GameObject("EssenceDisplay");
-      createdObjects.Add(essenceDisplayGo);
-      essenceDisplayGo.transform.SetParent(bottomLeftGo.transform, false);
-      var essenceDisplayGoRect = essenceDisplayGo.AddComponent<RectTransform>();
-      essenceDisplayGoRect.anchorMin = new Vector2(0.5f, 0.5f);
-      essenceDisplayGoRect.anchorMax = new Vector2(0.5f, 0.5f);
-      essenceDisplayGoRect.anchoredPosition = new Vector2(28.4f, 14.8f);
-      essenceDisplayGoRect.sizeDelta = new Vector2(500f, 128f);
-      essenceDisplayGoRect.localScale = new Vector3(0.1579779f, 0.1579779f, 0.1579779f);
-      result.Objects.Add("SafeArea/BottomLeft/EssenceDisplay", essenceDisplayGo);
+      var questUserIdentityCardPositionGo = new GameObject("QuestUserIdentityCardPosition");
+      createdObjects.Add(questUserIdentityCardPositionGo);
+      questUserIdentityCardPositionGo.transform.SetParent(bottomLeftGo.transform, false);
+      var questUserIdentityCardPositionGoRect =
+        questUserIdentityCardPositionGo.AddComponent<RectTransform>();
+      questUserIdentityCardPositionGoRect.anchorMin = new Vector2(0.5f, 0.5f);
+      questUserIdentityCardPositionGoRect.anchorMax = new Vector2(0.5f, 0.5f);
+      questUserIdentityCardPositionGoRect.anchoredPosition = new Vector2(0f, -10f);
+      result.Objects.Add(
+        "SafeArea/BottomLeft/QuestUserIdentityCardPosition",
+        questUserIdentityCardPositionGo
+      );
+
+      var essenceDisplayPortraitGo = new GameObject("EssenceDisplayPortrait");
+      createdObjects.Add(essenceDisplayPortraitGo);
+      essenceDisplayPortraitGo.transform.SetParent(bottomLeftGo.transform, false);
+      var essenceDisplayPortraitGoRect = essenceDisplayPortraitGo.AddComponent<RectTransform>();
+      essenceDisplayPortraitGoRect.anchorMin = new Vector2(0.5f, 0.5f);
+      essenceDisplayPortraitGoRect.anchorMax = new Vector2(0.5f, 0.5f);
+      essenceDisplayPortraitGoRect.anchoredPosition = new Vector2(2f, 25f);
+      essenceDisplayPortraitGoRect.sizeDelta = new Vector2(50f, 50f);
+      essenceDisplayPortraitGoRect.localScale = new Vector3(0.1579779f, 0.1579779f, 0.1579779f);
+      result.Objects.Add("SafeArea/BottomLeft/EssenceDisplayPortrait", essenceDisplayPortraitGo);
 
       var essenceTextGo = new GameObject("EssenceText");
       createdObjects.Add(essenceTextGo);
-      essenceTextGo.transform.SetParent(essenceDisplayGo.transform, false);
+      essenceTextGo.transform.SetParent(essenceDisplayPortraitGo.transform, false);
       var essenceTextGoRect = essenceTextGo.AddComponent<RectTransform>();
       essenceTextGoRect.anchorMin = new Vector2(0.5f, 0.5f);
       essenceTextGoRect.anchorMax = new Vector2(0.5f, 0.5f);
-      essenceTextGoRect.anchoredPosition = new Vector2(-52.3f, 0f);
-      essenceTextGoRect.sizeDelta = new Vector2(275.6726f, 100f);
-      result.Objects.Add("SafeArea/BottomLeft/EssenceDisplay/EssenceText", essenceTextGo);
+      essenceTextGoRect.sizeDelta = new Vector2(300f, 200f);
+      result.Objects.Add("SafeArea/BottomLeft/EssenceDisplayPortrait/EssenceText", essenceTextGo);
+
+      var tMPSubMeshUIFiraOutlineBoxiconsSDFAtlasGo = new GameObject(
+        "TMP SubMeshUI [fira_outline + boxicons SDF Atlas]"
+      );
+      createdObjects.Add(tMPSubMeshUIFiraOutlineBoxiconsSDFAtlasGo);
+      tMPSubMeshUIFiraOutlineBoxiconsSDFAtlasGo.transform.SetParent(essenceTextGo.transform, false);
+      var tMPSubMeshUIFiraOutlineBoxiconsSDFAtlasGoRect =
+        tMPSubMeshUIFiraOutlineBoxiconsSDFAtlasGo.AddComponent<RectTransform>();
+      result.Objects.Add(
+        "SafeArea/BottomLeft/EssenceDisplayPortrait/EssenceText/TMP SubMeshUI [fira_outline + boxicons SDF Atlas]",
+        tMPSubMeshUIFiraOutlineBoxiconsSDFAtlasGo
+      );
 
       var essenceSymbolGo = new GameObject("EssenceSymbol");
       createdObjects.Add(essenceSymbolGo);
-      essenceSymbolGo.transform.SetParent(essenceDisplayGo.transform, false);
+      essenceSymbolGo.transform.SetParent(essenceDisplayPortraitGo.transform, false);
       var essenceSymbolGoRect = essenceSymbolGo.AddComponent<RectTransform>();
       essenceSymbolGoRect.anchorMin = new Vector2(0.5f, 0.5f);
       essenceSymbolGoRect.anchorMax = new Vector2(0.5f, 0.5f);
       essenceSymbolGoRect.anchoredPosition = new Vector2(196.2942f, 0f);
       essenceSymbolGoRect.sizeDelta = new Vector2(209.8115f, 100f);
-      result.Objects.Add("SafeArea/BottomLeft/EssenceDisplay/EssenceSymbol", essenceSymbolGo);
+      result.Objects.Add(
+        "SafeArea/BottomLeft/EssenceDisplayPortrait/EssenceSymbol",
+        essenceSymbolGo
+      );
+
+      var essenceDisplayLandscapeGo = new GameObject("EssenceDisplayLandscape");
+      createdObjects.Add(essenceDisplayLandscapeGo);
+      essenceDisplayLandscapeGo.transform.SetParent(bottomLeftGo.transform, false);
+      var essenceDisplayLandscapeGoRect = essenceDisplayLandscapeGo.AddComponent<RectTransform>();
+      essenceDisplayLandscapeGoRect.anchorMin = new Vector2(0.5f, 0.5f);
+      essenceDisplayLandscapeGoRect.anchorMax = new Vector2(0.5f, 0.5f);
+      essenceDisplayLandscapeGoRect.anchoredPosition = new Vector2(60f, -20f);
+      essenceDisplayLandscapeGoRect.sizeDelta = new Vector2(50f, 50f);
+      essenceDisplayLandscapeGoRect.localScale = new Vector3(0.1579779f, 0.1579779f, 0.1579779f);
+      result.Objects.Add("SafeArea/BottomLeft/EssenceDisplayLandscape", essenceDisplayLandscapeGo);
+
+      var essenceText1Go = new GameObject("EssenceText");
+      createdObjects.Add(essenceText1Go);
+      essenceText1Go.transform.SetParent(essenceDisplayLandscapeGo.transform, false);
+      var essenceText1GoRect = essenceText1Go.AddComponent<RectTransform>();
+      essenceText1GoRect.anchorMin = new Vector2(0.5f, 0.5f);
+      essenceText1GoRect.anchorMax = new Vector2(0.5f, 0.5f);
+      essenceText1GoRect.sizeDelta = new Vector2(300f, 200f);
+      result.Objects.Add("SafeArea/BottomLeft/EssenceDisplayLandscape/EssenceText", essenceText1Go);
+
+      var tMPSubMeshUIFiraOutlineBoxiconsSDFAtlas1Go = new GameObject(
+        "TMP SubMeshUI [fira_outline + boxicons SDF Atlas]"
+      );
+      createdObjects.Add(tMPSubMeshUIFiraOutlineBoxiconsSDFAtlas1Go);
+      tMPSubMeshUIFiraOutlineBoxiconsSDFAtlas1Go.transform.SetParent(
+        essenceText1Go.transform,
+        false
+      );
+      var tMPSubMeshUIFiraOutlineBoxiconsSDFAtlas1GoRect =
+        tMPSubMeshUIFiraOutlineBoxiconsSDFAtlas1Go.AddComponent<RectTransform>();
+      result.Objects.Add(
+        "SafeArea/BottomLeft/EssenceDisplayLandscape/EssenceText/TMP SubMeshUI [fira_outline + boxicons SDF Atlas]",
+        tMPSubMeshUIFiraOutlineBoxiconsSDFAtlas1Go
+      );
+
+      var essenceSymbol1Go = new GameObject("EssenceSymbol");
+      createdObjects.Add(essenceSymbol1Go);
+      essenceSymbol1Go.transform.SetParent(essenceDisplayLandscapeGo.transform, false);
+      var essenceSymbol1GoRect = essenceSymbol1Go.AddComponent<RectTransform>();
+      essenceSymbol1GoRect.anchorMin = new Vector2(0.5f, 0.5f);
+      essenceSymbol1GoRect.anchorMax = new Vector2(0.5f, 0.5f);
+      essenceSymbol1GoRect.anchoredPosition = new Vector2(196.2942f, 0f);
+      essenceSymbol1GoRect.sizeDelta = new Vector2(209.8115f, 100f);
+      result.Objects.Add(
+        "SafeArea/BottomLeft/EssenceDisplayLandscape/EssenceSymbol",
+        essenceSymbol1Go
+      );
 
       var spaceCameraFarGo = new GameObject("SpaceCameraFar");
       createdObjects.Add(spaceCameraFarGo);

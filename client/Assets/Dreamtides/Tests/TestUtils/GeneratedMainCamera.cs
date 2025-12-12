@@ -1,6 +1,6 @@
 // AUTO-GENERATED CODE - DO NOT EDIT
 // Generated from: MainCamera
-// Generated at: 2025-12-11 06:45:15
+// Generated at: 2025-12-12 13:52:39
 
 #nullable enable
 
@@ -213,6 +213,14 @@ namespace Dreamtides.Tests.TestUtils
       smoke1Go.transform.SetParent(magicCircle331Go.transform, false);
       smoke1Go.transform.localPosition = new Vector3(0f, 0.5f, 0f);
 
+      var questUserIdentityCardGo = new GameObject("QuestUserIdentityCard");
+      createdObjects.Add(questUserIdentityCardGo);
+      questUserIdentityCardGo.transform.SetParent(mainCameraGo.transform, false);
+      questUserIdentityCardGo.transform.localPosition = new Vector3(0f, 0f, 1f);
+      questUserIdentityCardGo.transform.localScale = new Vector3(0.05f, 0.05f, 0.05f);
+      var questUserIdentityCard = questUserIdentityCardGo.AddComponent<QuestDeckObjectLayout>();
+      questUserIdentityCard._yMultiplier = 0.5f;
+
       var questDeckObjectLayoutGo = new GameObject("QuestDeckObjectLayout");
       createdObjects.Add(questDeckObjectLayoutGo);
       questDeckObjectLayoutGo.transform.SetParent(mainCameraGo.transform, false);
@@ -378,8 +386,6 @@ namespace Dreamtides.Tests.TestUtils
       var startBattleObjectLayout =
         startBattleObjectLayoutGo.AddComponent<StartBattleObjectLayout>();
       startBattleObjectLayout._internalGameContext = GameContext.Interface;
-      startBattleObjectLayout._cardInwardOffsetPortrait = 1.15f;
-      startBattleObjectLayout._cardInwardOffsetLandscape = 0.7f;
       startBattleObjectLayout._cardScalePortrait = 0.25f;
       startBattleObjectLayout._cardScaleLandscape = 0.45f;
       startBattleObjectLayout._buttonVerticalOffsetPortrait = -1.5f;
@@ -392,8 +398,6 @@ namespace Dreamtides.Tests.TestUtils
       startBattleObjectLayout._dreamsignVerticalSpacingLandscape = 0.45f;
       startBattleObjectLayout._dreamsignColumnSpacingPortrait = 0.3f;
       startBattleObjectLayout._dreamsignColumnSpacingLandscape = 0.45f;
-      startBattleObjectLayout._dreamsignOutwardOffsetPortrait = 0.4f;
-      startBattleObjectLayout._dreamsignOutwardOffsetLandscape = 0.3f;
       startBattleObjectLayout._dreamsignVerticalOffsetPortrait = -0.75f;
       startBattleObjectLayout._dreamsignVerticalOffsetLandscape = -0.1f;
 
