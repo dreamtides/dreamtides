@@ -51,7 +51,7 @@ namespace Dreamtides.Components
     internal GameObject _shadowCaster = null!;
 
     [SerializeField]
-    internal SpriteRenderer _battlefieldCardImage = null!;
+    internal Renderer _battlefieldCardImage = null!;
 
     [SerializeField]
     internal BoxCollider _cardCollider = null!;
@@ -63,7 +63,7 @@ namespace Dreamtides.Components
     internal Renderer _outline = null!;
 
     [SerializeField]
-    internal SpriteRenderer _battlefieldOutline = null!;
+    internal SpriteRenderer? _battlefieldOutline;
 
     [SerializeField]
     internal SpriteRenderer? _costBackground;
@@ -522,9 +522,26 @@ namespace Dreamtides.Components
         Registry.LoggingService.LogError($"Card has no valid image", ("id", Id));
       }
 
-      if (revealed.Image.Sprite is { } sprite)
+      if (
+        _battlefieldCardImage is SpriteRenderer battlefieldSpriteRenderer
+        && revealed.Image.Sprite != null
+      )
       {
-        _battlefieldCardImage.sprite = Registry.AssetService.GetSprite(sprite);
+        battlefieldSpriteRenderer.sprite = Registry.AssetService.GetSprite(revealed.Image.Sprite);
+      }
+      else if (
+        _battlefieldCardImage is MeshRenderer battlefieldMeshRenderer
+        && revealed.Image.Prefab != null
+      )
+      {
+        var battlefieldPrefab = Registry.AssetService.GetPrefab(revealed.Image.Prefab.Prefab);
+        Registry.StudioService.EndCapture(revealed.Image.Prefab.StudioType);
+        Registry.StudioService.CaptureSubject(
+          revealed.Image.Prefab.StudioType,
+          battlefieldPrefab,
+          battlefieldMeshRenderer,
+          far: false
+        );
       }
 
       _outline.material.SetInt("_Seed", UnityEngine.Random.Range(0, 9999));
@@ -532,13 +549,19 @@ namespace Dreamtides.Components
       {
         _outline.material.SetColor("_Color", new Color(0f, 1f, 0f));
         _outline.material.SetColor("_HiColor", new Color(0f, 1f, 0f));
-        _battlefieldOutline.color = new Color(1f, 1f, 1f);
+        if (_battlefieldOutline)
+        {
+          _battlefieldOutline.color = new Color(1f, 1f, 1f);
+        }
       }
       else
       {
         _outline.material.SetColor("_Color", MasonRenderer.ToUnityColor(revealed.OutlineColor));
         _outline.material.SetColor("_HiColor", MasonRenderer.ToUnityColor(revealed.OutlineColor));
-        _battlefieldOutline.color = MasonRenderer.ToUnityColor(revealed.OutlineColor);
+        if (_battlefieldOutline)
+        {
+          _battlefieldOutline.color = MasonRenderer.ToUnityColor(revealed.OutlineColor);
+        }
       }
 
       if (revealed.Effects?.LoopingEffect != null)
@@ -843,15 +866,21 @@ namespace Dreamtides.Components
         _battlefieldCardFront.gameObject.SetActive(BattlefieldMode());
         _cardFrame.gameObject.SetActive(!BattlefieldMode());
         _battlefieldSparkBackground.gameObject.SetActive(false);
-        _battlefieldOutline.gameObject.SetActive(false);
+        if (_battlefieldOutline)
+        {
+          _battlefieldOutline.gameObject.SetActive(false);
+        }
       }
       else if (BattlefieldMode())
       {
         _cardBack.gameObject.SetActive(false);
         _cardFront.gameObject.SetActive(false);
-        _battlefieldOutline.gameObject.SetActive(
-          !CardView.Backless && GameContext != GameContext.DiscardPile
-        );
+        if (_battlefieldOutline)
+        {
+          _battlefieldOutline.gameObject.SetActive(
+            !CardView.Backless && GameContext != GameContext.DiscardPile
+          );
+        }
         _battlefieldCardFront.gameObject.SetActive(true);
         _battlefieldSparkBackground.gameObject.SetActive(
           GameContext != GameContext.DiscardPile && CardView.Revealed?.Spark != null

@@ -65,7 +65,7 @@ namespace Dreamtides.Components
     {
       Errors.CheckNotNull(text);
       Errors.CheckArgument(text.Length > 0, "text must be non-empty");
-      _text.text = text;
+      _text.text = $"{text}<voffset=-0.04em><size=80%>\ufcec</size></voffset>";
     }
 
     void SetOriginalText(string text)
