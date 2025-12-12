@@ -1152,9 +1152,9 @@ namespace Dreamtides.Tests.Layout
       return layout;
     }
 
-    TestCard CreateDreamsign(bool isUserSide)
+    Card CreateDreamsign(bool isUserSide)
     {
-      var dreamsign = CreateTestCard(colliderWidth: 2.5f, colliderHeight: 4f);
+      var dreamsign = CreateTestCard();
       dreamsign.ObjectPosition = new ObjectPosition
       {
         Position = new PositionClass
@@ -1168,7 +1168,7 @@ namespace Dreamtides.Tests.Layout
       return dreamsign;
     }
 
-    void SetIdentityCardPosition(TestCard card, bool isUserSide)
+    void SetIdentityCardPosition(Card card, bool isUserSide)
     {
       card.ObjectPosition = new ObjectPosition
       {
@@ -1184,7 +1184,7 @@ namespace Dreamtides.Tests.Layout
 
     void AssertDreamsignBoxColliderIsOnScreen(
       IGameViewport viewport,
-      TestCard dreamsign,
+      Card dreamsign,
       string description
     )
     {

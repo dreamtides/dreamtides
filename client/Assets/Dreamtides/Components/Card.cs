@@ -123,7 +123,7 @@ namespace Dreamtides.Components
     internal float _cardColliderHeight = 4f;
 
     bool _isRevealed = false;
-    CardView _cardView = null!;
+    internal CardView _cardView = null!;
     float _dragStartScreenZ;
     Vector3 _dragStartPosition;
     Vector3 _dragOffset;
@@ -153,6 +153,8 @@ namespace Dreamtides.Components
     public SpriteRenderer? SpriteCardContentProtection => _spriteCardContentProtection;
 
     public DisplayableButton ButtonAttachment => _buttonAttachment;
+
+    public BoxCollider CardCollider => _cardCollider;
 
     protected override void OnInitialize()
     {
@@ -193,6 +195,11 @@ namespace Dreamtides.Components
         }
       }
     }
+
+    public Vector3 GetCardCenter() => transform.TransformPoint(_cardCollider.center);
+
+    public Vector3 GetCostSpriteWorldPosition() =>
+      _costText != null ? _costText.transform.position : GetCardCenter();
 
     public void TurnFaceDown(Sequence? sequence = null)
     {

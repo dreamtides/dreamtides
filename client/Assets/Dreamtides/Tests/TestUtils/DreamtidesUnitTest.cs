@@ -5,31 +5,21 @@ using System.Collections;
 using System.Collections.Generic;
 using Dreamtides.Components;
 using Dreamtides.Layout;
+using Dreamtides.Schema;
 using Dreamtides.Services;
 using Dreamtides.TestFakes;
 using NUnit.Framework;
+using UnityEditor;
 using UnityEngine;
 
 namespace Dreamtides.Tests.TestUtils
 {
   public class TestDisplayable : Displayable { }
 
-  public class TestCard : Displayable
-  {
-    internal BoxCollider _cardCollider = null!;
-    internal Transform _costSpritePosition = null!;
-
-    public BoxCollider CardCollider => _cardCollider;
-    public Transform CostSpritePosition => _costSpritePosition;
-
-    public Vector3 GetCardCenter() => transform.TransformPoint(_cardCollider.center);
-
-    public Vector3 GetCostSpriteWorldPosition() => _costSpritePosition.position;
-  }
-
   public abstract class DreamtidesUnitTest
   {
     readonly List<GameObject> _createdObjects = new();
+    int _testCardCounter;
 
     Registry? _registry;
     BattleLayout? _portraitLayout;
@@ -203,39 +193,34 @@ namespace Dreamtides.Tests.TestUtils
       return CreateViewport(resolution, cameraGo.transform, canvasRootRect);
     }
 
-    protected TestCard CreateTestCard(
-      float colliderWidth = 2.5f,
-      float colliderHeight = 4f,
-      Vector3? costSpriteLocalPosition = null
-    )
+    protected Card CreateTestCard()
     {
-      var card = CreateSceneObject<TestCard>(c =>
+      var prefab = AssetDatabase.LoadAssetAtPath<Card>("Assets/Content/Prefabs/Card.prefab");
+      var cardObject = UnityEngine.Object.Instantiate(prefab.gameObject);
+      _createdObjects.Add(cardObject);
+      var card = cardObject.GetComponent<Card>();
+      card._cardView = new CardView
       {
-        var collider = c.gameObject.AddComponent<BoxCollider>();
-        collider.size = new Vector3(colliderWidth, colliderHeight, 0.1f);
-        collider.center = new Vector3(0f, -0.5f, 0f);
-        c._cardCollider = collider;
-
-        var costSpriteGo = new GameObject("CostSprite");
-        _createdObjects.Add(costSpriteGo);
-        costSpriteGo.transform.SetParent(c.transform, worldPositionStays: false);
-        costSpriteGo.transform.localPosition =
-          costSpriteLocalPosition ?? new Vector3(-1f, 1.5f, 0f);
-        c._costSpritePosition = costSpriteGo.transform;
-      });
+        Id = $"test-card-{_testCardCounter++}",
+        Position = new ObjectPosition
+        {
+          Position = new Position { Enum = PositionEnum.Offscreen },
+          SortingKey = 0,
+        },
+        Prefab = CardPrefab.Character,
+        CardFacing = CardFacing.FaceUp,
+      };
+      card.Initialize(Registry, _gameMode, _testConfiguration, fromRegistry: true);
+      card.StartFromRegistry();
       return card;
     }
 
-    protected TestCard[] CreateTestCards(
-      int count,
-      float colliderWidth = 2.5f,
-      float colliderHeight = 4f
-    )
+    protected Card[] CreateTestCards(int count)
     {
-      var cards = new TestCard[count];
+      var cards = new Card[count];
       for (var i = 0; i < count; i++)
       {
-        cards[i] = CreateTestCard(colliderWidth, colliderHeight);
+        cards[i] = CreateTestCard();
       }
       return cards;
     }
@@ -264,7 +249,7 @@ namespace Dreamtides.Tests.TestUtils
       );
     }
 
-    protected static void AssertCardIsOnScreen(IGameViewport viewport, TestCard card)
+    protected static void AssertCardIsOnScreen(IGameViewport viewport, Card card)
     {
       AssertPointIsOnScreen(viewport, card.GetCardCenter(), $"Card center ({card.name})");
       AssertPointIsOnScreen(
@@ -274,7 +259,7 @@ namespace Dreamtides.Tests.TestUtils
       );
     }
 
-    protected static void AssertCardsAreOnScreen(IGameViewport viewport, TestCard[] cards)
+    protected static void AssertCardsAreOnScreen(IGameViewport viewport, Card[] cards)
     {
       foreach (var card in cards)
       {
@@ -282,10 +267,7 @@ namespace Dreamtides.Tests.TestUtils
       }
     }
 
-    protected static void AssertCardsAreHorizontallyOrdered(
-      IGameViewport viewport,
-      TestCard[] cards
-    )
+    protected static void AssertCardsAreHorizontallyOrdered(IGameViewport viewport, Card[] cards)
     {
       for (var i = 0; i < cards.Length - 1; i++)
       {
@@ -301,7 +283,7 @@ namespace Dreamtides.Tests.TestUtils
 
     protected static void AssertCardBoxColliderIsOnScreen(
       IGameViewport viewport,
-      TestCard card,
+      Card card,
       string cardDescription
     )
     {
