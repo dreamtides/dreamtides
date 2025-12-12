@@ -178,6 +178,8 @@ MonoBehaviour:
   _studioCamera: {fileID: 3085817843473304525}
   _subjectPosition: {fileID: 971371375051325545}
   _farSubjectPosition: {fileID: 1800943075708763680}
+  _studioType: 0
+  _isFar: 0
 --- !u!1 &8448531787035611579
 GameObject:
   m_ObjectHideFlags: 0
@@ -234,14 +236,14 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 9047851759489804580}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.13052624, y: 0, z: 0, w: 0.9914449}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 8803092083821967031}
   m_Father: {fileID: 1523033941321127516}
-  m_LocalEulerAnglesHint: {x: -15, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!20 &3085817843473304525
 Camera:
   m_ObjectHideFlags: 0

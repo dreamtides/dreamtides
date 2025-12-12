@@ -43,7 +43,6 @@ public class PrototypeQuestBattleFlow
 
   public IEnumerator ApplyBattleStartupRoutine()
   {
-    Debug.Log("battle opened");
     var layout = _registry.BattleLayout;
     var cameraPosition = layout.CameraPosition;
     _registry.MainCamera.transform.SetPositionAndRotation(
@@ -66,6 +65,10 @@ public class PrototypeQuestBattleFlow
     };
 
     var allCards = new List<CardView> { userIdentity, BuildEnemyIdentityCard() };
+    if (_userIdentityCard != null)
+    {
+      allCards.Add(_userIdentityCard);
+    }
     AddUserDreamsignsWithUpdatedPositions(allCards);
     AddEnemyDreamsigns(allCards);
     allCards.AddRange(_prototypeCards.GetGroupCards(QuestDeckGroupKey));

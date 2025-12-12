@@ -513,7 +513,11 @@ namespace Dreamtides.Components
       {
         spriteRenderer.sprite = Registry.AssetService.GetSprite(revealed.Image.Sprite);
       }
-      else if (_cardImage is MeshRenderer meshRenderer && revealed.Image.Prefab != null)
+      else if (
+        _cardImage is MeshRenderer meshRenderer
+        && !IsBattlefieldModePosition()
+        && revealed.Image.Prefab != null
+      )
       {
         var prefab = Registry.AssetService.GetPrefab(revealed.Image.Prefab.Prefab);
         Registry.StudioService.CaptureSubject(
@@ -522,10 +526,6 @@ namespace Dreamtides.Components
           meshRenderer,
           far: true
         );
-      }
-      else
-      {
-        Registry.LoggingService.LogError($"Card has no valid image", ("id", Id));
       }
 
       if (
@@ -537,10 +537,10 @@ namespace Dreamtides.Components
       }
       else if (
         _battlefieldCardImage is MeshRenderer battlefieldMeshRenderer
+        && IsBattlefieldModePosition()
         && revealed.Image.Prefab != null
       )
       {
-        Debug.Log("CaptureSubject: " + revealed.Image.Prefab.StudioType);
         var battlefieldPrefab = Registry.AssetService.GetPrefab(revealed.Image.Prefab.Prefab);
         Registry.StudioService.CaptureSubject(
           revealed.Image.Prefab.StudioType,
@@ -925,6 +925,12 @@ namespace Dreamtides.Components
     }
 
     bool BattlefieldMode() => HasGameContext && GameContext.IsBattlefieldContext();
+
+    bool IsBattlefieldModePosition() =>
+      CardView.Position.Position.PositionClass?.OnBattlefield != null
+      || CardView.Position.Position.PositionClass?.InVoid != null
+      || CardView.Position.Position.Enum == PositionEnum.QuestUserIdentityCard
+      || CardView.Position.Position.Enum == PositionEnum.GameModifier;
 
     Vector3 MobileHandCardJumpPosition()
     {

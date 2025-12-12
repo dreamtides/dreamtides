@@ -24,6 +24,12 @@ namespace Dreamtides.Services
     [SerializeField]
     List<CaptureSession> _captureSessions = new();
 
+    [SerializeField]
+    float _nearCameraRotationX = -15f;
+
+    [SerializeField]
+    float _farCameraRotationX = 0f;
+
     private Dictionary<StudioType, CaptureSession> _activeSessions = new();
 
     [Serializable]
@@ -49,8 +55,6 @@ namespace Dreamtides.Services
       bool far = false
     )
     {
-      Debug.Log("CaptureSubject: " + type);
-
       if (_activeSessions.TryGetValue(type, out var existingSession))
       {
         if (existingSession.AnimationSequence != null)
@@ -70,6 +74,14 @@ namespace Dreamtides.Services
         instance.transform.localPosition = Vector3.zero;
         instance.transform.localRotation = Quaternion.identity;
 
+        var cameraRotationX = far ? _farCameraRotationX : _nearCameraRotationX;
+        var currentEuler = existingSession.Studio.StudioCamera.transform.eulerAngles;
+        existingSession.Studio.StudioCamera.transform.eulerAngles = new Vector3(
+          cameraRotationX,
+          currentEuler.y,
+          currentEuler.z
+        );
+
         output.material.mainTexture = existingSession.RenderTexture;
 
         existingSession.Subject = instance;
@@ -79,11 +91,20 @@ namespace Dreamtides.Services
       else
       {
         var studio = ComponentUtils.Instantiate(_studioPrefab);
+        studio.name = $"Studio_{type}_{(far ? "Far" : "Near")}";
         studio.StudioType = type;
         studio.IsFar = far;
         var studioPosition = FindStudioPosition();
         studio.transform.SetParent(_studioPosition);
         studio.transform.position = studioPosition;
+
+        var cameraRotationX = far ? _farCameraRotationX : _nearCameraRotationX;
+        var currentEuler = studio.StudioCamera.transform.eulerAngles;
+        studio.StudioCamera.transform.eulerAngles = new Vector3(
+          cameraRotationX,
+          currentEuler.y,
+          currentEuler.z
+        );
 
         var renderTexture = new RenderTexture(1024, 1024, 24);
         studio.StudioCamera.targetTexture = renderTexture;
