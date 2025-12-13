@@ -54,6 +54,9 @@ namespace Dreamtides.Components
     internal Renderer _battlefieldCardImage = null!;
 
     [SerializeField]
+    internal Renderer? _battlefieldCardImageBackground;
+
+    [SerializeField]
     internal BoxCollider _cardCollider = null!;
 
     [SerializeField]
@@ -917,11 +920,18 @@ namespace Dreamtides.Components
     {
       var disableShadows =
         CardView.Position.Position.Enum == PositionEnum.QuestDeck
-        || CardView.Position.Position.Enum == PositionEnum.DreamsignDisplay;
+        || CardView.Position.Position.Enum == PositionEnum.DreamsignDisplay
+        || CardView.Position.Position.Enum == PositionEnum.QuestUserIdentityCard;
       _shadowCaster.SetActive(!disableShadows);
       _cardBack.shadowCastingMode = disableShadows
         ? UnityEngine.Rendering.ShadowCastingMode.Off
         : UnityEngine.Rendering.ShadowCastingMode.On;
+      if (_battlefieldCardImageBackground)
+      {
+        _battlefieldCardImageBackground.shadowCastingMode = disableShadows
+          ? UnityEngine.Rendering.ShadowCastingMode.Off
+          : UnityEngine.Rendering.ShadowCastingMode.On;
+      }
     }
 
     bool BattlefieldMode() => HasGameContext && GameContext.IsBattlefieldContext();

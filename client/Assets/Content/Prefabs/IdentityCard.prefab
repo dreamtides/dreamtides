@@ -558,6 +558,10 @@ PrefabInstance:
       propertyPath: _battlefieldCardImage
       value: 
       objectReference: {fileID: 2553195109037417346}
+    - target: {fileID: 8215946370556705966, guid: dd6008076c4484dbda8c385e712d05aa, type: 3}
+      propertyPath: _battlefieldCardImageBackground
+      value: 
+      objectReference: {fileID: 1203902642710919078}
     - target: {fileID: 8401684551806214642, guid: dd6008076c4484dbda8c385e712d05aa, type: 3}
       propertyPath: m_text
       value: Blackbeard, Cunning Navigator
