@@ -160,6 +160,12 @@ namespace Dreamtides.Services
       return Errors.CheckNotNull(site.CharacterOwnedObjects);
     }
 
+    public ObjectLayout SiteCardOriginLayout(Guid siteId)
+    {
+      var site = FindBattleSite(siteId);
+      return site.BattleCardOrigin;
+    }
+
     public Transform CharacterScreenAnchorPosition(Guid merchantId)
     {
       var site = FindCharacterSite(merchantId);
@@ -200,6 +206,23 @@ namespace Dreamtides.Services
       throw new InvalidOperationException($"Unknown draft site id: {siteId}");
     }
 
+    BattleSite FindBattleSite(Guid siteId)
+    {
+      var sites = FindObjectsByType<BattleSite>(
+        FindObjectsInactive.Exclude,
+        FindObjectsSortMode.None
+      );
+      for (var i = 0; i < sites.Length; i++)
+      {
+        var site = sites[i];
+        if (site != null && site.SiteId == siteId)
+        {
+          return site;
+        }
+      }
+      throw new InvalidOperationException($"Unknown battle site id: {siteId}");
+    }
+
     void ApplySiteOwnedLayouts(Sequence? sequence)
     {
       var sites = FindObjectsByType<CharacterSite>(
@@ -210,6 +233,34 @@ namespace Dreamtides.Services
       {
         var site = sites[i];
         var layout = site?.CharacterOwnedObjects;
+        if (layout != null)
+        {
+          layout.ApplyLayout(sequence);
+        }
+      }
+
+      var battleSites = FindObjectsByType<BattleSite>(
+        FindObjectsInactive.Exclude,
+        FindObjectsSortMode.None
+      );
+      for (var i = 0; i < battleSites.Length; i++)
+      {
+        var site = battleSites[i];
+        var layout = site?.BattleCardOrigin;
+        if (layout != null)
+        {
+          layout.ApplyLayout(sequence);
+        }
+      }
+
+      var draftSites = FindObjectsByType<DraftSite>(
+        FindObjectsInactive.Exclude,
+        FindObjectsSortMode.None
+      );
+      for (var i = 0; i < draftSites.Length; i++)
+      {
+        var site = draftSites[i];
+        var layout = site?.SiteDeckLayout;
         if (layout != null)
         {
           layout.ApplyLayout(sequence);

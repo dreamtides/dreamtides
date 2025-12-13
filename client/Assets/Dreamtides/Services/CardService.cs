@@ -554,6 +554,11 @@ namespace Dreamtides.Services
         return Registry.DreamscapeLayout.TemptingOfferDisplay;
       }
 
+      if (position.PositionClass.StartBattleCardOrigin is { } siteId)
+      {
+        return Registry.DreamscapeService.SiteCardOriginLayout(siteId);
+      }
+
       if (position.PositionClass.StartBattleDisplay is { } _)
       {
         return Registry.DreamscapeLayout.StartBattleLayout;

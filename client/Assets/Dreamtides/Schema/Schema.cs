@@ -1564,6 +1564,9 @@ namespace Dreamtides.Schema
     ///
     /// Object is being displayed as an option in a tempting offer choice.
     ///
+    /// Object is being displayed at the origin position of a battle at the
+    /// given site.
+    ///
     /// Object is being displayed as one of the identity cards participating in
     /// a battle.
     /// </summary>
@@ -1610,6 +1613,9 @@ namespace Dreamtides.Schema
 
         [JsonProperty("TemptingOfferDisplay", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public TemptingOfferPosition TemptingOfferDisplay { get; set; }
+
+        [JsonProperty("StartBattleCardOrigin", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public Guid? StartBattleCardOrigin { get; set; }
 
         [JsonProperty("StartBattleDisplay", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public StartBattleDisplayType? StartBattleDisplay { get; set; }

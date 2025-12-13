@@ -24,6 +24,7 @@ public class PrototypeQuest : Service
   public static readonly Guid TemptingOfferSiteId = Guid.Parse(
     "2d9b1d2c-6637-4930-b9fc-a70fa901d662"
   );
+  public static readonly Guid BattleSiteId = Guid.Parse("0c5b497f-b768-4f76-bfcc-5bdb54d16d79");
 
   PrototypeCards _prototypeCards = new PrototypeCards();
   PrototypeQuestDraftFlow _draftFlow = null!;

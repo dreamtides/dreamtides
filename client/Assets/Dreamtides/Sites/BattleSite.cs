@@ -3,6 +3,7 @@
 using System;
 using System.Runtime.CompilerServices;
 using Dreamtides.Components;
+using Dreamtides.Layout;
 using Dreamtides.Services;
 using Unity.Cinemachine;
 using UnityEngine;
@@ -22,8 +23,13 @@ namespace Dreamtides.Sites
     [SerializeField]
     internal bool _debugUpdateContinuously;
 
+    [SerializeField]
+    internal ObjectLayout _battleCardOrigin = null!;
+
     bool _lastIsLandscape;
     bool _hasValidatedBattleCamera;
+
+    public ObjectLayout BattleCardOrigin => _battleCardOrigin;
 
     protected override void OnActiveCameraChanged(IGameViewport viewport, CinemachineCamera camera)
     {
@@ -101,11 +107,6 @@ namespace Dreamtides.Sites
       var camera = ResolveBattleCamera();
       camera.Priority = 0;
       _activeCamera = null;
-    }
-
-    public override void OnOpenedSite()
-    {
-      // Registry.BattleLayout.Contents.SetActive(true);
     }
 
     void AlignBattleLayout(IGameViewport viewport)

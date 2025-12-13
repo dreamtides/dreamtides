@@ -163,58 +163,5 @@ namespace Dreamtides.Tests.Layout
       layout.GameContext = GameContext.Interface;
       return layout;
     }
-
-    Card CreateDreamsign(bool isUserSide)
-    {
-      var dreamsign = CreateTestCard();
-      dreamsign.ObjectPosition = new ObjectPosition
-      {
-        Position = new PositionClass
-        {
-          StartBattleDisplay = StartBattleDisplayType.EnemyDreamsigns,
-        },
-        SortingKey = 0,
-      };
-      return dreamsign;
-    }
-
-    void SetIdentityCardPosition(Card card, bool isUserSide)
-    {
-      card.ObjectPosition = new ObjectPosition
-      {
-        Position = new PositionClass
-        {
-          StartBattleDisplay = StartBattleDisplayType.EnemyIdentityCard,
-        },
-        SortingKey = 0,
-      };
-    }
-
-    void AssertDreamsignBoxColliderIsOnScreen(
-      IGameViewport viewport,
-      Card dreamsign,
-      string description
-    )
-    {
-      var collider = dreamsign.CardCollider;
-      var center = collider.center;
-      var extents = collider.size * 0.5f;
-
-      var localCorners = new Vector3[8];
-      localCorners[0] = center + new Vector3(-extents.x, -extents.y, -extents.z);
-      localCorners[1] = center + new Vector3(-extents.x, -extents.y, extents.z);
-      localCorners[2] = center + new Vector3(-extents.x, extents.y, -extents.z);
-      localCorners[3] = center + new Vector3(-extents.x, extents.y, extents.z);
-      localCorners[4] = center + new Vector3(extents.x, -extents.y, -extents.z);
-      localCorners[5] = center + new Vector3(extents.x, -extents.y, extents.z);
-      localCorners[6] = center + new Vector3(extents.x, extents.y, -extents.z);
-      localCorners[7] = center + new Vector3(extents.x, extents.y, extents.z);
-
-      for (var i = 0; i < localCorners.Length; i++)
-      {
-        var worldCorner = dreamsign.transform.TransformPoint(localCorners[i]);
-        AssertPointIsOnScreen(viewport, worldCorner, $"{description} box collider corner {i}");
-      }
-    }
   }
 }

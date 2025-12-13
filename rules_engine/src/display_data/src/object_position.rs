@@ -141,6 +141,10 @@ pub enum Position {
     /// battle.
     QuestEffect,
 
+    /// Object is being displayed at the origin position of a battle at the
+    /// given site.
+    StartBattleCardOrigin(SiteId),
+
     /// Object is being displayed as one of the identity cards participating in
     /// a battle.
     StartBattleDisplay(StartBattleDisplayType),
