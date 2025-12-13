@@ -2,6 +2,7 @@
 
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Dreamtides.Prototype;
 using Dreamtides.Schema;
 using Dreamtides.Services;
@@ -50,7 +51,8 @@ public class PrototypeQuestBattleFlow
     );
     _registry.CameraAdjuster.AdjustFieldOfView(layout.BattleCameraBounds);
 
-    var allCards = new List<CardView> { BuildEnemyIdentityCard() };
+    var enemyIdentityCardAtOrigin = BuildEnemyIdentityCardAtOrigin();
+    var allCards = new List<CardView> { enemyIdentityCardAtOrigin };
     if (_userIdentityCard != null)
     {
       allCards.Add(_userIdentityCard);
@@ -61,6 +63,47 @@ public class PrototypeQuestBattleFlow
 
     var command = new UpdateQuestCommand { Quest = new QuestView { Cards = allCards } };
     yield return _registry.CardService.HandleUpdateQuestCards(command);
+
+    yield return new WaitForSeconds(0.3f);
+
+    var enemyIdentityCardAtDisplay = BuildEnemyIdentityCard();
+    var animation = new MoveCardsWithCustomAnimationCommand
+    {
+      Animation = MoveCardsCustomAnimation.DefaultAnimation,
+      Cards = new List<CardView> { enemyIdentityCardAtDisplay },
+      Destination = new Position
+      {
+        PositionClass = new PositionClass
+        {
+          StartBattleDisplay = StartBattleDisplayType.EnemyIdentityCard,
+        },
+      },
+      PauseDuration = new Milliseconds { MillisecondsValue = 0 },
+      StaggerInterval = new Milliseconds { MillisecondsValue = 50 },
+    };
+
+    yield return _registry.CardAnimationService.HandleMoveCardsWithCustomAnimation(animation);
+
+    var allIds = _registry.CardService.GetCardIds().ToList();
+    var updateCards = new List<CardView>(allIds.Count);
+    foreach (var id in allIds)
+    {
+      var card = _registry.CardService.GetCard(id);
+      var source = card.CardView;
+      if (id == EnemyIdentityCardId)
+      {
+        updateCards.Add(enemyIdentityCardAtDisplay);
+      }
+      else
+      {
+        updateCards.Add(source);
+      }
+    }
+
+    var update = new UpdateQuestCommand { Quest = new QuestView { Cards = updateCards } };
+    yield return _registry.CardService.HandleUpdateQuestCards(update);
+
+    _registry.DreamscapeLayout.StartBattleLayout.ShowButton();
   }
 
   CardView BuildUserIdentityCard(ObjectPosition position, StudioType studioType)
@@ -98,6 +141,54 @@ public class PrototypeQuestBattleFlow
         OutlineColor = null,
         Produced = null,
         RulesText = "At the end of your turn, if you played no characters this turn, draw a card.",
+        Spark = null,
+      },
+      RevealedToOpponents = true,
+    };
+  }
+
+  CardView BuildEnemyIdentityCardAtOrigin()
+  {
+    return new CardView
+    {
+      Backless = true,
+      CardFacing = CardFacing.FaceUp,
+      CreatePosition = null,
+      CreateSound = null,
+      DestroyPosition = null,
+      Id = EnemyIdentityCardId,
+      Position = new ObjectPosition
+      {
+        Position = new Position
+        {
+          PositionClass = new PositionClass { StartBattleCardOrigin = PrototypeQuest.BattleSiteId },
+        },
+        SortingKey = 1,
+      },
+      Prefab = CardPrefab.Identity,
+      Revealed = new RevealedCardView
+      {
+        Actions = new CardActions(),
+        CardType = "",
+        Cost = null,
+        Effects = new CardEffects(),
+        Image = new DisplayImage
+        {
+          Prefab = new DisplayPrefabImage
+          {
+            Prefab = new PrefabAddress
+            {
+              Prefab = "Assets/Content/Characters/WarriorKing/WarriorKing.prefab",
+            },
+            StudioType = StudioType.EnemyIdentityCard,
+          },
+        },
+        InfoZoomData = null,
+        IsFast = false,
+        Name = "The Black Knight",
+        OutlineColor = null,
+        Produced = null,
+        RulesText = "Whenever you discard your second card in a turn, draw a card.",
         Spark = null,
       },
       RevealedToOpponents = true,
