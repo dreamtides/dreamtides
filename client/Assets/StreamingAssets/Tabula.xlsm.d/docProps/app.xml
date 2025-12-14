@@ -4,17 +4,23 @@
   <ns0:DocSecurity>0</ns0:DocSecurity>
   <ns0:ScaleCrop>false</ns0:ScaleCrop>
   <ns0:HeadingPairs>
-    <ns1:vector size="2" baseType="variant">
+    <ns1:vector size="4" baseType="variant">
       <ns1:variant>
         <ns1:lpstr>Worksheets</ns1:lpstr>
       </ns1:variant>
       <ns1:variant>
         <ns1:i4>7</ns1:i4>
       </ns1:variant>
+      <ns1:variant>
+        <ns1:lpstr>Named Ranges</ns1:lpstr>
+      </ns1:variant>
+      <ns1:variant>
+        <ns1:i4>1</ns1:i4>
+      </ns1:variant>
     </ns1:vector>
   </ns0:HeadingPairs>
   <ns0:TitlesOfParts>
-    <ns1:vector size="7" baseType="lpstr">
+    <ns1:vector size="8" baseType="lpstr">
       <ns1:lpstr>Strings</ns1:lpstr>
       <ns1:lpstr>Cards</ns1:lpstr>
       <ns1:lpstr>Dreamwell</ns1:lpstr>
@@ -22,6 +28,7 @@
       <ns1:lpstr>Card Effects</ns1:lpstr>
       <ns1:lpstr>Test Cards</ns1:lpstr>
       <ns1:lpstr>Test Dreamwell</ns1:lpstr>
+      <ns1:lpstr>EffectTypesRange</ns1:lpstr>
     </ns1:vector>
   </ns0:TitlesOfParts>
   <ns0:Company />

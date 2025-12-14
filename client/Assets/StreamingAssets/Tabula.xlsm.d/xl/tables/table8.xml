@@ -1,0 +1,17 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:table xmlns:ns0="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:ns1="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:ns2="http://schemas.microsoft.com/office/spreadsheetml/2014/revision" xmlns:ns3="http://schemas.microsoft.com/office/spreadsheetml/2016/revision3" ns1:Ignorable="xr xr3" id="5" ns2:uid="{CFBAC16A-0116-CC4D-81BD-13DE083C2E23}" name="TestDreamwell" displayName="TestDreamwell" ref="A1:H9" totalsRowShown="0" headerRowDxfId="59" headerRowBorderDxfId="60" tableBorderDxfId="61">
+  <ns0:autoFilter ref="A1:H9" ns2:uid="{CFBAC16A-0116-CC4D-81BD-13DE083C2E23}" />
+  <ns0:tableColumns count="8">
+    <ns0:tableColumn id="1" ns3:uid="{E73100B7-A139-7546-9EAA-251F6DD90F19}" name="Image" dataDxfId="31">
+      <ns0:calculatedColumnFormula>_xlfn.IMAGE("https://www.shutterstock.com/image-illustration/-260nw-"&amp;H2&amp;".jpg")</ns0:calculatedColumnFormula>
+    </ns0:tableColumn>
+    <ns0:tableColumn id="2" ns3:uid="{9CCCF032-033A-E847-A749-5D01C18D2C1E}" name="Name" dataDxfId="30" />
+    <ns0:tableColumn id="3" ns3:uid="{27B1D06E-8077-2C45-B9F7-BC51A3A1EBE5}" name="ID" dataDxfId="29" />
+    <ns0:tableColumn id="4" ns3:uid="{4CB25FCD-0B0A-D949-A870-275480AF28AF}" name="Energy Produced" dataDxfId="28" />
+    <ns0:tableColumn id="5" ns3:uid="{AB029CE8-C5A9-B949-BFE2-593C8DFA58F0}" name="Rules Text" dataDxfId="27" />
+    <ns0:tableColumn id="6" ns3:uid="{A54FEC22-6872-804E-896F-8C280D629F36}" name="Prompts" dataDxfId="26" />
+    <ns0:tableColumn id="7" ns3:uid="{228C54F9-F6E9-3042-B82C-AC8BAE6EC150}" name="Phase" dataDxfId="25" />
+    <ns0:tableColumn id="8" ns3:uid="{166117D3-FC1D-F64C-BE79-2CAEF20A44B5}" name="Image Number" dataDxfId="24" />
+  </ns0:tableColumns>
+  <ns0:tableStyleInfo name="TableStyleMedium3" showFirstColumn="0" showLastColumn="0" showRowStripes="1" showColumnStripes="0" />
+</ns0:table>
