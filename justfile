@@ -65,17 +65,6 @@ schema:
     quicktype --lang cs --src-lang schema -t SchemaTypes --namespace Dreamtides.Schema --csharp-version 6 --array-type list --features complete --check-required -o client/Assets/Dreamtides/Schema/Schema.cs schema.json
     rm schema.json
 
-extract-tabula:
-    python3 client/scripts/xlsm_extract.py client/Assets/StreamingAssets/Tabula.xlsm client/Assets/StreamingAssets/Tabula.xlsm.d --clean
-
-pack-tabula-tmp:
-    python3 client/scripts/xlsm_roundtrip_test.py client/Assets/StreamingAssets/Tabula.xlsm client/Assets/StreamingAssets/Tabula.roundtrip.xlsm --keep-temp
-    open client/Assets/StreamingAssets/
-
-roundtrip-tabula:
-    python3 client/scripts/xlsm_roundtrip_test.py client/Assets/StreamingAssets/Tabula.xlsm client/Assets/StreamingAssets/Tabula.roundtrip.xlsm
-    open client/Assets/StreamingAssets/
-
 plugin_out := "client/Assets/Plugins"
 target_ios := "aarch64-apple-ios"
 
