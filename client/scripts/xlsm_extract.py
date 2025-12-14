@@ -3,9 +3,22 @@ import sys
 import zipfile
 import argparse
 import subprocess
+import re
 from pathlib import Path
 
 PLACEHOLDER_PNG = b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x01\x00\x00\x00\x01\x08\x02\x00\x00\x00\x90wS\xde\x00\x00\x00\tpHYs\x00\x00\x0b\x13\x00\x00\x0b\x13\x01\x00\x9a\x9c\x18\x00\x00\x00\nIDATx\x9cc\xf8\x00\x00\x00\x01\x00\x01\x00\x00\x00\x00IEND\xaeB`\x82'
+
+def minimal_pretty_print_xml(xml_bytes):
+    try:
+        xml_str = xml_bytes.decode('utf-8')
+        
+        xml_str = re.sub(r'><', '>\n<', xml_str)
+        
+        xml_str = re.sub(r'\n\s*\n', '\n', xml_str)
+        
+        return xml_str.encode('utf-8')
+    except Exception:
+        return xml_bytes
 
 def get_git_dir():
     try:
@@ -67,7 +80,16 @@ def extract_xlsm(xlsm_path, output_dir, clean=False):
                 entry_path.write_bytes(PLACEHOLDER_PNG)
             else:
                 entry_data = zip_ref.read(entry_name)
-                entry_path.write_bytes(entry_data)
+                
+                if entry_name.endswith('.xml') or entry_name.endswith('.rels'):
+                    try:
+                        formatted_data = minimal_pretty_print_xml(entry_data)
+                        entry_path.write_bytes(formatted_data)
+                    except Exception as e:
+                        sys.stderr.write(f"Warning: Could not format XML {entry_name}: {e}, writing as-is\n")
+                        entry_path.write_bytes(entry_data)
+                else:
+                    entry_path.write_bytes(entry_data)
 
 def main():
     parser = argparse.ArgumentParser(description='Extract .xlsm file to directory, replacing images with 1x1 PNGs')

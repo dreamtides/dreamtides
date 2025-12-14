@@ -1,22 +1,1990 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<sst xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" count="1131" uniqueCount="657"><si><t>ID</t></si><si><t>Image</t></si><si><t>d8fe4b2a-088c-4a92-aeb7-d6d4d22fda1a</t></si><si><t>Immolate</t></si><si><t>Energy Cost</t></si><si><t>{Dissolve} an enemy character.</t></si><si><t>Name</t></si><si><t>Rules Text</t></si><si><t>d07ac4fa-cc3b-4bb8-8018-de7dc1760f35</t></si><si><t>Abolish</t></si><si><t>{Prevent} a played enemy card.</t></si><si><t>Prompts</t></si><si><t>Choose an enemy character to {dissolve}.</t></si><si><t>Card Type</t></si><si><t>Event</t></si><si><t>Subtype</t></si><si><t>Is Fast?</t></si><si><t>d4207a7b-fc36-45e4-a1ee-f01b34485221</t></si><si><t>Ripple of Defiance</t></si><si><t>1</t></si><si><t>{Prevent} a played enemy event unless the enemy pays {-energy-cost(e:2)}.</t></si><si><t>Choose an enemy event to {prevent}.</t></si><si><t>Choose an enemy card to {prevent}.</t></si><si><t>Spark</t></si><si><t>Image Number</t></si><si><t>1907487244</t></si><si><t>1282908322</t></si><si><t>2123360837</t></si><si><t>Dreamscatter</t></si><si><t>2</t></si><si><t>Pay one or more {e}: Draw {-drawn-cards(n:1)} for each {e} spent.</t></si><si><t>Pay one or more {e}.</t></si><si><t>489056605</t></si><si><t>15a39336-2c71-44d6-b462-d9fd23a4d925</t></si><si><t>Sundown Surfer</t></si><si><t>Whenever you play a card during the enemy's turn, this character gains {-gained-spark(n:1)}.</t></si><si><t>Character</t></si><si><t>403770319</t></si><si><t>3380cf41-2bca-468c-95e0-57abafd29430</t></si><si><t>Minstrel of Falling Light</t></si><si><t>86c79455-f9ba-46e4-80a6-e018f330942b</t></si><si><t>{fma} {-energy-cost(e:3)}: Draw {-drawn-cards(n:1)}.</t></si><si><t>1794244540</t></si><si><t>Archive of the Forgotten</t></si><si><t>07f737af-dbaf-471a-8edc-e1d987c23903</t></si><si><t>4</t></si><si><t>Return one or two events from your void to your hand.</t></si><si><t>Choose one or two events in your void to return.</t></si><si><t>644603677</t></si><si><t>Break the Sequence</t></si><si><t>33c0db9c-666d-4b4c-a596-b74106025be8</t></si><si><t>*</t></si><si><t>{choose-one}
+<sst xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" count="1131" uniqueCount="657">
+<si>
+<t>ID</t>
+</si>
+<si>
+<t>Image</t>
+</si>
+<si>
+<t>d8fe4b2a-088c-4a92-aeb7-d6d4d22fda1a</t>
+</si>
+<si>
+<t>Immolate</t>
+</si>
+<si>
+<t>Energy Cost</t>
+</si>
+<si>
+<t>{Dissolve} an enemy character.</t>
+</si>
+<si>
+<t>Name</t>
+</si>
+<si>
+<t>Rules Text</t>
+</si>
+<si>
+<t>d07ac4fa-cc3b-4bb8-8018-de7dc1760f35</t>
+</si>
+<si>
+<t>Abolish</t>
+</si>
+<si>
+<t>{Prevent} a played enemy card.</t>
+</si>
+<si>
+<t>Prompts</t>
+</si>
+<si>
+<t>Choose an enemy character to {dissolve}.</t>
+</si>
+<si>
+<t>Card Type</t>
+</si>
+<si>
+<t>Event</t>
+</si>
+<si>
+<t>Subtype</t>
+</si>
+<si>
+<t>Is Fast?</t>
+</si>
+<si>
+<t>d4207a7b-fc36-45e4-a1ee-f01b34485221</t>
+</si>
+<si>
+<t>Ripple of Defiance</t>
+</si>
+<si>
+<t>1</t>
+</si>
+<si>
+<t>{Prevent} a played enemy event unless the enemy pays {-energy-cost(e:2)}.</t>
+</si>
+<si>
+<t>Choose an enemy event to {prevent}.</t>
+</si>
+<si>
+<t>Choose an enemy card to {prevent}.</t>
+</si>
+<si>
+<t>Spark</t>
+</si>
+<si>
+<t>Image Number</t>
+</si>
+<si>
+<t>1907487244</t>
+</si>
+<si>
+<t>1282908322</t>
+</si>
+<si>
+<t>2123360837</t>
+</si>
+<si>
+<t>Dreamscatter</t>
+</si>
+<si>
+<t>2</t>
+</si>
+<si>
+<t>Pay one or more {e}: Draw {-drawn-cards(n:1)} for each {e} spent.</t>
+</si>
+<si>
+<t>Pay one or more {e}.</t>
+</si>
+<si>
+<t>489056605</t>
+</si>
+<si>
+<t>15a39336-2c71-44d6-b462-d9fd23a4d925</t>
+</si>
+<si>
+<t>Sundown Surfer</t>
+</si>
+<si>
+<t>Whenever you play a card during the enemy's turn, this character gains {-gained-spark(n:1)}.</t>
+</si>
+<si>
+<t>Character</t>
+</si>
+<si>
+<t>403770319</t>
+</si>
+<si>
+<t>3380cf41-2bca-468c-95e0-57abafd29430</t>
+</si>
+<si>
+<t>Minstrel of Falling Light</t>
+</si>
+<si>
+<t>86c79455-f9ba-46e4-80a6-e018f330942b</t>
+</si>
+<si>
+<t>{fma} {-energy-cost(e:3)}: Draw {-drawn-cards(n:1)}.</t>
+</si>
+<si>
+<t>1794244540</t>
+</si>
+<si>
+<t>Archive of the Forgotten</t>
+</si>
+<si>
+<t>07f737af-dbaf-471a-8edc-e1d987c23903</t>
+</si>
+<si>
+<t>4</t>
+</si>
+<si>
+<t>Return one or two events from your void to your hand.</t>
+</si>
+<si>
+<t>Choose one or two events in your void to return.</t>
+</si>
+<si>
+<t>644603677</t>
+</si>
+<si>
+<t>Break the Sequence</t>
+</si>
+<si>
+<t>33c0db9c-666d-4b4c-a596-b74106025be8</t>
+</si>
+<si>
+<t>*</t>
+</si>
+<si>
+<t>{choose-one}
 {bullet} {-energy-cost(e:2)}: Return an enemy character to hand.
-{bullet} {-energy-cost(e:3)}: Draw {-drawn-cards(n:2)}.</t></si><si><t>Choose an enemy character to return to hand.</t></si><si><t>1200949264</t></si><si><t>Together Against the Tide</t></si><si><t>9866955c-31af-4aad-8319-a52d2fd85d0f</t></si><si><t>Give an allied character {anchored} until end of turn.</t></si><si><t>Choose an allied character to gain {anchored}.</t></si><si><t>1621160806</t></si><si><t>Guiding Light</t></si><si><t>5e70988b-ce14-45a0-8334-7cf4539ee2d8</t></si><si><t>{-Foresee(n:1)}. Draw {-drawn-cards(n:1)}.
-
-{-Reclaim-Cost(e:3)}</t></si><si><t>1328168243</t></si><si><t>Cragfall</t></si><si><t>1d41a21a-1beb-4e56-8d7f-be29c4a9d43d</t></si><si><t>{Prevent} a played enemy character.</t></si><si><t>Choose an enemy character to {prevent}.</t></si><si><t>1239919309</t></si><si><t>Test Vanilla Character</t></si><si><t>253ee0ca-f973-4d9f-ad37-abe548bc674f</t></si><si><t xml:space="preserve"> </t></si><si><t>Musician</t></si><si><t>5</t></si><si><t>Test Dissolve</t></si><si><t>d4854b6e-5274-4f6a-8a60-a1ea1c15e9a6</t></si><si><t>Test Counterspell</t></si><si><t>aad836b0-3ece-477c-b923-b099360f0115</t></si><si><t>Test Counterspell Unless Pays</t></si><si><t>76b6d00c-5a28-4ee3-9655-e4fea1d8a4d8</t></si><si><t>Test Variable Energy Draw</t></si><si><t>e06a8cfe-483f-42c0-aac8-9c12b21b3f99</t></si><si><t>Test Trigger Gain Spark On Play Card Enemy Turn</t></si><si><t>86ee5ad7-b60b-4596-af8c-7a495022ac61</t></si><si><t>Test Fast Multi Activated Ability Draw Card Character</t></si><si><t>d8a8541f-5b00-4d91-9518-aa8ae70ea450</t></si><si><t>Test Return One Or Two Void Event Cards To Hand</t></si><si><t>559e62a0-7ead-4136-8bd4-6cc58db4bef7</t></si><si><t>Test Modal Return To Hand Or Draw Two</t></si><si><t>e8f937da-cca7-447d-a559-530d7c339325</t></si><si><t>Test Prevent Dissolve This Turn</t></si><si><t>0b783ac8-6aea-438e-a2d5-87bf68548eda</t></si><si><t>Test Foresee One Draw Reclaim</t></si><si><t>de21db6c-54b4-4bff-b1d6-5a4711ef5ed8</t></si><si><t>Test Counterspell Character</t></si><si><t>86ed0d3f-320b-49d0-b022-cd94aa07edbd</t></si><si><t>Test Named Dissolve</t></si><si><t>3c1dbdc7-702e-4748-af3c-4fd837bcb404</t></si><si><t>Test Draw One</t></si><si><t>68f90d08-9b51-424e-90d1-d15ddd1ece93</t></si><si><t>0</t></si><si><t>Draw {-drawn-cards(n:1)}.</t></si><si><t>Test Trigger Gain Spark When Materialize Another Character</t></si><si><t>91c9ed93-5faf-4178-aec9-d631bbcf5d6a</t></si><si><t>Whenever you materialize another character, this character gains {-gained-spark(n:1)}.</t></si><si><t>Test Trigger Gain Two Spark On Play Card Enemy Turn</t></si><si><t>82759c0b-5161-4f6f-91b3-d42c2b4e0f9f</t></si><si><t>Whenever you play a card during the enemy's turn, this character gains {-gained-spark(n:2)}.</t></si><si><t>Test Activated Ability Draw Card</t></si><si><t>8dfeb2c1-2d72-411c-a8cc-7f84ca532c63</t></si><si><t>{a} {-energy-cost(e:1)}: Draw {-drawn-cards(n:1)}.</t></si><si><t>3</t></si><si><t>Test Multi Activated Ability Draw Card Character</t></si><si><t>56f944bb-333b-4e2c-9c8c-2068f41998c2</t></si><si><t>{ma} {-energy-cost(e:1)}: Draw {-drawn-cards(n:1)}.</t></si><si><t>Test Fast Activated Ability Draw Card Character</t></si><si><t>44aa4a1a-e8c6-4969-94bc-5fdbe010395e</t></si><si><t>{fa} {-energy-cost(e:1)}: Draw {-drawn-cards(n:1)}.</t></si><si><t>Test Activated Ability Dissolve Character</t></si><si><t>785e0341-fdd8-4e05-acb4-cbceed70ea6c</t></si><si><t>{a} {-energy-cost(e:2)}: {Dissolve} an enemy character.</t></si><si><t>Test Dual Activated Ability Character</t></si><si><t>3af84464-874a-4fd2-89cb-1986dee59ae1</t></si><si><t>{a} {-energy-cost(e:1)}: Draw {-drawn-cards(n:1)}.
-
-{a} {-energy-cost(e:2)}: Draw {-drawn-cards(n:2)}.</t></si><si><t>Test Foresee One</t></si><si><t>8217b59b-6573-484b-9f3b-203e86e1d841</t></si><si><t>{-Foresee(n:1)}.</t></si><si><t>Test Foresee Two</t></si><si><t>89e34264-a69c-48a4-867e-add7b811394b</t></si><si><t>{-Foresee(n:2)}.</t></si><si><t>Test Foresee One Draw A Card</t></si><si><t>820faab3-37c1-46fa-a314-5f023ec739a1</t></si><si><t>{-Foresee(n:1)}. Draw {-drawn-cards(n:1)}.</t></si><si><t>Test Draw One Reclaim</t></si><si><t>0cba1386-d1b6-4f57-8ccc-d92f8be01d7c</t></si><si><t>Draw {-drawn-cards(n:1)}.
-
-{-Reclaim-Cost(e:1)}</t></si><si><t>Test Foresee One Reclaim</t></si><si><t>86ffc58b-96db-4106-a892-8ae2a70719e6</t></si><si><t>{-Foresee(n:1)}.
-
-{-Reclaim-Cost(e:3)}</t></si><si><t>Test Return Void Card To Hand</t></si><si><t>46e20fe4-36ca-438d-91a6-fac880ee9495</t></si><si><t>Return a card from your void to your hand.</t></si><si><t>Choose a card in your void.</t></si><si><t>Test Modal Draw One Or Draw Two</t></si><si><t>029889e9-25bc-438f-a492-8813febd65d8</t></si><si><t>{choose-one}
+{bullet} {-energy-cost(e:3)}: Draw {-drawn-cards(n:2)}.</t>
+</si>
+<si>
+<t>Choose an enemy character to return to hand.</t>
+</si>
+<si>
+<t>1200949264</t>
+</si>
+<si>
+<t>Together Against the Tide</t>
+</si>
+<si>
+<t>9866955c-31af-4aad-8319-a52d2fd85d0f</t>
+</si>
+<si>
+<t>Give an allied character {anchored} until end of turn.</t>
+</si>
+<si>
+<t>Choose an allied character to gain {anchored}.</t>
+</si>
+<si>
+<t>1621160806</t>
+</si>
+<si>
+<t>Guiding Light</t>
+</si>
+<si>
+<t>5e70988b-ce14-45a0-8334-7cf4539ee2d8</t>
+</si>
+<si>
+<t>{-Foresee(n:1)}. Draw {-drawn-cards(n:1)}.
+{-Reclaim-Cost(e:3)}</t>
+</si>
+<si>
+<t>1328168243</t>
+</si>
+<si>
+<t>Cragfall</t>
+</si>
+<si>
+<t>1d41a21a-1beb-4e56-8d7f-be29c4a9d43d</t>
+</si>
+<si>
+<t>{Prevent} a played enemy character.</t>
+</si>
+<si>
+<t>Choose an enemy character to {prevent}.</t>
+</si>
+<si>
+<t>1239919309</t>
+</si>
+<si>
+<t>Test Vanilla Character</t>
+</si>
+<si>
+<t>253ee0ca-f973-4d9f-ad37-abe548bc674f</t>
+</si>
+<si>
+<t xml:space="preserve"> </t>
+</si>
+<si>
+<t>Musician</t>
+</si>
+<si>
+<t>5</t>
+</si>
+<si>
+<t>Test Dissolve</t>
+</si>
+<si>
+<t>d4854b6e-5274-4f6a-8a60-a1ea1c15e9a6</t>
+</si>
+<si>
+<t>Test Counterspell</t>
+</si>
+<si>
+<t>aad836b0-3ece-477c-b923-b099360f0115</t>
+</si>
+<si>
+<t>Test Counterspell Unless Pays</t>
+</si>
+<si>
+<t>76b6d00c-5a28-4ee3-9655-e4fea1d8a4d8</t>
+</si>
+<si>
+<t>Test Variable Energy Draw</t>
+</si>
+<si>
+<t>e06a8cfe-483f-42c0-aac8-9c12b21b3f99</t>
+</si>
+<si>
+<t>Test Trigger Gain Spark On Play Card Enemy Turn</t>
+</si>
+<si>
+<t>86ee5ad7-b60b-4596-af8c-7a495022ac61</t>
+</si>
+<si>
+<t>Test Fast Multi Activated Ability Draw Card Character</t>
+</si>
+<si>
+<t>d8a8541f-5b00-4d91-9518-aa8ae70ea450</t>
+</si>
+<si>
+<t>Test Return One Or Two Void Event Cards To Hand</t>
+</si>
+<si>
+<t>559e62a0-7ead-4136-8bd4-6cc58db4bef7</t>
+</si>
+<si>
+<t>Test Modal Return To Hand Or Draw Two</t>
+</si>
+<si>
+<t>e8f937da-cca7-447d-a559-530d7c339325</t>
+</si>
+<si>
+<t>Test Prevent Dissolve This Turn</t>
+</si>
+<si>
+<t>0b783ac8-6aea-438e-a2d5-87bf68548eda</t>
+</si>
+<si>
+<t>Test Foresee One Draw Reclaim</t>
+</si>
+<si>
+<t>de21db6c-54b4-4bff-b1d6-5a4711ef5ed8</t>
+</si>
+<si>
+<t>Test Counterspell Character</t>
+</si>
+<si>
+<t>86ed0d3f-320b-49d0-b022-cd94aa07edbd</t>
+</si>
+<si>
+<t>Test Named Dissolve</t>
+</si>
+<si>
+<t>3c1dbdc7-702e-4748-af3c-4fd837bcb404</t>
+</si>
+<si>
+<t>Test Draw One</t>
+</si>
+<si>
+<t>68f90d08-9b51-424e-90d1-d15ddd1ece93</t>
+</si>
+<si>
+<t>0</t>
+</si>
+<si>
+<t>Draw {-drawn-cards(n:1)}.</t>
+</si>
+<si>
+<t>Test Trigger Gain Spark When Materialize Another Character</t>
+</si>
+<si>
+<t>91c9ed93-5faf-4178-aec9-d631bbcf5d6a</t>
+</si>
+<si>
+<t>Whenever you materialize another character, this character gains {-gained-spark(n:1)}.</t>
+</si>
+<si>
+<t>Test Trigger Gain Two Spark On Play Card Enemy Turn</t>
+</si>
+<si>
+<t>82759c0b-5161-4f6f-91b3-d42c2b4e0f9f</t>
+</si>
+<si>
+<t>Whenever you play a card during the enemy's turn, this character gains {-gained-spark(n:2)}.</t>
+</si>
+<si>
+<t>Test Activated Ability Draw Card</t>
+</si>
+<si>
+<t>8dfeb2c1-2d72-411c-a8cc-7f84ca532c63</t>
+</si>
+<si>
+<t>{a} {-energy-cost(e:1)}: Draw {-drawn-cards(n:1)}.</t>
+</si>
+<si>
+<t>3</t>
+</si>
+<si>
+<t>Test Multi Activated Ability Draw Card Character</t>
+</si>
+<si>
+<t>56f944bb-333b-4e2c-9c8c-2068f41998c2</t>
+</si>
+<si>
+<t>{ma} {-energy-cost(e:1)}: Draw {-drawn-cards(n:1)}.</t>
+</si>
+<si>
+<t>Test Fast Activated Ability Draw Card Character</t>
+</si>
+<si>
+<t>44aa4a1a-e8c6-4969-94bc-5fdbe010395e</t>
+</si>
+<si>
+<t>{fa} {-energy-cost(e:1)}: Draw {-drawn-cards(n:1)}.</t>
+</si>
+<si>
+<t>Test Activated Ability Dissolve Character</t>
+</si>
+<si>
+<t>785e0341-fdd8-4e05-acb4-cbceed70ea6c</t>
+</si>
+<si>
+<t>{a} {-energy-cost(e:2)}: {Dissolve} an enemy character.</t>
+</si>
+<si>
+<t>Test Dual Activated Ability Character</t>
+</si>
+<si>
+<t>3af84464-874a-4fd2-89cb-1986dee59ae1</t>
+</si>
+<si>
+<t>{a} {-energy-cost(e:1)}: Draw {-drawn-cards(n:1)}.
+{a} {-energy-cost(e:2)}: Draw {-drawn-cards(n:2)}.</t>
+</si>
+<si>
+<t>Test Foresee One</t>
+</si>
+<si>
+<t>8217b59b-6573-484b-9f3b-203e86e1d841</t>
+</si>
+<si>
+<t>{-Foresee(n:1)}.</t>
+</si>
+<si>
+<t>Test Foresee Two</t>
+</si>
+<si>
+<t>89e34264-a69c-48a4-867e-add7b811394b</t>
+</si>
+<si>
+<t>{-Foresee(n:2)}.</t>
+</si>
+<si>
+<t>Test Foresee One Draw A Card</t>
+</si>
+<si>
+<t>820faab3-37c1-46fa-a314-5f023ec739a1</t>
+</si>
+<si>
+<t>{-Foresee(n:1)}. Draw {-drawn-cards(n:1)}.</t>
+</si>
+<si>
+<t>Test Draw One Reclaim</t>
+</si>
+<si>
+<t>0cba1386-d1b6-4f57-8ccc-d92f8be01d7c</t>
+</si>
+<si>
+<t>Draw {-drawn-cards(n:1)}.
+{-Reclaim-Cost(e:1)}</t>
+</si>
+<si>
+<t>Test Foresee One Reclaim</t>
+</si>
+<si>
+<t>86ffc58b-96db-4106-a892-8ae2a70719e6</t>
+</si>
+<si>
+<t>{-Foresee(n:1)}.
+{-Reclaim-Cost(e:3)}</t>
+</si>
+<si>
+<t>Test Return Void Card To Hand</t>
+</si>
+<si>
+<t>46e20fe4-36ca-438d-91a6-fac880ee9495</t>
+</si>
+<si>
+<t>Return a card from your void to your hand.</t>
+</si>
+<si>
+<t>Choose a card in your void.</t>
+</si>
+<si>
+<t>Test Modal Draw One Or Draw Two</t>
+</si>
+<si>
+<t>029889e9-25bc-438f-a492-8813febd65d8</t>
+</si>
+<si>
+<t>{choose-one}
 {bullet} {-energy-cost(e:1)}: Draw {-drawn-cards(n:1)}.
-{bullet} {-energy-cost(e:3)}: Draw {-drawn-cards(n:2)}.</t></si><si><t>Test Modal Draw One Or Dissolve Enemy</t></si><si><t>9847b3fc-1e7f-44e5-90af-1240ae12aaee</t></si><si><t>{choose-one}
+{bullet} {-energy-cost(e:3)}: Draw {-drawn-cards(n:2)}.</t>
+</si>
+<si>
+<t>Test Modal Draw One Or Dissolve Enemy</t>
+</si>
+<si>
+<t>9847b3fc-1e7f-44e5-90af-1240ae12aaee</t>
+</si>
+<si>
+<t>{choose-one}
 {bullet} {-energy-cost(e:1)}: Draw {-drawn-cards(n:1)}.
-{bullet} {-energy-cost(e:2)}: {Dissolve} an enemy character.</t></si><si><t>Test Return To Hand</t></si><si><t>cf2f292b-f02c-4130-aff7-3f48fd147633</t></si><si><t>Return an enemy character to hand.</t></si><si><t>Test Gain Points</t></si><si><t>995b52a1-b368-4c83-ae05-8ab3800ca618</t></si><si><t>Gain {-gained-points(n: 2)}.</t></si><si><t>Test Gain Energy</t></si><si><t>db191470-7a5b-4133-b731-8a81767d46e1</t></si><si><t>Gain {-gained-energy(e: 1)}.</t></si><si><t>Test Deck To Void</t></si><si><t>a7340f26-b759-458c-b8cb-b6fcc36fe412</t></si><si><t>Put the top {-count(n: 3)} cards of your deck into your void.</t></si><si><t>Test Discard</t></si><si><t>6e76f193-dcf0-4faf-b1f7-50af2e0dc8a2</t></si><si><t>Discard {-discarded-cards(n: 1)}.</t></si><si><t>Test Discard Two</t></si><si><t>ef6d55f9-49ba-4637-af50-91068cb3a2b2</t></si><si><t>Discard {-discarded-cards(n: 2)}.</t></si><si><t>Test Materialized Draw Card</t></si><si><t>f62670ae-73ad-4645-8de4-4cd8fb58b920</t></si><si><t>{Materialized}: Draw {-drawn-cards(n:1)}.</t></si><si><t>Description</t></si><si><t>en-US</t></si><si><t>dbb75f1b-8c25-4c27-a598-7b300f5b5ca4</t></si><si><t>e</t></si><si><t>Energy icon</t></si><si><t>{$context -&gt;
+{bullet} {-energy-cost(e:2)}: {Dissolve} an enemy character.</t>
+</si>
+<si>
+<t>Test Return To Hand</t>
+</si>
+<si>
+<t>cf2f292b-f02c-4130-aff7-3f48fd147633</t>
+</si>
+<si>
+<t>Return an enemy character to hand.</t>
+</si>
+<si>
+<t>Test Gain Points</t>
+</si>
+<si>
+<t>995b52a1-b368-4c83-ae05-8ab3800ca618</t>
+</si>
+<si>
+<t>Gain {-gained-points(n: 2)}.</t>
+</si>
+<si>
+<t>Test Gain Energy</t>
+</si>
+<si>
+<t>db191470-7a5b-4133-b731-8a81767d46e1</t>
+</si>
+<si>
+<t>Gain {-gained-energy(e: 1)}.</t>
+</si>
+<si>
+<t>Test Deck To Void</t>
+</si>
+<si>
+<t>a7340f26-b759-458c-b8cb-b6fcc36fe412</t>
+</si>
+<si>
+<t>Put the top {-count(n: 3)} cards of your deck into your void.</t>
+</si>
+<si>
+<t>Test Discard</t>
+</si>
+<si>
+<t>6e76f193-dcf0-4faf-b1f7-50af2e0dc8a2</t>
+</si>
+<si>
+<t>Discard {-discarded-cards(n: 1)}.</t>
+</si>
+<si>
+<t>Test Discard Two</t>
+</si>
+<si>
+<t>ef6d55f9-49ba-4637-af50-91068cb3a2b2</t>
+</si>
+<si>
+<t>Discard {-discarded-cards(n: 2)}.</t>
+</si>
+<si>
+<t>Test Materialized Draw Card</t>
+</si>
+<si>
+<t>f62670ae-73ad-4645-8de4-4cd8fb58b920</t>
+</si>
+<si>
+<t>{Materialized}: Draw {-drawn-cards(n:1)}.</t>
+</si>
+<si>
+<t>Description</t>
+</si>
+<si>
+<t>en-US</t>
+</si>
+<si>
+<t>dbb75f1b-8c25-4c27-a598-7b300f5b5ca4</t>
+</si>
+<si>
+<t>e</t>
+</si>
+<si>
+<t>Energy icon</t>
+</si>
+<si>
+<t>{$context -&gt;
   [card-text] &lt;color=#00838F&gt;{"\ufa1f"}&lt;/color&gt;
   *[interface] {"\ufa1f"}
-}</t></si><si><t>7b21533d-7f49-451c-bfa1-949ab28ed258</t></si><si><t>f</t></si><si><t>Fast icon</t></si><si><t>{"\uf852"}</t></si><si><t>adc9a41d-fd82-49b5-a099-a9f10a73afad</t></si><si><t>a</t></si><si><t>Activated icon</t></si><si><t>{"\uf90d"}</t></si><si><t>121fc3af-6abd-4a90-9197-43c6e18eeca2</t></si><si><t>ma</t></si><si><t>Multi-activated icon</t></si><si><t>{"\uf916"}</t></si><si><t>e0eb0864-3150-4ac5-a903-258ada0f906a</t></si><si><t>fa</t></si><si><t>Fast + Activated icon</t></si><si><t>{f}&lt;space=\"-0.25px\"&gt;{a}</t></si><si><t>1921caf1-b581-4feb-b956-b27a553cbc43</t></si><si><t>fma</t></si><si><t>Fast + Multi-Activated icon</t></si><si><t>{f}&lt;space=\"-0.25px\"&gt;{ma}</t></si><si><t>81fb9fe5-eff0-46ce-a10a-7aa4a45b0992</t></si><si><t>p</t></si><si><t>Points icon</t></si><si><t>{"\ufb43"}</t></si><si><t>eeb2bbe9-1952-43fa-9ae6-12512d005829</t></si><si><t>bug-icon</t></si><si><t>Dev menu icon</t></si><si><t>{"\uf88d"}</t></si><si><t>d439176c-7a40-410b-808d-cc2be53116d7</t></si><si><t>undo-icon</t></si><si><t>Undo button icon</t></si><si><t>{"\ufd88"}</t></si><si><t>ad291414-914c-4039-8f8f-8902b752bf74</t></si><si><t>eye-icon</t></si><si><t>Eye icon</t></si><si><t>{"\uf9f9"}</t></si><si><t>2ca2c1dd-20f7-410b-9f5d-ce313a2d9175</t></si><si><t>eye-slash-icon</t></si><si><t>Eye icon with slash through it</t></si><si><t>{"\uf9f8"}</t></si><si><t>fd603588-7ab8-48c8-93b0-2bf6afc59325</t></si><si><t>asterisk-icon</t></si><si><t>"Star" icon used to represent non-numeric costs</t></si><si><t>{"\uf810"}</t></si><si><t>cb899350-def7-4466-a1e2-2a59e105d9fb</t></si><si><t>keyword</t></si><si><t>Formatting that appears before keywords</t></si><si><t>&lt;color=#AA00FF&gt;&lt;b&gt;</t></si><si><t>bf435908-6161-4a6e-9407-81e0ccde2c4e</t></si><si><t>end-keyword</t></si><si><t>Formatting that appears after keywords</t></si><si><t>&lt;/b&gt;&lt;/color&gt;</t></si><si><t>cc5c5509-69c5-4c1f-8faa-b9948029dcb8</t></si><si><t>-energy-cost</t></si><si><t>Formatting for an amount of energy paid as a cost</t></si><si><t>&lt;color=#00838F&gt;&lt;b&gt;{$e}{e}&lt;/b&gt;&lt;/color&gt;</t></si><si><t>50ef5a4a-86f6-4640-88f9-a249cc4cd5cf</t></si><si><t>-gained-energy</t></si><si><t>Formatting for an amount of energy gained as an effect</t></si><si><t>44535fb6-0190-4197-8bce-3acf063d4318</t></si><si><t>-drawn-cards</t></si><si><t>Formatting for a number of cards drawn</t></si><si><t>{$n -&gt;
+}</t>
+</si>
+<si>
+<t>7b21533d-7f49-451c-bfa1-949ab28ed258</t>
+</si>
+<si>
+<t>f</t>
+</si>
+<si>
+<t>Fast icon</t>
+</si>
+<si>
+<t>{"\uf852"}</t>
+</si>
+<si>
+<t>adc9a41d-fd82-49b5-a099-a9f10a73afad</t>
+</si>
+<si>
+<t>a</t>
+</si>
+<si>
+<t>Activated icon</t>
+</si>
+<si>
+<t>{"\uf90d"}</t>
+</si>
+<si>
+<t>121fc3af-6abd-4a90-9197-43c6e18eeca2</t>
+</si>
+<si>
+<t>ma</t>
+</si>
+<si>
+<t>Multi-activated icon</t>
+</si>
+<si>
+<t>{"\uf916"}</t>
+</si>
+<si>
+<t>e0eb0864-3150-4ac5-a903-258ada0f906a</t>
+</si>
+<si>
+<t>fa</t>
+</si>
+<si>
+<t>Fast + Activated icon</t>
+</si>
+<si>
+<t>{f}&lt;space=\"-0.25px\"&gt;{a}</t>
+</si>
+<si>
+<t>1921caf1-b581-4feb-b956-b27a553cbc43</t>
+</si>
+<si>
+<t>fma</t>
+</si>
+<si>
+<t>Fast + Multi-Activated icon</t>
+</si>
+<si>
+<t>{f}&lt;space=\"-0.25px\"&gt;{ma}</t>
+</si>
+<si>
+<t>81fb9fe5-eff0-46ce-a10a-7aa4a45b0992</t>
+</si>
+<si>
+<t>p</t>
+</si>
+<si>
+<t>Points icon</t>
+</si>
+<si>
+<t>{"\ufb43"}</t>
+</si>
+<si>
+<t>eeb2bbe9-1952-43fa-9ae6-12512d005829</t>
+</si>
+<si>
+<t>bug-icon</t>
+</si>
+<si>
+<t>Dev menu icon</t>
+</si>
+<si>
+<t>{"\uf88d"}</t>
+</si>
+<si>
+<t>d439176c-7a40-410b-808d-cc2be53116d7</t>
+</si>
+<si>
+<t>undo-icon</t>
+</si>
+<si>
+<t>Undo button icon</t>
+</si>
+<si>
+<t>{"\ufd88"}</t>
+</si>
+<si>
+<t>ad291414-914c-4039-8f8f-8902b752bf74</t>
+</si>
+<si>
+<t>eye-icon</t>
+</si>
+<si>
+<t>Eye icon</t>
+</si>
+<si>
+<t>{"\uf9f9"}</t>
+</si>
+<si>
+<t>2ca2c1dd-20f7-410b-9f5d-ce313a2d9175</t>
+</si>
+<si>
+<t>eye-slash-icon</t>
+</si>
+<si>
+<t>Eye icon with slash through it</t>
+</si>
+<si>
+<t>{"\uf9f8"}</t>
+</si>
+<si>
+<t>fd603588-7ab8-48c8-93b0-2bf6afc59325</t>
+</si>
+<si>
+<t>asterisk-icon</t>
+</si>
+<si>
+<t>"Star" icon used to represent non-numeric costs</t>
+</si>
+<si>
+<t>{"\uf810"}</t>
+</si>
+<si>
+<t>cb899350-def7-4466-a1e2-2a59e105d9fb</t>
+</si>
+<si>
+<t>keyword</t>
+</si>
+<si>
+<t>Formatting that appears before keywords</t>
+</si>
+<si>
+<t>&lt;color=#AA00FF&gt;&lt;b&gt;</t>
+</si>
+<si>
+<t>bf435908-6161-4a6e-9407-81e0ccde2c4e</t>
+</si>
+<si>
+<t>end-keyword</t>
+</si>
+<si>
+<t>Formatting that appears after keywords</t>
+</si>
+<si>
+<t>&lt;/b&gt;&lt;/color&gt;</t>
+</si>
+<si>
+<t>cc5c5509-69c5-4c1f-8faa-b9948029dcb8</t>
+</si>
+<si>
+<t>-energy-cost</t>
+</si>
+<si>
+<t>Formatting for an amount of energy paid as a cost</t>
+</si>
+<si>
+<t>&lt;color=#00838F&gt;&lt;b&gt;{$e}{e}&lt;/b&gt;&lt;/color&gt;</t>
+</si>
+<si>
+<t>50ef5a4a-86f6-4640-88f9-a249cc4cd5cf</t>
+</si>
+<si>
+<t>-gained-energy</t>
+</si>
+<si>
+<t>Formatting for an amount of energy gained as an effect</t>
+</si>
+<si>
+<t>44535fb6-0190-4197-8bce-3acf063d4318</t>
+</si>
+<si>
+<t>-drawn-cards</t>
+</si>
+<si>
+<t>Formatting for a number of cards drawn</t>
+</si>
+<si>
+<t>{$n -&gt;
   [one] a card
   *[other] {$n} cards
-}</t></si><si><t>0d6c79d7-af53-4477-977c-a248fb4fa0ba</t></si><si><t>-discarded-cards</t></si><si><t>Formatting for a number of cards discarded</t></si><si><t>c49b155f-57a2-479a-bc45-254b2144d04b</t></si><si><t>-gained-spark</t></si><si><t>Formatting for gaining an amount of spark</t></si><si><t>+{$n} spark</t></si><si><t>707467ad-9e99-4953-8e4d-cf5f47e31768</t></si><si><t>-count</t></si><si><t>Formatting for an arbitrary numerical value</t></si><si><t>{$n}</t></si><si><t>3057478f-1445-4b7d-8241-a90d97da7adf</t></si><si><t>choose-one</t></si><si><t>Formatting to select a single mode of a modal card</t></si><si><t>Choose one:</t></si><si><t>abfc5cdc-e118-4e43-87a1-3493cc80df75</t></si><si><t>bullet</t></si><si><t>Inserts a bullet character</t></si><si><t>•</t></si><si><t>2e44ee4c-3218-45bf-a29e-0508f853c873</t></si><si><t>-foresee</t></si><si><t>Foresee keyword ability with quantity</t></si><si><t>{keyword}foresee{end-keyword} {$n}</t></si><si><t>b68a7c1c-5b2b-4885-863b-4ebf81279330</t></si><si><t>-Foresee</t></si><si><t>Foresee keyword ability with quantity, capitalized</t></si><si><t>{keyword}Foresee{end-keyword} {$n}</t></si><si><t>f19214ee-632b-4f0b-b3e4-d63e67b7ac03</t></si><si><t>reclaim</t></si><si><t>Reclaim keyword ability without energy cost</t></si><si><t>{keyword}reclaim{end-keyword}</t></si><si><t>6640dfed-a5d6-4b68-88db-3b62a4400132</t></si><si><t>Reclaim</t></si><si><t>Reclaim keyword ability without energy cost, capitalized</t></si><si><t>{keyword}Reclaim{end-keyword}</t></si><si><t>fb895ce7-1f66-426d-8c29-b19fdeee7828</t></si><si><t>-reclaim-cost</t></si><si><t>Reclaim keyword ability with energy cost</t></si><si><t>{keyword}reclaim{end-keyword} &lt;color=#00838F&gt;&lt;b&gt;{$e}{e}&lt;/b&gt;&lt;/color&gt;</t></si><si><t>5674a8dd-b4eb-4630-85c2-79d6b95cdaae</t></si><si><t>-Reclaim-Cost</t></si><si><t>Reclaim keyword ability with energy cost, capitalized</t></si><si><t>{keyword}Reclaim{end-keyword} &lt;color=#00838F&gt;&lt;b&gt;{$e}{e}&lt;/b&gt;&lt;/color&gt;</t></si><si><t>bf189fe0-75e2-4a87-9dca-67dd5f755766</t></si><si><t>-kindle</t></si><si><t>Kindle keyword ability with quantity</t></si><si><t>{keyword}kindle{end-keyword} {$s}</t></si><si><t>d1c8ff05-9dd8-4ed6-9436-746a9caf5a63</t></si><si><t>-Kindle</t></si><si><t>Kindle keyword ability with quantity, capitalized</t></si><si><t>{keyword}Kindle{end-keyword} {$s}</t></si><si><t>70374512-2121-4569-a028-e871209fad38</t></si><si><t>-gained-points</t></si><si><t>Formatting for gaining an amount of points</t></si><si><t>{$n}{p}</t></si><si><t>5771085d-3c89-423f-be05-c728035e7cd0</t></si><si><t>dissolve</t></si><si><t>Dissolve keyword ability</t></si><si><t>{keyword}dissolve{end-keyword}</t></si><si><t>8b9ef6b9-a6e1-4abe-be4d-cf7fa3ce41b8</t></si><si><t>Dissolve</t></si><si><t>Dissolve keyword ability, capitalized</t></si><si><t>{keyword}Dissolve{end-keyword}</t></si><si><t>1a9e01e9-e7aa-4692-9b1b-5dd9e0b4a7f9</t></si><si><t>prevent</t></si><si><t>Prevent keyword ability</t></si><si><t>{keyword}prevent{end-keyword}</t></si><si><t>fb38409b-cbaf-41a5-96fc-af622ce6f333</t></si><si><t>Prevent</t></si><si><t>Prevent keyword ability, capitalized</t></si><si><t>{keyword}Prevent{end-keyword}</t></si><si><t>901b84a1-c886-447b-bd0d-005e240a23de</t></si><si><t>anchored</t></si><si><t>Anchored keyword ability</t></si><si><t>{keyword}anchored{end-keyword}</t></si><si><t>1bb69fb4-344a-48f2-a7a2-95a30ac4a2f2</t></si><si><t>Anchored</t></si><si><t>Anchored keyword ability, capitalized</t></si><si><t>{keyword}Anchored{end-keyword}</t></si><si><t>66edfc8f-483b-4ad0-b37b-c66aa7c4347b</t></si><si><t>prompt-choose-character</t></si><si><t>Prompt message to target a character</t></si><si><t>Choose a character</t></si><si><t>3f16a9f0-c905-4040-b4e3-58eafa3144f2</t></si><si><t>prompt-select-stack-card</t></si><si><t>Prompt message to pick a card on the stack</t></si><si><t>Select a card</t></si><si><t>95c481aa-46e6-4e03-ab9f-ae162207cd39</t></si><si><t>prompt-select-from-void</t></si><si><t>Prompt message to pick a card from your void</t></si><si><t>Select from your void</t></si><si><t>68ddc76a-67ee-4d95-a0a1-ff688752b5f8</t></si><si><t>prompt-select-from-hand</t></si><si><t>Prompt message to pick a card from your hand</t></si><si><t>Select from your hand</t></si><si><t>02b21277-492f-4a76-9d9e-b71ea88e72ad</t></si><si><t>prompt-select-option</t></si><si><t>Prompt message to pick a choice among several options</t></si><si><t>Select an option</t></si><si><t>165d5300-2f77-4c23-9b36-217902fab895</t></si><si><t>prompt-choose-energy-amount</t></si><si><t>Prompt message to pick an amount of energy</t></si><si><t>Choose energy amount</t></si><si><t>4b770aa5-47e8-4dab-b879-c2d3aaa40ba2</t></si><si><t>prompt-select-card-order</t></si><si><t>Prompt message to pick card ordering within the deck</t></si><si><t>Select card position</t></si><si><t>df13df4b-c876-48ec-aa81-5e25b0c6c9cb</t></si><si><t>prompt-pick-mode</t></si><si><t>Prompt message to pick a mode of a modal card to play</t></si><si><t>Choose a mode</t></si><si><t>e0dd5336-cb19-49f5-ad50-aa3a61823405</t></si><si><t>dev-menu-button</t></si><si><t>Dev menu button label</t></si><si><t>{bug-icon} Dev</t></si><si><t>6095730f-d43c-49cd-a5dc-2781882389ed</t></si><si><t>decline-prompt-button</t></si><si><t>Decline to take the action associated with a prompt</t></si><si><t>Decline</t></si><si><t>211e9d51-07ed-4261-88ce-fbfeb3390449</t></si><si><t>pay-energy-prompt-button</t></si><si><t>Choose to pay energy to take a prompt action</t></si><si><t>Spend {$energy}{e}</t></si><si><t>3d41f282-892b-47e6-9e8c-b82ca534ca20</t></si><si><t>pay-energy-addtional-cost-button</t></si><si><t>Button to confirm the amount of energy to pay as an additional cost</t></si><si><t>a637975a-fb02-40b1-8dbe-95f278867ef8</t></si><si><t>primary-button-submit-void-card-targets</t></si><si><t>Button to confirm selection of target cards in the void</t></si><si><t>Submit</t></si><si><t>be3fe1f9-17ed-4324-b1d9-f1d5e6ccf2c3</t></si><si><t>primary-button-submit-hand-card-targets</t></si><si><t>Button to confirm selection of target cards in the hand</t></si><si><t>f03ee2d3-e278-40bc-a449-25571d36fa56</t></si><si><t>primary-button-submit-deck-card-order</t></si><si><t>Button to confirm selection of ordering of cards in deck</t></si><si><t>5c8a0769-2507-4082-84c8-5d7fd69855d8</t></si><si><t>primary-button-resolve-stack</t></si><si><t>Button to resolve the top card of the stack</t></si><si><t>Resolve</t></si><si><t>08d4e22b-5eab-4354-9cb5-7ff68c3b5196</t></si><si><t>primary-button-end-turn</t></si><si><t>Button to end your turn</t></si><si><t>End Turn</t></si><si><t>bb1acabc-e74c-44d2-a586-54689f5de23b</t></si><si><t>primary-button-start-next-turn</t></si><si><t>Button to end the opponent's turn and begin your turn</t></si><si><t>Next Turn</t></si><si><t>010f152b-115a-4a52-bae0-3f9961b0990f</t></si><si><t>increment-energy-prompt-button</t></si><si><t>Button to increment the energy amount in a prompt to pick an energy value</t></si><si><t>+1{e}</t></si><si><t>5632f153-07d7-41de-bc85-5864f5578d73</t></si><si><t>decrement-energy-prompt-button</t></si><si><t>Button to decrement the energy amount in a prompt to pick an energy value</t></si><si><t>-1{e}</t></si><si><t>bec6ea4b-55b9-4eb9-8173-9dd4f03eaf05</t></si><si><t>hide-stack-button</t></si><si><t>Button to hide the stack and view the battlefield</t></si><si><t>{eye-icon}</t></si><si><t>e2cbff72-868a-4be2-a13a-37815ce0a5f2</t></si><si><t>show-stack-button</t></si><si><t>Button to show the stack after hiding it</t></si><si><t>{eye-slash-icon}</t></si><si><t>1231c8b5-de17-4cf3-b45d-f42d62143916</t></si><si><t>card-rules-text-energy-paid</t></si><si><t>Addition to card rules text showing how much energy was spent on a card with a variable energy cost</t></si><si><t>({$energy}{e} paid)</t></si><si><t>dd5982c1-cfba-4608-a0ce-abf4257fcd5a</t></si><si><t>card-rules-text-reclaimed</t></si><si><t>Addition to card rules text showing that a card was played with the "reclaim" ability</t></si><si><t>(Reclaimed)</t></si><si><t>6d3f9774-49a1-4263-b354-177dd069c329</t></si><si><t>card-rules-text-anchored</t></si><si><t>Addition to card rules text showing that a card has been "anchored"</t></si><si><t>(Anchored)</t></si><si><t>76e30436-5446-4b71-8189-439c843184ad</t></si><si><t>modal-effect-choice-card-name</t></si><si><t>Card name for a card representing a numbered modal effect choice</t></si><si><t>Choice {$number}</t></si><si><t>740ba650-6ee0-4fa2-9f6a-7c163454a191</t></si><si><t>character-ability-card-name</t></si><si><t>Card name for a card representing an ability of a character</t></si><si><t>{$character-name} Ability</t></si><si><t>f144ac6d-bd7a-460c-9990-06812c084191</t></si><si><t>hand-size-limit-exceeded-warning-message</t></si><si><t>Message describing the effects of exceeding the hand size limit</t></si><si><t>Note: Cards drawn in excess of 10 become {e} instead.</t></si><si><t>9cffdaea-7a9f-4ca0-80af-6c414cb5c4f0</t></si><si><t>character-limit-exceeded-warning-message</t></si><si><t>Message describing the effects of exceeding the character limit</t></si><si><t>Character limit exceeded: A character will be abandoned, with its spark permanently added to your total.</t></si><si><t>59bc7390-ee3f-426c-8874-48d56d62d7ea</t></si><si><t>combined-limit-warning-message</t></si><si><t>Message describing the effects of exceeding both the character limit and the hand size limit</t></si><si><t>Character limit exceeded: A character will be abandoned. Cards drawn in excess of 10 become {e} instead.</t></si><si><t>a36c2696-4c39-49d5-9c63-3e5b7149cefb</t></si><si><t>error-message-panel-title</t></si><si><t>Title for a panel displaying an error message</t></si><si><t>Error</t></si><si><t>b7b16e85-8cbf-4433-8ee1-805858a10493</t></si><si><t>card-type-character</t></si><si><t>Card type for character cards</t></si><si><t>11b07242-b514-42cb-aed9-a64992ac2e2b</t></si><si><t>card-type-event</t></si><si><t>Card type for event cards</t></si><si><t>3876f34a-f8c3-49f3-bec5-5ae740e2978f</t></si><si><t>card-type-dreamsign</t></si><si><t>Card type for dreamsign cards</t></si><si><t>Dreamsign</t></si><si><t>a71f9d3b-ffc9-4edd-9be1-e998bdc5310a</t></si><si><t>card-type-dreamcaller</t></si><si><t>Card type for dreamcaller cards</t></si><si><t>Dreamcaller</t></si><si><t>a2bcbaa7-2167-47fc-9db7-5267a91b17c4</t></si><si><t>card-type-dreamwell</t></si><si><t>Card type for dreamwell cards</t></si><si><t>Dreamwell</t></si><si><t>bee9a795-eb5a-46a1-aac5-692c7a070c64</t></si><si><t>card-subtype-ancient</t></si><si><t>Card subtype, displayed on character cards</t></si><si><t>Ancient</t></si><si><t>602ea4ae-0f44-4704-9cf4-c1ef70248642</t></si><si><t>card-subtype-child</t></si><si><t>Child</t></si><si><t>94f37651-7ffa-4bb1-97b9-40b5640db8ab</t></si><si><t>card-subtype-detective</t></si><si><t>Detective</t></si><si><t>9aa89193-4555-4906-9830-8c4584d4e882</t></si><si><t>card-subtype-enigma</t></si><si><t>Enigma</t></si><si><t>45d5bee1-12b7-4150-983c-4c4ce721d091</t></si><si><t>card-subtype-explorer</t></si><si><t>Explorer</t></si><si><t>411b42ec-fa60-44a0-8282-35b9f1e6dcd8</t></si><si><t>card-subtype-hacker</t></si><si><t>Hacker</t></si><si><t>0c84be77-7bac-4820-a5c2-7b648522db47</t></si><si><t>card-subtype--mage</t></si><si><t>Mage</t></si><si><t>7947e5c2-bf87-4840-90be-4bbff0639b5f</t></si><si><t>card-subtype-monster</t></si><si><t>Monster</t></si><si><t>bcc76e70-cb45-4667-8e89-7b2dacb81ebc</t></si><si><t>card-subtype-musician</t></si><si><t>f786771e-b0fa-483a-b773-72fc9e9b56a5</t></si><si><t>card-subtype-outsider</t></si><si><t>Outsider</t></si><si><t>f8032816-7252-4c33-8ce4-ffd3ba279a2a</t></si><si><t>card-subtype-renegade</t></si><si><t>Renegade</t></si><si><t>60921d72-fde8-4958-b425-9bdc0964b0a3</t></si><si><t>card-subtype-spirit-animal</t></si><si><t>Spirit Animal</t></si><si><t>1a6221e0-a5bd-4a48-8629-51a2796ad166</t></si><si><t>card-subtype-super</t></si><si><t>Super</t></si><si><t>649edeb4-6c1d-48f4-bb39-8e01caba3d2a</t></si><si><t>card-subtype-survivor</t></si><si><t>Survivor</t></si><si><t>82f771ba-f7d6-4718-9e26-a9ff3dcac12f</t></si><si><t>card-subtype-synth</t></si><si><t>Synth</t></si><si><t>40e3fefd-b41e-4dfc-a467-0c59766116c8</t></si><si><t>card-subtype-tinkerer</t></si><si><t>Tinkerer</t></si><si><t>f29c168c-6f67-4682-b948-dddd535fc467</t></si><si><t>card-subtype-trooper</t></si><si><t>Trooper</t></si><si><t>42abc8f3-b741-4d49-97b1-d96a29563f18</t></si><si><t>card-subtype-visionary</t></si><si><t>Visionary</t></si><si><t>727a0d85-e67d-49c6-920c-95619b488402</t></si><si><t>card-subtype-visitor</t></si><si><t>Visitor</t></si><si><t>68338f97-ffd9-4082-8c5a-41091323e8cb</t></si><si><t>card-subtype-warrior</t></si><si><t>Warrior</t></si><si><t>a4e6687d-4c0e-4de9-b3aa-1e49e09b4668</t></si><si><t>help-text-dissolve</t></si><si><t>Info zoom help text, displayed on a tooltip to describe card abilities</t></si><si><t>{Dissolve}: Send a character to the void</t></si><si><t>c58bd162-3392-444f-868e-488c023e9e91</t></si><si><t>help-text-prevent</t></si><si><t>{Prevent}: Send a card to the void in response to it being played</t></si><si><t>893f14c2-d7d6-4adf-a97a-66847febe6ed</t></si><si><t>help-text-foresee-1</t></si><si><t>{keyword}Foresee{end-keyword} 1: Look at the top card of your deck. You may put it into your void.</t></si><si><t>283a1526-f6e7-4885-a000-1b0cd54a75ed</t></si><si><t>help-text-foresee-n</t></si><si><t>{keyword}Foresee{end-keyword} {$n}: Look at the top {$n} cards of your deck. You may put them into your void or put them back in any order.</t></si><si><t>85f5f06f-417d-4bb7-bf99-51eef3d4a5ac</t></si><si><t>help-text-anchored</t></si><si><t>{Anchored}: Cannot be dissolved.</t></si><si><t>3e724a9f-4eed-4044-85ee-12187f1aef65</t></si><si><t>help-text-reclaim-without-cost</t></si><si><t>{Reclaim}: You may play a card from your void, then banish it when it leaves play.</t></si><si><t>7b13a745-c94b-437c-bc2d-73c64b479147</t></si><si><t>help-text-reclaim-with-cost</t></si><si><t>{keyword}Reclaim{end-keyword} {$e}{e}: You may play this card from your void for {$e}{e}, then banish it.</t></si><si><t>cf017f6f-7cc5-4b40-8819-25ec7fb5acd2</t></si><si><t>token-type-activated-ability</t></si><si><t>Card type for an activated ability card</t></si><si><t>Activated Ability</t></si><si><t>f4fe91cb-3bb9-4b58-9949-6652a388c0c8</t></si><si><t>token-type-triggered-ability</t></si><si><t>Card type for a triggered ability card</t></si><si><t>Triggered Ability</t></si><si><t>1dd37348-a684-4f5f-a8e3-87ecb7354c85</t></si><si><t>token-type-reclaim-ability</t></si><si><t>Card type for a reclaim ability card</t></si><si><t>Reclaim Ability</t></si><si><t>Energy Produced</t></si><si><t>Phase</t></si><si><t>Dawning Horizon</t></si><si><t>bc143c3c-f149-4506-813f-1aa8dd54e370</t></si><si><t>1963305268</t></si><si><t>Sunrise Cavern</t></si><si><t>1dda2551-c972-4db2-81c0-9dc95ac8b27c</t></si><si><t>565499323</t></si><si><t>Skypath</t></si><si><t>dcd99f3d-8c47-47fa-9b9a-4c1455a9d2eb</t></si><si><t>1897537165</t></si><si><t>Autumn Glade</t></si><si><t>276c1e23-53d8-4aeb-a4dd-243189a44561</t></si><si><t>Gain {-gained-points(n: 1)}.</t></si><si><t>1789989917</t></si><si><t>Twilight Radiance</t></si><si><t>63d5d9f5-208f-4e35-9681-d51a5ba6ce57</t></si><si><t>1786390154</t></si><si><t>Astral Interface</t></si><si><t>8e5b3423-b8e1-4e1c-9e3e-5281190c4713</t></si><si><t>Draw {-drawn-cards(n: 1)}. Discard {-discarded-cards(n: 1)}.</t></si><si><t>Select a card to discard.</t></si><si><t>1011222385</t></si><si><t>Auroral Passage</t></si><si><t>e2c10a87-e92f-4170-9bbf-c288abcf9f9b</t></si><si><t>2421338077</t></si><si><t>Dreamwell Produce 0</t></si><si><t>146ae27e-a8ac-4f3c-aef2-cf2211e4bcfe</t></si><si><t>Dreamwell Produce 1</t></si><si><t>ee7b0367-f7c3-46c3-94db-b29cfd8dc2d2</t></si><si><t>Dreamwell Produce 2 Starter</t></si><si><t>308fd4c0-ca98-4bfa-a9be-c29b36a145fd</t></si><si><t>Dreamwell Foresee</t></si><si><t>40c77ea8-a021-4bc6-8970-0853c03f3fe0</t></si><si><t>Dreamwell Gain Points</t></si><si><t>d386663c-9e9f-4b8e-b410-f3467e39801b</t></si><si><t>Dreamwell Gain Energy</t></si><si><t>107c3b3f-6131-4ff8-afcb-f0ce4188848f</t></si><si><t>Dreamwell Draw Discard</t></si><si><t>40e4381f-12f7-46b9-ae50-67b3195781b1</t></si><si><t>Dreamwell Mill 3</t></si><si><t>a2cdf115-8e1a-455e-a118-123f6f36c7ba</t></si><si><t>List Name</t></si><si><t>List Type</t></si><si><t>Card ID</t></si><si><t>Copies</t></si><si><t>Test Dreamwell No Abilities</t></si><si><t>DreamwellCardId</t></si><si><t>Test Dreamwell Basic 5</t></si><si><t>Dreamwell Basic 5</t></si><si><t>Core 11</t></si><si><t>BaseCardId</t></si><si><t>Card Name</t></si><si><t>Card Image</t></si><si><t>Effect Type</t></si><si><t>Effect Trigger</t></si><si><t>Projectile Source</t></si><si><t>Projectile Target</t></si><si><t>Projectile Address</t></si><si><t>Projectile Fire Sound</t></si><si><t>Projectile Impact Sound</t></si><si><t>Dissolve Material</t></si><si><t>Dissolve Color</t></si><si><t>Dissolve Sound</t></si><si><t>Effect Target</t></si><si><t>Effect Address</t></si><si><t>Effect Duration Milliseconds</t></si><si><t>Effect Scale</t></si><si><t>Effect Sound</t></si><si><t>Card Trail Targets</t></si><si><t>Card Trail Address</t></si><si><t>Trail Duration Milliseconds</t></si><si><t>FireProjectile</t></si><si><t>ApplyTargetedEffect</t></si><si><t>ThisCard</t></si><si><t>ForEachTarget</t></si><si><t>Assets/ThirdParty/Hovl Studio/AAA Projectiles Vol 1/Prefabs/Dreamtides/Projectile 3 black fire.prefab</t></si><si><t>Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Fire Magic/RPG3_FireMagicArrow_Projectile01.wav</t></si><si><t>Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Fire Magic/RPG3_FireMagic_Impact01.wav</t></si><si><t>DissolveTargets</t></si><si><t>Assets/Content/Dissolves/Dissolve15.mat</t></si><si><t>#FFC107</t></si><si><t>ReverseDissolveTargets</t></si><si><t>Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Fire Magic/RPG3_FireMagicBall_LightImpact03.wav</t></si><si><t>Assets/ThirdParty/Hovl Studio/AAA Projectiles Vol 1/Prefabs/Dreamtides/Projectile 6 blue fire.prefab</t></si><si><t>Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Water Magic/RPG3_WaterMagic_Cast01.wav</t></si><si><t>Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Water Magic/RPG3_WaterMagic_Impact03.wav</t></si><si><t>Assets/ThirdParty/Hovl Studio/AAA Projectiles Vol 1/Prefabs/Dreamtides/Projectile 10 blue laser.prefab</t></si><si><t>DisplayEffect</t></si><si><t>DrawCards</t></si><si><t>ControllerDeck</t></si><si><t>Assets/ThirdParty/Hovl Studio/Magic circles/Dreamtides/Magic circle 1.prefab</t></si><si><t>500</t></si><si><t>Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Light Magic/RPG3_LightMagicEpic_HealingWing_P1.wav</t></si><si><t>ActivatedAbility</t></si><si><t>Assets/ThirdParty/Hovl Studio/Magic circles/Dreamtides/Magic circle 2.prefab</t></si><si><t>Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Light Magic/RPG3_LightMagic_Cast03.wav</t></si><si><t>SetCardTrail</t></si><si><t>SelectedTargetsForCard</t></si><si><t>Assets/ThirdParty/Hovl Studio/AAA Projectiles Vol 1/Prefabs/Dreamtides/Projectile 7 pink.prefab</t></si><si><t>Assets/ThirdParty/Hovl Studio/AAA Projectiles Vol 1/Prefabs/Dreamtides/Projectile 5 red.prefab</t></si><si><t>Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Plasma Magic/RPG3_PlasmaMagic_Cast01.wav</t></si><si><t>Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Plasma Magic/RPG3_PlasmaMagic_MediumImpact01.wav</t></si><si><t>Assets/ThirdParty/Hovl Studio/Magic circles/Dreamtides/Magic circle 9.prefab</t></si><si><t>Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Fire Magic/RPG3_FireMagic_Cast04.wav</t></si><si><t>1500</t></si></sst>
+}</t>
+</si>
+<si>
+<t>0d6c79d7-af53-4477-977c-a248fb4fa0ba</t>
+</si>
+<si>
+<t>-discarded-cards</t>
+</si>
+<si>
+<t>Formatting for a number of cards discarded</t>
+</si>
+<si>
+<t>c49b155f-57a2-479a-bc45-254b2144d04b</t>
+</si>
+<si>
+<t>-gained-spark</t>
+</si>
+<si>
+<t>Formatting for gaining an amount of spark</t>
+</si>
+<si>
+<t>+{$n} spark</t>
+</si>
+<si>
+<t>707467ad-9e99-4953-8e4d-cf5f47e31768</t>
+</si>
+<si>
+<t>-count</t>
+</si>
+<si>
+<t>Formatting for an arbitrary numerical value</t>
+</si>
+<si>
+<t>{$n}</t>
+</si>
+<si>
+<t>3057478f-1445-4b7d-8241-a90d97da7adf</t>
+</si>
+<si>
+<t>choose-one</t>
+</si>
+<si>
+<t>Formatting to select a single mode of a modal card</t>
+</si>
+<si>
+<t>Choose one:</t>
+</si>
+<si>
+<t>abfc5cdc-e118-4e43-87a1-3493cc80df75</t>
+</si>
+<si>
+<t>bullet</t>
+</si>
+<si>
+<t>Inserts a bullet character</t>
+</si>
+<si>
+<t>•</t>
+</si>
+<si>
+<t>2e44ee4c-3218-45bf-a29e-0508f853c873</t>
+</si>
+<si>
+<t>-foresee</t>
+</si>
+<si>
+<t>Foresee keyword ability with quantity</t>
+</si>
+<si>
+<t>{keyword}foresee{end-keyword} {$n}</t>
+</si>
+<si>
+<t>b68a7c1c-5b2b-4885-863b-4ebf81279330</t>
+</si>
+<si>
+<t>-Foresee</t>
+</si>
+<si>
+<t>Foresee keyword ability with quantity, capitalized</t>
+</si>
+<si>
+<t>{keyword}Foresee{end-keyword} {$n}</t>
+</si>
+<si>
+<t>f19214ee-632b-4f0b-b3e4-d63e67b7ac03</t>
+</si>
+<si>
+<t>reclaim</t>
+</si>
+<si>
+<t>Reclaim keyword ability without energy cost</t>
+</si>
+<si>
+<t>{keyword}reclaim{end-keyword}</t>
+</si>
+<si>
+<t>6640dfed-a5d6-4b68-88db-3b62a4400132</t>
+</si>
+<si>
+<t>Reclaim</t>
+</si>
+<si>
+<t>Reclaim keyword ability without energy cost, capitalized</t>
+</si>
+<si>
+<t>{keyword}Reclaim{end-keyword}</t>
+</si>
+<si>
+<t>fb895ce7-1f66-426d-8c29-b19fdeee7828</t>
+</si>
+<si>
+<t>-reclaim-cost</t>
+</si>
+<si>
+<t>Reclaim keyword ability with energy cost</t>
+</si>
+<si>
+<t>{keyword}reclaim{end-keyword} &lt;color=#00838F&gt;&lt;b&gt;{$e}{e}&lt;/b&gt;&lt;/color&gt;</t>
+</si>
+<si>
+<t>5674a8dd-b4eb-4630-85c2-79d6b95cdaae</t>
+</si>
+<si>
+<t>-Reclaim-Cost</t>
+</si>
+<si>
+<t>Reclaim keyword ability with energy cost, capitalized</t>
+</si>
+<si>
+<t>{keyword}Reclaim{end-keyword} &lt;color=#00838F&gt;&lt;b&gt;{$e}{e}&lt;/b&gt;&lt;/color&gt;</t>
+</si>
+<si>
+<t>bf189fe0-75e2-4a87-9dca-67dd5f755766</t>
+</si>
+<si>
+<t>-kindle</t>
+</si>
+<si>
+<t>Kindle keyword ability with quantity</t>
+</si>
+<si>
+<t>{keyword}kindle{end-keyword} {$s}</t>
+</si>
+<si>
+<t>d1c8ff05-9dd8-4ed6-9436-746a9caf5a63</t>
+</si>
+<si>
+<t>-Kindle</t>
+</si>
+<si>
+<t>Kindle keyword ability with quantity, capitalized</t>
+</si>
+<si>
+<t>{keyword}Kindle{end-keyword} {$s}</t>
+</si>
+<si>
+<t>70374512-2121-4569-a028-e871209fad38</t>
+</si>
+<si>
+<t>-gained-points</t>
+</si>
+<si>
+<t>Formatting for gaining an amount of points</t>
+</si>
+<si>
+<t>{$n}{p}</t>
+</si>
+<si>
+<t>5771085d-3c89-423f-be05-c728035e7cd0</t>
+</si>
+<si>
+<t>dissolve</t>
+</si>
+<si>
+<t>Dissolve keyword ability</t>
+</si>
+<si>
+<t>{keyword}dissolve{end-keyword}</t>
+</si>
+<si>
+<t>8b9ef6b9-a6e1-4abe-be4d-cf7fa3ce41b8</t>
+</si>
+<si>
+<t>Dissolve</t>
+</si>
+<si>
+<t>Dissolve keyword ability, capitalized</t>
+</si>
+<si>
+<t>{keyword}Dissolve{end-keyword}</t>
+</si>
+<si>
+<t>1a9e01e9-e7aa-4692-9b1b-5dd9e0b4a7f9</t>
+</si>
+<si>
+<t>prevent</t>
+</si>
+<si>
+<t>Prevent keyword ability</t>
+</si>
+<si>
+<t>{keyword}prevent{end-keyword}</t>
+</si>
+<si>
+<t>fb38409b-cbaf-41a5-96fc-af622ce6f333</t>
+</si>
+<si>
+<t>Prevent</t>
+</si>
+<si>
+<t>Prevent keyword ability, capitalized</t>
+</si>
+<si>
+<t>{keyword}Prevent{end-keyword}</t>
+</si>
+<si>
+<t>901b84a1-c886-447b-bd0d-005e240a23de</t>
+</si>
+<si>
+<t>anchored</t>
+</si>
+<si>
+<t>Anchored keyword ability</t>
+</si>
+<si>
+<t>{keyword}anchored{end-keyword}</t>
+</si>
+<si>
+<t>1bb69fb4-344a-48f2-a7a2-95a30ac4a2f2</t>
+</si>
+<si>
+<t>Anchored</t>
+</si>
+<si>
+<t>Anchored keyword ability, capitalized</t>
+</si>
+<si>
+<t>{keyword}Anchored{end-keyword}</t>
+</si>
+<si>
+<t>66edfc8f-483b-4ad0-b37b-c66aa7c4347b</t>
+</si>
+<si>
+<t>prompt-choose-character</t>
+</si>
+<si>
+<t>Prompt message to target a character</t>
+</si>
+<si>
+<t>Choose a character</t>
+</si>
+<si>
+<t>3f16a9f0-c905-4040-b4e3-58eafa3144f2</t>
+</si>
+<si>
+<t>prompt-select-stack-card</t>
+</si>
+<si>
+<t>Prompt message to pick a card on the stack</t>
+</si>
+<si>
+<t>Select a card</t>
+</si>
+<si>
+<t>95c481aa-46e6-4e03-ab9f-ae162207cd39</t>
+</si>
+<si>
+<t>prompt-select-from-void</t>
+</si>
+<si>
+<t>Prompt message to pick a card from your void</t>
+</si>
+<si>
+<t>Select from your void</t>
+</si>
+<si>
+<t>68ddc76a-67ee-4d95-a0a1-ff688752b5f8</t>
+</si>
+<si>
+<t>prompt-select-from-hand</t>
+</si>
+<si>
+<t>Prompt message to pick a card from your hand</t>
+</si>
+<si>
+<t>Select from your hand</t>
+</si>
+<si>
+<t>02b21277-492f-4a76-9d9e-b71ea88e72ad</t>
+</si>
+<si>
+<t>prompt-select-option</t>
+</si>
+<si>
+<t>Prompt message to pick a choice among several options</t>
+</si>
+<si>
+<t>Select an option</t>
+</si>
+<si>
+<t>165d5300-2f77-4c23-9b36-217902fab895</t>
+</si>
+<si>
+<t>prompt-choose-energy-amount</t>
+</si>
+<si>
+<t>Prompt message to pick an amount of energy</t>
+</si>
+<si>
+<t>Choose energy amount</t>
+</si>
+<si>
+<t>4b770aa5-47e8-4dab-b879-c2d3aaa40ba2</t>
+</si>
+<si>
+<t>prompt-select-card-order</t>
+</si>
+<si>
+<t>Prompt message to pick card ordering within the deck</t>
+</si>
+<si>
+<t>Select card position</t>
+</si>
+<si>
+<t>df13df4b-c876-48ec-aa81-5e25b0c6c9cb</t>
+</si>
+<si>
+<t>prompt-pick-mode</t>
+</si>
+<si>
+<t>Prompt message to pick a mode of a modal card to play</t>
+</si>
+<si>
+<t>Choose a mode</t>
+</si>
+<si>
+<t>e0dd5336-cb19-49f5-ad50-aa3a61823405</t>
+</si>
+<si>
+<t>dev-menu-button</t>
+</si>
+<si>
+<t>Dev menu button label</t>
+</si>
+<si>
+<t>{bug-icon} Dev</t>
+</si>
+<si>
+<t>6095730f-d43c-49cd-a5dc-2781882389ed</t>
+</si>
+<si>
+<t>decline-prompt-button</t>
+</si>
+<si>
+<t>Decline to take the action associated with a prompt</t>
+</si>
+<si>
+<t>Decline</t>
+</si>
+<si>
+<t>211e9d51-07ed-4261-88ce-fbfeb3390449</t>
+</si>
+<si>
+<t>pay-energy-prompt-button</t>
+</si>
+<si>
+<t>Choose to pay energy to take a prompt action</t>
+</si>
+<si>
+<t>Spend {$energy}{e}</t>
+</si>
+<si>
+<t>3d41f282-892b-47e6-9e8c-b82ca534ca20</t>
+</si>
+<si>
+<t>pay-energy-addtional-cost-button</t>
+</si>
+<si>
+<t>Button to confirm the amount of energy to pay as an additional cost</t>
+</si>
+<si>
+<t>a637975a-fb02-40b1-8dbe-95f278867ef8</t>
+</si>
+<si>
+<t>primary-button-submit-void-card-targets</t>
+</si>
+<si>
+<t>Button to confirm selection of target cards in the void</t>
+</si>
+<si>
+<t>Submit</t>
+</si>
+<si>
+<t>be3fe1f9-17ed-4324-b1d9-f1d5e6ccf2c3</t>
+</si>
+<si>
+<t>primary-button-submit-hand-card-targets</t>
+</si>
+<si>
+<t>Button to confirm selection of target cards in the hand</t>
+</si>
+<si>
+<t>f03ee2d3-e278-40bc-a449-25571d36fa56</t>
+</si>
+<si>
+<t>primary-button-submit-deck-card-order</t>
+</si>
+<si>
+<t>Button to confirm selection of ordering of cards in deck</t>
+</si>
+<si>
+<t>5c8a0769-2507-4082-84c8-5d7fd69855d8</t>
+</si>
+<si>
+<t>primary-button-resolve-stack</t>
+</si>
+<si>
+<t>Button to resolve the top card of the stack</t>
+</si>
+<si>
+<t>Resolve</t>
+</si>
+<si>
+<t>08d4e22b-5eab-4354-9cb5-7ff68c3b5196</t>
+</si>
+<si>
+<t>primary-button-end-turn</t>
+</si>
+<si>
+<t>Button to end your turn</t>
+</si>
+<si>
+<t>End Turn</t>
+</si>
+<si>
+<t>bb1acabc-e74c-44d2-a586-54689f5de23b</t>
+</si>
+<si>
+<t>primary-button-start-next-turn</t>
+</si>
+<si>
+<t>Button to end the opponent's turn and begin your turn</t>
+</si>
+<si>
+<t>Next Turn</t>
+</si>
+<si>
+<t>010f152b-115a-4a52-bae0-3f9961b0990f</t>
+</si>
+<si>
+<t>increment-energy-prompt-button</t>
+</si>
+<si>
+<t>Button to increment the energy amount in a prompt to pick an energy value</t>
+</si>
+<si>
+<t>+1{e}</t>
+</si>
+<si>
+<t>5632f153-07d7-41de-bc85-5864f5578d73</t>
+</si>
+<si>
+<t>decrement-energy-prompt-button</t>
+</si>
+<si>
+<t>Button to decrement the energy amount in a prompt to pick an energy value</t>
+</si>
+<si>
+<t>-1{e}</t>
+</si>
+<si>
+<t>bec6ea4b-55b9-4eb9-8173-9dd4f03eaf05</t>
+</si>
+<si>
+<t>hide-stack-button</t>
+</si>
+<si>
+<t>Button to hide the stack and view the battlefield</t>
+</si>
+<si>
+<t>{eye-icon}</t>
+</si>
+<si>
+<t>e2cbff72-868a-4be2-a13a-37815ce0a5f2</t>
+</si>
+<si>
+<t>show-stack-button</t>
+</si>
+<si>
+<t>Button to show the stack after hiding it</t>
+</si>
+<si>
+<t>{eye-slash-icon}</t>
+</si>
+<si>
+<t>1231c8b5-de17-4cf3-b45d-f42d62143916</t>
+</si>
+<si>
+<t>card-rules-text-energy-paid</t>
+</si>
+<si>
+<t>Addition to card rules text showing how much energy was spent on a card with a variable energy cost</t>
+</si>
+<si>
+<t>({$energy}{e} paid)</t>
+</si>
+<si>
+<t>dd5982c1-cfba-4608-a0ce-abf4257fcd5a</t>
+</si>
+<si>
+<t>card-rules-text-reclaimed</t>
+</si>
+<si>
+<t>Addition to card rules text showing that a card was played with the "reclaim" ability</t>
+</si>
+<si>
+<t>(Reclaimed)</t>
+</si>
+<si>
+<t>6d3f9774-49a1-4263-b354-177dd069c329</t>
+</si>
+<si>
+<t>card-rules-text-anchored</t>
+</si>
+<si>
+<t>Addition to card rules text showing that a card has been "anchored"</t>
+</si>
+<si>
+<t>(Anchored)</t>
+</si>
+<si>
+<t>76e30436-5446-4b71-8189-439c843184ad</t>
+</si>
+<si>
+<t>modal-effect-choice-card-name</t>
+</si>
+<si>
+<t>Card name for a card representing a numbered modal effect choice</t>
+</si>
+<si>
+<t>Choice {$number}</t>
+</si>
+<si>
+<t>740ba650-6ee0-4fa2-9f6a-7c163454a191</t>
+</si>
+<si>
+<t>character-ability-card-name</t>
+</si>
+<si>
+<t>Card name for a card representing an ability of a character</t>
+</si>
+<si>
+<t>{$character-name} Ability</t>
+</si>
+<si>
+<t>f144ac6d-bd7a-460c-9990-06812c084191</t>
+</si>
+<si>
+<t>hand-size-limit-exceeded-warning-message</t>
+</si>
+<si>
+<t>Message describing the effects of exceeding the hand size limit</t>
+</si>
+<si>
+<t>Note: Cards drawn in excess of 10 become {e} instead.</t>
+</si>
+<si>
+<t>9cffdaea-7a9f-4ca0-80af-6c414cb5c4f0</t>
+</si>
+<si>
+<t>character-limit-exceeded-warning-message</t>
+</si>
+<si>
+<t>Message describing the effects of exceeding the character limit</t>
+</si>
+<si>
+<t>Character limit exceeded: A character will be abandoned, with its spark permanently added to your total.</t>
+</si>
+<si>
+<t>59bc7390-ee3f-426c-8874-48d56d62d7ea</t>
+</si>
+<si>
+<t>combined-limit-warning-message</t>
+</si>
+<si>
+<t>Message describing the effects of exceeding both the character limit and the hand size limit</t>
+</si>
+<si>
+<t>Character limit exceeded: A character will be abandoned. Cards drawn in excess of 10 become {e} instead.</t>
+</si>
+<si>
+<t>a36c2696-4c39-49d5-9c63-3e5b7149cefb</t>
+</si>
+<si>
+<t>error-message-panel-title</t>
+</si>
+<si>
+<t>Title for a panel displaying an error message</t>
+</si>
+<si>
+<t>Error</t>
+</si>
+<si>
+<t>b7b16e85-8cbf-4433-8ee1-805858a10493</t>
+</si>
+<si>
+<t>card-type-character</t>
+</si>
+<si>
+<t>Card type for character cards</t>
+</si>
+<si>
+<t>11b07242-b514-42cb-aed9-a64992ac2e2b</t>
+</si>
+<si>
+<t>card-type-event</t>
+</si>
+<si>
+<t>Card type for event cards</t>
+</si>
+<si>
+<t>3876f34a-f8c3-49f3-bec5-5ae740e2978f</t>
+</si>
+<si>
+<t>card-type-dreamsign</t>
+</si>
+<si>
+<t>Card type for dreamsign cards</t>
+</si>
+<si>
+<t>Dreamsign</t>
+</si>
+<si>
+<t>a71f9d3b-ffc9-4edd-9be1-e998bdc5310a</t>
+</si>
+<si>
+<t>card-type-dreamcaller</t>
+</si>
+<si>
+<t>Card type for dreamcaller cards</t>
+</si>
+<si>
+<t>Dreamcaller</t>
+</si>
+<si>
+<t>a2bcbaa7-2167-47fc-9db7-5267a91b17c4</t>
+</si>
+<si>
+<t>card-type-dreamwell</t>
+</si>
+<si>
+<t>Card type for dreamwell cards</t>
+</si>
+<si>
+<t>Dreamwell</t>
+</si>
+<si>
+<t>bee9a795-eb5a-46a1-aac5-692c7a070c64</t>
+</si>
+<si>
+<t>card-subtype-ancient</t>
+</si>
+<si>
+<t>Card subtype, displayed on character cards</t>
+</si>
+<si>
+<t>Ancient</t>
+</si>
+<si>
+<t>602ea4ae-0f44-4704-9cf4-c1ef70248642</t>
+</si>
+<si>
+<t>card-subtype-child</t>
+</si>
+<si>
+<t>Child</t>
+</si>
+<si>
+<t>94f37651-7ffa-4bb1-97b9-40b5640db8ab</t>
+</si>
+<si>
+<t>card-subtype-detective</t>
+</si>
+<si>
+<t>Detective</t>
+</si>
+<si>
+<t>9aa89193-4555-4906-9830-8c4584d4e882</t>
+</si>
+<si>
+<t>card-subtype-enigma</t>
+</si>
+<si>
+<t>Enigma</t>
+</si>
+<si>
+<t>45d5bee1-12b7-4150-983c-4c4ce721d091</t>
+</si>
+<si>
+<t>card-subtype-explorer</t>
+</si>
+<si>
+<t>Explorer</t>
+</si>
+<si>
+<t>411b42ec-fa60-44a0-8282-35b9f1e6dcd8</t>
+</si>
+<si>
+<t>card-subtype-hacker</t>
+</si>
+<si>
+<t>Hacker</t>
+</si>
+<si>
+<t>0c84be77-7bac-4820-a5c2-7b648522db47</t>
+</si>
+<si>
+<t>card-subtype--mage</t>
+</si>
+<si>
+<t>Mage</t>
+</si>
+<si>
+<t>7947e5c2-bf87-4840-90be-4bbff0639b5f</t>
+</si>
+<si>
+<t>card-subtype-monster</t>
+</si>
+<si>
+<t>Monster</t>
+</si>
+<si>
+<t>bcc76e70-cb45-4667-8e89-7b2dacb81ebc</t>
+</si>
+<si>
+<t>card-subtype-musician</t>
+</si>
+<si>
+<t>f786771e-b0fa-483a-b773-72fc9e9b56a5</t>
+</si>
+<si>
+<t>card-subtype-outsider</t>
+</si>
+<si>
+<t>Outsider</t>
+</si>
+<si>
+<t>f8032816-7252-4c33-8ce4-ffd3ba279a2a</t>
+</si>
+<si>
+<t>card-subtype-renegade</t>
+</si>
+<si>
+<t>Renegade</t>
+</si>
+<si>
+<t>60921d72-fde8-4958-b425-9bdc0964b0a3</t>
+</si>
+<si>
+<t>card-subtype-spirit-animal</t>
+</si>
+<si>
+<t>Spirit Animal</t>
+</si>
+<si>
+<t>1a6221e0-a5bd-4a48-8629-51a2796ad166</t>
+</si>
+<si>
+<t>card-subtype-super</t>
+</si>
+<si>
+<t>Super</t>
+</si>
+<si>
+<t>649edeb4-6c1d-48f4-bb39-8e01caba3d2a</t>
+</si>
+<si>
+<t>card-subtype-survivor</t>
+</si>
+<si>
+<t>Survivor</t>
+</si>
+<si>
+<t>82f771ba-f7d6-4718-9e26-a9ff3dcac12f</t>
+</si>
+<si>
+<t>card-subtype-synth</t>
+</si>
+<si>
+<t>Synth</t>
+</si>
+<si>
+<t>40e3fefd-b41e-4dfc-a467-0c59766116c8</t>
+</si>
+<si>
+<t>card-subtype-tinkerer</t>
+</si>
+<si>
+<t>Tinkerer</t>
+</si>
+<si>
+<t>f29c168c-6f67-4682-b948-dddd535fc467</t>
+</si>
+<si>
+<t>card-subtype-trooper</t>
+</si>
+<si>
+<t>Trooper</t>
+</si>
+<si>
+<t>42abc8f3-b741-4d49-97b1-d96a29563f18</t>
+</si>
+<si>
+<t>card-subtype-visionary</t>
+</si>
+<si>
+<t>Visionary</t>
+</si>
+<si>
+<t>727a0d85-e67d-49c6-920c-95619b488402</t>
+</si>
+<si>
+<t>card-subtype-visitor</t>
+</si>
+<si>
+<t>Visitor</t>
+</si>
+<si>
+<t>68338f97-ffd9-4082-8c5a-41091323e8cb</t>
+</si>
+<si>
+<t>card-subtype-warrior</t>
+</si>
+<si>
+<t>Warrior</t>
+</si>
+<si>
+<t>a4e6687d-4c0e-4de9-b3aa-1e49e09b4668</t>
+</si>
+<si>
+<t>help-text-dissolve</t>
+</si>
+<si>
+<t>Info zoom help text, displayed on a tooltip to describe card abilities</t>
+</si>
+<si>
+<t>{Dissolve}: Send a character to the void</t>
+</si>
+<si>
+<t>c58bd162-3392-444f-868e-488c023e9e91</t>
+</si>
+<si>
+<t>help-text-prevent</t>
+</si>
+<si>
+<t>{Prevent}: Send a card to the void in response to it being played</t>
+</si>
+<si>
+<t>893f14c2-d7d6-4adf-a97a-66847febe6ed</t>
+</si>
+<si>
+<t>help-text-foresee-1</t>
+</si>
+<si>
+<t>{keyword}Foresee{end-keyword} 1: Look at the top card of your deck. You may put it into your void.</t>
+</si>
+<si>
+<t>283a1526-f6e7-4885-a000-1b0cd54a75ed</t>
+</si>
+<si>
+<t>help-text-foresee-n</t>
+</si>
+<si>
+<t>{keyword}Foresee{end-keyword} {$n}: Look at the top {$n} cards of your deck. You may put them into your void or put them back in any order.</t>
+</si>
+<si>
+<t>85f5f06f-417d-4bb7-bf99-51eef3d4a5ac</t>
+</si>
+<si>
+<t>help-text-anchored</t>
+</si>
+<si>
+<t>{Anchored}: Cannot be dissolved.</t>
+</si>
+<si>
+<t>3e724a9f-4eed-4044-85ee-12187f1aef65</t>
+</si>
+<si>
+<t>help-text-reclaim-without-cost</t>
+</si>
+<si>
+<t>{Reclaim}: You may play a card from your void, then banish it when it leaves play.</t>
+</si>
+<si>
+<t>7b13a745-c94b-437c-bc2d-73c64b479147</t>
+</si>
+<si>
+<t>help-text-reclaim-with-cost</t>
+</si>
+<si>
+<t>{keyword}Reclaim{end-keyword} {$e}{e}: You may play this card from your void for {$e}{e}, then banish it.</t>
+</si>
+<si>
+<t>cf017f6f-7cc5-4b40-8819-25ec7fb5acd2</t>
+</si>
+<si>
+<t>token-type-activated-ability</t>
+</si>
+<si>
+<t>Card type for an activated ability card</t>
+</si>
+<si>
+<t>Activated Ability</t>
+</si>
+<si>
+<t>f4fe91cb-3bb9-4b58-9949-6652a388c0c8</t>
+</si>
+<si>
+<t>token-type-triggered-ability</t>
+</si>
+<si>
+<t>Card type for a triggered ability card</t>
+</si>
+<si>
+<t>Triggered Ability</t>
+</si>
+<si>
+<t>1dd37348-a684-4f5f-a8e3-87ecb7354c85</t>
+</si>
+<si>
+<t>token-type-reclaim-ability</t>
+</si>
+<si>
+<t>Card type for a reclaim ability card</t>
+</si>
+<si>
+<t>Reclaim Ability</t>
+</si>
+<si>
+<t>Energy Produced</t>
+</si>
+<si>
+<t>Phase</t>
+</si>
+<si>
+<t>Dawning Horizon</t>
+</si>
+<si>
+<t>bc143c3c-f149-4506-813f-1aa8dd54e370</t>
+</si>
+<si>
+<t>1963305268</t>
+</si>
+<si>
+<t>Sunrise Cavern</t>
+</si>
+<si>
+<t>1dda2551-c972-4db2-81c0-9dc95ac8b27c</t>
+</si>
+<si>
+<t>565499323</t>
+</si>
+<si>
+<t>Skypath</t>
+</si>
+<si>
+<t>dcd99f3d-8c47-47fa-9b9a-4c1455a9d2eb</t>
+</si>
+<si>
+<t>1897537165</t>
+</si>
+<si>
+<t>Autumn Glade</t>
+</si>
+<si>
+<t>276c1e23-53d8-4aeb-a4dd-243189a44561</t>
+</si>
+<si>
+<t>Gain {-gained-points(n: 1)}.</t>
+</si>
+<si>
+<t>1789989917</t>
+</si>
+<si>
+<t>Twilight Radiance</t>
+</si>
+<si>
+<t>63d5d9f5-208f-4e35-9681-d51a5ba6ce57</t>
+</si>
+<si>
+<t>1786390154</t>
+</si>
+<si>
+<t>Astral Interface</t>
+</si>
+<si>
+<t>8e5b3423-b8e1-4e1c-9e3e-5281190c4713</t>
+</si>
+<si>
+<t>Draw {-drawn-cards(n: 1)}. Discard {-discarded-cards(n: 1)}.</t>
+</si>
+<si>
+<t>Select a card to discard.</t>
+</si>
+<si>
+<t>1011222385</t>
+</si>
+<si>
+<t>Auroral Passage</t>
+</si>
+<si>
+<t>e2c10a87-e92f-4170-9bbf-c288abcf9f9b</t>
+</si>
+<si>
+<t>2421338077</t>
+</si>
+<si>
+<t>Dreamwell Produce 0</t>
+</si>
+<si>
+<t>146ae27e-a8ac-4f3c-aef2-cf2211e4bcfe</t>
+</si>
+<si>
+<t>Dreamwell Produce 1</t>
+</si>
+<si>
+<t>ee7b0367-f7c3-46c3-94db-b29cfd8dc2d2</t>
+</si>
+<si>
+<t>Dreamwell Produce 2 Starter</t>
+</si>
+<si>
+<t>308fd4c0-ca98-4bfa-a9be-c29b36a145fd</t>
+</si>
+<si>
+<t>Dreamwell Foresee</t>
+</si>
+<si>
+<t>40c77ea8-a021-4bc6-8970-0853c03f3fe0</t>
+</si>
+<si>
+<t>Dreamwell Gain Points</t>
+</si>
+<si>
+<t>d386663c-9e9f-4b8e-b410-f3467e39801b</t>
+</si>
+<si>
+<t>Dreamwell Gain Energy</t>
+</si>
+<si>
+<t>107c3b3f-6131-4ff8-afcb-f0ce4188848f</t>
+</si>
+<si>
+<t>Dreamwell Draw Discard</t>
+</si>
+<si>
+<t>40e4381f-12f7-46b9-ae50-67b3195781b1</t>
+</si>
+<si>
+<t>Dreamwell Mill 3</t>
+</si>
+<si>
+<t>a2cdf115-8e1a-455e-a118-123f6f36c7ba</t>
+</si>
+<si>
+<t>List Name</t>
+</si>
+<si>
+<t>List Type</t>
+</si>
+<si>
+<t>Card ID</t>
+</si>
+<si>
+<t>Copies</t>
+</si>
+<si>
+<t>Test Dreamwell No Abilities</t>
+</si>
+<si>
+<t>DreamwellCardId</t>
+</si>
+<si>
+<t>Test Dreamwell Basic 5</t>
+</si>
+<si>
+<t>Dreamwell Basic 5</t>
+</si>
+<si>
+<t>Core 11</t>
+</si>
+<si>
+<t>BaseCardId</t>
+</si>
+<si>
+<t>Card Name</t>
+</si>
+<si>
+<t>Card Image</t>
+</si>
+<si>
+<t>Effect Type</t>
+</si>
+<si>
+<t>Effect Trigger</t>
+</si>
+<si>
+<t>Projectile Source</t>
+</si>
+<si>
+<t>Projectile Target</t>
+</si>
+<si>
+<t>Projectile Address</t>
+</si>
+<si>
+<t>Projectile Fire Sound</t>
+</si>
+<si>
+<t>Projectile Impact Sound</t>
+</si>
+<si>
+<t>Dissolve Material</t>
+</si>
+<si>
+<t>Dissolve Color</t>
+</si>
+<si>
+<t>Dissolve Sound</t>
+</si>
+<si>
+<t>Effect Target</t>
+</si>
+<si>
+<t>Effect Address</t>
+</si>
+<si>
+<t>Effect Duration Milliseconds</t>
+</si>
+<si>
+<t>Effect Scale</t>
+</si>
+<si>
+<t>Effect Sound</t>
+</si>
+<si>
+<t>Card Trail Targets</t>
+</si>
+<si>
+<t>Card Trail Address</t>
+</si>
+<si>
+<t>Trail Duration Milliseconds</t>
+</si>
+<si>
+<t>FireProjectile</t>
+</si>
+<si>
+<t>ApplyTargetedEffect</t>
+</si>
+<si>
+<t>ThisCard</t>
+</si>
+<si>
+<t>ForEachTarget</t>
+</si>
+<si>
+<t>Assets/ThirdParty/Hovl Studio/AAA Projectiles Vol 1/Prefabs/Dreamtides/Projectile 3 black fire.prefab</t>
+</si>
+<si>
+<t>Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Fire Magic/RPG3_FireMagicArrow_Projectile01.wav</t>
+</si>
+<si>
+<t>Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Fire Magic/RPG3_FireMagic_Impact01.wav</t>
+</si>
+<si>
+<t>DissolveTargets</t>
+</si>
+<si>
+<t>Assets/Content/Dissolves/Dissolve15.mat</t>
+</si>
+<si>
+<t>#FFC107</t>
+</si>
+<si>
+<t>ReverseDissolveTargets</t>
+</si>
+<si>
+<t>Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Fire Magic/RPG3_FireMagicBall_LightImpact03.wav</t>
+</si>
+<si>
+<t>Assets/ThirdParty/Hovl Studio/AAA Projectiles Vol 1/Prefabs/Dreamtides/Projectile 6 blue fire.prefab</t>
+</si>
+<si>
+<t>Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Water Magic/RPG3_WaterMagic_Cast01.wav</t>
+</si>
+<si>
+<t>Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Water Magic/RPG3_WaterMagic_Impact03.wav</t>
+</si>
+<si>
+<t>Assets/ThirdParty/Hovl Studio/AAA Projectiles Vol 1/Prefabs/Dreamtides/Projectile 10 blue laser.prefab</t>
+</si>
+<si>
+<t>DisplayEffect</t>
+</si>
+<si>
+<t>DrawCards</t>
+</si>
+<si>
+<t>ControllerDeck</t>
+</si>
+<si>
+<t>Assets/ThirdParty/Hovl Studio/Magic circles/Dreamtides/Magic circle 1.prefab</t>
+</si>
+<si>
+<t>500</t>
+</si>
+<si>
+<t>Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Light Magic/RPG3_LightMagicEpic_HealingWing_P1.wav</t>
+</si>
+<si>
+<t>ActivatedAbility</t>
+</si>
+<si>
+<t>Assets/ThirdParty/Hovl Studio/Magic circles/Dreamtides/Magic circle 2.prefab</t>
+</si>
+<si>
+<t>Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Light Magic/RPG3_LightMagic_Cast03.wav</t>
+</si>
+<si>
+<t>SetCardTrail</t>
+</si>
+<si>
+<t>SelectedTargetsForCard</t>
+</si>
+<si>
+<t>Assets/ThirdParty/Hovl Studio/AAA Projectiles Vol 1/Prefabs/Dreamtides/Projectile 7 pink.prefab</t>
+</si>
+<si>
+<t>Assets/ThirdParty/Hovl Studio/AAA Projectiles Vol 1/Prefabs/Dreamtides/Projectile 5 red.prefab</t>
+</si>
+<si>
+<t>Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Plasma Magic/RPG3_PlasmaMagic_Cast01.wav</t>
+</si>
+<si>
+<t>Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Plasma Magic/RPG3_PlasmaMagic_MediumImpact01.wav</t>
+</si>
+<si>
+<t>Assets/ThirdParty/Hovl Studio/Magic circles/Dreamtides/Magic circle 9.prefab</t>
+</si>
+<si>
+<t>Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Fire Magic/RPG3_FireMagic_Cast04.wav</t>
+</si>
+<si>
+<t>1500</t>
+</si>
+</sst>
