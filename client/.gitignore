@@ -6,6 +6,7 @@
 /out/
 /Library
 /test_output/
+~$*.xlsm
 
 # temp
 Assets/Content/Imposters/
