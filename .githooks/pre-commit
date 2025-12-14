@@ -7,6 +7,5 @@ DIR="client/Assets/StreamingAssets/Tabula.xlsm.d"
 if [[ -f "$XLSM" ]]; then
   python3 client/scripts/xlsm_extract.py "$XLSM" "$DIR" --clean
   git add "$DIR"
-  git reset HEAD -- "$XLSM" 2>/dev/null || true
 fi
 
