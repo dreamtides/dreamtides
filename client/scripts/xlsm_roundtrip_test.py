@@ -15,11 +15,6 @@ def roundtrip_test(input_xlsm, output_xlsm, keep_temp=False):
         sys.stderr.write(f"Error: Input file not found: {input_path}\n")
         sys.exit(1)
     
-    if output_path.exists():
-        sys.stderr.write(f"Error: Output file already exists: {output_path}\n")
-        sys.stderr.write("  Delete it first or choose a different output path\n")
-        sys.exit(1)
-    
     temp_dir = Path(tempfile.mkdtemp(prefix='xlsm_roundtrip_'))
     
     try:
@@ -27,7 +22,7 @@ def roundtrip_test(input_xlsm, output_xlsm, keep_temp=False):
         extract_xlsm(input_path, temp_dir, clean=True)
         
         sys.stdout.write(f"Packing to {output_path}...\n")
-        pack_xlsm(temp_dir, output_path, overwrite=False)
+        pack_xlsm(temp_dir, output_path, overwrite=True)
         
         sys.stdout.write(f"Round-trip test complete: {output_path}\n")
         
