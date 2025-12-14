@@ -65,6 +65,9 @@ schema:
     quicktype --lang cs --src-lang schema -t SchemaTypes --namespace Dreamtides.Schema --csharp-version 6 --array-type list --features complete --check-required -o client/Assets/Dreamtides/Schema/Schema.cs schema.json
     rm schema.json
 
+fods:
+    python3 client/scripts/xlsm_fods_converter.py --input client/Assets/StreamingAssets/Tabula.xlsm --output client/Assets/StreamingAssets/Tabula.fods
+
 plugin_out := "client/Assets/Plugins"
 target_ios := "aarch64-apple-ios"
 
