@@ -69,7 +69,14 @@ extract-xlsm:
     python3 client/scripts/xlsm_extract.py client/Assets/StreamingAssets/Tabula.xlsm client/Assets/StreamingAssets/Tabula.xlsm.d --clean
 
 pack-xlsm:
-    python3 client/scripts/xlsm_pack.py client/Assets/StreamingAssets/Tabula.xlsm.d client/Assets/StreamingAssets/Tabula.xlsm
+    python3 client/scripts/xlsm_pack.py client/Assets/StreamingAssets/Tabula.xlsm.d client/Assets/StreamingAssets/Tabula.xlsm --overwrite
+
+pack-xlsm-tmp:
+    python3 client/scripts/xlsm_pack.py client/Assets/StreamingAssets/Tabula.xlsm.d client/Assets/StreamingAssets/Tabula.tmp.xlsm --overwrite
+
+roundtrip-xlsm:
+    python3 client/scripts/xlsm_roundtrip_test.py client/Assets/StreamingAssets/Tabula.xlsm client/Assets/StreamingAssets/Tabula.roundtrip.xlsm
+    open client/Assets/StreamingAssets/
 
 plugin_out := "client/Assets/Plugins"
 target_ios := "aarch64-apple-ios"

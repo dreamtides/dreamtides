@@ -2,19 +2,9 @@
 import sys
 import zipfile
 import argparse
-import xml.etree.ElementTree as ET
 from pathlib import Path
 
-def pretty_print_xml(xml_bytes):
-    try:
-        root = ET.fromstring(xml_bytes)
-        ET.indent(root, space='  ')
-        result = ET.tostring(root, encoding='utf-8', xml_declaration=True)
-        return result
-    except ET.ParseError:
-        return xml_bytes
-    except Exception:
-        return xml_bytes
+PLACEHOLDER_PNG = b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x01\x00\x00\x00\x01\x08\x02\x00\x00\x00\x90wS\xde\x00\x00\x00\tpHYs\x00\x00\x0b\x13\x00\x00\x0b\x13\x01\x00\x9a\x9c\x18\x00\x00\x00\nIDATx\x9cc\xf8\x00\x00\x00\x01\x00\x01\x00\x00\x00\x00IEND\xaeB`\x82'
 
 def extract_xlsm(xlsm_path, output_dir, clean=False):
     xlsm_path = Path(xlsm_path)
@@ -36,31 +26,17 @@ def extract_xlsm(xlsm_path, output_dir, clean=False):
     
     with zipfile.ZipFile(xlsm_path, 'r') as zip_ref:
         for entry_name in zip_ref.namelist():
-            if entry_name.startswith('xl/media/') or entry_name.startswith('xl/embeddings/'):
-                continue
-            
             entry_path = output_dir / entry_name
             entry_path.parent.mkdir(parents=True, exist_ok=True)
             
-            entry_data = zip_ref.read(entry_name)
-            
-            if entry_name.endswith('.xml') or entry_name.endswith('.rels'):
-                try:
-                    formatted_data = pretty_print_xml(entry_data)
-                    entry_path.write_bytes(formatted_data)
-                except Exception as e:
-                    sys.stderr.write(f"Warning: Could not format XML {entry_name}: {e}, writing as-is\n")
-                    entry_path.write_bytes(entry_data)
+            if entry_name.startswith('xl/media/'):
+                entry_path.write_bytes(PLACEHOLDER_PNG)
             else:
+                entry_data = zip_ref.read(entry_name)
                 entry_path.write_bytes(entry_data)
-    
-    media_dir = output_dir / 'xl' / 'media'
-    embeddings_dir = output_dir / 'xl' / 'embeddings'
-    media_dir.mkdir(parents=True, exist_ok=True)
-    embeddings_dir.mkdir(parents=True, exist_ok=True)
 
 def main():
-    parser = argparse.ArgumentParser(description='Extract .xlsm file to directory, excluding images')
+    parser = argparse.ArgumentParser(description='Extract .xlsm file to directory, replacing images with 1x1 PNGs')
     parser.add_argument('xlsm_path', help='Path to .xlsm file')
     parser.add_argument('output_dir', help='Output directory')
     parser.add_argument('--clean', action='store_true', help='Remove output directory before extracting')
@@ -70,4 +46,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-

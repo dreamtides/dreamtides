@@ -1,8 +1,0 @@
-<?xml version='1.0' encoding='utf-8'?>
-<ns0:table xmlns:ns0="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:ns1="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:ns2="http://schemas.microsoft.com/office/spreadsheetml/2014/revision" xmlns:ns3="http://schemas.microsoft.com/office/spreadsheetml/2016/revision3" ns1:Ignorable="xr xr3" id="13" ns2:uid="{4C545426-BE24-7243-AE97-4A6FE5A11C3C}" name="ObjectPredicateTypes" displayName="ObjectPredicateTypes" ref="AA1:AA4" totalsRowShown="0" headerRowDxfId="8" dataDxfId="7">
-  <ns0:autoFilter ref="AA1:AA4" ns2:uid="{4C545426-BE24-7243-AE97-4A6FE5A11C3C}" />
-  <ns0:tableColumns count="1">
-    <ns0:tableColumn id="1" ns3:uid="{4350F7C3-B634-1C4E-BD6E-02DFF383DE5B}" name="ObjectPredicateTypes" dataDxfId="6" />
-  </ns0:tableColumns>
-  <ns0:tableStyleInfo name="TableStyleMedium1" showFirstColumn="0" showLastColumn="0" showRowStripes="1" showColumnStripes="0" />
-</ns0:table>
