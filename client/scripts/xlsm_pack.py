@@ -16,7 +16,7 @@ def pack_xlsm(source_dir, output_xlsm, overwrite=False):
         sys.stderr.write(f"Error: Output file exists: {output_xlsm}\n")
         sys.stderr.write("  Use --overwrite to replace it\n")
         sys.exit(1)
-    
+        
     with zipfile.ZipFile(output_xlsm, 'w', zipfile.ZIP_DEFLATED) as zip_ref:
         for file_path in sorted(source_dir.rglob('*')):
             if file_path.is_file():

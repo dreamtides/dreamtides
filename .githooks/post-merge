@@ -5,6 +5,8 @@ DIR="client/Assets/StreamingAssets/Tabula.xlsm.d"
 XLSM="client/Assets/StreamingAssets/Tabula.xlsm"
 
 if [[ -d "$DIR" ]]; then
-  python3 client/scripts/xlsm_pack.py "$DIR" "$XLSM" --overwrite
+  if [[ ! -f "$XLSM" ]] || [[ "$DIR" -nt "$XLSM" ]]; then
+    python3 client/scripts/xlsm_pack.py "$DIR" "$XLSM" --overwrite
+  fi
 fi
 
