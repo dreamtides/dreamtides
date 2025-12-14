@@ -1,9 +1,9 @@
 <?xml version='1.0' encoding='utf-8'?>
 <ns0:worksheet xmlns:ns0="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:ns1="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:ns2="http://schemas.microsoft.com/office/spreadsheetml/2014/revision" xmlns:ns3="http://schemas.microsoft.com/office/spreadsheetml/2009/9/ac" xmlns:ns4="http://schemas.openxmlformats.org/officeDocument/2006/relationships" ns1:Ignorable="x14ac xr xr2 xr3" ns2:uid="{E28BC96C-43E1-D549-932D-5E23B9F75240}">
-  <ns0:dimension ref="A1:W25" />
+  <ns0:dimension ref="A1:AA25" />
   <ns0:sheetViews>
-    <ns0:sheetView tabSelected="1" workbookViewId="0">
-      <ns0:selection activeCell="B21" sqref="B21" />
+    <ns0:sheetView tabSelected="1" topLeftCell="R1" workbookViewId="0">
+      <ns0:selection activeCell="AA3" sqref="AA3" />
     </ns0:sheetView>
   </ns0:sheetViews>
   <ns0:sheetFormatPr baseColWidth="10" defaultRowHeight="16" ns3:dyDescent="0.2" />
@@ -15,18 +15,24 @@
     <ns0:col min="11" max="11" width="40.83203125" style="2" customWidth="1" />
     <ns0:col min="12" max="12" width="14.1640625" style="2" customWidth="1" />
     <ns0:col min="13" max="13" width="40.83203125" style="2" customWidth="1" />
-    <ns0:col min="14" max="14" width="26.6640625" style="2" customWidth="1" />
+    <ns0:col min="14" max="14" width="26.6640625" style="4" customWidth="1" />
     <ns0:col min="15" max="15" width="13.1640625" style="2" customWidth="1" />
     <ns0:col min="16" max="16" width="40.83203125" style="2" customWidth="1" />
     <ns0:col min="17" max="17" width="25.83203125" style="2" customWidth="1" />
     <ns0:col min="18" max="18" width="40.83203125" style="2" customWidth="1" />
-    <ns0:col min="19" max="19" width="25.5" style="2" customWidth="1" />
+    <ns0:col min="19" max="19" width="25.5" style="4" customWidth="1" />
     <ns0:col min="20" max="22" width="10.83203125" style="2" />
-    <ns0:col min="23" max="23" width="23" style="2" customWidth="1" />
-    <ns0:col min="24" max="16384" width="10.83203125" style="2" />
+    <ns0:col min="23" max="23" width="30.83203125" style="2" customWidth="1" />
+    <ns0:col min="24" max="24" width="10.83203125" style="2" />
+    <ns0:col min="25" max="25" width="30.83203125" style="2" customWidth="1" />
+    <ns0:col min="26" max="26" width="10.83203125" style="2" />
+    <ns0:col min="27" max="27" width="30.83203125" style="2" customWidth="1" />
+    <ns0:col min="28" max="28" width="10.83203125" style="2" />
+    <ns0:col min="29" max="29" width="30.83203125" style="2" customWidth="1" />
+    <ns0:col min="30" max="16384" width="10.83203125" style="2" />
   </ns0:cols>
   <ns0:sheetData>
-    <ns0:row r="1" spans="1:23" s="1" customFormat="1" ht="40" customHeight="1" ns3:dyDescent="0.2">
+    <ns0:row r="1" spans="1:27" s="1" customFormat="1" ht="40" customHeight="1" ns3:dyDescent="0.2">
       <ns0:c r="A1" s="1" t="s">
         <ns0:v>595</ns0:v>
       </ns0:c>
@@ -87,8 +93,14 @@
       <ns0:c r="W1" s="1" t="s">
         <ns0:v>657</ns0:v>
       </ns0:c>
+      <ns0:c r="Y1" s="1" t="s">
+        <ns0:v>658</ns0:v>
+      </ns0:c>
+      <ns0:c r="AA1" s="2" t="s">
+        <ns0:v>659</ns0:v>
+      </ns0:c>
     </ns0:row>
-    <ns0:row r="2" spans="1:23" ht="68" ns3:dyDescent="0.2">
+    <ns0:row r="2" spans="1:27" ht="68" ns3:dyDescent="0.2">
       <ns0:c r="A2" s="2" t="s">
         <ns0:v>2</ns0:v>
       </ns0:c>
@@ -113,11 +125,18 @@
       <ns0:c r="H2" s="2" t="s">
         <ns0:v>629</ns0:v>
       </ns0:c>
+      <ns0:c r="O2" s="4" />
       <ns0:c r="W2" s="2" t="s">
         <ns0:v>623</ns0:v>
       </ns0:c>
+      <ns0:c r="Y2" s="2" t="s">
+        <ns0:v>624</ns0:v>
+      </ns0:c>
+      <ns0:c r="AA2" s="2" t="s">
+        <ns0:v>625</ns0:v>
+      </ns0:c>
     </ns0:row>
-    <ns0:row r="3" spans="1:23" ht="34" ns3:dyDescent="0.2">
+    <ns0:row r="3" spans="1:27" ht="34" ns3:dyDescent="0.2">
       <ns0:c r="A3" s="2" t="s">
         <ns0:v>2</ns0:v>
       </ns0:c>
@@ -133,11 +152,18 @@
       <ns0:c r="J3" s="2" t="s">
         <ns0:v>632</ns0:v>
       </ns0:c>
+      <ns0:c r="O3" s="4" />
       <ns0:c r="W3" s="2" t="s">
         <ns0:v>630</ns0:v>
       </ns0:c>
+      <ns0:c r="Y3" s="2" t="s">
+        <ns0:v>640</ns0:v>
+      </ns0:c>
+      <ns0:c r="AA3" s="2" t="s">
+        <ns0:v>626</ns0:v>
+      </ns0:c>
     </ns0:row>
-    <ns0:row r="4" spans="1:23" ht="68" ns3:dyDescent="0.2">
+    <ns0:row r="4" spans="1:27" ht="68" ns3:dyDescent="0.2">
       <ns0:c r="A4" s="2" t="s">
         <ns0:v>2</ns0:v>
       </ns0:c>
@@ -156,11 +182,18 @@
       <ns0:c r="K4" s="2" t="s">
         <ns0:v>634</ns0:v>
       </ns0:c>
+      <ns0:c r="O4" s="4" />
       <ns0:c r="W4" s="2" t="s">
         <ns0:v>633</ns0:v>
       </ns0:c>
+      <ns0:c r="Y4" s="2" t="s">
+        <ns0:v>645</ns0:v>
+      </ns0:c>
+      <ns0:c r="AA4" s="2" t="s">
+        <ns0:v>641</ns0:v>
+      </ns0:c>
     </ns0:row>
-    <ns0:row r="5" spans="1:23" ht="51" ns3:dyDescent="0.2">
+    <ns0:row r="5" spans="1:27" ht="51" ns3:dyDescent="0.2">
       <ns0:c r="A5" s="2" t="s">
         <ns0:v>8</ns0:v>
       </ns0:c>
@@ -185,11 +218,15 @@
       <ns0:c r="H5" s="2" t="s">
         <ns0:v>637</ns0:v>
       </ns0:c>
+      <ns0:c r="O5" s="4" />
       <ns0:c r="W5" s="2" t="s">
         <ns0:v>639</ns0:v>
       </ns0:c>
+      <ns0:c r="Y5" s="2" t="s">
+        <ns0:v>649</ns0:v>
+      </ns0:c>
     </ns0:row>
-    <ns0:row r="6" spans="1:23" ht="51" ns3:dyDescent="0.2">
+    <ns0:row r="6" spans="1:27" ht="51" ns3:dyDescent="0.2">
       <ns0:c r="A6" s="2" t="s">
         <ns0:v>65</ns0:v>
       </ns0:c>
@@ -214,11 +251,12 @@
       <ns0:c r="H6" s="2" t="s">
         <ns0:v>637</ns0:v>
       </ns0:c>
+      <ns0:c r="O6" s="4" />
       <ns0:c r="W6" s="2" t="s">
         <ns0:v>648</ns0:v>
       </ns0:c>
     </ns0:row>
-    <ns0:row r="7" spans="1:23" ht="68" ns3:dyDescent="0.2">
+    <ns0:row r="7" spans="1:27" ht="51" ns3:dyDescent="0.2">
       <ns0:c r="A7" s="2" t="s">
         <ns0:v>17</ns0:v>
       </ns0:c>
@@ -243,8 +281,9 @@
       <ns0:c r="H7" s="2" t="s">
         <ns0:v>637</ns0:v>
       </ns0:c>
+      <ns0:c r="O7" s="4" />
     </ns0:row>
-    <ns0:row r="8" spans="1:23" ht="153" ns3:dyDescent="0.2">
+    <ns0:row r="8" spans="1:27" ht="68" ns3:dyDescent="0.2">
       <ns0:c r="A8" s="2" t="s">
         <ns0:v>33</ns0:v>
       </ns0:c>
@@ -260,17 +299,17 @@
       <ns0:c r="M8" s="2" t="s">
         <ns0:v>642</ns0:v>
       </ns0:c>
-      <ns0:c r="N8" s="2" t="s">
+      <ns0:c r="N8" s="4" t="s">
         <ns0:v>643</ns0:v>
       </ns0:c>
-      <ns0:c r="O8" s="2">
+      <ns0:c r="O8" s="4">
         <ns0:v>5</ns0:v>
       </ns0:c>
       <ns0:c r="P8" s="2" t="s">
         <ns0:v>644</ns0:v>
       </ns0:c>
     </ns0:row>
-    <ns0:row r="9" spans="1:23" ht="136" ns3:dyDescent="0.2">
+    <ns0:row r="9" spans="1:27" ht="51" ns3:dyDescent="0.2">
       <ns0:c r="A9" s="2" t="s">
         <ns0:v>40</ns0:v>
       </ns0:c>
@@ -286,17 +325,17 @@
       <ns0:c r="M9" s="2" t="s">
         <ns0:v>646</ns0:v>
       </ns0:c>
-      <ns0:c r="N9" s="2" t="s">
+      <ns0:c r="N9" s="4" t="s">
         <ns0:v>643</ns0:v>
       </ns0:c>
-      <ns0:c r="O9" s="2">
+      <ns0:c r="O9" s="4">
         <ns0:v>5</ns0:v>
       </ns0:c>
       <ns0:c r="P9" s="2" t="s">
         <ns0:v>647</ns0:v>
       </ns0:c>
     </ns0:row>
-    <ns0:row r="10" spans="1:23" ht="102" ns3:dyDescent="0.2">
+    <ns0:row r="10" spans="1:27" ht="51" ns3:dyDescent="0.2">
       <ns0:c r="A10" s="2" t="s">
         <ns0:v>44</ns0:v>
       </ns0:c>
@@ -306,17 +345,18 @@
       <ns0:c r="C10" s="2" t="s">
         <ns0:v>649</ns0:v>
       </ns0:c>
+      <ns0:c r="O10" s="4" />
       <ns0:c r="Q10" s="2" t="s">
         <ns0:v>626</ns0:v>
       </ns0:c>
       <ns0:c r="R10" s="2" t="s">
         <ns0:v>650</ns0:v>
       </ns0:c>
-      <ns0:c r="S10" s="2" t="s">
+      <ns0:c r="S10" s="4" t="s">
         <ns0:v>643</ns0:v>
       </ns0:c>
     </ns0:row>
-    <ns0:row r="11" spans="1:23" ht="68" ns3:dyDescent="0.2">
+    <ns0:row r="11" spans="1:27" ht="68" ns3:dyDescent="0.2">
       <ns0:c r="A11" s="2" t="s">
         <ns0:v>50</ns0:v>
       </ns0:c>
@@ -341,8 +381,9 @@
       <ns0:c r="H11" s="2" t="s">
         <ns0:v>653</ns0:v>
       </ns0:c>
+      <ns0:c r="O11" s="4" />
     </ns0:row>
-    <ns0:row r="12" spans="1:23" ht="136" ns3:dyDescent="0.2">
+    <ns0:row r="12" spans="1:27" ht="51" ns3:dyDescent="0.2">
       <ns0:c r="A12" s="2" t="s">
         <ns0:v>50</ns0:v>
       </ns0:c>
@@ -358,17 +399,17 @@
       <ns0:c r="M12" s="2" t="s">
         <ns0:v>654</ns0:v>
       </ns0:c>
-      <ns0:c r="N12" s="2" t="s">
+      <ns0:c r="N12" s="4" t="s">
         <ns0:v>643</ns0:v>
       </ns0:c>
-      <ns0:c r="O12" s="2">
+      <ns0:c r="O12" s="4">
         <ns0:v>2.5</ns0:v>
       </ns0:c>
       <ns0:c r="P12" s="2" t="s">
         <ns0:v>655</ns0:v>
       </ns0:c>
     </ns0:row>
-    <ns0:row r="13" spans="1:23" ht="102" ns3:dyDescent="0.2">
+    <ns0:row r="13" spans="1:27" ht="51" ns3:dyDescent="0.2">
       <ns0:c r="A13" s="2" t="s">
         <ns0:v>50</ns0:v>
       </ns0:c>
@@ -378,17 +419,18 @@
       <ns0:c r="C13" s="2" t="s">
         <ns0:v>640</ns0:v>
       </ns0:c>
+      <ns0:c r="O13" s="4" />
       <ns0:c r="Q13" s="2" t="s">
         <ns0:v>626</ns0:v>
       </ns0:c>
       <ns0:c r="R13" s="2" t="s">
         <ns0:v>651</ns0:v>
       </ns0:c>
-      <ns0:c r="S13" s="2" t="s">
+      <ns0:c r="S13" s="4" t="s">
         <ns0:v>656</ns0:v>
       </ns0:c>
     </ns0:row>
-    <ns0:row r="14" spans="1:23" ht="68" ns3:dyDescent="0.2">
+    <ns0:row r="14" spans="1:27" ht="68" ns3:dyDescent="0.2">
       <ns0:c r="A14" s="2" t="s">
         <ns0:v>75</ns0:v>
       </ns0:c>
@@ -413,8 +455,9 @@
       <ns0:c r="H14" s="2" t="s">
         <ns0:v>629</ns0:v>
       </ns0:c>
+      <ns0:c r="O14" s="4" />
     </ns0:row>
-    <ns0:row r="15" spans="1:23" ht="51" ns3:dyDescent="0.2">
+    <ns0:row r="15" spans="1:27" ht="34" ns3:dyDescent="0.2">
       <ns0:c r="A15" s="2" t="s">
         <ns0:v>75</ns0:v>
       </ns0:c>
@@ -430,8 +473,9 @@
       <ns0:c r="J15" s="2" t="s">
         <ns0:v>632</ns0:v>
       </ns0:c>
+      <ns0:c r="O15" s="4" />
     </ns0:row>
-    <ns0:row r="16" spans="1:23" ht="68" ns3:dyDescent="0.2">
+    <ns0:row r="16" spans="1:27" ht="68" ns3:dyDescent="0.2">
       <ns0:c r="A16" s="2" t="s">
         <ns0:v>75</ns0:v>
       </ns0:c>
@@ -450,8 +494,9 @@
       <ns0:c r="K16" s="2" t="s">
         <ns0:v>634</ns0:v>
       </ns0:c>
+      <ns0:c r="O16" s="4" />
     </ns0:row>
-    <ns0:row r="17" spans="1:19" ht="68" ns3:dyDescent="0.2">
+    <ns0:row r="17" spans="1:19" ht="51" ns3:dyDescent="0.2">
       <ns0:c r="A17" s="2" t="s">
         <ns0:v>77</ns0:v>
       </ns0:c>
@@ -476,8 +521,9 @@
       <ns0:c r="H17" s="2" t="s">
         <ns0:v>637</ns0:v>
       </ns0:c>
+      <ns0:c r="O17" s="4" />
     </ns0:row>
-    <ns0:row r="18" spans="1:19" ht="68" ns3:dyDescent="0.2">
+    <ns0:row r="18" spans="1:19" ht="51" ns3:dyDescent="0.2">
       <ns0:c r="A18" s="2" t="s">
         <ns0:v>95</ns0:v>
       </ns0:c>
@@ -502,8 +548,9 @@
       <ns0:c r="H18" s="2" t="s">
         <ns0:v>637</ns0:v>
       </ns0:c>
+      <ns0:c r="O18" s="4" />
     </ns0:row>
-    <ns0:row r="19" spans="1:19" ht="68" ns3:dyDescent="0.2">
+    <ns0:row r="19" spans="1:19" ht="51" ns3:dyDescent="0.2">
       <ns0:c r="A19" s="2" t="s">
         <ns0:v>79</ns0:v>
       </ns0:c>
@@ -528,8 +575,9 @@
       <ns0:c r="H19" s="2" t="s">
         <ns0:v>637</ns0:v>
       </ns0:c>
+      <ns0:c r="O19" s="4" />
     </ns0:row>
-    <ns0:row r="20" spans="1:19" ht="153" ns3:dyDescent="0.2">
+    <ns0:row r="20" spans="1:19" ht="68" ns3:dyDescent="0.2">
       <ns0:c r="A20" s="2" t="s">
         <ns0:v>81</ns0:v>
       </ns0:c>
@@ -545,17 +593,17 @@
       <ns0:c r="M20" s="2" t="s">
         <ns0:v>642</ns0:v>
       </ns0:c>
-      <ns0:c r="N20" s="2" t="s">
+      <ns0:c r="N20" s="4" t="s">
         <ns0:v>643</ns0:v>
       </ns0:c>
-      <ns0:c r="O20" s="2">
+      <ns0:c r="O20" s="4">
         <ns0:v>5</ns0:v>
       </ns0:c>
       <ns0:c r="P20" s="2" t="s">
         <ns0:v>644</ns0:v>
       </ns0:c>
     </ns0:row>
-    <ns0:row r="21" spans="1:19" ht="136" ns3:dyDescent="0.2">
+    <ns0:row r="21" spans="1:19" ht="51" ns3:dyDescent="0.2">
       <ns0:c r="A21" s="2" t="s">
         <ns0:v>85</ns0:v>
       </ns0:c>
@@ -571,17 +619,17 @@
       <ns0:c r="M21" s="2" t="s">
         <ns0:v>646</ns0:v>
       </ns0:c>
-      <ns0:c r="N21" s="2" t="s">
+      <ns0:c r="N21" s="4" t="s">
         <ns0:v>643</ns0:v>
       </ns0:c>
-      <ns0:c r="O21" s="2">
+      <ns0:c r="O21" s="4">
         <ns0:v>5</ns0:v>
       </ns0:c>
       <ns0:c r="P21" s="2" t="s">
         <ns0:v>647</ns0:v>
       </ns0:c>
     </ns0:row>
-    <ns0:row r="22" spans="1:19" ht="102" ns3:dyDescent="0.2">
+    <ns0:row r="22" spans="1:19" ht="51" ns3:dyDescent="0.2">
       <ns0:c r="A22" s="2" t="s">
         <ns0:v>87</ns0:v>
       </ns0:c>
@@ -591,13 +639,14 @@
       <ns0:c r="C22" s="2" t="s">
         <ns0:v>649</ns0:v>
       </ns0:c>
+      <ns0:c r="O22" s="4" />
       <ns0:c r="Q22" s="2" t="s">
         <ns0:v>626</ns0:v>
       </ns0:c>
       <ns0:c r="R22" s="2" t="s">
         <ns0:v>650</ns0:v>
       </ns0:c>
-      <ns0:c r="S22" s="2" t="s">
+      <ns0:c r="S22" s="4" t="s">
         <ns0:v>643</ns0:v>
       </ns0:c>
     </ns0:row>
@@ -626,8 +675,9 @@
       <ns0:c r="H23" s="2" t="s">
         <ns0:v>653</ns0:v>
       </ns0:c>
+      <ns0:c r="O23" s="4" />
     </ns0:row>
-    <ns0:row r="24" spans="1:19" ht="136" ns3:dyDescent="0.2">
+    <ns0:row r="24" spans="1:19" ht="51" ns3:dyDescent="0.2">
       <ns0:c r="A24" s="2" t="s">
         <ns0:v>89</ns0:v>
       </ns0:c>
@@ -643,17 +693,17 @@
       <ns0:c r="M24" s="2" t="s">
         <ns0:v>654</ns0:v>
       </ns0:c>
-      <ns0:c r="N24" s="2" t="s">
+      <ns0:c r="N24" s="4" t="s">
         <ns0:v>643</ns0:v>
       </ns0:c>
-      <ns0:c r="O24" s="2">
+      <ns0:c r="O24" s="4">
         <ns0:v>2.5</ns0:v>
       </ns0:c>
       <ns0:c r="P24" s="2" t="s">
         <ns0:v>655</ns0:v>
       </ns0:c>
     </ns0:row>
-    <ns0:row r="25" spans="1:19" ht="102" ns3:dyDescent="0.2">
+    <ns0:row r="25" spans="1:19" ht="51" ns3:dyDescent="0.2">
       <ns0:c r="A25" s="2" t="s">
         <ns0:v>89</ns0:v>
       </ns0:c>
@@ -663,25 +713,34 @@
       <ns0:c r="C25" s="2" t="s">
         <ns0:v>640</ns0:v>
       </ns0:c>
+      <ns0:c r="O25" s="4" />
       <ns0:c r="Q25" s="2" t="s">
         <ns0:v>626</ns0:v>
       </ns0:c>
       <ns0:c r="R25" s="2" t="s">
         <ns0:v>651</ns0:v>
       </ns0:c>
-      <ns0:c r="S25" s="2" t="s">
+      <ns0:c r="S25" s="4" t="s">
         <ns0:v>656</ns0:v>
       </ns0:c>
     </ns0:row>
   </ns0:sheetData>
-  <ns0:dataValidations count="1">
+  <ns0:dataValidations count="3">
     <ns0:dataValidation type="list" allowBlank="1" showInputMessage="1" showErrorMessage="1" sqref="B2:B1048576" ns2:uid="{FA034A4C-4D12-2349-8679-D373E292272A}">
       <ns0:formula1>EffectTypesRange</ns0:formula1>
     </ns0:dataValidation>
+    <ns0:dataValidation type="list" allowBlank="1" showInputMessage="1" showErrorMessage="1" sqref="C2:C1048576" ns2:uid="{1C2854DD-DEA5-3A43-A74C-DFD356693A4C}">
+      <ns0:formula1>TriggerTypesRange</ns0:formula1>
+    </ns0:dataValidation>
+    <ns0:dataValidation type="list" allowBlank="1" showInputMessage="1" showErrorMessage="1" sqref="D2:D1048576 E2:E1048576 L2:L1048576 Q2:Q1048576" ns2:uid="{81B9A451-9918-1F41-BDD9-D3175D11AB0B}">
+      <ns0:formula1>ObjectPredicateTypesRange</ns0:formula1>
+    </ns0:dataValidation>
   </ns0:dataValidations>
   <ns0:pageMargins left="0.7" right="0.7" top="0.75" bottom="0.75" header="0.3" footer="0.3" />
-  <ns0:tableParts count="2">
+  <ns0:tableParts count="4">
     <ns0:tablePart ns4:id="rId1" />
     <ns0:tablePart ns4:id="rId2" />
+    <ns0:tablePart ns4:id="rId3" />
+    <ns0:tablePart ns4:id="rId4" />
   </ns0:tableParts>
 </ns0:worksheet>

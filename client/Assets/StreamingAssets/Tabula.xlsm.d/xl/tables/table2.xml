@@ -1,20 +1,20 @@
 <?xml version='1.0' encoding='utf-8'?>
-<ns0:table xmlns:ns0="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:ns1="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:ns2="http://schemas.microsoft.com/office/spreadsheetml/2014/revision" xmlns:ns3="http://schemas.microsoft.com/office/spreadsheetml/2016/revision3" ns1:Ignorable="xr xr3" id="1" ns2:uid="{C88B35DF-CC4F-1A44-ACFF-350AB0C05441}" name="Cards" displayName="Cards" ref="A1:K12" totalsRowShown="0" headerRowDxfId="87" dataDxfId="86" totalsRowDxfId="85">
+<ns0:table xmlns:ns0="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:ns1="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:ns2="http://schemas.microsoft.com/office/spreadsheetml/2014/revision" xmlns:ns3="http://schemas.microsoft.com/office/spreadsheetml/2016/revision3" ns1:Ignorable="xr xr3" id="1" ns2:uid="{C88B35DF-CC4F-1A44-ACFF-350AB0C05441}" name="Cards" displayName="Cards" ref="A1:K12" totalsRowShown="0" headerRowDxfId="93" dataDxfId="92" totalsRowDxfId="91">
   <ns0:autoFilter ref="A1:K12" ns2:uid="{C88B35DF-CC4F-1A44-ACFF-350AB0C05441}" />
   <ns0:tableColumns count="11">
-    <ns0:tableColumn id="9" ns3:uid="{5E1BF833-FD7A-E641-AC2F-D6EDCE733EF5}" name="Image" dataDxfId="84">
+    <ns0:tableColumn id="9" ns3:uid="{5E1BF833-FD7A-E641-AC2F-D6EDCE733EF5}" name="Image" dataDxfId="90">
       <ns0:calculatedColumnFormula>_xlfn.IMAGE("https://www.shutterstock.com/image-illustration/-260nw-"&amp;K2&amp;".jpg")</ns0:calculatedColumnFormula>
     </ns0:tableColumn>
-    <ns0:tableColumn id="3" ns3:uid="{72122BFF-FC00-704C-AF1E-FA551B0E6C8E}" name="Name" dataDxfId="50" />
-    <ns0:tableColumn id="1" ns3:uid="{73C5C259-36A6-D048-921B-B103F271DAA4}" name="ID" dataDxfId="49" />
-    <ns0:tableColumn id="4" ns3:uid="{2DE05BBD-E0CA-4B47-838D-1B4E7E29F71F}" name="Energy Cost" dataDxfId="83" />
-    <ns0:tableColumn id="5" ns3:uid="{B12BBEF2-6F1F-1942-8462-05899913E8DC}" name="Rules Text" dataDxfId="82" />
-    <ns0:tableColumn id="16" ns3:uid="{CD97084E-5175-0D40-87DA-7E0D86FE9E79}" name="Prompts" dataDxfId="81" />
-    <ns0:tableColumn id="7" ns3:uid="{BA627A34-1A10-2C4E-A4B1-DC3E3948E5DD}" name="Card Type" dataDxfId="80" />
-    <ns0:tableColumn id="8" ns3:uid="{79ED84D1-E07C-5C4D-B632-1D538FFB3541}" name="Subtype" dataDxfId="79" />
-    <ns0:tableColumn id="10" ns3:uid="{1D9AC4E6-176F-1949-A533-FDF4B6A9A0C0}" name="Is Fast?" dataDxfId="78" />
-    <ns0:tableColumn id="11" ns3:uid="{2E17CE39-85FD-9F48-B9E5-AA29306008C7}" name="Spark" dataDxfId="77" />
-    <ns0:tableColumn id="13" ns3:uid="{A32AC102-6FE4-5C48-B23F-F34158DCEFC8}" name="Image Number" dataDxfId="76" />
+    <ns0:tableColumn id="3" ns3:uid="{72122BFF-FC00-704C-AF1E-FA551B0E6C8E}" name="Name" dataDxfId="56" />
+    <ns0:tableColumn id="1" ns3:uid="{73C5C259-36A6-D048-921B-B103F271DAA4}" name="ID" dataDxfId="55" />
+    <ns0:tableColumn id="4" ns3:uid="{2DE05BBD-E0CA-4B47-838D-1B4E7E29F71F}" name="Energy Cost" dataDxfId="89" />
+    <ns0:tableColumn id="5" ns3:uid="{B12BBEF2-6F1F-1942-8462-05899913E8DC}" name="Rules Text" dataDxfId="88" />
+    <ns0:tableColumn id="16" ns3:uid="{CD97084E-5175-0D40-87DA-7E0D86FE9E79}" name="Prompts" dataDxfId="87" />
+    <ns0:tableColumn id="7" ns3:uid="{BA627A34-1A10-2C4E-A4B1-DC3E3948E5DD}" name="Card Type" dataDxfId="86" />
+    <ns0:tableColumn id="8" ns3:uid="{79ED84D1-E07C-5C4D-B632-1D538FFB3541}" name="Subtype" dataDxfId="85" />
+    <ns0:tableColumn id="10" ns3:uid="{1D9AC4E6-176F-1949-A533-FDF4B6A9A0C0}" name="Is Fast?" dataDxfId="84" />
+    <ns0:tableColumn id="11" ns3:uid="{2E17CE39-85FD-9F48-B9E5-AA29306008C7}" name="Spark" dataDxfId="83" />
+    <ns0:tableColumn id="13" ns3:uid="{A32AC102-6FE4-5C48-B23F-F34158DCEFC8}" name="Image Number" dataDxfId="82" />
   </ns0:tableColumns>
   <ns0:tableStyleInfo name="TableStyleMedium2" showFirstColumn="0" showLastColumn="0" showRowStripes="1" showColumnStripes="0" />
 </ns0:table>

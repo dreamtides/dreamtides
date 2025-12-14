@@ -7,7 +7,7 @@
       <ns2:absPath url="/Users/dthurn/Documents/GoogleDrive/dreamtides/client/Assets/StreamingAssets/" />
     </ns1:Choice>
   </ns1:AlternateContent>
-  <ns3:revisionPtr revIDLastSave="0" documentId="13_ncr:1_{DA3BDC07-BD8D-8247-90A1-C7DCC6C79B1B}" ns4:coauthVersionLast="47" ns4:coauthVersionMax="47" ns5:uidLastSave="{00000000-0000-0000-0000-000000000000}" />
+  <ns3:revisionPtr revIDLastSave="0" documentId="13_ncr:1_{884C6847-D72E-A841-860F-9B9A23181053}" ns4:coauthVersionLast="47" ns4:coauthVersionMax="47" ns5:uidLastSave="{00000000-0000-0000-0000-000000000000}" />
   <ns0:bookViews>
     <ns0:workbookView xWindow="0" yWindow="760" windowWidth="30240" windowHeight="18880" activeTab="4" ns6:uid="{C59A4AF3-5F5C-5648-958E-C952FA7E9CF2}" />
   </ns0:bookViews>
@@ -29,6 +29,8 @@
     <ns0:definedName name="_xlpm.p" hidden="1" xlm="1">#NAME?</ns0:definedName>
     <ns0:definedName name="_xlpm.s" hidden="1" xlm="1">#NAME?</ns0:definedName>
     <ns0:definedName name="EffectTypesRange">EffectTypes[EffectTypes]</ns0:definedName>
+    <ns0:definedName name="ObjectPredicateTypesRange">ObjectPredicateTypes[ObjectPredicateTypes]</ns0:definedName>
+    <ns0:definedName name="TriggerTypesRange">TriggerTypes[TriggerTypes]</ns0:definedName>
   </ns0:definedNames>
   <ns0:calcPr calcId="191029" />
   <ns0:extLst>
