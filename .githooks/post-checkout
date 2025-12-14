@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+DIR="client/Assets/StreamingAssets/Tabula.xlsm.d"
+XLSM="client/Assets/StreamingAssets/Tabula.xlsm"
+
+if [[ -d "$DIR" ]]; then
+  python3 client/scripts/xlsm_pack.py "$DIR" "$XLSM" --overwrite
+fi
+

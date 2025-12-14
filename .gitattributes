@@ -1,2 +1,4 @@
-*.xlsm filter=excelimg
+*.xml   text eol=lf
+*.rels  text eol=lf
+*.bin   binary
 

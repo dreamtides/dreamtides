@@ -7,6 +7,10 @@
 /Library
 /test_output/
 
+*.xlsm
+Assets/StreamingAssets/Tabula.xlsm.d/xl/media/**
+Assets/StreamingAssets/Tabula.xlsm.d/xl/embeddings/**
+
 # temp
 Assets/Content/Imposters/
 
