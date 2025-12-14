@@ -2,7 +2,19 @@
 import sys
 import zipfile
 import argparse
+import xml.etree.ElementTree as ET
 from pathlib import Path
+
+def pretty_print_xml(xml_bytes):
+    try:
+        root = ET.fromstring(xml_bytes)
+        ET.indent(root, space='  ')
+        result = ET.tostring(root, encoding='utf-8', xml_declaration=True)
+        return result
+    except ET.ParseError:
+        return xml_bytes
+    except Exception:
+        return xml_bytes
 
 def extract_xlsm(xlsm_path, output_dir, clean=False):
     xlsm_path = Path(xlsm_path)
@@ -31,7 +43,16 @@ def extract_xlsm(xlsm_path, output_dir, clean=False):
             entry_path.parent.mkdir(parents=True, exist_ok=True)
             
             entry_data = zip_ref.read(entry_name)
-            entry_path.write_bytes(entry_data)
+            
+            if entry_name.endswith('.xml') or entry_name.endswith('.rels'):
+                try:
+                    formatted_data = pretty_print_xml(entry_data)
+                    entry_path.write_bytes(formatted_data)
+                except Exception as e:
+                    sys.stderr.write(f"Warning: Could not format XML {entry_name}: {e}, writing as-is\n")
+                    entry_path.write_bytes(entry_data)
+            else:
+                entry_path.write_bytes(entry_data)
     
     media_dir = output_dir / 'xl' / 'media'
     embeddings_dir = output_dir / 'xl' / 'embeddings'

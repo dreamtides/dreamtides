@@ -1,2 +1,9 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<rvStructures xmlns="http://schemas.microsoft.com/office/spreadsheetml/2017/richdata" count="1"><s t="_webimage"><k n="WebImageIdentifier" t="i"/><k n="CalcOrigin" t="i"/><k n="ComputedImage" t="b"/><k n="ImageSizing" t="i"/></s></rvStructures>
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:rvStructures xmlns:ns0="http://schemas.microsoft.com/office/spreadsheetml/2017/richdata" count="1">
+  <ns0:s t="_webimage">
+    <ns0:k n="WebImageIdentifier" t="i" />
+    <ns0:k n="CalcOrigin" t="i" />
+    <ns0:k n="ComputedImage" t="b" />
+    <ns0:k n="ImageSizing" t="i" />
+  </ns0:s>
+</ns0:rvStructures>
