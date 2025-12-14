@@ -2,7 +2,7 @@
 <ns0:worksheet xmlns:ns0="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:ns1="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:ns2="http://schemas.microsoft.com/office/spreadsheetml/2014/revision" xmlns:ns3="http://schemas.microsoft.com/office/spreadsheetml/2009/9/ac" xmlns:ns4="http://schemas.openxmlformats.org/officeDocument/2006/relationships" ns1:Ignorable="x14ac xr xr2 xr3" ns2:uid="{E28BC96C-43E1-D549-932D-5E23B9F75240}">
   <ns0:dimension ref="A1:AA25" />
   <ns0:sheetViews>
-    <ns0:sheetView tabSelected="1" topLeftCell="R1" workbookViewId="0">
+    <ns0:sheetView workbookViewId="0">
       <ns0:selection activeCell="AA3" sqref="AA3" />
     </ns0:sheetView>
   </ns0:sheetViews>

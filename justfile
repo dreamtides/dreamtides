@@ -68,6 +68,9 @@ schema:
 extract-xlsm:
     python3 client/scripts/xlsm_extract.py client/Assets/StreamingAssets/Tabula.xlsm client/Assets/StreamingAssets/Tabula.xlsm.d --clean
 
+pack-xlsm:
+    python3 client/scripts/xlsm_pack.py client/Assets/StreamingAssets/Tabula.xlsm.d client/Assets/StreamingAssets/Tabula.xlsm
+
 plugin_out := "client/Assets/Plugins"
 target_ios := "aarch64-apple-ios"
 
