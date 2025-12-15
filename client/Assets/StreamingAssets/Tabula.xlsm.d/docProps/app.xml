@@ -4,17 +4,23 @@
 <DocSecurity>0</DocSecurity>
 <ScaleCrop>false</ScaleCrop>
 <HeadingPairs>
-<vt:vector size="2" baseType="variant">
+<vt:vector size="4" baseType="variant">
 <vt:variant>
 <vt:lpstr>Worksheets</vt:lpstr>
 </vt:variant>
 <vt:variant>
 <vt:i4>7</vt:i4>
 </vt:variant>
+<vt:variant>
+<vt:lpstr>Named Ranges</vt:lpstr>
+</vt:variant>
+<vt:variant>
+<vt:i4>2</vt:i4>
+</vt:variant>
 </vt:vector>
 </HeadingPairs>
 <TitlesOfParts>
-<vt:vector size="7" baseType="lpstr">
+<vt:vector size="9" baseType="lpstr">
 <vt:lpstr>Strings</vt:lpstr>
 <vt:lpstr>Cards</vt:lpstr>
 <vt:lpstr>Dreamwell</vt:lpstr>
@@ -22,6 +28,8 @@
 <vt:lpstr>Card Effects</vt:lpstr>
 <vt:lpstr>Test Cards</vt:lpstr>
 <vt:lpstr>Test Dreamwell</vt:lpstr>
+<vt:lpstr>EffectTypeRange</vt:lpstr>
+<vt:lpstr>EffectTypesRange</vt:lpstr>
 </vt:vector>
 </TitlesOfParts>
 <Company>

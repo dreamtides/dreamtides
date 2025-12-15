@@ -7,9 +7,9 @@
 <x15ac:absPath url="/Users/dthurn/Documents/GoogleDrive/dreamtides/client/Assets/StreamingAssets/" xmlns:x15ac="http://schemas.microsoft.com/office/spreadsheetml/2010/11/ac"/>
 </mc:Choice>
 </mc:AlternateContent>
-<xr:revisionPtr revIDLastSave="0" documentId="13_ncr:1_{BC55BC51-5734-F243-88B2-D35E49697A86}" xr6:coauthVersionLast="47" xr6:coauthVersionMax="47" xr10:uidLastSave="{00000000-0000-0000-0000-000000000000}"/>
+<xr:revisionPtr revIDLastSave="0" documentId="13_ncr:1_{8DBED49E-5D93-3C43-90AA-82A663B09EA1}" xr6:coauthVersionLast="47" xr6:coauthVersionMax="47" xr10:uidLastSave="{00000000-0000-0000-0000-000000000000}"/>
 <bookViews>
-<workbookView xWindow="0" yWindow="760" windowWidth="30240" windowHeight="18880" activeTab="1" xr2:uid="{C59A4AF3-5F5C-5648-958E-C952FA7E9CF2}"/>
+<workbookView xWindow="0" yWindow="780" windowWidth="30240" windowHeight="18880" activeTab="4" xr2:uid="{C59A4AF3-5F5C-5648-958E-C952FA7E9CF2}"/>
 </bookViews>
 <sheets>
 <sheet name="Strings" sheetId="3" r:id="rId1"/>
@@ -28,6 +28,8 @@
 <definedName name="_xlpm.id" hidden="1" xlm="1">#NAME?</definedName>
 <definedName name="_xlpm.p" hidden="1" xlm="1">#NAME?</definedName>
 <definedName name="_xlpm.s" hidden="1" xlm="1">#NAME?</definedName>
+<definedName name="EffectTypeRange">'Card Effects'!$U$1:$U$6</definedName>
+<definedName name="EffectTypesRange">EffectTypes[EffectTypes]</definedName>
 </definedNames>
 <calcPr calcId="191029"/>
 <extLst>

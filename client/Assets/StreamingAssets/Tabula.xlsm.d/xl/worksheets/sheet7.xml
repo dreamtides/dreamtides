@@ -4,7 +4,7 @@
 <dimension ref="A1:H9"/>
 <sheetViews>
 <sheetView workbookViewId="0">
-<selection activeCell="H2" sqref="H2:H9"/>
+<selection activeCell="I4" sqref="I4"/>
 </sheetView>
 </sheetViews>
 <sheetFormatPr baseColWidth="10" defaultRowHeight="16" x14ac:dyDescent="0.2"/>
