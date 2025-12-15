@@ -428,25 +428,14 @@ def git_pre_commit(git_root: Path | None = None) -> bool:
         print("Skipping pre-commit XLSM processing")
         return True
     
-    xlsm_mtime = xlsm_path.stat().st_mtime
-    dir_mtime = 0
-    if xlsm_dir.exists():
-        manifest_path = xlsm_dir / MANIFEST_FILENAME
-        if manifest_path.exists():
-            dir_mtime = manifest_path.stat().st_mtime
-    
-    if xlsm_mtime > dir_mtime:
-        print(f"XLSM file is newer than directory, updating {xlsm_dir}...")
-        extract_xlsm_to_directory(
-            xlsm_path,
-            xlsm_dir,
-            image_cache_dir=image_cache,
-            strip_images=True
-        )
-        return True
-    else:
-        print("XLSM directory is up to date, no extraction needed")
-        return True
+    print(f"Extracting {xlsm_path.name} to {xlsm_dir.name}...")
+    extract_xlsm_to_directory(
+        xlsm_path,
+        xlsm_dir,
+        image_cache_dir=image_cache,
+        strip_images=True
+    )
+    return True
 
 
 def git_post_checkout(git_root: Path | None = None) -> bool:
