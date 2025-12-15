@@ -308,6 +308,55 @@ def get_default_paths(git_root: Path) -> tuple[Path, Path, Path]:
     return xlsm_path, xlsm_dir, image_cache
 
 
+def git_status(git_root: Path | None = None) -> bool:
+    if git_root is None:
+        git_root = find_git_root()
+    if git_root is None:
+        print("ERROR: Not in a git repository")
+        return False
+    
+    xlsm_path, xlsm_dir, image_cache = get_default_paths(git_root)
+    
+    if not xlsm_path.exists():
+        print(f"XLSM file not found: {xlsm_path}")
+        return True
+    
+    if not xlsm_dir.exists():
+        print(f"XLSM directory not found: {xlsm_dir}")
+        print("Run 'git-setup' to initialize")
+        return True
+    
+    xlsm_mtime = xlsm_path.stat().st_mtime
+    manifest_path = xlsm_dir / MANIFEST_FILENAME
+    
+    if not manifest_path.exists():
+        print("Directory exists but manifest is missing")
+        return False
+    
+    dir_mtime = manifest_path.stat().st_mtime
+    
+    from datetime import datetime
+    xlsm_time = datetime.fromtimestamp(xlsm_mtime)
+    dir_time = datetime.fromtimestamp(dir_mtime)
+    
+    if xlsm_mtime > dir_mtime:
+        print("⚠️  XLSM has UNCOMMITTED CHANGES")
+        print(f"   XLSM modified:      {xlsm_time}")
+        print(f"   Directory modified: {dir_time}")
+        print("")
+        print("   The spreadsheet has been modified since the last extraction.")
+        print("   These changes will be committed when you run 'git commit'.")
+        print("")
+        print("   To update the directory now, run:")
+        print(f"     python3 {Path(__file__).name} git-pre-commit")
+    else:
+        print("✓ XLSM is up to date with directory")
+        print(f"   XLSM modified:      {xlsm_time}")
+        print(f"   Directory modified: {dir_time}")
+    
+    return True
+
+
 def git_pre_commit(git_root: Path | None = None) -> bool:
     if git_root is None:
         git_root = find_git_root()
@@ -468,6 +517,7 @@ def main():
     roundtrip_parser.add_argument('output_path', type=Path, help='Output XLSM file (different from source)')
     roundtrip_parser.add_argument('--image-cache', type=Path, help='Directory to cache/restore images')
     
+    subparsers.add_parser('git-status', help='Check if XLSM has uncommitted changes')
     subparsers.add_parser('git-pre-commit', help='Git pre-commit hook handler')
     subparsers.add_parser('git-post-checkout', help='Git post-checkout hook handler')
     subparsers.add_parser('git-setup', help='Install git hooks and configure repository')
@@ -493,6 +543,9 @@ def main():
             print("ERROR: Output path must be different from source path")
             sys.exit(1)
         success = roundtrip_test(args.xlsm_path, args.output_path, args.image_cache)
+        sys.exit(0 if success else 1)
+    elif args.command == 'git-status':
+        success = git_status()
         sys.exit(0 if success else 1)
     elif args.command == 'git-pre-commit':
         success = git_pre_commit()
