@@ -69,6 +69,10 @@ tabula-validate:
 tabula-roundtrip:
     python3 client/scripts/xlsm_manager.py roundtrip client/Assets/StreamingAssets/Tabula.xlsm /tmp/test_output.xlsm --image-cache /tmp/test_cache
 
+tabula-initial-setup:
+    python3 client/scripts/xlsm_manager.py git-setup
+    python3 client/scripts/xlsm_manager.py reconstruct client/Assets/StreamingAssets/Tabula.xlsm.d client/Assets/StreamingAssets/Tabula.xlsm 
+
 schema:
     cargo run --manifest-path rules_engine/Cargo.toml --bin "schema_generator" > schema.json
     quicktype --lang cs --src-lang schema -t SchemaTypes --namespace Dreamtides.Schema --csharp-version 6 --array-type list --features complete --check-required -o client/Assets/Dreamtides/Schema/Schema.cs schema.json
