@@ -66,6 +66,41 @@ MANIFEST_FILENAME = "_xlsm_manifest.json"
 IMAGE_CACHE_DIRNAME = "xlsm_image_cache"
 
 
+SAFE_TO_FORMAT_XML = {
+    '[Content_Types].xml',
+    'xl/workbook.xml',
+    'xl/styles.xml',
+    'xl/calcChain.xml',
+    'docProps/core.xml',
+    'docProps/app.xml',
+}
+
+
+def is_safe_to_format(filename: str) -> bool:
+    if filename in SAFE_TO_FORMAT_XML:
+        return True
+    if filename.endswith('.rels'):
+        return True
+    if filename.startswith('xl/worksheets/') and filename.endswith('.xml'):
+        return True
+    if filename.startswith('xl/tables/') and filename.endswith('.xml'):
+        return True
+    return False
+
+
+def minimal_xml_format(xml_bytes: bytes) -> bytes:
+    import re
+    
+    try:
+        text = xml_bytes.decode('utf-8')
+        
+        result = re.sub(r'>(\s*)<', r'>\n<', text)
+        
+        return result.encode('utf-8')
+    except Exception:
+        return xml_bytes
+
+
 def get_compression_for_file(filename: str) -> int:
     lower = filename.lower()
     if lower.endswith(('.jpg', '.jpeg', '.png', '.gif', '.emf', '.wmf')):
@@ -125,6 +160,8 @@ def extract_xlsm_to_directory(
                 
                 file_path.write_bytes(PLACEHOLDER_JPEG)
             else:
+                if is_safe_to_format(info.filename):
+                    data = minimal_xml_format(data)
                 file_path.write_bytes(data)
     
     manifest = {
