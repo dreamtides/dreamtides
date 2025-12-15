@@ -71,6 +71,7 @@ SAFE_TO_FORMAT_XML = {
     'xl/workbook.xml',
     'xl/styles.xml',
     'xl/calcChain.xml',
+    'xl/sharedStrings.xml',
     'docProps/core.xml',
     'docProps/app.xml',
 }
