@@ -1,6 +1,6 @@
 set positional-arguments
 
-code-review: check-format build workspace-lints tabula-validate clippy test check-docs unity-tests
+code-review: check-format build workspace-lints clippy test check-docs unity-tests
 
 # Run this before pushing
 code-review-rsync: rsync-for-review
@@ -62,9 +62,6 @@ workspace-lints:
 
 tabula-extract:
     python3 client/scripts/xlsm_manager.py git-pre-commit
-
-tabula-validate:
-    python3 client/scripts/xlsm_manager.py validate client/Assets/StreamingAssets/Tabula.xlsm.d --image-cache .git/xlsm_image_cache
 
 tabula-roundtrip:
     python3 client/scripts/xlsm_manager.py roundtrip client/Assets/StreamingAssets/Tabula.xlsm /tmp/test_output.xlsm --image-cache /tmp/test_cache

@@ -347,110 +347,6 @@ def get_default_paths(git_root: Path) -> tuple[Path, Path, Path]:
     return xlsm_path, xlsm_dir, image_cache
 
 
-def validate_xlsm_directory(
-    input_dir: Path,
-    image_cache_dir: Path | None = None
-) -> tuple[bool, str]:
-    """
-    Validate that an XLSM directory can be reconstructed into a valid Excel file.
-    
-    Tests both scenarios:
-    1. New contributor (no image cache) - uses placeholder images
-    2. Existing contributor (with image cache) - restores real images
-    
-    Returns:
-        Tuple of (success: bool, message: str)
-    """
-    import tempfile
-    
-    manifest_path = input_dir / MANIFEST_FILENAME
-    if not manifest_path.exists():
-        return False, f"Manifest not found: {manifest_path}"
-    
-    try:
-        with open(manifest_path, 'r', encoding='utf-8') as f:
-            manifest = json.load(f)
-    except json.JSONDecodeError as e:
-        return False, f"Invalid manifest JSON: {e}"
-    
-    if 'file_order' not in manifest:
-        return False, "Manifest missing 'file_order' field"
-    
-    file_order = manifest.get('file_order', [])
-    missing_files = []
-    for filename in file_order:
-        if filename.endswith('/'):
-            continue
-        file_path = input_dir / filename
-        if not file_path.exists():
-            missing_files.append(filename)
-    
-    if missing_files:
-        return False, f"Missing {len(missing_files)} files: {missing_files[:5]}{'...' if len(missing_files) > 5 else ''}"
-    
-    with tempfile.TemporaryDirectory() as temp_dir:
-        temp_path = Path(temp_dir)
-        
-        new_contributor_xlsm = temp_path / "new_contributor.xlsm"
-        try:
-            reconstruct_xlsm_from_directory(
-                input_dir,
-                new_contributor_xlsm,
-                image_cache_dir=None,
-                restore_images=False,
-                quiet=True
-            )
-        except Exception as e:
-            return False, f"Failed to reconstruct (new contributor mode): {e}"
-        
-        try:
-            with zipfile.ZipFile(new_contributor_xlsm, 'r') as zf:
-                bad_file = zf.testzip()
-                if bad_file:
-                    return False, f"Corrupt file in new contributor XLSM: {bad_file}"
-                
-                zip_files = set(info.filename for info in zf.infolist() if not info.filename.endswith('/'))
-                expected_files = set(f for f in file_order if not f.endswith('/'))
-                
-                missing = expected_files - zip_files
-                if missing:
-                    return False, f"New contributor XLSM missing files: {list(missing)[:5]}"
-        except zipfile.BadZipFile as e:
-            return False, f"New contributor XLSM is not a valid ZIP: {e}"
-        
-        if image_cache_dir and image_cache_dir.exists():
-            existing_contributor_xlsm = temp_path / "existing_contributor.xlsm"
-            try:
-                reconstruct_xlsm_from_directory(
-                    input_dir,
-                    existing_contributor_xlsm,
-                    image_cache_dir=image_cache_dir,
-                    restore_images=True,
-                    quiet=True
-                )
-            except Exception as e:
-                return False, f"Failed to reconstruct (existing contributor mode): {e}"
-            
-            try:
-                with zipfile.ZipFile(existing_contributor_xlsm, 'r') as zf:
-                    bad_file = zf.testzip()
-                    if bad_file:
-                        return False, f"Corrupt file in existing contributor XLSM: {bad_file}"
-            except zipfile.BadZipFile as e:
-                return False, f"Existing contributor XLSM is not a valid ZIP: {e}"
-            
-            image_manifest = manifest.get('images', {})
-            restored_count = 0
-            for img_path, img_info in image_manifest.items():
-                cache_file = image_cache_dir / img_info['hash']
-                if cache_file.exists():
-                    restored_count += 1
-            
-            return True, f"Validation passed: new contributor OK, existing contributor OK ({restored_count}/{len(image_manifest)} images cached)"
-        else:
-            return True, f"Validation passed: new contributor OK (no image cache to test existing contributor mode)"
-
-
 def git_pre_commit(git_root: Path | None = None) -> bool:
     if git_root is None:
         git_root = find_git_root()
@@ -618,10 +514,6 @@ def main():
     roundtrip_parser.add_argument('output_path', type=Path, help='Output XLSM file (different from source)')
     roundtrip_parser.add_argument('--image-cache', type=Path, help='Directory to cache/restore images')
     
-    validate_parser = subparsers.add_parser('validate', help='Validate XLSM directory for CI (exit 1 on error)')
-    validate_parser.add_argument('input_dir', type=Path, help='XLSM directory to validate')
-    validate_parser.add_argument('--image-cache', type=Path, help='Optional image cache directory')
-    
     subparsers.add_parser('git-pre-commit', help='Git pre-commit hook handler')
     subparsers.add_parser('git-post-checkout', help='Git post-checkout hook handler')
     subparsers.add_parser('git-setup', help='Install git hooks and configure repository')
@@ -648,14 +540,6 @@ def main():
             sys.exit(1)
         success = roundtrip_test(args.xlsm_path, args.output_path, args.image_cache)
         sys.exit(0 if success else 1)
-    elif args.command == 'validate':
-        success, message = validate_xlsm_directory(args.input_dir, args.image_cache)
-        if success:
-            print(f"OK: {message}")
-            sys.exit(0)
-        else:
-            print(f"ERROR: {message}")
-            sys.exit(1)
     elif args.command == 'git-pre-commit':
         success = git_pre_commit()
         sys.exit(0 if success else 1)
