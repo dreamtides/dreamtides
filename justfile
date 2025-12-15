@@ -71,7 +71,7 @@ tabula-roundtrip:
 
 tabula-initial-setup:
     python3 client/scripts/xlsm_manager.py git-setup
-    python3 client/scripts/xlsm_manager.py reconstruct client/Assets/StreamingAssets/Tabula.xlsm.d client/Assets/StreamingAssets/Tabula.xlsm 
+    python3 client/scripts/xlsm_manager.py git-post-checkout
 
 schema:
     cargo run --manifest-path rules_engine/Cargo.toml --bin "schema_generator" > schema.json

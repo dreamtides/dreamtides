@@ -465,6 +465,24 @@ def git_pre_commit(git_root: Path | None = None) -> bool:
         print("Skipping pre-commit XLSM processing")
         return True
     
+    backup_dir = git_root / ".git/excel-backups"
+    backup_dir.mkdir(parents=True, exist_ok=True)
+    
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    backup_filename = f"Tabula_{timestamp}.xlsm"
+    backup_path = backup_dir / backup_filename
+    
+    shutil.copy2(xlsm_path, backup_path)
+    print(f"Backed up {xlsm_path.name} to {backup_path.name}")
+    
+    backup_files = list(backup_dir.glob("Tabula_*.xlsm"))
+    if len(backup_files) > 100:
+        backup_files.sort(key=lambda p: p.stat().st_mtime)
+        files_to_delete = backup_files[:len(backup_files) - 100]
+        for file_to_delete in files_to_delete:
+            file_to_delete.unlink()
+        print(f"Deleted {len(files_to_delete)} oldest backup file(s)")
+
     print(f"Extracting {xlsm_path.name} to {xlsm_dir.name}...")
     extract_xlsm_to_directory(
         xlsm_path,
