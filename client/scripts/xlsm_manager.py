@@ -147,7 +147,8 @@ def reconstruct_xlsm_from_directory(
     input_dir: Path,
     xlsm_path: Path,
     image_cache_dir: Path | None = None,
-    restore_images: bool = True
+    restore_images: bool = True,
+    quiet: bool = False
 ) -> None:
     """
     Reconstruct an XLSM file from a directory structure.
@@ -209,9 +210,10 @@ def reconstruct_xlsm_from_directory(
             
             zf.writestr(info, data)
     
-    print(f"Created {xlsm_path}")
-    if image_manifest:
-        print(f"Images: {restored_count} restored from cache, {placeholder_count} using placeholders")
+    if not quiet:
+        print(f"Created {xlsm_path}")
+        if image_manifest:
+            print(f"Images: {restored_count} restored from cache, {placeholder_count} using placeholders")
 
 
 def roundtrip_test(xlsm_path: Path, output_path: Path, image_cache_dir: Path | None = None) -> bool:
@@ -308,53 +310,108 @@ def get_default_paths(git_root: Path) -> tuple[Path, Path, Path]:
     return xlsm_path, xlsm_dir, image_cache
 
 
-def git_status(git_root: Path | None = None) -> bool:
-    if git_root is None:
-        git_root = find_git_root()
-    if git_root is None:
-        print("ERROR: Not in a git repository")
-        return False
+def validate_xlsm_directory(
+    input_dir: Path,
+    image_cache_dir: Path | None = None
+) -> tuple[bool, str]:
+    """
+    Validate that an XLSM directory can be reconstructed into a valid Excel file.
     
-    xlsm_path, xlsm_dir, image_cache = get_default_paths(git_root)
+    Tests both scenarios:
+    1. New contributor (no image cache) - uses placeholder images
+    2. Existing contributor (with image cache) - restores real images
     
-    if not xlsm_path.exists():
-        print(f"XLSM file not found: {xlsm_path}")
-        return True
+    Returns:
+        Tuple of (success: bool, message: str)
+    """
+    import tempfile
     
-    if not xlsm_dir.exists():
-        print(f"XLSM directory not found: {xlsm_dir}")
-        print("Run 'git-setup' to initialize")
-        return True
-    
-    xlsm_mtime = xlsm_path.stat().st_mtime
-    manifest_path = xlsm_dir / MANIFEST_FILENAME
-    
+    manifest_path = input_dir / MANIFEST_FILENAME
     if not manifest_path.exists():
-        print("Directory exists but manifest is missing")
-        return False
+        return False, f"Manifest not found: {manifest_path}"
     
-    dir_mtime = manifest_path.stat().st_mtime
+    try:
+        with open(manifest_path, 'r', encoding='utf-8') as f:
+            manifest = json.load(f)
+    except json.JSONDecodeError as e:
+        return False, f"Invalid manifest JSON: {e}"
     
-    from datetime import datetime
-    xlsm_time = datetime.fromtimestamp(xlsm_mtime)
-    dir_time = datetime.fromtimestamp(dir_mtime)
+    if 'file_order' not in manifest:
+        return False, "Manifest missing 'file_order' field"
     
-    if xlsm_mtime > dir_mtime:
-        print("⚠️  XLSM has UNCOMMITTED CHANGES")
-        print(f"   XLSM modified:      {xlsm_time}")
-        print(f"   Directory modified: {dir_time}")
-        print("")
-        print("   The spreadsheet has been modified since the last extraction.")
-        print("   These changes will be committed when you run 'git commit'.")
-        print("")
-        print("   To update the directory now, run:")
-        print(f"     python3 {Path(__file__).name} git-pre-commit")
-    else:
-        print("✓ XLSM is up to date with directory")
-        print(f"   XLSM modified:      {xlsm_time}")
-        print(f"   Directory modified: {dir_time}")
+    file_order = manifest.get('file_order', [])
+    missing_files = []
+    for filename in file_order:
+        if filename.endswith('/'):
+            continue
+        file_path = input_dir / filename
+        if not file_path.exists():
+            missing_files.append(filename)
     
-    return True
+    if missing_files:
+        return False, f"Missing {len(missing_files)} files: {missing_files[:5]}{'...' if len(missing_files) > 5 else ''}"
+    
+    with tempfile.TemporaryDirectory() as temp_dir:
+        temp_path = Path(temp_dir)
+        
+        new_contributor_xlsm = temp_path / "new_contributor.xlsm"
+        try:
+            reconstruct_xlsm_from_directory(
+                input_dir,
+                new_contributor_xlsm,
+                image_cache_dir=None,
+                restore_images=False,
+                quiet=True
+            )
+        except Exception as e:
+            return False, f"Failed to reconstruct (new contributor mode): {e}"
+        
+        try:
+            with zipfile.ZipFile(new_contributor_xlsm, 'r') as zf:
+                bad_file = zf.testzip()
+                if bad_file:
+                    return False, f"Corrupt file in new contributor XLSM: {bad_file}"
+                
+                zip_files = set(info.filename for info in zf.infolist() if not info.filename.endswith('/'))
+                expected_files = set(f for f in file_order if not f.endswith('/'))
+                
+                missing = expected_files - zip_files
+                if missing:
+                    return False, f"New contributor XLSM missing files: {list(missing)[:5]}"
+        except zipfile.BadZipFile as e:
+            return False, f"New contributor XLSM is not a valid ZIP: {e}"
+        
+        if image_cache_dir and image_cache_dir.exists():
+            existing_contributor_xlsm = temp_path / "existing_contributor.xlsm"
+            try:
+                reconstruct_xlsm_from_directory(
+                    input_dir,
+                    existing_contributor_xlsm,
+                    image_cache_dir=image_cache_dir,
+                    restore_images=True,
+                    quiet=True
+                )
+            except Exception as e:
+                return False, f"Failed to reconstruct (existing contributor mode): {e}"
+            
+            try:
+                with zipfile.ZipFile(existing_contributor_xlsm, 'r') as zf:
+                    bad_file = zf.testzip()
+                    if bad_file:
+                        return False, f"Corrupt file in existing contributor XLSM: {bad_file}"
+            except zipfile.BadZipFile as e:
+                return False, f"Existing contributor XLSM is not a valid ZIP: {e}"
+            
+            image_manifest = manifest.get('images', {})
+            restored_count = 0
+            for img_path, img_info in image_manifest.items():
+                cache_file = image_cache_dir / img_info['hash']
+                if cache_file.exists():
+                    restored_count += 1
+            
+            return True, f"Validation passed: new contributor OK, existing contributor OK ({restored_count}/{len(image_manifest)} images cached)"
+        else:
+            return True, f"Validation passed: new contributor OK (no image cache to test existing contributor mode)"
 
 
 def git_pre_commit(git_root: Path | None = None) -> bool:
@@ -480,26 +537,12 @@ fi
             image_cache_dir=image_cache,
             strip_images=True
         )
-        print("\nSetup complete!")
-        print("\nNext steps:")
-        print(f"  1. Run: git add {xlsm_dir.relative_to(git_root)}")
-        print(f"  2. Run: git add .gitignore")
-        print("  3. Commit the changes")
-    elif xlsm_dir.exists() and not xlsm_path.exists():
-        print(f"\nReconstructing {xlsm_path.name} from directory (new clone detected)...")
-        reconstruct_xlsm_from_directory(
-            xlsm_dir,
-            xlsm_path,
-            image_cache_dir=image_cache,
-            restore_images=True
-        )
-        print("\nSetup complete! The XLSM file has been created.")
-    elif xlsm_dir.exists() and xlsm_path.exists():
-        print(f"\nBoth XLSM and directory exist. Setup complete!")
-    else:
-        print(f"\nWarning: Neither {xlsm_path.name} nor {xlsm_dir.name} found.")
-        print("You may need to create the spreadsheet first.")
     
+    print("\nSetup complete!")
+    print("\nNext steps:")
+    print(f"  1. Run: git add {xlsm_dir.relative_to(git_root)}")
+    print(f"  2. Run: git add .gitignore")
+    print("  3. Commit the changes")
     print("\nAfter setup:")
     print("  - Edit Tabula.xlsm in Excel as normal")
     print("  - When you commit, the directory will be updated automatically")
@@ -531,7 +574,10 @@ def main():
     roundtrip_parser.add_argument('output_path', type=Path, help='Output XLSM file (different from source)')
     roundtrip_parser.add_argument('--image-cache', type=Path, help='Directory to cache/restore images')
     
-    subparsers.add_parser('git-status', help='Check if XLSM has uncommitted changes')
+    validate_parser = subparsers.add_parser('validate', help='Validate XLSM directory for CI (exit 1 on error)')
+    validate_parser.add_argument('input_dir', type=Path, help='XLSM directory to validate')
+    validate_parser.add_argument('--image-cache', type=Path, help='Optional image cache directory')
+    
     subparsers.add_parser('git-pre-commit', help='Git pre-commit hook handler')
     subparsers.add_parser('git-post-checkout', help='Git post-checkout hook handler')
     subparsers.add_parser('git-setup', help='Install git hooks and configure repository')
@@ -558,9 +604,14 @@ def main():
             sys.exit(1)
         success = roundtrip_test(args.xlsm_path, args.output_path, args.image_cache)
         sys.exit(0 if success else 1)
-    elif args.command == 'git-status':
-        success = git_status()
-        sys.exit(0 if success else 1)
+    elif args.command == 'validate':
+        success, message = validate_xlsm_directory(args.input_dir, args.image_cache)
+        if success:
+            print(f"OK: {message}")
+            sys.exit(0)
+        else:
+            print(f"ERROR: {message}")
+            sys.exit(1)
     elif args.command == 'git-pre-commit':
         success = git_pre_commit()
         sys.exit(0 if success else 1)
