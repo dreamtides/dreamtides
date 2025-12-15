@@ -1,0 +1,154 @@
+{
+  "version": 1,
+  "file_order": [
+    "[Content_Types].xml",
+    "_rels/.rels",
+    "xl/_rels/workbook.xml.rels",
+    "xl/workbook.xml",
+    "xl/vbaProject.bin",
+    "xl/worksheets/sheet5.xml",
+    "xl/worksheets/sheet6.xml",
+    "xl/worksheets/sheet7.xml",
+    "xl/theme/theme1.xml",
+    "xl/styles.xml",
+    "xl/sharedStrings.xml",
+    "xl/worksheets/_rels/sheet7.xml.rels",
+    "xl/worksheets/_rels/sheet6.xml.rels",
+    "xl/media/image1.jpg",
+    "xl/media/image2.jpg",
+    "xl/media/image3.jpg",
+    "xl/media/image4.jpg",
+    "xl/media/image5.jpg",
+    "xl/media/image6.jpg",
+    "xl/media/image7.jpg",
+    "xl/media/image8.jpg",
+    "xl/media/image9.jpg",
+    "xl/media/image10.jpg",
+    "xl/media/image11.jpg",
+    "xl/media/image12.jpg",
+    "xl/media/image13.jpg",
+    "xl/media/image14.jpg",
+    "xl/media/image15.jpg",
+    "xl/media/image16.jpg",
+    "xl/media/image17.jpg",
+    "xl/media/image18.jpg",
+    "xl/worksheets/_rels/sheet5.xml.rels",
+    "xl/worksheets/_rels/sheet4.xml.rels",
+    "xl/worksheets/_rels/sheet3.xml.rels",
+    "xl/worksheets/_rels/sheet2.xml.rels",
+    "xl/worksheets/_rels/sheet1.xml.rels",
+    "xl/worksheets/sheet1.xml",
+    "xl/worksheets/sheet2.xml",
+    "xl/worksheets/sheet4.xml",
+    "xl/worksheets/sheet3.xml",
+    "xl/tables/table7.xml",
+    "xl/calcChain.xml",
+    "xl/tables/table5.xml",
+    "docProps/core.xml",
+    "docProps/app.xml",
+    "xl/tables/table4.xml",
+    "xl/tables/table3.xml",
+    "xl/tables/table2.xml",
+    "xl/tables/table1.xml",
+    "xl/richData/rdRichValueTypes.xml",
+    "xl/richData/rdrichvaluestructure.xml",
+    "xl/richData/rdrichvalue.xml",
+    "xl/richData/rdRichValueWebImage.xml",
+    "xl/metadata.xml",
+    "xl/richData/_rels/rdRichValueWebImage.xml.rels",
+    "xl/tables/table6.xml"
+  ],
+  "images": {
+    "xl/media/image1.jpg": {
+      "hash": "c531cf314572b7e0a5c175b6328ce8ed0ed5e9fbb9eb2e736c77676a9a96bd27",
+      "size": 44198,
+      "original_name": "image1.jpg"
+    },
+    "xl/media/image2.jpg": {
+      "hash": "eff062a97821bffc1fa782f2055b7fd7c79d264801b0612372d10b982376e29c",
+      "size": 38218,
+      "original_name": "image2.jpg"
+    },
+    "xl/media/image3.jpg": {
+      "hash": "7bfddeb53145168650c68f030e27ce048a0f992c493b6977375e48486b5bdcf6",
+      "size": 31795,
+      "original_name": "image3.jpg"
+    },
+    "xl/media/image4.jpg": {
+      "hash": "91b91f015f15b5e478adbdc6615200480edd35bac80c0c90c210c718193d00ef",
+      "size": 37511,
+      "original_name": "image4.jpg"
+    },
+    "xl/media/image5.jpg": {
+      "hash": "f072bec0b5a3bbe8d92cacc42a66df1cccd17b00f0b11eb4d3a1232aaebb6214",
+      "size": 34021,
+      "original_name": "image5.jpg"
+    },
+    "xl/media/image6.jpg": {
+      "hash": "550cc051307d50f153b49e7aa518369521365b31eb4d736b5c68804fddd2ceec",
+      "size": 31493,
+      "original_name": "image6.jpg"
+    },
+    "xl/media/image7.jpg": {
+      "hash": "c1ae9689b979f9d62166390582ade2207c002ba7067776bd7823e7945d473a02",
+      "size": 28034,
+      "original_name": "image7.jpg"
+    },
+    "xl/media/image8.jpg": {
+      "hash": "efafc65b7c8a5e15c42f3b07cab00df5ec893320b6e22f0934fae5a7b71080dc",
+      "size": 47233,
+      "original_name": "image8.jpg"
+    },
+    "xl/media/image9.jpg": {
+      "hash": "26a94b3e7d305fb70df91bcc2b4eeb3a4fdb5b670e7738fa9097edbbb3f6d104",
+      "size": 39288,
+      "original_name": "image9.jpg"
+    },
+    "xl/media/image10.jpg": {
+      "hash": "79397246812dbae74fff52dfb0a0ec6aaf6150ac1e9df73abb1c0961188320ec",
+      "size": 37407,
+      "original_name": "image10.jpg"
+    },
+    "xl/media/image11.jpg": {
+      "hash": "a313fe85511b1075f90934b2d4f64f19d131f346dc621e4e09f79bb1c6c2ec5a",
+      "size": 30747,
+      "original_name": "image11.jpg"
+    },
+    "xl/media/image12.jpg": {
+      "hash": "0982b9b6140ed8eda767773985801972d340170f754d47b77d7f1c59e378adc0",
+      "size": 30722,
+      "original_name": "image12.jpg"
+    },
+    "xl/media/image13.jpg": {
+      "hash": "32d3c34f3f0c4124fba0526c938c9d5d9455740e034c12d1596e8453f37c3924",
+      "size": 34658,
+      "original_name": "image13.jpg"
+    },
+    "xl/media/image14.jpg": {
+      "hash": "929529defbe35d46da11d6e7bd7b9411bc898121a40ccfa400c52277597ef2f8",
+      "size": 27166,
+      "original_name": "image14.jpg"
+    },
+    "xl/media/image15.jpg": {
+      "hash": "d95e87be57ddab73be936fa5e3b8e0b5b0c8ce56848b47342d723c1e1087d906",
+      "size": 61980,
+      "original_name": "image15.jpg"
+    },
+    "xl/media/image16.jpg": {
+      "hash": "907b9234917c40f5fe46022baabf89a2e516706eef0c690f8014cb127f4ebfd9",
+      "size": 29692,
+      "original_name": "image16.jpg"
+    },
+    "xl/media/image17.jpg": {
+      "hash": "a301835365ace1b13e7bc0b567932a00adc4cef2452fdbfc8daab372d8395469",
+      "size": 44473,
+      "original_name": "image17.jpg"
+    },
+    "xl/media/image18.jpg": {
+      "hash": "1acf5647c634a0aeee077527a484b70b305aeef158c6491aa5b90bbfa4161ac8",
+      "size": 39310,
+      "original_name": "image18.jpg"
+    }
+  },
+  "source_file": "Tabula_original.xlsm"
+}
