@@ -480,12 +480,26 @@ fi
             image_cache_dir=image_cache,
             strip_images=True
         )
+        print("\nSetup complete!")
+        print("\nNext steps:")
+        print(f"  1. Run: git add {xlsm_dir.relative_to(git_root)}")
+        print(f"  2. Run: git add .gitignore")
+        print("  3. Commit the changes")
+    elif xlsm_dir.exists() and not xlsm_path.exists():
+        print(f"\nReconstructing {xlsm_path.name} from directory (new clone detected)...")
+        reconstruct_xlsm_from_directory(
+            xlsm_dir,
+            xlsm_path,
+            image_cache_dir=image_cache,
+            restore_images=True
+        )
+        print("\nSetup complete! The XLSM file has been created.")
+    elif xlsm_dir.exists() and xlsm_path.exists():
+        print(f"\nBoth XLSM and directory exist. Setup complete!")
+    else:
+        print(f"\nWarning: Neither {xlsm_path.name} nor {xlsm_dir.name} found.")
+        print("You may need to create the spreadsheet first.")
     
-    print("\nSetup complete!")
-    print("\nNext steps:")
-    print(f"  1. Run: git add {xlsm_dir.relative_to(git_root)}")
-    print(f"  2. Run: git add .gitignore")
-    print("  3. Commit the changes")
     print("\nAfter setup:")
     print("  - Edit Tabula.xlsm in Excel as normal")
     print("  - When you commit, the directory will be updated automatically")
