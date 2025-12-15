@@ -43,6 +43,8 @@
     "xl/worksheets/sheet3.xml",
     "xl/tables/table7.xml",
     "xl/tables/table8.xml",
+    "xl/tables/table9.xml",
+    "xl/tables/table10.xml",
     "xl/calcChain.xml",
     "xl/tables/table5.xml",
     "docProps/core.xml",
