@@ -1221,6 +1221,22 @@ End Function
    <style:footer-left style:display="false"/>
    <style:footer-first style:display="false"/>
   </style:master-page>
+  <style:master-page style:name="PageStyle_5f_Card_20_Lists" style:display-name="PageStyle_Card Lists" style:page-layout-name="pm3">
+   <style:header style:display="false"/>
+   <style:header-left style:display="false"/>
+   <style:header-first style:display="false"/>
+   <style:footer style:display="false"/>
+   <style:footer-left style:display="false"/>
+   <style:footer-first style:display="false"/>
+  </style:master-page>
+  <style:master-page style:name="PageStyle_5f_Card_20_Effects" style:display-name="PageStyle_Card Effects" style:page-layout-name="pm3">
+   <style:header style:display="false"/>
+   <style:header-left style:display="false"/>
+   <style:header-first style:display="false"/>
+   <style:footer style:display="false"/>
+   <style:footer-left style:display="false"/>
+   <style:footer-first style:display="false"/>
+  </style:master-page>
   <style:master-page style:name="PageStyle_5f_Dreamwell" style:display-name="PageStyle_Dreamwell" style:page-layout-name="pm3">
    <style:header style:display="false"/>
    <style:header-left style:display="false"/>
@@ -1237,31 +1253,7 @@ End Function
    <style:footer-left style:display="false"/>
    <style:footer-first style:display="false"/>
   </style:master-page>
-  <style:master-page style:name="PageStyle_5f_Card_20_Lists" style:display-name="PageStyle_Card Lists" style:page-layout-name="pm3">
-   <style:header style:display="false"/>
-   <style:header-left style:display="false"/>
-   <style:header-first style:display="false"/>
-   <style:footer style:display="false"/>
-   <style:footer-left style:display="false"/>
-   <style:footer-first style:display="false"/>
-  </style:master-page>
   <style:master-page style:name="PageStyle_5f_Test_20_Dreamwell" style:display-name="PageStyle_Test Dreamwell" style:page-layout-name="pm3">
-   <style:header style:display="false"/>
-   <style:header-left style:display="false"/>
-   <style:header-first style:display="false"/>
-   <style:footer style:display="false"/>
-   <style:footer-left style:display="false"/>
-   <style:footer-first style:display="false"/>
-  </style:master-page>
-  <style:master-page style:name="PageStyle_5f_Card_20_Effects" style:display-name="PageStyle_Card Effects" style:page-layout-name="pm3">
-   <style:header style:display="false"/>
-   <style:header-left style:display="false"/>
-   <style:header-first style:display="false"/>
-   <style:footer style:display="false"/>
-   <style:footer-left style:display="false"/>
-   <style:footer-first style:display="false"/>
-  </style:master-page>
-  <style:master-page style:name="PageStyle_5f_Test_20_Cards" style:display-name="PageStyle_Test Cards" style:page-layout-name="pm3">
    <style:header style:display="false"/>
    <style:header-left style:display="false"/>
    <style:header-first style:display="false"/>
@@ -1277,6 +1269,14 @@ End Function
    <style:footer-left style:display="false"/>
    <style:footer-first style:display="false"/>
   </style:master-page>
+  <style:master-page style:name="PageStyle_5f_Test_20_Cards" style:display-name="PageStyle_Test Cards" style:page-layout-name="pm3">
+   <style:header style:display="false"/>
+   <style:header-left style:display="false"/>
+   <style:header-first style:display="false"/>
+   <style:footer style:display="false"/>
+   <style:footer-left style:display="false"/>
+   <style:footer-first style:display="false"/>
+  </style:master-page>
  </office:master-styles>
  <office:body>
   <office:spreadsheet>
@@ -1284,15 +1284,15 @@ End Function
     <table:iteration table:maximum-difference="0.0001"/>
    </table:calculation-settings>
    <table:content-validations>
-    <table:content-validation table:name="val1" table:condition="of:cell-content-is-in-list(&quot;Event&quot;;&quot;Character&quot;)" table:allow-empty-cell="true" table:display-list="unsorted" table:base-cell-address="Strings.G2">
+    <table:content-validation table:name="val1" table:condition="of:cell-content-is-in-list(&quot;Event&quot;;&quot;Character&quot;)" table:allow-empty-cell="true" table:display-list="unsorted" table:base-cell-address="&apos;Card Effects&apos;.G2">
      <table:help-message table:display="true"/>
      <table:error-message table:message-type="stop" table:display="true"/>
     </table:content-validation>
-    <table:content-validation table:name="val2" table:condition="of:cell-content-is-in-list(&quot;FALSE&quot;;&quot;TRUE&quot;)" table:allow-empty-cell="true" table:display-list="unsorted" table:base-cell-address="Strings.I2">
+    <table:content-validation table:name="val2" table:condition="of:cell-content-is-in-list(&quot;FALSE&quot;;&quot;TRUE&quot;)" table:allow-empty-cell="true" table:display-list="unsorted" table:base-cell-address="&apos;Card Effects&apos;.I2">
      <table:help-message table:display="true"/>
      <table:error-message table:message-type="stop" table:display="true"/>
     </table:content-validation>
-    <table:content-validation table:name="val3" table:condition="of:cell-content-is-in-list(&quot;DreamwellCardId&quot;;&quot;BaseCardId&quot;)" table:allow-empty-cell="true" table:display-list="unsorted" table:base-cell-address="Strings.B2">
+    <table:content-validation table:name="val3" table:condition="of:cell-content-is-in-list(&quot;DreamwellCardId&quot;;&quot;BaseCardId&quot;)" table:allow-empty-cell="true" table:display-list="unsorted" table:base-cell-address="&apos;Card Effects&apos;.B2">
      <table:help-message table:display="true"/>
      <table:error-message table:message-type="stop" table:display="true"/>
     </table:content-validation>
