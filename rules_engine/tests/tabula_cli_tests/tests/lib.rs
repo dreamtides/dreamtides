@@ -1,1 +1,1 @@
-mod tabula_cli_tests;
+mod old_tabula_cli_tests;

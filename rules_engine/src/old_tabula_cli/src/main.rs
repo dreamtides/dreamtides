@@ -12,10 +12,10 @@ use google_sheets4::Sheets;
 use google_sheets4::yup_oauth2::{ServiceAccountAuthenticator, ServiceAccountKey};
 use hyper_util::client::legacy::Client;
 use hyper_util::rt::TokioExecutor;
-use tabula_cli::google_sheet::GoogleSheet;
-use tabula_cli::missing_cards_table::write_missing_cards_html;
-use tabula_cli::spreadsheet::Spreadsheet;
-use tabula_cli::{ability_parsing, tabula_codegen, tabula_sync};
+use old_tabula_cli::google_sheet::GoogleSheet;
+use old_tabula_cli::missing_cards_table::write_missing_cards_html;
+use old_tabula_cli::spreadsheet::Spreadsheet;
+use old_tabula_cli::{ability_parsing, tabula_codegen, tabula_sync};
 use tabula_data::card_definitions::card_definition::CardDefinition; // for type reference
 use tabula_data::localized_strings::LanguageId;
 use tabula_data::tabula::{self, TabulaBuildContext, TabulaRaw};

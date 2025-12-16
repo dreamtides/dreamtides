@@ -50,7 +50,7 @@ fn common_fields<T: BaseCardDefinitionType>(
         let mut ierr = InitializationError::with_details(
             ErrorCode::AbilitiesNotPresent,
             "Abilities not present on card definition",
-            "Please run tabula_cli to populate this field",
+            "Please run old_tabula_cli to populate this field",
         );
         ierr.tabula_sheet = Some(sheet_name.to_string());
         ierr.tabula_row = Some(row_index);
@@ -62,7 +62,7 @@ fn common_fields<T: BaseCardDefinitionType>(
         let mut ierr = InitializationError::with_details(
             ErrorCode::AbilitiesNotPresent,
             "Abilities not present on card definition",
-            "Please run tabula_cli to populate this field",
+            "Please run old_tabula_cli to populate this field",
         );
         ierr.tabula_sheet = Some(sheet_name.to_string());
         ierr.tabula_row = Some(row_index);

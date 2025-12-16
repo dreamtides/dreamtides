@@ -1,9 +1,9 @@
 use std::collections::{BTreeMap, HashMap};
 
 use anyhow::Result;
+use old_tabula_cli::spreadsheet::{SheetRow, SheetTable, SheetValue, Spreadsheet};
 use parking_lot::RwLock;
 use serde_json::Value;
-use tabula_cli::spreadsheet::{SheetRow, SheetTable, SheetValue, Spreadsheet};
 
 #[derive(Default)]
 pub struct FakeSpreadsheet {

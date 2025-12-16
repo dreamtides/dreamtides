@@ -24,9 +24,9 @@ use crate::tabula_table::Table;
 ///
 /// Tabula is persisted as the tabula.json file that's bundled with the game,
 /// and it is generated from Google Sheets as its source of truth. The
-/// `tabula_cli` tool is used to generate the tabula.json file from Google
+/// `old_tabula_cli` tool is used to generate the tabula.json file from Google
 /// Sheets. Some data in tabula is also used to drive code generation for use in
-/// the rules engine, which is also handled by the `tabula_cli` tool.
+/// the rules engine, which is also handled by the `old_tabula_cli` tool.
 #[derive(Debug, Clone, Default)]
 pub struct Tabula {
     pub strings: LocalizedStrings,

@@ -1,5 +1,5 @@
 [package]
-name = "tabula_cli"
+name = "old_tabula_cli"
 version = "0.0.0"
 edition = "2024"
 
@@ -12,7 +12,7 @@ doctest = false
 bench = false
 
 [[bin]]
-name = "tabula_cli"
+name = "old_tabula_cli"
 test = false
 doctest = false
 bench = false

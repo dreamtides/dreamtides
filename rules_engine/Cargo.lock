@@ -2118,6 +2118,43 @@ dependencies = [
 ]
 
 [[package]]
+name = "old_tabula_cli"
+version = "0.0.0"
+dependencies = [
+ "ability_data",
+ "anyhow",
+ "clap",
+ "convert_case 0.8.0",
+ "core_data",
+ "database",
+ "fluent",
+ "fluent-bundle",
+ "google-sheets4",
+ "hyper-util",
+ "parser",
+ "quest_state",
+ "serde",
+ "serde_json",
+ "tabula_data",
+ "tokio",
+ "tracing",
+ "uuid",
+ "yup-oauth2 12.1.0",
+]
+
+[[package]]
+name = "old_tabula_cli_tests"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "old_tabula_cli",
+ "parking_lot",
+ "serde",
+ "serde_json",
+ "tokio",
+]
+
+[[package]]
 name = "once_cell"
 version = "1.20.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3204,43 +3241,6 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn",
-]
-
-[[package]]
-name = "tabula_cli"
-version = "0.0.0"
-dependencies = [
- "ability_data",
- "anyhow",
- "clap",
- "convert_case 0.8.0",
- "core_data",
- "database",
- "fluent",
- "fluent-bundle",
- "google-sheets4",
- "hyper-util",
- "parser",
- "quest_state",
- "serde",
- "serde_json",
- "tabula_data",
- "tokio",
- "tracing",
- "uuid",
- "yup-oauth2 12.1.0",
-]
-
-[[package]]
-name = "tabula_cli_tests"
-version = "0.0.0"
-dependencies = [
- "anyhow",
- "parking_lot",
- "serde",
- "serde_json",
- "tabula_cli",
- "tokio",
 ]
 
 [[package]]
