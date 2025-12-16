@@ -1,1 +1,471 @@
-# Tabula Design Document
+# Tabula CLI Design Document
+
+## Overview
+
+The Tabula CLI is a Rust command-line tool for managing Excel spreadsheets in a
+Git-friendly way. It converts data between Excel tables and TOML files, enabling
+version control of spreadsheet content while preserving Excel-specific features
+like formulas, data validation, and formatting.
+
+**Primary Goals:**
+- Extract named Excel Table data into human-readable TOML files for Git
+- Reconstruct Excel spreadsheets from TOML using the original XLSM as a template
+- Strip/rebuild embedded images to reduce Git storage costs
+- Validate round-trip conversions produce valid Excel files
+
+## Dependencies
+
+### Workspace Dependencies (from existing Cargo.toml)
+- `anyhow` - Error handling with context
+- `clap` v4 - Command-line argument parsing with derive macros
+- `serde` - Serialization framework
+- `convert_case` - Column name normalization (snake_case, kebab-case)
+- `chrono` - Date/time handling
+- `sha2` - Image hash computation for caching
+- `zip` - Low-level XLSM manipulation for image stripping
+
+### New Dependencies to Add
+- `calamine` 0.32 - Reading Excel files ([docs](https://docs.rs/calamine/0.32.0/calamine/))
+- `umya-spreadsheet` - Writing/modifying Excel files with formulas
+- `toml` - TOML serialization/deserialization
+- `reqwest` (with blocking feature) - HTTP client for image downloading
+- `tempfile` - Temporary files for atomic writes and validation
+
+## Project Structure
+
+```
+src/tabula_cli/
+├── Cargo.toml
+├── design_document.md
+├── src/
+│   ├── main.rs                   # CLI entry point, clap command dispatch
+│   ├── lib.rs                    # Public API, re-exports
+│   ├── core/
+│   │   ├── mod.rs
+│   │   ├── excel_reader.rs       # Calamine wrapper for reading tables
+│   │   ├── excel_writer.rs       # Umya-spreadsheet wrapper for writing
+│   │   ├── toml_data.rs          # TOML data structures and serialization
+│   │   ├── column_names.rs       # Name normalization utilities
+│   │   └── paths.rs              # Default path resolution
+│   └── commands/
+│       ├── mod.rs
+│       ├── build_toml.rs         # XLS -> TOML conversion
+│       ├── build_xls.rs          # TOML -> XLS conversion
+│       ├── validate.rs           # Round-trip validation
+│       ├── strip_images.rs       # Image placeholder replacement
+│       ├── rebuild_images.rs     # Image restoration from URLs
+│       └── git_setup.rs          # Git hook installation
+
+tests/tabula_cli_tests/
+├── Cargo.toml
+├── src/lib.rs
+├── tests/
+│   ├── lib.rs
+│   └── tabula_tests/
+│       ├── mod.rs
+│       ├── build_toml_tests.rs
+│       ├── build_xls_tests.rs
+│       └── roundtrip_tests.rs
+└── test_data/
+    ├── simple_table.xlsx
+    └── formula_table.xlsx
+```
+
+## Command-Line Interface
+
+```bash
+# Convert Excel tables to TOML files
+tabula build-toml [XLSM_PATH] [OUTPUT_DIR]
+
+# Reconstruct Excel from TOML files (requires original XLSM as template)
+tabula build-xls [TOML_DIR] [XLSM_PATH]
+tabula build-xls --dry-run [TOML_DIR] [XLSM_PATH]
+
+# Validate round-trip conversion
+tabula validate [TOML_DIR]
+tabula validate --applescript [TOML_DIR]
+tabula validate --strip-images [TOML_DIR]
+tabula validate --check-equality [TOML_DIR]
+
+# Manage embedded images
+tabula strip-images [XLSM_PATH]
+tabula rebuild-images [XLSM_PATH]
+
+# Git integration
+tabula git-setup
+```
+
+### Default Paths
+
+When paths are omitted, the CLI finds the git root and defaults to:
+- Spreadsheet: `client/Assets/StreamingAssets/Tabula.xlsm`
+- TOML directory: `client/Assets/StreamingAssets/Tabula/`
+
+## Core Design: No Schema Files
+
+**Key design decision:** We do NOT generate separate schema files for formulas,
+styles, or data validation. Instead:
+
+1. **build-toml** extracts only raw data values into TOML files
+2. **build-xls** requires the original XLSM to exist, uses it as a template,
+   and updates only the data cells
+
+This approach:
+- Keeps version-controlled files minimal (just data)
+- Preserves any formatting changes made to the spreadsheet
+- Avoids versioning Excel internal details (style IDs, formula syntax variations)
+- Ensures VBA macros are always preserved
+
+### TOML Output Format
+
+Each named Excel Table generates one TOML file: `{TableName}.toml`
+
+```toml
+[[card]]
+name = "Immolate"
+id = "d8fe4b2a-088c-4a92-aeb7-d6d4d22fda1a"
+energy-cost = 2
+rules-text = "{Dissolve} an enemy character."
+prompts = "Choose an enemy character to {dissolve}."
+card-type = "Event"
+subtype = "Fire"
+is-fast = true
+image-number = 1907487244
+
+[[card]]
+name = "Abolish"
+id = "d07ac4fa-cc3b-4bb8-8018-de7dc1760f35"
+energy-cost = 2
+rules-text = "{Prevent} a played enemy card."
+prompts = "Choose an enemy card to {prevent}."
+card-type = "Event"
+is-fast = true
+image-number = 1282908322
+```
+
+**Column handling:**
+- Raw data columns → included in TOML with normalized names (spaces→hyphens)
+- Formula columns (detected via `=` prefix or calamine's DataType::Formula) → skipped
+- IMAGE columns (detected via `=IMAGE()` pattern) → skipped
+- Empty cells → omitted from that row's TOML entry
+
+## Technical Strategy: Round-Trip Conversion
+
+### The Template Approach
+
+Rather than regenerating Excel files from scratch (which risks corruption), we
+use the **original XLSM as a template**:
+
+1. **build-xls** opens the original `Tabula.xlsm`
+2. For each table, it locates the data range
+3. It writes only the data cell values from the TOML files
+4. Formula columns are left untouched
+5. The modified file is saved atomically (write to temp, then rename)
+
+This preserves:
+- All Excel internal structure (`.rels` files, content types, etc.)
+- Style definitions and conditional formatting
+- Data validation rules
+- Table structure and calculated column formulas
+- VBA macros (`vbaProject.bin`)
+
+### Formula Recalculation Behavior
+
+Excel tables have **calculated columns** where a single formula applies to the
+entire column. These are stored in the table XML as `<calculatedColumnFormula>`.
+
+**Important:** When we modify data cells, we must NOT touch formula cells.
+Excel will recalculate these columns automatically when:
+1. The file is opened in Excel
+2. The `calcChain.xml` triggers recalculation
+
+**Verification required during Milestone 2:** We need to test that after
+modifying data cells with umya-spreadsheet:
+- The table structure remains valid
+- Opening the file in Excel triggers formula recalculation
+- No "repair file" warnings appear
+
+If this doesn't work automatically, we may need to:
+- Clear cached values in formula cells
+- Update the `calcChain.xml` to mark cells dirty
+- Or use a different strategy (detailed in Observations if needed)
+
+### Column Classification
+
+During `build-toml`, each column is classified:
+
+| Classification | Detection Method | TOML Behavior |
+|---------------|------------------|---------------|
+| Data | Cell contains string/number/boolean directly | Include in TOML |
+| Formula | DataType::Formula from calamine | Skip entirely |
+| Image | Formula contains `IMAGE(` | Skip entirely |
+| Empty | All cells empty | Skip entirely |
+
+During `build-xls`, we use the same classification from the template:
+- Data columns: overwrite with TOML values
+- Formula/Image columns: do not modify (preserve formulas)
+
+## Image Handling
+
+### strip-images Command
+
+Replicates `../client/scripts/xlsm_manager.py` functionality. XLSM files are ZIP archives:
+
+1. Extract XLSM to temp directory
+2. Find images in `xl/media/` (JPEG, PNG, GIF)
+3. Replace each with 1x1 JPEG placeholder
+4. Cache originals by SHA-256 hash in `.git/xlsm_image_cache/`
+5. Record mapping in `_xlsm_manifest.json`
+6. Repack ZIP preserving file order and compression
+
+**Critical ZIP details:**
+- Preserve exact file ordering (from manifest)
+- Images: `ZIP_STORED`, XML: `ZIP_DEFLATED`
+- Timestamps: `1980-01-01 00:00:00`
+- No zip64
+
+### rebuild-images Command
+
+Restores images by evaluating `=IMAGE("http://prefix"&G2&".jpg")` type formulas:
+
+1. Read table schema to find IMAGE columns
+2. Parse formula to extract URL pattern (e.g., `"prefix"&H2&".jpg"`)
+3. For each row, substitute cell values to compute full URL
+4. Download image via HTTP
+5. Replace placeholder in XLSM ZIP structure
+
+**Formula parsing:** Use regex to identify string literals and cell references
+in the pattern. This is sufficient for the known `=IMAGE()` patterns in this
+project.
+
+## Validate Command Details
+
+The `validate` command performs a round-trip conversion and checks the result:
+
+```bash
+tabula validate [TOML_DIR]
+```
+
+**Basic operation:**
+1. Run `build-xls` to generate a new XLSM in a temp location
+2. Run `build-toml` on the generated XLSM to a temp directory
+3. Compare the newly-extracted TOML with the original TOML files
+4. Report any differences
+
+### --applescript Flag (macOS only)
+
+```bash
+tabula validate --applescript [TOML_DIR]
+```
+
+Uses AppleScript to verify Excel can open the file without corruption warnings:
+
+1. Generate test XLSM via round-trip
+2. Execute AppleScript that:
+   - Opens Microsoft Excel
+   - Opens the generated XLSM file
+   - Waits briefly for any "repair" dialogs
+   - Checks if a repair dialog appeared
+   - Quits Excel
+3. Return exit code 1 if repair dialog was detected
+
+This catches subtle corruption that passes ZIP validation but triggers Excel's
+internal consistency checks.
+
+### --strip-images Flag
+
+```bash
+tabula validate --strip-images [TOML_DIR]
+```
+
+Includes image stripping in the validation workflow:
+1. Run `strip-images` on the original XLSM
+2. Perform standard round-trip validation
+3. Optionally run `rebuild-images` if URLs are available
+4. Verify the final XLSM is valid
+
+## Error Handling
+
+All commands use `anyhow` for error context chains:
+
+**build-toml:**
+- `Cannot open spreadsheet at {path}: {err}`
+- `No named Excel Tables found in {path}. Tables are distinct from worksheets.`
+- `Cannot write to output directory {path}: {err}`
+
+**build-xls:**
+- `Original XLSM not found at {path}. This file is required as a template.`
+- `Table '{name}' not found in original XLSM`
+- `TOML file for table '{name}' not found at {path}`
+- `Row {n}: column '{col}' value cannot be parsed: {err}`
+
+**validate:**
+- `Round-trip failed: TOML differs at table '{name}', row {n}`
+- `Excel reported file corruption (detected via AppleScript)`
+- `Files differ at byte offset {offset}`
+
+**strip-images:**
+- `File {path} is not a valid XLSM archive: {err}`
+- `No embedded images found`
+
+**rebuild-images:**
+- `Failed to download image from {url}: {err}`
+- `Cannot parse URL from formula: {formula}`
+
+## Git Integration
+
+The `tabula git-setup` command configures the repository for the tabula workflow:
+
+1. **Git LFS**: Configures `*.xlsm` files for Git Large File Storage
+2. **Pre-commit hook**: Installs a hook that:
+   - Creates a backup of Tabula.xlsm in `.git/excel-backups/`
+   - Runs `tabula build-toml` to extract data
+   - Runs `tabula strip-images` to replace images with placeholders
+   - Fails if any TOML file has a newer timestamp than the spreadsheet
+3. **Image cache**: Creates `.git/xlsm_image_cache/` for stripped images
+
+The hook ensures the workflow is always: edit spreadsheet → extract to TOML,
+never the reverse (which could overwrite spreadsheet changes).
+
+## Testing Strategy
+
+### Principles
+
+1. **Black-box testing** - Test command-line behavior, not internal functions
+2. **Fast execution** - All tests complete in < 3 seconds
+3. **Synthetic test data** - Don't depend on production Tabula.xlsm structure
+4. **Deterministic** - No randomness, fixed test inputs
+
+### Test Spreadsheets
+
+Create minimal XLSX files programmatically or check in small test files:
+
+- `simple_table.xlsx`: Basic table with 3 columns, 5 rows, no formulas
+- `formula_table.xlsx`: Table with a calculated column
+- `validation_table.xlsx`: Table with dropdown data validation
+
+### Test Location
+
+Following existing project patterns in `tests/tabula_cli_tests/`.
+
+## Milestone Breakdown
+
+### Milestone 1: Project Setup
+**Scope:** Crate structure, Cargo.toml, clap CLI skeleton
+- Create `src/tabula_cli/Cargo.toml` with all dependencies
+- Set up `main.rs` with clap subcommand stubs
+- Create directory structure under `src/`
+- Create test crate `tests/tabula_cli_tests/`
+- Verify `cargo check` passes
+
+### Milestone 2: Excel Reading with Calamine
+**Scope:** Read named tables and classify columns
+- Implement `core/excel_reader.rs` using calamine 0.32
+- Enumerate named tables via `Reader` trait
+- Read cell data and distinguish DataType variants
+- Classify columns as data/formula/image
+- **Critical:** Verify we can detect calculated column formulas
+- Unit tests with synthetic spreadsheet
+
+### Milestone 3: build-toml Command
+**Scope:** Convert tables to TOML
+- Implement `commands/build_toml.rs`
+- Column name normalization (spaces → hyphens)
+- Omit empty cells and formula columns
+- Create backup in `.git/excel-backups/`
+- Integration tests
+
+### Milestone 4: strip-images Command
+**Scope:** Replace images with placeholders
+- Implement `commands/strip_images.rs`
+- ZIP manipulation with correct ordering/compression
+- Image caching by SHA-256
+- Manifest file generation
+- Tests with image-containing spreadsheet
+
+### Milestone 5: build-xls Command (Basic)
+**Scope:** Write data cells to template
+- Implement `commands/build_xls.rs` using umya-spreadsheet
+- Require original XLSM as template
+- Write data cells only, skip formula columns
+- Atomic write via temp file + rename
+- **Critical:** Verify Excel recalculates formulas correctly
+- Integration tests
+
+### Milestone 6: build-xls Row Handling
+**Scope:** Handle row additions/deletions
+- Detect when TOML has more/fewer rows than template
+- Add new rows at end of table (copy formatting from last row)
+- Delete excess rows if TOML has fewer
+- Preserve table boundaries and auto-filter
+
+### Milestone 7: validate Command
+**Scope:** Round-trip validation
+- Implement `commands/validate.rs`
+- Orchestrate build-xls and build-toml
+- Implement `--check-equality` flag
+- Implement `--strip-images` flag
+- Clear error reporting
+
+### Milestone 8: validate --applescript
+**Scope:** macOS Excel validation
+- Implement AppleScript execution (conditional compilation)
+- Detect repair dialog appearance
+- Timeout handling
+- Skip gracefully on non-macOS
+
+### Milestone 9: rebuild-images Command
+**Scope:** Restore images from URLs
+- Implement `commands/rebuild_images.rs`
+- Parse IMAGE formula patterns
+- HTTP download via reqwest
+- Replace placeholders in ZIP
+- Network error handling
+
+### Milestone 10: Git Integration and Polish
+**Scope:** git-setup command, final validation
+- Implement `commands/git_setup.rs`
+- Generate pre-commit hook script
+- Configure Git LFS
+- Test with production Tabula.xlsm
+- Run `just review`
+
+## Workflow Instructions for Implementing Agent
+
+### Validation Process
+
+After each milestone:
+1. Run `just fmt` to apply rustfmt
+2. Run `just check` to verify type checking
+3. Run `just clippy` to check for lint warnings
+4. Run `cargo test -p tabula_cli_tests` to execute tests
+5. Run `just review` for complete validation before committing
+
+### Style Rules
+
+Follow project `.cursorrc` rules:
+- No inline comments in code
+- Functions qualified with one module: `excel_reader::extract_tables()`
+- Structs unqualified: `TableData`
+- Enums one level: `ColumnType::Formula`
+- Public items at top of file, private below
+- Cargo.toml dependencies alphabetized
+- Prefer inline expressions over intermediate `let` bindings
+
+### Recording Context
+
+Create/update `src/tabula_cli/observations.md` for:
+- Implementation decisions that differ from this document
+- Issues encountered and solutions
+- API quirks in calamine or umya-spreadsheet
+- Test results for critical behaviors (formula recalculation)
+
+Mark completed milestones at the top of this design document.
+
+### Getting More Information
+
+1. Search codebase: `grep` for similar patterns
+2. Read crate docs: `cargo doc --open`
+3. Examine `xlsm_manager.py` for behavior reference
+4. Look at `client/Assets/StreamingAssets/Tabula.xlsm.d/` structure
+5. Ask for clarification rather than assuming

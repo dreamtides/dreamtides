@@ -15,4 +15,4 @@ chrome_profiler.json
 .DS_Store
 missing_cards.html
 
-client/Assets/StreamingAssets/Tabula.xlsm
+client/Assets/StreamingAssets/Tabula/Tabula.xlsm
