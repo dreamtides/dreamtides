@@ -25,6 +25,10 @@ pub fn backup_dir_for(root: &Path) -> PathBuf {
     root.join(".git/excel-backups")
 }
 
+pub fn image_cache_dir_for(root: &Path) -> PathBuf {
+    root.join(".git/xlsm_image_cache")
+}
+
 fn find_git_root(start: &Path) -> Result<PathBuf> {
     let mut current = Some(start);
     while let Some(dir) = current {

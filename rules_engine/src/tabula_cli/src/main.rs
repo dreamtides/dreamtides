@@ -2,7 +2,7 @@ use std::path::PathBuf;
 
 use anyhow::{Result, bail};
 use clap::{Parser, Subcommand};
-use tabula_cli::commands::build_toml;
+use tabula_cli::commands::{build_toml, strip_images};
 
 #[derive(Parser)]
 #[command(name = "tabula")]
@@ -51,6 +51,9 @@ enum Commands {
     StripImages {
         #[arg(help = "Path to the XLSM file")]
         xlsm_path: Option<PathBuf>,
+
+        #[arg(long, help = "Path for the stripped XLSM output")]
+        output_path: Option<PathBuf>,
     },
 
     #[command(about = "Restore images from URLs")]
@@ -83,8 +86,8 @@ fn run() -> Result<()> {
         Commands::Validate { applescript, strip_images, toml_dir } => bail!(
             "validate not yet implemented: applescript={applescript}, strip_images={strip_images}, toml_dir={toml_dir:?}"
         ),
-        Commands::StripImages { xlsm_path } => {
-            bail!("strip-images not yet implemented: xlsm_path={xlsm_path:?}")
+        Commands::StripImages { xlsm_path, output_path } => {
+            strip_images::strip_images(xlsm_path, output_path)?;
         }
         Commands::RebuildImages { xlsm_path } => {
             bail!("rebuild-images not yet implemented: xlsm_path={xlsm_path:?}")

@@ -3662,6 +3662,7 @@ dependencies = [
  "convert_case 0.8.0",
  "reqwest",
  "serde",
+ "serde_json",
  "sha2",
  "tempfile",
  "toml",
@@ -3674,10 +3675,13 @@ name = "tabula_cli_tests"
 version = "0.0.0"
 dependencies = [
  "anyhow",
+ "serde_json",
+ "sha2",
  "tabula_cli",
  "tempfile",
  "toml",
  "umya-spreadsheet",
+ "zip 4.6.1",
 ]
 
 [[package]]

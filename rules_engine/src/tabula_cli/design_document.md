@@ -88,6 +88,7 @@ tabula validate --strip-images [TOML_DIR]
 
 # Manage embedded images
 tabula strip-images [XLSM_PATH]
+tabula strip-images --output <OUTPUT_XLSM> [XLSM_PATH]
 tabula rebuild-images [XLSM_PATH]
 
 # Git integration
@@ -216,7 +217,7 @@ Replicates `../client/scripts/xlsm_manager.py` functionality. XLSM files are ZIP
 2. Find images in `xl/media/` (JPEG, PNG, GIF)
 3. Replace each with 1x1 JPEG placeholder
 4. Cache originals by SHA-256 hash in `.git/xlsm_image_cache/`
-5. Record mapping in `_xlsm_manifest.json`
+5. Record mapping in `_xlsm_manifest.json` saved alongside the cache (`.git/xlsm_image_cache/_xlsm_manifest.json`, outside the ZIP)
 6. Repack ZIP preserving file order and compression
 
 **Critical ZIP details:**
@@ -224,6 +225,7 @@ Replicates `../client/scripts/xlsm_manager.py` functionality. XLSM files are ZIP
 - Images: `ZIP_STORED`, XML: `ZIP_DEFLATED`
 - Timestamps: `1980-01-01 00:00:00`
 - No zip64
+- Do not add manifest or other auxiliary files to the archive
 
 ### rebuild-images Command
 
@@ -626,3 +628,4 @@ Mark completed milestones at the top of this design document.
 - [x] Milestone 1: Project Setup
 - [x] Milestone 2: Excel Reading with Calamine
 - [x] Milestone 3: build-toml Command
+- [x] Milestone 4: strip-images Command

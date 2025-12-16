@@ -1,8 +1,12 @@
+use std::fs::File;
+use std::io::Write;
 use std::path::Path;
 
 use anyhow::Result;
 use umya_spreadsheet::structs::{Table, TableColumn};
 use umya_spreadsheet::writer::xlsx;
+use zip::write::FileOptions;
+use zip::{CompressionMethod, ZipWriter};
 
 fn make_column(name: &str) -> TableColumn {
     let mut col = TableColumn::default();
@@ -109,4 +113,38 @@ pub fn create_predicate_types_spreadsheet(path: &Path) -> Result<()> {
 
     xlsx::write(&book, path)?;
     Ok(())
+}
+
+pub fn create_xlsm_with_images(path: &Path) -> Result<(Vec<String>, Vec<u8>, Vec<u8>)> {
+    let file = File::create(path)?;
+    let mut writer = ZipWriter::new(file);
+    let time = zip::DateTime::from_date_and_time(1980, 1, 1, 0, 0, 0).expect("valid zip time");
+    let deflated = FileOptions::<()>::default()
+        .compression_method(CompressionMethod::Deflated)
+        .last_modified_time(time);
+    let stored = FileOptions::<()>::default()
+        .compression_method(CompressionMethod::Stored)
+        .last_modified_time(time);
+
+    writer.start_file("[Content_Types].xml", deflated)?;
+    writer.write_all(b"<Types/>")?;
+
+    let img1 = b"first-image-bytes";
+    let img2 = b"second-image-bytes";
+    writer.start_file("xl/media/image1.jpg", stored)?;
+    writer.write_all(img1)?;
+    writer.start_file("xl/media/image2.png", stored)?;
+    writer.write_all(img2)?;
+
+    writer.finish()?;
+
+    Ok((
+        vec![
+            "[Content_Types].xml".to_string(),
+            "xl/media/image1.jpg".to_string(),
+            "xl/media/image2.png".to_string(),
+        ],
+        img1.to_vec(),
+        img2.to_vec(),
+    ))
 }
