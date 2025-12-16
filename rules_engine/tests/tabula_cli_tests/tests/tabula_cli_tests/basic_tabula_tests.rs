@@ -1,4 +1,5 @@
 use tabula_cli::core::excel_reader::{self, ColumnType};
+use tabula_cli::core::excel_writer;
 use tabula_cli_tests::tabula_cli_test_utils;
 use tempfile::TempDir;
 
@@ -70,4 +71,18 @@ fn test_error_on_no_tables() {
     let result = excel_reader::extract_tables(&xlsx_path);
     assert!(result.is_err());
     assert!(result.unwrap_err().to_string().contains("No named Excel Tables"));
+}
+
+#[test]
+fn load_table_layouts_counts_only_data_rows() {
+    let temp_dir = TempDir::new().expect("Failed to create temp dir");
+    let xlsx_path = temp_dir.path().join("trailing.xlsx");
+
+    tabula_cli_test_utils::create_table_with_trailing_blank_row(&xlsx_path)
+        .expect("Failed to create spreadsheet");
+
+    let layouts = excel_writer::load_table_layouts(&xlsx_path).expect("Failed to load layouts");
+    let layout =
+        layouts.iter().find(|l| l.normalized_name == "trailing").expect("Expected trailing layout");
+    assert_eq!(layout.data_rows, 2);
 }

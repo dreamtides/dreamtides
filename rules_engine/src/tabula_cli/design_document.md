@@ -229,7 +229,10 @@ Replicates `../client/scripts/xlsm_manager.py` functionality. XLSM files are ZIP
 
 ### rebuild-images Command
 
-Restores images by evaluating `=IMAGE("http://prefix"&G2&".jpg")` type formulas:
+Restores images, either by:
+
+- Loading them from the image cache in the .git/ directory, or
+- Evaluating `=IMAGE("http://prefix"&G2&".jpg")` type formulas:
 
 1. Read table schema to find IMAGE columns
 2. Parse formula to extract URL pattern (e.g., `"prefix"&H2&".jpg"`)
@@ -284,7 +287,7 @@ tabula validate --strip-images [TOML_DIR]
 Includes image stripping in the validation workflow:
 1. Run `strip-images` on the original XLSM
 2. Perform standard round-trip validation
-3. Run `rebuild-images` if URLs are available
+3. Run `rebuild-images`
 4. Verify the final XLSM is valid
 
 ## Error Handling
@@ -300,6 +303,9 @@ All commands use `anyhow` for error context chains:
 - `Original XLSM not found at {path}. This file is required as a template.`
 - `Table '{name}' not found in original XLSM`
 - `TOML file for table '{name}' not found at {path}`
+- `Unexpected TOML table '{name}' (not present in template)`
+- `Row {n}: column '{col}' does not match any writable column in '{table}'`
+- `Row count mismatch for '{name}': TOML has {toml_rows}, template has {template_rows}`
 - `Row {n}: column '{col}' value cannot be parsed: {err}`
 
 **validate:**
@@ -536,12 +542,12 @@ Following existing project patterns in `tests/tabula_cli_tests/`.
 
 ### Milestone 5: build-xls Command (Basic)
 **Scope:** Write data cells to template
-- Implement `commands/build_xls.rs` using umya-spreadsheet
-- Require original XLSM as template
-- Write data cells only, skip formula columns
-- Atomic write via temp file + rename
-- **Critical:** Verify Excel recalculates formulas correctly
-- Integration tests
+- Implement `commands/build_xls.rs` using umya-spreadsheet with calamine metadata for table layout
+- Require original XLSM as template; default paths match `build-toml`
+- Strict table/column alignment: write data columns only, error on missing/extra tables, skip formula/image columns, no row resizing yet
+- Convert TOML scalars to cell values, reject unsupported types, treat absent cells as empty
+- Support `--dry-run` validation and atomic writes via temp file + rename
+- Integration tests for data writes, preserved formulas, and validation errors
 
 ### Milestone 6: build-xls Row Handling
 **Scope:** Handle row additions/deletions
@@ -565,8 +571,9 @@ Following existing project patterns in `tests/tabula_cli_tests/`.
 - Skip gracefully on non-macOS
 
 ### Milestone 9: rebuild-images Command
-**Scope:** Restore images from URLs
+**Scope:** Restore images from URLs *or* from .git image cache
 - Implement `commands/rebuild_images.rs`
+- Restore image from .git cache when requested via flag
 - Parse IMAGE formula patterns
 - HTTP download via reqwest
 - Replace placeholders in ZIP
@@ -622,6 +629,7 @@ Mark completed milestones at the top of this design document.
 3. Examine `xlsm_manager.py` for behavior reference
 4. Look at `client/Assets/StreamingAssets/Tabula.xlsm.d/` structure
 5. Ask for clarification rather than assuming
+
 # Tabula CLI Design Document
 
 ## Milestone Status
@@ -629,3 +637,40 @@ Mark completed milestones at the top of this design document.
 - [x] Milestone 2: Excel Reading with Calamine
 - [x] Milestone 3: build-toml Command
 - [x] Milestone 4: strip-images Command
+- [x] Milestone 5: build-xls Command (Basic)
+
+## Milestone 5 Plan (build-xls)
+
+### Goals
+- Update the XLSM template using TOML data while leaving formulas/images untouched.
+- Validate inputs before writing; no row insertion/deletion until Milestone 6.
+- Keep writes atomic and preserve workbook structure/macros.
+
+### CLI Behavior
+- `tabula build-xls [TOML_DIR] [XLSM_PATH]` uses the same defaults as `build-toml` when paths are omitted and overwrites the template in place.
+- `--dry-run` runs all validations (table presence, column mapping, row counts, TOML type checks) without writing output; failures return a non-zero exit code.
+- Writes are atomic: save to a temp file in the destination directory, then rename to the final path.
+
+### Template Metadata and TOML Loading
+- Reuse `excel_reader` on the template to capture table layout: table name, sheet name, data start cell (1-based col,row), data row count, and ColumnType classification for each column.
+- Add a writer helper that pairs raw column names with normalized names (via `column_names`) so TOML keys map back to Excel columns; retain column order from the template.
+- Parse TOML directory into a map keyed by normalized table names; accept the array-of-tables format and the single-column array format emitted by `build-toml`.
+- Reject TOML rows containing nested tables/arrays; allow only strings, integers, floats, booleans, or empty/missing cells.
+
+### Validation Rules
+- Every template table must have a corresponding TOML file; extra TOML files are errors.
+- Only data columns are writable; TOML keys that do not match a data column cause an error. Missing data cells are written as empty.
+- Row counts must match the template’s data row count; if TOML has more or fewer rows, return an error (row resizing moves to Milestone 6).
+- Formula and IMAGE columns are never written, even if TOML includes values for them.
+
+### Write Behavior
+- Open the template with umya-spreadsheet once; compute cell coordinates from the calamine metadata and write data column cells row by row.
+- Convert TOML scalars to the closest Excel cell type: bool → bool, integer → i64, float → f64, string → string. Empty/missing becomes an empty string.
+- After all tables are updated, persist via the atomic save path; ensure existing ZIP structure, relationships, and macros remain intact.
+
+### Testing Focus
+- Integration tests that: rewrite a simple table; verify formula columns remain unchanged; confirm `--dry-run` leaves the file untouched; error on row-count mismatches; error on extra/missing tables or unknown columns; reject unsupported TOML types.
+- Add a test workbook with at least one formula column to confirm we skip calculated columns while writing adjacent data.
+
+### Follow-Ups
+- Confirm Excel recalculates formulas when opening the modified file; this will be exercised further during `validate`/AppleScript work.

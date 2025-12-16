@@ -2,7 +2,7 @@ use std::path::PathBuf;
 
 use anyhow::{Result, bail};
 use clap::{Parser, Subcommand};
-use tabula_cli::commands::{build_toml, strip_images};
+use tabula_cli::commands::{build_toml, build_xls, strip_images};
 
 #[derive(Parser)]
 #[command(name = "tabula")]
@@ -27,6 +27,9 @@ enum Commands {
     BuildXls {
         #[arg(long, help = "Perform a dry run without writing changes")]
         dry_run: bool,
+
+        #[arg(long, help = "Path for the XLSM output; defaults to overwriting the input")]
+        output_path: Option<PathBuf>,
 
         #[arg(help = "Directory containing TOML files")]
         toml_dir: Option<PathBuf>,
@@ -80,9 +83,9 @@ fn run() -> Result<()> {
         Commands::BuildToml { xlsm_path, output_dir } => {
             build_toml::build_toml(xlsm_path, output_dir)?;
         }
-        Commands::BuildXls { dry_run, toml_dir, xlsm_path } => bail!(
-            "build-xls not yet implemented: dry_run={dry_run}, toml_dir={toml_dir:?}, xlsm_path={xlsm_path:?}"
-        ),
+        Commands::BuildXls { dry_run, toml_dir, xlsm_path, output_path } => {
+            build_xls::build_xls(dry_run, toml_dir, xlsm_path, output_path)?;
+        }
         Commands::Validate { applescript, strip_images, toml_dir } => bail!(
             "validate not yet implemented: applescript={applescript}, strip_images={strip_images}, toml_dir={toml_dir:?}"
         ),
