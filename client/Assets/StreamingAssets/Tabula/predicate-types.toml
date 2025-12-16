@@ -1,0 +1,5 @@
+predicate_types = [
+    "ThisCard",
+    "ForEachTarget",
+    "ControllerDeck",
+]

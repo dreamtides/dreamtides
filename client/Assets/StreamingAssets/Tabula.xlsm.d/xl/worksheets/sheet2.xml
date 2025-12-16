@@ -3,7 +3,7 @@
 <sheetPr codeName="Sheet1"/>
 <dimension ref="A1:K97"/>
 <sheetViews>
-<sheetView tabSelected="1" workbookViewId="0">
+<sheetView workbookViewId="0">
 <selection activeCell="E3" sqref="E3"/>
 </sheetView>
 </sheetViews>

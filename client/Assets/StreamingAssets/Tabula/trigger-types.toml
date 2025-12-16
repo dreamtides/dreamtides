@@ -1,0 +1,6 @@
+trigger_types = [
+    "ApplyTargetedEffect",
+    "DrawCards",
+    "ActivatedAbility",
+    "SelectedTargetsForCard",
+]

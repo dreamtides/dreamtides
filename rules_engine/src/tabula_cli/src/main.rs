@@ -1,6 +1,8 @@
 use std::path::PathBuf;
 
+use anyhow::{Result, bail};
 use clap::{Parser, Subcommand};
+use tabula_cli::commands::build_toml;
 
 #[derive(Parser)]
 #[command(name = "tabula")]
@@ -61,34 +63,34 @@ enum Commands {
     GitSetup,
 }
 
-#[expect(clippy::print_stdout)]
 fn main() {
+    if let Err(err) = run() {
+        eprintln!("{err:#}");
+        std::process::exit(1);
+    }
+}
+
+fn run() -> Result<()> {
     let cli = Cli::parse();
 
     match cli.command {
         Commands::BuildToml { xlsm_path, output_dir } => {
-            println!(
-                "build-toml: xlsm_path={xlsm_path:?}, output_dir={output_dir:?} (not yet implemented)"
-            );
+            build_toml::build_toml(xlsm_path, output_dir)?;
         }
-        Commands::BuildXls { dry_run, toml_dir, xlsm_path } => {
-            println!(
-                "build-xls: dry_run={dry_run}, toml_dir={toml_dir:?}, xlsm_path={xlsm_path:?} (not yet implemented)"
-            );
-        }
-        Commands::Validate { applescript, strip_images, toml_dir } => {
-            println!(
-                "validate: applescript={applescript}, strip_images={strip_images}, toml_dir={toml_dir:?} (not yet implemented)"
-            );
-        }
+        Commands::BuildXls { dry_run, toml_dir, xlsm_path } => bail!(
+            "build-xls not yet implemented: dry_run={dry_run}, toml_dir={toml_dir:?}, xlsm_path={xlsm_path:?}"
+        ),
+        Commands::Validate { applescript, strip_images, toml_dir } => bail!(
+            "validate not yet implemented: applescript={applescript}, strip_images={strip_images}, toml_dir={toml_dir:?}"
+        ),
         Commands::StripImages { xlsm_path } => {
-            println!("strip-images: xlsm_path={xlsm_path:?} (not yet implemented)");
+            bail!("strip-images not yet implemented: xlsm_path={xlsm_path:?}")
         }
         Commands::RebuildImages { xlsm_path } => {
-            println!("rebuild-images: xlsm_path={xlsm_path:?} (not yet implemented)");
+            bail!("rebuild-images not yet implemented: xlsm_path={xlsm_path:?}")
         }
-        Commands::GitSetup => {
-            println!("git-setup (not yet implemented)");
-        }
+        Commands::GitSetup => bail!("git-setup not yet implemented"),
     }
+
+    Ok(())
 }

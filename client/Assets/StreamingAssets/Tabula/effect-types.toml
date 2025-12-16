@@ -1,0 +1,7 @@
+effect_types = [
+    "FireProjectile",
+    "DissolveTargets",
+    "ReverseDissolveTargets",
+    "DisplayEffect",
+    "SetCardTrail",
+]

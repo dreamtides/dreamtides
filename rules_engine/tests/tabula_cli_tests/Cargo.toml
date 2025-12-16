@@ -16,4 +16,5 @@ tabula_cli = { path = "../../src/tabula_cli" }
 
 anyhow = { workspace = true }
 tempfile = { workspace = true }
+toml = { workspace = true }
 umya-spreadsheet = { workspace = true }

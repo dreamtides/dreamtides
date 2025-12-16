@@ -1,132 +1,63 @@
 # Tabula CLI Observations
 
-Working context for agents implementing Milestones 3+.
+Working context for agents implementing Milestones 4+.
 
 ## Project Structure
 
 ```
 src/tabula_cli/
-├── Cargo.toml                    # Dependencies configured
+├── Cargo.toml
 ├── src/
-│   ├── main.rs                   # CLI entry point with clap subcommands
-│   ├── lib.rs                    # Module declarations + re-exports
+│   ├── main.rs                   # CLI dispatch; only build-toml implemented
+│   ├── lib.rs
 │   ├── core/
-│   │   ├── mod.rs
-│   │   ├── column_names.rs       # Empty stub
-│   │   ├── excel_reader.rs       # ✓ Implemented - table extraction
+│   │   ├── column_names.rs       # kebab-case normalization for table/column names
+│   │   ├── excel_reader.rs       # Table extraction and column classification
 │   │   ├── excel_writer.rs       # Empty stub
-│   │   ├── paths.rs              # Empty stub
-│   │   └── toml_data.rs          # Empty stub
+│   │   ├── paths.rs              # Git root discovery and default paths
+│   │   └── toml_data.rs          # TableInfo to TOML serialization
 │   └── commands/
-│       ├── mod.rs
-│       ├── build_toml.rs         # Empty stub
+│       ├── build_toml.rs         # Implements build-toml conversion + backups
 │       ├── build_xls.rs          # Empty stub
 │       ├── git_setup.rs          # Empty stub
 │       ├── rebuild_images.rs     # Empty stub
 │       ├── strip_images.rs       # Empty stub
 │       └── validate.rs           # Empty stub
+└── tests/tabula_cli_tests/
+    ├── Cargo.toml
+    ├── src/lib.rs
+    ├── src/tabula_cli_test_utils.rs
+    └── tests/
+        ├── lib.rs
+        └── tabula_cli_tests/
+            ├── basic_tabula_tests.rs
+            └── build_toml_tests.rs
 ```
 
 ## Dependencies Available
 
-From workspace Cargo.toml:
-- **calamine** v0.32 - Reading Excel files
-- **umya-spreadsheet** v2 - Writing/modifying Excel files
-- **toml** v0.8 - TOML serialization
-- **reqwest** v0.12 (blocking feature) - HTTP client
-- **tempfile** v3 - Temporary files
-- **sha2** v0.10 - Hash computation
-- **zip** v4 - XLSM ZIP manipulation
-- **chrono** v0.4 - Date/time
-- **convert_case** v0.8 - Column name normalization
+Workspace dependencies include calamine, umya-spreadsheet, toml, serde, convert_case, tempfile, sha2, zip, reqwest (blocking), chrono, clap, anyhow.
 
 ## Important Implementation Notes
 
-### Rust Edition 2024
-This project uses `edition = "2024"`. Note that:
-- `use` statements in 2024 edition require explicit imports
-- Some clippy lints behave differently (e.g., `#[expect(...)]` instead of `#[allow(...)`)
+- CLI dispatch now returns errors for unimplemented commands; only build-toml executes real work.
+- Paths: `paths::git_root` and `git_root_for` search upward for a `.git` directory; defaults derive spreadsheet path (`client/Assets/StreamingAssets/Tabula.xlsm`) and TOML directory (`client/Assets/StreamingAssets/Tabula`). Backups live under `git_root/.git/excel-backups`.
+- Column naming: `normalize_column_name` and `normalize_table_name` convert to kebab-case via convert_case and strip special characters (collapse punctuation to single hyphens, drop trailing hyphens). Single-column tables where the column matches the table name are emitted as a flat array keyed by the table name with hyphens replaced by underscores (e.g., `predicate_types = ["ThisCard", ...]`). Backups are pruned to keep only the 50 most recent files by name.
+- Excel reader: `extract_tables` still requires `workbook.load_tables()`. `classify_column` inspects worksheet formulas using relative coordinates from `worksheet_formula` plus a fallback for strings starting with `=`; IMAGE formulas detected case-insensitively. Non-data columns are skipped when building rows. Floats with no fractional component are stored as `CellValue::Int`.
+- TOML serialization: `toml_data::table_to_toml` builds an array-of-tables keyed by the normalized table name. Empty cells are omitted. Floats serialize as integers when possible. Column order in TOML follows the source Excel table’s data column order (non-data columns are skipped), enabled by the `toml` crate’s `preserve_order` feature.
+- build-toml command: resolves paths from CLI args or defaults, creates the backup directory if needed, writes timestamped backups named `{timestamp}-{original_name}` into `.git/excel-backups`, then emits `{normalized_table}.toml` files into the output directory (auto-created). Errors when writing TOML are surfaced as `Cannot write to output directory {path}: ...`.
 
-### CLI Structure
-The CLI uses clap derive macros with kebab-case subcommands:
-- `build-toml` → `Commands::BuildToml`
-- `build-xls` → `Commands::BuildXls`
-- `strip-images` → `Commands::StripImages`
-- `rebuild-images` → `Commands::RebuildImages`
-- `git-setup` → `Commands::GitSetup`
+## Tests
 
-Each command currently prints a placeholder message. Actual implementation should:
-1. Add logic to the corresponding `commands/*.rs` file
-2. Call that function from the match arm in `main.rs`
+- `basic_tabula_tests.rs` covers table discovery, column classification (including empty column), cell value extraction, and the error on missing named tables.
+- `build_toml_tests.rs` verifies TOML output skips formula/empty columns, preserves data values, preserves column order, and that backups are written to `.git/excel-backups`. Tests create a `.git` directory in a temp location so git-root discovery succeeds.
+- Helpers in `src/tabula_cli_test_utils.rs` build synthetic spreadsheets with a named table plus formula columns.
 
-### Test Crate
-The test crate `tests/tabula_cli_tests/` has:
-- `src/tabula_cli_test_utils.rs` - Helper to create synthetic XLSX files with tables
-- `tests/tabula_cli_tests/basic_tabula_tests.rs` - 4 passing tests for excel_reader
+## Verification Commands
 
-### Verification Commands
-```bash
-cargo check -p tabula_cli
-cargo clippy -p tabula_cli
-cargo run -p tabula_cli -- --help
-cargo test -p tabula_cli_tests
-```
+Preferred workflow remains: `just fmt`, `just check`, `just clippy`, `cargo test -p tabula_cli_tests`, `just review`.
 
-## Milestone 2 Completion Notes
+## Next Steps Toward Milestone 4
 
-### Excel Reader (`core/excel_reader.rs`)
-
-Implemented types and functions:
-- `ColumnType` enum: `Data`, `Formula`, `Image`, `Empty`
-- `CellValue` enum: `Empty`, `String`, `Float`, `Int`, `Bool`
-- `ColumnInfo` struct: column name + type
-- `TableInfo` struct: name, columns, rows
-- `extract_tables(path) -> Result<Vec<TableInfo>>` - main extraction function
-
-### Critical Calamine API Details
-
-**MUST call `load_tables()` before accessing table data:**
-```rust
-let mut workbook: Xlsx<_> = open_workbook(path)?;
-workbook.load_tables()?;  // Required!
-let table_names = workbook.table_names();
-```
-
-**Table data coordinate system:**
-- `table.data().start()` returns (row, col) in 0-indexed worksheet coordinates
-- The data range includes only data rows, not the header
-- `table.columns()` returns column headers from the table definition
-
-**Formula detection limitations:**
-- `workbook.worksheet_formula()` returns formulas in a separate Range
-- Formulas must be looked up by absolute worksheet coordinates (row, col)
-- Not all formula formats are readable (umya-spreadsheet set_formula() may not produce compatible output)
-- For real Excel files, formula detection should work correctly
-
-### umya-spreadsheet Table Creation
-
-When creating tables for testing:
-```rust
-let mut table = Table::default();
-table.set_name("TableName");
-table.set_display_name("TableName");
-table.set_area(("A1", "E3"));  // Tuple format, not "A1:E3"
-
-// Must explicitly add columns:
-let mut col = TableColumn::default();
-col.set_name("ColumnName".to_string());  // Requires String, not &str
-table.add_column(col);
-```
-
-## Next Steps for Milestone 3
-
-Milestone 3 focuses on the `build-toml` command:
-1. Implement `commands/build_toml.rs`
-2. Use `excel_reader::extract_tables()` to get table data
-3. Implement column name normalization (spaces → hyphens) in `core/column_names.rs`
-4. Serialize to TOML format using dynamic keys
-5. Create backup in `.git/excel-backups/` before modifying
-6. Integration tests
-
-Key types to reuse from lib.rs exports:
-- `extract_tables`, `TableInfo`, `ColumnInfo`, `CellValue`, `ColumnType`
+- Implement `commands/build_xls.rs` using umya-spreadsheet, reusing column normalization and classification from the template XLSM.
+- Extend tests for TOML to XLSM writing and ensure formula columns remain untouched.

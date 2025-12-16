@@ -1,0 +1,114 @@
+[[cards]]
+name = "Immolate"
+id = "d8fe4b2a-088c-4a92-aeb7-d6d4d22fda1a"
+energy-cost = 2
+rules-text = "{Dissolve} an enemy character."
+prompts = "Choose an enemy character to {dissolve}."
+card-type = "Event"
+is-fast = true
+image-number = "1907487244"
+
+[[cards]]
+name = "Abolish"
+id = "d07ac4fa-cc3b-4bb8-8018-de7dc1760f35"
+energy-cost = 2
+rules-text = "{Prevent} a played enemy card."
+prompts = "Choose an enemy card to {prevent}."
+card-type = "Event"
+is-fast = true
+image-number = "1282908322"
+
+[[cards]]
+name = "Ripple of Defiance"
+id = "d4207a7b-fc36-45e4-a1ee-f01b34485221"
+energy-cost = "1"
+rules-text = "{Prevent} a played enemy event unless the enemy pays {-energy-cost(e:2)}."
+prompts = "Choose an enemy event to {prevent}."
+card-type = "Event"
+is-fast = true
+image-number = "2123360837"
+
+[[cards]]
+name = "Dreamscatter"
+id = "15a39336-2c71-44d6-b462-d9fd23a4d925"
+energy-cost = "2"
+rules-text = "Pay one or more {e}: Draw {-drawn-cards(n:1)} for each {e} spent."
+prompts = "Pay one or more {e}."
+card-type = "Event"
+is-fast = true
+image-number = "489056605"
+
+[[cards]]
+name = "Sundown Surfer"
+id = "3380cf41-2bca-468c-95e0-57abafd29430"
+energy-cost = "2"
+rules-text = "Whenever you play a card during the enemy's turn, this character gains {-gained-spark(n:1)}."
+card-type = "Character"
+is-fast = true
+spark = "1"
+image-number = "403770319"
+
+[[cards]]
+name = "Minstrel of Falling Light"
+id = "86c79455-f9ba-46e4-80a6-e018f330942b"
+energy-cost = "2"
+rules-text = "{fma} {-energy-cost(e:3)}: Draw {-drawn-cards(n:1)}."
+card-type = "Character"
+is-fast = false
+spark = "2"
+image-number = "1794244540"
+
+[[cards]]
+name = "Archive of the Forgotten"
+id = "07f737af-dbaf-471a-8edc-e1d987c23903"
+energy-cost = "4"
+rules-text = "Return one or two events from your void to your hand."
+prompts = "Choose one or two events in your void to return."
+card-type = "Event"
+is-fast = false
+image-number = "644603677"
+
+[[cards]]
+name = "Break the Sequence"
+id = "33c0db9c-666d-4b4c-a596-b74106025be8"
+energy-cost = "*"
+rules-text = """
+{choose-one}
+{bullet} {-energy-cost(e:2)}: Return an enemy character to hand.
+{bullet} {-energy-cost(e:3)}: Draw {-drawn-cards(n:2)}."""
+prompts = "Choose an enemy character to return to hand."
+card-type = "Event"
+is-fast = true
+image-number = "1200949264"
+
+[[cards]]
+name = "Together Against the Tide"
+id = "9866955c-31af-4aad-8319-a52d2fd85d0f"
+energy-cost = "1"
+rules-text = "Give an allied character {anchored} until end of turn."
+prompts = "Choose an allied character to gain {anchored}."
+card-type = "Event"
+is-fast = true
+image-number = "1621160806"
+
+[[cards]]
+name = "Guiding Light"
+id = "5e70988b-ce14-45a0-8334-7cf4539ee2d8"
+energy-cost = "1"
+rules-text = """
+{-Foresee(n:1)}. Draw {-drawn-cards(n:1)}.
+
+{-Reclaim-Cost(e:3)}"""
+card-type = "Event"
+is-fast = true
+image-number = "1328168243"
+
+[[cards]]
+name = "Cragfall"
+id = "1d41a21a-1beb-4e56-8d7f-be29c4a9d43d"
+energy-cost = "2"
+rules-text = "{Prevent} a played enemy character."
+prompts = "Choose an enemy character to {prevent}."
+card-type = "Event"
+is-fast = true
+image-number = "1239919309"

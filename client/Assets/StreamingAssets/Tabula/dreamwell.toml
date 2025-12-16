@@ -1,0 +1,56 @@
+[[dreamwell]]
+name = "Dawning Horizon"
+id = "bc143c3c-f149-4506-813f-1aa8dd54e370"
+energy-produced = "2"
+rules-text = " "
+phase = "0"
+image-number = "1963305268"
+
+[[dreamwell]]
+name = "Sunrise Cavern"
+id = "1dda2551-c972-4db2-81c0-9dc95ac8b27c"
+energy-produced = "2"
+rules-text = " "
+phase = "0"
+image-number = "565499323"
+
+[[dreamwell]]
+name = "Skypath"
+id = "dcd99f3d-8c47-47fa-9b9a-4c1455a9d2eb"
+energy-produced = "1"
+rules-text = "{-Foresee(n:1)}."
+phase = "1"
+image-number = "1897537165"
+
+[[dreamwell]]
+name = "Autumn Glade"
+id = "276c1e23-53d8-4aeb-a4dd-243189a44561"
+energy-produced = "1"
+rules-text = "Gain {-gained-points(n: 1)}."
+phase = "1"
+image-number = "1789989917"
+
+[[dreamwell]]
+name = "Twilight Radiance"
+id = "63d5d9f5-208f-4e35-9681-d51a5ba6ce57"
+energy-produced = "1"
+rules-text = "Gain {-gained-energy(e: 1)}."
+phase = "1"
+image-number = "1786390154"
+
+[[dreamwell]]
+name = "Astral Interface"
+id = "8e5b3423-b8e1-4e1c-9e3e-5281190c4713"
+energy-produced = "1"
+rules-text = "Draw {-drawn-cards(n: 1)}. Discard {-discarded-cards(n: 1)}."
+prompts = "Select a card to discard."
+phase = "1"
+image-number = "1011222385"
+
+[[dreamwell]]
+name = "Auroral Passage"
+id = "e2c10a87-e92f-4170-9bbf-c288abcf9f9b"
+energy-produced = "1"
+rules-text = "Put the top {-count(n: 3)} cards of your deck into your void."
+phase = "1"
+image-number = "2421338077"

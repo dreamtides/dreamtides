@@ -27,6 +27,6 @@ reqwest = { workspace = true }
 serde = { workspace = true }
 sha2 = { workspace = true }
 tempfile = { workspace = true }
-toml = { workspace = true }
+toml = { features = ["preserve_order"], workspace = true }
 umya-spreadsheet = { workspace = true }
 zip = { workspace = true }

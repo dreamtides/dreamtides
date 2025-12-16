@@ -2,7 +2,7 @@ use std::collections::BTreeMap;
 use std::path::Path;
 
 use anyhow::{Context, Result, bail};
-use calamine::{Data, Range, Reader, Xlsx, open_workbook};
+use calamine::{self, Data, Range, Reader, Xlsx};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum ColumnType {
@@ -35,7 +35,7 @@ pub struct TableInfo {
 }
 
 pub fn extract_tables(path: &Path) -> Result<Vec<TableInfo>> {
-    let mut workbook: Xlsx<_> = open_workbook(path)
+    let mut workbook: Xlsx<_> = calamine::open_workbook(path)
         .with_context(|| format!("Cannot open spreadsheet at {}", path.display()))?;
 
     workbook
@@ -109,16 +109,45 @@ fn classify_column(
     let mut is_image = false;
 
     if let Some(formula_range) = formulas {
+        let (formula_start_row, formula_start_col) = formula_range.start().unwrap_or((0, 0));
         for row_idx in 0..data.height() {
-            let abs_row = start_row as usize + row_idx + 1;
+            let abs_row = start_row as usize + row_idx;
             let abs_col_usize = abs_col as usize;
-            if let Some(formula) = formula_range.get((abs_row, abs_col_usize)) {
-                if !formula.is_empty() {
-                    has_formula = true;
-                    if formula.to_uppercase().contains("IMAGE(") {
-                        is_image = true;
+            let rel_row = abs_row as i64 - formula_start_row as i64;
+            let rel_col = abs_col_usize as i64 - formula_start_col as i64;
+            if rel_row < 0 || rel_col < 0 {
+                continue;
+            }
+            if let Some(formula) = formula_range.get((rel_row as usize, rel_col as usize)) {
+                if formula.is_empty() {
+                    continue;
+                }
+                has_formula = true;
+                if formula.to_uppercase().contains("IMAGE(") {
+                    is_image = true;
+                }
+                break;
+            }
+        }
+    }
+
+    for row in data.rows() {
+        if let Some(cell) = row.get(rel_col) {
+            match cell {
+                Data::Empty => {}
+                Data::String(s) => {
+                    let trimmed = s.trim_start();
+                    if trimmed.starts_with('=') {
+                        has_formula = true;
+                        if trimmed.to_uppercase().contains("IMAGE(") {
+                            is_image = true;
+                        }
+                        break;
                     }
-                    break;
+                    has_data = true;
+                }
+                _ => {
+                    has_data = true;
                 }
             }
         }
@@ -132,15 +161,6 @@ fn classify_column(
         return ColumnType::Formula;
     }
 
-    for row in data.rows() {
-        if let Some(cell) = row.get(rel_col) {
-            if !matches!(cell, Data::Empty) {
-                has_data = true;
-                break;
-            }
-        }
-    }
-
     if has_data { ColumnType::Data } else { ColumnType::Empty }
 }
 
@@ -148,7 +168,13 @@ fn convert_cell(cell: &Data) -> CellValue {
     match cell {
         Data::Empty => CellValue::Empty,
         Data::String(s) => CellValue::String(s.clone()),
-        Data::Float(f) => CellValue::Float(*f),
+        Data::Float(f) => {
+            if f.fract() == 0.0 {
+                CellValue::Int(*f as i64)
+            } else {
+                CellValue::Float(*f)
+            }
+        }
         Data::Int(i) => CellValue::Int(*i),
         Data::Bool(b) => CellValue::Bool(*b),
         Data::DateTime(dt) => CellValue::Float(dt.as_f64()),

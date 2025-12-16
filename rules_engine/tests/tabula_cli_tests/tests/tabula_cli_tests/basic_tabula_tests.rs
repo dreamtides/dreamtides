@@ -1,4 +1,4 @@
-use tabula_cli::core::excel_reader::{ColumnType, extract_tables};
+use tabula_cli::core::excel_reader::{self, ColumnType};
 use tabula_cli_tests::tabula_cli_test_utils;
 use tempfile::TempDir;
 
@@ -10,7 +10,7 @@ fn test_extract_tables_finds_named_table() {
     tabula_cli_test_utils::create_test_spreadsheet_with_table(&xlsx_path)
         .expect("Failed to create test spreadsheet");
 
-    let tables = extract_tables(&xlsx_path).expect("Failed to extract tables");
+    let tables = excel_reader::extract_tables(&xlsx_path).expect("Failed to extract tables");
 
     assert_eq!(tables.len(), 1, "Expected 1 table");
     assert_eq!(tables[0].name, "TestTable");
@@ -26,7 +26,7 @@ fn test_column_classification_data_and_empty() {
     tabula_cli_test_utils::create_test_spreadsheet_with_table(&xlsx_path)
         .expect("Failed to create test spreadsheet");
 
-    let tables = extract_tables(&xlsx_path).expect("Failed to extract tables");
+    let tables = excel_reader::extract_tables(&xlsx_path).expect("Failed to extract tables");
     let table = &tables[0];
 
     let name_col = table.columns.iter().find(|c| c.name == "Name").expect("Name column");
@@ -48,7 +48,7 @@ fn test_cell_value_extraction() {
     tabula_cli_test_utils::create_test_spreadsheet_with_table(&xlsx_path)
         .expect("Failed to create test spreadsheet");
 
-    let tables = extract_tables(&xlsx_path).expect("Failed to extract tables");
+    let tables = excel_reader::extract_tables(&xlsx_path).expect("Failed to extract tables");
     let table = &tables[0];
 
     assert_eq!(table.rows.len(), 2, "Expected 2 data rows");
@@ -67,7 +67,7 @@ fn test_error_on_no_tables() {
     tabula_cli_test_utils::create_simple_spreadsheet(&xlsx_path)
         .expect("Failed to create spreadsheet");
 
-    let result = extract_tables(&xlsx_path);
+    let result = excel_reader::extract_tables(&xlsx_path);
     assert!(result.is_err());
     assert!(result.unwrap_err().to_string().contains("No named Excel Tables"));
 }

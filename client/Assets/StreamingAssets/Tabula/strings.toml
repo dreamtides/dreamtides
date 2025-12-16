@@ -1,0 +1,629 @@
+[[strings]]
+id = "dbb75f1b-8c25-4c27-a598-7b300f5b5ca4"
+name = "e"
+description = "Energy icon"
+en-us = '''
+{$context ->
+  [card-text] <color=#00838F>{"\ufa1f"}</color>
+  *[interface] {"\ufa1f"}
+}'''
+
+[[strings]]
+id = "7b21533d-7f49-451c-bfa1-949ab28ed258"
+name = "f"
+description = "Fast icon"
+en-us = '{"\uf852"}'
+
+[[strings]]
+id = "adc9a41d-fd82-49b5-a099-a9f10a73afad"
+name = "a"
+description = "Activated icon"
+en-us = '{"\uf90d"}'
+
+[[strings]]
+id = "121fc3af-6abd-4a90-9197-43c6e18eeca2"
+name = "ma"
+description = "Multi-activated icon"
+en-us = '{"\uf916"}'
+
+[[strings]]
+id = "e0eb0864-3150-4ac5-a903-258ada0f906a"
+name = "fa"
+description = "Fast + Activated icon"
+en-us = '{f}<space=\"-0.25px\">{a}'
+
+[[strings]]
+id = "1921caf1-b581-4feb-b956-b27a553cbc43"
+name = "fma"
+description = "Fast + Multi-Activated icon"
+en-us = '{f}<space=\"-0.25px\">{ma}'
+
+[[strings]]
+id = "81fb9fe5-eff0-46ce-a10a-7aa4a45b0992"
+name = "p"
+description = "Points icon"
+en-us = '{"\ufb43"}'
+
+[[strings]]
+id = "eeb2bbe9-1952-43fa-9ae6-12512d005829"
+name = "bug-icon"
+description = "Dev menu icon"
+en-us = '{"\uf88d"}'
+
+[[strings]]
+id = "d439176c-7a40-410b-808d-cc2be53116d7"
+name = "undo-icon"
+description = "Undo button icon"
+en-us = '{"\ufd88"}'
+
+[[strings]]
+id = "ad291414-914c-4039-8f8f-8902b752bf74"
+name = "eye-icon"
+description = "Eye icon"
+en-us = '{"\uf9f9"}'
+
+[[strings]]
+id = "2ca2c1dd-20f7-410b-9f5d-ce313a2d9175"
+name = "eye-slash-icon"
+description = "Eye icon with slash through it"
+en-us = '{"\uf9f8"}'
+
+[[strings]]
+id = "fd603588-7ab8-48c8-93b0-2bf6afc59325"
+name = "asterisk-icon"
+description = '"Star" icon used to represent non-numeric costs'
+en-us = '{"\uf810"}'
+
+[[strings]]
+id = "cb899350-def7-4466-a1e2-2a59e105d9fb"
+name = "keyword"
+description = "Formatting that appears before keywords"
+en-us = "<color=#AA00FF><b>"
+
+[[strings]]
+id = "bf435908-6161-4a6e-9407-81e0ccde2c4e"
+name = "end-keyword"
+description = "Formatting that appears after keywords"
+en-us = "</b></color>"
+
+[[strings]]
+id = "cc5c5509-69c5-4c1f-8faa-b9948029dcb8"
+name = "-energy-cost"
+description = "Formatting for an amount of energy paid as a cost"
+en-us = "<color=#00838F><b>{$e}{e}</b></color>"
+
+[[strings]]
+id = "50ef5a4a-86f6-4640-88f9-a249cc4cd5cf"
+name = "-gained-energy"
+description = "Formatting for an amount of energy gained as an effect"
+en-us = "<color=#00838F><b>{$e}{e}</b></color>"
+
+[[strings]]
+id = "44535fb6-0190-4197-8bce-3acf063d4318"
+name = "-drawn-cards"
+description = "Formatting for a number of cards drawn"
+en-us = """
+{$n ->
+  [one] a card
+  *[other] {$n} cards
+}"""
+
+[[strings]]
+id = "0d6c79d7-af53-4477-977c-a248fb4fa0ba"
+name = "-discarded-cards"
+description = "Formatting for a number of cards discarded"
+en-us = """
+{$n ->
+  [one] a card
+  *[other] {$n} cards
+}"""
+
+[[strings]]
+id = "c49b155f-57a2-479a-bc45-254b2144d04b"
+name = "-gained-spark"
+description = "Formatting for gaining an amount of spark"
+en-us = "+{$n} spark"
+
+[[strings]]
+id = "707467ad-9e99-4953-8e4d-cf5f47e31768"
+name = "-count"
+description = "Formatting for an arbitrary numerical value"
+en-us = "{$n}"
+
+[[strings]]
+id = "3057478f-1445-4b7d-8241-a90d97da7adf"
+name = "choose-one"
+description = "Formatting to select a single mode of a modal card"
+en-us = "Choose one:"
+
+[[strings]]
+id = "abfc5cdc-e118-4e43-87a1-3493cc80df75"
+name = "bullet"
+description = "Inserts a bullet character"
+en-us = "•"
+
+[[strings]]
+id = "2e44ee4c-3218-45bf-a29e-0508f853c873"
+name = "-foresee"
+description = "Foresee keyword ability with quantity"
+en-us = "{keyword}foresee{end-keyword} {$n}"
+
+[[strings]]
+id = "b68a7c1c-5b2b-4885-863b-4ebf81279330"
+name = "-Foresee"
+description = "Foresee keyword ability with quantity, capitalized"
+en-us = "{keyword}Foresee{end-keyword} {$n}"
+
+[[strings]]
+id = "f19214ee-632b-4f0b-b3e4-d63e67b7ac03"
+name = "reclaim"
+description = "Reclaim keyword ability without energy cost"
+en-us = "{keyword}reclaim{end-keyword}"
+
+[[strings]]
+id = "6640dfed-a5d6-4b68-88db-3b62a4400132"
+name = "Reclaim"
+description = "Reclaim keyword ability without energy cost, capitalized"
+en-us = "{keyword}Reclaim{end-keyword}"
+
+[[strings]]
+id = "fb895ce7-1f66-426d-8c29-b19fdeee7828"
+name = "-reclaim-cost"
+description = "Reclaim keyword ability with energy cost"
+en-us = "{keyword}reclaim{end-keyword} <color=#00838F><b>{$e}{e}</b></color>"
+
+[[strings]]
+id = "5674a8dd-b4eb-4630-85c2-79d6b95cdaae"
+name = "-Reclaim-Cost"
+description = "Reclaim keyword ability with energy cost, capitalized"
+en-us = "{keyword}Reclaim{end-keyword} <color=#00838F><b>{$e}{e}</b></color>"
+
+[[strings]]
+id = "bf189fe0-75e2-4a87-9dca-67dd5f755766"
+name = "-kindle"
+description = "Kindle keyword ability with quantity"
+en-us = "{keyword}kindle{end-keyword} {$s}"
+
+[[strings]]
+id = "d1c8ff05-9dd8-4ed6-9436-746a9caf5a63"
+name = "-Kindle"
+description = "Kindle keyword ability with quantity, capitalized"
+en-us = "{keyword}Kindle{end-keyword} {$s}"
+
+[[strings]]
+id = "70374512-2121-4569-a028-e871209fad38"
+name = "-gained-points"
+description = "Formatting for gaining an amount of points"
+en-us = "{$n}{p}"
+
+[[strings]]
+id = "5771085d-3c89-423f-be05-c728035e7cd0"
+name = "dissolve"
+description = "Dissolve keyword ability"
+en-us = "{keyword}dissolve{end-keyword}"
+
+[[strings]]
+id = "8b9ef6b9-a6e1-4abe-be4d-cf7fa3ce41b8"
+name = "Dissolve"
+description = "Dissolve keyword ability, capitalized"
+en-us = "{keyword}Dissolve{end-keyword}"
+
+[[strings]]
+id = "1a9e01e9-e7aa-4692-9b1b-5dd9e0b4a7f9"
+name = "prevent"
+description = "Prevent keyword ability"
+en-us = "{keyword}prevent{end-keyword}"
+
+[[strings]]
+id = "fb38409b-cbaf-41a5-96fc-af622ce6f333"
+name = "Prevent"
+description = "Prevent keyword ability, capitalized"
+en-us = "{keyword}Prevent{end-keyword}"
+
+[[strings]]
+id = "901b84a1-c886-447b-bd0d-005e240a23de"
+name = "anchored"
+description = "Anchored keyword ability"
+en-us = "{keyword}anchored{end-keyword}"
+
+[[strings]]
+id = "1bb69fb4-344a-48f2-a7a2-95a30ac4a2f2"
+name = "Anchored"
+description = "Anchored keyword ability, capitalized"
+en-us = "{keyword}Anchored{end-keyword}"
+
+[[strings]]
+id = "66edfc8f-483b-4ad0-b37b-c66aa7c4347b"
+name = "prompt-choose-character"
+description = "Prompt message to target a character"
+en-us = "Choose a character"
+
+[[strings]]
+id = "3f16a9f0-c905-4040-b4e3-58eafa3144f2"
+name = "prompt-select-stack-card"
+description = "Prompt message to pick a card on the stack"
+en-us = "Select a card"
+
+[[strings]]
+id = "95c481aa-46e6-4e03-ab9f-ae162207cd39"
+name = "prompt-select-from-void"
+description = "Prompt message to pick a card from your void"
+en-us = "Select from your void"
+
+[[strings]]
+id = "68ddc76a-67ee-4d95-a0a1-ff688752b5f8"
+name = "prompt-select-from-hand"
+description = "Prompt message to pick a card from your hand"
+en-us = "Select from your hand"
+
+[[strings]]
+id = "02b21277-492f-4a76-9d9e-b71ea88e72ad"
+name = "prompt-select-option"
+description = "Prompt message to pick a choice among several options"
+en-us = "Select an option"
+
+[[strings]]
+id = "165d5300-2f77-4c23-9b36-217902fab895"
+name = "prompt-choose-energy-amount"
+description = "Prompt message to pick an amount of energy"
+en-us = "Choose energy amount"
+
+[[strings]]
+id = "4b770aa5-47e8-4dab-b879-c2d3aaa40ba2"
+name = "prompt-select-card-order"
+description = "Prompt message to pick card ordering within the deck"
+en-us = "Select card position"
+
+[[strings]]
+id = "df13df4b-c876-48ec-aa81-5e25b0c6c9cb"
+name = "prompt-pick-mode"
+description = "Prompt message to pick a mode of a modal card to play"
+en-us = "Choose a mode"
+
+[[strings]]
+id = "e0dd5336-cb19-49f5-ad50-aa3a61823405"
+name = "dev-menu-button"
+description = "Dev menu button label"
+en-us = "{bug-icon} Dev"
+
+[[strings]]
+id = "6095730f-d43c-49cd-a5dc-2781882389ed"
+name = "decline-prompt-button"
+description = "Decline to take the action associated with a prompt"
+en-us = "Decline"
+
+[[strings]]
+id = "211e9d51-07ed-4261-88ce-fbfeb3390449"
+name = "pay-energy-prompt-button"
+description = "Choose to pay energy to take a prompt action"
+en-us = "Spend {$energy}{e}"
+
+[[strings]]
+id = "3d41f282-892b-47e6-9e8c-b82ca534ca20"
+name = "pay-energy-addtional-cost-button"
+description = "Button to confirm the amount of energy to pay as an additional cost"
+en-us = "Spend {$energy}{e}"
+
+[[strings]]
+id = "a637975a-fb02-40b1-8dbe-95f278867ef8"
+name = "primary-button-submit-void-card-targets"
+description = "Button to confirm selection of target cards in the void"
+en-us = "Submit"
+
+[[strings]]
+id = "be3fe1f9-17ed-4324-b1d9-f1d5e6ccf2c3"
+name = "primary-button-submit-hand-card-targets"
+description = "Button to confirm selection of target cards in the hand"
+en-us = "Submit"
+
+[[strings]]
+id = "f03ee2d3-e278-40bc-a449-25571d36fa56"
+name = "primary-button-submit-deck-card-order"
+description = "Button to confirm selection of ordering of cards in deck"
+en-us = "Submit"
+
+[[strings]]
+id = "5c8a0769-2507-4082-84c8-5d7fd69855d8"
+name = "primary-button-resolve-stack"
+description = "Button to resolve the top card of the stack"
+en-us = "Resolve"
+
+[[strings]]
+id = "08d4e22b-5eab-4354-9cb5-7ff68c3b5196"
+name = "primary-button-end-turn"
+description = "Button to end your turn"
+en-us = "End Turn"
+
+[[strings]]
+id = "bb1acabc-e74c-44d2-a586-54689f5de23b"
+name = "primary-button-start-next-turn"
+description = "Button to end the opponent's turn and begin your turn"
+en-us = "Next Turn"
+
+[[strings]]
+id = "010f152b-115a-4a52-bae0-3f9961b0990f"
+name = "increment-energy-prompt-button"
+description = "Button to increment the energy amount in a prompt to pick an energy value"
+en-us = "+1{e}"
+
+[[strings]]
+id = "5632f153-07d7-41de-bc85-5864f5578d73"
+name = "decrement-energy-prompt-button"
+description = "Button to decrement the energy amount in a prompt to pick an energy value"
+en-us = "-1{e}"
+
+[[strings]]
+id = "bec6ea4b-55b9-4eb9-8173-9dd4f03eaf05"
+name = "hide-stack-button"
+description = "Button to hide the stack and view the battlefield"
+en-us = "{eye-icon}"
+
+[[strings]]
+id = "e2cbff72-868a-4be2-a13a-37815ce0a5f2"
+name = "show-stack-button"
+description = "Button to show the stack after hiding it"
+en-us = "{eye-slash-icon}"
+
+[[strings]]
+id = "1231c8b5-de17-4cf3-b45d-f42d62143916"
+name = "card-rules-text-energy-paid"
+description = "Addition to card rules text showing how much energy was spent on a card with a variable energy cost"
+en-us = "({$energy}{e} paid)"
+
+[[strings]]
+id = "dd5982c1-cfba-4608-a0ce-abf4257fcd5a"
+name = "card-rules-text-reclaimed"
+description = 'Addition to card rules text showing that a card was played with the "reclaim" ability'
+en-us = "(Reclaimed)"
+
+[[strings]]
+id = "6d3f9774-49a1-4263-b354-177dd069c329"
+name = "card-rules-text-anchored"
+description = 'Addition to card rules text showing that a card has been "anchored"'
+en-us = "(Anchored)"
+
+[[strings]]
+id = "76e30436-5446-4b71-8189-439c843184ad"
+name = "modal-effect-choice-card-name"
+description = "Card name for a card representing a numbered modal effect choice"
+en-us = "Choice {$number}"
+
+[[strings]]
+id = "740ba650-6ee0-4fa2-9f6a-7c163454a191"
+name = "character-ability-card-name"
+description = "Card name for a card representing an ability of a character"
+en-us = "{$character-name} Ability"
+
+[[strings]]
+id = "f144ac6d-bd7a-460c-9990-06812c084191"
+name = "hand-size-limit-exceeded-warning-message"
+description = "Message describing the effects of exceeding the hand size limit"
+en-us = "Note: Cards drawn in excess of 10 become {e} instead."
+
+[[strings]]
+id = "9cffdaea-7a9f-4ca0-80af-6c414cb5c4f0"
+name = "character-limit-exceeded-warning-message"
+description = "Message describing the effects of exceeding the character limit"
+en-us = "Character limit exceeded: A character will be abandoned, with its spark permanently added to your total."
+
+[[strings]]
+id = "59bc7390-ee3f-426c-8874-48d56d62d7ea"
+name = "combined-limit-warning-message"
+description = "Message describing the effects of exceeding both the character limit and the hand size limit"
+en-us = "Character limit exceeded: A character will be abandoned. Cards drawn in excess of 10 become {e} instead."
+
+[[strings]]
+id = "a36c2696-4c39-49d5-9c63-3e5b7149cefb"
+name = "error-message-panel-title"
+description = "Title for a panel displaying an error message"
+en-us = "Error"
+
+[[strings]]
+id = "b7b16e85-8cbf-4433-8ee1-805858a10493"
+name = "card-type-character"
+description = "Card type for character cards"
+en-us = "Character"
+
+[[strings]]
+id = "11b07242-b514-42cb-aed9-a64992ac2e2b"
+name = "card-type-event"
+description = "Card type for event cards"
+en-us = "Event"
+
+[[strings]]
+id = "3876f34a-f8c3-49f3-bec5-5ae740e2978f"
+name = "card-type-dreamsign"
+description = "Card type for dreamsign cards"
+en-us = "Dreamsign"
+
+[[strings]]
+id = "a71f9d3b-ffc9-4edd-9be1-e998bdc5310a"
+name = "card-type-dreamcaller"
+description = "Card type for dreamcaller cards"
+en-us = "Dreamcaller"
+
+[[strings]]
+id = "a2bcbaa7-2167-47fc-9db7-5267a91b17c4"
+name = "card-type-dreamwell"
+description = "Card type for dreamwell cards"
+en-us = "Dreamwell"
+
+[[strings]]
+id = "bee9a795-eb5a-46a1-aac5-692c7a070c64"
+name = "card-subtype-ancient"
+description = "Card subtype, displayed on character cards"
+en-us = "Ancient"
+
+[[strings]]
+id = "602ea4ae-0f44-4704-9cf4-c1ef70248642"
+name = "card-subtype-child"
+description = "Card subtype, displayed on character cards"
+en-us = "Child"
+
+[[strings]]
+id = "94f37651-7ffa-4bb1-97b9-40b5640db8ab"
+name = "card-subtype-detective"
+description = "Card subtype, displayed on character cards"
+en-us = "Detective"
+
+[[strings]]
+id = "9aa89193-4555-4906-9830-8c4584d4e882"
+name = "card-subtype-enigma"
+description = "Card subtype, displayed on character cards"
+en-us = "Enigma"
+
+[[strings]]
+id = "45d5bee1-12b7-4150-983c-4c4ce721d091"
+name = "card-subtype-explorer"
+description = "Card subtype, displayed on character cards"
+en-us = "Explorer"
+
+[[strings]]
+id = "411b42ec-fa60-44a0-8282-35b9f1e6dcd8"
+name = "card-subtype-hacker"
+description = "Card subtype, displayed on character cards"
+en-us = "Hacker"
+
+[[strings]]
+id = "0c84be77-7bac-4820-a5c2-7b648522db47"
+name = "card-subtype--mage"
+description = "Card subtype, displayed on character cards"
+en-us = "Mage"
+
+[[strings]]
+id = "7947e5c2-bf87-4840-90be-4bbff0639b5f"
+name = "card-subtype-monster"
+description = "Card subtype, displayed on character cards"
+en-us = "Monster"
+
+[[strings]]
+id = "bcc76e70-cb45-4667-8e89-7b2dacb81ebc"
+name = "card-subtype-musician"
+description = "Card subtype, displayed on character cards"
+en-us = "Musician"
+
+[[strings]]
+id = "f786771e-b0fa-483a-b773-72fc9e9b56a5"
+name = "card-subtype-outsider"
+description = "Card subtype, displayed on character cards"
+en-us = "Outsider"
+
+[[strings]]
+id = "f8032816-7252-4c33-8ce4-ffd3ba279a2a"
+name = "card-subtype-renegade"
+description = "Card subtype, displayed on character cards"
+en-us = "Renegade"
+
+[[strings]]
+id = "60921d72-fde8-4958-b425-9bdc0964b0a3"
+name = "card-subtype-spirit-animal"
+description = "Card subtype, displayed on character cards"
+en-us = "Spirit Animal"
+
+[[strings]]
+id = "1a6221e0-a5bd-4a48-8629-51a2796ad166"
+name = "card-subtype-super"
+description = "Card subtype, displayed on character cards"
+en-us = "Super"
+
+[[strings]]
+id = "649edeb4-6c1d-48f4-bb39-8e01caba3d2a"
+name = "card-subtype-survivor"
+description = "Card subtype, displayed on character cards"
+en-us = "Survivor"
+
+[[strings]]
+id = "82f771ba-f7d6-4718-9e26-a9ff3dcac12f"
+name = "card-subtype-synth"
+description = "Card subtype, displayed on character cards"
+en-us = "Synth"
+
+[[strings]]
+id = "40e3fefd-b41e-4dfc-a467-0c59766116c8"
+name = "card-subtype-tinkerer"
+description = "Card subtype, displayed on character cards"
+en-us = "Tinkerer"
+
+[[strings]]
+id = "f29c168c-6f67-4682-b948-dddd535fc467"
+name = "card-subtype-trooper"
+description = "Card subtype, displayed on character cards"
+en-us = "Trooper"
+
+[[strings]]
+id = "42abc8f3-b741-4d49-97b1-d96a29563f18"
+name = "card-subtype-visionary"
+description = "Card subtype, displayed on character cards"
+en-us = "Visionary"
+
+[[strings]]
+id = "727a0d85-e67d-49c6-920c-95619b488402"
+name = "card-subtype-visitor"
+description = "Card subtype, displayed on character cards"
+en-us = "Visitor"
+
+[[strings]]
+id = "68338f97-ffd9-4082-8c5a-41091323e8cb"
+name = "card-subtype-warrior"
+description = "Card subtype, displayed on character cards"
+en-us = "Warrior"
+
+[[strings]]
+id = "a4e6687d-4c0e-4de9-b3aa-1e49e09b4668"
+name = "help-text-dissolve"
+description = "Info zoom help text, displayed on a tooltip to describe card abilities"
+en-us = "{Dissolve}: Send a character to the void"
+
+[[strings]]
+id = "c58bd162-3392-444f-868e-488c023e9e91"
+name = "help-text-prevent"
+description = "Info zoom help text, displayed on a tooltip to describe card abilities"
+en-us = "{Prevent}: Send a card to the void in response to it being played"
+
+[[strings]]
+id = "893f14c2-d7d6-4adf-a97a-66847febe6ed"
+name = "help-text-foresee-1"
+description = "Info zoom help text, displayed on a tooltip to describe card abilities"
+en-us = "{keyword}Foresee{end-keyword} 1: Look at the top card of your deck. You may put it into your void."
+
+[[strings]]
+id = "283a1526-f6e7-4885-a000-1b0cd54a75ed"
+name = "help-text-foresee-n"
+description = "Info zoom help text, displayed on a tooltip to describe card abilities"
+en-us = "{keyword}Foresee{end-keyword} {$n}: Look at the top {$n} cards of your deck. You may put them into your void or put them back in any order."
+
+[[strings]]
+id = "85f5f06f-417d-4bb7-bf99-51eef3d4a5ac"
+name = "help-text-anchored"
+description = "Info zoom help text, displayed on a tooltip to describe card abilities"
+en-us = "{Anchored}: Cannot be dissolved."
+
+[[strings]]
+id = "3e724a9f-4eed-4044-85ee-12187f1aef65"
+name = "help-text-reclaim-without-cost"
+description = "Info zoom help text, displayed on a tooltip to describe card abilities"
+en-us = "{Reclaim}: You may play a card from your void, then banish it when it leaves play."
+
+[[strings]]
+id = "7b13a745-c94b-437c-bc2d-73c64b479147"
+name = "help-text-reclaim-with-cost"
+description = "Info zoom help text, displayed on a tooltip to describe card abilities"
+en-us = "{keyword}Reclaim{end-keyword} {$e}{e}: You may play this card from your void for {$e}{e}, then banish it."
+
+[[strings]]
+id = "cf017f6f-7cc5-4b40-8819-25ec7fb5acd2"
+name = "token-type-activated-ability"
+description = "Card type for an activated ability card"
+en-us = "Activated Ability"
+
+[[strings]]
+id = "f4fe91cb-3bb9-4b58-9949-6652a388c0c8"
+name = "token-type-triggered-ability"
+description = "Card type for a triggered ability card"
+en-us = "Triggered Ability"
+
+[[strings]]
+id = "1dd37348-a684-4f5f-a8e3-87ecb7354c85"
+name = "token-type-reclaim-ability"
+description = "Card type for a reclaim ability card"
+en-us = "Reclaim Ability"

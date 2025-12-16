@@ -143,10 +143,12 @@ image-number = 1282908322
 ```
 
 **Column handling:**
-- Raw data columns → included in TOML with normalized names (spaces→hyphens)
+- Raw data columns → included in TOML with normalized names (spaces→hyphens, special characters removed)
 - Formula columns (detected via `=` prefix or calamine's DataType::Formula) → skipped
 - IMAGE columns (detected via `=IMAGE()` pattern) → skipped
 - Empty cells → omitted from that row's TOML entry
+- Column order in the TOML output follows the Excel table’s data column order (formula/image columns are skipped)
+- Single-column tables that match their column name (e.g., `Predicate Types`) are serialized as a simple array under an underscore key (`predicate_types = ["A", "B"]`) instead of array-of-tables
 
 ## Technical Strategy: Round-Trip Conversion
 
@@ -593,6 +595,7 @@ Follow project `AGENT.md` rules:
 - No inline comments in code
 - No `pub use` re-exports in lib.rs; use full module paths instead
 - Functions qualified with one module: `excel_reader::extract_tables()`
+- Do not import functions directly; call them via a module qualifier (e.g., `paths::git_root_for()`)
 - Structs unqualified: `TableData`
 - Enums one level: `ColumnType::Formula`
 - Public items at top of file, private below
@@ -617,3 +620,9 @@ Mark completed milestones at the top of this design document.
 3. Examine `xlsm_manager.py` for behavior reference
 4. Look at `client/Assets/StreamingAssets/Tabula.xlsm.d/` structure
 5. Ask for clarification rather than assuming
+# Tabula CLI Design Document
+
+## Milestone Status
+- [x] Milestone 1: Project Setup
+- [x] Milestone 2: Excel Reading with Calamine
+- [x] Milestone 3: build-toml Command
