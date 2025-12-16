@@ -77,7 +77,7 @@ tests/tabula_cli_tests/
 # Convert Excel tables to TOML files
 tabula build-toml [XLSM_PATH] [OUTPUT_DIR]
 
-# Reconstruct Excel from TOML files (requires original XLSM as template)
+# Update Excel from TOML files (requires original XLSM as template)
 tabula build-xls [TOML_DIR] [XLSM_PATH]
 tabula build-xls --dry-run [TOML_DIR] [XLSM_PATH]
 
@@ -85,7 +85,6 @@ tabula build-xls --dry-run [TOML_DIR] [XLSM_PATH]
 tabula validate [TOML_DIR]
 tabula validate --applescript [TOML_DIR]
 tabula validate --strip-images [TOML_DIR]
-tabula validate --check-equality [TOML_DIR]
 
 # Manage embedded images
 tabula strip-images [XLSM_PATH]
@@ -103,8 +102,8 @@ When paths are omitted, the CLI finds the git root and defaults to:
 
 ## Core Design: No Schema Files
 
-**Key design decision:** We do NOT generate separate schema files for formulas,
-styles, or data validation. Instead:
+**Key design decision:** We do NOT generate separate metadata or schema files
+for formulas, styles, or data validation. Instead:
 
 1. **build-toml** extracts only raw data values into TOML files
 2. **build-xls** requires the original XLSM to exist, uses it as a template,
@@ -281,7 +280,7 @@ tabula validate --strip-images [TOML_DIR]
 Includes image stripping in the validation workflow:
 1. Run `strip-images` on the original XLSM
 2. Perform standard round-trip validation
-3. Optionally run `rebuild-images` if URLs are available
+3. Run `rebuild-images` if URLs are available
 4. Verify the final XLSM is valid
 
 ## Error Handling
@@ -326,6 +325,154 @@ The `tabula git-setup` command configures the repository for the tabula workflow
 
 The hook ensures the workflow is always: edit spreadsheet → extract to TOML,
 never the reverse (which could overwrite spreadsheet changes).
+
+
+## Key Library APIs
+
+### Calamine (Reading)
+
+Calamine is read-only. Key types and methods for this project:
+
+**Opening a workbook:**
+```rust
+use calamine::{open_workbook, Xlsx, Reader, Data};
+
+let mut workbook: Xlsx<_> = open_workbook("Tabula.xlsm")?;
+```
+
+**Listing sheet names:**
+```rust
+let sheet_names: Vec<String> = workbook.sheet_names().to_owned();
+```
+
+**Reading a worksheet range:**
+```rust
+if let Ok(range) = workbook.worksheet_range("Sheet1") {
+    for row in range.rows() {
+        for cell in row {
+            match cell {
+                Data::Empty => { /* skip */ }
+                Data::String(s) => { /* string value */ }
+                Data::Float(f) => { /* numeric value */ }
+                Data::Int(i) => { /* integer value */ }
+                Data::Bool(b) => { /* boolean */ }
+                Data::DateTime(dt) => { /* Excel datetime */ }
+                Data::Error(e) => { /* cell error like #REF! */ }
+            }
+        }
+    }
+}
+```
+
+**Accessing named tables:**
+
+The `Table` struct represents an Excel Table (not just a worksheet). Tables have
+names, column headers, and defined data ranges.
+
+```rust
+use calamine::Table;
+
+let table_names = workbook.table_names();
+for name in table_names {
+    if let Some(table) = workbook.table_by_name(&name)? {
+        let columns: &[String] = table.columns();
+        let data: &Range<Data> = table.data();
+    }
+}
+```
+
+**Getting formulas (separate from values):**
+```rust
+if let Ok(formulas) = workbook.worksheet_formula("Sheet1") {
+    for row in formulas.rows() {
+        for formula in row {
+            if !formula.is_empty() {
+                println!("Formula: {formula}");
+            }
+        }
+    }
+}
+```
+
+### Umya-Spreadsheet (Writing)
+
+Umya-spreadsheet can read AND write xlsx/xlsm files, preserving existing content.
+
+**Reading an existing file:**
+```rust
+use umya_spreadsheet::reader::xlsx;
+
+let path = std::path::Path::new("Tabula.xlsm");
+let mut book = xlsx::read(path)?;
+```
+
+**Accessing worksheets:**
+```rust
+let sheet = book.get_sheet_by_name_mut("Cards")?;
+```
+
+**Reading/writing cell values:**
+```rust
+let cell = sheet.get_cell_mut("B5");
+cell.set_value("New Value");
+
+let cell = sheet.get_cell_mut((2, 5));  // (col, row) 1-indexed
+cell.set_value(42.0);
+cell.set_value(true);
+```
+
+**Getting cell value without modification:**
+```rust
+let cell = sheet.get_cell("A1")?;
+let value: &str = cell.get_value();
+```
+
+**Saving the workbook:**
+```rust
+use umya_spreadsheet::writer::xlsx;
+
+let output = std::path::Path::new("output.xlsm");
+xlsx::write(&book, output)?;
+```
+
+**Important for this project:** When we modify cell values, umya-spreadsheet
+preserves all other content including:
+- Table definitions and calculated column formulas
+- VBA macros (vbaProject.bin)
+- Styles, conditional formatting, data validation
+- Relationships between sheets and other components
+
+We rely on this preservation behavior for our template-based approach.
+
+### TOML Serialization
+
+**Defining data structures:**
+```rust
+use serde::{Deserialize, Serialize};
+
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "kebab-case")]
+struct CardRow {
+    name: String,
+    id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    energy_cost: Option<i64>,
+    rules_text: Option<String>,
+}
+```
+
+**Writing TOML:**
+```rust
+let cards = vec![CardRow { ... }, CardRow { ... }];
+let toml_string = toml::to_string_pretty(&cards)?;
+std::fs::write("Cards.toml", toml_string)?;
+```
+
+**Reading TOML:**
+```rust
+let content = std::fs::read_to_string("Cards.toml")?;
+let cards: Vec<CardRow> = toml::from_str(&content)?;
+```
 
 ## Testing Strategy
 
@@ -403,7 +550,6 @@ Following existing project patterns in `tests/tabula_cli_tests/`.
 **Scope:** Round-trip validation
 - Implement `commands/validate.rs`
 - Orchestrate build-xls and build-toml
-- Implement `--check-equality` flag
 - Implement `--strip-images` flag
 - Clear error reporting
 
@@ -443,7 +589,7 @@ After each milestone:
 
 ### Style Rules
 
-Follow project `.cursorrc` rules:
+Follow project `AGENT.md` rules:
 - No inline comments in code
 - Functions qualified with one module: `excel_reader::extract_tables()`
 - Structs unqualified: `TableData`
@@ -458,6 +604,7 @@ Create/update `src/tabula_cli/observations.md` for:
 - Implementation decisions that differ from this document
 - Issues encountered and solutions
 - API quirks in calamine or umya-spreadsheet
+- Important source files to read for project context
 - Test results for critical behaviors (formula recalculation)
 
 Mark completed milestones at the top of this design document.
