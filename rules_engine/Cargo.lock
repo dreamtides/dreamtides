@@ -3244,6 +3244,31 @@ dependencies = [
 ]
 
 [[package]]
+name = "tabula_cli"
+version = "0.0.0"
+dependencies = [
+ "ability_data",
+ "anyhow",
+ "clap",
+ "convert_case 0.8.0",
+ "core_data",
+ "database",
+ "fluent",
+ "fluent-bundle",
+ "google-sheets4",
+ "hyper-util",
+ "parser",
+ "quest_state",
+ "serde",
+ "serde_json",
+ "tabula_data",
+ "tokio",
+ "tracing",
+ "uuid",
+ "yup-oauth2 12.1.0",
+]
+
+[[package]]
 name = "tabula_data"
 version = "0.0.0"
 dependencies = [
