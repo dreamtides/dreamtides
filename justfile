@@ -179,6 +179,9 @@ parser-release *args='':
   cargo run --manifest-path rules_engine/Cargo.toml --release --bin "parser_cli" -- "$@"
 
 tabula *args='':
+  cargo run --manifest-path rules_engine/Cargo.toml -p tabula_cli -- "$@"
+
+tabula-old *args='':
   cargo run --manifest-path rules_engine/Cargo.toml --bin "tabula_cli" -- \
       --key-file ./service_account_key.json \
       --spreadsheet-id "1AqSIZ_kwo3H3vfNsG-ubPV5GobkPVV_XEQEKZpRWqrA" \

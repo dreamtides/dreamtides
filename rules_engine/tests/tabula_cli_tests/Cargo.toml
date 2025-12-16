@@ -1,5 +1,5 @@
 [package]
-name = "old_tabula_cli_tests"
+name = "tabula_cli_tests"
 version = "0.0.0"
 edition = "2024"
 
@@ -12,10 +12,6 @@ doctest = false
 bench = false
 
 [dependencies]
-old_tabula_cli = { path = "../../src/old_tabula_cli" }
+tabula_cli = { path = "../../src/tabula_cli" }
 
 anyhow = { workspace = true }
-parking_lot = { workspace = true }
-serde = { workspace = true }
-serde_json = { workspace = true }
-tokio = { workspace = true }

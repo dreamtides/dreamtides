@@ -18,23 +18,15 @@ doctest = false
 bench = false
 
 [dependencies]
-ability_data = { path = "../ability_data" }
-core_data = { path = "../core_data" }
-database = { path = "../database" }
-parser = { path = "../parser" }
-quest_state = { path = "../quest_state" }
-tabula_data = { path = "../tabula_data" }
-
 anyhow = { workspace = true }
+calamine = { workspace = true }
+chrono = { workspace = true }
 clap = { workspace = true }
 convert_case = { workspace = true }
-fluent = { workspace = true }
-fluent-bundle = { workspace = true }
-google-sheets4 = { workspace = true }
-hyper-util = { workspace = true }
+reqwest = { workspace = true }
 serde = { workspace = true }
-serde_json = { workspace = true }
-tokio = { workspace = true }
-tracing = { workspace = true }
-uuid = { workspace = true }
-yup-oauth2 = { workspace = true }
+sha2 = { workspace = true }
+tempfile = { workspace = true }
+toml = { workspace = true }
+umya-spreadsheet = { workspace = true }
+zip = { workspace = true }
