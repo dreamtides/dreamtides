@@ -591,6 +591,7 @@ After each milestone:
 
 Follow project `AGENT.md` rules:
 - No inline comments in code
+- No `pub use` re-exports in lib.rs; use full module paths instead
 - Functions qualified with one module: `excel_reader::extract_tables()`
 - Structs unqualified: `TableData`
 - Enums one level: `ColumnType::Formula`

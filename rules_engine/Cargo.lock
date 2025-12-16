@@ -3675,6 +3675,8 @@ version = "0.0.0"
 dependencies = [
  "anyhow",
  "tabula_cli",
+ "tempfile",
+ "umya-spreadsheet",
 ]
 
 [[package]]

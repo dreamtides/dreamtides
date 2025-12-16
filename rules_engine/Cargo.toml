@@ -11,9 +11,9 @@ axum = { version = "0.8", features = ["macros"] }
 axum-macros = "0.5"
 backtrace = "0.3"
 bit-set = { version = "0.8", features = ["serde"] }
-calamine = "0.32"
 bit-vec = "0.8"
 bon = "3"
+calamine = "0.32"
 chrono = "0.4"
 chumsky = "0.10"
 clap = { version = "4", features = ["derive"] }
@@ -49,8 +49,8 @@ sha2 = "0.10"
 strum = { version = "0.27", features = ["derive"] }
 strum_macros = "0.27"
 tempfile = "3"
-toml = "0.8"
 tokio = { version = "1", features = ["full"] }
+toml = "0.8"
 tower = "0.5"
 tracing = "0.1"
 tracing-error = "0.2"
