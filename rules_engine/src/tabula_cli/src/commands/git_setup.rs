@@ -1,12 +1,14 @@
 use std::collections::BTreeMap;
 use std::ffi::OsStr;
 use std::fs;
+use std::io::Read;
 use std::path::{Path, PathBuf};
 use std::process::Command;
 
 use anyhow::{Context, Result, bail};
 use clap::ValueEnum;
 use toml::Value;
+use zip::ZipArchive;
 
 use crate::commands::{build_toml, rebuild_images, strip_images};
 use crate::core::{column_names, excel_reader, paths, toml_data};
@@ -59,6 +61,7 @@ fn run_pre_commit(root: &Path) -> Result<()> {
     ensure_toml_not_newer(root, &xlsm_path, &toml_dir)?;
     build_toml::build_toml(Some(xlsm_path.clone()), Some(toml_dir.clone()))?;
     strip_images::strip_images(Some(xlsm_path.clone()), Some(xlsm_path.clone()))?;
+    ensure_stripped(&xlsm_path)?;
     stage_paths(root, &[xlsm_path.as_path(), toml_dir.as_path()])
 }
 
@@ -139,6 +142,29 @@ fn expected_toml(root: &Path, xlsm_path: &Path) -> Result<BTreeMap<String, Value
         expected.insert(file_name, toml_data::canonicalize_numbers(parsed));
     }
     Ok(expected)
+}
+
+fn ensure_stripped(xlsm_path: &Path) -> Result<()> {
+    let file = fs::File::open(xlsm_path)
+        .with_context(|| format!("Cannot open spreadsheet at {}", xlsm_path.display()))?;
+    let mut archive = ZipArchive::new(file)
+        .with_context(|| format!("Cannot open spreadsheet at {}", xlsm_path.display()))?;
+    for i in 0..archive.len() {
+        let mut entry = archive.by_index(i)?;
+        if entry.is_dir() {
+            continue;
+        }
+        let name = entry.name().to_string();
+        if !name.starts_with("xl/media/") {
+            continue;
+        }
+        let mut data = Vec::new();
+        entry.read_to_end(&mut data)?;
+        if data != strip_images::PLACEHOLDER_JPEG {
+            bail!("Embedded image {name} still present after strip-images");
+        }
+    }
+    Ok(())
 }
 
 fn ensure_gitattributes(root: &Path) -> Result<()> {
