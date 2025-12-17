@@ -62,7 +62,8 @@ fn run_pre_commit(root: &Path) -> Result<()> {
     build_toml::build_toml(Some(xlsm_path.clone()), Some(toml_dir.clone()))?;
     strip_images::strip_images(Some(xlsm_path.clone()), Some(xlsm_path.clone()))?;
     ensure_stripped(&xlsm_path)?;
-    stage_paths(root, &[xlsm_path.as_path(), toml_dir.as_path()])
+    stage_paths(root, &[xlsm_path.as_path(), toml_dir.as_path()])?;
+    ensure_staged_stripped(root, &xlsm_path)
 }
 
 fn rebuild_after_checkout(root: &Path) -> Result<()> {
@@ -165,6 +166,43 @@ fn ensure_stripped(xlsm_path: &Path) -> Result<()> {
         }
     }
     Ok(())
+}
+
+fn ensure_staged_stripped(root: &Path, xlsm_path: &Path) -> Result<()> {
+    let bytes = staged_bytes(root, xlsm_path)?;
+    let cursor = std::io::Cursor::new(bytes);
+    let mut archive = ZipArchive::new(cursor)
+        .with_context(|| format!("Cannot open spreadsheet at {}", xlsm_path.display()))?;
+    for i in 0..archive.len() {
+        let mut entry = archive.by_index(i)?;
+        if entry.is_dir() {
+            continue;
+        }
+        let name = entry.name().to_string();
+        if !name.starts_with("xl/media/") {
+            continue;
+        }
+        let mut data = Vec::new();
+        entry.read_to_end(&mut data)?;
+        if data != strip_images::PLACEHOLDER_JPEG {
+            bail!("Staged spreadsheet still contains embedded image {name}");
+        }
+    }
+    Ok(())
+}
+
+fn staged_bytes(root: &Path, path: &Path) -> Result<Vec<u8>> {
+    let relative = path.strip_prefix(root).unwrap_or(path);
+    let output = Command::new("git")
+        .current_dir(root)
+        .arg("show")
+        .arg(format!(":{}", relative.display()))
+        .output()
+        .context("Failed to read staged Tabula.xlsm from index")?;
+    if !output.status.success() {
+        bail!("Staged Tabula.xlsm not found in index; run git add and retry");
+    }
+    Ok(output.stdout)
 }
 
 fn ensure_gitattributes(root: &Path) -> Result<()> {

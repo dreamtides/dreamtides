@@ -5,6 +5,7 @@ use std::process::Command;
 use std::thread;
 use std::time::Duration;
 
+use calamine::Reader;
 use tabula_cli::commands::git_setup::{self, Hook};
 use tabula_cli::commands::build_toml;
 use tabula_cli::commands::strip_images;
@@ -64,6 +65,23 @@ fn pre_commit_builds_toml_strips_and_stages_changes() {
         .read_to_end(&mut data)
         .expect("read image1");
     assert_eq!(data, strip_images::PLACEHOLDER_JPEG);
+
+    let staged = Command::new("git")
+        .current_dir(root)
+        .arg("show")
+        .arg(":client/Assets/StreamingAssets/Tabula.xlsm")
+        .output()
+        .expect("git show");
+    assert!(staged.status.success());
+    let mut cursor = std::io::Cursor::new(staged.stdout);
+    let mut archive = ZipArchive::new(&mut cursor).expect("zip archive");
+    let mut staged_data = Vec::new();
+    archive
+        .by_name("xl/media/image1.jpg")
+        .expect("image1 staged")
+        .read_to_end(&mut staged_data)
+        .expect("read staged");
+    assert_eq!(staged_data, strip_images::PLACEHOLDER_JPEG);
 
     let toml_path = root.join("client/Assets/StreamingAssets/Tabula/test-table.toml");
     let toml_content = fs::read_to_string(&toml_path).expect("toml file");
