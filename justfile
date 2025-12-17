@@ -1,6 +1,6 @@
 set positional-arguments
 
-code-review: check-format build workspace-lints clippy test check-docs unity-tests
+code-review: check-format build workspace-lints clippy test tabula-validate check-docs unity-tests
 
 # Run this before pushing
 code-review-rsync: rsync-for-review
@@ -59,16 +59,6 @@ doc:
 
 workspace-lints:
     cargo workspace-lints rules_engine/Cargo.toml
-
-tabula-extract:
-    python3 client/scripts/xlsm_manager.py git-pre-commit
-
-tabula-roundtrip:
-    python3 client/scripts/xlsm_manager.py roundtrip client/Assets/StreamingAssets/Tabula.xlsm /tmp/test_output.xlsm --image-cache /tmp/test_cache
-
-tabula-initial-setup:
-    python3 client/scripts/xlsm_manager.py git-setup
-    python3 client/scripts/xlsm_manager.py git-post-checkout
 
 schema:
     cargo run --manifest-path rules_engine/Cargo.toml --bin "schema_generator" > schema.json
@@ -180,6 +170,9 @@ parser-release *args='':
 
 tabula *args='':
   cargo run --manifest-path rules_engine/Cargo.toml -p tabula_cli -- "$@"
+
+tabula-validate:
+  cargo run --manifest-path rules_engine/Cargo.toml -p tabula_cli -- validate
 
 tabula-old *args='':
   cargo run --manifest-path rules_engine/Cargo.toml --bin "tabula_cli" -- \

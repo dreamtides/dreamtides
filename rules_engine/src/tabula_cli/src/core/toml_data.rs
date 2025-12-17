@@ -5,6 +5,20 @@ use toml::value::Value;
 use crate::core::column_names;
 use crate::core::excel_reader::{CellValue, ColumnType, TableInfo};
 
+pub fn canonicalize_numbers(value: Value) -> Value {
+    match value {
+        Value::Table(table) => Value::Table(
+            table.into_iter().map(|(key, value)| (key, canonicalize_numbers(value))).collect(),
+        ),
+        Value::Array(array) => Value::Array(array.into_iter().map(canonicalize_numbers).collect()),
+        Value::String(s) => match s.parse::<i64>() {
+            Ok(parsed) if parsed.to_string() == s => Value::Integer(parsed),
+            _ => Value::String(s),
+        },
+        other => other,
+    }
+}
+
 pub fn table_to_toml(table: &TableInfo) -> Result<String> {
     let table_key = column_names::normalize_table_name(table.name.as_str());
     let ordered_columns: Vec<(String, String)> = table
@@ -28,7 +42,9 @@ pub fn table_to_toml(table: &TableInfo) -> Result<String> {
         }
         let mut root = Table::new();
         root.insert(table_key.replace('-', "_"), Value::Array(values));
-        return toml::to_string_pretty(&Value::Table(root)).context("Failed to serialize TOML");
+        let root = Value::Table(root);
+        let canonical = canonicalize_numbers(root);
+        return toml::to_string_pretty(&canonical).context("Failed to serialize TOML");
     }
 
     let mut rows = Vec::new();
@@ -46,7 +62,9 @@ pub fn table_to_toml(table: &TableInfo) -> Result<String> {
 
     let mut root = Table::new();
     root.insert(table_key, Value::Array(rows));
-    toml::to_string_pretty(&Value::Table(root)).context("Failed to serialize TOML")
+    let root = Value::Table(root);
+    let canonical = canonicalize_numbers(root);
+    toml::to_string_pretty(&canonical).context("Failed to serialize TOML")
 }
 
 fn cell_value_to_toml(value: &CellValue) -> Option<Value> {

@@ -133,6 +133,27 @@ fn build_toml_encodes_single_column_table_as_array() {
 }
 
 #[test]
+fn build_toml_converts_numeric_strings_to_integers() {
+    let temp_dir = TempDir::new().expect("temp dir");
+    let git_dir = temp_dir.path().join(".git");
+    fs::create_dir_all(&git_dir).expect("git dir");
+
+    let xlsx_path = temp_dir.path().join("numbers.xlsx");
+    tabula_cli_test_utils::create_numeric_string_spreadsheet(&xlsx_path).expect("spreadsheet");
+
+    let output_dir = temp_dir.path().join("out");
+    build_toml::build_toml(Some(xlsx_path), Some(output_dir.clone())).expect("build-toml");
+
+    let toml_path = output_dir.join("numbers.toml");
+    let content = fs::read_to_string(&toml_path).expect("read toml");
+    let value: Value = toml::from_str(&content).expect("parse toml");
+
+    let numbers = value.get("numbers").and_then(Value::as_array).cloned().unwrap_or_default();
+    assert_eq!(numbers.len(), 1);
+    assert!(numbers[0].is_integer());
+}
+
+#[test]
 fn build_toml_prunes_old_backups() {
     let temp_dir = TempDir::new().expect("temp dir");
     let git_dir = temp_dir.path().join(".git");

@@ -156,6 +156,7 @@ fn load_toml_tables(dir: &Path) -> Result<BTreeMap<String, ParsedTomlTable>> {
             .with_context(|| format!("Cannot open TOML file {}", entry.path().display()))?;
         let value: Value = toml::from_str(&content)
             .with_context(|| format!("Cannot parse TOML file {}", entry.path().display()))?;
+        let value = toml_data::canonicalize_numbers(value);
         let table = value.as_table().cloned().unwrap_or_default();
         for (key, data) in table {
             let normalized_name = column_names::normalize_table_name(key.as_str());

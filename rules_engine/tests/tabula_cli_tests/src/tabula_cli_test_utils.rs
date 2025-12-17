@@ -92,6 +92,27 @@ pub fn create_special_column_spreadsheet(path: &Path) -> Result<()> {
     Ok(())
 }
 
+pub fn create_numeric_string_spreadsheet(path: &Path) -> Result<()> {
+    let mut book = umya_spreadsheet::new_file();
+    let sheet = book.get_sheet_mut(&0).expect("Sheet 0 should exist");
+    sheet.set_name("NumbersSheet");
+
+    sheet.get_cell_mut("A1").set_value("Numbers");
+    sheet.get_cell_mut("A2").set_value("1");
+
+    let mut table = Table::default();
+    table.set_name("Numbers");
+    table.set_display_name("Numbers");
+    table.set_area(("A1", "A2"));
+
+    table.add_column(make_column("Numbers"));
+
+    sheet.add_table(table);
+
+    xlsx::write(&book, path)?;
+    Ok(())
+}
+
 pub fn create_predicate_types_spreadsheet(path: &Path) -> Result<()> {
     let mut book = umya_spreadsheet::new_file();
     let sheet = book.get_sheet_mut(&0).expect("Sheet 0 should exist");

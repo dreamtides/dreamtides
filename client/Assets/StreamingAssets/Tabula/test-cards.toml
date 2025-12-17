@@ -1,83 +1,83 @@
 [[test-cards]]
 name = "Test Vanilla Character"
 id = "253ee0ca-f973-4d9f-ad37-abe548bc674f"
-energy-cost = "2"
+energy-cost = 2
 rules-text = " "
 card-type = "Character"
 subtype = "Musician"
 is-fast = false
-spark = "5"
-image-number = "1794244540"
+spark = 5
+image-number = 1794244540
 
 [[test-cards]]
 name = "Test Dissolve"
 id = "d4854b6e-5274-4f6a-8a60-a1ea1c15e9a6"
-energy-cost = "2"
+energy-cost = 2
 rules-text = "{Dissolve} an enemy character."
 prompts = "Choose an enemy character to {dissolve}."
 card-type = "Event"
 is-fast = true
-image-number = "1907487244"
+image-number = 1907487244
 
 [[test-cards]]
 name = "Test Counterspell"
 id = "aad836b0-3ece-477c-b923-b099360f0115"
-energy-cost = "2"
+energy-cost = 2
 rules-text = "{Prevent} a played enemy card."
 prompts = "Choose an enemy card to {prevent}."
 card-type = "Event"
 is-fast = true
-image-number = "1282908322"
+image-number = 1282908322
 
 [[test-cards]]
 name = "Test Counterspell Unless Pays"
 id = "76b6d00c-5a28-4ee3-9655-e4fea1d8a4d8"
-energy-cost = "1"
+energy-cost = 1
 rules-text = "{Prevent} a played enemy event unless the enemy pays {-energy-cost(e:2)}."
 prompts = "Choose an enemy event to {prevent}."
 card-type = "Event"
 is-fast = true
-image-number = "2123360837"
+image-number = 2123360837
 
 [[test-cards]]
 name = "Test Variable Energy Draw"
 id = "e06a8cfe-483f-42c0-aac8-9c12b21b3f99"
-energy-cost = "2"
+energy-cost = 2
 rules-text = "Pay one or more {e}: Draw {-drawn-cards(n:1)} for each {e} spent."
 prompts = "Pay one or more {e}."
 card-type = "Event"
 is-fast = true
-image-number = "489056605"
+image-number = 489056605
 
 [[test-cards]]
 name = "Test Trigger Gain Spark On Play Card Enemy Turn"
 id = "86ee5ad7-b60b-4596-af8c-7a495022ac61"
-energy-cost = "2"
+energy-cost = 2
 rules-text = "Whenever you play a card during the enemy's turn, this character gains {-gained-spark(n:1)}."
 card-type = "Character"
 is-fast = true
-spark = "1"
-image-number = "403770319"
+spark = 1
+image-number = 403770319
 
 [[test-cards]]
 name = "Test Fast Multi Activated Ability Draw Card Character"
 id = "d8a8541f-5b00-4d91-9518-aa8ae70ea450"
-energy-cost = "2"
+energy-cost = 2
 rules-text = "{fma} {-energy-cost(e:3)}: Draw {-drawn-cards(n:1)}."
 card-type = "Character"
 is-fast = false
-spark = "2"
-image-number = "1794244540"
+spark = 2
+image-number = 1794244540
 
 [[test-cards]]
 name = "Test Return One Or Two Void Event Cards To Hand"
 id = "559e62a0-7ead-4136-8bd4-6cc58db4bef7"
-energy-cost = "4"
+energy-cost = 4
 rules-text = "Return one or two events from your void to your hand."
 prompts = "Choose one or two events in your void to return."
 card-type = "Event"
 is-fast = false
-image-number = "644603677"
+image-number = 644603677
 
 [[test-cards]]
 name = "Test Modal Return To Hand Or Draw Two"
@@ -90,193 +90,193 @@ rules-text = """
 prompts = "Choose an enemy character to return to hand."
 card-type = "Event"
 is-fast = true
-image-number = "1200949264"
+image-number = 1200949264
 
 [[test-cards]]
 name = "Test Prevent Dissolve This Turn"
 id = "0b783ac8-6aea-438e-a2d5-87bf68548eda"
-energy-cost = "1"
+energy-cost = 1
 rules-text = "Give an allied character {anchored} until end of turn."
 prompts = "Choose an allied character to gain {anchored}."
 card-type = "Event"
 is-fast = true
-image-number = "1621160806"
+image-number = 1621160806
 
 [[test-cards]]
 name = "Test Foresee One Draw Reclaim"
 id = "de21db6c-54b4-4bff-b1d6-5a4711ef5ed8"
-energy-cost = "1"
+energy-cost = 1
 rules-text = """
 {-Foresee(n:1)}. Draw {-drawn-cards(n:1)}.
 
 {-Reclaim-Cost(e:3)}"""
 card-type = "Event"
 is-fast = true
-image-number = "1328168243"
+image-number = 1328168243
 
 [[test-cards]]
 name = "Test Counterspell Character"
 id = "86ed0d3f-320b-49d0-b022-cd94aa07edbd"
-energy-cost = "2"
+energy-cost = 2
 rules-text = "{Prevent} a played enemy character."
 prompts = "Choose an enemy character to {prevent}."
 card-type = "Event"
 is-fast = true
-image-number = "1239919309"
+image-number = 1239919309
 
 [[test-cards]]
 name = "Test Named Dissolve"
 id = "3c1dbdc7-702e-4748-af3c-4fd837bcb404"
-energy-cost = "2"
+energy-cost = 2
 rules-text = "{Dissolve} an enemy character."
 prompts = "Choose an enemy character to {dissolve}."
 card-type = "Event"
 is-fast = true
-image-number = "1907487244"
+image-number = 1907487244
 
 [[test-cards]]
 name = "Test Draw One"
 id = "68f90d08-9b51-424e-90d1-d15ddd1ece93"
-energy-cost = "0"
+energy-cost = 0
 rules-text = "Draw {-drawn-cards(n:1)}."
 card-type = "Event"
 is-fast = true
-image-number = "489056605"
+image-number = 489056605
 
 [[test-cards]]
 name = "Test Trigger Gain Spark When Materialize Another Character"
 id = "91c9ed93-5faf-4178-aec9-d631bbcf5d6a"
-energy-cost = "0"
+energy-cost = 0
 rules-text = "Whenever you materialize another character, this character gains {-gained-spark(n:1)}."
 card-type = "Character"
 is-fast = false
-spark = "5"
-image-number = "403770319"
+spark = 5
+image-number = 403770319
 
 [[test-cards]]
 name = "Test Trigger Gain Two Spark On Play Card Enemy Turn"
 id = "82759c0b-5161-4f6f-91b3-d42c2b4e0f9f"
-energy-cost = "2"
+energy-cost = 2
 rules-text = "Whenever you play a card during the enemy's turn, this character gains {-gained-spark(n:2)}."
 card-type = "Character"
 is-fast = true
-spark = "5"
-image-number = "403770319"
+spark = 5
+image-number = 403770319
 
 [[test-cards]]
 name = "Test Activated Ability Draw Card"
 id = "8dfeb2c1-2d72-411c-a8cc-7f84ca532c63"
-energy-cost = "2"
+energy-cost = 2
 rules-text = "{a} {-energy-cost(e:1)}: Draw {-drawn-cards(n:1)}."
 card-type = "Character"
 is-fast = false
-spark = "3"
-image-number = "1794244540"
+spark = 3
+image-number = 1794244540
 
 [[test-cards]]
 name = "Test Multi Activated Ability Draw Card Character"
 id = "56f944bb-333b-4e2c-9c8c-2068f41998c2"
-energy-cost = "0"
+energy-cost = 0
 rules-text = "{ma} {-energy-cost(e:1)}: Draw {-drawn-cards(n:1)}."
 card-type = "Character"
 is-fast = false
-spark = "3"
-image-number = "1794244540"
+spark = 3
+image-number = 1794244540
 
 [[test-cards]]
 name = "Test Fast Activated Ability Draw Card Character"
 id = "44aa4a1a-e8c6-4969-94bc-5fdbe010395e"
-energy-cost = "0"
+energy-cost = 0
 rules-text = "{fa} {-energy-cost(e:1)}: Draw {-drawn-cards(n:1)}."
 card-type = "Character"
 is-fast = false
-spark = "3"
-image-number = "1794244540"
+spark = 3
+image-number = 1794244540
 
 [[test-cards]]
 name = "Test Activated Ability Dissolve Character"
 id = "785e0341-fdd8-4e05-acb4-cbceed70ea6c"
-energy-cost = "3"
+energy-cost = 3
 rules-text = "{a} {-energy-cost(e:2)}: {Dissolve} an enemy character."
 prompts = "Choose an enemy character to {dissolve}."
 card-type = "Character"
 is-fast = false
-spark = "4"
-image-number = "1794244540"
+spark = 4
+image-number = 1794244540
 
 [[test-cards]]
 name = "Test Dual Activated Ability Character"
 id = "3af84464-874a-4fd2-89cb-1986dee59ae1"
-energy-cost = "4"
+energy-cost = 4
 rules-text = """
 {a} {-energy-cost(e:1)}: Draw {-drawn-cards(n:1)}.
 
 {a} {-energy-cost(e:2)}: Draw {-drawn-cards(n:2)}."""
 card-type = "Character"
 is-fast = false
-spark = "3"
-image-number = "1794244540"
+spark = 3
+image-number = 1794244540
 
 [[test-cards]]
 name = "Test Foresee One"
 id = "8217b59b-6573-484b-9f3b-203e86e1d841"
-energy-cost = "1"
+energy-cost = 1
 rules-text = "{-Foresee(n:1)}."
 card-type = "Event"
 is-fast = true
-image-number = "489056605"
+image-number = 489056605
 
 [[test-cards]]
 name = "Test Foresee Two"
 id = "89e34264-a69c-48a4-867e-add7b811394b"
-energy-cost = "1"
+energy-cost = 1
 rules-text = "{-Foresee(n:2)}."
 card-type = "Event"
 is-fast = true
-image-number = "489056605"
+image-number = 489056605
 
 [[test-cards]]
 name = "Test Foresee One Draw A Card"
 id = "820faab3-37c1-46fa-a314-5f023ec739a1"
-energy-cost = "1"
+energy-cost = 1
 rules-text = "{-Foresee(n:1)}. Draw {-drawn-cards(n:1)}."
 card-type = "Event"
 is-fast = true
-image-number = "1328168243"
+image-number = 1328168243
 
 [[test-cards]]
 name = "Test Draw One Reclaim"
 id = "0cba1386-d1b6-4f57-8ccc-d92f8be01d7c"
-energy-cost = "2"
+energy-cost = 2
 rules-text = """
 Draw {-drawn-cards(n:1)}.
 
 {-Reclaim-Cost(e:1)}"""
 card-type = "Event"
 is-fast = true
-image-number = "1328168243"
+image-number = 1328168243
 
 [[test-cards]]
 name = "Test Foresee One Reclaim"
 id = "86ffc58b-96db-4106-a892-8ae2a70719e6"
-energy-cost = "1"
+energy-cost = 1
 rules-text = """
 {-Foresee(n:1)}.
 
 {-Reclaim-Cost(e:3)}"""
 card-type = "Event"
 is-fast = true
-image-number = "1328168243"
+image-number = 1328168243
 
 [[test-cards]]
 name = "Test Return Void Card To Hand"
 id = "46e20fe4-36ca-438d-91a6-fac880ee9495"
-energy-cost = "1"
+energy-cost = 1
 rules-text = "Return a card from your void to your hand."
 prompts = "Choose a card in your void."
 card-type = "Event"
 is-fast = true
-image-number = "1328168243"
+image-number = 1328168243
 
 [[test-cards]]
 name = "Test Modal Draw One Or Draw Two"
@@ -288,7 +288,7 @@ rules-text = """
 {bullet} {-energy-cost(e:3)}: Draw {-drawn-cards(n:2)}."""
 card-type = "Event"
 is-fast = false
-image-number = "1200949264"
+image-number = 1200949264
 
 [[test-cards]]
 name = "Test Modal Draw One Or Dissolve Enemy"
@@ -301,69 +301,69 @@ rules-text = """
 prompts = "Choose an enemy character to {dissolve}."
 card-type = "Event"
 is-fast = true
-image-number = "1200949264"
+image-number = 1200949264
 
 [[test-cards]]
 name = "Test Return To Hand"
 id = "cf2f292b-f02c-4130-aff7-3f48fd147633"
-energy-cost = "1"
+energy-cost = 1
 rules-text = "Return an enemy character to hand."
 prompts = "Choose an enemy character to return to hand."
 card-type = "Event"
 is-fast = true
-image-number = "1200949264"
+image-number = 1200949264
 
 [[test-cards]]
 name = "Test Gain Points"
 id = "995b52a1-b368-4c83-ae05-8ab3800ca618"
-energy-cost = "0"
+energy-cost = 0
 rules-text = "Gain {-gained-points(n: 2)}."
 card-type = "Event"
 is-fast = false
-image-number = "1200949264"
+image-number = 1200949264
 
 [[test-cards]]
 name = "Test Gain Energy"
 id = "db191470-7a5b-4133-b731-8a81767d46e1"
-energy-cost = "2"
+energy-cost = 2
 rules-text = "Gain {-gained-energy(e: 1)}."
 card-type = "Event"
 is-fast = false
-image-number = "1200949264"
+image-number = 1200949264
 
 [[test-cards]]
 name = "Test Deck To Void"
 id = "a7340f26-b759-458c-b8cb-b6fcc36fe412"
-energy-cost = "2"
+energy-cost = 2
 rules-text = "Put the top {-count(n: 3)} cards of your deck into your void."
 card-type = "Event"
 is-fast = false
-image-number = "1200949264"
+image-number = 1200949264
 
 [[test-cards]]
 name = "Test Discard"
 id = "6e76f193-dcf0-4faf-b1f7-50af2e0dc8a2"
-energy-cost = "1"
+energy-cost = 1
 rules-text = "Discard {-discarded-cards(n: 1)}."
 card-type = "Event"
 is-fast = false
-image-number = "1200949264"
+image-number = 1200949264
 
 [[test-cards]]
 name = "Test Discard Two"
 id = "ef6d55f9-49ba-4637-af50-91068cb3a2b2"
-energy-cost = "2"
+energy-cost = 2
 rules-text = "Discard {-discarded-cards(n: 2)}."
 card-type = "Event"
 is-fast = false
-image-number = "1200949264"
+image-number = 1200949264
 
 [[test-cards]]
 name = "Test Materialized Draw Card"
 id = "f62670ae-73ad-4645-8de4-4cd8fb58b920"
-energy-cost = "0"
+energy-cost = 0
 rules-text = "{Materialized}: Draw {-drawn-cards(n:1)}."
 card-type = "Character"
 is-fast = false
-spark = "1"
-image-number = "1200949264"
+spark = 1
+image-number = 1200949264
