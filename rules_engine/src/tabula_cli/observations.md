@@ -1,6 +1,6 @@
 # Tabula CLI Observations
 
-- Validate command now lives in `commands/validate/` with orchestration in `mod.rs`, TOML comparison in `toml_compare.rs`, and workbook snapshot checks in `workbook_snapshot.rs`; `--strip-images` strips the original XLSM to a temp copy, runs the TOML round-trip against that stripped template, rebuilds images from the cache, then compares workbook snapshots and xl/media bytes against the original. AppleScript validation still returns "AppleScript validation not implemented yet".
-- TOML comparison canonicalizes numeric strings and stops at the first difference unless `--report-all` is set; workbook comparison covers sheet order, table layout, dimensions, validations, conditionals, and alignment.
-- `strip-images` writes placeholders plus manifest v1 into `.git/xlsm_image_cache`; `rebuild-images` defaults to cache restoration while `--from-urls` resolves IMAGE formulas through rich data mappings with row/column offset handling.
-- Test helpers now include `add_media_entries` for injecting `xl/media` files into generated workbooks when exercising strip/rebuild flows.
+- git-setup installs pre-commit, post-checkout, post-merge, and post-commit hooks that call `tabula git-hook <hook>` (falling back to a workspace cargo run); pre-commit runs build-toml, blocks when any Tabula/*.toml file is newer than Tabula.xlsm (suggesting build-xls), strips images in place, and stages the XLSM plus the TOML directory so LFS only sees placeholder media.
+- Checkout/merge/commit hooks rebuild images with `rebuild-images --auto`, restoring from the cache then falling back to IMAGE() downloads so working copies retain images while the repo stores stripped XLSM files with cache-backed manifests in `.git/xlsm_image_cache`.
+- git-setup populates `.gitattributes` to track `client/Assets/StreamingAssets/Tabula.xlsm` via Git LFS and creates the image cache directory under `.git/`.
+- Validate keeps AppleScript as unimplemented; `--strip-images` validation strips to a temp copy, round-trips TOML, rebuilds from cache, then diffs workbook snapshots and xl/media bytes.

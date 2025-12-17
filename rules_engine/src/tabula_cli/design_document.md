@@ -83,7 +83,6 @@ tabula build-xls --dry-run [TOML_DIR] [XLSM_PATH]
 
 # Validate round-trip conversion
 tabula validate [TOML_DIR]
-tabula validate --applescript [TOML_DIR]
 tabula validate --strip-images [TOML_DIR]
 
 # Manage embedded images
@@ -328,7 +327,6 @@ The `tabula git-setup` command configures the repository for the tabula workflow
 
 1. **Git LFS**: Configures `*.xlsm` files for Git Large File Storage
 2. **Pre-commit hook**: Installs a hook that:
-   - Creates a backup of Tabula.xlsm in `.git/excel-backups/`
    - Runs `tabula build-toml` to extract data
    - Runs `tabula strip-images` to replace images with placeholders
    - Fails if any TOML file has a newer timestamp than the spreadsheet
@@ -583,14 +581,7 @@ Following existing project patterns in `tests/tabula_cli_tests/`.
   spreadsheet and then rebuild them, confirm visual equality
 - Clear error reporting
 
-### Milestone 11: --applescript validation
-**Scope:** macOS Excel validation
-- Implement AppleScript execution
-- Detect repair dialog appearance
-- Timeout handling
-- Skip gracefully on non-macOS
-
-### Milestone 12: Git Integration and Polish
+### Milestone 11: Git Integration and Polish
 **Scope:** git-setup command, final validation
 - Implement `commands/git_setup.rs`
 - Generate pre-commit hook script
@@ -653,3 +644,5 @@ Mark completed milestones at the top of this design document.
 - [x] Milestone 7: validate Command
 - [x] Milestone 8: rebuild-images Command
 - [x] Milestone 9: rebuild-images from URLs
+- [x] Milestone 10: --strip-images validation
+- [x] Milestone 11: Git Integration and Polish

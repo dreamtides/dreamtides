@@ -1,8 +1,10 @@
 use std::path::PathBuf;
 
-use anyhow::{Result, bail};
+use anyhow::Result;
 use clap::{Parser, Subcommand};
-use tabula_cli::commands::{build_toml, build_xls, rebuild_images, strip_images, validate};
+use tabula_cli::commands::{
+    build_toml, build_xls, git_setup, rebuild_images, strip_images, validate,
+};
 
 #[derive(Parser)]
 #[command(name = "tabula")]
@@ -89,6 +91,12 @@ enum Commands {
 
     #[command(about = "Configure Git for the tabula workflow")]
     GitSetup,
+
+    #[command(hide = true)]
+    GitHook {
+        #[arg(value_enum)]
+        hook: git_setup::Hook,
+    },
 }
 
 fn main() {
@@ -121,7 +129,8 @@ fn run() -> Result<()> {
         Commands::RebuildImages { xlsm_path, from_urls, auto } => {
             rebuild_images::rebuild_images(xlsm_path, from_urls, auto)?;
         }
-        Commands::GitSetup => bail!("git-setup not yet implemented"),
+        Commands::GitSetup => git_setup::git_setup()?,
+        Commands::GitHook { hook } => git_setup::run_hook(hook)?,
     }
 
     Ok(())
