@@ -63,6 +63,7 @@ fn run_pre_commit(root: &Path) -> Result<()> {
     strip_images::strip_images(Some(xlsm_path.clone()), Some(xlsm_path.clone()))?;
     ensure_stripped(&xlsm_path)?;
     stage_paths(root, &[xlsm_path.as_path(), toml_dir.as_path()])?;
+    panic!("test");
     ensure_staged_stripped(root, &xlsm_path)
 }
 
