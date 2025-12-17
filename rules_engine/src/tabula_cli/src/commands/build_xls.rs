@@ -5,7 +5,9 @@ use std::path::{Path, PathBuf};
 use anyhow::{Context, Result, anyhow, bail};
 use tempfile::Builder;
 use toml::Value;
+use umya_spreadsheet::helper::coordinate::string_from_column_index;
 use umya_spreadsheet::reader::xlsx;
+use umya_spreadsheet::structs::Worksheet;
 use umya_spreadsheet::writer;
 
 use crate::core::excel_reader::ColumnType;
@@ -220,15 +222,6 @@ fn prepare_table(layout: &TableLayout, table: &TomlTable) -> Result<PreparedTabl
         column_map.insert(col.normalized_name.clone(), col);
     }
 
-    if table.rows.len() != layout.data_rows {
-        bail!(
-            "Row count mismatch for '{}': TOML has {}, template has {}",
-            layout.name,
-            table.rows.len(),
-            layout.data_rows
-        );
-    }
-
     let mut rows = Vec::new();
     for (row_idx, row) in table.rows.iter().enumerate() {
         for (normalized, (original, _)) in &row.values {
@@ -270,17 +263,154 @@ fn cell_from_toml(value: TomlValue) -> CellValue {
     }
 }
 
+fn copy_row(sheet: &mut Worksheet, source_row: u32, target_row: u32, layout: &TableLayout) {
+    for column in &layout.columns {
+        let col_num = layout.start_col + column.index as u32;
+        if let Some(source_cell) = sheet.get_cell((col_num, source_row)) {
+            let value = source_cell.get_cell_value().clone();
+            let style = source_cell.get_style().clone();
+            let target_cell = sheet.get_cell_mut((col_num, target_row));
+            target_cell.set_cell_value(value);
+            target_cell.set_style(style);
+        }
+    }
+}
+
+fn write_single_table(
+    table: &PreparedTable,
+    book: &mut umya_spreadsheet::Spreadsheet,
+) -> Result<()> {
+    let sheet = book.get_sheet_by_name_mut(table.layout.sheet_name.as_str()).ok_or_else(|| {
+        anyhow::anyhow!("Table '{}' not found in original XLSM", table.layout.name)
+    })?;
+    // umya's insert_new_row re-parses every formula on the sheet and can hang on
+    // large single-table sheets; bypass it here
+    let (header_row, start_col_index, end_col, area_end_row) = {
+        let table_def = sheet
+            .get_tables_mut()
+            .iter_mut()
+            .find(|t| t.get_name() == table.layout.name)
+            .ok_or_else(|| {
+                anyhow::anyhow!("Table '{}' not found in original XLSM", table.layout.name)
+            })?;
+        let area = table_def.get_area().clone();
+        (*area.0.get_row_num(), *area.0.get_col_num(), *area.1.get_col_num(), *area.1.get_row_num())
+    };
+    let target_end_row = std::cmp::max(area_end_row, header_row + table.rows.len() as u32);
+    let source_row = if table.layout.data_rows > 0 {
+        table.layout.data_start_row + table.layout.data_rows as u32 - 1
+    } else {
+        table.layout.data_start_row
+    };
+    let max_existing_row = target_end_row;
+
+    for (row_idx, row) in table.rows.iter().enumerate() {
+        let row_num = table.layout.data_start_row + row_idx as u32;
+        if row_num > source_row {
+            copy_row(sheet, source_row, row_num, &table.layout);
+        }
+        for (col_idx, value) in row.iter().enumerate() {
+            let col_num = table.column_indices[col_idx];
+            let cell = sheet.get_cell_mut((col_num, row_num));
+            match value {
+                CellValue::String(s) => cell.set_value(s),
+                CellValue::Integer(i) => cell.set_value_number(*i as f64),
+                CellValue::Float(f) => cell.set_value_number(*f),
+                CellValue::Boolean(b) => cell.set_value_bool(*b),
+                CellValue::Empty => cell.set_value(""),
+            };
+        }
+    }
+
+    let clear_start = table.layout.data_start_row + table.rows.len() as u32;
+    if clear_start <= max_existing_row {
+        for row_num in clear_start..=max_existing_row {
+            for &col_num in &table.column_indices {
+                let cell = sheet.get_cell_mut((col_num, row_num));
+                cell.set_value("");
+                cell.get_cell_value_mut().remove_formula();
+            }
+        }
+    }
+
+    let start_cell = format!("{}{}", string_from_column_index(&start_col_index), header_row);
+    let end_cell = format!("{}{}", string_from_column_index(&end_col), target_end_row);
+    let table_def =
+        sheet.get_tables_mut().iter_mut().find(|t| t.get_name() == table.layout.name).ok_or_else(
+            || anyhow::anyhow!("Table '{}' not found in original XLSM", table.layout.name),
+        )?;
+    table_def.set_area((start_cell.as_str(), end_cell.as_str()));
+
+    Ok(())
+}
+
 fn write_tables(template_path: &Path, destination: &Path, tables: &[PreparedTable]) -> Result<()> {
     let mut book = xlsx::read(template_path)
         .with_context(|| format!("Cannot open spreadsheet at {}", template_path.display()))?;
 
-    for table in tables {
+    let mut table_refs: Vec<&PreparedTable> = tables.iter().collect();
+    table_refs.sort_by(|a, b| {
+        let sheet_cmp = a.layout.sheet_name.cmp(&b.layout.sheet_name);
+        if sheet_cmp == std::cmp::Ordering::Equal {
+            a.layout.data_start_row.cmp(&b.layout.data_start_row)
+        } else {
+            sheet_cmp
+        }
+    });
+
+    let mut sheet_table_counts: BTreeMap<String, usize> = BTreeMap::new();
+    for table in &table_refs {
+        let entry = sheet_table_counts.entry(table.layout.sheet_name.clone()).or_insert(0);
+        *entry += 1;
+    }
+
+    let mut sheet_offsets: BTreeMap<String, i32> = BTreeMap::new();
+
+    for table in table_refs {
+        let single_table_sheet =
+            *sheet_table_counts.get(table.layout.sheet_name.as_str()).unwrap_or(&0) == 1;
+        if single_table_sheet {
+            write_single_table(table, &mut book)?;
+            continue;
+        }
+        let offset = *sheet_offsets.get(table.layout.sheet_name.as_str()).unwrap_or(&0);
+        let start_row = (table.layout.data_start_row as i32 + offset) as u32;
+        let current_rows = table.layout.data_rows as i32;
+        let desired_rows = table.rows.len() as i32;
+        let diff = desired_rows - current_rows;
+        eprintln!(
+            "Writing table '{}' on sheet '{}' start_row={} current_rows={} desired_rows={} diff={}",
+            table.layout.name, table.layout.sheet_name, start_row, current_rows, desired_rows, diff
+        );
+
         let sheet =
             book.get_sheet_by_name_mut(table.layout.sheet_name.as_str()).ok_or_else(|| {
                 anyhow::anyhow!("Table '{}' not found in original XLSM", table.layout.name)
             })?;
+
+        if diff > 0 {
+            let insert_at = start_row + table.layout.data_rows as u32;
+            sheet.insert_new_row(&insert_at, &(diff as u32));
+            let source_row = if table.layout.data_rows > 0 {
+                start_row + table.layout.data_rows as u32 - 1
+            } else {
+                start_row
+            };
+            for i in 0..diff {
+                let target_row = insert_at + i as u32;
+                copy_row(sheet, source_row, target_row, &table.layout);
+            }
+        } else if diff < 0 {
+            let remove_start = start_row + desired_rows as u32;
+            let remove_count = (-diff) as u32;
+            sheet.remove_row(&remove_start, &remove_count);
+        }
+
+        let updated_offset = offset + diff;
+        sheet_offsets.insert(table.layout.sheet_name.clone(), updated_offset);
+
         for (row_idx, row) in table.rows.iter().enumerate() {
-            let row_num = table.layout.data_start_row + row_idx as u32;
+            let row_num = start_row + row_idx as u32;
             for (col_idx, value) in row.iter().enumerate() {
                 let col_num = table.column_indices[col_idx];
                 let cell = sheet.get_cell_mut((col_num, row_num));

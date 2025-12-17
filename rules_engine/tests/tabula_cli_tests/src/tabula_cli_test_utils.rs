@@ -145,6 +145,35 @@ pub fn create_table_with_trailing_blank_row(path: &Path) -> Result<()> {
     Ok(())
 }
 
+pub fn create_single_table_with_note(path: &Path) -> Result<()> {
+    let mut book = umya_spreadsheet::new_file();
+    let sheet = book.get_sheet_mut(&0).expect("Sheet 0 should exist");
+    sheet.set_name("Single");
+
+    sheet.get_cell_mut("A1").set_value("Name");
+    sheet.get_cell_mut("B1").set_value("Value");
+
+    sheet.get_cell_mut("A2").set_value("First");
+    sheet.get_cell_mut("B2").set_value_number(1);
+    sheet.get_cell_mut("A3").set_value("Second");
+    sheet.get_cell_mut("B3").set_value_number(2);
+
+    sheet.get_cell_mut("A10").set_value("Note");
+
+    let mut table = Table::default();
+    table.set_name("Single");
+    table.set_display_name("Single");
+    table.set_area(("A1", "B3"));
+
+    table.add_column(make_column("Name"));
+    table.add_column(make_column("Value"));
+
+    sheet.add_table(table);
+
+    xlsx::write(&book, path)?;
+    Ok(())
+}
+
 pub fn create_xlsm_with_images(path: &Path) -> Result<(Vec<String>, Vec<u8>, Vec<u8>)> {
     let file = File::create(path)?;
     let mut writer = ZipWriter::new(file);

@@ -82,29 +82,6 @@ active = true
 }
 
 #[test]
-fn build_xls_errors_on_row_count_mismatch() {
-    let temp_dir = TempDir::new().expect("temp dir");
-    let git_dir = temp_dir.path().join(".git");
-    fs::create_dir_all(&git_dir).expect("git dir");
-
-    let xlsx_path = temp_dir.path().join("test_table.xlsx");
-    tabula_cli_test_utils::create_test_spreadsheet_with_table(&xlsx_path).expect("spreadsheet");
-
-    let toml_dir = temp_dir.path().join("toml");
-    fs::create_dir_all(&toml_dir).expect("toml dir");
-    let toml = r#"
-[[test-table]]
-name = "Only"
-count = 1
-active = true
-"#;
-    fs::write(toml_dir.join("test-table.toml"), toml).expect("write toml");
-
-    let result = build_xls::build_xls(false, Some(toml_dir), Some(xlsx_path), None);
-    assert!(result.unwrap_err().to_string().contains("Row count mismatch"));
-}
-
-#[test]
 fn build_xls_errors_on_unknown_columns() {
     let temp_dir = TempDir::new().expect("temp dir");
     let git_dir = temp_dir.path().join(".git");
@@ -195,6 +172,82 @@ value = 20
     assert!(matches!(data.get((0, 1)), Some(Data::Float(f)) if (*f - 10.0).abs() < f64::EPSILON));
     assert!(matches!(data.get((1, 1)), Some(Data::Float(f)) if (*f - 20.0).abs() < f64::EPSILON));
     assert!(matches!(data.get((2, 0)), Some(Data::Empty)));
+}
+
+#[test]
+fn build_xls_removes_excess_rows() {
+    let temp_dir = TempDir::new().expect("temp dir");
+    let git_dir = temp_dir.path().join(".git");
+    fs::create_dir_all(&git_dir).expect("git dir");
+
+    let xlsx_path = temp_dir.path().join("trailing.xlsx");
+    tabula_cli_test_utils::create_table_with_trailing_blank_row(&xlsx_path).expect("spreadsheet");
+
+    let toml_dir = temp_dir.path().join("toml");
+    fs::create_dir_all(&toml_dir).expect("toml dir");
+    let toml = r#"
+[[trailing]]
+name = "Alpha"
+value = 10
+"#;
+    fs::write(toml_dir.join("trailing.toml"), toml).expect("write toml");
+
+    build_xls::build_xls(false, Some(toml_dir), Some(xlsx_path.clone()), None).expect("build-xls");
+
+    let mut workbook: calamine::Xlsx<_> = calamine::open_workbook(&xlsx_path).expect("open");
+    workbook.load_tables().expect("tables");
+    let table = workbook.table_by_name("Trailing").expect("table");
+    let data = table.data();
+    assert!(matches!(data.get((0, 0)), Some(Data::String(s)) if s == "Alpha"));
+    assert!(matches!(data.get((0, 1)), Some(Data::Float(f)) if (*f - 10.0).abs() < f64::EPSILON));
+    assert!(matches!(data.get((1, 0)), Some(Data::Empty)));
+    assert!(matches!(data.get((1, 1)), Some(Data::Empty)));
+}
+
+#[test]
+fn build_xls_does_not_shift_cells_outside_single_table() {
+    let temp_dir = TempDir::new().expect("temp dir");
+    let git_dir = temp_dir.path().join(".git");
+    fs::create_dir_all(&git_dir).expect("git dir");
+
+    let xlsx_path = temp_dir.path().join("single.xlsx");
+    tabula_cli_test_utils::create_single_table_with_note(&xlsx_path).expect("spreadsheet");
+
+    let toml_dir = temp_dir.path().join("toml");
+    fs::create_dir_all(&toml_dir).expect("toml dir");
+    let toml = r#"
+[[single]]
+name = "Alpha"
+value = 1
+
+[[single]]
+name = "Beta"
+value = 2
+
+[[single]]
+name = "Gamma"
+value = 3
+"#;
+    fs::write(toml_dir.join("single.toml"), toml).expect("write toml");
+
+    build_xls::build_xls(false, Some(toml_dir), Some(xlsx_path.clone()), None).expect("build-xls");
+
+    let mut workbook: calamine::Xlsx<_> = calamine::open_workbook(&xlsx_path).expect("open");
+    workbook.load_tables().expect("tables");
+    let table = workbook.table_by_name("Single").expect("table");
+    let data = table.data();
+    let names: Vec<_> = data
+        .rows()
+        .map(|row| match row.get(0) {
+            Some(Data::String(s)) => s.clone(),
+            _ => "".to_string(),
+        })
+        .collect();
+    assert_eq!(names, vec!["Alpha".to_string(), "Beta".to_string(), "Gamma".to_string()]);
+
+    let book = umya_spreadsheet::reader::xlsx::read(&xlsx_path).expect("read umya");
+    let sheet = book.get_sheet_by_name("Single").expect("sheet");
+    assert_eq!(sheet.get_value("A10"), "Note");
 }
 
 #[test]
