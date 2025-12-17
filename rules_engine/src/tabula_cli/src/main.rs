@@ -2,7 +2,7 @@ use std::path::PathBuf;
 
 use anyhow::{Result, bail};
 use clap::{Parser, Subcommand};
-use tabula_cli::commands::{build_toml, build_xls, strip_images};
+use tabula_cli::commands::{build_toml, build_xls, strip_images, validate};
 
 #[derive(Parser)]
 #[command(name = "tabula")]
@@ -50,6 +50,12 @@ enum Commands {
         #[arg(long, help = "Include image stripping in validation")]
         strip_images: bool,
 
+        #[arg(long, help = "Report all validation problems instead of stopping at the first")]
+        all: bool,
+
+        #[arg(long, help = "Show surrounding XML lines for file differences")]
+        verbose: bool,
+
         #[arg(help = "Directory containing TOML files")]
         toml_dir: Option<PathBuf>,
     },
@@ -90,9 +96,13 @@ fn run() -> Result<()> {
         Commands::BuildXls { dry_run, toml_dir, xlsm_path, output_path } => {
             build_xls::build_xls(dry_run, toml_dir, xlsm_path, output_path)?;
         }
-        Commands::Validate { applescript, strip_images, toml_dir } => bail!(
-            "validate not yet implemented: applescript={applescript}, strip_images={strip_images}, toml_dir={toml_dir:?}"
-        ),
+        Commands::Validate { applescript, strip_images, all, verbose, toml_dir } => {
+            validate::validate(
+                validate::ValidateConfig { applescript, strip_images, report_all: all, verbose },
+                toml_dir,
+                None,
+            )?;
+        }
         Commands::StripImages { xlsm_path, output_path } => {
             strip_images::strip_images(xlsm_path, output_path)?;
         }

@@ -649,3 +649,4 @@ Mark completed milestones at the top of this design document.
 - [x] Milestone 4: strip-images Command
 - [x] Milestone 5: build-xls Command (Basic)
 - [x] Milestone 6: build-xls Row Handling
+- [x] Milestone 7: validate Command
