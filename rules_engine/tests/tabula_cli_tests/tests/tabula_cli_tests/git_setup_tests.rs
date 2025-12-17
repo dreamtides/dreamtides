@@ -5,7 +5,6 @@ use std::process::Command;
 use std::thread;
 use std::time::Duration;
 
-use calamine::Reader;
 use tabula_cli::commands::git_setup::{self, Hook};
 use tabula_cli::commands::build_toml;
 use tabula_cli::commands::strip_images;
@@ -23,18 +22,17 @@ fn git_setup_installs_hooks_and_gitattributes() {
 
     let gitattributes =
         fs::read_to_string(root.join(".gitattributes")).expect("gitattributes contents");
-    assert!(gitattributes.contains("client/Assets/StreamingAssets/Tabula.xlsm filter=lfs diff=lfs merge=lfs -text"));
+    assert!(gitattributes
+        .contains("client/Assets/StreamingAssets/TabulaData.xlsm filter=lfs diff=lfs merge=lfs -text"));
 
     let pre_commit = fs::read_to_string(root.join(".git/hooks/pre-commit")).expect("pre-commit");
     let post_checkout =
         fs::read_to_string(root.join(".git/hooks/post-checkout")).expect("post-checkout");
     let post_merge = fs::read_to_string(root.join(".git/hooks/post-merge")).expect("post-merge");
-    let post_commit = fs::read_to_string(root.join(".git/hooks/post-commit")).expect("post-commit");
 
     assert!(pre_commit.contains("git-hook pre-commit"));
     assert!(post_checkout.contains("git-hook post-checkout"));
     assert!(post_merge.contains("git-hook post-merge"));
-    assert!(post_commit.contains("git-hook post-commit"));
     assert!(root.join(".git/xlsm_image_cache").is_dir());
 }
 
@@ -74,32 +72,36 @@ fn pre_commit_builds_toml_strips_and_stages_changes() {
 
     git_setup::run_hook_for_root(Hook::PreCommit, root).expect("pre-commit");
 
-    let mut archive = ZipArchive::new(fs::File::open(&xlsm_path).expect("open zip"))
-        .expect("zip archive");
+    let data_path = root.join("client/Assets/StreamingAssets/TabulaData.xlsm");
+    let mut data_archive =
+        ZipArchive::new(fs::File::open(&data_path).expect("open zip")).expect("zip archive");
     let mut data = Vec::new();
-    archive
+    data_archive
         .by_name("xl/media/image1.jpg")
         .expect("image1")
         .read_to_end(&mut data)
         .expect("read image1");
     assert_eq!(data, strip_images::PLACEHOLDER_JPEG);
 
+    let mut xlsm_archive =
+        ZipArchive::new(fs::File::open(&xlsm_path).expect("open zip")).expect("zip archive");
+    let mut original = Vec::new();
+    xlsm_archive
+        .by_name("xl/media/image1.jpg")
+        .expect("image1")
+        .read_to_end(&mut original)
+        .expect("read image1");
+    assert_ne!(original, strip_images::PLACEHOLDER_JPEG);
+
     let staged = Command::new("git")
         .current_dir(root)
         .arg("show")
-        .arg(":client/Assets/StreamingAssets/Tabula.xlsm")
+        .arg(":client/Assets/StreamingAssets/TabulaData.xlsm")
         .output()
         .expect("git show");
     assert!(staged.status.success());
-    let mut cursor = std::io::Cursor::new(staged.stdout);
-    let mut archive = ZipArchive::new(&mut cursor).expect("zip archive");
-    let mut staged_data = Vec::new();
-    archive
-        .by_name("xl/media/image1.jpg")
-        .expect("image1 staged")
-        .read_to_end(&mut staged_data)
-        .expect("read staged");
-    assert_eq!(staged_data, strip_images::PLACEHOLDER_JPEG);
+    let staged_text = String::from_utf8_lossy(&staged.stdout);
+    assert!(staged_text.contains("git-lfs.github.com/spec/v1"));
 
     let toml_path = root.join("client/Assets/StreamingAssets/Tabula/test-table.toml");
     let toml_content = fs::read_to_string(&toml_path).expect("toml file");
@@ -113,7 +115,8 @@ fn pre_commit_builds_toml_strips_and_stages_changes() {
         .output()
         .expect("git status");
     let output = String::from_utf8_lossy(&status.stdout);
-    assert!(output.contains("client/Assets/StreamingAssets/Tabula.xlsm"));
+    assert!(!output.contains("Tabula.xlsm"));
+    assert!(output.contains("client/Assets/StreamingAssets/TabulaData.xlsm"));
     assert!(output.contains("client/Assets/StreamingAssets/Tabula/test-table.toml"));
 }
 
@@ -182,6 +185,7 @@ fn rebuild_hook_restores_images_from_cache() {
     git_setup::git_setup_for_root(root).expect("setup");
 
     let xlsm_path = root.join("client/Assets/StreamingAssets/Tabula.xlsm");
+    let data_path = root.join("client/Assets/StreamingAssets/TabulaData.xlsm");
     fs::create_dir_all(xlsm_path.parent().unwrap()).expect("xlsm dir");
     tabula_cli_test_utils::create_test_spreadsheet_with_table(&xlsm_path).expect("sheet");
     let original_one = b"img-one".to_vec();
@@ -192,8 +196,8 @@ fn rebuild_hook_restores_images_from_cache() {
     )
     .expect("media");
 
-    strip_images::strip_images(Some(xlsm_path.clone()), Some(xlsm_path.clone()))
-        .expect("strip");
+    strip_images::strip_images(Some(xlsm_path.clone()), Some(data_path.clone())).expect("strip");
+    fs::remove_file(&xlsm_path).expect("remove original");
     git_setup::run_hook_for_root(Hook::PostCheckout, root).expect("rebuild");
 
     let mut archive = ZipArchive::new(fs::File::open(&xlsm_path).expect("open zip"))

@@ -28,6 +28,7 @@ pub fn git_setup() -> Result<()> {
 
 pub fn git_setup_for_root(root: &Path) -> Result<()> {
     ensure_hooks_path(root)?;
+    ensure_gitignore(root)?;
     ensure_gitattributes(root)?;
     let cache_dir = paths::image_cache_dir_for(root);
     fs::create_dir_all(&cache_dir)
@@ -35,7 +36,6 @@ pub fn git_setup_for_root(root: &Path) -> Result<()> {
     install_hook(root, Hook::PreCommit)?;
     install_hook(root, Hook::PostCheckout)?;
     install_hook(root, Hook::PostMerge)?;
-    install_hook(root, Hook::PostCommit)?;
     Ok(())
 }
 
@@ -61,17 +61,29 @@ fn run_pre_commit(root: &Path) -> Result<()> {
         .with_context(|| format!("Cannot write to output directory {}", toml_dir.display()))?;
     ensure_toml_not_newer(root, &xlsm_path, &toml_dir)?;
     build_toml::build_toml(Some(xlsm_path.clone()), Some(toml_dir.clone()))?;
-    strip_images::strip_images(Some(xlsm_path.clone()), Some(xlsm_path.clone()))?;
-    ensure_stripped(&xlsm_path)?;
-    stage_paths(root, &[xlsm_path.as_path(), toml_dir.as_path()])?;
-    ensure_staged_stripped(root, &xlsm_path)
+    let data_path = tabula_data_path(root);
+    strip_images::strip_images(Some(xlsm_path.clone()), Some(data_path.clone()))?;
+    ensure_stripped(&data_path)?;
+    stage_paths(root, &[data_path.as_path(), toml_dir.as_path()])?;
+    ensure_staged_stripped(root, &data_path)
 }
 
 fn rebuild_after_checkout(root: &Path) -> Result<()> {
-    let xlsm_path = tabula_path(root);
-    if !xlsm_path.exists() {
+    let data_path = tabula_data_path(root);
+    if !data_path.exists() {
         return Ok(());
     }
+    let xlsm_path = tabula_path(root);
+    if let Some(parent) = xlsm_path.parent() {
+        fs::create_dir_all(parent)
+            .with_context(|| format!("Cannot write to output directory {}", parent.display()))?;
+    }
+    fs::copy(&data_path, &xlsm_path).with_context(|| {
+        format!(
+            "Cannot write to output directory {}",
+            xlsm_path.parent().unwrap_or(Path::new(".")).display()
+        )
+    })?;
     rebuild_images::rebuild_images(Some(xlsm_path), false, true)
 }
 
@@ -220,7 +232,8 @@ fn is_lfs_pointer(bytes: &[u8]) -> bool {
 
 fn ensure_gitattributes(root: &Path) -> Result<()> {
     let path = root.join(".gitattributes");
-    let desired = "client/Assets/StreamingAssets/Tabula.xlsm filter=lfs diff=lfs merge=lfs -text\n";
+    let desired =
+        "client/Assets/StreamingAssets/TabulaData.xlsm filter=lfs diff=lfs merge=lfs -text\n";
     let mut content = if path.exists() {
         fs::read_to_string(&path).with_context(|| format!("Cannot open {}", path.display()))?
     } else {
@@ -254,6 +267,24 @@ fn ensure_hooks_path(root: &Path) -> Result<()> {
         );
     }
     Ok(())
+}
+
+fn ensure_gitignore(root: &Path) -> Result<()> {
+    let path = root.join(".gitignore");
+    let desired = "client/Assets/StreamingAssets/Tabula.xlsm\n";
+    let mut content = if path.exists() {
+        fs::read_to_string(&path).with_context(|| format!("Cannot open {}", path.display()))?
+    } else {
+        String::new()
+    };
+    if content.contains(desired.trim_end()) {
+        return Ok(());
+    }
+    if !content.is_empty() && !content.ends_with('\n') {
+        content.push('\n');
+    }
+    content.push_str(desired);
+    fs::write(&path, content).with_context(|| format!("Cannot write to {}", path.display()))
 }
 
 fn install_hook(root: &Path, hook: Hook) -> Result<()> {
@@ -298,6 +329,10 @@ fn hook_script(hook: Hook) -> String {
 
 fn tabula_path(root: &Path) -> PathBuf {
     root.join("client/Assets/StreamingAssets/Tabula.xlsm")
+}
+
+fn tabula_data_path(root: &Path) -> PathBuf {
+    root.join("client/Assets/StreamingAssets/TabulaData.xlsm")
 }
 
 fn tabula_toml_dir(root: &Path) -> PathBuf {
