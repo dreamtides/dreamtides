@@ -1,5 +1,6 @@
 use std::collections::{BTreeMap, HashSet};
 use std::fs;
+use std::io::{Read, Write};
 use std::path::{Path, PathBuf};
 
 use anyhow::{Context, Result, anyhow, bail};
@@ -9,6 +10,7 @@ use umya_spreadsheet::helper::coordinate::string_from_column_index;
 use umya_spreadsheet::reader::xlsx;
 use umya_spreadsheet::structs::Worksheet;
 use umya_spreadsheet::writer;
+use zip::write::FileOptions;
 
 use crate::core::excel_reader::ColumnType;
 use crate::core::excel_writer::{ColumnLayout, TableLayout};
@@ -91,10 +93,12 @@ fn resolve_xlsm_path(xlsm_path: Option<PathBuf>) -> Result<PathBuf> {
 }
 
 fn resolve_output_path(template_path: &Path, output_path: Option<PathBuf>) -> Result<PathBuf> {
-    match output_path {
-        Some(path) => Ok(path),
-        None => Ok(template_path.to_path_buf()),
-    }
+    output_path.ok_or_else(|| {
+        anyhow!(
+            "--output-path is required (pass the XLSM template path to overwrite in place; template: {})",
+            template_path.display()
+        )
+    })
 }
 
 fn load_toml_tables(dir: &Path) -> Result<BTreeMap<String, TomlTable>> {
@@ -519,9 +523,63 @@ fn write_tables(template_path: &Path, destination: &Path, tables: &[PreparedTabl
     let temp_path = temp.into_temp_path();
     let temp_buf = temp_path.to_path_buf();
     writer::xlsx::write(&book, &temp_buf)?;
+    ensure_recalc_on_open(&temp_buf)?;
     temp_path
         .persist(destination)
         .with_context(|| format!("Cannot write to output directory {}", parent.display()))?;
 
+    Ok(())
+}
+
+fn ensure_recalc_on_open(path: &Path) -> Result<()> {
+    let file = fs::File::open(path)?;
+    let mut archive = zip::ZipArchive::new(file)?;
+    let parent = path.parent().unwrap_or(Path::new("."));
+    let patched = Builder::new().prefix("tabula_calc_patch").tempfile_in(parent)?;
+    let mut writer = zip::ZipWriter::new(patched);
+
+    for i in 0..archive.len() {
+        let mut entry = archive.by_index(i)?;
+        let name = entry.name().to_string();
+        if name == "xl/calcChain.xml" {
+            continue;
+        }
+        let options = FileOptions::<()>::default()
+            .compression_method(entry.compression())
+            .last_modified_time(entry.last_modified().unwrap_or_else(zip::DateTime::default));
+        if entry.is_dir() {
+            writer.add_directory(name.clone(), options)?;
+            continue;
+        }
+        writer.start_file(name.clone(), options)?;
+        if name == "xl/workbook.xml" {
+            let mut contents = String::new();
+            entry.read_to_string(&mut contents)?;
+            let calc_tag =
+                r#"<calcPr calcId="122211" calcMode="auto" fullCalcOnLoad="1" forceFullCalc="1"/>"#;
+            if let Some(start) = contents.find("<calcPr") {
+                if let Some(end) = contents[start..].find("/>") {
+                    let end_idx = start + end + 2;
+                    contents.replace_range(start..end_idx, calc_tag);
+                }
+            } else if let Some(pos) = contents.rfind("</workbook>") {
+                contents.insert_str(pos, calc_tag);
+            }
+            writer.write_all(contents.as_bytes())?;
+        } else if name == "xl/_rels/workbook.xml.rels" {
+            let mut contents = String::new();
+            entry.read_to_string(&mut contents)?;
+            let filtered = contents
+                .lines()
+                .filter(|line| !line.contains("calcChain"))
+                .collect::<Vec<_>>()
+                .join("\n");
+            writer.write_all(filtered.as_bytes())?;
+        } else {
+            std::io::copy(&mut entry, &mut writer)?;
+        }
+    }
+    let patched_file = writer.finish()?;
+    patched_file.persist(path)?;
     Ok(())
 }

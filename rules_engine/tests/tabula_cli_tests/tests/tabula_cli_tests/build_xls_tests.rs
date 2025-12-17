@@ -1,9 +1,11 @@
 use std::fs;
+use std::io::Read;
 
 use calamine::{self, Data};
 use tabula_cli::commands::build_xls;
 use tabula_cli_tests::tabula_cli_test_utils;
 use tempfile::TempDir;
+use zip::ZipArchive;
 
 #[test]
 fn build_xls_writes_data_and_preserves_formulas() {
@@ -29,7 +31,8 @@ active = true
 "#;
     fs::write(toml_dir.join("test-table.toml"), toml).expect("write toml");
 
-    build_xls::build_xls(false, Some(toml_dir), Some(xlsx_path.clone()), None).expect("build-xls");
+    build_xls::build_xls(false, Some(toml_dir), Some(xlsx_path.clone()), Some(xlsx_path.clone()))
+        .expect("build-xls");
 
     let mut workbook: calamine::Xlsx<_> = calamine::open_workbook(&xlsx_path).expect("open");
     workbook.load_tables().expect("tables");
@@ -74,7 +77,12 @@ active = true
 "#;
     fs::write(toml_dir.join("test-table.toml"), toml).expect("write toml");
 
-    let result = build_xls::build_xls(true, Some(toml_dir), Some(xlsx_path.clone()), None);
+    let result = build_xls::build_xls(
+        true,
+        Some(toml_dir),
+        Some(xlsx_path.clone()),
+        Some(xlsx_path.clone()),
+    );
     assert!(result.is_ok());
 
     let after = fs::read(&xlsx_path).expect("read after");
@@ -107,7 +115,8 @@ computed = "nope"
 "#;
     fs::write(toml_dir.join("test-table.toml"), toml).expect("write toml");
 
-    let result = build_xls::build_xls(false, Some(toml_dir), Some(xlsx_path), None);
+    let result =
+        build_xls::build_xls(false, Some(toml_dir), Some(xlsx_path.clone()), Some(xlsx_path));
     assert!(result.unwrap_err().to_string().contains("does not match any writable column"));
 }
 
@@ -127,7 +136,8 @@ predicate_types = ["One", "Two", "Three"]
 "#;
     fs::write(toml_dir.join("predicate-types.toml"), toml).expect("write toml");
 
-    build_xls::build_xls(false, Some(toml_dir), Some(xlsx_path.clone()), None).expect("build-xls");
+    build_xls::build_xls(false, Some(toml_dir), Some(xlsx_path.clone()), Some(xlsx_path.clone()))
+        .expect("build-xls");
 
     let mut workbook: calamine::Xlsx<_> = calamine::open_workbook(&xlsx_path).expect("open");
     workbook.load_tables().expect("tables");
@@ -161,7 +171,8 @@ value = 20
 "#;
     fs::write(toml_dir.join("trailing.toml"), toml).expect("write toml");
 
-    build_xls::build_xls(false, Some(toml_dir), Some(xlsx_path.clone()), None).expect("build-xls");
+    build_xls::build_xls(false, Some(toml_dir), Some(xlsx_path.clone()), Some(xlsx_path.clone()))
+        .expect("build-xls");
 
     let mut workbook: calamine::Xlsx<_> = calamine::open_workbook(&xlsx_path).expect("open");
     workbook.load_tables().expect("tables");
@@ -192,7 +203,8 @@ value = 10
 "#;
     fs::write(toml_dir.join("trailing.toml"), toml).expect("write toml");
 
-    build_xls::build_xls(false, Some(toml_dir), Some(xlsx_path.clone()), None).expect("build-xls");
+    build_xls::build_xls(false, Some(toml_dir), Some(xlsx_path.clone()), Some(xlsx_path.clone()))
+        .expect("build-xls");
 
     let mut workbook: calamine::Xlsx<_> = calamine::open_workbook(&xlsx_path).expect("open");
     workbook.load_tables().expect("tables");
@@ -230,7 +242,8 @@ value = 3
 "#;
     fs::write(toml_dir.join("single.toml"), toml).expect("write toml");
 
-    build_xls::build_xls(false, Some(toml_dir), Some(xlsx_path.clone()), None).expect("build-xls");
+    build_xls::build_xls(false, Some(toml_dir), Some(xlsx_path.clone()), Some(xlsx_path.clone()))
+        .expect("build-xls");
 
     let mut workbook: calamine::Xlsx<_> = calamine::open_workbook(&xlsx_path).expect("open");
     workbook.load_tables().expect("tables");
@@ -284,7 +297,8 @@ score = 20
 "#;
     fs::write(toml_dir.join("tables.toml"), toml).expect("write toml");
 
-    build_xls::build_xls(false, Some(toml_dir), Some(xlsx_path.clone()), None).expect("build-xls");
+    build_xls::build_xls(false, Some(toml_dir), Some(xlsx_path.clone()), Some(xlsx_path.clone()))
+        .expect("build-xls");
 
     let mut workbook: calamine::Xlsx<_> = calamine::open_workbook(&xlsx_path).expect("open");
     workbook.load_tables().expect("tables");
@@ -338,7 +352,8 @@ right-score = 40
 "#;
     fs::write(toml_dir.join("tables.toml"), toml).expect("write toml");
 
-    build_xls::build_xls(false, Some(toml_dir), Some(xlsx_path.clone()), None).expect("build-xls");
+    build_xls::build_xls(false, Some(toml_dir), Some(xlsx_path.clone()), Some(xlsx_path.clone()))
+        .expect("build-xls");
 
     let mut workbook: calamine::Xlsx<_> = calamine::open_workbook(&xlsx_path).expect("open");
     workbook.load_tables().expect("tables");
@@ -403,4 +418,45 @@ active = false
 
     let template_after = fs::read(&template_path).expect("read template after");
     assert_eq!(original_bytes, template_after);
+}
+
+#[test]
+fn build_xls_marks_workbook_for_recalc() {
+    let temp_dir = TempDir::new().expect("temp dir");
+    let git_dir = temp_dir.path().join(".git");
+    fs::create_dir_all(&git_dir).expect("git dir");
+
+    let xlsx_path = temp_dir.path().join("test_table.xlsx");
+    tabula_cli_test_utils::create_test_spreadsheet_with_table(&xlsx_path).expect("spreadsheet");
+
+    let toml_dir = temp_dir.path().join("toml");
+    fs::create_dir_all(&toml_dir).expect("toml dir");
+    let toml = r#"
+[[test-table]]
+name = "Carol"
+count = 5
+active = false
+"#;
+    fs::write(toml_dir.join("test-table.toml"), toml).expect("write toml");
+
+    build_xls::build_xls(false, Some(toml_dir), Some(xlsx_path.clone()), Some(xlsx_path.clone()))
+        .expect("build-xls");
+
+    let file = fs::File::open(&xlsx_path).expect("open output");
+    let mut archive = ZipArchive::new(file).expect("zip");
+    assert!(archive.by_name("xl/calcChain.xml").is_err());
+
+    {
+        let mut workbook_rels =
+            archive.by_name("xl/_rels/workbook.xml.rels").expect("workbook rels");
+        let mut rels_contents = String::new();
+        workbook_rels.read_to_string(&mut rels_contents).expect("read rels");
+        assert!(!rels_contents.contains("calcChain"));
+    }
+
+    let mut workbook = archive.by_name("xl/workbook.xml").expect("workbook");
+    let mut workbook_contents = String::new();
+    workbook.read_to_string(&mut workbook_contents).expect("read workbook");
+    assert!(workbook_contents.contains("fullCalcOnLoad=\"1\""));
+    assert!(workbook_contents.contains("calcMode=\"auto\""));
 }

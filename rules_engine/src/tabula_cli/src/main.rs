@@ -28,7 +28,11 @@ enum Commands {
         #[arg(long, help = "Perform a dry run without writing changes")]
         dry_run: bool,
 
-        #[arg(long, help = "Path for the XLSM output; defaults to overwriting the input")]
+        #[arg(
+            long,
+            required = true,
+            help = "Path for the XLSM output (pass the input path to overwrite in place)"
+        )]
         output_path: Option<PathBuf>,
 
         #[arg(help = "Directory containing TOML files")]
