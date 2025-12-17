@@ -1,5 +1,7 @@
+use std::fs;
+
 use tabula_cli::core::excel_reader::{self, ColumnType};
-use tabula_cli::core::excel_writer;
+use tabula_cli::core::{excel_writer, paths};
 use tabula_cli_tests::tabula_cli_test_utils;
 use tempfile::TempDir;
 
@@ -85,4 +87,16 @@ fn load_table_layouts_counts_only_data_rows() {
     let layout =
         layouts.iter().find(|l| l.normalized_name == "trailing").expect("Expected trailing layout");
     assert_eq!(layout.data_rows, 2);
+}
+
+#[test]
+fn git_root_for_prefers_directory_with_justfile() {
+    let temp_dir = TempDir::new().expect("Failed to create temp dir");
+    let root = temp_dir.path().join("workspace");
+    let nested = root.join("nested");
+    fs::create_dir_all(&nested).expect("Failed to create nested dirs");
+    fs::write(root.join("justfile"), "").expect("Failed to write justfile");
+
+    let found = paths::git_root_for(&nested).expect("Failed to locate root");
+    assert_eq!(found, root);
 }

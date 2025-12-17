@@ -5,12 +5,12 @@ use anyhow::{Context, Result, bail};
 
 pub fn git_root() -> Result<PathBuf> {
     let cwd = env::current_dir().context("Failed to read current directory")?;
-    find_git_root(&cwd)
+    locate_project_root(&cwd)
 }
 
 pub fn git_root_for(path: &Path) -> Result<PathBuf> {
     let start = if path.is_dir() { path } else { path.parent().unwrap_or(path) };
-    find_git_root(start)
+    locate_project_root(start)
 }
 
 pub fn default_xlsm_path() -> Result<PathBuf> {
@@ -29,14 +29,33 @@ pub fn image_cache_dir_for(root: &Path) -> PathBuf {
     root.join(".git/xlsm_image_cache")
 }
 
-fn find_git_root(start: &Path) -> Result<PathBuf> {
+fn locate_project_root(start: &Path) -> Result<PathBuf> {
+    if let Some(found) = find_root(start) {
+        return Ok(found);
+    }
+    if let Some(found) = manifest_root() {
+        return Ok(found);
+    }
+    bail!("Unable to locate project root starting from {}", start.display());
+}
+
+fn find_root(start: &Path) -> Option<PathBuf> {
     let mut current = Some(start);
     while let Some(dir) = current {
-        let candidate = dir.join(".git");
-        if candidate.is_dir() {
-            return Ok(dir.to_path_buf());
+        let justfile = dir.join("justfile");
+        if justfile.is_file() {
+            return Some(dir.to_path_buf());
+        }
+        let git = dir.join(".git");
+        if git.is_dir() {
+            return Some(dir.to_path_buf());
         }
         current = dir.parent();
     }
-    bail!("Unable to locate .git directory starting from {}", start.display());
+    None
+}
+
+fn manifest_root() -> Option<PathBuf> {
+    let manifest_dir = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
+    manifest_dir.parent().and_then(|p| p.parent()).and_then(|p| p.parent()).map(|p| p.to_path_buf())
 }
