@@ -1,10 +1,7 @@
 use std::collections::{BTreeMap, BTreeSet};
-use std::fs;
-use std::path::{Path, PathBuf};
+use std::path::Path;
 
-use anyhow::{Context, Result, bail};
-use tempfile::Builder;
-use toml::Value;
+use anyhow::{Context, Result};
 use umya_spreadsheet::helper::coordinate::string_from_column_index;
 use umya_spreadsheet::reader::xlsx;
 use umya_spreadsheet::structs::{
@@ -13,319 +10,10 @@ use umya_spreadsheet::structs::{
 };
 use umya_spreadsheet::{DataValidationValues, Worksheet};
 
-use crate::commands::build_xls;
-use crate::core::{column_names, excel_reader, paths, toml_data};
-
-#[derive(Clone, Copy)]
-pub struct ValidateConfig {
-    pub applescript: bool,
-    pub strip_images: bool,
-    pub report_all: bool,
-    pub verbose: bool,
-}
-
-pub fn validate(
-    config: ValidateConfig,
-    toml_dir: Option<PathBuf>,
-    xlsm_path: Option<PathBuf>,
-) -> Result<()> {
-    if config.applescript {
-        bail!("AppleScript validation not implemented yet");
-    }
-    if config.strip_images {
-        bail!("--strip-images validation not implemented yet");
-    }
-    let toml_dir = resolve_toml_dir(toml_dir)?;
-    let template = resolve_xlsm_path(xlsm_path)?;
-    if !template.exists() {
-        bail!(
-            "Original XLSM not found at {}. This file is required as a template.",
-            template.display()
-        );
-    }
-    let temp_dir = Builder::new().prefix("tabula_validate").tempdir()?;
-    let output_name = template
-        .file_name()
-        .map(|s| s.to_string_lossy().to_string())
-        .unwrap_or_else(|| "output.xlsm".to_string());
-    let output_path = temp_dir.path().join(output_name);
-    build_xls::build_xls(
-        false,
-        Some(toml_dir.clone()),
-        Some(template.clone()),
-        Some(output_path.clone()),
-    )?;
-    let roundtrip_toml_dir = temp_dir.path().join("toml");
-    extract_tables_to_dir(&output_path, &roundtrip_toml_dir)?;
-
-    let mut errors = Vec::new();
-    compare_toml_dirs(&toml_dir, &roundtrip_toml_dir, config.report_all, &mut errors)?;
-    compare_workbooks(&template, &output_path, config, &mut errors)?;
-    if !errors.is_empty() {
-        bail!("{}", errors.join("\n"));
-    }
-    Ok(())
-}
-
-fn resolve_toml_dir(toml_dir: Option<PathBuf>) -> Result<PathBuf> {
-    match toml_dir {
-        Some(path) => Ok(path),
-        None => paths::default_toml_dir(),
-    }
-}
-
-fn resolve_xlsm_path(xlsm_path: Option<PathBuf>) -> Result<PathBuf> {
-    match xlsm_path {
-        Some(path) => Ok(path),
-        None => paths::default_xlsm_path(),
-    }
-}
-
-fn extract_tables_to_dir(xlsm_path: &Path, output_dir: &Path) -> Result<()> {
-    let tables = excel_reader::extract_tables(xlsm_path)?;
-    fs::create_dir_all(output_dir)
-        .with_context(|| format!("Cannot write to output directory {}", output_dir.display()))?;
-    for table in tables {
-        let toml_string = toml_data::table_to_toml(&table)?;
-        let file_name = format!("{}.toml", column_names::normalize_table_name(table.name.as_str()));
-        let file_path = output_dir.join(file_name);
-        fs::write(&file_path, toml_string).with_context(|| {
-            format!("Cannot write to output directory {}", output_dir.display())
-        })?;
-    }
-    Ok(())
-}
-
-fn compare_toml_dirs(
-    original: &Path,
-    roundtrip: &Path,
-    report_all: bool,
-    errors: &mut Vec<String>,
-) -> Result<()> {
-    let expected = load_toml_tables(original)?;
-    let actual = load_toml_tables(roundtrip)?;
-    for (name, table) in &expected {
-        let Some(actual_table) = actual.get(name) else {
-            if record_error(
-                errors,
-                report_all,
-                format!(
-                    "Round-trip failed: TOML differs at table '{}': missing table",
-                    table.source_name
-                ),
-            ) {
-                return Ok(());
-            }
-            continue;
-        };
-        compare_toml_values(table, actual_table, report_all, errors)?;
-    }
-    if let Some(extra) = actual.values().find(|t| !expected.contains_key(&t.normalized_name)) {
-        record_error(
-            errors,
-            report_all,
-            format!(
-                "Round-trip failed: TOML differs at table '{}': unexpected table",
-                extra.source_name
-            ),
-        );
-    }
-    Ok(())
-}
+use super::{ValidateConfig, record_error};
 
 #[derive(Clone)]
-struct ParsedTomlTable {
-    normalized_name: String,
-    source_name: String,
-    value: Value,
-}
-
-fn load_toml_tables(dir: &Path) -> Result<BTreeMap<String, ParsedTomlTable>> {
-    let entries = fs::read_dir(dir)
-        .with_context(|| format!("Cannot open TOML directory {}", dir.display()))?;
-    let mut tables = BTreeMap::new();
-    for entry in entries {
-        let entry = entry?;
-        if !entry.file_type()?.is_file() {
-            continue;
-        }
-        if entry.path().extension().and_then(|s| s.to_str()) != Some("toml") {
-            continue;
-        }
-        let content = fs::read_to_string(entry.path())
-            .with_context(|| format!("Cannot open TOML file {}", entry.path().display()))?;
-        let value: Value = toml::from_str(&content)
-            .with_context(|| format!("Cannot parse TOML file {}", entry.path().display()))?;
-        let value = toml_data::canonicalize_numbers(value);
-        let table = value.as_table().cloned().unwrap_or_default();
-        for (key, data) in table {
-            let normalized_name = column_names::normalize_table_name(key.as_str());
-            if tables.contains_key(&normalized_name) {
-                bail!("Unexpected TOML table '{normalized_name}' (not present in template)");
-            }
-            tables.insert(normalized_name.clone(), ParsedTomlTable {
-                normalized_name,
-                source_name: key,
-                value: data.clone(),
-            });
-        }
-    }
-    Ok(tables)
-}
-
-fn compare_toml_values(
-    expected: &ParsedTomlTable,
-    actual: &ParsedTomlTable,
-    report_all: bool,
-    errors: &mut Vec<String>,
-) -> Result<()> {
-    match (&expected.value, &actual.value) {
-        (Value::Array(expected_rows), Value::Array(actual_rows)) => {
-            if expected_rows.len() != actual_rows.len()
-                && record_error(
-                    errors,
-                    report_all,
-                    format!(
-                        "Round-trip failed: TOML differs at table '{}', row count {} vs {}",
-                        expected.source_name,
-                        expected_rows.len(),
-                        actual_rows.len()
-                    ),
-                )
-            {
-                return Ok(());
-            }
-            for (idx, (expected_row, actual_row)) in
-                expected_rows.iter().zip(actual_rows.iter()).enumerate()
-            {
-                match (expected_row, actual_row) {
-                    (Value::Table(expected_table), Value::Table(actual_table)) => {
-                        compare_table_row(
-                            expected.source_name.as_str(),
-                            idx + 1,
-                            expected_table,
-                            actual_table,
-                            report_all,
-                            errors,
-                        )?;
-                    }
-                    _ => {
-                        if expected_row != actual_row
-                            && record_error(
-                                errors,
-                                report_all,
-                                format!(
-                                    "Round-trip failed: TOML differs at table '{}', row {}, expected {} but found {}",
-                                    expected.source_name,
-                                    idx + 1,
-                                    format_value(expected_row),
-                                    format_value(actual_row)
-                                ),
-                            )
-                        {
-                            return Ok(());
-                        }
-                    }
-                }
-            }
-            Ok(())
-        }
-        _ => {
-            if expected.value == actual.value {
-                Ok(())
-            } else {
-                record_error(
-                    errors,
-                    report_all,
-                    format!("Round-trip failed: TOML differs at table '{}'", expected.source_name),
-                );
-                Ok(())
-            }
-        }
-    }
-}
-
-fn compare_table_row(
-    table_name: &str,
-    row_idx: usize,
-    expected: &toml::Table,
-    actual: &toml::Table,
-    report_all: bool,
-    errors: &mut Vec<String>,
-) -> Result<()> {
-    let expected_keys: BTreeSet<_> = expected.keys().cloned().collect();
-    let actual_keys: BTreeSet<_> = actual.keys().cloned().collect();
-    for key in &expected_keys {
-        if !actual_keys.contains(key)
-            && record_error(
-                errors,
-                report_all,
-                format!(
-                    "Round-trip failed: TOML differs at table '{table_name}', row {row_idx}, missing column '{key}'"
-                ),
-            )
-        {
-            return Ok(());
-        }
-    }
-    for key in &actual_keys {
-        if !expected_keys.contains(key)
-            && record_error(
-                errors,
-                report_all,
-                format!(
-                    "Round-trip failed: TOML differs at table '{table_name}', row {row_idx}, unexpected column '{key}'"
-                ),
-            )
-        {
-            return Ok(());
-        }
-    }
-    for key in &expected_keys {
-        let expected_value = expected.get(key).unwrap();
-        let actual_value = actual.get(key).unwrap();
-        if expected_value != actual_value
-            && record_error(
-                errors,
-                report_all,
-                format!(
-                    "Round-trip failed: TOML differs at table '{table_name}', row {row_idx}, column '{key}': expected {} but found {}",
-                    format_value(expected_value),
-                    format_value(actual_value)
-                ),
-            )
-        {
-            return Ok(());
-        }
-    }
-    Ok(())
-}
-
-fn format_value(value: &Value) -> String {
-    value.to_string()
-}
-
-fn compare_workbooks(
-    original: &Path,
-    roundtrip: &Path,
-    config: ValidateConfig,
-    errors: &mut Vec<String>,
-) -> Result<()> {
-    let original_snapshot = build_snapshot(original)?;
-    let roundtrip_snapshot = build_snapshot(roundtrip)?;
-    compare_sheet_order(&original_snapshot, &roundtrip_snapshot, config, errors)?;
-    compare_tables(&original_snapshot, &roundtrip_snapshot, config, errors)?;
-    compare_sheet_snapshots(&original_snapshot, &roundtrip_snapshot, config, errors)?;
-    Ok(())
-}
-
-fn record_error(errors: &mut Vec<String>, report_all: bool, message: String) -> bool {
-    errors.push(message);
-    !report_all
-}
-
-#[derive(Clone)]
-struct WorkbookSnapshot {
+pub(super) struct WorkbookSnapshot {
     sheets: Vec<String>,
     tables: BTreeMap<String, TableSnapshot>,
     sheet_snapshots: BTreeMap<String, SheetSnapshot>,
@@ -402,6 +90,20 @@ struct CellAlignmentSnapshot {
     horizontal: Option<HorizontalAlignmentValues>,
     vertical: Option<VerticalAlignmentValues>,
     wrap_text: bool,
+}
+
+pub(super) fn compare_workbooks(
+    original: &Path,
+    roundtrip: &Path,
+    config: ValidateConfig,
+    errors: &mut Vec<String>,
+) -> Result<()> {
+    let original_snapshot = build_snapshot(original)?;
+    let roundtrip_snapshot = build_snapshot(roundtrip)?;
+    compare_sheet_order(&original_snapshot, &roundtrip_snapshot, config, errors)?;
+    compare_tables(&original_snapshot, &roundtrip_snapshot, config, errors)?;
+    compare_sheet_snapshots(&original_snapshot, &roundtrip_snapshot, config, errors)?;
+    Ok(())
 }
 
 fn build_snapshot(path: &Path) -> Result<WorkbookSnapshot> {

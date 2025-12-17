@@ -1,12 +1,14 @@
+use std::collections::BTreeMap;
 use std::fs::File;
-use std::io::Write;
+use std::io::{Read, Write};
 use std::path::Path;
 
-use anyhow::Result;
+use anyhow::{Context, Result};
+use tempfile::NamedTempFile;
 use umya_spreadsheet::structs::{Table, TableColumn};
 use umya_spreadsheet::writer::xlsx;
 use zip::write::FileOptions;
-use zip::{CompressionMethod, ZipWriter};
+use zip::{CompressionMethod, DateTime, ZipArchive, ZipWriter};
 
 fn make_column(name: &str) -> TableColumn {
     let mut col = TableColumn::default();
@@ -239,7 +241,7 @@ pub fn create_spreadsheet_with_two_tables(path: &Path) -> Result<()> {
 pub fn create_xlsm_with_images(path: &Path) -> Result<(Vec<String>, Vec<u8>, Vec<u8>)> {
     let file = File::create(path)?;
     let mut writer = ZipWriter::new(file);
-    let time = zip::DateTime::from_date_and_time(1980, 1, 1, 0, 0, 0).expect("valid zip time");
+    let time = DateTime::from_date_and_time(1980, 1, 1, 0, 0, 0).expect("valid zip time");
     let deflated = FileOptions::<()>::default()
         .compression_method(CompressionMethod::Deflated)
         .last_modified_time(time);
@@ -308,5 +310,57 @@ pub fn create_side_by_side_tables(path: &Path) -> Result<()> {
     sheet.add_table(right);
 
     xlsx::write(&book, path)?;
+    Ok(())
+}
+
+pub fn add_media_entries(path: &Path, media: &[(&str, &[u8])]) -> Result<()> {
+    let file = File::open(path)
+        .with_context(|| format!("Cannot open spreadsheet at {}", path.display()))?;
+    let mut archive = ZipArchive::new(file)
+        .with_context(|| format!("Cannot open spreadsheet at {}", path.display()))?;
+    let mut entries = Vec::new();
+    let mut order = Vec::new();
+    for i in 0..archive.len() {
+        let mut entry = archive.by_index(i)?;
+        let name = entry.name().to_string();
+        order.push(name.clone());
+        if entry.is_dir() {
+            entries.push((name, Vec::new(), CompressionMethod::Stored, true));
+            continue;
+        }
+        let mut data = Vec::new();
+        entry.read_to_end(&mut data)?;
+        entries.push((name, data, entry.compression(), false));
+    }
+    for (name, data) in media {
+        order.push(name.to_string());
+        entries.push((name.to_string(), data.to_vec(), CompressionMethod::Stored, false));
+    }
+    let parent = path.parent().unwrap_or(Path::new("."));
+    let temp = NamedTempFile::new_in(parent)?;
+    let file = temp
+        .reopen()
+        .with_context(|| format!("Cannot write to output directory {}", parent.display()))?;
+    let mut writer = ZipWriter::new(file);
+    let time = DateTime::from_date_and_time(1980, 1, 1, 0, 0, 0).expect("valid zip time");
+    let mut entry_map = BTreeMap::new();
+    for (name, data, compression, is_dir) in entries {
+        entry_map.insert(name, (data, compression, is_dir));
+    }
+    for name in order {
+        if let Some((data, compression, is_dir)) = entry_map.get(&name) {
+            let options = FileOptions::<()>::default()
+                .compression_method(*compression)
+                .last_modified_time(time);
+            if *is_dir {
+                writer.add_directory(name, options)?;
+            } else {
+                writer.start_file(name, options)?;
+                writer.write_all(data)?;
+            }
+        }
+    }
+    writer.finish()?;
+    temp.persist(path)?;
     Ok(())
 }

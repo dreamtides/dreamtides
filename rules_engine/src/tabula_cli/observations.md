@@ -1,7 +1,6 @@
 # Tabula CLI Observations
 
-- `rebuild-images` now has two modes: default restores `xl/media/*` from `.git/xlsm_image_cache/_xlsm_manifest.json` (manifest v1 required), while `--from-urls` ignores the cache and downloads images from `IMAGE()` formulas.
-- URL mode maps IMAGE metadata via `xl/metadata.xml` value metadata → `xl/richData/rdrichvalue.xml` identifiers → `xl/richData/rdRichValueWebImage.xml` entries; each entry pairs an address rel (URL) with a media rel, and every identifier must produce a URL or the command fails.
-- Shared IMAGE formulas use the anchor cell’s text and adjust relative references by the row/column offset of each consuming cell, respecting `$`-fixed references; cell values come from calamine ranges.
-- Downloads use blocking reqwest and rewrite both `xl/media/*` bytes and `xl/richData/_rels/rdRichValueWebImage.xml.rels` hyperlink targets; the `.git` image cache is unchanged in URL mode.
-- Keep running `just fmt`, `just check`, `just clippy`, and `just review` before handoff.
+- Validate command now lives in `commands/validate/` with orchestration in `mod.rs`, TOML comparison in `toml_compare.rs`, and workbook snapshot checks in `workbook_snapshot.rs`; `--strip-images` strips the original XLSM to a temp copy, runs the TOML round-trip against that stripped template, rebuilds images from the cache, then compares workbook snapshots and xl/media bytes against the original. AppleScript validation still returns "AppleScript validation not implemented yet".
+- TOML comparison canonicalizes numeric strings and stops at the first difference unless `--report-all` is set; workbook comparison covers sheet order, table layout, dimensions, validations, conditionals, and alignment.
+- `strip-images` writes placeholders plus manifest v1 into `.git/xlsm_image_cache`; `rebuild-images` defaults to cache restoration while `--from-urls` resolves IMAGE formulas through rich data mappings with row/column offset handling.
+- Test helpers now include `add_media_entries` for injecting `xl/media` files into generated workbooks when exercising strip/rebuild flows.

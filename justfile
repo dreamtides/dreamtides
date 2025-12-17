@@ -173,6 +173,7 @@ tabula *args='':
 
 tabula-validate:
   cargo run --manifest-path rules_engine/Cargo.toml -p tabula_cli -- validate
+  cargo run --manifest-path rules_engine/Cargo.toml -p tabula_cli -- validate --strip-images
 
 tabula-old *args='':
   cargo run --manifest-path rules_engine/Cargo.toml --bin "tabula_cli" -- \
