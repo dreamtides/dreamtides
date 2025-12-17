@@ -20,6 +20,9 @@ const WEB_IMAGE_NS: &str =
     "http://schemas.microsoft.com/office/spreadsheetml/2020/richdatawebimage";
 const RICH_DATA_NS: &str = "http://schemas.microsoft.com/office/spreadsheetml/2017/richdata";
 
+pub type UrlDownloader =
+    dyn Fn(&BTreeMap<usize, String>, &mut Vec<String>) -> Result<BTreeMap<usize, Vec<u8>>>;
+
 #[derive(Clone)]
 struct WebImage {
     address_rid: String,
@@ -51,6 +54,10 @@ struct ImageCell {
 }
 
 pub fn rebuild_from_urls(source: &Path) -> Result<()> {
+    rebuild_from_urls_with_downloader(source, &download_images)
+}
+
+pub fn rebuild_from_urls_with_downloader(source: &Path, downloader: &UrlDownloader) -> Result<()> {
     let (records, file_order) = read_zip(source).with_context(|| {
         format!("File {path} is not a valid XLSM archive", path = source.display())
     })?;
@@ -84,7 +91,7 @@ pub fn rebuild_from_urls(source: &Path) -> Result<()> {
         }
     }
 
-    let downloads = download_images(&identifier_urls, &mut warnings)?;
+    let downloads = downloader(&identifier_urls, &mut warnings)?;
     if !warnings.is_empty() {
         for warning in &warnings {
             eprintln!("warning: {warning}");

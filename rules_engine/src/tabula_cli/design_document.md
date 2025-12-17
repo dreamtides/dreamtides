@@ -585,7 +585,7 @@ Following existing project patterns in `tests/tabula_cli_tests/`.
 
 ### Milestone 11: --applescript validation
 **Scope:** macOS Excel validation
-- Implement AppleScript execution (conditional compilation)
+- Implement AppleScript execution
 - Detect repair dialog appearance
 - Timeout handling
 - Skip gracefully on non-macOS

@@ -5,6 +5,7 @@ use std::path::{Path, PathBuf};
 
 use anyhow::{Context, Result, bail};
 use tempfile::NamedTempFile;
+use url::UrlDownloader;
 use zip::write::FileOptions;
 use zip::{CompressionMethod, ZipArchive, ZipWriter};
 
@@ -32,6 +33,14 @@ pub fn rebuild_images(xlsm_path: Option<PathBuf>, from_urls: bool, auto: bool) -
     } else {
         cache::rebuild_from_cache(&source)
     }
+}
+
+pub fn rebuild_images_from_urls_with_downloader(
+    xlsm_path: Option<PathBuf>,
+    downloader: &UrlDownloader,
+) -> Result<()> {
+    let source = resolve_xlsm_path(xlsm_path)?;
+    url::rebuild_from_urls_with_downloader(&source, downloader)
 }
 
 #[derive(Clone)]
