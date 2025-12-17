@@ -1,4 +1,4 @@
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, HashSet};
 use std::fs;
 use std::path::{Path, PathBuf};
 
@@ -276,6 +276,16 @@ fn copy_row(sheet: &mut Worksheet, source_row: u32, target_row: u32, layout: &Ta
     }
 }
 
+fn adjusted_row(row: u32, adjustments: &[(u32, i32)]) -> u32 {
+    let mut value = row as i64;
+    for (position, delta) in adjustments {
+        if value >= *position as i64 {
+            value = (value + *delta as i64).max(1);
+        }
+    }
+    value as u32
+}
+
 fn write_single_table(
     table: &PreparedTable,
     book: &mut umya_spreadsheet::Spreadsheet,
@@ -358,13 +368,38 @@ fn write_tables(template_path: &Path, destination: &Path, tables: &[PreparedTabl
         }
     });
 
+    let mut sheet_column_ranges: BTreeMap<String, Vec<(String, u32, u32)>> = BTreeMap::new();
+    for table in tables {
+        let end_col = table.layout.start_col + table.layout.columns.len() as u32 - 1;
+        sheet_column_ranges.entry(table.layout.sheet_name.clone()).or_default().push((
+            table.layout.name.clone(),
+            table.layout.start_col,
+            end_col,
+        ));
+    }
+
+    let mut overlapping_columns: HashSet<String> = HashSet::new();
+    for ranges in sheet_column_ranges.values() {
+        for i in 0..ranges.len() {
+            for j in (i + 1)..ranges.len() {
+                let (name_a, start_a, end_a) = &ranges[i];
+                let (name_b, start_b, end_b) = &ranges[j];
+                let cols_overlap = !(end_a < start_b || end_b < start_a);
+                if cols_overlap {
+                    overlapping_columns.insert(name_a.clone());
+                    overlapping_columns.insert(name_b.clone());
+                }
+            }
+        }
+    }
+
     let mut sheet_table_counts: BTreeMap<String, usize> = BTreeMap::new();
     for table in &table_refs {
         let entry = sheet_table_counts.entry(table.layout.sheet_name.clone()).or_insert(0);
         *entry += 1;
     }
 
-    let mut sheet_offsets: BTreeMap<String, i32> = BTreeMap::new();
+    let mut sheet_adjustments: BTreeMap<String, Vec<(u32, i32)>> = BTreeMap::new();
 
     for table in table_refs {
         let single_table_sheet =
@@ -373,44 +408,66 @@ fn write_tables(template_path: &Path, destination: &Path, tables: &[PreparedTabl
             write_single_table(table, &mut book)?;
             continue;
         }
-        let offset = *sheet_offsets.get(table.layout.sheet_name.as_str()).unwrap_or(&0);
-        let start_row = (table.layout.data_start_row as i32 + offset) as u32;
+        let has_column_overlap = overlapping_columns.contains(&table.layout.name);
+        let adjustments = sheet_adjustments.entry(table.layout.sheet_name.clone()).or_default();
+        let start_row = adjusted_row(table.layout.data_start_row, adjustments);
         let current_rows = table.layout.data_rows as i32;
         let desired_rows = table.rows.len() as i32;
         let diff = desired_rows - current_rows;
-        eprintln!(
-            "Writing table '{}' on sheet '{}' start_row={} current_rows={} desired_rows={} diff={}",
-            table.layout.name, table.layout.sheet_name, start_row, current_rows, desired_rows, diff
-        );
 
         let sheet =
             book.get_sheet_by_name_mut(table.layout.sheet_name.as_str()).ok_or_else(|| {
                 anyhow::anyhow!("Table '{}' not found in original XLSM", table.layout.name)
             })?;
 
-        if diff > 0 {
+        let table_index =
+            sheet.get_tables().iter().position(|t| t.get_name() == table.layout.name).ok_or_else(
+                || anyhow::anyhow!("Table '{}' not found in original XLSM", table.layout.name),
+            )?;
+        let (header_row, start_col_index, end_col, totals_rows, area_end_row) = {
+            let table_def = &sheet.get_tables()[table_index];
+            let area = table_def.get_area();
+            let totals = if *table_def.get_totals_row_shown() {
+                std::cmp::max(1, *table_def.get_totals_row_count())
+            } else {
+                *table_def.get_totals_row_count()
+            };
+            (
+                *area.0.get_row_num(),
+                *area.0.get_col_num(),
+                *area.1.get_col_num(),
+                totals,
+                *area.1.get_row_num(),
+            )
+        };
+        let header_row = adjusted_row(header_row, adjustments);
+
+        let source_row = if table.layout.data_rows > 0 {
+            start_row + table.layout.data_rows as u32 - 1
+        } else {
+            start_row
+        };
+
+        if diff > 0 && has_column_overlap {
             let insert_at = start_row + table.layout.data_rows as u32;
             sheet.insert_new_row(&insert_at, &(diff as u32));
-            let source_row = if table.layout.data_rows > 0 {
-                start_row + table.layout.data_rows as u32 - 1
-            } else {
-                start_row
-            };
             for i in 0..diff {
                 let target_row = insert_at + i as u32;
                 copy_row(sheet, source_row, target_row, &table.layout);
             }
-        } else if diff < 0 {
+            adjustments.push((insert_at, diff));
+        } else if diff < 0 && has_column_overlap {
             let remove_start = start_row + desired_rows as u32;
             let remove_count = (-diff) as u32;
             sheet.remove_row(&remove_start, &remove_count);
+            adjustments.push((remove_start, diff));
         }
-
-        let updated_offset = offset + diff;
-        sheet_offsets.insert(table.layout.sheet_name.clone(), updated_offset);
 
         for (row_idx, row) in table.rows.iter().enumerate() {
             let row_num = start_row + row_idx as u32;
+            if row_num > source_row {
+                copy_row(sheet, source_row, row_num, &table.layout);
+            }
             for (col_idx, value) in row.iter().enumerate() {
                 let col_num = table.column_indices[col_idx];
                 let cell = sheet.get_cell_mut((col_num, row_num));
@@ -423,6 +480,27 @@ fn write_tables(template_path: &Path, destination: &Path, tables: &[PreparedTabl
                 };
             }
         }
+
+        let target_end_row = header_row + table.rows.len() as u32 + totals_rows;
+        let clear_start = start_row + table.rows.len() as u32;
+        let max_existing_row =
+            std::cmp::max(target_end_row, adjusted_row(area_end_row, adjustments));
+        if clear_start <= max_existing_row {
+            for row_num in clear_start..=max_existing_row {
+                for &col_num in &table.column_indices {
+                    let cell = sheet.get_cell_mut((col_num, row_num));
+                    cell.set_value("");
+                    cell.get_cell_value_mut().remove_formula();
+                }
+            }
+        }
+
+        let start_cell = format!("{}{}", string_from_column_index(&start_col_index), header_row);
+        let end_cell = format!("{}{}", string_from_column_index(&end_col), target_end_row);
+        let table_def = sheet.get_tables_mut().get_mut(table_index).ok_or_else(|| {
+            anyhow::anyhow!("Table '{}' not found in original XLSM", table.layout.name)
+        })?;
+        table_def.set_area((start_cell.as_str(), end_cell.as_str()));
     }
 
     let parent = destination.parent().unwrap_or(Path::new("."));

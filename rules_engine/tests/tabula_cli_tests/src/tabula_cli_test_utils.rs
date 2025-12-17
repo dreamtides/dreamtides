@@ -174,6 +174,47 @@ pub fn create_single_table_with_note(path: &Path) -> Result<()> {
     Ok(())
 }
 
+pub fn create_spreadsheet_with_two_tables(path: &Path) -> Result<()> {
+    let mut book = umya_spreadsheet::new_file();
+    let sheet = book.get_sheet_mut(&0).expect("Sheet 0 should exist");
+    sheet.set_name("MultiTables");
+
+    sheet.get_cell_mut("A1").set_value("Name");
+    sheet.get_cell_mut("B1").set_value("Value");
+
+    sheet.get_cell_mut("A2").set_value("First");
+    sheet.get_cell_mut("B2").set_value_number(1);
+    sheet.get_cell_mut("A3").set_value("Second");
+    sheet.get_cell_mut("B3").set_value_number(2);
+
+    sheet.get_cell_mut("A5").set_value("Kind");
+    sheet.get_cell_mut("B5").set_value("Score");
+
+    sheet.get_cell_mut("A6").set_value("Alpha");
+    sheet.get_cell_mut("B6").set_value_number(10);
+    sheet.get_cell_mut("A7").set_value("Beta");
+    sheet.get_cell_mut("B7").set_value_number(20);
+
+    let mut primary = Table::default();
+    primary.set_name("Primary");
+    primary.set_display_name("Primary");
+    primary.set_area(("A1", "B3"));
+    primary.add_column(make_column("Name"));
+    primary.add_column(make_column("Value"));
+    sheet.add_table(primary);
+
+    let mut secondary = Table::default();
+    secondary.set_name("Secondary");
+    secondary.set_display_name("Secondary");
+    secondary.set_area(("A5", "B7"));
+    secondary.add_column(make_column("Kind"));
+    secondary.add_column(make_column("Score"));
+    sheet.add_table(secondary);
+
+    xlsx::write(&book, path)?;
+    Ok(())
+}
+
 pub fn create_xlsm_with_images(path: &Path) -> Result<(Vec<String>, Vec<u8>, Vec<u8>)> {
     let file = File::create(path)?;
     let mut writer = ZipWriter::new(file);
@@ -206,4 +247,45 @@ pub fn create_xlsm_with_images(path: &Path) -> Result<(Vec<String>, Vec<u8>, Vec
         img1.to_vec(),
         img2.to_vec(),
     ))
+}
+
+pub fn create_side_by_side_tables(path: &Path) -> Result<()> {
+    let mut book = umya_spreadsheet::new_file();
+    let sheet = book.get_sheet_mut(&0).expect("Sheet 0 should exist");
+    sheet.set_name("Parallel");
+
+    sheet.get_cell_mut("A1").set_value("Left Name");
+    sheet.get_cell_mut("B1").set_value("Left Value");
+    sheet.get_cell_mut("A2").set_value("LeftOne");
+    sheet.get_cell_mut("B2").set_value_number(1);
+    sheet.get_cell_mut("A3").set_value("LeftTwo");
+    sheet.get_cell_mut("B3").set_value_number(2);
+
+    sheet.get_cell_mut("D1").set_value("Right Name");
+    sheet.get_cell_mut("E1").set_value("Right Score");
+    sheet.get_cell_mut("D2").set_value("RightOne");
+    sheet.get_cell_mut("E2").set_value_number(10);
+    sheet.get_cell_mut("D3").set_value("RightTwo");
+    sheet.get_cell_mut("E3").set_value_number(20);
+
+    sheet.get_cell_mut("A8").set_value("Note");
+
+    let mut left = Table::default();
+    left.set_name("Left");
+    left.set_display_name("Left");
+    left.set_area(("A1", "B3"));
+    left.add_column(make_column("Left Name"));
+    left.add_column(make_column("Left Value"));
+    sheet.add_table(left);
+
+    let mut right = Table::default();
+    right.set_name("Right");
+    right.set_display_name("Right");
+    right.set_area(("D1", "E3"));
+    right.add_column(make_column("Right Name"));
+    right.add_column(make_column("Right Score"));
+    sheet.add_table(right);
+
+    xlsx::write(&book, path)?;
+    Ok(())
 }

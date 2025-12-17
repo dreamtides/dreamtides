@@ -251,6 +251,115 @@ value = 3
 }
 
 #[test]
+fn build_xls_updates_table_ranges_on_multi_table_sheet() {
+    let temp_dir = TempDir::new().expect("temp dir");
+    let git_dir = temp_dir.path().join(".git");
+    fs::create_dir_all(&git_dir).expect("git dir");
+
+    let xlsx_path = temp_dir.path().join("multi.xlsx");
+    tabula_cli_test_utils::create_spreadsheet_with_two_tables(&xlsx_path).expect("spreadsheet");
+
+    let toml_dir = temp_dir.path().join("toml");
+    fs::create_dir_all(&toml_dir).expect("toml dir");
+    let toml = r#"
+[[primary]]
+name = "First"
+value = 1
+
+[[primary]]
+name = "Second"
+value = 2
+
+[[primary]]
+name = "Third"
+value = 3
+
+[[secondary]]
+kind = "Alpha"
+score = 10
+
+[[secondary]]
+kind = "Beta"
+score = 20
+"#;
+    fs::write(toml_dir.join("tables.toml"), toml).expect("write toml");
+
+    build_xls::build_xls(false, Some(toml_dir), Some(xlsx_path.clone()), None).expect("build-xls");
+
+    let mut workbook: calamine::Xlsx<_> = calamine::open_workbook(&xlsx_path).expect("open");
+    workbook.load_tables().expect("tables");
+    let primary = workbook.table_by_name("Primary").expect("primary table");
+    let primary_data = primary.data();
+    assert_eq!(primary_data.height(), 3);
+    assert!(matches!(primary_data.get((2, 0)), Some(Data::String(s)) if s == "Third"));
+
+    let secondary = workbook.table_by_name("Secondary").expect("secondary table");
+    let secondary_data = secondary.data();
+    assert_eq!(secondary_data.height(), 2);
+    assert!(matches!(secondary_data.get((0, 0)), Some(Data::String(s)) if s == "Alpha"));
+    assert!(matches!(secondary_data.get((1, 0)), Some(Data::String(s)) if s == "Beta"));
+}
+
+#[test]
+fn build_xls_handles_side_by_side_tables_without_shifting() {
+    let temp_dir = TempDir::new().expect("temp dir");
+    let git_dir = temp_dir.path().join(".git");
+    fs::create_dir_all(&git_dir).expect("git dir");
+
+    let xlsx_path = temp_dir.path().join("parallel.xlsx");
+    tabula_cli_test_utils::create_side_by_side_tables(&xlsx_path).expect("spreadsheet");
+
+    let toml_dir = temp_dir.path().join("toml");
+    fs::create_dir_all(&toml_dir).expect("toml dir");
+    let toml = r#"
+[[left]]
+left-name = "L1"
+left-value = 1
+
+[[left]]
+left-name = "L2"
+left-value = 2
+
+[[right]]
+right-name = "R1"
+right-score = 10
+
+[[right]]
+right-name = "R2"
+right-score = 20
+
+[[right]]
+right-name = "R3"
+right-score = 30
+
+[[right]]
+right-name = "R4"
+right-score = 40
+"#;
+    fs::write(toml_dir.join("tables.toml"), toml).expect("write toml");
+
+    build_xls::build_xls(false, Some(toml_dir), Some(xlsx_path.clone()), None).expect("build-xls");
+
+    let mut workbook: calamine::Xlsx<_> = calamine::open_workbook(&xlsx_path).expect("open");
+    workbook.load_tables().expect("tables");
+
+    let left = workbook.table_by_name("Left").expect("left table");
+    let left_data = left.data();
+    assert_eq!(left_data.height(), 2);
+    assert!(matches!(left_data.get((0, 0)), Some(Data::String(s)) if s == "L1"));
+    assert!(matches!(left_data.get((1, 0)), Some(Data::String(s)) if s == "L2"));
+
+    let right = workbook.table_by_name("Right").expect("right table");
+    let right_data = right.data();
+    assert_eq!(right_data.height(), 4);
+    assert!(matches!(right_data.get((3, 0)), Some(Data::String(s)) if s == "R4"));
+
+    let book = umya_spreadsheet::reader::xlsx::read(&xlsx_path).expect("read umya");
+    let sheet = book.get_sheet_by_name("Parallel").expect("sheet");
+    assert_eq!(sheet.get_value("A8"), "Note");
+}
+
+#[test]
 fn build_xls_can_write_to_new_output_path() {
     let temp_dir = TempDir::new().expect("temp dir");
     let git_dir = temp_dir.path().join(".git");
