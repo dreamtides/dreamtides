@@ -90,6 +90,7 @@ tabula validate --strip-images [TOML_DIR]
 tabula strip-images [XLSM_PATH]
 tabula strip-images --output <OUTPUT_XLSM> [XLSM_PATH]
 tabula rebuild-images [XLSM_PATH]
+tabula rebuild-images --from-urls [XLSM_PATH]
 
 # Git integration
 tabula git-setup
@@ -650,3 +651,5 @@ Mark completed milestones at the top of this design document.
 - [x] Milestone 5: build-xls Command (Basic)
 - [x] Milestone 6: build-xls Row Handling
 - [x] Milestone 7: validate Command
+- [x] Milestone 8: rebuild-images Command
+- [x] Milestone 9: rebuild-images from URLs

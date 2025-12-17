@@ -3063,6 +3063,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "roxmltree"
+version = "0.19.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3cd14fd5e3b777a7422cca79358c57a8f6e3a703d9ac187448d0daf220c2407f"
+
+[[package]]
 name = "rules_engine"
 version = "0.0.0"
 dependencies = [
@@ -3661,6 +3667,7 @@ dependencies = [
  "clap",
  "convert_case 0.8.0",
  "reqwest",
+ "roxmltree",
  "serde",
  "serde_json",
  "sha2",

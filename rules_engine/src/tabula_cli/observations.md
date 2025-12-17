@@ -1,7 +1,7 @@
 # Tabula CLI Observations
 
-- `rebuild-images` restores stripped XLSM media from `.git/xlsm_image_cache/_xlsm_manifest.json`, using cached hashes, preserving manifest ZIP order, and failing on missing cache files, manifest entries, or size mismatches.
-- `strip-images` swaps `xl/media/*` with a 1x1 JPEG while caching originals by SHA-256 in `.git/xlsm_image_cache/` and writing manifest version 1 alongside the cache.
-- `validate` still lacks `--applescript` and `--strip-images`; the flow builds XLSM from TOML, re-extracts TOML, and compares workbook snapshots via `umya-spreadsheet`.
-- Snapshot diffs cover sheet order, table layout/style, column widths/hidden/best-fit, row heights/hidden/custom, validations, conditional formatting, and alignment/wrap; extra dimensions or alignments absent in the template are ignored, and `--verbose`/`--all` expand reporting.
-- Always run `just fmt`, `just check`, `just clippy`, and `just review` before handing off changes.
+- `rebuild-images` now has two modes: default restores `xl/media/*` from `.git/xlsm_image_cache/_xlsm_manifest.json` (manifest v1 required), while `--from-urls` ignores the cache and downloads images from `IMAGE()` formulas.
+- URL mode maps IMAGE metadata via `xl/metadata.xml` value metadata → `xl/richData/rdrichvalue.xml` identifiers → `xl/richData/rdRichValueWebImage.xml` entries; each entry pairs an address rel (URL) with a media rel, and every identifier must produce a URL or the command fails.
+- Shared IMAGE formulas use the anchor cell’s text and adjust relative references by the row/column offset of each consuming cell, respecting `$`-fixed references; cell values come from calamine ranges.
+- Downloads use blocking reqwest and rewrite both `xl/media/*` bytes and `xl/richData/_rels/rdRichValueWebImage.xml.rels` hyperlink targets; the `.git` image cache is unchanged in URL mode.
+- Keep running `just fmt`, `just check`, `just clippy`, and `just review` before handoff.
