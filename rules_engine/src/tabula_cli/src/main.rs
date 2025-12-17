@@ -79,6 +79,12 @@ enum Commands {
             help = "Download images from IMAGE() formulas instead of using the .git cache"
         )]
         from_urls: bool,
+
+        #[arg(
+            long,
+            help = "Restore from cache and fall back to downloading IMAGE() URLs on failure"
+        )]
+        auto: bool,
     },
 
     #[command(about = "Configure Git for the tabula workflow")]
@@ -112,8 +118,8 @@ fn run() -> Result<()> {
         Commands::StripImages { xlsm_path, output_path } => {
             strip_images::strip_images(xlsm_path, output_path)?;
         }
-        Commands::RebuildImages { xlsm_path, from_urls } => {
-            rebuild_images::rebuild_images(xlsm_path, from_urls)?;
+        Commands::RebuildImages { xlsm_path, from_urls, auto } => {
+            rebuild_images::rebuild_images(xlsm_path, from_urls, auto)?;
         }
         Commands::GitSetup => bail!("git-setup not yet implemented"),
     }

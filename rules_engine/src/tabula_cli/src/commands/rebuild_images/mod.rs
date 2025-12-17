@@ -3,7 +3,7 @@ use std::fs;
 use std::io::{Read, Write};
 use std::path::{Path, PathBuf};
 
-use anyhow::{Context, Result};
+use anyhow::{Context, Result, bail};
 use tempfile::NamedTempFile;
 use zip::write::FileOptions;
 use zip::{CompressionMethod, ZipArchive, ZipWriter};
@@ -13,9 +13,25 @@ use crate::core::paths;
 mod cache;
 mod url;
 
-pub fn rebuild_images(xlsm_path: Option<PathBuf>, from_urls: bool) -> Result<()> {
+pub fn rebuild_images(xlsm_path: Option<PathBuf>, from_urls: bool, auto: bool) -> Result<()> {
     let source = resolve_xlsm_path(xlsm_path)?;
-    if from_urls { url::rebuild_from_urls(&source) } else { cache::rebuild_from_cache(&source) }
+    if from_urls && auto {
+        bail!("--from-urls cannot be combined with --auto");
+    }
+    if auto {
+        match cache::rebuild_from_cache(&source) {
+            Ok(()) => Ok(()),
+            Err(err) => {
+                eprintln!("warning: Cache rebuild failed: {err}; falling back to IMAGE() download");
+                url::rebuild_from_urls(&source)
+                    .with_context(|| format!("Cache rebuild failed: {err}"))
+            }
+        }
+    } else if from_urls {
+        url::rebuild_from_urls(&source)
+    } else {
+        cache::rebuild_from_cache(&source)
+    }
 }
 
 #[derive(Clone)]

@@ -20,7 +20,7 @@ fn rebuild_images_restores_from_cache() {
     let stripped = temp_dir.path().join("stripped.xlsm");
     strip_images::strip_images(Some(xlsm_path.clone()), Some(stripped.clone())).expect("strip");
 
-    rebuild_images::rebuild_images(Some(stripped.clone()), false).expect("rebuild");
+    rebuild_images::rebuild_images(Some(stripped.clone()), false, false).expect("rebuild");
 
     let mut archive = ZipArchive::new(File::open(&stripped).expect("open output")).expect("zip");
     let mut names = Vec::new();

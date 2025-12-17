@@ -290,15 +290,28 @@ fn parse_image_cells(
                 Some(r) => r,
                 None => continue,
             };
-            let vm = match node.attribute("vm") {
-                Some(value) => value.parse::<usize>().context("Value metadata index is invalid")?,
+            let vm_index = match node.attribute("vm") {
+                Some(value) => {
+                    let raw = value.parse::<usize>().context("Value metadata index is invalid")?;
+                    match raw.checked_sub(1) {
+                        Some(index) => index,
+                        None => {
+                            warnings.push(format!(
+                                "Value metadata index {raw} is invalid for {}!{}",
+                                sheet.name, cell_ref
+                            ));
+                            continue;
+                        }
+                    }
+                }
                 None => continue,
             };
-            let identifier = match vm_to_identifier.get(vm) {
+            let identifier = match vm_to_identifier.get(vm_index) {
                 Some(value) => *value,
                 None => {
                     warnings.push(format!(
-                        "Value metadata {vm} is missing for {}!{} ({} entries present)",
+                        "Value metadata {} is missing for {}!{} ({} entries present)",
+                        vm_index + 1,
                         sheet.name,
                         cell_ref,
                         vm_to_identifier.len()
