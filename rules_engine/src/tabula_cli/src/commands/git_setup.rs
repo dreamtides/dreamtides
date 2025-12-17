@@ -27,6 +27,7 @@ pub fn git_setup() -> Result<()> {
 }
 
 pub fn git_setup_for_root(root: &Path) -> Result<()> {
+    ensure_hooks_path(root)?;
     ensure_gitattributes(root)?;
     let cache_dir = paths::image_cache_dir_for(root);
     fs::create_dir_all(&cache_dir)
@@ -63,7 +64,6 @@ fn run_pre_commit(root: &Path) -> Result<()> {
     strip_images::strip_images(Some(xlsm_path.clone()), Some(xlsm_path.clone()))?;
     ensure_stripped(&xlsm_path)?;
     stage_paths(root, &[xlsm_path.as_path(), toml_dir.as_path()])?;
-    panic!("test");
     ensure_staged_stripped(root, &xlsm_path)
 }
 
@@ -171,6 +171,9 @@ fn ensure_stripped(xlsm_path: &Path) -> Result<()> {
 
 fn ensure_staged_stripped(root: &Path, xlsm_path: &Path) -> Result<()> {
     let bytes = staged_bytes(root, xlsm_path)?;
+    if is_lfs_pointer(&bytes) {
+        return Ok(());
+    }
     let cursor = std::io::Cursor::new(bytes);
     let mut archive = ZipArchive::new(cursor)
         .with_context(|| format!("Cannot open spreadsheet at {}", xlsm_path.display()))?;
@@ -206,6 +209,15 @@ fn staged_bytes(root: &Path, path: &Path) -> Result<Vec<u8>> {
     Ok(output.stdout)
 }
 
+fn is_lfs_pointer(bytes: &[u8]) -> bool {
+    if let Ok(text) = std::str::from_utf8(bytes) {
+        text.starts_with("version https://git-lfs.github.com/spec/v1")
+            && text.contains("oid sha256:")
+    } else {
+        false
+    }
+}
+
 fn ensure_gitattributes(root: &Path) -> Result<()> {
     let path = root.join(".gitattributes");
     let desired = "client/Assets/StreamingAssets/Tabula.xlsm filter=lfs diff=lfs merge=lfs -text\n";
@@ -222,6 +234,26 @@ fn ensure_gitattributes(root: &Path) -> Result<()> {
     }
     content.push_str(desired);
     fs::write(&path, content).with_context(|| format!("Cannot write to {}", path.display()))
+}
+
+fn ensure_hooks_path(root: &Path) -> Result<()> {
+    let output = Command::new("git")
+        .current_dir(root)
+        .arg("config")
+        .arg("--get")
+        .arg("core.hooksPath")
+        .output()
+        .context("Failed to read git config core.hooksPath")?;
+    if output.status.success() {
+        let value = String::from_utf8_lossy(&output.stdout).trim().to_string();
+        if value.is_empty() || value == ".git/hooks" {
+            return Ok(());
+        }
+        bail!(
+            "core.hooksPath is set to '{value}'; set it to .git/hooks or unset before running tabula git-setup"
+        );
+    }
+    Ok(())
 }
 
 fn install_hook(root: &Path, hook: Hook) -> Result<()> {

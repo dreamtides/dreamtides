@@ -39,6 +39,24 @@ fn git_setup_installs_hooks_and_gitattributes() {
 }
 
 #[test]
+fn git_setup_errors_when_core_hooks_path_set_elsewhere() {
+    let temp_dir = TempDir::new().expect("temp dir");
+    let root = temp_dir.path();
+    init_repo(root);
+    Command::new("git")
+        .current_dir(root)
+        .arg("config")
+        .arg("core.hooksPath")
+        .arg(".githooks")
+        .status()
+        .expect("set hooksPath");
+
+    let result = git_setup::git_setup_for_root(root);
+    let message = result.unwrap_err().to_string();
+    assert!(message.contains("core.hooksPath"));
+}
+
+#[test]
 fn pre_commit_builds_toml_strips_and_stages_changes() {
     let temp_dir = TempDir::new().expect("temp dir");
     let root = temp_dir.path();
