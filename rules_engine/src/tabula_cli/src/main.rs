@@ -2,7 +2,7 @@ use std::path::PathBuf;
 
 use anyhow::{Result, bail};
 use clap::{Parser, Subcommand};
-use tabula_cli::commands::{build_toml, build_xls, strip_images, validate};
+use tabula_cli::commands::{build_toml, build_xls, rebuild_images, strip_images, validate};
 
 #[derive(Parser)]
 #[command(name = "tabula")]
@@ -106,9 +106,7 @@ fn run() -> Result<()> {
         Commands::StripImages { xlsm_path, output_path } => {
             strip_images::strip_images(xlsm_path, output_path)?;
         }
-        Commands::RebuildImages { xlsm_path } => {
-            bail!("rebuild-images not yet implemented: xlsm_path={xlsm_path:?}")
-        }
+        Commands::RebuildImages { xlsm_path } => rebuild_images::rebuild_images(xlsm_path)?,
         Commands::GitSetup => bail!("git-setup not yet implemented"),
     }
 
