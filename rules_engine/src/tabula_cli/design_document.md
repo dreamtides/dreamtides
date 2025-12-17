@@ -559,18 +559,15 @@ Following existing project patterns in `tests/tabula_cli_tests/`.
 ### Milestone 7: validate Command
 **Scope:** Round-trip validation
 - Implement `commands/validate.rs`
-- Orchestrate build-xls and build-toml
-- Implement `--strip-images` flag
-- Clear error reporting
+- Run `build-toml` and then `build-xls`, validate results are visually identical
 
-### Milestone 8: validate --applescript
-**Scope:** macOS Excel validation
-- Implement AppleScript execution (conditional compilation)
-- Detect repair dialog appearance
-- Timeout handling
-- Skip gracefully on non-macOS
+### Milestone 8: rebuild-images from .git image cache
+**Scope:** Restore images from .git image cache
+- Implement `commands/rebuild_images.rs`
+- When requested via flag, read image metadata from _xlsm_manifest.json
+- Restore images in spreadsheet
 
-### Milestone 9: rebuild-images Command
+### Milestone 9: rebuild-images from URLs
 **Scope:** Restore images from URLs *or* from .git image cache
 - Implement `commands/rebuild_images.rs`
 - Restore image from .git cache when requested via flag
@@ -579,7 +576,20 @@ Following existing project patterns in `tests/tabula_cli_tests/`.
 - Replace placeholders in ZIP
 - Network error handling
 
-### Milestone 10: Git Integration and Polish
+### Milestone 10: --strip-images validation
+- Implement `--strip-images` validation flag
+- Run the same validation pipeline but strip images from the resulting
+  spreadsheet and then rebuild them, confirm visual equality
+- Clear error reporting
+
+### Milestone 11: --applescript validation
+**Scope:** macOS Excel validation
+- Implement AppleScript execution (conditional compilation)
+- Detect repair dialog appearance
+- Timeout handling
+- Skip gracefully on non-macOS
+
+### Milestone 12: Git Integration and Polish
 **Scope:** git-setup command, final validation
 - Implement `commands/git_setup.rs`
 - Generate pre-commit hook script
