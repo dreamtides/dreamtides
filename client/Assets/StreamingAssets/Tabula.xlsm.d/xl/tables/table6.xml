@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<table xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" mc:Ignorable="xr xr3" xmlns:xr="http://schemas.microsoft.com/office/spreadsheetml/2014/revision" xmlns:xr3="http://schemas.microsoft.com/office/spreadsheetml/2016/revision3" id="11" xr:uid="{1A95097D-6BDC-E844-8202-5B7F71128310}" name="EffectTypes" displayName="EffectTypes" ref="U1:U6" totalsRowShown="0" headerRowDxfId="34" dataDxfId="33">
-<autoFilter ref="U1:U6" xr:uid="{1A95097D-6BDC-E844-8202-5B7F71128310}"/>
-<tableColumns count="1">
-<tableColumn id="1" xr3:uid="{4E1F9518-425B-7245-AEDE-2ED09360A3FF}" name="EffectTypes" dataDxfId="32"/>
-</tableColumns>
-<tableStyleInfo name="TableStyleMedium15" showFirstColumn="0" showLastColumn="0" showRowStripes="1" showColumnStripes="0"/>
-</table>
