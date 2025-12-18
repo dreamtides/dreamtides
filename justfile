@@ -175,6 +175,21 @@ tabula-validate:
   cargo run --manifest-path rules_engine/Cargo.toml -p tabula_cli -- validate
   cargo run --manifest-path rules_engine/Cargo.toml -p tabula_cli -- validate --strip-images
 
+tabula-roundtrip:
+  cp client/Assets/StreamingAssets/Tabula.xlsm /tmp/Tabula.backup.xlsm
+  cargo run --manifest-path rules_engine/Cargo.toml -p tabula_cli -- \
+      build-toml client/Assets/StreamingAssets/TabulaData.xlsm \
+      client/Assets/StreamingAssets/Tabula
+  cargo run --manifest-path rules_engine/Cargo.toml -p tabula_cli -- \
+      build-xls --output-path client/Assets/StreamingAssets/Tabula.xlsm \
+      client/Assets/StreamingAssets/Tabula \
+      client/Assets/StreamingAssets/TabulaData.xlsm
+  cargo run --manifest-path rules_engine/Cargo.toml -p tabula_cli -- \
+      rebuild-images --auto client/Assets/StreamingAssets/Tabula.xlsm
+
+tabula-roundtrip-revert:
+  cp /tmp/Tabula.backup.xlsm client/Assets/StreamingAssets/Tabula.xlsm
+
 tabula-old *args='':
   cargo run --manifest-path rules_engine/Cargo.toml --bin "tabula_cli" -- \
       --key-file ./service_account_key.json \
