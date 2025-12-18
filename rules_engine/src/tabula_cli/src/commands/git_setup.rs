@@ -173,7 +173,9 @@ fn ensure_stripped(xlsm_path: &Path) -> Result<()> {
             continue;
         }
         let mut data = Vec::new();
-        entry.read_to_end(&mut data)?;
+        entry.read_to_end(&mut data).with_context(|| {
+            format!("Failed to read ZIP entry {name} in {}", xlsm_path.display())
+        })?;
         if data != strip_images::PLACEHOLDER_JPEG {
             bail!("Embedded image {name} still present after strip-images");
         }
@@ -199,7 +201,9 @@ fn ensure_staged_stripped(root: &Path, xlsm_path: &Path) -> Result<()> {
             continue;
         }
         let mut data = Vec::new();
-        entry.read_to_end(&mut data)?;
+        entry.read_to_end(&mut data).with_context(|| {
+            format!("Failed to read ZIP entry {name} in {}", xlsm_path.display())
+        })?;
         if data != strip_images::PLACEHOLDER_JPEG {
             bail!("Staged spreadsheet still contains embedded image {name}");
         }

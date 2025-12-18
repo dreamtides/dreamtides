@@ -599,7 +599,9 @@ fn read_zip_records(path: &Path) -> Result<(BTreeMap<String, ZipRecord>, Vec<Str
         let mut entry = archive.by_index(i)?;
         let name = entry.name().to_string();
         let mut data = Vec::new();
-        entry.read_to_end(&mut data)?;
+        entry
+            .read_to_end(&mut data)
+            .with_context(|| format!("Failed to read ZIP entry {name} in {}", path.display()))?;
         let record = ZipRecord {
             data,
             compression: entry.compression(),
@@ -766,7 +768,9 @@ fn ensure_recalc_on_open(path: &Path) -> Result<()> {
             writer.write_all(filtered.as_bytes())?;
         } else if name == "[Content_Types].xml" {
             let mut contents = Vec::new();
-            entry.read_to_end(&mut contents)?;
+            entry.read_to_end(&mut contents).with_context(|| {
+                format!("Failed to read ZIP entry {name} in {}", path.display())
+            })?;
             let merged = merged_content_types(&contents, &contents)?;
             writer.write_all(&merged)?;
         } else {

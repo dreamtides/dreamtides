@@ -187,6 +187,15 @@ tabula-roundtrip:
   cargo run --manifest-path rules_engine/Cargo.toml -p tabula_cli -- \
       rebuild-images --auto client/Assets/StreamingAssets/Tabula.xlsm
 
+tabula-build-from-toml:
+  cp client/Assets/StreamingAssets/Tabula.xlsm /tmp/Tabula.backup.xlsm
+  cargo run --manifest-path rules_engine/Cargo.toml -p tabula_cli -- \
+      build-xls --output-path client/Assets/StreamingAssets/Tabula.xlsm \
+      client/Assets/StreamingAssets/Tabula \
+      client/Assets/StreamingAssets/Tabula.xlsm
+  cargo run --manifest-path rules_engine/Cargo.toml -p tabula_cli -- \
+      rebuild-images --auto client/Assets/StreamingAssets/Tabula.xlsm
+
 tabula-roundtrip-revert:
   cp /tmp/Tabula.backup.xlsm client/Assets/StreamingAssets/Tabula.xlsm
 

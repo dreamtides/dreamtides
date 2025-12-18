@@ -259,7 +259,9 @@ fn media_files(path: &Path) -> Result<BTreeMap<String, Vec<u8>>> {
             continue;
         }
         let mut data = Vec::new();
-        entry.read_to_end(&mut data)?;
+        entry
+            .read_to_end(&mut data)
+            .with_context(|| format!("Failed to read ZIP entry {name} in {}", path.display()))?;
         map.insert(name, data);
     }
     Ok(map)
@@ -294,7 +296,9 @@ fn read_zip_records(path: &Path) -> Result<(Vec<ZipRecord>, Vec<String>)> {
             continue;
         }
         let mut data = Vec::new();
-        entry.read_to_end(&mut data)?;
+        entry
+            .read_to_end(&mut data)
+            .with_context(|| format!("Failed to read ZIP entry {name} in {}", path.display()))?;
         records.push(ZipRecord { name, data, compression: entry.compression(), is_dir: false });
     }
     Ok((records, order))

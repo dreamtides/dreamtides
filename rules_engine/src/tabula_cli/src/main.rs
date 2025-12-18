@@ -3,7 +3,7 @@ use std::path::PathBuf;
 use anyhow::Result;
 use clap::{Parser, Subcommand};
 use tabula_cli::commands::{
-    build_toml, build_xls, git_setup, rebuild_images, strip_images, validate,
+    build_toml, build_xls, git_setup, rebuild_images, repair, strip_images, validate,
 };
 
 #[derive(Parser)]
@@ -94,6 +94,15 @@ enum Commands {
         #[arg(value_enum)]
         hook: git_setup::Hook,
     },
+
+    #[command(about = "Repair XLSM CRC errors")]
+    Repair {
+        #[arg(help = "Path to the XLSM file")]
+        xlsm_path: Option<PathBuf>,
+
+        #[arg(long, help = "Rebuild IMAGE() entries and cache after fixing CRCs")]
+        rebuild_images: bool,
+    },
 }
 
 fn main() {
@@ -128,6 +137,9 @@ fn run() -> Result<()> {
         }
         Commands::GitSetup => git_setup::git_setup()?,
         Commands::GitHook { hook } => git_setup::run_hook(hook)?,
+        Commands::Repair { xlsm_path, rebuild_images } => {
+            repair::repair(xlsm_path, rebuild_images)?;
+        }
     }
 
     Ok(())

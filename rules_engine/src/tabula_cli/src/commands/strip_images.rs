@@ -118,7 +118,9 @@ fn read_zip(path: &Path) -> Result<(Vec<FileRecord>, Vec<String>)> {
             continue;
         }
         let mut data = Vec::new();
-        entry.read_to_end(&mut data)?;
+        entry
+            .read_to_end(&mut data)
+            .with_context(|| format!("Failed to read ZIP entry {name} in {}", path.display()))?;
         let compression = entry.compression();
         records.push(FileRecord { name, data, compression });
     }
