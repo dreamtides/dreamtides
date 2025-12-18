@@ -1,4 +1,4 @@
-[[card-effects]]
+[[card-fx]]
 card-id = "d8fe4b2a-088c-4a92-aeb7-d6d4d22fda1a"
 effect-type = "FireProjectile"
 effect-trigger = "ApplyTargetedEffect"
@@ -8,14 +8,14 @@ projectile-address = "Assets/ThirdParty/Hovl Studio/AAA Projectiles Vol 1/Prefab
 projectile-fire-sound = "Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Fire Magic/RPG3_FireMagicArrow_Projectile01.wav"
 projectile-impact-sound = "Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Fire Magic/RPG3_FireMagic_Impact01.wav"
 
-[[card-effects]]
+[[card-fx]]
 card-id = "d8fe4b2a-088c-4a92-aeb7-d6d4d22fda1a"
 effect-type = "DissolveTargets"
 effect-trigger = "ApplyTargetedEffect"
 dissolve-material = "Assets/Content/Dissolves/Dissolve15.mat"
 dissolve-color = "#FFC107"
 
-[[card-effects]]
+[[card-fx]]
 card-id = "d8fe4b2a-088c-4a92-aeb7-d6d4d22fda1a"
 effect-type = "ReverseDissolveTargets"
 effect-trigger = "ApplyTargetedEffect"
@@ -23,7 +23,7 @@ dissolve-material = "Assets/Content/Dissolves/Dissolve15.mat"
 dissolve-color = "#FFC107"
 dissolve-sound = "Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Fire Magic/RPG3_FireMagicBall_LightImpact03.wav"
 
-[[card-effects]]
+[[card-fx]]
 card-id = "d07ac4fa-cc3b-4bb8-8018-de7dc1760f35"
 effect-type = "FireProjectile"
 effect-trigger = "ApplyTargetedEffect"
@@ -33,7 +33,7 @@ projectile-address = "Assets/ThirdParty/Hovl Studio/AAA Projectiles Vol 1/Prefab
 projectile-fire-sound = "Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Water Magic/RPG3_WaterMagic_Cast01.wav"
 projectile-impact-sound = "Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Water Magic/RPG3_WaterMagic_Impact03.wav"
 
-[[card-effects]]
+[[card-fx]]
 card-id = "1d41a21a-1beb-4e56-8d7f-be29c4a9d43d"
 effect-type = "FireProjectile"
 effect-trigger = "ApplyTargetedEffect"
@@ -43,7 +43,7 @@ projectile-address = "Assets/ThirdParty/Hovl Studio/AAA Projectiles Vol 1/Prefab
 projectile-fire-sound = "Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Water Magic/RPG3_WaterMagic_Cast01.wav"
 projectile-impact-sound = "Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Water Magic/RPG3_WaterMagic_Impact03.wav"
 
-[[card-effects]]
+[[card-fx]]
 card-id = "d4207a7b-fc36-45e4-a1ee-f01b34485221"
 effect-type = "FireProjectile"
 effect-trigger = "ApplyTargetedEffect"
@@ -53,7 +53,7 @@ projectile-address = "Assets/ThirdParty/Hovl Studio/AAA Projectiles Vol 1/Prefab
 projectile-fire-sound = "Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Water Magic/RPG3_WaterMagic_Cast01.wav"
 projectile-impact-sound = "Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Water Magic/RPG3_WaterMagic_Impact03.wav"
 
-[[card-effects]]
+[[card-fx]]
 card-id = "15a39336-2c71-44d6-b462-d9fd23a4d925"
 effect-type = "DisplayEffect"
 effect-trigger = "DrawCards"
@@ -63,7 +63,7 @@ effect-duration-milliseconds = 500
 effect-scale = 5
 effect-sound = "Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Light Magic/RPG3_LightMagicEpic_HealingWing_P1.wav"
 
-[[card-effects]]
+[[card-fx]]
 card-id = "86c79455-f9ba-46e4-80a6-e018f330942b"
 effect-type = "DisplayEffect"
 effect-trigger = "ActivatedAbility"
@@ -73,7 +73,7 @@ effect-duration-milliseconds = 500
 effect-scale = 5
 effect-sound = "Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Light Magic/RPG3_LightMagic_Cast03.wav"
 
-[[card-effects]]
+[[card-fx]]
 card-id = "07f737af-dbaf-471a-8edc-e1d987c23903"
 effect-type = "SetCardTrail"
 effect-trigger = "SelectedTargetsForCard"
@@ -81,7 +81,7 @@ card-trail-targets = "ForEachTarget"
 card-trail-address = "Assets/ThirdParty/Hovl Studio/AAA Projectiles Vol 1/Prefabs/Dreamtides/Projectile 7 pink.prefab"
 trail-duration-milliseconds = 500
 
-[[card-effects]]
+[[card-fx]]
 card-id = "33c0db9c-666d-4b4c-a596-b74106025be8"
 effect-type = "FireProjectile"
 effect-trigger = "ApplyTargetedEffect"
@@ -91,7 +91,7 @@ projectile-address = "Assets/ThirdParty/Hovl Studio/AAA Projectiles Vol 1/Prefab
 projectile-fire-sound = "Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Plasma Magic/RPG3_PlasmaMagic_Cast01.wav"
 projectile-impact-sound = "Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Plasma Magic/RPG3_PlasmaMagic_MediumImpact01.wav"
 
-[[card-effects]]
+[[card-fx]]
 card-id = "33c0db9c-666d-4b4c-a596-b74106025be8"
 effect-type = "DisplayEffect"
 effect-trigger = "DrawCards"
@@ -101,7 +101,7 @@ effect-duration-milliseconds = 500
 effect-scale = 2.5
 effect-sound = "Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Fire Magic/RPG3_FireMagic_Cast04.wav"
 
-[[card-effects]]
+[[card-fx]]
 card-id = "33c0db9c-666d-4b4c-a596-b74106025be8"
 effect-type = "SetCardTrail"
 effect-trigger = "DrawCards"
@@ -109,7 +109,7 @@ card-trail-targets = "ForEachTarget"
 card-trail-address = "Assets/ThirdParty/Hovl Studio/AAA Projectiles Vol 1/Prefabs/Dreamtides/Projectile 5 red.prefab"
 trail-duration-milliseconds = 1500
 
-[[card-effects]]
+[[card-fx]]
 card-id = "d4854b6e-5274-4f6a-8a60-a1ea1c15e9a6"
 effect-type = "FireProjectile"
 effect-trigger = "ApplyTargetedEffect"
@@ -119,14 +119,14 @@ projectile-address = "Assets/ThirdParty/Hovl Studio/AAA Projectiles Vol 1/Prefab
 projectile-fire-sound = "Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Fire Magic/RPG3_FireMagicArrow_Projectile01.wav"
 projectile-impact-sound = "Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Fire Magic/RPG3_FireMagic_Impact01.wav"
 
-[[card-effects]]
+[[card-fx]]
 card-id = "d4854b6e-5274-4f6a-8a60-a1ea1c15e9a6"
 effect-type = "DissolveTargets"
 effect-trigger = "ApplyTargetedEffect"
 dissolve-material = "Assets/Content/Dissolves/Dissolve15.mat"
 dissolve-color = "#FFC107"
 
-[[card-effects]]
+[[card-fx]]
 card-id = "d4854b6e-5274-4f6a-8a60-a1ea1c15e9a6"
 effect-type = "ReverseDissolveTargets"
 effect-trigger = "ApplyTargetedEffect"
@@ -134,7 +134,7 @@ dissolve-material = "Assets/Content/Dissolves/Dissolve15.mat"
 dissolve-color = "#FFC107"
 dissolve-sound = "Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Fire Magic/RPG3_FireMagicBall_LightImpact03.wav"
 
-[[card-effects]]
+[[card-fx]]
 card-id = "aad836b0-3ece-477c-b923-b099360f0115"
 effect-type = "FireProjectile"
 effect-trigger = "ApplyTargetedEffect"
@@ -144,7 +144,7 @@ projectile-address = "Assets/ThirdParty/Hovl Studio/AAA Projectiles Vol 1/Prefab
 projectile-fire-sound = "Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Water Magic/RPG3_WaterMagic_Cast01.wav"
 projectile-impact-sound = "Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Water Magic/RPG3_WaterMagic_Impact03.wav"
 
-[[card-effects]]
+[[card-fx]]
 card-id = "86ed0d3f-320b-49d0-b022-cd94aa07edbd"
 effect-type = "FireProjectile"
 effect-trigger = "ApplyTargetedEffect"
@@ -154,7 +154,7 @@ projectile-address = "Assets/ThirdParty/Hovl Studio/AAA Projectiles Vol 1/Prefab
 projectile-fire-sound = "Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Water Magic/RPG3_WaterMagic_Cast01.wav"
 projectile-impact-sound = "Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Water Magic/RPG3_WaterMagic_Impact03.wav"
 
-[[card-effects]]
+[[card-fx]]
 card-id = "76b6d00c-5a28-4ee3-9655-e4fea1d8a4d8"
 effect-type = "FireProjectile"
 effect-trigger = "ApplyTargetedEffect"
@@ -164,7 +164,7 @@ projectile-address = "Assets/ThirdParty/Hovl Studio/AAA Projectiles Vol 1/Prefab
 projectile-fire-sound = "Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Water Magic/RPG3_WaterMagic_Cast01.wav"
 projectile-impact-sound = "Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Water Magic/RPG3_WaterMagic_Impact03.wav"
 
-[[card-effects]]
+[[card-fx]]
 card-id = "e06a8cfe-483f-42c0-aac8-9c12b21b3f99"
 effect-type = "DisplayEffect"
 effect-trigger = "DrawCards"
@@ -174,7 +174,7 @@ effect-duration-milliseconds = 500
 effect-scale = 5
 effect-sound = "Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Light Magic/RPG3_LightMagicEpic_HealingWing_P1.wav"
 
-[[card-effects]]
+[[card-fx]]
 card-id = "d8a8541f-5b00-4d91-9518-aa8ae70ea450"
 effect-type = "DisplayEffect"
 effect-trigger = "ActivatedAbility"
@@ -184,7 +184,7 @@ effect-duration-milliseconds = 500
 effect-scale = 5
 effect-sound = "Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Light Magic/RPG3_LightMagic_Cast03.wav"
 
-[[card-effects]]
+[[card-fx]]
 card-id = "559e62a0-7ead-4136-8bd4-6cc58db4bef7"
 effect-type = "SetCardTrail"
 effect-trigger = "SelectedTargetsForCard"
@@ -192,7 +192,7 @@ card-trail-targets = "ForEachTarget"
 card-trail-address = "Assets/ThirdParty/Hovl Studio/AAA Projectiles Vol 1/Prefabs/Dreamtides/Projectile 7 pink.prefab"
 trail-duration-milliseconds = 500
 
-[[card-effects]]
+[[card-fx]]
 card-id = "e8f937da-cca7-447d-a559-530d7c339325"
 effect-type = "FireProjectile"
 effect-trigger = "ApplyTargetedEffect"
@@ -202,7 +202,7 @@ projectile-address = "Assets/ThirdParty/Hovl Studio/AAA Projectiles Vol 1/Prefab
 projectile-fire-sound = "Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Plasma Magic/RPG3_PlasmaMagic_Cast01.wav"
 projectile-impact-sound = "Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Plasma Magic/RPG3_PlasmaMagic_MediumImpact01.wav"
 
-[[card-effects]]
+[[card-fx]]
 card-id = "e8f937da-cca7-447d-a559-530d7c339325"
 effect-type = "DisplayEffect"
 effect-trigger = "DrawCards"
@@ -212,7 +212,7 @@ effect-duration-milliseconds = 500
 effect-scale = 2.5
 effect-sound = "Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Fire Magic/RPG3_FireMagic_Cast04.wav"
 
-[[card-effects]]
+[[card-fx]]
 card-id = "e8f937da-cca7-447d-a559-530d7c339325"
 effect-type = "SetCardTrail"
 effect-trigger = "DrawCards"
