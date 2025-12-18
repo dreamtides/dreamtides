@@ -3683,6 +3683,7 @@ version = "0.0.0"
 dependencies = [
  "anyhow",
  "calamine",
+ "roxmltree",
  "serde_json",
  "sha2",
  "tabula_cli",

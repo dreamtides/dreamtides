@@ -1,11 +1,12 @@
 use std::fs;
-use std::io::Read;
+use std::io::{Read, Write};
 
 use calamine::{self, Data};
+use roxmltree::Document;
 use tabula_cli::commands::build_xls;
 use tabula_cli_tests::tabula_cli_test_utils;
 use tempfile::TempDir;
-use zip::ZipArchive;
+use zip::{CompressionMethod, DateTime, ZipArchive, ZipWriter};
 
 #[test]
 fn build_xls_writes_data_and_preserves_formulas() {
@@ -214,6 +215,118 @@ value = 10
     assert!(matches!(data.get((0, 1)), Some(Data::Float(f)) if (*f - 10.0).abs() < f64::EPSILON));
     assert!(matches!(data.get((1, 0)), Some(Data::Empty)));
     assert!(matches!(data.get((1, 1)), Some(Data::Empty)));
+}
+
+#[test]
+fn build_xls_preserves_metadata_and_relationships() {
+    let temp_dir = TempDir::new().expect("temp dir");
+    let git_dir = temp_dir.path().join(".git");
+    fs::create_dir_all(&git_dir).expect("git dir");
+
+    let xlsx_path = temp_dir.path().join("metadata.xlsx");
+    tabula_cli_test_utils::create_test_spreadsheet_with_table(&xlsx_path).expect("spreadsheet");
+    let metadata_bytes =
+        br#"<metadata xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"/>"#;
+
+    let file = fs::File::open(&xlsx_path).expect("open");
+    let mut archive = ZipArchive::new(file).expect("zip");
+    let mut entries = Vec::new();
+    for i in 0..archive.len() {
+        let mut entry = archive.by_index(i).expect("entry");
+        let mut data = Vec::new();
+        entry.read_to_end(&mut data).expect("read");
+        entries.push((entry.name().to_string(), data, entry.compression(), entry.is_dir()));
+    }
+    let mut content_types = String::new();
+    let mut workbook_rels = String::new();
+    for (name, data, _compression, _is_dir) in &entries {
+        if name == "[Content_Types].xml" {
+            content_types = String::from_utf8_lossy(data).to_string();
+        }
+        if name == "xl/_rels/workbook.xml.rels" {
+            workbook_rels = String::from_utf8_lossy(data).to_string();
+        }
+    }
+    content_types = content_types.replace(
+        "</Types>",
+        r#"<Override PartName="/xl/metadata.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheetMetadata+xml"/></Types>"#,
+    );
+    workbook_rels = workbook_rels.replace(
+        "</Relationships>",
+        r#"<Relationship Id="rIdMeta" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/sheetMetadata" Target="metadata.xml"/></Relationships>"#,
+    );
+
+    let time = DateTime::from_date_and_time(1980, 1, 1, 0, 0, 0).expect("zip time");
+    let deflated = zip::write::FileOptions::<()>::default()
+        .compression_method(CompressionMethod::Deflated)
+        .last_modified_time(time);
+    let stored = zip::write::FileOptions::<()>::default()
+        .compression_method(CompressionMethod::Stored)
+        .last_modified_time(time);
+    let rewrite = fs::File::create(temp_dir.path().join("rewrite.xlsx")).expect("create");
+    let mut writer = ZipWriter::new(rewrite);
+    for (name, data, compression, is_dir) in entries {
+        let options = match compression {
+            CompressionMethod::Deflated => deflated,
+            CompressionMethod::Stored => stored,
+            other => zip::write::FileOptions::<()>::default()
+                .compression_method(other)
+                .last_modified_time(time),
+        };
+        if is_dir {
+            writer.add_directory(name, options).expect("dir");
+        } else if name == "[Content_Types].xml" {
+            writer.start_file(name, options).expect("types");
+            writer.write_all(content_types.as_bytes()).expect("write types");
+        } else if name == "xl/_rels/workbook.xml.rels" {
+            writer.start_file(name, options).expect("rels");
+            writer.write_all(workbook_rels.as_bytes()).expect("write rels");
+        } else {
+            writer.start_file(name, options).expect("file");
+            writer.write_all(&data).expect("write");
+        }
+    }
+    writer.start_file("xl/metadata.xml", deflated).expect("metadata entry");
+    writer.write_all(metadata_bytes).expect("write metadata");
+    writer.finish().expect("finish");
+    fs::rename(temp_dir.path().join("rewrite.xlsx"), &xlsx_path).expect("rename");
+
+    let toml_dir = temp_dir.path().join("toml");
+    fs::create_dir_all(&toml_dir).expect("toml dir");
+    let toml = r#"
+[[test-table]]
+name = "Eve"
+count = 3
+active = true
+"#;
+    fs::write(toml_dir.join("test-table.toml"), toml).expect("write toml");
+
+    build_xls::build_xls(false, Some(toml_dir), Some(xlsx_path.clone()), Some(xlsx_path.clone()))
+        .expect("build-xls");
+
+    let mut archive = ZipArchive::new(fs::File::open(&xlsx_path).expect("open")).expect("zip");
+    let mut metadata_out = Vec::new();
+    archive
+        .by_name("xl/metadata.xml")
+        .expect("metadata")
+        .read_to_end(&mut metadata_out)
+        .expect("read metadata");
+    assert_eq!(metadata_out, metadata_bytes);
+    let mut types_out = String::new();
+    archive
+        .by_name("[Content_Types].xml")
+        .expect("types")
+        .read_to_string(&mut types_out)
+        .expect("read types");
+    assert!(types_out.contains(r#"PartName="/xl/metadata.xml""#));
+    let mut rels_out = String::new();
+    archive
+        .by_name("xl/_rels/workbook.xml.rels")
+        .expect("rels")
+        .read_to_string(&mut rels_out)
+        .expect("read rels");
+    Document::parse(&rels_out).expect("rels xml valid");
+    assert!(rels_out.contains(r#"Id="rIdMeta""#));
 }
 
 #[test]

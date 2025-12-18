@@ -2,6 +2,8 @@ use std::fs;
 use std::fs::File;
 use std::io::Read;
 
+use serde_json::json;
+use sha2::{Digest, Sha256};
 use tabula_cli::commands::{rebuild_images, strip_images};
 use tabula_cli_tests::tabula_cli_test_utils;
 use tempfile::TempDir;
@@ -84,6 +86,54 @@ fn rebuild_images_from_urls_with_stubbed_downloader() {
     assert!(
         std::str::from_utf8(&rels_data).unwrap().contains("https://example.invalid/image1.jpeg")
     );
+}
+
+#[test]
+fn rebuild_images_handles_missing_optional_entries() {
+    let temp_dir = TempDir::new().expect("temp dir");
+    let git_dir = temp_dir.path().join(".git");
+    fs::create_dir_all(&git_dir).expect("git dir");
+    let cache_dir = git_dir.join("xlsm_image_cache");
+    fs::create_dir_all(&cache_dir).expect("cache dir");
+
+    let xlsm_path = temp_dir.path().join("input.xlsm");
+    let (order, img1, img2) =
+        tabula_cli_test_utils::create_xlsm_with_images(&xlsm_path).expect("xlsm");
+
+    let hash1 = Sha256::digest(&img1).iter().map(|b| format!("{:02x}", b)).collect::<String>();
+    let hash2 = Sha256::digest(&img2).iter().map(|b| format!("{:02x}", b)).collect::<String>();
+    fs::write(cache_dir.join(&hash1), &img1).expect("cache1");
+    fs::write(cache_dir.join(&hash2), &img2).expect("cache2");
+
+    let mut file_order = order.clone();
+    file_order.push("xl/calcChain.xml".to_string());
+    let manifest = json!({
+        "version": 1,
+        "file_order": file_order,
+        "images": {
+            "xl/media/image1.jpg": {"hash": hash1, "size": img1.len()},
+            "xl/media/image2.png": {"hash": hash2, "size": img2.len()}
+        }
+    });
+    fs::write(cache_dir.join("_xlsm_manifest.json"), manifest.to_string()).expect("manifest");
+
+    rebuild_images::rebuild_images(Some(xlsm_path.clone()), false, false).expect("rebuild");
+
+    let mut archive = ZipArchive::new(File::open(&xlsm_path).expect("open output")).expect("zip");
+    let mut img1_data = Vec::new();
+    archive
+        .by_name("xl/media/image1.jpg")
+        .expect("image1")
+        .read_to_end(&mut img1_data)
+        .expect("read");
+    assert_eq!(img1_data, img1);
+    let mut img2_data = Vec::new();
+    archive
+        .by_name("xl/media/image2.png")
+        .expect("image2")
+        .read_to_end(&mut img2_data)
+        .expect("read");
+    assert_eq!(img2_data, img2);
 }
 
 fn build_minimal_image_workbook(path: &std::path::Path) {

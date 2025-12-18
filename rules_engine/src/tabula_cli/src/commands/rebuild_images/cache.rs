@@ -99,10 +99,14 @@ fn restore_records(
     }
 
     for name in &file_order {
-        if !present.contains(name.as_str()) {
+        if !present.contains(name.as_str()) && !is_optional_entry(name) {
             bail!("Spreadsheet is missing entry {}", name);
         }
     }
 
     Ok((updated, file_order, restored))
+}
+
+fn is_optional_entry(name: &str) -> bool {
+    name == "xl/calcChain.xml"
 }
