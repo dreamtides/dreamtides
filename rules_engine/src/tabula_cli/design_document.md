@@ -258,26 +258,6 @@ tabula validate [TOML_DIR]
 3. Compare the newly-extracted TOML with the original TOML files
 4. Report any differences
 
-### --applescript Flag (macOS only)
-
-```bash
-tabula validate --applescript [TOML_DIR]
-```
-
-Uses AppleScript to verify Excel can open the file without corruption warnings:
-
-1. Generate test XLSM via round-trip
-2. Execute AppleScript that:
-   - Opens Microsoft Excel
-   - Opens the generated XLSM file
-   - Waits briefly for any "repair" dialogs
-   - Checks if a repair dialog appeared
-   - Quits Excel
-3. Return exit code 1 if repair dialog was detected
-
-This catches subtle corruption that passes ZIP validation but triggers Excel's
-internal consistency checks.
-
 ### --strip-images Flag
 
 ```bash
@@ -310,7 +290,7 @@ All commands use `anyhow` for error context chains:
 
 **validate:**
 - `Round-trip failed: TOML differs at table '{name}', row {n}`
-- `Excel reported file corruption (detected via AppleScript)`
+- `Excel reported file corruption`
 - `Files differ at byte offset {offset}`
 
 **strip-images:**

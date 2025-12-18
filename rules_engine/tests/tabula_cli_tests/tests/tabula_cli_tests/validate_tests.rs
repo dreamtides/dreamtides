@@ -18,12 +18,7 @@ fn validate_round_trip_succeeds() {
     build_toml::build_toml(Some(xlsm_path.clone()), Some(toml_dir.clone())).expect("build toml");
 
     let result = validate::validate(
-        ValidateConfig {
-            applescript: false,
-            strip_images: false,
-            report_all: false,
-            verbose: false,
-        },
+        ValidateConfig { strip_images: false, report_all: false, verbose: false },
         Some(toml_dir),
         Some(xlsm_path),
     );
@@ -58,12 +53,7 @@ active = false
     fs::write(toml_dir.join("test-table.toml"), toml).expect("write toml");
 
     let result = validate::validate(
-        ValidateConfig {
-            applescript: false,
-            strip_images: false,
-            report_all: false,
-            verbose: false,
-        },
+        ValidateConfig { strip_images: false, report_all: false, verbose: false },
         Some(toml_dir),
         Some(xlsm_path),
     );
@@ -91,12 +81,7 @@ fn validate_strip_images_round_trip_succeeds() {
     build_toml::build_toml(Some(xlsm_path.clone()), Some(toml_dir.clone())).expect("build toml");
 
     let result = validate::validate(
-        ValidateConfig {
-            applescript: false,
-            strip_images: true,
-            report_all: false,
-            verbose: false,
-        },
+        ValidateConfig { strip_images: true, report_all: false, verbose: false },
         Some(toml_dir),
         Some(xlsm_path),
     );
@@ -104,21 +89,4 @@ fn validate_strip_images_round_trip_succeeds() {
     if let Err(err) = result {
         panic!("{err}");
     }
-}
-
-#[test]
-fn validate_errors_when_applescript_requested() {
-    let result = validate::validate(
-        ValidateConfig {
-            applescript: true,
-            strip_images: false,
-            report_all: false,
-            verbose: false,
-        },
-        None,
-        None,
-    );
-    assert!(result.is_err());
-    let message = result.unwrap_err().to_string();
-    assert!(message.contains("AppleScript validation not implemented yet"));
 }

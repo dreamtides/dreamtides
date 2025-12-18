@@ -46,9 +46,6 @@ enum Commands {
 
     #[command(about = "Validate round-trip conversion")]
     Validate {
-        #[arg(long, help = "Use AppleScript to verify Excel can open the file")]
-        applescript: bool,
-
         #[arg(long, help = "Include image stripping in validation")]
         strip_images: bool,
 
@@ -116,9 +113,9 @@ fn run() -> Result<()> {
         Commands::BuildXls { dry_run, toml_dir, xlsm_path, output_path } => {
             build_xls::build_xls(dry_run, toml_dir, xlsm_path, output_path)?;
         }
-        Commands::Validate { applescript, strip_images, all, verbose, toml_dir } => {
+        Commands::Validate { strip_images, all, verbose, toml_dir } => {
             validate::validate(
-                validate::ValidateConfig { applescript, strip_images, report_all: all, verbose },
+                validate::ValidateConfig { strip_images, report_all: all, verbose },
                 toml_dir,
                 None,
             )?;

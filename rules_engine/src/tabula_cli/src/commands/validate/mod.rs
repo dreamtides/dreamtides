@@ -16,7 +16,6 @@ mod workbook_snapshot;
 
 #[derive(Clone, Copy)]
 pub struct ValidateConfig {
-    pub applescript: bool,
     pub strip_images: bool,
     pub report_all: bool,
     pub verbose: bool,
@@ -27,9 +26,6 @@ pub fn validate(
     toml_dir: Option<PathBuf>,
     xlsm_path: Option<PathBuf>,
 ) -> Result<()> {
-    if config.applescript {
-        bail!("AppleScript validation not implemented yet");
-    }
     let toml_dir = resolve_toml_dir(toml_dir)?;
     let template = resolve_xlsm_path(xlsm_path)?;
     if !template.exists() {
