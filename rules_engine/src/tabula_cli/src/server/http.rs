@@ -12,8 +12,12 @@ use axum::{Router, routing};
 use tokio::net::TcpListener;
 use tokio::sync::{Mutex, oneshot};
 
+use super::listener_runner::{ListenerContext, run_listeners};
 use super::model::{Response, ResponseStatus};
 use super::{ServerConfig, serialization, server_workbook_snapshot};
+use crate::server::listeners::conditional_formatting::ConditionalFormattingListener;
+use crate::server::listeners::ensure_uuid::EnsureUuidListener;
+use crate::server::listeners::partial_formatting::PartialFormattingListener;
 
 pub async fn serve(config: ServerConfig) -> Result<()> {
     let (shutdown_tx, shutdown_rx) = oneshot::channel();
@@ -63,20 +67,29 @@ async fn handle_notify(State(state): State<Arc<ServerState>>, body: Bytes) -> im
             .unwrap_or_else(|e| Err(anyhow::anyhow!("Task join error: {}", e)));
 
             match snapshot_result {
-                Ok(_snapshot) => {
+                Ok(snapshot) => {
+                    let context = ListenerContext {
+                        request_id: request.request_id.clone(),
+                        workbook_path: request.workbook_path.clone(),
+                        changed_range: request.changed_range.clone(),
+                    };
+
+                    let listeners = build_listeners();
+                    let listener_result = run_listeners(&listeners, &snapshot, &context);
+
                     let changeset_id = serialization::compute_changeset_id(
                         &request.workbook_path,
                         request.workbook_mtime,
                         request.workbook_size,
-                        &[],
+                        &listener_result.changes,
                     );
 
                     let response = Response {
                         request_id: Some(request.request_id),
                         status: ResponseStatus::Ok,
                         retry_after_ms: None,
-                        warnings: vec![],
-                        changes: vec![],
+                        warnings: listener_result.warnings,
+                        changes: listener_result.changes,
                         changeset_id: Some(changeset_id.clone()),
                     };
 
@@ -120,6 +133,14 @@ async fn shutdown_signal(once: bool, shutdown_rx: oneshot::Receiver<()>) {
     } else {
         future::pending::<()>().await;
     }
+}
+
+fn build_listeners() -> Vec<Box<dyn super::listener_runner::Listener>> {
+    vec![
+        Box::new(ConditionalFormattingListener),
+        Box::new(PartialFormattingListener),
+        Box::new(EnsureUuidListener),
+    ]
 }
 
 struct ServerState {
