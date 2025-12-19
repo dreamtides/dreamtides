@@ -3676,6 +3676,7 @@ dependencies = [
  "tokio",
  "toml",
  "umya-spreadsheet",
+ "uuid",
  "zip 4.6.1",
 ]
 

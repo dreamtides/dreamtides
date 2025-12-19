@@ -33,4 +33,5 @@ tempfile = { workspace = true }
 toml = { features = ["preserve_order"], workspace = true }
 tokio = { workspace = true }
 umya-spreadsheet = { workspace = true }
+uuid = { workspace = true }
 zip = { workspace = true }

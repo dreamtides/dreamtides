@@ -15,3 +15,7 @@ pub fn run(config: ServerConfig) -> Result<()> {
 }
 
 mod http;
+mod model;
+mod serialization;
+
+pub use model::{Request, Response};

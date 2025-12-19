@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 use std::future;
 use std::net::SocketAddr;
 use std::sync::Arc;
@@ -11,12 +12,16 @@ use axum::{Router, routing};
 use tokio::net::TcpListener;
 use tokio::sync::{Mutex, oneshot};
 
-use super::ServerConfig;
+use super::model::{Response, ResponseStatus};
+use super::{ServerConfig, serialization};
 
 pub async fn serve(config: ServerConfig) -> Result<()> {
     let (shutdown_tx, shutdown_rx) = oneshot::channel();
-    let state =
-        Arc::new(ServerState { once: config.once, shutdown: Mutex::new(Some(shutdown_tx)) });
+    let state = Arc::new(ServerState {
+        once: config.once,
+        shutdown: Mutex::new(Some(shutdown_tx)),
+        cache: Mutex::new(HashMap::new()),
+    });
     let app = Router::new()
         .route("/notify", routing::post(handle_notify))
         .with_state(state)
@@ -30,13 +35,58 @@ pub async fn serve(config: ServerConfig) -> Result<()> {
     Ok(())
 }
 
-async fn handle_notify(State(state): State<Arc<ServerState>>, _body: Bytes) -> impl IntoResponse {
+async fn handle_notify(State(state): State<Arc<ServerState>>, body: Bytes) -> impl IntoResponse {
+    let response = match serialization::parse_request(&body) {
+        Ok(request) => {
+            let cache_key =
+                (request.workbook_path.clone(), request.workbook_mtime, request.workbook_size);
+            let mut cache = state.cache.lock().await;
+            if let Some(cached_response) = cache.get(&cache_key) {
+                return (
+                    StatusCode::OK,
+                    [(header::CONTENT_TYPE, "text/plain; charset=utf-8")],
+                    cached_response.clone(),
+                );
+            }
+
+            let changeset_id = serialization::compute_changeset_id(
+                &request.workbook_path,
+                request.workbook_mtime,
+                request.workbook_size,
+                &[],
+            );
+
+            let response = Response {
+                request_id: Some(request.request_id),
+                status: ResponseStatus::Ok,
+                retry_after_ms: None,
+                warnings: vec![],
+                changes: vec![],
+                changeset_id: Some(changeset_id.clone()),
+            };
+
+            let serialized = serialization::serialize_response(&response);
+            cache.insert(cache_key, serialized.clone());
+            response
+        }
+        Err(e) => Response {
+            request_id: None,
+            status: ResponseStatus::Error,
+            retry_after_ms: Some(1000),
+            warnings: vec![format!("Failed to parse request: {}", e)],
+            changes: vec![],
+            changeset_id: None,
+        },
+    };
+
     if state.once {
         if let Some(sender) = state.shutdown.lock().await.take() {
             let _ = sender.send(());
         }
     }
-    (StatusCode::OK, [(header::CONTENT_TYPE, "text/plain; charset=utf-8")], FIXED_RESPONSE)
+
+    let serialized = serialization::serialize_response(&response);
+    (StatusCode::OK, [(header::CONTENT_TYPE, "text/plain; charset=utf-8")], serialized)
 }
 
 async fn shutdown_signal(once: bool, shutdown_rx: oneshot::Receiver<()>) {
@@ -50,6 +100,5 @@ async fn shutdown_signal(once: bool, shutdown_rx: oneshot::Receiver<()>) {
 struct ServerState {
     once: bool,
     shutdown: Mutex<Option<oneshot::Sender<()>>>,
+    cache: Mutex<HashMap<(String, i64, u64), String>>,
 }
-
-const FIXED_RESPONSE: &str = "TABULA/1\nSTATUS ok\n";
