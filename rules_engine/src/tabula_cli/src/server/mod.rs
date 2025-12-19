@@ -11,6 +11,7 @@ pub struct ServerConfig {
 }
 
 pub fn run(config: ServerConfig) -> Result<()> {
+    println!("Tabula Server running at {}:{}", config.host, config.port);
     Builder::new_multi_thread().enable_all().build()?.block_on(http::serve(config))
 }
 

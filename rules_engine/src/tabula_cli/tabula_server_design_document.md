@@ -62,7 +62,7 @@ src/tabula_cli/
 
 src/tabula_cli/
 ├── vba/
-│   ├── tabula_server_bas.bas
+│   ├── tabula_server.bas
 │   ├── tabula_server_parser.bas
 │   └── tabula_server_events.bas
 

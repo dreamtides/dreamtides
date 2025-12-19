@@ -362,7 +362,7 @@ name = "The Devourer"
 id = "99720e39-6bad-4c6c-867c-7bc5c326195e"
 energy-cost = 8
 rules-text = "If you have 8 or more cards in your void, you may play this character from your void for $0 by banishing all other cards from your void."
-alternate-rules-text = "Banish your void with 8+ cards: Materialize this character from your void."
+alternate-rules-text = "Banish your void with 8 or more cards: Materialize this character from your void."
 card-type = "Character"
 subtype = "Ancient"
 is-fast = false
@@ -1540,7 +1540,7 @@ If you have 8 or more cards in your void, you may play this event for $0 by bani
 alternate-rules-text = """
 Draw 3 cards.
 
-Banish your void with 8+ cards: Play this event for $0."""
+Banish your void with 8 or more cards: Play this event for $0."""
 card-type = "Event"
 is-fast = false
 image-number = 1786390157
