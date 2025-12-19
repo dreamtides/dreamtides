@@ -5,6 +5,7 @@ use tabula_cli::server::model::{Change, ChangedRange};
 use tabula_cli::server::server_workbook_snapshot::read_snapshot;
 use tabula_cli_tests::tabula_cli_test_utils;
 use tempfile::TempDir;
+use umya_spreadsheet::writer::xlsx;
 
 #[test]
 fn test_conditional_formatting_finds_pineapple() {
@@ -58,7 +59,7 @@ fn test_conditional_formatting_case_insensitive() {
     sheet.get_cell_mut("A2").set_value("Pineapple");
     sheet.get_cell_mut("A3").set_value("pineapple");
     sheet.get_cell_mut("A4").set_value("PiNeApPlE");
-    umya_spreadsheet::writer::xlsx::write(&book, &xlsx_path).expect("Write workbook");
+    xlsx::write(&book, &xlsx_path).expect("Write workbook");
 
     let snapshot = read_snapshot(&xlsx_path, None).expect("Failed to read snapshot");
 
@@ -133,7 +134,7 @@ fn test_conditional_formatting_ignores_non_string_cells() {
     sheet.get_cell_mut("A1").set_value("pineapple");
     sheet.get_cell_mut("A2").set_value_number(123);
     sheet.get_cell_mut("A3").set_value_bool(true);
-    umya_spreadsheet::writer::xlsx::write(&book, &xlsx_path).expect("Write workbook");
+    xlsx::write(&book, &xlsx_path).expect("Write workbook");
 
     let snapshot = read_snapshot(&xlsx_path, None).expect("Failed to read snapshot");
 
