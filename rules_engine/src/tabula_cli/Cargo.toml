@@ -19,6 +19,7 @@ bench = false
 
 [dependencies]
 anyhow = { workspace = true }
+axum = { workspace = true }
 calamine = { workspace = true }
 chrono = { workspace = true }
 clap = { workspace = true }
@@ -30,5 +31,6 @@ serde_json = { workspace = true }
 sha2 = { workspace = true }
 tempfile = { workspace = true }
 toml = { features = ["preserve_order"], workspace = true }
+tokio = { workspace = true }
 umya-spreadsheet = { workspace = true }
 zip = { workspace = true }

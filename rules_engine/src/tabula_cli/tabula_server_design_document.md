@@ -458,7 +458,9 @@ CRITICAL: After every step is completed, the agent should provide
 ```
 
 Output with a description of how to manually verify the most recently completed
-work.
+work. Please assume the working directory is /dreamtides/ and all cargo commands
+require `--manifest-path rules_engine/Cargo.toml`. Please format all commands
+via newline + three backticks for easy copy and paste.
 
 ## Milestone Breakdown
 

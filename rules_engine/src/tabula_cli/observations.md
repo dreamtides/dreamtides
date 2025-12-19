@@ -5,3 +5,4 @@
 - git-setup writes `.gitignore` to ignore `client/Assets/StreamingAssets/Tabula.xlsm` and `.gitattributes` to track `client/Assets/StreamingAssets/TabulaData.xlsm` via LFS, ensuring only stripped content hits the index.
 - Validate no longer exposes an AppleScript option; `--strip-images` validation strips to a temp copy, round-trips TOML, rebuilds from cache, then diffs workbook snapshots and xl/media bytes.
 - The AppleScriptTask helper `tabula_server_curl.scpt` is compiled from `tabula_server_curl.applescript`, exposes `tabula_server_request`, expects `url|request_path|response_path`, posts via `/usr/bin/curl --data-binary @request`, writes the response file, and returns `ok|<http_code>` or `error|<number>|<message>`.
+- `tabula server` binds `POST /notify` with a fixed `TABULA/1` `STATUS ok` response, defaults to `127.0.0.1:3030` with a 1048576-byte payload limit, and `--once` exits after the first request.

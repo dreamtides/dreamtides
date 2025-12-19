@@ -3662,6 +3662,7 @@ name = "tabula_cli"
 version = "0.0.0"
 dependencies = [
  "anyhow",
+ "axum",
  "calamine",
  "chrono",
  "clap",
@@ -3672,6 +3673,7 @@ dependencies = [
  "serde_json",
  "sha2",
  "tempfile",
+ "tokio",
  "toml",
  "umya-spreadsheet",
  "zip 4.6.1",

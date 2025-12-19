@@ -1,9 +1,10 @@
+use std::net::IpAddr;
 use std::path::PathBuf;
 
 use anyhow::Result;
 use clap::{Parser, Subcommand};
 use tabula_cli::commands::{
-    build_toml, build_xls, git_setup, rebuild_images, repair, server_install, strip_images,
+    build_toml, build_xls, git_setup, rebuild_images, repair, server, server_install, strip_images,
     validate,
 };
 
@@ -93,6 +94,21 @@ enum Commands {
     #[command(about = "Install the AppleScriptTask helper for tabula server")]
     ServerInstall,
 
+    #[command(about = "Run the tabula server")]
+    Server {
+        #[arg(long, default_value = "127.0.0.1", help = "Host address to bind")]
+        host: IpAddr,
+
+        #[arg(long, default_value_t = 3030, help = "Port to listen on")]
+        port: u16,
+
+        #[arg(long, default_value_t = 1_048_576, help = "Maximum request payload size in bytes")]
+        max_payload_bytes: usize,
+
+        #[arg(long, help = "Handle a single request then exit")]
+        once: bool,
+    },
+
     #[command(hide = true)]
     GitHook {
         #[arg(value_enum)]
@@ -141,6 +157,9 @@ fn run() -> Result<()> {
         }
         Commands::GitSetup => git_setup::git_setup()?,
         Commands::ServerInstall => server_install::server_install()?,
+        Commands::Server { host, port, max_payload_bytes, once } => {
+            server::server(host, port, max_payload_bytes, once)?;
+        }
         Commands::GitHook { hook } => git_setup::run_hook(hook)?,
         Commands::Repair { xlsm_path, rebuild_images } => {
             repair::repair(xlsm_path, rebuild_images)?;
