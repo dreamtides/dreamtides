@@ -15,7 +15,7 @@ art-owned = true
 name = "Beacon of Tomorrow"
 id = "6d7969d2-9d18-4a38-8c26-c900aca5f1d4"
 energy-cost = 2
-rules-text = "{kw: Discover} a card with cost $2. {reminder: (pick one of 4 cards with different types to put into your hand.)}"
+rules-text = "{discover} a card with cost $2. "
 card-type = "Event"
 is-fast = false
 image-number = 1633431262
@@ -27,8 +27,8 @@ name = "Scrap Reclaimer"
 id = "a04cb59f-1ce6-48e7-9a2d-5e3b09613e6a"
 energy-cost = 4
 rules-text = """
-$judgment: Return this character from your void to your hand.
-{flavor: Born from rust and resilience.}"""
+{judgment}: Return this character from your void to your hand.
+"""
 card-type = "Character"
 subtype = "Tinkerer"
 is-fast = false
@@ -42,8 +42,8 @@ name = "Evacuation Enforcer"
 id = "5aee5a0d-c22a-4c09-9612-248d28c3df2f"
 energy-cost = 2
 rules-text = """
-$activated: Draw 2 cards. Discard 3 cards.
-{flavor: Promises under a stormy sky.}"""
+{activated}: Draw 2 cards. Discard 3 cards.
+"""
 card-type = "Character"
 subtype = "Trooper"
 is-fast = false
@@ -58,8 +58,8 @@ id = "8cc1a7da-42f8-4ab8-a41a-b9c8867f2dc4"
 energy-cost = 2
 rules-text = """
 Draw 2 cards. Discard 2 cards.
-$br
-{kw: Reclaim} {reminder: (you may play this dream from your void, then banish it.)}"""
+
+{reclaim} """
 card-type = "Event"
 is-fast = false
 image-number = 2027158310
@@ -72,7 +72,7 @@ id = "46634b47-e83c-4eda-a0ff-7f1ba4e1ce89"
 energy-cost = 3
 rules-text = """
 When you discard this character, materialize it.
-{flavor: Beyond lies the unknown.}"""
+"""
 card-type = "Character"
 subtype = "Explorer"
 is-fast = false
@@ -86,8 +86,8 @@ name = "Pattern Seeker"
 id = "bd9ec464-fac5-4f42-85f5-2c61e2f04636"
 energy-cost = 2
 rules-text = """
-$activated Discard a card: Draw a card. Gain 1 $point.
-{flavor: In whispers, secrets unfold.}"""
+{activated} Discard a card: Draw a card. Gain 1 $point.
+"""
 card-type = "Character"
 subtype = "Child"
 is-fast = false
@@ -100,7 +100,7 @@ art-owned = true
 name = "Ashmaze Guide"
 id = "33d83d81-0d4e-40ab-aaeb-daa820ffbde3"
 energy-cost = 3
-rules-text = "Whenever you discard a card, it gains {kw: reclaim} until end of turn {reminder: (you may play it from your void and banish it when it leaves play.)}"
+rules-text = "Whenever you discard a card, it gains {reclaim} until end of turn "
 card-type = "Character"
 subtype = "Explorer"
 is-fast = false
@@ -113,7 +113,7 @@ art-owned = true
 name = "Synaptic Sentinel"
 id = "c9531521-b8ae-4ce0-8857-474e60aa814a"
 energy-cost = 3
-rules-text = "$materialized: {kw: Foresee} 2 {reminder: (Look at the top 2 cards of your deck. Put any of them into your void, then put the rest back in any order.)}"
+rules-text = "{materialized}: {Forsee} 2 "
 card-type = "Character"
 subtype = "Agent"
 is-fast = true
@@ -128,7 +128,7 @@ id = "fb2661ee-387c-4a8f-965e-dd89be65cfe0"
 energy-cost = 9
 rules-text = """
 You may play this character from your void for $0 by abandoning 2 characters.
-{flavor: The blade's whisper stirred darkness.}"""
+"""
 card-type = "Character"
 subtype = "Ancient"
 is-fast = false
@@ -143,7 +143,7 @@ id = "b6c8065c-ddc0-4eb1-9243-a3dcdcc870a4"
 energy-cost = 3
 rules-text = """
 Whenever you discard a card, gain 1 $point.
-{flavor: Await the dawn of chaos.}"""
+"""
 card-type = "Character"
 is-fast = false
 spark = 1
@@ -156,8 +156,8 @@ name = "Ethereal Trailblazer"
 id = "2c037f79-f049-4f19-b73a-50231ad7e751"
 energy-cost = 0
 rules-text = """
-$judgment: Gain $1.
-{flavor: Where light shines in shadow, life stirs and power flows.}"""
+{judgment}: Gain $1.
+"""
 card-type = "Character"
 subtype = "Warrior"
 is-fast = false
@@ -172,7 +172,7 @@ id = "a23df796-03d2-4082-9c30-fe6958e65ffe"
 energy-cost = 0
 rules-text = """
 Gain $3.
-{flavor: Stand before the fathomless.}"""
+"""
 card-type = "Event"
 subtype = "Survivor"
 is-fast = false
@@ -208,7 +208,7 @@ art-owned = true
 name = "Eclipse Herald"
 id = "e5ac026b-a397-47ee-929d-46de1177784c"
 energy-cost = 2
-rules-text = "$activated Banish 3 cards from your void: Dissolve an enemy character with cost $2 or less."
+rules-text = "{activated} Banish 3 cards from your void: Dissolve an enemy character with cost $2 or less."
 card-type = "Character"
 subtype = "Warrior"
 is-fast = false
@@ -222,8 +222,8 @@ name = "Chronicle Reclaimer"
 id = "177f4f38-2265-459d-a0a5-db196f32c6e1"
 energy-cost = 2
 rules-text = """
-$activated: Draw a card. Discard a card.
-{flavor: She sifts through the wreckage of memory, searching for fragments to rebuild the future.}"""
+{activated}: Draw a card. Discard a card.
+"""
 card-type = "Character"
 subtype = "Hacker"
 is-fast = false
@@ -238,7 +238,7 @@ id = "d122f4a5-c8a9-49bf-9c8a-a16b8d9567a6"
 energy-cost = 6
 rules-text = """
 Dissolve all characters.
-{flavor: He watched as worlds fell.}"""
+"""
 card-type = "Event"
 is-fast = false
 image-number = 1200949222
@@ -249,7 +249,7 @@ art-owned = true
 name = "Mother of Flames"
 id = "04f44172-4877-476e-aa91-36a6eb50b53c"
 energy-cost = 2
-rules-text = "Whenever you discard a card, {kw: kindle} 1 {reminder: (add +1 to the spark of your rightmost character.)}"
+rules-text = "Whenever you discard a card, {kindle} 1 "
 card-type = "Character"
 subtype = "Renegade"
 is-fast = false
@@ -263,8 +263,8 @@ name = "The Calling Night"
 id = "be97e5e0-eebb-4b90-a676-fcf909b35600"
 energy-cost = 2
 rules-text = """
-$judgment: Draw a card. The enemy gains 2 $points.
-{flavor: "Take my gift; the cost is yours alone."}"""
+{judgment}: Draw a card. The enemy gains 2 $points.
+"""
 card-type = "Character"
 subtype = "Visitor"
 is-fast = false
@@ -279,7 +279,7 @@ id = "f06932ac-6d8a-493f-b47e-9134676ea396"
 energy-cost = 4
 rules-text = """
 Once per turn, you may play a character with cost $2 or less from your void.
-{flavor: Between stars, destiny beckons.}"""
+"""
 card-type = "Character"
 subtype = "Explorer"
 is-fast = false
@@ -293,8 +293,8 @@ name = "Urban Cipher"
 id = "aa0cd61a-13ce-4d61-b063-578686d1445a"
 energy-cost = 4
 rules-text = """
-$materialized: Discard 2 cards. Draw 2 cards.
-{flavor: In the endless maze of lights, clarity is fleeting.}"""
+{materialized}: Discard 2 cards. Draw 2 cards.
+"""
 card-type = "Character"
 subtype = "Detective"
 is-fast = false
@@ -309,7 +309,7 @@ id = "ddde23e7-939c-4b0f-be6a-ecc1e38c92f0"
 energy-cost = 2
 rules-text = """
 You may return a character from your void to your hand. Draw a card.
-{flavor: Even in the shadow of despair, they found their way back to the light.}"""
+"""
 card-type = "Event"
 is-fast = false
 image-number = 2278837661
@@ -322,7 +322,7 @@ id = "36c2a4e1-3212-4933-979a-73f109f9b256"
 energy-cost = 3
 rules-text = """
 Dissolve an enemy character.
-{flavor: Darkness released from within.}"""
+"""
 card-type = "Event"
 is-fast = true
 image-number = 1907487244
@@ -334,8 +334,8 @@ name = "Duneveil Vanguard"
 id = "adfd1cfe-459b-4a9b-bc90-203847082a03"
 energy-cost = 2
 rules-text = """
-$activated Discard a card: Dissolve an enemy character with spark 1 or less.
-{flavor: A shadow in the storm.}"""
+{activated} Discard a card: Dissolve an enemy character with spark 1 or less.
+"""
 card-type = "Character"
 subtype = "Survivor"
 is-fast = false
@@ -348,7 +348,7 @@ art-owned = true
 name = "Torchbearer of the Abyss"
 id = "dfcf69cb-c569-484a-8a98-b673a5c47899"
 energy-cost = 4
-rules-text = "Once per turn, when you discard a card, gain $1 and then {kw: kindle} 2 {reminder: (add +2 to the spark of your most recently played character.)}"
+rules-text = "Once per turn, when you discard a card, gain $1 and then {kindle} 2 "
 card-type = "Character"
 subtype = "Visitor"
 is-fast = false
@@ -362,6 +362,7 @@ name = "The Devourer"
 id = "99720e39-6bad-4c6c-867c-7bc5c326195e"
 energy-cost = 8
 rules-text = "If you have 8 or more cards in your void, you may play this character from your void for $0 by banishing all other cards from your void."
+alternate-rules-text = "Banish your void with 8+ cards: Materialize this character from your void."
 card-type = "Character"
 subtype = "Ancient"
 is-fast = false
@@ -375,9 +376,9 @@ name = "Nocturne"
 id = "cb445b05-ea7b-4a1b-9484-110021e266f3"
 energy-cost = 3
 rules-text = """
-$materialized: Draw a card. Discard a card.
-$br
-{kw: Reclaim} {reminder: (you may play this card from your void and banish it when it leaves play.)}"""
+{materialized}: Draw a card. Discard a card.
+
+{reclaim} """
 card-type = "Character"
 subtype = "Child"
 is-fast = false
@@ -392,7 +393,7 @@ id = "86e7ff73-90bf-4e3d-9069-d6533f4407b8"
 energy-cost = 5
 rules-text = """
 This character's spark is equal to the number of cards in your void.
-{flavor: Born of despair and fed by memory, it grows as the past crumbles.}"""
+"""
 card-type = "Character"
 subtype = "Ancient"
 is-fast = false
@@ -405,7 +406,7 @@ art-owned = true
 name = "Aspiring Guardian"
 id = "b8b94c40-108d-4beb-9e71-6c8e9d00554e"
 energy-cost = 0
-rules-text = "{flavor: Courage knows no bounds}."
+rules-text = "."
 card-type = "Character"
 subtype = "Warrior"
 is-fast = false
@@ -418,7 +419,7 @@ art-owned = true
 name = "The Dread Sovereign"
 id = "521b912b-1dfb-4440-a1e0-7181bac6aa58"
 energy-cost = 3
-rules-text = "$activated Abandon a {cardtype: warrior}: {kw: Discover} a {cardtype: warrior} with cost $1 higher than the abandoned character and materialize it."
+rules-text = "{activated} Abandon a {cardtype: warrior}: {discover} a {cardtype: warrior} with cost $1 higher than the abandoned character and materialize it."
 card-type = "Character"
 subtype = "Ancient"
 is-fast = false
@@ -432,8 +433,8 @@ name = "Tranquil Duelist"
 id = "84eedef8-9dc9-42ef-afe8-07bc1882f7ee"
 energy-cost = 2
 rules-text = """
-$materialized, $dissolved: Draw a card.
-{flavor: Peace forged under falling leaves.}"""
+{materialized}, $dissolved: Draw a card.
+"""
 card-type = "Character"
 subtype = "Warrior"
 is-fast = false
@@ -447,8 +448,8 @@ name = "Voidshield Guardian"
 id = "fb285715-af52-4358-94de-b40256916f9b"
 energy-cost = 2
 rules-text = """
-$fastActivated: Another character you control gains {kw: aegis} this turn. {reminder: (it cannot be affected by the enemy)}
-{flavor: She stands where others would fall.}"""
+$fastActivated: Another character you control gains {kw: aegis} this turn. 
+"""
 card-type = "Character"
 subtype = "Synth"
 is-fast = false
@@ -463,7 +464,7 @@ id = "7163d032-c2db-44c0-b9d4-624994a0e648"
 energy-cost = 3
 rules-text = """
 $fastActivated $2: Another character you control gains +1 spark until your next main phase for each {cardtype: warrior} you control.
-{flavor: Cleave the shadows apart.}"""
+"""
 card-type = "Character"
 subtype = "Warrior"
 is-fast = false
@@ -489,7 +490,7 @@ id = "5dd8c16c-e8ed-4591-83c1-bdd610bed5a2"
 energy-cost = 2
 rules-text = """
 Whenever you materialize another {cardtype: warrior}, this character gains +1 spark.
-{flavor: The sound of hooves and steel is his battle cry—and his soldiers' anthem.}"""
+"""
 card-type = "Character"
 subtype = "Warrior"
 is-fast = false
@@ -504,7 +505,7 @@ id = "d4123a89-fa76-46f9-a8b7-6a1d4ecc4c4f"
 energy-cost = 4
 rules-text = """
 Once per turn, when you materialize a character with cost $2 or less, draw a card.
-{flavor: Claim the night.}"""
+"""
 card-type = "Character"
 subtype = "Explorer"
 is-fast = false
@@ -541,7 +542,7 @@ id = "56020364-cbe8-4500-900f-33510a95ff10"
 energy-cost = 2
 rules-text = """
 Dissolve an enemy character with spark 1 or less.
-{flavor: The weak are swept away, leaving only ash and silence.}"""
+"""
 card-type = "Event"
 is-fast = true
 image-number = 2521694541
@@ -563,7 +564,7 @@ art-owned = true
 name = "Summons of the Bonded"
 id = "ff0fc84e-5d40-4317-820d-76d2a660c453"
 energy-cost = 1
-rules-text = "{kw: Discover} a {cardtype: warrior} {reminder: (pick one of 4 random warriors with different costs to put into your hand).}"
+rules-text = "{discover} a {cardtype: warrior} "
 card-type = "Event"
 is-fast = false
 image-number = 1570031575
@@ -576,7 +577,7 @@ id = "b9b26dbb-0384-4839-bff2-3b25c4c26518"
 energy-cost = 3
 rules-text = """
 You may play this character from your void for $2 by banishing another card in your void.
-{flavor: Death is but a detour for vengeance.}"""
+"""
 card-type = "Character"
 subtype = "Warrior"
 is-fast = false
@@ -590,8 +591,8 @@ name = "Dreadcall Warden"
 id = "eb84ba88-8352-45e8-8cf9-d160227db3ad"
 energy-cost = 2
 rules-text = """
-$multiActivated $2, Abandon another character with spark 1 or less: Draw 2 cards.
-{flavor: Knowledge comes at a cost, and he always collects.}"""
+{multiActivated} $2, Abandon another character with spark 1 or less: Draw 2 cards.
+"""
 card-type = "Character"
 subtype = "Warrior"
 is-fast = false
@@ -605,8 +606,8 @@ name = "Wolfbond Chieftain"
 id = "a5275ef5-2896-4a0a-89de-96b241e05472"
 energy-cost = 0
 rules-text = """
-$materialized, $judgment: If you control 2 other {cardtype: warriors}, gain $1.
-{flavor: He speaks not of glory, but of bonds that cannot be broken.}"""
+{materialized}, {judgment}: If you control 2 other {cardtype: warriors}, gain $1.
+"""
 card-type = "Character"
 subtype = "Warrior"
 is-fast = false
@@ -620,9 +621,9 @@ name = "Dawnblade Wanderer"
 id = "d8f9abc2-a864-47b9-96e6-2ced9f9ba208"
 energy-cost = 1
 rules-text = """
-$materialized, $judgment: 
+{materialized}, {judgment}: 
 Gain $2.
-{flavor: Each step forward brings light.}"""
+"""
 card-type = "Character"
 subtype = "Warrior"
 is-fast = false
@@ -637,7 +638,7 @@ id = "725cf0ad-b5d1-400e-9a55-31e0bb62f612"
 energy-cost = 1
 rules-text = """
 Once per turn, when you materialize a character, gain $1.
-{flavor: Every step she takes invites another to follow.}"""
+"""
 card-type = "Character"
 subtype = "Warrior"
 is-fast = false
@@ -651,8 +652,8 @@ name = "Seeker for the Way"
 id = "a42e3d7a-35a0-4dbc-a85d-c71b191d44a8"
 energy-cost = 3
 rules-text = """
-$materialized: Draw a {cardtype: warrior} from your deck.
-{flavor: The stones whispered, and she listened.}"""
+{materialized}: Draw a {cardtype: warrior} from your deck.
+"""
 card-type = "Character"
 subtype = "Warrior"
 is-fast = false
@@ -665,7 +666,7 @@ art-owned = true
 name = "Rebirth Ritualist"
 id = "1b69b697-4829-4e25-8d53-7462572cbb55"
 energy-cost = 2
-rules-text = "$activated $2, Abandon this character, discard your hand: Draw 3 cards."
+rules-text = "{activated} $2, Abandon this character, discard your hand: Draw 3 cards."
 card-type = "Character"
 subtype = "Warrior"
 is-fast = false
@@ -679,8 +680,8 @@ name = "Pallid Arbiter"
 id = "91a32fb4-5bb2-4f8d-b24a-22a8963b3302"
 energy-cost = 2
 rules-text = """
-Disable the "$materialized" abilities of enemy characters.
-{flavor: Life's song fades beneath his march.}"""
+Disable the "{materialized}" abilities of enemy characters.
+"""
 card-type = "Character"
 subtype = "Warrior"
 is-fast = false
@@ -695,7 +696,7 @@ id = "07dea7d2-6d3b-40f6-9740-cfefd44aaaaf"
 energy-cost = 2
 rules-text = """
 Other {cardtype: warriors} you control have +1 spark.
-{flavor: Under his shadow, warriors find their fire.}"""
+"""
 card-type = "Character"
 subtype = "Warrior"
 is-fast = false
@@ -709,8 +710,8 @@ name = "Spirit Field Reclaimer"
 id = "7d1820ef-80c4-415e-bc36-7d361259225c"
 energy-cost = 2
 rules-text = """
-$activated $1: This character gains +1 spark. You may banish a card from the enemy's void.
- {flavor: What is cast away only fuels her fire.}"""
+{activated} $1: This character gains +1 spark. You may banish a card from the enemy's void.
+ """
 card-type = "Character"
 subtype = "Warrior"
 is-fast = false
@@ -725,7 +726,7 @@ id = "f453990c-934d-42c6-a12c-2a7d50689909"
 energy-cost = 3
 rules-text = """
 The enemy's events cost $1 more.
-{flavor: In shadow, energy awakens.}"""
+"""
 card-type = "Character"
 subtype = "Mage"
 is-fast = false
@@ -738,7 +739,7 @@ art-owned = true
 name = "Twilight Suppressor"
 id = "4e3420f2-6f0d-4381-b2b1-afb16af7549f"
 energy-cost = 3
-rules-text = "$materialized: Disable the activated abilities of a chosen enemy character while this character is in play."
+rules-text = "{materialized}: Disable the activated abilities of a chosen enemy character while this character is in play."
 card-type = "Character"
 subtype = "Warrior"
 is-fast = false
@@ -752,8 +753,8 @@ name = "Frost Visionary"
 id = "80076dbf-efdb-4130-80b9-45ebc8b3a235"
 energy-cost = 2
 rules-text = """
-$materialized: Draw a card.
-{flavor: The spirit's shadow speaks truths only the bold dare to hear.}"""
+{materialized}: Draw a card.
+"""
 card-type = "Character"
 subtype = "Warrior"
 is-fast = false
@@ -767,8 +768,8 @@ name = "Forsworn Champion"
 id = "3baa112c-951f-4552-bc9e-0a3ee61543fa"
 energy-cost = 4
 rules-text = """
-$multiActivated Abandon another character: This character gains +1 spark.
-{flavor: The flames whispered promises of power, and he discarded honor to listen.}"""
+{multiActivated} Abandon another character: This character gains +1 spark.
+"""
 card-type = "Character"
 subtype = "Warrior"
 is-fast = false
@@ -783,7 +784,7 @@ id = "6d7c5ef9-14ed-4301-8aa5-a07944d1918f"
 energy-cost = 4
 rules-text = """
 This character's spark is equal to the number of {cardtype: warriors} you control.
-{flavor: His strength burns hottest when the many stand as one.}"""
+"""
 card-type = "Character"
 subtype = "Warrior"
 is-fast = false
@@ -798,7 +799,7 @@ id = "e3b7d716-2776-4469-af9c-4dc082e0083c"
 energy-cost = 4
 rules-text = """
 Once per turn, when you materialize a {cardtype: warrior}, draw a card.
-{flavor: Each story adds a link to the unbreakable chain of fate.}"""
+"""
 card-type = "Character"
 subtype = "Mage"
 is-fast = false
@@ -826,7 +827,7 @@ id = "d02cc851-4c89-463a-b988-a94dfefef797"
 energy-cost = 2
 rules-text = """
 Negate an enemy dream.
-$br
+
 You may play this event for $0 by abandoning a dreamscape."""
 card-type = "Event"
 is-fast = true
@@ -839,7 +840,7 @@ name = "Echoing Denial"
 id = "4666416e-5f12-47a3-9e7e-56943c0d6e44"
 energy-cost = 5
 rules-text = """
-Negate an enemy dream. $br
+Negate an enemy dream. 
 You may play this event for $0 by banishing a '$fast' card from your hand."""
 card-type = "Event"
 is-fast = true
@@ -853,7 +854,7 @@ id = "9c605a08-dac4-4c3e-8aff-437b79809937"
 energy-cost = 1
 rules-text = """
 Negate an enemy event unless they pay $2.
-{flavor: Every wave carries strength, but not all are destined to crash.}"""
+"""
 card-type = "Event"
 is-fast = true
 image-number = 2123360837
@@ -887,7 +888,7 @@ name = "Fell the Mighty"
 id = "ff10c460-125f-4f77-b9e2-4c4f33adff3e"
 energy-cost = 4
 rules-text = """
-Dissolve an enemy character. $br
+Dissolve an enemy character. 
 You may play this event for $0 by banishing a '$fast' card from your hand."""
 card-type = "Event"
 is-fast = true
@@ -901,7 +902,7 @@ id = "754a3d7d-24e8-40e0-9ed8-f99672bc76eb"
 energy-cost = 0
 rules-text = """
 Dissolve an enemy character. The enemy gains 3 $points.
-{flavor: Victory was hers, but at a cost her enemies would not let her forget.}"""
+"""
 card-type = "Event"
 is-fast = true
 image-number = 1463121788
@@ -914,7 +915,7 @@ id = "eb85b69a-3771-4148-83cf-a7ddb0caee98"
 energy-cost = 2
 rules-text = """
 Negate an enemy dream.
-{flavor: A shadow unmade, a song unheard, a fate rewritten.}"""
+"""
 card-type = "Event"
 is-fast = true
 image-number = 1282908322
@@ -926,9 +927,9 @@ name = "Guiding Light"
 id = "62bf2eb8-4afb-42b1-a8c5-5423eed96545"
 energy-cost = 1
 rules-text = """
-{kw: Foresee} 1. Draw a card.
+{Forsee} 1. Draw a card.
 {kw: Reclaim $3}.
-{flavor: The beacon’s light cut through the mist, showing what was and what could be.}"""
+"""
 card-type = "Event"
 is-fast = true
 image-number = 1328168243
@@ -941,7 +942,7 @@ id = "f83a0657-f55a-4ee6-8630-c2ca2d8429ac"
 energy-cost = 1
 rules-text = """
 Abandon a character or discard a card. Dissolve an enemy character.
-{flavor: Unleash the inner fire.}"""
+"""
 card-type = "Event"
 is-fast = true
 image-number = 2023111787
@@ -953,8 +954,8 @@ name = "Threadbreaker"
 id = "6e757f74-08e4-4f4e-ab27-70106b93a159"
 energy-cost = 3
 rules-text = """
-$materialized: Negate an enemy dream with cost $2 or less.
-{flavor: Before words found form, they were lost to the void.}"""
+{materialized}: Negate an enemy dream with cost $2 or less.
+"""
 card-type = "Character"
 subtype = "Synth"
 is-fast = true
@@ -967,7 +968,7 @@ art-owned = false
 name = "Cosmic Puppeteer"
 id = "e4aff892-1a6d-40b7-901d-1d57a9a21807"
 energy-cost = 5
-rules-text = "$materialized: Gain control of an enemy character with cost $2 or less."
+rules-text = "{materialized}: Gain control of an enemy character with cost $2 or less."
 card-type = "Character"
 subtype = "Ancient"
 is-fast = true
@@ -980,10 +981,17 @@ art-owned = false
 name = "Obliterator of Worlds"
 id = "5aea70af-2df6-411f-b513-cb9ee8b18fb4"
 energy-cost = 6
-rules-text = "{small: $materialized: Dissolve an enemy character.}$br{small: You may play this character for $0 by abandoning a character. If you do, abandon this character at end of turn.}"
+rules-text = """
+{materialized}: Dissolve an enemy character. 
+
+You may play this character for $0 by abandoning a character. If you do, abandon this character at end of turn."""
+alternate-rules-text = """
+{Materialized}: Dissolve an enemy character.
+
+Abandon a character: Materialize this character from your hand. Abandon it at end of turn."""
 card-type = "Character"
 subtype = "Ancient"
-is-fast = true
+is-fast = false
 spark = 2
 image-number = 443761822
 rarity = "Rare"
@@ -994,8 +1002,8 @@ name = "Horizon Follower"
 id = "d124e9cc-407f-4288-9a09-78e426c00761"
 energy-cost = 2
 rules-text = """
-$judgment: Gain 1 $point.
-{flavor: Chasing the sun's first light.}"""
+{judgment}: Gain 1 $point.
+"""
 card-type = "Character"
 subtype = "Vistor"
 is-fast = true
@@ -1009,8 +1017,8 @@ name = "Astral Navigators"
 id = "03f73699-bf4d-4f36-a811-0e1f847b55f7"
 energy-cost = 3
 rules-text = """
-$materialized: {kw: Foresee} 2.
-{flavor: In the shifting sands of time, they glimpsed what was to come.}"""
+{materialized}: {Forsee} 2.
+"""
 card-type = "Character"
 subtype = "Robot"
 is-fast = true
@@ -1024,8 +1032,12 @@ name = "Boundless Wanderer"
 id = "bd99da06-6591-4458-a4f6-d372a2def6bb"
 energy-cost = 2
 rules-text = """
-This character has all character types. $br
-$judgment: If you control 3 other characters which share a character type, draw a card."""
+This character has all character types. 
+{judgment}: If you control 3 other characters which share a character type, draw a card."""
+alternate-rules-text = """
+Has all character types.
+
+{Judgment}: If 3 allies share a character type, draw a card."""
 card-type = "Character"
 subtype = '\*'
 is-fast = false
@@ -1078,8 +1090,8 @@ name = "The Waking Titan"
 id = "76435ef9-18df-4c2d-bf5a-c92d997e86b5"
 energy-cost = 5
 rules-text = """
-$materialized: Return a character with cost $3 or more you control to hand. $br
-$judgment: Draw a card."""
+{materialized}: Return a character with cost $3 or more you control to hand. 
+{judgment}: Draw a card."""
 card-type = "Character"
 subtype = "Ancient"
 is-fast = false
@@ -1106,7 +1118,7 @@ name = "Moonlit Dancer"
 id = "1f5024e3-aa36-4a44-b257-0caf35484cf8"
 energy-cost = 3
 rules-text = """
-Characters in your hand have '$fast'. $br
+Characters in your hand have '$fast'. 
 Once per turn, when you play a '$fast' character, gain $1."""
 card-type = "Character"
 subtype = "Visitor"
@@ -1132,8 +1144,8 @@ name = "Abyssal Enforcer"
 id = "0bc5151d-cf48-4c15-bc44-673cb1663a52"
 energy-cost = 4
 rules-text = """
-$materialized: Return an enemy character to hand.
-{flavor: With a flick of his hand, reality folded, and they vanished.}"""
+{materialized}: Return an enemy character to hand.
+"""
 card-type = "Character"
 subtype = "Outsider"
 is-fast = true
@@ -1147,8 +1159,8 @@ name = "Lantern Keeper"
 id = "81008e3a-e2d1-4d7e-a13a-1583ef75b2ff"
 energy-cost = 4
 rules-text = """
-$judgment: Gain 2 $points.
-{flavor: Every flame holds a story; every story lights the path forward.}"""
+{judgment}: Gain 2 $points.
+"""
 card-type = "Character"
 subtype = "Visitor"
 is-fast = true
@@ -1161,7 +1173,7 @@ art-owned = false
 name = "Ashlight Caller"
 id = "977ce2e4-ef8c-48e7-a27b-83a7348fa94f"
 energy-cost = 3
-rules-text = "$materialized: An event in your void gains {kw: reclaim} until end of turn {reminder: (you may play it from your void, then banish it.)}"
+rules-text = "{materialized}: An event in your void gains {reclaim} until end of turn "
 card-type = "Character"
 subtype = "Survivor"
 is-fast = true
@@ -1189,7 +1201,7 @@ id = "84f1d31e-149f-4ab8-ac67-de35b0ad97a9"
 energy-cost = 1
 rules-text = """
 Draw 3 cards.
-{flavor: Every page turned reveals a universe untold.}"""
+"""
 card-type = "Event"
 is-fast = true
 image-number = 1021646686
@@ -1202,7 +1214,7 @@ id = "3e93788c-bae3-4fda-a94c-a387cf0f386d"
 energy-cost = 3
 rules-text = """
 Return a character to hand. Draw a card.
-{flavor: Sometimes the only way forward is to retrace your steps.}"""
+"""
 card-type = "Event"
 is-fast = true
 image-number = 1149594743
@@ -1213,7 +1225,7 @@ art-owned = false
 name = "Keeper of the Tides"
 id = "7066c559-3ab1-4c89-b654-39c22dcb8603"
 energy-cost = 2
-rules-text = "$materialized: {kw: Discover} a '$fast' event {reminder: (pick one of 4 random events with different costs to put into your hand.)}"
+rules-text = "{materialized}: {discover} a '$fast' event "
 card-type = "Character"
 subtype = "Visitor"
 is-fast = true
@@ -1239,7 +1251,7 @@ id = "5ddbb693-5fc3-4e5a-8040-944fa9e9755d"
 energy-cost = 3
 rules-text = """
 Draw a card for each dream you have played this turn.
-{flavor: Each step forward reveals another secret waiting to be uncovered.}"""
+"""
 card-type = "Event"
 is-fast = false
 image-number = 1798514905
@@ -1252,7 +1264,7 @@ id = "8fad0360-df91-4c08-8e48-298a07a4c3f3"
 energy-cost = 4
 rules-text = """
 Events cost you $2 more.
-$br
+
 Whenever you play an event from your hand, copy it."""
 card-type = "Character"
 subtype = "Tinkerer"
@@ -1268,7 +1280,7 @@ id = "2910484b-ecfe-445d-92b7-2f7d246b17fd"
 energy-cost = 3
 rules-text = """
 Until end of turn, whenever you play an event, copy it.
-{flavor: The sky answered once, then a thousandfold.}"""
+"""
 card-type = "Event"
 is-fast = false
 image-number = 1739438657
@@ -1281,8 +1293,8 @@ id = "5ce29518-6ccd-420c-9fbf-c4b882266593"
 energy-cost = 5
 rules-text = """
 Copy the next event you play this turn twice.
-$br
-{kw: Reclaim} $2"""
+
+{reclaim} $2"""
 card-type = "Event"
 is-fast = false
 image-number = 1196004052
@@ -1294,8 +1306,8 @@ name = "Path to Redemption"
 id = "16853a85-1211-462e-9ca4-8a0ba0890657"
 energy-cost = 6
 rules-text = """
-Until end of turn, all cards in your void have {kw: reclaim}.
-{flavor: What was lost is only waiting to be found again.}"""
+Until end of turn, all cards in your void have {reclaim}.
+"""
 card-type = "Event"
 is-fast = false
 image-number = 1005938023
@@ -1308,7 +1320,7 @@ id = "48578752-91df-44dd-a9ac-1f46fe4454ed"
 energy-cost = 2
 rules-text = """
 Discard a card. Draw 2 cards.
-{flavor: Let go of the weight, and watch new horizons unfold.}"""
+"""
 card-type = "Event"
 is-fast = false
 image-number = 670293475
@@ -1331,8 +1343,8 @@ name = "Whisper of the Past"
 id = "35cc788c-b7f1-46ae-b398-7ad37a624247"
 energy-cost = 3
 rules-text = """
-An event in your void gains {kw: reclaim} $0 until end of turn.
-{flavor: In the glow of forgotten paths, a new story begins.}"""
+An event in your void gains {reclaim} $0 until end of turn.
+"""
 card-type = "Event"
 is-fast = false
 image-number = 2186149269
@@ -1356,7 +1368,7 @@ id = "214169c7-dc03-487f-bd85-d560f68031a1"
 energy-cost = 3
 rules-text = """
 Take an extra turn after this one.
-{flavor: The gears of time never stop turning—but sometimes they need a push.}"""
+"""
 card-type = "Event"
 is-fast = false
 image-number = 758082493
@@ -1382,7 +1394,7 @@ id = "2df6ba84-9aec-451d-80e6-f14d743a6db6"
 energy-cost = 4
 rules-text = """
 Whenever you play an event, gain $1.
-{flavor: She gathers energy from every ripple in the universe.}"""
+"""
 card-type = "Character"
 subtype = "Visitor"
 is-fast = false
@@ -1397,7 +1409,7 @@ id = "a43133a1-ad75-4685-a5dd-9e94b249e463"
 energy-cost = 4
 rules-text = """
 Gain $6.
-{flavor: The energy coursed through him, unyielding and limitless.}"""
+"""
 card-type = "Event"
 is-fast = false
 image-number = 1063277315
@@ -1410,7 +1422,7 @@ id = "1a6babbe-c0fe-47ed-8ad3-4cdbf0585b10"
 energy-cost = 2
 rules-text = """
 Double the amount of energy in your energy pool.
-{flavor: Power flowed through him, as if the planet itself had awakened.}"""
+"""
 card-type = "Event"
 is-fast = false
 image-number = 1314287447
@@ -1423,7 +1435,7 @@ id = "90a624db-d288-4856-afc9-f9222e67d3bd"
 energy-cost = 2
 rules-text = """
 Until end of turn, whenever you gain energy, gain twice that much energy instead.
-{flavor: In that moment, she was the storm incarnate.}"""
+"""
 card-type = "Event"
 is-fast = false
 image-number = 1529898278
@@ -1436,7 +1448,7 @@ id = "c27871a8-5256-4505-bdd1-8f5c8c222153"
 energy-cost = 2
 rules-text = """
 Gain $2. Draw a card.
-{flavor: The screens glowed, and the world’s secrets spilled forth.}"""
+"""
 card-type = "Event"
 is-fast = false
 image-number = 1084619579
@@ -1449,7 +1461,7 @@ id = "7d1b1516-f89a-4a27-b9b6-54afaa85c217"
 energy-cost = 3
 rules-text = """
 Draw 2 cards. Discard 2 cards. Gain $2.
-{flavor: In the glow of the setting sun, the future seemed boundless.}"""
+"""
 card-type = "Event"
 is-fast = false
 image-number = 1728839131
@@ -1461,8 +1473,8 @@ name = "The Ringleader"
 id = "afee62e2-7768-47d5-87bd-eaea08400fad"
 energy-cost = 6
 rules-text = """
-$materialized: Copy the next event you play this turn three times.
-{flavor: Every act becomes a storm, every storm a symphony.}"""
+{materialized}: Copy the next event you play this turn three times.
+"""
 card-type = "Character"
 subtype = "Outsider"
 is-fast = false
@@ -1488,7 +1500,7 @@ id = "7b22f49a-04a3-4ed9-9834-841883c2b14d"
 energy-cost = 2
 rules-text = """
 Gain $4.
-{flavor: She felt the charge ripple through her veins, setting the world aflame.}"""
+"""
 card-type = "Event"
 is-fast = false
 image-number = 1164289066
@@ -1523,8 +1535,12 @@ id = "ded25ef2-3c3f-4012-8717-8dec3def1854"
 energy-cost = 5
 rules-text = """
 Draw 3 cards.
-$br
+
 If you have 8 or more cards in your void, you may play this event for $0 by banishing all cards from your void."""
+alternate-rules-text = """
+Draw 3 cards.
+
+Banish your void with 8+ cards: Play this event for $0."""
 card-type = "Event"
 is-fast = false
 image-number = 1786390157
@@ -1537,7 +1553,7 @@ id = "540cd70f-4fc8-417b-ac0d-3b337bfe8f01"
 energy-cost = 1
 rules-text = """
 Put the top 3 cards of your deck into your void. Draw a card.
-{flavor: Each discarded thought fuels the relentless machine.}"""
+"""
 card-type = "Event"
 is-fast = false
 image-number = 1739438660
@@ -1550,7 +1566,7 @@ id = "cb47502c-6251-42e3-9104-e879b90d06ae"
 energy-cost = 1
 rules-text = """
 Negate an enemy '$fast' dream.
-{flavor: The sea does not ask; it takes.}"""
+"""
 card-type = "Event"
 is-fast = false
 image-number = 1042405558
@@ -1561,7 +1577,7 @@ art-owned = false
 name = "Door to Possibility"
 id = "2529d712-3e11-449e-a389-6dadd49cc145"
 energy-cost = 2
-rules-text = "{kw: Discover} an event {reminder: (pick one of 4 random events with different costs to put into your hand).}"
+rules-text = "{discover} an event "
 card-type = "Event"
 is-fast = false
 image-number = 1798382125
@@ -1574,7 +1590,7 @@ id = "57fb24df-bedf-414d-b190-03e831570fda"
 energy-cost = 3
 rules-text = """
 Draw 3 cards. Discard 2 cards.
-{flavor: To reach the future, he first had to rearrange the past.}"""
+"""
 card-type = "Event"
 is-fast = false
 image-number = 1924168811
@@ -1586,8 +1602,8 @@ name = "Oracle of Shifting Skies"
 id = "129ec84c-6423-466f-ad75-c83b50bab09f"
 energy-cost = 2
 rules-text = """
-Whenever you play an event, {kw: foresee} 1.
-{flavor: She sees storms where others see clear skies.}"""
+Whenever you play an event, {Forsee} 1.
+"""
 card-type = "Character"
 subtype = "Visionary"
 is-fast = false
@@ -1613,7 +1629,7 @@ id = "fe13ba87-8935-4740-b762-23c8ccd89ff9"
 energy-cost = 4
 rules-text = """
 This character's spark is equal to the number of events in your void.
-{flavor: Every spark remembers the fire that birthed it.}"""
+"""
 card-type = "Character"
 subtype = "Ancient"
 is-fast = false
@@ -1628,7 +1644,7 @@ id = "30e50754-0903-45ef-8569-b9032a93ed8f"
 energy-cost = 5
 rules-text = """
 Characters cost you $2 less.
-{flavor: Through runes and rivers, they chart the unseen paths of power.}"""
+"""
 card-type = "Character"
 subtype = "Explorer"
 is-fast = false
@@ -1641,7 +1657,7 @@ art-owned = false
 name = "Conduit of Resonance"
 id = "cb474c3f-1670-4e44-88d9-bef6475a4199"
 energy-cost = 5
-rules-text = "Whenever you materialize a character, trigger the '$judgment' ability of each character you control."
+rules-text = "Whenever you materialize a character, trigger the '{judgment}' ability of each character you control."
 card-type = "Character"
 subtype = "Super"
 is-fast = false
@@ -1666,8 +1682,8 @@ name = "Ghostlight Wolves"
 id = "b7bc3d79-3c83-4015-92c5-1984c37830f3"
 energy-cost = 3
 rules-text = """
-$judgment: Gain $1 for each {cardtype: spirit animal} you control.
-{flavor: Together, their glow lights the path.}"""
+{judgment}: Gain $1 for each {cardtype: spirit animal} you control.
+"""
 card-type = "Character"
 subtype = "Spirit Animal"
 is-fast = false
@@ -1681,8 +1697,8 @@ name = "Ethereal Courser"
 id = "715fe2e6-e2c7-4437-8eaa-dfd6e1dad1b8"
 energy-cost = 3
 rules-text = """
-$materialized: Return a character you control to hand.
-{flavor: In its glowing wake, companions find sanctuary, hidden and secure.}"""
+{materialized}: Return a character you control to hand.
+"""
 card-type = "Character"
 subtype = "Spirit Animal"
 is-fast = false
@@ -1696,8 +1712,8 @@ name = "Nomad of Endless Paths"
 id = "a4322fb3-6195-41e5-9cb2-74113f961f4d"
 energy-cost = 2
 rules-text = """
-$materialized: Return another character you control to hand.
-{flavor: Home is where the journey begins again.}"""
+{materialized}: Return another character you control to hand.
+"""
 card-type = "Character"
 subtype = "Explorer"
 is-fast = true
@@ -1710,7 +1726,7 @@ art-owned = false
 name = "Blazing Emberwing"
 id = "5ed4d321-07d9-4607-9897-3a645df8c012"
 energy-cost = 3
-rules-text = "The '$judgment' ability of characters you contol triggers when you materialize them."
+rules-text = "The '{judgment}' ability of characters you contol triggers when you materialize them."
 card-type = "Character"
 subtype = "Spirit Animal"
 is-fast = false
@@ -1725,7 +1741,7 @@ id = "f44fabc0-b239-423d-b602-a70a9da38479"
 energy-cost = 1
 rules-text = """
 Whenever you materialize another {cardtype: spirit animal}, gain $1.
-{flavor: Lightning follows its stride.}"""
+"""
 card-type = "Character"
 subtype = "Spirit Animal"
 is-fast = false
@@ -1739,8 +1755,8 @@ name = "Luminwings"
 id = "2621f88d-3207-40ec-840a-3d45fb5ed10f"
 energy-cost = 1
 rules-text = """
-$judgment: If you control 2 other {cardtype: spirit animals}, gain $2.
-{flavor: They glow with the essence of forgotten wonders}"""
+{judgment}: If you control 2 other {cardtype: spirit animals}, gain $2.
+"""
 card-type = "Character"
 subtype = "Spirit Animal"
 is-fast = false
@@ -1754,8 +1770,8 @@ name = "Spirit of the Greenwood"
 id = "e1c49dfb-d84b-440e-80ef-029719c172d3"
 energy-cost = 3
 rules-text = """
-$judgment: Gain $1 for each other character you control.
-{flavor: A beacon of unity beneath the ancient canopy.}"""
+{judgment}: Gain $1 for each other character you control.
+"""
 card-type = "Character"
 subtype = "Spirit Animal"
 is-fast = false
@@ -1781,7 +1797,7 @@ id = "cd398e35-fd5d-46df-8adb-5d2595df612d"
 energy-cost = 2
 rules-text = """
 When you draw all of the cards in a copy of your deck, you win the game.
-{flavor: The ocean whispers, 'Draw closer, and all shall be revealed.'}"""
+"""
 card-type = "Character"
 subtype = "Spirit Animal"
 is-fast = false
@@ -1820,7 +1836,7 @@ id = "ec80cc3c-a23d-465e-a2cf-4eed6fb89e1d"
 energy-cost = 3
 rules-text = """
 Whenever you play a {cardtype: spirit animal}, draw a card.
-{flavor: A light in the dusk, a guide for the lost.}"""
+"""
 card-type = "Character"
 subtype = "Spirit Animal"
 is-fast = false
@@ -1834,8 +1850,8 @@ name = "Spiritbound Alpha"
 id = "86e31227-afab-4eb3-a53f-53e08c7ff227"
 energy-cost = 2
 rules-text = """
-$activated $4: Each {cardtype: spirit animal} you control gains +2 spark until your next main phase.
-{flavor: Its presence ignites the pack’s fury.}"""
+{activated} $4: Each {cardtype: spirit animal} you control gains +2 spark until your next main phase.
+"""
 card-type = "Character"
 subtype = "Spirit Animal"
 is-fast = false
@@ -1850,7 +1866,7 @@ id = "b8b55ef4-2f79-4c62-b347-e91bea3a40bd"
 energy-cost = 3
 rules-text = """
 Whenever you materialize another {cardtype: spirit animal}, that character gains +1 spark.
-{flavor: Its cry awakens strength in all who hear.}"""
+"""
 card-type = "Character"
 subtype = "Spirit Animal"
 is-fast = false
@@ -1864,8 +1880,8 @@ name = "Ebonwing"
 id = "2ff0d711-4202-4dca-983d-96622849b76a"
 energy-cost = 1
 rules-text = """
-$materialized, $judgment: {kw: Kindle} 1.
-{flavor: Bound by light, shadow, and an unbroken oath.}"""
+{materialized}, {judgment}: {kindle} 1.
+"""
 card-type = "Character"
 subtype = "Spirit Animal"
 is-fast = false
@@ -1879,8 +1895,8 @@ name = "Shadowpaw"
 id = "a52a502f-558b-4e33-bd33-44a866582f17"
 energy-cost = 3
 rules-text = """
-$materialized: Return a character from your void to your hand.
-{flavor: Through the forest’s glow, it finds what others cannot.}"""
+{materialized}: Return a character from your void to your hand.
+"""
 card-type = "Character"
 subtype = "Spirit Animal"
 is-fast = false
@@ -1894,8 +1910,8 @@ name = "Looming Oracle"
 id = "1b65c84c-6714-4f9b-a229-f1efa467a6c5"
 energy-cost = 2
 rules-text = """
-$materialized: Draw a card.
-{flavor: In the ethereal green glow, answers await the curious.}"""
+{materialized}: Draw a card.
+"""
 card-type = "Character"
 subtype = "Spirit Animal"
 is-fast = false
@@ -1909,8 +1925,8 @@ name = "Driftcaller Sovereign"
 id = "919f4169-7a9d-4004-871f-9f36e3761e72"
 energy-cost = 1
 rules-text = """
-$judgment: Gain $1.
-{flavor: Its light pulses with the rhythm of endless currents.}"""
+{judgment}: Gain $1.
+"""
 card-type = "Character"
 subtype = "Spirit Animal"
 is-fast = false
@@ -1924,8 +1940,8 @@ name = "Emerald Guardian"
 id = "08daba86-8d26-416c-ac16-4c7c2185951f"
 energy-cost = 3
 rules-text = """
-$judgment: Gain $2.
-{flavor: The air hums with its boundless power}"""
+{judgment}: Gain $2.
+"""
 card-type = "Character"
 subtype = "Spirit Animal"
 is-fast = false
@@ -1940,7 +1956,7 @@ id = "64b5552f-1fc3-4aee-a79c-cebc19792044"
 energy-cost = 4
 rules-text = """
 You may look at the top card of your deck.
-$br
+
 You may play characters from the top of your deck."""
 card-type = "Character"
 subtype = "Spirit Animal"
@@ -1955,8 +1971,8 @@ name = "Soulflame Predator"
 id = "9787a2fc-9f92-489d-b5a4-63f777356eda"
 energy-cost = 3
 rules-text = """
-$materialized: Banish the enemy's void.
-{flavor: Where it prowls, the past finds no refuge.}"""
+{materialized}: Banish the enemy's void.
+"""
 card-type = "Character"
 subtype = "Spirit Animal"
 is-fast = true
@@ -1969,7 +1985,7 @@ art-owned = false
 name = "Seeker of the Radiant Wilds"
 id = "0dc21b19-b21b-4905-9a9a-113db544e587"
 energy-cost = 2
-rules-text = "$materialized: Draw a card for each {cardtype: spirit animal} you control."
+rules-text = "{materialized}: Draw a card for each {cardtype: spirit animal} you control."
 card-type = "Character"
 subtype = "Visitor"
 is-fast = false
@@ -1982,7 +1998,7 @@ art-owned = false
 name = "Mystic Runefish"
 id = "83fc9336-c5a4-4a6e-bf90-be84f3535d34"
 energy-cost = 1
-rules-text = "$activated $3: The spark of each {cardtype: spirit animal} you control becomes 5."
+rules-text = "{activated} $3: The spark of each {cardtype: spirit animal} you control becomes 5."
 card-type = "Character"
 subtype = "Spirit Animal"
 is-fast = false
@@ -1996,8 +2012,8 @@ name = "Starlight Guide"
 id = "3d9f38a4-6ae8-4e90-bc75-84d711b5fef9"
 energy-cost = 5
 rules-text = """
-$materialized: You may banish another character you control, then materialize it.
-{flavor: Step into the unknown.}"""
+{materialized}: You may banish another character you control, then materialize it.
+"""
 card-type = "Character"
 subtype = "Guide"
 is-fast = true
@@ -2010,7 +2026,7 @@ art-owned = false
 name = "Flickerveil Adept"
 id = "d8017d8f-7855-47e5-bfe5-89ca2e7c5203"
 energy-cost = 4
-rules-text = "$immediate $activated: Banish another character with spark 1 or less you control, then materialize it."
+rules-text = "{immediate} {activated}: Banish another character with spark 1 or less you control, then materialize it."
 card-type = "Character"
 subtype = "Mage"
 is-fast = false
@@ -2023,7 +2039,7 @@ art-owned = false
 name = "Reclaimer of Lost Paths"
 id = "0ad4ca5c-f723-4494-8dec-1e058c37a099"
 energy-cost = 4
-rules-text = "$materialized: A card with cost $3 or less in your void gains {kw: reclaim} $0 until end of turn."
+rules-text = "{materialized}: A card with cost $3 or less in your void gains {reclaim} $0 until end of turn."
 card-type = "Character"
 subtype = "Survivor"
 is-fast = false
@@ -2037,8 +2053,8 @@ name = "Aurora Rider"
 id = "c4766fc9-9d67-49b6-89d1-e457aa9a415d"
 energy-cost = 6
 rules-text = """
-$materialized: Banish any number of other characters you control, then materialize them.
-{flavor: He rides the seams of reality.}"""
+{materialized}: Banish any number of other characters you control, then materialize them.
+"""
 card-type = "Character"
 subtype = "Ancient"
 is-fast = false
@@ -2051,7 +2067,8 @@ art-owned = false
 name = "Wraith of Twisting Shadows"
 id = "f649bc96-1d35-4665-97d9-799208558ff3"
 energy-cost = 3
-rules-text = "$materialized: Look at the enemy's hand. You may choose a card from it. The enemy discards that card and then draws a card."
+rules-text = "{materialized}: Look at the enemy's hand. You may choose a card from it. The enemy discards that card and then draws a card."
+alternate-rules-text = "{materialized}: Look at the opponent's hand and discard a card from it. They draw a card."
 card-type = "Character"
 subtype = "Outsider"
 is-fast = false
@@ -2065,8 +2082,8 @@ name = "Keeper of Forgotten Light"
 id = "b1eb6004-c379-4b87-93be-3fe527b830b7"
 energy-cost = 6
 rules-text = """
-$materialized: Draw 2 cards.
-{flavor: The lantern held more than light—it carried whispers of worlds lost, waiting to be remembered.}"""
+{materialized}: Draw 2 cards.
+"""
 card-type = "Character"
 subtype = "Ancient"
 is-fast = false
@@ -2080,8 +2097,8 @@ name = "Paradox Enforcer"
 id = "e3beadd0-4248-4835-a1c5-d41f85737d4d"
 energy-cost = 5
 rules-text = """
-$materialized: Banish an enemy character until this character leaves play.
-{flavor: He doesn't kill—he rewrites the story.}"""
+{materialized}: Banish an enemy character until this character leaves play.
+"""
 card-type = "Character"
 subtype = "Outsider"
 is-fast = false
@@ -2096,8 +2113,8 @@ id = "59f826ee-55d1-499e-86bb-8266c382f5fa"
 energy-cost = 1
 rules-text = """
 Banish a character you control, then materialize it at end of turn.
-$br
-{kw: Reclaim} $1"""
+
+{reclaim} $1"""
 card-type = "Event"
 is-fast = false
 image-number = 2212744813
@@ -2108,7 +2125,7 @@ art-owned = false
 name = "Herald of the Last Light"
 id = "cf339e0b-685a-4a06-abb2-2fad01916ca7"
 energy-cost = 1
-rules-text = "$immediate $fastActivated Abandon this character: Negate an enemy event."
+rules-text = "{immediate} $fastActivated Abandon this character: Negate an enemy event."
 card-type = "Character"
 subtype = "Visitor"
 is-fast = false
@@ -2121,7 +2138,7 @@ art-owned = false
 name = "Call to the Unknown"
 id = "66ae76ab-13ba-473c-891d-9d53403c300e"
 energy-cost = 2
-rules-text = "{kw: Discover} a character with a $materialized ability {reminder: (pick one of 4 random matching cards with different costs to put into your hand)}"
+rules-text = "{discover} a character with a {materialized} ability "
 card-type = "Event"
 is-fast = false
 image-number = 1991802455
@@ -2133,8 +2150,8 @@ name = "Blooming Path Wanderer"
 id = "dce8efc8-2643-47a4-ae13-4b9a7e4ba8bb"
 energy-cost = 3
 rules-text = """
-$judgment: You may banish another character you control, then materialize it.
-{flavor: The gate opens, the story begins anew.}"""
+{judgment}: You may banish another character you control, then materialize it.
+"""
 card-type = "Character"
 subtype = "Explorer"
 is-fast = false
@@ -2149,7 +2166,7 @@ id = "522368e5-38cc-480c-930a-f8e1bc5a1f68"
 energy-cost = 4
 rules-text = """
 Whenever a character you control is banished, this character gains +1 spark.
-{flavor: Every return casts ripples.}"""
+"""
 card-type = "Character"
 subtype = "Explorer"
 is-fast = false
@@ -2163,8 +2180,8 @@ name = "Pyrestone Avatar"
 id = "c85de002-4b55-4975-b800-a627fb699615"
 energy-cost = 4
 rules-text = """
-Whenever a character you control is banished, {kw: kindle} 1.
-{flavor: What fades feeds the flames.}"""
+Whenever a character you control is banished, {kindle} 1.
+"""
 card-type = "Character"
 subtype = "Avatar"
 is-fast = false
@@ -2179,7 +2196,7 @@ id = "3f98591f-5ede-4add-9df6-536e39780ec3"
 energy-cost = 5
 rules-text = """
 Materialize two random characters with cost $3 or less from your deck.
-{flavor: The light draws what darkness hides.}"""
+"""
 card-type = "Event"
 is-fast = false
 image-number = 618071684
@@ -2192,7 +2209,7 @@ id = "716aa6ec-ddac-488c-aafe-e9a997335c58"
 energy-cost = 2
 rules-text = """
 Negate an enemy character.
-{flavor: What rises against the peak is buried beneath it}"""
+"""
 card-type = "Event"
 is-fast = true
 image-number = 1239919309
@@ -2205,7 +2222,7 @@ id = "2b0d4a5a-83f0-4cae-a7e3-aefbb595fd1d"
 energy-cost = 2
 rules-text = """
 Dissolve an enemy character with spark 3 or more.
-{flavor: The flames hunger for greatness, and devour it whole.}"""
+"""
 card-type = "Event"
 is-fast = false
 image-number = 2182865325
@@ -2218,8 +2235,8 @@ id = "810764f4-fda3-414a-9364-9ce3f2092710"
 energy-cost = 3
 rules-text = """
 Dissolve an enemy character with cost $3 or more.
-$br
-{kw: Reclaim} $2."""
+
+{reclaim} $2."""
 card-type = "Event"
 is-fast = false
 image-number = 1730836234
@@ -2242,8 +2259,8 @@ name = "Dimensional Pathfinder"
 id = "6e7c552f-23b5-431a-9d50-f7706e27166a"
 energy-cost = 3
 rules-text = """
-$activated $3: Banish up to two other characters you control, then materialize them.
-{flavor: Nothing is lost—only transformed.}"""
+{activated} $3: Banish up to two other characters you control, then materialize them.
+"""
 card-type = "Character"
 subtype = "Explorer"
 is-fast = false
@@ -2257,8 +2274,8 @@ name = "Riftwalker"
 id = "e4b6ce4c-363e-4483-8246-a4b7ac368d17"
 energy-cost = 5
 rules-text = """
-$materialized: You may banish another character until the start of your next main phase.
-{flavor: The veil opens, and time is rewritten.}"""
+{materialized}: You may banish another character until the start of your next main phase.
+"""
 card-type = "Character"
 subtype = "Synth"
 is-fast = false
@@ -2283,8 +2300,8 @@ name = "Aurora Channeler"
 id = "d12cbf86-5b50-4654-8c33-ff4428537c71"
 energy-cost = 4
 rules-text = """
-$materialized: Gain $3.
-{flavor: He stepped into the cascade, his body trembling as the colors wove power into his very soul.}"""
+{materialized}: Gain $3.
+"""
 card-type = "Character"
 subtype = "Explorer"
 is-fast = false
@@ -2298,8 +2315,8 @@ name = "Mirrorlight Architect"
 id = "476638a3-6ed9-47bc-b129-ad8b6662f41e"
 energy-cost = 1
 rules-text = """
-$multiActivated $4: Materialize a copy of another character you control.
-{flavor: The circle shimmered, and where one stood, another emerged—an echo of power made flesh.}"""
+{multiActivated} $4: Materialize a copy of another character you control.
+"""
 card-type = "Character"
 subtype = "Synth"
 is-fast = false
@@ -2325,7 +2342,7 @@ id = "d41a0c56-ca67-4626-90b6-c7fadeadfc4a"
 energy-cost = 5
 rules-text = """
 If you control a {cardtype: survivor}, this character costs $1.
-$br
+
 You may play this character from your void."""
 card-type = "Character"
 subtype = "Survivor"
@@ -2340,8 +2357,8 @@ name = "Emberwatch Veteran"
 id = "4a558573-ddf0-478e-b5ac-75401cbc74f7"
 energy-cost = 1
 rules-text = """
-$activated $1, Discard a card: {kw: Kindle} 2.
-{flavor: When the world collapses, some rise to hold its weight.}"""
+{activated} $1, Discard a card: {kindle} 2.
+"""
 card-type = "Character"
 subtype = "Survivor"
 is-fast = false
@@ -2355,8 +2372,8 @@ name = "Hope's Vanguard"
 id = "c08ffd90-ef79-48f7-9aa2-22875acbeba4"
 energy-cost = 2
 rules-text = """
-$materialized, $judgment: If you control 2 other {cardtype: survivors} draw a card.
-{flavor: In the wreckage of the old world, he finds whispers of a brighter one.}"""
+{materialized}, {judgment}: If you control 2 other {cardtype: survivors} draw a card.
+"""
 card-type = "Character"
 subtype = "Survivor"
 is-fast = false
@@ -2370,9 +2387,9 @@ name = "Silent Avenger"
 id = "36ca76ae-0202-495f-bf99-d0ce98da6352"
 energy-cost = 3
 rules-text = """
-$dissolved: {kw: Kindle} 2.
-$br
-Whenever another {cardtype: survivor} you control is dissolved, {kw: kindle} 2."""
+$dissolved: {kindle} 2.
+
+Whenever another {cardtype: survivor} you control is dissolved, {kindle} 2."""
 card-type = "Character"
 subtype = "Survivor"
 is-fast = false
@@ -2386,8 +2403,8 @@ name = "Soulbinder"
 id = "ad04efcb-158b-4ac7-a48f-7d15d7e9daff"
 energy-cost = 3
 rules-text = """
-$multiActivated Abandon another character: Gain $1.
-{flavor: They followed him, believing in the hope of rebirth. They did not know that rebirth required their lives.}"""
+{multiActivated} Abandon another character: Gain $1.
+"""
 card-type = "Character"
 subtype = "Synth"
 is-fast = false
@@ -2402,7 +2419,7 @@ id = "233f67e8-2715-4b30-8985-2b5b15f851ac"
 energy-cost = 2
 rules-text = """
 $dissolved: Draw a card.
-$br
+
 Whenever another {cardtype: survivor} you control is dissolved, draw a card."""
 card-type = "Character"
 subtype = "Survivor"
@@ -2416,7 +2433,7 @@ art-owned = false
 name = "Ashborn Necromancer"
 id = "5511b4b5-a7e3-48df-978d-c09673b39f42"
 energy-cost = 4
-rules-text = "$immediate $multiActivated Abandon another character: Put the top 2 cards of your deck into your void."
+rules-text = "{immediate} {multiActivated} Abandon another character: Put the top 2 cards of your deck into your void."
 card-type = "Character"
 subtype = "Outsider"
 is-fast = false
@@ -2431,7 +2448,7 @@ id = "ef74faa0-b550-4134-9afc-c6898f7af44c"
 energy-cost = 4
 rules-text = """
 Whenever another character you control is dissolved, draw a card.
-{flavor: Through the haze of destruction, he gathers fragments of hope.}"""
+"""
 card-type = "Character"
 subtype = "Survivor"
 is-fast = false
@@ -2445,8 +2462,8 @@ name = "Wasteland Arbitrator"
 id = "2246466d-341e-4fe2-a804-5bc4ed3541e2"
 energy-cost = 1
 rules-text = """
-$materialized: Each player discards a card.
-{flavor: In the ruins, strength is measured in what you’re willing to lose.}"""
+{materialized}: Each player discards a card.
+"""
 card-type = "Character"
 subtype = "Survivor"
 is-fast = true
@@ -2474,7 +2491,7 @@ id = "0ebb38a7-5a30-40b3-b2f0-b6516a53303c"
 energy-cost = 6
 rules-text = """
 Whenever a character you control is dissolved, gain 1 $points.
-{flavor: Every soul it claims becomes a thread in the tapestry of its ascension.}"""
+"""
 card-type = "Character"
 subtype = "Ancient"
 is-fast = false
@@ -2489,7 +2506,7 @@ id = "c85edc15-ff74-45d5-aed5-7ca488b6d100"
 energy-cost = 2
 rules-text = """
 $dissolved: You may pay $1 to return this character from your void to your hand.
-{flavor: Every fall is a chance to rise stronger.}"""
+"""
 card-type = "Character"
 subtype = "Survivor"
 is-fast = false
@@ -2502,7 +2519,7 @@ art-owned = false
 name = "Twilight Reclaimer"
 id = "fb3029e1-7f43-4284-bcdd-11dfe6711f96"
 energy-cost = 1
-rules-text = "$dissolved: A {cardtype: survivor} with cost $3 or less in your void gains {kw: reclaim} until end of turn."
+rules-text = "$dissolved: A {cardtype: survivor} with cost $3 or less in your void gains {reclaim} until end of turn."
 card-type = "Character"
 subtype = "Survivor"
 is-fast = false
@@ -2516,8 +2533,8 @@ name = "Wreckheap Survivor"
 id = "b5d3ce4f-2587-47a6-b8c2-d73204d4c05a"
 energy-cost = 3
 rules-text = """
-$judgment: You may pay $1 to return this character from your void to your hand.
-{flavor: Lost once, but never forgotten}"""
+{judgment}: You may pay $1 to return this character from your void to your hand.
+"""
 card-type = "Character"
 subtype = "Survivor"
 is-fast = false
@@ -2545,7 +2562,7 @@ id = "7d20f2bb-50b5-418a-a435-da13a13ad257"
 energy-cost = 2
 rules-text = """
 If this character is in your void, {cardtype: survivors} you control have +1 spark.
-{flavor: His spark ignites in the hearts of those who remember him.}"""
+"""
 card-type = "Character"
 subtype = "Survivor"
 is-fast = false
@@ -2559,8 +2576,8 @@ name = "Exiles of the Last Light"
 id = "37c39729-f5f9-45ac-a01a-9f65c09c731c"
 energy-cost = 3
 rules-text = """
-$multiActivated Abandon another character: {kw: Kindle} 1.
-{flavor: In the wasteland, power is built on sacrifice, and survival demands it.}"""
+{multiActivated} Abandon another character: {kindle} 1.
+"""
 card-type = "Character"
 subtype = "Survivor"
 is-fast = false
@@ -2574,8 +2591,8 @@ name = "Ruin Scavenger"
 id = "6a95e4f6-75c7-435b-ae21-35a01e58c0b1"
 energy-cost = 1
 rules-text = """
-$activated: You may banish a card from the enemy's void to gain $1.
-{flavor: What others leave behind, he turns into survival.}"""
+{activated}: You may banish a card from the enemy's void to gain $1.
+"""
 card-type = "Character"
 subtype = "Survivor"
 is-fast = false
@@ -2590,8 +2607,12 @@ id = "24388863-1b0b-477d-aa06-faf33cba6176"
 energy-cost = 2
 rules-text = """
 Dissolve an enemy character with cost $2 or less.
-$br
+
 You may play this event from your void for $0 by abandoning a character."""
+alternate-rules-text = """
+Dissolve an enemy with cost $2 or less.
+
+Reclaim: Abandon a character."""
 card-type = "Event"
 is-fast = false
 image-number = 2155438695
@@ -2603,8 +2624,8 @@ name = "Searcher in the Mists"
 id = "560ad530-9ad9-452c-b80e-902d9a76af0c"
 energy-cost = 2
 rules-text = """
-$materialized, $dissolved: Put the top 4 cards of your deck into your void.
-{flavor: In the poisoned haze, he searches for remnants of a forgotten world.}"""
+{materialized}, $dissolved: Put the top 4 cards of your deck into your void.
+"""
 card-type = "Character"
 subtype = "Survivor"
 is-fast = false
@@ -2630,7 +2651,7 @@ art-owned = false
 name = "Through the Rift"
 id = "437fc66b-c0eb-46fd-82fa-ebbb16939e66"
 energy-cost = 1
-rules-text = "{kw: Discover} a {cardtype: survivor}."
+rules-text = "{discover} a {cardtype: survivor}."
 card-type = "Event"
 is-fast = false
 image-number = 1790126243
@@ -2667,7 +2688,8 @@ art-owned = false
 name = "Blade of Oblivion"
 id = "86eed140-60b0-4e69-b868-332fcf25b8b3"
 energy-cost = 2
-rules-text = "$activated: Dissolve an enemy character with spark less than or equal to the number of characters you have abandoned this turn."
+rules-text = "{activated}: Dissolve an enemy character with spark less than or equal to the number of characters you have abandoned this turn."
+alternate-rules-text = "↴:  If you have abandoned 3 characters this turn, dissolve an enemy."
 card-type = "Character"
 subtype = "Warrior"
 is-fast = false
@@ -2694,9 +2716,9 @@ name = "The Forsaker"
 id = "7263c37a-85c2-403a-8254-8ebd4b42a60d"
 energy-cost = 2
 rules-text = """
-$activated Abandon another character: 
+{activated} Abandon another character: 
 Gain 1 $points.
-{flavor: The path ahead is clear when the past burns behind you.}"""
+"""
 card-type = "Character"
 subtype = "Renegade"
 is-fast = true
@@ -2710,8 +2732,8 @@ name = "Infernal Ascendant"
 id = "e89e3b97-984b-40a2-a74b-3c0489511eba"
 energy-cost = 3
 rules-text = """
-Whenever you abandon a character, {kw: kindle} 2.
-{flavor: Every offering feeds the flames}"""
+Whenever you abandon a character, {kindle} 2.
+"""
 card-type = "Character"
 subtype = "Monster"
 is-fast = false
@@ -2724,7 +2746,7 @@ art-owned = false
 name = "Ashen Remnant"
 id = "5ed8b4b4-abd4-410b-8c41-e94ac7609567"
 energy-cost = 2
-rules-text = "$immediate $fastMultiActivated Abandon another character: You may put a character from your void on top of your deck."
+rules-text = "{immediate} {fastMultiActivated} Abandon another character: You may put a character from your void on top of your deck."
 card-type = "Character"
 subtype = "Survivor"
 is-fast = false
@@ -2737,7 +2759,7 @@ art-owned = false
 name = "Shardwoven Tyrant"
 id = "b8bc35ae-4a4a-402e-a570-707bedceb5ce"
 energy-cost = 3
-rules-text = "$multiActivated Abandon another character: You may dissolve an enemy character with spark less than or equal to the abandoned character's spark."
+rules-text = "{multiActivated} Abandon another character: You may dissolve an enemy character with spark less than or equal to the abandoned character's spark."
 card-type = "Character"
 subtype = "Ancient"
 is-fast = false
@@ -2752,7 +2774,7 @@ id = "eb8f817b-ca18-4edd-b278-05b54b890364"
 energy-cost = 4
 rules-text = """
 Whenever a character you control is dissolved, gain $1.
-{flavor: From destruction, she draws power—each loss ignites her purpose.}"""
+"""
 card-type = "Character"
 subtype = "Mage"
 is-fast = false
@@ -2765,7 +2787,7 @@ art-owned = false
 name = "Grim Reclaimer"
 id = "61c9fa98-dda1-4f45-976e-b3fc89987b11"
 energy-cost = 2
-rules-text = "$activated Abandon a character: You may return a {cardtype: warrior} from your void to play."
+rules-text = "{activated} Abandon a character: You may return a {cardtype: warrior} from your void to play."
 card-type = "Character"
 subtype = "Outsider"
 is-fast = false
@@ -2791,7 +2813,7 @@ art-owned = false
 name = "Packcaller of Shadows"
 id = "4d3eebd3-02b4-4016-a15a-0e8a05b6696b"
 energy-cost = 1
-rules-text = "$materialized: Materialize a {kw: silent} copy of this character for each dream you have played this turn."
+rules-text = "{materialized}: Materialize a {kw: silent} copy of this character for each dream you have played this turn."
 card-type = "Character"
 subtype = "Mage"
 is-fast = false
@@ -2805,8 +2827,8 @@ name = "Radiant Trio"
 id = "c37964f0-153d-417e-8651-bbd043c5e118"
 energy-cost = 3
 rules-text = """
-$materialized: Materialize two {kw: silent} copies of this character.
-{flavor: Bound by unity, their precision is as unyielding as their resolve.}"""
+{materialized}: Materialize two {kw: silent} copies of this character.
+"""
 card-type = "Character"
 subtype = "Synth"
 is-fast = false
@@ -2821,7 +2843,7 @@ id = "3ab4dd0d-28c6-42e7-ab47-691781d458c5"
 energy-cost = 4
 rules-text = """
 Whenever you play a character, materialize a {kw: silent} copy of this character.
-{flavor: He races forward, his reflection never far behind.}"""
+"""
 card-type = "Character"
 subtype = "Visitor"
 is-fast = false
@@ -2834,7 +2856,7 @@ art-owned = false
 name = "Prophet of the Consumed"
 id = "b0ee552a-3a4f-434f-903d-165ebfe3d072"
 energy-cost = 3
-rules-text = "$materialized: Draw a card for each character you abandoned this turn."
+rules-text = "{materialized}: Draw a card for each character you abandoned this turn."
 card-type = "Character"
 subtype = "Synth"
 is-fast = false
@@ -2849,7 +2871,7 @@ id = "06e86fc5-b501-49eb-bdbe-0445fc56fa65"
 energy-cost = 4
 rules-text = """
 Whenever you abandon a character, draw a card.
-{flavor: In the stillness of winter, it gathers the echoes of lives cut short.}"""
+"""
 card-type = "Character"
 subtype = "Outsider"
 is-fast = false
@@ -2864,7 +2886,7 @@ id = "39bbbc92-34d0-4699-8ac6-99805a1248fb"
 energy-cost = 2
 rules-text = """
 Abandon any number of characters. Draw a card for each character abandoned.
-{flavor: As the shadows rose, he realized the price of survival was everyone else.}"""
+"""
 card-type = "Event"
 is-fast = false
 image-number = 1470059006
@@ -2876,8 +2898,8 @@ name = "Rite of Summoning"
 id = "f35d60ff-da13-4abb-87ab-5fd27874e9bf"
 energy-cost = 2
 rules-text = """
-{kw: Discover} a character with a $activated or $multiActivated ability.
-{flavor: From the ashes of the lost, the destined one emerges.}"""
+{discover} a character with a {activated} or {multiActivated} ability.
+"""
 card-type = "Event"
 is-fast = false
 image-number = 439817032
@@ -2888,7 +2910,7 @@ art-owned = false
 name = "Architect of Memory"
 id = "2530adcc-5ae2-486a-94b2-f40dd62f3755"
 energy-cost = 2
-rules-text = "If you have 8 or more cards in your void, cards in your void have {kw: reclaim}."
+rules-text = "If you have 8 or more cards in your void, cards in your void have {reclaim}."
 card-type = "Character"
 subtype = "Synth"
 is-fast = false
@@ -2903,7 +2925,7 @@ id = "dfd2523a-ff26-4c8c-9197-ba60f492d819"
 energy-cost = 4
 rules-text = """
 Dissolve an enemy character. Draw a card.
-$br
+
 This event costs $2 less to play for each character which dissolved this turn."""
 card-type = "Event"
 is-fast = false
@@ -2917,7 +2939,7 @@ id = "12a59f07-7ff4-4a3b-9e9f-4f9b524d26af"
 energy-cost = 0
 rules-text = """
 Abandon a character. Discard your hand. Gain $5.
-{flavor: A storm answers the call, but only when the price is paid.}"""
+"""
 card-type = "Event"
 is-fast = false
 image-number = 708313726
@@ -2929,8 +2951,8 @@ name = "Nightmare Manifest"
 id = "cc474374-2538-4e5d-9b84-15ed70b0c774"
 energy-cost = 1
 rules-text = """
-$judgment: Each player abandons a character.
-{flavor: To stand against it is to lose yourself, and to flee is to lose everything else.}"""
+{judgment}: Each player abandons a character.
+"""
 card-type = "Character"
 subtype = "Ancient"
 is-fast = false
