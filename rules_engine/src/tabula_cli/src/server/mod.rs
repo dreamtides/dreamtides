@@ -17,5 +17,7 @@ pub fn run(config: ServerConfig) -> Result<()> {
 mod http;
 mod model;
 mod serialization;
+mod server_workbook_snapshot;
 
 pub use model::{Request, Response};
+pub use server_workbook_snapshot::{FileMetadata, WorkbookSnapshot};

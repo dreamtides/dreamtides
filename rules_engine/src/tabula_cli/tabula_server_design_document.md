@@ -448,6 +448,8 @@ If more information is needed:
 - Review `ensure_guid.vba` to match UUID behavior and edge cases.
 - Ask for clarification on Excel workbook locations or macro constraints.
 
+# Manual Testing
+
 CRITICAL: After every step is completed, the agent should provide
 
 
@@ -461,6 +463,10 @@ Output with a description of how to manually verify the most recently completed
 work. Please assume the working directory is /dreamtides/ and all cargo commands
 require `--manifest-path rules_engine/Cargo.toml`. Please format all commands
 via newline + three backticks for easy copy and paste.
+
+Please use the path to the workbook
+`dreamtides/client/Assets/StreamingAssets/Tabula.xlsm` for provided testing
+commands.
 
 ## Milestone Breakdown
 

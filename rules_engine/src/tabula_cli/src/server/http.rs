@@ -13,7 +13,7 @@ use tokio::net::TcpListener;
 use tokio::sync::{Mutex, oneshot};
 
 use super::model::{Response, ResponseStatus};
-use super::{ServerConfig, serialization};
+use super::{ServerConfig, serialization, server_workbook_snapshot};
 
 pub async fn serve(config: ServerConfig) -> Result<()> {
     let (shutdown_tx, shutdown_rx) = oneshot::channel();
@@ -49,25 +49,50 @@ async fn handle_notify(State(state): State<Arc<ServerState>>, body: Bytes) -> im
                 );
             }
 
-            let changeset_id = serialization::compute_changeset_id(
-                &request.workbook_path,
-                request.workbook_mtime,
-                request.workbook_size,
-                &[],
-            );
-
-            let response = Response {
-                request_id: Some(request.request_id),
-                status: ResponseStatus::Ok,
-                retry_after_ms: None,
-                warnings: vec![],
-                changes: vec![],
-                changeset_id: Some(changeset_id.clone()),
+            let workbook_path = request.workbook_path.clone();
+            let expected_metadata = server_workbook_snapshot::FileMetadata {
+                size: request.workbook_size,
+                mtime: request.workbook_mtime,
             };
 
-            let serialized = serialization::serialize_response(&response);
-            cache.insert(cache_key, serialized.clone());
-            response
+            let snapshot_result = tokio::task::spawn_blocking(move || {
+                let path = std::path::Path::new(&workbook_path);
+                server_workbook_snapshot::read_snapshot(path, Some(expected_metadata))
+            })
+            .await
+            .unwrap_or_else(|e| Err(anyhow::anyhow!("Task join error: {}", e)));
+
+            match snapshot_result {
+                Ok(_snapshot) => {
+                    let changeset_id = serialization::compute_changeset_id(
+                        &request.workbook_path,
+                        request.workbook_mtime,
+                        request.workbook_size,
+                        &[],
+                    );
+
+                    let response = Response {
+                        request_id: Some(request.request_id),
+                        status: ResponseStatus::Ok,
+                        retry_after_ms: None,
+                        warnings: vec![],
+                        changes: vec![],
+                        changeset_id: Some(changeset_id.clone()),
+                    };
+
+                    let serialized = serialization::serialize_response(&response);
+                    cache.insert(cache_key, serialized.clone());
+                    response
+                }
+                Err(e) => Response {
+                    request_id: Some(request.request_id),
+                    status: ResponseStatus::Error,
+                    retry_after_ms: Some(1000),
+                    warnings: vec![format!("Failed to read workbook: {}", e)],
+                    changes: vec![],
+                    changeset_id: None,
+                },
+            }
         }
         Err(e) => Response {
             request_id: None,

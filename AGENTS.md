@@ -36,6 +36,7 @@ all times.
 - Don't add "pub use" for anything.
 - Keep Cargo.toml dependencies alphabetized in two lists, internal then external dependencies.
 - Use modern Rust features such as if-let statements and "{inline:?}" variable formatting
+- Do not add code to `mod.rs` or `lib.rs` files except for module declarations
 
 
 # VALIDATING CHANGES
