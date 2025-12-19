@@ -188,6 +188,34 @@ fn serialize_change(change: &Change) -> String {
                 if *underline { "1" } else { "0" }
             )
         }
+        Change::SetFontNameSpans { sheet, cell, font_name, spans } => {
+            let spans_str = spans
+                .iter()
+                .map(|s| format!("{}:{}", s.start, s.length))
+                .collect::<Vec<_>>()
+                .join(",");
+            format!(
+                "CHANGE set_font_name_spans {} {} {} {}",
+                percent_encode(sheet),
+                percent_encode(cell),
+                percent_encode(font_name),
+                spans_str
+            )
+        }
+        Change::SetFontSizeSpans { sheet, cell, points, spans } => {
+            let spans_str = spans
+                .iter()
+                .map(|s| format!("{}:{}", s.start, s.length))
+                .collect::<Vec<_>>()
+                .join(",");
+            format!(
+                "CHANGE set_font_size_spans {} {} {} {}",
+                percent_encode(sheet),
+                percent_encode(cell),
+                points,
+                spans_str
+            )
+        }
     }
 }
 

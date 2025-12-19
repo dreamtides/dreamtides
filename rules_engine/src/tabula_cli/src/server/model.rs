@@ -57,4 +57,6 @@ pub enum Change {
     SetHorizontalAlignment { sheet: String, cell: String, alignment: HorizontalAlignment },
     SetItalic { sheet: String, cell: String, italic: bool },
     SetUnderline { sheet: String, cell: String, underline: bool },
+    SetFontNameSpans { sheet: String, cell: String, font_name: String, spans: Vec<Span> },
+    SetFontSizeSpans { sheet: String, cell: String, points: f32, spans: Vec<Span> },
 }

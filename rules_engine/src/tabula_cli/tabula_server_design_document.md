@@ -333,6 +333,49 @@ Optimization:
 UUID format:
 - Lowercase hex with hyphens, matching existing VBA output.
 
+### Listener 4: Boxicon Font Insertion
+
+**Goal:** Automatically insert icons using the "boxicons" font.
+
+When a cell contains specific literal text patterns, replace them with corresponding
+Boxicons Unicode characters. The boxicons font is already installed, but needs to be
+applied to the characters.
+
+Supported patterns:
+- `{x}` → U+FEFC (turn down icon)
+- `{e}` → U+FB31 (energy icon)
+- `{fast}` → U+F93A (fast icon)
+- `{p}` → U+FC6A (points icon)
+
+Design:
+- Scan all sheets for string cells containing any of the literal patterns.
+- Patterns are checked longest-first to avoid partial matches.
+- For each occurrence, replace the pattern with a Left-to-Right Mark (LRM, `\u{200E}`)
+  followed by the corresponding boxicons character.
+- The LRM prevents RTL rendering issues when the icon appears at the start of a cell,
+  since many boxicons characters are in the Arabic Presentation Forms-B range.
+- All replacements in a cell are sorted by position and applied together.
+- Emit a `set_value` change with the modified text containing all icon replacements.
+- Emit a `set_font_name_spans` change to apply the "boxicons" font to each LRM+icon
+  pair (span length 2 per icon).
+- Emit a `set_font_size_spans` change to set the font size to 16 points for each
+  LRM+icon pair.
+
+VBA application:
+- Apply `cell.ReadingOrder = xlLTR` to ensure left-to-right text direction.
+- Use `cell.Characters(Start, Length).Font.Name` to set the boxicons font on each
+  2-character span (LRM + icon).
+- Use `cell.Characters(Start, Length).Font.Size` to set size 16 on each span.
+
+*Only* the icon characters (LRM + boxicons) should have the boxicons font and size 16
+applied, the remaining text should keep its original formatting.
+
+Icons render correctly inline in Excel. Examples:
+- `=UNICHAR(HEX2DEC("FEFC"))` for the turn down icon
+- `=UNICHAR(HEX2DEC("FB31"))` for the energy icon
+- `=UNICHAR(HEX2DEC("F93A"))` for the fast icon
+- `=UNICHAR(HEX2DEC("FC6A"))` for the points icon
+
 ## Workbook Snapshot Strategy
 
 The server should read a stable snapshot without touching formulas:
@@ -384,6 +427,10 @@ Response line types:
 - `CHANGE set_number_format <sheet> <cell> <format>`: format is percent-encoded.
 - `CHANGE set_horizontal_alignment <sheet> <cell> <alignment>`: alignment is one
   of `left`, `center`, or `right`.
+- `CHANGE set_font_name_spans <sheet> <cell> <font_name> <spans>`: `font_name` is
+  percent-encoded, `spans` is `start:length,start:length` with 1-based indices.
+- `CHANGE set_font_size_spans <sheet> <cell> <points> <spans>`: `points` is a decimal
+  number, `spans` is `start:length,start:length` with 1-based indices.
 
 Round-trip cycle:
 - VBA sends request with workbook metadata and optional changed range.
@@ -509,3 +556,7 @@ commands.
    - Implement the table ID generation listener and row pruning rules.
    - Add end-to-end tests for ID creation and clearing behavior.
    - Validate overall response aggregation and VBA expectations.
+
+9. Listener 4: Boxicons font application
+   - Replace the text {x} with the boxicons icon
+   - Add unit tests

@@ -1,4 +1,5 @@
 use tabula_cli::server::listener_runner::{Listener, ListenerContext};
+use tabula_cli::server::listeners::boxicons::BoxiconsListener;
 use tabula_cli::server::listeners::conditional_formatting::ConditionalFormattingListener;
 use tabula_cli::server::listeners::partial_formatting::PartialFormattingListener;
 use tabula_cli::server::model::{Change, ChangedRange};
@@ -486,4 +487,244 @@ fn test_partial_formatting_multiple_sheets() {
     assert_eq!(span_changes.len(), 2, "Should find jackalope in both sheets");
     assert!(span_changes.contains(&("Sheet1".to_string(), "A1".to_string())));
     assert!(span_changes.contains(&("Sheet2".to_string(), "A1".to_string())));
+}
+
+#[test]
+fn test_boxicons_replaces_x_with_icon() {
+    let temp_dir = TempDir::new().expect("Failed to create temp dir");
+    let xlsx_path = temp_dir.path().join("test_boxicons.xlsx");
+
+    let mut book = umya_spreadsheet::new_file();
+    let sheet = book.get_sheet_mut(&0).expect("Sheet 0 should exist");
+    sheet.set_name("Sheet1");
+    sheet.get_cell_mut("A1").set_value("Click {x} to expand");
+    sheet.get_cell_mut("A2").set_value("{x}");
+    sheet.get_cell_mut("A3").set_value("No icon here");
+    xlsx::write(&book, &xlsx_path).expect("Write workbook");
+
+    let snapshot = read_snapshot(&xlsx_path, None).expect("Failed to read snapshot");
+
+    let context = ListenerContext {
+        request_id: "test-boxicons-1".to_string(),
+        workbook_path: xlsx_path.to_string_lossy().to_string(),
+        changed_range: None,
+    };
+
+    let listener = BoxiconsListener;
+    let result = listener.run(&snapshot, &context).expect("Listener should succeed");
+
+    let set_value_changes: Vec<_> = result
+        .changes
+        .iter()
+        .filter_map(|c| match c {
+            Change::SetValue { cell, value, .. } => Some((cell.clone(), value.clone())),
+            _ => None,
+        })
+        .collect();
+
+    assert_eq!(set_value_changes.len(), 2, "Should replace {{x}} in 2 cells");
+
+    let a1_value =
+        set_value_changes.iter().find(|(cell, _)| cell == "A1").map(|(_, value)| value.clone());
+    assert_eq!(a1_value, Some("Click \u{200E}\u{FEFC} to expand".to_string()));
+
+    let a2_value =
+        set_value_changes.iter().find(|(cell, _)| cell == "A2").map(|(_, value)| value.clone());
+    assert_eq!(a2_value, Some("\u{200E}\u{FEFC}".to_string()));
+
+    let font_name_changes: Vec<_> = result
+        .changes
+        .iter()
+        .filter_map(|c| match c {
+            Change::SetFontNameSpans { cell, font_name, spans, .. } => {
+                Some((cell.clone(), font_name.clone(), spans.clone()))
+            }
+            _ => None,
+        })
+        .collect();
+
+    assert_eq!(font_name_changes.len(), 2);
+
+    let a1_font = font_name_changes.iter().find(|(cell, _, _)| cell == "A1");
+    assert!(a1_font.is_some());
+    let (_, font_name, spans) = a1_font.unwrap();
+    assert_eq!(font_name, "boxicons");
+    assert_eq!(spans.len(), 1);
+    assert_eq!(spans[0].start, 7);
+    assert_eq!(spans[0].length, 2);
+
+    let font_size_changes: Vec<_> = result
+        .changes
+        .iter()
+        .filter_map(|c| match c {
+            Change::SetFontSizeSpans { cell, points, spans, .. } => {
+                Some((cell.clone(), *points, spans.clone()))
+            }
+            _ => None,
+        })
+        .collect();
+
+    assert_eq!(font_size_changes.len(), 2);
+
+    let a1_size = font_size_changes.iter().find(|(cell, _, _)| cell == "A1");
+    assert!(a1_size.is_some());
+    let (_, points, _) = a1_size.unwrap();
+    assert_eq!(*points, 16.0);
+
+    assert!(result.warnings.is_empty(), "Should have no warnings");
+}
+
+#[test]
+fn test_boxicons_multiple_occurrences() {
+    let temp_dir = TempDir::new().expect("Failed to create temp dir");
+    let xlsx_path = temp_dir.path().join("test_boxicons_multi.xlsx");
+
+    let mut book = umya_spreadsheet::new_file();
+    let sheet = book.get_sheet_mut(&0).expect("Sheet 0 should exist");
+    sheet.set_name("Sheet1");
+    sheet.get_cell_mut("A1").set_value("{x} and {x}");
+    xlsx::write(&book, &xlsx_path).expect("Write workbook");
+
+    let snapshot = read_snapshot(&xlsx_path, None).expect("Failed to read snapshot");
+
+    let context = ListenerContext {
+        request_id: "test-boxicons-2".to_string(),
+        workbook_path: xlsx_path.to_string_lossy().to_string(),
+        changed_range: None,
+    };
+
+    let listener = BoxiconsListener;
+    let result = listener.run(&snapshot, &context).expect("Listener should succeed");
+
+    let set_value_changes: Vec<_> = result
+        .changes
+        .iter()
+        .filter_map(|c| match c {
+            Change::SetValue { value, .. } => Some(value.clone()),
+            _ => None,
+        })
+        .collect();
+
+    assert_eq!(set_value_changes.len(), 1);
+    assert_eq!(set_value_changes[0], "\u{200E}\u{FEFC} and \u{200E}\u{FEFC}");
+
+    let font_name_changes: Vec<_> = result
+        .changes
+        .iter()
+        .filter_map(|c| match c {
+            Change::SetFontNameSpans { spans, .. } => Some(spans.clone()),
+            _ => None,
+        })
+        .collect();
+
+    assert_eq!(font_name_changes.len(), 1);
+    let spans = &font_name_changes[0];
+    assert_eq!(spans.len(), 2);
+    assert_eq!(spans[0].start, 1);
+    assert_eq!(spans[0].length, 2);
+    assert_eq!(spans[1].start, 8);
+    assert_eq!(spans[1].length, 2);
+}
+
+#[test]
+fn test_boxicons_no_match() {
+    let temp_dir = TempDir::new().expect("Failed to create temp dir");
+    let xlsx_path = temp_dir.path().join("test_boxicons_none.xlsx");
+
+    let mut book = umya_spreadsheet::new_file();
+    let sheet = book.get_sheet_mut(&0).expect("Sheet 0 should exist");
+    sheet.set_name("Sheet1");
+    sheet.get_cell_mut("A1").set_value("No icons here");
+    sheet.get_cell_mut("A2").set_value("{ x }");
+    xlsx::write(&book, &xlsx_path).expect("Write workbook");
+
+    let snapshot = read_snapshot(&xlsx_path, None).expect("Failed to read snapshot");
+
+    let context = ListenerContext {
+        request_id: "test-boxicons-3".to_string(),
+        workbook_path: xlsx_path.to_string_lossy().to_string(),
+        changed_range: None,
+    };
+
+    let listener = BoxiconsListener;
+    let result = listener.run(&snapshot, &context).expect("Listener should succeed");
+
+    assert_eq!(result.changes.len(), 0, "Should not generate any changes");
+    assert!(result.warnings.is_empty(), "Should have no warnings");
+}
+
+#[test]
+fn test_boxicons_multiple_icon_types() {
+    let temp_dir = TempDir::new().expect("Failed to create temp dir");
+    let xlsx_path = temp_dir.path().join("test_boxicons_types.xlsx");
+
+    let mut book = umya_spreadsheet::new_file();
+    let sheet = book.get_sheet_mut(&0).expect("Sheet 0 should exist");
+    sheet.set_name("Sheet1");
+    sheet.get_cell_mut("A1").set_value("{e}");
+    sheet.get_cell_mut("A2").set_value("{fast}");
+    sheet.get_cell_mut("A3").set_value("{p}");
+    sheet.get_cell_mut("A4").set_value("{x} {e} {fast} {p}");
+    xlsx::write(&book, &xlsx_path).expect("Write workbook");
+
+    let snapshot = read_snapshot(&xlsx_path, None).expect("Failed to read snapshot");
+
+    let context = ListenerContext {
+        request_id: "test-boxicons-4".to_string(),
+        workbook_path: xlsx_path.to_string_lossy().to_string(),
+        changed_range: None,
+    };
+
+    let listener = BoxiconsListener;
+    let result = listener.run(&snapshot, &context).expect("Listener should succeed");
+
+    let set_value_changes: Vec<_> = result
+        .changes
+        .iter()
+        .filter_map(|c| match c {
+            Change::SetValue { cell, value, .. } => Some((cell.clone(), value.clone())),
+            _ => None,
+        })
+        .collect();
+
+    assert_eq!(set_value_changes.len(), 4);
+
+    let a1_value = set_value_changes.iter().find(|(cell, _)| cell == "A1");
+    assert_eq!(a1_value, Some(&("A1".to_string(), "\u{200E}\u{FB31}".to_string())));
+
+    let a2_value = set_value_changes.iter().find(|(cell, _)| cell == "A2");
+    assert_eq!(a2_value, Some(&("A2".to_string(), "\u{200E}\u{F93A}".to_string())));
+
+    let a3_value = set_value_changes.iter().find(|(cell, _)| cell == "A3");
+    assert_eq!(a3_value, Some(&("A3".to_string(), "\u{200E}\u{FC6A}".to_string())));
+
+    let a4_value = set_value_changes.iter().find(|(cell, _)| cell == "A4");
+    assert_eq!(
+        a4_value,
+        Some(&(
+            "A4".to_string(),
+            "\u{200E}\u{FEFC} \u{200E}\u{FB31} \u{200E}\u{F93A} \u{200E}\u{FC6A}".to_string()
+        ))
+    );
+
+    let font_name_changes: Vec<_> = result
+        .changes
+        .iter()
+        .filter_map(|c| match c {
+            Change::SetFontNameSpans { cell, spans, .. } if cell == "A4" => Some(spans.clone()),
+            _ => None,
+        })
+        .collect();
+
+    assert_eq!(font_name_changes.len(), 1);
+    let spans = &font_name_changes[0];
+    assert_eq!(spans.len(), 4);
+    assert_eq!(spans[0].start, 1);
+    assert_eq!(spans[0].length, 2);
+    assert_eq!(spans[1].start, 4);
+    assert_eq!(spans[1].length, 2);
+    assert_eq!(spans[2].start, 7);
+    assert_eq!(spans[2].length, 2);
+    assert_eq!(spans[3].start, 10);
+    assert_eq!(spans[3].length, 2);
 }

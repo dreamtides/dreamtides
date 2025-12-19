@@ -1,5 +1,3 @@
-Attribute VB_Name = "TabulaServerParser"
-
 Option Explicit
 
 Public Type TabulaChange
@@ -92,13 +90,15 @@ NextLine:
 End Function
 
 Private Function PercentDecode(encoded As String) As String
-    Dim result As String
+    Dim bytes() As Byte
+    Dim byteCount As Long
     Dim i As Long
     Dim c As String
     Dim hexStr As String
-    Dim decodedChar As String
+    Dim byteValue As Byte
 
-    result = ""
+    ReDim bytes(0 To Len(encoded) * 3)
+    byteCount = 0
     i = 1
 
     Do While i <= Len(encoded)
@@ -106,19 +106,93 @@ Private Function PercentDecode(encoded As String) As String
         If c = "%" Then
             If i + 2 <= Len(encoded) Then
                 hexStr = Mid(encoded, i + 1, 2)
-                decodedChar = Chr(CLng("&H" & hexStr))
-                result = result & decodedChar
+                byteValue = CByte(CLng("&H" & hexStr))
+                bytes(byteCount) = byteValue
+                byteCount = byteCount + 1
                 i = i + 3
             Else
-                result = result & c
+                bytes(byteCount) = Asc(c)
+                byteCount = byteCount + 1
                 i = i + 1
             End If
         Else
-            result = result & c
+            bytes(byteCount) = Asc(c)
+            byteCount = byteCount + 1
             i = i + 1
         End If
     Loop
 
-    PercentDecode = result
+    If byteCount > 0 Then
+        ReDim Preserve bytes(0 To byteCount - 1)
+        PercentDecode = Utf8BytesToString(bytes)
+    Else
+        PercentDecode = ""
+    End If
+End Function
+
+Private Function Utf8BytesToString(bytes() As Byte) As String
+    Dim result As String
+    Dim i As Long
+    Dim b1 As Long
+    Dim b2 As Long
+    Dim b3 As Long
+    Dim b4 As Long
+    Dim codePoint As Long
+    Dim upperBound As Long
+
+    result = ""
+    i = LBound(bytes)
+    upperBound = UBound(bytes)
+
+    Do While i <= upperBound
+        b1 = bytes(i)
+
+        If (b1 And &H80) = 0 Then
+            result = result & ChrW(b1)
+            i = i + 1
+        ElseIf (b1 And &HE0) = &HC0 Then
+            If i + 1 <= upperBound Then
+                b2 = bytes(i + 1)
+                codePoint = ((b1 And &H1F) * 64) + (b2 And &H3F)
+                result = result & ChrW(codePoint)
+                i = i + 2
+            Else
+                result = result & "?"
+                i = i + 1
+            End If
+        ElseIf (b1 And &HF0) = &HE0 Then
+            If i + 2 <= upperBound Then
+                b2 = bytes(i + 1)
+                b3 = bytes(i + 2)
+                codePoint = ((b1 And &HF) * 4096) + ((b2 And &H3F) * 64) + (b3 And &H3F)
+                result = result & ChrW(codePoint)
+                i = i + 3
+            Else
+                result = result & "?"
+                i = i + 1
+            End If
+        ElseIf (b1 And &HF8) = &HF0 Then
+            If i + 3 <= upperBound Then
+                b2 = bytes(i + 1)
+                b3 = bytes(i + 2)
+                b4 = bytes(i + 3)
+                codePoint = ((b1 And &H7) * 262144) + ((b2 And &H3F) * 4096) + ((b3 And &H3F) * 64) + (b4 And &H3F)
+                If codePoint > 65535 Then
+                    result = result & "?"
+                Else
+                    result = result & ChrW(codePoint)
+                End If
+                i = i + 4
+            Else
+                result = result & "?"
+                i = i + 1
+            End If
+        Else
+            result = result & "?"
+            i = i + 1
+        End If
+    Loop
+
+    Utf8BytesToString = result
 End Function
 

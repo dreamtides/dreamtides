@@ -43,6 +43,10 @@ Public Sub ApplyChanges(response As TabulaResponse)
                 ApplySetItalic change
             Case "set_underline"
                 ApplySetUnderline change
+            Case "set_font_name_spans"
+                ApplySetFontNameSpans change
+            Case "set_font_size_spans"
+                ApplySetFontSizeSpans change
         End Select
     Next i
 
@@ -321,6 +325,80 @@ Private Sub ApplySetUnderline(change As TabulaChange)
     Else
         cell.Font.Underline = xlUnderlineStyleNone
     End If
+End Sub
+
+Private Sub ApplySetFontNameSpans(change As TabulaChange)
+    Dim sheet As Worksheet
+    Dim cell As Range
+    Dim spans() As String
+    Dim i As Long
+    Dim spanParts() As String
+    Dim startPos As Long
+    Dim length As Long
+    Dim fontName As String
+
+    On Error Resume Next
+    Set sheet = ThisWorkbook.Worksheets(change.Sheet)
+    If sheet Is Nothing Then
+        Exit Sub
+    End If
+
+    Set cell = sheet.Range(change.Cell)
+    If cell Is Nothing Then
+        Exit Sub
+    End If
+
+    On Error GoTo 0
+
+    cell.ReadingOrder = xlLTR
+
+    fontName = change.Value1
+    spans = Split(change.Value2, ",")
+
+    For i = LBound(spans) To UBound(spans)
+        spanParts = Split(spans(i), ":")
+        If UBound(spanParts) >= 1 Then
+            startPos = CLng(spanParts(0))
+            length = CLng(spanParts(1))
+            cell.Characters(startPos, length).Font.Name = fontName
+        End If
+    Next i
+End Sub
+
+Private Sub ApplySetFontSizeSpans(change As TabulaChange)
+    Dim sheet As Worksheet
+    Dim cell As Range
+    Dim spans() As String
+    Dim i As Long
+    Dim spanParts() As String
+    Dim startPos As Long
+    Dim length As Long
+    Dim points As Double
+
+    On Error Resume Next
+    Set sheet = ThisWorkbook.Worksheets(change.Sheet)
+    If sheet Is Nothing Then
+        Exit Sub
+    End If
+
+    Set cell = sheet.Range(change.Cell)
+    If cell Is Nothing Then
+        Exit Sub
+    End If
+
+    On Error GoTo 0
+
+    points = CDbl(change.Value1)
+    spans = Split(change.Value2, ",")
+
+    For i = LBound(spans) To UBound(spans)
+        spanParts = Split(spans(i), ":")
+        If UBound(spanParts) >= 1 Then
+            startPos = CLng(spanParts(0))
+            length = CLng(spanParts(1))
+            cell.Characters(startPos, length).Font.Size = points
+        End If
+    Next i
 End Sub
 
 Private Function HexToLong(hexStr As String) As Long

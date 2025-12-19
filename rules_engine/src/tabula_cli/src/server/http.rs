@@ -15,6 +15,7 @@ use tokio::sync::{Mutex, oneshot};
 use super::listener_runner::{ListenerContext, run_listeners};
 use super::model::{Response, ResponseStatus};
 use super::{ServerConfig, serialization, server_workbook_snapshot};
+use crate::server::listeners::boxicons::BoxiconsListener;
 use crate::server::listeners::conditional_formatting::ConditionalFormattingListener;
 use crate::server::listeners::ensure_uuid::EnsureUuidListener;
 use crate::server::listeners::partial_formatting::PartialFormattingListener;
@@ -140,6 +141,7 @@ fn build_listeners() -> Vec<Box<dyn super::listener_runner::Listener>> {
         Box::new(ConditionalFormattingListener),
         Box::new(PartialFormattingListener),
         Box::new(EnsureUuidListener),
+        Box::new(BoxiconsListener),
     ]
 }
 
