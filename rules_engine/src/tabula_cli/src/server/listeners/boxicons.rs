@@ -17,7 +17,7 @@ impl Listener for BoxiconsListener {
         _context: &ListenerContext,
     ) -> Result<ListenerResult> {
         const BOXICONS_FONT: &str = "boxicons";
-        const FONT_SIZE: f32 = 16.0;
+        const FONT_SIZE: f32 = 20.0;
 
         let mut changes = Vec::new();
 
@@ -43,6 +43,13 @@ impl Listener for BoxiconsListener {
                             sheet: sheet.name.clone(),
                             cell: cell_ref.clone(),
                             points: FONT_SIZE,
+                            spans: spans.clone(),
+                        });
+
+                        changes.push(Change::SetSubscriptSpans {
+                            sheet: sheet.name.clone(),
+                            cell: cell_ref.clone(),
+                            subscript: true,
                             spans,
                         });
                     }
@@ -62,7 +69,7 @@ struct IconReplacement {
 const ICON_REPLACEMENTS: &[IconReplacement] = &[
     IconReplacement { pattern: "{fast}", icon: '\u{F93A}' },
     IconReplacement { pattern: "{x}", icon: '\u{FEFC}' },
-    IconReplacement { pattern: "{e}", icon: '\u{FB31}' },
+    IconReplacement { pattern: "{e}", icon: '\u{F407}' },
     IconReplacement { pattern: "{p}", icon: '\u{FC6A}' },
 ];
 

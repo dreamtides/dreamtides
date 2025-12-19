@@ -343,7 +343,7 @@ applied to the characters.
 
 Supported patterns:
 - `{x}` → U+FEFC (turn down icon)
-- `{e}` → U+FB31 (energy icon)
+- `{e}` → U+F407 (energy icon)
 - `{fast}` → U+F93A (fast icon)
 - `{p}` → U+FC6A (points icon)
 
@@ -360,19 +360,23 @@ Design:
   pair (span length 2 per icon).
 - Emit a `set_font_size_spans` change to set the font size to 16 points for each
   LRM+icon pair.
+- Emit a `set_subscript_spans` change to set subscript formatting for each LRM+icon
+  pair.
 
 VBA application:
 - Apply `cell.ReadingOrder = xlLTR` to ensure left-to-right text direction.
 - Use `cell.Characters(Start, Length).Font.Name` to set the boxicons font on each
   2-character span (LRM + icon).
 - Use `cell.Characters(Start, Length).Font.Size` to set size 16 on each span.
+- Use `cell.Characters(Start, Length).Font.Subscript` to enable subscript rendering
+  on each span.
 
-*Only* the icon characters (LRM + boxicons) should have the boxicons font and size 16
-applied, the remaining text should keep its original formatting.
+*Only* the icon characters (LRM + boxicons) should have the boxicons font, size 16,
+and subscript formatting applied. The remaining text should keep its original formatting.
 
-Icons render correctly inline in Excel. Examples:
+Icons render correctly inline in Excel as subscripts. Examples:
 - `=UNICHAR(HEX2DEC("FEFC"))` for the turn down icon
-- `=UNICHAR(HEX2DEC("FB31"))` for the energy icon
+- `=UNICHAR(HEX2DEC("F407"))` for the energy icon
 - `=UNICHAR(HEX2DEC("F93A"))` for the fast icon
 - `=UNICHAR(HEX2DEC("FC6A"))` for the points icon
 
@@ -431,6 +435,8 @@ Response line types:
   percent-encoded, `spans` is `start:length,start:length` with 1-based indices.
 - `CHANGE set_font_size_spans <sheet> <cell> <points> <spans>`: `points` is a decimal
   number, `spans` is `start:length,start:length` with 1-based indices.
+- `CHANGE set_subscript_spans <sheet> <cell> <subscript> <spans>`: `subscript` is `0`
+  or `1`, `spans` is `start:length,start:length` with 1-based indices.
 
 Round-trip cycle:
 - VBA sends request with workbook metadata and optional changed range.

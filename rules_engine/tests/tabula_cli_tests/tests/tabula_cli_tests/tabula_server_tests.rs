@@ -569,7 +569,27 @@ fn test_boxicons_replaces_x_with_icon() {
     let a1_size = font_size_changes.iter().find(|(cell, _, _)| cell == "A1");
     assert!(a1_size.is_some());
     let (_, points, _) = a1_size.unwrap();
-    assert_eq!(*points, 16.0);
+
+    let subscript_changes: Vec<_> = result
+        .changes
+        .iter()
+        .filter_map(|c| match c {
+            Change::SetSubscriptSpans { cell, subscript, spans, .. } => {
+                Some((cell.clone(), *subscript, spans.clone()))
+            }
+            _ => None,
+        })
+        .collect();
+
+    assert_eq!(subscript_changes.len(), 2);
+
+    let a1_subscript = subscript_changes.iter().find(|(cell, _, _)| cell == "A1");
+    assert!(a1_subscript.is_some());
+    let (_, is_subscript, spans) = a1_subscript.unwrap();
+    assert!(is_subscript);
+    assert_eq!(spans.len(), 1);
+    assert_eq!(spans[0].start, 7);
+    assert_eq!(spans[0].length, 2);
 
     assert!(result.warnings.is_empty(), "Should have no warnings");
 }
@@ -624,6 +644,24 @@ fn test_boxicons_multiple_occurrences() {
     assert_eq!(spans[0].length, 2);
     assert_eq!(spans[1].start, 8);
     assert_eq!(spans[1].length, 2);
+
+    let subscript_changes: Vec<_> = result
+        .changes
+        .iter()
+        .filter_map(|c| match c {
+            Change::SetSubscriptSpans { subscript, spans, .. } => Some((*subscript, spans.clone())),
+            _ => None,
+        })
+        .collect();
+
+    assert_eq!(subscript_changes.len(), 1);
+    let (is_subscript, subscript_spans) = &subscript_changes[0];
+    assert!(is_subscript);
+    assert_eq!(subscript_spans.len(), 2);
+    assert_eq!(subscript_spans[0].start, 1);
+    assert_eq!(subscript_spans[0].length, 2);
+    assert_eq!(subscript_spans[1].start, 8);
+    assert_eq!(subscript_spans[1].length, 2);
 }
 
 #[test]
@@ -690,7 +728,7 @@ fn test_boxicons_multiple_icon_types() {
     assert_eq!(set_value_changes.len(), 4);
 
     let a1_value = set_value_changes.iter().find(|(cell, _)| cell == "A1");
-    assert_eq!(a1_value, Some(&("A1".to_string(), "\u{200E}\u{FB31}".to_string())));
+    assert_eq!(a1_value, Some(&("A1".to_string(), "\u{200E}\u{F407}".to_string())));
 
     let a2_value = set_value_changes.iter().find(|(cell, _)| cell == "A2");
     assert_eq!(a2_value, Some(&("A2".to_string(), "\u{200E}\u{F93A}".to_string())));
@@ -703,7 +741,7 @@ fn test_boxicons_multiple_icon_types() {
         a4_value,
         Some(&(
             "A4".to_string(),
-            "\u{200E}\u{FEFC} \u{200E}\u{FB31} \u{200E}\u{F93A} \u{200E}\u{FC6A}".to_string()
+            "\u{200E}\u{FEFC} \u{200E}\u{F407} \u{200E}\u{F93A} \u{200E}\u{FC6A}".to_string()
         ))
     );
 
@@ -727,4 +765,20 @@ fn test_boxicons_multiple_icon_types() {
     assert_eq!(spans[2].length, 2);
     assert_eq!(spans[3].start, 10);
     assert_eq!(spans[3].length, 2);
+
+    let subscript_changes: Vec<_> = result
+        .changes
+        .iter()
+        .filter_map(|c| match c {
+            Change::SetSubscriptSpans { cell, subscript, spans, .. } if cell == "A4" => {
+                Some((*subscript, spans.clone()))
+            }
+            _ => None,
+        })
+        .collect();
+
+    assert_eq!(subscript_changes.len(), 1);
+    let (is_subscript, subscript_spans) = &subscript_changes[0];
+    assert!(is_subscript);
+    assert_eq!(subscript_spans.len(), 4);
 }

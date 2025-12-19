@@ -59,4 +59,5 @@ pub enum Change {
     SetUnderline { sheet: String, cell: String, underline: bool },
     SetFontNameSpans { sheet: String, cell: String, font_name: String, spans: Vec<Span> },
     SetFontSizeSpans { sheet: String, cell: String, points: f32, spans: Vec<Span> },
+    SetSubscriptSpans { sheet: String, cell: String, subscript: bool, spans: Vec<Span> },
 }

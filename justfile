@@ -199,6 +199,9 @@ tabula-build-from-toml:
 tabula-roundtrip-revert:
   cp /tmp/Tabula.backup.xlsm client/Assets/StreamingAssets/Tabula.xlsm
 
+watch-tabula:
+    cargo watch -C rules_engine -x "run --bin tabula_cli server"
+
 tabula-old *args='':
   cargo run --manifest-path rules_engine/Cargo.toml --bin "tabula_cli" -- \
       --key-file ./service_account_key.json \

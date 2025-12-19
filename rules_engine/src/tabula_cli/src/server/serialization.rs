@@ -216,6 +216,20 @@ fn serialize_change(change: &Change) -> String {
                 spans_str
             )
         }
+        Change::SetSubscriptSpans { sheet, cell, subscript, spans } => {
+            let spans_str = spans
+                .iter()
+                .map(|s| format!("{}:{}", s.start, s.length))
+                .collect::<Vec<_>>()
+                .join(",");
+            format!(
+                "CHANGE set_subscript_spans {} {} {} {}",
+                percent_encode(sheet),
+                percent_encode(cell),
+                if *subscript { "1" } else { "0" },
+                spans_str
+            )
+        }
     }
 }
 
