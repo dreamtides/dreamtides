@@ -3,7 +3,8 @@ use std::path::PathBuf;
 use anyhow::Result;
 use clap::{Parser, Subcommand};
 use tabula_cli::commands::{
-    build_toml, build_xls, git_setup, rebuild_images, repair, strip_images, validate,
+    build_toml, build_xls, git_setup, rebuild_images, repair, server_install, strip_images,
+    validate,
 };
 
 #[derive(Parser)]
@@ -89,6 +90,9 @@ enum Commands {
     #[command(about = "Configure Git for the tabula workflow")]
     GitSetup,
 
+    #[command(about = "Install the AppleScriptTask helper for tabula server")]
+    ServerInstall,
+
     #[command(hide = true)]
     GitHook {
         #[arg(value_enum)]
@@ -136,6 +140,7 @@ fn run() -> Result<()> {
             rebuild_images::rebuild_images(xlsm_path, from_urls, auto)?;
         }
         Commands::GitSetup => git_setup::git_setup()?,
+        Commands::ServerInstall => server_install::server_install()?,
         Commands::GitHook { hook } => git_setup::run_hook(hook)?,
         Commands::Repair { xlsm_path, rebuild_images } => {
             repair::repair(xlsm_path, rebuild_images)?;

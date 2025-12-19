@@ -448,9 +448,17 @@ If more information is needed:
 - Review `ensure_guid.vba` to match UUID behavior and edge cases.
 - Ask for clarification on Excel workbook locations or macro constraints.
 
-CRITICAL: After every step is completed, the agent should provide "Manual
-Testing Instructions:" output with a description of how to manually verify the
-most recently completed work.
+CRITICAL: After every step is completed, the agent should provide
+
+
+```
+
+# MANUAL TESTING INSTRUCTIONS
+
+```
+
+Output with a description of how to manually verify the most recently completed
+work.
 
 ## Milestone Breakdown
 
