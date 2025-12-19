@@ -364,3 +364,23 @@ pub fn add_media_entries(path: &Path, media: &[(&str, &[u8])]) -> Result<()> {
     temp.persist(path)?;
     Ok(())
 }
+
+pub fn create_cards_sheet_with_pineapple(path: &Path) -> Result<()> {
+    let mut book = umya_spreadsheet::new_file();
+    let sheet = book.get_sheet_mut(&0).expect("Sheet 0 should exist");
+    sheet.set_name("Cards");
+
+    sheet.get_cell_mut("A1").set_value("Name");
+    sheet.get_cell_mut("B1").set_value("Description");
+    sheet.get_cell_mut("A2").set_value("Apple");
+    sheet.get_cell_mut("B2").set_value("A red fruit");
+    sheet.get_cell_mut("A3").set_value("Pineapple");
+    sheet.get_cell_mut("B3").set_value("A tropical fruit");
+    sheet.get_cell_mut("A4").set_value("Orange");
+    sheet.get_cell_mut("B4").set_value("Contains pineapple flavor");
+    sheet.get_cell_mut("A5").set_value("Banana");
+    sheet.get_cell_mut("B5").set_value("Yellow fruit");
+
+    xlsx::write(&book, path)?;
+    Ok(())
+}
