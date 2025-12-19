@@ -522,15 +522,15 @@ fn test_boxicons_replaces_x_with_icon() {
         })
         .collect();
 
-    assert_eq!(set_value_changes.len(), 2, "Should replace {{x}} in 2 cells");
+    assert_eq!(set_value_changes.len(), 2, "Should create formatted versions in 2 cells");
 
-    let a1_value =
-        set_value_changes.iter().find(|(cell, _)| cell == "A1").map(|(_, value)| value.clone());
-    assert_eq!(a1_value, Some("Click \u{200E}\u{FEFC} to expand".to_string()));
+    let b1_value =
+        set_value_changes.iter().find(|(cell, _)| cell == "B1").map(|(_, value)| value.clone());
+    assert_eq!(b1_value, Some("Click \u{200E}\u{FEFC} to expand".to_string()));
 
-    let a2_value =
-        set_value_changes.iter().find(|(cell, _)| cell == "A2").map(|(_, value)| value.clone());
-    assert_eq!(a2_value, Some("\u{200E}\u{FEFC}".to_string()));
+    let b2_value =
+        set_value_changes.iter().find(|(cell, _)| cell == "B2").map(|(_, value)| value.clone());
+    assert_eq!(b2_value, Some("\u{200E}\u{FEFC}".to_string()));
 
     let font_name_changes: Vec<_> = result
         .changes
@@ -545,9 +545,9 @@ fn test_boxicons_replaces_x_with_icon() {
 
     assert_eq!(font_name_changes.len(), 2);
 
-    let a1_font = font_name_changes.iter().find(|(cell, _, _)| cell == "A1");
-    assert!(a1_font.is_some());
-    let (_, font_name, spans) = a1_font.unwrap();
+    let b1_font = font_name_changes.iter().find(|(cell, _, _)| cell == "B1");
+    assert!(b1_font.is_some());
+    let (_, font_name, spans) = b1_font.unwrap();
     assert_eq!(font_name, "boxicons");
     assert_eq!(spans.len(), 1);
     assert_eq!(spans[0].start, 7);
@@ -566,9 +566,8 @@ fn test_boxicons_replaces_x_with_icon() {
 
     assert_eq!(font_size_changes.len(), 2);
 
-    let a1_size = font_size_changes.iter().find(|(cell, _, _)| cell == "A1");
-    assert!(a1_size.is_some());
-    let (_, points, _) = a1_size.unwrap();
+    let b1_size = font_size_changes.iter().find(|(cell, _, _)| cell == "B1");
+    assert!(b1_size.is_some());
 
     let subscript_changes: Vec<_> = result
         .changes
@@ -583,9 +582,9 @@ fn test_boxicons_replaces_x_with_icon() {
 
     assert_eq!(subscript_changes.len(), 2);
 
-    let a1_subscript = subscript_changes.iter().find(|(cell, _, _)| cell == "A1");
-    assert!(a1_subscript.is_some());
-    let (_, is_subscript, spans) = a1_subscript.unwrap();
+    let b1_subscript = subscript_changes.iter().find(|(cell, _, _)| cell == "B1");
+    assert!(b1_subscript.is_some());
+    let (_, is_subscript, spans) = b1_subscript.unwrap();
     assert!(is_subscript);
     assert_eq!(spans.len(), 1);
     assert_eq!(spans[0].start, 7);
@@ -620,19 +619,23 @@ fn test_boxicons_multiple_occurrences() {
         .changes
         .iter()
         .filter_map(|c| match c {
-            Change::SetValue { value, .. } => Some(value.clone()),
+            Change::SetValue { cell, value, .. } => Some((cell.clone(), value.clone())),
             _ => None,
         })
         .collect();
 
     assert_eq!(set_value_changes.len(), 1);
-    assert_eq!(set_value_changes[0], "\u{200E}\u{FEFC} and \u{200E}\u{FEFC}");
+    let b1_value = set_value_changes.iter().find(|(cell, _)| cell == "B1");
+    assert_eq!(
+        b1_value,
+        Some(&("B1".to_string(), "\u{200E}\u{FEFC} and \u{200E}\u{FEFC}".to_string()))
+    );
 
     let font_name_changes: Vec<_> = result
         .changes
         .iter()
         .filter_map(|c| match c {
-            Change::SetFontNameSpans { spans, .. } => Some(spans.clone()),
+            Change::SetFontNameSpans { cell, spans, .. } if cell == "B1" => Some(spans.clone()),
             _ => None,
         })
         .collect();
@@ -649,7 +652,9 @@ fn test_boxicons_multiple_occurrences() {
         .changes
         .iter()
         .filter_map(|c| match c {
-            Change::SetSubscriptSpans { subscript, spans, .. } => Some((*subscript, spans.clone())),
+            Change::SetSubscriptSpans { cell, subscript, spans, .. } if cell == "B1" => {
+                Some((*subscript, spans.clone()))
+            }
             _ => None,
         })
         .collect();
@@ -727,20 +732,20 @@ fn test_boxicons_multiple_icon_types() {
 
     assert_eq!(set_value_changes.len(), 4);
 
-    let a1_value = set_value_changes.iter().find(|(cell, _)| cell == "A1");
-    assert_eq!(a1_value, Some(&("A1".to_string(), "\u{200E}\u{F407}".to_string())));
+    let b1_value = set_value_changes.iter().find(|(cell, _)| cell == "B1");
+    assert_eq!(b1_value, Some(&("B1".to_string(), "\u{200E}\u{F407}".to_string())));
 
-    let a2_value = set_value_changes.iter().find(|(cell, _)| cell == "A2");
-    assert_eq!(a2_value, Some(&("A2".to_string(), "\u{200E}\u{F93A}".to_string())));
+    let b2_value = set_value_changes.iter().find(|(cell, _)| cell == "B2");
+    assert_eq!(b2_value, Some(&("B2".to_string(), "\u{200E}\u{F93A}".to_string())));
 
-    let a3_value = set_value_changes.iter().find(|(cell, _)| cell == "A3");
-    assert_eq!(a3_value, Some(&("A3".to_string(), "\u{200E}\u{FC6A}".to_string())));
+    let b3_value = set_value_changes.iter().find(|(cell, _)| cell == "B3");
+    assert_eq!(b3_value, Some(&("B3".to_string(), "\u{200E}\u{FC6A}".to_string())));
 
-    let a4_value = set_value_changes.iter().find(|(cell, _)| cell == "A4");
+    let b4_value = set_value_changes.iter().find(|(cell, _)| cell == "B4");
     assert_eq!(
-        a4_value,
+        b4_value,
         Some(&(
-            "A4".to_string(),
+            "B4".to_string(),
             "\u{200E}\u{FEFC} \u{200E}\u{F407} \u{200E}\u{F93A} \u{200E}\u{FC6A}".to_string()
         ))
     );
@@ -749,7 +754,7 @@ fn test_boxicons_multiple_icon_types() {
         .changes
         .iter()
         .filter_map(|c| match c {
-            Change::SetFontNameSpans { cell, spans, .. } if cell == "A4" => Some(spans.clone()),
+            Change::SetFontNameSpans { cell, spans, .. } if cell == "B4" => Some(spans.clone()),
             _ => None,
         })
         .collect();
@@ -770,7 +775,7 @@ fn test_boxicons_multiple_icon_types() {
         .changes
         .iter()
         .filter_map(|c| match c {
-            Change::SetSubscriptSpans { cell, subscript, spans, .. } if cell == "A4" => {
+            Change::SetSubscriptSpans { cell, subscript, spans, .. } if cell == "B4" => {
                 Some((*subscript, spans.clone()))
             }
             _ => None,

@@ -26,32 +26,34 @@ impl Listener for BoxiconsListener {
                 if let CellValue::String(text) = value {
                     let (new_text, spans) = find_and_replace_boxicons(text);
                     if !spans.is_empty() {
-                        changes.push(Change::SetValue {
-                            sheet: sheet.name.clone(),
-                            cell: cell_ref.clone(),
-                            value: new_text,
-                        });
+                        if let Some(target_cell) = next_cell_to_right(cell_ref) {
+                            changes.push(Change::SetValue {
+                                sheet: sheet.name.clone(),
+                                cell: target_cell.clone(),
+                                value: new_text,
+                            });
 
-                        changes.push(Change::SetFontNameSpans {
-                            sheet: sheet.name.clone(),
-                            cell: cell_ref.clone(),
-                            font_name: BOXICONS_FONT.to_string(),
-                            spans: spans.clone(),
-                        });
+                            changes.push(Change::SetFontNameSpans {
+                                sheet: sheet.name.clone(),
+                                cell: target_cell.clone(),
+                                font_name: BOXICONS_FONT.to_string(),
+                                spans: spans.clone(),
+                            });
 
-                        changes.push(Change::SetFontSizeSpans {
-                            sheet: sheet.name.clone(),
-                            cell: cell_ref.clone(),
-                            points: FONT_SIZE,
-                            spans: spans.clone(),
-                        });
+                            changes.push(Change::SetFontSizeSpans {
+                                sheet: sheet.name.clone(),
+                                cell: target_cell.clone(),
+                                points: FONT_SIZE,
+                                spans: spans.clone(),
+                            });
 
-                        changes.push(Change::SetSubscriptSpans {
-                            sheet: sheet.name.clone(),
-                            cell: cell_ref.clone(),
-                            subscript: true,
-                            spans,
-                        });
+                            changes.push(Change::SetSubscriptSpans {
+                                sheet: sheet.name.clone(),
+                                cell: target_cell,
+                                subscript: true,
+                                spans,
+                            });
+                        }
                     }
                 }
             }
@@ -116,4 +118,50 @@ fn find_and_replace_boxicons(text: &str) -> (String, Vec<Span>) {
     result.push_str(&text[text_pos..]);
 
     (result, spans)
+}
+
+fn next_cell_to_right(cell_ref: &str) -> Option<String> {
+    let mut col_letters = String::new();
+    let mut row_digits = String::new();
+
+    for ch in cell_ref.chars() {
+        if ch.is_ascii_alphabetic() {
+            col_letters.push(ch.to_ascii_uppercase());
+        } else if ch.is_ascii_digit() {
+            row_digits.push(ch);
+        } else if ch != '$' {
+            return None;
+        }
+    }
+
+    if col_letters.is_empty() || row_digits.is_empty() {
+        return None;
+    }
+
+    let col_index = column_to_index(&col_letters)?;
+    let next_col = index_to_column(col_index + 1);
+
+    Some(format!("{next_col}{row_digits}"))
+}
+
+fn column_to_index(col: &str) -> Option<u32> {
+    let mut value = 0u32;
+    for ch in col.chars() {
+        if !ch.is_ascii_uppercase() {
+            return None;
+        }
+        value = value.checked_mul(26)?;
+        value = value.checked_add((ch as u32 - 'A' as u32) + 1)?;
+    }
+    Some(value)
+}
+
+fn index_to_column(mut index: u32) -> String {
+    let mut result = String::new();
+    while index > 0 {
+        index -= 1;
+        result.push((b'A' + (index % 26) as u8) as char);
+        index /= 26;
+    }
+    result.chars().rev().collect()
 }
