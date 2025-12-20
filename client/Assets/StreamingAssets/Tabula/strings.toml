@@ -91,12 +91,14 @@ id = "cc5c5509-69c5-4c1f-8faa-b9948029dcb8"
 name = "-energy-cost"
 description = "Formatting for an amount of energy paid as a cost"
 en-us = "<color=#00838F><b>{$e}{e}</b></color>"
+column-1 = "<color=#00838F><b>{$e}‎</b></color>"
 
 [[strings]]
 id = "50ef5a4a-86f6-4640-88f9-a249cc4cd5cf"
 name = "-gained-energy"
 description = "Formatting for an amount of energy gained as an effect"
 en-us = "<color=#00838F><b>{$e}{e}</b></color>"
+column-1 = "<color=#00838F><b>{$e}‎</b></color>"
 
 [[strings]]
 id = "44535fb6-0190-4197-8bce-3acf063d4318"
@@ -171,12 +173,14 @@ id = "fb895ce7-1f66-426d-8c29-b19fdeee7828"
 name = "-reclaim-cost"
 description = "Reclaim keyword ability with energy cost"
 en-us = "{keyword}reclaim{end-keyword} <color=#00838F><b>{$e}{e}</b></color>"
+column-1 = "{keyword}reclaim{end-keyword} <color=#00838F><b>{$e}‎</b></color>"
 
 [[strings]]
 id = "5674a8dd-b4eb-4630-85c2-79d6b95cdaae"
 name = "-Reclaim-Cost"
 description = "Reclaim keyword ability with energy cost, capitalized"
 en-us = "{keyword}Reclaim{end-keyword} <color=#00838F><b>{$e}{e}</b></color>"
+column-1 = "{keyword}Reclaim{end-keyword} <color=#00838F><b>{$e}‎</b></color>"
 
 [[strings]]
 id = "bf189fe0-75e2-4a87-9dca-67dd5f755766"
@@ -195,6 +199,7 @@ id = "70374512-2121-4569-a028-e871209fad38"
 name = "-gained-points"
 description = "Formatting for gaining an amount of points"
 en-us = "{$n}{p}"
+column-1 = "{$n}‎ﱪ"
 
 [[strings]]
 id = "5771085d-3c89-423f-be05-c728035e7cd0"
@@ -297,12 +302,14 @@ id = "211e9d51-07ed-4261-88ce-fbfeb3390449"
 name = "pay-energy-prompt-button"
 description = "Choose to pay energy to take a prompt action"
 en-us = "Spend {$energy}{e}"
+column-1 = "Spend {$energy}‎"
 
 [[strings]]
 id = "3d41f282-892b-47e6-9e8c-b82ca534ca20"
 name = "pay-energy-addtional-cost-button"
 description = "Button to confirm the amount of energy to pay as an additional cost"
 en-us = "Spend {$energy}{e}"
+column-1 = "Spend {$energy}‎"
 
 [[strings]]
 id = "a637975a-fb02-40b1-8dbe-95f278867ef8"
@@ -345,12 +352,14 @@ id = "010f152b-115a-4a52-bae0-3f9961b0990f"
 name = "increment-energy-prompt-button"
 description = "Button to increment the energy amount in a prompt to pick an energy value"
 en-us = "+1{e}"
+column-1 = "+1‎"
 
 [[strings]]
 id = "5632f153-07d7-41de-bc85-5864f5578d73"
 name = "decrement-energy-prompt-button"
 description = "Button to decrement the energy amount in a prompt to pick an energy value"
 en-us = "-1{e}"
+column-1 = "-1‎"
 
 [[strings]]
 id = "bec6ea4b-55b9-4eb9-8173-9dd4f03eaf05"
@@ -369,6 +378,7 @@ id = "1231c8b5-de17-4cf3-b45d-f42d62143916"
 name = "card-rules-text-energy-paid"
 description = "Addition to card rules text showing how much energy was spent on a card with a variable energy cost"
 en-us = "({$energy}{e} paid)"
+column-1 = "({$energy}‎ paid)"
 
 [[strings]]
 id = "dd5982c1-cfba-4608-a0ce-abf4257fcd5a"
@@ -399,6 +409,7 @@ id = "f144ac6d-bd7a-460c-9990-06812c084191"
 name = "hand-size-limit-exceeded-warning-message"
 description = "Message describing the effects of exceeding the hand size limit"
 en-us = "Note: Cards drawn in excess of 10 become {e} instead."
+column-1 = "Note: Cards drawn in excess of 10 become ‎ instead."
 
 [[strings]]
 id = "9cffdaea-7a9f-4ca0-80af-6c414cb5c4f0"
@@ -411,6 +422,7 @@ id = "59bc7390-ee3f-426c-8874-48d56d62d7ea"
 name = "combined-limit-warning-message"
 description = "Message describing the effects of exceeding both the character limit and the hand size limit"
 en-us = "Character limit exceeded: A character will be abandoned. Cards drawn in excess of 10 become {e} instead."
+column-1 = "Character limit exceeded: A character will be abandoned. Cards drawn in excess of 10 become ‎ instead."
 
 [[strings]]
 id = "a36c2696-4c39-49d5-9c63-3e5b7149cefb"
@@ -609,6 +621,7 @@ id = "7b13a745-c94b-437c-bc2d-73c64b479147"
 name = "help-text-reclaim-with-cost"
 description = "Info zoom help text, displayed on a tooltip to describe card abilities"
 en-us = "{keyword}Reclaim{end-keyword} {$e}{e}: You may play this card from your void for {$e}{e}, then banish it."
+column-1 = "{keyword}Reclaim{end-keyword} {$e}‎: You may play this card from your void for {$e}‎, then banish it."
 
 [[strings]]
 id = "cf017f6f-7cc5-4b40-8819-25ec7fb5acd2"

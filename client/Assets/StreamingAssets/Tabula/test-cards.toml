@@ -44,8 +44,8 @@ name = "Test Variable Energy Draw"
 id = "e06a8cfe-483f-42c0-aac8-9c12b21b3f99"
 energy-cost = 2
 rules-text = "Pay one or more {e}: Draw {-drawn-cards(n:1)} for each {e} spent."
-prompts = "Pay one or more {e}."
-card-type = "Event"
+prompts = "Pay one or more ‎: Draw {-drawn-cards(n:1)} for each ‎ spent."
+card-type = "Pay one or more ‎."
 is-fast = true
 image-number = 489056605
 

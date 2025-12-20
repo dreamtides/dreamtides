@@ -33,8 +33,8 @@ name = "Dreamscatter"
 id = "15a39336-2c71-44d6-b462-d9fd23a4d925"
 energy-cost = 2
 rules-text = "Pay one or more {e}: Draw {-drawn-cards(n:1)} for each {e} spent."
-prompts = "Pay one or more {e}."
-card-type = "Event"
+prompts = "Pay one or more ‎: Draw {-drawn-cards(n:1)} for each ‎ spent."
+card-type = "Pay one or more ‎."
 is-fast = true
 image-number = 489056605
 

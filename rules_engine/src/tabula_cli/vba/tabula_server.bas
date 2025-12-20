@@ -1,5 +1,3 @@
-Attribute VB_Name = "TabulaServer"
-
 Option Explicit
 
 Private Const SERVER_URL As String = "http://127.0.0.1:3030/notify"

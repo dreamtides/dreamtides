@@ -1,6 +1,6 @@
 set positional-arguments
 
-code-review: check-format build workspace-lints clippy test tabula-validate check-docs unity-tests
+code-review: check-format build workspace-lints clippy test tabula-verify-vba tabula-validate check-docs unity-tests
 
 # Run this before pushing
 code-review-rsync: rsync-for-review
@@ -198,6 +198,9 @@ tabula-build-from-toml:
 
 tabula-roundtrip-revert:
   cp /tmp/Tabula.backup.xlsm client/Assets/StreamingAssets/Tabula.xlsm
+
+tabula-verify-vba:
+   ./rules_engine/scripts/verify_vba.py
 
 watch-tabula:
     cargo watch -C rules_engine -x "run --bin tabula_cli server"
