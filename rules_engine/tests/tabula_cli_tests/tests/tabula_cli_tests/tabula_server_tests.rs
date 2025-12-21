@@ -873,7 +873,7 @@ fn test_fluent_rules_text_simple_html() {
 }
 
 #[test]
-fn test_fluent_rules_text_named_argument_variable() {
+fn test_fluent_rules_text_variable_select() {
     let temp_dir = TempDir::new().expect("Failed to create temp dir");
     let xlsx_path = temp_dir.path().join("test_fluent_named_arg.xlsx");
 
@@ -884,7 +884,7 @@ fn test_fluent_rules_text_named_argument_variable() {
     sheet.get_cell_mut("A1").set_value("RulesText3");
     sheet.get_cell_mut("B1").set_value("Fluent Output");
     sheet.get_cell_mut("C1").set_value("Variables");
-    sheet.get_cell_mut("A2").set_value("{-a(noun:$type)}");
+    sheet.get_cell_mut("A2").set_value("{a}");
     sheet.get_cell_mut("C2").set_value("type: warrior");
 
     let mut table = umya_spreadsheet::structs::Table::default();

@@ -330,106 +330,6 @@ fn apply_simple_html_styles(text: &str) -> StyledText {
     }
 }
 
-fn inline_named_argument_variables(expression: &str, args: &FluentArgs) -> String {
-    let chars: Vec<char> = expression.chars().collect();
-    let mut result = String::with_capacity(expression.len());
-    let mut brace_depth = 0usize;
-    let mut paren_depth = 0usize;
-    let mut in_string = false;
-    let mut escape_next = false;
-    let mut idx = 0usize;
-
-    while idx < chars.len() {
-        let ch = chars[idx];
-
-        if in_string {
-            result.push(ch);
-            if escape_next {
-                escape_next = false;
-            } else if ch == '\\' {
-                escape_next = true;
-            } else if ch == '"' {
-                in_string = false;
-            }
-            idx += 1;
-            continue;
-        }
-
-        match ch {
-            '"' if brace_depth > 0 => {
-                in_string = true;
-                result.push(ch);
-                idx += 1;
-                continue;
-            }
-            '{' => {
-                brace_depth += 1;
-            }
-            '}' => {
-                brace_depth = brace_depth.saturating_sub(1);
-            }
-            '(' if brace_depth > 0 => {
-                paren_depth += 1;
-            }
-            ')' if brace_depth > 0 => {
-                paren_depth = paren_depth.saturating_sub(1);
-            }
-            ':' if brace_depth > 0 && paren_depth > 0 => {
-                let mut cursor = idx + 1;
-                while cursor < chars.len() && chars[cursor].is_whitespace() {
-                    cursor += 1;
-                }
-                if cursor < chars.len() && chars[cursor] == '$' {
-                    let mut name_end = cursor + 1;
-                    while name_end < chars.len()
-                        && (chars[name_end] == '_' || chars[name_end].is_ascii_alphanumeric())
-                    {
-                        name_end += 1;
-                    }
-                    if name_end > cursor + 1 {
-                        let name = chars[cursor + 1..name_end].iter().collect::<String>();
-                        if let Some(value) = args.get(name.as_str()) {
-                            if let Some(literal) = format_fluent_literal(value) {
-                                result.push(':');
-                                result.extend(chars[idx + 1..cursor].iter());
-                                result.push_str(&literal);
-                                idx = name_end;
-                                continue;
-                            }
-                        }
-                    }
-                }
-            }
-            _ => {}
-        }
-
-        result.push(ch);
-        idx += 1;
-    }
-
-    result
-}
-
-fn format_fluent_literal(value: &FluentValue) -> Option<String> {
-    match value {
-        FluentValue::String(text) => Some(format!("\"{}\"", escape_fluent_string(text.as_ref()))),
-        FluentValue::Number(number) => Some(number.as_string().to_string()),
-        _ => None,
-    }
-}
-
-fn escape_fluent_string(value: &str) -> String {
-    let mut escaped = String::with_capacity(value.len());
-    for ch in value.chars() {
-        match ch {
-            '\\' => escaped.push_str("\\\\"),
-            '"' => escaped.push_str("\\\""),
-            _ => escaped.push(ch),
-        }
-    }
-    escaped
-}
-
 fn parse_simple_html_tag(tag: &str) -> Option<HtmlTag> {
     let trimmed = tag.trim();
     let lower = trimmed.to_ascii_lowercase();
@@ -509,10 +409,7 @@ fn format_fluent_expression(
         ));
     }
 
-    let temp_ftl = format!(
-        "temp-message = {}",
-        expand_plain_variables(&inline_named_argument_variables(expression, args))
-    );
+    let temp_ftl = format!("temp-message = {}", expand_plain_variables(expression));
     let temp_resource = FluentResource::try_new(temp_ftl).map_err(|(_, errors)| {
         let error_vec: Vec<FluentError> =
             errors.into_iter().map(FluentError::ParserError).collect();
