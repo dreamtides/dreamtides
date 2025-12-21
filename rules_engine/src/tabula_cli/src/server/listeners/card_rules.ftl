@@ -5,6 +5,10 @@
 # Energy symbol used in costs
 -energy-symbol = ⚡
 
-Materialized = Materialized
+Materialized = ▸ <b>Materialized: </b>
 
-Judgment = Judgment
+Judgment = ▸ <b>Judgment: </b>
+
+Dissolve = <color=#AA00FF><b>Dissolve</b></color>
+
+discover = <color=#AA00FF><b>discover</b></color>

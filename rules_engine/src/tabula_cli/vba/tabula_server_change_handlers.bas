@@ -23,6 +23,8 @@ Public Sub ApplyChanges(response As TabulaResponse)
         Select Case change.ChangeType
             Case "set_bold"
                 ApplySetBold change
+            Case "set_bold_spans"
+                ApplySetBoldSpans change
             Case "set_font_color_spans"
                 ApplySetFontColorSpans change
             Case "set_value"
@@ -85,6 +87,42 @@ Private Sub ApplySetBold(change As TabulaChange)
     Else
         cell.Font.Bold = False
     End If
+End Sub
+
+Private Sub ApplySetBoldSpans(change As TabulaChange)
+    Dim sheet As Worksheet
+    Dim cell As Range
+    Dim spans() As String
+    Dim i As Long
+    Dim spanParts() As String
+    Dim startPos As Long
+    Dim length As Long
+    Dim isBold As Boolean
+
+    On Error Resume Next
+    Set sheet = ThisWorkbook.Worksheets(change.Sheet)
+    If sheet Is Nothing Then
+        Exit Sub
+    End If
+
+    Set cell = sheet.Range(change.Cell)
+    If cell Is Nothing Then
+        Exit Sub
+    End If
+
+    On Error GoTo 0
+
+    isBold = change.Value1 = "1"
+    spans = Split(change.Value2, ",")
+
+    For i = LBound(spans) To UBound(spans)
+        spanParts = Split(spans(i), ":")
+        If UBound(spanParts) >= 1 Then
+            startPos = CLng(spanParts(0))
+            length = CLng(spanParts(1))
+            cell.Characters(startPos, length).Font.Bold = isBold
+        End If
+    Next i
 End Sub
 
 Private Sub ApplySetFontColorSpans(change As TabulaChange)
@@ -455,4 +493,3 @@ Private Function HexToLong(hexStr As String) As Long
 
     HexToLong = RGB(r, g, b)
 End Function
-

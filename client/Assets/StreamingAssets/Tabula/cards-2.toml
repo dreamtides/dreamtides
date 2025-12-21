@@ -12,12 +12,12 @@ Abandon an ally: Play this character for $0, then abandon it.
 {Materialized}: Dissolve an enemy."""
 rules-text-3 = """
 Abandon an ally: Play this character for 0e, then abandon it.
-
-{Materialized}: Dissolve an enemy."""
+ 
+{Materialized} {Dissolve} an enemy."""
 preview-3 = """
 Abandon an ally: Play this character for 0e, then abandon it.
-
-Materialized: Dissolve an enemy."""
+ 
+▸ Materialized:  Dissolve an enemy."""
 card-type = "Character"
 subtype = "Ancient"
 is-fast = false
@@ -46,8 +46,8 @@ id = "521b912b-1dfb-4440-a1e0-7181bac6aa58"
 energy-cost = 3
 rules-text = "{activated} Abandon a {cardtype: warrior}: {discover} a {cardtype: warrior} with cost $1 higher than the abandoned character and materialize it."
 alternate-rules-text = "{Judgment}: Abandon a warrior to discover a warrior with cost $1 higher and materialize it."
-rules-text-3 = "{Judgment}: Abandon a {$type} to discover a {$type} with cost 1e higher and materialize it."
-preview-3 = "Error: Fluent formatting errors: Resolver error: Unknown variable: $type; Resolver error: Unknown variable: $type"
+rules-text-3 = "{Judgment} Abandon a {$type} to {discover} a {$type} with cost 1e higher and materialize it."
+preview-3 = "▸ Judgment:  Abandon a warrior to discover a warrior with cost 1e higher and materialize it."
 variables = "type: warrior"
 card-type = "Character"
 subtype = "Ancient"
@@ -69,6 +69,8 @@ alternate-rules-text = """
 Dissolve an enemy. Draw a card.
 
 This event costs $1 if a character dissolved this turn."""
+rules-text-3 = "s"
+preview-3 = "s"
 card-type = "Event"
 is-fast = false
 image-number = 454095982

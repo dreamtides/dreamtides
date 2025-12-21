@@ -1,3 +1,4 @@
+use std::collections::BTreeMap;
 use std::sync::Arc;
 
 use anyhow::Result;
@@ -5,7 +6,7 @@ use fluent::FluentBundle;
 use fluent_bundle::{FluentArgs, FluentError, FluentResource, FluentValue};
 
 use super::super::listener_runner::{Listener, ListenerContext, ListenerResult};
-use super::super::model::Change;
+use super::super::model::{Change, Span};
 use super::super::server_workbook_snapshot::{CellValue, WorkbookSnapshot};
 
 pub struct FluentRulesTextListener {
@@ -106,11 +107,36 @@ impl Listener for FluentRulesTextListener {
 
                 match format_fluent_expression(&self.resource, input_text, &args) {
                     Ok(formatted) => {
+                        let styled = apply_simple_html_styles(&formatted);
                         changes.push(Change::SetValue {
                             sheet: sheet.name.clone(),
-                            cell: output_cell_ref,
-                            value: formatted,
+                            cell: output_cell_ref.clone(),
+                            value: styled.text,
                         });
+                        if !styled.unbold_spans.is_empty() {
+                            changes.push(Change::SetBoldSpans {
+                                sheet: sheet.name.clone(),
+                                cell: output_cell_ref.clone(),
+                                bold: false,
+                                spans: styled.unbold_spans,
+                            });
+                        }
+                        if !styled.bold_spans.is_empty() {
+                            changes.push(Change::SetBoldSpans {
+                                sheet: sheet.name.clone(),
+                                cell: output_cell_ref.clone(),
+                                bold: true,
+                                spans: styled.bold_spans,
+                            });
+                        }
+                        for (rgb, spans) in styled.color_spans {
+                            changes.push(Change::SetFontColorSpans {
+                                sheet: sheet.name.clone(),
+                                cell: output_cell_ref.clone(),
+                                rgb,
+                                spans,
+                            });
+                        }
                     }
                     Err(e) => {
                         changes.push(Change::SetValue {
@@ -164,6 +190,166 @@ fn parse_fluent_args(cell_value: Option<&CellValue>) -> Result<FluentArgs> {
     }
 
     Ok(args)
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+struct StyleState {
+    bold: bool,
+    color: Option<String>,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+struct StyledRun {
+    start: usize,
+    length: usize,
+    bold: bool,
+    color: Option<String>,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+struct StyledText {
+    text: String,
+    bold_spans: Vec<Span>,
+    unbold_spans: Vec<Span>,
+    color_spans: Vec<(String, Vec<Span>)>,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+enum HtmlTag {
+    BoldStart,
+    BoldEnd,
+    ColorStart(String),
+    ColorEnd,
+}
+
+fn apply_simple_html_styles(text: &str) -> StyledText {
+    let mut output = String::new();
+    let mut runs = Vec::new();
+    let mut bold_depth = 0usize;
+    let mut color_stack: Vec<String> = Vec::new();
+    let mut current_style = StyleState { bold: false, color: None };
+    let mut output_len = 0usize;
+    let mut run_start = 0usize;
+    let mut idx = 0usize;
+
+    while idx < text.len() {
+        let Some(open_rel) = text[idx..].find('<') else {
+            let tail = &text[idx..];
+            output.push_str(tail);
+            output_len += tail.chars().count();
+            break;
+        };
+
+        let tag_start = idx + open_rel;
+        if tag_start > idx {
+            let chunk = &text[idx..tag_start];
+            output.push_str(chunk);
+            output_len += chunk.chars().count();
+        }
+
+        let Some(close_rel) = text[tag_start..].find('>') else {
+            output.push('<');
+            output_len += 1;
+            idx = tag_start + 1;
+            continue;
+        };
+
+        let tag_end = tag_start + close_rel;
+        let tag_text = text[tag_start + 1..tag_end].trim();
+        if let Some(tag) = parse_simple_html_tag(tag_text) {
+            let next_style = match tag {
+                HtmlTag::BoldStart => {
+                    bold_depth += 1;
+                    StyleState { bold: true, color: color_stack.last().cloned() }
+                }
+                HtmlTag::BoldEnd => {
+                    bold_depth = bold_depth.saturating_sub(1);
+                    StyleState { bold: bold_depth > 0, color: color_stack.last().cloned() }
+                }
+                HtmlTag::ColorStart(color) => {
+                    color_stack.push(color);
+                    StyleState { bold: bold_depth > 0, color: color_stack.last().cloned() }
+                }
+                HtmlTag::ColorEnd => {
+                    color_stack.pop();
+                    StyleState { bold: bold_depth > 0, color: color_stack.last().cloned() }
+                }
+            };
+            if next_style != current_style {
+                if output_len > run_start {
+                    runs.push(StyledRun {
+                        start: run_start,
+                        length: output_len - run_start,
+                        bold: current_style.bold,
+                        color: current_style.color.clone(),
+                    });
+                }
+                current_style = next_style;
+                run_start = output_len;
+            }
+            idx = tag_end + 1;
+            continue;
+        }
+
+        let literal = &text[tag_start..=tag_end];
+        output.push_str(literal);
+        output_len += literal.chars().count();
+        idx = tag_end + 1;
+    }
+
+    if output_len > run_start {
+        runs.push(StyledRun {
+            start: run_start,
+            length: output_len - run_start,
+            bold: current_style.bold,
+            color: current_style.color.clone(),
+        });
+    }
+
+    let mut bold_spans = Vec::new();
+    let mut unbold_spans = Vec::new();
+    let mut color_spans: BTreeMap<String, Vec<Span>> = BTreeMap::new();
+    for run in runs {
+        let start = (run.start + 1) as u32;
+        let length = run.length as u32;
+        if run.bold {
+            bold_spans.push(Span { start, length });
+        } else {
+            unbold_spans.push(Span { start, length });
+        }
+        if let Some(color) = run.color {
+            color_spans.entry(color).or_default().push(Span { start, length });
+        }
+    }
+
+    StyledText {
+        text: output,
+        bold_spans,
+        unbold_spans,
+        color_spans: color_spans.into_iter().collect(),
+    }
+}
+
+fn parse_simple_html_tag(tag: &str) -> Option<HtmlTag> {
+    let trimmed = tag.trim();
+    let lower = trimmed.to_ascii_lowercase();
+    if lower == "b" {
+        return Some(HtmlTag::BoldStart);
+    }
+    if lower == "/b" {
+        return Some(HtmlTag::BoldEnd);
+    }
+    if lower == "/color" {
+        return Some(HtmlTag::ColorEnd);
+    }
+    if lower.starts_with("color=") {
+        let value = trimmed.split_once('=')?.1;
+        let hex = value.trim().strip_prefix('#').unwrap_or(value.trim());
+        if hex.len() == 6 && hex.chars().all(|ch| ch.is_ascii_hexdigit()) {
+            return Some(HtmlTag::ColorStart(hex.to_ascii_uppercase()));
+        }
+    }
+    None
 }
 
 fn expand_plain_variables(expression: &str) -> String {

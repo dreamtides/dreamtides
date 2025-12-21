@@ -47,6 +47,7 @@ pub enum HorizontalAlignment {
 #[derive(Clone, Debug, PartialEq)]
 pub enum Change {
     SetBold { sheet: String, cell: String, bold: bool },
+    SetBoldSpans { sheet: String, cell: String, bold: bool, spans: Vec<Span> },
     SetFontColorSpans { sheet: String, cell: String, rgb: String, spans: Vec<Span> },
     SetValue { sheet: String, cell: String, value: String },
     ClearValue { sheet: String, cell: String },

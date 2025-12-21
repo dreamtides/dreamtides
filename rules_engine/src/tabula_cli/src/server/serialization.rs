@@ -102,6 +102,20 @@ fn serialize_change(change: &Change) -> String {
                 if *bold { "1" } else { "0" }
             )
         }
+        Change::SetBoldSpans { sheet, cell, bold, spans } => {
+            let spans_str = spans
+                .iter()
+                .map(|s| format!("{}:{}", s.start, s.length))
+                .collect::<Vec<_>>()
+                .join(",");
+            format!(
+                "CHANGE set_bold_spans {} {} {} {}",
+                percent_encode(sheet),
+                percent_encode(cell),
+                if *bold { "1" } else { "0" },
+                spans_str
+            )
+        }
         Change::SetFontColorSpans { sheet, cell, rgb, spans } => {
             let spans_str = spans
                 .iter()

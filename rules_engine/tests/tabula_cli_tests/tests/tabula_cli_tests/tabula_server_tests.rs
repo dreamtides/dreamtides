@@ -3,7 +3,7 @@ use tabula_cli::server::listeners::boxicons::BoxiconsListener;
 use tabula_cli::server::listeners::conditional_formatting::ConditionalFormattingListener;
 use tabula_cli::server::listeners::fluent_rules_text::FluentRulesTextListener;
 use tabula_cli::server::listeners::partial_formatting::PartialFormattingListener;
-use tabula_cli::server::model::{Change, ChangedRange};
+use tabula_cli::server::model::{Change, ChangedRange, Span};
 use tabula_cli::server::server_workbook_snapshot::read_snapshot;
 use tabula_cli_tests::tabula_cli_test_utils;
 use tempfile::TempDir;
@@ -787,6 +787,89 @@ fn test_boxicons_multiple_icon_types() {
     let (is_subscript, subscript_spans) = &subscript_changes[0];
     assert!(is_subscript);
     assert_eq!(subscript_spans.len(), 4);
+}
+
+#[test]
+fn test_fluent_rules_text_simple_html() {
+    let temp_dir = TempDir::new().expect("Failed to create temp dir");
+    let xlsx_path = temp_dir.path().join("test_fluent_html.xlsx");
+
+    let mut book = umya_spreadsheet::new_file();
+    let sheet = book.get_sheet_mut(&0).expect("Sheet 0 should exist");
+    sheet.set_name("Cards");
+
+    sheet.get_cell_mut("A1").set_value("RulesText3");
+    sheet.get_cell_mut("B1").set_value("Fluent Output");
+    sheet.get_cell_mut("A2").set_value("<color=#AA00FF><b>Dissolve</b></color>: Draw a card.");
+
+    let mut table = umya_spreadsheet::structs::Table::default();
+    table.set_name("Cards2");
+    table.set_display_name("Cards2");
+    table.set_area(("A1", "B2"));
+    table.add_column(tabula_cli_test_utils::make_column("RulesText3"));
+    table.add_column(tabula_cli_test_utils::make_column("Fluent Output"));
+    sheet.add_table(table);
+
+    xlsx::write(&book, &xlsx_path).expect("Write workbook");
+
+    let snapshot = read_snapshot(&xlsx_path, None).expect("Failed to read snapshot");
+
+    let context = ListenerContext {
+        request_id: "test-fluent-html".to_string(),
+        workbook_path: xlsx_path.to_string_lossy().to_string(),
+        changed_range: None,
+    };
+
+    let listener = FluentRulesTextListener::new().expect("Failed to create listener");
+    let result = listener.run(&snapshot, &context).expect("Listener should succeed");
+
+    let set_value_changes: Vec<_> = result
+        .changes
+        .iter()
+        .filter_map(|c| match c {
+            Change::SetValue { cell, value, .. } => Some((cell.clone(), value.clone())),
+            _ => None,
+        })
+        .collect();
+
+    assert_eq!(set_value_changes.len(), 1, "Should create formatted output in 1 cell");
+    assert_eq!(set_value_changes[0], ("B2".to_string(), "Dissolve: Draw a card.".to_string()));
+
+    let bold_span_changes: Vec<_> = result
+        .changes
+        .iter()
+        .filter_map(|c| match c {
+            Change::SetBoldSpans { cell, bold, spans, .. } => {
+                Some((cell.clone(), *bold, spans.clone()))
+            }
+            _ => None,
+        })
+        .collect();
+
+    assert_eq!(bold_span_changes.len(), 2, "Should apply bold and unbold spans");
+    assert!(
+        bold_span_changes.contains(&("B2".to_string(), true, vec![Span { start: 1, length: 8 }]))
+    );
+    assert!(
+        bold_span_changes.contains(&("B2".to_string(), false, vec![Span { start: 9, length: 14 }]))
+    );
+
+    let color_span_changes: Vec<_> = result
+        .changes
+        .iter()
+        .filter_map(|c| match c {
+            Change::SetFontColorSpans { cell, rgb, spans, .. } => {
+                Some((cell.clone(), rgb.clone(), spans.clone()))
+            }
+            _ => None,
+        })
+        .collect();
+
+    assert_eq!(color_span_changes.len(), 1, "Should apply one color span");
+    assert_eq!(
+        color_span_changes[0],
+        ("B2".to_string(), "AA00FF".to_string(), vec![Span { start: 1, length: 8 }])
+    );
 }
 
 #[test]
