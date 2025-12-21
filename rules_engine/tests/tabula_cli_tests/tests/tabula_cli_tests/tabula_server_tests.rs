@@ -892,24 +892,8 @@ fn test_fluent_rules_text_invalid_expression() {
     let listener = FluentRulesTextListener::new().expect("Failed to create listener");
     let result = listener.run(&snapshot, &context).expect("Listener should succeed");
 
-    assert_eq!(result.changes.len(), 2, "Should generate fill color and error message changes");
+    assert_eq!(result.changes.len(), 1, "Should generate error message change");
     assert!(result.warnings.is_empty(), "Should have no warnings");
-
-    let fill_color_changes: Vec<_> = result
-        .changes
-        .iter()
-        .filter_map(|c| match c {
-            Change::SetFillColor { cell, rgb, .. } => Some((cell.clone(), rgb.clone())),
-            _ => None,
-        })
-        .collect();
-
-    assert_eq!(fill_color_changes.len(), 1, "Should set fill color on error cell");
-    assert_eq!(
-        fill_color_changes[0],
-        ("A2".to_string(), "FFE0E0".to_string()),
-        "Should set light red background on A2"
-    );
 
     let set_value_changes: Vec<_> = result
         .changes

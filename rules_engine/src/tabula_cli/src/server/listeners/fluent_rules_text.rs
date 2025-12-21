@@ -95,13 +95,6 @@ impl Listener for FluentRulesTextListener {
                 ) {
                     Ok(args) => args,
                     Err(e) => {
-                        if let Some(cell_ref) = variables_cell_ref.as_ref() {
-                            changes.push(Change::SetFillColor {
-                                sheet: sheet.name.clone(),
-                                cell: cell_ref.clone(),
-                                rgb: "FFE0E0".to_string(),
-                            });
-                        }
                         changes.push(Change::SetValue {
                             sheet: sheet.name.clone(),
                             cell: output_cell_ref.clone(),
@@ -120,11 +113,6 @@ impl Listener for FluentRulesTextListener {
                         });
                     }
                     Err(e) => {
-                        changes.push(Change::SetFillColor {
-                            sheet: sheet.name.clone(),
-                            cell: input_cell_ref.clone(),
-                            rgb: "FFE0E0".to_string(),
-                        });
                         changes.push(Change::SetValue {
                             sheet: sheet.name.clone(),
                             cell: output_cell_ref,
@@ -178,6 +166,49 @@ fn parse_fluent_args(cell_value: Option<&CellValue>) -> Result<FluentArgs> {
     Ok(args)
 }
 
+fn expand_plain_variables(expression: &str) -> String {
+    let mut result = String::with_capacity(expression.len());
+    let mut chars = expression.chars().peekable();
+    let mut depth = 0;
+
+    while let Some(ch) = chars.next() {
+        match ch {
+            '{' => {
+                depth += 1;
+                result.push(ch);
+            }
+            '}' => {
+                if depth > 0 {
+                    depth -= 1;
+                }
+                result.push(ch);
+            }
+            '$' if depth == 0 => {
+                let mut name = String::new();
+                while let Some(&next) = chars.peek() {
+                    if next == '_' || next.is_ascii_alphanumeric() {
+                        name.push(next);
+                        chars.next();
+                    } else {
+                        break;
+                    }
+                }
+
+                if name.is_empty() {
+                    result.push('$');
+                } else {
+                    result.push_str("{ $");
+                    result.push_str(&name);
+                    result.push_str(" }");
+                }
+            }
+            _ => result.push(ch),
+        }
+    }
+
+    result
+}
+
 fn format_fluent_expression(
     resource: &Arc<FluentResource>,
     expression: &str,
@@ -192,7 +223,7 @@ fn format_fluent_expression(
         ));
     }
 
-    let temp_ftl = format!("temp-message = {expression}");
+    let temp_ftl = format!("temp-message = {}", expand_plain_variables(expression));
     let temp_resource = FluentResource::try_new(temp_ftl).map_err(|(_, errors)| {
         let error_vec: Vec<FluentError> =
             errors.into_iter().map(FluentError::ParserError).collect();
