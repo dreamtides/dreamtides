@@ -1,18 +1,4 @@
 [[cards-2]]
-name = "The Devourer"
-id = "99720e39-6bad-4c6c-867c-7bc5c326195e"
-energy-cost = 8
-rules-text = "If you have 8 or more cards in your void, you may play this character from your void for $0 by banishing all other cards from your void."
-alternate-rules-text = "Banish your void with 8 or more cards: Reclaim this character."
-card-type = "Character"
-subtype = "Ancient"
-is-fast = false
-spark = 8
-image-number = 700254508
-rarity = "Rare"
-art-owned = true
-
-[[cards-2]]
 name = "Obliterator of Worlds"
 id = "5aea70af-2df6-411f-b513-cb9ee8b18fb4"
 energy-cost = 6
@@ -21,9 +7,9 @@ rules-text = """
 
 You may play this character for $0 by abandoning a character. If you do, abandon this character at end of turn."""
 alternate-rules-text = """
-{Materialized}: Dissolve an enemy.
+Abandon an ally: Play this character for $0, then abandon it.
 
-Abandon a character: Play this character. Abandon it at end of turn."""
+{Materialized}: Dissolve an enemy."""
 card-type = "Character"
 subtype = "Ancient"
 is-fast = false
@@ -33,52 +19,82 @@ rarity = "Rare"
 art-owned = false
 
 [[cards-2]]
-name = "Knowledge Restored"
-id = "ded25ef2-3c3f-4012-8717-8dec3def1854"
-energy-cost = 5
-rules-text = """
-Draw 3 cards.
-
-If you have 8 or more cards in your void, you may play this event for $0 by banishing all cards from your void."""
-alternate-rules-text = """
-Draw 3 cards.
-
-Banish your void with 8 or more cards: Play this event."""
-card-type = "Event"
-is-fast = false
-image-number = 1786390157
-rarity = "Uncommon"
-art-owned = false
-
-[[cards-2]]
-name = "Wraith of Twisting Shadows"
-id = "f649bc96-1d35-4665-97d9-799208558ff3"
+name = "Twilight Suppressor"
+id = "4e3420f2-6f0d-4381-b2b1-afb16af7549f"
 energy-cost = 3
-rules-text = "{materialized}: Look at the enemy's hand. You may choose a card from it. The enemy discards that card and then draws a card."
-alternate-rules-text = "{materialized}: Look at the opponent's hand and discard a card from it. They draw a card."
+rules-text = "{materialized}: Disable the activated abilities of a chosen enemy character while this character is in play."
+alternate-rules-text = "{Materialized}: Disable the activated abilities of an enemy while this character is in play."
 card-type = "Character"
-subtype = "Outsider"
+subtype = "Warrior"
 is-fast = false
 spark = 2
-image-number = 2025883232
+image-number = 2293194529
+rarity = "Uncommon"
+art-owned = true
+
+[[cards-2]]
+name = "The Dread Sovereign"
+id = "521b912b-1dfb-4440-a1e0-7181bac6aa58"
+energy-cost = 3
+rules-text = "{activated} Abandon a {cardtype: warrior}: {discover} a {cardtype: warrior} with cost $1 higher than the abandoned character and materialize it."
+alternate-rules-text = "{Judgment}: Abandon a warrior to discover a warrior with cost $1 higher and materialize it."
+card-type = "Character"
+subtype = "Ancient"
+is-fast = false
+spark = 1
+image-number = 2427491215
+rarity = "Rare"
+art-owned = true
+
+[[cards-2]]
+name = "Momentum of the Fallen"
+id = "dfd2523a-ff26-4c8c-9197-ba60f492d819"
+energy-cost = 4
+rules-text = """
+Dissolve an enemy character. Draw a card.
+
+This event costs $2 less to play for each character which dissolved this turn."""
+alternate-rules-text = """
+Dissolve an enemy. Draw a card.
+
+This event costs $1 if a character dissolved this turn."""
+card-type = "Event"
+is-fast = false
+image-number = 454095982
 rarity = "Rare"
 art-owned = false
 
 [[cards-2]]
-name = "Unleashed Destruction"
-id = "24388863-1b0b-477d-aa06-faf33cba6176"
-energy-cost = 2
+name = "The Waking Titan"
+id = "76435ef9-18df-4c2d-bf5a-c92d997e86b5"
+energy-cost = 5
 rules-text = """
-Dissolve an enemy character with cost $2 or less.
-
-You may play this event from your void for $0 by abandoning a character."""
+{materialized}: Return a character with cost $3 or more you control to hand. 
+{judgment}: Draw a card."""
 alternate-rules-text = """
-Dissolve an enemy with cost 2{e} or less.
+Additional Cost: Return an ally with cost $3 or more to hand.
 
-Reclaim: Abandon a character."""
-card-type = "Event"
+{Judgment}: Draw a card."""
+card-type = "Character"
+subtype = "Ancient"
 is-fast = false
-image-number = 2155438695
+spark = 3
+image-number = 2320845229
+rarity = "Rare"
+art-owned = false
+
+[[cards-2]]
+name = "Architect of Memory"
+id = "2530adcc-5ae2-486a-94b2-f40dd62f3755"
+energy-cost = 2
+rules-text = "If you have 8 or more cards in your void, cards in your void have {reclaim}."
+alternate-rules-text = "While you have 5 or more events in your void, they have {reclaim} equal to their cost."
+reminders = "Reclaim: Play an event from your void for its cost, then banish it."
+card-type = "Character"
+subtype = "Synth"
+is-fast = false
+spark = 1
+image-number = 678431950
 rarity = "Rare"
 art-owned = false
 
@@ -102,161 +118,15 @@ rarity = "Common"
 art-owned = false
 
 [[cards-2]]
-name = "Blade of Oblivion"
-id = "86eed140-60b0-4e69-b868-332fcf25b8b3"
-energy-cost = 2
-rules-text = "{activated}: Dissolve an enemy character with spark less than or equal to the number of characters you have abandoned this turn."
-alternate-rules-text = "↴: If you've abandoned 3 characters this turn, dissolve an enemy."
-card-type = "Character"
-subtype = "Warrior"
+name = "Spirit Bond"
+id = "1396e9c8-5719-42bc-8ef6-98d2777cc069"
+energy-cost = 12
+rules-text = "Each {cardtype: spirit animal} you control gains spark equal to the number of {cardtype: spirit animals} you control."
+alternate-rules-text = "Give each allied {spirit animal} spark equal to the number of allied {spirit animals}."
+card-type = "Event"
 is-fast = false
-spark = 1
-image-number = 1798382134
-rarity = "Uncommon"
-art-owned = false
-
-[[cards-2]]
-name = "Shardwoven Tyrant"
-id = "b8bc35ae-4a4a-402e-a570-707bedceb5ce"
-energy-cost = 3
-rules-text = "{multiActivated} Abandon another character: You may dissolve an enemy character with spark less than or equal to the abandoned character's spark."
-alternate-rules-text = "Abandon another character: Dissolve an enemy with spark less than or equal to its spark."
-card-type = "Character"
-subtype = "Ancient"
-is-fast = false
-spark = 1
-image-number = 1180104511
+image-number = 1913887486
 rarity = "Rare"
-art-owned = false
-
-[[cards-2]]
-name = "Titan of Forgotten Echoes"
-id = "d31723e7-8faa-41e3-89b6-c30d8fdf9cca"
-energy-cost = 6
-rules-text = "If you have played 2 or more dreams this turn, you may play this character from your void for (0)."
-alternate-rules-text = "If you've played 2 cards this turn, you may materialize this character from your void."
-card-type = "Character"
-subtype = "Ancient"
-is-fast = false
-spark = 4
-image-number = 2521694543
-rarity = "Uncommon"
-art-owned = true
-
-[[cards-2]]
-name = "The Dread Sovereign"
-id = "521b912b-1dfb-4440-a1e0-7181bac6aa58"
-energy-cost = 3
-rules-text = "{activated} Abandon a {cardtype: warrior}: {discover} a {cardtype: warrior} with cost $1 higher than the abandoned character and materialize it."
-card-type = "Character"
-subtype = "Ancient"
-is-fast = false
-spark = 1
-image-number = 2427491215
-rarity = "Rare"
-art-owned = true
-
-[[cards-2]]
-name = "Assault Leader"
-id = "7163d032-c2db-44c0-b9d4-624994a0e648"
-energy-cost = 3
-rules-text = """
-$fastActivated $2: Another character you control gains +1 spark until your next main phase for each {cardtype: warrior} you control.
-"""
-card-type = "Character"
-subtype = "Warrior"
-is-fast = false
-spark = 2
-image-number = 1897537156
-rarity = "Uncommon"
-art-owned = true
-
-[[cards-2]]
-name = "Break the Veil"
-id = "129bd326-ec4d-4da6-aff6-f1c2b78f10e4"
-energy-cost = 1
-rules-text = "Look at the enemy's hand. Choose a card with cost $3 or less from it. The enemy discards that card."
-card-type = "Event"
-is-fast = false
-image-number = 2221518875
-rarity = "Uncommon"
-art-owned = true
-
-[[cards-2]]
-name = "Eternal Sentry"
-id = "511e8751-95d0-4d09-9f60-48fa53f14a13"
-energy-cost = 4
-rules-text = "If you have drawn 2 or more cards this turn, you may play this character from your void for $1."
-card-type = "Character"
-subtype = "Survivor"
-is-fast = true
-spark = 2
-image-number = 1725212353
-rarity = "Uncommon"
-art-owned = false
-
-[[cards-2]]
-name = "Momentum of the Fallen"
-id = "dfd2523a-ff26-4c8c-9197-ba60f492d819"
-energy-cost = 4
-rules-text = """
-Dissolve an enemy character. Draw a card.
-
-This event costs $2 less to play for each character which dissolved this turn."""
-card-type = "Event"
-is-fast = false
-image-number = 454095982
-rarity = "Rare"
-art-owned = false
-
-[[cards-2]]
-name = "Speaker for the Forgotten"
-id = "59f14f33-3aff-45d2-9492-fb06c0ef7fea"
-energy-cost = 5
-rules-text = "Whenever you play a {cardtype: warrior}, you may materialize a character with cost $3 or less from your void."
-card-type = "Character"
-subtype = "Mage"
-is-fast = false
-spark = 3
-image-number = 2278837663
-rarity = "Rare"
-art-owned = true
-
-[[cards-2]]
-name = "Echoing Denial"
-id = "4666416e-5f12-47a3-9e7e-56943c0d6e44"
-energy-cost = 5
-rules-text = """
-Negate an enemy dream. 
-You may play this event for $0 by banishing a '$fast' card from your hand."""
-card-type = "Event"
-is-fast = true
-image-number = 2258761881
-rarity = "Uncommon"
-art-owned = true
-
-[[cards-2]]
-name = "Fell the Mighty"
-id = "ff10c460-125f-4f77-b9e2-4c4f33adff3e"
-energy-cost = 4
-rules-text = """
-Dissolve an enemy character. 
-You may play this event for $0 by banishing a '$fast' card from your hand."""
-card-type = "Event"
-is-fast = true
-image-number = 2027158295
-rarity = "Uncommon"
-art-owned = true
-
-[[cards-2]]
-name = "Secrets of the Deep"
-id = "958b9c00-bdbf-4bad-974e-baf57357c3a5"
-energy-cost = 0
-rules-text = "Spend all your remaining energy. Draw a card for each energy spent this way, then discard that many cards."
-card-type = "Event"
-is-fast = true
-image-number = 2131591273
-rarity = "Common"
 art-owned = false
 
 [[cards-2]]
@@ -265,6 +135,10 @@ id = "64b5552f-1fc3-4aee-a79c-cebc19792044"
 energy-cost = 4
 rules-text = """
 You may look at the top card of your deck.
+
+You may play characters from the top of your deck."""
+alternate-rules-text = """
+Reveal the top card of your deck.
 
 You may play characters from the top of your deck."""
 card-type = "Character"
@@ -276,163 +150,16 @@ rarity = "Uncommon"
 art-owned = false
 
 [[cards-2]]
-name = "Veil of the Wastes"
-id = "10ad7a9e-401d-494e-b4f3-5580b8d850d0"
-energy-cost = 3
-rules-text = "Once per turn, when you materialize a {cardtype: survivor}, you may return this character from your void to play."
-card-type = "Character"
-subtype = "Survivor"
-is-fast = false
-spark = 1
-image-number = 789291004
-rarity = "Rare"
-art-owned = false
-
-[[cards-2]]
-name = "Ride of the Vanguard"
-id = "e79d484f-d564-4429-9eca-0f90d2af5ef5"
-energy-cost = 2
-rules-text = "A character you control gains +1 spark until your next main phase for each {cardtype: warrior} you control."
-card-type = "Event"
-is-fast = true
-image-number = 1788833078
-rarity = "Uncommon"
-art-owned = true
-
-[[cards-2]]
-name = "Judgment of the Blade"
-id = "e0c88a46-b85f-4497-ab19-850acc868863"
-energy-cost = 1
-rules-text = "Banish an enemy character that is not a {cardtype: warrior}. The enemy gains $points equal to its spark."
-card-type = "Event"
-is-fast = false
-image-number = 1708315387
-rarity = "Uncommon"
-art-owned = true
-
-[[cards-2]]
-name = "Fury of the Clan"
-id = "cd3d7b81-de72-4668-b505-e09848a477be"
-energy-cost = 1
-rules-text = "Dissolve an enemy character with cost less than or equal to the number of {cardtype: warriors} you control."
-card-type = "Event"
-is-fast = false
-image-number = 2303852059
-rarity = "Common"
-art-owned = true
-
-[[cards-2]]
-name = "Weight of Memory"
-id = "6897e6d5-2ab6-4faa-a221-dfa5ffe0a0a7"
-energy-cost = 2
-rules-text = "Dissolve an enemy character with cost less than or equal to the number of cards in your void."
-alternate-rules-text = " "
-card-type = "Event"
-is-fast = false
-image-number = 2018053223
-rarity = "Uncommon"
-art-owned = false
-
-[[cards-2]]
-name = "Spirit Bond"
-id = "1396e9c8-5719-42bc-8ef6-98d2777cc069"
-energy-cost = 12
-rules-text = "Each {cardtype: spirit animal} you control gains spark equal to the number of {cardtype: spirit animals} you control."
-card-type = "Event"
-is-fast = false
-image-number = 1913887486
-rarity = "Rare"
-art-owned = false
-
-[[cards-2]]
-name = "Reclaimer of Lost Paths"
-id = "0ad4ca5c-f723-4494-8dec-1e058c37a099"
-energy-cost = 4
-rules-text = "{materialized}: A card with cost $3 or less in your void gains {reclaim} $0 until end of turn."
-card-type = "Character"
-subtype = "Survivor"
-is-fast = false
-spark = 1
-image-number = 2287436067
-rarity = "Uncommon"
-art-owned = false
-
-[[cards-2]]
-name = "Dustborn Veteran"
-id = "dce9ebda-da62-4304-a4e9-21170c98e2a6"
-energy-cost = 3
-rules-text = "If a character you controlled dissolved this turn, you may play this character from your void for $1"
-card-type = "Character"
-subtype = "Survivor"
-is-fast = false
-spark = 1
-image-number = 2258761883
-rarity = "Uncommon"
-art-owned = false
-
-[[cards-2]]
-name = "Twilight Reclaimer"
-id = "fb3029e1-7f43-4284-bcdd-11dfe6711f96"
-energy-cost = 1
-rules-text = "$dissolved: A {cardtype: survivor} with cost $3 or less in your void gains {reclaim} until end of turn."
-card-type = "Character"
-subtype = "Survivor"
-is-fast = false
-spark = 1
-image-number = 1104412604
-rarity = "Rare"
-art-owned = false
-
-[[cards-2]]
-name = "Ashen Remnant"
-id = "5ed8b4b4-abd4-410b-8c41-e94ac7609567"
-energy-cost = 2
-rules-text = "{immediate} {fastMultiActivated} Abandon another character: You may put a character from your void on top of your deck."
-card-type = "Character"
-subtype = "Survivor"
-is-fast = false
-spark = 1
-image-number = 1639942843
-rarity = "Common"
-art-owned = false
-
-[[cards-2]]
-name = "Ashen Avenger"
-id = "b9b26dbb-0384-4839-bff2-3b25c4c26518"
-energy-cost = 3
-rules-text = """
-You may play this character from your void for $2 by banishing another card in your void.
-"""
-card-type = "Character"
-subtype = "Warrior"
-is-fast = false
-spark = 1
-image-number = 1798514896
-rarity = "Common"
-art-owned = true
-
-[[cards-2]]
-name = "The Waking Titan"
-id = "76435ef9-18df-4c2d-bf5a-c92d997e86b5"
-energy-cost = 5
-rules-text = """
-{materialized}: Return a character with cost $3 or more you control to hand. 
-{judgment}: Draw a card."""
-card-type = "Character"
-subtype = "Ancient"
-is-fast = false
-spark = 3
-image-number = 2320845229
-rarity = "Rare"
-art-owned = false
-
-[[cards-2]]
 name = "Moonlit Dancer"
 id = "1f5024e3-aa36-4a44-b257-0caf35484cf8"
 energy-cost = 3
 rules-text = """
 Characters in your hand have '$fast'. 
 Once per turn, when you play a '$fast' character, gain $1."""
+alternate-rules-text = """
+Characters in your hand have ↯.
+
+Once per turn, when you play a ↯ character, gain $1."""
 card-type = "Character"
 subtype = "Visitor"
 is-fast = false
@@ -442,46 +169,16 @@ rarity = "Rare"
 art-owned = false
 
 [[cards-2]]
-name = "Lumineth"
-id = "cd398e35-fd5d-46df-8adb-5d2595df612d"
-energy-cost = 2
-rules-text = """
-When you draw all of the cards in a copy of your deck, you win the game.
-"""
+name = "Flickerveil Adept"
+id = "d8017d8f-7855-47e5-bfe5-89ca2e7c5203"
+energy-cost = 4
+rules-text = "{immediate} {activated}: Banish another character with spark 1 or less you control, then materialize it."
+alternate-rules-text = "{Materialized}, {Judgment}: Banish an ally with spark 2 or less, then materialize it."
 card-type = "Character"
-subtype = "Spirit Animal"
-is-fast = false
-spark = 2
-image-number = 2027158304
-rarity = "Rare"
-art-owned = false
-
-[[cards-2]]
-name = "Kindred Sparks"
-id = "d41a0c56-ca67-4626-90b6-c7fadeadfc4a"
-energy-cost = 5
-rules-text = """
-If you control a {cardtype: survivor}, this character costs $1.
-
-You may play this character from your void."""
-card-type = "Character"
-subtype = "Survivor"
-is-fast = false
-spark = 2
-image-number = 2216124453
-rarity = "Common"
-art-owned = false
-
-[[cards-2]]
-name = "Flagbearer of Decay"
-id = "9979e005-3a9e-4c98-ae7b-d8a25307c959"
-energy-cost = 2
-rules-text = "Whenever you play a {cardtype: survivor}, put the top 2 cards of your deck into your void."
-card-type = "Character"
-subtype = "Survivor"
+subtype = "Mage"
 is-fast = false
 spark = 1
-image-number = 2197688373
+image-number = 2285036623
 rarity = "Common"
 art-owned = false
 
@@ -490,6 +187,7 @@ name = "Packcaller of Shadows"
 id = "4d3eebd3-02b4-4016-a15a-0e8a05b6696b"
 energy-cost = 1
 rules-text = "{materialized}: Materialize a {kw: silent} copy of this character for each dream you have played this turn."
+alternate-rules-text = "{Materialized}: Materialize a Dream Figment for each card you have played this card."
 card-type = "Character"
 subtype = "Mage"
 is-fast = false
@@ -503,6 +201,7 @@ name = "Eclipse Herald"
 id = "e5ac026b-a397-47ee-929d-46de1177784c"
 energy-cost = 2
 rules-text = "{activated} Banish 3 cards from your void: Dissolve an enemy character with cost $2 or less."
+alternate-rules-text = "{Judgment}: Banish 3 cards from your void to dissolve an enemy with cost $2 or less."
 card-type = "Character"
 subtype = "Warrior"
 is-fast = false
@@ -512,25 +211,13 @@ rarity = "Uncommon"
 art-owned = true
 
 [[cards-2]]
-name = "Starsea Traveler"
-id = "f06932ac-6d8a-493f-b47e-9134676ea396"
-energy-cost = 4
-rules-text = """
-Once per turn, you may play a character with cost $2 or less from your void.
-"""
-card-type = "Character"
-subtype = "Explorer"
-is-fast = false
-spark = 2
-image-number = 1084620233
-rarity = "Rare"
-art-owned = true
-
-[[cards-2]]
 name = "Lumin-Gate Seer"
 id = "d4123a89-fa76-46f9-a8b7-6a1d4ecc4c4f"
 energy-cost = 4
 rules-text = """
+Once per turn, when you materialize a character with cost $2 or less, draw a card.
+"""
+alternate-rules-text = """
 Once per turn, when you materialize a character with cost $2 or less, draw a card.
 """
 card-type = "Character"
@@ -542,38 +229,37 @@ rarity = "Rare"
 art-owned = true
 
 [[cards-2]]
-name = "Spirit Field Reclaimer"
-id = "7d1820ef-80c4-415e-bc36-7d361259225c"
-energy-cost = 2
-rules-text = """
-{activated} $1: This character gains +1 spark. You may banish a card from the enemy's void.
- """
-card-type = "Character"
-subtype = "Warrior"
+name = "Burst of Obliteration"
+id = "f841dd11-102c-42b2-b85a-492930189fbd"
+energy-cost = 3
+rules-text = "Dissolve an enemy character. This card's cost is equal to that character's spark."
+alternate-rules-text = "Pay 1 or more $: Dissolve each character with spark less than the amount of $ paid."
+card-type = "Event"
 is-fast = false
-spark = 0
-image-number = 2287054239
+image-number = 2299755789
 rarity = "Uncommon"
-art-owned = true
+art-owned = false
 
 [[cards-2]]
-name = "Twilight Suppressor"
-id = "4e3420f2-6f0d-4381-b2b1-afb16af7549f"
+name = "Shardwoven Tyrant"
+id = "b8bc35ae-4a4a-402e-a570-707bedceb5ce"
 energy-cost = 3
-rules-text = "{materialized}: Disable the activated abilities of a chosen enemy character while this character is in play."
+rules-text = "{multiActivated} Abandon another character: You may dissolve an enemy character with spark less than or equal to the abandoned character's spark."
+alternate-rules-text = "Abandon an ally: You may dissolve an enemy with spark less than that ally's spark."
 card-type = "Character"
-subtype = "Warrior"
+subtype = "Ancient"
 is-fast = false
-spark = 2
-image-number = 2293194529
-rarity = "Uncommon"
-art-owned = true
+spark = 1
+image-number = 1180104511
+rarity = "Rare"
+art-owned = false
 
 [[cards-2]]
 name = "Wheel the Heavens"
 id = "4950a8cd-85d5-402a-8a2d-efdd250764b7"
 energy-cost = 4
 rules-text = "Each player may shuffle their hand and void into their deck and then draw 4 cards."
+alternate-rules-text = "Each player may shuffle their hand and void into their deck and then draw 5 cards."
 card-type = "Event"
 is-fast = false
 image-number = 1480584617
@@ -581,104 +267,30 @@ rarity = "Rare"
 art-owned = false
 
 [[cards-2]]
-name = "Key to the Moment"
-id = "ff0bdb02-7d2b-448d-98e3-f360f39aafc3"
+name = "Ashlight Caller"
+id = "977ce2e4-ef8c-48e7-a27b-83a7348fa94f"
 energy-cost = 3
-rules-text = "Return all but one character you control to hand. Draw a card for each character returned."
-card-type = "Event"
-is-fast = false
-image-number = 1037215606
-rarity = "Uncommon"
-art-owned = false
-
-[[cards-2]]
-name = "Spiritbound Alpha"
-id = "86e31227-afab-4eb3-a53f-53e08c7ff227"
-energy-cost = 2
-rules-text = """
-{activated} $4: Each {cardtype: spirit animal} you control gains +2 spark until your next main phase.
-"""
-card-type = "Character"
-subtype = "Spirit Animal"
-is-fast = false
-spark = 1
-image-number = 1727859040
-rarity = "Uncommon"
-art-owned = false
-
-[[cards-2]]
-name = "Ashborn Necromancer"
-id = "5511b4b5-a7e3-48df-978d-c09673b39f42"
-energy-cost = 4
-rules-text = "{immediate} {multiActivated} Abandon another character: Put the top 2 cards of your deck into your void."
-card-type = "Character"
-subtype = "Outsider"
-is-fast = false
-spark = 2
-image-number = 2303852063
-rarity = "Common"
-art-owned = false
-
-[[cards-2]]
-name = "Architect of Memory"
-id = "2530adcc-5ae2-486a-94b2-f40dd62f3755"
-energy-cost = 2
-rules-text = "If you have 8 or more cards in your void, cards in your void have {reclaim}."
-card-type = "Character"
-subtype = "Synth"
-is-fast = false
-spark = 1
-image-number = 678431950
-rarity = "Rare"
-art-owned = false
-
-[[cards-2]]
-name = "Lurking Dread"
-id = "89d54c43-ffd6-4e0f-94ec-9e08f59e8891"
-energy-cost = 1
-rules-text = "Look at the enemy's hand. Choose a character from it. The enemy discards that card."
-card-type = "Event"
-is-fast = false
-image-number = 2030910791
-rarity = "Uncommon"
-art-owned = true
-
-[[cards-2]]
-name = "The Power Within"
-id = "be92ff6f-a468-4545-8ea2-cd8c3c53cb9a"
-energy-cost = 1
-rules-text = "Until end of turn, if you would draw cards, draw twice that many cards instead."
-card-type = "Event"
-is-fast = false
-image-number = 717263302
-rarity = "Uncommon"
-art-owned = false
-
-[[cards-2]]
-name = "Flickerveil Adept"
-id = "d8017d8f-7855-47e5-bfe5-89ca2e7c5203"
-energy-cost = 4
-rules-text = "{immediate} {activated}: Banish another character with spark 1 or less you control, then materialize it."
-card-type = "Character"
-subtype = "Mage"
-is-fast = false
-spark = 1
-image-number = 2285036623
-rarity = "Common"
-art-owned = false
-
-[[cards-2]]
-name = "Resilient Wanderer"
-id = "c85edc15-ff74-45d5-aed5-7ca488b6d100"
-energy-cost = 2
-rules-text = """
-$dissolved: You may pay $1 to return this character from your void to your hand.
-"""
+rules-text = "{materialized}: An event in your void gains {reclaim} until end of turn "
+alternate-rules-text = "{Materialized}: An event in your void gains {reclaim} equal to its cost this turn."
 card-type = "Character"
 subtype = "Survivor"
-is-fast = false
+is-fast = true
 spark = 1
-image-number = 1252796545
+image-number = 1044240499
+rarity = "Uncommon"
+art-owned = false
+
+[[cards-2]]
+name = "Starlight Guide"
+id = "3d9f38a4-6ae8-4e90-bc75-84d711b5fef9"
+energy-cost = 5
+rules-text = "{materialized}: You may banish another character you control, then materialize it."
+alternate-rules-text = "{Materialized}: You may banish another character you control, then materialize it."
+card-type = "Character"
+subtype = "Guide"
+is-fast = true
+spark = 1
+image-number = 2022594419
 rarity = "Uncommon"
 art-owned = false
 
@@ -689,6 +301,7 @@ energy-cost = 3
 rules-text = """
 {judgment}: You may pay $1 to return this character from your void to your hand.
 """
+alternate-rules-text = "{Judgment}: You may pay $1 to return this character from your void to your hand."
 card-type = "Character"
 subtype = "Survivor"
 is-fast = false
@@ -698,120 +311,11 @@ rarity = "Uncommon"
 art-owned = false
 
 [[cards-2]]
-name = "Grim Reclaimer"
-id = "61c9fa98-dda1-4f45-976e-b3fc89987b11"
-energy-cost = 2
-rules-text = "{activated} Abandon a character: You may return a {cardtype: warrior} from your void to play."
-card-type = "Character"
-subtype = "Outsider"
-is-fast = false
-spark = 1
-image-number = 1740270992
-rarity = "Uncommon"
-art-owned = false
-
-[[cards-2]]
-name = "The Rising God"
-id = "fb2661ee-387c-4a8f-965e-dd89be65cfe0"
-energy-cost = 9
-rules-text = """
-You may play this character from your void for $0 by abandoning 2 characters.
-"""
-card-type = "Character"
-subtype = "Ancient"
-is-fast = false
-spark = 6
-image-number = 2290648801
-rarity = "Uncommon"
-art-owned = true
-
-[[cards-2]]
-name = "Reunion"
-id = "ddde23e7-939c-4b0f-be6a-ecc1e38c92f0"
-energy-cost = 2
-rules-text = """
-You may return a character from your void to your hand. Draw a card.
-"""
-card-type = "Event"
-is-fast = false
-image-number = 2278837661
-rarity = "Common"
-art-owned = true
-
-[[cards-2]]
-name = "Torchbearer of the Abyss"
-id = "dfcf69cb-c569-484a-8a98-b673a5c47899"
-energy-cost = 4
-rules-text = "Once per turn, when you discard a card, gain $1 and then {kindle} 2 "
-card-type = "Character"
-subtype = "Visitor"
-is-fast = false
-spark = 3
-image-number = 695511787
-rarity = "Uncommon"
-art-owned = true
-
-[[cards-2]]
-name = "Infernal Rest"
-id = "d02cc851-4c89-463a-b988-a94dfefef797"
-energy-cost = 2
-rules-text = """
-Negate an enemy dream.
-
-You may play this event for $0 by abandoning a dreamscape."""
-card-type = "Event"
-is-fast = true
-image-number = 1164289078
-rarity = "Uncommon"
-art-owned = true
-
-[[cards-2]]
-name = "Echo Architect"
-id = "8fad0360-df91-4c08-8e48-298a07a4c3f3"
-energy-cost = 4
-rules-text = """
-Events cost you $2 more.
-
-Whenever you play an event from your hand, copy it."""
-card-type = "Character"
-subtype = "Tinkerer"
-is-fast = false
-spark = 2
-image-number = 2027158298
-rarity = "Uncommon"
-art-owned = false
-
-[[cards-2]]
-name = "Catalyst Ignition"
-id = "90a624db-d288-4856-afc9-f9222e67d3bd"
-energy-cost = 2
-rules-text = """
-Until end of turn, whenever you gain energy, gain twice that much energy instead.
-"""
-card-type = "Event"
-is-fast = false
-image-number = 1529898278
-rarity = "Uncommon"
-art-owned = false
-
-[[cards-2]]
-name = "Harvest the Forgotten"
-id = "540cd70f-4fc8-417b-ac0d-3b337bfe8f01"
-energy-cost = 1
-rules-text = """
-Put the top 3 cards of your deck into your void. Draw a card.
-"""
-card-type = "Event"
-is-fast = false
-image-number = 1739438660
-rarity = "Common"
-art-owned = false
-
-[[cards-2]]
 name = "Conduit of Resonance"
 id = "cb474c3f-1670-4e44-88d9-bef6475a4199"
 energy-cost = 5
 rules-text = "Whenever you materialize a character, trigger the '{judgment}' ability of each character you control."
+alternate-rules-text = "When you materialize a character, trigger the '{judgment}' ability of each ally."
 card-type = "Character"
 subtype = "Super"
 is-fast = false
@@ -821,19 +325,127 @@ rarity = "Rare"
 art-owned = false
 
 [[cards-2]]
-name = "Riftwalker"
-id = "e4b6ce4c-363e-4483-8246-a4b7ac368d17"
-energy-cost = 5
+name = "Silent Avenger"
+id = "36ca76ae-0202-495f-bf99-d0ce98da6352"
+energy-cost = 3
 rules-text = """
-{materialized}: You may banish another character until the start of your next main phase.
-"""
+$dissolved: {kindle} 2.
+
+Whenever another {cardtype: survivor} you control is dissolved, {kindle} 2."""
+alternate-rules-text = """
+{Dissolved}: {Kindle: 2}.
+
+When an allied {survivor} is dissolved, {kindle: 2}."""
 card-type = "Character"
-subtype = "Synth"
+subtype = "Survivor"
 is-fast = false
 spark = 2
-image-number = 1793552422
+image-number = 2025883229
+rarity = "Uncommon"
+art-owned = false
+
+[[cards-2]]
+name = "Blooming Path Wanderer"
+id = "dce8efc8-2643-47a4-ae13-4b9a7e4ba8bb"
+energy-cost = 3
+rules-text = """
+{judgment}: You may banish another character you control, then materialize it.
+"""
+alternate-rules-text = """
+{Judgment}: You may banish another character you control, then materialize it.
+"""
+card-type = "Character"
+subtype = "Explorer"
+is-fast = false
+spark = 1
+image-number = 1037215528
+rarity = "Uncommon"
+art-owned = false
+
+[[cards-2]]
+name = "Echoing Denial"
+id = "4666416e-5f12-47a3-9e7e-56943c0d6e44"
+energy-cost = 5
+rules-text = """
+Negate an enemy dream. 
+You may play this event for $0 by banishing a '$fast' card from your hand."""
+alternate-rules-text = """
+Banish a card from hand: Play this event for $0.
+
+Prevent a played enemy card."""
+card-type = "Event"
+is-fast = true
+image-number = 2258761881
+rarity = "Uncommon"
+art-owned = true
+
+[[cards-2]]
+name = "Searcher in the Mists"
+id = "560ad530-9ad9-452c-b80e-902d9a76af0c"
+energy-cost = 2
+rules-text = """
+{materialized}, $dissolved: Put the top 4 cards of your deck into your void.
+"""
+alternate-rules-text = """
+{Materialized}, {Dissolved}: Put the top 4 cards of your deck into your void.
+"""
+card-type = "Character"
+subtype = "Survivor"
+is-fast = false
+spark = 1
+image-number = 1971751580
+rarity = "Common"
+art-owned = false
+
+[[cards-2]]
+name = "Knowledge Restored"
+id = "ded25ef2-3c3f-4012-8717-8dec3def1854"
+energy-cost = 5
+rules-text = """
+Draw 3 cards.
+
+If you have 8 or more cards in your void, you may play this event for $0 by banishing all cards from your void."""
+alternate-rules-text = """
+Draw 3 cards.
+
+Banish your void with 8 or more cards: Play this event for $0."""
+card-type = "Event"
+is-fast = false
+image-number = 1786390157
+rarity = "Uncommon"
+art-owned = false
+
+[[cards-2]]
+name = "Wraith of Twisting Shadows"
+id = "f649bc96-1d35-4665-97d9-799208558ff3"
+energy-cost = 3
+rules-text = "{materialized}: Look at the enemy's hand. You may choose a card from it. The enemy discards that card and then draws a card."
+alternate-rules-text = "{Materialized}: Discard a chosen card from opponent's hand. They draw a card."
+card-type = "Character"
+subtype = "Outsider"
+is-fast = false
+spark = 2
+image-number = 2025883232
 rarity = "Rare"
 art-owned = false
+
+[[cards-2]]
+name = "Starsea Traveler"
+id = "f06932ac-6d8a-493f-b47e-9134676ea396"
+energy-cost = 4
+rules-text = """
+Once per turn, you may play a character with cost $2 or less from your void.
+"""
+alternate-rules-text = """
+Once per turn, you may play a character with cost $2 or less from your void.
+"""
+card-type = "Character"
+subtype = "Explorer"
+is-fast = false
+spark = 2
+image-number = 1084620233
+rarity = "Rare"
+art-owned = true
 
 [[cards-2]]
 name = "Seer of the Fallen"
@@ -843,6 +455,10 @@ rules-text = """
 $dissolved: Draw a card.
 
 Whenever another {cardtype: survivor} you control is dissolved, draw a card."""
+alternate-rules-text = """
+{Dissolved}: Draw a card.
+
+When an allied survivor is dissolved, draw a card."""
 card-type = "Character"
 subtype = "Survivor"
 is-fast = false
@@ -852,17 +468,215 @@ rarity = "Uncommon"
 art-owned = false
 
 [[cards-2]]
-name = "Soulkindler"
-id = "7d20f2bb-50b5-418a-a435-da13a13ad257"
-energy-cost = 2
+name = "Sunshadow Eagle"
+id = "b8b55ef4-2f79-4c62-b347-e91bea3a40bd"
+energy-cost = 3
 rules-text = """
-If this character is in your void, {cardtype: survivors} you control have +1 spark.
+Whenever you materialize another {cardtype: spirit animal}, that character gains +1 spark.
 """
+alternate-rules-text = """
+When you materialize another {spirit animal}, that character gains +1 spark.
+"""
+card-type = "Character"
+subtype = "Spirit Animal"
+is-fast = false
+spark = 1
+image-number = 2303852061
+rarity = "Common"
+art-owned = false
+
+[[cards-2]]
+name = "Ashen Remnant"
+id = "5ed8b4b4-abd4-410b-8c41-e94ac7609567"
+energy-cost = 2
+rules-text = "{immediate} {fastMultiActivated} Abandon another character: You may put a character from your void on top of your deck."
+alternate-rules-text = "Abandon an ally: You may put a character from your void on top of your deck."
 card-type = "Character"
 subtype = "Survivor"
 is-fast = false
 spark = 1
-image-number = 512756368
+image-number = 1639942843
+rarity = "Common"
+art-owned = false
+
+[[cards-2]]
+name = "Flagbearer of Decay"
+id = "9979e005-3a9e-4c98-ae7b-d8a25307c959"
+energy-cost = 2
+rules-text = "Whenever you play a {cardtype: survivor}, put the top 2 cards of your deck into your void."
+alternate-rules-text = "When you play a {survivor}, put the top 2 cards of your deck into your void."
+card-type = "Character"
+subtype = "Survivor"
+is-fast = false
+spark = 1
+image-number = 2197688373
+rarity = "Common"
+art-owned = false
+
+[[cards-2]]
+name = "Assault Leader"
+id = "7163d032-c2db-44c0-b9d4-624994a0e648"
+energy-cost = 3
+rules-text = """
+$fastActivated $2: Another character you control gains +1 spark until your next main phase for each {cardtype: warrior} you control.
+"""
+alternate-rules-text = "{Judgment}: You may pay $3 to give an ally +1 spark for each allied warior."
+card-type = "Character"
+subtype = "Warrior"
+is-fast = false
+spark = 2
+image-number = 1897537156
+rarity = "Uncommon"
+art-owned = true
+
+[[cards-2]]
+name = "Veil of the Wastes"
+id = "10ad7a9e-401d-494e-b4f3-5580b8d850d0"
+energy-cost = 3
+rules-text = "Once per turn, when you materialize a {cardtype: survivor}, you may return this character from your void to play."
+alternate-rules-text = "When you materialize a {survivor}, return this card from your void to play."
+card-type = "Character"
+subtype = "Survivor"
+is-fast = false
+spark = 1
+image-number = 789291004
+rarity = "Rare"
+art-owned = false
+
+[[cards-2]]
+name = "Voidshield Guardian"
+id = "fb285715-af52-4358-94de-b40256916f9b"
+energy-cost = 2
+rules-text = """
+$fastActivated: Another character you control gains {kw: aegis} this turn. 
+"""
+alternate-rules-text = "When opponent plays a card which would dissolve an ally, prevent that card."
+card-type = "Character"
+subtype = "Synth"
+is-fast = false
+spark = 1
+image-number = 2186149279
+rarity = "Uncommon"
+art-owned = true
+
+[[cards-2]]
+name = "Kindred Sparks"
+id = "d41a0c56-ca67-4626-90b6-c7fadeadfc4a"
+energy-cost = 5
+rules-text = """
+If you control a {cardtype: survivor}, this character costs $1.
+
+You may play this character from your void."""
+alternate-rules-text = "With an allied {suvivor}, you may play this from your hand or void for $1."
+card-type = "Character"
+subtype = "Survivor"
+is-fast = false
+spark = 2
+image-number = 2216124453
+rarity = "Common"
+art-owned = false
+
+[[cards-2]]
+name = "Spirit Field Reclaimer"
+id = "7d1820ef-80c4-415e-bc36-7d361259225c"
+energy-cost = 2
+rules-text = """
+{activated} $1: This character gains +1 spark. You may banish a card from the enemy's void.
+ """
+alternate-rules-text = "{Judgement}: Pay $1 to {kindle 1} and banish a card from the enemy's void."
+card-type = "Character"
+subtype = "Warrior"
+is-fast = false
+spark = 0
+image-number = 2287054239
+rarity = "Uncommon"
+art-owned = true
+
+[[cards-2]]
+name = "Catalyst Ignition"
+id = "90a624db-d288-4856-afc9-f9222e67d3bd"
+energy-cost = 2
+rules-text = """
+Until end of turn, whenever you gain energy, gain twice that much energy instead.
+"""
+alternate-rules-text = "Until end of turn, double the amount of $ you gain from from card effects."
+card-type = "Event"
+is-fast = false
+image-number = 1529898278
+rarity = "Uncommon"
+art-owned = false
+
+[[cards-2]]
+name = "Speaker for the Forgotten"
+id = "59f14f33-3aff-45d2-9492-fb06c0ef7fea"
+energy-cost = 5
+rules-text = "Whenever you play a {cardtype: warrior}, you may materialize a character with cost $3 or less from your void."
+alternate-rules-text = "When you play a warrior, reclaim a random character with cost $3 or less."
+card-type = "Character"
+subtype = "Mage"
+is-fast = false
+spark = 3
+image-number = 2278837663
+rarity = "Rare"
+art-owned = true
+
+[[cards-2]]
+name = "Reclaimer of Lost Paths"
+id = "0ad4ca5c-f723-4494-8dec-1e058c37a099"
+energy-cost = 4
+rules-text = "{materialized}: A card with cost $3 or less in your void gains {reclaim} $0 until end of turn."
+alternate-rules-text = "{Materialized}: Give a card with cost $3 or less in your void Reclaim $0."
+card-type = "Character"
+subtype = "Survivor"
+is-fast = false
+spark = 1
+image-number = 2287436067
+rarity = "Uncommon"
+art-owned = false
+
+[[cards-2]]
+name = "Twilight Reclaimer"
+id = "fb3029e1-7f43-4284-bcdd-11dfe6711f96"
+energy-cost = 1
+rules-text = "$dissolved: A {cardtype: survivor} with cost $3 or less in your void gains {reclaim} until end of turn."
+alternate-rules-text = "{Dissolved}: Another {survivor} in your void gains {reclaim ↯} this turn."
+card-type = "Character"
+subtype = "Survivor"
+is-fast = false
+spark = 1
+image-number = 1104412604
+rarity = "Rare"
+art-owned = false
+
+[[cards-2]]
+name = "The Power Within"
+id = "be92ff6f-a468-4545-8ea2-cd8c3c53cb9a"
+energy-cost = 1
+rules-text = "Until end of turn, if you would draw cards, draw twice that many cards instead."
+alternate-rules-text = "Until end of turn, double the number of cards you draw from card effects."
+card-type = "Event"
+is-fast = false
+image-number = 717263302
+rarity = "Uncommon"
+art-owned = false
+
+[[cards-2]]
+name = "Echo Architect"
+id = "8fad0360-df91-4c08-8e48-298a07a4c3f3"
+energy-cost = 4
+rules-text = """
+Events cost you $2 more.
+
+Whenever you play an event from your hand, copy it."""
+alternate-rules-text = """
+Events cost you $2 more.
+
+When you play an event from your hand, copy it."""
+card-type = "Character"
+subtype = "Tinkerer"
+is-fast = false
+spark = 2
+image-number = 2027158298
 rarity = "Uncommon"
 art-owned = false
 
@@ -873,6 +687,7 @@ energy-cost = 2
 rules-text = """
 {activated} Discard a card: Dissolve an enemy character with spark 1 or less.
 """
+alternate-rules-text = "Exhaust, discard a card: You may dissolve an enemy with spark 1 or less."
 card-type = "Character"
 subtype = "Survivor"
 is-fast = false
@@ -882,34 +697,30 @@ rarity = "Rare"
 art-owned = true
 
 [[cards-2]]
-name = "Abomination of Memory"
-id = "86e7ff73-90bf-4e3d-9069-d6533f4407b8"
-energy-cost = 5
-rules-text = """
-This character's spark is equal to the number of cards in your void.
-"""
+name = "Ashmaze Guide"
+id = "33d83d81-0d4e-40ab-aaeb-daa820ffbde3"
+energy-cost = 3
+rules-text = "Whenever you discard a card, it gains {reclaim} until end of turn "
+alternate-rules-text = "When you discard a card, it gains {reclaim} equal to its cost this turn."
 card-type = "Character"
-subtype = "Ancient"
+subtype = "Explorer"
 is-fast = false
-spark = "*"
-image-number = 1577968036
-rarity = "Uncommon"
+spark = 1
+image-number = 1185684772
+rarity = "Rare"
 art-owned = true
 
 [[cards-2]]
-name = "Dreadcall Warden"
-id = "eb84ba88-8352-45e8-8cf9-d160227db3ad"
+name = "Weight of Memory"
+id = "6897e6d5-2ab6-4faa-a221-dfa5ffe0a0a7"
 energy-cost = 2
-rules-text = """
-{multiActivated} $2, Abandon another character with spark 1 or less: Draw 2 cards.
-"""
-card-type = "Character"
-subtype = "Warrior"
+rules-text = "Dissolve an enemy character with cost less than or equal to the number of cards in your void."
+alternate-rules-text = "Dissolve an enemy with cost less than the number of cards in your void."
+card-type = "Event"
 is-fast = false
-spark = 1
-image-number = 2521694547
-rarity = "Rare"
-art-owned = true
+image-number = 2018053223
+rarity = "Uncommon"
+art-owned = false
 
 [[cards-2]]
 name = "Blade of Unity"
@@ -917,6 +728,9 @@ id = "6d7c5ef9-14ed-4301-8aa5-a07944d1918f"
 energy-cost = 4
 rules-text = """
 This character's spark is equal to the number of {cardtype: warriors} you control.
+"""
+alternate-rules-text = """
+This character's spark is equal to the number of warriors you control.
 """
 card-type = "Character"
 subtype = "Warrior"
@@ -927,23 +741,340 @@ rarity = "Common"
 art-owned = true
 
 [[cards-2]]
-name = "Ripple Through Reality"
-id = "44701519-e4f1-431e-bb7d-5e76ae75fe35"
-energy-cost = 1
-rules-text = "Negate an enemy dream. Put that card on top of the enemy's deck."
-card-type = "Event"
+name = "Company Commander"
+id = "5dd8c16c-e8ed-4591-83c1-bdd610bed5a2"
+energy-cost = 2
+rules-text = """
+Whenever you materialize another {cardtype: warrior}, this character gains +1 spark.
+"""
+alternate-rules-text = """
+When you materialize another {warrior}, this character gains +1 spark.
+"""
+card-type = "Character"
+subtype = "Warrior"
 is-fast = false
-image-number = 1058321690
+spark = 0
+image-number = 1798382140
+rarity = "Common"
+art-owned = true
+
+[[cards-2]]
+name = "Dimensional Pathfinder"
+id = "6e7c552f-23b5-431a-9d50-f7706e27166a"
+energy-cost = 3
+rules-text = """
+{activated} $3: Banish up to two other characters you control, then materialize them.
+"""
+alternate-rules-text = "{Judgment}: Pay $3 to banish one or two allies, then materialize them."
+card-type = "Character"
+subtype = "Explorer"
+is-fast = false
+spark = 2
+image-number = 712713373
 rarity = "Uncommon"
 art-owned = false
+
+[[cards-2]]
+name = "Blazing Emberwing"
+id = "5ed4d321-07d9-4607-9897-3a645df8c012"
+energy-cost = 3
+rules-text = "The '{judgment}' ability of characters you contol triggers when you materialize them."
+alternate-rules-text = "The '{judgment}' ability of allies triggers when you materialize them."
+card-type = "Character"
+subtype = "Spirit Animal"
+is-fast = false
+spark = 2
+image-number = 2123360855
+rarity = "Rare"
+art-owned = false
+
+[[cards-2]]
+name = "Light of Emergence"
+id = "3f98591f-5ede-4add-9df6-536e39780ec3"
+energy-cost = 5
+rules-text = """
+Materialize two random characters with cost $3 or less from your deck.
+"""
+alternate-rules-text = "Materialize two random characters with cost $3 or less from your deck."
+card-type = "Event"
+is-fast = false
+image-number = 618071684
+rarity = "Rare"
+art-owned = false
+
+[[cards-2]]
+name = "Seeker of the Radiant Wilds"
+id = "0dc21b19-b21b-4905-9a9a-113db544e587"
+energy-cost = 2
+rules-text = "{materialized}: Draw a card for each {cardtype: spirit animal} you control."
+alternate-rules-text = "{Materialized}: Draw a card for each allied {cardtype: spirit animal}."
+card-type = "Character"
+subtype = "Visitor"
+is-fast = false
+spark = 1
+image-number = 2022594416
+rarity = "Uncommon"
+art-owned = false
+
+[[cards-2]]
+name = "Unleashed Destruction"
+id = "24388863-1b0b-477d-aa06-faf33cba6176"
+energy-cost = 2
+rules-text = """
+Dissolve an enemy character with cost $2 or less.
+
+You may play this event from your void for $0 by abandoning a character."""
+alternate-rules-text = """
+Dissolve an enemy with cost $2 or less.
+
+Reclaim -- Abandon an ally. """
+card-type = "Event"
+is-fast = false
+image-number = 2155438695
+rarity = "Rare"
+art-owned = false
+
+[[cards-2]]
+name = "Reunion"
+id = "ddde23e7-939c-4b0f-be6a-ecc1e38c92f0"
+energy-cost = 2
+rules-text = """
+You may return a character from your void to your hand. Draw a card.
+"""
+alternate-rules-text = """
+You may return a character from your void to your hand. Draw a card.
+"""
+card-type = "Event"
+is-fast = false
+image-number = 2278837661
+rarity = "Common"
+art-owned = true
+
+[[cards-2]]
+name = "Key to the Moment"
+id = "ff0bdb02-7d2b-448d-98e3-f360f39aafc3"
+energy-cost = 3
+rules-text = "Return all but one character you control to hand. Draw a card for each character returned."
+alternate-rules-text = "Return all but one ally to hand. Draw a card for each ally returned."
+card-type = "Event"
+is-fast = false
+image-number = 1037215606
+rarity = "Uncommon"
+art-owned = false
+
+[[cards-2]]
+name = "Fell the Mighty"
+id = "ff10c460-125f-4f77-b9e2-4c4f33adff3e"
+energy-cost = 4
+rules-text = """
+Dissolve an enemy character. 
+You may play this event for $0 by banishing a '$fast' card from your hand."""
+alternate-rules-text = """
+Banish a card from hand: Play this event for $0.
+
+Dissolve an enemy."""
+card-type = "Event"
+is-fast = true
+image-number = 2027158295
+rarity = "Uncommon"
+art-owned = true
+
+[[cards-2]]
+name = "Secrets of the Deep"
+id = "958b9c00-bdbf-4bad-974e-baf57357c3a5"
+energy-cost = 0
+rules-text = "Spend all your remaining energy. Draw a card for each energy spent this way, then discard that many cards."
+alternate-rules-text = "Pay 1 or more $: Draw a card for each $ spent, then discard 2 cards."
+card-type = "Event"
+is-fast = true
+image-number = 2131591273
+rarity = "Common"
+art-owned = false
+
+[[cards-2]]
+name = "Fury of the Clan"
+id = "cd3d7b81-de72-4668-b505-e09848a477be"
+energy-cost = 1
+rules-text = "Dissolve an enemy character with cost less than or equal to the number of {cardtype: warriors} you control."
+alternate-rules-text = "Dissolve an enemy with cost less than the number of allied warriors."
+card-type = "Event"
+is-fast = false
+image-number = 2303852059
+rarity = "Common"
+art-owned = true
+
+[[cards-2]]
+name = "Abomination of Memory"
+id = "86e7ff73-90bf-4e3d-9069-d6533f4407b8"
+energy-cost = 5
+rules-text = """
+This character's spark is equal to the number of cards in your void.
+"""
+alternate-rules-text = "This character's spark is equal to the number of cards in your void."
+card-type = "Character"
+subtype = "Ancient"
+is-fast = false
+spark = "*"
+image-number = 1577968036
+rarity = "Uncommon"
+art-owned = true
+
+[[cards-2]]
+name = "Path to Redemption"
+id = "16853a85-1211-462e-9ca4-8a0ba0890657"
+energy-cost = 6
+rules-text = """
+Until end of turn, all cards in your void have {reclaim}.
+"""
+alternate-rules-text = "All cards in your void gain {reclaim} equal to their cost this turn."
+card-type = "Event"
+is-fast = false
+image-number = 1005938023
+rarity = "Rare"
+art-owned = false
+
+[[cards-2]]
+name = "The Ringleader"
+id = "afee62e2-7768-47d5-87bd-eaea08400fad"
+energy-cost = 6
+rules-text = """
+{materialized}: Copy the next event you play this turn three times.
+"""
+alternate-rules-text = """
+{Materialized}: Copy the next event you play this turn three times.
+"""
+card-type = "Character"
+subtype = "Outsider"
+is-fast = false
+spark = 3
+image-number = 1005938035
+rarity = "Rare"
+art-owned = false
+
+[[cards-2]]
+name = "Aurora Rider"
+id = "c4766fc9-9d67-49b6-89d1-e457aa9a415d"
+energy-cost = 6
+rules-text = "{materialized}: Banish any number of other characters you control, then materialize them."
+alternate-rules-text = "{materialized}: Banish any number of allies, then materialize them."
+card-type = "Character"
+subtype = "Ancient"
+is-fast = false
+spark = 3
+image-number = 2256745747
+rarity = "Rare"
+art-owned = false
+
+[[cards-2]]
+name = "Hope's Vanguard"
+id = "c08ffd90-ef79-48f7-9aa2-22875acbeba4"
+energy-cost = 2
+rules-text = """
+{materialized}, {judgment}: If you control 2 other {cardtype: survivors} draw a card.
+"""
+alternate-rules-text = "{Materialized}, {Judgment}: With 2 allied {survivors}, draw a card."
+card-type = "Character"
+subtype = "Survivor"
+is-fast = false
+spark = 1
+image-number = 2123360834
+rarity = "Common"
+art-owned = false
+
+[[cards-2]]
+name = "Pyrokinetic Surge"
+id = "f83a0657-f55a-4ee6-8630-c2ca2d8429ac"
+energy-cost = 1
+rules-text = """
+Abandon a character or discard a card. Dissolve an enemy character.
+"""
+alternate-rules-text = "Abandon a character or discard a card: Dissolve an enemy character."
+card-type = "Event"
+is-fast = true
+image-number = 2023111787
+rarity = "Uncommon"
+art-owned = false
+
+[[cards-2]]
+name = "Resilient Wanderer"
+id = "c85edc15-ff74-45d5-aed5-7ca488b6d100"
+energy-cost = 2
+rules-text = """
+$dissolved: You may pay $1 to return this character from your void to your hand.
+"""
+alternate-rules-text = "{Dissolved}: You may pay $1 to return this character to your hand."
+card-type = "Character"
+subtype = "Survivor"
+is-fast = false
+spark = 1
+image-number = 1252796545
+rarity = "Uncommon"
+art-owned = false
+
+[[cards-2]]
+name = "Desperation"
+id = "39bbbc92-34d0-4699-8ac6-99805a1248fb"
+energy-cost = 2
+rules-text = "Abandon any number of characters. Draw a card for each character abandoned."
+alternate-rules-text = "Abandon any number of allies. Draw a card for each ally abandoned."
+card-type = "Event"
+is-fast = false
+image-number = 1470059006
+rarity = "Common"
+art-owned = false
+
+[[cards-2]]
+name = "Eternal Sentry"
+id = "511e8751-95d0-4d09-9f60-48fa53f14a13"
+energy-cost = 4
+rules-text = "If you have drawn 2 or more cards this turn, you may play this character from your void for $1."
+alternate-rules-text = "When you draw 2 cards in a turn, this character gains reclaim $1."
+card-type = "Character"
+subtype = "Survivor"
+is-fast = true
+spark = 2
+image-number = 1725212353
+rarity = "Uncommon"
+art-owned = false
+
+[[cards-2]]
+name = "Ashborn Necromancer"
+id = "5511b4b5-a7e3-48df-978d-c09673b39f42"
+energy-cost = 4
+rules-text = "{immediate} {multiActivated} Abandon another character: Put the top 2 cards of your deck into your void."
+alternate-rules-text = "Abandon an ally: Put the top 2 cards of your deck into your void."
+card-type = "Character"
+subtype = "Outsider"
+is-fast = false
+spark = 2
+image-number = 2303852063
+rarity = "Common"
+art-owned = false
+
+[[cards-2]]
+name = "Infernal Rest"
+id = "d02cc851-4c89-463a-b988-a94dfefef797"
+energy-cost = 2
+rules-text = """
+Negate an enemy dream.
+
+You may play this event for $0 by abandoning a dreamscape."""
+alternate-rules-text = """
+Lose 1 maximum $: Play this event for $0.
+
+Prevent a played card."""
+card-type = "Event"
+is-fast = true
+image-number = 1164289078
+rarity = "Uncommon"
+art-owned = true
 
 [[cards-2]]
 name = "Spirit of Smoldering Echoes"
 id = "fe13ba87-8935-4740-b762-23c8ccd89ff9"
 energy-cost = 4
-rules-text = """
-This character's spark is equal to the number of events in your void.
-"""
+rules-text = "This character's spark is equal to the number of events in your void."
+alternate-rules-text = "When an event is put in your void, this character gains +1 spark."
 card-type = "Character"
 subtype = "Ancient"
 is-fast = false
@@ -953,15 +1084,216 @@ rarity = "Uncommon"
 art-owned = false
 
 [[cards-2]]
-name = "Mystic Runefish"
-id = "83fc9336-c5a4-4a6e-bf90-be84f3535d34"
+name = "Break the Veil"
+id = "129bd326-ec4d-4da6-aff6-f1c2b78f10e4"
 energy-cost = 1
-rules-text = "{activated} $3: The spark of each {cardtype: spirit animal} you control becomes 5."
+rules-text = "Look at the enemy's hand. Choose a card with cost $3 or less from it. The enemy discards that card."
+alternate-rules-text = "Discard a chosen card with cost $3 or less from opponent's hand."
+card-type = "Event"
+is-fast = false
+image-number = 2221518875
+rarity = "Uncommon"
+art-owned = true
+
+[[cards-2]]
+name = "Dustborn Veteran"
+id = "dce9ebda-da62-4304-a4e9-21170c98e2a6"
+energy-cost = 3
+rules-text = "If a character you controlled dissolved this turn, you may play this character from your void for $1"
+alternate-rules-text = "When an ally is dissolved, this card gains reclaim $1 this turn."
+card-type = "Character"
+subtype = "Survivor"
+is-fast = false
+spark = 1
+image-number = 2258761883
+rarity = "Uncommon"
+art-owned = false
+
+[[cards-2]]
+name = "Spiritbound Alpha"
+id = "86e31227-afab-4eb3-a53f-53e08c7ff227"
+energy-cost = 2
+rules-text = """
+{activated} $4: Each {cardtype: spirit animal} you control gains +2 spark until your next main phase.
+"""
+alternate-rules-text = "{Judgment}: Pay $4 to give each allied {spirit animal} +2 spark."
 card-type = "Character"
 subtype = "Spirit Animal"
 is-fast = false
 spark = 1
-image-number = 726444853
+image-number = 1727859040
+rarity = "Uncommon"
+art-owned = false
+
+[[cards-2]]
+name = "Soulkindler"
+id = "7d20f2bb-50b5-418a-a435-da13a13ad257"
+energy-cost = 2
+rules-text = """
+If this character is in your void, {cardtype: survivors} you control have +1 spark.
+"""
+alternate-rules-text = "While this card is in your void, allied survivors have +2 spark."
+card-type = "Character"
+subtype = "Survivor"
+is-fast = false
+spark = 1
+image-number = 512756368
+rarity = "Uncommon"
+art-owned = false
+
+[[cards-2]]
+name = "Forgotten Titan"
+id = "8fb2e9d0-28e5-4253-a61c-59f7d4044d59"
+energy-cost = 5
+rules-text = "If you have discarded a card this turn, this character costs $1."
+alternate-rules-text = "If you have discarded a card this turn, this character costs $1."
+card-type = "Character"
+subtype = "Ancient"
+is-fast = false
+spark = 3
+image-number = 2424248089
+rarity = "Common"
+art-owned = true
+
+[[cards-2]]
+name = "Surge of Fury"
+id = "ab07f1aa-ca7a-4716-988e-281ab871baf4"
+energy-cost = 1
+rules-text = 'At the end of this turn, trigger an additional "judgment" phase.'
+alternate-rules-text = 'At the end of this turn, trigger an additional "judgment" phase.'
+card-type = "Event"
+is-fast = false
+image-number = 1968259702
+rarity = "Uncommon"
+art-owned = false
+
+[[cards-2]]
+name = "Torchbearer of the Abyss"
+id = "dfcf69cb-c569-484a-8a98-b673a5c47899"
+energy-cost = 4
+rules-text = "Once per turn, when you discard a card, gain $1 and then {kindle} 2 "
+alternate-rules-text = "Once per turn, when you discard a card, gain $1 and {kindle} 2."
+card-type = "Character"
+subtype = "Visitor"
+is-fast = false
+spark = 3
+image-number = 695511787
+rarity = "Uncommon"
+art-owned = true
+
+[[cards-2]]
+name = "Wolfbond Chieftain"
+id = "a5275ef5-2896-4a0a-89de-96b241e05472"
+energy-cost = 0
+rules-text = """
+{materialized}, {judgment}: If you control 2 other {cardtype: warriors}, gain $1.
+"""
+alternate-rules-text = """
+{Materialized}, {Judgment}: With 2 allied {warriors}, gain $1.
+"""
+card-type = "Character"
+subtype = "Warrior"
+is-fast = false
+spark = 0
+image-number = 2216124451
+rarity = "Common"
+art-owned = true
+
+[[cards-2]]
+name = "The Devourer"
+id = "99720e39-6bad-4c6c-867c-7bc5c326195e"
+energy-cost = 8
+rules-text = "If you have 8 or more cards in your void, you may play this character from your void for $0 by banishing all other cards from your void."
+alternate-rules-text = "Banish your void with 8 or more cards: Reclaim this character."
+card-type = "Character"
+subtype = "Ancient"
+is-fast = false
+spark = 8
+image-number = 700254508
+rarity = "Rare"
+art-owned = true
+
+[[cards-2]]
+name = "Harvest the Forgotten"
+id = "540cd70f-4fc8-417b-ac0d-3b337bfe8f01"
+energy-cost = 1
+rules-text = """
+Put the top 3 cards of your deck into your void. Draw a card.
+"""
+alternate-rules-text = """
+Put the top 3 cards of your deck into your void. Draw a card.
+"""
+card-type = "Event"
+is-fast = false
+image-number = 1739438660
+rarity = "Common"
+art-owned = false
+
+[[cards-2]]
+name = "Cosmic Puppeteer"
+id = "e4aff892-1a6d-40b7-901d-1d57a9a21807"
+energy-cost = 5
+rules-text = "{materialized}: Gain control of an enemy character with cost $2 or less."
+alternate-rules-text = "{Materialized}: Gain control of an enemy with cost $2 or less."
+card-type = "Character"
+subtype = "Ancient"
+is-fast = true
+spark = 2
+image-number = 316023560
+rarity = "Rare"
+art-owned = false
+
+[[cards-2]]
+name = "Celestial Reverie"
+id = "85eaf1ac-bcb4-4266-84be-844965bce25d"
+energy-cost = 1
+rules-text = "Until end of turn, whenever you play a character, draw a card."
+alternate-rules-text = "Until end of turn, whenever you play a character, draw a card."
+card-type = "Event"
+is-fast = false
+image-number = 2293194521
+rarity = "Uncommon"
+art-owned = false
+
+[[cards-2]]
+name = "Prophet of the Consumed"
+id = "b0ee552a-3a4f-434f-903d-165ebfe3d072"
+energy-cost = 3
+rules-text = "{materialized}: Draw a card for each character you abandoned this turn."
+alternate-rules-text = "{Materialized}: Draw a card for each abandoned ally this turn."
+card-type = "Character"
+subtype = "Synth"
+is-fast = false
+spark = 1
+image-number = 1991802452
+rarity = "Uncommon"
+art-owned = false
+
+[[cards-2]]
+name = "Ashen Avenger"
+id = "b9b26dbb-0384-4839-bff2-3b25c4c26518"
+energy-cost = 3
+rules-text = """
+You may play this character from your void for $2 by banishing another card in your void.
+"""
+alternate-rules-text = "$2, Banish another card in your void: Reclaim this character."
+card-type = "Character"
+subtype = "Warrior"
+is-fast = false
+spark = 1
+image-number = 1798514896
+rarity = "Common"
+art-owned = true
+
+[[cards-2]]
+name = "Ripple Through Reality"
+id = "44701519-e4f1-431e-bb7d-5e76ae75fe35"
+energy-cost = 1
+rules-text = "Negate an enemy dream. Put that card on top of the enemy's deck."
+alternate-rules-text = "Prevent a played card. Put it on top of the opponent's deck."
+card-type = "Event"
+is-fast = false
+image-number = 1058321690
 rarity = "Uncommon"
 art-owned = false
 
@@ -973,6 +1305,10 @@ rules-text = """
 Banish a character you control, then materialize it at end of turn.
 
 {reclaim} $1"""
+alternate-rules-text = """
+Banish an ally. Materialize it at end of turn.
+
+{Reclaim: 1}"""
 card-type = "Event"
 is-fast = false
 image-number = 2212744813
@@ -980,40 +1316,19 @@ rarity = "Common"
 art-owned = false
 
 [[cards-2]]
-name = "Burst of Obliteration"
-id = "f841dd11-102c-42b2-b85a-492930189fbd"
-energy-cost = "✲"
-rules-text = "Dissolve an enemy character. This card's cost is equal to that character's spark."
-card-type = "Event"
-is-fast = false
-image-number = 2299755789
-rarity = "Uncommon"
-art-owned = false
-
-[[cards-2]]
-name = "Dimensional Pathfinder"
-id = "6e7c552f-23b5-431a-9d50-f7706e27166a"
-energy-cost = 3
+name = "Riftwalker"
+id = "e4b6ce4c-363e-4483-8246-a4b7ac368d17"
+energy-cost = 5
 rules-text = """
-{activated} $3: Banish up to two other characters you control, then materialize them.
+{materialized}: You may banish another character until the start of your next main phase.
 """
+alternate-rules-text = "{Materialized}: Banish an enemy until your next main phase."
 card-type = "Character"
-subtype = "Explorer"
+subtype = "Synth"
 is-fast = false
 spark = 2
-image-number = 712713373
-rarity = "Uncommon"
-art-owned = false
-
-[[cards-2]]
-name = "Starlit Cascade"
-id = "5de09339-b7de-45bd-abc0-1ab3a09e859d"
-energy-cost = 1
-rules-text = "Until end of turn, whenever a character you control leaves play, gain $2."
-card-type = "Event"
-is-fast = false
-image-number = 1798382143
-rarity = "Common"
+image-number = 1793552422
+rarity = "Rare"
 art-owned = false
 
 [[cards-2]]
@@ -1023,6 +1338,7 @@ energy-cost = 1
 rules-text = """
 {activated}: You may banish a card from the enemy's void to gain $1.
 """
+alternate-rules-text = "{Judgment}: Banish a card from the enemy's void to gain $1."
 card-type = "Character"
 subtype = "Survivor"
 is-fast = false
@@ -1032,68 +1348,13 @@ rarity = "Uncommon"
 art-owned = false
 
 [[cards-2]]
-name = "Searcher in the Mists"
-id = "560ad530-9ad9-452c-b80e-902d9a76af0c"
-energy-cost = 2
-rules-text = """
-{materialized}, $dissolved: Put the top 4 cards of your deck into your void.
-"""
-card-type = "Character"
-subtype = "Survivor"
-is-fast = false
-spark = 1
-image-number = 1971751580
-rarity = "Common"
-art-owned = false
-
-[[cards-2]]
-name = "Endless Projection"
-id = "3ab4dd0d-28c6-42e7-ab47-691781d458c5"
-energy-cost = 4
-rules-text = """
-Whenever you play a character, materialize a {kw: silent} copy of this character.
-"""
-card-type = "Character"
-subtype = "Visitor"
-is-fast = false
-spark = 1
-image-number = 2131591279
-rarity = "Uncommon"
-art-owned = false
-
-[[cards-2]]
-name = "Ashmaze Guide"
-id = "33d83d81-0d4e-40ab-aaeb-daa820ffbde3"
-energy-cost = 3
-rules-text = "Whenever you discard a card, it gains {reclaim} until end of turn "
-card-type = "Character"
-subtype = "Explorer"
-is-fast = false
-spark = 1
-image-number = 1185684772
-rarity = "Rare"
-art-owned = true
-
-[[cards-2]]
-name = "Forgotten Titan"
-id = "8fb2e9d0-28e5-4253-a61c-59f7d4044d59"
-energy-cost = 5
-rules-text = "If you have discarded a card this turn, this character costs $1."
-card-type = "Character"
-subtype = "Ancient"
-is-fast = false
-spark = 3
-image-number = 2424248089
-rarity = "Common"
-art-owned = true
-
-[[cards-2]]
 name = "Invoker of Myths"
 id = "e3b7d716-2776-4469-af9c-4dc082e0083c"
 energy-cost = 4
 rules-text = """
 Once per turn, when you materialize a {cardtype: warrior}, draw a card.
 """
+alternate-rules-text = "Once per turn, when you materialize a warrior, draw a card."
 card-type = "Character"
 subtype = "Mage"
 is-fast = false
@@ -1103,233 +1364,27 @@ rarity = "Uncommon"
 art-owned = true
 
 [[cards-2]]
-name = "Cosmic Puppeteer"
-id = "e4aff892-1a6d-40b7-901d-1d57a9a21807"
-energy-cost = 5
-rules-text = "{materialized}: Gain control of an enemy character with cost $2 or less."
-card-type = "Character"
-subtype = "Ancient"
-is-fast = true
-spark = 2
-image-number = 316023560
-rarity = "Rare"
-art-owned = false
-
-[[cards-2]]
-name = "Sage of the Prelude"
-id = "ef6c27d3-e55f-4107-b2fd-69ad00994351"
-energy-cost = 2
-rules-text = "Once per turn, when you play a '$fast' dream, draw a card."
-card-type = "Character"
-subtype = "Musician"
-is-fast = true
-spark = 1
-image-number = 1084620026
-rarity = "Common"
-art-owned = false
-
-[[cards-2]]
-name = "Ashlight Caller"
-id = "977ce2e4-ef8c-48e7-a27b-83a7348fa94f"
-energy-cost = 3
-rules-text = "{materialized}: An event in your void gains {reclaim} until end of turn "
-card-type = "Character"
-subtype = "Survivor"
-is-fast = true
-spark = 1
-image-number = 1044240499
-rarity = "Uncommon"
-art-owned = false
-
-[[cards-2]]
-name = "Whisper of the Past"
-id = "35cc788c-b7f1-46ae-b398-7ad37a624247"
-energy-cost = 3
-rules-text = """
-An event in your void gains {reclaim} $0 until end of turn.
-"""
-card-type = "Event"
-is-fast = false
-image-number = 2186149269
-rarity = "Common"
-art-owned = false
-
-[[cards-2]]
-name = "Celestial Reverie"
-id = "85eaf1ac-bcb4-4266-84be-844965bce25d"
-energy-cost = 1
-rules-text = "Until end of turn, whenever you play a character, draw a card."
-card-type = "Event"
-is-fast = false
-image-number = 2293194521
-rarity = "Uncommon"
-art-owned = false
-
-[[cards-2]]
-name = "Blazing Emberwing"
-id = "5ed4d321-07d9-4607-9897-3a645df8c012"
-energy-cost = 3
-rules-text = "The '{judgment}' ability of characters you contol triggers when you materialize them."
-card-type = "Character"
-subtype = "Spirit Animal"
-is-fast = false
-spark = 2
-image-number = 2123360855
-rarity = "Rare"
-art-owned = false
-
-[[cards-2]]
-name = "Sunshadow Eagle"
-id = "b8b55ef4-2f79-4c62-b347-e91bea3a40bd"
-energy-cost = 3
-rules-text = """
-Whenever you materialize another {cardtype: spirit animal}, that character gains +1 spark.
-"""
-card-type = "Character"
-subtype = "Spirit Animal"
-is-fast = false
-spark = 1
-image-number = 2303852061
-rarity = "Common"
-art-owned = false
-
-[[cards-2]]
-name = "Aurora Rider"
-id = "c4766fc9-9d67-49b6-89d1-e457aa9a415d"
-energy-cost = 6
-rules-text = """
-{materialized}: Banish any number of other characters you control, then materialize them.
-"""
-card-type = "Character"
-subtype = "Ancient"
-is-fast = false
-spark = 3
-image-number = 2256745747
-rarity = "Rare"
-art-owned = false
-
-[[cards-2]]
-name = "Tideborne Voyager"
-id = "522368e5-38cc-480c-930a-f8e1bc5a1f68"
+name = "Endless Projection"
+id = "3ab4dd0d-28c6-42e7-ab47-691781d458c5"
 energy-cost = 4
 rules-text = """
-Whenever a character you control is banished, this character gains +1 spark.
+Whenever you play a character, materialize a {kw: silent} copy of this character.
 """
+alternate-rules-text = "When you play a character, materialize a Halcyon Figment."
 card-type = "Character"
-subtype = "Explorer"
-is-fast = false
-spark = 0
-image-number = 753489193
-rarity = "Uncommon"
-art-owned = false
-
-[[cards-2]]
-name = "Light of Emergence"
-id = "3f98591f-5ede-4add-9df6-536e39780ec3"
-energy-cost = 5
-rules-text = """
-Materialize two random characters with cost $3 or less from your deck.
-"""
-card-type = "Event"
-is-fast = false
-image-number = 618071684
-rarity = "Rare"
-art-owned = false
-
-[[cards-2]]
-name = "Hope's Vanguard"
-id = "c08ffd90-ef79-48f7-9aa2-22875acbeba4"
-energy-cost = 2
-rules-text = """
-{materialized}, {judgment}: If you control 2 other {cardtype: survivors} draw a card.
-"""
-card-type = "Character"
-subtype = "Survivor"
+subtype = "Visitor"
 is-fast = false
 spark = 1
-image-number = 2123360834
-rarity = "Common"
-art-owned = false
-
-[[cards-2]]
-name = "Silent Avenger"
-id = "36ca76ae-0202-495f-bf99-d0ce98da6352"
-energy-cost = 3
-rules-text = """
-$dissolved: {kindle} 2.
-
-Whenever another {cardtype: survivor} you control is dissolved, {kindle} 2."""
-card-type = "Character"
-subtype = "Survivor"
-is-fast = false
-spark = 2
-image-number = 2025883229
+image-number = 2131591279
 rarity = "Uncommon"
 art-owned = false
-
-[[cards-2]]
-name = "Desperation"
-id = "39bbbc92-34d0-4699-8ac6-99805a1248fb"
-energy-cost = 2
-rules-text = """
-Abandon any number of characters. Draw a card for each character abandoned.
-"""
-card-type = "Event"
-is-fast = false
-image-number = 1470059006
-rarity = "Common"
-art-owned = false
-
-[[cards-2]]
-name = "Voidshield Guardian"
-id = "fb285715-af52-4358-94de-b40256916f9b"
-energy-cost = 2
-rules-text = """
-$fastActivated: Another character you control gains {kw: aegis} this turn. 
-"""
-card-type = "Character"
-subtype = "Synth"
-is-fast = false
-spark = 1
-image-number = 2186149279
-rarity = "Uncommon"
-art-owned = true
-
-[[cards-2]]
-name = "Company Commander"
-id = "5dd8c16c-e8ed-4591-83c1-bdd610bed5a2"
-energy-cost = 2
-rules-text = """
-Whenever you materialize another {cardtype: warrior}, this character gains +1 spark.
-"""
-card-type = "Character"
-subtype = "Warrior"
-is-fast = false
-spark = 0
-image-number = 1798382140
-rarity = "Common"
-art-owned = true
-
-[[cards-2]]
-name = "Wolfbond Chieftain"
-id = "a5275ef5-2896-4a0a-89de-96b241e05472"
-energy-cost = 0
-rules-text = """
-{materialized}, {judgment}: If you control 2 other {cardtype: warriors}, gain $1.
-"""
-card-type = "Character"
-subtype = "Warrior"
-is-fast = false
-spark = 0
-image-number = 2216124451
-rarity = "Common"
-art-owned = true
 
 [[cards-2]]
 name = "Rebirth Ritualist"
 id = "1b69b697-4829-4e25-8d53-7462572cbb55"
 energy-cost = 2
 rules-text = "{activated} $2, Abandon this character, discard your hand: Draw 3 cards."
+alternate-rules-text = "$2, Abandon a character, discard your hand: Draw 3 cards."
 card-type = "Character"
 subtype = "Warrior"
 is-fast = false
@@ -1339,15 +1394,30 @@ rarity = "Rare"
 art-owned = true
 
 [[cards-2]]
-name = "Pyrokinetic Surge"
-id = "f83a0657-f55a-4ee6-8630-c2ca2d8429ac"
-energy-cost = 1
-rules-text = """
-Abandon a character or discard a card. Dissolve an enemy character.
-"""
-card-type = "Event"
-is-fast = true
-image-number = 2023111787
+name = "Titan of Forgotten Echoes"
+id = "d31723e7-8faa-41e3-89b6-c30d8fdf9cca"
+energy-cost = 6
+rules-text = "If you have played 2 or more dreams this turn, you may play this character from your void for (0)."
+alternate-rules-text = "When you play 2 cards in a turn, reclaim this character."
+card-type = "Character"
+subtype = "Ancient"
+is-fast = false
+spark = 4
+image-number = 2521694543
+rarity = "Uncommon"
+art-owned = true
+
+[[cards-2]]
+name = "Tideborne Voyager"
+id = "522368e5-38cc-480c-930a-f8e1bc5a1f68"
+energy-cost = 4
+rules-text = "Whenever a character you control is banished, this character gains +1 spark."
+alternate-rules-text = "When an ally is banished, this character gains +1 spark."
+card-type = "Character"
+subtype = "Explorer"
+is-fast = false
+spark = 0
+image-number = 753489193
 rarity = "Uncommon"
 art-owned = false
 
@@ -1356,6 +1426,7 @@ name = "Intermezzo Balladeer"
 id = "8ace6dbe-f2cd-4a5c-b56d-6ea01d60985b"
 energy-cost = 3
 rules-text = "Whenever you play a '$fast' dream, this character gains +2 spark."
+alternate-rules-text = "When you play a '↯' card, this character gains +2 spark."
 card-type = "Character"
 subtype = "Musician"
 is-fast = true
@@ -1365,78 +1436,62 @@ rarity = "Common"
 art-owned = false
 
 [[cards-2]]
-name = "Illumination of Glory"
-id = "a2381225-b97f-4a38-845b-cefd8b86d499"
-energy-cost = 5
-rules-text = "Gain 1 $points for each dream you have played this turn."
-card-type = "Event"
-is-fast = false
-image-number = 2430444889
-rarity = "Rare"
-art-owned = false
-
-[[cards-2]]
-name = "Echoes of the Journey"
-id = "5ddbb693-5fc3-4e5a-8040-944fa9e9755d"
-energy-cost = 3
-rules-text = """
-Draw a card for each dream you have played this turn.
-"""
-card-type = "Event"
-is-fast = false
-image-number = 1798514905
-rarity = "Uncommon"
-art-owned = false
-
-[[cards-2]]
-name = "Cascade of Reflections"
-id = "2910484b-ecfe-445d-92b7-2f7d246b17fd"
-energy-cost = 3
-rules-text = """
-Until end of turn, whenever you play an event, copy it.
-"""
-card-type = "Event"
-is-fast = false
-image-number = 1739438657
-rarity = "Uncommon"
-art-owned = false
-
-[[cards-2]]
-name = "Path to Redemption"
-id = "16853a85-1211-462e-9ca4-8a0ba0890657"
-energy-cost = 6
-rules-text = """
-Until end of turn, all cards in your void have {reclaim}.
-"""
-card-type = "Event"
-is-fast = false
-image-number = 1005938023
-rarity = "Rare"
-art-owned = false
-
-[[cards-2]]
-name = "Surge of Fury"
-id = "ab07f1aa-ca7a-4716-988e-281ab871baf4"
-energy-cost = 1
-rules-text = 'At the end of this turn, trigger an additional "judgment" phase.'
-card-type = "Event"
-is-fast = false
-image-number = 1968259702
-rarity = "Uncommon"
-art-owned = false
-
-[[cards-2]]
-name = "The Ringleader"
-id = "afee62e2-7768-47d5-87bd-eaea08400fad"
-energy-cost = 6
-rules-text = """
-{materialized}: Copy the next event you play this turn three times.
-"""
+name = "Blade of Oblivion"
+id = "86eed140-60b0-4e69-b868-332fcf25b8b3"
+energy-cost = 2
+rules-text = "{activated}: Dissolve an enemy character with spark less than or equal to the number of characters you have abandoned this turn."
+alternate-rules-text = "When you abandon 2 allies in a turn, dissolve an enemy."
 card-type = "Character"
-subtype = "Outsider"
+subtype = "Warrior"
 is-fast = false
-spark = 3
-image-number = 1005938035
+spark = 1
+image-number = 1798382134
+rarity = "Uncommon"
+art-owned = false
+
+[[cards-2]]
+name = "Dreadcall Warden"
+id = "eb84ba88-8352-45e8-8cf9-d160227db3ad"
+energy-cost = 2
+rules-text = """
+{multiActivated} $2, Abandon another character with spark 1 or less: Draw 2 cards.
+"""
+alternate-rules-text = "$2, abandon an ally with spark 1 or less: Draw 2 cards."
+card-type = "Character"
+subtype = "Warrior"
+is-fast = false
+spark = 1
+image-number = 2521694547
+rarity = "Rare"
+art-owned = true
+
+[[cards-2]]
+name = "Mystic Runefish"
+id = "83fc9336-c5a4-4a6e-bf90-be84f3535d34"
+energy-cost = 1
+rules-text = "{activated} $3: The spark of each {cardtype: spirit animal} you control becomes 5."
+alternate-rules-text = "$3: The spark of each allied {spirit animal} becomes 5."
+card-type = "Character"
+subtype = "Spirit Animal"
+is-fast = false
+spark = 1
+image-number = 726444853
+rarity = "Uncommon"
+art-owned = false
+
+[[cards-2]]
+name = "Lumineth"
+id = "cd398e35-fd5d-46df-8adb-5d2595df612d"
+energy-cost = 2
+rules-text = """
+When you draw all of the cards in a copy of your deck, you win the game.
+"""
+alternate-rules-text = "When you have no cards in your deck, you win the game."
+card-type = "Character"
+subtype = "Spirit Animal"
+is-fast = false
+spark = 2
+image-number = 2027158304
 rarity = "Rare"
 art-owned = false
 
@@ -1447,6 +1502,7 @@ energy-cost = 1
 rules-text = """
 {judgment}: If you control 2 other {cardtype: spirit animals}, gain $2.
 """
+alternate-rules-text = "{Judgment}: With two allied {spirit animals}, gain $2."
 card-type = "Character"
 subtype = "Spirit Animal"
 is-fast = false
@@ -1456,60 +1512,154 @@ rarity = "Common"
 art-owned = false
 
 [[cards-2]]
-name = "Seeker of the Radiant Wilds"
-id = "0dc21b19-b21b-4905-9a9a-113db544e587"
-energy-cost = 2
-rules-text = "{materialized}: Draw a card for each {cardtype: spirit animal} you control."
-card-type = "Character"
-subtype = "Visitor"
+name = "Starlit Cascade"
+id = "5de09339-b7de-45bd-abc0-1ab3a09e859d"
+energy-cost = 1
+rules-text = "Until end of turn, whenever a character you control leaves play, gain $2."
+alternate-rules-text = "Until end of turn, when an ally leaves play, gain $2."
+card-type = "Event"
 is-fast = false
-spark = 1
-image-number = 2022594416
-rarity = "Uncommon"
+image-number = 1798382143
+rarity = "Common"
 art-owned = false
 
 [[cards-2]]
-name = "Starlight Guide"
-id = "3d9f38a4-6ae8-4e90-bc75-84d711b5fef9"
-energy-cost = 5
-rules-text = """
-{materialized}: You may banish another character you control, then materialize it.
-"""
+name = "Sage of the Prelude"
+id = "ef6c27d3-e55f-4107-b2fd-69ad00994351"
+energy-cost = 2
+rules-text = "Once per turn, when you play a '$fast' dream, draw a card."
+alternate-rules-text = "Once per turn, when you play a '↯' card, draw a card."
 card-type = "Character"
-subtype = "Guide"
+subtype = "Musician"
 is-fast = true
 spark = 1
-image-number = 2022594419
-rarity = "Uncommon"
+image-number = 1084620026
+rarity = "Common"
 art-owned = false
 
 [[cards-2]]
-name = "Blooming Path Wanderer"
-id = "dce8efc8-2643-47a4-ae13-4b9a7e4ba8bb"
+name = "Lurking Dread"
+id = "89d54c43-ffd6-4e0f-94ec-9e08f59e8891"
+energy-cost = 1
+rules-text = "Look at the enemy's hand. Choose a character from it. The enemy discards that card."
+alternate-rules-text = "Choose and discard a character from opponent's hand."
+card-type = "Event"
+is-fast = false
+image-number = 2030910791
+rarity = "Uncommon"
+art-owned = true
+
+[[cards-2]]
+name = "Whisper of the Past"
+id = "35cc788c-b7f1-46ae-b398-7ad37a624247"
 energy-cost = 3
 rules-text = """
-{judgment}: You may banish another character you control, then materialize it.
+An event in your void gains {reclaim} $0 until end of turn.
 """
-card-type = "Character"
-subtype = "Explorer"
+alternate-rules-text = """
+An event in your void gains {Reclaim} $0 this turn.
+"""
+card-type = "Event"
 is-fast = false
-spark = 1
-image-number = 1037215528
+image-number = 2186149269
+rarity = "Common"
+art-owned = false
+
+[[cards-2]]
+name = "Echoes of the Journey"
+id = "5ddbb693-5fc3-4e5a-8040-944fa9e9755d"
+energy-cost = 3
+rules-text = """
+Draw a card for each dream you have played this turn.
+"""
+alternate-rules-text = "Draw a card for each card you have played this turn."
+card-type = "Event"
+is-fast = false
+image-number = 1798514905
 rarity = "Uncommon"
 art-owned = false
 
 [[cards-2]]
-name = "Prophet of the Consumed"
-id = "b0ee552a-3a4f-434f-903d-165ebfe3d072"
-energy-cost = 3
-rules-text = "{materialized}: Draw a card for each character you abandoned this turn."
+name = "Grim Reclaimer"
+id = "61c9fa98-dda1-4f45-976e-b3fc89987b11"
+energy-cost = 2
+rules-text = "{activated} Abandon a character: You may return a {cardtype: warrior} from your void to play."
+alternate-rules-text = "{Judgment}: Abandon an ally to reclaim a warrior."
 card-type = "Character"
-subtype = "Synth"
+subtype = "Outsider"
 is-fast = false
 spark = 1
-image-number = 1991802452
+image-number = 1740270992
 rarity = "Uncommon"
 art-owned = false
+
+[[cards-2]]
+name = "Illumination of Glory"
+id = "a2381225-b97f-4a38-845b-cefd8b86d499"
+energy-cost = 5
+rules-text = "Gain 1 $points for each dream you have played this turn."
+alternate-rules-text = "Score 1⍟ for each card you have played this turn."
+card-type = "Event"
+is-fast = false
+image-number = 2430444889
+rarity = "Rare"
+art-owned = false
+
+[[cards-2]]
+name = "Cascade of Reflections"
+id = "2910484b-ecfe-445d-92b7-2f7d246b17fd"
+energy-cost = 3
+rules-text = """
+Until end of turn, whenever you play an event, copy it.
+"""
+alternate-rules-text = """
+This turn, whenever you play an event, copy it.
+"""
+card-type = "Event"
+is-fast = false
+image-number = 1739438657
+rarity = "Uncommon"
+art-owned = false
+
+[[cards-2]]
+name = "Ride of the Vanguard"
+id = "e79d484f-d564-4429-9eca-0f90d2af5ef5"
+energy-cost = 2
+rules-text = "A character you control gains +1 spark until your next main phase for each {cardtype: warrior} you control."
+alternate-rules-text = "Give an ally +1 spark for each allied warrior."
+card-type = "Event"
+is-fast = true
+image-number = 1788833078
+rarity = "Uncommon"
+art-owned = true
+
+[[cards-2]]
+name = "The Rising God"
+id = "fb2661ee-387c-4a8f-965e-dd89be65cfe0"
+energy-cost = 9
+rules-text = """
+You may play this character from your void for $0 by abandoning 2 characters.
+"""
+alternate-rules-text = "Abandon 2 allies: Reclaim this character."
+card-type = "Character"
+subtype = "Ancient"
+is-fast = false
+spark = 6
+image-number = 2290648801
+rarity = "Uncommon"
+art-owned = true
+
+[[cards-2]]
+name = "Judgment of the Blade"
+id = "e0c88a46-b85f-4497-ab19-850acc868863"
+energy-cost = 1
+rules-text = "Banish an enemy character that is not a {cardtype: warrior}. The enemy gains $points equal to its spark."
+alternate-rules-text = "Banish a non-warrior enemy."
+card-type = "Event"
+is-fast = false
+image-number = 1708315387
+rarity = "Uncommon"
+art-owned = true
 
 [[cards-2]]
 name = "Scrap Reclaimer"
