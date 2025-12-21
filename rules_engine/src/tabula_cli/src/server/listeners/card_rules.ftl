@@ -12,3 +12,10 @@ Judgment = ▸ <b>Judgment: </b>
 Dissolve = <color=#AA00FF><b>Dissolve</b></color>
 
 discover = <color=#AA00FF><b>discover</b></color>
+
+-a =
+  {
+    $n ->
+      [warrior] a warrior
+      *[other] a thing
+  }
