@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use anyhow::Result;
 use fluent::FluentBundle;
-use fluent_bundle::{FluentArgs, FluentError, FluentResource};
+use fluent_bundle::{FluentArgs, FluentError, FluentResource, FluentValue};
 
 use super::super::listener_runner::{Listener, ListenerContext, ListenerResult};
 use super::super::model::Change;
@@ -47,6 +47,7 @@ impl Listener for FluentRulesTextListener {
             None => return Ok(ListenerResult { changes, warnings }),
         };
 
+        let variables_col_idx = find_column_index(&cards_table.columns, "Variables");
         let output_col_idx = rules_text_col_idx + 1;
         if output_col_idx >= cards_table.columns.len() {
             warnings.push(
@@ -79,7 +80,38 @@ impl Listener for FluentRulesTextListener {
                     continue;
                 }
 
-                match format_fluent_expression(&self.resource, input_text) {
+                let variables_cell_ref = variables_col_idx.map(|idx| {
+                    format!(
+                        "{}{}",
+                        col_index_to_letter(cards_table.data_range.start_col + idx as u32),
+                        row + 1
+                    )
+                });
+
+                let args = match parse_fluent_args(
+                    variables_cell_ref
+                        .as_ref()
+                        .and_then(|cell_ref| sheet.cell_values.get(cell_ref)),
+                ) {
+                    Ok(args) => args,
+                    Err(e) => {
+                        if let Some(cell_ref) = variables_cell_ref.as_ref() {
+                            changes.push(Change::SetFillColor {
+                                sheet: sheet.name.clone(),
+                                cell: cell_ref.clone(),
+                                rgb: "FFE0E0".to_string(),
+                            });
+                        }
+                        changes.push(Change::SetValue {
+                            sheet: sheet.name.clone(),
+                            cell: output_cell_ref.clone(),
+                            value: format!("Error: {e}"),
+                        });
+                        continue;
+                    }
+                };
+
+                match format_fluent_expression(&self.resource, input_text, &args) {
                     Ok(formatted) => {
                         changes.push(Change::SetValue {
                             sheet: sheet.name.clone(),
@@ -116,7 +148,41 @@ fn normalize_column_name(name: &str) -> String {
     name.trim().replace(['\u{00A0}', '\u{202F}'], " ").to_lowercase()
 }
 
-fn format_fluent_expression(resource: &Arc<FluentResource>, expression: &str) -> Result<String> {
+fn parse_fluent_args(cell_value: Option<&CellValue>) -> Result<FluentArgs> {
+    let mut args = FluentArgs::new();
+    let variables_text = match cell_value {
+        None | Some(CellValue::Empty) => return Ok(args),
+        Some(CellValue::String(text)) => text,
+        Some(_) => {
+            return Err(anyhow::anyhow!("Variables cell must be text with entries like 'e: 3'"));
+        }
+    };
+
+    for line in variables_text.lines() {
+        let line = line.trim();
+        if line.is_empty() {
+            continue;
+        }
+
+        let Some((key, value)) = line.split_once(':') else {
+            return Err(anyhow::anyhow!("Invalid variable definition '{line}'"));
+        };
+
+        if key.trim().is_empty() || value.trim().is_empty() {
+            return Err(anyhow::anyhow!("Invalid variable definition '{line}'"));
+        }
+
+        args.set(key.trim(), FluentValue::try_number(value.trim()));
+    }
+
+    Ok(args)
+}
+
+fn format_fluent_expression(
+    resource: &Arc<FluentResource>,
+    expression: &str,
+    args: &FluentArgs,
+) -> Result<String> {
     let mut bundle: FluentBundle<Arc<FluentResource>> = FluentBundle::default();
     bundle.set_use_isolating(false);
     if let Err(errors) = bundle.add_resource(Arc::clone(resource)) {
@@ -146,9 +212,8 @@ fn format_fluent_expression(resource: &Arc<FluentResource>, expression: &str) ->
 
     let pattern = message.value().ok_or_else(|| anyhow::anyhow!("Message has no value"))?;
 
-    let args = FluentArgs::new();
     let mut errors = Vec::new();
-    let formatted = bundle.format_pattern(pattern, Some(&args), &mut errors);
+    let formatted = bundle.format_pattern(pattern, Some(args), &mut errors);
 
     if !errors.is_empty() {
         return Err(anyhow::anyhow!("Fluent formatting errors: {}", format_fluent_errors(&errors)));
