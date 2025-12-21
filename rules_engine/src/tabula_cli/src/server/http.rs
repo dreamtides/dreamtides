@@ -18,6 +18,7 @@ use super::{ServerConfig, serialization, server_workbook_snapshot};
 use crate::server::listeners::boxicons::BoxiconsListener;
 use crate::server::listeners::conditional_formatting::ConditionalFormattingListener;
 use crate::server::listeners::ensure_uuid::EnsureUuidListener;
+use crate::server::listeners::fluent_rules_text::FluentRulesTextListener;
 use crate::server::listeners::partial_formatting::PartialFormattingListener;
 
 pub async fn serve(config: ServerConfig) -> Result<()> {
@@ -137,12 +138,23 @@ async fn shutdown_signal(once: bool, shutdown_rx: oneshot::Receiver<()>) {
 }
 
 fn build_listeners() -> Vec<Box<dyn super::listener_runner::Listener>> {
-    vec![
+    let mut listeners: Vec<Box<dyn super::listener_runner::Listener>> = vec![
         Box::new(ConditionalFormattingListener),
         Box::new(PartialFormattingListener),
         Box::new(EnsureUuidListener),
         Box::new(BoxiconsListener),
-    ]
+    ];
+
+    match FluentRulesTextListener::new() {
+        Ok(listener) => {
+            listeners.push(Box::new(listener));
+        }
+        Err(e) => {
+            eprintln!("Failed to initialize FluentRulesTextListener: {e}");
+        }
+    }
+
+    listeners
 }
 
 struct ServerState {

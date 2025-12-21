@@ -3667,6 +3667,8 @@ dependencies = [
  "chrono",
  "clap",
  "convert_case 0.8.0",
+ "fluent",
+ "fluent-bundle",
  "reqwest",
  "roxmltree",
  "serde",

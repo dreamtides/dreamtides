@@ -1,6 +1,7 @@
 use tabula_cli::server::listener_runner::{Listener, ListenerContext};
 use tabula_cli::server::listeners::boxicons::BoxiconsListener;
 use tabula_cli::server::listeners::conditional_formatting::ConditionalFormattingListener;
+use tabula_cli::server::listeners::fluent_rules_text::FluentRulesTextListener;
 use tabula_cli::server::listeners::partial_formatting::PartialFormattingListener;
 use tabula_cli::server::model::{Change, ChangedRange};
 use tabula_cli::server::server_workbook_snapshot::read_snapshot;
@@ -786,4 +787,230 @@ fn test_boxicons_multiple_icon_types() {
     let (is_subscript, subscript_spans) = &subscript_changes[0];
     assert!(is_subscript);
     assert_eq!(subscript_spans.len(), 4);
+}
+
+#[test]
+fn test_fluent_rules_text_formats_expression() {
+    let temp_dir = TempDir::new().expect("Failed to create temp dir");
+    let xlsx_path = temp_dir.path().join("test_fluent.xlsx");
+
+    let mut book = umya_spreadsheet::new_file();
+    let sheet = book.get_sheet_mut(&0).expect("Sheet 0 should exist");
+    sheet.set_name("Cards");
+
+    sheet.get_cell_mut("A1").set_value("RulesText3");
+    sheet.get_cell_mut("B1").set_value("Fluent Output");
+    sheet.get_cell_mut("A2").set_value(
+        "{ -pay-energy(n: 2) }: { -draw-cards(n: 3) } { -this-character-gains-spark(delta: 1) }",
+    );
+
+    let mut table = umya_spreadsheet::structs::Table::default();
+    table.set_name("Cards2");
+    table.set_display_name("Cards2");
+    table.set_area(("A1", "B2"));
+    table.add_column(tabula_cli_test_utils::make_column("RulesText3"));
+    table.add_column(tabula_cli_test_utils::make_column("Fluent Output"));
+    sheet.add_table(table);
+
+    xlsx::write(&book, &xlsx_path).expect("Write workbook");
+
+    let snapshot = read_snapshot(&xlsx_path, None).expect("Failed to read snapshot");
+
+    let context = ListenerContext {
+        request_id: "test-fluent-1".to_string(),
+        workbook_path: xlsx_path.to_string_lossy().to_string(),
+        changed_range: None,
+    };
+
+    let listener = FluentRulesTextListener::new().expect("Failed to create listener");
+    let result = listener.run(&snapshot, &context).expect("Listener should succeed");
+
+    let set_value_changes: Vec<_> = result
+        .changes
+        .iter()
+        .filter_map(|c| match c {
+            Change::SetValue { cell, value, .. } => Some((cell.clone(), value.clone())),
+            _ => None,
+        })
+        .collect();
+
+    assert_eq!(set_value_changes.len(), 1, "Should create formatted output in 1 cell");
+
+    let b2_value = set_value_changes.iter().find(|(cell, _)| cell == "B2");
+    assert_eq!(
+        b2_value,
+        Some(&(
+            "B2".to_string(),
+            "Pay 2 energy: Draw 3 cards. This character gains 1 spark.".to_string()
+        ))
+    );
+
+    assert!(result.warnings.is_empty(), "Should have no warnings");
+}
+
+#[test]
+fn test_fluent_rules_text_multiple_rows() {
+    let temp_dir = TempDir::new().expect("Failed to create temp dir");
+    let xlsx_path = temp_dir.path().join("test_fluent_multi.xlsx");
+
+    let mut book = umya_spreadsheet::new_file();
+    let sheet = book.get_sheet_mut(&0).expect("Sheet 0 should exist");
+    sheet.set_name("Cards");
+
+    sheet.get_cell_mut("A1").set_value("RulesText3");
+    sheet.get_cell_mut("B1").set_value("Fluent Output");
+    sheet.get_cell_mut("A2").set_value("{ -pay-energy(n: 1) }");
+    sheet.get_cell_mut("A3").set_value("{ -draw-cards(n: 2) }");
+    sheet.get_cell_mut("A4").set_value("");
+
+    let mut table = umya_spreadsheet::structs::Table::default();
+    table.set_name("Cards2");
+    table.set_display_name("Cards2");
+    table.set_area(("A1", "B4"));
+    table.add_column(tabula_cli_test_utils::make_column("RulesText3"));
+    table.add_column(tabula_cli_test_utils::make_column("Fluent Output"));
+    sheet.add_table(table);
+
+    xlsx::write(&book, &xlsx_path).expect("Write workbook");
+
+    let snapshot = read_snapshot(&xlsx_path, None).expect("Failed to read snapshot");
+
+    let context = ListenerContext {
+        request_id: "test-fluent-2".to_string(),
+        workbook_path: xlsx_path.to_string_lossy().to_string(),
+        changed_range: None,
+    };
+
+    let listener = FluentRulesTextListener::new().expect("Failed to create listener");
+    let result = listener.run(&snapshot, &context).expect("Listener should succeed");
+
+    let set_value_changes: Vec<_> = result
+        .changes
+        .iter()
+        .filter_map(|c| match c {
+            Change::SetValue { cell, value, .. } => Some((cell.clone(), value.clone())),
+            _ => None,
+        })
+        .collect();
+
+    assert_eq!(set_value_changes.len(), 2, "Should format 2 non-empty cells");
+
+    let b2_value = set_value_changes.iter().find(|(cell, _)| cell == "B2");
+    assert_eq!(b2_value, Some(&("B2".to_string(), "Pay 1 energy".to_string())));
+
+    let b3_value = set_value_changes.iter().find(|(cell, _)| cell == "B3");
+    assert_eq!(b3_value, Some(&("B3".to_string(), "Draw 2 cards.".to_string())));
+
+    assert!(result.warnings.is_empty(), "Should have no warnings");
+}
+
+#[test]
+fn test_fluent_rules_text_no_cards_table() {
+    let temp_dir = TempDir::new().expect("Failed to create temp dir");
+    let xlsx_path = temp_dir.path().join("test_fluent_no_table.xlsx");
+
+    let mut book = umya_spreadsheet::new_file();
+    let sheet = book.get_sheet_mut(&0).expect("Sheet 0 should exist");
+    sheet.set_name("OtherSheet");
+    sheet.get_cell_mut("A1").set_value("No table here");
+    xlsx::write(&book, &xlsx_path).expect("Write workbook");
+
+    let snapshot = read_snapshot(&xlsx_path, None).expect("Failed to read snapshot");
+
+    let context = ListenerContext {
+        request_id: "test-fluent-3".to_string(),
+        workbook_path: xlsx_path.to_string_lossy().to_string(),
+        changed_range: None,
+    };
+
+    let listener = FluentRulesTextListener::new().expect("Failed to create listener");
+    let result = listener.run(&snapshot, &context).expect("Listener should succeed");
+
+    assert_eq!(result.changes.len(), 0, "Should not generate any changes without Cards table");
+    assert!(result.warnings.is_empty(), "Should have no warnings");
+}
+
+#[test]
+fn test_fluent_rules_text_no_rules_text_column() {
+    let temp_dir = TempDir::new().expect("Failed to create temp dir");
+    let xlsx_path = temp_dir.path().join("test_fluent_no_column.xlsx");
+
+    let mut book = umya_spreadsheet::new_file();
+    let sheet = book.get_sheet_mut(&0).expect("Sheet 0 should exist");
+    sheet.set_name("Cards");
+
+    sheet.get_cell_mut("A1").set_value("Name");
+    sheet.get_cell_mut("B1").set_value("Cost");
+    sheet.get_cell_mut("A2").set_value("Card 1");
+    sheet.get_cell_mut("B2").set_value_number(3);
+
+    let mut table = umya_spreadsheet::structs::Table::default();
+    table.set_name("Cards");
+    table.set_display_name("Cards");
+    table.set_area(("A1", "B2"));
+    table.add_column(tabula_cli_test_utils::make_column("Name"));
+    table.add_column(tabula_cli_test_utils::make_column("Cost"));
+    sheet.add_table(table);
+
+    xlsx::write(&book, &xlsx_path).expect("Write workbook");
+
+    let snapshot = read_snapshot(&xlsx_path, None).expect("Failed to read snapshot");
+
+    let context = ListenerContext {
+        request_id: "test-fluent-4".to_string(),
+        workbook_path: xlsx_path.to_string_lossy().to_string(),
+        changed_range: None,
+    };
+
+    let listener = FluentRulesTextListener::new().expect("Failed to create listener");
+    let result = listener.run(&snapshot, &context).expect("Listener should succeed");
+
+    assert_eq!(
+        result.changes.len(),
+        0,
+        "Should not generate any changes without Rules Text column"
+    );
+    assert!(result.warnings.is_empty(), "Should have no warnings");
+}
+
+#[test]
+fn test_fluent_rules_text_invalid_expression() {
+    let temp_dir = TempDir::new().expect("Failed to create temp dir");
+    let xlsx_path = temp_dir.path().join("test_fluent_invalid.xlsx");
+
+    let mut book = umya_spreadsheet::new_file();
+    let sheet = book.get_sheet_mut(&0).expect("Sheet 0 should exist");
+    sheet.set_name("Cards");
+
+    sheet.get_cell_mut("A1").set_value("RulesText3");
+    sheet.get_cell_mut("B1").set_value("Fluent Output");
+    sheet.get_cell_mut("A2").set_value("{ unclosed bracket");
+
+    let mut table = umya_spreadsheet::structs::Table::default();
+    table.set_name("Cards2");
+    table.set_display_name("Cards2");
+    table.set_area(("A1", "B2"));
+    table.add_column(tabula_cli_test_utils::make_column("RulesText3"));
+    table.add_column(tabula_cli_test_utils::make_column("Fluent Output"));
+    sheet.add_table(table);
+
+    xlsx::write(&book, &xlsx_path).expect("Write workbook");
+
+    let snapshot = read_snapshot(&xlsx_path, None).expect("Failed to read snapshot");
+
+    let context = ListenerContext {
+        request_id: "test-fluent-5".to_string(),
+        workbook_path: xlsx_path.to_string_lossy().to_string(),
+        changed_range: None,
+    };
+
+    let listener = FluentRulesTextListener::new().expect("Failed to create listener");
+    let result = listener.run(&snapshot, &context).expect("Listener should succeed");
+
+    assert_eq!(result.changes.len(), 0, "Should not generate changes for invalid expression");
+    assert_eq!(result.warnings.len(), 1, "Should have exactly one warning");
+    assert!(
+        result.warnings[0].contains("Failed to format cell A2"),
+        "Warning should mention the problematic cell"
+    );
 }

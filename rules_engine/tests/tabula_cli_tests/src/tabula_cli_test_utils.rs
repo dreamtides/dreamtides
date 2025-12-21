@@ -10,7 +10,7 @@ use umya_spreadsheet::writer::xlsx;
 use zip::write::FileOptions;
 use zip::{CompressionMethod, DateTime, ZipArchive, ZipWriter};
 
-fn make_column(name: &str) -> TableColumn {
+pub fn make_column(name: &str) -> TableColumn {
     let mut col = TableColumn::default();
     col.set_name(name.to_string());
     col
