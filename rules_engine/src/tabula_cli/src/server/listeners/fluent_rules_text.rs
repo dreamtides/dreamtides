@@ -88,8 +88,16 @@ impl Listener for FluentRulesTextListener {
                         });
                     }
                     Err(e) => {
-                        eprintln!("Failed to format cell {input_cell_ref}: {e}");
-                        warnings.push(format!("Failed to format cell {input_cell_ref}: {e}"));
+                        changes.push(Change::SetFillColor {
+                            sheet: sheet.name.clone(),
+                            cell: input_cell_ref.clone(),
+                            rgb: "FFE0E0".to_string(),
+                        });
+                        changes.push(Change::SetValue {
+                            sheet: sheet.name.clone(),
+                            cell: output_cell_ref,
+                            value: format!("Error: {e}"),
+                        });
                     }
                 }
             }

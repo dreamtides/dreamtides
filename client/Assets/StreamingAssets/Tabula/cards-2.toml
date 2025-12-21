@@ -64,7 +64,6 @@ alternate-rules-text = """
 Dissolve an enemy. Draw a card.
 
 This event costs $1 if a character dissolved this turn."""
-rules-text-3 = "Please {-pay-energy(n:4)}."
 card-type = "Event"
 is-fast = false
 image-number = 454095982
