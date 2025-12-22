@@ -610,7 +610,7 @@ rules-text-3 = """
 
 When an allied {subtype} is dissolved, draw {cards-v2}."""
 preview-3 = """
-▸ Dissolved:: Draw a card.
+▸ Dissolved: Draw a card.
 
 When an allied survivor is dissolved, draw a card."""
 variables = """
