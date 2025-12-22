@@ -1,4 +1,23 @@
 [[cards-2]]
+name = "The Dread Sovereign"
+id = "521b912b-1dfb-4440-a1e0-7181bac6aa58"
+energy-cost = 3
+rules-text = "{activated} Abandon a {cardtype: warrior}: {discover} a {cardtype: warrior} with cost $1 higher than the abandoned character and materialize it."
+alternate-rules-text = "{Judgment}: Abandon a warrior to discover a warrior with cost $1 higher and materialize it."
+rules-text-3 = "{Judgment} You may abandon {a-subtype} to {discover} {a-subtype} with cost {e} higher and materialize it."
+preview-3 = "▸ Judgment: You may abandon a warrior to discover a warrior with cost 1● higher and materialize it."
+variables = """
+type: warrior
+e: 1"""
+card-type = "Character"
+subtype = "Ancient"
+is-fast = false
+spark = 1
+image-number = 2427491215
+rarity = "Rare"
+art-owned = true
+
+[[cards-2]]
 name = "Obliterator of Worlds"
 id = "5aea70af-2df6-411f-b513-cb9ee8b18fb4"
 energy-cost = 6
@@ -11,13 +30,13 @@ Abandon an ally: Play this character for $0, then abandon it.
 
 {Materialized}: Dissolve an enemy."""
 rules-text-3 = """
-Abandon an ally: {Play} this character for {e}, then abandon it.
+Abandon an ally: Play this character for {e}, then abandon it.
 
 {Materialized} {Dissolve} an enemy."""
 preview-3 = """
 Abandon an ally: Play this character for 0●, then abandon it.
 
-▸Materialized: Dissolve an enemy."""
+▸ Materialized: Dissolve an enemy."""
 variables = "e: 0"
 card-type = "Character"
 subtype = "Ancient"
@@ -28,12 +47,41 @@ rarity = "Rare"
 art-owned = false
 
 [[cards-2]]
+name = "Moonlit Dancer"
+id = "1f5024e3-aa36-4a44-b257-0caf35484cf8"
+energy-cost = 3
+rules-text = """
+Characters in your hand have '$fast'. 
+Once per turn, when you play a '$fast' character, gain $1."""
+alternate-rules-text = """
+Characters in your hand have ↯.
+
+Once per turn, when you play a ↯ character, gain $1."""
+rules-text-3 = """
+Characters in your hand have {fast}.
+
+Once per turn, when you play a {fast} character, gain {e}. """
+preview-3 = """
+Characters in your hand have ↯Fast.
+
+Once per turn, when you play a ↯Fast character, gain 1●."""
+variables = "e: 1"
+card-type = "Character"
+subtype = "Visitor"
+is-fast = false
+spark = 2
+image-number = 1790126252
+rarity = "Rare"
+art-owned = false
+
+[[cards-2]]
 name = "Twilight Suppressor"
 id = "4e3420f2-6f0d-4381-b2b1-afb16af7549f"
 energy-cost = 3
 rules-text = "{materialized}: Disable the activated abilities of a chosen enemy character while this character is in play."
 alternate-rules-text = "{Materialized}: Disable the activated abilities of an enemy while this character is in play. "
-rules-text-3 = "{Materialized} {Disable} the activated abilities of an enemy while this character is in play."
+rules-text-3 = "{Materialized} Disable the activated abilities of an enemy while this character is in play."
+preview-3 = "▸ Materialized: Disable the activated abilities of an enemy while this character is in play."
 card-type = "Character"
 subtype = "Warrior"
 is-fast = false
@@ -43,22 +91,22 @@ rarity = "Uncommon"
 art-owned = true
 
 [[cards-2]]
-name = "The Dread Sovereign"
-id = "521b912b-1dfb-4440-a1e0-7181bac6aa58"
-energy-cost = 3
-rules-text = "{activated} Abandon a {cardtype: warrior}: {discover} a {cardtype: warrior} with cost $1 higher than the abandoned character and materialize it."
-alternate-rules-text = "{Judgment}: Abandon a warrior to discover a warrior with cost $1 higher and materialize it."
-rules-text-3 = "{Judgment} You may abandon {a-subtype} to {Discover} {a-subtype} with cost {e} higher and materialize it."
-preview-3 = "▸Judgment: You may abandon a warrior to Discover a warrior with cost 1● higher and materialize it."
+name = "Eclipse Herald"
+id = "e5ac026b-a397-47ee-929d-46de1177784c"
+energy-cost = 2
+rules-text = "{activated} Banish 3 cards from your void: Dissolve an enemy character with cost $2 or less."
+alternate-rules-text = "{Judgment}: Banish 3 cards from your void to dissolve an enemy with cost $2 or less."
+rules-text-3 = "{Judgment} You may {banish} {cards} from your void to {dissolve} an enemy with cost {e} or less. "
+preview-3 = "▸ Judgment: You may banish 3 cards from your void to dissolve an enemy with cost 2● or less."
 variables = """
-type: warrior
-e: 1"""
+cards: 3
+e: 2"""
 card-type = "Character"
-subtype = "Ancient"
+subtype = "Warrior"
 is-fast = false
 spark = 1
-image-number = 2427491215
-rarity = "Rare"
+image-number = 2295991863
+rarity = "Uncommon"
 art-owned = true
 
 [[cards-2]]
@@ -74,7 +122,7 @@ Dissolve an enemy. Draw a card.
 
 This event costs $1 if a character dissolved this turn."""
 rules-text-3 = """
-{Dissolve} an enemy. {Draw} {cards}.
+{Dissolve} an enemy. Draw {cards}.
 
 This event costs {e} if a character dissolved this turn."""
 preview-3 = """
@@ -104,11 +152,11 @@ Additional Cost: Return an ally with cost $3 or more to hand.
 rules-text-3 = """
 Additional Cost: Return an ally with cost {e} or more to hand.
 
-{Judgment} {Draw} {cards}."""
+{Judgment} Draw {cards}."""
 preview-3 = """
 Additional Cost: Return an ally with cost 3● or more to hand.
 
-▸Judgment: Draw a card."""
+▸ Judgment: Draw a card."""
 variables = """
 e: 3
 cards: 1"""
@@ -121,21 +169,17 @@ rarity = "Rare"
 art-owned = false
 
 [[cards-2]]
-name = "Architect of Memory"
-id = "2530adcc-5ae2-486a-94b2-f40dd62f3755"
-energy-cost = 2
-rules-text = "If you have 8 or more cards in your void, cards in your void have {reclaim}."
-alternate-rules-text = "While you have 5 or more events in your void, they have {reclaim} equal to their cost. "
-rules-text-3 = "While you have {$count} or more events in your void, they have {Reclaim} equal to their cost."
-preview-3 = "While you have 5 or more events in your void, they have Reclaim equal to their cost."
-variables = "count: 5"
-reminders = "Reclaim: Play an event from your void for its cost, then banish it."
-card-type = "Character"
-subtype = "Synth"
+name = "Burst of Obliteration"
+id = "f841dd11-102c-42b2-b85a-492930189fbd"
+energy-cost = 3
+rules-text = "Dissolve an enemy character. This card's cost is equal to that character's spark."
+alternate-rules-text = "Pay 1 or more $: Dissolve each character with spark less than the amount of $ paid."
+rules-text-3 = "Pay any amount of {energy-symbol}: {Dissolve} each character with spark less than the amount of {energy-symbol} paid."
+preview-3 = "Pay any amount of ●: Dissolve each character with spark less than the amount of ● paid."
+card-type = "Event"
 is-fast = false
-spark = 1
-image-number = 678431950
-rarity = "Rare"
+image-number = 2299755789
+rarity = "Uncommon"
 art-owned = false
 
 [[cards-2]]
@@ -152,11 +196,11 @@ Has all character types.
 rules-text-3 = """
 Has all character types.
 
-{Judgment} If {count-allies} share a character type, {Draw} {cards}."""
+{Judgment} If {count-allies} share a character type, Draw {cards}."""
 preview-3 = """
 Has all character types.
 
-▸Judgment: If 3 allies share a character type, Draw a card."""
+▸ Judgment: If 3 allies share a character type, Draw a card."""
 variables = """
 allies: 3
 cards: 1"""
@@ -166,6 +210,52 @@ is-fast = false
 spark = 2
 image-number = 2191235661
 rarity = "Common"
+art-owned = false
+
+[[cards-2]]
+name = "Dreamborne Leviathan"
+id = "64b5552f-1fc3-4aee-a79c-cebc19792044"
+energy-cost = 4
+rules-text = """
+You may look at the top card of your deck.
+
+You may play characters from the top of your deck."""
+alternate-rules-text = """
+Reveal the top card of your deck.
+
+You may play characters from the top of your deck."""
+rules-text-3 = """
+Reveal the top card of your deck.
+
+You may Play characters from the top of your deck."""
+preview-3 = """
+Reveal the top card of your deck.
+
+You may Play characters from the top of your deck."""
+card-type = "Character"
+subtype = "Spirit Animal"
+is-fast = false
+spark = 2
+image-number = 1723965970
+rarity = "Uncommon"
+art-owned = false
+
+[[cards-2]]
+name = "Architect of Memory"
+id = "2530adcc-5ae2-486a-94b2-f40dd62f3755"
+energy-cost = 2
+rules-text = "If you have 8 or more cards in your void, cards in your void have {reclaim}."
+alternate-rules-text = "While you have 5 or more events in your void, they have {reclaim} equal to their cost. "
+rules-text-3 = "While you have {$count} or more events in your void, they have {reclaim} equal to their cost."
+preview-3 = "While you have 5 or more events in your void, they have reclaim equal to their cost."
+variables = "count: 5"
+reminders = "Reclaim: Play an event from your void for its cost, then banish it."
+card-type = "Character"
+subtype = "Synth"
+is-fast = false
+spark = 1
+image-number = 678431950
+rarity = "Rare"
 art-owned = false
 
 [[cards-2]]
@@ -184,69 +274,13 @@ rarity = "Rare"
 art-owned = false
 
 [[cards-2]]
-name = "Dreamborne Leviathan"
-id = "64b5552f-1fc3-4aee-a79c-cebc19792044"
-energy-cost = 4
-rules-text = """
-You may look at the top card of your deck.
-
-You may play characters from the top of your deck."""
-alternate-rules-text = """
-Reveal the top card of your deck.
-
-You may play characters from the top of your deck."""
-rules-text-3 = """
-{Reveal} the top card of your deck.
-
-You may {Play} characters from the top of your deck."""
-preview-3 = """
-Reveal the top card of your deck.
-
-You may Play characters from the top of your deck."""
-card-type = "Character"
-subtype = "Spirit Animal"
-is-fast = false
-spark = 2
-image-number = 1723965970
-rarity = "Uncommon"
-art-owned = false
-
-[[cards-2]]
-name = "Moonlit Dancer"
-id = "1f5024e3-aa36-4a44-b257-0caf35484cf8"
-energy-cost = 3
-rules-text = """
-Characters in your hand have '$fast'. 
-Once per turn, when you play a '$fast' character, gain $1."""
-alternate-rules-text = """
-Characters in your hand have ↯.
-
-Once per turn, when you play a ↯ character, gain $1."""
-rules-text-3 = """
-Characters in your hand have {fast}.
-
-Once per turn, when you play a {fast} character, {Gain} {e}. """
-preview-3 = """
-Characters in your hand have ↯Fast.
-
-Once per turn, when you play a ↯Fast character, Gain 1●."""
-variables = "e: 1"
-card-type = "Character"
-subtype = "Visitor"
-is-fast = false
-spark = 2
-image-number = 1790126252
-rarity = "Rare"
-art-owned = false
-
-[[cards-2]]
 name = "Flickerveil Adept"
 id = "d8017d8f-7855-47e5-bfe5-89ca2e7c5203"
 energy-cost = 4
 rules-text = "{immediate} {activated}: Banish another character with spark 1 or less you control, then materialize it."
 alternate-rules-text = "{Materialized}, {Judgment}: Banish an ally with spark 2 or less, then materialize it."
-rules-text-3 = "{Materialized-Judgment} {Banish} an ally with {spark} {s} or less, then {Materialize} it."
-preview-3 = "▸Materialized, Judgment: Banish an ally with spark 2 or less, then Materialize it."
+rules-text-3 = "{Materialized-Judgment} {Banish} an ally with {spark} {s} or less, then {materialize} it."
+preview-3 = "▸ Materialized, Judgment: Banish an ally with spark 2 or less, then materialize it."
 variables = "s: 2"
 card-type = "Character"
 subtype = "Mage"
@@ -254,6 +288,94 @@ is-fast = false
 spark = 1
 image-number = 2285036623
 rarity = "Common"
+art-owned = false
+
+[[cards-2]]
+name = "Lumin-Gate Seer"
+id = "d4123a89-fa76-46f9-a8b7-6a1d4ecc4c4f"
+energy-cost = 4
+rules-text = """
+Once per turn, when you materialize a character with cost $2 or less, draw a card.
+"""
+alternate-rules-text = """
+Once per turn, when you materialize a character with cost $2 or less, draw a card.
+"""
+rules-text-3 = """
+Once per turn, when you {materialize} a character with cost {e} or less, draw {cards}.
+"""
+preview-3 = "Once per turn, when you materialize a character with cost 2● or less, draw a card."
+variables = """
+e: 2
+cards: 1"""
+card-type = "Character"
+subtype = "Explorer"
+is-fast = false
+spark = 2
+image-number = 2127752120
+rarity = "Rare"
+art-owned = true
+
+[[cards-2]]
+name = "Shardwoven Tyrant"
+id = "b8bc35ae-4a4a-402e-a570-707bedceb5ce"
+energy-cost = 3
+rules-text = "{multiActivated} Abandon another character: You may dissolve an enemy character with spark less than or equal to the abandoned character's spark."
+alternate-rules-text = "Abandon an ally: You may dissolve an enemy with spark less than that ally's spark."
+rules-text-3 = "Abandon an ally: You may {dissolve} an enemy with spark less than that ally's spark."
+preview-3 = "Abandon an ally: You may dissolve an enemy with spark less than that ally's spark."
+card-type = "Character"
+subtype = "Ancient"
+is-fast = false
+spark = 1
+image-number = 1180104511
+rarity = "Rare"
+art-owned = false
+
+[[cards-2]]
+name = "Wheel the Heavens"
+id = "4950a8cd-85d5-402a-8a2d-efdd250764b7"
+energy-cost = 4
+rules-text = "Each player may shuffle their hand and void into their deck and then draw 4 cards."
+alternate-rules-text = "Each player may shuffle their hand and void into their deck and then draw 5 cards."
+rules-text-3 = "Each player may shuffle their hand and void into their deck and then draw {cards}."
+preview-3 = "Each player may shuffle their hand and void into their deck and then draw 5 cards."
+variables = "cards: 5"
+card-type = "Event"
+is-fast = false
+image-number = 1480584617
+rarity = "Rare"
+art-owned = false
+
+[[cards-2]]
+name = "Starlight Guide"
+id = "3d9f38a4-6ae8-4e90-bc75-84d711b5fef9"
+energy-cost = 5
+rules-text = "{materialized}: You may banish another character you control, then materialize it."
+alternate-rules-text = "{Materialized}: You may banish another character you control, then materialize it."
+rules-text-3 = "{Materialized} You may {banish} another character you control, then {materialize} it."
+preview-3 = "▸ Materialized: You may banish another character you control, then materialize it."
+card-type = "Character"
+subtype = "Guide"
+is-fast = true
+spark = 1
+image-number = 2022594419
+rarity = "Uncommon"
+art-owned = false
+
+[[cards-2]]
+name = "Ashlight Caller"
+id = "977ce2e4-ef8c-48e7-a27b-83a7348fa94f"
+energy-cost = 3
+rules-text = "{materialized}: An event in your void gains {reclaim} until end of turn "
+alternate-rules-text = "{Materialized}: An event in your void gains {reclaim} equal to its cost this turn."
+rules-text-3 = "{Materialized} An event in your void gains {reclaim} equal to its cost this turn."
+preview-3 = "▸ Materialized: An event in your void gains reclaim equal to its cost this turn."
+card-type = "Character"
+subtype = "Survivor"
+is-fast = true
+spark = 1
+image-number = 1044240499
+rarity = "Uncommon"
 art-owned = false
 
 [[cards-2]]
@@ -274,127 +396,6 @@ rarity = "Uncommon"
 art-owned = false
 
 [[cards-2]]
-name = "Eclipse Herald"
-id = "e5ac026b-a397-47ee-929d-46de1177784c"
-energy-cost = 2
-rules-text = "{activated} Banish 3 cards from your void: Dissolve an enemy character with cost $2 or less."
-alternate-rules-text = "{Judgment}: Banish 3 cards from your void to dissolve an enemy with cost $2 or less."
-rules-text-3 = "{Judgment} You may {Banish} {cards} from your void to {Dissolve} an enemy with cost {e} or less. "
-preview-3 = "▸Judgment: You may Banish 3 cards from your void to Dissolve an enemy with cost 2● or less."
-variables = """
-cards: 3
-e: 2"""
-card-type = "Character"
-subtype = "Warrior"
-is-fast = false
-spark = 1
-image-number = 2295991863
-rarity = "Uncommon"
-art-owned = true
-
-[[cards-2]]
-name = "Lumin-Gate Seer"
-id = "d4123a89-fa76-46f9-a8b7-6a1d4ecc4c4f"
-energy-cost = 4
-rules-text = """
-Once per turn, when you materialize a character with cost $2 or less, draw a card.
-"""
-alternate-rules-text = """
-Once per turn, when you materialize a character with cost $2 or less, draw a card.
-"""
-rules-text-3 = """
-Once per turn, when you {Materialize} a character with cost {e} or less, {Draw} {cards}.
-"""
-preview-3 = "Once per turn, when you Materialize a character with cost 2● or less, Draw a card."
-variables = """
-e: 2
-cards: 1"""
-card-type = "Character"
-subtype = "Explorer"
-is-fast = false
-spark = 2
-image-number = 2127752120
-rarity = "Rare"
-art-owned = true
-
-[[cards-2]]
-name = "Burst of Obliteration"
-id = "f841dd11-102c-42b2-b85a-492930189fbd"
-energy-cost = 3
-rules-text = "Dissolve an enemy character. This card's cost is equal to that character's spark."
-alternate-rules-text = "Pay 1 or more $: Dissolve each character with spark less than the amount of $ paid."
-rules-text-3 = "Pay any amount of {energy-symbol}: {Dissolve} each character with spark less than the amount of {energy-symbol} paid."
-preview-3 = "Pay any amount of ●: Dissolve each character with spark less than the amount of ● paid."
-card-type = "Event"
-is-fast = false
-image-number = 2299755789
-rarity = "Uncommon"
-art-owned = false
-
-[[cards-2]]
-name = "Shardwoven Tyrant"
-id = "b8bc35ae-4a4a-402e-a570-707bedceb5ce"
-energy-cost = 3
-rules-text = "{multiActivated} Abandon another character: You may dissolve an enemy character with spark less than or equal to the abandoned character's spark."
-alternate-rules-text = "Abandon an ally: You may dissolve an enemy with spark less than that ally's spark."
-rules-text-3 = "Abandon an ally: You may {Dissolve} an enemy with spark less than that ally's spark."
-preview-3 = "Abandon an ally: You may Dissolve an enemy with spark less than that ally's spark."
-card-type = "Character"
-subtype = "Ancient"
-is-fast = false
-spark = 1
-image-number = 1180104511
-rarity = "Rare"
-art-owned = false
-
-[[cards-2]]
-name = "Wheel the Heavens"
-id = "4950a8cd-85d5-402a-8a2d-efdd250764b7"
-energy-cost = 4
-rules-text = "Each player may shuffle their hand and void into their deck and then draw 4 cards."
-alternate-rules-text = "Each player may shuffle their hand and void into their deck and then draw 5 cards."
-rules-text-3 = "Each player may shuffle their hand and void into their deck and then {Draw} {cards}."
-preview-3 = "Each player may shuffle their hand and void into their deck and then Draw 5 cards."
-variables = "cards: 5"
-card-type = "Event"
-is-fast = false
-image-number = 1480584617
-rarity = "Rare"
-art-owned = false
-
-[[cards-2]]
-name = "Ashlight Caller"
-id = "977ce2e4-ef8c-48e7-a27b-83a7348fa94f"
-energy-cost = 3
-rules-text = "{materialized}: An event in your void gains {reclaim} until end of turn "
-alternate-rules-text = "{Materialized}: An event in your void gains {reclaim} equal to its cost this turn."
-rules-text-3 = "{Materialized} An event in your void gains {Reclaim} equal to its cost this turn."
-preview-3 = "▸Materialized: An event in your void gains Reclaim equal to its cost this turn."
-card-type = "Character"
-subtype = "Survivor"
-is-fast = true
-spark = 1
-image-number = 1044240499
-rarity = "Uncommon"
-art-owned = false
-
-[[cards-2]]
-name = "Starlight Guide"
-id = "3d9f38a4-6ae8-4e90-bc75-84d711b5fef9"
-energy-cost = 5
-rules-text = "{materialized}: You may banish another character you control, then materialize it."
-alternate-rules-text = "{Materialized}: You may banish another character you control, then materialize it."
-rules-text-3 = "{Materialized} You may {Banish} another character you control, then {Materialize} it."
-preview-3 = "▸Materialized: You may Banish another character you control, then Materialize it."
-card-type = "Character"
-subtype = "Guide"
-is-fast = true
-spark = 1
-image-number = 2022594419
-rarity = "Uncommon"
-art-owned = false
-
-[[cards-2]]
 name = "Wreckheap Survivor"
 id = "b5d3ce4f-2587-47a6-b8c2-d73204d4c05a"
 energy-cost = 3
@@ -402,6 +403,9 @@ rules-text = """
 {judgment}: You may pay $1 to return this character from your void to your hand.
 """
 alternate-rules-text = "{Judgment}: You may pay $1 to return this character from your void to your hand."
+rules-text-3 = "{Judgment}: You may pay {e} to return this character from your void to your hand."
+preview-3 = "▸ Judgment:: You may pay 1● to return this character from your void to your hand."
+variables = "e: 1"
 card-type = "Character"
 subtype = "Survivor"
 is-fast = false
@@ -416,6 +420,8 @@ id = "cb474c3f-1670-4e44-88d9-bef6475a4199"
 energy-cost = 5
 rules-text = "Whenever you materialize a character, trigger the '{judgment}' ability of each character you control."
 alternate-rules-text = "When you materialize a character, trigger the '{judgment}' ability of each ally."
+rules-text-3 = "When you {materialize} a character, trigger the '{Judgment}' ability of each ally."
+preview-3 = "When you materialize a character, trigger the '▸ Judgment:' ability of each ally."
 card-type = "Character"
 subtype = "Super"
 is-fast = false
@@ -436,6 +442,18 @@ alternate-rules-text = """
 {Dissolved}: {Kindle: 2}.
 
 When an allied {survivor} is dissolved, {kindle: 2}."""
+rules-text-3 = """
+{Dissolved} {Kindle}.
+
+When an allied {subtype} is dissolved, {kindle-k2}."""
+preview-3 = """
+▸ Dissolved: Kindle 2.
+
+When an allied survivor is dissolved, kindle 2."""
+variables = """
+k: 2
+k2: 2
+type: survivor"""
 card-type = "Character"
 subtype = "Survivor"
 is-fast = false
@@ -454,6 +472,10 @@ rules-text = """
 alternate-rules-text = """
 {Judgment}: You may banish another character you control, then materialize it.
 """
+rules-text-3 = """
+{Judgment} You may {banish} an ally, then {materialize} it.
+"""
+preview-3 = "▸ Judgment:: You may banish another character you control, then materialize it."
 card-type = "Character"
 subtype = "Explorer"
 is-fast = false
@@ -473,6 +495,15 @@ alternate-rules-text = """
 Banish a card from hand: Play this event for $0.
 
 Prevent a played enemy card."""
+rules-text-3 = """
+{Banish} a card from hand: Play this event for {e}.
+
+{Prevent} a played enemy card."""
+preview-3 = """
+Banish a card from hand: Play this event for 0●.
+
+Prevent a played enemy card."""
+variables = "e: 0"
 card-type = "Event"
 is-fast = true
 image-number = 2258761881
@@ -489,6 +520,11 @@ rules-text = """
 alternate-rules-text = """
 {Materialized}, {Dissolved}: Put the top 4 cards of your deck into your void.
 """
+rules-text-3 = """
+{MaterializedDissolved} Put the {top-cards} of your deck into your void.
+"""
+preview-3 = "▸ Materialized, Dissolved: Put the top 4 cards of your deck into your void."
+variables = "cards: 4"
 card-type = "Character"
 subtype = "Survivor"
 is-fast = false

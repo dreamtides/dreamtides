@@ -5,21 +5,29 @@ energy-symbol = <color=#00838F>●</color>
 -trigger = ▸ <b>{$trigger}:</b>
 Materialized = {-trigger(trigger: "Materialized")}
 Judgment = {-trigger(trigger: "Judgment")}
+Dissolved = {-trigger(trigger: "Dissolved")}
 Materialized-Judgment = {-trigger(trigger: "Materialized, Judgment")}
+MaterializedDissolved = {-trigger(trigger: "Materialized, Dissolved")}
 
--keyword = <color=#AA00FF><b>{$k}</b></color>
 
+-keyword = <color=#AA00FF>{$k}</color>
+
+dissolve = {-keyword(k: "dissolve")}
 Dissolve = {-keyword(k: "Dissolve")}
+banish = {-keyword(k: "banish")}
 Banish = {-keyword(k: "Banish")}
-Disable = {-keyword(k: "Disable")}
+discover = {-keyword(k: "discover")}
 Discover = {-keyword(k: "Discover")}
+reclaim = {-keyword(k: "reclaim")}
 Reclaim = {-keyword(k: "Reclaim")}
-Play = {-keyword(k: "Play")}
+materialize = {-keyword(k: "materialize")}
 Materialize = {-keyword(k: "Materialize")}
-Draw = {-keyword(k: "Draw")}
-Reveal = {-keyword(k: "Reveal")}
-Gain = {-keyword(k: "Gain")}
-Gains = {-keyword(k: "Gains")}
+prevent = {-keyword(k: "prevent")}
+Prevent = {-keyword(k: "Prevent")}
+kindle = {-keyword(k: "kindle")} {$k}
+Kindle = {-keyword(k: "Kindle")} {$k}
+kindle-k2 = {-keyword(k: "kindle")} {$k2}
+Kindle-k2 = {-keyword(k: "Kindle")} {$k2}
 fast = ↯Fast
 
 cards =
@@ -27,6 +35,13 @@ cards =
     $cards ->
       [one] a card
       *[other] { $cards } cards
+  }
+
+top-cards =
+  {
+    $cards ->
+      [one] top card
+      *[other] top { $cards } cards
   }
 
 s = { $s }
