@@ -403,8 +403,8 @@ rules-text = """
 {judgment}: You may pay $1 to return this character from your void to your hand.
 """
 alternate-rules-text = "{Judgment}: You may pay $1 to return this character from your void to your hand."
-rules-text-3 = "{Judgment}: You may pay {e} to return this character from your void to your hand."
-preview-3 = "▸ Judgment:: You may pay 1● to return this character from your void to your hand."
+rules-text-3 = "{Judgment} You may pay {e} to return this character from your void to your hand."
+preview-3 = "▸ Judgment: You may pay 1● to return this character from your void to your hand."
 variables = "e: 1"
 card-type = "Character"
 subtype = "Survivor"
@@ -475,7 +475,7 @@ alternate-rules-text = """
 rules-text-3 = """
 {Judgment} You may {banish} an ally, then {materialize} it.
 """
-preview-3 = "▸ Judgment:: You may banish another character you control, then materialize it."
+preview-3 = "▸ Judgment: You may banish an ally, then materialize it."
 card-type = "Character"
 subtype = "Explorer"
 is-fast = false
@@ -545,6 +545,8 @@ alternate-rules-text = """
 Draw 3 cards.
 
 Banish your void with 8 or more cards: Play this event for $0."""
+rules-text-3 = "Draw 3 cards."
+preview-3 = "Draw 3 cards."
 card-type = "Event"
 is-fast = false
 image-number = 1786390157
@@ -557,6 +559,9 @@ id = "f649bc96-1d35-4665-97d9-799208558ff3"
 energy-cost = 3
 rules-text = "{materialized}: Look at the enemy's hand. You may choose a card from it. The enemy discards that card and then draws a card."
 alternate-rules-text = "{Materialized}: Discard a chosen card from opponent's hand. They draw a card."
+rules-text-3 = "{Materialized} Discard a chosen card from opponent's hand. They draw {cards}."
+preview-3 = "▸ Materialized: Discard a chosen card from opponent's hand. They draw a card."
+variables = "cards: 1"
 card-type = "Character"
 subtype = "Outsider"
 is-fast = false
@@ -575,6 +580,11 @@ Once per turn, you may play a character with cost $2 or less from your void.
 alternate-rules-text = """
 Once per turn, you may play a character with cost $2 or less from your void.
 """
+rules-text-3 = """
+Once per turn, you may play a character with cost {e} or less from your void.
+"""
+preview-3 = "Once per turn, you may play a character with cost 2● or less from your void."
+variables = "e:2"
 card-type = "Character"
 subtype = "Explorer"
 is-fast = false
@@ -595,6 +605,18 @@ alternate-rules-text = """
 {Dissolved}: Draw a card.
 
 When an allied survivor is dissolved, draw a card."""
+rules-text-3 = """
+{Dissolved} Draw {cards}.
+
+When an allied {subtype} is dissolved, draw {cards-v2}."""
+preview-3 = """
+▸ Dissolved:: Draw a card.
+
+When an allied survivor is dissolved, draw a card."""
+variables = """
+cards: 1
+type: survivor
+cards-v2: 1"""
 card-type = "Character"
 subtype = "Survivor"
 is-fast = false

@@ -37,6 +37,13 @@ cards =
       *[other] { $cards } cards
   }
 
+cards-v2 =
+  {
+    $cards-v2 ->
+      [one] a card
+      *[other] { $cards-v2 } cards
+  }
+
 top-cards =
   {
     $cards ->
