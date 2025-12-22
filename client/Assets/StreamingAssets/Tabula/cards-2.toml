@@ -49,7 +49,7 @@ id = "521b912b-1dfb-4440-a1e0-7181bac6aa58"
 energy-cost = 3
 rules-text = "{activated} Abandon a {cardtype: warrior}: {discover} a {cardtype: warrior} with cost $1 higher than the abandoned character and materialize it."
 alternate-rules-text = "{Judgment}: Abandon a warrior to discover a warrior with cost $1 higher and materialize it."
-rules-text-3 = "{Judgment} You may abandon {a-type} to {Discover} {a-type} with cost {e} higher and materialize it."
+rules-text-3 = "{Judgment} You may abandon {a-subtype} to {Discover} {a-subtype} with cost {e} higher and materialize it."
 preview-3 = "▸ Judgment: You may abandon a warrior to Discover a warrior with cost 1● higher and materialize it."
 variables = """
 type: warrior
@@ -175,9 +175,9 @@ id = "1396e9c8-5719-42bc-8ef6-98d2777cc069"
 energy-cost = 12
 rules-text = "Each {cardtype: spirit animal} you control gains spark equal to the number of {cardtype: spirit animals} you control."
 alternate-rules-text = "Give each allied {spirit animal} spark equal to the number of allied {spirit animals}."
-rules-text-3 = "Each allied {type} gains spark equal to the number of allied {plural-type}. "
-preview-3 = "Each allied Error: Unknown 'type' for type: warriore gains spark equal to the number of allied Error: Unknown 'plural-type' for type: warriore."
-variables = "type: warrior"
+rules-text-3 = "Each allied {subtype} gains {spark} equal to the number of allied {plural-subtype}. "
+preview-3 = "Each allied spirit animal gains spark equal to the number of allied spirit animals."
+variables = "type: spirit-animal"
 card-type = "Event"
 is-fast = false
 image-number = 1913887486
@@ -193,6 +193,14 @@ You may look at the top card of your deck.
 
 You may play characters from the top of your deck."""
 alternate-rules-text = """
+Reveal the top card of your deck.
+
+You may play characters from the top of your deck."""
+rules-text-3 = """
+Reveal the top card of your deck.
+
+You may play characters from the top of your deck."""
+preview-3 = """
 Reveal the top card of your deck.
 
 You may play characters from the top of your deck."""
@@ -215,6 +223,15 @@ alternate-rules-text = """
 Characters in your hand have ↯.
 
 Once per turn, when you play a ↯ character, gain $1."""
+rules-text-3 = """
+Characters in your hand have {fast}.
+
+Once per turn, when you play a {fast} character, gain {e}. """
+preview-3 = """
+Characters in your hand have ↯.
+
+Once per turn, when you play a ↯ character, gain 1●."""
+variables = "e: 1"
 card-type = "Character"
 subtype = "Visitor"
 is-fast = false
@@ -229,6 +246,9 @@ id = "d8017d8f-7855-47e5-bfe5-89ca2e7c5203"
 energy-cost = 4
 rules-text = "{immediate} {activated}: Banish another character with spark 1 or less you control, then materialize it."
 alternate-rules-text = "{Materialized}, {Judgment}: Banish an ally with spark 2 or less, then materialize it."
+rules-text-3 = "{Materialized-Judgment} {Banish} an ally with {spark} {s} or less, then materialize it."
+preview-3 = "▸Materialized, ▸Judgment: Banish an ally with spark 2 or less, then materialize it."
+variables = "s: 2"
 card-type = "Character"
 subtype = "Mage"
 is-fast = false
@@ -243,6 +263,9 @@ id = "4d3eebd3-02b4-4016-a15a-0e8a05b6696b"
 energy-cost = 1
 rules-text = "{materialized}: Materialize a {kw: silent} copy of this character for each dream you have played this turn."
 alternate-rules-text = "{Materialized}: Materialize a Dream Figment for each card you have played this card."
+rules-text-3 = "{Materialize} a {figment} for each card you have played this turn."
+preview-3 = "Materialize a Dream Figment for each card you have played this turn."
+variables = "figment: Dream Figment"
 card-type = "Character"
 subtype = "Mage"
 is-fast = false

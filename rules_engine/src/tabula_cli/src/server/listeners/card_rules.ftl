@@ -4,7 +4,11 @@ Materialized = ▸ <b>Materialized:</b>
 
 Judgment = ▸ <b>Judgment:</b>
 
+Materialized-Judgment = <b>▸Materialized, ▸Judgment:</b>
+
 Dissolve = <color=#AA00FF><b>Dissolve</b></color>
+
+Banish = <color=#AA00FF><b>Banish</b></color>
 
 Disable = <color=#AA00FF><b>Disable</b></color>
 
@@ -14,12 +18,20 @@ Reclaim = <color=#AA00FF><b>Reclaim</b></color>
 
 Play = <color=#AA00FF><b>Play</b></color>
 
+Materialize = <color=#AA00FF><b>Materialize</b></color>
+
+fast = <color=#AA00FF><b>↯</b></color>
+
 cards =
   {
     $cards ->
       [one] a card
       *[other] { $cards } cards
   }
+
+s = { $s }
+
+spark = spark
 
 count-allies =
   {
@@ -28,10 +40,12 @@ count-allies =
       *[other] { $allies } allies
   }
 
+figment = <color=#F57F17><b>{$figment}</b></color>
+
 -begin-type = <color=#2E7D32><b>
 -end-type = </b></color>
 
-a-type =
+a-subtype =
   {
     $type ->
       [ancient] an {-begin-type}ancient{-end-type}
@@ -57,7 +71,7 @@ a-type =
       *[other] Error: Unknown 'a-type' for type: { $type }
   }
 
-type =
+subtype =
   {
     $type ->
       [ancient] {-begin-type}ancient{-end-type}
@@ -83,7 +97,7 @@ type =
       *[other] Error: Unknown 'type' for type: { $type }
   }
 
-plural-type =
+plural-subtype =
   {
     $type ->
       [ancient] {-begin-type}ancients{-end-type}
