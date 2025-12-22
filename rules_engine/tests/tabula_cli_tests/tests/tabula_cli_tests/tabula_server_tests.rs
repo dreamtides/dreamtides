@@ -9,6 +9,10 @@ use tabula_cli_tests::tabula_cli_test_utils;
 use tempfile::TempDir;
 use umya_spreadsheet::writer::xlsx;
 
+fn listener_with_ftl(ftl: &str) -> FluentRulesTextListener {
+    FluentRulesTextListener::with_ftl(ftl).expect("Failed to create listener")
+}
+
 #[test]
 fn test_conditional_formatting_finds_pineapple() {
     let temp_dir = TempDir::new().expect("Failed to create temp dir");
@@ -820,7 +824,7 @@ fn test_fluent_rules_text_simple_html() {
         changed_range: None,
     };
 
-    let listener = FluentRulesTextListener::new().expect("Failed to create listener");
+    let listener = listener_with_ftl("a = a\n");
     let result = listener.run(&snapshot, &context).expect("Listener should succeed");
 
     let set_value_changes: Vec<_> = result
@@ -906,7 +910,8 @@ fn test_fluent_rules_text_variable_select() {
         changed_range: None,
     };
 
-    let listener = FluentRulesTextListener::new().expect("Failed to create listener");
+    let listener =
+        listener_with_ftl("a =\n  { $type ->\n    [warrior] a warrior\n   *[other] a thing\n  }\n");
     let result = listener.run(&snapshot, &context).expect("Listener should succeed");
 
     let set_value_changes: Vec<_> = result
@@ -941,7 +946,7 @@ fn test_fluent_rules_text_no_cards_table() {
         changed_range: None,
     };
 
-    let listener = FluentRulesTextListener::new().expect("Failed to create listener");
+    let listener = listener_with_ftl("a = a\n");
     let result = listener.run(&snapshot, &context).expect("Listener should succeed");
 
     assert_eq!(result.changes.len(), 0, "Should not generate any changes without Cards table");
@@ -980,7 +985,7 @@ fn test_fluent_rules_text_no_rules_text_column() {
         changed_range: None,
     };
 
-    let listener = FluentRulesTextListener::new().expect("Failed to create listener");
+    let listener = listener_with_ftl("a = a\n");
     let result = listener.run(&snapshot, &context).expect("Listener should succeed");
 
     assert_eq!(
@@ -1022,7 +1027,7 @@ fn test_fluent_rules_text_invalid_expression() {
         changed_range: None,
     };
 
-    let listener = FluentRulesTextListener::new().expect("Failed to create listener");
+    let listener = listener_with_ftl("a = a\n");
     let result = listener.run(&snapshot, &context).expect("Listener should succeed");
 
     assert_eq!(result.changes.len(), 1, "Should generate error message change");

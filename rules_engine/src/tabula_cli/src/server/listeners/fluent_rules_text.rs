@@ -14,14 +14,17 @@ pub struct FluentRulesTextListener {
 }
 
 impl FluentRulesTextListener {
-    pub fn new() -> Result<Self> {
-        let ftl_source = include_str!("card_rules.ftl");
+    pub fn with_ftl(ftl_source: &str) -> Result<Self> {
         let resource = FluentResource::try_new(ftl_source.to_string()).map_err(|(_, errors)| {
             let error_vec: Vec<FluentError> =
                 errors.into_iter().map(FluentError::ParserError).collect();
             anyhow::anyhow!("Failed to parse Fluent resource: {}", format_fluent_errors(&error_vec))
         })?;
         Ok(FluentRulesTextListener { resource: Arc::new(resource) })
+    }
+
+    pub fn new() -> Result<Self> {
+        Self::with_ftl(include_str!("card_rules.ftl"))
     }
 }
 
