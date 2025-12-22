@@ -2,18 +2,22 @@
 ### Helpers (shared terms/messages)
 ### ----------------------------
 
--e = {$n}◆
+-e = <color=#00838F>◆</color>
 
 # Energy symbol used in costs
 -energy-symbol = ⚡
 
-Materialized = ▸ <b>Materialized: </b>
+Materialized = ▸ <b>Materialized:</b>
 
-Judgment = ▸ <b>Judgment: </b>
+Judgment = ▸ <b>Judgment:</b>
 
 Dissolve = <color=#AA00FF><b>Dissolve</b></color>
 
-discover = <color=#AA00FF><b>discover</b></color>
+Disable = <color=#AA00FF><b>Disable</b></color>
+
+Discover = <color=#AA00FF><b>Discover</b></color>
+
+Play = <color=#AA00FF><b>Play</b></color>
 
 a-type =
   {

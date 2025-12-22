@@ -928,6 +928,53 @@ fn test_fluent_rules_text_variable_select() {
 }
 
 #[test]
+fn test_fluent_rules_text_multiline() {
+    let temp_dir = TempDir::new().expect("Failed to create temp dir");
+    let xlsx_path = temp_dir.path().join("test_fluent_multiline.xlsx");
+
+    let mut book = umya_spreadsheet::new_file();
+    let sheet = book.get_sheet_mut(&0).expect("Sheet 0 should exist");
+    sheet.set_name("Cards");
+
+    sheet.get_cell_mut("A1").set_value("RulesText3");
+    sheet.get_cell_mut("B1").set_value("Fluent Output");
+    sheet.get_cell_mut("A2").set_value("One\n\nTwo");
+
+    let mut table = umya_spreadsheet::structs::Table::default();
+    table.set_name("Cards2");
+    table.set_display_name("Cards2");
+    table.set_area(("A1", "B2"));
+    table.add_column(tabula_cli_test_utils::make_column("RulesText3"));
+    table.add_column(tabula_cli_test_utils::make_column("Fluent Output"));
+    sheet.add_table(table);
+
+    xlsx::write(&book, &xlsx_path).expect("Write workbook");
+
+    let snapshot = read_snapshot(&xlsx_path, None).expect("Failed to read snapshot");
+
+    let context = ListenerContext {
+        request_id: "test-fluent-multiline".to_string(),
+        workbook_path: xlsx_path.to_string_lossy().to_string(),
+        changed_range: None,
+    };
+
+    let listener = listener_with_ftl("a = a\n");
+    let result = listener.run(&snapshot, &context).expect("Listener should succeed");
+
+    let set_value_changes: Vec<_> = result
+        .changes
+        .iter()
+        .filter_map(|c| match c {
+            Change::SetValue { cell, value, .. } => Some((cell.clone(), value.clone())),
+            _ => None,
+        })
+        .collect();
+
+    assert_eq!(set_value_changes.len(), 1, "Should create formatted output in 1 cell");
+    assert_eq!(set_value_changes[0], ("B2".to_string(), "One\n\nTwo".to_string()));
+}
+
+#[test]
 fn test_fluent_rules_text_no_cards_table() {
     let temp_dir = TempDir::new().expect("Failed to create temp dir");
     let xlsx_path = temp_dir.path().join("test_fluent_no_table.xlsx");

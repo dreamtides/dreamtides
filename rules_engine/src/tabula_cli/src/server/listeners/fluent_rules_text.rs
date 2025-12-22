@@ -398,6 +398,30 @@ fn expand_plain_variables(expression: &str) -> String {
     result
 }
 
+fn build_temp_message(expression: &str) -> String {
+    let expanded = expand_plain_variables(expression);
+    let normalized = expanded.replace("\r\n", "\n").replace('\r', "\n");
+    if !normalized.contains('\n') {
+        return format!("temp-message = {normalized}");
+    }
+
+    let mut lines = normalized.split('\n');
+    let first = lines.next().unwrap_or("");
+    let mut temp = if first.is_empty() {
+        "temp-message =".to_string()
+    } else {
+        format!("temp-message = {first}")
+    };
+
+    for line in lines {
+        temp.push('\n');
+        temp.push_str("    ");
+        temp.push_str(line);
+    }
+
+    temp
+}
+
 fn format_fluent_expression(
     resource: &Arc<FluentResource>,
     expression: &str,
@@ -412,7 +436,7 @@ fn format_fluent_expression(
         ));
     }
 
-    let temp_ftl = format!("temp-message = {}", expand_plain_variables(expression));
+    let temp_ftl = build_temp_message(expression);
     let temp_resource = FluentResource::try_new(temp_ftl).map_err(|(_, errors)| {
         let error_vec: Vec<FluentError> =
             errors.into_iter().map(FluentError::ParserError).collect();
