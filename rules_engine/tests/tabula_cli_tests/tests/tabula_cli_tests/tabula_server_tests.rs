@@ -1077,7 +1077,7 @@ fn test_fluent_rules_text_invalid_expression() {
     let listener = listener_with_ftl("a = a\n");
     let result = listener.run(&snapshot, &context).expect("Listener should succeed");
 
-    assert_eq!(result.changes.len(), 1, "Should generate error message change");
+    assert_eq!(result.changes.len(), 2, "Should generate error message change");
     assert!(result.warnings.is_empty(), "Should have no warnings");
 
     let set_value_changes: Vec<_> = result
@@ -1093,4 +1093,16 @@ fn test_fluent_rules_text_invalid_expression() {
     let (cell, value) = &set_value_changes[0];
     assert_eq!(cell, "B2", "Error message should be in B2");
     assert!(value.starts_with("Error:"), "Error message should start with 'Error:'");
+
+    let set_color_changes: Vec<_> = result
+        .changes
+        .iter()
+        .filter_map(|c| match c {
+            Change::SetFontColor { cell, rgb, .. } => Some((cell.clone(), rgb.clone())),
+            _ => None,
+        })
+        .collect();
+
+    assert_eq!(set_color_changes.len(), 1, "Should reset base text color");
+    assert_eq!(set_color_changes[0], ("B2".to_string(), "000000".to_string()));
 }

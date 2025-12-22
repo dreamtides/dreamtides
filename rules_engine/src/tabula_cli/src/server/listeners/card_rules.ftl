@@ -1,11 +1,4 @@
-### ----------------------------
-### Helpers (shared terms/messages)
-### ----------------------------
-
--e = <color=#00838F>◆</color>
-
-# Energy symbol used in costs
--energy-symbol = ⚡
+e = <color=#00838F>{$e}$</color>
 
 Materialized = ▸ <b>Materialized:</b>
 
@@ -16,6 +9,8 @@ Dissolve = <color=#AA00FF><b>Dissolve</b></color>
 Disable = <color=#AA00FF><b>Disable</b></color>
 
 Discover = <color=#AA00FF><b>Discover</b></color>
+
+Reclaim = <color=#AA00FF><b>Reclaim</b></color>
 
 Play = <color=#AA00FF><b>Play</b></color>
 

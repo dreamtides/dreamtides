@@ -116,6 +116,11 @@ impl Listener for FluentRulesTextListener {
                             cell: output_cell_ref.clone(),
                             value: styled.text,
                         });
+                        changes.push(Change::SetFontColor {
+                            sheet: sheet.name.clone(),
+                            cell: output_cell_ref.clone(),
+                            rgb: "000000".to_string(),
+                        });
                         if !styled.unbold_spans.is_empty() {
                             changes.push(Change::SetBoldSpans {
                                 sheet: sheet.name.clone(),
@@ -144,8 +149,13 @@ impl Listener for FluentRulesTextListener {
                     Err(e) => {
                         changes.push(Change::SetValue {
                             sheet: sheet.name.clone(),
-                            cell: output_cell_ref,
+                            cell: output_cell_ref.clone(),
                             value: format!("Error: {e}"),
+                        });
+                        changes.push(Change::SetFontColor {
+                            sheet: sheet.name.clone(),
+                            cell: output_cell_ref,
+                            rgb: "000000".to_string(),
                         });
                     }
                 }

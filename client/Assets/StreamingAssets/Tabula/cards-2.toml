@@ -11,13 +11,10 @@ Abandon an ally: Play this character for $0, then abandon it.
 
 {Materialized}: Dissolve an enemy."""
 rules-text-3 = """
-Abandon an ally: {Play} this character for 0{-e}, then abandon it.
+Abandon an ally: {Play} this character for {e}, then abandon it.
 
 {Materialized} {Dissolve} an enemy."""
-preview-3 = """
-Abandon an ally: Play this character for 0◆, then abandon it.
-
-▸ Materialized: Dissolve an enemy."""
+variables = "e: 0"
 card-type = "Character"
 subtype = "Ancient"
 is-fast = false
@@ -32,7 +29,7 @@ id = "4e3420f2-6f0d-4381-b2b1-afb16af7549f"
 energy-cost = 3
 rules-text = "{materialized}: Disable the activated abilities of a chosen enemy character while this character is in play."
 alternate-rules-text = "{Materialized}: Disable the activated abilities of an enemy while this character is in play. "
-rules-text-3 = "{Materialized} {Disable} the activated abilities of an enemy while this character is in play. "
+rules-text-3 = "{Materialized} {Disable} the activated abilities of an enemy while this character is in play."
 preview-3 = "▸ Materialized: Disable the activated abilities of an enemy while this character is in play."
 card-type = "Character"
 subtype = "Warrior"
@@ -48,8 +45,8 @@ id = "521b912b-1dfb-4440-a1e0-7181bac6aa58"
 energy-cost = 3
 rules-text = "{activated} Abandon a {cardtype: warrior}: {discover} a {cardtype: warrior} with cost $1 higher than the abandoned character and materialize it."
 alternate-rules-text = "{Judgment}: Abandon a warrior to discover a warrior with cost $1 higher and materialize it."
-rules-text-3 = "{Judgment} Abandon {a-type} to {Discover} {a-type} with cost 1{-e} higher and materialize it."
-preview-3 = "▸ Judgment: Abandon a warrior to Discover a warrior with cost 1◆ higher and materialize it."
+rules-text-3 = "{Judgment} Abandon {a-type} to {Discover} {a-type} with cost {-energy(e:1)} higher and materialize it."
+preview-3 = "Error: Fluent formatting errors: Resolver error: Unknown term: -energy"
 variables = "type: warrior"
 card-type = "Character"
 subtype = "Ancient"
@@ -74,11 +71,8 @@ This event costs $1 if a character dissolved this turn."""
 rules-text-3 = """
 {Dissolve} an enemy. Draw a card.
 
-This event costs 1{-e} if a character dissolved this turn."""
-preview-3 = """
-Dissolve an enemy. Draw a card.
-
-This event costs 1◆ if a character dissolved this turn."""
+This event costs {-energy(e:1)} if a character dissolved this turn."""
+preview-3 = "Error: Fluent formatting errors: Resolver error: Unknown term: -energy"
 card-type = "Event"
 is-fast = false
 image-number = 454095982
@@ -97,13 +91,14 @@ Additional Cost: Return an ally with cost $3 or more to hand.
 
 {Judgment}: Draw a card."""
 rules-text-3 = """
-Additional Cost: Return an ally with cost 3{-e} or more to hand.
+Additional Cost: Return an ally with cost {e} or more to hand.
 
-{Judgment}: Draw a card."""
+{Judgment} Draw a card."""
 preview-3 = """
-Additional Cost: Return an ally with cost 3◆ or more to hand.
+Additional Cost: Return an ally with cost 3$ or more to hand.
 
-▸ Judgment:: Draw a card."""
+▸ Judgment: Draw a card."""
+variables = "e: 3"
 card-type = "Character"
 subtype = "Ancient"
 is-fast = false
@@ -118,6 +113,9 @@ id = "2530adcc-5ae2-486a-94b2-f40dd62f3755"
 energy-cost = 2
 rules-text = "If you have 8 or more cards in your void, cards in your void have {reclaim}."
 alternate-rules-text = "While you have 5 or more events in your void, they have {reclaim} equal to their cost. "
+rules-text-3 = "While you have {$count} or more events in your void, they have {Reclaim} equal to their cost."
+preview-3 = "While you have 5 or more events in your void, they have Reclaim equal to their cost."
+variables = "count: 5"
 reminders = "Reclaim: Play an event from your void for its cost, then banish it."
 card-type = "Character"
 subtype = "Synth"
