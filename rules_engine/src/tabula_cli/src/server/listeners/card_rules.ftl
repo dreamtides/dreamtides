@@ -1,26 +1,20 @@
 e = <color=#00838F>{$e}●</color>
 
-Materialized = ▸ <b>Materialized:</b>
+-trigger = ▸ <b>{$trigger}:</b>
+Materialized = {-trigger(trigger: "Materialized")}
+Judgment = {-trigger(trigger: "Judgment")}
+Materialized-Judgment = {-trigger(trigger: "Materialized, Judgment")}
 
-Judgment = ▸ <b>Judgment:</b>
+-keyword = <color=#AA00FF><b>{$k}</b></color>
 
-Materialized-Judgment = <b>▸Materialized, ▸Judgment:</b>
-
-Dissolve = <color=#AA00FF><b>Dissolve</b></color>
-
-Banish = <color=#AA00FF><b>Banish</b></color>
-
-Disable = <color=#AA00FF><b>Disable</b></color>
-
-Discover = <color=#AA00FF><b>Discover</b></color>
-
-Reclaim = <color=#AA00FF><b>Reclaim</b></color>
-
-Play = <color=#AA00FF><b>Play</b></color>
-
-Materialize = <color=#AA00FF><b>Materialize</b></color>
-
-fast = <color=#AA00FF><b>↯</b></color>
+Dissolve = {-keyword(k: "Dissolve")}
+Banish = {-keyword(k: "Banish")}
+Disable = {-keyword(k: "Disable")}
+Discover = {-keyword(k: "Discover")}
+Reclaim = {-keyword(k: "Reclaim")}
+Play = {-keyword(k: "Play")}
+Materialize = {-keyword(k: "Materialize")}
+fast = {-keyword(k: "↯")}
 
 cards =
   {
@@ -40,7 +34,7 @@ count-allies =
       *[other] { $allies } allies
   }
 
-figment = <color=#F57F17><b>{$figment}</b></color>
+figment = <color=#F57F17><b><u>{$figment}</u></color></b> Figment
 
 -begin-type = <color=#2E7D32><b>
 -end-type = </b></color>

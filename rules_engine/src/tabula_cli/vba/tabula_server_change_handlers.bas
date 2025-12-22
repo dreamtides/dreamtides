@@ -25,6 +25,10 @@ Public Sub ApplyChanges(response As TabulaResponse)
                 ApplySetBold change
             Case "set_bold_spans"
                 ApplySetBoldSpans change
+            Case "set_italic_spans"
+                ApplySetItalicSpans change
+            Case "set_underline_spans"
+                ApplySetUnderlineSpans change
             Case "set_font_color_spans"
                 ApplySetFontColorSpans change
             Case "set_value"
@@ -121,6 +125,83 @@ Private Sub ApplySetBoldSpans(change As TabulaChange)
             startPos = CLng(spanParts(0))
             length = CLng(spanParts(1))
             cell.Characters(startPos, length).Font.Bold = isBold
+        End If
+    Next i
+End Sub
+
+Private Sub ApplySetItalicSpans(change As TabulaChange)
+    Dim sheet As Worksheet
+    Dim cell As Range
+    Dim spans() As String
+    Dim i As Long
+    Dim spanParts() As String
+    Dim startPos As Long
+    Dim length As Long
+    Dim isItalic As Boolean
+
+    On Error Resume Next
+    Set sheet = ThisWorkbook.Worksheets(change.Sheet)
+    If sheet Is Nothing Then
+        Exit Sub
+    End If
+
+    Set cell = sheet.Range(change.Cell)
+    If cell Is Nothing Then
+        Exit Sub
+    End If
+
+    On Error GoTo 0
+
+    isItalic = change.Value1 = "1"
+    spans = Split(change.Value2, ",")
+
+    For i = LBound(spans) To UBound(spans)
+        spanParts = Split(spans(i), ":")
+        If UBound(spanParts) >= 1 Then
+            startPos = CLng(spanParts(0))
+            length = CLng(spanParts(1))
+            cell.Characters(startPos, length).Font.Italic = isItalic
+        End If
+    Next i
+End Sub
+
+Private Sub ApplySetUnderlineSpans(change As TabulaChange)
+    Dim sheet As Worksheet
+    Dim cell As Range
+    Dim spans() As String
+    Dim i As Long
+    Dim spanParts() As String
+    Dim startPos As Long
+    Dim length As Long
+    Dim underlineStyle As XlUnderlineStyle
+
+    On Error Resume Next
+    Set sheet = ThisWorkbook.Worksheets(change.Sheet)
+    If sheet Is Nothing Then
+        Exit Sub
+    End If
+
+    Set cell = sheet.Range(change.Cell)
+    If cell Is Nothing Then
+        Exit Sub
+    End If
+
+    On Error GoTo 0
+
+    If change.Value1 = "1" Then
+        underlineStyle = xlUnderlineStyleSingle
+    Else
+        underlineStyle = xlUnderlineStyleNone
+    End If
+
+    spans = Split(change.Value2, ",")
+
+    For i = LBound(spans) To UBound(spans)
+        spanParts = Split(spans(i), ":")
+        If UBound(spanParts) >= 1 Then
+            startPos = CLng(spanParts(0))
+            length = CLng(spanParts(1))
+            cell.Characters(startPos, length).Font.Underline = underlineStyle
         End If
     Next i
 End Sub

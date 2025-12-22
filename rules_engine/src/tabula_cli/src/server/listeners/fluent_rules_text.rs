@@ -137,6 +137,38 @@ impl Listener for FluentRulesTextListener {
                                 spans: styled.bold_spans,
                             });
                         }
+                        if !styled.unitalic_spans.is_empty() {
+                            changes.push(Change::SetItalicSpans {
+                                sheet: sheet.name.clone(),
+                                cell: output_cell_ref.clone(),
+                                italic: false,
+                                spans: styled.unitalic_spans,
+                            });
+                        }
+                        if !styled.italic_spans.is_empty() {
+                            changes.push(Change::SetItalicSpans {
+                                sheet: sheet.name.clone(),
+                                cell: output_cell_ref.clone(),
+                                italic: true,
+                                spans: styled.italic_spans,
+                            });
+                        }
+                        if !styled.ununderline_spans.is_empty() {
+                            changes.push(Change::SetUnderlineSpans {
+                                sheet: sheet.name.clone(),
+                                cell: output_cell_ref.clone(),
+                                underline: false,
+                                spans: styled.ununderline_spans,
+                            });
+                        }
+                        if !styled.underline_spans.is_empty() {
+                            changes.push(Change::SetUnderlineSpans {
+                                sheet: sheet.name.clone(),
+                                cell: output_cell_ref.clone(),
+                                underline: true,
+                                spans: styled.underline_spans,
+                            });
+                        }
                         for (rgb, spans) in styled.color_spans {
                             changes.push(Change::SetFontColorSpans {
                                 sheet: sheet.name.clone(),
@@ -208,6 +240,8 @@ fn parse_fluent_args(cell_value: Option<&CellValue>) -> Result<FluentArgs> {
 #[derive(Clone, Debug, PartialEq, Eq)]
 struct StyleState {
     bold: bool,
+    italic: bool,
+    underline: bool,
     color: Option<String>,
 }
 
@@ -216,6 +250,8 @@ struct StyledRun {
     start: usize,
     length: usize,
     bold: bool,
+    italic: bool,
+    underline: bool,
     color: Option<String>,
 }
 
@@ -224,6 +260,10 @@ struct StyledText {
     text: String,
     bold_spans: Vec<Span>,
     unbold_spans: Vec<Span>,
+    italic_spans: Vec<Span>,
+    unitalic_spans: Vec<Span>,
+    underline_spans: Vec<Span>,
+    ununderline_spans: Vec<Span>,
     color_spans: Vec<(String, Vec<Span>)>,
 }
 
@@ -231,6 +271,10 @@ struct StyledText {
 enum HtmlTag {
     BoldStart,
     BoldEnd,
+    ItalicStart,
+    ItalicEnd,
+    UnderlineStart,
+    UnderlineEnd,
     ColorStart(String),
     ColorEnd,
 }
@@ -239,8 +283,11 @@ fn apply_simple_html_styles(text: &str) -> StyledText {
     let mut output = String::new();
     let mut runs = Vec::new();
     let mut bold_depth = 0usize;
+    let mut italic_depth = 0usize;
+    let mut underline_depth = 0usize;
     let mut color_stack: Vec<String> = Vec::new();
-    let mut current_style = StyleState { bold: false, color: None };
+    let mut current_style =
+        StyleState { bold: false, italic: false, underline: false, color: None };
     let mut output_len = 0usize;
     let mut run_start = 0usize;
     let mut idx = 0usize;
@@ -273,19 +320,75 @@ fn apply_simple_html_styles(text: &str) -> StyledText {
             let next_style = match tag {
                 HtmlTag::BoldStart => {
                     bold_depth += 1;
-                    StyleState { bold: true, color: color_stack.last().cloned() }
+                    StyleState {
+                        bold: bold_depth > 0,
+                        italic: italic_depth > 0,
+                        underline: underline_depth > 0,
+                        color: color_stack.last().cloned(),
+                    }
                 }
                 HtmlTag::BoldEnd => {
                     bold_depth = bold_depth.saturating_sub(1);
-                    StyleState { bold: bold_depth > 0, color: color_stack.last().cloned() }
+                    StyleState {
+                        bold: bold_depth > 0,
+                        italic: italic_depth > 0,
+                        underline: underline_depth > 0,
+                        color: color_stack.last().cloned(),
+                    }
+                }
+                HtmlTag::ItalicStart => {
+                    italic_depth += 1;
+                    StyleState {
+                        bold: bold_depth > 0,
+                        italic: italic_depth > 0,
+                        underline: underline_depth > 0,
+                        color: color_stack.last().cloned(),
+                    }
+                }
+                HtmlTag::ItalicEnd => {
+                    italic_depth = italic_depth.saturating_sub(1);
+                    StyleState {
+                        bold: bold_depth > 0,
+                        italic: italic_depth > 0,
+                        underline: underline_depth > 0,
+                        color: color_stack.last().cloned(),
+                    }
+                }
+                HtmlTag::UnderlineStart => {
+                    underline_depth += 1;
+                    StyleState {
+                        bold: bold_depth > 0,
+                        italic: italic_depth > 0,
+                        underline: underline_depth > 0,
+                        color: color_stack.last().cloned(),
+                    }
+                }
+                HtmlTag::UnderlineEnd => {
+                    underline_depth = underline_depth.saturating_sub(1);
+                    StyleState {
+                        bold: bold_depth > 0,
+                        italic: italic_depth > 0,
+                        underline: underline_depth > 0,
+                        color: color_stack.last().cloned(),
+                    }
                 }
                 HtmlTag::ColorStart(color) => {
                     color_stack.push(color);
-                    StyleState { bold: bold_depth > 0, color: color_stack.last().cloned() }
+                    StyleState {
+                        bold: bold_depth > 0,
+                        italic: italic_depth > 0,
+                        underline: underline_depth > 0,
+                        color: color_stack.last().cloned(),
+                    }
                 }
                 HtmlTag::ColorEnd => {
                     color_stack.pop();
-                    StyleState { bold: bold_depth > 0, color: color_stack.last().cloned() }
+                    StyleState {
+                        bold: bold_depth > 0,
+                        italic: italic_depth > 0,
+                        underline: underline_depth > 0,
+                        color: color_stack.last().cloned(),
+                    }
                 }
             };
             if next_style != current_style {
@@ -294,6 +397,8 @@ fn apply_simple_html_styles(text: &str) -> StyledText {
                         start: run_start,
                         length: output_len - run_start,
                         bold: current_style.bold,
+                        italic: current_style.italic,
+                        underline: current_style.underline,
                         color: current_style.color.clone(),
                     });
                 }
@@ -315,12 +420,18 @@ fn apply_simple_html_styles(text: &str) -> StyledText {
             start: run_start,
             length: output_len - run_start,
             bold: current_style.bold,
+            italic: current_style.italic,
+            underline: current_style.underline,
             color: current_style.color.clone(),
         });
     }
 
     let mut bold_spans = Vec::new();
     let mut unbold_spans = Vec::new();
+    let mut italic_spans = Vec::new();
+    let mut unitalic_spans = Vec::new();
+    let mut underline_spans = Vec::new();
+    let mut ununderline_spans = Vec::new();
     let mut color_spans: BTreeMap<String, Vec<Span>> = BTreeMap::new();
     for run in runs {
         let start = (run.start + 1) as u32;
@@ -329,6 +440,16 @@ fn apply_simple_html_styles(text: &str) -> StyledText {
             bold_spans.push(Span { start, length });
         } else {
             unbold_spans.push(Span { start, length });
+        }
+        if run.italic {
+            italic_spans.push(Span { start, length });
+        } else {
+            unitalic_spans.push(Span { start, length });
+        }
+        if run.underline {
+            underline_spans.push(Span { start, length });
+        } else {
+            ununderline_spans.push(Span { start, length });
         }
         if let Some(color) = run.color {
             color_spans.entry(color).or_default().push(Span { start, length });
@@ -339,6 +460,10 @@ fn apply_simple_html_styles(text: &str) -> StyledText {
         text: output,
         bold_spans,
         unbold_spans,
+        italic_spans,
+        unitalic_spans,
+        underline_spans,
+        ununderline_spans,
         color_spans: color_spans.into_iter().collect(),
     }
 }
@@ -351,6 +476,18 @@ fn parse_simple_html_tag(tag: &str) -> Option<HtmlTag> {
     }
     if lower == "/b" {
         return Some(HtmlTag::BoldEnd);
+    }
+    if lower == "i" {
+        return Some(HtmlTag::ItalicStart);
+    }
+    if lower == "/i" {
+        return Some(HtmlTag::ItalicEnd);
+    }
+    if lower == "u" {
+        return Some(HtmlTag::UnderlineStart);
+    }
+    if lower == "/u" {
+        return Some(HtmlTag::UnderlineEnd);
     }
     if lower == "/color" {
         return Some(HtmlTag::ColorEnd);

@@ -107,6 +107,9 @@ All changes specify sheet and cell. Spans use 1-based indexing for VBA compatibi
 - `set_horizontal_alignment <sheet> <cell> <left|center|right>`
 
 **Character-Level Formatting (Spans):**
+- `set_bold_spans <sheet> <cell> <0|1> <spans>`
+- `set_italic_spans <sheet> <cell> <0|1> <spans>`
+- `set_underline_spans <sheet> <cell> <0|1> <spans>`
 - `set_font_color_spans <sheet> <cell> <RRGGBB> <spans>`
 - `set_font_name_spans <sheet> <cell> <font-name> <spans>`
 - `set_font_size_spans <sheet> <cell> <points> <spans>`
@@ -314,4 +317,3 @@ See `docs/adding_new_effects.md` for detailed guidance.
 - Bounded retry attempts (default MAX_RETRIES = 3)
 - Always restore `Application.EnableEvents` state
 - Clean up temp files on all paths (success and error)
-

@@ -48,6 +48,8 @@ pub enum HorizontalAlignment {
 pub enum Change {
     SetBold { sheet: String, cell: String, bold: bool },
     SetBoldSpans { sheet: String, cell: String, bold: bool, spans: Vec<Span> },
+    SetItalicSpans { sheet: String, cell: String, italic: bool, spans: Vec<Span> },
+    SetUnderlineSpans { sheet: String, cell: String, underline: bool, spans: Vec<Span> },
     SetFontColorSpans { sheet: String, cell: String, rgb: String, spans: Vec<Span> },
     SetValue { sheet: String, cell: String, value: String },
     ClearValue { sheet: String, cell: String },

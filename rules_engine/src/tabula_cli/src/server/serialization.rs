@@ -116,6 +116,34 @@ fn serialize_change(change: &Change) -> String {
                 spans_str
             )
         }
+        Change::SetItalicSpans { sheet, cell, italic, spans } => {
+            let spans_str = spans
+                .iter()
+                .map(|s| format!("{}:{}", s.start, s.length))
+                .collect::<Vec<_>>()
+                .join(",");
+            format!(
+                "CHANGE set_italic_spans {} {} {} {}",
+                percent_encode(sheet),
+                percent_encode(cell),
+                if *italic { "1" } else { "0" },
+                spans_str
+            )
+        }
+        Change::SetUnderlineSpans { sheet, cell, underline, spans } => {
+            let spans_str = spans
+                .iter()
+                .map(|s| format!("{}:{}", s.start, s.length))
+                .collect::<Vec<_>>()
+                .join(",");
+            format!(
+                "CHANGE set_underline_spans {} {} {} {}",
+                percent_encode(sheet),
+                percent_encode(cell),
+                if *underline { "1" } else { "0" },
+                spans_str
+            )
+        }
         Change::SetFontColorSpans { sheet, cell, rgb, spans } => {
             let spans_str = spans
                 .iter()
