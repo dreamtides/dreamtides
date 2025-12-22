@@ -14,6 +14,10 @@ rules-text-3 = """
 Abandon an ally: {Play} this character for {e}, then abandon it.
 
 {Materialized} {Dissolve} an enemy."""
+preview-3 = """
+Abandon an ally: Play this character for 0●, then abandon it.
+
+▸ Materialized: Dissolve an enemy."""
 variables = "e: 0"
 card-type = "Character"
 subtype = "Ancient"
@@ -45,9 +49,11 @@ id = "521b912b-1dfb-4440-a1e0-7181bac6aa58"
 energy-cost = 3
 rules-text = "{activated} Abandon a {cardtype: warrior}: {discover} a {cardtype: warrior} with cost $1 higher than the abandoned character and materialize it."
 alternate-rules-text = "{Judgment}: Abandon a warrior to discover a warrior with cost $1 higher and materialize it."
-rules-text-3 = "{Judgment} Abandon {a-type} to {Discover} {a-type} with cost {-energy(e:1)} higher and materialize it."
-preview-3 = "Error: Fluent formatting errors: Resolver error: Unknown term: -energy"
-variables = "type: warrior"
+rules-text-3 = "{Judgment} You may abandon {a-type} to {Discover} {a-type} with cost {e} higher and materialize it."
+preview-3 = "▸ Judgment: You may abandon a warrior to Discover a warrior with cost 1● higher and materialize it."
+variables = """
+type: warrior
+e: 1"""
 card-type = "Character"
 subtype = "Ancient"
 is-fast = false
@@ -69,10 +75,16 @@ Dissolve an enemy. Draw a card.
 
 This event costs $1 if a character dissolved this turn."""
 rules-text-3 = """
-{Dissolve} an enemy. Draw a card.
+{Dissolve} an enemy. Draw {cards}.
 
-This event costs {-energy(e:1)} if a character dissolved this turn."""
-preview-3 = "Error: Fluent formatting errors: Resolver error: Unknown term: -energy"
+This event costs {e} if a character dissolved this turn."""
+preview-3 = """
+Dissolve an enemy. Draw a card.
+
+This event costs 1● if a character dissolved this turn."""
+variables = """
+cards: 1
+e: 1"""
 card-type = "Event"
 is-fast = false
 image-number = 454095982
@@ -93,12 +105,14 @@ Additional Cost: Return an ally with cost $3 or more to hand.
 rules-text-3 = """
 Additional Cost: Return an ally with cost {e} or more to hand.
 
-{Judgment} Draw a card."""
+{Judgment} Draw {cards}."""
 preview-3 = """
-Additional Cost: Return an ally with cost 3$ or more to hand.
+Additional Cost: Return an ally with cost 3● or more to hand.
 
 ▸ Judgment: Draw a card."""
-variables = "e: 3"
+variables = """
+e: 3
+cards: 1"""
 card-type = "Character"
 subtype = "Ancient"
 is-fast = false
@@ -136,6 +150,17 @@ alternate-rules-text = """
 Has all character types.
 
 {Judgment}: If 3 allies share a character type, draw a card."""
+rules-text-3 = """
+Has all character types.
+
+{Judgment} If {count-allies} share a character type, draw {cards}."""
+preview-3 = """
+Has all character types.
+
+▸ Judgment: If 3 allies share a character type, draw a card."""
+variables = """
+allies: 3
+cards: 1"""
 card-type = "Character"
 subtype = '\*'
 is-fast = false
@@ -150,6 +175,9 @@ id = "1396e9c8-5719-42bc-8ef6-98d2777cc069"
 energy-cost = 12
 rules-text = "Each {cardtype: spirit animal} you control gains spark equal to the number of {cardtype: spirit animals} you control."
 alternate-rules-text = "Give each allied {spirit animal} spark equal to the number of allied {spirit animals}."
+rules-text-3 = "Each allied {type} gains spark equal to the number of allied {plural-type}. "
+preview-3 = "Each allied Error: Unknown 'type' for type: warriore gains spark equal to the number of allied Error: Unknown 'plural-type' for type: warriore."
+variables = "type: warrior"
 card-type = "Event"
 is-fast = false
 image-number = 1913887486
