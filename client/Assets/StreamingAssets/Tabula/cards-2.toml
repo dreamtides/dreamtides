@@ -72,13 +72,13 @@ Dissolve an enemy. Draw a card.
 
 This event costs $1 if a character dissolved this turn."""
 rules-text-3 = """
-Dissolve an enemy. Draw a card.
+{Dissolve} an enemy. Draw a card.
 
 This event costs 1{-e} if a character dissolved this turn."""
 preview-3 = """
-One
+Dissolve an enemy. Draw a card.
 
-T"""
+This event costs 1◆ if a character dissolved this turn."""
 card-type = "Event"
 is-fast = false
 image-number = 454095982
