@@ -8,7 +8,7 @@ Judgment = {-trigger(trigger: "Judgment")}
 Dissolved = {-trigger(trigger: "Dissolved")}
 MaterializedJudgment = {-trigger(trigger: "Materialized, Judgment")}
 MaterializedDissolved = {-trigger(trigger: "Materialized, Dissolved")}
-
+JudgmentPhaseName = <b>Judgment</b>
 
 -keyword = <color=#AA00FF>{$k}</color>
 
@@ -32,6 +32,7 @@ Kindle-k2 = {-keyword(k: "Kindle")} {$k2}
 fast = ↯Fast
 
 reclaim-for-cost = {-keyword(k: "reclaim")} <color=#00838F>{$reclaim}●</color>
+ReclaimForCost = {-keyword(k: "Reclaim")} <color=#00838F>{$reclaim}●</color>
 
 cards =
   {
@@ -54,9 +55,18 @@ top-n-cards =
       *[other] top { $cards } cards
   }
 
+cards-numeral =
+  {
+    $cards ->
+      [one] { $cards } card
+      *[other] { $cards } cards
+  }
+
 s = { $s }
 
 spark = spark
+
+count = { $count }
 
 count-allies =
   {

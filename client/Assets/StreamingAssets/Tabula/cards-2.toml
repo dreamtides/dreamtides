@@ -4,7 +4,7 @@ id = "521b912b-1dfb-4440-a1e0-7181bac6aa58"
 energy-cost = 3
 rules-text = "{activated} Abandon a {cardtype: warrior}: {discover} a {cardtype: warrior} with cost $1 higher than the abandoned character and materialize it."
 alternate-rules-text = "{Judgment}: Abandon a warrior to discover a warrior with cost $1 higher and materialize it."
-rules-text-3 = "{Judgment} You may abandon {a-subtype} to {discover} {a-subtype} with cost {e} higher and materialize it."
+rules-text-3 = "{Judgment} You may abandon {a-subtype} to {discover} {a-subtype} with cost {e} higher and {materialize} it."
 preview-3 = "▸ Judgment: You may abandon a warrior to discover a warrior with cost 1● higher and materialize it."
 variables = """
 subtype: warrior
@@ -1290,6 +1290,8 @@ rules-text = """
 Abandon a character or discard a card. Dissolve an enemy character.
 """
 alternate-rules-text = "Abandon a character or discard a card: Dissolve an enemy character."
+rules-text-3 = "Abandon an ally or discard a card: {Dissolve} an enemy."
+preview-3 = "Abandon an ally or discard a card: Dissolve an enemy."
 card-type = "Event"
 is-fast = true
 image-number = 2023111787
@@ -1304,6 +1306,9 @@ rules-text = """
 $dissolved: You may pay $1 to return this character from your void to your hand.
 """
 alternate-rules-text = "{Dissolved}: You may pay $1 to return this character to your hand."
+rules-text-3 = "{Dissolved} You may pay {e} to return this character to your hand."
+preview-3 = "▸ Dissolved: You may pay 1● to return this character to your hand."
+variables = "e: 1"
 card-type = "Character"
 subtype = "Survivor"
 is-fast = false
@@ -1318,6 +1323,9 @@ id = "39bbbc92-34d0-4699-8ac6-99805a1248fb"
 energy-cost = 2
 rules-text = "Abandon any number of characters. Draw a card for each character abandoned."
 alternate-rules-text = "Abandon any number of allies. Draw a card for each ally abandoned."
+rules-text-3 = "Abandon any number of allies. Draw {cards} for each ally abandoned."
+preview-3 = "Abandon any number of allies. Draw a card for each ally abandoned."
+variables = "cards: 1"
 card-type = "Event"
 is-fast = false
 image-number = 1470059006
@@ -1330,6 +1338,11 @@ id = "511e8751-95d0-4d09-9f60-48fa53f14a13"
 energy-cost = 4
 rules-text = "If you have drawn 2 or more cards this turn, you may play this character from your void for $1."
 alternate-rules-text = "When you draw 2 cards in a turn, this character gains reclaim $1."
+rules-text-3 = "When you draw {cards-numeral} in a turn, this character gains {reclaim-for-cost}."
+preview-3 = "When you draw 2 cards in a turn, this character gains reclaim 1●."
+variables = """
+cards: 2
+reclaim: 1"""
 card-type = "Character"
 subtype = "Survivor"
 is-fast = true
@@ -1344,6 +1357,9 @@ id = "5511b4b5-a7e3-48df-978d-c09673b39f42"
 energy-cost = 4
 rules-text = "{immediate} {multiActivated} Abandon another character: Put the top 2 cards of your deck into your void."
 alternate-rules-text = "Abandon an ally: Put the top 2 cards of your deck into your void."
+rules-text-3 = "Abandon an ally: Put the {top-n-cards} of your deck into your void."
+preview-3 = "Abandon an ally: Put the top 2 cards of your deck into your void."
+variables = "cards: 2"
 card-type = "Character"
 subtype = "Outsider"
 is-fast = false
@@ -1364,6 +1380,15 @@ alternate-rules-text = """
 Lose 1 maximum $: Play this event for $0.
 
 Prevent a played card."""
+rules-text-3 = """
+Lose 1 maximum {energy-symbol}: Play this event for {e}.
+
+{Prevent} a played card."""
+preview-3 = """
+Lose 1 maximum ●: Play this event for 0●.
+
+Prevent a played card."""
+variables = "e: 0"
 card-type = "Event"
 is-fast = true
 image-number = 1164289078
@@ -1376,6 +1401,9 @@ id = "fe13ba87-8935-4740-b762-23c8ccd89ff9"
 energy-cost = 4
 rules-text = "This character's spark is equal to the number of events in your void."
 alternate-rules-text = "When an event is put in your void, this character gains +1 spark."
+rules-text-3 = "When an event is put in your void, this character gains +{s} spark."
+preview-3 = "When an event is put in your void, this character gains +1 spark."
+variables = "s: 1"
 card-type = "Character"
 subtype = "Ancient"
 is-fast = false
@@ -1390,6 +1418,9 @@ id = "129bd326-ec4d-4da6-aff6-f1c2b78f10e4"
 energy-cost = 1
 rules-text = "Look at the enemy's hand. Choose a card with cost $3 or less from it. The enemy discards that card."
 alternate-rules-text = "Discard a chosen card with cost $3 or less from opponent's hand."
+rules-text-3 = "Discard a chosen card with cost {e} or less from the opponent's hand."
+preview-3 = "Discard a chosen card with cost 3● or less from the opponent's hand."
+variables = "e: 3"
 card-type = "Event"
 is-fast = false
 image-number = 2221518875
@@ -1402,6 +1433,9 @@ id = "dce9ebda-da62-4304-a4e9-21170c98e2a6"
 energy-cost = 3
 rules-text = "If a character you controlled dissolved this turn, you may play this character from your void for $1"
 alternate-rules-text = "When an ally is dissolved, this card gains reclaim $1 this turn."
+rules-text-3 = "When an ally is {dissolved}, this card gains {reclaim-for-cost} this turn."
+preview-3 = "When an ally is dissolved, this card gains reclaim 1● this turn."
+variables = "reclaim: 1"
 card-type = "Character"
 subtype = "Survivor"
 is-fast = false
@@ -1418,6 +1452,12 @@ rules-text = """
 {activated} $4: Each {cardtype: spirit animal} you control gains +2 spark until your next main phase.
 """
 alternate-rules-text = "{Judgment}: Pay $4 to give each allied {spirit animal} +2 spark."
+rules-text-3 = "{Judgment}: You may pay {e} to give each allied {subtype} +{s} spark."
+preview-3 = "▸ Judgment:: You may pay 4● to give each allied spirit animal +2 spark."
+variables = """
+e: 4
+subtype:spirit-animal
+s: 2"""
 card-type = "Character"
 subtype = "Spirit Animal"
 is-fast = false
@@ -1434,6 +1474,11 @@ rules-text = """
 If this character is in your void, {cardtype: survivors} you control have +1 spark.
 """
 alternate-rules-text = "While this card is in your void, allied survivors have +2 spark."
+rules-text-3 = "While this card is in your void, allied {plural-subtype} have +{s} spark."
+preview-3 = "While this card is in your void, allied survivors have +2 spark."
+variables = """
+subtype: survivor
+s: 2"""
 card-type = "Character"
 subtype = "Survivor"
 is-fast = false
@@ -1448,6 +1493,9 @@ id = "8fb2e9d0-28e5-4253-a61c-59f7d4044d59"
 energy-cost = 5
 rules-text = "If you have discarded a card this turn, this character costs $1."
 alternate-rules-text = "If you have discarded a card this turn, this character costs $1."
+rules-text-3 = "If you have discarded a card this turn, this character costs {e}."
+preview-3 = "If you have discarded a card this turn, this character costs 1●."
+variables = "e: 1"
 card-type = "Character"
 subtype = "Ancient"
 is-fast = false
@@ -1462,6 +1510,8 @@ id = "ab07f1aa-ca7a-4716-988e-281ab871baf4"
 energy-cost = 1
 rules-text = 'At the end of this turn, trigger an additional "judgment" phase.'
 alternate-rules-text = 'At the end of this turn, trigger an additional "judgment" phase.'
+rules-text-3 = "At the end of this turn, trigger an additional {JudgmentPhaseName} phase."
+preview-3 = "At the end of this turn, trigger an additional Judgment phase."
 card-type = "Event"
 is-fast = false
 image-number = 1968259702
@@ -1474,6 +1524,11 @@ id = "dfcf69cb-c569-484a-8a98-b673a5c47899"
 energy-cost = 4
 rules-text = "Once per turn, when you discard a card, gain $1 and then {kindle} 2 "
 alternate-rules-text = "Once per turn, when you discard a card, gain $1 and {kindle} 2."
+rules-text-3 = "Once per turn, when you discard a card, gain {e} and {kindle}."
+preview-3 = "Once per turn, when you discard a card, gain 1● and kindle 2."
+variables = """
+e: 1
+k: 2"""
 card-type = "Character"
 subtype = "Visitor"
 is-fast = false
@@ -1492,6 +1547,12 @@ rules-text = """
 alternate-rules-text = """
 {Materialized}, {Judgment}: With 2 allied {warriors}, gain $1.
 """
+rules-text-3 = "{MaterializedJudgment} With {count-allied-subtype}, gain {e}. "
+preview-3 = "▸ Materialized, Judgment: With 2 allied warriors, gain 1●."
+variables = """
+subtype: warrior
+allies: 2
+e: 1"""
 card-type = "Character"
 subtype = "Warrior"
 is-fast = false
@@ -1506,6 +1567,9 @@ id = "99720e39-6bad-4c6c-867c-7bc5c326195e"
 energy-cost = 8
 rules-text = "If you have 8 or more cards in your void, you may play this character from your void for $0 by banishing all other cards from your void."
 alternate-rules-text = "Banish your void with 8 or more cards: Reclaim this character."
+rules-text-3 = "{Banish} your void with {count} or more cards: {Reclaim} this character."
+preview-3 = "Banish your void with 8 or more cards: Reclaim this character."
+variables = "count: 8"
 card-type = "Character"
 subtype = "Ancient"
 is-fast = false
@@ -1524,6 +1588,13 @@ Put the top 3 cards of your deck into your void. Draw a card.
 alternate-rules-text = """
 Put the top 3 cards of your deck into your void. Draw a card.
 """
+rules-text-3 = """
+Put the {top-n-cards} of your deck into your void. Draw {cards-v2}.
+"""
+preview-3 = "Put the top 3 cards of your deck into your void. Draw a card."
+variables = """
+cards: 3
+cards-v2: 1"""
 card-type = "Event"
 is-fast = false
 image-number = 1739438660
@@ -1536,6 +1607,9 @@ id = "e4aff892-1a6d-40b7-901d-1d57a9a21807"
 energy-cost = 5
 rules-text = "{materialized}: Gain control of an enemy character with cost $2 or less."
 alternate-rules-text = "{Materialized}: Gain control of an enemy with cost $2 or less."
+rules-text-3 = "{Materialized} Gain control of an enemy with cost {e} or less."
+preview-3 = "▸ Materialized: Gain control of an enemy with cost 2● or less."
+variables = "e: 2"
 card-type = "Character"
 subtype = "Ancient"
 is-fast = true
@@ -1550,6 +1624,9 @@ id = "85eaf1ac-bcb4-4266-84be-844965bce25d"
 energy-cost = 1
 rules-text = "Until end of turn, whenever you play a character, draw a card."
 alternate-rules-text = "Until end of turn, whenever you play a character, draw a card."
+rules-text-3 = "Until end of turn, whenever you play a character, draw {cards}."
+preview-3 = "Until end of turn, whenever you play a character, draw a card."
+variables = "cards: 1"
 card-type = "Event"
 is-fast = false
 image-number = 2293194521
@@ -1562,6 +1639,9 @@ id = "b0ee552a-3a4f-434f-903d-165ebfe3d072"
 energy-cost = 3
 rules-text = "{materialized}: Draw a card for each character you abandoned this turn."
 alternate-rules-text = "{Materialized}: Draw a card for each abandoned ally this turn."
+rules-text-3 = "{Materialized} Draw {cards} for each abandoned ally this turn."
+preview-3 = "▸ Materialized: Draw a card for each abandoned ally this turn."
+variables = "cards: 1"
 card-type = "Character"
 subtype = "Synth"
 is-fast = false
@@ -1578,6 +1658,9 @@ rules-text = """
 You may play this character from your void for $2 by banishing another card in your void.
 """
 alternate-rules-text = "$2, Banish another card in your void: Reclaim this character."
+rules-text-3 = "{e}, {Banish} another card in your void: {Reclaim} this character."
+preview-3 = "2●, Banish another card in your void: Reclaim this character."
+variables = "e: 2"
 card-type = "Character"
 subtype = "Warrior"
 is-fast = false
@@ -1592,6 +1675,8 @@ id = "44701519-e4f1-431e-bb7d-5e76ae75fe35"
 energy-cost = 1
 rules-text = "Negate an enemy dream. Put that card on top of the enemy's deck."
 alternate-rules-text = "Prevent a played card. Put it on top of the opponent's deck."
+rules-text-3 = "{Prevent} a played card. Put it on top of the opponent's deck."
+preview-3 = "Prevent a played card. Put it on top of the opponent's deck."
 card-type = "Event"
 is-fast = false
 image-number = 1058321690
@@ -1610,6 +1695,15 @@ alternate-rules-text = """
 Banish an ally. Materialize it at end of turn.
 
 {Reclaim: 1}"""
+rules-text-3 = """
+{Banish} an ally. {Materialize} it at end of turn.
+
+{ReclaimForCost}"""
+preview-3 = """
+Banish an ally. Materialize it at end of turn.
+
+Reclaim 1●"""
+variables = "reclaim: 1"
 card-type = "Event"
 is-fast = false
 image-number = 2212744813
@@ -1624,6 +1718,8 @@ rules-text = """
 {materialized}: You may banish another character until the start of your next main phase.
 """
 alternate-rules-text = "{Materialized}: Banish an enemy until your next main phase."
+rules-text-3 = "{Materialized} {Banish} an enemy until your next main phase."
+preview-3 = "▸ Materialized: Banish an enemy until your next main phase."
 card-type = "Character"
 subtype = "Synth"
 is-fast = false
@@ -1640,6 +1736,9 @@ rules-text = """
 {activated}: You may banish a card from the enemy's void to gain $1.
 """
 alternate-rules-text = "{Judgment}: Banish a card from the enemy's void to gain $1."
+rules-text-3 = "{Judgment} You may {banish} a card from the enemy's void to gain {e}."
+preview-3 = "▸ Judgment: You may banish a card from the enemy's void to gain 1●."
+variables = "e: 1"
 card-type = "Character"
 subtype = "Survivor"
 is-fast = false
@@ -1656,6 +1755,11 @@ rules-text = """
 Once per turn, when you materialize a {cardtype: warrior}, draw a card.
 """
 alternate-rules-text = "Once per turn, when you materialize a warrior, draw a card."
+rules-text-3 = "Once per turn, when you {materialize} {a-subtype}, draw {cards}."
+preview-3 = "Once per turn, when you materialize a warrior, draw a card."
+variables = """
+subtype: warrior
+cards: 1"""
 card-type = "Character"
 subtype = "Mage"
 is-fast = false
