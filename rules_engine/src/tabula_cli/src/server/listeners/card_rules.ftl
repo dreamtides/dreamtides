@@ -13,6 +13,7 @@ MaterializedDissolved = {-trigger(trigger: "Materialized, Dissolved")}
 -keyword = <color=#AA00FF>{$k}</color>
 
 dissolve = {-keyword(k: "dissolve")}
+dissolved = {-keyword(k: "dissolved")}
 Dissolve = {-keyword(k: "Dissolve")}
 banish = {-keyword(k: "banish")}
 Banish = {-keyword(k: "Banish")}
@@ -44,7 +45,7 @@ cards-v2 =
       *[other] { $cards-v2 } cards
   }
 
-top-cards =
+top-n-cards =
   {
     $cards ->
       [one] top card
@@ -68,7 +69,7 @@ figment = <color=#F57F17><b><u>{$figment} Figment</u></color></b>
 
 a-subtype =
   {
-    $type ->
+    $subtype ->
       [ancient] an {-type(value: "ancient")}
       [child] a {-type(value: "child")}
       [detective] a {-type(value: "detective")}
@@ -89,12 +90,12 @@ a-subtype =
       [visionary] a {-type(value: "visionary")}
       [visitor] a {-type(value: "visitor")}
       [warrior] a {-type(value: "warrior")}
-      *[other] Error: Unknown 'a-type' for type: { $type }
+      *[other] Error: Unknown 'a-type' for type: { $subtype }
   }
 
 subtype =
   {
-    $type ->
+    $subtype ->
       [ancient] {-type(value: "ancient")}
       [child] {-type(value: "child")}
       [detective] {-type(value: "detective")}
@@ -115,12 +116,12 @@ subtype =
       [visionary] {-type(value: "visionary")}
       [visitor] {-type(value: "visitor")}
       [warrior] {-type(value: "warrior")}
-      *[other] Error: Unknown 'type' for type: { $type }
+      *[other] Error: Unknown 'type' for type: { $subtype }
   }
 
 plural-subtype =
   {
-    $type ->
+    $subtype ->
       [ancient] {-type(value: "ancients")}
       [child] {-type(value: "children")}
       [detective] {-type(value: "detectives")}
@@ -141,5 +142,5 @@ plural-subtype =
       [visionaries] {-type(value: "visionaries")}
       [visitors] {-type(value: "visitors")}
       [warrior] {-type(value: "warriors")}
-      *[other] Error: Unknown 'plural-type' for type: { $type }
+      *[other] Error: Unknown 'plural-type' for type: { $subtype }
   }

@@ -7,7 +7,7 @@ alternate-rules-text = "{Judgment}: Abandon a warrior to discover a warrior with
 rules-text-3 = "{Judgment} You may abandon {a-subtype} to {discover} {a-subtype} with cost {e} higher and materialize it."
 preview-3 = "▸ Judgment: You may abandon a warrior to discover a warrior with cost 1● higher and materialize it."
 variables = """
-type: warrior
+subtype: warrior
 e: 1"""
 card-type = "Character"
 subtype = "Ancient"
@@ -266,7 +266,7 @@ rules-text = "Each {cardtype: spirit animal} you control gains spark equal to th
 alternate-rules-text = "Give each allied {spirit animal} spark equal to the number of allied {spirit animals}."
 rules-text-3 = "Each allied {subtype} gains {spark} equal to the number of allied {plural-subtype}. "
 preview-3 = "Each allied spirit animal gains spark equal to the number of allied spirit animals."
-variables = "type: spirit-animal"
+variables = "subtype: spirit-animal"
 card-type = "Event"
 is-fast = false
 image-number = 1913887486
@@ -453,7 +453,7 @@ When an allied survivor is dissolved, kindle 2."""
 variables = """
 k: 2
 k2: 2
-type: survivor"""
+subtype: survivor"""
 card-type = "Character"
 subtype = "Survivor"
 is-fast = false
@@ -521,7 +521,7 @@ alternate-rules-text = """
 {Materialized}, {Dissolved}: Put the top 4 cards of your deck into your void.
 """
 rules-text-3 = """
-{MaterializedDissolved} Put the {top-cards} of your deck into your void.
+{MaterializedDissolved} Put the {top-n-cards} of your deck into your void.
 """
 preview-3 = "▸ Materialized, Dissolved: Put the top 4 cards of your deck into your void."
 variables = "cards: 4"
@@ -608,14 +608,14 @@ When an allied survivor is dissolved, draw a card."""
 rules-text-3 = """
 {Dissolved} Draw {cards}.
 
-When an allied {subtype} is dissolved, draw {cards-v2}."""
+When an allied {subtype} is {dissolved}, draw {cards-v2}. """
 preview-3 = """
 ▸ Dissolved: Draw a card.
 
 When an allied survivor is dissolved, draw a card."""
 variables = """
 cards: 1
-type: survivor
+subtype: survivor
 cards-v2: 1"""
 card-type = "Character"
 subtype = "Survivor"
@@ -635,6 +635,13 @@ Whenever you materialize another {cardtype: spirit animal}, that character gains
 alternate-rules-text = """
 When you materialize another {spirit animal}, that character gains +1 spark.
 """
+rules-text-3 = """
+When you {materialize} another {subtype}, that character gains +{s} spark.
+"""
+preview-3 = "When you materialize another spirit animal, that character gains +1 spark."
+variables = """
+subtype:spirit-animal
+s:1"""
 card-type = "Character"
 subtype = "Spirit Animal"
 is-fast = false
@@ -649,6 +656,8 @@ id = "5ed8b4b4-abd4-410b-8c41-e94ac7609567"
 energy-cost = 2
 rules-text = "{immediate} {fastMultiActivated} Abandon another character: You may put a character from your void on top of your deck."
 alternate-rules-text = "Abandon an ally: You may put a character from your void on top of your deck."
+rules-text-3 = "Abandon an ally: You may put a character from your void on top of your deck."
+preview-3 = "Abandon an ally: You may put a character from your void on top of your deck."
 card-type = "Character"
 subtype = "Survivor"
 is-fast = false
@@ -663,6 +672,11 @@ id = "9979e005-3a9e-4c98-ae7b-d8a25307c959"
 energy-cost = 2
 rules-text = "Whenever you play a {cardtype: survivor}, put the top 2 cards of your deck into your void."
 alternate-rules-text = "When you play a {survivor}, put the top 2 cards of your deck into your void."
+rules-text-3 = "When you play a {subtype}, put the {top-n-cards} of your deck into your void."
+preview-3 = "When you play a survivor, put the top 2 cards of your deck into your void."
+variables = """
+subtype: survivor
+cards: 2"""
 card-type = "Character"
 subtype = "Survivor"
 is-fast = false
@@ -679,6 +693,12 @@ rules-text = """
 $fastActivated $2: Another character you control gains +1 spark until your next main phase for each {cardtype: warrior} you control.
 """
 alternate-rules-text = "{Judgment}: You may pay $3 to give an ally +1 spark for each allied warior."
+rules-text-3 = "{Judgment} You may pay {e} to give this character +{s} spark for each allied {subtype}."
+preview-3 = "▸ Judgment: You may pay 3● to give this character +1 spark for each allied warrior."
+variables = """
+e: 3
+s: 1
+subtype: warrior"""
 card-type = "Character"
 subtype = "Warrior"
 is-fast = false
@@ -693,6 +713,9 @@ id = "10ad7a9e-401d-494e-b4f3-5580b8d850d0"
 energy-cost = 3
 rules-text = "Once per turn, when you materialize a {cardtype: survivor}, you may return this character from your void to play."
 alternate-rules-text = "When you materialize a {survivor}, return this card from your void to play."
+rules-text-3 = "When you {materialize} {a-subtype}, return this card from your void to play."
+preview-3 = "When you materialize a survivor, return this card from your void to play."
+variables = "subtype: survivor"
 card-type = "Character"
 subtype = "Survivor"
 is-fast = false
@@ -709,6 +732,8 @@ rules-text = """
 $fastActivated: Another character you control gains {kw: aegis} this turn. 
 """
 alternate-rules-text = "When opponent plays a card which would dissolve an ally, prevent that card."
+rules-text-3 = "When the opponent plays a card which would {dissolve} an ally, {prevent} that card."
+preview-3 = "When the opponent plays a card which would dissolve an ally, prevent that card."
 card-type = "Character"
 subtype = "Synth"
 is-fast = false
@@ -726,6 +751,10 @@ If you control a {cardtype: survivor}, this character costs $1.
 
 You may play this character from your void."""
 alternate-rules-text = "With an allied {suvivor}, you may play this from your hand or void for $1."
+rules-text-3 = "With an allied {subtype}, you may play this from your hand or void for {e}."
+variables = """
+subtype: survivor
+e: 1"""
 card-type = "Character"
 subtype = "Survivor"
 is-fast = false
