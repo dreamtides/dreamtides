@@ -6,7 +6,7 @@ energy-symbol = <color=#00838F>●</color>
 Materialized = {-trigger(trigger: "Materialized")}
 Judgment = {-trigger(trigger: "Judgment")}
 Dissolved = {-trigger(trigger: "Dissolved")}
-Materialized-Judgment = {-trigger(trigger: "Materialized, Judgment")}
+MaterializedJudgment = {-trigger(trigger: "Materialized, Judgment")}
 MaterializedDissolved = {-trigger(trigger: "Materialized, Dissolved")}
 
 
@@ -30,6 +30,8 @@ Kindle = {-keyword(k: "Kindle")} {$k}
 kindle-k2 = {-keyword(k: "kindle")} {$k2}
 Kindle-k2 = {-keyword(k: "Kindle")} {$k2}
 fast = ↯Fast
+
+reclaim-for-cost = {-keyword(k: "reclaim")} <color=#00838F>{$reclaim}●</color>
 
 cards =
   {
@@ -61,6 +63,13 @@ count-allies =
     $allies ->
       [one] an ally
       *[other] { $allies } allies
+  }
+
+count-allied-subtype =
+  {
+    $allies ->
+      [one] an allied {subtype}
+      *[other] { $allies } allied {plural-subtype}
   }
 
 figment = <color=#F57F17><b><u>{$figment} Figment</u></color></b>
@@ -135,12 +144,27 @@ plural-subtype =
       [renegade] {-type(value: "renegades")}
       [spirit-animal] {-type(value: "spirit animals")}
       [super] {-type(value: "supers")}
-      [survivors] {-type(value: "survivors")}
-      [synths] {-type(value: "synths")}
-      [tinkerers] {-type(value: "tinkerers")}
-      [troopers] {-type(value: "troopers")}
-      [visionaries] {-type(value: "visionaries")}
-      [visitors] {-type(value: "visitors")}
+      [survivor] {-type(value: "survivors")}
+      [synth] {-type(value: "synths")}
+      [tinker] {-type(value: "tinkerers")}
+      [trooper] {-type(value: "troopers")}
+      [visionary] {-type(value: "visionaries")}
+      [visitor] {-type(value: "visitors")}
       [warrior] {-type(value: "warriors")}
       *[other] Error: Unknown 'plural-type' for type: { $subtype }
+  }
+
+text-number =
+  {
+    $number ->
+      [1] one
+      [2] two
+      [3] three
+      [4] four
+      [5] five
+      [6] six
+      [7] seven
+      [8] eight
+      [9] nine
+      *[toher] { $number }
   }
