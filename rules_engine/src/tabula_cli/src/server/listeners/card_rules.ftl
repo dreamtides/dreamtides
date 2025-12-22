@@ -1,5 +1,7 @@
 e = <color=#00838F>{$e}●</color>
 
+energy-symbol = <color=#00838F>●</color>
+
 -trigger = ▸ <b>{$trigger}:</b>
 Materialized = {-trigger(trigger: "Materialized")}
 Judgment = {-trigger(trigger: "Judgment")}
@@ -14,7 +16,11 @@ Discover = {-keyword(k: "Discover")}
 Reclaim = {-keyword(k: "Reclaim")}
 Play = {-keyword(k: "Play")}
 Materialize = {-keyword(k: "Materialize")}
-fast = {-keyword(k: "↯")}
+Draw = {-keyword(k: "Draw")}
+Reveal = {-keyword(k: "Reveal")}
+Gain = {-keyword(k: "Gain")}
+Gains = {-keyword(k: "Gains")}
+fast = ↯Fast
 
 cards =
   {
@@ -34,85 +40,84 @@ count-allies =
       *[other] { $allies } allies
   }
 
-figment = <color=#F57F17><b><u>{$figment}</u></color></b> Figment
+figment = <color=#F57F17><b><u>{$figment} Figment</u></color></b>
 
--begin-type = <color=#2E7D32><b>
--end-type = </b></color>
+-type = <color=#2E7D32><b>{$value}</b></color>
 
 a-subtype =
   {
     $type ->
-      [ancient] an {-begin-type}ancient{-end-type}
-      [child] a {-begin-type}child{-end-type}
-      [detective] a {-begin-type}detective{-end-type}
-      [enigma] an {-begin-type}enigma{-end-type}
-      [explorer] an {-begin-type}explorer{-end-type}
-      [hacker] a {-begin-type}hacker{-end-type}
-      [mage] a {-begin-type}mage{-end-type}
-      [monster] a {-begin-type}monster{-end-type}
-      [musician] a {-begin-type}musician{-end-type}
-      [outsider] an {-begin-type}outsider{-end-type}
-      [renegade] a {-begin-type}renegade{-end-type}
-      [spirit-animal] a {-begin-type}spirit animal{-end-type}
-      [super] a {-begin-type}super{-end-type}
-      [survivor] a {-begin-type}survivor{-end-type}
-      [synth] a {-begin-type}synth{-end-type}
-      [tinkerer] a {-begin-type}tinkerer{-end-type}
-      [trooper] a {-begin-type}trooper{-end-type}
-      [visionary] a {-begin-type}visionary{-end-type}
-      [visitor] a {-begin-type}visitor{-end-type}
-      [warrior] a {-begin-type}warrior{-end-type}
+      [ancient] an {-type(value: "ancient")}
+      [child] a {-type(value: "child")}
+      [detective] a {-type(value: "detective")}
+      [enigma] an {-type(value: "enigma")}
+      [explorer] an {-type(value: "explorer")}
+      [hacker] a {-type(value: "hacker")}
+      [mage] a {-type(value: "mage")}
+      [monster] a {-type(value: "monster")}
+      [musician] a {-type(value: "musician")}
+      [outsider] an {-type(value: "outsider")}
+      [renegade] a {-type(value: "renegade")}
+      [spirit-animal] a {-type(value: "spirit animal")}
+      [super] a {-type(value: "super")}
+      [survivor] a {-type(value: "survivor")}
+      [synth] a {-type(value: "synth")}
+      [tinkerer] a {-type(value: "tinkerer")}
+      [trooper] a {-type(value: "trooper")}
+      [visionary] a {-type(value: "visionary")}
+      [visitor] a {-type(value: "visitor")}
+      [warrior] a {-type(value: "warrior")}
       *[other] Error: Unknown 'a-type' for type: { $type }
   }
 
 subtype =
   {
     $type ->
-      [ancient] {-begin-type}ancient{-end-type}
-      [child] {-begin-type}child{-end-type}
-      [detective] {-begin-type}detective{-end-type}
-      [enigma] {-begin-type}enigma{-end-type}
-      [explorer] {-begin-type}explorer{-end-type}
-      [hacker] {-begin-type}hacker{-end-type}
-      [mage] {-begin-type}mage{-end-type}
-      [monster] {-begin-type}monster{-end-type}
-      [musician] {-begin-type}musician{-end-type}
-      [outsider] {-begin-type}outsider{-end-type}
-      [renegade] {-begin-type}renegade{-end-type}
-      [spirit-animal] {-begin-type}spirit animal{-end-type}
-      [super] {-begin-type}super{-end-type}
-      [survivor] {-begin-type}survivor{-end-type}
-      [synth] {-begin-type}synth{-end-type}
-      [tinkerer] {-begin-type}tinkerer{-end-type}
-      [trooper] {-begin-type}trooper{-end-type}
-      [visionary] {-begin-type}visionary{-end-type}
-      [visitor] {-begin-type}visitor{-end-type}
-      [warrior] {-begin-type}warrior{-end-type}
+      [ancient] {-type(value: "ancient")}
+      [child] {-type(value: "child")}
+      [detective] {-type(value: "detective")}
+      [enigma] {-type(value: "enigma")}
+      [explorer] {-type(value: "explorer")}
+      [hacker] {-type(value: "hacker")}
+      [mage] {-type(value: "mage")}
+      [monster] {-type(value: "monster")}
+      [musician] {-type(value: "musician")}
+      [outsider] {-type(value: "outsider")}
+      [renegade] {-type(value: "renegade")}
+      [spirit-animal] {-type(value: "spirit animal")}
+      [super] {-type(value: "super")}
+      [survivor] {-type(value: "survivor")}
+      [synth] {-type(value: "synth")}
+      [tinkerer] {-type(value: "tinkerer")}
+      [trooper] {-type(value: "trooper")}
+      [visionary] {-type(value: "visionary")}
+      [visitor] {-type(value: "visitor")}
+      [warrior] {-type(value: "warrior")}
       *[other] Error: Unknown 'type' for type: { $type }
   }
 
 plural-subtype =
   {
     $type ->
-      [ancient] {-begin-type}ancients{-end-type}
-      [child] {-begin-type}children{-end-type}
-      [detective] {-begin-type}detectives{-end-type}
-      [enigma] {-begin-type}enigmas{-end-type}
-      [explorer] {-begin-type}explorers{-end-type}
-      [hacker] {-begin-type}hackers{-end-type}
-      [mage] {-begin-type}mages{-end-type}
-      [monster] {-begin-type}monsters{-end-type}
-      [musician] {-begin-type}musicians{-end-type}
-      [outsider] {-begin-type}outsiders{-end-type}
-      [renegade] {-begin-type}renegades{-end-type}
-      [spirit-animal] {-begin-type}spirit animals{-end-type}
-      [super] {-begin-type}supers{-end-type}
-      [survivors] {-begin-type}survivors{-end-type}
-      [synths] {-begin-type}synths{-end-type}
-      [tinkerers] {-begin-type}tinkerers{-end-type}
-      [troopers] {-begin-type}troopers{-end-type}
-      [visionaries] {-begin-type}visionaries{-end-type}
-      [visitors] {-begin-type}visitors{-end-type}
-      [warrior] {-begin-type}warriors{-end-type}
+      [ancient] {-type(value: "ancients")}
+      [child] {-type(value: "children")}
+      [detective] {-type(value: "detectives")}
+      [enigma] {-type(value: "enigmas")}
+      [explorer] {-type(value: "explorers")}
+      [hacker] {-type(value: "hackers")}
+      [mage] {-type(value: "mages")}
+      [monster] {-type(value: "monsters")}
+      [musician] {-type(value: "musicians")}
+      [outsider] {-type(value: "outsiders")}
+      [renegade] {-type(value: "renegades")}
+      [spirit-animal] {-type(value: "spirit animals")}
+      [super] {-type(value: "supers")}
+      [survivors] {-type(value: "survivors")}
+      [synths] {-type(value: "synths")}
+      [tinkerers] {-type(value: "tinkerers")}
+      [troopers] {-type(value: "troopers")}
+      [visionaries] {-type(value: "visionaries")}
+      [visitors] {-type(value: "visitors")}
+      [warrior] {-type(value: "warriors")}
       *[other] Error: Unknown 'plural-type' for type: { $type }
   }
