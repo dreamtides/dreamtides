@@ -31,7 +31,10 @@ kindle = {-keyword(k: "kindle")} {$k}
 Kindle = {-keyword(k: "Kindle")} {$k}
 kindle-k2 = {-keyword(k: "kindle")} {$k2}
 Kindle-k2 = {-keyword(k: "Kindle")} {$k2}
+foresee = {-keyword(k: "foresee")} {$foresee}
+Foresee = {-keyword(k: "Foresee")} {$foresee}
 fast = <b>↯fast</b>
+Fast = <b>↯Fast</b>
 
 reclaim-for-cost = {-keyword(k: "reclaim")} <color=#00838F>{$reclaim}●</color>
 ReclaimForCost = {-keyword(k: "Reclaim")} <color=#00838F>{$reclaim}●</color>
@@ -203,4 +206,21 @@ this-turn-times =
       [1] this turn
       [2] this turn twice
       *[other] this turn {text-number} times
+  }
+
+MultiplyBy =
+  {
+    $number ->
+      [2] Double
+      [3] Triple
+      [4] Quadruple
+      [5] Quintuple
+      *[other] Multiply by { $number }
+  }
+
+copies =
+  {
+    $number ->
+      [one] a copy
+      *[other] { text-number } copies
   }
