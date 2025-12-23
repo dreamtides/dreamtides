@@ -3646,6 +3646,9 @@ Gain $2.
 rules-text-3 = """
 {MaterializedJudgment} 
 Gain {e}."""
+preview-3 = """
+▸ Materialized, Judgment: 
+Gain 2●."""
 variables = "e: 2"
 card-type = "Character"
 subtype = "Warrior"
@@ -3662,6 +3665,9 @@ energy-cost = 2
 rules-text = """
 {materialized}: Draw a card.
 """
+rules-text-3 = "{Materialized} Draw {cards}."
+preview-3 = "▸ Materialized: Draw a card."
+variables = "cards: 1"
 card-type = "Character"
 subtype = "Warrior"
 is-fast = false
@@ -3677,6 +3683,8 @@ energy-cost = 2
 rules-text = """
 Negate an enemy dream.
 """
+rules-text-3 = "{Prevent} a card."
+preview-3 = "Prevent a card."
 card-type = "Event"
 is-fast = true
 image-number = 1282908322
@@ -3690,6 +3698,11 @@ energy-cost = 2
 rules-text = """
 {judgment}: Gain 1 $point.
 """
+rules-text-3 = """
+{Judgment} Gain {points}.
+"""
+preview-3 = "▸ Judgment: Gain 1⍟."
+variables = "points: 1"
 card-type = "Character"
 subtype = "Vistor"
 is-fast = true
@@ -3705,6 +3718,9 @@ energy-cost = 4
 rules-text = """
 {judgment}: Gain 2 $points.
 """
+rules-text-3 = "{Judgment} Gain {points}."
+preview-3 = "▸ Judgment: Gain 2⍟."
+variables = "points: 2"
 card-type = "Character"
 subtype = "Visitor"
 is-fast = true
@@ -3720,6 +3736,11 @@ energy-cost = 1
 rules-text = """
 {materialized}, {judgment}: {kindle} 1.
 """
+rules-text-3 = """
+{MaterializedJudgment} {Kindle}.
+"""
+preview-3 = "▸ Materialized, Judgment: Kindle 1."
+variables = "k: 1"
 card-type = "Character"
 subtype = "Spirit Animal"
 is-fast = false
@@ -3735,6 +3756,9 @@ energy-cost = 2
 rules-text = """
 {materialized}: Draw a card.
 """
+rules-text-3 = "{Materialized} Draw {cards}."
+preview-3 = "▸ Materialized: Draw a card."
+variables = "cards: 1"
 card-type = "Character"
 subtype = "Spirit Animal"
 is-fast = false
@@ -3750,6 +3774,9 @@ energy-cost = 6
 rules-text = """
 {materialized}: Draw 2 cards.
 """
+rules-text-3 = "{Materialized} Draw {cards}."
+preview-3 = "▸ Materialized: Draw 2 cards."
+variables = "cards: 2"
 card-type = "Character"
 subtype = "Ancient"
 is-fast = false
@@ -3765,6 +3792,8 @@ energy-cost = 2
 rules-text = """
 Negate an enemy character.
 """
+rules-text-3 = "{Prevent} a character."
+preview-3 = "Prevent a character."
 card-type = "Event"
 is-fast = true
 image-number = 1239919309
@@ -3776,6 +3805,9 @@ name = "Through the Rift"
 id = "437fc66b-c0eb-46fd-82fa-ebbb16939e66"
 energy-cost = 1
 rules-text = "{discover} a {cardtype: survivor}."
+rules-text-3 = "{Discover} {a-subtype}."
+preview-3 = "Discover a survivor."
+variables = "subtype: survivor"
 card-type = "Event"
 is-fast = false
 image-number = 1790126243
@@ -3787,6 +3819,9 @@ name = "Synaptic Sentinel"
 id = "c9531521-b8ae-4ce0-8857-474e60aa814a"
 energy-cost = 3
 rules-text = "{materialized}: {Forsee} 2 "
+rules-text-3 = "{Judgment} {Foresee}."
+preview-3 = "▸ Judgment: Foresee 1."
+variables = "foresee: 1"
 card-type = "Character"
 subtype = "Agent"
 is-fast = true
@@ -3802,6 +3837,9 @@ energy-cost = 0
 rules-text = """
 {judgment}: Gain $1.
 """
+rules-text-3 = "{Judgment} Gain {e}."
+preview-3 = "▸ Judgment: Gain 1●."
+variables = "e: 1"
 card-type = "Character"
 subtype = "Warrior"
 is-fast = false
@@ -3817,6 +3855,10 @@ energy-cost = 6
 rules-text = """
 Dissolve all characters.
 """
+rules-text-3 = """
+{Dissolve} all characters.
+"""
+preview-3 = "Dissolve all characters."
 card-type = "Event"
 is-fast = false
 image-number = 1200949222
@@ -3830,6 +3872,9 @@ energy-cost = 3
 rules-text = """
 {materialized}: {Forsee} 2.
 """
+rules-text-3 = "{Materialized} {Foresee}."
+preview-3 = "▸ Materialized: Foresee 2."
+variables = "foresee: 2"
 card-type = "Character"
 subtype = "Robot"
 is-fast = true
@@ -3845,6 +3890,9 @@ energy-cost = 1
 rules-text = """
 Draw 3 cards.
 """
+rules-text-3 = "Draw {cards}."
+preview-3 = "Draw 3 cards."
+variables = "cards: 3"
 card-type = "Event"
 is-fast = true
 image-number = 1021646686
@@ -3856,6 +3904,8 @@ name = "Door to Possibility"
 id = "2529d712-3e11-449e-a389-6dadd49cc145"
 energy-cost = 2
 rules-text = "{discover} an event "
+rules-text-3 = "{Discover} an event."
+preview-3 = "Discover an event."
 card-type = "Event"
 is-fast = false
 image-number = 1798382125
@@ -3869,6 +3919,9 @@ energy-cost = 1
 rules-text = """
 {judgment}: Gain $1.
 """
+rules-text-3 = "{MaterializedJudgment} Gain {e}."
+preview-3 = "▸ Materialized, Judgment: Gain 1●."
+variables = "e: 1"
 card-type = "Character"
 subtype = "Spirit Animal"
 is-fast = false
@@ -3884,6 +3937,9 @@ energy-cost = 3
 rules-text = """
 {judgment}: Gain $2.
 """
+rules-text-3 = "{Judgment} Gain {e}."
+preview-3 = "▸ Judgment: Gain 2●."
+variables = "e: 2"
 card-type = "Character"
 subtype = "Spirit Animal"
 is-fast = false
@@ -3899,6 +3955,9 @@ energy-cost = 4
 rules-text = """
 {materialized}: Gain $3.
 """
+rules-text-3 = "{Materialized} Gain {e}."
+preview-3 = "▸ Materialized: Gain 3●."
+variables = "e: 3"
 card-type = "Character"
 subtype = "Explorer"
 is-fast = false
@@ -3914,6 +3973,11 @@ energy-cost = 0
 rules-text = """
 Gain $3.
 """
+rules-text-3 = """
+Gain {e}.
+"""
+preview-3 = "Gain 3●."
+variables = "e: 3"
 card-type = "Event"
 subtype = "Survivor"
 is-fast = false
@@ -3928,6 +3992,11 @@ energy-cost = 4
 rules-text = """
 Gain $6.
 """
+rules-text-3 = """
+Gain {e}.
+"""
+preview-3 = "Gain 6●."
+variables = "e: 6"
 card-type = "Event"
 is-fast = false
 image-number = 1063277315
@@ -3941,6 +4010,11 @@ energy-cost = 2
 rules-text = """
 Gain $4.
 """
+rules-text-3 = """
+Gain {e}.
+"""
+preview-3 = "Gain 4●."
+variables = "e: 4"
 card-type = "Event"
 is-fast = false
 image-number = 1164289066
