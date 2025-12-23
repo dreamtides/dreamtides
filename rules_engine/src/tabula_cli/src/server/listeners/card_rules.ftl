@@ -1,4 +1,5 @@
 e = <color=#00838F>{$e}●</color>
+points = <color=#F57F17>{$points}⍟</color>
 
 energy-symbol = <color=#00838F>●</color>
 
@@ -41,6 +42,14 @@ cards =
       [one] a card
       *[other] { $cards } cards
   }
+
+discards =
+  {
+    $discards ->
+      [one] a card
+      *[other] { $discards } cards
+  }
+
 
 cards-v2 =
   {
@@ -185,5 +194,13 @@ text-number =
       [7] seven
       [8] eight
       [9] nine
-      *[toher] { $number }
+      *[other] { $number }
+  }
+
+this-turn-times =
+  {
+    $number ->
+      [1] this turn
+      [2] this turn twice
+      *[other] this turn {text-number} times
   }

@@ -1231,9 +1231,7 @@ rules-text = """
 alternate-rules-text = """
 {Materialized}: Copy the next event you play this turn three times.
 """
-rules-text-3 = """
-{Materialized} Copy the next event you play this turn {text-number} times.
-"""
+rules-text-3 = "{Materialized} Copy the next event you play {this-turn-times}."
 preview-3 = "▸ Materialized: Copy the next event you play this turn three times."
 variables = "number: 3"
 card-type = "Character"
@@ -2047,7 +2045,7 @@ energy-cost = 2
 rules-text = "{activated} Abandon a character: You may return a {cardtype: warrior} from your void to play."
 alternate-rules-text = "{Judgment}: Abandon an ally to reclaim a warrior."
 rules-text-3 = "{Judgment} You may abandon an ally to {reclaim} a {subtype}."
-preview-3 = "Error: Fluent formatting errors: Resolver error: Unknown variable: $subtype; Resolver error: Unknown variable: $subtype"
+preview-3 = "▸ Judgment: You may abandon an ally to reclaim a warrior."
 variables = "subtype: warrior"
 card-type = "Character"
 subtype = "Outsider"
@@ -2063,6 +2061,9 @@ id = "a2381225-b97f-4a38-845b-cefd8b86d499"
 energy-cost = 5
 rules-text = "Gain 1 $points for each dream you have played this turn."
 alternate-rules-text = "Score 1⍟ for each card you have played this turn."
+rules-text-3 = "Score {points} for each card you have played this turn."
+preview-3 = "Score 1⍟ for each card you have played this turn."
+variables = "points: 1"
 card-type = "Event"
 is-fast = false
 image-number = 2430444889
@@ -2079,6 +2080,10 @@ Until end of turn, whenever you play an event, copy it.
 alternate-rules-text = """
 This turn, whenever you play an event, copy it.
 """
+rules-text-3 = """
+This turn, when you play an event, copy it.
+"""
+preview-3 = "This turn, when you play an event, copy it."
 card-type = "Event"
 is-fast = false
 image-number = 1739438657
@@ -2091,6 +2096,11 @@ id = "e79d484f-d564-4429-9eca-0f90d2af5ef5"
 energy-cost = 2
 rules-text = "A character you control gains +1 spark until your next main phase for each {cardtype: warrior} you control."
 alternate-rules-text = "Give an ally +1 spark for each allied warrior."
+rules-text-3 = "Give an ally +{s} spark for each allied {subtype}."
+preview-3 = "Give an ally +1 spark for each allied warrior."
+variables = """
+s: 1
+subtype: warrior"""
 card-type = "Event"
 is-fast = true
 image-number = 1788833078
@@ -2105,6 +2115,9 @@ rules-text = """
 You may play this character from your void for $0 by abandoning 2 characters.
 """
 alternate-rules-text = "Abandon 2 allies: Reclaim this character."
+rules-text-3 = "Abandon {count-allies}: {Reclaim} this character."
+preview-3 = "Abandon 2 allies: Reclaim this character."
+variables = "allies: 2"
 card-type = "Character"
 subtype = "Ancient"
 is-fast = false
@@ -2119,6 +2132,9 @@ id = "e0c88a46-b85f-4497-ab19-850acc868863"
 energy-cost = 1
 rules-text = "Banish an enemy character that is not a {cardtype: warrior}. The enemy gains $points equal to its spark."
 alternate-rules-text = "Banish a non-warrior enemy."
+rules-text-3 = "Banish a non-{subtype} enemy."
+preview-3 = "Banish a non-warrior enemy."
+variables = "subtype: warrior"
 card-type = "Event"
 is-fast = false
 image-number = 1708315387
@@ -2132,6 +2148,10 @@ energy-cost = 4
 rules-text = """
 {judgment}: Return this character from your void to your hand.
 """
+rules-text-3 = """
+{Judgment} Return this character from your void to your hand.
+"""
+preview-3 = "▸ Judgment: Return this character from your void to your hand."
 card-type = "Character"
 subtype = "Tinkerer"
 is-fast = false
@@ -2147,6 +2167,12 @@ energy-cost = 2
 rules-text = """
 {activated} Discard a card: Draw a card. Gain 1 $point.
 """
+rules-text-3 = "{Judgment} You may discard {discards} to draw {cards} and gain {points}."
+preview-3 = "▸ Judgment: You may discard a card to draw a card and gain 1⍟."
+variables = """
+discards: 1
+cards: 1
+points: 1"""
 card-type = "Character"
 subtype = "Child"
 is-fast = false
@@ -2162,6 +2188,11 @@ energy-cost = 1
 rules-text = """
 Once per turn, when you materialize a character, gain $1.
 """
+rules-text-3 = """
+Once per turn, when you {materialize} a character, gain {e}.
+"""
+preview-3 = "Once per turn, when you materialize a character, gain 1●."
+variables = "e: 1"
 card-type = "Character"
 subtype = "Warrior"
 is-fast = false
@@ -2177,6 +2208,11 @@ energy-cost = 3
 rules-text = """
 {materialized}: Negate an enemy dream with cost $2 or less.
 """
+rules-text-3 = """
+{Materialized} {Prevent} a played card with cost {e} or less.
+"""
+preview-3 = "▸ Materialized: Prevent a played card with cost 2● or less."
+variables = "e: 2"
 card-type = "Character"
 subtype = "Synth"
 is-fast = true
@@ -2193,6 +2229,17 @@ rules-text = """
 Copy the next event you play this turn twice.
 
 {reclaim} $2"""
+rules-text-3 = """
+Copy the next event you play {this-turn-times}.
+
+{ReclaimForCost}"""
+preview-3 = """
+Copy the next event you play this turn three times.
+
+Reclaim 2●"""
+variables = """
+number: 3
+reclaim: 2"""
 card-type = "Event"
 is-fast = false
 image-number = 1196004052
@@ -2204,6 +2251,8 @@ name = "Spirit Reaping"
 id = "36c59908-aae7-42fb-9419-4a6aa1255211"
 energy-cost = 1
 rules-text = "Abandon a character. Gain energy equal to that character's cost."
+rules-text-3 = "Abandon an ally. Gain {energy-symbol} equal to that character's cost."
+preview-3 = "Abandon an ally. Gain ● equal to that character's cost."
 card-type = "Event"
 is-fast = false
 image-number = 2155438703
@@ -2217,6 +2266,13 @@ energy-cost = 3
 rules-text = """
 {judgment}: Gain $1 for each {cardtype: spirit animal} you control.
 """
+rules-text-3 = """
+{Judgment} Gain {e} for each allied {subtype}.
+"""
+preview-3 = "▸ Judgment: Gain 1● for each allied spirit animal."
+variables = """
+e: 1
+subtype: spirit-animal"""
 card-type = "Character"
 subtype = "Spirit Animal"
 is-fast = false
@@ -2230,6 +2286,9 @@ name = "The Bondweaver"
 id = "baae7f70-226f-48af-94c8-b8b211fd5087"
 energy-cost = 3
 rules-text = "Whenever you materialize a character, this character gains +1 spark."
+rules-text-3 = "When you {materialize} a character, this character gains +{s} spark."
+preview-3 = "When you materialize a character, this character gains +1 spark."
+variables = "s: 1"
 card-type = "Character"
 subtype = "Visitor"
 is-fast = false
@@ -2245,6 +2304,13 @@ energy-cost = 3
 rules-text = """
 Whenever you play a {cardtype: spirit animal}, draw a card.
 """
+rules-text-3 = """
+When you play {a-subtype}, draw {cards}.
+"""
+preview-3 = "When you play a spirit animal, draw a card."
+variables = """
+subtype: spirit-animal
+cards: 1"""
 card-type = "Character"
 subtype = "Spirit Animal"
 is-fast = false
@@ -2260,6 +2326,10 @@ energy-cost = 3
 rules-text = """
 {materialized}: Return a character from your void to your hand.
 """
+rules-text-3 = """
+{Materialized} Return a character from your void to your hand.
+"""
+preview-3 = "▸ Materialized: Return a character from your void to your hand."
 card-type = "Character"
 subtype = "Spirit Animal"
 is-fast = false
@@ -2275,6 +2345,10 @@ energy-cost = 5
 rules-text = """
 {materialized}: Banish an enemy character until this character leaves play.
 """
+rules-text-3 = """
+{Materialized} {Banish} an enemy until this character leaves play.
+"""
+preview-3 = "▸ Materialized:: Banish an enemy until this character leaves play."
 card-type = "Character"
 subtype = "Outsider"
 is-fast = false
