@@ -62,9 +62,9 @@ Characters in your hand have {fast}.
 
 Once per turn, when you play a {fast} character, gain {e}. """
 preview-3 = """
-Characters in your hand have ↯Fast.
+Characters in your hand have ↯fast.
 
-Once per turn, when you play a ↯Fast character, gain 1●."""
+Once per turn, when you play a ↯fast character, gain 1●."""
 variables = "e: 1"
 card-type = "Character"
 subtype = "Visitor"
@@ -384,9 +384,9 @@ id = "4d3eebd3-02b4-4016-a15a-0e8a05b6696b"
 energy-cost = 1
 rules-text = "{materialized}: Materialize a {kw: silent} copy of this character for each dream you have played this turn."
 alternate-rules-text = "{Materialized}: Materialize a Dream Figment for each card you have played this card."
-rules-text-3 = "{Materialize} a {figment} for each card you have played this turn. "
+rules-text-3 = "{Materialize} {a-figment} for each card you have played this turn."
 preview-3 = "Materialize a Celestial Figment for each card you have played this turn."
-variables = "figment: Celestial"
+variables = "figment: celestial"
 card-type = "Character"
 subtype = "Mage"
 is-fast = false
@@ -1776,6 +1776,9 @@ rules-text = """
 Whenever you play a character, materialize a {kw: silent} copy of this character.
 """
 alternate-rules-text = "When you play a character, materialize a Halcyon Figment."
+rules-text-3 = "When you play a character, {materialize} {a-figment}."
+preview-3 = "When you play a character, materialize a Halcyon Figment."
+variables = "figment: halcyon"
 card-type = "Character"
 subtype = "Visitor"
 is-fast = false
@@ -1790,6 +1793,11 @@ id = "1b69b697-4829-4e25-8d53-7462572cbb55"
 energy-cost = 2
 rules-text = "{activated} $2, Abandon this character, discard your hand: Draw 3 cards."
 alternate-rules-text = "$2, Abandon a character, discard your hand: Draw 3 cards."
+rules-text-3 = "{e}, Abandon a character, Discard your hand: Draw {cards}."
+preview-3 = "2●, Abandon a character, Discard your hand: Draw 3 cards."
+variables = """
+e: 2
+cards: 3"""
 card-type = "Character"
 subtype = "Warrior"
 is-fast = false
@@ -1804,6 +1812,9 @@ id = "d31723e7-8faa-41e3-89b6-c30d8fdf9cca"
 energy-cost = 6
 rules-text = "If you have played 2 or more dreams this turn, you may play this character from your void for (0)."
 alternate-rules-text = "When you play 2 cards in a turn, reclaim this character."
+rules-text-3 = "When you play {cards-numeral} in a turn, {reclaim} this character."
+preview-3 = "When you play 2 cards in a turn, reclaim this character."
+variables = "cards: 2"
 card-type = "Character"
 subtype = "Ancient"
 is-fast = false
@@ -1818,6 +1829,9 @@ id = "522368e5-38cc-480c-930a-f8e1bc5a1f68"
 energy-cost = 4
 rules-text = "Whenever a character you control is banished, this character gains +1 spark."
 alternate-rules-text = "When an ally is banished, this character gains +1 spark."
+rules-text-3 = "When an ally is {banished}, this character gains +{s} spark."
+preview-3 = "When an ally is banished, this character gains +1 spark."
+variables = "s: 1"
 card-type = "Character"
 subtype = "Explorer"
 is-fast = false
@@ -1832,6 +1846,9 @@ id = "8ace6dbe-f2cd-4a5c-b56d-6ea01d60985b"
 energy-cost = 3
 rules-text = "Whenever you play a '$fast' dream, this character gains +2 spark."
 alternate-rules-text = "When you play a '↯' card, this character gains +2 spark."
+rules-text-3 = "When you play a {fast} card, this character gains +{s} spark."
+preview-3 = "When you play a ↯fast card, this character gains +2 spark."
+variables = "s: 2"
 card-type = "Character"
 subtype = "Musician"
 is-fast = true
@@ -1846,6 +1863,13 @@ id = "86eed140-60b0-4e69-b868-332fcf25b8b3"
 energy-cost = 2
 rules-text = "{activated}: Dissolve an enemy character with spark less than or equal to the number of characters you have abandoned this turn."
 alternate-rules-text = "When you abandon 2 allies in a turn, dissolve an enemy."
+rules-text-3 = """
+When you abandon { $allies ->
+  [one] your first ally each turn,
+  *[other] {count-allies} in a turn,
+} {dissolve} an enemy."""
+preview-3 = "When you abandon 2 allies in a turn, dissolve an enemy."
+variables = "allies: 2"
 card-type = "Character"
 subtype = "Warrior"
 is-fast = false
@@ -1862,6 +1886,12 @@ rules-text = """
 {multiActivated} $2, Abandon another character with spark 1 or less: Draw 2 cards.
 """
 alternate-rules-text = "$2, abandon an ally with spark 1 or less: Draw 2 cards."
+rules-text-3 = "{e}, Abandon an ally with spark {s} or less: Draw {cards}."
+preview-3 = "2●, Abandon an ally with spark 1 or less: Draw 2 cards."
+variables = """
+e: 2
+s: 1
+cards: 2"""
 card-type = "Character"
 subtype = "Warrior"
 is-fast = false
@@ -1876,6 +1906,12 @@ id = "83fc9336-c5a4-4a6e-bf90-be84f3535d34"
 energy-cost = 1
 rules-text = "{activated} $3: The spark of each {cardtype: spirit animal} you control becomes 5."
 alternate-rules-text = "$3: The spark of each allied {spirit animal} becomes 5."
+rules-text-3 = "{e}: The spark of each allied {subtype} becomes {s}."
+preview-3 = "3●: The spark of each allied spirit animal becomes 5."
+variables = """
+e: 3
+subtype: spirit-animal
+s: 5"""
 card-type = "Character"
 subtype = "Spirit Animal"
 is-fast = false
@@ -1892,6 +1928,8 @@ rules-text = """
 When you draw all of the cards in a copy of your deck, you win the game.
 """
 alternate-rules-text = "When you have no cards in your deck, you win the game."
+rules-text-3 = "When you have no cards in your deck, you win the game."
+preview-3 = "When you have no cards in your deck, you win the game."
 card-type = "Character"
 subtype = "Spirit Animal"
 is-fast = false
@@ -1908,6 +1946,12 @@ rules-text = """
 {judgment}: If you control 2 other {cardtype: spirit animals}, gain $2.
 """
 alternate-rules-text = "{Judgment}: With two allied {spirit animals}, gain $2."
+rules-text-3 = "{Judgment} With {count-allied-subtype}, gain {e}."
+preview-3 = "▸ Judgment: With 2 allied spirit animals, gain 2●."
+variables = """
+subtype:spirit-animal
+allies: 2
+e: 2"""
 card-type = "Character"
 subtype = "Spirit Animal"
 is-fast = false
@@ -1922,6 +1966,9 @@ id = "5de09339-b7de-45bd-abc0-1ab3a09e859d"
 energy-cost = 1
 rules-text = "Until end of turn, whenever a character you control leaves play, gain $2."
 alternate-rules-text = "Until end of turn, when an ally leaves play, gain $2."
+rules-text-3 = "Until end of turn, when an ally leaves play, gain {e}."
+preview-3 = "Until end of turn, when an ally leaves play, gain 2●."
+variables = "e: 2"
 card-type = "Event"
 is-fast = false
 image-number = 1798382143
@@ -1934,6 +1981,9 @@ id = "ef6c27d3-e55f-4107-b2fd-69ad00994351"
 energy-cost = 2
 rules-text = "Once per turn, when you play a '$fast' dream, draw a card."
 alternate-rules-text = "Once per turn, when you play a '↯' card, draw a card."
+rules-text-3 = "Once per turn, when you play a {fast} card, draw {cards}."
+preview-3 = "Once per turn, when you play a ↯fast card, draw a card."
+variables = "cards: 1"
 card-type = "Character"
 subtype = "Musician"
 is-fast = true
@@ -1948,6 +1998,8 @@ id = "89d54c43-ffd6-4e0f-94ec-9e08f59e8891"
 energy-cost = 1
 rules-text = "Look at the enemy's hand. Choose a character from it. The enemy discards that card."
 alternate-rules-text = "Choose and discard a character from opponent's hand."
+rules-text-3 = "Choose and discard a character from the opponent's hand."
+preview-3 = "Choose and discard a character from the opponent's hand."
 card-type = "Event"
 is-fast = false
 image-number = 2030910791
@@ -1961,9 +2013,10 @@ energy-cost = 3
 rules-text = """
 An event in your void gains {reclaim} $0 until end of turn.
 """
-alternate-rules-text = """
-An event in your void gains {Reclaim} $0 this turn.
-"""
+alternate-rules-text = "An event in your void gains {Reclaim} $0 this turn."
+rules-text-3 = "An event in your void gains {reclaim-for-cost} this turn."
+preview-3 = "An event in your void gains reclaim 0● this turn."
+variables = "reclaim: 0"
 card-type = "Event"
 is-fast = false
 image-number = 2186149269
@@ -1978,6 +2031,9 @@ rules-text = """
 Draw a card for each dream you have played this turn.
 """
 alternate-rules-text = "Draw a card for each card you have played this turn."
+rules-text-3 = "Draw {cards} for each card you have played this turn."
+preview-3 = "Draw a card for each card you have played this turn."
+variables = "cards: 1"
 card-type = "Event"
 is-fast = false
 image-number = 1798514905
@@ -1990,6 +2046,9 @@ id = "61c9fa98-dda1-4f45-976e-b3fc89987b11"
 energy-cost = 2
 rules-text = "{activated} Abandon a character: You may return a {cardtype: warrior} from your void to play."
 alternate-rules-text = "{Judgment}: Abandon an ally to reclaim a warrior."
+rules-text-3 = "{Judgment} You may abandon an ally to {reclaim} a {subtype}."
+preview-3 = "Error: Fluent formatting errors: Resolver error: Unknown variable: $subtype; Resolver error: Unknown variable: $subtype"
+variables = "subtype: warrior"
 card-type = "Character"
 subtype = "Outsider"
 is-fast = false

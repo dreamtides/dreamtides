@@ -17,6 +17,7 @@ dissolved = {-keyword(k: "dissolved")}
 Dissolve = {-keyword(k: "Dissolve")}
 banish = {-keyword(k: "banish")}
 Banish = {-keyword(k: "Banish")}
+banished = {-keyword(k: "banished")}
 discover = {-keyword(k: "discover")}
 Discover = {-keyword(k: "Discover")}
 reclaim = {-keyword(k: "reclaim")}
@@ -29,7 +30,7 @@ kindle = {-keyword(k: "kindle")} {$k}
 Kindle = {-keyword(k: "Kindle")} {$k}
 kindle-k2 = {-keyword(k: "kindle")} {$k2}
 Kindle-k2 = {-keyword(k: "Kindle")} {$k2}
-fast = ↯Fast
+fast = <b>↯fast</b>
 
 reclaim-for-cost = {-keyword(k: "reclaim")} <color=#00838F>{$reclaim}●</color>
 ReclaimForCost = {-keyword(k: "Reclaim")} <color=#00838F>{$reclaim}●</color>
@@ -82,7 +83,15 @@ count-allied-subtype =
       *[other] { $allies } allied {plural-subtype}
   }
 
-figment = <color=#F57F17><b><u>{$figment} Figment</u></color></b>
+-figment = <color=#F57F17><b><u>{$f} Figment</u></color></b>
+
+a-figment =
+  {
+    $figment ->
+      [celestial] a {-figment(f: "Celestial")}
+      [halcyon] a {-figment(f: "Halcyon")}
+      *[other] Error: Unknown 'a-figment' for type: { $figment }
+  }
 
 -type = <color=#2E7D32><b>{$value}</b></color>
 
