@@ -2348,7 +2348,7 @@ rules-text = """
 rules-text-3 = """
 {Materialized} {Banish} an enemy until this character leaves play.
 """
-preview-3 = "▸ Materialized:: Banish an enemy until this character leaves play."
+preview-3 = "▸ Materialized: Banish an enemy until this character leaves play."
 card-type = "Character"
 subtype = "Outsider"
 is-fast = false
@@ -2365,6 +2365,17 @@ rules-text = """
 Dissolve an enemy character with cost $3 or more.
 
 {reclaim} $2."""
+rules-text-3 = """
+{Dissolve} an enemy with cost {e} or more.
+
+{ReclaimForCost}"""
+preview-3 = """
+Dissolve an enemy with cost 3● or more.
+
+Reclaim 2●"""
+variables = """
+e: 3
+reclaim: 2"""
 card-type = "Event"
 is-fast = false
 image-number = 1730836234
@@ -2376,6 +2387,13 @@ name = "Portal of Twin Paths"
 id = "5af14769-48c7-45eb-a73d-52fdea4405c4"
 energy-cost = 3
 rules-text = "Banish up to two characters you control, then materialize them."
+rules-text-3 = """
+{Banish} { $number ->
+  [one] an ally, then materialize it.
+  *[other] up to {text-number} allies, then materialize them.
+}"""
+preview-3 = "Banish up to two allies, then materialize them."
+variables = "number: 2"
 card-type = "Event"
 is-fast = false
 image-number = 2285036625
@@ -2389,6 +2407,11 @@ energy-cost = 1
 rules-text = """
 {multiActivated} $4: Materialize a copy of another character you control.
 """
+rules-text-3 = """
+{e}: {Materialize} a copy of an ally.
+"""
+preview-3 = "4●: Materialize a copy of an ally."
+variables = "e: 4"
 card-type = "Character"
 subtype = "Synth"
 is-fast = false
@@ -2404,6 +2427,9 @@ energy-cost = 4
 rules-text = """
 Whenever another character you control is dissolved, draw a card.
 """
+rules-text-3 = "When an ally is {dissolved}, draw {cards}."
+preview-3 = "When an ally is dissolved, draw a card."
+variables = "cards: 1"
 card-type = "Character"
 subtype = "Survivor"
 is-fast = false
@@ -2419,6 +2445,9 @@ energy-cost = 6
 rules-text = """
 Whenever a character you control is dissolved, gain 1 $points.
 """
+rules-text-3 = "When an ally is {dissolved}, gain {points}."
+preview-3 = "When an ally is dissolved, gain 1⍟."
+variables = "points: 1"
 card-type = "Character"
 subtype = "Ancient"
 is-fast = false
@@ -2432,6 +2461,9 @@ name = "Harvester of Despair"
 id = "0fb45922-4d27-4d01-9372-86e991164006"
 energy-cost = 3
 rules-text = "Whenever you abandon a character, this character gains +1 spark."
+rules-text-3 = "When you abandon an ally, this character gains +{s} spark."
+preview-3 = "When you abandon an ally, this character gains +1 spark."
+variables = "s: 1"
 card-type = "Character"
 subtype = "Ancient"
 is-fast = false
@@ -2447,6 +2479,13 @@ energy-cost = 2
 rules-text = """
 {judgment}: Draw a card. The enemy gains 2 $points.
 """
+rules-text-3 = """
+{Judgment} Draw {cards}. The opponent gains {points}.
+"""
+preview-3 = "▸ Judgment: Draw a card. The opponent gains 2⍟."
+variables = """
+cards: 1
+points: 2"""
 card-type = "Character"
 subtype = "Visitor"
 is-fast = false
@@ -2460,6 +2499,9 @@ name = "Veil Shatter"
 id = "4a4db2a7-0d00-4762-8dad-18648ddbc4fc"
 energy-cost = 2
 rules-text = "Banish an enemy character with cost $2 or less."
+rules-text-3 = "{Banish} an enemy with cost {e} or less."
+preview-3 = "Banish an enemy with cost 2● or less."
+variables = "e: 2"
 card-type = "Event"
 is-fast = false
 image-number = 2033123279
@@ -2473,6 +2515,9 @@ energy-cost = 2
 rules-text = """
 Dissolve an enemy character with spark 1 or less.
 """
+rules-text-3 = "{Dissolve} an enemy with spark {s} or less."
+preview-3 = "Dissolve an enemy with spark 1 or less."
+variables = "s: 1"
 card-type = "Event"
 is-fast = true
 image-number = 2521694541
@@ -2486,6 +2531,9 @@ energy-cost = 4
 rules-text = """
 {multiActivated} Abandon another character: This character gains +1 spark.
 """
+rules-text-3 = "Abandon an ally: This character gains +{s} spark."
+preview-3 = "Abandon an ally: This character gains +1 spark."
+variables = "s: 1"
 card-type = "Character"
 subtype = "Warrior"
 is-fast = false
