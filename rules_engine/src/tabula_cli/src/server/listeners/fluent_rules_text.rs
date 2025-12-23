@@ -41,12 +41,12 @@ impl Listener for FluentRulesTextListener {
         let mut changes = Vec::new();
         let mut warnings = Vec::new();
 
-        let cards_table = match snapshot.tables.iter().find(|t| t.name == "Cards2") {
+        let cards_table = match snapshot.tables.iter().find(|t| t.name == "Cards") {
             Some(t) => t,
             None => return Ok(ListenerResult { changes, warnings }),
         };
 
-        let rules_text_col_idx = match find_column_index(&cards_table.columns, "RulesText3") {
+        let rules_text_col_idx = match find_column_index(&cards_table.columns, "Rules Text") {
             Some(idx) => idx,
             None => return Ok(ListenerResult { changes, warnings }),
         };
@@ -55,7 +55,7 @@ impl Listener for FluentRulesTextListener {
         let output_col_idx = rules_text_col_idx + 1;
         if output_col_idx >= cards_table.columns.len() {
             warnings.push(
-                "Cannot create output column: 'RulesText3' is the last column in table 'Cards2'"
+                "Cannot create output column: 'Rules Text' is the last column in table 'Cards'"
                     .to_string(),
             );
             return Ok(ListenerResult { changes, warnings });
@@ -65,7 +65,7 @@ impl Listener for FluentRulesTextListener {
             Some(s) => s,
             None => {
                 warnings.push(format!(
-                    "Sheet '{}' for table 'Cards2' not found",
+                    "Sheet '{}' for table 'Cards' not found",
                     cards_table.sheet_name
                 ));
                 return Ok(ListenerResult { changes, warnings });

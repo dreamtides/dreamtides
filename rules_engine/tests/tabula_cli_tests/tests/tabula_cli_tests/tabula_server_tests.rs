@@ -502,15 +502,15 @@ fn test_fluent_rules_text_simple_html() {
     let sheet = book.get_sheet_mut(&0).expect("Sheet 0 should exist");
     sheet.set_name("Cards");
 
-    sheet.get_cell_mut("A1").set_value("RulesText3");
+    sheet.get_cell_mut("A1").set_value("Rules Text");
     sheet.get_cell_mut("B1").set_value("Fluent Output");
     sheet.get_cell_mut("A2").set_value("<color=#AA00FF><b>Dissolve</b></color>: Draw a card.");
 
     let mut table = umya_spreadsheet::structs::Table::default();
-    table.set_name("Cards2");
-    table.set_display_name("Cards2");
+    table.set_name("Cards");
+    table.set_display_name("Cards");
     table.set_area(("A1", "B2"));
-    table.add_column(tabula_cli_test_utils::make_column("RulesText3"));
+    table.add_column(tabula_cli_test_utils::make_column("Rules Text"));
     table.add_column(tabula_cli_test_utils::make_column("Fluent Output"));
     sheet.add_table(table);
 
@@ -585,17 +585,17 @@ fn test_fluent_rules_text_variable_select() {
     let sheet = book.get_sheet_mut(&0).expect("Sheet 0 should exist");
     sheet.set_name("Cards");
 
-    sheet.get_cell_mut("A1").set_value("RulesText3");
+    sheet.get_cell_mut("A1").set_value("Rules Text");
     sheet.get_cell_mut("B1").set_value("Fluent Output");
     sheet.get_cell_mut("C1").set_value("Variables");
     sheet.get_cell_mut("A2").set_value("{a}");
     sheet.get_cell_mut("C2").set_value("type: warrior");
 
     let mut table = umya_spreadsheet::structs::Table::default();
-    table.set_name("Cards2");
-    table.set_display_name("Cards2");
+    table.set_name("Cards");
+    table.set_display_name("Cards");
     table.set_area(("A1", "C2"));
-    table.add_column(tabula_cli_test_utils::make_column("RulesText3"));
+    table.add_column(tabula_cli_test_utils::make_column("Rules Text"));
     table.add_column(tabula_cli_test_utils::make_column("Fluent Output"));
     table.add_column(tabula_cli_test_utils::make_column("Variables"));
     sheet.add_table(table);
@@ -636,15 +636,15 @@ fn test_fluent_rules_text_multiline() {
     let sheet = book.get_sheet_mut(&0).expect("Sheet 0 should exist");
     sheet.set_name("Cards");
 
-    sheet.get_cell_mut("A1").set_value("RulesText3");
+    sheet.get_cell_mut("A1").set_value("Rules Text");
     sheet.get_cell_mut("B1").set_value("Fluent Output");
     sheet.get_cell_mut("A2").set_value("One\n\nTwo");
 
     let mut table = umya_spreadsheet::structs::Table::default();
-    table.set_name("Cards2");
-    table.set_display_name("Cards2");
+    table.set_name("Cards");
+    table.set_display_name("Cards");
     table.set_area(("A1", "B2"));
-    table.add_column(tabula_cli_test_utils::make_column("RulesText3"));
+    table.add_column(tabula_cli_test_utils::make_column("Rules Text"));
     table.add_column(tabula_cli_test_utils::make_column("Fluent Output"));
     sheet.add_table(table);
 
@@ -752,15 +752,15 @@ fn test_fluent_rules_text_invalid_expression() {
     let sheet = book.get_sheet_mut(&0).expect("Sheet 0 should exist");
     sheet.set_name("Cards");
 
-    sheet.get_cell_mut("A1").set_value("RulesText3");
+    sheet.get_cell_mut("A1").set_value("Rules Text");
     sheet.get_cell_mut("B1").set_value("Fluent Output");
     sheet.get_cell_mut("A2").set_value("{ unclosed bracket");
 
     let mut table = umya_spreadsheet::structs::Table::default();
-    table.set_name("Cards2");
-    table.set_display_name("Cards2");
+    table.set_name("Cards");
+    table.set_display_name("Cards");
     table.set_area(("A1", "B2"));
-    table.add_column(tabula_cli_test_utils::make_column("RulesText3"));
+    table.add_column(tabula_cli_test_utils::make_column("Rules Text"));
     table.add_column(tabula_cli_test_utils::make_column("Fluent Output"));
     sheet.add_table(table);
 
