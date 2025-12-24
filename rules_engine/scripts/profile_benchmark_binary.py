@@ -5,7 +5,8 @@ Usage example:
   python scripts/profile_benchmark_binary.py \
 	  --benchmark ai_core_11/ai_core_11 \
 	  --package battle_benchmarks \
-	  --manifest-path benchmarks/battle/Cargo.toml
+	  --manifest-path benchmarks/battle/Cargo.toml \
+	  --samply
 
 Prints the absolute path to the executable benchmark binary to stdout.
 
