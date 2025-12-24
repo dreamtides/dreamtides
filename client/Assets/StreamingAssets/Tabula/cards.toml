@@ -1089,7 +1089,7 @@ name = "Fell the Mighty"
 id = "ff10c460-125f-4f77-b9e2-4c4f33adff3e"
 energy-cost = 4
 rules-text = """
-{Banish} a card from hand: Play this event for $e.
+{Banish} a card from hand: Play this event for {e}.
 
 {Dissolve} an enemy."""
 preview = """

@@ -24,7 +24,7 @@ pub enum Ability {
 
     /// An activated ability is present on a character card and allows the
     /// controlling player to pay some cost in order to achieve an effect.
-    /// This is written as "> cost: effect".
+    /// This is written as "cost: effect".
     Activated(ActivatedAbility),
 
     /// A triggered ability is an effect which happens when some triggering

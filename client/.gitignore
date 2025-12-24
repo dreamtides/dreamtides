@@ -10,6 +10,8 @@
 *.xlsm.meta
 ~$*.xlsm.meta
 
+rules_text.json
+
 # temp
 Assets/Content/Imposters/
 
