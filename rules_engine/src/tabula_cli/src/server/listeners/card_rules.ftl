@@ -229,6 +229,13 @@ copies =
       *[other] { text-number } copies
   }
 
+n-random-characters =
+  {
+    $number ->
+      [1] a random character
+      *[other] { text-number } random characters
+  }
+
 up-to-n-events  =
   {
     $number ->

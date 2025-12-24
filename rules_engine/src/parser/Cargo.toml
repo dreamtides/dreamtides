@@ -16,4 +16,4 @@ core_data = { path = "../core_data" }
 ability_data = { path = "../ability_data" }
 
 ariadne = { workspace = true }
-chumsky = { workspace = true }
+chumsky = "0.10"

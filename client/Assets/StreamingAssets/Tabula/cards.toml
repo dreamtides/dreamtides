@@ -2644,7 +2644,7 @@ card-number = 159
 name = "Light of Emergence"
 id = "3f98591f-5ede-4add-9df6-536e39780ec3"
 energy-cost = 5
-rules-text = "{Materialize} {text-number} random characters with cost {e} or less from your deck."
+rules-text = "{Materialize} {n-random-characters} with cost {e} or less from your deck."
 preview = "Materialize two random characters with cost 3● or less from your deck."
 variables = """
 e: 3
