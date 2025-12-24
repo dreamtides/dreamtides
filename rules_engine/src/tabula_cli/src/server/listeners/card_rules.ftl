@@ -1,4 +1,5 @@
 e = <color=#00838F>{$e}●</color>
+e- = <color=#00838F>{$e_}●</color>
 points = <color=#F57F17>{$points}⍟</color>
 
 energy-symbol = <color=#00838F>●</color>
@@ -38,6 +39,9 @@ Fast = <b>↯Fast</b>
 
 reclaim-for-cost = {-keyword(k: "reclaim")} <color=#00838F>{$reclaim}●</color>
 ReclaimForCost = {-keyword(k: "Reclaim")} <color=#00838F>{$reclaim}●</color>
+
+ChooseOne = <b>Choose One:</b>
+bullet = •
 
 cards =
   {
@@ -223,4 +227,12 @@ copies =
     $number ->
       [one] a copy
       *[other] { text-number } copies
+  }
+
+up-to-n-events  =
+  {
+    $number ->
+      [1] an event
+      [2] one or two events
+      *[other] up to { $number } events
   }
