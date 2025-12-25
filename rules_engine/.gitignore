@@ -12,3 +12,4 @@ tarpaulin-report.html
 *.log
 *.mm_profdata
 *.profraw
+rules_text.json
