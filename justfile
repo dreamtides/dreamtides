@@ -9,6 +9,16 @@ code-review-rsync: rsync-for-review
 review: check-format build workspace-lints clippy test
 
 check:
+    #!/usr/bin/env bash
+    output=$(cargo check --manifest-path rules_engine/Cargo.toml --workspace --all-targets --all-features 2>&1)
+    if [ $? -eq 0 ]; then
+        echo "Check passed"
+    else
+        echo "$output"
+        exit 1
+    fi
+
+check-verbose:
     cargo check --manifest-path rules_engine/Cargo.toml --workspace --all-targets --all-features
 
 check-timed:
@@ -25,6 +35,16 @@ check-warnings:
     RUSTFLAGS="--deny warnings" cargo check --manifest-path rules_engine/Cargo.toml --workspace --all-targets --all-features
 
 build:
+    #!/usr/bin/env bash
+    output=$(cargo build --manifest-path rules_engine/Cargo.toml --all-targets --all-features 2>&1)
+    if [ $? -eq 0 ]; then
+        echo "Build passed"
+    else
+        echo "$output"
+        exit 1
+    fi
+
+build-verbose:
     cargo build --manifest-path rules_engine/Cargo.toml --all-targets --all-features
 
 build-release:
@@ -46,6 +66,16 @@ watch-release:
     cargo watch -C rules_engine -x "run --release --bin dev_server" --ignore dreamtides.json
 
 test:
+    #!/usr/bin/env bash
+    output=$(cargo test --manifest-path rules_engine/Cargo.toml 2>&1)
+    if [ $? -eq 0 ]; then
+        echo "Tests passed"
+    else
+        echo "$output"
+        exit 1
+    fi
+
+test-verbose:
     cargo test --manifest-path rules_engine/Cargo.toml
 
 battle-test *args='':
@@ -58,6 +88,16 @@ doc:
     cargo doc --manifest-path rules_engine/Cargo.toml
 
 workspace-lints:
+    #!/usr/bin/env bash
+    output=$(cargo workspace-lints rules_engine/Cargo.toml 2>&1)
+    if [ $? -eq 0 ]; then
+        echo "Lints passed"
+    else
+        echo "$output"
+        exit 1
+    fi
+
+workspace-lints-verbose:
     cargo workspace-lints rules_engine/Cargo.toml
 
 schema:
@@ -154,6 +194,16 @@ windows-dev-server:
 plugins: ios-plugin android-plugin mac-plugin windows-plugin
 
 clippy:
+  #!/usr/bin/env bash
+  output=$(cargo clippy --manifest-path rules_engine/Cargo.toml --workspace -- -D warnings -D clippy::all 2>&1)
+  if [ $? -eq 0 ]; then
+      echo "Clippy passed"
+  else
+      echo "$output"
+      exit 1
+  fi
+
+clippy-verbose:
   cargo clippy --manifest-path rules_engine/Cargo.toml --workspace -- -D warnings -D clippy::all
 
 fix:
@@ -229,12 +279,32 @@ insta:
 # Reformats code. Requires nightly because several useful options (e.g. imports_granularity) are
 # nightly-only
 fmt:
+    #!/usr/bin/env bash
+    output=$(cd rules_engine && cargo +nightly fmt 2>&1)
+    if [ $? -eq 0 ]; then
+        echo "Formatted"
+    else
+        echo "$output"
+        exit 1
+    fi
+
+fmt-verbose:
     cd rules_engine && cargo +nightly fmt
 
 fmt-csharp:
     cd client && dotnet csharpier format .
 
 check-format:
+    #!/usr/bin/env bash
+    output=$(cd rules_engine && cargo +nightly fmt -- --check 2>&1)
+    if [ $? -eq 0 ]; then
+        echo "Format OK"
+    else
+        echo "$output"
+        exit 1
+    fi
+
+check-format-verbose:
     cd rules_engine && cargo +nightly fmt -- --check
 
 check-docs:
