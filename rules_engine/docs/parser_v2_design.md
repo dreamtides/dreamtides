@@ -827,6 +827,10 @@ path = "src/cli.rs"
 
 ## 11. Agent Workflow Instructions
 
+### 11.0 Token Efficiency
+
+Minimize token usage by reading only essential files specified in the milestone deliverables rather than broadly exploring the codebase—the design doc already provides the necessary file structure and imports. Always Read files before attempting Write or Edit operations to avoid tool call errors, and use TodoWrite at the start of each milestone to track deliverables systematically.
+
 ### 11.1 Validation Checklist
 
 After every code change:
