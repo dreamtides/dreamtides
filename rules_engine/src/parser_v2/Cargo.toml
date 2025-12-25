@@ -28,5 +28,5 @@ criterion = { workspace = true }
 insta = { workspace = true }
 
 [[bin]]
-name = "parser"
+name = "parser_v2"
 path = "src/cli.rs"
