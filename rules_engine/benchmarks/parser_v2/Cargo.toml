@@ -1,0 +1,23 @@
+[package]
+name = "parser_v2_benchmarks"
+version = "0.1.0"
+edition = "2021"
+
+[lints]
+workspace = true
+
+[dependencies]
+parser_v2 = { path = "../../src/parser_v2" }
+
+ability_data = { path = "../../src/ability_data" }
+core_data = { path = "../../src/core_data" }
+
+criterion = { workspace = true }
+
+[[bench]]
+name = "parser_bench"
+harness = false
+
+[[bench]]
+name = "full_pipeline_bench"
+harness = false
