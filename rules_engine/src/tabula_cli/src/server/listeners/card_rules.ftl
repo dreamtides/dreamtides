@@ -4,6 +4,8 @@ points = <color=#F57F17>{$points}⍟</color>
 
 energy-symbol = <color=#00838F>●</color>
 
+maximum-energy = {$max} maximum {energy-symbol}
+
 -trigger = ▸ <b>{$trigger}:</b>
 Materialized = {-trigger(trigger: "Materialized")}
 Judgment = {-trigger(trigger: "Judgment")}
@@ -67,9 +69,9 @@ cards-v2 =
 
 top-n-cards =
   {
-    $cards ->
+    $to-void ->
       [one] top card
-      *[other] top { $cards } cards
+      *[other] top { $to-void } cards
   }
 
 cards-numeral =
@@ -101,12 +103,31 @@ count-allied-subtype =
 
 -figment = <color=#F57F17><b><u>{$f} Figment</u></color></b>
 
+-figments-plural = <color=#F57F17><b><u>{$f} Figments</u></color></b>
+
+figments =
+  {
+    $figment ->
+      [celestial] {-figments-plural(f: "Celestial")}
+      [halcyon] {-figments-plural(f: "Halcyon")}
+      [radiant] {-figments-plural(f: "Radiant")}
+      *[other] Error: Unknown 'figment' for type: { $figment }
+  }
+
 a-figment =
   {
     $figment ->
       [celestial] a {-figment(f: "Celestial")}
       [halcyon] a {-figment(f: "Halcyon")}
+      [radiant] a {-figment(f: "Radiant")}
       *[other] Error: Unknown 'a-figment' for type: { $figment }
+  }
+
+n-figments =
+  {
+    $number ->
+      [one] {a-figment}
+      *[other] { text-number } {figments}
   }
 
 -type = <color=#2E7D32><b>{$value}</b></color>
@@ -242,4 +263,19 @@ up-to-n-events  =
       [1] an event
       [2] one or two events
       *[other] up to { $number } events
+  }
+
+up-to-n-allies  =
+  {
+    $number ->
+      [1] an ally
+      [2] one or two allies
+      *[other] up to { $number } allies
+  }
+
+it-or-them =
+  {
+    $number ->
+      [1] it
+      *[other] them
   }

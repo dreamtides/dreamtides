@@ -1,6 +1,7 @@
 /target
 
 /client_docs
+docs/chumsky
 .vscode
 .idea
 log.json
