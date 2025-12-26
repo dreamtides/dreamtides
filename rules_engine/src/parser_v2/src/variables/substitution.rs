@@ -11,6 +11,7 @@ pub static COMPOUND_DIRECTIVES: &[&str] = &["n-figments", "a-figment"];
 
 pub static VARIABLE_DIRECTIVES: &[&str] = &[
     "e",
+    "e-",
     "e_",
     "cards",
     "cards-v2",
@@ -42,28 +43,33 @@ pub static VARIABLE_DIRECTIVES: &[&str] = &[
     "allies",
     "to-void",
     "foresee",
-    "reclaim",
     "max",
     "MultiplyBy",
     "copies",
 ];
 
 pub static DIRECTIVE_VARIABLE_MAPPINGS: &[(&str, &str)] = &[
-    ("cards-numeral", "cards"),
-    ("plural-subtype", "subtype"),
     ("a-subtype", "subtype"),
-    ("count-allies", "allies"),
+    ("cards-numeral", "cards"),
+    ("copies", "number"),
     ("count-allied-subtype", "allies"),
+    ("count-allies", "allies"),
+    ("e-", "e_"),
+    ("figments", "figment"),
+    ("it-or-them", "number"),
+    ("kindle", "k"),
+    ("kindle-k2", "k2"),
+    ("maximum-energy", "max"),
+    ("MultiplyBy", "number"),
+    ("n-random-characters", "number"),
+    ("plural-subtype", "subtype"),
+    ("reclaim-for-cost", "reclaim"),
+    ("ReclaimForCost", "reclaim"),
+    ("text-number", "number"),
+    ("this-turn-times", "number"),
     ("top-n-cards", "to-void"),
     ("up-to-n-allies", "number"),
     ("up-to-n-events", "number"),
-    ("n-random-characters", "number"),
-    ("it-or-them", "number"),
-    ("this-turn-times", "number"),
-    ("text-number", "number"),
-    ("MultiplyBy", "number"),
-    ("copies", "number"),
-    ("figments", "figment"),
 ];
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]

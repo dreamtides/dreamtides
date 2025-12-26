@@ -100,7 +100,7 @@ fn parse_ftl_directive_variables(content: &str) -> HashMap<String, String> {
             continue;
         }
 
-        if let Some(directive_name) = line.strip_suffix(" =") {
+        if let Some((directive_name, definition)) = line.split_once(" = ") {
             let directive = directive_name.trim();
 
             if COMPOUND_DIRECTIVES.contains(&directive) {
@@ -108,7 +108,9 @@ fn parse_ftl_directive_variables(content: &str) -> HashMap<String, String> {
                 continue;
             }
 
-            if i + 1 < lines.len() {
+            if let Some(var_name) = extract_inline_variable(definition) {
+                mappings.insert(directive.to_string(), var_name);
+            } else if i + 1 < lines.len() {
                 let next_line = lines[i + 1].trim();
 
                 if next_line == "{" && i + 2 < lines.len() {
@@ -124,6 +126,29 @@ fn parse_ftl_directive_variables(content: &str) -> HashMap<String, String> {
     }
 
     mappings
+}
+
+fn extract_inline_variable(definition: &str) -> Option<String> {
+    let mut chars = definition.chars().peekable();
+    while let Some(ch) = chars.next() {
+        if ch == '{' {
+            if chars.peek() == Some(&'$') {
+                chars.next();
+                let mut var_name = String::new();
+                while let Some(&next_ch) = chars.peek() {
+                    if next_ch.is_alphanumeric() || next_ch == '_' || next_ch == '-' {
+                        var_name.push(chars.next().unwrap());
+                    } else {
+                        break;
+                    }
+                }
+                if !var_name.is_empty() && chars.peek() == Some(&'}') {
+                    return Some(var_name);
+                }
+            }
+        }
+    }
+    None
 }
 
 fn extract_variable_from_pattern(line: &str) -> Option<String> {
@@ -161,6 +186,7 @@ fn extract_all_ftl_variables(content: &str) -> HashSet<String> {
     variables.remove("k");
     variables.remove("f");
     variables.remove("value");
+    variables.remove("reclaim");
 
     variables
 }
