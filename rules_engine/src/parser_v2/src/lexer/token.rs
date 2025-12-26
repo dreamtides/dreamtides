@@ -1,4 +1,4 @@
-use crate::lexer::span::Span;
+use chumsky::span::SimpleSpan;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Token {
@@ -10,4 +10,4 @@ pub enum Token {
     Newline,
 }
 
-pub type Spanned<T> = (T, Span);
+pub type Spanned<T> = (T, SimpleSpan);

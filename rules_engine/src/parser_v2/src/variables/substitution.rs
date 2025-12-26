@@ -1,8 +1,8 @@
 use ability_data::figment_type::FigmentType;
 use ability_data::variable_value::VariableValue;
+use chumsky::span::SimpleSpan;
 use core_data::card_types::CardSubtype;
 
-use crate::lexer::span::Span;
 use crate::lexer::token::{Spanned, Token};
 use crate::variables::binding::VariableBindings;
 
@@ -78,7 +78,7 @@ pub enum ResolvedToken {
 #[error("Unresolved variable: {name}")]
 pub struct UnresolvedVariable {
     pub name: String,
-    pub span: Span,
+    pub span: SimpleSpan,
 }
 
 pub fn resolve_variables(
@@ -126,7 +126,7 @@ fn extract_variable_name(directive: &str) -> String {
 fn resolve_compound_directive(
     name: &str,
     bindings: &VariableBindings,
-    span: Span,
+    span: SimpleSpan,
 ) -> Result<ResolvedToken, UnresolvedVariable> {
     match name {
         "n-figments" => {

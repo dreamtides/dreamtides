@@ -1,4 +1,5 @@
-use parser_v2::lexer::span::Span;
+use chumsky::span::{SimpleSpan, Span};
+use parser_v2::error::parser_errors::LexError;
 use parser_v2::lexer::token::Token;
 use parser_v2::lexer::tokenize::{lex, LexResult};
 
@@ -6,7 +7,7 @@ fn tokens(result: &LexResult) -> Vec<&Token> {
     result.tokens.iter().map(|(t, _)| t).collect()
 }
 
-fn spans(result: &LexResult) -> Vec<Span> {
+fn spans(result: &LexResult) -> Vec<SimpleSpan> {
     result.tokens.iter().map(|(_, s)| *s).collect()
 }
 
@@ -195,7 +196,11 @@ fn test_span_tracking() {
     let input = "Draw {cards}.";
     let result = lex(input).expect("lexing should succeed");
 
-    assert_eq!(spans(&result), vec![Span::new(0, 4), Span::new(5, 12), Span::new(12, 13),]);
+    assert_eq!(spans(&result), vec![
+        SimpleSpan::new((), 0..4),
+        SimpleSpan::new((), 5..12),
+        SimpleSpan::new((), 12..13),
+    ]);
 }
 
 #[test]
@@ -284,7 +289,7 @@ fn test_error_unclosed_brace() {
 
     assert!(result.is_err());
     let err = result.unwrap_err();
-    assert!(matches!(err, parser_v2::error::LexError::UnclosedBrace { .. }));
+    assert!(matches!(err, LexError::UnclosedBrace { .. }));
 }
 
 #[test]
@@ -294,7 +299,7 @@ fn test_error_empty_directive() {
 
     assert!(result.is_err());
     let err = result.unwrap_err();
-    assert!(matches!(err, parser_v2::error::LexError::EmptyDirective { .. }));
+    assert!(matches!(err, LexError::EmptyDirective { .. }));
 }
 
 #[test]

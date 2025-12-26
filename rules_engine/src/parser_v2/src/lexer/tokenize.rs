@@ -1,8 +1,9 @@
 use std::iter::Peekable;
 use std::str::CharIndices;
 
-use crate::error::LexError;
-use crate::lexer::span::Span;
+use chumsky::span::{SimpleSpan, Span};
+
+use crate::error::parser_errors::LexError;
 use crate::lexer::token::{Spanned, Token};
 
 #[derive(Debug, Clone)]
@@ -20,10 +21,10 @@ pub fn lex(input: &str) -> Result<LexResult, LexError> {
     while let Some((start, ch)) = chars.next() {
         match ch {
             '{' => tokens.push(lex_directive(&mut chars, start)?),
-            '.' => tokens.push((Token::Period, Span::new(start, start + 1))),
-            ',' => tokens.push((Token::Comma, Span::new(start, start + 1))),
-            ':' => tokens.push((Token::Colon, Span::new(start, start + 1))),
-            '\n' => tokens.push((Token::Newline, Span::new(start, start + 1))),
+            '.' => tokens.push((Token::Period, SimpleSpan::new((), start..start + 1))),
+            ',' => tokens.push((Token::Comma, SimpleSpan::new((), start..start + 1))),
+            ':' => tokens.push((Token::Colon, SimpleSpan::new((), start..start + 1))),
+            '\n' => tokens.push((Token::Newline, SimpleSpan::new((), start..start + 1))),
             c if c.is_whitespace() => {}
             _ => tokens.push(lex_word(&mut chars, start, ch)),
         }
@@ -43,16 +44,18 @@ fn lex_directive(
         match chars.next() {
             Some((end, '}')) => {
                 if name.is_empty() {
-                    return Err(LexError::EmptyDirective { span: Span::new(start, end + 1) });
+                    return Err(LexError::EmptyDirective {
+                        span: SimpleSpan::new((), start..end + 1),
+                    });
                 }
-                return Ok((Token::Directive(name), Span::new(start, end + 1)));
+                return Ok((Token::Directive(name), SimpleSpan::new((), start..end + 1)));
             }
             Some((_, ch)) => {
                 name.push(ch);
             }
             None => {
                 return Err(LexError::UnclosedBrace {
-                    span: Span::new(start, content_start + name.len()),
+                    span: SimpleSpan::new((), start..content_start + name.len()),
                 });
             }
         }
@@ -78,7 +81,7 @@ fn lex_word(
         }
     }
 
-    (Token::Word(word), Span::new(start, end))
+    (Token::Word(word), SimpleSpan::new((), start..end))
 }
 
 fn is_word_char(ch: char) -> bool {

@@ -3,6 +3,7 @@ pub mod activated;
 pub mod condition;
 pub mod cost;
 pub mod effect;
+pub mod effect_parser;
 pub mod helpers;
 pub mod named;
 pub mod predicate;

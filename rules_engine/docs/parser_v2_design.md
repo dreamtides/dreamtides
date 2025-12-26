@@ -944,13 +944,18 @@ These cards must parse and round-trip correctly. They are the primary validation
 **Scope:** Chumsky 0.12 setup, error types, DrawCards, GainEnergy, DiscardCards
 
 **Deliverables:**
-- `parser/mod.rs`, `parser/helpers.rs`, `parser/effect/mod.rs`, `parser/effect/card_effects.rs`
-- `error/mod.rs`, `error/diagnostic.rs`
+- `parser/helpers.rs` - Common parser combinators (word, directive, integer, etc.)
+- `parser/effect_parser.rs` - Effect parser orchestration (single_effect_parser)
+- `parser/effect/card_effects.rs` - Draw, discard, gain energy parsers
+- `error/mod.rs` - Error types (ParserError, LexError)
+- `error/diagnostic.rs` - Ariadne integration
 - Serializer stubs for implemented effects
 
 **Test Cards:** Cards 2 and 5 (partial - draw/discard portions)
 
 **Round-trip:** Verify `Draw {cards}.` parses and serializes back identically.
+
+**Note:** `parser/mod.rs` and `parser/effect/mod.rs` contain only module declarations, per code style rules.
 
 ---
 

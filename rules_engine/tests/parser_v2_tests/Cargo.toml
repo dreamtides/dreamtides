@@ -12,4 +12,5 @@ parser_v2 = { path = "../../src/parser_v2" }
 ability_data = { path = "../../src/ability_data" }
 core_data = { path = "../../src/core_data" }
 
+chumsky = { workspace = true }
 insta = { workspace = true }
