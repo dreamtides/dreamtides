@@ -1,12 +1,13 @@
 use ability_data::standard_effect::StandardEffect;
 use chumsky::prelude::*;
+use parser_v2::lexer::tokenize;
 use parser_v2::parser::effect_parser;
 use parser_v2::serializer::formatter;
 use parser_v2::variables::binding::VariableBindings;
 use parser_v2::variables::substitution::resolve_variables;
 
 fn parse_effect(input: &str, vars: &str) -> StandardEffect {
-    let lex_result = parser_v2::lexer::tokenize::lex(input).unwrap();
+    let lex_result = tokenize::lex(input).unwrap();
     let bindings = VariableBindings::parse(vars).unwrap();
     let resolved = resolve_variables(&lex_result.tokens, &bindings).unwrap();
 
