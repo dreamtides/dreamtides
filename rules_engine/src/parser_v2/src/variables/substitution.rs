@@ -7,6 +7,40 @@ use serde::Serialize;
 use crate::lexer::token::{Spanned, Token};
 use crate::variables::binding::VariableBindings;
 
+pub static DIRECTIVES: &[(&str, &[&str])] = &[
+    ("e", &["e"]),
+    ("points", &["points"]),
+    ("maximum-energy", &["max"]),
+    ("kindle", &["k"]),
+    ("Kindle", &["k"]),
+    ("foresee", &["foresee"]),
+    ("Foresee", &["foresee"]),
+    ("reclaim-for-cost", &["reclaim"]),
+    ("ReclaimForCost", &["reclaim"]),
+    ("cards", &["cards"]),
+    ("discards", &["discards"]),
+    ("top-n-cards", &["to-void"]),
+    ("cards-numeral", &["cards"]),
+    ("s", &["s"]),
+    ("count", &["count"]),
+    ("count-allies", &["allies"]),
+    ("count-allied-subtype", &["allies"]),
+    ("figments", &["figment"]),
+    ("a-figment", &["figment"]),
+    ("n-figments", &["number", "figment"]),
+    ("a-subtype", &["subtype"]),
+    ("subtype", &["subtype"]),
+    ("plural-subtype", &["subtype"]),
+    ("text-number", &["number"]),
+    ("this-turn-times", &["number"]),
+    ("MultiplyBy", &["number"]),
+    ("copies", &["number"]),
+    ("n-random-characters", &["number"]),
+    ("up-to-n-events", &["number"]),
+    ("up-to-n-allies", &["number"]),
+    ("it-or-them", &["number"]),
+];
+
 pub static COMPOUND_DIRECTIVES: &[&str] = &["n-figments", "a-figment"];
 
 pub static VARIABLE_DIRECTIVES: &[&str] = &[

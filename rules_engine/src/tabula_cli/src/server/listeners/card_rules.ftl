@@ -1,5 +1,6 @@
 e = <color=#00838F>{$e}●</color>
-e- = <color=#00838F>{$e_}●</color>
+mode1-cost = <color=#00838F>{$mode1-cost}●</color>
+mode2-cost = <color=#00838F>{$mode2-cost}●</color>
 points = <color=#F57F17>{$points}⍟</color>
 
 energy-symbol = <color=#00838F>●</color>
@@ -32,8 +33,6 @@ prevent = {-keyword(k: "prevent")}
 Prevent = {-keyword(k: "Prevent")}
 kindle = {-keyword(k: "kindle")} {$k}
 Kindle = {-keyword(k: "Kindle")} {$k}
-kindle-k2 = {-keyword(k: "kindle")} {$k2}
-Kindle-k2 = {-keyword(k: "Kindle")} {$k2}
 foresee = {-keyword(k: "foresee")} {$foresee}
 Foresee = {-keyword(k: "Foresee")} {$foresee}
 fast = <b>↯fast</b>
@@ -57,14 +56,6 @@ discards =
     $discards ->
       [one] a card
       *[other] { $discards } cards
-  }
-
-
-cards-v2 =
-  {
-    $cards-v2 ->
-      [one] a card
-      *[other] { $cards-v2 } cards
   }
 
 top-n-cards =

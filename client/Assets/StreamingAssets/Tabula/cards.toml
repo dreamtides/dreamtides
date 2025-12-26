@@ -3626,15 +3626,15 @@ id = "6e94b4a6-4164-4572-91c1-e74de3e75188"
 energy-cost = "*"
 rules-text = """
 {ChooseOne}
-{bullet} {e}: Return an enemy to hand.
-{bullet} {e-}: Draw {cards}."""
+{bullet} {mode1-cost}: Return an enemy to hand.
+{bullet} {mode2-cost}: Draw {cards}."""
 preview = """
 Choose One:
 • 2●: Return an enemy to hand.
 • 3●: Draw 2 cards."""
 variables = """
-e: 2
-e_: 3
+mode1-cost: 2
+mode2-cost: 3
 cards: 2"""
 card-type = "Event"
 is-fast = true
