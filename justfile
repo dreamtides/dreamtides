@@ -213,10 +213,10 @@ benchmark *args='':
   cargo criterion --manifest-path rules_engine/Cargo.toml "$@"
 
 parser *args='':
-  cargo run --manifest-path rules_engine/Cargo.toml --bin "parser_cli" -- "$@"
+  cargo run --manifest-path rules_engine/Cargo.toml --bin "parser_v2" -- "$@"
 
 parser-release *args='':
-  cargo run --manifest-path rules_engine/Cargo.toml --release --bin "parser_cli" -- "$@"
+  cargo run --manifest-path rules_engine/Cargo.toml --release --bin "parser_v2" -- "$@"
 
 tabula *args='':
   cargo run --manifest-path rules_engine/Cargo.toml -p tabula_cli -- "$@"

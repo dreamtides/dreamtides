@@ -76,14 +76,16 @@ A few relevant keywords:
 
 More task-specification documentation is available:
 
-- Development environment setup: rules_engine/docs/environment_setup.md
-- Adding new battle effects: rules_engine/docs/adding_new_effects.md
-- Adding new trigger conditions: rules_engine/docs/adding_new_triggers.md
-- Running benchmarks: rules_engine/docs/benchmarks.md
+- Development environment setup: `rules_engine/docs/environment_setup.md`
+- Adding new battle effects: `rules_engine/docs/adding_new_effects.md`
+- Adding new trigger conditions: `rules_engine/docs/adding_new_triggers.md`
+- Running benchmarks: `rules_engine/docs/benchmarks.md`
 
 
 # CODE STRUCTURE
 
 The code is structured as a series of Rust crates using the cargo "workspace" feature.
 
-Rules engine source code lives in the rules_engine/ directory.
+Rules engine source code lives in the `rules_engine/` directory.
+
+Card data lives in `rules_engine/tabula/cards.toml`

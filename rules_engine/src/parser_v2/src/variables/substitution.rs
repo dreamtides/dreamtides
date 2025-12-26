@@ -2,6 +2,7 @@ use ability_data::figment_type::FigmentType;
 use ability_data::variable_value::VariableValue;
 use chumsky::span::SimpleSpan;
 use core_data::card_types::CardSubtype;
+use serde::Serialize;
 
 use crate::lexer::token::{Spanned, Token};
 use crate::variables::binding::VariableBindings;
@@ -65,7 +66,7 @@ pub static DIRECTIVE_VARIABLE_MAPPINGS: &[(&str, &str)] = &[
     ("figments", "figment"),
 ];
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub enum ResolvedToken {
     Token(Token),
     Integer { directive: String, value: u32 },

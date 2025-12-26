@@ -1,6 +1,7 @@
 use chumsky::span::SimpleSpan;
+use serde::Serialize;
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub enum Token {
     Word(String),
     Directive(String),

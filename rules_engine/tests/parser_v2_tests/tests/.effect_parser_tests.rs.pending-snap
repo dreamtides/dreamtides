@@ -1,1 +1,0 @@
-{"run_id":"1766716347-283990000","line":30,"new":{"module_name":"effect_parser_tests","snapshot_name":"draw_cards","metadata":{"source":"tests/parser_v2_tests/tests/effect_parser_tests.rs","assertion_line":30,"expression":"result"},"snapshot":"DrawCards(\n  count: 2,\n)"},"old":{"module_name":"effect_parser_tests","metadata":{},"snapshot":"DrawCards(\n  count: 21, \n)"}}
