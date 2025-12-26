@@ -144,6 +144,7 @@ fn test_resolve_compound_n_figments() {
     let resolved = resolve_variables(&tokens, &bindings).unwrap();
     assert_eq!(resolved.len(), 1);
     assert_eq!(resolved[0].0, ResolvedToken::FigmentCount {
+        directive: "n-figments".to_string(),
         count: 3,
         figment_type: FigmentType::Radiant
     });
@@ -156,7 +157,10 @@ fn test_resolve_compound_a_figment() {
 
     let resolved = resolve_variables(&tokens, &bindings).unwrap();
     assert_eq!(resolved.len(), 1);
-    assert_eq!(resolved[0].0, ResolvedToken::FigmentSingle { figment_type: FigmentType::Shadow });
+    assert_eq!(resolved[0].0, ResolvedToken::Figment {
+        directive: "a-figment".to_string(),
+        figment_type: FigmentType::Shadow
+    });
 }
 
 #[test]
@@ -277,6 +281,7 @@ fn test_representative_card_9() {
     assert_eq!(resolved.len(), 3);
     assert_eq!(resolved[0].0, ResolvedToken::Token(Token::Directive("Materialize".to_string())));
     assert_eq!(resolved[1].0, ResolvedToken::FigmentCount {
+        directive: "n-figments".to_string(),
         count: 3,
         figment_type: FigmentType::Radiant
     });
@@ -306,16 +311,14 @@ fn test_variable_directive_recognition() {
         (Token::Directive("discards".to_string()), SimpleSpan::new((), 12..22)),
         (Token::Directive("points".to_string()), SimpleSpan::new((), 23..31)),
         (Token::Directive("s".to_string()), SimpleSpan::new((), 32..35)),
-        (Token::Directive("k".to_string()), SimpleSpan::new((), 36..39)),
         (Token::Directive("subtype".to_string()), SimpleSpan::new((), 40..49)),
     ];
-    let bindings = VariableBindings::parse(
-        "e: 1, cards: 2, discards: 3, points: 4, s: 5, k: 6, subtype: Warrior",
-    )
-    .unwrap();
+    let bindings =
+        VariableBindings::parse("e: 1, cards: 2, discards: 3, points: 4, s: 5, subtype: Warrior")
+            .unwrap();
 
     let resolved = resolve_variables(&tokens, &bindings).unwrap();
-    assert_eq!(resolved.len(), 7);
+    assert_eq!(resolved.len(), 6);
     assert_eq!(resolved[0].0, ResolvedToken::Integer { directive: "e".to_string(), value: 1 });
     assert_eq!(resolved[1].0, ResolvedToken::Integer { directive: "cards".to_string(), value: 2 });
     assert_eq!(resolved[2].0, ResolvedToken::Integer {
@@ -324,8 +327,7 @@ fn test_variable_directive_recognition() {
     });
     assert_eq!(resolved[3].0, ResolvedToken::Integer { directive: "points".to_string(), value: 4 });
     assert_eq!(resolved[4].0, ResolvedToken::Integer { directive: "s".to_string(), value: 5 });
-    assert_eq!(resolved[5].0, ResolvedToken::Integer { directive: "k".to_string(), value: 6 });
-    assert_eq!(resolved[6].0, ResolvedToken::Subtype {
+    assert_eq!(resolved[5].0, ResolvedToken::Subtype {
         directive: "subtype".to_string(),
         subtype: CardSubtype::Warrior
     });
