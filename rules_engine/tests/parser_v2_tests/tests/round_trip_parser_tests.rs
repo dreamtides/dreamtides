@@ -30,8 +30,8 @@ fn test_round_trip_draw_cards() {
 
 #[test]
 fn test_round_trip_discard_cards() {
-    let original = "Discard {cards}.";
-    let vars = "cards: 3";
+    let original = "Discard {discards}.";
+    let vars = "discards: 3";
 
     let parsed = parse_effect(original, vars);
     let serialized = formatter::serialize_standard_effect(&parsed);

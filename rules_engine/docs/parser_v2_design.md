@@ -73,8 +73,7 @@ rules_engine/src/parser_v2/
 │   │
 │   ├── lexer/
 │   │   ├── mod.rs                # Lexer entry point
-│   │   ├── token.rs              # Token enum definition
-│   │   └── span.rs               # Span tracking utilities
+│   │   ├── token_lexer.rs              # Token enum definition
 │   │
 │   ├── variables/
 │   │   ├── mod.rs                # Variable resolution
@@ -83,37 +82,37 @@ rules_engine/src/parser_v2/
 │   │
 │   ├── parser/
 │   │   ├── mod.rs                # Parser orchestration
-│   │   ├── ability.rs            # Top-level ability parsing
-│   │   ├── triggered.rs          # Triggered ability parsing
-│   │   ├── activated.rs          # Activated ability parsing
-│   │   ├── static_ability.rs     # Static ability parsing
+│   │   ├── ability_parsers.rs            # Top-level ability parsing
+│   │   ├── triggered_parsers.rs          # Triggered ability parsing
+│   │   ├── activated_parsers.rs          # Activated ability parsing
+│   │   ├── static_ability_parsers.rs     # Static ability parsing
 │   │   ├── named.rs              # Named ability parsing
 │   │   ├── effect/
 │   │   │   ├── mod.rs            # Effect orchestration
-│   │   │   ├── card_effects.rs   # Draw, discard, materialize, etc.
-│   │   │   ├── spark_effects.rs  # Kindle, spark gains
-│   │   │   ├── resource_effects.rs # Energy, points
-│   │   │   ├── control_effects.rs  # Gain control, disable
-│   │   │   └── game_effects.rs   # Foresee, prevent, discover
-│   │   ├── trigger.rs            # Trigger event parsing
-│   │   ├── cost.rs               # Cost parsing
-│   │   ├── predicate.rs          # Card predicate parsing
-│   │   ├── condition.rs          # Condition parsing
-│   │   └── helpers.rs            # Shared parser combinators
+│   │   │   ├── card_effect_parsers.rs   # Draw, discard, materialize, etc.
+│   │   │   ├── spark_effect_parsers.rs  # Kindle, spark gains
+│   │   │   ├── resource_effect_parsers.rs # Energy, points
+│   │   │   ├── control_effect_parsers.rs  # Gain control, disable
+│   │   │   └── game_effect_parsers.rs   # Foresee, prevent, discover
+│   │   ├── trigger_parsers.rs            # Trigger event parsing
+│   │   ├── cost_parsers.rs               # Cost parsing
+│   │   ├── predicate_parsers.rs          # Card predicate parsing
+│   │   ├── condition_parsers.rs          # Condition parsing
+│   │   └── parser_helpers.rs            # Shared parser combinators
 │   │
 │   ├── builder/
 │   │   ├── mod.rs                # Ability construction
-│   │   ├── spanned.rs            # SpannedAbility types
-│   │   └── display.rs            # Display text extraction
+│   │   ├── spanned_builder.rs            # SpannedAbility types
+│   │   └── parser_display.rs            # Display text extraction
 │   │
 │   ├── serializer/
 │   │   ├── mod.rs                # Round-trip serialization
-│   │   └── formatter.rs          # Ability → String conversion
+│   │   └── parser_formatter.rs          # Ability → String conversion
 │   │
 │   └── error/
 │       ├── mod.rs                # Error types
-│       ├── diagnostic.rs         # Ariadne integration
-│       └── recovery.rs           # Error recovery strategies
+│       ├── parser_diagnostics.rs         # Ariadne integration
+│       └── parser_recovery.rs           # Error recovery strategies
 
 rules_engine/tests/parser_v2_tests/
 ├── Cargo.toml
@@ -944,11 +943,11 @@ These cards must parse and round-trip correctly. They are the primary validation
 **Scope:** Chumsky 0.12 setup, error types, DrawCards, GainEnergy, DiscardCards
 
 **Deliverables:**
-- `parser/helpers.rs` - Common parser combinators (word, directive, integer, etc.)
-- `parser/effect_parser.rs` - Effect parser orchestration (single_effect_parser)
-- `parser/effect/card_effects.rs` - Draw, discard, gain energy parsers
+- `parser/parser_helpers.rs` - Common parser combinators (word, directive, integer, etc.)
+- `parser/effect_parsers.rs` - Effect parser orchestration (single_effect_parser)
+- `parser/effect/card_effect_parsers.rs` - Draw, discard, gain energy parsers
 - `error/mod.rs` - Error types (ParserError, LexError)
-- `error/diagnostic.rs` - Ariadne integration
+- `error/parser_diagnostic.rs` - Ariadne integration
 - Serializer stubs for implemented effects
 
 **Test Cards:** Cards 2 and 5 (partial - draw/discard portions)
@@ -963,7 +962,7 @@ These cards must parse and round-trip correctly. They are the primary validation
 **Scope:** All trigger events, keyword triggers
 
 **Deliverables:**
-- `parser/trigger.rs`
+- `parser/trigger_parsers.rs`
 - Tests for trigger parsing
 
 **Test Cards:** Cards 1, 3, 4, 6, 7, 8 (trigger portions only)
@@ -976,7 +975,7 @@ These cards must parse and round-trip correctly. They are the primary validation
 **Scope:** Card predicates, determiners, targets
 
 **Deliverables:**
-- `parser/predicate.rs`
+- `parser/predicate_parsers.rs`
 - Tests for predicate parsing
 
 **Test Cards:** Cards 2, 6, 7 (predicate portions)
@@ -989,7 +988,7 @@ These cards must parse and round-trip correctly. They are the primary validation
 **Scope:** All cost types
 
 **Deliverables:**
-- `parser/cost.rs`
+- `parser/cost_parsers.rs`
 - Tests for cost parsing
 
 **Test Cards:** Card 6 (banish cost), card 4 (discard cost trigger cost)
@@ -1002,7 +1001,7 @@ These cards must parse and round-trip correctly. They are the primary validation
 **Scope:** All remaining StandardEffect variants
 
 **Deliverables:**
-- `parser/effect/spark_effects.rs`, `parser/effect/resource_effects.rs`, `parser/effect/control_effects.rs`, `parser/effect/game_effects.rs`
+- `parser/effect/spark_effect_parsers.rs`, `parser/effect/resource_effect_parsers.rs`, `parser/effect/control_effect_parsers.rs`, `parser/effect/game_effect_parsers.rs`
 - Complete serializer for all effects
 
 **Test Cards:** All 9 representative test cards should now have all effects parsing, including compound directive card 9.
@@ -1015,7 +1014,7 @@ These cards must parse and round-trip correctly. They are the primary validation
 **Scope:** Full triggered abilities including "Once per turn"
 
 **Deliverables:**
-- `parser/triggered.rs`
+- `parser/triggered_parsers.rs`
 - Integration tests
 
 **Test Cards:** Cards 1, 3, 4, 6, 7, 8 should fully parse as triggered abilities.
@@ -1028,7 +1027,7 @@ These cards must parse and round-trip correctly. They are the primary validation
 **Scope:** Static abilities
 
 **Deliverables:**
-- `parser/static_ability.rs`
+- `parser/static_ability_parsers.rs`
 - Tests for static abilities
 
 **Test Cards:** Card 7 (static: once per turn play from void)
@@ -1041,7 +1040,7 @@ These cards must parse and round-trip correctly. They are the primary validation
 **Scope:** Optional effects, conditional effects, trigger costs
 
 **Deliverables:**
-- `parser/condition.rs`
+- `parser/condition_parsers.rs`
 - Updates to effect parser
 
 **Test Cards:** Cards 4 and 6 ("You may...")
@@ -1054,7 +1053,7 @@ These cards must parse and round-trip correctly. They are the primary validation
 **Scope:** {ReclaimForCost}, {Fast}
 
 **Deliverables:**
-- `parser/named.rs`
+- `parser/named_parsers.rs`
 
 **Test Cards:** Card 5 ({ReclaimForCost})
 
@@ -1066,7 +1065,7 @@ These cards must parse and round-trip correctly. They are the primary validation
 **Scope:** Activated abilities
 
 **Deliverables:**
-- `parser/activated.rs`
+- `parser/activated_parsers.rs`
 
 **Test Cards:** None in representative set, but add test for `{e}: Draw {cards}.`
 
@@ -1090,9 +1089,6 @@ These cards must parse and round-trip correctly. They are the primary validation
 ### Milestone 14: SpannedAbility and Display
 **Scope:** Text segmentation for UI
 
-**Deliverables:**
-- `builder/spanned.rs`, `builder/display.rs`
-
 **Test Cards:** All 9 representative cards produce correct spans.
 
 **Round-trip:** N/A (spans are metadata)
@@ -1102,9 +1098,6 @@ These cards must parse and round-trip correctly. They are the primary validation
 ### Milestone 15: CLI and File Processing
 **Scope:** Command line interface, TOML processing
 
-**Deliverables:**
-- `cli.rs`
-
 **Test Cards:** CLI can parse all 9 representative cards.
 
 **Round-trip:** `parser verify cards.toml` passes for representative cards.
@@ -1113,10 +1106,6 @@ These cards must parse and round-trip correctly. They are the primary validation
 
 ### Milestone 16: Error Recovery and Polish
 **Scope:** Error recovery strategies, edge cases
-
-**Deliverables:**
-- `error/recovery.rs`
-- Edge case tests
 
 **Test Cards:** Test malformed versions of all 9 representative cards produce helpful errors.
 
@@ -1143,6 +1132,25 @@ Minimal changes expected. Potentially new StandardEffect variants if template sy
 No breaking changes to existing Ability structure.
 
 ---
+
+## 15. Unit Testing
+
+We need extensive unit tests for parsers, covering both success and failure
+cases. Parsing tests should use the `insta` crate along with the
+`assert_ron_snapshot!()` function to make assertions about parser output.
+
+```
+#[test]
+fn test_draw_cards() {
+    let result = parse_effect("Draw {cards}.", "cards: 2");
+    assert_ron_snapshot!(result, @r###"
+    DrawCards(
+      count: 2,
+    )
+    "###);
+}
+```
+
 
 ## Appendix A: Template Syntax Reference
 

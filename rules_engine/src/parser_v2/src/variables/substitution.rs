@@ -68,8 +68,8 @@ pub static DIRECTIVE_VARIABLE_MAPPINGS: &[(&str, &str)] = &[
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum ResolvedToken {
     Token(Token),
-    Integer(u32),
-    Subtype(CardSubtype),
+    Integer { directive: String, value: u32 },
+    Subtype { directive: String, subtype: CardSubtype },
     FigmentCount { count: u32, figment_type: FigmentType },
     FigmentSingle { figment_type: FigmentType },
 }
@@ -94,8 +94,12 @@ pub fn resolve_variables(
             Token::Directive(name) if is_variable_directive(name) => {
                 let var_name = extract_variable_name(name);
                 match bindings.get(&var_name) {
-                    Some(VariableValue::Integer(n)) => Ok((ResolvedToken::Integer(*n), *span)),
-                    Some(VariableValue::Subtype(s)) => Ok((ResolvedToken::Subtype(*s), *span)),
+                    Some(VariableValue::Integer(n)) => {
+                        Ok((ResolvedToken::Integer { directive: name.clone(), value: *n }, *span))
+                    }
+                    Some(VariableValue::Subtype(s)) => {
+                        Ok((ResolvedToken::Subtype { directive: name.clone(), subtype: *s }, *span))
+                    }
                     Some(VariableValue::Figment(_)) => {
                         Err(UnresolvedVariable { name: var_name.clone(), span: *span })
                     }

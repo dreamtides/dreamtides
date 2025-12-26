@@ -34,8 +34,26 @@ pub fn comma<'a>() -> impl Parser<'a, ParserInput<'a>, (), ParserExtra<'a>> + Cl
     }
 }
 
-pub fn integer<'a>() -> impl Parser<'a, ParserInput<'a>, u32, ParserExtra<'a>> + Clone {
+pub fn energy<'a>() -> impl Parser<'a, ParserInput<'a>, u32, ParserExtra<'a>> + Clone {
     select! {
-        (ResolvedToken::Integer(n), _) => n
+        (ResolvedToken::Integer { directive, value }, _) if directive == "e" => value
+    }
+}
+
+pub fn cards<'a>() -> impl Parser<'a, ParserInput<'a>, u32, ParserExtra<'a>> + Clone {
+    select! {
+        (ResolvedToken::Integer { directive, value }, _) if directive == "cards" => value
+    }
+}
+
+pub fn discards<'a>() -> impl Parser<'a, ParserInput<'a>, u32, ParserExtra<'a>> + Clone {
+    select! {
+        (ResolvedToken::Integer { directive, value }, _) if directive == "discards" => value
+    }
+}
+
+pub fn points<'a>() -> impl Parser<'a, ParserInput<'a>, u32, ParserExtra<'a>> + Clone {
+    select! {
+        (ResolvedToken::Integer { directive, value }, _) if directive == "points" => value
     }
 }

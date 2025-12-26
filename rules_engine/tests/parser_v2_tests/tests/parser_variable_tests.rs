@@ -100,7 +100,7 @@ fn test_resolve_simple_integer() {
 
     let resolved = resolve_variables(&tokens, &bindings).unwrap();
     assert_eq!(resolved.len(), 1);
-    assert_eq!(resolved[0].0, ResolvedToken::Integer(2));
+    assert_eq!(resolved[0].0, ResolvedToken::Integer { directive: "cards".to_string(), value: 2 });
 }
 
 #[test]
@@ -110,7 +110,10 @@ fn test_resolve_simple_subtype() {
 
     let resolved = resolve_variables(&tokens, &bindings).unwrap();
     assert_eq!(resolved.len(), 1);
-    assert_eq!(resolved[0].0, ResolvedToken::Subtype(CardSubtype::Warrior));
+    assert_eq!(resolved[0].0, ResolvedToken::Subtype {
+        directive: "subtype".to_string(),
+        subtype: CardSubtype::Warrior
+    });
 }
 
 #[test]
@@ -201,7 +204,7 @@ fn test_resolve_mixed_tokens() {
     let resolved = resolve_variables(&tokens, &bindings).unwrap();
     assert_eq!(resolved.len(), 3);
     assert_eq!(resolved[0].0, ResolvedToken::Token(Token::Word("draw".to_string())));
-    assert_eq!(resolved[1].0, ResolvedToken::Integer(2));
+    assert_eq!(resolved[1].0, ResolvedToken::Integer { directive: "cards".to_string(), value: 2 });
     assert_eq!(resolved[2].0, ResolvedToken::Token(Token::Period));
 }
 
@@ -217,7 +220,10 @@ fn test_representative_card_1() {
 
     let resolved = resolve_variables(&tokens, &bindings).unwrap();
     assert_eq!(resolved.len(), 4);
-    assert_eq!(resolved[3].0, ResolvedToken::Integer(2));
+    assert_eq!(resolved[3].0, ResolvedToken::Integer {
+        directive: "cards-numeral".to_string(),
+        value: 2
+    });
 }
 
 #[test]
@@ -235,9 +241,12 @@ fn test_representative_card_4() {
 
     let resolved = resolve_variables(&tokens, &bindings).unwrap();
     assert_eq!(resolved.len(), 7);
-    assert_eq!(resolved[0].0, ResolvedToken::Integer(1));
-    assert_eq!(resolved[3].0, ResolvedToken::Integer(1));
-    assert_eq!(resolved[6].0, ResolvedToken::Integer(1));
+    assert_eq!(resolved[0].0, ResolvedToken::Integer {
+        directive: "discards".to_string(),
+        value: 1
+    });
+    assert_eq!(resolved[3].0, ResolvedToken::Integer { directive: "cards".to_string(), value: 1 });
+    assert_eq!(resolved[6].0, ResolvedToken::Integer { directive: "points".to_string(), value: 1 });
 }
 
 #[test]
@@ -252,7 +261,7 @@ fn test_representative_card_7() {
 
     let resolved = resolve_variables(&tokens, &bindings).unwrap();
     assert_eq!(resolved.len(), 4);
-    assert_eq!(resolved[3].0, ResolvedToken::Integer(2));
+    assert_eq!(resolved[3].0, ResolvedToken::Integer { directive: "e".to_string(), value: 2 });
 }
 
 #[test]
@@ -307,11 +316,17 @@ fn test_variable_directive_recognition() {
 
     let resolved = resolve_variables(&tokens, &bindings).unwrap();
     assert_eq!(resolved.len(), 7);
-    assert_eq!(resolved[0].0, ResolvedToken::Integer(1));
-    assert_eq!(resolved[1].0, ResolvedToken::Integer(2));
-    assert_eq!(resolved[2].0, ResolvedToken::Integer(3));
-    assert_eq!(resolved[3].0, ResolvedToken::Integer(4));
-    assert_eq!(resolved[4].0, ResolvedToken::Integer(5));
-    assert_eq!(resolved[5].0, ResolvedToken::Integer(6));
-    assert_eq!(resolved[6].0, ResolvedToken::Subtype(CardSubtype::Warrior));
+    assert_eq!(resolved[0].0, ResolvedToken::Integer { directive: "e".to_string(), value: 1 });
+    assert_eq!(resolved[1].0, ResolvedToken::Integer { directive: "cards".to_string(), value: 2 });
+    assert_eq!(resolved[2].0, ResolvedToken::Integer {
+        directive: "discards".to_string(),
+        value: 3
+    });
+    assert_eq!(resolved[3].0, ResolvedToken::Integer { directive: "points".to_string(), value: 4 });
+    assert_eq!(resolved[4].0, ResolvedToken::Integer { directive: "s".to_string(), value: 5 });
+    assert_eq!(resolved[5].0, ResolvedToken::Integer { directive: "k".to_string(), value: 6 });
+    assert_eq!(resolved[6].0, ResolvedToken::Subtype {
+        directive: "subtype".to_string(),
+        subtype: CardSubtype::Warrior
+    });
 }

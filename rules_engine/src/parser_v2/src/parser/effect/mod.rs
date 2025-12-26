@@ -1,5 +1,5 @@
-pub mod card_effects;
-pub mod control_effects;
-pub mod game_effects;
-pub mod resource_effects;
-pub mod spark_effects;
+pub mod card_effect_parsers;
+pub mod control_effects_parsers;
+pub mod game_effects_parsers;
+pub mod resource_effect_parsers;
+pub mod spark_effect_parsers;
