@@ -21,6 +21,18 @@ pub fn resolve_variables(
         .collect()
 }
 
+pub fn directive_names() -> impl Iterator<Item = &'static str> {
+    DIRECTIVES.iter().map(|(name, _, _)| *name)
+}
+
+pub fn variable_names() -> impl Iterator<Item = &'static str> {
+    DIRECTIVES
+        .iter()
+        .map(|(_, var_name, _)| *var_name)
+        .filter(|name| !name.is_empty())
+        .chain(["figment", "number", "subtype", "allies"])
+}
+
 type VariableConstructor =
     fn(&str, &str, &VariableBindings, SimpleSpan) -> Result<ResolvedToken, UnresolvedVariable>;
 
@@ -55,7 +67,7 @@ static DIRECTIVES: &[(&str, &str, VariableConstructor)] = &[
     ("subtype", "subtype", subtype),
     ("text-number", "number", integer),
     ("this-turn-times", "number", integer),
-    ("top-n-cards", "number", integer),
+    ("top-n-cards", "to-void", integer),
     ("up-to-n-allies", "number", integer),
     ("up-to-n-events", "number", integer),
 ];

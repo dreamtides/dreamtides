@@ -14,4 +14,3 @@ tarpaulin-report.html
 *.profraw
 rules_text.json
 .serena
-tabula

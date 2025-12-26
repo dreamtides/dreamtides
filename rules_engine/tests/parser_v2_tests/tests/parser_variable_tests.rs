@@ -1,10 +1,13 @@
+use std::collections::HashSet;
+
 use ability_data::figment_type::FigmentType;
 use ability_data::variable_value::VariableValue;
 use chumsky::span::{SimpleSpan, Span};
 use core_data::card_types::CardSubtype;
 use parser_v2::lexer::token::Token;
 use parser_v2::variables::binding::VariableBindings;
-use parser_v2::variables::substitution::{resolve_variables, ResolvedToken};
+use parser_v2::variables::substitution::{resolve_variables, variable_names, ResolvedToken};
+use regex::Regex;
 
 #[test]
 fn test_parse_integer_variable() {
@@ -331,4 +334,46 @@ fn test_variable_directive_recognition() {
         directive: "subtype".to_string(),
         subtype: CardSubtype::Warrior
     });
+}
+
+#[test]
+fn test_variables_in_cards_toml_match_directives() {
+    let cards_toml =
+        std::fs::read_to_string("../../tabula/cards.toml").expect("Failed to read cards.toml");
+
+    let variable_regex = Regex::new(r"([a-zA-Z][a-zA-Z0-9-]*)\s*:\s*").unwrap();
+    let mut toml_variables: HashSet<String> = HashSet::new();
+    let mut in_variables_block = false;
+
+    for line in cards_toml.lines() {
+        if line.starts_with("variables") {
+            in_variables_block = true;
+        } else if in_variables_block && line.contains("\"\"\"") {
+            in_variables_block = false;
+        } else if line.contains('=') && !line.starts_with("variables") {
+            in_variables_block = false;
+        }
+
+        if in_variables_block || line.starts_with("variables") {
+            for cap in variable_regex.captures_iter(line) {
+                let var_name = cap.get(1).unwrap().as_str();
+                if var_name != "variables" {
+                    toml_variables.insert(var_name.to_string());
+                }
+            }
+        }
+    }
+
+    let registered_variables: HashSet<String> = variable_names().map(String::from).collect();
+
+    let missing_from_code: Vec<_> = toml_variables.difference(&registered_variables).collect();
+
+    if !missing_from_code.is_empty() {
+        let mut sorted: Vec<_> = missing_from_code.iter().map(|s| s.as_str()).collect();
+        sorted.sort();
+        panic!(
+            "Variable names in cards.toml not handled by DIRECTIVES:\n  {}",
+            sorted.join("\n  ")
+        );
+    }
 }

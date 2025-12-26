@@ -14,3 +14,5 @@ core_data = { path = "../../src/core_data" }
 
 chumsky = { workspace = true }
 insta = { workspace = true }
+regex = { workspace = true }
+toml = { workspace = true }
