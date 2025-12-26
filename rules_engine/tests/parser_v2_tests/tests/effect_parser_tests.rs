@@ -4,12 +4,12 @@ use insta::assert_ron_snapshot;
 use parser_v2::lexer::tokenize;
 use parser_v2::parser::effect_parser;
 use parser_v2::variables::binding::VariableBindings;
-use parser_v2::variables::substitution::resolve_variables;
+use parser_v2::variables::substitution;
 
 fn parse_effect(input: &str, vars: &str) -> StandardEffect {
     let lex_result = tokenize::lex(input).unwrap();
     let bindings = VariableBindings::parse(vars).unwrap();
-    let resolved = resolve_variables(&lex_result.tokens, &bindings).unwrap();
+    let resolved = substitution::resolve_variables(&lex_result.tokens, &bindings).unwrap();
 
     let parser = effect_parser::single_effect_parser();
     parser.parse(&resolved).into_result().unwrap()
@@ -18,7 +18,7 @@ fn parse_effect(input: &str, vars: &str) -> StandardEffect {
 fn try_parse_effect(input: &str, vars: &str) -> Option<StandardEffect> {
     let lex_result = tokenize::lex(input).ok()?;
     let bindings = VariableBindings::parse(vars).ok()?;
-    let resolved = resolve_variables(&lex_result.tokens, &bindings).ok()?;
+    let resolved = substitution::resolve_variables(&lex_result.tokens, &bindings).ok()?;
 
     let parser = effect_parser::single_effect_parser();
     parser.parse(&resolved).into_result().ok()

@@ -62,57 +62,56 @@ This document specifies Parser V2 for the Dreamtides card game rules engine. V2 
 
 ### 1.2 Crate Structure
 
-Parser V2 consolidates into a single crate with clear module separation:
+Parser V2 consolidates into a single crate with clear module separation. **Important:** Do not put code into `mod.rs` files. Each module should have a descriptively-named file. All filenames must be globally unique (prefixed with their module context).
 
 ```
 rules_engine/src/parser_v2/
 ├── Cargo.toml
 ├── src/
-│   ├── lib.rs                    # Public API
-│   ├── cli.rs                    # CLI implementation (bin target)
+│   ├── lib.rs                    # Public API + module declarations
+│   ├── parser_cli.rs             # CLI implementation (bin target)
 │   │
 │   ├── lexer/
-│   │   ├── mod.rs                # Lexer entry point
-│   │   ├── token_lexer.rs              # Token enum definition
+│   │   ├── lexer_core.rs         # Lexer entry point and main logic
+│   │   └── lexer_tokens.rs       # Token enum definition
 │   │
 │   ├── variables/
-│   │   ├── mod.rs                # Variable resolution
-│   │   ├── binding.rs            # Variable binding types
-│   │   └── substitution.rs       # Token substitution logic
+│   │   ├── variable_binding.rs   # Variable binding types
+│   │   └── variable_substitution.rs # Token substitution logic
 │   │
 │   ├── parser/
-│   │   ├── mod.rs                # Parser orchestration
-│   │   ├── ability_parsers.rs            # Top-level ability parsing
-│   │   ├── triggered_parsers.rs          # Triggered ability parsing
-│   │   ├── activated_parsers.rs          # Activated ability parsing
-│   │   ├── static_ability_parsers.rs     # Static ability parsing
-│   │   ├── named.rs              # Named ability parsing
+│   │   ├── parser_core.rs        # Parser orchestration
+│   │   ├── ability_parsers.rs    # Top-level ability parsing
+│   │   ├── triggered_parsers.rs  # Triggered ability parsing
+│   │   ├── activated_parsers.rs  # Activated ability parsing
+│   │   ├── static_ability_parsers.rs # Static ability parsing
+│   │   ├── named_ability_parsers.rs  # Named ability parsing
 │   │   ├── effect/
-│   │   │   ├── mod.rs            # Effect orchestration
+│   │   │   ├── effect_core.rs    # Effect orchestration
 │   │   │   ├── card_effect_parsers.rs   # Draw, discard, materialize, etc.
 │   │   │   ├── spark_effect_parsers.rs  # Kindle, spark gains
 │   │   │   ├── resource_effect_parsers.rs # Energy, points
 │   │   │   ├── control_effect_parsers.rs  # Gain control, disable
 │   │   │   └── game_effect_parsers.rs   # Foresee, prevent, discover
-│   │   ├── trigger_parsers.rs            # Trigger event parsing
-│   │   ├── cost_parsers.rs               # Cost parsing
-│   │   ├── predicate_parsers.rs          # Card predicate parsing
-│   │   ├── condition_parsers.rs          # Condition parsing
-│   │   └── parser_helpers.rs            # Shared parser combinators
+│   │   ├── trigger_parsers.rs    # Trigger event parsing
+│   │   ├── cost_parsers.rs       # Cost parsing
+│   │   ├── predicate_parsers.rs  # Card predicate parsing
+│   │   ├── condition_parsers.rs  # Condition parsing
+│   │   └── parser_helpers.rs     # Shared parser combinators
 │   │
 │   ├── builder/
-│   │   ├── mod.rs                # Ability construction
-│   │   ├── spanned_builder.rs            # SpannedAbility types
-│   │   └── parser_display.rs            # Display text extraction
+│   │   ├── builder_core.rs       # Ability construction
+│   │   ├── spanned_builder.rs    # SpannedAbility types
+│   │   └── parser_display.rs     # Display text extraction
 │   │
 │   ├── serializer/
-│   │   ├── mod.rs                # Round-trip serialization
-│   │   └── parser_formatter.rs          # Ability → String conversion
+│   │   ├── serializer_core.rs    # Round-trip serialization
+│   │   └── parser_formatter.rs   # Ability → String conversion
 │   │
 │   └── error/
-│       ├── mod.rs                # Error types
-│       ├── parser_diagnostics.rs         # Ariadne integration
-│       └── parser_recovery.rs           # Error recovery strategies
+│       ├── error_types.rs        # Error types
+│       ├── parser_diagnostics.rs # Ariadne integration
+│       └── parser_recovery.rs    # Error recovery strategies
 
 rules_engine/tests/parser_v2_tests/
 ├── Cargo.toml
@@ -121,11 +120,11 @@ rules_engine/tests/parser_v2_tests/
 └── tests/
     ├── lexer_tests.rs
     ├── variable_tests.rs
-    ├── effect_tests.rs
-    ├── trigger_tests.rs
-    ├── cost_tests.rs
-    ├── predicate_tests.rs
-    ├── static_tests.rs
+    ├── effect_parser_tests.rs
+    ├── trigger_parser_tests.rs
+    ├── cost_parser_tests.rs
+    ├── predicate_parser_tests.rs
+    ├── static_ability_tests.rs
     ├── integration_tests.rs
     ├── round_trip_tests.rs
     └── error_tests.rs
@@ -453,7 +452,7 @@ ability_parser()
 Effects are split across multiple files for maintainability:
 
 ```rust
-// parser/effect/mod.rs
+// parser/effect/effect_core.rs
 fn effect_parser<'a>() -> impl Parser<'a, ParserInput<'a>, Effect, ParserExtra<'a>> {
     recursive(|effect| {
         choice((
@@ -467,11 +466,11 @@ fn effect_parser<'a>() -> impl Parser<'a, ParserInput<'a>, Effect, ParserExtra<'
 
 fn single_effect_parser<'a>() -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> {
     choice((
-        card_effects::parser(),      // draw, discard, materialize, dissolve
-        spark_effects::parser(),     // gain spark, kindle, spark becomes
-        resource_effects::parser(),  // gain energy, gain points
-        control_effects::parser(),   // gain control, disable abilities
-        game_effects::parser(),      // foresee, prevent, banish, discover
+        card_effect_parsers::parser(),      // draw, discard, materialize, dissolve
+        spark_effect_parsers::parser(),     // gain spark, kindle, spark becomes
+        resource_effect_parsers::parser(),  // gain energy, gain points
+        control_effect_parsers::parser(),   // gain control, disable abilities
+        game_effect_parsers::parser(),      // foresee, prevent, banish, discover
     ))
     .boxed()
 }
@@ -819,7 +818,7 @@ insta = { workspace = true }
 
 [[bin]]
 name = "parser"
-path = "src/cli.rs"
+path = "src/parser_cli.rs"
 ```
 
 ---
@@ -847,7 +846,8 @@ After every code change:
 - **Zero qualifiers for structs and enums:** `Ability` not `ability::Ability`
 - **Public items at top of file**, private below
 - **No `pub use` re-exports**
-- **Keep `mod.rs` minimal** - only module declarations
+- **No code in `mod.rs` files** - use descriptively-named files like `lexer_core.rs` instead
+- **Globally unique filenames** - prefix with module context (e.g., `variable_binding.rs` not `binding.rs`)
 - **Alphabetized Cargo.toml deps** - internal first, then external
 - **Use modern Rust features:** if-let, `"{inline:?}"` formatting
 
@@ -913,11 +913,25 @@ These cards must parse and round-trip correctly. They are the primary validation
 
 ## 13. Milestones
 
+**IMPORTANT: End-to-End First Strategy**
+
+The milestone order is designed to prove out a working end-to-end solution as early as possible. After implementing the lexer, variables, and basic parser infrastructure (Milestones 1-3), we immediately implement the CLI, display, error handling, and benchmarking infrastructure (Milestones 4-7). This ensures:
+
+1. We can validate the full pipeline works before investing in more parsers
+2. Error reporting and diagnostics are available early for debugging
+3. We can measure performance impact as we add features
+4. Round-trip testing is exercised from the start
+
+Only after proving the end-to-end solution works do we proceed to implement additional parser features (Milestones 8+).
+
+---
+
 ### Milestone 1: Lexer and Token System
 **Scope:** Implement manual lexer, token types, span tracking
 
 **Deliverables:**
-- `lexer/mod.rs`, `lexer/token.rs`, `lexer/span.rs`
+- `lexer/lexer_core.rs` - Main lexer logic
+- `lexer/lexer_tokens.rs` - Token types and Span
 - `tests/parser_v2_tests/tests/lexer_tests.rs`
 
 **Test Cards:** Verify lexer correctly tokenizes all 9 representative test cards.
@@ -930,7 +944,8 @@ These cards must parse and round-trip correctly. They are the primary validation
 **Scope:** Variable parsing, binding, resolution
 
 **Deliverables:**
-- `variables/mod.rs`, `variables/binding.rs`, `variables/substitution.rs`
+- `variables/variable_binding.rs` - Variable binding types
+- `variables/variable_substitution.rs` - Token substitution logic
 - `tests/parser_v2_tests/tests/variable_tests.rs`
 
 **Test Cards:** Verify variables resolve correctly for all 9 representative test cards, including compound directive resolution for card 9.
@@ -944,21 +959,81 @@ These cards must parse and round-trip correctly. They are the primary validation
 
 **Deliverables:**
 - `parser/parser_helpers.rs` - Common parser combinators (word, directive, integer, etc.)
-- `parser/effect_parsers.rs` - Effect parser orchestration (single_effect_parser)
+- `parser/parser_core.rs` - Parser orchestration
 - `parser/effect/card_effect_parsers.rs` - Draw, discard, gain energy parsers
-- `error/mod.rs` - Error types (ParserError, LexError)
-- `error/parser_diagnostic.rs` - Ariadne integration
+- `parser/effect/effect_core.rs` - Effect parser orchestration (single_effect_parser)
+- `error/error_types.rs` - Error types (ParserError, LexError)
+- `error/parser_diagnostics.rs` - Ariadne integration
 - Serializer stubs for implemented effects
 
 **Test Cards:** Cards 2 and 5 (partial - draw/discard portions)
 
 **Round-trip:** Verify `Draw {cards}.` parses and serializes back identically.
 
-**Note:** `parser/mod.rs` and `parser/effect/mod.rs` contain only module declarations, per code style rules.
+---
+
+### Milestone 4: CLI and File Processing
+**Scope:** Command line interface, TOML processing
+
+**Rationale:** We implement the CLI early to prove out the end-to-end pipeline before investing in more parser features. This ensures the architecture works and provides tooling for testing subsequent milestones.
+
+**Deliverables:**
+- `parser_cli.rs` - CLI implementation with Parse, ParseFile, Verify commands
+- Integration with lexer, variable resolution, and basic parser
+
+**Test Cards:** CLI can parse `Draw {cards}.` with variables.
+
+**Round-trip:** `parser verify` command works for simple effects implemented so far.
 
 ---
 
-### Milestone 4: Trigger Parser
+### Milestone 5: SpannedAbility and Display
+**Scope:** Text segmentation for UI
+
+**Rationale:** Display infrastructure is needed early to verify span tracking works correctly before adding more complex parsers.
+
+**Deliverables:**
+- `builder/builder_core.rs` - Ability construction
+- `builder/spanned_builder.rs` - SpannedAbility types
+- `builder/parser_display.rs` - Display text extraction
+
+**Test Cards:** Simple effects from Milestone 3 produce correct spans.
+
+**Round-trip:** N/A (spans are metadata)
+
+---
+
+### Milestone 6: Error Recovery and Polish
+**Scope:** Error recovery strategies, edge cases
+
+**Rationale:** Good error messages are essential for debugging as we add more parsers. Implementing this early means all subsequent work benefits from clear diagnostics.
+
+**Deliverables:**
+- `error/parser_recovery.rs` - Error recovery strategies
+- Enhanced error messages with Ariadne
+
+**Test Cards:** Test malformed versions of simple effects produce helpful errors.
+
+**Round-trip:** N/A
+
+---
+
+### Milestone 7: Benchmarking and Optimization
+**Scope:** Performance validation infrastructure
+
+**Rationale:** Establishing benchmarks early lets us track performance impact as we add features. If the basic pipeline is slow, we want to know before building on top of it.
+
+**Deliverables:**
+- `benchmarks/parser_v2/benches/parser_bench.rs`
+- `benchmarks/parser_v2/benches/full_pipeline_bench.rs`
+
+**Test Cards:** Benchmark simple effects implemented so far.
+
+**Round-trip:** Verify round-trip performance is acceptable.
+
+---
+
+### Milestone 8: Trigger Parser
 **Scope:** All trigger events, keyword triggers
 
 **Deliverables:**
@@ -971,7 +1046,7 @@ These cards must parse and round-trip correctly. They are the primary validation
 
 ---
 
-### Milestone 5: Predicate Parser
+### Milestone 9: Predicate Parser
 **Scope:** Card predicates, determiners, targets
 
 **Deliverables:**
@@ -984,7 +1059,7 @@ These cards must parse and round-trip correctly. They are the primary validation
 
 ---
 
-### Milestone 6: Cost Parser
+### Milestone 10: Cost Parser
 **Scope:** All cost types
 
 **Deliverables:**
@@ -997,11 +1072,14 @@ These cards must parse and round-trip correctly. They are the primary validation
 
 ---
 
-### Milestone 7: Complete Effect Parsers
+### Milestone 11: Complete Effect Parsers
 **Scope:** All remaining StandardEffect variants
 
 **Deliverables:**
-- `parser/effect/spark_effect_parsers.rs`, `parser/effect/resource_effect_parsers.rs`, `parser/effect/control_effect_parsers.rs`, `parser/effect/game_effect_parsers.rs`
+- `parser/effect/spark_effect_parsers.rs`
+- `parser/effect/resource_effect_parsers.rs`
+- `parser/effect/control_effect_parsers.rs`
+- `parser/effect/game_effect_parsers.rs`
 - Complete serializer for all effects
 
 **Test Cards:** All 9 representative test cards should now have all effects parsing, including compound directive card 9.
@@ -1010,7 +1088,7 @@ These cards must parse and round-trip correctly. They are the primary validation
 
 ---
 
-### Milestone 8: Triggered Ability Parser (Complete)
+### Milestone 12: Triggered Ability Parser (Complete)
 **Scope:** Full triggered abilities including "Once per turn"
 
 **Deliverables:**
@@ -1023,7 +1101,7 @@ These cards must parse and round-trip correctly. They are the primary validation
 
 ---
 
-### Milestone 9: Static Ability Parser
+### Milestone 13: Static Ability Parser
 **Scope:** Static abilities
 
 **Deliverables:**
@@ -1036,7 +1114,7 @@ These cards must parse and round-trip correctly. They are the primary validation
 
 ---
 
-### Milestone 10: Effect Options and Conditions
+### Milestone 14: Effect Options and Conditions
 **Scope:** Optional effects, conditional effects, trigger costs
 
 **Deliverables:**
@@ -1049,11 +1127,11 @@ These cards must parse and round-trip correctly. They are the primary validation
 
 ---
 
-### Milestone 11: Named Abilities
+### Milestone 15: Named Abilities
 **Scope:** {ReclaimForCost}, {Fast}
 
 **Deliverables:**
-- `parser/named_parsers.rs`
+- `parser/named_ability_parsers.rs`
 
 **Test Cards:** Card 5 ({ReclaimForCost})
 
@@ -1061,7 +1139,7 @@ These cards must parse and round-trip correctly. They are the primary validation
 
 ---
 
-### Milestone 12: Activated Ability Parser
+### Milestone 16: Activated Ability Parser
 **Scope:** Activated abilities
 
 **Deliverables:**
@@ -1073,55 +1151,16 @@ These cards must parse and round-trip correctly. They are the primary validation
 
 ---
 
-### Milestone 13: Modal Effects
+### Milestone 17: Modal Effects
 **Scope:** {ChooseOne}, {bullet}
 
 **Deliverables:**
-- Modal parser in effect/mod.rs
+- Modal parser in `parser/effect/effect_core.rs`
 
 **Test Cards:** Add modal test card from rules_text.json:
 `{ChooseOne}\n{bullet} {e}: Return an enemy to hand.\n{bullet} {e-}: Draw {cards}.`
 
 **Round-trip:** Modal effect round-trips.
-
----
-
-### Milestone 14: SpannedAbility and Display
-**Scope:** Text segmentation for UI
-
-**Test Cards:** All 9 representative cards produce correct spans.
-
-**Round-trip:** N/A (spans are metadata)
-
----
-
-### Milestone 15: CLI and File Processing
-**Scope:** Command line interface, TOML processing
-
-**Test Cards:** CLI can parse all 9 representative cards.
-
-**Round-trip:** `parser verify cards.toml` passes for representative cards.
-
----
-
-### Milestone 16: Error Recovery and Polish
-**Scope:** Error recovery strategies, edge cases
-
-**Test Cards:** Test malformed versions of all 9 representative cards produce helpful errors.
-
-**Round-trip:** N/A
-
----
-
-### Milestone 17: Benchmarking and Optimization
-**Scope:** Performance validation
-
-**Deliverables:**
-- `benchmarks/parser_v2/benches/*.rs`
-
-**Test Cards:** Benchmark all cards from rules_text.json.
-
-**Round-trip:** Verify round-trip doesn't regress performance significantly.
 
 ---
 
