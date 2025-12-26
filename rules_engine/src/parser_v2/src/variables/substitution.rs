@@ -1,6 +1,6 @@
-use ability_data::figment_type::FigmentType;
 use chumsky::span::SimpleSpan;
 use core_data::card_types::CardSubtype;
+use core_data::figment_type::FigmentType;
 use serde::Serialize;
 
 use crate::lexer::token::{Spanned, Token};

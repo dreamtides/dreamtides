@@ -1,9 +1,8 @@
 use std::collections::HashMap;
-use std::str::FromStr;
 
-use ability_data::figment_type::FigmentType;
 use ability_data::variable_value::VariableValue;
 use core_data::card_types::CardSubtype;
+use core_data::figment_type::FigmentType;
 
 #[derive(Debug, Clone, thiserror::Error)]
 pub enum ParseError {
@@ -39,9 +38,9 @@ impl VariableBindings {
 
             if let Ok(n) = value.parse::<u32>() {
                 bindings.insert(key.to_string(), VariableValue::Integer(n));
-            } else if let Ok(subtype) = CardSubtype::from_str(value) {
+            } else if let Some(subtype) = CardSubtype::from_variable(value) {
                 bindings.insert(key.to_string(), VariableValue::Subtype(subtype));
-            } else if let Ok(figment) = FigmentType::from_str(value) {
+            } else if let Some(figment) = FigmentType::from_variable(value) {
                 bindings.insert(key.to_string(), VariableValue::Figment(figment));
             } else {
                 return Err(ParseError::InvalidValue(value.to_string()));

@@ -2,6 +2,7 @@ pub mod card_property_data;
 pub mod card_types;
 pub mod display_color;
 pub mod display_types;
+pub mod figment_type;
 pub mod identifiers;
 pub mod initialization_error;
 pub mod numerics;

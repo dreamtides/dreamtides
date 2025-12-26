@@ -4,7 +4,6 @@ pub mod collection_expression;
 pub mod condition;
 pub mod cost;
 pub mod effect;
-pub mod figment_type;
 pub mod named_ability;
 pub mod predicate;
 pub mod quantity_expression_data;

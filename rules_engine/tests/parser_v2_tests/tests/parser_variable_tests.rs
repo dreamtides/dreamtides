@@ -1,9 +1,9 @@
 use std::collections::HashSet;
 
-use ability_data::figment_type::FigmentType;
 use ability_data::variable_value::VariableValue;
 use chumsky::span::{SimpleSpan, Span};
 use core_data::card_types::CardSubtype;
+use core_data::figment_type::FigmentType;
 use parser_v2::lexer::token::Token;
 use parser_v2::variables::binding::VariableBindings;
 use parser_v2::variables::substitution::{resolve_variables, variable_names, ResolvedToken};
@@ -25,7 +25,7 @@ fn test_parse_multiple_integer_variables() {
 
 #[test]
 fn test_parse_subtype_variable() {
-    let bindings = VariableBindings::parse("subtype: Warrior").unwrap();
+    let bindings = VariableBindings::parse("subtype: warrior").unwrap();
     assert_eq!(bindings.get("subtype"), Some(&VariableValue::Subtype(CardSubtype::Warrior)));
 }
 
@@ -37,7 +37,7 @@ fn test_parse_figment_variable() {
 
 #[test]
 fn test_parse_mixed_variables() {
-    let bindings = VariableBindings::parse("cards: 2, subtype: Explorer, figment: shadow").unwrap();
+    let bindings = VariableBindings::parse("cards: 2, subtype: explorer, figment: shadow").unwrap();
     assert_eq!(bindings.get("cards"), Some(&VariableValue::Integer(2)));
     assert_eq!(bindings.get("subtype"), Some(&VariableValue::Subtype(CardSubtype::Explorer)));
     assert_eq!(bindings.get("figment"), Some(&VariableValue::Figment(FigmentType::Shadow)));
@@ -84,7 +84,7 @@ fn test_get_integer_helper() {
 
 #[test]
 fn test_get_subtype_helper() {
-    let bindings = VariableBindings::parse("subtype: Warrior").unwrap();
+    let bindings = VariableBindings::parse("subtype: warrior").unwrap();
     assert_eq!(bindings.get_subtype("subtype"), Some(CardSubtype::Warrior));
     assert_eq!(bindings.get_subtype("missing"), None);
 }
@@ -109,7 +109,7 @@ fn test_resolve_simple_integer() {
 #[test]
 fn test_resolve_simple_subtype() {
     let tokens = vec![(Token::Directive("subtype".to_string()), SimpleSpan::new((), 0..9))];
-    let bindings = VariableBindings::parse("subtype: Warrior").unwrap();
+    let bindings = VariableBindings::parse("subtype: warrior").unwrap();
 
     let resolved = resolve_variables(&tokens, &bindings).unwrap();
     assert_eq!(resolved.len(), 1);
@@ -292,7 +292,7 @@ fn test_representative_card_9() {
 
 #[test]
 fn test_round_trip_bindings() {
-    let original = "cards: 2, e: 3, subtype: Warrior, figment: radiant";
+    let original = "cards: 2, e: 3, subtype: warrior, figment: radiant";
     let bindings1 = VariableBindings::parse(original).unwrap();
 
     let bindings2 = VariableBindings::parse(original).unwrap();
@@ -317,7 +317,7 @@ fn test_variable_directive_recognition() {
         (Token::Directive("subtype".to_string()), SimpleSpan::new((), 40..49)),
     ];
     let bindings =
-        VariableBindings::parse("e: 1, cards: 2, discards: 3, points: 4, s: 5, subtype: Warrior")
+        VariableBindings::parse("e: 1, cards: 2, discards: 3, points: 4, s: 5, subtype: warrior")
             .unwrap();
 
     let resolved = resolve_variables(&tokens, &bindings).unwrap();

@@ -1,7 +1,6 @@
 use core_data::card_types::CardSubtype;
+use core_data::figment_type::FigmentType;
 use serde::{Deserialize, Serialize};
-
-use crate::figment_type::FigmentType;
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub enum VariableValue {

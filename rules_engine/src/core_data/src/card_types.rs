@@ -48,3 +48,31 @@ pub enum CardSubtype {
     #[serde(other)]
     Enigma,
 }
+
+impl CardSubtype {
+    pub fn from_variable(variable: &str) -> Option<CardSubtype> {
+        match variable {
+            "ancient" => Some(CardSubtype::Ancient),
+            "child" => Some(CardSubtype::Child),
+            "detective" => Some(CardSubtype::Detective),
+            "explorer" => Some(CardSubtype::Explorer),
+            "hacker" => Some(CardSubtype::Hacker),
+            "mage" => Some(CardSubtype::Mage),
+            "monster" => Some(CardSubtype::Monster),
+            "musician" => Some(CardSubtype::Musician),
+            "outsider" => Some(CardSubtype::Outsider),
+            "renegade" => Some(CardSubtype::Renegade),
+            "spirit-animal" => Some(CardSubtype::SpiritAnimal),
+            "super" => Some(CardSubtype::Super),
+            "survivor" => Some(CardSubtype::Survivor),
+            "synth" => Some(CardSubtype::Synth),
+            "tinkerer" => Some(CardSubtype::Tinkerer),
+            "trooper" => Some(CardSubtype::Trooper),
+            "visionary" => Some(CardSubtype::Visionary),
+            "visitor" => Some(CardSubtype::Visitor),
+            "warrior" => Some(CardSubtype::Warrior),
+            "enigma" => Some(CardSubtype::Enigma),
+            _ => None,
+        }
+    }
+}
