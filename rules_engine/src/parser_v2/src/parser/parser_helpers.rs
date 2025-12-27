@@ -58,6 +58,19 @@ pub fn points<'a>() -> impl Parser<'a, ParserInput<'a>, u32, ParserExtra<'a>> + 
     }
 }
 
+pub fn spark<'a>() -> impl Parser<'a, ParserInput<'a>, u32, ParserExtra<'a>> + Clone {
+    select! {
+        (ResolvedToken::Integer { directive, value }, _) if directive == "s" => value
+    }
+}
+
+pub fn subtype<'a>(
+) -> impl Parser<'a, ParserInput<'a>, core_data::card_types::CardSubtype, ParserExtra<'a>> + Clone {
+    select! {
+        (ResolvedToken::Subtype { subtype, .. }, _) => subtype
+    }
+}
+
 pub fn words<'a>(
     sequence: &'static [&'static str],
 ) -> impl Parser<'a, ParserInput<'a>, (), ParserExtra<'a>> + Clone {
