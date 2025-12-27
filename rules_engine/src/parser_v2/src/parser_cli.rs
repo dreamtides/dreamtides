@@ -1,11 +1,13 @@
 use std::fs;
 use std::path::PathBuf;
 
+use chumsky::Parser as ChumskyParser;
 use clap::{Parser, Subcommand, ValueEnum};
 use parser_v2::error::parser_diagnostics;
 use parser_v2::error::parser_errors::ParserError;
 use parser_v2::lexer::token::Token;
 use parser_v2::lexer::tokenize;
+use parser_v2::parser::ability;
 use parser_v2::variables::binding::VariableBindings;
 use parser_v2::variables::substitution::{self, ResolvedToken};
 use serde::{Deserialize, Serialize};
@@ -156,7 +158,23 @@ fn parse_command(
             output_format(&resolved_tokens, format);
         }
         Stage::Full => {
-            return Err("Full parsing not yet implemented".into());
+            let lex_result = tokenize::lex(text).map_err(|e| {
+                let error = ParserError::from(e);
+                parser_diagnostics::format_error(&error, text, "<input>")
+            })?;
+            let resolved =
+                substitution::resolve_variables(&lex_result.tokens, &bindings).map_err(|e| {
+                    let error = ParserError::from(e);
+                    parser_diagnostics::format_error(&error, text, "<input>")
+                })?;
+
+            let parser = ability::ability_parser();
+            let parsed = parser
+                .parse(&resolved)
+                .into_result()
+                .map_err(|errors| format_parse_errors(errors, text))?;
+
+            output_format(&parsed, format);
         }
     }
 
@@ -282,6 +300,48 @@ fn output_format<T: serde::Serialize + std::fmt::Debug>(value: &T, format: Outpu
             println!("{value:#?}");
         }
     }
+}
+
+fn format_parse_errors<'a>(
+    errors: Vec<chumsky::error::Rich<'a, (ResolvedToken, chumsky::span::SimpleSpan)>>,
+    text: &str,
+) -> String {
+    use ariadne::{Color, Label, Report, ReportKind, Source};
+    use chumsky::span::Span;
+
+    let error_strs: Vec<String> = errors
+        .into_iter()
+        .map(|e| {
+            let span = *e.span();
+            let mut output = Vec::new();
+
+            let message = format!("Parse error: {:?}", e.reason());
+            let mut report = Report::<(&str, std::ops::Range<usize>)>::build(
+                ReportKind::Error,
+                "<input>",
+                span.start(),
+            )
+            .with_message(&message);
+
+            let label = Label::new(("<input>", span.start()..span.end()))
+                .with_message("Failed to parse ability text here")
+                .with_color(Color::Red);
+
+            report = report.with_label(label);
+
+            if !e.expected().collect::<Vec<_>>().is_empty() {
+                let expected_tokens: Vec<String> =
+                    e.expected().map(|exp| format!("{exp:?}")).collect();
+                report =
+                    report.with_note(format!("Expected one of: {}", expected_tokens.join(", ")));
+            }
+
+            report.finish().write(("<input>", Source::from(text)), &mut output).unwrap();
+            String::from_utf8(output).unwrap()
+        })
+        .collect();
+
+    error_strs.join("\n\n")
 }
 
 #[derive(Debug, Deserialize)]
