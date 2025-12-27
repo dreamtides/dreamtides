@@ -328,9 +328,7 @@ fn collect_rows(sheet: &Worksheet) -> BTreeMap<u32, RowDimensionSnapshot> {
     result
 }
 
-fn collect_data_validations(
-    sheet: &umya_spreadsheet::Worksheet,
-) -> BTreeSet<DataValidationSnapshot> {
+fn collect_data_validations(sheet: &Worksheet) -> BTreeSet<DataValidationSnapshot> {
     let mut set = BTreeSet::new();
     if let Some(validations) = sheet.get_data_validations() {
         for validation in validations.get_data_validation_list() {

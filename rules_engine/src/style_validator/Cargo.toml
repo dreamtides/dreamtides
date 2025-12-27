@@ -1,0 +1,18 @@
+[package]
+name = "style_validator"
+version = "0.1.0"
+edition = "2021"
+
+[lints]
+workspace = true
+
+[[bin]]
+name = "style_validator"
+path = "src/main.rs"
+
+[dependencies]
+anyhow = { workspace = true }
+proc-macro2 = { version = "1", features = ["span-locations"] }
+quote = "1"
+syn = { version = "2", features = ["full", "visit"] }
+walkdir = "2"

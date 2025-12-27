@@ -1,5 +1,5 @@
 use ability_data::ability::Ability;
-use ability_data::predicate::Predicate;
+use ability_data::predicate::{CardPredicate, Predicate};
 use ability_data::standard_effect::StandardEffect;
 use ability_data::trigger_event::{TriggerEvent, TriggerKeyword};
 
@@ -102,18 +102,18 @@ fn serialize_predicate(predicate: &Predicate) -> String {
     }
 }
 
-fn serialize_your_predicate(card_predicate: &ability_data::predicate::CardPredicate) -> String {
+fn serialize_your_predicate(card_predicate: &CardPredicate) -> String {
     match card_predicate {
         ability_data::predicate::CardPredicate::Character => "ally".to_string(),
         _ => unimplemented!("Serialization not yet implemented for this your predicate type"),
     }
 }
 
-fn serialize_card_predicate(card_predicate: &ability_data::predicate::CardPredicate) -> String {
+fn serialize_card_predicate(card_predicate: &CardPredicate) -> String {
     match card_predicate {
-        ability_data::predicate::CardPredicate::Card => "a card".to_string(),
-        ability_data::predicate::CardPredicate::Character => "a character".to_string(),
-        ability_data::predicate::CardPredicate::Event => "an event".to_string(),
+        CardPredicate::Card => "a card".to_string(),
+        CardPredicate::Character => "a character".to_string(),
+        CardPredicate::Event => "an event".to_string(),
         _ => {
             unimplemented!("Serialization not yet implemented for this card predicate type")
         }

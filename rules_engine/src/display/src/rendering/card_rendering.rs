@@ -19,7 +19,7 @@ use core_data::card_types::{CardSubtype, CardType};
 use core_data::display_color::{self, DisplayColor};
 use core_data::display_types::SpriteAddress;
 use core_data::identifiers::AbilityNumber;
-use core_data::types::CardFacing;
+use core_data::types::{CardFacing, PlayerName};
 use display_data::card_view::{
     CardActions, CardPrefab, CardView, DisplayImage, InfoZoomData, InfoZoomIcon, RevealedCardView,
 };
@@ -138,7 +138,7 @@ fn outline_and_selection_action(
     battle: &BattleState,
     legal_actions: &LegalActions,
     card_id: CardId,
-    current_player: core_data::types::PlayerName,
+    current_player: PlayerName,
 ) -> (Option<DisplayColor>, Option<GameAction>) {
     if legal_actions
         .contains(BattleAction::SelectCharacterTarget(CharacterId(card_id)), ForPlayer::Human)
@@ -540,7 +540,7 @@ fn displayed_effect_text(effect: &DisplayedAbilityEffect) -> String {
 /// Returns the appropriate targeting color based on card ownership
 fn targeting_color(
     battle: &BattleState,
-    current_player: core_data::types::PlayerName,
+    current_player: PlayerName,
     target_card_id: CardId,
 ) -> DisplayColor {
     let target_controller = card_properties::controller(battle, target_card_id);

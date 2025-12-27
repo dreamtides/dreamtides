@@ -1,3 +1,4 @@
+use std::cmp::Ordering;
 use std::collections::{BTreeMap, HashSet};
 use std::fs;
 use std::io::{Read, Write};
@@ -10,7 +11,7 @@ use toml::Value;
 use umya_spreadsheet::helper::coordinate::string_from_column_index;
 use umya_spreadsheet::reader::xlsx;
 use umya_spreadsheet::structs::Worksheet;
-use umya_spreadsheet::writer;
+use umya_spreadsheet::{Spreadsheet, writer};
 use zip::write::FileOptions;
 use zip::{CompressionMethod, DateTime, ZipArchive, ZipWriter};
 
@@ -301,10 +302,7 @@ fn adjusted_row(row: u32, adjustments: &[(u32, i32)]) -> u32 {
     value as u32
 }
 
-fn write_single_table(
-    table: &PreparedTable,
-    book: &mut umya_spreadsheet::Spreadsheet,
-) -> Result<()> {
+fn write_single_table(table: &PreparedTable, book: &mut Spreadsheet) -> Result<()> {
     let sheet = book.get_sheet_by_name_mut(table.layout.sheet_name.as_str()).ok_or_else(|| {
         anyhow::anyhow!("Table '{}' not found in original XLSM", table.layout.name)
     })?;
@@ -376,7 +374,7 @@ fn write_tables(template_path: &Path, destination: &Path, tables: &[PreparedTabl
     let mut table_refs: Vec<&PreparedTable> = tables.iter().collect();
     table_refs.sort_by(|a, b| {
         let sheet_cmp = a.layout.sheet_name.cmp(&b.layout.sheet_name);
-        if sheet_cmp == std::cmp::Ordering::Equal {
+        if sheet_cmp == Ordering::Equal {
             a.layout.data_start_row.cmp(&b.layout.data_start_row)
         } else {
             sheet_cmp

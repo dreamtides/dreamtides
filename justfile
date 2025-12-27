@@ -212,6 +212,9 @@ fix:
 benchmark *args='':
   cargo criterion --manifest-path rules_engine/Cargo.toml "$@"
 
+style-validator:
+  cargo run --manifest-path rules_engine/Cargo.toml --bin "style_validator" -- "$@"
+
 parser *args='':
   cargo run --manifest-path rules_engine/Cargo.toml --bin "parser_v2" -- "$@"
 

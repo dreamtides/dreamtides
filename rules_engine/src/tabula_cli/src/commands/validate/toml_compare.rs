@@ -3,7 +3,7 @@ use std::fs;
 use std::path::Path;
 
 use anyhow::{Context, Result, bail};
-use toml::Value;
+use toml::{Table, Value};
 
 use super::record_error;
 use crate::core::{column_names, toml_data};
@@ -160,8 +160,8 @@ fn compare_toml_values(
 fn compare_table_row(
     table_name: &str,
     row_idx: usize,
-    expected: &toml::Table,
-    actual: &toml::Table,
+    expected: &Table,
+    actual: &Table,
     report_all: bool,
     errors: &mut Vec<String>,
 ) -> Result<()> {

@@ -10,6 +10,7 @@ use axum::http::{StatusCode, header};
 use axum::response::IntoResponse;
 use axum::{Router, routing};
 use tokio::net::TcpListener;
+use tokio::sync::oneshot::{Receiver, Sender};
 use tokio::sync::{Mutex, oneshot};
 
 use super::listener_runner::{ListenerContext, run_listeners};
@@ -128,7 +129,7 @@ async fn handle_notify(State(state): State<Arc<ServerState>>, body: Bytes) -> im
     (StatusCode::OK, [(header::CONTENT_TYPE, "text/plain; charset=utf-8")], serialized)
 }
 
-async fn shutdown_signal(once: bool, shutdown_rx: oneshot::Receiver<()>) {
+async fn shutdown_signal(once: bool, shutdown_rx: Receiver<()>) {
     if once {
         let _ = shutdown_rx.await;
     } else {
@@ -157,6 +158,6 @@ fn build_listeners() -> Vec<Box<dyn super::listener_runner::Listener>> {
 
 struct ServerState {
     once: bool,
-    shutdown: Mutex<Option<oneshot::Sender<()>>>,
+    shutdown: Mutex<Option<Sender<()>>>,
     cache: Mutex<HashMap<(String, i64, u64), String>>,
 }

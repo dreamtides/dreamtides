@@ -1,10 +1,12 @@
+use chumsky::extra::Err;
 use chumsky::prelude::*;
+use core_data::card_types::CardSubtype;
 
 use crate::lexer::lexer_token::Token;
 use crate::variables::parser_substitutions::ResolvedToken;
 
 pub type ParserInput<'a> = &'a [(ResolvedToken, SimpleSpan)];
-pub type ParserExtra<'a> = extra::Err<Rich<'a, (ResolvedToken, SimpleSpan), SimpleSpan>>;
+pub type ParserExtra<'a> = Err<Rich<'a, (ResolvedToken, SimpleSpan), SimpleSpan>>;
 
 pub fn word<'a>(
     text: &'static str,
@@ -64,8 +66,7 @@ pub fn spark<'a>() -> impl Parser<'a, ParserInput<'a>, u32, ParserExtra<'a>> + C
     }
 }
 
-pub fn subtype<'a>(
-) -> impl Parser<'a, ParserInput<'a>, core_data::card_types::CardSubtype, ParserExtra<'a>> + Clone {
+pub fn subtype<'a>() -> impl Parser<'a, ParserInput<'a>, CardSubtype, ParserExtra<'a>> + Clone {
     select! {
         (ResolvedToken::Subtype { subtype, .. }, _) => subtype
     }

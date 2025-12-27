@@ -2,7 +2,8 @@ use std::fs;
 use std::path::PathBuf;
 
 use ariadne::{Color, Label, Report, ReportKind, Source};
-use chumsky::span::Span;
+use chumsky::error::Rich;
+use chumsky::span::{SimpleSpan, Span};
 use chumsky::Parser as ChumskyParser;
 use clap::{Parser, Subcommand, ValueEnum};
 use parser_v2::error::parser_errors::ParserError;
@@ -305,7 +306,7 @@ fn output_format<T: serde::Serialize + std::fmt::Debug>(value: &T, format: Outpu
 }
 
 fn format_parse_errors<'a>(
-    errors: Vec<chumsky::error::Rich<'a, (ResolvedToken, chumsky::span::SimpleSpan)>>,
+    errors: Vec<Rich<'a, (ResolvedToken, SimpleSpan)>>,
     text: &str,
 ) -> String {
     let error_strs: Vec<String> = errors

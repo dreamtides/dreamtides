@@ -1,6 +1,7 @@
+use chumsky::extra::Err;
 use chumsky::prelude::*;
 
-pub type ErrorType<'a> = extra::Err<Rich<'a, char>>;
+pub type ErrorType<'a> = Err<Rich<'a, char>>;
 
 pub fn phrase<'a>(text: &'static str) -> impl Parser<'a, &'a str, &'a str, ErrorType<'a>> {
     just(text).padded()

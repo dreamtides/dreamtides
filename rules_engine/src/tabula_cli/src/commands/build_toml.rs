@@ -1,3 +1,4 @@
+use std::cmp::Reverse;
 use std::ffi::OsStr;
 use std::fs;
 use std::path::{Path, PathBuf};
@@ -69,7 +70,7 @@ fn prune_backups(backup_dir: &Path) -> Result<()> {
     if entries.len() <= 50 {
         return Ok(());
     }
-    entries.sort_by_key(|entry| std::cmp::Reverse(entry.file_name()));
+    entries.sort_by_key(|entry| Reverse(entry.file_name()));
     for entry in entries.into_iter().skip(50) {
         fs::remove_file(entry.path()).with_context(|| {
             format!("Cannot write to output directory {}", backup_dir.display())

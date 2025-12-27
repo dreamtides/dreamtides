@@ -15,7 +15,7 @@ use battle_state::core::should_animate::ShouldAnimate;
 use battle_state::prompt_types::prompt_data::{
     PromptConfiguration, PromptData, PromptType, SelectDeckCardOrderPrompt,
 };
-use core_data::numerics::Spark;
+use core_data::numerics::{Energy, Points, Spark};
 use core_data::types::PlayerName;
 
 use crate::card_mutations::battle_deck::SetRevealedToPlayer;
@@ -168,7 +168,7 @@ fn foresee(
 fn gain_energy(
     battle: &mut BattleState,
     source: EffectSource,
-    gains: core_data::numerics::Energy,
+    gains: Energy,
 ) -> Option<EffectWasApplied> {
     let player = source.controller();
     battle_trace!("Gaining energy", battle, player, gains);
@@ -179,7 +179,7 @@ fn gain_energy(
 fn gain_points(
     battle: &mut BattleState,
     source: EffectSource,
-    gains: core_data::numerics::Points,
+    gains: Points,
 ) -> Option<EffectWasApplied> {
     let player = source.controller();
     battle_trace!("Gaining points", battle, player, gains);

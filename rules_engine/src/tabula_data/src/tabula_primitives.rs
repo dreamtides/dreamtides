@@ -1,4 +1,5 @@
 use std::fmt::{self, Debug, Display};
+use std::marker::PhantomData;
 use std::ops::Deref;
 
 use core_data::display_types::StringWrapper;
@@ -24,7 +25,7 @@ impl<T: StringWrapper> Serialize for TabulaValue<T> {
     }
 }
 
-struct TabulaVisitor<T>(std::marker::PhantomData<T>);
+struct TabulaVisitor<T>(PhantomData<T>);
 
 impl<'de, T: StringWrapper> Visitor<'de> for TabulaVisitor<T> {
     type Value = TabulaValue<T>;
@@ -44,7 +45,7 @@ impl<'de, T: StringWrapper> Visitor<'de> for TabulaVisitor<T> {
 
 impl<'de, T: StringWrapper> Deserialize<'de> for TabulaValue<T> {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
-        deserializer.deserialize_string(TabulaVisitor(std::marker::PhantomData))
+        deserializer.deserialize_string(TabulaVisitor(PhantomData))
     }
 }
 

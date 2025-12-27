@@ -3,6 +3,7 @@ use std::path::PathBuf;
 
 use anyhow::Result;
 use clap::{Parser, Subcommand};
+use tabula_cli::commands::git_setup::Hook;
 use tabula_cli::commands::{
     build_toml, build_xls, git_setup, rebuild_images, repair, server, server_install, strip_images,
     validate,
@@ -112,7 +113,7 @@ enum Commands {
     #[command(hide = true)]
     GitHook {
         #[arg(value_enum)]
-        hook: git_setup::Hook,
+        hook: Hook,
     },
 
     #[command(about = "Repair XLSM CRC errors")]

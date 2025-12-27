@@ -1,9 +1,10 @@
-use std::fs;
-use std::io::{Read, Write};
+use std::fs::{self, File};
+use std::io::{ErrorKind, Read, Write};
 use std::path::{Path, PathBuf};
 
 use anyhow::{Context, Result};
 use tempfile::NamedTempFile;
+use zip::read::ZipFile;
 use zip::write::FileOptions;
 use zip::{DateTime, ZipArchive, ZipWriter};
 
@@ -65,17 +66,12 @@ fn repair_archive(path: &Path) -> Result<()> {
     Ok(())
 }
 
-fn read_entry(
-    entry: &mut zip::read::ZipFile<'_, fs::File>,
-    source: &Path,
-) -> Result<(Vec<u8>, bool)> {
+fn read_entry(entry: &mut ZipFile<'_, File>, source: &Path) -> Result<(Vec<u8>, bool)> {
     let mut data = Vec::new();
     match entry.read_to_end(&mut data) {
         Ok(_) => Ok((data, false)),
         Err(err) => match err.kind() {
-            std::io::ErrorKind::InvalidData | std::io::ErrorKind::UnexpectedEof
-                if !data.is_empty() =>
-            {
+            ErrorKind::InvalidData | ErrorKind::UnexpectedEof if !data.is_empty() => {
                 Ok((data, true))
             }
             _ => Err(err).with_context(|| {

@@ -1,5 +1,5 @@
 use std::collections::{BTreeMap, HashMap};
-use std::path::{Path, PathBuf};
+use std::path::{Component, Path, PathBuf};
 use std::thread;
 use std::time::Duration;
 
@@ -191,7 +191,7 @@ fn parse_web_images(xml: &[u8], relationships: &[Relationship]) -> Result<Vec<We
 fn normalize_media_path(target: &str) -> Result<String> {
     let path = Path::new("xl/richData").join(target);
     let normalized = path.components().fold(PathBuf::new(), |mut acc, comp| {
-        if comp == std::path::Component::ParentDir {
+        if comp == Component::ParentDir {
             acc.pop();
         } else {
             acc.push(comp);
