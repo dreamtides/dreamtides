@@ -1,4 +1,6 @@
+use test_utils::session::test_revealed_card_extension::TestRevealedCardExtension;
 use test_utils::session::test_session::TestSession;
+use test_utils::session::test_session_battle_extension::TestSessionBattleExtension;
 
 pub fn assert_clients_identical(s: &TestSession) {
     assert_eq!(

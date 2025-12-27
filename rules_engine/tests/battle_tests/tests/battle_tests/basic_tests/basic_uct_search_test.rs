@@ -2,6 +2,7 @@ use ai_data::game_ai::GameAI;
 use battle_state::actions::battle_actions::BattleAction;
 use display_data::command::GameMessageType;
 use test_utils::battle::test_battle::TestBattle;
+use test_utils::session::test_session_prelude::*;
 
 #[tokio::test]
 async fn test_monte_carlo_agent_basic_game() {

@@ -28,7 +28,7 @@
 macro_rules! battle_trace {
     ($message:expr, $battle:expr) => {{
         if $battle.tracing.is_some() {
-            $crate::macros::write_battle_event(
+            $crate::macros::write_tracing_event::write_battle_event(
                 $battle,
                 $message.to_string(),
                 std::collections::BTreeMap::new()
@@ -43,7 +43,7 @@ macro_rules! battle_trace {
             $(
                 values.insert(stringify!($key).to_string(), format!("{:?}", $key));
             )*
-            $crate::macros::write_battle_event(
+            $crate::macros::write_tracing_event::write_battle_event(
                 $battle,
                 $message.to_string(),
                 values
@@ -57,7 +57,7 @@ macro_rules! battle_trace {
             $(
                 values.insert(stringify!($key).to_string(), format!("{:?}", $value));
             )*
-            $crate::macros::write_battle_event(
+            $crate::macros::write_tracing_event::write_battle_event(
                 $battle,
                 $message.to_string(),
                 values

@@ -17,6 +17,7 @@ pub enum ViolationKind {
     EnumVariantTooManyQualifiers,
     DirectFunctionImport,
     CodeInModLibFile,
+    PubUseStatement,
 }
 
 impl ViolationKind {
@@ -36,6 +37,9 @@ impl ViolationKind {
             }
             ViolationKind::CodeInModLibFile => {
                 "code added to mod.rs or lib.rs file (only mod declarations allowed)"
+            }
+            ViolationKind::PubUseStatement => {
+                "pub use statement not permitted (all imports must come from their original file location)"
             }
         }
     }

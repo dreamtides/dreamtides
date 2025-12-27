@@ -5,6 +5,7 @@ use anyhow::Result;
 mod direct_function_imports;
 mod file_scanner;
 mod mod_lib_files;
+mod pub_use;
 mod qualified_imports;
 mod violation;
 
@@ -38,6 +39,15 @@ fn main() -> Result<()> {
         }
 
         match mod_lib_files::check_file(file) {
+            Ok(violations) => {
+                all_violations.extend(violations);
+            }
+            Err(e) => {
+                eprintln!("Error checking {}: {}", file.display(), e);
+            }
+        }
+
+        match pub_use::check_file(file) {
             Ok(violations) => {
                 all_violations.extend(violations);
             }

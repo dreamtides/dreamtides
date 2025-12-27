@@ -6,7 +6,7 @@ use display_data::card_view::{CardView, ClientCardId, RevealedCardView};
 use display_data::object_position::Position;
 
 use crate::client::test_client_card_list::TestClientCardList;
-use crate::session::test_session_prelude::TestRevealedCardExtension;
+use crate::session::test_session_prelude::*;
 
 #[derive(Default)]
 pub struct TestClientCards {
