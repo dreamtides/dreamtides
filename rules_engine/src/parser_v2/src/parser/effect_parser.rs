@@ -10,6 +10,7 @@ pub fn single_effect_parser<'a>(
         card_effect_parsers::draw_cards(),
         card_effect_parsers::discard_cards(),
         card_effect_parsers::gain_energy(),
+        card_effect_parsers::gain_points(),
     ))
     .boxed()
 }

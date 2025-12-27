@@ -101,8 +101,9 @@ fn build_spanned_triggered(
 
     let trigger_start = if once_per_turn.is_some() { 15 } else { 0 };
 
-    let comma_or_colon_idx =
-        lex_result.tokens.iter().position(|(t, _)| matches!(t, Token::Comma | Token::Colon))?;
+    let comma_or_colon_idx = lex_result.tokens.iter().position(|(t, s)| {
+        matches!(t, Token::Comma | Token::Colon) && s.start() >= trigger_start
+    })?;
     let trigger_end = lex_result.tokens[comma_or_colon_idx].1.start();
     let trigger_span = SimpleSpan::new((), trigger_start..trigger_end);
 

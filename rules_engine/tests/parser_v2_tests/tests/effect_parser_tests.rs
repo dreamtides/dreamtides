@@ -55,9 +55,13 @@ fn test_gain_energy() {
 }
 
 #[test]
-fn test_gain_energy_requires_energy_directive() {
-    let result = try_parse_effect("Gain {points}.", "points: 5");
-    assert_ron_snapshot!(result, @"None");
+fn test_gain_points() {
+    let result = parse_effect("Gain {points}.", "points: 5");
+    assert_ron_snapshot!(result, @r###"
+    GainPoints(
+      gains: Points(5),
+    )
+    "###);
 }
 
 #[test]

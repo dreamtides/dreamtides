@@ -17,7 +17,7 @@ fn parse_effect(input: &str, vars: &str) -> StandardEffect {
 
 #[test]
 fn test_round_trip_draw_cards() {
-    let original = "Draw {cards}.";
+    let original = "draw {cards}.";
     let vars = "cards: 2";
 
     let parsed = parse_effect(original, vars);
@@ -31,7 +31,7 @@ fn test_round_trip_draw_cards() {
 
 #[test]
 fn test_round_trip_discard_cards() {
-    let original = "Discard {discards}.";
+    let original = "discard {discards}.";
     let vars = "discards: 3";
 
     let parsed = parse_effect(original, vars);
@@ -45,7 +45,7 @@ fn test_round_trip_discard_cards() {
 
 #[test]
 fn test_round_trip_gain_energy() {
-    let original = "Gain {e}.";
+    let original = "gain {e}.";
     let vars = "e: 5";
 
     let parsed = parse_effect(original, vars);

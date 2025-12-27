@@ -1049,11 +1049,11 @@ Only after proving the end-to-end solution works do we proceed to implement addi
 
 **Round-trip:** Verify triggered ability trigger text round-trips.
 
-**Checklist**: Ensure this milestone works with
+**Checklist**: Ensure this milestone works with / has tests for:
 - Command line interface
 - Display parsing via `SpannedAbility`
 - Error recovery
-- Round trip
+- Round trip serialization
 
 ---
 

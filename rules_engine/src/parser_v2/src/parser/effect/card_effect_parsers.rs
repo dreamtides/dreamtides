@@ -1,9 +1,9 @@
 use ability_data::standard_effect::StandardEffect;
 use chumsky::prelude::*;
-use core_data::numerics::Energy;
+use core_data::numerics::{Energy, Points};
 
 use crate::parser::parser_helpers::{
-    cards, discards, energy, period, word, ParserExtra, ParserInput,
+    cards, discards, energy, period, points, word, ParserExtra, ParserInput,
 };
 
 pub fn draw_cards<'a>() -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone
@@ -28,4 +28,12 @@ pub fn gain_energy<'a>() -> impl Parser<'a, ParserInput<'a>, StandardEffect, Par
         .ignore_then(energy())
         .then_ignore(period())
         .map(|n| StandardEffect::GainEnergy { gains: Energy(n) })
+}
+
+pub fn gain_points<'a>() -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone
+{
+    word("gain")
+        .ignore_then(points())
+        .then_ignore(period())
+        .map(|n| StandardEffect::GainPoints { gains: Points(n) })
 }

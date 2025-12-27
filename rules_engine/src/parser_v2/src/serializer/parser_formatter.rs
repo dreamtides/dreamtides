@@ -1,10 +1,121 @@
+use ability_data::ability::Ability;
+use ability_data::predicate::Predicate;
 use ability_data::standard_effect::StandardEffect;
+use ability_data::trigger_event::{TriggerEvent, TriggerKeyword};
+
+pub fn serialize_ability(ability: &Ability) -> String {
+    match ability {
+        Ability::Triggered(triggered) => {
+            let mut result = String::new();
+            let has_once_per_turn =
+                triggered.options.as_ref().map(|o| o.once_per_turn).unwrap_or(false);
+            if has_once_per_turn {
+                result.push_str("Once per turn, ");
+            }
+            let trigger = serialize_trigger_event(&triggered.trigger);
+            let capitalized_trigger = capitalize_first_letter(&trigger);
+            result.push_str(if has_once_per_turn { &trigger } else { &capitalized_trigger });
+            if let ability_data::effect::Effect::Effect(effect) = &triggered.effect {
+                result.push_str(&serialize_standard_effect(effect));
+            }
+            result
+        }
+        _ => unimplemented!("Serialization not yet implemented for this ability type"),
+    }
+}
+
+fn capitalize_first_letter(s: &str) -> String {
+    let mut chars = s.chars();
+    match chars.next() {
+        None => String::new(),
+        Some(first) => first.to_uppercase().collect::<String>() + chars.as_str(),
+    }
+}
 
 pub fn serialize_standard_effect(effect: &StandardEffect) -> String {
     match effect {
-        StandardEffect::DrawCards { .. } => "Draw {cards}.".to_string(),
-        StandardEffect::DiscardCards { .. } => "Discard {discards}.".to_string(),
-        StandardEffect::GainEnergy { .. } => "Gain {e}.".to_string(),
+        StandardEffect::DrawCards { .. } => "draw {cards}.".to_string(),
+        StandardEffect::DiscardCards { .. } => "discard {discards}.".to_string(),
+        StandardEffect::GainEnergy { .. } => "gain {e}.".to_string(),
+        StandardEffect::GainPoints { .. } => "gain {points}.".to_string(),
         _ => unimplemented!("Serialization not yet implemented for this effect type"),
+    }
+}
+
+pub fn serialize_trigger_event(trigger: &TriggerEvent) -> String {
+    match trigger {
+        TriggerEvent::Keywords(keywords) if keywords.len() == 1 => {
+            format!("{{{}}}", serialize_keyword(&keywords[0]))
+        }
+        TriggerEvent::Keywords(keywords) if keywords.len() == 2 => {
+            format!("{{{}{}}}", serialize_keyword(&keywords[0]), serialize_keyword(&keywords[1]))
+        }
+        TriggerEvent::Play(predicate) => {
+            format!("when you play {}, ", serialize_predicate(predicate))
+        }
+        TriggerEvent::PlayFromHand(predicate) => {
+            format!("when you play {} from your hand, ", serialize_predicate(predicate))
+        }
+        TriggerEvent::PlayDuringTurn(predicate, _) => {
+            format!("when you play {} in a turn, ", serialize_predicate(predicate))
+        }
+        TriggerEvent::Discard(predicate) => {
+            format!("when you discard {}, ", serialize_predicate(predicate))
+        }
+        TriggerEvent::Materialize(predicate) => {
+            format!("when you {{materialize}} {}, ", serialize_predicate(predicate))
+        }
+        TriggerEvent::Dissolved(predicate) => {
+            format!("when {} is {{dissolved}}, ", serialize_predicate(predicate))
+        }
+        TriggerEvent::Banished(predicate) => {
+            format!("when {} is {{banished}}, ", serialize_predicate(predicate))
+        }
+        TriggerEvent::Abandon(predicate) => {
+            format!("when you abandon {}, ", serialize_predicate(predicate))
+        }
+        TriggerEvent::EndOfYourTurn => "at the end of your turn, ".to_string(),
+        TriggerEvent::DrawAllCardsInCopyOfDeck => {
+            "when you have no cards in your deck, ".to_string()
+        }
+        TriggerEvent::GainEnergy => "when you gain energy, ".to_string(),
+        _ => unimplemented!("Serialization not yet implemented for this trigger type"),
+    }
+}
+
+fn serialize_keyword(keyword: &TriggerKeyword) -> String {
+    match keyword {
+        TriggerKeyword::Judgment => "Judgment".to_string(),
+        TriggerKeyword::Materialized => "Materialized".to_string(),
+        TriggerKeyword::Dissolved => "Dissolved".to_string(),
+    }
+}
+
+fn serialize_predicate(predicate: &Predicate) -> String {
+    match predicate {
+        Predicate::This => "this character".to_string(),
+        Predicate::Your(card_predicate) => {
+            format!("an {}", serialize_your_predicate(card_predicate))
+        }
+        Predicate::Any(card_predicate) => serialize_card_predicate(card_predicate),
+        _ => unimplemented!("Serialization not yet implemented for this predicate type"),
+    }
+}
+
+fn serialize_your_predicate(card_predicate: &ability_data::predicate::CardPredicate) -> String {
+    match card_predicate {
+        ability_data::predicate::CardPredicate::Character => "ally".to_string(),
+        _ => unimplemented!("Serialization not yet implemented for this your predicate type"),
+    }
+}
+
+fn serialize_card_predicate(card_predicate: &ability_data::predicate::CardPredicate) -> String {
+    match card_predicate {
+        ability_data::predicate::CardPredicate::Card => "a card".to_string(),
+        ability_data::predicate::CardPredicate::Character => "a character".to_string(),
+        ability_data::predicate::CardPredicate::Event => "an event".to_string(),
+        _ => {
+            unimplemented!("Serialization not yet implemented for this card predicate type")
+        }
     }
 }
