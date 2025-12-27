@@ -2,6 +2,8 @@ use std::collections::BTreeMap;
 use std::ffi::OsStr;
 use std::fs;
 use std::io::Read;
+#[cfg(unix)]
+use std::os::unix::fs::PermissionsExt;
 use std::path::{Path, PathBuf};
 use std::process::Command;
 
@@ -370,8 +372,6 @@ impl Hook {
 
 #[cfg(unix)]
 fn set_executable(path: &Path) -> Result<()> {
-    use std::os::unix::fs::PermissionsExt;
-
     let mut permissions = fs::metadata(path)
         .with_context(|| format!("Cannot open hook {}", path.display()))?
         .permissions();

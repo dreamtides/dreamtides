@@ -5,6 +5,7 @@ use std::path::{Path, PathBuf};
 use atomic_write_file::AtomicWriteFile;
 use core_data::identifiers::UserId;
 use core_data::initialization_error::{ErrorCode, InitializationError};
+use serde_json::error::Category;
 use tracing::debug;
 use {serde_json, serde_path_to_error};
 
@@ -59,7 +60,6 @@ fn build_parse_error(
     error: &serde_json::Error,
     length_hint: Option<usize>,
 ) -> InitializationError {
-    use serde_json::error::Category;
     let line = error.line();
     let column = error.column();
     let text = String::from_utf8_lossy(data);

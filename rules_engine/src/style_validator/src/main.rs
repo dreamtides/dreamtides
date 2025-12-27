@@ -5,6 +5,7 @@ use anyhow::Result;
 mod cargo_dependencies;
 mod direct_function_imports;
 mod file_scanner;
+mod inline_use_statements;
 mod mod_lib_files;
 mod pub_use;
 mod qualified_imports;
@@ -49,6 +50,15 @@ fn main() -> Result<()> {
         }
 
         match pub_use::check_file(file) {
+            Ok(violations) => {
+                all_violations.extend(violations);
+            }
+            Err(e) => {
+                eprintln!("Error checking {}: {}", file.display(), e);
+            }
+        }
+
+        match inline_use_statements::check_file(file) {
             Ok(violations) => {
                 all_violations.extend(violations);
             }

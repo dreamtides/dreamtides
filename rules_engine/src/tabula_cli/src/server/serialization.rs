@@ -1,4 +1,5 @@
 use anyhow::{Context, Result};
+use sha2::{Digest, Sha256};
 
 use super::model::{
     Change, ChangedRange, HorizontalAlignment, PROTOCOL_VERSION, Request, Response, ResponseStatus,
@@ -314,7 +315,6 @@ pub fn compute_changeset_id(
     workbook_size: u64,
     changes: &[Change],
 ) -> String {
-    use sha2::{Digest, Sha256};
     let mut hasher = Sha256::new();
     hasher.update(workbook_path.as_bytes());
     hasher.update(workbook_mtime.to_le_bytes());

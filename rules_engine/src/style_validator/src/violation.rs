@@ -19,6 +19,7 @@ pub enum ViolationKind {
     CodeInModLibFile,
     PubUseStatement,
     CargoTomlDependencyOrder,
+    InlineUseStatement,
 }
 
 impl ViolationKind {
@@ -44,6 +45,9 @@ impl ViolationKind {
             }
             ViolationKind::CargoTomlDependencyOrder => {
                 "Cargo.toml dependencies must be alphabetized: internal dependencies first, then external dependencies"
+            }
+            ViolationKind::InlineUseStatement => {
+                "use statement placed inline within function body or other nested context (use statements must be at top of file)"
             }
         }
     }
