@@ -1,11 +1,73 @@
 use crate::variables::substitution;
 
+static PARSER_WORDS: &[&str] = &[
+    "abandon",
+    "a",
+    "allied",
+    "and",
+    "an",
+    "another",
+    "any",
+    "are",
+    "at",
+    "battlefield",
+    "becomes",
+    "card",
+    "cards",
+    "character",
+    "characters",
+    "control",
+    "cost",
+    "deck",
+    "disable",
+    "discard",
+    "draw",
+    "end",
+    "enemy",
+    "event",
+    "events",
+    "from",
+    "gain",
+    "gains",
+    "hand",
+    "has",
+    "have",
+    "in",
+    "it",
+    "less",
+    "materialized",
+    "may",
+    "of",
+    "once",
+    "or",
+    "per",
+    "play",
+    "spark",
+    "that",
+    "the",
+    "them",
+    "this",
+    "to",
+    "top",
+    "turn",
+    "void",
+    "when",
+    "whenever",
+    "with",
+    "you",
+    "your",
+];
+
 pub fn suggest_directive(name: &str) -> Option<Vec<String>> {
     find_suggestions(name, substitution::directive_names().collect())
 }
 
 pub fn suggest_variable(name: &str) -> Option<Vec<String>> {
     find_suggestions(name, substitution::variable_names().collect())
+}
+
+pub fn suggest_word(word: &str) -> Option<Vec<String>> {
+    find_suggestions(word, PARSER_WORDS.to_vec())
 }
 
 fn find_suggestions(input: &str, candidates: Vec<&str>) -> Option<Vec<String>> {
@@ -111,5 +173,27 @@ mod tests {
         assert!(suggestions.is_some());
         let suggestions = suggestions.unwrap();
         assert!(suggestions.contains(&"cards".to_string()));
+    }
+
+    #[test]
+    fn test_suggest_word_close_match() {
+        let suggestions = suggest_word("drew");
+        assert!(suggestions.is_some());
+        let suggestions = suggestions.unwrap();
+        assert!(suggestions.contains(&"draw".to_string()));
+    }
+
+    #[test]
+    fn test_suggest_word_exact_match() {
+        let suggestions = suggest_word("draw");
+        assert!(suggestions.is_some());
+        let suggestions = suggestions.unwrap();
+        assert_eq!(suggestions, vec!["draw"]);
+    }
+
+    #[test]
+    fn test_suggest_word_no_match() {
+        let suggestions = suggest_word("xyzabc");
+        assert!(suggestions.is_none());
     }
 }

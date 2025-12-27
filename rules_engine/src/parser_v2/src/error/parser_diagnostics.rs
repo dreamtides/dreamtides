@@ -1,8 +1,11 @@
 use ariadne::{Color, Label, Report, ReportKind, Source};
+use chumsky::error::Rich;
 use chumsky::span::{SimpleSpan, Span};
 
 use crate::error::parser_errors::{LexError, ParserError};
 use crate::error::suggestions;
+use crate::lexer::token::Token;
+use crate::variables::substitution::ResolvedToken;
 
 pub fn format_error(error: &ParserError, source: &str, filename: &str) -> String {
     let mut output = Vec::new();
@@ -50,29 +53,7 @@ pub fn format_error(error: &ParserError, source: &str, filename: &str) -> String
             report.finish().write((filename, Source::from(source)), &mut output).unwrap();
         }
         ParserError::Parse { span, error } => {
-            let message = format!("Parse error: {:?}", error.reason());
-
-            let mut report = Report::<(&str, std::ops::Range<usize>)>::build(
-                ReportKind::Error,
-                filename,
-                span.start(),
-            )
-            .with_message(&message);
-
-            let label = Label::new((filename, span.start()..span.end()))
-                .with_message("Failed to parse ability text here")
-                .with_color(Color::Red);
-
-            report = report.with_label(label);
-
-            if !error.expected().collect::<Vec<_>>().is_empty() {
-                let expected_tokens: Vec<String> =
-                    error.expected().map(|e| format!("{e:?}")).collect();
-                report =
-                    report.with_note(format!("Expected one of: {}", expected_tokens.join(", ")));
-            }
-
-            report.finish().write((filename, Source::from(source)), &mut output).unwrap();
+            format_parse_error(error, *span, source, filename, &mut output);
         }
     }
 
@@ -122,4 +103,65 @@ fn build_lex_error_report(
         .finish()
         .write((filename, Source::from(source)), output)
         .unwrap();
+}
+
+fn format_parse_error(
+    error: &Rich<'_, (ResolvedToken, SimpleSpan), SimpleSpan>,
+    span: SimpleSpan,
+    source: &str,
+    filename: &str,
+    output: &mut Vec<u8>,
+) {
+    let found_token = error.found().map(|(token, _)| token);
+    let (message, label_message, note) = match found_token {
+        Some(ResolvedToken::Token(Token::Word(word))) => {
+            if let Some(suggestions) = suggestions::suggest_word(word) {
+                (
+                    format!("Unexpected word '{word}'"),
+                    format!("Found '{word}' here. Did you mean '{}'?", suggestions.join("', '")),
+                    Some(format!("Similar words: {}", suggestions.join(", "))),
+                )
+            } else {
+                (format!("Unexpected word '{word}'"), format!("Found '{word}' here"), None)
+            }
+        }
+        Some(ResolvedToken::Token(Token::Directive(name))) => {
+            if let Some(suggestions) = suggestions::suggest_directive(name) {
+                (
+                    format!("Unexpected directive '{{{name}}}'"),
+                    format!(
+                        "Found '{{{name}}}' here. Did you mean '{{{}}}'?",
+                        suggestions.join("', '{")
+                    ),
+                    Some(format!("Similar directives: {}", suggestions.join(", "))),
+                )
+            } else {
+                (
+                    format!("Unexpected directive '{{{name}}}'"),
+                    format!("Found '{{{name}}}' here"),
+                    None,
+                )
+            }
+        }
+        _ => {
+            let message = format!("Parse error: {:?}", error.reason());
+            (message, "Failed to parse ability text here".to_string(), None)
+        }
+    };
+
+    let mut report =
+        Report::<(&str, std::ops::Range<usize>)>::build(ReportKind::Error, filename, span.start())
+            .with_message(&message);
+
+    let label = Label::new((filename, span.start()..span.end()))
+        .with_message(&label_message)
+        .with_color(Color::Red);
+
+    report = report.with_label(label);
+
+    if let Some(note_text) = note {
+        report = report.with_note(note_text);
+    }
+
+    report.finish().write((filename, Source::from(source)), output).unwrap();
 }
