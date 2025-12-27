@@ -2,6 +2,8 @@ use std::fs;
 use std::path::PathBuf;
 
 use clap::{Parser, Subcommand, ValueEnum};
+use parser_v2::error::parser_diagnostics;
+use parser_v2::error::parser_errors::ParserError;
 use parser_v2::lexer::token::Token;
 use parser_v2::lexer::tokenize;
 use parser_v2::variables::binding::VariableBindings;
@@ -96,7 +98,7 @@ enum Stage {
 
 fn main() {
     if let Err(e) = run() {
-        eprintln!("Error: {e}");
+        eprintln!("{e}");
         std::process::exit(1);
     }
 }
@@ -126,20 +128,30 @@ fn parse_command(
     stage: Stage,
 ) -> Result<(), Box<dyn std::error::Error>> {
     let bindings = if let Some(vars_str) = vars {
-        VariableBindings::parse(vars_str)?
+        VariableBindings::parse(vars_str).map_err(ParserError::from)?
     } else {
         VariableBindings::new()
     };
 
     match stage {
         Stage::Lex => {
-            let lex_result = tokenize::lex(text)?;
+            let lex_result = tokenize::lex(text).map_err(|e| {
+                let error = ParserError::from(e);
+                parser_diagnostics::format_error(&error, text, "<input>")
+            })?;
             let tokens: Vec<&Token> = lex_result.tokens.iter().map(|(t, _)| t).collect();
             output_format(&tokens, format);
         }
         Stage::ResolveVariables => {
-            let lex_result = tokenize::lex(text)?;
-            let resolved = substitution::resolve_variables(&lex_result.tokens, &bindings)?;
+            let lex_result = tokenize::lex(text).map_err(|e| {
+                let error = ParserError::from(e);
+                parser_diagnostics::format_error(&error, text, "<input>")
+            })?;
+            let resolved =
+                substitution::resolve_variables(&lex_result.tokens, &bindings).map_err(|e| {
+                    let error = ParserError::from(e);
+                    parser_diagnostics::format_error(&error, text, "<input>")
+                })?;
             let resolved_tokens: Vec<&ResolvedToken> = resolved.iter().map(|(t, _)| t).collect();
             output_format(&resolved_tokens, format);
         }
@@ -209,7 +221,10 @@ fn verify_command(input: &PathBuf) -> Result<(), Box<dyn std::error::Error>> {
             match VariableBindings::parse(vars) {
                 Ok(b) => b,
                 Err(e) => {
-                    println!("❌ {}: Variable parse error: {e}", card.name);
+                    let error = ParserError::from(e);
+                    let formatted =
+                        parser_diagnostics::format_error(&error, rules_text, &card.name);
+                    eprintln!("\n{formatted}");
                     error_count += 1;
                     continue;
                 }
@@ -226,13 +241,18 @@ fn verify_command(input: &PathBuf) -> Result<(), Box<dyn std::error::Error>> {
                         success_count += 1;
                     }
                     Err(e) => {
-                        println!("❌ {}: Variable resolution error: {e}", card.name);
+                        let error = ParserError::from(e);
+                        let formatted =
+                            parser_diagnostics::format_error(&error, rules_text, &card.name);
+                        eprintln!("\n{formatted}");
                         error_count += 1;
                     }
                 }
             }
             Err(e) => {
-                println!("❌ {}: Lex error: {e}", card.name);
+                let error = ParserError::from(e);
+                let formatted = parser_diagnostics::format_error(&error, rules_text, &card.name);
+                eprintln!("\n{formatted}");
                 error_count += 1;
             }
         }

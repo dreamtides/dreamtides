@@ -31,4 +31,4 @@ insta = { workspace = true }
 
 [[bin]]
 name = "parser_v2"
-path = "src/cli.rs"
+path = "src/parser_cli.rs"

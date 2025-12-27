@@ -2,6 +2,7 @@ use ariadne::{Color, Label, Report, ReportKind, Source};
 use chumsky::span::{SimpleSpan, Span};
 
 use crate::error::parser_errors::{LexError, ParserError};
+use crate::error::suggestions;
 
 pub fn format_error(error: &ParserError, source: &str, filename: &str) -> String {
     let mut output = Vec::new();
@@ -18,36 +19,60 @@ pub fn format_error(error: &ParserError, source: &str, filename: &str) -> String
                 .unwrap();
         }
         ParserError::UnresolvedVariable(unresolved) => {
-            Report::<(&str, std::ops::Range<usize>)>::build(
+            let mut report = Report::<(&str, std::ops::Range<usize>)>::build(
                 ReportKind::Error,
                 filename,
                 unresolved.span.start(),
             )
-            .with_message(format!("Unresolved variable: {}", unresolved.name))
-            .with_label(
-                Label::new((filename, unresolved.span.start()..unresolved.span.end()))
-                    .with_message(format!("Variable '{}' not found in bindings", unresolved.name))
-                    .with_color(Color::Red),
-            )
-            .finish()
-            .write((filename, Source::from(source)), &mut output)
-            .unwrap();
+            .with_message(format!("Unresolved variable: {}", unresolved.name));
+
+            let mut label = Label::new((filename, unresolved.span.start()..unresolved.span.end()))
+                .with_color(Color::Red);
+
+            if let Some(suggestions) = suggestions::suggest_variable(&unresolved.name) {
+                label = label.with_message(format!(
+                    "Variable '{}' not found in bindings. Did you mean '{}'?",
+                    unresolved.name,
+                    suggestions.join("', '")
+                ));
+            } else {
+                label = label
+                    .with_message(format!("Variable '{}' not found in bindings", unresolved.name));
+            }
+
+            report = report.with_label(label);
+
+            if let Some(suggestions) = suggestions::suggest_variable(&unresolved.name) {
+                report = report
+                    .with_note(format!("Available variables include: {}", suggestions.join(", ")));
+            }
+
+            report.finish().write((filename, Source::from(source)), &mut output).unwrap();
         }
-        ParserError::Parse { span, .. } => {
-            Report::<(&str, std::ops::Range<usize>)>::build(
+        ParserError::Parse { span, error } => {
+            let message = format!("Parse error: {:?}", error.reason());
+
+            let mut report = Report::<(&str, std::ops::Range<usize>)>::build(
                 ReportKind::Error,
                 filename,
                 span.start(),
             )
-            .with_message("Parse error")
-            .with_label(
-                Label::new((filename, span.start()..span.end()))
-                    .with_message("Failed to parse ability text")
-                    .with_color(Color::Red),
-            )
-            .finish()
-            .write((filename, Source::from(source)), &mut output)
-            .unwrap();
+            .with_message(&message);
+
+            let label = Label::new((filename, span.start()..span.end()))
+                .with_message("Failed to parse ability text here")
+                .with_color(Color::Red);
+
+            report = report.with_label(label);
+
+            if !error.expected().collect::<Vec<_>>().is_empty() {
+                let expected_tokens: Vec<String> =
+                    error.expected().map(|e| format!("{e:?}")).collect();
+                report =
+                    report.with_note(format!("Expected one of: {}", expected_tokens.join(", ")));
+            }
+
+            report.finish().write((filename, Source::from(source)), &mut output).unwrap();
         }
     }
 
