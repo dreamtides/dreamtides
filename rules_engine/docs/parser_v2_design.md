@@ -585,6 +585,211 @@ fn static_ability_parser<'a>() -> impl Parser<'a, ParserInput<'a>, StaticAbility
 }
 ```
 
+### 4.9 Avoiding Infinite Loops (Left Recursion)
+
+**Critical:** Parser combinators are vulnerable to infinite loops caused by left recursion. A parser has left recursion when it can attempt to match itself as the first action without consuming any input.
+
+#### 4.9.1 The Problem
+
+Left recursion occurs when a recursive parser can immediately call itself before consuming any tokens:
+
+```rust
+// DANGER: This will cause an infinite loop!
+fn card_predicate_parser<'a>() -> impl Parser<'a, ParserInput<'a>, CardPredicate, ParserExtra<'a>> {
+    recursive(|cp| {
+        choice((
+            // This alternative starts with the recursive parser 'cp' without consuming input first
+            cp.clone().then_ignore(word("with")).then(word("cost")),  // INFINITE LOOP!
+            word("character").to(CardPredicate::Character),
+        ))
+    })
+}
+```
+
+**Why this loops forever:**
+1. Parser tries to match first alternative
+2. First alternative immediately tries to match `cp` (the recursive parser)
+3. This recursively tries step 1 again **without consuming any tokens**
+4. Loop repeats infinitely
+
+#### 4.9.2 The Golden Rule
+
+**Always consume at least one token before any recursive call.**
+
+Every alternative in a `choice()` that uses a recursive parser must begin with a non-recursive parser that consumes input:
+
+```rust
+// CORRECT: Each alternative consumes tokens before recursing
+fn card_predicate_parser<'a>() -> impl Parser<'a, ParserInput<'a>, CardPredicate, ParserExtra<'a>> {
+    recursive(|cp| {
+        choice((
+            // ✓ Consumes {fast} directive BEFORE recursing
+            directive("fast").ignore_then(cp.clone()),
+            // ✓ Consumes "character" word before returning
+            word("character").to(CardPredicate::Character),
+        ))
+    })
+}
+```
+
+#### 4.9.3 Common Patterns to Avoid
+
+**Dangerous Pattern 1: Recursive parameter used first**
+```rust
+// BAD
+fn with_cost_parser<'a>(
+    target: impl Parser<'a, ParserInput<'a>, CardPredicate, ParserExtra<'a>> + Clone,
+) -> impl Parser<'a, ParserInput<'a>, CardPredicate, ParserExtra<'a>> {
+    choice((
+        words(&["character", "with", "cost"]).ignore_then(energy()),  // OK
+        target.then_ignore(words(&["with", "cost"])),  // LEFT RECURSION if target is recursive!
+    ))
+}
+```
+
+**Dangerous Pattern 2: Optional matching before recursion**
+```rust
+// BAD
+recursive(|cp| {
+    word("fast").or_not()  // Can match nothing!
+        .ignore_then(cp)   // Then immediately recurse - INFINITE LOOP!
+})
+```
+
+**Dangerous Pattern 3: Empty alternative before recursion**
+```rust
+// BAD
+choice((
+    empty().ignore_then(cp),  // Can match nothing, then recurse - INFINITE LOOP!
+    word("character"),
+))
+```
+
+#### 4.9.4 Safe Patterns
+
+**Pattern 1: Token consumption before recursion**
+```rust
+// GOOD: directive() consumes a token before recursing
+directive("fast").ignore_then(cp.clone())
+```
+
+**Pattern 2: Recursion after required tokens**
+```rust
+// GOOD: Multiple tokens consumed before any recursion
+words(&["character", "with", "cost"])
+    .ignore_then(energy())
+    .then(cp.clone())
+```
+
+**Pattern 3: Non-recursive alternatives**
+```rust
+// GOOD: No recursion in this alternative
+word("character").to(CardPredicate::Character)
+```
+
+**Pattern 4: Recursion at the end of a chain**
+```rust
+// GOOD: Tokens consumed, THEN recursive parser used
+word("fast").ignore_then(
+    cp.clone().or(just(&[]).to(CardPredicate::Card))
+)
+```
+
+#### 4.9.5 How to Identify Left Recursion
+
+When adding a recursive parser, check each alternative in the `choice()`:
+
+1. **Trace the first action**: What's the first parser combinator that executes?
+2. **Does it consume input?**: Check if it matches `word()`, `directive()`, `words()`, or other consuming parsers
+3. **Can it match empty?**: Parsers like `empty()`, `or_not()`, or default alternatives can match without consuming
+4. **Is it the recursive parser?**: If the first thing is `cp` or a parameter that might be recursive, you have left recursion
+
+**Example audit:**
+```rust
+recursive(|cp| {
+    choice((
+        directive("fast").ignore_then(cp.clone()),  // ✓ directive() consumes first
+        character_with_cost_parser(cp.clone()),     // ⚠️  Check character_with_cost_parser!
+        word("character").to(CardPredicate::Character),  // ✓ word() consumes first
+    ))
+})
+```
+
+If `character_with_cost_parser` has an alternative that starts with its `target` parameter, and you pass `cp` as that target, you have left recursion.
+
+#### 4.9.6 How to Fix Left Recursion
+
+**Strategy 1: Remove the recursive parameter**
+
+If the problematic function accepts a recursive parser as a parameter, remove alternatives that use it first:
+
+```rust
+// BEFORE (has left recursion when called with recursive parser)
+fn character_with_cost_parser<'a>(
+    target: impl Parser<'a, ParserInput<'a>, CardPredicate, ParserExtra<'a>>,
+) -> impl Parser<'a, ParserInput<'a>, CardPredicate, ParserExtra<'a>> {
+    choice((
+        words(&["character", "with", "cost"]).ignore_then(energy()),
+        target.then_ignore(words(&["with", "cost"])),  // Problem!
+    ))
+}
+
+// AFTER (no recursion parameter)
+fn character_with_cost_parser<'a>(
+) -> impl Parser<'a, ParserInput<'a>, CardPredicate, ParserExtra<'a>> {
+    choice((
+        words(&["character", "with", "cost"]).ignore_then(energy()),
+        // Removed the problematic alternative
+    ))
+}
+```
+
+**Strategy 2: Consume tokens first**
+
+Restructure to ensure token consumption before recursion:
+
+```rust
+// BEFORE
+recursive(|cp| cp.clone().then(word("modifier")))  // BAD
+
+// AFTER
+recursive(|cp| word("base").then(cp.clone().then(word("modifier")).or_not()))  // GOOD
+```
+
+**Strategy 3: Move recursion to parent parser**
+
+Let the parent parser handle the composition:
+
+```rust
+// Parent handles {fast} + target composition
+recursive(|cp| {
+    choice((
+        directive("fast").ignore_then(character_with_cost_parser()),  // Composes here
+        character_with_cost_parser(),  // No recursion in this function
+    ))
+})
+```
+
+#### 4.9.7 Testing for Infinite Loops
+
+After implementing any recursive parser:
+
+1. **Add a simple test** that exercises the parser
+2. **Run with timeout**: `cargo test <test_name> --timeout 5`
+3. **If it hangs**: You likely have left recursion
+4. **Audit all alternatives** using the checklist in 4.9.5
+
+```rust
+#[test]
+fn test_predicate_terminates() {
+    // This test should complete in milliseconds
+    let result = parse_predicate("it", "");
+    assert_eq!(result, Predicate::It);
+}
+```
+
+If this test hangs, trace through the parser logic to find where recursion occurs without token consumption.
+
 ---
 
 ## 5. Boxing Strategy for Compile Performance

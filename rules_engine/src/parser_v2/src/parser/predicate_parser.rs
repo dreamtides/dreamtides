@@ -119,7 +119,7 @@ fn card_predicate_parser<'a>(
         choice((
             fast_parser(cp.clone()),
             character_with_spark_parser(),
-            character_with_cost_parser(cp.clone()),
+            character_with_cost_parser(),
             character_with_cost_compared_to_controlled(),
             character_with_cost_compared_to_abandoned(),
             character_with_spark_compared_to_abandoned(),
@@ -183,7 +183,6 @@ fn character_with_spark_parser<'a>(
 }
 
 fn character_with_cost_parser<'a>(
-    target: impl Parser<'a, ParserInput<'a>, CardPredicate, ParserExtra<'a>> + Clone,
 ) -> impl Parser<'a, ParserInput<'a>, CardPredicate, ParserExtra<'a>> + Clone {
     choice((
         words(&["character", "with", "cost"])
@@ -208,15 +207,6 @@ fn character_with_cost_parser<'a>(
                 cost: Energy(e),
             },
         ),
-        target
-            .then_ignore(words(&["with", "cost"]))
-            .then(energy())
-            .then(energy_operator_parser())
-            .map(|((target, e), op)| CardPredicate::CardWithCost {
-                target: Box::new(target),
-                cost_operator: op,
-                cost: Energy(e),
-            }),
     ))
 }
 
