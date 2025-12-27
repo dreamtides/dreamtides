@@ -2543,9 +2543,12 @@ name = "parser_v2_benchmarks"
 version = "0.1.0"
 dependencies = [
  "ability_data",
+ "chumsky 0.12.0",
  "core_data",
  "criterion",
  "parser_v2",
+ "serde",
+ "toml",
 ]
 
 [[package]]

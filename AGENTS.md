@@ -12,18 +12,15 @@ all times.
   - A `just` command can be run from any directory of the project and will have the same result
 - This project uses `cargo-workspace-lints`
     - `cargo install cargo-workspace-lints`
-- If you want to be able to run benchmarks, you will need valgrind:
-    - `sudo apt-get install valgrind`
-
 
 # CODE STYLE
 
 
 - Prefer writing code inline (when possible) to creating new variables via "let" statements
-- DO NOT add inline comments to code
+- DO NOT add inline comments to code. Add a short doc comment to top-level public functions.
 - DO NOT delete existing inline comments
 - DO NOT fully-qualify names in code ever
-- Function calls and enum values have exactly one qualifier, struct names have
+- Function calls and enum values have exactly one qualifier, struct names and enum types have
   zero qualifiers:
   - WRONG FUNCTION CALL: crate::zone_mutations::move_card::to_destination_zone()
   - WRONG FUNCTION CALL: to_destination_zone()
@@ -37,6 +34,7 @@ all times.
 - Keep Cargo.toml dependencies alphabetized in two lists, internal then external dependencies.
 - Use modern Rust features such as if-let statements and "{inline:?}" variable formatting
 - Do not add code to `mod.rs` or `lib.rs` files except for module declarations
+- Do not add `use` declarations within function bodies, only place them at the top of files
 
 
 # VALIDATING CHANGES
