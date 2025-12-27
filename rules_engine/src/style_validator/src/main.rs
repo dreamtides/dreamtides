@@ -2,12 +2,12 @@ use std::path::Path;
 
 use anyhow::Result;
 
+mod direct_function_imports;
 mod file_scanner;
 mod qualified_imports;
 mod violation;
 
 use file_scanner::find_rust_files;
-use qualified_imports::check_file;
 
 fn main() -> Result<()> {
     let rules_engine_path =
@@ -21,19 +21,29 @@ fn main() -> Result<()> {
     let mut all_violations = Vec::new();
     let style_validator_path = Path::new(env!("CARGO_MANIFEST_DIR"));
 
-    for file in &rust_files {
-        // Skip the style_validator's own source files
-        if file.starts_with(style_validator_path) {
-            continue;
-        }
+    // Filter out style_validator's own files
+    let rust_files: Vec<_> =
+        rust_files.into_iter().filter(|file| !file.starts_with(style_validator_path)).collect();
 
-        match check_file(file) {
+    // Run per-file checks
+    for file in &rust_files {
+        match qualified_imports::check_file(file) {
             Ok(violations) => {
                 all_violations.extend(violations);
             }
             Err(e) => {
                 eprintln!("Error checking {}: {}", file.display(), e);
             }
+        }
+    }
+
+    // Run cross-file checks
+    match direct_function_imports::check_all_files(&rust_files, rules_engine_path) {
+        Ok(violations) => {
+            all_violations.extend(violations);
+        }
+        Err(e) => {
+            eprintln!("Error checking direct function imports: {e}");
         }
     }
 

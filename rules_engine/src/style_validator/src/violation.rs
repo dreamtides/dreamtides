@@ -15,6 +15,7 @@ pub enum ViolationKind {
     TooManyQualifiers,
     TypeShouldNotBeQualified,
     EnumVariantTooManyQualifiers,
+    DirectFunctionImport,
 }
 
 impl ViolationKind {
@@ -28,6 +29,9 @@ impl ViolationKind {
             }
             ViolationKind::EnumVariantTooManyQualifiers => {
                 "enum variant has too many qualifiers (should have exactly one)"
+            }
+            ViolationKind::DirectFunctionImport => {
+                "function imported directly in use statement (should use module::function_name at call site instead)"
             }
         }
     }
