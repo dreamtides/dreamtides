@@ -1,6 +1,8 @@
+use chumsky::Parser;
 use parser_v2::error::parser_diagnostics;
 use parser_v2::error::parser_errors::ParserError;
 use parser_v2::lexer::lexer_tokenize;
+use parser_v2::parser::predicate_parser;
 use parser_v2::variables::parser_bindings::VariableBindings;
 use parser_v2::variables::parser_substitutions;
 
@@ -146,4 +148,43 @@ fn test_suggestions_for_close_variable_names() {
     let formatted = parser_diagnostics::format_error(&error, input, "test");
 
     assert!(formatted.contains("discards"));
+}
+
+#[test]
+fn test_predicate_parsing_with_invalid_cost() {
+    let input = "an enemy with cost invalid";
+    let lex_result = lexer_tokenize::lex(input).unwrap();
+    let bindings = VariableBindings::new();
+    let resolved = parser_substitutions::resolve_variables(&lex_result.tokens, &bindings).unwrap();
+
+    let parser = predicate_parser::predicate_parser();
+    let result = parser.parse(&resolved).into_result();
+
+    assert!(result.is_err());
+}
+
+#[test]
+fn test_predicate_missing_spark_value() {
+    let input = "an enemy with spark";
+    let lex_result = lexer_tokenize::lex(input).unwrap();
+    let bindings = VariableBindings::new();
+    let resolved = parser_substitutions::resolve_variables(&lex_result.tokens, &bindings).unwrap();
+
+    let parser = predicate_parser::predicate_parser();
+    let result = parser.parse(&resolved).into_result();
+
+    assert!(result.is_err());
+}
+
+#[test]
+fn test_incomplete_predicate() {
+    let input = "an enemy with";
+    let lex_result = lexer_tokenize::lex(input).unwrap();
+    let bindings = VariableBindings::new();
+    let resolved = parser_substitutions::resolve_variables(&lex_result.tokens, &bindings).unwrap();
+
+    let parser = predicate_parser::predicate_parser();
+    let result = parser.parse(&resolved).into_result();
+
+    assert!(result.is_err());
 }

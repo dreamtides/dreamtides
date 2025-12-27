@@ -60,27 +60,23 @@ fn your_void_parser<'a>() -> impl Parser<'a, ParserInput<'a>, Predicate, ParserE
 
 fn enemy_parser<'a>() -> impl Parser<'a, ParserInput<'a>, Predicate, ParserExtra<'a>> + Clone {
     choice((
-        word("an").ignore_then(word("enemy")).ignore_then(card_predicate_parser()),
-        word("an").ignore_then(word("enemy")).to(CardPredicate::Character),
+        words(&["an", "enemy"]).ignore_then(card_predicate_parser()).map(Predicate::Enemy),
+        words(&["an", "enemy"]).to(Predicate::Enemy(CardPredicate::Character)),
     ))
-    .map(Predicate::Enemy)
 }
 
 fn another_parser<'a>() -> impl Parser<'a, ParserInput<'a>, Predicate, ParserExtra<'a>> + Clone {
     choice((
-        words(&["another", "card"]).ignore_then(card_predicate_parser()).map(Predicate::Another),
-        words(&["another", "character"])
-            .ignore_then(card_predicate_parser())
-            .map(Predicate::Another),
-        words(&["another", "ally"]).ignore_then(card_predicate_parser()).map(Predicate::Another),
-        words(&["another", "card"]).to(Predicate::Another(CardPredicate::Card)),
-        words(&["another", "character"]).to(Predicate::Another(CardPredicate::Character)),
-        words(&["another", "ally"]).to(Predicate::Another(CardPredicate::Character)),
+        word("another").ignore_then(card_predicate_parser()).map(Predicate::Another),
+        word("another").to(Predicate::Another(CardPredicate::Card)),
     ))
 }
 
 fn any_other_parser<'a>() -> impl Parser<'a, ParserInput<'a>, Predicate, ParserExtra<'a>> + Clone {
-    words(&["any", "other"]).ignore_then(card_predicate_parser()).map(Predicate::AnyOther)
+    choice((
+        words(&["any", "other"]).ignore_then(card_predicate_parser()).map(Predicate::AnyOther),
+        words(&["any", "other"]).to(Predicate::AnyOther(CardPredicate::Card)),
+    ))
 }
 
 fn your_parser<'a>() -> impl Parser<'a, ParserInput<'a>, Predicate, ParserExtra<'a>> + Clone {
@@ -89,26 +85,21 @@ fn your_parser<'a>() -> impl Parser<'a, ParserInput<'a>, Predicate, ParserExtra<
             .ignore_then(card_predicate_parser())
             .map(Predicate::Your),
         words(&["an", "ally"]).ignore_then(card_predicate_parser()).map(Predicate::Your),
-        words(&["a", "character", "you", "control"]).to(Predicate::Your(CardPredicate::Character)),
-        words(&["an", "ally"]).to(Predicate::Your(CardPredicate::Character)),
         words(&["an", "allied"])
             .ignore_then(subtype())
             .map(|s| Predicate::Your(CardPredicate::CharacterType(s))),
         words(&["allied"])
             .ignore_then(subtype())
             .map(|s| Predicate::Your(CardPredicate::CharacterType(s))),
+        words(&["a", "character", "you", "control"]).to(Predicate::Your(CardPredicate::Character)),
+        words(&["an", "ally"]).to(Predicate::Your(CardPredicate::Character)),
     ))
 }
 
 fn any_parser<'a>() -> impl Parser<'a, ParserInput<'a>, Predicate, ParserExtra<'a>> + Clone {
     choice((
-        words(&["a", "chosen"]).ignore_then(card_predicate_parser()).map(Predicate::Any),
-        words(&["a", "card"]).ignore_then(card_predicate_parser()).map(Predicate::Any),
-        words(&["a", "character"]).ignore_then(card_predicate_parser()).map(Predicate::Any),
-        words(&["an", "event"]).ignore_then(card_predicate_parser()).map(Predicate::Any),
-        words(&["a", "card"]).to(Predicate::Any(CardPredicate::Card)),
-        words(&["a", "character"]).to(Predicate::Any(CardPredicate::Character)),
-        words(&["an", "event"]).to(Predicate::Any(CardPredicate::Event)),
+        word("a").ignore_then(card_predicate_parser()).map(Predicate::Any),
+        word("an").ignore_then(card_predicate_parser()).map(Predicate::Any),
         subtype().map(|s| Predicate::Any(CardPredicate::CharacterType(s))),
     ))
 }
@@ -118,6 +109,8 @@ fn card_predicate_parser<'a>(
     recursive(|cp| {
         choice((
             fast_parser(cp.clone()),
+            with_spark_parser(),
+            with_cost_parser(),
             character_with_spark_parser(),
             character_with_cost_parser(),
             character_with_cost_compared_to_controlled(),
@@ -129,6 +122,7 @@ fn card_predicate_parser<'a>(
             not_character_type_parser(),
             character_type_parser(),
             event_parser(),
+            ally_parser(),
             character_parser(),
             card_parser(),
         ))
@@ -149,6 +143,10 @@ fn event_parser<'a>() -> impl Parser<'a, ParserInput<'a>, CardPredicate, ParserE
     word("event").to(CardPredicate::Event)
 }
 
+fn ally_parser<'a>() -> impl Parser<'a, ParserInput<'a>, CardPredicate, ParserExtra<'a>> + Clone {
+    word("ally").to(CardPredicate::Character)
+}
+
 fn character_type_parser<'a>(
 ) -> impl Parser<'a, ParserInput<'a>, CardPredicate, ParserExtra<'a>> + Clone {
     subtype().map(CardPredicate::CharacterType)
@@ -165,6 +163,25 @@ fn fast_parser<'a>(
     directive("fast")
         .ignore_then(target.or(just::<_, ParserInput, ParserExtra>(&[]).to(CardPredicate::Card)))
         .map(|target| CardPredicate::Fast { target: Box::new(target) })
+}
+
+fn with_cost_parser<'a>() -> impl Parser<'a, ParserInput<'a>, CardPredicate, ParserExtra<'a>> + Clone
+{
+    words(&["with", "cost"]).ignore_then(energy()).then(energy_operator_parser()).map(|(e, op)| {
+        CardPredicate::CardWithCost {
+            target: Box::new(CardPredicate::Character),
+            cost_operator: op,
+            cost: Energy(e),
+        }
+    })
+}
+
+fn with_spark_parser<'a>(
+) -> impl Parser<'a, ParserInput<'a>, CardPredicate, ParserExtra<'a>> + Clone {
+    words(&["with", "spark"])
+        .ignore_then(spark())
+        .then(spark_operator_parser())
+        .map(|(s, op)| CardPredicate::CharacterWithSpark(Spark(s), op))
 }
 
 fn character_with_spark_parser<'a>(
