@@ -1,12 +1,12 @@
 set positional-arguments
 
-code-review: check-format build workspace-lints clippy test tabula-verify-vba tabula-validate check-docs unity-tests
+code-review: check-format build workspace-lints clippy style-validator test tabula-verify-vba tabula-validate check-docs unity-tests
 
 # Run this before pushing
 code-review-rsync: rsync-for-review
     cd ~/dreamtides_tests && just code-review || (osascript -e 'display dialog "Review failed" with icon stop'; exit 1)
 
-review: check-format build workspace-lints clippy test
+review: check-format build workspace-lints clippy style-validator test
 
 check:
     #!/usr/bin/env bash
