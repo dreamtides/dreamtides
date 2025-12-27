@@ -2,9 +2,9 @@ use std::net::IpAddr;
 
 use anyhow::Result;
 
-use crate::server;
-use crate::server::ServerConfig;
+use crate::server::server_config;
+use crate::server::server_config::ServerConfig;
 
 pub fn server(host: IpAddr, port: u16, max_payload_bytes: usize, once: bool) -> Result<()> {
-    server::run(ServerConfig { host, port, max_payload_bytes, once })
+    server_config::run(ServerConfig { host, port, max_payload_bytes, once })
 }

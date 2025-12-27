@@ -16,6 +16,7 @@ pub enum ViolationKind {
     TypeShouldNotBeQualified,
     EnumVariantTooManyQualifiers,
     DirectFunctionImport,
+    CodeInModLibFile,
 }
 
 impl ViolationKind {
@@ -32,6 +33,9 @@ impl ViolationKind {
             }
             ViolationKind::DirectFunctionImport => {
                 "function imported directly in use statement (should use module::function_name at call site instead)"
+            }
+            ViolationKind::CodeInModLibFile => {
+                "code added to mod.rs or lib.rs file (only mod declarations allowed)"
             }
         }
     }

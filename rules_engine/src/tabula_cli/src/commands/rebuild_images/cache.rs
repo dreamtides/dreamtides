@@ -5,7 +5,7 @@ use std::path::{Path, PathBuf};
 use anyhow::{Context, Result, bail};
 use serde::Deserialize;
 
-use super::{FileRecord, read_zip, write_zip};
+use super::rebuild::{FileRecord, read_zip, write_zip};
 use crate::core::paths;
 
 const MANIFEST_FILENAME: &str = "_xlsm_manifest.json";

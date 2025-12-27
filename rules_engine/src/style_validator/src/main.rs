@@ -4,6 +4,7 @@ use anyhow::Result;
 
 mod direct_function_imports;
 mod file_scanner;
+mod mod_lib_files;
 mod qualified_imports;
 mod violation;
 
@@ -28,6 +29,15 @@ fn main() -> Result<()> {
     // Run per-file checks
     for file in &rust_files {
         match qualified_imports::check_file(file) {
+            Ok(violations) => {
+                all_violations.extend(violations);
+            }
+            Err(e) => {
+                eprintln!("Error checking {}: {}", file.display(), e);
+            }
+        }
+
+        match mod_lib_files::check_file(file) {
             Ok(violations) => {
                 all_violations.extend(violations);
             }

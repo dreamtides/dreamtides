@@ -1,6 +1,6 @@
 use std::fs;
 
-use tabula_cli::commands::validate::ValidateConfig;
+use tabula_cli::commands::validate::runner::ValidateConfig;
 use tabula_cli::commands::{build_toml, validate};
 use tabula_cli_tests::tabula_cli_test_utils;
 use tempfile::TempDir;
@@ -17,7 +17,7 @@ fn validate_round_trip_succeeds() {
     let toml_dir = assets_dir.join("Tabula");
     build_toml::build_toml(Some(xlsm_path.clone()), Some(toml_dir.clone())).expect("build toml");
 
-    let result = validate::validate(
+    let result = validate::runner::validate(
         ValidateConfig { strip_images: false, report_all: false, verbose: false },
         Some(toml_dir),
         Some(xlsm_path),
@@ -52,7 +52,7 @@ active = false
 "#;
     fs::write(toml_dir.join("test-table.toml"), toml).expect("write toml");
 
-    let result = validate::validate(
+    let result = validate::runner::validate(
         ValidateConfig { strip_images: false, report_all: false, verbose: false },
         Some(toml_dir),
         Some(xlsm_path),
@@ -80,7 +80,7 @@ fn validate_strip_images_round_trip_succeeds() {
     let toml_dir = assets_dir.join("Tabula");
     build_toml::build_toml(Some(xlsm_path.clone()), Some(toml_dir.clone())).expect("build toml");
 
-    let result = validate::validate(
+    let result = validate::runner::validate(
         ValidateConfig { strip_images: true, report_all: false, verbose: false },
         Some(toml_dir),
         Some(xlsm_path),

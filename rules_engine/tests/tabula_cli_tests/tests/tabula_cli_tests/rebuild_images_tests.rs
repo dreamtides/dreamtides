@@ -22,7 +22,7 @@ fn rebuild_images_restores_from_cache() {
     let stripped = temp_dir.path().join("stripped.xlsm");
     strip_images::strip_images(Some(xlsm_path.clone()), Some(stripped.clone())).expect("strip");
 
-    rebuild_images::rebuild_images(Some(stripped.clone()), false, false).expect("rebuild");
+    rebuild_images::rebuild::rebuild_images(Some(stripped.clone()), false, false).expect("rebuild");
 
     let mut archive = ZipArchive::new(File::open(&stripped).expect("open output")).expect("zip");
     let mut names = Vec::new();
@@ -65,8 +65,11 @@ fn rebuild_images_from_urls_with_stubbed_downloader() {
         Ok(map)
     };
 
-    rebuild_images::rebuild_images_from_urls_with_downloader(Some(xlsm_path.clone()), &downloader)
-        .expect("rebuild");
+    rebuild_images::rebuild::rebuild_images_from_urls_with_downloader(
+        Some(xlsm_path.clone()),
+        &downloader,
+    )
+    .expect("rebuild");
 
     let mut archive = ZipArchive::new(File::open(&xlsm_path).expect("open output")).expect("zip");
     let mut img_data = Vec::new();
@@ -117,7 +120,8 @@ fn rebuild_images_handles_missing_optional_entries() {
     });
     fs::write(cache_dir.join("_xlsm_manifest.json"), manifest.to_string()).expect("manifest");
 
-    rebuild_images::rebuild_images(Some(xlsm_path.clone()), false, false).expect("rebuild");
+    rebuild_images::rebuild::rebuild_images(Some(xlsm_path.clone()), false, false)
+        .expect("rebuild");
 
     let mut archive = ZipArchive::new(File::open(&xlsm_path).expect("open output")).expect("zip");
     let mut img1_data = Vec::new();

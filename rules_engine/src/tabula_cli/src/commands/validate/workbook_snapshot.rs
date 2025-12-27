@@ -10,7 +10,7 @@ use umya_spreadsheet::structs::{
 };
 use umya_spreadsheet::{DataValidationValues, Worksheet};
 
-use super::{ValidateConfig, record_error};
+use super::runner::{ValidateConfig, record_error};
 
 #[derive(Clone)]
 pub(super) struct WorkbookSnapshot {

@@ -5,7 +5,7 @@ use std::path::Path;
 use anyhow::{Context, Result, bail};
 use toml::{Table, Value};
 
-use super::record_error;
+use super::runner::record_error;
 use crate::core::{column_names, toml_data};
 
 #[derive(Clone)]

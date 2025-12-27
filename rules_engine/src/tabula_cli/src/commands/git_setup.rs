@@ -10,7 +10,8 @@ use clap::ValueEnum;
 use toml::Value;
 use zip::ZipArchive;
 
-use crate::commands::{build_toml, rebuild_images, strip_images};
+use crate::commands::rebuild_images::rebuild;
+use crate::commands::{build_toml, strip_images};
 use crate::core::{column_names, excel_reader, paths, toml_data};
 
 #[derive(Clone, Copy, ValueEnum)]
@@ -84,7 +85,7 @@ fn rebuild_after_checkout(root: &Path) -> Result<()> {
             xlsm_path.parent().unwrap_or(Path::new(".")).display()
         )
     })?;
-    rebuild_images::rebuild_images(Some(xlsm_path), false, true)
+    rebuild::rebuild_images(Some(xlsm_path), false, true)
 }
 
 fn ensure_toml_not_newer(root: &Path, xlsm_path: &Path, toml_dir: &Path) -> Result<()> {

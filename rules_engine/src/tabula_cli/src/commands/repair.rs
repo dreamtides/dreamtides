@@ -8,13 +8,13 @@ use zip::read::ZipFile;
 use zip::write::FileOptions;
 use zip::{DateTime, ZipArchive, ZipWriter};
 
-use crate::commands::rebuild_images;
+use crate::commands::rebuild_images::rebuild;
 use crate::core::paths;
 
 pub fn repair(xlsm_path: Option<PathBuf>, rebuild_media: bool) -> Result<()> {
     let path = resolve_xlsm_path(xlsm_path)?;
     repair_archive(&path)?;
-    if rebuild_media { rebuild_images::rebuild_images(Some(path), false, true) } else { Ok(()) }
+    if rebuild_media { rebuild::rebuild_images(Some(path), false, true) } else { Ok(()) }
 }
 
 fn resolve_xlsm_path(xlsm_path: Option<PathBuf>) -> Result<PathBuf> {

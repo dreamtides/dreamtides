@@ -4,9 +4,10 @@ use std::path::PathBuf;
 use anyhow::Result;
 use clap::{Parser, Subcommand};
 use tabula_cli::commands::git_setup::Hook;
+use tabula_cli::commands::rebuild_images::rebuild;
+use tabula_cli::commands::validate::runner;
 use tabula_cli::commands::{
-    build_toml, build_xls, git_setup, rebuild_images, repair, server, server_install, strip_images,
-    validate,
+    build_toml, build_xls, git_setup, repair, server, server_install, strip_images,
 };
 
 #[derive(Parser)]
@@ -144,8 +145,8 @@ fn run() -> Result<()> {
             build_xls::build_xls(dry_run, toml_dir, xlsm_path, output_path)?;
         }
         Commands::Validate { strip_images, all, verbose, toml_dir } => {
-            validate::validate(
-                validate::ValidateConfig { strip_images, report_all: all, verbose },
+            runner::validate(
+                runner::ValidateConfig { strip_images, report_all: all, verbose },
                 toml_dir,
                 None,
             )?;
@@ -154,7 +155,7 @@ fn run() -> Result<()> {
             strip_images::strip_images(xlsm_path, output_path)?;
         }
         Commands::RebuildImages { xlsm_path, from_urls, auto } => {
-            rebuild_images::rebuild_images(xlsm_path, from_urls, auto)?;
+            rebuild::rebuild_images(xlsm_path, from_urls, auto)?;
         }
         Commands::GitSetup => git_setup::git_setup()?,
         Commands::ServerInstall => server_install::server_install()?,

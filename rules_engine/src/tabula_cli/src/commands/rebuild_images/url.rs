@@ -11,7 +11,7 @@ use reqwest::header::{
 };
 use roxmltree::Document;
 
-use super::{FileRecord, read_zip, write_zip};
+use super::rebuild::{FileRecord, read_zip, write_zip};
 
 const MAIN_NS: &str = "http://schemas.openxmlformats.org/spreadsheetml/2006/main";
 const REL_NS: &str = "http://schemas.openxmlformats.org/officeDocument/2006/relationships";
