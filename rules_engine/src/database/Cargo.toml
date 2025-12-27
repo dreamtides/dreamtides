@@ -12,8 +12,8 @@ doctest = false
 bench = false
 
 [dependencies]
-ai_data = { path = "../ai_data" }
 action_data = { path = "../action_data" }
+ai_data = { path = "../ai_data" }
 battle_state = { path = "../battle_state" }
 core_data = { path = "../core_data" }
 game_creation = { path = "../game_creation" }

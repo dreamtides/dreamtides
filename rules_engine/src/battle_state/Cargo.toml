@@ -13,11 +13,14 @@ bench = false
 [dependencies]
 ability_data = { path = "../ability_data" }
 ai_data = { path = "../ai_data" }
-bit-vec = { workspace = true }
 core_data = { path = "../core_data" }
+quest_state = { path = "../quest_state" }
+tabula_data = { path = "../tabula_data" }
+tabula_ids = { path = "../tabula_ids" }
+
+bit-vec = { workspace = true }
 enum-iterator = { workspace = true }
 enumset = { workspace = true }
-quest_state = { path = "../quest_state" }
 rand = { workspace = true }
 rand_xoshiro = { workspace = true }
 schemars = { workspace = true }
@@ -26,6 +29,4 @@ serde_json = { workspace = true }
 serde_with = { workspace = true }
 strum = { workspace = true }
 strum_macros = { workspace = true }
-tabula_data = { path = "../tabula_data" }
-tabula_ids = { path = "../tabula_ids" }
 uuid = { workspace = true }

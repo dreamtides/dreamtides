@@ -15,9 +15,9 @@ test = false
 [dependencies]
 ai_agents = { path = "../ai_agents" }
 ai_data = { path = "../ai_data" }
-battle_state = { path = "../battle_state" }
 battle_mutations = { path = "../battle_mutations" }
 battle_queries = { path = "../battle_queries" }
+battle_state = { path = "../battle_state" }
 core_data = { path = "../core_data" }
 game_creation = { path = "../game_creation" }
 logging = { path = "../logging" }

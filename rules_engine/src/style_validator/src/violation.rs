@@ -18,6 +18,7 @@ pub enum ViolationKind {
     DirectFunctionImport,
     CodeInModLibFile,
     PubUseStatement,
+    CargoTomlDependencyOrder,
 }
 
 impl ViolationKind {
@@ -40,6 +41,9 @@ impl ViolationKind {
             }
             ViolationKind::PubUseStatement => {
                 "pub use statement not permitted (all imports must come from their original file location)"
+            }
+            ViolationKind::CargoTomlDependencyOrder => {
+                "Cargo.toml dependencies must be alphabetized: internal dependencies first, then external dependencies"
             }
         }
     }

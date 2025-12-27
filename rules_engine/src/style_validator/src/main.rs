@@ -2,6 +2,7 @@ use std::path::Path;
 
 use anyhow::Result;
 
+mod cargo_dependencies;
 mod direct_function_imports;
 mod file_scanner;
 mod mod_lib_files;
@@ -9,7 +10,7 @@ mod pub_use;
 mod qualified_imports;
 mod violation;
 
-use file_scanner::find_rust_files;
+use file_scanner::{find_cargo_toml_files, find_rust_files};
 
 fn main() -> Result<()> {
     let rules_engine_path =
@@ -64,6 +65,21 @@ fn main() -> Result<()> {
         }
         Err(e) => {
             eprintln!("Error checking direct function imports: {e}");
+        }
+    }
+
+    // Check Cargo.toml files
+    let cargo_toml_files = find_cargo_toml_files(rules_engine_path);
+    println!("Found {} Cargo.toml files", cargo_toml_files.len());
+
+    for file in &cargo_toml_files {
+        match cargo_dependencies::check_file(file) {
+            Ok(violations) => {
+                all_violations.extend(violations);
+            }
+            Err(e) => {
+                eprintln!("Error checking {}: {}", file.display(), e);
+            }
         }
     }
 
