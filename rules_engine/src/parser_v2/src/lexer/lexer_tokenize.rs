@@ -4,7 +4,7 @@ use std::str::CharIndices;
 use chumsky::span::{SimpleSpan, Span};
 
 use crate::error::parser_errors::LexError;
-use crate::lexer::token::{Spanned, Token};
+use crate::lexer::lexer_token::{Spanned, Token};
 
 #[derive(Debug, Clone)]
 pub struct LexResult {

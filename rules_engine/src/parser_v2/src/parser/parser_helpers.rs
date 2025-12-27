@@ -1,7 +1,7 @@
 use chumsky::prelude::*;
 
-use crate::lexer::token::Token;
-use crate::variables::substitution::ResolvedToken;
+use crate::lexer::lexer_token::Token;
+use crate::variables::parser_substitutions::ResolvedToken;
 
 pub type ParserInput<'a> = &'a [(ResolvedToken, SimpleSpan)];
 pub type ParserExtra<'a> = extra::Err<Rich<'a, (ResolvedToken, SimpleSpan), SimpleSpan>>;

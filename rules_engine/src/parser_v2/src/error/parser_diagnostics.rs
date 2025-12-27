@@ -2,10 +2,10 @@ use ariadne::{Color, Label, Report, ReportKind, Source};
 use chumsky::error::Rich;
 use chumsky::span::{SimpleSpan, Span};
 
+use crate::error::parser_error_suggestions;
 use crate::error::parser_errors::{LexError, ParserError};
-use crate::error::suggestions;
-use crate::lexer::token::Token;
-use crate::variables::substitution::ResolvedToken;
+use crate::lexer::lexer_token::Token;
+use crate::variables::parser_substitutions::ResolvedToken;
 
 pub fn format_error(error: &ParserError, source: &str, filename: &str) -> String {
     let mut output = Vec::new();
@@ -32,7 +32,8 @@ pub fn format_error(error: &ParserError, source: &str, filename: &str) -> String
             let mut label = Label::new((filename, unresolved.span.start()..unresolved.span.end()))
                 .with_color(Color::Red);
 
-            if let Some(suggestions) = suggestions::suggest_variable(&unresolved.name) {
+            if let Some(suggestions) = parser_error_suggestions::suggest_variable(&unresolved.name)
+            {
                 label = label.with_message(format!(
                     "Variable '{}' not found in bindings. Did you mean '{}'?",
                     unresolved.name,
@@ -45,7 +46,8 @@ pub fn format_error(error: &ParserError, source: &str, filename: &str) -> String
 
             report = report.with_label(label);
 
-            if let Some(suggestions) = suggestions::suggest_variable(&unresolved.name) {
+            if let Some(suggestions) = parser_error_suggestions::suggest_variable(&unresolved.name)
+            {
                 report = report
                     .with_note(format!("Available variables include: {}", suggestions.join(", ")));
             }
@@ -115,7 +117,7 @@ fn format_parse_error(
     let found_token = error.found().map(|(token, _)| token);
     let (message, label_message, note) = match found_token {
         Some(ResolvedToken::Token(Token::Word(word))) => {
-            if let Some(suggestions) = suggestions::suggest_word(word) {
+            if let Some(suggestions) = parser_error_suggestions::suggest_word(word) {
                 (
                     format!("Unexpected word '{word}'"),
                     format!("Found '{word}' here. Did you mean '{}'?", suggestions.join("', '")),
@@ -126,7 +128,7 @@ fn format_parse_error(
             }
         }
         Some(ResolvedToken::Token(Token::Directive(name))) => {
-            if let Some(suggestions) = suggestions::suggest_directive(name) {
+            if let Some(suggestions) = parser_error_suggestions::suggest_directive(name) {
                 (
                     format!("Unexpected directive '{{{name}}}'"),
                     format!(

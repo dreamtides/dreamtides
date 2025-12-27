@@ -1,2 +1,2 @@
-pub mod binding;
-pub mod substitution;
+pub mod parser_bindings;
+pub mod parser_substitutions;

@@ -1,8 +1,8 @@
 use chumsky::error::Rich;
 use chumsky::span::SimpleSpan;
 
-use crate::variables::binding::ParseError as VariableParseError;
-use crate::variables::substitution::{ResolvedToken, UnresolvedVariable};
+use crate::variables::parser_bindings::ParseError as VariableParseError;
+use crate::variables::parser_substitutions::{ResolvedToken, UnresolvedVariable};
 
 #[derive(Debug, Clone, thiserror::Error)]
 pub enum LexError {

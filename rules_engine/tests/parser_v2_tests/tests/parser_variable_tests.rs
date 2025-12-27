@@ -4,9 +4,11 @@ use ability_data::variable_value::VariableValue;
 use chumsky::span::{SimpleSpan, Span};
 use core_data::card_types::CardSubtype;
 use core_data::figment_type::FigmentType;
-use parser_v2::lexer::token::Token;
-use parser_v2::variables::binding::VariableBindings;
-use parser_v2::variables::substitution::{resolve_variables, variable_names, ResolvedToken};
+use parser_v2::lexer::lexer_token::Token;
+use parser_v2::variables::parser_bindings::VariableBindings;
+use parser_v2::variables::parser_substitutions::{
+    resolve_variables, variable_names, ResolvedToken,
+};
 use regex::Regex;
 
 #[test]

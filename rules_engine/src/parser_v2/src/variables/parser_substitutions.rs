@@ -3,8 +3,8 @@ use core_data::card_types::CardSubtype;
 use core_data::figment_type::FigmentType;
 use serde::Serialize;
 
-use crate::lexer::token::{Spanned, Token};
-use crate::variables::binding::VariableBindings;
+use crate::lexer::lexer_token::{Spanned, Token};
+use crate::variables::parser_bindings::VariableBindings;
 
 pub fn resolve_variables(
     tokens: &[Spanned<Token>],

@@ -1,2 +1,2 @@
-pub mod token;
-pub mod tokenize;
+pub mod lexer_token;
+pub mod lexer_tokenize;

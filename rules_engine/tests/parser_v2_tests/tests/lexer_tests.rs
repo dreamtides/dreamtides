@@ -1,7 +1,7 @@
 use chumsky::span::{SimpleSpan, Span};
 use parser_v2::error::parser_errors::LexError;
-use parser_v2::lexer::token::Token;
-use parser_v2::lexer::tokenize::{lex, LexResult};
+use parser_v2::lexer::lexer_token::Token;
+use parser_v2::lexer::lexer_tokenize::{lex, LexResult};
 
 fn tokens(result: &LexResult) -> Vec<&Token> {
     result.tokens.iter().map(|(t, _)| t).collect()

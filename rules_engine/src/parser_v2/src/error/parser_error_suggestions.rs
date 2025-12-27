@@ -1,4 +1,4 @@
-use crate::variables::substitution;
+use crate::variables::parser_substitutions;
 
 static PARSER_WORDS: &[&str] = &[
     "abandon",
@@ -59,11 +59,11 @@ static PARSER_WORDS: &[&str] = &[
 ];
 
 pub fn suggest_directive(name: &str) -> Option<Vec<String>> {
-    find_suggestions(name, substitution::directive_names().collect())
+    find_suggestions(name, parser_substitutions::directive_names().collect())
 }
 
 pub fn suggest_variable(name: &str) -> Option<Vec<String>> {
-    find_suggestions(name, substitution::variable_names().collect())
+    find_suggestions(name, parser_substitutions::variable_names().collect())
 }
 
 pub fn suggest_word(word: &str) -> Option<Vec<String>> {

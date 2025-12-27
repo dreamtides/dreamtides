@@ -1,24 +1,24 @@
 use ability_data::standard_effect::StandardEffect;
 use chumsky::prelude::*;
 use insta::assert_ron_snapshot;
-use parser_v2::lexer::tokenize;
+use parser_v2::lexer::lexer_tokenize;
 use parser_v2::parser::effect_parser;
-use parser_v2::variables::binding::VariableBindings;
-use parser_v2::variables::substitution;
+use parser_v2::variables::parser_bindings::VariableBindings;
+use parser_v2::variables::parser_substitutions;
 
 fn parse_effect(input: &str, vars: &str) -> StandardEffect {
-    let lex_result = tokenize::lex(input).unwrap();
+    let lex_result = lexer_tokenize::lex(input).unwrap();
     let bindings = VariableBindings::parse(vars).unwrap();
-    let resolved = substitution::resolve_variables(&lex_result.tokens, &bindings).unwrap();
+    let resolved = parser_substitutions::resolve_variables(&lex_result.tokens, &bindings).unwrap();
 
     let parser = effect_parser::single_effect_parser();
     parser.parse(&resolved).into_result().unwrap()
 }
 
 fn try_parse_effect(input: &str, vars: &str) -> Option<StandardEffect> {
-    let lex_result = tokenize::lex(input).ok()?;
+    let lex_result = lexer_tokenize::lex(input).ok()?;
     let bindings = VariableBindings::parse(vars).ok()?;
-    let resolved = substitution::resolve_variables(&lex_result.tokens, &bindings).ok()?;
+    let resolved = parser_substitutions::resolve_variables(&lex_result.tokens, &bindings).ok()?;
 
     let parser = effect_parser::single_effect_parser();
     parser.parse(&resolved).into_result().ok()

@@ -2,10 +2,10 @@ use std::fs;
 use std::path::Path;
 
 use chumsky::Parser;
-use parser_v2::lexer::tokenize;
-use parser_v2::parser::ability;
-use parser_v2::variables::binding::VariableBindings;
-use parser_v2::variables::substitution;
+use parser_v2::lexer::lexer_tokenize;
+use parser_v2::parser::ability_parser;
+use parser_v2::variables::parser_bindings::VariableBindings;
+use parser_v2::variables::parser_substitutions;
 use serde::Deserialize;
 
 #[derive(Debug, Deserialize, Clone)]
@@ -22,10 +22,10 @@ pub struct BenchmarkCard {
 
 pub fn parse_single_card(text: &str, vars: &str) {
     let bindings = VariableBindings::parse(vars).expect("Failed to parse variables");
-    let lex_result = tokenize::lex(text).expect("Failed to lex text");
-    let resolved = substitution::resolve_variables(&lex_result.tokens, &bindings)
+    let lex_result = lexer_tokenize::lex(text).expect("Failed to lex text");
+    let resolved = parser_substitutions::resolve_variables(&lex_result.tokens, &bindings)
         .expect("Failed to resolve variables");
-    let parser = ability::ability_parser();
+    let parser = ability_parser::ability_parser();
     parser.parse(&resolved).into_result().expect("Failed to parse ability");
 }
 
@@ -50,10 +50,10 @@ pub fn parse_all_cards(cards_file: BenchmarkCardsFile) {
             VariableBindings::new()
         };
 
-        let lex_result = tokenize::lex(rules_text).expect("Failed to lex rules text");
-        let resolved = substitution::resolve_variables(&lex_result.tokens, &bindings)
+        let lex_result = lexer_tokenize::lex(rules_text).expect("Failed to lex rules text");
+        let resolved = parser_substitutions::resolve_variables(&lex_result.tokens, &bindings)
             .expect("Failed to resolve variables");
-        let parser = ability::ability_parser();
+        let parser = ability_parser::ability_parser();
         let _ = parser.parse(&resolved).into_result();
     }
 }

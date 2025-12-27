@@ -3,7 +3,7 @@ use ability_data::ability::{
 };
 use chumsky::span::SimpleSpan;
 
-use crate::builder::spanned::{
+use crate::builder::parser_spans::{
     SpannedAbility, SpannedEffect, SpannedModalEffectChoice, SpannedText,
 };
 

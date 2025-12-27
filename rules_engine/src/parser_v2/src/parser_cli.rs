@@ -6,12 +6,12 @@ use chumsky::span::Span;
 use chumsky::Parser as ChumskyParser;
 use clap::{Parser, Subcommand, ValueEnum};
 use parser_v2::error::parser_errors::ParserError;
-use parser_v2::error::{parser_diagnostics, suggestions};
-use parser_v2::lexer::token::Token;
-use parser_v2::lexer::tokenize;
-use parser_v2::parser::ability;
-use parser_v2::variables::binding::VariableBindings;
-use parser_v2::variables::substitution::{self, ResolvedToken};
+use parser_v2::error::{parser_diagnostics, parser_error_suggestions};
+use parser_v2::lexer::lexer_token::Token;
+use parser_v2::lexer::lexer_tokenize;
+use parser_v2::parser::ability_parser;
+use parser_v2::variables::parser_bindings::VariableBindings;
+use parser_v2::variables::parser_substitutions::{self, ResolvedToken};
 use serde::{Deserialize, Serialize};
 
 #[derive(Parser)]
@@ -139,7 +139,7 @@ fn parse_command(
 
     match stage {
         Stage::Lex => {
-            let lex_result = tokenize::lex(text).map_err(|e| {
+            let lex_result = lexer_tokenize::lex(text).map_err(|e| {
                 let error = ParserError::from(e);
                 parser_diagnostics::format_error(&error, text, "<input>")
             })?;
@@ -147,30 +147,30 @@ fn parse_command(
             output_format(&tokens, format);
         }
         Stage::ResolveVariables => {
-            let lex_result = tokenize::lex(text).map_err(|e| {
+            let lex_result = lexer_tokenize::lex(text).map_err(|e| {
                 let error = ParserError::from(e);
                 parser_diagnostics::format_error(&error, text, "<input>")
             })?;
-            let resolved =
-                substitution::resolve_variables(&lex_result.tokens, &bindings).map_err(|e| {
-                    let error = ParserError::from(e);
-                    parser_diagnostics::format_error(&error, text, "<input>")
-                })?;
+            let resolved = parser_substitutions::resolve_variables(&lex_result.tokens, &bindings)
+                .map_err(|e| {
+                let error = ParserError::from(e);
+                parser_diagnostics::format_error(&error, text, "<input>")
+            })?;
             let resolved_tokens: Vec<&ResolvedToken> = resolved.iter().map(|(t, _)| t).collect();
             output_format(&resolved_tokens, format);
         }
         Stage::Full => {
-            let lex_result = tokenize::lex(text).map_err(|e| {
+            let lex_result = lexer_tokenize::lex(text).map_err(|e| {
                 let error = ParserError::from(e);
                 parser_diagnostics::format_error(&error, text, "<input>")
             })?;
-            let resolved =
-                substitution::resolve_variables(&lex_result.tokens, &bindings).map_err(|e| {
-                    let error = ParserError::from(e);
-                    parser_diagnostics::format_error(&error, text, "<input>")
-                })?;
+            let resolved = parser_substitutions::resolve_variables(&lex_result.tokens, &bindings)
+                .map_err(|e| {
+                let error = ParserError::from(e);
+                parser_diagnostics::format_error(&error, text, "<input>")
+            })?;
 
-            let parser = ability::ability_parser();
+            let parser = ability_parser::ability_parser();
             let parsed = parser
                 .parse(&resolved)
                 .into_result()
@@ -201,8 +201,8 @@ fn parse_file_command(input: &PathBuf, output: &PathBuf) -> Result<(), Box<dyn s
             VariableBindings::new()
         };
 
-        let lex_result = tokenize::lex(rules_text)?;
-        let resolved = substitution::resolve_variables(&lex_result.tokens, &bindings)?;
+        let lex_result = lexer_tokenize::lex(rules_text)?;
+        let resolved = parser_substitutions::resolve_variables(&lex_result.tokens, &bindings)?;
 
         results.push(CardParseResult {
             name: card.name,
@@ -253,9 +253,9 @@ fn verify_command(input: &PathBuf) -> Result<(), Box<dyn std::error::Error>> {
             VariableBindings::new()
         };
 
-        match tokenize::lex(rules_text) {
+        match lexer_tokenize::lex(rules_text) {
             Ok(lex_result) => {
-                match substitution::resolve_variables(&lex_result.tokens, &bindings) {
+                match parser_substitutions::resolve_variables(&lex_result.tokens, &bindings) {
                     Ok(_) => {
                         println!("✓ {}", card.name);
                         success_count += 1;
@@ -317,7 +317,7 @@ fn format_parse_errors<'a>(
             let found_token = e.found().map(|(token, _)| token);
             let (message, label_message, note) = match found_token {
                 Some(ResolvedToken::Token(Token::Word(word))) => {
-                    if let Some(suggestions) = suggestions::suggest_word(word) {
+                    if let Some(suggestions) = parser_error_suggestions::suggest_word(word) {
                         (
                             format!("Unexpected word '{word}'"),
                             format!(
@@ -331,7 +331,7 @@ fn format_parse_errors<'a>(
                     }
                 }
                 Some(ResolvedToken::Token(Token::Directive(name))) => {
-                    if let Some(suggestions) = suggestions::suggest_directive(name) {
+                    if let Some(suggestions) = parser_error_suggestions::suggest_directive(name) {
                         (
                             format!("Unexpected directive '{{{name}}}'"),
                             format!(

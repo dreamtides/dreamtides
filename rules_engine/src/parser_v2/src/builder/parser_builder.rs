@@ -2,12 +2,12 @@ use ability_data::ability::{Ability, EventAbility};
 use ability_data::triggered_ability::TriggeredAbility;
 use chumsky::span::{SimpleSpan, Span};
 
-use crate::builder::spanned::{
+use crate::builder::parser_spans::{
     SpannedAbility, SpannedActivatedAbility, SpannedEffect, SpannedEventAbility, SpannedText,
     SpannedTriggeredAbility,
 };
-use crate::lexer::token::Token;
-use crate::lexer::tokenize::LexResult;
+use crate::lexer::lexer_token::Token;
+use crate::lexer::lexer_tokenize::LexResult;
 
 pub fn build_spanned_ability(ability: &Ability, lex_result: &LexResult) -> Option<SpannedAbility> {
     match ability {

@@ -3,21 +3,21 @@ use ability_data::effect::Effect;
 use ability_data::standard_effect::StandardEffect;
 use chumsky::span::Span;
 use core_data::numerics::Energy;
-use parser_v2::builder::spanned::{SpannedAbility, SpannedEffect};
-use parser_v2::builder::{builder_core, display};
-use parser_v2::lexer::tokenize;
+use parser_v2::builder::parser_spans::{SpannedAbility, SpannedEffect};
+use parser_v2::builder::{parser_builder, parser_display};
+use parser_v2::lexer::lexer_tokenize;
 
 #[test]
 fn test_parse_simple_event_draw() {
     let input = "Draw 2.";
-    let lex_result = tokenize::lex(input).unwrap();
+    let lex_result = lexer_tokenize::lex(input).unwrap();
 
     let ability = Ability::Event(EventAbility {
         additional_cost: None,
         effect: Effect::Effect(StandardEffect::DrawCards { count: 2 }),
     });
 
-    let spanned = builder_core::build_spanned_ability(&ability, &lex_result).unwrap();
+    let spanned = parser_builder::build_spanned_ability(&ability, &lex_result).unwrap();
 
     match &spanned {
         SpannedAbility::Event(event) => {
@@ -34,21 +34,21 @@ fn test_parse_simple_event_draw() {
         _ => panic!("Expected Event variant"),
     }
 
-    let displayed = display::to_displayed_ability(&lex_result.original, &spanned);
+    let displayed = parser_display::to_displayed_ability(&lex_result.original, &spanned);
     assert!(matches!(displayed, ability_data::ability::DisplayedAbility::Event { .. }));
 }
 
 #[test]
 fn test_parse_event_with_cost() {
     let input = "1: Draw 2.";
-    let lex_result = tokenize::lex(input).unwrap();
+    let lex_result = lexer_tokenize::lex(input).unwrap();
 
     let ability = Ability::Event(EventAbility {
         additional_cost: Some(ability_data::cost::Cost::Energy(Energy(1))),
         effect: Effect::Effect(StandardEffect::DrawCards { count: 2 }),
     });
 
-    let spanned = builder_core::build_spanned_ability(&ability, &lex_result).unwrap();
+    let spanned = parser_builder::build_spanned_ability(&ability, &lex_result).unwrap();
 
     match &spanned {
         SpannedAbility::Event(event) => {
@@ -73,7 +73,7 @@ fn test_parse_event_with_cost() {
 #[test]
 fn test_parse_activated_ability() {
     let input = "1: Draw 2.";
-    let lex_result = tokenize::lex(input).unwrap();
+    let lex_result = lexer_tokenize::lex(input).unwrap();
 
     let ability = Ability::Activated(ability_data::activated_ability::ActivatedAbility {
         costs: vec![ability_data::cost::Cost::Energy(Energy(1))],
@@ -81,7 +81,7 @@ fn test_parse_activated_ability() {
         options: None,
     });
 
-    let spanned = builder_core::build_spanned_ability(&ability, &lex_result).unwrap();
+    let spanned = parser_builder::build_spanned_ability(&ability, &lex_result).unwrap();
 
     match &spanned {
         SpannedAbility::Activated(activated) => {
