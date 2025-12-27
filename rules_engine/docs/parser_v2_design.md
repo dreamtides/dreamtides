@@ -72,46 +72,51 @@ rules_engine/src/parser_v2/
 │   ├── parser_cli.rs             # CLI implementation (bin target)
 │   │
 │   ├── lexer/
-│   │   ├── lexer_core.rs         # Lexer entry point and main logic
-│   │   └── lexer_tokens.rs       # Token enum definition
+│   │   ├── mod.rs                # Module declarations
+│   │   ├── lexer_tokenize.rs     # Lexer entry point and main logic
+│   │   └── lexer_token.rs        # Token enum definition
 │   │
 │   ├── variables/
-│   │   ├── variable_binding.rs   # Variable binding types
-│   │   └── variable_substitution.rs # Token substitution logic
+│   │   ├── mod.rs                # Module declarations
+│   │   ├── parser_bindings.rs    # Variable binding types
+│   │   └── parser_substitutions.rs # Token substitution logic
 │   │
 │   ├── parser/
-│   │   ├── parser_core.rs        # Parser orchestration
-│   │   ├── ability_parsers.rs    # Top-level ability parsing
-│   │   ├── triggered_parsers.rs  # Triggered ability parsing
-│   │   ├── activated_parsers.rs  # Activated ability parsing
-│   │   ├── static_ability_parsers.rs # Static ability parsing
-│   │   ├── named_ability_parsers.rs  # Named ability parsing
+│   │   ├── mod.rs                # Module declarations
+│   │   ├── ability_parser.rs     # Top-level ability parsing
+│   │   ├── triggered_parser.rs   # Triggered ability parsing
+│   │   ├── activated_ability_parser.rs # Activated ability parsing
+│   │   ├── static_ability_parser.rs # Static ability parsing
+│   │   ├── named_parser.rs       # Named ability parsing
+│   │   ├── effect_parser.rs      # Effect orchestration
 │   │   ├── effect/
-│   │   │   ├── effect_core.rs    # Effect orchestration
+│   │   │   ├── mod.rs            # Module declarations
 │   │   │   ├── card_effect_parsers.rs   # Draw, discard, materialize, etc.
 │   │   │   ├── spark_effect_parsers.rs  # Kindle, spark gains
 │   │   │   ├── resource_effect_parsers.rs # Energy, points
-│   │   │   ├── control_effect_parsers.rs  # Gain control, disable
-│   │   │   └── game_effect_parsers.rs   # Foresee, prevent, discover
-│   │   ├── trigger_parsers.rs    # Trigger event parsing
-│   │   ├── cost_parsers.rs       # Cost parsing
-│   │   ├── predicate_parsers.rs  # Card predicate parsing
-│   │   ├── condition_parsers.rs  # Condition parsing
+│   │   │   ├── control_effects_parsers.rs  # Gain control, disable
+│   │   │   └── game_effects_parsers.rs   # Foresee, prevent, discover
+│   │   ├── trigger_parser.rs     # Trigger event parsing
+│   │   ├── cost_parser.rs        # Cost parsing
+│   │   ├── predicate_parser.rs   # Card predicate parsing
+│   │   ├── condition_parser.rs   # Condition parsing
 │   │   └── parser_helpers.rs     # Shared parser combinators
 │   │
 │   ├── builder/
-│   │   ├── builder_core.rs       # Ability construction
-│   │   ├── spanned_builder.rs    # SpannedAbility types
+│   │   ├── mod.rs                # Module declarations
+│   │   ├── parser_builder.rs     # Ability construction
+│   │   ├── parser_spans.rs       # SpannedAbility types
 │   │   └── parser_display.rs     # Display text extraction
 │   │
 │   ├── serializer/
-│   │   ├── serializer_core.rs    # Round-trip serialization
-│   │   └── parser_formatter.rs   # Ability → String conversion
+│   │   ├── mod.rs                # Module declarations
+│   │   └── parser_formatter.rs   # Round-trip serialization & Ability → String conversion
 │   │
 │   └── error/
-│       ├── error_types.rs        # Error types
+│       ├── mod.rs                # Module declarations
+│       ├── parser_errors.rs      # Error types
 │       ├── parser_diagnostics.rs # Ariadne integration
-│       └── parser_recovery.rs    # Error recovery strategies
+│       └── parser_error_suggestions.rs # Error recovery strategies
 
 rules_engine/tests/parser_v2_tests/
 ├── Cargo.toml
@@ -452,7 +457,7 @@ ability_parser()
 Effects are split across multiple files for maintainability:
 
 ```rust
-// parser/effect/effect_core.rs
+// parser/effect_parser.rs
 fn effect_parser<'a>() -> impl Parser<'a, ParserInput<'a>, Effect, ParserExtra<'a>> {
     recursive(|effect| {
         choice((
@@ -469,8 +474,8 @@ fn single_effect_parser<'a>() -> impl Parser<'a, ParserInput<'a>, StandardEffect
         card_effect_parsers::parser(),      // draw, discard, materialize, dissolve
         spark_effect_parsers::parser(),     // gain spark, kindle, spark becomes
         resource_effect_parsers::parser(),  // gain energy, gain points
-        control_effect_parsers::parser(),   // gain control, disable abilities
-        game_effect_parsers::parser(),      // foresee, prevent, banish, discover
+        control_effects_parsers::parser(),  // gain control, disable abilities
+        game_effects_parsers::parser(),     // foresee, prevent, banish, discover
     ))
     .boxed()
 }
@@ -930,8 +935,8 @@ Only after proving the end-to-end solution works do we proceed to implement addi
 **Scope:** Implement manual lexer, token types, span tracking
 
 **Deliverables:**
-- `lexer/lexer_core.rs` - Main lexer logic
-- `lexer/lexer_tokens.rs` - Token types and Span
+- `lexer/lexer_tokenize.rs` - Main lexer logic
+- `lexer/lexer_token.rs` - Token types and Span
 - `tests/parser_v2_tests/tests/lexer_tests.rs`
 
 **Test Cards:** Verify lexer correctly tokenizes all 9 representative test cards.
@@ -944,8 +949,8 @@ Only after proving the end-to-end solution works do we proceed to implement addi
 **Scope:** Variable parsing, binding, resolution
 
 **Deliverables:**
-- `variables/variable_binding.rs` - Variable binding types
-- `variables/variable_substitution.rs` - Token substitution logic
+- `variables/parser_bindings.rs` - Variable binding types
+- `variables/parser_substitutions.rs` - Token substitution logic
 - `tests/parser_v2_tests/tests/variable_tests.rs`
 
 **Test Cards:** Verify variables resolve correctly for all 9 representative test cards, including compound directive resolution for card 9.
@@ -959,10 +964,10 @@ Only after proving the end-to-end solution works do we proceed to implement addi
 
 **Deliverables:**
 - `parser/parser_helpers.rs` - Common parser combinators (word, directive, integer, etc.)
-- `parser/parser_core.rs` - Parser orchestration
+- `parser/ability_parser.rs` - Parser orchestration
 - `parser/effect/card_effect_parsers.rs` - Draw, discard, gain energy parsers
-- `parser/effect/effect_core.rs` - Effect parser orchestration (single_effect_parser)
-- `error/error_types.rs` - Error types (ParserError, LexError)
+- `parser/effect_parser.rs` - Effect parser orchestration (single_effect_parser)
+- `error/parser_errors.rs` - Error types (ParserError, LexError)
 - `error/parser_diagnostics.rs` - Ariadne integration
 - Serializer stubs for implemented effects
 
@@ -993,8 +998,8 @@ Only after proving the end-to-end solution works do we proceed to implement addi
 **Rationale:** Display infrastructure is needed early to verify span tracking works correctly before adding more complex parsers.
 
 **Deliverables:**
-- `builder/builder_core.rs` - Ability construction
-- `builder/spanned_builder.rs` - SpannedAbility types
+- `builder/parser_builder.rs` - Ability construction
+- `builder/parser_spans.rs` - SpannedAbility types
 - `builder/parser_display.rs` - Display text extraction
 
 **Test Cards:** Simple effects from Milestone 3 produce correct spans.
@@ -1009,7 +1014,7 @@ Only after proving the end-to-end solution works do we proceed to implement addi
 **Rationale:** Good error messages are essential for debugging as we add more parsers. Implementing this early means all subsequent work benefits from clear diagnostics.
 
 **Deliverables:**
-- `error/parser_recovery.rs` - Error recovery strategies
+- `error/parser_error_suggestions.rs` - Error recovery strategies
 - Enhanced error messages with Ariadne
 
 **Test Cards:** Test malformed versions of simple effects produce helpful errors.
@@ -1037,7 +1042,7 @@ Only after proving the end-to-end solution works do we proceed to implement addi
 **Scope:** All trigger events, keyword triggers
 
 **Deliverables:**
-- `parser/trigger_parsers.rs`
+- `parser/trigger_parser.rs`
 - Tests for trigger parsing
 
 **Test Cards:** Cards 1, 3, 4, 6, 7, 8 (trigger portions only)
@@ -1060,7 +1065,7 @@ Only after proving the end-to-end solution works do we proceed to implement addi
 **Scope:** Card predicates, determiners, targets
 
 **Deliverables:**
-- `parser/predicate_parsers.rs`
+- `parser/predicate_parser.rs`
 - Tests for predicate parsing
 
 **Test Cards:** Cards 2, 6, 7 (predicate portions)
@@ -1073,7 +1078,7 @@ Only after proving the end-to-end solution works do we proceed to implement addi
 **Scope:** All cost types
 
 **Deliverables:**
-- `parser/cost_parsers.rs`
+- `parser/cost_parser.rs`
 - Tests for cost parsing
 
 **Test Cards:** Card 6 (banish cost), card 4 (discard cost trigger cost)
@@ -1088,8 +1093,8 @@ Only after proving the end-to-end solution works do we proceed to implement addi
 **Deliverables:**
 - `parser/effect/spark_effect_parsers.rs`
 - `parser/effect/resource_effect_parsers.rs`
-- `parser/effect/control_effect_parsers.rs`
-- `parser/effect/game_effect_parsers.rs`
+- `parser/effect/control_effects_parsers.rs`
+- `parser/effect/game_effects_parsers.rs`
 - Complete serializer for all effects
 
 **Test Cards:** All 9 representative test cards should now have all effects parsing, including compound directive card 9.
@@ -1102,7 +1107,7 @@ Only after proving the end-to-end solution works do we proceed to implement addi
 **Scope:** Full triggered abilities including "Once per turn"
 
 **Deliverables:**
-- `parser/triggered_parsers.rs`
+- `parser/triggered_parser.rs`
 - Integration tests
 
 **Test Cards:** Cards 1, 3, 4, 6, 7, 8 should fully parse as triggered abilities.
@@ -1115,7 +1120,7 @@ Only after proving the end-to-end solution works do we proceed to implement addi
 **Scope:** Static abilities
 
 **Deliverables:**
-- `parser/static_ability_parsers.rs`
+- `parser/static_ability_parser.rs`
 - Tests for static abilities
 
 **Test Cards:** Card 7 (static: once per turn play from void)
@@ -1128,7 +1133,7 @@ Only after proving the end-to-end solution works do we proceed to implement addi
 **Scope:** Optional effects, conditional effects, trigger costs
 
 **Deliverables:**
-- `parser/condition_parsers.rs`
+- `parser/condition_parser.rs`
 - Updates to effect parser
 
 **Test Cards:** Cards 4 and 6 ("You may...")
@@ -1141,7 +1146,7 @@ Only after proving the end-to-end solution works do we proceed to implement addi
 **Scope:** {ReclaimForCost}, {Fast}
 
 **Deliverables:**
-- `parser/named_ability_parsers.rs`
+- `parser/named_parser.rs`
 
 **Test Cards:** Card 5 ({ReclaimForCost})
 
@@ -1153,7 +1158,7 @@ Only after proving the end-to-end solution works do we proceed to implement addi
 **Scope:** Activated abilities
 
 **Deliverables:**
-- `parser/activated_parsers.rs`
+- `parser/activated_ability_parser.rs`
 
 **Test Cards:** None in representative set, but add test for `{e}: Draw {cards}.`
 
@@ -1165,7 +1170,7 @@ Only after proving the end-to-end solution works do we proceed to implement addi
 **Scope:** {ChooseOne}, {bullet}
 
 **Deliverables:**
-- Modal parser in `parser/effect/effect_core.rs`
+- Modal parser in `parser/effect_parser.rs`
 
 **Test Cards:** Add modal test card from rules_text.json:
 `{ChooseOne}\n{bullet} {e}: Return an enemy to hand.\n{bullet} {e-}: Draw {cards}.`
