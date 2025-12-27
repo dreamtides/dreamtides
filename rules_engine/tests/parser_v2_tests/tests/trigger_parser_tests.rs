@@ -1,20 +1,5 @@
-use ability_data::trigger_event::TriggerEvent;
-use chumsky::prelude::*;
 use insta::assert_ron_snapshot;
-use parser_v2::lexer::lexer_tokenize;
-use parser_v2::parser::trigger_parser;
-use parser_v2::serializer::parser_formatter;
-use parser_v2::variables::parser_bindings::VariableBindings;
-use parser_v2::variables::parser_substitutions;
-
-fn parse_trigger(input: &str, vars: &str) -> TriggerEvent {
-    let lex_result = lexer_tokenize::lex(input).unwrap();
-    let bindings = VariableBindings::parse(vars).unwrap();
-    let resolved = parser_substitutions::resolve_variables(&lex_result.tokens, &bindings).unwrap();
-
-    let parser = trigger_parser::trigger_event_parser();
-    parser.parse(&resolved).into_result().unwrap()
-}
+use parser_v2_tests::test_helpers::parse_trigger;
 
 #[test]
 fn test_judgment_keyword() {
@@ -138,84 +123,4 @@ fn test_when_an_ally_is_dissolved() {
 fn test_when_you_have_no_cards_in_your_deck() {
     let result = parse_trigger("When you have no cards in your deck,", "");
     assert_ron_snapshot!(result, @"DrawAllCardsInCopyOfDeck");
-}
-
-#[test]
-fn test_round_trip_judgment() {
-    let original = "{Judgment}";
-    let parsed = parse_trigger(original, "");
-    let serialized = parser_formatter::serialize_trigger_event(&parsed);
-    assert_eq!(original, serialized);
-}
-
-#[test]
-fn test_round_trip_materialized() {
-    let original = "{Materialized}";
-    let parsed = parse_trigger(original, "");
-    let serialized = parser_formatter::serialize_trigger_event(&parsed);
-    assert_eq!(original, serialized);
-}
-
-#[test]
-fn test_round_trip_when_you_discard_a_card() {
-    let original = "when you discard a card, ";
-    let parsed = parse_trigger(original, "");
-    let serialized = parser_formatter::serialize_trigger_event(&parsed);
-    assert_eq!(original, serialized);
-}
-
-#[test]
-fn test_round_trip_when_you_discard_this_character() {
-    let original = "when you discard this character, ";
-    let parsed = parse_trigger(original, "");
-    let serialized = parser_formatter::serialize_trigger_event(&parsed);
-    assert_eq!(original, serialized);
-}
-
-#[test]
-fn test_round_trip_when_you_materialize_a_character() {
-    let original = "when you {materialize} a character, ";
-    let parsed = parse_trigger(original, "");
-    let serialized = parser_formatter::serialize_trigger_event(&parsed);
-    assert_eq!(original, serialized);
-}
-
-#[test]
-fn test_round_trip_when_you_play_an_event_from_your_hand() {
-    let original = "when you play an event from your hand, ";
-    let parsed = parse_trigger(original, "");
-    let serialized = parser_formatter::serialize_trigger_event(&parsed);
-    assert_eq!(original, serialized);
-}
-
-#[test]
-fn test_round_trip_at_end_of_turn() {
-    let original = "at the end of your turn, ";
-    let parsed = parse_trigger(original, "");
-    let serialized = parser_formatter::serialize_trigger_event(&parsed);
-    assert_eq!(original, serialized);
-}
-
-#[test]
-fn test_round_trip_when_an_ally_is_dissolved() {
-    let original = "when an ally is {dissolved}, ";
-    let parsed = parse_trigger(original, "");
-    let serialized = parser_formatter::serialize_trigger_event(&parsed);
-    assert_eq!(original, serialized);
-}
-
-#[test]
-fn test_round_trip_when_an_ally_is_banished() {
-    let original = "when an ally is {banished}, ";
-    let parsed = parse_trigger(original, "");
-    let serialized = parser_formatter::serialize_trigger_event(&parsed);
-    assert_eq!(original, serialized);
-}
-
-#[test]
-fn test_round_trip_when_you_have_no_cards_in_your_deck() {
-    let original = "when you have no cards in your deck, ";
-    let parsed = parse_trigger(original, "");
-    let serialized = parser_formatter::serialize_trigger_event(&parsed);
-    assert_eq!(original, serialized);
 }

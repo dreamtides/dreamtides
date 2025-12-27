@@ -57,3 +57,9 @@ pub fn points<'a>() -> impl Parser<'a, ParserInput<'a>, u32, ParserExtra<'a>> + 
         (ResolvedToken::Integer { directive, value }, _) if directive == "points" => value
     }
 }
+
+pub fn words<'a>(
+    sequence: &'static [&'static str],
+) -> impl Parser<'a, ParserInput<'a>, (), ParserExtra<'a>> + Clone {
+    sequence.iter().fold(empty().boxed(), |acc, &w| acc.then_ignore(word(w)).boxed())
+}
