@@ -378,6 +378,9 @@ bench-c11:
 bench-full:
     cargo criterion --manifest-path rules_engine/Cargo.toml -p battle_benchmarks -- ai_full/ai_full
 
+bench-parser:
+    cargo criterion --manifest-path rules_engine/Cargo.toml -p parser_v2_benchmarks
+
 iai:
     ./rules_engine/scripts/benchmark_on_linux.py 'iai_benchmarks'
 

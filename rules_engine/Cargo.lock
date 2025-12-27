@@ -2560,8 +2560,8 @@ dependencies = [
  "core_data",
  "insta",
  "parser_v2",
+ "parser_v2_benchmarks",
  "regex",
- "toml",
 ]
 
 [[package]]
