@@ -56,7 +56,14 @@ fn main() -> Result<()> {
 
         match pub_use::check_file(file) {
             Ok(violations) => {
-                all_violations.extend(violations);
+                if !violations.is_empty() && fix_mode {
+                    println!("Fixing pub use statements in {}", file.display());
+                    if let Err(e) = pub_use::fix_file(file) {
+                        eprintln!("Error fixing {}: {}", file.display(), e);
+                    }
+                } else {
+                    all_violations.extend(violations);
+                }
             }
             Err(e) => {
                 eprintln!("Error checking {}: {}", file.display(), e);
@@ -65,7 +72,14 @@ fn main() -> Result<()> {
 
         match inline_use_statements::check_file(file) {
             Ok(violations) => {
-                all_violations.extend(violations);
+                if !violations.is_empty() && fix_mode {
+                    println!("Fixing inline use statements in {}", file.display());
+                    if let Err(e) = inline_use_statements::fix_file(file) {
+                        eprintln!("Error fixing {}: {}", file.display(), e);
+                    }
+                } else {
+                    all_violations.extend(violations);
+                }
             }
             Err(e) => {
                 eprintln!("Error checking {}: {}", file.display(), e);
@@ -108,7 +122,14 @@ fn main() -> Result<()> {
     for file in &cargo_toml_files {
         match cargo_dependencies::check_file(file) {
             Ok(violations) => {
-                all_violations.extend(violations);
+                if !violations.is_empty() && fix_mode {
+                    println!("Fixing dependency order in {}", file.display());
+                    if let Err(e) = cargo_dependencies::fix_file(file) {
+                        eprintln!("Error fixing {}: {}", file.display(), e);
+                    }
+                } else {
+                    all_violations.extend(violations);
+                }
             }
             Err(e) => {
                 eprintln!("Error checking {}: {}", file.display(), e);

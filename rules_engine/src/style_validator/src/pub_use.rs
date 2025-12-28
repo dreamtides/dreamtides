@@ -80,3 +80,37 @@ pub fn check_file(path: &Path) -> Result<Vec<StyleViolation>> {
 
     Ok(checker.violations().to_vec())
 }
+
+pub fn fix_file(path: &Path) -> Result<()> {
+    if is_test_session_prelude(path) {
+        return Ok(());
+    }
+
+    let content = std::fs::read_to_string(path)
+        .with_context(|| format!("Failed to read file: {}", path.display()))?;
+
+    let syntax = syn::parse_file(&content)
+        .with_context(|| format!("Failed to parse file: {}", path.display()))?;
+
+    let mut modified_items = Vec::new();
+
+    for item in syntax.items {
+        match item {
+            Item::Use(mut item_use) if matches!(item_use.vis, Visibility::Public(_)) => {
+                item_use.vis = Visibility::Inherited;
+                modified_items.push(Item::Use(item_use));
+            }
+            other => modified_items.push(other),
+        }
+    }
+
+    let modified_file =
+        syn::File { shebang: syntax.shebang, attrs: syntax.attrs, items: modified_items };
+
+    let output = prettyplease::unparse(&modified_file);
+
+    std::fs::write(path, output)
+        .with_context(|| format!("Failed to write file: {}", path.display()))?;
+
+    Ok(())
+}
