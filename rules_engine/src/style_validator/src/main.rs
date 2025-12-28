@@ -17,6 +17,7 @@ use file_scanner::{find_cargo_toml_files, find_rust_files};
 fn main() -> Result<()> {
     let args: Vec<String> = std::env::args().collect();
     let check_code_order = args.contains(&"--code-order".to_string());
+    let fix_mode = args.contains(&"--fix".to_string());
 
     let rules_engine_path =
         Path::new(env!("CARGO_MANIFEST_DIR")).parent().unwrap().parent().unwrap();
@@ -74,7 +75,14 @@ fn main() -> Result<()> {
         if check_code_order {
             match code_order::check_file(file) {
                 Ok(violations) => {
-                    all_violations.extend(violations);
+                    if !violations.is_empty() && fix_mode {
+                        println!("Fixing code order in {}", file.display());
+                        if let Err(e) = code_order::fix_file(file) {
+                            eprintln!("Error fixing {}: {}", file.display(), e);
+                        }
+                    } else {
+                        all_violations.extend(violations);
+                    }
                 }
                 Err(e) => {
                     eprintln!("Error checking {}: {}", file.display(), e);

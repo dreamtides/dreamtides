@@ -144,7 +144,7 @@ fn log_tabula_row_error(index: usize, v: &Value, s: &str, err: &PathError<JsonEr
         _ => eprintln!(
             "\n{header}\n  \x1b[1mRow\x1b[0m: {index}\n{path_line}\n{error_line}\n{context_line}\n{row_line}\n"
         ),
-    }
+    };
 }
 
 fn error_context_snippet(s: &str, json_error: &JsonError) -> String {

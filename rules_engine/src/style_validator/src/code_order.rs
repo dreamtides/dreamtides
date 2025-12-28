@@ -117,3 +117,57 @@ pub fn check_file(path: &Path) -> Result<Vec<StyleViolation>> {
 
     Ok(checker.violations().to_vec())
 }
+
+pub fn fix_file(path: &Path) -> Result<()> {
+    let content = std::fs::read_to_string(path)
+        .with_context(|| format!("Failed to read file: {}", path.display()))?;
+
+    let syntax = syn::parse_file(&content)
+        .with_context(|| format!("Failed to parse file: {}", path.display()))?;
+
+    let mut categorized_items: Vec<(ItemCategory, String)> = Vec::new();
+    let mut use_and_mod_items: Vec<String> = Vec::new();
+
+    for item in syntax.items {
+        if matches!(item, Item::Use(_) | Item::Mod(_)) {
+            use_and_mod_items.push(prettyplease::unparse(&syn::File {
+                shebang: None,
+                attrs: Vec::new(),
+                items: vec![item],
+            }));
+        } else {
+            let formatted_item = prettyplease::unparse(&syn::File {
+                shebang: None,
+                attrs: Vec::new(),
+                items: vec![item.clone()],
+            });
+            categorized_items.push((CodeOrderChecker::categorize_item(&item), formatted_item));
+        }
+    }
+
+    categorized_items.sort_by_key(|(category, _)| *category);
+
+    let mut output = String::new();
+
+    for item_str in &use_and_mod_items {
+        output.push_str(item_str.trim());
+        output.push('\n');
+    }
+
+    if !use_and_mod_items.is_empty() && !categorized_items.is_empty() {
+        output.push('\n');
+    }
+
+    for (i, (_, item_str)) in categorized_items.iter().enumerate() {
+        if i > 0 {
+            output.push('\n');
+        }
+        output.push_str(item_str.trim());
+        output.push('\n');
+    }
+
+    std::fs::write(path, output)
+        .with_context(|| format!("Failed to write file: {}", path.display()))?;
+
+    Ok(())
+}

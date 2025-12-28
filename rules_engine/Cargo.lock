@@ -3663,6 +3663,7 @@ name = "style_validator"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "prettyplease",
  "proc-macro2",
  "quote",
  "syn",
