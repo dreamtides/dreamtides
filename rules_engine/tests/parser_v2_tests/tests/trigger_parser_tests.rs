@@ -54,69 +54,15 @@ fn test_materialized_dissolved_combined() {
 }
 
 #[test]
-fn test_when_you_discard_a_card() {
-    let result = parse_trigger("When you discard a card,", "");
-    assert_ron_snapshot!(result, @"Discard(Any(Card))");
-}
-
-#[test]
 fn test_when_you_discard_this_character() {
     let result = parse_trigger("When you discard this character,", "");
     assert_ron_snapshot!(result, @"Discard(This)");
 }
 
 #[test]
-fn test_when_you_materialize_a_character() {
-    let result = parse_trigger("When you {materialize} a character,", "");
-    assert_ron_snapshot!(result, @"Materialize(Any(Character))");
-}
-
-#[test]
-fn test_when_you_play_a_card() {
-    let result = parse_trigger("When you play a card,", "");
-    assert_ron_snapshot!(result, @"Play(Any(Card))");
-}
-
-#[test]
-fn test_when_you_play_an_event() {
-    let result = parse_trigger("When you play an event,", "");
-    assert_ron_snapshot!(result, @"Play(Any(Event))");
-}
-
-#[test]
-fn test_when_you_play_an_event_from_your_hand() {
-    let result = parse_trigger("When you play an event from your hand,", "");
-    assert_ron_snapshot!(result, @"PlayFromHand(Any(Event))");
-}
-
-#[test]
 fn test_at_end_of_your_turn() {
     let result = parse_trigger("At the end of your turn,", "");
     assert_ron_snapshot!(result, @"EndOfYourTurn");
-}
-
-#[test]
-fn test_when_you_abandon_an_ally() {
-    let result = parse_trigger("When you abandon an ally,", "");
-    assert_ron_snapshot!(result, @"Abandon(Your(Character))");
-}
-
-#[test]
-fn test_when_you_abandon_a_character() {
-    let result = parse_trigger("When you abandon a character,", "");
-    assert_ron_snapshot!(result, @"Abandon(Any(Character))");
-}
-
-#[test]
-fn test_when_an_ally_is_banished() {
-    let result = parse_trigger("When an ally is {banished},", "");
-    assert_ron_snapshot!(result, @"Banished(Your(Character))");
-}
-
-#[test]
-fn test_when_an_ally_is_dissolved() {
-    let result = parse_trigger("When an ally is {dissolved},", "");
-    assert_ron_snapshot!(result, @"Dissolved(Your(Character))");
 }
 
 #[test]

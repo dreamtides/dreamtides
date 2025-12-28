@@ -1,5 +1,6 @@
 pub mod ability_parser;
 pub mod activated_ability_parser;
+pub mod card_predicate_parser;
 pub mod condition_parser;
 pub mod cost_parser;
 pub mod effect;
