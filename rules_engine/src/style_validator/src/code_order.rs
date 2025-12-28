@@ -9,6 +9,8 @@ use crate::violation::{StyleViolation, ViolationKind};
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 enum ItemCategory {
     PrivateConst,
+    PrivateStatic,
+    ThreadLocal,
     PublicTypeAlias,
     PublicConst,
     PublicTrait,
@@ -63,9 +65,20 @@ impl CodeOrderChecker {
         }
     }
 
+    fn is_thread_local(item: &Item) -> bool {
+        if let Item::Macro(m) = item {
+            m.mac.path.is_ident("thread_local")
+        } else {
+            false
+        }
+    }
+
     fn categorize_item(item: &Item) -> ItemCategory {
         match item {
             Item::Const(c) if !matches!(c.vis, Visibility::Public(_)) => ItemCategory::PrivateConst,
+            Item::Static(s) if !matches!(s.vis, Visibility::Public(_)) => {
+                ItemCategory::PrivateStatic
+            }
             Item::Type(t) if matches!(t.vis, Visibility::Public(_)) => {
                 ItemCategory::PublicTypeAlias
             }
@@ -85,6 +98,8 @@ impl CodeOrderChecker {
     fn category_name(category: ItemCategory) -> &'static str {
         match category {
             ItemCategory::PrivateConst => "private constants",
+            ItemCategory::PrivateStatic => "private statics",
+            ItemCategory::ThreadLocal => "thread_local items",
             ItemCategory::PublicTypeAlias => "public type aliases",
             ItemCategory::PublicConst => "public constants",
             ItemCategory::PublicTrait => "public traits",
@@ -107,6 +122,8 @@ impl CodeOrderChecker {
 
             let category = if Self::is_test_module(item) {
                 ItemCategory::TestModule
+            } else if Self::is_thread_local(item) {
+                ItemCategory::ThreadLocal
             } else {
                 Self::categorize_item(item)
             };
@@ -169,6 +186,8 @@ pub fn fix_file(path: &Path) -> Result<()> {
             test_modules.push(item_text);
         } else if matches!(item, Item::Use(_) | Item::Mod(_)) {
             use_and_mod_items.push(item_text);
+        } else if CodeOrderChecker::is_thread_local(item) {
+            categorized_items.push((ItemCategory::ThreadLocal, item_text));
         } else {
             categorized_items.push((CodeOrderChecker::categorize_item(item), item_text));
         }
@@ -187,9 +206,17 @@ pub fn fix_file(path: &Path) -> Result<()> {
         output.push('\n');
     }
 
-    for (i, (_, item_str)) in categorized_items.iter().enumerate() {
+    for (i, (category, item_str)) in categorized_items.iter().enumerate() {
         if i > 0 {
-            output.push('\n');
+            let prev_category = categorized_items[i - 1].0;
+            let is_const =
+                matches!(category, ItemCategory::PrivateConst | ItemCategory::PublicConst);
+            let prev_is_const =
+                matches!(prev_category, ItemCategory::PrivateConst | ItemCategory::PublicConst);
+
+            if !is_const || !prev_is_const {
+                output.push('\n');
+            }
         }
         output.push_str(item_str.trim());
         output.push('\n');

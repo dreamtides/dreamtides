@@ -35,12 +35,6 @@ use serde::{Deserialize, Serialize};
 )]
 pub struct Energy(pub u32);
 
-impl<'a> From<Energy> for FluentValue<'a> {
-    fn from(energy: Energy) -> Self {
-        FluentValue::Number(FluentNumber::from(energy.0))
-    }
-}
-
 /// Represents the 'power' of characters; the primary way in which players earn
 /// victory points.
 #[derive(
@@ -71,12 +65,6 @@ impl<'a> From<Energy> for FluentValue<'a> {
 )]
 pub struct Spark(pub u32);
 
-impl<'a> From<Spark> for FluentValue<'a> {
-    fn from(spark: Spark) -> Self {
-        FluentValue::Number(FluentNumber::from(spark.0))
-    }
-}
-
 /// Victory points. Enable the player to win the game.
 #[derive(
     Debug,
@@ -106,12 +94,6 @@ impl<'a> From<Spark> for FluentValue<'a> {
 )]
 pub struct Points(pub u32);
 
-impl<'a> From<Points> for FluentValue<'a> {
-    fn from(points: Points) -> Self {
-        FluentValue::Number(FluentNumber::from(points.0))
-    }
-}
-
 /// Currency used during quests.
 #[derive(
     Debug,
@@ -140,12 +122,6 @@ impl<'a> From<Points> for FluentValue<'a> {
     JsonSchema,
 )]
 pub struct Essence(pub u32);
-
-impl<'a> From<Essence> for FluentValue<'a> {
-    fn from(essence: Essence) -> Self {
-        FluentValue::Number(FluentNumber::from(essence.0))
-    }
-}
 
 /// Identifies a turn within a game.
 ///
@@ -177,3 +153,27 @@ impl<'a> From<Essence> for FluentValue<'a> {
     JsonSchema,
 )]
 pub struct TurnId(pub u32);
+
+impl<'a> From<Energy> for FluentValue<'a> {
+    fn from(energy: Energy) -> Self {
+        FluentValue::Number(FluentNumber::from(energy.0))
+    }
+}
+
+impl<'a> From<Spark> for FluentValue<'a> {
+    fn from(spark: Spark) -> Self {
+        FluentValue::Number(FluentNumber::from(spark.0))
+    }
+}
+
+impl<'a> From<Points> for FluentValue<'a> {
+    fn from(points: Points) -> Self {
+        FluentValue::Number(FluentNumber::from(points.0))
+    }
+}
+
+impl<'a> From<Essence> for FluentValue<'a> {
+    fn from(essence: Essence) -> Self {
+        FluentValue::Number(FluentNumber::from(essence.0))
+    }
+}

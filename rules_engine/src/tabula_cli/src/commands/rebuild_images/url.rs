@@ -23,36 +23,6 @@ const RICH_DATA_NS: &str = "http://schemas.microsoft.com/office/spreadsheetml/20
 pub type UrlDownloader =
     dyn Fn(&BTreeMap<usize, String>, &mut Vec<String>) -> Result<BTreeMap<usize, Vec<u8>>>;
 
-#[derive(Clone)]
-struct WebImage {
-    address_rid: String,
-    image_path: String,
-}
-
-#[derive(Clone)]
-struct Relationship {
-    id: String,
-    target: String,
-    type_name: String,
-    mode: Option<String>,
-}
-
-struct SheetInfo {
-    name: String,
-    path: String,
-}
-
-struct ImageCell {
-    sheet: String,
-    cell_ref: String,
-    identifier: usize,
-    formula: String,
-    base_col: u32,
-    base_row: u32,
-    cell_col: u32,
-    cell_row: u32,
-}
-
 pub fn rebuild_from_urls(source: &Path) -> Result<()> {
     rebuild_from_urls_with_downloader(source, &download_images)
 }
@@ -107,6 +77,36 @@ pub fn rebuild_from_urls_with_downloader(source: &Path, downloader: &UrlDownload
     write_relationships(&mut record_map, relationships)?;
 
     write_zip(source, record_map.into_values().collect(), &file_order)
+}
+
+#[derive(Clone)]
+struct WebImage {
+    address_rid: String,
+    image_path: String,
+}
+
+#[derive(Clone)]
+struct Relationship {
+    id: String,
+    target: String,
+    type_name: String,
+    mode: Option<String>,
+}
+
+struct SheetInfo {
+    name: String,
+    path: String,
+}
+
+struct ImageCell {
+    sheet: String,
+    cell_ref: String,
+    identifier: usize,
+    formula: String,
+    base_col: u32,
+    base_row: u32,
+    cell_col: u32,
+    cell_row: u32,
 }
 
 fn require_record<'a>(records: &'a BTreeMap<String, FileRecord>, name: &str) -> Result<&'a [u8]> {

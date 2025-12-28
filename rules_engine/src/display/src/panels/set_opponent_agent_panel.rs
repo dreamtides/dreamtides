@@ -20,6 +20,14 @@ pub struct SetOpponentAgentPanel<'a> {
     pub battle: &'a BattleState,
 }
 
+#[derive(Clone, Builder)]
+pub struct SetAgentCell {
+    pub agent: GameAI,
+}
+
+#[derive(Clone, Builder)]
+pub struct SetHumanCell {}
+
 impl Component for SetOpponentAgentPanel<'_> {
     fn render(self) -> Option<impl Component> {
         Some(
@@ -106,11 +114,6 @@ impl SetOpponentAgentPanel<'_> {
     }
 }
 
-#[derive(Clone, Builder)]
-pub struct SetAgentCell {
-    pub agent: GameAI,
-}
-
 impl Component for SetAgentCell {
     fn render(self) -> Option<impl Component> {
         Some(
@@ -139,9 +142,6 @@ impl Component for SetAgentCell {
         )
     }
 }
-
-#[derive(Clone, Builder)]
-pub struct SetHumanCell {}
 
 impl Component for SetHumanCell {
     fn render(self) -> Option<impl Component> {

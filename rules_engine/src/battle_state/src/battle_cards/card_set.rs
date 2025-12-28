@@ -12,6 +12,12 @@ pub struct CardSet<T> {
     _marker: PhantomData<T>,
 }
 
+/// Iterator for CardSet that yields card IDs in order from lowest to highest.
+pub struct CardSetIter<T> {
+    bits: u128,
+    _marker: PhantomData<T>,
+}
+
 impl<T: CardIdType> fmt::Debug for CardSet<T> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "CardSet(0b{:0128b})", self.bits)
@@ -22,12 +28,6 @@ impl<T: CardIdType> Default for CardSet<T> {
     fn default() -> Self {
         Self::new()
     }
-}
-
-/// Iterator for CardSet that yields card IDs in order from lowest to highest.
-pub struct CardSetIter<T> {
-    bits: u128,
-    _marker: PhantomData<T>,
 }
 
 impl<T: CardIdType> Iterator for CardSetIter<T> {

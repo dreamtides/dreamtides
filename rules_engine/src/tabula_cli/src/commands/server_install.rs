@@ -4,6 +4,10 @@ use std::{env, fs};
 
 use anyhow::{Context, Result, bail};
 
+const SCRIPT_NAME: &str = "tabula_server_curl.scpt";
+const SOURCE_NAME: &str = "tabula_server_curl.applescript";
+const APPLESCRIPT_SOURCE: &str = include_str!("../../applescript/tabula_server_curl.applescript");
+
 pub fn server_install() -> Result<()> {
     let home = env::var("HOME").context("HOME environment variable not set")?;
     let target_dir =
@@ -27,7 +31,3 @@ pub fn server_install() -> Result<()> {
     }
     Ok(())
 }
-
-const SCRIPT_NAME: &str = "tabula_server_curl.scpt";
-const SOURCE_NAME: &str = "tabula_server_curl.applescript";
-const APPLESCRIPT_SOURCE: &str = include_str!("../../applescript/tabula_server_curl.applescript");

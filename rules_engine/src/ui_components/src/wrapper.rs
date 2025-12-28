@@ -2,6 +2,11 @@ use masonry::flex_node::FlexNode;
 
 use crate::component::{Component, NodeComponent};
 
+#[derive(Clone)]
+pub struct WrapperComponent {
+    child: FlexNode,
+}
+
 /// Implements type erasure for components.
 ///
 /// If you want to interact with a set of components in a generic way, you can
@@ -9,11 +14,6 @@ use crate::component::{Component, NodeComponent};
 /// components.
 pub fn wrap(child: impl Component) -> Option<WrapperComponent> {
     child.flex_node().map(|child| WrapperComponent { child })
-}
-
-#[derive(Clone)]
-pub struct WrapperComponent {
-    child: FlexNode,
 }
 
 impl Component for WrapperComponent {

@@ -93,6 +93,23 @@ pub fn serialize_response(response: &Response) -> String {
     lines.join("\n") + "\n"
 }
 
+pub fn compute_changeset_id(
+    workbook_path: &str,
+    workbook_mtime: i64,
+    workbook_size: u64,
+    changes: &[Change],
+) -> String {
+    let mut hasher = Sha256::new();
+    hasher.update(workbook_path.as_bytes());
+    hasher.update(workbook_mtime.to_le_bytes());
+    hasher.update(workbook_size.to_le_bytes());
+    for change in changes {
+        hasher.update(format!("{change:?}").as_bytes());
+    }
+    let hash = hasher.finalize();
+    format!("{hash:x}")
+}
+
 fn serialize_change(change: &Change) -> String {
     match change {
         Change::SetBold { sheet, cell, bold } => {
@@ -307,21 +324,4 @@ fn percent_decode(s: &str) -> Result<String> {
         }
     }
     String::from_utf8(decoded).context("Decoded string is not valid UTF-8")
-}
-
-pub fn compute_changeset_id(
-    workbook_path: &str,
-    workbook_mtime: i64,
-    workbook_size: u64,
-    changes: &[Change],
-) -> String {
-    let mut hasher = Sha256::new();
-    hasher.update(workbook_path.as_bytes());
-    hasher.update(workbook_mtime.to_le_bytes());
-    hasher.update(workbook_size.to_le_bytes());
-    for change in changes {
-        hasher.update(format!("{change:?}").as_bytes());
-    }
-    let hash = hasher.finalize();
-    format!("{hash:x}")
 }

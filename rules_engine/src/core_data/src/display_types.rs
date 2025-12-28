@@ -13,6 +13,56 @@ pub struct Url {
     pub url_value: String,
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
+pub struct ProjectileAddress {
+    pub projectile: String,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct EffectAddress {
+    pub effect: String,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct AudioClipAddress {
+    pub audio_clip: String,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct TextureAddress {
+    pub texture: String,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct SpriteAddress {
+    pub sprite: String,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct PrefabAddress {
+    pub prefab: String,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct MaterialAddress {
+    pub material: String,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct FontAddress {
+    pub font: String,
+}
+
+#[derive(Clone, Copy, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct Milliseconds {
+    pub milliseconds_value: u32,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct StudioAnimation {
+    pub name: String,
+}
+
 impl Url {
     pub fn new(url: String) -> Self {
         Self { url_value: url }
@@ -27,11 +77,6 @@ impl StringWrapper for Url {
     fn from_string_value(s: &str) -> Result<Self, String> {
         Ok(Url { url_value: s.to_string() })
     }
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
-pub struct ProjectileAddress {
-    pub projectile: String,
 }
 
 impl ProjectileAddress {
@@ -50,11 +95,6 @@ impl StringWrapper for ProjectileAddress {
     }
 }
 
-#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
-pub struct EffectAddress {
-    pub effect: String,
-}
-
 impl EffectAddress {
     pub fn new(effect: impl Into<String>) -> Self {
         Self { effect: effect.into() }
@@ -69,11 +109,6 @@ impl StringWrapper for EffectAddress {
     fn from_string_value(s: &str) -> Result<Self, String> {
         Ok(EffectAddress { effect: s.to_string() })
     }
-}
-
-#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
-pub struct AudioClipAddress {
-    pub audio_clip: String,
 }
 
 impl AudioClipAddress {
@@ -92,11 +127,6 @@ impl StringWrapper for AudioClipAddress {
     }
 }
 
-#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
-pub struct TextureAddress {
-    pub texture: String,
-}
-
 impl TextureAddress {
     pub fn new(texture: impl Into<String>) -> Self {
         Self { texture: texture.into() }
@@ -111,11 +141,6 @@ impl StringWrapper for TextureAddress {
     fn from_string_value(s: &str) -> Result<Self, String> {
         Ok(TextureAddress { texture: s.to_string() })
     }
-}
-
-#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
-pub struct SpriteAddress {
-    pub sprite: String,
 }
 
 impl SpriteAddress {
@@ -134,11 +159,6 @@ impl StringWrapper for SpriteAddress {
     }
 }
 
-#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
-pub struct PrefabAddress {
-    pub prefab: String,
-}
-
 impl PrefabAddress {
     pub fn new(prefab: impl Into<String>) -> Self {
         Self { prefab: prefab.into() }
@@ -153,11 +173,6 @@ impl StringWrapper for PrefabAddress {
     fn from_string_value(s: &str) -> Result<Self, String> {
         Ok(PrefabAddress { prefab: s.to_string() })
     }
-}
-
-#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
-pub struct MaterialAddress {
-    pub material: String,
 }
 
 impl MaterialAddress {
@@ -176,11 +191,6 @@ impl StringWrapper for MaterialAddress {
     }
 }
 
-#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
-pub struct FontAddress {
-    pub font: String,
-}
-
 impl FontAddress {
     pub fn new(font: impl Into<String>) -> Self {
         Self { font: font.into() }
@@ -195,11 +205,6 @@ impl StringWrapper for FontAddress {
     fn from_string_value(s: &str) -> Result<Self, String> {
         Ok(FontAddress { font: s.to_string() })
     }
-}
-
-#[derive(Clone, Copy, Debug, Serialize, Deserialize, JsonSchema)]
-pub struct Milliseconds {
-    pub milliseconds_value: u32,
 }
 
 impl Milliseconds {
@@ -222,11 +227,6 @@ impl StringWrapper for Milliseconds {
         let ms = trimmed.parse::<u32>().map_err(|e| e.to_string())?;
         Ok(Milliseconds { milliseconds_value: ms })
     }
-}
-
-#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
-pub struct StudioAnimation {
-    pub name: String,
 }
 
 impl StudioAnimation {

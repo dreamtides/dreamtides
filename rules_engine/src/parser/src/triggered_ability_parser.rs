@@ -9,13 +9,6 @@ pub fn parser<'a>() -> impl Parser<'a, &'a str, TriggeredAbility, ErrorType<'a>>
     choice((keyword_trigger_parser(), standard_trigger_parser())).boxed()
 }
 
-fn keyword_trigger_parser<'a>() -> impl Parser<'a, &'a str, TriggeredAbility, ErrorType<'a>> {
-    trigger_event_parser::keyword_parser()
-        .then_ignore(phrase(":"))
-        .then(effect_parser::effect())
-        .map(|(trigger, effect)| TriggeredAbility { trigger, effect, options: None })
-}
-
 pub fn standard_trigger_parser<'a>() -> impl Parser<'a, &'a str, TriggeredAbility, ErrorType<'a>> {
     phrase("once per turn,")
         .or_not()
@@ -29,4 +22,11 @@ pub fn standard_trigger_parser<'a>() -> impl Parser<'a, &'a str, TriggeredAbilit
             options: once_per_turn
                 .map(|_| TriggeredAbilityOptions { once_per_turn: true, until_end_of_turn: false }),
         })
+}
+
+fn keyword_trigger_parser<'a>() -> impl Parser<'a, &'a str, TriggeredAbility, ErrorType<'a>> {
+    trigger_event_parser::keyword_parser()
+        .then_ignore(phrase(":"))
+        .then(effect_parser::effect())
+        .map(|(trigger, effect)| TriggeredAbility { trigger, effect, options: None })
 }

@@ -74,6 +74,145 @@ pub fn card_view(builder: &ResponseBuilder, context: &CardViewContext) -> CardVi
     }
 }
 
+pub fn card_image(battle: &BattleState, card_id: CardId) -> SpriteAddress {
+    card::get_definition(battle, card_id).image.clone()
+}
+
+pub fn card_name(battle: &BattleState, card_id: CardId) -> String {
+    card::get_definition(battle, card_id).displayed_name.clone()
+}
+
+/// Returns the rules text for the given ability, without including any costs.
+pub fn ability_token_text(
+    builder: &ResponseBuilder,
+    definition: &CardDefinition,
+    ability_number: AbilityNumber,
+) -> String {
+    let ability = &definition.displayed_abilities[ability_number.0];
+    let text = match ability {
+        DisplayedAbility::Event { event } => displayed_effect_text(&event.effect),
+        DisplayedAbility::Static { text } => text.clone(),
+        DisplayedAbility::Activated { effect, .. } => displayed_effect_text(effect),
+        DisplayedAbility::Triggered { text } => text.clone(),
+        DisplayedAbility::Named { name } => name.clone(),
+    };
+    builder.tabula().strings.format_display_string(&text, StringContext::CardText, fluent_args![])
+}
+
+pub fn rules_text(builder: &ResponseBuilder, battle: &BattleState, card_id: CardId) -> String {
+    let definition = card::get_definition(battle, card_id);
+    let mut formatted = builder.tabula().strings.format_display_string(
+        &get_displayed_text(&definition.displayed_abilities),
+        StringContext::CardText,
+        fluent_args![],
+    );
+
+    if let Some(stack_item) = battle.cards.stack_item(StackCardId(card_id))
+        && let Some(ModelEffectChoiceIndex(index)) = stack_item.modal_choice
+    {
+        formatted = modal_effect_prompt_rendering::modal_effect_descriptions(
+            builder,
+            &definition.displayed_abilities,
+        )[index]
+            .clone();
+    }
+
+    if let Some(stack_item) = battle.cards.stack_item(StackCardId(card_id))
+        && let StackCardAdditionalCostsPaid::Energy(energy) = &stack_item.additional_costs_paid
+    {
+        return format!(
+            "{} <b><color=\"blue\">{}</color></b>",
+            formatted,
+            builder.string_with_args(
+                string_id::CARD_RULES_TEXT_ENERGY_PAID,
+                fluent_args!("energy" => energy.0)
+            )
+        );
+    }
+
+    if is_on_stack_from_void(battle, card_id) {
+        return format!(
+            "{formatted} <b><color=\"blue\">{}</color></b>",
+            builder.string(string_id::CARD_RULES_TEXT_RECLAIMED)
+        );
+    }
+
+    if apply_card_fx::is_anchored(battle, card_id) {
+        return format!(
+            "{formatted} <b><color=\"blue\">{}</color></b>",
+            builder.string(string_id::CARD_RULES_TEXT_ANCHORED)
+        );
+    }
+
+    formatted
+}
+
+pub fn build_info_zoom_data(
+    builder: &ResponseBuilder,
+    battle: &BattleState,
+    card_id: CardId,
+) -> Option<InfoZoomData> {
+    let targeting_icons = get_targeting_icons(battle, card_id);
+    let supplemental_texts = ability_help_text::help_texts(builder, battle, card_id);
+
+    let supplemental_info = if supplemental_texts.is_empty() {
+        None
+    } else {
+        let supplemental_components: Vec<_> = supplemental_texts
+            .into_iter()
+            .filter_map(|text| {
+                SupplementalCardInfo::builder().text(text).build().render()?.flex_node()
+            })
+            .collect();
+
+        if supplemental_components.is_empty() {
+            None
+        } else {
+            BoxComponent::builder()
+                .name("Supplemental Card Info Column")
+                .style(FlexStyle::builder().flex_direction(FlexDirection::Column).margin(4).build())
+                .children(supplemental_components)
+                .build()
+                .flex_node()
+        }
+    };
+
+    if targeting_icons.is_empty() && supplemental_info.is_none() {
+        None
+    } else {
+        Some(InfoZoomData { supplemental_card_info: supplemental_info, icons: targeting_icons })
+    }
+}
+
+pub fn get_displayed_text(abilities: &[DisplayedAbility]) -> String {
+    // Tags must use Fluent "quoted string" syntax to avoid breaking parsing.
+    let colon = "{\"<size=130%>:</size>\"}";
+    let line_height_25 = "{\"<line-height=25%>\"}";
+    let end_line_height = "{\"</line-height>\"}";
+
+    abilities
+        .iter()
+        .map(|ability| match ability {
+            DisplayedAbility::Event { event } => {
+                let effect = displayed_effect_text(&event.effect);
+                if let Some(additional_cost) = &event.additional_cost {
+                    format!("{additional_cost}{colon} {effect}")
+                } else {
+                    effect
+                }
+            }
+            DisplayedAbility::Static { text } => text.clone(),
+            DisplayedAbility::Activated { cost, effect } => {
+                let effect_text = displayed_effect_text(effect);
+                format!("{cost}{colon} {effect_text}")
+            }
+            DisplayedAbility::Triggered { text } => text.clone(),
+            DisplayedAbility::Named { name } => name.clone(),
+        })
+        .collect::<Vec<_>>()
+        .join(&format!("\n{line_height_25}\n{end_line_height}"))
+}
+
 fn revealed_card_view(builder: &ResponseBuilder, context: &CardViewContext) -> RevealedCardView {
     let battle = context.battle();
     let card_id = context.card_id();
@@ -201,14 +340,6 @@ fn can_select_order_action(legal_actions: &LegalActions, card_id: CardId) -> Opt
     if let LegalActions::SelectDeckCardOrder { .. } = legal_actions { Some(card_id) } else { None }
 }
 
-pub fn card_image(battle: &BattleState, card_id: CardId) -> SpriteAddress {
-    card::get_definition(battle, card_id).image.clone()
-}
-
-pub fn card_name(battle: &BattleState, card_id: CardId) -> String {
-    card::get_definition(battle, card_id).displayed_name.clone()
-}
-
 fn card_type(builder: &ResponseBuilder, battle: &BattleState, card_id: CardId) -> String {
     let definition = card::get_definition(battle, card_id);
     let type_string = if let Some(subtype) = definition.card_subtype {
@@ -248,71 +379,6 @@ fn card_type(builder: &ResponseBuilder, battle: &BattleState, card_id: CardId) -
     if card_properties::is_fast(battle, card_id) { format!("\u{f0e7} {result}") } else { result }
 }
 
-/// Returns the rules text for the given ability, without including any costs.
-pub fn ability_token_text(
-    builder: &ResponseBuilder,
-    definition: &CardDefinition,
-    ability_number: AbilityNumber,
-) -> String {
-    let ability = &definition.displayed_abilities[ability_number.0];
-    let text = match ability {
-        DisplayedAbility::Event { event } => displayed_effect_text(&event.effect),
-        DisplayedAbility::Static { text } => text.clone(),
-        DisplayedAbility::Activated { effect, .. } => displayed_effect_text(effect),
-        DisplayedAbility::Triggered { text } => text.clone(),
-        DisplayedAbility::Named { name } => name.clone(),
-    };
-    builder.tabula().strings.format_display_string(&text, StringContext::CardText, fluent_args![])
-}
-
-pub fn rules_text(builder: &ResponseBuilder, battle: &BattleState, card_id: CardId) -> String {
-    let definition = card::get_definition(battle, card_id);
-    let mut formatted = builder.tabula().strings.format_display_string(
-        &get_displayed_text(&definition.displayed_abilities),
-        StringContext::CardText,
-        fluent_args![],
-    );
-
-    if let Some(stack_item) = battle.cards.stack_item(StackCardId(card_id))
-        && let Some(ModelEffectChoiceIndex(index)) = stack_item.modal_choice
-    {
-        formatted = modal_effect_prompt_rendering::modal_effect_descriptions(
-            builder,
-            &definition.displayed_abilities,
-        )[index]
-            .clone();
-    }
-
-    if let Some(stack_item) = battle.cards.stack_item(StackCardId(card_id))
-        && let StackCardAdditionalCostsPaid::Energy(energy) = &stack_item.additional_costs_paid
-    {
-        return format!(
-            "{} <b><color=\"blue\">{}</color></b>",
-            formatted,
-            builder.string_with_args(
-                string_id::CARD_RULES_TEXT_ENERGY_PAID,
-                fluent_args!("energy" => energy.0)
-            )
-        );
-    }
-
-    if is_on_stack_from_void(battle, card_id) {
-        return format!(
-            "{formatted} <b><color=\"blue\">{}</color></b>",
-            builder.string(string_id::CARD_RULES_TEXT_RECLAIMED)
-        );
-    }
-
-    if apply_card_fx::is_anchored(battle, card_id) {
-        return format!(
-            "{formatted} <b><color=\"blue\">{}</color></b>",
-            builder.string(string_id::CARD_RULES_TEXT_ANCHORED)
-        );
-    }
-
-    formatted
-}
-
 /// Returns true if the the `card_id` is on the stack and was played from the
 /// void.
 fn is_on_stack_from_void(battle: &BattleState, card_id: CardId) -> bool {
@@ -344,43 +410,6 @@ fn is_on_stack_from_void(battle: &BattleState, card_id: CardId) -> bool {
                 .unwrap_or(false)
         })
         .unwrap_or(false)
-}
-
-pub fn build_info_zoom_data(
-    builder: &ResponseBuilder,
-    battle: &BattleState,
-    card_id: CardId,
-) -> Option<InfoZoomData> {
-    let targeting_icons = get_targeting_icons(battle, card_id);
-    let supplemental_texts = ability_help_text::help_texts(builder, battle, card_id);
-
-    let supplemental_info = if supplemental_texts.is_empty() {
-        None
-    } else {
-        let supplemental_components: Vec<_> = supplemental_texts
-            .into_iter()
-            .filter_map(|text| {
-                SupplementalCardInfo::builder().text(text).build().render()?.flex_node()
-            })
-            .collect();
-
-        if supplemental_components.is_empty() {
-            None
-        } else {
-            BoxComponent::builder()
-                .name("Supplemental Card Info Column")
-                .style(FlexStyle::builder().flex_direction(FlexDirection::Column).margin(4).build())
-                .children(supplemental_components)
-                .build()
-                .flex_node()
-        }
-    };
-
-    if targeting_icons.is_empty() && supplemental_info.is_none() {
-        None
-    } else {
-        Some(InfoZoomData { supplemental_card_info: supplemental_info, icons: targeting_icons })
-    }
 }
 
 fn get_targeting_icons(battle: &BattleState, card_id: CardId) -> Vec<InfoZoomIcon> {
@@ -481,35 +510,6 @@ fn get_targeting_icons(battle: &BattleState, card_id: CardId) -> Vec<InfoZoomIco
     }
 
     icons.into_values().collect()
-}
-
-pub fn get_displayed_text(abilities: &[DisplayedAbility]) -> String {
-    // Tags must use Fluent "quoted string" syntax to avoid breaking parsing.
-    let colon = "{\"<size=130%>:</size>\"}";
-    let line_height_25 = "{\"<line-height=25%>\"}";
-    let end_line_height = "{\"</line-height>\"}";
-
-    abilities
-        .iter()
-        .map(|ability| match ability {
-            DisplayedAbility::Event { event } => {
-                let effect = displayed_effect_text(&event.effect);
-                if let Some(additional_cost) = &event.additional_cost {
-                    format!("{additional_cost}{colon} {effect}")
-                } else {
-                    effect
-                }
-            }
-            DisplayedAbility::Static { text } => text.clone(),
-            DisplayedAbility::Activated { cost, effect } => {
-                let effect_text = displayed_effect_text(effect);
-                format!("{cost}{colon} {effect_text}")
-            }
-            DisplayedAbility::Triggered { text } => text.clone(),
-            DisplayedAbility::Named { name } => name.clone(),
-        })
-        .collect::<Vec<_>>()
-        .join(&format!("\n{line_height_25}\n{end_line_height}"))
 }
 
 fn displayed_effect_text(effect: &DisplayedAbilityEffect) -> String {

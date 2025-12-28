@@ -15,12 +15,6 @@ use crate::battle_cards::ability_list::AbilityData;
 #[derive(Debug, Clone, Copy, Eq, PartialEq, Hash, Serialize, Deserialize)]
 pub struct BattleDreamwellCardId(usize);
 
-impl From<BattleDreamwellCardId> for usize {
-    fn from(value: BattleDreamwellCardId) -> Self {
-        value.0
-    }
-}
-
 #[derive(Debug, Clone, Serialize)]
 pub struct DreamwellCard {
     pub definition: DreamwellCardDefinition,
@@ -28,21 +22,6 @@ pub struct DreamwellCard {
     pub produced_energy: Energy,
     #[serde(skip)]
     pub effects: Vec<AbilityData<EventAbility>>,
-}
-
-impl<'de> Deserialize<'de> for DreamwellCard {
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: Deserializer<'de>,
-    {
-        #[derive(Deserialize)]
-        struct DreamwellBattleCardSerde {
-            definition: DreamwellCardDefinition,
-        }
-
-        let s = DreamwellBattleCardSerde::deserialize(deserializer)?;
-        Ok(build_card(s.definition))
-    }
 }
 
 /// The dreamwell is a deck of cards that is used during the dreamwell phase to
@@ -62,6 +41,27 @@ pub struct Dreamwell {
     /// Subsequent iterations through the dreamwell will skip phase 0 cards.
     #[serde(default)]
     pub first_iteration_complete: bool,
+}
+
+impl From<BattleDreamwellCardId> for usize {
+    fn from(value: BattleDreamwellCardId) -> Self {
+        value.0
+    }
+}
+
+impl<'de> Deserialize<'de> for DreamwellCard {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        #[derive(Deserialize)]
+        struct DreamwellBattleCardSerde {
+            definition: DreamwellCardDefinition,
+        }
+
+        let s = DreamwellBattleCardSerde::deserialize(deserializer)?;
+        Ok(build_card(s.definition))
+    }
 }
 
 impl Dreamwell {

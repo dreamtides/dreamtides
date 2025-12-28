@@ -21,6 +21,12 @@ pub struct PlayOpponentCardPanel<'a> {
     pub battle: &'a BattleState,
 }
 
+#[derive(Clone, Builder)]
+pub struct PlayOpponentCardCell<'a> {
+    pub battle: &'a BattleState,
+    pub card: BaseCardId,
+}
+
 impl Component for PlayOpponentCardPanel<'_> {
     fn render(self) -> Option<impl Component> {
         Some(
@@ -73,12 +79,6 @@ impl Component for PlayOpponentCardPanel<'_> {
                 .build(),
         )
     }
-}
-
-#[derive(Clone, Builder)]
-pub struct PlayOpponentCardCell<'a> {
-    pub battle: &'a BattleState,
-    pub card: BaseCardId,
 }
 
 impl Component for PlayOpponentCardCell<'_> {

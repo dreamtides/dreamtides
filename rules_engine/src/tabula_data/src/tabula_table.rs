@@ -8,10 +8,6 @@ use serde_json::{Deserializer as JsonDeserializer, Error as JsonError, Value};
 use serde_path_to_error as serde_path;
 use serde_path_to_error::Error as PathError;
 
-pub fn from_vec<I, T>(items: Vec<T>) -> Table<I, T> {
-    Table(items, PhantomData)
-}
-
 /// A trait for types that have an ID.
 pub trait HasId<I> {
     type Id: PartialEq + Copy + fmt::Debug;
@@ -24,6 +20,10 @@ pub trait HasId<I> {
 /// are logged and skipped.
 #[derive(Clone, Debug)]
 pub struct Table<I, T>(pub Vec<T>, PhantomData<I>);
+
+pub fn from_vec<I, T>(items: Vec<T>) -> Table<I, T> {
+    Table(items, PhantomData)
+}
 
 impl<I, T> Default for Table<I, T> {
     fn default() -> Self {

@@ -25,6 +25,16 @@ pub struct ViewLogsPanel {
     pub filter: Option<String>,
 }
 
+#[derive(Clone, Builder)]
+pub struct LogFilterButtons {}
+
+#[derive(Clone, Builder)]
+pub struct FilterButton {
+    #[builder(into)]
+    pub emoji: String,
+    pub emoji_filter: Option<String>,
+}
+
 impl Component for ViewLogsPanel {
     fn render(self) -> Option<impl Component> {
         let log_content = self.read_log_content();
@@ -136,9 +146,6 @@ impl ViewLogsPanel {
     }
 }
 
-#[derive(Clone, Builder)]
-pub struct LogFilterButtons {}
-
 impl Component for LogFilterButtons {
     fn render(self) -> Option<impl Component> {
         let mut buttons = BoxComponent::builder()
@@ -170,13 +177,6 @@ impl Component for LogFilterButtons {
 
         Some(buttons.build())
     }
-}
-
-#[derive(Clone, Builder)]
-pub struct FilterButton {
-    #[builder(into)]
-    pub emoji: String,
-    pub emoji_filter: Option<String>,
 }
 
 impl Component for FilterButton {

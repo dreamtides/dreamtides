@@ -7,6 +7,10 @@ use crate::display_properties;
 #[derive(Clone)]
 pub struct ScrollViewComponent(pub FlexNode);
 
+pub struct ScrollViewComponentBuilder {
+    content: Option<FlexNode>,
+}
+
 impl Component for ScrollViewComponent {
     fn render(self) -> Option<impl Component> {
         Some(NodeComponent)
@@ -15,10 +19,6 @@ impl Component for ScrollViewComponent {
     fn flex_node(&self) -> Option<FlexNode> {
         Some(self.0.clone())
     }
-}
-
-pub struct ScrollViewComponentBuilder {
-    content: Option<FlexNode>,
 }
 
 impl ScrollViewComponent {

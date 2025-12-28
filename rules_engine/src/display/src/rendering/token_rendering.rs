@@ -29,6 +29,28 @@ use crate::core::response_builder::ResponseBuilder;
 use crate::display_actions::{display_state, outcome_simulation};
 use crate::rendering::{card_rendering, positions};
 
+/// A view for a token card.
+#[derive(Builder)]
+pub struct TokenCardView {
+    id: ClientCardId,
+    position: ObjectPosition,
+    image: SpriteAddress,
+    name: String,
+    cost: Option<String>,
+    spark: Option<String>,
+    card_type: Option<String>,
+    rules_text: String,
+    create_position: Option<ObjectPosition>,
+    destroy_position: Option<ObjectPosition>,
+    #[builder(default)]
+    is_fast: bool,
+    create_sound: Option<AudioClipAddress>,
+    #[builder(default)]
+    actions: CardActions,
+    outline_color: Option<DisplayColor>,
+    info_zoom_data: Option<InfoZoomData>,
+}
+
 pub fn trigger_card_view(
     builder: &ResponseBuilder,
     battle: &BattleState,
@@ -160,6 +182,66 @@ pub fn activated_ability_card_view_on_stack(
     activated_ability_card_view(builder, battle, ability, Some(stack_position), None)
 }
 
+/// Returns a list of all void card tokens for a player to display in
+/// their hand.
+pub fn all_user_void_card_tokens(builder: &ResponseBuilder, battle: &BattleState) -> Vec<CardView> {
+    let mut offset = 0;
+    all_user_void_card_tokens_with_offset(builder, battle, &mut offset)
+}
+
+/// Returns a list of all void card tokens for a player to display in
+/// their hand, updating the token offset for coordinated sorting.
+pub fn all_user_void_card_tokens_with_offset(
+    builder: &ResponseBuilder,
+    battle: &BattleState,
+    token_offset: &mut usize,
+) -> Vec<CardView> {
+    let void_ability_cards = battle.cards.void(builder.act_for_player()).iter().filter(|card_id| {
+        can_play_cards::can_play_from_void_energy_cost(battle, *card_id).is_some()
+    });
+    let base_sorting_key = battle.cards.next_object_id_for_display().0 + *token_offset;
+
+    let result: Vec<CardView> = void_ability_cards
+        .enumerate()
+        .map(|(index, card_id)| {
+            let hand_sorting_key = (base_sorting_key + index) as u32;
+            void_card_token_view(builder, battle, card_id, hand_sorting_key)
+        })
+        .collect();
+
+    *token_offset += result.len();
+    result
+}
+
+/// Converts a [TokenCardView] to a [CardView].
+pub fn token_card_view(view: TokenCardView) -> CardView {
+    CardView {
+        id: view.id,
+        position: view.position,
+        revealed: Some(RevealedCardView {
+            image: DisplayImage::Sprite(view.image),
+            name: view.name,
+            cost: view.cost,
+            produced: None,
+            spark: view.spark,
+            card_type: view.card_type.unwrap_or_default(),
+            rules_text: view.rules_text,
+            outline_color: view.outline_color,
+            is_fast: view.is_fast,
+            actions: view.actions,
+            effects: CardEffects::default(),
+            info_zoom_data: view.info_zoom_data,
+        }),
+        revealed_to_opponents: true,
+        card_facing: CardFacing::FaceUp,
+        backless: true,
+        create_position: view.create_position,
+        create_sound: view.create_sound,
+        destroy_position: view.destroy_position,
+        prefab: CardPrefab::Token,
+    }
+}
+
 fn activated_ability_card_view(
     builder: &ResponseBuilder,
     battle: &BattleState,
@@ -264,37 +346,6 @@ fn activated_ability_card_view(
     )
 }
 
-/// Returns a list of all void card tokens for a player to display in
-/// their hand.
-pub fn all_user_void_card_tokens(builder: &ResponseBuilder, battle: &BattleState) -> Vec<CardView> {
-    let mut offset = 0;
-    all_user_void_card_tokens_with_offset(builder, battle, &mut offset)
-}
-
-/// Returns a list of all void card tokens for a player to display in
-/// their hand, updating the token offset for coordinated sorting.
-pub fn all_user_void_card_tokens_with_offset(
-    builder: &ResponseBuilder,
-    battle: &BattleState,
-    token_offset: &mut usize,
-) -> Vec<CardView> {
-    let void_ability_cards = battle.cards.void(builder.act_for_player()).iter().filter(|card_id| {
-        can_play_cards::can_play_from_void_energy_cost(battle, *card_id).is_some()
-    });
-    let base_sorting_key = battle.cards.next_object_id_for_display().0 + *token_offset;
-
-    let result: Vec<CardView> = void_ability_cards
-        .enumerate()
-        .map(|(index, card_id)| {
-            let hand_sorting_key = (base_sorting_key + index) as u32;
-            void_card_token_view(builder, battle, card_id, hand_sorting_key)
-        })
-        .collect();
-
-    *token_offset += result.len();
-    result
-}
-
 fn void_card_token_view(
     builder: &ResponseBuilder,
     battle: &BattleState,
@@ -357,57 +408,6 @@ fn void_card_token_view(
             .maybe_info_zoom_data(build_token_info_zoom_data(builder, battle, card_id))
             .build(),
     )
-}
-
-/// A view for a token card.
-#[derive(Builder)]
-pub struct TokenCardView {
-    id: ClientCardId,
-    position: ObjectPosition,
-    image: SpriteAddress,
-    name: String,
-    cost: Option<String>,
-    spark: Option<String>,
-    card_type: Option<String>,
-    rules_text: String,
-    create_position: Option<ObjectPosition>,
-    destroy_position: Option<ObjectPosition>,
-    #[builder(default)]
-    is_fast: bool,
-    create_sound: Option<AudioClipAddress>,
-    #[builder(default)]
-    actions: CardActions,
-    outline_color: Option<DisplayColor>,
-    info_zoom_data: Option<InfoZoomData>,
-}
-
-/// Converts a [TokenCardView] to a [CardView].
-pub fn token_card_view(view: TokenCardView) -> CardView {
-    CardView {
-        id: view.id,
-        position: view.position,
-        revealed: Some(RevealedCardView {
-            image: DisplayImage::Sprite(view.image),
-            name: view.name,
-            cost: view.cost,
-            produced: None,
-            spark: view.spark,
-            card_type: view.card_type.unwrap_or_default(),
-            rules_text: view.rules_text,
-            outline_color: view.outline_color,
-            is_fast: view.is_fast,
-            actions: view.actions,
-            effects: CardEffects::default(),
-            info_zoom_data: view.info_zoom_data,
-        }),
-        revealed_to_opponents: true,
-        card_facing: CardFacing::FaceUp,
-        backless: true,
-        create_position: view.create_position,
-        create_sound: view.create_sound,
-        destroy_position: view.destroy_position,
-        prefab: CardPrefab::Token,
-    }
 }
 
 fn build_token_info_zoom_data(

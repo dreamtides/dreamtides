@@ -1,5 +1,4 @@
 pub mod android_logging;
-
 use std::env;
 use std::fs::File;
 use std::io::{self, Write};
@@ -15,11 +14,13 @@ use tracing_subscriber::layer::SubscriberExt;
 use tracing_subscriber::util::SubscriberInitExt;
 use tracing_subscriber::{EnvFilter, Layer};
 
-pub const LOG_FILTER_EMOJIS: &[&str] = &["🚨", "🚧", "🌐", "🤖", "🟢"];
-
 static INIT: Once = Once::new();
+
 static LOG_FILE_PATH: OnceLock<PathBuf> = OnceLock::new();
+
 static TRACE_JSON_PATH: OnceLock<PathBuf> = OnceLock::new();
+
+pub const LOG_FILTER_EMOJIS: &[&str] = &["🚨", "🚧", "🌐", "🤖", "🟢"];
 
 /// Initializes global logging behavior for the 'tracing' crate if it hasn't
 /// already been initialized.
@@ -27,39 +28,6 @@ pub fn maybe_initialize(request_context: &RequestContext) {
     INIT.call_once(|| {
         initialize(request_context);
     });
-}
-
-/// Initializes global logging behavior for the 'tracing' crate.
-fn initialize(request_context: &RequestContext) {
-    let env_filter =
-        env::var("RUST_LOG").map(EnvFilter::new).unwrap_or_else(|_| EnvFilter::new("debug"));
-
-    match request_context.logging_options.log_directory.as_ref() {
-        Some(log_directory) => {
-            // Set up dual output to stdout and file
-            let log_path = log_directory.join("dreamtides.log");
-            println!("Logging to: {}", log_path.display());
-            LOG_FILE_PATH.set(log_path.clone()).expect("Failed to set log file path");
-            TRACE_JSON_PATH
-                .set(log_directory.join("dreamtides.json"))
-                .expect("Failed to set log JSON path");
-            let log_file = File::create(log_path).expect("Error creating tracing log file");
-
-            let dual_writer = DualMakeWriter::new(log_file);
-            let printer = PrettyPrinter::new().writer(dual_writer);
-
-            let forest_layer = ForestLayer::new(printer, tag_parser).with_filter(env_filter);
-
-            tracing_subscriber::registry().with(forest_layer).with(ErrorLayer::default()).init();
-        }
-        None => {
-            // Stdout only
-            let forest_layer =
-                ForestLayer::new(PrettyPrinter::new(), tag_parser).with_filter(env_filter);
-
-            tracing_subscriber::registry().with(forest_layer).with(ErrorLayer::default()).init();
-        }
-    }
 }
 
 pub fn trace_json_path() -> Option<&'static PathBuf> {
@@ -104,6 +72,39 @@ pub fn get_developer_mode_streaming_assets_path() -> String {
         .expect("Failed to canonicalize path")
         .to_string_lossy()
         .to_string()
+}
+
+/// Initializes global logging behavior for the 'tracing' crate.
+fn initialize(request_context: &RequestContext) {
+    let env_filter =
+        env::var("RUST_LOG").map(EnvFilter::new).unwrap_or_else(|_| EnvFilter::new("debug"));
+
+    match request_context.logging_options.log_directory.as_ref() {
+        Some(log_directory) => {
+            // Set up dual output to stdout and file
+            let log_path = log_directory.join("dreamtides.log");
+            println!("Logging to: {}", log_path.display());
+            LOG_FILE_PATH.set(log_path.clone()).expect("Failed to set log file path");
+            TRACE_JSON_PATH
+                .set(log_directory.join("dreamtides.json"))
+                .expect("Failed to set log JSON path");
+            let log_file = File::create(log_path).expect("Error creating tracing log file");
+
+            let dual_writer = DualMakeWriter::new(log_file);
+            let printer = PrettyPrinter::new().writer(dual_writer);
+
+            let forest_layer = ForestLayer::new(printer, tag_parser).with_filter(env_filter);
+
+            tracing_subscriber::registry().with(forest_layer).with(ErrorLayer::default()).init();
+        }
+        None => {
+            // Stdout only
+            let forest_layer =
+                ForestLayer::new(PrettyPrinter::new(), tag_parser).with_filter(env_filter);
+
+            tracing_subscriber::registry().with(forest_layer).with(ErrorLayer::default()).init();
+        }
+    }
 }
 
 fn tag_parser(event: &Event) -> Option<Tag> {

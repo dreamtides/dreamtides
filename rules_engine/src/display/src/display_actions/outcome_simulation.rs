@@ -110,6 +110,34 @@ pub fn action_effect_preview(
     BattlePreviewView { user: user_preview, enemy: enemy_preview, cards, preview_message }
 }
 
+/// Returns a unified preview of the battle state based on the current prompt
+/// and selected display state.
+///
+/// This function handles different types of prompts and simulates their effects
+/// to provide a preview of the resulting battle state.
+pub fn current_prompt_battle_preview(
+    builder: &ResponseBuilder,
+    battle: &BattleState,
+    player: PlayerName,
+) -> Option<BattlePreviewView> {
+    if let Some(prompt) = battle.prompts.front()
+        && prompt.player == player
+    {
+        let prompt = prompt.clone();
+        match &prompt.prompt_type {
+            PromptType::ChooseEnergyValue { minimum, .. } => {
+                let selected_energy =
+                    display_state::get_selected_energy_additional_cost(builder).unwrap_or(*minimum);
+                let action = BattleAction::SelectEnergyAdditionalCost(selected_energy);
+                Some(action_effect_preview(builder, battle, player, action))
+            }
+            _ => None,
+        }
+    } else {
+        None
+    }
+}
+
 fn get_preview_message(
     builder: &ResponseBuilder,
     simulation: &BattleState,
@@ -184,34 +212,6 @@ fn get_preview_cards(
     }
 
     card_previews.into_values().collect()
-}
-
-/// Returns a unified preview of the battle state based on the current prompt
-/// and selected display state.
-///
-/// This function handles different types of prompts and simulates their effects
-/// to provide a preview of the resulting battle state.
-pub fn current_prompt_battle_preview(
-    builder: &ResponseBuilder,
-    battle: &BattleState,
-    player: PlayerName,
-) -> Option<BattlePreviewView> {
-    if let Some(prompt) = battle.prompts.front()
-        && prompt.player == player
-    {
-        let prompt = prompt.clone();
-        match &prompt.prompt_type {
-            PromptType::ChooseEnergyValue { minimum, .. } => {
-                let selected_energy =
-                    display_state::get_selected_energy_additional_cost(builder).unwrap_or(*minimum);
-                let action = BattleAction::SelectEnergyAdditionalCost(selected_energy);
-                Some(action_effect_preview(builder, battle, player, action))
-            }
-            _ => None,
-        }
-    } else {
-        None
-    }
 }
 
 fn hand_size_limit_exceeded_message(builder: &ResponseBuilder) -> impl Component {

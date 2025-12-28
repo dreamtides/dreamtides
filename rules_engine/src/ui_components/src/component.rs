@@ -26,6 +26,9 @@ pub trait Component: Clone {
     }
 }
 
+#[derive(Clone)]
+pub struct NodeComponent;
+
 impl<T: Component> Component for Option<T> {
     fn render(self) -> Option<impl Component> {
         if let Some(c) = self { c.render() } else { None }
@@ -35,9 +38,6 @@ impl<T: Component> Component for Option<T> {
         if let Some(c) = self { c.flex_node() } else { None }
     }
 }
-
-#[derive(Clone)]
-pub struct NodeComponent;
 
 impl Component for NodeComponent {
     fn render(self) -> Option<impl Component> {

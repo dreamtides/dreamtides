@@ -25,16 +25,6 @@ pub struct FlexVector3 {
     pub z: f32,
 }
 
-impl FlexVector3 {
-    pub fn new(x: f32, y: f32, z: f32) -> Self {
-        Self { x, y, z }
-    }
-
-    pub fn one() -> Self {
-        Self { x: 1.0, y: 1.0, z: 1.0 }
-    }
-}
-
 #[derive(Clone, Copy, Debug, Serialize, Deserialize, JsonSchema)]
 pub struct FlexRotate {
     pub degrees: f32,
@@ -55,12 +45,6 @@ pub struct FlexScale {
     pub amount: FlexVector3,
 }
 
-impl FlexScale {
-    pub fn new(amount: f32) -> Self {
-        Self { amount: FlexVector3::new(amount, amount, amount) }
-    }
-}
-
 #[derive(Clone, Copy, Debug, Serialize, Deserialize, JsonSchema)]
 pub struct TextShadow {
     pub offset: FlexVector2,
@@ -76,12 +60,6 @@ pub struct ImageSlice {
     pub left: u32,
 }
 
-impl From<u32> for ImageSlice {
-    fn from(value: u32) -> Self {
-        Self { top: value, right: value, bottom: value, left: value }
-    }
-}
-
 #[derive(Clone, Copy, Debug, Serialize, Deserialize, JsonSchema)]
 pub enum FlexPickingMode {
     Position,
@@ -91,47 +69,11 @@ pub enum FlexPickingMode {
 #[derive(Copy, Clone, Debug, Default, Serialize, Deserialize, JsonSchema)]
 pub struct FlexGrow(pub f32);
 
-impl From<f32> for FlexGrow {
-    fn from(value: f32) -> Self {
-        Self(value)
-    }
-}
-
-impl From<i32> for FlexGrow {
-    fn from(value: i32) -> Self {
-        Self(value as f32)
-    }
-}
-
 #[derive(Copy, Clone, Debug, Default, Serialize, Deserialize, JsonSchema)]
 pub struct FlexShrink(pub f32);
 
-impl From<f32> for FlexShrink {
-    fn from(value: f32) -> Self {
-        Self(value)
-    }
-}
-
-impl From<i32> for FlexShrink {
-    fn from(value: i32) -> Self {
-        Self(value as f32)
-    }
-}
-
 #[derive(Copy, Clone, Debug, Default, Serialize, Deserialize, JsonSchema)]
 pub struct Opacity(pub f32);
-
-impl From<f32> for Opacity {
-    fn from(value: f32) -> Self {
-        Self(value)
-    }
-}
-
-impl From<i32> for Opacity {
-    fn from(value: i32) -> Self {
-        Self(value as f32)
-    }
-}
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
 pub enum ImageScaleMode {
@@ -272,4 +214,62 @@ pub struct FlexStyle {
     #[builder(into)]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub word_spacing: Option<Dimension>,
+}
+
+impl FlexVector3 {
+    pub fn new(x: f32, y: f32, z: f32) -> Self {
+        Self { x, y, z }
+    }
+
+    pub fn one() -> Self {
+        Self { x: 1.0, y: 1.0, z: 1.0 }
+    }
+}
+
+impl FlexScale {
+    pub fn new(amount: f32) -> Self {
+        Self { amount: FlexVector3::new(amount, amount, amount) }
+    }
+}
+
+impl From<u32> for ImageSlice {
+    fn from(value: u32) -> Self {
+        Self { top: value, right: value, bottom: value, left: value }
+    }
+}
+
+impl From<f32> for FlexGrow {
+    fn from(value: f32) -> Self {
+        Self(value)
+    }
+}
+
+impl From<i32> for FlexGrow {
+    fn from(value: i32) -> Self {
+        Self(value as f32)
+    }
+}
+
+impl From<f32> for FlexShrink {
+    fn from(value: f32) -> Self {
+        Self(value)
+    }
+}
+
+impl From<i32> for FlexShrink {
+    fn from(value: i32) -> Self {
+        Self(value as f32)
+    }
+}
+
+impl From<f32> for Opacity {
+    fn from(value: f32) -> Self {
+        Self(value)
+    }
+}
+
+impl From<i32> for Opacity {
+    fn from(value: i32) -> Self {
+        Self(value as f32)
+    }
 }

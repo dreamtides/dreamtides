@@ -10,19 +10,6 @@ use crate::core::paths;
 
 const MANIFEST_FILENAME: &str = "_xlsm_manifest.json";
 
-#[derive(Deserialize)]
-struct ImageInfo {
-    hash: String,
-    size: usize,
-}
-
-#[derive(Deserialize)]
-struct Manifest {
-    version: u32,
-    file_order: Vec<String>,
-    images: BTreeMap<String, ImageInfo>,
-}
-
 pub fn rebuild_from_cache(source: &Path) -> Result<()> {
     let git_root = paths::git_root_for(source)?;
     let image_cache_dir = paths::image_cache_dir_for(&git_root);
@@ -43,6 +30,19 @@ pub fn rebuild_from_cache(source: &Path) -> Result<()> {
     }
 
     write_zip(source, updated_records, &file_order)
+}
+
+#[derive(Deserialize)]
+struct ImageInfo {
+    hash: String,
+    size: usize,
+}
+
+#[derive(Deserialize)]
+struct Manifest {
+    version: u32,
+    file_order: Vec<String>,
+    images: BTreeMap<String, ImageInfo>,
 }
 
 fn manifest_path_for(cache_dir: &Path) -> PathBuf {

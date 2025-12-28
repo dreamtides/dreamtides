@@ -24,6 +24,20 @@ pub enum FastOnly {
     No,
 }
 
+/// A card that can be played from the void via a given ability.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
+pub struct CanPlayFromVoid {
+    pub card_id: VoidCardId,
+    pub via_ability_id: AbilityId,
+}
+
+/// Cost and ability ID of a card that can be played from the void.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+pub struct FromVoidWithCost {
+    pub cost: Energy,
+    pub via_ability_id: AbilityId,
+}
+
 /// Returns the set of cards in a player's hand that are playable based on their
 /// own internal state & costs. If `fast_only` is set, only cards with the
 /// "fast" property are returned.
@@ -44,19 +58,6 @@ pub fn from_hand(
         add_if_meets_restriction(battle, player, card_id, energy_cost, &mut legal_cards);
     }
     legal_cards
-}
-
-/// A card that can be played from the void via a given ability.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
-pub struct CanPlayFromVoid {
-    pub card_id: VoidCardId,
-    pub via_ability_id: AbilityId,
-}
-
-impl From<CanPlayFromVoid> for CardId {
-    fn from(value: CanPlayFromVoid) -> Self {
-        value.card_id.card_id()
-    }
 }
 
 /// Returns the set of cards in a player's void that are playable based on their
@@ -122,13 +123,6 @@ pub fn play_from_void_energy_cost(
     }
 }
 
-/// Cost and ability ID of a card that can be played from the void.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
-pub struct FromVoidWithCost {
-    pub cost: Energy,
-    pub via_ability_id: AbilityId,
-}
-
 /// Check if a card can be played from the void, and returns the energy cost
 /// of playing it if it can be. If there are multiple abilities that can be
 /// used to play the card, returns the one with the lowest cost. This does not
@@ -151,6 +145,12 @@ pub fn can_play_from_void_energy_cost(
             )
         })
         .min()
+}
+
+impl From<CanPlayFromVoid> for CardId {
+    fn from(value: CanPlayFromVoid) -> Self {
+        value.card_id.card_id()
+    }
 }
 
 /// Returns the energy cost of playing a card from the void with a given static

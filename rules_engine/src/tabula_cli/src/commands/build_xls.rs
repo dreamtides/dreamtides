@@ -19,6 +19,33 @@ use crate::core::excel_reader::ColumnType;
 use crate::core::excel_writer::{ColumnLayout, TableLayout};
 use crate::core::{column_names, excel_writer, paths, toml_data};
 
+pub fn build_xls(
+    dry_run: bool,
+    toml_dir: Option<PathBuf>,
+    xlsm_path: Option<PathBuf>,
+    output_path: Option<PathBuf>,
+) -> Result<()> {
+    let toml_dir = resolve_toml_dir(toml_dir)?;
+    let template_path = resolve_xlsm_path(xlsm_path)?;
+    if !template_path.exists() {
+        bail!(
+            "Original XLSM not found at {}. This file is required as a template.",
+            template_path.display()
+        );
+    }
+    let destination = resolve_output_path(&template_path, output_path)?;
+
+    let layouts = excel_writer::load_table_layouts(&template_path)?;
+    let toml_tables = load_toml_tables(&toml_dir)?;
+    let prepared = prepare_tables(&layouts, &toml_tables, &toml_dir)?;
+
+    if dry_run {
+        return Ok(());
+    }
+
+    write_tables(&template_path, &destination, &prepared)
+}
+
 #[derive(Clone, Debug)]
 enum TomlValue {
     String(String),
@@ -60,33 +87,6 @@ struct ZipRecord {
     compression: CompressionMethod,
     modified: DateTime,
     is_dir: bool,
-}
-
-pub fn build_xls(
-    dry_run: bool,
-    toml_dir: Option<PathBuf>,
-    xlsm_path: Option<PathBuf>,
-    output_path: Option<PathBuf>,
-) -> Result<()> {
-    let toml_dir = resolve_toml_dir(toml_dir)?;
-    let template_path = resolve_xlsm_path(xlsm_path)?;
-    if !template_path.exists() {
-        bail!(
-            "Original XLSM not found at {}. This file is required as a template.",
-            template_path.display()
-        );
-    }
-    let destination = resolve_output_path(&template_path, output_path)?;
-
-    let layouts = excel_writer::load_table_layouts(&template_path)?;
-    let toml_tables = load_toml_tables(&toml_dir)?;
-    let prepared = prepare_tables(&layouts, &toml_tables, &toml_dir)?;
-
-    if dry_run {
-        return Ok(());
-    }
-
-    write_tables(&template_path, &destination, &prepared)
 }
 
 fn resolve_toml_dir(toml_dir: Option<PathBuf>) -> Result<PathBuf> {

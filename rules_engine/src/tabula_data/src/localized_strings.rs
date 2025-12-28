@@ -23,15 +23,6 @@ pub enum StringContext {
     CardText,
 }
 
-impl StringContext {
-    pub fn key(&self) -> &'static str {
-        match self {
-            StringContext::Interface => "interface",
-            StringContext::CardText => "card-text",
-        }
-    }
-}
-
 /// A language identifier.
 #[derive(Debug, Clone, Copy, Ord, PartialOrd, Eq, PartialEq)]
 pub enum LanguageId {
@@ -52,22 +43,6 @@ pub struct LocalizedStringSetRaw {
     pub name: String,
     pub description: String,
     pub en_us: String,
-}
-
-impl LocalizedStringSetRaw {
-    pub fn string(&self, language: LanguageId) -> String {
-        match language {
-            LanguageId::EnglishUnitedStates => self.en_us.clone(),
-        }
-    }
-}
-
-impl HasId<StringId> for LocalizedStringSetRaw {
-    type Id = StringId;
-
-    fn id(&self) -> StringId {
-        self.id
-    }
 }
 
 pub fn build(
@@ -188,6 +163,31 @@ pub fn build(
     if errors.is_empty() { Ok(ls) } else { Err(errors) }
 }
 
+impl StringContext {
+    pub fn key(&self) -> &'static str {
+        match self {
+            StringContext::Interface => "interface",
+            StringContext::CardText => "card-text",
+        }
+    }
+}
+
+impl LocalizedStringSetRaw {
+    pub fn string(&self, language: LanguageId) -> String {
+        match language {
+            LanguageId::EnglishUnitedStates => self.en_us.clone(),
+        }
+    }
+}
+
+impl HasId<StringId> for LocalizedStringSetRaw {
+    type Id = StringId;
+
+    fn id(&self) -> StringId {
+        self.id
+    }
+}
+
 impl LocalizedStrings {
     fn resource(&self) -> Arc<FluentResource> {
         self.resource.clone().expect("Resource is not set")
@@ -278,8 +278,6 @@ impl LocalizedStrings {
         if errors.is_empty() { out } else { format_error_details(&errors) }
     }
 }
-
-// normalize_literal removed (no longer required)
 
 fn format_error_details(errors: &[FluentError]) -> String {
     let mut parts: Vec<String> = Vec::new();

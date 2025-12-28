@@ -21,6 +21,13 @@ pub struct AddCardToHandPanel<'a> {
     pub battle: &'a BattleState,
 }
 
+#[derive(Clone, Builder)]
+pub struct AddCardCell<'a> {
+    pub battle: &'a BattleState,
+    pub card: BaseCardId,
+    pub user_player: PlayerName,
+}
+
 impl Component for AddCardToHandPanel<'_> {
     fn render(self) -> Option<impl Component> {
         Some(
@@ -96,13 +103,6 @@ impl Component for AddCardToHandPanel<'_> {
                 .build(),
         )
     }
-}
-
-#[derive(Clone, Builder)]
-pub struct AddCardCell<'a> {
-    pub battle: &'a BattleState,
-    pub card: BaseCardId,
-    pub user_player: PlayerName,
 }
 
 impl Component for AddCardCell<'_> {

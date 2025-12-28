@@ -34,6 +34,21 @@ pub fn object_position(
     ObjectPosition { position, sorting_key: object_position.sorting_key }
 }
 
+/// Returns the position for a card in the browser, if it is the current
+/// browser.
+pub fn for_browser(builder: &ResponseBuilder, position: Position) -> Position {
+    if display_state::is_battlefield_shown(builder) {
+        return position;
+    }
+    if let Some(browser_source) = apply_battle_display_action::current_browser_source(builder)
+        && position == browser_source
+    {
+        Position::Browser
+    } else {
+        position
+    }
+}
+
 /// Returns the position for a card if it is the source of the current prompt.
 fn for_prompt_source(
     builder: &ResponseBuilder,
@@ -49,21 +64,6 @@ fn for_prompt_source(
         Position::OnStack(positions::current_stack_type(builder, battle))
     } else {
         base_position
-    }
-}
-
-/// Returns the position for a card in the browser, if it is the current
-/// browser.
-pub fn for_browser(builder: &ResponseBuilder, position: Position) -> Position {
-    if display_state::is_battlefield_shown(builder) {
-        return position;
-    }
-    if let Some(browser_source) = apply_battle_display_action::current_browser_source(builder)
-        && position == browser_source
-    {
-        Position::Browser
-    } else {
-        position
     }
 }
 

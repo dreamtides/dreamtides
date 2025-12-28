@@ -17,69 +17,6 @@ use crate::localized_strings::LanguageId;
 use crate::tabula::TabulaBuildContext;
 use crate::tabula_table::Table;
 
-struct CommonCardFields {
-    displayed_name: String,
-    displayed_rules_text: String,
-    displayed_prompts: Vec<String>,
-    image: SpriteAddress,
-    abilities: Vec<Ability>,
-    displayed_abilities: Vec<DisplayedAbility>,
-}
-
-fn common_fields<T: BaseCardDefinitionType>(
-    sheet_name: &str,
-    context: &TabulaBuildContext,
-    row_index: usize,
-    row: &T,
-    errors: &mut Vec<InitializationError>,
-) -> Option<CommonCardFields> {
-    let displayed_name = match context.current_language {
-        LanguageId::EnglishUnitedStates => row.name_en_us().to_string(),
-    };
-    let displayed_rules_text = match context.current_language {
-        LanguageId::EnglishUnitedStates => row.rules_text_en_us().to_string(),
-    };
-    let displayed_prompts = row.prompts_en_us().map(|s| vec![s.to_string()]).unwrap_or_default();
-    let image = SpriteAddress::new(format!(
-        "Assets/ThirdParty/GameAssets/CardImages/{}/shutterstock_{}.png",
-        row.image_directory(),
-        row.image_number()
-    ));
-
-    let Some(abilities) = row.abilities_ref() else {
-        let mut ierr = InitializationError::with_details(
-            ErrorCode::AbilitiesNotPresent,
-            "Abilities not present on card definition",
-            "Please run old_tabula_cli to populate this field",
-        );
-        ierr.tabula_sheet = Some(sheet_name.to_string());
-        ierr.tabula_row = Some(row_index);
-        errors.push(ierr);
-        return None;
-    };
-
-    let Some(displayed_abilities) = row.displayed_abilities_ref() else {
-        let mut ierr = InitializationError::with_details(
-            ErrorCode::AbilitiesNotPresent,
-            "Abilities not present on card definition",
-            "Please run old_tabula_cli to populate this field",
-        );
-        ierr.tabula_sheet = Some(sheet_name.to_string());
-        ierr.tabula_row = Some(row_index);
-        errors.push(ierr);
-        return None;
-    };
-
-    Some(CommonCardFields {
-        displayed_name,
-        displayed_rules_text,
-        displayed_prompts,
-        image,
-        abilities: abilities.clone(),
-        displayed_abilities: displayed_abilities.clone(),
-    })
-}
-
 pub fn build_base_cards(
     sheet_name: &str,
     context: &TabulaBuildContext,
@@ -250,4 +187,67 @@ pub fn build_dreamwell_cards(
     }
 
     if errors.is_empty() { Ok(out) } else { Err(errors) }
+}
+
+struct CommonCardFields {
+    displayed_name: String,
+    displayed_rules_text: String,
+    displayed_prompts: Vec<String>,
+    image: SpriteAddress,
+    abilities: Vec<Ability>,
+    displayed_abilities: Vec<DisplayedAbility>,
+}
+
+fn common_fields<T: BaseCardDefinitionType>(
+    sheet_name: &str,
+    context: &TabulaBuildContext,
+    row_index: usize,
+    row: &T,
+    errors: &mut Vec<InitializationError>,
+) -> Option<CommonCardFields> {
+    let displayed_name = match context.current_language {
+        LanguageId::EnglishUnitedStates => row.name_en_us().to_string(),
+    };
+    let displayed_rules_text = match context.current_language {
+        LanguageId::EnglishUnitedStates => row.rules_text_en_us().to_string(),
+    };
+    let displayed_prompts = row.prompts_en_us().map(|s| vec![s.to_string()]).unwrap_or_default();
+    let image = SpriteAddress::new(format!(
+        "Assets/ThirdParty/GameAssets/CardImages/{}/shutterstock_{}.png",
+        row.image_directory(),
+        row.image_number()
+    ));
+
+    let Some(abilities) = row.abilities_ref() else {
+        let mut ierr = InitializationError::with_details(
+            ErrorCode::AbilitiesNotPresent,
+            "Abilities not present on card definition",
+            "Please run old_tabula_cli to populate this field",
+        );
+        ierr.tabula_sheet = Some(sheet_name.to_string());
+        ierr.tabula_row = Some(row_index);
+        errors.push(ierr);
+        return None;
+    };
+
+    let Some(displayed_abilities) = row.displayed_abilities_ref() else {
+        let mut ierr = InitializationError::with_details(
+            ErrorCode::AbilitiesNotPresent,
+            "Abilities not present on card definition",
+            "Please run old_tabula_cli to populate this field",
+        );
+        ierr.tabula_sheet = Some(sheet_name.to_string());
+        ierr.tabula_row = Some(row_index);
+        errors.push(ierr);
+        return None;
+    };
+
+    Some(CommonCardFields {
+        displayed_name,
+        displayed_rules_text,
+        displayed_prompts,
+        image,
+        abilities: abilities.clone(),
+        displayed_abilities: displayed_abilities.clone(),
+    })
 }

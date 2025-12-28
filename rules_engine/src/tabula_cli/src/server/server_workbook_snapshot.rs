@@ -5,6 +5,9 @@ use std::time::{Duration, SystemTime, UNIX_EPOCH};
 use anyhow::{Context, Result};
 use calamine::{Data, Reader, Xlsx};
 
+const MAX_RETRIES: u32 = 3;
+const RETRY_DELAY_MS: u64 = 100;
+
 #[derive(Clone, Debug)]
 pub struct WorkbookSnapshot {
     pub sheets: Vec<SheetSnapshot>,
@@ -48,9 +51,6 @@ pub struct FileMetadata {
     pub size: u64,
     pub mtime: i64,
 }
-
-const MAX_RETRIES: u32 = 3;
-const RETRY_DELAY_MS: u64 = 100;
 
 pub fn read_snapshot(
     path: &Path,

@@ -25,6 +25,12 @@ use crate::player_mutations::energy;
 
 const HAND_SIZE_LIMIT: usize = 10;
 
+#[derive(Copy, Clone, Debug, Eq, PartialEq, Hash)]
+pub enum SetRevealedToPlayer {
+    Yes,
+    No,
+}
+
 /// Draw a card from `player`'s deck and put it into their hand. If their deck
 /// is empty, all cards from the void will be shuffled back into the deck.
 ///
@@ -132,12 +138,6 @@ pub fn debug_add_cards(battle: &mut BattleState, player: PlayerName, cards: &[Ca
     battle.cards.create_cards_in_deck(player, response.created);
 
     legal_actions_cache::populate(battle);
-}
-
-#[derive(Copy, Clone, Debug, Eq, PartialEq, Hash)]
-pub enum SetRevealedToPlayer {
-    Yes,
-    No,
 }
 
 /// Ensures that at least `count` cards are known at the top of a player's deck.

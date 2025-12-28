@@ -40,15 +40,15 @@ use crate::{
     debug_actions, deserialize_save_file, error_message, handle_battle_action, serialize_save_file,
 };
 
-thread_local! {
-    static PANIC_INFO: RefCell<Option<(String, String, Backtrace)>> = const { RefCell::new(None) };
-}
-
 static TEST_STATE_PROVIDERS: LazyLock<Mutex<HashMap<Uuid, TestStateProvider>>> =
     LazyLock::new(|| Mutex::new(HashMap::new()));
 
 static DEFAULT_AI_OPPONENT: LazyLock<PlayerType> =
     LazyLock::new(|| PlayerType::Agent(GameAI::MonteCarlo(50)));
+
+thread_local! {
+    static PANIC_INFO: RefCell<Option<(String, String, Backtrace)>> = const { RefCell::new(None) };
+}
 
 #[derive(Debug, Clone)]
 pub struct PerformActionBlockingResult {

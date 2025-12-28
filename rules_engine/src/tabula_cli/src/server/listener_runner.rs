@@ -5,6 +5,12 @@ use anyhow::Result;
 use super::model::{Change, ChangedRange};
 use super::server_workbook_snapshot::WorkbookSnapshot;
 
+pub trait Listener: Send + Sync {
+    fn name(&self) -> &str;
+    fn run(&self, snapshot: &WorkbookSnapshot, context: &ListenerContext)
+    -> Result<ListenerResult>;
+}
+
 pub struct ListenerContext {
     pub request_id: String,
     pub workbook_path: String,
@@ -14,12 +20,6 @@ pub struct ListenerContext {
 pub struct ListenerResult {
     pub changes: Vec<Change>,
     pub warnings: Vec<String>,
-}
-
-pub trait Listener: Send + Sync {
-    fn name(&self) -> &str;
-    fn run(&self, snapshot: &WorkbookSnapshot, context: &ListenerContext)
-    -> Result<ListenerResult>;
 }
 
 pub fn run_listeners(

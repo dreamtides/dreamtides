@@ -2,7 +2,6 @@ use std::collections::BTreeMap;
 use std::fmt::Write as FmtWrite;
 use std::fs::{self, File, OpenOptions};
 use std::io::{Read, Seek, SeekFrom, Write};
-// PathBuf no longer needed after refactor
 use std::time::SystemTime;
 
 use battle_state::battle::animation_data::AnimationData;
@@ -17,6 +16,18 @@ use strum::IntoDiscriminant;
 use tracing::{debug, error};
 
 use crate::debug_snapshot::debug_battle_snapshot;
+
+#[derive(Debug, Clone, Serialize)]
+pub struct UndoPanicEvent {
+    pub m: String,
+    pub snapshot: DebugBattleState,
+    pub panic_action_index: usize,
+    pub total_actions: usize,
+    pub panic_info: String,
+    pub action_history: Vec<serde_json::Value>,
+    pub panic_details: serde_json::Map<String, serde_json::Value>,
+    pub timestamp: String,
+}
 
 pub fn write_battle_event(
     battle: &mut BattleState,
@@ -71,18 +82,6 @@ pub fn write_panic_snapshot(
     panic!("PANIC: {message}");
 }
 
-#[derive(Debug, Clone, Serialize)]
-pub struct UndoPanicEvent {
-    pub m: String,
-    pub snapshot: DebugBattleState,
-    pub panic_action_index: usize,
-    pub total_actions: usize,
-    pub panic_info: String,
-    pub action_history: Vec<serde_json::Value>,
-    pub panic_details: serde_json::Map<String, serde_json::Value>,
-    pub timestamp: String,
-}
-
 pub fn write_undo_panic(
     battle: &BattleState,
     panic_action_index: usize,
@@ -112,22 +111,6 @@ pub fn write_undo_panic(
             error!("Failed to serialize UndoPanicEvent: {}", e);
         }
     }
-}
-
-#[derive(Debug, Clone, Serialize)]
-struct CommandTraceEvent {
-    pub m: String,
-    pub snapshot: Option<DebugBattleState>,
-    pub sequence: CommandSequence,
-    pub timestamp: String,
-}
-
-#[derive(Debug, Clone, Serialize)]
-struct AnimationTraceEvent {
-    pub m: String,
-    pub snapshot: DebugBattleState,
-    pub step_names: Vec<String>,
-    pub timestamp: String,
 }
 
 pub fn write_animations(battle: &BattleState, animations: &AnimationData) {
@@ -184,12 +167,6 @@ pub fn write_commands(sequence: &CommandSequence, request_context: &RequestConte
     }
 }
 
-fn format_current_time() -> String {
-    let now = SystemTime::now();
-    let datetime: DateTime<Local> = now.into();
-    datetime.format("%Y-%m-%d %H:%M:%S%.3f %z").to_string()
-}
-
 pub fn clear_log_file() {
     let Some(log_path) = logging::trace_json_path() else {
         return;
@@ -200,6 +177,28 @@ pub fn clear_log_file() {
     {
         error!(?log_path, "Failed to remove dreamtides.json: {}", e);
     }
+}
+
+#[derive(Debug, Clone, Serialize)]
+struct CommandTraceEvent {
+    pub m: String,
+    pub snapshot: Option<DebugBattleState>,
+    pub sequence: CommandSequence,
+    pub timestamp: String,
+}
+
+#[derive(Debug, Clone, Serialize)]
+struct AnimationTraceEvent {
+    pub m: String,
+    pub snapshot: DebugBattleState,
+    pub step_names: Vec<String>,
+    pub timestamp: String,
+}
+
+fn format_current_time() -> String {
+    let now = SystemTime::now();
+    let datetime: DateTime<Local> = now.into();
+    datetime.format("%Y-%m-%d %H:%M:%S%.3f %z").to_string()
 }
 
 /// Writes an event to the log file. Returns true if the event was written.

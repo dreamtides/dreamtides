@@ -22,6 +22,38 @@ pub struct Dimension {
     pub value: f32,
 }
 
+#[derive(Clone, Copy, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct DimensionGroup {
+    pub top: Dimension,
+    pub right: Dimension,
+    pub bottom: Dimension,
+    pub left: Dimension,
+}
+
+#[derive(Clone, Copy, Debug, Serialize, Deserialize, JsonSchema, Builder)]
+pub struct FlexInsets {
+    #[builder(into)]
+    pub top: Option<Dimension>,
+    #[builder(into)]
+    pub right: Option<Dimension>,
+    #[builder(into)]
+    pub bottom: Option<Dimension>,
+    #[builder(into)]
+    pub left: Option<Dimension>,
+}
+
+#[derive(Clone, Copy, Debug, Serialize, Deserialize, JsonSchema, Builder)]
+pub struct SafeAreaInsets {
+    #[builder(into)]
+    pub top: Option<i32>,
+    #[builder(into)]
+    pub right: Option<i32>,
+    #[builder(into)]
+    pub bottom: Option<i32>,
+    #[builder(into)]
+    pub left: Option<i32>,
+}
+
 impl From<i32> for Dimension {
     fn from(value: i32) -> Self {
         Self { unit: DimensionUnit::Pixels, value: value as f32 }
@@ -38,14 +70,6 @@ impl From<Percent> for Dimension {
     fn from(value: Percent) -> Self {
         Self { unit: DimensionUnit::Percentage, value: value.0 as f32 }
     }
-}
-
-#[derive(Clone, Copy, Debug, Serialize, Deserialize, JsonSchema)]
-pub struct DimensionGroup {
-    pub top: Dimension,
-    pub right: Dimension,
-    pub bottom: Dimension,
-    pub left: Dimension,
 }
 
 impl From<i32> for DimensionGroup {
@@ -94,18 +118,6 @@ impl From<(f32, f32, f32, f32)> for DimensionGroup {
     }
 }
 
-#[derive(Clone, Copy, Debug, Serialize, Deserialize, JsonSchema, Builder)]
-pub struct FlexInsets {
-    #[builder(into)]
-    pub top: Option<Dimension>,
-    #[builder(into)]
-    pub right: Option<Dimension>,
-    #[builder(into)]
-    pub bottom: Option<Dimension>,
-    #[builder(into)]
-    pub left: Option<Dimension>,
-}
-
 impl FlexInsets {
     pub fn all(value: i32) -> Self {
         Self {
@@ -115,18 +127,6 @@ impl FlexInsets {
             left: Some(value.into()),
         }
     }
-}
-
-#[derive(Clone, Copy, Debug, Serialize, Deserialize, JsonSchema, Builder)]
-pub struct SafeAreaInsets {
-    #[builder(into)]
-    pub top: Option<i32>,
-    #[builder(into)]
-    pub right: Option<i32>,
-    #[builder(into)]
-    pub bottom: Option<i32>,
-    #[builder(into)]
-    pub left: Option<i32>,
 }
 
 impl From<SafeAreaInsets> for FlexInsets {

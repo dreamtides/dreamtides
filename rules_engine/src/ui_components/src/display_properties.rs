@@ -5,24 +5,18 @@ use core_data::identifiers::UserId;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
+static USER_DISPLAY_PROPERTIES: LazyLock<Mutex<HashMap<UserId, DisplayProperties>>> =
+    LazyLock::new(|| Mutex::new(HashMap::new()));
+
+static MOST_RECENT_DISPLAY_PROPERTIES: LazyLock<Mutex<Option<DisplayProperties>>> =
+    LazyLock::new(|| Mutex::new(None));
+
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
 pub struct DisplayProperties {
     pub screen_width: u32,
     pub screen_height: u32,
     pub is_mobile_device: bool,
 }
-
-impl Default for DisplayProperties {
-    fn default() -> Self {
-        Self { screen_width: 1920, screen_height: 1080, is_mobile_device: false }
-    }
-}
-
-static USER_DISPLAY_PROPERTIES: LazyLock<Mutex<HashMap<UserId, DisplayProperties>>> =
-    LazyLock::new(|| Mutex::new(HashMap::new()));
-
-static MOST_RECENT_DISPLAY_PROPERTIES: LazyLock<Mutex<Option<DisplayProperties>>> =
-    LazyLock::new(|| Mutex::new(None));
 
 pub fn store_display_properties(user_id: UserId, properties: DisplayProperties) {
     let mut display_props = USER_DISPLAY_PROPERTIES.lock().unwrap();
@@ -40,4 +34,10 @@ pub fn get_display_properties() -> DisplayProperties {
 pub fn get_display_properties_for_user(user_id: UserId) -> DisplayProperties {
     let display_props = USER_DISPLAY_PROPERTIES.lock().unwrap();
     display_props.get(&user_id).cloned().unwrap_or_default()
+}
+
+impl Default for DisplayProperties {
+    fn default() -> Self {
+        Self { screen_width: 1920, screen_height: 1080, is_mobile_device: false }
+    }
 }

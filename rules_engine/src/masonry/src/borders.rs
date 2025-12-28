@@ -12,6 +12,22 @@ pub struct BorderWidth {
     pub left: f32,
 }
 
+#[derive(Clone, Copy, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct BorderColor {
+    pub top: DisplayColor,
+    pub right: DisplayColor,
+    pub bottom: DisplayColor,
+    pub left: DisplayColor,
+}
+
+#[derive(Clone, Copy, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct BorderRadius {
+    pub top_left: Dimension,
+    pub top_right: Dimension,
+    pub bottom_right: Dimension,
+    pub bottom_left: Dimension,
+}
+
 impl From<f32> for BorderWidth {
     fn from(value: f32) -> Self {
         Self { top: value, right: value, bottom: value, left: value }
@@ -53,14 +69,6 @@ impl From<(i32, i32, i32, i32)> for BorderWidth {
     }
 }
 
-#[derive(Clone, Copy, Debug, Serialize, Deserialize, JsonSchema)]
-pub struct BorderColor {
-    pub top: DisplayColor,
-    pub right: DisplayColor,
-    pub bottom: DisplayColor,
-    pub left: DisplayColor,
-}
-
 impl From<DisplayColor> for BorderColor {
     fn from(value: DisplayColor) -> Self {
         Self { top: value, right: value, bottom: value, left: value }
@@ -79,14 +87,6 @@ impl From<(DisplayColor, DisplayColor, DisplayColor, DisplayColor)> for BorderCo
     ) -> Self {
         Self { top, right, bottom, left }
     }
-}
-
-#[derive(Clone, Copy, Debug, Serialize, Deserialize, JsonSchema)]
-pub struct BorderRadius {
-    pub top_left: Dimension,
-    pub top_right: Dimension,
-    pub bottom_right: Dimension,
-    pub bottom_left: Dimension,
 }
 
 impl From<f32> for BorderRadius {

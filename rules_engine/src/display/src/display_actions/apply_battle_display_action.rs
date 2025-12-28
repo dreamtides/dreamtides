@@ -59,6 +59,12 @@ pub fn on_action_performed(
     }
 }
 
+/// Returns whether a card browser is currently active and what source position
+/// it's browsing.
+pub fn current_browser_source(builder: &ResponseBuilder) -> Option<Position> {
+    display_state::get_card_browser_source(builder)
+}
+
 fn browse_cards(card_browser: CardBrowserType, builder: &mut ResponseBuilder) {
     let source_position = match card_browser {
         CardBrowserType::UserDeck => Position::InDeck(DisplayPlayer::User),
@@ -95,12 +101,6 @@ fn close_card_browser(builder: &ResponseBuilder) {
 
 fn set_selected_energy_additional_cost(builder: &ResponseBuilder, energy: Energy) {
     display_state::set_selected_energy_additional_cost(builder, Some(energy));
-}
-
-/// Returns whether a card browser is currently active and what source position
-/// it's browsing.
-pub fn current_browser_source(builder: &ResponseBuilder) -> Option<Position> {
-    display_state::get_card_browser_source(builder)
 }
 
 /// Toggles the visibility of the stack.

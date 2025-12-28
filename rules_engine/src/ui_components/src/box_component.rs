@@ -10,16 +10,6 @@ use crate::component::{Component, NodeComponent};
 #[derive(Clone)]
 pub struct BoxComponent(pub FlexNode);
 
-impl Component for BoxComponent {
-    fn render(self) -> Option<impl Component> {
-        Some(NodeComponent)
-    }
-
-    fn flex_node(&self) -> Option<FlexNode> {
-        Some(self.0.clone())
-    }
-}
-
 pub struct Unnamed;
 
 pub struct Named(pub String);
@@ -33,6 +23,16 @@ pub struct BoxComponentBuilder<T> {
     pressed_style: Option<FlexStyle>,
     on_attach_style: Option<FlexStyle>,
     on_attach_style_duration: Option<Milliseconds>,
+}
+
+impl Component for BoxComponent {
+    fn render(self) -> Option<impl Component> {
+        Some(NodeComponent)
+    }
+
+    fn flex_node(&self) -> Option<FlexNode> {
+        Some(self.0.clone())
+    }
 }
 
 impl BoxComponent {

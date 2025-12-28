@@ -21,12 +21,6 @@ pub enum Effect {
 )]
 pub struct ModelEffectChoiceIndex(pub usize);
 
-impl ModelEffectChoiceIndex {
-    pub fn value(self) -> usize {
-        self.0
-    }
-}
-
 /// Represents a choice of effect to apply. These are written as a bulleted list
 /// of options with associated costs and the text "Choose One".
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -58,6 +52,12 @@ pub struct EffectWithOptions {
     /// usually phrased as "If {condition}, {effect}"
     #[serde(skip_serializing_if = "Option::is_none")]
     pub condition: Option<Condition>,
+}
+
+impl ModelEffectChoiceIndex {
+    pub fn value(self) -> usize {
+        self.0
+    }
 }
 
 impl EffectWithOptions {

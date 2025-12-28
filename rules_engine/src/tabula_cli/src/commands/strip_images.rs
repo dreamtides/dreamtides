@@ -12,6 +12,7 @@ use zip::{CompressionMethod, ZipArchive, ZipWriter};
 
 use crate::core::paths;
 
+const MANIFEST_FILENAME: &str = "_xlsm_manifest.json";
 pub const PLACEHOLDER_JPEG: &[u8] = &[
     0xFF, 0xD8, 0xFF, 0xE0, 0x00, 0x10, 0x4A, 0x46, 0x49, 0x46, 0x00, 0x01, 0x01, 0x00, 0x00, 0x01,
     0x00, 0x01, 0x00, 0x00, 0xFF, 0xDB, 0x00, 0x43, 0x00, 0x08, 0x06, 0x06, 0x07, 0x06, 0x05, 0x08,
@@ -37,29 +38,6 @@ pub const PLACEHOLDER_JPEG: &[u8] = &[
     0xFF, 0xD9,
 ];
 
-const MANIFEST_FILENAME: &str = "_xlsm_manifest.json";
-
-#[derive(Serialize)]
-struct ImageInfo {
-    hash: String,
-    size: usize,
-    original_name: String,
-}
-
-#[derive(Serialize)]
-struct Manifest {
-    version: u32,
-    file_order: Vec<String>,
-    images: BTreeMap<String, ImageInfo>,
-    source_file: String,
-}
-
-struct FileRecord {
-    name: String,
-    data: Vec<u8>,
-    compression: CompressionMethod,
-}
-
 pub fn strip_images(xlsm_path: Option<PathBuf>, output_path: Option<PathBuf>) -> Result<()> {
     let source = resolve_xlsm_path(xlsm_path)?;
     let output = resolve_output_path(&source, output_path)?;
@@ -81,6 +59,27 @@ pub fn strip_images(xlsm_path: Option<PathBuf>, output_path: Option<PathBuf>) ->
     write_manifest_file(&manifest, &manifest_path)?;
 
     Ok(())
+}
+
+#[derive(Serialize)]
+struct ImageInfo {
+    hash: String,
+    size: usize,
+    original_name: String,
+}
+
+#[derive(Serialize)]
+struct Manifest {
+    version: u32,
+    file_order: Vec<String>,
+    images: BTreeMap<String, ImageInfo>,
+    source_file: String,
+}
+
+struct FileRecord {
+    name: String,
+    data: Vec<u8>,
+    compression: CompressionMethod,
 }
 
 fn resolve_xlsm_path(xlsm_path: Option<PathBuf>) -> Result<PathBuf> {

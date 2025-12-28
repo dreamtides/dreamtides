@@ -16,15 +16,6 @@ pub enum StaticAbility {
     WithOptions(StaticAbilityWithOptions),
 }
 
-impl StaticAbility {
-    pub fn standard_static_ability(&self) -> &StandardStaticAbility {
-        match self {
-            StaticAbility::StaticAbility(ability) => ability,
-            StaticAbility::WithOptions(ability) => &ability.ability,
-        }
-    }
-}
-
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct StaticAbilityWithOptions {
     pub ability: StandardStaticAbility,
@@ -83,4 +74,13 @@ pub struct AlternateCost {
     pub additional_cost: Option<Cost>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub if_you_do: Option<Effect>,
+}
+
+impl StaticAbility {
+    pub fn standard_static_ability(&self) -> &StandardStaticAbility {
+        match self {
+            StaticAbility::StaticAbility(ability) => ability,
+            StaticAbility::WithOptions(ability) => &ability.ability,
+        }
+    }
 }

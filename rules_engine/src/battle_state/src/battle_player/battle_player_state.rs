@@ -49,12 +49,6 @@ pub struct BattlePlayerState {
     pub quest: Arc<QuestState>,
 }
 
-impl BattlePlayerState {
-    pub fn as_create_battle_player(&self) -> CreateBattlePlayer {
-        CreateBattlePlayer { player_type: self.player_type.clone(), deck_name: self.deck_name }
-    }
-}
-
 #[derive(Debug, Clone, Serialize, Eq, PartialEq, Hash, Deserialize, JsonSchema)]
 pub enum PlayerType {
     User(UserId),
@@ -73,4 +67,10 @@ pub enum TestDeckName {
 pub struct CreateBattlePlayer {
     pub player_type: PlayerType,
     pub deck_name: TestDeckName,
+}
+
+impl BattlePlayerState {
+    pub fn as_create_battle_player(&self) -> CreateBattlePlayer {
+        CreateBattlePlayer { player_type: self.player_type.clone(), deck_name: self.deck_name }
+    }
 }

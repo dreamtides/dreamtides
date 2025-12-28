@@ -25,12 +25,41 @@ use zip::ZipArchive;
 
 use crate::display_state_provider::{DisplayState, DisplayStateProvider};
 
-#[derive(Debug, Clone)]
-pub struct PollResult {
-    pub commands: CommandSequence,
-    pub request_id: Option<RequestId>,
-    pub response_type: PollResponseType,
-}
+static REQUEST_CONTEXTS: LazyLock<Mutex<HashMap<UserId, RequestContext>>> =
+    LazyLock::new(|| Mutex::new(HashMap::new()));
+
+static REQUEST_TIMESTAMPS: LazyLock<Mutex<HashMap<Option<Uuid>, Instant>>> =
+    LazyLock::new(|| Mutex::new(HashMap::new()));
+
+static LAST_RESPONSE_VERSIONS: LazyLock<Mutex<HashMap<UserId, Uuid>>> =
+    LazyLock::new(|| Mutex::new(HashMap::new()));
+
+static INITIALIZATION_ERROR: LazyLock<Mutex<Option<String>>> = LazyLock::new(|| Mutex::new(None));
+
+static UNDO_STACKS: LazyLock<Mutex<HashMap<BattleId, Vec<UndoEntry>>>> =
+    LazyLock::new(|| Mutex::new(HashMap::new()));
+
+static PROCESSING_USERS: LazyLock<Mutex<HashMap<UserId, bool>>> =
+    LazyLock::new(|| Mutex::new(HashMap::new()));
+
+static PENDING_UPDATES: LazyLock<Mutex<HashMap<UserId, Vec<PollResult>>>> =
+    LazyLock::new(|| Mutex::new(HashMap::new()));
+
+/// Fast path counter for total pending poll results across all users. This lets
+/// callers check for any pending updates with a single atomic read instead of
+/// locking the PENDING_UPDATES map. Maintained in append_poll_result /
+/// take_next_poll_result.
+static TOTAL_PENDING_UPDATES: LazyLock<AtomicUsize> = LazyLock::new(|| AtomicUsize::new(0));
+
+static DISPLAY_STATES: LazyLock<Mutex<HashMap<UserId, DisplayState>>> =
+    LazyLock::new(|| Mutex::new(HashMap::new()));
+
+static SPECULATIVE_SEARCHES: LazyLock<Mutex<HashMap<BattleId, SpeculativeSearchState>>> =
+    LazyLock::new(|| Mutex::new(HashMap::new()));
+
+static TABULA_DATA: LazyLock<RwLock<Option<Arc<Tabula>>>> = LazyLock::new(|| RwLock::new(None));
+
+static PERSISTENT_DATA_DIR: LazyLock<Mutex<Option<PathBuf>>> = LazyLock::new(|| Mutex::new(None));
 
 pub trait StateProvider:
     Clone + RefUnwindSafe + UnwindSafe + Send + Sync + DisplayStateProvider
@@ -89,40 +118,12 @@ pub trait StateProvider:
     fn set_initialization_error(&self, _error: String) {}
 }
 
-static REQUEST_CONTEXTS: LazyLock<Mutex<HashMap<UserId, RequestContext>>> =
-    LazyLock::new(|| Mutex::new(HashMap::new()));
-
-static REQUEST_TIMESTAMPS: LazyLock<Mutex<HashMap<Option<Uuid>, Instant>>> =
-    LazyLock::new(|| Mutex::new(HashMap::new()));
-
-static LAST_RESPONSE_VERSIONS: LazyLock<Mutex<HashMap<UserId, Uuid>>> =
-    LazyLock::new(|| Mutex::new(HashMap::new()));
-
-static INITIALIZATION_ERROR: LazyLock<Mutex<Option<String>>> = LazyLock::new(|| Mutex::new(None));
-
-#[derive(Clone)]
-struct UndoEntry {
-    player: PlayerName,
-    state: BattleState,
+#[derive(Debug, Clone)]
+pub struct PollResult {
+    pub commands: CommandSequence,
+    pub request_id: Option<RequestId>,
+    pub response_type: PollResponseType,
 }
-
-static UNDO_STACKS: LazyLock<Mutex<HashMap<BattleId, Vec<UndoEntry>>>> =
-    LazyLock::new(|| Mutex::new(HashMap::new()));
-
-static PROCESSING_USERS: LazyLock<Mutex<HashMap<UserId, bool>>> =
-    LazyLock::new(|| Mutex::new(HashMap::new()));
-
-static PENDING_UPDATES: LazyLock<Mutex<HashMap<UserId, Vec<PollResult>>>> =
-    LazyLock::new(|| Mutex::new(HashMap::new()));
-
-// Fast path counter for total pending poll results across all users. This lets
-// callers check for any pending updates with a single atomic read instead of
-// locking the PENDING_UPDATES map. Maintained in append_poll_result /
-// take_next_poll_result.
-static TOTAL_PENDING_UPDATES: LazyLock<AtomicUsize> = LazyLock::new(|| AtomicUsize::new(0));
-
-static DISPLAY_STATES: LazyLock<Mutex<HashMap<UserId, DisplayState>>> =
-    LazyLock::new(|| Mutex::new(HashMap::new()));
 
 #[derive(Clone)]
 pub struct SpeculativeSearchState {
@@ -130,15 +131,14 @@ pub struct SpeculativeSearchState {
     pub result: Arc<(Mutex<Option<BattleAction>>, Condvar)>,
 }
 
-static SPECULATIVE_SEARCHES: LazyLock<Mutex<HashMap<BattleId, SpeculativeSearchState>>> =
-    LazyLock::new(|| Mutex::new(HashMap::new()));
-
-static TABULA_DATA: LazyLock<RwLock<Option<Arc<Tabula>>>> = LazyLock::new(|| RwLock::new(None));
-
-static PERSISTENT_DATA_DIR: LazyLock<Mutex<Option<PathBuf>>> = LazyLock::new(|| Mutex::new(None));
-
 #[derive(Clone)]
 pub struct DefaultStateProvider;
+
+#[derive(Clone)]
+struct UndoEntry {
+    player: PlayerName,
+    state: BattleState,
+}
 
 impl DefaultStateProvider {
     // Fast check used by the rules engine to determine if any poll results are

@@ -24,14 +24,6 @@ pub fn serialize_ability(ability: &Ability) -> String {
     }
 }
 
-fn capitalize_first_letter(s: &str) -> String {
-    let mut chars = s.chars();
-    match chars.next() {
-        None => String::new(),
-        Some(first) => first.to_uppercase().collect::<String>() + chars.as_str(),
-    }
-}
-
 pub fn serialize_standard_effect(effect: &StandardEffect) -> String {
     match effect {
         StandardEffect::DrawCards { .. } => "draw {cards}.".to_string(),
@@ -80,6 +72,14 @@ pub fn serialize_trigger_event(trigger: &TriggerEvent) -> String {
         }
         TriggerEvent::GainEnergy => "when you gain energy, ".to_string(),
         _ => unimplemented!("Serialization not yet implemented for this trigger type"),
+    }
+}
+
+fn capitalize_first_letter(s: &str) -> String {
+    let mut chars = s.chars();
+    match chars.next() {
+        None => String::new(),
+        Some(first) => first.to_uppercase().collect::<String>() + chars.as_str(),
     }
 }
 

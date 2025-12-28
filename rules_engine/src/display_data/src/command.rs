@@ -23,38 +23,6 @@ pub struct CommandSequence {
     pub groups: Vec<ParallelCommandGroup>,
 }
 
-impl CommandSequence {
-    pub fn from_command(command: Command) -> Self {
-        Self { groups: vec![ParallelCommandGroup { commands: vec![command] }] }
-    }
-
-    pub fn sequential(sequence: Vec<Command>) -> Self {
-        Self {
-            groups: sequence
-                .into_iter()
-                .map(|c| ParallelCommandGroup { commands: vec![c] })
-                .collect(),
-        }
-    }
-
-    pub fn from_vecs(vecs: Vec<Vec<Command>>) -> Self {
-        Self { groups: vecs.into_iter().map(|c| ParallelCommandGroup { commands: c }).collect() }
-    }
-
-    pub fn parallel(commands: Vec<Command>) -> Self {
-        Self { groups: vec![ParallelCommandGroup { commands }] }
-    }
-
-    pub fn optional_sequential(sequence: Vec<Option<Command>>) -> Self {
-        Self {
-            groups: sequence
-                .into_iter()
-                .filter_map(|c| c.map(|c| ParallelCommandGroup { commands: vec![c] }))
-                .collect(),
-        }
-    }
-}
-
 /// A set of [Command]s to execute simultaneously.
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
 pub struct ParallelCommandGroup {
@@ -101,17 +69,6 @@ pub struct UpdateQuestCommand {
 
     /// Sound to play when the quest is updated.
     pub update_sound: Option<AudioClipAddress>,
-}
-
-impl UpdateBattleCommand {
-    pub fn new(battle: BattleView) -> Self {
-        Self { battle, update_sound: None }
-    }
-
-    pub fn with_update_sound(mut self, update_sound: AudioClipAddress) -> Self {
-        self.update_sound = Some(update_sound);
-        self
-    }
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema, Builder)]
@@ -400,4 +357,47 @@ pub enum GameMessageType {
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema, Eq, PartialEq)]
 pub enum ScreenAnchor {
     SiteCharacter(SiteId),
+}
+
+impl CommandSequence {
+    pub fn from_command(command: Command) -> Self {
+        Self { groups: vec![ParallelCommandGroup { commands: vec![command] }] }
+    }
+
+    pub fn sequential(sequence: Vec<Command>) -> Self {
+        Self {
+            groups: sequence
+                .into_iter()
+                .map(|c| ParallelCommandGroup { commands: vec![c] })
+                .collect(),
+        }
+    }
+
+    pub fn from_vecs(vecs: Vec<Vec<Command>>) -> Self {
+        Self { groups: vecs.into_iter().map(|c| ParallelCommandGroup { commands: c }).collect() }
+    }
+
+    pub fn parallel(commands: Vec<Command>) -> Self {
+        Self { groups: vec![ParallelCommandGroup { commands }] }
+    }
+
+    pub fn optional_sequential(sequence: Vec<Option<Command>>) -> Self {
+        Self {
+            groups: sequence
+                .into_iter()
+                .filter_map(|c| c.map(|c| ParallelCommandGroup { commands: vec![c] }))
+                .collect(),
+        }
+    }
+}
+
+impl UpdateBattleCommand {
+    pub fn new(battle: BattleView) -> Self {
+        Self { battle, update_sound: None }
+    }
+
+    pub fn with_update_sound(mut self, update_sound: AudioClipAddress) -> Self {
+        self.update_sound = Some(update_sound);
+        self
+    }
 }

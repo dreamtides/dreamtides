@@ -6,12 +6,6 @@ pub struct SpannedText {
     pub span: SimpleSpan,
 }
 
-impl SpannedText {
-    pub fn new(text: String, span: SimpleSpan) -> Self {
-        Self { text, span }
-    }
-}
-
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum SpannedAbility {
     Event(SpannedEventAbility),
@@ -50,4 +44,10 @@ pub enum SpannedEffect {
 pub struct SpannedModalEffectChoice {
     pub cost: SpannedText,
     pub effect: SpannedText,
+}
+
+impl SpannedText {
+    pub fn new(text: String, span: SimpleSpan) -> Self {
+        Self { text, span }
+    }
 }

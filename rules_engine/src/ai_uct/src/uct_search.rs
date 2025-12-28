@@ -117,6 +117,15 @@ pub fn search_first_action_candidate_for_benchmarking(
     result.action
 }
 
+/// Public version of `evaluate` for use in benchmark tests.
+pub fn evaluate_for_benchmarking(
+    battle: &mut BattleState,
+    maximizing_player: PlayerName,
+) -> OrderedFloat<f64> {
+    fastrand::seed(31415926535897);
+    evaluate(battle, maximizing_player)
+}
+
 fn search_action_candidate(
     initial_battle: &BattleState,
     player: PlayerName,
@@ -357,15 +366,6 @@ fn evaluate(battle: &mut BattleState, maximizing_player: PlayerName) -> OrderedF
     };
     let reward = if winner == Some(maximizing_player) { 1.0 } else { -1.0 };
     OrderedFloat(reward)
-}
-
-/// Public version of `evaluate` for use in benchmark tests.
-pub fn evaluate_for_benchmarking(
-    battle: &mut BattleState,
-    maximizing_player: PlayerName,
-) -> OrderedFloat<f64> {
-    fastrand::seed(31415926535897);
-    evaluate(battle, maximizing_player)
 }
 
 /// Computes the score for a child node based on its parent's visit count and

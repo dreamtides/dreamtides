@@ -56,6 +56,24 @@ pub fn cards(builder: &ResponseBuilder, battle: &BattleState) -> Vec<CardView> {
         .collect()
 }
 
+/// [String]s for the descriptions of the choices in an active modal effect
+/// prompt, if any.
+pub fn modal_effect_descriptions(
+    builder: &ResponseBuilder,
+    abilities: &[DisplayedAbility],
+) -> Vec<String> {
+    all_modal_effect_descriptions(abilities)
+        .iter()
+        .map(|choice| {
+            builder.tabula().strings.format_display_string(
+                &choice.effect,
+                StringContext::CardText,
+                fluent_args![],
+            )
+        })
+        .collect()
+}
+
 fn modal_effect_card_view(
     builder: &ResponseBuilder,
     battle: &BattleState,
@@ -94,24 +112,6 @@ fn modal_effect_card_view(
         .build();
 
     token_rendering::token_card_view(view)
-}
-
-/// [String]s for the descriptions of the choices in an active modal effect
-/// prompt, if any.
-pub fn modal_effect_descriptions(
-    builder: &ResponseBuilder,
-    abilities: &[DisplayedAbility],
-) -> Vec<String> {
-    all_modal_effect_descriptions(abilities)
-        .iter()
-        .map(|choice| {
-            builder.tabula().strings.format_display_string(
-                &choice.effect,
-                StringContext::CardText,
-                fluent_args![],
-            )
-        })
-        .collect()
 }
 
 fn all_modal_effect_descriptions(

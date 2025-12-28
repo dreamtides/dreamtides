@@ -12,6 +12,11 @@ use display_data::object_position::{ObjectPosition, Position, StackType};
 use crate::core::response_builder::ResponseBuilder;
 use crate::rendering::position_overrides;
 
+pub struct ControllerAndZone {
+    pub controller: PlayerName,
+    pub zone: Zone,
+}
+
 pub fn calculate(
     builder: &ResponseBuilder,
     battle: &BattleState,
@@ -35,11 +40,6 @@ pub fn calculate(
 pub fn for_card(battle: &BattleState, card_id: CardId, position: Position) -> ObjectPosition {
     let object_id = card::get(battle, card_id).object_id;
     ObjectPosition { position, sorting_key: object_id.0 as u32 }
-}
-
-pub struct ControllerAndZone {
-    pub controller: PlayerName,
-    pub zone: Zone,
 }
 
 pub fn controller_and_zone(battle: &BattleState, card_id: CardId) -> ControllerAndZone {

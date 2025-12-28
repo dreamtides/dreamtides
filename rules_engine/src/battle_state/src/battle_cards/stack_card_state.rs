@@ -24,6 +24,43 @@ pub enum StackItemId {
     ActivatedAbility(ActivatedAbilityId),
 }
 
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct StackItemState {
+    pub id: StackItemId,
+    pub controller: PlayerName,
+    pub targets: Option<EffectTargets>,
+    pub additional_costs_paid: StackCardAdditionalCostsPaid,
+    pub modal_choice: Option<ModelEffectChoiceIndex>,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub enum EffectTargets {
+    /// A target for a standard effect.
+    Standard(StandardEffectTarget),
+
+    /// Target queue for an effect list. An entry of `None` indicates that the
+    /// specified target was provided but is no longer valid on resolution, e.g.
+    /// because a target character has been dissolved.
+    ///
+    /// During effect resolution, we pop targets from the list when required,
+    /// i.e. it is assumed that this order will match the order in which targets
+    /// are required for effects.
+    EffectList(VecDeque<Option<StandardEffectTarget>>),
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub enum StandardEffectTarget {
+    Character(CardObjectId<CharacterId>),
+    StackCard(CardObjectId<StackCardId>),
+    VoidCardSet(BTreeSet<CardObjectId<VoidCardId>>),
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub enum StackCardAdditionalCostsPaid {
+    None,
+    Energy(Energy),
+}
+
 impl From<StackCardId> for StackItemId {
     fn from(id: StackCardId) -> Self {
         StackItemId::Card(id)
@@ -43,15 +80,6 @@ impl StackItemId {
             StackItemId::ActivatedAbility(activated) => activated.character_id.card_id(),
         }
     }
-}
-
-#[derive(Clone, Debug, Serialize, Deserialize)]
-pub struct StackItemState {
-    pub id: StackItemId,
-    pub controller: PlayerName,
-    pub targets: Option<EffectTargets>,
-    pub additional_costs_paid: StackCardAdditionalCostsPaid,
-    pub modal_choice: Option<ModelEffectChoiceIndex>,
 }
 
 impl StackItemState {
@@ -86,21 +114,6 @@ impl StackItemState {
     }
 }
 
-#[derive(Clone, Debug, Serialize, Deserialize)]
-pub enum EffectTargets {
-    /// A target for a standard effect.
-    Standard(StandardEffectTarget),
-
-    /// Target queue for an effect list. An entry of `None` indicates that the
-    /// specified target was provided but is no longer valid on resolution, e.g.
-    /// because a target character has been dissolved.
-    ///
-    /// During effect resolution, we pop targets from the list when required,
-    /// i.e. it is assumed that this order will match the order in which targets
-    /// are required for effects.
-    EffectList(VecDeque<Option<StandardEffectTarget>>),
-}
-
 impl EffectTargets {
     pub fn add(&mut self, target: StandardEffectTarget) {
         match self {
@@ -129,13 +142,6 @@ impl EffectTargets {
     }
 }
 
-#[derive(Clone, Debug, Serialize, Deserialize)]
-pub enum StandardEffectTarget {
-    Character(CardObjectId<CharacterId>),
-    StackCard(CardObjectId<StackCardId>),
-    VoidCardSet(BTreeSet<CardObjectId<VoidCardId>>),
-}
-
 impl StandardEffectTarget {
     pub fn card_ids(&self) -> Vec<CardId> {
         match self {
@@ -146,10 +152,4 @@ impl StandardEffectTarget {
             }
         }
     }
-}
-
-#[derive(Clone, Debug, Serialize, Deserialize)]
-pub enum StackCardAdditionalCostsPaid {
-    None,
-    Energy(Energy),
 }

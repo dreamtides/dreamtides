@@ -15,6 +15,19 @@ use tabula_data::card_definitions::card_definition::CardDefinition;
 use crate::battle_card_queries::build_named_abilities;
 use crate::card_ability_queries::{effect_queries, target_predicates};
 
+#[derive(Debug, Copy, Clone)]
+pub enum PredicateType {
+    Character,
+    Stack,
+    Void,
+}
+
+pub struct EventEffectPredicate<'a> {
+    pub effect: &'a StandardEffect,
+    pub predicate: &'a Predicate,
+    pub predicate_type: PredicateType,
+}
+
 /// Builds an ability list from a card definition for a specific identity.
 pub fn build_from_definition(definition: &CardDefinition) -> AbilityList {
     let abilities = definition
@@ -145,19 +158,6 @@ fn compute_event_target_restriction(list: &AbilityList) -> Option<CanPlayRestric
         },
         PredicateType::Void => None,
     }
-}
-
-#[derive(Debug, Copy, Clone)]
-pub enum PredicateType {
-    Character,
-    Stack,
-    Void,
-}
-
-pub struct EventEffectPredicate<'a> {
-    pub effect: &'a StandardEffect,
-    pub predicate: &'a Predicate,
-    pub predicate_type: PredicateType,
 }
 
 fn event_effect_predicates(list: &AbilityList) -> Vec<EventEffectPredicate<'_>> {

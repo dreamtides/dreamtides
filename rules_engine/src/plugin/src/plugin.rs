@@ -1,5 +1,3 @@
-#![allow(clippy::missing_safety_doc)] // You only live once, that's the motto - Drake
-
 use std::backtrace::Backtrace;
 use std::panic::{self, UnwindSafe};
 use std::path::PathBuf;
@@ -32,6 +30,7 @@ static TOKIO_RUNTIME: LazyLock<Runtime> =
 /// Returns the number of bytes written to the `response` buffer, or -1 on
 /// error.
 #[unsafe(no_mangle)]
+#[expect(clippy::missing_safety_doc)]
 pub unsafe extern "C" fn dreamtides_connect(
     request: *const u8,
     request_length: i32,
@@ -39,6 +38,68 @@ pub unsafe extern "C" fn dreamtides_connect(
     response_length: i32,
 ) -> i32 {
     unsafe { error_boundary(|| connect_impl(request, request_length, response, response_length)) }
+}
+
+/// Performs a given game action.
+///
+/// `request` should be a buffer including the json serialization of a
+/// `PerformActionRequest` message of `request_length` bytes. `response` should
+/// be an empty buffer of `response_length` bytes, this buffer will be populated
+/// with a json-serialized `PerformActionResponse` describing the result of
+/// performing this action.
+///
+/// Returns the number of bytes written to the `response` buffer, or -1 on
+/// error.
+#[unsafe(no_mangle)]
+#[expect(clippy::missing_safety_doc)]
+pub unsafe extern "C" fn dreamtides_perform_action(
+    request: *const u8,
+    request_length: i32,
+    response: *mut u8,
+    response_length: i32,
+) -> i32 {
+    unsafe { error_boundary(|| perform_impl(request, request_length, response, response_length)) }
+}
+
+/// Checks whether any updates are available to retreive from the poll()
+/// function.
+#[unsafe(no_mangle)]
+#[expect(clippy::missing_safety_doc)]
+pub unsafe extern "C" fn dreamtides_has_updates() -> bool {
+    engine::any_user_has_updates()
+}
+
+/// Polls for pending updates for a user.
+///
+/// `request` should be a buffer including the json serialization of a
+/// `PollRequest` message of `request_length` bytes. `response` should be an
+/// empty buffer of `response_length` bytes, this buffer will be populated with
+/// a json-serialized `PollResponse` describing any pending updates for the
+/// user.
+///
+/// Returns the number of bytes written to the `response` buffer, or -1 on
+/// error.
+#[unsafe(no_mangle)]
+#[expect(clippy::missing_safety_doc)]
+pub unsafe extern "C" fn dreamtides_poll(
+    request: *const u8,
+    request_length: i32,
+    response: *mut u8,
+    response_length: i32,
+) -> i32 {
+    unsafe { error_boundary(|| poll_impl(request, request_length, response, response_length)) }
+}
+
+/// Logs events from the client.
+///
+/// `request` should be a buffer including the json serialization of a
+/// `ClientLogRequest` message of `request_length` bytes.
+///
+/// Returns 0 on success, or -1 on error.
+#[unsafe(no_mangle)]
+#[expect(clippy::missing_safety_doc)]
+pub unsafe extern "C" fn dreamtides_log(request: *const u8, request_length: i32) -> i32 {
+    unsafe { error_boundary(|| log_impl(request, request_length)) }
 }
 
 unsafe fn connect_impl(
@@ -75,26 +136,6 @@ unsafe fn connect_impl(
     Ok(json_bytes.len() as i32)
 }
 
-/// Performs a given game action.
-///
-/// `request` should be a buffer including the json serialization of a
-/// `PerformActionRequest` message of `request_length` bytes. `response` should
-/// be an empty buffer of `response_length` bytes, this buffer will be populated
-/// with a json-serialized `PerformActionResponse` describing the result of
-/// performing this action.
-///
-/// Returns the number of bytes written to the `response` buffer, or -1 on
-/// error.
-#[unsafe(no_mangle)]
-pub unsafe extern "C" fn dreamtides_perform_action(
-    request: *const u8,
-    request_length: i32,
-    response: *mut u8,
-    response_length: i32,
-) -> i32 {
-    unsafe { error_boundary(|| perform_impl(request, request_length, response, response_length)) }
-}
-
 unsafe fn perform_impl(
     request: *const u8,
     request_length: i32,
@@ -127,33 +168,6 @@ unsafe fn perform_impl(
     Ok(json_bytes.len() as i32)
 }
 
-/// Checks whether any updates are available to retreive from the poll()
-/// function.
-#[unsafe(no_mangle)]
-pub unsafe extern "C" fn dreamtides_has_updates() -> bool {
-    engine::any_user_has_updates()
-}
-
-/// Polls for pending updates for a user.
-///
-/// `request` should be a buffer including the json serialization of a
-/// `PollRequest` message of `request_length` bytes. `response` should be an
-/// empty buffer of `response_length` bytes, this buffer will be populated with
-/// a json-serialized `PollResponse` describing any pending updates for the
-/// user.
-///
-/// Returns the number of bytes written to the `response` buffer, or -1 on
-/// error.
-#[unsafe(no_mangle)]
-pub unsafe extern "C" fn dreamtides_poll(
-    request: *const u8,
-    request_length: i32,
-    response: *mut u8,
-    response_length: i32,
-) -> i32 {
-    unsafe { error_boundary(|| poll_impl(request, request_length, response, response_length)) }
-}
-
 unsafe fn poll_impl(
     request: *const u8,
     request_length: i32,
@@ -184,17 +198,6 @@ unsafe fn poll_impl(
     let out = unsafe { std::slice::from_raw_parts_mut(response, response_length as usize) };
     out[..json_bytes.len()].copy_from_slice(json_bytes);
     Ok(json_bytes.len() as i32)
-}
-
-/// Logs events from the client.
-///
-/// `request` should be a buffer including the json serialization of a
-/// `ClientLogRequest` message of `request_length` bytes.
-///
-/// Returns 0 on success, or -1 on error.
-#[unsafe(no_mangle)]
-pub unsafe extern "C" fn dreamtides_log(request: *const u8, request_length: i32) -> i32 {
-    unsafe { error_boundary(|| log_impl(request, request_length)) }
 }
 
 unsafe fn log_impl(request: *const u8, request_length: i32) -> Result<i32> {

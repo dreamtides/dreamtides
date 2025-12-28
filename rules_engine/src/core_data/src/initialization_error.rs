@@ -18,6 +18,18 @@ pub enum ErrorCode {
     AbilityParsingError,
 }
 
+/// Message describing why an error happened during initialization.
+#[derive(Debug, Clone)]
+pub struct InitializationError {
+    pub code: ErrorCode,
+    pub name: String,
+    pub details: Option<String>,
+    pub tabula_sheet: Option<String>,
+    pub tabula_row: Option<usize>,
+    pub tabula_column: Option<String>,
+    pub tabula_id: Option<String>,
+}
+
 impl ErrorCode {
     /// Returns a 2-4 character code for this error code. Each code must be
     /// unique.
@@ -41,18 +53,6 @@ impl ErrorCode {
             ErrorCode::AbilityParsingError => "APE",
         }
     }
-}
-
-/// Message describing why an error happened during initialization.
-#[derive(Debug, Clone)]
-pub struct InitializationError {
-    pub code: ErrorCode,
-    pub name: String,
-    pub details: Option<String>,
-    pub tabula_sheet: Option<String>,
-    pub tabula_row: Option<usize>,
-    pub tabula_column: Option<String>,
-    pub tabula_id: Option<String>,
 }
 
 impl InitializationError {

@@ -6,36 +6,6 @@ use serde::Serialize;
 use crate::lexer::lexer_token::{Spanned, Token};
 use crate::variables::parser_bindings::VariableBindings;
 
-pub fn resolve_variables(
-    tokens: &[Spanned<Token>],
-    bindings: &VariableBindings,
-) -> Result<Vec<Spanned<ResolvedToken>>, UnresolvedVariable> {
-    tokens
-        .iter()
-        .map(|(token, span)| match token {
-            Token::Directive(name) => {
-                resolve_directive(name, bindings, *span).map(|resolved| (resolved, *span))
-            }
-            _ => Ok((ResolvedToken::Token(token.clone()), *span)),
-        })
-        .collect()
-}
-
-pub fn directive_names() -> impl Iterator<Item = &'static str> {
-    DIRECTIVES.iter().map(|(name, _, _)| *name)
-}
-
-pub fn variable_names() -> impl Iterator<Item = &'static str> {
-    DIRECTIVES
-        .iter()
-        .map(|(_, var_name, _)| *var_name)
-        .filter(|name| !name.is_empty())
-        .chain(["figment", "number", "subtype", "allies"])
-}
-
-type VariableConstructor =
-    fn(&str, &str, &VariableBindings, SimpleSpan) -> Result<ResolvedToken, UnresolvedVariable>;
-
 static DIRECTIVES: &[(&str, &str, VariableConstructor)] = &[
     ("a-figment", "figment", figment),
     ("a-subtype", "subtype", subtype),
@@ -88,6 +58,36 @@ pub struct UnresolvedVariable {
     pub name: String,
     pub span: SimpleSpan,
 }
+
+pub fn resolve_variables(
+    tokens: &[Spanned<Token>],
+    bindings: &VariableBindings,
+) -> Result<Vec<Spanned<ResolvedToken>>, UnresolvedVariable> {
+    tokens
+        .iter()
+        .map(|(token, span)| match token {
+            Token::Directive(name) => {
+                resolve_directive(name, bindings, *span).map(|resolved| (resolved, *span))
+            }
+            _ => Ok((ResolvedToken::Token(token.clone()), *span)),
+        })
+        .collect()
+}
+
+pub fn directive_names() -> impl Iterator<Item = &'static str> {
+    DIRECTIVES.iter().map(|(name, _, _)| *name)
+}
+
+pub fn variable_names() -> impl Iterator<Item = &'static str> {
+    DIRECTIVES
+        .iter()
+        .map(|(_, var_name, _)| *var_name)
+        .filter(|name| !name.is_empty())
+        .chain(["figment", "number", "subtype", "allies"])
+}
+
+type VariableConstructor =
+    fn(&str, &str, &VariableBindings, SimpleSpan) -> Result<ResolvedToken, UnresolvedVariable>;
 
 fn figment_count(
     directive: &str,

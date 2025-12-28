@@ -11,12 +11,6 @@ pub struct TurnHistory {
     pub current_action_history: PlayerMap<CurrentActionHistory>,
 }
 
-impl TurnHistory {
-    pub fn clear_current_action_history(&mut self) {
-        self.current_action_history = PlayerMap::default();
-    }
-}
-
 /// Tracks history of actions and events while resolving a single action.
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
 pub struct CurrentActionHistory {
@@ -26,4 +20,10 @@ pub struct CurrentActionHistory {
     /// IDs of the characters that were abandoned due to the character limit
     /// while resolving this action.
     pub character_limit_characters_abandoned: CardSet<CharacterId>,
+}
+
+impl TurnHistory {
+    pub fn clear_current_action_history(&mut self) {
+        self.current_action_history = PlayerMap::default();
+    }
 }

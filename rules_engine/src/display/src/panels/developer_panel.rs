@@ -22,6 +22,14 @@ pub struct DeveloperPanel {
     pub user_player: PlayerName,
 }
 
+#[derive(Clone, Builder)]
+pub struct DebugButton {
+    #[builder(into)]
+    pub label: String,
+    #[builder(into)]
+    pub action: GameAction,
+}
+
 impl Component for DeveloperPanel {
     fn render(self) -> Option<impl Component> {
         Some(
@@ -145,14 +153,6 @@ impl Component for DeveloperPanel {
                 .build(),
         )
     }
-}
-
-#[derive(Clone, Builder)]
-pub struct DebugButton {
-    #[builder(into)]
-    pub label: String,
-    #[builder(into)]
-    pub action: GameAction,
 }
 
 impl Component for DebugButton {

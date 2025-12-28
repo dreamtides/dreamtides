@@ -19,6 +19,15 @@ pub struct ActivatedAbility {
     pub options: Option<ActivatedAbilityOptions>,
 }
 
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+pub struct ActivatedAbilityOptions {
+    /// True if this ability can be activated in response to enemy game actions.
+    pub is_fast: bool,
+
+    /// True if this ability can be used multiple times per turn.
+    pub is_multi: bool,
+}
+
 impl ActivatedAbility {
     pub fn is_fast(&self) -> bool {
         self.options.as_ref().map(|o| o.is_fast).unwrap_or_default()
@@ -27,13 +36,4 @@ impl ActivatedAbility {
     pub fn is_multi(&self) -> bool {
         self.options.as_ref().map(|o| o.is_multi).unwrap_or_default()
     }
-}
-
-#[derive(Debug, Clone, Default, Serialize, Deserialize)]
-pub struct ActivatedAbilityOptions {
-    /// True if this ability can be activated in response to enemy game actions.
-    pub is_fast: bool,
-
-    /// True if this ability can be used multiple times per turn.
-    pub is_multi: bool,
 }

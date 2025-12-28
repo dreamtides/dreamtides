@@ -16,12 +16,6 @@ pub struct ObjectPosition {
     pub sorting_key: u32,
 }
 
-impl Default for ObjectPosition {
-    fn default() -> Self {
-        Self { position: Position::Default, sorting_key: 0 }
-    }
-}
-
 /// Possible types of display positions
 #[derive(
     Clone, Debug, Eq, PartialEq, Hash, Serialize, Deserialize, Ord, PartialOrd, JsonSchema,
@@ -184,4 +178,10 @@ pub struct TemptingOfferPosition {
 pub enum TemptingOfferType {
     Journey,
     Cost,
+}
+
+impl Default for ObjectPosition {
+    fn default() -> Self {
+        Self { position: Position::Default, sorting_key: 0 }
+    }
 }

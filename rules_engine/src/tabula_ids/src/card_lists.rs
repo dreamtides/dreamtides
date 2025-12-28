@@ -3,32 +3,6 @@ use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use uuid::uuid;
 
-#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
-pub enum BaseCardIdList {
-    Core11,
-}
-
-pub fn base_card_id_list(list: BaseCardIdList) -> &'static [BaseCardId] {
-    match list {
-        BaseCardIdList::Core11 => CORE_11,
-    }
-}
-
-#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
-pub enum DreamwellCardIdList {
-    TestDreamwellNoAbilities,
-    TestDreamwellBasic5,
-    DreamwellBasic5,
-}
-
-pub fn dreamwell_card_id_list(list: DreamwellCardIdList) -> &'static [DreamwellCardId] {
-    match list {
-        DreamwellCardIdList::TestDreamwellNoAbilities => TEST_DREAMWELL_NO_ABILITIES,
-        DreamwellCardIdList::TestDreamwellBasic5 => TEST_DREAMWELL_BASIC_5,
-        DreamwellCardIdList::DreamwellBasic5 => DREAMWELL_BASIC_5,
-    }
-}
-
 pub const CORE_11: &[BaseCardId] = &[
     BaseCardId(uuid!("d8fe4b2a-088c-4a92-aeb7-d6d4d22fda1a")),
     BaseCardId(uuid!("d8fe4b2a-088c-4a92-aeb7-d6d4d22fda1a")),
@@ -129,3 +103,29 @@ pub const TEST_DREAMWELL_NO_ABILITIES: &[DreamwellCardId] = &[
     DreamwellCardId(uuid!("ee7b0367-f7c3-46c3-94db-b29cfd8dc2d2")),
     DreamwellCardId(uuid!("ee7b0367-f7c3-46c3-94db-b29cfd8dc2d2")),
 ];
+
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub enum BaseCardIdList {
+    Core11,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub enum DreamwellCardIdList {
+    TestDreamwellNoAbilities,
+    TestDreamwellBasic5,
+    DreamwellBasic5,
+}
+
+pub fn base_card_id_list(list: BaseCardIdList) -> &'static [BaseCardId] {
+    match list {
+        BaseCardIdList::Core11 => CORE_11,
+    }
+}
+
+pub fn dreamwell_card_id_list(list: DreamwellCardIdList) -> &'static [DreamwellCardId] {
+    match list {
+        DreamwellCardIdList::TestDreamwellNoAbilities => TEST_DREAMWELL_NO_ABILITIES,
+        DreamwellCardIdList::TestDreamwellBasic5 => TEST_DREAMWELL_BASIC_5,
+        DreamwellCardIdList::DreamwellBasic5 => DREAMWELL_BASIC_5,
+    }
+}

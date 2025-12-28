@@ -6,6 +6,13 @@ pub struct TestInterfaceView {
     pub view: Option<InterfaceView>,
 }
 
+/// Recursively extract all text content from a FlexNode and its children
+pub fn extract_text_from_node(node: &FlexNode) -> String {
+    let mut texts = Vec::new();
+    collect_text_recursive(node, &mut texts);
+    texts.join(" ")
+}
+
 impl TestInterfaceView {
     pub fn new(view: Option<InterfaceView>) -> Self {
         Self { view }
@@ -108,13 +115,6 @@ impl TestInterfaceView {
     pub fn undo_button_contains(&self, substring: &str) -> bool {
         self.undo_button_text().contains(substring)
     }
-}
-
-/// Recursively extract all text content from a FlexNode and its children
-pub fn extract_text_from_node(node: &FlexNode) -> String {
-    let mut texts = Vec::new();
-    collect_text_recursive(node, &mut texts);
-    texts.join(" ")
 }
 
 /// Recursively collect text from a FlexNode hierarchy

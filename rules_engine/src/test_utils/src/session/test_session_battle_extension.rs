@@ -13,28 +13,6 @@ use display_data::command::Command;
 
 use crate::session::test_session::TestSession;
 
-pub struct TestPlayCard {
-    pub name: BaseCardId,
-    pub target: Option<ClientCardId>,
-}
-
-impl TestPlayCard {
-    pub fn new(name: BaseCardId) -> Self {
-        Self { name, target: None }
-    }
-
-    pub fn target(mut self, target: &ClientCardId) -> Self {
-        self.target = Some(target.clone());
-        self
-    }
-}
-
-impl From<BaseCardId> for TestPlayCard {
-    fn from(name: BaseCardId) -> Self {
-        Self { name, target: None }
-    }
-}
-
 /// Extension trait for TestSession to add battle-specific methods.
 pub trait TestSessionBattleExtension {
     /// Creates and then plays a card according to a [TestPlayCard] description.
@@ -161,6 +139,28 @@ pub trait TestSessionBattleExtension {
 
     /// Sets the next card that will be drawn from the dreamwell.
     fn set_next_dreamwell_card(&mut self, player: DisplayPlayer, id: DreamwellCardId);
+}
+
+pub struct TestPlayCard {
+    pub name: BaseCardId,
+    pub target: Option<ClientCardId>,
+}
+
+impl TestPlayCard {
+    pub fn new(name: BaseCardId) -> Self {
+        Self { name, target: None }
+    }
+
+    pub fn target(mut self, target: &ClientCardId) -> Self {
+        self.target = Some(target.clone());
+        self
+    }
+}
+
+impl From<BaseCardId> for TestPlayCard {
+    fn from(name: BaseCardId) -> Self {
+        Self { name, target: None }
+    }
 }
 
 impl TestSessionBattleExtension for TestSession {
