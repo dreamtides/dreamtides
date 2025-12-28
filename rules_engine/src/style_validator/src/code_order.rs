@@ -28,7 +28,7 @@ pub struct CodeOrderChecker {
 
 impl CodeOrderChecker {
     pub fn new(file_path: PathBuf) -> Self {
-        Self { violations: Vec::new(), file_path, current_phase: ItemCategory::PublicTypeAlias }
+        Self { violations: Vec::new(), file_path, current_phase: ItemCategory::PrivateConst }
     }
 
     fn get_line_column<T: Spanned>(&self, node: &T) -> (usize, usize) {
