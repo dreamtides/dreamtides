@@ -200,7 +200,7 @@ fn normalize_column_name(name: &str) -> String {
     name.trim().replace(['\u{00A0}', '\u{202F}'], " ").to_lowercase()
 }
 
-fn parse_fluent_args(cell_value: Option<&CellValue>) -> Result<FluentArgs> {
+fn parse_fluent_args(cell_value: Option<&CellValue>) -> Result<FluentArgs<'_>> {
     let mut args = FluentArgs::new();
     let variables_text = match cell_value {
         None | Some(CellValue::Empty) => return Ok(args),

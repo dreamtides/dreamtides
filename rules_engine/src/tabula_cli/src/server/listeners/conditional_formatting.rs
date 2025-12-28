@@ -32,19 +32,19 @@ impl Listener for ConditionalFormattingListener {
         let mut changes = Vec::new();
 
         for (cell_ref, value) in &cards_sheet.cell_values {
-            if let CellValue::String(text) = value {
-                if text.to_lowercase().contains("pineapple") {
-                    if let Some(ref range) = scan_range {
-                        if !cell_in_range(cell_ref, range)? {
-                            continue;
-                        }
-                    }
-                    changes.push(Change::SetBold {
-                        sheet: "Cards".to_string(),
-                        cell: cell_ref.clone(),
-                        bold: true,
-                    });
+            if let CellValue::String(text) = value
+                && text.to_lowercase().contains("pineapple")
+            {
+                if let Some(ref range) = scan_range
+                    && !cell_in_range(cell_ref, range)?
+                {
+                    continue;
                 }
+                changes.push(Change::SetBold {
+                    sheet: "Cards".to_string(),
+                    cell: cell_ref.clone(),
+                    bold: true,
+                });
             }
         }
 

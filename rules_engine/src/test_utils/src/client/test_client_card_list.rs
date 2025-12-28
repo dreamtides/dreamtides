@@ -37,7 +37,7 @@ impl<'a> TestClientCardList<'a> {
     pub fn print_ids(&self) {
         println!(
             ">>>>> [{}]",
-            self.cards.iter().map(|card| card.id.to_string()).collect::<Vec<_>>().join(", ")
+            self.cards.iter().map(|card| card.id.clone()).collect::<Vec<_>>().join(", ")
         );
     }
 
@@ -48,7 +48,7 @@ impl<'a> TestClientCardList<'a> {
             ">>>>> [{}]",
             self.cards
                 .iter()
-                .map(|card| card.view.revealed.as_ref().unwrap().name.to_string())
+                .map(|card| card.view.revealed.as_ref().unwrap().name.clone())
                 .collect::<Vec<_>>()
                 .join(", ")
         );

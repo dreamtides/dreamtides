@@ -34,10 +34,10 @@ pub fn table_to_toml(table: &TableInfo) -> Result<String> {
         let (raw_name, _) = &ordered_columns[0];
         let mut values = Vec::new();
         for row in &table.rows {
-            if let Some(value) = row.get(raw_name) {
-                if let Some(toml_value) = cell_value_to_toml(value) {
-                    values.push(toml_value);
-                }
+            if let Some(value) = row.get(raw_name)
+                && let Some(toml_value) = cell_value_to_toml(value)
+            {
+                values.push(toml_value);
             }
         }
         let mut root = Table::new();
@@ -51,10 +51,10 @@ pub fn table_to_toml(table: &TableInfo) -> Result<String> {
     for row in &table.rows {
         let mut table_row = Table::new();
         for (raw_name, normalized_name) in &ordered_columns {
-            if let Some(value) = row.get(raw_name) {
-                if let Some(toml_value) = cell_value_to_toml(value) {
-                    table_row.insert(normalized_name.clone(), toml_value);
-                }
+            if let Some(value) = row.get(raw_name)
+                && let Some(toml_value) = cell_value_to_toml(value)
+            {
+                table_row.insert(normalized_name.clone(), toml_value);
             }
         }
         rows.push(Value::Table(table_row));

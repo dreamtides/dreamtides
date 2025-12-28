@@ -340,7 +340,7 @@ fn collect_data_validations(sheet: &Worksheet) -> BTreeSet<DataValidationSnapsho
 
 fn validation_snapshot(validation: &DataValidation) -> DataValidationSnapshot {
     DataValidationSnapshot {
-        sqref: validation.get_sequence_of_references().get_sqref().to_string(),
+        sqref: validation.get_sequence_of_references().get_sqref().clone(),
         r#type: validation.get_type().clone(),
         operator: validation.get_operator().clone(),
         allow_blank: *validation.get_allow_blank(),
@@ -361,7 +361,7 @@ fn collect_conditionals(sheet: &Worksheet) -> BTreeSet<ConditionalFormattingSnap
         let rules: Vec<ConditionalRuleSnapshot> =
             cf.get_conditional_collection().iter().map(rule_snapshot).collect();
         set.insert(ConditionalFormattingSnapshot {
-            sqref: cf.get_sequence_of_references().get_sqref().to_string(),
+            sqref: cf.get_sequence_of_references().get_sqref().clone(),
             rules,
         });
     }

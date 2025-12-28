@@ -261,7 +261,7 @@ fn debug_dreamwell(state: &BattleState) -> DebugDreamwellState {
             let idx = usize::from(id);
             DebugDreamwellCardState {
                 index: format!("{idx}"),
-                name: card.definition.displayed_name.to_string(),
+                name: card.definition.displayed_name.clone(),
                 phase: format!("{:?}", card.definition.phase),
                 produced_energy: format!("{:?}", card.produced_energy),
                 abilities: card.effects.iter().map(|a| format!("{:?}", a.ability)).collect(),

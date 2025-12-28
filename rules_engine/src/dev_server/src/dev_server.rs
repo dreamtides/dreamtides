@@ -82,7 +82,7 @@ async fn connect(body: String) -> AppResult<Json<ConnectResponse>> {
         Ok(directory) => directory,
         Err(e) => {
             error!(error.message = %e, "Failed to get log directory");
-            return Err(AppError::Internal(e.to_string()));
+            return Err(AppError::Internal(e.clone()));
         }
     };
     let response = engine::connect(&req, RequestContext {

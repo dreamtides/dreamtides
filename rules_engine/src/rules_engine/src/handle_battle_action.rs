@@ -193,8 +193,7 @@ fn start_speculative_response_search(
     };
     let mut simulation = battle.logical_clone();
     apply_battle_action::execute(&mut simulation, human_player, assumed_action);
-    loop {
-        let Some(next_player) = legal_actions::next_to_act(&simulation) else { break };
+    while let Some(next_player) = legal_actions::next_to_act(&simulation) {
         if let Some(auto) =
             should_auto_execute_action(&legal_actions::compute(&simulation, next_player))
         {

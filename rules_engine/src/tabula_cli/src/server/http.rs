@@ -120,10 +120,10 @@ async fn handle_notify(State(state): State<Arc<ServerState>>, body: Bytes) -> im
         },
     };
 
-    if state.once {
-        if let Some(sender) = state.shutdown.lock().await.take() {
-            let _ = sender.send(());
-        }
+    if state.once
+        && let Some(sender) = state.shutdown.lock().await.take()
+    {
+        let _ = sender.send(());
     }
 
     let serialized = serialization::serialize_response(&response);

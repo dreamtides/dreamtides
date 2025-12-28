@@ -116,7 +116,7 @@ fn require_record<'a>(records: &'a BTreeMap<String, FileRecord>, name: &str) -> 
         .ok_or_else(|| anyhow::anyhow!("Spreadsheet is missing entry {}", name))
 }
 
-fn parse_doc(xml: &[u8]) -> Result<Document> {
+fn parse_doc(xml: &[u8]) -> Result<Document<'_>> {
     let text = std::str::from_utf8(xml).context("XML data is not valid UTF-8")?;
     Document::parse(text).context("Failed to parse XML")
 }
@@ -281,14 +281,11 @@ fn parse_image_cells(
         let mut shared_formulas = HashMap::new();
         for node in doc.descendants().filter(|n| n.has_tag_name((MAIN_NS, "c"))) {
             if let Some(formula) = node.children().find(|child| child.has_tag_name((MAIN_NS, "f")))
+                && let Some(si) = formula.attribute("si")
+                && let Some(text) = formula.text()
             {
-                if let Some(si) = formula.attribute("si") {
-                    if let Some(text) = formula.text() {
-                        let anchor = node.attribute("r").context("Cell missing reference")?;
-                        shared_formulas
-                            .insert(si.to_string(), (text.to_string(), anchor.to_string()));
-                    }
-                }
+                let anchor = node.attribute("r").context("Cell missing reference")?;
+                shared_formulas.insert(si.to_string(), (text.to_string(), anchor.to_string()));
             }
         }
 
@@ -707,10 +704,10 @@ fn update_relationship_targets(
         }
     }
     for rel in relationships {
-        if rel.type_name.ends_with("/hyperlink") {
-            if let Some(url) = address_targets.get(rel.id.as_str()) {
-                rel.target = (*url).to_string();
-            }
+        if rel.type_name.ends_with("/hyperlink")
+            && let Some(url) = address_targets.get(rel.id.as_str())
+        {
+            rel.target = (*url).to_string();
         }
     }
 }

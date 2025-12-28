@@ -699,7 +699,7 @@ where
             let panic_msg = match panic_error.downcast_ref::<&'static str>() {
                 Some(s) => s.to_string(),
                 None => match panic_error.downcast_ref::<String>() {
-                    Some(s) => s.to_string(),
+                    Some(s) => s.clone(),
                     None => "Unknown panic".to_string(),
                 },
             };
