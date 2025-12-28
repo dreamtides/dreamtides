@@ -217,18 +217,11 @@ impl LocalizedStrings {
         if bundle.add_resource(self.resource()).is_err() {
             return "ERR3: Add Resource Failed".to_string();
         }
-        let key = match self.id_to_key.get(&id) {
-            Some(k) => k,
-            None => return "ERR4: Missing Message".to_string(),
+        let Some(key) = self.id_to_key.get(&id) else { return "ERR4: Missing Message".to_string() };
+        let Some(msg) = bundle.get_message(key.as_str()) else {
+            return "ERR4: Missing Message".to_string();
         };
-        let msg = match bundle.get_message(key.as_str()) {
-            Some(m) => m,
-            None => return "ERR4: Missing Message".to_string(),
-        };
-        let pattern = match msg.value() {
-            Some(p) => p,
-            None => return "ERR5: Missing Value".to_string(),
-        };
+        let Some(pattern) = msg.value() else { return "ERR5: Missing Value".to_string() };
         let mut errors = vec![];
         let out = bundle.format_pattern(pattern, Some(&args), &mut errors).into_owned();
         if errors.is_empty() { out } else { format_error_details(&errors) }
@@ -265,14 +258,10 @@ impl LocalizedStrings {
         if bundle.add_resource(Arc::new(temp_res)).is_err() {
             return "ERR3: Add Resource Failed".to_string();
         }
-        let msg = match bundle.get_message("tmp-for-display") {
-            Some(m) => m,
-            None => return "ERR4: Missing Message 'tmp-for-display'".to_string(),
+        let Some(msg) = bundle.get_message("tmp-for-display") else {
+            return "ERR4: Missing Message 'tmp-for-display'".to_string();
         };
-        let pattern = match msg.value() {
-            Some(p) => p,
-            None => return "ERR5: Missing Value".to_string(),
-        };
+        let Some(pattern) = msg.value() else { return "ERR5: Missing Value".to_string() };
         let mut errors = vec![];
         let out = bundle.format_pattern(pattern, Some(&args), &mut errors).into_owned();
         if errors.is_empty() { out } else { format_error_details(&errors) }

@@ -39,10 +39,7 @@ pub fn load_cards_toml() -> BenchmarkCardsFile {
 
 pub fn parse_all_cards(cards_file: BenchmarkCardsFile) {
     for card in cards_file.cards {
-        let rules_text = match &card.rules_text {
-            Some(text) => text,
-            None => continue,
-        };
+        let Some(rules_text) = &card.rules_text else { continue };
 
         let bindings = if let Some(vars) = &card.variables {
             VariableBindings::parse(vars).expect("Failed to parse variables")

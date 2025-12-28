@@ -41,14 +41,12 @@ impl Listener for FluentRulesTextListener {
         let mut changes = Vec::new();
         let mut warnings = Vec::new();
 
-        let cards_table = match snapshot.tables.iter().find(|t| t.name == "Cards") {
-            Some(t) => t,
-            None => return Ok(ListenerResult { changes, warnings }),
+        let Some(cards_table) = snapshot.tables.iter().find(|t| t.name == "Cards") else {
+            return Ok(ListenerResult { changes, warnings });
         };
 
-        let rules_text_col_idx = match find_column_index(&cards_table.columns, "Rules Text") {
-            Some(idx) => idx,
-            None => return Ok(ListenerResult { changes, warnings }),
+        let Some(rules_text_col_idx) = find_column_index(&cards_table.columns, "Rules Text") else {
+            return Ok(ListenerResult { changes, warnings });
         };
 
         let variables_col_idx = find_column_index(&cards_table.columns, "Variables");
@@ -61,15 +59,10 @@ impl Listener for FluentRulesTextListener {
             return Ok(ListenerResult { changes, warnings });
         }
 
-        let sheet = match snapshot.sheets.iter().find(|s| s.name == cards_table.sheet_name) {
-            Some(s) => s,
-            None => {
-                warnings.push(format!(
-                    "Sheet '{}' for table 'Cards' not found",
-                    cards_table.sheet_name
-                ));
-                return Ok(ListenerResult { changes, warnings });
-            }
+        let Some(sheet) = snapshot.sheets.iter().find(|s| s.name == cards_table.sheet_name) else {
+            warnings
+                .push(format!("Sheet '{}' for table 'Cards' not found", cards_table.sheet_name));
+            return Ok(ListenerResult { changes, warnings });
         };
 
         for row in cards_table.data_range.start_row..=cards_table.data_range.end_row {

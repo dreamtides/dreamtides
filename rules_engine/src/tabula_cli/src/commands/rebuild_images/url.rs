@@ -293,10 +293,7 @@ fn parse_image_cells(
         }
 
         for node in doc.descendants().filter(|n| n.has_tag_name((MAIN_NS, "c"))) {
-            let cell_ref = match node.attribute("r") {
-                Some(r) => r,
-                None => continue,
-            };
+            let Some(cell_ref) = node.attribute("r") else { continue };
             let vm_index = match node.attribute("vm") {
                 Some(value) => {
                     let raw = value.parse::<usize>().context("Value metadata index is invalid")?;
@@ -326,22 +323,17 @@ fn parse_image_cells(
                     continue;
                 }
             };
-            let formula_node =
-                match node.children().find(|child| child.has_tag_name((MAIN_NS, "f"))) {
-                    Some(f) => f,
-                    None => continue,
-                };
+            let Some(formula_node) =
+                node.children().find(|child| child.has_tag_name((MAIN_NS, "f")))
+            else {
+                continue;
+            };
             let raw_formula = formula_node.text().unwrap_or("").to_string();
             let (formula_text, base_ref) = if raw_formula.trim().is_empty() {
-                let si = match formula_node.attribute("si") {
-                    Some(value) => value,
-                    None => {
-                        warnings.push(format!(
-                            "Shared formula missing si for {}!{}",
-                            sheet.name, cell_ref
-                        ));
-                        continue;
-                    }
+                let Some(si) = formula_node.attribute("si") else {
+                    warnings
+                        .push(format!("Shared formula missing si for {}!{}", sheet.name, cell_ref));
+                    continue;
                 };
                 match shared_formulas.get(si) {
                     Some(value) => value.clone(),
@@ -414,10 +406,7 @@ fn compute_urls(
             };
             ranges.insert(cell.sheet.clone(), range);
         }
-        let range = match ranges.get(&cell.sheet) {
-            Some(value) => value,
-            None => continue,
-        };
+        let Some(range) = ranges.get(&cell.sheet) else { continue };
         let row_offset = cell.cell_row as i32 - cell.base_row as i32;
         let col_offset = cell.cell_col as i32 - cell.base_col as i32;
         let url = match evaluate_formula(&cell.formula, range, row_offset, col_offset) {
@@ -690,22 +679,16 @@ fn apply_downloads(
     warnings: &mut Vec<String>,
 ) -> Result<()> {
     for (identifier, data) in downloads {
-        let image = match web_images.get(*identifier) {
-            Some(value) => value,
-            None => {
-                warnings.push(format!("No web image entry for identifier {identifier}"));
-                continue;
-            }
+        let Some(image) = web_images.get(*identifier) else {
+            warnings.push(format!("No web image entry for identifier {identifier}"));
+            continue;
         };
-        let record = match records.get_mut(&image.image_path) {
-            Some(value) => value,
-            None => {
-                warnings.push(format!(
-                    "Spreadsheet is missing image entry {path}",
-                    path = image.image_path
-                ));
-                continue;
-            }
+        let Some(record) = records.get_mut(&image.image_path) else {
+            warnings.push(format!(
+                "Spreadsheet is missing image entry {path}",
+                path = image.image_path
+            ));
+            continue;
         };
         record.data = data.clone();
     }

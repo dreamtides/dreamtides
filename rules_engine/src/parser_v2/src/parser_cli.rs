@@ -191,10 +191,7 @@ fn parse_file_command(input: &PathBuf, output: &PathBuf) -> Result<(), Box<dyn s
     let mut results = Vec::new();
 
     for card in cards_file.cards {
-        let rules_text = match &card.rules_text {
-            Some(text) => text,
-            None => continue,
-        };
+        let Some(rules_text) = &card.rules_text else { continue };
 
         let bindings = if let Some(vars) = &card.variables {
             VariableBindings::parse(vars)?
@@ -230,12 +227,9 @@ fn verify_command(input: &PathBuf) -> Result<(), Box<dyn std::error::Error>> {
     let mut skipped_count = 0;
 
     for card in cards_file.cards {
-        let rules_text = match &card.rules_text {
-            Some(text) => text,
-            None => {
-                skipped_count += 1;
-                continue;
-            }
+        let Some(rules_text) = &card.rules_text else {
+            skipped_count += 1;
+            continue;
         };
 
         let bindings = if let Some(vars) = &card.variables {

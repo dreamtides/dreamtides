@@ -181,19 +181,13 @@ fn fire_projectile(
             return;
         }
     };
-    let source_pred = match &row.projectile_source {
-        Some(p) => p,
-        None => {
-            warn!(?row.card_id, "Missing projectile_source for FireProjectile effect");
-            return;
-        }
+    let Some(source_pred) = &row.projectile_source else {
+        warn!(?row.card_id, "Missing projectile_source for FireProjectile effect");
+        return;
     };
-    let target_pred = match &row.projectile_target {
-        Some(p) => p,
-        None => {
-            warn!(?row.card_id, "Missing projectile_target for FireProjectile effect");
-            return;
-        }
+    let Some(target_pred) = &row.projectile_target else {
+        warn!(?row.card_id, "Missing projectile_target for FireProjectile effect");
+        return;
     };
     let sources = resolve_object_predicate(
         builder,
@@ -276,12 +270,9 @@ fn display_effect(
     controller: PlayerName,
     animation: &BattleAnimation,
 ) {
-    let target_pred = match &row.effect_target {
-        Some(p) => p,
-        None => {
-            warn!(?row.card_id, "Missing effect_target for DisplayEffect effect");
-            return;
-        }
+    let Some(target_pred) = &row.effect_target else {
+        warn!(?row.card_id, "Missing effect_target for DisplayEffect effect");
+        return;
     };
     let targets = resolve_object_predicate(
         builder,
@@ -310,12 +301,9 @@ fn display_effect(
             Milliseconds::new(500)
         }
     };
-    let scale = match row.effect_scale {
-        Some(s) => s,
-        None => {
-            warn!(?row.card_id, "Missing effect_scale for DisplayEffect effect");
-            return;
-        }
+    let Some(scale) = row.effect_scale else {
+        warn!(?row.card_id, "Missing effect_scale for DisplayEffect effect");
+        return;
     };
     for t in targets {
         builder.push(Command::DisplayEffect(DisplayEffectCommand {
@@ -335,12 +323,9 @@ fn set_card_trail(
     _animation: &BattleAnimation,
     animation_targets: &[ClientCardId],
 ) {
-    let targets_pred = match &row.card_trail_targets {
-        Some(p) => p,
-        None => {
-            warn!(?row.card_id, "Missing card_trail_targets for SetCardTrail effect");
-            return;
-        }
+    let Some(targets_pred) = &row.card_trail_targets else {
+        warn!(?row.card_id, "Missing card_trail_targets for SetCardTrail effect");
+        return;
     };
     let card_ids = resolve_card_ids_predicate(targets_pred, source_id, animation_targets);
     if card_ids.is_empty() {

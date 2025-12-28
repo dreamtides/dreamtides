@@ -2,16 +2,6 @@ Please follow all of the "code style" and "validating changes" rules below at
 all times.
 
 
-# SETUP
-
-
-- This project uses Rust and Cargo, which can be installed via `rustup`
-    - `curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh`
-- This project uses the `just` command runner
-    - `cargo install just`
-  - A `just` command can be run from any directory of the project and will have the same result
-- This project uses `cargo-workspace-lints`
-    - `cargo install cargo-workspace-lints`
 
 # CODE STYLE
 
@@ -84,6 +74,9 @@ More task-specification documentation is available:
 
 The code is structured as a series of Rust crates using the cargo "workspace" feature.
 
-Rules engine source code lives in the `rules_engine/` directory.
+Rules engine Rust source code lives in the `rules_engine/` directory.
+Clietn soruce code lives in the `client/` directory.
+
+Your current working directory is `rules_engine/`. The `justfile` and similar are located in the parent directory.
 
 Card data lives in `rules_engine/tabula/cards.toml`

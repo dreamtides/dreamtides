@@ -47,10 +47,9 @@ pub fn from_hand(battle: &mut BattleState, player: PlayerName, card_id: HandCard
 /// Plays a card from the void to the stack as `player` by paying its costs. If
 /// the card requires targets or choices, a prompt will be displayed.
 pub fn from_void(battle: &mut BattleState, player: PlayerName, card_id: VoidCardId) {
-    let from_void_with_cost = match can_play_cards::can_play_from_void_energy_cost(battle, card_id)
-    {
-        Some(cost) => cost,
-        None => panic_with!("Card cannot be played from void", battle, card_id),
+    let Some(from_void_with_cost) = can_play_cards::can_play_from_void_energy_cost(battle, card_id)
+    else {
+        panic_with!("Card cannot be played from void", battle, card_id)
     };
     let via_ability = from_void_with_cost.via_ability_id;
     let source = EffectSource::Player { controller: player };
