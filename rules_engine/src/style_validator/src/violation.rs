@@ -20,6 +20,7 @@ pub enum ViolationKind {
     PubUseStatement,
     CargoTomlDependencyOrder,
     InlineUseStatement,
+    CodeOrder,
 }
 
 impl ViolationKind {
@@ -48,6 +49,9 @@ impl ViolationKind {
             }
             ViolationKind::InlineUseStatement => {
                 "use statement placed inline within function body or other nested context (use statements must be at top of file)"
+            }
+            ViolationKind::CodeOrder => {
+                "items not in correct order (should be: public type aliases, public constants, public traits, public structs/enums, public functions, then private items)"
             }
         }
     }

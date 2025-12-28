@@ -3,6 +3,7 @@ use std::path::Path;
 use anyhow::Result;
 
 mod cargo_dependencies;
+mod code_order;
 mod direct_function_imports;
 mod file_scanner;
 mod inline_use_statements;
@@ -14,6 +15,9 @@ mod violation;
 use file_scanner::{find_cargo_toml_files, find_rust_files};
 
 fn main() -> Result<()> {
+    let args: Vec<String> = std::env::args().collect();
+    let check_code_order = args.contains(&"--code-order".to_string());
+
     let rules_engine_path =
         Path::new(env!("CARGO_MANIFEST_DIR")).parent().unwrap().parent().unwrap();
 
@@ -64,6 +68,17 @@ fn main() -> Result<()> {
             }
             Err(e) => {
                 eprintln!("Error checking {}: {}", file.display(), e);
+            }
+        }
+
+        if check_code_order {
+            match code_order::check_file(file) {
+                Ok(violations) => {
+                    all_violations.extend(violations);
+                }
+                Err(e) => {
+                    eprintln!("Error checking {}: {}", file.display(), e);
+                }
             }
         }
     }
