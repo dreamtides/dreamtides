@@ -22,10 +22,7 @@ fn main() -> Result<()> {
     let rules_engine_path =
         Path::new(env!("CARGO_MANIFEST_DIR")).parent().unwrap().parent().unwrap();
 
-    println!("Checking Rust files in: {}", rules_engine_path.display());
-
     let rust_files = find_rust_files(rules_engine_path);
-    println!("Found {} Rust files", rust_files.len());
 
     let mut all_violations = Vec::new();
     let style_validator_path = Path::new(env!("CARGO_MANIFEST_DIR"));
@@ -90,7 +87,6 @@ fn main() -> Result<()> {
             match code_order::check_file(file) {
                 Ok(violations) => {
                     if !violations.is_empty() && fix_mode {
-                        println!("Fixing code order in {}", file.display());
                         if let Err(e) = code_order::fix_file(file) {
                             eprintln!("Error fixing {}: {}", file.display(), e);
                         }
@@ -117,7 +113,6 @@ fn main() -> Result<()> {
 
     // Check Cargo.toml files
     let cargo_toml_files = find_cargo_toml_files(rules_engine_path);
-    println!("Found {} Cargo.toml files", cargo_toml_files.len());
 
     for file in &cargo_toml_files {
         match cargo_dependencies::check_file(file) {

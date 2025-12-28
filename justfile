@@ -213,7 +213,10 @@ benchmark *args='':
   cargo criterion --manifest-path rules_engine/Cargo.toml "$@"
 
 style-validator:
-  cargo run --manifest-path rules_engine/Cargo.toml --bin "style_validator" -- "$@"
+  cargo run --manifest-path rules_engine/Cargo.toml --bin "style_validator" -- --code-order "$@"
+
+style-validator-fix:
+  cargo run --manifest-path rules_engine/Cargo.toml --bin "style_validator" -- --code-order --fix "$@"
 
 parser *args='':
   cargo run --manifest-path rules_engine/Cargo.toml --bin "parser_v2" -- "$@"
@@ -281,7 +284,7 @@ insta:
 
 # Reformats code. Requires nightly because several useful options (e.g. imports_granularity) are
 # nightly-only
-fmt:
+fmt: style-validator-fix
     #!/usr/bin/env bash
     output=$(cd rules_engine && cargo +nightly fmt 2>&1)
     if [ $? -eq 0 ]; then
