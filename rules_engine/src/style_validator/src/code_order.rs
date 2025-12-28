@@ -8,12 +8,14 @@ use crate::violation::{StyleViolation, ViolationKind};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 enum ItemCategory {
+    PrivateConst,
     PublicTypeAlias,
     PublicConst,
     PublicTrait,
     PublicStructOrEnum,
     PublicFunction,
     PrivateItems,
+    TestModule,
 }
 
 pub struct CodeOrderChecker {
@@ -50,8 +52,20 @@ impl CodeOrderChecker {
         &self.violations
     }
 
+    fn is_test_module(item: &Item) -> bool {
+        if let Item::Mod(m) = item {
+            m.attrs.iter().any(|attr| {
+                attr.path().is_ident("cfg")
+                    && attr.parse_args::<syn::Ident>().map(|ident| ident == "test").unwrap_or(false)
+            })
+        } else {
+            false
+        }
+    }
+
     fn categorize_item(item: &Item) -> ItemCategory {
         match item {
+            Item::Const(c) if !matches!(c.vis, Visibility::Public(_)) => ItemCategory::PrivateConst,
             Item::Type(t) if matches!(t.vis, Visibility::Public(_)) => {
                 ItemCategory::PublicTypeAlias
             }
@@ -70,23 +84,32 @@ impl CodeOrderChecker {
 
     fn category_name(category: ItemCategory) -> &'static str {
         match category {
+            ItemCategory::PrivateConst => "private constants",
             ItemCategory::PublicTypeAlias => "public type aliases",
             ItemCategory::PublicConst => "public constants",
             ItemCategory::PublicTrait => "public traits",
             ItemCategory::PublicStructOrEnum => "public structs and enums",
             ItemCategory::PublicFunction => "public functions",
             ItemCategory::PrivateItems => "private items",
+            ItemCategory::TestModule => "test modules",
         }
     }
 
     pub fn check_file(&mut self, file: &File) {
         for item in &file.items {
-            // Skip use statements and module declarations
-            if matches!(item, Item::Use(_) | Item::Mod(_)) {
+            if matches!(item, Item::Use(_)) {
                 continue;
             }
 
-            let category = Self::categorize_item(item);
+            if matches!(item, Item::Mod(_)) && !Self::is_test_module(item) {
+                continue;
+            }
+
+            let category = if Self::is_test_module(item) {
+                ItemCategory::TestModule
+            } else {
+                Self::categorize_item(item)
+            };
 
             if category < self.current_phase {
                 self.add_violation(
@@ -125,23 +148,29 @@ pub fn fix_file(path: &Path) -> Result<()> {
     let syntax = syn::parse_file(&content)
         .with_context(|| format!("Failed to parse file: {}", path.display()))?;
 
+    let lines: Vec<&str> = content.lines().collect();
+
     let mut categorized_items: Vec<(ItemCategory, String)> = Vec::new();
     let mut use_and_mod_items: Vec<String> = Vec::new();
+    let mut test_modules: Vec<String> = Vec::new();
 
-    for item in syntax.items {
-        if matches!(item, Item::Use(_) | Item::Mod(_)) {
-            use_and_mod_items.push(prettyplease::unparse(&syn::File {
-                shebang: None,
-                attrs: Vec::new(),
-                items: vec![item],
-            }));
+    for item in &syntax.items {
+        let span = item.span();
+        let start_line = span.start().line.saturating_sub(1);
+        let end_line = span.end().line.saturating_sub(1);
+
+        let item_text = if start_line == end_line {
+            lines[start_line].to_string()
         } else {
-            let formatted_item = prettyplease::unparse(&syn::File {
-                shebang: None,
-                attrs: Vec::new(),
-                items: vec![item.clone()],
-            });
-            categorized_items.push((CodeOrderChecker::categorize_item(&item), formatted_item));
+            lines[start_line..=end_line.min(lines.len().saturating_sub(1))].join("\n")
+        };
+
+        if CodeOrderChecker::is_test_module(item) {
+            test_modules.push(item_text);
+        } else if matches!(item, Item::Use(_) | Item::Mod(_)) {
+            use_and_mod_items.push(item_text);
+        } else {
+            categorized_items.push((CodeOrderChecker::categorize_item(item), item_text));
         }
     }
 
@@ -164,6 +193,19 @@ pub fn fix_file(path: &Path) -> Result<()> {
         }
         output.push_str(item_str.trim());
         output.push('\n');
+    }
+
+    if !test_modules.is_empty() {
+        if !categorized_items.is_empty() {
+            output.push('\n');
+        }
+        for (i, item_str) in test_modules.iter().enumerate() {
+            if i > 0 {
+                output.push('\n');
+            }
+            output.push_str(item_str.trim());
+            output.push('\n');
+        }
     }
 
     std::fs::write(path, output)
