@@ -103,8 +103,8 @@ fn rebuild_images_handles_missing_optional_entries() {
     let (order, img1, img2) =
         tabula_cli_test_utils::create_xlsm_with_images(&xlsm_path).expect("xlsm");
 
-    let hash1 = Sha256::digest(&img1).iter().map(|b| format!("{:02x}", b)).collect::<String>();
-    let hash2 = Sha256::digest(&img2).iter().map(|b| format!("{:02x}", b)).collect::<String>();
+    let hash1 = Sha256::digest(&img1).iter().map(|b| format!("{b:02x}")).collect::<String>();
+    let hash2 = Sha256::digest(&img2).iter().map(|b| format!("{b:02x}")).collect::<String>();
     fs::write(cache_dir.join(&hash1), &img1).expect("cache1");
     fs::write(cache_dir.join(&hash2), &img2).expect("cache2");
 

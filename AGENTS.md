@@ -32,7 +32,7 @@ all times.
 - Public functions and types go at the TOP of the file, then private ones.
 - Don't add "pub use" for anything.
 - Keep Cargo.toml dependencies alphabetized in two lists, internal then external dependencies.
-- Use modern Rust features such as if-let statements and "{inline:?}" variable formatting
+- Use modern Rust features such as let-else statements and "{inline:?}" variable formatting
 - Do not add code to `mod.rs` or `lib.rs` files except for module declarations
 - Do not add `use` declarations within function bodies, only place them at the top of files
 

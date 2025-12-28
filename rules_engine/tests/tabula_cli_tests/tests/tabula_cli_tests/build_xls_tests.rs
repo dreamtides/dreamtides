@@ -364,7 +364,7 @@ value = 3
     let data = table.data();
     let names: Vec<_> = data
         .rows()
-        .map(|row| match row.get(0) {
+        .map(|row| match row.first() {
             Some(Data::String(s)) => s.clone(),
             _ => "".to_string(),
         })

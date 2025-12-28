@@ -42,8 +42,7 @@ fn put_cards_from_deck_into_void_with_small_deck() {
     // (3 from deck + 1 event card)
     assert_eq!(
         final_void_size, 4,
-        "Should have 4 cards in void (3 deck cards plus 1 event card). Initial void: {}, Final void: {}",
-        initial_void_size, final_void_size
+        "Should have 4 cards in void (3 deck cards plus 1 event card). Initial void: {initial_void_size}, Final void: {final_void_size}"
     );
 
     // Deck should have cards remaining after shuffle

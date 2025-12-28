@@ -65,7 +65,7 @@ fn build_toml_preserves_column_order() {
     let toml_path = output_dir.join("test-table.toml");
     let content = fs::read_to_string(&toml_path).expect("read toml");
     let mut lines = content.lines();
-    while let Some(line) = lines.next() {
+    for line in lines.by_ref() {
         if line.starts_with("[[test-table]]") {
             break;
         }
@@ -161,7 +161,7 @@ fn build_toml_prunes_old_backups() {
     fs::create_dir_all(&backup_dir).expect("git dir");
 
     for i in 0..60 {
-        let name = format!("202001010000{0:02}-test.xlsm", i);
+        let name = format!("202001010000{i:02}-test.xlsm");
         fs::write(backup_dir.join(name), b"old").expect("seed backup");
     }
 
