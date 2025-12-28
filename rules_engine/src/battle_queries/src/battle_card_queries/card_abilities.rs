@@ -93,7 +93,7 @@ fn build_ability_list(
 fn merge_can_play_restrictions(
     restrictions: Vec<Option<CanPlayRestriction>>,
 ) -> Option<CanPlayRestriction> {
-    if restrictions.iter().any(|r| r.is_none()) {
+    if restrictions.iter().any(Option::is_none) {
         return None;
     }
 

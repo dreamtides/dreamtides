@@ -40,7 +40,7 @@ impl QualifierChecker {
 
             // Function names typically start with lowercase or are snake_case
             // This heuristic isn't perfect but should catch most cases
-            name.chars().next().map(|c| c.is_lowercase()).unwrap_or(false)
+            name.chars().next().map(char::is_lowercase).unwrap_or(false)
         } else {
             false
         }
@@ -53,8 +53,7 @@ impl QualifierChecker {
 
             // Enum variants typically start with uppercase (PascalCase)
             // And we need at least one qualifier (TypeName::Variant)
-            name.chars().next().map(|c| c.is_uppercase()).unwrap_or(false)
-                && path.segments.len() >= 2
+            name.chars().next().map(char::is_uppercase).unwrap_or(false) && path.segments.len() >= 2
         } else {
             false
         }
@@ -64,7 +63,7 @@ impl QualifierChecker {
         // Type names are PascalCase and typically used without qualifiers
         if let Some(last) = path.segments.last() {
             let name = last.ident.to_string();
-            name.chars().next().map(|c| c.is_uppercase()).unwrap_or(false)
+            name.chars().next().map(char::is_uppercase).unwrap_or(false)
         } else {
             false
         }

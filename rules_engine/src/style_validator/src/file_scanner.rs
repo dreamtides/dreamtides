@@ -21,7 +21,7 @@ pub fn find_rust_files(root: &Path) -> Vec<PathBuf> {
 
             true
         })
-        .filter_map(|e| e.ok())
+        .filter_map(Result::ok)
         .filter(|e| e.path().extension().map(|ext| ext == "rs").unwrap_or(false))
         .map(|e| e.path().to_path_buf())
         .collect()
@@ -46,7 +46,7 @@ pub fn find_cargo_toml_files(root: &Path) -> Vec<PathBuf> {
 
             true
         })
-        .filter_map(|e| e.ok())
+        .filter_map(Result::ok)
         .filter(|e| {
             e.path()
                 .file_name()

@@ -140,11 +140,12 @@ fn read_workbook_internal(path: &Path) -> Result<WorkbookSnapshot> {
     let mut tables = Vec::new();
     if workbook.load_tables().is_ok() {
         let table_names: Vec<String> =
-            workbook.table_names().iter().map(|s| s.to_string()).collect();
+            workbook.table_names().iter().map(ToString::to_string).collect();
         for table_name in &table_names {
             if let Ok(table) = workbook.table_by_name(table_name) {
                 let sheet_name = table.sheet_name().to_string();
-                let columns: Vec<String> = table.columns().iter().map(|s| s.to_string()).collect();
+                let columns: Vec<String> =
+                    table.columns().iter().map(ToString::to_string).collect();
                 let data = table.data();
                 let (start_row, start_col) = data.start().unwrap_or((0, 0));
                 let (end_row, end_col) = data.end().unwrap_or((0, 0));

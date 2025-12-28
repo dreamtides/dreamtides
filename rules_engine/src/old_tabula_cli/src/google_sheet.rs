@@ -110,12 +110,11 @@ impl Spreadsheet for GoogleSheet {
             }
             rows.push(out);
         }
-        let end_col =
-            number_to_column_letters(if rows.first().map(|r| r.len()).unwrap_or(0) == 0 {
-                1
-            } else {
-                rows.first().map(|r| r.len() as u32).unwrap_or(1)
-            });
+        let end_col = number_to_column_letters(if rows.first().map(Vec::len).unwrap_or(0) == 0 {
+            1
+        } else {
+            rows.first().map(|r| r.len() as u32).unwrap_or(1)
+        });
         let end_row = if rows.is_empty() { 1 } else { rows.len() as u32 };
         let range = format!("{name}!A1:{end_col}{end_row}");
         let value_range = ValueRange { values: Some(rows), ..Default::default() };

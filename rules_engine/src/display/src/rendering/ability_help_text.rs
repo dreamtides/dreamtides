@@ -50,7 +50,7 @@ pub fn help_texts(builder: &ResponseBuilder, battle: &BattleState, card_id: Card
 fn capture_number(text: &str, prefix: &str) -> Option<u32> {
     if let Some(start) = text.find(prefix) {
         let rest = &text[start + prefix.len()..];
-        let digits: String = rest.chars().take_while(|c| c.is_ascii_digit()).collect();
+        let digits: String = rest.chars().take_while(char::is_ascii_digit).collect();
         if digits.is_empty() { None } else { digits.parse().ok() }
     } else {
         None

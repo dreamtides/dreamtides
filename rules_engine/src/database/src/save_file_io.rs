@@ -203,7 +203,7 @@ fn extract_non_string_map_key_hint(text: &str) -> Option<&str> {
         return text[pos..]
             .split(',')
             .find(|seg| !seg.trim_start().starts_with('"'))
-            .map(|s| s.trim());
+            .map(str::trim);
     }
     None
 }

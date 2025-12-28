@@ -248,7 +248,8 @@ impl StateProvider for DefaultStateProvider {
         let raw: TabulaRaw = match load_tabula_raw(&tabula_path) {
             Ok(r) => r,
             Err(e) => {
-                let formatted = e.iter().map(|e| e.format()).collect::<Vec<_>>().join("\n");
+                let formatted =
+                    e.iter().map(InitializationError::format).collect::<Vec<_>>().join("\n");
                 if let Ok(mut guard) = INITIALIZATION_ERROR.lock() {
                     *guard = Some(formatted.clone());
                 }

@@ -42,7 +42,7 @@ pub fn extract_tables(path: &Path) -> Result<Vec<TableInfo>> {
         .load_tables()
         .with_context(|| format!("Failed to load tables from {}", path.display()))?;
 
-    let table_names: Vec<String> = workbook.table_names().iter().map(|s| s.to_string()).collect();
+    let table_names: Vec<String> = workbook.table_names().iter().map(ToString::to_string).collect();
     if table_names.is_empty() {
         bail!(
             "No named Excel Tables found in {}. Tables are distinct from worksheets.",
@@ -57,7 +57,7 @@ pub fn extract_tables(path: &Path) -> Result<Vec<TableInfo>> {
             .with_context(|| format!("Failed to read table '{table_name}'"))?;
 
         let sheet_name = table.sheet_name().to_string();
-        let column_names: Vec<String> = table.columns().iter().map(|s| s.to_string()).collect();
+        let column_names: Vec<String> = table.columns().iter().map(ToString::to_string).collect();
         let data = table.data();
         let (start_row, start_col) = data.start().unwrap_or((0, 0));
 

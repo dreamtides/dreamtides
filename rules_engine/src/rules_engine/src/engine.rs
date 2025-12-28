@@ -514,7 +514,7 @@ fn format_initialization_errors(errors: &[InitializationError]) -> String {
     if errors.is_empty() {
         return "Unknown initialization error".to_string();
     }
-    errors.iter().map(|e| e.format()).collect::<Vec<_>>().join("\n")
+    errors.iter().map(InitializationError::format).collect::<Vec<_>>().join("\n")
 }
 
 fn send_updates_to_user_and_opponent<P: StateProvider + 'static>(

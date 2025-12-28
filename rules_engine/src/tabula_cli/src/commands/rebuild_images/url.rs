@@ -154,7 +154,7 @@ fn parse_relationships(xml: &[u8]) -> Result<Vec<Relationship>> {
             id,
             target,
             type_name,
-            mode: node.attribute("TargetMode").map(|s| s.to_string()),
+            mode: node.attribute("TargetMode").map(ToString::to_string),
         });
     }
     Ok(relationships)

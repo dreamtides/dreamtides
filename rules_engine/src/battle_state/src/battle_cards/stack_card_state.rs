@@ -135,7 +135,7 @@ impl EffectTargets {
             EffectTargets::Standard(target) => target.card_ids(),
             EffectTargets::EffectList(targets) => targets
                 .iter()
-                .filter_map(|target| target.as_ref().map(|target| target.card_ids()))
+                .filter_map(|target| target.as_ref().map(StandardEffectTarget::card_ids))
                 .flatten()
                 .collect(),
         }

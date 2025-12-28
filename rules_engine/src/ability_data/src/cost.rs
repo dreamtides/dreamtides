@@ -31,7 +31,7 @@ impl Cost {
     pub fn energy_cost(&self) -> Option<Energy> {
         match self {
             Cost::Energy(energy) => Some(*energy),
-            Cost::CostList(costs) => costs.iter().find_map(|cost| cost.energy_cost()),
+            Cost::CostList(costs) => costs.iter().find_map(Cost::energy_cost),
             _ => None,
         }
     }

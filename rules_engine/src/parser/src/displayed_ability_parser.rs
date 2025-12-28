@@ -63,7 +63,7 @@ pub fn parse_with(
 }
 
 fn split_blocks(text: &str) -> Vec<&str> {
-    text.split("\n\n").map(|b| b.trim()).filter(|b| !b.is_empty()).collect()
+    text.split("\n\n").map(str::trim).filter(|b| !b.is_empty()).collect()
 }
 
 /// Finds a : character that is not inside parentheses or braces.

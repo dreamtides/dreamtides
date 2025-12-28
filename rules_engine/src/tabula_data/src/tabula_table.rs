@@ -178,7 +178,7 @@ fn parse_error_column(msg: &str) -> Option<usize> {
     match msg.rfind("column ") {
         Some(i) => {
             let j = i + 7;
-            let digits: String = msg[j..].chars().take_while(|c| c.is_ascii_digit()).collect();
+            let digits: String = msg[j..].chars().take_while(char::is_ascii_digit).collect();
             digits.parse().ok()
         }
         None => None,

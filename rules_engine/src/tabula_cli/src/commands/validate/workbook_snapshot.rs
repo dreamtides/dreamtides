@@ -369,7 +369,8 @@ fn collect_conditionals(sheet: &Worksheet) -> BTreeSet<ConditionalFormattingSnap
 }
 
 fn rule_snapshot(rule: &ConditionalFormattingRule) -> ConditionalRuleSnapshot {
-    let formula = rule.get_formula().map(|f| f.get_address_str()).unwrap_or_default();
+    let formula =
+        rule.get_formula().map(umya_spreadsheet::Formula::get_address_str).unwrap_or_default();
     ConditionalRuleSnapshot {
         r#type: format!("{:?}", rule.get_type()),
         operator: format!("{:?}", rule.get_operator()),

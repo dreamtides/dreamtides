@@ -33,7 +33,7 @@ pub fn load_table_layouts(path: &Path) -> Result<Vec<TableLayout>> {
         .load_tables()
         .with_context(|| format!("Failed to load tables from {}", path.display()))?;
 
-    let table_names: Vec<String> = workbook.table_names().iter().map(|s| s.to_string()).collect();
+    let table_names: Vec<String> = workbook.table_names().iter().map(ToString::to_string).collect();
     if table_names.is_empty() {
         bail!(
             "No named Excel Tables found in {}. Tables are distinct from worksheets.",
@@ -53,7 +53,7 @@ pub fn load_table_layouts(path: &Path) -> Result<Vec<TableLayout>> {
         let mut data_start_row = start_row_zero + 1;
         let start_col = start_col_zero + 1;
         let mut data_rows = data.height();
-        let column_names: Vec<String> = table.columns().iter().map(|s| s.to_string()).collect();
+        let column_names: Vec<String> = table.columns().iter().map(ToString::to_string).collect();
 
         let formulas: Option<Range<String>> = workbook.worksheet_formula(&sheet_name).ok();
 

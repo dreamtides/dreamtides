@@ -57,5 +57,5 @@ fn find_root(start: &Path) -> Option<PathBuf> {
 
 fn manifest_root() -> Option<PathBuf> {
     let manifest_dir = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
-    manifest_dir.parent().and_then(|p| p.parent()).and_then(|p| p.parent()).map(|p| p.to_path_buf())
+    manifest_dir.parent().and_then(|p| p.parent()).and_then(|p| p.parent()).map(Path::to_path_buf)
 }
