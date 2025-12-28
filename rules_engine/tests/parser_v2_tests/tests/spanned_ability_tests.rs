@@ -1,6 +1,6 @@
 use chumsky::span::Span;
 use parser_v2::builder::parser_spans::{SpannedAbility, SpannedEffect};
-use parser_v2_tests::test_helpers::parse_spanned_ability;
+use parser_v2_tests::test_helpers::*;
 
 #[test]
 fn test_spanned_ability_at_end_of_turn() {

@@ -1,5 +1,5 @@
 use ability_data::ability::Ability;
-use parser_v2_tests::test_helpers::parse_ability;
+use parser_v2_tests::test_helpers::*;
 
 #[test]
 fn test_full_ability_at_end_of_turn_gain_energy() {

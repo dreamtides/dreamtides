@@ -50,3 +50,12 @@ pub fn parse_predicate(input: &str, vars: &str) -> Predicate {
     let parser = predicate_parser::predicate_parser();
     parser.parse(&resolved).into_result().unwrap()
 }
+
+pub fn try_parse_effect(input: &str, vars: &str) -> Option<StandardEffect> {
+    let lex_result = lexer_tokenize::lex(input).ok()?;
+    let bindings = VariableBindings::parse(vars).ok()?;
+    let resolved = parser_substitutions::resolve_variables(&lex_result.tokens, &bindings).ok()?;
+
+    let parser = effect_parser::single_effect_parser();
+    parser.parse(&resolved).into_result().ok()
+}

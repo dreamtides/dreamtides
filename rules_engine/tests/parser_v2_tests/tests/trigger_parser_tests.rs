@@ -1,5 +1,5 @@
 use insta::assert_ron_snapshot;
-use parser_v2_tests::test_helpers::parse_trigger;
+use parser_v2_tests::test_helpers::*;
 
 #[test]
 fn test_judgment_keyword() {

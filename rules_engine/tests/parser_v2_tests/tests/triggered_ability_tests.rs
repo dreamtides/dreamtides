@@ -1,5 +1,5 @@
 use insta::assert_ron_snapshot;
-use parser_v2_tests::test_helpers::parse_ability;
+use parser_v2_tests::test_helpers::*;
 
 #[test]
 fn test_at_end_of_turn_gain_energy() {
