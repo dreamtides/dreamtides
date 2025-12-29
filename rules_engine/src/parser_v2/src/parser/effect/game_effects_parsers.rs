@@ -1,14 +1,13 @@
 use ability_data::standard_effect::StandardEffect;
 use chumsky::prelude::*;
 
-use crate::parser::card_predicate_parser;
-use crate::parser::parser_helpers::{directive, foresee_count, period, word, ParserExtra, ParserInput};
-use crate::parser::predicate_parser;
+use crate::parser::parser_helpers::{
+    directive, foresee_count, period, word, ParserExtra, ParserInput,
+};
+use crate::parser::{card_predicate_parser, predicate_parser};
 
 pub fn foresee<'a>() -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
-    foresee_count()
-        .then_ignore(period())
-        .map(|count| StandardEffect::Foresee { count })
+    foresee_count().then_ignore(period()).map(|count| StandardEffect::Foresee { count })
 }
 
 pub fn discover<'a>() -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {

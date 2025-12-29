@@ -11,6 +11,7 @@ fn card_parser<'a>() -> impl Parser<'a, ParserInput<'a>, CardPredicate, ParserEx
     word("card").to(CardPredicate::Card)
 }
 
-fn subtype_parser<'a>() -> impl Parser<'a, ParserInput<'a>, CardPredicate, ParserExtra<'a>> + Clone {
+fn subtype_parser<'a>() -> impl Parser<'a, ParserInput<'a>, CardPredicate, ParserExtra<'a>> + Clone
+{
     subtype().map(CardPredicate::CharacterType)
 }
