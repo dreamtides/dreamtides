@@ -46,6 +46,18 @@ pub fn serialize_standard_effect(effect: &StandardEffect) -> String {
         StandardEffect::DissolveCharacter { target } => {
             format!("{{Dissolve}} {}.", serialize_predicate(target))
         }
+        StandardEffect::DissolveCharactersCount { target, count } => {
+            use ability_data::collection_expression::CollectionExpression;
+            match count {
+                CollectionExpression::All => match target {
+                    Predicate::Any(CardPredicate::Character) => {
+                        "{Dissolve} all characters.".to_string()
+                    }
+                    _ => unimplemented!("Unsupported dissolve all characters target"),
+                },
+                _ => unimplemented!("Unsupported dissolve characters count"),
+            }
+        }
         StandardEffect::BanishCharacter { target } => {
             format!("{{Banish}} {}.", serialize_predicate(target))
         }
@@ -171,9 +183,19 @@ fn serialize_card_predicate(card_predicate: &CardPredicate) -> String {
         CardPredicate::Character => "a character".to_string(),
         CardPredicate::Event => "an event".to_string(),
         CardPredicate::CharacterType(_) => "{a-subtype}".to_string(),
+        CardPredicate::Fast { target } => format!("a {{fast}} {}", serialize_fast_target(target)),
         _ => {
             unimplemented!("Serialization not yet implemented for this card predicate type")
         }
+    }
+}
+
+fn serialize_fast_target(card_predicate: &CardPredicate) -> String {
+    match card_predicate {
+        CardPredicate::Card => "card".to_string(),
+        CardPredicate::Character => "character".to_string(),
+        CardPredicate::Event => "event".to_string(),
+        _ => unimplemented!("Unsupported fast target"),
     }
 }
 

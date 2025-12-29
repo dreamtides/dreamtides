@@ -22,11 +22,11 @@
   "{Dissolve} an enemy with spark {s} or less.", // Implemented
   "{Dissolve} an enemy with spark {s} or more.", // Implemented
   "{Banish} an enemy with cost {e} or less.", // Implemented
-  "{Prevent} a played {fast} card.",
-  "{Prevent} a played character.",
-  "{Discover} an event.",
-  "{Dissolve} all characters.",
-  "{Materialized} Gain {e}.",
+  "{Prevent} a played {fast} card.", // Implemented
+  "{Prevent} a played character.", // Implemented
+  "{Discover} an event.", // Implemented
+  "{Dissolve} all characters.", // Implemented
+  "{Materialized} Gain {e}.", // Implemented
   "{Judgment} Draw {cards}, then discard {discards}.",
   "{Materialized} Discard {discards}, then draw {cards}.",
   "{MaterializedDissolved} Draw {cards}.",

@@ -249,3 +249,18 @@ fn test_spanned_return_enemy_or_ally_to_hand_draw_cards() {
     assert_eq!(effect.text.trim(), "Return an enemy or ally to hand. Draw {cards}.");
     assert_valid_span(&effect.span);
 }
+
+#[test]
+fn test_spanned_dissolve_all_characters() {
+    let SpannedAbility::Event(event) = parse_spanned_ability("{Dissolve} all characters.", "")
+    else {
+        panic!("Expected Event ability");
+    };
+
+    assert_eq!(event.additional_cost, None);
+    let SpannedEffect::Effect(effect) = &event.effect else {
+        panic!("Expected Effect, got Modal");
+    };
+    assert_eq!(effect.text.trim(), "{Dissolve} all characters.");
+    assert_valid_span(&effect.span);
+}

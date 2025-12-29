@@ -2,11 +2,19 @@ use ability_data::predicate::{CardPredicate, Predicate};
 use chumsky::prelude::*;
 
 use crate::parser::card_predicate_parser;
-use crate::parser::parser_helpers::{word, words, ParserExtra, ParserInput};
+use crate::parser::parser_helpers::{directive, word, words, ParserExtra, ParserInput};
 
 pub fn predicate_parser<'a>() -> impl Parser<'a, ParserInput<'a>, Predicate, ParserExtra<'a>> + Clone
 {
-    choice((this_parser(), enemy_parser(), any_card_parser())).boxed()
+    choice((
+        this_parser(),
+        enemy_parser(),
+        any_fast_card_parser(),
+        any_character_parser(),
+        any_event_parser(),
+        any_card_parser(),
+    ))
+    .boxed()
 }
 
 fn this_parser<'a>() -> impl Parser<'a, ParserInput<'a>, Predicate, ParserExtra<'a>> + Clone {
@@ -25,4 +33,20 @@ fn enemy_parser<'a>() -> impl Parser<'a, ParserInput<'a>, Predicate, ParserExtra
 
 fn any_card_parser<'a>() -> impl Parser<'a, ParserInput<'a>, Predicate, ParserExtra<'a>> + Clone {
     word("card").map(|_| Predicate::Any(CardPredicate::Card))
+}
+
+fn any_character_parser<'a>() -> impl Parser<'a, ParserInput<'a>, Predicate, ParserExtra<'a>> + Clone
+{
+    word("character").map(|_| Predicate::Any(CardPredicate::Character))
+}
+
+fn any_event_parser<'a>() -> impl Parser<'a, ParserInput<'a>, Predicate, ParserExtra<'a>> + Clone {
+    word("event").map(|_| Predicate::Any(CardPredicate::Event))
+}
+
+fn any_fast_card_parser<'a>() -> impl Parser<'a, ParserInput<'a>, Predicate, ParserExtra<'a>> + Clone
+{
+    directive("fast")
+        .ignore_then(card_predicate_parser::parser())
+        .map(|target| Predicate::Any(CardPredicate::Fast { target: Box::new(target) }))
 }
