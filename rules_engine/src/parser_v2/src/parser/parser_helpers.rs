@@ -89,3 +89,7 @@ pub fn kindle_amount<'a>() -> impl Parser<'a, ParserInput<'a>, u32, ParserExtra<
         (ResolvedToken::Integer { directive, value }, _) if directive == "kindle" || directive == "Kindle" => value
     }
 }
+
+pub fn article<'a>() -> impl Parser<'a, ParserInput<'a>, (), ParserExtra<'a>> + Clone {
+    choice((word("a"), word("an")))
+}

@@ -15,6 +15,12 @@ pub fn serialize_ability(ability: &Ability) -> String {
             let trigger = serialize_trigger_event(&triggered.trigger);
             let capitalized_trigger = capitalize_first_letter(&trigger);
             result.push_str(if has_once_per_turn { &trigger } else { &capitalized_trigger });
+
+            let is_keyword_trigger = matches!(triggered.trigger, TriggerEvent::Keywords(_));
+            if is_keyword_trigger {
+                result.push(' ');
+            }
+
             if let ability_data::effect::Effect::Effect(effect) = &triggered.effect {
                 result.push_str(&serialize_standard_effect(effect));
             }
