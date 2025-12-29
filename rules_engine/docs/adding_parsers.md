@@ -409,9 +409,19 @@ Available test helpers in `test_helpers.rs`:
 | `parse_ability(input, vars)` | Parse to `Ability` |
 | `parse_spanned_ability(input, vars)` | Parse to `SpannedAbility` |
 
-Run tests with:
+**IMPORTANT**: All cargo commands must be run from the `rules_engine` directory:
+
 ```bash
-cargo test -p parser_v2_tests
+cd /home/user/dreamtides/rules_engine  # Or your repo path
+cargo test -p parser_v2_tests           # Run all parser_v2 tests
+```
+
+Run specific test files:
+```bash
+cargo test -p parser_v2_tests --test effect_parser_tests
+cargo test -p parser_v2_tests --test ability_round_trip_tests
+cargo test -p parser_v2_tests --test spanned_ability_tests
+cargo test -p parser_v2_tests --test parse_error_tests
 ```
 
 Update snapshots with:
@@ -1322,13 +1332,19 @@ This character's spark is equal to the number of cards in your void.
 
 ## Validation Commands Reference
 
+**IMPORTANT**: All commands must be run from the `rules_engine` directory. Change to this directory first:
+```bash
+cd /home/user/dreamtides/rules_engine  # Or wherever your repo is located
+```
+
 | Command | Purpose |
 |---------|---------|
 | `just fmt` | Apply rustfmt formatting |
 | `just check` | Type check code |
 | `just clippy` | Check for lint warnings |
-| `cargo test -p parser_v2_tests` | Run parser tests |
-| `just review` | Full validation pipeline |
+| `cargo test -p parser_v2_tests` | Run all parser tests |
+| `cargo test -p parser_v2_tests --test effect_parser_tests` | Run specific test file |
+| `just review` | Full validation pipeline (fmt check, build, lint, clippy, test) |
 | `cargo insta review` | Review/update snapshots |
 
 ---
