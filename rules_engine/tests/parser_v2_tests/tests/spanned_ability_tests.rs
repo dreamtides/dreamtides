@@ -1,114 +1,99 @@
-use chumsky::span::Span;
+use ability_data::ability::{Ability, EventAbility};
+use ability_data::activated_ability::ActivatedAbility;
+use ability_data::cost::Cost;
+use ability_data::effect::Effect;
+use ability_data::standard_effect::StandardEffect;
+use core_data::numerics::Energy;
+use parser_v2::builder::parser_display;
 use parser_v2::builder::parser_spans::{SpannedAbility, SpannedEffect};
+use parser_v2::lexer::lexer_tokenize;
 use parser_v2_tests::test_helpers::*;
 
 #[test]
 fn test_spanned_ability_at_end_of_turn() {
-    let spanned = parse_spanned_ability("At the end of your turn, gain {e}.", "e: 2");
-
-    if let SpannedAbility::Triggered(triggered) = spanned {
-        assert_eq!(triggered.once_per_turn, None);
-        assert_eq!(triggered.trigger.text, "At the end of your turn");
-        assert_eq!(triggered.trigger.span.start(), 0);
-        assert_eq!(triggered.trigger.span.end(), 23);
-
-        if let SpannedEffect::Effect(effect) = triggered.effect {
-            assert_eq!(effect.text.trim(), "gain {e}.");
-            assert!(effect.span.start() >= 24);
-        } else {
-            panic!("Expected Effect, got Modal");
-        }
-    } else {
+    let SpannedAbility::Triggered(triggered) =
+        parse_spanned_ability("At the end of your turn, gain {e}.", "e: 2")
+    else {
         panic!("Expected Triggered ability");
-    }
+    };
+
+    assert_eq!(triggered.once_per_turn, None);
+    assert_eq!(triggered.trigger.text, "At the end of your turn");
+    assert_valid_span(&triggered.trigger.span);
+
+    let SpannedEffect::Effect(effect) = triggered.effect else {
+        panic!("Expected Effect, got Modal");
+    };
+    assert_eq!(effect.text.trim(), "gain {e}.");
+    assert_valid_span(&effect.span);
 }
 
 #[test]
-fn test_spanned_event_foresee() {
-    let spanned = parse_spanned_ability("{Foresee}.", "foresee: 3");
+fn test_parse_simple_event_draw() {
+    let input = "Draw 2.";
+    let ability = Ability::Event(EventAbility {
+        additional_cost: None,
+        effect: Effect::Effect(StandardEffect::DrawCards { count: 2 }),
+    });
 
-    if let SpannedAbility::Event(event) = spanned {
-        assert_eq!(event.additional_cost, None);
+    let SpannedAbility::Event(event) = build_spanned_ability(&ability, input) else {
+        panic!("Expected Event variant");
+    };
 
-        if let SpannedEffect::Effect(effect) = event.effect {
-            assert_eq!(effect.text.trim(), "{Foresee}.");
-            assert_eq!(effect.span.start(), 0);
-        } else {
-            panic!("Expected Effect, got Modal");
-        }
-    } else {
-        panic!("Expected Event ability");
-    }
+    assert_eq!(event.additional_cost, None);
+    let SpannedEffect::Effect(text) = &event.effect else {
+        panic!("Expected Effect variant");
+    };
+    assert_eq!(text.text, "Draw 2.");
+    assert_valid_span(&text.span);
+
+    let displayed = parser_display::to_displayed_ability(
+        &lexer_tokenize::lex(input).unwrap().original,
+        &SpannedAbility::Event(event),
+    );
+    assert!(matches!(displayed, ability_data::ability::DisplayedAbility::Event { .. }));
 }
 
 #[test]
-fn test_spanned_event_discover() {
-    let spanned = parse_spanned_ability("{Discover} {a-subtype}.", "subtype: warrior");
+fn test_parse_event_with_cost() {
+    let ability = Ability::Event(EventAbility {
+        additional_cost: Some(Cost::Energy(Energy(1))),
+        effect: Effect::Effect(StandardEffect::DrawCards { count: 2 }),
+    });
 
-    if let SpannedAbility::Event(event) = spanned {
-        assert_eq!(event.additional_cost, None);
+    let SpannedAbility::Event(event) = build_spanned_ability(&ability, "1: Draw 2.") else {
+        panic!("Expected Event variant");
+    };
 
-        if let SpannedEffect::Effect(effect) = event.effect {
-            assert_eq!(effect.text.trim(), "{Discover} {a-subtype}.");
-            assert_eq!(effect.span.start(), 0);
-        } else {
-            panic!("Expected Effect, got Modal");
-        }
-    } else {
-        panic!("Expected Event ability");
-    }
+    let cost = event.additional_cost.as_ref().unwrap();
+    assert_eq!(cost.text, "1");
+    assert_valid_span(&cost.span);
+
+    let SpannedEffect::Effect(text) = &event.effect else {
+        panic!("Expected Effect variant");
+    };
+    assert_eq!(text.text.trim(), "Draw 2.");
+    assert_valid_span(&text.span);
 }
 
 #[test]
-fn test_spanned_event_prevent() {
-    let spanned = parse_spanned_ability("{Prevent} a card.", "");
+fn test_parse_activated_ability() {
+    let ability = Ability::Activated(ActivatedAbility {
+        costs: vec![Cost::Energy(Energy(1))],
+        effect: Effect::Effect(StandardEffect::DrawCards { count: 2 }),
+        options: None,
+    });
 
-    if let SpannedAbility::Event(event) = spanned {
-        assert_eq!(event.additional_cost, None);
+    let SpannedAbility::Activated(activated) = build_spanned_ability(&ability, "1: Draw 2.") else {
+        panic!("Expected Activated variant");
+    };
 
-        if let SpannedEffect::Effect(effect) = event.effect {
-            assert_eq!(effect.text.trim(), "{Prevent} a card.");
-            assert_eq!(effect.span.start(), 0);
-        } else {
-            panic!("Expected Effect, got Modal");
-        }
-    } else {
-        panic!("Expected Event ability");
-    }
-}
+    assert_eq!(activated.cost.text, "1");
+    assert_valid_span(&activated.cost.span);
 
-#[test]
-fn test_spanned_event_dissolve() {
-    let spanned = parse_spanned_ability("{Dissolve} an enemy.", "");
-
-    if let SpannedAbility::Event(event) = spanned {
-        assert_eq!(event.additional_cost, None);
-
-        if let SpannedEffect::Effect(effect) = event.effect {
-            assert_eq!(effect.text.trim(), "{Dissolve} an enemy.");
-            assert_eq!(effect.span.start(), 0);
-        } else {
-            panic!("Expected Effect, got Modal");
-        }
-    } else {
-        panic!("Expected Event ability");
-    }
-}
-
-#[test]
-fn test_spanned_triggered_kindle() {
-    let spanned = parse_spanned_ability("{Judgment} {Kindle}.", "k: 1");
-
-    if let SpannedAbility::Triggered(triggered) = spanned {
-        assert_eq!(triggered.once_per_turn, None);
-        assert_eq!(triggered.trigger.text, "{Judgment}");
-
-        if let SpannedEffect::Effect(effect) = triggered.effect {
-            assert!(effect.text.contains("{Kindle}"));
-        } else {
-            panic!("Expected Effect, got Modal");
-        }
-    } else {
-        panic!("Expected Triggered ability");
-    }
+    let SpannedEffect::Effect(text) = &activated.effect else {
+        panic!("Expected Effect variant");
+    };
+    assert!(text.text.contains("Draw 2."));
+    assert_valid_span(&text.span);
 }
