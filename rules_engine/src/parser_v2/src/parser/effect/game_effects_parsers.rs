@@ -7,7 +7,8 @@ use crate::parser::parser_helpers::{
 use crate::parser::{card_predicate_parser, predicate_parser};
 
 pub fn parser<'a>() -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
-    choice((foresee(), discover(), counterspell(), dissolve_character())).boxed()
+    choice((foresee(), discover(), counterspell(), dissolve_character(), banish_character()))
+        .boxed()
 }
 
 pub fn foresee<'a>() -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
@@ -37,4 +38,13 @@ pub fn dissolve_character<'a>(
         .ignore_then(predicate_parser::predicate_parser())
         .then_ignore(period())
         .map(|target| StandardEffect::DissolveCharacter { target })
+}
+
+pub fn banish_character<'a>(
+) -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
+    directive("banish")
+        .ignore_then(article())
+        .ignore_then(predicate_parser::predicate_parser())
+        .then_ignore(period())
+        .map(|target| StandardEffect::BanishCharacter { target })
 }

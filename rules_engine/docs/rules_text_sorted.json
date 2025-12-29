@@ -19,9 +19,9 @@
   "{Dissolve} an enemy. The opponent gains {points}.", // Implemented
   "{Judgment} Draw {cards}. The opponent gains {points}.", // Implemented
   "Return an enemy or ally to hand. Draw {cards}.", // Implemented
-  "{Dissolve} an enemy with spark {s} or less.",
-  "{Dissolve} an enemy with spark {s} or more.",
-  "{Banish} an enemy with cost {e} or less.",
+  "{Dissolve} an enemy with spark {s} or less.", // Implemented
+  "{Dissolve} an enemy with spark {s} or more.", // Implemented
+  "{Banish} an enemy with cost {e} or less.", // Implemented
   "{Prevent} a played {fast} card.",
   "{Prevent} a played character.",
   "{Discover} an event.",

@@ -1,6 +1,6 @@
 use ability_data::ability::Ability;
 use ability_data::effect::Effect;
-use ability_data::predicate::{CardPredicate, Predicate};
+use ability_data::predicate::{CardPredicate, Operator, Predicate};
 use ability_data::standard_effect::StandardEffect;
 use ability_data::trigger_event::{TriggerEvent, TriggerKeyword};
 
@@ -45,6 +45,9 @@ pub fn serialize_standard_effect(effect: &StandardEffect) -> String {
         }
         StandardEffect::DissolveCharacter { target } => {
             format!("{{Dissolve}} {}.", serialize_predicate(target))
+        }
+        StandardEffect::BanishCharacter { target } => {
+            format!("{{Banish}} {}.", serialize_predicate(target))
         }
         StandardEffect::Discover { predicate } => {
             format!("{{Discover}} {}.", serialize_card_predicate(predicate))
@@ -152,6 +155,12 @@ fn serialize_your_predicate(card_predicate: &CardPredicate) -> String {
 fn serialize_enemy_predicate(card_predicate: &CardPredicate) -> String {
     match card_predicate {
         CardPredicate::Character => "enemy".to_string(),
+        CardPredicate::CharacterWithSpark(_, operator) => {
+            format!("enemy with spark {{s}} {}", serialize_operator(operator))
+        }
+        CardPredicate::CardWithCost { cost_operator, .. } => {
+            format!("enemy with cost {{e}} {}", serialize_operator(cost_operator))
+        }
         _ => unimplemented!("Serialization not yet implemented for this enemy predicate type"),
     }
 }
@@ -165,5 +174,15 @@ fn serialize_card_predicate(card_predicate: &CardPredicate) -> String {
         _ => {
             unimplemented!("Serialization not yet implemented for this card predicate type")
         }
+    }
+}
+
+fn serialize_operator<T>(operator: &Operator<T>) -> String {
+    match operator {
+        Operator::OrLess => "or less".to_string(),
+        Operator::OrMore => "or more".to_string(),
+        Operator::Exactly => "exactly".to_string(),
+        Operator::LowerBy(_) => "lower".to_string(),
+        Operator::HigherBy(_) => "higher".to_string(),
     }
 }
