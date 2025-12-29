@@ -49,6 +49,12 @@ pub fn serialize_standard_effect(effect: &StandardEffect) -> String {
         StandardEffect::Discover { predicate } => {
             format!("{{Discover}} {}.", serialize_card_predicate(predicate))
         }
+        StandardEffect::ReturnToHand { target } => match target {
+            Predicate::Any(CardPredicate::Character) => {
+                "return an enemy or ally to hand.".to_string()
+            }
+            _ => format!("return {} to hand.", serialize_predicate(target)),
+        },
         _ => unimplemented!("Serialization not yet implemented for this effect type"),
     }
 }

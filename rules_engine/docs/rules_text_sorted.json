@@ -18,7 +18,7 @@
   "{Dissolve} an enemy. You lose {points}.", // Implemented
   "{Dissolve} an enemy. The opponent gains {points}.", // Implemented
   "{Judgment} Draw {cards}. The opponent gains {points}.", // Implemented
-  "Return an enemy or ally to hand. Draw {cards}.",
+  "Return an enemy or ally to hand. Draw {cards}.", // Implemented
   "{Dissolve} an enemy with spark {s} or less.",
   "{Dissolve} an enemy with spark {s} or more.",
   "{Banish} an enemy with cost {e} or less.",

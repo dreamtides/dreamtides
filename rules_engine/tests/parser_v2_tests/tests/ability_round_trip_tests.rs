@@ -144,3 +144,11 @@ fn test_round_trip_judgment_draw_cards_opponent_gains_points() {
     let serialized = parser_formatter::serialize_ability(&parsed);
     assert_eq!(original, serialized);
 }
+
+#[test]
+fn test_round_trip_return_enemy_or_ally_to_hand_draw_cards() {
+    let original = "Return an enemy or ally to hand. Draw {cards}.";
+    let parsed = parse_ability(original, "cards: 1");
+    let serialized = parser_formatter::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
