@@ -1,48 +1,27 @@
-// For format details, see https://aka.ms/devcontainer.json. For config options, see the
-// README at: https://github.com/devcontainers/templates/tree/main/src/rust
 {
-	"name": "Rust",
-	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
-	"image": "mcr.microsoft.com/devcontainers/rust:2-1-trixie",
-	"features": {
-		"ghcr.io/lee-orr/rusty-dev-containers/cargo-watch:0": {}
-	},
+  "name": "Rust (Debian Trixie) + Cargo home + Git LFS",
+  "image": "mcr.microsoft.com/devcontainers/rust:dev-trixie",
 
-	// Use 'mounts' to make the cargo & rustup cache persistent in Docker Volumes.
-	"mounts": [
-		{
-			"source": "devcontainer-cargo-cache-${devcontainerId}",
-			"target": "${containerEnv:HOME}/.cargo",
-			"type": "volume"
-		},
-		{
-			"source": "devcontainer-rustup-${devcontainerId}",
-			"target": "${containerEnv:HOME}/.rustup",
-			"type": "volume"
-		}
-	],
-
-	// Create cache dirs (if missing) and set permissions after container is created
-	"postCreateCommand": "mkdir -p $HOME/.cargo $HOME/.rustup && chmod -R u+rwX $HOME/.cargo $HOME/.rustup",
-
-	// Features to add to the dev container. More info: https://containers.dev/features.
-	// "features": {},
-
-	// Use 'forwardPorts' to make a list of ports inside the container available locally.
-	// "forwardPorts": [],
-
-	// Use 'postCreateCommand' to run commands after the container is created.
-	// "postCreateCommand": "rustc --version",
-
-	// Configure tool-specific properties.
-	// "customizations": {},
-
-	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
-	// "remoteUser": "root"
+  "features": {
+    "ghcr.io/devcontainers/features/git-lfs:1": {}
+  },
 
   "remoteEnv": {
     "CARGO_HOME": "${containerEnv:HOME}/.cargo",
     "RUSTUP_HOME": "${containerEnv:HOME}/.rustup",
     "PATH": "${containerEnv:HOME}/.cargo/bin:${containerEnv:PATH}"
+  },
+
+  "postCreateCommand": "mkdir -p \"$HOME/.cargo\" \"$HOME/.rustup\" && git lfs install --local || true",
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "rust-lang.rust-analyzer"
+      ],
+      "settings": {
+        "rust-analyzer.checkOnSave.command": "clippy"
+      }
+    }
   }
 }
