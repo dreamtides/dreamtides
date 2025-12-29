@@ -8,7 +8,6 @@ pub fn single_effect_parser<'a>(
 ) -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
     choice((
         card_effect_parsers::draw_cards(),
-        card_effect_parsers::draw_literal_cards(),
         card_effect_parsers::discard_cards(),
         card_effect_parsers::gain_energy(),
         card_effect_parsers::gain_points(),

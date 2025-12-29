@@ -78,12 +78,6 @@ pub fn words<'a>(
     sequence.iter().fold(empty().boxed(), |acc, &w| acc.then_ignore(word(w)).boxed())
 }
 
-pub fn literal_number<'a>() -> impl Parser<'a, ParserInput<'a>, u32, ParserExtra<'a>> + Clone {
-    select! {
-        (ResolvedToken::Token(Token::Word(w)), _) if w.parse::<u32>().is_ok() => w.parse::<u32>().unwrap()
-    }
-}
-
 pub fn foresee_count<'a>() -> impl Parser<'a, ParserInput<'a>, u32, ParserExtra<'a>> + Clone {
     select! {
         (ResolvedToken::Integer { directive, value }, _) if directive == "foresee" || directive == "Foresee" => value

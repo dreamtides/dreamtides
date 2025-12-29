@@ -3,22 +3,13 @@ use chumsky::prelude::*;
 use core_data::numerics::{Energy, Points};
 
 use crate::parser::parser_helpers::{
-    cards, discards, energy, literal_number, period, points, word, ParserExtra, ParserInput,
+    cards, discards, energy, period, points, word, ParserExtra, ParserInput,
 };
 
 pub fn draw_cards<'a>() -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone
 {
     word("draw")
         .ignore_then(cards())
-        .then_ignore(period())
-        .map(|count| StandardEffect::DrawCards { count })
-}
-
-pub fn draw_literal_cards<'a>(
-) -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
-    word("draw")
-        .ignore_then(literal_number())
-        .then_ignore(choice((word("card"), word("cards"))))
         .then_ignore(period())
         .map(|count| StandardEffect::DrawCards { count })
 }

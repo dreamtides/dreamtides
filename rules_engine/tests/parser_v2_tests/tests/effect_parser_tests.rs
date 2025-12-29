@@ -130,8 +130,8 @@ fn test_discover_a_subtype() {
 }
 
 #[test]
-fn test_draw_literal_cards() {
-    let result = parse_ability("Draw 3 cards.", "");
+fn test_draw_cards_event() {
+    let result = parse_ability("Draw {cards}.", "cards: 3");
     assert_ron_snapshot!(result, @r###"
     Event(EventAbility(
       effect: Effect(DrawCards(
