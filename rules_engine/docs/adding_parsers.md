@@ -409,9 +409,19 @@ Available test helpers in `test_helpers.rs`:
 | `parse_ability(input, vars)` | Parse to `Ability` |
 | `parse_spanned_ability(input, vars)` | Parse to `SpannedAbility` |
 
-Run tests with:
+**IMPORTANT**: All cargo commands must be run from the `rules_engine` directory:
+
 ```bash
-cargo test -p parser_v2_tests
+cd /home/user/dreamtides/rules_engine  # Or your repo path
+cargo test -p parser_v2_tests           # Run all parser_v2 tests
+```
+
+Run specific test files:
+```bash
+cargo test -p parser_v2_tests --test effect_parser_tests
+cargo test -p parser_v2_tests --test ability_round_trip_tests
+cargo test -p parser_v2_tests --test spanned_ability_tests
+cargo test -p parser_v2_tests --test parse_error_tests
 ```
 
 Update snapshots with:
@@ -1265,11 +1275,27 @@ Draw {cards}.
 ```
 
 ### Compound Effects
+
+**IMPORTANT**: Compound effects (multiple effects separated by periods) are automatically
+supported through the `effect_or_compound_parser` in `effect_parser.rs`. You typically
+do NOT need to write a special parser for compound effects.
+
+When you implement a single effect parser (e.g., `draw_cards()`, `discard_cards()`), it
+automatically works in compound effect patterns:
+
 ```
-Gain {e}. Draw {cards}.
-Draw {cards}. Discard {discards}.
-{Dissolve} an enemy. You lose {points}.
+Gain {e}. Draw {cards}.           // Automatically works
+Draw {cards}. Discard {discards}. // Automatically works
+Discard {discards}. Draw {cards}. // Automatically works
+{Dissolve} an enemy. You lose {points}. // Automatically works
 ```
+
+The `effect_or_compound_parser` uses `.repeated().at_least(1)` to parse multiple effects
+and combines them into `Effect::List`. Serialization, spanned abilities, and round-trip
+support all handle compound effects automatically.
+
+**When implementing new effects**: Focus on implementing the single effect parser correctly.
+Test both the standalone effect AND compound variations to ensure proper integration.
 
 ### Triggers with Conditions
 ```
@@ -1306,13 +1332,19 @@ This character's spark is equal to the number of cards in your void.
 
 ## Validation Commands Reference
 
+**IMPORTANT**: All commands must be run from the `rules_engine` directory. Change to this directory first:
+```bash
+cd /home/user/dreamtides/rules_engine  # Or wherever your repo is located
+```
+
 | Command | Purpose |
 |---------|---------|
 | `just fmt` | Apply rustfmt formatting |
 | `just check` | Type check code |
 | `just clippy` | Check for lint warnings |
-| `cargo test -p parser_v2_tests` | Run parser tests |
-| `just review` | Full validation pipeline |
+| `cargo test -p parser_v2_tests` | Run all parser tests |
+| `cargo test -p parser_v2_tests --test effect_parser_tests` | Run specific test file |
+| `just review` | Full validation pipeline (fmt check, build, lint, clippy, test) |
 | `cargo insta review` | Review/update snapshots |
 
 ---

@@ -189,3 +189,79 @@ fn test_judgment_gain_energy_draw_cards() {
     ))
     "###);
 }
+
+#[test]
+fn test_draw_cards_discard_cards() {
+    let result = parse_ability("Draw {cards}. Discard {discards}.", "cards: 2, discards: 1");
+    assert_ron_snapshot!(result, @r###"
+    Event(EventAbility(
+      effect: List([
+        EffectWithOptions(
+          effect: DrawCards(
+            count: 2,
+          ),
+          optional: false,
+        ),
+        EffectWithOptions(
+          effect: DiscardCards(
+            count: 1,
+          ),
+          optional: false,
+        ),
+      ]),
+    ))
+    "###);
+}
+
+#[test]
+fn test_draw_cards_discard_cards_gain_energy() {
+    let result =
+        parse_ability("Draw {cards}. Discard {discards}. Gain {e}.", "cards: 1, discards: 1, e: 1");
+    assert_ron_snapshot!(result, @r###"
+    Event(EventAbility(
+      effect: List([
+        EffectWithOptions(
+          effect: DrawCards(
+            count: 1,
+          ),
+          optional: false,
+        ),
+        EffectWithOptions(
+          effect: DiscardCards(
+            count: 1,
+          ),
+          optional: false,
+        ),
+        EffectWithOptions(
+          effect: GainEnergy(
+            gains: Energy(1),
+          ),
+          optional: false,
+        ),
+      ]),
+    ))
+    "###);
+}
+
+#[test]
+fn test_discard_cards_draw_cards() {
+    let result = parse_ability("Discard {discards}. Draw {cards}.", "discards: 1, cards: 2");
+    assert_ron_snapshot!(result, @r###"
+    Event(EventAbility(
+      effect: List([
+        EffectWithOptions(
+          effect: DiscardCards(
+            count: 1,
+          ),
+          optional: false,
+        ),
+        EffectWithOptions(
+          effect: DrawCards(
+            count: 2,
+          ),
+          optional: false,
+        ),
+      ]),
+    ))
+    "###);
+}

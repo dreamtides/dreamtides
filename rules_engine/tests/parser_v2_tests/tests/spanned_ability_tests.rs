@@ -132,3 +132,52 @@ fn test_spanned_compound_effect_triggered() {
     assert_eq!(effect.text.trim(), "Gain {e}. Draw {cards}.");
     assert_valid_span(&effect.span);
 }
+
+#[test]
+fn test_spanned_draw_cards_discard_cards() {
+    let SpannedAbility::Event(event) =
+        parse_spanned_ability("Draw {cards}. Discard {discards}.", "cards: 2, discards: 1")
+    else {
+        panic!("Expected Event ability");
+    };
+
+    assert_eq!(event.additional_cost, None);
+    let SpannedEffect::Effect(effect) = &event.effect else {
+        panic!("Expected Effect, got Modal");
+    };
+    assert_eq!(effect.text.trim(), "Draw {cards}. Discard {discards}.");
+    assert_valid_span(&effect.span);
+}
+
+#[test]
+fn test_spanned_draw_cards_discard_cards_gain_energy() {
+    let SpannedAbility::Event(event) = parse_spanned_ability(
+        "Draw {cards}. Discard {discards}. Gain {e}.",
+        "cards: 1, discards: 1, e: 1",
+    ) else {
+        panic!("Expected Event ability");
+    };
+
+    assert_eq!(event.additional_cost, None);
+    let SpannedEffect::Effect(effect) = &event.effect else {
+        panic!("Expected Effect, got Modal");
+    };
+    assert_eq!(effect.text.trim(), "Draw {cards}. Discard {discards}. Gain {e}.");
+    assert_valid_span(&effect.span);
+}
+
+#[test]
+fn test_spanned_discard_cards_draw_cards() {
+    let SpannedAbility::Event(event) =
+        parse_spanned_ability("Discard {discards}. Draw {cards}.", "discards: 1, cards: 2")
+    else {
+        panic!("Expected Event ability");
+    };
+
+    assert_eq!(event.additional_cost, None);
+    let SpannedEffect::Effect(effect) = &event.effect else {
+        panic!("Expected Effect, got Modal");
+    };
+    assert_eq!(effect.text.trim(), "Discard {discards}. Draw {cards}.");
+    assert_valid_span(&effect.span);
+}

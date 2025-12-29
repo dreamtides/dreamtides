@@ -12,9 +12,9 @@
   "{Dissolve} an enemy.", // Implemented
   "{Discover} {a-subtype}.", // Implemented
   "Gain {e}. Draw {cards}.", // Implemented
-  "Draw {cards}. Discard {discards}.",
-  "Draw {cards}. Discard {discards}. Gain {e}.",
-  "Discard {discards}. Draw {cards}.",
+  "Draw {cards}. Discard {discards}.", // Implemented
+  "Draw {cards}. Discard {discards}. Gain {e}.", // Implemented
+  "Discard {discards}. Draw {cards}.", // Implemented
   "{Dissolve} an enemy. You lose {points}.",
   "{Dissolve} an enemy. The opponent gains {points}.",
   "{Judgment} Draw {cards}. The opponent gains {points}.",
