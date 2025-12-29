@@ -140,3 +140,52 @@ fn test_draw_cards_event() {
     ))
     "###);
 }
+
+#[test]
+fn test_gain_energy_draw_cards() {
+    let result = parse_ability("Gain {e}. Draw {cards}.", "e: 2, cards: 3");
+    assert_ron_snapshot!(result, @r###"
+    Event(EventAbility(
+      effect: List([
+        EffectWithOptions(
+          effect: GainEnergy(
+            gains: Energy(2),
+          ),
+          optional: false,
+        ),
+        EffectWithOptions(
+          effect: DrawCards(
+            count: 3,
+          ),
+          optional: false,
+        ),
+      ]),
+    ))
+    "###);
+}
+
+#[test]
+fn test_judgment_gain_energy_draw_cards() {
+    let result = parse_ability("{Judgment} Gain {e}. Draw {cards}.", "e: 1, cards: 2");
+    assert_ron_snapshot!(result, @r###"
+    Triggered(TriggeredAbility(
+      trigger: Keywords([
+        Judgment,
+      ]),
+      effect: List([
+        EffectWithOptions(
+          effect: GainEnergy(
+            gains: Energy(1),
+          ),
+          optional: false,
+        ),
+        EffectWithOptions(
+          effect: DrawCards(
+            count: 2,
+          ),
+          optional: false,
+        ),
+      ]),
+    ))
+    "###);
+}

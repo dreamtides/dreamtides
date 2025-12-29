@@ -1,3 +1,4 @@
+use ability_data::effect::{Effect, EffectWithOptions};
 use ability_data::standard_effect::StandardEffect;
 use chumsky::prelude::*;
 
@@ -12,4 +13,20 @@ pub fn single_effect_parser<'a>(
         spark_effect_parsers::parser(),
     ))
     .boxed()
+}
+
+pub fn effect_or_compound_parser<'a>(
+) -> impl Parser<'a, ParserInput<'a>, Effect, ParserExtra<'a>> + Clone {
+    single_effect_parser()
+        .repeated()
+        .at_least(1)
+        .collect::<Vec<_>>()
+        .map(|effects| {
+            if effects.len() == 1 {
+                Effect::Effect(effects.into_iter().next().unwrap())
+            } else {
+                Effect::List(effects.into_iter().map(EffectWithOptions::new).collect())
+            }
+        })
+        .boxed()
 }
