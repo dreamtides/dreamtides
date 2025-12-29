@@ -54,9 +54,7 @@ pub fn return_enemy_or_ally_to_hand<'a>(
 ) -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
     word("return")
         .ignore_then(article())
-        .ignore_then(word("enemy"))
-        .ignore_then(word("or"))
-        .ignore_then(word("ally"))
+        .ignore_then(words(&["enemy", "or", "ally"]))
         .ignore_then(words(&["to", "hand"]))
         .then_ignore(period())
         .map(|_| StandardEffect::ReturnToHand { target: Predicate::Any(CardPredicate::Character) })
