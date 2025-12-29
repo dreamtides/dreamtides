@@ -7,11 +7,28 @@ use crate::parser::parser_helpers::{
 };
 
 pub fn parser<'a>() -> impl Parser<'a, ParserInput<'a>, CardPredicate, ParserExtra<'a>> + Clone {
-    choice((with_spark_parser(), with_cost_parser(), subtype_parser(), card_parser())).boxed()
+    choice((
+        with_spark_parser(),
+        with_cost_parser(),
+        subtype_parser(),
+        character_parser(),
+        event_parser(),
+        card_parser(),
+    ))
+    .boxed()
 }
 
 fn card_parser<'a>() -> impl Parser<'a, ParserInput<'a>, CardPredicate, ParserExtra<'a>> + Clone {
     word("card").to(CardPredicate::Card)
+}
+
+fn character_parser<'a>() -> impl Parser<'a, ParserInput<'a>, CardPredicate, ParserExtra<'a>> + Clone
+{
+    word("character").to(CardPredicate::Character)
+}
+
+fn event_parser<'a>() -> impl Parser<'a, ParserInput<'a>, CardPredicate, ParserExtra<'a>> + Clone {
+    word("event").to(CardPredicate::Event)
 }
 
 fn subtype_parser<'a>() -> impl Parser<'a, ParserInput<'a>, CardPredicate, ParserExtra<'a>> + Clone
