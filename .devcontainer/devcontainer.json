@@ -6,16 +6,24 @@
 	"image": "mcr.microsoft.com/devcontainers/rust:2-1-trixie",
 	"features": {
 		"ghcr.io/lee-orr/rusty-dev-containers/cargo-watch:0": {}
-	}
+	},
 
-	// Use 'mounts' to make the cargo cache persistent in a Docker Volume.
-	// "mounts": [
-	// 	{
-	// 		"source": "devcontainer-cargo-cache-${devcontainerId}",
-	// 		"target": "/usr/local/cargo",
-	// 		"type": "volume"
-	// 	}
-	// ]
+	// Use 'mounts' to make the cargo & rustup cache persistent in Docker Volumes.
+	"mounts": [
+		{
+			"source": "devcontainer-cargo-cache-${devcontainerId}",
+			"target": "${containerEnv:HOME}/.cargo",
+			"type": "volume"
+		},
+		{
+			"source": "devcontainer-rustup-${devcontainerId}",
+			"target": "${containerEnv:HOME}/.rustup",
+			"type": "volume"
+		}
+	],
+
+	// Create cache dirs (if missing) and set permissions after container is created
+	"postCreateCommand": "mkdir -p $HOME/.cargo $HOME/.rustup && chmod -R u+rwX $HOME/.cargo $HOME/.rustup",
 
 	// Features to add to the dev container. More info: https://containers.dev/features.
 	// "features": {},
@@ -31,4 +39,10 @@
 
 	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
 	// "remoteUser": "root"
+
+  "remoteEnv": {
+    "CARGO_HOME": "${containerEnv:HOME}/.cargo",
+    "RUSTUP_HOME": "${containerEnv:HOME}/.rustup",
+    "PATH": "${containerEnv:HOME}/.cargo/bin:${containerEnv:PATH}"
+  }
 }
