@@ -96,3 +96,27 @@ fn test_round_trip_judgment_gain_energy_draw_cards() {
     let serialized = parser_formatter::serialize_ability(&parsed);
     assert_eq!(original, serialized);
 }
+
+#[test]
+fn test_round_trip_draw_cards_discard_cards() {
+    let original = "Draw {cards}. Discard {discards}.";
+    let parsed = parse_ability(original, "cards: 2, discards: 1");
+    let serialized = parser_formatter::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_draw_cards_discard_cards_gain_energy() {
+    let original = "Draw {cards}. Discard {discards}. Gain {e}.";
+    let parsed = parse_ability(original, "cards: 1, discards: 1, e: 1");
+    let serialized = parser_formatter::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_discard_cards_draw_cards() {
+    let original = "Discard {discards}. Draw {cards}.";
+    let parsed = parse_ability(original, "discards: 1, cards: 2");
+    let serialized = parser_formatter::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}

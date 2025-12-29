@@ -1265,11 +1265,27 @@ Draw {cards}.
 ```
 
 ### Compound Effects
+
+**IMPORTANT**: Compound effects (multiple effects separated by periods) are automatically
+supported through the `effect_or_compound_parser` in `effect_parser.rs`. You typically
+do NOT need to write a special parser for compound effects.
+
+When you implement a single effect parser (e.g., `draw_cards()`, `discard_cards()`), it
+automatically works in compound effect patterns:
+
 ```
-Gain {e}. Draw {cards}.
-Draw {cards}. Discard {discards}.
-{Dissolve} an enemy. You lose {points}.
+Gain {e}. Draw {cards}.           // Automatically works
+Draw {cards}. Discard {discards}. // Automatically works
+Discard {discards}. Draw {cards}. // Automatically works
+{Dissolve} an enemy. You lose {points}. // Automatically works
 ```
+
+The `effect_or_compound_parser` uses `.repeated().at_least(1)` to parse multiple effects
+and combines them into `Effect::List`. Serialization, spanned abilities, and round-trip
+support all handle compound effects automatically.
+
+**When implementing new effects**: Focus on implementing the single effect parser correctly.
+Test both the standalone effect AND compound variations to ensure proper integration.
 
 ### Triggers with Conditions
 ```

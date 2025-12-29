@@ -188,3 +188,19 @@ fn test_incomplete_predicate() {
 
     assert!(result.is_err());
 }
+
+#[test]
+fn test_draw_discard_missing_variables_suggests_fix() {
+    let input = "Draw {cards}. Discard {discards}.";
+    let lex_result = lexer_tokenize::lex(input).unwrap();
+    let bindings = VariableBindings::new();
+
+    let result = parser_substitutions::resolve_variables(&lex_result.tokens, &bindings);
+
+    assert!(result.is_err());
+    let error = ParserError::from(result.unwrap_err());
+    let formatted = parser_diagnostics::format_error(&error, input, "test");
+
+    assert!(formatted.contains("cards"));
+    assert!(formatted.contains("not found"));
+}
