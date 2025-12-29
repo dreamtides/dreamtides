@@ -1,4 +1,5 @@
 use ability_data::ability::Ability;
+use ability_data::effect::Effect;
 use ability_data::predicate::{CardPredicate, Predicate};
 use ability_data::standard_effect::StandardEffect;
 use ability_data::trigger_event::{TriggerEvent, TriggerKeyword};
@@ -21,18 +22,10 @@ pub fn serialize_ability(ability: &Ability) -> String {
                 result.push(' ');
             }
 
-            if let ability_data::effect::Effect::Effect(effect) = &triggered.effect {
-                result.push_str(&serialize_standard_effect(effect));
-            }
+            result.push_str(&serialize_effect(&triggered.effect));
             result
         }
-        Ability::Event(event) => {
-            if let ability_data::effect::Effect::Effect(effect) = &event.effect {
-                capitalize_first_letter(&serialize_standard_effect(effect))
-            } else {
-                unimplemented!("Serialization not yet implemented for complex event effects")
-            }
-        }
+        Ability::Event(event) => capitalize_first_letter(&serialize_effect(&event.effect)),
         _ => unimplemented!("Serialization not yet implemented for this ability type"),
     }
 }
@@ -96,6 +89,18 @@ pub fn serialize_trigger_event(trigger: &TriggerEvent) -> String {
         }
         TriggerEvent::GainEnergy => "when you gain energy, ".to_string(),
         _ => unimplemented!("Serialization not yet implemented for this trigger type"),
+    }
+}
+
+fn serialize_effect(effect: &Effect) -> String {
+    match effect {
+        Effect::Effect(standard_effect) => serialize_standard_effect(standard_effect),
+        Effect::List(effects) => effects
+            .iter()
+            .map(|e| capitalize_first_letter(&serialize_standard_effect(&e.effect)))
+            .collect::<Vec<_>>()
+            .join(" "),
+        _ => unimplemented!("Serialization not yet implemented for this effect type"),
     }
 }
 

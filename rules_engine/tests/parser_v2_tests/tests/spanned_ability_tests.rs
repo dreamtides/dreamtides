@@ -97,3 +97,38 @@ fn test_parse_activated_ability() {
     assert!(text.text.contains("Draw 2."));
     assert_valid_span(&text.span);
 }
+
+#[test]
+fn test_spanned_compound_effect_event() {
+    let SpannedAbility::Event(event) =
+        parse_spanned_ability("Gain {e}. Draw {cards}.", "e: 2, cards: 3")
+    else {
+        panic!("Expected Event ability");
+    };
+
+    assert_eq!(event.additional_cost, None);
+    let SpannedEffect::Effect(effect) = &event.effect else {
+        panic!("Expected Effect, got Modal");
+    };
+    assert_eq!(effect.text.trim(), "Gain {e}. Draw {cards}.");
+    assert_valid_span(&effect.span);
+}
+
+#[test]
+fn test_spanned_compound_effect_triggered() {
+    let SpannedAbility::Triggered(triggered) =
+        parse_spanned_ability("{Judgment} Gain {e}. Draw {cards}.", "e: 1, cards: 2")
+    else {
+        panic!("Expected Triggered ability");
+    };
+
+    assert_eq!(triggered.once_per_turn, None);
+    assert_eq!(triggered.trigger.text, "{Judgment}");
+    assert_valid_span(&triggered.trigger.span);
+
+    let SpannedEffect::Effect(effect) = &triggered.effect else {
+        panic!("Expected Effect, got Modal");
+    };
+    assert_eq!(effect.text.trim(), "Gain {e}. Draw {cards}.");
+    assert_valid_span(&effect.span);
+}

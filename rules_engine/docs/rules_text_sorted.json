@@ -11,7 +11,7 @@
   "{Prevent} a card.", // Implemented
   "{Dissolve} an enemy.", // Implemented
   "{Discover} {a-subtype}.", // Implemented
-  "Gain {e}. Draw {cards}.",
+  "Gain {e}. Draw {cards}.", // Implemented
   "Draw {cards}. Discard {discards}.",
   "Draw {cards}. Discard {discards}. Gain {e}.",
   "Discard {discards}. Draw {cards}.",

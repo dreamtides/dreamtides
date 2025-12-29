@@ -1,4 +1,3 @@
-use ability_data::effect::Effect;
 use ability_data::triggered_ability::{TriggeredAbility, TriggeredAbilityOptions};
 use chumsky::prelude::*;
 
@@ -17,10 +16,10 @@ fn once_per_turn_triggered<'a>(
         .ignore_then(word("turn"))
         .ignore_then(comma())
         .ignore_then(trigger_parser::trigger_event_parser())
-        .then(effect_parser::single_effect_parser())
+        .then(effect_parser::effect_or_compound_parser())
         .map(|(trigger, effect)| TriggeredAbility {
             trigger,
-            effect: Effect::Effect(effect),
+            effect,
             options: Some(TriggeredAbilityOptions {
                 once_per_turn: true,
                 until_end_of_turn: false,
@@ -30,11 +29,7 @@ fn once_per_turn_triggered<'a>(
 
 fn simple_triggered<'a>(
 ) -> impl Parser<'a, ParserInput<'a>, TriggeredAbility, ParserExtra<'a>> + Clone {
-    trigger_parser::trigger_event_parser().then(effect_parser::single_effect_parser()).map(
-        |(trigger, effect)| TriggeredAbility {
-            trigger,
-            effect: Effect::Effect(effect),
-            options: None,
-        },
-    )
+    trigger_parser::trigger_event_parser()
+        .then(effect_parser::effect_or_compound_parser())
+        .map(|(trigger, effect)| TriggeredAbility { trigger, effect, options: None })
 }

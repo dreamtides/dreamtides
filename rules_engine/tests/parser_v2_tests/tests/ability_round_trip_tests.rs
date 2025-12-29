@@ -80,3 +80,19 @@ fn test_round_trip_materialized_judgment_kindle() {
     let serialized = parser_formatter::serialize_ability(&parsed);
     assert_eq!(original, serialized);
 }
+
+#[test]
+fn test_round_trip_gain_energy_draw_cards() {
+    let original = "Gain {e}. Draw {cards}.";
+    let parsed = parse_ability(original, "e: 2, cards: 3");
+    let serialized = parser_formatter::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_judgment_gain_energy_draw_cards() {
+    let original = "{Judgment} Gain {e}. Draw {cards}.";
+    let parsed = parse_ability(original, "e: 1, cards: 2");
+    let serialized = parser_formatter::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
