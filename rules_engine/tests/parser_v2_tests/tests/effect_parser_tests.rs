@@ -340,3 +340,26 @@ fn test_judgment_draw_cards_opponent_gains_points() {
     ))
     "###);
 }
+
+#[test]
+fn test_return_enemy_or_ally_to_hand_draw_cards() {
+    let result = parse_ability("Return an enemy or ally to hand. Draw {cards}.", "cards: 1");
+    assert_ron_snapshot!(result, @r###"
+    Event(EventAbility(
+      effect: List([
+        EffectWithOptions(
+          effect: ReturnToHand(
+            target: Any(Character),
+          ),
+          optional: false,
+        ),
+        EffectWithOptions(
+          effect: DrawCards(
+            count: 1,
+          ),
+          optional: false,
+        ),
+      ]),
+    ))
+    "###);
+}
