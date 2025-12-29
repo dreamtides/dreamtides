@@ -181,3 +181,55 @@ fn test_spanned_discard_cards_draw_cards() {
     assert_eq!(effect.text.trim(), "Discard {discards}. Draw {cards}.");
     assert_valid_span(&effect.span);
 }
+
+#[test]
+fn test_spanned_dissolve_enemy_you_lose_points() {
+    let SpannedAbility::Event(event) =
+        parse_spanned_ability("{Dissolve} an enemy. You lose {points}.", "points: 1")
+    else {
+        panic!("Expected Event ability");
+    };
+
+    assert_eq!(event.additional_cost, None);
+    let SpannedEffect::Effect(effect) = &event.effect else {
+        panic!("Expected Effect, got Modal");
+    };
+    assert_eq!(effect.text.trim(), "{Dissolve} an enemy. You lose {points}.");
+    assert_valid_span(&effect.span);
+}
+
+#[test]
+fn test_spanned_dissolve_enemy_opponent_gains_points() {
+    let SpannedAbility::Event(event) =
+        parse_spanned_ability("{Dissolve} an enemy. The opponent gains {points}.", "points: 1")
+    else {
+        panic!("Expected Event ability");
+    };
+
+    assert_eq!(event.additional_cost, None);
+    let SpannedEffect::Effect(effect) = &event.effect else {
+        panic!("Expected Effect, got Modal");
+    };
+    assert_eq!(effect.text.trim(), "{Dissolve} an enemy. The opponent gains {points}.");
+    assert_valid_span(&effect.span);
+}
+
+#[test]
+fn test_spanned_judgment_draw_cards_opponent_gains_points() {
+    let SpannedAbility::Triggered(triggered) = parse_spanned_ability(
+        "{Judgment} Draw {cards}. The opponent gains {points}.",
+        "cards: 2, points: 1",
+    ) else {
+        panic!("Expected Triggered ability");
+    };
+
+    assert_eq!(triggered.once_per_turn, None);
+    assert_eq!(triggered.trigger.text, "{Judgment}");
+    assert_valid_span(&triggered.trigger.span);
+
+    let SpannedEffect::Effect(effect) = &triggered.effect else {
+        panic!("Expected Effect, got Modal");
+    };
+    assert_eq!(effect.text.trim(), "Draw {cards}. The opponent gains {points}.");
+    assert_valid_span(&effect.span);
+}

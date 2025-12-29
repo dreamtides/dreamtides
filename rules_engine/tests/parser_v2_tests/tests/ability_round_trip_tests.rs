@@ -120,3 +120,27 @@ fn test_round_trip_discard_cards_draw_cards() {
     let serialized = parser_formatter::serialize_ability(&parsed);
     assert_eq!(original, serialized);
 }
+
+#[test]
+fn test_round_trip_dissolve_enemy_you_lose_points() {
+    let original = "{Dissolve} an enemy. You lose {points}.";
+    let parsed = parse_ability(original, "points: 1");
+    let serialized = parser_formatter::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_dissolve_enemy_opponent_gains_points() {
+    let original = "{Dissolve} an enemy. The opponent gains {points}.";
+    let parsed = parse_ability(original, "points: 1");
+    let serialized = parser_formatter::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_judgment_draw_cards_opponent_gains_points() {
+    let original = "{Judgment} Draw {cards}. The opponent gains {points}.";
+    let parsed = parse_ability(original, "cards: 2, points: 1");
+    let serialized = parser_formatter::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
