@@ -33,6 +33,7 @@ a todo list at the start of work with items for each major step:
 7. Add spanned ability tests
 8. Consider error handling improvements
 9. Run `just fmt` and `just review`
+10. Update this guide with any improvements or new context discovered
 
 Mark todos as in_progress before starting each step and completed when done.
 
@@ -394,6 +395,24 @@ The `just review` command runs:
 3. `cargo workspace-lints`
 4. `cargo clippy`
 5. `cargo test`
+
+### Step 9: Update This Guide
+
+After completing your implementation, update `docs/adding_parsers.md` with any
+improvements discovered during your work:
+
+- **New patterns**: If you encountered syntax patterns not documented here,
+  add them to the "Common Patterns in Rules Text" section
+- **New data types**: If new variants were added to StandardEffect, TriggerEvent,
+  or other enums, update the "Ability Data Types Reference" section
+- **Setup issues**: If you encountered environment setup problems, update the
+  setup instructions or link to updated documentation
+- **Workflow improvements**: If you found better approaches to testing,
+  serialization, or error handling, document them
+- **Directive additions**: If new directives were introduced, add them to the
+  "Directive Reference" section
+
+This keeps the guide accurate for future agents working on parser extensions.
 
 ---
 
