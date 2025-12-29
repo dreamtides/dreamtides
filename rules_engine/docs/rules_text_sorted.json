@@ -1,18 +1,16 @@
 [
-  "Draw a card.",
-  "Gain {e}.",
-  "Draw {cards}.",
+  "Gain {e}.", // Implemented
+  "Draw {cards}.", // Implemented
   "{Judgment} Gain {e}.",
-  "{Judgment} Gain {points}.",
-  "{Judgment} {Foresee}.",
-  "{Materialized} Draw {cards}.",
-  "{Materialized} {Foresee}.",
-  "{MaterializedJudgment} {Kindle}.",
-  "{MaterializedJudgment} Gain {e}.",
-  "{Prevent} a card.",
-  "{Dissolve} an enemy.",
-  "{Discover} {a-subtype}.",
-  "Draw 3 cards.",
+  "{Judgment} Gain {points}.", // Implemented
+  "{Judgment} {Foresee}.", // Implemented
+  "{Materialized} Draw {cards}.", // Implemented
+  "{Materialized} {Foresee}.", // Implemented
+  "{MaterializedJudgment} {Kindle}.", // Implemented
+  "{MaterializedJudgment} Gain {e}.", // Implemented
+  "{Prevent} a card.", // Implemented
+  "{Dissolve} an enemy.", // Implemented
+  "{Discover} {a-subtype}.", // Implemented
   "Gain {e}. Draw {cards}.",
   "Draw {cards}. Discard {discards}.",
   "Draw {cards}. Discard {discards}. Gain {e}.",
