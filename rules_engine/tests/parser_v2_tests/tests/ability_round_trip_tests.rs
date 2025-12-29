@@ -152,3 +152,27 @@ fn test_round_trip_return_enemy_or_ally_to_hand_draw_cards() {
     let serialized = parser_formatter::serialize_ability(&parsed);
     assert_eq!(original, serialized);
 }
+
+#[test]
+fn test_round_trip_dissolve_enemy_with_spark_or_less() {
+    let original = "{Dissolve} an enemy with spark {s} or less.";
+    let parsed = parse_ability(original, "s: 3");
+    let serialized = parser_formatter::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_dissolve_enemy_with_spark_or_more() {
+    let original = "{Dissolve} an enemy with spark {s} or more.";
+    let parsed = parse_ability(original, "s: 5");
+    let serialized = parser_formatter::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_banish_enemy_with_cost_or_less() {
+    let original = "{Banish} an enemy with cost {e} or less.";
+    let parsed = parse_ability(original, "e: 2");
+    let serialized = parser_formatter::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}

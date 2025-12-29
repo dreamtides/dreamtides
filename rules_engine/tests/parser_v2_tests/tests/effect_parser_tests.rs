@@ -363,3 +363,43 @@ fn test_return_enemy_or_ally_to_hand_draw_cards() {
     ))
     "###);
 }
+
+#[test]
+fn test_dissolve_enemy_with_spark_or_less() {
+    let result = parse_ability("{Dissolve} an enemy with spark {s} or less.", "s: 3");
+    assert_ron_snapshot!(result, @r###"
+    Event(EventAbility(
+      effect: Effect(DissolveCharacter(
+        target: Enemy(CharacterWithSpark(Spark(3), OrLess)),
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_dissolve_enemy_with_spark_or_more() {
+    let result = parse_ability("{Dissolve} an enemy with spark {s} or more.", "s: 5");
+    assert_ron_snapshot!(result, @r###"
+    Event(EventAbility(
+      effect: Effect(DissolveCharacter(
+        target: Enemy(CharacterWithSpark(Spark(5), OrMore)),
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_banish_enemy_with_cost_or_less() {
+    let result = parse_ability("{Banish} an enemy with cost {e} or less.", "e: 2");
+    assert_ron_snapshot!(result, @r###"
+    Event(EventAbility(
+      effect: Effect(BanishCharacter(
+        target: Enemy(CardWithCost(
+          target: Character,
+          cost_operator: OrLess,
+          cost: Energy(2),
+        )),
+      )),
+    ))
+    "###);
+}
