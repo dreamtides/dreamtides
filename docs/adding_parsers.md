@@ -78,6 +78,161 @@ The following terminology has changed from previous versions:
 - **Directives** replace all previous variable syntax (like `$2` for costs)
 - Directives never take arguments - they are a single identifier in braces
 
+### Common Pitfalls and Solutions
+
+#### Critical: Directive Names Must Be Lowercase
+
+**THE MOST IMPORTANT RULE**: The lexer lowercases ALL input text before parsing.
+This means directive names in your parsers **MUST** be lowercase.
+
+❌ **WRONG:**
+```rust
+directive("Judgment")  // Will NEVER match!
+directive("Foresee")   // Will NEVER match!
+directive("Kindle")    // Will NEVER match!
+```
+
+✅ **CORRECT:**
+```rust
+directive("judgment")  // Matches {Judgment} in rules text
+directive("foresee")   // Matches {Foresee} in rules text
+directive("kindle")    // Matches {Kindle} in rules text
+```
+
+**Why this happens**: The lexer converts `"{Judgment}"` → `Token::Directive("judgment")`
+before the parser sees it. If you write `directive("Judgment")`, it will never match
+the lowercased token.
+
+#### Understanding Variable Directives
+
+Some directives are configured in `parser_substitutions.rs` to be **variables** that
+require values, not simple directive tokens. Check the `DIRECTIVES` array to see which
+directives are variables:
+
+```rust
+// From parser_substitutions.rs
+static DIRECTIVES: &[(&str, &str, VariableConstructor)] = &[
+    ("foresee", "foresee", integer),  // {foresee} requires variable value
+    ("Foresee", "foresee", integer),  // {Foresee} also requires variable value
+    ("kindle", "k", integer),         // {kindle} maps to variable "k"
+    ("Kindle", "k", integer),         // {Kindle} maps to variable "k"
+    // ...
+];
+```
+
+**What this means:**
+- `{Foresee}` gets resolved to `ResolvedToken::Integer { directive: "foresee", value: X }`
+- You need a helper function to parse this, not `directive()`
+- Tests must provide variable values: `parse_ability("{Judgment} {Foresee}.", "foresee: 3")`
+
+**Creating helpers for variable directives:**
+```rust
+// In parser_helpers.rs
+pub fn foresee_count<'a>() -> impl Parser<'a, ParserInput<'a>, u32, ParserExtra<'a>> + Clone {
+    select! {
+        (ResolvedToken::Integer { directive, value }, _)
+            if directive == "foresee" || directive == "Foresee" => value
+    }
+}
+
+// In your parser
+pub fn foresee<'a>() -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
+    foresee_count()  // NOT directive("foresee")
+        .then_ignore(period())
+        .map(|count| StandardEffect::Foresee { count })
+}
+```
+
+#### Compound Directives Are Single Tokens
+
+Directives like `{a-subtype}` are resolved as **single tokens**, not as word("a")
+followed by something else.
+
+❌ **WRONG:**
+```rust
+directive("discover")
+    .ignore_then(word("a"))  // Don't expect "a" as a separate word!
+    .ignore_then(subtype())
+```
+
+✅ **CORRECT:**
+```rust
+directive("discover")
+    .ignore_then(card_predicate_parser::parser())  // Parses the subtype token directly
+```
+
+**Why**: `{a-subtype}` gets resolved to `ResolvedToken::Subtype` during variable
+resolution, so there's no word("a") token to match.
+
+#### Test Variable Naming Conventions
+
+When providing variables in tests, use the **variable name** from the DIRECTIVES
+array, not the directive name:
+
+```rust
+// DIRECTIVES shows: ("Kindle", "k", integer)
+parse_ability("{Kindle}.", "k: 1")  // Use "k", not "kindle"
+
+// DIRECTIVES shows: ("a-subtype", "subtype", subtype)
+parse_ability("{Discover} {a-subtype}.", "subtype: warrior")  // Use "subtype"
+```
+
+**Subtype values must be lowercase:** `"subtype: warrior"` not `"subtype: Warrior"`
+
+#### Snapshot Array Formatting
+
+RON snapshots use multi-line array formatting:
+
+✅ **Expected format:**
+```rust
+Keywords([
+  Judgment,
+])
+```
+
+❌ **Not this:**
+```rust
+Keywords([Judgment])
+```
+
+Use `sed` or accept snapshots with `INSTA_UPDATE=always` to fix formatting.
+
+#### Event Ability Serialization
+
+Don't forget to add Event ability support in `serialize_ability`:
+
+```rust
+pub fn serialize_ability(ability: &Ability) -> String {
+    match ability {
+        Ability::Triggered(triggered) => { /* ... */ }
+        Ability::Event(event) => {  // Add this!
+            if let ability_data::effect::Effect::Effect(effect) = &event.effect {
+                capitalize_first_letter(&serialize_standard_effect(effect))
+            } else {
+                unimplemented!("Complex event effects")
+            }
+        }
+        _ => unimplemented!(),
+    }
+}
+```
+
+#### Import Organization
+
+The nightly formatter groups imports in a specific way. Let it format your imports
+rather than trying to organize them manually:
+
+```rust
+// After rustfmt, imports will be grouped like this:
+use ability_data::standard_effect::StandardEffect;
+use chumsky::prelude::*;
+
+use crate::parser::parser_helpers::{
+    directive, foresee_count, period, word, ParserExtra, ParserInput,
+};
+use crate::parser::{card_predicate_parser, predicate_parser};
+```
+
 ---
 
 ## Implementation Workflow
@@ -123,7 +278,7 @@ Use helpers from `parser_helpers.rs`:
 |--------|---------|---------------|
 | `word("text")` | Match a specific word | `word("draw")` |
 | `words(&["a", "b"])` | Match word sequence | `words(&["at", "the", "end"])` |
-| `directive("name")` | Match a directive | `directive("Judgment")` |
+| `directive("name")` | Match a directive (MUST be lowercase!) | `directive("judgment")` |
 | `period()` | Match period | `.then_ignore(period())` |
 | `comma()` | Match comma | `.then_ignore(comma())` |
 | `energy()` | Parse {e} directive | `energy()` returns `u32` |
@@ -132,6 +287,10 @@ Use helpers from `parser_helpers.rs`:
 | `points()` | Parse {points} | `points()` returns `u32` |
 | `spark()` | Parse {s} directive | `spark()` returns `u32` |
 | `subtype()` | Parse subtype variable | `subtype()` returns `CardSubtype` |
+| `literal_number()` | Parse literal numbers | Matches "3" in "Draw 3 cards" |
+
+**Important**: For variable directives like `{Foresee}` or `{Kindle}`, you need to
+create custom helpers (see "Understanding Variable Directives" section above).
 
 #### Register the New Parser
 
@@ -220,7 +379,9 @@ fn test_your_new_ability() {
     let result = parse_ability("{Judgment} Your effect {cards}.", "cards: 3");
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
-      trigger: Keywords([Judgment]),
+      trigger: Keywords([
+        Judgment,
+      ]),
       effect: Effect(YourNewEffect(
         count: 3,
       )),
