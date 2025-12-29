@@ -6,6 +6,10 @@ use crate::parser::parser_helpers::{
     cards, discards, energy, period, points, word, ParserExtra, ParserInput,
 };
 
+pub fn parser<'a>() -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
+    choice((draw_cards(), discard_cards(), gain_energy(), gain_points())).boxed()
+}
+
 pub fn draw_cards<'a>() -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone
 {
     word("draw")

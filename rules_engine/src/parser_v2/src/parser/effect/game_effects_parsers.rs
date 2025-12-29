@@ -6,6 +6,10 @@ use crate::parser::parser_helpers::{
 };
 use crate::parser::{card_predicate_parser, predicate_parser};
 
+pub fn parser<'a>() -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
+    choice((foresee(), discover(), counterspell(), dissolve_character())).boxed()
+}
+
 pub fn foresee<'a>() -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
     foresee_count().then_ignore(period()).map(|count| StandardEffect::Foresee { count })
 }

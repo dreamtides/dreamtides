@@ -4,6 +4,10 @@ use core_data::numerics::Spark;
 
 use crate::parser::parser_helpers::{kindle_amount, period, ParserExtra, ParserInput};
 
+pub fn parser<'a>() -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
+    kindle()
+}
+
 pub fn kindle<'a>() -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
     kindle_amount()
         .then_ignore(period())

@@ -7,15 +7,9 @@ use crate::parser::parser_helpers::{ParserExtra, ParserInput};
 pub fn single_effect_parser<'a>(
 ) -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
     choice((
-        card_effect_parsers::draw_cards(),
-        card_effect_parsers::discard_cards(),
-        card_effect_parsers::gain_energy(),
-        card_effect_parsers::gain_points(),
-        game_effects_parsers::foresee(),
-        game_effects_parsers::discover(),
-        game_effects_parsers::counterspell(),
-        game_effects_parsers::dissolve_character(),
-        spark_effect_parsers::kindle(),
+        card_effect_parsers::parser(),
+        game_effects_parsers::parser(),
+        spark_effect_parsers::parser(),
     ))
     .boxed()
 }
