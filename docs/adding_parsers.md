@@ -215,23 +215,25 @@ use insta::assert_ron_snapshot;
 use parser_v2_tests::test_helpers::*;
 
 #[test]
-fn test_your_new_effect() {
-    let result = parse_effect("Your effect {cards}.", "cards: 2");
-    assert_ron_snapshot!(result, @r###"
-    YourNewEffect(
-      count: 2,
-    )
-    "###);
-}
-
-#[test]
-fn test_your_new_ability_full() {
+fn test_your_new_ability() {
     let result = parse_ability("{Judgment} Your effect {cards}.", "cards: 3");
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
       trigger: Keywords([Judgment]),
       effect: Effect(YourNewEffect(
         count: 3,
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_your_new_event_ability() {
+    let result = parse_ability("Your effect {cards}.", "cards: 2");
+    assert_ron_snapshot!(result, @r###"
+    Event(EventAbility(
+      effect: Effect(YourNewEffect(
+        count: 2,
       )),
     ))
     "###);
@@ -243,10 +245,6 @@ Available test helpers in `test_helpers.rs`:
 | Function | Purpose |
 |----------|---------|
 | `parse_ability(input, vars)` | Parse to `Ability` |
-| `parse_effect(input, vars)` | Parse to `StandardEffect` |
-| `parse_trigger(input, vars)` | Parse to `TriggerEvent` |
-| `parse_predicate(input, vars)` | Parse to `Predicate` |
-| `try_parse_effect(input, vars)` | Parse with `Option` result |
 | `parse_spanned_ability(input, vars)` | Parse to `SpannedAbility` |
 
 Run tests with:
