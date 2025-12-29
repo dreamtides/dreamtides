@@ -36,6 +36,8 @@ pub fn serialize_standard_effect(effect: &StandardEffect) -> String {
         StandardEffect::DiscardCards { .. } => "discard {discards}.".to_string(),
         StandardEffect::GainEnergy { .. } => "gain {e}.".to_string(),
         StandardEffect::GainPoints { .. } => "gain {points}.".to_string(),
+        StandardEffect::LosePoints { .. } => "you lose {points}.".to_string(),
+        StandardEffect::EnemyGainsPoints { .. } => "the opponent gains {points}.".to_string(),
         StandardEffect::Foresee { .. } => "{Foresee}.".to_string(),
         StandardEffect::Kindle { .. } => "{Kindle}.".to_string(),
         StandardEffect::Counterspell { target } => {
