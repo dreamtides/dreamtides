@@ -1,24 +1,26 @@
 {
-  "name": "Rust (Debian Trixie) + Cargo home + Git LFS",
+  "name": "Rust (Debian Trixie) + Git LFS + Just",
   "image": "mcr.microsoft.com/devcontainers/rust:dev-trixie",
+  "remoteUser": "vscode",
 
   "features": {
     "ghcr.io/devcontainers/features/git-lfs:1": {}
   },
 
-  "remoteEnv": {
-    "CARGO_HOME": "${containerEnv:HOME}/.cargo",
-    "RUSTUP_HOME": "${containerEnv:HOME}/.rustup",
-    "PATH": "${containerEnv:HOME}/.cargo/bin:${containerEnv:PATH}"
+  "containerEnv": {
+    "CARGO_HOME": "/home/vscode/.cargo",
+    "RUSTUP_HOME": "/home/vscode/.rustup"
   },
 
-  "postCreateCommand": "mkdir -p \"$HOME/.cargo\" \"$HOME/.rustup\" && git lfs install --local || true",
+  "remoteEnv": {
+    "PATH": "/home/vscode/.cargo/bin:${containerEnv:PATH}"
+  },
+
+  "postCreateCommand": "set -e; mkdir -p /home/vscode/.cargo /home/vscode/.rustup; sudo apt-get update; sudo apt-get install -y --no-install-recommends just; git lfs install --local || true",
 
   "customizations": {
     "vscode": {
-      "extensions": [
-        "rust-lang.rust-analyzer"
-      ],
+      "extensions": ["rust-lang.rust-analyzer"],
       "settings": {
         "rust-analyzer.checkOnSave.command": "clippy"
       }
