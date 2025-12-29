@@ -8,3 +8,75 @@ fn test_round_trip_at_end_of_turn_gain_energy() {
     let serialized = parser_formatter::serialize_ability(&parsed);
     assert_eq!(original, serialized);
 }
+
+#[test]
+fn test_round_trip_event_foresee() {
+    let original = "{Foresee}.";
+    let parsed = parse_ability(original, "foresee: 3");
+    let serialized = parser_formatter::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_event_kindle() {
+    let original = "{Kindle}.";
+    let parsed = parse_ability(original, "k: 1");
+    let serialized = parser_formatter::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_event_discover() {
+    let original = "{Discover} {a-subtype}.";
+    let parsed = parse_ability(original, "subtype: warrior");
+    let serialized = parser_formatter::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_event_prevent() {
+    let original = "{Prevent} a card.";
+    let parsed = parse_ability(original, "");
+    let serialized = parser_formatter::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_event_dissolve() {
+    let original = "{Dissolve} an enemy.";
+    let parsed = parse_ability(original, "");
+    let serialized = parser_formatter::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_judgment_foresee() {
+    let original = "{Judgment} {Foresee}.";
+    let parsed = parse_ability(original, "foresee: 3");
+    let serialized = parser_formatter::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_judgment_kindle() {
+    let original = "{Judgment} {Kindle}.";
+    let parsed = parse_ability(original, "k: 2");
+    let serialized = parser_formatter::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_materialized_foresee() {
+    let original = "{Materialized} {Foresee}.";
+    let parsed = parse_ability(original, "foresee: 2");
+    let serialized = parser_formatter::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_materialized_judgment_kindle() {
+    let original = "{MaterializedJudgment} {Kindle}.";
+    let parsed = parse_ability(original, "k: 1");
+    let serialized = parser_formatter::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}

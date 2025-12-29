@@ -15,10 +15,23 @@ pub fn serialize_ability(ability: &Ability) -> String {
             let trigger = serialize_trigger_event(&triggered.trigger);
             let capitalized_trigger = capitalize_first_letter(&trigger);
             result.push_str(if has_once_per_turn { &trigger } else { &capitalized_trigger });
+
+            let is_keyword_trigger = matches!(triggered.trigger, TriggerEvent::Keywords(_));
+            if is_keyword_trigger {
+                result.push(' ');
+            }
+
             if let ability_data::effect::Effect::Effect(effect) = &triggered.effect {
                 result.push_str(&serialize_standard_effect(effect));
             }
             result
+        }
+        Ability::Event(event) => {
+            if let ability_data::effect::Effect::Effect(effect) = &event.effect {
+                capitalize_first_letter(&serialize_standard_effect(effect))
+            } else {
+                unimplemented!("Serialization not yet implemented for complex event effects")
+            }
         }
         _ => unimplemented!("Serialization not yet implemented for this ability type"),
     }
@@ -30,6 +43,17 @@ pub fn serialize_standard_effect(effect: &StandardEffect) -> String {
         StandardEffect::DiscardCards { .. } => "discard {discards}.".to_string(),
         StandardEffect::GainEnergy { .. } => "gain {e}.".to_string(),
         StandardEffect::GainPoints { .. } => "gain {points}.".to_string(),
+        StandardEffect::Foresee { .. } => "{Foresee}.".to_string(),
+        StandardEffect::Kindle { .. } => "{Kindle}.".to_string(),
+        StandardEffect::Counterspell { target } => {
+            format!("{{Prevent}} {}.", serialize_predicate(target))
+        }
+        StandardEffect::DissolveCharacter { target } => {
+            format!("{{Dissolve}} {}.", serialize_predicate(target))
+        }
+        StandardEffect::Discover { predicate } => {
+            format!("{{Discover}} {}.", serialize_card_predicate(predicate))
+        }
         _ => unimplemented!("Serialization not yet implemented for this effect type"),
     }
 }
@@ -98,6 +122,9 @@ fn serialize_predicate(predicate: &Predicate) -> String {
             format!("an {}", serialize_your_predicate(card_predicate))
         }
         Predicate::Any(card_predicate) => serialize_card_predicate(card_predicate),
+        Predicate::Enemy(card_predicate) => {
+            format!("an {}", serialize_enemy_predicate(card_predicate))
+        }
         _ => unimplemented!("Serialization not yet implemented for this predicate type"),
     }
 }
@@ -109,11 +136,19 @@ fn serialize_your_predicate(card_predicate: &CardPredicate) -> String {
     }
 }
 
+fn serialize_enemy_predicate(card_predicate: &CardPredicate) -> String {
+    match card_predicate {
+        CardPredicate::Character => "enemy".to_string(),
+        _ => unimplemented!("Serialization not yet implemented for this enemy predicate type"),
+    }
+}
+
 fn serialize_card_predicate(card_predicate: &CardPredicate) -> String {
     match card_predicate {
         CardPredicate::Card => "a card".to_string(),
         CardPredicate::Character => "a character".to_string(),
         CardPredicate::Event => "an event".to_string(),
+        CardPredicate::CharacterType(_) => "{a-subtype}".to_string(),
         _ => {
             unimplemented!("Serialization not yet implemented for this card predicate type")
         }

@@ -101,13 +101,27 @@ fn build_spanned_triggered(
 
     let trigger_start = if once_per_turn.is_some() { 15 } else { 0 };
 
-    let comma_or_colon_idx = lex_result.tokens.iter().position(|(t, s)| {
-        matches!(t, Token::Comma | Token::Colon) && s.start() >= trigger_start
-    })?;
-    let trigger_end = lex_result.tokens[comma_or_colon_idx].1.start();
-    let trigger_span = SimpleSpan::new((), trigger_start..trigger_end);
+    let is_keyword_trigger =
+        matches!(triggered.trigger, ability_data::trigger_event::TriggerEvent::Keywords(_));
 
-    let effect_start = lex_result.tokens[comma_or_colon_idx].1.end();
+    let (trigger_end, effect_start) = if is_keyword_trigger {
+        let first_directive_idx = lex_result
+            .tokens
+            .iter()
+            .position(|(t, s)| matches!(t, Token::Directive(_)) && s.start() >= trigger_start)?;
+        let trigger_end = lex_result.tokens[first_directive_idx].1.end();
+        let effect_start = trigger_end + 1;
+        (trigger_end, effect_start)
+    } else {
+        let comma_or_colon_idx = lex_result.tokens.iter().position(|(t, s)| {
+            matches!(t, Token::Comma | Token::Colon) && s.start() >= trigger_start
+        })?;
+        let trigger_end = lex_result.tokens[comma_or_colon_idx].1.start();
+        let effect_start = lex_result.tokens[comma_or_colon_idx].1.end();
+        (trigger_end, effect_start)
+    };
+
+    let trigger_span = SimpleSpan::new((), trigger_start..trigger_end);
     let effect_end = lex_result.tokens.last()?.1.end();
     let effect_span = SimpleSpan::new((), effect_start..effect_end);
 
