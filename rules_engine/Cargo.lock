@@ -2510,16 +2510,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "parser_tests"
-version = "0.0.0"
-dependencies = [
- "ability_data",
- "ariadne",
- "insta",
- "parser",
-]
-
-[[package]]
 name = "parser_v2"
 version = "0.1.0"
 dependencies = [
