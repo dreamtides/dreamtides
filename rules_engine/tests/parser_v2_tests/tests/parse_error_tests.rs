@@ -236,13 +236,3 @@ fn test_return_enemy_or_ally_to_hand_draw_cards_missing_variable_suggests_fix() 
     assert!(formatted.contains("cards"));
     assert!(formatted.contains("not found"));
 }
-
-#[test]
-fn test_prevent_played_character_parse_succeeds() {
-    let input = "{Prevent} a played character.";
-    let lex_result = lexer_tokenize::lex(input).unwrap();
-    let bindings = VariableBindings::new();
-    let resolved = parser_substitutions::resolve_variables(&lex_result.tokens, &bindings);
-
-    assert!(resolved.is_ok());
-}

@@ -403,3 +403,69 @@ fn test_banish_enemy_with_cost_or_less() {
     ))
     "###);
 }
+
+#[test]
+fn test_prevent_a_played_fast_card() {
+    let result = parse_ability("{Prevent} a played {fast} card.", "");
+    assert_ron_snapshot!(result, @r###"
+    Event(EventAbility(
+      effect: Effect(Counterspell(
+        target: Any(Fast(
+          target: Card,
+        )),
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_prevent_a_played_character() {
+    let result = parse_ability("{Prevent} a played character.", "");
+    assert_ron_snapshot!(result, @r###"
+    Event(EventAbility(
+      effect: Effect(Counterspell(
+        target: Any(Character),
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_discover_an_event() {
+    let result = parse_ability("{Discover} an event.", "");
+    assert_ron_snapshot!(result, @r###"
+    Event(EventAbility(
+      effect: Effect(Discover(
+        predicate: Event,
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_dissolve_all_characters() {
+    let result = parse_ability("{Dissolve} all characters.", "");
+    assert_ron_snapshot!(result, @r###"
+    Event(EventAbility(
+      effect: Effect(DissolveCharactersCount(
+        target: Any(Character),
+        count: All,
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_materialized_gain_energy() {
+    let result = parse_ability("{Materialized} Gain {e}.", "e: 2");
+    assert_ron_snapshot!(result, @r###"
+    Triggered(TriggeredAbility(
+      trigger: Keywords([
+        Materialized,
+      ]),
+      effect: Effect(GainEnergy(
+        gains: Energy(2),
+      )),
+    ))
+    "###);
+}

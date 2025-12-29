@@ -26,6 +26,7 @@ pub fn foresee<'a>() -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserE
 
 pub fn discover<'a>() -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
     directive("discover")
+        .ignore_then(article().or_not())
         .ignore_then(card_predicate_parser::parser())
         .then_ignore(period())
         .map(|predicate| StandardEffect::Discover { predicate })
