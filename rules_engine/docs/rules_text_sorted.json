@@ -36,8 +36,8 @@
   "{Materialized} {Discover} a {fast} event.", // Implemented
   "{Judgment} Return this character from your void to your hand.", // Implemented
   "{Materialized} Return an enemy to hand.", // Implemented
-  "Abandon an ally: Gain {e}.",
-  "Abandon an ally: {Kindle}.",
+  "Abandon an ally: Gain {e}.", // Implemented
+  "Abandon an ally: {Kindle}.", // Implemented
   "{e}: Draw {cards}.",
   "{Foresee}. Draw {cards}.\n\n{ReclaimForCost}",
   "Draw {cards}. Discard {discards}.\n\n{ReclaimForCost}",

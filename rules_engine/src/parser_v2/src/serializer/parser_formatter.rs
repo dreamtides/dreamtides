@@ -1,4 +1,5 @@
 use ability_data::ability::Ability;
+use ability_data::cost::Cost;
 use ability_data::effect::Effect;
 use ability_data::predicate::{CardPredicate, Operator, Predicate};
 use ability_data::standard_effect::StandardEffect;
@@ -28,6 +29,14 @@ pub fn serialize_ability(ability: &Ability) -> String {
             result
         }
         Ability::Event(event) => capitalize_first_letter(&serialize_effect(&event.effect)),
+        Ability::Activated(activated) => {
+            let mut result = String::new();
+            let costs = activated.costs.iter().map(serialize_cost).collect::<Vec<_>>().join(", ");
+            result.push_str(&capitalize_first_letter(&costs));
+            result.push_str(": ");
+            result.push_str(&capitalize_first_letter(&serialize_effect(&activated.effect)));
+            result
+        }
         _ => unimplemented!("Serialization not yet implemented for this ability type"),
     }
 }
@@ -121,6 +130,15 @@ pub fn serialize_trigger_event(trigger: &TriggerEvent) -> String {
     }
 }
 
+fn serialize_cost(cost: &Cost) -> String {
+    match cost {
+        Cost::AbandonCharacters(predicate, _) => {
+            format!("abandon {}", serialize_predicate(predicate))
+        }
+        _ => unimplemented!("Serialization not yet implemented for this cost type"),
+    }
+}
+
 fn serialize_effect(effect: &Effect) -> String {
     match effect {
         Effect::Effect(standard_effect) => serialize_standard_effect(standard_effect),
@@ -160,6 +178,9 @@ fn serialize_predicate(predicate: &Predicate) -> String {
     match predicate {
         Predicate::This => "this character".to_string(),
         Predicate::Your(card_predicate) => {
+            format!("an {}", serialize_your_predicate(card_predicate))
+        }
+        Predicate::Another(card_predicate) => {
             format!("an {}", serialize_your_predicate(card_predicate))
         }
         Predicate::Any(card_predicate) => serialize_card_predicate(card_predicate),

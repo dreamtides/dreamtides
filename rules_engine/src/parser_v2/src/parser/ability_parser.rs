@@ -2,15 +2,20 @@ use ability_data::ability::{Ability, EventAbility};
 use chumsky::prelude::*;
 
 use crate::parser::parser_helpers::{ParserExtra, ParserInput};
-use crate::parser::{effect_parser, triggered_parser};
+use crate::parser::{activated_ability_parser, effect_parser, triggered_parser};
 
 pub fn ability_parser<'a>() -> impl Parser<'a, ParserInput<'a>, Ability, ParserExtra<'a>> + Clone {
-    choice((triggered_ability_parser(), event_ability_parser())).boxed()
+    choice((triggered_ability_parser(), activated_ability_parser(), event_ability_parser())).boxed()
 }
 
 fn triggered_ability_parser<'a>(
 ) -> impl Parser<'a, ParserInput<'a>, Ability, ParserExtra<'a>> + Clone {
     triggered_parser::triggered_ability_parser().map(Ability::Triggered)
+}
+
+fn activated_ability_parser<'a>(
+) -> impl Parser<'a, ParserInput<'a>, Ability, ParserExtra<'a>> + Clone {
+    activated_ability_parser::activated_ability_parser().map(Ability::Activated)
 }
 
 fn event_ability_parser<'a>() -> impl Parser<'a, ParserInput<'a>, Ability, ParserExtra<'a>> + Clone

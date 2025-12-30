@@ -99,6 +99,24 @@ fn test_parse_activated_ability() {
 }
 
 #[test]
+fn test_parse_activated_ability_abandon() {
+    let SpannedAbility::Activated(activated) =
+        parse_spanned_ability("Abandon an ally: Gain {e}.", "e: 1")
+    else {
+        panic!("Expected Activated ability");
+    };
+
+    assert_eq!(activated.cost.text, "Abandon an ally");
+    assert_valid_span(&activated.cost.span);
+
+    let SpannedEffect::Effect(effect) = activated.effect else {
+        panic!("Expected Effect, got Modal");
+    };
+    assert!(effect.text.contains("Gain {e}."));
+    assert_valid_span(&effect.span);
+}
+
+#[test]
 fn test_spanned_compound_effect_event() {
     let SpannedAbility::Event(event) =
         parse_spanned_ability("Gain {e}. Draw {cards}.", "e: 2, cards: 3")

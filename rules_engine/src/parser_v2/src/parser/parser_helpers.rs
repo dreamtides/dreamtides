@@ -36,6 +36,12 @@ pub fn comma<'a>() -> impl Parser<'a, ParserInput<'a>, (), ParserExtra<'a>> + Cl
     }
 }
 
+pub fn colon<'a>() -> impl Parser<'a, ParserInput<'a>, (), ParserExtra<'a>> + Clone {
+    select! {
+        (ResolvedToken::Token(Token::Colon), _) => ()
+    }
+}
+
 pub fn effect_separator<'a>() -> impl Parser<'a, ParserInput<'a>, (), ParserExtra<'a>> + Clone {
     choice((period(), comma().then_ignore(word("then"))))
 }
