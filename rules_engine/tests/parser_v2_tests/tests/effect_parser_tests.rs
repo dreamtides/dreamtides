@@ -680,3 +680,163 @@ fn test_judgment_return_this_from_void_to_hand() {
     ))
     "###);
 }
+
+#[test]
+fn test_discover_card_with_cost() {
+    let result = parse_ability("{Discover} a card with cost {e}.", "e: 3");
+    assert_ron_snapshot!(result, @r###"
+    Event(EventAbility(
+      effect: Effect(Discover(
+        predicate: CardWithCost(
+          target: Card,
+          cost_operator: Exactly,
+          cost: Energy(3),
+        ),
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_banish_non_subtype_enemy() {
+    let result = parse_ability("{Banish} a non-{subtype} enemy.", "subtype: warrior");
+    assert_ron_snapshot!(result, @r###"
+    Event(EventAbility(
+      effect: Effect(BanishCharacter(
+        target: Enemy(NotCharacterType(Warrior)),
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_discover_event_with_cost() {
+    let result = parse_ability("{Discover} an event with cost {e}.", "e: 2");
+    assert_ron_snapshot!(result, @r###"
+    Event(EventAbility(
+      effect: Effect(Discover(
+        predicate: CardWithCost(
+          target: Event,
+          cost_operator: Exactly,
+          cost: Energy(2),
+        ),
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_discover_character_with_cost() {
+    let result = parse_ability("{Discover} a character with cost {e} or less.", "e: 3");
+    assert_ron_snapshot!(result, @r###"
+    Event(EventAbility(
+      effect: Effect(Discover(
+        predicate: CardWithCost(
+          target: Character,
+          cost_operator: OrLess,
+          cost: Energy(3),
+        ),
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_discover_subtype_with_cost() {
+    let result =
+        parse_ability("{Discover} {a-subtype} with cost {e} or more.", "subtype: warrior, e: 4");
+    assert_ron_snapshot!(result, @r###"
+    Event(EventAbility(
+      effect: Effect(Discover(
+        predicate: CardWithCost(
+          target: CharacterType(Warrior),
+          cost_operator: OrMore,
+          cost: Energy(4),
+        ),
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_discover_fast_event_with_cost() {
+    let result = parse_ability("{Discover} a {fast} event with cost {e}.", "e: 1");
+    assert_ron_snapshot!(result, @r###"
+    Event(EventAbility(
+      effect: Effect(Discover(
+        predicate: Fast(
+          target: CardWithCost(
+            target: Event,
+            cost_operator: Exactly,
+            cost: Energy(1),
+          ),
+        ),
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_discover_fast_subtype_with_cost() {
+    let result = parse_ability(
+        "{Discover} a {fast} {subtype} with cost {e} or less.",
+        "subtype: mage, e: 2",
+    );
+    assert_ron_snapshot!(result, @r###"
+    Event(EventAbility(
+      effect: Effect(Discover(
+        predicate: Fast(
+          target: CardWithCost(
+            target: CharacterType(Mage),
+            cost_operator: OrLess,
+            cost: Energy(2),
+          ),
+        ),
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_discover_subtype_with_spark() {
+    let result =
+        parse_ability("{Discover} {a-subtype} with spark {s} or less.", "subtype: warrior, s: 2");
+    assert_ron_snapshot!(result, @r###"
+    Event(EventAbility(
+      effect: Effect(Discover(
+        predicate: CharacterWithSpark(Spark(2), OrLess),
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_discover_fast_character_with_spark_general() {
+    let result = parse_ability("{Discover} a {fast} character with spark {s} or more.", "s: 3");
+    assert_ron_snapshot!(result, @r###"
+    Event(EventAbility(
+      effect: Effect(Discover(
+        predicate: Fast(
+          target: CharacterWithSpark(Spark(3), OrMore),
+        ),
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_discover_fast_subtype_with_spark_general() {
+    let result = parse_ability(
+        "{Discover} a {fast} {subtype} with spark {s} or less.",
+        "subtype: warrior, s: 1",
+    );
+    assert_ron_snapshot!(result, @r###"
+    Event(EventAbility(
+      effect: Effect(Discover(
+        predicate: Fast(
+          target: CharacterWithSpark(Spark(1), OrLess),
+        ),
+      )),
+    ))
+    "###);
+}

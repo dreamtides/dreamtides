@@ -2,13 +2,14 @@ use ability_data::predicate::{CardPredicate, Predicate};
 use chumsky::prelude::*;
 
 use crate::parser::card_predicate_parser;
-use crate::parser::parser_helpers::{directive, word, words, ParserExtra, ParserInput};
+use crate::parser::parser_helpers::{directive, subtype, word, words, ParserExtra, ParserInput};
 
 pub fn predicate_parser<'a>() -> impl Parser<'a, ParserInput<'a>, Predicate, ParserExtra<'a>> + Clone
 {
     choice((
         this_parser(),
         enemy_or_ally_parser(),
+        non_subtype_enemy_parser(),
         enemy_parser(),
         ally_parser(),
         any_fast_card_parser(),
@@ -25,6 +26,14 @@ fn this_parser<'a>() -> impl Parser<'a, ParserInput<'a>, Predicate, ParserExtra<
         words(&["this", "event"]).to(Predicate::This),
         words(&["this", "card"]).to(Predicate::This),
     ))
+}
+
+fn non_subtype_enemy_parser<'a>(
+) -> impl Parser<'a, ParserInput<'a>, Predicate, ParserExtra<'a>> + Clone {
+    word("non-")
+        .ignore_then(subtype())
+        .then_ignore(word("enemy"))
+        .map(|subtype| Predicate::Enemy(CardPredicate::NotCharacterType(subtype)))
 }
 
 fn enemy_parser<'a>() -> impl Parser<'a, ParserInput<'a>, Predicate, ParserExtra<'a>> + Clone {

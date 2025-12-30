@@ -1,23 +1,41 @@
-use ability_data::predicate::{CardPredicate, Operator};
+use ability_data::predicate::CardPredicate;
 use chumsky::prelude::*;
 use core_data::numerics::{Energy, Spark};
 
-use crate::parser::parser_helpers::{
-    directive, energy, spark, subtype, word, words, ParserExtra, ParserInput,
-};
+use crate::parser::parser_helpers::{directive, subtype, word, ParserExtra, ParserInput};
+use crate::parser::predicate_suffix_parser;
 
 pub fn parser<'a>() -> impl Parser<'a, ParserInput<'a>, CardPredicate, ParserExtra<'a>> + Clone {
     recursive(|parser| {
-        choice((
+        let base = choice((
             fast_parser(parser.clone()),
-            character_with_spark_parser(),
-            character_with_cost_parser(),
-            with_spark_parser(),
-            with_cost_parser(),
             subtype_parser(),
             character_parser(),
             event_parser(),
             card_parser(),
+        ));
+
+        choice((
+            base.clone().then(predicate_suffix_parser::with_cost_suffix()).map(
+                |(target, (cost, op))| CardPredicate::CardWithCost {
+                    target: Box::new(target),
+                    cost_operator: op,
+                    cost: Energy(cost),
+                },
+            ),
+            base.clone().then(predicate_suffix_parser::with_spark_suffix()).map(
+                |(_, (spark_value, op))| CardPredicate::CharacterWithSpark(Spark(spark_value), op),
+            ),
+            predicate_suffix_parser::with_cost_suffix().map(|(cost, op)| {
+                CardPredicate::CardWithCost {
+                    target: Box::new(CardPredicate::Character),
+                    cost_operator: op,
+                    cost: Energy(cost),
+                }
+            }),
+            predicate_suffix_parser::with_spark_suffix()
+                .map(|(spark_value, op)| CardPredicate::CharacterWithSpark(Spark(spark_value), op)),
+            base,
         ))
     })
     .boxed()
@@ -47,62 +65,4 @@ fn fast_parser<'a>(
 fn subtype_parser<'a>() -> impl Parser<'a, ParserInput<'a>, CardPredicate, ParserExtra<'a>> + Clone
 {
     subtype().map(CardPredicate::CharacterType)
-}
-
-fn character_with_spark_parser<'a>(
-) -> impl Parser<'a, ParserInput<'a>, CardPredicate, ParserExtra<'a>> + Clone {
-    word("character")
-        .ignore_then(words(&["with", "spark"]))
-        .ignore_then(spark())
-        .then(spark_operator())
-        .map(|(spark_value, operator)| {
-            CardPredicate::CharacterWithSpark(Spark(spark_value), operator)
-        })
-}
-
-fn character_with_cost_parser<'a>(
-) -> impl Parser<'a, ParserInput<'a>, CardPredicate, ParserExtra<'a>> + Clone {
-    word("character")
-        .ignore_then(words(&["with", "cost"]))
-        .ignore_then(energy())
-        .then(energy_operator())
-        .map(|(cost_value, operator)| CardPredicate::CardWithCost {
-            target: Box::new(CardPredicate::Character),
-            cost_operator: operator,
-            cost: Energy(cost_value),
-        })
-}
-
-fn spark_operator<'a>() -> impl Parser<'a, ParserInput<'a>, Operator<Spark>, ParserExtra<'a>> + Clone
-{
-    choice((
-        words(&["or", "less"]).to(Operator::OrLess),
-        words(&["or", "more"]).to(Operator::OrMore),
-    ))
-}
-
-fn energy_operator<'a>(
-) -> impl Parser<'a, ParserInput<'a>, Operator<Energy>, ParserExtra<'a>> + Clone {
-    choice((
-        words(&["or", "less"]).to(Operator::OrLess),
-        words(&["or", "more"]).to(Operator::OrMore),
-    ))
-}
-
-fn with_spark_parser<'a>(
-) -> impl Parser<'a, ParserInput<'a>, CardPredicate, ParserExtra<'a>> + Clone {
-    words(&["with", "spark"]).ignore_then(spark()).then(spark_operator()).map(
-        |(spark_value, operator)| CardPredicate::CharacterWithSpark(Spark(spark_value), operator),
-    )
-}
-
-fn with_cost_parser<'a>() -> impl Parser<'a, ParserInput<'a>, CardPredicate, ParserExtra<'a>> + Clone
-{
-    words(&["with", "cost"]).ignore_then(energy()).then(energy_operator()).map(
-        |(cost_value, operator)| CardPredicate::CardWithCost {
-            target: Box::new(CardPredicate::Character),
-            cost_operator: operator,
-            cost: Energy(cost_value),
-        },
-    )
 }
