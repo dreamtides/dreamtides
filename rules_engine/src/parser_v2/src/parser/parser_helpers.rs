@@ -36,6 +36,10 @@ pub fn comma<'a>() -> impl Parser<'a, ParserInput<'a>, (), ParserExtra<'a>> + Cl
     }
 }
 
+pub fn effect_separator<'a>() -> impl Parser<'a, ParserInput<'a>, (), ParserExtra<'a>> + Clone {
+    choice((period(), comma().then_ignore(word("then"))))
+}
+
 pub fn energy<'a>() -> impl Parser<'a, ParserInput<'a>, u32, ParserExtra<'a>> + Clone {
     select! {
         (ResolvedToken::Integer { directive, value }, _) if directive == "e" => value

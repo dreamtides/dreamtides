@@ -469,3 +469,90 @@ fn test_materialized_gain_energy() {
     ))
     "###);
 }
+
+#[test]
+fn test_judgment_draw_then_discard() {
+    let result =
+        parse_ability("{Judgment} Draw {cards}, then discard {discards}.", "cards: 2, discards: 1");
+    assert_ron_snapshot!(result, @r###"
+    Triggered(TriggeredAbility(
+      trigger: Keywords([
+        Judgment,
+      ]),
+      effect: List([
+        EffectWithOptions(
+          effect: DrawCards(
+            count: 2,
+          ),
+          optional: false,
+        ),
+        EffectWithOptions(
+          effect: DiscardCards(
+            count: 1,
+          ),
+          optional: false,
+        ),
+      ]),
+    ))
+    "###);
+}
+
+#[test]
+fn test_materialized_discard_then_draw() {
+    let result = parse_ability(
+        "{Materialized} Discard {discards}, then draw {cards}.",
+        "discards: 1, cards: 2",
+    );
+    assert_ron_snapshot!(result, @r###"
+    Triggered(TriggeredAbility(
+      trigger: Keywords([
+        Materialized,
+      ]),
+      effect: List([
+        EffectWithOptions(
+          effect: DiscardCards(
+            count: 1,
+          ),
+          optional: false,
+        ),
+        EffectWithOptions(
+          effect: DrawCards(
+            count: 2,
+          ),
+          optional: false,
+        ),
+      ]),
+    ))
+    "###);
+}
+
+#[test]
+fn test_materialized_dissolved_draw_cards() {
+    let result = parse_ability("{MaterializedDissolved} Draw {cards}.", "cards: 1");
+    assert_ron_snapshot!(result, @r###"
+    Triggered(TriggeredAbility(
+      trigger: Keywords([
+        Materialized,
+        Dissolved,
+      ]),
+      effect: Effect(DrawCards(
+        count: 1,
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_materialized_return_ally_to_hand() {
+    let result = parse_ability("{Materialized} Return an ally to hand.", "");
+    assert_ron_snapshot!(result, @r###"
+    Triggered(TriggeredAbility(
+      trigger: Keywords([
+        Materialized,
+      ]),
+      effect: Effect(ReturnToHand(
+        target: Another(Character),
+      )),
+    ))
+    "###);
+}

@@ -176,3 +176,47 @@ fn test_round_trip_banish_enemy_with_cost_or_less() {
     let serialized = parser_formatter::serialize_ability(&parsed);
     assert_eq!(original, serialized);
 }
+
+#[test]
+fn test_round_trip_judgment_draw_then_discard() {
+    // Note: "then" separated effects are parsed as Effect::List and serialize
+    // with periods instead of ", then"
+    let original = "{Judgment} Draw {cards}, then discard {discards}.";
+    let parsed = parse_ability(original, "cards: 2, discards: 1");
+    let serialized = parser_formatter::serialize_ability(&parsed);
+    assert_eq!("{Judgment} Draw {cards}. Discard {discards}.", serialized);
+}
+
+#[test]
+fn test_round_trip_materialized_discard_then_draw() {
+    // Note: "then" separated effects are parsed as Effect::List and serialize
+    // with periods instead of ", then"
+    let original = "{Materialized} Discard {discards}, then draw {cards}.";
+    let parsed = parse_ability(original, "discards: 1, cards: 2");
+    let serialized = parser_formatter::serialize_ability(&parsed);
+    assert_eq!("{Materialized} Discard {discards}. Draw {cards}.", serialized);
+}
+
+#[test]
+fn test_round_trip_materialized_dissolved_draw_cards() {
+    let original = "{MaterializedDissolved} Draw {cards}.";
+    let parsed = parse_ability(original, "cards: 1");
+    let serialized = parser_formatter::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_materialized_judgment_gain_energy() {
+    let original = "{MaterializedJudgment} Gain {e}.";
+    let parsed = parse_ability(original, "e: 1");
+    let serialized = parser_formatter::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_materialized_return_ally_to_hand() {
+    let original = "{Materialized} Return an ally to hand.";
+    let parsed = parse_ability(original, "");
+    let serialized = parser_formatter::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}

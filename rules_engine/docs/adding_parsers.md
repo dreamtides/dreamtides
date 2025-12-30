@@ -462,8 +462,8 @@ Use these canonical names:
 
 ### Step 4: Add Round-Trip Tests
 
-Round-trip tests verify that parsing then serializing produces the original
-text. Add tests in `rules_engine/tests/parser_v2_tests/tests/ability_round_trip_tests.rs`:
+Round-trip tests verify that parsing then serializing produces reasonable output.
+Add tests in `rules_engine/tests/parser_v2_tests/tests/ability_round_trip_tests.rs`:
 
 ```rust
 use parser_v2::serializer::parser_formatter;
@@ -477,6 +477,11 @@ fn test_round_trip_your_new_effect() {
     assert_eq!(original, serialized);
 }
 ```
+
+**Note**: Round-trips don't need to be 100% exact. When there are multiple valid
+phrasings for the same effect (like ", then" vs "."), either output is fine. Make
+a best effort to match the original, but don't create special-case code just for
+serialization.
 
 ### Step 5: Update Spanned Ability Support
 
