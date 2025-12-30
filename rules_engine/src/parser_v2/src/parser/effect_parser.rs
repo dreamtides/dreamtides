@@ -5,7 +5,7 @@ use chumsky::prelude::*;
 use crate::parser::effect::{
     card_effect_parsers, game_effects_parsers, resource_effect_parsers, spark_effect_parsers,
 };
-use crate::parser::parser_helpers::{effect_separator, period, ParserExtra, ParserInput};
+use crate::parser::parser_helpers::{effect_separator, period, words, ParserExtra, ParserInput};
 
 pub fn single_effect_parser<'a>(
 ) -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
@@ -20,6 +20,23 @@ pub fn single_effect_parser<'a>(
 
 pub fn effect_or_compound_parser<'a>(
 ) -> impl Parser<'a, ParserInput<'a>, Effect, ParserExtra<'a>> + Clone {
+    choice((optional_effect_parser(), standard_effect_parser())).boxed()
+}
+
+fn optional_effect_parser<'a>() -> impl Parser<'a, ParserInput<'a>, Effect, ParserExtra<'a>> + Clone
+{
+    words(&["you", "may"]).ignore_then(single_effect_parser()).then_ignore(period()).map(|effect| {
+        Effect::WithOptions(EffectWithOptions {
+            effect,
+            optional: true,
+            trigger_cost: None,
+            condition: None,
+        })
+    })
+}
+
+fn standard_effect_parser<'a>() -> impl Parser<'a, ParserInput<'a>, Effect, ParserExtra<'a>> + Clone
+{
     single_effect_parser()
         .separated_by(effect_separator())
         .at_least(1)
@@ -32,5 +49,4 @@ pub fn effect_or_compound_parser<'a>(
                 Effect::List(effects.into_iter().map(EffectWithOptions::new).collect())
             }
         })
-        .boxed()
 }

@@ -282,3 +282,21 @@ fn test_spanned_materialized_return_ally_to_hand() {
     assert_eq!(effect.text.trim(), "Return an ally to hand.");
     assert_valid_span(&effect.span);
 }
+
+#[test]
+fn test_spanned_judgment_return_this_from_void_to_hand() {
+    let SpannedAbility::Triggered(triggered) =
+        parse_spanned_ability("{Judgment} Return this character from your void to your hand.", "")
+    else {
+        panic!("Expected Triggered ability");
+    };
+
+    assert_eq!(triggered.trigger.text, "{Judgment}");
+    assert_valid_span(&triggered.trigger.span);
+
+    let SpannedEffect::Effect(effect) = triggered.effect else {
+        panic!("Expected Effect, got Modal");
+    };
+    assert_eq!(effect.text.trim(), "Return this character from your void to your hand.");
+    assert_valid_span(&effect.span);
+}

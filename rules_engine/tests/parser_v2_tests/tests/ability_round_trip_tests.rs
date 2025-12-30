@@ -220,3 +220,67 @@ fn test_round_trip_materialized_return_ally_to_hand() {
     let serialized = parser_formatter::serialize_ability(&parsed);
     assert_eq!(original, serialized);
 }
+
+#[test]
+fn test_round_trip_materialized_you_may_return_ally_to_hand() {
+    let original = "{Materialized} You may return an ally to hand.";
+    let parsed = parse_ability(original, "");
+    let serialized = parser_formatter::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_materialized_discover_fast_event() {
+    let original = "{Materialized} {Discover} a {fast} event.";
+    let parsed = parse_ability(original, "");
+    let serialized = parser_formatter::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_judgment_return_this_from_void_to_hand() {
+    let original = "{Judgment} Return this character from your void to your hand.";
+    let parsed = parse_ability(original, "");
+    let serialized = parser_formatter::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_discover_fast_character() {
+    let original = "{Discover} a {fast} character.";
+    let parsed = parse_ability(original, "");
+    let serialized = parser_formatter::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_discover_fast_card() {
+    let original = "{Discover} a {fast} card.";
+    let parsed = parse_ability(original, "");
+    let serialized = parser_formatter::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_discover_fast_subtype() {
+    let original = "{Discover} a {fast} {subtype}.";
+    let parsed = parse_ability(original, "subtype: warrior");
+    let serialized = parser_formatter::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_discover_fast_character_with_spark() {
+    let original = "{Discover} a {fast} character with spark {s} or less.";
+    let parsed = parse_ability(original, "s: 2");
+    let serialized = parser_formatter::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_discover_fast_card_with_cost() {
+    let original = "{Discover} a {fast} character with cost {e} or less.";
+    let parsed = parse_ability(original, "e: 3");
+    let serialized = parser_formatter::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}

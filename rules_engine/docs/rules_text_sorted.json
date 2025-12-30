@@ -32,9 +32,9 @@
   "{MaterializedDissolved} Draw {cards}.", // Implemented
   "{MaterializedJudgment} \nGain {e}.", // Implemented
   "{Materialized} Return an ally to hand.", // Implemented
-  "{Materialized} You may return an ally to hand.",
-  "{Materialized} {Discover} a {fast} event.",
-  "{Judgment} Return this character from your void to your hand.",
+  "{Materialized} You may return an ally to hand.", // Implemented
+  "{Materialized} {Discover} a {fast} event.", // Implemented
+  "{Judgment} Return this character from your void to your hand.", // Implemented
   "{Materialized} Return an enemy to hand.", // Implemented
   "Abandon an ally: Gain {e}.",
   "Abandon an ally: {Kindle}.",

@@ -479,7 +479,7 @@ fn test_spanned_your_new_effect() {
 Review whether parser error suggestions should be added for your new text.
 Error suggestions live in `parser_error_suggestions.rs`.
 
-If your new syntax introduces new keywords, add them to `PARSER_WORDS`:
+If your new syntax introduces new words, add them to `PARSER_WORDS`:
 
 ```rust
 static PARSER_WORDS: &[&str] = &[
@@ -497,14 +497,6 @@ After completing all changes, run formatting and validation:
 just fmt      # Apply rustfmt formatting
 just review   # Full validation (format check, build, lint, test)
 ```
-
-### Step 9: Update This Guide
-
-After completing implementation, update this guide with any improvements:
-
-- **New patterns**: Document new syntax patterns encountered
-- **New data types**: Document new enum variants added
-- **Workflow improvements**: Document better testing or implementation approaches
 
 ---
 
@@ -525,6 +517,30 @@ Draw {cards}. Discard {discards}. // Automatically works
 
 Focus on implementing the single effect parser correctly. Test both the
 standalone effect AND compound variations to ensure proper integration.
+
+---
+
+## Optional Effects
+
+Optional effects (prefixed with "You may") are supported through
+`EffectWithOptions` in `effect_parser.rs`. The parser automatically wraps
+effects prefixed with "you may" in an optional wrapper.
+
+When you implement an effect parser, it automatically works with the optional
+prefix:
+
+```
+Return an ally to hand.           // Works without optional
+You may return an ally to hand.   // Automatically wrapped as optional
+```
+
+The parser creates an `Effect::WithOptions` with the `optional` field set to
+`true`. No special parser code is needed for individual effects - the optional
+handling is done at the effect composition level in `effect_or_compound_parser`.
+
+When serializing optional effects, the formatter automatically adds "you may"
+prefix when `options.optional` is true. See `serialize_effect` in
+`parser_formatter.rs` for the implementation.
 
 ---
 

@@ -8,7 +8,15 @@ use crate::parser::parser_helpers::{
 use crate::parser::predicate_parser;
 
 pub fn parser<'a>() -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
-    choice((draw_cards(), discard_cards(), gain_energy(), gain_points(), return_to_hand())).boxed()
+    choice((
+        draw_cards(),
+        discard_cards(),
+        gain_energy(),
+        gain_points(),
+        return_from_void_to_hand(),
+        return_to_hand(),
+    ))
+    .boxed()
 }
 
 pub fn draw_cards<'a>() -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone
@@ -38,4 +46,12 @@ pub fn return_to_hand<'a>(
         .ignore_then(predicate_parser::predicate_parser())
         .then_ignore(words(&["to", "hand"]))
         .map(|target| StandardEffect::ReturnToHand { target })
+}
+
+pub fn return_from_void_to_hand<'a>(
+) -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
+    word("return")
+        .ignore_then(predicate_parser::predicate_parser())
+        .then_ignore(words(&["from", "your", "void", "to", "your", "hand"]))
+        .map(|target| StandardEffect::ReturnFromYourVoidToHand { target })
 }

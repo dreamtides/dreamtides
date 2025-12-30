@@ -556,3 +556,127 @@ fn test_materialized_return_ally_to_hand() {
     ))
     "###);
 }
+
+#[test]
+fn test_materialized_you_may_return_ally_to_hand() {
+    let result = parse_ability("{Materialized} You may return an ally to hand.", "");
+    assert_ron_snapshot!(result, @r###"
+    Triggered(TriggeredAbility(
+      trigger: Keywords([
+        Materialized,
+      ]),
+      effect: WithOptions(EffectWithOptions(
+        effect: ReturnToHand(
+          target: Another(Character),
+        ),
+        optional: true,
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_materialized_discover_fast_event() {
+    let result = parse_ability("{Materialized} {Discover} a {fast} event.", "");
+    assert_ron_snapshot!(result, @r###"
+    Triggered(TriggeredAbility(
+      trigger: Keywords([
+        Materialized,
+      ]),
+      effect: Effect(Discover(
+        predicate: Fast(
+          target: Event,
+        ),
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_discover_fast_character() {
+    let result = parse_ability("{Discover} a {fast} character.", "");
+    assert_ron_snapshot!(result, @r###"
+    Event(EventAbility(
+      effect: Effect(Discover(
+        predicate: Fast(
+          target: Character,
+        ),
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_discover_fast_card() {
+    let result = parse_ability("{Discover} a {fast} card.", "");
+    assert_ron_snapshot!(result, @r###"
+    Event(EventAbility(
+      effect: Effect(Discover(
+        predicate: Fast(
+          target: Card,
+        ),
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_discover_fast_subtype() {
+    let result = parse_ability("{Discover} a {fast} {a-subtype}.", "subtype: warrior");
+    assert_ron_snapshot!(result, @r###"
+    Event(EventAbility(
+      effect: Effect(Discover(
+        predicate: Fast(
+          target: CharacterType(Warrior),
+        ),
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_discover_fast_character_with_spark() {
+    let result = parse_ability("{Discover} a {fast} character with spark {s} or less.", "s: 2");
+    assert_ron_snapshot!(result, @r###"
+    Event(EventAbility(
+      effect: Effect(Discover(
+        predicate: Fast(
+          target: CharacterWithSpark(Spark(2), OrLess),
+        ),
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_discover_fast_card_with_cost() {
+    let result = parse_ability("{Discover} a {fast} character with cost {e} or less.", "e: 3");
+    assert_ron_snapshot!(result, @r###"
+    Event(EventAbility(
+      effect: Effect(Discover(
+        predicate: Fast(
+          target: CardWithCost(
+            target: Character,
+            cost_operator: OrLess,
+            cost: Energy(3),
+          ),
+        ),
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_judgment_return_this_from_void_to_hand() {
+    let result = parse_ability("{Judgment} Return this character from your void to your hand.", "");
+    assert_ron_snapshot!(result, @r###"
+    Triggered(TriggeredAbility(
+      trigger: Keywords([
+        Judgment,
+      ]),
+      effect: Effect(ReturnFromYourVoidToHand(
+        target: This,
+      )),
+    ))
+    "###);
+}

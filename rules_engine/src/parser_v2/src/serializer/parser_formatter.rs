@@ -73,6 +73,9 @@ pub fn serialize_standard_effect(effect: &StandardEffect) -> String {
             Predicate::Another(CardPredicate::Character) => "return an ally to hand.".to_string(),
             _ => format!("return {} to hand.", serialize_predicate(target)),
         },
+        StandardEffect::ReturnFromYourVoidToHand { target } => {
+            format!("return {} from your void to your hand.", serialize_predicate(target))
+        }
         _ => unimplemented!("Serialization not yet implemented for this effect type"),
     }
 }
@@ -121,12 +124,19 @@ pub fn serialize_trigger_event(trigger: &TriggerEvent) -> String {
 fn serialize_effect(effect: &Effect) -> String {
     match effect {
         Effect::Effect(standard_effect) => serialize_standard_effect(standard_effect),
+        Effect::WithOptions(options) => {
+            if options.optional {
+                format!("you may {}", serialize_standard_effect(&options.effect))
+            } else {
+                serialize_standard_effect(&options.effect)
+            }
+        }
         Effect::List(effects) => effects
             .iter()
             .map(|e| capitalize_first_letter(&serialize_standard_effect(&e.effect)))
             .collect::<Vec<_>>()
             .join(" "),
-        _ => unimplemented!("Serialization not yet implemented for this effect type"),
+        Effect::Modal(_) => unimplemented!("Serialization not yet implemented for modal effects"),
     }
 }
 
@@ -198,6 +208,17 @@ fn serialize_fast_target(card_predicate: &CardPredicate) -> String {
         CardPredicate::Card => "card".to_string(),
         CardPredicate::Character => "character".to_string(),
         CardPredicate::Event => "event".to_string(),
+        CardPredicate::CharacterType(_) => "{subtype}".to_string(),
+        CardPredicate::CharacterWithSpark(_spark, operator) => {
+            format!("character with spark {{s}} {}", serialize_operator(operator))
+        }
+        CardPredicate::CardWithCost { target, cost_operator, .. } => {
+            format!(
+                "{} with cost {{e}} {}",
+                serialize_fast_target(target),
+                serialize_operator(cost_operator)
+            )
+        }
         _ => unimplemented!("Unsupported fast target"),
     }
 }
