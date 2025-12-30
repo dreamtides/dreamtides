@@ -4,7 +4,7 @@ use ability_data::standard_effect::StandardEffect;
 use chumsky::prelude::*;
 
 use crate::parser::parser_helpers::{
-    article, directive, foresee_count, period, word, ParserExtra, ParserInput,
+    article, directive, foresee_count, word, ParserExtra, ParserInput,
 };
 use crate::parser::{card_predicate_parser, predicate_parser};
 
@@ -21,14 +21,13 @@ pub fn parser<'a>() -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserEx
 }
 
 pub fn foresee<'a>() -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
-    foresee_count().then_ignore(period()).map(|count| StandardEffect::Foresee { count })
+    foresee_count().map(|count| StandardEffect::Foresee { count })
 }
 
 pub fn discover<'a>() -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
     directive("discover")
         .ignore_then(article().or_not())
         .ignore_then(card_predicate_parser::parser())
-        .then_ignore(period())
         .map(|predicate| StandardEffect::Discover { predicate })
 }
 
@@ -38,20 +37,17 @@ pub fn counterspell<'a>(
         .ignore_then(article())
         .ignore_then(word("played").or_not())
         .ignore_then(predicate_parser::predicate_parser())
-        .then_ignore(period())
         .map(|target| StandardEffect::Counterspell { target })
 }
 
 pub fn dissolve_all_characters<'a>(
 ) -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
-    directive("dissolve")
-        .ignore_then(word("all"))
-        .ignore_then(word("characters"))
-        .then_ignore(period())
-        .map(|_| StandardEffect::DissolveCharactersCount {
+    directive("dissolve").ignore_then(word("all")).ignore_then(word("characters")).map(|_| {
+        StandardEffect::DissolveCharactersCount {
             target: Predicate::Any(CardPredicate::Character),
             count: CollectionExpression::All,
-        })
+        }
+    })
 }
 
 pub fn dissolve_character<'a>(
@@ -59,7 +55,6 @@ pub fn dissolve_character<'a>(
     directive("dissolve")
         .ignore_then(article())
         .ignore_then(predicate_parser::predicate_parser())
-        .then_ignore(period())
         .map(|target| StandardEffect::DissolveCharacter { target })
 }
 
@@ -68,6 +63,5 @@ pub fn banish_character<'a>(
     directive("banish")
         .ignore_then(article())
         .ignore_then(predicate_parser::predicate_parser())
-        .then_ignore(period())
         .map(|target| StandardEffect::BanishCharacter { target })
 }

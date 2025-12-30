@@ -5,7 +5,7 @@ use chumsky::prelude::*;
 use crate::parser::effect::{
     card_effect_parsers, game_effects_parsers, resource_effect_parsers, spark_effect_parsers,
 };
-use crate::parser::parser_helpers::{ParserExtra, ParserInput};
+use crate::parser::parser_helpers::{effect_separator, period, ParserExtra, ParserInput};
 
 pub fn single_effect_parser<'a>(
 ) -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
@@ -21,9 +21,10 @@ pub fn single_effect_parser<'a>(
 pub fn effect_or_compound_parser<'a>(
 ) -> impl Parser<'a, ParserInput<'a>, Effect, ParserExtra<'a>> + Clone {
     single_effect_parser()
-        .repeated()
+        .separated_by(effect_separator())
         .at_least(1)
         .collect::<Vec<_>>()
+        .then_ignore(period())
         .map(|effects| {
             if effects.len() == 1 {
                 Effect::Effect(effects.into_iter().next().unwrap())
