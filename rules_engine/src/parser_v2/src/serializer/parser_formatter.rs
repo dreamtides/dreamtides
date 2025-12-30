@@ -73,12 +73,6 @@ pub fn serialize_standard_effect(effect: &StandardEffect) -> String {
             Predicate::Another(CardPredicate::Character) => "return an ally to hand.".to_string(),
             _ => format!("return {} to hand.", serialize_predicate(target)),
         },
-        StandardEffect::DrawThenDiscard { .. } => {
-            "draw {cards}, then discard {discards}.".to_string()
-        }
-        StandardEffect::DiscardThenDraw { .. } => {
-            "discard {discards}, then draw {cards}.".to_string()
-        }
         _ => unimplemented!("Serialization not yet implemented for this effect type"),
     }
 }

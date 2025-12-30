@@ -478,6 +478,28 @@ fn test_round_trip_your_new_effect() {
 }
 ```
 
+**Important Note on Compound Effects**: Some effects use separators like ", then "
+(e.g., "Draw {cards}, then discard {discards}."). These are parsed as `Effect::List`
+containing multiple `StandardEffect` variants. When serialized, they output with
+periods instead of ", then " (e.g., "Draw {cards}. Discard {discards}.").
+
+This is acceptable and intentional. The round-trip test should verify the serialized
+output matches the period-separated format, not the original ", then " format:
+
+```rust
+#[test]
+fn test_round_trip_draw_then_discard() {
+    // Note: "then" separated effects serialize with periods
+    let original = "{Judgment} Draw {cards}, then discard {discards}.";
+    let parsed = parse_ability(original, "cards: 2, discards: 1");
+    let serialized = parser_formatter::serialize_ability(&parsed);
+    assert_eq!("{Judgment} Draw {cards}. Discard {discards}.", serialized);
+}
+```
+
+Do not create new `StandardEffect` variants for compound effects with special separators.
+Use `Effect::List` to represent the sequence of effects.
+
 ### Step 5: Update Spanned Ability Support
 
 Spanned abilities track text spans for UI display segmentation. Update

@@ -42,8 +42,6 @@ pub enum StandardEffect {
     DrawCards { count: u32 },
     DrawCardsForEach { count: u32, for_each: QuantityExpression },
     DrawMatchingCard { predicate: CardPredicate },
-    DrawThenDiscard { draw_count: u32, discard_count: u32 },
-    DiscardThenDraw { discard_count: u32, draw_count: u32 },
     EachMatchingGainsSparkForEach { each: CardPredicate, gains: Spark, for_each: CardPredicate },
     EachMatchingGainsSparkUntilNextMain { each: CardPredicate, gains: Spark },
     EachPlayerAbandonsCharacters { matching: CardPredicate, count: u32 },

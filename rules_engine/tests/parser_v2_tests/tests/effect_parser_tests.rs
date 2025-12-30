@@ -479,10 +479,20 @@ fn test_judgment_draw_then_discard() {
       trigger: Keywords([
         Judgment,
       ]),
-      effect: Effect(DrawThenDiscard(
-        draw_count: 2,
-        discard_count: 1,
-      )),
+      effect: List([
+        EffectWithOptions(
+          effect: DrawCards(
+            count: 2,
+          ),
+          optional: false,
+        ),
+        EffectWithOptions(
+          effect: DiscardCards(
+            count: 1,
+          ),
+          optional: false,
+        ),
+      ]),
     ))
     "###);
 }
@@ -498,10 +508,20 @@ fn test_materialized_discard_then_draw() {
       trigger: Keywords([
         Materialized,
       ]),
-      effect: Effect(DiscardThenDraw(
-        discard_count: 1,
-        draw_count: 2,
-      )),
+      effect: List([
+        EffectWithOptions(
+          effect: DiscardCards(
+            count: 1,
+          ),
+          optional: false,
+        ),
+        EffectWithOptions(
+          effect: DrawCards(
+            count: 2,
+          ),
+          optional: false,
+        ),
+      ]),
     ))
     "###);
 }

@@ -1,3 +1,4 @@
+use ability_data::effect::{Effect, EffectWithOptions};
 use ability_data::predicate::{CardPredicate, Predicate};
 use ability_data::standard_effect::StandardEffect;
 use chumsky::prelude::*;
@@ -9,8 +10,6 @@ use crate::parser::parser_helpers::{
 
 pub fn parser<'a>() -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
     choice((
-        draw_then_discard(),
-        discard_then_draw(),
         draw_cards(),
         discard_cards(),
         gain_energy(),
@@ -19,6 +18,10 @@ pub fn parser<'a>() -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserEx
         return_enemy_or_ally_to_hand(),
     ))
     .boxed()
+}
+
+pub fn compound_parser<'a>() -> impl Parser<'a, ParserInput<'a>, Effect, ParserExtra<'a>> + Clone {
+    choice((draw_then_discard(), discard_then_draw())).boxed()
 }
 
 pub fn draw_cards<'a>() -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone
@@ -75,30 +78,34 @@ pub fn return_ally_to_hand<'a>(
         })
 }
 
-pub fn draw_then_discard<'a>(
-) -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
+pub fn draw_then_discard<'a>() -> impl Parser<'a, ParserInput<'a>, Effect, ParserExtra<'a>> + Clone
+{
     word("draw")
         .ignore_then(cards())
         .then_ignore(comma())
         .then_ignore(word("then"))
         .then(word("discard").ignore_then(discards()))
         .then_ignore(period())
-        .map(|(draw_count, discard_count)| StandardEffect::DrawThenDiscard {
-            draw_count,
-            discard_count,
+        .map(|(draw_count, discard_count)| {
+            Effect::List(vec![
+                EffectWithOptions::new(StandardEffect::DrawCards { count: draw_count }),
+                EffectWithOptions::new(StandardEffect::DiscardCards { count: discard_count }),
+            ])
         })
 }
 
-pub fn discard_then_draw<'a>(
-) -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
+pub fn discard_then_draw<'a>() -> impl Parser<'a, ParserInput<'a>, Effect, ParserExtra<'a>> + Clone
+{
     word("discard")
         .ignore_then(discards())
         .then_ignore(comma())
         .then_ignore(word("then"))
         .then(word("draw").ignore_then(cards()))
         .then_ignore(period())
-        .map(|(discard_count, draw_count)| StandardEffect::DiscardThenDraw {
-            discard_count,
-            draw_count,
+        .map(|(discard_count, draw_count)| {
+            Effect::List(vec![
+                EffectWithOptions::new(StandardEffect::DiscardCards { count: discard_count }),
+                EffectWithOptions::new(StandardEffect::DrawCards { count: draw_count }),
+            ])
         })
 }
