@@ -27,11 +27,11 @@
   "{Discover} an event.", // Implemented
   "{Dissolve} all characters.", // Implemented
   "{Materialized} Gain {e}.", // Implemented
-  "{Judgment} Draw {cards}, then discard {discards}.",
-  "{Materialized} Discard {discards}, then draw {cards}.",
-  "{MaterializedDissolved} Draw {cards}.",
+  "{Judgment} Draw {cards}, then discard {discards}.", // Implemented
+  "{Materialized} Discard {discards}, then draw {cards}.", // Implemented
+  "{MaterializedDissolved} Draw {cards}.", // Implemented
   "{MaterializedJudgment} \nGain {e}.",
-  "{Materialized} Return an ally to hand.",
+  "{Materialized} Return an ally to hand.", // Implemented
   "{Materialized} You may return an ally to hand.",
   "{Materialized} {Discover} a {fast} event.",
   "{Judgment} Return this character from your void to your hand.",

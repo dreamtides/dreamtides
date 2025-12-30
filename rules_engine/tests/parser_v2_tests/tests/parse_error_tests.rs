@@ -236,3 +236,19 @@ fn test_return_enemy_or_ally_to_hand_draw_cards_missing_variable_suggests_fix() 
     assert!(formatted.contains("cards"));
     assert!(formatted.contains("not found"));
 }
+
+#[test]
+fn test_draw_then_discard_missing_variable_suggests_fix() {
+    let input = "Draw {cards}, then discard {discards}.";
+    let lex_result = lexer_tokenize::lex(input).unwrap();
+    let bindings = VariableBindings::new();
+
+    let result = parser_substitutions::resolve_variables(&lex_result.tokens, &bindings);
+
+    assert!(result.is_err());
+    let error = ParserError::from(result.unwrap_err());
+    let formatted = parser_diagnostics::format_error(&error, input, "test");
+
+    assert!(formatted.contains("cards"));
+    assert!(formatted.contains("not found"));
+}

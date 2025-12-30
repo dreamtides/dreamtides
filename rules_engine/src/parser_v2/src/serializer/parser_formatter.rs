@@ -20,9 +20,11 @@ pub fn serialize_ability(ability: &Ability) -> String {
             let is_keyword_trigger = matches!(triggered.trigger, TriggerEvent::Keywords(_));
             if is_keyword_trigger {
                 result.push(' ');
+                result.push_str(&capitalize_first_letter(&serialize_effect(&triggered.effect)));
+            } else {
+                result.push_str(&serialize_effect(&triggered.effect));
             }
 
-            result.push_str(&serialize_effect(&triggered.effect));
             result
         }
         Ability::Event(event) => capitalize_first_letter(&serialize_effect(&event.effect)),
@@ -68,8 +70,15 @@ pub fn serialize_standard_effect(effect: &StandardEffect) -> String {
             Predicate::Any(CardPredicate::Character) => {
                 "return an enemy or ally to hand.".to_string()
             }
+            Predicate::Another(CardPredicate::Character) => "return an ally to hand.".to_string(),
             _ => format!("return {} to hand.", serialize_predicate(target)),
         },
+        StandardEffect::DrawThenDiscard { .. } => {
+            "draw {cards}, then discard {discards}.".to_string()
+        }
+        StandardEffect::DiscardThenDraw { .. } => {
+            "discard {discards}, then draw {cards}.".to_string()
+        }
         _ => unimplemented!("Serialization not yet implemented for this effect type"),
     }
 }

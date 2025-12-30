@@ -4,15 +4,18 @@ use chumsky::prelude::*;
 use core_data::numerics::{Energy, Points};
 
 use crate::parser::parser_helpers::{
-    article, cards, discards, energy, period, points, word, words, ParserExtra, ParserInput,
+    article, cards, comma, discards, energy, period, points, word, words, ParserExtra, ParserInput,
 };
 
 pub fn parser<'a>() -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
     choice((
+        draw_then_discard(),
+        discard_then_draw(),
         draw_cards(),
         discard_cards(),
         gain_energy(),
         gain_points(),
+        return_ally_to_hand(),
         return_enemy_or_ally_to_hand(),
     ))
     .boxed()
@@ -58,4 +61,44 @@ pub fn return_enemy_or_ally_to_hand<'a>(
         .ignore_then(words(&["to", "hand"]))
         .then_ignore(period())
         .map(|_| StandardEffect::ReturnToHand { target: Predicate::Any(CardPredicate::Character) })
+}
+
+pub fn return_ally_to_hand<'a>(
+) -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
+    word("return")
+        .ignore_then(article())
+        .ignore_then(word("ally"))
+        .ignore_then(words(&["to", "hand"]))
+        .then_ignore(period())
+        .map(|_| StandardEffect::ReturnToHand {
+            target: Predicate::Another(CardPredicate::Character),
+        })
+}
+
+pub fn draw_then_discard<'a>(
+) -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
+    word("draw")
+        .ignore_then(cards())
+        .then_ignore(comma())
+        .then_ignore(word("then"))
+        .then(word("discard").ignore_then(discards()))
+        .then_ignore(period())
+        .map(|(draw_count, discard_count)| StandardEffect::DrawThenDiscard {
+            draw_count,
+            discard_count,
+        })
+}
+
+pub fn discard_then_draw<'a>(
+) -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
+    word("discard")
+        .ignore_then(discards())
+        .then_ignore(comma())
+        .then_ignore(word("then"))
+        .then(word("draw").ignore_then(cards()))
+        .then_ignore(period())
+        .map(|(discard_count, draw_count)| StandardEffect::DiscardThenDraw {
+            discard_count,
+            draw_count,
+        })
 }

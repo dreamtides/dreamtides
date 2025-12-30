@@ -264,3 +264,21 @@ fn test_spanned_dissolve_all_characters() {
     assert_eq!(effect.text.trim(), "{Dissolve} all characters.");
     assert_valid_span(&effect.span);
 }
+
+#[test]
+fn test_spanned_materialized_return_ally_to_hand() {
+    let SpannedAbility::Triggered(triggered) =
+        parse_spanned_ability("{Materialized} Return an ally to hand.", "")
+    else {
+        panic!("Expected Triggered ability");
+    };
+
+    assert_eq!(triggered.trigger.text, "{Materialized}");
+    assert_valid_span(&triggered.trigger.span);
+
+    let SpannedEffect::Effect(effect) = triggered.effect else {
+        panic!("Expected Effect, got Modal");
+    };
+    assert_eq!(effect.text.trim(), "Return an ally to hand.");
+    assert_valid_span(&effect.span);
+}
