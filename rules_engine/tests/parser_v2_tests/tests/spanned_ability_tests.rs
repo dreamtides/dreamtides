@@ -318,3 +318,14 @@ fn test_spanned_judgment_return_this_from_void_to_hand() {
     assert_eq!(effect.text.trim(), "Return this character from your void to your hand.");
     assert_valid_span(&effect.span);
 }
+
+#[test]
+fn test_spanned_reclaim_for_cost() {
+    let SpannedAbility::Named { name } = parse_spanned_ability("{ReclaimForCost}", "reclaim: 2")
+    else {
+        panic!("Expected Named ability");
+    };
+
+    assert_eq!(name.text, "{ReclaimForCost}");
+    assert_valid_span(&name.span);
+}

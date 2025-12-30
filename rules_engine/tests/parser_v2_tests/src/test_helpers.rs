@@ -16,6 +16,23 @@ pub fn parse_ability(input: &str, vars: &str) -> Ability {
     parser.parse(&resolved).into_result().unwrap()
 }
 
+pub fn parse_abilities(input: &str, vars: &str) -> Vec<Ability> {
+    let bindings = VariableBindings::parse(vars).unwrap();
+    let mut abilities = Vec::new();
+    for block in input.split("\n\n") {
+        let block = block.trim();
+        if block.is_empty() {
+            continue;
+        }
+        let lex_result = lexer_tokenize::lex(block).unwrap();
+        let resolved =
+            parser_substitutions::resolve_variables(&lex_result.tokens, &bindings).unwrap();
+        let parser = ability_parser::ability_parser();
+        abilities.push(parser.parse(&resolved).into_result().unwrap());
+    }
+    abilities
+}
+
 pub fn parse_spanned_ability(input: &str, vars: &str) -> SpannedAbility {
     let lex_result = lexer_tokenize::lex(input).unwrap();
     let bindings = VariableBindings::parse(vars).unwrap();

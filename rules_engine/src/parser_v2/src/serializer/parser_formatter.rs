@@ -1,6 +1,7 @@
 use ability_data::ability::Ability;
 use ability_data::cost::Cost;
 use ability_data::effect::Effect;
+use ability_data::named_ability::NamedAbility;
 use ability_data::predicate::{CardPredicate, Operator, Predicate};
 use ability_data::standard_effect::StandardEffect;
 use ability_data::trigger_event::{TriggerEvent, TriggerKeyword};
@@ -37,7 +38,10 @@ pub fn serialize_ability(ability: &Ability) -> String {
             result.push_str(&capitalize_first_letter(&serialize_effect(&activated.effect)));
             result
         }
-        _ => unimplemented!("Serialization not yet implemented for this ability type"),
+        Ability::Named(named) => serialize_named_ability(named),
+        Ability::Static(_) => {
+            unimplemented!("Serialization not yet implemented for this ability type")
+        }
     }
 }
 
@@ -251,5 +255,11 @@ fn serialize_operator<T>(operator: &Operator<T>) -> String {
         Operator::Exactly => "exactly".to_string(),
         Operator::LowerBy(_) => "lower".to_string(),
         Operator::HigherBy(_) => "higher".to_string(),
+    }
+}
+
+fn serialize_named_ability(named: &NamedAbility) -> String {
+    match named {
+        NamedAbility::Reclaim(_) => "{ReclaimForCost}".to_string(),
     }
 }

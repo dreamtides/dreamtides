@@ -39,7 +39,7 @@
   "Abandon an ally: Gain {e}.", // Implemented
   "Abandon an ally: {Kindle}.", // Implemented
   "{e}: Draw {cards}.", // Implemented
-  "{Foresee}. Draw {cards}.\n\n{ReclaimForCost}",
+  "{Foresee}. Draw {cards}.\n\n{ReclaimForCost}", // Implemented
   "Draw {cards}. Discard {discards}.\n\n{ReclaimForCost}",
   "{Dissolve} an enemy with cost {e} or more.\n\n{ReclaimForCost}",
   "{Discover} a card with cost {e}.", // Implemented
