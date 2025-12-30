@@ -462,8 +462,8 @@ Use these canonical names:
 
 ### Step 4: Add Round-Trip Tests
 
-Round-trip tests verify that parsing then serializing produces the original
-text. Add tests in `rules_engine/tests/parser_v2_tests/tests/ability_round_trip_tests.rs`:
+Round-trip tests verify that parsing then serializing produces reasonable output.
+Add tests in `rules_engine/tests/parser_v2_tests/tests/ability_round_trip_tests.rs`:
 
 ```rust
 use parser_v2::serializer::parser_formatter;
@@ -478,27 +478,10 @@ fn test_round_trip_your_new_effect() {
 }
 ```
 
-**Important Note on Compound Effects**: Some effects use separators like ", then "
-(e.g., "Draw {cards}, then discard {discards}."). These are parsed as `Effect::List`
-containing multiple `StandardEffect` variants. When serialized, they output with
-periods instead of ", then " (e.g., "Draw {cards}. Discard {discards}.").
-
-This is acceptable and intentional. The round-trip test should verify the serialized
-output matches the period-separated format, not the original ", then " format:
-
-```rust
-#[test]
-fn test_round_trip_draw_then_discard() {
-    // Note: "then" separated effects serialize with periods
-    let original = "{Judgment} Draw {cards}, then discard {discards}.";
-    let parsed = parse_ability(original, "cards: 2, discards: 1");
-    let serialized = parser_formatter::serialize_ability(&parsed);
-    assert_eq!("{Judgment} Draw {cards}. Discard {discards}.", serialized);
-}
-```
-
-Do not create new `StandardEffect` variants for compound effects with special separators.
-Use `Effect::List` to represent the sequence of effects.
+**Note**: Round-trips don't need to be 100% exact. When there are multiple valid
+phrasings for the same effect (like ", then" vs "."), either output is fine. Make
+a best effort to match the original, but don't create special-case code just for
+serialization.
 
 ### Step 5: Update Spanned Ability Support
 
