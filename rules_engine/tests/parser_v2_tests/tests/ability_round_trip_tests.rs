@@ -308,3 +308,43 @@ fn test_round_trip_discover_fast_card_with_cost() {
     let serialized = parser_formatter::serialize_ability(&parsed);
     assert_eq!(original, serialized);
 }
+
+#[test]
+fn test_round_trip_judgment_you_may_draw_then_discard() {
+    let original = "{Judgment} You may draw {cards}, then discard {discards}.";
+    let parsed = parse_ability(original, "cards: 2, discards: 1");
+    let serialized = parser_formatter::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_when_you_discard_a_card_gain_points() {
+    let original = "When you discard a card, gain {points}.";
+    let parsed = parse_ability(original, "points: 1");
+    let serialized = parser_formatter::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_when_you_discard_a_card_kindle() {
+    let original = "When you discard a card, {Kindle}.";
+    let parsed = parse_ability(original, "k: 1");
+    let serialized = parser_formatter::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_when_you_play_an_event_gain_energy() {
+    let original = "When you play an event, gain {e}.";
+    let parsed = parse_ability(original, "e: 1");
+    let serialized = parser_formatter::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_when_you_play_an_event_foresee() {
+    let original = "When you play an event, {Foresee}.";
+    let parsed = parse_ability(original, "foresee: 1");
+    let serialized = parser_formatter::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}

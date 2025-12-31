@@ -1,7 +1,9 @@
 use ability_data::trigger_event::{PlayerTurn, TriggerEvent, TriggerKeyword};
 use chumsky::prelude::*;
 
-use crate::parser::parser_helpers::{comma, directive, word, words, ParserExtra, ParserInput};
+use crate::parser::parser_helpers::{
+    article, comma, directive, word, words, ParserExtra, ParserInput,
+};
 use crate::parser::predicate_parser;
 
 pub fn trigger_event_parser<'a>(
@@ -60,6 +62,7 @@ fn draw_all_cards_trigger<'a>(
 
 fn play_trigger<'a>() -> impl Parser<'a, ParserInput<'a>, TriggerEvent, ParserExtra<'a>> + Clone {
     words(&["when", "you", "play"])
+        .ignore_then(article())
         .ignore_then(predicate_parser::predicate_parser())
         .map(TriggerEvent::Play)
 }
@@ -83,6 +86,7 @@ fn play_during_turn_trigger<'a>(
 fn discard_trigger<'a>() -> impl Parser<'a, ParserInput<'a>, TriggerEvent, ParserExtra<'a>> + Clone
 {
     words(&["when", "you", "discard"])
+        .ignore_then(article())
         .ignore_then(predicate_parser::predicate_parser())
         .map(TriggerEvent::Discard)
 }
@@ -91,6 +95,7 @@ fn materialize_trigger<'a>(
 ) -> impl Parser<'a, ParserInput<'a>, TriggerEvent, ParserExtra<'a>> + Clone {
     words(&["when", "you"])
         .ignore_then(directive("materialize"))
+        .ignore_then(article())
         .ignore_then(predicate_parser::predicate_parser())
         .map(TriggerEvent::Materialize)
 }
@@ -98,6 +103,7 @@ fn materialize_trigger<'a>(
 fn dissolved_trigger<'a>() -> impl Parser<'a, ParserInput<'a>, TriggerEvent, ParserExtra<'a>> + Clone
 {
     words(&["when"])
+        .ignore_then(article())
         .ignore_then(predicate_parser::predicate_parser())
         .then_ignore(word("is"))
         .then_ignore(directive("dissolved"))
@@ -107,6 +113,7 @@ fn dissolved_trigger<'a>() -> impl Parser<'a, ParserInput<'a>, TriggerEvent, Par
 fn banished_trigger<'a>() -> impl Parser<'a, ParserInput<'a>, TriggerEvent, ParserExtra<'a>> + Clone
 {
     words(&["when"])
+        .ignore_then(article())
         .ignore_then(predicate_parser::predicate_parser())
         .then_ignore(word("is"))
         .then_ignore(directive("banished"))
@@ -116,6 +123,7 @@ fn banished_trigger<'a>() -> impl Parser<'a, ParserInput<'a>, TriggerEvent, Pars
 fn abandon_trigger<'a>() -> impl Parser<'a, ParserInput<'a>, TriggerEvent, ParserExtra<'a>> + Clone
 {
     words(&["when", "you", "abandon"])
+        .ignore_then(article())
         .ignore_then(predicate_parser::predicate_parser())
         .map(TriggerEvent::Abandon)
 }

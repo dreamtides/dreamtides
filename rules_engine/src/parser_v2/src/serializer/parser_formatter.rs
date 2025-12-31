@@ -153,11 +153,22 @@ fn serialize_effect(effect: &Effect) -> String {
                 serialize_standard_effect(&options.effect)
             }
         }
-        Effect::List(effects) => effects
-            .iter()
-            .map(|e| capitalize_first_letter(&serialize_standard_effect(&e.effect)))
-            .collect::<Vec<_>>()
-            .join(" "),
+        Effect::List(effects) => {
+            let all_optional = effects.iter().all(|e| e.optional);
+            if all_optional && !effects.is_empty() {
+                let effect_strings: Vec<String> = effects
+                    .iter()
+                    .map(|e| serialize_standard_effect(&e.effect).trim_end_matches('.').to_string())
+                    .collect();
+                format!("you may {}.", effect_strings.join(", then "))
+            } else {
+                effects
+                    .iter()
+                    .map(|e| capitalize_first_letter(&serialize_standard_effect(&e.effect)))
+                    .collect::<Vec<_>>()
+                    .join(" ")
+            }
+        }
         Effect::Modal(_) => unimplemented!("Serialization not yet implemented for modal effects"),
     }
 }

@@ -341,3 +341,32 @@ fn test_judgment_return_this_from_void_to_hand() {
     ))
     "###);
 }
+
+#[test]
+fn test_judgment_you_may_draw_then_discard() {
+    let result = parse_ability(
+        "{Judgment} You may draw {cards}, then discard {discards}.",
+        "cards: 2, discards: 1",
+    );
+    assert_ron_snapshot!(result, @r###"
+    Triggered(TriggeredAbility(
+      trigger: Keywords([
+        Judgment,
+      ]),
+      effect: List([
+        EffectWithOptions(
+          effect: DrawCards(
+            count: 2,
+          ),
+          optional: true,
+        ),
+        EffectWithOptions(
+          effect: DiscardCards(
+            count: 1,
+          ),
+          optional: true,
+        ),
+      ]),
+    ))
+    "###);
+}

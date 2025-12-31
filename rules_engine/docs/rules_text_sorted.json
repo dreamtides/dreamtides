@@ -44,11 +44,11 @@
   "{Dissolve} an enemy with cost {e} or more.\n\n{ReclaimForCost}", // Implemented
   "{Discover} a card with cost {e}.", // Implemented
   "{Banish} a non-{subtype} enemy.", // Implemented
-  "{Judgment} You may draw {cards}, then discard {discards}.",
-  "When you discard a card, gain {points}.",
-  "When you discard a card, {kindle}.",
-  "When you play an event, gain {e}",
-  "When you play an event, {foresee}.",
+  "{Judgment} You may draw {cards}, then discard {discards}.", // Implemented
+  "When you discard a card, gain {points}.", // Implemented
+  "When you discard a card, {kindle}.", // Implemented
+  "When you play an event, gain {e}", // Implemented
+  "When you play an event, {foresee}.", // Implemented
   "When you {materialize} an ally, gain {e}.",
   "When you {materialize} a character, this character gains +{s} spark.",
   "When you play {a-subtype}, draw {cards}.",

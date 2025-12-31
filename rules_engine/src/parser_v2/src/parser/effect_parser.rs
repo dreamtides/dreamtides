@@ -25,14 +25,33 @@ pub fn effect_or_compound_parser<'a>(
 
 fn optional_effect_parser<'a>() -> impl Parser<'a, ParserInput<'a>, Effect, ParserExtra<'a>> + Clone
 {
-    words(&["you", "may"]).ignore_then(single_effect_parser()).then_ignore(period()).map(|effect| {
-        Effect::WithOptions(EffectWithOptions {
-            effect,
-            optional: true,
-            trigger_cost: None,
-            condition: None,
+    words(&["you", "may"])
+        .ignore_then(
+            single_effect_parser().separated_by(effect_separator()).at_least(1).collect::<Vec<_>>(),
+        )
+        .then_ignore(period())
+        .map(|effects| {
+            if effects.len() == 1 {
+                Effect::WithOptions(EffectWithOptions {
+                    effect: effects.into_iter().next().unwrap(),
+                    optional: true,
+                    trigger_cost: None,
+                    condition: None,
+                })
+            } else {
+                Effect::List(
+                    effects
+                        .into_iter()
+                        .map(|effect| EffectWithOptions {
+                            effect,
+                            optional: true,
+                            trigger_cost: None,
+                            condition: None,
+                        })
+                        .collect(),
+                )
+            }
         })
-    })
 }
 
 fn standard_effect_parser<'a>() -> impl Parser<'a, ParserInput<'a>, Effect, ParserExtra<'a>> + Clone
