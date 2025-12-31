@@ -90,6 +90,11 @@ pub fn diff_master_agent(worktree_path: &Path, branch: &str) -> Result<String> {
     self::git_output(worktree_path, &["diff", &range])
 }
 
+/// Return the subject line for the latest commit in a revision.
+pub fn commit_subject(worktree_path: &Path, revision: &str) -> Result<String> {
+    self::git_output(worktree_path, &["log", "-1", "--pretty=%s", revision])
+}
+
 /// Return `git diff` output for unstaged changes.
 pub fn diff_worktree(worktree_path: &Path) -> Result<String> {
     self::git_output(worktree_path, &["diff"])

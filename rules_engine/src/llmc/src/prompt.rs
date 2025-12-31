@@ -27,7 +27,7 @@ pub fn assemble_user_prompt(prompt: Option<&str>, prompt_files: &[PathBuf]) -> R
 /// Wrap a user prompt with the fixed LLMC preamble.
 pub fn wrap_prompt(repo_root: &Path, worktree_path: &Path, user_prompt: &str) -> String {
     let preamble = format!(
-        "LLMC Preamble\nrepo_root: {repo_root:?}\nworktree: {worktree_path:?}\nFollow AGENTS.md.\nRequired validations: just fmt, just check, just clippy, just review."
+        "LLMC Preamble\nrepo_root: {repo_root:?}\nworktree: {worktree_path:?}\nFollow AGENTS.md.\nRequired validations: just fmt, just check, just clippy, just review.\nCreate a git commit with a ~10 word commit message describing the changes."
     );
 
     if user_prompt.trim().is_empty() { preamble } else { format!("{preamble}\n\n{user_prompt}") }

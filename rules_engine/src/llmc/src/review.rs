@@ -30,12 +30,17 @@ pub fn run(args: &ReviewArgs, repo_override: Option<&Path>) -> Result<()> {
 
 fn run_diff(record: &AgentRecord) -> Result<()> {
     let diff = git_ops::diff_master_agent(&record.worktree_path, &record.branch)?;
+    let status = git_ops::status_porcelain(&record.worktree_path)?;
+    let commit_status = self::commit_status(record)?;
+    if let Some(message) = self::commit_warning(&commit_status, !diff.trim().is_empty(), &status) {
+        self::print_warning(&message);
+    }
+
     if !diff.trim().is_empty() {
         print!("{diff}");
         return Ok(());
     }
 
-    let status = git_ops::status_porcelain(&record.worktree_path)?;
     if status.trim().is_empty() {
         println!("Nothing to review, working directory clean");
         return Ok(());
@@ -61,4 +66,54 @@ fn run_diff(record: &AgentRecord) -> Result<()> {
     }
 
     Ok(())
+}
+
+fn commit_status(record: &AgentRecord) -> Result<CommitStatus> {
+    let range = format!("master..{}", record.branch);
+    let commit_count = git_ops::rev_list_count(&record.worktree_path, &range)?;
+    if commit_count == 0 {
+        return Ok(CommitStatus { commit_count, message_word_count: None, message_ok: false });
+    }
+
+    let message = git_ops::commit_subject(&record.worktree_path, &record.branch)?;
+    let message_word_count = message.split_whitespace().count();
+
+    Ok(CommitStatus {
+        commit_count,
+        message_word_count: Some(message_word_count),
+        message_ok: (8..=12).contains(&message_word_count),
+    })
+}
+
+fn commit_warning(
+    status: &CommitStatus,
+    has_commit_diff: bool,
+    worktree_status: &str,
+) -> Option<String> {
+    if !has_commit_diff && worktree_status.trim().is_empty() {
+        return None;
+    }
+
+    if status.commit_count == 0 {
+        return Some("Review warning: no commit found on agent worktree".to_string());
+    }
+
+    if !status.message_ok {
+        let word_count = status.message_word_count.unwrap_or_default();
+        return Some(format!(
+            "Review warning: commit message should be ~10 words (got {word_count})"
+        ));
+    }
+
+    None
+}
+
+fn print_warning(message: &str) {
+    println!("\x1b[31m{message}\x1b[0m");
+}
+
+struct CommitStatus {
+    commit_count: usize,
+    message_word_count: Option<usize>,
+    message_ok: bool,
 }
