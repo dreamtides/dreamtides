@@ -61,6 +61,7 @@ pub fn run(args: &RejectArgs, repo_override: Option<&Path>) -> Result<()> {
         "Runtime exited with status {status:?}",
         status = outcome.status
     );
+    self::print_agent_completed(&args.agent);
 
     Ok(())
 }
@@ -79,4 +80,8 @@ fn collect_notes(args: &RejectArgs) -> Result<String> {
     }
 
     Ok(notes.join("\n\n"))
+}
+
+fn print_agent_completed(agent_id: &str) {
+    println!("Agent {agent_id} task completed");
 }

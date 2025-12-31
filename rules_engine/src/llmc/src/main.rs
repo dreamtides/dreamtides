@@ -6,6 +6,7 @@ mod nouns;
 mod prompt;
 mod rebase;
 mod reject;
+mod review;
 mod runtime;
 mod setup;
 mod start;
@@ -43,7 +44,9 @@ fn run() -> Result<()> {
         Commands::Rebase(args) => {
             rebase::run(&args, cli.repo.as_deref())?;
         }
-        Commands::Review { .. } => anyhow::bail!("llmc review is not implemented yet"),
+        Commands::Review(args) => {
+            review::run(&args, cli.repo.as_deref())?;
+        }
         Commands::Reject(args) => {
             reject::run(&args, cli.repo.as_deref())?;
         }

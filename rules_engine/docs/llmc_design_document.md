@@ -233,7 +233,29 @@ Steps:
 Manual verification:
 - Run `llmc review --agent <noun> --interface diff` and confirm it matches `git -C .worktrees/agent-<noun> diff master...agent/<noun>`.
 
-### Milestone 5: Agent: Claude
+### Milestone 5: Review Interface: difftastic
+Steps:
+- Implement `llmc review --interface difftastic` using `git -c diff.external=difft diff master...agent/<id>`.
+- Verify errors are surfaced when `difft` is missing.
+Manual verification:
+- Run `llmc review --agent <noun> --interface difftastic` and confirm difftastic output is shown.
+
+### Milestone 6: Review Interface: vscode
+Steps:
+- Implement `llmc review --interface vscode` using `code --reuse-window --wait <worktree>`.
+- Ensure the command returns control when VSCode exits.
+Manual verification:
+- Run `llmc review --agent <noun> --interface vscode` and confirm VSCode opens the worktree.
+
+### Milestone 7: Review Interface: forgejo
+Steps:
+- Implement Forgejo compare URL generation from `remote.origin.url`.
+- Open the compare URL for `master...agent/<id>` with the system browser.
+Manual verification:
+- Run `llmc review --agent <noun> --interface forgejo` and confirm the compare view loads in Forgejo.
+
+
+### Milestone 8: Agent: Claude
 Steps:
 - Implement Claude runtime invocation (`claude -p`) using the same prompt, worktree, and state flow.
 - Ensure stdout/stderr streaming and `WORKTREE` environment configuration match Codex behavior.
@@ -241,7 +263,7 @@ Manual verification:
 - Run `llmc start --runtime claude --prompt \"Report the current git status.\" --agent <noun>`.
 - Confirm the worktree and state entry are created and Claude runs headlessly.
 
-### Milestone 6: Agent: Gemini
+### Milestone 9: Agent: Gemini
 Steps:
 - Implement Gemini runtime invocation (`gemini -p`) aligned with the existing prompt and worktree flow.
 - Ensure runtime errors are surfaced with actionable context.
@@ -249,7 +271,7 @@ Manual verification:
 - Run `llmc start --runtime gemini --prompt \"List the files at repo root.\" --agent <noun>`.
 - Confirm the worktree and state entry are created and Gemini runs headlessly.
 
-### Milestone 6: Agent: Cursor
+### Milestone 10: Agent: Cursor
 Steps:
 - Implement Cursor runtime invocation (`cursor --print`) aligned with the existing prompt and worktree flow.
 - Preserve streaming output and exit code behavior.
@@ -257,28 +279,7 @@ Manual verification:
 - Run `llmc start --runtime cursor --prompt \"Explain the AGENTS.md requirements.\" --agent <noun>`.
 - Confirm the worktree and state entry are created and Cursor runs headlessly.
 
-### Milestone 7: Review Interface: difftastic
-Steps:
-- Implement `llmc review --interface difftastic` using `git -c diff.external=difft diff master...agent/<id>`.
-- Verify errors are surfaced when `difft` is missing.
-Manual verification:
-- Run `llmc review --agent <noun> --interface difftastic` and confirm difftastic output is shown.
-
-### Milestone 8: Review Interface: vscode
-Steps:
-- Implement `llmc review --interface vscode` using `code --reuse-window --wait <worktree>`.
-- Ensure the command returns control when VSCode exits.
-Manual verification:
-- Run `llmc review --agent <noun> --interface vscode` and confirm VSCode opens the worktree.
-
-### Milestone 9: Review Interface: forgejo
-Steps:
-- Implement Forgejo compare URL generation from `remote.origin.url`.
-- Open the compare URL for `master...agent/<id>` with the system browser.
-Manual verification:
-- Run `llmc review --agent <noun> --interface forgejo` and confirm the compare view loads in Forgejo.
-
-### Milestone 10: Notifications, Logging, and Polish
+### Milestone 11: Notifications, Logging, and Polish
 Steps:
 - Add `--notify/--no-notify` with `osascript` notifications on completion.
 - Implement optional `.llmc/logs` output and include command lines and exit codes.

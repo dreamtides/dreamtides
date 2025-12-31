@@ -63,6 +63,10 @@ pub fn run(args: &AgentArgs, repo_override: Option<&Path>) -> Result<()> {
 
     self::update_status(&state_path, &record.agent_id, AgentStatus::NeedsReview)?;
 
+    if !rebase_status.success() {
+        self::print_agent_completed(&record.agent_id);
+    }
+
     Ok(())
 }
 
@@ -123,4 +127,8 @@ fn run_just(worktree: &Path, command: &str) -> Result<()> {
     anyhow::ensure!(status.success(), "just {command} failed in {worktree:?}");
 
     Ok(())
+}
+
+fn print_agent_completed(agent_id: &str) {
+    println!("Agent {agent_id} task completed");
 }

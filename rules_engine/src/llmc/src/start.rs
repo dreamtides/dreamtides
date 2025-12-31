@@ -83,6 +83,11 @@ pub fn run(args: &StartArgs, repo_override: Option<&Path>) -> Result<()> {
         "Runtime exited with status {status:?}",
         status = outcome.status
     );
+    self::print_agent_completed(&agent_id);
 
     Ok(())
+}
+
+fn print_agent_completed(agent_id: &str) {
+    println!("Agent {agent_id} task completed");
 }

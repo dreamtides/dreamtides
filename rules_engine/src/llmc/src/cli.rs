@@ -19,7 +19,7 @@ pub struct Cli {
 pub enum Commands {
     Setup(SetupArgs),
     Start(StartArgs),
-    Status(AgentArgs),
+    Status(StatusArgs),
     Rebase(AgentArgs),
     Review(ReviewArgs),
     Reject(RejectArgs),
@@ -63,6 +63,12 @@ pub struct StartArgs {
 pub struct AgentArgs {
     #[arg(long, help = "Agent identifier")]
     pub agent: String,
+}
+
+#[derive(Args)]
+pub struct StatusArgs {
+    #[arg(long, help = "Agent identifier")]
+    pub agent: Option<String>,
 }
 
 #[derive(ValueEnum, Clone, Debug)]

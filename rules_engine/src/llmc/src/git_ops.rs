@@ -90,6 +90,16 @@ pub fn diff_master_agent(worktree_path: &Path, branch: &str) -> Result<String> {
     self::git_output(worktree_path, &["diff", &range])
 }
 
+/// Return `git diff` output for unstaged changes.
+pub fn diff_worktree(worktree_path: &Path) -> Result<String> {
+    self::git_output(worktree_path, &["diff"])
+}
+
+/// Return `git diff --cached` output for staged changes.
+pub fn diff_cached(worktree_path: &Path) -> Result<String> {
+    self::git_output(worktree_path, &["diff", "--cached"])
+}
+
 /// Return the number of commits for a revision range.
 pub fn rev_list_count(worktree_path: &Path, range: &str) -> Result<usize> {
     let output = self::git_output(worktree_path, &["rev-list", "--count", range])?;
