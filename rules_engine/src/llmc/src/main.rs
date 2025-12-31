@@ -1,10 +1,17 @@
+mod accept;
 mod cli;
 mod config;
+mod git_ops;
 mod nouns;
+mod prompt;
+mod rebase;
+mod reject;
+mod runtime;
 mod setup;
 mod start;
 mod state;
 mod status;
+mod time;
 
 use std::process;
 
@@ -33,10 +40,16 @@ fn run() -> Result<()> {
         Commands::Status(args) => {
             status::run(&args, cli.repo.as_deref())?;
         }
-        Commands::Rebase { .. } => anyhow::bail!("llmc rebase is not implemented yet"),
+        Commands::Rebase(args) => {
+            rebase::run(&args, cli.repo.as_deref())?;
+        }
         Commands::Review { .. } => anyhow::bail!("llmc review is not implemented yet"),
-        Commands::Reject { .. } => anyhow::bail!("llmc reject is not implemented yet"),
-        Commands::Accept { .. } => anyhow::bail!("llmc accept is not implemented yet"),
+        Commands::Reject(args) => {
+            reject::run(&args, cli.repo.as_deref())?;
+        }
+        Commands::Accept(args) => {
+            accept::run(&args, cli.repo.as_deref())?;
+        }
     }
 
     Ok(())
