@@ -64,13 +64,13 @@ pub struct StartArgs {
 #[derive(Args)]
 pub struct AgentArgs {
     #[arg(long, help = "Agent identifier")]
-    pub agent: String,
+    pub agent: Option<String>,
 }
 
 #[derive(Args)]
 pub struct AcceptArgs {
     #[arg(long, help = "Agent identifier")]
-    pub agent: String,
+    pub agent: Option<String>,
 
     #[arg(long, help = "Also rebase the commit onto the dreamtides master branch")]
     pub pull: bool,
@@ -96,7 +96,7 @@ pub enum ReviewInterface {
 #[derive(Args)]
 pub struct ReviewArgs {
     #[arg(long, help = "Agent identifier")]
-    pub agent: String,
+    pub agent: Option<String>,
 
     #[arg(long, value_enum, default_value = "diff", help = "Review interface")]
     pub interface: ReviewInterface,
@@ -105,7 +105,7 @@ pub struct ReviewArgs {
 #[derive(Args)]
 pub struct RejectArgs {
     #[arg(long, help = "Agent identifier")]
-    pub agent: String,
+    pub agent: Option<String>,
 
     #[arg(long, help = "Reviewer notes to append")]
     pub notes: Option<String>,

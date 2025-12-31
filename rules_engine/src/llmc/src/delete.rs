@@ -11,14 +11,16 @@ pub fn run(args: &AgentArgs, repo_override: Option<&Path>) -> Result<()> {
     let paths = config::repo_paths(repo_override)?;
     let state_path = paths.llmc_dir.join("state.json");
     let mut state = state::load_state(&state_path)?;
-    let Some(record) = state.agents.get(&args.agent) else {
-        return Err(anyhow::anyhow!("Unknown agent id: {}", args.agent));
+    let agent_id = state::resolve_agent_id(args.agent.as_deref(), &state)?;
+    let Some(record) = state.agents.get(&agent_id) else {
+        return Err(anyhow::anyhow!("Unknown agent id: {agent_id}"));
     };
     let record = record.clone();
+    println!("agent_id={agent_id}");
 
     self::remove_agent(&paths.repo_root, &record)?;
 
-    state.agents.remove(&args.agent);
+    state.agents.remove(&agent_id);
     state::save_state(&state_path, &state)?;
 
     println!("Deleted agent {}", record.agent_id);

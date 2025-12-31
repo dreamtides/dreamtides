@@ -11,20 +11,22 @@ pub fn run(args: &AcceptArgs, repo_override: Option<&Path>) -> Result<()> {
     let paths = config::repo_paths(repo_override)?;
     let state_path = paths.llmc_dir.join("state.json");
     let state = state::load_state(&state_path)?;
-    let Some(record) = state.agents.get(&args.agent) else {
-        return Err(anyhow::anyhow!("Unknown agent id: {}", args.agent));
+    let agent_id = state::resolve_agent_id(args.agent.as_deref(), &state)?;
+    let Some(record) = state.agents.get(&agent_id) else {
+        return Err(anyhow::anyhow!("Unknown agent id: {agent_id}"));
     };
+    println!("agent_id={agent_id}");
 
     git_ops::ensure_clean_worktree(&record.worktree_path)?;
 
     let range = format!("master..{}", record.branch);
     let ahead_count = git_ops::rev_list_count(&record.worktree_path, &range)?;
     anyhow::ensure!(
-        ahead_count == 1,
-        "Expected one commit ahead of master, found {ahead_count} for {range}"
+        ahead_count > 0,
+        "Expected at least one commit ahead of master, found {ahead_count} for {range}"
     );
 
-    rebase::run(&AgentArgs { agent: args.agent.clone() }, repo_override)?;
+    rebase::run(&AgentArgs { agent: Some(agent_id.clone()) }, repo_override)?;
 
     let commit = git_ops::rev_parse(&record.worktree_path, &record.branch)?;
 
@@ -34,13 +36,13 @@ pub fn run(args: &AcceptArgs, repo_override: Option<&Path>) -> Result<()> {
     git_ops::branch_delete(&paths.repo_root, &record.branch)?;
 
     let mut state = state::load_state(&state_path)?;
-    if state.agents.remove(&args.agent).is_none() {
-        return Err(anyhow::anyhow!("Unknown agent id: {}", args.agent));
+    if state.agents.remove(&agent_id).is_none() {
+        return Err(anyhow::anyhow!("Unknown agent id: {agent_id}"));
     }
     state::save_state(&state_path, &state)?;
 
     if args.pull {
-        self::pull_to_source(&paths.repo_root, &args.agent, &commit)?;
+        self::pull_to_source(&paths.repo_root, &agent_id, &commit)?;
     }
 
     Ok(())
@@ -54,8 +56,8 @@ fn pull_to_source(llmc_root: &Path, agent_id: &str, commit: &str) -> Result<()> 
     let range = "master..FETCH_HEAD";
     let ahead_count = git_ops::rev_list_count(&source_root, range)?;
     anyhow::ensure!(
-        ahead_count == 1,
-        "Expected one commit ahead of master, found {ahead_count} for {range}"
+        ahead_count > 0,
+        "Expected at least one commit ahead of master, found {ahead_count} for {range}"
     );
 
     let branch = format!("llmc/{agent_id}");

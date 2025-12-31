@@ -12,9 +12,11 @@ pub fn run(args: &RejectArgs, repo_override: Option<&Path>) -> Result<()> {
     let paths = config::repo_paths(repo_override)?;
     let state_path = paths.llmc_dir.join("state.json");
     let state = state::load_state(&state_path)?;
-    let Some(record) = state.agents.get(&args.agent) else {
-        return Err(anyhow::anyhow!("Unknown agent id: {}", args.agent));
+    let agent_id = state::resolve_agent_id(args.agent.as_deref(), &state)?;
+    let Some(record) = state.agents.get(&agent_id) else {
+        return Err(anyhow::anyhow!("Unknown agent id: {agent_id}"));
     };
+    println!("agent_id={agent_id}");
 
     let notes = self::collect_notes(args)?;
     let diff = git_ops::diff_master_agent(&record.worktree_path, &record.branch)?;
@@ -28,8 +30,8 @@ pub fn run(args: &RejectArgs, repo_override: Option<&Path>) -> Result<()> {
 
     let mut state = state::load_state(&state_path)?;
     let (runtime, worktree_path) = {
-        let Some(record) = state.agents.get_mut(&args.agent) else {
-            return Err(anyhow::anyhow!("Unknown agent id: {}", args.agent));
+        let Some(record) = state.agents.get_mut(&agent_id) else {
+            return Err(anyhow::anyhow!("Unknown agent id: {agent_id}"));
         };
         record.prompt = updated_prompt.clone();
         record.status = AgentStatus::Running;
@@ -43,8 +45,8 @@ pub fn run(args: &RejectArgs, repo_override: Option<&Path>) -> Result<()> {
 
     let mut state = state::load_state(&state_path)?;
     {
-        let Some(record) = state.agents.get_mut(&args.agent) else {
-            return Err(anyhow::anyhow!("Unknown agent id: {}", args.agent));
+        let Some(record) = state.agents.get_mut(&agent_id) else {
+            return Err(anyhow::anyhow!("Unknown agent id: {agent_id}"));
         };
         record.last_run_unix = time::unix_timestamp()?;
         record.last_pid = outcome.as_ref().ok().and_then(|outcome| outcome.pid);
@@ -62,7 +64,7 @@ pub fn run(args: &RejectArgs, repo_override: Option<&Path>) -> Result<()> {
         "Runtime exited with status {status:?}",
         status = outcome.status
     );
-    self::print_agent_completed(&args.agent);
+    self::print_agent_completed(&agent_id);
 
     Ok(())
 }

@@ -15,13 +15,15 @@ pub fn run(args: &AgentArgs, repo_override: Option<&Path>) -> Result<()> {
     let mut state = state::load_state(&state_path)?;
     let now = time::unix_timestamp()?;
 
-    let Some(record) = state.agents.get_mut(&args.agent) else {
-        return Err(anyhow::anyhow!("Unknown agent id: {}", args.agent));
+    let agent_id = state::resolve_agent_id(args.agent.as_deref(), &state)?;
+    let Some(record) = state.agents.get_mut(&agent_id) else {
+        return Err(anyhow::anyhow!("Unknown agent id: {agent_id}"));
     };
     record.status = AgentStatus::Rebasing;
     record.last_run_unix = now;
     let record = record.clone();
     state::save_state(&state_path, &state)?;
+    println!("agent_id={agent_id}");
 
     git_ops::ensure_clean_worktree(&record.worktree_path)?;
     git_ops::fetch_master(&paths.repo_root)?;

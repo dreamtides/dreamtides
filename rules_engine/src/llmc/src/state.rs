@@ -48,6 +48,28 @@ pub enum Runtime {
     Cursor,
 }
 
+/// Return the oldest agent id in needs_review status.
+pub fn oldest_pending_agent_id(state: &StateFile) -> Option<String> {
+    state
+        .agents
+        .values()
+        .filter(|record| record.status == AgentStatus::NeedsReview)
+        .min_by_key(|record| record.created_at_unix)
+        .map(|record| record.agent_id.clone())
+}
+
+/// Resolve an agent id or select the oldest pending agent.
+pub fn resolve_agent_id(agent: Option<&str>, state: &StateFile) -> Result<String> {
+    let Some(agent) = agent else {
+        let Some(agent_id) = oldest_pending_agent_id(state) else {
+            return Err(anyhow::anyhow!("No agents in needs_review state"));
+        };
+        return Ok(agent_id);
+    };
+
+    Ok(agent.to_string())
+}
+
 /// Load the LLMC state file if present, otherwise return a default state.
 pub fn load_state(path: &Path) -> Result<StateFile> {
     if !path.exists() {

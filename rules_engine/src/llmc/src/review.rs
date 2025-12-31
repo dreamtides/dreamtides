@@ -11,10 +11,10 @@ pub fn run(args: &ReviewArgs, repo_override: Option<&Path>) -> Result<()> {
     let paths = config::repo_paths(repo_override)?;
     let state_path = paths.llmc_dir.join("state.json");
     let state = state::load_state(&state_path)?;
-    let record = state
-        .agents
-        .get(&args.agent)
-        .with_context(|| format!("Unknown agent id: {}", args.agent))?;
+    let agent_id = state::resolve_agent_id(args.agent.as_deref(), &state)?;
+    let record =
+        state.agents.get(&agent_id).with_context(|| format!("Unknown agent id: {agent_id}"))?;
+    println!("agent_id={agent_id}");
 
     match args.interface {
         ReviewInterface::Diff => self::run_diff(record),
