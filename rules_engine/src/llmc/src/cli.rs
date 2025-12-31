@@ -22,6 +22,8 @@ pub enum Commands {
     Status(StatusArgs),
     Rebase(AgentArgs),
     Review(ReviewArgs),
+    Delete(AgentArgs),
+    Clean(CleanArgs),
     Reject(RejectArgs),
     Accept(AgentArgs),
 }
@@ -70,6 +72,9 @@ pub struct StatusArgs {
     #[arg(long, help = "Agent identifier")]
     pub agent: Option<String>,
 }
+
+#[derive(Args)]
+pub struct CleanArgs {}
 
 #[derive(ValueEnum, Clone, Debug)]
 pub enum ReviewInterface {

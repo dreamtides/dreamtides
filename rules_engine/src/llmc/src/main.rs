@@ -1,6 +1,8 @@
 mod accept;
+mod clean;
 mod cli;
 mod config;
+mod delete;
 mod git_ops;
 mod nouns;
 mod prompt;
@@ -46,6 +48,12 @@ fn run() -> Result<()> {
         }
         Commands::Review(args) => {
             review::run(&args, cli.repo.as_deref())?;
+        }
+        Commands::Delete(args) => {
+            delete::run(&args, cli.repo.as_deref())?;
+        }
+        Commands::Clean(args) => {
+            clean::run(&args, cli.repo.as_deref())?;
         }
         Commands::Reject(args) => {
             reject::run(&args, cli.repo.as_deref())?;

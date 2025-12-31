@@ -51,6 +51,23 @@ pub fn worktree_remove(repo_root: &Path, worktree_path: &Path) -> Result<()> {
     Ok(())
 }
 
+/// Force remove the agent worktree from the repository.
+pub fn worktree_remove_force(repo_root: &Path, worktree_path: &Path) -> Result<()> {
+    let status = Command::new("git")
+        .arg("-C")
+        .arg(repo_root)
+        .arg("worktree")
+        .arg("remove")
+        .arg("--force")
+        .arg(worktree_path)
+        .status()
+        .with_context(|| format!("Failed to remove worktree {worktree_path:?}"))?;
+
+    anyhow::ensure!(status.success(), "git worktree remove failed for {worktree_path:?}");
+
+    Ok(())
+}
+
 /// Delete the agent branch.
 pub fn branch_delete(repo_root: &Path, branch: &str) -> Result<()> {
     self::git_run(repo_root, &["branch", "-d", branch])
