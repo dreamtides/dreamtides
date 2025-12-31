@@ -1,4 +1,4 @@
-kumquat # LLMC Design Document
+avocado # LLMC Design Document
 
 ## Top-Level Design
 
