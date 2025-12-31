@@ -289,3 +289,5 @@ Manual verification:
 - Re-run with `--no-notify` and confirm no notification appears and logs are written when enabled.
 - Write user-facing README.md documentation under `src/llmc` describing the
   project and how to use it
+
+Test: just fmt && just check && just clippy && just review
