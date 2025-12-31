@@ -194,6 +194,14 @@ fn test_round_trip_banish_enemy_with_cost_or_less() {
 }
 
 #[test]
+fn test_round_trip_dissolve_enemy_with_cost_or_more() {
+    let original = "{Dissolve} an enemy with cost {e} or more.";
+    let parsed = parse_ability(original, "e: 4");
+    let serialized = parser_formatter::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
 fn test_round_trip_judgment_draw_then_discard() {
     // Note: "then" separated effects are parsed as Effect::List and serialize
     // with periods instead of ", then"

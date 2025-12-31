@@ -92,6 +92,22 @@ fn test_dissolve_enemy_with_spark_or_more() {
 }
 
 #[test]
+fn test_dissolve_enemy_with_cost_or_more() {
+    let result = parse_ability("{Dissolve} an enemy with cost {e} or more.", "e: 3");
+    assert_ron_snapshot!(result, @r###"
+    Event(EventAbility(
+      effect: Effect(DissolveCharacter(
+        target: Enemy(CardWithCost(
+          target: Character,
+          cost_operator: OrMore,
+          cost: Energy(3),
+        )),
+      )),
+    ))
+    "###);
+}
+
+#[test]
 fn test_banish_enemy_with_cost_or_less() {
     let result = parse_ability("{Banish} an enemy with cost {e} or less.", "e: 2");
     assert_ron_snapshot!(result, @r###"
