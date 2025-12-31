@@ -72,8 +72,8 @@ pub struct AcceptArgs {
     #[arg(long, help = "Agent identifier")]
     pub agent: Option<String>,
 
-    #[arg(long, help = "Also rebase the commit onto the dreamtides master branch")]
-    pub pull: bool,
+    #[arg(long, help = "Do not rebase the commit onto the dreamtides master branch")]
+    pub nopull: bool,
 }
 
 #[derive(Args)]

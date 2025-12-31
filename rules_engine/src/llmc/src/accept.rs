@@ -41,7 +41,7 @@ pub fn run(args: &AcceptArgs, repo_override: Option<&Path>) -> Result<()> {
     }
     state::save_state(&state_path, &state)?;
 
-    if args.pull {
+    if !args.nopull {
         self::pull_to_source(&paths.repo_root, &agent_id, &commit)?;
     }
 
