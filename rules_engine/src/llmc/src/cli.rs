@@ -25,7 +25,7 @@ pub enum Commands {
     Delete(AgentArgs),
     Clean(CleanArgs),
     Reject(RejectArgs),
-    Accept(AgentArgs),
+    Accept(AcceptArgs),
 }
 
 #[derive(Args)]
@@ -65,6 +65,15 @@ pub struct StartArgs {
 pub struct AgentArgs {
     #[arg(long, help = "Agent identifier")]
     pub agent: String,
+}
+
+#[derive(Args)]
+pub struct AcceptArgs {
+    #[arg(long, help = "Agent identifier")]
+    pub agent: String,
+
+    #[arg(long, help = "Also rebase the commit onto the dreamtides master branch")]
+    pub pull: bool,
 }
 
 #[derive(Args)]

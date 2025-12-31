@@ -78,9 +78,30 @@ pub fn fetch_master(repo_root: &Path) -> Result<()> {
     self::git_run(repo_root, &["fetch", "origin", "master"])
 }
 
+/// Fetch a revision from another local repo.
+pub fn fetch_from(repo_root: &Path, source: &Path, revision: &str) -> Result<()> {
+    let status = Command::new("git")
+        .arg("-C")
+        .arg(repo_root)
+        .arg("fetch")
+        .arg(source)
+        .arg(revision)
+        .status()
+        .with_context(|| format!("Failed to fetch {revision} from {source:?} in {repo_root:?}"))?;
+
+    anyhow::ensure!(status.success(), "git fetch failed for {revision} in {repo_root:?}");
+
+    Ok(())
+}
+
 /// Start a rebase of the current branch onto origin/master.
 pub fn rebase_onto_master(worktree_path: &Path) -> Result<ExitStatus> {
     self::git_status(worktree_path, &["rebase", "origin/master"])
+}
+
+/// Start a rebase of the current branch onto another branch.
+pub fn rebase_onto_branch(worktree_path: &Path, branch: &str) -> Result<ExitStatus> {
+    self::git_status(worktree_path, &["rebase", branch])
 }
 
 /// Continue an in-progress rebase.
@@ -128,6 +149,11 @@ pub fn diff_master_agent_difftastic(worktree_path: &Path, branch: &str) -> Resul
 /// Return the subject line for the latest commit in a revision.
 pub fn commit_subject(worktree_path: &Path, revision: &str) -> Result<String> {
     self::git_output(worktree_path, &["log", "-1", "--pretty=%s", revision])
+}
+
+/// Resolve a revision to a commit hash.
+pub fn rev_parse(repo_root: &Path, revision: &str) -> Result<String> {
+    Ok(self::git_output(repo_root, &["rev-parse", revision])?.trim().to_string())
 }
 
 /// Return `git diff` output for unstaged changes.
@@ -188,9 +214,24 @@ pub fn checkout_master(repo_root: &Path) -> Result<()> {
     self::git_run(repo_root, &["checkout", "master"])
 }
 
+/// Checkout a branch at the repository root.
+pub fn checkout_branch(repo_root: &Path, branch: &str) -> Result<()> {
+    self::git_run(repo_root, &["checkout", branch])
+}
+
 /// Fast-forward merge the agent branch into master.
 pub fn merge_ff_only(repo_root: &Path, branch: &str) -> Result<()> {
     self::git_run(repo_root, &["merge", "--ff-only", branch])
+}
+
+/// Create or update a branch to a revision.
+pub fn branch_force(repo_root: &Path, branch: &str, revision: &str) -> Result<()> {
+    self::git_run(repo_root, &["branch", "-f", branch, revision])
+}
+
+/// Read the configured origin URL.
+pub fn remote_origin_url(repo_root: &Path) -> Result<String> {
+    Ok(self::git_output(repo_root, &["config", "--get", "remote.origin.url"])?.trim().to_string())
 }
 
 fn git_run(repo_root: &Path, args: &[&str]) -> Result<()> {
