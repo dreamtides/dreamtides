@@ -1,4 +1,4 @@
-pineapple # LLMC Design Document
+kumquat # LLMC Design Document
 
 ## Top-Level Design
 
