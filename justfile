@@ -225,7 +225,7 @@ parser-release *args='':
   cargo run --manifest-path rules_engine/Cargo.toml --release --bin "parser_v2" -- "$@"
 
 llmc *args='':
-  cargo run --manifest-path rules_engine/Cargo.toml -p llmc -- "$@"
+  cargo run --manifest-path rules_engine/Cargo.toml -p llmc -- --repo ~/Documents/llmc "$@"
 
 tabula *args='':
   cargo run --manifest-path rules_engine/Cargo.toml -p tabula_cli -- "$@"

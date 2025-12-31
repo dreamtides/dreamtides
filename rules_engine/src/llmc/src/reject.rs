@@ -38,7 +38,8 @@ pub fn run(args: &RejectArgs, repo_override: Option<&Path>) -> Result<()> {
     };
     state::save_state(&state_path, &state)?;
 
-    let outcome = runtime::run_runtime(runtime, &updated_prompt, &worktree_path, false);
+    let outcome =
+        runtime::run_runtime(runtime, &updated_prompt, &paths.repo_root, &worktree_path, false);
 
     let mut state = state::load_state(&state_path)?;
     {

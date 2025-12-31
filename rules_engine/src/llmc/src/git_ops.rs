@@ -107,6 +107,24 @@ pub fn diff_master_agent(worktree_path: &Path, branch: &str) -> Result<String> {
     self::git_output(worktree_path, &["diff", &range])
 }
 
+/// Run difftastic for `git diff master...<branch>`.
+pub fn diff_master_agent_difftastic(worktree_path: &Path, branch: &str) -> Result<()> {
+    let range = format!("master...{branch}");
+    let status = Command::new("git")
+        .arg("-C")
+        .arg(worktree_path)
+        .arg("-c")
+        .arg("diff.external=difft")
+        .arg("diff")
+        .arg(&range)
+        .status()
+        .with_context(|| format!("Failed to diff {range} in {worktree_path:?}"))?;
+
+    anyhow::ensure!(status.success(), "git diff failed for {range} in {worktree_path:?}");
+
+    Ok(())
+}
+
 /// Return the subject line for the latest commit in a revision.
 pub fn commit_subject(worktree_path: &Path, revision: &str) -> Result<String> {
     self::git_output(worktree_path, &["log", "-1", "--pretty=%s", revision])
@@ -117,9 +135,42 @@ pub fn diff_worktree(worktree_path: &Path) -> Result<String> {
     self::git_output(worktree_path, &["diff"])
 }
 
+/// Run difftastic for unstaged changes.
+pub fn diff_worktree_difftastic(worktree_path: &Path) -> Result<()> {
+    let status = Command::new("git")
+        .arg("-C")
+        .arg(worktree_path)
+        .arg("-c")
+        .arg("diff.external=difft")
+        .arg("diff")
+        .status()
+        .with_context(|| format!("Failed to diff worktree {worktree_path:?}"))?;
+
+    anyhow::ensure!(status.success(), "git diff failed for worktree {worktree_path:?}");
+
+    Ok(())
+}
+
 /// Return `git diff --cached` output for staged changes.
 pub fn diff_cached(worktree_path: &Path) -> Result<String> {
     self::git_output(worktree_path, &["diff", "--cached"])
+}
+
+/// Run difftastic for staged changes.
+pub fn diff_cached_difftastic(worktree_path: &Path) -> Result<()> {
+    let status = Command::new("git")
+        .arg("-C")
+        .arg(worktree_path)
+        .arg("-c")
+        .arg("diff.external=difft")
+        .arg("diff")
+        .arg("--cached")
+        .status()
+        .with_context(|| format!("Failed to diff cached changes in {worktree_path:?}"))?;
+
+    anyhow::ensure!(status.success(), "git diff --cached failed for {worktree_path:?}");
+
+    Ok(())
 }
 
 /// Return the number of commits for a revision range.

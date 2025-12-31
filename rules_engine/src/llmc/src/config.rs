@@ -28,6 +28,7 @@ pub fn repo_paths(repo_override: Option<&Path>) -> Result<RepoPaths> {
             .with_context(|| format!("Failed to canonicalize repo override {repo_override:?}"))?,
         None => self::llmc_repo_root()?,
     };
+    self::ensure_llmc_root(&repo_root)?;
     Ok(RepoPaths {
         llmc_dir: repo_root.join(".llmc"),
         worktrees_dir: repo_root.join(".worktrees"),
@@ -80,4 +81,17 @@ fn llmc_repo_root() -> Result<PathBuf> {
 
 fn is_llmc_root(root: &Path) -> bool {
     root.join(".llmc").exists() && root.join(".git").exists()
+}
+
+fn ensure_llmc_root(repo_root: &Path) -> Result<()> {
+    let Some(name) = repo_root.file_name().and_then(|name| name.to_str()) else {
+        return Err(anyhow::anyhow!("Invalid repo root path: {repo_root:?}"));
+    };
+
+    anyhow::ensure!(
+        name == "llmc",
+        "LLMC can only operate in a repo root named `llmc`: {repo_root:?}"
+    );
+
+    Ok(())
 }

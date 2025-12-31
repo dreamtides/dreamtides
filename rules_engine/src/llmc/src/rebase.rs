@@ -37,8 +37,13 @@ pub fn run(args: &AgentArgs, repo_override: Option<&Path>) -> Result<()> {
             prompt::wrap_prompt(&paths.repo_root, &record.worktree_path, &user_prompt);
 
         self::update_prompt(&state_path, &record.agent_id, &full_prompt)?;
-        let outcome =
-            runtime::run_runtime(record.runtime, &full_prompt, &record.worktree_path, false);
+        let outcome = runtime::run_runtime(
+            record.runtime,
+            &full_prompt,
+            &paths.repo_root,
+            &record.worktree_path,
+            false,
+        );
         self::record_runtime_result(&state_path, &record.agent_id, &full_prompt, &outcome)?;
 
         let outcome = outcome?;

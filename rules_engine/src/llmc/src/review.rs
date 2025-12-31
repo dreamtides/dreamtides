@@ -18,9 +18,7 @@ pub fn run(args: &ReviewArgs, repo_override: Option<&Path>) -> Result<()> {
 
     match args.interface {
         ReviewInterface::Diff => self::run_diff(record),
-        ReviewInterface::Difftastic => {
-            anyhow::bail!("Review interface difftastic is not implemented yet")
-        }
+        ReviewInterface::Difftastic => self::run_difftastic(record),
         ReviewInterface::Vscode => anyhow::bail!("Review interface vscode is not implemented yet"),
         ReviewInterface::Forgejo => {
             anyhow::bail!("Review interface forgejo is not implemented yet")
@@ -63,6 +61,45 @@ fn run_diff(record: &AgentRecord) -> Result<()> {
 
     if !unstaged.trim().is_empty() {
         print!("{unstaged}");
+    }
+
+    Ok(())
+}
+
+fn run_difftastic(record: &AgentRecord) -> Result<()> {
+    let diff = git_ops::diff_master_agent(&record.worktree_path, &record.branch)?;
+    let status = git_ops::status_porcelain(&record.worktree_path)?;
+    let commit_status = self::commit_status(record)?;
+    if let Some(message) = self::commit_warning(&commit_status, !diff.trim().is_empty(), &status) {
+        self::print_warning(&message);
+    }
+
+    if !diff.trim().is_empty() {
+        return git_ops::diff_master_agent_difftastic(&record.worktree_path, &record.branch);
+    }
+
+    if status.trim().is_empty() {
+        println!("Nothing to review, working directory clean");
+        return Ok(());
+    }
+
+    let staged = git_ops::diff_cached(&record.worktree_path)?;
+    let unstaged = git_ops::diff_worktree(&record.worktree_path)?;
+
+    if staged.trim().is_empty() && unstaged.trim().is_empty() {
+        println!("No diff output; working directory has untracked changes");
+        return Ok(());
+    }
+
+    if !staged.trim().is_empty() {
+        git_ops::diff_cached_difftastic(&record.worktree_path)?;
+        if !unstaged.trim().is_empty() {
+            println!();
+        }
+    }
+
+    if !unstaged.trim().is_empty() {
+        git_ops::diff_worktree_difftastic(&record.worktree_path)?;
     }
 
     Ok(())

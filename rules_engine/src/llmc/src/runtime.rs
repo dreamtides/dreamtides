@@ -15,16 +15,22 @@ pub struct RuntimeOutcome {
 pub fn run_runtime(
     runtime: Runtime,
     prompt: &str,
+    repo_root: &Path,
     worktree: &Path,
     background: bool,
 ) -> Result<RuntimeOutcome> {
     match runtime {
-        Runtime::Codex => self::run_codex(prompt, worktree, background),
+        Runtime::Codex => self::run_codex(prompt, repo_root, worktree, background),
         _ => Err(anyhow::anyhow!("Runtime {runtime:?} is not supported yet")),
     }
 }
 
-fn run_codex(prompt: &str, worktree: &Path, background: bool) -> Result<RuntimeOutcome> {
+fn run_codex(
+    prompt: &str,
+    repo_root: &Path,
+    worktree: &Path,
+    background: bool,
+) -> Result<RuntimeOutcome> {
     let mut command = Command::new("codex");
     command
         .arg("-a")
@@ -34,6 +40,8 @@ fn run_codex(prompt: &str, worktree: &Path, background: bool) -> Result<RuntimeO
         .arg(worktree)
         .arg("--sandbox")
         .arg("workspace-write")
+        .arg("--add-dir")
+        .arg(repo_root.join(".git"))
         .arg(prompt)
         .env("WORKTREE", worktree)
         .current_dir(worktree);

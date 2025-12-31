@@ -60,7 +60,13 @@ pub fn run(args: &StartArgs, repo_override: Option<&Path>) -> Result<()> {
     state.agents.insert(agent_id.clone(), record);
     state::save_state(&state_path, &state)?;
 
-    let outcome = runtime::run_runtime(runtime, &full_prompt, &worktree_path, args.background);
+    let outcome = runtime::run_runtime(
+        runtime,
+        &full_prompt,
+        &paths.repo_root,
+        &worktree_path,
+        args.background,
+    );
 
     let mut state = state::load_state(&state_path)?;
     {
