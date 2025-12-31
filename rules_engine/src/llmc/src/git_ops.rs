@@ -146,11 +146,6 @@ pub fn diff_master_agent_difftastic(worktree_path: &Path, branch: &str) -> Resul
     Ok(())
 }
 
-/// Return the subject line for the latest commit in a revision.
-pub fn commit_subject(worktree_path: &Path, revision: &str) -> Result<String> {
-    self::git_output(worktree_path, &["log", "-1", "--pretty=%s", revision])
-}
-
 /// Resolve a revision to a commit hash.
 pub fn rev_parse(repo_root: &Path, revision: &str) -> Result<String> {
     Ok(self::git_output(repo_root, &["rev-parse", revision])?.trim().to_string())

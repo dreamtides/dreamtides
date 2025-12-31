@@ -109,17 +109,10 @@ fn commit_status(record: &AgentRecord) -> Result<CommitStatus> {
     let range = format!("master..{}", record.branch);
     let commit_count = git_ops::rev_list_count(&record.worktree_path, &range)?;
     if commit_count == 0 {
-        return Ok(CommitStatus { commit_count, message_word_count: None, message_ok: false });
+        return Ok(CommitStatus { commit_count });
     }
 
-    let message = git_ops::commit_subject(&record.worktree_path, &record.branch)?;
-    let message_word_count = message.split_whitespace().count();
-
-    Ok(CommitStatus {
-        commit_count,
-        message_word_count: Some(message_word_count),
-        message_ok: (8..=12).contains(&message_word_count),
-    })
+    Ok(CommitStatus { commit_count })
 }
 
 fn commit_warning(
@@ -135,13 +128,6 @@ fn commit_warning(
         return Some("Review warning: no commit found on agent worktree".to_string());
     }
 
-    if !status.message_ok {
-        let word_count = status.message_word_count.unwrap_or_default();
-        return Some(format!(
-            "Review warning: commit message should be ~10 words (got {word_count})"
-        ));
-    }
-
     None
 }
 
@@ -151,6 +137,4 @@ fn print_warning(message: &str) {
 
 struct CommitStatus {
     commit_count: usize,
-    message_word_count: Option<usize>,
-    message_ok: bool,
 }
