@@ -1,4 +1,4 @@
-avocado # LLMC Design Document
+# LLMC Design Document
 
 ## Top-Level Design
 
