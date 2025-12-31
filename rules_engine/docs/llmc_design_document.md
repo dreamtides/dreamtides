@@ -6,8 +6,8 @@
 LLMC is a Rust CLI that coordinates multiple command line AI agents working in parallel worktrees. It should create isolated worktrees per agent, run one agent per worktree in headless mode, resolve conflicts (including rerere reuse), and merge cleanly back onto the local master branch. The workflow must default to minimal manual setup and use existing agent CLIs (`claude`, `codex`, `gemini`, `cursor`).
 
 ### Requirements and Constraints
-- All LLMC code lives in `rules_engine/src/llmc` as a new workspace member crate.
-- Avoid modifying other paths unless required for workspace membership or runtime state.
+- All LLMC code lives in `rules_engine/src/llmc` as a new workspace member
+  crate.
 - The canonical repo root is the top-level checkout containing `client/` and `rules_engine/`.
 - `llmc setup` creates a new checkout at `~/Documents/llmc` and does not modify the existing `~/Documents/GoogleDrive/dreamtides` checkout.
 - Git LFS is required and must be installed and pulled in the new checkout.
@@ -26,9 +26,10 @@ LLMC is a Rust CLI that coordinates multiple command line AI agents working in p
   - `logs/` (per-run logs, optional)
 
 ### Architecture Overview
-LLMC is a single binary crate (`rules_engine/src/llmc`) with explicit modules that keep CLI, git operations, state, and runtime execution separate.
+LLMC is a single binary crate with explicit modules that keep CLI, git operations, state, and runtime execution separate.
 
-Proposed module layout inside `rules_engine/src/llmc/src/`:
+Proposed module layout:
+- docs/llmc_design_document.md
 - `main.rs` (CLI entrypoint and top-level dispatch)
 - `cli.rs` (clap definitions and argument parsing)
 - `config.rs` (defaults and derived paths)
@@ -145,18 +146,17 @@ LLMC builds a deterministic prompt wrapper around the user prompt:
 1. Fixed preamble:
    - Repo root path and worktree path
    - Reminder to follow `AGENTS.md`
-   - Hard requirement: only change files under `rules_engine/src/llmc`
    - Required validations: `just fmt`, `just check`, `just clippy`, `just review`
 2. User prompt (concatenated from flags/files)
 3. Persist the full prompt string in `.llmc/state.json` for future rebase or reject runs.
 
 ### Agent Runtime Commands
-All agents run headlessly with `WORKTREE` set and `cwd` equal to the worktree path.
+All agents run headlessly with `WORKTREE` set and `cwd` equal to the worktree path. Milestones deliver a Codex-only proof of concept first, then add other runtimes.
 
-- Claude Code:
-  - `claude -p <PROMPT> --allowedTools "Bash,Edit,Read" --output-format stream-json`
 - Codex:
   - `codex exec --cd <WORKTREE> --ask-for-approval never --sandbox workspace-write <PROMPT>`
+- Claude Code:
+  - `claude -p <PROMPT> --allowedTools "Bash,Edit,Read" --output-format stream-json`
 - Gemini:
   - `gemini -p <PROMPT> --output-format stream-json`
 - Cursor:
@@ -183,72 +183,88 @@ External dependencies (alphabetical):
 
 ## Milestone Documents
 
-### Milestone 1: New LLMC Crate Skeleton
+### Milestone 1: Core CLI, Setup, and State
 Steps:
-- Create `rules_engine/src/llmc` with `Cargo.toml` and `src/main.rs`.
-- Wire clap with top-level subcommands and placeholder handlers.
-- Ensure the workspace member is picked up by `members = ["src/*"]` without changes to other files.
-- Implement minimal `--help` output and error on unknown subcommands.
+- Create the `llmc` crate, wire clap subcommands, and expose `--help`.
+- Implement repo root detection, `--repo` overrides, and path helpers for `.llmc` and `.worktrees`.
+- Define `AgentRecord` and `StateFile`, with atomic read/write for `.llmc/state.json`.
+- Add noun-based agent id generation and uniqueness checks.
+- Agent IDs should be short english nouns not current in use (examples:
+  pineapple, dalmation), there is no intention that they're globally unique
+- Implement `llmc setup` with dependency checks, local clone, rerere config, LFS install/pull, `.gitignore` validation, and directory creation.
+Manual verification:
+- Run `llmc setup --source ~/Documents/GoogleDrive/dreamtides --target ~/Documents/llmc`.
+- Confirm `.llmc/` is ignored via `git -C ~/Documents/llmc status --ignored`.
+- Run `llmc --help` and verify subcommands render.
 
-### Milestone 2: Repo Root and Path Derivation
+### Milestone 2: Agent: Codex (End-to-End Proof of Concept)
 Steps:
-- Implement repo root detection using `git rev-parse --show-toplevel`.
-- Add `--repo` override to all commands.
-- Add path helpers for `.worktrees` and `.llmc` with validation errors if missing.
-- Add unit tests for path derivation with temp dirs if allowed.
+- Implement worktree add/remove for agent branches and ensure clean working trees.
+- Implement prompt assembly, preamble injection, and prompt storage in state.
+- Implement Codex runtime invocation for `llmc start`, with foreground streaming.
+- Implement `llmc rebase`, `llmc reject`, and `llmc accept` flows using Codex for conflict resolution and fixups.
+Manual verification:
+- Run `llmc start --runtime codex --prompt \"Add a one-line note to docs/llmc_design_document.md\"`.
+- Confirm `.worktrees/agent-<noun>` exists and `.llmc/state.json` records the prompt and runtime.
+- Run `llmc rebase --agent <noun>` followed by `llmc accept --agent <noun>` and verify `master` fast-forwards.
 
-### Milestone 3: State Storage and Agent Registry
+### Milestone 3: Review Interface: diff
 Steps:
-- Define `AgentRecord` and `StateFile` structs with serde.
-- Implement atomic read/write of `.llmc/state.json`.
-- Add helper functions to register, update, and remove agents by id.
-- Validate uniqueness of `agent_id` and branch name on creation.
+- Implement `llmc review --interface diff` using `git diff master...agent/<id>`.
+- Ensure the interface looks up agent metadata in state for branch names and worktree paths.
+Manual verification:
+- Run `llmc review --agent <noun> --interface diff` and confirm it matches `git -C .worktrees/agent-<noun> diff master...agent/<noun>`.
 
-### Milestone 4: Dependency Checks and Setup Workflow
+### Milestone 4: Agent: Claude
 Steps:
-- Implement binary availability checks using `Command::new(...).arg("--version")`.
-- Add `llmc setup` with `--source` and `--target` defaults.
-- Implement local clone, rerere config, LFS install/pull, and directory creation.
-- Add clear error messages for missing tools or non-empty target directory.
+- Implement Claude runtime invocation (`claude -p`) using the same prompt, worktree, and state flow.
+- Ensure stdout/stderr streaming and `WORKTREE` environment configuration match Codex behavior.
+Manual verification:
+- Run `llmc start --runtime claude --prompt \"Report the current git status.\" --agent <noun>`.
+- Confirm the worktree and state entry are created and Claude runs headlessly.
 
-### Milestone 5: Worktree and Branch Lifecycle
+### Milestone 5: Agent: Gemini
 Steps:
-- Implement `worktree add` and `worktree remove` helpers.
-- Enforce branch naming as `agent/<agent_id>`.
-- Validate worktree cleanliness before starting and before accept.
-- Add detection for "one commit ahead" rule using `git rev-list --count`.
+- Implement Gemini runtime invocation (`gemini -p`) aligned with the existing prompt and worktree flow.
+- Ensure runtime errors are surfaced with actionable context.
+Manual verification:
+- Run `llmc start --runtime gemini --prompt \"List the files at repo root.\" --agent <noun>`.
+- Confirm the worktree and state entry are created and Gemini runs headlessly.
 
-### Milestone 6: Prompt Assembly and Archiving
+### Milestone 6: Agent: Cursor
 Steps:
-- Implement prompt concatenation for repeated `--prompt` and `--prompt-file` flags.
-- Build fixed preamble string and prepend to user prompt.
-- Store the full prompt text in `.llmc/state.json` for the agent record.
-- Add tests for prompt concatenation order and spacing.
+- Implement Cursor runtime invocation (`cursor --print`) aligned with the existing prompt and worktree flow.
+- Preserve streaming output and exit code behavior.
+Manual verification:
+- Run `llmc start --runtime cursor --prompt \"Explain the AGENTS.md requirements.\" --agent <noun>`.
+- Confirm the worktree and state entry are created and Cursor runs headlessly.
 
-### Milestone 7: Agent Runtime Execution
+### Milestone 7: Review Interface: difftastic
 Steps:
-- Implement runtime enum and command builders for `claude`, `codex`, `gemini`, `cursor`.
-- Ensure `cwd` is the worktree path and `WORKTREE` env var is set.
-- Implement `--background` by spawning and storing PID in state.
-- Add SIGINT handling using `ctrlc` to forward to child and exit cleanly.
+- Implement `llmc review --interface difftastic` using `git -c diff.external=difft diff master...agent/<id>`.
+- Verify errors are surfaced when `difft` is missing.
+Manual verification:
+- Run `llmc review --agent <noun> --interface difftastic` and confirm difftastic output is shown.
 
-### Milestone 8: Rebase and Conflict Resolution
+### Milestone 8: Review Interface: vscode
 Steps:
-- Implement `llmc rebase` to fetch `origin/master` and rebase the worktree.
-- Detect conflicts via exit code and `git status --porcelain`.
-- Re-run agent with conflict context and require `git rebase --continue`.
-- Verify no unmerged paths remain before marking rebase complete.
+- Implement `llmc review --interface vscode` using `code --reuse-window --wait <worktree>`.
+- Ensure the command returns control when VSCode exits.
+Manual verification:
+- Run `llmc review --agent <noun> --interface vscode` and confirm VSCode opens the worktree.
 
-### Milestone 9: Review, Reject, Accept
+### Milestone 9: Review Interface: forgejo
 Steps:
-- Implement `llmc review` interfaces and forgejo URL generation.
-- Implement `llmc reject` to append notes and diff to the original prompt.
-- Implement `llmc accept` to rebase, fast-forward merge, and cleanup.
-- Enforce clean worktree and single-commit constraint on accept.
+- Implement Forgejo compare URL generation from `remote.origin.url`.
+- Open the compare URL for `master...agent/<id>` with the system browser.
+Manual verification:
+- Run `llmc review --agent <noun> --interface forgejo` and confirm the compare view loads in Forgejo.
 
 ### Milestone 10: Notifications, Logging, and Polish
 Steps:
-- Add `--notify/--no-notify` defaulting to notify on completion.
-- Implement optional per-run log files under `.llmc/logs`.
-- Add consistent error messages with actionable remediation hints.
-- Run `just fmt`, `just check`, `just clippy`, and `just review` after each change set.
+- Add `--notify/--no-notify` with `osascript` notifications on completion.
+- Implement optional `.llmc/logs` output and include command lines and exit codes.
+- Add consistent error messages with remediation hints.
+Manual verification:
+- Run `llmc start --runtime codex --prompt \"Exit immediately.\" --notify` and confirm the notification fires.
+- Re-run with `--no-notify` and confirm no notification appears and logs are written when enabled.
