@@ -240,21 +240,6 @@ Steps:
 Manual verification:
 - Run `llmc review --agent <noun> --interface difftastic` and confirm difftastic output is shown.
 
-### Milestone 6: Review Interface: vscode
-Steps:
-- Implement `llmc review --interface vscode` using `code --reuse-window --wait <worktree>`.
-- Ensure the command returns control when VSCode exits.
-Manual verification:
-- Run `llmc review --agent <noun> --interface vscode` and confirm VSCode opens the worktree.
-
-### Milestone 7: Review Interface: forgejo
-Steps:
-- Implement Forgejo compare URL generation from `remote.origin.url`.
-- Open the compare URL for `master...agent/<id>` with the system browser.
-Manual verification:
-- Run `llmc review --agent <noun> --interface forgejo` and confirm the compare view loads in Forgejo.
-
-
 ### Milestone 8: Agent: Claude
 Steps:
 - Implement Claude runtime invocation (`claude -p`) using the same prompt, worktree, and state flow.
