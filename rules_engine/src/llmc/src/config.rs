@@ -23,7 +23,11 @@ pub fn repo_root(repo_override: Option<&Path>) -> Result<PathBuf> {
 
 /// Build commonly used LLMC directories based on the repo root.
 pub fn repo_paths(repo_override: Option<&Path>) -> Result<RepoPaths> {
-    let repo_root = self::repo_root(repo_override)?;
+    let repo_root = match repo_override {
+        Some(repo_override) => fs::canonicalize(repo_override)
+            .with_context(|| format!("Failed to canonicalize repo override {repo_override:?}"))?,
+        None => self::llmc_repo_root()?,
+    };
     Ok(RepoPaths {
         llmc_dir: repo_root.join(".llmc"),
         worktrees_dir: repo_root.join(".worktrees"),
@@ -56,4 +60,24 @@ fn git_repo_root() -> Result<PathBuf> {
     anyhow::ensure!(!root.is_empty(), "git rev-parse --show-toplevel returned empty output");
 
     Ok(PathBuf::from(root))
+}
+
+fn llmc_repo_root() -> Result<PathBuf> {
+    let current_root = self::git_repo_root()?;
+    if self::is_llmc_root(&current_root) {
+        return Ok(current_root);
+    }
+
+    let default_target = self::default_target_dir()?;
+    let target_root = fs::canonicalize(&default_target).unwrap_or(default_target);
+
+    if self::is_llmc_root(&target_root) {
+        return Ok(target_root);
+    }
+
+    Ok(current_root)
+}
+
+fn is_llmc_root(root: &Path) -> bool {
+    root.join(".llmc").exists() && root.join(".git").exists()
 }
