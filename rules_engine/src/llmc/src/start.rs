@@ -1,13 +1,10 @@
-use std::mem;
 use std::path::Path;
 use std::time::{SystemTime, UNIX_EPOCH};
 
 use anyhow::{Context, Result};
 
 use crate::cli::StartArgs;
-use crate::state::{
-    AgentRecord, AgentStatus, Runtime, {self},
-};
+use crate::state::{self, AgentRecord, AgentStatus, Runtime};
 use crate::{config, nouns};
 
 /// Prepare the initial agent record and state needed for llmc start.
@@ -21,9 +18,11 @@ pub fn run(args: &StartArgs, repo_override: Option<&Path>) -> Result<()> {
         None => nouns::choose_agent_id(&state)?,
     };
 
+    anyhow::ensure!(!state.agents.contains_key(&agent_id), "Agent id already exists: {agent_id}");
+
     let now = self::unix_timestamp()?;
 
-    mem::drop(AgentRecord {
+    let _record = AgentRecord {
         agent_id: agent_id.clone(),
         branch: format!("agent/{agent_id}"),
         worktree_path: paths.worktrees_dir.join(format!("agent-{agent_id}")),
@@ -33,7 +32,7 @@ pub fn run(args: &StartArgs, repo_override: Option<&Path>) -> Result<()> {
         last_run_unix: now,
         status: AgentStatus::Idle,
         last_pid: None,
-    });
+    };
 
     let repo_root = &paths.repo_root;
 

@@ -14,7 +14,7 @@ const REQUIRED_BINARIES: &[&str] = &[
     "claude",
     "codex",
     "gemini",
-    "cursor-agent",
+    "cursor",
     "forgejo",
     "difft",
     "code",
@@ -93,7 +93,7 @@ fn validate_gitignore(target: &Path) -> Result<()> {
     let gitignore_path = target.join(".gitignore");
     let contents = fs::read_to_string(&gitignore_path)
         .with_context(|| format!("Failed to read {gitignore_path:?}"))?;
-    let has_entry = contents.lines().any(|line| line.trim() == ".llmc/");
+    let has_entry = contents.lines().map(str::trim).any(|line| matches!(line, ".llmc" | ".llmc/"));
 
     anyhow::ensure!(has_entry, "Missing .llmc/ entry in {gitignore_path:?}");
 
