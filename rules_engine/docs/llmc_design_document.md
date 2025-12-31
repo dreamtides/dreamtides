@@ -3,13 +3,21 @@
 ## Top-Level Design
 
 ### Purpose
-LLMC is a Rust CLI that coordinates multiple command line AI agents working in parallel worktrees. It should create isolated worktrees per agent, run one agent per worktree in headless mode, resolve conflicts (including rerere reuse), and merge cleanly back onto the local master branch. The workflow must default to minimal manual setup and use existing agent CLIs (`claude`, `codex`, `gemini`, `cursor`).
+LLMC is a Rust CLI that coordinates multiple command line AI agents working in
+parallel worktrees. It should create isolated worktrees per agent, run one agent
+per worktree in headless mode, resolve conflicts (including rerere reuse), and
+merge cleanly back onto the local master branch. The workflow must default to
+minimal manual setup and use existing agent CLIs (`claude`, `codex`, `gemini`,
+`cursor`).
 
 ### Requirements and Constraints
 - All LLMC code lives in `rules_engine/src/llmc` as a new workspace member
   crate.
-- The canonical repo root is the top-level checkout containing `client/` and `rules_engine/`.
-- `llmc setup` creates a new checkout at `~/Documents/llmc` and does not modify the existing `~/Documents/GoogleDrive/dreamtides` checkout.
+- The canonical repo root is the top-level checkout containing `dreamtides/client/` and
+  `dreamtides/rules_engine/`.
+- You are currently in the `rules_engine/` sub-directory.
+- `llmc setup` creates a new checkout at `~/Documents/llmc` and does not modify
+  the existing `~/Documents/GoogleDrive/dreamtides` checkout.
 - Git LFS is required and must be installed and pulled in the new checkout.
 - Worktrees live under `<repo>/.worktrees/agent-<id>` and each agent runs with `WORKTREE` set and `cwd` equal to that path.
 - Rerere must be enabled once per checkout: `rerere.enabled=true` and `rerere.autoupdate=true`.
@@ -26,7 +34,8 @@ LLMC is a Rust CLI that coordinates multiple command line AI agents working in p
   - `logs/` (per-run logs, optional)
 
 ### Architecture Overview
-LLMC is a single binary crate with explicit modules that keep CLI, git operations, state, and runtime execution separate.
+LLMC is a single binary crate with explicit modules that keep CLI, git
+operations, state, and runtime execution separate.
 
 Proposed module layout:
 - docs/llmc_design_document.md
@@ -42,7 +51,8 @@ Proposed module layout:
 - `notify.rs` (osascript notifications)
 
 ### Data Model and State
-State is stored in `.llmc/state.json` for machine-friendly lookup by agent name. The file is authoritative for agent lifecycle.
+State is stored in `.llmc/state.json` for machine-friendly lookup by agent name.
+The file is authoritative for agent lifecycle.
 
 `AgentRecord` fields:
 - `agent_id` (string, unique lowercase English noun, used in branch and worktree names)
@@ -86,8 +96,9 @@ Purpose: create a new agent worktree, build prompt, run agent headlessly, and re
 Steps:
 1. Resolve repo root and ensure `.worktrees` exists.
 2. Determine `agent_id`:
-   - Use `--agent` if provided (must be a lowercase English noun).
-   - Otherwise select an unused noun from a built-in list and use it as the agent id.
+   - Use `--agent` if provided.
+   - Otherwise select an unused noun from the dictionary and use it as the agent
+     id.
 3. Create branch and worktree:
    - `git -C <root> worktree add -b agent/<agent_id> <root>/.worktrees/agent-<agent_id> master`
 4. Build prompt:
@@ -208,14 +219,21 @@ Manual verification:
 - Confirm `.worktrees/agent-<noun>` exists and `.llmc/state.json` records the prompt and runtime.
 - Run `llmc rebase --agent <noun>` followed by `llmc accept --agent <noun>` and verify `master` fast-forwards.
 
-### Milestone 3: Review Interface: diff
+### Milestone 3: Agent Status Command
+Steps:
+- Add `llmc status --agent <id>` to display the stored status for a named agent.
+- Read `.llmc/state.json` and fail if the agent does not exist.
+Manual verification:
+- Run `llmc status --agent <noun>` after creating an agent and confirm it prints the stored status.
+
+### Milestone 4: Review Interface: diff
 Steps:
 - Implement `llmc review --interface diff` using `git diff master...agent/<id>`.
 - Ensure the interface looks up agent metadata in state for branch names and worktree paths.
 Manual verification:
 - Run `llmc review --agent <noun> --interface diff` and confirm it matches `git -C .worktrees/agent-<noun> diff master...agent/<noun>`.
 
-### Milestone 4: Agent: Claude
+### Milestone 5: Agent: Claude
 Steps:
 - Implement Claude runtime invocation (`claude -p`) using the same prompt, worktree, and state flow.
 - Ensure stdout/stderr streaming and `WORKTREE` environment configuration match Codex behavior.
@@ -223,7 +241,7 @@ Manual verification:
 - Run `llmc start --runtime claude --prompt \"Report the current git status.\" --agent <noun>`.
 - Confirm the worktree and state entry are created and Claude runs headlessly.
 
-### Milestone 5: Agent: Gemini
+### Milestone 6: Agent: Gemini
 Steps:
 - Implement Gemini runtime invocation (`gemini -p`) aligned with the existing prompt and worktree flow.
 - Ensure runtime errors are surfaced with actionable context.
@@ -268,3 +286,5 @@ Steps:
 Manual verification:
 - Run `llmc start --runtime codex --prompt \"Exit immediately.\" --notify` and confirm the notification fires.
 - Re-run with `--no-notify` and confirm no notification appears and logs are written when enabled.
+- Write user-facing README.md documentation under `src/llmc` describing the
+  project and how to use it
