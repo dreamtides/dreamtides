@@ -1,4 +1,4 @@
-# Prompt [Implemented]
+# Prompt
   "Allied {plural-subtype} have +{s} spark.",
   "Abandon an ally: This character gains +{s} spark.",
   "When you abandon an ally, this character gains +{s} spark.",

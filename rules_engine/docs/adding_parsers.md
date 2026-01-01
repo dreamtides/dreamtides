@@ -69,6 +69,19 @@ The following terminology applies in parser v2:
 
 ---
 
+## Terminology Notes
+
+The following terminology changes from parser v1 are important to keep in mind:
+
+- The term "reclaim" when used as a *verb* means to return from your void to
+  play (`ReturnFromYourVoidToPlay`). There is also a named ability called
+  `{ReclaimForCost}` that gives a card the ability to be reclaimed for a cost.
+- The term "ally" means a character *other* than this character when it appears
+  on character cards. On event cards an "ally" is any character you control.
+- The term "enemy" means a character controlled by the opponent. The opposing
+  player themself is called "the opponent".
+
+
 ## Critical Pitfalls
 
 ### Directive Names Must Be Lowercase

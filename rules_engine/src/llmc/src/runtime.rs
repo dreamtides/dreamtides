@@ -77,7 +77,18 @@ fn run_claude(
     let config = claude_config.unwrap_or_default();
     let mut command = Command::new("claude");
 
-    command.arg("-p").arg(prompt).arg("--verbose").env("WORKTREE", worktree).current_dir(worktree);
+    command
+        .arg("-p")
+        .arg(prompt)
+        .arg("--verbose")
+        .arg("--output-format")
+        .arg("stream-json")
+        .arg("--replay-user-messages")
+        .arg("--include-partial-messages")
+        .arg("--permission-mode")
+        .arg("bypassPermissions")
+        .env("WORKTREE", worktree)
+        .current_dir(worktree);
 
     if let Some(model) = &config.model {
         command.arg("--model").arg(model);
