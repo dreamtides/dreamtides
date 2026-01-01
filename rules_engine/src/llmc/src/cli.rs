@@ -42,7 +42,7 @@ pub struct StartArgs {
     #[arg(long, help = "Agent identifier")]
     pub agent: Option<String>,
 
-    #[arg(long, value_enum, help = "Runtime to use")]
+    #[arg(long, value_enum, default_value = "codex", help = "Runtime to use")]
     pub runtime: Option<Runtime>,
 
     #[arg(long, help = "Prompt text for the agent")]
@@ -98,7 +98,7 @@ pub struct ReviewArgs {
     #[arg(long, help = "Agent identifier")]
     pub agent: Option<String>,
 
-    #[arg(long, value_enum, default_value = "diff", help = "Review interface")]
+    #[arg(long, value_enum, default_value = "difftastic", help = "Review interface")]
     pub interface: ReviewInterface,
 }
 
