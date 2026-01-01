@@ -82,6 +82,12 @@ fn collect_notes(args: &RejectArgs) -> Result<String> {
         notes.push(contents);
     }
 
+    if let Some(path) = &args.notes_file_pos {
+        let contents = fs::read_to_string(path)
+            .with_context(|| format!("Failed to read notes file {path:?}"))?;
+        notes.push(contents);
+    }
+
     Ok(notes.join("\n\n"))
 }
 

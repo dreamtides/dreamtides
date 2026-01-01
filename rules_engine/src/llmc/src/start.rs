@@ -1,5 +1,5 @@
 use std::fs;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 use anyhow::{Context, Result};
 
@@ -39,7 +39,8 @@ pub fn run(args: &StartArgs, repo_override: Option<&Path>) -> Result<()> {
     git_ops::worktree_add(&paths.repo_root, &worktree_path, &format!("agent/{agent_id}"))?;
     git_ops::ensure_clean_worktree(&worktree_path)?;
 
-    let user_prompt = prompt::assemble_user_prompt(args.prompt.as_deref(), &args.prompt_file)?;
+    let user_prompt =
+        prompt::assemble_user_prompt(args.prompt.as_deref(), &self::prompt_files(args))?;
     let full_prompt = prompt::wrap_prompt(&paths.repo_root, &worktree_path, &user_prompt);
 
     let now = time::unix_timestamp()?;
@@ -96,4 +97,12 @@ pub fn run(args: &StartArgs, repo_override: Option<&Path>) -> Result<()> {
 
 fn print_agent_completed(agent_id: &str) {
     println!("Agent {agent_id} task completed");
+}
+
+fn prompt_files(args: &StartArgs) -> Vec<PathBuf> {
+    let mut files = args.prompt_file.clone();
+    if let Some(path) = &args.prompt_file_pos {
+        files.push(path.clone());
+    }
+    files
 }

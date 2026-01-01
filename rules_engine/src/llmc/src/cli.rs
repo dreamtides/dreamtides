@@ -51,6 +51,9 @@ pub struct StartArgs {
     #[arg(long, value_name = "PATH", help = "Prompt file to append")]
     pub prompt_file: Vec<PathBuf>,
 
+    #[arg(value_name = "PATH", help = "Prompt file to append")]
+    pub prompt_file_pos: Option<PathBuf>,
+
     #[arg(long, help = "Run without streaming output")]
     pub background: bool,
 
@@ -112,4 +115,7 @@ pub struct RejectArgs {
 
     #[arg(long, value_name = "PATH", help = "Notes file to append")]
     pub notes_file: Option<PathBuf>,
+
+    #[arg(value_name = "PATH", help = "Notes file to append")]
+    pub notes_file_pos: Option<PathBuf>,
 }
