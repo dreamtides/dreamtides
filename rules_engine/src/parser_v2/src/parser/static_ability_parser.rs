@@ -1,9 +1,9 @@
 use ability_data::static_ability::{StandardStaticAbility, StaticAbility};
 use chumsky::prelude::*;
-use core_data::numerics::Energy;
+use core_data::numerics::{Energy, Spark};
 
 use crate::parser::card_predicate_parser;
-use crate::parser::parser_helpers::{energy, period, word, words, ParserExtra, ParserInput};
+use crate::parser::parser_helpers::{energy, period, spark, word, words, ParserExtra, ParserInput};
 
 /// Parses static abilities that apply continuously.
 pub fn static_ability_parser<'a>(
@@ -13,7 +13,8 @@ pub fn static_ability_parser<'a>(
 
 fn standard_static_ability<'a>(
 ) -> impl Parser<'a, ParserInput<'a>, StandardStaticAbility, ParserExtra<'a>> + Clone {
-    choice((enemy_cards_cost_increase(), your_cards_cost_modification())).boxed()
+    choice((allied_spark_bonus(), enemy_cards_cost_increase(), your_cards_cost_modification()))
+        .boxed()
 }
 
 fn your_cards_cost_modification<'a>(
@@ -44,6 +45,20 @@ fn your_cards_cost_increase<'a>(
         .map(|(matching, reduction)| StandardStaticAbility::YourCardsCostIncrease {
             matching,
             reduction: Energy(reduction),
+        })
+}
+
+fn allied_spark_bonus<'a>(
+) -> impl Parser<'a, ParserInput<'a>, StandardStaticAbility, ParserExtra<'a>> + Clone {
+    word("allied")
+        .ignore_then(card_predicate_parser::parser())
+        .then_ignore(words(&["have", "+"]))
+        .then(spark())
+        .then_ignore(word("spark"))
+        .then_ignore(period())
+        .map(|(matching, added_spark)| StandardStaticAbility::SparkBonusOtherCharacters {
+            matching,
+            added_spark: Spark(added_spark),
         })
 }
 

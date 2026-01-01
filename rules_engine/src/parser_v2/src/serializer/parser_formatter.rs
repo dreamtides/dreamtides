@@ -162,6 +162,9 @@ fn serialize_standard_static_ability(ability: &StandardStaticAbility) -> String 
         StandardStaticAbility::EnemyCardsCostIncrease { matching, .. } => {
             format!("the opponent's {} cost {{e}} more.", serialize_card_predicate_plural(matching))
         }
+        StandardStaticAbility::SparkBonusOtherCharacters { matching, .. } => {
+            format!("allied {} have +{{s}} spark.", serialize_card_predicate_plural(matching))
+        }
         _ => unimplemented!("Serialization not yet implemented for this static ability"),
     }
 }
