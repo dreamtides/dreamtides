@@ -25,6 +25,45 @@ pub fn oldest_commit_message(repo_root: &Path, range: &str) -> Result<String> {
     Ok(output.trim_end().to_string())
 }
 
+/// Return the current HEAD commit message.
+pub fn current_commit_message(repo_root: &Path) -> Result<String> {
+    let output = self::git_output(repo_root, &["log", "--format=%B", "-n", "1", "HEAD"])?;
+
+    Ok(output.trim_end().to_string())
+}
+
+/// Amend the current commit with a new message.
+pub fn amend_commit_message(repo_root: &Path, message: &str) -> Result<()> {
+    let mut child = Command::new("git")
+        .arg("-C")
+        .arg(repo_root)
+        .arg("commit")
+        .arg("--amend")
+        .arg("--file")
+        .arg("-")
+        .stdin(Stdio::piped())
+        .spawn()
+        .with_context(|| format!("Failed to run git commit --amend in {repo_root:?}"))?;
+
+    let message =
+        if message.ends_with('\n') { message.to_string() } else { format!("{message}\n") };
+
+    let Some(mut stdin) = child.stdin.take() else {
+        return Err(anyhow::anyhow!("Failed to open git commit --amend stdin in {repo_root:?}"));
+    };
+    stdin
+        .write_all(message.as_bytes())
+        .with_context(|| format!("Failed to write amended commit message in {repo_root:?}"))?;
+    drop(stdin);
+
+    let status = child
+        .wait()
+        .with_context(|| format!("Failed to wait on git commit --amend in {repo_root:?}"))?;
+    anyhow::ensure!(status.success(), "git commit --amend failed in {repo_root:?}");
+
+    Ok(())
+}
+
 /// Soft reset the current branch to a revision.
 pub fn reset_soft_to(repo_root: &Path, revision: &str) -> Result<()> {
     self::git_run(repo_root, &["reset", "--soft", revision])

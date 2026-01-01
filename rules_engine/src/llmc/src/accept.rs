@@ -45,6 +45,12 @@ pub fn run(args: &AcceptArgs, repo_override: Option<&Path>) -> Result<()> {
         git_ops::commit_with_message(&record.worktree_path, &message)?;
     }
 
+    let message = git_ops::current_commit_message(&record.worktree_path)?;
+    let cleaned_message = self::strip_agent_attribution(&message);
+    if cleaned_message != message {
+        git_ops::amend_commit_message(&record.worktree_path, &cleaned_message)?;
+    }
+
     let commit = git_ops::rev_parse(&record.worktree_path, &record.branch)?;
 
     git_ops::checkout_master(&paths.repo_root)?;
@@ -66,6 +72,15 @@ pub fn run(args: &AcceptArgs, repo_override: Option<&Path>) -> Result<()> {
     }
 
     Ok(())
+}
+
+/// Strip lines containing agent attribution markers from a commit message.
+fn strip_agent_attribution(message: &str) -> String {
+    message
+        .lines()
+        .filter(|line| !line.contains("Generated with") && !line.contains("Co-Authored-By"))
+        .collect::<Vec<_>>()
+        .join("\n")
 }
 
 fn pull_to_source(llmc_root: &Path, agent_id: &str, commit: &str) -> Result<()> {

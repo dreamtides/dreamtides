@@ -145,12 +145,16 @@ Purpose: finalize agent work, rebase onto master, fast-forward merge, and clean 
 Steps:
 1. Ensure clean working tree and exactly one commit ahead of master.
 2. Run `llmc rebase --agent <id>`.
-3. `git -C <root> checkout master`.
-4. `git -C <root> merge --ff-only agent/<agent_id>`.
-5. Remove worktree and branch:
+3. Clean the commit message by removing any lines containing `Generated with` or `Co-Authored-By`:
+   - Get the current commit message
+   - Filter out lines containing these strings
+   - Amend the commit with the cleaned message
+4. `git -C <root> checkout master`.
+5. `git -C <root> merge --ff-only agent/<agent_id>`.
+6. Remove worktree and branch:
    - `git -C <root> worktree remove <worktree>`
    - `git -C <root> branch -d agent/<agent_id>`
-6. Remove agent entry from `.llmc/state.json` and archive logs if present.
+7. Remove agent entry from `.llmc/state.json` and archive logs if present.
 
 ### Prompt Composition
 LLMC builds a deterministic prompt wrapper around the user prompt:
