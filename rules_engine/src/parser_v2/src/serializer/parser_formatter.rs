@@ -3,10 +3,10 @@ use ability_data::cost::Cost;
 use ability_data::effect::Effect;
 use ability_data::named_ability::NamedAbility;
 use ability_data::predicate::{CardPredicate, Operator, Predicate};
+use ability_data::quantity_expression_data::QuantityExpression;
 use ability_data::standard_effect::StandardEffect;
 use ability_data::static_ability::{StandardStaticAbility, StaticAbility};
 use ability_data::trigger_event::{TriggerEvent, TriggerKeyword};
-
 pub fn serialize_ability(ability: &Ability) -> String {
     match ability {
         Ability::Triggered(triggered) => {
@@ -19,7 +19,6 @@ pub fn serialize_ability(ability: &Ability) -> String {
             let trigger = serialize_trigger_event(&triggered.trigger);
             let capitalized_trigger = capitalize_first_letter(&trigger);
             result.push_str(if has_once_per_turn { &trigger } else { &capitalized_trigger });
-
             let is_keyword_trigger = matches!(triggered.trigger, TriggerEvent::Keywords(_));
             if is_keyword_trigger {
                 result.push(' ');
@@ -27,7 +26,6 @@ pub fn serialize_ability(ability: &Ability) -> String {
             } else {
                 result.push_str(&serialize_effect(&triggered.effect));
             }
-
             result
         }
         Ability::Event(event) => capitalize_first_letter(&serialize_effect(&event.effect)),
@@ -45,13 +43,18 @@ pub fn serialize_ability(ability: &Ability) -> String {
         }
     }
 }
-
 pub fn serialize_standard_effect(effect: &StandardEffect) -> String {
     match effect {
         StandardEffect::DrawCards { .. } => "draw {cards}.".to_string(),
         StandardEffect::DiscardCards { .. } => "discard {discards}.".to_string(),
         StandardEffect::GainEnergy { .. } => "gain {e}.".to_string(),
+        StandardEffect::GainEnergyForEach { for_each, .. } => {
+            format!("gain {{e}} for each {}.", serialize_for_each_predicate(for_each))
+        }
         StandardEffect::GainPoints { .. } => "gain {points}.".to_string(),
+        StandardEffect::GainPointsForEach { for_count, .. } => {
+            format!("gain {{points}} for each {}.", serialize_for_count_expression(for_count))
+        }
         StandardEffect::LosePoints { .. } => "you lose {points}.".to_string(),
         StandardEffect::EnemyGainsPoints { .. } => "the opponent gains {points}.".to_string(),
         StandardEffect::Foresee { .. } => "{Foresee}.".to_string(),
@@ -96,7 +99,6 @@ pub fn serialize_standard_effect(effect: &StandardEffect) -> String {
         _ => unimplemented!("Serialization not yet implemented for this effect type"),
     }
 }
-
 pub fn serialize_trigger_event(trigger: &TriggerEvent) -> String {
     match trigger {
         TriggerEvent::Keywords(keywords) if keywords.len() == 1 => {
@@ -137,7 +139,6 @@ pub fn serialize_trigger_event(trigger: &TriggerEvent) -> String {
         _ => unimplemented!("Serialization not yet implemented for this trigger type"),
     }
 }
-
 fn serialize_static_ability(static_ability: &StaticAbility) -> String {
     match static_ability {
         StaticAbility::StaticAbility(ability) => serialize_standard_static_ability(ability),
@@ -150,7 +151,6 @@ fn serialize_static_ability(static_ability: &StaticAbility) -> String {
         }
     }
 }
-
 fn serialize_standard_static_ability(ability: &StandardStaticAbility) -> String {
     match ability {
         StandardStaticAbility::YourCardsCostIncrease { matching, .. } => {
@@ -168,7 +168,6 @@ fn serialize_standard_static_ability(ability: &StandardStaticAbility) -> String 
         _ => unimplemented!("Serialization not yet implemented for this static ability"),
     }
 }
-
 fn serialize_cost(cost: &Cost) -> String {
     match cost {
         Cost::AbandonCharacters(predicate, _) => {
@@ -177,7 +176,6 @@ fn serialize_cost(cost: &Cost) -> String {
         _ => unimplemented!("Serialization not yet implemented for this cost type"),
     }
 }
-
 fn serialize_effect(effect: &Effect) -> String {
     match effect {
         Effect::Effect(standard_effect) => serialize_standard_effect(standard_effect),
@@ -204,10 +202,11 @@ fn serialize_effect(effect: &Effect) -> String {
                     .join(" ")
             }
         }
-        Effect::Modal(_) => unimplemented!("Serialization not yet implemented for modal effects"),
+        Effect::Modal(_) => {
+            unimplemented!("Serialization not yet implemented for modal effects")
+        }
     }
 }
-
 fn capitalize_first_letter(s: &str) -> String {
     let mut chars = s.chars();
     match chars.next() {
@@ -215,7 +214,6 @@ fn capitalize_first_letter(s: &str) -> String {
         Some(first) => first.to_uppercase().collect::<String>() + chars.as_str(),
     }
 }
-
 fn serialize_keyword(keyword: &TriggerKeyword) -> String {
     match keyword {
         TriggerKeyword::Judgment => "Judgment".to_string(),
@@ -223,7 +221,6 @@ fn serialize_keyword(keyword: &TriggerKeyword) -> String {
         TriggerKeyword::Dissolved => "Dissolved".to_string(),
     }
 }
-
 fn serialize_predicate(predicate: &Predicate) -> String {
     match predicate {
         Predicate::This => "this character".to_string(),
@@ -240,14 +237,15 @@ fn serialize_predicate(predicate: &Predicate) -> String {
         _ => unimplemented!("Serialization not yet implemented for this predicate type"),
     }
 }
-
 fn serialize_your_predicate(card_predicate: &CardPredicate) -> String {
     match card_predicate {
-        ability_data::predicate::CardPredicate::Character => "ally".to_string(),
-        _ => unimplemented!("Serialization not yet implemented for this your predicate type"),
+        CardPredicate::Character => "ally".to_string(),
+        CardPredicate::CharacterType(_) => "allied {subtype}".to_string(),
+        _ => {
+            unimplemented!("Serialization not yet implemented for this your predicate type")
+        }
     }
 }
-
 fn serialize_enemy_predicate(card_predicate: &CardPredicate) -> String {
     match card_predicate {
         CardPredicate::Character => "enemy".to_string(),
@@ -257,23 +255,25 @@ fn serialize_enemy_predicate(card_predicate: &CardPredicate) -> String {
         CardPredicate::CardWithCost { cost_operator, .. } => {
             format!("enemy with cost {{e}} {}", serialize_operator(cost_operator))
         }
-        _ => unimplemented!("Serialization not yet implemented for this enemy predicate type"),
+        _ => {
+            unimplemented!("Serialization not yet implemented for this enemy predicate type")
+        }
     }
 }
-
 fn serialize_card_predicate(card_predicate: &CardPredicate) -> String {
     match card_predicate {
         CardPredicate::Card => "a card".to_string(),
         CardPredicate::Character => "a character".to_string(),
         CardPredicate::Event => "an event".to_string(),
         CardPredicate::CharacterType(_) => "{a-subtype}".to_string(),
-        CardPredicate::Fast { target } => format!("a {{fast}} {}", serialize_fast_target(target)),
+        CardPredicate::Fast { target } => {
+            format!("a {{fast}} {}", serialize_fast_target(target))
+        }
         _ => {
             unimplemented!("Serialization not yet implemented for this card predicate type")
         }
     }
 }
-
 fn serialize_card_predicate_plural(card_predicate: &CardPredicate) -> String {
     match card_predicate {
         CardPredicate::Card => "cards".to_string(),
@@ -288,7 +288,6 @@ fn serialize_card_predicate_plural(card_predicate: &CardPredicate) -> String {
         }
     }
 }
-
 fn serialize_fast_target(card_predicate: &CardPredicate) -> String {
     match card_predicate {
         CardPredicate::Card => "card".to_string(),
@@ -308,7 +307,6 @@ fn serialize_fast_target(card_predicate: &CardPredicate) -> String {
         _ => unimplemented!("Unsupported fast target"),
     }
 }
-
 fn serialize_operator<T>(operator: &Operator<T>) -> String {
     match operator {
         Operator::OrLess => "or less".to_string(),
@@ -318,9 +316,25 @@ fn serialize_operator<T>(operator: &Operator<T>) -> String {
         Operator::HigherBy(_) => "higher".to_string(),
     }
 }
-
 fn serialize_named_ability(named: &NamedAbility) -> String {
     match named {
         NamedAbility::Reclaim(_) => "{ReclaimForCost}".to_string(),
+    }
+}
+fn serialize_for_each_predicate(predicate: &Predicate) -> String {
+    match predicate {
+        Predicate::Another(CardPredicate::Character) => "allied character".to_string(),
+        Predicate::Another(CardPredicate::CharacterType(_)) => "allied {subtype}".to_string(),
+        _ => {
+            unimplemented!("Serialization not yet implemented for this for-each predicate")
+        }
+    }
+}
+fn serialize_for_count_expression(quantity_expression: &QuantityExpression) -> String {
+    match quantity_expression {
+        QuantityExpression::Matching(predicate) => serialize_for_each_predicate(predicate),
+        _ => {
+            unimplemented!("Serialization not yet implemented for this quantity expression")
+        }
     }
 }
