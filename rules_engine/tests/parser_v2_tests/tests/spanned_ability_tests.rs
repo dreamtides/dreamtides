@@ -226,6 +226,55 @@ fn test_parse_activated_ability_abandon() {
 }
 
 #[test]
+fn test_spanned_ability_allied_plural_subtype_have_spark() {
+    let SpannedAbility::Static { text } =
+        parse_spanned_ability("Allied {plural-subtype} have +{s} spark.", "subtype: warrior, s: 1")
+    else {
+        panic!("Expected Static ability");
+    };
+
+    assert_eq!(text.text, "Allied {plural-subtype} have +{s} spark.");
+    assert_valid_span(&text.span);
+}
+
+#[test]
+fn test_spanned_ability_abandon_an_ally_this_character_gains_spark() {
+    let SpannedAbility::Activated(activated) =
+        parse_spanned_ability("Abandon an ally: This character gains +{s} spark.", "s: 2")
+    else {
+        panic!("Expected Activated ability");
+    };
+
+    assert_eq!(activated.cost.text, "Abandon an ally");
+    assert_valid_span(&activated.cost.span);
+
+    let SpannedEffect::Effect(effect) = activated.effect else {
+        panic!("Expected Effect, got Modal");
+    };
+    assert!(effect.text.contains("This character gains +{s} spark."));
+    assert_valid_span(&effect.span);
+}
+
+#[test]
+fn test_spanned_ability_when_you_abandon_an_ally_this_character_gains_spark() {
+    let SpannedAbility::Triggered(triggered) =
+        parse_spanned_ability("When you abandon an ally, this character gains +{s} spark.", "s: 2")
+    else {
+        panic!("Expected Triggered ability");
+    };
+
+    assert_eq!(triggered.once_per_turn, None);
+    assert_eq!(triggered.trigger.text, "When you abandon an ally");
+    assert_valid_span(&triggered.trigger.span);
+
+    let SpannedEffect::Effect(effect) = triggered.effect else {
+        panic!("Expected Effect, got Modal");
+    };
+    assert_eq!(effect.text.trim(), "this character gains +{s} spark.");
+    assert_valid_span(&effect.span);
+}
+
+#[test]
 fn test_spanned_compound_effect_event() {
     let SpannedAbility::Event(event) =
         parse_spanned_ability("Gain {e}. Draw {cards}.", "e: 2, cards: 3")

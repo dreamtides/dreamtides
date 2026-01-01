@@ -64,9 +64,9 @@
   "Events cost you {e} less.", // Implemented
   "Characters cost you {e} less.", // Implemented
   "The opponent's events cost {e} more.", // Implemented
-  "Allied {plural-subtype} have +{s} spark.",
-  "Abandon an ally: This character gains +{s} spark.",
-  "When you abandon an ally, this character gains +{s} spark.",
+  "Allied {plural-subtype} have +{s} spark.", // Implemented
+  "Abandon an ally: This character gains +{s} spark.", // Implemented
+  "When you abandon an ally, this character gains +{s} spark.", // Implemented
   "When you {materialize} an allied {subtype}, gain {e}.",
   "When you play a {fast} card, gain {points}.",
   "{Judgment} Gain {e} for each allied {subtype}.",

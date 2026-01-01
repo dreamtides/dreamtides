@@ -444,3 +444,27 @@ fn test_round_trip_when_you_play_an_event_foresee() {
     let serialized = parser_formatter::serialize_ability(&parsed);
     assert_eq!(original, serialized);
 }
+
+#[test]
+fn test_round_trip_allied_plural_subtype_have_spark() {
+    let original = "Allied {plural-subtype} have +{s} spark.";
+    let parsed = parse_ability(original, "subtype: warrior, s: 1");
+    let serialized = parser_formatter::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_abandon_an_ally_this_character_gains_spark() {
+    let original = "Abandon an ally: This character gains +{s} spark.";
+    let parsed = parse_ability(original, "s: 2");
+    let serialized = parser_formatter::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_when_you_abandon_an_ally_this_character_gains_spark() {
+    let original = "When you abandon an ally, this character gains +{s} spark.";
+    let parsed = parse_ability(original, "s: 2");
+    let serialized = parser_formatter::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}

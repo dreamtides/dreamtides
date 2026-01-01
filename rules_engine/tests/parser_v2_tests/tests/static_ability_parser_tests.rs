@@ -33,3 +33,15 @@ fn test_opponent_events_cost_more() {
     )))
     "###);
 }
+
+#[test]
+fn test_allied_plural_subtype_have_spark() {
+    let result =
+        parse_ability("Allied {plural-subtype} have +{s} spark.", "subtype: warrior, s: 1");
+    assert_ron_snapshot!(result, @r###"
+    Static(StaticAbility(SparkBonusOtherCharacters(
+      matching: CharacterType(Warrior),
+      added_spark: Spark(1),
+    )))
+    "###);
+}
