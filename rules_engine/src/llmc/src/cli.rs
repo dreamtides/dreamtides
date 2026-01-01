@@ -91,6 +91,9 @@ pub struct StartArgs {
         value_name = "CONFIGS"
     )]
     pub claude_mcp_config: Vec<String>,
+
+    #[arg(long, help = "Claude: run in interactive mode")]
+    pub claude_interactive: bool,
 }
 
 #[derive(Args)]

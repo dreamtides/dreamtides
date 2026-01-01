@@ -62,6 +62,7 @@ pub struct ClaudeConfig {
     pub skip_permissions: bool,
     pub allowed_tools: Option<String>,
     pub mcp_config: Vec<String>,
+    pub interactive: bool,
 }
 
 /// Return the oldest agent id in needs_review status.
