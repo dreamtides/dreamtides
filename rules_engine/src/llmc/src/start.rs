@@ -53,6 +53,7 @@ pub fn run(args: &StartArgs, repo_override: Option<&Path>) -> Result<()> {
             skip_permissions: args.claude_skip_permissions,
             allowed_tools: args.claude_allowed_tools.clone(),
             mcp_config: args.claude_mcp_config.clone(),
+            interactive: args.claude_interactive,
         })
     } else {
         None

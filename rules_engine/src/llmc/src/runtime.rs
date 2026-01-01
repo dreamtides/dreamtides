@@ -308,17 +308,23 @@ fn run_claude(
     let config = claude_config.unwrap_or_default();
     let mut command = Command::new("claude");
 
-    command
-        .arg("-p")
-        .arg(prompt)
-        .arg("--verbose")
-        .arg("--output-format")
-        .arg("stream-json")
-        .arg("--include-partial-messages")
-        .arg("--permission-mode")
-        .arg("bypassPermissions")
-        .env("WORKTREE", worktree)
-        .current_dir(worktree);
+    if config.interactive {
+        // Interactive mode: pass prompt as positional argument
+        command.arg(prompt).env("WORKTREE", worktree).current_dir(worktree);
+    } else {
+        // Non-interactive mode: use -p with stream-json output
+        command
+            .arg("-p")
+            .arg(prompt)
+            .arg("--verbose")
+            .arg("--output-format")
+            .arg("stream-json")
+            .arg("--include-partial-messages")
+            .arg("--permission-mode")
+            .arg("bypassPermissions")
+            .env("WORKTREE", worktree)
+            .current_dir(worktree);
+    }
 
     if let Some(model) = &config.model {
         command.arg("--model").arg(model);
@@ -351,6 +357,17 @@ fn run_claude(
         let pid = Some(child.id());
         let status =
             child.wait().with_context(|| format!("Failed to wait for claude in {worktree:?}"))?;
+        Ok(RuntimeOutcome { status, pid })
+    } else if config.interactive {
+        // Interactive mode: inherit all stdio
+        command.stdin(Stdio::inherit()).stdout(Stdio::inherit()).stderr(Stdio::inherit());
+
+        let mut child =
+            command.spawn().with_context(|| format!("Failed to spawn claude in {worktree:?}"))?;
+        let pid = Some(child.id());
+        let status =
+            child.wait().with_context(|| format!("Failed to wait for claude in {worktree:?}"))?;
+
         Ok(RuntimeOutcome { status, pid })
     } else {
         // Process stdout to convert JSON stream to readable text
