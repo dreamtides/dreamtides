@@ -171,6 +171,11 @@ pub fn branch_delete(repo_root: &Path, branch: &str) -> Result<()> {
     self::git_run(repo_root, &["branch", "-d", branch])
 }
 
+/// Force delete the agent branch.
+pub fn branch_delete_force(repo_root: &Path, branch: &str) -> Result<()> {
+    self::git_run(repo_root, &["branch", "-D", branch])
+}
+
 /// Fetch the latest master branch.
 pub fn fetch_master(repo_root: &Path) -> Result<()> {
     self::git_run(repo_root, &["fetch", "origin", "master"])

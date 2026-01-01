@@ -41,7 +41,7 @@ pub fn run(_args: &CleanArgs, repo_override: Option<&Path>) -> Result<()> {
 fn remove_agent(repo_root: &Path, record: &AgentRecord) -> Result<()> {
     git_ops::worktree_remove_force(repo_root, &record.worktree_path)
         .with_context(|| format!("Failed to remove worktree for {}", record.agent_id))?;
-    git_ops::branch_delete(repo_root, &record.branch)
+    git_ops::branch_delete_force(repo_root, &record.branch)
         .with_context(|| format!("Failed to delete branch for {}", record.agent_id))?;
 
     Ok(())
