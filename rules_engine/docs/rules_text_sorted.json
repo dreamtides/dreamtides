@@ -50,10 +50,10 @@
   "When you play an event, gain {e}", // Implemented
   "When you play an event, {foresee}.", // Implemented
   "When you {materialize} an ally, gain {e}.", // Implemented
-  "When you {materialize} a character, this character gains +{s} spark.",
-  "When you play {a-subtype}, draw {cards}.",
-  "When you abandon a character, draw {cards}.",
-  "When you abandon a character, gain {points}.",
+  "When you {materialize} a character, this character gains +{s} spark.", // Implemented
+  "When you play {a-subtype}, draw {cards}.", // Implemented
+  "When you abandon a character, draw {cards}.", // Implemented
+  "When you abandon a character, gain {points}.", // Implemented
   "When you abandon an ally, {kindle}.",
   "When an ally is {dissolved}, gain {points}.",
   "When an ally is {dissolved}, draw {cards}.",

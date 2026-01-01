@@ -62,7 +62,7 @@ fn draw_all_cards_trigger<'a>(
 
 fn play_trigger<'a>() -> impl Parser<'a, ParserInput<'a>, TriggerEvent, ParserExtra<'a>> + Clone {
     words(&["when", "you", "play"])
-        .ignore_then(article())
+        .ignore_then(article().or_not())
         .ignore_then(predicate_parser::predicate_parser())
         .map(TriggerEvent::Play)
 }
@@ -70,6 +70,7 @@ fn play_trigger<'a>() -> impl Parser<'a, ParserInput<'a>, TriggerEvent, ParserEx
 fn play_from_hand_trigger<'a>(
 ) -> impl Parser<'a, ParserInput<'a>, TriggerEvent, ParserExtra<'a>> + Clone {
     words(&["when", "you", "play"])
+        .ignore_then(article().or_not())
         .ignore_then(predicate_parser::predicate_parser())
         .then_ignore(words(&["from", "your", "hand"]))
         .map(TriggerEvent::PlayFromHand)
@@ -78,6 +79,7 @@ fn play_from_hand_trigger<'a>(
 fn play_during_turn_trigger<'a>(
 ) -> impl Parser<'a, ParserInput<'a>, TriggerEvent, ParserExtra<'a>> + Clone {
     words(&["when", "you", "play"])
+        .ignore_then(article().or_not())
         .ignore_then(predicate_parser::predicate_parser())
         .then_ignore(words(&["in", "a", "turn"]))
         .map(|predicate| TriggerEvent::PlayDuringTurn(predicate, PlayerTurn::YourTurn))
@@ -86,7 +88,7 @@ fn play_during_turn_trigger<'a>(
 fn discard_trigger<'a>() -> impl Parser<'a, ParserInput<'a>, TriggerEvent, ParserExtra<'a>> + Clone
 {
     words(&["when", "you", "discard"])
-        .ignore_then(article())
+        .ignore_then(article().or_not())
         .ignore_then(predicate_parser::predicate_parser())
         .map(TriggerEvent::Discard)
 }
@@ -95,7 +97,7 @@ fn materialize_trigger<'a>(
 ) -> impl Parser<'a, ParserInput<'a>, TriggerEvent, ParserExtra<'a>> + Clone {
     words(&["when", "you"])
         .ignore_then(directive("materialize"))
-        .ignore_then(article())
+        .ignore_then(article().or_not())
         .ignore_then(predicate_parser::predicate_parser())
         .map(TriggerEvent::Materialize)
 }
@@ -123,7 +125,7 @@ fn banished_trigger<'a>() -> impl Parser<'a, ParserInput<'a>, TriggerEvent, Pars
 fn abandon_trigger<'a>() -> impl Parser<'a, ParserInput<'a>, TriggerEvent, ParserExtra<'a>> + Clone
 {
     words(&["when", "you", "abandon"])
-        .ignore_then(article())
+        .ignore_then(article().or_not())
         .ignore_then(predicate_parser::predicate_parser())
         .map(TriggerEvent::Abandon)
 }

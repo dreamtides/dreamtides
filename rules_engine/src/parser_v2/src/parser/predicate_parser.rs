@@ -6,18 +6,29 @@ use crate::parser::parser_helpers::{directive, subtype, word, words, ParserExtra
 
 pub fn predicate_parser<'a>() -> impl Parser<'a, ParserInput<'a>, Predicate, ParserExtra<'a>> + Clone
 {
+    choice((specific_predicates(), general_predicates())).boxed()
+}
+
+fn specific_predicates<'a>() -> impl Parser<'a, ParserInput<'a>, Predicate, ParserExtra<'a>> + Clone
+{
     choice((
         this_parser(),
         enemy_or_ally_parser(),
         non_subtype_enemy_parser(),
         enemy_parser(),
         ally_parser(),
-        any_fast_card_parser(),
-        any_character_parser(),
-        any_event_parser(),
-        any_card_parser(),
     ))
     .boxed()
+}
+
+fn general_predicates<'a>() -> impl Parser<'a, ParserInput<'a>, Predicate, ParserExtra<'a>> + Clone
+{
+    choice((any_fast_card_parser(), any_basic_predicates(), any_card_predicate_parser())).boxed()
+}
+
+fn any_basic_predicates<'a>() -> impl Parser<'a, ParserInput<'a>, Predicate, ParserExtra<'a>> + Clone
+{
+    choice((any_character_parser(), any_event_parser(), any_card_parser())).boxed()
 }
 
 fn this_parser<'a>() -> impl Parser<'a, ParserInput<'a>, Predicate, ParserExtra<'a>> + Clone {
@@ -69,4 +80,9 @@ fn any_fast_card_parser<'a>() -> impl Parser<'a, ParserInput<'a>, Predicate, Par
     directive("fast")
         .ignore_then(card_predicate_parser::parser())
         .map(|target| Predicate::Any(CardPredicate::Fast { target: Box::new(target) }))
+}
+
+fn any_card_predicate_parser<'a>(
+) -> impl Parser<'a, ParserInput<'a>, Predicate, ParserExtra<'a>> + Clone {
+    card_predicate_parser::parser().map(Predicate::Any)
 }

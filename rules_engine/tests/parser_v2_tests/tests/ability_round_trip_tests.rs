@@ -34,6 +34,22 @@ fn test_round_trip_when_you_materialize_an_ally_gain_energy() {
 }
 
 #[test]
+fn test_round_trip_when_you_materialize_a_character_this_character_gains_spark() {
+    let original = "When you {materialize} a character, this character gains +{s} spark.";
+    let parsed = parse_ability(original, "s: 2");
+    let serialized = parser_formatter::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_when_you_play_a_subtype_draw_cards() {
+    let original = "When you play {a-subtype}, draw {cards}.";
+    let parsed = parse_ability(original, "subtype: warrior, cards: 2");
+    let serialized = parser_formatter::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
 fn test_round_trip_event_foresee() {
     let original = "{Foresee}.";
     let parsed = parse_ability(original, "foresee: 3");
