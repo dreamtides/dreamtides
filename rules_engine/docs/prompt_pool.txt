@@ -1,7 +1,9 @@
-# Prompt
+# Prompt [Implemented]
   "Allied {plural-subtype} have +{s} spark.",
   "Abandon an ally: This character gains +{s} spark.",
   "When you abandon an ally, this character gains +{s} spark.",
+  // Please generalize "plural subtype" via a predicate
+  // Please generalize "an ally" via a predicate
 
 # Prompt
   "When you {materialize} an allied {subtype}, gain {e}.",

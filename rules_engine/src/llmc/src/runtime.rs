@@ -33,8 +33,21 @@ pub fn run_runtime(
     }
 }
 
+struct StreamState {
+    current_tool: Option<String>,
+    accumulated_input: String,
+}
+
+impl StreamState {
+    fn new() -> Self {
+        Self { current_tool: None, accumulated_input: String::new() }
+    }
+}
+
 /// Process Claude's stream-json output and print readable text.
 fn process_claude_stream(reader: impl BufRead) -> Result<()> {
+    let mut state = StreamState::new();
+
     for line in reader.lines() {
         let line = line.context("Failed to read line from claude output")?;
         if line.trim().is_empty() {
@@ -56,14 +69,11 @@ fn process_claude_stream(reader: impl BufRead) -> Result<()> {
         match event_type {
             Some("stream_event") => {
                 if let Some(event) = parsed.get("event") {
-                    process_stream_event(event)?;
+                    process_stream_event(event, &mut state)?;
                 }
             }
-            Some("message_start") => {
-                // Silence message_start events
-            }
-            Some("message_stop") => {
-                // Silence message_stop events
+            Some("tool_result") => {
+                process_tool_result(&parsed, &mut state)?;
             }
             Some("error") => {
                 if let Some(error_msg) = parsed.get("error").and_then(|e| e.get("message")) {
@@ -71,8 +81,8 @@ fn process_claude_stream(reader: impl BufRead) -> Result<()> {
                 }
             }
             _ => {
-                // Print unknown event types for debugging
-                eprintln!("[DEBUG] {}", serde_json::to_string_pretty(&parsed)?);
+                // Silently ignore unknown event types (message_start,
+                // message_stop, assistant, etc.)
             }
         }
     }
@@ -80,7 +90,7 @@ fn process_claude_stream(reader: impl BufRead) -> Result<()> {
     Ok(())
 }
 
-fn process_stream_event(event: &Value) -> Result<()> {
+fn process_stream_event(event: &Value, state: &mut StreamState) -> Result<()> {
     let event_type = event.get("type").and_then(|v| v.as_str());
 
     match event_type {
@@ -94,7 +104,11 @@ fn process_stream_event(event: &Value) -> Result<()> {
                     }
                     Some("tool_use") => {
                         if let Some(name) = content_block.get("name").and_then(|v| v.as_str()) {
-                            print!("\n[Tool: {name}] ");
+                            state.current_tool = Some(name.to_string());
+                            state.accumulated_input.clear();
+
+                            // Print initial tool header
+                            print!("\n[Tool: {name}");
                             std::io::Write::flush(&mut std::io::stdout())?;
                         }
                     }
@@ -113,25 +127,138 @@ fn process_stream_event(event: &Value) -> Result<()> {
                         }
                     }
                     Some("thinking_delta") => {
-                        // Optionally print thinking text
                         if let Some(text) = delta.get("thinking").and_then(|v| v.as_str()) {
                             print!("{text}");
                             std::io::Write::flush(&mut std::io::stdout())?;
                         }
                     }
                     Some("input_json_delta") => {
-                        // Tool input - could optionally display
+                        if let Some(partial) = delta.get("partial_json").and_then(|v| v.as_str()) {
+                            state.accumulated_input.push_str(partial);
+                        }
                     }
                     _ => {}
                 }
             }
         }
         Some("content_block_stop") => {
-            println!(); // Newline after block completes
+            // Display tool details if we accumulated input
+            if state.current_tool.is_some() && !state.accumulated_input.is_empty() {
+                if let Ok(input) = serde_json::from_str::<Value>(&state.accumulated_input) {
+                    display_tool_details(state.current_tool.as_deref().unwrap(), &input)?;
+                }
+                state.current_tool = None;
+                state.accumulated_input.clear();
+            } else if state.current_tool.is_some() {
+                // Close the bracket if no input was shown
+                println!("]");
+                state.current_tool = None;
+            } else {
+                println!(); // Newline after text/thinking blocks
+            }
         }
         _ => {}
     }
 
+    Ok(())
+}
+
+fn display_tool_details(tool_name: &str, input: &Value) -> Result<()> {
+    match tool_name {
+        "Read" => {
+            if let Some(path) = input.get("file_path").and_then(|v| v.as_str()) {
+                println!(": {path}]");
+            } else {
+                println!("]");
+            }
+        }
+        "Edit" | "Write" => {
+            if let Some(path) = input.get("file_path").and_then(|v| v.as_str()) {
+                println!(": {path}]");
+            } else {
+                println!("]");
+            }
+        }
+        "Bash" => {
+            if let Some(cmd) = input.get("command").and_then(|v| v.as_str()) {
+                println!(": {cmd}]");
+            } else {
+                println!("]");
+            }
+        }
+        "TodoWrite" => {
+            println!("]");
+            if let Some(todos) = input.get("todos").and_then(|v| v.as_array()) {
+                for todo in todos {
+                    if let Some(content) = todo.get("content").and_then(|v| v.as_str())
+                        && let Some(status) = todo.get("status").and_then(|v| v.as_str())
+                    {
+                        let marker = match status {
+                            "completed" => "✓",
+                            "in_progress" => "→",
+                            _ => "·",
+                        };
+                        println!("  {marker} {content}");
+                    }
+                }
+            }
+        }
+        "Glob" => {
+            if let Some(pattern) = input.get("pattern").and_then(|v| v.as_str()) {
+                print!(": {pattern}");
+                if let Some(path) = input.get("path").and_then(|v| v.as_str()) {
+                    println!(" in {path}]");
+                } else {
+                    println!("]");
+                }
+            } else {
+                println!("]");
+            }
+        }
+        "Grep" => {
+            if let Some(pattern) = input.get("pattern").and_then(|v| v.as_str()) {
+                println!(": \"{pattern}\"]");
+            } else {
+                println!("]");
+            }
+        }
+        _ => {
+            // For other tools, just close the bracket
+            println!("]");
+        }
+    }
+    Ok(())
+}
+
+fn process_tool_result(parsed: &Value, _state: &mut StreamState) -> Result<()> {
+    // Extract tool name and result - only process Bash results
+    if let Some("Bash") = parsed.get("tool_name").and_then(|v| v.as_str()) {
+        // Show exit code and output summary for bash commands
+        if let Some(result) = parsed.get("result") {
+            if let Some(exit_code) = result.get("exit_code").and_then(Value::as_i64) {
+                if exit_code == 0 {
+                    println!("  → Exit code: {exit_code} (success)");
+                } else {
+                    println!("  → Exit code: {exit_code} (FAILED)");
+                }
+            }
+
+            // Show truncated output
+            if let Some(output) = result.get("output").and_then(|v| v.as_str()) {
+                let lines: Vec<_> = output.lines().collect();
+                if lines.len() <= 5 {
+                    for line in lines {
+                        println!("  {line}");
+                    }
+                } else {
+                    for line in &lines[..3] {
+                        println!("  {line}");
+                    }
+                    println!("  ... ({} more lines)", lines.len() - 3);
+                }
+            }
+        }
+    }
     Ok(())
 }
 
@@ -187,7 +314,6 @@ fn run_claude(
         .arg("--verbose")
         .arg("--output-format")
         .arg("stream-json")
-        .arg("--replay-user-messages")
         .arg("--include-partial-messages")
         .arg("--permission-mode")
         .arg("bypassPermissions")
