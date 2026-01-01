@@ -20,6 +20,10 @@ pub fn run_runtime(
     background: bool,
     claude_config: Option<ClaudeConfig>,
 ) -> Result<RuntimeOutcome> {
+    println!("=== LLMC PROMPT ===");
+    println!("{prompt}");
+    println!("=== END PROMPT ===\n");
+
     match runtime {
         Runtime::Codex => self::run_codex(prompt, repo_root, worktree, background),
         Runtime::Claude => self::run_claude(prompt, repo_root, worktree, background, claude_config),
@@ -73,13 +77,7 @@ fn run_claude(
     let config = claude_config.unwrap_or_default();
     let mut command = Command::new("claude");
 
-    command
-        .arg("-p")
-        .arg(prompt)
-        .arg("--output-format")
-        .arg("stream-json")
-        .env("WORKTREE", worktree)
-        .current_dir(worktree);
+    command.arg("-p").arg(prompt).arg("--verbose").env("WORKTREE", worktree).current_dir(worktree);
 
     if let Some(model) = &config.model {
         command.arg("--model").arg(model);

@@ -4,6 +4,12 @@ use std::path::{Path, PathBuf};
 use anyhow::{Context, Result};
 
 /// Assemble the user prompt from inline and file inputs.
+///
+/// If a prompt pool is provided, its content will replace any `{{PROMPT_POOL}}`
+/// placeholder found in the assembled prompt. If no placeholder is found, the
+/// pool content will be prepended to the prompt.
+///
+/// Returns an error if any prompt input is empty or whitespace-only.
 pub fn assemble_user_prompt(
     prompt: Option<&str>,
     prompt_files: &[PathBuf],
@@ -11,28 +17,49 @@ pub fn assemble_user_prompt(
 ) -> Result<String> {
     let mut sections = Vec::new();
 
-    if let Some(pool_path) = prompt_pool {
-        let pool_prompt = process_prompt_pool(pool_path)?;
-        if !pool_prompt.trim().is_empty() {
-            sections.push(pool_prompt);
-        }
-    }
-
-    if let Some(prompt) = prompt
-        && !prompt.trim().is_empty()
-    {
+    if let Some(prompt) = prompt {
+        anyhow::ensure!(
+            !prompt.trim().is_empty(),
+            "Prompt argument (--prompt) is empty or whitespace-only"
+        );
         sections.push(prompt.to_string());
     }
 
     for path in prompt_files {
         let contents = fs::read_to_string(path)
             .with_context(|| format!("Failed to read prompt file {path:?}"))?;
-        if !contents.trim().is_empty() {
-            sections.push(contents);
+        anyhow::ensure!(
+            !contents.trim().is_empty(),
+            "Prompt file {path:?} is empty or whitespace-only"
+        );
+        sections.push(contents);
+    }
+
+    let mut assembled = sections.join("\n\n");
+
+    if let Some(pool_path) = prompt_pool {
+        let pool_prompt = process_prompt_pool(pool_path)?;
+        if !pool_prompt.trim().is_empty() {
+            // If there's a placeholder, replace it; otherwise prepend
+            if assembled.contains("{{PROMPT_POOL}}") {
+                assembled = assembled.replace("{{PROMPT_POOL}}", &pool_prompt);
+            } else {
+                // Backward compatibility: prepend if no placeholder found
+                assembled = if assembled.is_empty() {
+                    pool_prompt
+                } else {
+                    format!("{pool_prompt}\n\n{assembled}")
+                };
+            }
         }
     }
 
-    Ok(sections.join("\n\n"))
+    anyhow::ensure!(
+        !assembled.trim().is_empty(),
+        "Final assembled prompt is empty. Provide at least one of: --prompt, --prompt-file, or --prompt-pool"
+    );
+
+    Ok(assembled)
 }
 
 /// Wrap a user prompt with the fixed LLMC preamble.
