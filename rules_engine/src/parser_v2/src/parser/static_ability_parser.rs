@@ -13,8 +13,12 @@ pub fn static_ability_parser<'a>(
 
 fn standard_static_ability<'a>(
 ) -> impl Parser<'a, ParserInput<'a>, StandardStaticAbility, ParserExtra<'a>> + Clone {
-    choice((allied_spark_bonus(), enemy_cards_cost_increase(), your_cards_cost_modification()))
-        .boxed()
+    choice((
+        allied_spark_bonus(),
+        enemy_cards_cost_increase(),
+        your_cards_cost_modification(),
+    ))
+    .boxed()
 }
 
 fn your_cards_cost_modification<'a>(

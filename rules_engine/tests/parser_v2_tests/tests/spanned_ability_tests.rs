@@ -257,9 +257,10 @@ fn test_spanned_ability_abandon_an_ally_this_character_gains_spark() {
 
 #[test]
 fn test_spanned_ability_when_you_abandon_an_ally_this_character_gains_spark() {
-    let SpannedAbility::Triggered(triggered) =
-        parse_spanned_ability("When you abandon an ally, this character gains +{s} spark.", "s: 2")
-    else {
+    let SpannedAbility::Triggered(triggered) = parse_spanned_ability(
+        "When you abandon an ally, this character gains +{s} spark.",
+        "s: 2",
+    ) else {
         panic!("Expected Triggered ability");
     };
 
