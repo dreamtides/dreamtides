@@ -54,6 +54,19 @@ fn test_when_you_play_an_event_gain_energy() {
 }
 
 #[test]
+fn test_when_you_materialize_an_ally_gain_energy() {
+    let result = parse_ability("When you {materialize} an ally, gain {e}.", "e: 1");
+    assert_ron_snapshot!(result, @r###"
+    Triggered(TriggeredAbility(
+      trigger: Materialize(Another(Character)),
+      effect: Effect(GainEnergy(
+        gains: Energy(1),
+      )),
+    ))
+    "###);
+}
+
+#[test]
 fn test_when_you_play_an_event_foresee() {
     let result = parse_ability("When you play an event, {foresee}.", "foresee: 1");
     assert_ron_snapshot!(result, @r###"

@@ -49,7 +49,7 @@
   "When you discard a card, {kindle}.", // Implemented
   "When you play an event, gain {e}", // Implemented
   "When you play an event, {foresee}.", // Implemented
-  "When you {materialize} an ally, gain {e}.",
+  "When you {materialize} an ally, gain {e}.", // Implemented
   "When you {materialize} a character, this character gains +{s} spark.",
   "When you play {a-subtype}, draw {cards}.",
   "When you abandon a character, draw {cards}.",

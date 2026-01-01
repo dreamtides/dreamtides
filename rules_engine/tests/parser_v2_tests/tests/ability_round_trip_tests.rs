@@ -26,6 +26,14 @@ fn test_round_trip_at_end_of_turn_gain_energy() {
 }
 
 #[test]
+fn test_round_trip_when_you_materialize_an_ally_gain_energy() {
+    let original = "When you {materialize} an ally, gain {e}.";
+    let parsed = parse_ability(original, "e: 1");
+    let serialized = parser_formatter::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
 fn test_round_trip_event_foresee() {
     let original = "{Foresee}.";
     let parsed = parse_ability(original, "foresee: 3");

@@ -29,6 +29,25 @@ fn test_spanned_ability_at_end_of_turn() {
 }
 
 #[test]
+fn test_spanned_ability_when_you_materialize_an_ally() {
+    let SpannedAbility::Triggered(triggered) =
+        parse_spanned_ability("When you {materialize} an ally, gain {e}.", "e: 1")
+    else {
+        panic!("Expected Triggered ability");
+    };
+
+    assert_eq!(triggered.once_per_turn, None);
+    assert_eq!(triggered.trigger.text, "When you {materialize} an ally");
+    assert_valid_span(&triggered.trigger.span);
+
+    let SpannedEffect::Effect(effect) = triggered.effect else {
+        panic!("Expected Effect, got Modal");
+    };
+    assert_eq!(effect.text.trim(), "gain {e}.");
+    assert_valid_span(&effect.span);
+}
+
+#[test]
 fn test_parse_simple_event_draw() {
     let input = "Draw 2.";
     let ability = Ability::Event(EventAbility {
