@@ -5,15 +5,17 @@
   // Please generalize "plural subtype" via a predicate
   // Please generalize "an ally" via a predicate
 
-# Prompt
+# Prompt [Implemented]
   "When you {materialize} an allied {subtype}, gain {e}.",
   "When you play a {fast} card, gain {points}.",
   "{Judgment} Gain {e} for each allied {subtype}.",
+  // please generalize fast, subtype, etc via predicates
 
 # Prompt
   "{Judgment} Gain {e} for each allied character.",
   "{MaterializedJudgment} With {count-allied-subtype}, gain {e}.",
   "{Judgment} With {count-allied-subtype}, gain {e}.",
+  // Please generalize 'character', count via predicates
 
 # Prompt
   "{MaterializedJudgment} With {count-allied-subtype}, draw {cards}.",
