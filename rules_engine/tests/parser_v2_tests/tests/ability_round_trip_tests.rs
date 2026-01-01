@@ -468,3 +468,35 @@ fn test_round_trip_when_you_abandon_an_ally_this_character_gains_spark() {
     let serialized = parser_formatter::serialize_ability(&parsed);
     assert_eq!(original, serialized);
 }
+
+#[test]
+fn test_round_trip_when_you_materialize_an_allied_subtype_gain_energy() {
+    let original = "When you {materialize} an allied {subtype}, gain {e}.";
+    let parsed = parse_ability(original, "subtype: warrior, e: 1");
+    let serialized = parser_formatter::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_when_you_play_a_fast_card_gain_points() {
+    let original = "When you play a {fast} card, gain {points}.";
+    let parsed = parse_ability(original, "points: 1");
+    let serialized = parser_formatter::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_judgment_gain_energy_for_each_allied_subtype() {
+    let original = "{Judgment} Gain {e} for each allied {subtype}.";
+    let parsed = parse_ability(original, "subtype: warrior, e: 1");
+    let serialized = parser_formatter::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_judgment_gain_energy_for_each_allied_character() {
+    let original = "{Judgment} Gain {e} for each allied character.";
+    let parsed = parse_ability(original, "e: 1");
+    let serialized = parser_formatter::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}

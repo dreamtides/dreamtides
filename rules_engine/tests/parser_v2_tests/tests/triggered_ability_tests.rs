@@ -230,3 +230,67 @@ fn test_when_you_play_an_event_foresee() {
     ))
     "###);
 }
+
+#[test]
+fn test_when_you_materialize_an_allied_subtype_gain_energy() {
+    let result = parse_ability(
+        "When you {materialize} an allied {subtype}, gain {e}.",
+        "subtype: warrior, e: 1",
+    );
+    assert_ron_snapshot!(result, @r###"
+    Triggered(TriggeredAbility(
+      trigger: Materialize(Another(CharacterType(Warrior))),
+      effect: Effect(GainEnergy(
+        gains: Energy(1),
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_when_you_play_a_fast_card_gain_points() {
+    let result = parse_ability("When you play a {fast} card, gain {points}.", "points: 1");
+    assert_ron_snapshot!(result, @r###"
+    Triggered(TriggeredAbility(
+      trigger: Play(Any(Fast(
+        target: Card,
+      ))),
+      effect: Effect(GainPoints(
+        gains: Points(1),
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_judgment_gain_energy_for_each_allied_subtype() {
+    let result =
+        parse_ability("{Judgment} Gain {e} for each allied {subtype}.", "subtype: warrior, e: 1");
+    assert_ron_snapshot!(result, @r###"
+    Triggered(TriggeredAbility(
+      trigger: Keywords([
+        Judgment,
+      ]),
+      effect: Effect(GainEnergyForEach(
+        gains: Energy(1),
+        for_each: Another(CharacterType(Warrior)),
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_judgment_gain_energy_for_each_allied_character() {
+    let result = parse_ability("{Judgment} Gain {e} for each allied character.", "e: 1");
+    assert_ron_snapshot!(result, @r###"
+    Triggered(TriggeredAbility(
+      trigger: Keywords([
+        Judgment,
+      ]),
+      effect: Effect(GainEnergyForEach(
+        gains: Energy(1),
+        for_each: Another(Character),
+      )),
+    ))
+    "###);
+}

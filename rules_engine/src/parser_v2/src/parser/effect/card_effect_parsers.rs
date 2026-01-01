@@ -1,3 +1,4 @@
+use ability_data::quantity_expression_data::QuantityExpression;
 use ability_data::standard_effect::StandardEffect;
 use chumsky::prelude::*;
 use core_data::numerics::{Energy, Points};
@@ -11,7 +12,9 @@ pub fn parser<'a>() -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserEx
     choice((
         draw_cards(),
         discard_cards(),
+        gain_energy_for_each(),
         gain_energy(),
+        gain_points_for_each(),
         gain_points(),
         return_from_void_to_hand(),
         return_to_hand(),
@@ -34,9 +37,33 @@ pub fn gain_energy<'a>() -> impl Parser<'a, ParserInput<'a>, StandardEffect, Par
     word("gain").ignore_then(energy()).map(|n| StandardEffect::GainEnergy { gains: Energy(n) })
 }
 
+pub fn gain_energy_for_each<'a>(
+) -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
+    word("gain")
+        .ignore_then(energy())
+        .then_ignore(words(&["for", "each"]))
+        .then(predicate_parser::predicate_parser())
+        .map(|(gains, for_each)| StandardEffect::GainEnergyForEach {
+            gains: Energy(gains),
+            for_each,
+        })
+}
+
 pub fn gain_points<'a>() -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone
 {
     word("gain").ignore_then(points()).map(|n| StandardEffect::GainPoints { gains: Points(n) })
+}
+
+pub fn gain_points_for_each<'a>(
+) -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
+    word("gain")
+        .ignore_then(points())
+        .then_ignore(words(&["for", "each"]))
+        .then(predicate_parser::predicate_parser())
+        .map(|(gains, for_each)| StandardEffect::GainPointsForEach {
+            gain: Points(gains),
+            for_count: QuantityExpression::Matching(for_each),
+        })
 }
 
 pub fn return_to_hand<'a>(

@@ -541,3 +541,81 @@ fn test_spanned_dissolve_enemy_with_cost_reclaim() {
     assert_eq!(name.text, "{ReclaimForCost}");
     assert_valid_span(&name.span);
 }
+
+#[test]
+fn test_spanned_when_you_materialize_an_allied_subtype_gain_energy() {
+    let SpannedAbility::Triggered(triggered) = parse_spanned_ability(
+        "When you {materialize} an allied {subtype}, gain {e}.",
+        "subtype: warrior, e: 1",
+    ) else {
+        panic!("Expected Triggered ability");
+    };
+
+    assert_eq!(triggered.once_per_turn, None);
+    assert_eq!(triggered.trigger.text, "When you {materialize} an allied {subtype}");
+    assert_valid_span(&triggered.trigger.span);
+
+    let SpannedEffect::Effect(effect) = triggered.effect else {
+        panic!("Expected Effect, got Modal");
+    };
+    assert_eq!(effect.text.trim(), "gain {e}.");
+    assert_valid_span(&effect.span);
+}
+
+#[test]
+fn test_spanned_when_you_play_a_fast_card_gain_points() {
+    let SpannedAbility::Triggered(triggered) =
+        parse_spanned_ability("When you play a {fast} card, gain {points}.", "points: 1")
+    else {
+        panic!("Expected Triggered ability");
+    };
+
+    assert_eq!(triggered.once_per_turn, None);
+    assert_eq!(triggered.trigger.text, "When you play a {fast} card");
+    assert_valid_span(&triggered.trigger.span);
+
+    let SpannedEffect::Effect(effect) = triggered.effect else {
+        panic!("Expected Effect, got Modal");
+    };
+    assert_eq!(effect.text.trim(), "gain {points}.");
+    assert_valid_span(&effect.span);
+}
+
+#[test]
+fn test_spanned_judgment_gain_energy_for_each_allied_subtype() {
+    let SpannedAbility::Triggered(triggered) = parse_spanned_ability(
+        "{Judgment} Gain {e} for each allied {subtype}.",
+        "subtype: warrior, e: 1",
+    ) else {
+        panic!("Expected Triggered ability");
+    };
+
+    assert_eq!(triggered.once_per_turn, None);
+    assert_eq!(triggered.trigger.text, "{Judgment}");
+    assert_valid_span(&triggered.trigger.span);
+
+    let SpannedEffect::Effect(effect) = triggered.effect else {
+        panic!("Expected Effect, got Modal");
+    };
+    assert_eq!(effect.text.trim(), "Gain {e} for each allied {subtype}.");
+    assert_valid_span(&effect.span);
+}
+
+#[test]
+fn test_spanned_judgment_gain_energy_for_each_allied_character() {
+    let SpannedAbility::Triggered(triggered) =
+        parse_spanned_ability("{Judgment} Gain {e} for each allied character.", "e: 1")
+    else {
+        panic!("Expected Triggered ability");
+    };
+
+    assert_eq!(triggered.once_per_turn, None);
+    assert_eq!(triggered.trigger.text, "{Judgment}");
+    assert_valid_span(&triggered.trigger.span);
+
+    let SpannedEffect::Effect(effect) = triggered.effect else {
+        panic!("Expected Effect, got Modal");
+    };
+    assert_eq!(effect.text.trim(), "Gain {e} for each allied character.");
+    assert_valid_span(&effect.span);
+}

@@ -15,6 +15,7 @@ fn specific_predicates<'a>() -> impl Parser<'a, ParserInput<'a>, Predicate, Pars
         this_parser(),
         enemy_or_ally_parser(),
         non_subtype_enemy_parser(),
+        allied_parser(),
         enemy_parser(),
         ally_parser(),
     ))
@@ -51,6 +52,10 @@ fn enemy_parser<'a>() -> impl Parser<'a, ParserInput<'a>, Predicate, ParserExtra
     word("enemy")
         .ignore_then(card_predicate_parser::parser().or_not())
         .map(|pred| Predicate::Enemy(pred.unwrap_or(CardPredicate::Character)))
+}
+
+fn allied_parser<'a>() -> impl Parser<'a, ParserInput<'a>, Predicate, ParserExtra<'a>> + Clone {
+    word("allied").ignore_then(card_predicate_parser::parser()).map(Predicate::Another)
 }
 
 fn ally_parser<'a>() -> impl Parser<'a, ParserInput<'a>, Predicate, ParserExtra<'a>> + Clone {
