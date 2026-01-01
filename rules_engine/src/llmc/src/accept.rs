@@ -11,7 +11,7 @@ pub fn run(args: &AcceptArgs, repo_override: Option<&Path>) -> Result<()> {
     let paths = config::repo_paths(repo_override)?;
     let state_path = paths.llmc_dir.join("state.json");
     let state = state::load_state(&state_path)?;
-    let agent_id = state::resolve_agent_id(args.agent.as_deref(), &state)?;
+    let agent_id = state::resolve_reviewed_agent_id(args.agent.as_deref(), &state)?;
     let Some(record) = state.agents.get(&agent_id) else {
         return Err(anyhow::anyhow!("Unknown agent id: {agent_id}"));
     };
@@ -47,6 +47,9 @@ pub fn run(args: &AcceptArgs, repo_override: Option<&Path>) -> Result<()> {
     let mut state = state::load_state(&state_path)?;
     if state.agents.remove(&agent_id).is_none() {
         return Err(anyhow::anyhow!("Unknown agent id: {agent_id}"));
+    }
+    if state.last_reviewed_agent.as_deref() == Some(agent_id.as_str()) {
+        state.last_reviewed_agent = None;
     }
     state::save_state(&state_path, &state)?;
 

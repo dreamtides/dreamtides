@@ -10,8 +10,13 @@ use crate::{config, git_ops, rebase};
 pub fn run(args: &ReviewArgs, repo_override: Option<&Path>) -> Result<()> {
     let paths = config::repo_paths(repo_override)?;
     let state_path = paths.llmc_dir.join("state.json");
-    let state = state::load_state(&state_path)?;
+    let mut state = state::load_state(&state_path)?;
     let agent_id = state::resolve_agent_id(args.agent.as_deref(), &state)?;
+    if !state.agents.contains_key(&agent_id) {
+        return Err(anyhow::anyhow!("Unknown agent id: {agent_id}"));
+    }
+    state.last_reviewed_agent = Some(agent_id.clone());
+    state::save_state(&state_path, &state)?;
     println!("agent_id={agent_id}");
 
     rebase::run(&AgentArgs { agent: Some(agent_id.clone()) }, repo_override)?;

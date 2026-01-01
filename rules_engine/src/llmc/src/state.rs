@@ -27,6 +27,7 @@ pub struct AgentRecord {
 #[serde(default)]
 pub struct StateFile {
     pub agents: BTreeMap<String, AgentRecord>,
+    pub last_reviewed_agent: Option<String>,
 }
 
 #[derive(Copy, Clone, Debug, Eq, PartialEq, Serialize, Deserialize)]
@@ -67,6 +68,20 @@ pub fn resolve_agent_id(agent: Option<&str>, state: &StateFile) -> Result<String
             return Err(anyhow::anyhow!("No agents in needs_review state"));
         };
         return Ok(agent_id);
+    };
+
+    Ok(agent.to_string())
+}
+
+/// Resolve an agent id or use the most recently reviewed agent.
+pub fn resolve_reviewed_agent_id(agent: Option<&str>, state: &StateFile) -> Result<String> {
+    let Some(agent) = agent else {
+        let Some(agent_id) = state.last_reviewed_agent.as_deref() else {
+            return Err(anyhow::anyhow!(
+                "No last reviewed agent found; run llmc review or pass --agent"
+            ));
+        };
+        return Ok(agent_id.to_string());
     };
 
     Ok(agent.to_string())
