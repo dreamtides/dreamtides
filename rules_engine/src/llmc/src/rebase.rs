@@ -52,7 +52,7 @@ fn run_with_target(
     if !rebase_status.success() {
         let status = git_ops::status_porcelain(&record.worktree_path)?;
         let user_prompt = format!(
-            "Resolve the rebase conflicts for agent {agent_id}.\n\nRebase target: {base_branch}\n\nCurrent git status --porcelain:\n{status}\n\nFinish the rebase with `git rebase --continue`, then run `just check` and `just clippy`.",
+            "Resolve the rebase conflicts for agent {agent_id}.\\n\\nRebase target: {base_branch}\\n\\nCurrent git status --porcelain:\\n{status}\\n\\nFinish the rebase with `git rebase --continue`, then run `just check` and `just clippy`.",
             agent_id = record.agent_id
         );
         let full_prompt =
@@ -65,6 +65,7 @@ fn run_with_target(
             &paths.repo_root,
             &record.worktree_path,
             false,
+            record.claude_config.clone(),
         );
         self::record_runtime_result(&state_path, &record.agent_id, &full_prompt, &outcome)?;
 

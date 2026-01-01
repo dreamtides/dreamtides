@@ -21,6 +21,8 @@ pub struct AgentRecord {
     pub last_run_unix: u64,
     pub status: AgentStatus,
     pub last_pid: Option<u32>,
+    #[serde(default)]
+    pub claude_config: Option<ClaudeConfig>,
 }
 
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
@@ -49,6 +51,17 @@ pub enum Runtime {
     Codex,
     Gemini,
     Cursor,
+}
+
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+#[serde(default)]
+pub struct ClaudeConfig {
+    pub model: Option<String>,
+    pub no_thinking: bool,
+    pub sandbox: Option<String>,
+    pub skip_permissions: bool,
+    pub allowed_tools: Option<String>,
+    pub mcp_config: Vec<String>,
 }
 
 /// Return the oldest agent id in needs_review status.

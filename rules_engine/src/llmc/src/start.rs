@@ -4,7 +4,7 @@ use std::path::{Path, PathBuf};
 use anyhow::{Context, Result};
 
 use crate::cli::StartArgs;
-use crate::state::{self, AgentRecord, AgentStatus, Runtime};
+use crate::state::{self, AgentRecord, AgentStatus, ClaudeConfig, Runtime};
 use crate::{config, git_ops, nouns, prompt, runtime, time};
 
 /// Prepare the initial agent record and state needed for llmc start.
@@ -31,7 +31,6 @@ pub fn run(args: &StartArgs, repo_override: Option<&Path>) -> Result<()> {
     anyhow::ensure!(!state.agents.contains_key(&agent_id), "Agent id already exists: {agent_id}");
 
     let runtime = args.runtime.unwrap_or(Runtime::Codex);
-    anyhow::ensure!(runtime == Runtime::Codex, "Runtime {runtime:?} is not supported yet");
 
     let worktree_path = paths.worktrees_dir.join(format!("agent-{agent_id}"));
     anyhow::ensure!(!worktree_path.exists(), "Worktree already exists: {worktree_path:?}");
@@ -42,6 +41,19 @@ pub fn run(args: &StartArgs, repo_override: Option<&Path>) -> Result<()> {
     let user_prompt =
         prompt::assemble_user_prompt(args.prompt.as_deref(), &self::prompt_files(args))?;
     let full_prompt = prompt::wrap_prompt(&paths.repo_root, &worktree_path, &user_prompt);
+
+    let claude_config = if runtime == Runtime::Claude {
+        Some(ClaudeConfig {
+            model: args.claude_model.clone(),
+            no_thinking: args.claude_no_thinking,
+            sandbox: args.claude_sandbox.clone(),
+            skip_permissions: args.claude_skip_permissions,
+            allowed_tools: args.claude_allowed_tools.clone(),
+            mcp_config: args.claude_mcp_config.clone(),
+        })
+    } else {
+        None
+    };
 
     let now = time::unix_timestamp()?;
 
@@ -56,6 +68,7 @@ pub fn run(args: &StartArgs, repo_override: Option<&Path>) -> Result<()> {
         last_run_unix: now,
         status: AgentStatus::Running,
         last_pid: None,
+        claude_config: claude_config.clone(),
     };
 
     let mut state = state::load_state(&state_path)?;
@@ -68,6 +81,7 @@ pub fn run(args: &StartArgs, repo_override: Option<&Path>) -> Result<()> {
         &paths.repo_root,
         &worktree_path,
         args.background,
+        claude_config,
     );
 
     let mut state = state::load_state(&state_path)?;

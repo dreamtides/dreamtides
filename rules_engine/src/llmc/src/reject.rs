@@ -24,19 +24,25 @@ pub fn run(args: &RejectArgs, repo_override: Option<&Path>) -> Result<()> {
     let updated_prompt = prompt::wrap_prompt(&paths.repo_root, &record.worktree_path, &user_prompt);
 
     let mut state = state::load_state(&state_path)?;
-    let (runtime, worktree_path) = {
+    let (runtime, worktree_path, claude_config) = {
         let Some(record) = state.agents.get_mut(&agent_id) else {
             return Err(anyhow::anyhow!("Unknown agent id: {agent_id}"));
         };
         record.prompt = updated_prompt.clone();
         record.status = AgentStatus::Running;
         record.last_run_unix = time::unix_timestamp()?;
-        (record.runtime, record.worktree_path.clone())
+        (record.runtime, record.worktree_path.clone(), record.claude_config.clone())
     };
     state::save_state(&state_path, &state)?;
 
-    let outcome =
-        runtime::run_runtime(runtime, &updated_prompt, &paths.repo_root, &worktree_path, false);
+    let outcome = runtime::run_runtime(
+        runtime,
+        &updated_prompt,
+        &paths.repo_root,
+        &worktree_path,
+        false,
+        claude_config,
+    );
 
     let mut state = state::load_state(&state_path)?;
     {

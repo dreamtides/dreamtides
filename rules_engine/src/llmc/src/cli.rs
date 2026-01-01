@@ -62,6 +62,28 @@ pub struct StartArgs {
 
     #[arg(long, help = "Write logs to .llmc/logs")]
     pub log: bool,
+
+    #[arg(long, help = "Claude: model to use (sonnet/opus)", value_name = "MODEL")]
+    pub claude_model: Option<String>,
+
+    #[arg(long, help = "Claude: disable thinking")]
+    pub claude_no_thinking: bool,
+
+    #[arg(long, help = "Claude: sandbox mode", value_name = "MODE")]
+    pub claude_sandbox: Option<String>,
+
+    #[arg(long, help = "Claude: skip permission prompts")]
+    pub claude_skip_permissions: bool,
+
+    #[arg(long, help = "Claude: allowed tools (comma-separated)")]
+    pub claude_allowed_tools: Option<String>,
+
+    #[arg(
+        long,
+        help = "Claude: MCP config files or JSON strings (space-separated)",
+        value_name = "CONFIGS"
+    )]
+    pub claude_mcp_config: Vec<String>,
 }
 
 #[derive(Args)]

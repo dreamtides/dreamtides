@@ -248,22 +248,6 @@ Manual verification:
 - Run `llmc start --runtime claude --prompt \"Report the current git status.\" --agent <noun>`.
 - Confirm the worktree and state entry are created and Claude runs headlessly.
 
-### Milestone 9: Agent: Gemini
-Steps:
-- Implement Gemini runtime invocation (`gemini -p`) aligned with the existing prompt and worktree flow.
-- Ensure runtime errors are surfaced with actionable context.
-Manual verification:
-- Run `llmc start --runtime gemini --prompt \"List the files at repo root.\" --agent <noun>`.
-- Confirm the worktree and state entry are created and Gemini runs headlessly.
-
-### Milestone 10: Agent: Cursor
-Steps:
-- Implement Cursor runtime invocation (`cursor --print`) aligned with the existing prompt and worktree flow.
-- Preserve streaming output and exit code behavior.
-Manual verification:
-- Run `llmc start --runtime cursor --prompt \"Explain the AGENTS.md requirements.\" --agent <noun>`.
-- Confirm the worktree and state entry are created and Cursor runs headlessly.
-
 ### Milestone 11: Notifications, Logging, and Polish
 Steps:
 - Add `--notify/--no-notify` with `osascript` notifications on completion.
