@@ -7,21 +7,9 @@ text parser to support new card abilities.
 
 ## Quick Start
 
-### First-Time Setup
-
-Before beginning work, verify the environment is configured:
-
-1. Verify Rust toolchain: `rustc --version && cargo --version`
-2. Install components: `rustup component add clippy rustfmt`
-3. Install nightly rustfmt: `rustup component add rustfmt --toolchain nightly`
-4. Install just: `cargo install just`
-5. Install workspace lints: `cargo install cargo-workspace-lints`
-
-See `rules_engine/docs/environment_setup.md` for complete setup instructions.
-
 ### Progress Tracking
 
-Use the TodoWrite MCP tool to track progress. Create a todo list with:
+Use an internal task list or todowrite mcp to track progress. Create a task list for yourself with:
 
 1. Analyze rules text and review similar cards in rules_text_sorted.json
 2. Implement parser for new syntax
@@ -35,6 +23,8 @@ Use the TodoWrite MCP tool to track progress. Create a todo list with:
 10. Update this guide with improvements discovered
 
 Mark todos as in_progress before starting each step and completed when done.
+
+Do NOT commit the task list to version control, maintain it in memory.
 
 ### Code Style Rules (Critical)
 
