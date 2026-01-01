@@ -138,7 +138,8 @@ fn test_when_you_abandon_an_ally_kindle() {
 
 #[test]
 fn test_when_you_abandon_an_ally_this_character_gains_spark() {
-    let result = parse_ability("When you abandon an ally, this character gains +{s} spark.", "s: 2");
+    let result =
+        parse_ability("When you abandon an ally, this character gains +{s} spark.", "s: 2");
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
       trigger: Abandon(Another(Character)),
