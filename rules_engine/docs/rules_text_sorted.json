@@ -71,9 +71,9 @@
   "When you play a {fast} card, gain {points}.", // Implemented
   "{Judgment} Gain {e} for each allied {subtype}.", // Implemented
   "{Judgment} Gain {e} for each allied character.", // Implemented
-  "{MaterializedJudgment} With {count-allied-subtype}, gain {e}.",
-  "{Judgment} With {count-allied-subtype}, gain {e}.",
-  "{MaterializedJudgment} With {count-allied-subtype}, draw {cards}.",
+  "{MaterializedJudgment} With {count-allied-subtype}, gain {e}.", // Implemented
+  "{Judgment} With {count-allied-subtype}, gain {e}.", // Implemented
+  "{MaterializedJudgment} With {count-allied-subtype}, draw {cards}.", // Implemented
   "Abandon {count-allies}: {Reclaim} this character.",
   "{MaterializedJudgment} \nGain {e}.",
   "{Materialized} Each player discards {discards}.",

@@ -294,3 +294,80 @@ fn test_judgment_gain_energy_for_each_allied_character() {
     ))
     "###);
 }
+
+#[test]
+fn test_judgment_with_count_allied_subtype_gain_energy() {
+    let result = parse_ability(
+        "{Judgment} With {count-allied-subtype}, gain {e}.",
+        "subtype: warrior, allies: 2, e: 3",
+    );
+    assert_ron_snapshot!(result, @r###"
+    Triggered(TriggeredAbility(
+      trigger: Keywords([
+        Judgment,
+      ]),
+      effect: WithOptions(EffectWithOptions(
+        effect: GainEnergy(
+          gains: Energy(3),
+        ),
+        optional: false,
+        condition: Some(PredicateCount(
+          count: 2,
+          predicate: Another(CharacterType(Warrior)),
+        )),
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_materialized_judgment_with_count_allied_subtype_gain_energy() {
+    let result = parse_ability(
+        "{MaterializedJudgment} With {count-allied-subtype}, gain {e}.",
+        "subtype: warrior, allies: 2, e: 3",
+    );
+    assert_ron_snapshot!(result, @r###"
+    Triggered(TriggeredAbility(
+      trigger: Keywords([
+        Materialized,
+        Judgment,
+      ]),
+      effect: WithOptions(EffectWithOptions(
+        effect: GainEnergy(
+          gains: Energy(3),
+        ),
+        optional: false,
+        condition: Some(PredicateCount(
+          count: 2,
+          predicate: Another(CharacterType(Warrior)),
+        )),
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_materialized_judgment_with_count_allied_subtype_draw_cards() {
+    let result = parse_ability(
+        "{MaterializedJudgment} With {count-allied-subtype}, draw {cards}.",
+        "subtype: warrior, allies: 2, cards: 1",
+    );
+    assert_ron_snapshot!(result, @r###"
+    Triggered(TriggeredAbility(
+      trigger: Keywords([
+        Materialized,
+        Judgment,
+      ]),
+      effect: WithOptions(EffectWithOptions(
+        effect: DrawCards(
+          count: 1,
+        ),
+        optional: false,
+        condition: Some(PredicateCount(
+          count: 2,
+          predicate: Another(CharacterType(Warrior)),
+        )),
+      )),
+    ))
+    "###);
+}
