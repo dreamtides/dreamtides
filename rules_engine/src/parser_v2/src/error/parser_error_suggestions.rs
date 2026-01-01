@@ -4,6 +4,7 @@ static PARSER_WORDS: &[&str] = &[
     "abandon",
     "a",
     "allied",
+    "ally",
     "and",
     "an",
     "another",
