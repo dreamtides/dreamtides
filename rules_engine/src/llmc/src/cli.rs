@@ -54,6 +54,13 @@ pub struct StartArgs {
     #[arg(value_name = "PATH", help = "Prompt file to append")]
     pub prompt_file_pos: Option<PathBuf>,
 
+    #[arg(
+        long,
+        value_name = "PATH",
+        help = "Prompt pool file (finds and marks first unimplemented prompt)"
+    )]
+    pub prompt_pool: Option<PathBuf>,
+
     #[arg(long, help = "Run without streaming output")]
     pub background: bool,
 

@@ -38,8 +38,11 @@ pub fn run(args: &StartArgs, repo_override: Option<&Path>) -> Result<()> {
     git_ops::worktree_add(&paths.repo_root, &worktree_path, &format!("agent/{agent_id}"))?;
     git_ops::ensure_clean_worktree(&worktree_path)?;
 
-    let user_prompt =
-        prompt::assemble_user_prompt(args.prompt.as_deref(), &self::prompt_files(args))?;
+    let user_prompt = prompt::assemble_user_prompt(
+        args.prompt.as_deref(),
+        &self::prompt_files(args),
+        args.prompt_pool.as_deref(),
+    )?;
     let full_prompt = prompt::wrap_prompt(&paths.repo_root, &worktree_path, &user_prompt);
 
     let claude_config = if runtime == Runtime::Claude {
