@@ -2,6 +2,7 @@ use ability_data::effect::{Effect, EffectWithOptions};
 use ability_data::standard_effect::StandardEffect;
 use chumsky::prelude::*;
 
+use crate::parser::condition_parser;
 use crate::parser::effect::{
     card_effect_parsers, game_effects_parsers, resource_effect_parsers, spark_effect_parsers,
 };
@@ -20,7 +21,39 @@ pub fn single_effect_parser<'a>(
 
 pub fn effect_or_compound_parser<'a>(
 ) -> impl Parser<'a, ParserInput<'a>, Effect, ParserExtra<'a>> + Clone {
-    choice((optional_effect_parser(), standard_effect_parser())).boxed()
+    choice((optional_effect_parser(), conditional_effect_parser(), standard_effect_parser()))
+        .boxed()
+}
+
+fn conditional_effect_parser<'a>(
+) -> impl Parser<'a, ParserInput<'a>, Effect, ParserExtra<'a>> + Clone {
+    condition_parser::condition_parser()
+        .then(
+            single_effect_parser().separated_by(effect_separator()).at_least(1).collect::<Vec<_>>(),
+        )
+        .then_ignore(period())
+        .map(|(condition, effects)| {
+            if effects.len() == 1 {
+                Effect::WithOptions(EffectWithOptions {
+                    effect: effects.into_iter().next().unwrap(),
+                    optional: false,
+                    trigger_cost: None,
+                    condition: Some(condition),
+                })
+            } else {
+                Effect::List(
+                    effects
+                        .into_iter()
+                        .map(|effect| EffectWithOptions {
+                            effect,
+                            optional: false,
+                            trigger_cost: None,
+                            condition: Some(condition.clone()),
+                        })
+                        .collect(),
+                )
+            }
+        })
 }
 
 fn optional_effect_parser<'a>() -> impl Parser<'a, ParserInput<'a>, Effect, ParserExtra<'a>> + Clone

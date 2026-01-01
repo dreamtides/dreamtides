@@ -11,7 +11,7 @@
   "{Judgment} Gain {e} for each allied {subtype}.",
   // please generalize fast, subtype, etc via predicates
 
-# Prompt
+# Prompt [Implemented]
   "{Judgment} Gain {e} for each allied character.",
   "{MaterializedJudgment} With {count-allied-subtype}, gain {e}.",
   "{Judgment} With {count-allied-subtype}, gain {e}.",

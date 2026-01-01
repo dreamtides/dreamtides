@@ -1,4 +1,5 @@
 use ability_data::ability::Ability;
+use ability_data::condition::Condition;
 use ability_data::cost::Cost;
 use ability_data::effect::Effect;
 use ability_data::named_ability::NamedAbility;
@@ -180,30 +181,70 @@ fn serialize_effect(effect: &Effect) -> String {
     match effect {
         Effect::Effect(standard_effect) => serialize_standard_effect(standard_effect),
         Effect::WithOptions(options) => {
-            if options.optional {
-                format!("you may {}", serialize_standard_effect(&options.effect))
-            } else {
-                serialize_standard_effect(&options.effect)
+            let mut result = String::new();
+            if let Some(condition) = &options.condition {
+                result.push_str(&serialize_condition(condition));
+                result.push(' ');
             }
+            if options.optional {
+                result.push_str(&format!("you may {}", serialize_standard_effect(&options.effect)));
+            } else {
+                result.push_str(&serialize_standard_effect(&options.effect));
+            }
+            result
         }
         Effect::List(effects) => {
             let all_optional = effects.iter().all(|e| e.optional);
+            let has_condition = effects.first().and_then(|e| e.condition.as_ref()).is_some();
             if all_optional && !effects.is_empty() {
                 let effect_strings: Vec<String> = effects
                     .iter()
                     .map(|e| serialize_standard_effect(&e.effect).trim_end_matches('.').to_string())
                     .collect();
-                format!("you may {}.", effect_strings.join(", then "))
+                let mut result = String::new();
+                if has_condition {
+                    if let Some(condition) = &effects[0].condition {
+                        result.push_str(&serialize_condition(condition));
+                        result.push(' ');
+                    }
+                }
+                result.push_str(&format!("you may {}.", effect_strings.join(", then ")));
+                result
             } else {
-                effects
+                let mut result = String::new();
+                if has_condition {
+                    if let Some(condition) = &effects[0].condition {
+                        result.push_str(&serialize_condition(condition));
+                        result.push(' ');
+                    }
+                }
+                let effect_str = effects
                     .iter()
                     .map(|e| capitalize_first_letter(&serialize_standard_effect(&e.effect)))
                     .collect::<Vec<_>>()
-                    .join(" ")
+                    .join(" ");
+                result.push_str(&effect_str);
+                result
             }
         }
         Effect::Modal(_) => {
             unimplemented!("Serialization not yet implemented for modal effects")
+        }
+    }
+}
+fn serialize_condition(condition: &Condition) -> String {
+    match condition {
+        Condition::PredicateCount { count, predicate } => {
+            format!("with {},", serialize_predicate_count(*count, predicate))
+        }
+        _ => unimplemented!("Serialization not yet implemented for this condition type"),
+    }
+}
+fn serialize_predicate_count(_count: u32, predicate: &Predicate) -> String {
+    match predicate {
+        Predicate::Another(CardPredicate::CharacterType(_)) => "{count-allied-subtype}".to_string(),
+        _ => {
+            unimplemented!("Serialization not yet implemented for this predicate count type")
         }
     }
 }

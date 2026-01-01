@@ -500,3 +500,27 @@ fn test_round_trip_judgment_gain_energy_for_each_allied_character() {
     let serialized = parser_formatter::serialize_ability(&parsed);
     assert_eq!(original, serialized);
 }
+
+#[test]
+fn test_round_trip_judgment_with_count_allied_subtype_gain_energy() {
+    let original = "{Judgment} With {count-allied-subtype}, gain {e}.";
+    let parsed = parse_ability(original, "subtype: warrior, allies: 2, e: 3");
+    let serialized = parser_formatter::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_materialized_judgment_with_count_allied_subtype_gain_energy() {
+    let original = "{MaterializedJudgment} With {count-allied-subtype}, gain {e}.";
+    let parsed = parse_ability(original, "subtype: warrior, allies: 2, e: 3");
+    let serialized = parser_formatter::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_materialized_judgment_with_count_allied_subtype_draw_cards() {
+    let original = "{MaterializedJudgment} With {count-allied-subtype}, draw {cards}.";
+    let parsed = parse_ability(original, "subtype: warrior, allies: 2, cards: 1");
+    let serialized = parser_formatter::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}

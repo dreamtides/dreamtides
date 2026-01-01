@@ -103,3 +103,10 @@ pub fn kindle_amount<'a>() -> impl Parser<'a, ParserInput<'a>, u32, ParserExtra<
 pub fn article<'a>() -> impl Parser<'a, ParserInput<'a>, (), ParserExtra<'a>> + Clone {
     choice((word("a"), word("an")))
 }
+
+pub fn count_allied_subtype<'a>(
+) -> impl Parser<'a, ParserInput<'a>, (u32, CardSubtype), ParserExtra<'a>> + Clone {
+    select! {
+        (ResolvedToken::SubtypeCount { count, subtype, .. }, _) => (count, subtype)
+    }
+}
