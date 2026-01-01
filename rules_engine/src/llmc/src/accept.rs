@@ -37,6 +37,14 @@ pub fn run(args: &AcceptArgs, repo_override: Option<&Path>) -> Result<()> {
         )?;
     }
 
+    let range = format!("master..{}", record.branch);
+    let commit_count = git_ops::rev_list_count(&record.worktree_path, &range)?;
+    if commit_count > 1 {
+        let message = git_ops::oldest_commit_message(&record.worktree_path, &range)?;
+        git_ops::reset_soft_to(&record.worktree_path, "master")?;
+        git_ops::commit_with_message(&record.worktree_path, &message)?;
+    }
+
     let commit = git_ops::rev_parse(&record.worktree_path, &record.branch)?;
 
     git_ops::checkout_master(&paths.repo_root)?;

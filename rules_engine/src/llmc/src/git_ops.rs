@@ -1,5 +1,6 @@
+use std::io::Write;
 use std::path::{Path, PathBuf};
-use std::process::{Command, ExitStatus};
+use std::process::{Command, ExitStatus, Stdio};
 
 use anyhow::{Context, Result};
 
@@ -14,6 +15,49 @@ pub fn ensure_clean_worktree(path: &Path) -> Result<()> {
 /// Return `git status --porcelain` output.
 pub fn status_porcelain(path: &Path) -> Result<String> {
     self::git_output(path, &["status", "--porcelain"])
+}
+
+/// Return the oldest commit message for a revision range.
+pub fn oldest_commit_message(repo_root: &Path, range: &str) -> Result<String> {
+    let output =
+        self::git_output(repo_root, &["log", "--reverse", "--format=%B", "-n", "1", range])?;
+
+    Ok(output.trim_end().to_string())
+}
+
+/// Soft reset the current branch to a revision.
+pub fn reset_soft_to(repo_root: &Path, revision: &str) -> Result<()> {
+    self::git_run(repo_root, &["reset", "--soft", revision])
+}
+
+/// Create a commit using a message passed via stdin.
+pub fn commit_with_message(repo_root: &Path, message: &str) -> Result<()> {
+    let mut child = Command::new("git")
+        .arg("-C")
+        .arg(repo_root)
+        .arg("commit")
+        .arg("--file")
+        .arg("-")
+        .stdin(Stdio::piped())
+        .spawn()
+        .with_context(|| format!("Failed to run git commit in {repo_root:?}"))?;
+
+    let message =
+        if message.ends_with('\n') { message.to_string() } else { format!("{message}\n") };
+
+    let Some(mut stdin) = child.stdin.take() else {
+        return Err(anyhow::anyhow!("Failed to open git commit stdin in {repo_root:?}"));
+    };
+    stdin
+        .write_all(message.as_bytes())
+        .with_context(|| format!("Failed to write commit message in {repo_root:?}"))?;
+    drop(stdin);
+
+    let status =
+        child.wait().with_context(|| format!("Failed to wait on git commit in {repo_root:?}"))?;
+    anyhow::ensure!(status.success(), "git commit failed in {repo_root:?}");
+
+    Ok(())
 }
 
 /// Check if a revision is an ancestor of another.
