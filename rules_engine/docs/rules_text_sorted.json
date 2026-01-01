@@ -54,12 +54,12 @@
   "When you play {a-subtype}, draw {cards}.", // Implemented
   "When you abandon a character, draw {cards}.", // Implemented
   "When you abandon a character, gain {points}.", // Implemented
-  "When you abandon an ally, {kindle}.",
-  "When an ally is {dissolved}, gain {points}.",
-  "When an ally is {dissolved}, draw {cards}.",
-  "When an ally is {dissolved}, gain {e}.",
-  "When an ally is {banished}, {kindle}.",
-  "When an ally is {banished}, this character gains +{s} spark.",
+  "When you abandon an ally, {kindle}.", // Implemented
+  "When an ally is {dissolved}, gain {points}.", // Implemented
+  "When an ally is {dissolved}, draw {cards}.", // Implemented
+  "When an ally is {dissolved}, gain {e}.", // Implemented
+  "When an ally is {banished}, {kindle}.", // Implemented
+  "When an ally is {banished}, this character gains +{s} spark.", // Implemented
   "At the end of your turn, gain {e}.",
   "Events cost you {e} less.",
   "Characters cost you {e} less.",

@@ -42,6 +42,54 @@ fn test_round_trip_when_you_materialize_a_character_this_character_gains_spark()
 }
 
 #[test]
+fn test_round_trip_when_you_abandon_an_ally_kindle() {
+    let original = "When you abandon an ally, {Kindle}.";
+    let parsed = parse_ability(original, "k: 1");
+    let serialized = parser_formatter::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_when_an_ally_is_dissolved_gain_points() {
+    let original = "When an ally is {dissolved}, gain {points}.";
+    let parsed = parse_ability(original, "points: 2");
+    let serialized = parser_formatter::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_when_an_ally_is_dissolved_draw_cards() {
+    let original = "When an ally is {dissolved}, draw {cards}.";
+    let parsed = parse_ability(original, "cards: 2");
+    let serialized = parser_formatter::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_when_an_ally_is_dissolved_gain_energy() {
+    let original = "When an ally is {dissolved}, gain {e}.";
+    let parsed = parse_ability(original, "e: 1");
+    let serialized = parser_formatter::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_when_an_ally_is_banished_kindle() {
+    let original = "When an ally is {banished}, {Kindle}.";
+    let parsed = parse_ability(original, "k: 1");
+    let serialized = parser_formatter::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_when_an_ally_is_banished_this_character_gains_spark() {
+    let original = "When an ally is {banished}, this character gains +{s} spark.";
+    let parsed = parse_ability(original, "s: 2");
+    let serialized = parser_formatter::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
 fn test_round_trip_when_you_play_a_subtype_draw_cards() {
     let original = "When you play {a-subtype}, draw {cards}.";
     let parsed = parse_ability(original, "subtype: warrior, cards: 2");

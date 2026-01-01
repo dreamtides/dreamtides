@@ -124,6 +124,86 @@ fn test_when_you_abandon_a_character_gain_points() {
 }
 
 #[test]
+fn test_when_you_abandon_an_ally_kindle() {
+    let result = parse_ability("When you abandon an ally, {kindle}.", "k: 1");
+    assert_ron_snapshot!(result, @r###"
+    Triggered(TriggeredAbility(
+      trigger: Abandon(Another(Character)),
+      effect: Effect(Kindle(
+        amount: Spark(1),
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_when_an_ally_is_dissolved_gain_points() {
+    let result = parse_ability("When an ally is {dissolved}, gain {points}.", "points: 2");
+    assert_ron_snapshot!(result, @r###"
+    Triggered(TriggeredAbility(
+      trigger: Dissolved(Another(Character)),
+      effect: Effect(GainPoints(
+        gains: Points(2),
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_when_an_ally_is_dissolved_draw_cards() {
+    let result = parse_ability("When an ally is {dissolved}, draw {cards}.", "cards: 2");
+    assert_ron_snapshot!(result, @r###"
+    Triggered(TriggeredAbility(
+      trigger: Dissolved(Another(Character)),
+      effect: Effect(DrawCards(
+        count: 2,
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_when_an_ally_is_dissolved_gain_energy() {
+    let result = parse_ability("When an ally is {dissolved}, gain {e}.", "e: 1");
+    assert_ron_snapshot!(result, @r###"
+    Triggered(TriggeredAbility(
+      trigger: Dissolved(Another(Character)),
+      effect: Effect(GainEnergy(
+        gains: Energy(1),
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_when_an_ally_is_banished_kindle() {
+    let result = parse_ability("When an ally is {banished}, {kindle}.", "k: 1");
+    assert_ron_snapshot!(result, @r###"
+    Triggered(TriggeredAbility(
+      trigger: Banished(Another(Character)),
+      effect: Effect(Kindle(
+        amount: Spark(1),
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_when_an_ally_is_banished_this_character_gains_spark() {
+    let result =
+        parse_ability("When an ally is {banished}, this character gains +{s} spark.", "s: 2");
+    assert_ron_snapshot!(result, @r###"
+    Triggered(TriggeredAbility(
+      trigger: Banished(Another(Character)),
+      effect: Effect(GainsSpark(
+        target: This,
+        gains: Spark(2),
+      )),
+    ))
+    "###);
+}
+
+#[test]
 fn test_when_you_play_an_event_foresee() {
     let result = parse_ability("When you play an event, {foresee}.", "foresee: 1");
     assert_ron_snapshot!(result, @r###"

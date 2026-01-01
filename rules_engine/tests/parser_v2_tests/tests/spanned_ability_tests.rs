@@ -68,6 +68,64 @@ fn test_spanned_ability_when_you_materialize_a_character_gains_spark() {
 }
 
 #[test]
+fn test_spanned_ability_when_you_abandon_an_ally_kindle() {
+    let SpannedAbility::Triggered(triggered) =
+        parse_spanned_ability("When you abandon an ally, {kindle}.", "k: 1")
+    else {
+        panic!("Expected Triggered ability");
+    };
+
+    assert_eq!(triggered.once_per_turn, None);
+    assert_eq!(triggered.trigger.text, "When you abandon an ally");
+    assert_valid_span(&triggered.trigger.span);
+
+    let SpannedEffect::Effect(effect) = triggered.effect else {
+        panic!("Expected Effect, got Modal");
+    };
+    assert_eq!(effect.text.trim(), "{kindle}.");
+    assert_valid_span(&effect.span);
+}
+
+#[test]
+fn test_spanned_ability_when_an_ally_is_dissolved_gain_points() {
+    let SpannedAbility::Triggered(triggered) =
+        parse_spanned_ability("When an ally is {dissolved}, gain {points}.", "points: 2")
+    else {
+        panic!("Expected Triggered ability");
+    };
+
+    assert_eq!(triggered.once_per_turn, None);
+    assert_eq!(triggered.trigger.text, "When an ally is {dissolved}");
+    assert_valid_span(&triggered.trigger.span);
+
+    let SpannedEffect::Effect(effect) = triggered.effect else {
+        panic!("Expected Effect, got Modal");
+    };
+    assert_eq!(effect.text.trim(), "gain {points}.");
+    assert_valid_span(&effect.span);
+}
+
+#[test]
+fn test_spanned_ability_when_an_ally_is_banished_this_character_gains_spark() {
+    let SpannedAbility::Triggered(triggered) = parse_spanned_ability(
+        "When an ally is {banished}, this character gains +{s} spark.",
+        "s: 2",
+    ) else {
+        panic!("Expected Triggered ability");
+    };
+
+    assert_eq!(triggered.once_per_turn, None);
+    assert_eq!(triggered.trigger.text, "When an ally is {banished}");
+    assert_valid_span(&triggered.trigger.span);
+
+    let SpannedEffect::Effect(effect) = triggered.effect else {
+        panic!("Expected Effect, got Modal");
+    };
+    assert_eq!(effect.text.trim(), "this character gains +{s} spark.");
+    assert_valid_span(&effect.span);
+}
+
+#[test]
 fn test_parse_simple_event_draw() {
     let input = "Draw 2.";
     let ability = Ability::Event(EventAbility {
