@@ -4,6 +4,7 @@ use ability_data::effect::Effect;
 use ability_data::named_ability::NamedAbility;
 use ability_data::predicate::{CardPredicate, Operator, Predicate};
 use ability_data::standard_effect::StandardEffect;
+use ability_data::static_ability::{StandardStaticAbility, StaticAbility};
 use ability_data::trigger_event::{TriggerEvent, TriggerKeyword};
 
 pub fn serialize_ability(ability: &Ability) -> String {
@@ -39,8 +40,8 @@ pub fn serialize_ability(ability: &Ability) -> String {
             result
         }
         Ability::Named(named) => serialize_named_ability(named),
-        Ability::Static(_) => {
-            unimplemented!("Serialization not yet implemented for this ability type")
+        Ability::Static(static_ability) => {
+            capitalize_first_letter(&serialize_static_ability(static_ability))
         }
     }
 }
@@ -134,6 +135,34 @@ pub fn serialize_trigger_event(trigger: &TriggerEvent) -> String {
         }
         TriggerEvent::GainEnergy => "when you gain energy, ".to_string(),
         _ => unimplemented!("Serialization not yet implemented for this trigger type"),
+    }
+}
+
+fn serialize_static_ability(static_ability: &StaticAbility) -> String {
+    match static_ability {
+        StaticAbility::StaticAbility(ability) => serialize_standard_static_ability(ability),
+        StaticAbility::WithOptions(ability) => {
+            if ability.condition.is_none() {
+                serialize_standard_static_ability(&ability.ability)
+            } else {
+                unimplemented!("Serialization not yet implemented for this static ability")
+            }
+        }
+    }
+}
+
+fn serialize_standard_static_ability(ability: &StandardStaticAbility) -> String {
+    match ability {
+        StandardStaticAbility::YourCardsCostIncrease { matching, .. } => {
+            format!("{} cost you {{e}} more.", serialize_card_predicate_plural(matching))
+        }
+        StandardStaticAbility::YourCardsCostReduction { matching, .. } => {
+            format!("{} cost you {{e}} less.", serialize_card_predicate_plural(matching))
+        }
+        StandardStaticAbility::EnemyCardsCostIncrease { matching, .. } => {
+            format!("the opponent's {} cost {{e}} more.", serialize_card_predicate_plural(matching))
+        }
+        _ => unimplemented!("Serialization not yet implemented for this static ability"),
     }
 }
 
@@ -236,6 +265,21 @@ fn serialize_card_predicate(card_predicate: &CardPredicate) -> String {
         CardPredicate::Event => "an event".to_string(),
         CardPredicate::CharacterType(_) => "{a-subtype}".to_string(),
         CardPredicate::Fast { target } => format!("a {{fast}} {}", serialize_fast_target(target)),
+        _ => {
+            unimplemented!("Serialization not yet implemented for this card predicate type")
+        }
+    }
+}
+
+fn serialize_card_predicate_plural(card_predicate: &CardPredicate) -> String {
+    match card_predicate {
+        CardPredicate::Card => "cards".to_string(),
+        CardPredicate::Character => "characters".to_string(),
+        CardPredicate::Event => "events".to_string(),
+        CardPredicate::CharacterType(_) => "{plural-subtype}".to_string(),
+        CardPredicate::Fast { target } => {
+            format!("fast {}", serialize_card_predicate_plural(target))
+        }
         _ => {
             unimplemented!("Serialization not yet implemented for this card predicate type")
         }

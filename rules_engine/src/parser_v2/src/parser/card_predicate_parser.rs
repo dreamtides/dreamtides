@@ -42,16 +42,16 @@ pub fn parser<'a>() -> impl Parser<'a, ParserInput<'a>, CardPredicate, ParserExt
 }
 
 fn card_parser<'a>() -> impl Parser<'a, ParserInput<'a>, CardPredicate, ParserExtra<'a>> + Clone {
-    word("card").to(CardPredicate::Card)
+    choice((word("card"), word("cards"))).to(CardPredicate::Card)
 }
 
 fn character_parser<'a>() -> impl Parser<'a, ParserInput<'a>, CardPredicate, ParserExtra<'a>> + Clone
 {
-    word("character").to(CardPredicate::Character)
+    choice((word("character"), word("characters"))).to(CardPredicate::Character)
 }
 
 fn event_parser<'a>() -> impl Parser<'a, ParserInput<'a>, CardPredicate, ParserExtra<'a>> + Clone {
-    word("event").to(CardPredicate::Event)
+    choice((word("event"), word("events"))).to(CardPredicate::Event)
 }
 
 fn fast_parser<'a>(

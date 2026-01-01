@@ -29,6 +29,18 @@ fn test_spanned_ability_at_end_of_turn() {
 }
 
 #[test]
+fn test_spanned_static_events_cost_less() {
+    let SpannedAbility::Static { text } =
+        parse_spanned_ability("Events cost you {e} less.", "e: 1")
+    else {
+        panic!("Expected Static ability");
+    };
+
+    assert_eq!(text.text, "Events cost you {e} less.");
+    assert_valid_span(&text.span);
+}
+
+#[test]
 fn test_spanned_ability_when_you_materialize_an_ally() {
     let SpannedAbility::Triggered(triggered) =
         parse_spanned_ability("When you {materialize} an ally, gain {e}.", "e: 1")

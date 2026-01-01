@@ -60,10 +60,10 @@
   "When an ally is {dissolved}, gain {e}.", // Implemented
   "When an ally is {banished}, {kindle}.", // Implemented
   "When an ally is {banished}, this character gains +{s} spark.", // Implemented
-  "At the end of your turn, gain {e}.",
-  "Events cost you {e} less.",
-  "Characters cost you {e} less.",
-  "The opponent's events cost {e} more.",
+  "At the end of your turn, gain {e}.", // Implemented
+  "Events cost you {e} less.", // Implemented
+  "Characters cost you {e} less.", // Implemented
+  "The opponent's events cost {e} more.", // Implemented
   "Allied {plural-subtype} have +{s} spark.",
   "Abandon an ally: This character gains +{s} spark.",
   "When you abandon an ally, this character gains +{s} spark.",

@@ -41,6 +41,8 @@ static PARSER_WORDS: &[&str] = &[
     "of",
     "once",
     "or",
+    "opponent",
+    "opponent's",
     "per",
     "play",
     "spark",
