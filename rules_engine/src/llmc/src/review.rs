@@ -2,9 +2,9 @@ use std::path::Path;
 
 use anyhow::{Context, Result};
 
-use crate::cli::{ReviewArgs, ReviewInterface};
+use crate::cli::{AgentArgs, ReviewArgs, ReviewInterface};
 use crate::state::{self, AgentRecord};
-use crate::{config, git_ops};
+use crate::{config, git_ops, rebase};
 
 /// Run the selected review interface for an agent.
 pub fn run(args: &ReviewArgs, repo_override: Option<&Path>) -> Result<()> {
@@ -12,9 +12,24 @@ pub fn run(args: &ReviewArgs, repo_override: Option<&Path>) -> Result<()> {
     let state_path = paths.llmc_dir.join("state.json");
     let state = state::load_state(&state_path)?;
     let agent_id = state::resolve_agent_id(args.agent.as_deref(), &state)?;
+    println!("agent_id={agent_id}");
+
+    rebase::run(&AgentArgs { agent: Some(agent_id.clone()) }, repo_override)?;
+    git_ops::sync_master_to_origin(&paths.repo_root)?;
+    let state = state::load_state(&state_path)?;
     let record =
         state.agents.get(&agent_id).with_context(|| format!("Unknown agent id: {agent_id}"))?;
-    println!("agent_id={agent_id}");
+    if !git_ops::is_ancestor(&paths.repo_root, "master", &record.branch)? {
+        rebase::run_onto_branch(
+            &AgentArgs { agent: Some(agent_id.clone()) },
+            repo_override,
+            "master",
+        )?;
+    }
+
+    let state = state::load_state(&state_path)?;
+    let record =
+        state.agents.get(&agent_id).with_context(|| format!("Unknown agent id: {agent_id}"))?;
 
     match args.interface {
         ReviewInterface::Diff => self::run_diff(record),

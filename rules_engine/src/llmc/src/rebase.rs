@@ -8,8 +8,26 @@ use crate::runtime::{self, RuntimeOutcome};
 use crate::state::{self, AgentStatus};
 use crate::{config, git_ops, prompt, time};
 
-/// Rebase an agent branch onto master and resolve conflicts with Codex.
+/// Rebase an agent branch onto origin/master and resolve conflicts with Codex.
 pub fn run(args: &AgentArgs, repo_override: Option<&Path>) -> Result<()> {
+    self::run_with_target(args, repo_override, "origin/master", true)
+}
+
+/// Rebase an agent branch onto another branch and resolve conflicts with Codex.
+pub fn run_onto_branch(
+    args: &AgentArgs,
+    repo_override: Option<&Path>,
+    base_branch: &str,
+) -> Result<()> {
+    self::run_with_target(args, repo_override, base_branch, false)
+}
+
+fn run_with_target(
+    args: &AgentArgs,
+    repo_override: Option<&Path>,
+    base_branch: &str,
+    fetch_master: bool,
+) -> Result<()> {
     let paths = config::repo_paths(repo_override)?;
     let state_path = paths.llmc_dir.join("state.json");
     let mut state = state::load_state(&state_path)?;
@@ -26,13 +44,15 @@ pub fn run(args: &AgentArgs, repo_override: Option<&Path>) -> Result<()> {
     println!("agent_id={agent_id}");
 
     git_ops::ensure_clean_worktree(&record.worktree_path)?;
-    git_ops::fetch_master(&paths.repo_root)?;
-    let rebase_status = git_ops::rebase_onto_master(&record.worktree_path)?;
+    if fetch_master {
+        git_ops::fetch_master(&paths.repo_root)?;
+    }
+    let rebase_status = git_ops::rebase_onto_branch(&record.worktree_path, base_branch)?;
 
     if !rebase_status.success() {
         let status = git_ops::status_porcelain(&record.worktree_path)?;
         let user_prompt = format!(
-            "Resolve the rebase conflicts for agent {agent_id}.\n\nCurrent git status --porcelain:\n{status}\n\nFinish the rebase with `git rebase --continue`, then run `just check` and `just clippy`.",
+            "Resolve the rebase conflicts for agent {agent_id}.\n\nRebase target: {base_branch}\n\nCurrent git status --porcelain:\n{status}\n\nFinish the rebase with `git rebase --continue`, then run `just check` and `just clippy`.",
             agent_id = record.agent_id
         );
         let full_prompt =

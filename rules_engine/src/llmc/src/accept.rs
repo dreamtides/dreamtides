@@ -28,6 +28,15 @@ pub fn run(args: &AcceptArgs, repo_override: Option<&Path>) -> Result<()> {
 
     rebase::run(&AgentArgs { agent: Some(agent_id.clone()) }, repo_override)?;
 
+    git_ops::sync_master_to_origin(&paths.repo_root)?;
+    if !git_ops::is_ancestor(&paths.repo_root, "master", &record.branch)? {
+        rebase::run_onto_branch(
+            &AgentArgs { agent: Some(agent_id.clone()) },
+            repo_override,
+            "master",
+        )?;
+    }
+
     let commit = git_ops::rev_parse(&record.worktree_path, &record.branch)?;
 
     git_ops::checkout_master(&paths.repo_root)?;

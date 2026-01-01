@@ -16,6 +16,60 @@ pub fn status_porcelain(path: &Path) -> Result<String> {
     self::git_output(path, &["status", "--porcelain"])
 }
 
+/// Check if a revision is an ancestor of another.
+pub fn is_ancestor(repo_root: &Path, ancestor: &str, descendant: &str) -> Result<bool> {
+    let status = Command::new("git")
+        .arg("-C")
+        .arg(repo_root)
+        .arg("merge-base")
+        .arg("--is-ancestor")
+        .arg(ancestor)
+        .arg(descendant)
+        .status()
+        .with_context(|| {
+            format!(
+                "Failed to run git merge-base --is-ancestor {ancestor} {descendant} in {repo_root:?}"
+            )
+        })?;
+
+    if status.success() {
+        return Ok(true);
+    }
+
+    let Some(code) = status.code() else {
+        anyhow::bail!("git merge-base --is-ancestor exited with signal in {repo_root:?}");
+    };
+
+    if code == 1 {
+        return Ok(false);
+    }
+
+    anyhow::bail!("git merge-base --is-ancestor failed with status {status:?} in {repo_root:?}")
+}
+
+/// Update master to include origin/master.
+pub fn sync_master_to_origin(repo_root: &Path) -> Result<()> {
+    self::ensure_clean_worktree(repo_root)?;
+    self::fetch_master(repo_root)?;
+    self::checkout_master(repo_root)?;
+
+    if self::is_ancestor(repo_root, "origin/master", "master")? {
+        return Ok(());
+    }
+
+    if self::is_ancestor(repo_root, "master", "origin/master")? {
+        return self::merge_ff_only(repo_root, "origin/master");
+    }
+
+    let rebase_status = self::rebase_onto_branch(repo_root, "origin/master")?;
+    if rebase_status.success() {
+        return Ok(());
+    }
+
+    let status = self::status_porcelain(repo_root)?;
+    anyhow::bail!("git rebase origin/master failed in {repo_root:?}:\n{status}")
+}
+
 /// Create a new worktree for the agent branch.
 pub fn worktree_add(repo_root: &Path, worktree_path: &Path, branch: &str) -> Result<()> {
     let status = Command::new("git")
@@ -92,11 +146,6 @@ pub fn fetch_from(repo_root: &Path, source: &Path, revision: &str) -> Result<()>
     anyhow::ensure!(status.success(), "git fetch failed for {revision} in {repo_root:?}");
 
     Ok(())
-}
-
-/// Start a rebase of the current branch onto origin/master.
-pub fn rebase_onto_master(worktree_path: &Path) -> Result<ExitStatus> {
-    self::git_status(worktree_path, &["rebase", "origin/master"])
 }
 
 /// Start a rebase of the current branch onto another branch.
