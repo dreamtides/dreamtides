@@ -118,4 +118,7 @@ pub struct RejectArgs {
 
     #[arg(value_name = "PATH", help = "Notes file to append")]
     pub notes_file_pos: Option<PathBuf>,
+
+    #[arg(long, help = "Include the original user prompt context")]
+    pub include_prompt: bool,
 }

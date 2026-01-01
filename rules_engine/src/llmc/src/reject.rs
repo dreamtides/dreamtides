@@ -4,8 +4,8 @@ use std::path::Path;
 use anyhow::{Context, Result};
 
 use crate::cli::RejectArgs;
-use crate::state::{self, AgentStatus};
-use crate::{config, git_ops, runtime, time};
+use crate::state::{self, AgentRecord, AgentStatus};
+use crate::{config, git_ops, prompt, runtime, time};
 
 /// Re-run an agent with reviewer notes and the current diff.
 pub fn run(args: &RejectArgs, repo_override: Option<&Path>) -> Result<()> {
@@ -20,13 +20,8 @@ pub fn run(args: &RejectArgs, repo_override: Option<&Path>) -> Result<()> {
 
     let notes = self::collect_notes(args)?;
     let diff = git_ops::diff_master_agent(&record.worktree_path, &record.branch)?;
-    let mut updated_prompt = record.prompt.clone();
-
-    if !notes.trim().is_empty() {
-        updated_prompt = format!("{updated_prompt}\n\nReviewer notes:\n{notes}");
-    }
-
-    updated_prompt = format!("{updated_prompt}\n\nDiff:\n{diff}");
+    let user_prompt = self::build_reject_prompt(args, record, &notes, &diff);
+    let updated_prompt = prompt::wrap_prompt(&paths.repo_root, &record.worktree_path, &user_prompt);
 
     let mut state = state::load_state(&state_path)?;
     let (runtime, worktree_path) = {
@@ -89,6 +84,46 @@ fn collect_notes(args: &RejectArgs) -> Result<String> {
     }
 
     Ok(notes.join("\n\n"))
+}
+
+fn build_reject_prompt(args: &RejectArgs, record: &AgentRecord, notes: &str, diff: &str) -> String {
+    let mut sections = Vec::new();
+
+    sections.push(
+        "IMPORTANT: PRIMARY TASK IS TO IMPLEMENT THE CODE REVIEW NOTES ONLY. EVERYTHING BELOW IS CONTEXT. DO NOT RESTART THE TASK OR CHANGE ANYTHING ELSE."
+            .to_string(),
+    );
+
+    if !notes.trim().is_empty() {
+        sections.push(format!("Code review notes:\n{notes}"));
+    }
+
+    if args.include_prompt {
+        let original_prompt = self::record_user_prompt(record);
+        if !original_prompt.trim().is_empty() {
+            sections.push(format!("Original prompt:\n{original_prompt}"));
+        }
+    }
+
+    sections.push(format!("Diff:\n{diff}"));
+
+    sections.join("\n\n")
+}
+
+fn record_user_prompt(record: &AgentRecord) -> &str {
+    if !record.user_prompt.trim().is_empty() {
+        return record.user_prompt.as_str();
+    }
+
+    self::extract_user_prompt(&record.prompt)
+}
+
+fn extract_user_prompt(prompt: &str) -> &str {
+    let Some((_, user_prompt)) = prompt.split_once("\n\n") else {
+        return "";
+    };
+
+    user_prompt
 }
 
 fn print_agent_completed(agent_id: &str) {

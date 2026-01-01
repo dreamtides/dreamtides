@@ -15,6 +15,8 @@ pub struct AgentRecord {
     pub worktree_path: PathBuf,
     pub runtime: Runtime,
     pub prompt: String,
+    #[serde(default)]
+    pub user_prompt: String,
     pub created_at_unix: u64,
     pub last_run_unix: u64,
     pub status: AgentStatus,

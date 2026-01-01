@@ -51,6 +51,7 @@ pub fn run(args: &StartArgs, repo_override: Option<&Path>) -> Result<()> {
         worktree_path: worktree_path.clone(),
         runtime,
         prompt: full_prompt.clone(),
+        user_prompt: user_prompt.clone(),
         created_at_unix: now,
         last_run_unix: now,
         status: AgentStatus::Running,
