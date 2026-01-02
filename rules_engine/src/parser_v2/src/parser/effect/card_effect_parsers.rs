@@ -102,6 +102,7 @@ pub fn return_from_void_to_hand<'a>(
 pub fn reclaim_from_void<'a>(
 ) -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
     directive("reclaim")
+        .ignore_then(article().or_not())
         .ignore_then(predicate_parser::predicate_parser())
         .map(|target| StandardEffect::ReturnFromYourVoidToPlay { target })
 }

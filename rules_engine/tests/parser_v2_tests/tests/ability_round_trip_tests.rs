@@ -18,6 +18,14 @@ fn test_round_trip_abandon_an_ally_once_per_turn_gain_points() {
 }
 
 #[test]
+fn test_round_trip_abandon_an_ally_once_per_turn_reclaim_subtype() {
+    let original = "Abandon an ally, once per turn: {Reclaim} a {subtype}.";
+    let parsed = parse_ability(original, "subtype: warrior");
+    let serialized = parser_formatter::serialize_ability(&parsed);
+    assert_eq!("Abandon an ally, once per turn: {Reclaim} {a-subtype}.", serialized);
+}
+
+#[test]
 fn test_round_trip_abandon_an_ally_kindle() {
     let original = "Abandon an ally: {Kindle}.";
     let parsed = parse_ability(original, "k: 1");
@@ -143,6 +151,22 @@ fn test_round_trip_when_you_materialize_a_character_this_character_gains_spark()
     let parsed = parse_ability(original, "s: 2");
     let serialized = parser_formatter::serialize_ability(&parsed);
     assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_once_per_turn_when_you_materialize_a_character_gain_energy() {
+    let original = "Once per turn, when you {materialize} a character, gain {e}.";
+    let parsed = parse_ability(original, "e: 1");
+    let serialized = parser_formatter::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_once_per_turn_when_you_discard_a_card_gain_energy_and_kindle() {
+    let original = "Once per turn, when you discard a card, gain {e} and {kindle}.";
+    let parsed = parse_ability(original, "e: 1, k: 1");
+    let serialized = parser_formatter::serialize_ability(&parsed);
+    assert_eq!("Once per turn, when you discard a card, Gain {e}. {Kindle}.", serialized);
 }
 
 #[test]
