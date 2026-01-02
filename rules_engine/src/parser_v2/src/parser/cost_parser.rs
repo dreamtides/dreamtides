@@ -30,8 +30,7 @@ fn abandon_cost_with_count<'a>() -> impl Parser<'a, ParserInput<'a>, Cost, Parse
 }
 
 fn abandon_cost_single<'a>() -> impl Parser<'a, ParserInput<'a>, Cost, ParserExtra<'a>> + Clone {
-    word("abandon")
-        .ignore_then(article())
-        .ignore_then(predicate_parser::predicate_parser())
-        .map(|target| Cost::AbandonCharacters(target, 1))
+    word("abandon").ignore_then(article()).ignore_then(predicate_parser::predicate_parser()).map(
+        |target| Cost::AbandonCharactersCount { target, count: CollectionExpression::Exactly(1) },
+    )
 }

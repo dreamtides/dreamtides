@@ -174,14 +174,15 @@ fn serialize_standard_static_ability(ability: &StandardStaticAbility) -> String 
 }
 fn serialize_cost(cost: &Cost) -> String {
     match cost {
-        Cost::AbandonCharacters(predicate, count) => {
-            if *count == 1 {
-                format!("abandon {}", serialize_predicate(predicate))
-            } else {
-                "abandon {count-allies}".to_string()
+        Cost::AbandonCharactersCount { target, count } => {
+            use ability_data::collection_expression::CollectionExpression;
+            match count {
+                CollectionExpression::Exactly(1) => {
+                    format!("abandon {}", serialize_predicate(target))
+                }
+                _ => "abandon {count-allies}".to_string(),
             }
         }
-        Cost::AbandonCharactersCount { .. } => "abandon {count-allies}".to_string(),
         Cost::Energy(_) => "{e}".to_string(),
         _ => unimplemented!("Serialization not yet implemented for this cost type"),
     }

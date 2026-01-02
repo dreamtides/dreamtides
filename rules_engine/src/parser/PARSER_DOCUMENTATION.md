@@ -154,7 +154,7 @@ EffectWithOptions { effect, optional, trigger_cost, condition }
 ```
 Cost
 ├── Energy(Energy)
-├── AbandonCharacters(Predicate, u32)
+├── AbandonCharactersCount { target: Predicate, count: CollectionExpression }
 ├── BanishCardsFromYourVoid(u32)
 ├── DiscardCards(CardPredicate, u32)
 ├── DiscardHand

@@ -8,7 +8,6 @@ use crate::predicate::{CardPredicate, Predicate};
 /// ability, such as paying energy.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum Cost {
-    AbandonCharacters(Predicate, u32),
     AbandonCharactersCount { target: Predicate, count: CollectionExpression },
     AbandonDreamscapes(u32),
     AbandonACharacterOrDiscardACard,
