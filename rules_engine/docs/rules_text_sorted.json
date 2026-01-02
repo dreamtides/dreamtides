@@ -8,7 +8,7 @@
   "{Materialized} {Foresee}.", // Implemented
   "{MaterializedJudgment} {Kindle}.", // Implemented
   "{MaterializedJudgment} Gain {e}.", // Implemented
-  "{Prevent} a card.", // Implemented
+  "{Prevent} played a card.", // Implemented
   "{Dissolve} an enemy.", // Implemented
   "{Discover} {a-subtype}.", // Implemented
   "Gain {e}. Draw {cards}.", // Implemented
@@ -86,7 +86,7 @@
   "{Dissolved} You may pay {e} to return this character to your hand.", // Implemented
   "Discard a chosen character from the opponent's hand.", // Implemented
   "Discard a chosen card with cost {e} or less from the opponent's hand.", // Implemented
-  "{Prevent} an event unless the opponent pays {e}.", // Implemented
+  "{Prevent} played event unless the opponent pays {e}.", // Implemented
   "{Materialized} {Prevent} a played card with cost {e} or less.", // Implemented
   "{Materialized} Gain control of an enemy with cost {e} or less.", // Implemented
   "{Prevent} a played card. Put it on top of the opponent's deck.", // Implemented
@@ -210,7 +210,7 @@
   "While you have {$count} or more cards in your void, they have {reclaim} equal to their cost.",
   "{ChooseOne}\n{bullet} {e}: Return an enemy to hand.\n{bullet} {e-}: Draw {cards}.",
   "When the opponent plays a card which could {dissolve} an ally, {prevent} that card.",
-  "{Prevent} an event which could {dissolve} an ally.",
+  "{Prevent} a played event which could {dissolve} an ally.",
   "When you abandon { $allies ->\n  [one] your first ally each turn,\n  *[other] {count-allies} in a turn,\n} {dissolve} an enemy.",
   "(Placeholder card to avoid reusing this art)"
 ]

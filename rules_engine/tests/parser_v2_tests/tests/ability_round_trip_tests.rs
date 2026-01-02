@@ -155,7 +155,7 @@ fn test_round_trip_event_discover() {
 
 #[test]
 fn test_round_trip_event_prevent() {
-    let original = "{Prevent} a card.";
+    let original = "{Prevent} a played card.";
     let parsed = parse_ability(original, "");
     let serialized = parser_formatter::serialize_ability(&parsed);
     assert_eq!(original, serialized);
@@ -451,7 +451,7 @@ fn test_round_trip_discard_chosen_card_with_cost_from_opponent_hand() {
 
 #[test]
 fn test_round_trip_prevent_event_unless_opponent_pays() {
-    let original = "{Prevent} an event unless the opponent pays {e}.";
+    let original = "{Prevent} a played event unless the opponent pays {e}.";
     let parsed = parse_ability(original, "e: 1");
     let serialized = parser_formatter::serialize_ability(&parsed);
     assert_eq!(original, serialized);
@@ -462,7 +462,7 @@ fn test_round_trip_materialized_prevent_played_card_with_cost() {
     let original = "{Materialized} {Prevent} a played card with cost {e} or less.";
     let parsed = parse_ability(original, "e: 3");
     let serialized = parser_formatter::serialize_ability(&parsed);
-    assert_eq!("{Materialized} {Prevent} a card with cost {e} or less.", serialized);
+    assert_eq!(original, serialized);
 }
 
 #[test]

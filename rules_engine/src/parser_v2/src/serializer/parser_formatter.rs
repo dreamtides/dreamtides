@@ -68,12 +68,12 @@ pub fn serialize_standard_effect(effect: &StandardEffect) -> String {
             format!("{} gains +{{s}} spark.", serialize_predicate(target))
         }
         StandardEffect::Counterspell { target } => {
-            format!("{{Prevent}} {}.", serialize_predicate(target))
+            format!("{{Prevent}} a played {}.", serialize_predicate_without_article(target))
         }
         StandardEffect::CounterspellUnlessPaysCost { target, cost } => {
             format!(
-                "{{Prevent}} {} unless the opponent pays {}.",
-                serialize_predicate(target),
+                "{{Prevent}} a played {} unless the opponent pays {}.",
+                serialize_predicate_without_article(target),
                 serialize_cost(cost)
             )
         }
@@ -342,6 +342,14 @@ fn serialize_keyword(keyword: &TriggerKeyword) -> String {
         TriggerKeyword::Dissolved => "Dissolved".to_string(),
     }
 }
+
+fn serialize_predicate_without_article(predicate: &Predicate) -> String {
+    let result = serialize_predicate(predicate);
+    let trimmed =
+        result.strip_prefix("an ").or_else(|| result.strip_prefix("a ")).unwrap_or(&result);
+    trimmed.to_string()
+}
+
 fn serialize_predicate(predicate: &Predicate) -> String {
     match predicate {
         Predicate::This => "this character".to_string(),

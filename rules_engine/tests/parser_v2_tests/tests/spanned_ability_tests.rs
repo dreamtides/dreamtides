@@ -374,7 +374,7 @@ fn test_spanned_event_discard_chosen_card_with_cost_from_opponent_hand() {
 #[test]
 fn test_spanned_event_prevent_unless_opponent_pays() {
     let SpannedAbility::Event(event) =
-        parse_spanned_ability("{Prevent} an event unless the opponent pays {e}.", "e: 1")
+        parse_spanned_ability("{Prevent} a played event unless the opponent pays {e}.", "e: 1")
     else {
         panic!("Expected Event ability");
     };
@@ -383,7 +383,7 @@ fn test_spanned_event_prevent_unless_opponent_pays() {
     let SpannedEffect::Effect(effect) = event.effect else {
         panic!("Expected Effect, got Modal");
     };
-    assert_eq!(effect.text.trim(), "{Prevent} an event unless the opponent pays {e}.");
+    assert_eq!(effect.text.trim(), "{Prevent} a played event unless the opponent pays {e}.");
     assert_valid_span(&effect.span);
 }
 

@@ -33,7 +33,7 @@ fn test_materialized_foresee() {
 
 #[test]
 fn test_prevent_a_card() {
-    let result = parse_ability("{Prevent} a card.", "");
+    let result = parse_ability("{Prevent} a played card.", "");
     assert_ron_snapshot!(result, @r###"
     Event(EventAbility(
       effect: Effect(Counterspell(
@@ -45,7 +45,7 @@ fn test_prevent_a_card() {
 
 #[test]
 fn test_prevent_event_unless_opponent_pays() {
-    let result = parse_ability("{Prevent} an event unless the opponent pays {e}.", "e: 1");
+    let result = parse_ability("{Prevent} a played event unless the opponent pays {e}.", "e: 1");
     assert_ron_snapshot!(result, @r###"
     Event(EventAbility(
       effect: Effect(CounterspellUnlessPaysCost(
