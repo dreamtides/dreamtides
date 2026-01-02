@@ -144,13 +144,23 @@ pub fn sync_master_to_origin(repo_root: &Path) -> Result<()> {
         return self::merge_ff_only(repo_root, "origin/master");
     }
 
-    let rebase_status = self::rebase_onto_branch(repo_root, "origin/master")?;
-    if rebase_status.success() {
-        return Ok(());
-    }
+    eprintln!(
+        "Warning: master has diverged from origin/master in {repo_root:?}. Resetting to origin/master."
+    );
+    let status = Command::new("git")
+        .arg("-C")
+        .arg(repo_root)
+        .arg("reset")
+        .arg("--hard")
+        .arg("origin/master")
+        .status()
+        .with_context(|| {
+            format!("Failed to run git reset --hard origin/master in {repo_root:?}")
+        })?;
 
-    let status = self::status_porcelain(repo_root)?;
-    anyhow::bail!("git rebase origin/master failed in {repo_root:?}:\n{status}")
+    anyhow::ensure!(status.success(), "git reset --hard origin/master failed in {repo_root:?}");
+
+    Ok(())
 }
 
 /// Create a new worktree for the agent branch.
