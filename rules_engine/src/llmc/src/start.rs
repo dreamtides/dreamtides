@@ -79,6 +79,8 @@ pub fn run(args: &StartArgs, repo_override: Option<&Path>) -> Result<()> {
     state.agents.insert(agent_id.clone(), record);
     state::save_state(&state_path, &state)?;
 
+    let is_interactive = claude_config.as_ref().is_some_and(|c| c.interactive);
+
     let outcome = runtime::run_runtime(
         runtime,
         &full_prompt,
@@ -97,6 +99,7 @@ pub fn run(args: &StartArgs, repo_override: Option<&Path>) -> Result<()> {
         record.last_pid = outcome.as_ref().ok().and_then(|outcome| outcome.pid);
         record.status = match outcome.as_ref() {
             Ok(outcome) if outcome.status.success() => AgentStatus::NeedsReview,
+            Ok(_) if is_interactive => AgentStatus::NeedsReview,
             Ok(_) => AgentStatus::Idle,
             Err(_) => AgentStatus::Idle,
         };
@@ -104,11 +107,9 @@ pub fn run(args: &StartArgs, repo_override: Option<&Path>) -> Result<()> {
     state::save_state(&state_path, &state)?;
 
     let outcome = outcome?;
-    anyhow::ensure!(
-        outcome.status.success(),
-        "Runtime exited with status {status:?}",
-        status = outcome.status
-    );
+    if !outcome.status.success() && !is_interactive {
+        anyhow::bail!("Runtime exited with status {status:?}", status = outcome.status);
+    }
     self::print_agent_completed(&agent_id);
 
     Ok(())
