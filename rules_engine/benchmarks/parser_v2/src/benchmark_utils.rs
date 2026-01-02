@@ -1,5 +1,5 @@
-use std::fs;
 use std::path::Path;
+use std::{fs, hint};
 
 use chumsky::Parser;
 use parser_v2::lexer::lexer_tokenize;
@@ -38,19 +38,29 @@ pub fn load_cards_toml() -> BenchmarkCardsFile {
 }
 
 pub fn parse_all_cards(cards_file: BenchmarkCardsFile) {
-    for card in cards_file.cards {
-        let Some(rules_text) = &card.rules_text else { continue };
+    let resolved_cards = cards_file
+        .cards
+        .into_iter()
+        .filter_map(|card| {
+            let Some(rules_text) = &card.rules_text else { return None };
 
-        let bindings = if let Some(vars) = &card.variables {
-            VariableBindings::parse(vars).expect("Failed to parse variables")
-        } else {
-            VariableBindings::new()
-        };
+            let bindings = if let Some(vars) = &card.variables {
+                VariableBindings::parse(vars).expect("Failed to parse variables")
+            } else {
+                VariableBindings::new()
+            };
 
-        let lex_result = lexer_tokenize::lex(rules_text).expect("Failed to lex rules text");
-        let resolved = parser_substitutions::resolve_variables(&lex_result.tokens, &bindings)
-            .expect("Failed to resolve variables");
-        let parser = ability_parser::ability_parser();
-        let _ = parser.parse(&resolved).into_result();
+            let lex_result = lexer_tokenize::lex(rules_text).expect("Failed to lex rules text");
+            Some(
+                parser_substitutions::resolve_variables(&lex_result.tokens, &bindings)
+                    .expect("Failed to resolve variables"),
+            )
+        })
+        .collect::<Vec<_>>();
+
+    let parser = ability_parser::ability_parser();
+
+    for resolved in &resolved_cards {
+        let _ = hint::black_box(parser.parse(resolved)).into_result();
     }
 }
