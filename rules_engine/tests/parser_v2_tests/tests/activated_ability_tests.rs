@@ -20,6 +20,27 @@ fn test_abandon_an_ally_gain_energy() {
 }
 
 #[test]
+fn test_abandon_an_ally_put_cards_from_deck_into_void() {
+    let result = parse_ability(
+        "Abandon an ally: Put the {top-n-cards} of your deck into your void.",
+        "to-void: 2",
+    );
+    assert_ron_snapshot!(result, @r###"
+    Activated(ActivatedAbility(
+      costs: [
+        AbandonCharactersCount(
+          target: Another(Character),
+          count: Exactly(1),
+        ),
+      ],
+      effect: Effect(PutCardsFromYourDeckIntoVoid(
+        count: 2,
+      )),
+    ))
+    "###);
+}
+
+#[test]
 fn test_abandon_an_ally_kindle() {
     let result = parse_ability("Abandon an ally: {Kindle}.", "k: 1");
     assert_ron_snapshot!(result, @r###"

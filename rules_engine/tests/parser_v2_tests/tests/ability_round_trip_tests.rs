@@ -18,6 +18,14 @@ fn test_round_trip_abandon_an_ally_kindle() {
 }
 
 #[test]
+fn test_round_trip_abandon_an_ally_put_cards_from_deck_into_void() {
+    let original = "Abandon an ally: Put the {top-n-cards} of your deck into your void.";
+    let parsed = parse_ability(original, "to-void: 2");
+    let serialized = parser_formatter::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
 fn test_round_trip_abandon_or_discard_dissolve_enemy() {
     let original = "Abandon an ally or discard a card: {Dissolve} an enemy.";
     let parsed = parse_ability(original, "");
@@ -250,6 +258,14 @@ fn test_round_trip_draw_cards_discard_cards_gain_energy() {
 }
 
 #[test]
+fn test_round_trip_put_cards_from_deck_into_void_draw_cards() {
+    let original = "Put the {top-n-cards} of your deck into your void. Draw {cards}.";
+    let parsed = parse_ability(original, "to-void: 3, cards: 2");
+    let serialized = parser_formatter::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
 fn test_round_trip_discard_cards_draw_cards() {
     let original = "Discard {discards}. Draw {cards}.";
     let parsed = parse_ability(original, "discards: 1, cards: 2");
@@ -345,6 +361,14 @@ fn test_round_trip_materialized_discard_then_draw() {
 fn test_round_trip_materialized_dissolved_draw_cards() {
     let original = "{MaterializedDissolved} Draw {cards}.";
     let parsed = parse_ability(original, "cards: 1");
+    let serialized = parser_formatter::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_materialized_dissolved_put_cards_from_deck_into_void() {
+    let original = "{MaterializedDissolved} Put the {top-n-cards} of your deck into your void.";
+    let parsed = parse_ability(original, "to-void: 2");
     let serialized = parser_formatter::serialize_ability(&parsed);
     assert_eq!(original, serialized);
 }
