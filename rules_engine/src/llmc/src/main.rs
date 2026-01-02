@@ -4,6 +4,7 @@ mod cli;
 mod config;
 mod delete;
 mod git_ops;
+mod notify;
 mod nouns;
 mod prompt;
 mod rebase;

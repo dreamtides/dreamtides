@@ -5,7 +5,7 @@ use anyhow::{Context, Result};
 
 use crate::cli::StartArgs;
 use crate::state::{self, AgentRecord, AgentStatus, ClaudeConfig, Runtime};
-use crate::{config, git_ops, nouns, prompt, runtime, time};
+use crate::{config, git_ops, notify, nouns, prompt, runtime, time};
 
 /// Prepare the initial agent record and state needed for llmc start.
 pub fn run(args: &StartArgs, repo_override: Option<&Path>) -> Result<()> {
@@ -111,6 +111,10 @@ pub fn run(args: &StartArgs, repo_override: Option<&Path>) -> Result<()> {
         anyhow::bail!("Runtime exited with status {status:?}", status = outcome.status);
     }
     self::print_agent_completed(&agent_id);
+
+    if !args.no_notify {
+        let _ = notify::send_notification("LLMC", &format!("Agent {agent_id} task completed"));
+    }
 
     Ok(())
 }
