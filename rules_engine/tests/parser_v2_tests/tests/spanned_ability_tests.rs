@@ -352,6 +352,61 @@ fn test_spanned_event_prevent_put_on_top_of_opponent_deck() {
 }
 
 #[test]
+fn test_spanned_event_discard_chosen_card_with_cost_from_opponent_hand() {
+    let SpannedAbility::Event(event) = parse_spanned_ability(
+        "Discard a chosen card with cost {e} or less from the opponent's hand.",
+        "e: 2",
+    ) else {
+        panic!("Expected Event ability");
+    };
+
+    assert_eq!(event.additional_cost, None);
+    let SpannedEffect::Effect(effect) = event.effect else {
+        panic!("Expected Effect, got Modal");
+    };
+    assert_eq!(
+        effect.text.trim(),
+        "Discard a chosen card with cost {e} or less from the opponent's hand."
+    );
+    assert_valid_span(&effect.span);
+}
+
+#[test]
+fn test_spanned_event_prevent_unless_opponent_pays() {
+    let SpannedAbility::Event(event) =
+        parse_spanned_ability("{Prevent} an event unless the opponent pays {e}.", "e: 1")
+    else {
+        panic!("Expected Event ability");
+    };
+
+    assert_eq!(event.additional_cost, None);
+    let SpannedEffect::Effect(effect) = event.effect else {
+        panic!("Expected Effect, got Modal");
+    };
+    assert_eq!(effect.text.trim(), "{Prevent} an event unless the opponent pays {e}.");
+    assert_valid_span(&effect.span);
+}
+
+#[test]
+fn test_spanned_materialized_prevent_played_card_with_cost() {
+    let SpannedAbility::Triggered(triggered) = parse_spanned_ability(
+        "{Materialized} {Prevent} a played card with cost {e} or less.",
+        "e: 3",
+    ) else {
+        panic!("Expected Triggered ability");
+    };
+
+    assert_eq!(triggered.trigger.text, "{Materialized}");
+    assert_valid_span(&triggered.trigger.span);
+
+    let SpannedEffect::Effect(effect) = triggered.effect else {
+        panic!("Expected Effect, got Modal");
+    };
+    assert_eq!(effect.text.trim(), "{Prevent} a played card with cost {e} or less.");
+    assert_valid_span(&effect.span);
+}
+
+#[test]
 fn test_parse_simple_event_draw() {
     let input = "Draw 2.";
     let ability = Ability::Event(EventAbility {

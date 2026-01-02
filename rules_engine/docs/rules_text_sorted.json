@@ -85,9 +85,9 @@
   "{Judgment} You may pay {e} to return this character from your void to your hand.", // Implemented
   "{Dissolved} You may pay {e} to return this character to your hand.", // Implemented
   "Discard a chosen character from the opponent's hand.", // Implemented
-  "Discard a chosen card with cost {e} or less from the opponent's hand.",
-  "{Prevent} an event unless the opponent pays {e}.",
-  "{Materialized} {Prevent} a played card with cost {e} or less.",
+  "Discard a chosen card with cost {e} or less from the opponent's hand.", // Implemented
+  "{Prevent} an event unless the opponent pays {e}.", // Implemented
+  "{Materialized} {Prevent} a played card with cost {e} or less.", // Implemented
   "{Materialized} Gain control of an enemy with cost {e} or less.", // Implemented
   "{Prevent} a played card. Put it on top of the opponent's deck.", // Implemented
   "Abandon an ally or discard a card: {Dissolve} an enemy.", // Implemented

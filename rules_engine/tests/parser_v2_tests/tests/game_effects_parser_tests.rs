@@ -44,6 +44,19 @@ fn test_prevent_a_card() {
 }
 
 #[test]
+fn test_prevent_event_unless_opponent_pays() {
+    let result = parse_ability("{Prevent} an event unless the opponent pays {e}.", "e: 1");
+    assert_ron_snapshot!(result, @r###"
+    Event(EventAbility(
+      effect: Effect(CounterspellUnlessPaysCost(
+        target: Any(Event),
+        cost: Energy(Energy(1)),
+      )),
+    ))
+    "###);
+}
+
+#[test]
 fn test_dissolve_an_enemy() {
     let result = parse_ability("{Dissolve} an enemy.", "");
     assert_ron_snapshot!(result, @r###"
@@ -159,6 +172,26 @@ fn test_prevent_a_played_character() {
     Event(EventAbility(
       effect: Effect(Counterspell(
         target: Any(Character),
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_materialized_prevent_played_card_with_cost() {
+    let result =
+        parse_ability("{Materialized} {Prevent} a played card with cost {e} or less.", "e: 3");
+    assert_ron_snapshot!(result, @r###"
+    Triggered(TriggeredAbility(
+      trigger: Keywords([
+        Materialized,
+      ]),
+      effect: Effect(Counterspell(
+        target: Any(CardWithCost(
+          target: Card,
+          cost_operator: OrLess,
+          cost: Energy(3),
+        )),
       )),
     ))
     "###);

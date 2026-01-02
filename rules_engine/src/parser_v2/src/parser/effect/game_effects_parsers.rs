@@ -6,11 +6,13 @@ use chumsky::prelude::*;
 use crate::parser::parser_helpers::{
     article, directive, foresee_count, word, words, ParserExtra, ParserInput,
 };
-use crate::parser::{card_predicate_parser, predicate_parser};
+use crate::parser::{card_predicate_parser, cost_parser, predicate_parser};
 
 pub fn parser<'a>() -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
     choice((
-        choice((foresee(), discover(), counterspell())).boxed(),
+        foresee(),
+        discover(),
+        counterspell_effects(),
         choice((dissolve_all_characters(), dissolve_character())).boxed(),
         choice((banish_character(), banish_enemy_void())).boxed(),
         materialize_character(),
@@ -35,6 +37,17 @@ pub fn counterspell<'a>(
         .ignore_then(article())
         .ignore_then(predicate_parser::predicate_parser())
         .map(|target| StandardEffect::Counterspell { target })
+}
+
+pub fn counterspell_unless_pays_cost<'a>(
+) -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
+    directive("prevent")
+        .ignore_then(article())
+        .ignore_then(word("played").or_not())
+        .ignore_then(predicate_parser::predicate_parser())
+        .then_ignore(words(&["unless", "the", "opponent", "pays"]))
+        .then(cost_parser::cost_parser())
+        .map(|(target, cost)| StandardEffect::CounterspellUnlessPaysCost { target, cost })
 }
 
 pub fn dissolve_all_characters<'a>(
@@ -76,4 +89,9 @@ pub fn materialize_character<'a>(
         .ignore_then(article().or_not())
         .ignore_then(predicate_parser::predicate_parser())
         .map(|target| StandardEffect::MaterializeCharacter { target })
+}
+
+fn counterspell_effects<'a>(
+) -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
+    choice((counterspell_unless_pays_cost(), counterspell())).boxed()
 }

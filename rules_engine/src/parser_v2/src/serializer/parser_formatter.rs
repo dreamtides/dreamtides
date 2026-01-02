@@ -70,6 +70,13 @@ pub fn serialize_standard_effect(effect: &StandardEffect) -> String {
         StandardEffect::Counterspell { target } => {
             format!("{{Prevent}} {}.", serialize_predicate(target))
         }
+        StandardEffect::CounterspellUnlessPaysCost { target, cost } => {
+            format!(
+                "{{Prevent}} {} unless the opponent pays {}.",
+                serialize_predicate(target),
+                serialize_cost(cost)
+            )
+        }
         StandardEffect::GainControl { target } => {
             format!("gain control of {}.", serialize_predicate(target))
         }
@@ -384,6 +391,11 @@ fn serialize_card_predicate(card_predicate: &CardPredicate) -> String {
         CardPredicate::Fast { target } => {
             format!("a {{fast}} {}", serialize_fast_target(target))
         }
+        CardPredicate::CardWithCost { target, cost_operator, .. } => format!(
+            "{} with cost {{e}} {}",
+            serialize_card_predicate(target),
+            serialize_operator(cost_operator)
+        ),
         _ => {
             unimplemented!("Serialization not yet implemented for this card predicate type")
         }
