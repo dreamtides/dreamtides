@@ -9,6 +9,10 @@ pub fn predicate_parser<'a>() -> impl Parser<'a, ParserInput<'a>, Predicate, Par
     choice((specific_predicates(), general_predicates())).boxed()
 }
 
+pub fn ally() -> Predicate {
+    Predicate::Another(CardPredicate::Character)
+}
+
 fn specific_predicates<'a>() -> impl Parser<'a, ParserInput<'a>, Predicate, ParserExtra<'a>> + Clone
 {
     choice((

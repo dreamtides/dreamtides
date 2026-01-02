@@ -370,3 +370,34 @@ fn test_judgment_you_may_draw_then_discard() {
     ))
     "###);
 }
+
+#[test]
+fn test_materialized_each_player_discards() {
+    let result = parse_ability("{Materialized} Each player discards {discards}.", "discards: 1");
+    assert_ron_snapshot!(result, @r###"
+    Triggered(TriggeredAbility(
+      trigger: Keywords([
+        Materialized,
+      ]),
+      effect: Effect(EachPlayerDiscardCards(
+        count: 1,
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_judgment_each_player_abandons_character() {
+    let result = parse_ability("{Judgment} Each player abandons a character.", "");
+    assert_ron_snapshot!(result, @r###"
+    Triggered(TriggeredAbility(
+      trigger: Keywords([
+        Judgment,
+      ]),
+      effect: Effect(EachPlayerAbandonsCharacters(
+        matching: Character,
+        count: 1,
+      )),
+    ))
+    "###);
+}

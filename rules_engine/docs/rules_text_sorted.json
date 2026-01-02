@@ -76,9 +76,9 @@
   "{MaterializedJudgment} With {count-allied-subtype}, draw {cards}.", // Implemented
   "Abandon {count-allies}: {Reclaim} this character.", // Implemented
   "{MaterializedJudgment} \nGain {e}.", // Implemented
-  "{Materialized} Each player discards {discards}.",
-  "{Judgment} Each player abandons a character.",
-  "{Materialized} Draw {cards}.",
+  "{Materialized} Each player discards {discards}.", // Implemented
+  "{Judgment} Each player abandons a character.", // Implemented
+  "{Materialized} Draw {cards}.", // Implemented
   "You may return a character from your void to your hand. Draw {cards}.",
   "{Materialized} Return a character from your void to your hand.",
   "{Materialized} {Banish} the opponent's void.",

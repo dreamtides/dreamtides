@@ -100,6 +100,12 @@ pub fn serialize_standard_effect(effect: &StandardEffect) -> String {
         StandardEffect::ReturnFromYourVoidToPlay { target } => {
             format!("{{Reclaim}} {}.", serialize_predicate(target))
         }
+        StandardEffect::EachPlayerDiscardCards { .. } => {
+            "each player discards {discards}.".to_string()
+        }
+        StandardEffect::EachPlayerAbandonsCharacters { matching, .. } => {
+            format!("each player abandons {}.", serialize_card_predicate(matching))
+        }
         _ => unimplemented!("Serialization not yet implemented for this effect type"),
     }
 }

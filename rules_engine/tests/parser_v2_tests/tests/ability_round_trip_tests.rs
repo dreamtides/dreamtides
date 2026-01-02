@@ -532,3 +532,19 @@ fn test_round_trip_abandon_count_allies_reclaim_this_character() {
     let serialized = parser_formatter::serialize_ability(&parsed);
     assert_eq!(original, serialized);
 }
+
+#[test]
+fn test_round_trip_materialized_each_player_discards() {
+    let original = "{Materialized} Each player discards {discards}.";
+    let parsed = parse_ability(original, "discards: 1");
+    let serialized = parser_formatter::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_judgment_each_player_abandons_character() {
+    let original = "{Judgment} Each player abandons a character.";
+    let parsed = parse_ability(original, "");
+    let serialized = parser_formatter::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
