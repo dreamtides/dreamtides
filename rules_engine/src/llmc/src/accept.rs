@@ -19,6 +19,12 @@ pub fn run(args: &AcceptArgs, repo_override: Option<&Path>) -> Result<()> {
 
     git_ops::ensure_clean_worktree(&record.worktree_path)?;
 
+    if !args.nopull {
+        let source_root = self::source_repo_root(&paths.repo_root)?;
+        git_ops::ensure_clean_worktree(&source_root)
+            .context("Source repo must have a clean working tree before accept")?;
+    }
+
     let range = format!("master..{}", record.branch);
     let ahead_count = git_ops::rev_list_count(&record.worktree_path, &range)?;
     anyhow::ensure!(
