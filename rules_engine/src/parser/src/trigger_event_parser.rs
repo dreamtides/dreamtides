@@ -8,18 +8,11 @@ use crate::{card_predicate_parser, determiner_parser};
 
 pub fn event_parser<'a>() -> impl Parser<'a, &'a str, TriggerEvent, ErrorType<'a>> {
     choice((
-        materialize_nth_this_turn(),
-        materialize(),
-        play_from_hand(),
-        play_during_enemy_turn(),
-        play(),
-        discard(),
-        end_of_turn(),
-        gain_energy(),
-        draw_all_cards_in_copy_of_deck(),
-        banished(),
-        dissolved(),
-        abandon(),
+        play_triggers(),
+        materialize_triggers(),
+        action_triggers(),
+        state_triggers(),
+        timing_triggers(),
     ))
     .boxed()
 }
@@ -42,6 +35,26 @@ fn materialize<'a>() -> impl Parser<'a, &'a str, TriggerEvent, ErrorType<'a>> {
     phrase("you materialize")
         .ignore_then(determiner_parser::your_action())
         .map(TriggerEvent::Materialize)
+}
+
+fn play_triggers<'a>() -> impl Parser<'a, &'a str, TriggerEvent, ErrorType<'a>> {
+    choice((play_from_hand(), play_during_enemy_turn(), play())).boxed()
+}
+
+fn materialize_triggers<'a>() -> impl Parser<'a, &'a str, TriggerEvent, ErrorType<'a>> {
+    choice((materialize_nth_this_turn(), materialize())).boxed()
+}
+
+fn action_triggers<'a>() -> impl Parser<'a, &'a str, TriggerEvent, ErrorType<'a>> {
+    choice((discard(), abandon())).boxed()
+}
+
+fn state_triggers<'a>() -> impl Parser<'a, &'a str, TriggerEvent, ErrorType<'a>> {
+    choice((banished(), dissolved(), put_into_void())).boxed()
+}
+
+fn timing_triggers<'a>() -> impl Parser<'a, &'a str, TriggerEvent, ErrorType<'a>> {
+    choice((end_of_turn(), gain_energy(), draw_all_cards_in_copy_of_deck())).boxed()
 }
 
 fn materialize_nth_this_turn<'a>() -> impl Parser<'a, &'a str, TriggerEvent, ErrorType<'a>> {
@@ -99,6 +112,12 @@ fn dissolved<'a>() -> impl Parser<'a, &'a str, TriggerEvent, ErrorType<'a>> {
     determiner_parser::target_parser()
         .then_ignore(phrase("is {dissolved}"))
         .map(TriggerEvent::Dissolved)
+}
+
+fn put_into_void<'a>() -> impl Parser<'a, &'a str, TriggerEvent, ErrorType<'a>> {
+    determiner_parser::target_parser()
+        .then_ignore(phrase("is put into your void"))
+        .map(TriggerEvent::PutIntoVoid)
 }
 
 fn abandon<'a>() -> impl Parser<'a, &'a str, TriggerEvent, ErrorType<'a>> {

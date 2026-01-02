@@ -106,6 +106,14 @@ fn test_round_trip_at_end_of_turn_gain_energy() {
 }
 
 #[test]
+fn test_round_trip_until_end_of_turn_when_you_play_a_character_draw_cards() {
+    let original = "Until end of turn, when you play a character, draw {cards}.";
+    let parsed = parse_ability(original, "cards: 2");
+    let serialized = parser_formatter::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
 fn test_round_trip_events_cost_less() {
     let original = "Events cost you {e} less.";
     let parsed = parse_ability(original, "e: 1");
@@ -775,9 +783,25 @@ fn test_round_trip_when_you_materialize_an_allied_subtype_gain_energy() {
 }
 
 #[test]
+fn test_round_trip_when_you_materialize_an_allied_subtype_this_character_gains_spark() {
+    let original = "When you {materialize} an allied {subtype}, this character gains +{s} spark.";
+    let parsed = parse_ability(original, "subtype: warrior, s: 2");
+    let serialized = parser_formatter::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
 fn test_round_trip_when_you_play_a_fast_card_gain_points() {
     let original = "When you play a {fast} card, gain {points}.";
     let parsed = parse_ability(original, "points: 1");
+    let serialized = parser_formatter::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_when_an_event_is_put_into_your_void_this_character_gains_spark() {
+    let original = "When an event is put into your void, this character gains +{s} spark.";
+    let parsed = parse_ability(original, "s: 2");
     let serialized = parser_formatter::serialize_ability(&parsed);
     assert_eq!(original, serialized);
 }

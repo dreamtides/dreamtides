@@ -14,12 +14,18 @@ pub fn serialize_ability(ability: &Ability) -> String {
             let mut result = String::new();
             let has_once_per_turn =
                 triggered.options.as_ref().map(|o| o.once_per_turn).unwrap_or(false);
+            let has_until_end_of_turn =
+                triggered.options.as_ref().map(|o| o.until_end_of_turn).unwrap_or(false);
+            let has_prefix = has_once_per_turn || has_until_end_of_turn;
+            if has_until_end_of_turn {
+                result.push_str("Until end of turn, ");
+            }
             if has_once_per_turn {
                 result.push_str("Once per turn, ");
             }
             let trigger = serialize_trigger_event(&triggered.trigger);
             let capitalized_trigger = capitalize_first_letter(&trigger);
-            result.push_str(if has_once_per_turn { &trigger } else { &capitalized_trigger });
+            result.push_str(if has_prefix { &trigger } else { &capitalized_trigger });
             let is_keyword_trigger = matches!(triggered.trigger, TriggerEvent::Keywords(_));
             if is_keyword_trigger {
                 result.push(' ');
@@ -58,6 +64,21 @@ pub fn serialize_ability(ability: &Ability) -> String {
 }
 pub fn serialize_standard_effect(effect: &StandardEffect) -> String {
     match effect {
+        StandardEffect::CreateTriggerUntilEndOfTurn { trigger } => {
+            if matches!(trigger.trigger, TriggerEvent::Keywords(_)) {
+                format!(
+                    "until end of turn, {} {}",
+                    serialize_trigger_event(&trigger.trigger),
+                    capitalize_first_letter(&serialize_effect(&trigger.effect))
+                )
+            } else {
+                format!(
+                    "until end of turn, {}{}",
+                    serialize_trigger_event(&trigger.trigger),
+                    serialize_effect(&trigger.effect)
+                )
+            }
+        }
         StandardEffect::DrawCards { .. } => "draw {cards}.".to_string(),
         StandardEffect::DiscardCards { .. } => "discard {discards}.".to_string(),
         StandardEffect::DiscardCardFromEnemyHand { predicate } => format!(
@@ -184,6 +205,9 @@ pub fn serialize_trigger_event(trigger: &TriggerEvent) -> String {
         }
         TriggerEvent::Abandon(predicate) => {
             format!("when you abandon {}, ", serialize_predicate(predicate))
+        }
+        TriggerEvent::PutIntoVoid(predicate) => {
+            format!("when {} is put into your void, ", serialize_predicate(predicate))
         }
         TriggerEvent::EndOfYourTurn => "at the end of your turn, ".to_string(),
         TriggerEvent::DrawAllCardsInCopyOfDeck => {

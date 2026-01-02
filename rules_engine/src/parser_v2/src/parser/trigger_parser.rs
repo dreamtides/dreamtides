@@ -39,19 +39,26 @@ fn combined_keyword_trigger<'a>(
 
 fn standard_trigger<'a>() -> impl Parser<'a, ParserInput<'a>, TriggerEvent, ParserExtra<'a>> + Clone
 {
-    choice((
-        draw_all_cards_trigger(),
-        play_from_hand_trigger(),
-        play_during_turn_trigger(),
-        play_trigger(),
-        discard_trigger(),
-        materialize_trigger(),
-        dissolved_trigger(),
-        banished_trigger(),
-        abandon_trigger(),
-        end_of_turn_trigger(),
-        gain_energy_trigger(),
-    ))
+    choice((play_triggers(), action_triggers(), state_change_triggers(), timing_triggers())).boxed()
+}
+
+fn play_triggers<'a>() -> impl Parser<'a, ParserInput<'a>, TriggerEvent, ParserExtra<'a>> + Clone {
+    choice((play_from_hand_trigger(), play_during_turn_trigger(), play_trigger())).boxed()
+}
+
+fn action_triggers<'a>() -> impl Parser<'a, ParserInput<'a>, TriggerEvent, ParserExtra<'a>> + Clone
+{
+    choice((discard_trigger(), materialize_trigger(), abandon_trigger())).boxed()
+}
+
+fn state_change_triggers<'a>(
+) -> impl Parser<'a, ParserInput<'a>, TriggerEvent, ParserExtra<'a>> + Clone {
+    choice((dissolved_trigger(), banished_trigger(), put_into_void_trigger())).boxed()
+}
+
+fn timing_triggers<'a>() -> impl Parser<'a, ParserInput<'a>, TriggerEvent, ParserExtra<'a>> + Clone
+{
+    choice((draw_all_cards_trigger(), end_of_turn_trigger(), gain_energy_trigger())).boxed()
 }
 
 fn draw_all_cards_trigger<'a>(
@@ -120,6 +127,15 @@ fn banished_trigger<'a>() -> impl Parser<'a, ParserInput<'a>, TriggerEvent, Pars
         .then_ignore(word("is"))
         .then_ignore(directive("banished"))
         .map(TriggerEvent::Banished)
+}
+
+fn put_into_void_trigger<'a>(
+) -> impl Parser<'a, ParserInput<'a>, TriggerEvent, ParserExtra<'a>> + Clone {
+    words(&["when"])
+        .ignore_then(article())
+        .ignore_then(predicate_parser::predicate_parser())
+        .then_ignore(words(&["is", "put", "into", "your", "void"]))
+        .map(TriggerEvent::PutIntoVoid)
 }
 
 fn abandon_trigger<'a>() -> impl Parser<'a, ParserInput<'a>, TriggerEvent, ParserExtra<'a>> + Clone

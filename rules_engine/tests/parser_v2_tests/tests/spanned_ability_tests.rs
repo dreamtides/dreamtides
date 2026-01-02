@@ -155,6 +155,21 @@ fn test_spanned_once_per_turn_when_you_play_a_fast_card_draw_cards() {
 }
 
 #[test]
+fn test_spanned_until_end_of_turn_when_you_play_a_character_draw_cards() {
+    let SpannedAbility::Event(event) = parse_spanned_ability(
+        "Until end of turn, when you play a character, draw {cards}.",
+        "cards: 2",
+    ) else {
+        panic!("Expected Event ability");
+    };
+    let SpannedEffect::Effect(effect) = event.effect else {
+        panic!("Expected Effect, got Modal");
+    };
+    assert_eq!(effect.text.trim(), "Until end of turn, when you play a character, draw {cards}.");
+    assert_valid_span(&effect.span);
+}
+
+#[test]
 fn test_spanned_ability_when_you_play_a_fast_card_this_character_gains_spark() {
     let SpannedAbility::Triggered(triggered) = parse_spanned_ability(
         "When you play a {fast} card, this character gains +{s} spark.",
@@ -267,6 +282,25 @@ fn test_spanned_ability_when_an_ally_is_banished_this_character_gains_spark() {
 
     assert_eq!(triggered.once_per_turn, None);
     assert_eq!(triggered.trigger.text, "When an ally is {banished}");
+    assert_valid_span(&triggered.trigger.span);
+
+    let SpannedEffect::Effect(effect) = triggered.effect else {
+        panic!("Expected Effect, got Modal");
+    };
+    assert_eq!(effect.text.trim(), "this character gains +{s} spark.");
+    assert_valid_span(&effect.span);
+}
+
+#[test]
+fn test_spanned_when_an_event_is_put_into_your_void_this_character_gains_spark() {
+    let SpannedAbility::Triggered(triggered) = parse_spanned_ability(
+        "When an event is put into your void, this character gains +{s} spark.",
+        "s: 2",
+    ) else {
+        panic!("Expected Triggered ability");
+    };
+
+    assert_eq!(triggered.trigger.text, "When an event is put into your void");
     assert_valid_span(&triggered.trigger.span);
 
     let SpannedEffect::Effect(effect) = triggered.effect else {
@@ -1184,6 +1218,25 @@ fn test_spanned_when_you_materialize_an_allied_subtype_gain_energy() {
         panic!("Expected Effect, got Modal");
     };
     assert_eq!(effect.text.trim(), "gain {e}.");
+    assert_valid_span(&effect.span);
+}
+
+#[test]
+fn test_spanned_when_you_materialize_an_allied_subtype_this_character_gains_spark() {
+    let SpannedAbility::Triggered(triggered) = parse_spanned_ability(
+        "When you {materialize} an allied {subtype}, this character gains +{s} spark.",
+        "subtype: warrior, s: 2",
+    ) else {
+        panic!("Expected Triggered ability");
+    };
+
+    assert_eq!(triggered.trigger.text, "When you {materialize} an allied {subtype}");
+    assert_valid_span(&triggered.trigger.span);
+
+    let SpannedEffect::Effect(effect) = triggered.effect else {
+        panic!("Expected Effect, got Modal");
+    };
+    assert_eq!(effect.text.trim(), "this character gains +{s} spark.");
     assert_valid_span(&effect.span);
 }
 

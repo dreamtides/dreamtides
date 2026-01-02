@@ -362,6 +362,23 @@ fn test_when_you_materialize_an_allied_subtype_gain_energy() {
 }
 
 #[test]
+fn test_when_you_materialize_an_allied_subtype_this_character_gains_spark() {
+    let result = parse_ability(
+        "When you {materialize} an allied {subtype}, this character gains +{s} spark.",
+        "subtype: warrior, s: 2",
+    );
+    assert_ron_snapshot!(result, @r###"
+    Triggered(TriggeredAbility(
+      trigger: Materialize(Another(CharacterType(Warrior))),
+      effect: Effect(GainsSpark(
+        target: This,
+        gains: Spark(2),
+      )),
+    ))
+    "###);
+}
+
+#[test]
 fn test_when_you_play_a_fast_card_gain_points() {
     let result = parse_ability("When you play a {fast} card, gain {points}.", "points: 1");
     assert_ron_snapshot!(result, @r###"
@@ -371,6 +388,23 @@ fn test_when_you_play_a_fast_card_gain_points() {
       ))),
       effect: Effect(GainPoints(
         gains: Points(1),
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_when_an_event_is_put_into_your_void_this_character_gains_spark() {
+    let result = parse_ability(
+        "When an event is put into your void, this character gains +{s} spark.",
+        "s: 2",
+    );
+    assert_ron_snapshot!(result, @r###"
+    Triggered(TriggeredAbility(
+      trigger: PutIntoVoid(Any(Event)),
+      effect: Effect(GainsSpark(
+        target: This,
+        gains: Spark(2),
       )),
     ))
     "###);
@@ -391,6 +425,28 @@ fn test_once_per_turn_when_you_play_a_fast_card_draw_cards() {
       options: Some(TriggeredAbilityOptions(
         once_per_turn: true,
         until_end_of_turn: false,
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_until_end_of_turn_when_you_play_a_character_draw_cards() {
+    let result =
+        parse_ability("Until end of turn, when you play a character, draw {cards}.", "cards: 2");
+    assert_ron_snapshot!(result, @r###"
+    Event(EventAbility(
+      effect: Effect(CreateTriggerUntilEndOfTurn(
+        trigger: TriggeredAbility(
+          trigger: Play(Any(Character)),
+          effect: Effect(DrawCards(
+            count: 2,
+          )),
+          options: Some(TriggeredAbilityOptions(
+            once_per_turn: false,
+            until_end_of_turn: true,
+          )),
+        ),
       )),
     ))
     "###);

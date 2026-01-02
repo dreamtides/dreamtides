@@ -66,6 +66,16 @@ pub fn matches(
             ),
             _ => false,
         },
+        TriggerEvent::PutIntoVoid(predicate) => match trigger {
+            Trigger::PutIntoVoid(card_id) => trigger_predicates::trigger_matches(
+                battle,
+                predicate,
+                card_id,
+                owning_card_controller,
+                owning_card_id,
+            ),
+            _ => false,
+        },
         TriggerEvent::DrawAllCardsInCopyOfDeck => match trigger {
             Trigger::DrewAllCardsInCopyOfDeck(player) => owning_card_controller == player,
             _ => false,
@@ -142,6 +152,7 @@ pub fn triggering_card_id(trigger: Trigger) -> Option<CardId> {
         Trigger::Banished(card_id) => Some(card_id.card_id()),
         Trigger::Discarded(card_id) => Some(card_id.card_id()),
         Trigger::Dissolved(card_id) => Some(card_id.card_id()),
+        Trigger::PutIntoVoid(card_id) => Some(card_id.card_id()),
         Trigger::DrewAllCardsInCopyOfDeck(..) => None,
         Trigger::EndOfTurn(..) => None,
         Trigger::GainedEnergy(..) => None,

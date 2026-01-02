@@ -1,4 +1,5 @@
 use ability_data::ability::{Ability, EventAbility};
+use ability_data::trigger_event::TriggerEvent;
 use ability_data::triggered_ability::TriggeredAbility;
 use chumsky::span::{SimpleSpan, Span};
 
@@ -91,18 +92,32 @@ fn build_spanned_triggered(
 ) -> Option<SpannedAbility> {
     let is_once_per_turn =
         triggered.options.as_ref().map(|opts| opts.once_per_turn).unwrap_or(false);
+    let is_until_end_of_turn =
+        triggered.options.as_ref().map(|opts| opts.until_end_of_turn).unwrap_or(false);
 
-    let once_per_turn = if is_once_per_turn {
+    let until_end_of_turn = if is_until_end_of_turn {
+        let until_span = SimpleSpan::new((), 0..17);
+        Some(SpannedText::new("Until end of turn".to_string(), until_span))
+    } else {
+        None
+    };
+
+    let once_per_turn = if is_once_per_turn && until_end_of_turn.is_none() {
         let once_span = SimpleSpan::new((), 0..13);
         Some(SpannedText::new("Once per turn".to_string(), once_span))
     } else {
         None
     };
 
-    let trigger_start = if once_per_turn.is_some() { 15 } else { 0 };
+    let trigger_start = if let Some(until_end_of_turn) = &until_end_of_turn {
+        until_end_of_turn.span.end() + 2
+    } else if let Some(once_per_turn) = &once_per_turn {
+        once_per_turn.span.end() + 2
+    } else {
+        0
+    };
 
-    let is_keyword_trigger =
-        matches!(triggered.trigger, ability_data::trigger_event::TriggerEvent::Keywords(_));
+    let is_keyword_trigger = matches!(triggered.trigger, TriggerEvent::Keywords(_));
 
     let (trigger_end, effect_start) = if is_keyword_trigger {
         let first_directive_idx = lex_result
@@ -126,6 +141,7 @@ fn build_spanned_triggered(
     let effect_span = SimpleSpan::new((), effect_start..effect_end);
 
     Some(SpannedAbility::Triggered(SpannedTriggeredAbility {
+        until_end_of_turn,
         once_per_turn,
         trigger: SpannedText::new(
             lex_result.original[trigger_span.into_range()].to_string(),
