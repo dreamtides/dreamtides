@@ -823,6 +823,36 @@ fn test_spanned_draw_discard_reclaim() {
 }
 
 #[test]
+fn test_spanned_materialized_draw_discard_reclaim() {
+    let abilities = parse_spanned_abilities(
+        "{Materialized} Draw {cards}. Discard {discards}.\n\n{ReclaimForCost}",
+        "cards: 2, discards: 1, reclaim: 3",
+    );
+    assert_eq!(abilities.len(), 2);
+
+    let SpannedAbility::Triggered(triggered) = &abilities[0] else {
+        panic!("Expected Triggered ability");
+    };
+
+    assert_eq!(triggered.trigger.text, "{Materialized}");
+    assert_valid_span(&triggered.trigger.span);
+
+    let SpannedEffect::Effect(effect) = &triggered.effect else {
+        panic!("Expected Effect");
+    };
+
+    assert_eq!(effect.text.trim(), "Draw {cards}. Discard {discards}.");
+    assert_valid_span(&effect.span);
+
+    let SpannedAbility::Named { name } = &abilities[1] else {
+        panic!("Expected Named ability");
+    };
+
+    assert_eq!(name.text, "{ReclaimForCost}");
+    assert_valid_span(&name.span);
+}
+
+#[test]
 fn test_spanned_dissolve_enemy_with_cost_reclaim() {
     let abilities = parse_spanned_abilities(
         "{Dissolve} an enemy with cost {e} or more.\n\n{ReclaimForCost}",
@@ -870,6 +900,26 @@ fn test_spanned_when_you_materialize_an_allied_subtype_gain_energy() {
 }
 
 #[test]
+fn test_spanned_when_you_materialize_a_subtype_reclaim_this_character() {
+    let SpannedAbility::Triggered(triggered) = parse_spanned_ability(
+        "When you {materialize} {a-subtype}, {reclaim} this character.",
+        "subtype: warrior",
+    ) else {
+        panic!("Expected Triggered ability");
+    };
+
+    assert_eq!(triggered.once_per_turn, None);
+    assert_eq!(triggered.trigger.text, "When you {materialize} {a-subtype}");
+    assert_valid_span(&triggered.trigger.span);
+
+    let SpannedEffect::Effect(effect) = triggered.effect else {
+        panic!("Expected Effect, got Modal");
+    };
+    assert_eq!(effect.text.trim(), "{reclaim} this character.");
+    assert_valid_span(&effect.span);
+}
+
+#[test]
 fn test_spanned_when_you_play_a_fast_card_gain_points() {
     let SpannedAbility::Triggered(triggered) =
         parse_spanned_ability("When you play a {fast} card, gain {points}.", "points: 1")
@@ -885,6 +935,26 @@ fn test_spanned_when_you_play_a_fast_card_gain_points() {
         panic!("Expected Effect, got Modal");
     };
     assert_eq!(effect.text.trim(), "gain {points}.");
+    assert_valid_span(&effect.span);
+}
+
+#[test]
+fn test_spanned_when_you_play_a_subtype_put_cards_from_deck_into_void() {
+    let SpannedAbility::Triggered(triggered) = parse_spanned_ability(
+        "When you play {a-subtype}, put the {top-n-cards} of your deck into your void.",
+        "subtype: warrior, to-void: 3",
+    ) else {
+        panic!("Expected Triggered ability");
+    };
+
+    assert_eq!(triggered.once_per_turn, None);
+    assert_eq!(triggered.trigger.text, "When you play {a-subtype}");
+    assert_valid_span(&triggered.trigger.span);
+
+    let SpannedEffect::Effect(effect) = triggered.effect else {
+        panic!("Expected Effect, got Modal");
+    };
+    assert_eq!(effect.text.trim(), "put the {top-n-cards} of your deck into your void.");
     assert_valid_span(&effect.span);
 }
 
