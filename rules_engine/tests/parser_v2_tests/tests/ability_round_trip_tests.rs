@@ -98,6 +98,14 @@ fn test_round_trip_energy_materialize_copy_of_ally() {
 }
 
 #[test]
+fn test_round_trip_energy_gain_spark_for_each_allied_subtype() {
+    let original = "{e}: Gain +{s} spark for each allied {subtype}.";
+    let parsed = parse_ability(original, "e: 1, s: 2, subtype: warrior");
+    let serialized = parser_formatter::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
 fn test_round_trip_at_end_of_turn_gain_energy() {
     let original = "At the end of your turn, gain {e}.";
     let parsed = parse_ability(original, "e: 2");
@@ -109,6 +117,14 @@ fn test_round_trip_at_end_of_turn_gain_energy() {
 fn test_round_trip_until_end_of_turn_when_you_play_a_character_draw_cards() {
     let original = "Until end of turn, when you play a character, draw {cards}.";
     let parsed = parse_ability(original, "cards: 2");
+    let serialized = parser_formatter::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_until_end_of_turn_when_an_ally_leaves_play_gain_energy() {
+    let original = "Until end of turn, when an ally leaves play, gain {e}.";
+    let parsed = parse_ability(original, "e: 1");
     let serialized = parser_formatter::serialize_ability(&parsed);
     assert_eq!(original, serialized);
 }
@@ -165,6 +181,15 @@ fn test_round_trip_when_you_materialize_a_character_this_character_gains_spark()
 fn test_round_trip_once_per_turn_when_you_materialize_a_character_gain_energy() {
     let original = "Once per turn, when you {materialize} a character, gain {e}.";
     let parsed = parse_ability(original, "e: 1");
+    let serialized = parser_formatter::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_once_per_turn_when_you_materialize_a_character_with_cost_or_less_draw_cards() {
+    let original =
+        "Once per turn, when you {materialize} a character with cost {e} or less, draw {cards}.";
+    let parsed = parse_ability(original, "e: 2, cards: 1");
     let serialized = parser_formatter::serialize_ability(&parsed);
     assert_eq!(original, serialized);
 }

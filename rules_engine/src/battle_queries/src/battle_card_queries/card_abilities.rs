@@ -317,6 +317,12 @@ fn watch_for_battlefield_triggers(event: &TriggerEvent) -> EnumSet<TriggerName> 
             triggers.insert(TriggerName::PutIntoVoid);
             triggers
         }
+        TriggerEvent::LeavesPlay(..) => {
+            let mut triggers = EnumSet::new();
+            triggers.insert(TriggerName::Banished);
+            triggers.insert(TriggerName::Dissolved);
+            triggers
+        }
         _ => todo!("Implement watch_for_trigger() for {:?}", event),
     }
 }

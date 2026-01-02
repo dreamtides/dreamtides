@@ -10,6 +10,7 @@ pub enum TriggerEvent {
     Banished(Predicate),
     Discard(Predicate),
     Dissolved(Predicate),
+    LeavesPlay(Predicate),
     PutIntoVoid(Predicate),
     DrawAllCardsInCopyOfDeck,
     EndOfYourTurn,

@@ -38,6 +38,7 @@ static PARSER_WORDS: &[&str] = &[
     "in",
     "into",
     "it",
+    "leaves",
     "less",
     "materialized",
     "may",
