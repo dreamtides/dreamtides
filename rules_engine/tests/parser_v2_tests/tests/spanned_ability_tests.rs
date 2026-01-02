@@ -105,6 +105,76 @@ fn test_spanned_once_per_turn_when_you_materialize_a_character_gain_energy() {
 }
 
 #[test]
+fn test_spanned_once_per_turn_when_you_materialize_a_subtype_draw_cards() {
+    let SpannedAbility::Triggered(triggered) = parse_spanned_ability(
+        "Once per turn, when you {materialize} {a-subtype}, draw {cards}.",
+        "subtype: warrior, cards: 2",
+    ) else {
+        panic!("Expected Triggered ability");
+    };
+
+    let Some(once_per_turn) = triggered.once_per_turn else {
+        panic!("Expected once per turn marker");
+    };
+    assert_eq!(once_per_turn.text, "Once per turn");
+    assert_valid_span(&once_per_turn.span);
+
+    assert_eq!(triggered.trigger.text, "when you {materialize} {a-subtype}");
+    assert_valid_span(&triggered.trigger.span);
+
+    let SpannedEffect::Effect(effect) = triggered.effect else {
+        panic!("Expected Effect, got Modal");
+    };
+    assert_eq!(effect.text.trim(), "draw {cards}.");
+    assert_valid_span(&effect.span);
+}
+
+#[test]
+fn test_spanned_once_per_turn_when_you_play_a_fast_card_draw_cards() {
+    let SpannedAbility::Triggered(triggered) = parse_spanned_ability(
+        "Once per turn, when you play a {fast} card, draw {cards}.",
+        "cards: 2",
+    ) else {
+        panic!("Expected Triggered ability");
+    };
+
+    let Some(once_per_turn) = triggered.once_per_turn else {
+        panic!("Expected once per turn marker");
+    };
+    assert_eq!(once_per_turn.text, "Once per turn");
+    assert_valid_span(&once_per_turn.span);
+
+    assert_eq!(triggered.trigger.text, "when you play a {fast} card");
+    assert_valid_span(&triggered.trigger.span);
+
+    let SpannedEffect::Effect(effect) = triggered.effect else {
+        panic!("Expected Effect, got Modal");
+    };
+    assert_eq!(effect.text.trim(), "draw {cards}.");
+    assert_valid_span(&effect.span);
+}
+
+#[test]
+fn test_spanned_ability_when_you_play_a_fast_card_this_character_gains_spark() {
+    let SpannedAbility::Triggered(triggered) = parse_spanned_ability(
+        "When you play a {fast} card, this character gains +{s} spark.",
+        "s: 2",
+    ) else {
+        panic!("Expected Triggered ability");
+    };
+
+    assert_eq!(triggered.once_per_turn, None);
+    assert_eq!(triggered.trigger.text, "When you play a {fast} card");
+    assert_valid_span(&triggered.trigger.span);
+
+    let SpannedEffect::Effect(effect) = triggered.effect else {
+        panic!("Expected Effect, got Modal");
+    };
+    assert_eq!(effect.text.trim(), "this character gains +{s} spark.");
+    assert_valid_span(&effect.span);
+}
+
+#[test]
 fn test_spanned_ability_when_you_abandon_an_ally_kindle() {
     let SpannedAbility::Triggered(triggered) =
         parse_spanned_ability("When you abandon an ally, {kindle}.", "k: 1")

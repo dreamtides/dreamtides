@@ -103,6 +103,26 @@ fn test_once_per_turn_when_you_materialize_a_character_gain_energy() {
 }
 
 #[test]
+fn test_once_per_turn_when_you_materialize_a_subtype_draw_cards() {
+    let result = parse_ability(
+        "Once per turn, when you {materialize} {a-subtype}, draw {cards}.",
+        "subtype: warrior, cards: 2",
+    );
+    assert_ron_snapshot!(result, @r###"
+    Triggered(TriggeredAbility(
+      trigger: Materialize(Any(CharacterType(Warrior))),
+      effect: Effect(DrawCards(
+        count: 2,
+      )),
+      options: Some(TriggeredAbilityOptions(
+        once_per_turn: true,
+        until_end_of_turn: false,
+      )),
+    ))
+    "###);
+}
+
+#[test]
 fn test_when_you_play_an_event_gain_energy() {
     let result = parse_ability("When you play an event, gain {e}.", "e: 1");
     assert_ron_snapshot!(result, @r###"
@@ -351,6 +371,43 @@ fn test_when_you_play_a_fast_card_gain_points() {
       ))),
       effect: Effect(GainPoints(
         gains: Points(1),
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_once_per_turn_when_you_play_a_fast_card_draw_cards() {
+    let result =
+        parse_ability("Once per turn, when you play a {fast} card, draw {cards}.", "cards: 2");
+    assert_ron_snapshot!(result, @r###"
+    Triggered(TriggeredAbility(
+      trigger: Play(Any(Fast(
+        target: Card,
+      ))),
+      effect: Effect(DrawCards(
+        count: 2,
+      )),
+      options: Some(TriggeredAbilityOptions(
+        once_per_turn: true,
+        until_end_of_turn: false,
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_when_you_play_a_fast_card_this_character_gains_spark() {
+    let result =
+        parse_ability("When you play a {fast} card, this character gains +{s} spark.", "s: 2");
+    assert_ron_snapshot!(result, @r###"
+    Triggered(TriggeredAbility(
+      trigger: Play(Any(Fast(
+        target: Card,
+      ))),
+      effect: Effect(GainsSpark(
+        target: This,
+        gains: Spark(2),
       )),
     ))
     "###);
