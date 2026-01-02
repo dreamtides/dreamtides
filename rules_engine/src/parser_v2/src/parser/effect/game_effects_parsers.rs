@@ -4,7 +4,7 @@ use ability_data::standard_effect::StandardEffect;
 use chumsky::prelude::*;
 
 use crate::parser::parser_helpers::{
-    article, directive, foresee_count, word, ParserExtra, ParserInput,
+    article, directive, foresee_count, word, words, ParserExtra, ParserInput,
 };
 use crate::parser::{card_predicate_parser, predicate_parser};
 
@@ -13,9 +13,8 @@ pub fn parser<'a>() -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserEx
         foresee(),
         discover(),
         counterspell(),
-        dissolve_all_characters(),
-        dissolve_character(),
-        banish_character(),
+        choice((dissolve_all_characters(), dissolve_character())).boxed(),
+        choice((banish_character(), banish_enemy_void())).boxed(),
     ))
     .boxed()
 }
@@ -64,4 +63,11 @@ pub fn banish_character<'a>(
         .ignore_then(article())
         .ignore_then(predicate_parser::predicate_parser())
         .map(|target| StandardEffect::BanishCharacter { target })
+}
+
+pub fn banish_enemy_void<'a>(
+) -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
+    directive("banish")
+        .ignore_then(words(&["the", "opponent's", "void"]))
+        .map(|_| StandardEffect::BanishEnemyVoid)
 }

@@ -84,6 +84,7 @@ pub fn serialize_standard_effect(effect: &StandardEffect) -> String {
         StandardEffect::BanishCharacter { target } => {
             format!("{{Banish}} {}.", serialize_predicate(target))
         }
+        StandardEffect::BanishEnemyVoid => "{Banish} the opponent's void.".to_string(),
         StandardEffect::Discover { predicate } => {
             format!("{{Discover}} {}.", serialize_card_predicate(predicate))
         }
