@@ -35,6 +35,8 @@ pub fn run(args: &StartArgs, repo_override: Option<&Path>) -> Result<()> {
     let worktree_path = paths.worktrees_dir.join(format!("agent-{agent_id}"));
     anyhow::ensure!(!worktree_path.exists(), "Worktree already exists: {worktree_path:?}");
 
+    git_ops::sync_master_to_origin(&paths.repo_root)?;
+
     git_ops::worktree_add(&paths.repo_root, &worktree_path, &format!("agent/{agent_id}"))?;
     git_ops::ensure_clean_worktree(&worktree_path)?;
 
