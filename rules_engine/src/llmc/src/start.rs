@@ -114,8 +114,11 @@ pub fn run(args: &StartArgs, repo_override: Option<&Path>) -> Result<()> {
     }
     self::print_agent_completed(&agent_id);
 
-    if !args.no_notify {
-        let _ = notify::send_notification("LLMC", &format!("Agent {agent_id} task completed"));
+    if !args.no_notify
+        && let Err(err) =
+            notify::send_notification("LLMC", &format!("Agent {agent_id} task completed"))
+    {
+        eprintln!("Warning: Failed to send notification: {err:#}");
     }
 
     Ok(())

@@ -19,13 +19,23 @@ pub struct ActivatedAbility {
     pub options: Option<ActivatedAbilityOptions>,
 }
 
-#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ActivatedAbilityOptions {
     /// True if this ability can be activated in response to enemy game actions.
+    ///
+    /// Defaults to false.
     pub is_fast: bool,
 
     /// True if this ability can be used multiple times per turn.
+    ///
+    /// Defaults to true.
     pub is_multi: bool,
+}
+
+impl Default for ActivatedAbilityOptions {
+    fn default() -> Self {
+        Self { is_fast: false, is_multi: true }
+    }
 }
 
 impl ActivatedAbility {
