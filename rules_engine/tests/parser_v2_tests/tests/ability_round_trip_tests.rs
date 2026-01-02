@@ -350,6 +350,14 @@ fn test_round_trip_materialized_you_may_return_ally_to_hand() {
 }
 
 #[test]
+fn test_round_trip_materialized_return_character_from_void_to_hand() {
+    let original = "{Materialized} Return a character from your void to your hand.";
+    let parsed = parse_ability(original, "");
+    let serialized = parser_formatter::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
 fn test_round_trip_materialized_discover_fast_event() {
     let original = "{Materialized} {Discover} a {fast} event.";
     let parsed = parse_ability(original, "");
@@ -363,6 +371,25 @@ fn test_round_trip_judgment_return_this_from_void_to_hand() {
     let parsed = parse_ability(original, "");
     let serialized = parser_formatter::serialize_ability(&parsed);
     assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_materialized_banish_opponent_void() {
+    let original = "{Materialized} {Banish} the opponent's void.";
+    let parsed = parse_ability(original, "");
+    let serialized = parser_formatter::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_you_may_return_character_from_void_draw_cards() {
+    assert_eq!(
+        "You may return a character from your void to your hand, then draw {cards}.",
+        parser_formatter::serialize_ability(&parse_ability(
+            "You may return a character from your void to your hand. Draw {cards}.",
+            "cards: 2",
+        )),
+    );
 }
 
 #[test]

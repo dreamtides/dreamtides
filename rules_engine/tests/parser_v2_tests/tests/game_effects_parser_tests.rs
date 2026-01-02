@@ -124,6 +124,21 @@ fn test_banish_enemy_with_cost_or_less() {
 }
 
 #[test]
+fn test_materialized_banish_opponent_void() {
+    assert_ron_snapshot!(
+        parse_ability("{Materialized} {Banish} the opponent's void.", ""),
+        @r###"
+    Triggered(TriggeredAbility(
+      trigger: Keywords([
+        Materialized,
+      ]),
+      effect: Effect(BanishEnemyVoid),
+    ))
+    "###,
+    );
+}
+
+#[test]
 fn test_prevent_a_played_fast_card() {
     let result = parse_ability("{Prevent} a played {fast} card.", "");
     assert_ron_snapshot!(result, @r###"

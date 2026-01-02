@@ -79,9 +79,9 @@
   "{Materialized} Each player discards {discards}.", // Implemented
   "{Judgment} Each player abandons a character.", // Implemented
   "{Materialized} Draw {cards}.", // Implemented
-  "You may return a character from your void to your hand. Draw {cards}.",
-  "{Materialized} Return a character from your void to your hand.",
-  "{Materialized} {Banish} the opponent's void.",
+  "You may return a character from your void to your hand. Draw {cards}.", // Implemented
+  "{Materialized} Return a character from your void to your hand.", // Implemented
+  "{Materialized} {Banish} the opponent's void.", // Implemented
   "{Judgment} You may pay {e} to return this character from your void to your hand.",
   "{Dissolved} You may pay {e} to return this character to your hand.",
   "Discard a chosen character from the opponent's hand.",

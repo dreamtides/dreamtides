@@ -328,6 +328,23 @@ fn test_materialized_you_may_return_ally_to_hand() {
 }
 
 #[test]
+fn test_materialized_return_character_from_void_to_hand() {
+    assert_ron_snapshot!(
+        parse_ability("{Materialized} Return a character from your void to your hand.", ""),
+        @r###"
+    Triggered(TriggeredAbility(
+      trigger: Keywords([
+        Materialized,
+      ]),
+      effect: Effect(ReturnFromYourVoidToHand(
+        target: Any(Character),
+      )),
+    ))
+    "###,
+    );
+}
+
+#[test]
 fn test_judgment_return_this_from_void_to_hand() {
     let result = parse_ability("{Judgment} Return this character from your void to your hand.", "");
     assert_ron_snapshot!(result, @r###"
@@ -340,6 +357,34 @@ fn test_judgment_return_this_from_void_to_hand() {
       )),
     ))
     "###);
+}
+
+#[test]
+fn test_you_may_return_character_from_void_draw_cards() {
+    assert_ron_snapshot!(
+        parse_ability(
+            "You may return a character from your void to your hand. Draw {cards}.",
+            "cards: 2",
+        ),
+        @r###"
+    Event(EventAbility(
+      effect: List([
+        EffectWithOptions(
+          effect: ReturnFromYourVoidToHand(
+            target: Any(Character),
+          ),
+          optional: true,
+        ),
+        EffectWithOptions(
+          effect: DrawCards(
+            count: 2,
+          ),
+          optional: true,
+        ),
+      ]),
+    ))
+    "###,
+    );
 }
 
 #[test]

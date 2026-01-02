@@ -81,6 +81,7 @@ pub fn return_to_hand<'a>(
 pub fn return_from_void_to_hand<'a>(
 ) -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
     word("return")
+        .then_ignore(article().or_not())
         .ignore_then(predicate_parser::predicate_parser())
         .then_ignore(words(&["from", "your", "void", "to", "your", "hand"]))
         .map(|target| StandardEffect::ReturnFromYourVoidToHand { target })

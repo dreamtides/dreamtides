@@ -138,6 +138,64 @@ fn test_spanned_ability_when_an_ally_is_banished_this_character_gains_spark() {
 }
 
 #[test]
+fn test_spanned_materialized_return_character_from_void_to_hand() {
+    let SpannedAbility::Triggered(triggered) =
+        parse_spanned_ability("{Materialized} Return a character from your void to your hand.", "")
+    else {
+        panic!("Expected Triggered ability");
+    };
+
+    assert_eq!(triggered.once_per_turn, None);
+    assert_eq!(triggered.trigger.text, "{Materialized}");
+    assert_valid_span(&triggered.trigger.span);
+
+    let SpannedEffect::Effect(effect) = triggered.effect else {
+        panic!("Expected Effect, got Modal");
+    };
+    assert_eq!(effect.text.trim(), "Return a character from your void to your hand.");
+    assert_valid_span(&effect.span);
+}
+
+#[test]
+fn test_spanned_materialized_banish_opponent_void() {
+    let SpannedAbility::Triggered(triggered) =
+        parse_spanned_ability("{Materialized} {Banish} the opponent's void.", "")
+    else {
+        panic!("Expected Triggered ability");
+    };
+
+    assert_eq!(triggered.once_per_turn, None);
+    assert_eq!(triggered.trigger.text, "{Materialized}");
+    assert_valid_span(&triggered.trigger.span);
+
+    let SpannedEffect::Effect(effect) = triggered.effect else {
+        panic!("Expected Effect, got Modal");
+    };
+    assert_eq!(effect.text.trim(), "{Banish} the opponent's void.");
+    assert_valid_span(&effect.span);
+}
+
+#[test]
+fn test_spanned_event_you_may_return_from_void_draw_cards() {
+    let SpannedAbility::Event(event) = parse_spanned_ability(
+        "You may return a character from your void to your hand. Draw {cards}.",
+        "cards: 2",
+    ) else {
+        panic!("Expected Event ability");
+    };
+
+    assert_eq!(event.additional_cost, None);
+    let SpannedEffect::Effect(effect) = event.effect else {
+        panic!("Expected Effect, got Modal");
+    };
+    assert_eq!(
+        effect.text,
+        "You may return a character from your void to your hand. Draw {cards}."
+    );
+    assert_valid_span(&effect.span);
+}
+
+#[test]
 fn test_parse_simple_event_draw() {
     let input = "Draw 2.";
     let ability = Ability::Event(EventAbility {
