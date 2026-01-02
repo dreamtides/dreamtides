@@ -619,3 +619,41 @@ fn test_spanned_judgment_gain_energy_for_each_allied_character() {
     assert_eq!(effect.text.trim(), "Gain {e} for each allied character.");
     assert_valid_span(&effect.span);
 }
+
+#[test]
+fn test_spanned_materialized_each_player_discards() {
+    let SpannedAbility::Triggered(triggered) =
+        parse_spanned_ability("{Materialized} Each player discards {discards}.", "discards: 1")
+    else {
+        panic!("Expected Triggered ability");
+    };
+
+    assert_eq!(triggered.once_per_turn, None);
+    assert_eq!(triggered.trigger.text, "{Materialized}");
+    assert_valid_span(&triggered.trigger.span);
+
+    let SpannedEffect::Effect(effect) = triggered.effect else {
+        panic!("Expected Effect, got Modal");
+    };
+    assert_eq!(effect.text.trim(), "Each player discards {discards}.");
+    assert_valid_span(&effect.span);
+}
+
+#[test]
+fn test_spanned_judgment_each_player_abandons_character() {
+    let SpannedAbility::Triggered(triggered) =
+        parse_spanned_ability("{Judgment} Each player abandons a character.", "")
+    else {
+        panic!("Expected Triggered ability");
+    };
+
+    assert_eq!(triggered.once_per_turn, None);
+    assert_eq!(triggered.trigger.text, "{Judgment}");
+    assert_valid_span(&triggered.trigger.span);
+
+    let SpannedEffect::Effect(effect) = triggered.effect else {
+        panic!("Expected Effect, got Modal");
+    };
+    assert_eq!(effect.text.trim(), "Each player abandons a character.");
+    assert_valid_span(&effect.span);
+}

@@ -6,10 +6,12 @@ use core_data::numerics::{Energy, Points};
 use crate::parser::parser_helpers::{
     article, cards, directive, discards, energy, points, word, words, ParserExtra, ParserInput,
 };
-use crate::parser::predicate_parser;
+use crate::parser::{card_predicate_parser, predicate_parser};
 
 pub fn parser<'a>() -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
     choice((
+        each_player_abandons_characters(),
+        each_player_discard_cards(),
         draw_cards(),
         discard_cards(),
         gain_energy_for_each(),
@@ -89,4 +91,19 @@ pub fn reclaim_from_void<'a>(
     directive("reclaim")
         .ignore_then(predicate_parser::predicate_parser())
         .map(|target| StandardEffect::ReturnFromYourVoidToPlay { target })
+}
+
+pub fn each_player_discard_cards<'a>(
+) -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
+    words(&["each", "player", "discards"])
+        .ignore_then(discards())
+        .map(|count| StandardEffect::EachPlayerDiscardCards { count })
+}
+
+pub fn each_player_abandons_characters<'a>(
+) -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
+    words(&["each", "player", "abandons"])
+        .ignore_then(article())
+        .ignore_then(card_predicate_parser::parser())
+        .map(|matching| StandardEffect::EachPlayerAbandonsCharacters { matching, count: 1 })
 }
