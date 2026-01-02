@@ -115,9 +115,9 @@
   "Once per turn, when you {materialize} {a-subtype}, draw {cards}.", // Implemented
   "Once per turn, when you play a {fast} card, draw {cards}.", // Implemented
   "When you play a {fast} card, this character gains +{s} spark.", // Implemented
-  "When you {materialize} an allied {subtype}, this character gains +{s} spark.",
-  "When an event is put into your void, this character gains +{s} spark.",
-  "Until end of turn, when you play a character, draw {cards}.",
+  "When you {materialize} an allied {subtype}, this character gains +{s} spark.", // Implemented
+  "When an event is put into your void, this character gains +{s} spark.", // Implemented
+  "Until end of turn, when you play a character, draw {cards}.", // Implemented
   "Until end of turn, when an ally leaves play, gain {e}.",
   "Once per turn, when you {materialize} a character with cost {e} or less, draw {cards}.",
   "{e}: Gain +{s} spark for each allied {subtype}.",

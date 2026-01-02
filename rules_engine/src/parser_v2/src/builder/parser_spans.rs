@@ -29,6 +29,7 @@ pub struct SpannedActivatedAbility {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct SpannedTriggeredAbility {
+    pub until_end_of_turn: Option<SpannedText>,
     pub once_per_turn: Option<SpannedText>,
     pub trigger: SpannedText,
     pub effect: SpannedEffect,

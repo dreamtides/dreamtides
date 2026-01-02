@@ -28,7 +28,12 @@ pub fn to_displayed_ability(original: &str, ability: &SpannedAbility) -> Display
         },
         SpannedAbility::Triggered(triggered) => DisplayedAbility::Triggered {
             text: format!(
-                "{}{}{}",
+                "{}{}{}{}",
+                triggered
+                    .until_end_of_turn
+                    .as_ref()
+                    .map(|opt| format!("{}, ", spanned_text_to_string(original, opt)))
+                    .unwrap_or_default(),
                 triggered
                     .once_per_turn
                     .as_ref()

@@ -241,6 +241,10 @@ fn to_destination_zone(
 
     battle.cards.move_card(controller, card_id, old, new);
 
+    if new == Zone::Void {
+        battle.triggers.push(source, Trigger::PutIntoVoid(VoidCardId(card_id)));
+    }
+
     match new {
         Zone::Stack => on_enter_stack(battle, card_id),
         Zone::Battlefield => on_enter_battlefield(battle, source, controller, card_id),
