@@ -393,6 +393,31 @@ fn test_round_trip_you_may_return_character_from_void_draw_cards() {
 }
 
 #[test]
+fn test_round_trip_judgment_you_may_pay_to_return_this_from_void_to_hand() {
+    let original =
+        "{Judgment} You may pay {e} to return this character from your void to your hand.";
+    let parsed = parse_ability(original, "e: 1");
+    let serialized = parser_formatter::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_dissolved_you_may_pay_to_return_this_to_hand() {
+    let original = "{Dissolved} You may pay {e} to return this character to your hand.";
+    let parsed = parse_ability(original, "e: 1");
+    let serialized = parser_formatter::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_discard_chosen_character_from_opponent_hand() {
+    let original = "Discard a chosen character from the opponent's hand.";
+    let parsed = parse_ability(original, "");
+    let serialized = parser_formatter::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
 fn test_round_trip_discover_fast_character() {
     let original = "{Discover} a {fast} character.";
     let parsed = parse_ability(original, "");
