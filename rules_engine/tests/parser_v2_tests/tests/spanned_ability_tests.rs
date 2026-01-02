@@ -195,6 +195,26 @@ fn test_spanned_materialized_banish_opponent_void() {
 }
 
 #[test]
+fn test_spanned_materialized_you_may_banish_ally_then_materialize_it() {
+    let SpannedAbility::Triggered(triggered) = parse_spanned_ability(
+        "{Materialized} You may {banish} an ally, then {materialize} it.",
+        "",
+    ) else {
+        panic!("Expected Triggered ability");
+    };
+
+    assert_eq!(triggered.once_per_turn, None);
+    assert_eq!(triggered.trigger.text, "{Materialized}");
+    assert_valid_span(&triggered.trigger.span);
+
+    let SpannedEffect::Effect(effect) = triggered.effect else {
+        panic!("Expected Effect, got Modal");
+    };
+    assert_eq!(effect.text.trim(), "You may {banish} an ally, then {materialize} it.");
+    assert_valid_span(&effect.span);
+}
+
+#[test]
 fn test_spanned_materialized_gain_control_enemy_with_cost_or_less() {
     let SpannedAbility::Triggered(triggered) = parse_spanned_ability(
         "{Materialized} Gain control of an enemy with cost {e} or less.",
@@ -491,6 +511,24 @@ fn test_parse_activated_ability_abandon() {
         panic!("Expected Effect, got Modal");
     };
     assert!(effect.text.contains("Gain {e}."));
+    assert_valid_span(&effect.span);
+}
+
+#[test]
+fn test_parse_activated_ability_abandon_once_per_turn_gain_points() {
+    let SpannedAbility::Activated(activated) =
+        parse_spanned_ability("Abandon an ally, once per turn: Gain {points}.", "points: 1")
+    else {
+        panic!("Expected Activated ability");
+    };
+
+    assert_eq!(activated.cost.text, "Abandon an ally, once per turn");
+    assert_valid_span(&activated.cost.span);
+
+    let SpannedEffect::Effect(effect) = activated.effect else {
+        panic!("Expected Effect, got Modal");
+    };
+    assert_eq!(effect.text.trim(), "Gain {points}.");
     assert_valid_span(&effect.span);
 }
 

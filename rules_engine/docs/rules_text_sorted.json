@@ -106,9 +106,9 @@
   "{e}, Abandon a character, Discard your hand: Draw {cards}.", // Implemented
   "Abandon a character, Discard your hand: Gain {e}.", // Implemented
   "{e}: {Materialize} a copy of an ally.", // Implemented
-  "{Materialized} You may {banish} an ally, then {materialize} it.",
-  "{Judgment} You may {banish} an ally, then {materialize} it.",
-  "Abandon an ally, once per turn: Gain {points}.",
+  "{Materialized} You may {banish} an ally, then {materialize} it.", // Implemented
+  "{Judgment} You may {banish} an ally, then {materialize} it.", // Implemented
+  "Abandon an ally, once per turn: Gain {points}.", // Implemented
   "Abandon an ally, once per turn: {Reclaim} a {subtype}.",
   "Once per turn, when you {materialize} a character, gain {e}.",
   "Once per turn, when you discard a card, gain {e} and {kindle}.",
