@@ -53,7 +53,13 @@ fn action_triggers<'a>() -> impl Parser<'a, ParserInput<'a>, TriggerEvent, Parse
 
 fn state_change_triggers<'a>(
 ) -> impl Parser<'a, ParserInput<'a>, TriggerEvent, ParserExtra<'a>> + Clone {
-    choice((dissolved_trigger(), banished_trigger(), put_into_void_trigger())).boxed()
+    choice((
+        dissolved_trigger(),
+        banished_trigger(),
+        leaves_play_trigger(),
+        put_into_void_trigger(),
+    ))
+    .boxed()
 }
 
 fn timing_triggers<'a>() -> impl Parser<'a, ParserInput<'a>, TriggerEvent, ParserExtra<'a>> + Clone
@@ -127,6 +133,15 @@ fn banished_trigger<'a>() -> impl Parser<'a, ParserInput<'a>, TriggerEvent, Pars
         .then_ignore(word("is"))
         .then_ignore(directive("banished"))
         .map(TriggerEvent::Banished)
+}
+
+fn leaves_play_trigger<'a>(
+) -> impl Parser<'a, ParserInput<'a>, TriggerEvent, ParserExtra<'a>> + Clone {
+    words(&["when"])
+        .ignore_then(article())
+        .ignore_then(predicate_parser::predicate_parser())
+        .then_ignore(words(&["leaves", "play"]))
+        .map(TriggerEvent::LeavesPlay)
 }
 
 fn put_into_void_trigger<'a>(

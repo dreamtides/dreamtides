@@ -103,6 +103,30 @@ fn test_once_per_turn_when_you_materialize_a_character_gain_energy() {
 }
 
 #[test]
+fn test_once_per_turn_when_you_materialize_a_character_with_cost_or_less_draw_cards() {
+    let result = parse_ability(
+        "Once per turn, when you {materialize} a character with cost {e} or less, draw {cards}.",
+        "e: 2, cards: 1",
+    );
+    assert_ron_snapshot!(result, @r###"
+    Triggered(TriggeredAbility(
+      trigger: Materialize(Any(CardWithCost(
+        target: Character,
+        cost_operator: OrLess,
+        cost: Energy(2),
+      ))),
+      effect: Effect(DrawCards(
+        count: 1,
+      )),
+      options: Some(TriggeredAbilityOptions(
+        once_per_turn: true,
+        until_end_of_turn: false,
+      )),
+    ))
+    "###);
+}
+
+#[test]
 fn test_once_per_turn_when_you_materialize_a_subtype_draw_cards() {
     let result = parse_ability(
         "Once per turn, when you {materialize} {a-subtype}, draw {cards}.",
@@ -441,6 +465,27 @@ fn test_until_end_of_turn_when_you_play_a_character_draw_cards() {
           trigger: Play(Any(Character)),
           effect: Effect(DrawCards(
             count: 2,
+          )),
+          options: Some(TriggeredAbilityOptions(
+            once_per_turn: false,
+            until_end_of_turn: true,
+          )),
+        ),
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_until_end_of_turn_when_an_ally_leaves_play_gain_energy() {
+    let result = parse_ability("Until end of turn, when an ally leaves play, gain {e}.", "e: 1");
+    assert_ron_snapshot!(result, @r###"
+    Event(EventAbility(
+      effect: Effect(CreateTriggerUntilEndOfTurn(
+        trigger: TriggeredAbility(
+          trigger: LeavesPlay(Another(Character)),
+          effect: Effect(GainEnergy(
+            gains: Energy(1),
           )),
           options: Some(TriggeredAbilityOptions(
             once_per_turn: false,

@@ -156,6 +156,26 @@ fn test_energy_draw_cards() {
 }
 
 #[test]
+fn test_energy_gain_spark_for_each_allied_subtype() {
+    let result = parse_ability(
+        "{e}: Gain +{s} spark for each allied {subtype}.",
+        "e: 1, s: 2, subtype: warrior",
+    );
+    assert_ron_snapshot!(result, @r###"
+    Activated(ActivatedAbility(
+      costs: [
+        Energy(Energy(1)),
+      ],
+      effect: Effect(GainsSparkForQuantity(
+        target: This,
+        gains: Spark(2),
+        for_quantity: Matching(Another(CharacterType(Warrior))),
+      )),
+    ))
+    "###);
+}
+
+#[test]
 fn test_energy_discard_kindle() {
     let result = parse_ability("{e}, Discard {discards}: {kindle}.", "e: 1, discards: 2, k: 2");
     assert_ron_snapshot!(result, @r###"

@@ -100,6 +100,20 @@ pub fn serialize_standard_effect(effect: &StandardEffect) -> String {
         StandardEffect::GainsSpark { target, .. } => {
             format!("{} gains +{{s}} spark.", serialize_predicate(target))
         }
+        StandardEffect::GainsSparkForQuantity { target, for_quantity, .. } => {
+            if matches!(target, Predicate::This) {
+                format!(
+                    "gain +{{s}} spark for each {}.",
+                    serialize_for_count_expression(for_quantity)
+                )
+            } else {
+                format!(
+                    "{} gains +{{s}} spark for each {}.",
+                    serialize_predicate(target),
+                    serialize_for_count_expression(for_quantity)
+                )
+            }
+        }
         StandardEffect::PutCardsFromYourDeckIntoVoid { .. } => {
             "put the {top-n-cards} of your deck into your void.".to_string()
         }
@@ -202,6 +216,9 @@ pub fn serialize_trigger_event(trigger: &TriggerEvent) -> String {
         }
         TriggerEvent::Banished(predicate) => {
             format!("when {} is {{banished}}, ", serialize_predicate(predicate))
+        }
+        TriggerEvent::LeavesPlay(predicate) => {
+            format!("when {} leaves play, ", serialize_predicate(predicate))
         }
         TriggerEvent::Abandon(predicate) => {
             format!("when you abandon {}, ", serialize_predicate(predicate))

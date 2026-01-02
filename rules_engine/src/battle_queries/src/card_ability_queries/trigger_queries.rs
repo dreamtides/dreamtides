@@ -66,6 +66,18 @@ pub fn matches(
             ),
             _ => false,
         },
+        TriggerEvent::LeavesPlay(predicate) => match trigger {
+            Trigger::Banished(card_id) | Trigger::Dissolved(card_id) => {
+                trigger_predicates::trigger_matches(
+                    battle,
+                    predicate,
+                    card_id,
+                    owning_card_controller,
+                    owning_card_id,
+                )
+            }
+            _ => false,
+        },
         TriggerEvent::PutIntoVoid(predicate) => match trigger {
             Trigger::PutIntoVoid(card_id) => trigger_predicates::trigger_matches(
                 battle,
