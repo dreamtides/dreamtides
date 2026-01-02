@@ -112,9 +112,9 @@
   "Abandon an ally, once per turn: {Reclaim} a {subtype}.", // Implemented
   "Once per turn, when you {materialize} a character, gain {e}.", // Implemented
   "Once per turn, when you discard a card, gain {e} and {kindle}.", // Implemented
-  "Once per turn, when you {materialize} {a-subtype}, draw {cards}.",
-  "Once per turn, when you play a {fast} card, draw {cards}.",
-  "When you play a {fast} card, this character gains +{s} spark.",
+  "Once per turn, when you {materialize} {a-subtype}, draw {cards}.", // Implemented
+  "Once per turn, when you play a {fast} card, draw {cards}.", // Implemented
+  "When you play a {fast} card, this character gains +{s} spark.", // Implemented
   "When you {materialize} an allied {subtype}, this character gains +{s} spark.",
   "When an event is put into your void, this character gains +{s} spark.",
   "Until end of turn, when you play a character, draw {cards}.",

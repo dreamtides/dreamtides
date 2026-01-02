@@ -162,6 +162,30 @@ fn test_round_trip_once_per_turn_when_you_materialize_a_character_gain_energy() 
 }
 
 #[test]
+fn test_round_trip_once_per_turn_when_you_materialize_a_subtype_draw_cards() {
+    let original = "Once per turn, when you {materialize} {a-subtype}, draw {cards}.";
+    let parsed = parse_ability(original, "subtype: warrior, cards: 2");
+    let serialized = parser_formatter::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_once_per_turn_when_you_play_a_fast_card_draw_cards() {
+    let original = "Once per turn, when you play a {fast} card, draw {cards}.";
+    let parsed = parse_ability(original, "cards: 2");
+    let serialized = parser_formatter::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_when_you_play_a_fast_card_this_character_gains_spark() {
+    let original = "When you play a {fast} card, this character gains +{s} spark.";
+    let parsed = parse_ability(original, "s: 2");
+    let serialized = parser_formatter::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
 fn test_round_trip_once_per_turn_when_you_discard_a_card_gain_energy_and_kindle() {
     let original = "Once per turn, when you discard a card, gain {e} and {kindle}.";
     let parsed = parse_ability(original, "e: 1, k: 1");
