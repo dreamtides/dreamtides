@@ -97,6 +97,9 @@ pub fn serialize_standard_effect(effect: &StandardEffect) -> String {
         StandardEffect::ReturnFromYourVoidToHand { target } => {
             format!("return {} from your void to your hand.", serialize_predicate(target))
         }
+        StandardEffect::ReturnFromYourVoidToPlay { target } => {
+            format!("{{Reclaim}} {}.", serialize_predicate(target))
+        }
         _ => unimplemented!("Serialization not yet implemented for this effect type"),
     }
 }
@@ -171,9 +174,15 @@ fn serialize_standard_static_ability(ability: &StandardStaticAbility) -> String 
 }
 fn serialize_cost(cost: &Cost) -> String {
     match cost {
-        Cost::AbandonCharacters(predicate, _) => {
-            format!("abandon {}", serialize_predicate(predicate))
+        Cost::AbandonCharacters(predicate, count) => {
+            if *count == 1 {
+                format!("abandon {}", serialize_predicate(predicate))
+            } else {
+                "abandon {count-allies}".to_string()
+            }
         }
+        Cost::AbandonCharactersCount { .. } => "abandon {count-allies}".to_string(),
+        Cost::Energy(_) => "{e}".to_string(),
         _ => unimplemented!("Serialization not yet implemented for this cost type"),
     }
 }

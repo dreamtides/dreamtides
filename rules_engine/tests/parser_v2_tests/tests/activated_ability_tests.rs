@@ -48,6 +48,24 @@ fn test_abandon_an_ally_this_character_gains_spark() {
 }
 
 #[test]
+fn test_abandon_count_allies_reclaim_this_character() {
+    let result = parse_ability("Abandon {count-allies}: {Reclaim} this character.", "allies: 3");
+    assert_ron_snapshot!(result, @r###"
+    Activated(ActivatedAbility(
+      costs: [
+        AbandonCharactersCount(
+          target: Another(Character),
+          count: Exactly(3),
+        ),
+      ],
+      effect: Effect(ReturnFromYourVoidToPlay(
+        target: This,
+      )),
+    ))
+    "###);
+}
+
+#[test]
 fn test_energy_draw_cards() {
     let result = parse_ability("{e}: Draw {cards}.", "e: 1, cards: 2");
     assert_ron_snapshot!(result, @r###"

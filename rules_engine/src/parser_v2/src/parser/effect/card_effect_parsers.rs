@@ -4,7 +4,7 @@ use chumsky::prelude::*;
 use core_data::numerics::{Energy, Points};
 
 use crate::parser::parser_helpers::{
-    article, cards, discards, energy, points, word, words, ParserExtra, ParserInput,
+    article, cards, directive, discards, energy, points, word, words, ParserExtra, ParserInput,
 };
 use crate::parser::predicate_parser;
 
@@ -16,6 +16,7 @@ pub fn parser<'a>() -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserEx
         gain_energy(),
         gain_points_for_each(),
         gain_points(),
+        reclaim_from_void(),
         return_from_void_to_hand(),
         return_to_hand(),
     ))
@@ -81,4 +82,11 @@ pub fn return_from_void_to_hand<'a>(
         .ignore_then(predicate_parser::predicate_parser())
         .then_ignore(words(&["from", "your", "void", "to", "your", "hand"]))
         .map(|target| StandardEffect::ReturnFromYourVoidToHand { target })
+}
+
+pub fn reclaim_from_void<'a>(
+) -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
+    directive("reclaim")
+        .ignore_then(predicate_parser::predicate_parser())
+        .map(|target| StandardEffect::ReturnFromYourVoidToPlay { target })
 }

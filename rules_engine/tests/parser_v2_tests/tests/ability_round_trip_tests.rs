@@ -524,3 +524,11 @@ fn test_round_trip_materialized_judgment_with_count_allied_subtype_draw_cards() 
     let serialized = parser_formatter::serialize_ability(&parsed);
     assert_eq!(original, serialized);
 }
+
+#[test]
+fn test_round_trip_abandon_count_allies_reclaim_this_character() {
+    let original = "Abandon {count-allies}: {Reclaim} this character.";
+    let parsed = parse_ability(original, "allies: 3");
+    let serialized = parser_formatter::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}

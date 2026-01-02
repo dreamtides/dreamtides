@@ -74,8 +74,8 @@
   "{MaterializedJudgment} With {count-allied-subtype}, gain {e}.", // Implemented
   "{Judgment} With {count-allied-subtype}, gain {e}.", // Implemented
   "{MaterializedJudgment} With {count-allied-subtype}, draw {cards}.", // Implemented
-  "Abandon {count-allies}: {Reclaim} this character.",
-  "{MaterializedJudgment} \nGain {e}.",
+  "Abandon {count-allies}: {Reclaim} this character.", // Implemented
+  "{MaterializedJudgment} \nGain {e}.", // Implemented
   "{Materialized} Each player discards {discards}.",
   "{Judgment} Each player abandons a character.",
   "{Materialized} Draw {cards}.",
