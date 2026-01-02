@@ -94,9 +94,9 @@
   "{Judgment} You may discard {discards} to draw {cards} and gain {points}.", // Implemented
   "{Judgment} You may discard a card to {dissolve} an enemy with spark {s} or less.", // Implemented
   "When you discard this character, {materialize} it.", // Implemented
-  "Put the {top-n-cards} of your deck into your void. Draw {cards}.",
-  "Abandon an ally: Put the {top-n-cards} of your deck into your void.",
-  "{MaterializedDissolved} Put the {top-n-cards} of your deck into your void.",
+  "Put the {top-n-cards} of your deck into your void. Draw {cards}.", // Implemented
+  "Abandon an ally: Put the {top-n-cards} of your deck into your void.", // Implemented
+  "{MaterializedDissolved} Put the {top-n-cards} of your deck into your void.", // Implemented
   "When you play a {subtype}, put the {top-n-cards} of your deck into your void.",
   "When you {materialize} {a-subtype}, {reclaim} this character.",
   "{Materialized} Draw {cards}. Discard {discards}.\n\n{ReclaimForCost}",

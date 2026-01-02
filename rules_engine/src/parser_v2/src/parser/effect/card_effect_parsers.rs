@@ -4,7 +4,8 @@ use chumsky::prelude::*;
 use core_data::numerics::{Energy, Points};
 
 use crate::parser::parser_helpers::{
-    article, cards, directive, discards, energy, points, word, words, ParserExtra, ParserInput,
+    article, cards, directive, discards, energy, points, top_n_cards, word, words, ParserExtra,
+    ParserInput,
 };
 use crate::parser::{card_predicate_parser, predicate_parser};
 
@@ -24,8 +25,14 @@ pub fn parser<'a>() -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserEx
             gain_points_for_each(),
         ))
         .boxed(),
-        choice((gain_points(), reclaim_from_void(), return_from_void_to_hand(), return_to_hand()))
-            .boxed(),
+        choice((
+            gain_points(),
+            put_cards_from_deck_into_void(),
+            reclaim_from_void(),
+            return_from_void_to_hand(),
+            return_to_hand(),
+        ))
+        .boxed(),
     ))
     .boxed()
 }
@@ -97,6 +104,15 @@ pub fn reclaim_from_void<'a>(
     directive("reclaim")
         .ignore_then(predicate_parser::predicate_parser())
         .map(|target| StandardEffect::ReturnFromYourVoidToPlay { target })
+}
+
+/// Parses effects that move the top cards of your deck into your void.
+pub fn put_cards_from_deck_into_void<'a>(
+) -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
+    words(&["put", "the"])
+        .ignore_then(top_n_cards())
+        .then_ignore(words(&["of", "your", "deck", "into", "your", "void"]))
+        .map(|count| StandardEffect::PutCardsFromYourDeckIntoVoid { count })
 }
 
 pub fn each_player_discard_cards<'a>(

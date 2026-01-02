@@ -67,6 +67,9 @@ pub fn serialize_standard_effect(effect: &StandardEffect) -> String {
         StandardEffect::GainsSpark { target, .. } => {
             format!("{} gains +{{s}} spark.", serialize_predicate(target))
         }
+        StandardEffect::PutCardsFromYourDeckIntoVoid { .. } => {
+            "put the {top-n-cards} of your deck into your void.".to_string()
+        }
         StandardEffect::Counterspell { target } => {
             format!("{{Prevent}} a played {}.", serialize_predicate_without_article(target))
         }

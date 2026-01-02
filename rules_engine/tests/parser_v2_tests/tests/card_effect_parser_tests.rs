@@ -295,6 +295,25 @@ fn test_materialized_dissolved_draw_cards() {
 }
 
 #[test]
+fn test_materialized_dissolved_put_cards_from_deck_into_void() {
+    let result = parse_ability(
+        "{MaterializedDissolved} Put the {top-n-cards} of your deck into your void.",
+        "to-void: 2",
+    );
+    assert_ron_snapshot!(result, @r###"
+    Triggered(TriggeredAbility(
+      trigger: Keywords([
+        Materialized,
+        Dissolved,
+      ]),
+      effect: Effect(PutCardsFromYourDeckIntoVoid(
+        count: 2,
+      )),
+    ))
+    "###);
+}
+
+#[test]
 fn test_materialized_return_ally_to_hand() {
     let result = parse_ability("{Materialized} Return an ally to hand.", "");
     assert_ron_snapshot!(result, @r###"
@@ -516,6 +535,32 @@ fn test_judgment_each_player_abandons_character() {
         matching: Character,
         count: 1,
       )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_put_cards_from_deck_into_void_draw_cards() {
+    let result = parse_ability(
+        "Put the {top-n-cards} of your deck into your void. Draw {cards}.",
+        "to-void: 3, cards: 2",
+    );
+    assert_ron_snapshot!(result, @r###"
+    Event(EventAbility(
+      effect: List([
+        EffectWithOptions(
+          effect: PutCardsFromYourDeckIntoVoid(
+            count: 3,
+          ),
+          optional: false,
+        ),
+        EffectWithOptions(
+          effect: DrawCards(
+            count: 2,
+          ),
+          optional: false,
+        ),
+      ]),
     ))
     "###);
 }

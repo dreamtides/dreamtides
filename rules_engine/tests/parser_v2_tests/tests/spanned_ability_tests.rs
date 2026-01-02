@@ -578,6 +578,26 @@ fn test_spanned_compound_effect_event() {
 }
 
 #[test]
+fn test_spanned_put_cards_from_deck_into_void_draw_cards() {
+    let SpannedAbility::Event(event) = parse_spanned_ability(
+        "Put the {top-n-cards} of your deck into your void. Draw {cards}.",
+        "to-void: 3, cards: 2",
+    ) else {
+        panic!("Expected Event ability");
+    };
+
+    assert_eq!(event.additional_cost, None);
+    let SpannedEffect::Effect(effect) = &event.effect else {
+        panic!("Expected Effect, got Modal");
+    };
+    assert_eq!(
+        effect.text.trim(),
+        "Put the {top-n-cards} of your deck into your void. Draw {cards}."
+    );
+    assert_valid_span(&effect.span);
+}
+
+#[test]
 fn test_spanned_compound_effect_triggered() {
     let SpannedAbility::Triggered(triggered) =
         parse_spanned_ability("{Judgment} Gain {e}. Draw {cards}.", "e: 1, cards: 2")
