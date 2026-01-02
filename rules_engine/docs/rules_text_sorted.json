@@ -109,9 +109,9 @@
   "{Materialized} You may {banish} an ally, then {materialize} it.", // Implemented
   "{Judgment} You may {banish} an ally, then {materialize} it.", // Implemented
   "Abandon an ally, once per turn: Gain {points}.", // Implemented
-  "Abandon an ally, once per turn: {Reclaim} a {subtype}.",
-  "Once per turn, when you {materialize} a character, gain {e}.",
-  "Once per turn, when you discard a card, gain {e} and {kindle}.",
+  "Abandon an ally, once per turn: {Reclaim} a {subtype}.", // Implemented
+  "Once per turn, when you {materialize} a character, gain {e}.", // Implemented
+  "Once per turn, when you discard a card, gain {e} and {kindle}.", // Implemented
   "Once per turn, when you {materialize} {a-subtype}, draw {cards}.",
   "Once per turn, when you play a {fast} card, draw {cards}.",
   "When you play a {fast} card, this character gains +{s} spark.",

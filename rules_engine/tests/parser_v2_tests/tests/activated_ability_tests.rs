@@ -42,6 +42,29 @@ fn test_abandon_an_ally_once_per_turn_gain_points() {
 }
 
 #[test]
+fn test_abandon_an_ally_once_per_turn_reclaim_subtype() {
+    let result =
+        parse_ability("Abandon an ally, once per turn: {Reclaim} a {subtype}.", "subtype: warrior");
+    assert_ron_snapshot!(result, @r###"
+    Activated(ActivatedAbility(
+      costs: [
+        AbandonCharactersCount(
+          target: Another(Character),
+          count: Exactly(1),
+        ),
+      ],
+      effect: Effect(ReturnFromYourVoidToPlay(
+        target: Any(CharacterType(Warrior)),
+      )),
+      options: Some(ActivatedAbilityOptions(
+        is_fast: false,
+        is_multi: false,
+      )),
+    ))
+    "###);
+}
+
+#[test]
 fn test_abandon_an_ally_put_cards_from_deck_into_void() {
     let result = parse_ability(
         "Abandon an ally: Put the {top-n-cards} of your deck into your void.",

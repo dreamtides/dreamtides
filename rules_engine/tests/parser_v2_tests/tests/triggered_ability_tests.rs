@@ -41,6 +41,37 @@ fn test_when_you_discard_a_card_kindle() {
 }
 
 #[test]
+fn test_once_per_turn_when_you_discard_a_card_gain_energy_and_kindle() {
+    let result = parse_ability(
+        "Once per turn, when you discard a card, gain {e} and {kindle}.",
+        "e: 1, k: 1",
+    );
+    assert_ron_snapshot!(result, @r###"
+    Triggered(TriggeredAbility(
+      trigger: Discard(Any(Card)),
+      effect: List([
+        EffectWithOptions(
+          effect: GainEnergy(
+            gains: Energy(1),
+          ),
+          optional: false,
+        ),
+        EffectWithOptions(
+          effect: Kindle(
+            amount: Spark(1),
+          ),
+          optional: false,
+        ),
+      ]),
+      options: Some(TriggeredAbilityOptions(
+        once_per_turn: true,
+        until_end_of_turn: false,
+      )),
+    ))
+    "###);
+}
+
+#[test]
 fn test_when_you_discard_this_character_materialize_it() {
     let result = parse_ability("When you discard this character, {materialize} it.", "");
     assert_ron_snapshot!(result, @r###"
@@ -48,6 +79,24 @@ fn test_when_you_discard_this_character_materialize_it() {
       trigger: Discard(This),
       effect: Effect(MaterializeCharacter(
         target: It,
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_once_per_turn_when_you_materialize_a_character_gain_energy() {
+    let result =
+        parse_ability("Once per turn, when you {materialize} a character, gain {e}.", "e: 1");
+    assert_ron_snapshot!(result, @r###"
+    Triggered(TriggeredAbility(
+      trigger: Materialize(Any(Character)),
+      effect: Effect(GainEnergy(
+        gains: Energy(1),
+      )),
+      options: Some(TriggeredAbilityOptions(
+        once_per_turn: true,
+        until_end_of_turn: false,
       )),
     ))
     "###);

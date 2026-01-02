@@ -80,6 +80,31 @@ fn test_spanned_ability_when_you_materialize_a_character_gains_spark() {
 }
 
 #[test]
+fn test_spanned_once_per_turn_when_you_materialize_a_character_gain_energy() {
+    let SpannedAbility::Triggered(triggered) = parse_spanned_ability(
+        "Once per turn, when you {materialize} a character, gain {e}.",
+        "e: 1",
+    ) else {
+        panic!("Expected Triggered ability");
+    };
+
+    let Some(once_per_turn) = triggered.once_per_turn else {
+        panic!("Expected once per turn marker");
+    };
+    assert_eq!(once_per_turn.text, "Once per turn");
+    assert_valid_span(&once_per_turn.span);
+
+    assert_eq!(triggered.trigger.text, "when you {materialize} a character");
+    assert_valid_span(&triggered.trigger.span);
+
+    let SpannedEffect::Effect(effect) = triggered.effect else {
+        panic!("Expected Effect, got Modal");
+    };
+    assert_eq!(effect.text.trim(), "gain {e}.");
+    assert_valid_span(&effect.span);
+}
+
+#[test]
 fn test_spanned_ability_when_you_abandon_an_ally_kindle() {
     let SpannedAbility::Triggered(triggered) =
         parse_spanned_ability("When you abandon an ally, {kindle}.", "k: 1")
@@ -114,6 +139,31 @@ fn test_spanned_when_you_discard_this_character_materialize_it() {
         panic!("Expected Effect, got Modal");
     };
     assert_eq!(effect.text.trim(), "{materialize} it.");
+    assert_valid_span(&effect.span);
+}
+
+#[test]
+fn test_spanned_once_per_turn_when_you_discard_a_card_gain_energy_and_kindle() {
+    let SpannedAbility::Triggered(triggered) = parse_spanned_ability(
+        "Once per turn, when you discard a card, gain {e} and {kindle}.",
+        "e: 1, k: 1",
+    ) else {
+        panic!("Expected Triggered ability");
+    };
+
+    let Some(once_per_turn) = triggered.once_per_turn else {
+        panic!("Expected once per turn marker");
+    };
+    assert_eq!(once_per_turn.text, "Once per turn");
+    assert_valid_span(&once_per_turn.span);
+
+    assert_eq!(triggered.trigger.text, "when you discard a card");
+    assert_valid_span(&triggered.trigger.span);
+
+    let SpannedEffect::Effect(effect) = triggered.effect else {
+        panic!("Expected Effect, got Modal");
+    };
+    assert_eq!(effect.text.trim(), "gain {e} and {kindle}.");
     assert_valid_span(&effect.span);
 }
 
@@ -529,6 +579,25 @@ fn test_parse_activated_ability_abandon_once_per_turn_gain_points() {
         panic!("Expected Effect, got Modal");
     };
     assert_eq!(effect.text.trim(), "Gain {points}.");
+    assert_valid_span(&effect.span);
+}
+
+#[test]
+fn test_parse_activated_ability_abandon_once_per_turn_reclaim_subtype() {
+    let SpannedAbility::Activated(activated) = parse_spanned_ability(
+        "Abandon an ally, once per turn: {Reclaim} a {subtype}.",
+        "subtype: warrior",
+    ) else {
+        panic!("Expected Activated ability");
+    };
+
+    assert_eq!(activated.cost.text, "Abandon an ally, once per turn");
+    assert_valid_span(&activated.cost.span);
+
+    let SpannedEffect::Effect(effect) = activated.effect else {
+        panic!("Expected Effect, got Modal");
+    };
+    assert!(effect.text.contains("{Reclaim} a {subtype}."));
     assert_valid_span(&effect.span);
 }
 
