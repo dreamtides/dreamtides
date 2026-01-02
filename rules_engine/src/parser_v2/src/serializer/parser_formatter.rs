@@ -32,6 +32,10 @@ pub fn serialize_ability(ability: &Ability) -> String {
         Ability::Event(event) => capitalize_first_letter(&serialize_effect(&event.effect)),
         Ability::Activated(activated) => {
             let mut result = String::new();
+            let has_once_per_turn = activated
+                .options
+                .as_ref()
+                .is_some_and(|options| !options.is_fast && !options.is_multi);
             let costs = activated
                 .costs
                 .iter()
@@ -39,6 +43,9 @@ pub fn serialize_ability(ability: &Ability) -> String {
                 .collect::<Vec<_>>()
                 .join(", ");
             result.push_str(&costs);
+            if has_once_per_turn {
+                result.push_str(", once per turn");
+            }
             result.push_str(": ");
             result.push_str(&capitalize_first_letter(&serialize_effect(&activated.effect)));
             result

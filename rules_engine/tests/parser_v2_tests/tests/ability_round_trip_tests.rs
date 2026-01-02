@@ -10,6 +10,14 @@ fn test_round_trip_abandon_an_ally_gain_energy() {
 }
 
 #[test]
+fn test_round_trip_abandon_an_ally_once_per_turn_gain_points() {
+    let original = "Abandon an ally, once per turn: Gain {points}.";
+    let parsed = parse_ability(original, "points: 1");
+    let serialized = parser_formatter::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
 fn test_round_trip_abandon_an_ally_kindle() {
     let original = "Abandon an ally: {Kindle}.";
     let parsed = parse_ability(original, "k: 1");
@@ -181,6 +189,23 @@ fn test_round_trip_when_an_ally_is_banished_kindle() {
 fn test_round_trip_when_an_ally_is_banished_this_character_gains_spark() {
     let original = "When an ally is {banished}, this character gains +{s} spark.";
     let parsed = parse_ability(original, "s: 2");
+    let serialized = parser_formatter::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_materialized_you_may_banish_ally_then_materialize_it() {
+    let original = "{Materialized} You may {Banish} an ally, then {Materialize} it.";
+    let parsed =
+        parse_ability("{Materialized} You may {banish} an ally, then {materialize} it.", "");
+    let serialized = parser_formatter::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_judgment_you_may_banish_ally_then_materialize_it() {
+    let original = "{Judgment} You may {Banish} an ally, then {Materialize} it.";
+    let parsed = parse_ability("{Judgment} You may {banish} an ally, then {materialize} it.", "");
     let serialized = parser_formatter::serialize_ability(&parsed);
     assert_eq!(original, serialized);
 }

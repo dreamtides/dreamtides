@@ -152,6 +152,59 @@ fn test_materialized_banish_opponent_void() {
 }
 
 #[test]
+fn test_materialized_you_may_banish_ally_then_materialize_it() {
+    let result =
+        parse_ability("{Materialized} You may {banish} an ally, then {materialize} it.", "");
+    assert_ron_snapshot!(result, @r###"
+    Triggered(TriggeredAbility(
+      trigger: Keywords([
+        Materialized,
+      ]),
+      effect: List([
+        EffectWithOptions(
+          effect: BanishCharacter(
+            target: Another(Character),
+          ),
+          optional: true,
+        ),
+        EffectWithOptions(
+          effect: MaterializeCharacter(
+            target: It,
+          ),
+          optional: true,
+        ),
+      ]),
+    ))
+    "###);
+}
+
+#[test]
+fn test_judgment_you_may_banish_ally_then_materialize_it() {
+    let result = parse_ability("{Judgment} You may {banish} an ally, then {materialize} it.", "");
+    assert_ron_snapshot!(result, @r###"
+    Triggered(TriggeredAbility(
+      trigger: Keywords([
+        Judgment,
+      ]),
+      effect: List([
+        EffectWithOptions(
+          effect: BanishCharacter(
+            target: Another(Character),
+          ),
+          optional: true,
+        ),
+        EffectWithOptions(
+          effect: MaterializeCharacter(
+            target: It,
+          ),
+          optional: true,
+        ),
+      ]),
+    ))
+    "###);
+}
+
+#[test]
 fn test_prevent_a_played_fast_card() {
     let result = parse_ability("{Prevent} a played {fast} card.", "");
     assert_ron_snapshot!(result, @r###"
