@@ -34,7 +34,7 @@ pub fn discover<'a>() -> impl Parser<'a, ParserInput<'a>, StandardEffect, Parser
 pub fn counterspell<'a>(
 ) -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
     directive("prevent")
-        .ignore_then(article())
+        .ignore_then(words(&["a", "played"]))
         .ignore_then(predicate_parser::predicate_parser())
         .map(|target| StandardEffect::Counterspell { target })
 }
@@ -42,8 +42,7 @@ pub fn counterspell<'a>(
 pub fn counterspell_unless_pays_cost<'a>(
 ) -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
     directive("prevent")
-        .ignore_then(article())
-        .ignore_then(word("played").or_not())
+        .ignore_then(words(&["a", "played"]))
         .ignore_then(predicate_parser::predicate_parser())
         .then_ignore(words(&["unless", "the", "opponent", "pays"]))
         .then(cost_parser::cost_parser())
