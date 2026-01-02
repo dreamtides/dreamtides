@@ -28,8 +28,8 @@ fn general_predicates<'a>() -> impl Parser<'a, ParserInput<'a>, Predicate, Parse
     choice((
         played_card_predicate(),
         any_fast_card_parser(),
-        any_basic_predicates(),
         any_card_predicate_parser(),
+        any_basic_predicates(),
     ))
     .boxed()
 }

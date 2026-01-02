@@ -442,6 +442,30 @@ fn test_round_trip_discard_chosen_character_from_opponent_hand() {
 }
 
 #[test]
+fn test_round_trip_discard_chosen_card_with_cost_from_opponent_hand() {
+    let original = "Discard a chosen card with cost {e} or less from the opponent's hand.";
+    let parsed = parse_ability(original, "e: 2");
+    let serialized = parser_formatter::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_prevent_event_unless_opponent_pays() {
+    let original = "{Prevent} an event unless the opponent pays {e}.";
+    let parsed = parse_ability(original, "e: 1");
+    let serialized = parser_formatter::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_materialized_prevent_played_card_with_cost() {
+    let original = "{Materialized} {Prevent} a played card with cost {e} or less.";
+    let parsed = parse_ability(original, "e: 3");
+    let serialized = parser_formatter::serialize_ability(&parsed);
+    assert_eq!("{Materialized} {Prevent} a card with cost {e} or less.", serialized);
+}
+
+#[test]
 fn test_round_trip_discover_fast_character() {
     let original = "{Discover} a {fast} character.";
     let parsed = parse_ability(original, "");

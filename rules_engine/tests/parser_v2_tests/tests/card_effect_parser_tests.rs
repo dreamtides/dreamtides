@@ -442,6 +442,25 @@ fn test_discard_chosen_character_from_opponent_hand() {
 }
 
 #[test]
+fn test_discard_chosen_card_with_cost_from_opponent_hand() {
+    let result = parse_ability(
+        "Discard a chosen card with cost {e} or less from the opponent's hand.",
+        "e: 2",
+    );
+    assert_ron_snapshot!(result, @r###"
+    Event(EventAbility(
+      effect: Effect(DiscardCardFromEnemyHand(
+        predicate: CardWithCost(
+          target: Card,
+          cost_operator: OrLess,
+          cost: Energy(2),
+        ),
+      )),
+    ))
+    "###);
+}
+
+#[test]
 fn test_judgment_you_may_draw_then_discard() {
     let result = parse_ability(
         "{Judgment} You may draw {cards}, then discard {discards}.",

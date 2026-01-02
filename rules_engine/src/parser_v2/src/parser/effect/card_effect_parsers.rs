@@ -116,9 +116,7 @@ pub fn each_player_abandons_characters<'a>(
 
 fn discard_from_opponent_hand<'a>(
 ) -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
-    word("discard")
-        .ignore_then(article())
-        .ignore_then(word("chosen"))
+    words(&["discard", "a", "chosen"])
         .ignore_then(card_predicate_parser::parser())
         .then_ignore(words(&["from", "the", "opponent's", "hand"]))
         .map(|predicate| StandardEffect::DiscardCardFromEnemyHand { predicate })
