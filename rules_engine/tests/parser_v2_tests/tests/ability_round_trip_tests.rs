@@ -74,6 +74,14 @@ fn test_round_trip_when_you_materialize_an_ally_gain_energy() {
 }
 
 #[test]
+fn test_round_trip_when_you_materialize_a_subtype_reclaim_this_character() {
+    let original = "When you {materialize} {a-subtype}, {Reclaim} this character.";
+    let parsed = parse_ability(original, "subtype: warrior");
+    let serialized = parser_formatter::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
 fn test_round_trip_when_you_materialize_a_character_this_character_gains_spark() {
     let original = "When you {materialize} a character, this character gains +{s} spark.";
     let parsed = parse_ability(original, "s: 2");
@@ -133,6 +141,14 @@ fn test_round_trip_when_an_ally_is_banished_this_character_gains_spark() {
 fn test_round_trip_when_you_play_a_subtype_draw_cards() {
     let original = "When you play {a-subtype}, draw {cards}.";
     let parsed = parse_ability(original, "subtype: warrior, cards: 2");
+    let serialized = parser_formatter::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_when_you_play_a_subtype_put_cards_from_deck_into_void() {
+    let original = "When you play {a-subtype}, put the {top-n-cards} of your deck into your void.";
+    let parsed = parse_ability(original, "subtype: warrior, to-void: 3");
     let serialized = parser_formatter::serialize_ability(&parsed);
     assert_eq!(original, serialized);
 }
@@ -355,6 +371,14 @@ fn test_round_trip_materialized_discard_then_draw() {
     let parsed = parse_ability(original, "discards: 1, cards: 2");
     let serialized = parser_formatter::serialize_ability(&parsed);
     assert_eq!("{Materialized} Discard {discards}. Draw {cards}.", serialized);
+}
+
+#[test]
+fn test_round_trip_materialized_draw_discard() {
+    let original = "{Materialized} Draw {cards}. Discard {discards}.";
+    let parsed = parse_ability(original, "cards: 2, discards: 1");
+    let serialized = parser_formatter::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
 }
 
 #[test]

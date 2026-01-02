@@ -70,6 +70,39 @@ fn test_draw_discard_reclaim() {
 }
 
 #[test]
+fn test_materialized_draw_discard_reclaim() {
+    let result = parse_abilities(
+        "{Materialized} Draw {cards}. Discard {discards}.\n\n{ReclaimForCost}",
+        "cards: 2, discards: 1, reclaim: 3",
+    );
+    assert_eq!(result.len(), 2);
+    assert_ron_snapshot!(result[0], @r###"
+    Triggered(TriggeredAbility(
+      trigger: Keywords([
+        Materialized,
+      ]),
+      effect: List([
+        EffectWithOptions(
+          effect: DrawCards(
+            count: 2,
+          ),
+          optional: false,
+        ),
+        EffectWithOptions(
+          effect: DiscardCards(
+            count: 1,
+          ),
+          optional: false,
+        ),
+      ]),
+    ))
+    "###);
+    assert_ron_snapshot!(result[1], @r###"
+    Named(Reclaim(Some(Energy(3))))
+    "###);
+}
+
+#[test]
 fn test_dissolve_enemy_with_cost_reclaim() {
     let result = parse_abilities(
         "{Dissolve} an enemy with cost {e} or more.\n\n{ReclaimForCost}",

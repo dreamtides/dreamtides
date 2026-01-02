@@ -80,6 +80,22 @@ fn test_when_you_materialize_an_ally_gain_energy() {
 }
 
 #[test]
+fn test_when_you_materialize_a_subtype_reclaim_this_character() {
+    let result = parse_ability(
+        "When you {materialize} {a-subtype}, {reclaim} this character.",
+        "subtype: warrior",
+    );
+    assert_ron_snapshot!(result, @r###"
+    Triggered(TriggeredAbility(
+      trigger: Materialize(Any(CharacterType(Warrior))),
+      effect: Effect(ReturnFromYourVoidToPlay(
+        target: This,
+      )),
+    ))
+    "###);
+}
+
+#[test]
 fn test_when_you_materialize_a_character_this_character_gains_spark() {
     let result = parse_ability(
         "When you {materialize} a character, this character gains +{s} spark.",
@@ -105,6 +121,22 @@ fn test_when_you_play_a_subtype_draw_cards() {
       trigger: Play(Any(CharacterType(Warrior))),
       effect: Effect(DrawCards(
         count: 2,
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_when_you_play_a_subtype_put_cards_from_deck_into_void() {
+    let result = parse_ability(
+        "When you play {a-subtype}, put the {top-n-cards} of your deck into your void.",
+        "subtype: warrior, to-void: 3",
+    );
+    assert_ron_snapshot!(result, @r###"
+    Triggered(TriggeredAbility(
+      trigger: Play(Any(CharacterType(Warrior))),
+      effect: Effect(PutCardsFromYourDeckIntoVoid(
+        count: 3,
       )),
     ))
     "###);

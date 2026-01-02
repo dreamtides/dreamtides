@@ -97,9 +97,9 @@
   "Put the {top-n-cards} of your deck into your void. Draw {cards}.", // Implemented
   "Abandon an ally: Put the {top-n-cards} of your deck into your void.", // Implemented
   "{MaterializedDissolved} Put the {top-n-cards} of your deck into your void.", // Implemented
-  "When you play {a-subtype}, put the {top-n-cards} of your deck into your void.",
-  "When you {materialize} {a-subtype}, {reclaim} this character.",
-  "{Materialized} Draw {cards}. Discard {discards}.\n\n{ReclaimForCost}",
+  "When you play {a-subtype}, put the {top-n-cards} of your deck into your void.", // Implemented
+  "When you {materialize} {a-subtype}, {reclaim} this character.", // Implemented
+  "{Materialized} Draw {cards}. Discard {discards}.\n\n{ReclaimForCost}", // Implemented
   "{e}, Discard {discards}: {kindle}.",
   "{e}, {Banish} another card in your void: {Reclaim} this character.",
   "{e}, Abandon an ally with spark {s} or less: Draw {cards}.",
