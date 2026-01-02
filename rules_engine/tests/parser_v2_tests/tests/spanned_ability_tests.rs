@@ -195,6 +195,26 @@ fn test_spanned_materialized_banish_opponent_void() {
 }
 
 #[test]
+fn test_spanned_materialized_gain_control_enemy_with_cost_or_less() {
+    let SpannedAbility::Triggered(triggered) = parse_spanned_ability(
+        "{Materialized} Gain control of an enemy with cost {e} or less.",
+        "e: 2",
+    ) else {
+        panic!("Expected Triggered ability");
+    };
+
+    assert_eq!(triggered.once_per_turn, None);
+    assert_eq!(triggered.trigger.text, "{Materialized}");
+    assert_valid_span(&triggered.trigger.span);
+
+    let SpannedEffect::Effect(effect) = triggered.effect else {
+        panic!("Expected Effect, got Modal");
+    };
+    assert_eq!(effect.text.trim(), "Gain control of an enemy with cost {e} or less.");
+    assert_valid_span(&effect.span);
+}
+
+#[test]
 fn test_spanned_event_you_may_return_from_void_draw_cards() {
     let SpannedAbility::Event(event) = parse_spanned_ability(
         "You may return a character from your void to your hand. Draw {cards}.",
@@ -313,6 +333,25 @@ fn test_spanned_event_discard_chosen_character_from_opponent_hand() {
 }
 
 #[test]
+fn test_spanned_event_prevent_put_on_top_of_opponent_deck() {
+    let SpannedAbility::Event(event) =
+        parse_spanned_ability("{Prevent} a played card. Put it on top of the opponent's deck.", "")
+    else {
+        panic!("Expected Event ability");
+    };
+
+    assert_eq!(event.additional_cost, None);
+    let SpannedEffect::Effect(effect) = event.effect else {
+        panic!("Expected Effect, got Modal");
+    };
+    assert_eq!(
+        effect.text.trim(),
+        "{Prevent} a played card. Put it on top of the opponent's deck."
+    );
+    assert_valid_span(&effect.span);
+}
+
+#[test]
 fn test_parse_simple_event_draw() {
     let input = "Draw 2.";
     let ability = Ability::Event(EventAbility {
@@ -397,6 +436,24 @@ fn test_parse_activated_ability_abandon() {
         panic!("Expected Effect, got Modal");
     };
     assert!(effect.text.contains("Gain {e}."));
+    assert_valid_span(&effect.span);
+}
+
+#[test]
+fn test_parse_activated_ability_abandon_or_discard() {
+    let SpannedAbility::Activated(activated) =
+        parse_spanned_ability("Abandon an ally or discard a card: {Dissolve} an enemy.", "")
+    else {
+        panic!("Expected Activated ability");
+    };
+
+    assert_eq!(activated.cost.text, "Abandon an ally or discard a card");
+    assert_valid_span(&activated.cost.span);
+
+    let SpannedEffect::Effect(effect) = activated.effect else {
+        panic!("Expected Effect, got Modal");
+    };
+    assert!(effect.text.contains("{Dissolve} an enemy."));
     assert_valid_span(&effect.span);
 }
 

@@ -33,7 +33,6 @@ pub fn counterspell<'a>(
 ) -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
     directive("prevent")
         .ignore_then(article())
-        .ignore_then(word("played").or_not())
         .ignore_then(predicate_parser::predicate_parser())
         .map(|target| StandardEffect::Counterspell { target })
 }

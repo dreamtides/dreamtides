@@ -165,6 +165,30 @@ fn test_prevent_a_played_character() {
 }
 
 #[test]
+fn test_prevent_played_card_put_on_top_of_opponent_deck() {
+    let result =
+        parse_ability("{Prevent} a played card. Put it on top of the opponent's deck.", "");
+    assert_ron_snapshot!(result, @r###"
+    Event(EventAbility(
+      effect: List([
+        EffectWithOptions(
+          effect: Counterspell(
+            target: Any(Card),
+          ),
+          optional: false,
+        ),
+        EffectWithOptions(
+          effect: PutOnTopOfEnemyDeck(
+            target: It,
+          ),
+          optional: false,
+        ),
+      ]),
+    ))
+    "###);
+}
+
+#[test]
 fn test_discover_an_event() {
     let result = parse_ability("{Discover} an event.", "");
     assert_ron_snapshot!(result, @r###"

@@ -47,6 +47,8 @@ static PARSER_WORDS: &[&str] = &[
     "pay",
     "per",
     "play",
+    "played",
+    "put",
     "return",
     "spark",
     "that",

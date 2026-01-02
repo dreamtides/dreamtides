@@ -70,6 +70,9 @@ pub fn serialize_standard_effect(effect: &StandardEffect) -> String {
         StandardEffect::Counterspell { target } => {
             format!("{{Prevent}} {}.", serialize_predicate(target))
         }
+        StandardEffect::GainControl { target } => {
+            format!("gain control of {}.", serialize_predicate(target))
+        }
         StandardEffect::DissolveCharacter { target } => {
             format!("{{Dissolve}} {}.", serialize_predicate(target))
         }
@@ -108,6 +111,9 @@ pub fn serialize_standard_effect(effect: &StandardEffect) -> String {
         }
         StandardEffect::ReturnFromYourVoidToPlay { target } => {
             format!("{{Reclaim}} {}.", serialize_predicate(target))
+        }
+        StandardEffect::PutOnTopOfEnemyDeck { target } => {
+            format!("put {} on top of the opponent's deck.", serialize_predicate(target))
         }
         StandardEffect::EachPlayerDiscardCards { .. } => {
             "each player discards {discards}.".to_string()
@@ -212,6 +218,7 @@ fn serialize_cost(cost: &Cost) -> String {
             }
         }
         Cost::Energy(_) => "{e}".to_string(),
+        Cost::AbandonACharacterOrDiscardACard => "abandon an ally or discard a card".to_string(),
         _ => unimplemented!("Serialization not yet implemented for this cost type"),
     }
 }

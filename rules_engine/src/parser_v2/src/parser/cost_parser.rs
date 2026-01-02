@@ -5,12 +5,12 @@ use chumsky::prelude::*;
 use core_data::numerics::Energy;
 
 use crate::parser::parser_helpers::{
-    article, count_allies, discards, energy, word, ParserExtra, ParserInput,
+    article, count_allies, discards, energy, word, words, ParserExtra, ParserInput,
 };
 use crate::parser::{card_predicate_parser, predicate_parser};
 
 pub fn cost_parser<'a>() -> impl Parser<'a, ParserInput<'a>, Cost, ParserExtra<'a>> + Clone {
-    choice((energy_cost(), abandon_cost(), discard_cost())).boxed()
+    choice((abandon_or_discard_cost(), energy_cost(), abandon_cost(), discard_cost())).boxed()
 }
 
 fn energy_cost<'a>() -> impl Parser<'a, ParserInput<'a>, Cost, ParserExtra<'a>> + Clone {
@@ -19,6 +19,21 @@ fn energy_cost<'a>() -> impl Parser<'a, ParserInput<'a>, Cost, ParserExtra<'a>> 
 
 fn abandon_cost<'a>() -> impl Parser<'a, ParserInput<'a>, Cost, ParserExtra<'a>> + Clone {
     choice((abandon_cost_with_count(), abandon_cost_single()))
+}
+
+fn abandon_or_discard_cost<'a>() -> impl Parser<'a, ParserInput<'a>, Cost, ParserExtra<'a>> + Clone
+{
+    word("abandon")
+        .ignore_then(article())
+        .ignore_then(predicate_parser::predicate_parser())
+        .filter(|predicate| matches!(predicate, Predicate::Another(CardPredicate::Character)))
+        .then_ignore(words(&["or", "discard"]))
+        .then_ignore(article())
+        .ignore_then(
+            predicate_parser::predicate_parser()
+                .filter(|predicate| matches!(predicate, Predicate::Any(CardPredicate::Card))),
+        )
+        .to(Cost::AbandonACharacterOrDiscardACard)
 }
 
 fn abandon_cost_with_count<'a>() -> impl Parser<'a, ParserInput<'a>, Cost, ParserExtra<'a>> + Clone
