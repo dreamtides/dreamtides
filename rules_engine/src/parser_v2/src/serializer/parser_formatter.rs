@@ -48,6 +48,10 @@ pub fn serialize_standard_effect(effect: &StandardEffect) -> String {
     match effect {
         StandardEffect::DrawCards { .. } => "draw {cards}.".to_string(),
         StandardEffect::DiscardCards { .. } => "discard {discards}.".to_string(),
+        StandardEffect::DiscardCardFromEnemyHand { predicate } => format!(
+            "discard a chosen {} from the opponent's hand.",
+            serialize_card_predicate_without_article(predicate)
+        ),
         StandardEffect::GainEnergy { .. } => "gain {e}.".to_string(),
         StandardEffect::GainEnergyForEach { for_each, .. } => {
             format!("gain {{e}} for each {}.", serialize_for_each_predicate(for_each))
@@ -93,6 +97,7 @@ pub fn serialize_standard_effect(effect: &StandardEffect) -> String {
                 "return an enemy or ally to hand.".to_string()
             }
             Predicate::Another(CardPredicate::Character) => "return an ally to hand.".to_string(),
+            Predicate::This => "return this character to your hand.".to_string(),
             _ => format!("return {} to hand.", serialize_predicate(target)),
         },
         StandardEffect::ReturnFromYourVoidToHand { target } => {
@@ -204,10 +209,12 @@ fn serialize_effect(effect: &Effect) -> String {
                 result.push(' ');
             }
             if options.optional {
-                result.push_str(&format!("you may {}", serialize_standard_effect(&options.effect)));
-            } else {
-                result.push_str(&serialize_standard_effect(&options.effect));
+                result.push_str("you may ");
             }
+            if let Some(trigger_cost) = &options.trigger_cost {
+                result.push_str(&format!("pay {} to ", serialize_cost(trigger_cost)));
+            }
+            result.push_str(&serialize_standard_effect(&options.effect));
             result
         }
         Effect::List(effects) => {
@@ -331,6 +338,14 @@ fn serialize_card_predicate(card_predicate: &CardPredicate) -> String {
             unimplemented!("Serialization not yet implemented for this card predicate type")
         }
     }
+}
+fn serialize_card_predicate_without_article(card_predicate: &CardPredicate) -> String {
+    let predicate = serialize_card_predicate(card_predicate);
+    let trimmed = predicate
+        .strip_prefix("an ")
+        .or_else(|| predicate.strip_prefix("a "))
+        .unwrap_or(&predicate);
+    trimmed.to_string()
 }
 fn serialize_card_predicate_plural(card_predicate: &CardPredicate) -> String {
     match card_predicate {

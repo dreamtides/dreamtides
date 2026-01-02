@@ -10,17 +10,22 @@ use crate::parser::{card_predicate_parser, predicate_parser};
 
 pub fn parser<'a>() -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
     choice((
-        each_player_abandons_characters(),
-        each_player_discard_cards(),
-        draw_cards(),
-        discard_cards(),
-        gain_energy_for_each(),
-        gain_energy(),
-        gain_points_for_each(),
-        gain_points(),
-        reclaim_from_void(),
-        return_from_void_to_hand(),
-        return_to_hand(),
+        choice((
+            each_player_abandons_characters(),
+            each_player_discard_cards(),
+            discard_from_opponent_hand(),
+        ))
+        .boxed(),
+        choice((
+            draw_cards(),
+            discard_cards(),
+            gain_energy_for_each(),
+            gain_energy(),
+            gain_points_for_each(),
+        ))
+        .boxed(),
+        choice((gain_points(), reclaim_from_void(), return_from_void_to_hand(), return_to_hand()))
+            .boxed(),
     ))
     .boxed()
 }
@@ -72,16 +77,16 @@ pub fn gain_points_for_each<'a>(
 pub fn return_to_hand<'a>(
 ) -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
     word("return")
-        .ignore_then(article())
+        .ignore_then(article().or_not())
         .ignore_then(predicate_parser::predicate_parser())
-        .then_ignore(words(&["to", "hand"]))
+        .then_ignore(choice((words(&["to", "hand"]), words(&["to", "your", "hand"]))).boxed())
         .map(|target| StandardEffect::ReturnToHand { target })
 }
 
 pub fn return_from_void_to_hand<'a>(
 ) -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
     word("return")
-        .then_ignore(article().or_not())
+        .ignore_then(article().or_not())
         .ignore_then(predicate_parser::predicate_parser())
         .then_ignore(words(&["from", "your", "void", "to", "your", "hand"]))
         .map(|target| StandardEffect::ReturnFromYourVoidToHand { target })
@@ -107,4 +112,14 @@ pub fn each_player_abandons_characters<'a>(
         .ignore_then(article())
         .ignore_then(card_predicate_parser::parser())
         .map(|matching| StandardEffect::EachPlayerAbandonsCharacters { matching, count: 1 })
+}
+
+fn discard_from_opponent_hand<'a>(
+) -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
+    word("discard")
+        .ignore_then(article())
+        .ignore_then(word("chosen"))
+        .ignore_then(card_predicate_parser::parser())
+        .then_ignore(words(&["from", "the", "opponent's", "hand"]))
+        .map(|predicate| StandardEffect::DiscardCardFromEnemyHand { predicate })
 }

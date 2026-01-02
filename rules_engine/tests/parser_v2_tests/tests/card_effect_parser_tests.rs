@@ -388,6 +388,60 @@ fn test_you_may_return_character_from_void_draw_cards() {
 }
 
 #[test]
+fn test_judgment_you_may_pay_to_return_this_from_void_to_hand() {
+    let result = parse_ability(
+        "{Judgment} You may pay {e} to return this character from your void to your hand.",
+        "e: 1",
+    );
+    assert_ron_snapshot!(result, @r###"
+    Triggered(TriggeredAbility(
+      trigger: Keywords([
+        Judgment,
+      ]),
+      effect: WithOptions(EffectWithOptions(
+        effect: ReturnFromYourVoidToHand(
+          target: This,
+        ),
+        optional: true,
+        trigger_cost: Some(Energy(Energy(1))),
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_dissolved_you_may_pay_to_return_this_to_hand() {
+    let result =
+        parse_ability("{Dissolved} You may pay {e} to return this character to your hand.", "e: 1");
+    assert_ron_snapshot!(result, @r###"
+    Triggered(TriggeredAbility(
+      trigger: Keywords([
+        Dissolved,
+      ]),
+      effect: WithOptions(EffectWithOptions(
+        effect: ReturnToHand(
+          target: This,
+        ),
+        optional: true,
+        trigger_cost: Some(Energy(Energy(1))),
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_discard_chosen_character_from_opponent_hand() {
+    let result = parse_ability("Discard a chosen character from the opponent's hand.", "");
+    assert_ron_snapshot!(result, @r###"
+    Event(EventAbility(
+      effect: Effect(DiscardCardFromEnemyHand(
+        predicate: Character,
+      )),
+    ))
+    "###);
+}
+
+#[test]
 fn test_judgment_you_may_draw_then_discard() {
     let result = parse_ability(
         "{Judgment} You may draw {cards}, then discard {discards}.",

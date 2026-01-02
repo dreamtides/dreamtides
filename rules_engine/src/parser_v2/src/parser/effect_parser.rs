@@ -1,12 +1,16 @@
+use ability_data::cost::Cost;
 use ability_data::effect::{Effect, EffectWithOptions};
 use ability_data::standard_effect::StandardEffect;
 use chumsky::prelude::*;
+use core_data::numerics::Energy;
 
 use crate::parser::condition_parser;
 use crate::parser::effect::{
     card_effect_parsers, game_effects_parsers, resource_effect_parsers, spark_effect_parsers,
 };
-use crate::parser::parser_helpers::{effect_separator, period, words, ParserExtra, ParserInput};
+use crate::parser::parser_helpers::{
+    effect_separator, energy, period, word, words, ParserExtra, ParserInput,
+};
 
 pub fn single_effect_parser<'a>(
 ) -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
@@ -21,8 +25,31 @@ pub fn single_effect_parser<'a>(
 
 pub fn effect_or_compound_parser<'a>(
 ) -> impl Parser<'a, ParserInput<'a>, Effect, ParserExtra<'a>> + Clone {
-    choice((optional_effect_parser(), conditional_effect_parser(), standard_effect_parser()))
-        .boxed()
+    choice((
+        optional_effect_with_trigger_cost_parser(),
+        optional_effect_parser(),
+        conditional_effect_parser(),
+        standard_effect_parser(),
+    ))
+    .boxed()
+}
+
+fn optional_effect_with_trigger_cost_parser<'a>(
+) -> impl Parser<'a, ParserInput<'a>, Effect, ParserExtra<'a>> + Clone {
+    words(&["you", "may", "pay"])
+        .ignore_then(energy())
+        .map(|cost| Cost::Energy(Energy(cost)))
+        .then_ignore(word("to"))
+        .then(single_effect_parser())
+        .then_ignore(period())
+        .map(|(trigger_cost, effect)| {
+            Effect::WithOptions(EffectWithOptions {
+                effect,
+                optional: true,
+                trigger_cost: Some(trigger_cost),
+                condition: None,
+            })
+        })
 }
 
 fn conditional_effect_parser<'a>(
