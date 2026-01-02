@@ -437,3 +437,23 @@ fn test_materialized_judgment_with_count_allied_subtype_draw_cards() {
     ))
     "###);
 }
+
+#[test]
+fn test_materialized_gain_control_enemy_with_cost_or_less() {
+    let result =
+        parse_ability("{Materialized} Gain control of an enemy with cost {e} or less.", "e: 2");
+    assert_ron_snapshot!(result, @r###"
+    Triggered(TriggeredAbility(
+      trigger: Keywords([
+        Materialized,
+      ]),
+      effect: Effect(GainControl(
+        target: Enemy(CardWithCost(
+          target: Character,
+          cost_operator: OrLess,
+          cost: Energy(2),
+        )),
+      )),
+    ))
+    "###);
+}

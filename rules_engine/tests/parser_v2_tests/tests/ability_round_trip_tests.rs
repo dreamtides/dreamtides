@@ -18,6 +18,14 @@ fn test_round_trip_abandon_an_ally_kindle() {
 }
 
 #[test]
+fn test_round_trip_abandon_or_discard_dissolve_enemy() {
+    let original = "Abandon an ally or discard a card: {Dissolve} an enemy.";
+    let parsed = parse_ability(original, "");
+    let serialized = parser_formatter::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
 fn test_round_trip_at_end_of_turn_gain_energy() {
     let original = "At the end of your turn, gain {e}.";
     let parsed = parse_ability(original, "e: 2");
@@ -154,6 +162,14 @@ fn test_round_trip_event_prevent() {
 }
 
 #[test]
+fn test_round_trip_event_put_on_top_of_opponent_deck() {
+    let original = "Put it on top of the opponent's deck.";
+    let parsed = parse_ability(original, "");
+    let serialized = parser_formatter::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
 fn test_round_trip_event_dissolve() {
     let original = "{Dissolve} an enemy.";
     let parsed = parse_ability(original, "");
@@ -189,6 +205,14 @@ fn test_round_trip_materialized_foresee() {
 fn test_round_trip_materialized_judgment_kindle() {
     let original = "{MaterializedJudgment} {Kindle}.";
     let parsed = parse_ability(original, "k: 1");
+    let serialized = parser_formatter::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_materialized_gain_control_enemy_with_cost_or_less() {
+    let original = "{Materialized} Gain control of an enemy with cost {e} or less.";
+    let parsed = parse_ability(original, "e: 2");
     let serialized = parser_formatter::serialize_ability(&parsed);
     assert_eq!(original, serialized);
 }

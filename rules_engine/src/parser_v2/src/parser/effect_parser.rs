@@ -6,7 +6,8 @@ use chumsky::prelude::*;
 use core_data::numerics::Energy;
 
 use crate::parser::effect::{
-    card_effect_parsers, game_effects_parsers, resource_effect_parsers, spark_effect_parsers,
+    card_effect_parsers, control_effects_parsers, game_effects_parsers, resource_effect_parsers,
+    spark_effect_parsers,
 };
 use crate::parser::parser_helpers::{
     article, discards, effect_separator, energy, period, word, words, ParserExtra, ParserInput,
@@ -17,6 +18,7 @@ pub fn single_effect_parser<'a>(
 ) -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
     choice((
         card_effect_parsers::parser(),
+        control_effects_parsers::parser(),
         game_effects_parsers::parser(),
         resource_effect_parsers::parser(),
         spark_effect_parsers::parser(),

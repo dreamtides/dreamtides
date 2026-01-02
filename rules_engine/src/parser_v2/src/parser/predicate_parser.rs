@@ -16,25 +16,32 @@ pub fn ally() -> Predicate {
 fn specific_predicates<'a>() -> impl Parser<'a, ParserInput<'a>, Predicate, ParserExtra<'a>> + Clone
 {
     choice((
-        this_parser(),
-        it_parser(),
-        enemy_or_ally_parser(),
-        non_subtype_enemy_parser(),
-        allied_parser(),
-        enemy_parser(),
-        ally_parser(),
+        reference_predicates(),
+        choice((enemy_or_ally_parser(), non_subtype_enemy_parser(), allied_parser())).boxed(),
+        choice((enemy_parser(), ally_parser())).boxed(),
     ))
     .boxed()
 }
 
 fn general_predicates<'a>() -> impl Parser<'a, ParserInput<'a>, Predicate, ParserExtra<'a>> + Clone
 {
-    choice((any_fast_card_parser(), any_basic_predicates(), any_card_predicate_parser())).boxed()
+    choice((
+        played_card_predicate(),
+        any_fast_card_parser(),
+        any_basic_predicates(),
+        any_card_predicate_parser(),
+    ))
+    .boxed()
 }
 
 fn any_basic_predicates<'a>() -> impl Parser<'a, ParserInput<'a>, Predicate, ParserExtra<'a>> + Clone
 {
     choice((any_character_parser(), any_event_parser(), any_card_parser())).boxed()
+}
+
+fn reference_predicates<'a>() -> impl Parser<'a, ParserInput<'a>, Predicate, ParserExtra<'a>> + Clone
+{
+    choice((this_parser(), it_parser())).boxed()
 }
 
 fn this_parser<'a>() -> impl Parser<'a, ParserInput<'a>, Predicate, ParserExtra<'a>> + Clone {
@@ -94,6 +101,11 @@ fn any_fast_card_parser<'a>() -> impl Parser<'a, ParserInput<'a>, Predicate, Par
     directive("fast")
         .ignore_then(card_predicate_parser::parser())
         .map(|target| Predicate::Any(CardPredicate::Fast { target: Box::new(target) }))
+}
+
+fn played_card_predicate<'a>(
+) -> impl Parser<'a, ParserInput<'a>, Predicate, ParserExtra<'a>> + Clone {
+    word("played").ignore_then(card_predicate_parser::parser()).map(Predicate::Any)
 }
 
 fn any_card_predicate_parser<'a>(

@@ -88,9 +88,9 @@
   "Discard a chosen card with cost {e} or less from the opponent's hand.",
   "{Prevent} an event unless the opponent pays {e}.",
   "{Materialized} {Prevent} a played card with cost {e} or less.",
-  "{Materialized} Gain control of an enemy with cost {e} or less.",
-  "{Prevent} a played card. Put it on top of the opponent's deck.",
-  "Abandon an ally or discard a card: {Dissolve} an enemy.",
+  "{Materialized} Gain control of an enemy with cost {e} or less.", // Implemented
+  "{Prevent} a played card. Put it on top of the opponent's deck.", // Implemented
+  "Abandon an ally or discard a card: {Dissolve} an enemy.", // Implemented
   "{Judgment} You may discard {discards} to draw {cards} and gain {points}.", // Implemented
   "{Judgment} You may discard a card to {dissolve} an enemy with spark {s} or less.", // Implemented
   "When you discard this character, {materialize} it.", // Implemented
