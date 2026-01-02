@@ -1048,7 +1048,7 @@ name = "Ripple of Defiance"
 id = "9c605a08-dac4-4c3e-8aff-437b79809937"
 energy-cost = 1
 rules-text = """
-{Prevent} an event unless the opponent pays {e}.
+{Prevent} a played event unless the opponent pays {e}.
 """
 preview = "Prevent an event unless the opponent pays 2●."
 variables = "e: 2"
@@ -1124,7 +1124,7 @@ card-number = 66
 name = "Abolish"
 id = "eb85b69a-3771-4148-83cf-a7ddb0caee98"
 energy-cost = 2
-rules-text = "{Prevent} a card."
+rules-text = "{Prevent} played a card."
 preview = "Prevent a card."
 card-type = "Event"
 is-fast = true
@@ -3649,7 +3649,7 @@ name = "Together Against the Tide"
 id = "89084e83-a934-4fda-9178-f6a371ccac13"
 energy-cost = 1
 rules-text = """
-{Prevent} an event which could {dissolve} an ally.
+{Prevent} a played event which could {dissolve} an ally.
 """
 preview = "Prevent an event which could dissolve an ally."
 card-type = "Event"
