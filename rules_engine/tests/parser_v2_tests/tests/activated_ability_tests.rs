@@ -7,7 +7,10 @@ fn test_abandon_an_ally_gain_energy() {
     assert_ron_snapshot!(result, @r###"
     Activated(ActivatedAbility(
       costs: [
-        AbandonCharacters(Another(Character), 1),
+        AbandonCharactersCount(
+          target: Another(Character),
+          count: Exactly(1),
+        ),
       ],
       effect: Effect(GainEnergy(
         gains: Energy(1),
@@ -22,7 +25,10 @@ fn test_abandon_an_ally_kindle() {
     assert_ron_snapshot!(result, @r###"
     Activated(ActivatedAbility(
       costs: [
-        AbandonCharacters(Another(Character), 1),
+        AbandonCharactersCount(
+          target: Another(Character),
+          count: Exactly(1),
+        ),
       ],
       effect: Effect(Kindle(
         amount: Spark(1),
@@ -37,7 +43,10 @@ fn test_abandon_an_ally_this_character_gains_spark() {
     assert_ron_snapshot!(result, @r###"
     Activated(ActivatedAbility(
       costs: [
-        AbandonCharacters(Another(Character), 1),
+        AbandonCharactersCount(
+          target: Another(Character),
+          count: Exactly(1),
+        ),
       ],
       effect: Effect(GainsSpark(
         target: This,

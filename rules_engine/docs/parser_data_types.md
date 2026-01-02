@@ -247,7 +247,6 @@ Costs represent what must be paid:
 ```rust
 pub enum Cost {
     Energy(Energy),
-    AbandonCharacters(Predicate, u32),
     AbandonCharactersCount { target: Predicate, count: CollectionExpression },
     AbandonDreamscapes(u32),
     AbandonACharacterOrDiscardACard,
