@@ -32,8 +32,13 @@ pub fn serialize_ability(ability: &Ability) -> String {
         Ability::Event(event) => capitalize_first_letter(&serialize_effect(&event.effect)),
         Ability::Activated(activated) => {
             let mut result = String::new();
-            let costs = activated.costs.iter().map(serialize_cost).collect::<Vec<_>>().join(", ");
-            result.push_str(&capitalize_first_letter(&costs));
+            let costs = activated
+                .costs
+                .iter()
+                .map(|cost| capitalize_first_letter(&serialize_cost(cost)))
+                .collect::<Vec<_>>()
+                .join(", ");
+            result.push_str(&costs);
             result.push_str(": ");
             result.push_str(&capitalize_first_letter(&serialize_effect(&activated.effect)));
             result
@@ -229,6 +234,13 @@ fn serialize_cost(cost: &Cost) -> String {
         }
         Cost::Energy(_) => "{e}".to_string(),
         Cost::AbandonACharacterOrDiscardACard => "abandon an ally or discard a card".to_string(),
+        Cost::BanishCardsFromYourVoid(count) => {
+            if *count == 1 {
+                "{Banish} another card in your void".to_string()
+            } else {
+                "{Banish} {count} cards in your void".to_string()
+            }
+        }
         _ => unimplemented!("Serialization not yet implemented for this cost type"),
     }
 }
@@ -374,6 +386,9 @@ fn serialize_your_predicate(card_predicate: &CardPredicate) -> String {
     match card_predicate {
         CardPredicate::Character => "ally".to_string(),
         CardPredicate::CharacterType(_) => "allied {subtype}".to_string(),
+        CardPredicate::CharacterWithSpark(_, operator) => {
+            format!("ally with spark {{s}} {}", serialize_operator(operator))
+        }
         _ => {
             unimplemented!("Serialization not yet implemented for this your predicate type")
         }

@@ -34,6 +34,30 @@ fn test_round_trip_abandon_or_discard_dissolve_enemy() {
 }
 
 #[test]
+fn test_round_trip_energy_discard_kindle() {
+    let original = "{e}, Discard {discards}: {kindle}.";
+    let parsed = parse_ability(original, "e: 1, discards: 2, k: 1");
+    let serialized = parser_formatter::serialize_ability(&parsed);
+    assert_eq!("{e}, Discard {discards}: {Kindle}.", serialized);
+}
+
+#[test]
+fn test_round_trip_energy_banish_reclaim_this_character() {
+    let original = "{e}, {Banish} another card in your void: {Reclaim} this character.";
+    let parsed = parse_ability(original, "e: 1");
+    let serialized = parser_formatter::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_energy_abandon_ally_with_spark_draw_cards() {
+    let original = "{e}, Abandon an ally with spark {s} or less: Draw {cards}.";
+    let parsed = parse_ability(original, "e: 1, s: 2, cards: 3");
+    let serialized = parser_formatter::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
 fn test_round_trip_at_end_of_turn_gain_energy() {
     let original = "At the end of your turn, gain {e}.";
     let parsed = parse_ability(original, "e: 2");
