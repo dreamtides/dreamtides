@@ -113,6 +113,13 @@ pub fn serialize_standard_effect(effect: &StandardEffect) -> String {
         StandardEffect::MaterializeCharacter { target } => {
             format!("{{Materialize}} {}.", serialize_predicate(target))
         }
+        StandardEffect::MaterializeSilentCopy { target, count, quantity } => {
+            if *count == 1 && matches!(quantity, QuantityExpression::Matching(_)) {
+                format!("{{Materialize}} a copy of {}.", serialize_predicate(target))
+            } else {
+                unimplemented!("Serialization not yet implemented for this materialize copy effect")
+            }
+        }
         StandardEffect::ReturnToHand { target } => match target {
             Predicate::Any(CardPredicate::Character) => {
                 "return an enemy or ally to hand.".to_string()
@@ -232,6 +239,7 @@ fn serialize_cost(cost: &Cost) -> String {
                 }
             }
         }
+        Cost::DiscardHand => "discard your hand".to_string(),
         Cost::Energy(_) => "{e}".to_string(),
         Cost::AbandonACharacterOrDiscardACard => "abandon an ally or discard a card".to_string(),
         Cost::BanishCardsFromYourVoid(count) => {

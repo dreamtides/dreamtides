@@ -1,5 +1,6 @@
 use ability_data::collection_expression::CollectionExpression;
 use ability_data::predicate::{CardPredicate, Predicate};
+use ability_data::quantity_expression_data::QuantityExpression;
 use ability_data::standard_effect::StandardEffect;
 use chumsky::prelude::*;
 
@@ -10,12 +11,13 @@ use crate::parser::{card_predicate_parser, cost_parser, predicate_parser};
 
 pub fn parser<'a>() -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
     choice((
-        foresee(),
-        discover(),
-        counterspell_effects(),
-        choice((dissolve_all_characters(), dissolve_character())).boxed(),
-        choice((banish_character(), banish_enemy_void())).boxed(),
-        materialize_character(),
+        choice((foresee(), discover(), counterspell_effects())).boxed(),
+        choice((
+            choice((dissolve_all_characters(), dissolve_character())).boxed(),
+            choice((banish_character(), banish_enemy_void())).boxed(),
+            choice((materialize_copy(), materialize_character())).boxed(),
+        ))
+        .boxed(),
     ))
     .boxed()
 }
@@ -88,6 +90,19 @@ pub fn materialize_character<'a>(
         .ignore_then(article().or_not())
         .ignore_then(predicate_parser::predicate_parser())
         .map(|target| StandardEffect::MaterializeCharacter { target })
+}
+
+pub fn materialize_copy<'a>(
+) -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
+    directive("materialize")
+        .ignore_then(words(&["a", "copy", "of"]))
+        .ignore_then(article().or_not())
+        .ignore_then(predicate_parser::predicate_parser())
+        .map(|target| StandardEffect::MaterializeSilentCopy {
+            target: target.clone(),
+            count: 1,
+            quantity: QuantityExpression::Matching(target),
+        })
 }
 
 fn counterspell_effects<'a>(
