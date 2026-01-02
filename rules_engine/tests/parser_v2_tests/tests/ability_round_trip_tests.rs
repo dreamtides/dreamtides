@@ -58,6 +58,30 @@ fn test_round_trip_energy_abandon_ally_with_spark_draw_cards() {
 }
 
 #[test]
+fn test_round_trip_energy_abandon_character_discard_hand_draw_cards() {
+    let original = "{e}, Abandon a character, Discard your hand: Draw {cards}.";
+    let parsed = parse_ability(original, "e: 2, cards: 3");
+    let serialized = parser_formatter::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_abandon_character_discard_hand_gain_energy() {
+    let original = "Abandon a character, Discard your hand: Gain {e}.";
+    let parsed = parse_ability(original, "e: 1");
+    let serialized = parser_formatter::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_energy_materialize_copy_of_ally() {
+    let original = "{e}: {Materialize} a copy of an ally.";
+    let parsed = parse_ability(original, "e: 1");
+    let serialized = parser_formatter::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
 fn test_round_trip_at_end_of_turn_gain_energy() {
     let original = "At the end of your turn, gain {e}.";
     let parsed = parse_ability(original, "e: 2");

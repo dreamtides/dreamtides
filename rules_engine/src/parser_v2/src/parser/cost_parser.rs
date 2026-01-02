@@ -11,11 +11,8 @@ use crate::parser::{card_predicate_parser, predicate_parser};
 
 pub fn cost_parser<'a>() -> impl Parser<'a, ParserInput<'a>, Cost, ParserExtra<'a>> + Clone {
     choice((
-        abandon_or_discard_cost(),
-        energy_cost(),
-        abandon_cost(),
-        discard_cost(),
-        banish_from_your_void_cost(),
+        choice((abandon_or_discard_cost(), energy_cost(), abandon_cost())).boxed(),
+        choice((discard_hand_cost(), discard_cost(), banish_from_your_void_cost())).boxed(),
     ))
     .boxed()
 }
@@ -64,6 +61,10 @@ fn discard_cost<'a>() -> impl Parser<'a, ParserInput<'a>, Cost, ParserExtra<'a>>
             article().ignore_then(card_predicate_parser::parser()).map(|predicate| (predicate, 1)),
         )))
         .map(|(predicate, count)| Cost::DiscardCards(predicate, count))
+}
+
+fn discard_hand_cost<'a>() -> impl Parser<'a, ParserInput<'a>, Cost, ParserExtra<'a>> + Clone {
+    words(&["discard", "your", "hand"]).to(Cost::DiscardHand)
 }
 
 fn banish_from_your_void_cost<'a>(

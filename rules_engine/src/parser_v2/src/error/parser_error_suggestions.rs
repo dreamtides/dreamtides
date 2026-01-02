@@ -19,6 +19,7 @@ static PARSER_WORDS: &[&str] = &[
     "characters",
     "chosen",
     "control",
+    "copy",
     "cost",
     "deck",
     "disable",

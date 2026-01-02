@@ -166,6 +166,65 @@ fn test_energy_abandon_ally_with_spark_draw_cards() {
 }
 
 #[test]
+fn test_energy_abandon_character_discard_hand_draw_cards() {
+    let result = parse_ability(
+        "{e}, Abandon a character, Discard your hand: Draw {cards}.",
+        "e: 2, cards: 3",
+    );
+    assert_ron_snapshot!(result, @r###"
+    Activated(ActivatedAbility(
+      costs: [
+        Energy(Energy(2)),
+        AbandonCharactersCount(
+          target: Any(Character),
+          count: Exactly(1),
+        ),
+        DiscardHand,
+      ],
+      effect: Effect(DrawCards(
+        count: 3,
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_abandon_character_discard_hand_gain_energy() {
+    let result = parse_ability("Abandon a character, Discard your hand: Gain {e}.", "e: 1");
+    assert_ron_snapshot!(result, @r###"
+    Activated(ActivatedAbility(
+      costs: [
+        AbandonCharactersCount(
+          target: Any(Character),
+          count: Exactly(1),
+        ),
+        DiscardHand,
+      ],
+      effect: Effect(GainEnergy(
+        gains: Energy(1),
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_energy_materialize_copy_of_ally() {
+    let result = parse_ability("{e}: {Materialize} a copy of an ally.", "e: 1");
+    assert_ron_snapshot!(result, @r###"
+    Activated(ActivatedAbility(
+      costs: [
+        Energy(Energy(1)),
+      ],
+      effect: Effect(MaterializeSilentCopy(
+        target: Another(Character),
+        count: 1,
+        quantity: Matching(Another(Character)),
+      )),
+    ))
+    "###);
+}
+
+#[test]
 fn test_abandon_or_discard_dissolve_enemy() {
     let result = parse_ability("Abandon an ally or discard a card: {Dissolve} an enemy.", "");
     assert_ron_snapshot!(result, @r###"

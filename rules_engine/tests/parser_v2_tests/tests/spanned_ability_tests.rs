@@ -569,6 +569,61 @@ fn test_parse_activated_ability_energy_abandon_ally_with_spark_draw() {
 }
 
 #[test]
+fn test_parse_activated_ability_energy_abandon_character_discard_hand_draw() {
+    let SpannedAbility::Activated(activated) = parse_spanned_ability(
+        "{e}, Abandon a character, Discard your hand: Draw {cards}.",
+        "e: 2, cards: 3",
+    ) else {
+        panic!("Expected Activated ability");
+    };
+
+    assert_eq!(activated.cost.text, "{e}, Abandon a character, Discard your hand");
+    assert_valid_span(&activated.cost.span);
+
+    let SpannedEffect::Effect(effect) = activated.effect else {
+        panic!("Expected Effect, got Modal");
+    };
+    assert!(effect.text.contains("Draw {cards}."));
+    assert_valid_span(&effect.span);
+}
+
+#[test]
+fn test_parse_activated_ability_abandon_character_discard_hand_gain_energy() {
+    let SpannedAbility::Activated(activated) =
+        parse_spanned_ability("Abandon a character, Discard your hand: Gain {e}.", "e: 1")
+    else {
+        panic!("Expected Activated ability");
+    };
+
+    assert_eq!(activated.cost.text, "Abandon a character, Discard your hand");
+    assert_valid_span(&activated.cost.span);
+
+    let SpannedEffect::Effect(effect) = activated.effect else {
+        panic!("Expected Effect, got Modal");
+    };
+    assert!(effect.text.contains("Gain {e}."));
+    assert_valid_span(&effect.span);
+}
+
+#[test]
+fn test_parse_activated_ability_energy_materialize_copy_of_ally() {
+    let SpannedAbility::Activated(activated) =
+        parse_spanned_ability("{e}: {Materialize} a copy of an ally.", "e: 1")
+    else {
+        panic!("Expected Activated ability");
+    };
+
+    assert_eq!(activated.cost.text, "{e}");
+    assert_valid_span(&activated.cost.span);
+
+    let SpannedEffect::Effect(effect) = activated.effect else {
+        panic!("Expected Effect, got Modal");
+    };
+    assert!(effect.text.contains("{Materialize} a copy of an ally."));
+    assert_valid_span(&effect.span);
+}
+
+#[test]
 fn test_spanned_ability_allied_plural_subtype_have_spark() {
     let SpannedAbility::Static { text } =
         parse_spanned_ability("Allied {plural-subtype} have +{s} spark.", "subtype: warrior, s: 1")
