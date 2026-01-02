@@ -466,6 +466,26 @@ fn test_round_trip_judgment_you_may_draw_then_discard() {
 }
 
 #[test]
+fn test_round_trip_judgment_you_may_discard_draw_gain_points() {
+    let original = "{Judgment} You may discard {discards} to draw {cards} and gain {points}.";
+    let parsed = parse_ability(original, "discards: 2, cards: 1, points: 3");
+    let serialized = parser_formatter::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_judgment_you_may_discard_dissolve_enemy() {
+    let original =
+        "{Judgment} You may discard a card to {Dissolve} an enemy with spark {s} or less.";
+    let parsed = parse_ability(
+        "{Judgment} You may discard a card to {dissolve} an enemy with spark {s} or less.",
+        "s: 2",
+    );
+    let serialized = parser_formatter::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
 fn test_round_trip_when_you_discard_a_card_gain_points() {
     let original = "When you discard a card, gain {points}.";
     let parsed = parse_ability(original, "points: 1");
@@ -477,6 +497,14 @@ fn test_round_trip_when_you_discard_a_card_gain_points() {
 fn test_round_trip_when_you_discard_a_card_kindle() {
     let original = "When you discard a card, {Kindle}.";
     let parsed = parse_ability(original, "k: 1");
+    let serialized = parser_formatter::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_when_you_discard_this_character_materialize_it() {
+    let original = "When you discard this character, {Materialize} it.";
+    let parsed = parse_ability("When you discard this character, {materialize} it.", "");
     let serialized = parser_formatter::serialize_ability(&parsed);
     assert_eq!(original, serialized);
 }

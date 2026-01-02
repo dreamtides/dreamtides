@@ -17,6 +17,7 @@ fn specific_predicates<'a>() -> impl Parser<'a, ParserInput<'a>, Predicate, Pars
 {
     choice((
         this_parser(),
+        it_parser(),
         enemy_or_ally_parser(),
         non_subtype_enemy_parser(),
         allied_parser(),
@@ -42,6 +43,10 @@ fn this_parser<'a>() -> impl Parser<'a, ParserInput<'a>, Predicate, ParserExtra<
         words(&["this", "event"]).to(Predicate::This),
         words(&["this", "card"]).to(Predicate::This),
     ))
+}
+
+fn it_parser<'a>() -> impl Parser<'a, ParserInput<'a>, Predicate, ParserExtra<'a>> + Clone {
+    word("it").to(Predicate::It)
 }
 
 fn non_subtype_enemy_parser<'a>(

@@ -99,6 +99,25 @@ fn test_spanned_ability_when_you_abandon_an_ally_kindle() {
 }
 
 #[test]
+fn test_spanned_when_you_discard_this_character_materialize_it() {
+    let SpannedAbility::Triggered(triggered) =
+        parse_spanned_ability("When you discard this character, {materialize} it.", "")
+    else {
+        panic!("Expected Triggered ability");
+    };
+
+    assert_eq!(triggered.once_per_turn, None);
+    assert_eq!(triggered.trigger.text, "When you discard this character");
+    assert_valid_span(&triggered.trigger.span);
+
+    let SpannedEffect::Effect(effect) = triggered.effect else {
+        panic!("Expected Effect, got Modal");
+    };
+    assert_eq!(effect.text.trim(), "{materialize} it.");
+    assert_valid_span(&effect.span);
+}
+
+#[test]
 fn test_spanned_ability_when_an_ally_is_dissolved_gain_points() {
     let SpannedAbility::Triggered(triggered) =
         parse_spanned_ability("When an ally is {dissolved}, gain {points}.", "points: 2")
@@ -213,6 +232,47 @@ fn test_spanned_judgment_you_may_pay_return_from_void() {
     assert_eq!(
         effect.text.trim(),
         "You may pay {e} to return this character from your void to your hand."
+    );
+    assert_valid_span(&effect.span);
+}
+
+#[test]
+fn test_spanned_judgment_you_may_discard_draw_gain_points() {
+    let SpannedAbility::Triggered(triggered) = parse_spanned_ability(
+        "{Judgment} You may discard {discards} to draw {cards} and gain {points}.",
+        "discards: 2, cards: 1, points: 3",
+    ) else {
+        panic!("Expected Triggered ability");
+    };
+
+    assert_eq!(triggered.trigger.text, "{Judgment}");
+    assert_valid_span(&triggered.trigger.span);
+
+    let SpannedEffect::Effect(effect) = triggered.effect else {
+        panic!("Expected Effect, got Modal");
+    };
+    assert_eq!(effect.text.trim(), "You may discard {discards} to draw {cards} and gain {points}.");
+    assert_valid_span(&effect.span);
+}
+
+#[test]
+fn test_spanned_judgment_you_may_discard_dissolve_enemy() {
+    let SpannedAbility::Triggered(triggered) = parse_spanned_ability(
+        "{Judgment} You may discard a card to {dissolve} an enemy with spark {s} or less.",
+        "s: 2",
+    ) else {
+        panic!("Expected Triggered ability");
+    };
+
+    assert_eq!(triggered.trigger.text, "{Judgment}");
+    assert_valid_span(&triggered.trigger.span);
+
+    let SpannedEffect::Effect(effect) = triggered.effect else {
+        panic!("Expected Effect, got Modal");
+    };
+    assert_eq!(
+        effect.text.trim(),
+        "You may discard a card to {dissolve} an enemy with spark {s} or less."
     );
     assert_valid_span(&effect.span);
 }

@@ -5,12 +5,12 @@ use chumsky::prelude::*;
 use core_data::numerics::Energy;
 
 use crate::parser::parser_helpers::{
-    article, count_allies, energy, word, ParserExtra, ParserInput,
+    article, count_allies, discards, energy, word, ParserExtra, ParserInput,
 };
-use crate::parser::predicate_parser;
+use crate::parser::{card_predicate_parser, predicate_parser};
 
 pub fn cost_parser<'a>() -> impl Parser<'a, ParserInput<'a>, Cost, ParserExtra<'a>> + Clone {
-    choice((energy_cost(), abandon_cost()))
+    choice((energy_cost(), abandon_cost(), discard_cost())).boxed()
 }
 
 fn energy_cost<'a>() -> impl Parser<'a, ParserInput<'a>, Cost, ParserExtra<'a>> + Clone {
@@ -33,4 +33,13 @@ fn abandon_cost_single<'a>() -> impl Parser<'a, ParserInput<'a>, Cost, ParserExt
     word("abandon").ignore_then(article()).ignore_then(predicate_parser::predicate_parser()).map(
         |target| Cost::AbandonCharactersCount { target, count: CollectionExpression::Exactly(1) },
     )
+}
+
+fn discard_cost<'a>() -> impl Parser<'a, ParserInput<'a>, Cost, ParserExtra<'a>> + Clone {
+    word("discard")
+        .ignore_then(choice((
+            discards().map(|count| (CardPredicate::Card, count)),
+            article().ignore_then(card_predicate_parser::parser()).map(|predicate| (predicate, 1)),
+        )))
+        .map(|(predicate, count)| Cost::DiscardCards(predicate, count))
 }

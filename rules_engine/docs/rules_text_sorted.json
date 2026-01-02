@@ -91,9 +91,9 @@
   "{Materialized} Gain control of an enemy with cost {e} or less.",
   "{Prevent} a played card. Put it on top of the opponent's deck.",
   "Abandon an ally or discard a card: {Dissolve} an enemy.",
-  "{Judgment} You may discard {discards} to draw {cards} and gain {points}.",
-  "{Judgment} You may discard a card to {dissolve} an enemy with spark {s} or less.",
-  "When you discard this character, {materialize} it.",
+  "{Judgment} You may discard {discards} to draw {cards} and gain {points}.", // Implemented
+  "{Judgment} You may discard a card to {dissolve} an enemy with spark {s} or less.", // Implemented
+  "When you discard this character, {materialize} it.", // Implemented
   "Put the {top-n-cards} of your deck into your void. Draw {cards}.",
   "Abandon an ally: Put the {top-n-cards} of your deck into your void.",
   "{MaterializedDissolved} Put the {top-n-cards} of your deck into your void.",

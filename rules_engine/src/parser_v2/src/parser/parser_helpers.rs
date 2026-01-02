@@ -43,7 +43,7 @@ pub fn colon<'a>() -> impl Parser<'a, ParserInput<'a>, (), ParserExtra<'a>> + Cl
 }
 
 pub fn effect_separator<'a>() -> impl Parser<'a, ParserInput<'a>, (), ParserExtra<'a>> + Clone {
-    choice((period(), comma().then_ignore(word("then"))))
+    choice((period(), comma().then_ignore(word("then")), word("and")))
 }
 
 pub fn energy<'a>() -> impl Parser<'a, ParserInput<'a>, u32, ParserExtra<'a>> + Clone {
