@@ -111,6 +111,61 @@ fn test_energy_draw_cards() {
 }
 
 #[test]
+fn test_energy_discard_kindle() {
+    let result = parse_ability("{e}, Discard {discards}: {kindle}.", "e: 1, discards: 2, k: 2");
+    assert_ron_snapshot!(result, @r###"
+    Activated(ActivatedAbility(
+      costs: [
+        Energy(Energy(1)),
+        DiscardCards(Card, 2),
+      ],
+      effect: Effect(Kindle(
+        amount: Spark(2),
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_energy_banish_from_void_reclaim_this_character() {
+    let result =
+        parse_ability("{e}, {Banish} another card in your void: {Reclaim} this character.", "e: 1");
+    assert_ron_snapshot!(result, @r###"
+    Activated(ActivatedAbility(
+      costs: [
+        Energy(Energy(1)),
+        BanishCardsFromYourVoid(1),
+      ],
+      effect: Effect(ReturnFromYourVoidToPlay(
+        target: This,
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_energy_abandon_ally_with_spark_draw_cards() {
+    let result = parse_ability(
+        "{e}, Abandon an ally with spark {s} or less: Draw {cards}.",
+        "e: 1, s: 2, cards: 3",
+    );
+    assert_ron_snapshot!(result, @r###"
+    Activated(ActivatedAbility(
+      costs: [
+        Energy(Energy(1)),
+        AbandonCharactersCount(
+          target: Another(CharacterWithSpark(Spark(2), OrLess)),
+          count: Exactly(1),
+        ),
+      ],
+      effect: Effect(DrawCards(
+        count: 3,
+      )),
+    ))
+    "###);
+}
+
+#[test]
 fn test_abandon_or_discard_dissolve_enemy() {
     let result = parse_ability("Abandon an ally or discard a card: {Dissolve} an enemy.", "");
     assert_ron_snapshot!(result, @r###"

@@ -100,9 +100,9 @@
   "When you play {a-subtype}, put the {top-n-cards} of your deck into your void.", // Implemented
   "When you {materialize} {a-subtype}, {reclaim} this character.", // Implemented
   "{Materialized} Draw {cards}. Discard {discards}.\n\n{ReclaimForCost}", // Implemented
-  "{e}, Discard {discards}: {kindle}.",
-  "{e}, {Banish} another card in your void: {Reclaim} this character.",
-  "{e}, Abandon an ally with spark {s} or less: Draw {cards}.",
+  "{e}, Discard {discards}: {kindle}.", // Implemented
+  "{e}, {Banish} another card in your void: {Reclaim} this character.", // Implemented
+  "{e}, Abandon an ally with spark {s} or less: Draw {cards}.", // Implemented
   "{e}, Abandon a character, Discard your hand: Draw {cards}.",
   "Abandon a character, Discard your hand: Gain {e}.",
   "{e}: {Materialize} a copy of an ally.",
