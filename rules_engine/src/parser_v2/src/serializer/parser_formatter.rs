@@ -92,6 +92,9 @@ pub fn serialize_standard_effect(effect: &StandardEffect) -> String {
         StandardEffect::Discover { predicate } => {
             format!("{{Discover}} {}.", serialize_card_predicate(predicate))
         }
+        StandardEffect::MaterializeCharacter { target } => {
+            format!("{{Materialize}} {}.", serialize_predicate(target))
+        }
         StandardEffect::ReturnToHand { target } => match target {
             Predicate::Any(CardPredicate::Character) => {
                 "return an enemy or ally to hand.".to_string()
@@ -195,8 +198,28 @@ fn serialize_cost(cost: &Cost) -> String {
                 _ => "abandon {count-allies}".to_string(),
             }
         }
+        Cost::DiscardCards(predicate, count) => {
+            if *count == 1 {
+                format!("discard {}", serialize_card_predicate(predicate))
+            } else {
+                match predicate {
+                    CardPredicate::Card => "discard {discards}".to_string(),
+                    _ => format!(
+                        "discard {{discards}} {}",
+                        serialize_card_predicate_plural(predicate)
+                    ),
+                }
+            }
+        }
         Cost::Energy(_) => "{e}".to_string(),
         _ => unimplemented!("Serialization not yet implemented for this cost type"),
+    }
+}
+
+fn serialize_trigger_cost(cost: &Cost) -> String {
+    match cost {
+        Cost::Energy(_) => format!("pay {}", serialize_cost(cost)),
+        _ => serialize_cost(cost),
     }
 }
 fn serialize_effect(effect: &Effect) -> String {
@@ -212,7 +235,7 @@ fn serialize_effect(effect: &Effect) -> String {
                 result.push_str("you may ");
             }
             if let Some(trigger_cost) = &options.trigger_cost {
-                result.push_str(&format!("pay {} to ", serialize_cost(trigger_cost)));
+                result.push_str(&format!("{} to ", serialize_trigger_cost(trigger_cost)));
             }
             result.push_str(&serialize_standard_effect(&options.effect));
             result
@@ -220,7 +243,26 @@ fn serialize_effect(effect: &Effect) -> String {
         Effect::List(effects) => {
             let all_optional = effects.iter().all(|e| e.optional);
             let has_condition = effects.first().and_then(|e| e.condition.as_ref()).is_some();
-            if all_optional && !effects.is_empty() {
+            let all_have_trigger_cost = effects.iter().all(|e| e.trigger_cost.is_some());
+            if all_optional && all_have_trigger_cost && !effects.is_empty() {
+                let effect_strings: Vec<String> = effects
+                    .iter()
+                    .map(|e| serialize_standard_effect(&e.effect).trim_end_matches('.').to_string())
+                    .collect();
+                let mut result = String::new();
+                if has_condition {
+                    if let Some(condition) = &effects[0].condition {
+                        result.push_str(&serialize_condition(condition));
+                        result.push(' ');
+                    }
+                }
+                result.push_str("you may ");
+                if let Some(trigger_cost) = &effects[0].trigger_cost {
+                    result.push_str(&format!("{} to ", serialize_trigger_cost(trigger_cost)));
+                }
+                result.push_str(&format!("{}.", effect_strings.join(" and ")));
+                result
+            } else if all_optional && !effects.is_empty() {
                 let effect_strings: Vec<String> = effects
                     .iter()
                     .map(|e| serialize_standard_effect(&e.effect).trim_end_matches('.').to_string())
@@ -289,6 +331,7 @@ fn serialize_keyword(keyword: &TriggerKeyword) -> String {
 fn serialize_predicate(predicate: &Predicate) -> String {
     match predicate {
         Predicate::This => "this character".to_string(),
+        Predicate::It => "it".to_string(),
         Predicate::Your(card_predicate) => {
             format!("an {}", serialize_your_predicate(card_predicate))
         }

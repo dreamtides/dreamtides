@@ -41,6 +41,19 @@ fn test_when_you_discard_a_card_kindle() {
 }
 
 #[test]
+fn test_when_you_discard_this_character_materialize_it() {
+    let result = parse_ability("When you discard this character, {materialize} it.", "");
+    assert_ron_snapshot!(result, @r###"
+    Triggered(TriggeredAbility(
+      trigger: Discard(This),
+      effect: Effect(MaterializeCharacter(
+        target: It,
+      )),
+    ))
+    "###);
+}
+
+#[test]
 fn test_when_you_play_an_event_gain_energy() {
     let result = parse_ability("When you play an event, gain {e}.", "e: 1");
     assert_ron_snapshot!(result, @r###"
@@ -290,6 +303,59 @@ fn test_judgment_gain_energy_for_each_allied_character() {
       effect: Effect(GainEnergyForEach(
         gains: Energy(1),
         for_each: Another(Character),
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_judgment_you_may_discard_draw_gain_points() {
+    let result = parse_ability(
+        "{Judgment} You may discard {discards} to draw {cards} and gain {points}.",
+        "discards: 2, cards: 1, points: 3",
+    );
+    assert_ron_snapshot!(result, @r###"
+    Triggered(TriggeredAbility(
+      trigger: Keywords([
+        Judgment,
+      ]),
+      effect: List([
+        EffectWithOptions(
+          effect: DrawCards(
+            count: 1,
+          ),
+          optional: true,
+          trigger_cost: Some(DiscardCards(Card, 2)),
+        ),
+        EffectWithOptions(
+          effect: GainPoints(
+            gains: Points(3),
+          ),
+          optional: true,
+          trigger_cost: Some(DiscardCards(Card, 2)),
+        ),
+      ]),
+    ))
+    "###);
+}
+
+#[test]
+fn test_judgment_you_may_discard_to_dissolve_enemy_with_spark_or_less() {
+    let result = parse_ability(
+        "{Judgment} You may discard a card to {dissolve} an enemy with spark {s} or less.",
+        "s: 2",
+    );
+    assert_ron_snapshot!(result, @r###"
+    Triggered(TriggeredAbility(
+      trigger: Keywords([
+        Judgment,
+      ]),
+      effect: WithOptions(EffectWithOptions(
+        effect: DissolveCharacter(
+          target: Enemy(CharacterWithSpark(Spark(2), OrLess)),
+        ),
+        optional: true,
+        trigger_cost: Some(DiscardCards(Card, 1)),
       )),
     ))
     "###);

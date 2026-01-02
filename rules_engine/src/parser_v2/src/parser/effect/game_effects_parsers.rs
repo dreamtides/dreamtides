@@ -10,11 +10,10 @@ use crate::parser::{card_predicate_parser, predicate_parser};
 
 pub fn parser<'a>() -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
     choice((
-        foresee(),
-        discover(),
-        counterspell(),
+        choice((foresee(), discover(), counterspell())).boxed(),
         choice((dissolve_all_characters(), dissolve_character())).boxed(),
         choice((banish_character(), banish_enemy_void())).boxed(),
+        materialize_character(),
     ))
     .boxed()
 }
@@ -70,4 +69,12 @@ pub fn banish_enemy_void<'a>(
     directive("banish")
         .ignore_then(words(&["the", "opponent's", "void"]))
         .map(|_| StandardEffect::BanishEnemyVoid)
+}
+
+pub fn materialize_character<'a>(
+) -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
+    directive("materialize")
+        .ignore_then(article().or_not())
+        .ignore_then(predicate_parser::predicate_parser())
+        .map(|target| StandardEffect::MaterializeCharacter { target })
 }
