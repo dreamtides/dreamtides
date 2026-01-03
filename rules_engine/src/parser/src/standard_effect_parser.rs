@@ -386,7 +386,7 @@ fn each_matching_gains_spark_until_next_main<'a>()
             Spark,
             ")} until your next main phase",
         ))
-        .map(|(each, gains)| StandardEffect::EachMatchingGainsSparkUntilNextMain { each, gains })
+        .map(|(each, gains)| StandardEffect::EachMatchingGainsSpark { each, gains })
 }
 
 fn each_matching_gains_spark_for_each<'a>()

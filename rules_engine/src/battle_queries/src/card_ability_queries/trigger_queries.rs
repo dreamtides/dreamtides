@@ -126,6 +126,9 @@ pub fn matches(
             ),
             _ => false,
         },
+        TriggerEvent::PlayCardsInTurn(..) => {
+            todo!("Implement PlayCardsInTurn")
+        }
         TriggerEvent::PlayDuringTurn(predicate, player_turn) => match trigger {
             Trigger::PlayedCard(card_id) => {
                 let turn_matches = match player_turn {

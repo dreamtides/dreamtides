@@ -93,6 +93,19 @@ fn test_gain_points_for_each_card_played_this_turn() {
 }
 
 #[test]
+fn test_draw_cards_for_each_card_played_this_turn() {
+    let result = parse_ability("Draw {cards} for each card you have played this turn.", "cards: 2");
+    assert_ron_snapshot!(result, @r###"
+    Event(EventAbility(
+      effect: Effect(DrawCardsForEach(
+        count: 2,
+        for_each: PlayedThisTurn(Card),
+      )),
+    ))
+    "###);
+}
+
+#[test]
 fn test_gain_energy_draw_cards() {
     let result = parse_ability("Gain {e}. Draw {cards}.", "e: 2, cards: 3");
     assert_ron_snapshot!(result, @r###"

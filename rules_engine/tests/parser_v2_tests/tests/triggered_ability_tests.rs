@@ -160,6 +160,22 @@ fn test_when_you_play_an_event_gain_energy() {
 }
 
 #[test]
+fn test_when_you_play_cards_in_turn_reclaim_this_character() {
+    let result = parse_ability(
+        "When you play {cards-numeral} in a turn, {reclaim} this character.",
+        "cards: 2",
+    );
+    assert_ron_snapshot!(result, @r###"
+    Triggered(TriggeredAbility(
+      trigger: PlayCardsInTurn(2),
+      effect: Effect(ReturnFromYourVoidToPlay(
+        target: This,
+      )),
+    ))
+    "###);
+}
+
+#[test]
 fn test_when_you_materialize_an_ally_gain_energy() {
     let result = parse_ability("When you {materialize} an ally, gain {e}.", "e: 1");
     assert_ron_snapshot!(result, @r###"

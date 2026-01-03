@@ -7,10 +7,10 @@ use core_data::numerics::Spark;
 use crate::parser::parser_helpers::{
     article, kindle_amount, spark, word, words, ParserExtra, ParserInput,
 };
-use crate::parser::predicate_parser;
+use crate::parser::{card_predicate_parser, predicate_parser};
 
 pub fn parser<'a>() -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
-    choice((kindle(), gains_spark_for_each(), gains_spark())).boxed()
+    choice((kindle(), each_allied_gains_spark(), gains_spark_for_each(), gains_spark())).boxed()
 }
 
 pub fn kindle<'a>() -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
@@ -45,6 +45,19 @@ fn gains_spark_for_each<'a>(
             }),
     ))
     .boxed()
+}
+
+fn each_allied_gains_spark<'a>(
+) -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
+    words(&["have", "each", "allied"])
+        .ignore_then(card_predicate_parser::parser())
+        .then_ignore(words(&["gain", "+"]))
+        .then(spark())
+        .then_ignore(word("spark"))
+        .map(|(matching, gains)| StandardEffect::EachMatchingGainsSpark {
+            each: matching,
+            gains: Spark(gains),
+        })
 }
 
 fn gains_spark<'a>() -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {

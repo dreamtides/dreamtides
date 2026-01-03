@@ -19,6 +19,7 @@ pub enum TriggerEvent {
     Materialize(Predicate),
     MaterializeNthThisTurn(Predicate, u32),
     Play(Predicate),
+    PlayCardsInTurn(u32),
     PlayDuringTurn(Predicate, PlayerTurn),
     PlayFromHand(Predicate),
 }

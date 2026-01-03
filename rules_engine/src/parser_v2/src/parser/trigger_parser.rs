@@ -2,7 +2,7 @@ use ability_data::trigger_event::{PlayerTurn, TriggerEvent, TriggerKeyword};
 use chumsky::prelude::*;
 
 use crate::parser::parser_helpers::{
-    article, comma, directive, word, words, ParserExtra, ParserInput,
+    article, cards_numeral, comma, directive, word, words, ParserExtra, ParserInput,
 };
 use crate::parser::predicate_parser;
 
@@ -43,7 +43,13 @@ fn standard_trigger<'a>() -> impl Parser<'a, ParserInput<'a>, TriggerEvent, Pars
 }
 
 fn play_triggers<'a>() -> impl Parser<'a, ParserInput<'a>, TriggerEvent, ParserExtra<'a>> + Clone {
-    choice((play_from_hand_trigger(), play_during_turn_trigger(), play_trigger())).boxed()
+    choice((
+        play_cards_in_turn_trigger(),
+        play_from_hand_trigger(),
+        play_during_turn_trigger(),
+        play_trigger(),
+    ))
+    .boxed()
 }
 
 fn action_triggers<'a>() -> impl Parser<'a, ParserInput<'a>, TriggerEvent, ParserExtra<'a>> + Clone
@@ -96,6 +102,14 @@ fn play_during_turn_trigger<'a>(
         .ignore_then(predicate_parser::predicate_parser())
         .then_ignore(words(&["in", "a", "turn"]))
         .map(|predicate| TriggerEvent::PlayDuringTurn(predicate, PlayerTurn::YourTurn))
+}
+
+fn play_cards_in_turn_trigger<'a>(
+) -> impl Parser<'a, ParserInput<'a>, TriggerEvent, ParserExtra<'a>> + Clone {
+    words(&["when", "you", "play"])
+        .ignore_then(cards_numeral())
+        .then_ignore(words(&["in", "a", "turn"]))
+        .map(TriggerEvent::PlayCardsInTurn)
 }
 
 fn discard_trigger<'a>() -> impl Parser<'a, ParserInput<'a>, TriggerEvent, ParserExtra<'a>> + Clone

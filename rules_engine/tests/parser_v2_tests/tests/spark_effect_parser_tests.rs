@@ -33,3 +33,26 @@ fn test_ally_gains_spark_for_each_allied_subtype() {
     ))
     "###);
 }
+
+#[test]
+fn test_judgment_you_may_pay_to_have_each_allied_gain_spark() {
+    let result = parse_ability(
+        "{Judgment} You may pay {e} to have each allied {subtype} gain +{s} spark.",
+        "e: 1, subtype: warrior, s: 2",
+    );
+    assert_ron_snapshot!(result, @r###"
+    Triggered(TriggeredAbility(
+      trigger: Keywords([
+        Judgment,
+      ]),
+      effect: WithOptions(EffectWithOptions(
+        effect: EachMatchingGainsSpark(
+          each: CharacterType(Warrior),
+          gains: Spark(2),
+        ),
+        optional: true,
+        trigger_cost: Some(Energy(Energy(1))),
+      )),
+    ))
+    "###);
+}

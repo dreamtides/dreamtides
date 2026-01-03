@@ -54,6 +54,9 @@ pub fn serialize_standard_effect(effect: &StandardEffect) -> String {
         StandardEffect::GainsSpark { target, .. } => {
             format!("{} gains +{{s}} spark.", serialize_predicate(target))
         }
+        StandardEffect::EachMatchingGainsSpark { each, .. } => {
+            format!("have each {} gain +{{s}} spark.", serialize_allied_card_predicate(each))
+        }
         StandardEffect::GainsSparkForQuantity { target, for_quantity, .. } => {
             if matches!(target, Predicate::This) {
                 format!(
@@ -248,5 +251,12 @@ fn serialize_for_count_expression(quantity_expression: &QuantityExpression) -> S
         _ => {
             unimplemented!("Serialization not yet implemented for this quantity expression")
         }
+    }
+}
+
+fn serialize_allied_card_predicate(card_predicate: &CardPredicate) -> String {
+    match card_predicate {
+        CardPredicate::CharacterType(_) => "allied {subtype}".to_string(),
+        _ => format!("allied {}", serialize_card_predicate_without_article(card_predicate)),
     }
 }
