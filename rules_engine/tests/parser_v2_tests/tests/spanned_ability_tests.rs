@@ -80,6 +80,25 @@ fn test_spanned_ability_when_you_materialize_a_character_gains_spark() {
 }
 
 #[test]
+fn test_spanned_ability_when_you_materialize_an_allied_subtype_that_character_gains_spark() {
+    let SpannedAbility::Triggered(triggered) = parse_spanned_ability(
+        "When you {materialize} an allied {subtype}, that character gains +{s} spark.",
+        "subtype: warrior, s: 2",
+    ) else {
+        panic!("Expected Triggered ability");
+    };
+
+    assert_eq!(triggered.trigger.text, "When you {materialize} an allied {subtype}");
+    assert_valid_span(&triggered.trigger.span);
+
+    let SpannedEffect::Effect(effect) = triggered.effect else {
+        panic!("Expected Effect, got Modal");
+    };
+    assert_eq!(effect.text.trim(), "that character gains +{s} spark.");
+    assert_valid_span(&effect.span);
+}
+
+#[test]
 fn test_spanned_once_per_turn_when_you_materialize_a_character_gain_energy() {
     let SpannedAbility::Triggered(triggered) = parse_spanned_ability(
         "Once per turn, when you {materialize} a character, gain {e}.",
@@ -1541,5 +1560,43 @@ fn test_spanned_judgment_each_player_abandons_character() {
         panic!("Expected Effect, got Modal");
     };
     assert_eq!(effect.text.trim(), "Each player abandons a character.");
+    assert_valid_span(&effect.span);
+}
+
+#[test]
+fn test_spanned_abandon_ally_put_character_from_void_on_top_of_deck() {
+    let SpannedAbility::Activated(activated) = parse_spanned_ability(
+        "Abandon an ally: You may put a character from your void on top of your deck.",
+        "",
+    ) else {
+        panic!("Expected Activated ability");
+    };
+
+    assert_eq!(activated.cost.text, "Abandon an ally");
+    assert_valid_span(&activated.cost.span);
+
+    let SpannedEffect::Effect(effect) = activated.effect else {
+        panic!("Expected Effect, got Modal");
+    };
+    assert_eq!(effect.text.trim(), "You may put a character from your void on top of your deck.");
+    assert_valid_span(&effect.span);
+}
+
+#[test]
+fn test_spanned_materialized_banish_any_number_of_allies_then_materialize_them() {
+    let SpannedAbility::Triggered(triggered) = parse_spanned_ability(
+        "{Materialized} {Banish} any number of allies, then {materialize} them.",
+        "",
+    ) else {
+        panic!("Expected Triggered ability");
+    };
+
+    assert_eq!(triggered.trigger.text, "{Materialized}");
+    assert_valid_span(&triggered.trigger.span);
+
+    let SpannedEffect::Effect(effect) = triggered.effect else {
+        panic!("Expected Effect, got Modal");
+    };
+    assert_eq!(effect.text.trim(), "{Banish} any number of allies, then {materialize} them.");
     assert_valid_span(&effect.span);
 }

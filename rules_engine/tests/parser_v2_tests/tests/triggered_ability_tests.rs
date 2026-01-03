@@ -419,6 +419,23 @@ fn test_when_you_materialize_an_allied_subtype_this_character_gains_spark() {
 }
 
 #[test]
+fn test_when_you_materialize_an_allied_subtype_that_character_gains_spark() {
+    let result = parse_ability(
+        "When you {materialize} an allied {subtype}, that character gains +{s} spark.",
+        "subtype: warrior, s: 2",
+    );
+    assert_ron_snapshot!(result, @r###"
+    Triggered(TriggeredAbility(
+      trigger: Materialize(Another(CharacterType(Warrior))),
+      effect: Effect(GainsSpark(
+        target: That,
+        gains: Spark(2),
+      )),
+    ))
+    "###);
+}
+
+#[test]
 fn test_when_you_play_a_fast_card_gain_points() {
     let result = parse_ability("When you play a {fast} card, gain {points}.", "points: 1");
     assert_ron_snapshot!(result, @r###"
@@ -709,6 +726,34 @@ fn test_materialized_gain_control_enemy_with_cost_or_less() {
           cost: Energy(2),
         )),
       )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_materialized_banish_any_number_of_allies_then_materialize_them() {
+    let result =
+        parse_ability("{Materialized} {Banish} any number of allies, then {materialize} them.", "");
+    assert_ron_snapshot!(result, @r###"
+    Triggered(TriggeredAbility(
+      trigger: Keywords([
+        Materialized,
+      ]),
+      effect: List([
+        EffectWithOptions(
+          effect: BanishCollection(
+            target: Another(Character),
+            count: AnyNumberOf,
+          ),
+          optional: false,
+        ),
+        EffectWithOptions(
+          effect: MaterializeCharacter(
+            target: Them,
+          ),
+          optional: false,
+        ),
+      ]),
     ))
     "###);
 }

@@ -86,6 +86,31 @@ fn test_abandon_an_ally_put_cards_from_deck_into_void() {
 }
 
 #[test]
+fn test_abandon_an_ally_put_character_from_void_on_top_of_deck() {
+    let result = parse_ability(
+        "Abandon an ally: You may put a character from your void on top of your deck.",
+        "",
+    );
+    assert_ron_snapshot!(result, @r###"
+    Activated(ActivatedAbility(
+      costs: [
+        AbandonCharactersCount(
+          target: Another(Character),
+          count: Exactly(1),
+        ),
+      ],
+      effect: WithOptions(EffectWithOptions(
+        effect: PutCardsFromVoidOnTopOfDeck(
+          count: 1,
+          matching: Character,
+        ),
+        optional: true,
+      )),
+    ))
+    "###);
+}
+
+#[test]
 fn test_abandon_an_ally_kindle() {
     let result = parse_ability("Abandon an ally: {Kindle}.", "k: 1");
     assert_ron_snapshot!(result, @r###"

@@ -1,3 +1,4 @@
+use ability_data::collection_expression::CollectionExpression;
 use ability_data::condition::Condition;
 use ability_data::effect::Effect;
 use ability_data::predicate::{CardPredicate, Predicate};
@@ -8,7 +9,8 @@ use ability_data::trigger_event::TriggerEvent;
 use super::cost_serializer::{serialize_cost, serialize_trigger_cost};
 use super::predicate_serializer::{
     serialize_card_predicate, serialize_card_predicate_without_article,
-    serialize_for_each_predicate, serialize_predicate, serialize_predicate_without_article,
+    serialize_for_each_predicate, serialize_predicate, serialize_predicate_plural,
+    serialize_predicate_without_article,
 };
 use super::serializer_utils::capitalize_first_letter;
 use super::trigger_serializer::serialize_trigger_event;
@@ -74,6 +76,16 @@ pub fn serialize_standard_effect(effect: &StandardEffect) -> String {
         StandardEffect::PutCardsFromYourDeckIntoVoid { .. } => {
             "put the {top-n-cards} of your deck into your void.".to_string()
         }
+        StandardEffect::PutCardsFromVoidOnTopOfDeck { matching, count } => {
+            if *count == 1 {
+                format!(
+                    "put {} from your void on top of your deck.",
+                    serialize_card_predicate(matching)
+                )
+            } else {
+                unimplemented!("Serialization not yet implemented for this put-on-top count")
+            }
+        }
         StandardEffect::Counterspell { target } => {
             format!("{{Prevent}} a played {}.", serialize_predicate_without_article(target))
         }
@@ -105,6 +117,12 @@ pub fn serialize_standard_effect(effect: &StandardEffect) -> String {
         StandardEffect::BanishCharacter { target } => {
             format!("{{Banish}} {}.", serialize_predicate(target))
         }
+        StandardEffect::BanishCollection { target, count } => match count {
+            CollectionExpression::AnyNumberOf => {
+                format!("{{Banish}} any number of {}.", serialize_predicate_plural(target))
+            }
+            _ => unimplemented!("Serialization not yet implemented for this banish collection"),
+        },
         StandardEffect::BanishEnemyVoid => "{Banish} the opponent's void.".to_string(),
         StandardEffect::Discover { predicate } => {
             format!("{{Discover}} {}.", serialize_card_predicate(predicate))

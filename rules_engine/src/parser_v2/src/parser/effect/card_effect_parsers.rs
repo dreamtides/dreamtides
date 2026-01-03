@@ -20,7 +20,13 @@ pub fn parser<'a>() -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserEx
         choice((
             choice((draw_cards_for_each(), draw_cards(), discard_cards())).boxed(),
             choice((gain_energy_for_each(), gain_energy(), gain_points_for_each())).boxed(),
-            choice((gain_points(), put_cards_from_deck_into_void(), reclaim_from_void())).boxed(),
+            choice((
+                gain_points(),
+                put_cards_from_deck_into_void(),
+                put_cards_from_void_on_top_of_deck(),
+                reclaim_from_void(),
+            ))
+            .boxed(),
             choice((return_from_void_to_hand(), return_to_hand())).boxed(),
         ))
         .boxed(),
@@ -105,6 +111,15 @@ pub fn put_cards_from_deck_into_void<'a>(
         .ignore_then(top_n_cards())
         .then_ignore(words(&["of", "your", "deck", "into", "your", "void"]))
         .map(|count| StandardEffect::PutCardsFromYourDeckIntoVoid { count })
+}
+
+pub fn put_cards_from_void_on_top_of_deck<'a>(
+) -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
+    word("put")
+        .ignore_then(article())
+        .ignore_then(card_predicate_parser::parser())
+        .then_ignore(words(&["from", "your", "void", "on", "top", "of", "your", "deck"]))
+        .map(|matching| StandardEffect::PutCardsFromVoidOnTopOfDeck { count: 1, matching })
 }
 
 pub fn each_player_discard_cards<'a>(

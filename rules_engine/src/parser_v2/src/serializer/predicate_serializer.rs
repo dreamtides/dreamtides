@@ -12,6 +12,8 @@ pub fn serialize_predicate_without_article(predicate: &Predicate) -> String {
 pub fn serialize_predicate(predicate: &Predicate) -> String {
     match predicate {
         Predicate::This => "this character".to_string(),
+        Predicate::That => "that character".to_string(),
+        Predicate::Them => "them".to_string(),
         Predicate::It => "it".to_string(),
         Predicate::Your(card_predicate) => {
             format!("an {}", serialize_your_predicate(card_predicate))
@@ -24,6 +26,14 @@ pub fn serialize_predicate(predicate: &Predicate) -> String {
             format!("an {}", serialize_enemy_predicate(card_predicate))
         }
         _ => unimplemented!("Serialization not yet implemented for this predicate type"),
+    }
+}
+
+pub fn serialize_predicate_plural(predicate: &Predicate) -> String {
+    match predicate {
+        Predicate::Another(card_predicate) => serialize_your_predicate_plural(card_predicate),
+        Predicate::Any(card_predicate) => serialize_card_predicate_plural(card_predicate),
+        _ => unimplemented!("Serialization not yet implemented for this plural predicate type"),
     }
 }
 
@@ -126,5 +136,13 @@ pub fn serialize_for_each_predicate(predicate: &Predicate) -> String {
         _ => {
             unimplemented!("Serialization not yet implemented for this for-each predicate")
         }
+    }
+}
+
+fn serialize_your_predicate_plural(card_predicate: &CardPredicate) -> String {
+    match card_predicate {
+        CardPredicate::Character => "allies".to_string(),
+        CardPredicate::CharacterType(_) => "allied {plural-subtype}".to_string(),
+        _ => unimplemented!("Serialization not yet implemented for this allied plural predicate"),
     }
 }

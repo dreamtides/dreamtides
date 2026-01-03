@@ -42,6 +42,14 @@ fn test_round_trip_abandon_an_ally_put_cards_from_deck_into_void() {
 }
 
 #[test]
+fn test_round_trip_abandon_an_ally_put_character_from_void_on_top_of_deck() {
+    let original = "Abandon an ally: You may put a character from your void on top of your deck.";
+    let parsed = parse_ability(original, "");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
 fn test_round_trip_abandon_or_discard_dissolve_enemy() {
     let original = "Abandon an ally or discard a card: {Dissolve} an enemy.";
     let parsed = parse_ability(original, "");
@@ -210,6 +218,14 @@ fn test_round_trip_when_you_materialize_a_character_this_character_gains_spark()
 }
 
 #[test]
+fn test_round_trip_when_you_materialize_an_allied_subtype_that_character_gains_spark() {
+    let original = "When you {materialize} an allied {subtype}, that character gains +{s} spark.";
+    let parsed = parse_ability(original, "subtype: warrior, s: 2");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
 fn test_round_trip_once_per_turn_when_you_materialize_a_character_gain_energy() {
     let original = "Once per turn, when you {materialize} a character, gain {e}.";
     let parsed = parse_ability(original, "e: 1");
@@ -313,6 +329,14 @@ fn test_round_trip_materialized_you_may_banish_ally_then_materialize_it() {
         parse_ability("{Materialized} You may {banish} an ally, then {materialize} it.", "");
     let serialized = ability_serializer::serialize_ability(&parsed);
     assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_materialized_banish_any_number_of_allies_then_materialize_them() {
+    let original = "{Materialized} {Banish} any number of allies, then {materialize} them.";
+    let parsed = parse_ability(original, "");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!("{Materialized} {Banish} any number of allies. {Materialize} them.", serialized);
 }
 
 #[test]

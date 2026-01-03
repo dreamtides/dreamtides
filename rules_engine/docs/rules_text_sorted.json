@@ -127,9 +127,9 @@
   "Draw {cards} for each card you have played this turn.", // Implemented
   "When you play {cards-numeral} in a turn, {reclaim} this character.", // Implemented
   "{Judgment} You may pay {e} to have each allied {subtype} gain +{s} spark.", // Implemented
-  "When you {materialize} an allied {subtype}, that character gains +{s} spark.",
-  "Abandon an ally: You may put a character from your void on top of your deck.",
-  "{Materialized} {Banish} any number of allies, then {materialize} them.",
+  "When you {materialize} an allied {subtype}, that character gains +{s} spark.", // Implemented
+  "Abandon an ally: You may put a character from your void on top of your deck.", // Implemented
+  "{Materialized} {Banish} any number of allies, then {materialize} them.", // Implemented
   "Abandon any number of allies. Draw {cards} for each ally abandoned.",
   "{Banish} {up-to-n-allies}, then {materialize} {it-or-them}.",
   "{MaterializedJudgment} {Banish} an ally with {spark} {s} or less, then {materialize} it.",
