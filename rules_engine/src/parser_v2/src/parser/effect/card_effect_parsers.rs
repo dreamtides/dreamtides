@@ -18,19 +18,10 @@ pub fn parser<'a>() -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserEx
         ))
         .boxed(),
         choice((
-            draw_cards(),
-            discard_cards(),
-            gain_energy_for_each(),
-            gain_energy(),
-            gain_points_for_each(),
-        ))
-        .boxed(),
-        choice((
-            gain_points(),
-            put_cards_from_deck_into_void(),
-            reclaim_from_void(),
-            return_from_void_to_hand(),
-            return_to_hand(),
+            choice((draw_cards_for_each(), draw_cards(), discard_cards())).boxed(),
+            choice((gain_energy_for_each(), gain_energy(), gain_points_for_each())).boxed(),
+            choice((gain_points(), put_cards_from_deck_into_void(), reclaim_from_void())).boxed(),
+            choice((return_from_void_to_hand(), return_to_hand())).boxed(),
         ))
         .boxed(),
     ))
@@ -71,13 +62,13 @@ pub fn gain_points<'a>() -> impl Parser<'a, ParserInput<'a>, StandardEffect, Par
 
 pub fn gain_points_for_each<'a>(
 ) -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
-    word("gain")
+    choice((word("gain"), word("score")))
         .ignore_then(points())
         .then_ignore(words(&["for", "each"]))
-        .then(predicate_parser::predicate_parser())
-        .map(|(gains, for_each)| StandardEffect::GainPointsForEach {
+        .then(for_each_quantity_expression())
+        .map(|(gains, for_count)| StandardEffect::GainPointsForEach {
             gain: Points(gains),
-            for_count: QuantityExpression::Matching(for_each),
+            for_count,
         })
 }
 
@@ -131,10 +122,30 @@ pub fn each_player_abandons_characters<'a>(
         .map(|matching| StandardEffect::EachPlayerAbandonsCharacters { matching, count: 1 })
 }
 
+fn draw_cards_for_each<'a>(
+) -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
+    word("draw")
+        .ignore_then(cards())
+        .then_ignore(words(&["for", "each"]))
+        .then(for_each_quantity_expression())
+        .map(|(count, for_each)| StandardEffect::DrawCardsForEach { count, for_each })
+}
+
 fn discard_from_opponent_hand<'a>(
 ) -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
     words(&["discard", "a", "chosen"])
         .ignore_then(card_predicate_parser::parser())
         .then_ignore(words(&["from", "the", "opponent's", "hand"]))
         .map(|predicate| StandardEffect::DiscardCardFromEnemyHand { predicate })
+}
+
+fn for_each_quantity_expression<'a>(
+) -> impl Parser<'a, ParserInput<'a>, QuantityExpression, ParserExtra<'a>> + Clone {
+    choice((
+        card_predicate_parser::parser()
+            .then_ignore(words(&["you", "have", "played", "this", "turn"]))
+            .map(QuantityExpression::PlayedThisTurn),
+        predicate_parser::predicate_parser().map(QuantityExpression::Matching),
+    ))
+    .boxed()
 }

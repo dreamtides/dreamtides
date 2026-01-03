@@ -31,6 +31,9 @@ pub fn serialize_standard_effect(effect: &StandardEffect) -> String {
             }
         }
         StandardEffect::DrawCards { .. } => "draw {cards}.".to_string(),
+        StandardEffect::DrawCardsForEach { for_each, .. } => {
+            format!("draw {{cards}} for each {}.", serialize_for_count_expression(for_each))
+        }
         StandardEffect::DiscardCards { .. } => "discard {discards}.".to_string(),
         StandardEffect::DiscardCardFromEnemyHand { predicate } => format!(
             "discard a chosen {} from the opponent's hand.",
@@ -238,6 +241,10 @@ fn serialize_predicate_count(_count: u32, predicate: &Predicate) -> String {
 fn serialize_for_count_expression(quantity_expression: &QuantityExpression) -> String {
     match quantity_expression {
         QuantityExpression::Matching(predicate) => serialize_for_each_predicate(predicate),
+        QuantityExpression::PlayedThisTurn(predicate) => format!(
+            "{} you have played this turn",
+            serialize_card_predicate_without_article(predicate)
+        ),
         _ => {
             unimplemented!("Serialization not yet implemented for this quantity expression")
         }

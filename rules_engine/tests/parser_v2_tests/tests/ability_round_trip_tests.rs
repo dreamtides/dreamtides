@@ -106,6 +106,30 @@ fn test_round_trip_energy_gain_spark_for_each_allied_subtype() {
 }
 
 #[test]
+fn test_round_trip_ally_gains_spark_for_each_allied_subtype() {
+    let original = "An ally gains +{s} spark for each allied {subtype}.";
+    let parsed = parse_ability(original, "s: 2, subtype: warrior");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_materialized_draw_cards_for_each_allied_subtype() {
+    let original = "{Materialized} Draw {cards} for each allied {subtype}.";
+    let parsed = parse_ability(original, "cards: 2, subtype: warrior");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_score_points_for_each_card_played_this_turn() {
+    let original = "Score {points} for each card you have played this turn.";
+    let parsed = parse_ability(original, "points: 3");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!("Gain {points} for each card you have played this turn.", serialized);
+}
+
+#[test]
 fn test_round_trip_at_end_of_turn_gain_energy() {
     let original = "At the end of your turn, gain {e}.";
     let parsed = parse_ability(original, "e: 2");
