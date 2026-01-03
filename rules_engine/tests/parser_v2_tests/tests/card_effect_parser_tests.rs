@@ -32,6 +32,25 @@ fn test_materialized_draw_cards() {
 }
 
 #[test]
+fn test_materialized_draw_cards_for_each_allied_subtype() {
+    let result = parse_ability(
+        "{Materialized} Draw {cards} for each allied {subtype}.",
+        "cards: 2, subtype: warrior",
+    );
+    assert_ron_snapshot!(result, @r###"
+    Triggered(TriggeredAbility(
+      trigger: Keywords([
+        Materialized,
+      ]),
+      effect: Effect(DrawCardsForEach(
+        count: 2,
+        for_each: Matching(Another(CharacterType(Warrior))),
+      )),
+    ))
+    "###);
+}
+
+#[test]
 fn test_materialized_judgment_gain_energy() {
     let result = parse_ability("{MaterializedJudgment} Gain {e}.", "e: 1");
     assert_ron_snapshot!(result, @r###"
@@ -54,6 +73,20 @@ fn test_draw_cards_event() {
     Event(EventAbility(
       effect: Effect(DrawCards(
         count: 3,
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_score_points_for_each_card_played_this_turn() {
+    let result =
+        parse_ability("Score {points} for each card you have played this turn.", "points: 2");
+    assert_ron_snapshot!(result, @r###"
+    Event(EventAbility(
+      effect: Effect(GainPointsForEach(
+        gain: Points(2),
+        for_count: PlayedThisTurn(Card),
       )),
     ))
     "###);

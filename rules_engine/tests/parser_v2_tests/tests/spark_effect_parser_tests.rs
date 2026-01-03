@@ -16,3 +16,20 @@ fn test_materialized_judgment_kindle() {
     ))
     "###);
 }
+
+#[test]
+fn test_ally_gains_spark_for_each_allied_subtype() {
+    let result = parse_ability(
+        "An ally gains +{s} spark for each allied {subtype}.",
+        "s: 2, subtype: warrior",
+    );
+    assert_ron_snapshot!(result, @r###"
+    Event(EventAbility(
+      effect: Effect(GainsSparkForQuantity(
+        target: Another(Character),
+        gains: Spark(2),
+        for_quantity: Matching(Another(CharacterType(Warrior))),
+      )),
+    ))
+    "###);
+}

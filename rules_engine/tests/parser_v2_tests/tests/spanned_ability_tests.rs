@@ -1416,6 +1416,59 @@ fn test_spanned_materialized_each_player_discards() {
 }
 
 #[test]
+fn test_spanned_ally_gains_spark_for_each_allied_subtype() {
+    let SpannedAbility::Event(event) = parse_spanned_ability(
+        "An ally gains +{s} spark for each allied {subtype}.",
+        "s: 2, subtype: warrior",
+    ) else {
+        panic!("Expected Event ability");
+    };
+
+    assert_eq!(event.additional_cost, None);
+    let SpannedEffect::Effect(effect) = &event.effect else {
+        panic!("Expected Effect, got Modal");
+    };
+    assert_eq!(effect.text.trim(), "An ally gains +{s} spark for each allied {subtype}.");
+    assert_valid_span(&effect.span);
+}
+
+#[test]
+fn test_spanned_materialized_draw_cards_for_each_allied_subtype() {
+    let SpannedAbility::Triggered(triggered) = parse_spanned_ability(
+        "{Materialized} Draw {cards} for each allied {subtype}.",
+        "cards: 2, subtype: warrior",
+    ) else {
+        panic!("Expected Triggered ability");
+    };
+
+    assert_eq!(triggered.trigger.text, "{Materialized}");
+    assert_valid_span(&triggered.trigger.span);
+
+    let SpannedEffect::Effect(effect) = triggered.effect else {
+        panic!("Expected Effect, got Modal");
+    };
+    assert_eq!(effect.text.trim(), "Draw {cards} for each allied {subtype}.");
+    assert_valid_span(&effect.span);
+}
+
+#[test]
+fn test_spanned_score_points_for_each_card_played_this_turn() {
+    let SpannedAbility::Event(event) = parse_spanned_ability(
+        "Score {points} for each card you have played this turn.",
+        "points: 3",
+    ) else {
+        panic!("Expected Event ability");
+    };
+
+    assert_eq!(event.additional_cost, None);
+    let SpannedEffect::Effect(effect) = &event.effect else {
+        panic!("Expected Effect, got Modal");
+    };
+    assert_eq!(effect.text.trim(), "Score {points} for each card you have played this turn.");
+    assert_valid_span(&effect.span);
+}
+
+#[test]
 fn test_spanned_judgment_each_player_abandons_character() {
     let SpannedAbility::Triggered(triggered) =
         parse_spanned_ability("{Judgment} Each player abandons a character.", "")

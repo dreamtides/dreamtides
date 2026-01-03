@@ -4,7 +4,9 @@ use ability_data::standard_effect::StandardEffect;
 use chumsky::prelude::*;
 use core_data::numerics::Spark;
 
-use crate::parser::parser_helpers::{kindle_amount, spark, word, words, ParserExtra, ParserInput};
+use crate::parser::parser_helpers::{
+    article, kindle_amount, spark, word, words, ParserExtra, ParserInput,
+};
 use crate::parser::predicate_parser;
 
 pub fn parser<'a>() -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
@@ -28,7 +30,9 @@ fn gains_spark_for_each<'a>(
                 gains: Spark(gains),
                 for_quantity: QuantityExpression::Matching(for_each),
             }),
-        predicate_parser::predicate_parser()
+        article()
+            .or_not()
+            .ignore_then(predicate_parser::predicate_parser())
             .then_ignore(words(&["gains", "+"]))
             .then(spark())
             .then_ignore(word("spark"))
@@ -44,7 +48,9 @@ fn gains_spark_for_each<'a>(
 }
 
 fn gains_spark<'a>() -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
-    predicate_parser::predicate_parser()
+    article()
+        .or_not()
+        .ignore_then(predicate_parser::predicate_parser())
         .then_ignore(words(&["gains", "+"]))
         .then(spark())
         .then_ignore(word("spark"))
