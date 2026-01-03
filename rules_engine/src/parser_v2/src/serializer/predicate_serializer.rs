@@ -1,0 +1,130 @@
+use ability_data::predicate::{CardPredicate, Predicate};
+
+use super::serializer_utils::serialize_operator;
+
+pub fn serialize_predicate_without_article(predicate: &Predicate) -> String {
+    let result = serialize_predicate(predicate);
+    let trimmed =
+        result.strip_prefix("an ").or_else(|| result.strip_prefix("a ")).unwrap_or(&result);
+    trimmed.to_string()
+}
+
+pub fn serialize_predicate(predicate: &Predicate) -> String {
+    match predicate {
+        Predicate::This => "this character".to_string(),
+        Predicate::It => "it".to_string(),
+        Predicate::Your(card_predicate) => {
+            format!("an {}", serialize_your_predicate(card_predicate))
+        }
+        Predicate::Another(card_predicate) => {
+            format!("an {}", serialize_your_predicate(card_predicate))
+        }
+        Predicate::Any(card_predicate) => serialize_card_predicate(card_predicate),
+        Predicate::Enemy(card_predicate) => {
+            format!("an {}", serialize_enemy_predicate(card_predicate))
+        }
+        _ => unimplemented!("Serialization not yet implemented for this predicate type"),
+    }
+}
+
+pub fn serialize_your_predicate(card_predicate: &CardPredicate) -> String {
+    match card_predicate {
+        CardPredicate::Character => "ally".to_string(),
+        CardPredicate::CharacterType(_) => "allied {subtype}".to_string(),
+        CardPredicate::CharacterWithSpark(_, operator) => {
+            format!("ally with spark {{s}} {}", serialize_operator(operator))
+        }
+        _ => {
+            unimplemented!("Serialization not yet implemented for this your predicate type")
+        }
+    }
+}
+
+pub fn serialize_enemy_predicate(card_predicate: &CardPredicate) -> String {
+    match card_predicate {
+        CardPredicate::Character => "enemy".to_string(),
+        CardPredicate::CharacterWithSpark(_, operator) => {
+            format!("enemy with spark {{s}} {}", serialize_operator(operator))
+        }
+        CardPredicate::CardWithCost { cost_operator, .. } => {
+            format!("enemy with cost {{e}} {}", serialize_operator(cost_operator))
+        }
+        _ => {
+            unimplemented!("Serialization not yet implemented for this enemy predicate type")
+        }
+    }
+}
+
+pub fn serialize_card_predicate(card_predicate: &CardPredicate) -> String {
+    match card_predicate {
+        CardPredicate::Card => "a card".to_string(),
+        CardPredicate::Character => "a character".to_string(),
+        CardPredicate::Event => "an event".to_string(),
+        CardPredicate::CharacterType(_) => "{a-subtype}".to_string(),
+        CardPredicate::Fast { target } => {
+            format!("a {{fast}} {}", serialize_fast_target(target))
+        }
+        CardPredicate::CardWithCost { target, cost_operator, .. } => format!(
+            "{} with cost {{e}} {}",
+            serialize_card_predicate(target),
+            serialize_operator(cost_operator)
+        ),
+        _ => {
+            unimplemented!("Serialization not yet implemented for this card predicate type")
+        }
+    }
+}
+
+pub fn serialize_card_predicate_without_article(card_predicate: &CardPredicate) -> String {
+    let predicate = serialize_card_predicate(card_predicate);
+    let trimmed = predicate
+        .strip_prefix("an ")
+        .or_else(|| predicate.strip_prefix("a "))
+        .unwrap_or(&predicate);
+    trimmed.to_string()
+}
+
+pub fn serialize_card_predicate_plural(card_predicate: &CardPredicate) -> String {
+    match card_predicate {
+        CardPredicate::Card => "cards".to_string(),
+        CardPredicate::Character => "characters".to_string(),
+        CardPredicate::Event => "events".to_string(),
+        CardPredicate::CharacterType(_) => "{plural-subtype}".to_string(),
+        CardPredicate::Fast { target } => {
+            format!("fast {}", serialize_card_predicate_plural(target))
+        }
+        _ => {
+            unimplemented!("Serialization not yet implemented for this card predicate type")
+        }
+    }
+}
+
+pub fn serialize_fast_target(card_predicate: &CardPredicate) -> String {
+    match card_predicate {
+        CardPredicate::Card => "card".to_string(),
+        CardPredicate::Character => "character".to_string(),
+        CardPredicate::Event => "event".to_string(),
+        CardPredicate::CharacterType(_) => "{subtype}".to_string(),
+        CardPredicate::CharacterWithSpark(_spark, operator) => {
+            format!("character with spark {{s}} {}", serialize_operator(operator))
+        }
+        CardPredicate::CardWithCost { target, cost_operator, .. } => {
+            format!(
+                "{} with cost {{e}} {}",
+                serialize_fast_target(target),
+                serialize_operator(cost_operator)
+            )
+        }
+        _ => unimplemented!("Unsupported fast target"),
+    }
+}
+
+pub fn serialize_for_each_predicate(predicate: &Predicate) -> String {
+    match predicate {
+        Predicate::Another(CardPredicate::Character) => "allied character".to_string(),
+        Predicate::Another(CardPredicate::CharacterType(_)) => "allied {subtype}".to_string(),
+        _ => {
+            unimplemented!("Serialization not yet implemented for this for-each predicate")
+        }
+    }
+}
