@@ -14,7 +14,7 @@ pub fn parser<'a>() -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserEx
         choice((foresee(), discover(), counterspell_effects())).boxed(),
         choice((
             choice((dissolve_all_characters(), dissolve_character())).boxed(),
-            choice((banish_character(), banish_enemy_void())).boxed(),
+            choice((banish_collection(), banish_character(), banish_enemy_void())).boxed(),
             choice((materialize_copy(), materialize_character())).boxed(),
         ))
         .boxed(),
@@ -75,6 +75,17 @@ pub fn banish_character<'a>(
         .ignore_then(article())
         .ignore_then(predicate_parser::predicate_parser())
         .map(|target| StandardEffect::BanishCharacter { target })
+}
+
+pub fn banish_collection<'a>(
+) -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
+    directive("banish")
+        .ignore_then(words(&["any", "number", "of"]))
+        .ignore_then(predicate_parser::predicate_parser())
+        .map(|target| StandardEffect::BanishCollection {
+            target,
+            count: CollectionExpression::AnyNumberOf,
+        })
 }
 
 pub fn banish_enemy_void<'a>(

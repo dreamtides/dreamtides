@@ -42,7 +42,7 @@ fn any_basic_predicates<'a>() -> impl Parser<'a, ParserInput<'a>, Predicate, Par
 
 fn reference_predicates<'a>() -> impl Parser<'a, ParserInput<'a>, Predicate, ParserExtra<'a>> + Clone
 {
-    choice((this_parser(), it_parser())).boxed()
+    choice((this_parser(), that_parser(), it_parser(), them_parser())).boxed()
 }
 
 fn this_parser<'a>() -> impl Parser<'a, ParserInput<'a>, Predicate, ParserExtra<'a>> + Clone {
@@ -55,6 +55,15 @@ fn this_parser<'a>() -> impl Parser<'a, ParserInput<'a>, Predicate, ParserExtra<
 
 fn it_parser<'a>() -> impl Parser<'a, ParserInput<'a>, Predicate, ParserExtra<'a>> + Clone {
     word("it").to(Predicate::It)
+}
+
+fn that_parser<'a>() -> impl Parser<'a, ParserInput<'a>, Predicate, ParserExtra<'a>> + Clone {
+    choice((words(&["that", "character"]), words(&["that", "event"]), words(&["that", "card"])))
+        .to(Predicate::That)
+}
+
+fn them_parser<'a>() -> impl Parser<'a, ParserInput<'a>, Predicate, ParserExtra<'a>> + Clone {
+    word("them").to(Predicate::Them)
 }
 
 fn non_subtype_enemy_parser<'a>(
@@ -76,7 +85,7 @@ fn allied_parser<'a>() -> impl Parser<'a, ParserInput<'a>, Predicate, ParserExtr
 }
 
 fn ally_parser<'a>() -> impl Parser<'a, ParserInput<'a>, Predicate, ParserExtra<'a>> + Clone {
-    word("ally")
+    choice((word("ally"), word("allies")))
         .ignore_then(card_predicate_parser::parser().or_not())
         .map(|predicate| Predicate::Another(predicate.unwrap_or(CardPredicate::Character)))
 }
