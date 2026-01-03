@@ -123,10 +123,10 @@
   "{e}: Gain +{s} spark for each allied {subtype}.", // Implemented
   "An ally gains +{s} spark for each allied {subtype}.", // Implemented
   "{Materialized} Draw {cards} for each allied {subtype}.", // Implemented
-  "Score {points} for each card you have played this turn.", // Implemented
+  "Gain {points} for each card you have played this turn.", // Implemented
   "Draw {cards} for each card you have played this turn.",
   "When you play {cards-numeral} in a turn, {reclaim} this character.",
-  "{Judgment} You may pay {e} to give each allied {subtype} +{s} spark.",
+  "{Judgment} You may pay {e} to have each allied {subtype} gain +{s} spark.",
   "When you {materialize} an allied {subtype}, that character gains +{s} spark.",
   "Abandon an ally: You may put a character from your void on top of your deck.",
   "{Materialized} {Banish} any number of allies, then {materialize} them.",

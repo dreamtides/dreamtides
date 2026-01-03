@@ -1523,7 +1523,7 @@ name = "Illumination of Glory"
 id = "a2381225-b97f-4a38-845b-cefd8b86d499"
 energy-cost = 5
 rules-text = "Gain {points} for each card you have played this turn."
-preview = "Score 1⍟ for each card you have played this turn."
+preview = "Gain 1⍟ for each card you have played this turn."
 variables = "points: 1"
 card-type = "Event"
 is-fast = false
@@ -2240,7 +2240,7 @@ card-number = 135
 name = "Spiritbound Alpha"
 id = "86e31227-afab-4eb3-a53f-53e08c7ff227"
 energy-cost = 2
-rules-text = "{Judgment} You may pay {e} to give each allied {subtype} +{s} spark."
+rules-text = "{Judgment} You may pay {e} to have each allied {subtype} gain +{s} spark."
 preview = "▸ Judgment: You may pay 4● to give each allied spirit animal +2 spark."
 variables = """
 e: 4
