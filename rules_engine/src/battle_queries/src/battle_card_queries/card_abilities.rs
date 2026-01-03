@@ -302,6 +302,11 @@ fn watch_for_battlefield_triggers(event: &TriggerEvent) -> EnumSet<TriggerName> 
             triggers.insert(TriggerName::PlayedCard);
             triggers
         }
+        TriggerEvent::PlayCardsInTurn(..) => {
+            let mut triggers = EnumSet::new();
+            triggers.insert(TriggerName::PlayedCard);
+            triggers
+        }
         TriggerEvent::PlayDuringTurn(..) => {
             let mut triggers = EnumSet::new();
             triggers.insert(TriggerName::PlayedCard);

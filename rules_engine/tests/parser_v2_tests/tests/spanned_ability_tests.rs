@@ -209,6 +209,63 @@ fn test_spanned_until_end_of_turn_when_an_ally_leaves_play_gain_energy() {
 }
 
 #[test]
+fn test_spanned_draw_cards_for_each_card_played_this_turn() {
+    let SpannedAbility::Event(event) =
+        parse_spanned_ability("Draw {cards} for each card you have played this turn.", "cards: 2")
+    else {
+        panic!("Expected Event ability");
+    };
+    let SpannedEffect::Effect(effect) = event.effect else {
+        panic!("Expected Effect, got Modal");
+    };
+    assert_eq!(effect.text.trim(), "Draw {cards} for each card you have played this turn.");
+    assert_valid_span(&effect.span);
+}
+
+#[test]
+fn test_spanned_when_you_play_cards_in_turn_reclaim_this_character() {
+    let SpannedAbility::Triggered(triggered) = parse_spanned_ability(
+        "When you play {cards-numeral} in a turn, {reclaim} this character.",
+        "cards: 2",
+    ) else {
+        panic!("Expected Triggered ability");
+    };
+
+    assert_eq!(triggered.once_per_turn, None);
+    assert_eq!(triggered.trigger.text, "When you play {cards-numeral} in a turn");
+    assert_valid_span(&triggered.trigger.span);
+
+    let SpannedEffect::Effect(effect) = triggered.effect else {
+        panic!("Expected Effect, got Modal");
+    };
+    assert_eq!(effect.text.trim(), "{reclaim} this character.");
+    assert_valid_span(&effect.span);
+}
+
+#[test]
+fn test_spanned_judgment_you_may_pay_to_have_each_allied_gain_spark() {
+    let SpannedAbility::Triggered(triggered) = parse_spanned_ability(
+        "{Judgment} You may pay {e} to have each allied {subtype} gain +{s} spark.",
+        "e: 1, subtype: warrior, s: 2",
+    ) else {
+        panic!("Expected Triggered ability");
+    };
+
+    assert_eq!(triggered.once_per_turn, None);
+    assert_eq!(triggered.trigger.text, "{Judgment}");
+    assert_valid_span(&triggered.trigger.span);
+
+    let SpannedEffect::Effect(effect) = triggered.effect else {
+        panic!("Expected Effect, got Modal");
+    };
+    assert_eq!(
+        effect.text.trim(),
+        "You may pay {e} to have each allied {subtype} gain +{s} spark."
+    );
+    assert_valid_span(&effect.span);
+}
+
+#[test]
 fn test_spanned_ability_when_you_play_a_fast_card_this_character_gains_spark() {
     let SpannedAbility::Triggered(triggered) = parse_spanned_ability(
         "When you play a {fast} card, this character gains +{s} spark.",

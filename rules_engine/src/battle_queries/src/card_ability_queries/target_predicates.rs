@@ -58,7 +58,7 @@ pub fn get_character_target_predicate(effect: &StandardEffect) -> Option<&Predic
         StandardEffect::DrawCardsForEach { .. } => None,
         StandardEffect::DrawMatchingCard { .. } => None,
         StandardEffect::EachMatchingGainsSparkForEach { .. } => None,
-        StandardEffect::EachMatchingGainsSparkUntilNextMain { .. } => None,
+        StandardEffect::EachMatchingGainsSpark { .. } => None,
         StandardEffect::EachPlayerAbandonsCharacters { .. } => None,
         StandardEffect::EachPlayerDiscardCards { .. } => None,
         StandardEffect::EnemyGainsPoints { .. } => None,

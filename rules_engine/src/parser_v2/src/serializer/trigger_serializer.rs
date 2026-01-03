@@ -16,6 +16,7 @@ pub fn serialize_trigger_event(trigger: &TriggerEvent) -> String {
         TriggerEvent::PlayFromHand(predicate) => {
             format!("when you play {} from your hand, ", serialize_predicate(predicate))
         }
+        TriggerEvent::PlayCardsInTurn(_) => "when you play {cards-numeral} in a turn, ".to_string(),
         TriggerEvent::PlayDuringTurn(predicate, _) => {
             format!("when you play {} in a turn, ", serialize_predicate(predicate))
         }

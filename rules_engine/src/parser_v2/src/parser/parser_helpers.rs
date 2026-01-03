@@ -58,6 +58,13 @@ pub fn cards<'a>() -> impl Parser<'a, ParserInput<'a>, u32, ParserExtra<'a>> + C
     }
 }
 
+/// Parses the {cards-numeral} directive value.
+pub fn cards_numeral<'a>() -> impl Parser<'a, ParserInput<'a>, u32, ParserExtra<'a>> + Clone {
+    select! {
+        (ResolvedToken::Integer { directive, value }, _) if directive == "cards-numeral" => value
+    }
+}
+
 /// Parses the {top-n-cards} directive value.
 pub fn top_n_cards<'a>() -> impl Parser<'a, ParserInput<'a>, u32, ParserExtra<'a>> + Clone {
     select! {
