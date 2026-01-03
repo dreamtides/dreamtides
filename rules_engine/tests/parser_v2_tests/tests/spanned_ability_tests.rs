@@ -1452,9 +1452,9 @@ fn test_spanned_materialized_draw_cards_for_each_allied_subtype() {
 }
 
 #[test]
-fn test_spanned_score_points_for_each_card_played_this_turn() {
+fn test_spanned_gain_points_for_each_card_played_this_turn() {
     let SpannedAbility::Event(event) = parse_spanned_ability(
-        "Score {points} for each card you have played this turn.",
+        "Gain {points} for each card you have played this turn.",
         "points: 3",
     ) else {
         panic!("Expected Event ability");
@@ -1464,7 +1464,7 @@ fn test_spanned_score_points_for_each_card_played_this_turn() {
     let SpannedEffect::Effect(effect) = &event.effect else {
         panic!("Expected Effect, got Modal");
     };
-    assert_eq!(effect.text.trim(), "Score {points} for each card you have played this turn.");
+    assert_eq!(effect.text.trim(), "Gain {points} for each card you have played this turn.");
     assert_valid_span(&effect.span);
 }
 

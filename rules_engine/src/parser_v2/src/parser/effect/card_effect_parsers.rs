@@ -62,7 +62,7 @@ pub fn gain_points<'a>() -> impl Parser<'a, ParserInput<'a>, StandardEffect, Par
 
 pub fn gain_points_for_each<'a>(
 ) -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
-    choice((word("gain"), word("score")))
+    word("gain")
         .ignore_then(points())
         .then_ignore(words(&["for", "each"]))
         .then(for_each_quantity_expression())

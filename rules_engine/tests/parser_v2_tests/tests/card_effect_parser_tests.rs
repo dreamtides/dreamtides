@@ -79,9 +79,9 @@ fn test_draw_cards_event() {
 }
 
 #[test]
-fn test_score_points_for_each_card_played_this_turn() {
+fn test_gain_points_for_each_card_played_this_turn() {
     let result =
-        parse_ability("Score {points} for each card you have played this turn.", "points: 2");
+        parse_ability("Gain {points} for each card you have played this turn.", "points: 2");
     assert_ron_snapshot!(result, @r###"
     Event(EventAbility(
       effect: Effect(GainPointsForEach(
