@@ -584,8 +584,8 @@ card-number = 34
 name = "Ride of the Vanguard"
 id = "e79d484f-d564-4429-9eca-0f90d2af5ef5"
 energy-cost = 2
-rules-text = "Give an ally +{s} spark for each allied {subtype}."
-preview = "Give an ally +1 spark for each allied warrior."
+rules-text = "An ally gains +{s} spark for each allied {subtype}."
+preview = "An ally gains +1 spark for each allied warrior."
 variables = """
 s: 1
 subtype: warrior"""
@@ -2240,8 +2240,8 @@ card-number = 135
 name = "Spiritbound Alpha"
 id = "86e31227-afab-4eb3-a53f-53e08c7ff227"
 energy-cost = 2
-rules-text = "{Judgment}: You may pay {e} to give each allied {subtype} +{s} spark."
-preview = "▸ Judgment:: You may pay 4● to give each allied spirit animal +2 spark."
+rules-text = "{Judgment} You may pay {e} to give each allied {subtype} +{s} spark."
+preview = "▸ Judgment: You may pay 4● to give each allied spirit animal +2 spark."
 variables = """
 e: 4
 subtype:spirit-animal
@@ -2400,9 +2400,11 @@ card-number = 144
 name = "Seeker of the Radiant Wilds"
 id = "0dc21b19-b21b-4905-9a9a-113db544e587"
 energy-cost = 2
-rules-text = "{Materialized} Draw a card for each allied {subtype}."
+rules-text = "{Materialized} Draw {cards} for each allied {subtype}."
 preview = "▸ Materialized: Draw a card for each allied spirit animal."
-variables = "subtype:spirit-animal"
+variables = """
+cards: 1
+subtype:spirit-animal"""
 card-type = "Character"
 subtype = "Visitor"
 is-fast = false
@@ -3677,8 +3679,9 @@ card-number = 221
 name = "Nightmare"
 id = "b4fd32f8-fbb0-42c9-a794-f0949d4062c5"
 energy-cost = 2
-rules-text = "Draw a card."
+rules-text = "Draw {cards}."
 preview = "Draw a card."
+variables = "cards: 1"
 card-type = "Event"
 is-fast = false
 image-number = 1486924805
