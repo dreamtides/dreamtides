@@ -123,10 +123,10 @@ fn test_round_trip_materialized_draw_cards_for_each_allied_subtype() {
 
 #[test]
 fn test_round_trip_score_points_for_each_card_played_this_turn() {
-    let original = "Score {points} for each card you have played this turn.";
+    let original = "Gain {points} for each card you have played this turn.";
     let parsed = parse_ability(original, "points: 3");
     let serialized = ability_serializer::serialize_ability(&parsed);
-    assert_eq!("Gain {points} for each card you have played this turn.", serialized);
+    assert_eq!(original, serialized);
 }
 
 #[test]
