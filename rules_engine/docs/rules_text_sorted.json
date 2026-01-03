@@ -121,8 +121,8 @@
   "Until end of turn, when an ally leaves play, gain {e}.", // Implemented
   "Once per turn, when you {materialize} a character with cost {e} or less, draw {cards}.", // Implemented
   "{e}: Gain +{s} spark for each allied {subtype}.", // Implemented
-  "Give an ally +{s} spark for each allied {subtype}.",
-  "{Materialized} Draw a card for each allied {subtype}.",
+  "An ally gains +{s} spark for each allied {subtype}.",
+  "{Materialized} Draw {cards} for each allied {subtype}.",
   "Score {points} for each card you have played this turn.",
   "Draw {cards} for each card you have played this turn.",
   "When you play {cards-numeral} in a turn, {reclaim} this character.",
