@@ -1050,7 +1050,7 @@ energy-cost = 1
 rules-text = """
 {Prevent} a played event unless the opponent pays {e}.
 """
-preview = "Prevent an event unless the opponent pays 2●."
+preview = "Prevent a played event unless the opponent pays 2●."
 variables = "e: 2"
 card-type = "Event"
 is-fast = true
@@ -1125,7 +1125,7 @@ name = "Abolish"
 id = "eb85b69a-3771-4148-83cf-a7ddb0caee98"
 energy-cost = 2
 rules-text = "{Prevent} played a card."
-preview = "Prevent a card."
+preview = "Prevent played a card."
 card-type = "Event"
 is-fast = true
 image-number = 1282908322
@@ -3037,7 +3037,7 @@ name = "Twilight Reclaimer"
 id = "fb3029e1-7f43-4284-bcdd-11dfe6711f96"
 energy-cost = 1
 rules-text = "{Dissolved} {a-subtype} in your void gains {reclaim} equal to its cost."
-preview = "▸ Dissolved: A survivor in your void gains reclaim equal to its cost."
+preview = "▸ Dissolved: a survivor in your void gains reclaim equal to its cost."
 variables = "subtype: survivor"
 card-type = "Character"
 subtype = "Survivor"
@@ -3651,7 +3651,7 @@ energy-cost = 1
 rules-text = """
 {Prevent} a played event which could {dissolve} an ally.
 """
-preview = "Prevent an event which could dissolve an ally."
+preview = "Prevent a played event which could dissolve an ally."
 card-type = "Event"
 is-fast = false
 image-number = 1621160806
