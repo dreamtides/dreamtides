@@ -44,7 +44,7 @@ pub struct TestCardsFile {
 
 ```rust
 pub fn load_cards<P: AsRef<Path>>(path: P) -> Result<Vec<CardDefinitionRaw>, TabulaError> {
-    let content = std::fs::read_to_string(&path)?;
+    let content = fs::read_to_string(&path)?;
     let file: CardsFile = toml::from_str(&content)?;
     Ok(file.cards)
 }

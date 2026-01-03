@@ -28,7 +28,6 @@ pub struct CardDefinitionRaw {
     pub variables: Option<String>,
     pub image_number: Option<i64>,
     pub rarity: Option<String>,
-    pub art_owned: Option<bool>,
     pub card_number: Option<i32>,
     pub energy_produced: Option<i32>,
     pub is_fast: Option<bool>,

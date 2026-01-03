@@ -99,7 +99,7 @@ fn test_build_dreamwell_card() {
 fn test_dreamwell_rejects_spark() {
     let raw = CardDefinitionRaw {
         id: Some(Uuid::new_v4()),
-        name: Some("Invalid Well".to_string()),
+        name: Some("Invalid Dreamwell Card".to_string()),
         energy_produced: Some(2),
         spark: Some(3),  // Should cause error
         ..Default::default()
