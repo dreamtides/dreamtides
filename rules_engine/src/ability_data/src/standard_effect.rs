@@ -66,6 +66,7 @@ pub enum StandardEffect {
     MaterializeCharacter { target: Predicate },
     MaterializeCharacterAtEndOfTurn { target: Predicate },
     MaterializeCharacterFromVoid { target: CardPredicate },
+    MaterializeCollection { target: Predicate, count: CollectionExpression },
     MaterializeRandomFromDeck { count: u32, predicate: CardPredicate },
     MaterializeSilentCopy { target: Predicate, count: u32, quantity: QuantityExpression },
     NoEffect,

@@ -5,7 +5,8 @@ use ability_data::standard_effect::StandardEffect;
 use chumsky::prelude::*;
 
 use crate::parser::parser_helpers::{
-    article, directive, foresee_count, word, words, ParserExtra, ParserInput,
+    article, directive, foresee_count, it_or_them_count, up_to_n_allies, word, words, ParserExtra,
+    ParserInput,
 };
 use crate::parser::{card_predicate_parser, cost_parser, predicate_parser};
 
@@ -14,8 +15,14 @@ pub fn parser<'a>() -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserEx
         choice((foresee(), discover(), counterspell_effects())).boxed(),
         choice((
             choice((dissolve_all_characters(), dissolve_character())).boxed(),
-            choice((banish_collection(), banish_character(), banish_enemy_void())).boxed(),
-            choice((materialize_copy(), materialize_character())).boxed(),
+            choice((
+                banish_up_to_n(),
+                banish_collection(),
+                banish_character(),
+                banish_enemy_void(),
+            ))
+            .boxed(),
+            choice((materialize_collection(), materialize_copy(), materialize_character())).boxed(),
         ))
         .boxed(),
     ))
@@ -88,6 +95,16 @@ pub fn banish_collection<'a>(
         })
 }
 
+pub fn banish_up_to_n<'a>(
+) -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
+    directive("banish").ignore_then(up_to_n_allies()).map(|count| {
+        StandardEffect::BanishCollection {
+            target: Predicate::Another(CardPredicate::Character),
+            count: CollectionExpression::UpTo(count),
+        }
+    })
+}
+
 pub fn banish_enemy_void<'a>(
 ) -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
     directive("banish")
@@ -101,6 +118,16 @@ pub fn materialize_character<'a>(
         .ignore_then(article().or_not())
         .ignore_then(predicate_parser::predicate_parser())
         .map(|target| StandardEffect::MaterializeCharacter { target })
+}
+
+pub fn materialize_collection<'a>(
+) -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
+    directive("materialize").ignore_then(it_or_them_count()).map(|count| {
+        StandardEffect::MaterializeCollection {
+            target: Predicate::Another(CardPredicate::Character),
+            count: CollectionExpression::UpTo(count),
+        }
+    })
 }
 
 pub fn materialize_copy<'a>(

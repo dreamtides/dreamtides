@@ -22,7 +22,17 @@ fn energy_cost<'a>() -> impl Parser<'a, ParserInput<'a>, Cost, ParserExtra<'a>> 
 }
 
 fn abandon_cost<'a>() -> impl Parser<'a, ParserInput<'a>, Cost, ParserExtra<'a>> + Clone {
-    choice((abandon_cost_with_count(), abandon_cost_single()))
+    choice((abandon_any_number(), abandon_cost_with_count(), abandon_cost_single()))
+}
+
+fn abandon_any_number<'a>() -> impl Parser<'a, ParserInput<'a>, Cost, ParserExtra<'a>> + Clone {
+    word("abandon")
+        .ignore_then(words(&["any", "number", "of"]))
+        .ignore_then(predicate_parser::predicate_parser())
+        .map(|target| Cost::AbandonCharactersCount {
+            target,
+            count: CollectionExpression::AnyNumberOf,
+        })
 }
 
 fn abandon_or_discard_cost<'a>() -> impl Parser<'a, ParserInput<'a>, Cost, ParserExtra<'a>> + Clone

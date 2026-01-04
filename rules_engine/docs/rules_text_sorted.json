@@ -130,9 +130,9 @@
   "When you {materialize} an allied {subtype}, that character gains +{s} spark.", // Implemented
   "Abandon an ally: You may put a character from your void on top of your deck.", // Implemented
   "{Materialized} {Banish} any number of allies, then {materialize} them.", // Implemented
-  "Abandon any number of allies. Draw {cards} for each ally abandoned.",
-  "{Banish} {up-to-n-allies}, then {materialize} {it-or-them}.",
-  "{MaterializedJudgment} {Banish} an ally with {spark} {s} or less, then {materialize} it.",
+  "Abandon any number of allies: Draw {cards} for each ally abandoned.", // Implemented
+  "{Banish} {up-to-n-allies}, then {materialize} {it-or-them}.", // Implemented
+  "{MaterializedJudgment} {Banish} an ally with spark {s} or less, then {materialize} it.", // Implemented
   "{Materialized} Discard a chosen card from the opponent's hand. They draw {cards}.",
   "Return {up-to-n-events} from your void to your hand.",
   "Abandon an ally. Gain {energy-symbol} equal to that character's cost.",
