@@ -53,6 +53,7 @@ pub fn serialize_your_predicate(card_predicate: &CardPredicate) -> String {
 pub fn serialize_enemy_predicate(card_predicate: &CardPredicate) -> String {
     match card_predicate {
         CardPredicate::Character => "enemy".to_string(),
+        CardPredicate::Card => "enemy card".to_string(),
         CardPredicate::CharacterWithSpark(_, operator) => {
             format!("enemy with spark {{s}} {}", serialize_operator(operator))
         }

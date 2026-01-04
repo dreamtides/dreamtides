@@ -1600,3 +1600,69 @@ fn test_spanned_materialized_banish_any_number_of_allies_then_materialize_them()
     assert_eq!(effect.text.trim(), "{Banish} any number of allies, then {materialize} them.");
     assert_valid_span(&effect.span);
 }
+
+#[test]
+fn test_spanned_banish_from_hand_play_for_alternate_cost() {
+    let SpannedAbility::Static { text } =
+        parse_spanned_ability("{Banish} a card from hand: Play this event for {e}.", "e: 0")
+    else {
+        panic!("Expected Static ability");
+    };
+
+    assert_eq!(text.text, "{Banish} a card from hand: Play this event for {e}.");
+    assert_valid_span(&text.span);
+}
+
+#[test]
+fn test_spanned_banish_from_hand_alternate_cost_dissolve_enemy() {
+    let abilities = parse_spanned_abilities(
+        "{Banish} a card from hand: Play this event for {e}.\n\n{Dissolve} an enemy.",
+        "e: 0",
+    );
+    assert_eq!(abilities.len(), 2);
+
+    let SpannedAbility::Static { text } = &abilities[0] else {
+        panic!("Expected Static ability");
+    };
+
+    assert_eq!(text.text, "{Banish} a card from hand: Play this event for {e}.");
+    assert_valid_span(&text.span);
+
+    let SpannedAbility::Event(event) = &abilities[1] else {
+        panic!("Expected Event ability");
+    };
+
+    let SpannedEffect::Effect(effect) = &event.effect else {
+        panic!("Expected Effect");
+    };
+
+    assert_eq!(effect.text.trim(), "{Dissolve} an enemy.");
+    assert_valid_span(&effect.span);
+}
+
+#[test]
+fn test_spanned_banish_from_hand_alternate_cost_prevent_enemy_card() {
+    let abilities = parse_spanned_abilities(
+        "{Banish} a card from hand: Play this event for {e}.\n\n{Prevent} a played enemy card.",
+        "e: 0",
+    );
+    assert_eq!(abilities.len(), 2);
+
+    let SpannedAbility::Static { text } = &abilities[0] else {
+        panic!("Expected Static ability");
+    };
+
+    assert_eq!(text.text, "{Banish} a card from hand: Play this event for {e}.");
+    assert_valid_span(&text.span);
+
+    let SpannedAbility::Event(event) = &abilities[1] else {
+        panic!("Expected Event ability");
+    };
+
+    let SpannedEffect::Effect(effect) = &event.effect else {
+        panic!("Expected Effect");
+    };
+
+    assert_eq!(effect.text.trim(), "{Prevent} a played enemy card.");
+    assert_valid_span(&effect.span);
+}

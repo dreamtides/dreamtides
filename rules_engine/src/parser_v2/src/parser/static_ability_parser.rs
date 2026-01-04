@@ -1,9 +1,12 @@
-use ability_data::static_ability::{StandardStaticAbility, StaticAbility};
+use ability_data::static_ability::{AlternateCost, StandardStaticAbility, StaticAbility};
 use chumsky::prelude::*;
 use core_data::numerics::{Energy, Spark};
 
 use crate::parser::card_predicate_parser;
-use crate::parser::parser_helpers::{energy, period, spark, word, words, ParserExtra, ParserInput};
+use crate::parser::cost_parser;
+use crate::parser::parser_helpers::{
+    colon, energy, period, spark, word, words, ParserExtra, ParserInput,
+};
 
 /// Parses static abilities that apply continuously.
 pub fn static_ability_parser<'a>(
@@ -13,8 +16,13 @@ pub fn static_ability_parser<'a>(
 
 fn standard_static_ability<'a>(
 ) -> impl Parser<'a, ParserInput<'a>, StandardStaticAbility, ParserExtra<'a>> + Clone {
-    choice((allied_spark_bonus(), enemy_cards_cost_increase(), your_cards_cost_modification()))
-        .boxed()
+    choice((
+        play_for_alternate_cost(),
+        allied_spark_bonus(),
+        enemy_cards_cost_increase(),
+        your_cards_cost_modification(),
+    ))
+    .boxed()
 }
 
 fn your_cards_cost_modification<'a>(
@@ -73,5 +81,21 @@ fn enemy_cards_cost_increase<'a>(
         .map(|(matching, increase)| StandardStaticAbility::EnemyCardsCostIncrease {
             matching,
             increase: Energy(increase),
+        })
+}
+
+fn play_for_alternate_cost<'a>(
+) -> impl Parser<'a, ParserInput<'a>, StandardStaticAbility, ParserExtra<'a>> + Clone {
+    cost_parser::banish_from_hand_cost()
+        .then_ignore(colon())
+        .then_ignore(words(&["play", "this", "event", "for"]))
+        .then(energy())
+        .then_ignore(period())
+        .map(|(additional_cost, e)| {
+            StandardStaticAbility::PlayForAlternateCost(AlternateCost {
+                energy_cost: Energy(e),
+                additional_cost: Some(additional_cost),
+                if_you_do: None,
+            })
         })
 }

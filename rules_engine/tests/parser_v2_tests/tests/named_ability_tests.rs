@@ -124,3 +124,47 @@ fn test_dissolve_enemy_with_cost_reclaim() {
     Named(Reclaim(Some(Energy(2))))
     "###);
 }
+
+#[test]
+fn test_banish_from_hand_alternate_cost_dissolve_enemy() {
+    let result = parse_abilities(
+        "{Banish} a card from hand: Play this event for {e}.\n\n{Dissolve} an enemy.",
+        "e: 0",
+    );
+    assert_eq!(result.len(), 2);
+    assert_ron_snapshot!(result[0], @r###"
+    Static(StaticAbility(PlayForAlternateCost(AlternateCost(
+      energy_cost: Energy(0),
+      additional_cost: Some(BanishFromHand(Any(Card))),
+    ))))
+    "###);
+    assert_ron_snapshot!(result[1], @r###"
+    Event(EventAbility(
+      effect: Effect(DissolveCharacter(
+        target: Enemy(Character),
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_banish_from_hand_alternate_cost_prevent_enemy_card() {
+    let result = parse_abilities(
+        "{Banish} a card from hand: Play this event for {e}.\n\n{Prevent} a played enemy card.",
+        "e: 0",
+    );
+    assert_eq!(result.len(), 2);
+    assert_ron_snapshot!(result[0], @r###"
+    Static(StaticAbility(PlayForAlternateCost(AlternateCost(
+      energy_cost: Energy(0),
+      additional_cost: Some(BanishFromHand(Any(Card))),
+    ))))
+    "###);
+    assert_ron_snapshot!(result[1], @r###"
+    Event(EventAbility(
+      effect: Effect(Counterspell(
+        target: Enemy(Card),
+      )),
+    ))
+    "###);
+}

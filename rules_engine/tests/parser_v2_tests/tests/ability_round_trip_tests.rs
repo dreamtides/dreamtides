@@ -1015,3 +1015,19 @@ fn test_round_trip_event_in_void_gains_reclaim_this_turn() {
     let serialized = ability_serializer::serialize_ability(&parsed);
     assert_eq!(original, serialized);
 }
+
+#[test]
+fn test_round_trip_banish_from_hand_play_for_alternate_cost() {
+    let original = "{Banish} a card from hand: Play this event for {e}.";
+    let parsed = parse_ability(original, "e: 0");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_prevent_a_played_enemy_card() {
+    let original = "{Prevent} a played enemy card.";
+    let parsed = parse_ability(original, "");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}

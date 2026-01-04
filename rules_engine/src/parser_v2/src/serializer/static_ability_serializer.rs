@@ -1,6 +1,8 @@
 use ability_data::static_ability::{StandardStaticAbility, StaticAbility};
 
+use super::cost_serializer::serialize_cost;
 use super::predicate_serializer::serialize_card_predicate_plural;
+use super::serializer_utils::capitalize_first_letter;
 
 pub fn serialize_static_ability(static_ability: &StaticAbility) -> String {
     match static_ability {
@@ -28,6 +30,14 @@ pub fn serialize_standard_static_ability(ability: &StandardStaticAbility) -> Str
         }
         StandardStaticAbility::SparkBonusOtherCharacters { matching, .. } => {
             format!("allied {} have +{{s}} spark.", serialize_card_predicate_plural(matching))
+        }
+        StandardStaticAbility::PlayForAlternateCost(alt_cost) => {
+            let cost = alt_cost
+                .additional_cost
+                .as_ref()
+                .map(|c| capitalize_first_letter(&serialize_cost(c)))
+                .unwrap_or_default();
+            format!("{}: Play this event for {{e}}.", cost)
         }
         _ => unimplemented!("Serialization not yet implemented for this static ability"),
     }
