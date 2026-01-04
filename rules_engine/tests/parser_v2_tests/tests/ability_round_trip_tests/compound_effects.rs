@@ -159,3 +159,11 @@ fn test_round_trip_banish_from_hand_play_for_alternate_cost() {
     let serialized = ability_serializer::serialize_ability(&parsed);
     assert_eq!(original, serialized);
 }
+
+#[test]
+fn test_round_trip_banish_ally_materialize_at_end_of_turn() {
+    let original = "{Banish} an ally. {Materialize} it at end of turn.";
+    let parsed = parse_ability(original, "");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}

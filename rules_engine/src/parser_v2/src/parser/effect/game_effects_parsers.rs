@@ -22,7 +22,13 @@ pub fn parser<'a>() -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserEx
                 banish_enemy_void(),
             ))
             .boxed(),
-            choice((materialize_collection(), materialize_copy(), materialize_character())).boxed(),
+            choice((
+                materialize_character_at_end_of_turn(),
+                materialize_collection(),
+                materialize_copy(),
+                materialize_character(),
+            ))
+            .boxed(),
         ))
         .boxed(),
     ))
@@ -118,6 +124,15 @@ pub fn materialize_character<'a>(
         .ignore_then(article().or_not())
         .ignore_then(predicate_parser::predicate_parser())
         .map(|target| StandardEffect::MaterializeCharacter { target })
+}
+
+pub fn materialize_character_at_end_of_turn<'a>(
+) -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
+    directive("materialize")
+        .ignore_then(article().or_not())
+        .ignore_then(predicate_parser::predicate_parser())
+        .then_ignore(words(&["at", "end", "of", "turn"]))
+        .map(|target| StandardEffect::MaterializeCharacterAtEndOfTurn { target })
 }
 
 pub fn materialize_collection<'a>(
