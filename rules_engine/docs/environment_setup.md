@@ -20,7 +20,7 @@ repository buildable and ready for day-to-day development.
    rustfmt component before trying to format again. The download and install took
    roughly 30 seconds on my machine:
    ```bash
-   rustup component add -q rustfmt --toolchain nightly
+   rustup component add rustfmt --toolchain nightly > /dev/null
    ```
 
 ## 2. Install the `just` command runner

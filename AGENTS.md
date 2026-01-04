@@ -1,7 +1,9 @@
-Please follow all of the "code style" and "validating changes" rules below at
-all times.
+Please follow all of the "code style" and "validating changes" rules below at all times.
 
+IMPORTANT: Run all `cargo` commands from the `rules_engine/` subdirectory, and
+*always* pass the -q flag.
 
+Example: `cargo test -q -p parser_v2_tests --test card_effect_parser_tests`.
 
 # CODE STYLE
 
