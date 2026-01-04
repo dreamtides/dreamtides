@@ -549,3 +549,15 @@ fn test_discover_fast_subtype_with_spark_general() {
     ))
     "###);
 }
+
+#[test]
+fn test_prevent_a_played_enemy_card() {
+    let result = parse_ability("{Prevent} a played enemy card.", "");
+    assert_ron_snapshot!(result, @r###"
+    Event(EventAbility(
+      effect: Effect(Counterspell(
+        target: Enemy(Card),
+      )),
+    ))
+    "###);
+}

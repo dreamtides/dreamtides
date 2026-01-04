@@ -143,8 +143,8 @@
 
 
 
-  "{Banish} a card from hand: Play this event for {e}.\n\n{Dissolve} an enemy.",
-  "{Banish} a card from hand: Play this event for {e}.\n\n{Prevent} a played enemy card.",
+  "{Banish} a card from hand: Play this event for {e}.\n\n{Dissolve} an enemy.", // Implemented
+  "{Banish} a card from hand: Play this event for {e}.\n\n{Prevent} a played enemy card.", // Implemented
   "{Banish} an ally. {Materialize} it at end of turn.\n\n{ReclaimForCost}",
   "{Banish} your void with {count} or more cards: {Reclaim} this character.",
   "{ChooseOne}\n{bullet} {e}: Return an enemy to hand.\n{bullet} {e-}: Draw {cards}.",
