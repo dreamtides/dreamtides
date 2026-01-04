@@ -99,7 +99,7 @@ fn banish_void_with_min_count_cost<'a>(
         .ignore_then(words(&["your", "void", "with"]))
         .ignore_then(count())
         .then_ignore(words(&["or", "more", "cards"]))
-        .map(|min_count| Cost::BanishAllCardsFromYourVoidWithMinCount(min_count))
+        .map(Cost::BanishAllCardsFromYourVoidWithMinCount)
 }
 
 fn banish_from_your_void_cost<'a>(
