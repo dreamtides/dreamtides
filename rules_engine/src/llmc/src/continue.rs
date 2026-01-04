@@ -4,7 +4,7 @@ use std::path::Path;
 use anyhow::{Context, Result};
 
 use crate::cli::ContinueArgs;
-use crate::state::{self, AgentRecord, AgentStatus};
+use crate::state::{self, AgentRecord, AgentStatus, ClaudeConfig, Runtime};
 use crate::{config, git_ops, prompt, runtime, time};
 
 /// Continue an agent's work from where it left off.
@@ -36,7 +36,41 @@ pub fn run(args: &ContinueArgs, repo_override: Option<&Path>) -> Result<()> {
             record.runtime = new_runtime;
         }
 
-        (record.runtime, record.worktree_path.clone(), record.claude_config.clone())
+        let final_runtime = record.runtime;
+        let claude_config = if final_runtime == Runtime::Claude {
+            let existing_config = record.claude_config.as_ref();
+            Some(ClaudeConfig {
+                model: args
+                    .claude_model
+                    .clone()
+                    .or_else(|| existing_config.and_then(|c| c.model.clone())),
+                no_thinking: args.claude_no_thinking
+                    || existing_config.is_some_and(|c| c.no_thinking),
+                sandbox: args
+                    .claude_sandbox
+                    .clone()
+                    .or_else(|| existing_config.and_then(|c| c.sandbox.clone())),
+                skip_permissions: args.claude_skip_permissions
+                    || existing_config.is_some_and(|c| c.skip_permissions),
+                allowed_tools: args
+                    .claude_allowed_tools
+                    .clone()
+                    .or_else(|| existing_config.and_then(|c| c.allowed_tools.clone())),
+                mcp_config: if args.claude_mcp_config.is_empty() {
+                    existing_config.map(|c| c.mcp_config.clone()).unwrap_or_default()
+                } else {
+                    args.claude_mcp_config.clone()
+                },
+                interactive: args.claude_interactive
+                    || existing_config.is_some_and(|c| c.interactive),
+            })
+        } else {
+            None
+        };
+
+        record.claude_config = claude_config.clone();
+
+        (final_runtime, record.worktree_path.clone(), claude_config)
     };
     state::save_state(&state_path, &state)?;
 
