@@ -192,3 +192,19 @@ fn test_spanned_materialized_draw_cards_for_each_allied_subtype() {
     assert_eq!(effect.text.trim(), "Draw {cards} for each allied {subtype}.");
     assert_valid_span(&effect.span);
 }
+
+#[test]
+fn test_spanned_banish_ally_materialize_at_end_of_turn() {
+    let SpannedAbility::Event(event) =
+        parse_spanned_ability("{Banish} an ally. {Materialize} it at end of turn.", "")
+    else {
+        panic!("Expected Event ability");
+    };
+
+    assert_eq!(event.additional_cost, None);
+    let SpannedEffect::Effect(effect) = &event.effect else {
+        panic!("Expected Effect, got Modal");
+    };
+    assert_eq!(effect.text.trim(), "{Banish} an ally. {Materialize} it at end of turn.");
+    assert_valid_span(&effect.span);
+}
