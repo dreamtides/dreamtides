@@ -1,21 +1,12 @@
 set positional-arguments
 
-check-commit-messages:
-    #!/usr/bin/env bash
-    output=$(./rules_engine/scripts/strip_commit_messages.py --check 2>&1)
-    if [ $? -ne 0 ]; then
-        echo "$output"
-        echo "Error: Commits contain 'Generated with' or 'Co-Authored-By' lines. Run 'just fmt' to fix."
-        exit 1
-    fi
-
-code-review: check-commit-messages check-format build workspace-lints clippy style-validator test tabula-verify-vba tabula-validate check-docs unity-tests
+code-review: check-format build workspace-lints clippy style-validator test tabula-verify-vba tabula-validate check-docs unity-tests
 
 # Run this before pushing
 code-review-rsync: rsync-for-review
     cd ~/dreamtides_tests && just code-review || (osascript -e 'display dialog "Review failed" with icon stop'; exit 1)
 
-review: check-format build workspace-lints clippy style-validator test
+review: check-format build clippy style-validator test
 
 check:
     #!/usr/bin/env bash

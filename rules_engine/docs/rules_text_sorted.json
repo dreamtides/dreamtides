@@ -1,153 +1,4 @@
 [
-  "Gain {e}.", // Implemented
-  "Draw {cards}.", // Implemented
-  "{Judgment} Gain {e}.",
-  "{Judgment} Gain {points}.", // Implemented
-  "{Judgment} {Foresee}.", // Implemented
-  "{Materialized} Draw {cards}.", // Implemented
-  "{Materialized} {Foresee}.", // Implemented
-  "{MaterializedJudgment} {Kindle}.", // Implemented
-  "{MaterializedJudgment} Gain {e}.", // Implemented
-  "{Prevent} played a card.", // Implemented
-  "{Dissolve} an enemy.", // Implemented
-  "{Discover} {a-subtype}.", // Implemented
-  "Gain {e}. Draw {cards}.", // Implemented
-  "Draw {cards}. Discard {discards}.", // Implemented
-  "Draw {cards}. Discard {discards}. Gain {e}.", // Implemented
-  "Discard {discards}. Draw {cards}.", // Implemented
-  "{Dissolve} an enemy. You lose {points}.", // Implemented
-  "{Dissolve} an enemy. The opponent gains {points}.", // Implemented
-  "{Judgment} Draw {cards}. The opponent gains {points}.", // Implemented
-  "Return an enemy or ally to hand. Draw {cards}.", // Implemented
-  "{Dissolve} an enemy with spark {s} or less.", // Implemented
-  "{Dissolve} an enemy with spark {s} or more.", // Implemented
-  "{Banish} an enemy with cost {e} or less.", // Implemented
-  "{Prevent} a played {fast} card.", // Implemented
-  "{Prevent} a played character.", // Implemented
-  "{Discover} an event.", // Implemented
-  "{Dissolve} all characters.", // Implemented
-  "{Materialized} Gain {e}.", // Implemented
-  "{Judgment} Draw {cards}, then discard {discards}.", // Implemented
-  "{Materialized} Discard {discards}, then draw {cards}.", // Implemented
-  "{MaterializedDissolved} Draw {cards}.", // Implemented
-  "{MaterializedJudgment} \nGain {e}.", // Implemented
-  "{Materialized} Return an ally to hand.", // Implemented
-  "{Materialized} You may return an ally to hand.", // Implemented
-  "{Materialized} {Discover} a {fast} event.", // Implemented
-  "{Judgment} Return this character from your void to your hand.", // Implemented
-  "{Materialized} Return an enemy to hand.", // Implemented
-  "Abandon an ally: Gain {e}.", // Implemented
-  "Abandon an ally: {Kindle}.", // Implemented
-  "{e}: Draw {cards}.", // Implemented
-  "{Foresee}. Draw {cards}.\n\n{ReclaimForCost}", // Implemented
-  "Draw {cards}. Discard {discards}.\n\n{ReclaimForCost}", // Implemented
-  "{Dissolve} an enemy with cost {e} or more.\n\n{ReclaimForCost}", // Implemented
-  "{Discover} a card with cost {e}.", // Implemented
-  "{Banish} a non-{subtype} enemy.", // Implemented
-  "{Judgment} You may draw {cards}, then discard {discards}.", // Implemented
-  "When you discard a card, gain {points}.", // Implemented
-  "When you discard a card, {kindle}.", // Implemented
-  "When you play an event, gain {e}", // Implemented
-  "When you play an event, {foresee}.", // Implemented
-  "When you {materialize} an ally, gain {e}.", // Implemented
-  "When you {materialize} a character, this character gains +{s} spark.", // Implemented
-  "When you play {a-subtype}, draw {cards}.", // Implemented
-  "When you abandon a character, draw {cards}.", // Implemented
-  "When you abandon a character, gain {points}.", // Implemented
-  "When you abandon an ally, {kindle}.", // Implemented
-  "When an ally is {dissolved}, gain {points}.", // Implemented
-  "When an ally is {dissolved}, draw {cards}.", // Implemented
-  "When an ally is {dissolved}, gain {e}.", // Implemented
-  "When an ally is {banished}, {kindle}.", // Implemented
-  "When an ally is {banished}, this character gains +{s} spark.", // Implemented
-  "At the end of your turn, gain {e}.", // Implemented
-  "Events cost you {e} less.", // Implemented
-  "Characters cost you {e} less.", // Implemented
-  "The opponent's events cost {e} more.", // Implemented
-  "Allied {plural-subtype} have +{s} spark.", // Implemented
-  "Abandon an ally: This character gains +{s} spark.", // Implemented
-  "When you abandon an ally, this character gains +{s} spark.", // Implemented
-  "When you {materialize} an allied {subtype}, gain {e}.", // Implemented
-  "When you play a {fast} card, gain {points}.", // Implemented
-  "{Judgment} Gain {e} for each allied {subtype}.", // Implemented
-  "{Judgment} Gain {e} for each allied character.", // Implemented
-  "{MaterializedJudgment} With {count-allied-subtype}, gain {e}.", // Implemented
-  "{Judgment} With {count-allied-subtype}, gain {e}.", // Implemented
-  "{MaterializedJudgment} With {count-allied-subtype}, draw {cards}.", // Implemented
-  "Abandon {count-allies}: {Reclaim} this character.", // Implemented
-  "{MaterializedJudgment} \nGain {e}.", // Implemented
-  "{Materialized} Each player discards {discards}.", // Implemented
-  "{Judgment} Each player abandons a character.", // Implemented
-  "{Materialized} Draw {cards}.", // Implemented
-  "You may return a character from your void to your hand. Draw {cards}.", // Implemented
-  "{Materialized} Return a character from your void to your hand.", // Implemented
-  "{Materialized} {Banish} the opponent's void.", // Implemented
-  "{Judgment} You may pay {e} to return this character from your void to your hand.", // Implemented
-  "{Dissolved} You may pay {e} to return this character to your hand.", // Implemented
-  "Discard a chosen character from the opponent's hand.", // Implemented
-  "Discard a chosen card with cost {e} or less from the opponent's hand.", // Implemented
-  "{Prevent} played event unless the opponent pays {e}.", // Implemented
-  "{Materialized} {Prevent} a played card with cost {e} or less.", // Implemented
-  "{Materialized} Gain control of an enemy with cost {e} or less.", // Implemented
-  "{Prevent} a played card. Put it on top of the opponent's deck.", // Implemented
-  "Abandon an ally or discard a card: {Dissolve} an enemy.", // Implemented
-  "{Judgment} You may discard {discards} to draw {cards} and gain {points}.", // Implemented
-  "{Judgment} You may discard a card to {dissolve} an enemy with spark {s} or less.", // Implemented
-  "When you discard this character, {materialize} it.", // Implemented
-  "Put the {top-n-cards} of your deck into your void. Draw {cards}.", // Implemented
-  "Abandon an ally: Put the {top-n-cards} of your deck into your void.", // Implemented
-  "{MaterializedDissolved} Put the {top-n-cards} of your deck into your void.", // Implemented
-  "When you play {a-subtype}, put the {top-n-cards} of your deck into your void.", // Implemented
-  "When you {materialize} {a-subtype}, {reclaim} this character.", // Implemented
-  "{Materialized} Draw {cards}. Discard {discards}.\n\n{ReclaimForCost}", // Implemented
-  "{e}, Discard {discards}: {kindle}.", // Implemented
-  "{e}, {Banish} another card in your void: {Reclaim} this character.", // Implemented
-  "{e}, Abandon an ally with spark {s} or less: Draw {cards}.", // Implemented
-  "{e}, Abandon a character, Discard your hand: Draw {cards}.", // Implemented
-  "Abandon a character, Discard your hand: Gain {e}.", // Implemented
-  "{e}: {Materialize} a copy of an ally.", // Implemented
-  "{Materialized} You may {banish} an ally, then {materialize} it.", // Implemented
-  "{Judgment} You may {banish} an ally, then {materialize} it.", // Implemented
-  "Abandon an ally, once per turn: Gain {points}.", // Implemented
-  "Abandon an ally, once per turn: {Reclaim} a {subtype}.", // Implemented
-  "Once per turn, when you {materialize} a character, gain {e}.", // Implemented
-  "Once per turn, when you discard a card, gain {e} and {kindle}.", // Implemented
-  "Once per turn, when you {materialize} {a-subtype}, draw {cards}.", // Implemented
-  "Once per turn, when you play a {fast} card, draw {cards}.", // Implemented
-  "When you play a {fast} card, this character gains +{s} spark.", // Implemented
-  "When you {materialize} an allied {subtype}, this character gains +{s} spark.", // Implemented
-  "When an event is put into your void, this character gains +{s} spark.", // Implemented
-  "Until end of turn, when you play a character, draw {cards}.", // Implemented
-  "Until end of turn, when an ally leaves play, gain {e}.", // Implemented
-  "Once per turn, when you {materialize} a character with cost {e} or less, draw {cards}.", // Implemented
-  "{e}: Gain +{s} spark for each allied {subtype}.", // Implemented
-  "An ally gains +{s} spark for each allied {subtype}.", // Implemented
-  "{Materialized} Draw {cards} for each allied {subtype}.", // Implemented
-  "Gain {points} for each card you have played this turn.", // Implemented
-  "Draw {cards} for each card you have played this turn.", // Implemented
-  "When you play {cards-numeral} in a turn, {reclaim} this character.", // Implemented
-  "{Judgment} You may pay {e} to have each allied {subtype} gain +{s} spark.", // Implemented
-  "When you {materialize} an allied {subtype}, that character gains +{s} spark.", // Implemented
-  "Abandon an ally: You may put a character from your void on top of your deck.", // Implemented
-  "{Materialized} {Banish} any number of allies, then {materialize} them.", // Implemented
-  "Abandon any number of allies: Draw {cards} for each ally abandoned.", // Implemented
-  "{Banish} {up-to-n-allies}, then {materialize} {it-or-them}.", // Implemented
-  "{MaterializedJudgment} {Banish} an ally with spark {s} or less, then {materialize} it.", // Implemented
-  "{Materialized} Discard a chosen card from the opponent's hand. They draw {cards}.", // Implemented
-  "Return {up-to-n-events} from your void to your hand.", // Implemented
-  "Abandon an ally: Gain {energy-symbol} equal to that character's cost.", // Implemented
-  "{Materialized} Draw {cards} for each ally abandoned this turn.", // Implemented
-  "{Materialized} A card with cost {e} or less in your void gains {reclaim-for-cost}.", // Implemented
-  "An event in your void gains {reclaim-for-cost} this turn.", // Implemented
-
-
-
-
-  "{Banish} a card from hand: Play this event for {e}.\n\n{Dissolve} an enemy.", // Implemented
-  "{Banish} a card from hand: Play this event for {e}.\n\n{Prevent} a played enemy card.", // Implemented
-  "{Banish} an ally. {Materialize} it at end of turn.\n\n{ReclaimForCost}", // Implemented
-  "{Banish} your void with {count} or more cards: {Reclaim} this character.", // Implemented
-  "{ChooseOne}\n{bullet} {e}: Return an enemy to hand.\n{bullet} {e-}: Draw {cards}.",
   "{Discover} a character with a '{Materialized}' ability.",
   "{Discover} a character with an activated ability.",
   "{Dissolve} an enemy with cost {e} or less.\n\n{Reclaim} -- Abandon an ally.",
@@ -174,7 +25,6 @@
   "{Materialized} Disable the activated abilities of an enemy while this character is in play.",
   "{Materialized} Draw {a-subtype} from your deck.",
   "{MultiplyBy} the amount of {energy-symbol} you have.",
-  "{Prevent} a played event which could {dissolve} an ally.",
   "Abandon an ally: Play this character for {e}, then abandon it.\n\n{Materialized} {Dissolve} an enemy.",
   "Abandon an ally: You may {dissolve} an enemy with spark less than that ally's spark.",
   "Additional Cost: Return an ally with cost {e} or more to hand.\n\n{Judgment} Draw {cards}.",
@@ -215,5 +65,7 @@
   "While this card is in your void, allied {plural-subtype} have +{s} spark.",
   "While you have {$count} or more cards in your void, they have {reclaim} equal to their cost.",
   "With an allied {subtype}, you may play this card from your hand or void for {e}.",
-  "You may only play this character from your void."
+  "You may only play this character from your void.",
+  "{ChooseOne}\n{bullet} {e}: Return an enemy to hand.\n{bullet} {e-}: Draw {cards}.",
+  "{Prevent} a played event which could {dissolve} an ally."
 ]
