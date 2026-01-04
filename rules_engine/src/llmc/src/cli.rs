@@ -26,6 +26,7 @@ pub enum Commands {
     Clean(CleanArgs),
     Reject(RejectArgs),
     Accept(AcceptArgs),
+    Continue(ContinueArgs),
 }
 
 #[derive(Args)]
@@ -153,4 +154,22 @@ pub struct RejectArgs {
 
     #[arg(long, help = "Include the original user prompt context")]
     pub include_prompt: bool,
+}
+
+#[derive(Args)]
+pub struct ContinueArgs {
+    #[arg(long, help = "Agent identifier")]
+    pub agent: Option<String>,
+
+    #[arg(long, help = "Additional notes or instructions for continuing work")]
+    pub notes: Option<String>,
+
+    #[arg(long, value_name = "PATH", help = "Notes file to append")]
+    pub notes_file: Option<PathBuf>,
+
+    #[arg(value_name = "PATH", help = "Notes file to append")]
+    pub notes_file_pos: Option<PathBuf>,
+
+    #[arg(long, value_enum, help = "Runtime to use (overrides stored runtime)")]
+    pub runtime: Option<Runtime>,
 }
