@@ -2,11 +2,10 @@ use ability_data::static_ability::{AlternateCost, StandardStaticAbility, StaticA
 use chumsky::prelude::*;
 use core_data::numerics::{Energy, Spark};
 
-use crate::parser::card_predicate_parser;
-use crate::parser::cost_parser;
 use crate::parser::parser_helpers::{
     colon, energy, period, spark, word, words, ParserExtra, ParserInput,
 };
+use crate::parser::{card_predicate_parser, cost_parser};
 
 /// Parses static abilities that apply continuously.
 pub fn static_ability_parser<'a>(
