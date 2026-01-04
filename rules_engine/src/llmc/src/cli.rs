@@ -136,6 +136,9 @@ pub struct ReviewArgs {
 
     #[arg(long, value_enum, default_value = "difftastic", help = "Review interface")]
     pub interface: ReviewInterface,
+
+    #[arg(long, help = "Allow reviewing running agents")]
+    pub force: bool,
 }
 
 #[derive(Args)]

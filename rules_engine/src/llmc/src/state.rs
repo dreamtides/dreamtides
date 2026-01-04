@@ -75,6 +75,16 @@ pub fn oldest_pending_agent_id(state: &StateFile) -> Option<String> {
         .map(|record| record.agent_id.clone())
 }
 
+/// Return the oldest agent id in running status.
+pub fn oldest_running_agent_id(state: &StateFile) -> Option<String> {
+    state
+        .agents
+        .values()
+        .filter(|record| record.status == AgentStatus::Running)
+        .min_by_key(|record| record.created_at_unix)
+        .map(|record| record.agent_id.clone())
+}
+
 /// Resolve an agent id or select the oldest pending agent.
 pub fn resolve_agent_id(agent: Option<&str>, state: &StateFile) -> Result<String> {
     let Some(agent) = agent else {

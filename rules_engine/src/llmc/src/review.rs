@@ -11,7 +11,18 @@ pub fn run(args: &ReviewArgs, repo_override: Option<&Path>) -> Result<()> {
     let paths = config::repo_paths(repo_override)?;
     let state_path = paths.llmc_dir.join("state.json");
     let mut state = state::load_state(&state_path)?;
-    let agent_id = state::resolve_agent_id(args.agent.as_deref(), &state)?;
+
+    let agent_id = match args.agent.as_deref() {
+        Some(agent) => agent.to_string(),
+        None if args.force => {
+            let Some(agent_id) = state::oldest_running_agent_id(&state) else {
+                return Err(anyhow::anyhow!("No agents in running state"));
+            };
+            agent_id
+        }
+        None => state::resolve_agent_id(None, &state)?,
+    };
+
     if !state.agents.contains_key(&agent_id) {
         return Err(anyhow::anyhow!("Unknown agent id: {agent_id}"));
     }
