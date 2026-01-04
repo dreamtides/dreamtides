@@ -219,7 +219,12 @@ style-validator:
   cargo run --manifest-path rules_engine/Cargo.toml --bin "style_validator" -- --code-order "$@"
 
 style-validator-fix:
-  cargo run --manifest-path rules_engine/Cargo.toml --bin "style_validator" -- --code-order --fix "$@"
+  #!/usr/bin/env bash
+  output=$(cargo run --manifest-path rules_engine/Cargo.toml --bin "style_validator" -- --code-order --fix "$@" 2>&1)
+  if [ $? -ne 0 ]; then
+      echo "$output"
+      exit 1
+  fi
 
 parser *args='':
   cargo run --manifest-path rules_engine/Cargo.toml --bin "parser_v2" -- "$@"
