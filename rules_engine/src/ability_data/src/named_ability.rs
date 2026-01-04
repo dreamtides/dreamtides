@@ -9,8 +9,7 @@ pub enum NamedAbility {
     /// its normal energy cost if none is given. If you do, banish it when it
     /// leaves play.
     Reclaim(Option<Energy>),
-    /// You may play this card from your void by paying the given cost, or for
-    /// its normal energy cost if none is given. If you do, banish it when it
-    /// leaves play.
+    /// You may play this card from your void by paying the given cost instead
+    /// of paying energy. If you do, banish it when it leaves play.
     ReclaimForCost(Cost),
 }
