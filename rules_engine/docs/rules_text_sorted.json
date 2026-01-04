@@ -1,6 +1,4 @@
 [
-  "{Discover} a character with a '{Materialized}' ability.",
-  "{Discover} a character with an activated ability.",
   "{Dissolve} an enemy with cost {e} or less.\n\n{Reclaim} -- Abandon an ally.",
   "{Dissolve} an enemy with cost less than the number of allied {plural-subtype}.",
   "{Dissolve} an enemy with cost less than the number of cards in your void.",

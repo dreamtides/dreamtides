@@ -26,6 +26,12 @@ pub fn parser<'a>() -> impl Parser<'a, ParserInput<'a>, CardPredicate, ParserExt
             base.clone().then(predicate_suffix_parser::with_spark_suffix()).map(
                 |(_, (spark_value, op))| CardPredicate::CharacterWithSpark(Spark(spark_value), op),
             ),
+            base.clone()
+                .then(predicate_suffix_parser::with_materialized_ability_suffix())
+                .map(|_| CardPredicate::CharacterWithMaterializedAbility),
+            base.clone()
+                .then(predicate_suffix_parser::with_activated_ability_suffix())
+                .map(|_| CardPredicate::CharacterWithMultiActivatedAbility),
             predicate_suffix_parser::with_cost_suffix().map(|(cost, op)| {
                 CardPredicate::CardWithCost {
                     target: Box::new(CardPredicate::Character),

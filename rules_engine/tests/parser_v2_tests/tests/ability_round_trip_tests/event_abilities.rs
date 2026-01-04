@@ -216,3 +216,19 @@ fn test_round_trip_prevent_a_played_enemy_card() {
     let serialized = ability_serializer::serialize_ability(&parsed);
     assert_eq!(original, serialized);
 }
+
+#[test]
+fn test_round_trip_discover_character_with_materialized_ability() {
+    let original = "{Discover} a character with a {materialized} ability.";
+    let parsed = parse_ability(original, "");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_discover_character_with_activated_ability() {
+    let original = "{Discover} a character with an activated ability.";
+    let parsed = parse_ability(original, "");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}

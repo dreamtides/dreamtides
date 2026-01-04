@@ -80,6 +80,12 @@ pub fn serialize_card_predicate(card_predicate: &CardPredicate) -> String {
             serialize_card_predicate(target),
             serialize_operator(cost_operator)
         ),
+        CardPredicate::CharacterWithMaterializedAbility => {
+            "a character with a {materialized} ability".to_string()
+        }
+        CardPredicate::CharacterWithMultiActivatedAbility => {
+            "a character with an activated ability".to_string()
+        }
         _ => {
             unimplemented!("Serialization not yet implemented for this card predicate type")
         }
