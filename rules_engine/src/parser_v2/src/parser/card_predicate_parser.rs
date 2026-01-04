@@ -16,6 +16,23 @@ pub fn parser<'a>() -> impl Parser<'a, ParserInput<'a>, CardPredicate, ParserExt
         ));
 
         choice((
+            base.clone()
+                .then(predicate_suffix_parser::with_cost_compared_to_controlled_suffix())
+                .map(|(target, (cost_operator, count_matching))| {
+                    CardPredicate::CharacterWithCostComparedToControlled {
+                        target: Box::new(target),
+                        cost_operator,
+                        count_matching: Box::new(count_matching),
+                    }
+                }),
+            base.clone()
+                .then(predicate_suffix_parser::with_cost_compared_to_void_count_suffix())
+                .map(|(target, cost_operator)| {
+                    CardPredicate::CharacterWithCostComparedToVoidCount {
+                        target: Box::new(target),
+                        cost_operator,
+                    }
+                }),
             base.clone().then(predicate_suffix_parser::with_cost_suffix()).map(
                 |(target, (cost, op))| CardPredicate::CardWithCost {
                     target: Box::new(target),
@@ -32,6 +49,21 @@ pub fn parser<'a>() -> impl Parser<'a, ParserInput<'a>, CardPredicate, ParserExt
             base.clone()
                 .then(predicate_suffix_parser::with_activated_ability_suffix())
                 .map(|_| CardPredicate::CharacterWithMultiActivatedAbility),
+            predicate_suffix_parser::with_cost_compared_to_controlled_suffix().map(
+                |(cost_operator, count_matching)| {
+                    CardPredicate::CharacterWithCostComparedToControlled {
+                        target: Box::new(CardPredicate::Character),
+                        cost_operator,
+                        count_matching: Box::new(count_matching),
+                    }
+                },
+            ),
+            predicate_suffix_parser::with_cost_compared_to_void_count_suffix().map(
+                |cost_operator| CardPredicate::CharacterWithCostComparedToVoidCount {
+                    target: Box::new(CardPredicate::Character),
+                    cost_operator,
+                },
+            ),
             predicate_suffix_parser::with_cost_suffix().map(|(cost, op)| {
                 CardPredicate::CardWithCost {
                     target: Box::new(CardPredicate::Character),
