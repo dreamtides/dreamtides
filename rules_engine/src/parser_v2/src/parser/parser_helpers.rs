@@ -118,6 +118,12 @@ pub fn article<'a>() -> impl Parser<'a, ParserInput<'a>, (), ParserExtra<'a>> + 
     choice((word("a"), word("an")))
 }
 
+pub fn count<'a>() -> impl Parser<'a, ParserInput<'a>, u32, ParserExtra<'a>> + Clone {
+    select! {
+        (ResolvedToken::Integer { directive, value }, _) if directive == "count" => value
+    }
+}
+
 pub fn count_allies<'a>() -> impl Parser<'a, ParserInput<'a>, u32, ParserExtra<'a>> + Clone {
     select! {
         (ResolvedToken::Integer { directive, value }, _) if directive == "count-allies" => value

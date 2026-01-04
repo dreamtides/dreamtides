@@ -39,6 +39,9 @@ pub fn serialize_cost(cost: &Cost) -> String {
                 "{Banish} {count} cards in your void".to_string()
             }
         }
+        Cost::BanishAllCardsFromYourVoidWithMinCount(_) => {
+            "{Banish} your void with {count} or more cards".to_string()
+        }
         Cost::BanishFromHand(predicate) => {
             format!("{{Banish}} {} from hand", serialize_predicate(predicate))
         }

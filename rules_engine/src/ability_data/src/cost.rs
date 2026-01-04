@@ -12,6 +12,7 @@ pub enum Cost {
     AbandonDreamscapes(u32),
     AbandonACharacterOrDiscardACard,
     BanishAllCardsFromYourVoid,
+    BanishAllCardsFromYourVoidWithMinCount(u32),
     BanishCardsFromEnemyVoid(u32),
     BanishCardsFromYourVoid(u32),
     BanishFromHand(Predicate),

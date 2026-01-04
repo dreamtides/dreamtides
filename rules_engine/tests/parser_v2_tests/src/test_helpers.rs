@@ -9,9 +9,9 @@ use parser_v2::variables::parser_bindings::VariableBindings;
 use parser_v2::variables::parser_substitutions;
 
 /// Stack red zone size - if less than this remains, grow the stack.
-/// The parser hierarchy is deep and needs significant stack during construction.
-/// We use a very large red zone to ensure we catch the overflow early, before
-/// the thread's stack is exhausted.
+/// The parser hierarchy is deep and needs significant stack during
+/// construction. We use a very large red zone to ensure we catch the overflow
+/// early, before the thread's stack is exhausted.
 const STACK_RED_ZONE: usize = 1024 * 1024; // 1 MB
 
 /// Stack size to grow by when needed.
