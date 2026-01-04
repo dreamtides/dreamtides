@@ -14,6 +14,7 @@ pub enum Cost {
     BanishAllCardsFromYourVoid,
     BanishCardsFromEnemyVoid(u32),
     BanishCardsFromYourVoid(u32),
+    BanishYourVoidWithMinCount(u32),
     BanishFromHand(Predicate),
     CostList(Vec<Cost>),
     DiscardCards(CardPredicate, u32),

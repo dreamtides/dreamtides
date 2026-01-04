@@ -90,6 +90,12 @@ pub fn spark<'a>() -> impl Parser<'a, ParserInput<'a>, u32, ParserExtra<'a>> + C
     }
 }
 
+pub fn count<'a>() -> impl Parser<'a, ParserInput<'a>, u32, ParserExtra<'a>> + Clone {
+    select! {
+        (ResolvedToken::Integer { directive, value }, _) if directive == "count" => value
+    }
+}
+
 pub fn subtype<'a>() -> impl Parser<'a, ParserInput<'a>, CardSubtype, ParserExtra<'a>> + Clone {
     select! {
         (ResolvedToken::Subtype { subtype, .. }, _) => subtype

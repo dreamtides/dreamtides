@@ -298,7 +298,6 @@ insta:
 # nightly-only
 fmt: style-validator-fix
     #!/usr/bin/env bash
-    ./rules_engine/scripts/strip_commit_messages.py
     output=$(cd rules_engine && cargo +nightly fmt 2>&1)
     if [ $? -eq 0 ]; then
         echo "Formatted"

@@ -5,14 +5,21 @@ use chumsky::prelude::*;
 use core_data::numerics::Energy;
 
 use crate::parser::parser_helpers::{
-    article, count_allies, directive, discards, energy, word, words, ParserExtra, ParserInput,
+    article, count, count_allies, directive, discards, energy, word, words, ParserExtra,
+    ParserInput,
 };
 use crate::parser::{card_predicate_parser, predicate_parser};
 
 pub fn cost_parser<'a>() -> impl Parser<'a, ParserInput<'a>, Cost, ParserExtra<'a>> + Clone {
     choice((
         choice((abandon_or_discard_cost(), energy_cost(), abandon_cost())).boxed(),
-        choice((discard_hand_cost(), discard_cost(), banish_from_your_void_cost())).boxed(),
+        choice((
+            discard_hand_cost(),
+            discard_cost(),
+            banish_void_with_min_count_cost(),
+            banish_from_your_void_cost(),
+        ))
+        .boxed(),
     ))
     .boxed()
 }
@@ -84,6 +91,15 @@ fn discard_cost<'a>() -> impl Parser<'a, ParserInput<'a>, Cost, ParserExtra<'a>>
 
 fn discard_hand_cost<'a>() -> impl Parser<'a, ParserInput<'a>, Cost, ParserExtra<'a>> + Clone {
     words(&["discard", "your", "hand"]).to(Cost::DiscardHand)
+}
+
+fn banish_void_with_min_count_cost<'a>(
+) -> impl Parser<'a, ParserInput<'a>, Cost, ParserExtra<'a>> + Clone {
+    directive("banish")
+        .ignore_then(words(&["your", "void", "with"]))
+        .ignore_then(count())
+        .then_ignore(words(&["or", "more", "cards"]))
+        .map(Cost::BanishYourVoidWithMinCount)
 }
 
 fn banish_from_your_void_cost<'a>(
