@@ -269,3 +269,25 @@ fn test_spanned_ability_when_you_abandon_an_ally_this_character_gains_spark() {
     assert_eq!(effect.text.trim(), "this character gains +{s} spark.");
     assert_valid_span(&effect.span);
 }
+
+#[test]
+fn test_spanned_banish_void_with_min_count_reclaim_this_character() {
+    let SpannedAbility::Activated(activated) = parse_spanned_ability(
+        "{Banish} your void with {count} or more cards: {Reclaim} this character.",
+        "count: 3",
+    ) else {
+        panic!("Expected Activated ability");
+    };
+
+    assert_eq!(
+        activated.cost.text,
+        "{Banish} your void with {count} or more cards"
+    );
+    assert_valid_span(&activated.cost.span);
+
+    let SpannedEffect::Effect(effect) = activated.effect else {
+        panic!("Expected Effect, got Modal");
+    };
+    assert!(effect.text.contains("{Reclaim} this character."));
+    assert_valid_span(&effect.span);
+}

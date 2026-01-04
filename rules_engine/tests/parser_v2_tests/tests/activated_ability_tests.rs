@@ -346,3 +346,21 @@ fn test_abandon_ally_gain_energy_equal_to_cost() {
     ))
     "###);
 }
+
+#[test]
+fn test_banish_void_with_min_count_reclaim_this_character() {
+    let result = parse_ability(
+        "{Banish} your void with {count} or more cards: {Reclaim} this character.",
+        "count: 3",
+    );
+    assert_ron_snapshot!(result, @r###"
+    Activated(ActivatedAbility(
+      costs: [
+        BanishAllCardsFromYourVoidWithMinCount(3),
+      ],
+      effect: Effect(ReturnFromYourVoidToPlay(
+        target: This,
+      )),
+    ))
+    "###);
+}
