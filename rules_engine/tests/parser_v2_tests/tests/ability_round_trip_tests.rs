@@ -999,3 +999,19 @@ fn test_round_trip_materialized_draw_cards_for_each_ally_abandoned_this_turn() {
     let serialized = ability_serializer::serialize_ability(&parsed);
     assert_eq!(original, serialized);
 }
+
+#[test]
+fn test_round_trip_materialized_card_with_cost_in_void_gains_reclaim() {
+    let original = "{Materialized} A card with cost {e} or less in your void gains {reclaim-for-cost} this turn.";
+    let parsed = parse_ability(original, "e: 3, reclaim: 0");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_event_in_void_gains_reclaim_this_turn() {
+    let original = "An event in your void gains {reclaim-for-cost} this turn.";
+    let parsed = parse_ability(original, "reclaim: 0");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}

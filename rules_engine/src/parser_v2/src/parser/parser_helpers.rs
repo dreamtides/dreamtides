@@ -148,3 +148,9 @@ pub fn up_to_n_events<'a>() -> impl Parser<'a, ParserInput<'a>, u32, ParserExtra
         (ResolvedToken::Integer { directive, value }, _) if directive == "up-to-n-events" => value
     }
 }
+
+pub fn reclaim_cost<'a>() -> impl Parser<'a, ParserInput<'a>, u32, ParserExtra<'a>> + Clone {
+    select! {
+        (ResolvedToken::Integer { directive, value }, _) if directive == "reclaim-for-cost" || directive == "reclaimforcost" => value
+    }
+}

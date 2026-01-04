@@ -31,6 +31,7 @@ static DIRECTIVES: &[(&str, &str, VariableConstructor)] = &[
     ("n-random-characters", "number", integer),
     ("plural-subtype", "subtype", subtype),
     ("points", "points", integer),
+    ("reclaim-for-cost", "reclaim", integer),
     ("reclaimforcost", "reclaim", integer),
     ("s", "s", integer),
     ("subtype", "subtype", subtype),
