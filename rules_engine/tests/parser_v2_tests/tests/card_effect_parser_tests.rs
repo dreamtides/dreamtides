@@ -736,3 +736,40 @@ fn test_materialized_draw_cards_for_each_ally_abandoned_this_turn() {
     ))
     "###);
 }
+
+#[test]
+fn test_materialized_card_with_cost_in_void_gains_reclaim() {
+    let result = parse_ability(
+        "{Materialized} A card with cost {e} or less in your void gains {reclaim-for-cost}.",
+        "e: 3, reclaim: 0",
+    );
+    assert_ron_snapshot!(result, @r###"
+    Triggered(TriggeredAbility(
+      trigger: Keywords([
+        Materialized,
+      ]),
+      effect: Effect(CardsInVoidGainReclaimThisTurn(
+        count: Exactly(1),
+        predicate: CardWithCost(
+          target: Card,
+          cost_operator: OrLess,
+          cost: Energy(3),
+        ),
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_event_in_void_gains_reclaim_this_turn() {
+    let result =
+        parse_ability("An event in your void gains {reclaim-for-cost} this turn.", "reclaim: 0");
+    assert_ron_snapshot!(result, @r###"
+    Event(EventAbility(
+      effect: Effect(CardsInVoidGainReclaimThisTurn(
+        count: Exactly(1),
+        predicate: Event,
+      )),
+    ))
+    "###);
+}

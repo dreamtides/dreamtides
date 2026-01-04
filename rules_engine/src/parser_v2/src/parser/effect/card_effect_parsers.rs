@@ -1,3 +1,4 @@
+use ability_data::collection_expression::CollectionExpression;
 use ability_data::predicate::{CardPredicate, Predicate};
 use ability_data::quantity_expression_data::QuantityExpression;
 use ability_data::standard_effect::StandardEffect;
@@ -5,8 +6,8 @@ use chumsky::prelude::*;
 use core_data::numerics::{Energy, Points};
 
 use crate::parser::parser_helpers::{
-    article, cards, directive, discards, energy, period, points, top_n_cards, up_to_n_events, word,
-    words, ParserExtra, ParserInput,
+    article, cards, directive, discards, energy, period, points, reclaim_cost, top_n_cards,
+    up_to_n_events, word, words, ParserExtra, ParserInput,
 };
 use crate::parser::{card_predicate_parser, predicate_parser};
 
@@ -34,7 +35,8 @@ pub fn parser<'a>() -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserEx
                 reclaim_from_void(),
             ))
             .boxed(),
-            choice((return_from_void_to_hand(), return_to_hand())).boxed(),
+            choice((cards_in_void_gain_reclaim(), return_from_void_to_hand(), return_to_hand()))
+                .boxed(),
         ))
         .boxed(),
     ))
@@ -160,6 +162,19 @@ pub fn each_player_abandons_characters<'a>(
         .ignore_then(article())
         .ignore_then(card_predicate_parser::parser())
         .map(|matching| StandardEffect::EachPlayerAbandonsCharacters { matching, count: 1 })
+}
+
+pub fn cards_in_void_gain_reclaim<'a>(
+) -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
+    article()
+        .ignore_then(card_predicate_parser::parser())
+        .then_ignore(words(&["in", "your", "void", "gains"]))
+        .then(reclaim_cost())
+        .then_ignore(words(&["this", "turn"]).or_not())
+        .map(|(predicate, _cost)| StandardEffect::CardsInVoidGainReclaimThisTurn {
+            count: CollectionExpression::Exactly(1),
+            predicate,
+        })
 }
 
 fn draw_cards_for_each<'a>(

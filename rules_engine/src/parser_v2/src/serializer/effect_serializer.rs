@@ -173,6 +173,9 @@ pub fn serialize_standard_effect(effect: &StandardEffect) -> String {
         StandardEffect::EachPlayerAbandonsCharacters { matching, .. } => {
             format!("each player abandons {}.", serialize_card_predicate(matching))
         }
+        StandardEffect::CardsInVoidGainReclaimThisTurn { count, predicate } => {
+            serialize_cards_in_void_gain_reclaim_this_turn(count, predicate)
+        }
         _ => unimplemented!("Serialization not yet implemented for this effect type"),
     }
 }
@@ -292,5 +295,22 @@ fn serialize_allied_card_predicate(card_predicate: &CardPredicate) -> String {
     match card_predicate {
         CardPredicate::CharacterType(_) => "allied {subtype}".to_string(),
         _ => format!("allied {}", serialize_card_predicate_without_article(card_predicate)),
+    }
+}
+
+fn serialize_cards_in_void_gain_reclaim_this_turn(
+    count: &CollectionExpression,
+    predicate: &CardPredicate,
+) -> String {
+    match count {
+        CollectionExpression::Exactly(1) => {
+            format!(
+                "{} in your void gains {{reclaim-for-cost}} this turn.",
+                serialize_card_predicate(predicate)
+            )
+        }
+        _ => unimplemented!(
+            "Serialization not yet implemented for this collection expression in cards in void gain reclaim"
+        ),
     }
 }

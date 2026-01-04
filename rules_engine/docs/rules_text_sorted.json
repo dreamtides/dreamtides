@@ -137,8 +137,8 @@
   "Return {up-to-n-events} from your void to your hand.", // Implemented
   "Abandon an ally: Gain {energy-symbol} equal to that character's cost.", // Implemented
   "{Materialized} Draw {cards} for each ally abandoned this turn.", // Implemented
-  "{Materialized} A card with cost {e} or less in your void gains {reclaim-for-cost}.",
-  "An event in your void gains {reclaim-for-cost} this turn.",
+  "{Materialized} A card with cost {e} or less in your void gains {reclaim-for-cost}.", // Implemented
+  "An event in your void gains {reclaim-for-cost} this turn.", // Implemented
   "{Materialized} An event in your void gains {reclaim} equal to its cost this turn.",
   "When an ally is {dissolved}, this card gains {reclaim-for-cost} this turn.",
   "{Dissolved} A {subtype} in your void gains {reclaim} equal to its cost.",
