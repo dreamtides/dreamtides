@@ -1,5 +1,4 @@
 [
-  "{Dissolve} an enemy with cost {e} or less.\n\n{Reclaim} -- Abandon an ally.",
   "{Dissolve} an enemy with cost less than the number of allied {plural-subtype}.",
   "{Dissolve} an enemy with cost less than the number of cards in your void.",
   "{Dissolve} an enemy. Draw {cards}.\n\nThis event costs {e} if a character dissolved this turn.",
