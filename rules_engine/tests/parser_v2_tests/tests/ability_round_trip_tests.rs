@@ -966,3 +966,20 @@ fn test_round_trip_judgment_each_player_abandons_character() {
     let serialized = ability_serializer::serialize_ability(&parsed);
     assert_eq!(original, serialized);
 }
+
+#[test]
+fn test_round_trip_materialized_discard_chosen_card_from_opponent_hand_they_draw() {
+    let original =
+        "{Materialized} Discard a chosen card from the opponent's hand. They draw {cards}.";
+    let parsed = parse_ability(original, "cards: 1");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_return_up_to_n_events_from_void_to_hand() {
+    let original = "Return {up-to-n-events} from your void to your hand.";
+    let parsed = parse_ability(original, "number: 3");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}

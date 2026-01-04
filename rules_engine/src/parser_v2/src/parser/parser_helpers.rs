@@ -142,3 +142,9 @@ pub fn count_allied_subtype<'a>(
         (ResolvedToken::SubtypeCount { count, subtype, .. }, _) => (count, subtype)
     }
 }
+
+pub fn up_to_n_events<'a>() -> impl Parser<'a, ParserInput<'a>, u32, ParserExtra<'a>> + Clone {
+    select! {
+        (ResolvedToken::Integer { directive, value }, _) if directive == "up-to-n-events" => value
+    }
+}

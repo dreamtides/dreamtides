@@ -688,3 +688,34 @@ fn test_materialized_judgment_banish_ally_with_spark_then_materialize_it() {
     ))
     "###);
 }
+
+#[test]
+fn test_materialized_discard_chosen_card_from_opponent_hand_they_draw() {
+    let result = parse_ability(
+        "{Materialized} Discard a chosen card from the opponent's hand. They draw {cards}.",
+        "cards: 1",
+    );
+    assert_ron_snapshot!(result, @r###"
+    Triggered(TriggeredAbility(
+      trigger: Keywords([
+        Materialized,
+      ]),
+      effect: Effect(DiscardCardFromEnemyHandThenTheyDraw(
+        predicate: Card,
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_return_up_to_n_events_from_void_to_hand() {
+    let result = parse_ability("Return {up-to-n-events} from your void to your hand.", "number: 3");
+    assert_ron_snapshot!(result, @r###"
+    Event(EventAbility(
+      effect: Effect(ReturnUpToCountFromYourVoidToHand(
+        target: Any(Event),
+        count: 3,
+      )),
+    ))
+    "###);
+}

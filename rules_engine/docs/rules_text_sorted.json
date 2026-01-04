@@ -133,8 +133,8 @@
   "Abandon any number of allies: Draw {cards} for each ally abandoned.", // Implemented
   "{Banish} {up-to-n-allies}, then {materialize} {it-or-them}.", // Implemented
   "{MaterializedJudgment} {Banish} an ally with spark {s} or less, then {materialize} it.", // Implemented
-  "{Materialized} Discard a chosen card from the opponent's hand. They draw {cards}.",
-  "Return {up-to-n-events} from your void to your hand.",
+  "{Materialized} Discard a chosen card from the opponent's hand. They draw {cards}.", // Implemented
+  "Return {up-to-n-events} from your void to your hand.", // Implemented
   "Abandon an ally. Gain {energy-symbol} equal to that character's cost.",
   "{Materialized} Draw {cards} for each ally abandoned this turn.",
   "{Materialized} A card with cost {e} or less in your void gains {reclaim-for-cost}.",
