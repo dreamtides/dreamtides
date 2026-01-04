@@ -12,7 +12,20 @@ pub fn run(args: &ContinueArgs, repo_override: Option<&Path>) -> Result<()> {
     let paths = config::repo_paths(repo_override)?;
     let state_path = paths.llmc_dir.join("state.json");
     let state = state::load_state(&state_path)?;
-    let agent_id = state::resolve_reviewed_agent_id(args.agent.as_deref(), &state)?;
+
+    let agent_id = match args.agent.as_deref() {
+        Some(agent) => agent.to_string(),
+        None => {
+            if state.agents.len() == 1 {
+                state.agents.keys().next().unwrap().clone()
+            } else {
+                return Err(anyhow::anyhow!(
+                    "Multiple agents exist; pass --agent to specify which one to continue"
+                ));
+            }
+        }
+    };
+
     let Some(record) = state.agents.get(&agent_id) else {
         return Err(anyhow::anyhow!("Unknown agent id: {agent_id}"));
     };
