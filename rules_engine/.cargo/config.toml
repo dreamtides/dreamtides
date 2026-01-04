@@ -1,0 +1,19 @@
+# Cargo configuration for the rules engine
+#
+# This configuration helps ensure tests run reliably in low-memory environments
+# (like Docker containers) by addressing stack overflow issues caused by
+# the deep Chumsky parser hierarchy.
+#
+# The parser_v2 tests require:
+# 1. Sufficient stack space per thread (at least 8MB for parser construction)
+# 2. Limited parallelism to prevent total memory exhaustion
+#
+# To run parser tests in constrained environments, use:
+#   RUST_MIN_STACK=8388608 cargo test -p parser_v2_tests -- --test-threads=4
+#
+# Or for maximum safety in very low-memory environments:
+#   cargo test -p parser_v2_tests -- --test-threads=1
+
+[alias]
+# Alias for running parser tests with proper stack configuration
+parser-test-safe = "test -p parser_v2_tests -- --test-threads=4"
