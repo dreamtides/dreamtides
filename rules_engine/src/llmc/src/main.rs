@@ -2,6 +2,7 @@ mod accept;
 mod clean;
 mod cli;
 mod config;
+mod r#continue;
 mod delete;
 mod git_ops;
 mod notify;
@@ -61,6 +62,9 @@ fn run() -> Result<()> {
         }
         Commands::Accept(args) => {
             accept::run(&args, cli.repo.as_deref())?;
+        }
+        Commands::Continue(args) => {
+            r#continue::run(&args, cli.repo.as_deref())?;
         }
     }
 

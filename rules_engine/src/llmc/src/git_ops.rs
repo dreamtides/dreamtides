@@ -17,6 +17,11 @@ pub fn status_porcelain(path: &Path) -> Result<String> {
     self::git_output(path, &["status", "--porcelain"])
 }
 
+/// Return `git status` output.
+pub fn get_git_status(path: &Path) -> Result<String> {
+    self::git_output(path, &["status"])
+}
+
 /// Return the oldest commit message for a revision range.
 pub fn oldest_commit_message(repo_root: &Path, range: &str) -> Result<String> {
     let output =
