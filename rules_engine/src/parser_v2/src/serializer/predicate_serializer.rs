@@ -60,6 +60,19 @@ pub fn serialize_enemy_predicate(card_predicate: &CardPredicate) -> String {
         CardPredicate::CardWithCost { cost_operator, .. } => {
             format!("enemy with cost {{e}} {}", serialize_operator(cost_operator))
         }
+        CardPredicate::CharacterWithCostComparedToControlled { target, count_matching, .. } => {
+            format!(
+                "{} with cost less than the number of allied {}",
+                serialize_enemy_predicate(target),
+                serialize_card_predicate_plural(count_matching)
+            )
+        }
+        CardPredicate::CharacterWithCostComparedToVoidCount { target, .. } => {
+            format!(
+                "{} with cost less than the number of cards in your void",
+                serialize_enemy_predicate(target)
+            )
+        }
         _ => {
             unimplemented!("Serialization not yet implemented for this enemy predicate type")
         }

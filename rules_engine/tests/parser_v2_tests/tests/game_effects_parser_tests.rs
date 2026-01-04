@@ -591,3 +591,40 @@ fn test_banish_ally_materialize_at_end_of_turn_reclaim() {
     Named(Reclaim(Some(Energy(2))))
     "###);
 }
+
+#[test]
+fn test_dissolve_enemy_with_cost_less_than_allied_subtype() {
+    let result = parse_ability(
+        "{Dissolve} an enemy with cost less than the number of allied {plural-subtype}.",
+        "subtype: warrior",
+    );
+    assert_ron_snapshot!(result, @r###"
+    Event(EventAbility(
+      effect: Effect(DissolveCharacter(
+        target: Enemy(CharacterWithCostComparedToControlled(
+          target: Character,
+          cost_operator: OrLess,
+          count_matching: CharacterType(Warrior),
+        )),
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_dissolve_enemy_with_cost_less_than_void_count() {
+    let result = parse_ability(
+        "{Dissolve} an enemy with cost less than the number of cards in your void.",
+        "",
+    );
+    assert_ron_snapshot!(result, @r###"
+    Event(EventAbility(
+      effect: Effect(DissolveCharacter(
+        target: Enemy(CharacterWithCostComparedToVoidCount(
+          target: Character,
+          cost_operator: OrLess,
+        )),
+      )),
+    ))
+    "###);
+}

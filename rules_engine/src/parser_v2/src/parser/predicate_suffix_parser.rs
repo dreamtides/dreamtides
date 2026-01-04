@@ -1,9 +1,9 @@
-use ability_data::predicate::Operator;
+use ability_data::predicate::{CardPredicate, Operator};
 use chumsky::prelude::*;
 use core_data::numerics::{Energy, Spark};
 
 use crate::parser::parser_helpers::{
-    directive, energy, spark, word, words, ParserExtra, ParserInput,
+    directive, energy, spark, subtype, word, words, ParserExtra, ParserInput,
 };
 
 pub fn with_cost_suffix<'a>(
@@ -35,6 +35,19 @@ pub fn with_materialized_ability_suffix<'a>(
 pub fn with_activated_ability_suffix<'a>(
 ) -> impl Parser<'a, ParserInput<'a>, (), ParserExtra<'a>> + Clone {
     words(&["with", "an", "activated", "ability"]).to(())
+}
+
+pub fn with_cost_compared_to_controlled_suffix<'a>(
+) -> impl Parser<'a, ParserInput<'a>, (Operator<Energy>, CardPredicate), ParserExtra<'a>> + Clone {
+    words(&["with", "cost", "less", "than", "the", "number", "of", "allied"])
+        .ignore_then(subtype())
+        .map(|count_matching| (Operator::OrLess, CardPredicate::CharacterType(count_matching)))
+}
+
+pub fn with_cost_compared_to_void_count_suffix<'a>(
+) -> impl Parser<'a, ParserInput<'a>, Operator<Energy>, ParserExtra<'a>> + Clone {
+    words(&["with", "cost", "less", "than", "the", "number", "of", "cards", "in", "your", "void"])
+        .to(Operator::OrLess)
 }
 
 fn spark_operator<'a>() -> impl Parser<'a, ParserInput<'a>, Operator<Spark>, ParserExtra<'a>> + Clone
