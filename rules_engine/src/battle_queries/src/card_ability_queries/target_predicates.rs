@@ -34,6 +34,7 @@ pub fn get_character_target_predicate(effect: &StandardEffect) -> Option<&Predic
         StandardEffect::GainsSparkForQuantity { target, .. } => Some(target),
         StandardEffect::GainsSparkUntilYourNextMainForEach { target, .. } => Some(target),
         StandardEffect::MaterializeCharacterAtEndOfTurn { target } => Some(target),
+        StandardEffect::MaterializeCollection { target, .. } => Some(target),
         StandardEffect::MaterializeSilentCopy { target, .. } => Some(target),
         StandardEffect::PreventDissolveThisTurn { target } => Some(target),
         StandardEffect::PutOnTopOfEnemyDeck { target } => Some(target),

@@ -610,3 +610,81 @@ fn test_put_cards_from_deck_into_void_draw_cards() {
     ))
     "###);
 }
+
+#[test]
+fn test_abandon_any_number_of_allies_draw_for_each_abandoned() {
+    let result = parse_ability(
+        "Abandon any number of allies: Draw {cards} for each ally abandoned.",
+        "cards: 1",
+    );
+    assert_ron_snapshot!(result, @r###"
+    Activated(ActivatedAbility(
+      costs: [
+        AbandonCharactersCount(
+          target: Another(Character),
+          count: AnyNumberOf,
+        ),
+      ],
+      effect: Effect(DrawCardsForEach(
+        count: 1,
+        for_each: AbandonedThisWay(Character),
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_banish_up_to_n_then_materialize_them() {
+    let result =
+        parse_ability("{Banish} {up-to-n-allies}, then {materialize} {it-or-them}.", "number: 2");
+    assert_ron_snapshot!(result, @r###"
+    Event(EventAbility(
+      effect: List([
+        EffectWithOptions(
+          effect: BanishCollection(
+            target: Another(Character),
+            count: UpTo(2),
+          ),
+          optional: false,
+        ),
+        EffectWithOptions(
+          effect: MaterializeCollection(
+            target: Another(Character),
+            count: UpTo(2),
+          ),
+          optional: false,
+        ),
+      ]),
+    ))
+    "###);
+}
+
+#[test]
+fn test_materialized_judgment_banish_ally_with_spark_then_materialize_it() {
+    let result = parse_ability(
+        "{MaterializedJudgment} {Banish} an ally with spark {s} or less, then {materialize} it.",
+        "s: 2",
+    );
+    assert_ron_snapshot!(result, @r###"
+    Triggered(TriggeredAbility(
+      trigger: Keywords([
+        Materialized,
+        Judgment,
+      ]),
+      effect: List([
+        EffectWithOptions(
+          effect: BanishCharacter(
+            target: Another(CharacterWithSpark(Spark(2), OrLess)),
+          ),
+          optional: false,
+        ),
+        EffectWithOptions(
+          effect: MaterializeCharacter(
+            target: It,
+          ),
+          optional: false,
+        ),
+      ]),
+    ))
+    "###);
+}

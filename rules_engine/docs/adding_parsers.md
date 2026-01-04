@@ -3,6 +3,9 @@
 This guide provides instructions for AI agents extending the Dreamtides rules
 text parser to support new card abilities.
 
+**IMPORTANT**: Do not add doc comments to parser functions. Code should be
+self-documenting through clear function and variable names.
+
 ---
 
 ## Quick Start

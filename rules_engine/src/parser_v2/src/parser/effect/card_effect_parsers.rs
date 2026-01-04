@@ -1,3 +1,4 @@
+use ability_data::predicate::CardPredicate;
 use ability_data::quantity_expression_data::QuantityExpression;
 use ability_data::standard_effect::StandardEffect;
 use chumsky::prelude::*;
@@ -156,11 +157,15 @@ fn discard_from_opponent_hand<'a>(
 
 fn for_each_quantity_expression<'a>(
 ) -> impl Parser<'a, ParserInput<'a>, QuantityExpression, ParserExtra<'a>> + Clone {
-    choice((
-        card_predicate_parser::parser()
-            .then_ignore(words(&["you", "have", "played", "this", "turn"]))
-            .map(QuantityExpression::PlayedThisTurn),
-        predicate_parser::predicate_parser().map(QuantityExpression::Matching),
-    ))
-    .boxed()
+    card_predicate_parser::parser()
+        .then_ignore(words(&["you", "have", "played", "this", "turn"]))
+        .map(QuantityExpression::PlayedThisTurn)
+        .or(words(&["ally", "abandoned"])
+            .to(())
+            .map(|_| QuantityExpression::AbandonedThisWay(CardPredicate::Character)))
+        .or(card_predicate_parser::parser()
+            .then_ignore(word("abandoned"))
+            .map(QuantityExpression::AbandonedThisWay))
+        .or(predicate_parser::predicate_parser().map(QuantityExpression::Matching))
+        .boxed()
 }

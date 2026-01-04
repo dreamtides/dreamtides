@@ -124,6 +124,18 @@ pub fn count_allies<'a>() -> impl Parser<'a, ParserInput<'a>, u32, ParserExtra<'
     }
 }
 
+pub fn up_to_n_allies<'a>() -> impl Parser<'a, ParserInput<'a>, u32, ParserExtra<'a>> + Clone {
+    select! {
+        (ResolvedToken::Integer { directive, value }, _) if directive == "up-to-n-allies" => value
+    }
+}
+
+pub fn it_or_them_count<'a>() -> impl Parser<'a, ParserInput<'a>, u32, ParserExtra<'a>> + Clone {
+    select! {
+        (ResolvedToken::Integer { directive, value }, _) if directive == "it-or-them" => value
+    }
+}
+
 pub fn count_allied_subtype<'a>(
 ) -> impl Parser<'a, ParserInput<'a>, (u32, CardSubtype), ParserExtra<'a>> + Clone {
     select! {
