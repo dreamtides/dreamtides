@@ -28,6 +28,7 @@ pub fn get_character_target_predicate(effect: &StandardEffect) -> Option<&Predic
         StandardEffect::DissolveCharactersCount { target, .. } => Some(target),
         StandardEffect::DissolveCharactersQuantity { target, .. } => Some(target),
         StandardEffect::GainControl { target } => Some(target),
+        StandardEffect::GainEnergyEqualToCost { target } => Some(target),
         StandardEffect::GainsAegisThisTurn { target } => Some(target),
         StandardEffect::GainsReclaimUntilEndOfTurn { target, .. } => Some(target),
         StandardEffect::GainsSpark { target, .. } => Some(target),

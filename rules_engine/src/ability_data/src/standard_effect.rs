@@ -52,6 +52,7 @@ pub enum StandardEffect {
     Foresee { count: u32 },
     GainControl { target: Predicate },
     GainEnergy { gains: Energy },
+    GainEnergyEqualToCost { target: Predicate },
     GainEnergyForEach { gains: Energy, for_each: Predicate },
     GainPoints { gains: Points },
     GainPointsForEach { gain: Points, for_count: QuantityExpression },

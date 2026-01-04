@@ -983,3 +983,19 @@ fn test_round_trip_return_up_to_n_events_from_void_to_hand() {
     let serialized = ability_serializer::serialize_ability(&parsed);
     assert_eq!(original, serialized);
 }
+
+#[test]
+fn test_round_trip_abandon_ally_gain_energy_equal_to_cost() {
+    let original = "Abandon an ally: Gain {e} equal to that character's cost.";
+    let parsed = parse_ability(original, "e: 1");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_materialized_draw_cards_for_each_ally_abandoned_this_turn() {
+    let original = "{Materialized} Draw {cards} for each ally abandoned this turn.";
+    let parsed = parse_ability(original, "cards: 2");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
