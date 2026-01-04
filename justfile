@@ -15,7 +15,7 @@ code-review: check-commit-messages check-format build workspace-lints clippy sty
 code-review-rsync: rsync-for-review
     cd ~/dreamtides_tests && just code-review || (osascript -e 'display dialog "Review failed" with icon stop'; exit 1)
 
-review: check-commit-messages check-format build workspace-lints clippy style-validator test
+review: check-format build workspace-lints clippy style-validator test
 
 check:
     #!/usr/bin/env bash
@@ -298,7 +298,6 @@ insta:
 # nightly-only
 fmt: style-validator-fix
     #!/usr/bin/env bash
-    ./rules_engine/scripts/strip_commit_messages.py
     output=$(cd rules_engine && cargo +nightly fmt 2>&1)
     if [ $? -eq 0 ]; then
         echo "Formatted"
