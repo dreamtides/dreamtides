@@ -2635,6 +2635,7 @@ dependencies = [
  "parser_v2",
  "parser_v2_benchmarks",
  "regex",
+ "stacker",
 ]
 
 [[package]]

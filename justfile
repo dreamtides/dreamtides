@@ -76,7 +76,10 @@ watch-release:
 
 test:
     #!/usr/bin/env bash
-    output=$(cargo test --manifest-path rules_engine/Cargo.toml 2>&1)
+    # Set RUST_MIN_STACK for parser_v2 tests which need extra stack space for
+    # deep Chumsky parser hierarchies. Limit test parallelism to prevent memory
+    # exhaustion in low-memory environments (like Docker).
+    output=$(RUST_MIN_STACK=8388608 cargo test --manifest-path rules_engine/Cargo.toml -- --test-threads=4 2>&1)
     if [ $? -eq 0 ]; then
         echo "Tests passed"
     else
@@ -85,13 +88,13 @@ test:
     fi
 
 test-verbose:
-    cargo test --manifest-path rules_engine/Cargo.toml
+    RUST_MIN_STACK=8388608 cargo test --manifest-path rules_engine/Cargo.toml -- --test-threads=4
 
 battle-test *args='':
     cargo test --manifest-path rules_engine/Cargo.toml -p battle_tests "$@"
 
 parser-test *args='':
-    cargo test --manifest-path rules_engine/Cargo.toml -p parser_v2_tests "$@"
+    RUST_MIN_STACK=8388608 cargo test --manifest-path rules_engine/Cargo.toml -p parser_v2_tests -- --test-threads=4 "$@"
 
 doc:
     cargo doc --manifest-path rules_engine/Cargo.toml
