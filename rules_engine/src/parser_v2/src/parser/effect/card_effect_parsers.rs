@@ -20,7 +20,13 @@ pub fn parser<'a>() -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserEx
         .boxed(),
         choice((
             choice((draw_cards_for_each(), draw_cards(), discard_cards())).boxed(),
-            choice((gain_energy_for_each(), gain_energy(), gain_points_for_each())).boxed(),
+            choice((
+                gain_energy_equal_to_abandoned_cost(),
+                gain_energy_for_each(),
+                gain_energy(),
+                gain_points_for_each(),
+            ))
+            .boxed(),
             choice((
                 gain_points(),
                 put_cards_from_deck_into_void(),
@@ -48,6 +54,14 @@ pub fn discard_cards<'a>(
 pub fn gain_energy<'a>() -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone
 {
     word("gain").ignore_then(energy()).map(|n| StandardEffect::GainEnergy { gains: Energy(n) })
+}
+
+pub fn gain_energy_equal_to_abandoned_cost<'a>(
+) -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
+    word("gain")
+        .ignore_then(energy())
+        .then_ignore(words(&["equal", "to", "that", "character's", "cost"]))
+        .to(StandardEffect::GainEnergyEqualToCost { target: Predicate::It })
 }
 
 pub fn gain_energy_for_each<'a>(
@@ -180,6 +194,9 @@ fn for_each_quantity_expression<'a>(
     card_predicate_parser::parser()
         .then_ignore(words(&["you", "have", "played", "this", "turn"]))
         .map(QuantityExpression::PlayedThisTurn)
+        .or(words(&["ally", "abandoned", "this", "turn"])
+            .to(())
+            .map(|_| QuantityExpression::AbandonedThisTurn(CardPredicate::Character)))
         .or(words(&["ally", "abandoned"])
             .to(())
             .map(|_| QuantityExpression::AbandonedThisWay(CardPredicate::Character)))

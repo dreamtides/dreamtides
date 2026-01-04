@@ -719,3 +719,20 @@ fn test_return_up_to_n_events_from_void_to_hand() {
     ))
     "###);
 }
+
+#[test]
+fn test_materialized_draw_cards_for_each_ally_abandoned_this_turn() {
+    let result =
+        parse_ability("{Materialized} Draw {cards} for each ally abandoned this turn.", "cards: 2");
+    assert_ron_snapshot!(result, @r###"
+    Triggered(TriggeredAbility(
+      trigger: Keywords([
+        Materialized,
+      ]),
+      effect: Effect(DrawCardsForEach(
+        count: 2,
+        for_each: AbandonedThisTurn(Character),
+      )),
+    ))
+    "###);
+}

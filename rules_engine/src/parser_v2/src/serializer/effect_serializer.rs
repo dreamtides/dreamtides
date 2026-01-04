@@ -46,6 +46,12 @@ pub fn serialize_standard_effect(effect: &StandardEffect) -> String {
             serialize_card_predicate_without_article(predicate)
         ),
         StandardEffect::GainEnergy { .. } => "gain {e}.".to_string(),
+        StandardEffect::GainEnergyEqualToCost { target } => match target {
+            Predicate::It => "gain {e} equal to that character's cost.".to_string(),
+            _ => unimplemented!(
+                "Serialization not yet implemented for this GainEnergyEqualTo target"
+            ),
+        },
         StandardEffect::GainEnergyForEach { for_each, .. } => {
             format!("gain {{e}} for each {}.", serialize_for_each_predicate(for_each))
         }
@@ -273,6 +279,9 @@ fn serialize_for_count_expression(quantity_expression: &QuantityExpression) -> S
             "{} you have played this turn",
             serialize_card_predicate_without_article(predicate)
         ),
+        QuantityExpression::AbandonedThisTurn(CardPredicate::Character) => {
+            "ally abandoned this turn".to_string()
+        }
         _ => {
             unimplemented!("Serialization not yet implemented for this quantity expression")
         }
