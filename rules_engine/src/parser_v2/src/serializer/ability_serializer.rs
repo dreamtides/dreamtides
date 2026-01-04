@@ -67,5 +67,8 @@ pub fn serialize_ability(ability: &Ability) -> String {
 fn serialize_named_ability(named: &NamedAbility) -> String {
     match named {
         NamedAbility::Reclaim(_) => "{ReclaimForCost}".to_string(),
+        NamedAbility::ReclaimForCost(cost) => {
+            format!("{{Reclaim}} -- {}", capitalize_first_letter(&serialize_cost(cost)))
+        }
     }
 }

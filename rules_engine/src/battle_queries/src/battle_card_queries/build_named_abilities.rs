@@ -29,5 +29,19 @@ pub fn build(
                 )),
             });
         }
+        NamedAbility::ReclaimForCost(cost) => {
+            ability_list.static_abilities.push(AbilityData {
+                ability_number,
+                ability: StaticAbility::StaticAbility(StandardStaticAbility::PlayFromVoid(
+                    PlayFromVoid {
+                        energy_cost: definition.energy_cost,
+                        additional_cost: Some(cost),
+                        if_you_do: Some(Effect::Effect(StandardEffect::BanishWhenLeavesPlay {
+                            target: Predicate::This,
+                        })),
+                    },
+                )),
+            });
+        }
     }
 }

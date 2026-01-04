@@ -10,6 +10,43 @@ fn test_reclaim_for_cost() {
 }
 
 #[test]
+fn test_reclaim_abandon_ally() {
+    let result = parse_ability("{Reclaim} -- Abandon an ally", "");
+    assert_ron_snapshot!(result, @r###"
+    Named(ReclaimForCost(AbandonCharactersCount(
+      target: Another(Character),
+      count: Exactly(1),
+    )))
+    "###);
+}
+
+#[test]
+fn test_dissolve_enemy_with_cost_or_less_reclaim_abandon_ally() {
+    let result = parse_abilities(
+        "{Dissolve} an enemy with cost {e} or less.\n\n{Reclaim} -- Abandon an ally",
+        "e: 3",
+    );
+    assert_eq!(result.len(), 2);
+    assert_ron_snapshot!(result[0], @r###"
+    Event(EventAbility(
+      effect: Effect(DissolveCharacter(
+        target: Enemy(CardWithCost(
+          target: Character,
+          cost_operator: OrLess,
+          cost: Energy(3),
+        )),
+      )),
+    ))
+    "###);
+    assert_ron_snapshot!(result[1], @r###"
+    Named(ReclaimForCost(AbandonCharactersCount(
+      target: Another(Character),
+      count: Exactly(1),
+    )))
+    "###);
+}
+
+#[test]
 fn test_foresee_draw_cards_reclaim() {
     let result = parse_abilities(
         "{Foresee}. Draw {cards}.\n\n{ReclaimForCost}",
