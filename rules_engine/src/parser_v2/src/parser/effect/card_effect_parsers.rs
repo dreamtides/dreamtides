@@ -1,12 +1,12 @@
-use ability_data::predicate::CardPredicate;
+use ability_data::predicate::{CardPredicate, Predicate};
 use ability_data::quantity_expression_data::QuantityExpression;
 use ability_data::standard_effect::StandardEffect;
 use chumsky::prelude::*;
 use core_data::numerics::{Energy, Points};
 
 use crate::parser::parser_helpers::{
-    article, cards, directive, discards, energy, points, top_n_cards, word, words, ParserExtra,
-    ParserInput,
+    article, cards, directive, discards, energy, period, points, top_n_cards, up_to_n_events, word,
+    words, ParserExtra, ParserInput,
 };
 use crate::parser::{card_predicate_parser, predicate_parser};
 
@@ -90,11 +90,21 @@ pub fn return_to_hand<'a>(
 
 pub fn return_from_void_to_hand<'a>(
 ) -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
-    word("return")
-        .ignore_then(article().or_not())
-        .ignore_then(predicate_parser::predicate_parser())
-        .then_ignore(words(&["from", "your", "void", "to", "your", "hand"]))
-        .map(|target| StandardEffect::ReturnFromYourVoidToHand { target })
+    choice((
+        word("return")
+            .ignore_then(up_to_n_events())
+            .then_ignore(words(&["from", "your", "void", "to", "your", "hand"]))
+            .map(|count| StandardEffect::ReturnUpToCountFromYourVoidToHand {
+                target: Predicate::Any(CardPredicate::Event),
+                count,
+            }),
+        word("return")
+            .ignore_then(article().or_not())
+            .ignore_then(predicate_parser::predicate_parser())
+            .then_ignore(words(&["from", "your", "void", "to", "your", "hand"]))
+            .map(|target| StandardEffect::ReturnFromYourVoidToHand { target }),
+    ))
+    .boxed()
 }
 
 pub fn reclaim_from_void<'a>(
@@ -149,10 +159,20 @@ fn draw_cards_for_each<'a>(
 
 fn discard_from_opponent_hand<'a>(
 ) -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
-    words(&["discard", "a", "chosen"])
-        .ignore_then(card_predicate_parser::parser())
-        .then_ignore(words(&["from", "the", "opponent's", "hand"]))
-        .map(|predicate| StandardEffect::DiscardCardFromEnemyHand { predicate })
+    choice((
+        words(&["discard", "a", "chosen"])
+            .ignore_then(card_predicate_parser::parser())
+            .then_ignore(words(&["from", "the", "opponent's", "hand"]))
+            .then_ignore(period())
+            .then_ignore(words(&["they", "draw"]))
+            .then_ignore(cards())
+            .map(|predicate| StandardEffect::DiscardCardFromEnemyHandThenTheyDraw { predicate }),
+        words(&["discard", "a", "chosen"])
+            .ignore_then(card_predicate_parser::parser())
+            .then_ignore(words(&["from", "the", "opponent's", "hand"]))
+            .map(|predicate| StandardEffect::DiscardCardFromEnemyHand { predicate }),
+    ))
+    .boxed()
 }
 
 fn for_each_quantity_expression<'a>(

@@ -41,6 +41,10 @@ pub fn serialize_standard_effect(effect: &StandardEffect) -> String {
             "discard a chosen {} from the opponent's hand.",
             serialize_card_predicate_without_article(predicate)
         ),
+        StandardEffect::DiscardCardFromEnemyHandThenTheyDraw { predicate } => format!(
+            "discard a chosen {} from the opponent's hand. They draw {{cards}}.",
+            serialize_card_predicate_without_article(predicate)
+        ),
         StandardEffect::GainEnergy { .. } => "gain {e}.".to_string(),
         StandardEffect::GainEnergyForEach { for_each, .. } => {
             format!("gain {{e}} for each {}.", serialize_for_each_predicate(for_each))
@@ -147,6 +151,9 @@ pub fn serialize_standard_effect(effect: &StandardEffect) -> String {
         },
         StandardEffect::ReturnFromYourVoidToHand { target } => {
             format!("return {} from your void to your hand.", serialize_predicate(target))
+        }
+        StandardEffect::ReturnUpToCountFromYourVoidToHand { .. } => {
+            "return {up-to-n-events} from your void to your hand.".to_string()
         }
         StandardEffect::ReturnFromYourVoidToPlay { target } => {
             format!("{{Reclaim}} {}.", serialize_predicate(target))
