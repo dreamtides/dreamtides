@@ -773,3 +773,27 @@ fn test_event_in_void_gains_reclaim_this_turn() {
     ))
     "###);
 }
+
+#[test]
+fn test_discover_character_with_materialized_ability() {
+    let result = parse_ability("{Discover} a character with a '{Materialized}' ability.", "");
+    assert_ron_snapshot!(result, @r###"
+    Event(EventAbility(
+      effect: Effect(Discover(
+        predicate: CharacterWithMaterializedAbility,
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_discover_character_with_activated_ability() {
+    let result = parse_ability("{Discover} a character with an activated ability.", "");
+    assert_ron_snapshot!(result, @r###"
+    Event(EventAbility(
+      effect: Effect(Discover(
+        predicate: CharacterWithMultiActivatedAbility,
+      )),
+    ))
+    "###);
+}

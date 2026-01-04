@@ -240,3 +240,35 @@ fn test_spanned_dissolve_all_characters() {
     assert_eq!(effect.text.trim(), "{Dissolve} all characters.");
     assert_valid_span(&effect.span);
 }
+
+#[test]
+fn test_spanned_discover_character_with_materialized_ability() {
+    let SpannedAbility::Event(event) =
+        parse_spanned_ability("{Discover} a character with a '{Materialized}' ability.", "")
+    else {
+        panic!("Expected Event ability");
+    };
+
+    assert_eq!(event.additional_cost, None);
+    let SpannedEffect::Effect(effect) = &event.effect else {
+        panic!("Expected Effect, got Modal");
+    };
+    assert_eq!(effect.text.trim(), "{Discover} a character with a '{Materialized}' ability.");
+    assert_valid_span(&effect.span);
+}
+
+#[test]
+fn test_spanned_discover_character_with_activated_ability() {
+    let SpannedAbility::Event(event) =
+        parse_spanned_ability("{Discover} a character with an activated ability.", "")
+    else {
+        panic!("Expected Event ability");
+    };
+
+    assert_eq!(event.additional_cost, None);
+    let SpannedEffect::Effect(effect) = &event.effect else {
+        panic!("Expected Effect, got Modal");
+    };
+    assert_eq!(effect.text.trim(), "{Discover} a character with an activated ability.");
+    assert_valid_span(&effect.span);
+}
