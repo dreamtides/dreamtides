@@ -568,6 +568,38 @@ For detailed reference information, see:
 
 ---
 
+## Troubleshooting
+
+### Setup/Installation Issues
+
+- **`rustup component add -q` fails**: The `-q` flag is not valid for `rustup
+  component add`. Use `rustup component add rustfmt --toolchain nightly`
+  (without `-q`)
+- **Branch naming**: The main branch is `master`, not `main`. Documentation
+  refers to "main branch" but should specify to use `git checkout master`
+
+### File Path Issues
+
+- **Working directory context**: Commands must be run from
+  `/home/user/dreamtides/rules_engine` (the `rules_engine` subdirectory), not
+  the repository root at `/home/user/dreamtides`
+- **justfile location**: The justfile is in the repository root
+  (`/home/user/dreamtides/justfile`), not in the `rules_engine` subdirectory
+- **rules_text_sorted.json path**: Located at `docs/rules_text_sorted.json`
+  relative to the `rules_engine` directory
+
+### Platform-Specific Issues
+
+- **`just review` on Linux**: Fails with `objc2` compilation error because some
+  dependencies only work on Apple platforms. Use
+  `cargo check -p ability_data -p parser_v2 -p parser_v2_tests` instead for
+  parser-specific validation on Linux
+- **Test suite SIGSEGV**: Running full `cargo test -p parser_v2_tests` causes
+  segmentation faults, but individual tests with filters work fine (e.g.,
+  `cargo test -p parser_v2_tests --test activated_ability_tests test_name`)
+
+---
+
 ## Validation Commands
 
 All commands must be run from the `rules_engine` directory:
