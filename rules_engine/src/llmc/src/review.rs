@@ -15,8 +15,8 @@ pub fn run(args: &ReviewArgs, repo_override: Option<&Path>) -> Result<()> {
     let agent_id = match args.agent.as_deref() {
         Some(agent) => agent.to_string(),
         None if args.force => {
-            let Some(agent_id) = state::oldest_running_agent_id(&state) else {
-                return Err(anyhow::anyhow!("No agents in running state"));
+            let Some(agent_id) = state::oldest_agent_id(&state) else {
+                return Err(anyhow::anyhow!("No agents"));
             };
             agent_id
         }
