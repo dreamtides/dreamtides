@@ -20,7 +20,7 @@ repository buildable and ready for day-to-day development.
    rustfmt component before trying to format again. The download and install took
    roughly 30 seconds on my machine:
    ```bash
-   rustup component add rustfmt --toolchain nightly
+   rustup component add -q rustfmt --toolchain nightly
    ```
 
 ## 2. Install the `just` command runner
@@ -30,7 +30,7 @@ initially failed, so I installed it with Cargo:
 
 ```bash
 just --version  # produced "command not found"
-cargo install just        # first build and install took ~3 minutes
+cargo install -q just     # first build and install took ~3 minutes
 just --version            # verified the install succeeded
 ```
 
@@ -41,7 +41,7 @@ not present by default, so I installed it separately. The install and build phas
 completed in about 90 seconds:
 
 ```bash
-cargo install cargo-workspace-lints
+cargo install -q cargo-workspace-lints
 ```
 
 ## 4. Run formatting and validation commands
