@@ -140,6 +140,9 @@ pub fn serialize_standard_effect(effect: &StandardEffect) -> String {
         StandardEffect::MaterializeCharacter { target } => {
             format!("{{Materialize}} {}.", serialize_predicate(target))
         }
+        StandardEffect::MaterializeCharacterAtEndOfTurn { target } => {
+            format!("{{Materialize}} {} at end of turn.", serialize_predicate(target))
+        }
         StandardEffect::MaterializeSilentCopy { target, count, quantity } => {
             if *count == 1 && matches!(quantity, QuantityExpression::Matching(_)) {
                 format!("{{Materialize}} a copy of {}.", serialize_predicate(target))

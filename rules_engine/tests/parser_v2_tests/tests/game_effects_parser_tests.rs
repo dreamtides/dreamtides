@@ -561,3 +561,33 @@ fn test_prevent_a_played_enemy_card() {
     ))
     "###);
 }
+
+#[test]
+fn test_banish_ally_materialize_at_end_of_turn_reclaim() {
+    let result = parse_abilities(
+        "{Banish} an ally. {Materialize} it at end of turn.\n\n{ReclaimForCost}",
+        "reclaim: 2",
+    );
+    assert_eq!(result.len(), 2);
+    assert_ron_snapshot!(result[0], @r###"
+    Event(EventAbility(
+      effect: List([
+        EffectWithOptions(
+          effect: BanishCharacter(
+            target: Another(Character),
+          ),
+          optional: false,
+        ),
+        EffectWithOptions(
+          effect: MaterializeCharacterAtEndOfTurn(
+            target: It,
+          ),
+          optional: false,
+        ),
+      ]),
+    ))
+    "###);
+    assert_ron_snapshot!(result[1], @r###"
+    Named(Reclaim(Some(Energy(2))))
+    "###);
+}
