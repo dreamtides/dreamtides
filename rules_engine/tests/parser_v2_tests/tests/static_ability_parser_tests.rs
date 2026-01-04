@@ -45,3 +45,14 @@ fn test_allied_plural_subtype_have_spark() {
     )))
     "###);
 }
+
+#[test]
+fn test_banish_from_hand_play_for_alternate_cost() {
+    let result = parse_ability("{Banish} a card from hand: Play this event for {e}.", "e: 0");
+    assert_ron_snapshot!(result, @r###"
+    Static(StaticAbility(PlayForAlternateCost(AlternateCost(
+      energy_cost: Energy(0),
+      additional_cost: Some(BanishFromHand(Any(Card))),
+    ))))
+    "###);
+}

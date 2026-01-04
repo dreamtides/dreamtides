@@ -84,3 +84,12 @@ fn banish_from_your_void_cost<'a>(
         .then_ignore(words(&["in", "your", "void"]))
         .map(|_| Cost::BanishCardsFromYourVoid(1))
 }
+
+pub fn banish_from_hand_cost<'a>() -> impl Parser<'a, ParserInput<'a>, Cost, ParserExtra<'a>> + Clone
+{
+    directive("banish")
+        .ignore_then(article())
+        .ignore_then(card_predicate_parser::parser())
+        .then_ignore(words(&["from", "hand"]))
+        .map(|predicate| Cost::BanishFromHand(Predicate::Any(predicate)))
+}
