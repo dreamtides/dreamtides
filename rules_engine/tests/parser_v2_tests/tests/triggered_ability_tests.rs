@@ -19,7 +19,7 @@ fn test_when_you_discard_a_card_gain_points() {
     let result = parse_ability("When you discard a card, gain {points}.", "points: 1");
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
-      trigger: Discard(Any(Card)),
+      trigger: Discard(Your(Card)),
       effect: Effect(GainPoints(
         gains: Points(1),
       )),
@@ -32,7 +32,7 @@ fn test_when_you_discard_a_card_kindle() {
     let result = parse_ability("When you discard a card, {kindle}.", "k: 1");
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
-      trigger: Discard(Any(Card)),
+      trigger: Discard(Your(Card)),
       effect: Effect(Kindle(
         amount: Spark(1),
       )),
@@ -48,7 +48,7 @@ fn test_once_per_turn_when_you_discard_a_card_gain_energy_and_kindle() {
     );
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
-      trigger: Discard(Any(Card)),
+      trigger: Discard(Your(Card)),
       effect: List([
         EffectWithOptions(
           effect: GainEnergy(
@@ -90,7 +90,7 @@ fn test_once_per_turn_when_you_materialize_a_character_gain_energy() {
         parse_ability("Once per turn, when you {materialize} a character, gain {e}.", "e: 1");
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
-      trigger: Materialize(Any(Character)),
+      trigger: Materialize(Your(Character)),
       effect: Effect(GainEnergy(
         gains: Energy(1),
       )),
@@ -110,7 +110,7 @@ fn test_once_per_turn_when_you_materialize_a_character_with_cost_or_less_draw_ca
     );
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
-      trigger: Materialize(Any(CardWithCost(
+      trigger: Materialize(Your(CardWithCost(
         target: Character,
         cost_operator: OrLess,
         cost: Energy(2),
@@ -134,7 +134,7 @@ fn test_once_per_turn_when_you_materialize_a_subtype_draw_cards() {
     );
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
-      trigger: Materialize(Any(CharacterType(Warrior))),
+      trigger: Materialize(Your(CharacterType(Warrior))),
       effect: Effect(DrawCards(
         count: 2,
       )),
@@ -196,7 +196,7 @@ fn test_when_you_materialize_a_subtype_reclaim_this_character() {
     );
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
-      trigger: Materialize(Any(CharacterType(Warrior))),
+      trigger: Materialize(Your(CharacterType(Warrior))),
       effect: Effect(ReturnFromYourVoidToPlay(
         target: This,
       )),
@@ -212,7 +212,7 @@ fn test_when_you_materialize_a_character_this_character_gains_spark() {
     );
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
-      trigger: Materialize(Any(Character)),
+      trigger: Materialize(Your(Character)),
       effect: Effect(GainsSpark(
         target: This,
         gains: Spark(2),

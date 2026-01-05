@@ -180,14 +180,22 @@ pub fn each_player_abandons_characters<'a>(
 
 pub fn gains_reclaim_for_cost_this_turn<'a>(
 ) -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
-    predicate_parser::predicate_parser()
-        .then_ignore(word("gains"))
-        .then(reclaim_cost())
-        .then_ignore(words(&["this", "turn"]))
-        .map(|(target, cost)| StandardEffect::GainsReclaimUntilEndOfTurn {
-            target,
-            cost: Some(Energy(cost)),
-        })
+    choice((
+        word("it")
+            .ignore_then(word("gains"))
+            .ignore_then(directive("reclaim"))
+            .ignore_then(words(&["equal", "to", "its", "cost", "this", "turn"]))
+            .to(StandardEffect::GainsReclaimUntilEndOfTurn { target: Predicate::It, cost: None }),
+        predicate_parser::predicate_parser()
+            .then_ignore(word("gains"))
+            .then(reclaim_cost())
+            .then_ignore(words(&["this", "turn"]))
+            .map(|(target, cost)| StandardEffect::GainsReclaimUntilEndOfTurn {
+                target,
+                cost: Some(Energy(cost)),
+            }),
+    ))
+    .boxed()
 }
 
 pub fn cards_in_void_gain_reclaim<'a>(

@@ -22,6 +22,7 @@ pub fn parser<'a>() -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserEx
             discover_and_materialize(),
             discover(),
             counterspell_effects(),
+            trigger_judgment_ability(),
         ))
         .boxed(),
         choice((
@@ -299,6 +300,17 @@ pub fn take_extra_turn<'a>(
 ) -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
     words(&["take", "an", "extra", "turn", "after", "this", "one"])
         .to(StandardEffect::TakeExtraTurn)
+}
+
+pub fn trigger_judgment_ability<'a>(
+) -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
+    words(&["trigger", "the"])
+        .ignore_then(directive("judgment"))
+        .ignore_then(words(&["ability", "of", "each", "ally"]))
+        .to(StandardEffect::TriggerJudgmentAbility {
+            matching: Predicate::Another(CardPredicate::Character),
+            collection: CollectionExpression::All,
+        })
 }
 
 fn counterspell_effects<'a>(

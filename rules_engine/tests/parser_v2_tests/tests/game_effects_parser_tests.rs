@@ -1077,3 +1077,37 @@ fn test_take_an_extra_turn_after_this_one() {
     ))
     "###);
 }
+
+#[test]
+fn test_when_you_materialize_trigger_judgment_ability_each_ally() {
+    let result = parse_ability(
+        "When you {materialize} a character, trigger the {Judgment} ability of each ally.",
+        "",
+    );
+    assert_ron_snapshot!(result, @r###"
+    Triggered(TriggeredAbility(
+      trigger: Materialize(Your(Character)),
+      effect: Effect(TriggerJudgmentAbility(
+        matching: Another(Character),
+        collection: All,
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_when_you_discard_card_it_gains_reclaim_equal_to_cost() {
+    let result = parse_ability(
+        "When you discard a card, it gains {reclaim} equal to its cost this turn.",
+        "",
+    );
+    assert_ron_snapshot!(result, @r###"
+    Triggered(TriggeredAbility(
+      trigger: Discard(Your(Card)),
+      effect: Effect(GainsReclaimUntilEndOfTurn(
+        target: It,
+        cost: None,
+      )),
+    ))
+    "###);
+}

@@ -1,7 +1,4 @@
 [
-  "When you {materialize} a character, trigger the '{Judgment}' ability of each ally.",
-  "When you abandon { $allies ->\n  [one] your first ally each turn,\n  *[other] {count-allies} in a turn,\n} {dissolve} an enemy.",
-  "When you discard a card, it gains {reclaim} equal to its cost this turn.",
   "When you draw {cards-numeral} in a turn, if this card is in your void, it gains {reclaim-for-cost}.",
   "When you have no cards in your deck, you win the game.",
   "When you play {a-subtype}, {reclaim} a random character with cost {e} or less.",
@@ -13,5 +10,6 @@
   "You may only play this character from your void.",
   "{ChooseOne}\n{bullet} {e}: Return an enemy to hand.\n{bullet} {e-}: Draw {cards}.",
   "When the opponent plays a card which could {dissolve} an ally, {prevent} that card.",
-  "{Prevent} a played event which could {dissolve} an ally."
+  "{Prevent} a played event which could {dissolve} an ally.",
+  "When you abandon { $allies ->\n  [one] your first ally each turn,\n  *[other] {count-allies} in a turn,\n} {dissolve} an enemy.",
 ]

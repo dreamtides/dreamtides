@@ -119,7 +119,10 @@ fn discard_trigger<'a>() -> impl Parser<'a, ParserInput<'a>, TriggerEvent, Parse
 {
     words(&["when", "you", "discard"])
         .ignore_then(article().or_not())
-        .ignore_then(predicate_parser::predicate_parser())
+        .ignore_then(choice((
+            card_predicate_parser::parser().map(Predicate::Your),
+            predicate_parser::predicate_parser(),
+        )))
         .map(TriggerEvent::Discard)
 }
 
@@ -128,7 +131,10 @@ fn materialize_trigger<'a>(
     words(&["when", "you"])
         .ignore_then(directive("materialize"))
         .ignore_then(article().or_not())
-        .ignore_then(predicate_parser::predicate_parser())
+        .ignore_then(choice((
+            card_predicate_parser::parser().map(Predicate::Your),
+            predicate_parser::predicate_parser(),
+        )))
         .map(TriggerEvent::Materialize)
 }
 

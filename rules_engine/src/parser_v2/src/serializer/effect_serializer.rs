@@ -67,11 +67,12 @@ pub fn serialize_standard_effect(effect: &StandardEffect) -> String {
         StandardEffect::EnemyGainsPoints { .. } => "the opponent gains {points}.".to_string(),
         StandardEffect::Foresee { .. } => "{Foresee}.".to_string(),
         StandardEffect::Kindle { .. } => "{Kindle}.".to_string(),
-        StandardEffect::GainsReclaimUntilEndOfTurn { target, cost } => match cost {
-            Some(_) => {
+        StandardEffect::GainsReclaimUntilEndOfTurn { target, cost } => match (target, cost) {
+            (Predicate::It, None) => "it gains {reclaim} equal to its cost this turn.".to_string(),
+            (_, Some(_)) => {
                 format!("{} gains {{reclaim-for-cost}} this turn.", serialize_predicate(target))
             }
-            None => format!("{} gains {{reclaim}} this turn.", serialize_predicate(target)),
+            (_, None) => format!("{} gains {{reclaim}} this turn.", serialize_predicate(target)),
         },
         StandardEffect::GainsSpark { target, .. } => {
             format!("{} gains +{{s}} spark.", serialize_predicate(target))
@@ -265,6 +266,17 @@ pub fn serialize_standard_effect(effect: &StandardEffect) -> String {
         ),
         StandardEffect::DrawMatchingCard { predicate } => {
             format!("draw {} from your deck.", serialize_card_predicate(predicate))
+        }
+        StandardEffect::TriggerJudgmentAbility { matching, collection } => {
+            if matches!(matching, Predicate::Another(CardPredicate::Character))
+                && matches!(collection, CollectionExpression::All)
+            {
+                "trigger the {Judgment} ability of each ally.".to_string()
+            } else {
+                unimplemented!(
+                    "Serialization not yet implemented for this TriggerJudgmentAbility pattern"
+                )
+            }
         }
         StandardEffect::TriggerAdditionalJudgmentPhaseAtEndOfTurn => {
             "at the end of this turn, trigger an additional {JudgmentPhaseName} phase.".to_string()
