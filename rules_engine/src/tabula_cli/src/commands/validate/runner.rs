@@ -8,7 +8,7 @@ use tempfile::{Builder, NamedTempFile};
 use zip::write::FileOptions;
 use zip::{CompressionMethod, DateTime, ZipArchive, ZipWriter};
 
-use super::{toml_compare, workbook_snapshot};
+use super::{toml_compare, workbook_snapshot, xlsm_toml_compare};
 use crate::commands::rebuild_images::rebuild;
 use crate::commands::{build_xls, strip_images};
 use crate::core::{column_names, excel_reader, paths, toml_data};
@@ -49,6 +49,7 @@ fn validate_standard(
     temp_root: &Path,
 ) -> Result<()> {
     let mut errors = Vec::new();
+    xlsm_toml_compare::compare_xlsm_to_toml(template, toml_dir, config.report_all, &mut errors)?;
     run_roundtrip(config, toml_dir, template, temp_root, &mut errors)?;
     if !errors.is_empty() {
         bail!("{}", errors.join("\n"));
@@ -63,6 +64,7 @@ fn validate_with_strip_images(
     temp_root: &Path,
 ) -> Result<()> {
     let mut errors = Vec::new();
+    xlsm_toml_compare::compare_xlsm_to_toml(template, toml_dir, config.report_all, &mut errors)?;
     let stripped_path = temp_root.join(output_file_name(template, "stripped"));
     strip_images::strip_images(Some(template.to_path_buf()), Some(stripped_path.clone()))?;
     let placeholder_media = media_files(&stripped_path)?;

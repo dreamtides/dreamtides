@@ -25,11 +25,15 @@ pub enum Ability {
     /// An activated ability is present on a character card and allows the
     /// controlling player to pay some cost in order to achieve an effect.
     /// This is written as "cost: effect".
+    ///
+    /// An activated ability on an *event* card describes an additional cost to
+    /// play that event and must be paid immediately.
     Activated(ActivatedAbility),
 
     /// A triggered ability is an effect which happens when some triggering
-    /// event occurs, typically while its card is in play. Indicated in card
-    /// text by "When", "Whenever", "At", or by a trigger keyword.
+    /// event occurs, typically (but not exclusively) while the card is in play.
+    /// Indicated in card text by "When", "Whenever", "At", or by a trigger
+    /// keyword.
     Triggered(TriggeredAbility),
 
     /// A named ability is a special keyword which is expanded to one or more

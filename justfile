@@ -6,7 +6,7 @@ code-review: check-format build workspace-lints clippy style-validator test tabu
 code-review-rsync: rsync-for-review
     cd ~/dreamtides_tests && just code-review || (osascript -e 'display dialog "Review failed" with icon stop'; exit 1)
 
-review: check-snapshots check-format build clippy style-validator test
+review: check-snapshots check-format build clippy style-validator tabula-validate test 
 
 check:
     #!/usr/bin/env bash
@@ -285,8 +285,19 @@ tabula *args='':
   cargo run --manifest-path rules_engine/Cargo.toml -p tabula_cli -- "$@"
 
 tabula-validate:
-  cargo run --manifest-path rules_engine/Cargo.toml -p tabula_cli -- validate
-  cargo run --manifest-path rules_engine/Cargo.toml -p tabula_cli -- validate --strip-images
+  #!/usr/bin/env bash
+  output=$(cargo run --manifest-path rules_engine/Cargo.toml -p tabula_cli -- validate 2>&1)
+  if [ $? -ne 0 ]; then
+      echo "$output"
+      exit 1
+  fi
+  output=$(cargo run --manifest-path rules_engine/Cargo.toml -p tabula_cli -- validate --strip-images 2>&1)
+  if [ $? -eq 0 ]; then
+      echo "Tabula validation passed"
+  else
+      echo "$output"
+      exit 1
+  fi
 
 tabula-roundtrip:
   mv client/Assets/StreamingAssets/Tabula.xlsm /tmp/Tabula.backup.xlsm

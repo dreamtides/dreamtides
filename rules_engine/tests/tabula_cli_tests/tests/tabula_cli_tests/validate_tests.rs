@@ -41,13 +41,13 @@ fn validate_accepts_numeric_strings() {
     fs::create_dir_all(&toml_dir).expect("toml dir");
     let toml = r#"
 [[test-table]]
-name = "Carol"
-count = "5"
+name = "Alice"
+count = "10"
 active = true
 
 [[test-table]]
-name = "Dave"
-count = "7"
+name = "Bob"
+count = "20"
 active = false
 "#;
     fs::write(toml_dir.join("test-table.toml"), toml).expect("write toml");
