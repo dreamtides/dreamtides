@@ -76,6 +76,21 @@ pub fn query(
                 )
             })
             .collect(),
+        Effect::ListWithOptions(list_with_options) => list_with_options
+            .effects
+            .iter()
+            .filter_map(|effect| {
+                standard_effect_targeting_prompt(
+                    battle,
+                    player,
+                    source,
+                    &effect.effect,
+                    effect.optional,
+                    that_card,
+                    on_selected,
+                )
+            })
+            .collect(),
         Effect::Modal(modal) => {
             if let Some(choice) = modal_choice {
                 query(

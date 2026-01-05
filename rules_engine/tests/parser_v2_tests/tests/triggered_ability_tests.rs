@@ -637,22 +637,23 @@ fn test_judgment_you_may_discard_draw_gain_points() {
       trigger: Keywords([
         Judgment,
       ]),
-      effect: List([
-        EffectWithOptions(
-          effect: DrawCards(
-            count: 1,
+      effect: ListWithOptions(ListWithOptions(
+        effects: [
+          EffectWithOptions(
+            effect: DrawCards(
+              count: 1,
+            ),
+            optional: true,
           ),
-          optional: true,
-          trigger_cost: Some(DiscardCards(Card, 2)),
-        ),
-        EffectWithOptions(
-          effect: GainPoints(
-            gains: Points(3),
+          EffectWithOptions(
+            effect: GainPoints(
+              gains: Points(3),
+            ),
+            optional: true,
           ),
-          optional: true,
-          trigger_cost: Some(DiscardCards(Card, 2)),
-        ),
-      ]),
+        ],
+        trigger_cost: Some(DiscardCards(Card, 2)),
+      )),
     ))
     "###);
 }

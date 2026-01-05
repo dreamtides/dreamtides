@@ -12,6 +12,7 @@ pub enum Effect {
     Effect(StandardEffect),
     WithOptions(EffectWithOptions),
     List(Vec<EffectWithOptions>),
+    ListWithOptions(ListWithOptions),
     Modal(Vec<ModalEffectChoice>),
 }
 
@@ -50,6 +51,27 @@ pub struct EffectWithOptions {
 
     /// Indicates an effect which occurs only if some condition is met,
     /// usually phrased as "If {condition}, {effect}"
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub condition: Option<Condition>,
+}
+
+/// Provides a list of effects with shared configuration options.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ListWithOptions {
+    /// Effects to apply
+    pub effects: Vec<EffectWithOptions>,
+
+    /// A cost to apply all effects in this list, if any. Usually written as
+    /// "You may pay {cost} to perform {effect}" on triggered abilities.
+    ///
+    /// This is used for costs that apply on resolution of the effect. It is
+    /// *not* used for additional costs to play event cards, which are paid
+    /// before placing the card on the stack.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub trigger_cost: Option<Cost>,
+
+    /// Indicates that all effects in this list occur only if some condition is
+    /// met, usually phrased as "If {condition}, {effect}"
     #[serde(skip_serializing_if = "Option::is_none")]
     pub condition: Option<Condition>,
 }

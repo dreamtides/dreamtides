@@ -1,5 +1,5 @@
 use ability_data::cost::Cost;
-use ability_data::effect::{Effect, EffectWithOptions};
+use ability_data::effect::{Effect, EffectWithOptions, ListWithOptions};
 use ability_data::predicate::CardPredicate;
 use ability_data::standard_effect::StandardEffect;
 use ability_data::triggered_ability::{TriggeredAbility, TriggeredAbilityOptions};
@@ -80,17 +80,19 @@ fn effect_with_trigger_cost_parser<'a>(
                     condition: None,
                 })
             } else {
-                Effect::List(
-                    effects
+                Effect::ListWithOptions(ListWithOptions {
+                    effects: effects
                         .into_iter()
                         .map(|effect| EffectWithOptions {
                             effect,
                             optional: false,
-                            trigger_cost: Some(trigger_cost.clone()),
+                            trigger_cost: None,
                             condition: None,
                         })
                         .collect(),
-                )
+                    trigger_cost: Some(trigger_cost),
+                    condition: None,
+                })
             }
         })
 }
@@ -113,17 +115,19 @@ fn optional_effect_with_trigger_cost_parser<'a>(
                     condition: None,
                 })
             } else {
-                Effect::List(
-                    effects
+                Effect::ListWithOptions(ListWithOptions {
+                    effects: effects
                         .into_iter()
                         .map(|effect| EffectWithOptions {
                             effect,
                             optional: true,
-                            trigger_cost: Some(trigger_cost.clone()),
+                            trigger_cost: None,
                             condition: None,
                         })
                         .collect(),
-                )
+                    trigger_cost: Some(trigger_cost),
+                    condition: None,
+                })
             }
         })
 }
@@ -144,17 +148,19 @@ fn conditional_effect_parser<'a>(
                     condition: Some(condition),
                 })
             } else {
-                Effect::List(
-                    effects
+                Effect::ListWithOptions(ListWithOptions {
+                    effects: effects
                         .into_iter()
                         .map(|effect| EffectWithOptions {
                             effect,
                             optional: false,
                             trigger_cost: None,
-                            condition: Some(condition.clone()),
+                            condition: None,
                         })
                         .collect(),
-                )
+                    trigger_cost: None,
+                    condition: Some(condition),
+                })
             }
         })
 }

@@ -80,6 +80,15 @@ pub fn execute(
             });
             execute_pending_effects_if_no_active_prompt_internal(battle);
         }
+        Effect::ListWithOptions(_) => {
+            battle.pending_effects.push_back(PendingEffect {
+                source,
+                effect: effect.clone(),
+                requested_targets: requested_targets.cloned(),
+                modal_choice,
+            });
+            execute_pending_effects_if_no_active_prompt_internal(battle);
+        }
         Effect::Modal(choices) => {
             if let Some(modal_choice) = modal_choice {
                 execute_modal_effect(battle, source, choices, requested_targets, modal_choice);
@@ -155,6 +164,36 @@ fn execute_pending_effects_if_no_active_prompt_internal(battle: &mut BattleState
                         battle.pending_effects.push_front(PendingEffect {
                             source: pending_effect.source,
                             effect: Effect::List(effect_list),
+                            requested_targets: pending_effect.requested_targets,
+                            modal_choice: pending_effect.modal_choice,
+                        });
+                    }
+                }
+            }
+            Effect::ListWithOptions(mut list_with_options) => {
+                if list_with_options.trigger_cost.is_some() {
+                    todo!("Implement trigger cost effects")
+                }
+                if list_with_options.condition.is_some() {
+                    todo!("Implement conditional effects")
+                }
+                if !list_with_options.effects.is_empty() {
+                    let first_effect = list_with_options.effects.remove(0);
+                    let mut targets = valid_target_queries::valid_targets(
+                        battle,
+                        pending_effect.requested_targets.as_ref(),
+                    );
+                    execute_with_options(
+                        battle,
+                        pending_effect.source,
+                        &first_effect,
+                        &mut targets,
+                    );
+
+                    if !list_with_options.effects.is_empty() {
+                        battle.pending_effects.push_front(PendingEffect {
+                            source: pending_effect.source,
+                            effect: Effect::ListWithOptions(list_with_options),
                             requested_targets: pending_effect.requested_targets,
                             modal_choice: pending_effect.modal_choice,
                         });

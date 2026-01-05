@@ -640,22 +640,23 @@ fn test_judgment_pay_energy_to_kindle_and_banish_cards_from_opponent_void() {
       trigger: Keywords([
         Judgment,
       ]),
-      effect: List([
-        EffectWithOptions(
-          effect: Kindle(
-            amount: Spark(1),
+      effect: ListWithOptions(ListWithOptions(
+        effects: [
+          EffectWithOptions(
+            effect: Kindle(
+              amount: Spark(1),
+            ),
+            optional: false,
           ),
-          optional: false,
-          trigger_cost: Some(Energy(Energy(1))),
-        ),
-        EffectWithOptions(
-          effect: BanishCardsFromEnemyVoid(
-            count: 2,
+          EffectWithOptions(
+            effect: BanishCardsFromEnemyVoid(
+              count: 2,
+            ),
+            optional: false,
           ),
-          optional: false,
-          trigger_cost: Some(Energy(Energy(1))),
-        ),
-      ]),
+        ],
+        trigger_cost: Some(Energy(Energy(1))),
+      )),
     ))
     "###);
 }

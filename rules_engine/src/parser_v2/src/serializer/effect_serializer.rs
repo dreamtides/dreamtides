@@ -280,6 +280,38 @@ pub fn serialize_effect(effect: &Effect) -> String {
                 result
             }
         }
+        Effect::ListWithOptions(list_with_options) => {
+            let mut result = String::new();
+            if let Some(condition) = &list_with_options.condition {
+                result.push_str(&serialize_condition(condition));
+                result.push(' ');
+            }
+            if let Some(trigger_cost) = &list_with_options.trigger_cost {
+                result.push_str(&format!("{} to ", serialize_trigger_cost(trigger_cost)));
+            }
+            let effect_strings: Vec<String> = list_with_options
+                .effects
+                .iter()
+                .map(|e| {
+                    let mut effect_str = String::new();
+                    if e.optional {
+                        effect_str.push_str("you may ");
+                    }
+                    if let Some(trigger_cost) = &e.trigger_cost {
+                        effect_str
+                            .push_str(&format!("{} to ", serialize_trigger_cost(trigger_cost)));
+                    }
+                    if let Some(condition) = &e.condition {
+                        effect_str.push_str(&serialize_condition(condition));
+                        effect_str.push(' ');
+                    }
+                    effect_str.push_str(serialize_standard_effect(&e.effect).trim_end_matches('.'));
+                    effect_str
+                })
+                .collect();
+            result.push_str(&format!("{}.", effect_strings.join(", then ")));
+            result
+        }
         Effect::Modal(_) => {
             unimplemented!("Serialization not yet implemented for modal effects")
         }

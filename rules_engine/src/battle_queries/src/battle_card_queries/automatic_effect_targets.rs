@@ -69,6 +69,24 @@ pub fn query(
             }
             AutomaticEffectTargets::Targets(Some(EffectTargets::EffectList(target_list)))
         }
+        Effect::ListWithOptions(list_with_options) => {
+            let mut target_list = VecDeque::new();
+            for effect_item in &list_with_options.effects {
+                if let Some(targets) = standard_effect_automatic_targets(
+                    battle,
+                    source,
+                    &effect_item.effect,
+                    that_card,
+                ) {
+                    target_list.push_back(Some(targets));
+                } else if target_predicates::has_targets(&effect_item.effect) {
+                    return AutomaticEffectTargets::RequiresPrompt;
+                } else {
+                    target_list.push_back(None);
+                }
+            }
+            AutomaticEffectTargets::Targets(Some(EffectTargets::EffectList(target_list)))
+        }
         Effect::Modal(modal) => {
             if let Some(modal_choice) = modal_choice {
                 query(battle, source, &modal[modal_choice.value()].effect, that_card, None)

@@ -238,6 +238,37 @@ fn event_effect_predicates(list: &AbilityList) -> Vec<EventEffectPredicate<'_>> 
                     .flatten()
                 })
                 .collect(),
+            Effect::ListWithOptions(list_with_options) => list_with_options
+                .effects
+                .iter()
+                .flat_map(|effect| {
+                    vec![
+                        target_predicates::get_character_target_predicate(&effect.effect).map(
+                            |predicate| EventEffectPredicate {
+                                effect: &effect.effect,
+                                predicate,
+                                predicate_type: PredicateType::Character,
+                            },
+                        ),
+                        target_predicates::get_stack_target_predicate(&effect.effect).map(
+                            |predicate| EventEffectPredicate {
+                                effect: &effect.effect,
+                                predicate,
+                                predicate_type: PredicateType::Stack,
+                            },
+                        ),
+                        target_predicates::get_void_target_predicate(&effect.effect).map(
+                            |predicate| EventEffectPredicate {
+                                effect: &effect.effect,
+                                predicate,
+                                predicate_type: PredicateType::Void,
+                            },
+                        ),
+                    ]
+                    .into_iter()
+                    .flatten()
+                })
+                .collect(),
             Effect::Modal(_) => vec![],
         })
         .collect()
