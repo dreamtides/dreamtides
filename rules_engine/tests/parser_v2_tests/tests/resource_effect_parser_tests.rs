@@ -75,3 +75,39 @@ fn test_judgment_draw_cards_opponent_gains_points() {
     ))
     "###);
 }
+
+#[test]
+fn test_dissolve_enemy_draw_cards_with_cost_reduction() {
+    let result = parse_abilities(
+        "{Dissolve} an enemy. Draw {cards}.\n\nThis event costs {e} if a character dissolved this turn.",
+        "cards: 1, e: 1",
+    );
+    assert_ron_snapshot!(result, @r###"
+    [
+      Event(EventAbility(
+        effect: List([
+          EffectWithOptions(
+            effect: DissolveCharacter(
+              target: Enemy(Character),
+            ),
+            optional: false,
+          ),
+          EffectWithOptions(
+            effect: DrawCards(
+              count: 1,
+            ),
+            optional: false,
+          ),
+        ]),
+      )),
+      Static(WithOptions(StaticAbilityWithOptions(
+        ability: PlayForAlternateCost(AlternateCost(
+          energy_cost: Energy(1),
+        )),
+        condition: Some(DissolvedThisTurn(
+          predicate: Any(Character),
+        )),
+      ))),
+    ]
+    "###);
+}

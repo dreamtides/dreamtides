@@ -1,27 +1,48 @@
-use ability_data::static_ability::{AlternateCost, StandardStaticAbility, StaticAbility};
+use ability_data::static_ability::{
+    AlternateCost, StandardStaticAbility, StaticAbility, StaticAbilityWithOptions,
+};
 use chumsky::prelude::*;
 use core_data::numerics::{Energy, Spark};
 
 use crate::parser::parser_helpers::{
     colon, energy, period, spark, word, words, ParserExtra, ParserInput,
 };
-use crate::parser::{card_predicate_parser, cost_parser};
+use crate::parser::{card_predicate_parser, condition_parser, cost_parser};
 
 /// Parses static abilities that apply continuously.
 pub fn static_ability_parser<'a>(
 ) -> impl Parser<'a, ParserInput<'a>, StaticAbility, ParserExtra<'a>> + Clone {
-    standard_static_ability().map(StaticAbility::StaticAbility)
+    choice((
+        standard_static_ability_without_period()
+            .then_ignore(word("if"))
+            .then(condition_parser::condition_parser())
+            .then_ignore(period())
+            .map(|(ability, condition)| {
+                StaticAbility::WithOptions(StaticAbilityWithOptions {
+                    ability,
+                    condition: Some(condition),
+                })
+            }),
+        standard_static_ability().map(StaticAbility::StaticAbility),
+    ))
+    .boxed()
 }
 
 fn standard_static_ability<'a>(
 ) -> impl Parser<'a, ParserInput<'a>, StandardStaticAbility, ParserExtra<'a>> + Clone {
     choice((
         play_for_alternate_cost(),
+        simple_alternate_cost_with_period(),
         allied_spark_bonus(),
         enemy_cards_cost_increase(),
         your_cards_cost_modification(),
     ))
     .boxed()
+}
+
+fn standard_static_ability_without_period<'a>(
+) -> impl Parser<'a, ParserInput<'a>, StandardStaticAbility, ParserExtra<'a>> + Clone {
+    simple_alternate_cost()
 }
 
 fn your_cards_cost_modification<'a>(
@@ -97,4 +118,26 @@ fn play_for_alternate_cost<'a>(
                 if_you_do: None,
             })
         })
+}
+
+fn simple_alternate_cost<'a>(
+) -> impl Parser<'a, ParserInput<'a>, StandardStaticAbility, ParserExtra<'a>> + Clone {
+    words(&["this", "event", "costs"]).ignore_then(energy()).map(|e| {
+        StandardStaticAbility::PlayForAlternateCost(AlternateCost {
+            energy_cost: Energy(e),
+            additional_cost: None,
+            if_you_do: None,
+        })
+    })
+}
+
+fn simple_alternate_cost_with_period<'a>(
+) -> impl Parser<'a, ParserInput<'a>, StandardStaticAbility, ParserExtra<'a>> + Clone {
+    words(&["this", "event", "costs"]).ignore_then(energy()).then_ignore(period()).map(|e| {
+        StandardStaticAbility::PlayForAlternateCost(AlternateCost {
+            energy_cost: Energy(e),
+            additional_cost: None,
+            if_you_do: None,
+        })
+    })
 }
