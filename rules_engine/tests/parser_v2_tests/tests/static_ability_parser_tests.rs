@@ -56,3 +56,24 @@ fn test_banish_from_hand_play_for_alternate_cost() {
     ))))
     "###);
 }
+
+#[test]
+fn test_abandon_ally_play_character_for_alternate_cost() {
+    let result =
+        parse_ability("Abandon an ally: Play this character for {e}, then abandon it.", "e: 0");
+    assert_ron_snapshot!(result, @r###"
+    Static(StaticAbility(PlayForAlternateCost(AlternateCost(
+      energy_cost: Energy(0),
+      additional_cost: Some(AbandonCharactersCount(
+        target: Another(Character),
+        count: Exactly(1),
+      )),
+      if_you_do: Some(Effect(PayCost(
+        cost: AbandonCharactersCount(
+          target: This,
+          count: Exactly(1),
+        ),
+      ))),
+    ))))
+    "###);
+}

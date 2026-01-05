@@ -49,10 +49,17 @@ pub fn serialize_standard_static_ability(ability: &StandardStaticAbility) -> Str
         }
         StandardStaticAbility::PlayForAlternateCost(alt_cost) => {
             if let Some(cost) = &alt_cost.additional_cost {
-                format!(
-                    "{}: Play this event for {{e}}.",
-                    capitalize_first_letter(&serialize_cost(cost))
-                )
+                let card_type = if alt_cost.if_you_do.is_some() { "character" } else { "event" };
+                let base = format!(
+                    "{}: Play this {} for {{e}}",
+                    capitalize_first_letter(&serialize_cost(cost)),
+                    card_type
+                );
+                if alt_cost.if_you_do.is_some() {
+                    format!("{}, then abandon it.", base)
+                } else {
+                    format!("{}.", base)
+                }
             } else {
                 "this event costs {e}".to_string()
             }

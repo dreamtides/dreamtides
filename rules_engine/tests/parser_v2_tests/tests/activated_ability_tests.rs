@@ -348,6 +348,33 @@ fn test_abandon_ally_gain_energy_equal_to_cost() {
 }
 
 #[test]
+fn test_abandon_ally_dissolve_enemy_with_spark_less_than_abandoned() {
+    let result = parse_ability(
+        "Abandon an ally: You may {dissolve} an enemy with spark less than that ally's spark.",
+        "",
+    );
+    assert_ron_snapshot!(result, @r###"
+    Activated(ActivatedAbility(
+      costs: [
+        AbandonCharactersCount(
+          target: Another(Character),
+          count: Exactly(1),
+        ),
+      ],
+      effect: WithOptions(EffectWithOptions(
+        effect: DissolveCharacter(
+          target: Enemy(CharacterWithSparkComparedToAbandoned(
+            target: Character,
+            spark_operator: OrLess,
+          )),
+        ),
+        optional: true,
+      )),
+    ))
+    "###);
+}
+
+#[test]
 fn test_banish_void_with_min_count_reclaim_this_character() {
     let result = parse_ability(
         "{Banish} your void with {count} or more cards: {Reclaim} this character.",

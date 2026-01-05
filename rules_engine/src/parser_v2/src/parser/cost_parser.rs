@@ -55,6 +55,13 @@ pub fn banish_cards_from_enemy_void_cost<'a>(
         .map(Cost::BanishCardsFromEnemyVoid)
 }
 
+pub fn abandon_cost_single<'a>() -> impl Parser<'a, ParserInput<'a>, Cost, ParserExtra<'a>> + Clone
+{
+    word("abandon").ignore_then(article()).ignore_then(predicate_parser::predicate_parser()).map(
+        |target| Cost::AbandonCharactersCount { target, count: CollectionExpression::Exactly(1) },
+    )
+}
+
 fn energy_cost<'a>() -> impl Parser<'a, ParserInput<'a>, Cost, ParserExtra<'a>> + Clone {
     energy().map(|n| Cost::Energy(Energy(n)))
 }
@@ -102,12 +109,6 @@ fn abandon_cost_with_count<'a>() -> impl Parser<'a, ParserInput<'a>, Cost, Parse
         target: Predicate::Another(CardPredicate::Character),
         count: CollectionExpression::Exactly(count),
     })
-}
-
-fn abandon_cost_single<'a>() -> impl Parser<'a, ParserInput<'a>, Cost, ParserExtra<'a>> + Clone {
-    word("abandon").ignore_then(article()).ignore_then(predicate_parser::predicate_parser()).map(
-        |target| Cost::AbandonCharactersCount { target, count: CollectionExpression::Exactly(1) },
-    )
 }
 
 fn discard_cost<'a>() -> impl Parser<'a, ParserInput<'a>, Cost, ParserExtra<'a>> + Clone {

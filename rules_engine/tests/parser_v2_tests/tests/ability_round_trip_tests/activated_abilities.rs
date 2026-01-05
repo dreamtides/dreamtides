@@ -138,6 +138,14 @@ fn test_round_trip_abandon_ally_gain_energy_equal_to_cost() {
 }
 
 #[test]
+fn test_round_trip_abandon_ally_dissolve_enemy_with_spark_less_than_abandoned() {
+    let original = "Abandon an ally: You may {dissolve} an enemy with spark less than that ally's spark.";
+    let parsed = parse_ability(original, "");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
 fn test_round_trip_banish_void_with_min_count_reclaim_this_character() {
     let original = "{Banish} your void with {count} or more cards: {Reclaim} this character.";
     let parsed = parse_ability(original, "count: 3");

@@ -185,6 +185,40 @@ fn test_banish_from_hand_alternate_cost_dissolve_enemy() {
 }
 
 #[test]
+fn test_abandon_ally_alternate_cost_materialized_dissolve_enemy() {
+    let result = parse_abilities(
+        "Abandon an ally: Play this character for {e}, then abandon it.\n\n{Materialized} {Dissolve} an enemy.",
+        "e: 0",
+    );
+    assert_eq!(result.len(), 2);
+    assert_ron_snapshot!(result[0], @r###"
+    Static(StaticAbility(PlayForAlternateCost(AlternateCost(
+      energy_cost: Energy(0),
+      additional_cost: Some(AbandonCharactersCount(
+        target: Another(Character),
+        count: Exactly(1),
+      )),
+      if_you_do: Some(Effect(PayCost(
+        cost: AbandonCharactersCount(
+          target: This,
+          count: Exactly(1),
+        ),
+      ))),
+    ))))
+    "###);
+    assert_ron_snapshot!(result[1], @r###"
+    Triggered(TriggeredAbility(
+      trigger: Keywords([
+        Materialized,
+      ]),
+      effect: Effect(DissolveCharacter(
+        target: Enemy(Character),
+      )),
+    ))
+    "###);
+}
+
+#[test]
 fn test_banish_from_hand_alternate_cost_prevent_enemy_card() {
     let result = parse_abilities(
         "{Banish} a card from hand: Play this event for {e}.\n\n{Prevent} a played enemy card.",

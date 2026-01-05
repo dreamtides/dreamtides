@@ -1,3 +1,8 @@
+use ability_data::collection_expression::CollectionExpression;
+use ability_data::cost::Cost;
+use ability_data::effect::Effect;
+use ability_data::predicate::Predicate;
+use ability_data::standard_effect::StandardEffect;
 use ability_data::static_ability::{
     AlternateCost, StandardStaticAbility, StaticAbility, StaticAbilityWithOptions,
 };
@@ -5,7 +10,7 @@ use chumsky::prelude::*;
 use core_data::numerics::{Energy, Spark};
 
 use crate::parser::parser_helpers::{
-    colon, energy, period, spark, word, words, ParserExtra, ParserInput,
+    colon, comma, energy, period, spark, word, words, ParserExtra, ParserInput,
 };
 use crate::parser::{card_predicate_parser, condition_parser, cost_parser};
 
@@ -31,6 +36,7 @@ pub fn static_ability_parser<'a>(
 fn standard_static_ability<'a>(
 ) -> impl Parser<'a, ParserInput<'a>, StandardStaticAbility, ParserExtra<'a>> + Clone {
     choice((
+        abandon_ally_play_character_for_alternate_cost(),
         play_for_alternate_cost(),
         simple_alternate_cost_with_period(),
         allied_spark_bonus(),
@@ -101,6 +107,29 @@ fn enemy_cards_cost_increase<'a>(
         .map(|(matching, increase)| StandardStaticAbility::EnemyCardsCostIncrease {
             matching,
             increase: Energy(increase),
+        })
+}
+
+fn abandon_ally_play_character_for_alternate_cost<'a>(
+) -> impl Parser<'a, ParserInput<'a>, StandardStaticAbility, ParserExtra<'a>> + Clone {
+    cost_parser::abandon_cost_single()
+        .then_ignore(colon())
+        .then_ignore(words(&["play", "this", "character", "for"]))
+        .then(energy())
+        .then_ignore(comma())
+        .then_ignore(words(&["then", "abandon", "it"]))
+        .then_ignore(period())
+        .map(|(additional_cost, e)| {
+            StandardStaticAbility::PlayForAlternateCost(AlternateCost {
+                energy_cost: Energy(e),
+                additional_cost: Some(additional_cost),
+                if_you_do: Some(Effect::Effect(StandardEffect::PayCost {
+                    cost: Cost::AbandonCharactersCount {
+                        target: Predicate::This,
+                        count: CollectionExpression::Exactly(1),
+                    },
+                })),
+            })
         })
 }
 

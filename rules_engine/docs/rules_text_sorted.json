@@ -1,6 +1,4 @@
 [
-  "Abandon an ally: Play this character for {e}, then abandon it.\n\n{Materialized} {Dissolve} an enemy.",
-  "Abandon an ally: You may {dissolve} an enemy with spark less than that ally's spark.",
   "Additional Cost: Return an ally with cost {e} or more to hand.\n\n{Judgment} Draw {cards}.",
   "All cards currently in your void gain {reclaim} equal to their cost this turn.",
   "At the end of this turn, trigger an additional {JudgmentPhaseName} phase.",

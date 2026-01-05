@@ -73,6 +73,9 @@ pub fn serialize_enemy_predicate(card_predicate: &CardPredicate) -> String {
                 serialize_enemy_predicate(target)
             )
         }
+        CardPredicate::CharacterWithSparkComparedToAbandoned { target, .. } => {
+            format!("{} with spark less than that ally's spark", serialize_enemy_predicate(target))
+        }
         _ => {
             unimplemented!("Serialization not yet implemented for this enemy predicate type")
         }
