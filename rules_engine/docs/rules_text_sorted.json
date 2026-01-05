@@ -1,7 +1,5 @@
 [
   "Additional Cost: Return an ally with cost {e} or more to hand.\n\n{Judgment} Draw {cards}.",
-  "All cards currently in your void gain {reclaim} equal to their cost this turn.",
-  "At the end of this turn, trigger an additional {JudgmentPhaseName} phase.",
   "Characters in your hand have {fast}.\n\nOnce per turn, when you play a {fast} character, gain {e}.",
   "Copy the next event you play {this-turn-times}.\n\n{ReclaimForCost}",
   "Disable the '{Materialized}' abilities of enemies.",

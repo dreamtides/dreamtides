@@ -5,8 +5,8 @@ use ability_data::standard_effect::StandardEffect;
 use chumsky::prelude::*;
 
 use crate::parser::parser_helpers::{
-    article, cards, directive, figment, figment_count, foresee_count, it_or_them_count, number,
-    this_turn_times, up_to_n_allies, word, words, ParserExtra, ParserInput,
+    article, cards, comma, directive, figment, figment_count, foresee_count, it_or_them_count,
+    number, this_turn_times, up_to_n_allies, word, words, ParserExtra, ParserInput,
 };
 use crate::parser::{
     card_predicate_parser, cost_parser, predicate_parser, quantity_expression_parser,
@@ -44,6 +44,7 @@ pub fn parser<'a>() -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserEx
                 materialize_character(),
             ))
             .boxed(),
+            trigger_additional_judgment_phase(),
         ))
         .boxed(),
     ))
@@ -253,6 +254,16 @@ pub fn copy_next_played<'a>(
             matching: Predicate::Any(CardPredicate::Event),
             times: Some(times),
         })
+}
+
+pub fn trigger_additional_judgment_phase<'a>(
+) -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
+    words(&["at", "the", "end", "of", "this", "turn"])
+        .ignore_then(comma())
+        .ignore_then(words(&["trigger", "an", "additional"]))
+        .ignore_then(directive("judgmentphasename"))
+        .ignore_then(word("phase"))
+        .to(StandardEffect::TriggerAdditionalJudgmentPhase)
 }
 
 fn counterspell_effects<'a>(

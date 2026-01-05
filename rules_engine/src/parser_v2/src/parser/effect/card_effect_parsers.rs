@@ -175,18 +175,33 @@ pub fn each_player_abandons_characters<'a>(
 
 pub fn cards_in_void_gain_reclaim<'a>(
 ) -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
-    article()
-        .ignore_then(card_predicate_parser::parser())
-        .then_ignore(words(&["in", "your", "void", "gains"]))
-        .then_ignore(choice((
-            reclaim_cost().ignored(),
-            directive("reclaim").then_ignore(words(&["equal", "to", "its", "cost"])),
-        )))
-        .then_ignore(words(&["this", "turn"]).or_not())
-        .map(|predicate| StandardEffect::CardsInVoidGainReclaimThisTurn {
-            count: CollectionExpression::Exactly(1),
-            predicate,
-        })
+    choice((
+        words(&["all", "cards"])
+            .ignore_then(word("currently").or_not())
+            .ignore_then(words(&["in", "your", "void", "gain"]))
+            .ignore_then(choice((
+                reclaim_cost().ignored(),
+                directive("reclaim").then_ignore(words(&["equal", "to", "their", "cost"])),
+            )))
+            .ignore_then(words(&["this", "turn"]).or_not())
+            .to(StandardEffect::CardsInVoidGainReclaimThisTurn {
+                count: CollectionExpression::All,
+                predicate: CardPredicate::Card,
+            }),
+        article()
+            .ignore_then(card_predicate_parser::parser())
+            .then_ignore(words(&["in", "your", "void", "gains"]))
+            .then_ignore(choice((
+                reclaim_cost().ignored(),
+                directive("reclaim").then_ignore(words(&["equal", "to", "its", "cost"])),
+            )))
+            .then_ignore(words(&["this", "turn"]).or_not())
+            .map(|predicate| StandardEffect::CardsInVoidGainReclaimThisTurn {
+                count: CollectionExpression::Exactly(1),
+                predicate,
+            }),
+    ))
+    .boxed()
 }
 
 fn draw_cards_for_each<'a>(

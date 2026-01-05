@@ -239,6 +239,9 @@ pub fn serialize_standard_effect(effect: &StandardEffect) -> String {
         StandardEffect::DrawMatchingCard { predicate } => {
             format!("draw {} from your deck.", serialize_card_predicate(predicate))
         }
+        StandardEffect::TriggerAdditionalJudgmentPhase => {
+            "at the end of this turn, trigger an additional {JudgmentPhaseName} phase.".to_string()
+        }
         _ => unimplemented!("Serialization not yet implemented for this effect type"),
     }
 }
@@ -421,6 +424,10 @@ fn serialize_cards_in_void_gain_reclaim_this_turn(
                 "{} in your void gains {{reclaim}} equal to its cost.",
                 serialize_card_predicate(predicate)
             )
+        }
+        CollectionExpression::All => {
+            "all cards currently in your void gain {reclaim} equal to their cost this turn."
+                .to_string()
         }
         _ => unimplemented!(
             "Serialization not yet implemented for this collection expression in cards in void gain reclaim"
