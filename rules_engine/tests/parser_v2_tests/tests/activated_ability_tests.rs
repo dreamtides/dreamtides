@@ -364,3 +364,25 @@ fn test_banish_void_with_min_count_reclaim_this_character() {
     ))
     "###);
 }
+
+#[test]
+fn test_fast_abandon_this_character_prevent_played_event() {
+    let result = parse_ability("{Fast} -- Abandon this character: {Prevent} a played event.", "");
+    assert_ron_snapshot!(result, @r###"
+    Activated(ActivatedAbility(
+      costs: [
+        AbandonCharactersCount(
+          target: This,
+          count: Exactly(1),
+        ),
+      ],
+      effect: Effect(Counterspell(
+        target: Any(Event),
+      )),
+      options: Some(ActivatedAbilityOptions(
+        is_fast: true,
+        is_multi: true,
+      )),
+    ))
+    "###);
+}
