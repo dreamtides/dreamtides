@@ -77,3 +77,38 @@ fn test_abandon_ally_play_character_for_alternate_cost() {
     ))))
     "###);
 }
+
+#[test]
+fn test_additional_cost_to_play_return_ally() {
+    let result =
+        parse_ability("To play this card, return an ally with cost {e} or more to hand.", "e: 4");
+    assert_ron_snapshot!(result, @r###"
+    Static(StaticAbility(AdditionalCostToPlay(ReturnToHand(Another(CardWithCost(
+      target: Character,
+      cost_operator: OrMore,
+      cost: Energy(4),
+    ))))))
+    "###);
+}
+
+#[test]
+fn test_additional_cost_to_play_with_judgment() {
+    let result = parse_abilities("To play this card, return an ally with cost {e} or more to hand.\n\n{Judgment} Draw {cards}.", "e: 4, cards: 2");
+    assert_ron_snapshot!(result, @r###"
+    [
+      Static(StaticAbility(AdditionalCostToPlay(ReturnToHand(Another(CardWithCost(
+        target: Character,
+        cost_operator: OrMore,
+        cost: Energy(4),
+      )))))),
+      Triggered(TriggeredAbility(
+        trigger: Keywords([
+          Judgment,
+        ]),
+        effect: Effect(DrawCards(
+          count: 2,
+        )),
+      )),
+    ]
+    "###);
+}

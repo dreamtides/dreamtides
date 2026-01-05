@@ -28,6 +28,7 @@ pub struct StaticAbilityWithOptions {
 /// Basic static abilities
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum StandardStaticAbility {
+    AdditionalCostToPlay(Cost),
     CardsInYourVoidHaveReclaim { matching: CardPredicate },
     CharactersInHandHaveFast,
     CostReductionForEach { reduction: Energy, quantity: QuantityExpression },

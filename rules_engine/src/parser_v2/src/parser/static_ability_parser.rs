@@ -36,6 +36,7 @@ pub fn static_ability_parser<'a>(
 fn standard_static_ability<'a>(
 ) -> impl Parser<'a, ParserInput<'a>, StandardStaticAbility, ParserExtra<'a>> + Clone {
     choice((
+        additional_cost_to_play(),
         abandon_ally_play_character_for_alternate_cost(),
         play_for_alternate_cost(),
         simple_alternate_cost_with_period(),
@@ -169,4 +170,13 @@ fn simple_alternate_cost_with_period<'a>(
             if_you_do: None,
         })
     })
+}
+
+fn additional_cost_to_play<'a>(
+) -> impl Parser<'a, ParserInput<'a>, StandardStaticAbility, ParserExtra<'a>> + Clone {
+    words(&["to", "play", "this", "card"])
+        .ignore_then(comma())
+        .ignore_then(cost_parser::cost_parser())
+        .then_ignore(period())
+        .map(StandardStaticAbility::AdditionalCostToPlay)
 }

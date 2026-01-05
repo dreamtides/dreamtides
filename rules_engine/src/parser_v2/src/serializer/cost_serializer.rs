@@ -48,6 +48,9 @@ pub fn serialize_cost(cost: &Cost) -> String {
         Cost::BanishFromHand(predicate) => {
             format!("{{Banish}} {} from hand", serialize_predicate(predicate))
         }
+        Cost::ReturnToHand(predicate) => {
+            format!("return {} to hand", serialize_predicate(predicate))
+        }
         _ => unimplemented!("Serialization not yet implemented for this cost type"),
     }
 }

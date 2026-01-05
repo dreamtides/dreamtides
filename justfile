@@ -262,7 +262,14 @@ benchmark *args='':
   cargo criterion --manifest-path rules_engine/Cargo.toml "$@"
 
 style-validator:
-  cargo run --manifest-path rules_engine/Cargo.toml --bin "style_validator" -- --code-order "$@"
+  #!/usr/bin/env bash
+  output=$(cargo run --manifest-path rules_engine/Cargo.toml --bin "style_validator" -- --code-order "$@")
+  if [ $? -ne 0 ]; then
+      echo "$output"
+      exit 1
+  else
+    echo "Style validation passed"
+  fi
 
 style-validator-fix:
   #!/usr/bin/env bash

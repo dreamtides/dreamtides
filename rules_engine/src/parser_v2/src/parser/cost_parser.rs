@@ -20,6 +20,7 @@ pub fn cost_parser<'a>() -> impl Parser<'a, ParserInput<'a>, Cost, ParserExtra<'
         ))
         .boxed(),
         choice((
+            return_to_hand_cost(),
             discard_hand_cost(),
             discard_cost(),
             banish_void_with_min_count_cost(),
@@ -37,6 +38,15 @@ pub fn banish_from_hand_cost<'a>() -> impl Parser<'a, ParserInput<'a>, Cost, Par
         .ignore_then(card_predicate_parser::parser())
         .then_ignore(words(&["from", "hand"]))
         .map(|predicate| Cost::BanishFromHand(Predicate::Any(predicate)))
+}
+
+pub fn return_to_hand_cost<'a>() -> impl Parser<'a, ParserInput<'a>, Cost, ParserExtra<'a>> + Clone
+{
+    word("return")
+        .ignore_then(article())
+        .ignore_then(predicate_parser::predicate_parser())
+        .then_ignore(words(&["to", "hand"]))
+        .map(Cost::ReturnToHand)
 }
 
 pub fn banish_cards_from_your_void_cost<'a>(

@@ -1,5 +1,4 @@
 [
-  "Additional Cost: Return an ally with cost {e} or more to hand.\n\n{Judgment} Draw {cards}.",
   "Characters in your hand have {fast}.\n\nOnce per turn, when you play a {fast} character, gain {e}.",
   "Copy the next event you play {this-turn-times}.\n\n{ReclaimForCost}",
   "Disable the '{Materialized}' abilities of enemies.",

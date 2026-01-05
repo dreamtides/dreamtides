@@ -47,6 +47,9 @@ pub fn serialize_standard_static_ability(ability: &StandardStaticAbility) -> Str
         StandardStaticAbility::SparkBonusOtherCharacters { matching, .. } => {
             format!("allied {} have +{{s}} spark.", serialize_card_predicate_plural(matching))
         }
+        StandardStaticAbility::AdditionalCostToPlay(cost) => {
+            format!("To play this card, {}.", serialize_cost(cost))
+        }
         StandardStaticAbility::PlayForAlternateCost(alt_cost) => {
             if let Some(cost) = &alt_cost.additional_cost {
                 let card_type = if alt_cost.if_you_do.is_some() { "character" } else { "event" };
