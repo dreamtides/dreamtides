@@ -13,6 +13,7 @@ pub enum TriggerEvent {
     LeavesPlay(Predicate),
     PutIntoVoid(Predicate),
     DrawAllCardsInCopyOfDeck,
+    DrawCardsInTurn(u32),
     EndOfYourTurn,
     GainEnergy,
     Keywords(Vec<TriggerKeyword>),

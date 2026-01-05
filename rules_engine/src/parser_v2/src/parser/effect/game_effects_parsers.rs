@@ -15,6 +15,7 @@ use crate::parser::{
 pub fn parser<'a>() -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
     choice((
         choice((
+            you_win_the_game(),
             copy_next_played(),
             copy_it(),
             foresee(),
@@ -311,6 +312,11 @@ pub fn trigger_judgment_ability<'a>(
             matching: Predicate::Another(CardPredicate::Character),
             collection: CollectionExpression::All,
         })
+}
+
+pub fn you_win_the_game<'a>(
+) -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
+    words(&["you", "win", "the", "game"]).to(StandardEffect::YouWinTheGame)
 }
 
 fn counterspell_effects<'a>(

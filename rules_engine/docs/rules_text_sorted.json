@@ -1,6 +1,4 @@
 [
-  "When you draw {cards-numeral} in a turn, if this card is in your void, it gains {reclaim-for-cost}.",
-  "When you have no cards in your deck, you win the game.",
   "When you play {a-subtype}, {reclaim} a random character with cost {e} or less.",
   "When you play a card during the opponent's turn, this character gains +{s} spark.",
   "When you play a character, {materialize} {a-figment}.",

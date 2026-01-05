@@ -13,5 +13,5 @@ pub enum Condition {
     CardsInVoidCount { count: u32 },
     DissolvedThisTurn { predicate: Predicate },
     PredicateCount { count: u32, predicate: Predicate },
-    ThisCharacterIsInYourVoid,
+    ThisCardIsInYourVoid,
 }

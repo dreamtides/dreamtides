@@ -92,6 +92,9 @@ pub fn matches(
             Trigger::DrewAllCardsInCopyOfDeck(player) => owning_card_controller == player,
             _ => false,
         },
+        TriggerEvent::DrawCardsInTurn(..) => {
+            todo!("Implement DrawCardsInTurn")
+        }
         TriggerEvent::EndOfYourTurn => match trigger {
             Trigger::EndOfTurn(player) => owning_card_controller == player,
             _ => false,

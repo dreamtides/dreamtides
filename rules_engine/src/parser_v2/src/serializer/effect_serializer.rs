@@ -282,6 +282,7 @@ pub fn serialize_standard_effect(effect: &StandardEffect) -> String {
             "at the end of this turn, trigger an additional {JudgmentPhaseName} phase.".to_string()
         }
         StandardEffect::TakeExtraTurn => "take an extra turn after this one.".to_string(),
+        StandardEffect::YouWinTheGame => "you win the game.".to_string(),
         _ => unimplemented!("Serialization not yet implemented for this effect type"),
     }
 }
@@ -421,6 +422,7 @@ fn serialize_condition(condition: &Condition) -> String {
             format!("with {},", serialize_predicate_count(*count, predicate))
         }
         Condition::DissolvedThisTurn { .. } => "if a character dissolved this turn".to_string(),
+        Condition::ThisCardIsInYourVoid => "if this card is in your void, ".to_string(),
         _ => unimplemented!("Serialization not yet implemented for this condition type"),
     }
 }

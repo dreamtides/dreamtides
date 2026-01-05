@@ -930,3 +930,35 @@ fn test_has_all_character_types_and_judgment_with_allies() {
     ]
     "###);
 }
+
+#[test]
+fn test_when_you_draw_cards_in_turn_if_in_void_gains_reclaim() {
+    let result = parse_ability(
+        "When you draw {cards-numeral} in a turn, if this card is in your void, it gains {reclaim-for-cost} this turn.",
+        "cards: 3, reclaim: 2",
+    );
+    assert_ron_snapshot!(result, @r###"
+    Triggered(TriggeredAbility(
+      trigger: DrawCardsInTurn(3),
+      effect: WithOptions(EffectWithOptions(
+        effect: GainsReclaimUntilEndOfTurn(
+          target: It,
+          cost: Some(Energy(2)),
+        ),
+        optional: false,
+        condition: Some(ThisCardIsInYourVoid),
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_when_no_cards_in_deck_you_win() {
+    let result = parse_ability("When you have no cards in your deck, you win the game.", "");
+    assert_ron_snapshot!(result, @r###"
+    Triggered(TriggeredAbility(
+      trigger: DrawAllCardsInCopyOfDeck,
+      effect: Effect(YouWinTheGame),
+    ))
+    "###);
+}

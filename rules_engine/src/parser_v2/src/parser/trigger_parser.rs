@@ -71,13 +71,27 @@ fn state_change_triggers<'a>(
 
 fn timing_triggers<'a>() -> impl Parser<'a, ParserInput<'a>, TriggerEvent, ParserExtra<'a>> + Clone
 {
-    choice((draw_all_cards_trigger(), end_of_turn_trigger(), gain_energy_trigger())).boxed()
+    choice((
+        draw_cards_in_turn_trigger(),
+        draw_all_cards_trigger(),
+        end_of_turn_trigger(),
+        gain_energy_trigger(),
+    ))
+    .boxed()
 }
 
 fn draw_all_cards_trigger<'a>(
 ) -> impl Parser<'a, ParserInput<'a>, TriggerEvent, ParserExtra<'a>> + Clone {
     words(&["when", "you", "have", "no", "cards", "in", "your", "deck"])
         .to(TriggerEvent::DrawAllCardsInCopyOfDeck)
+}
+
+fn draw_cards_in_turn_trigger<'a>(
+) -> impl Parser<'a, ParserInput<'a>, TriggerEvent, ParserExtra<'a>> + Clone {
+    words(&["when", "you", "draw"])
+        .ignore_then(cards_numeral())
+        .then_ignore(words(&["in", "a", "turn"]))
+        .map(TriggerEvent::DrawCardsInTurn)
 }
 
 fn play_trigger<'a>() -> impl Parser<'a, ParserInput<'a>, TriggerEvent, ParserExtra<'a>> + Clone {

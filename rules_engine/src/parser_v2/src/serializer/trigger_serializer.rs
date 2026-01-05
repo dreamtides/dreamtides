@@ -41,6 +41,7 @@ pub fn serialize_trigger_event(trigger: &TriggerEvent) -> String {
         TriggerEvent::PutIntoVoid(predicate) => {
             format!("when {} is put into your void, ", serialize_predicate(predicate))
         }
+        TriggerEvent::DrawCardsInTurn(_) => "when you draw {cards-numeral} in a turn, ".to_string(),
         TriggerEvent::EndOfYourTurn => "at the end of your turn, ".to_string(),
         TriggerEvent::DrawAllCardsInCopyOfDeck => {
             "when you have no cards in your deck, ".to_string()
