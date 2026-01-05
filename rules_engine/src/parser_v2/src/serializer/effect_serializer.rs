@@ -139,6 +139,9 @@ pub fn serialize_standard_effect(effect: &StandardEffect) -> String {
             }
             _ => unimplemented!("Serialization not yet implemented for this banish collection"),
         },
+        StandardEffect::BanishCardsFromEnemyVoid { .. } => {
+            "{Banish} {cards} from the opponent's void.".to_string()
+        }
         StandardEffect::BanishEnemyVoid => "{Banish} the opponent's void.".to_string(),
         StandardEffect::Discover { predicate } => {
             format!("{{Discover}} {}.", serialize_card_predicate(predicate))
@@ -224,6 +227,23 @@ pub fn serialize_effect(effect: &Effect) -> String {
                     }
                 }
                 result.push_str("you may ");
+                if let Some(trigger_cost) = &effects[0].trigger_cost {
+                    result.push_str(&format!("{} to ", serialize_trigger_cost(trigger_cost)));
+                }
+                result.push_str(&format!("{}.", effect_strings.join(" and ")));
+                result
+            } else if !all_optional && all_have_trigger_cost && !effects.is_empty() {
+                let effect_strings: Vec<String> = effects
+                    .iter()
+                    .map(|e| serialize_standard_effect(&e.effect).trim_end_matches('.').to_string())
+                    .collect();
+                let mut result = String::new();
+                if has_condition {
+                    if let Some(condition) = &effects[0].condition {
+                        result.push_str(&serialize_condition(condition));
+                        result.push(' ');
+                    }
+                }
                 if let Some(trigger_cost) = &effects[0].trigger_cost {
                     result.push_str(&format!("{} to ", serialize_trigger_cost(trigger_cost)));
                 }

@@ -25,6 +25,7 @@ pub fn effect_or_compound_parser<'a>(
 ) -> impl Parser<'a, ParserInput<'a>, Effect, ParserExtra<'a>> + Clone {
     choice((
         optional_effect_with_trigger_cost_parser(),
+        effect_with_trigger_cost_parser(),
         optional_effect_parser(),
         conditional_effect_parser(),
         standard_effect_parser(),
@@ -59,6 +60,38 @@ fn create_trigger_until_end_of_turn<'a>(
                     until_end_of_turn: true,
                 }),
             }),
+        })
+}
+
+fn effect_with_trigger_cost_parser<'a>(
+) -> impl Parser<'a, ParserInput<'a>, Effect, ParserExtra<'a>> + Clone {
+    trigger_cost_parser()
+        .then_ignore(word("to"))
+        .then(
+            single_effect_parser().separated_by(effect_separator()).at_least(1).collect::<Vec<_>>(),
+        )
+        .then_ignore(period())
+        .map(|(trigger_cost, effects)| {
+            if effects.len() == 1 {
+                Effect::WithOptions(EffectWithOptions {
+                    effect: effects.into_iter().next().unwrap(),
+                    optional: false,
+                    trigger_cost: Some(trigger_cost),
+                    condition: None,
+                })
+            } else {
+                Effect::List(
+                    effects
+                        .into_iter()
+                        .map(|effect| EffectWithOptions {
+                            effect,
+                            optional: false,
+                            trigger_cost: Some(trigger_cost.clone()),
+                            condition: None,
+                        })
+                        .collect(),
+                )
+            }
         })
 }
 
