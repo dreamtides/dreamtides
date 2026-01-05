@@ -56,3 +56,23 @@ fn test_judgment_you_may_pay_to_have_each_allied_gain_spark() {
     ))
     "###);
 }
+
+#[test]
+fn test_energy_cost_spark_of_each_allied_subtype_becomes() {
+    let result = parse_ability(
+        "{e}: The spark of each allied {subtype} becomes {s}.",
+        "e: 1, subtype: warrior, s: 3",
+    );
+    assert_ron_snapshot!(result, @r###"
+    Activated(ActivatedAbility(
+      costs: [
+        Energy(Energy(1)),
+      ],
+      effect: Effect(SparkBecomes(
+        collection: All,
+        matching: CharacterType(Warrior),
+        spark: Spark(3),
+      )),
+    ))
+    "###);
+}

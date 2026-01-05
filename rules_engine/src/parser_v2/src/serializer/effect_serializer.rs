@@ -83,6 +83,12 @@ pub fn serialize_standard_effect(effect: &StandardEffect) -> String {
                 )
             }
         }
+        StandardEffect::SparkBecomes { matching, .. } => {
+            format!(
+                "the spark of each {} becomes {{s}}.",
+                serialize_allied_card_predicate(matching)
+            )
+        }
         StandardEffect::PutCardsFromYourDeckIntoVoid { .. } => {
             "put the {top-n-cards} of your deck into your void.".to_string()
         }
