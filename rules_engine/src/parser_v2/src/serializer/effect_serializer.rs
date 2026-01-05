@@ -239,7 +239,7 @@ pub fn serialize_standard_effect(effect: &StandardEffect) -> String {
         StandardEffect::DrawMatchingCard { predicate } => {
             format!("draw {} from your deck.", serialize_card_predicate(predicate))
         }
-        StandardEffect::TriggerAdditionalJudgmentPhase => {
+        StandardEffect::TriggerAdditionalJudgmentPhaseAtEndOfTurn => {
             "at the end of this turn, trigger an additional {JudgmentPhaseName} phase.".to_string()
         }
         _ => unimplemented!("Serialization not yet implemented for this effect type"),

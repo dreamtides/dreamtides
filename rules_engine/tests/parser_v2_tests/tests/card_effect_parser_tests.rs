@@ -778,7 +778,7 @@ fn test_event_in_void_gains_reclaim_this_turn() {
 fn test_all_cards_in_void_gain_reclaim_equal_to_cost() {
     let result = parse_ability(
         "All cards currently in your void gain {reclaim} equal to their cost this turn.",
-        "reclaim: 0",
+        "",
     );
     assert_ron_snapshot!(result, @r###"
     Event(EventAbility(

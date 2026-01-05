@@ -932,7 +932,7 @@ fn test_event_trigger_additional_judgment_phase() {
     );
     assert_ron_snapshot!(result, @r###"
     Event(EventAbility(
-      effect: Effect(TriggerAdditionalJudgmentPhase),
+      effect: Effect(TriggerAdditionalJudgmentPhaseAtEndOfTurn),
     ))
     "###);
 }

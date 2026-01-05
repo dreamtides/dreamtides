@@ -263,7 +263,7 @@ pub fn trigger_additional_judgment_phase<'a>(
         .ignore_then(words(&["trigger", "an", "additional"]))
         .ignore_then(directive("judgmentphasename"))
         .ignore_then(word("phase"))
-        .to(StandardEffect::TriggerAdditionalJudgmentPhase)
+        .to(StandardEffect::TriggerAdditionalJudgmentPhaseAtEndOfTurn)
 }
 
 fn counterspell_effects<'a>(

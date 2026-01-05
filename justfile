@@ -124,7 +124,7 @@ parser-test-insta *args='':
     else
         TEST_THREADS=""
     fi
-    output=$(INSTA_UPDATE=always RUST_MIN_STACK=8388608 cargo test -q --manifest-path rules_engine/Cargo.toml -p parser_v2_tests -- $TEST_THREADS "$@" 2>&1)
+    output=$(cd rules_engine && RUST_MIN_STACK=8388608 cargo insta test --accept -p parser_v2_tests -- $TEST_THREADS "$@" 2>&1)
     exit_code=$?
     if [ $exit_code -eq 0 ]; then
         echo "Success"
