@@ -21,6 +21,7 @@ pub enum ViolationKind {
     CargoTomlDependencyOrder,
     InlineUseStatement,
     CodeOrder,
+    MissingDocCommentImport,
 }
 
 impl ViolationKind {
@@ -52,6 +53,9 @@ impl ViolationKind {
             }
             ViolationKind::CodeOrder => {
                 "items not in correct order (should be: public type aliases, public constants, public traits, public structs/enums, public functions, then private items)"
+            }
+            ViolationKind::MissingDocCommentImport => {
+                "doc comment references type not imported in use statements"
             }
         }
     }
