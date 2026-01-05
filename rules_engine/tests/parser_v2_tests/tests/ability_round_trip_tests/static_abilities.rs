@@ -72,3 +72,11 @@ fn test_round_trip_play_characters_from_top_of_deck() {
     let serialized = ability_serializer::serialize_ability(&parsed);
     assert_eq!(original, serialized);
 }
+
+#[test]
+fn test_round_trip_judgment_ability_of_allies_triggers_when_materialize() {
+    let original = "The '{Judgment}' ability of allies triggers when you {materialize} them.";
+    let parsed = parse_ability(original, "");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}

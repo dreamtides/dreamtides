@@ -184,3 +184,11 @@ fn test_round_trip_pay_one_or_more_dissolve_each_character() {
     let serialized = ability_serializer::serialize_ability(&parsed);
     assert_eq!(original, serialized);
 }
+
+#[test]
+fn test_round_trip_spend_one_or_more_energy_draw_for_each_energy_spent() {
+    let original = "Spend 1 or more {energy-symbol}: Draw {cards} for each {energy-symbol} spent.";
+    let parsed = parse_ability(original, "cards: 2");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!("Pay 1 or more {energy-symbol}: Draw {cards} for each {energy-symbol} spent.", serialized);
+}

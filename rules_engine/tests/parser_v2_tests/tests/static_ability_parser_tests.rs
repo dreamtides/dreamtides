@@ -253,3 +253,16 @@ fn test_reveal_and_play_from_top() {
     ]
     "###);
 }
+
+#[test]
+fn test_judgment_ability_of_allies_triggers_when_materialize() {
+    let result = parse_ability(
+        "The '{Judgment}' ability of allies triggers when you {materialize} them.",
+        "",
+    );
+    assert_ron_snapshot!(result, @r###"
+    Static(StaticAbility(JudgmentTriggersWhenMaterialized(
+      predicate: Another(Character),
+    )))
+    "###);
+}

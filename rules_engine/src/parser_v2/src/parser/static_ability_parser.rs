@@ -12,7 +12,7 @@ use core_data::numerics::{Energy, Spark};
 use crate::parser::parser_helpers::{
     article, colon, comma, directive, energy, period, spark, word, words, ParserExtra, ParserInput,
 };
-use crate::parser::{card_predicate_parser, condition_parser, cost_parser};
+use crate::parser::{card_predicate_parser, condition_parser, cost_parser, predicate_parser};
 
 /// Parses static abilities that apply continuously.
 pub fn static_ability_parser<'a>(
@@ -49,6 +49,7 @@ fn standard_static_ability<'a>(
         your_cards_cost_modification(),
         reveal_top_card_of_deck(),
         play_from_top_of_deck(),
+        judgment_triggers_when_materialized(),
     ))
     .boxed()
 }
@@ -248,4 +249,17 @@ fn play_from_top_of_deck<'a>(
         .then_ignore(words(&["from", "the", "top", "of", "your", "deck"]))
         .then_ignore(period())
         .map(|matching| StandardStaticAbility::YouMayPlayFromTopOfDeck { matching })
+}
+
+fn judgment_triggers_when_materialized<'a>(
+) -> impl Parser<'a, ParserInput<'a>, StandardStaticAbility, ParserExtra<'a>> + Clone {
+    words(&["the", "'"])
+        .ignore_then(directive("judgment"))
+        .ignore_then(words(&["'", "ability", "of"]))
+        .ignore_then(predicate_parser::predicate_parser())
+        .then_ignore(words(&["triggers", "when", "you"]))
+        .then_ignore(directive("materialize"))
+        .then_ignore(word("them"))
+        .then_ignore(period())
+        .map(|predicate| StandardStaticAbility::JudgmentTriggersWhenMaterialized { predicate })
 }

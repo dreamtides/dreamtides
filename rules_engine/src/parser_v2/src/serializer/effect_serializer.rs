@@ -263,6 +263,7 @@ pub fn serialize_standard_effect(effect: &StandardEffect) -> String {
         StandardEffect::TriggerAdditionalJudgmentPhaseAtEndOfTurn => {
             "at the end of this turn, trigger an additional {JudgmentPhaseName} phase.".to_string()
         }
+        StandardEffect::TakeExtraTurn => "take an extra turn after this one.".to_string(),
         _ => unimplemented!("Serialization not yet implemented for this effect type"),
     }
 }

@@ -352,3 +352,11 @@ fn test_round_trip_return_all_but_one_ally_draw_cards() {
     let serialized = ability_serializer::serialize_ability(&parsed);
     assert_eq!(original, serialized);
 }
+
+#[test]
+fn test_round_trip_take_an_extra_turn_after_this_one() {
+    let original = "Take an extra turn after this one.";
+    let parsed = parse_ability(original, "");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}

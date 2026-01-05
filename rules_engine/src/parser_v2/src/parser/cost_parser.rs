@@ -98,7 +98,7 @@ fn collection_expression_for_return_cost<'a>(
 
 fn spend_one_or_more_energy_cost<'a>(
 ) -> impl Parser<'a, ParserInput<'a>, Cost, ParserExtra<'a>> + Clone {
-    words(&["pay", "1", "or", "more"])
+    choice((words(&["spend", "1", "or", "more"]), words(&["pay", "1", "or", "more"])))
         .ignore_then(directive("energy-symbol"))
         .to(Cost::SpendOneOrMoreEnergy)
 }

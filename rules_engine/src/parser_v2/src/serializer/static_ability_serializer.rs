@@ -4,6 +4,7 @@ use ability_data::static_ability::{StandardStaticAbility, StaticAbility};
 use super::cost_serializer::serialize_cost;
 use super::predicate_serializer::{
     serialize_card_predicate_plural, serialize_card_predicate_without_article,
+    serialize_predicate_without_article,
 };
 use super::serializer_utils::capitalize_first_letter;
 
@@ -99,6 +100,12 @@ pub fn serialize_standard_static_ability(ability: &StandardStaticAbility) -> Str
             format!(
                 "you may play {} from the top of your deck.",
                 serialize_card_predicate_without_article(matching)
+            )
+        }
+        StandardStaticAbility::JudgmentTriggersWhenMaterialized { predicate } => {
+            format!(
+                "the '{{Judgment}}' ability of {} triggers when you {{materialize}} them.",
+                serialize_predicate_without_article(predicate)
             )
         }
         _ => unimplemented!("Serialization not yet implemented for this static ability"),

@@ -465,3 +465,22 @@ fn test_pay_one_or_more_dissolve_each_character() {
     ))
     "###);
 }
+
+#[test]
+fn test_spend_one_or_more_energy_draw_for_each_energy_spent() {
+    let result = parse_ability(
+        "Spend 1 or more {energy-symbol}: Draw {cards} for each {energy-symbol} spent.",
+        "cards: 2",
+    );
+    assert_ron_snapshot!(result, @r###"
+    Activated(ActivatedAbility(
+      costs: [
+        SpendOneOrMoreEnergy,
+      ],
+      effect: Effect(DrawCardsForEach(
+        count: 2,
+        for_each: ForEachEnergySpentOnThisCard,
+      )),
+    ))
+    "###);
+}

@@ -1029,3 +1029,13 @@ fn test_when_you_play_event_from_hand_copy_it() {
     ))
     "###);
 }
+
+#[test]
+fn test_take_an_extra_turn_after_this_one() {
+    let result = parse_ability("Take an extra turn after this one.", "");
+    assert_ron_snapshot!(result, @r###"
+    Event(EventAbility(
+      effect: Effect(TakeExtraTurn),
+    ))
+    "###);
+}

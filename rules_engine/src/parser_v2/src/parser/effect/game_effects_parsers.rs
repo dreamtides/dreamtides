@@ -48,6 +48,7 @@ pub fn parser<'a>() -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserEx
             ))
             .boxed(),
             trigger_additional_judgment_phase(),
+            take_extra_turn(),
         ))
         .boxed(),
     ))
@@ -292,6 +293,12 @@ pub fn trigger_additional_judgment_phase<'a>(
         .ignore_then(directive("judgmentphasename"))
         .ignore_then(word("phase"))
         .to(StandardEffect::TriggerAdditionalJudgmentPhaseAtEndOfTurn)
+}
+
+pub fn take_extra_turn<'a>(
+) -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
+    words(&["take", "an", "extra", "turn", "after", "this", "one"])
+        .to(StandardEffect::TakeExtraTurn)
 }
 
 fn counterspell_effects<'a>(
