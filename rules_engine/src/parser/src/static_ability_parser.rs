@@ -25,7 +25,18 @@ pub fn parser<'a>() -> impl Parser<'a, &'a str, StaticAbility, ErrorType<'a>> {
                     condition: Some(condition),
                 })
             }),
-        standard().map(StaticAbility::StaticAbility),
+        standard().then(phrase("if").ignore_then(condition_parser::parser()).or_not()).map(
+            |(ability, condition)| {
+                if let Some(condition) = condition {
+                    StaticAbility::WithOptions(StaticAbilityWithOptions {
+                        ability,
+                        condition: Some(condition),
+                    })
+                } else {
+                    StaticAbility::StaticAbility(ability)
+                }
+            },
+        ),
     ))
     .boxed()
 }

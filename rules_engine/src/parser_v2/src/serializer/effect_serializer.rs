@@ -265,6 +265,7 @@ fn serialize_condition(condition: &Condition) -> String {
         Condition::PredicateCount { count, predicate } => {
             format!("with {},", serialize_predicate_count(*count, predicate))
         }
+        Condition::DissolvedThisTurn { .. } => "if a character dissolved this turn".to_string(),
         _ => unimplemented!("Serialization not yet implemented for this condition type"),
     }
 }

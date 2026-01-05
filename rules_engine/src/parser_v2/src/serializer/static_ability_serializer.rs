@@ -1,3 +1,4 @@
+use ability_data::condition::Condition;
 use ability_data::static_ability::{StandardStaticAbility, StaticAbility};
 
 use super::cost_serializer::serialize_cost;
@@ -6,12 +7,27 @@ use super::serializer_utils::capitalize_first_letter;
 
 pub fn serialize_static_ability(static_ability: &StaticAbility) -> String {
     match static_ability {
-        StaticAbility::StaticAbility(ability) => serialize_standard_static_ability(ability),
-        StaticAbility::WithOptions(ability) => {
-            if ability.condition.is_none() {
-                serialize_standard_static_ability(&ability.ability)
+        StaticAbility::StaticAbility(ability) => {
+            let base = serialize_standard_static_ability(ability);
+            if base.ends_with('.') {
+                base
             } else {
-                unimplemented!("Serialization not yet implemented for this static ability")
+                format!("{}.", base)
+            }
+        }
+        StaticAbility::WithOptions(ability) => {
+            let base = serialize_standard_static_ability(&ability.ability);
+            if let Some(condition) = &ability.condition {
+                let condition_str = serialize_condition(condition);
+                if base.ends_with('.') {
+                    format!("{} {}.", base.trim_end_matches('.'), condition_str)
+                } else {
+                    format!("{} {}.", base, condition_str)
+                }
+            } else if base.ends_with('.') {
+                base
+            } else {
+                format!("{}.", base)
             }
         }
     }
@@ -32,13 +48,22 @@ pub fn serialize_standard_static_ability(ability: &StandardStaticAbility) -> Str
             format!("allied {} have +{{s}} spark.", serialize_card_predicate_plural(matching))
         }
         StandardStaticAbility::PlayForAlternateCost(alt_cost) => {
-            let cost = alt_cost
-                .additional_cost
-                .as_ref()
-                .map(|c| capitalize_first_letter(&serialize_cost(c)))
-                .unwrap_or_default();
-            format!("{}: Play this event for {{e}}.", cost)
+            if let Some(cost) = &alt_cost.additional_cost {
+                format!(
+                    "{}: Play this event for {{e}}.",
+                    capitalize_first_letter(&serialize_cost(cost))
+                )
+            } else {
+                "this event costs {e}".to_string()
+            }
         }
         _ => unimplemented!("Serialization not yet implemented for this static ability"),
+    }
+}
+
+fn serialize_condition(condition: &Condition) -> String {
+    match condition {
+        Condition::DissolvedThisTurn { .. } => "if a character dissolved this turn".to_string(),
+        _ => unimplemented!("Serialization not yet implemented for this condition type"),
     }
 }

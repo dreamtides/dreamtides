@@ -1,5 +1,4 @@
 [
-  "{Dissolve} an enemy. Draw {cards}.\n\nThis event costs {e} if a character dissolved this turn.",
   "{Dissolved} {Kindle}.\n\nWhen an allied {subtype} is dissolved, {kindle}.",
   "{Dissolved} A {subtype} in your void gains {reclaim} equal to its cost.",
   "{Dissolved} Draw {cards}.\n\nWhen an allied {subtype} is {dissolved}, draw {cards}.",

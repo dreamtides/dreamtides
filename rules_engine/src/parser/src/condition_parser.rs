@@ -30,6 +30,10 @@ pub fn parser<'a>() -> impl Parser<'a, &'a str, Condition, ErrorType<'a>> {
             .map(|predicate| Condition::DissolvedThisTurn {
                 predicate: Predicate::Your(predicate),
             }),
+        phrase("a")
+            .ignore_then(card_predicate_parser::parser())
+            .then_ignore(phrase("{dissolved} this turn"))
+            .map(|predicate| Condition::DissolvedThisTurn { predicate: Predicate::Any(predicate) }),
         choice((
             phrase("you have discarded a card this turn")
                 .to(Condition::CardsDiscardedThisTurn { count: 1 }),
