@@ -144,3 +144,11 @@ fn test_round_trip_banish_void_with_min_count_reclaim_this_character() {
     let serialized = ability_serializer::serialize_ability(&parsed);
     assert_eq!(original, serialized);
 }
+
+#[test]
+fn test_round_trip_energy_spark_of_each_allied_subtype_becomes() {
+    let original = "{e}: The spark of each allied {subtype} becomes {s}.";
+    let parsed = parse_ability(original, "e: 1, subtype: warrior, s: 3");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}

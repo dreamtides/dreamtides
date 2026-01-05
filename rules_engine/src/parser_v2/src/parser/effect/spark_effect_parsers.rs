@@ -1,3 +1,4 @@
+use ability_data::collection_expression::CollectionExpression;
 use ability_data::predicate::Predicate;
 use ability_data::quantity_expression_data::QuantityExpression;
 use ability_data::standard_effect::StandardEffect;
@@ -10,7 +11,14 @@ use crate::parser::parser_helpers::{
 use crate::parser::{card_predicate_parser, predicate_parser};
 
 pub fn parser<'a>() -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
-    choice((kindle(), each_allied_gains_spark(), gains_spark_for_each(), gains_spark())).boxed()
+    choice((
+        kindle(),
+        spark_becomes(),
+        each_allied_gains_spark(),
+        gains_spark_for_each(),
+        gains_spark(),
+    ))
+    .boxed()
 }
 
 pub fn kindle<'a>() -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
@@ -68,4 +76,17 @@ fn gains_spark<'a>() -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserE
         .then(spark())
         .then_ignore(word("spark"))
         .map(|(target, gains)| StandardEffect::GainsSpark { target, gains: Spark(gains) })
+}
+
+fn spark_becomes<'a>() -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone
+{
+    words(&["the", "spark", "of", "each", "allied"])
+        .ignore_then(card_predicate_parser::parser())
+        .then_ignore(word("becomes"))
+        .then(spark())
+        .map(|(matching, spark_value)| StandardEffect::SparkBecomes {
+            collection: CollectionExpression::All,
+            matching,
+            spark: Spark(spark_value),
+        })
 }
