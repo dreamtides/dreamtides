@@ -152,3 +152,11 @@ fn test_round_trip_energy_spark_of_each_allied_subtype_becomes() {
     let serialized = ability_serializer::serialize_ability(&parsed);
     assert_eq!(original, serialized);
 }
+
+#[test]
+fn test_round_trip_fast_abandon_this_character_prevent_played_event() {
+    let original = "{Fast} -- Abandon this character: {Prevent} a played event.";
+    let parsed = parse_ability(original, "");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}

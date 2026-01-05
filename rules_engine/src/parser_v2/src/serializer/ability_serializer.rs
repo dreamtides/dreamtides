@@ -39,10 +39,14 @@ pub fn serialize_ability(ability: &Ability) -> String {
         Ability::Event(event) => capitalize_first_letter(&serialize_effect(&event.effect)),
         Ability::Activated(activated) => {
             let mut result = String::new();
+            let is_fast = activated.options.as_ref().is_some_and(|options| options.is_fast);
             let has_once_per_turn = activated
                 .options
                 .as_ref()
                 .is_some_and(|options| !options.is_fast && !options.is_multi);
+            if is_fast {
+                result.push_str("{Fast} -- ");
+            }
             let costs = activated
                 .costs
                 .iter()

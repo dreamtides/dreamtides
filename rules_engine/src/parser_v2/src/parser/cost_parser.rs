@@ -12,7 +12,13 @@ use crate::parser::{card_predicate_parser, predicate_parser};
 
 pub fn cost_parser<'a>() -> impl Parser<'a, ParserInput<'a>, Cost, ParserExtra<'a>> + Clone {
     choice((
-        choice((abandon_or_discard_cost(), energy_cost(), abandon_cost())).boxed(),
+        choice((
+            abandon_or_discard_cost(),
+            energy_cost(),
+            abandon_this_character_cost(),
+            abandon_cost(),
+        ))
+        .boxed(),
         choice((
             discard_hand_cost(),
             discard_cost(),
@@ -35,6 +41,14 @@ pub fn banish_from_hand_cost<'a>() -> impl Parser<'a, ParserInput<'a>, Cost, Par
 
 fn energy_cost<'a>() -> impl Parser<'a, ParserInput<'a>, Cost, ParserExtra<'a>> + Clone {
     energy().map(|n| Cost::Energy(Energy(n)))
+}
+
+fn abandon_this_character_cost<'a>(
+) -> impl Parser<'a, ParserInput<'a>, Cost, ParserExtra<'a>> + Clone {
+    words(&["abandon", "this", "character"]).map(|_| Cost::AbandonCharactersCount {
+        target: Predicate::This,
+        count: CollectionExpression::Exactly(1),
+    })
 }
 
 fn abandon_cost<'a>() -> impl Parser<'a, ParserInput<'a>, Cost, ParserExtra<'a>> + Clone {

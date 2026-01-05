@@ -291,3 +291,21 @@ fn test_spanned_banish_void_with_min_count_reclaim_this_character() {
     assert!(effect.text.contains("{Reclaim} this character."));
     assert_valid_span(&effect.span);
 }
+
+#[test]
+fn test_parse_fast_activated_ability_abandon_this_character() {
+    let SpannedAbility::Activated(activated) =
+        parse_spanned_ability("{Fast} -- Abandon this character: {Prevent} a played event.", "")
+    else {
+        panic!("Expected Activated ability");
+    };
+
+    assert_eq!(activated.cost.text, "{Fast} -- Abandon this character");
+    assert_valid_span(&activated.cost.span);
+
+    let SpannedEffect::Effect(effect) = activated.effect else {
+        panic!("Expected Effect, got Modal");
+    };
+    assert!(effect.text.contains("{Prevent} a played event."));
+    assert_valid_span(&effect.span);
+}
