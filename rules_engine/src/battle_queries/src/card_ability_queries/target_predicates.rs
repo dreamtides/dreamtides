@@ -55,7 +55,7 @@ pub fn get_character_target_predicate(effect: &StandardEffect) -> Option<&Predic
         StandardEffect::DiscardCards { .. } => None,
         StandardEffect::Discover { .. } => None,
         StandardEffect::DiscoverAndThenMaterialize { .. } => None,
-        StandardEffect::DoubleYourEnergy => None,
+        StandardEffect::MultiplyYourEnergy { .. } => None,
         StandardEffect::DrawCards { .. } => None,
         StandardEffect::DrawCardsForEach { .. } => None,
         StandardEffect::DrawMatchingCard { .. } => None,

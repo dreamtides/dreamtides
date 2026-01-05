@@ -210,6 +210,15 @@ pub fn serialize_standard_effect(effect: &StandardEffect) -> String {
                 )
             }
         }
+        StandardEffect::MaterializeRandomFromDeck { predicate, .. } => {
+            format!(
+                "{{Materialize}} {{n-random-characters}} {} from your deck.",
+                serialize_card_predicate_without_article(predicate)
+            )
+        }
+        StandardEffect::MultiplyYourEnergy { .. } => {
+            "{MultiplyBy} the amount of {energy-symbol} you have.".to_string()
+        }
         _ => unimplemented!("Serialization not yet implemented for this effect type"),
     }
 }

@@ -2,6 +2,36 @@ use insta::assert_ron_snapshot;
 use parser_v2_tests::test_helpers::*;
 
 #[test]
+fn test_multiply_your_energy() {
+    let result = parse_ability("{MultiplyBy} the amount of {energy-symbol} you have.", "number: 2");
+    assert_ron_snapshot!(result, @r###"
+    Event(EventAbility(
+      effect: Effect(MultiplyYourEnergy(
+        multiplier: 2,
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_judgment_multiply_your_energy() {
+    let result = parse_ability(
+        "{Judgment} {MultiplyBy} the amount of {energy-symbol} you have.",
+        "number: 3",
+    );
+    assert_ron_snapshot!(result, @r###"
+    Triggered(TriggeredAbility(
+      trigger: Keywords([
+        Judgment,
+      ]),
+      effect: Effect(MultiplyYourEnergy(
+        multiplier: 3,
+      )),
+    ))
+    "###);
+}
+
+#[test]
 fn test_dissolve_enemy_you_lose_points() {
     let result = parse_ability("{Dissolve} an enemy. You lose {points}.", "points: 1");
     assert_ron_snapshot!(result, @r###"

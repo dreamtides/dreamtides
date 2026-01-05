@@ -569,7 +569,8 @@ fn take_extra_turn<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'
 }
 
 fn double_your_energy<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
-    phrase("double the amount of energy in your energy pool").to(StandardEffect::DoubleYourEnergy)
+    phrase("double the amount of energy in your energy pool")
+        .to(StandardEffect::MultiplyYourEnergy { multiplier: 2 })
 }
 
 fn gain_twice_that_much_energy_instead<'a>()

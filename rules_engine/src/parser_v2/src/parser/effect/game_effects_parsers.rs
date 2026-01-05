@@ -5,7 +5,7 @@ use ability_data::standard_effect::StandardEffect;
 use chumsky::prelude::*;
 
 use crate::parser::parser_helpers::{
-    article, cards, directive, figment, figment_count, foresee_count, it_or_them_count,
+    article, cards, directive, figment, figment_count, foresee_count, it_or_them_count, number,
     up_to_n_allies, word, words, ParserExtra, ParserInput,
 };
 use crate::parser::{
@@ -27,6 +27,7 @@ pub fn parser<'a>() -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserEx
             .boxed(),
             choice((
                 materialize_character_at_end_of_turn(),
+                materialize_random_from_deck(),
                 materialize_collection(),
                 materialize_copy(),
                 materialize_figments_quantity(),
@@ -187,6 +188,15 @@ pub fn materialize_figments<'a>(
     directive("materialize")
         .ignore_then(figment_count())
         .map(|(figment, count)| StandardEffect::MaterializeFigments { figment, count })
+}
+
+pub fn materialize_random_from_deck<'a>(
+) -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
+    directive("materialize")
+        .ignore_then(number())
+        .then(card_predicate_parser::parser())
+        .then_ignore(words(&["from", "your", "deck"]))
+        .map(|(count, predicate)| StandardEffect::MaterializeRandomFromDeck { count, predicate })
 }
 
 pub fn materialize_figments_quantity<'a>(

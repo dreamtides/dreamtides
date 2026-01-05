@@ -2,6 +2,30 @@ use parser_v2::serializer::ability_serializer;
 use parser_v2_tests::test_helpers::*;
 
 #[test]
+fn test_round_trip_multiply_your_energy() {
+    let original = "{MultiplyBy} the amount of {energy-symbol} you have.";
+    let parsed = parse_ability(original, "number: 2");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_materialize_random_characters_with_cost() {
+    let original = "{Materialize} {n-random-characters} with cost {e} or less from your deck.";
+    let parsed = parse_ability(original, "number: 3, e: 5");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_materialize_random_subtype_from_deck() {
+    let original = "{Materialize} {n-random-characters} {subtype} from your deck.";
+    let parsed = parse_ability(original, "number: 2, subtype: warrior");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
 fn test_round_trip_until_end_of_turn_when_you_play_a_character_draw_cards() {
     let original = "Until end of turn, when you play a character, draw {cards}.";
     let parsed = parse_ability(original, "cards: 2");

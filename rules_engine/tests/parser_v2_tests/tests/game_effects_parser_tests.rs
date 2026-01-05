@@ -2,6 +2,45 @@ use insta::assert_ron_snapshot;
 use parser_v2_tests::test_helpers::*;
 
 #[test]
+fn test_materialize_random_characters_with_cost() {
+    let result = parse_ability(
+        "{Materialize} {n-random-characters} with cost {e} or less from your deck.",
+        "number: 3, e: 5",
+    );
+    assert_ron_snapshot!(result, @r###"
+    Event(EventAbility(
+      effect: Effect(MaterializeRandomFromDeck(
+        count: 3,
+        predicate: CardWithCost(
+          target: Character,
+          cost_operator: OrLess,
+          cost: Energy(5),
+        ),
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_judgment_materialize_random_subtype_from_deck() {
+    let result = parse_ability(
+        "{Judgment} {Materialize} {n-random-characters} {subtype} from your deck.",
+        "number: 2, subtype: warrior",
+    );
+    assert_ron_snapshot!(result, @r###"
+    Triggered(TriggeredAbility(
+      trigger: Keywords([
+        Judgment,
+      ]),
+      effect: Effect(MaterializeRandomFromDeck(
+        count: 2,
+        predicate: CharacterType(Warrior),
+      )),
+    ))
+    "###);
+}
+
+#[test]
 fn test_judgment_foresee() {
     let result = parse_ability("{Judgment} {Foresee}.", "foresee: 3");
     assert_ron_snapshot!(result, @r###"

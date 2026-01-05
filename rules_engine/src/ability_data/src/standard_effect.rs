@@ -39,7 +39,7 @@ pub enum StandardEffect {
     DissolveCharacter { target: Predicate },
     DissolveCharactersCount { target: Predicate, count: CollectionExpression },
     DissolveCharactersQuantity { target: Predicate, quantity: QuantityExpression },
-    DoubleYourEnergy,
+    MultiplyYourEnergy { multiplier: u32 },
     DrawCards { count: u32 },
     DrawCardsForEach { count: u32, for_each: QuantityExpression },
     DrawMatchingCard { predicate: CardPredicate },

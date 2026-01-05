@@ -26,7 +26,7 @@ static DIRECTIVES: &[(&str, &str, VariableConstructor)] = &[
     ("maximum-energy", "max", integer),
     ("mode1-cost", "mode1-cost", integer),
     ("mode2-cost", "mode2-cost", integer),
-    ("MultiplyBy", "number", integer),
+    ("multiplyby", "number", integer),
     ("n-figments", "", figment_count),
     ("n-random-characters", "number", integer),
     ("plural-subtype", "subtype", subtype),

@@ -108,7 +108,7 @@ LosePoints { loses: Points }
 EnemyGainsPoints { count: u32 }
 EnemyGainsPointsEqualToItsSpark
 EnemyLosesPoints { count: u32 }
-DoubleYourEnergy
+MultiplyYourEnergy { multiplier: u32 }
 GainTwiceThatMuchEnergyInstead
 ```
 
