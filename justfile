@@ -6,7 +6,7 @@ code-review: check-format build workspace-lints clippy style-validator test tabu
 code-review-rsync: rsync-for-review
     cd ~/dreamtides_tests && just code-review || (osascript -e 'display dialog "Review failed" with icon stop'; exit 1)
 
-review: check-format build clippy style-validator test
+review: check-snapshots check-format build clippy style-validator test
 
 check:
     #!/usr/bin/env bash
@@ -268,6 +268,9 @@ tabula-roundtrip-revert:
 
 tabula-verify-vba:
    ./rules_engine/scripts/verify_vba.py
+
+check-snapshots:
+   ./rules_engine/scripts/check_pending_snapshots.py
 
 watch-tabula:
     cargo watch -C rules_engine -x "run --bin tabula_cli server"
