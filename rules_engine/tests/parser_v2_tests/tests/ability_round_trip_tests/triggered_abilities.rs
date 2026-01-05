@@ -241,3 +241,19 @@ fn test_round_trip_when_an_event_is_put_into_your_void_this_character_gains_spar
     let serialized = ability_serializer::serialize_ability(&parsed);
     assert_eq!(original, serialized);
 }
+
+#[test]
+fn test_round_trip_dissolved_kindle() {
+    let original = "{Dissolved} {Kindle}.";
+    let parsed = parse_ability(original, "k: 1");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_when_allied_subtype_dissolved_kindle() {
+    let original = "When an allied {subtype} is {dissolved}, {Kindle}.";
+    let parsed = parse_ability(original, "subtype: warrior, k: 1");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
