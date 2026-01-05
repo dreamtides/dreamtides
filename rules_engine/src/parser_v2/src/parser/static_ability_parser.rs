@@ -45,6 +45,7 @@ fn standard_static_ability<'a>(
         disable_enemy_materialized_abilities(),
         has_all_character_types(),
         allied_spark_bonus(),
+        spark_equal_to_predicate_count(),
         enemy_cards_cost_increase(),
         your_cards_cost_modification(),
         reveal_top_card_of_deck(),
@@ -262,4 +263,12 @@ fn judgment_triggers_when_materialized<'a>(
         .then_ignore(word("them"))
         .then_ignore(period())
         .map(|predicate| StandardStaticAbility::JudgmentTriggersWhenMaterialized { predicate })
+}
+
+fn spark_equal_to_predicate_count<'a>(
+) -> impl Parser<'a, ParserInput<'a>, StandardStaticAbility, ParserExtra<'a>> + Clone {
+    words(&["this", "character's", "spark", "is", "equal", "to", "the", "number", "of"])
+        .ignore_then(predicate_parser::predicate_parser())
+        .then_ignore(period())
+        .map(|predicate| StandardStaticAbility::SparkEqualToPredicateCount { predicate })
 }

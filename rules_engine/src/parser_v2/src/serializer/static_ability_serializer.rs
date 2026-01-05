@@ -108,6 +108,12 @@ pub fn serialize_standard_static_ability(ability: &StandardStaticAbility) -> Str
                 serialize_predicate_without_article(predicate)
             )
         }
+        StandardStaticAbility::SparkEqualToPredicateCount { predicate } => {
+            format!(
+                "this character's spark is equal to the number of {}.",
+                serialize_predicate_without_article(predicate)
+            )
+        }
         _ => unimplemented!("Serialization not yet implemented for this static ability"),
     }
 }

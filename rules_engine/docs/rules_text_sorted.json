@@ -1,6 +1,4 @@
 [
-  "This character's spark is equal to the number of allied {plural-subtype}.",
-  "This character's spark is equal to the number of cards in your void.",
   "This turn, when you play an event, copy it.",
   "When an ally is {dissolved}, this card gains {reclaim-for-cost} this turn.",
   "When the opponent plays a card which could {dissolve} an ally, {prevent} that card.",

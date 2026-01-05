@@ -266,3 +266,27 @@ fn test_judgment_ability_of_allies_triggers_when_materialize() {
     )))
     "###);
 }
+
+#[test]
+fn test_spark_equal_to_allied_subtype() {
+    let result = parse_ability(
+        "This character's spark is equal to the number of allied {plural-subtype}.",
+        "subtype: warrior",
+    );
+    assert_ron_snapshot!(result, @r###"
+    Static(StaticAbility(SparkEqualToPredicateCount(
+      predicate: Another(CharacterType(Warrior)),
+    )))
+    "###);
+}
+
+#[test]
+fn test_spark_equal_to_cards_in_void() {
+    let result =
+        parse_ability("This character's spark is equal to the number of cards in your void.", "");
+    assert_ron_snapshot!(result, @r###"
+    Static(StaticAbility(SparkEqualToPredicateCount(
+      predicate: YourVoid(Card),
+    )))
+    "###);
+}

@@ -25,7 +25,15 @@ pub fn serialize_predicate(predicate: &Predicate) -> String {
         Predicate::Enemy(card_predicate) => {
             format!("an {}", serialize_enemy_predicate(card_predicate))
         }
-        _ => unimplemented!("Serialization not yet implemented for this predicate type"),
+        Predicate::YourVoid(card_predicate) => {
+            format!("{} in your void", serialize_card_predicate_plural(card_predicate))
+        }
+        Predicate::EnemyVoid(card_predicate) => {
+            format!("{} in the opponent's void", serialize_card_predicate_plural(card_predicate))
+        }
+        Predicate::AnyOther(_) => {
+            unimplemented!("Serialization not yet implemented for this predicate type")
+        }
     }
 }
 

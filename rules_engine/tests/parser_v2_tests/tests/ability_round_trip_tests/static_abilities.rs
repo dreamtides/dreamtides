@@ -80,3 +80,19 @@ fn test_round_trip_judgment_ability_of_allies_triggers_when_materialize() {
     let serialized = ability_serializer::serialize_ability(&parsed);
     assert_eq!(original, serialized);
 }
+
+#[test]
+fn test_round_trip_spark_equal_to_allied_subtype() {
+    let original = "This character's spark is equal to the number of allied {plural-subtype}.";
+    let parsed = parse_ability(original, "subtype: warrior");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_spark_equal_to_cards_in_void() {
+    let original = "This character's spark is equal to the number of cards in your void.";
+    let parsed = parse_ability(original, "");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}

@@ -29,6 +29,7 @@ fn general_predicates<'a>() -> impl Parser<'a, ParserInput<'a>, Predicate, Parse
     choice((
         played_card_predicate(),
         any_fast_card_parser(),
+        choice((your_void_parser(), enemy_void_parser())).boxed(),
         any_card_predicate_parser(),
         any_basic_predicates(),
     ))
@@ -127,4 +128,16 @@ fn any_card_predicate_parser<'a>(
 
 fn another_parser<'a>() -> impl Parser<'a, ParserInput<'a>, Predicate, ParserExtra<'a>> + Clone {
     word("another").ignore_then(card_predicate_parser::parser()).map(Predicate::Another)
+}
+
+fn your_void_parser<'a>() -> impl Parser<'a, ParserInput<'a>, Predicate, ParserExtra<'a>> + Clone {
+    card_predicate_parser::parser()
+        .then_ignore(words(&["in", "your", "void"]))
+        .map(Predicate::YourVoid)
+}
+
+fn enemy_void_parser<'a>() -> impl Parser<'a, ParserInput<'a>, Predicate, ParserExtra<'a>> + Clone {
+    card_predicate_parser::parser()
+        .then_ignore(words(&["in", "the", "opponent's", "void"]))
+        .map(Predicate::EnemyVoid)
 }
