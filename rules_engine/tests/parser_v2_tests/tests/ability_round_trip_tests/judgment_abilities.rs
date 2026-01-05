@@ -99,6 +99,14 @@ fn test_round_trip_materialized_return_ally_to_hand() {
 }
 
 #[test]
+fn test_round_trip_judgment_pay_energy_to_kindle_and_banish_cards_from_opponent_void() {
+    let original = "{Judgment} Pay {e} to {Kindle} and {Banish} {cards} from the opponent's void.";
+    let parsed = parse_ability(original, "e: 1, k: 1, cards: 2");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
 fn test_round_trip_materialized_you_may_return_ally_to_hand() {
     let original = "{Materialized} You may return an ally to hand.";
     let parsed = parse_ability(original, "");

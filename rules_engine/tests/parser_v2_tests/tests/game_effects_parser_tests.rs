@@ -628,3 +628,34 @@ fn test_dissolve_enemy_with_cost_less_than_void_count() {
     ))
     "###);
 }
+
+#[test]
+fn test_judgment_pay_energy_to_kindle_and_banish_cards_from_opponent_void() {
+    let result = parse_ability(
+        "{Judgment} Pay {e} to {kindle} and {banish} {cards} from the opponent's void.",
+        "e: 1, k: 1, cards: 2",
+    );
+    assert_ron_snapshot!(result, @r###"
+    Triggered(TriggeredAbility(
+      trigger: Keywords([
+        Judgment,
+      ]),
+      effect: List([
+        EffectWithOptions(
+          effect: Kindle(
+            amount: Spark(1),
+          ),
+          optional: false,
+          trigger_cost: Some(Energy(Energy(1))),
+        ),
+        EffectWithOptions(
+          effect: BanishCardsFromEnemyVoid(
+            count: 2,
+          ),
+          optional: false,
+          trigger_cost: Some(Energy(Energy(1))),
+        ),
+      ]),
+    ))
+    "###);
+}

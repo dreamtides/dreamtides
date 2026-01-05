@@ -5,8 +5,8 @@ use ability_data::standard_effect::StandardEffect;
 use chumsky::prelude::*;
 
 use crate::parser::parser_helpers::{
-    article, directive, foresee_count, it_or_them_count, up_to_n_allies, word, words, ParserExtra,
-    ParserInput,
+    article, cards, directive, foresee_count, it_or_them_count, up_to_n_allies, word, words,
+    ParserExtra, ParserInput,
 };
 use crate::parser::{card_predicate_parser, cost_parser, predicate_parser};
 
@@ -16,6 +16,7 @@ pub fn parser<'a>() -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserEx
         choice((
             choice((dissolve_all_characters(), dissolve_character())).boxed(),
             choice((
+                banish_cards_from_opponent_void(),
                 banish_up_to_n(),
                 banish_collection(),
                 banish_character(),
@@ -109,6 +110,14 @@ pub fn banish_up_to_n<'a>(
             count: CollectionExpression::UpTo(count),
         }
     })
+}
+
+pub fn banish_cards_from_opponent_void<'a>(
+) -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
+    directive("banish")
+        .ignore_then(cards())
+        .then_ignore(words(&["from", "the", "opponent's", "void"]))
+        .map(|count| StandardEffect::BanishCardsFromEnemyVoid { count })
 }
 
 pub fn banish_enemy_void<'a>(
