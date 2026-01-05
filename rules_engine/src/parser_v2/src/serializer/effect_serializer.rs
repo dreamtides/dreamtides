@@ -146,6 +146,9 @@ pub fn serialize_standard_effect(effect: &StandardEffect) -> String {
         StandardEffect::Discover { predicate } => {
             format!("{{Discover}} {}.", serialize_card_predicate(predicate))
         }
+        StandardEffect::DiscoverAndThenMaterialize { predicate } => {
+            format!("{{Discover}} {} and {{materialize}} it.", serialize_card_predicate(predicate))
+        }
         StandardEffect::MaterializeCharacter { target } => {
             format!("{{Materialize}} {}.", serialize_predicate(target))
         }
@@ -187,6 +190,15 @@ pub fn serialize_standard_effect(effect: &StandardEffect) -> String {
         }
         StandardEffect::CardsInVoidGainReclaimThisTurn { count, predicate } => {
             serialize_cards_in_void_gain_reclaim_this_turn(count, predicate)
+        }
+        StandardEffect::MaterializeCollection { target, count } => {
+            if matches!(target, Predicate::Them) && matches!(count, CollectionExpression::All) {
+                "{Materialize} them.".to_string()
+            } else {
+                unimplemented!(
+                    "Serialization not yet implemented for this materialize collection pattern"
+                )
+            }
         }
         _ => unimplemented!("Serialization not yet implemented for this effect type"),
     }

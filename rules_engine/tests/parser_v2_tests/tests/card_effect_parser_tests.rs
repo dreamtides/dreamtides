@@ -649,8 +649,8 @@ fn test_banish_up_to_n_then_materialize_them() {
         ),
         EffectWithOptions(
           effect: MaterializeCollection(
-            target: Another(Character),
-            count: UpTo(2),
+            target: Them,
+            count: All,
           ),
           optional: false,
         ),

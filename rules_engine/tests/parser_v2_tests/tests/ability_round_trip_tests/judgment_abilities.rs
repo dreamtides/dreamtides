@@ -309,3 +309,25 @@ fn test_round_trip_judgment_banish_cards_from_opponent_void_to_gain_energy() {
     let serialized = ability_serializer::serialize_ability(&parsed);
     assert_eq!(original, serialized);
 }
+
+#[test]
+fn test_round_trip_judgment_abandon_to_discover_and_materialize() {
+    let original = "{Judgment} You may abandon {subtype} to {Discover} {subtype} with cost {e} or more and {materialize} it.";
+    let parsed = parse_ability(
+        "{Judgment} You may abandon {a-subtype} to {discover} {a-subtype} with cost {e} higher and {materialize} it.",
+        "subtype: warrior, e: 2",
+    );
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_judgment_pay_to_banish_allies_then_materialize() {
+    let original = "{Judgment} You may pay {e} to {Banish} {up-to-n-allies}, then {Materialize} them.";
+    let parsed = parse_ability(
+        "{Judgment} You may pay {e} to {banish} {up-to-n-allies}, then {materialize} {it-or-them}.",
+        "e: 1, number: 2",
+    );
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}

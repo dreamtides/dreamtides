@@ -12,7 +12,7 @@ use crate::parser::{card_predicate_parser, cost_parser, predicate_parser};
 
 pub fn parser<'a>() -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
     choice((
-        choice((foresee(), discover(), counterspell_effects())).boxed(),
+        choice((foresee(), discover_and_materialize(), discover(), counterspell_effects())).boxed(),
         choice((
             choice((dissolve_all_characters(), dissolve_character())).boxed(),
             choice((
@@ -45,6 +45,17 @@ pub fn discover<'a>() -> impl Parser<'a, ParserInput<'a>, StandardEffect, Parser
         .ignore_then(article().or_not())
         .ignore_then(card_predicate_parser::parser())
         .map(|predicate| StandardEffect::Discover { predicate })
+}
+
+pub fn discover_and_materialize<'a>(
+) -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
+    directive("discover")
+        .ignore_then(article().or_not())
+        .ignore_then(card_predicate_parser::parser())
+        .then_ignore(word("and"))
+        .then_ignore(directive("materialize"))
+        .then_ignore(word("it"))
+        .map(|predicate| StandardEffect::DiscoverAndThenMaterialize { predicate })
 }
 
 pub fn counterspell<'a>(
@@ -146,10 +157,10 @@ pub fn materialize_character_at_end_of_turn<'a>(
 
 pub fn materialize_collection<'a>(
 ) -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
-    directive("materialize").ignore_then(it_or_them_count()).map(|count| {
+    directive("materialize").ignore_then(it_or_them_count()).map(|_count| {
         StandardEffect::MaterializeCollection {
-            target: Predicate::Another(CardPredicate::Character),
-            count: CollectionExpression::UpTo(count),
+            target: Predicate::Them,
+            count: CollectionExpression::All,
         }
     })
 }

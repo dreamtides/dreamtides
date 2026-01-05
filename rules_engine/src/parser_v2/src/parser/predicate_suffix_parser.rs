@@ -8,10 +8,16 @@ use crate::parser::parser_helpers::{
 
 pub fn with_cost_suffix<'a>(
 ) -> impl Parser<'a, ParserInput<'a>, (u32, Operator<Energy>), ParserExtra<'a>> + Clone {
-    words(&["with", "cost"])
-        .ignore_then(energy())
-        .then(energy_operator().or_not())
-        .map(|(cost_value, operator)| (cost_value, operator.unwrap_or(Operator::Exactly)))
+    words(&["with", "cost"]).ignore_then(energy()).then(energy_operator().or_not()).map(
+        |(cost_value, operator)| match operator {
+            Some(op) => match op {
+                Operator::HigherBy(_) => (cost_value, Operator::HigherBy(Energy(cost_value))),
+                Operator::LowerBy(_) => (cost_value, Operator::LowerBy(Energy(cost_value))),
+                _ => (cost_value, op),
+            },
+            None => (cost_value, Operator::Exactly),
+        },
+    )
 }
 
 pub fn with_spark_suffix<'a>(
@@ -63,5 +69,7 @@ fn energy_operator<'a>(
     choice((
         words(&["or", "less"]).to(Operator::OrLess),
         words(&["or", "more"]).to(Operator::OrMore),
+        word("higher").to(Operator::HigherBy(Energy(0))),
+        word("lower").to(Operator::LowerBy(Energy(0))),
     ))
 }

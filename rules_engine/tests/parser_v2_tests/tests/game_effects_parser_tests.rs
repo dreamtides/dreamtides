@@ -708,3 +708,66 @@ fn test_judgment_you_may_banish_cards_from_opponent_void_to_gain_energy() {
     ))
     "###);
 }
+
+#[test]
+fn test_judgment_you_may_abandon_subtype_to_discover_subtype_with_cost_higher_and_materialize_it() {
+    let result = parse_ability(
+        "{Judgment} You may abandon {a-subtype} to {discover} {a-subtype} with cost {e} higher and {materialize} it.",
+        "subtype: warrior, e: 2",
+    );
+    assert_ron_snapshot!(result, @r###"
+    Triggered(TriggeredAbility(
+      trigger: Keywords([
+        Judgment,
+      ]),
+      effect: WithOptions(EffectWithOptions(
+        effect: DiscoverAndThenMaterialize(
+          predicate: CardWithCost(
+            target: CharacterType(Warrior),
+            cost_operator: HigherBy(Energy(2)),
+            cost: Energy(2),
+          ),
+        ),
+        optional: true,
+        trigger_cost: Some(AbandonCharactersCount(
+          target: Any(CharacterType(Warrior)),
+          count: Exactly(1),
+        )),
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_judgment_you_may_pay_energy_to_banish_up_to_n_allies_then_materialize_them() {
+    let result = parse_ability(
+        "{Judgment} You may pay {e} to {banish} {up-to-n-allies}, then {materialize} {it-or-them}.",
+        "e: 1, number: 2",
+    );
+    assert_ron_snapshot!(result, @r###"
+    Triggered(TriggeredAbility(
+      trigger: Keywords([
+        Judgment,
+      ]),
+      effect: ListWithOptions(ListWithOptions(
+        effects: [
+          EffectWithOptions(
+            effect: BanishCollection(
+              target: Another(Character),
+              count: UpTo(2),
+            ),
+            optional: true,
+          ),
+          EffectWithOptions(
+            effect: MaterializeCollection(
+              target: Them,
+              count: All,
+            ),
+            optional: true,
+          ),
+        ],
+        trigger_cost: Some(Energy(Energy(1))),
+      )),
+    ))
+    "###);
+}
