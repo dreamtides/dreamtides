@@ -86,7 +86,6 @@ pub fn get_character_target_predicate(effect: &StandardEffect) -> Option<&Predic
         StandardEffect::PayCost { .. } => None,
         StandardEffect::PutCardsFromVoidOnTopOfDeck { .. } => None,
         StandardEffect::PutCardsFromYourDeckIntoVoid { .. } => None,
-        StandardEffect::ReturnCharactersToHandDrawCardForEach { .. } => None,
         StandardEffect::ReturnFromYourVoidToHand { .. } => None,
         StandardEffect::ReturnFromYourVoidToPlay { .. } => None,
         StandardEffect::ReturnUpToCountFromYourVoidToHand { .. } => None,

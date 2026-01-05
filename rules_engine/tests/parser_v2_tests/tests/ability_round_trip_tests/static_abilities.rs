@@ -56,3 +56,19 @@ fn test_round_trip_once_per_turn_play_from_void() {
     let serialized = ability_serializer::serialize_ability(&parsed);
     assert_eq!(original, serialized);
 }
+
+#[test]
+fn test_round_trip_reveal_top_card_of_deck() {
+    let original = "Reveal the top card of your deck.";
+    let parsed = parse_ability(original, "");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_play_characters_from_top_of_deck() {
+    let original = "You may play characters from the top of your deck.";
+    let parsed = parse_ability(original, "");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}

@@ -21,7 +21,7 @@ pub enum Cost {
     DiscardHand,
     Energy(Energy),
     LoseMaximumEnergy(u32),
-    ReturnToHand(Predicate),
+    ReturnToHand { target: Predicate, count: CollectionExpression },
     SpendOneOrMoreEnergy,
 }
 

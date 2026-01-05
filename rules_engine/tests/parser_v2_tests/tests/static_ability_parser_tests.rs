@@ -83,11 +83,14 @@ fn test_additional_cost_to_play_return_ally() {
     let result =
         parse_ability("To play this card, return an ally with cost {e} or more to hand.", "e: 4");
     assert_ron_snapshot!(result, @r###"
-    Static(StaticAbility(AdditionalCostToPlay(ReturnToHand(Another(CardWithCost(
-      target: Character,
-      cost_operator: OrMore,
-      cost: Energy(4),
-    ))))))
+    Static(StaticAbility(AdditionalCostToPlay(ReturnToHand(
+      target: Another(CardWithCost(
+        target: Character,
+        cost_operator: OrMore,
+        cost: Energy(4),
+      )),
+      count: Exactly(1),
+    ))))
     "###);
 }
 
@@ -96,11 +99,14 @@ fn test_additional_cost_to_play_with_judgment() {
     let result = parse_abilities("To play this card, return an ally with cost {e} or more to hand.\n\n{Judgment} Draw {cards}.", "e: 4, cards: 2");
     assert_ron_snapshot!(result, @r###"
     [
-      Static(StaticAbility(AdditionalCostToPlay(ReturnToHand(Another(CardWithCost(
-        target: Character,
-        cost_operator: OrMore,
-        cost: Energy(4),
-      )))))),
+      Static(StaticAbility(AdditionalCostToPlay(ReturnToHand(
+        target: Another(CardWithCost(
+          target: Character,
+          cost_operator: OrMore,
+          cost: Energy(4),
+        )),
+        count: Exactly(1),
+      )))),
       Triggered(TriggeredAbility(
         trigger: Keywords([
           Judgment,
@@ -211,5 +217,39 @@ fn test_once_per_turn_play_from_void() {
         cost: Energy(0),
       ),
     )))
+    "###);
+}
+
+#[test]
+fn test_reveal_top_card_of_deck() {
+    let result = parse_ability("Reveal the top card of your deck.", "");
+    assert_ron_snapshot!(result, @r###"
+    Static(StaticAbility(RevealTopCardOfYourDeck))
+    "###);
+}
+
+#[test]
+fn test_play_characters_from_top_of_deck() {
+    let result = parse_ability("You may play characters from the top of your deck.", "");
+    assert_ron_snapshot!(result, @r###"
+    Static(StaticAbility(YouMayPlayFromTopOfDeck(
+      matching: Character,
+    )))
+    "###);
+}
+
+#[test]
+fn test_reveal_and_play_from_top() {
+    let result = parse_abilities(
+        "Reveal the top card of your deck.\n\nYou may play characters from the top of your deck.",
+        "",
+    );
+    assert_ron_snapshot!(result, @r###"
+    [
+      Static(StaticAbility(RevealTopCardOfYourDeck)),
+      Static(StaticAbility(YouMayPlayFromTopOfDeck(
+        matching: Character,
+      ))),
+    ]
     "###);
 }

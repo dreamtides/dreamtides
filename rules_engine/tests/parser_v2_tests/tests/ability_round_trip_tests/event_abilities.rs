@@ -344,3 +344,11 @@ fn test_round_trip_each_player_shuffles_hand_and_void_and_draws() {
     let serialized = ability_serializer::serialize_ability(&parsed);
     assert_eq!(original, serialized);
 }
+
+#[test]
+fn test_round_trip_return_all_but_one_ally_draw_cards() {
+    let original = "Return all but one ally to hand. Draw {cards} for each ally returned.";
+    let parsed = parse_ability(original, "cards: 2");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}

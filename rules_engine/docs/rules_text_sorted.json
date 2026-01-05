@@ -1,7 +1,5 @@
 [
-  "Return all but one ally to hand. Draw {cards} for each ally returned.",
-  "Reveal the top card of your deck.\n\nYou may play characters from the top of your deck.",
-  "Spend one or more {energy-symbol}: Draw {cards} for each {energy-symbol} spent.",
+  "Spend 1 or more {energy-symbol}: Draw {cards} for each {energy-symbol} spent.",
   "Take an extra turn after this one.",
   "The '{Judgment}' ability of allies triggers when you {materialize} them.",
   "This character's spark is equal to the number of allied {plural-subtype}.",

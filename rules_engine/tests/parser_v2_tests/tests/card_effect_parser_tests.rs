@@ -829,3 +829,47 @@ fn test_materialized_draw_subtype_from_deck() {
     ))
     "###);
 }
+
+#[test]
+fn test_return_all_but_one_ally_to_hand_draw_cards() {
+    let result = parse_ability(
+        "Return all but one ally to hand: Draw {cards} for each ally returned.",
+        "cards: 2",
+    );
+    assert_ron_snapshot!(result, @r###"
+    Activated(ActivatedAbility(
+      costs: [
+        ReturnToHand(
+          target: Another(Character),
+          count: AllButOne,
+        ),
+      ],
+      effect: Effect(DrawCardsForEach(
+        count: 2,
+        for_each: ReturnedToHandThisWay(Character),
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_return_all_ally_to_hand_draw_cards() {
+    let result = parse_ability(
+        "Return all allies to hand: Draw {cards} for each ally returned.",
+        "cards: 1",
+    );
+    assert_ron_snapshot!(result, @r###"
+    Activated(ActivatedAbility(
+      costs: [
+        ReturnToHand(
+          target: Another(Character),
+          count: All,
+        ),
+      ],
+      effect: Effect(DrawCardsForEach(
+        count: 1,
+        for_each: ReturnedToHandThisWay(Character),
+      )),
+    ))
+    "###);
+}

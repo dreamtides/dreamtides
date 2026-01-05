@@ -83,7 +83,6 @@ pub enum StandardEffect {
     PutCardsFromVoidOnTopOfDeck { count: u32, matching: CardPredicate },
     PutCardsFromYourDeckIntoVoid { count: u32 },
     PutOnTopOfEnemyDeck { target: Predicate },
-    ReturnCharactersToHandDrawCardForEach { count: CollectionExpression },
     ReturnFromYourVoidToHand { target: Predicate },
     ReturnFromYourVoidToPlay { target: Predicate },
     ReturnToHand { target: Predicate },

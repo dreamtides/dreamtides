@@ -89,6 +89,18 @@ pub fn serialize_standard_static_ability(ability: &StandardStaticAbility) -> Str
                 serialize_card_predicate_without_article(matching)
             )
         }
+        StandardStaticAbility::RevealTopCardOfYourDeck => {
+            "reveal the top card of your deck.".to_string()
+        }
+        StandardStaticAbility::YouMayLookAtTopCardOfYourDeck => {
+            "you may look at the top card of your deck.".to_string()
+        }
+        StandardStaticAbility::YouMayPlayFromTopOfDeck { matching } => {
+            format!(
+                "you may play {} from the top of your deck.",
+                serialize_card_predicate_without_article(matching)
+            )
+        }
         _ => unimplemented!("Serialization not yet implemented for this static ability"),
     }
 }

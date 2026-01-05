@@ -425,6 +425,12 @@ fn serialize_for_count_expression(quantity_expression: &QuantityExpression) -> S
         QuantityExpression::AbandonedThisTurn(CardPredicate::Character) => {
             "ally abandoned this turn".to_string()
         }
+        QuantityExpression::AbandonedThisWay(CardPredicate::Character) => {
+            "ally abandoned".to_string()
+        }
+        QuantityExpression::ReturnedToHandThisWay(CardPredicate::Character) => {
+            "ally returned".to_string()
+        }
         QuantityExpression::ForEachEnergySpentOnThisCard => "{energy-symbol} spent".to_string(),
         _ => {
             unimplemented!("Serialization not yet implemented for this quantity expression")

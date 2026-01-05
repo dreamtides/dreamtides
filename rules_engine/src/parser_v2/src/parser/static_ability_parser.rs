@@ -47,6 +47,8 @@ fn standard_static_ability<'a>(
         allied_spark_bonus(),
         enemy_cards_cost_increase(),
         your_cards_cost_modification(),
+        reveal_top_card_of_deck(),
+        play_from_top_of_deck(),
     ))
     .boxed()
 }
@@ -230,4 +232,20 @@ fn additional_cost_to_play<'a>(
         .ignore_then(cost_parser::cost_parser())
         .then_ignore(period())
         .map(StandardStaticAbility::AdditionalCostToPlay)
+}
+
+fn reveal_top_card_of_deck<'a>(
+) -> impl Parser<'a, ParserInput<'a>, StandardStaticAbility, ParserExtra<'a>> + Clone {
+    words(&["reveal", "the", "top", "card", "of", "your", "deck"])
+        .ignore_then(period())
+        .to(StandardStaticAbility::RevealTopCardOfYourDeck)
+}
+
+fn play_from_top_of_deck<'a>(
+) -> impl Parser<'a, ParserInput<'a>, StandardStaticAbility, ParserExtra<'a>> + Clone {
+    words(&["you", "may", "play"])
+        .ignore_then(card_predicate_parser::parser())
+        .then_ignore(words(&["from", "the", "top", "of", "your", "deck"]))
+        .then_ignore(period())
+        .map(|matching| StandardStaticAbility::YouMayPlayFromTopOfDeck { matching })
 }

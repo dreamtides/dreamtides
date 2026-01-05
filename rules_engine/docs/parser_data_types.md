@@ -89,7 +89,6 @@ ReturnToHand { target: Predicate }
 ReturnFromYourVoidToHand { target: Predicate }
 ReturnFromYourVoidToPlay { target: Predicate }
 ReturnUpToCountFromYourVoidToHand { target: Predicate, count: u32 }
-ReturnCharactersToHandDrawCardForEach { count: CollectionExpression }
 PutCardsFromYourDeckIntoVoid { count: u32 }
 PutCardsFromVoidOnTopOfDeck { count: u32, matching: CardPredicate }
 PutOnTopOfEnemyDeck { target: Predicate }
@@ -256,6 +255,7 @@ pub enum Cost {
     BanishCardsFromEnemyVoid(u32),
     BanishAllCardsFromYourVoid,
     BanishFromHand(Predicate),
+    ReturnToHand { target: Predicate, count: CollectionExpression },
     SpendOneOrMoreEnergy,
     CostList(Vec<Cost>),  // Multiple costs combined
 }
@@ -383,6 +383,7 @@ pub enum QuantityExpression {
     DiscardedThisTurn(CardPredicate),
     DissolvedThisTurn(CardPredicate),
     PlayedThisTurn(CardPredicate),
+    ReturnedToHandThisWay(CardPredicate), // Cards returned to hand by this effect
     ForEachEnergySpentOnThisCard,
 }
 ```

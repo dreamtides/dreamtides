@@ -49,8 +49,23 @@ pub fn serialize_cost(cost: &Cost) -> String {
         Cost::BanishFromHand(predicate) => {
             format!("{{Banish}} {} from hand", serialize_predicate(predicate))
         }
-        Cost::ReturnToHand(predicate) => {
-            format!("return {} to hand", serialize_predicate(predicate))
+        Cost::ReturnToHand { target, count } => {
+            use ability_data::collection_expression::CollectionExpression;
+            match count {
+                CollectionExpression::Exactly(1) => {
+                    format!("return {} to hand", serialize_predicate(target))
+                }
+                CollectionExpression::AllButOne => {
+                    format!("return all but one {} to hand", serialize_predicate(target))
+                }
+                CollectionExpression::All => {
+                    format!("return all {} to hand", serialize_predicate(target))
+                }
+                CollectionExpression::AnyNumberOf => {
+                    format!("return any number of {} to hand", serialize_predicate(target))
+                }
+                _ => unimplemented!("Serialization not yet implemented for this collection expression in return to hand cost"),
+            }
         }
         Cost::SpendOneOrMoreEnergy => "pay 1 or more {energy-symbol}".to_string(),
         _ => unimplemented!("Serialization not yet implemented for this cost type"),

@@ -48,11 +48,19 @@ pub fn lose_maximum_energy_cost<'a>(
 
 pub fn return_to_hand_cost<'a>() -> impl Parser<'a, ParserInput<'a>, Cost, ParserExtra<'a>> + Clone
 {
-    word("return")
-        .ignore_then(article())
-        .ignore_then(predicate_parser::predicate_parser())
-        .then_ignore(words(&["to", "hand"]))
-        .map(Cost::ReturnToHand)
+    choice((
+        word("return")
+            .ignore_then(collection_expression_for_return_cost())
+            .then(predicate_parser::predicate_parser())
+            .then_ignore(words(&["to", "hand"]))
+            .map(|(count, target)| Cost::ReturnToHand { target, count }),
+        word("return")
+            .ignore_then(article())
+            .ignore_then(predicate_parser::predicate_parser())
+            .then_ignore(words(&["to", "hand"]))
+            .map(|target| Cost::ReturnToHand { target, count: CollectionExpression::Exactly(1) }),
+    ))
+    .boxed()
 }
 
 pub fn banish_cards_from_your_void_cost<'a>(
@@ -76,6 +84,16 @@ pub fn abandon_cost_single<'a>() -> impl Parser<'a, ParserInput<'a>, Cost, Parse
     word("abandon").ignore_then(article()).ignore_then(predicate_parser::predicate_parser()).map(
         |target| Cost::AbandonCharactersCount { target, count: CollectionExpression::Exactly(1) },
     )
+}
+
+fn collection_expression_for_return_cost<'a>(
+) -> impl Parser<'a, ParserInput<'a>, CollectionExpression, ParserExtra<'a>> + Clone {
+    choice((
+        words(&["all", "but", "one"]).to(CollectionExpression::AllButOne),
+        word("all").to(CollectionExpression::All),
+        words(&["any", "number", "of"]).to(CollectionExpression::AnyNumberOf),
+    ))
+    .boxed()
 }
 
 fn spend_one_or_more_energy_cost<'a>(

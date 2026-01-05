@@ -45,7 +45,6 @@ fn card_effects<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>>
         banish_card_from_enemy_void(),
         discard_card_from_enemy_hand_then_they_draw(),
         discard_card_from_enemy_hand(),
-        return_all_but_one_character_draw_card_for_each(),
         put_on_top_of_deck(),
         put_cards_from_void_on_top_of_deck(),
         spend_all_energy_draw_and_discard(),
@@ -401,16 +400,6 @@ fn each_matching_gains_spark_for_each<'a>()
             gains: Spark(1),
             for_each,
         })
-}
-
-fn return_all_but_one_character_draw_card_for_each<'a>()
--> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
-    phrase("return")
-        .ignore_then(collection_expression_parser::parser())
-        .then_ignore(phrase(
-            "character you control to hand. draw a card for each character returned",
-        ))
-        .map(|count| StandardEffect::ReturnCharactersToHandDrawCardForEach { count })
 }
 
 fn banish_character<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {

@@ -14,4 +14,5 @@ pub enum QuantityExpression {
     ForEachEnergySpentOnThisCard,
     Matching(Predicate),
     PlayedThisTurn(CardPredicate),
+    ReturnedToHandThisWay(CardPredicate),
 }

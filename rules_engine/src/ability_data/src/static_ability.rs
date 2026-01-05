@@ -42,6 +42,7 @@ pub enum StandardStaticAbility {
     PlayForAlternateCost(AlternateCost),
     PlayFromVoid(PlayFromVoid),
     PlayOnlyFromVoid,
+    RevealTopCardOfYourDeck,
     SparkBonusYourCharacters { matching: CardPredicate, added_spark: Spark },
     SparkBonusOtherCharacters { matching: CardPredicate, added_spark: Spark },
     SparkEqualToPredicateCount { predicate: Predicate },
