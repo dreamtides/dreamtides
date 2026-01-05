@@ -239,3 +239,25 @@ fn test_banish_from_hand_alternate_cost_prevent_enemy_card() {
     ))
     "###);
 }
+
+#[test]
+fn test_lose_maximum_energy_alternate_cost_prevent_card() {
+    let result = parse_abilities(
+        "Lose {maximum-energy}: Play this event for {e}.\n\n{Prevent} a played card.",
+        "max: 1, e: 0",
+    );
+    assert_eq!(result.len(), 2);
+    assert_ron_snapshot!(result[0], @r###"
+    Static(StaticAbility(PlayForAlternateCost(AlternateCost(
+      energy_cost: Energy(0),
+      additional_cost: Some(LoseMaximumEnergy(1)),
+    ))))
+    "###);
+    assert_ron_snapshot!(result[1], @r###"
+    Event(EventAbility(
+      effect: Effect(Counterspell(
+        target: Any(Card),
+      )),
+    ))
+    "###);
+}

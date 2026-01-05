@@ -31,6 +31,7 @@ pub fn serialize_cost(cost: &Cost) -> String {
         }
         Cost::DiscardHand => "discard your hand".to_string(),
         Cost::Energy(_) => "{e}".to_string(),
+        Cost::LoseMaximumEnergy(_) => "lose {maximum-energy}".to_string(),
         Cost::AbandonACharacterOrDiscardACard => "abandon an ally or discard a card".to_string(),
         Cost::BanishCardsFromYourVoid(count) => {
             if *count == 1 {

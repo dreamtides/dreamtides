@@ -88,6 +88,9 @@ pub fn serialize_standard_static_ability(ability: &StandardStaticAbility) -> Str
 fn serialize_condition(condition: &Condition) -> String {
     match condition {
         Condition::DissolvedThisTurn { .. } => "if a character dissolved this turn".to_string(),
+        Condition::CardsDiscardedThisTurn { count: 1 } => {
+            "if you have discarded a card this turn".to_string()
+        }
         _ => unimplemented!("Serialization not yet implemented for this condition type"),
     }
 }

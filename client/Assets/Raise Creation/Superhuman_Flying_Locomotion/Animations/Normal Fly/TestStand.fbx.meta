@@ -1,13 +1,5 @@
 fileFormatVersion: 2
-guid: a0366036a5ffd9f4a98127b87bdff838
-AssetOrigin:
-  serializedVersion: 1
-  productId: 314068
-  packageName: Superhuman Flying Locomotion
-  packageVersion: 1.0
-  assetPath: Assets/Raise Creation/Superhuman_Flying_Locomotion/Animations/Normal
-    Fly/Anim_Fly_Normal_Rightmove.fbx
-  uploadId: 740859
+guid: 17ee7b51509a5482e9dae5cf1fbab07f
 ModelImporter:
   serializedVersion: 24200
   internalIDToNameTable: []
@@ -39,11 +31,11 @@ ModelImporter:
     extraUserProperties: []
     clipAnimations:
     - serializedVersion: 16
-      name: Anim_Fly_Normal_Rightmove
+      name: Anim_Fly_Stand
       takeName: Take 001
       internalID: 1827226128182048838
       firstFrame: 1
-      lastFrame: 100
+      lastFrame: 120
       wrapMode: 0
       orientationOffsetY: 0
       level: 0

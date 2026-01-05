@@ -12,6 +12,7 @@ pub fn condition_parser<'a>() -> impl Parser<'a, ParserInput<'a>, Condition, Par
 {
     choice((
         dissolved_this_turn(),
+        discarded_this_turn(),
         with_count_allies_that_share_a_character_type(),
         with_count_allied_subtype(),
     ))
@@ -44,4 +45,13 @@ fn dissolved_this_turn<'a>() -> impl Parser<'a, ParserInput<'a>, Condition, Pars
         .ignore_then(card_predicate_parser::parser())
         .then_ignore(words(&["dissolved", "this", "turn"]))
         .map(|predicate| Condition::DissolvedThisTurn { predicate: Predicate::Any(predicate) })
+}
+
+fn discarded_this_turn<'a>() -> impl Parser<'a, ParserInput<'a>, Condition, ParserExtra<'a>> + Clone
+{
+    words(&["you", "have", "discarded"])
+        .ignore_then(word("a"))
+        .ignore_then(card_predicate_parser::parser())
+        .then_ignore(words(&["this", "turn"]))
+        .map(|_| Condition::CardsDiscardedThisTurn { count: 1 })
 }

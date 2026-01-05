@@ -128,6 +128,12 @@ pub fn kindle_amount<'a>() -> impl Parser<'a, ParserInput<'a>, u32, ParserExtra<
     }
 }
 
+pub fn maximum_energy<'a>() -> impl Parser<'a, ParserInput<'a>, u32, ParserExtra<'a>> + Clone {
+    select! {
+        (ResolvedToken::Integer { directive, value }, _) if directive == "maximum-energy" => value
+    }
+}
+
 pub fn article<'a>() -> impl Parser<'a, ParserInput<'a>, (), ParserExtra<'a>> + Clone {
     choice((word("a"), word("an")))
 }

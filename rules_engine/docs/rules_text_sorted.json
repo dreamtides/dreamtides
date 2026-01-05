@@ -1,6 +1,4 @@
 [
-  "If you have discarded a card this turn, this character costs {e}.",
-  "Lose {maximum-energy}: Play this event for {e}.\n\n{Prevent} a played card.",
   "Once per turn, you may play a character with cost {e} or less from your void.",
   "Pay 1 or more {energy-symbol}: Draw {cards} for each {energy-symbol} spent, then discard {discards}.",
   "Pay any amount of {energy-symbol}: {Dissolve} each character with spark less than the amount of {energy-symbol} paid.",

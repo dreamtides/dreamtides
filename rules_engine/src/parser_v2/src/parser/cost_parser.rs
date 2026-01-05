@@ -5,8 +5,8 @@ use chumsky::prelude::*;
 use core_data::numerics::Energy;
 
 use crate::parser::parser_helpers::{
-    article, cards, count, count_allies, directive, discards, energy, word, words, ParserExtra,
-    ParserInput,
+    article, cards, count, count_allies, directive, discards, energy, maximum_energy, word, words,
+    ParserExtra, ParserInput,
 };
 use crate::parser::{card_predicate_parser, predicate_parser};
 
@@ -38,6 +38,11 @@ pub fn banish_from_hand_cost<'a>() -> impl Parser<'a, ParserInput<'a>, Cost, Par
         .ignore_then(card_predicate_parser::parser())
         .then_ignore(words(&["from", "hand"]))
         .map(|predicate| Cost::BanishFromHand(Predicate::Any(predicate)))
+}
+
+pub fn lose_maximum_energy_cost<'a>(
+) -> impl Parser<'a, ParserInput<'a>, Cost, ParserExtra<'a>> + Clone {
+    word("lose").ignore_then(maximum_energy()).map(Cost::LoseMaximumEnergy)
 }
 
 pub fn return_to_hand_cost<'a>() -> impl Parser<'a, ParserInput<'a>, Cost, ParserExtra<'a>> + Clone

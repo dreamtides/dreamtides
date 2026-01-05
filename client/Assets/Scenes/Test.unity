@@ -119,6 +119,105 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1001 &518717744
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 363634375178615457, guid: 77d9e03413374fa44a1299ea62f0b053, type: 3}
+      propertyPath: m_Controller
+      value: 
+      objectReference: {fileID: 9100000, guid: b2f9dd416660647f0874932241af073c, type: 2}
+    - target: {fileID: 363634375178615457, guid: 77d9e03413374fa44a1299ea62f0b053, type: 3}
+      propertyPath: m_WarningMessage
+      value: "\nBinding warning: Some generic clip(s) animate transforms that are
+        already bound by a Humanoid avatar. These transforms can only be changed
+        by Humanoid clips.\n\tTransform 'ball_l'\n\tTransform 'foot_l'\n\tTransform
+        'foot_r'\n\tTransform 'ball_r'\n\tFrom animation clip 'FootFix'"
+      objectReference: {fileID: 0}
+    - target: {fileID: 2919284019603447333, guid: 77d9e03413374fa44a1299ea62f0b053, type: 3}
+      propertyPath: m_DirtyAABB
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2919284019603447333, guid: 77d9e03413374fa44a1299ea62f0b053, type: 3}
+      propertyPath: m_AABB.m_Center.x
+      value: 0.0002233386
+      objectReference: {fileID: 0}
+    - target: {fileID: 2919284019603447333, guid: 77d9e03413374fa44a1299ea62f0b053, type: 3}
+      propertyPath: m_AABB.m_Center.y
+      value: 0.9386282
+      objectReference: {fileID: 0}
+    - target: {fileID: 2919284019603447333, guid: 77d9e03413374fa44a1299ea62f0b053, type: 3}
+      propertyPath: m_AABB.m_Center.z
+      value: -0.05480723
+      objectReference: {fileID: 0}
+    - target: {fileID: 2919284019603447333, guid: 77d9e03413374fa44a1299ea62f0b053, type: 3}
+      propertyPath: m_AABB.m_Extent.x
+      value: 0.9424165
+      objectReference: {fileID: 0}
+    - target: {fileID: 2919284019603447333, guid: 77d9e03413374fa44a1299ea62f0b053, type: 3}
+      propertyPath: m_AABB.m_Extent.y
+      value: 0.9540676
+      objectReference: {fileID: 0}
+    - target: {fileID: 2919284019603447333, guid: 77d9e03413374fa44a1299ea62f0b053, type: 3}
+      propertyPath: m_AABB.m_Extent.z
+      value: 0.26107663
+      objectReference: {fileID: 0}
+    - target: {fileID: 4490094177596422941, guid: 77d9e03413374fa44a1299ea62f0b053, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4490094177596422941, guid: 77d9e03413374fa44a1299ea62f0b053, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4490094177596422941, guid: 77d9e03413374fa44a1299ea62f0b053, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4490094177596422941, guid: 77d9e03413374fa44a1299ea62f0b053, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4490094177596422941, guid: 77d9e03413374fa44a1299ea62f0b053, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4490094177596422941, guid: 77d9e03413374fa44a1299ea62f0b053, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4490094177596422941, guid: 77d9e03413374fa44a1299ea62f0b053, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4490094177596422941, guid: 77d9e03413374fa44a1299ea62f0b053, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4490094177596422941, guid: 77d9e03413374fa44a1299ea62f0b053, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 180
+      objectReference: {fileID: 0}
+    - target: {fileID: 4490094177596422941, guid: 77d9e03413374fa44a1299ea62f0b053, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4942079891879379738, guid: 77d9e03413374fa44a1299ea62f0b053, type: 3}
+      propertyPath: m_Name
+      value: ScifiCivilians_02
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 4942079891879379738, guid: 77d9e03413374fa44a1299ea62f0b053, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1693658482}
+  m_SourcePrefab: {fileID: 100100000, guid: 77d9e03413374fa44a1299ea62f0b053, type: 3}
 --- !u!1 &1003515995
 GameObject:
   m_ObjectHideFlags: 0
@@ -229,7 +328,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Dreamtides::FlyingFootFixer
   applyFix: 1
-  footPitchAngle: 30
+  leftFootRotation: {x: -30, y: 0, z: 0}
+  rightFootRotation: {x: -60, y: 0, z: 0}
   blendWeight: 1
   animationStateName: 
   animatorLayer: 0
@@ -272,6 +372,10 @@ PrefabInstance:
     - target: {fileID: 4932585734828693027, guid: b1656b6b68ea673458fe64e8e4166e8e, type: 3}
       propertyPath: m_Name
       value: SamuraiWarriors_03
+      objectReference: {fileID: 0}
+    - target: {fileID: 4932585734828693027, guid: b1656b6b68ea673458fe64e8e4166e8e, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6641138764540066733, guid: b1656b6b68ea673458fe64e8e4166e8e, type: 3}
       propertyPath: m_Controller
@@ -333,6 +437,29 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 1075204867}
   m_SourcePrefab: {fileID: 100100000, guid: b1656b6b68ea673458fe64e8e4166e8e, type: 3}
+--- !u!1 &1693658479 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4942079891879379738, guid: 77d9e03413374fa44a1299ea62f0b053, type: 3}
+  m_PrefabInstance: {fileID: 518717744}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1693658482
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1693658479}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 216e6eff78b484acf9fdab60af108819, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Dreamtides::FlyingFootFixer
+  applyFix: 1
+  leftFootRotation: {x: 0, y: 0, z: 0}
+  rightFootRotation: {x: -60, y: 0, z: 0}
+  blendWeight: 1
+  animationStateName: 
+  animatorLayer: 0
 --- !u!1 &2123959637
 GameObject:
   m_ObjectHideFlags: 0
@@ -437,3 +564,4 @@ SceneRoots:
   - {fileID: 1003515998}
   - {fileID: 2123959639}
   - {fileID: 1452999779}
+  - {fileID: 518717744}

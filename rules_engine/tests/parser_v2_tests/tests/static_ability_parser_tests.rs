@@ -169,3 +169,30 @@ fn test_events_cost_you_more() {
     )))
     "###);
 }
+
+#[test]
+fn test_character_costs_if_discarded_card_this_turn() {
+    let result =
+        parse_ability("This character costs {e} if you have discarded a card this turn.", "e: 1");
+    assert_ron_snapshot!(result, @r###"
+    Static(WithOptions(StaticAbilityWithOptions(
+      ability: PlayForAlternateCost(AlternateCost(
+        energy_cost: Energy(1),
+      )),
+      condition: Some(CardsDiscardedThisTurn(
+        count: 1,
+      )),
+    )))
+    "###);
+}
+
+#[test]
+fn test_lose_maximum_energy_play_for_alternate_cost() {
+    let result = parse_ability("Lose {maximum-energy}: Play this event for {e}.", "max: 1, e: 0");
+    assert_ron_snapshot!(result, @r###"
+    Static(StaticAbility(PlayForAlternateCost(AlternateCost(
+      energy_cost: Energy(0),
+      additional_cost: Some(LoseMaximumEnergy(1)),
+    ))))
+    "###);
+}
