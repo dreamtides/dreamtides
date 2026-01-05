@@ -524,6 +524,44 @@ fn test_spanned_dissolved_you_may_pay_return_to_hand() {
 }
 
 #[test]
+fn test_spanned_dissolved_kindle() {
+    let SpannedAbility::Triggered(triggered) =
+        parse_spanned_ability("{Dissolved} {Kindle}.", "k: 1")
+    else {
+        panic!("Expected Triggered ability");
+    };
+
+    assert_eq!(triggered.trigger.text, "{Dissolved}");
+    assert_valid_span(&triggered.trigger.span);
+
+    let SpannedEffect::Effect(effect) = triggered.effect else {
+        panic!("Expected Effect, got Modal");
+    };
+    assert_eq!(effect.text.trim(), "{Kindle}.");
+    assert_valid_span(&effect.span);
+}
+
+#[test]
+fn test_spanned_when_allied_subtype_dissolved_kindle() {
+    let SpannedAbility::Triggered(triggered) = parse_spanned_ability(
+        "When an allied {subtype} is {dissolved}, {Kindle}.",
+        "subtype: warrior, k: 1",
+    ) else {
+        panic!("Expected Triggered ability");
+    };
+
+    assert_eq!(triggered.once_per_turn, None);
+    assert_eq!(triggered.trigger.text, "When an allied {subtype} is {dissolved}");
+    assert_valid_span(&triggered.trigger.span);
+
+    let SpannedEffect::Effect(effect) = triggered.effect else {
+        panic!("Expected Effect, got Modal");
+    };
+    assert_eq!(effect.text.trim(), "{Kindle}.");
+    assert_valid_span(&effect.span);
+}
+
+#[test]
 fn test_spanned_materialized_prevent_played_card_with_cost() {
     let SpannedAbility::Triggered(triggered) = parse_spanned_ability(
         "{Materialized} {Prevent} a played card with cost {e} or less.",

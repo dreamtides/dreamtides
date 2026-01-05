@@ -757,3 +757,34 @@ fn test_materialized_banish_any_number_of_allies_then_materialize_them() {
     ))
     "###);
 }
+
+#[test]
+fn test_dissolved_kindle() {
+    let result = parse_ability("{Dissolved} {Kindle}.", "k: 1");
+    assert_ron_snapshot!(result, @r###"
+    Triggered(TriggeredAbility(
+      trigger: Keywords([
+        Dissolved,
+      ]),
+      effect: Effect(Kindle(
+        amount: Spark(1),
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_when_allied_subtype_dissolved_kindle() {
+    let result = parse_ability(
+        "When an allied {subtype} is {dissolved}, {kindle}.",
+        "subtype: warrior, k: 1",
+    );
+    assert_ron_snapshot!(result, @r###"
+    Triggered(TriggeredAbility(
+      trigger: Dissolved(Another(CharacterType(Warrior))),
+      effect: Effect(Kindle(
+        amount: Spark(1),
+      )),
+    ))
+    "###);
+}
