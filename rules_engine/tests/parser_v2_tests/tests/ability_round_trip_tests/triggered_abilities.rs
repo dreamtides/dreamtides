@@ -257,3 +257,19 @@ fn test_round_trip_when_allied_subtype_dissolved_kindle() {
     let serialized = ability_serializer::serialize_ability(&parsed);
     assert_eq!(original, serialized);
 }
+
+#[test]
+fn test_round_trip_dissolved_subtype_in_void_gains_reclaim() {
+    let original = "{Dissolved} {A-subtype} in your void gains {reclaim} equal to its cost.";
+    let parsed = parse_ability(original, "subtype: warrior");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_dissolved_draw_cards() {
+    let original = "{Dissolved} Draw {cards}.";
+    let parsed = parse_ability(original, "cards: 1");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}

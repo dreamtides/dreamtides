@@ -169,9 +169,12 @@ pub fn cards_in_void_gain_reclaim<'a>(
     article()
         .ignore_then(card_predicate_parser::parser())
         .then_ignore(words(&["in", "your", "void", "gains"]))
-        .then(reclaim_cost())
+        .then_ignore(choice((
+            reclaim_cost().ignored(),
+            directive("reclaim").then_ignore(words(&["equal", "to", "its", "cost"])),
+        )))
         .then_ignore(words(&["this", "turn"]).or_not())
-        .map(|(predicate, _cost)| StandardEffect::CardsInVoidGainReclaimThisTurn {
+        .map(|predicate| StandardEffect::CardsInVoidGainReclaimThisTurn {
             count: CollectionExpression::Exactly(1),
             predicate,
         })

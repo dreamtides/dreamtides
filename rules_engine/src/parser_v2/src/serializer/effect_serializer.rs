@@ -309,7 +309,7 @@ fn serialize_cards_in_void_gain_reclaim_this_turn(
     match count {
         CollectionExpression::Exactly(1) => {
             format!(
-                "{} in your void gains {{reclaim-for-cost}} this turn.",
+                "{} in your void gains {{reclaim}} equal to its cost.",
                 serialize_card_predicate(predicate)
             )
         }
