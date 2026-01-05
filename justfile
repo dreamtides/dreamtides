@@ -85,7 +85,26 @@ battle-test *args='':
     cargo test --manifest-path rules_engine/Cargo.toml -p battle_tests "$@"
 
 parser-test *args='':
-    RUST_MIN_STACK=8388608 cargo test --manifest-path rules_engine/Cargo.toml -p parser_v2_tests -- --test-threads=4 "$@"
+    #!/usr/bin/env bash
+    output=$(RUST_MIN_STACK=8388608 cargo test -q --manifest-path rules_engine/Cargo.toml -p parser_v2_tests -- --test-threads=4 "$@" 2>&1)
+    exit_code=$?
+    if [ $exit_code -eq 0 ]; then
+        echo "Success"
+    else
+        echo "$output" | grep -v "^running 0 tests$" | grep -v "^test result: ok\." | sed '/^$/N;/^\n$/D'
+        exit 1
+    fi
+
+parser-test-insta *args='':
+    #!/usr/bin/env bash
+    output=$(INSTA_UPDATE=always RUST_MIN_STACK=8388608 cargo test -q --manifest-path rules_engine/Cargo.toml -p parser_v2_tests -- --test-threads=4 "$@" 2>&1)
+    exit_code=$?
+    if [ $exit_code -eq 0 ]; then
+        echo "Success"
+    else
+        echo "$output" | grep -v "^running 0 tests$" | grep -v "^test result: ok\." | sed '/^$/N;/^\n$/D'
+        exit 1
+    fi
 
 doc:
     cargo doc --manifest-path rules_engine/Cargo.toml
