@@ -1266,11 +1266,11 @@ energy-cost = 2
 rules-text = """
 Has all character types.
 
-{Judgment} If {count-allies} share a character type, Draw {cards}."""
+{Judgment} With {count-allies} that share a character type, draw {cards}."""
 preview = """
 Has all character types.
 
-▸ Judgment: If 3 allies share a character type, Draw a card."""
+▸ Judgment: With 3 allies that share a character type, Draw a card."""
 variables = """
 allies: 3
 cards: 1"""
@@ -1638,8 +1638,9 @@ card-number = 96
 name = "The Power Within"
 id = "be92ff6f-a468-4545-8ea2-cd8c3c53cb9a"
 energy-cost = 1
-rules-text = "Double the number of cards you draw from card effects this turn."
+rules-text = "{MultiplyBy} the number of cards you draw from card effects this turn."
 preview = "Double the number of cards you draw from card effects this turn."
+variables = "number: 2"
 card-type = "Event"
 is-fast = false
 image-number = 717263302
@@ -1755,8 +1756,9 @@ card-number = 104
 name = "Catalyst Ignition"
 id = "90a624db-d288-4856-afc9-f9222e67d3bd"
 energy-cost = 2
-rules-text = "Double the amount of {energy-symbol} you gain from from card effects this turn."
+rules-text = "{MultiplyBy} the amount of {energy-symbol} you gain from from card effects this turn."
 preview = "Double the amount of ● you gain from from card effects this turn."
+variables = "number: 2"
 card-type = "Event"
 is-fast = false
 image-number = 1529898278
