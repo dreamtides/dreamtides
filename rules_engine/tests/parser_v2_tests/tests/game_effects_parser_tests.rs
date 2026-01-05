@@ -891,3 +891,35 @@ fn test_materialized_event_in_void_gains_reclaim() {
     ))
     "###);
 }
+
+#[test]
+fn test_materialized_copy_next_event() {
+    let result = parse_ability(
+        "{Materialized} Copy the next event you play {this-turn-times}.",
+        "number: 1",
+    );
+    assert_ron_snapshot!(result, @r###"
+    Triggered(TriggeredAbility(
+      trigger: Keywords([
+        Materialized,
+      ]),
+      effect: Effect(CopyNextPlayed(
+        matching: Any(Event),
+        times: Some(1),
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_event_copy_next_event() {
+    let result = parse_ability("Copy the next event you play {this-turn-times}.", "number: 2");
+    assert_ron_snapshot!(result, @r###"
+    Event(EventAbility(
+      effect: Effect(CopyNextPlayed(
+        matching: Any(Event),
+        times: Some(2),
+      )),
+    ))
+    "###);
+}

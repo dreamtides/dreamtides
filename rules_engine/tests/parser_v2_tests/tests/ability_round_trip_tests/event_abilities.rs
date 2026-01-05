@@ -272,3 +272,11 @@ fn test_round_trip_materialize_a_figment_for_each_card_played_this_turn() {
     let serialized = ability_serializer::serialize_ability(&parsed);
     assert_eq!(original, serialized);
 }
+
+#[test]
+fn test_round_trip_copy_next_event() {
+    let original = "Copy the next event you play {this-turn-times}.";
+    let parsed = parse_ability(original, "number: 2");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}

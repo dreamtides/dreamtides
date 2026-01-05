@@ -1,7 +1,4 @@
 [
-  "{Materialized} Copy the next event you play {this-turn-times}.",
-  "{Materialized} Disable the activated abilities of an enemy while this character is in play.",
-  "{Materialized} Draw {a-subtype} from your deck.",
   "Abandon an ally: Play this character for {e}, then abandon it.\n\n{Materialized} {Dissolve} an enemy.",
   "Abandon an ally: You may {dissolve} an enemy with spark less than that ally's spark.",
   "Additional Cost: Return an ally with cost {e} or more to hand.\n\n{Judgment} Draw {cards}.",

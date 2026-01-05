@@ -229,6 +229,16 @@ pub fn serialize_standard_effect(effect: &StandardEffect) -> String {
         StandardEffect::MultiplyYourEnergy { .. } => {
             "{MultiplyBy} the amount of {energy-symbol} you have.".to_string()
         }
+        StandardEffect::CopyNextPlayed { .. } => {
+            "copy the next event you play {this-turn-times}.".to_string()
+        }
+        StandardEffect::DisableActivatedAbilitiesWhileInPlay { target } => format!(
+            "disable the activated abilities of {} while this character is in play.",
+            serialize_predicate(target)
+        ),
+        StandardEffect::DrawMatchingCard { predicate } => {
+            format!("draw {} from your deck.", serialize_card_predicate(predicate))
+        }
         _ => unimplemented!("Serialization not yet implemented for this effect type"),
     }
 }

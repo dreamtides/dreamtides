@@ -6,7 +6,7 @@ use chumsky::prelude::*;
 
 use crate::parser::parser_helpers::{
     article, cards, directive, figment, figment_count, foresee_count, it_or_them_count, number,
-    up_to_n_allies, word, words, ParserExtra, ParserInput,
+    this_turn_times, up_to_n_allies, word, words, ParserExtra, ParserInput,
 };
 use crate::parser::{
     card_predicate_parser, cost_parser, predicate_parser, quantity_expression_parser,
@@ -14,7 +14,14 @@ use crate::parser::{
 
 pub fn parser<'a>() -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
     choice((
-        choice((foresee(), discover_and_materialize(), discover(), counterspell_effects())).boxed(),
+        choice((
+            copy_next_played(),
+            foresee(),
+            discover_and_materialize(),
+            discover(),
+            counterspell_effects(),
+        ))
+        .boxed(),
         choice((
             choice((dissolve_all_characters(), dissolve_character())).boxed(),
             choice((
@@ -234,6 +241,17 @@ pub fn materialize_figments_quantity<'a>(
             figment,
             count: 1,
             quantity,
+        })
+}
+
+pub fn copy_next_played<'a>(
+) -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
+    word("copy")
+        .ignore_then(words(&["the", "next", "event", "you", "play"]))
+        .ignore_then(this_turn_times())
+        .map(|times| StandardEffect::CopyNextPlayed {
+            matching: Predicate::Any(CardPredicate::Event),
+            times: Some(times),
         })
 }
 

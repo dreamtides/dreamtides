@@ -19,7 +19,8 @@ pub fn parser<'a>() -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserEx
         ))
         .boxed(),
         choice((
-            choice((draw_cards_for_each(), draw_cards(), discard_cards())).boxed(),
+            choice((draw_cards_for_each(), draw_matching_card(), draw_cards(), discard_cards()))
+                .boxed(),
             choice((
                 gain_energy_equal_to_abandoned_cost(),
                 gain_energy_for_each(),
@@ -45,6 +46,15 @@ pub fn parser<'a>() -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserEx
 pub fn draw_cards<'a>() -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone
 {
     word("draw").ignore_then(cards()).map(|count| StandardEffect::DrawCards { count })
+}
+
+pub fn draw_matching_card<'a>(
+) -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
+    word("draw")
+        .ignore_then(article().or_not())
+        .ignore_then(card_predicate_parser::parser())
+        .then_ignore(words(&["from", "your", "deck"]))
+        .map(|predicate| StandardEffect::DrawMatchingCard { predicate })
 }
 
 pub fn discard_cards<'a>(

@@ -797,3 +797,19 @@ fn test_discover_character_with_activated_ability() {
     ))
     "###);
 }
+
+#[test]
+fn test_materialized_draw_subtype_from_deck() {
+    let result =
+        parse_ability("{Materialized} Draw {a-subtype} from your deck.", "subtype: warrior");
+    assert_ron_snapshot!(result, @r###"
+    Triggered(TriggeredAbility(
+      trigger: Keywords([
+        Materialized,
+      ]),
+      effect: Effect(DrawMatchingCard(
+        predicate: CharacterType(Warrior),
+      )),
+    ))
+    "###);
+}

@@ -355,3 +355,28 @@ fn test_round_trip_materialized_event_in_void_gains_reclaim() {
     let serialized = ability_serializer::serialize_ability(&parsed);
     assert_eq!(original, serialized);
 }
+
+#[test]
+fn test_round_trip_materialized_copy_next_event() {
+    let original = "{Materialized} Copy the next event you play {this-turn-times}.";
+    let parsed = parse_ability(original, "number: 1");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_materialized_disable_activated_abilities() {
+    let original =
+        "{Materialized} Disable the activated abilities of an enemy while this character is in play.";
+    let parsed = parse_ability(original, "");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_materialized_draw_subtype() {
+    let original = "{Materialized} Draw {a-subtype} from your deck.";
+    let parsed = parse_ability(original, "subtype: warrior");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
