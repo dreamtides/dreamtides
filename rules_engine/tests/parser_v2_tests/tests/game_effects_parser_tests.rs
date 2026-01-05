@@ -923,3 +923,16 @@ fn test_event_copy_next_event() {
     ))
     "###);
 }
+
+#[test]
+fn test_event_trigger_additional_judgment_phase() {
+    let result = parse_ability(
+        "At the end of this turn, trigger an additional {JudgmentPhaseName} phase.",
+        "",
+    );
+    assert_ron_snapshot!(result, @r###"
+    Event(EventAbility(
+      effect: Effect(TriggerAdditionalJudgmentPhase),
+    ))
+    "###);
+}

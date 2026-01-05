@@ -280,3 +280,19 @@ fn test_round_trip_copy_next_event() {
     let serialized = ability_serializer::serialize_ability(&parsed);
     assert_eq!(original, serialized);
 }
+
+#[test]
+fn test_round_trip_all_cards_in_void_gain_reclaim_equal_to_cost() {
+    let original = "All cards currently in your void gain {reclaim} equal to their cost this turn.";
+    let parsed = parse_ability(original, "reclaim: 0");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_trigger_additional_judgment_phase() {
+    let original = "At the end of this turn, trigger an additional {JudgmentPhaseName} phase.";
+    let parsed = parse_ability(original, "");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
