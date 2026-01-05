@@ -24,3 +24,11 @@ fn test_round_trip_characters_in_hand_have_fast() {
     let serialized = ability_serializer::serialize_ability(&parsed);
     assert_eq!(original, serialized);
 }
+
+#[test]
+fn test_round_trip_disable_enemy_materialized_abilities() {
+    let original = "Disable the {Materialized} abilities of enemies.";
+    let parsed = parse_ability(original, "");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}

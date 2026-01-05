@@ -7,6 +7,7 @@ use crate::collection_expression::CollectionExpression;
 use crate::cost::Cost;
 use crate::predicate::{CardPredicate, Predicate};
 use crate::quantity_expression_data::QuantityExpression;
+use crate::static_ability::StandardStaticAbility;
 use crate::triggered_ability::TriggeredAbility;
 
 /// Effects are the primary way in which cards modify the game state. This can
@@ -29,6 +30,7 @@ pub enum StandardEffect {
     CopyNextPlayed { matching: Predicate, times: Option<u32> },
     Counterspell { target: Predicate },
     CounterspellUnlessPaysCost { target: Predicate, cost: Cost },
+    CreateStaticAbilityUntilEndOfTurn { ability: Box<StandardStaticAbility> },
     CreateTriggerUntilEndOfTurn { trigger: Box<TriggeredAbility> },
     DisableActivatedAbilitiesWhileInPlay { target: Predicate },
     DiscardCardFromEnemyHand { predicate: CardPredicate },

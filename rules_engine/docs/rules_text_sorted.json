@@ -1,7 +1,4 @@
 [
-  "Disable the '{Materialized}' abilities of enemies.",
-  "Double the amount of {energy-symbol} you gain from from card effects this turn.",
-  "Double the number of cards you draw from card effects this turn.",
   "Each allied {subtype} gains {spark} equal to the number of allied {plural-subtype}.",
   "Each player shuffles their hand and void into their deck and then draws {cards}.",
   "Events cost you {e} more.\n\nWhen you play an event from your hand, copy it.",

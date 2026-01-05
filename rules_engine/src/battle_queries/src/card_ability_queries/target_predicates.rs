@@ -49,6 +49,7 @@ pub fn get_character_target_predicate(effect: &StandardEffect) -> Option<&Predic
         StandardEffect::CopyNextPlayed { .. } => None,
         StandardEffect::Counterspell { .. } => None,
         StandardEffect::CounterspellUnlessPaysCost { .. } => None,
+        StandardEffect::CreateStaticAbilityUntilEndOfTurn { .. } => None,
         StandardEffect::CreateTriggerUntilEndOfTurn { .. } => None,
         StandardEffect::DiscardCardFromEnemyHand { .. } => None,
         StandardEffect::DiscardCardFromEnemyHandThenTheyDraw { .. } => None,

@@ -142,3 +142,11 @@ fn test_characters_in_hand_have_fast_with_triggered() {
     ]
     "###);
 }
+
+#[test]
+fn test_disable_enemy_materialized_abilities() {
+    let result = parse_ability("Disable the {Materialized} abilities of enemies.", "");
+    assert_ron_snapshot!(result, @r###"
+    Static(StaticAbility(DisableEnemyMaterializedAbilities))
+    "###);
+}

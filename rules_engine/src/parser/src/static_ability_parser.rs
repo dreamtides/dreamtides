@@ -87,7 +87,8 @@ fn enemy_added_cost_to_play<'a>() -> impl Parser<'a, &'a str, StandardStaticAbil
 
 fn disable_enemy_materialized_abilities<'a>()
 -> impl Parser<'a, &'a str, StandardStaticAbility, ErrorType<'a>> {
-    let enemy_characters = choice((phrase("the enemy's characters"), phrase("enemy characters")));
+    let enemy_characters =
+        choice((phrase("the enemy's characters"), phrase("enemy characters"), phrase("enemies")));
     phrase("disable the \"{materialized}\" abilities of")
         .ignore_then(enemy_characters)
         .to(StandardStaticAbility::DisableEnemyMaterializedAbilities)

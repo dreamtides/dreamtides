@@ -141,3 +141,37 @@ fn test_dissolve_enemy_draw_cards_with_cost_reduction() {
     ]
     "###);
 }
+
+#[test]
+fn test_multiply_energy_gain_from_card_effects() {
+    let result = parse_ability(
+        "{MultiplyBy} the amount of {energy-symbol} you gain from card effects this turn.",
+        "number: 2",
+    );
+    assert_ron_snapshot!(result, @r###"
+    Event(EventAbility(
+      effect: Effect(CreateStaticAbilityUntilEndOfTurn(
+        ability: MultiplyEnergyGainFromCardEffects(
+          multiplier: 2,
+        ),
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_multiply_card_draw_from_card_effects() {
+    let result = parse_ability(
+        "{MultiplyBy} the number of cards you draw from card effects this turn.",
+        "number: 3",
+    );
+    assert_ron_snapshot!(result, @r###"
+    Event(EventAbility(
+      effect: Effect(CreateStaticAbilityUntilEndOfTurn(
+        ability: MultiplyCardDrawFromCardEffects(
+          multiplier: 3,
+        ),
+      )),
+    ))
+    "###);
+}

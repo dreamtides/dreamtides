@@ -13,10 +13,14 @@ use super::predicate_serializer::{
     serialize_predicate_without_article,
 };
 use super::serializer_utils::capitalize_first_letter;
+use super::static_ability_serializer::serialize_standard_static_ability;
 use super::trigger_serializer::serialize_trigger_event;
 
 pub fn serialize_standard_effect(effect: &StandardEffect) -> String {
     match effect {
+        StandardEffect::CreateStaticAbilityUntilEndOfTurn { ability } => {
+            serialize_standard_static_ability(ability)
+        }
         StandardEffect::CreateTriggerUntilEndOfTurn { trigger } => {
             if matches!(trigger.trigger, TriggerEvent::Keywords(_)) {
                 format!(

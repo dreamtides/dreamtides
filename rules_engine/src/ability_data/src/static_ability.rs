@@ -36,6 +36,8 @@ pub enum StandardStaticAbility {
     EnemyCardsCostIncrease { matching: CardPredicate, increase: Energy },
     HasAllCharacterTypes,
     JudgmentTriggersWhenMaterialized { predicate: Predicate },
+    MultiplyCardDrawFromCardEffects { multiplier: u32 },
+    MultiplyEnergyGainFromCardEffects { multiplier: u32 },
     OncePerTurnPlayFromVoid { matching: CardPredicate },
     PlayForAlternateCost(AlternateCost),
     PlayFromVoid(PlayFromVoid),

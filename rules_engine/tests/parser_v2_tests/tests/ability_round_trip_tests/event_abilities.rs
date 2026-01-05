@@ -312,3 +312,19 @@ fn test_round_trip_copy_next_fast_character() {
     let serialized = ability_serializer::serialize_ability(&parsed);
     assert_eq!(original, serialized);
 }
+
+#[test]
+fn test_round_trip_multiply_energy_gain_from_card_effects() {
+    let original = "{MultiplyBy} the amount of {energy-symbol} you gain from card effects this turn.";
+    let parsed = parse_ability(original, "number: 2");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_multiply_card_draw_from_card_effects() {
+    let original = "{MultiplyBy} the number of cards you draw from card effects this turn.";
+    let parsed = parse_ability(original, "number: 3");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}

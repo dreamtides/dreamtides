@@ -70,6 +70,16 @@ pub fn serialize_standard_static_ability(ability: &StandardStaticAbility) -> Str
         StandardStaticAbility::CharactersInHandHaveFast => {
             "characters in your hand have {fast}.".to_string()
         }
+        StandardStaticAbility::DisableEnemyMaterializedAbilities => {
+            "disable the {Materialized} abilities of enemies.".to_string()
+        }
+        StandardStaticAbility::MultiplyEnergyGainFromCardEffects { .. } => {
+            "{multiplyby} the amount of {energy-symbol} you gain from card effects this turn."
+                .to_string()
+        }
+        StandardStaticAbility::MultiplyCardDrawFromCardEffects { .. } => {
+            "{multiplyby} the number of cards you draw from card effects this turn.".to_string()
+        }
         _ => unimplemented!("Serialization not yet implemented for this static ability"),
     }
 }
