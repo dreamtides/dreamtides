@@ -36,8 +36,11 @@ pub fn serialize_cost(cost: &Cost) -> String {
             if *count == 1 {
                 "{Banish} another card in your void".to_string()
             } else {
-                "{Banish} {count} cards in your void".to_string()
+                "{Banish} {cards} from your void".to_string()
             }
+        }
+        Cost::BanishCardsFromEnemyVoid(_) => {
+            "{Banish} {cards} from the opponent's void".to_string()
         }
         Cost::BanishAllCardsFromYourVoidWithMinCount(_) => {
             "{Banish} your void with {count} or more cards".to_string()

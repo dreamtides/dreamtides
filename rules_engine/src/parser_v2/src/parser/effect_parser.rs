@@ -14,7 +14,7 @@ use crate::parser::parser_helpers::{
     article, comma, discards, effect_separator, energy, period, word, words, ParserExtra,
     ParserInput,
 };
-use crate::parser::{card_predicate_parser, condition_parser, trigger_parser};
+use crate::parser::{card_predicate_parser, condition_parser, cost_parser, trigger_parser};
 
 pub fn single_effect_parser<'a>(
 ) -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
@@ -213,7 +213,13 @@ fn standard_effect_parser<'a>() -> impl Parser<'a, ParserInput<'a>, Effect, Pars
 }
 
 fn trigger_cost_parser<'a>() -> impl Parser<'a, ParserInput<'a>, Cost, ParserExtra<'a>> + Clone {
-    choice((pay_energy_cost(), discard_cost())).boxed()
+    choice((
+        cost_parser::banish_cards_from_your_void_cost(),
+        cost_parser::banish_cards_from_enemy_void_cost(),
+        pay_energy_cost(),
+        discard_cost(),
+    ))
+    .boxed()
 }
 
 fn pay_energy_cost<'a>() -> impl Parser<'a, ParserInput<'a>, Cost, ParserExtra<'a>> + Clone {

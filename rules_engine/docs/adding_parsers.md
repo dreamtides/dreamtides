@@ -89,8 +89,8 @@ The following terminology changes from parser v1 are important to keep in mind:
 
 ### Directive Names Must Be Lowercase
 
-**THE MOST IMPORTANT RULE**: The lexer lowercases ALL input text before
-parsing. This means directive names in your parsers **MUST** be lowercase.
+The lexer lowercases ALL input text before parsing. This means directive names
+in your parsers **MUST** be lowercase.
 
 ```rust
 // WRONG - will NEVER match:

@@ -3119,9 +3119,11 @@ card-number = 187
 name = "Ruin Scavenger"
 id = "6a95e4f6-75c7-435b-ae21-35a01e58c0b1"
 energy-cost = 1
-rules-text = "{Judgment} You may {banish} a card from the enemy's void to gain {e}."
-preview = "▸ Judgment: You may banish a card from the enemy's void to gain 1●."
-variables = "e: 1"
+rules-text = "{Judgment} You may {banish} {cards} from the opponent's void to gain {e}."
+preview = "▸ Judgment: You may banish 1 card from the opponent's void to gain 1●."
+variables = """
+cards: 1
+e: 1"""
 card-type = "Character"
 subtype = "Survivor"
 is-fast = false
