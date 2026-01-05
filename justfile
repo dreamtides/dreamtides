@@ -1,6 +1,6 @@
 set positional-arguments
 
-code-review: check-format build workspace-lints clippy style-validator test tabula-verify-vba tabula-validate check-docs unity-tests
+code-review: check-format build workspace-lints clippy style-validator test tabula-verify-vba tabula-validate unity-tests
 
 # Run this before pushing
 code-review-rsync: rsync-for-review

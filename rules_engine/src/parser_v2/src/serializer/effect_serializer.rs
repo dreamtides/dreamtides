@@ -229,8 +229,11 @@ pub fn serialize_standard_effect(effect: &StandardEffect) -> String {
         StandardEffect::MultiplyYourEnergy { .. } => {
             "{MultiplyBy} the amount of {energy-symbol} you have.".to_string()
         }
-        StandardEffect::CopyNextPlayed { .. } => {
-            "copy the next event you play {this-turn-times}.".to_string()
+        StandardEffect::CopyNextPlayed { matching, .. } => {
+            format!(
+                "copy the next {} you play {{this-turn-times}}.",
+                serialize_predicate_without_article(matching)
+            )
         }
         StandardEffect::DisableActivatedAbilitiesWhileInPlay { target } => format!(
             "disable the activated abilities of {} while this character is in play.",

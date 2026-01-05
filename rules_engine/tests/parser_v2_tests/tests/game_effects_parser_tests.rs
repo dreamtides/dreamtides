@@ -904,7 +904,7 @@ fn test_materialized_copy_next_event() {
         Materialized,
       ]),
       effect: Effect(CopyNextPlayed(
-        matching: Any(Event),
+        matching: Your(Event),
         times: Some(1),
       )),
     ))
@@ -917,7 +917,7 @@ fn test_event_copy_next_event() {
     assert_ron_snapshot!(result, @r###"
     Event(EventAbility(
       effect: Effect(CopyNextPlayed(
-        matching: Any(Event),
+        matching: Your(Event),
         times: Some(2),
       )),
     ))
@@ -934,5 +934,40 @@ fn test_event_trigger_additional_judgment_phase() {
     Event(EventAbility(
       effect: Effect(TriggerAdditionalJudgmentPhaseAtEndOfTurn),
     ))
+    "###);
+}
+
+#[test]
+fn test_event_copy_next_fast_character() {
+    let result =
+        parse_ability("Copy the next {fast} character you play {this-turn-times}.", "number: 1");
+    assert_ron_snapshot!(result, @r###"
+    Event(EventAbility(
+      effect: Effect(CopyNextPlayed(
+        matching: Your(Fast(
+          target: Character,
+        )),
+        times: Some(1),
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_event_copy_next_event_with_reclaim_for_cost() {
+    let result = parse_abilities(
+        "Copy the next event you play {this-turn-times}.\n\n{ReclaimForCost}",
+        "number: 1, reclaim: 2",
+    );
+    assert_ron_snapshot!(result, @r###"
+    [
+      Event(EventAbility(
+        effect: Effect(CopyNextPlayed(
+          matching: Your(Event),
+          times: Some(1),
+        )),
+      )),
+      Named(Reclaim(Some(Energy(2)))),
+    ]
     "###);
 }

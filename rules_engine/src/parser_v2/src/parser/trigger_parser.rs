@@ -1,10 +1,11 @@
+use ability_data::predicate::Predicate;
 use ability_data::trigger_event::{PlayerTurn, TriggerEvent, TriggerKeyword};
 use chumsky::prelude::*;
 
 use crate::parser::parser_helpers::{
     article, cards_numeral, comma, directive, word, words, ParserExtra, ParserInput,
 };
-use crate::parser::predicate_parser;
+use crate::parser::{card_predicate_parser, predicate_parser};
 
 pub fn trigger_event_parser<'a>(
 ) -> impl Parser<'a, ParserInput<'a>, TriggerEvent, ParserExtra<'a>> + Clone {
@@ -82,26 +83,28 @@ fn draw_all_cards_trigger<'a>(
 fn play_trigger<'a>() -> impl Parser<'a, ParserInput<'a>, TriggerEvent, ParserExtra<'a>> + Clone {
     words(&["when", "you", "play"])
         .ignore_then(article().or_not())
-        .ignore_then(predicate_parser::predicate_parser())
-        .map(TriggerEvent::Play)
+        .ignore_then(card_predicate_parser::parser())
+        .map(|card_predicate| TriggerEvent::Play(Predicate::Your(card_predicate)))
 }
 
 fn play_from_hand_trigger<'a>(
 ) -> impl Parser<'a, ParserInput<'a>, TriggerEvent, ParserExtra<'a>> + Clone {
     words(&["when", "you", "play"])
         .ignore_then(article().or_not())
-        .ignore_then(predicate_parser::predicate_parser())
+        .ignore_then(card_predicate_parser::parser())
         .then_ignore(words(&["from", "your", "hand"]))
-        .map(TriggerEvent::PlayFromHand)
+        .map(|card_predicate| TriggerEvent::PlayFromHand(Predicate::Your(card_predicate)))
 }
 
 fn play_during_turn_trigger<'a>(
 ) -> impl Parser<'a, ParserInput<'a>, TriggerEvent, ParserExtra<'a>> + Clone {
     words(&["when", "you", "play"])
         .ignore_then(article().or_not())
-        .ignore_then(predicate_parser::predicate_parser())
+        .ignore_then(card_predicate_parser::parser())
         .then_ignore(words(&["in", "a", "turn"]))
-        .map(|predicate| TriggerEvent::PlayDuringTurn(predicate, PlayerTurn::YourTurn))
+        .map(|card_predicate| {
+            TriggerEvent::PlayDuringTurn(Predicate::Your(card_predicate), PlayerTurn::YourTurn)
+        })
 }
 
 fn play_cards_in_turn_trigger<'a>(

@@ -1,9 +1,7 @@
 Please follow all of the "code style" and "validating changes" rules below at all times.
 
-IMPORTANT: Run all `cargo` commands from the `rules_engine/` subdirectory, and
-*always* pass the -q flag.
-
-Example: `cargo test -q -p parser_v2_tests --test card_effect_parser_tests`.
+IMPORTANT: Please use `just` commands instead of `cargo`, e.g. `just fmt`, `just check`,
+`just-clippy`, `just-test`, `just parser-test`
 
 # CODE STYLE
 

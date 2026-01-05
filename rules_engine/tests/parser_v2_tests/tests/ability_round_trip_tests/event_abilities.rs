@@ -296,3 +296,19 @@ fn test_round_trip_trigger_additional_judgment_phase() {
     let serialized = ability_serializer::serialize_ability(&parsed);
     assert_eq!(original, serialized);
 }
+
+#[test]
+fn test_round_trip_copy_next_event() {
+    let original = "Copy the next event you play {this-turn-times}.";
+    let parsed = parse_ability(original, "number: 2");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_copy_next_fast_character() {
+    let original = "Copy the next {fast} character you play {this-turn-times}.";
+    let parsed = parse_ability(original, "number: 1");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}

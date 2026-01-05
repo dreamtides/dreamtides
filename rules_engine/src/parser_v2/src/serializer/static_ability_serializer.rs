@@ -67,6 +67,9 @@ pub fn serialize_standard_static_ability(ability: &StandardStaticAbility) -> Str
                 "this event costs {e}".to_string()
             }
         }
+        StandardStaticAbility::CharactersInHandHaveFast => {
+            "characters in your hand have {fast}.".to_string()
+        }
         _ => unimplemented!("Serialization not yet implemented for this static ability"),
     }
 }

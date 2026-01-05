@@ -151,7 +151,7 @@ fn test_when_you_play_an_event_gain_energy() {
     let result = parse_ability("When you play an event, gain {e}.", "e: 1");
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
-      trigger: Play(Any(Event)),
+      trigger: Play(Your(Event)),
       effect: Effect(GainEnergy(
         gains: Energy(1),
       )),
@@ -227,7 +227,7 @@ fn test_when_you_play_a_subtype_draw_cards() {
         parse_ability("When you play {a-subtype}, draw {cards}.", "subtype: warrior, cards: 2");
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
-      trigger: Play(Any(CharacterType(Warrior))),
+      trigger: Play(Your(CharacterType(Warrior))),
       effect: Effect(DrawCards(
         count: 2,
       )),
@@ -243,7 +243,7 @@ fn test_when_you_play_a_subtype_put_cards_from_deck_into_void() {
     );
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
-      trigger: Play(Any(CharacterType(Warrior))),
+      trigger: Play(Your(CharacterType(Warrior))),
       effect: Effect(PutCardsFromYourDeckIntoVoid(
         count: 3,
       )),
@@ -423,7 +423,7 @@ fn test_when_you_play_an_event_foresee() {
     let result = parse_ability("When you play an event, {foresee}.", "foresee: 1");
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
-      trigger: Play(Any(Event)),
+      trigger: Play(Your(Event)),
       effect: Effect(Foresee(
         count: 1,
       )),
@@ -486,7 +486,7 @@ fn test_when_you_play_a_fast_card_gain_points() {
     let result = parse_ability("When you play a {fast} card, gain {points}.", "points: 1");
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
-      trigger: Play(Any(Fast(
+      trigger: Play(Your(Fast(
         target: Card,
       ))),
       effect: Effect(GainPoints(
@@ -519,7 +519,7 @@ fn test_once_per_turn_when_you_play_a_fast_card_draw_cards() {
         parse_ability("Once per turn, when you play a {fast} card, draw {cards}.", "cards: 2");
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
-      trigger: Play(Any(Fast(
+      trigger: Play(Your(Fast(
         target: Card,
       ))),
       effect: Effect(DrawCards(
@@ -541,7 +541,7 @@ fn test_until_end_of_turn_when_you_play_a_character_draw_cards() {
     Event(EventAbility(
       effect: Effect(CreateTriggerUntilEndOfTurn(
         trigger: TriggeredAbility(
-          trigger: Play(Any(Character)),
+          trigger: Play(Your(Character)),
           effect: Effect(DrawCards(
             count: 2,
           )),
@@ -582,7 +582,7 @@ fn test_when_you_play_a_fast_card_this_character_gains_spark() {
         parse_ability("When you play a {fast} card, this character gains +{s} spark.", "s: 2");
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
-      trigger: Play(Any(Fast(
+      trigger: Play(Your(Fast(
         target: Card,
       ))),
       effect: Effect(GainsSpark(
@@ -831,6 +831,26 @@ fn test_when_allied_subtype_dissolved_kindle() {
       trigger: Dissolved(Another(CharacterType(Warrior))),
       effect: Effect(Kindle(
         amount: Spark(1),
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_once_per_turn_play_fast_character_gain_energy() {
+    let result =
+        parse_ability("Once per turn, when you play a {fast} character, gain {e}.", "e: 1");
+    assert_ron_snapshot!(result, @r###"
+    Triggered(TriggeredAbility(
+      trigger: Play(Your(Fast(
+        target: Character,
+      ))),
+      effect: Effect(GainEnergy(
+        gains: Energy(1),
+      )),
+      options: Some(TriggeredAbilityOptions(
+        once_per_turn: true,
+        until_end_of_turn: false,
       )),
     ))
     "###);

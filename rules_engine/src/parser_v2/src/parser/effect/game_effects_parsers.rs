@@ -248,10 +248,12 @@ pub fn materialize_figments_quantity<'a>(
 pub fn copy_next_played<'a>(
 ) -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
     word("copy")
-        .ignore_then(words(&["the", "next", "event", "you", "play"]))
-        .ignore_then(this_turn_times())
-        .map(|times| StandardEffect::CopyNextPlayed {
-            matching: Predicate::Any(CardPredicate::Event),
+        .ignore_then(words(&["the", "next"]))
+        .ignore_then(card_predicate_parser::parser())
+        .then_ignore(words(&["you", "play"]))
+        .then(this_turn_times())
+        .map(|(card_predicate, times)| StandardEffect::CopyNextPlayed {
+            matching: Predicate::Your(card_predicate),
             times: Some(times),
         })
 }

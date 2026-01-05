@@ -237,7 +237,7 @@ fn next_evaluation_target(
 /// Adds a new child node to the search graph (the 'expand' function).
 ///
 /// Generates a new tree node by applying the next untried action from the
-/// provided input node. Mutates the provided [GameState] to apply the
+/// provided input node. Mutates the provided [BattleState] to apply the
 /// provided game action.
 ///
 /// Pseudocode:

@@ -16,3 +16,11 @@ fn test_round_trip_additional_cost_to_play() {
     let serialized = ability_serializer::serialize_ability(&parsed);
     assert_eq!(original, serialized);
 }
+
+#[test]
+fn test_round_trip_characters_in_hand_have_fast() {
+    let original = "Characters in your hand have {fast}.";
+    let parsed = parse_ability(original, "");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}

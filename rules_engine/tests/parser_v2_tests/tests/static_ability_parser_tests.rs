@@ -112,3 +112,33 @@ fn test_additional_cost_to_play_with_judgment() {
     ]
     "###);
 }
+
+#[test]
+fn test_characters_in_hand_have_fast() {
+    let result = parse_ability("Characters in your hand have {fast}.", "");
+    assert_ron_snapshot!(result, @r###"
+    Static(StaticAbility(CharactersInHandHaveFast))
+    "###);
+}
+
+#[test]
+fn test_characters_in_hand_have_fast_with_triggered() {
+    let result = parse_abilities("Characters in your hand have {fast}.\n\nOnce per turn, when you play a {fast} character, gain {e}.", "e: 1");
+    assert_ron_snapshot!(result, @r###"
+    [
+      Static(StaticAbility(CharactersInHandHaveFast)),
+      Triggered(TriggeredAbility(
+        trigger: Play(Your(Fast(
+          target: Character,
+        ))),
+        effect: Effect(GainEnergy(
+          gains: Energy(1),
+        )),
+        options: Some(TriggeredAbilityOptions(
+          once_per_turn: true,
+          until_end_of_turn: false,
+        )),
+      )),
+    ]
+    "###);
+}

@@ -273,3 +273,11 @@ fn test_round_trip_dissolved_draw_cards() {
     let serialized = ability_serializer::serialize_ability(&parsed);
     assert_eq!(original, serialized);
 }
+
+#[test]
+fn test_round_trip_once_per_turn_play_fast_character_gain_energy() {
+    let original = "Once per turn, when you play a {fast} character, gain {e}.";
+    let parsed = parse_ability(original, "e: 1");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}

@@ -10,7 +10,7 @@ use chumsky::prelude::*;
 use core_data::numerics::{Energy, Spark};
 
 use crate::parser::parser_helpers::{
-    colon, comma, energy, period, spark, word, words, ParserExtra, ParserInput,
+    colon, comma, directive, energy, period, spark, word, words, ParserExtra, ParserInput,
 };
 use crate::parser::{card_predicate_parser, condition_parser, cost_parser};
 
@@ -40,6 +40,7 @@ fn standard_static_ability<'a>(
         abandon_ally_play_character_for_alternate_cost(),
         play_for_alternate_cost(),
         simple_alternate_cost_with_period(),
+        characters_in_hand_have_fast(),
         allied_spark_bonus(),
         enemy_cards_cost_increase(),
         your_cards_cost_modification(),
@@ -109,6 +110,14 @@ fn enemy_cards_cost_increase<'a>(
             matching,
             increase: Energy(increase),
         })
+}
+
+fn characters_in_hand_have_fast<'a>(
+) -> impl Parser<'a, ParserInput<'a>, StandardStaticAbility, ParserExtra<'a>> + Clone {
+    words(&["characters", "in", "your", "hand", "have"])
+        .ignore_then(directive("fast"))
+        .ignore_then(period())
+        .to(StandardStaticAbility::CharactersInHandHaveFast)
 }
 
 fn abandon_ally_play_character_for_alternate_cost<'a>(
