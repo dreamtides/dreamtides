@@ -17,10 +17,6 @@ public class ClipFootRotation
 
     [Tooltip("Local rotation to apply to the right foot (in degrees)")]
     public Vector3 rightFootRotation = new(0f, 0f, 0f);
-
-    [Tooltip("How much to blend between original and fixed rotation. 1 = fully fixed, 0 = original animation")]
-    [Range(0f, 1f)]
-    public float blendWeight = 1f;
 }
 
 /// <summary>
@@ -72,8 +68,8 @@ public class FlyingFootFixer : MonoBehaviour
             return;
 
         // Apply the foot rotation fix
-        FixFootRotation(leftFoot, config.leftFootRotation, config.blendWeight);
-        FixFootRotation(rightFoot, config.rightFootRotation, config.blendWeight);
+        FixFootRotation(leftFoot, config.leftFootRotation);
+        FixFootRotation(rightFoot, config.rightFootRotation);
     }
 
     private ClipFootRotation? GetCurrentClipConfiguration()
@@ -103,19 +99,9 @@ public class FlyingFootFixer : MonoBehaviour
         return null;
     }
 
-    private void FixFootRotation(Transform foot, Vector3 targetRotationEuler, float blendWeight)
+    private void FixFootRotation(Transform foot, Vector3 targetRotationEuler)
     {
-        // Convert euler angles to quaternion
-        Quaternion targetRotation = Quaternion.Euler(targetRotationEuler);
-
-        // Blend between original and target rotation
-        if (blendWeight < 1f)
-        {
-            foot.localRotation = Quaternion.Slerp(foot.localRotation, targetRotation, blendWeight);
-        }
-        else
-        {
-            foot.localRotation = targetRotation;
-        }
+        // Convert euler angles to quaternion and apply directly
+        foot.localRotation = Quaternion.Euler(targetRotationEuler);
     }
 }

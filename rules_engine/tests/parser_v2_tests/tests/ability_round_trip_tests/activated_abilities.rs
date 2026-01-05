@@ -168,3 +168,19 @@ fn test_round_trip_fast_abandon_this_character_prevent_played_event() {
     let serialized = ability_serializer::serialize_ability(&parsed);
     assert_eq!(original, serialized);
 }
+
+#[test]
+fn test_round_trip_pay_one_or_more_energy_draw_for_each_energy_spent() {
+    let original = "Pay 1 or more {energy-symbol}: Draw {cards} for each {energy-symbol} spent, then discard {discards}.";
+    let parsed = parse_ability(original, "cards: 1, discards: 1");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_pay_one_or_more_dissolve_each_character() {
+    let original = "Pay 1 or more {energy-symbol}: {Dissolve} each character with spark less than the amount of {energy-symbol} paid.";
+    let parsed = parse_ability(original, "");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}

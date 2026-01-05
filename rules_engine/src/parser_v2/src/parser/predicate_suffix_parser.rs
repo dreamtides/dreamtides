@@ -61,6 +61,14 @@ pub fn with_spark_compared_to_abandoned_suffix<'a>(
     words(&["with", "spark", "less", "than", "that", "ally's", "spark"]).to(Operator::OrLess)
 }
 
+pub fn with_spark_compared_to_energy_spent_suffix<'a>(
+) -> impl Parser<'a, ParserInput<'a>, Operator<Spark>, ParserExtra<'a>> + Clone {
+    words(&["with", "spark", "less", "than", "the", "amount", "of"])
+        .ignore_then(directive("energy-symbol"))
+        .ignore_then(word("paid"))
+        .to(Operator::OrLess)
+}
+
 fn spark_operator<'a>() -> impl Parser<'a, ParserInput<'a>, Operator<Spark>, ParserExtra<'a>> + Clone
 {
     choice((

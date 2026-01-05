@@ -2,7 +2,9 @@ use ability_data::condition::Condition;
 use ability_data::static_ability::{StandardStaticAbility, StaticAbility};
 
 use super::cost_serializer::serialize_cost;
-use super::predicate_serializer::serialize_card_predicate_plural;
+use super::predicate_serializer::{
+    serialize_card_predicate_plural, serialize_card_predicate_without_article,
+};
 use super::serializer_utils::capitalize_first_letter;
 
 pub fn serialize_static_ability(static_ability: &StaticAbility) -> String {
@@ -80,6 +82,12 @@ pub fn serialize_standard_static_ability(ability: &StandardStaticAbility) -> Str
         }
         StandardStaticAbility::MultiplyCardDrawFromCardEffects { .. } => {
             "{multiplyby} the number of cards you draw from card effects this turn.".to_string()
+        }
+        StandardStaticAbility::OncePerTurnPlayFromVoid { matching } => {
+            format!(
+                "once per turn, you may play {} from your void.",
+                serialize_card_predicate_without_article(matching)
+            )
         }
         _ => unimplemented!("Serialization not yet implemented for this static ability"),
     }

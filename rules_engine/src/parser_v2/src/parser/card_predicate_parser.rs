@@ -41,6 +41,14 @@ pub fn parser<'a>() -> impl Parser<'a, ParserInput<'a>, CardPredicate, ParserExt
                         spark_operator,
                     }
                 }),
+            base.clone()
+                .then(predicate_suffix_parser::with_spark_compared_to_energy_spent_suffix())
+                .map(|(target, spark_operator)| {
+                    CardPredicate::CharacterWithSparkComparedToEnergySpent {
+                        target: Box::new(target),
+                        spark_operator,
+                    }
+                }),
             base.clone().then(predicate_suffix_parser::with_cost_suffix()).map(
                 |(target, (cost, op))| CardPredicate::CardWithCost {
                     target: Box::new(target),
@@ -74,6 +82,12 @@ pub fn parser<'a>() -> impl Parser<'a, ParserInput<'a>, CardPredicate, ParserExt
             ),
             predicate_suffix_parser::with_spark_compared_to_abandoned_suffix().map(
                 |spark_operator| CardPredicate::CharacterWithSparkComparedToAbandoned {
+                    target: Box::new(CardPredicate::Character),
+                    spark_operator,
+                },
+            ),
+            predicate_suffix_parser::with_spark_compared_to_energy_spent_suffix().map(
+                |spark_operator| CardPredicate::CharacterWithSparkComparedToEnergySpent {
                     target: Box::new(CardPredicate::Character),
                     spark_operator,
                 },

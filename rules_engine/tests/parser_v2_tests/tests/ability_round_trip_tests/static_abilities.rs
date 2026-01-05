@@ -48,3 +48,11 @@ fn test_round_trip_disable_enemy_materialized_abilities() {
     let serialized = ability_serializer::serialize_ability(&parsed);
     assert_eq!(original, serialized);
 }
+
+#[test]
+fn test_round_trip_once_per_turn_play_from_void() {
+    let original = "Once per turn, you may play a character with cost {e} or less from your void.";
+    let parsed = parse_ability(original, "e: 0");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}

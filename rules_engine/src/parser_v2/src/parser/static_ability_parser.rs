@@ -10,7 +10,7 @@ use chumsky::prelude::*;
 use core_data::numerics::{Energy, Spark};
 
 use crate::parser::parser_helpers::{
-    colon, comma, directive, energy, period, spark, word, words, ParserExtra, ParserInput,
+    article, colon, comma, directive, energy, period, spark, word, words, ParserExtra, ParserInput,
 };
 use crate::parser::{card_predicate_parser, condition_parser, cost_parser};
 
@@ -37,6 +37,7 @@ fn standard_static_ability<'a>(
 ) -> impl Parser<'a, ParserInput<'a>, StandardStaticAbility, ParserExtra<'a>> + Clone {
     choice((
         additional_cost_to_play(),
+        once_per_turn_play_from_void(),
         abandon_ally_play_character_for_alternate_cost(),
         play_for_alternate_cost(),
         simple_alternate_cost_with_period(),
@@ -208,6 +209,18 @@ fn simple_alternate_cost_with_period<'a>(
             if_you_do: None,
         })
     })
+}
+
+fn once_per_turn_play_from_void<'a>(
+) -> impl Parser<'a, ParserInput<'a>, StandardStaticAbility, ParserExtra<'a>> + Clone {
+    words(&["once", "per", "turn"])
+        .ignore_then(comma())
+        .ignore_then(words(&["you", "may", "play"]))
+        .ignore_then(article())
+        .ignore_then(card_predicate_parser::parser())
+        .then_ignore(words(&["from", "your", "void"]))
+        .then_ignore(period())
+        .map(|matching| StandardStaticAbility::OncePerTurnPlayFromVoid { matching })
 }
 
 fn additional_cost_to_play<'a>(

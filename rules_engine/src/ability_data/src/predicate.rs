@@ -79,6 +79,10 @@ pub enum CardPredicate {
         target: Box<CardPredicate>,
         spark_operator: Operator<Spark>,
     },
+    CharacterWithSparkComparedToEnergySpent {
+        target: Box<CardPredicate>,
+        spark_operator: Operator<Spark>,
+    },
     CharacterWithCostComparedToVoidCount {
         target: Box<CardPredicate>,
         cost_operator: Operator<Energy>,

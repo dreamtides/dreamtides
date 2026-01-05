@@ -413,3 +413,55 @@ fn test_fast_abandon_this_character_prevent_played_event() {
     ))
     "###);
 }
+
+#[test]
+fn test_pay_one_or_more_energy_draw_for_each_energy_spent() {
+    let result = parse_ability(
+        "Pay 1 or more {energy-symbol}: Draw {cards} for each {energy-symbol} spent, then discard {discards}.",
+        "cards: 1, discards: 1"
+    );
+    assert_ron_snapshot!(result, @r###"
+    Activated(ActivatedAbility(
+      costs: [
+        SpendOneOrMoreEnergy,
+      ],
+      effect: List([
+        EffectWithOptions(
+          effect: DrawCardsForEach(
+            count: 1,
+            for_each: ForEachEnergySpentOnThisCard,
+          ),
+          optional: false,
+        ),
+        EffectWithOptions(
+          effect: DiscardCards(
+            count: 1,
+          ),
+          optional: false,
+        ),
+      ]),
+    ))
+    "###);
+}
+
+#[test]
+fn test_pay_one_or_more_dissolve_each_character() {
+    let result = parse_ability(
+        "Pay 1 or more {energy-symbol}: {Dissolve} each character with spark less than the amount of {energy-symbol} paid.",
+        ""
+    );
+    assert_ron_snapshot!(result, @r###"
+    Activated(ActivatedAbility(
+      costs: [
+        SpendOneOrMoreEnergy,
+      ],
+      effect: Effect(DissolveCharactersCount(
+        target: Any(CharacterWithSparkComparedToEnergySpent(
+          target: Character,
+          spark_operator: OrLess,
+        )),
+        count: All,
+      )),
+    ))
+    "###);
+}

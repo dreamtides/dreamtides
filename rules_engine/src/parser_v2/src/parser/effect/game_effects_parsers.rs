@@ -25,7 +25,8 @@ pub fn parser<'a>() -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserEx
         ))
         .boxed(),
         choice((
-            choice((dissolve_all_characters(), dissolve_character())).boxed(),
+            choice((dissolve_each_character(), dissolve_all_characters(), dissolve_character()))
+                .boxed(),
             choice((
                 banish_cards_from_opponent_void(),
                 banish_up_to_n(),
@@ -99,6 +100,17 @@ pub fn counterspell_unless_pays_cost<'a>(
         .then_ignore(words(&["unless", "the", "opponent", "pays"]))
         .then(cost_parser::cost_parser())
         .map(|(target, cost)| StandardEffect::CounterspellUnlessPaysCost { target, cost })
+}
+
+pub fn dissolve_each_character<'a>(
+) -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
+    directive("dissolve")
+        .ignore_then(word("each"))
+        .ignore_then(card_predicate_parser::parser())
+        .map(|predicate| StandardEffect::DissolveCharactersCount {
+            target: Predicate::Any(predicate),
+            count: CollectionExpression::All,
+        })
 }
 
 pub fn dissolve_all_characters<'a>(

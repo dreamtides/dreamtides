@@ -327,12 +327,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 216e6eff78b484acf9fdab60af108819, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Dreamtides::FlyingFootFixer
-  applyFix: 1
-  leftFootRotation: {x: -30, y: 0, z: 0}
-  rightFootRotation: {x: -60, y: 0, z: 0}
-  blendWeight: 1
-  animationStateName: 
-  animatorLayer: 0
+  clipConfigurations: []
 --- !u!1001 &1452999779
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -454,12 +449,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 216e6eff78b484acf9fdab60af108819, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Dreamtides::FlyingFootFixer
-  applyFix: 1
-  leftFootRotation: {x: 0, y: 0, z: 0}
-  rightFootRotation: {x: -60, y: 0, z: 0}
-  blendWeight: 1
-  animationStateName: 
-  animatorLayer: 0
+  clipConfigurations:
+  - clipName: Anim_Fly_Normal_Idle
+    leftFootRotation: {x: 0, y: 0, z: 0}
+    rightFootRotation: {x: -60, y: 0, z: 0}
+    blendWeight: 0.55
+  - clipName: Anim_Fly_Normal_to_Stand
+    leftFootRotation: {x: 0, y: 0, z: 0}
+    rightFootRotation: {x: -60, y: 0, z: 0}
+    blendWeight: 0.41
+  - clipName: Anim_Fly_Normal_Forwardmove
+    leftFootRotation: {x: -30, y: 0, z: 0}
+    rightFootRotation: {x: -60, y: 0, z: 0}
+    blendWeight: 0.41
+  - clipName: Anim_Fly_Normal_Looking
+    leftFootRotation: {x: 0, y: 0, z: 0}
+    rightFootRotation: {x: -45, y: 0, z: 0}
+    blendWeight: 0.41
 --- !u!1 &2123959637
 GameObject:
   m_ObjectHideFlags: 0

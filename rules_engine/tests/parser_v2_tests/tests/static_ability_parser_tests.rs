@@ -196,3 +196,20 @@ fn test_lose_maximum_energy_play_for_alternate_cost() {
     ))))
     "###);
 }
+
+#[test]
+fn test_once_per_turn_play_from_void() {
+    let result = parse_ability(
+        "Once per turn, you may play a character with cost {e} or less from your void.",
+        "e: 0",
+    );
+    assert_ron_snapshot!(result, @r###"
+    Static(StaticAbility(OncePerTurnPlayFromVoid(
+      matching: CardWithCost(
+        target: Character,
+        cost_operator: OrLess,
+        cost: Energy(0),
+      ),
+    )))
+    "###);
+}

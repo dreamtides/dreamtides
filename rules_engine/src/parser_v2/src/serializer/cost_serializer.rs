@@ -52,6 +52,7 @@ pub fn serialize_cost(cost: &Cost) -> String {
         Cost::ReturnToHand(predicate) => {
             format!("return {} to hand", serialize_predicate(predicate))
         }
+        Cost::SpendOneOrMoreEnergy => "pay 1 or more {energy-symbol}".to_string(),
         _ => unimplemented!("Serialization not yet implemented for this cost type"),
     }
 }

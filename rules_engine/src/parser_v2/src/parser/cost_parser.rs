@@ -14,6 +14,7 @@ pub fn cost_parser<'a>() -> impl Parser<'a, ParserInput<'a>, Cost, ParserExtra<'
     choice((
         choice((
             abandon_or_discard_cost(),
+            spend_one_or_more_energy_cost(),
             energy_cost(),
             abandon_this_character_cost(),
             abandon_cost(),
@@ -75,6 +76,13 @@ pub fn abandon_cost_single<'a>() -> impl Parser<'a, ParserInput<'a>, Cost, Parse
     word("abandon").ignore_then(article()).ignore_then(predicate_parser::predicate_parser()).map(
         |target| Cost::AbandonCharactersCount { target, count: CollectionExpression::Exactly(1) },
     )
+}
+
+fn spend_one_or_more_energy_cost<'a>(
+) -> impl Parser<'a, ParserInput<'a>, Cost, ParserExtra<'a>> + Clone {
+    words(&["pay", "1", "or", "more"])
+        .ignore_then(directive("energy-symbol"))
+        .to(Cost::SpendOneOrMoreEnergy)
 }
 
 fn energy_cost<'a>() -> impl Parser<'a, ParserInput<'a>, Cost, ParserExtra<'a>> + Clone {
