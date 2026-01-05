@@ -328,3 +328,19 @@ fn test_round_trip_multiply_card_draw_from_card_effects() {
     let serialized = ability_serializer::serialize_ability(&parsed);
     assert_eq!(original, serialized);
 }
+
+#[test]
+fn test_round_trip_each_allied_subtype_gains_spark_for_each_allied_subtype() {
+    let original = "Each allied {subtype} gains {s} equal to the number of allied {plural-subtype}.";
+    let parsed = parse_ability(original, "subtype: warrior, s: 1, plural-subtype: warrior");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_each_player_shuffles_hand_and_void_and_draws() {
+    let original = "Each player shuffles their hand and void into their deck and then draws {cards}.";
+    let parsed = parse_ability(original, "cards: 5");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}

@@ -581,7 +581,7 @@ fn gain_twice_that_much_energy_instead<'a>()
 fn shuffle_hand_and_deck_and_draw<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
     phrase("each player may shuffle their hand and void into their deck and then draw")
         .ignore_then(numeric("", count, "cards"))
-        .map(|count| StandardEffect::ShuffleHandAndDeckAndDraw { count })
+        .map(|count| StandardEffect::EachPlayerShufflesHandAndVoidIntoDeckAndDraws { count })
 }
 
 fn dissolve_characters_quantity<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {

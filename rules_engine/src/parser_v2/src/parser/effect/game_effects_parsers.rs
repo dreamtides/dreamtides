@@ -17,6 +17,7 @@ pub fn parser<'a>() -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserEx
         choice((
             copy_next_played(),
             foresee(),
+            each_player_shuffles_hand_and_void_and_draws(),
             discover_and_materialize(),
             discover(),
             counterspell_effects(),
@@ -53,6 +54,14 @@ pub fn parser<'a>() -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserEx
 
 pub fn foresee<'a>() -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
     foresee_count().map(|count| StandardEffect::Foresee { count })
+}
+
+pub fn each_player_shuffles_hand_and_void_and_draws<'a>(
+) -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
+    words(&["each", "player", "shuffles", "their", "hand", "and", "void", "into", "their", "deck"])
+        .ignore_then(words(&["and", "then", "draws"]))
+        .ignore_then(cards())
+        .map(|count| StandardEffect::EachPlayerShufflesHandAndVoidIntoDeckAndDraws { count })
 }
 
 pub fn discover<'a>() -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {

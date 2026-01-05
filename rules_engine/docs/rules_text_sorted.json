@@ -1,6 +1,4 @@
 [
-  "Each allied {subtype} gains {spark} equal to the number of allied {plural-subtype}.",
-  "Each player shuffles their hand and void into their deck and then draws {cards}.",
   "Events cost you {e} more.\n\nWhen you play an event from your hand, copy it.",
   "Has all character types.\n\n{Judgment} If {count-allies} share a character type, Draw {cards}.",
   "If you have discarded a card this turn, this character costs {e}.",

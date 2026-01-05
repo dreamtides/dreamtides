@@ -76,3 +76,40 @@ fn test_energy_cost_spark_of_each_allied_subtype_becomes() {
     ))
     "###);
 }
+
+#[test]
+fn test_each_allied_subtype_gains_spark_for_each_allied_subtype() {
+    let result = parse_ability(
+        "Each allied {subtype} gains {s} equal to the number of allied {plural-subtype}.",
+        "subtype: warrior, s: 1, plural-subtype: warrior",
+    );
+    assert_ron_snapshot!(result, @r###"
+    Event(EventAbility(
+      effect: Effect(EachMatchingGainsSparkForEach(
+        each: CharacterType(Warrior),
+        gains: Spark(1),
+        for_each: CharacterType(Warrior),
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_judgment_each_allied_subtype_gains_spark_for_each_allied_subtype() {
+    let result = parse_ability(
+        "{Judgment} Each allied {subtype} gains {s} equal to the number of allied {plural-subtype}.",
+        "subtype: warrior, s: 1",
+    );
+    assert_ron_snapshot!(result, @r###"
+    Triggered(TriggeredAbility(
+      trigger: Keywords([
+        Judgment,
+      ]),
+      effect: Effect(EachMatchingGainsSparkForEach(
+        each: CharacterType(Warrior),
+        gains: Spark(1),
+        for_each: CharacterType(Warrior),
+      )),
+    ))
+    "###);
+}

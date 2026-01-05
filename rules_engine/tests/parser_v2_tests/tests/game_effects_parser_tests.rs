@@ -971,3 +971,36 @@ fn test_event_copy_next_event_with_reclaim_for_cost() {
     ]
     "###);
 }
+
+#[test]
+fn test_each_player_shuffles_hand_and_void_and_draws() {
+    let result = parse_ability(
+        "Each player shuffles their hand and void into their deck and then draws {cards}.",
+        "cards: 5",
+    );
+    assert_ron_snapshot!(result, @r###"
+    Event(EventAbility(
+      effect: Effect(EachPlayerShufflesHandAndVoidIntoDeckAndDraws(
+        count: 5,
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_judgment_each_player_shuffles_hand_and_void_and_draws() {
+    let result = parse_ability(
+        "{Judgment} Each player shuffles their hand and void into their deck and then draws {cards}.",
+        "cards: 3",
+    );
+    assert_ron_snapshot!(result, @r###"
+    Triggered(TriggeredAbility(
+      trigger: Keywords([
+        Judgment,
+      ]),
+      effect: Effect(EachPlayerShufflesHandAndVoidIntoDeckAndDraws(
+        count: 3,
+      )),
+    ))
+    "###);
+}

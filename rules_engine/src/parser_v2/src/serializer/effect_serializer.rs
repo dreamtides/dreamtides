@@ -73,6 +73,13 @@ pub fn serialize_standard_effect(effect: &StandardEffect) -> String {
         StandardEffect::EachMatchingGainsSpark { each, .. } => {
             format!("have each {} gain +{{s}} spark.", serialize_allied_card_predicate(each))
         }
+        StandardEffect::EachMatchingGainsSparkForEach { each, for_each, .. } => {
+            format!(
+                "each {} gains {{s}} equal to the number of {}.",
+                serialize_allied_card_predicate(each),
+                serialize_allied_card_predicate(for_each)
+            )
+        }
         StandardEffect::GainsSparkForQuantity { target, for_quantity, .. } => {
             if matches!(target, Predicate::This) {
                 format!(
@@ -211,6 +218,10 @@ pub fn serialize_standard_effect(effect: &StandardEffect) -> String {
         }
         StandardEffect::EachPlayerAbandonsCharacters { matching, .. } => {
             format!("each player abandons {}.", serialize_card_predicate(matching))
+        }
+        StandardEffect::EachPlayerShufflesHandAndVoidIntoDeckAndDraws { .. } => {
+            "each player shuffles their hand and void into their deck and then draws {cards}."
+                .to_string()
         }
         StandardEffect::CardsInVoidGainReclaimThisTurn { count, predicate } => {
             serialize_cards_in_void_gain_reclaim_this_turn(count, predicate)

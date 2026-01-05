@@ -13,6 +13,7 @@ pub fn parser<'a>() -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserEx
     choice((
         kindle(),
         spark_becomes(),
+        each_gains_spark_for_each(),
         each_allied_gains_spark(),
         gains_spark_for_each(),
         gains_spark(),
@@ -64,6 +65,23 @@ fn each_allied_gains_spark<'a>(
         .map(|(matching, gains)| StandardEffect::EachMatchingGainsSpark {
             each: matching,
             gains: Spark(gains),
+        })
+}
+
+fn each_gains_spark_for_each<'a>(
+) -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
+    word("each")
+        .ignore_then(word("allied").or_not())
+        .ignore_then(card_predicate_parser::parser())
+        .then_ignore(word("gains"))
+        .then(spark())
+        .then_ignore(words(&["equal", "to", "the", "number", "of"]))
+        .then_ignore(word("allied").or_not())
+        .then(card_predicate_parser::parser())
+        .map(|((each, gains), for_each)| StandardEffect::EachMatchingGainsSparkForEach {
+            each,
+            gains: Spark(gains),
+            for_each,
         })
 }
 
