@@ -35,8 +35,13 @@ pub fn parser<'a>() -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserEx
                 reclaim_from_void(),
             ))
             .boxed(),
-            choice((cards_in_void_gain_reclaim(), return_from_void_to_hand(), return_to_hand()))
-                .boxed(),
+            choice((
+                gains_reclaim_for_cost_this_turn(),
+                cards_in_void_gain_reclaim(),
+                return_from_void_to_hand(),
+                return_to_hand(),
+            ))
+            .boxed(),
         ))
         .boxed(),
     ))
@@ -171,6 +176,18 @@ pub fn each_player_abandons_characters<'a>(
         .ignore_then(article())
         .ignore_then(card_predicate_parser::parser())
         .map(|matching| StandardEffect::EachPlayerAbandonsCharacters { matching, count: 1 })
+}
+
+pub fn gains_reclaim_for_cost_this_turn<'a>(
+) -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
+    predicate_parser::predicate_parser()
+        .then_ignore(word("gains"))
+        .then(reclaim_cost())
+        .then_ignore(words(&["this", "turn"]))
+        .map(|(target, cost)| StandardEffect::GainsReclaimUntilEndOfTurn {
+            target,
+            cost: Some(Energy(cost)),
+        })
 }
 
 pub fn cards_in_void_gain_reclaim<'a>(

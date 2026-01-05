@@ -550,7 +550,7 @@ card-number = 32
 name = "Voidshield Guardian"
 id = "fb285715-af52-4358-94de-b40256916f9b"
 energy-cost = 2
-rules-text = "When the opponent plays a card which could {dissolve} an ally, {prevent} that card."
+rules-text = "When the opponent plays an event which could {dissolve} an ally, {prevent} that card."
 preview = "When the opponent plays a card which could dissolve an ally, prevent that card."
 card-type = "Character"
 subtype = "Synth"
@@ -1270,7 +1270,7 @@ Has all character types.
 preview = """
 Has all character types.
 
-▸ Judgment: With 3 allies that share a character type, Draw a card."""
+▸ Judgment: With 3 allies that share a character type, draw a card."""
 variables = """
 allies: 3
 cards: 1"""
@@ -1573,9 +1573,9 @@ name = "Cascade of Reflections"
 id = "2910484b-ecfe-445d-92b7-2f7d246b17fd"
 energy-cost = 3
 rules-text = """
-This turn, when you play an event, copy it.
+Until end of turn, when you play an event, copy it.
 """
-preview = "This turn, when you play an event, copy it."
+preview = "Until end of turn, when you play an event, copy it."
 card-type = "Event"
 is-fast = false
 image-number = 1739438657

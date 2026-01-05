@@ -2,6 +2,44 @@ use insta::assert_ron_snapshot;
 use parser_v2_tests::test_helpers::*;
 
 #[test]
+fn test_until_end_of_turn_when_you_play_event_copy_it() {
+    let result = parse_ability("Until end of turn, when you play an event, copy it.", "");
+    assert_ron_snapshot!(result, @r###"
+    Event(EventAbility(
+      effect: Effect(CreateTriggerUntilEndOfTurn(
+        trigger: TriggeredAbility(
+          trigger: Play(Your(Event)),
+          effect: Effect(Copy(
+            target: It,
+          )),
+          options: Some(TriggeredAbilityOptions(
+            once_per_turn: false,
+            until_end_of_turn: true,
+          )),
+        ),
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_when_ally_dissolved_gains_reclaim_for_cost() {
+    let result = parse_ability(
+        "When an ally is {dissolved}, this card gains {reclaim-for-cost} this turn.",
+        "reclaim: 3",
+    );
+    assert_ron_snapshot!(result, @r###"
+    Triggered(TriggeredAbility(
+      trigger: Dissolved(Another(Character)),
+      effect: Effect(GainsReclaimUntilEndOfTurn(
+        target: This,
+        cost: Some(Energy(3)),
+      )),
+    ))
+    "###);
+}
+
+#[test]
 fn test_materialize_random_characters_with_cost() {
     let result = parse_ability(
         "{Materialize} {n-random-characters} with cost {e} or less from your deck.",

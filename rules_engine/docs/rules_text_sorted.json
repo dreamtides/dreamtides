@@ -1,7 +1,4 @@
 [
-  "This turn, when you play an event, copy it.",
-  "When an ally is {dissolved}, this card gains {reclaim-for-cost} this turn.",
-  "When the opponent plays a card which could {dissolve} an ally, {prevent} that card.",
   "When you {materialize} a character, trigger the '{Judgment}' ability of each ally.",
   "When you abandon { $allies ->\n  [one] your first ally each turn,\n  *[other] {count-allies} in a turn,\n} {dissolve} an enemy.",
   "When you discard a card, it gains {reclaim} equal to its cost this turn.",
@@ -15,5 +12,6 @@
   "With an allied {subtype}, you may play this card from your hand or void for {e}.",
   "You may only play this character from your void.",
   "{ChooseOne}\n{bullet} {e}: Return an enemy to hand.\n{bullet} {e-}: Draw {cards}.",
+  "When the opponent plays a card which could {dissolve} an ally, {prevent} that card.",
   "{Prevent} a played event which could {dissolve} an ally."
 ]

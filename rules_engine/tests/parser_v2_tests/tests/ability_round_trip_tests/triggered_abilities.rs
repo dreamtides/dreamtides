@@ -2,6 +2,14 @@ use parser_v2::serializer::ability_serializer;
 use parser_v2_tests::test_helpers::*;
 
 #[test]
+fn test_round_trip_when_ally_dissolved_gains_reclaim_for_cost() {
+    let original = "When an ally is {dissolved}, this card gains {reclaim-for-cost} this turn.";
+    let parsed = parse_ability(original, "reclaim: 3");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
 fn test_round_trip_at_end_of_turn_gain_energy() {
     let original = "At the end of your turn, gain {e}.";
     let parsed = parse_ability(original, "e: 2");

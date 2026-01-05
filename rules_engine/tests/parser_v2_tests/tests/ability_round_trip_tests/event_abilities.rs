@@ -2,6 +2,14 @@ use parser_v2::serializer::ability_serializer;
 use parser_v2_tests::test_helpers::*;
 
 #[test]
+fn test_round_trip_until_end_of_turn_when_you_play_event_copy_it() {
+    let original = "Until end of turn, when you play an event, copy it.";
+    let parsed = parse_ability(original, "");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
 fn test_round_trip_multiply_your_energy() {
     let original = "{MultiplyBy} the amount of {energy-symbol} you have.";
     let parsed = parse_ability(original, "number: 2");

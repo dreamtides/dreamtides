@@ -67,6 +67,12 @@ pub fn serialize_standard_effect(effect: &StandardEffect) -> String {
         StandardEffect::EnemyGainsPoints { .. } => "the opponent gains {points}.".to_string(),
         StandardEffect::Foresee { .. } => "{Foresee}.".to_string(),
         StandardEffect::Kindle { .. } => "{Kindle}.".to_string(),
+        StandardEffect::GainsReclaimUntilEndOfTurn { target, cost } => match cost {
+            Some(_) => {
+                format!("{} gains {{reclaim-for-cost}} this turn.", serialize_predicate(target))
+            }
+            None => format!("{} gains {{reclaim}} this turn.", serialize_predicate(target)),
+        },
         StandardEffect::GainsSpark { target, .. } => {
             format!("{} gains +{{s}} spark.", serialize_predicate(target))
         }
