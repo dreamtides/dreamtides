@@ -345,6 +345,52 @@ fn test_when_an_ally_is_dissolved_gain_energy() {
 }
 
 #[test]
+fn test_dissolved_subtype_in_void_gains_reclaim() {
+    let result = parse_ability(
+        "{Dissolved} A {subtype} in your void gains {reclaim} equal to its cost.",
+        "subtype: warrior",
+    );
+    assert_ron_snapshot!(result, @r###"
+    Triggered(TriggeredAbility(
+      trigger: Keywords([
+        Dissolved,
+      ]),
+      effect: Effect(CardsInVoidGainReclaimThisTurn(
+        count: Exactly(1),
+        predicate: CharacterType(Warrior),
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_dissolved_draw_cards_with_allied_subtype_dissolved_trigger() {
+    let result = parse_abilities(
+        "{Dissolved} Draw {cards}.\n\nWhen an allied {subtype} is {dissolved}, draw {cards}.",
+        "cards: 1, subtype: warrior",
+    );
+    assert_eq!(result.len(), 2);
+    assert_ron_snapshot!(result[0], @r###"
+    Triggered(TriggeredAbility(
+      trigger: Keywords([
+        Dissolved,
+      ]),
+      effect: Effect(DrawCards(
+        count: 1,
+      )),
+    ))
+    "###);
+    assert_ron_snapshot!(result[1], @r###"
+    Triggered(TriggeredAbility(
+      trigger: Dissolved(Another(CharacterType(Warrior))),
+      effect: Effect(DrawCards(
+        count: 1,
+      )),
+    ))
+    "###);
+}
+
+#[test]
 fn test_when_an_ally_is_banished_kindle() {
     let result = parse_ability("When an ally is {banished}, {kindle}.", "k: 1");
     assert_ron_snapshot!(result, @r###"
