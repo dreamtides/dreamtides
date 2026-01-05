@@ -70,7 +70,7 @@ test:
     # Set RUST_MIN_STACK for parser_v2 tests which need extra stack space for
     # deep Chumsky parser hierarchies. Limit test parallelism to prevent memory
     # exhaustion in low-memory environments (like Docker).
-    output=$(RUST_MIN_STACK=8388608 cargo test --manifest-path rules_engine/Cargo.toml -- --test-threads=4 2>&1)
+    output=$(RUST_MIN_STACK=8388608 cargo test --manifest-path rules_engine/Cargo.toml -- --test-threads=1 2>&1)
     if [ $? -eq 0 ]; then
         echo "Tests passed"
     else
@@ -79,14 +79,14 @@ test:
     fi
 
 test-verbose:
-    RUST_MIN_STACK=8388608 cargo test --manifest-path rules_engine/Cargo.toml -- --test-threads=4
+    RUST_MIN_STACK=8388608 cargo test --manifest-path rules_engine/Cargo.toml -- --test-threads=1
 
 battle-test *args='':
     cargo test --manifest-path rules_engine/Cargo.toml -p battle_tests "$@"
 
 parser-test *args='':
     #!/usr/bin/env bash
-    output=$(RUST_MIN_STACK=8388608 cargo test -q --manifest-path rules_engine/Cargo.toml -p parser_v2_tests -- --test-threads=4 "$@" 2>&1)
+    output=$(RUST_MIN_STACK=8388608 cargo test -q --manifest-path rules_engine/Cargo.toml -p parser_v2_tests -- --test-threads=1 "$@" 2>&1)
     exit_code=$?
     if [ $exit_code -eq 0 ]; then
         echo "Success"
@@ -97,7 +97,7 @@ parser-test *args='':
 
 parser-test-insta *args='':
     #!/usr/bin/env bash
-    output=$(INSTA_UPDATE=always RUST_MIN_STACK=8388608 cargo test -q --manifest-path rules_engine/Cargo.toml -p parser_v2_tests -- --test-threads=4 "$@" 2>&1)
+    output=$(INSTA_UPDATE=always RUST_MIN_STACK=8388608 cargo test -q --manifest-path rules_engine/Cargo.toml -p parser_v2_tests -- --test-threads=1 "$@" 2>&1)
     exit_code=$?
     if [ $exit_code -eq 0 ]; then
         echo "Success"
