@@ -232,3 +232,19 @@ fn test_round_trip_discover_character_with_activated_ability() {
     let serialized = ability_serializer::serialize_ability(&parsed);
     assert_eq!(original, serialized);
 }
+
+#[test]
+fn test_round_trip_materialize_n_figments() {
+    let original = "{Materialize} {n-figments}.";
+    let parsed = parse_ability(original, "figment: celestial, number: 2");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_materialize_a_figment_for_each_card_played_this_turn() {
+    let original = "{Materialize} {a-figment} for each card you have played this turn.";
+    let parsed = parse_ability(original, "figment: shadow");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}

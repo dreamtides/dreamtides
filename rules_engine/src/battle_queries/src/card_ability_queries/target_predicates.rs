@@ -76,6 +76,8 @@ pub fn get_character_target_predicate(effect: &StandardEffect) -> Option<&Predic
         StandardEffect::LosePoints { .. } => None,
         StandardEffect::MaterializeCharacter { .. } => None,
         StandardEffect::MaterializeCharacterFromVoid { .. } => None,
+        StandardEffect::MaterializeFigments { .. } => None,
+        StandardEffect::MaterializeFigmentsQuantity { .. } => None,
         StandardEffect::MaterializeRandomFromDeck { .. } => None,
         StandardEffect::NoEffect => None,
         StandardEffect::OpponentPaysCost { .. } => None,

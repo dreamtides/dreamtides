@@ -1,6 +1,7 @@
 use chumsky::extra::Err;
 use chumsky::prelude::*;
 use core_data::card_types::CardSubtype;
+use core_data::figment_type::FigmentType;
 
 use crate::lexer::lexer_token::Token;
 use crate::variables::parser_substitutions::ResolvedToken;
@@ -93,6 +94,19 @@ pub fn spark<'a>() -> impl Parser<'a, ParserInput<'a>, u32, ParserExtra<'a>> + C
 pub fn subtype<'a>() -> impl Parser<'a, ParserInput<'a>, CardSubtype, ParserExtra<'a>> + Clone {
     select! {
         (ResolvedToken::Subtype { subtype, .. }, _) => subtype
+    }
+}
+
+pub fn figment<'a>() -> impl Parser<'a, ParserInput<'a>, FigmentType, ParserExtra<'a>> + Clone {
+    select! {
+        (ResolvedToken::Figment { figment_type, .. }, _) => figment_type
+    }
+}
+
+pub fn figment_count<'a>(
+) -> impl Parser<'a, ParserInput<'a>, (FigmentType, u32), ParserExtra<'a>> + Clone {
+    select! {
+        (ResolvedToken::FigmentCount { figment_type, count, .. }, _) => (figment_type, count)
     }
 }
 

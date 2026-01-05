@@ -162,6 +162,16 @@ pub fn serialize_standard_effect(effect: &StandardEffect) -> String {
                 unimplemented!("Serialization not yet implemented for this materialize copy effect")
             }
         }
+        StandardEffect::MaterializeFigments { .. } => "{Materialize} {n-figments}.".to_string(),
+        StandardEffect::MaterializeFigmentsQuantity { count, quantity, .. } => {
+            if *count == 1 && matches!(quantity, QuantityExpression::PlayedThisTurn(_)) {
+                "{Materialize} {a-figment} for each card you have played this turn.".to_string()
+            } else {
+                unimplemented!(
+                    "Serialization not yet implemented for this materialize figments quantity"
+                )
+            }
+        }
         StandardEffect::ReturnToHand { target } => match target {
             Predicate::Any(CardPredicate::Character) => {
                 "return an enemy or ally to hand.".to_string()

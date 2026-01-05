@@ -5,8 +5,8 @@ use ability_data::standard_effect::StandardEffect;
 use chumsky::prelude::*;
 
 use crate::parser::parser_helpers::{
-    article, cards, directive, foresee_count, it_or_them_count, up_to_n_allies, word, words,
-    ParserExtra, ParserInput,
+    article, cards, directive, figment, figment_count, foresee_count, it_or_them_count,
+    up_to_n_allies, word, words, ParserExtra, ParserInput,
 };
 use crate::parser::{card_predicate_parser, cost_parser, predicate_parser};
 
@@ -27,6 +27,8 @@ pub fn parser<'a>() -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserEx
                 materialize_character_at_end_of_turn(),
                 materialize_collection(),
                 materialize_copy(),
+                materialize_figments_quantity(),
+                materialize_figments(),
                 materialize_character(),
             ))
             .boxed(),
@@ -175,6 +177,27 @@ pub fn materialize_copy<'a>(
             target: target.clone(),
             count: 1,
             quantity: QuantityExpression::Matching(target),
+        })
+}
+
+pub fn materialize_figments<'a>(
+) -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
+    directive("materialize")
+        .ignore_then(figment_count())
+        .map(|(figment, count)| StandardEffect::MaterializeFigments { figment, count })
+}
+
+pub fn materialize_figments_quantity<'a>(
+) -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
+    directive("materialize")
+        .ignore_then(figment())
+        .then_ignore(words(&["for", "each"]))
+        .then(card_predicate_parser::parser())
+        .then_ignore(words(&["you", "have", "played", "this", "turn"]))
+        .map(|(figment, predicate)| StandardEffect::MaterializeFigmentsQuantity {
+            figment,
+            count: 1,
+            quantity: QuantityExpression::PlayedThisTurn(predicate),
         })
 }
 

@@ -771,3 +771,33 @@ fn test_judgment_you_may_pay_energy_to_banish_up_to_n_allies_then_materialize_th
     ))
     "###);
 }
+
+#[test]
+fn test_materialize_n_figments() {
+    let result = parse_ability("{Materialize} {n-figments}.", "figment: celestial, number: 2");
+    assert_ron_snapshot!(result, @r###"
+    Event(EventAbility(
+      effect: Effect(MaterializeFigments(
+        figment: Celestial,
+        count: 2,
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_materialize_a_figment_for_each_card_played_this_turn() {
+    let result = parse_ability(
+        "{Materialize} {a-figment} for each card you have played this turn.",
+        "figment: shadow",
+    );
+    assert_ron_snapshot!(result, @r###"
+    Event(EventAbility(
+      effect: Effect(MaterializeFigmentsQuantity(
+        figment: Shadow,
+        count: 1,
+        quantity: PlayedThisTurn(Card),
+      )),
+    ))
+    "###);
+}

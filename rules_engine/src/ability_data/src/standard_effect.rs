@@ -1,3 +1,4 @@
+use core_data::figment_type::FigmentType;
 use core_data::numerics::{Energy, Points, Spark};
 use serde::{Deserialize, Serialize};
 use strum::{Display, EnumDiscriminants};
@@ -68,6 +69,8 @@ pub enum StandardEffect {
     MaterializeCharacterAtEndOfTurn { target: Predicate },
     MaterializeCharacterFromVoid { target: CardPredicate },
     MaterializeCollection { target: Predicate, count: CollectionExpression },
+    MaterializeFigments { figment: FigmentType, count: u32 },
+    MaterializeFigmentsQuantity { figment: FigmentType, count: u32, quantity: QuantityExpression },
     MaterializeRandomFromDeck { count: u32, predicate: CardPredicate },
     MaterializeSilentCopy { target: Predicate, count: u32, quantity: QuantityExpression },
     NoEffect,
