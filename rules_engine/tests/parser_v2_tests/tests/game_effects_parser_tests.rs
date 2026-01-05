@@ -840,3 +840,54 @@ fn test_materialize_a_figment_for_each_card_played_this_turn() {
     ))
     "###);
 }
+
+#[test]
+fn test_materialized_banish_enemy_until_character_leaves_play() {
+    let result =
+        parse_ability("{Materialized} {Banish} an enemy until this character leaves play.", "");
+    assert_ron_snapshot!(result, @r###"
+    Triggered(TriggeredAbility(
+      trigger: Keywords([
+        Materialized,
+      ]),
+      effect: Effect(BanishCharacterUntilLeavesPlay(
+        target: Enemy(Character),
+        until_leaves: This,
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_materialized_banish_enemy_until_next_main_phase() {
+    let result = parse_ability("{Materialized} {Banish} an enemy until your next main phase.", "");
+    assert_ron_snapshot!(result, @r###"
+    Triggered(TriggeredAbility(
+      trigger: Keywords([
+        Materialized,
+      ]),
+      effect: Effect(BanishUntilNextMain(
+        target: Enemy(Character),
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_materialized_event_in_void_gains_reclaim() {
+    let result = parse_ability(
+        "{Materialized} An event in your void gains {reclaim} equal to its cost this turn.",
+        "",
+    );
+    assert_ron_snapshot!(result, @r###"
+    Triggered(TriggeredAbility(
+      trigger: Keywords([
+        Materialized,
+      ]),
+      effect: Effect(CardsInVoidGainReclaimThisTurn(
+        count: Exactly(1),
+        predicate: Event,
+      )),
+    ))
+    "###);
+}

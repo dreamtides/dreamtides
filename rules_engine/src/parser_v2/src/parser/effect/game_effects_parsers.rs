@@ -21,6 +21,8 @@ pub fn parser<'a>() -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserEx
                 banish_cards_from_opponent_void(),
                 banish_up_to_n(),
                 banish_collection(),
+                banish_character_until_leaves_play(),
+                banish_until_next_main(),
                 banish_character(),
                 banish_enemy_void(),
             ))
@@ -105,6 +107,29 @@ pub fn banish_character<'a>(
         .ignore_then(article())
         .ignore_then(predicate_parser::predicate_parser())
         .map(|target| StandardEffect::BanishCharacter { target })
+}
+
+pub fn banish_character_until_leaves_play<'a>(
+) -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
+    directive("banish")
+        .ignore_then(article())
+        .ignore_then(predicate_parser::predicate_parser())
+        .then_ignore(word("until"))
+        .then(predicate_parser::predicate_parser())
+        .then_ignore(words(&["leaves", "play"]))
+        .map(|(target, until_leaves)| StandardEffect::BanishCharacterUntilLeavesPlay {
+            target,
+            until_leaves,
+        })
+}
+
+pub fn banish_until_next_main<'a>(
+) -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
+    directive("banish")
+        .ignore_then(article())
+        .ignore_then(predicate_parser::predicate_parser())
+        .then_ignore(words(&["until", "your", "next", "main", "phase"]))
+        .map(|target| StandardEffect::BanishUntilNextMain { target })
 }
 
 pub fn banish_collection<'a>(

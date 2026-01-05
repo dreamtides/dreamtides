@@ -143,6 +143,16 @@ pub fn serialize_standard_effect(effect: &StandardEffect) -> String {
             "{Banish} {cards} from the opponent's void.".to_string()
         }
         StandardEffect::BanishEnemyVoid => "{Banish} the opponent's void.".to_string(),
+        StandardEffect::BanishCharacterUntilLeavesPlay { target, until_leaves } => {
+            format!(
+                "{{Banish}} {} until {} leaves play.",
+                serialize_predicate(target),
+                serialize_predicate_without_article(until_leaves)
+            )
+        }
+        StandardEffect::BanishUntilNextMain { target } => {
+            format!("{{Banish}} {} until your next main phase.", serialize_predicate(target))
+        }
         StandardEffect::Discover { predicate } => {
             format!("{{Discover}} {}.", serialize_card_predicate(predicate))
         }

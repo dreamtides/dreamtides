@@ -331,3 +331,27 @@ fn test_round_trip_judgment_pay_to_banish_allies_then_materialize() {
     let serialized = ability_serializer::serialize_ability(&parsed);
     assert_eq!(original, serialized);
 }
+
+#[test]
+fn test_round_trip_materialized_banish_enemy_until_character_leaves_play() {
+    let original = "{Materialized} {Banish} an enemy until this character leaves play.";
+    let parsed = parse_ability(original, "");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_materialized_banish_enemy_until_next_main_phase() {
+    let original = "{Materialized} {Banish} an enemy until your next main phase.";
+    let parsed = parse_ability(original, "");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_materialized_event_in_void_gains_reclaim() {
+    let original = "{Materialized} An event in your void gains {reclaim} equal to its cost.";
+    let parsed = parse_ability("{Materialized} An event in your void gains {reclaim} equal to its cost this turn.", "");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
