@@ -17,13 +17,12 @@ Use an internal task list or todowrite mcp to track progress. Create a task list
 1. Analyze rules text and review similar cards in rules_text_sorted.json
 2. Implement parser for new syntax
 3. Add parsing tests with insta snapshots
-4. Update serialize_ability support
+4. Update serialization support (effects, costs, predicates as needed)
 5. Add round-trip tests
-6. Update parse_spanned_ability support
-7. Add spanned ability tests
-8. Consider error handling improvements
-9. Run `just fmt` and `just review`
-10. Update this guide with improvements discovered
+6. Update parse_spanned_ability support (if needed for new ability types)
+7. Add spanned ability tests (if adding new ability types)
+8. Run `just fmt` and `just review`
+9. Remove parsed abilities from rules_text_sorted.json
 
 Mark todos as in_progress before starting each step and completed when done.
 
@@ -193,27 +192,15 @@ Keywords([
 Keywords([Judgment])
 ```
 
-Use `sed` or accept snapshots with `INSTA_UPDATE=always` to fix formatting.
+Write snapshots directly inline in test code using the `@r###"..."###` syntax. The
+test will fail on first run, showing you the actual output which you can then copy
+into the snapshot assertion.
 
 ### Event Ability Serialization
 
-Don't forget to add Event ability support in `serialize_ability`:
-
-```rust
-pub fn serialize_ability(ability: &Ability) -> String {
-    match ability {
-        Ability::Triggered(triggered) => { /* ... */ }
-        Ability::Event(event) => {  // Add this!
-            if let ability_data::effect::Effect::Effect(effect) = &event.effect {
-                capitalize_first_letter(&serialize_standard_effect(effect))
-            } else {
-                unimplemented!("Complex event effects")
-            }
-        }
-        _ => unimplemented!(),
-    }
-}
-```
+Event abilities are automatically handled by the serializer in `ability_serializer.rs`.
+Effects are serialized via `effect_serializer.rs`. You typically only need to add
+serialization for new `StandardEffect` variants in `effect_serializer::serialize_standard_effect()`.
 
 ### Import Organization
 
@@ -396,25 +383,43 @@ fn test_your_new_event_ability() {
 }
 ```
 
-**IMPORTANT**: All cargo commands must be run from the `rules_engine` directory.
+**IMPORTANT**: Do NOT use `cargo test` directly. Always use the `just` commands which have project-specific optimizations.
 
-Run tests: `cargo test -p parser_v2_tests`
-Run specific test file: `cargo test -p parser_v2_tests --test effect_parser_tests`
-Update snapshots: `cargo insta review`
+Run all parser tests:
+```bash
+just parser-test
+```
+
+Run specific test files or tests by name:
+```bash
+just parser-test test_judgment_you_may_banish
+```
+
+Run a test and update `insta` snapshots:
+```bash
+just parser-test-insta game_effects_parser_tests
+```
 
 ### Step 3: Update Serialization Support
 
 Serialization converts `Ability` structs back to template text for round-trip
-verification. Update `rules_engine/src/parser_v2/src/serializer/parser_formatter.rs`.
+verification. Update the appropriate serializer module in
+`rules_engine/src/parser_v2/src/serializer/`:
 
-Add a match arm for your new effect in `serialize_standard_effect`:
+- **Effects**: Add to `effect_serializer::serialize_standard_effect()`
+- **Costs**: Add to `cost_serializer::serialize_cost()`
+- **Predicates**: Add to `predicate_serializer` if needed
+- **Static abilities**: Add to `static_ability_serializer` if needed
+
+Example for effects:
 
 ```rust
+// In effect_serializer.rs
 pub fn serialize_standard_effect(effect: &StandardEffect) -> String {
     match effect {
-        StandardEffect::DrawCards { .. } => "draw {cards}.".to_string(),
-        StandardEffect::DiscardCards { .. } => "discard {discards}.".to_string(),
-        StandardEffect::YourNewEffect { .. } => "your effect {cards}.".to_string(),
+        StandardEffect::DrawCards { .. } => "draw {cards}".to_string(),
+        StandardEffect::DiscardCards { .. } => "discard {discards}".to_string(),
+        StandardEffect::YourNewEffect { .. } => "your effect {cards}".to_string(),
         _ => unimplemented!("Serialization not yet implemented"),
     }
 }
@@ -434,17 +439,25 @@ Use these canonical variable names:
 ### Step 4: Add Round-Trip Tests
 
 Round-trip tests verify that parsing then serializing produces reasonable output.
-Add tests in `rules_engine/tests/parser_v2_tests/tests/ability_round_trip_tests.rs`:
+Add tests to the appropriate file in `rules_engine/tests/parser_v2_tests/tests/ability_round_trip_tests/`:
+
+- `judgment_abilities.rs` - For {Judgment} and {Materialized} triggered abilities
+- `event_abilities.rs` - For event card abilities
+- `activated_abilities.rs` - For activated abilities
+- `triggered_abilities.rs` - For other triggered abilities
+- `compound_effects.rs` - For compound effect patterns
+
+Example:
 
 ```rust
-use parser_v2::serializer::parser_formatter;
+use parser_v2::serializer::ability_serializer;
 use parser_v2_tests::test_helpers::*;
 
 #[test]
 fn test_round_trip_your_new_effect() {
     let original = "Your effect {cards}.";
     let parsed = parse_ability(original, "cards: 2");
-    let serialized = parser_formatter::serialize_ability(&parsed);
+    let serialized = ability_serializer::serialize_ability(&parsed);
     assert_eq!(original, serialized);
 }
 ```
@@ -462,7 +475,14 @@ requires special span handling.
 
 ### Step 6: Add Spanned Ability Tests
 
-Add tests in `rules_engine/tests/parser_v2_tests/tests/spanned_ability_tests.rs`:
+Add tests to the appropriate file in `rules_engine/tests/parser_v2_tests/tests/spanned_ability_tests/`:
+
+- `triggered_tests.rs` - For triggered abilities
+- `event_tests.rs` - For event abilities
+- `activated_tests.rs` - For activated abilities
+- `compound_tests.rs` - For compound effects
+
+Example:
 
 ```rust
 use parser_v2::builder::parser_spans::{SpannedAbility, SpannedEffect};
@@ -546,7 +566,54 @@ handling is done at the effect composition level in `effect_or_compound_parser`.
 
 When serializing optional effects, the formatter automatically adds "you may"
 prefix when `options.optional` is true. See `serialize_effect` in
-`parser_formatter.rs` for the implementation.
+`effect_serializer.rs` for the implementation.
+
+---
+
+## Trigger Costs
+
+Effects can have trigger costs that must be paid to activate them. The pattern
+`"You may {cost} to {effect}"` is automatically supported by the parser.
+
+### Adding New Trigger Costs
+
+Trigger costs are parsed in `cost_parser.rs` and registered in
+`effect_parser::trigger_cost_parser()`. Common trigger costs include:
+
+- `pay {e}` - Pay energy
+- `discard {discards}` - Discard cards
+- `{banish} {cards} from your void` - Banish cards from your void
+- `{banish} {cards} from the opponent's void` - Banish cards from opponent's void
+
+Example cost parser:
+
+```rust
+// In cost_parser.rs
+pub fn banish_cards_from_your_void_cost<'a>(
+) -> impl Parser<'a, ParserInput<'a>, Cost, ParserExtra<'a>> + Clone {
+    directive("banish")
+        .ignore_then(cards())
+        .then_ignore(words(&["from", "your", "void"]))
+        .map(Cost::BanishCardsFromYourVoid)
+}
+```
+
+Then register it in `effect_parser.rs`:
+
+```rust
+fn trigger_cost_parser<'a>() -> impl Parser<'a, ParserInput<'a>, Cost, ParserExtra<'a>> + Clone {
+    choice((
+        cost_parser::banish_cards_from_your_void_cost(),
+        pay_energy_cost(),
+        discard_cost(),
+    ))
+    .boxed()
+}
+```
+
+The parser automatically handles both patterns:
+- `{Judgment} You may {banish} {cards} from your void to {dissolve} an enemy.`
+- `{cost} to {effect}` (without optional)
 
 ---
 
@@ -570,14 +637,14 @@ For detailed reference information, see:
 
 ## Validation Commands
 
-All commands must be run from the `rules_engine` directory:
+**IMPORTANT**: Do NOT use `cargo` commands directly. Always use `just` commands.
 
 | Command | Purpose |
 |---------|---------|
 | `just fmt` | Apply rustfmt formatting |
 | `just check` | Type check code |
 | `just clippy` | Check for lint warnings |
-| `cargo test -p parser_v2_tests` | Run all parser tests |
-| `cargo test -p parser_v2_tests --test effect_parser_tests` | Run specific test file |
-| `just review` | Full validation pipeline |
-| `cargo insta review` | Review/update snapshots |
+| `just parser-test` | Run all parser tests |
+| `just parser-test <test_name>` | Run specific test(s) by name |
+| `just parser-test-insta <file>` | Run specific test file & update insta snapshots |
+| `just review` | Full validation pipeline (format, build, lint, test) |
