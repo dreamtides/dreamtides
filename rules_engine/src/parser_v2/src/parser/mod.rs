@@ -9,6 +9,7 @@ pub mod named_parser;
 pub mod parser_helpers;
 pub mod predicate_parser;
 pub mod predicate_suffix_parser;
+pub mod quantity_expression_parser;
 pub mod static_ability_parser;
 pub mod trigger_parser;
 pub mod triggered_parser;

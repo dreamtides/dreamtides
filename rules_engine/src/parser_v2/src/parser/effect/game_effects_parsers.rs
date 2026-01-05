@@ -8,7 +8,9 @@ use crate::parser::parser_helpers::{
     article, cards, directive, figment, figment_count, foresee_count, it_or_them_count,
     up_to_n_allies, word, words, ParserExtra, ParserInput,
 };
-use crate::parser::{card_predicate_parser, cost_parser, predicate_parser};
+use crate::parser::{
+    card_predicate_parser, cost_parser, predicate_parser, quantity_expression_parser,
+};
 
 pub fn parser<'a>() -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
     choice((
@@ -192,12 +194,11 @@ pub fn materialize_figments_quantity<'a>(
     directive("materialize")
         .ignore_then(figment())
         .then_ignore(words(&["for", "each"]))
-        .then(card_predicate_parser::parser())
-        .then_ignore(words(&["you", "have", "played", "this", "turn"]))
-        .map(|(figment, predicate)| StandardEffect::MaterializeFigmentsQuantity {
+        .then(quantity_expression_parser::parser())
+        .map(|(figment, quantity)| StandardEffect::MaterializeFigmentsQuantity {
             figment,
             count: 1,
-            quantity: QuantityExpression::PlayedThisTurn(predicate),
+            quantity,
         })
 }
 

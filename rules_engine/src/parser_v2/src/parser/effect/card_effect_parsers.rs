@@ -1,6 +1,5 @@
 use ability_data::collection_expression::CollectionExpression;
 use ability_data::predicate::{CardPredicate, Predicate};
-use ability_data::quantity_expression_data::QuantityExpression;
 use ability_data::standard_effect::StandardEffect;
 use chumsky::prelude::*;
 use core_data::numerics::{Energy, Points};
@@ -9,7 +8,7 @@ use crate::parser::parser_helpers::{
     article, cards, directive, discards, energy, period, points, reclaim_cost, top_n_cards,
     up_to_n_events, word, words, ParserExtra, ParserInput,
 };
-use crate::parser::{card_predicate_parser, predicate_parser};
+use crate::parser::{card_predicate_parser, predicate_parser, quantity_expression_parser};
 
 pub fn parser<'a>() -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
     choice((
@@ -88,7 +87,7 @@ pub fn gain_points_for_each<'a>(
     word("gain")
         .ignore_then(points())
         .then_ignore(words(&["for", "each"]))
-        .then(for_each_quantity_expression())
+        .then(quantity_expression_parser::parser())
         .map(|(gains, for_count)| StandardEffect::GainPointsForEach {
             gain: Points(gains),
             for_count,
@@ -185,7 +184,7 @@ fn draw_cards_for_each<'a>(
     word("draw")
         .ignore_then(cards())
         .then_ignore(words(&["for", "each"]))
-        .then(for_each_quantity_expression())
+        .then(quantity_expression_parser::parser())
         .map(|(count, for_each)| StandardEffect::DrawCardsForEach { count, for_each })
 }
 
@@ -205,22 +204,4 @@ fn discard_from_opponent_hand<'a>(
             .map(|predicate| StandardEffect::DiscardCardFromEnemyHand { predicate }),
     ))
     .boxed()
-}
-
-fn for_each_quantity_expression<'a>(
-) -> impl Parser<'a, ParserInput<'a>, QuantityExpression, ParserExtra<'a>> + Clone {
-    card_predicate_parser::parser()
-        .then_ignore(words(&["you", "have", "played", "this", "turn"]))
-        .map(QuantityExpression::PlayedThisTurn)
-        .or(words(&["ally", "abandoned", "this", "turn"])
-            .to(())
-            .map(|_| QuantityExpression::AbandonedThisTurn(CardPredicate::Character)))
-        .or(words(&["ally", "abandoned"])
-            .to(())
-            .map(|_| QuantityExpression::AbandonedThisWay(CardPredicate::Character)))
-        .or(card_predicate_parser::parser()
-            .then_ignore(word("abandoned"))
-            .map(QuantityExpression::AbandonedThisWay))
-        .or(predicate_parser::predicate_parser().map(QuantityExpression::Matching))
-        .boxed()
 }

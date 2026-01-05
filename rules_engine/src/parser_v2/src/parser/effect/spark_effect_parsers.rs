@@ -1,6 +1,5 @@
 use ability_data::collection_expression::CollectionExpression;
 use ability_data::predicate::Predicate;
-use ability_data::quantity_expression_data::QuantityExpression;
 use ability_data::standard_effect::StandardEffect;
 use chumsky::prelude::*;
 use core_data::numerics::Spark;
@@ -8,7 +7,7 @@ use core_data::numerics::Spark;
 use crate::parser::parser_helpers::{
     article, kindle_amount, spark, word, words, ParserExtra, ParserInput,
 };
-use crate::parser::{card_predicate_parser, predicate_parser};
+use crate::parser::{card_predicate_parser, predicate_parser, quantity_expression_parser};
 
 pub fn parser<'a>() -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
     choice((
@@ -32,11 +31,11 @@ fn gains_spark_for_each<'a>(
             .ignore_then(spark())
             .then_ignore(word("spark"))
             .then_ignore(words(&["for", "each"]))
-            .then(predicate_parser::predicate_parser())
-            .map(|(gains, for_each)| StandardEffect::GainsSparkForQuantity {
+            .then(quantity_expression_parser::parser())
+            .map(|(gains, for_quantity)| StandardEffect::GainsSparkForQuantity {
                 target: Predicate::This,
                 gains: Spark(gains),
-                for_quantity: QuantityExpression::Matching(for_each),
+                for_quantity,
             }),
         article()
             .or_not()
@@ -45,11 +44,11 @@ fn gains_spark_for_each<'a>(
             .then(spark())
             .then_ignore(word("spark"))
             .then_ignore(words(&["for", "each"]))
-            .then(predicate_parser::predicate_parser())
-            .map(|((target, gains), for_each)| StandardEffect::GainsSparkForQuantity {
+            .then(quantity_expression_parser::parser())
+            .map(|((target, gains), for_quantity)| StandardEffect::GainsSparkForQuantity {
                 target,
                 gains: Spark(gains),
-                for_quantity: QuantityExpression::Matching(for_each),
+                for_quantity,
             }),
     ))
     .boxed()
