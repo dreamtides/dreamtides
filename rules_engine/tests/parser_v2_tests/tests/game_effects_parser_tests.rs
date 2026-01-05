@@ -1004,3 +1004,28 @@ fn test_judgment_each_player_shuffles_hand_and_void_and_draws() {
     ))
     "###);
 }
+
+#[test]
+fn test_copy_it() {
+    let result = parse_ability("copy it.", "");
+    assert_ron_snapshot!(result, @r###"
+    Event(EventAbility(
+      effect: Effect(Copy(
+        target: It,
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_when_you_play_event_from_hand_copy_it() {
+    let result = parse_ability("When you play an event from your hand, copy it.", "");
+    assert_ron_snapshot!(result, @r###"
+    Triggered(TriggeredAbility(
+      trigger: PlayFromHand(Your(Event)),
+      effect: Effect(Copy(
+        target: It,
+      )),
+    ))
+    "###);
+}

@@ -73,6 +73,7 @@ pub fn serialize_standard_static_ability(ability: &StandardStaticAbility) -> Str
         StandardStaticAbility::DisableEnemyMaterializedAbilities => {
             "disable the {Materialized} abilities of enemies.".to_string()
         }
+        StandardStaticAbility::HasAllCharacterTypes => "has all character types.".to_string(),
         StandardStaticAbility::MultiplyEnergyGainFromCardEffects { .. } => {
             "{multiplyby} the amount of {energy-symbol} you gain from card effects this turn."
                 .to_string()

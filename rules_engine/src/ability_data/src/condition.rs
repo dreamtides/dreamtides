@@ -7,6 +7,7 @@ use crate::predicate::Predicate;
 /// card".
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum Condition {
+    AlliesThatShareACharacterType { of: Predicate, count: u32 },
     CardsDiscardedThisTurn { count: u32 },
     CardsDrawnThisTurn { count: u32 },
     CardsInVoidCount { count: u32 },

@@ -855,3 +855,78 @@ fn test_once_per_turn_play_fast_character_gain_energy() {
     ))
     "###);
 }
+
+#[test]
+fn test_judgment_with_count_allies_that_share_character_type_draw_cards() {
+    let result = parse_ability(
+        "{Judgment} With {count-allies} that share a character type, draw {cards}.",
+        "allies: 3, cards: 2",
+    );
+    assert_ron_snapshot!(result, @r###"
+    Triggered(TriggeredAbility(
+      trigger: Keywords([
+        Judgment,
+      ]),
+      effect: WithOptions(EffectWithOptions(
+        effect: DrawCards(
+          count: 2,
+        ),
+        optional: false,
+        condition: Some(AlliesThatShareACharacterType(
+          of: This,
+          count: 3,
+        )),
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_events_cost_more_and_play_event_from_hand_copy() {
+    let result = parse_abilities(
+        "Events cost you {e} more.\n\nWhen you play an event from your hand, copy it.",
+        "e: 1",
+    );
+    assert_ron_snapshot!(result, @r###"
+    [
+      Static(StaticAbility(YourCardsCostIncrease(
+        matching: Event,
+        reduction: Energy(1),
+      ))),
+      Triggered(TriggeredAbility(
+        trigger: PlayFromHand(Your(Event)),
+        effect: Effect(Copy(
+          target: It,
+        )),
+      )),
+    ]
+    "###);
+}
+
+#[test]
+fn test_has_all_character_types_and_judgment_with_allies() {
+    let result = parse_abilities(
+        "Has all character types.\n\n{Judgment} With {count-allies} that share a character type, draw {cards}.",
+        "allies: 2, cards: 1",
+    );
+    assert_ron_snapshot!(result, @r###"
+    [
+      Static(StaticAbility(HasAllCharacterTypes)),
+      Triggered(TriggeredAbility(
+        trigger: Keywords([
+          Judgment,
+        ]),
+        effect: WithOptions(EffectWithOptions(
+          effect: DrawCards(
+            count: 1,
+          ),
+          optional: false,
+          condition: Some(AlliesThatShareACharacterType(
+            of: This,
+            count: 2,
+          )),
+        )),
+      )),
+    ]
+    "###);
+}

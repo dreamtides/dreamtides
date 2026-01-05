@@ -211,6 +211,28 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1075204864 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4932585734828693027, guid: b1656b6b68ea673458fe64e8e4166e8e, type: 3}
+  m_PrefabInstance: {fileID: 1452999779}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1075204867
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1075204864}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 216e6eff78b484acf9fdab60af108819, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Dreamtides::FlyingFootFixer
+  applyFix: 1
+  footPitchAngle: 30
+  blendWeight: 1
+  animationStateName: 
+  animatorLayer: 0
 --- !u!1001 &1452999779
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -255,6 +277,14 @@ PrefabInstance:
       propertyPath: m_Controller
       value: 
       objectReference: {fileID: 9100000, guid: b2f9dd416660647f0874932241af073c, type: 2}
+    - target: {fileID: 6641138764540066733, guid: b1656b6b68ea673458fe64e8e4166e8e, type: 3}
+      propertyPath: m_WarningMessage
+      value: "\nBinding warning: Some generic clip(s) animate transforms that are
+        already bound by a Humanoid avatar. These transforms can only be changed
+        by Humanoid clips.\n\tTransform 'ball_l'\n\tTransform 'foot_l'\n\tTransform
+        'foot_r'\n\tTransform 'ball_r'\n\tFrom animation clip 'FootFix'\n\tFrom animation
+        clip 'FootFix'"
+      objectReference: {fileID: 0}
     - target: {fileID: 6708770601277738925, guid: b1656b6b68ea673458fe64e8e4166e8e, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -298,7 +328,10 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 4932585734828693027, guid: b1656b6b68ea673458fe64e8e4166e8e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1075204867}
   m_SourcePrefab: {fileID: 100100000, guid: b1656b6b68ea673458fe64e8e4166e8e, type: 3}
 --- !u!1 &2123959637
 GameObject:

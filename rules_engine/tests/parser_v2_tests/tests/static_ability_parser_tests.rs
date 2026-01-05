@@ -150,3 +150,22 @@ fn test_disable_enemy_materialized_abilities() {
     Static(StaticAbility(DisableEnemyMaterializedAbilities))
     "###);
 }
+
+#[test]
+fn test_has_all_character_types() {
+    let result = parse_ability("Has all character types.", "");
+    assert_ron_snapshot!(result, @r###"
+    Static(StaticAbility(HasAllCharacterTypes))
+    "###);
+}
+
+#[test]
+fn test_events_cost_you_more() {
+    let result = parse_ability("Events cost you {e} more.", "e: 1");
+    assert_ron_snapshot!(result, @r###"
+    Static(StaticAbility(YourCardsCostIncrease(
+      matching: Event,
+      reduction: Energy(1),
+    )))
+    "###);
+}

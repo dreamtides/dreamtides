@@ -250,6 +250,9 @@ pub fn serialize_standard_effect(effect: &StandardEffect) -> String {
                 serialize_predicate_without_article(matching)
             )
         }
+        StandardEffect::Copy { target } => {
+            format!("copy {}.", serialize_predicate(target))
+        }
         StandardEffect::DisableActivatedAbilitiesWhileInPlay { target } => format!(
             "disable the activated abilities of {} while this character is in play.",
             serialize_predicate(target)
@@ -392,6 +395,9 @@ pub fn serialize_effect(effect: &Effect) -> String {
 
 fn serialize_condition(condition: &Condition) -> String {
     match condition {
+        Condition::AlliesThatShareACharacterType { .. } => {
+            "with {count-allies} that share a character type,".to_string()
+        }
         Condition::PredicateCount { count, predicate } => {
             format!("with {},", serialize_predicate_count(*count, predicate))
         }

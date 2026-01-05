@@ -1,6 +1,4 @@
 [
-  "Events cost you {e} more.\n\nWhen you play an event from your hand, copy it.",
-  "Has all character types.\n\n{Judgment} If {count-allies} share a character type, Draw {cards}.",
   "If you have discarded a card this turn, this character costs {e}.",
   "Lose {maximum-energy}: Play this event for {e}.\n\n{Prevent} a played card.",
   "Once per turn, you may play a character with cost {e} or less from your void.",

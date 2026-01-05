@@ -42,6 +42,7 @@ fn standard_static_ability<'a>(
         simple_alternate_cost_with_period(),
         characters_in_hand_have_fast(),
         disable_enemy_materialized_abilities(),
+        has_all_character_types(),
         allied_spark_bonus(),
         enemy_cards_cost_increase(),
         your_cards_cost_modification(),
@@ -128,6 +129,13 @@ fn disable_enemy_materialized_abilities<'a>(
         .ignore_then(words(&["abilities", "of", "enemies"]))
         .ignore_then(period())
         .to(StandardStaticAbility::DisableEnemyMaterializedAbilities)
+}
+
+fn has_all_character_types<'a>(
+) -> impl Parser<'a, ParserInput<'a>, StandardStaticAbility, ParserExtra<'a>> + Clone {
+    words(&["has", "all", "character", "types"])
+        .ignore_then(period())
+        .to(StandardStaticAbility::HasAllCharacterTypes)
 }
 
 fn abandon_ally_play_character_for_alternate_cost<'a>(

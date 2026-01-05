@@ -16,6 +16,7 @@ pub fn parser<'a>() -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserEx
     choice((
         choice((
             copy_next_played(),
+            copy_it(),
             foresee(),
             each_player_shuffles_hand_and_void_and_draws(),
             discover_and_materialize(),
@@ -265,6 +266,10 @@ pub fn copy_next_played<'a>(
             matching: Predicate::Your(card_predicate),
             times: Some(times),
         })
+}
+
+pub fn copy_it<'a>() -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
+    word("copy").ignore_then(word("it")).to(StandardEffect::Copy { target: Predicate::It })
 }
 
 pub fn trigger_additional_judgment_phase<'a>(
