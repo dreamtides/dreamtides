@@ -7,13 +7,14 @@ edition = "2021"
 workspace = true
 
 [dependencies]
-parser_v2 = { path = "../../src/parser_v2" }
-parser_v2_benchmarks = { path = "../../benchmarks/parser_v2" }
-
 ability_data = { path = "../../src/ability_data" }
 core_data = { path = "../../src/core_data" }
+parser_v2 = { path = "../../src/parser_v2" }
+parser_v2_benchmarks = { path = "../../benchmarks/parser_v2" }
 
 chumsky = { workspace = true }
 insta = { workspace = true }
 regex = { workspace = true }
+serde = { workspace = true }
 stacker = "0.1"
+toml = { workspace = true }
