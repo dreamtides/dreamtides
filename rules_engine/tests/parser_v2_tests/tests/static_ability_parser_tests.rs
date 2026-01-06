@@ -307,3 +307,29 @@ fn test_while_in_void_allied_subtype_have_spark() {
     )))
     "###);
 }
+
+#[test]
+fn test_while_count_or_more_cards_in_void_have_reclaim() {
+    let result = parse_ability(
+        "While you have {count} or more cards in your void, they have {reclaim} equal to their cost.",
+        "count: 3",
+    );
+    assert_ron_snapshot!(result, @r###"
+    Static(WithOptions(StaticAbilityWithOptions(
+      ability: CardsInYourVoidHaveReclaim(
+        matching: Card,
+      ),
+      condition: Some(CardsInVoidCount(
+        count: 3,
+      )),
+    )))
+    "###);
+}
+
+#[test]
+fn test_play_only_from_void() {
+    let result = parse_ability("You may only play this character from your void.", "");
+    assert_ron_snapshot!(result, @r###"
+    Static(StaticAbility(PlayOnlyFromVoid))
+    "###);
+}

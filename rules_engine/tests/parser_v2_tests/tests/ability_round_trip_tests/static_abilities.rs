@@ -104,3 +104,19 @@ fn test_round_trip_while_in_void_allied_subtype_have_spark() {
     let serialized = ability_serializer::serialize_ability(&parsed);
     assert_eq!(original, serialized);
 }
+
+#[test]
+fn test_round_trip_while_count_or_more_cards_in_void_have_reclaim() {
+    let original = "While you have {count} or more cards in your void, they have {reclaim} equal to their cost.";
+    let parsed = parse_ability(original, "count: 3");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_play_only_from_void() {
+    let original = "You may only play this character from your void.";
+    let parsed = parse_ability(original, "");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}

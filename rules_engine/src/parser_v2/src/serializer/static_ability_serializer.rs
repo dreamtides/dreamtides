@@ -27,6 +27,13 @@ pub fn serialize_static_ability(static_ability: &StaticAbility) -> String {
                     } else {
                         format!("while this card is in your void, {}.", base)
                     }
+                } else if matches!(condition, Condition::CardsInVoidCount { .. }) {
+                    let condition_str = serialize_condition(condition);
+                    if base.ends_with('.') {
+                        format!("{} {}", condition_str, base)
+                    } else {
+                        format!("{} {}.", condition_str, base)
+                    }
                 } else {
                     let condition_str = serialize_condition(condition);
                     if base.ends_with('.') {
@@ -122,6 +129,12 @@ pub fn serialize_standard_static_ability(ability: &StandardStaticAbility) -> Str
                 serialize_predicate_without_article(predicate)
             )
         }
+        StandardStaticAbility::PlayOnlyFromVoid => {
+            "you may only play this character from your void.".to_string()
+        }
+        StandardStaticAbility::CardsInYourVoidHaveReclaim { .. } => {
+            "they have {reclaim} equal to their cost.".to_string()
+        }
         _ => unimplemented!("Serialization not yet implemented for this static ability"),
     }
 }
@@ -131,6 +144,9 @@ fn serialize_condition(condition: &Condition) -> String {
         Condition::DissolvedThisTurn { .. } => "if a character dissolved this turn".to_string(),
         Condition::CardsDiscardedThisTurn { count: 1 } => {
             "if you have discarded a card this turn".to_string()
+        }
+        Condition::CardsInVoidCount { .. } => {
+            "while you have {count} or more cards in your void,".to_string()
         }
         _ => unimplemented!("Serialization not yet implemented for this condition type"),
     }

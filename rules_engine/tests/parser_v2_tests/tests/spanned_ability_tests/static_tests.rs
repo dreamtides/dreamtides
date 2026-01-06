@@ -69,3 +69,31 @@ fn test_spanned_while_in_void_allied_subtype_have_spark() {
     );
     assert_valid_span(&text.span);
 }
+
+#[test]
+fn test_spanned_while_count_or_more_cards_in_void_have_reclaim() {
+    let SpannedAbility::Static { text } = parse_spanned_ability(
+        "While you have {count} or more cards in your void, they have {reclaim} equal to their cost.",
+        "count: 3",
+    ) else {
+        panic!("Expected Static ability");
+    };
+
+    assert_eq!(
+        text.text,
+        "While you have {count} or more cards in your void, they have {reclaim} equal to their cost."
+    );
+    assert_valid_span(&text.span);
+}
+
+#[test]
+fn test_spanned_play_only_from_void() {
+    let SpannedAbility::Static { text } =
+        parse_spanned_ability("You may only play this character from your void.", "")
+    else {
+        panic!("Expected Static ability");
+    };
+
+    assert_eq!(text.text, "You may only play this character from your void.");
+    assert_valid_span(&text.span);
+}

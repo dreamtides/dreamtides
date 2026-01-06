@@ -1,7 +1,7 @@
 use ability_data::collection_expression::CollectionExpression;
 use ability_data::cost::Cost;
 use ability_data::effect::Effect;
-use ability_data::predicate::Predicate;
+use ability_data::predicate::{CardPredicate, Predicate};
 use ability_data::standard_effect::StandardEffect;
 use ability_data::static_ability::{
     AlternateCost, StandardStaticAbility, StaticAbility, StaticAbilityWithOptions,
@@ -46,6 +46,8 @@ pub fn static_ability_parser<'a>(
 fn standard_static_ability<'a>(
 ) -> impl Parser<'a, ParserInput<'a>, StandardStaticAbility, ParserExtra<'a>> + Clone {
     choice((
+        play_only_from_void(),
+        cards_in_your_void_have_reclaim(),
         additional_cost_to_play(),
         once_per_turn_play_from_void(),
         abandon_ally_play_character_for_alternate_cost(),
@@ -281,4 +283,22 @@ fn spark_equal_to_predicate_count<'a>(
         .ignore_then(predicate_parser::predicate_parser())
         .then_ignore(period())
         .map(|predicate| StandardStaticAbility::SparkEqualToPredicateCount { predicate })
+}
+
+fn play_only_from_void<'a>(
+) -> impl Parser<'a, ParserInput<'a>, StandardStaticAbility, ParserExtra<'a>> + Clone {
+    words(&["you", "may", "only", "play", "this", "character", "from", "your", "void"])
+        .ignore_then(period())
+        .to(StandardStaticAbility::PlayOnlyFromVoid)
+}
+
+fn cards_in_your_void_have_reclaim<'a>(
+) -> impl Parser<'a, ParserInput<'a>, StandardStaticAbility, ParserExtra<'a>> + Clone {
+    words(&["they", "have"])
+        .ignore_then(directive("reclaim"))
+        .ignore_then(words(&["equal", "to", "their", "cost"]))
+        .ignore_then(period())
+        .map(|_| StandardStaticAbility::CardsInYourVoidHaveReclaim {
+            matching: CardPredicate::Card,
+        })
 }

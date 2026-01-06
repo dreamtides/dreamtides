@@ -5,12 +5,13 @@ use core_data::card_types::CardSubtype;
 
 use crate::parser::card_predicate_parser;
 use crate::parser::parser_helpers::{
-    comma, count_allied_subtype, count_allies, word, words, ParserExtra, ParserInput,
+    comma, count, count_allied_subtype, count_allies, word, words, ParserExtra, ParserInput,
 };
 
 pub fn condition_parser<'a>() -> impl Parser<'a, ParserInput<'a>, Condition, ParserExtra<'a>> + Clone
 {
     choice((
+        while_you_have_count_or_more_cards_in_your_void(),
         while_this_card_is_in_your_void(),
         this_card_is_in_your_void(),
         dissolved_this_turn(),
@@ -70,4 +71,13 @@ fn while_this_card_is_in_your_void<'a>(
     words(&["while", "this", "card", "is", "in", "your", "void"])
         .then_ignore(comma())
         .to(Condition::ThisCardIsInYourVoid)
+}
+
+fn while_you_have_count_or_more_cards_in_your_void<'a>(
+) -> impl Parser<'a, ParserInput<'a>, Condition, ParserExtra<'a>> + Clone {
+    words(&["while", "you", "have"])
+        .ignore_then(count())
+        .then_ignore(words(&["or", "more", "cards", "in", "your", "void"]))
+        .then_ignore(comma())
+        .map(|count| Condition::CardsInVoidCount { count })
 }
