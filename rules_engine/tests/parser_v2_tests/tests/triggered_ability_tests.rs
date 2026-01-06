@@ -962,3 +962,20 @@ fn test_when_no_cards_in_deck_you_win() {
     ))
     "###);
 }
+
+#[test]
+fn test_when_you_play_card_during_opponent_turn_this_character_gains_spark() {
+    let result = parse_ability(
+        "When you play a card during the opponent's turn, this character gains +{s} spark.",
+        "s: 1",
+    );
+    assert_ron_snapshot!(result, @r###"
+    Triggered(TriggeredAbility(
+      trigger: PlayDuringTurn(Your(Card), EnemyTurn),
+      effect: Effect(GainsSpark(
+        target: This,
+        gains: Spark(1),
+      )),
+    ))
+    "###);
+}

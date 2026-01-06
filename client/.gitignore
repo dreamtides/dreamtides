@@ -12,8 +12,7 @@
 
 rules_text.json
 
-# temp
-Assets/Content/Imposters/
+Assets/Scenes/Test.unity
 
 /UIElementsSchema/
 /HostedData/

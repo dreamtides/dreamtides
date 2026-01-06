@@ -88,6 +88,7 @@ pub fn get_character_target_predicate(effect: &StandardEffect) -> Option<&Predic
         StandardEffect::PutCardsFromYourDeckIntoVoid { .. } => None,
         StandardEffect::ReturnFromYourVoidToHand { .. } => None,
         StandardEffect::ReturnFromYourVoidToPlay { .. } => None,
+        StandardEffect::ReturnRandomFromYourVoidToPlay { .. } => None,
         StandardEffect::ReturnUpToCountFromYourVoidToHand { .. } => None,
         StandardEffect::SparkBecomes { .. } => None,
         StandardEffect::SpendAllEnergyDissolveEnemy => None,

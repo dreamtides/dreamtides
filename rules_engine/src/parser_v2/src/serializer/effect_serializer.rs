@@ -217,6 +217,9 @@ pub fn serialize_standard_effect(effect: &StandardEffect) -> String {
         StandardEffect::ReturnFromYourVoidToPlay { target } => {
             format!("{{Reclaim}} {}.", serialize_predicate(target))
         }
+        StandardEffect::ReturnRandomFromYourVoidToPlay { predicate } => {
+            format!("{{Reclaim}} a random {}.", serialize_card_predicate(predicate))
+        }
         StandardEffect::PutOnTopOfEnemyDeck { target } => {
             format!("put {} on top of the opponent's deck.", serialize_predicate(target))
         }

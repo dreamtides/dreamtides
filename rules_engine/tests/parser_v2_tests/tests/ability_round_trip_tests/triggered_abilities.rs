@@ -305,3 +305,19 @@ fn test_round_trip_when_you_discard_card_it_gains_reclaim_equal_to_cost() {
     let serialized = ability_serializer::serialize_ability(&parsed);
     assert_eq!(original, serialized);
 }
+
+#[test]
+fn test_round_trip_when_you_play_subtype_reclaim_random_character_with_cost_or_less() {
+    let original = "When you play {a-subtype}, {Reclaim} a random character with cost {e} or less.";
+    let parsed = parse_ability(original, "subtype: warrior, e: 3");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_when_you_play_card_during_opponent_turn_this_character_gains_spark() {
+    let original = "When you play a card during the opponent's turn, this character gains +{s} spark.";
+    let parsed = parse_ability(original, "s: 1");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}

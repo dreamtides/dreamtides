@@ -32,6 +32,7 @@ pub fn parser<'a>() -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserEx
                 gain_points(),
                 put_cards_from_deck_into_void(),
                 put_cards_from_void_on_top_of_deck(),
+                reclaim_random_from_void(),
                 reclaim_from_void(),
             ))
             .boxed(),
@@ -143,6 +144,14 @@ pub fn reclaim_from_void<'a>(
         .ignore_then(article().or_not())
         .ignore_then(predicate_parser::predicate_parser())
         .map(|target| StandardEffect::ReturnFromYourVoidToPlay { target })
+}
+
+pub fn reclaim_random_from_void<'a>(
+) -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
+    directive("reclaim")
+        .ignore_then(words(&["a", "random"]))
+        .ignore_then(card_predicate_parser::parser())
+        .map(|predicate| StandardEffect::ReturnRandomFromYourVoidToPlay { predicate })
 }
 
 /// Parses effects that move the top cards of your deck into your void.

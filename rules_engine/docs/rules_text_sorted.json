@@ -1,6 +1,4 @@
 [
-  "When you play {a-subtype}, {reclaim} a random character with cost {e} or less.",
-  "When you play a card during the opponent's turn, this character gains +{s} spark.",
   "When you play a character, {materialize} {a-figment}.",
   "While this card is in your void, allied {plural-subtype} have +{s} spark.",
   "While you have {$count} or more cards in your void, they have {reclaim} equal to their cost.",

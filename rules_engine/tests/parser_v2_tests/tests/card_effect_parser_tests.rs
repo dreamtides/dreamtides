@@ -873,3 +873,23 @@ fn test_return_all_ally_to_hand_draw_cards() {
     ))
     "###);
 }
+
+#[test]
+fn test_reclaim_random_character_with_cost_or_less() {
+    let result = parse_ability(
+        "When you play {a-subtype}, {reclaim} a random character with cost {e} or less.",
+        "subtype: warrior, e: 3",
+    );
+    assert_ron_snapshot!(result, @r###"
+    Triggered(TriggeredAbility(
+      trigger: Play(Your(CharacterType(Warrior))),
+      effect: Effect(ReturnRandomFromYourVoidToPlay(
+        predicate: CardWithCost(
+          target: Character,
+          cost_operator: OrLess,
+          cost: Energy(3),
+        ),
+      )),
+    ))
+    "###);
+}

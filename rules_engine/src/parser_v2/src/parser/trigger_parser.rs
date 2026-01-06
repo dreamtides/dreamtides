@@ -47,6 +47,7 @@ fn play_triggers<'a>() -> impl Parser<'a, ParserInput<'a>, TriggerEvent, ParserE
     choice((
         play_cards_in_turn_trigger(),
         play_from_hand_trigger(),
+        play_during_opponent_turn_trigger(),
         play_during_turn_trigger(),
         play_trigger(),
     ))
@@ -118,6 +119,17 @@ fn play_during_turn_trigger<'a>(
         .then_ignore(words(&["in", "a", "turn"]))
         .map(|card_predicate| {
             TriggerEvent::PlayDuringTurn(Predicate::Your(card_predicate), PlayerTurn::YourTurn)
+        })
+}
+
+fn play_during_opponent_turn_trigger<'a>(
+) -> impl Parser<'a, ParserInput<'a>, TriggerEvent, ParserExtra<'a>> + Clone {
+    words(&["when", "you", "play"])
+        .ignore_then(article().or_not())
+        .ignore_then(card_predicate_parser::parser())
+        .then_ignore(words(&["during", "the", "opponent's", "turn"]))
+        .map(|card_predicate| {
+            TriggerEvent::PlayDuringTurn(Predicate::Your(card_predicate), PlayerTurn::EnemyTurn)
         })
 }
 

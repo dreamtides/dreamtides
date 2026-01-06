@@ -1,4 +1,4 @@
-use ability_data::trigger_event::{TriggerEvent, TriggerKeyword};
+use ability_data::trigger_event::{PlayerTurn, TriggerEvent, TriggerKeyword};
 
 use super::predicate_serializer::serialize_predicate;
 
@@ -17,9 +17,17 @@ pub fn serialize_trigger_event(trigger: &TriggerEvent) -> String {
             format!("when you play {} from your hand, ", serialize_predicate(predicate))
         }
         TriggerEvent::PlayCardsInTurn(_) => "when you play {cards-numeral} in a turn, ".to_string(),
-        TriggerEvent::PlayDuringTurn(predicate, _) => {
-            format!("when you play {} in a turn, ", serialize_predicate(predicate))
-        }
+        TriggerEvent::PlayDuringTurn(predicate, turn) => match turn {
+            PlayerTurn::YourTurn => {
+                format!("when you play {} in a turn, ", serialize_predicate(predicate))
+            }
+            PlayerTurn::EnemyTurn => {
+                format!(
+                    "when you play {} during the opponent's turn, ",
+                    serialize_predicate(predicate)
+                )
+            }
+        },
         TriggerEvent::Discard(predicate) => {
             format!("when you discard {}, ", serialize_predicate(predicate))
         }

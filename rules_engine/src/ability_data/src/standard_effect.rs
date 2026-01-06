@@ -85,6 +85,7 @@ pub enum StandardEffect {
     PutOnTopOfEnemyDeck { target: Predicate },
     ReturnFromYourVoidToHand { target: Predicate },
     ReturnFromYourVoidToPlay { target: Predicate },
+    ReturnRandomFromYourVoidToPlay { predicate: CardPredicate },
     ReturnToHand { target: Predicate },
     ReturnUpToCountFromYourVoidToHand { target: Predicate, count: u32 },
     SparkBecomes { collection: CollectionExpression, matching: CardPredicate, spark: Spark },
