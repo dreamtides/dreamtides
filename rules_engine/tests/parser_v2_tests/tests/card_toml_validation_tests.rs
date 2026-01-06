@@ -92,7 +92,7 @@ fn test_all_cards_toml_parse() {
     print_results(success_count, total_abilities, &all_errors);
 
     if !all_errors.is_empty() {
-        eprintln!("\n{} abilities failed to parse (see details above)", all_errors.len());
+        panic!("\n{} abilities failed to parse (see details above)", all_errors.len());
     }
 }
 

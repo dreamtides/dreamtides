@@ -3140,11 +3140,11 @@ energy-cost = 2
 rules-text = """
 {Dissolve} an enemy with cost {e} or less.
 
-{Reclaim} -- Abandon an ally. """
+{Reclaim} -- Abandon an ally"""
 preview = """
 Dissolve an enemy with cost 2● or less.
 
-Reclaim -- Abandon an ally."""
+Reclaim -- Abandon an ally"""
 variables = "e: 2"
 card-type = "Event"
 is-fast = false
@@ -3494,7 +3494,7 @@ card-number = 210
 name = "Architect of Memory"
 id = "2530adcc-5ae2-486a-94b2-f40dd62f3755"
 energy-cost = 2
-rules-text = "While you have {$count} or more cards in your void, they have {reclaim} equal to their cost."
+rules-text = "While you have {count} or more cards in your void, they have {reclaim} equal to their cost."
 preview = "While you have 7 or more cards in your void, they have reclaim equal to their cost."
 variables = "count: 7"
 card-type = "Character"
@@ -3663,10 +3663,6 @@ card-number = 220
 name = "Void Indicator Card"
 id = "c0ae09e9-e4c7-423f-9f23-35a5c927d8c0"
 energy-cost = 0
-rules-text = """
-(Placeholder card to avoid reusing this art)
-"""
-preview = "(Placeholder card to avoid reusing this art)"
 is-fast = false
 image-number = 313783940
 rarity = "Special"
