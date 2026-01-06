@@ -51,7 +51,7 @@ pub fn serialize_standard_effect(effect: &StandardEffect) -> String {
         ),
         StandardEffect::GainEnergy { .. } => "gain {e}.".to_string(),
         StandardEffect::GainEnergyEqualToCost { target } => match target {
-            Predicate::It => "gain {e} equal to that character's cost.".to_string(),
+            Predicate::It => "gain {energy-symbol} equal to that character's cost.".to_string(),
             _ => unimplemented!(
                 "Serialization not yet implemented for this GainEnergyEqualTo target"
             ),

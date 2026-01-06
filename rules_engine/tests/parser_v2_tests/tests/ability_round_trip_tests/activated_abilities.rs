@@ -131,8 +131,8 @@ fn test_round_trip_abandon_count_allies_reclaim_this_character() {
 
 #[test]
 fn test_round_trip_abandon_ally_gain_energy_equal_to_cost() {
-    let original = "Abandon an ally: Gain {e} equal to that character's cost.";
-    let parsed = parse_ability(original, "e: 1");
+    let original = "Abandon an ally: Gain {energy-symbol} equal to that character's cost.";
+    let parsed = parse_ability(original, "");
     let serialized = ability_serializer::serialize_ability(&parsed);
     assert_eq!(original, serialized);
 }

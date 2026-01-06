@@ -331,7 +331,8 @@ fn test_abandon_or_discard_dissolve_enemy() {
 
 #[test]
 fn test_abandon_ally_gain_energy_equal_to_cost() {
-    let result = parse_ability("Abandon an ally: Gain {e} equal to that character's cost.", "e: 1");
+    let result =
+        parse_ability("Abandon an ally: Gain {energy-symbol} equal to that character's cost.", "");
     assert_ron_snapshot!(result, @r###"
     Activated(ActivatedAbility(
       costs: [
