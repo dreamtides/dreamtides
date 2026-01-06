@@ -74,13 +74,13 @@ fn each_gains_spark_for_each<'a>(
         .ignore_then(word("allied").or_not())
         .ignore_then(card_predicate_parser::parser())
         .then_ignore(word("gains"))
-        .then(spark())
+        .then_ignore(word("spark"))
         .then_ignore(words(&["equal", "to", "the", "number", "of"]))
         .then_ignore(word("allied").or_not())
         .then(card_predicate_parser::parser())
-        .map(|((each, gains), for_each)| StandardEffect::EachMatchingGainsSparkForEach {
+        .map(|(each, for_each)| StandardEffect::EachMatchingGainsSparkForEach {
             each,
-            gains: Spark(gains),
+            gains: Spark(1),
             for_each,
         })
 }

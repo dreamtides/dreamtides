@@ -74,9 +74,15 @@ More task-specification documentation is available:
 
 The code is structured as a series of Rust crates using the cargo "workspace" feature.
 
+Dreamtides:
+  - `justfile`
+  - `rules_engine/`
+    - 'Cargo.toml`
+  - `client/
+
 Rules engine Rust source code lives in the `rules_engine/` directory.
-Clietn soruce code lives in the `client/` directory.
+Client source code lives in the `client/` directory.
 
 Your current working directory is `rules_engine/`. The `justfile` and similar are located in the parent directory.
 
-Card data lives in `rules_engine/tabula/cards.toml`
+Card data lives in `rules_engine/tabula/cards.toml`. Do NOT read this file directly, it is much too large.

@@ -82,7 +82,7 @@ pub fn serialize_standard_effect(effect: &StandardEffect) -> String {
         }
         StandardEffect::EachMatchingGainsSparkForEach { each, for_each, .. } => {
             format!(
-                "each {} gains {{s}} equal to the number of {}.",
+                "each {} gains spark equal to the number of {}.",
                 serialize_allied_card_predicate(each),
                 serialize_allied_card_predicate(for_each)
             )
