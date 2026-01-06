@@ -1,6 +1,6 @@
 use ability_data::collection_expression::CollectionExpression;
 use ability_data::cost::Cost;
-use ability_data::effect::{Effect, EffectWithOptions, ListWithOptions};
+use ability_data::effect::{Effect, EffectWithOptions, ListWithOptions, ModalEffectChoice};
 use ability_data::predicate::{CardPredicate, Predicate};
 use ability_data::standard_effect::StandardEffect;
 use ability_data::triggered_ability::{TriggeredAbility, TriggeredAbilityOptions};
@@ -12,8 +12,8 @@ use crate::parser::effect::{
     spark_effect_parsers,
 };
 use crate::parser::parser_helpers::{
-    article, comma, discards, effect_separator, energy, period, word, words, ParserExtra,
-    ParserInput,
+    article, colon, comma, directive, discards, effect_separator, energy, mode1_cost, mode2_cost,
+    newline, period, word, words, ParserExtra, ParserInput,
 };
 use crate::parser::{
     card_predicate_parser, condition_parser, cost_parser, predicate_parser, trigger_parser,
@@ -27,6 +27,7 @@ pub fn single_effect_parser<'a>(
 pub fn effect_or_compound_parser<'a>(
 ) -> impl Parser<'a, ParserInput<'a>, Effect, ParserExtra<'a>> + Clone {
     choice((
+        modal_effect_parser(),
         optional_effect_with_trigger_cost_parser(),
         effect_with_trigger_cost_parser(),
         optional_effect_parser(),
@@ -34,6 +35,53 @@ pub fn effect_or_compound_parser<'a>(
         standard_effect_parser(),
     ))
     .boxed()
+}
+
+fn modal_effect_parser<'a>() -> impl Parser<'a, ParserInput<'a>, Effect, ParserExtra<'a>> + Clone {
+    directive("chooseone")
+        .ignore_then(newline())
+        .ignore_then(
+            directive("bullet")
+                .ignore_then(mode1_cost())
+                .then_ignore(colon())
+                .then(
+                    single_effect_parser()
+                        .separated_by(effect_separator())
+                        .at_least(1)
+                        .collect::<Vec<_>>(),
+                )
+                .then_ignore(period())
+                .map(|(cost, effects)| ModalEffectChoice {
+                    energy_cost: Energy(cost),
+                    effect: if effects.len() == 1 {
+                        Effect::Effect(effects.into_iter().next().unwrap())
+                    } else {
+                        Effect::List(effects.into_iter().map(EffectWithOptions::new).collect())
+                    },
+                }),
+        )
+        .then_ignore(newline())
+        .then(
+            directive("bullet")
+                .ignore_then(mode2_cost())
+                .then_ignore(colon())
+                .then(
+                    single_effect_parser()
+                        .separated_by(effect_separator())
+                        .at_least(1)
+                        .collect::<Vec<_>>(),
+                )
+                .then_ignore(period())
+                .map(|(cost, effects)| ModalEffectChoice {
+                    energy_cost: Energy(cost),
+                    effect: if effects.len() == 1 {
+                        Effect::Effect(effects.into_iter().next().unwrap())
+                    } else {
+                        Effect::List(effects.into_iter().map(EffectWithOptions::new).collect())
+                    },
+                }),
+        )
+        .map(|(mode1, mode2)| Effect::Modal(vec![mode1, mode2]))
 }
 
 fn base_single_effect_parser<'a>(

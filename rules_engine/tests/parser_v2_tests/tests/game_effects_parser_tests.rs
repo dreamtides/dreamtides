@@ -1111,3 +1111,29 @@ fn test_when_you_discard_card_it_gains_reclaim_equal_to_cost() {
     ))
     "###);
 }
+
+#[test]
+fn test_modal_return_enemy_or_draw_cards() {
+    let result = parse_ability(
+        "{ChooseOne}\n{bullet} {mode1-cost}: Return an enemy to hand.\n{bullet} {mode2-cost}: Draw {cards}.",
+        "mode1-cost: 1, mode2-cost: 2, cards: 3",
+    );
+    assert_ron_snapshot!(result, @r###"
+    Event(EventAbility(
+      effect: Modal([
+        ModalEffectChoice(
+          energy_cost: Energy(1),
+          effect: Effect(ReturnToHand(
+            target: Enemy(Character),
+          )),
+        ),
+        ModalEffectChoice(
+          energy_cost: Energy(2),
+          effect: Effect(DrawCards(
+            count: 3,
+          )),
+        ),
+      ]),
+    ))
+    "###);
+}

@@ -192,3 +192,21 @@ pub fn this_turn_times<'a>() -> impl Parser<'a, ParserInput<'a>, u32, ParserExtr
         (ResolvedToken::Integer { directive, value }, _) if directive == "this-turn-times" => value
     }
 }
+
+pub fn mode1_cost<'a>() -> impl Parser<'a, ParserInput<'a>, u32, ParserExtra<'a>> + Clone {
+    select! {
+        (ResolvedToken::Integer { directive, value }, _) if directive == "mode1-cost" => value
+    }
+}
+
+pub fn mode2_cost<'a>() -> impl Parser<'a, ParserInput<'a>, u32, ParserExtra<'a>> + Clone {
+    select! {
+        (ResolvedToken::Integer { directive, value }, _) if directive == "mode2-cost" => value
+    }
+}
+
+pub fn newline<'a>() -> impl Parser<'a, ParserInput<'a>, (), ParserExtra<'a>> + Clone {
+    select! {
+        (ResolvedToken::Token(Token::Newline), _) => ()
+    }
+}

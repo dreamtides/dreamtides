@@ -368,3 +368,11 @@ fn test_round_trip_take_an_extra_turn_after_this_one() {
     let serialized = ability_serializer::serialize_ability(&parsed);
     assert_eq!(original, serialized);
 }
+
+#[test]
+fn test_round_trip_modal_return_enemy_or_draw_cards() {
+    let original = "{ChooseOne}\n{bullet} {mode1-cost}: Return an enemy to hand.\n{bullet} {mode2-cost}: Draw {cards}.";
+    let parsed = parse_ability(original, "mode1-cost: 1, mode2-cost: 2, cards: 3");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}

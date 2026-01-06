@@ -416,8 +416,19 @@ pub fn serialize_effect(effect: &Effect) -> String {
             result.push_str(&format!("{}.", effect_strings.join(", then ")));
             result
         }
-        Effect::Modal(_) => {
-            unimplemented!("Serialization not yet implemented for modal effects")
+        Effect::Modal(choices) => {
+            let mut result = "{ChooseOne}".to_string();
+            for (index, choice) in choices.iter().enumerate() {
+                result.push('\n');
+                result.push_str("{bullet} ");
+                let cost_var = if index == 0 { "{mode1-cost}" } else { "{mode2-cost}" };
+                result.push_str(&format!(
+                    "{}: {}",
+                    cost_var,
+                    capitalize_first_letter(&serialize_effect(&choice.effect))
+                ));
+            }
+            result
         }
     }
 }

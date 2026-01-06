@@ -1,11 +1,12 @@
 use ability_data::ability::{Ability, EventAbility};
+use ability_data::effect::Effect;
 use ability_data::trigger_event::TriggerEvent;
 use ability_data::triggered_ability::TriggeredAbility;
 use chumsky::span::{SimpleSpan, Span};
 
 use crate::builder::parser_spans::{
-    SpannedAbility, SpannedActivatedAbility, SpannedEffect, SpannedEventAbility, SpannedText,
-    SpannedTriggeredAbility,
+    SpannedAbility, SpannedActivatedAbility, SpannedEffect, SpannedEventAbility,
+    SpannedModalEffectChoice, SpannedText, SpannedTriggeredAbility,
 };
 use crate::lexer::lexer_token::Token;
 use crate::lexer::lexer_tokenize::LexResult;
@@ -75,15 +76,69 @@ fn build_spanned_event(event: &EventAbility, lex_result: &LexResult) -> Option<S
 
     let effect_start = if let Some(ref cost) = additional_cost { cost.span.end() + 1 } else { 0 };
     let effect_end = lex_result.tokens.last()?.1.end();
-    let effect_span = SimpleSpan::new((), effect_start..effect_end);
 
-    Some(SpannedAbility::Event(SpannedEventAbility {
-        additional_cost,
-        effect: SpannedEffect::Effect(SpannedText::new(
+    let spanned_effect = if let Effect::Modal(_choices) = &event.effect {
+        let newline_positions: Vec<usize> = lex_result
+            .tokens
+            .iter()
+            .enumerate()
+            .filter(|(_, (t, _))| matches!(t, Token::Newline))
+            .map(|(i, _)| i)
+            .collect();
+
+        if newline_positions.len() < 2 {
+            return None;
+        }
+
+        let mode1_colon_idx = lex_result.tokens[..newline_positions[0]]
+            .iter()
+            .position(|(t, _)| matches!(t, Token::Colon))?;
+        let mode1_cost_start = lex_result.tokens[newline_positions[0] + 2].1.start();
+        let mode1_cost_end = lex_result.tokens[mode1_colon_idx].1.start();
+        let mode1_effect_start = lex_result.tokens[mode1_colon_idx].1.end();
+        let mode1_effect_end = lex_result.tokens[newline_positions[0]].1.start();
+
+        let mode2_colon_idx = lex_result.tokens[newline_positions[0] + 1..]
+            .iter()
+            .position(|(t, _)| matches!(t, Token::Colon))?
+            + newline_positions[0]
+            + 1;
+        let mode2_cost_start = lex_result.tokens[newline_positions[1] + 2].1.start();
+        let mode2_cost_end = lex_result.tokens[mode2_colon_idx].1.start();
+        let mode2_effect_start = lex_result.tokens[mode2_colon_idx].1.end();
+        let mode2_effect_end = lex_result.tokens.last()?.1.end();
+
+        SpannedEffect::Modal(vec![
+            SpannedModalEffectChoice {
+                cost: SpannedText::new(
+                    lex_result.original[mode1_cost_start..mode1_cost_end].trim().to_string(),
+                    SimpleSpan::new((), mode1_cost_start..mode1_cost_end),
+                ),
+                effect: SpannedText::new(
+                    lex_result.original[mode1_effect_start..mode1_effect_end].trim().to_string(),
+                    SimpleSpan::new((), mode1_effect_start..mode1_effect_end),
+                ),
+            },
+            SpannedModalEffectChoice {
+                cost: SpannedText::new(
+                    lex_result.original[mode2_cost_start..mode2_cost_end].trim().to_string(),
+                    SimpleSpan::new((), mode2_cost_start..mode2_cost_end),
+                ),
+                effect: SpannedText::new(
+                    lex_result.original[mode2_effect_start..mode2_effect_end].trim().to_string(),
+                    SimpleSpan::new((), mode2_effect_start..mode2_effect_end),
+                ),
+            },
+        ])
+    } else {
+        let effect_span = SimpleSpan::new((), effect_start..effect_end);
+        SpannedEffect::Effect(SpannedText::new(
             lex_result.original[effect_span.into_range()].trim().to_string(),
             effect_span,
-        )),
-    }))
+        ))
+    };
+
+    Some(SpannedAbility::Event(SpannedEventAbility { additional_cost, effect: spanned_effect }))
 }
 
 fn build_spanned_triggered(

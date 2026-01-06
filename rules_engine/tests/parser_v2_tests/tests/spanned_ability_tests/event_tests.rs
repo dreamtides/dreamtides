@@ -272,3 +272,27 @@ fn test_spanned_discover_character_with_activated_ability() {
     assert_eq!(effect.text.trim(), "{Discover} a character with an activated ability.");
     assert_valid_span(&effect.span);
 }
+
+#[test]
+fn test_spanned_modal_return_enemy_or_draw_cards() {
+    let SpannedAbility::Event(event) = parse_spanned_ability(
+        "{ChooseOne}\n{bullet} {mode1-cost}: Return an enemy to hand.\n{bullet} {mode2-cost}: Draw {cards}.",
+        "mode1-cost: 1, mode2-cost: 2, cards: 3",
+    ) else {
+        panic!("Expected Event ability");
+    };
+
+    assert_eq!(event.additional_cost, None);
+    let SpannedEffect::Modal(choices) = &event.effect else {
+        panic!("Expected Modal effect");
+    };
+    assert_eq!(choices.len(), 2);
+    assert_eq!(choices[0].cost.text.trim(), "{mode1-cost}");
+    assert_eq!(choices[0].effect.text.trim(), "Return an enemy to hand.");
+    assert_valid_span(&choices[0].cost.span);
+    assert_valid_span(&choices[0].effect.span);
+    assert_eq!(choices[1].cost.text.trim(), "{mode2-cost}");
+    assert_eq!(choices[1].effect.text.trim(), "Draw {cards}.");
+    assert_valid_span(&choices[1].cost.span);
+    assert_valid_span(&choices[1].effect.span);
+}
