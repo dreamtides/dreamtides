@@ -1460,7 +1460,7 @@ name = "Eternal Sentry"
 id = "511e8751-95d0-4d09-9f60-48fa53f14a13"
 energy-cost = 4
 rules-text = "When you draw {cards-numeral} in a turn, if this card is in your void, it gains {reclaim-for-cost} this turn."
-preview = "When you draw 2 cards in a turn, if this card is in your void, it gains reclaim 1●."
+preview = "When you draw 2 cards in a turn, if this card is in your void, it gains reclaim 1● this turn."
 variables = """
 cards: 2
 reclaim: 1"""

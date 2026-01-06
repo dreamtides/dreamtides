@@ -18,6 +18,15 @@ use crate::parser::{card_predicate_parser, condition_parser, cost_parser, predic
 pub fn static_ability_parser<'a>(
 ) -> impl Parser<'a, ParserInput<'a>, StaticAbility, ParserExtra<'a>> + Clone {
     choice((
+        condition_parser::condition_parser()
+            .then(standard_static_ability())
+            .map(|(condition, ability)| {
+                StaticAbility::WithOptions(StaticAbilityWithOptions {
+                    ability,
+                    condition: Some(condition),
+                })
+            })
+            .boxed(),
         standard_static_ability_without_period()
             .then_ignore(word("if"))
             .then(condition_parser::condition_parser())
@@ -27,7 +36,8 @@ pub fn static_ability_parser<'a>(
                     ability,
                     condition: Some(condition),
                 })
-            }),
+            })
+            .boxed(),
         standard_static_ability().map(StaticAbility::StaticAbility),
     ))
     .boxed()

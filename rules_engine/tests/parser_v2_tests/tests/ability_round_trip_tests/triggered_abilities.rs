@@ -321,3 +321,11 @@ fn test_round_trip_when_you_play_card_during_opponent_turn_this_character_gains_
     let serialized = ability_serializer::serialize_ability(&parsed);
     assert_eq!(original, serialized);
 }
+
+#[test]
+fn test_round_trip_when_you_play_a_character_materialize_figment() {
+    let original = "When you play a character, {Materialize} {a-figment}.";
+    let parsed = parse_ability(original, "figment: shadow");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}

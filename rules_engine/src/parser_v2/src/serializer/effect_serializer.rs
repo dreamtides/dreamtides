@@ -190,7 +190,13 @@ pub fn serialize_standard_effect(effect: &StandardEffect) -> String {
                 unimplemented!("Serialization not yet implemented for this materialize copy effect")
             }
         }
-        StandardEffect::MaterializeFigments { .. } => "{Materialize} {n-figments}.".to_string(),
+        StandardEffect::MaterializeFigments { count, .. } => {
+            if *count == 1 {
+                "{Materialize} {a-figment}.".to_string()
+            } else {
+                "{Materialize} {n-figments}.".to_string()
+            }
+        }
         StandardEffect::MaterializeFigmentsQuantity { count, quantity, .. } => {
             if *count == 1 && matches!(quantity, QuantityExpression::PlayedThisTurn(_)) {
                 "{Materialize} {a-figment} for each card you have played this turn.".to_string()

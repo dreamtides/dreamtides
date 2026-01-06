@@ -243,9 +243,11 @@ pub fn materialize_copy<'a>(
 
 pub fn materialize_figments<'a>(
 ) -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
-    directive("materialize")
-        .ignore_then(figment_count())
-        .map(|(figment, count)| StandardEffect::MaterializeFigments { figment, count })
+    directive("materialize").ignore_then(choice((
+        figment_count()
+            .map(|(figment, count)| StandardEffect::MaterializeFigments { figment, count }),
+        figment().map(|figment| StandardEffect::MaterializeFigments { figment, count: 1 }),
+    )))
 }
 
 pub fn materialize_random_from_deck<'a>(

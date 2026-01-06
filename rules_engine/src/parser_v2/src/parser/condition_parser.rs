@@ -11,6 +11,7 @@ use crate::parser::parser_helpers::{
 pub fn condition_parser<'a>() -> impl Parser<'a, ParserInput<'a>, Condition, ParserExtra<'a>> + Clone
 {
     choice((
+        while_this_card_is_in_your_void(),
         this_card_is_in_your_void(),
         dissolved_this_turn(),
         discarded_this_turn(),
@@ -60,6 +61,13 @@ fn discarded_this_turn<'a>() -> impl Parser<'a, ParserInput<'a>, Condition, Pars
 fn this_card_is_in_your_void<'a>(
 ) -> impl Parser<'a, ParserInput<'a>, Condition, ParserExtra<'a>> + Clone {
     words(&["if", "this", "card", "is", "in", "your", "void"])
+        .then_ignore(comma())
+        .to(Condition::ThisCardIsInYourVoid)
+}
+
+fn while_this_card_is_in_your_void<'a>(
+) -> impl Parser<'a, ParserInput<'a>, Condition, ParserExtra<'a>> + Clone {
+    words(&["while", "this", "card", "is", "in", "your", "void"])
         .then_ignore(comma())
         .to(Condition::ThisCardIsInYourVoid)
 }

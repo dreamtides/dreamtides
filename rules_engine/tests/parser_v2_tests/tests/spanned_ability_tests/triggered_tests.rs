@@ -894,3 +894,22 @@ fn test_spanned_banish_from_hand_alternate_cost_prevent_enemy_card() {
     assert_eq!(effect.text.trim(), "{Prevent} a played enemy card.");
     assert_valid_span(&effect.span);
 }
+
+#[test]
+fn test_spanned_when_you_play_a_character_materialize_figment() {
+    let SpannedAbility::Triggered(triggered) =
+        parse_spanned_ability("When you play a character, {materialize} {a-figment}.", "figment: shadow")
+    else {
+        panic!("Expected Triggered ability");
+    };
+
+    assert_eq!(triggered.once_per_turn, None);
+    assert_eq!(triggered.trigger.text, "When you play a character");
+    assert_valid_span(&triggered.trigger.span);
+
+    let SpannedEffect::Effect(effect) = triggered.effect else {
+        panic!("Expected Effect, got Modal");
+    };
+    assert_eq!(effect.text.trim(), "{materialize} {a-figment}.");
+    assert_valid_span(&effect.span);
+}

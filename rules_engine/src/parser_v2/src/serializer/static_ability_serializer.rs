@@ -21,11 +21,19 @@ pub fn serialize_static_ability(static_ability: &StaticAbility) -> String {
         StaticAbility::WithOptions(ability) => {
             let base = serialize_standard_static_ability(&ability.ability);
             if let Some(condition) = &ability.condition {
-                let condition_str = serialize_condition(condition);
-                if base.ends_with('.') {
-                    format!("{} {}.", base.trim_end_matches('.'), condition_str)
+                if matches!(condition, Condition::ThisCardIsInYourVoid) {
+                    if base.ends_with('.') {
+                        format!("while this card is in your void, {}", base)
+                    } else {
+                        format!("while this card is in your void, {}.", base)
+                    }
                 } else {
-                    format!("{} {}.", base, condition_str)
+                    let condition_str = serialize_condition(condition);
+                    if base.ends_with('.') {
+                        format!("{} {}.", base.trim_end_matches('.'), condition_str)
+                    } else {
+                        format!("{} {}.", base, condition_str)
+                    }
                 }
             } else if base.ends_with('.') {
                 base

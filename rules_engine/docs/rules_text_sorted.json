@@ -1,6 +1,4 @@
 [
-  "When you play a character, {materialize} {a-figment}.",
-  "While this card is in your void, allied {plural-subtype} have +{s} spark.",
   "While you have {$count} or more cards in your void, they have {reclaim} equal to their cost.",
   "With an allied {subtype}, you may play this card from your hand or void for {e}.",
   "You may only play this character from your void.",

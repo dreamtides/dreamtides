@@ -96,3 +96,11 @@ fn test_round_trip_spark_equal_to_cards_in_void() {
     let serialized = ability_serializer::serialize_ability(&parsed);
     assert_eq!(original, serialized);
 }
+
+#[test]
+fn test_round_trip_while_in_void_allied_subtype_have_spark() {
+    let original = "While this card is in your void, allied {plural-subtype} have +{s} spark.";
+    let parsed = parse_ability(original, "subtype: warrior, s: 1");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}

@@ -290,3 +290,20 @@ fn test_spark_equal_to_cards_in_void() {
     )))
     "###);
 }
+
+#[test]
+fn test_while_in_void_allied_subtype_have_spark() {
+    let result = parse_ability(
+        "While this card is in your void, allied {plural-subtype} have +{s} spark.",
+        "subtype: warrior, s: 1",
+    );
+    assert_ron_snapshot!(result, @r###"
+    Static(WithOptions(StaticAbilityWithOptions(
+      ability: SparkBonusOtherCharacters(
+        matching: CharacterType(Warrior),
+        added_spark: Spark(1),
+      ),
+      condition: Some(ThisCardIsInYourVoid),
+    )))
+    "###);
+}
