@@ -1,0 +1,269 @@
+# Static Abilities
+
+1. **Code Quality - Duplicate parsers**: `simple_alternate_cost_event()`
+   (static_ability_parser.rs:199) and `simple_alternate_cost_with_period()`
+   (static_ability_parser.rs:221) both parse "this event costs {e}" with the
+   only difference being whether a period is required. These should be unified
+   or one should be removed.
+
+2. **Generality - Card type hardcoding**: Multiple parsers hardcode "event" vs
+   "character" instead of parsing card types generically. Examples:
+   `simple_alternate_cost_event()` (line 201),
+   `simple_alternate_cost_character()` (line 211), `play_for_alternate_cost()`
+   requires "this event" (line 187), and
+   `abandon_ally_play_character_for_alternate_cost()` requires "this character"
+   (line 164). These could be unified into parsers that accept "this <card-type>
+   costs {e}" or "play this <card-type> for {e}" where the card type is parsed.
+
+3. **Code Quality - Near-duplicate cost parsers**: `your_cards_cost_reduction()`
+   (line 82) and `your_cards_cost_increase()` (line 95) are structurally
+   identical except for the word "less" vs "more". Consider unifying into a
+   single parser with a parameter or returning an enum to reduce duplication.
+
+4. **Consistency - Confusing variable naming**: In `your_cards_cost_increase()`
+   (line 102), the variable is named `reduction` when it represents an increase:
+   `StandardStaticAbility::YourCardsCostIncrease { matching, reduction:
+   Energy(reduction) }`. Should be named `increase` to match the semantic
+   meaning.
+
+5. **Generality - Hardcoded predicate in reclaim**:
+   `cards_in_your_void_have_reclaim()` (line 303) hardcodes `matching:
+   CardPredicate::Card` instead of parsing a predicate. The parser already
+   accepts "they" as a pronoun reference, but always maps to all cards rather
+   than potentially specific card types that could have reclaim.
+
+# Trigger Parsing
+
+6. **Consistency - Three different patterns for "when you <action>" triggers**:
+   Action triggers inconsistently use different parser combinations:
+   `play_trigger` (trigger_parser.rs:105) uses only `card_predicate_parser` and
+   wraps results in `Predicate::Your`; `discard_trigger` (line 159) and
+   `materialize_trigger` (line 170) use `choice` between both
+   `card_predicate_parser.map(Predicate::Your)` and `predicate_parser`;
+   `abandon_trigger` (line 220) uses only `predicate_parser`. This makes it
+   unclear which pattern should be used for new similar triggers, and suggests
+   these triggers may not handle the same range of predicates (e.g., "play this
+   character" might not work while "discard this character" does).
+
+7. **Code Quality - Near-duplicate state change triggers**: Four parsers in
+   trigger_parser.rs follow nearly identical patterns: `dissolved_trigger` (line
+   182), `banished_trigger` (line 192), `leaves_play_trigger` (line 202), and
+   `put_into_void_trigger` (line 211). All parse "when" + article + predicate +
+   verb phrase, differing only in the final verb phrase ("is {dissolved}", "is
+   {banished}", "leaves play", "is put into your void"). While each maps to a
+   different `TriggerEvent` variant, the structural similarity suggests
+   opportunity for a helper function to reduce boilerplate.
+
+8. **Generality - Parsed but ignored predicate**: In condition_parser.rs,
+   `discarded_this_turn` (line 66) parses a card predicate using
+   `card_predicate_parser::parser()` but then ignores it (line 68: `|_|
+   Condition::CardsDiscardedThisTurn { count: 1 }`). This means the parser
+   accepts "you have discarded a warrior this turn" or "you have discarded a
+   character this turn" but treats them identically to "you have discarded a
+   card this turn". Either parse only the literal word "card", or use the parsed
+   predicate to support different card types in the condition.
+
+# Activated Ability Parsing
+
+9. **Generality - Parsed but ignored predicate in cost**: In cost_parser.rs,
+   `banish_from_your_void_cost` (line 177) parses a full predicate using
+   `predicate_parser::predicate_parser()` but ignores it on line 182: `|_|
+   Cost::BanishCardsFromYourVoid(1)`. The test at activated_ability_tests.rs:222
+   shows this accepts "{Banish} another card in your void" where "another card"
+   is parsed then discarded. Either parse only the literal phrase "a card in
+   your void", or use the parsed predicate to support targeting specific card
+   types from the void.
+
+10. **Code Quality - Near-duplicate void banish parsers**:
+    `banish_cards_from_your_void_cost` (cost_parser.rs:66) and
+    `banish_cards_from_enemy_void_cost` (line 74) are structurally identical,
+    differing only in the word sequence: "from your void" vs "from the
+    opponent's void". These could be unified with a helper that accepts the void
+    owner as a parameter.
+
+11. **Consistency - Hard-coded predicate validation with filter**:
+    `abandon_or_discard_cost` (cost_parser.rs:132) uses `.filter()` calls on
+    lines 137 and 141-142 to validate that parsed predicates match very specific
+    patterns (`Predicate::Another(CardPredicate::Character)` and
+    `Predicate::Any(CardPredicate::Card)`). This hard-codes the exact text
+    pattern "abandon an ally or discard a card" rather than allowing the
+    predicate system to naturally express this. This validation approach is
+    unique to this parser and differs from how other cost parsers work, making
+    the pattern unclear for future additions.
+
+# Condition Parsing
+
+12. **Code Quality - Near-duplicate "in void" parsers**:
+    `this_card_is_in_your_void` (condition_parser.rs:71) and
+    `while_this_card_is_in_your_void` (line 78) are structurally identical, both
+    parsing "this card is in your void" followed by comma and mapping to
+    `Condition::ThisCardIsInYourVoid`. They differ only in accepting "if" vs
+    "while" as a prefix word. These could be unified with a single parser that
+    accepts either prefix. Please standardize on the "if" version.
+
+13. **Generality - Hardcoded "allied" in with conditions**:
+    `with_count_allied_subtype` (condition_parser.rs:27) and
+    `with_an_allied_subtype` (line 34) both hardcode
+    `allied_subtype_predicate(subtype)` which always returns
+    `Predicate::Another(CardPredicate::CharacterType(subtype))` on line 51. This
+    means conditions can only check for allied characters ("with 2 allied
+    warriors"), not enemy or any characters ("with 2 enemy warriors"). The
+    "allied" ownership is baked into the parser rather than being parsed from a
+    general predicate. Please get rid of `with_an_allied_subtype` and
+    standardize card text on the `with_count_allied_subtype` case.
+
+14. **Generality - Hardcoded comparison target**:
+    `with_count_allies_that_share_a_character_type` (condition_parser.rs:41)
+    hardcodes `of: Predicate::This` on line 47. This limits the condition to
+    only checking if allies share a type with "this" character, preventing
+    patterns like checking if allies share a type with each other or with a
+    specific card type. This should be rewritten to remove the `of` entirely
+    and have the meaning just be "they share a character type with each other".
+
+# Cost Parsing
+
+16. **Consistency - Different predicate parsers for similar actions**:
+    `discard_cost` (cost_parser.rs:155) uses `card_predicate_parser::parser()`
+    on line 159 for "discard a <predicate>", while abandon costs like
+    `abandon_cost_single` (line 84) use `predicate_parser::predicate_parser()`.
+    These are structurally similar actions (abandon character vs discard card)
+    but use different predicate parsing approaches, making it unclear which
+    pattern should be followed for new similar cost types.
+
+# Quantity Expression Parsing
+
+17. **Generality - Hardcoded "ally" predicates**: Three parsers in
+    quantity_expression_parser.rs hardcode `CardPredicate::Character` for "ally"
+    text: "ally abandoned this turn" (line 18), "ally abandoned" (line 21), and
+    "ally returned" (line 24). These are followed by more general parsers at
+    lines 25-30 that parse card predicates for "<card-predicate> abandoned" and
+    "<card-predicate> returned". The specific "ally" cases prevent parsing
+    variations like "enemy abandoned" or "event returned", and duplicate logic
+    that the general parsers already handle.
+
+18. **Code Quality - Redundant parser combinator pattern**: Lines 16-24 use
+    `.to(()).map(|_| ...)` to create unit values then map them. This is
+    redundant - they could use `.to(QuantityExpression::...)` directly instead
+    of the two-step `.to(()).map(|_| QuantityExpression::...)` pattern.
+
+# Predicate Parsing
+
+19. **Code Quality - Massive duplication in card_predicate_parser**: The
+    `parser()` function (card_predicate_parser.rs:8-109) has extensive
+    duplication where lines 20-61 parse base predicate + suffix, while lines
+    70-105 parse just the suffix defaulting to `CardPredicate::Character`. This
+    pattern repeats for 6 suffixes: `with_cost_compared_to_controlled` (lines
+    20-26 vs 70-77), `with_cost_compared_to_void_count` (lines 28-34 vs 79-83),
+    `with_spark_compared_to_abandoned` (lines 36-42 vs 85-89),
+    `with_spark_compared_to_energy_spent` (lines 44-50 vs 91-95), `with_cost`
+    (lines 52-57 vs 97-102), and `with_spark` (lines 59-61 vs 104-105). Each
+    appears twice with nearly identical mapping logic, differing only in whether
+    `target` is the parsed base or hardcoded `Character`.
+
+20. **Code Quality - Unused helper function**: The `ally()` function
+    (predicate_parser.rs:12-14) returns
+    `Predicate::Another(CardPredicate::Character)` but is never referenced
+    anywhere in the codebase, making it dead code that should be removed.
+
+21. **Consistency - Inconsistent optional predicates**: `allied_parser()`
+    (predicate_parser.rs:84-86) requires a card predicate after "allied" via
+    `ignore_then(card_predicate_parser::parser())` without `.or_not()`, while
+    `enemy_parser()` (line 78-82) and `ally_parser()` (line 88-92) make the
+    predicate optional using `.or_not().map(|pred| ...
+    pred.unwrap_or(CardPredicate::Character))`. This means "enemy" and "ally
+    character" both work, but "allied" alone fails while "allied character"
+    succeeds—an inconsistent pattern.
+
+23. **Generality - Limited operators in comparisons**: All comparison suffix
+    parsers only support "less than" (`Operator::OrLess`). Examples:
+    `with_cost_compared_to_controlled_suffix()`
+    (predicate_suffix_parser.rs:54-59),
+    `with_cost_compared_to_void_count_suffix()` (line 61-65),
+    `with_spark_compared_to_abandoned_suffix()` (line 67-69), and
+    `with_spark_compared_to_energy_spent_suffix()` (line 72-78) all hardcode
+    "less than" in their word sequences. This prevents parsing "greater than",
+    "equal to", or other comparison operators that might appear in future card
+    text.
+
+24. **Generality - Hardcoded ownership in cost comparison**:
+    `with_cost_compared_to_controlled_suffix()`
+    (predicate_suffix_parser.rs:54-59) hardcodes "allied" in the phrase "with
+    cost less than the number of allied {subtype}". This prevents parsing
+    patterns like "with cost less than the number of enemy {subtype}" or using
+    general predicate parsing for the ownership component.
+
+25. **Generality - Hardcoded reference in spark comparison**:
+    `with_spark_compared_to_abandoned_suffix()`
+    (predicate_suffix_parser.rs:67-69) hardcodes "that ally's spark" instead of
+    parsing a general predicate reference. This prevents comparing spark to
+    other targets like "this character's spark", "that enemy's spark", or any
+    other predicate reference pattern.
+
+# Effect Parsing
+
+26. **Code Quality - Duplicate "gains reclaim" parsers**:
+    `gains_reclaim_for_cost()` (control_effects_parsers.rs:45-55) and
+    `gains_reclaim_for_cost_this_turn()` (card_effect_parsers.rs:192-210) are
+    nearly identical parsers split across two files. The control_effects version
+    parses "it gains {reclaim-for-cost} this turn" while the card_effect version
+    has a choice between "it gains {reclaim} equal to its cost this turn" and
+    "<predicate> gains {reclaim-for-cost} this turn". These should be unified
+    into a single parser that handles all cases.
+
+27. **Generality - Hardcoded card types in return from void**:
+    `return_from_void_to_hand()` (card_effect_parsers.rs:128-133) hardcodes
+    `Predicate::Any(CardPredicate::Event)` when parsing "return {up-to-n-events}
+    from your void to your hand" instead of parsing the card type as a general
+    predicate. This prevents patterns like "return up to {n} {subtype} from your
+    void to your hand" or "return up to {n} characters from your void to your
+    hand".
+
+28. **Generality - Hardcoded allies in banish**: `banish_up_to_n()`
+    (game_effects_parsers.rs:181-186) hardcodes `target:
+    Predicate::Another(CardPredicate::Character)` instead of parsing which cards
+    to banish. The parser uses `up_to_n_allies()` helper which implies allies,
+    but the parser itself doesn't verify this matches the parsed text, limiting
+    extensibility to other card types.
+
+29. **Code Quality - Massive duplication in void reclaim parser**:
+    `cards_in_void_gain_reclaim()` (card_effect_parsers.rs:212-267) has three
+    branches parsing "all cards", "a card/character/event", and "{subtype}"
+    separately. Lines 217-223, 244-250, and 255-260 all repeat nearly identical
+    logic for parsing "in your void gains {reclaim} this turn". The card type
+    parsing logic (lines 228-243) also duplicates basic card type matching. This
+    55-line function could be significantly simplified with a unified predicate
+    parser.
+
+30. **Code Quality - Duplicate cost parsers in effect_parser**:
+    `pay_energy_cost()` (effect_parser.rs:277), `discard_cost()` (line 281), and
+    `abandon_cost()` (line 290) duplicate similar parsers already defined in
+    cost_parser.rs. When these trigger costs are used in
+    effect_with_trigger_cost_parser(), the parsing logic is maintained in two
+    places, creating inconsistency risk if cost parsing rules change.
+
+31. **Code Quality - Near-duplicate multiply effect parsers**:
+    `multiply_energy_gain_from_card_effects()`
+    (resource_effect_parsers.rs:33-44) and
+    `multiply_card_draw_from_card_effects()` (lines 46-58) are structurally
+    identical parsers differing only in the effect name and word sequence ("the
+    amount of {energy-symbol} you gain" vs "the number of cards you draw").
+    These could be unified with a helper that accepts the effect type and word
+    pattern as parameters.
+
+33. **Code Quality - Near-duplicate gains spark branches**:
+    `gains_spark_for_each()` (spark_effect_parsers.rs:28-56) contains two nearly
+    identical branches (lines 31-40 and 42-53) that differ only in whether the
+    target defaults to `Predicate::This` or is parsed. Both branches parse
+    identical "gains +{s} spark for each <quantity>" patterns with redundant
+    mapping logic. The first branch could simply check if no predicate was
+    parsed and default to `This`.
+
+34. **Generality - Hardcoded "each ally" in trigger judgment**:
+    `trigger_judgment_ability()` (game_effects_parsers.rs:308-317) hardcodes
+    both the word sequence "trigger the {judgment} ability of each ally" and the
+    result fields `matching: Predicate::Another(CardPredicate::Character)` and
+    `collection: CollectionExpression::All`. The "each ally" portion should be
+    parsed as a general predicate to support variations like "trigger the
+    {judgment} ability of each {subtype}" or "trigger the {judgment} ability of
+    each allied character with cost {e} or less".
+
