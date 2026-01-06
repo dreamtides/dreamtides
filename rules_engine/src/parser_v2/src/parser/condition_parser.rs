@@ -5,7 +5,8 @@ use core_data::card_types::CardSubtype;
 
 use crate::parser::card_predicate_parser;
 use crate::parser::parser_helpers::{
-    comma, count, count_allied_subtype, count_allies, word, words, ParserExtra, ParserInput,
+    comma, count, count_allied_subtype, count_allies, subtype, word, words, ParserExtra,
+    ParserInput,
 };
 
 pub fn condition_parser<'a>() -> impl Parser<'a, ParserInput<'a>, Condition, ParserExtra<'a>> + Clone
@@ -18,6 +19,7 @@ pub fn condition_parser<'a>() -> impl Parser<'a, ParserInput<'a>, Condition, Par
         discarded_this_turn(),
         with_count_allies_that_share_a_character_type(),
         with_count_allied_subtype(),
+        with_an_allied_subtype(),
     ))
     .boxed()
 }
@@ -26,6 +28,13 @@ fn with_count_allied_subtype<'a>(
 ) -> impl Parser<'a, ParserInput<'a>, Condition, ParserExtra<'a>> + Clone {
     word("with").ignore_then(count_allied_subtype()).then_ignore(comma()).map(|(count, subtype)| {
         Condition::PredicateCount { count, predicate: allied_subtype_predicate(subtype) }
+    })
+}
+
+fn with_an_allied_subtype<'a>(
+) -> impl Parser<'a, ParserInput<'a>, Condition, ParserExtra<'a>> + Clone {
+    words(&["with", "an", "allied"]).ignore_then(subtype()).then_ignore(comma()).map(|subtype| {
+        Condition::PredicateCount { count: 1, predicate: allied_subtype_predicate(subtype) }
     })
 }
 

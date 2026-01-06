@@ -333,3 +333,22 @@ fn test_play_only_from_void() {
     Static(StaticAbility(PlayOnlyFromVoid))
     "###);
 }
+
+#[test]
+fn test_with_allied_subtype_play_from_hand_or_void_for_cost() {
+    let result = parse_ability(
+        "With an allied {subtype}, you may play this card from your hand or void for {e}.",
+        "subtype: warrior, e: 2",
+    );
+    assert_ron_snapshot!(result, @r###"
+    Static(WithOptions(StaticAbilityWithOptions(
+      ability: PlayFromHandOrVoidForCost(PlayFromHandOrVoidForCost(
+        energy_cost: Energy(2),
+      )),
+      condition: Some(PredicateCount(
+        count: 1,
+        predicate: Another(CharacterType(Warrior)),
+      )),
+    )))
+    "###);
+}

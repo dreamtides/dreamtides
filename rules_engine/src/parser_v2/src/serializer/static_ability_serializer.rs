@@ -27,7 +27,9 @@ pub fn serialize_static_ability(static_ability: &StaticAbility) -> String {
                     } else {
                         format!("while this card is in your void, {}.", base)
                     }
-                } else if matches!(condition, Condition::CardsInVoidCount { .. }) {
+                } else if matches!(condition, Condition::CardsInVoidCount { .. })
+                    || matches!(condition, Condition::PredicateCount { count: 1, .. })
+                {
                     let condition_str = serialize_condition(condition);
                     if base.ends_with('.') {
                         format!("{} {}", condition_str, base)
@@ -132,6 +134,9 @@ pub fn serialize_standard_static_ability(ability: &StandardStaticAbility) -> Str
         StandardStaticAbility::PlayOnlyFromVoid => {
             "you may only play this character from your void.".to_string()
         }
+        StandardStaticAbility::PlayFromHandOrVoidForCost(_) => {
+            "you may play this card from your hand or void for {e}".to_string()
+        }
         StandardStaticAbility::CardsInYourVoidHaveReclaim { .. } => {
             "they have {reclaim} equal to their cost.".to_string()
         }
@@ -148,6 +153,7 @@ fn serialize_condition(condition: &Condition) -> String {
         Condition::CardsInVoidCount { .. } => {
             "while you have {count} or more cards in your void,".to_string()
         }
+        Condition::PredicateCount { count: 1, .. } => "with an allied {subtype},".to_string(),
         _ => unimplemented!("Serialization not yet implemented for this condition type"),
     }
 }

@@ -40,6 +40,7 @@ pub enum StandardStaticAbility {
     MultiplyEnergyGainFromCardEffects { multiplier: u32 },
     OncePerTurnPlayFromVoid { matching: CardPredicate },
     PlayForAlternateCost(AlternateCost),
+    PlayFromHandOrVoidForCost(PlayFromHandOrVoidForCost),
     PlayFromVoid(PlayFromVoid),
     PlayOnlyFromVoid,
     RevealTopCardOfYourDeck,
@@ -67,6 +68,15 @@ pub struct PlayFromVoid {
 
     /// An effect to apply if the card is played from the void using this
     /// static ability.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub if_you_do: Option<Effect>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct PlayFromHandOrVoidForCost {
+    pub energy_cost: Energy,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub additional_cost: Option<Cost>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub if_you_do: Option<Effect>,
 }

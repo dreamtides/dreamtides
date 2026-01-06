@@ -4,7 +4,8 @@ use ability_data::effect::Effect;
 use ability_data::predicate::{CardPredicate, Predicate};
 use ability_data::standard_effect::StandardEffect;
 use ability_data::static_ability::{
-    AlternateCost, StandardStaticAbility, StaticAbility, StaticAbilityWithOptions,
+    AlternateCost, PlayFromHandOrVoidForCost, StandardStaticAbility, StaticAbility,
+    StaticAbilityWithOptions,
 };
 use chumsky::prelude::*;
 use core_data::numerics::{Energy, Spark};
@@ -52,6 +53,7 @@ fn standard_static_ability<'a>(
         once_per_turn_play_from_void(),
         abandon_ally_play_character_for_alternate_cost(),
         play_for_alternate_cost(),
+        play_from_hand_or_void_for_cost(),
         simple_alternate_cost_with_period(),
         characters_in_hand_have_fast(),
         disable_enemy_materialized_abilities(),
@@ -300,5 +302,19 @@ fn cards_in_your_void_have_reclaim<'a>(
         .ignore_then(period())
         .map(|_| StandardStaticAbility::CardsInYourVoidHaveReclaim {
             matching: CardPredicate::Card,
+        })
+}
+
+fn play_from_hand_or_void_for_cost<'a>(
+) -> impl Parser<'a, ParserInput<'a>, StandardStaticAbility, ParserExtra<'a>> + Clone {
+    words(&["you", "may", "play", "this", "card", "from", "your", "hand", "or", "void", "for"])
+        .ignore_then(energy())
+        .then_ignore(period())
+        .map(|e| {
+            StandardStaticAbility::PlayFromHandOrVoidForCost(PlayFromHandOrVoidForCost {
+                energy_cost: Energy(e),
+                additional_cost: None,
+                if_you_do: None,
+            })
         })
 }

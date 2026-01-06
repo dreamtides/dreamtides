@@ -1,5 +1,4 @@
 [
-  "With an allied {subtype}, you may play this card from your hand or void for {e}.",
   "{ChooseOne}\n{bullet} {e}: Return an enemy to hand.\n{bullet} {e-}: Draw {cards}.",
   "When the opponent plays a card which could {dissolve} an ally, {prevent} that card.",
   "{Prevent} a played event which could {dissolve} an ally.",

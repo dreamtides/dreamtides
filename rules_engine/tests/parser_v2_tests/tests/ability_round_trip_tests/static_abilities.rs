@@ -120,3 +120,11 @@ fn test_round_trip_play_only_from_void() {
     let serialized = ability_serializer::serialize_ability(&parsed);
     assert_eq!(original, serialized);
 }
+
+#[test]
+fn test_round_trip_with_allied_subtype_play_from_hand_or_void_for_cost() {
+    let original = "With an allied {subtype}, you may play this card from your hand or void for {e}.";
+    let parsed = parse_ability(original, "subtype: warrior, e: 2");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
