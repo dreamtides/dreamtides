@@ -4,6 +4,7 @@ use battle_state::battle::card_id::{CardId, CardIdType};
 use battle_state::triggers::trigger::Trigger;
 use core_data::types::PlayerName;
 
+use crate::battle_card_queries::card_properties;
 use crate::card_ability_queries::trigger_predicates;
 
 /// Returns true if the predicates in a [TriggerEvent] match for the given
@@ -157,6 +158,20 @@ pub fn matches(
                 owning_card_controller,
                 owning_card_id,
             ),
+            _ => false,
+        },
+        TriggerEvent::OpponentPlays(predicate) => match trigger {
+            Trigger::PlayedCard(card_id) => {
+                let card_controller = card_properties::controller(battle, card_id);
+                card_controller == owning_card_controller.opponent()
+                    && trigger_predicates::trigger_matches(
+                        battle,
+                        predicate,
+                        card_id,
+                        owning_card_controller,
+                        owning_card_id,
+                    )
+            }
             _ => false,
         },
     }

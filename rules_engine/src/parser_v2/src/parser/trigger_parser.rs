@@ -49,6 +49,7 @@ fn play_triggers<'a>() -> impl Parser<'a, ParserInput<'a>, TriggerEvent, ParserE
         play_from_hand_trigger(),
         play_during_opponent_turn_trigger(),
         play_during_turn_trigger(),
+        opponent_plays_trigger(),
         play_trigger(),
     ))
     .boxed()
@@ -100,6 +101,14 @@ fn play_trigger<'a>() -> impl Parser<'a, ParserInput<'a>, TriggerEvent, ParserEx
         .ignore_then(article().or_not())
         .ignore_then(card_predicate_parser::parser())
         .map(|card_predicate| TriggerEvent::Play(Predicate::Your(card_predicate)))
+}
+
+fn opponent_plays_trigger<'a>(
+) -> impl Parser<'a, ParserInput<'a>, TriggerEvent, ParserExtra<'a>> + Clone {
+    words(&["when", "the", "opponent", "plays"])
+        .ignore_then(article().or_not())
+        .ignore_then(predicate_parser::predicate_parser())
+        .map(TriggerEvent::OpponentPlays)
 }
 
 fn play_from_hand_trigger<'a>(

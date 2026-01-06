@@ -329,3 +329,11 @@ fn test_round_trip_when_you_play_a_character_materialize_figment() {
     let serialized = ability_serializer::serialize_ability(&parsed);
     assert_eq!(original, serialized);
 }
+
+#[test]
+fn test_round_trip_when_opponent_plays_card_which_could_dissolve_ally_prevent_that_card() {
+    let original = "When the opponent plays an event which could {dissolve} an ally, {prevent} that card.";
+    let parsed = parse_ability(original, "");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}

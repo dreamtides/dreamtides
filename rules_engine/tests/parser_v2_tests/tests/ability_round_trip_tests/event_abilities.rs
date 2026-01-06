@@ -376,3 +376,11 @@ fn test_round_trip_modal_return_enemy_or_draw_cards() {
     let serialized = ability_serializer::serialize_ability(&parsed);
     assert_eq!(original, serialized);
 }
+
+#[test]
+fn test_round_trip_prevent_played_event_which_could_dissolve_ally() {
+    let original = "{Prevent} a played event which could {dissolve} an ally.";
+    let parsed = parse_ability(original, "");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}

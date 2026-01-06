@@ -65,6 +65,8 @@ pub fn parser<'a>() -> impl Parser<'a, ParserInput<'a>, CardPredicate, ParserExt
             base.clone()
                 .then(predicate_suffix_parser::with_activated_ability_suffix())
                 .map(|_| CardPredicate::CharacterWithMultiActivatedAbility),
+            predicate_suffix_parser::which_could_dissolve_suffix()
+                .map(|target| CardPredicate::CouldDissolve { target: Box::new(target) }),
             predicate_suffix_parser::with_cost_compared_to_controlled_suffix().map(
                 |(cost_operator, count_matching)| {
                     CardPredicate::CharacterWithCostComparedToControlled {

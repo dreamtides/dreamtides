@@ -122,6 +122,12 @@ pub fn serialize_card_predicate(card_predicate: &CardPredicate) -> String {
                 serialize_card_predicate(target)
             )
         }
+        CardPredicate::CouldDissolve { target } => {
+            format!(
+                "an event which could {{dissolve}} {}",
+                serialize_predicate_without_article(target)
+            )
+        }
         _ => {
             unimplemented!("Serialization not yet implemented for this card predicate type")
         }

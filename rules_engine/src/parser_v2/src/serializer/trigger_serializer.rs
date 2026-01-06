@@ -13,6 +13,9 @@ pub fn serialize_trigger_event(trigger: &TriggerEvent) -> String {
         TriggerEvent::Play(predicate) => {
             format!("when you play {}, ", serialize_predicate(predicate))
         }
+        TriggerEvent::OpponentPlays(predicate) => {
+            format!("when the opponent plays {}, ", serialize_predicate(predicate))
+        }
         TriggerEvent::PlayFromHand(predicate) => {
             format!("when you play {} from your hand, ", serialize_predicate(predicate))
         }

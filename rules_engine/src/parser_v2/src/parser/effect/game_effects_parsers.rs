@@ -321,7 +321,14 @@ pub fn you_win_the_game<'a>(
     words(&["you", "win", "the", "game"]).to(StandardEffect::YouWinTheGame)
 }
 
+pub fn prevent_that_card<'a>(
+) -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
+    directive("prevent")
+        .ignore_then(words(&["that", "card"]))
+        .to(StandardEffect::Counterspell { target: Predicate::That })
+}
+
 fn counterspell_effects<'a>(
 ) -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
-    choice((counterspell_unless_pays_cost(), counterspell())).boxed()
+    choice((counterspell_unless_pays_cost(), prevent_that_card(), counterspell())).boxed()
 }

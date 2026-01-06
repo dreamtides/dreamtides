@@ -23,6 +23,7 @@ pub enum TriggerEvent {
     PlayCardsInTurn(u32),
     PlayDuringTurn(Predicate, PlayerTurn),
     PlayFromHand(Predicate),
+    OpponentPlays(Predicate),
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

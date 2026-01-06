@@ -1,4 +1,4 @@
-use ability_data::predicate::{CardPredicate, Operator};
+use ability_data::predicate::{CardPredicate, Operator, Predicate};
 use chumsky::prelude::*;
 use core_data::numerics::{Energy, Spark};
 
@@ -41,6 +41,14 @@ pub fn with_materialized_ability_suffix<'a>(
 pub fn with_activated_ability_suffix<'a>(
 ) -> impl Parser<'a, ParserInput<'a>, (), ParserExtra<'a>> + Clone {
     words(&["with", "an", "activated", "ability"]).to(())
+}
+
+pub fn which_could_dissolve_suffix<'a>(
+) -> impl Parser<'a, ParserInput<'a>, Predicate, ParserExtra<'a>> + Clone {
+    words(&["event", "which", "could"])
+        .ignore_then(directive("dissolve"))
+        .ignore_then(words(&["an", "ally"]))
+        .to(Predicate::Another(CardPredicate::Character))
 }
 
 pub fn with_cost_compared_to_controlled_suffix<'a>(

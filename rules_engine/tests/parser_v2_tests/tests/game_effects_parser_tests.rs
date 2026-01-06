@@ -1137,3 +1137,35 @@ fn test_modal_return_enemy_or_draw_cards() {
     ))
     "###);
 }
+
+#[test]
+fn test_prevent_played_event_which_could_dissolve_ally() {
+    let result = parse_ability("{Prevent} a played event which could {dissolve} an ally.", "");
+    assert_ron_snapshot!(result, @r###"
+    Event(EventAbility(
+      effect: Effect(Counterspell(
+        target: Any(CouldDissolve(
+          target: Another(Character),
+        )),
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_when_opponent_plays_card_which_could_dissolve_ally_prevent_that_card() {
+    let result = parse_ability(
+        "When the opponent plays an event which could {dissolve} an ally, {prevent} that card.",
+        "",
+    );
+    assert_ron_snapshot!(result, @r###"
+    Triggered(TriggeredAbility(
+      trigger: OpponentPlays(Any(CouldDissolve(
+        target: Another(Character),
+      ))),
+      effect: Effect(Counterspell(
+        target: That,
+      )),
+    ))
+    "###);
+}

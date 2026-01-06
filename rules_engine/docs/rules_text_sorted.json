@@ -1,5 +1,3 @@
 [
-  "When the opponent plays a card which could {dissolve} an ally, {prevent} that card.",
-  "{Prevent} a played event which could {dissolve} an ally.",
-  "When you abandon { $allies ->\n  [one] your first ally each turn,\n  *[other] {count-allies} in a turn,\n} {dissolve} an enemy.",
+  "When you abandon { $allies ->\n  [one] your first ally each turn,\n  *[other] {count-allies} in a turn,\n} {dissolve} an enemy."
 ]

@@ -92,6 +92,9 @@ pub enum CardPredicate {
         target: Box<CardPredicate>,
     },
     CharacterWithMultiActivatedAbility,
+    CouldDissolve {
+        target: Box<Predicate>,
+    },
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

@@ -84,6 +84,9 @@ fn matches_card_predicate(
         CardPredicate::NotCharacterType(character_type) => {
             card_properties::card_subtype(battle, trigger_card_id) != Some(*character_type)
         }
+        CardPredicate::CouldDissolve { .. } => {
+            todo!("Implement CouldDissolve card predicate")
+        }
         _ => todo!("Implement card predicate: {:?}", predicate),
     }
 }
