@@ -8,9 +8,9 @@ use ability_data::trigger_event::TriggerEvent;
 
 use super::cost_serializer::{serialize_cost, serialize_trigger_cost};
 use super::predicate_serializer::{
-    serialize_card_predicate, serialize_card_predicate_without_article,
-    serialize_for_each_predicate, serialize_predicate, serialize_predicate_plural,
-    serialize_predicate_without_article,
+    serialize_card_predicate, serialize_card_predicate_capitalized,
+    serialize_card_predicate_without_article, serialize_for_each_predicate, serialize_predicate,
+    serialize_predicate_plural, serialize_predicate_without_article,
 };
 use super::serializer_utils::capitalize_first_letter;
 use super::static_ability_serializer::serialize_standard_static_ability;
@@ -494,7 +494,7 @@ fn serialize_cards_in_void_gain_reclaim_this_turn(
         CollectionExpression::Exactly(1) => {
             format!(
                 "{} in your void gains {{reclaim}} equal to its cost.",
-                serialize_card_predicate(predicate)
+                serialize_card_predicate_capitalized(predicate)
             )
         }
         CollectionExpression::All => {

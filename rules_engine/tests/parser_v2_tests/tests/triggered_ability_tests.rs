@@ -363,7 +363,7 @@ fn test_when_an_ally_is_dissolved_gain_energy() {
 #[test]
 fn test_dissolved_subtype_in_void_gains_reclaim() {
     let result = parse_ability(
-        "{Dissolved} A {subtype} in your void gains {reclaim} equal to its cost.",
+        "{Dissolved} {a-subtype} in your void gains {reclaim} equal to its cost.",
         "subtype: warrior",
     );
     assert_ron_snapshot!(result, @r###"
@@ -374,6 +374,25 @@ fn test_dissolved_subtype_in_void_gains_reclaim() {
       effect: Effect(CardsInVoidGainReclaimThisTurn(
         count: Exactly(1),
         predicate: CharacterType(Warrior),
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_dissolved_capitalized_subtype_directive_in_void_gains_reclaim() {
+    let result = parse_ability(
+        "{Dissolved} {ASubtype} in your void gains {reclaim} equal to its cost.",
+        "subtype: survivor",
+    );
+    assert_ron_snapshot!(result, @r###"
+    Triggered(TriggeredAbility(
+      trigger: Keywords([
+        Dissolved,
+      ]),
+      effect: Effect(CardsInVoidGainReclaimThisTurn(
+        count: Exactly(1),
+        predicate: CharacterType(Survivor),
       )),
     ))
     "###);

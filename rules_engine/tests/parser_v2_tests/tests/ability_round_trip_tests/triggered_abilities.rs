@@ -276,10 +276,18 @@ fn test_round_trip_when_allied_subtype_dissolved_kindle() {
 
 #[test]
 fn test_round_trip_dissolved_subtype_in_void_gains_reclaim() {
-    let original = "{Dissolved} {A-subtype} in your void gains {reclaim} equal to its cost.";
+    let original = "{Dissolved} {ASubtype} in your void gains {reclaim} equal to its cost.";
     let parsed = parse_ability(original, "subtype: warrior");
     let serialized = ability_serializer::serialize_ability(&parsed);
     assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_dissolved_lowercase_subtype_directive_serializes_to_capital() {
+    let original = "{Dissolved} {a-subtype} in your void gains {reclaim} equal to its cost.";
+    let parsed = parse_ability(original, "subtype: warrior");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!("{Dissolved} {ASubtype} in your void gains {reclaim} equal to its cost.", serialized);
 }
 
 #[test]

@@ -5,10 +5,12 @@ use chumsky::prelude::*;
 use core_data::numerics::{Energy, Points};
 
 use crate::parser::parser_helpers::{
-    article, cards, directive, discards, energy, period, points, reclaim_cost, top_n_cards,
-    up_to_n_events, word, words, ParserExtra, ParserInput,
+    article, cards, directive, discards, energy, period, points, reclaim_cost, subtype,
+    top_n_cards, up_to_n_events, word, words, ParserExtra, ParserInput,
 };
-use crate::parser::{card_predicate_parser, predicate_parser, quantity_expression_parser};
+use crate::parser::{
+    card_predicate_parser, predicate_parser, predicate_suffix_parser, quantity_expression_parser,
+};
 
 pub fn parser<'a>() -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
     choice((
@@ -223,7 +225,22 @@ pub fn cards_in_void_gain_reclaim<'a>(
                 predicate: CardPredicate::Card,
             }),
         article()
-            .ignore_then(card_predicate_parser::parser())
+            .ignore_then(choice((
+                choice((
+                    word("card").to(CardPredicate::Card),
+                    word("character").to(CardPredicate::Character),
+                    word("event").to(CardPredicate::Event),
+                ))
+                .then(predicate_suffix_parser::with_cost_suffix())
+                .map(|(base, (cost, op))| CardPredicate::CardWithCost {
+                    target: Box::new(base),
+                    cost_operator: op,
+                    cost: Energy(cost),
+                }),
+                word("event").to(CardPredicate::Event),
+                word("character").to(CardPredicate::Character),
+                word("card").to(CardPredicate::Card),
+            )))
             .then_ignore(words(&["in", "your", "void", "gains"]))
             .then_ignore(choice((
                 reclaim_cost().ignored(),
@@ -233,6 +250,17 @@ pub fn cards_in_void_gain_reclaim<'a>(
             .map(|predicate| StandardEffect::CardsInVoidGainReclaimThisTurn {
                 count: CollectionExpression::Exactly(1),
                 predicate,
+            }),
+        subtype()
+            .then_ignore(words(&["in", "your", "void", "gains"]))
+            .then_ignore(choice((
+                reclaim_cost().ignored(),
+                directive("reclaim").then_ignore(words(&["equal", "to", "its", "cost"])),
+            )))
+            .then_ignore(words(&["this", "turn"]).or_not())
+            .map(|subtype_value| StandardEffect::CardsInVoidGainReclaimThisTurn {
+                count: CollectionExpression::Exactly(1),
+                predicate: CardPredicate::CharacterType(subtype_value),
             }),
     ))
     .boxed()

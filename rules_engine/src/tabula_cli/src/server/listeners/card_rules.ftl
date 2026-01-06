@@ -146,7 +146,33 @@ a-subtype =
       [visionary] a {-type(value: "visionary")}
       [visitor] a {-type(value: "visitor")}
       [warrior] a {-type(value: "warrior")}
-      *[other] Error: Unknown 'a-type' for type: { $subtype }
+      *[other] Error: Unknown 'a-subtype' for type: { $subtype }
+  }
+
+ASubtype =
+  {
+    $subtype ->
+      [ancient] An {-type(value: "ancient")}
+      [child] An {-type(value: "child")}
+      [detective] An {-type(value: "detective")}
+      [enigma] An {-type(value: "enigma")}
+      [explorer] An {-type(value: "explorer")}
+      [hacker] An {-type(value: "hacker")}
+      [mage] An {-type(value: "mage")}
+      [monster] An {-type(value: "monster")}
+      [musician] An {-type(value: "musician")}
+      [outsider] An {-type(value: "outsider")}
+      [renegade] An {-type(value: "renegade")}
+      [spirit-animal] An {-type(value: "spirit animal")}
+      [super] An {-type(value: "super")}
+      [survivor] An {-type(value: "survivor")}
+      [synth] An {-type(value: "synth")}
+      [tinkerer] An {-type(value: "tinkerer")}
+      [trooper] An {-type(value: "trooper")}
+      [visionary] An {-type(value: "visionary")}
+      [visitor] An {-type(value: "visitor")}
+      [warrior] An {-type(value: "warrior")}
+      *[other] Error: Unknown 'ASubtype' for type: { $subtype }
   }
 
 subtype =

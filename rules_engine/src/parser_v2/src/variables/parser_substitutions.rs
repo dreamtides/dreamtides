@@ -9,6 +9,7 @@ use crate::variables::parser_bindings::VariableBindings;
 static DIRECTIVES: &[(&str, &str, VariableConstructor)] = &[
     ("a-figment", "figment", figment),
     ("a-subtype", "subtype", subtype),
+    ("asubtype", "subtype", subtype),
     ("cards-numeral", "cards", integer),
     ("cards", "cards", integer),
     ("copies", "number", integer),

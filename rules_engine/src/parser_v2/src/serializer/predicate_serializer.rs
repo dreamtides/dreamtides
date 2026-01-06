@@ -96,6 +96,19 @@ pub fn serialize_enemy_predicate(card_predicate: &CardPredicate) -> String {
     }
 }
 
+pub fn serialize_card_predicate_capitalized(card_predicate: &CardPredicate) -> String {
+    match card_predicate {
+        CardPredicate::Card => "A card".to_string(),
+        CardPredicate::Character => "A character".to_string(),
+        CardPredicate::Event => "An event".to_string(),
+        CardPredicate::CharacterType(_) => "{ASubtype}".to_string(),
+        CardPredicate::Fast { target } => {
+            format!("A {{fast}} {}", serialize_fast_target(target))
+        }
+        _ => serialize_card_predicate(card_predicate),
+    }
+}
+
 pub fn serialize_card_predicate(card_predicate: &CardPredicate) -> String {
     match card_predicate {
         CardPredicate::Card => "a card".to_string(),
