@@ -262,6 +262,26 @@ fn test_spanned_ability_when_you_abandon_an_ally_kindle() {
 }
 
 #[test]
+fn test_spanned_when_you_abandon_count_allies_in_a_turn_dissolve_an_enemy() {
+    let SpannedAbility::Triggered(triggered) = parse_spanned_ability(
+        "When you abandon {count-allies} in a turn, {dissolve} an enemy.",
+        "allies: 2",
+    ) else {
+        panic!("Expected Triggered ability");
+    };
+
+    assert_eq!(triggered.once_per_turn, None);
+    assert_eq!(triggered.trigger.text, "When you abandon {count-allies} in a turn");
+    assert_valid_span(&triggered.trigger.span);
+
+    let SpannedEffect::Effect(effect) = triggered.effect else {
+        panic!("Expected Effect, got Modal");
+    };
+    assert_eq!(effect.text.trim(), "{dissolve} an enemy.");
+    assert_valid_span(&effect.span);
+}
+
+#[test]
 fn test_spanned_when_you_discard_this_character_materialize_it() {
     let SpannedAbility::Triggered(triggered) =
         parse_spanned_ability("When you discard this character, {materialize} it.", "")

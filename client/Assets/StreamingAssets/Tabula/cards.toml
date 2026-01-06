@@ -3241,11 +3241,7 @@ card-number = 194
 name = "Blade of Oblivion"
 id = "86eed140-60b0-4e69-b868-332fcf25b8b3"
 energy-cost = 2
-rules-text = """
-When you abandon { $allies ->
-  [one] your first ally each turn,
-  *[other] {count-allies} in a turn,
-} {dissolve} an enemy."""
+rules-text = "When you abandon {count-allies} in a turn, {dissolve} an enemy."
 preview = "When you abandon 2 allies in a turn, dissolve an enemy."
 variables = "allies: 2"
 card-type = "Character"

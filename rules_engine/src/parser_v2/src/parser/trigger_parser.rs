@@ -3,7 +3,7 @@ use ability_data::trigger_event::{PlayerTurn, TriggerEvent, TriggerKeyword};
 use chumsky::prelude::*;
 
 use crate::parser::parser_helpers::{
-    article, cards_numeral, comma, directive, word, words, ParserExtra, ParserInput,
+    article, cards_numeral, comma, count_allies, directive, word, words, ParserExtra, ParserInput,
 };
 use crate::parser::{card_predicate_parser, predicate_parser};
 
@@ -57,7 +57,13 @@ fn play_triggers<'a>() -> impl Parser<'a, ParserInput<'a>, TriggerEvent, ParserE
 
 fn action_triggers<'a>() -> impl Parser<'a, ParserInput<'a>, TriggerEvent, ParserExtra<'a>> + Clone
 {
-    choice((discard_trigger(), materialize_trigger(), abandon_trigger())).boxed()
+    choice((
+        abandon_cards_in_turn_trigger(),
+        discard_trigger(),
+        materialize_trigger(),
+        abandon_trigger(),
+    ))
+    .boxed()
 }
 
 fn state_change_triggers<'a>(
@@ -217,6 +223,14 @@ fn abandon_trigger<'a>() -> impl Parser<'a, ParserInput<'a>, TriggerEvent, Parse
         .ignore_then(article().or_not())
         .ignore_then(predicate_parser::predicate_parser())
         .map(TriggerEvent::Abandon)
+}
+
+fn abandon_cards_in_turn_trigger<'a>(
+) -> impl Parser<'a, ParserInput<'a>, TriggerEvent, ParserExtra<'a>> + Clone {
+    words(&["when", "you", "abandon"])
+        .ignore_then(count_allies())
+        .then_ignore(words(&["in", "a", "turn"]))
+        .map(TriggerEvent::AbandonCardsInTurn)
 }
 
 fn end_of_turn_trigger<'a>(

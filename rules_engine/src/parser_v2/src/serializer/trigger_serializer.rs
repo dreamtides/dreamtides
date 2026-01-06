@@ -49,6 +49,9 @@ pub fn serialize_trigger_event(trigger: &TriggerEvent) -> String {
         TriggerEvent::Abandon(predicate) => {
             format!("when you abandon {}, ", serialize_predicate(predicate))
         }
+        TriggerEvent::AbandonCardsInTurn(_) => {
+            "when you abandon {count-allies} in a turn, ".to_string()
+        }
         TriggerEvent::PutIntoVoid(predicate) => {
             format!("when {} is put into your void, ", serialize_predicate(predicate))
         }

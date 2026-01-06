@@ -219,6 +219,14 @@ fn test_round_trip_when_you_abandon_an_ally_this_character_gains_spark() {
 }
 
 #[test]
+fn test_round_trip_when_you_abandon_count_allies_in_a_turn_dissolve_an_enemy() {
+    let original = "When you abandon {count-allies} in a turn, {Dissolve} an enemy.";
+    let parsed = parse_ability(original, "allies: 2");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
 fn test_round_trip_when_you_materialize_an_allied_subtype_gain_energy() {
     let original = "When you {materialize} an allied {subtype}, gain {e}.";
     let parsed = parse_ability(original, "subtype: warrior, e: 1");

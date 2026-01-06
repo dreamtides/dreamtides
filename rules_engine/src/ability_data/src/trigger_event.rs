@@ -7,6 +7,7 @@ use crate::predicate::Predicate;
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum TriggerEvent {
     Abandon(Predicate),
+    AbandonCardsInTurn(u32),
     Banished(Predicate),
     Discard(Predicate),
     Dissolved(Predicate),

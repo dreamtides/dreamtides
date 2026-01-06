@@ -306,6 +306,22 @@ fn test_when_you_abandon_an_ally_this_character_gains_spark() {
 }
 
 #[test]
+fn test_when_you_abandon_count_allies_in_a_turn_dissolve_an_enemy() {
+    let result = parse_ability(
+        "When you abandon {count-allies} in a turn, {dissolve} an enemy.",
+        "allies: 2",
+    );
+    assert_ron_snapshot!(result, @r###"
+    Triggered(TriggeredAbility(
+      trigger: AbandonCardsInTurn(2),
+      effect: Effect(DissolveCharacter(
+        target: Enemy(Character),
+      )),
+    ))
+    "###);
+}
+
+#[test]
 fn test_when_an_ally_is_dissolved_gain_points() {
     let result = parse_ability("When an ally is {dissolved}, gain {points}.", "points: 2");
     assert_ron_snapshot!(result, @r###"

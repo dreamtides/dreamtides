@@ -37,6 +37,9 @@ pub fn matches(
             ),
             _ => false,
         },
+        TriggerEvent::AbandonCardsInTurn(..) => {
+            todo!("Implement AbandonCardsInTurn")
+        }
         TriggerEvent::Banished(predicate) => match trigger {
             Trigger::Banished(card_id) => trigger_predicates::trigger_matches(
                 battle,
