@@ -239,8 +239,8 @@ card-number = 14
 name = "Forgotten Titan"
 id = "8fb2e9d0-28e5-4253-a61c-59f7d4044d59"
 energy-cost = 5
-rules-text = "If you have discarded a card this turn, this character costs {e}."
-preview = "If you have discarded a card this turn, this character costs 1●."
+rules-text = "This character costs {e} if you have discarded a card this turn."
+preview = "This character costs 1● if you have discarded a card this turn."
 variables = "e: 1"
 card-type = "Character"
 subtype = "Ancient"
@@ -764,9 +764,7 @@ card-number = 45
 name = "Dawnblade Wanderer"
 id = "d8f9abc2-a864-47b9-96e6-2ced9f9ba208"
 energy-cost = 1
-rules-text = """
-{MaterializedJudgment}
-Gain {e}."""
+rules-text = "{MaterializedJudgment} Gain {e}."
 preview = """
 ▸ Materialized, Judgment:
 Gain 2●."""
