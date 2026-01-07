@@ -1096,6 +1096,23 @@ fn test_when_you_materialize_trigger_judgment_ability_each_ally() {
 }
 
 #[test]
+fn test_when_you_materialize_trigger_judgment_ability_each_enemy() {
+    let result = parse_ability(
+        "When you {materialize} a character, trigger the {Judgment} ability of each enemy.",
+        "",
+    );
+    assert_ron_snapshot!(result, @r###"
+    Triggered(TriggeredAbility(
+      trigger: Materialize(Your(Character)),
+      effect: Effect(TriggerJudgmentAbility(
+        matching: Enemy(Character),
+        collection: All,
+      )),
+    ))
+    "###);
+}
+
+#[test]
 fn test_when_you_discard_card_it_gains_reclaim_equal_to_cost() {
     let result = parse_ability(
         "When you discard a card, it gains {reclaim} equal to its cost this turn.",

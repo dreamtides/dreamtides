@@ -315,6 +315,14 @@ fn test_round_trip_when_you_materialize_trigger_judgment_ability_each_ally() {
 }
 
 #[test]
+fn test_round_trip_when_you_materialize_trigger_judgment_ability_each_enemy() {
+    let original = "When you {materialize} a character, trigger the {Judgment} ability of each enemy.";
+    let parsed = parse_ability(original, "");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
 fn test_round_trip_when_you_discard_card_it_gains_reclaim_equal_to_cost() {
     let original = "When you discard a card, it gains {reclaim} equal to its cost this turn.";
     let parsed = parse_ability(original, "");

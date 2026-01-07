@@ -15,6 +15,7 @@ use super::predicate_serializer::{
 use super::serializer_utils::capitalize_first_letter;
 use super::static_ability_serializer::serialize_standard_static_ability;
 use super::trigger_serializer::serialize_trigger_event;
+use crate::serializer::predicate_serializer;
 
 pub fn serialize_standard_effect(effect: &StandardEffect) -> String {
     match effect {
@@ -277,10 +278,11 @@ pub fn serialize_standard_effect(effect: &StandardEffect) -> String {
             format!("draw {} from your deck.", serialize_card_predicate(predicate))
         }
         StandardEffect::TriggerJudgmentAbility { matching, collection } => {
-            if matches!(matching, Predicate::Another(CardPredicate::Character))
-                && matches!(collection, CollectionExpression::All)
-            {
-                "trigger the {Judgment} ability of each ally.".to_string()
+            if matches!(collection, CollectionExpression::All) {
+                format!(
+                    "trigger the {{Judgment}} ability of each {}.",
+                    predicate_serializer::serialize_predicate_without_article(matching)
+                )
             } else {
                 unimplemented!(
                     "Serialization not yet implemented for this TriggerJudgmentAbility pattern"

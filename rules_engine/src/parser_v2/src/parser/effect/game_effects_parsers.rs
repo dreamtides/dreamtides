@@ -309,9 +309,10 @@ pub fn trigger_judgment_ability<'a>(
 ) -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
     words(&["trigger", "the"])
         .ignore_then(directive("judgment"))
-        .ignore_then(words(&["ability", "of", "each", "ally"]))
-        .to(StandardEffect::TriggerJudgmentAbility {
-            matching: Predicate::Another(CardPredicate::Character),
+        .ignore_then(words(&["ability", "of", "each"]))
+        .ignore_then(predicate_parser::predicate_parser())
+        .map(|matching| StandardEffect::TriggerJudgmentAbility {
+            matching,
             collection: CollectionExpression::All,
         })
 }
