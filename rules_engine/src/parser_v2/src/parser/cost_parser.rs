@@ -11,25 +11,7 @@ use crate::parser::parser_helpers::{
 use crate::parser::{card_predicate_parser, predicate_parser};
 
 pub fn cost_parser<'a>() -> impl Parser<'a, ParserInput<'a>, Cost, ParserExtra<'a>> + Clone {
-    choice((
-        choice((
-            abandon_or_discard_cost(),
-            spend_one_or_more_energy_cost(),
-            energy_cost(),
-            abandon_this_character_cost(),
-            abandon_cost(),
-        ))
-        .boxed(),
-        choice((
-            return_to_hand_cost(),
-            discard_hand_cost(),
-            discard_cost(),
-            banish_void_with_min_count_cost(),
-            banish_from_your_void_cost(),
-        ))
-        .boxed(),
-    ))
-    .boxed()
+    choice((cost_choice(), single_cost_parser())).boxed()
 }
 
 pub fn banish_from_hand_cost<'a>() -> impl Parser<'a, ParserInput<'a>, Cost, ParserExtra<'a>> + Clone
@@ -86,6 +68,31 @@ pub fn abandon_cost_single<'a>() -> impl Parser<'a, ParserInput<'a>, Cost, Parse
     )
 }
 
+fn cost_choice<'a>() -> impl Parser<'a, ParserInput<'a>, Cost, ParserExtra<'a>> + Clone {
+    single_cost_parser().separated_by(word("or")).at_least(2).collect::<Vec<_>>().map(Cost::Choice)
+}
+
+fn single_cost_parser<'a>() -> impl Parser<'a, ParserInput<'a>, Cost, ParserExtra<'a>> + Clone {
+    choice((
+        choice((
+            spend_one_or_more_energy_cost(),
+            energy_cost(),
+            abandon_this_character_cost(),
+            abandon_cost(),
+        ))
+        .boxed(),
+        choice((
+            return_to_hand_cost(),
+            discard_hand_cost(),
+            discard_cost(),
+            banish_void_with_min_count_cost(),
+            banish_from_your_void_cost(),
+        ))
+        .boxed(),
+    ))
+    .boxed()
+}
+
 fn collection_expression_for_return_cost<'a>(
 ) -> impl Parser<'a, ParserInput<'a>, CollectionExpression, ParserExtra<'a>> + Clone {
     choice((
@@ -127,21 +134,6 @@ fn abandon_any_number<'a>() -> impl Parser<'a, ParserInput<'a>, Cost, ParserExtr
             target,
             count: CollectionExpression::AnyNumberOf,
         })
-}
-
-fn abandon_or_discard_cost<'a>() -> impl Parser<'a, ParserInput<'a>, Cost, ParserExtra<'a>> + Clone
-{
-    word("abandon")
-        .ignore_then(article())
-        .ignore_then(predicate_parser::predicate_parser())
-        .filter(|predicate| matches!(predicate, Predicate::Another(CardPredicate::Character)))
-        .then_ignore(words(&["or", "discard"]))
-        .then_ignore(article())
-        .ignore_then(
-            predicate_parser::predicate_parser()
-                .filter(|predicate| matches!(predicate, Predicate::Any(CardPredicate::Card))),
-        )
-        .to(Cost::AbandonACharacterOrDiscardACard)
 }
 
 fn abandon_cost_with_count<'a>() -> impl Parser<'a, ParserInput<'a>, Cost, ParserExtra<'a>> + Clone

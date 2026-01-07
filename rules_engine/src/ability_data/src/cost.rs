@@ -10,12 +10,12 @@ use crate::predicate::{CardPredicate, Predicate};
 pub enum Cost {
     AbandonCharactersCount { target: Predicate, count: CollectionExpression },
     AbandonDreamscapes(u32),
-    AbandonACharacterOrDiscardACard,
     BanishAllCardsFromYourVoid,
     BanishAllCardsFromYourVoidWithMinCount(u32),
     BanishCardsFromEnemyVoid(u32),
     BanishCardsFromYourVoid(u32),
     BanishFromHand(Predicate),
+    Choice(Vec<Cost>),
     CostList(Vec<Cost>),
     DiscardCards(CardPredicate, u32),
     DiscardHand,
@@ -33,6 +33,7 @@ impl Cost {
     pub fn energy_cost(&self) -> Option<Energy> {
         match self {
             Cost::Energy(energy) => Some(*energy),
+            Cost::Choice(costs) => costs.iter().find_map(Cost::energy_cost),
             Cost::CostList(costs) => costs.iter().find_map(Cost::energy_cost),
             _ => None,
         }

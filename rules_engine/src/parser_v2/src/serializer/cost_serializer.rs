@@ -32,7 +32,6 @@ pub fn serialize_cost(cost: &Cost) -> String {
         Cost::DiscardHand => "discard your hand".to_string(),
         Cost::Energy(_) => "{e}".to_string(),
         Cost::LoseMaximumEnergy(_) => "lose {maximum-energy}".to_string(),
-        Cost::AbandonACharacterOrDiscardACard => "abandon an ally or discard a card".to_string(),
         Cost::BanishCardsFromYourVoid(count) => {
             if *count == 1 {
                 "{Banish} another card in your void".to_string()
@@ -49,6 +48,7 @@ pub fn serialize_cost(cost: &Cost) -> String {
         Cost::BanishFromHand(predicate) => {
             format!("{{Banish}} {} from hand", serialize_predicate(predicate))
         }
+        Cost::Choice(costs) => costs.iter().map(serialize_cost).collect::<Vec<_>>().join(" or "),
         Cost::ReturnToHand { target, count } => {
             use ability_data::collection_expression::CollectionExpression;
             match count {

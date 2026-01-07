@@ -1,30 +1,3 @@
-# Activated Ability Parsing
-
-9. **Generality - Parsed but ignored predicate in cost**: In cost_parser.rs,
-   `banish_from_your_void_cost` (line 177) parses a full predicate using
-   `predicate_parser::predicate_parser()` but ignores it on line 182: `|_|
-   Cost::BanishCardsFromYourVoid(1)`. The test at activated_ability_tests.rs:222
-   shows this accepts "{Banish} another card in your void" where "another card"
-   is parsed then discarded. Use the parsed predicate to support targeting
-   specific card types from the void.
-
-10. **Code Quality - Near-duplicate void banish parsers**:
-    `banish_cards_from_your_void_cost` (cost_parser.rs:66) and
-    `banish_cards_from_enemy_void_cost` (line 74) are structurally identical,
-    differing only in the word sequence: "from your void" vs "from the
-    opponent's void". These could be unified with a helper that accepts the void
-    owner as a parameter.
-
-11. **Consistency - Hard-coded predicate validation with filter**:
-    `abandon_or_discard_cost` (cost_parser.rs:132) uses `.filter()` calls on
-    lines 137 and 141-142 to validate that parsed predicates match very specific
-    patterns (`Predicate::Another(CardPredicate::Character)` and
-    `Predicate::Any(CardPredicate::Card)`). This hard-codes the exact text
-    pattern "abandon an ally or discard a card" rather than allowing the
-    predicate system to naturally express this. This validation approach is
-    unique to this parser and differs from how other cost parsers work, making
-    the pattern unclear for future additions.
-
 # Condition Parsing
 
 12. **Code Quality - Near-duplicate "in void" parsers**:
@@ -33,7 +6,8 @@
     parsing "this card is in your void" followed by comma and mapping to
     `Condition::ThisCardIsInYourVoid`. They differ only in accepting "if" vs
     "while" as a prefix word. These could be unified with a single parser that
-    accepts either prefix. Please standardize on the "if" version.
+    accepts either prefix. Please standardize on the "if" version and update
+    cards.toml to match.
 
 13. **Generality - Hardcoded "allied" in with conditions**:
     `with_count_allied_subtype` (condition_parser.rs:27) and

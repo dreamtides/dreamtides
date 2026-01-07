@@ -22,7 +22,13 @@ pub fn standard_cost<'a>() -> impl Parser<'a, &'a str, Cost, ErrorType<'a>> {
         numeric("banish", count, "cards from your void").map(Cost::BanishCardsFromYourVoid),
         phrase("banish a card from the enemy's void").to(Cost::BanishCardsFromEnemyVoid(1)),
         numeric("banish", count, "cards from the enemy's void").map(Cost::BanishCardsFromEnemyVoid),
-        phrase("abandon a character or discard a card").to(Cost::AbandonACharacterOrDiscardACard),
+        phrase("abandon a character or discard a card").to(Cost::Choice(vec![
+            Cost::AbandonCharactersCount {
+                target: Predicate::Another(CardPredicate::Character),
+                count: CollectionExpression::Exactly(1),
+            },
+            Cost::DiscardCards(CardPredicate::Card, 1),
+        ])),
         phrase("abandon a dreamscape").to(Cost::AbandonDreamscapes(1)),
         numeric("abandon", count, "dreamscapes").map(Cost::AbandonDreamscapes),
         phrase("abandon").ignore_then(determiner_parser::your_action()).map(|target| {
@@ -84,7 +90,13 @@ pub fn third_person_singular_present_tense_cost<'a>()
         numeric("pays {-energy-cost(e:", Energy, ")}").map(Cost::Energy),
         phrase("banishes a card from their void").to(Cost::BanishCardsFromYourVoid(1)),
         numeric("banishes", count, "cards from their void").map(Cost::BanishCardsFromYourVoid),
-        phrase("abandons a character or discards a card").to(Cost::AbandonACharacterOrDiscardACard),
+        phrase("abandons a character or discards a card").to(Cost::Choice(vec![
+            Cost::AbandonCharactersCount {
+                target: Predicate::Another(CardPredicate::Character),
+                count: CollectionExpression::Exactly(1),
+            },
+            Cost::DiscardCards(CardPredicate::Card, 1),
+        ])),
         phrase("abandons a dreamscape").to(Cost::AbandonDreamscapes(1)),
         numeric("abandons", count, "dreamscapes").map(Cost::AbandonDreamscapes),
         phrase("abandons").ignore_then(determiner_parser::your_action()).map(|target| {

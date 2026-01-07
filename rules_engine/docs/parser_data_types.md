@@ -248,13 +248,13 @@ pub enum Cost {
     Energy(Energy),
     AbandonCharactersCount { target: Predicate, count: CollectionExpression },
     AbandonDreamscapes(u32),
-    AbandonACharacterOrDiscardACard,
     DiscardCards(CardPredicate, u32),
     DiscardHand,
     BanishCardsFromYourVoid(u32),
     BanishCardsFromEnemyVoid(u32),
     BanishAllCardsFromYourVoid,
     BanishFromHand(Predicate),
+    Choice(Vec<Cost>),  // Alternative costs separated by "or"
     ReturnToHand { target: Predicate, count: CollectionExpression },
     SpendOneOrMoreEnergy,
     CostList(Vec<Cost>),  // Multiple costs combined

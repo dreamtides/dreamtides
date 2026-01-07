@@ -320,7 +320,13 @@ fn test_abandon_or_discard_dissolve_enemy() {
     assert_ron_snapshot!(result, @r###"
     Activated(ActivatedAbility(
       costs: [
-        AbandonACharacterOrDiscardACard,
+        Choice([
+          AbandonCharactersCount(
+            target: Another(Character),
+            count: Exactly(1),
+          ),
+          DiscardCards(Card, 1),
+        ]),
       ],
       effect: Effect(DissolveCharacter(
         target: Enemy(Character),
