@@ -340,7 +340,7 @@ fn test_round_trip_multiply_card_draw_from_card_effects() {
 #[test]
 fn test_round_trip_each_allied_subtype_gains_spark_for_each_allied_subtype() {
     let original = "Each allied {subtype} gains spark equal to the number of allied {plural-subtype}.";
-    let parsed = parse_ability(original, "subtype: warrior, plural-subtype: warrior");
+    let parsed = parse_ability(original, "subtype: warrior");
     let serialized = ability_serializer::serialize_ability(&parsed);
     assert_eq!(original, serialized);
 }

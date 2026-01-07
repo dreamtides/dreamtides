@@ -384,7 +384,7 @@ fn test_round_trip_materialized_draw_subtype() {
 #[test]
 fn test_round_trip_judgment_each_allied_subtype_gains_spark_for_each_allied_subtype() {
     let original = "{Judgment} Each allied {subtype} gains spark equal to the number of allied {plural-subtype}.";
-    let parsed = parse_ability(original, "subtype: warrior, plural-subtype: warrior");
+    let parsed = parse_ability(original, "subtype: warrior");
     let serialized = ability_serializer::serialize_ability(&parsed);
     assert_eq!(original, serialized);
 }
