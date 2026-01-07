@@ -8,9 +8,7 @@ use crate::parser::parser_helpers::{
     article, cards, directive, discards, energy, period, points, reclaim_cost, subtype,
     top_n_cards, up_to_n_events, word, words, ParserExtra, ParserInput,
 };
-use crate::parser::{
-    card_predicate_parser, predicate_parser, predicate_suffix_parser, quantity_expression_parser,
-};
+use crate::parser::{card_predicate_parser, predicate_parser, quantity_expression_parser};
 
 pub fn parser<'a>() -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
     choice((
@@ -211,59 +209,34 @@ pub fn gains_reclaim_for_cost_this_turn<'a>(
 
 pub fn cards_in_void_gain_reclaim<'a>(
 ) -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
-    choice((
+    let count_and_predicate = choice((
         words(&["all", "cards"])
             .ignore_then(word("currently").or_not())
-            .ignore_then(words(&["in", "your", "void", "gain"]))
-            .ignore_then(choice((
-                reclaim_cost().ignored(),
-                directive("reclaim").then_ignore(words(&["equal", "to", "their", "cost"])),
-            )))
-            .ignore_then(words(&["this", "turn"]).or_not())
-            .to(StandardEffect::CardsInVoidGainReclaimThisTurn {
-                count: CollectionExpression::All,
-                predicate: CardPredicate::Card,
-            }),
+            .to((CollectionExpression::All, CardPredicate::Card)),
         article()
-            .ignore_then(choice((
-                choice((
-                    word("card").to(CardPredicate::Card),
-                    word("character").to(CardPredicate::Character),
-                    word("event").to(CardPredicate::Event),
-                ))
-                .then(predicate_suffix_parser::with_cost_suffix())
-                .map(|(base, (cost, op))| CardPredicate::CardWithCost {
-                    target: Box::new(base),
-                    cost_operator: op,
-                    cost: Energy(cost),
-                }),
-                word("event").to(CardPredicate::Event),
-                word("character").to(CardPredicate::Character),
-                word("card").to(CardPredicate::Card),
-            )))
-            .then_ignore(words(&["in", "your", "void", "gains"]))
-            .then_ignore(choice((
-                reclaim_cost().ignored(),
-                directive("reclaim").then_ignore(words(&["equal", "to", "its", "cost"])),
-            )))
-            .then_ignore(words(&["this", "turn"]).or_not())
-            .map(|predicate| StandardEffect::CardsInVoidGainReclaimThisTurn {
-                count: CollectionExpression::Exactly(1),
-                predicate,
-            }),
-        subtype()
-            .then_ignore(words(&["in", "your", "void", "gains"]))
-            .then_ignore(choice((
-                reclaim_cost().ignored(),
-                directive("reclaim").then_ignore(words(&["equal", "to", "its", "cost"])),
-            )))
-            .then_ignore(words(&["this", "turn"]).or_not())
-            .map(|subtype_value| StandardEffect::CardsInVoidGainReclaimThisTurn {
-                count: CollectionExpression::Exactly(1),
-                predicate: CardPredicate::CharacterType(subtype_value),
-            }),
-    ))
-    .boxed()
+            .ignore_then(card_predicate_parser::parser())
+            .map(|predicate| (CollectionExpression::Exactly(1), predicate)),
+        subtype().map(|subtype_value| {
+            (CollectionExpression::Exactly(1), CardPredicate::CharacterType(subtype_value))
+        }),
+    ));
+
+    count_and_predicate
+        .then_ignore(words(&["in", "your", "void"]))
+        .then_ignore(choice((word("gain"), word("gains"))))
+        .then_ignore(choice((
+            reclaim_cost().ignored(),
+            directive("reclaim").then_ignore(choice((
+                words(&["equal", "to", "their", "cost"]),
+                words(&["equal", "to", "its", "cost"]),
+            ))),
+        )))
+        .then_ignore(words(&["this", "turn"]).or_not())
+        .map(|(count, predicate)| StandardEffect::CardsInVoidGainReclaimThisTurn {
+            count,
+            predicate,
+        })
+        .boxed()
 }
 
 fn draw_cards_for_each<'a>(

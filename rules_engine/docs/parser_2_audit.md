@@ -2,30 +2,6 @@
 
 # Effect Parsing
 
-27. **Generality - Hardcoded card types in return from void**:
-    `return_from_void_to_hand()` (card_effect_parsers.rs:128-133) hardcodes
-    `Predicate::Any(CardPredicate::Event)` when parsing "return {up-to-n-events}
-    from your void to your hand" instead of parsing the card type as a general
-    predicate. This prevents patterns like "return up to {n} {subtype} from your
-    void to your hand" or "return up to {n} characters from your void to your
-    hand".
-
-28. **Generality - Hardcoded allies in banish**: `banish_up_to_n()`
-    (game_effects_parsers.rs:181-186) hardcodes `target:
-    Predicate::Another(CardPredicate::Character)` instead of parsing which cards
-    to banish. The parser uses `up_to_n_allies()` helper which implies allies,
-    but the parser itself doesn't verify this matches the parsed text, limiting
-    extensibility to other card types.
-
-29. **Code Quality - Massive duplication in void reclaim parser**:
-    `cards_in_void_gain_reclaim()` (card_effect_parsers.rs:212-267) has three
-    branches parsing "all cards", "a card/character/event", and "{subtype}"
-    separately. Lines 217-223, 244-250, and 255-260 all repeat nearly identical
-    logic for parsing "in your void gains {reclaim} this turn". The card type
-    parsing logic (lines 228-243) also duplicates basic card type matching. This
-    55-line function could be significantly simplified with a unified predicate
-    parser.
-
 30. **Code Quality - Duplicate cost parsers in effect_parser**:
     `pay_energy_cost()` (effect_parser.rs:277), `discard_cost()` (line 281), and
     `abandon_cost()` (line 290) duplicate similar parsers already defined in
