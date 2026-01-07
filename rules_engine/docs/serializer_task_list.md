@@ -17,30 +17,6 @@ The serializer is organized into several modules:
 
 ---
 
-### Task 7: Implement Missing serialize_enemy_predicate Variants
-
-**Location:** `predicate_serializer.rs` lines 61-96
-
-**Variants to add:**
-```rust
-CardPredicate::CharacterType(_) => "enemy {subtype}".to_string(),
-CardPredicate::NotCharacterType(_) => "enemy that is not {a-subtype}".to_string(),
-CardPredicate::CharacterWithMaterializedAbility => "enemy with a {materialized} ability".to_string(),
-CardPredicate::CharacterWithMultiActivatedAbility => "enemy with an activated ability".to_string(),
-CardPredicate::CharacterWithCostComparedToAbandoned { target, .. } => {
-    format!("{} with cost less than the abandoned ally's cost", serialize_enemy_predicate(target))
-}
-CardPredicate::CharacterWithSparkComparedToAbandonedCountThisTurn { target, .. } => {
-    format!(
-        "{} with spark less than the number of allies abandoned this turn",
-        serialize_enemy_predicate(target)
-    )
-}
-CardPredicate::Fast { target } => format!("fast {}", serialize_enemy_predicate(target)),
-```
-
----
-
 ### Task 8: Implement Missing serialize_card_predicate Variants
 
 **Location:** `predicate_serializer.rs` line 145
