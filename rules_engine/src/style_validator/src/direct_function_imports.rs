@@ -120,6 +120,7 @@ fn check_file_use_statements(
         .with_context(|| format!("Failed to parse file: {}", file.display()))?;
 
     let current_crate = get_crate_name(file, root);
+    let current_module = file_to_module_path(file, root);
     let mut violations = Vec::new();
 
     for item in &syntax.items {
@@ -130,6 +131,7 @@ fn check_file_use_statements(
                 &mut violations,
                 file,
                 &current_crate,
+                &current_module,
                 String::new(),
             );
         }
@@ -144,6 +146,7 @@ fn check_use_tree(
     violations: &mut Vec<StyleViolation>,
     current_file: &Path,
     current_crate: &str,
+    current_module: &str,
     path_so_far: String,
 ) {
     match tree {
@@ -152,6 +155,18 @@ fn check_use_tree(
 
             let new_path = if segment == "crate" {
                 current_crate.to_string()
+            } else if segment == "super" {
+                // Resolve super to the parent module
+                let parent = if path_so_far.is_empty() {
+                    // This is the first segment, so resolve based on current_module
+                    current_module.rsplit_once("::").map(|(parent, _)| parent.to_string())
+                        .unwrap_or_else(|| current_crate.to_string())
+                } else {
+                    // Already building a path, go up one level
+                    path_so_far.rsplit_once("::").map(|(parent, _)| parent.to_string())
+                        .unwrap_or_default()
+                };
+                parent
             } else if path_so_far.is_empty() {
                 segment
             } else {
@@ -164,6 +179,7 @@ fn check_use_tree(
                 violations,
                 current_file,
                 current_crate,
+                current_module,
                 new_path,
             );
         }
@@ -208,6 +224,7 @@ fn check_use_tree(
                     violations,
                     current_file,
                     current_crate,
+                    current_module,
                     path_so_far.clone(),
                 );
             }
