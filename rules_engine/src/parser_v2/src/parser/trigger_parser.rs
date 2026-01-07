@@ -105,8 +105,11 @@ fn draw_cards_in_turn_trigger<'a>(
 fn play_trigger<'a>() -> impl Parser<'a, ParserInput<'a>, TriggerEvent, ParserExtra<'a>> + Clone {
     words(&["when", "you", "play"])
         .ignore_then(article().or_not())
-        .ignore_then(card_predicate_parser::parser())
-        .map(|card_predicate| TriggerEvent::Play(Predicate::Your(card_predicate)))
+        .ignore_then(choice((
+            card_predicate_parser::parser().map(Predicate::Your),
+            predicate_parser::predicate_parser(),
+        )))
+        .map(TriggerEvent::Play)
 }
 
 fn opponent_plays_trigger<'a>(
@@ -121,31 +124,36 @@ fn play_from_hand_trigger<'a>(
 ) -> impl Parser<'a, ParserInput<'a>, TriggerEvent, ParserExtra<'a>> + Clone {
     words(&["when", "you", "play"])
         .ignore_then(article().or_not())
-        .ignore_then(card_predicate_parser::parser())
+        .ignore_then(choice((
+            card_predicate_parser::parser().map(Predicate::Your),
+            predicate_parser::predicate_parser(),
+        )))
         .then_ignore(words(&["from", "your", "hand"]))
-        .map(|card_predicate| TriggerEvent::PlayFromHand(Predicate::Your(card_predicate)))
+        .map(TriggerEvent::PlayFromHand)
 }
 
 fn play_during_turn_trigger<'a>(
 ) -> impl Parser<'a, ParserInput<'a>, TriggerEvent, ParserExtra<'a>> + Clone {
     words(&["when", "you", "play"])
         .ignore_then(article().or_not())
-        .ignore_then(card_predicate_parser::parser())
+        .ignore_then(choice((
+            card_predicate_parser::parser().map(Predicate::Your),
+            predicate_parser::predicate_parser(),
+        )))
         .then_ignore(words(&["in", "a", "turn"]))
-        .map(|card_predicate| {
-            TriggerEvent::PlayDuringTurn(Predicate::Your(card_predicate), PlayerTurn::YourTurn)
-        })
+        .map(|predicate| TriggerEvent::PlayDuringTurn(predicate, PlayerTurn::YourTurn))
 }
 
 fn play_during_opponent_turn_trigger<'a>(
 ) -> impl Parser<'a, ParserInput<'a>, TriggerEvent, ParserExtra<'a>> + Clone {
     words(&["when", "you", "play"])
         .ignore_then(article().or_not())
-        .ignore_then(card_predicate_parser::parser())
+        .ignore_then(choice((
+            card_predicate_parser::parser().map(Predicate::Your),
+            predicate_parser::predicate_parser(),
+        )))
         .then_ignore(words(&["during", "the", "opponent's", "turn"]))
-        .map(|card_predicate| {
-            TriggerEvent::PlayDuringTurn(Predicate::Your(card_predicate), PlayerTurn::EnemyTurn)
-        })
+        .map(|predicate| TriggerEvent::PlayDuringTurn(predicate, PlayerTurn::EnemyTurn))
 }
 
 fn play_cards_in_turn_trigger<'a>(
@@ -221,7 +229,10 @@ fn abandon_trigger<'a>() -> impl Parser<'a, ParserInput<'a>, TriggerEvent, Parse
 {
     words(&["when", "you", "abandon"])
         .ignore_then(article().or_not())
-        .ignore_then(predicate_parser::predicate_parser())
+        .ignore_then(choice((
+            card_predicate_parser::parser().map(Predicate::Your),
+            predicate_parser::predicate_parser(),
+        )))
         .map(TriggerEvent::Abandon)
 }
 

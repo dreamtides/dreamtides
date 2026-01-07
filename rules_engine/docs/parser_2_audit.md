@@ -1,11 +1,3 @@
-# Static Abilities
-
-5. **Generality - Hardcoded predicate in reclaim**:
-   `cards_in_your_void_have_reclaim()` (line 303) hardcodes `matching:
-   CardPredicate::Card` instead of parsing a predicate. The parser already
-   accepts "they" as a pronoun reference, but always maps to all cards rather
-   than potentially specific card types that could have reclaim.
-
 # Trigger Parsing
 
 6. **Consistency - Three different patterns for "when you <action>" triggers**:

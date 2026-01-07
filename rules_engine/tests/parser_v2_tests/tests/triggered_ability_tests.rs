@@ -256,7 +256,7 @@ fn test_when_you_abandon_a_character_draw_cards() {
     let result = parse_ability("When you abandon a character, draw {cards}.", "cards: 2");
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
-      trigger: Abandon(Any(Character)),
+      trigger: Abandon(Your(Character)),
       effect: Effect(DrawCards(
         count: 2,
       )),
@@ -269,7 +269,7 @@ fn test_when_you_abandon_a_character_gain_points() {
     let result = parse_ability("When you abandon a character, gain {points}.", "points: 1");
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
-      trigger: Abandon(Any(Character)),
+      trigger: Abandon(Your(Character)),
       effect: Effect(GainPoints(
         gains: Points(1),
       )),
@@ -886,6 +886,19 @@ fn test_once_per_turn_play_fast_character_gain_energy() {
       options: Some(TriggeredAbilityOptions(
         once_per_turn: true,
         until_end_of_turn: false,
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_when_you_play_this_character_gain_energy() {
+    let result = parse_ability("When you play this character, gain {e}.", "e: 2");
+    assert_ron_snapshot!(result, @r###"
+    Triggered(TriggeredAbility(
+      trigger: Play(This),
+      effect: Effect(GainEnergy(
+        gains: Energy(2),
       )),
     ))
     "###);
