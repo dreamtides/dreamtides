@@ -3085,8 +3085,8 @@ card-number = 185
 name = "Soulkindler"
 id = "7d20f2bb-50b5-418a-a435-da13a13ad257"
 energy-cost = 2
-rules-text = "While this card is in your void, allied {plural-subtype} have +{s} spark."
-preview = "While this card is in your void, allied survivors have +2 spark."
+rules-text = "If this card is in your void, allied {plural-subtype} have +{s} spark."
+preview = "If this card is in your void, allied survivors have +2 spark."
 variables = """
 subtype: survivor
 s: 2"""

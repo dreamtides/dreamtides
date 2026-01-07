@@ -13,7 +13,6 @@ pub fn condition_parser<'a>() -> impl Parser<'a, ParserInput<'a>, Condition, Par
 {
     choice((
         while_you_have_count_or_more_cards_in_your_void(),
-        while_this_card_is_in_your_void(),
         this_card_is_in_your_void(),
         dissolved_this_turn(),
         discarded_this_turn(),
@@ -71,13 +70,6 @@ fn discarded_this_turn<'a>() -> impl Parser<'a, ParserInput<'a>, Condition, Pars
 fn this_card_is_in_your_void<'a>(
 ) -> impl Parser<'a, ParserInput<'a>, Condition, ParserExtra<'a>> + Clone {
     words(&["if", "this", "card", "is", "in", "your", "void"])
-        .then_ignore(comma())
-        .to(Condition::ThisCardIsInYourVoid)
-}
-
-fn while_this_card_is_in_your_void<'a>(
-) -> impl Parser<'a, ParserInput<'a>, Condition, ParserExtra<'a>> + Clone {
-    words(&["while", "this", "card", "is", "in", "your", "void"])
         .then_ignore(comma())
         .to(Condition::ThisCardIsInYourVoid)
 }

@@ -1,14 +1,5 @@
 # Condition Parsing
 
-12. **Code Quality - Near-duplicate "in void" parsers**:
-    `this_card_is_in_your_void` (condition_parser.rs:71) and
-    `while_this_card_is_in_your_void` (line 78) are structurally identical, both
-    parsing "this card is in your void" followed by comma and mapping to
-    `Condition::ThisCardIsInYourVoid`. They differ only in accepting "if" vs
-    "while" as a prefix word. These could be unified with a single parser that
-    accepts either prefix. Please standardize on the "if" version and update
-    cards.toml to match.
-
 13. **Generality - Hardcoded "allied" in with conditions**:
     `with_count_allied_subtype` (condition_parser.rs:27) and
     `with_an_allied_subtype` (line 34) both hardcode
