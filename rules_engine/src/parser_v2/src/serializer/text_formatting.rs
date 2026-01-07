@@ -1,0 +1,43 @@
+use crate::serializer::serializer_utils;
+
+pub struct FormattedText {
+    base: String,
+    plural: String,
+    starts_with_vowel_sound: bool,
+}
+
+impl FormattedText {
+    pub fn new(base: &str) -> Self {
+        let starts_with_vowel_sound = base.starts_with(['a', 'e', 'i', 'o', 'u']);
+        Self { base: base.to_string(), plural: format!("{}s", base), starts_with_vowel_sound }
+    }
+
+    pub fn with_plural(base: &str, plural: &str) -> Self {
+        let starts_with_vowel_sound = base.starts_with(['a', 'e', 'i', 'o', 'u']);
+        Self { base: base.to_string(), plural: plural.to_string(), starts_with_vowel_sound }
+    }
+
+    pub fn with_article(&self) -> String {
+        if self.starts_with_vowel_sound {
+            format!("an {}", self.base)
+        } else {
+            format!("a {}", self.base)
+        }
+    }
+
+    pub fn without_article(&self) -> String {
+        self.base.clone()
+    }
+
+    pub fn plural(&self) -> String {
+        self.plural.clone()
+    }
+
+    pub fn capitalized(&self) -> String {
+        serializer_utils::capitalize_first_letter(&self.base)
+    }
+
+    pub fn capitalized_with_article(&self) -> String {
+        serializer_utils::capitalize_first_letter(&self.with_article())
+    }
+}

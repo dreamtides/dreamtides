@@ -31,8 +31,8 @@ pub fn serialize_predicate(predicate: &Predicate) -> String {
         Predicate::EnemyVoid(card_predicate) => {
             format!("{} in the opponent's void", serialize_card_predicate_plural(card_predicate))
         }
-        Predicate::AnyOther(_) => {
-            unimplemented!("Serialization not yet implemented for this predicate type")
+        Predicate::AnyOther(card_predicate) => {
+            format!("another {}", serialize_card_predicate_without_article(card_predicate))
         }
     }
 }
@@ -41,6 +41,14 @@ pub fn serialize_predicate_plural(predicate: &Predicate) -> String {
     match predicate {
         Predicate::Another(card_predicate) => serialize_your_predicate_plural(card_predicate),
         Predicate::Any(card_predicate) => serialize_card_predicate_plural(card_predicate),
+        Predicate::Your(card_predicate) => serialize_your_predicate_plural(card_predicate),
+        Predicate::Enemy(card_predicate) => serialize_enemy_predicate_plural(card_predicate),
+        Predicate::YourVoid(card_predicate) => {
+            format!("{} in your void", serialize_card_predicate_plural(card_predicate))
+        }
+        Predicate::EnemyVoid(card_predicate) => {
+            format!("{} in the opponent's void", serialize_card_predicate_plural(card_predicate))
+        }
         _ => unimplemented!("Serialization not yet implemented for this plural predicate type"),
     }
 }
@@ -206,5 +214,13 @@ fn serialize_your_predicate_plural(card_predicate: &CardPredicate) -> String {
         CardPredicate::Character => "allies".to_string(),
         CardPredicate::CharacterType(_) => "allied {plural-subtype}".to_string(),
         _ => unimplemented!("Serialization not yet implemented for this allied plural predicate"),
+    }
+}
+
+fn serialize_enemy_predicate_plural(card_predicate: &CardPredicate) -> String {
+    match card_predicate {
+        CardPredicate::Character => "enemies".to_string(),
+        CardPredicate::CharacterType(_) => "enemy {plural-subtype}".to_string(),
+        _ => format!("enemy {}", serialize_card_predicate_plural(card_predicate)),
     }
 }

@@ -17,7 +17,7 @@ The serializer is organized into several modules:
 
 ---
 
-## Part 1: Infrastructure Refactoring
+## Part 1: Infrastructure Refactoring [DONE]
 
 These tasks should be completed first to establish a cleaner foundation.
 
@@ -176,7 +176,7 @@ article-stripping functions.
 
 ## Part 2: Predicate Serialization Features
 
-### Task 5: Implement Missing Predicate Variants
+### Task 5: Implement Missing Predicate Variants [DONE]
 
 **Location:** `predicate_serializer.rs` lines 12-46
 
