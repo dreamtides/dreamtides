@@ -1,14 +1,5 @@
 # Static Abilities
 
-2. **Generality - Card type hardcoding**: Multiple parsers hardcode "event" vs
-   "character" instead of parsing card types generically. Examples:
-   `simple_alternate_cost_event()` (line 201),
-   `simple_alternate_cost_character()` (line 211), `play_for_alternate_cost()`
-   requires "this event" (line 187), and
-   `abandon_ally_play_character_for_alternate_cost()` requires "this character"
-   (line 164). These could be unified into parsers that accept "this <card-type>
-   costs {e}" or "play this <card-type> for {e}" where the card type is parsed.
-
 3. **Code Quality - Near-duplicate cost parsers**: `your_cards_cost_reduction()`
    (line 82) and `your_cards_cost_increase()` (line 95) are structurally
    identical except for the word "less" vs "more". Consider unifying into a

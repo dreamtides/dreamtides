@@ -54,7 +54,7 @@ fn standard_static_ability<'a>(
         abandon_ally_play_character_for_alternate_cost(),
         play_for_alternate_cost(),
         play_from_hand_or_void_for_cost(),
-        simple_alternate_cost_event().then_ignore(period()),
+        simple_alternate_cost().then_ignore(period()),
         characters_in_hand_have_fast(),
         disable_enemy_materialized_abilities(),
         has_all_character_types(),
@@ -71,7 +71,7 @@ fn standard_static_ability<'a>(
 
 fn standard_static_ability_without_period<'a>(
 ) -> impl Parser<'a, ParserInput<'a>, StandardStaticAbility, ParserExtra<'a>> + Clone {
-    choice((simple_alternate_cost_character(), simple_alternate_cost_event())).boxed()
+    simple_alternate_cost().boxed()
 }
 
 fn your_cards_cost_modification<'a>(
@@ -161,7 +161,9 @@ fn abandon_ally_play_character_for_alternate_cost<'a>(
 ) -> impl Parser<'a, ParserInput<'a>, StandardStaticAbility, ParserExtra<'a>> + Clone {
     cost_parser::abandon_cost_single()
         .then_ignore(colon())
-        .then_ignore(words(&["play", "this", "character", "for"]))
+        .then_ignore(words(&["play", "this"]))
+        .then_ignore(choice((word("character"), word("event"))))
+        .then_ignore(word("for"))
         .then(energy())
         .then_ignore(comma())
         .then_ignore(words(&["then", "abandon", "it"]))
@@ -184,7 +186,9 @@ fn play_for_alternate_cost<'a>(
 ) -> impl Parser<'a, ParserInput<'a>, StandardStaticAbility, ParserExtra<'a>> + Clone {
     choice((cost_parser::lose_maximum_energy_cost(), cost_parser::banish_from_hand_cost()))
         .then_ignore(colon())
-        .then_ignore(words(&["play", "this", "event", "for"]))
+        .then_ignore(words(&["play", "this"]))
+        .then_ignore(choice((word("character"), word("event"))))
+        .then_ignore(word("for"))
         .then(energy())
         .then_ignore(period())
         .map(|(additional_cost, e)| {
@@ -196,26 +200,19 @@ fn play_for_alternate_cost<'a>(
         })
 }
 
-fn simple_alternate_cost_event<'a>(
+fn simple_alternate_cost<'a>(
 ) -> impl Parser<'a, ParserInput<'a>, StandardStaticAbility, ParserExtra<'a>> + Clone {
-    words(&["this", "event", "costs"]).ignore_then(energy()).map(|e| {
-        StandardStaticAbility::PlayForAlternateCost(AlternateCost {
-            energy_cost: Energy(e),
-            additional_cost: None,
-            if_you_do: None,
+    word("this")
+        .ignore_then(choice((word("character"), word("event"))))
+        .then_ignore(word("costs"))
+        .ignore_then(energy())
+        .map(|e| {
+            StandardStaticAbility::PlayForAlternateCost(AlternateCost {
+                energy_cost: Energy(e),
+                additional_cost: None,
+                if_you_do: None,
+            })
         })
-    })
-}
-
-fn simple_alternate_cost_character<'a>(
-) -> impl Parser<'a, ParserInput<'a>, StandardStaticAbility, ParserExtra<'a>> + Clone {
-    words(&["this", "character", "costs"]).ignore_then(energy()).map(|e| {
-        StandardStaticAbility::PlayForAlternateCost(AlternateCost {
-            energy_cost: Energy(e),
-            additional_cost: None,
-            if_you_do: None,
-        })
-    })
 }
 
 fn once_per_turn_play_from_void<'a>(
