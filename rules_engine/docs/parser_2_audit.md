@@ -1,10 +1,5 @@
 # Static Abilities
 
-3. **Code Quality - Near-duplicate cost parsers**: `your_cards_cost_reduction()`
-   (line 82) and `your_cards_cost_increase()` (line 95) are structurally
-   identical except for the word "less" vs "more". Consider unifying into a
-   single parser with a parameter or returning an enum to reduce duplication.
-
 4. **Consistency - Confusing variable naming**: In `your_cards_cost_increase()`
    (line 102), the variable is named `reduction` when it represents an increase:
    `StandardStaticAbility::YourCardsCostIncrease { matching, reduction:

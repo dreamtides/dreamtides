@@ -76,33 +76,22 @@ fn standard_static_ability_without_period<'a>(
 
 fn your_cards_cost_modification<'a>(
 ) -> impl Parser<'a, ParserInput<'a>, StandardStaticAbility, ParserExtra<'a>> + Clone {
-    choice((your_cards_cost_reduction(), your_cards_cost_increase())).boxed()
-}
-
-fn your_cards_cost_reduction<'a>(
-) -> impl Parser<'a, ParserInput<'a>, StandardStaticAbility, ParserExtra<'a>> + Clone {
     card_predicate_parser::parser()
         .then_ignore(words(&["cost", "you"]))
         .then(energy())
-        .then_ignore(word("less"))
+        .then(choice((word("less").to(false), word("more").to(true))))
         .then_ignore(period())
-        .map(|(matching, reduction)| StandardStaticAbility::YourCardsCostReduction {
-            matching,
-            reduction: Energy(reduction),
+        .map(|((matching, amount), is_increase)| {
+            if is_increase {
+                StandardStaticAbility::YourCardsCostIncrease { matching, reduction: Energy(amount) }
+            } else {
+                StandardStaticAbility::YourCardsCostReduction {
+                    matching,
+                    reduction: Energy(amount),
+                }
+            }
         })
-}
-
-fn your_cards_cost_increase<'a>(
-) -> impl Parser<'a, ParserInput<'a>, StandardStaticAbility, ParserExtra<'a>> + Clone {
-    card_predicate_parser::parser()
-        .then_ignore(words(&["cost", "you"]))
-        .then(energy())
-        .then_ignore(word("more"))
-        .then_ignore(period())
-        .map(|(matching, reduction)| StandardStaticAbility::YourCardsCostIncrease {
-            matching,
-            reduction: Energy(reduction),
-        })
+        .boxed()
 }
 
 fn allied_spark_bonus<'a>(
