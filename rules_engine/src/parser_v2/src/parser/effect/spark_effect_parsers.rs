@@ -27,32 +27,20 @@ pub fn kindle<'a>() -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserEx
 
 fn gains_spark_for_each<'a>(
 ) -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
-    choice((
-        words(&["gain", "+"])
-            .ignore_then(spark())
-            .then_ignore(word("spark"))
-            .then_ignore(words(&["for", "each"]))
-            .then(quantity_expression_parser::parser())
-            .map(|(gains, for_quantity)| StandardEffect::GainsSparkForQuantity {
-                target: Predicate::This,
-                gains: Spark(gains),
-                for_quantity,
-            }),
-        article()
-            .or_not()
-            .ignore_then(predicate_parser::predicate_parser())
-            .then_ignore(words(&["gains", "+"]))
-            .then(spark())
-            .then_ignore(word("spark"))
-            .then_ignore(words(&["for", "each"]))
-            .then(quantity_expression_parser::parser())
-            .map(|((target, gains), for_quantity)| StandardEffect::GainsSparkForQuantity {
-                target,
-                gains: Spark(gains),
-                for_quantity,
-            }),
-    ))
-    .boxed()
+    article()
+        .or_not()
+        .ignore_then(predicate_parser::predicate_parser().or_not())
+        .then_ignore(choice((word("gains"), word("gain"))))
+        .then_ignore(word("+"))
+        .then(spark())
+        .then_ignore(word("spark"))
+        .then_ignore(words(&["for", "each"]))
+        .then(quantity_expression_parser::parser())
+        .map(|((target, gains), for_quantity)| StandardEffect::GainsSparkForQuantity {
+            target: target.unwrap_or(Predicate::This),
+            gains: Spark(gains),
+            for_quantity,
+        })
 }
 
 fn each_allied_gains_spark<'a>(
