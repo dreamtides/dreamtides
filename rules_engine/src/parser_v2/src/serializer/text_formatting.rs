@@ -1,9 +1,30 @@
+use ability_data::predicate::CardPredicate;
+
 use crate::serializer::serializer_utils;
 
 pub struct FormattedText {
     base: String,
     plural: String,
     starts_with_vowel_sound: bool,
+}
+
+pub fn card_predicate_base_text(predicate: &CardPredicate) -> FormattedText {
+    match predicate {
+        CardPredicate::Card => FormattedText::new("card"),
+        CardPredicate::Character => FormattedText::new("character"),
+        CardPredicate::Event => FormattedText::new("event"),
+        CardPredicate::CharacterType(_) => FormattedText::new("{subtype}"),
+        CardPredicate::NotCharacterType(_) => {
+            FormattedText::new("character that is not {a-subtype}")
+        }
+        CardPredicate::Fast { target } => card_predicate_base_text(target),
+        CardPredicate::CardWithCost { target, .. } => card_predicate_base_text(target),
+        CardPredicate::CharacterWithSpark(..) => FormattedText::new("character"),
+        CardPredicate::CharacterWithMaterializedAbility => FormattedText::new("character"),
+        CardPredicate::CharacterWithMultiActivatedAbility => FormattedText::new("character"),
+        CardPredicate::CouldDissolve { .. } => FormattedText::new("event"),
+        _ => FormattedText::new("character"),
+    }
 }
 
 impl FormattedText {

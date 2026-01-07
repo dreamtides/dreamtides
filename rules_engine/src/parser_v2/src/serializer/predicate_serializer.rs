@@ -1,13 +1,7 @@
 use ability_data::predicate::{CardPredicate, Predicate};
 
 use super::serializer_utils::serialize_operator;
-
-pub fn serialize_predicate_without_article(predicate: &Predicate) -> String {
-    let result = serialize_predicate(predicate);
-    let trimmed =
-        result.strip_prefix("an ").or_else(|| result.strip_prefix("a ")).unwrap_or(&result);
-    trimmed.to_string()
-}
+use super::text_formatting::card_predicate_base_text;
 
 pub fn serialize_predicate(predicate: &Predicate) -> String {
     match predicate {
@@ -32,7 +26,7 @@ pub fn serialize_predicate(predicate: &Predicate) -> String {
             format!("{} in the opponent's void", serialize_card_predicate_plural(card_predicate))
         }
         Predicate::AnyOther(card_predicate) => {
-            format!("another {}", serialize_card_predicate_without_article(card_predicate))
+            format!("another {}", card_predicate_base_text(card_predicate).without_article())
         }
     }
 }
@@ -50,6 +44,30 @@ pub fn serialize_predicate_plural(predicate: &Predicate) -> String {
             format!("{} in the opponent's void", serialize_card_predicate_plural(card_predicate))
         }
         _ => unimplemented!("Serialization not yet implemented for this plural predicate type"),
+    }
+}
+
+pub fn predicate_base_text(predicate: &Predicate) -> String {
+    match predicate {
+        Predicate::This => "this character".to_string(),
+        Predicate::That => "that character".to_string(),
+        Predicate::Them => "them".to_string(),
+        Predicate::It => "it".to_string(),
+        Predicate::Your(card_predicate) => serialize_your_predicate(card_predicate),
+        Predicate::Another(card_predicate) => serialize_your_predicate(card_predicate),
+        Predicate::Any(card_predicate) => {
+            card_predicate_base_text(card_predicate).without_article()
+        }
+        Predicate::Enemy(card_predicate) => serialize_enemy_predicate(card_predicate),
+        Predicate::YourVoid(card_predicate) => {
+            format!("{} in your void", card_predicate_base_text(card_predicate).plural())
+        }
+        Predicate::EnemyVoid(card_predicate) => {
+            format!("{} in the opponent's void", card_predicate_base_text(card_predicate).plural())
+        }
+        Predicate::AnyOther(card_predicate) => {
+            format!("another {}", card_predicate_base_text(card_predicate).without_article())
+        }
     }
 }
 
@@ -104,24 +122,11 @@ pub fn serialize_enemy_predicate(card_predicate: &CardPredicate) -> String {
     }
 }
 
-pub fn serialize_card_predicate_capitalized(card_predicate: &CardPredicate) -> String {
-    match card_predicate {
-        CardPredicate::Card => "A card".to_string(),
-        CardPredicate::Character => "A character".to_string(),
-        CardPredicate::Event => "An event".to_string(),
-        CardPredicate::CharacterType(_) => "{ASubtype}".to_string(),
-        CardPredicate::Fast { target } => {
-            format!("A {{fast}} {}", serialize_fast_target(target))
-        }
-        _ => serialize_card_predicate(card_predicate),
-    }
-}
-
 pub fn serialize_card_predicate(card_predicate: &CardPredicate) -> String {
     match card_predicate {
-        CardPredicate::Card => "a card".to_string(),
-        CardPredicate::Character => "a character".to_string(),
-        CardPredicate::Event => "an event".to_string(),
+        CardPredicate::Card | CardPredicate::Character | CardPredicate::Event => {
+            card_predicate_base_text(card_predicate).with_article()
+        }
         CardPredicate::CharacterType(_) => "{a-subtype}".to_string(),
         CardPredicate::Fast { target } => {
             format!("a {{fast}} {}", serialize_fast_target(target))
@@ -144,10 +149,7 @@ pub fn serialize_card_predicate(card_predicate: &CardPredicate) -> String {
             )
         }
         CardPredicate::CouldDissolve { target } => {
-            format!(
-                "an event which could {{dissolve}} {}",
-                serialize_predicate_without_article(target)
-            )
+            format!("an event which could {{dissolve}} {}", predicate_base_text(target))
         }
         _ => {
             unimplemented!("Serialization not yet implemented for this card predicate type")
@@ -155,20 +157,11 @@ pub fn serialize_card_predicate(card_predicate: &CardPredicate) -> String {
     }
 }
 
-pub fn serialize_card_predicate_without_article(card_predicate: &CardPredicate) -> String {
-    let predicate = serialize_card_predicate(card_predicate);
-    let trimmed = predicate
-        .strip_prefix("an ")
-        .or_else(|| predicate.strip_prefix("a "))
-        .unwrap_or(&predicate);
-    trimmed.to_string()
-}
-
 pub fn serialize_card_predicate_plural(card_predicate: &CardPredicate) -> String {
     match card_predicate {
-        CardPredicate::Card => "cards".to_string(),
-        CardPredicate::Character => "characters".to_string(),
-        CardPredicate::Event => "events".to_string(),
+        CardPredicate::Card | CardPredicate::Character | CardPredicate::Event => {
+            card_predicate_base_text(card_predicate).plural()
+        }
         CardPredicate::CharacterType(_) => "{plural-subtype}".to_string(),
         CardPredicate::Fast { target } => {
             format!("fast {}", serialize_card_predicate_plural(target))

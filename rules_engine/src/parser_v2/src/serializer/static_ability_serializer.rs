@@ -3,10 +3,10 @@ use ability_data::static_ability::{StandardStaticAbility, StaticAbility};
 
 use super::cost_serializer::serialize_cost;
 use super::predicate_serializer::{
-    serialize_card_predicate, serialize_card_predicate_plural,
-    serialize_card_predicate_without_article, serialize_predicate_without_article,
+    predicate_base_text, serialize_card_predicate, serialize_card_predicate_plural,
 };
 use super::serializer_utils::capitalize_first_letter;
+use super::text_formatting::card_predicate_base_text;
 
 pub fn serialize_static_ability(static_ability: &StaticAbility) -> String {
     match static_ability {
@@ -104,7 +104,7 @@ pub fn serialize_standard_static_ability(ability: &StandardStaticAbility) -> Str
         StandardStaticAbility::OncePerTurnPlayFromVoid { matching } => {
             format!(
                 "once per turn, you may play {} from your void.",
-                serialize_card_predicate_without_article(matching)
+                card_predicate_base_text(matching).without_article()
             )
         }
         StandardStaticAbility::RevealTopCardOfYourDeck => {
@@ -116,19 +116,19 @@ pub fn serialize_standard_static_ability(ability: &StandardStaticAbility) -> Str
         StandardStaticAbility::YouMayPlayFromTopOfDeck { matching } => {
             format!(
                 "you may play {} from the top of your deck.",
-                serialize_card_predicate_without_article(matching)
+                card_predicate_base_text(matching).without_article()
             )
         }
         StandardStaticAbility::JudgmentTriggersWhenMaterialized { predicate } => {
             format!(
                 "the '{{Judgment}}' ability of {} triggers when you {{materialize}} them.",
-                serialize_predicate_without_article(predicate)
+                predicate_base_text(predicate)
             )
         }
         StandardStaticAbility::SparkEqualToPredicateCount { predicate } => {
             format!(
                 "this character's spark is equal to the number of {}.",
-                serialize_predicate_without_article(predicate)
+                predicate_base_text(predicate)
             )
         }
         StandardStaticAbility::PlayOnlyFromVoid => {

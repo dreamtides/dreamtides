@@ -17,11 +17,11 @@ The serializer is organized into several modules:
 
 ---
 
-## Part 1: Infrastructure Refactoring [DONE]
+## Part 1: Infrastructure Refactoring
 
 These tasks should be completed first to establish a cleaner foundation.
 
-### Task 1: Create FormattedText Module
+### Task 1: Create FormattedText Module [DONE]
 
 **Goal:** Create a new `text_formatting.rs` module with a `FormattedText` struct that
 handles articles, pluralization, and capitalization in one place.
@@ -95,7 +95,7 @@ Add the module declaration to `mod.rs`.
 
 ---
 
-### Task 2: Create CardPredicate FormattedText Mappings
+### Task 2: Create CardPredicate FormattedText Mappings [DONE]
 
 **Goal:** Create a function that maps `CardPredicate` base types to `FormattedText`.
 
@@ -128,7 +128,7 @@ This provides the foundation for removing article-stripping hacks.
 
 ---
 
-### Task 3: Migrate Predicate Serializers to Use FormattedText
+### Task 3: Migrate Predicate Serializers to Use FormattedText [DONE]
 
 **Goal:** Update `predicate_serializer.rs` to use `FormattedText` and remove the
 article-stripping functions.
