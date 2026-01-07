@@ -1,19 +1,3 @@
-# Quantity Expression Parsing
-
-17. **Generality - Hardcoded "ally" predicates**: Three parsers in
-    quantity_expression_parser.rs hardcode `CardPredicate::Character` for "ally"
-    text: "ally abandoned this turn" (line 18), "ally abandoned" (line 21), and
-    "ally returned" (line 24). These are followed by more general parsers at
-    lines 25-30 that parse card predicates for "<card-predicate> abandoned" and
-    "<card-predicate> returned". The specific "ally" cases prevent parsing
-    variations like "enemy abandoned" or "event returned", and duplicate logic
-    that the general parsers already handle.
-
-18. **Code Quality - Redundant parser combinator pattern**: Lines 16-24 use
-    `.to(()).map(|_| ...)` to create unit values then map them. This is
-    redundant - they could use `.to(QuantityExpression::...)` directly instead
-    of the two-step `.to(()).map(|_| QuantityExpression::...)` pattern.
-
 # Predicate Parsing
 
 19. **Code Quality - Massive duplication in card_predicate_parser**: The
