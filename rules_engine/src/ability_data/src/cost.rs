@@ -2,7 +2,7 @@ use core_data::numerics::Energy;
 use serde::{Deserialize, Serialize};
 
 use crate::collection_expression::CollectionExpression;
-use crate::predicate::{CardPredicate, Predicate};
+use crate::predicate::Predicate;
 
 /// Any action a player must take in order to play a card or activate an
 /// ability, such as paying energy.
@@ -17,7 +17,7 @@ pub enum Cost {
     BanishFromHand(Predicate),
     Choice(Vec<Cost>),
     CostList(Vec<Cost>),
-    DiscardCards(CardPredicate, u32),
+    DiscardCards { target: Predicate, count: u32 },
     DiscardHand,
     Energy(Energy),
     LoseMaximumEnergy(u32),

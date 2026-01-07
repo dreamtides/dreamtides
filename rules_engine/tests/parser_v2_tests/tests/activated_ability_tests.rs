@@ -207,7 +207,10 @@ fn test_energy_discard_kindle() {
     Activated(ActivatedAbility(
       costs: [
         Energy(Energy(1)),
-        DiscardCards(Card, 2),
+        DiscardCards(
+          target: Any(Card),
+          count: 2,
+        ),
       ],
       effect: Effect(Kindle(
         amount: Spark(2),
@@ -325,7 +328,10 @@ fn test_abandon_or_discard_dissolve_enemy() {
             target: Another(Character),
             count: Exactly(1),
           ),
-          DiscardCards(Card, 1),
+          DiscardCards(
+            target: Any(Card),
+            count: 1,
+          ),
         ]),
       ],
       effect: Effect(DissolveCharacter(

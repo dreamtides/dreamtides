@@ -147,10 +147,10 @@ fn abandon_cost_with_count<'a>() -> impl Parser<'a, ParserInput<'a>, Cost, Parse
 fn discard_cost<'a>() -> impl Parser<'a, ParserInput<'a>, Cost, ParserExtra<'a>> + Clone {
     word("discard")
         .ignore_then(choice((
-            discards().map(|count| (CardPredicate::Card, count)),
-            article().ignore_then(card_predicate_parser::parser()).map(|predicate| (predicate, 1)),
+            discards().map(|count| (Predicate::Any(CardPredicate::Card), count)),
+            article().ignore_then(predicate_parser::predicate_parser()).map(|target| (target, 1)),
         )))
-        .map(|(predicate, count)| Cost::DiscardCards(predicate, count))
+        .map(|(target, count)| Cost::DiscardCards { target, count })
 }
 
 fn discard_hand_cost<'a>() -> impl Parser<'a, ParserInput<'a>, Cost, ParserExtra<'a>> + Clone {

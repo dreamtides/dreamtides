@@ -1,9 +1,6 @@
 use ability_data::cost::Cost;
-use ability_data::predicate::CardPredicate;
 
-use super::predicate_serializer::{
-    serialize_card_predicate, serialize_card_predicate_plural, serialize_predicate,
-};
+use super::predicate_serializer::serialize_predicate;
 
 pub fn serialize_cost(cost: &Cost) -> String {
     match cost {
@@ -16,17 +13,11 @@ pub fn serialize_cost(cost: &Cost) -> String {
                 _ => "abandon {count-allies}".to_string(),
             }
         }
-        Cost::DiscardCards(predicate, count) => {
+        Cost::DiscardCards { target, count } => {
             if *count == 1 {
-                format!("discard {}", serialize_card_predicate(predicate))
+                format!("discard {}", serialize_predicate(target))
             } else {
-                match predicate {
-                    CardPredicate::Card => "discard {discards}".to_string(),
-                    _ => format!(
-                        "discard {{discards}} {}",
-                        serialize_card_predicate_plural(predicate)
-                    ),
-                }
+                "discard {discards}".to_string()
             }
         }
         Cost::DiscardHand => "discard your hand".to_string(),

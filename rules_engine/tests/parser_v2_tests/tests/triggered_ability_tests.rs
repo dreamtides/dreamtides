@@ -687,7 +687,10 @@ fn test_judgment_you_may_discard_draw_gain_points() {
             optional: true,
           ),
         ],
-        trigger_cost: Some(DiscardCards(Card, 2)),
+        trigger_cost: Some(DiscardCards(
+          target: Any(Card),
+          count: 2,
+        )),
       )),
     ))
     "###);
@@ -709,7 +712,10 @@ fn test_judgment_you_may_discard_to_dissolve_enemy_with_spark_or_less() {
           target: Enemy(CharacterWithSpark(Spark(2), OrLess)),
         ),
         optional: true,
-        trigger_cost: Some(DiscardCards(Card, 1)),
+        trigger_cost: Some(DiscardCards(
+          target: Any(Card),
+          count: 1,
+        )),
       )),
     ))
     "###);

@@ -1,13 +1,3 @@
-# Cost Parsing
-
-16. **Consistency - Different predicate parsers for similar actions**:
-    `discard_cost` (cost_parser.rs:155) uses `card_predicate_parser::parser()`
-    on line 159 for "discard a <predicate>", while abandon costs like
-    `abandon_cost_single` (line 84) use `predicate_parser::predicate_parser()`.
-    These are structurally similar actions (abandon character vs discard card)
-    but use different predicate parsing approaches, making it unclear which
-    pattern should be followed for new similar cost types.
-
 # Quantity Expression Parsing
 
 17. **Generality - Hardcoded "ally" predicates**: Three parsers in

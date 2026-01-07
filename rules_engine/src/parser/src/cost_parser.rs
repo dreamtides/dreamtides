@@ -27,7 +27,7 @@ pub fn standard_cost<'a>() -> impl Parser<'a, &'a str, Cost, ErrorType<'a>> {
                 target: Predicate::Another(CardPredicate::Character),
                 count: CollectionExpression::Exactly(1),
             },
-            Cost::DiscardCards(CardPredicate::Card, 1),
+            Cost::DiscardCards { target: Predicate::Any(CardPredicate::Card), count: 1 },
         ])),
         phrase("abandon a dreamscape").to(Cost::AbandonDreamscapes(1)),
         numeric("abandon", count, "dreamscapes").map(Cost::AbandonDreamscapes),
@@ -38,14 +38,13 @@ pub fn standard_cost<'a>() -> impl Parser<'a, &'a str, Cost, ErrorType<'a>> {
         phrase("discard your hand").to(Cost::DiscardHand),
         phrase("discard")
             .ignore_then(numeric("{-discarded-cards(n:", count, ")}"))
-            .map(|n| Cost::DiscardCards(CardPredicate::Card, n)),
+            .map(|n| Cost::DiscardCards { target: Predicate::Any(CardPredicate::Card), count: n }),
         phrase("discard a")
             .ignore_then(card_predicate_parser::parser())
-            .map(|predicate| Cost::DiscardCards(predicate, 1)),
-        phrase("discard")
-            .ignore_then(number(count))
-            .then(card_predicate_parser::parser())
-            .map(|(count, predicate)| Cost::DiscardCards(predicate, count)),
+            .map(|predicate| Cost::DiscardCards { target: Predicate::Any(predicate), count: 1 }),
+        phrase("discard").ignore_then(number(count)).then(card_predicate_parser::parser()).map(
+            |(count, predicate)| Cost::DiscardCards { target: Predicate::Any(predicate), count },
+        ),
         phrase("spend any amount of energy").to(Cost::SpendOneOrMoreEnergy),
     ))
 }
@@ -71,14 +70,13 @@ pub fn present_participle_additional_cost<'a>() -> impl Parser<'a, &'a str, Cost
             .map(Cost::BanishFromHand),
         phrase("discarding")
             .ignore_then(numeric("{-discarded-cards(n:", count, ")}"))
-            .map(|n| Cost::DiscardCards(CardPredicate::Card, n)),
+            .map(|n| Cost::DiscardCards { target: Predicate::Any(CardPredicate::Card), count: n }),
         phrase("discarding a")
             .ignore_then(card_predicate_parser::parser())
-            .map(|predicate| Cost::DiscardCards(predicate, 1)),
-        phrase("discarding")
-            .ignore_then(number(count))
-            .then(card_predicate_parser::parser())
-            .map(|(count, predicate)| Cost::DiscardCards(predicate, count)),
+            .map(|predicate| Cost::DiscardCards { target: Predicate::Any(predicate), count: 1 }),
+        phrase("discarding").ignore_then(number(count)).then(card_predicate_parser::parser()).map(
+            |(count, predicate)| Cost::DiscardCards { target: Predicate::Any(predicate), count },
+        ),
     ))
 }
 
@@ -95,7 +93,7 @@ pub fn third_person_singular_present_tense_cost<'a>()
                 target: Predicate::Another(CardPredicate::Character),
                 count: CollectionExpression::Exactly(1),
             },
-            Cost::DiscardCards(CardPredicate::Card, 1),
+            Cost::DiscardCards { target: Predicate::Any(CardPredicate::Card), count: 1 },
         ])),
         phrase("abandons a dreamscape").to(Cost::AbandonDreamscapes(1)),
         numeric("abandons", count, "dreamscapes").map(Cost::AbandonDreamscapes),
@@ -106,14 +104,13 @@ pub fn third_person_singular_present_tense_cost<'a>()
         phrase("discards their hand").to(Cost::DiscardHand),
         phrase("discards")
             .ignore_then(numeric("{-discarded-cards(n:", count, ")}"))
-            .map(|n| Cost::DiscardCards(CardPredicate::Card, n)),
+            .map(|n| Cost::DiscardCards { target: Predicate::Any(CardPredicate::Card), count: n }),
         phrase("discards a")
             .ignore_then(card_predicate_parser::parser())
-            .map(|predicate| Cost::DiscardCards(predicate, 1)),
-        phrase("discards")
-            .ignore_then(number(count))
-            .then(card_predicate_parser::parser())
-            .map(|(count, predicate)| Cost::DiscardCards(predicate, count)),
+            .map(|predicate| Cost::DiscardCards { target: Predicate::Any(predicate), count: 1 }),
+        phrase("discards").ignore_then(number(count)).then(card_predicate_parser::parser()).map(
+            |(count, predicate)| Cost::DiscardCards { target: Predicate::Any(predicate), count },
+        ),
     ))
 }
 
