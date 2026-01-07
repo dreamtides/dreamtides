@@ -43,7 +43,7 @@ fn with_count_allies_that_share_a_character_type<'a>(
         .ignore_then(count_allies())
         .then_ignore(words(&["that", "share", "a", "character", "type"]))
         .then_ignore(comma())
-        .map(|count| Condition::AlliesThatShareACharacterType { of: Predicate::This, count })
+        .map(|count| Condition::AlliesThatShareACharacterType { count })
 }
 
 fn allied_subtype_predicate(subtype: CardSubtype) -> Predicate {

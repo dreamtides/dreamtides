@@ -1,24 +1,3 @@
-# Condition Parsing
-
-13. **Generality - Hardcoded "allied" in with conditions**:
-    `with_count_allied_subtype` (condition_parser.rs:27) and
-    `with_an_allied_subtype` (line 34) both hardcode
-    `allied_subtype_predicate(subtype)` which always returns
-    `Predicate::Another(CardPredicate::CharacterType(subtype))` on line 51. This
-    means conditions can only check for allied characters ("with 2 allied
-    warriors"), not enemy or any characters ("with 2 enemy warriors"). The
-    "allied" ownership is baked into the parser rather than being parsed from a
-    general predicate. Please get rid of `with_an_allied_subtype` and
-    standardize card text on the `with_count_allied_subtype` case.
-
-14. **Generality - Hardcoded comparison target**:
-    `with_count_allies_that_share_a_character_type` (condition_parser.rs:41)
-    hardcodes `of: Predicate::This` on line 47. This limits the condition to
-    only checking if allies share a type with "this" character, preventing
-    patterns like checking if allies share a type with each other or with a
-    specific card type. This should be rewritten to remove the `of` entirely
-    and have the meaning just be "they share a character type with each other".
-
 # Cost Parsing
 
 16. **Consistency - Different predicate parsers for similar actions**:

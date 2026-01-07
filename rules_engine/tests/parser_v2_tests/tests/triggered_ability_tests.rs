@@ -921,7 +921,6 @@ fn test_judgment_with_count_allies_that_share_character_type_draw_cards() {
         ),
         optional: false,
         condition: Some(AlliesThatShareACharacterType(
-          of: This,
           count: 3,
         )),
       )),
@@ -970,7 +969,6 @@ fn test_has_all_character_types_and_judgment_with_allies() {
           ),
           optional: false,
           condition: Some(AlliesThatShareACharacterType(
-            of: This,
             count: 2,
           )),
         )),
