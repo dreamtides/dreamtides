@@ -18,6 +18,22 @@ fn test_round_trip_character_costs_if_discarded_card_this_turn() {
 }
 
 #[test]
+fn test_round_trip_character_costs_if_discarded_character_this_turn() {
+    let original = "This character costs {e} if you have discarded a character this turn.";
+    let parsed = parse_ability(original, "e: 1");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_character_costs_if_discarded_subtype_this_turn() {
+    let original = "This character costs {e} if you have discarded {a-subtype} this turn.";
+    let parsed = parse_ability(original, "e: 1, subtype: warrior");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
 fn test_round_trip_lose_maximum_energy_play_for_alternate_cost() {
     let original = "Lose {maximum-energy}: Play this event for {e}.";
     let parsed = parse_ability(original, "max: 1, e: 0");

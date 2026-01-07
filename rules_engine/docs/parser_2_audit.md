@@ -1,34 +1,3 @@
-# Trigger Parsing
-
-6. **Consistency - Three different patterns for "when you <action>" triggers**:
-   Action triggers inconsistently use different parser combinations:
-   `play_trigger` (trigger_parser.rs:105) uses only `card_predicate_parser` and
-   wraps results in `Predicate::Your`; `discard_trigger` (line 159) and
-   `materialize_trigger` (line 170) use `choice` between both
-   `card_predicate_parser.map(Predicate::Your)` and `predicate_parser`;
-   `abandon_trigger` (line 220) uses only `predicate_parser`. This makes it
-   unclear which pattern should be used for new similar triggers, and suggests
-   these triggers may not handle the same range of predicates (e.g., "play this
-   character" might not work while "discard this character" does).
-
-7. **Code Quality - Near-duplicate state change triggers**: Four parsers in
-   trigger_parser.rs follow nearly identical patterns: `dissolved_trigger` (line
-   182), `banished_trigger` (line 192), `leaves_play_trigger` (line 202), and
-   `put_into_void_trigger` (line 211). All parse "when" + article + predicate +
-   verb phrase, differing only in the final verb phrase ("is {dissolved}", "is
-   {banished}", "leaves play", "is put into your void"). While each maps to a
-   different `TriggerEvent` variant, the structural similarity suggests
-   opportunity for a helper function to reduce boilerplate.
-
-8. **Generality - Parsed but ignored predicate**: In condition_parser.rs,
-   `discarded_this_turn` (line 66) parses a card predicate using
-   `card_predicate_parser::parser()` but then ignores it (line 68: `|_|
-   Condition::CardsDiscardedThisTurn { count: 1 }`). This means the parser
-   accepts "you have discarded a warrior this turn" or "you have discarded a
-   character this turn" but treats them identically to "you have discarded a
-   card this turn". Either parse only the literal word "card", or use the parsed
-   predicate to support different card types in the condition.
-
 # Activated Ability Parsing
 
 9. **Generality - Parsed but ignored predicate in cost**: In cost_parser.rs,
@@ -36,9 +5,8 @@
    `predicate_parser::predicate_parser()` but ignores it on line 182: `|_|
    Cost::BanishCardsFromYourVoid(1)`. The test at activated_ability_tests.rs:222
    shows this accepts "{Banish} another card in your void" where "another card"
-   is parsed then discarded. Either parse only the literal phrase "a card in
-   your void", or use the parsed predicate to support targeting specific card
-   types from the void.
+   is parsed then discarded. Use the parsed predicate to support targeting
+   specific card types from the void.
 
 10. **Code Quality - Near-duplicate void banish parsers**:
     `banish_cards_from_your_void_cost` (cost_parser.rs:66) and

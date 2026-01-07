@@ -1,5 +1,5 @@
 use ability_data::condition::Condition;
-use ability_data::predicate::Predicate;
+use ability_data::predicate::{CardPredicate, Predicate};
 use chumsky::Parser;
 use chumsky::prelude::*;
 
@@ -36,9 +36,10 @@ pub fn parser<'a>() -> impl Parser<'a, &'a str, Condition, ErrorType<'a>> {
             .map(|predicate| Condition::DissolvedThisTurn { predicate: Predicate::Any(predicate) }),
         choice((
             phrase("you have discarded a card this turn")
-                .to(Condition::CardsDiscardedThisTurn { count: 1 }),
-            numeric("you have discarded", count, "cards this turn")
-                .map(|count| Condition::CardsDiscardedThisTurn { count }),
+                .to(Condition::CardsDiscardedThisTurn { count: 1, predicate: CardPredicate::Card }),
+            numeric("you have discarded", count, "cards this turn").map(|count| {
+                Condition::CardsDiscardedThisTurn { count, predicate: CardPredicate::Card }
+            }),
         )),
         choice((
             phrase("you have drawn a card this turn")

@@ -187,6 +187,45 @@ fn test_character_costs_if_discarded_card_this_turn() {
       )),
       condition: Some(CardsDiscardedThisTurn(
         count: 1,
+        predicate: Card,
+      )),
+    )))
+    "###);
+}
+
+#[test]
+fn test_character_costs_if_discarded_character_this_turn() {
+    let result = parse_ability(
+        "This character costs {e} if you have discarded a character this turn.",
+        "e: 1",
+    );
+    assert_ron_snapshot!(result, @r###"
+    Static(WithOptions(StaticAbilityWithOptions(
+      ability: PlayForAlternateCost(AlternateCost(
+        energy_cost: Energy(1),
+      )),
+      condition: Some(CardsDiscardedThisTurn(
+        count: 1,
+        predicate: Character,
+      )),
+    )))
+    "###);
+}
+
+#[test]
+fn test_character_costs_if_discarded_subtype_this_turn() {
+    let result = parse_ability(
+        "This character costs {e} if you have discarded {a-subtype} this turn.",
+        "e: 1, subtype: warrior",
+    );
+    assert_ron_snapshot!(result, @r###"
+    Static(WithOptions(StaticAbilityWithOptions(
+      ability: PlayForAlternateCost(AlternateCost(
+        energy_cost: Energy(1),
+      )),
+      condition: Some(CardsDiscardedThisTurn(
+        count: 1,
+        predicate: CharacterType(Warrior),
       )),
     )))
     "###);

@@ -3,8 +3,8 @@ use ability_data::static_ability::{StandardStaticAbility, StaticAbility};
 
 use super::cost_serializer::serialize_cost;
 use super::predicate_serializer::{
-    serialize_card_predicate_plural, serialize_card_predicate_without_article,
-    serialize_predicate_without_article,
+    serialize_card_predicate, serialize_card_predicate_plural,
+    serialize_card_predicate_without_article, serialize_predicate_without_article,
 };
 use super::serializer_utils::capitalize_first_letter;
 
@@ -147,8 +147,8 @@ pub fn serialize_standard_static_ability(ability: &StandardStaticAbility) -> Str
 fn serialize_condition(condition: &Condition) -> String {
     match condition {
         Condition::DissolvedThisTurn { .. } => "if a character dissolved this turn".to_string(),
-        Condition::CardsDiscardedThisTurn { count: 1 } => {
-            "if you have discarded a card this turn".to_string()
+        Condition::CardsDiscardedThisTurn { count: 1, predicate } => {
+            format!("if you have discarded {} this turn", serialize_card_predicate(predicate))
         }
         Condition::CardsInVoidCount { .. } => {
             "while you have {count} or more cards in your void,".to_string()
