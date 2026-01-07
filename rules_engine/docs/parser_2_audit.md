@@ -1,22 +1,5 @@
 # Predicate Parsing
 
-19. **Code Quality - Massive duplication in card_predicate_parser**: The
-    `parser()` function (card_predicate_parser.rs:8-109) has extensive
-    duplication where lines 20-61 parse base predicate + suffix, while lines
-    70-105 parse just the suffix defaulting to `CardPredicate::Character`. This
-    pattern repeats for 6 suffixes: `with_cost_compared_to_controlled` (lines
-    20-26 vs 70-77), `with_cost_compared_to_void_count` (lines 28-34 vs 79-83),
-    `with_spark_compared_to_abandoned` (lines 36-42 vs 85-89),
-    `with_spark_compared_to_energy_spent` (lines 44-50 vs 91-95), `with_cost`
-    (lines 52-57 vs 97-102), and `with_spark` (lines 59-61 vs 104-105). Each
-    appears twice with nearly identical mapping logic, differing only in whether
-    `target` is the parsed base or hardcoded `Character`.
-
-20. **Code Quality - Unused helper function**: The `ally()` function
-    (predicate_parser.rs:12-14) returns
-    `Predicate::Another(CardPredicate::Character)` but is never referenced
-    anywhere in the codebase, making it dead code that should be removed.
-
 21. **Consistency - Inconsistent optional predicates**: `allied_parser()`
     (predicate_parser.rs:84-86) requires a card predicate after "allied" via
     `ignore_then(card_predicate_parser::parser())` without `.or_not()`, while

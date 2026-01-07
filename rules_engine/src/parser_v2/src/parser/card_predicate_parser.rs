@@ -17,46 +17,50 @@ pub fn parser<'a>() -> impl Parser<'a, ParserInput<'a>, CardPredicate, ParserExt
 
         choice((
             base.clone()
+                .or_not()
                 .then(predicate_suffix_parser::with_cost_compared_to_controlled_suffix())
-                .map(|(target, (cost_operator, count_matching))| {
+                .map(|(target_opt, (cost_operator, count_matching))| {
                     CardPredicate::CharacterWithCostComparedToControlled {
-                        target: Box::new(target),
+                        target: Box::new(target_opt.unwrap_or(CardPredicate::Character)),
                         cost_operator,
                         count_matching: Box::new(count_matching),
                     }
                 }),
             base.clone()
+                .or_not()
                 .then(predicate_suffix_parser::with_cost_compared_to_void_count_suffix())
-                .map(|(target, cost_operator)| {
+                .map(|(target_opt, cost_operator)| {
                     CardPredicate::CharacterWithCostComparedToVoidCount {
-                        target: Box::new(target),
+                        target: Box::new(target_opt.unwrap_or(CardPredicate::Character)),
                         cost_operator,
                     }
                 }),
             base.clone()
+                .or_not()
                 .then(predicate_suffix_parser::with_spark_compared_to_abandoned_suffix())
-                .map(|(target, spark_operator)| {
+                .map(|(target_opt, spark_operator)| {
                     CardPredicate::CharacterWithSparkComparedToAbandoned {
-                        target: Box::new(target),
+                        target: Box::new(target_opt.unwrap_or(CardPredicate::Character)),
                         spark_operator,
                     }
                 }),
             base.clone()
+                .or_not()
                 .then(predicate_suffix_parser::with_spark_compared_to_energy_spent_suffix())
-                .map(|(target, spark_operator)| {
+                .map(|(target_opt, spark_operator)| {
                     CardPredicate::CharacterWithSparkComparedToEnergySpent {
-                        target: Box::new(target),
+                        target: Box::new(target_opt.unwrap_or(CardPredicate::Character)),
                         spark_operator,
                     }
                 }),
-            base.clone().then(predicate_suffix_parser::with_cost_suffix()).map(
-                |(target, (cost, op))| CardPredicate::CardWithCost {
-                    target: Box::new(target),
+            base.clone().or_not().then(predicate_suffix_parser::with_cost_suffix()).map(
+                |(target_opt, (cost, op))| CardPredicate::CardWithCost {
+                    target: Box::new(target_opt.unwrap_or(CardPredicate::Character)),
                     cost_operator: op,
                     cost: Energy(cost),
                 },
             ),
-            base.clone().then(predicate_suffix_parser::with_spark_suffix()).map(
+            base.clone().or_not().then(predicate_suffix_parser::with_spark_suffix()).map(
                 |(_, (spark_value, op))| CardPredicate::CharacterWithSpark(Spark(spark_value), op),
             ),
             base.clone()
@@ -67,42 +71,6 @@ pub fn parser<'a>() -> impl Parser<'a, ParserInput<'a>, CardPredicate, ParserExt
                 .map(|_| CardPredicate::CharacterWithMultiActivatedAbility),
             predicate_suffix_parser::which_could_dissolve_suffix()
                 .map(|target| CardPredicate::CouldDissolve { target: Box::new(target) }),
-            predicate_suffix_parser::with_cost_compared_to_controlled_suffix().map(
-                |(cost_operator, count_matching)| {
-                    CardPredicate::CharacterWithCostComparedToControlled {
-                        target: Box::new(CardPredicate::Character),
-                        cost_operator,
-                        count_matching: Box::new(count_matching),
-                    }
-                },
-            ),
-            predicate_suffix_parser::with_cost_compared_to_void_count_suffix().map(
-                |cost_operator| CardPredicate::CharacterWithCostComparedToVoidCount {
-                    target: Box::new(CardPredicate::Character),
-                    cost_operator,
-                },
-            ),
-            predicate_suffix_parser::with_spark_compared_to_abandoned_suffix().map(
-                |spark_operator| CardPredicate::CharacterWithSparkComparedToAbandoned {
-                    target: Box::new(CardPredicate::Character),
-                    spark_operator,
-                },
-            ),
-            predicate_suffix_parser::with_spark_compared_to_energy_spent_suffix().map(
-                |spark_operator| CardPredicate::CharacterWithSparkComparedToEnergySpent {
-                    target: Box::new(CardPredicate::Character),
-                    spark_operator,
-                },
-            ),
-            predicate_suffix_parser::with_cost_suffix().map(|(cost, op)| {
-                CardPredicate::CardWithCost {
-                    target: Box::new(CardPredicate::Character),
-                    cost_operator: op,
-                    cost: Energy(cost),
-                }
-            }),
-            predicate_suffix_parser::with_spark_suffix()
-                .map(|(spark_value, op)| CardPredicate::CharacterWithSpark(Spark(spark_value), op)),
             base,
         ))
     })
