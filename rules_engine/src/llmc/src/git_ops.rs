@@ -187,6 +187,26 @@ pub fn worktree_add(repo_root: &Path, worktree_path: &Path, branch: &str) -> Res
     Ok(())
 }
 
+/// Copy gitignored Tabula.xlsm file from main repo to worktree.
+pub fn copy_tabula_xlsm(repo_root: &Path, worktree_path: &Path) -> Result<()> {
+    let source = repo_root.join("client/Assets/StreamingAssets/Tabula.xlsm");
+    let dest = worktree_path.join("client/Assets/StreamingAssets/Tabula.xlsm");
+
+    if !source.exists() {
+        anyhow::bail!("Tabula.xlsm not found in main repo at {source:?}");
+    }
+
+    if let Some(parent) = dest.parent() {
+        std::fs::create_dir_all(parent)
+            .with_context(|| format!("Failed to create directory {parent:?}"))?;
+    }
+
+    std::fs::copy(&source, &dest)
+        .with_context(|| format!("Failed to copy Tabula.xlsm from {source:?} to {dest:?}"))?;
+
+    Ok(())
+}
+
 /// Remove the agent worktree from the repository.
 pub fn worktree_remove(repo_root: &Path, worktree_path: &Path) -> Result<()> {
     let status = Command::new("git")
