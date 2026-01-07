@@ -1,25 +1,5 @@
 # Predicate Parsing
 
-21. **Consistency - Inconsistent optional predicates**: `allied_parser()`
-    (predicate_parser.rs:84-86) requires a card predicate after "allied" via
-    `ignore_then(card_predicate_parser::parser())` without `.or_not()`, while
-    `enemy_parser()` (line 78-82) and `ally_parser()` (line 88-92) make the
-    predicate optional using `.or_not().map(|pred| ...
-    pred.unwrap_or(CardPredicate::Character))`. This means "enemy" and "ally
-    character" both work, but "allied" alone fails while "allied character"
-    succeeds—an inconsistent pattern.
-
-23. **Generality - Limited operators in comparisons**: All comparison suffix
-    parsers only support "less than" (`Operator::OrLess`). Examples:
-    `with_cost_compared_to_controlled_suffix()`
-    (predicate_suffix_parser.rs:54-59),
-    `with_cost_compared_to_void_count_suffix()` (line 61-65),
-    `with_spark_compared_to_abandoned_suffix()` (line 67-69), and
-    `with_spark_compared_to_energy_spent_suffix()` (line 72-78) all hardcode
-    "less than" in their word sequences. This prevents parsing "greater than",
-    "equal to", or other comparison operators that might appear in future card
-    text.
-
 24. **Generality - Hardcoded ownership in cost comparison**:
     `with_cost_compared_to_controlled_suffix()`
     (predicate_suffix_parser.rs:54-59) hardcodes "allied" in the phrase "with

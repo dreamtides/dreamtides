@@ -53,28 +53,34 @@ pub fn which_could_dissolve_suffix<'a>(
 
 pub fn with_cost_compared_to_controlled_suffix<'a>(
 ) -> impl Parser<'a, ParserInput<'a>, (Operator<Energy>, CardPredicate), ParserExtra<'a>> + Clone {
-    words(&["with", "cost", "less", "than", "the", "number", "of", "allied"])
-        .ignore_then(subtype())
-        .map(|count_matching| (Operator::OrLess, CardPredicate::CharacterType(count_matching)))
+    words(&["with", "cost"])
+        .ignore_then(energy_comparison_operator())
+        .then_ignore(words(&["the", "number", "of", "allied"]))
+        .then(subtype())
+        .map(|(operator, count_matching)| (operator, CardPredicate::CharacterType(count_matching)))
 }
 
 pub fn with_cost_compared_to_void_count_suffix<'a>(
 ) -> impl Parser<'a, ParserInput<'a>, Operator<Energy>, ParserExtra<'a>> + Clone {
-    words(&["with", "cost", "less", "than", "the", "number", "of", "cards", "in", "your", "void"])
-        .to(Operator::OrLess)
+    words(&["with", "cost"])
+        .ignore_then(energy_comparison_operator())
+        .then_ignore(words(&["the", "number", "of", "cards", "in", "your", "void"]))
 }
 
 pub fn with_spark_compared_to_abandoned_suffix<'a>(
 ) -> impl Parser<'a, ParserInput<'a>, Operator<Spark>, ParserExtra<'a>> + Clone {
-    words(&["with", "spark", "less", "than", "that", "ally's", "spark"]).to(Operator::OrLess)
+    words(&["with", "spark"])
+        .ignore_then(spark_comparison_operator())
+        .then_ignore(words(&["that", "ally's", "spark"]))
 }
 
 pub fn with_spark_compared_to_energy_spent_suffix<'a>(
 ) -> impl Parser<'a, ParserInput<'a>, Operator<Spark>, ParserExtra<'a>> + Clone {
-    words(&["with", "spark", "less", "than", "the", "amount", "of"])
-        .ignore_then(directive("energy-symbol"))
-        .ignore_then(word("paid"))
-        .to(Operator::OrLess)
+    words(&["with", "spark"])
+        .ignore_then(spark_comparison_operator())
+        .then_ignore(words(&["the", "amount", "of"]))
+        .then_ignore(directive("energy-symbol"))
+        .then_ignore(word("paid"))
 }
 
 fn spark_operator<'a>() -> impl Parser<'a, ParserInput<'a>, Operator<Spark>, ParserExtra<'a>> + Clone
@@ -82,6 +88,28 @@ fn spark_operator<'a>() -> impl Parser<'a, ParserInput<'a>, Operator<Spark>, Par
     choice((
         words(&["or", "less"]).to(Operator::OrLess),
         words(&["or", "more"]).to(Operator::OrMore),
+    ))
+}
+
+fn spark_comparison_operator<'a>(
+) -> impl Parser<'a, ParserInput<'a>, Operator<Spark>, ParserExtra<'a>> + Clone {
+    choice((
+        words(&["less", "than", "or", "equal", "to"]).to(Operator::OrLess),
+        words(&["less", "than"]).to(Operator::OrLess),
+        words(&["greater", "than", "or", "equal", "to"]).to(Operator::OrMore),
+        words(&["greater", "than"]).to(Operator::OrMore),
+        words(&["equal", "to"]).to(Operator::Exactly),
+    ))
+}
+
+fn energy_comparison_operator<'a>(
+) -> impl Parser<'a, ParserInput<'a>, Operator<Energy>, ParserExtra<'a>> + Clone {
+    choice((
+        words(&["less", "than", "or", "equal", "to"]).to(Operator::OrLess),
+        words(&["less", "than"]).to(Operator::OrLess),
+        words(&["greater", "than", "or", "equal", "to"]).to(Operator::OrMore),
+        words(&["greater", "than"]).to(Operator::OrMore),
+        words(&["equal", "to"]).to(Operator::Exactly),
     ))
 }
 
