@@ -68,6 +68,32 @@ pub fn abandon_cost_single<'a>() -> impl Parser<'a, ParserInput<'a>, Cost, Parse
     )
 }
 
+pub fn abandon_cost_for_trigger<'a>(
+) -> impl Parser<'a, ParserInput<'a>, Cost, ParserExtra<'a>> + Clone {
+    word("abandon")
+        .ignore_then(choice((
+            article().ignore_then(predicate_parser::predicate_parser()),
+            card_predicate_parser::parser().map(Predicate::Any),
+        )))
+        .map(|target| Cost::AbandonCharactersCount {
+            target,
+            count: CollectionExpression::Exactly(1),
+        })
+}
+
+pub fn pay_energy_cost<'a>() -> impl Parser<'a, ParserInput<'a>, Cost, ParserExtra<'a>> + Clone {
+    word("pay").ignore_then(energy()).map(|cost| Cost::Energy(Energy(cost)))
+}
+
+pub fn discard_cost<'a>() -> impl Parser<'a, ParserInput<'a>, Cost, ParserExtra<'a>> + Clone {
+    word("discard")
+        .ignore_then(choice((
+            discards().map(|count| (Predicate::Any(CardPredicate::Card), count)),
+            article().ignore_then(predicate_parser::predicate_parser()).map(|target| (target, 1)),
+        )))
+        .map(|(target, count)| Cost::DiscardCards { target, count })
+}
+
 fn cost_choice<'a>() -> impl Parser<'a, ParserInput<'a>, Cost, ParserExtra<'a>> + Clone {
     single_cost_parser().separated_by(word("or")).at_least(2).collect::<Vec<_>>().map(Cost::Choice)
 }
@@ -142,15 +168,6 @@ fn abandon_cost_with_count<'a>() -> impl Parser<'a, ParserInput<'a>, Cost, Parse
         target: Predicate::Another(CardPredicate::Character),
         count: CollectionExpression::Exactly(count),
     })
-}
-
-fn discard_cost<'a>() -> impl Parser<'a, ParserInput<'a>, Cost, ParserExtra<'a>> + Clone {
-    word("discard")
-        .ignore_then(choice((
-            discards().map(|count| (Predicate::Any(CardPredicate::Card), count)),
-            article().ignore_then(predicate_parser::predicate_parser()).map(|target| (target, 1)),
-        )))
-        .map(|(target, count)| Cost::DiscardCards { target, count })
 }
 
 fn discard_hand_cost<'a>() -> impl Parser<'a, ParserInput<'a>, Cost, ParserExtra<'a>> + Clone {

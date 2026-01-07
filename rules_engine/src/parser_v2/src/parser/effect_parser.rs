@@ -1,7 +1,5 @@
-use ability_data::collection_expression::CollectionExpression;
 use ability_data::cost::Cost;
 use ability_data::effect::{Effect, EffectWithOptions, ListWithOptions, ModalEffectChoice};
-use ability_data::predicate::{CardPredicate, Predicate};
 use ability_data::standard_effect::StandardEffect;
 use ability_data::triggered_ability::{TriggeredAbility, TriggeredAbilityOptions};
 use chumsky::prelude::*;
@@ -12,12 +10,10 @@ use crate::parser::effect::{
     spark_effect_parsers,
 };
 use crate::parser::parser_helpers::{
-    article, colon, comma, directive, discards, effect_separator, energy, mode1_cost, mode2_cost,
-    newline, period, word, words, ParserExtra, ParserInput,
+    colon, comma, directive, effect_separator, mode1_cost, mode2_cost, newline, period, word,
+    words, ParserExtra, ParserInput,
 };
-use crate::parser::{
-    card_predicate_parser, condition_parser, cost_parser, predicate_parser, trigger_parser,
-};
+use crate::parser::{condition_parser, cost_parser, trigger_parser};
 
 pub fn single_effect_parser<'a>(
 ) -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
@@ -265,36 +261,11 @@ fn standard_effect_parser<'a>() -> impl Parser<'a, ParserInput<'a>, Effect, Pars
 
 fn trigger_cost_parser<'a>() -> impl Parser<'a, ParserInput<'a>, Cost, ParserExtra<'a>> + Clone {
     choice((
-        abandon_cost(),
+        cost_parser::abandon_cost_for_trigger(),
         cost_parser::banish_cards_from_your_void_cost(),
         cost_parser::banish_cards_from_enemy_void_cost(),
-        pay_energy_cost(),
-        discard_cost(),
+        cost_parser::pay_energy_cost(),
+        cost_parser::discard_cost(),
     ))
     .boxed()
-}
-
-fn pay_energy_cost<'a>() -> impl Parser<'a, ParserInput<'a>, Cost, ParserExtra<'a>> + Clone {
-    word("pay").ignore_then(energy()).map(|cost| Cost::Energy(Energy(cost)))
-}
-
-fn discard_cost<'a>() -> impl Parser<'a, ParserInput<'a>, Cost, ParserExtra<'a>> + Clone {
-    word("discard")
-        .ignore_then(choice((
-            discards().map(|count| (Predicate::Any(CardPredicate::Card), count)),
-            article().ignore_then(predicate_parser::predicate_parser()).map(|target| (target, 1)),
-        )))
-        .map(|(target, count)| Cost::DiscardCards { target, count })
-}
-
-fn abandon_cost<'a>() -> impl Parser<'a, ParserInput<'a>, Cost, ParserExtra<'a>> + Clone {
-    word("abandon")
-        .ignore_then(choice((
-            article().ignore_then(predicate_parser::predicate_parser()),
-            card_predicate_parser::parser().map(Predicate::Any),
-        )))
-        .map(|target| Cost::AbandonCharactersCount {
-            target,
-            count: CollectionExpression::Exactly(1),
-        })
 }

@@ -2,12 +2,13 @@
 
 # Effect Parsing
 
-30. **Code Quality - Duplicate cost parsers in effect_parser**:
-    `pay_energy_cost()` (effect_parser.rs:277), `discard_cost()` (line 281), and
-    `abandon_cost()` (line 290) duplicate similar parsers already defined in
-    cost_parser.rs. When these trigger costs are used in
-    effect_with_trigger_cost_parser(), the parsing logic is maintained in two
-    places, creating inconsistency risk if cost parsing rules change.
+33. **Code Quality - Near-duplicate gains spark branches**:
+    `gains_spark_for_each()` (spark_effect_parsers.rs:28-56) contains two nearly
+    identical branches (lines 31-40 and 42-53) that differ only in whether the
+    target defaults to `Predicate::This` or is parsed. Both branches parse
+    identical "gains +{s} spark for each <quantity>" patterns with redundant
+    mapping logic. The first branch could simply check if no predicate was
+    parsed and default to `This`.
 
 34. **Generality - Hardcoded "each ally" in trigger judgment**:
     `trigger_judgment_ability()` (game_effects_parsers.rs:308-317) hardcodes
