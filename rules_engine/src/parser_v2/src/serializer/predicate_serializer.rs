@@ -85,9 +85,28 @@ pub fn predicate_base_text(predicate: &Predicate) -> String {
 pub fn serialize_your_predicate(card_predicate: &CardPredicate) -> String {
     match card_predicate {
         CardPredicate::Character => "ally".to_string(),
+        CardPredicate::Card => "your card".to_string(),
+        CardPredicate::Event => "your event".to_string(),
         CardPredicate::CharacterType(_) => "allied {subtype}".to_string(),
+        CardPredicate::NotCharacterType(_) => "ally that is not {a-subtype}".to_string(),
         CardPredicate::CharacterWithSpark(_, operator) => {
             format!("ally with spark {{s}} {}", serializer_utils::serialize_operator(operator))
+        }
+        CardPredicate::CharacterWithMaterializedAbility => {
+            "ally with a {materialized} ability".to_string()
+        }
+        CardPredicate::CharacterWithMultiActivatedAbility => {
+            "ally with an activated ability".to_string()
+        }
+        CardPredicate::Fast { target } => {
+            format!("fast {}", serialize_your_predicate(target))
+        }
+        CardPredicate::CardWithCost { target, cost_operator, .. } => {
+            format!(
+                "{} with cost {{e}} {}",
+                serialize_your_predicate(target),
+                serializer_utils::serialize_operator(cost_operator)
+            )
         }
         _ => {
             unimplemented!("Serialization not yet implemented for this your predicate type")
@@ -216,7 +235,12 @@ pub fn serialize_for_each_predicate(predicate: &Predicate) -> String {
 fn serialize_your_predicate_plural(card_predicate: &CardPredicate) -> String {
     match card_predicate {
         CardPredicate::Character => "allies".to_string(),
+        CardPredicate::Card => "your cards".to_string(),
+        CardPredicate::Event => "your events".to_string(),
         CardPredicate::CharacterType(_) => "allied {plural-subtype}".to_string(),
+        CardPredicate::Fast { target } => {
+            format!("allied fast {}", serialize_card_predicate_plural(target))
+        }
         _ => unimplemented!("Serialization not yet implemented for this allied plural predicate"),
     }
 }
