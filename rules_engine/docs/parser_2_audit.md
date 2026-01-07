@@ -1,11 +1,5 @@
 # Static Abilities
 
-1. **Code Quality - Duplicate parsers**: `simple_alternate_cost_event()`
-   (static_ability_parser.rs:199) and `simple_alternate_cost_with_period()`
-   (static_ability_parser.rs:221) both parse "this event costs {e}" with the
-   only difference being whether a period is required. These should be unified
-   or one should be removed.
-
 2. **Generality - Card type hardcoding**: Multiple parsers hardcode "event" vs
    "character" instead of parsing card types generically. Examples:
    `simple_alternate_cost_event()` (line 201),

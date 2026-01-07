@@ -54,7 +54,7 @@ fn standard_static_ability<'a>(
         abandon_ally_play_character_for_alternate_cost(),
         play_for_alternate_cost(),
         play_from_hand_or_void_for_cost(),
-        simple_alternate_cost_with_period(),
+        simple_alternate_cost_event().then_ignore(period()),
         characters_in_hand_have_fast(),
         disable_enemy_materialized_abilities(),
         has_all_character_types(),
@@ -210,17 +210,6 @@ fn simple_alternate_cost_event<'a>(
 fn simple_alternate_cost_character<'a>(
 ) -> impl Parser<'a, ParserInput<'a>, StandardStaticAbility, ParserExtra<'a>> + Clone {
     words(&["this", "character", "costs"]).ignore_then(energy()).map(|e| {
-        StandardStaticAbility::PlayForAlternateCost(AlternateCost {
-            energy_cost: Energy(e),
-            additional_cost: None,
-            if_you_do: None,
-        })
-    })
-}
-
-fn simple_alternate_cost_with_period<'a>(
-) -> impl Parser<'a, ParserInput<'a>, StandardStaticAbility, ParserExtra<'a>> + Clone {
-    words(&["this", "event", "costs"]).ignore_then(energy()).then_ignore(period()).map(|e| {
         StandardStaticAbility::PlayForAlternateCost(AlternateCost {
             energy_cost: Energy(e),
             additional_cost: None,
