@@ -275,7 +275,7 @@ pub enum StaticAbility {
 
 pub enum StandardStaticAbility {
     YourCardsCostReduction { matching: CardPredicate, reduction: Energy },
-    YourCardsCostIncrease { matching: CardPredicate, reduction: Energy },
+    YourCardsCostIncrease { matching: CardPredicate, increase: Energy },
     EnemyCardsCostIncrease { matching: CardPredicate, increase: Energy },
     SparkBonusYourCharacters { matching: CardPredicate, added_spark: Spark },
     SparkBonusOtherCharacters { matching: CardPredicate, added_spark: Spark },

@@ -1,11 +1,5 @@
 # Static Abilities
 
-4. **Consistency - Confusing variable naming**: In `your_cards_cost_increase()`
-   (line 102), the variable is named `reduction` when it represents an increase:
-   `StandardStaticAbility::YourCardsCostIncrease { matching, reduction:
-   Energy(reduction) }`. Should be named `increase` to match the semantic
-   meaning.
-
 5. **Generality - Hardcoded predicate in reclaim**:
    `cards_in_your_void_have_reclaim()` (line 303) hardcodes `matching:
    CardPredicate::Card` instead of parsing a predicate. The parser already

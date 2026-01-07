@@ -49,7 +49,7 @@ pub enum StandardStaticAbility {
     SparkEqualToPredicateCount { predicate: Predicate },
     YouMayLookAtTopCardOfYourDeck,
     YouMayPlayFromTopOfDeck { matching: CardPredicate },
-    YourCardsCostIncrease { matching: CardPredicate, reduction: Energy },
+    YourCardsCostIncrease { matching: CardPredicate, increase: Energy },
     YourCardsCostReduction { matching: CardPredicate, reduction: Energy },
 }
 

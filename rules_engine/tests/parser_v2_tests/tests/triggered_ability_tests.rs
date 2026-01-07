@@ -926,7 +926,7 @@ fn test_events_cost_more_and_play_event_from_hand_copy() {
     [
       Static(StaticAbility(YourCardsCostIncrease(
         matching: Event,
-        reduction: Energy(1),
+        increase: Energy(1),
       ))),
       Triggered(TriggeredAbility(
         trigger: PlayFromHand(Your(Event)),

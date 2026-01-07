@@ -83,7 +83,7 @@ fn your_cards_cost_modification<'a>(
         .then_ignore(period())
         .map(|((matching, amount), is_increase)| {
             if is_increase {
-                StandardStaticAbility::YourCardsCostIncrease { matching, reduction: Energy(amount) }
+                StandardStaticAbility::YourCardsCostIncrease { matching, increase: Energy(amount) }
             } else {
                 StandardStaticAbility::YourCardsCostReduction {
                     matching,

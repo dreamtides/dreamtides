@@ -122,7 +122,7 @@ fn cost_increase<'a>() -> impl Parser<'a, &'a str, StandardStaticAbility, ErrorT
     card_predicate_parser::parser().then(numeric("cost you $", Energy, "more")).map(
         |(predicate, cost)| StandardStaticAbility::YourCardsCostIncrease {
             matching: predicate,
-            reduction: cost,
+            increase: cost,
         },
     )
 }

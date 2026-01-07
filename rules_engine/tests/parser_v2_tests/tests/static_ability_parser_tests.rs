@@ -171,7 +171,7 @@ fn test_events_cost_you_more() {
     assert_ron_snapshot!(result, @r###"
     Static(StaticAbility(YourCardsCostIncrease(
       matching: Event,
-      reduction: Energy(1),
+      increase: Energy(1),
     )))
     "###);
 }
