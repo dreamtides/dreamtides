@@ -1,29 +1,6 @@
 # Predicate Parsing
 
-24. **Generality - Hardcoded ownership in cost comparison**:
-    `with_cost_compared_to_controlled_suffix()`
-    (predicate_suffix_parser.rs:54-59) hardcodes "allied" in the phrase "with
-    cost less than the number of allied {subtype}". This prevents parsing
-    patterns like "with cost less than the number of enemy {subtype}" or using
-    general predicate parsing for the ownership component.
-
-25. **Generality - Hardcoded reference in spark comparison**:
-    `with_spark_compared_to_abandoned_suffix()`
-    (predicate_suffix_parser.rs:67-69) hardcodes "that ally's spark" instead of
-    parsing a general predicate reference. This prevents comparing spark to
-    other targets like "this character's spark", "that enemy's spark", or any
-    other predicate reference pattern.
-
 # Effect Parsing
-
-26. **Code Quality - Duplicate "gains reclaim" parsers**:
-    `gains_reclaim_for_cost()` (control_effects_parsers.rs:45-55) and
-    `gains_reclaim_for_cost_this_turn()` (card_effect_parsers.rs:192-210) are
-    nearly identical parsers split across two files. The control_effects version
-    parses "it gains {reclaim-for-cost} this turn" while the card_effect version
-    has a choice between "it gains {reclaim} equal to its cost this turn" and
-    "<predicate> gains {reclaim-for-cost} this turn". These should be unified
-    into a single parser that handles all cases.
 
 27. **Generality - Hardcoded card types in return from void**:
     `return_from_void_to_hand()` (card_effect_parsers.rs:128-133) hardcodes
