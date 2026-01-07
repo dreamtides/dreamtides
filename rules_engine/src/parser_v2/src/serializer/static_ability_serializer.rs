@@ -1,7 +1,9 @@
 use ability_data::condition::Condition;
 use ability_data::static_ability::{StandardStaticAbility, StaticAbility};
 
-use super::{cost_serializer, predicate_serializer, serializer_utils, text_formatting};
+use super::{
+    condition_serializer, cost_serializer, predicate_serializer, serializer_utils, text_formatting,
+};
 
 pub fn serialize_static_ability(static_ability: &StaticAbility) -> String {
     match static_ability {
@@ -25,14 +27,14 @@ pub fn serialize_static_ability(static_ability: &StaticAbility) -> String {
                 } else if matches!(condition, Condition::CardsInVoidCount { .. })
                     || matches!(condition, Condition::PredicateCount { count: 1, .. })
                 {
-                    let condition_str = serialize_condition(condition);
+                    let condition_str = condition_serializer::serialize_condition(condition);
                     if base.ends_with('.') {
                         format!("{} {}", condition_str, base)
                     } else {
                         format!("{} {}.", condition_str, base)
                     }
                 } else {
-                    let condition_str = serialize_condition(condition);
+                    let condition_str = condition_serializer::serialize_condition(condition);
                     if base.ends_with('.') {
                         format!("{} {}.", base.trim_end_matches('.'), condition_str)
                     } else {
@@ -150,22 +152,5 @@ pub fn serialize_standard_static_ability(ability: &StandardStaticAbility) -> Str
             "they have {reclaim} equal to their cost.".to_string()
         }
         _ => unimplemented!("Serialization not yet implemented for this static ability"),
-    }
-}
-
-fn serialize_condition(condition: &Condition) -> String {
-    match condition {
-        Condition::DissolvedThisTurn { .. } => "if a character dissolved this turn".to_string(),
-        Condition::CardsDiscardedThisTurn { count: 1, predicate } => {
-            format!(
-                "if you have discarded {} this turn",
-                predicate_serializer::serialize_card_predicate(predicate)
-            )
-        }
-        Condition::CardsInVoidCount { .. } => {
-            "while you have {count} or more cards in your void,".to_string()
-        }
-        Condition::PredicateCount { count: 1, .. } => "with an allied {subtype},".to_string(),
-        _ => unimplemented!("Serialization not yet implemented for this condition type"),
     }
 }

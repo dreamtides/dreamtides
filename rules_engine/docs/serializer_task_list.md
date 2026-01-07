@@ -151,7 +151,7 @@ article-stripping functions.
 
 ---
 
-### Task 4: Consolidate Duplicate serialize_condition Functions
+### Task 4: Consolidate Duplicate serialize_condition Functions [DONE]
 
 **Goal:** Merge the two `serialize_condition` functions into one shared function.
 

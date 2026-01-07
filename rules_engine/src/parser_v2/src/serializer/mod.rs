@@ -1,5 +1,6 @@
 pub mod ability_serializer;
 
+mod condition_serializer;
 mod cost_serializer;
 mod effect_serializer;
 mod predicate_serializer;

@@ -1,5 +1,4 @@
 use ability_data::collection_expression::CollectionExpression;
-use ability_data::condition::Condition;
 use ability_data::effect::Effect;
 use ability_data::predicate::{CardPredicate, Predicate};
 use ability_data::quantity_expression_data::QuantityExpression;
@@ -7,8 +6,8 @@ use ability_data::standard_effect::StandardEffect;
 use ability_data::trigger_event::TriggerEvent;
 
 use super::{
-    cost_serializer, predicate_serializer, serializer_utils, static_ability_serializer,
-    text_formatting, trigger_serializer,
+    condition_serializer, cost_serializer, predicate_serializer, serializer_utils,
+    static_ability_serializer, text_formatting, trigger_serializer,
 };
 
 pub fn serialize_standard_effect(effect: &StandardEffect) -> String {
@@ -337,7 +336,7 @@ pub fn serialize_effect(effect: &Effect) -> String {
         Effect::WithOptions(options) => {
             let mut result = String::new();
             if let Some(condition) = &options.condition {
-                result.push_str(&serialize_condition(condition));
+                result.push_str(&condition_serializer::serialize_condition(condition));
                 result.push(' ');
             }
             if options.optional {
@@ -364,7 +363,7 @@ pub fn serialize_effect(effect: &Effect) -> String {
                 let mut result = String::new();
                 if has_condition {
                     if let Some(condition) = &effects[0].condition {
-                        result.push_str(&serialize_condition(condition));
+                        result.push_str(&condition_serializer::serialize_condition(condition));
                         result.push(' ');
                     }
                 }
@@ -385,7 +384,7 @@ pub fn serialize_effect(effect: &Effect) -> String {
                 let mut result = String::new();
                 if has_condition {
                     if let Some(condition) = &effects[0].condition {
-                        result.push_str(&serialize_condition(condition));
+                        result.push_str(&condition_serializer::serialize_condition(condition));
                         result.push(' ');
                     }
                 }
@@ -405,7 +404,7 @@ pub fn serialize_effect(effect: &Effect) -> String {
                 let mut result = String::new();
                 if has_condition {
                     if let Some(condition) = &effects[0].condition {
-                        result.push_str(&serialize_condition(condition));
+                        result.push_str(&condition_serializer::serialize_condition(condition));
                         result.push(' ');
                     }
                 }
@@ -415,7 +414,7 @@ pub fn serialize_effect(effect: &Effect) -> String {
                 let mut result = String::new();
                 if has_condition {
                     if let Some(condition) = &effects[0].condition {
-                        result.push_str(&serialize_condition(condition));
+                        result.push_str(&condition_serializer::serialize_condition(condition));
                         result.push(' ');
                     }
                 }
@@ -435,7 +434,7 @@ pub fn serialize_effect(effect: &Effect) -> String {
         Effect::ListWithOptions(list_with_options) => {
             let mut result = String::new();
             if let Some(condition) = &list_with_options.condition {
-                result.push_str(&serialize_condition(condition));
+                result.push_str(&condition_serializer::serialize_condition(condition));
                 result.push(' ');
             }
             if let Some(trigger_cost) = &list_with_options.trigger_cost {
@@ -459,7 +458,7 @@ pub fn serialize_effect(effect: &Effect) -> String {
                         ));
                     }
                     if let Some(condition) = &e.condition {
-                        effect_str.push_str(&serialize_condition(condition));
+                        effect_str.push_str(&condition_serializer::serialize_condition(condition));
                         effect_str.push(' ');
                     }
                     effect_str.push_str(serialize_standard_effect(&e.effect).trim_end_matches('.'));
@@ -482,29 +481,6 @@ pub fn serialize_effect(effect: &Effect) -> String {
                 ));
             }
             result
-        }
-    }
-}
-
-fn serialize_condition(condition: &Condition) -> String {
-    match condition {
-        Condition::AlliesThatShareACharacterType { .. } => {
-            "with {count-allies} that share a character type,".to_string()
-        }
-        Condition::PredicateCount { count, predicate } => {
-            format!("with {},", serialize_predicate_count(*count, predicate))
-        }
-        Condition::DissolvedThisTurn { .. } => "if a character dissolved this turn".to_string(),
-        Condition::ThisCardIsInYourVoid => "if this card is in your void, ".to_string(),
-        _ => unimplemented!("Serialization not yet implemented for this condition type"),
-    }
-}
-
-fn serialize_predicate_count(_count: u32, predicate: &Predicate) -> String {
-    match predicate {
-        Predicate::Another(CardPredicate::CharacterType(_)) => "{count-allied-subtype}".to_string(),
-        _ => {
-            unimplemented!("Serialization not yet implemented for this predicate count type")
         }
     }
 }
