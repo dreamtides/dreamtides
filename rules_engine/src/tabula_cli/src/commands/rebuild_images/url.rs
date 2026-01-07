@@ -11,7 +11,7 @@ use reqwest::header::{
 };
 use roxmltree::Document;
 
-use super::rebuild::{FileRecord, read_zip, write_zip};
+use super::rebuild::{self, FileRecord};
 
 const MAIN_NS: &str = "http://schemas.openxmlformats.org/spreadsheetml/2006/main";
 const REL_NS: &str = "http://schemas.openxmlformats.org/officeDocument/2006/relationships";
@@ -28,7 +28,7 @@ pub fn rebuild_from_urls(source: &Path) -> Result<()> {
 }
 
 pub fn rebuild_from_urls_with_downloader(source: &Path, downloader: &UrlDownloader) -> Result<()> {
-    let (records, file_order) = read_zip(source).with_context(|| {
+    let (records, file_order) = rebuild::read_zip(source).with_context(|| {
         format!("File {path} is not a valid XLSM archive", path = source.display())
     })?;
     let mut record_map: BTreeMap<String, FileRecord> =
@@ -76,7 +76,7 @@ pub fn rebuild_from_urls_with_downloader(source: &Path, downloader: &UrlDownload
     update_relationship_targets(&mut relationships, &web_images, &identifier_urls);
     write_relationships(&mut record_map, relationships)?;
 
-    write_zip(source, record_map.into_values().collect(), &file_order)
+    rebuild::write_zip(source, record_map.into_values().collect(), &file_order)
 }
 
 #[derive(Clone)]

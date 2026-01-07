@@ -5,7 +5,7 @@ use std::path::Path;
 use anyhow::{Context, Result, bail};
 use toml::{Table, Value};
 
-use super::runner::record_error;
+use super::runner;
 use crate::core::{column_names, toml_data};
 
 #[derive(Clone)]
@@ -25,7 +25,7 @@ pub(super) fn compare_toml_dirs(
     let actual = load_toml_tables(roundtrip)?;
     for (name, table) in &expected {
         let Some(actual_table) = actual.get(name) else {
-            if record_error(
+            if runner::record_error(
                 errors,
                 report_all,
                 format!(
@@ -40,7 +40,7 @@ pub(super) fn compare_toml_dirs(
         compare_toml_values(table, actual_table, report_all, errors)?;
     }
     if let Some(extra) = actual.values().find(|t| !expected.contains_key(&t.normalized_name)) {
-        record_error(
+        runner::record_error(
             errors,
             report_all,
             format!(
@@ -94,7 +94,7 @@ fn compare_toml_values(
     match (&expected.value, &actual.value) {
         (Value::Array(expected_rows), Value::Array(actual_rows)) => {
             if expected_rows.len() != actual_rows.len()
-                && record_error(
+                && runner::record_error(
                     errors,
                     report_all,
                     format!(
@@ -123,7 +123,7 @@ fn compare_toml_values(
                     }
                     _ => {
                         if expected_row != actual_row
-                            && record_error(
+                            && runner::record_error(
                                 errors,
                                 report_all,
                                 format!(
@@ -146,7 +146,7 @@ fn compare_toml_values(
             if expected.value == actual.value {
                 Ok(())
             } else {
-                record_error(
+                runner::record_error(
                     errors,
                     report_all,
                     format!("Round-trip failed: TOML differs at table '{}'", expected.source_name),
@@ -169,7 +169,7 @@ fn compare_table_row(
     let actual_keys: BTreeSet<_> = actual.keys().cloned().collect();
     for key in &expected_keys {
         if !actual_keys.contains(key)
-            && record_error(
+            && runner::record_error(
                 errors,
                 report_all,
                 format!(
@@ -182,7 +182,7 @@ fn compare_table_row(
     }
     for key in &actual_keys {
         if !expected_keys.contains(key)
-            && record_error(
+            && runner::record_error(
                 errors,
                 report_all,
                 format!(
@@ -197,7 +197,7 @@ fn compare_table_row(
         let expected_value = expected.get(key).unwrap();
         let actual_value = actual.get(key).unwrap();
         if expected_value != actual_value
-            && record_error(
+            && runner::record_error(
                 errors,
                 report_all,
                 format!(

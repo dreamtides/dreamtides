@@ -159,11 +159,15 @@ fn check_use_tree(
                 // Resolve super to the parent module
                 let parent = if path_so_far.is_empty() {
                     // This is the first segment, so resolve based on current_module
-                    current_module.rsplit_once("::").map(|(parent, _)| parent.to_string())
+                    current_module
+                        .rsplit_once("::")
+                        .map(|(parent, _)| parent.to_string())
                         .unwrap_or_else(|| current_crate.to_string())
                 } else {
                     // Already building a path, go up one level
-                    path_so_far.rsplit_once("::").map(|(parent, _)| parent.to_string())
+                    path_so_far
+                        .rsplit_once("::")
+                        .map(|(parent, _)| parent.to_string())
                         .unwrap_or_default()
                 };
                 parent

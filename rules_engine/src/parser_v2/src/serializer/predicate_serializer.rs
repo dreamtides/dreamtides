@@ -1,7 +1,6 @@
 use ability_data::predicate::{CardPredicate, Predicate};
 
-use super::serializer_utils::serialize_operator;
-use super::text_formatting::card_predicate_base_text;
+use super::{serializer_utils, text_formatting};
 
 pub fn serialize_predicate(predicate: &Predicate) -> String {
     match predicate {
@@ -26,7 +25,10 @@ pub fn serialize_predicate(predicate: &Predicate) -> String {
             format!("{} in the opponent's void", serialize_card_predicate_plural(card_predicate))
         }
         Predicate::AnyOther(card_predicate) => {
-            format!("another {}", card_predicate_base_text(card_predicate).without_article())
+            format!(
+                "another {}",
+                text_formatting::card_predicate_base_text(card_predicate).without_article()
+            )
         }
     }
 }
@@ -56,17 +58,26 @@ pub fn predicate_base_text(predicate: &Predicate) -> String {
         Predicate::Your(card_predicate) => serialize_your_predicate(card_predicate),
         Predicate::Another(card_predicate) => serialize_your_predicate(card_predicate),
         Predicate::Any(card_predicate) => {
-            card_predicate_base_text(card_predicate).without_article()
+            text_formatting::card_predicate_base_text(card_predicate).without_article()
         }
         Predicate::Enemy(card_predicate) => serialize_enemy_predicate(card_predicate),
         Predicate::YourVoid(card_predicate) => {
-            format!("{} in your void", card_predicate_base_text(card_predicate).plural())
+            format!(
+                "{} in your void",
+                text_formatting::card_predicate_base_text(card_predicate).plural()
+            )
         }
         Predicate::EnemyVoid(card_predicate) => {
-            format!("{} in the opponent's void", card_predicate_base_text(card_predicate).plural())
+            format!(
+                "{} in the opponent's void",
+                text_formatting::card_predicate_base_text(card_predicate).plural()
+            )
         }
         Predicate::AnyOther(card_predicate) => {
-            format!("another {}", card_predicate_base_text(card_predicate).without_article())
+            format!(
+                "another {}",
+                text_formatting::card_predicate_base_text(card_predicate).without_article()
+            )
         }
     }
 }
@@ -76,7 +87,7 @@ pub fn serialize_your_predicate(card_predicate: &CardPredicate) -> String {
         CardPredicate::Character => "ally".to_string(),
         CardPredicate::CharacterType(_) => "allied {subtype}".to_string(),
         CardPredicate::CharacterWithSpark(_, operator) => {
-            format!("ally with spark {{s}} {}", serialize_operator(operator))
+            format!("ally with spark {{s}} {}", serializer_utils::serialize_operator(operator))
         }
         _ => {
             unimplemented!("Serialization not yet implemented for this your predicate type")
@@ -89,10 +100,10 @@ pub fn serialize_enemy_predicate(card_predicate: &CardPredicate) -> String {
         CardPredicate::Character => "enemy".to_string(),
         CardPredicate::Card => "enemy card".to_string(),
         CardPredicate::CharacterWithSpark(_, operator) => {
-            format!("enemy with spark {{s}} {}", serialize_operator(operator))
+            format!("enemy with spark {{s}} {}", serializer_utils::serialize_operator(operator))
         }
         CardPredicate::CardWithCost { cost_operator, .. } => {
-            format!("enemy with cost {{e}} {}", serialize_operator(cost_operator))
+            format!("enemy with cost {{e}} {}", serializer_utils::serialize_operator(cost_operator))
         }
         CardPredicate::CharacterWithCostComparedToControlled { target, count_matching, .. } => {
             format!(
@@ -125,7 +136,7 @@ pub fn serialize_enemy_predicate(card_predicate: &CardPredicate) -> String {
 pub fn serialize_card_predicate(card_predicate: &CardPredicate) -> String {
     match card_predicate {
         CardPredicate::Card | CardPredicate::Character | CardPredicate::Event => {
-            card_predicate_base_text(card_predicate).with_article()
+            text_formatting::card_predicate_base_text(card_predicate).with_article()
         }
         CardPredicate::CharacterType(_) => "{a-subtype}".to_string(),
         CardPredicate::Fast { target } => {
@@ -134,7 +145,7 @@ pub fn serialize_card_predicate(card_predicate: &CardPredicate) -> String {
         CardPredicate::CardWithCost { target, cost_operator, .. } => format!(
             "{} with cost {{e}} {}",
             serialize_card_predicate(target),
-            serialize_operator(cost_operator)
+            serializer_utils::serialize_operator(cost_operator)
         ),
         CardPredicate::CharacterWithMaterializedAbility => {
             "a character with a {materialized} ability".to_string()
@@ -160,7 +171,7 @@ pub fn serialize_card_predicate(card_predicate: &CardPredicate) -> String {
 pub fn serialize_card_predicate_plural(card_predicate: &CardPredicate) -> String {
     match card_predicate {
         CardPredicate::Card | CardPredicate::Character | CardPredicate::Event => {
-            card_predicate_base_text(card_predicate).plural()
+            text_formatting::card_predicate_base_text(card_predicate).plural()
         }
         CardPredicate::CharacterType(_) => "{plural-subtype}".to_string(),
         CardPredicate::Fast { target } => {
@@ -179,13 +190,13 @@ pub fn serialize_fast_target(card_predicate: &CardPredicate) -> String {
         CardPredicate::Event => "event".to_string(),
         CardPredicate::CharacterType(_) => "{subtype}".to_string(),
         CardPredicate::CharacterWithSpark(_spark, operator) => {
-            format!("character with spark {{s}} {}", serialize_operator(operator))
+            format!("character with spark {{s}} {}", serializer_utils::serialize_operator(operator))
         }
         CardPredicate::CardWithCost { target, cost_operator, .. } => {
             format!(
                 "{} with cost {{e}} {}",
                 serialize_fast_target(target),
-                serialize_operator(cost_operator)
+                serializer_utils::serialize_operator(cost_operator)
             )
         }
         _ => unimplemented!("Unsupported fast target"),

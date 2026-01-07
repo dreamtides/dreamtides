@@ -5,7 +5,7 @@ use std::path::Path;
 use anyhow::{Context, Result, bail};
 use toml::{Table, Value};
 
-use super::runner::record_error;
+use super::runner;
 use crate::core::{column_names, excel_reader, toml_data};
 
 #[derive(Clone)]
@@ -26,7 +26,7 @@ pub(super) fn compare_xlsm_to_toml(
     let initial_error_count = errors.len();
     for (name, toml_table) in &toml_tables {
         let Some(xlsm_table) = xlsm_tables.get(name) else {
-            if record_error(
+            if runner::record_error(
                 errors,
                 report_all,
                 format!(
@@ -43,7 +43,7 @@ pub(super) fn compare_xlsm_to_toml(
     if let Some(extra) =
         xlsm_tables.values().find(|t| !toml_tables.contains_key(&t.normalized_name))
     {
-        record_error(
+        runner::record_error(
             errors,
             report_all,
             format!(
@@ -129,7 +129,7 @@ fn compare_tables(
     match (&toml_table.value, &xlsm_table.value) {
         (Value::Array(toml_rows), Value::Array(xlsm_rows)) => {
             if toml_rows.len() != xlsm_rows.len()
-                && record_error(
+                && runner::record_error(
                     errors,
                     report_all,
                     format!(
@@ -156,7 +156,7 @@ fn compare_tables(
                     }
                     _ => {
                         if toml_row != xlsm_row
-                            && record_error(
+                            && runner::record_error(
                                 errors,
                                 report_all,
                                 format!(
@@ -179,7 +179,7 @@ fn compare_tables(
             if toml_table.value == xlsm_table.value {
                 Ok(())
             } else {
-                record_error(
+                runner::record_error(
                     errors,
                     report_all,
                     format!(
@@ -207,7 +207,7 @@ fn compare_table_row(
         xlsm_row.keys().filter(|k| k.as_str() != "preview").cloned().collect();
     for key in &toml_keys {
         if !xlsm_keys.contains(key)
-            && record_error(
+            && runner::record_error(
                 errors,
                 report_all,
                 format!(
@@ -220,7 +220,7 @@ fn compare_table_row(
     }
     for key in &xlsm_keys {
         if !toml_keys.contains(key)
-            && record_error(
+            && runner::record_error(
                 errors,
                 report_all,
                 format!(
@@ -235,7 +235,7 @@ fn compare_table_row(
         let toml_value = toml_row.get(key).unwrap();
         let xlsm_value = xlsm_row.get(key).unwrap();
         if toml_value != xlsm_value
-            && record_error(
+            && runner::record_error(
                 errors,
                 report_all,
                 format!(

@@ -1,12 +1,7 @@
 use ability_data::condition::Condition;
 use ability_data::static_ability::{StandardStaticAbility, StaticAbility};
 
-use super::cost_serializer::serialize_cost;
-use super::predicate_serializer::{
-    predicate_base_text, serialize_card_predicate, serialize_card_predicate_plural,
-};
-use super::serializer_utils::capitalize_first_letter;
-use super::text_formatting::card_predicate_base_text;
+use super::{cost_serializer, predicate_serializer, serializer_utils, text_formatting};
 
 pub fn serialize_static_ability(static_ability: &StaticAbility) -> String {
     match static_ability {
@@ -56,26 +51,40 @@ pub fn serialize_static_ability(static_ability: &StaticAbility) -> String {
 pub fn serialize_standard_static_ability(ability: &StandardStaticAbility) -> String {
     match ability {
         StandardStaticAbility::YourCardsCostIncrease { matching, .. } => {
-            format!("{} cost you {{e}} more.", serialize_card_predicate_plural(matching))
+            format!(
+                "{} cost you {{e}} more.",
+                predicate_serializer::serialize_card_predicate_plural(matching)
+            )
         }
         StandardStaticAbility::YourCardsCostReduction { matching, .. } => {
-            format!("{} cost you {{e}} less.", serialize_card_predicate_plural(matching))
+            format!(
+                "{} cost you {{e}} less.",
+                predicate_serializer::serialize_card_predicate_plural(matching)
+            )
         }
         StandardStaticAbility::EnemyCardsCostIncrease { matching, .. } => {
-            format!("the opponent's {} cost {{e}} more.", serialize_card_predicate_plural(matching))
+            format!(
+                "the opponent's {} cost {{e}} more.",
+                predicate_serializer::serialize_card_predicate_plural(matching)
+            )
         }
         StandardStaticAbility::SparkBonusOtherCharacters { matching, .. } => {
-            format!("allied {} have +{{s}} spark.", serialize_card_predicate_plural(matching))
+            format!(
+                "allied {} have +{{s}} spark.",
+                predicate_serializer::serialize_card_predicate_plural(matching)
+            )
         }
         StandardStaticAbility::AdditionalCostToPlay(cost) => {
-            format!("To play this card, {}.", serialize_cost(cost))
+            format!("To play this card, {}.", cost_serializer::serialize_cost(cost))
         }
         StandardStaticAbility::PlayForAlternateCost(alt_cost) => {
             if let Some(cost) = &alt_cost.additional_cost {
                 let card_type = if alt_cost.if_you_do.is_some() { "character" } else { "event" };
                 let base = format!(
                     "{}: Play this {} for {{e}}",
-                    capitalize_first_letter(&serialize_cost(cost)),
+                    serializer_utils::capitalize_first_letter(&cost_serializer::serialize_cost(
+                        cost
+                    )),
                     card_type
                 );
                 if alt_cost.if_you_do.is_some() {
@@ -104,7 +113,7 @@ pub fn serialize_standard_static_ability(ability: &StandardStaticAbility) -> Str
         StandardStaticAbility::OncePerTurnPlayFromVoid { matching } => {
             format!(
                 "once per turn, you may play {} from your void.",
-                card_predicate_base_text(matching).without_article()
+                text_formatting::card_predicate_base_text(matching).without_article()
             )
         }
         StandardStaticAbility::RevealTopCardOfYourDeck => {
@@ -116,19 +125,19 @@ pub fn serialize_standard_static_ability(ability: &StandardStaticAbility) -> Str
         StandardStaticAbility::YouMayPlayFromTopOfDeck { matching } => {
             format!(
                 "you may play {} from the top of your deck.",
-                card_predicate_base_text(matching).without_article()
+                text_formatting::card_predicate_base_text(matching).without_article()
             )
         }
         StandardStaticAbility::JudgmentTriggersWhenMaterialized { predicate } => {
             format!(
                 "the '{{Judgment}}' ability of {} triggers when you {{materialize}} them.",
-                predicate_base_text(predicate)
+                predicate_serializer::predicate_base_text(predicate)
             )
         }
         StandardStaticAbility::SparkEqualToPredicateCount { predicate } => {
             format!(
                 "this character's spark is equal to the number of {}.",
-                predicate_base_text(predicate)
+                predicate_serializer::predicate_base_text(predicate)
             )
         }
         StandardStaticAbility::PlayOnlyFromVoid => {
@@ -148,7 +157,10 @@ fn serialize_condition(condition: &Condition) -> String {
     match condition {
         Condition::DissolvedThisTurn { .. } => "if a character dissolved this turn".to_string(),
         Condition::CardsDiscardedThisTurn { count: 1, predicate } => {
-            format!("if you have discarded {} this turn", serialize_card_predicate(predicate))
+            format!(
+                "if you have discarded {} this turn",
+                predicate_serializer::serialize_card_predicate(predicate)
+            )
         }
         Condition::CardsInVoidCount { .. } => {
             "while you have {count} or more cards in your void,".to_string()

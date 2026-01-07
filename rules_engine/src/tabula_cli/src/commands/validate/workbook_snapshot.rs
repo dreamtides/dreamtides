@@ -10,7 +10,7 @@ use umya_spreadsheet::structs::{
 };
 use umya_spreadsheet::{DataValidationValues, Worksheet};
 
-use super::runner::{ValidateConfig, record_error};
+use super::runner::{self, ValidateConfig};
 
 #[derive(Clone)]
 pub(super) struct WorkbookSnapshot {
@@ -154,7 +154,7 @@ fn compare_sheet_order(
     errors: &mut Vec<String>,
 ) -> Result<()> {
     if expected.sheets.len() != actual.sheets.len()
-        && record_error(
+        && runner::record_error(
             errors,
             config.report_all,
             format!(
@@ -177,7 +177,7 @@ fn compare_sheet_order(
                 expected_name,
                 actual_name
             );
-            if record_error(errors, config.report_all, message) {
+            if runner::record_error(errors, config.report_all, message) {
                 return Ok(());
             }
         }
@@ -193,13 +193,17 @@ fn compare_tables(
 ) -> Result<()> {
     for (name, table) in &expected.tables {
         let Some(actual_table) = actual.tables.get(name) else {
-            if record_error(errors, config.report_all, format!("Missing table '{}'", table.name)) {
+            if runner::record_error(
+                errors,
+                config.report_all,
+                format!("Missing table '{}'", table.name),
+            ) {
                 return Ok(());
             }
             continue;
         };
         if table.sheet != actual_table.sheet
-            && record_error(
+            && runner::record_error(
                 errors,
                 config.report_all,
                 format!(
@@ -211,7 +215,7 @@ fn compare_tables(
             return Ok(());
         }
         if table.area != actual_table.area
-            && record_error(
+            && runner::record_error(
                 errors,
                 config.report_all,
                 format!(
@@ -223,7 +227,7 @@ fn compare_tables(
             return Ok(());
         }
         if table.totals_row != actual_table.totals_row
-            && record_error(
+            && runner::record_error(
                 errors,
                 config.report_all,
                 format!(
@@ -242,7 +246,7 @@ fn compare_tables(
                     table.columns, actual_table.columns
                 );
             }
-            if record_error(errors, config.report_all, message) {
+            if runner::record_error(errors, config.report_all, message) {
                 return Ok(());
             }
         }
@@ -254,14 +258,14 @@ fn compare_tables(
             if !config.verbose {
                 message = format!("Table '{}' style differs", table.name);
             }
-            if record_error(errors, config.report_all, message) {
+            if runner::record_error(errors, config.report_all, message) {
                 return Ok(());
             }
         }
     }
     for name in actual.tables.keys() {
         if !expected.tables.contains_key(name)
-            && record_error(errors, config.report_all, format!("Unexpected table '{name}'"))
+            && runner::record_error(errors, config.report_all, format!("Unexpected table '{name}'"))
         {
             return Ok(());
         }
@@ -277,7 +281,11 @@ fn compare_sheet_snapshots(
 ) -> Result<()> {
     for (name, sheet) in &expected.sheet_snapshots {
         let Some(actual_sheet) = actual.sheet_snapshots.get(name) else {
-            if record_error(errors, config.report_all, format!("Missing sheet snapshot '{name}'")) {
+            if runner::record_error(
+                errors,
+                config.report_all,
+                format!("Missing sheet snapshot '{name}'"),
+            ) {
                 return Ok(());
             }
             continue;
@@ -290,7 +298,7 @@ fn compare_sheet_snapshots(
     }
     for name in actual.sheet_snapshots.keys() {
         if !expected.sheet_snapshots.contains_key(name)
-            && record_error(
+            && runner::record_error(
                 errors,
                 config.report_all,
                 format!("Unexpected sheet snapshot '{name}'"),
@@ -406,7 +414,7 @@ fn compare_column_dimensions(
 ) -> Result<()> {
     for (col, dim) in &expected.columns {
         let Some(actual_dim) = actual.columns.get(col) else {
-            if record_error(
+            if runner::record_error(
                 errors,
                 config.report_all,
                 format!(
@@ -424,7 +432,7 @@ fn compare_column_dimensions(
             continue;
         };
         if dim.width != actual_dim.width
-            && record_error(
+            && runner::record_error(
                 errors,
                 config.report_all,
                 format!(
@@ -440,7 +448,7 @@ fn compare_column_dimensions(
             return Ok(());
         }
         if dim.hidden != actual_dim.hidden
-            && record_error(
+            && runner::record_error(
                 errors,
                 config.report_all,
                 format!(
@@ -452,7 +460,7 @@ fn compare_column_dimensions(
             return Ok(());
         }
         if dim.best_fit != actual_dim.best_fit
-            && record_error(
+            && runner::record_error(
                 errors,
                 config.report_all,
                 format!(
@@ -475,7 +483,7 @@ fn compare_row_dimensions(
 ) -> Result<()> {
     for (row, dim) in &expected.rows {
         let Some(actual_dim) = actual.rows.get(row) else {
-            if record_error(
+            if runner::record_error(
                 errors,
                 config.report_all,
                 format!(
@@ -488,7 +496,7 @@ fn compare_row_dimensions(
             continue;
         };
         if dim.height != actual_dim.height
-            && record_error(
+            && runner::record_error(
                 errors,
                 config.report_all,
                 format!(
@@ -500,7 +508,7 @@ fn compare_row_dimensions(
             return Ok(());
         }
         if dim.hidden != actual_dim.hidden
-            && record_error(
+            && runner::record_error(
                 errors,
                 config.report_all,
                 format!(
@@ -512,7 +520,7 @@ fn compare_row_dimensions(
             return Ok(());
         }
         if dim.custom != actual_dim.custom
-            && record_error(
+            && runner::record_error(
                 errors,
                 config.report_all,
                 format!(
@@ -535,7 +543,7 @@ fn compare_data_validations(
 ) -> Result<()> {
     for validation in &expected.data_validations {
         if !actual.data_validations.contains(validation)
-            && record_error(
+            && runner::record_error(
                 errors,
                 config.report_all,
                 format!(
@@ -549,7 +557,7 @@ fn compare_data_validations(
     }
     for validation in &actual.data_validations {
         if !expected.data_validations.contains(validation)
-            && record_error(
+            && runner::record_error(
                 errors,
                 config.report_all,
                 format!(
@@ -572,7 +580,7 @@ fn compare_conditionals(
 ) -> Result<()> {
     for conditional in &expected.conditionals {
         if !actual.conditionals.contains(conditional)
-            && record_error(
+            && runner::record_error(
                 errors,
                 config.report_all,
                 format!(
@@ -586,7 +594,7 @@ fn compare_conditionals(
     }
     for conditional in &actual.conditionals {
         if !expected.conditionals.contains(conditional)
-            && record_error(
+            && runner::record_error(
                 errors,
                 config.report_all,
                 format!(
@@ -619,13 +627,13 @@ fn compare_alignment(
             } else {
                 format!("Sheet '{}' missing alignment for {}", expected.name, coord)
             };
-            if record_error(errors, config.report_all, message) {
+            if runner::record_error(errors, config.report_all, message) {
                 return Ok(());
             }
             continue;
         };
         if style != actual_style
-            && record_error(
+            && runner::record_error(
                 errors,
                 config.report_all,
                 if config.verbose {

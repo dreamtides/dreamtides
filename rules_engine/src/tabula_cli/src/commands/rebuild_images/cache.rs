@@ -5,7 +5,7 @@ use std::path::{Path, PathBuf};
 use anyhow::{Context, Result, bail};
 use serde::Deserialize;
 
-use super::rebuild::{FileRecord, read_zip, write_zip};
+use super::rebuild::{self, FileRecord};
 use crate::core::paths;
 
 const MANIFEST_FILENAME: &str = "_xlsm_manifest.json";
@@ -20,7 +20,7 @@ pub fn rebuild_from_cache(source: &Path) -> Result<()> {
         bail!("Unsupported manifest version {}", manifest.version);
     }
 
-    let records = read_zip(source).with_context(|| {
+    let records = rebuild::read_zip(source).with_context(|| {
         format!("File {path} is not a valid XLSM archive", path = source.display())
     })?;
     let (updated_records, file_order, restored) =
@@ -29,7 +29,7 @@ pub fn rebuild_from_cache(source: &Path) -> Result<()> {
         bail!("No cached images were restored");
     }
 
-    write_zip(source, updated_records, &file_order)
+    rebuild::write_zip(source, updated_records, &file_order)
 }
 
 #[derive(Deserialize)]

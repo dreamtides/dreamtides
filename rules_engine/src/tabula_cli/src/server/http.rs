@@ -13,7 +13,7 @@ use tokio::net::TcpListener;
 use tokio::sync::oneshot::{Receiver, Sender};
 use tokio::sync::{Mutex, oneshot};
 
-use super::listener_runner::{ListenerContext, run_listeners};
+use super::listener_runner::{self, ListenerContext};
 use super::model::{Response, ResponseStatus};
 use super::server_config::ServerConfig;
 use super::{serialization, server_workbook_snapshot};
@@ -78,7 +78,8 @@ async fn handle_notify(State(state): State<Arc<ServerState>>, body: Bytes) -> im
                     };
 
                     let listeners = build_listeners();
-                    let listener_result = run_listeners(&listeners, &snapshot, &context);
+                    let listener_result =
+                        listener_runner::run_listeners(&listeners, &snapshot, &context);
 
                     let changeset_id = serialization::compute_changeset_id(
                         &request.workbook_path,
