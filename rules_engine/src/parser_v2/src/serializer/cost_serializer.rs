@@ -1,18 +1,16 @@
+use ability_data::collection_expression::CollectionExpression;
 use ability_data::cost::Cost;
 
 use super::predicate_serializer::serialize_predicate;
 
 pub fn serialize_cost(cost: &Cost) -> String {
     match cost {
-        Cost::AbandonCharactersCount { target, count } => {
-            use ability_data::collection_expression::CollectionExpression;
-            match count {
-                CollectionExpression::Exactly(1) => {
-                    format!("abandon {}", serialize_predicate(target))
-                }
-                _ => "abandon {count-allies}".to_string(),
+        Cost::AbandonCharactersCount { target, count } => match count {
+            CollectionExpression::Exactly(1) => {
+                format!("abandon {}", serialize_predicate(target))
             }
-        }
+            _ => "abandon {count-allies}".to_string(),
+        },
         Cost::DiscardCards { target, count } => {
             if *count == 1 {
                 format!("discard {}", serialize_predicate(target))
@@ -41,7 +39,6 @@ pub fn serialize_cost(cost: &Cost) -> String {
         }
         Cost::Choice(costs) => costs.iter().map(serialize_cost).collect::<Vec<_>>().join(" or "),
         Cost::ReturnToHand { target, count } => {
-            use ability_data::collection_expression::CollectionExpression;
             match count {
                 CollectionExpression::Exactly(1) => {
                     format!("return {} to hand", serialize_predicate(target))
