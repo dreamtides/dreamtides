@@ -17,44 +17,6 @@ The serializer is organized into several modules:
 
 ---
 
-### Task 8: Implement Missing serialize_card_predicate Variants
-
-**Location:** `predicate_serializer.rs` line 145
-
-**Variants to add:**
-```rust
-CardPredicate::NotCharacterType(_) => "a character that is not {a-subtype}".to_string(),
-CardPredicate::CharacterWithSpark(_, operator) => {
-    format!("a character with spark {{s}} {}", serialize_operator(operator))
-}
-CardPredicate::CharacterWithCostComparedToControlled { target, count_matching, .. } => {
-    format!(
-        "{} with cost less than the number of allied {}",
-        serialize_card_predicate(target),
-        serialize_card_predicate_plural(count_matching)
-    )
-}
-CardPredicate::CharacterWithCostComparedToAbandoned { target, .. } => {
-    format!("{} with cost less than the abandoned ally's cost", serialize_card_predicate(target))
-}
-CardPredicate::CharacterWithSparkComparedToAbandoned { target, .. } => {
-    format!("{} with spark less than the abandoned ally's spark", serialize_card_predicate(target))
-}
-CardPredicate::CharacterWithSparkComparedToAbandonedCountThisTurn { target, .. } => {
-    format!(
-        "{} with spark less than the number of allies abandoned this turn",
-        serialize_card_predicate(target)
-    )
-}
-CardPredicate::CharacterWithCostComparedToVoidCount { target, .. } => {
-    format!("{} with cost less than the number of cards in your void", serialize_card_predicate(target))
-}
-```
-
-Also add these to `serialize_card_predicate_plural` (line 169) and `serialize_fast_target` (line 190).
-
----
-
 ### Task 9: Implement Missing serialize_for_each_predicate Variants
 
 **Location:** `predicate_serializer.rs` lines 194-201

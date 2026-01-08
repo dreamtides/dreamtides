@@ -128,3 +128,83 @@ fn test_round_trip_when_materialize_fast_enemy_gain_energy() {
     let serialized = ability_serializer::serialize_ability(&parsed);
     assert_eq!(original, serialized);
 }
+
+#[test]
+fn test_round_trip_dissolve_character_that_is_not_subtype() {
+    let original = "{Dissolve} a character that is not {a-subtype}.";
+    let parsed = parse_ability(original, "subtype: warrior");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_dissolve_character_with_spark() {
+    let original = "{Dissolve} a character with spark {s} or less.";
+    let parsed = parse_ability(original, "s: 3");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_dissolve_character_with_cost_compared_to_controlled() {
+    let original = "{Dissolve} a character with cost less than the number of allied characters.";
+    let parsed = parse_ability(original, "");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_dissolve_character_with_cost_compared_to_abandoned() {
+    let original = "Abandon an ally: {Dissolve} a character with cost less than the abandoned ally's cost.";
+    let parsed = parse_ability(original, "");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_dissolve_character_with_spark_compared_to_abandoned() {
+    let original = "Abandon an ally: {Dissolve} a character with spark less than the abandoned ally's spark.";
+    let parsed = parse_ability(original, "");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_dissolve_character_with_spark_compared_to_abandoned_count() {
+    let original = "Abandon an ally: {Dissolve} a character with spark less than the number of allies abandoned this turn.";
+    let parsed = parse_ability(original, "");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_dissolve_character_with_cost_compared_to_void_count() {
+    let original = "{Dissolve} a character with cost less than the number of cards in your void.";
+    let parsed = parse_ability(original, "");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_dissolve_all_characters_that_are_not_subtype() {
+    let original = "{Dissolve} all characters that are not {plural-subtype}.";
+    let parsed = parse_ability(original, "subtype: warrior");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_when_play_fast_character_with_spark() {
+    let original = "When you play a {fast} character with spark {s} or less, gain {e}.";
+    let parsed = parse_ability(original, "s: 2, e: 1");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_when_play_fast_character_that_is_not_subtype() {
+    let original = "When you play a {fast} character that is not {a-subtype}, draw {cards}.";
+    let parsed = parse_ability(original, "subtype: warrior, cards: 1");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}

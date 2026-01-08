@@ -204,8 +204,43 @@ pub fn serialize_card_predicate(card_predicate: &CardPredicate) -> String {
         CardPredicate::CouldDissolve { target } => {
             format!("an event which could {{dissolve}} {}", predicate_base_text(target))
         }
-        _ => {
-            unimplemented!("Serialization not yet implemented for this card predicate type")
+        CardPredicate::NotCharacterType(_) => "a character that is not {a-subtype}".to_string(),
+        CardPredicate::CharacterWithSpark(_, operator) => {
+            format!(
+                "a character with spark {{s}} {}",
+                serializer_utils::serialize_operator(operator)
+            )
+        }
+        CardPredicate::CharacterWithCostComparedToControlled { target, count_matching, .. } => {
+            format!(
+                "{} with cost less than the number of allied {}",
+                serialize_card_predicate(target),
+                serialize_card_predicate_plural(count_matching)
+            )
+        }
+        CardPredicate::CharacterWithCostComparedToAbandoned { target, .. } => {
+            format!(
+                "{} with cost less than the abandoned ally's cost",
+                serialize_card_predicate(target)
+            )
+        }
+        CardPredicate::CharacterWithSparkComparedToAbandoned { target, .. } => {
+            format!(
+                "{} with spark less than the abandoned ally's spark",
+                serialize_card_predicate(target)
+            )
+        }
+        CardPredicate::CharacterWithSparkComparedToAbandonedCountThisTurn { target, .. } => {
+            format!(
+                "{} with spark less than the number of allies abandoned this turn",
+                serialize_card_predicate(target)
+            )
+        }
+        CardPredicate::CharacterWithCostComparedToVoidCount { target, .. } => {
+            format!(
+                "{} with cost less than the number of cards in your void",
+                serialize_card_predicate(target)
+            )
         }
     }
 }
@@ -216,6 +251,46 @@ pub fn serialize_card_predicate_plural(card_predicate: &CardPredicate) -> String
             text_formatting::card_predicate_base_text(card_predicate).plural()
         }
         CardPredicate::CharacterType(_) => "{plural-subtype}".to_string(),
+        CardPredicate::NotCharacterType(_) => {
+            "characters that are not {plural-subtype}".to_string()
+        }
+        CardPredicate::CharacterWithSpark(_, operator) => {
+            format!(
+                "characters with spark {{s}} {}",
+                serializer_utils::serialize_operator(operator)
+            )
+        }
+        CardPredicate::CharacterWithCostComparedToControlled { target, count_matching, .. } => {
+            format!(
+                "{} with cost less than the number of allied {}",
+                serialize_card_predicate_plural(target),
+                serialize_card_predicate_plural(count_matching)
+            )
+        }
+        CardPredicate::CharacterWithCostComparedToAbandoned { target, .. } => {
+            format!(
+                "{} with cost less than the abandoned ally's cost",
+                serialize_card_predicate_plural(target)
+            )
+        }
+        CardPredicate::CharacterWithSparkComparedToAbandoned { target, .. } => {
+            format!(
+                "{} with spark less than the abandoned ally's spark",
+                serialize_card_predicate_plural(target)
+            )
+        }
+        CardPredicate::CharacterWithSparkComparedToAbandonedCountThisTurn { target, .. } => {
+            format!(
+                "{} with spark less than the number of allies abandoned this turn",
+                serialize_card_predicate_plural(target)
+            )
+        }
+        CardPredicate::CharacterWithCostComparedToVoidCount { target, .. } => {
+            format!(
+                "{} with cost less than the number of cards in your void",
+                serialize_card_predicate_plural(target)
+            )
+        }
         CardPredicate::Fast { target } => {
             format!("fast {}", serialize_card_predicate_plural(target))
         }
@@ -231,8 +306,40 @@ pub fn serialize_fast_target(card_predicate: &CardPredicate) -> String {
         CardPredicate::Character => "character".to_string(),
         CardPredicate::Event => "event".to_string(),
         CardPredicate::CharacterType(_) => "{subtype}".to_string(),
+        CardPredicate::NotCharacterType(_) => "character that is not {a-subtype}".to_string(),
         CardPredicate::CharacterWithSpark(_spark, operator) => {
             format!("character with spark {{s}} {}", serializer_utils::serialize_operator(operator))
+        }
+        CardPredicate::CharacterWithCostComparedToControlled { target, count_matching, .. } => {
+            format!(
+                "{} with cost less than the number of allied {}",
+                serialize_fast_target(target),
+                serialize_card_predicate_plural(count_matching)
+            )
+        }
+        CardPredicate::CharacterWithCostComparedToAbandoned { target, .. } => {
+            format!(
+                "{} with cost less than the abandoned ally's cost",
+                serialize_fast_target(target)
+            )
+        }
+        CardPredicate::CharacterWithSparkComparedToAbandoned { target, .. } => {
+            format!(
+                "{} with spark less than the abandoned ally's spark",
+                serialize_fast_target(target)
+            )
+        }
+        CardPredicate::CharacterWithSparkComparedToAbandonedCountThisTurn { target, .. } => {
+            format!(
+                "{} with spark less than the number of allies abandoned this turn",
+                serialize_fast_target(target)
+            )
+        }
+        CardPredicate::CharacterWithCostComparedToVoidCount { target, .. } => {
+            format!(
+                "{} with cost less than the number of cards in your void",
+                serialize_fast_target(target)
+            )
         }
         CardPredicate::CardWithCost { target, cost_operator, .. } => {
             format!(
