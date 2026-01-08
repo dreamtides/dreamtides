@@ -1,8 +1,9 @@
 use ability_data::trigger_event::{PlayerTurn, TriggerEvent, TriggerKeyword};
 
 use super::predicate_serializer;
+use crate::variables::parser_bindings::VariableBindings;
 
-pub fn serialize_trigger_event(trigger: &TriggerEvent) -> String {
+pub fn serialize_trigger_event(trigger: &TriggerEvent, _bindings: &mut VariableBindings) -> String {
     match trigger {
         TriggerEvent::Keywords(keywords) if keywords.len() == 1 => {
             format!("{{{}}}", serialize_keyword(&keywords[0]))

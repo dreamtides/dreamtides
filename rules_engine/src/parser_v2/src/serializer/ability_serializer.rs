@@ -6,10 +6,19 @@ use super::{
     cost_serializer, effect_serializer, serializer_utils, static_ability_serializer,
     trigger_serializer,
 };
+use crate::variables::parser_bindings::VariableBindings;
 
-/// Serializes an ability into its rules text as a string.
-pub fn serialize_ability(ability: &Ability) -> String {
-    match ability {
+/// Result of serializing an ability, containing both the text and variable
+/// bindings.
+pub struct SerializedAbility {
+    pub text: String,
+    pub variables: VariableBindings,
+}
+
+/// Serializes an ability into its rules text and variable bindings.
+pub fn serialize_ability(ability: &Ability) -> SerializedAbility {
+    let mut variables = VariableBindings::new();
+    let text = match ability {
         Ability::Triggered(triggered) => {
             let mut result = String::new();
             let has_once_per_turn =
@@ -23,22 +32,26 @@ pub fn serialize_ability(ability: &Ability) -> String {
             if has_once_per_turn {
                 result.push_str("Once per turn, ");
             }
-            let trigger = trigger_serializer::serialize_trigger_event(&triggered.trigger);
+            let trigger =
+                trigger_serializer::serialize_trigger_event(&triggered.trigger, &mut variables);
             let capitalized_trigger = serializer_utils::capitalize_first_letter(&trigger);
             result.push_str(if has_prefix { &trigger } else { &capitalized_trigger });
             let is_keyword_trigger = matches!(triggered.trigger, TriggerEvent::Keywords(_));
             if is_keyword_trigger {
                 result.push(' ');
                 result.push_str(&serializer_utils::capitalize_first_letter(
-                    &effect_serializer::serialize_effect(&triggered.effect),
+                    &effect_serializer::serialize_effect(&triggered.effect, &mut variables),
                 ));
             } else {
-                result.push_str(&effect_serializer::serialize_effect(&triggered.effect));
+                result.push_str(&effect_serializer::serialize_effect(
+                    &triggered.effect,
+                    &mut variables,
+                ));
             }
             result
         }
         Ability::Event(event) => serializer_utils::capitalize_first_letter(
-            &effect_serializer::serialize_effect(&event.effect),
+            &effect_serializer::serialize_effect(&event.effect, &mut variables),
         ),
         Ability::Activated(activated) => {
             let mut result = String::new();
@@ -56,6 +69,7 @@ pub fn serialize_ability(ability: &Ability) -> String {
                 .map(|cost| {
                     serializer_utils::capitalize_first_letter(&cost_serializer::serialize_cost(
                         cost,
+                        &mut variables,
                     ))
                 })
                 .collect::<Vec<_>>()
@@ -66,24 +80,28 @@ pub fn serialize_ability(ability: &Ability) -> String {
             }
             result.push_str(": ");
             result.push_str(&serializer_utils::capitalize_first_letter(
-                &effect_serializer::serialize_effect(&activated.effect),
+                &effect_serializer::serialize_effect(&activated.effect, &mut variables),
             ));
             result
         }
-        Ability::Named(named) => serialize_named_ability(named),
+        Ability::Named(named) => serialize_named_ability(named, &mut variables),
         Ability::Static(static_ability) => serializer_utils::capitalize_first_letter(
-            &static_ability_serializer::serialize_static_ability(static_ability),
+            &static_ability_serializer::serialize_static_ability(static_ability, &mut variables),
         ),
-    }
+    };
+
+    SerializedAbility { text, variables }
 }
 
-fn serialize_named_ability(named: &NamedAbility) -> String {
+fn serialize_named_ability(named: &NamedAbility, variables: &mut VariableBindings) -> String {
     match named {
         NamedAbility::Reclaim(_) => "{ReclaimForCost}".to_string(),
         NamedAbility::ReclaimForCost(cost) => {
             format!(
                 "{{Reclaim}} -- {}",
-                serializer_utils::capitalize_first_letter(&cost_serializer::serialize_cost(cost))
+                serializer_utils::capitalize_first_letter(&cost_serializer::serialize_cost(
+                    cost, variables
+                ))
             )
         }
     }

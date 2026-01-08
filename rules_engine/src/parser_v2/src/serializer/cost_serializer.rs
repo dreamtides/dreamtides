@@ -2,8 +2,9 @@ use ability_data::collection_expression::CollectionExpression;
 use ability_data::cost::Cost;
 
 use super::predicate_serializer;
+use crate::variables::parser_bindings::VariableBindings;
 
-pub fn serialize_cost(cost: &Cost) -> String {
+pub fn serialize_cost(cost: &Cost, _bindings: &mut VariableBindings) -> String {
     match cost {
         Cost::AbandonCharactersCount { target, count } => match count {
             CollectionExpression::Exactly(1) => {
@@ -37,7 +38,7 @@ pub fn serialize_cost(cost: &Cost) -> String {
         Cost::BanishFromHand(predicate) => {
             format!("{{Banish}} {} from hand", predicate_serializer::serialize_predicate(predicate))
         }
-        Cost::Choice(costs) => costs.iter().map(serialize_cost).collect::<Vec<_>>().join(" or "),
+        Cost::Choice(costs) => costs.iter().map(|c| serialize_cost(c, _bindings)).collect::<Vec<_>>().join(" or "),
         Cost::ReturnToHand { target, count } => {
             match count {
                 CollectionExpression::Exactly(1) => {
@@ -61,14 +62,14 @@ pub fn serialize_cost(cost: &Cost) -> String {
         Cost::SpendOneOrMoreEnergy => "pay 1 or more {energy-symbol}".to_string(),
         Cost::BanishAllCardsFromYourVoid => "{Banish} your void".to_string(),
         Cost::CostList(costs) => {
-            costs.iter().map(serialize_cost).collect::<Vec<_>>().join(" and ")
+            costs.iter().map(|c| serialize_cost(c, _bindings)).collect::<Vec<_>>().join(" and ")
         }
     }
 }
 
-pub fn serialize_trigger_cost(cost: &Cost) -> String {
+pub fn serialize_trigger_cost(cost: &Cost, _bindings: &mut VariableBindings) -> String {
     match cost {
-        Cost::Energy(_) => format!("pay {}", serialize_cost(cost)),
-        _ => serialize_cost(cost),
+        Cost::Energy(_) => format!("pay {}", serialize_cost(cost, _bindings)),
+        _ => serialize_cost(cost, _bindings),
     }
 }

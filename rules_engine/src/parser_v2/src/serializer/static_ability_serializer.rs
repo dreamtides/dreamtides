@@ -5,11 +5,15 @@ use super::{
     condition_serializer, cost_serializer, effect_serializer, predicate_serializer,
     serializer_utils, text_formatting,
 };
+use crate::variables::parser_bindings::VariableBindings;
 
-pub fn serialize_static_ability(static_ability: &StaticAbility) -> String {
+pub fn serialize_static_ability(
+    static_ability: &StaticAbility,
+    bindings: &mut VariableBindings,
+) -> String {
     match static_ability {
         StaticAbility::StaticAbility(ability) => {
-            let base = serialize_standard_static_ability(ability);
+            let base = serialize_standard_static_ability(ability, bindings);
             if base.ends_with('.') {
                 base
             } else {
@@ -17,7 +21,7 @@ pub fn serialize_static_ability(static_ability: &StaticAbility) -> String {
             }
         }
         StaticAbility::WithOptions(ability) => {
-            let base = serialize_standard_static_ability(&ability.ability);
+            let base = serialize_standard_static_ability(&ability.ability, bindings);
             if let Some(condition) = &ability.condition {
                 if matches!(condition, Condition::ThisCardIsInYourVoid) {
                     if base.ends_with('.') {
@@ -51,7 +55,10 @@ pub fn serialize_static_ability(static_ability: &StaticAbility) -> String {
     }
 }
 
-pub fn serialize_standard_static_ability(ability: &StandardStaticAbility) -> String {
+pub fn serialize_standard_static_ability(
+    ability: &StandardStaticAbility,
+    bindings: &mut VariableBindings,
+) -> String {
     match ability {
         StandardStaticAbility::YourCardsCostIncrease { matching, .. } => {
             format!(
@@ -78,7 +85,7 @@ pub fn serialize_standard_static_ability(ability: &StandardStaticAbility) -> Str
             )
         }
         StandardStaticAbility::AdditionalCostToPlay(cost) => {
-            format!("To play this card, {}.", cost_serializer::serialize_cost(cost))
+            format!("To play this card, {}.", cost_serializer::serialize_cost(cost, bindings))
         }
         StandardStaticAbility::PlayForAlternateCost(alt_cost) => {
             if let Some(cost) = &alt_cost.additional_cost {
@@ -86,7 +93,7 @@ pub fn serialize_standard_static_ability(ability: &StandardStaticAbility) -> Str
                 let base = format!(
                     "{}: Play this {} for {{e}}",
                     serializer_utils::capitalize_first_letter(&cost_serializer::serialize_cost(
-                        cost
+                        cost, bindings,
                     )),
                     card_type
                 );
@@ -154,7 +161,7 @@ pub fn serialize_standard_static_ability(ability: &StandardStaticAbility) -> Str
         }
         StandardStaticAbility::CostReductionForEach { quantity, .. } => format!(
             "this card costs {{e}} less for each {}.",
-            effect_serializer::serialize_for_count_expression(quantity)
+            effect_serializer::serialize_for_count_expression(quantity, bindings)
         ),
         StandardStaticAbility::SparkBonusYourCharacters { matching, .. } => {
             let predicate_text = match matching {
@@ -172,13 +179,13 @@ pub fn serialize_standard_static_ability(ability: &StandardStaticAbility) -> Str
                 result.push_str(&format!(
                     "{}: ",
                     serializer_utils::capitalize_first_letter(&cost_serializer::serialize_cost(
-                        cost
+                        cost, bindings,
                     ))
                 ));
             }
             result.push_str("play this card from your void for {e}");
             if let Some(effect) = &play_from_void.if_you_do {
-                let effect_text = effect_serializer::serialize_effect(effect);
+                let effect_text = effect_serializer::serialize_effect(effect, bindings);
                 result.push_str(&format!(", then {}", effect_text.trim_end_matches('.')));
             }
             result.push('.');
