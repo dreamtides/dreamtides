@@ -5,6 +5,7 @@ use parser_v2::builder::parser_builder;
 use parser_v2::builder::parser_spans::SpannedAbility;
 use parser_v2::lexer::lexer_tokenize;
 use parser_v2::parser::ability_parser;
+use parser_v2::serializer::ability_serializer;
 use parser_v2::variables::parser_bindings::VariableBindings;
 use parser_v2::variables::parser_substitutions;
 
@@ -99,4 +100,27 @@ pub fn assert_valid_span(span: &SimpleSpan) {
         span.start(),
         span.end()
     );
+}
+
+/// Asserts that an ability round-trips correctly, including both text and
+/// variable bindings.
+pub fn assert_round_trip(expected_text: &str, vars: &str) {
+    let parsed = parse_ability(expected_text, vars);
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(expected_text, serialized.text);
+    assert_eq!(VariableBindings::parse(vars).unwrap(), serialized.variables);
+}
+
+/// Asserts that an ability round-trips to the provided expected text and
+/// variable bindings.
+pub fn assert_round_trip_with_expected(
+    input: &str,
+    vars: &str,
+    expected_text: &str,
+    expected_vars: &str,
+) {
+    let parsed = parse_ability(input, vars);
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(expected_text, serialized.text);
+    assert_eq!(VariableBindings::parse(expected_vars).unwrap(), serialized.variables);
 }
