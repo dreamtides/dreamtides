@@ -1,6 +1,7 @@
 mod activated_ability_round_trip_tests;
 mod collection_effect_round_trip_tests;
 mod compound_effect_round_trip_tests;
+mod condition_round_trip_tests;
 mod event_ability_round_trip_tests;
 mod judgment_ability_round_trip_tests;
 mod predicate_serialization_round_trip_tests;
