@@ -315,7 +315,8 @@ fn test_round_trip_materialize_n_copies_of_target() {
 
 #[test]
 fn test_round_trip_materialize_copies_equal_to_allies() {
-    let original = "{Materialize} a number of copies of that character equal to the number of allies.";
+    let original =
+        "{Materialize} a number of copies of that character equal to the number of allies.";
     let parsed = parse_ability(original, "");
     let serialized = ability_serializer::serialize_ability(&parsed);
     assert_eq!(original, serialized);
@@ -323,7 +324,8 @@ fn test_round_trip_materialize_copies_equal_to_allies() {
 
 #[test]
 fn test_round_trip_materialize_copies_equal_to_energy_spent() {
-    let original = "{Materialize} a number of copies of an ally equal to the amount of {energy-symbol} spent.";
+    let original =
+        "{Materialize} a number of copies of an ally equal to the amount of {energy-symbol} spent.";
     let parsed = parse_ability(original, "");
     let serialized = ability_serializer::serialize_ability(&parsed);
     assert_eq!(original, serialized);
@@ -371,7 +373,8 @@ fn test_round_trip_copy_next_fast_character() {
 
 #[test]
 fn test_round_trip_multiply_energy_gain_from_card_effects() {
-    let original = "{MultiplyBy} the amount of {energy-symbol} you gain from card effects this turn.";
+    let original =
+        "{MultiplyBy} the amount of {energy-symbol} you gain from card effects this turn.";
     let parsed = parse_ability(original, "number: 2");
     let serialized = ability_serializer::serialize_ability(&parsed);
     assert_eq!(original, serialized);
@@ -387,7 +390,8 @@ fn test_round_trip_multiply_card_draw_from_card_effects() {
 
 #[test]
 fn test_round_trip_each_allied_subtype_gains_spark_for_each_allied_subtype() {
-    let original = "Each allied {subtype} gains spark equal to the number of allied {plural-subtype}.";
+    let original =
+        "Each allied {subtype} gains spark equal to the number of allied {plural-subtype}.";
     let parsed = parse_ability(original, "subtype: warrior");
     let serialized = ability_serializer::serialize_ability(&parsed);
     assert_eq!(original, serialized);
@@ -395,7 +399,8 @@ fn test_round_trip_each_allied_subtype_gains_spark_for_each_allied_subtype() {
 
 #[test]
 fn test_round_trip_each_player_shuffles_hand_and_void_and_draws() {
-    let original = "Each player shuffles their hand and void into their deck and then draws {cards}.";
+    let original =
+        "Each player shuffles their hand and void into their deck and then draws {cards}.";
     let parsed = parse_ability(original, "cards: 5");
     let serialized = ability_serializer::serialize_ability(&parsed);
     assert_eq!(original, serialized);
@@ -492,6 +497,23 @@ fn test_round_trip_trigger_judgment_ability_of_each_ally() {
 #[test]
 fn test_round_trip_trigger_judgment_ability_of_an_ally() {
     let original = "Trigger the {Judgment} ability of an ally.";
+    let parsed = parse_ability(original, "");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_abandon_and_gain_energy_for_spark() {
+    let original =
+        "Abandon an ally and gain {energy-symbol} for each point of spark that character had.";
+    let parsed = parse_ability(original, "");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_abandon_at_end_of_turn() {
+    let original = "Abandon an ally at end of turn.";
     let parsed = parse_ability(original, "");
     let serialized = ability_serializer::serialize_ability(&parsed);
     assert_eq!(original, serialized);

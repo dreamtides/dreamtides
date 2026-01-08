@@ -19,22 +19,6 @@ The serializer is organized into several modules:
 
 ## Part 3: Effect Serialization Features
 
-### Task 13: Implement Abandon Effects
-
-**Location:** `effect_serializer.rs` line 297 (catch-all)
-
-**Implementation:**
-```rust
-StandardEffect::AbandonAndGainEnergyForSpark { target, .. } => {
-    format!("abandon {} and gain {{e}} for each spark it had.", serialize_predicate(target))
-}
-StandardEffect::AbandonAtEndOfTurn { target } => {
-    format!("abandon {} at end of turn.", serialize_predicate(target))
-}
-```
-
----
-
 ### Task 14: Implement Banish Effects
 
 **Location:** `effect_serializer.rs` line 297 (catch-all)

@@ -432,6 +432,15 @@ pub fn serialize_standard_effect(effect: &StandardEffect) -> String {
         }
         StandardEffect::TakeExtraTurn => "take an extra turn after this one.".to_string(),
         StandardEffect::YouWinTheGame => "you win the game.".to_string(),
+        StandardEffect::AbandonAndGainEnergyForSpark { target, .. } => {
+            format!(
+                "abandon {} and gain {{energy-symbol}} for each point of spark that character had.",
+                predicate_serializer::serialize_predicate(target)
+            )
+        }
+        StandardEffect::AbandonAtEndOfTurn { target } => {
+            format!("abandon {} at end of turn.", predicate_serializer::serialize_predicate(target))
+        }
         _ => unimplemented!("Serialization not yet implemented for this effect type"),
     }
 }
