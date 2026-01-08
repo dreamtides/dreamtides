@@ -211,3 +211,28 @@ fn test_round_trip_cost_list_abandon_and_discard() {
 fn test_round_trip_return_up_to_allies_to_hand_gain_energy() {
     assert_round_trip("Return up to 3 allies to hand: Gain {e}.", "e: 2");
 }
+
+#[test]
+fn test_round_trip_return_exactly_two_allies_to_hand_gain_energy() {
+    assert_round_trip("Return 2 allies to hand: Gain {e}.", "e: 1");
+}
+
+#[test]
+fn test_round_trip_return_exactly_three_allies_to_hand_draw_cards() {
+    assert_round_trip("Return 3 allies to hand: Draw {cards}.", "cards: 2");
+}
+
+#[test]
+fn test_round_trip_return_each_other_ally_to_hand_gain_energy() {
+    assert_round_trip("Return each other ally to hand: Gain {e}.", "e: 1");
+}
+
+#[test]
+fn test_round_trip_return_three_or_more_allies_to_hand_kindle() {
+    assert_round_trip("Return 3 or more allies to hand: {Kindle}.", "k: 1");
+}
+
+#[test]
+fn test_round_trip_return_two_or_more_characters_to_hand_draw_cards() {
+    assert_round_trip("Return 2 or more characters to hand: Draw {cards}.", "cards: 3");
+}

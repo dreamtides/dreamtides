@@ -18,7 +18,9 @@ pub fn serialize_cost(cost: &Cost, bindings: &mut VariableBindings) -> String {
             if *count == 1 {
                 format!("discard {}", predicate_serializer::serialize_predicate(target, bindings))
             } else {
-                if let Some(var_name) = parser_substitutions::directive_to_integer_variable("discards") {
+                if let Some(var_name) =
+                    parser_substitutions::directive_to_integer_variable("discards")
+                {
                     bindings.insert(var_name.to_string(), VariableValue::Integer(*count));
                 }
                 "discard {discards}".to_string()
@@ -32,7 +34,9 @@ pub fn serialize_cost(cost: &Cost, bindings: &mut VariableBindings) -> String {
             "{e}".to_string()
         }
         Cost::LoseMaximumEnergy(amount) => {
-            if let Some(var_name) = parser_substitutions::directive_to_integer_variable("maximum-energy") {
+            if let Some(var_name) =
+                parser_substitutions::directive_to_integer_variable("maximum-energy")
+            {
                 bindings.insert(var_name.to_string(), VariableValue::Integer(*amount));
             }
             "lose {maximum-energy}".to_string()
@@ -41,7 +45,8 @@ pub fn serialize_cost(cost: &Cost, bindings: &mut VariableBindings) -> String {
             if *count == 1 {
                 "{Banish} another card in your void".to_string()
             } else {
-                if let Some(var_name) = parser_substitutions::directive_to_integer_variable("cards") {
+                if let Some(var_name) = parser_substitutions::directive_to_integer_variable("cards")
+                {
                     bindings.insert(var_name.to_string(), VariableValue::Integer(*count));
                 }
                 "{Banish} {cards} from your void".to_string()
@@ -60,29 +65,67 @@ pub fn serialize_cost(cost: &Cost, bindings: &mut VariableBindings) -> String {
             "{Banish} your void with {count} or more cards".to_string()
         }
         Cost::BanishFromHand(predicate) => {
-            format!("{{Banish}} {} from hand", predicate_serializer::serialize_predicate(predicate, bindings))
+            format!(
+                "{{Banish}} {} from hand",
+                predicate_serializer::serialize_predicate(predicate, bindings)
+            )
         }
-        Cost::Choice(costs) => costs.iter().map(|c| serialize_cost(c, bindings)).collect::<Vec<_>>().join(" or "),
-        Cost::ReturnToHand { target, count } => {
-            match count {
-                CollectionExpression::Exactly(1) => {
-                    format!("return {} to hand", predicate_serializer::serialize_predicate(target, bindings))
-                }
-                CollectionExpression::AllButOne => {
-                    format!("return all but one {} to hand", predicate_serializer::serialize_predicate(target, bindings))
-                }
-                CollectionExpression::All => {
-                    format!("return all {} to hand", predicate_serializer::serialize_predicate(target, bindings))
-                }
-                CollectionExpression::AnyNumberOf => {
-                    format!("return any number of {} to hand", predicate_serializer::serialize_predicate(target, bindings))
-                }
-                CollectionExpression::UpTo(n) => {
-                    format!("return up to {} {} to hand", n, predicate_serializer::serialize_predicate_plural(target, bindings))
-                }
-                _ => unimplemented!("Serialization not yet implemented for this collection expression in return to hand cost"),
+        Cost::Choice(costs) => {
+            costs.iter().map(|c| serialize_cost(c, bindings)).collect::<Vec<_>>().join(" or ")
+        }
+        Cost::ReturnToHand { target, count } => match count {
+            CollectionExpression::Exactly(1) => {
+                format!(
+                    "return {} to hand",
+                    predicate_serializer::serialize_predicate(target, bindings)
+                )
             }
-        }
+            CollectionExpression::Exactly(n) => {
+                format!(
+                    "return {} {} to hand",
+                    n,
+                    predicate_serializer::serialize_predicate_plural(target, bindings)
+                )
+            }
+            CollectionExpression::AllButOne => {
+                format!(
+                    "return all but one {} to hand",
+                    predicate_serializer::serialize_predicate(target, bindings)
+                )
+            }
+            CollectionExpression::All => {
+                format!(
+                    "return all {} to hand",
+                    predicate_serializer::serialize_predicate(target, bindings)
+                )
+            }
+            CollectionExpression::AnyNumberOf => {
+                format!(
+                    "return any number of {} to hand",
+                    predicate_serializer::serialize_predicate(target, bindings)
+                )
+            }
+            CollectionExpression::UpTo(n) => {
+                format!(
+                    "return up to {} {} to hand",
+                    n,
+                    predicate_serializer::serialize_predicate_plural(target, bindings)
+                )
+            }
+            CollectionExpression::EachOther => {
+                format!(
+                    "return each other {} to hand",
+                    predicate_serializer::serialize_predicate(target, bindings)
+                )
+            }
+            CollectionExpression::OrMore(n) => {
+                format!(
+                    "return {} or more {} to hand",
+                    n,
+                    predicate_serializer::serialize_predicate_plural(target, bindings)
+                )
+            }
+        },
         Cost::SpendOneOrMoreEnergy => "pay 1 or more {energy-symbol}".to_string(),
         Cost::BanishAllCardsFromYourVoid => "{Banish} your void".to_string(),
         Cost::CostList(costs) => {
