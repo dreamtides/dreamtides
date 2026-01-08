@@ -45,9 +45,13 @@ pub fn serialize_standard_effect(effect: &StandardEffect) -> String {
         ),
         StandardEffect::GainEnergy { .. } => "gain {e}.".to_string(),
         StandardEffect::GainEnergyEqualToCost { target } => match target {
-            Predicate::It => "gain {energy-symbol} equal to that character's cost.".to_string(),
-            _ => unimplemented!(
-                "Serialization not yet implemented for this GainEnergyEqualTo target"
+            Predicate::It | Predicate::That => {
+                "gain {energy-symbol} equal to that character's cost.".to_string()
+            }
+            Predicate::This => "gain {energy-symbol} equal to this character's cost.".to_string(),
+            _ => format!(
+                "gain {{energy-symbol}} equal to {}'s cost.",
+                predicate_serializer::serialize_predicate(target)
             ),
         },
         StandardEffect::GainEnergyForEach { for_each, .. } => {
@@ -120,7 +124,10 @@ pub fn serialize_standard_effect(effect: &StandardEffect) -> String {
                     predicate_serializer::serialize_card_predicate(matching)
                 )
             } else {
-                unimplemented!("Serialization not yet implemented for this put-on-top count")
+                format!(
+                    "put {{up-to-n-cards}} {} from your void on top of your deck.",
+                    predicate_serializer::serialize_card_predicate_plural(matching)
+                )
             }
         }
         StandardEffect::Counterspell { target } => {
@@ -401,18 +408,25 @@ pub fn serialize_standard_effect(effect: &StandardEffect) -> String {
                 predicate_serializer::serialize_card_predicate(predicate)
             )
         }
-        StandardEffect::TriggerJudgmentAbility { matching, collection } => {
-            if matches!(collection, CollectionExpression::All) {
-                format!(
-                    "trigger the {{Judgment}} ability of each {}.",
-                    predicate_serializer::predicate_base_text(matching)
-                )
-            } else {
-                unimplemented!(
-                    "Serialization not yet implemented for this TriggerJudgmentAbility pattern"
-                )
-            }
-        }
+        StandardEffect::TriggerJudgmentAbility { matching, collection } => match collection {
+            CollectionExpression::All => format!(
+                "trigger the {{Judgment}} ability of each {}.",
+                predicate_serializer::predicate_base_text(matching)
+            ),
+            CollectionExpression::Exactly(1) => format!(
+                "trigger the {{Judgment}} ability of {}.",
+                predicate_serializer::serialize_predicate(matching)
+            ),
+            CollectionExpression::Exactly(n) => format!(
+                "trigger the {{Judgment}} ability of {} {}.",
+                n,
+                predicate_serializer::serialize_predicate_plural(matching)
+            ),
+            _ => format!(
+                "trigger the {{Judgment}} ability of {}.",
+                predicate_serializer::serialize_predicate(matching)
+            ),
+        },
         StandardEffect::TriggerAdditionalJudgmentPhaseAtEndOfTurn => {
             "at the end of this turn, trigger an additional {JudgmentPhaseName} phase.".to_string()
         }

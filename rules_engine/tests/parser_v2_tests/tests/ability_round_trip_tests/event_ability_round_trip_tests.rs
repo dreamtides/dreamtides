@@ -432,3 +432,75 @@ fn test_round_trip_prevent_played_event_which_could_dissolve_ally() {
     let serialized = ability_serializer::serialize_ability(&parsed);
     assert_eq!(original, serialized);
 }
+
+#[test]
+fn test_round_trip_gain_energy_equal_to_that_characters_cost() {
+    let original = "Gain {energy-symbol} equal to that character's cost.";
+    let parsed = parse_ability(original, "");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_gain_energy_equal_to_this_characters_cost() {
+    let original = "Gain {energy-symbol} equal to this character's cost.";
+    let parsed = parse_ability(original, "");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_gain_energy_equal_to_an_allys_cost() {
+    let original = "Gain {energy-symbol} equal to an ally's cost.";
+    let parsed = parse_ability(original, "");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_put_a_card_from_void_on_top_of_deck() {
+    let original = "Put a card from your void on top of your deck.";
+    let parsed = parse_ability(original, "");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_put_up_to_n_cards_from_void_on_top_of_deck() {
+    let original = "Put {up-to-n-cards} cards from your void on top of your deck.";
+    let parsed = parse_ability(original, "number: 3");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_put_up_to_n_events_from_void_on_top_of_deck() {
+    let original = "Put {up-to-n-cards} events from your void on top of your deck.";
+    let parsed = parse_ability(original, "number: 2");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_trigger_judgment_ability_of_each_ally() {
+    let original = "Trigger the {Judgment} ability of each ally.";
+    let parsed = parse_ability(original, "");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_trigger_judgment_ability_of_an_ally() {
+    let original = "Trigger the {Judgment} ability of an ally.";
+    let parsed = parse_ability(original, "");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_trigger_judgment_ability_of_three_allies() {
+    let original = "Trigger the {Judgment} ability of 3 allies.";
+    let parsed = parse_ability(original, "");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}

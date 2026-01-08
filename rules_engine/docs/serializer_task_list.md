@@ -19,48 +19,6 @@ The serializer is organized into several modules:
 
 ## Part 3: Effect Serialization Features
 
-### Task 12: Implement TriggerJudgmentAbility and PutCardsFromVoid Effects
-
-**Location:** `effect_serializer.rs`
-
-**TriggerJudgmentAbility (lines 280-290):**
-```rust
-StandardEffect::TriggerJudgmentAbility { matching, collection } => match collection {
-    CollectionExpression::All => {
-        format!("trigger the {{Judgment}} ability of each {}.", predicate_base_text(matching).without_article())
-    }
-    CollectionExpression::Exactly(1) => {
-        format!("trigger the {{Judgment}} ability of {}.", serialize_predicate(matching))
-    }
-    CollectionExpression::Exactly(n) => {
-        format!("trigger the {{Judgment}} ability of {} {}.", n, serialize_predicate_plural(matching))
-    }
-    _ => format!("trigger the {{Judgment}} ability of {}.", serialize_predicate(matching)),
-},
-```
-
-**PutCardsFromVoidOnTopOfDeck (line 121):**
-```rust
-StandardEffect::PutCardsFromVoidOnTopOfDeck { matching, count } => {
-    if *count == 1 {
-        format!("put {} from your void on top of your deck.", serialize_card_predicate(matching))
-    } else {
-        format!("put {{up-to-{}-cards}} {} from your void on top of your deck.", count, serialize_card_predicate_plural(matching))
-    }
-}
-```
-
-**GainEnergyEqualToCost (lines 54-59):**
-```rust
-StandardEffect::GainEnergyEqualToCost { target } => match target {
-    Predicate::It | Predicate::That => "gain {energy-symbol} equal to that character's cost.".to_string(),
-    Predicate::This => "gain {energy-symbol} equal to this character's cost.".to_string(),
-    _ => format!("gain {{energy-symbol}} equal to {}'s cost.", serialize_predicate(target)),
-},
-```
-
----
-
 ### Task 13: Implement Abandon Effects
 
 **Location:** `effect_serializer.rs` line 297 (catch-all)
