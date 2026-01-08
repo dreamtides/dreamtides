@@ -713,12 +713,45 @@ fn serialize_cards_in_void_gain_reclaim_this_turn(
                 text_formatting::card_predicate_base_text(predicate).capitalized_with_article()
             )
         }
+        CollectionExpression::Exactly(n) => {
+            format!(
+                "{} {} in your void gain {{reclaim}} equal to their cost this turn.",
+                n,
+                predicate_serializer::serialize_card_predicate_plural(predicate)
+            )
+        }
         CollectionExpression::All => {
             "all cards currently in your void gain {reclaim} equal to their cost this turn."
                 .to_string()
         }
-        _ => unimplemented!(
-            "Serialization not yet implemented for this collection expression in cards in void gain reclaim"
-        ),
+        CollectionExpression::AllButOne => {
+            format!(
+                "all but one {} in your void gain {{reclaim}} equal to their cost this turn.",
+                predicate_serializer::serialize_card_predicate_plural(predicate)
+            )
+        }
+        CollectionExpression::UpTo(n) => {
+            format!(
+                "up to {} {} in your void gain {{reclaim}} equal to their cost this turn.",
+                n,
+                predicate_serializer::serialize_card_predicate_plural(predicate)
+            )
+        }
+        CollectionExpression::AnyNumberOf => {
+            format!(
+                "any number of {} in your void gain {{reclaim}} equal to their cost this turn.",
+                predicate_serializer::serialize_card_predicate_plural(predicate)
+            )
+        }
+        CollectionExpression::OrMore(n) => {
+            format!(
+                "{} or more {} in your void gain {{reclaim}} equal to their cost this turn.",
+                n,
+                predicate_serializer::serialize_card_predicate_plural(predicate)
+            )
+        }
+        CollectionExpression::EachOther => {
+            "Each other card in your void gains {{reclaim}} equal to its cost this turn".to_string()
+        }
     }
 }

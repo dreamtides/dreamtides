@@ -23,29 +23,6 @@ The serializer is organized into several modules:
 
 ## Part 4: Other Serializer Features
 
-### Task 21: Implement CollectionExpression Cases in serialize_cards_in_void_gain_reclaim
-
-**Location:** `effect_serializer.rs` lines 491-509
-
-**Variants to add:**
-```rust
-CollectionExpression::UpTo(n) => {
-    format!(
-        "up to {} {} in your void gain {{reclaim}} equal to their cost this turn.",
-        n,
-        serialize_card_predicate_plural(predicate)
-    )
-}
-CollectionExpression::AnyNumberOf => {
-    format!(
-        "any number of {} in your void gain {{reclaim}} equal to their cost this turn.",
-        serialize_card_predicate_plural(predicate)
-    )
-}
-```
-
----
-
 ### Task 22: Implement TriggerEvent::MaterializeNthThisTurn
 
 **Location:** `trigger_serializer.rs` line 64

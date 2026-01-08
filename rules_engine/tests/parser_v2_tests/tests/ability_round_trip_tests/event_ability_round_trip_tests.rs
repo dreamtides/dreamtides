@@ -372,6 +372,40 @@ fn test_round_trip_all_cards_in_void_gain_reclaim_equal_to_cost() {
 }
 
 #[test]
+fn test_round_trip_up_to_two_characters_in_void_gain_reclaim() {
+    let original = "Up to 2 characters in your void gain {reclaim} equal to their cost this turn.";
+    let parsed = parse_ability(original, "reclaim-up-to: 2");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_any_number_of_events_in_void_gain_reclaim() {
+    let original =
+        "Any number of events in your void gain {reclaim} equal to their cost this turn.";
+    let parsed = parse_ability(original, "reclaim-any-number: true");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_three_characters_in_void_gain_reclaim() {
+    let original = "3 characters in your void gain {reclaim} equal to their cost this turn.";
+    let parsed = parse_ability(original, "reclaim-exactly: 3");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_two_or_more_characters_in_void_gain_reclaim() {
+    let original =
+        "2 or more characters in your void gain {reclaim} equal to their cost this turn.";
+    let parsed = parse_ability(original, "reclaim-or-more: 2");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
 fn test_round_trip_trigger_additional_judgment_phase() {
     let original = "At the end of this turn, trigger an additional {JudgmentPhaseName} phase.";
     let parsed = parse_ability(original, "");
