@@ -66,6 +66,10 @@ pub fn serialize_standard_effect(effect: &StandardEffect) -> String {
         }
         StandardEffect::LosePoints { .. } => "you lose {points}.".to_string(),
         StandardEffect::EnemyGainsPoints { .. } => "the opponent gains {points}.".to_string(),
+        StandardEffect::EnemyGainsPointsEqualToItsSpark => {
+            "the opponent gains points equal to its spark.".to_string()
+        }
+        StandardEffect::EnemyLosesPoints { .. } => "the opponent loses {points}.".to_string(),
         StandardEffect::Foresee { .. } => "{Foresee}.".to_string(),
         StandardEffect::Kindle { .. } => "{Kindle}.".to_string(),
         StandardEffect::GainsReclaimUntilEndOfTurn { target, cost } => match (target, cost) {

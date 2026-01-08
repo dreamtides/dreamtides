@@ -584,3 +584,35 @@ fn test_round_trip_enemy_cannot_be_dissolved_this_turn() {
     let serialized = ability_serializer::serialize_ability(&parsed);
     assert_eq!(original, serialized);
 }
+
+#[test]
+fn test_round_trip_banish_enemy_opponent_gains_points_equal_to_its_spark() {
+    let original = "{Banish} an enemy. The opponent gains points equal to its spark.";
+    let parsed = parse_ability(original, "");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_dissolve_it_opponent_gains_points_equal_to_its_spark() {
+    let original = "{Dissolve} it. The opponent gains points equal to its spark.";
+    let parsed = parse_ability(original, "");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_dissolve_ally_opponent_loses_points() {
+    let original = "{Dissolve} an ally. The opponent loses {points}.";
+    let parsed = parse_ability(original, "points: 2");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_opponent_loses_points() {
+    let original = "The opponent loses {points}.";
+    let parsed = parse_ability(original, "points: 1");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}

@@ -21,20 +21,6 @@ The serializer is organized into several modules:
 
 ---
 
-### Task 16: Implement Enemy and Points Effects
-
-**Location:** `effect_serializer.rs` line 297 (catch-all)
-
-**Implementation:**
-```rust
-StandardEffect::EnemyGainsPointsEqualToItsSpark => {
-    "the opponent gains points equal to its spark.".to_string()
-}
-StandardEffect::EnemyLosesPoints { .. } => "the opponent loses {points}.".to_string(),
-```
-
----
-
 ### Task 17: Implement Spark Gain Effects
 
 **Location:** `effect_serializer.rs` line 297 (catch-all)
