@@ -19,45 +19,6 @@ The serializer is organized into several modules:
 
 ## Part 3: Effect Serialization Features
 
-### Task 10: Implement Collection-Based Effect Variants
-
-**Location:** `effect_serializer.rs`
-
-**DissolveCharactersCount (lines 140-151):**
-```rust
-StandardEffect::DissolveCharactersCount { target, count } => match count {
-    CollectionExpression::All => format!("{{Dissolve}} all {}.", serialize_predicate_plural(target)),
-    CollectionExpression::Exactly(n) => format!("{{Dissolve}} {} {}.", n, serialize_predicate_plural(target)),
-    CollectionExpression::UpTo(n) => format!("{{Dissolve}} up to {} {}.", n, serialize_predicate_plural(target)),
-    CollectionExpression::AnyNumberOf => format!("{{Dissolve}} any number of {}.", serialize_predicate_plural(target)),
-    _ => format!("{{Dissolve}} {}.", serialize_predicate(target)),
-},
-```
-
-**BanishCollection (lines 155-160):**
-```rust
-StandardEffect::BanishCollection { target, count } => match count {
-    CollectionExpression::AnyNumberOf => format!("{{Banish}} any number of {}.", serialize_predicate_plural(target)),
-    CollectionExpression::All => format!("{{Banish}} all {}.", serialize_predicate_plural(target)),
-    CollectionExpression::Exactly(n) => format!("{{Banish}} {} {}.", n, serialize_predicate_plural(target)),
-    CollectionExpression::UpTo(n) => format!("{{Banish}} up to {} {}.", n, serialize_predicate_plural(target)),
-    _ => format!("{{Banish}} {}.", serialize_predicate(target)),
-},
-```
-
-**MaterializeCollection (lines 246-254):**
-```rust
-StandardEffect::MaterializeCollection { target, count } => match (target, count) {
-    (Predicate::Them, CollectionExpression::All) => "{Materialize} them.".to_string(),
-    (_, CollectionExpression::All) => format!("{{Materialize}} all {}.", serialize_predicate_plural(target)),
-    (_, CollectionExpression::AnyNumberOf) => format!("{{Materialize}} any number of {}.", serialize_predicate_plural(target)),
-    (_, CollectionExpression::UpTo(n)) => format!("{{Materialize}} up to {} {}.", n, serialize_predicate_plural(target)),
-    _ => format!("{{Materialize}} {}.", serialize_predicate(target)),
-},
-```
-
----
-
 ### Task 11: Implement Materialize Copy and Figment Effects
 
 **Location:** `effect_serializer.rs`

@@ -139,18 +139,35 @@ pub fn serialize_standard_effect(effect: &StandardEffect) -> String {
         StandardEffect::DissolveCharacter { target } => {
             format!("{{Dissolve}} {}.", predicate_serializer::serialize_predicate(target))
         }
-        StandardEffect::DissolveCharactersCount { target, count } => {
-            use ability_data::collection_expression::CollectionExpression;
-            match count {
-                CollectionExpression::All => match target {
-                    Predicate::Any(CardPredicate::Character) => {
-                        "{Dissolve} all characters.".to_string()
-                    }
-                    _ => unimplemented!("Unsupported dissolve all characters target"),
-                },
-                _ => unimplemented!("Unsupported dissolve characters count"),
+        StandardEffect::DissolveCharactersCount { target, count } => match count {
+            CollectionExpression::All => {
+                format!(
+                    "{{Dissolve}} all {}.",
+                    predicate_serializer::serialize_predicate_plural(target)
+                )
             }
-        }
+            CollectionExpression::Exactly(n) => {
+                format!(
+                    "{{Dissolve}} {} {}.",
+                    n,
+                    predicate_serializer::serialize_predicate_plural(target)
+                )
+            }
+            CollectionExpression::UpTo(n) => {
+                format!(
+                    "{{Dissolve}} up to {} {}.",
+                    n,
+                    predicate_serializer::serialize_predicate_plural(target)
+                )
+            }
+            CollectionExpression::AnyNumberOf => {
+                format!(
+                    "{{Dissolve}} any number of {}.",
+                    predicate_serializer::serialize_predicate_plural(target)
+                )
+            }
+            _ => format!("{{Dissolve}} {}.", predicate_serializer::serialize_predicate(target)),
+        },
         StandardEffect::BanishCharacter { target } => {
             format!("{{Banish}} {}.", predicate_serializer::serialize_predicate(target))
         }
@@ -161,7 +178,27 @@ pub fn serialize_standard_effect(effect: &StandardEffect) -> String {
                     predicate_serializer::serialize_predicate_plural(target)
                 )
             }
-            _ => unimplemented!("Serialization not yet implemented for this banish collection"),
+            CollectionExpression::All => {
+                format!(
+                    "{{Banish}} all {}.",
+                    predicate_serializer::serialize_predicate_plural(target)
+                )
+            }
+            CollectionExpression::Exactly(n) => {
+                format!(
+                    "{{Banish}} {} {}.",
+                    n,
+                    predicate_serializer::serialize_predicate_plural(target)
+                )
+            }
+            CollectionExpression::UpTo(n) => {
+                format!(
+                    "{{Banish}} up to {} {}.",
+                    n,
+                    predicate_serializer::serialize_predicate_plural(target)
+                )
+            }
+            _ => format!("{{Banish}} {}.", predicate_serializer::serialize_predicate(target)),
         },
         StandardEffect::BanishCardsFromEnemyVoid { .. } => {
             "{Banish} {cards} from the opponent's void.".to_string()
@@ -272,15 +309,29 @@ pub fn serialize_standard_effect(effect: &StandardEffect) -> String {
         StandardEffect::CardsInVoidGainReclaimThisTurn { count, predicate } => {
             serialize_cards_in_void_gain_reclaim_this_turn(count, predicate)
         }
-        StandardEffect::MaterializeCollection { target, count } => {
-            if matches!(target, Predicate::Them) && matches!(count, CollectionExpression::All) {
-                "{Materialize} them.".to_string()
-            } else {
-                unimplemented!(
-                    "Serialization not yet implemented for this materialize collection pattern"
+        StandardEffect::MaterializeCollection { target, count } => match (target, count) {
+            (Predicate::Them, CollectionExpression::All) => "{Materialize} them.".to_string(),
+            (_, CollectionExpression::All) => {
+                format!(
+                    "{{Materialize}} all {}.",
+                    predicate_serializer::serialize_predicate_plural(target)
                 )
             }
-        }
+            (_, CollectionExpression::AnyNumberOf) => {
+                format!(
+                    "{{Materialize}} any number of {}.",
+                    predicate_serializer::serialize_predicate_plural(target)
+                )
+            }
+            (_, CollectionExpression::UpTo(n)) => {
+                format!(
+                    "{{Materialize}} up to {} {}.",
+                    n,
+                    predicate_serializer::serialize_predicate_plural(target)
+                )
+            }
+            _ => format!("{{Materialize}} {}.", predicate_serializer::serialize_predicate(target)),
+        },
         StandardEffect::MaterializeRandomFromDeck { predicate, .. } => {
             format!(
                 "{{Materialize}} {{n-random-characters}} {} from your deck.",
