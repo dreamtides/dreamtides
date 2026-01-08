@@ -70,8 +70,37 @@ fn serialize_predicate_count(
             }
             "{count-allies}".to_string()
         }
-        _ => {
-            unimplemented!("Serialization not yet implemented for this predicate count type")
-        }
+        Predicate::Another(card_predicate) => predicate_serializer::serialize_predicate_plural(
+            &Predicate::Another(card_predicate.clone()),
+            bindings,
+        ),
+        Predicate::This => predicate_serializer::serialize_predicate_plural(predicate, bindings),
+        Predicate::It => predicate_serializer::serialize_predicate_plural(predicate, bindings),
+        Predicate::Them => predicate_serializer::serialize_predicate_plural(predicate, bindings),
+        Predicate::That => predicate_serializer::serialize_predicate_plural(predicate, bindings),
+        Predicate::Enemy(card_predicate) => predicate_serializer::serialize_predicate_plural(
+            &Predicate::Enemy(card_predicate.clone()),
+            bindings,
+        ),
+        Predicate::Your(card_predicate) => predicate_serializer::serialize_predicate_plural(
+            &Predicate::Your(card_predicate.clone()),
+            bindings,
+        ),
+        Predicate::Any(card_predicate) => predicate_serializer::serialize_predicate_plural(
+            &Predicate::Any(card_predicate.clone()),
+            bindings,
+        ),
+        Predicate::AnyOther(card_predicate) => predicate_serializer::serialize_predicate_plural(
+            &Predicate::AnyOther(card_predicate.clone()),
+            bindings,
+        ),
+        Predicate::YourVoid(card_predicate) => predicate_serializer::serialize_predicate_plural(
+            &Predicate::YourVoid(card_predicate.clone()),
+            bindings,
+        ),
+        Predicate::EnemyVoid(card_predicate) => predicate_serializer::serialize_predicate_plural(
+            &Predicate::EnemyVoid(card_predicate.clone()),
+            bindings,
+        ),
     }
 }
