@@ -832,10 +832,29 @@ pub fn serialize_for_count_expression(
         QuantityExpression::ReturnedToHandThisWay(CardPredicate::CharacterType(_)) => {
             "allied {subtype} returned".to_string()
         }
-        QuantityExpression::ForEachEnergySpentOnThisCard => "{energy-symbol} spent".to_string(),
-        _ => {
-            unimplemented!("Serialization not yet implemented for this quantity expression")
+        QuantityExpression::ReturnedToHandThisWay(predicate) => {
+            format!("{} returned", text_formatting::card_predicate_base_text(predicate).plural())
         }
+        QuantityExpression::AbandonedThisTurn(predicate) => format!(
+            "{} abandoned this turn",
+            text_formatting::card_predicate_base_text(predicate).plural()
+        ),
+        QuantityExpression::AbandonedThisWay(predicate) => {
+            format!("{} abandoned", text_formatting::card_predicate_base_text(predicate).plural())
+        }
+        QuantityExpression::ForEachEnergySpentOnThisCard => "{energy-symbol} spent".to_string(),
+        QuantityExpression::CardsDrawnThisTurn(predicate) => format!(
+            "{} you have drawn this turn",
+            text_formatting::card_predicate_base_text(predicate).plural()
+        ),
+        QuantityExpression::DiscardedThisTurn(predicate) => format!(
+            "{} you have discarded this turn",
+            text_formatting::card_predicate_base_text(predicate).plural()
+        ),
+        QuantityExpression::DissolvedThisTurn(predicate) => format!(
+            "{} which dissolved this turn",
+            text_formatting::card_predicate_base_text(predicate).plural()
+        ),
     }
 }
 
