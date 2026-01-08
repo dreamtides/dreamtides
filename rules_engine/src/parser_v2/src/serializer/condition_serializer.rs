@@ -37,6 +37,7 @@ pub fn serialize_condition(condition: &Condition) -> String {
 fn serialize_predicate_count(_count: u32, predicate: &Predicate) -> String {
     match predicate {
         Predicate::Another(CardPredicate::CharacterType(_)) => "{count-allied-subtype}".to_string(),
+        Predicate::Another(CardPredicate::Character) => "{count-allies}".to_string(),
         _ => {
             unimplemented!("Serialization not yet implemented for this predicate count type")
         }

@@ -439,6 +439,14 @@ fn test_round_trip_return_all_but_one_ally_draw_cards() {
 }
 
 #[test]
+fn test_round_trip_return_allies_draw_cards_for_each_allied_subtype_returned() {
+    let original = "Return all allies to hand. Draw {cards} for each allied {subtype} returned.";
+    let parsed = parse_ability(original, "subtype: warrior, cards: 1");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
 fn test_round_trip_take_an_extra_turn_after_this_one() {
     let original = "Take an extra turn after this one.";
     let parsed = parse_ability(original, "");

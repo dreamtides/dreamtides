@@ -130,6 +130,22 @@ fn test_round_trip_abandon_count_allies_reclaim_this_character() {
 }
 
 #[test]
+fn test_round_trip_abandon_any_number_of_allies_draw_cards_for_each_abandoned() {
+    let original = "Abandon any number of allies: Draw {cards} for each ally abandoned.";
+    let parsed = parse_ability(original, "cards: 1");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_abandon_allies_draw_cards_for_each_allied_subtype_abandoned() {
+    let original = "Abandon any number of allies: Draw {cards} for each allied {subtype} abandoned.";
+    let parsed = parse_ability(original, "subtype: warrior, cards: 1");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
 fn test_round_trip_abandon_ally_gain_energy_equal_to_cost() {
     let original = "Abandon an ally: Gain {energy-symbol} equal to that character's cost.";
     let parsed = parse_ability(original, "");

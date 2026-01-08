@@ -248,6 +248,14 @@ fn test_round_trip_materialized_judgment_with_count_allied_subtype_draw_cards() 
 }
 
 #[test]
+fn test_round_trip_judgment_with_count_allies_gain_energy() {
+    let original = "{Judgment} With {count-allies}, gain {e}.";
+    let parsed = parse_ability(original, "allies: 3, e: 2");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
 fn test_round_trip_materialized_each_player_discards() {
     let original = "{Materialized} Each player discards {discards}.";
     let parsed = parse_ability(original, "discards: 1");
@@ -276,6 +284,14 @@ fn test_round_trip_materialized_discard_chosen_card_from_opponent_hand_they_draw
 fn test_round_trip_materialized_draw_cards_for_each_ally_abandoned_this_turn() {
     let original = "{Materialized} Draw {cards} for each ally abandoned this turn.";
     let parsed = parse_ability(original, "cards: 2");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_materialized_draw_cards_for_each_allied_subtype_abandoned_this_turn() {
+    let original = "{Materialized} Draw {cards} for each allied {subtype} abandoned this turn.";
+    let parsed = parse_ability(original, "subtype: warrior, cards: 1");
     let serialized = ability_serializer::serialize_ability(&parsed);
     assert_eq!(original, serialized);
 }

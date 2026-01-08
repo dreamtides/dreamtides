@@ -670,11 +670,20 @@ fn serialize_for_count_expression(quantity_expression: &QuantityExpression) -> S
         QuantityExpression::AbandonedThisTurn(CardPredicate::Character) => {
             "allies abandoned this turn".to_string()
         }
+        QuantityExpression::AbandonedThisTurn(CardPredicate::CharacterType(_)) => {
+            "allied {subtype} abandoned this turn".to_string()
+        }
         QuantityExpression::AbandonedThisWay(CardPredicate::Character) => {
             "allies abandoned".to_string()
         }
+        QuantityExpression::AbandonedThisWay(CardPredicate::CharacterType(_)) => {
+            "allied {subtype} abandoned".to_string()
+        }
         QuantityExpression::ReturnedToHandThisWay(CardPredicate::Character) => {
             "allies returned".to_string()
+        }
+        QuantityExpression::ReturnedToHandThisWay(CardPredicate::CharacterType(_)) => {
+            "allied {subtype} returned".to_string()
         }
         QuantityExpression::ForEachEnergySpentOnThisCard => "{energy-symbol} spent".to_string(),
         _ => {

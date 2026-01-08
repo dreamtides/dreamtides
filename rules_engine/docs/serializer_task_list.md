@@ -23,34 +23,6 @@ The serializer is organized into several modules:
 
 ## Part 4: Other Serializer Features
 
-### Task 20: Implement Missing QuantityExpression Variants
-
-**Location:** `effect_serializer.rs` lines 452-482
-
-**In `serialize_predicate_count` (lines 452-458):**
-```rust
-Predicate::Another(CardPredicate::Character) => "{count-allies}".to_string(),
-Predicate::Your(card_predicate) => {
-    format!("{{count-your-{}}}", card_predicate_base_text(card_predicate).without_article())
-}
-Predicate::Enemy(CardPredicate::Character) => "{count-enemies}".to_string(),
-```
-
-**In `serialize_for_count_expression` (lines 461-482):**
-```rust
-QuantityExpression::AbandonedThisTurn(CardPredicate::CharacterType(_)) => {
-    "allied {subtype} abandoned this turn".to_string()
-}
-QuantityExpression::AbandonedThisWay(CardPredicate::CharacterType(_)) => {
-    "allied {subtype} abandoned this way".to_string()
-}
-QuantityExpression::ReturnedToHandThisWay(CardPredicate::CharacterType(_)) => {
-    "allied {subtype} returned this way".to_string()
-}
-```
-
----
-
 ### Task 21: Implement CollectionExpression Cases in serialize_cards_in_void_gain_reclaim
 
 **Location:** `effect_serializer.rs` lines 491-509
