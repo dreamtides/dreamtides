@@ -236,13 +236,40 @@ pub fn serialize_standard_effect(effect: &StandardEffect) -> String {
             )
         }
         StandardEffect::MaterializeSilentCopy { target, count, quantity } => {
-            if *count == 1 && matches!(quantity, QuantityExpression::Matching(_)) {
-                format!(
-                    "{{Materialize}} a copy of {}.",
-                    predicate_serializer::serialize_predicate(target)
-                )
-            } else {
-                unimplemented!("Serialization not yet implemented for this materialize copy effect")
+            match (count, quantity) {
+                (1, QuantityExpression::Matching(_)) => {
+                    format!(
+                        "{{Materialize}} a copy of {}.",
+                        predicate_serializer::serialize_predicate(target)
+                    )
+                }
+                (n, QuantityExpression::Matching(_)) if *n > 1 => {
+                    format!(
+                        "{{Materialize}} {} copies of {}.",
+                        n,
+                        predicate_serializer::serialize_predicate(target)
+                    )
+                }
+                (_, QuantityExpression::Matching(predicate)) => {
+                    format!(
+                        "{{Materialize}} a number of copies of {} equal to the number of {}.",
+                        predicate_serializer::serialize_predicate(target),
+                        predicate_serializer::serialize_predicate_plural(predicate)
+                    )
+                }
+                (_, QuantityExpression::ForEachEnergySpentOnThisCard) => {
+                    format!(
+                        "{{Materialize}} a number of copies of {} equal to the amount of {{energy-symbol}} spent.",
+                        predicate_serializer::serialize_predicate(target)
+                    )
+                }
+                (_, quantity_expr) => {
+                    format!(
+                        "{{Materialize}} a number of copies of {} equal to the number of {}.",
+                        predicate_serializer::serialize_predicate(target),
+                        serialize_for_count_expression(quantity_expr)
+                    )
+                }
             }
         }
         StandardEffect::MaterializeFigments { count, .. } => {
@@ -253,12 +280,26 @@ pub fn serialize_standard_effect(effect: &StandardEffect) -> String {
             }
         }
         StandardEffect::MaterializeFigmentsQuantity { count, quantity, .. } => {
-            if *count == 1 && matches!(quantity, QuantityExpression::PlayedThisTurn(_)) {
-                "{Materialize} {a-figment} for each card you have played this turn.".to_string()
-            } else {
-                unimplemented!(
-                    "Serialization not yet implemented for this materialize figments quantity"
-                )
+            let figment_text = if *count == 1 { "{a-figment}" } else { "{n-figments}" };
+            match quantity {
+                QuantityExpression::PlayedThisTurn(_) => {
+                    format!(
+                        "{{Materialize}} {} for each card you have played this turn.",
+                        figment_text
+                    )
+                }
+                QuantityExpression::Matching(predicate) => {
+                    format!(
+                        "{{Materialize}} {} for each {}.",
+                        figment_text,
+                        predicate_serializer::serialize_for_each_predicate(predicate)
+                    )
+                }
+                _ => format!(
+                    "{{Materialize}} {} for each {}.",
+                    figment_text,
+                    serialize_for_count_expression(quantity)
+                ),
             }
         }
         StandardEffect::ReturnToHand { target } => match target {

@@ -282,6 +282,54 @@ fn test_round_trip_materialize_a_figment_for_each_card_played_this_turn() {
 }
 
 #[test]
+fn test_round_trip_materialize_a_figment_for_each_ally() {
+    let original = "{Materialize} {a-figment} for each ally.";
+    let parsed = parse_ability(original, "figment: shadow");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_materialize_n_figments_for_each_allied_subtype() {
+    let original = "{Materialize} {n-figments} for each allied {subtype}.";
+    let parsed = parse_ability(original, "figment: celestial, number: 2, subtype: warrior");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_materialize_a_copy_of_target() {
+    let original = "{Materialize} a copy of an ally.";
+    let parsed = parse_ability(original, "");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_materialize_n_copies_of_target() {
+    let original = "{Materialize} 3 copies of an enemy.";
+    let parsed = parse_ability(original, "");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_materialize_copies_equal_to_allies() {
+    let original = "{Materialize} a number of copies of that character equal to the number of allies.";
+    let parsed = parse_ability(original, "");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_materialize_copies_equal_to_energy_spent() {
+    let original = "{Materialize} a number of copies of an ally equal to the amount of {energy-symbol} spent.";
+    let parsed = parse_ability(original, "");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
 fn test_round_trip_copy_next_event() {
     let original = "Copy the next event you play {this-turn-times}.";
     let parsed = parse_ability(original, "number: 2");

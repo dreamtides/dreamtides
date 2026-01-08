@@ -19,49 +19,6 @@ The serializer is organized into several modules:
 
 ## Part 3: Effect Serialization Features
 
-### Task 11: Implement Materialize Copy and Figment Effects
-
-**Location:** `effect_serializer.rs`
-
-**MaterializeSilentCopy (lines 187-192):**
-```rust
-StandardEffect::MaterializeSilentCopy { target, count, quantity } => {
-    match (count, quantity) {
-        (1, QuantityExpression::Matching(_)) => {
-            format!("{{Materialize}} a copy of {}.", serialize_predicate(target))
-        }
-        (n, QuantityExpression::Matching(_)) if *n > 1 => {
-            format!("{{Materialize}} {} copies of {}.", n, serialize_predicate(target))
-        }
-        (_, quantity_expr) => {
-            format!(
-                "{{Materialize}} copies of {} equal to the number of {}.",
-                serialize_predicate(target),
-                serialize_for_count_expression(quantity_expr)
-            )
-        }
-    }
-}
-```
-
-**MaterializeFigmentsQuantity (lines 201-209):**
-```rust
-StandardEffect::MaterializeFigmentsQuantity { figment, count, quantity } => {
-    let figment_text = if *count == 1 { "{a-figment}" } else { "{n-figments}" };
-    match quantity {
-        QuantityExpression::PlayedThisTurn(_) => {
-            format!("{{Materialize}} {} for each card you have played this turn.", figment_text)
-        }
-        QuantityExpression::Matching(predicate) => {
-            format!("{{Materialize}} {} for each {}.", figment_text, serialize_for_each_predicate(predicate))
-        }
-        _ => format!("{{Materialize}} {} for each {}.", figment_text, serialize_for_count_expression(quantity)),
-    }
-}
-```
-
----
-
 ### Task 12: Implement TriggerJudgmentAbility and PutCardsFromVoid Effects
 
 **Location:** `effect_serializer.rs`
