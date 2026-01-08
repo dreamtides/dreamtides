@@ -21,26 +21,6 @@ The serializer is organized into several modules:
 
 ---
 
-### Task 17: Implement Spark Gain Effects
-
-**Location:** `effect_serializer.rs` line 297 (catch-all)
-
-**Implementation:**
-```rust
-StandardEffect::GainsAegisThisTurn { target } => {
-    format!("{} gains {{Aegis}} this turn.", serialize_predicate(target))
-}
-StandardEffect::GainsSparkUntilYourNextMainForEach { target, for_each, .. } => {
-    format!(
-        "{} gains +{{s}} spark until your next main phase for each {}.",
-        serialize_predicate(target),
-        serialize_for_each_predicate(for_each)
-    )
-}
-```
-
----
-
 ### Task 18: Implement Energy and Materialize Effects
 
 **Location:** `effect_serializer.rs` line 297 (catch-all)

@@ -616,3 +616,36 @@ fn test_round_trip_opponent_loses_points() {
     let serialized = ability_serializer::serialize_ability(&parsed);
     assert_eq!(original, serialized);
 }
+
+#[test]
+fn test_round_trip_ally_gains_aegis_this_turn() {
+    let original = "An ally gains {Aegis} this turn.";
+    let parsed = parse_ability(original, "");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_this_character_gains_aegis_this_turn() {
+    let original = "This character gains {Aegis} this turn.";
+    let parsed = parse_ability(original, "");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_ally_gains_spark_until_next_main_for_each_ally() {
+    let original = "An ally gains +{s} spark until your next main phase for each ally.";
+    let parsed = parse_ability(original, "s: 1");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_this_character_gains_spark_until_next_main_for_each_subtype() {
+    let original =
+        "This character gains +{s} spark until your next main phase for each allied {subtype}.";
+    let parsed = parse_ability(original, "s: 2, subtype: warrior");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}

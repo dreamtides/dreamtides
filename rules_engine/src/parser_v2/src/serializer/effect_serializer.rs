@@ -464,6 +464,19 @@ pub fn serialize_standard_effect(effect: &StandardEffect) -> String {
                 predicate_serializer::serialize_predicate(target)
             )
         }
+        StandardEffect::GainsAegisThisTurn { target } => {
+            format!(
+                "{} gains {{Aegis}} this turn.",
+                predicate_serializer::serialize_predicate(target)
+            )
+        }
+        StandardEffect::GainsSparkUntilYourNextMainForEach { target, for_each, .. } => {
+            format!(
+                "{} gains +{{s}} spark until your next main phase for each {}.",
+                predicate_serializer::serialize_predicate(target),
+                predicate_serializer::serialize_for_each_predicate(for_each)
+            )
+        }
         _ => unimplemented!("Serialization not yet implemented for this effect type"),
     }
 }
