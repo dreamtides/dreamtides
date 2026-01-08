@@ -356,6 +356,14 @@ pub fn serialize_for_each_predicate(predicate: &Predicate) -> String {
     match predicate {
         Predicate::Another(CardPredicate::Character) => "allied character".to_string(),
         Predicate::Another(CardPredicate::CharacterType(_)) => "allied {subtype}".to_string(),
+        Predicate::Your(CardPredicate::Character) => "ally".to_string(),
+        Predicate::Your(CardPredicate::CharacterType(_)) => "allied {subtype}".to_string(),
+        Predicate::Enemy(CardPredicate::Character) => "enemy".to_string(),
+        Predicate::Any(CardPredicate::Character) => "character".to_string(),
+        Predicate::Any(CardPredicate::Card) => "card".to_string(),
+        Predicate::YourVoid(CardPredicate::Card) => "card in your void".to_string(),
+        Predicate::This => "this character".to_string(),
+        Predicate::It => "that character".to_string(),
         _ => {
             unimplemented!("Serialization not yet implemented for this for-each predicate")
         }

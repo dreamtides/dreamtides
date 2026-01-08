@@ -17,24 +17,6 @@ The serializer is organized into several modules:
 
 ---
 
-### Task 9: Implement Missing serialize_for_each_predicate Variants
-
-**Location:** `predicate_serializer.rs` lines 194-201
-
-**Variants to add:**
-```rust
-Predicate::Your(CardPredicate::Character) => "ally you control".to_string(),
-Predicate::Your(CardPredicate::CharacterType(_)) => "allied {subtype} you control".to_string(),
-Predicate::Enemy(CardPredicate::Character) => "enemy".to_string(),
-Predicate::Any(CardPredicate::Character) => "character".to_string(),
-Predicate::Any(CardPredicate::Card) => "card".to_string(),
-Predicate::YourVoid(CardPredicate::Card) => "card in your void".to_string(),
-Predicate::This => "this character".to_string(),
-Predicate::It => "that character".to_string(),
-```
-
----
-
 ## Part 3: Effect Serialization Features
 
 ### Task 10: Implement Collection-Based Effect Variants

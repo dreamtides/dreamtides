@@ -208,3 +208,51 @@ fn test_round_trip_when_play_fast_character_that_is_not_subtype() {
     let serialized = ability_serializer::serialize_ability(&parsed);
     assert_eq!(original, serialized);
 }
+
+#[test]
+fn test_round_trip_gain_energy_for_each_ally() {
+    let original = "Gain {e} for each ally.";
+    let parsed = parse_ability(original, "e: 1");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_gain_spark_for_each_allied_subtype() {
+    let original = "An ally gains +{s} spark for each allied {subtype}.";
+    let parsed = parse_ability(original, "subtype: warrior, s: 1");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_draw_cards_for_each_enemy() {
+    let original = "Draw {cards} for each enemy.";
+    let parsed = parse_ability(original, "cards: 1");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_gain_energy_for_each_character() {
+    let original = "Gain {e} for each character.";
+    let parsed = parse_ability(original, "e: 1");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_gain_points_for_each_card() {
+    let original = "Gain {points} for each card.";
+    let parsed = parse_ability(original, "points: 1");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_gain_energy_for_each_card_in_your_void() {
+    let original = "Gain {e} for each card in your void.";
+    let parsed = parse_ability(original, "e: 1");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
