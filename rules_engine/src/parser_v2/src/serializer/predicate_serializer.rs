@@ -63,7 +63,13 @@ pub fn serialize_predicate_plural(
                 serialize_card_predicate_plural(card_predicate, bindings)
             )
         }
-        _ => unimplemented!("Serialization not yet implemented for this plural predicate type"),
+        Predicate::This => "these characters".to_string(),
+        Predicate::That => "those characters".to_string(),
+        Predicate::Them => "them".to_string(),
+        Predicate::It => "them".to_string(),
+        Predicate::AnyOther(card_predicate) => {
+            format!("other {}", serialize_card_predicate_plural(card_predicate, bindings))
+        }
     }
 }
 
@@ -249,8 +255,25 @@ pub fn serialize_card_predicate_plural(
         CardPredicate::Fast { target } => {
             format!("fast {}", serialize_card_predicate_plural(target, bindings))
         }
-        _ => {
-            unimplemented!("Serialization not yet implemented for this card predicate type")
+        CardPredicate::CardWithCost { target, cost_operator, .. } => format!(
+            "{} with cost {{e}} {}",
+            serialize_card_predicate_plural(target, bindings),
+            serializer_utils::serialize_operator(cost_operator)
+        ),
+        CardPredicate::CharacterWithMaterializedAbility => {
+            "characters with {materialized} abilities".to_string()
+        }
+        CardPredicate::CharacterWithMultiActivatedAbility => {
+            "characters with activated abilities".to_string()
+        }
+        CardPredicate::CharacterWithSparkComparedToEnergySpent { target, .. } => {
+            format!(
+                "{} with spark less than the amount of {{energy-symbol}} paid",
+                serialize_card_predicate_plural(target, bindings)
+            )
+        }
+        CardPredicate::CouldDissolve { target } => {
+            format!("events which could {{dissolve}} {}", predicate_base_text(target, bindings))
         }
     }
 }
@@ -312,7 +335,24 @@ pub fn serialize_fast_target(
                 serializer_utils::serialize_operator(cost_operator)
             )
         }
-        _ => unimplemented!("Unsupported fast target"),
+        CardPredicate::CharacterWithMaterializedAbility => {
+            "character with a {materialized} ability".to_string()
+        }
+        CardPredicate::CharacterWithMultiActivatedAbility => {
+            "character with an activated ability".to_string()
+        }
+        CardPredicate::CharacterWithSparkComparedToEnergySpent { target, .. } => {
+            format!(
+                "{} with spark less than the amount of {{energy-symbol}} paid",
+                serialize_fast_target(target, bindings)
+            )
+        }
+        CardPredicate::CouldDissolve { target } => {
+            format!("event which could {{dissolve}} {}", predicate_base_text(target, bindings))
+        }
+        CardPredicate::Fast { target } => {
+            format!("fast {}", serialize_fast_target(target, bindings))
+        }
     }
 }
 
@@ -337,8 +377,42 @@ pub fn serialize_for_each_predicate(
         Predicate::YourVoid(CardPredicate::Card) => "card in your void".to_string(),
         Predicate::This => "this character".to_string(),
         Predicate::It => "that character".to_string(),
-        _ => {
-            unimplemented!("Serialization not yet implemented for this for-each predicate")
+        Predicate::That => "that character".to_string(),
+        Predicate::Them => "character".to_string(),
+        Predicate::Enemy(CardPredicate::CharacterType(subtype)) => {
+            bindings.insert("subtype".to_string(), VariableValue::Subtype(*subtype));
+            "enemy {subtype}".to_string()
+        }
+        Predicate::Any(CardPredicate::CharacterType(subtype)) => {
+            bindings.insert("subtype".to_string(), VariableValue::Subtype(*subtype));
+            "{subtype}".to_string()
+        }
+        Predicate::Any(CardPredicate::Event) => "event".to_string(),
+        Predicate::AnyOther(CardPredicate::Character) => "other character".to_string(),
+        Predicate::AnyOther(CardPredicate::CharacterType(subtype)) => {
+            bindings.insert("subtype".to_string(), VariableValue::Subtype(*subtype));
+            "other {subtype}".to_string()
+        }
+        Predicate::YourVoid(CardPredicate::Character) => "character in your void".to_string(),
+        Predicate::YourVoid(CardPredicate::CharacterType(subtype)) => {
+            bindings.insert("subtype".to_string(), VariableValue::Subtype(*subtype));
+            "{subtype} in your void".to_string()
+        }
+        Predicate::YourVoid(CardPredicate::Event) => "event in your void".to_string(),
+        Predicate::EnemyVoid(CardPredicate::Card) => "card in the opponent's void".to_string(),
+        Predicate::EnemyVoid(CardPredicate::Character) => {
+            "character in the opponent's void".to_string()
+        }
+        Predicate::EnemyVoid(CardPredicate::Event) => "event in the opponent's void".to_string(),
+        Predicate::Your(CardPredicate::Event) => "allied event".to_string(),
+        Predicate::Another(CardPredicate::CharacterWithSpark(_, operator)) => {
+            format!("ally with spark {{s}} {}", serializer_utils::serialize_operator(operator))
+        }
+        Predicate::Your(CardPredicate::CharacterWithSpark(_, operator)) => {
+            format!("ally with spark {{s}} {}", serializer_utils::serialize_operator(operator))
+        }
+        predicate => {
+            format!("each {}", predicate_base_text(predicate, bindings))
         }
     }
 }
@@ -377,9 +451,47 @@ fn your_predicate_formatted(
             serialize_your_predicate(target, bindings),
             serializer_utils::serialize_operator(cost_operator)
         )),
-        _ => {
-            unimplemented!("Serialization not yet implemented for this your predicate type")
+        CardPredicate::CharacterWithCostComparedToControlled { target, count_matching, .. } => {
+            FormattedText::new(&format!(
+                "{} with cost less than the number of allied {}",
+                serialize_your_predicate(target, bindings),
+                serialize_card_predicate_plural(count_matching, bindings)
+            ))
         }
+        CardPredicate::CharacterWithCostComparedToAbandoned { target, .. } => {
+            FormattedText::new(&format!(
+                "{} with cost less than the abandoned ally's cost",
+                serialize_your_predicate(target, bindings)
+            ))
+        }
+        CardPredicate::CharacterWithSparkComparedToAbandoned { target, .. } => {
+            FormattedText::new(&format!(
+                "{} with spark less than the abandoned ally's spark",
+                serialize_your_predicate(target, bindings)
+            ))
+        }
+        CardPredicate::CharacterWithSparkComparedToAbandonedCountThisTurn { target, .. } => {
+            FormattedText::new(&format!(
+                "{} with spark less than the number of allies abandoned this turn",
+                serialize_your_predicate(target, bindings)
+            ))
+        }
+        CardPredicate::CharacterWithCostComparedToVoidCount { target, .. } => {
+            FormattedText::new(&format!(
+                "{} with cost less than the number of cards in your void",
+                serialize_your_predicate(target, bindings)
+            ))
+        }
+        CardPredicate::CharacterWithSparkComparedToEnergySpent { target, .. } => {
+            FormattedText::new(&format!(
+                "{} with spark less than the amount of {{energy-symbol}} paid",
+                serialize_your_predicate(target, bindings)
+            ))
+        }
+        CardPredicate::CouldDissolve { target } => FormattedText::new(&format!(
+            "your event which could {{dissolve}} {}",
+            predicate_base_text(target, bindings)
+        )),
     }
 }
 
@@ -452,9 +564,11 @@ fn enemy_predicate_formatted(
         CardPredicate::Fast { target } => {
             FormattedText::new(&format!("fast {}", serialize_enemy_predicate(target, bindings)))
         }
-        _ => {
-            unimplemented!("Serialization not yet implemented for this enemy predicate type")
-        }
+        CardPredicate::Event => FormattedText::new("enemy event"),
+        CardPredicate::CouldDissolve { target } => FormattedText::new(&format!(
+            "enemy event which could {{dissolve}} {}",
+            predicate_base_text(target, bindings)
+        )),
     }
 }
 
@@ -473,7 +587,67 @@ fn serialize_your_predicate_plural(
         CardPredicate::Fast { target } => {
             format!("allied fast {}", serialize_card_predicate_plural(target, bindings))
         }
-        _ => unimplemented!("Serialization not yet implemented for this allied plural predicate"),
+        CardPredicate::NotCharacterType(subtype) => {
+            bindings.insert("subtype".to_string(), VariableValue::Subtype(*subtype));
+            "allies that are not {plural-subtype}".to_string()
+        }
+        CardPredicate::CharacterWithSpark(_, operator) => {
+            format!("allies with spark {{s}} {}", serializer_utils::serialize_operator(operator))
+        }
+        CardPredicate::CharacterWithMaterializedAbility => {
+            "allies with {materialized} abilities".to_string()
+        }
+        CardPredicate::CharacterWithMultiActivatedAbility => {
+            "allies with activated abilities".to_string()
+        }
+        CardPredicate::CardWithCost { target, cost_operator, .. } => format!(
+            "{} with cost {{e}} {}",
+            serialize_your_predicate_plural(target, bindings),
+            serializer_utils::serialize_operator(cost_operator)
+        ),
+        CardPredicate::CharacterWithCostComparedToControlled { target, count_matching, .. } => {
+            format!(
+                "{} with cost less than the number of allied {}",
+                serialize_your_predicate_plural(target, bindings),
+                serialize_card_predicate_plural(count_matching, bindings)
+            )
+        }
+        CardPredicate::CharacterWithCostComparedToAbandoned { target, .. } => {
+            format!(
+                "{} with cost less than the abandoned ally's cost",
+                serialize_your_predicate_plural(target, bindings)
+            )
+        }
+        CardPredicate::CharacterWithSparkComparedToAbandoned { target, .. } => {
+            format!(
+                "{} with spark less than the abandoned ally's spark",
+                serialize_your_predicate_plural(target, bindings)
+            )
+        }
+        CardPredicate::CharacterWithSparkComparedToAbandonedCountThisTurn { target, .. } => {
+            format!(
+                "{} with spark less than the number of allies abandoned this turn",
+                serialize_your_predicate_plural(target, bindings)
+            )
+        }
+        CardPredicate::CharacterWithCostComparedToVoidCount { target, .. } => {
+            format!(
+                "{} with cost less than the number of cards in your void",
+                serialize_your_predicate_plural(target, bindings)
+            )
+        }
+        CardPredicate::CharacterWithSparkComparedToEnergySpent { target, .. } => {
+            format!(
+                "{} with spark less than the amount of {{energy-symbol}} paid",
+                serialize_your_predicate_plural(target, bindings)
+            )
+        }
+        CardPredicate::CouldDissolve { target } => {
+            format!(
+                "your events which could {{dissolve}} {}",
+                predicate_base_text(target, bindings)
+            )
+        }
     }
 }
 
