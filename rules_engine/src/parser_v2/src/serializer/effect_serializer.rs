@@ -477,6 +477,16 @@ pub fn serialize_standard_effect(effect: &StandardEffect) -> String {
                 predicate_serializer::serialize_for_each_predicate(for_each)
             )
         }
+        StandardEffect::GainTwiceThatMuchEnergyInstead => {
+            "gain twice that much {energy-symbol} instead.".to_string()
+        }
+        StandardEffect::MaterializeCharacterFromVoid { target } => {
+            format!(
+                "{{Materialize}} {} from your void.",
+                predicate_serializer::serialize_card_predicate(target)
+            )
+        }
+        StandardEffect::ThenMaterializeIt => "then {Materialize} it.".to_string(),
         _ => unimplemented!("Serialization not yet implemented for this effect type"),
     }
 }

@@ -21,23 +21,6 @@ The serializer is organized into several modules:
 
 ---
 
-### Task 18: Implement Energy and Materialize Effects
-
-**Location:** `effect_serializer.rs` line 297 (catch-all)
-
-**Implementation:**
-```rust
-StandardEffect::GainTwiceThatMuchEnergyInstead => {
-    "gain twice that much {energy-symbol} instead.".to_string()
-}
-StandardEffect::MaterializeCharacterFromVoid { target } => {
-    format!("{{Materialize}} {} from your void.", serialize_card_predicate(target))
-}
-StandardEffect::ThenMaterializeIt => "then {Materialize} it.".to_string(),
-```
-
----
-
 ### Task 19: Implement Cost and Utility Effects
 
 **Location:** `effect_serializer.rs` line 297 (catch-all)

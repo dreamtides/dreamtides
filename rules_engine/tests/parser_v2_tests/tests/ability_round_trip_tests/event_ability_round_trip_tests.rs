@@ -649,3 +649,35 @@ fn test_round_trip_this_character_gains_spark_until_next_main_for_each_subtype()
     let serialized = ability_serializer::serialize_ability(&parsed);
     assert_eq!(original, serialized);
 }
+
+#[test]
+fn test_round_trip_gain_twice_that_much_energy_instead() {
+    let original = "Gain twice that much {energy-symbol} instead.";
+    let parsed = parse_ability(original, "");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_materialize_character_from_void() {
+    let original = "{Materialize} a character from your void.";
+    let parsed = parse_ability(original, "");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_materialize_subtype_from_void() {
+    let original = "{Materialize} {a-subtype} from your void.";
+    let parsed = parse_ability(original, "subtype: warrior");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_banish_ally_then_materialize_it() {
+    let original = "{Banish} an ally, then {Materialize} it.";
+    let parsed = parse_ability(original, "");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
