@@ -127,8 +127,9 @@ pub fn serialize_trigger_event(trigger: &TriggerEvent, bindings: &mut VariableBi
             )
         }
         TriggerEvent::GainEnergy => "when you gain energy, ".to_string(),
-        TriggerEvent::Keywords(_) => {
-            unimplemented!("Serialization not yet implemented for this trigger type")
+        TriggerEvent::Keywords(keywords) => {
+            let keyword_text = keywords.iter().map(serialize_keyword).collect::<String>();
+            format!("{{{}}}", keyword_text)
         }
     }
 }
