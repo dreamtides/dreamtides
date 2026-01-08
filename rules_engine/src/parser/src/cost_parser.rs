@@ -29,8 +29,6 @@ pub fn standard_cost<'a>() -> impl Parser<'a, &'a str, Cost, ErrorType<'a>> {
             },
             Cost::DiscardCards { target: Predicate::Any(CardPredicate::Card), count: 1 },
         ])),
-        phrase("abandon a dreamscape").to(Cost::AbandonDreamscapes(1)),
-        numeric("abandon", count, "dreamscapes").map(Cost::AbandonDreamscapes),
         phrase("abandon").ignore_then(determiner_parser::your_action()).map(|target| {
             Cost::AbandonCharactersCount { target, count: CollectionExpression::Exactly(1) }
         }),
@@ -56,8 +54,6 @@ pub fn present_participle_additional_cost<'a>() -> impl Parser<'a, &'a str, Cost
         phrase("banishing another card from your void").to(Cost::BanishCardsFromYourVoid(1)),
         phrase("banishing all other cards from your void").to(Cost::BanishAllCardsFromYourVoid),
         phrase("banishing all cards from your void").to(Cost::BanishAllCardsFromYourVoid),
-        phrase("abandoning a dreamscape").to(Cost::AbandonDreamscapes(1)),
-        numeric("abandoning", count, "dreamscapes").map(Cost::AbandonDreamscapes),
         choice((phrase("abandoning a").to(1), numeric("abandoning", count, "")))
             .then(card_predicate_parser::parser())
             .map(|(n, predicate)| Cost::AbandonCharactersCount {
@@ -95,8 +91,6 @@ pub fn third_person_singular_present_tense_cost<'a>()
             },
             Cost::DiscardCards { target: Predicate::Any(CardPredicate::Card), count: 1 },
         ])),
-        phrase("abandons a dreamscape").to(Cost::AbandonDreamscapes(1)),
-        numeric("abandons", count, "dreamscapes").map(Cost::AbandonDreamscapes),
         phrase("abandons").ignore_then(determiner_parser::your_action()).map(|target| {
             Cost::AbandonCharactersCount { target, count: CollectionExpression::Exactly(1) }
         }),

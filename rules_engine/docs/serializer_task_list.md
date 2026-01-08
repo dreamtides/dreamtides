@@ -23,34 +23,6 @@ The serializer is organized into several modules:
 
 ## Part 4: Other Serializer Features
 
-### Task 23: Implement Missing Cost Variants
-
-**Location:** `cost_serializer.rs` lines 55 and 59
-
-**Implementation:**
-```rust
-Cost::AbandonDreamscapes(count) => {
-    if *count == 1 {
-        "abandon a dreamscape".to_string()
-    } else {
-        format!("abandon {} dreamscapes", count)
-    }
-}
-Cost::BanishAllCardsFromYourVoid => "{Banish} your void".to_string(),
-Cost::CostList(costs) => {
-    costs.iter().map(serialize_cost).collect::<Vec<_>>().join(" and ")
-}
-```
-
-For `ReturnToHand` (line 55), add:
-```rust
-CollectionExpression::UpTo(n) => {
-    format!("return up to {} {} to hand", n, serialize_predicate_plural(target))
-}
-```
-
----
-
 ### Task 24: Implement Missing StaticAbility Variants
 
 **Location:** `static_ability_serializer.rs` line 143

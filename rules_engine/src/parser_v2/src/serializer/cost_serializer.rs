@@ -52,11 +52,17 @@ pub fn serialize_cost(cost: &Cost) -> String {
                 CollectionExpression::AnyNumberOf => {
                     format!("return any number of {} to hand", predicate_serializer::serialize_predicate(target))
                 }
+                CollectionExpression::UpTo(n) => {
+                    format!("return up to {} {} to hand", n, predicate_serializer::serialize_predicate_plural(target))
+                }
                 _ => unimplemented!("Serialization not yet implemented for this collection expression in return to hand cost"),
             }
         }
         Cost::SpendOneOrMoreEnergy => "pay 1 or more {energy-symbol}".to_string(),
-        _ => unimplemented!("Serialization not yet implemented for this cost type"),
+        Cost::BanishAllCardsFromYourVoid => "{Banish} your void".to_string(),
+        Cost::CostList(costs) => {
+            costs.iter().map(serialize_cost).collect::<Vec<_>>().join(" and ")
+        }
     }
 }
 

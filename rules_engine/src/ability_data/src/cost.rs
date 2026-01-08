@@ -9,7 +9,6 @@ use crate::predicate::Predicate;
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum Cost {
     AbandonCharactersCount { target: Predicate, count: CollectionExpression },
-    AbandonDreamscapes(u32),
     BanishAllCardsFromYourVoid,
     BanishAllCardsFromYourVoidWithMinCount(u32),
     BanishCardsFromEnemyVoid(u32),
