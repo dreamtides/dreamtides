@@ -681,3 +681,35 @@ fn test_round_trip_banish_ally_then_materialize_it() {
     let serialized = ability_serializer::serialize_ability(&parsed);
     assert_eq!(original, serialized);
 }
+
+#[test]
+fn test_round_trip_opponent_pays_energy_cost() {
+    let original = "The opponent pays {e}.";
+    let parsed = parse_ability(original, "e: 2");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_pay_energy_cost() {
+    let original = "Pay {e}.";
+    let parsed = parse_ability(original, "e: 1");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_spend_all_energy_dissolve_enemy() {
+    let original = "Spend all your {energy-symbol}. {Dissolve} an enemy with cost less than or equal to the amount spent.";
+    let parsed = parse_ability(original, "");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_spend_all_energy_draw_and_discard() {
+    let original = "Spend all your {energy-symbol}. Draw cards equal to the amount spent, then discard that many cards.";
+    let parsed = parse_ability(original, "");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}

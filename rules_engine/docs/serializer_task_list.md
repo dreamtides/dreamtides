@@ -21,27 +21,6 @@ The serializer is organized into several modules:
 
 ---
 
-### Task 19: Implement Cost and Utility Effects
-
-**Location:** `effect_serializer.rs` line 297 (catch-all)
-
-**Implementation:**
-```rust
-StandardEffect::NoEffect => "".to_string(),
-StandardEffect::OpponentPaysCost { cost } => {
-    format!("the opponent pays {}.", serialize_cost(cost))
-}
-StandardEffect::PayCost { cost } => format!("pay {}.", serialize_cost(cost)),
-StandardEffect::SpendAllEnergyDissolveEnemy => {
-    "spend all your {energy-symbol}. {Dissolve} an enemy with cost less than or equal to the amount spent.".to_string()
-}
-StandardEffect::SpendAllEnergyDrawAndDiscard => {
-    "spend all your {energy-symbol}. Draw cards equal to the amount spent, then discard that many cards.".to_string()
-}
-```
-
----
-
 ## Part 4: Other Serializer Features
 
 ### Task 20: Implement Missing QuantityExpression Variants

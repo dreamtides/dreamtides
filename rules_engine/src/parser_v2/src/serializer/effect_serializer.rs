@@ -487,7 +487,19 @@ pub fn serialize_standard_effect(effect: &StandardEffect) -> String {
             )
         }
         StandardEffect::ThenMaterializeIt => "then {Materialize} it.".to_string(),
-        _ => unimplemented!("Serialization not yet implemented for this effect type"),
+        StandardEffect::NoEffect => "".to_string(),
+        StandardEffect::OpponentPaysCost { cost } => {
+            format!("the opponent pays {}.", cost_serializer::serialize_cost(cost))
+        }
+        StandardEffect::PayCost { cost } => {
+            format!("pay {}.", cost_serializer::serialize_cost(cost))
+        }
+        StandardEffect::SpendAllEnergyDissolveEnemy => {
+            "spend all your {energy-symbol}. {Dissolve} an enemy with cost less than or equal to the amount spent.".to_string()
+        }
+        StandardEffect::SpendAllEnergyDrawAndDiscard => {
+            "spend all your {energy-symbol}. Draw cards equal to the amount spent, then discard that many cards.".to_string()
+        }
     }
 }
 
