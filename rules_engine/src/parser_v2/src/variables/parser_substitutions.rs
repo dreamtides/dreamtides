@@ -87,6 +87,18 @@ pub fn variable_names() -> impl Iterator<Item = &'static str> {
         .chain(["figment", "number", "subtype", "allies"])
 }
 
+/// Returns the integer variable name for a given directive, if it exists and is
+/// an integer type. Returns None for subtypes, figments, compound directives,
+/// or unknown directives.
+pub fn directive_to_integer_variable(directive: &str) -> Option<&'static str> {
+    DIRECTIVES
+        .iter()
+        .find(|(dir_name, _, constructor)| {
+            *dir_name == directive && std::ptr::eq(*constructor as *const (), integer as *const ())
+        })
+        .and_then(|(_, var_name, _)| if var_name.is_empty() { None } else { Some(*var_name) })
+}
+
 type VariableConstructor =
     fn(&str, &str, &VariableBindings, SimpleSpan) -> Result<ResolvedToken, UnresolvedVariable>;
 

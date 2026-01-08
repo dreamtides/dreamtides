@@ -1,9 +1,11 @@
 use ability_data::trigger_event::{PlayerTurn, TriggerEvent, TriggerKeyword};
+use ability_data::variable_value::VariableValue;
 
 use super::predicate_serializer;
 use crate::variables::parser_bindings::VariableBindings;
+use crate::variables::parser_substitutions;
 
-pub fn serialize_trigger_event(trigger: &TriggerEvent, _bindings: &mut VariableBindings) -> String {
+pub fn serialize_trigger_event(trigger: &TriggerEvent, bindings: &mut VariableBindings) -> String {
     match trigger {
         TriggerEvent::Keywords(keywords) if keywords.len() == 1 => {
             format!("{{{}}}", serialize_keyword(&keywords[0]))
@@ -26,7 +28,14 @@ pub fn serialize_trigger_event(trigger: &TriggerEvent, _bindings: &mut VariableB
                 predicate_serializer::serialize_predicate(predicate)
             )
         }
-        TriggerEvent::PlayCardsInTurn(_) => "when you play {cards-numeral} in a turn, ".to_string(),
+        TriggerEvent::PlayCardsInTurn(count) => {
+            if let Some(var_name) =
+                parser_substitutions::directive_to_integer_variable("cards-numeral")
+            {
+                bindings.insert(var_name.to_string(), VariableValue::Integer(*count));
+            }
+            "when you play {cards-numeral} in a turn, ".to_string()
+        }
         TriggerEvent::PlayDuringTurn(predicate, turn) => match turn {
             PlayerTurn::YourTurn => {
                 format!(
@@ -68,7 +77,12 @@ pub fn serialize_trigger_event(trigger: &TriggerEvent, _bindings: &mut VariableB
         TriggerEvent::Abandon(predicate) => {
             format!("when you abandon {}, ", predicate_serializer::serialize_predicate(predicate))
         }
-        TriggerEvent::AbandonCardsInTurn(_) => {
+        TriggerEvent::AbandonCardsInTurn(count) => {
+            if let Some(var_name) =
+                parser_substitutions::directive_to_integer_variable("count-allies")
+            {
+                bindings.insert(var_name.to_string(), VariableValue::Integer(*count));
+            }
             "when you abandon {count-allies} in a turn, ".to_string()
         }
         TriggerEvent::PutIntoVoid(predicate) => {
@@ -77,12 +91,24 @@ pub fn serialize_trigger_event(trigger: &TriggerEvent, _bindings: &mut VariableB
                 predicate_serializer::serialize_predicate(predicate)
             )
         }
-        TriggerEvent::DrawCardsInTurn(_) => "when you draw {cards-numeral} in a turn, ".to_string(),
+        TriggerEvent::DrawCardsInTurn(count) => {
+            if let Some(var_name) =
+                parser_substitutions::directive_to_integer_variable("cards-numeral")
+            {
+                bindings.insert(var_name.to_string(), VariableValue::Integer(*count));
+            }
+            "when you draw {cards-numeral} in a turn, ".to_string()
+        }
         TriggerEvent::EndOfYourTurn => "at the end of your turn, ".to_string(),
         TriggerEvent::DrawAllCardsInCopyOfDeck => {
             "when you have no cards in your deck, ".to_string()
         }
-        TriggerEvent::MaterializeNthThisTurn(predicate, _) => {
+        TriggerEvent::MaterializeNthThisTurn(predicate, count) => {
+            if let Some(var_name) =
+                parser_substitutions::directive_to_integer_variable("text-number")
+            {
+                bindings.insert(var_name.to_string(), VariableValue::Integer(*count));
+            }
             format!(
                 "when you {{materialize}} {{text-number}} {} in a turn, ",
                 predicate_serializer::serialize_predicate_plural(predicate)
