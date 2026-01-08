@@ -144,3 +144,83 @@ fn test_round_trip_with_allied_subtype_play_from_hand_or_void_for_cost() {
     let serialized = ability_serializer::serialize_ability(&parsed);
     assert_eq!(original, serialized);
 }
+
+#[test]
+fn test_round_trip_cost_reduction_for_each_allied_character() {
+    let original = "This card costs {e} less for each ally.";
+    let parsed = parse_ability(original, "e: 1");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_cost_reduction_for_each_allied_subtype() {
+    let original = "This card costs {e} less for each allied {subtype}.";
+    let parsed = parse_ability(original, "e: 1, subtype: warrior");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_allies_have_spark_bonus() {
+    let original = "Allies have +{s} spark.";
+    let parsed = parse_ability(original, "s: 1");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_allied_subtype_have_spark_bonus() {
+    let original = "Allied {plural-subtype} have +{s} spark.";
+    let parsed = parse_ability(original, "subtype: warrior, s: 1");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_play_from_void_for_cost() {
+    let original = "Play this card from your void for {e}.";
+    let parsed = parse_ability(original, "e: 0");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_play_from_void_with_additional_cost() {
+    let original = "Return an ally to hand: Play this card from your void for {e}.";
+    let parsed = parse_ability(original, "e: 0");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_play_from_void_then_banish_when_leaves_play() {
+    let original = "Play this card from your void for {e}, then {banish} it when it leaves play.";
+    let parsed = parse_ability(original, "e: 0");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_play_from_void_with_cost_then_banish() {
+    let original = "Return an ally to hand: Play this card from your void for {e}, then {banish} it when it leaves play.";
+    let parsed = parse_ability(original, "e: 0");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_play_from_void_then_gain_spark() {
+    let original = "Play this card from your void for {e}, then gain +{s} spark.";
+    let parsed = parse_ability(original, "e: 0, s: 1");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_play_from_void_then_dissolve_enemy() {
+    let original = "Play this card from your void for {e}, then {Dissolve} an enemy.";
+    let parsed = parse_ability(original, "e: 0");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}

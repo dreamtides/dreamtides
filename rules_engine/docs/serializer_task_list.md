@@ -23,30 +23,6 @@ The serializer is organized into several modules:
 
 ## Part 4: Other Serializer Features
 
-### Task 24: Implement Missing StaticAbility Variants
-
-**Location:** `static_ability_serializer.rs` line 143
-
-**Implementation:**
-```rust
-StandardStaticAbility::CostReductionForEach { quantity, .. } => {
-    format!("this card costs {{e}} less for each {}.", serialize_for_count_expression(quantity))
-}
-StandardStaticAbility::SparkBonusYourCharacters { matching, .. } => {
-    format!("your {} have +{{s}} spark.", serialize_card_predicate_plural(matching))
-}
-StandardStaticAbility::PlayFromVoid(play_from_void) => {
-    let mut result = String::new();
-    if let Some(cost) = &play_from_void.additional_cost {
-        result.push_str(&format!("{}: ", capitalize_first_letter(&serialize_cost(cost))));
-    }
-    result.push_str("Play this card from your void for {e}");
-    if play_from_void.if_you_do.is_some() {
-        result.push_str(", then abandon it");
-    }
-    result.push('.');
-    result
-}
-```
+(No pending tasks)
 
 ---

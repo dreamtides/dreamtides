@@ -658,7 +658,7 @@ pub fn serialize_effect(effect: &Effect) -> String {
     }
 }
 
-fn serialize_for_count_expression(quantity_expression: &QuantityExpression) -> String {
+pub fn serialize_for_count_expression(quantity_expression: &QuantityExpression) -> String {
     match quantity_expression {
         QuantityExpression::Matching(predicate) => {
             predicate_serializer::serialize_for_each_predicate(predicate)

@@ -2,7 +2,8 @@ use ability_data::condition::Condition;
 use ability_data::static_ability::{StandardStaticAbility, StaticAbility};
 
 use super::{
-    condition_serializer, cost_serializer, predicate_serializer, serializer_utils, text_formatting,
+    condition_serializer, cost_serializer, effect_serializer, predicate_serializer,
+    serializer_utils, text_formatting,
 };
 
 pub fn serialize_static_ability(static_ability: &StaticAbility) -> String {
@@ -151,6 +152,37 @@ pub fn serialize_standard_static_ability(ability: &StandardStaticAbility) -> Str
         StandardStaticAbility::CardsInYourVoidHaveReclaim { .. } => {
             "they have {reclaim} equal to their cost.".to_string()
         }
-        _ => unimplemented!("Serialization not yet implemented for this static ability"),
+        StandardStaticAbility::CostReductionForEach { quantity, .. } => format!(
+            "this card costs {{e}} less for each {}.",
+            effect_serializer::serialize_for_count_expression(quantity)
+        ),
+        StandardStaticAbility::SparkBonusYourCharacters { matching, .. } => {
+            let predicate_text = match matching {
+                ability_data::predicate::CardPredicate::Character => "allies".to_string(),
+                ability_data::predicate::CardPredicate::CharacterType(_) => {
+                    "allied {plural-subtype}".to_string()
+                }
+                _ => predicate_serializer::serialize_card_predicate_plural(matching),
+            };
+            format!("{} have +{{s}} spark.", predicate_text)
+        }
+        StandardStaticAbility::PlayFromVoid(play_from_void) => {
+            let mut result = String::new();
+            if let Some(cost) = &play_from_void.additional_cost {
+                result.push_str(&format!(
+                    "{}: ",
+                    serializer_utils::capitalize_first_letter(&cost_serializer::serialize_cost(
+                        cost
+                    ))
+                ));
+            }
+            result.push_str("play this card from your void for {e}");
+            if let Some(effect) = &play_from_void.if_you_do {
+                let effect_text = effect_serializer::serialize_effect(effect);
+                result.push_str(&format!(", then {}", effect_text.trim_end_matches('.')));
+            }
+            result.push('.');
+            result
+        }
     }
 }
