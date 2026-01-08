@@ -1,4 +1,5 @@
 use ability_data::predicate::{CardPredicate, Predicate};
+use text_formatting::FormattedText;
 
 use super::{serializer_utils, text_formatting};
 
@@ -8,15 +9,13 @@ pub fn serialize_predicate(predicate: &Predicate) -> String {
         Predicate::That => "that character".to_string(),
         Predicate::Them => "them".to_string(),
         Predicate::It => "it".to_string(),
-        Predicate::Your(card_predicate) => {
-            format!("an {}", serialize_your_predicate(card_predicate))
-        }
+        Predicate::Your(card_predicate) => your_predicate_formatted(card_predicate).with_article(),
         Predicate::Another(card_predicate) => {
-            format!("an {}", serialize_your_predicate(card_predicate))
+            your_predicate_formatted(card_predicate).with_article()
         }
         Predicate::Any(card_predicate) => serialize_card_predicate(card_predicate),
         Predicate::Enemy(card_predicate) => {
-            format!("an {}", serialize_enemy_predicate(card_predicate))
+            enemy_predicate_formatted(card_predicate).with_article()
         }
         Predicate::YourVoid(card_predicate) => {
             format!("{} in your void", serialize_card_predicate_plural(card_predicate))
@@ -83,96 +82,11 @@ pub fn predicate_base_text(predicate: &Predicate) -> String {
 }
 
 pub fn serialize_your_predicate(card_predicate: &CardPredicate) -> String {
-    match card_predicate {
-        CardPredicate::Character => "ally".to_string(),
-        CardPredicate::Card => "your card".to_string(),
-        CardPredicate::Event => "your event".to_string(),
-        CardPredicate::CharacterType(_) => "allied {subtype}".to_string(),
-        CardPredicate::NotCharacterType(_) => "ally that is not {a-subtype}".to_string(),
-        CardPredicate::CharacterWithSpark(_, operator) => {
-            format!("ally with spark {{s}} {}", serializer_utils::serialize_operator(operator))
-        }
-        CardPredicate::CharacterWithMaterializedAbility => {
-            "ally with a {materialized} ability".to_string()
-        }
-        CardPredicate::CharacterWithMultiActivatedAbility => {
-            "ally with an activated ability".to_string()
-        }
-        CardPredicate::Fast { target } => {
-            format!("fast {}", serialize_your_predicate(target))
-        }
-        CardPredicate::CardWithCost { target, cost_operator, .. } => {
-            format!(
-                "{} with cost {{e}} {}",
-                serialize_your_predicate(target),
-                serializer_utils::serialize_operator(cost_operator)
-            )
-        }
-        _ => {
-            unimplemented!("Serialization not yet implemented for this your predicate type")
-        }
-    }
+    your_predicate_formatted(card_predicate).without_article()
 }
 
 pub fn serialize_enemy_predicate(card_predicate: &CardPredicate) -> String {
-    match card_predicate {
-        CardPredicate::Character => "enemy".to_string(),
-        CardPredicate::Card => "enemy card".to_string(),
-        CardPredicate::CharacterType(_) => "enemy {subtype}".to_string(),
-        CardPredicate::NotCharacterType(_) => "enemy that is not {a-subtype}".to_string(),
-        CardPredicate::CharacterWithSpark(_, operator) => {
-            format!("enemy with spark {{s}} {}", serializer_utils::serialize_operator(operator))
-        }
-        CardPredicate::CharacterWithMaterializedAbility => {
-            "enemy with a {materialized} ability".to_string()
-        }
-        CardPredicate::CharacterWithMultiActivatedAbility => {
-            "enemy with an activated ability".to_string()
-        }
-        CardPredicate::CardWithCost { cost_operator, .. } => {
-            format!("enemy with cost {{e}} {}", serializer_utils::serialize_operator(cost_operator))
-        }
-        CardPredicate::CharacterWithCostComparedToControlled { target, count_matching, .. } => {
-            format!(
-                "{} with cost less than the number of allied {}",
-                serialize_enemy_predicate(target),
-                serialize_card_predicate_plural(count_matching)
-            )
-        }
-        CardPredicate::CharacterWithCostComparedToAbandoned { target, .. } => {
-            format!(
-                "{} with cost less than the abandoned ally's cost",
-                serialize_enemy_predicate(target)
-            )
-        }
-        CardPredicate::CharacterWithCostComparedToVoidCount { target, .. } => {
-            format!(
-                "{} with cost less than the number of cards in your void",
-                serialize_enemy_predicate(target)
-            )
-        }
-        CardPredicate::CharacterWithSparkComparedToAbandoned { target, .. } => {
-            format!("{} with spark less than that ally's spark", serialize_enemy_predicate(target))
-        }
-        CardPredicate::CharacterWithSparkComparedToAbandonedCountThisTurn { target, .. } => {
-            format!(
-                "{} with spark less than the number of allies abandoned this turn",
-                serialize_enemy_predicate(target)
-            )
-        }
-        CardPredicate::CharacterWithSparkComparedToEnergySpent { target, .. } => {
-            format!(
-                "{} with spark less than the amount of {{energy-symbol}} paid",
-                serialize_enemy_predicate(target)
-            )
-        }
-        CardPredicate::Fast { target } => {
-            format!("fast {}", serialize_enemy_predicate(target))
-        }
-        _ => {
-            unimplemented!("Serialization not yet implemented for this enemy predicate type")
-        }
-    }
+    enemy_predicate_formatted(card_predicate).without_article()
 }
 
 pub fn serialize_card_predicate(card_predicate: &CardPredicate) -> String {
@@ -366,6 +280,103 @@ pub fn serialize_for_each_predicate(predicate: &Predicate) -> String {
         Predicate::It => "that character".to_string(),
         _ => {
             unimplemented!("Serialization not yet implemented for this for-each predicate")
+        }
+    }
+}
+
+fn your_predicate_formatted(card_predicate: &CardPredicate) -> FormattedText {
+    match card_predicate {
+        CardPredicate::Character => FormattedText::new("ally"),
+        CardPredicate::Card => FormattedText::new("your card"),
+        CardPredicate::Event => FormattedText::new("your event"),
+        CardPredicate::CharacterType(_) => FormattedText::new("allied {subtype}"),
+        CardPredicate::NotCharacterType(_) => FormattedText::new("ally that is not {a-subtype}"),
+        CardPredicate::CharacterWithSpark(_, operator) => FormattedText::new(&format!(
+            "ally with spark {{s}} {}",
+            serializer_utils::serialize_operator(operator)
+        )),
+        CardPredicate::CharacterWithMaterializedAbility => {
+            FormattedText::new("ally with a {materialized} ability")
+        }
+        CardPredicate::CharacterWithMultiActivatedAbility => {
+            FormattedText::new("ally with an activated ability")
+        }
+        CardPredicate::Fast { target } => {
+            FormattedText::new(&format!("fast {}", serialize_your_predicate(target)))
+        }
+        CardPredicate::CardWithCost { target, cost_operator, .. } => FormattedText::new(&format!(
+            "{} with cost {{e}} {}",
+            serialize_your_predicate(target),
+            serializer_utils::serialize_operator(cost_operator)
+        )),
+        _ => {
+            unimplemented!("Serialization not yet implemented for this your predicate type")
+        }
+    }
+}
+
+fn enemy_predicate_formatted(card_predicate: &CardPredicate) -> FormattedText {
+    match card_predicate {
+        CardPredicate::Character => FormattedText::new("enemy"),
+        CardPredicate::Card => FormattedText::new("enemy card"),
+        CardPredicate::CharacterType(_) => FormattedText::new("enemy {subtype}"),
+        CardPredicate::NotCharacterType(_) => FormattedText::new("enemy that is not {a-subtype}"),
+        CardPredicate::CharacterWithSpark(_, operator) => FormattedText::new(&format!(
+            "enemy with spark {{s}} {}",
+            serializer_utils::serialize_operator(operator)
+        )),
+        CardPredicate::CharacterWithMaterializedAbility => {
+            FormattedText::new("enemy with a {materialized} ability")
+        }
+        CardPredicate::CharacterWithMultiActivatedAbility => {
+            FormattedText::new("enemy with an activated ability")
+        }
+        CardPredicate::CardWithCost { cost_operator, .. } => FormattedText::new(&format!(
+            "enemy with cost {{e}} {}",
+            serializer_utils::serialize_operator(cost_operator)
+        )),
+        CardPredicate::CharacterWithCostComparedToControlled { target, count_matching, .. } => {
+            FormattedText::new(&format!(
+                "{} with cost less than the number of allied {}",
+                serialize_enemy_predicate(target),
+                serialize_card_predicate_plural(count_matching)
+            ))
+        }
+        CardPredicate::CharacterWithCostComparedToAbandoned { target, .. } => {
+            FormattedText::new(&format!(
+                "{} with cost less than the abandoned ally's cost",
+                serialize_enemy_predicate(target)
+            ))
+        }
+        CardPredicate::CharacterWithCostComparedToVoidCount { target, .. } => {
+            FormattedText::new(&format!(
+                "{} with cost less than the number of cards in your void",
+                serialize_enemy_predicate(target)
+            ))
+        }
+        CardPredicate::CharacterWithSparkComparedToAbandoned { target, .. } => {
+            FormattedText::new(&format!(
+                "{} with spark less than that ally's spark",
+                serialize_enemy_predicate(target)
+            ))
+        }
+        CardPredicate::CharacterWithSparkComparedToAbandonedCountThisTurn { target, .. } => {
+            FormattedText::new(&format!(
+                "{} with spark less than the number of allies abandoned this turn",
+                serialize_enemy_predicate(target)
+            ))
+        }
+        CardPredicate::CharacterWithSparkComparedToEnergySpent { target, .. } => {
+            FormattedText::new(&format!(
+                "{} with spark less than the amount of {{energy-symbol}} paid",
+                serialize_enemy_predicate(target)
+            ))
+        }
+        CardPredicate::Fast { target } => {
+            FormattedText::new(&format!("fast {}", serialize_enemy_predicate(target)))
+        }
+        _ => {
+            unimplemented!("Serialization not yet implemented for this enemy predicate type")
         }
     }
 }
