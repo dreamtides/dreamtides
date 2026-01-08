@@ -52,21 +52,12 @@ fn test_ability_serialization() {
 }
 ```
 
-## SpannedAbility Serialization
+## UI Display Data
 
-SpannedAbility is for display only and doesn't need save file serialization.
-Mark with `#[serde(skip)]` if included in CardDefinition:
-
-```rust
-pub struct CardDefinition {
-    // Serialized fields...
-
-    #[serde(skip)]
-    pub spanned_abilities: Vec<SpannedAbility>,
-}
-```
-
-Or store spanned abilities separately from CardDefinition.
+Display text is not stored in CardDefinition. All UI rendering uses serializers from `parser_v2/src/serializer` on-demand. This means:
+- No display-specific fields need serialization
+- Save files are smaller and cleaner
+- Display logic can be updated without breaking save compatibility
 
 ## Existing Save Compatibility
 

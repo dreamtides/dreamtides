@@ -2,15 +2,16 @@
 
 ## Objective
 
-Implement `ability_parser.rs` to parse card abilities using the cached parser instance.
+Implement `ability_parser.rs` to parse card abilities using the parser_v2 system.
 
 ## Tasks
 
 1. Create `AbilityParser` struct with cached parser
 2. Implement ability parsing from rules text and variables
-3. Implement SpannedAbility generation for display
-4. Add error handling that includes card name/ID in messages
-5. Write tests parsing sample ability text
+3. Add error handling that includes card name/ID in messages
+4. Write tests parsing sample ability text
+
+**Note:** UI rendering will use serializers from `parser_v2/src/serializer` on-demand, not stored display data.
 
 ## AbilityParser Struct
 
@@ -19,7 +20,7 @@ use chumsky::Parser;
 use parser_v2::lexer::lexer_tokenize;
 use parser_v2::parser::ability_parser;
 use parser_v2::variables::{parser_bindings::VariableBindings, parser_substitutions};
-use parser_v2::builder::{parser_builder, parser_spans::SpannedAbility};
+use parser_v2::builder::parser_builder;
 
 pub struct AbilityParser {
     // Parser is created once and reused
@@ -34,7 +35,7 @@ impl AbilityParser {
         &self,
         rules_text: &str,
         variables: &str,
-    ) -> Result<ParsedAbilities, TabulaError> {
+    ) -> Result<Vec<Ability>, TabulaError> {
         // 1. Parse variable bindings
         let bindings = VariableBindings::parse(variables)?;
 
@@ -51,17 +52,11 @@ impl AbilityParser {
         let parser = ability_parser::ability_parser();
         let parsed = parser.parse(&resolved).into_result()?;
 
-        // 5. Build Ability and SpannedAbility
+        // 5. Build Ability structs
         let abilities = parser_builder::build_abilities(&parsed)?;
-        let spanned = /* build spanned from parsed and lex_result */;
 
-        Ok(ParsedAbilities { abilities, spanned })
+        Ok(abilities)
     }
-}
-
-pub struct ParsedAbilities {
-    pub abilities: Vec<Ability>,
-    pub spanned: Vec<SpannedAbility>,
 }
 ```
 
@@ -101,15 +96,30 @@ fn test_parse_triggered_ability() {
 }
 ```
 
+## UI Rendering Note
+
+Display text is NOT stored in CardDefinition. Instead, render on-demand using serializers:
+
+```rust
+use parser_v2::serializer::ability_serializer;
+
+// When displaying a card in UI
+for ability in &card.abilities {
+    let serialized = ability_serializer::serialize_ability(ability);
+    display_text(&serialized.text);
+    // Use serialized.variables for {placeholder} substitution
+}
+```
+
 ## Verification
 
 - `cargo test -p tabula_data_v2` passes
 - Sample cards from cards.toml parse successfully
-- SpannedAbility output matches expected structure
+- Parsed abilities match expected structure
 
 ## Context Files
 
 1. `benchmarks/parser_v2/src/benchmark_utils.rs` - Parser usage pattern
-2. `tests/parser_v2_tests/tests/spanned_ability_tests.rs` - Expected outputs
-3. `src/parser_v2/src/builder/parser_spans.rs` - SpannedAbility types
+2. `src/parser_v2/src/builder/parser_builder.rs` - Ability building
+3. `src/parser_v2/src/serializer/ability_serializer.rs` - UI text rendering
 4. `src/parser_v2/src/parser/ability_parser.rs` - Parser entry point

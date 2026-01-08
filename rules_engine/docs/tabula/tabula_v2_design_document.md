@@ -17,28 +17,28 @@ Tabula V2 is a complete rewrite of the card data loading system to replace `tabu
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
 │                        TOML/FTL FILES                               │
-│  cards.toml, test-cards.toml, dreamwell.toml, strings.ftl, etc.    │
+│  cards.toml, test-cards.toml, dreamwell.toml, strings.ftl, etc.     │
 └─────────────────────────────────┬───────────────────────────────────┘
                                   │
                                   ▼
 ┌─────────────────────────────────────────────────────────────────────┐
 │                     TABULA_DATA_V2 CRATE                            │
-│  ┌─────────────────┐  ┌─────────────────┐  ┌──────────────────┐    │
-│  │ CardDefinition  │  │ FluentStrings   │  │ CardEffectRow    │    │
-│  │ Raw (unified)   │  │ Loader          │  │ CardListRow      │    │
-│  └────────┬────────┘  └────────┬────────┘  └────────┬─────────┘    │
+│  ┌─────────────────┐  ┌─────────────────┐  ┌──────────────────┐     │
+│  │ CardDefinition  │  │ FluentStrings   │  │ CardEffectRow    │     │
+│  │ Raw (unified)   │  │ Loader          │  │ CardListRow      │     │
+│  └────────┬────────┘  └────────┬────────┘  └────────┬─────────┘     │
 │           │                    │                     │              │
 │           ▼                    ▼                     ▼              │
-│  ┌─────────────────────────────────────────────────────────────┐   │
+│  ┌─────────────────────────────────────────────────────────────┐    │
 │  │                    PARSER_V2 Integration                     │   │
 │  │  Runtime ability parsing with cached parser instance         │   │
-│  └─────────────────────────────────────────────────────────────┘   │
+│  └─────────────────────────────────────────────────────────────┘    │
 │           │                                                         │
 │           ▼                                                         │
-│  ┌─────────────────────────────────────────────────────────────┐   │
-│  │                    Final Card Definitions                    │   │
-│  │  CardDefinition, DreamwellCardDefinition, etc.              │   │
-│  └─────────────────────────────────────────────────────────────┘   │
+│  ┌─────────────────────────────────────────────────────────────┐    │
+│  │                    Final Card Definitions                   │    │
+│  │  CardDefinition, DreamwellCardDefinition, etc.              │    │
+│  └─────────────────────────────────────────────────────────────┘    │
 └─────────────────────────────────────────────────────────────────────┘
                                   │
                                   ▼
@@ -157,7 +157,7 @@ impl AbilityParser {
 }
 ```
 
-The parser is created once and reused for all cards. SpannedAbility is computed for display segmentation at the same time.
+The parser is created once and reused for all cards.
 
 ### 4. Fluent String System
 
@@ -178,32 +178,42 @@ impl FluentStrings {
 }
 ```
 
-### 5. SpannedAbility Replaces DisplayedAbility
+### 5. UI String Rendering via Serializers
 
-The `DisplayedAbility` struct is deleted. Instead, use `SpannedAbility` from `parser_v2`:
+The `DisplayedAbility` struct is deleted. Instead of storing display-ready text, UI strings are rendered on-demand using the serializer system from `parser_v2/src/serializer`.
 
-```rust
-pub enum SpannedAbility {
-    Event(SpannedEventAbility),
-    Static { text: SpannedText },
-    Activated(SpannedActivatedAbility),
-    Triggered(SpannedTriggeredAbility),
-    Named { name: SpannedText },
-}
-```
-
-**Storage Decision:** SpannedAbility is stored inside CardDefinition with `#[serde(skip)]`:
+**Storage Decision:** CardDefinition stores only the parsed `Ability` enum:
 
 ```rust
 pub struct CardDefinition {
     pub abilities: Vec<Ability>,
-
-    #[serde(skip)]
-    pub spanned_abilities: Vec<SpannedAbility>,  // Computed on load, not serialized
+    // No display-specific fields - render on demand
 }
 ```
 
-This is computed during ability parsing using `parser_display::to_displayed_ability()`.
+**Rendering UI Strings:** When displaying cards in the UI, use the appropriate serializer:
+
+```rust
+use parser_v2::serializer::ability_serializer;
+use parser_v2::serializer::effect_serializer;
+use parser_v2::serializer::predicate_serializer;
+use parser_v2::serializer::trigger_serializer;
+
+// Render full ability text
+let displayed = ability_serializer::serialize_ability(&ability);
+println!("{}", displayed.text);  // The rules text to display
+// displayed.variables contains the VariableBindings for {placeholder} substitution
+
+// Render just an effect (e.g., for an activated ability)
+let mut bindings = VariableBindings::new();
+let effect_text = effect_serializer::serialize_effect(&effect, &mut bindings);
+
+// Render a predicate for a UI label (e.g., "target an ally")
+let predicate_text = predicate_serializer::serialize_predicate(&predicate, &mut bindings);
+
+// Render a trigger for display
+let trigger_text = trigger_serializer::serialize_trigger_event(&trigger, &mut bindings);
+```
 
 ### 6. Test Card Replacement Strategy
 

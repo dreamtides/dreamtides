@@ -18,7 +18,7 @@ From workspace analysis:
 - `battle_state` - Uses CardDefinition
 - `battle_queries` - Uses card lookups
 - `battle_mutations` - Uses card data
-- `display` - Uses DisplayedAbility (now SpannedAbility)
+- `display` - Uses DisplayedAbility (now uses serializers)
 - `game_creation` - Creates games with cards
 - `quest_state` - Deck building with cards
 - `rules_engine` - Core game logic
@@ -36,19 +36,30 @@ use tabula_data_v2::{CardDefinition, Tabula};
 
 ## API Differences to Handle
 
-### DisplayedAbility -> SpannedAbility
+### DisplayedAbility -> Serializer System
 
-V2 uses `SpannedAbility` instead of `DisplayedAbility`:
+V2 removes stored display data. Instead, render UI text on-demand using serializers:
 
 ```rust
 // Before
 let displayed: &DisplayedAbility = card.displayed_abilities.get(0)?;
+show_text(&displayed.text);
 
 // After
-let spanned: &SpannedAbility = card.spanned_abilities.get(0)?;
+use parser_v2::serializer::ability_serializer;
+
+let ability = &card.abilities[0];
+let serialized = ability_serializer::serialize_ability(ability);
+show_text(&serialized.text);
+// Use serialized.variables for {placeholder} substitution
 ```
 
-Update display code to use SpannedAbility structure.
+For specific UI elements (prompts, effects, etc.), use the appropriate serializer:
+- `ability_serializer::serialize_ability()` - Full ability text
+- `effect_serializer::serialize_effect()` - Effect text only
+- `predicate_serializer::serialize_predicate()` - Target labels (e.g., "an ally")
+- `trigger_serializer::serialize_trigger_event()` - Trigger text
+- `cost_serializer::serialize_cost()` - Cost text
 
 ### is_test_card Removal
 
@@ -85,8 +96,10 @@ Create helper to find usages:
 grep -r "use tabula_data" src/ tests/
 grep -r "tabula_data::" src/ tests/
 
-# Find DisplayedAbility usage
+# Find DisplayedAbility usage (needs serializer migration)
 grep -r "DisplayedAbility" src/ tests/
+grep -r "displayed_abilities" src/ tests/
+grep -r "spanned_abilities" src/ tests/
 
 # Find is_test_card usage
 grep -r "is_test_card" src/ tests/
@@ -108,6 +121,7 @@ grep -r "is_test_card" src/ tests/
 ## Context Files
 
 1. `src/battle_state/Cargo.toml` - Example dependent crate
-2. `src/display/src/` - DisplayedAbility usage
-3. `src/tabula_data_v2/src/lib.rs` - New public API
-4. Each dependent crate's src/ directory
+2. `src/display/src/` - DisplayedAbility usage (migrate to serializers)
+3. `src/parser_v2/src/serializer/` - Available serializers for UI rendering
+4. `src/tabula_data_v2/src/lib.rs` - New public API
+5. Each dependent crate's src/ directory

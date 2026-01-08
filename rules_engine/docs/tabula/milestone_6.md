@@ -14,7 +14,7 @@ Implement `card_definition_builder.rs` to convert `CardDefinitionRaw` into `Card
 
 ## CardDefinition Struct
 
-The final struct (in `card_definition.rs`) should match V1 but without `is_test_card`:
+The final struct (in `card_definition.rs`) should match V1 but without `is_test_card` and without display-specific fields:
 
 ```rust
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -32,8 +32,8 @@ pub struct CardDefinition {
     pub rarity: Option<CardRarity>,
     pub is_fast: bool,
     pub abilities: Vec<Ability>,
-    pub spanned_abilities: Vec<SpannedAbility>,
     // Note: no is_test_card field
+    // Note: no spanned_abilities - use serializers for display
 }
 ```
 
@@ -64,15 +64,14 @@ impl<'a> CardDefinitionBuilder<'a> {
         let card_type = self.parse_card_type(&raw.card_type, id)?;
 
         // Parse abilities if rules_text exists
-        let (abilities, spanned) = if let Some(text) = &raw.rules_text {
+        let abilities = if let Some(text) = &raw.rules_text {
             let vars = raw.variables.as_deref().unwrap_or("");
-            let parsed = self.parser.parse(text, vars)?;
-            (parsed.abilities, parsed.spanned)
+            self.parser.parse(text, vars)?
         } else {
-            (Vec::new(), Vec::new())
+            Vec::new()
         };
 
-        Ok(CardDefinition { id, name, card_type, /* ... */ })
+        Ok(CardDefinition { id, name, card_type, abilities, /* ... */ })
     }
 }
 ```
