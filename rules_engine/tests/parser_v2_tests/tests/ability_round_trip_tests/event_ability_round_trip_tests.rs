@@ -550,3 +550,37 @@ fn test_round_trip_trigger_judgment_ability_of_three_allies() {
     let serialized = ability_serializer::serialize_ability(&parsed);
     assert_eq!(original, serialized);
 }
+
+#[test]
+fn test_round_trip_dissolve_enemies_with_cost_less_than_or_equal_to_allies() {
+    let original =
+        "{Dissolve} all enemies with cost less than or equal to the number of allied characters.";
+    let parsed = parse_ability(original, "");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_dissolve_allies_with_cost_less_than_or_equal_to_abandoned_count() {
+    let original =
+        "{Dissolve} all allies with cost less than or equal to the number of allies abandoned this turn.";
+    let parsed = parse_ability(original, "");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_ally_cannot_be_dissolved_this_turn() {
+    let original = "An ally cannot be {dissolved} this turn.";
+    let parsed = parse_ability(original, "");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_enemy_cannot_be_dissolved_this_turn() {
+    let original = "An enemy cannot be {dissolved} this turn.";
+    let parsed = parse_ability(original, "");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}

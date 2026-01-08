@@ -447,6 +447,19 @@ pub fn serialize_standard_effect(effect: &StandardEffect) -> String {
                 predicate_serializer::serialize_predicate(target)
             )
         }
+        StandardEffect::DissolveCharactersQuantity { target, quantity } => {
+            format!(
+                "{{Dissolve}} all {} with cost less than or equal to the number of {}.",
+                predicate_serializer::serialize_predicate_plural(target),
+                serialize_for_count_expression(quantity)
+            )
+        }
+        StandardEffect::PreventDissolveThisTurn { target } => {
+            format!(
+                "{} cannot be {{dissolved}} this turn.",
+                predicate_serializer::serialize_predicate(target)
+            )
+        }
         _ => unimplemented!("Serialization not yet implemented for this effect type"),
     }
 }
@@ -613,16 +626,16 @@ fn serialize_for_count_expression(quantity_expression: &QuantityExpression) -> S
         }
         QuantityExpression::PlayedThisTurn(predicate) => format!(
             "{} you have played this turn",
-            text_formatting::card_predicate_base_text(predicate).without_article()
+            text_formatting::card_predicate_base_text(predicate).plural()
         ),
         QuantityExpression::AbandonedThisTurn(CardPredicate::Character) => {
-            "ally abandoned this turn".to_string()
+            "allies abandoned this turn".to_string()
         }
         QuantityExpression::AbandonedThisWay(CardPredicate::Character) => {
-            "ally abandoned".to_string()
+            "allies abandoned".to_string()
         }
         QuantityExpression::ReturnedToHandThisWay(CardPredicate::Character) => {
-            "ally returned".to_string()
+            "allies returned".to_string()
         }
         QuantityExpression::ForEachEnergySpentOnThisCard => "{energy-symbol} spent".to_string(),
         _ => {

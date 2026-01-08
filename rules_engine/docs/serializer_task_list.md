@@ -19,24 +19,6 @@ The serializer is organized into several modules:
 
 ## Part 3: Effect Serialization Features
 
-### Task 15: Implement Dissolve and Prevent Effects
-
-**Location:** `effect_serializer.rs` line 297 (catch-all)
-
-**Implementation:**
-```rust
-StandardEffect::DissolveCharactersQuantity { target, quantity } => {
-    format!(
-        "{{Dissolve}} {} equal to the number of {}.",
-        serialize_predicate_plural(target),
-        serialize_for_count_expression(quantity)
-    )
-}
-StandardEffect::PreventDissolveThisTurn { target } => {
-    format!("{} cannot be {{dissolved}} this turn.", serialize_predicate(target))
-}
-```
-
 ---
 
 ### Task 16: Implement Enemy and Points Effects
