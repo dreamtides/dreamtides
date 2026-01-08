@@ -441,6 +441,12 @@ pub fn serialize_standard_effect(effect: &StandardEffect) -> String {
         StandardEffect::AbandonAtEndOfTurn { target } => {
             format!("abandon {} at end of turn.", predicate_serializer::serialize_predicate(target))
         }
+        StandardEffect::BanishWhenLeavesPlay { target } => {
+            format!(
+                "{{Banish}} {} when it leaves play.",
+                predicate_serializer::serialize_predicate(target)
+            )
+        }
         _ => unimplemented!("Serialization not yet implemented for this effect type"),
     }
 }

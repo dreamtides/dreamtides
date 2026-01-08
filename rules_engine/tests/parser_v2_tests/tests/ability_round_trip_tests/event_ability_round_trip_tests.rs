@@ -154,6 +154,30 @@ fn test_round_trip_banish_enemy_with_cost_or_less() {
 }
 
 #[test]
+fn test_round_trip_banish_ally_when_it_leaves_play() {
+    let original = "{Banish} an ally when it leaves play.";
+    let parsed = parse_ability(original, "");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_banish_this_character_when_it_leaves_play() {
+    let original = "{Banish} this character when it leaves play.";
+    let parsed = parse_ability(original, "");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_banish_enemy_when_it_leaves_play() {
+    let original = "{Banish} an enemy when it leaves play.";
+    let parsed = parse_ability(original, "");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
 fn test_round_trip_dissolve_enemy_with_cost_or_more() {
     let original = "{Dissolve} an enemy with cost {e} or more.";
     let parsed = parse_ability(original, "e: 4");
