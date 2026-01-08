@@ -10,13 +10,13 @@ pub fn serialize_cost(cost: &Cost, bindings: &mut VariableBindings) -> String {
     match cost {
         Cost::AbandonCharactersCount { target, count } => match count {
             CollectionExpression::Exactly(1) => {
-                format!("abandon {}", predicate_serializer::serialize_predicate(target))
+                format!("abandon {}", predicate_serializer::serialize_predicate(target, bindings))
             }
             _ => "abandon {count-allies}".to_string(),
         },
         Cost::DiscardCards { target, count } => {
             if *count == 1 {
-                format!("discard {}", predicate_serializer::serialize_predicate(target))
+                format!("discard {}", predicate_serializer::serialize_predicate(target, bindings))
             } else {
                 if let Some(var_name) = parser_substitutions::directive_to_integer_variable("discards") {
                     bindings.insert(var_name.to_string(), VariableValue::Integer(*count));
@@ -60,25 +60,25 @@ pub fn serialize_cost(cost: &Cost, bindings: &mut VariableBindings) -> String {
             "{Banish} your void with {count} or more cards".to_string()
         }
         Cost::BanishFromHand(predicate) => {
-            format!("{{Banish}} {} from hand", predicate_serializer::serialize_predicate(predicate))
+            format!("{{Banish}} {} from hand", predicate_serializer::serialize_predicate(predicate, bindings))
         }
         Cost::Choice(costs) => costs.iter().map(|c| serialize_cost(c, bindings)).collect::<Vec<_>>().join(" or "),
         Cost::ReturnToHand { target, count } => {
             match count {
                 CollectionExpression::Exactly(1) => {
-                    format!("return {} to hand", predicate_serializer::serialize_predicate(target))
+                    format!("return {} to hand", predicate_serializer::serialize_predicate(target, bindings))
                 }
                 CollectionExpression::AllButOne => {
-                    format!("return all but one {} to hand", predicate_serializer::serialize_predicate(target))
+                    format!("return all but one {} to hand", predicate_serializer::serialize_predicate(target, bindings))
                 }
                 CollectionExpression::All => {
-                    format!("return all {} to hand", predicate_serializer::serialize_predicate(target))
+                    format!("return all {} to hand", predicate_serializer::serialize_predicate(target, bindings))
                 }
                 CollectionExpression::AnyNumberOf => {
-                    format!("return any number of {} to hand", predicate_serializer::serialize_predicate(target))
+                    format!("return any number of {} to hand", predicate_serializer::serialize_predicate(target, bindings))
                 }
                 CollectionExpression::UpTo(n) => {
-                    format!("return up to {} {} to hand", n, predicate_serializer::serialize_predicate_plural(target))
+                    format!("return up to {} {} to hand", n, predicate_serializer::serialize_predicate_plural(target, bindings))
                 }
                 _ => unimplemented!("Serialization not yet implemented for this collection expression in return to hand cost"),
             }

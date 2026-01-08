@@ -70,7 +70,7 @@ pub fn serialize_standard_static_ability(
             }
             format!(
                 "{} cost you {{e}} more.",
-                predicate_serializer::serialize_card_predicate_plural(matching)
+                predicate_serializer::serialize_card_predicate_plural(matching, bindings)
             )
         }
         StandardStaticAbility::YourCardsCostReduction { matching, reduction } => {
@@ -79,7 +79,7 @@ pub fn serialize_standard_static_ability(
             }
             format!(
                 "{} cost you {{e}} less.",
-                predicate_serializer::serialize_card_predicate_plural(matching)
+                predicate_serializer::serialize_card_predicate_plural(matching, bindings)
             )
         }
         StandardStaticAbility::EnemyCardsCostIncrease { matching, increase } => {
@@ -88,7 +88,7 @@ pub fn serialize_standard_static_ability(
             }
             format!(
                 "the opponent's {} cost {{e}} more.",
-                predicate_serializer::serialize_card_predicate_plural(matching)
+                predicate_serializer::serialize_card_predicate_plural(matching, bindings)
             )
         }
         StandardStaticAbility::SparkBonusOtherCharacters { matching, added_spark } => {
@@ -97,7 +97,7 @@ pub fn serialize_standard_static_ability(
             }
             format!(
                 "allied {} have +{{s}} spark.",
-                predicate_serializer::serialize_card_predicate_plural(matching)
+                predicate_serializer::serialize_card_predicate_plural(matching, bindings)
             )
         }
         StandardStaticAbility::AdditionalCostToPlay(cost) => {
@@ -171,13 +171,13 @@ pub fn serialize_standard_static_ability(
         StandardStaticAbility::JudgmentTriggersWhenMaterialized { predicate } => {
             format!(
                 "the '{{Judgment}}' ability of {} triggers when you {{materialize}} them.",
-                predicate_serializer::predicate_base_text(predicate)
+                predicate_serializer::predicate_base_text(predicate, bindings)
             )
         }
         StandardStaticAbility::SparkEqualToPredicateCount { predicate } => {
             format!(
                 "this character's spark is equal to the number of {}.",
-                predicate_serializer::predicate_base_text(predicate)
+                predicate_serializer::predicate_base_text(predicate, bindings)
             )
         }
         StandardStaticAbility::PlayOnlyFromVoid => {
@@ -213,7 +213,7 @@ pub fn serialize_standard_static_ability(
                 ability_data::predicate::CardPredicate::CharacterType(_) => {
                     "allied {plural-subtype}".to_string()
                 }
-                _ => predicate_serializer::serialize_card_predicate_plural(matching),
+                _ => predicate_serializer::serialize_card_predicate_plural(matching, bindings),
             };
             format!("{} have +{{s}} spark.", predicate_text)
         }

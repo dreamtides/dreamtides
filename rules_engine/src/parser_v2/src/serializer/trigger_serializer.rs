@@ -14,18 +14,21 @@ pub fn serialize_trigger_event(trigger: &TriggerEvent, bindings: &mut VariableBi
             format!("{{{}{}}}", serialize_keyword(&keywords[0]), serialize_keyword(&keywords[1]))
         }
         TriggerEvent::Play(predicate) => {
-            format!("when you play {}, ", predicate_serializer::serialize_predicate(predicate))
+            format!(
+                "when you play {}, ",
+                predicate_serializer::serialize_predicate(predicate, bindings)
+            )
         }
         TriggerEvent::OpponentPlays(predicate) => {
             format!(
                 "when the opponent plays {}, ",
-                predicate_serializer::serialize_predicate(predicate)
+                predicate_serializer::serialize_predicate(predicate, bindings)
             )
         }
         TriggerEvent::PlayFromHand(predicate) => {
             format!(
                 "when you play {} from your hand, ",
-                predicate_serializer::serialize_predicate(predicate)
+                predicate_serializer::serialize_predicate(predicate, bindings)
             )
         }
         TriggerEvent::PlayCardsInTurn(count) => {
@@ -40,42 +43,51 @@ pub fn serialize_trigger_event(trigger: &TriggerEvent, bindings: &mut VariableBi
             PlayerTurn::YourTurn => {
                 format!(
                     "when you play {} in a turn, ",
-                    predicate_serializer::serialize_predicate(predicate)
+                    predicate_serializer::serialize_predicate(predicate, bindings)
                 )
             }
             PlayerTurn::EnemyTurn => {
                 format!(
                     "when you play {} during the opponent's turn, ",
-                    predicate_serializer::serialize_predicate(predicate)
+                    predicate_serializer::serialize_predicate(predicate, bindings)
                 )
             }
         },
         TriggerEvent::Discard(predicate) => {
-            format!("when you discard {}, ", predicate_serializer::serialize_predicate(predicate))
+            format!(
+                "when you discard {}, ",
+                predicate_serializer::serialize_predicate(predicate, bindings)
+            )
         }
         TriggerEvent::Materialize(predicate) => {
             format!(
                 "when you {{materialize}} {}, ",
-                predicate_serializer::serialize_predicate(predicate)
+                predicate_serializer::serialize_predicate(predicate, bindings)
             )
         }
         TriggerEvent::Dissolved(predicate) => {
             format!(
                 "when {} is {{dissolved}}, ",
-                predicate_serializer::serialize_predicate(predicate)
+                predicate_serializer::serialize_predicate(predicate, bindings)
             )
         }
         TriggerEvent::Banished(predicate) => {
             format!(
                 "when {} is {{banished}}, ",
-                predicate_serializer::serialize_predicate(predicate)
+                predicate_serializer::serialize_predicate(predicate, bindings)
             )
         }
         TriggerEvent::LeavesPlay(predicate) => {
-            format!("when {} leaves play, ", predicate_serializer::serialize_predicate(predicate))
+            format!(
+                "when {} leaves play, ",
+                predicate_serializer::serialize_predicate(predicate, bindings)
+            )
         }
         TriggerEvent::Abandon(predicate) => {
-            format!("when you abandon {}, ", predicate_serializer::serialize_predicate(predicate))
+            format!(
+                "when you abandon {}, ",
+                predicate_serializer::serialize_predicate(predicate, bindings)
+            )
         }
         TriggerEvent::AbandonCardsInTurn(count) => {
             if let Some(var_name) =
@@ -88,7 +100,7 @@ pub fn serialize_trigger_event(trigger: &TriggerEvent, bindings: &mut VariableBi
         TriggerEvent::PutIntoVoid(predicate) => {
             format!(
                 "when {} is put into your void, ",
-                predicate_serializer::serialize_predicate(predicate)
+                predicate_serializer::serialize_predicate(predicate, bindings)
             )
         }
         TriggerEvent::DrawCardsInTurn(count) => {
@@ -111,7 +123,7 @@ pub fn serialize_trigger_event(trigger: &TriggerEvent, bindings: &mut VariableBi
             }
             format!(
                 "when you {{materialize}} {{text-number}} {} in a turn, ",
-                predicate_serializer::serialize_predicate_plural(predicate)
+                predicate_serializer::serialize_predicate_plural(predicate, bindings)
             )
         }
         TriggerEvent::GainEnergy => "when you gain energy, ".to_string(),

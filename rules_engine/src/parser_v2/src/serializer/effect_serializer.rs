@@ -80,7 +80,7 @@ pub fn serialize_standard_effect(
             Predicate::This => "gain {energy-symbol} equal to this character's cost.".to_string(),
             _ => format!(
                 "gain {{energy-symbol}} equal to {}'s cost.",
-                predicate_serializer::serialize_predicate(target)
+                predicate_serializer::serialize_predicate(target, bindings)
             ),
         },
         StandardEffect::GainEnergyForEach { gains, for_each } => {
@@ -89,7 +89,7 @@ pub fn serialize_standard_effect(
             }
             format!(
                 "gain {{e}} for each {}.",
-                predicate_serializer::serialize_for_each_predicate(for_each)
+                predicate_serializer::serialize_for_each_predicate(for_each, bindings)
             )
         }
         StandardEffect::GainPoints { gains } => {
@@ -145,19 +145,19 @@ pub fn serialize_standard_effect(
                 }
                 format!(
                     "{} gains {{reclaim-for-cost}} this turn.",
-                    predicate_serializer::serialize_predicate(target)
+                    predicate_serializer::serialize_predicate(target, bindings)
                 )
             }
             (_, None) => format!(
                 "{} gains {{reclaim}} this turn.",
-                predicate_serializer::serialize_predicate(target)
+                predicate_serializer::serialize_predicate(target, bindings)
             ),
         },
         StandardEffect::GainsSpark { target, gains } => {
             if let Some(var_name) = parser_substitutions::directive_to_integer_variable("s") {
                 bindings.insert(var_name.to_string(), VariableValue::Integer(gains.0));
             }
-            format!("{} gains +{{s}} spark.", predicate_serializer::serialize_predicate(target))
+            format!("{} gains +{{s}} spark.", predicate_serializer::serialize_predicate(target, bindings))
         }
         StandardEffect::EachMatchingGainsSpark { each, gains } => {
             if let Some(var_name) = parser_substitutions::directive_to_integer_variable("s") {
@@ -184,7 +184,7 @@ pub fn serialize_standard_effect(
             } else {
                 format!(
                     "{} gains +{{s}} spark for each {}.",
-                    predicate_serializer::serialize_predicate(target),
+                    predicate_serializer::serialize_predicate(target, bindings),
                     serialize_for_count_expression(for_quantity, bindings)
                 )
             }
@@ -208,91 +208,91 @@ pub fn serialize_standard_effect(
             if *count == 1 {
                 format!(
                     "put {} from your void on top of your deck.",
-                    predicate_serializer::serialize_card_predicate(matching)
+                    predicate_serializer::serialize_card_predicate(matching, bindings)
                 )
             } else {
                 format!(
                     "put {{up-to-n-cards}} {} from your void on top of your deck.",
-                    predicate_serializer::serialize_card_predicate_plural(matching)
+                    predicate_serializer::serialize_card_predicate_plural(matching, bindings)
                 )
             }
         }
         StandardEffect::Counterspell { target } => {
-            format!("{{Prevent}} a played {}.", predicate_serializer::predicate_base_text(target))
+            format!("{{Prevent}} a played {}.", predicate_serializer::predicate_base_text(target, bindings))
         }
         StandardEffect::CounterspellUnlessPaysCost { target, cost } => {
             format!(
                 "{{Prevent}} a played {} unless the opponent pays {}.",
-                predicate_serializer::predicate_base_text(target),
+                predicate_serializer::predicate_base_text(target, bindings),
                 cost_serializer::serialize_cost(cost, bindings)
             )
         }
         StandardEffect::GainControl { target } => {
-            format!("gain control of {}.", predicate_serializer::serialize_predicate(target))
+            format!("gain control of {}.", predicate_serializer::serialize_predicate(target, bindings))
         }
         StandardEffect::DissolveCharacter { target } => {
-            format!("{{Dissolve}} {}.", predicate_serializer::serialize_predicate(target))
+            format!("{{Dissolve}} {}.", predicate_serializer::serialize_predicate(target, bindings))
         }
         StandardEffect::DissolveCharactersCount { target, count } => match count {
             CollectionExpression::All => {
                 format!(
                     "{{Dissolve}} all {}.",
-                    predicate_serializer::serialize_predicate_plural(target)
+                    predicate_serializer::serialize_predicate_plural(target, bindings)
                 )
             }
             CollectionExpression::Exactly(n) => {
                 format!(
                     "{{Dissolve}} {} {}.",
                     n,
-                    predicate_serializer::serialize_predicate_plural(target)
+                    predicate_serializer::serialize_predicate_plural(target, bindings)
                 )
             }
             CollectionExpression::UpTo(n) => {
                 format!(
                     "{{Dissolve}} up to {} {}.",
                     n,
-                    predicate_serializer::serialize_predicate_plural(target)
+                    predicate_serializer::serialize_predicate_plural(target, bindings)
                 )
             }
             CollectionExpression::AnyNumberOf => {
                 format!(
                     "{{Dissolve}} any number of {}.",
-                    predicate_serializer::serialize_predicate_plural(target)
+                    predicate_serializer::serialize_predicate_plural(target, bindings)
                 )
             }
-            _ => format!("{{Dissolve}} {}.", predicate_serializer::serialize_predicate(target)),
+            _ => format!("{{Dissolve}} {}.", predicate_serializer::serialize_predicate(target, bindings)),
         },
         StandardEffect::BanishCharacter { target } => {
-            format!("{{Banish}} {}.", predicate_serializer::serialize_predicate(target))
+            format!("{{Banish}} {}.", predicate_serializer::serialize_predicate(target, bindings))
         }
         StandardEffect::BanishCollection { target, count } => match count {
             CollectionExpression::AnyNumberOf => {
                 format!(
                     "{{Banish}} any number of {}.",
-                    predicate_serializer::serialize_predicate_plural(target)
+                    predicate_serializer::serialize_predicate_plural(target, bindings)
                 )
             }
             CollectionExpression::All => {
                 format!(
                     "{{Banish}} all {}.",
-                    predicate_serializer::serialize_predicate_plural(target)
+                    predicate_serializer::serialize_predicate_plural(target, bindings)
                 )
             }
             CollectionExpression::Exactly(n) => {
                 format!(
                     "{{Banish}} {} {}.",
                     n,
-                    predicate_serializer::serialize_predicate_plural(target)
+                    predicate_serializer::serialize_predicate_plural(target, bindings)
                 )
             }
             CollectionExpression::UpTo(n) => {
                 format!(
                     "{{Banish}} up to {} {}.",
                     n,
-                    predicate_serializer::serialize_predicate_plural(target)
+                    predicate_serializer::serialize_predicate_plural(target, bindings)
                 )
             }
-            _ => format!("{{Banish}} {}.", predicate_serializer::serialize_predicate(target)),
+            _ => format!("{{Banish}} {}.", predicate_serializer::serialize_predicate(target, bindings)),
         },
         StandardEffect::BanishCardsFromEnemyVoid { count } => {
             if let Some(var_name) = parser_substitutions::directive_to_integer_variable("cards") {
@@ -304,32 +304,32 @@ pub fn serialize_standard_effect(
         StandardEffect::BanishCharacterUntilLeavesPlay { target, until_leaves } => {
             format!(
                 "{{Banish}} {} until {} leaves play.",
-                predicate_serializer::serialize_predicate(target),
-                predicate_serializer::predicate_base_text(until_leaves)
+                predicate_serializer::serialize_predicate(target, bindings),
+                predicate_serializer::predicate_base_text(until_leaves, bindings)
             )
         }
         StandardEffect::BanishUntilNextMain { target } => {
             format!(
                 "{{Banish}} {} until your next main phase.",
-                predicate_serializer::serialize_predicate(target)
+                predicate_serializer::serialize_predicate(target, bindings)
             )
         }
         StandardEffect::Discover { predicate } => {
-            format!("{{Discover}} {}.", predicate_serializer::serialize_card_predicate(predicate))
+            format!("{{Discover}} {}.", predicate_serializer::serialize_card_predicate(predicate, bindings))
         }
         StandardEffect::DiscoverAndThenMaterialize { predicate } => {
             format!(
                 "{{Discover}} {} and {{materialize}} it.",
-                predicate_serializer::serialize_card_predicate(predicate)
+                predicate_serializer::serialize_card_predicate(predicate, bindings)
             )
         }
         StandardEffect::MaterializeCharacter { target } => {
-            format!("{{Materialize}} {}.", predicate_serializer::serialize_predicate(target))
+            format!("{{Materialize}} {}.", predicate_serializer::serialize_predicate(target, bindings))
         }
         StandardEffect::MaterializeCharacterAtEndOfTurn { target } => {
             format!(
                 "{{Materialize}} {} at end of turn.",
-                predicate_serializer::serialize_predicate(target)
+                predicate_serializer::serialize_predicate(target, bindings)
             )
         }
         StandardEffect::MaterializeSilentCopy { target, count, quantity } => {
@@ -337,47 +337,55 @@ pub fn serialize_standard_effect(
                 (1, QuantityExpression::Matching(_)) => {
                     format!(
                         "{{Materialize}} a copy of {}.",
-                        predicate_serializer::serialize_predicate(target)
+                        predicate_serializer::serialize_predicate(target, bindings)
                     )
                 }
                 (n, QuantityExpression::Matching(_)) if *n > 1 => {
                     format!(
                         "{{Materialize}} {} copies of {}.",
                         n,
-                        predicate_serializer::serialize_predicate(target)
+                        predicate_serializer::serialize_predicate(target, bindings)
                     )
                 }
                 (_, QuantityExpression::Matching(predicate)) => {
                     format!(
                         "{{Materialize}} a number of copies of {} equal to the number of {}.",
-                        predicate_serializer::serialize_predicate(target),
-                        predicate_serializer::serialize_predicate_plural(predicate)
+                        predicate_serializer::serialize_predicate(target, bindings),
+                        predicate_serializer::serialize_predicate_plural(predicate, bindings)
                     )
                 }
                 (_, QuantityExpression::ForEachEnergySpentOnThisCard) => {
                     format!(
                         "{{Materialize}} a number of copies of {} equal to the amount of {{energy-symbol}} spent.",
-                        predicate_serializer::serialize_predicate(target)
+                        predicate_serializer::serialize_predicate(target, bindings)
                     )
                 }
                 (_, quantity_expr) => {
                     format!(
                         "{{Materialize}} a number of copies of {} equal to the number of {}.",
-                        predicate_serializer::serialize_predicate(target),
+                        predicate_serializer::serialize_predicate(target, bindings),
                         serialize_for_count_expression(quantity_expr, bindings)
                     )
                 }
             }
         }
-        StandardEffect::MaterializeFigments { count, .. } => {
+        StandardEffect::MaterializeFigments { count, figment } => {
+            bindings.insert("figment".to_string(), VariableValue::Figment(*figment));
             if *count == 1 {
                 "{Materialize} {a-figment}.".to_string()
             } else {
+                bindings.insert("number".to_string(), VariableValue::Integer(*count));
                 "{Materialize} {n-figments}.".to_string()
             }
         }
-        StandardEffect::MaterializeFigmentsQuantity { count, quantity, .. } => {
-            let figment_text = if *count == 1 { "{a-figment}" } else { "{n-figments}" };
+        StandardEffect::MaterializeFigmentsQuantity { count, quantity, figment } => {
+            bindings.insert("figment".to_string(), VariableValue::Figment(*figment));
+            let figment_text = if *count == 1 {
+                "{a-figment}"
+            } else {
+                bindings.insert("number".to_string(), VariableValue::Integer(*count));
+                "{n-figments}"
+            };
             match quantity {
                 QuantityExpression::PlayedThisTurn(_) => {
                     format!(
@@ -389,7 +397,7 @@ pub fn serialize_standard_effect(
                     format!(
                         "{{Materialize}} {} for each {}.",
                         figment_text,
-                        predicate_serializer::serialize_for_each_predicate(predicate)
+                        predicate_serializer::serialize_for_each_predicate(predicate, bindings)
                     )
                 }
                 _ => format!(
@@ -405,12 +413,12 @@ pub fn serialize_standard_effect(
             }
             Predicate::Another(CardPredicate::Character) => "return an ally to hand.".to_string(),
             Predicate::This => "return this character to your hand.".to_string(),
-            _ => format!("return {} to hand.", predicate_serializer::serialize_predicate(target)),
+            _ => format!("return {} to hand.", predicate_serializer::serialize_predicate(target, bindings)),
         },
         StandardEffect::ReturnFromYourVoidToHand { target } => {
             format!(
                 "return {} from your void to your hand.",
-                predicate_serializer::serialize_predicate(target)
+                predicate_serializer::serialize_predicate(target, bindings)
             )
         }
         StandardEffect::ReturnUpToCountFromYourVoidToHand { count, .. } => {
@@ -420,18 +428,18 @@ pub fn serialize_standard_effect(
             "return {up-to-n-events} from your void to your hand.".to_string()
         }
         StandardEffect::ReturnFromYourVoidToPlay { target } => {
-            format!("{{Reclaim}} {}.", predicate_serializer::serialize_predicate(target))
+            format!("{{Reclaim}} {}.", predicate_serializer::serialize_predicate(target, bindings))
         }
         StandardEffect::ReturnRandomFromYourVoidToPlay { predicate } => {
             format!(
                 "{{Reclaim}} a random {}.",
-                predicate_serializer::serialize_card_predicate(predicate)
+                predicate_serializer::serialize_card_predicate(predicate, bindings)
             )
         }
         StandardEffect::PutOnTopOfEnemyDeck { target } => {
             format!(
                 "put {} on top of the opponent's deck.",
-                predicate_serializer::serialize_predicate(target)
+                predicate_serializer::serialize_predicate(target, bindings)
             )
         }
         StandardEffect::EachPlayerDiscardCards { count } => {
@@ -443,7 +451,7 @@ pub fn serialize_standard_effect(
         StandardEffect::EachPlayerAbandonsCharacters { matching, .. } => {
             format!(
                 "each player abandons {}.",
-                predicate_serializer::serialize_card_predicate(matching)
+                predicate_serializer::serialize_card_predicate(matching, bindings)
             )
         }
         StandardEffect::EachPlayerShufflesHandAndVoidIntoDeckAndDraws { count } => {
@@ -461,23 +469,23 @@ pub fn serialize_standard_effect(
             (_, CollectionExpression::All) => {
                 format!(
                     "{{Materialize}} all {}.",
-                    predicate_serializer::serialize_predicate_plural(target)
+                    predicate_serializer::serialize_predicate_plural(target, bindings)
                 )
             }
             (_, CollectionExpression::AnyNumberOf) => {
                 format!(
                     "{{Materialize}} any number of {}.",
-                    predicate_serializer::serialize_predicate_plural(target)
+                    predicate_serializer::serialize_predicate_plural(target, bindings)
                 )
             }
             (_, CollectionExpression::UpTo(n)) => {
                 format!(
                     "{{Materialize}} up to {} {}.",
                     n,
-                    predicate_serializer::serialize_predicate_plural(target)
+                    predicate_serializer::serialize_predicate_plural(target, bindings)
                 )
             }
-            _ => format!("{{Materialize}} {}.", predicate_serializer::serialize_predicate(target)),
+            _ => format!("{{Materialize}} {}.", predicate_serializer::serialize_predicate(target, bindings)),
         },
         StandardEffect::MaterializeRandomFromDeck { count, predicate } => {
             if let Some(var_name) = parser_substitutions::directive_to_integer_variable("n-random-characters") {
@@ -502,39 +510,39 @@ pub fn serialize_standard_effect(
             }
             format!(
                 "copy the next {} you play {{this-turn-times}}.",
-                predicate_serializer::predicate_base_text(matching)
+                predicate_serializer::predicate_base_text(matching, bindings)
             )
         }
         StandardEffect::Copy { target } => {
-            format!("copy {}.", predicate_serializer::serialize_predicate(target))
+            format!("copy {}.", predicate_serializer::serialize_predicate(target, bindings))
         }
         StandardEffect::DisableActivatedAbilitiesWhileInPlay { target } => format!(
             "disable the activated abilities of {} while this character is in play.",
-            predicate_serializer::serialize_predicate(target)
+            predicate_serializer::serialize_predicate(target, bindings)
         ),
         StandardEffect::DrawMatchingCard { predicate } => {
             format!(
                 "draw {} from your deck.",
-                predicate_serializer::serialize_card_predicate(predicate)
+                predicate_serializer::serialize_card_predicate(predicate, bindings)
             )
         }
         StandardEffect::TriggerJudgmentAbility { matching, collection } => match collection {
             CollectionExpression::All => format!(
                 "trigger the {{Judgment}} ability of each {}.",
-                predicate_serializer::predicate_base_text(matching)
+                predicate_serializer::predicate_base_text(matching, bindings)
             ),
             CollectionExpression::Exactly(1) => format!(
                 "trigger the {{Judgment}} ability of {}.",
-                predicate_serializer::serialize_predicate(matching)
+                predicate_serializer::serialize_predicate(matching, bindings)
             ),
             CollectionExpression::Exactly(n) => format!(
                 "trigger the {{Judgment}} ability of {} {}.",
                 n,
-                predicate_serializer::serialize_predicate_plural(matching)
+                predicate_serializer::serialize_predicate_plural(matching, bindings)
             ),
             _ => format!(
                 "trigger the {{Judgment}} ability of {}.",
-                predicate_serializer::serialize_predicate(matching)
+                predicate_serializer::serialize_predicate(matching, bindings)
             ),
         },
         StandardEffect::TriggerAdditionalJudgmentPhaseAtEndOfTurn => {
@@ -545,35 +553,35 @@ pub fn serialize_standard_effect(
         StandardEffect::AbandonAndGainEnergyForSpark { target, .. } => {
             format!(
                 "abandon {} and gain {{energy-symbol}} for each point of spark that character had.",
-                predicate_serializer::serialize_predicate(target)
+                predicate_serializer::serialize_predicate(target, bindings)
             )
         }
         StandardEffect::AbandonAtEndOfTurn { target } => {
-            format!("abandon {} at end of turn.", predicate_serializer::serialize_predicate(target))
+            format!("abandon {} at end of turn.", predicate_serializer::serialize_predicate(target, bindings))
         }
         StandardEffect::BanishWhenLeavesPlay { target } => {
             format!(
                 "{{Banish}} {} when it leaves play.",
-                predicate_serializer::serialize_predicate(target)
+                predicate_serializer::serialize_predicate(target, bindings)
             )
         }
         StandardEffect::DissolveCharactersQuantity { target, quantity } => {
             format!(
                 "{{Dissolve}} all {} with cost less than or equal to the number of {}.",
-                predicate_serializer::serialize_predicate_plural(target),
+                predicate_serializer::serialize_predicate_plural(target, bindings),
                 serialize_for_count_expression(quantity, bindings)
             )
         }
         StandardEffect::PreventDissolveThisTurn { target } => {
             format!(
                 "{} cannot be {{dissolved}} this turn.",
-                predicate_serializer::serialize_predicate(target)
+                predicate_serializer::serialize_predicate(target, bindings)
             )
         }
         StandardEffect::GainsAegisThisTurn { target } => {
             format!(
                 "{} gains {{Aegis}} this turn.",
-                predicate_serializer::serialize_predicate(target)
+                predicate_serializer::serialize_predicate(target, bindings)
             )
         }
         StandardEffect::GainsSparkUntilYourNextMainForEach { target, gains, for_each } => {
@@ -582,8 +590,8 @@ pub fn serialize_standard_effect(
             }
             format!(
                 "{} gains +{{s}} spark until your next main phase for each {}.",
-                predicate_serializer::serialize_predicate(target),
-                predicate_serializer::serialize_for_each_predicate(for_each)
+                predicate_serializer::serialize_predicate(target, bindings),
+                predicate_serializer::serialize_for_each_predicate(for_each, bindings)
             )
         }
         StandardEffect::GainTwiceThatMuchEnergyInstead => {
@@ -592,7 +600,7 @@ pub fn serialize_standard_effect(
         StandardEffect::MaterializeCharacterFromVoid { target } => {
             format!(
                 "{{Materialize}} {} from your void.",
-                predicate_serializer::serialize_card_predicate(target)
+                predicate_serializer::serialize_card_predicate(target, bindings)
             )
         }
         StandardEffect::ThenMaterializeIt => "then {Materialize} it.".to_string(),
@@ -796,11 +804,11 @@ pub fn serialize_effect(effect: &Effect, bindings: &mut VariableBindings) -> Str
 
 pub fn serialize_for_count_expression(
     quantity_expression: &QuantityExpression,
-    _bindings: &mut VariableBindings,
+    bindings: &mut VariableBindings,
 ) -> String {
     match quantity_expression {
         QuantityExpression::Matching(predicate) => {
-            predicate_serializer::serialize_for_each_predicate(predicate)
+            predicate_serializer::serialize_for_each_predicate(predicate, bindings)
         }
         QuantityExpression::PlayedThisTurn(predicate) => format!(
             "{} you have played this turn",
@@ -833,10 +841,13 @@ pub fn serialize_for_count_expression(
 
 fn serialize_allied_card_predicate(
     card_predicate: &CardPredicate,
-    _bindings: &mut VariableBindings,
+    bindings: &mut VariableBindings,
 ) -> String {
     match card_predicate {
-        CardPredicate::CharacterType(_) => "allied {subtype}".to_string(),
+        CardPredicate::CharacterType(subtype) => {
+            bindings.insert("subtype".to_string(), VariableValue::Subtype(*subtype));
+            "allied {subtype}".to_string()
+        }
         _ => format!(
             "allied {}",
             text_formatting::card_predicate_base_text(card_predicate).without_article()
@@ -847,7 +858,7 @@ fn serialize_allied_card_predicate(
 fn serialize_cards_in_void_gain_reclaim_this_turn(
     count: &CollectionExpression,
     predicate: &CardPredicate,
-    _bindings: &mut VariableBindings,
+    bindings: &mut VariableBindings,
 ) -> String {
     match count {
         CollectionExpression::Exactly(1) => {
@@ -860,7 +871,7 @@ fn serialize_cards_in_void_gain_reclaim_this_turn(
             format!(
                 "{} {} in your void gain {{reclaim}} equal to their cost this turn.",
                 n,
-                predicate_serializer::serialize_card_predicate_plural(predicate)
+                predicate_serializer::serialize_card_predicate_plural(predicate, bindings)
             )
         }
         CollectionExpression::All => {
@@ -870,27 +881,27 @@ fn serialize_cards_in_void_gain_reclaim_this_turn(
         CollectionExpression::AllButOne => {
             format!(
                 "all but one {} in your void gain {{reclaim}} equal to their cost this turn.",
-                predicate_serializer::serialize_card_predicate_plural(predicate)
+                predicate_serializer::serialize_card_predicate_plural(predicate, bindings)
             )
         }
         CollectionExpression::UpTo(n) => {
             format!(
                 "up to {} {} in your void gain {{reclaim}} equal to their cost this turn.",
                 n,
-                predicate_serializer::serialize_card_predicate_plural(predicate)
+                predicate_serializer::serialize_card_predicate_plural(predicate, bindings)
             )
         }
         CollectionExpression::AnyNumberOf => {
             format!(
                 "any number of {} in your void gain {{reclaim}} equal to their cost this turn.",
-                predicate_serializer::serialize_card_predicate_plural(predicate)
+                predicate_serializer::serialize_card_predicate_plural(predicate, bindings)
             )
         }
         CollectionExpression::OrMore(n) => {
             format!(
                 "{} or more {} in your void gain {{reclaim}} equal to their cost this turn.",
                 n,
-                predicate_serializer::serialize_card_predicate_plural(predicate)
+                predicate_serializer::serialize_card_predicate_plural(predicate, bindings)
             )
         }
         CollectionExpression::EachOther => {

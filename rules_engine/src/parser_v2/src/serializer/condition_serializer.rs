@@ -18,11 +18,11 @@ pub fn serialize_condition(condition: &Condition, bindings: &mut VariableBinding
         }
         Condition::CardsDiscardedThisTurn { count: 1, predicate } => format!(
             "if you have discarded {} this turn",
-            predicate_serializer::serialize_card_predicate(predicate)
+            predicate_serializer::serialize_card_predicate(predicate, bindings)
         ),
         Condition::CardsDiscardedThisTurn { predicate, .. } => format!(
             "if you have discarded {predicate} this turn",
-            predicate = predicate_serializer::serialize_card_predicate(predicate)
+            predicate = predicate_serializer::serialize_card_predicate(predicate, bindings)
         ),
         Condition::CardsDrawnThisTurn { count } => {
             if let Some(var_name) = parser_substitutions::directive_to_integer_variable("count") {
