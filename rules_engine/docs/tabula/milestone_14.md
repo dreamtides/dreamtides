@@ -105,12 +105,22 @@ grep -r "spanned_abilities" src/ tests/
 grep -r "is_test_card" src/ tests/
 ```
 
-## Testing Strategy
+## Migration Approach
 
-1. Update one crate at a time
-2. Run `just check` after each update
-3. Run tests for updated crate
-4. Proceed to next crate only when current passes
+This is a **single-pass migration** - all dependent crates are updated at once:
+
+1. Update imports in ALL crates simultaneously
+2. Handle API differences (DisplayedAbility -> serializers, etc.)
+3. Update all Cargo.toml dependencies
+4. Run `just check` on entire workspace
+5. Run `cargo test --workspace` to verify everything works
+6. Fix any remaining issues before committing
+
+**Pre-Migration Checklist:**
+- [ ] Audit all tests to confirm they use test cards only
+- [ ] Review all `tabula_data` usage across the workspace
+- [ ] Validate V2 parser output matches expectations for all production cards
+- [ ] Document all code locations that need DisplayedAbility -> serializer changes
 
 ## Verification
 

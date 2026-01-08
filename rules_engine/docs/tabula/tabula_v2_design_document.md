@@ -320,23 +320,35 @@ uuid = { version = "1", features = ["v4", "serde"] }
 
 ## Migration Strategy
 
-Migration happens in phases to avoid breaking the build:
+Migration happens in two phases: **Preparation** and **Cutover**.
 
-**Phase 1: Parallel Implementation**
-- Create `tabula_data_v2` alongside `tabula_data`
-- Both crates can coexist
-- Tests use V2, production uses V1
+**Phase 1: Preparation (Build V2 in Parallel)**
+- Create `tabula_data_v2` crate alongside `tabula_data`
+- Implement all V2 functionality completely
+- V2 is tested independently but not yet used by other crates
+- **Critical Prep Work:**
+  - Audit all existing tests to ensure they only use test cards (not production cards)
+  - Review all code that uses `tabula_data` to plan the migration
+  - Document all API differences between V1 and V2
+  - Create migration checklists for each dependent crate
+  - Validate V2 parser produces correct output for all production cards
 
-**Phase 2: Feature Flag Transition**
-- Add feature flag to switch between V1 and V2
-- Gradually migrate callers
-- Run both paths in CI
+**Phase 2: Single-Pass Cutover**
+- Update ALL dependent crates in a single migration pass
+- No feature flags or gradual rollout
+- All imports change from `tabula_data` to `tabula_data_v2` at once
+- Run full test suite after migration
+- Once passing, immediately proceed to cleanup:
+  - Remove `tabula_data` crate
+  - Remove `old_tabula_cli` crate
+  - Delete `tabula.json`
+  - Rename `tabula_data_v2` to `tabula_data`
 
-**Phase 3: V1 Removal**
-- Remove `tabula_data` crate
-- Remove `old_tabula_cli` crate
-- Delete `tabula.json`
-- Rename `tabula_data_v2` to `tabula_data`
+**Why Single-Pass Migration:**
+- Feature flags add complexity without benefit
+- Parallel paths create maintenance burden
+- Clean cut makes rollback decision clear
+- Thorough prep work reduces cutover risk
 
 ## Testing Strategy
 
