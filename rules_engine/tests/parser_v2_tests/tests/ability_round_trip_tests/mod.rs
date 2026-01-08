@@ -1,8 +1,9 @@
-mod activated_abilities;
+mod activated_ability_round_trip_tests;
 mod collection_effect_round_trip_tests;
-mod compound_effects;
-mod event_abilities;
-mod judgment_abilities;
+mod compound_effect_round_trip_tests;
+mod event_ability_round_trip_tests;
+mod judgment_ability_round_trip_tests;
 mod predicate_serialization_round_trip_tests;
-mod static_abilities;
-mod triggered_abilities;
+mod quantity_expression_round_trip_tests;
+mod static_ability_round_trip_tests;
+mod triggered_ability_round_trip_tests;
