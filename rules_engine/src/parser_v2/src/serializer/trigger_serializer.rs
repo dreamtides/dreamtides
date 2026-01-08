@@ -81,8 +81,16 @@ pub fn serialize_trigger_event(trigger: &TriggerEvent) -> String {
         TriggerEvent::DrawAllCardsInCopyOfDeck => {
             "when you have no cards in your deck, ".to_string()
         }
+        TriggerEvent::MaterializeNthThisTurn(predicate, _) => {
+            format!(
+                "when you {{materialize}} {{text-number}} {} in a turn, ",
+                predicate_serializer::serialize_predicate_plural(predicate)
+            )
+        }
         TriggerEvent::GainEnergy => "when you gain energy, ".to_string(),
-        _ => unimplemented!("Serialization not yet implemented for this trigger type"),
+        TriggerEvent::Keywords(_) => {
+            unimplemented!("Serialization not yet implemented for this trigger type")
+        }
     }
 }
 

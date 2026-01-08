@@ -361,3 +361,43 @@ fn test_round_trip_when_opponent_plays_card_which_could_dissolve_ally_prevent_th
     let serialized = ability_serializer::serialize_ability(&parsed);
     assert_eq!(original, serialized);
 }
+
+#[test]
+fn test_round_trip_when_you_materialize_text_number_allies_in_turn_reclaim_this_character() {
+    let original = "When you {materialize} {text-number} allies in a turn, {Reclaim} this character.";
+    let parsed = parse_ability(original, "number: 2");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_when_you_materialize_text_number_allies_in_turn_gain_energy() {
+    let original = "When you {materialize} {text-number} allies in a turn, gain {e}.";
+    let parsed = parse_ability(original, "number: 3, e: 2");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_when_you_materialize_text_number_warriors_in_turn_draw_cards() {
+    let original = "When you {materialize} {text-number} allied {plural-subtype} in a turn, draw {cards}.";
+    let parsed = parse_ability(original, "number: 2, subtype: warrior, cards: 1");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_when_you_materialize_text_number_allies_with_spark_in_turn_gain_spark() {
+    let original = "When you {materialize} {text-number} allies with spark {s} or more in a turn, this character gains +{s} spark.";
+    let parsed = parse_ability(original, "number: 3, s: 2");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}
+
+#[test]
+fn test_round_trip_when_you_materialize_text_number_characters_in_turn_kindle() {
+    let original = "When you {materialize} {text-number} characters in a turn, {Kindle}.";
+    let parsed = parse_ability(original, "number: 4, k: 1");
+    let serialized = ability_serializer::serialize_ability(&parsed);
+    assert_eq!(original, serialized);
+}

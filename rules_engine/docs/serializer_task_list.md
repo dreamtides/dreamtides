@@ -23,39 +23,6 @@ The serializer is organized into several modules:
 
 ## Part 4: Other Serializer Features
 
-### Task 22: Implement TriggerEvent::MaterializeNthThisTurn
-
-**Location:** `trigger_serializer.rs` line 64
-
-**Implementation:**
-
-First, add an ordinal helper to `serializer_utils.rs`:
-```rust
-pub fn ordinal(n: u32) -> &'static str {
-    match n {
-        1 => "first",
-        2 => "second",
-        3 => "third",
-        4 => "fourth",
-        5 => "fifth",
-        _ => "nth",
-    }
-}
-```
-
-Then implement the variant:
-```rust
-TriggerEvent::MaterializeNthThisTurn(predicate, n) => {
-    format!(
-        "when you {{materialize}} your {} {} this turn, ",
-        ordinal(*n),
-        predicate_base_text(predicate).without_article()
-    )
-}
-```
-
----
-
 ### Task 23: Implement Missing Cost Variants
 
 **Location:** `cost_serializer.rs` lines 55 and 59
@@ -111,37 +78,3 @@ StandardStaticAbility::PlayFromVoid(play_from_void) => {
 ```
 
 ---
-
-## Part 5: Testing
-
-### Task 25: Add Round-Trip Serializer Tests
-
-**Goal:** Create comprehensive tests that verify parsing and serialization produce
-equivalent output.
-
-**Implementation:**
-
-Create `src/parser_v2/src/serializer/tests.rs`:
-
-1. For each ability type, create test cases that:
-   - Parse rules text into an `Ability`
-   - Serialize the `Ability` back to text
-   - Verify the text matches or is semantically equivalent
-
-2. Test edge cases:
-   - Articles ("a" vs "an") for vowel-starting words
-   - Plural forms
-   - Capitalization at sentence boundaries
-   - Complex nested effects
-   - Modal abilities with multiple choices
-
-Example test structure:
-```rust
-#[test]
-fn test_serialize_triggered_ability() {
-    let text = "When you play a character, draw a card.";
-    let ability = parse_ability(text).unwrap();
-    let serialized = serialize_ability(&ability);
-    assert_eq!(serialized, text);
-}
-```
