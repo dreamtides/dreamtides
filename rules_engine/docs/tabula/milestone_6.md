@@ -1,131 +1,125 @@
-# Milestone 6: Card Definition Building
+# Milestone 5: Parser V2 Integration
 
 ## Objective
 
-Implement `card_definition_builder.rs` to convert `CardDefinitionRaw` into `CardDefinition`.
+Implement `ability_parser.rs` to parse card abilities using the parser_v2 system.
 
 ## Tasks
 
-1. Create builder functions for `CardDefinition`
-2. Validate required fields exist and have correct types
-3. Convert string enums to proper enum types (CardType, CardSubtype, etc.)
-4. Parse abilities using AbilityParser and attach to CardDefinition
-5. Generate descriptive errors for missing/invalid fields
+1. Create `AbilityParser` struct with cached parser
+2. Implement ability parsing from rules text and variables
+3. Add error handling that includes card name/ID in messages
+4. Write tests parsing sample ability text
 
-## CardDefinition Struct
+**Note:** UI rendering will use serializers from `parser_v2/src/serializer` on-demand, not stored display data.
 
-The final struct (in `card_definition.rs`) should match V1 but without `is_test_card` and without display-specific fields:
-
-```rust
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct CardDefinition {
-    pub id: BaseCardId,
-    pub name: String,
-    pub card_type: CardType,
-    pub subtype: Option<CardSubtype>,
-    pub energy_cost: EnergyCost,
-    pub spark: Option<i32>,
-    pub phase: Option<i32>,
-    pub rules_text: Option<String>,
-    pub prompts: Option<String>,
-    pub image_number: Option<i64>,
-    pub rarity: Option<CardRarity>,
-    pub is_fast: bool,
-    pub abilities: Vec<Ability>,
-    // Note: no is_test_card field
-    // Note: no spanned_abilities - use serializers for display
-}
-```
-
-## Builder Pattern
+## AbilityParser Struct
 
 ```rust
-pub struct CardDefinitionBuilder<'a> {
-    parser: &'a AbilityParser,
-    fluent: &'a FluentStrings,
-    source_file: PathBuf,
+use chumsky::Parser;
+use parser_v2::lexer::lexer_tokenize;
+use parser_v2::parser::ability_parser;
+use parser_v2::variables::{parser_bindings::VariableBindings, parser_substitutions};
+use parser_v2::builder::parser_builder;
+
+pub struct AbilityParser {
+    // Parser is created once and reused
 }
 
-impl<'a> CardDefinitionBuilder<'a> {
-    pub fn build(&self, raw: CardDefinitionRaw) -> Result<CardDefinition, TabulaError> {
-        let id = raw.id.ok_or_else(|| TabulaError::MissingField {
-            file: self.source_file.clone(),
-            card_id: None,
-            field: "id",
-        })?;
+impl AbilityParser {
+    pub fn new() -> Self {
+        Self {}
+    }
 
-        let name = raw.name.ok_or_else(|| TabulaError::MissingField {
-            file: self.source_file.clone(),
-            card_id: Some(id),
-            field: "name",
-        })?;
+    pub fn parse(
+        &self,
+        rules_text: &str,
+        variables: &str,
+    ) -> Result<Vec<Ability>, TabulaError> {
+        // 1. Parse variable bindings
+        let bindings = VariableBindings::parse(variables)?;
 
-        // Parse card_type string to CardType enum
-        let card_type = self.parse_card_type(&raw.card_type, id)?;
+        // 2. Lex the rules text
+        let lex_result = lexer_tokenize::lex(rules_text)?;
 
-        // Parse abilities if rules_text exists
-        let abilities = if let Some(text) = &raw.rules_text {
-            let vars = raw.variables.as_deref().unwrap_or("");
-            self.parser.parse(text, vars)?
-        } else {
-            Vec::new()
-        };
+        // 3. Resolve variables
+        let resolved = parser_substitutions::resolve_variables(
+            &lex_result.tokens,
+            &bindings
+        )?;
 
-        Ok(CardDefinition { id, name, card_type, abilities, /* ... */ })
+        // 4. Parse abilities
+        let parser = ability_parser::ability_parser();
+        let parsed = parser.parse(&resolved).into_result()?;
+
+        // 5. Build Ability structs
+        let abilities = parser_builder::build_abilities(&parsed)?;
+
+        Ok(abilities)
     }
 }
 ```
 
-## Enum Conversion
+## Performance Considerations
 
-Convert strings to enums with clear error messages:
+Create parser once per Tabula load, not per card:
 
 ```rust
-fn parse_card_type(&self, value: &Option<String>, card_id: Uuid) -> Result<CardType, TabulaError> {
-    match value.as_deref() {
-        Some("Character") => Ok(CardType::Character),
-        Some("Event") => Ok(CardType::Event),
-        Some(other) => Err(TabulaError::InvalidValue {
-            file: self.source_file.clone(),
-            card_id: Some(card_id),
-            field: "card_type",
-            value: other.to_string(),
-        }),
-        None => Err(TabulaError::MissingField { /* ... */ }),
+impl Tabula {
+    fn parse_all_cards(&self, cards: Vec<CardDefinitionRaw>) -> Vec<CardDefinition> {
+        let parser = AbilityParser::new();
+        cards.into_iter()
+            .filter_map(|raw| self.build_card(&parser, raw).ok())
+            .collect()
     }
 }
 ```
 
-## Testing
+## Testing Strategy
+
+Reference existing parser tests for expected inputs/outputs:
 
 ```rust
 #[test]
-fn test_build_character_card() {
-    let raw = CardDefinitionRaw {
-        id: Some(Uuid::new_v4()),
-        name: Some("Test Character".to_string()),
-        card_type: Some("Character".to_string()),
-        energy_cost: Some(TomlValue::Integer(3)),
-        spark: Some(2),
-        // ...
-    };
+fn test_parse_draw_cards() {
     let parser = AbilityParser::new();
-    let fluent = FluentStrings::from_ftl("").unwrap();
-    let builder = CardDefinitionBuilder::new(&parser, &fluent, PathBuf::new());
-    let result = builder.build(raw);
-    assert!(result.is_ok());
+    let result = parser.parse("Draw {cards}.", "cards: 2").unwrap();
+    assert_eq!(result.abilities.len(), 1);
+}
+
+#[test]
+fn test_parse_triggered_ability() {
+    let parser = AbilityParser::new();
+    let result = parser.parse("{Judgment} Draw {cards}.", "cards: 2").unwrap();
+    assert_eq!(result.abilities.len(), 1);
+    assert!(matches!(&result.abilities[0], Ability::Triggered(_)));
+}
+```
+
+## UI Rendering Note
+
+Display text is NOT stored in CardDefinition. Instead, render on-demand using serializers:
+
+```rust
+use parser_v2::serializer::ability_serializer;
+
+// When displaying a card in UI
+for ability in &card.abilities {
+    let serialized = ability_serializer::serialize_ability(ability);
+    display_text(&serialized.text);
+    // Use serialized.variables for {placeholder} substitution
 }
 ```
 
 ## Verification
 
 - `cargo test -p tabula_data_v2` passes
-- Sample cards build successfully
-- Error messages clearly indicate which field failed and which card
+- Sample cards from cards.toml parse successfully
+- Parsed abilities match expected structure
 
 ## Context Files
 
-1. `src/tabula_data/src/card_definitions/card_definition_builder.rs` - V1 builder
-2. `src/tabula_data/src/card_definitions/card_definition.rs` - V1 CardDefinition
-3. `src/core_data/src/card_types.rs` - CardType, CardSubtype enums
-4. `docs/tabula/tabula_v2_design_document.md` - Error handling approach
+1. `benchmarks/parser_v2/src/benchmark_utils.rs` - Parser usage pattern
+2. `src/parser_v2/src/builder/parser_builder.rs` - Ability building
+3. `src/parser_v2/src/serializer/ability_serializer.rs` - UI text rendering
+4. `src/parser_v2/src/parser/ability_parser.rs` - Parser entry point

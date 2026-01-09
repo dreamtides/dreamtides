@@ -1,128 +1,106 @@
-# Milestone 10: String ID Code Generation
+# Milestone 9: Code Generation Updates
 
 ## Objective
 
-Generate `StringId` enum from `strings.ftl` file.
+Update `tabula_cli` to generate code for `tabula_generated` (renamed from `tabula_ids`).
 
 ## Tasks
 
-1. Create `strings.ftl` from existing `strings.toml` (manual conversion)
-2. Add FTL parsing to code generator to extract message IDs
-3. Generate `string_id.rs` with StringId enum
-4. Include method to get string key for each variant
-5. Write tests for generation
+1. Rename `tabula_ids` crate to `tabula_generated` in Cargo.toml and workspace
+2. Add code generation command to tabula_cli
+3. Generate `CardEffectRowType` enum from effect-types.toml
+4. Generate `CardEffectRowTrigger` enum from trigger-types.toml
+5. Generate `CardEffectRowObjectPredicate` enum from predicate-types.toml
+6. Update CardEffectRow to use generated enums instead of strings
 
-## FTL File Creation
+## Crate Rename
 
-Convert `strings.toml` to `strings.ftl` format. Example:
-
+Update `src/tabula_ids/Cargo.toml`:
 ```toml
-# strings.toml
-[keys]
-main_menu_play = "Play"
-main_menu_quit = "Quit"
+[package]
+name = "tabula_generated"
 ```
 
-Becomes:
+Update all crates that depend on `tabula_ids` to use `tabula_generated`.
 
-```ftl
-# strings.ftl
-main-menu-play = Play
-main-menu-quit = Quit
+## Code Generation Command
+
+Add to tabula_cli:
+
+```bash
+tabula generate [OUTPUT_DIR]
 ```
 
-Note: FTL uses kebab-case by convention.
+Default output: `src/tabula_generated/src/`
 
-## StringId Enum Generation
+## Effect Types Generation
 
-Parse FTL to extract message IDs (lines matching `^[a-z-]+ =`):
+Read `effect-types.toml`:
+```toml
+effect_types = [
+    "FireProjectile",
+    "DissolveTargets",
+    ...
+]
+```
 
+Generate `effect_types.rs`:
 ```rust
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
-pub enum StringId {
-    MainMenuPlay,
-    MainMenuQuit,
-    // ... all message IDs
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+pub enum CardEffectRowType {
+    FireProjectile,
+    DissolveTargets,
+    // ...
 }
 
-impl StringId {
-    pub fn key(&self) -> &'static str {
-        match self {
-            Self::MainMenuPlay => "main-menu-play",
-            Self::MainMenuQuit => "main-menu-quit",
+impl CardEffectRowType {
+    pub fn from_str(s: &str) -> Option<Self> {
+        match s {
+            "FireProjectile" => Some(Self::FireProjectile),
             // ...
+            _ => None,
         }
     }
 }
 ```
 
-## FTL Parsing
-
-Simple line-based parsing (no full Fluent parser needed):
+## Generation Implementation
 
 ```rust
-fn extract_message_ids(ftl_content: &str) -> Vec<String> {
-    ftl_content
-        .lines()
-        .filter_map(|line| {
-            let trimmed = line.trim();
-            if trimmed.starts_with('#') || trimmed.is_empty() {
-                return None;
-            }
-            if let Some(eq_pos) = trimmed.find('=') {
-                let id = trimmed[..eq_pos].trim();
-                if id.chars().all(|c| c.is_ascii_alphanumeric() || c == '-') {
-                    return Some(id.to_string());
-                }
-            }
-            None
-        })
-        .collect()
+// src/tabula_cli/src/commands/generate.rs
+pub fn generate_enums(output_dir: &Path) -> Result<()> {
+    generate_effect_types(output_dir)?;
+    generate_trigger_types(output_dir)?;
+    generate_predicate_types(output_dir)?;
+    Ok(())
 }
-```
 
-## Name Conversion
+fn generate_effect_types(output_dir: &Path) -> Result<()> {
+    let toml_path = tabula_dir().join("effect-types.toml");
+    let content = fs::read_to_string(&toml_path)?;
+    let data: EffectTypesFile = toml::from_str(&content)?;
 
-Convert kebab-case FTL IDs to PascalCase enum variants:
-
-```rust
-fn to_pascal_case(kebab: &str) -> String {
-    kebab
-        .split('-')
-        .map(|word| {
-            let mut chars = word.chars();
-            match chars.next() {
-                None => String::new(),
-                Some(first) => first.to_uppercase().chain(chars).collect(),
-            }
-        })
-        .collect()
+    let code = generate_enum_code("CardEffectRowType", &data.effect_types);
+    fs::write(output_dir.join("effect_types.rs"), code)?;
+    Ok(())
 }
 ```
 
 ## Testing
 
-```rust
-#[test]
-fn test_extract_message_ids() {
-    let ftl = r#"
-# Comment
-main-menu-play = Play
-main-menu-quit = Quit
-"#;
-    let ids = extract_message_ids(ftl);
-    assert_eq!(ids, vec!["main-menu-play", "main-menu-quit"]);
-}
-```
+- Verify generated code compiles
+- Verify enum variants match TOML entries exactly
+- Run `just check` after generation
 
 ## Verification
 
-- strings.ftl created and valid
-- `tabula generate` produces string_id.rs
-- StringId enum compiles and matches FTL content
+- `tabula generate` produces valid Rust code
+- `just check` passes after generation
+- CardEffectRow uses generated enums
 
 ## Context Files
 
-1. `src/tabula_ids/src/string_id.rs` - V1 StringId enum
-2. `client/Assets/StreamingAssets/Tabula/strings.toml` - Source strings
-3. `src/old_tabula_cli/src/tabula_codegen.rs` - V1 generation approach
+1. `src/old_tabula_cli/src/tabula_codegen.rs` - V1 code generation
+2. `src/tabula_ids/src/lib.rs` - Current structure
+3. `client/Assets/StreamingAssets/Tabula/effect-types.toml` - Effect types
+4. `client/Assets/StreamingAssets/Tabula/trigger-types.toml` - Trigger types

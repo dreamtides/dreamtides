@@ -1,105 +1,137 @@
-# Milestone 15: Save File Compatibility
+# Milestone 14: Migration - Update Callers
 
 ## Objective
 
-Ensure CardDefinition and related types serialize correctly for save files.
+Migrate all crates that depend on `tabula_data` to use `tabula_data_v2`.
 
 ## Tasks
 
-1. Verify CardDefinition has correct Serialize/Deserialize derives
-2. Test JSON serialization matches expected format
-3. Ensure Ability serialization is preserved
-4. Test loading existing save files with V2 types
-5. Document any breaking changes to save format
+1. Identify all crates depending on tabula_data
+2. Update imports and type references
+3. Handle API differences between V1 and V2
+4. Update tests to use new loading pattern
+5. Run full test suite to verify compatibility
 
-## Serialization Requirements
+## Affected Crates
 
-CardDefinition must serialize to JSON for save files:
+From workspace analysis:
+- `battle_state` - Uses CardDefinition
+- `battle_queries` - Uses card lookups
+- `battle_mutations` - Uses card data
+- `display` - Uses DisplayedAbility (now uses serializers)
+- `game_creation` - Creates games with cards
+- `quest_state` - Deck building with cards
+- `rules_engine` - Core game logic
+- `ai_matchup` - AI uses card data
 
-```rust
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct CardDefinition {
-    pub id: BaseCardId,
-    pub name: String,
-    // All fields must be serializable
-}
-```
-
-## Testing Serialization
-
-```rust
-#[test]
-fn test_card_definition_roundtrip() {
-    let card = CardDefinition {
-        id: BaseCardId(Uuid::new_v4()),
-        name: "Test Card".to_string(),
-        // ...
-    };
-    let json = serde_json::to_string(&card).unwrap();
-    let restored: CardDefinition = serde_json::from_str(&json).unwrap();
-    assert_eq!(card.id, restored.id);
-}
-
-#[test]
-fn test_ability_serialization() {
-    let ability = Ability::Event(EventAbility {
-        additional_cost: None,
-        effect: Effect::Effect(StandardEffect::DrawCards { count: 2 }),
-    });
-    let json = serde_json::to_string(&ability).unwrap();
-    let restored: Ability = serde_json::from_str(&json).unwrap();
-    assert_eq!(ability, restored);
-}
-```
-
-## UI Display Data
-
-Display text is not stored in CardDefinition. All UI rendering uses serializers from `parser_v2/src/serializer` on-demand. This means:
-- No display-specific fields need serialization
-- Save files are smaller and cleaner
-- Display logic can be updated without breaking save compatibility
-
-## Existing Save Compatibility
-
-Test loading save files created with V1:
+## Import Updates
 
 ```rust
-#[test]
-fn test_load_v1_save_file() {
-    let save_json = include_str!("test_data/v1_save_file.json");
-    let save: SaveFile = serde_json::from_str(save_json).unwrap();
-    // Verify deck cards load correctly
-}
+// Before
+use tabula_data::{CardDefinition, Tabula};
+
+// After
+use tabula_data_v2::{CardDefinition, Tabula};
 ```
 
-## Breaking Change Handling
+## API Differences to Handle
 
-If any field changes are breaking:
-1. Add `#[serde(default)]` for new optional fields
-2. Use `#[serde(rename = "old_name")]` for renamed fields
-3. Implement custom Deserialize if needed for complex migrations
+### DisplayedAbility -> Serializer System
+
+V2 removes stored display data. Instead, render UI text on-demand using serializers:
 
 ```rust
-#[derive(Deserialize)]
-pub struct CardDefinition {
-    #[serde(default)]
-    pub new_optional_field: Option<i32>,
+// Before
+let displayed: &DisplayedAbility = card.displayed_abilities.get(0)?;
+show_text(&displayed.text);
 
-    // Handle removed is_test_card field
-    #[serde(skip)]
-    _is_test_card: Option<bool>,
-}
+// After
+use parser_v2::serializer::ability_serializer;
+
+let ability = &card.abilities[0];
+let serialized = ability_serializer::serialize_ability(ability);
+show_text(&serialized.text);
+// Use serialized.variables for {placeholder} substitution
 ```
+
+For specific UI elements (prompts, effects, etc.), use the appropriate serializer:
+- `ability_serializer::serialize_ability()` - Full ability text
+- `effect_serializer::serialize_effect()` - Effect text only
+- `predicate_serializer::serialize_predicate()` - Target labels (e.g., "an ally")
+- `trigger_serializer::serialize_trigger_event()` - Trigger text
+- `cost_serializer::serialize_cost()` - Cost text
+
+### is_test_card Removal
+
+Any code checking `is_test_card` must be updated:
+
+```rust
+// Before
+if card.is_test_card { continue; }
+
+// After
+// No longer needed - test cards are in separate file
+```
+
+### TabulaSource Parameter
+
+Loading now requires source specification:
+
+```rust
+// Before
+let tabula = Tabula::load(path)?;
+
+// After
+let tabula = Tabula::load(TabulaSource::Production, path)?;
+// In tests:
+let tabula = Tabula::load(TabulaSource::Test, test_path)?;
+```
+
+## Migration Script
+
+Create helper to find usages:
+
+```bash
+# Find all tabula_data imports
+grep -r "use tabula_data" src/ tests/
+grep -r "tabula_data::" src/ tests/
+
+# Find DisplayedAbility usage (needs serializer migration)
+grep -r "DisplayedAbility" src/ tests/
+grep -r "displayed_abilities" src/ tests/
+grep -r "spanned_abilities" src/ tests/
+
+# Find is_test_card usage
+grep -r "is_test_card" src/ tests/
+```
+
+## Migration Approach
+
+This is a **single-pass migration** - all dependent crates are updated at once:
+
+1. Update imports in ALL crates simultaneously
+2. Handle API differences (DisplayedAbility -> serializers, etc.)
+3. Update all Cargo.toml dependencies
+4. Run `just check` on entire workspace
+5. Run `cargo test --workspace` to verify everything works
+6. Fix any remaining issues before committing
+
+**Pre-Migration Checklist:**
+- [ ] Audit all tests to confirm they use test cards only
+- [ ] Review all `tabula_data` usage across the workspace
+- [ ] Validate V2 parser output matches expectations for all production cards
+- [ ] Document all code locations that need DisplayedAbility -> serializer changes
 
 ## Verification
 
-- Save file round-trip tests pass
-- Existing save files load correctly
-- No unexpected JSON format changes
+- `just check` passes for all crates
+- `just clippy` passes
+- `cargo test --workspace` passes
 
 ## Context Files
 
-1. `src/database/src/save_file.rs` - Save file structure
-2. `src/quest_state/src/quest/deck.rs` - Deck serialization
-3. `src/ability_data/src/ability.rs` - Ability serialization
-4. `src/tabula_data/src/card_definitions/card_definition.rs` - V1 serialization
+1. `src/battle_state/Cargo.toml` - Example dependent crate
+2. `src/display/src/` - DisplayedAbility usage (migrate to serializers)
+3. `src/parser_v2/src/serializer/` - Available serializers for UI rendering
+4. `src/tabula_data_v2/src/lib.rs` - New public API
+5. Each dependent crate's src/ directory

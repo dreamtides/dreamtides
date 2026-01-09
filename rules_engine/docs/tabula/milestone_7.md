@@ -1,81 +1,98 @@
-# Milestone 7: Dreamwell & Other Card Types
+# Milestone 6: Card Definition Building
 
 ## Objective
 
-Implement builders for DreamwellCardDefinition and prepare for future card types.
+Implement `card_definition_builder.rs` to convert `CardDefinitionRaw` into `CardDefinition`.
 
 ## Tasks
 
-1. Create `dreamwell_definition.rs` with `DreamwellCardDefinition` struct
-2. Add builder method that validates dreamwell-specific fields
-3. Ensure `energy_produced` field is required for dreamwell cards
-4. Create placeholder files for future card types (dreamsign)
-5. Test building dreamwell cards from TOML
+1. Create builder functions for `CardDefinition`
+2. Validate required fields exist and have correct types
+3. Convert string enums to proper enum types (CardType, CardSubtype, etc.)
+4. Parse abilities using AbilityParser and attach to CardDefinition
+5. Generate descriptive errors for missing/invalid fields
 
-## DreamwellCardDefinition Struct
+## CardDefinition Struct
+
+The final struct (in `card_definition.rs`) should match V1 but without `is_test_card` and without display-specific fields:
 
 ```rust
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct DreamwellCardDefinition {
+pub struct CardDefinition {
     pub id: BaseCardId,
     pub name: String,
-    pub energy_produced: i32,  // Required for dreamwell
+    pub card_type: CardType,
+    pub subtype: Option<CardSubtype>,
+    pub energy_cost: EnergyCost,
+    pub spark: Option<i32>,
+    pub phase: Option<i32>,
+    pub rules_text: Option<String>,
+    pub prompts: Option<String>,
     pub image_number: Option<i64>,
     pub rarity: Option<CardRarity>,
-    // Note: no abilities, no spark, simpler than CardDefinition
+    pub is_fast: bool,
+    pub abilities: Vec<Ability>,
+    // Note: no is_test_card field
+    // Note: no spanned_abilities - use serializers for display
 }
 ```
 
-## Builder Extension
-
-Add method to `CardDefinitionBuilder`:
+## Builder Pattern
 
 ```rust
-impl<'a> CardDefinitionBuilder<'a> {
-    pub fn build_dreamwell(&self, raw: CardDefinitionRaw) -> Result<DreamwellCardDefinition, TabulaError> {
-        let id = raw.id.ok_or_else(|| /* ... */)?;
-        let name = raw.name.ok_or_else(|| /* ... */)?;
+pub struct CardDefinitionBuilder<'a> {
+    parser: &'a AbilityParser,
+    fluent: &'a FluentStrings,
+    source_file: PathBuf,
+}
 
-        let energy_produced = raw.energy_produced.ok_or_else(|| TabulaError::MissingField {
+impl<'a> CardDefinitionBuilder<'a> {
+    pub fn build(&self, raw: CardDefinitionRaw) -> Result<CardDefinition, TabulaError> {
+        let id = raw.id.ok_or_else(|| TabulaError::MissingField {
             file: self.source_file.clone(),
-            card_id: Some(id),
-            field: "energy_produced",
+            card_id: None,
+            field: "id",
         })?;
 
-        // Validate no unexpected fields for dreamwell
-        if raw.spark.is_some() {
-            return Err(TabulaError::UnexpectedField {
-                file: self.source_file.clone(),
-                card_id: Some(id),
-                field: "spark".to_string(),
-            });
-        }
+        let name = raw.name.ok_or_else(|| TabulaError::MissingField {
+            file: self.source_file.clone(),
+            card_id: Some(id),
+            field: "name",
+        })?;
 
-        Ok(DreamwellCardDefinition { id, name, energy_produced, /* ... */ })
+        // Parse card_type string to CardType enum
+        let card_type = self.parse_card_type(&raw.card_type, id)?;
+
+        // Parse abilities if rules_text exists
+        let abilities = if let Some(text) = &raw.rules_text {
+            let vars = raw.variables.as_deref().unwrap_or("");
+            self.parser.parse(text, vars)?
+        } else {
+            Vec::new()
+        };
+
+        Ok(CardDefinition { id, name, card_type, abilities, /* ... */ })
     }
 }
 ```
 
-## TOML Wrapper for Dreamwell
+## Enum Conversion
+
+Convert strings to enums with clear error messages:
 
 ```rust
-#[derive(Debug, Deserialize)]
-pub struct DreamwellFile {
-    pub dreamwell: Vec<CardDefinitionRaw>,
-}
-```
-
-## Future Card Types
-
-Create placeholder for `DreamsignCardDefinition`:
-
-```rust
-// dreamsign_definition.rs - placeholder for future implementation
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct DreamsignCardDefinition {
-    pub id: BaseCardId,
-    pub name: String,
-    // Fields TBD based on dreamsign TOML structure
+fn parse_card_type(&self, value: &Option<String>, card_id: Uuid) -> Result<CardType, TabulaError> {
+    match value.as_deref() {
+        Some("Character") => Ok(CardType::Character),
+        Some("Event") => Ok(CardType::Event),
+        Some(other) => Err(TabulaError::InvalidValue {
+            file: self.source_file.clone(),
+            card_id: Some(card_id),
+            field: "card_type",
+            value: other.to_string(),
+        }),
+        None => Err(TabulaError::MissingField { /* ... */ }),
+    }
 }
 ```
 
@@ -83,41 +100,32 @@ pub struct DreamsignCardDefinition {
 
 ```rust
 #[test]
-fn test_build_dreamwell_card() {
+fn test_build_character_card() {
     let raw = CardDefinitionRaw {
         id: Some(Uuid::new_v4()),
-        name: Some("Forest Well".to_string()),
-        energy_produced: Some(2),
-        ..Default::default()
+        name: Some("Test Character".to_string()),
+        card_type: Some("Character".to_string()),
+        energy_cost: Some(TomlValue::Integer(3)),
+        spark: Some(2),
+        // ...
     };
-    let builder = CardDefinitionBuilder::new(/* ... */);
-    let result = builder.build_dreamwell(raw);
+    let parser = AbilityParser::new();
+    let fluent = FluentStrings::from_ftl("").unwrap();
+    let builder = CardDefinitionBuilder::new(&parser, &fluent, PathBuf::new());
+    let result = builder.build(raw);
     assert!(result.is_ok());
-}
-
-#[test]
-fn test_dreamwell_rejects_spark() {
-    let raw = CardDefinitionRaw {
-        id: Some(Uuid::new_v4()),
-        name: Some("Invalid Dreamwell Card".to_string()),
-        energy_produced: Some(2),
-        spark: Some(3),  // Should cause error
-        ..Default::default()
-    };
-    let builder = CardDefinitionBuilder::new(/* ... */);
-    let result = builder.build_dreamwell(raw);
-    assert!(result.is_err());
 }
 ```
 
 ## Verification
 
 - `cargo test -p tabula_data_v2` passes
-- Dreamwell cards from dreamwell.toml build successfully
-- Invalid field combinations produce clear errors
+- Sample cards build successfully
+- Error messages clearly indicate which field failed and which card
 
 ## Context Files
 
-1. `src/tabula_data/src/card_definitions/dreamwell_card_definition.rs` - V1 reference
-2. `client/Assets/StreamingAssets/Tabula/dreamwell.toml` - Dreamwell TOML
-3. `docs/tabula/tabula_v2_design_document.md` - Card type strategy
+1. `src/tabula_data/src/card_definitions/card_definition_builder.rs` - V1 builder
+2. `src/tabula_data/src/card_definitions/card_definition.rs` - V1 CardDefinition
+3. `src/core_data/src/card_types.rs` - CardType, CardSubtype enums
+4. `docs/tabula/tabula_v2_design_document.md` - Error handling approach

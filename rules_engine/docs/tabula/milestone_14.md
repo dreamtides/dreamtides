@@ -1,137 +1,109 @@
-# Milestone 14: Migration - Update Callers
+# Milestone 13: State Provider Integration
 
 ## Objective
 
-Migrate all crates that depend on `tabula_data` to use `tabula_data_v2`.
+Update `state_provider` to use `tabula_data_v2` for loading card data.
 
 ## Tasks
 
-1. Identify all crates depending on tabula_data
-2. Update imports and type references
-3. Handle API differences between V1 and V2
-4. Update tests to use new loading pattern
-5. Run full test suite to verify compatibility
+1. Update state_provider Cargo.toml to depend on tabula_data_v2
+2. Replace Tabula loading code with V2 API
+3. Handle Android-specific file loading
+4. Update streaming assets path handling
+5. Test loading on all platforms (desktop, Android)
 
-## Affected Crates
+## State Provider Updates
 
-From workspace analysis:
-- `battle_state` - Uses CardDefinition
-- `battle_queries` - Uses card lookups
-- `battle_mutations` - Uses card data
-- `display` - Uses DisplayedAbility (now uses serializers)
-- `game_creation` - Creates games with cards
-- `quest_state` - Deck building with cards
-- `rules_engine` - Core game logic
-- `ai_matchup` - AI uses card data
-
-## Import Updates
+Replace V1 loading:
 
 ```rust
-// Before
-use tabula_data::{CardDefinition, Tabula};
+// Before (V1)
+fn load_tabula(streaming_assets_path: &str) -> Result<Tabula> {
+    let json = load_tabula_raw(streaming_assets_path)?;
+    let raw: TabulaRaw = serde_json::from_str(&json)?;
+    Tabula::build(raw)
+}
 
-// After
-use tabula_data_v2::{CardDefinition, Tabula};
+// After (V2)
+fn load_tabula(streaming_assets_path: &str) -> Result<Tabula> {
+    let base_path = Path::new(streaming_assets_path).join("Tabula");
+    let source = TabulaSource::Production;
+    Tabula::load(source, &base_path)
+}
 ```
 
-## API Differences to Handle
+## Android File Loading
 
-### DisplayedAbility -> Serializer System
-
-V2 removes stored display data. Instead, render UI text on-demand using serializers:
+Create Android-aware loading in tabula_data_v2:
 
 ```rust
-// Before
-let displayed: &DisplayedAbility = card.displayed_abilities.get(0)?;
-show_text(&displayed.text);
+#[cfg(target_os = "android")]
+pub fn load_toml_android(asset_path: &str) -> Result<String, TabulaError> {
+    core_data::android::android_asset_read(asset_path)
+        .map_err(|e| TabulaError::IoError {
+            path: PathBuf::from(asset_path),
+            source: e,
+        })
+}
 
-// After
-use parser_v2::serializer::ability_serializer;
-
-let ability = &card.abilities[0];
-let serialized = ability_serializer::serialize_ability(ability);
-show_text(&serialized.text);
-// Use serialized.variables for {placeholder} substitution
+#[cfg(not(target_os = "android"))]
+pub fn load_toml_file(path: &Path) -> Result<String, TabulaError> {
+    std::fs::read_to_string(path)
+        .map_err(|e| TabulaError::IoError {
+            path: path.to_path_buf(),
+            source: e,
+        })
+}
 ```
 
-For specific UI elements (prompts, effects, etc.), use the appropriate serializer:
-- `ability_serializer::serialize_ability()` - Full ability text
-- `effect_serializer::serialize_effect()` - Effect text only
-- `predicate_serializer::serialize_predicate()` - Target labels (e.g., "an ally")
-- `trigger_serializer::serialize_trigger_event()` - Trigger text
-- `cost_serializer::serialize_cost()` - Cost text
-
-### is_test_card Removal
-
-Any code checking `is_test_card` must be updated:
+## Platform-Aware Tabula Loading
 
 ```rust
-// Before
-if card.is_test_card { continue; }
+impl Tabula {
+    #[cfg(target_os = "android")]
+    pub fn load_from_assets(base_path: &str, source: TabulaSource) -> Result<Self> {
+        let cards_toml = load_toml_android(&format!("{}/{}", base_path, source.cards_filename()))?;
+        // Parse from strings instead of files
+        Self::load_from_strings(cards_toml, /* ... */)
+    }
 
-// After
-// No longer needed - test cards are in separate file
+    #[cfg(not(target_os = "android"))]
+    pub fn load_from_path(base_path: &Path, source: TabulaSource) -> Result<Self> {
+        // Normal file-based loading
+        Self::load(source, base_path)
+    }
+}
 ```
 
-### TabulaSource Parameter
+## Integration Points
 
-Loading now requires source specification:
+Update these files in state_provider:
+- `src/state_provider/src/state_provider.rs` - Main loading code
+- Remove references to `tabula.json`
+- Update `load_tabula_raw()` and `load_tabula_raw_android()`
 
+## Testing
+
+Test on desktop:
 ```rust
-// Before
-let tabula = Tabula::load(path)?;
-
-// After
-let tabula = Tabula::load(TabulaSource::Production, path)?;
-// In tests:
-let tabula = Tabula::load(TabulaSource::Test, test_path)?;
+#[test]
+fn test_state_provider_loads_tabula() {
+    let state = StateProvider::new(assets_path()).unwrap();
+    assert!(state.tabula().cards.len() > 0);
+}
 ```
 
-## Migration Script
-
-Create helper to find usages:
-
-```bash
-# Find all tabula_data imports
-grep -r "use tabula_data" src/ tests/
-grep -r "tabula_data::" src/ tests/
-
-# Find DisplayedAbility usage (needs serializer migration)
-grep -r "DisplayedAbility" src/ tests/
-grep -r "displayed_abilities" src/ tests/
-grep -r "spanned_abilities" src/ tests/
-
-# Find is_test_card usage
-grep -r "is_test_card" src/ tests/
-```
-
-## Migration Approach
-
-This is a **single-pass migration** - all dependent crates are updated at once:
-
-1. Update imports in ALL crates simultaneously
-2. Handle API differences (DisplayedAbility -> serializers, etc.)
-3. Update all Cargo.toml dependencies
-4. Run `just check` on entire workspace
-5. Run `cargo test --workspace` to verify everything works
-6. Fix any remaining issues before committing
-
-**Pre-Migration Checklist:**
-- [ ] Audit all tests to confirm they use test cards only
-- [ ] Review all `tabula_data` usage across the workspace
-- [ ] Validate V2 parser output matches expectations for all production cards
-- [ ] Document all code locations that need DisplayedAbility -> serializer changes
+For Android testing, rely on integration tests on device.
 
 ## Verification
 
-- `just check` passes for all crates
-- `just clippy` passes
-- `cargo test --workspace` passes
+- Desktop builds and tests pass
+- Android build succeeds
+- `just check` passes
+- No references to tabula.json in state_provider
 
 ## Context Files
 
-1. `src/battle_state/Cargo.toml` - Example dependent crate
-2. `src/display/src/` - DisplayedAbility usage (migrate to serializers)
-3. `src/parser_v2/src/serializer/` - Available serializers for UI rendering
-4. `src/tabula_data_v2/src/lib.rs` - New public API
-5. Each dependent crate's src/ directory
+1. `src/state_provider/src/state_provider.rs` - Current loading code
+2. `src/core_data/src/android.rs` - Android asset loading
+3. `docs/tabula/tabula_v2_design_document.md` - Android loading notes

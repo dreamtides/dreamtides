@@ -1,128 +1,105 @@
-# Milestone 16: Cleanup & Deletion
+# Milestone 15: Save File Compatibility
 
 ## Objective
 
-Remove V1 tabula system and finalize V2 as the only implementation.
+Ensure CardDefinition and related types serialize correctly for save files.
 
 ## Tasks
 
-1. Delete `tabula_data` crate
-2. Delete `old_tabula_cli` crate
-3. Delete `tabula.json` file
-4. Rename `tabula_data_v2` to `tabula_data`
-5. Update all workspace references
-6. Final verification with `just review`
+1. Verify CardDefinition has correct Serialize/Deserialize derives
+2. Test JSON serialization matches expected format
+3. Ensure Ability serialization is preserved
+4. Test loading existing save files with V2 types
+5. Document any breaking changes to save format
 
-## Deletion Order
+## Serialization Requirements
 
-Delete in this order to avoid broken dependencies:
+CardDefinition must serialize to JSON for save files:
 
-### Step 1: Verify No V1 References
-
-```bash
-# Ensure no code references old crate
-grep -r "tabula_data::" src/ tests/ --include="*.rs"
-# Should only show tabula_data_v2 references
-
-# Ensure no Cargo.toml references old crate
-grep -r 'tabula_data = ' src/ --include="Cargo.toml"
-# Should show tabula_data_v2 only
+```rust
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct CardDefinition {
+    pub id: BaseCardId,
+    pub name: String,
+    // All fields must be serializable
+}
 ```
 
-### Step 2: Delete old_tabula_cli
+## Testing Serialization
 
-```bash
-rm -rf src/old_tabula_cli
+```rust
+#[test]
+fn test_card_definition_roundtrip() {
+    let card = CardDefinition {
+        id: BaseCardId(Uuid::new_v4()),
+        name: "Test Card".to_string(),
+        // ...
+    };
+    let json = serde_json::to_string(&card).unwrap();
+    let restored: CardDefinition = serde_json::from_str(&json).unwrap();
+    assert_eq!(card.id, restored.id);
+}
+
+#[test]
+fn test_ability_serialization() {
+    let ability = Ability::Event(EventAbility {
+        additional_cost: None,
+        effect: Effect::Effect(StandardEffect::DrawCards { count: 2 }),
+    });
+    let json = serde_json::to_string(&ability).unwrap();
+    let restored: Ability = serde_json::from_str(&json).unwrap();
+    assert_eq!(ability, restored);
+}
 ```
 
-Update workspace Cargo.toml to remove the member.
+## UI Display Data
 
-### Step 3: Delete tabula_data
+Display text is not stored in CardDefinition. All UI rendering uses serializers from `parser_v2/src/serializer` on-demand. This means:
+- No display-specific fields need serialization
+- Save files are smaller and cleaner
+- Display logic can be updated without breaking save compatibility
 
-```bash
-rm -rf src/tabula_data
+## Existing Save Compatibility
+
+Test loading save files created with V1:
+
+```rust
+#[test]
+fn test_load_v1_save_file() {
+    let save_json = include_str!("test_data/v1_save_file.json");
+    let save: SaveFile = serde_json::from_str(save_json).unwrap();
+    // Verify deck cards load correctly
+}
 ```
 
-Update workspace Cargo.toml to remove the member.
+## Breaking Change Handling
 
-### Step 4: Delete tabula.json
+If any field changes are breaking:
+1. Add `#[serde(default)]` for new optional fields
+2. Use `#[serde(rename = "old_name")]` for renamed fields
+3. Implement custom Deserialize if needed for complex migrations
 
-```bash
-rm rules_engine/tabula.json
+```rust
+#[derive(Deserialize)]
+pub struct CardDefinition {
+    #[serde(default)]
+    pub new_optional_field: Option<i32>,
+
+    // Handle removed is_test_card field
+    #[serde(skip)]
+    _is_test_card: Option<bool>,
+}
 ```
-
-Update any scripts or .gitignore entries referencing it.
-
-### Step 5: Rename tabula_data_v2
-
-```bash
-mv src/tabula_data_v2 src/tabula_data
-```
-
-Update `src/tabula_data/Cargo.toml`:
-```toml
-[package]
-name = "tabula_data"
-```
-
-### Step 6: Update All References
-
-Find and replace in all Cargo.toml files:
-- `tabula_data_v2` -> `tabula_data`
-
-Find and replace in all .rs files:
-- `use tabula_data_v2` -> `use tabula_data`
-- `tabula_data_v2::` -> `tabula_data::`
-
-### Step 7: Rename tabula_ids to tabula_generated
-
-If not already done in milestone 9:
-```bash
-mv src/tabula_ids src/tabula_generated
-```
-
-Update package name and all references.
-
-## Final Verification
-
-Run full validation:
-
-```bash
-just fmt
-just check
-just clippy
-just review
-cargo test --workspace
-```
-
-## Cleanup Checklist
-
-- [ ] No `tabula_data` (V1) in workspace
-- [ ] No `old_tabula_cli` in workspace
-- [ ] No `tabula.json` file exists
-- [ ] `tabula_data_v2` renamed to `tabula_data`
-- [ ] `tabula_ids` renamed to `tabula_generated`
-- [ ] All tests pass
-- [ ] `just review` passes
-- [ ] No warnings about unused dependencies
-
-## Documentation Updates
-
-Update any documentation referencing old structure:
-- CLAUDE.md if it mentions tabula_data
-- Any design docs referencing V1
-- README or setup instructions
 
 ## Verification
 
-- `just review` passes
-- `cargo test --workspace` passes
-- Clean git status (no unexpected changes)
-- Build succeeds on all targets
+- Save file round-trip tests pass
+- Existing save files load correctly
+- No unexpected JSON format changes
 
 ## Context Files
 
-1. `Cargo.toml` (workspace) - Member list to update
-2. `CLAUDE.md` - Documentation to check
-3. `src/tabula_data_v2/Cargo.toml` - To rename
-4. All dependent crate Cargo.toml files
+1. `src/database/src/save_file.rs` - Save file structure
+2. `src/quest_state/src/quest/deck.rs` - Deck serialization
+3. `src/ability_data/src/ability.rs` - Ability serialization
+4. `src/tabula_data/src/card_definitions/card_definition.rs` - V1 serialization

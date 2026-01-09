@@ -1,71 +1,81 @@
-# Milestone 8: Card Effects & Card Lists
+# Milestone 7: Dreamwell & Other Card Types
 
 ## Objective
 
-Implement loading for `CardEffectRow` and `CardListRow` from their TOML files.
+Implement builders for DreamwellCardDefinition and prepare for future card types.
 
 ## Tasks
 
-1. Create `card_effect_row.rs` with CardEffectRow struct
-2. Create `card_list_row.rs` with CardListRow struct
-3. Implement TOML loading for both file types
-4. Keep enum fields as strings for now (code gen in milestone 9)
-5. Write tests for loading both file types
+1. Create `dreamwell_definition.rs` with `DreamwellCardDefinition` struct
+2. Add builder method that validates dreamwell-specific fields
+3. Ensure `energy_produced` field is required for dreamwell cards
+4. Create placeholder files for future card types (dreamsign)
+5. Test building dreamwell cards from TOML
 
-## CardEffectRow Struct
+## DreamwellCardDefinition Struct
 
 ```rust
 #[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "kebab-case")]
-pub struct CardEffectRow {
+pub struct DreamwellCardDefinition {
+    pub id: BaseCardId,
     pub name: String,
-    #[serde(rename = "type")]
-    pub effect_type: String,  // Will be enum after code gen
-    pub trigger: Option<String>,  // Will be enum after code gen
-    pub object_predicate: Option<String>,  // Will be enum after code gen
-    pub prefab: Option<String>,
-    pub duration: Option<f64>,
-}
-
-#[derive(Debug, Deserialize)]
-pub struct CardFxFile {
-    #[serde(rename = "card-fx")]
-    pub card_fx: Vec<CardEffectRow>,
+    pub energy_produced: i32,  // Required for dreamwell
+    pub image_number: Option<i64>,
+    pub rarity: Option<CardRarity>,
+    // Note: no abilities, no spark, simpler than CardDefinition
 }
 ```
 
-## CardListRow Struct
+## Builder Extension
+
+Add method to `CardDefinitionBuilder`:
 
 ```rust
+impl<'a> CardDefinitionBuilder<'a> {
+    pub fn build_dreamwell(&self, raw: CardDefinitionRaw) -> Result<DreamwellCardDefinition, TabulaError> {
+        let id = raw.id.ok_or_else(|| /* ... */)?;
+        let name = raw.name.ok_or_else(|| /* ... */)?;
+
+        let energy_produced = raw.energy_produced.ok_or_else(|| TabulaError::MissingField {
+            file: self.source_file.clone(),
+            card_id: Some(id),
+            field: "energy_produced",
+        })?;
+
+        // Validate no unexpected fields for dreamwell
+        if raw.spark.is_some() {
+            return Err(TabulaError::UnexpectedField {
+                file: self.source_file.clone(),
+                card_id: Some(id),
+                field: "spark".to_string(),
+            });
+        }
+
+        Ok(DreamwellCardDefinition { id, name, energy_produced, /* ... */ })
+    }
+}
+```
+
+## TOML Wrapper for Dreamwell
+
+```rust
+#[derive(Debug, Deserialize)]
+pub struct DreamwellFile {
+    pub dreamwell: Vec<CardDefinitionRaw>,
+}
+```
+
+## Future Card Types
+
+Create placeholder for `DreamsignCardDefinition`:
+
+```rust
+// dreamsign_definition.rs - placeholder for future implementation
 #[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "kebab-case")]
-pub struct CardListRow {
-    pub list_name: String,
-    pub list_type: String,
-    pub card_id: Uuid,
-    pub copies: f64,
-}
-
-#[derive(Debug, Deserialize)]
-pub struct CardListsFile {
-    #[serde(rename = "card-list")]
-    pub card_list: Vec<CardListRow>,
-}
-```
-
-## Loading Functions
-
-```rust
-pub fn load_card_effects<P: AsRef<Path>>(path: P) -> Result<Vec<CardEffectRow>, TabulaError> {
-    let content = std::fs::read_to_string(&path)?;
-    let file: CardFxFile = toml::from_str(&content)?;
-    Ok(file.card_fx)
-}
-
-pub fn load_card_lists<P: AsRef<Path>>(path: P) -> Result<Vec<CardListRow>, TabulaError> {
-    let content = std::fs::read_to_string(&path)?;
-    let file: CardListsFile = toml::from_str(&content)?;
-    Ok(file.card_list)
+pub struct DreamsignCardDefinition {
+    pub id: BaseCardId,
+    pub name: String,
+    // Fields TBD based on dreamsign TOML structure
 }
 ```
 
@@ -73,41 +83,41 @@ pub fn load_card_lists<P: AsRef<Path>>(path: P) -> Result<Vec<CardListRow>, Tabu
 
 ```rust
 #[test]
-fn test_parse_card_fx() {
-    let toml = r#"
-    [[card-fx]]
-    name = "dissolve"
-    type = "DissolveTargets"
-    trigger = "OnTargetSelected"
-    "#;
-    let file: CardFxFile = toml::from_str(toml).unwrap();
-    assert_eq!(file.card_fx.len(), 1);
-    assert_eq!(file.card_fx[0].effect_type, "DissolveTargets");
+fn test_build_dreamwell_card() {
+    let raw = CardDefinitionRaw {
+        id: Some(Uuid::new_v4()),
+        name: Some("Forest Well".to_string()),
+        energy_produced: Some(2),
+        ..Default::default()
+    };
+    let builder = CardDefinitionBuilder::new(/* ... */);
+    let result = builder.build_dreamwell(raw);
+    assert!(result.is_ok());
 }
 
 #[test]
-fn test_parse_card_lists() {
-    let toml = r#"
-    [[card-list]]
-    list-name = "starter_deck"
-    list-type = "Deck"
-    card-id = "d8fe4b2a-088c-4a92-aeb7-d6d4d22fda1a"
-    copies = 2.0
-    "#;
-    let file: CardListsFile = toml::from_str(toml).unwrap();
-    assert_eq!(file.card_list.len(), 1);
+fn test_dreamwell_rejects_spark() {
+    let raw = CardDefinitionRaw {
+        id: Some(Uuid::new_v4()),
+        name: Some("Invalid Dreamwell Card".to_string()),
+        energy_produced: Some(2),
+        spark: Some(3),  // Should cause error
+        ..Default::default()
+    };
+    let builder = CardDefinitionBuilder::new(/* ... */);
+    let result = builder.build_dreamwell(raw);
+    assert!(result.is_err());
 }
 ```
 
 ## Verification
 
 - `cargo test -p tabula_data_v2` passes
-- card-fx.toml loads successfully
-- card-lists.toml loads successfully
+- Dreamwell cards from dreamwell.toml build successfully
+- Invalid field combinations produce clear errors
 
 ## Context Files
 
-1. `src/tabula_data/src/card_effect_definitions/card_effect_row.rs` - V1 reference
-2. `src/tabula_data/src/card_list_data/card_list_row.rs` - V1 reference
-3. `client/Assets/StreamingAssets/Tabula/card-fx.toml` - Effect TOML
-4. `client/Assets/StreamingAssets/Tabula/card-lists.toml` - Lists TOML
+1. `src/tabula_data/src/card_definitions/dreamwell_card_definition.rs` - V1 reference
+2. `client/Assets/StreamingAssets/Tabula/dreamwell.toml` - Dreamwell TOML
+3. `docs/tabula/tabula_v2_design_document.md` - Card type strategy

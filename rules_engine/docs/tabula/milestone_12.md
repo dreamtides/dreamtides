@@ -1,126 +1,97 @@
-# Milestone 12: Tabula Struct & Loading
+# Milestone 11: Test Card Replacement Strategy
 
 ## Objective
 
-Implement the main `Tabula` struct that holds all loaded card data.
+Implement test card loading strategy that replaces `cards.toml` entirely with `test-cards.toml` in tests.
 
 ## Tasks
 
-1. Create `Tabula` struct in `tabula_struct.rs`
-2. Implement `load()` method that orchestrates all loading
-3. Build lookup maps for fast card access
-4. Handle loading errors gracefully (skip bad cards, log errors)
-5. Cache parsed abilities to avoid re-parsing
+1. Generate test card constants from `test-cards.toml`
+2. Update tests to use TabulaSource::Test configuration
+3. Ensure all cards used in existing tests are in test-cards.toml
+4. Remove `is_test_card` field from all card definition types
+5. Create migration script to identify missing test cards
 
-## Tabula Struct
+## Test Card Generation
+
+Generate `test_card.rs` from `test-cards.toml`:
 
 ```rust
-use std::collections::HashMap;
+// Generated from test-cards.toml
+use core_data::identifiers::BaseCardId;
+use uuid::Uuid;
 
-pub struct Tabula {
-    pub cards: Vec<CardDefinition>,
-    pub dreamwell_cards: Vec<DreamwellCardDefinition>,
-    pub card_effects: Vec<CardEffectRow>,
-    pub card_lists: Vec<CardListRow>,
-    pub strings: FluentStrings,
-
-    // Lookup maps
-    card_by_id: HashMap<BaseCardId, usize>,
-    dreamwell_by_id: HashMap<BaseCardId, usize>,
-}
-
-impl Tabula {
-    pub fn get_card(&self, id: BaseCardId) -> Option<&CardDefinition> {
-        self.card_by_id.get(&id).map(|&i| &self.cards[i])
-    }
-
-    pub fn get_dreamwell(&self, id: BaseCardId) -> Option<&DreamwellCardDefinition> {
-        self.dreamwell_by_id.get(&id).map(|&i| &self.dreamwell_cards[i])
-    }
-}
+pub const TEST_DRAW_TWO: BaseCardId = BaseCardId(Uuid::from_u128(0x...));
+pub const TEST_CHARACTER: BaseCardId = BaseCardId(Uuid::from_u128(0x...));
+// ...
 ```
 
-## Loading Orchestration
+Generation extracts card name, converts to SCREAMING_SNAKE_CASE, prefixes with `TEST_`.
+
+## TabulaSource Configuration
 
 ```rust
+pub enum TabulaSource {
+    Production,
+    Test,
+}
+
 impl Tabula {
     pub fn load(source: TabulaSource, base_path: &Path) -> Result<Self, TabulaError> {
-        // 1. Load Fluent strings
-        let strings = FluentStrings::load(&base_path.join("strings.ftl"))?;
-        let rules_ftl = FluentStrings::load(&base_path.join("card_rules.ftl"))?;
-
-        // 2. Create parser (once for all cards)
-        let parser = AbilityParser::new();
-        let builder = CardDefinitionBuilder::new(&parser, &rules_ftl);
-
-        // 3. Load and build cards
-        let cards_file = source.cards_filename();
-        let raw_cards = toml_loader::load_cards(&base_path.join(cards_file))?;
-        let cards = raw_cards
-            .into_iter()
-            .filter_map(|raw| match builder.build(raw) {
-                Ok(card) => Some(card),
-                Err(e) => { eprintln!("Warning: {e}"); None }
-            })
-            .collect();
-
-        // 4. Load dreamwell cards similarly
-        // 5. Load card effects and lists
-        // 6. Build lookup maps
-
-        Ok(Self { cards, /* ... */ })
+        let cards_file = match source {
+            TabulaSource::Production => "cards.toml",
+            TabulaSource::Test => "test-cards.toml",
+        };
+        // Load from appropriate file
     }
 }
 ```
 
-## Error Handling Strategy
+## Finding Missing Test Cards
 
-Skip cards that fail to build rather than failing entire load:
+Create script to identify cards used in tests but not in test-cards.toml:
 
 ```rust
-let cards: Vec<CardDefinition> = raw_cards
-    .into_iter()
-    .filter_map(|raw| {
-        match builder.build(raw.clone()) {
-            Ok(card) => Some(card),
-            Err(e) => {
-                log::warn!(
-                    "Skipping card {:?}: {}",
-                    raw.name.as_deref().unwrap_or("unknown"),
-                    e
-                );
-                None
-            }
-        }
-    })
-    .collect();
+// Run: cargo run -p tabula_cli -- check-test-cards
+fn check_test_cards() -> Result<()> {
+    // 1. Load test-cards.toml
+    // 2. Grep for BaseCardId references in tests/
+    // 3. Report any IDs not found in test-cards.toml
+}
 ```
+
+## Migration: Update Test Cards
+
+For each test file using cards:
+1. Find card ID references
+2. Add missing cards to test-cards.toml
+3. Update test to use `TabulaSource::Test`
+
+Common patterns to find:
+- `BaseCardId::from_uuid(...)`
+- `test_card::TEST_*`
+- Direct UUID references in test code
 
 ## Testing
 
+After migration:
 ```rust
 #[test]
-fn test_tabula_load_production() {
-    let tabula = Tabula::load(TabulaSource::Production, tabula_path()).unwrap();
-    assert!(tabula.cards.len() > 50);
-}
-
-#[test]
-fn test_card_lookup_by_id() {
+fn test_cards_load_from_test_source() {
     let tabula = Tabula::load(TabulaSource::Test, test_path()).unwrap();
-    let card = tabula.get_card(test_card::TEST_DRAW_TWO);
-    assert!(card.is_some());
+    assert!(tabula.cards.len() > 0);
 }
 ```
 
 ## Verification
 
-- `cargo test -p tabula_data_v2` passes
-- All production cards load successfully
-- Lookup by ID works correctly
+- All tests pass with TabulaSource::Test
+- No `is_test_card` fields remain in card definitions
+- test-cards.toml contains all cards needed for tests
 
 ## Context Files
 
-1. `src/tabula_data/src/tabula.rs` - V1 Tabula struct
-2. `src/state_provider/src/state_provider.rs` - Loading patterns
-3. `docs/tabula/tabula_v2_design_document.md` - Architecture overview
+1. `src/tabula_ids/src/test_card.rs` - Current test card constants
+2. `client/Assets/StreamingAssets/Tabula/test-cards.toml` - Test card data
+3. `tests/battle_state_tests/` - Tests to check for card usage
+4. `src/tabula_data/src/card_definitions/card_definition.rs` - is_test_card removal

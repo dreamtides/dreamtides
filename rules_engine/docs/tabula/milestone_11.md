@@ -1,97 +1,128 @@
-# Milestone 11: Test Card Replacement Strategy
+# Milestone 10: String ID Code Generation
 
 ## Objective
 
-Implement test card loading strategy that replaces `cards.toml` entirely with `test-cards.toml` in tests.
+Generate `StringId` enum from `strings.ftl` file.
 
 ## Tasks
 
-1. Generate test card constants from `test-cards.toml`
-2. Update tests to use TabulaSource::Test configuration
-3. Ensure all cards used in existing tests are in test-cards.toml
-4. Remove `is_test_card` field from all card definition types
-5. Create migration script to identify missing test cards
+1. Create `strings.ftl` from existing `strings.toml` (manual conversion)
+2. Add FTL parsing to code generator to extract message IDs
+3. Generate `string_id.rs` with StringId enum
+4. Include method to get string key for each variant
+5. Write tests for generation
 
-## Test Card Generation
+## FTL File Creation
 
-Generate `test_card.rs` from `test-cards.toml`:
+Convert `strings.toml` to `strings.ftl` format. Example:
 
-```rust
-// Generated from test-cards.toml
-use core_data::identifiers::BaseCardId;
-use uuid::Uuid;
-
-pub const TEST_DRAW_TWO: BaseCardId = BaseCardId(Uuid::from_u128(0x...));
-pub const TEST_CHARACTER: BaseCardId = BaseCardId(Uuid::from_u128(0x...));
-// ...
+```toml
+# strings.toml
+[keys]
+main_menu_play = "Play"
+main_menu_quit = "Quit"
 ```
 
-Generation extracts card name, converts to SCREAMING_SNAKE_CASE, prefixes with `TEST_`.
+Becomes:
 
-## TabulaSource Configuration
+```ftl
+# strings.ftl
+main-menu-play = Play
+main-menu-quit = Quit
+```
+
+Note: FTL uses kebab-case by convention.
+
+## StringId Enum Generation
+
+Parse FTL to extract message IDs (lines matching `^[a-z-]+ =`):
 
 ```rust
-pub enum TabulaSource {
-    Production,
-    Test,
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+pub enum StringId {
+    MainMenuPlay,
+    MainMenuQuit,
+    // ... all message IDs
 }
 
-impl Tabula {
-    pub fn load(source: TabulaSource, base_path: &Path) -> Result<Self, TabulaError> {
-        let cards_file = match source {
-            TabulaSource::Production => "cards.toml",
-            TabulaSource::Test => "test-cards.toml",
-        };
-        // Load from appropriate file
+impl StringId {
+    pub fn key(&self) -> &'static str {
+        match self {
+            Self::MainMenuPlay => "main-menu-play",
+            Self::MainMenuQuit => "main-menu-quit",
+            // ...
+        }
     }
 }
 ```
 
-## Finding Missing Test Cards
+## FTL Parsing
 
-Create script to identify cards used in tests but not in test-cards.toml:
+Simple line-based parsing (no full Fluent parser needed):
 
 ```rust
-// Run: cargo run -p tabula_cli -- check-test-cards
-fn check_test_cards() -> Result<()> {
-    // 1. Load test-cards.toml
-    // 2. Grep for BaseCardId references in tests/
-    // 3. Report any IDs not found in test-cards.toml
+fn extract_message_ids(ftl_content: &str) -> Vec<String> {
+    ftl_content
+        .lines()
+        .filter_map(|line| {
+            let trimmed = line.trim();
+            if trimmed.starts_with('#') || trimmed.is_empty() {
+                return None;
+            }
+            if let Some(eq_pos) = trimmed.find('=') {
+                let id = trimmed[..eq_pos].trim();
+                if id.chars().all(|c| c.is_ascii_alphanumeric() || c == '-') {
+                    return Some(id.to_string());
+                }
+            }
+            None
+        })
+        .collect()
 }
 ```
 
-## Migration: Update Test Cards
+## Name Conversion
 
-For each test file using cards:
-1. Find card ID references
-2. Add missing cards to test-cards.toml
-3. Update test to use `TabulaSource::Test`
+Convert kebab-case FTL IDs to PascalCase enum variants:
 
-Common patterns to find:
-- `BaseCardId::from_uuid(...)`
-- `test_card::TEST_*`
-- Direct UUID references in test code
+```rust
+fn to_pascal_case(kebab: &str) -> String {
+    kebab
+        .split('-')
+        .map(|word| {
+            let mut chars = word.chars();
+            match chars.next() {
+                None => String::new(),
+                Some(first) => first.to_uppercase().chain(chars).collect(),
+            }
+        })
+        .collect()
+}
+```
 
 ## Testing
 
-After migration:
 ```rust
 #[test]
-fn test_cards_load_from_test_source() {
-    let tabula = Tabula::load(TabulaSource::Test, test_path()).unwrap();
-    assert!(tabula.cards.len() > 0);
+fn test_extract_message_ids() {
+    let ftl = r#"
+# Comment
+main-menu-play = Play
+main-menu-quit = Quit
+"#;
+    let ids = extract_message_ids(ftl);
+    assert_eq!(ids, vec!["main-menu-play", "main-menu-quit"]);
 }
 ```
 
 ## Verification
 
-- All tests pass with TabulaSource::Test
-- No `is_test_card` fields remain in card definitions
-- test-cards.toml contains all cards needed for tests
+- strings.ftl created and valid
+- `tabula generate` produces string_id.rs
+- StringId enum compiles and matches FTL content
 
 ## Context Files
 
-1. `src/tabula_ids/src/test_card.rs` - Current test card constants
-2. `client/Assets/StreamingAssets/Tabula/test-cards.toml` - Test card data
-3. `tests/battle_state_tests/` - Tests to check for card usage
-4. `src/tabula_data/src/card_definitions/card_definition.rs` - is_test_card removal
+1. `src/tabula_ids/src/string_id.rs` - V1 StringId enum
+2. `client/Assets/StreamingAssets/Tabula/strings.toml` - Source strings
+3. `src/old_tabula_cli/src/tabula_codegen.rs` - V1 generation approach
