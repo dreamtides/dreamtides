@@ -1,4 +1,4 @@
-# Milestone 0a: Update TOML Files to New Ability Syntax
+# Milestone 2: Update TOML Files to New Ability Syntax
 
 ## Objective
 
@@ -8,7 +8,7 @@ Update `dreamwell.toml` and `test-cards.toml` to use new parser_v2 ability synta
 
 1. Update `test-cards.toml` rules-text fields to new syntax
 2. Update `dreamwell.toml` if it has ability text
-3. Add `variables` field to cards with parameterized abilities
+3. Add `variables` field to cards with numbers in their text or subtypes
 4. Validate all updated cards parse with parser_v2
 5. Run parser tests to confirm syntax is correct
 
@@ -69,33 +69,16 @@ rules-text = "Draw {cards}."
 variables = "cards: 2"
 ```
 
-## Validation Script
+## Validation Test
 
-Create validation in tabula_cli:
-
-```rust
-pub fn validate_card_syntax(cards_path: &Path) -> Result<()> {
-    let cards = toml_loader::load_test_cards(cards_path)?;
-    let parser = AbilityParser::new();
-
-    for card in &cards {
-        if let Some(rules_text) = &card.rules_text {
-            let vars = card.variables.as_deref().unwrap_or("");
-            parser.parse(rules_text, vars)
-                .map_err(|e| anyhow!("Card '{}': {}", card.name.as_deref().unwrap_or("?"), e))?;
-        }
-    }
-    Ok(())
-}
-```
-
-Run as: `tabula validate-syntax test-cards.toml`
+Once complete, we should write a unit test which ensure all card rules text parses, matching
+the existing `rules_engine/tests/parser_v2_tests/tests/card_toml_validation_tests.rs`
 
 ## Verification
 
 1. All cards in test-cards.toml parse without error
-2. All cards in dreamwell.toml parse (if applicable)
-3. `cargo test -p parser_v2_tests` passes
+2. All cards in dreamwell.toml parse
+3. `just parser-test` passes
 4. No regressions in existing tests
 
 ## Context Files
@@ -103,5 +86,5 @@ Run as: `tabula validate-syntax test-cards.toml`
 1. `client/Assets/StreamingAssets/Tabula/test-cards.toml` - Test cards to update
 2. `client/Assets/StreamingAssets/Tabula/dreamwell.toml` - Dreamwell cards
 3. `client/Assets/StreamingAssets/Tabula/cards.toml` - Reference for syntax
-4. `docs/parser_v2_design.md` - Variable system documentation
-5. `tests/parser_v2_tests/tests/spanned_ability_tests.rs` - Parsing examples
+4. 'rules_engine/src/tabula_cli/src/server/listeners/card_rules.ftl' - Fluent selectors for text
+5. `docs/parser_v2_design.md` - Variable system documentation

@@ -1,4 +1,4 @@
-# Milestone 16: Cleanup & Deletion
+# Milestone 17: Cleanup & Deletion
 
 ## Objective
 

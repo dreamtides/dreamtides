@@ -1,4 +1,4 @@
-# Milestone 7: Dreamwell & Other Card Types
+# Milestone 8: Dreamwell & Other Card Types
 
 ## Objective
 

@@ -1,4 +1,4 @@
-# Milestone 5: Parser V2 Integration
+# Milestone 6: Parser V2 Integration
 
 ## Objective
 

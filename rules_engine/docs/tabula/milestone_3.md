@@ -1,4 +1,4 @@
-# Milestone 1: Crate Setup & Scaffolding
+# Milestone 3: Crate Setup & Scaffolding
 
 ## Objective
 

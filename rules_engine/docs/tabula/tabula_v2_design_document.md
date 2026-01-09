@@ -129,7 +129,7 @@ The `build()` methods validate that required fields exist for each target type a
 
 ### 2. No TabulaValue Wrapper
 
-After analysis, the `TabulaValue<T>` wrapper should be **removed**. Instead:
+The `TabulaValue<T>` wrapper should be **removed**. Instead:
 - Use direct deserialization for most fields
 - Use `TomlValue` enum for polymorphic fields like `energy_cost` that can be strings or integers
 - Convert at build time, not deserialization time
@@ -375,14 +375,15 @@ When implementing milestones:
 
 See individual milestone files for detailed implementation steps:
 
-- **Milestone 0:** Convert strings.toml to strings.ftl (Fluent format)
-- **Milestone 0a:** Update test-cards.toml and dreamwell.toml to new ability syntax
-- **Milestones 1-3:** Crate setup and core types
-- **Milestones 4-5:** Fluent and parser integration
-- **Milestones 6-8:** Card definition building
-- **Milestones 9-11:** Code generation (tabula_generated) and test cards
-- **Milestones 12-13:** Main Tabula struct and loading
-- **Milestones 14-15:** Migration and save files
-- **Milestone 16:** Cleanup and deletion
+- **Milestone 1:** Convert strings.toml to strings.ftl (Fluent format)
+- **Milestone 2:** Update test-cards.toml and dreamwell.toml to new ability syntax
+- **Milestone 3:** Crate setup and basic types
+- **Milestone 4:** CardDefinitionRaw and TOML loading (merged from old 2+3)
+- **Milestones 5-6:** Fluent and parser integration
+- **Milestones 7-9:** Card definition building and type parsing
+- **Milestones 10-12:** Code generation (tabula_generated) and test cards
+- **Milestones 13-14:** Main Tabula struct and loading
+- **Milestones 15-16:** Migration and save files
+- **Milestone 17:** Cleanup and deletion
 
-**Total: 18 milestones (0, 0a, 1-16)**
+**Total: 17 milestones (1-17)**

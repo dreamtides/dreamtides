@@ -1,4 +1,4 @@
-# Milestone 6: Card Definition Building
+# Milestone 7: Card Definition Building
 
 ## Objective
 

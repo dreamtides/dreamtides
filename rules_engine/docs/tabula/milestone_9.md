@@ -1,4 +1,4 @@
-# Milestone 8: Card Effects & Card Lists
+# Milestone 9: Card Effects & Card Lists
 
 ## Objective
 
