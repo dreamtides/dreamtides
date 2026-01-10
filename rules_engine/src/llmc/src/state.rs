@@ -11,7 +11,7 @@ use serde::{Deserialize, Serialize};
 use crate::config;
 
 /// Worker state machine states
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum WorkerStatus {
     /// Worker has no active task, ready to receive work

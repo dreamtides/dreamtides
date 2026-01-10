@@ -13,7 +13,7 @@ use clap::Parser;
 use cli::{Cli, Commands};
 use tracing_subscriber::fmt;
 
-use crate::commands::{add, down, init, message, start, up};
+use crate::commands::{add, attach, down, init, message, start, status, up};
 
 #[tokio::main]
 async fn main() -> Result<()> {
@@ -37,8 +37,8 @@ async fn main() -> Result<()> {
         Commands::Nuke { name } => {
             println!("Not implemented: nuke (worker: {})", name);
         }
-        Commands::Status => {
-            println!("Not implemented: status");
+        Commands::Status { json } => {
+            status::run_status(json)?;
         }
         Commands::Start { worker, prompt, prompt_file } => {
             start::run_start(worker, prompt, prompt_file)?;
@@ -47,7 +47,7 @@ async fn main() -> Result<()> {
             message::run_message(&worker, &message)?;
         }
         Commands::Attach { worker } => {
-            println!("Not implemented: attach (worker: {})", worker);
+            attach::run_attach(&worker)?;
         }
         Commands::Review { worker } => {
             println!("Not implemented: review (worker: {})", worker);

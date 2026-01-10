@@ -58,7 +58,11 @@ pub enum Commands {
     },
 
     /// Show status of all workers
-    Status,
+    Status {
+        /// Output in JSON format
+        #[arg(long)]
+        json: bool,
+    },
 
     /// Start a worker on a task
     Start {
