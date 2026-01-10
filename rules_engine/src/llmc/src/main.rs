@@ -13,7 +13,10 @@ use clap::Parser;
 use cli::{Cli, Commands};
 use tracing_subscriber::fmt;
 
-use crate::commands::{add, attach, down, init, message, start, status, up};
+use crate::commands::review::ReviewInterface;
+use crate::commands::{
+    accept, add, attach, down, init, message, reject, review, start, status, up,
+};
 
 #[tokio::main]
 async fn main() -> Result<()> {
@@ -49,14 +52,25 @@ async fn main() -> Result<()> {
         Commands::Attach { worker } => {
             attach::run_attach(&worker)?;
         }
-        Commands::Review { worker } => {
-            println!("Not implemented: review (worker: {})", worker);
+        Commands::Review { worker, interface } => {
+            let interface_enum = match interface.as_str() {
+                "difftastic" => ReviewInterface::Difftastic,
+                "vscode" => ReviewInterface::VSCode,
+                _ => {
+                    eprintln!(
+                        "Invalid interface: {}. Valid options: difftastic, vscode",
+                        interface
+                    );
+                    std::process::exit(1);
+                }
+            };
+            review::run_review(worker, interface_enum)?;
         }
-        Commands::Reject { worker, reason } => {
-            println!("Not implemented: reject (worker: {}, reason: {})", worker, reason);
+        Commands::Reject { message } => {
+            reject::run_reject(&message)?;
         }
         Commands::Accept { worker } => {
-            println!("Not implemented: accept (worker: {})", worker);
+            accept::run_accept(worker)?;
         }
         Commands::Rebase { worker } => {
             println!("Not implemented: rebase (worker: {})", worker);

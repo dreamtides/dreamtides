@@ -96,23 +96,26 @@ pub enum Commands {
 
     /// Review a worker's completed work
     Review {
-        /// Worker name
-        worker: String,
+        /// Worker name (optional, reviews oldest pending worker if not
+        /// specified)
+        worker: Option<String>,
+
+        /// Interface to use for displaying the diff
+        #[arg(long, default_value = "difftastic")]
+        interface: String,
     },
 
     /// Reject a worker's work and request changes
     Reject {
-        /// Worker name
-        worker: String,
-
         /// Reason for rejection
-        reason: String,
+        message: String,
     },
 
     /// Accept a worker's work and merge
     Accept {
-        /// Worker name
-        worker: String,
+        /// Worker name (optional, accepts most recently reviewed worker if not
+        /// specified)
+        worker: Option<String>,
     },
 
     /// Rebase a worker's branch
