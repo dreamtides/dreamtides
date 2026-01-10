@@ -26,6 +26,7 @@ pub enum PartialSendStatus {
 }
 
 /// Handles reliable message sending to TMUX sessions with debouncing
+#[derive(Clone)]
 pub struct TmuxSender {
     /// Base delay in milliseconds (default: 500ms)
     debounce_base_ms: u32,
