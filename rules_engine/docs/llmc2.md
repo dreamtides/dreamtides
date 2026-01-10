@@ -448,7 +448,7 @@ The `state.json` file is protected by:
 ### Module Layout
 
 ```
-src/llmc/
+rules_engine/src/llmc/
 ├── Cargo.toml
 └── src/
     ├── main.rs           # CLI entrypoint

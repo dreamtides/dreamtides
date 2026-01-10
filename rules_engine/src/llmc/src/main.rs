@@ -1,70 +1,66 @@
-mod accept;
-mod clean;
 mod cli;
+mod commands;
 mod config;
-mod r#continue;
-mod delete;
-mod git_ops;
-mod notify;
-mod nouns;
-mod prompt;
-mod rebase;
-mod reject;
-mod review;
-mod runtime;
-mod setup;
-mod start;
+mod git;
+mod patrol;
+mod sound;
 mod state;
-mod status;
-mod time;
-
-use std::process;
+mod tmux;
+mod worker;
 
 use anyhow::Result;
 use clap::Parser;
+use cli::{Cli, Commands};
+use tracing_subscriber::fmt;
 
-use crate::cli::{Cli, Commands};
+#[tokio::main]
+async fn main() -> Result<()> {
+    fmt::init();
 
-fn main() {
-    if let Err(err) = self::run() {
-        eprintln!("{err:#}");
-        process::exit(1);
-    }
-}
-
-fn run() -> Result<()> {
     let cli = Cli::parse();
 
     match cli.command {
-        Commands::Setup(args) => {
-            setup::run(&args, cli.repo.as_deref())?;
+        Commands::Init => {
+            println!("Not implemented: init");
         }
-        Commands::Start(args) => {
-            start::run(&args, cli.repo.as_deref())?;
+        Commands::Up => {
+            println!("Not implemented: up");
         }
-        Commands::Status(args) => {
-            status::run(&args, cli.repo.as_deref())?;
+        Commands::Down => {
+            println!("Not implemented: down");
         }
-        Commands::Rebase(args) => {
-            rebase::run(&args, cli.repo.as_deref())?;
+        Commands::Add { name } => {
+            println!("Not implemented: add (worker: {})", name);
         }
-        Commands::Review(args) => {
-            review::run(&args, cli.repo.as_deref())?;
+        Commands::Nuke { name } => {
+            println!("Not implemented: nuke (worker: {})", name);
         }
-        Commands::Delete(args) => {
-            delete::run(&args, cli.repo.as_deref())?;
+        Commands::Status => {
+            println!("Not implemented: status");
         }
-        Commands::Clean(args) => {
-            clean::run(&args, cli.repo.as_deref())?;
+        Commands::Start { worker, task } => {
+            println!("Not implemented: start (worker: {}, task: {})", worker, task);
         }
-        Commands::Reject(args) => {
-            reject::run(&args, cli.repo.as_deref())?;
+        Commands::Message { worker, message } => {
+            println!("Not implemented: message (worker: {}, message: {})", worker, message);
         }
-        Commands::Accept(args) => {
-            accept::run(&args, cli.repo.as_deref())?;
+        Commands::Attach { worker } => {
+            println!("Not implemented: attach (worker: {})", worker);
         }
-        Commands::Continue(args) => {
-            r#continue::run(&args, cli.repo.as_deref())?;
+        Commands::Review { worker } => {
+            println!("Not implemented: review (worker: {})", worker);
+        }
+        Commands::Reject { worker, reason } => {
+            println!("Not implemented: reject (worker: {}, reason: {})", worker, reason);
+        }
+        Commands::Accept { worker } => {
+            println!("Not implemented: accept (worker: {})", worker);
+        }
+        Commands::Rebase { worker } => {
+            println!("Not implemented: rebase (worker: {})", worker);
+        }
+        Commands::Doctor => {
+            println!("Not implemented: doctor");
         }
     }
 
