@@ -2,7 +2,11 @@
 
 ## Overview
 
-Tabula V2 is a complete rewrite of the card data loading system to replace `tabula_data` with `tabula_data_v2`. This refactor eliminates the legacy `tabula.json` file in favor of loading data directly from TOML and FTL files at runtime, parsing card abilities using `parser_v2` during game initialization, and generating code from the new CLI system.
+Tabula V2 is a complete rewrite of the card data loading system to replace
+`tabula_data` with `tabula_data_v2`. This refactor eliminates the legacy
+`tabula.json` file in favor of loading data directly from TOML and FTL files at
+runtime, parsing card abilities using `parser_v2` during game initialization,
+and generating code from the new CLI system.
 
 **Primary Goals:**
 
@@ -85,7 +89,9 @@ src/tabula_generated/                # Renamed from tabula_ids (milestone 9)
 
 ### 1. Unified CardDefinitionRaw
 
-Instead of separate raw types for each card category, a single `CardDefinitionRaw` struct contains the superset of all TOML fields. All fields are `Option<T>`:
+Instead of separate raw types for each card category, a single
+`CardDefinitionRaw` struct contains the superset of all TOML fields. All fields
+are `Option<T>`:
 
 ```rust
 #[derive(Debug, Clone, Deserialize)]
@@ -125,13 +131,15 @@ pub struct CardDefinitionRaw {
 }
 ```
 
-The `build()` methods validate that required fields exist for each target type and fail with descriptive errors if unexpected fields are present.
+The `build()` methods validate that required fields exist for each target type
+and fail with descriptive errors if unexpected fields are present.
 
 ### 2. No TabulaValue Wrapper
 
 The `TabulaValue<T>` wrapper should be **removed**. Instead:
 - Use direct deserialization for most fields
-- Use `TomlValue` enum for polymorphic fields like `energy_cost` that can be strings or integers
+- Use `TomlValue` enum for polymorphic fields like `energy_cost` that can be
+  strings or integers
 - Convert at build time, not deserialization time
 
 ### 3. Runtime Ability Parsing
@@ -180,7 +188,9 @@ impl FluentStrings {
 
 ### 5. UI String Rendering via Serializers
 
-The `DisplayedAbility` struct is deleted. Instead of storing display-ready text, UI strings are rendered on-demand using the serializer system from `parser_v2/src/serializer`.
+The `DisplayedAbility` struct is deleted. Instead of storing display-ready text,
+UI strings are rendered on-demand using the serializer system from
+`parser_v2/src/serializer`.
 
 **Storage Decision:** CardDefinition stores only the parsed `Ability` enum:
 
@@ -191,7 +201,8 @@ pub struct CardDefinition {
 }
 ```
 
-**Rendering UI Strings:** When displaying cards in the UI, use the appropriate serializer:
+**Rendering UI Strings:** When displaying cards in the UI, use the appropriate
+serializer:
 
 ```rust
 use parser_v2::serializer::ability_serializer;
@@ -260,11 +271,13 @@ pub enum TabulaError {
 }
 ```
 
-When a card fails to build, log the error and skip that card rather than failing the entire load.
+When a card fails to build, log the error and skip that card rather than failing
+the entire load.
 
 ### 9. Android File Loading
 
-Android requires special handling for streaming assets. The existing pattern in `state_provider.rs` is preserved:
+Android requires special handling for streaming assets. The existing pattern in
+`state_provider.rs` is preserved:
 
 ```rust
 #[cfg(target_os = "android")]
@@ -281,7 +294,9 @@ fn load_ftl_android(path: &str) -> Result<String> { ... }
 
 ### 10. Save File Compatibility
 
-`CardDefinition` and related types must remain serializable for save files. The `Ability` enum is already JSON-serializable. No changes needed to save file format - we serialize the final `CardDefinition`, not the raw TOML data.
+`CardDefinition` and related types must remain serializable for save files. The
+`Ability` enum is already JSON-serializable. No changes needed to save file
+format - we serialize the final `CardDefinition`, not the raw TOML data.
 
 ## File Mapping
 
@@ -327,7 +342,8 @@ Migration happens in two phases: **Preparation** and **Cutover**.
 - Implement all V2 functionality completely
 - V2 is tested independently but not yet used by other crates
 - **Critical Prep Work:**
-  - Audit all existing tests to ensure they only use test cards (not production cards)
+  - Audit all existing tests to ensure they only use test cards (not production
+    cards)
   - Review all code that uses `tabula_data` to plan the migration
   - Document all API differences between V1 and V2
   - Create migration checklists for each dependent crate
@@ -358,32 +374,5 @@ All tests must execute in under 500ms:
 - Cache parser instance across tests
 - Avoid actual file system access in unit tests
 
-Integration tests in separate test crate can use real files with longer timeouts.
-
-## Agent Workflow
-
-When implementing milestones:
-
-1. Read milestone file for specific tasks
-2. Read referenced context files (max 5 per milestone)
-3. Write code following project style rules
-4. Run `just fmt` and `just check` frequently
-5. Write tests as you implement, not at the end
-6. Update this design document if decisions change
-
-## Milestone Overview
-
-See individual milestone files for detailed implementation steps:
-
-- **Milestone 1:** Convert strings.toml to strings.ftl (Fluent format)
-- **Milestone 2:** Update test-cards.toml and dreamwell.toml to new ability syntax
-- **Milestone 3:** Crate setup and basic types
-- **Milestone 4:** CardDefinitionRaw and TOML loading (merged from old 2+3)
-- **Milestones 5-6:** Fluent and parser integration
-- **Milestones 7-9:** Card definition building and type parsing
-- **Milestones 10-12:** Code generation (tabula_generated) and test cards
-- **Milestones 13-14:** Main Tabula struct and loading
-- **Milestones 15-16:** Migration and save files
-- **Milestone 17:** Cleanup and deletion
-
-**Total: 17 milestones (1-17)**
+Integration tests in separate test crate can use real files with longer
+timeouts.

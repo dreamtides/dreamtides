@@ -17,5 +17,7 @@ missing_cards.html
 client/Assets/StreamingAssets/Tabula.xlsm
 .llmc
 .worktrees
-.beads
 state.json
+
+# bv (beads viewer) local config and caches
+.bv/
