@@ -125,5 +125,13 @@ pub enum Commands {
     },
 
     /// Check system health and configuration
-    Doctor,
+    Doctor {
+        /// Attempt to auto-repair detected issues
+        #[arg(long)]
+        repair: bool,
+
+        /// Rebuild state from filesystem
+        #[arg(long)]
+        rebuild: bool,
+    },
 }

@@ -15,7 +15,8 @@ use tracing_subscriber::fmt;
 
 use crate::commands::review::ReviewInterface;
 use crate::commands::{
-    accept, add, attach, down, init, message, nuke, rebase, reject, review, start, status, up,
+    accept, add, attach, doctor, down, init, message, nuke, rebase, reject, review, start, status,
+    up,
 };
 
 #[tokio::main]
@@ -75,8 +76,8 @@ async fn main() -> Result<()> {
         Commands::Rebase { worker } => {
             rebase::run_rebase(&worker)?;
         }
-        Commands::Doctor => {
-            println!("Not implemented: doctor");
+        Commands::Doctor { repair, rebuild } => {
+            doctor::run_doctor(repair, rebuild)?;
         }
     }
 

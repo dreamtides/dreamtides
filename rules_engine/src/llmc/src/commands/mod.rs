@@ -1,6 +1,7 @@
 pub mod accept;
 pub mod add;
 pub mod attach;
+pub mod doctor;
 pub mod down;
 pub mod init;
 pub mod message;
