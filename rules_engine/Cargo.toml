@@ -19,6 +19,7 @@ chumsky = "0.12"
 clap = { version = "4", features = ["derive"] }
 convert_case = "0.8"
 criterion = { version = "0.5.1", features = ["html_reports"] }
+ctrlc = "3"
 ego-tree = "0.10"
 either = "1"
 enum-iterator = "2"

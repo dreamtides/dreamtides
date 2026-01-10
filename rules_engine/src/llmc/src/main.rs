@@ -13,7 +13,7 @@ use clap::Parser;
 use cli::{Cli, Commands};
 use tracing_subscriber::fmt;
 
-use crate::commands::{add, init};
+use crate::commands::{add, down, init, up};
 
 #[tokio::main]
 async fn main() -> Result<()> {
@@ -25,11 +25,11 @@ async fn main() -> Result<()> {
         Commands::Init { source, target } => {
             init::run_init(source, target)?;
         }
-        Commands::Up => {
-            println!("Not implemented: up");
+        Commands::Up { no_patrol } => {
+            up::run_up(no_patrol)?;
         }
-        Commands::Down => {
-            println!("Not implemented: down");
+        Commands::Down { force } => {
+            down::run_down(force)?;
         }
         Commands::Add { name, model, role_prompt } => {
             add::run_add(&name, model, role_prompt)?;

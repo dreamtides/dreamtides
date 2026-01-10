@@ -24,10 +24,18 @@ pub enum Commands {
     },
 
     /// Start the LLMC daemon
-    Up,
+    Up {
+        /// Disable patrol system
+        #[arg(long)]
+        no_patrol: bool,
+    },
 
     /// Stop the LLMC daemon
-    Down,
+    Down {
+        /// Force shutdown (kill sessions immediately)
+        #[arg(long)]
+        force: bool,
+    },
 
     /// Add a new worker to the pool
     Add {
