@@ -7,6 +7,7 @@ use crate::lexer::lexer_token::Token;
 use crate::variables::parser_substitutions::ResolvedToken;
 
 pub type ParserInput<'a> = &'a [(ResolvedToken, SimpleSpan)];
+
 pub type ParserExtra<'a> = Err<Rich<'a, (ResolvedToken, SimpleSpan), SimpleSpan>>;
 
 pub fn word<'a>(
@@ -49,13 +50,13 @@ pub fn effect_separator<'a>() -> impl Parser<'a, ParserInput<'a>, (), ParserExtr
 
 pub fn energy<'a>() -> impl Parser<'a, ParserInput<'a>, u32, ParserExtra<'a>> + Clone {
     select! {
-        (ResolvedToken::Integer { directive, value }, _) if directive == "e" => value
+        (ResolvedToken::Integer { directive, value }, _) if directive_matches_with_suffix(&directive, "e") => value
     }
 }
 
 pub fn cards<'a>() -> impl Parser<'a, ParserInput<'a>, u32, ParserExtra<'a>> + Clone {
     select! {
-        (ResolvedToken::Integer { directive, value }, _) if directive == "cards" => value
+        (ResolvedToken::Integer { directive, value }, _) if directive_matches_with_suffix(&directive, "cards") => value
     }
 }
 
@@ -209,4 +210,10 @@ pub fn newline<'a>() -> impl Parser<'a, ParserInput<'a>, (), ParserExtra<'a>> + 
     select! {
         (ResolvedToken::Token(Token::Newline), _) => ()
     }
+}
+
+fn directive_matches_with_suffix(directive: &str, base: &str) -> bool {
+    directive == base
+        || (directive.starts_with(base)
+            && directive[base.len()..].chars().all(|c| c.is_ascii_digit()))
 }

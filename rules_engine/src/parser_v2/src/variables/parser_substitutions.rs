@@ -173,8 +173,32 @@ fn resolve_directive(
     bindings: &VariableBindings,
     span: SimpleSpan,
 ) -> Result<ResolvedToken, UnresolvedVariable> {
-    match DIRECTIVES.iter().find(|(directive_name, _, _)| *directive_name == name) {
-        Some((_, variable_name, constructor)) => constructor(name, variable_name, bindings, span),
-        None => Ok(ResolvedToken::Token(Token::Directive(name.to_string()))),
+    if let Some((_, variable_name, constructor)) =
+        DIRECTIVES.iter().find(|(directive_name, _, _)| *directive_name == name)
+    {
+        return constructor(name, variable_name, bindings, span);
+    }
+
+    if let Some((base_name, _suffix)) = split_numbered_directive(name) {
+        if let Some((_, _, constructor)) =
+            DIRECTIVES.iter().find(|(directive_name, _, _)| *directive_name == base_name)
+        {
+            return constructor(name, name, bindings, span);
+        }
+    }
+
+    Ok(ResolvedToken::Token(Token::Directive(name.to_string())))
+}
+
+fn split_numbered_directive(name: &str) -> Option<(&str, &str)> {
+    let mut split_pos = name.len();
+    while split_pos > 0 && name.as_bytes()[split_pos - 1].is_ascii_digit() {
+        split_pos -= 1;
+    }
+
+    if split_pos < name.len() && split_pos > 0 {
+        Some((&name[..split_pos], &name[split_pos..]))
+    } else {
+        None
     }
 }
