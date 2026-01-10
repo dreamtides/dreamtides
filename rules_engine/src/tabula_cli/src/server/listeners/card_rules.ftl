@@ -1,9 +1,11 @@
+energy-symbol = <color=#00838F>●</color>
+points-symbol = <color=#F57F17>⍟</color>
+fast-symbol = ↯
+
 e = <color=#00838F>{$e}●</color>
 mode1-cost = <color=#00838F>{$mode1-cost}●</color>
 mode2-cost = <color=#00838F>{$mode2-cost}●</color>
 points = <color=#F57F17>{$points}⍟</color>
-
-energy-symbol = <color=#00838F>●</color>
 
 maximum-energy = {$max} maximum {energy-symbol}
 
