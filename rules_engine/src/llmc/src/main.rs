@@ -11,7 +11,7 @@ mod worker;
 use anyhow::Result;
 use clap::Parser;
 use cli::{Cli, Commands};
-use tracing_subscriber::fmt;
+use tracing_subscriber::{EnvFilter, fmt};
 
 use crate::commands::review::ReviewInterface;
 use crate::commands::{
@@ -21,7 +21,12 @@ use crate::commands::{
 
 #[tokio::main]
 async fn main() -> Result<()> {
-    fmt::init();
+    fmt()
+        .with_env_filter(
+            EnvFilter::try_from_env("LLMC_LOG").unwrap_or_else(|_| EnvFilter::new("info")),
+        )
+        .with_writer(std::io::stderr)
+        .init();
 
     let cli = Cli::parse();
 

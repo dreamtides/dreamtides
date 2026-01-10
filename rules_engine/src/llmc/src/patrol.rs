@@ -7,12 +7,12 @@ use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
 use anyhow::Result;
 
 use crate::config::Config;
-use crate::git;
 use crate::state::{State, WorkerStatus};
 use crate::tmux::monitor::{ClaudeState, StateDetector};
 use crate::tmux::sender::TmuxSender;
 use crate::tmux::session;
 use crate::worker::{self, WorkerTransition};
+use crate::{git, sound};
 
 static PATROL_RUNNING: AtomicBool = AtomicBool::new(false);
 
@@ -177,10 +177,8 @@ impl Patrol {
                 worker::apply_transition(w, transition.clone())?;
                 report.transitions_applied.push((worker_name.clone(), transition.clone()));
 
-                if matches!(transition, WorkerTransition::ToNeedsReview { .. })
-                    && config.defaults.sound_on_review
-                {
-                    self.play_sound_notification();
+                if matches!(transition, WorkerTransition::ToNeedsReview { .. }) {
+                    let _ = sound::play_bell(config);
                 }
             }
         }
@@ -355,10 +353,6 @@ impl Patrol {
         sender.send(session_id, message)?;
 
         Ok(())
-    }
-
-    fn play_sound_notification(&self) {
-        print!("\x07");
     }
 }
 
