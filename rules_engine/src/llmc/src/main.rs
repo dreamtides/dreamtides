@@ -13,7 +13,7 @@ use clap::Parser;
 use cli::{Cli, Commands};
 use tracing_subscriber::fmt;
 
-use crate::commands::{add, down, init, up};
+use crate::commands::{add, down, init, message, start, up};
 
 #[tokio::main]
 async fn main() -> Result<()> {
@@ -40,11 +40,11 @@ async fn main() -> Result<()> {
         Commands::Status => {
             println!("Not implemented: status");
         }
-        Commands::Start { worker, task } => {
-            println!("Not implemented: start (worker: {}, task: {})", worker, task);
+        Commands::Start { worker, prompt, prompt_file } => {
+            start::run_start(worker, prompt, prompt_file)?;
         }
         Commands::Message { worker, message } => {
-            println!("Not implemented: message (worker: {}, message: {})", worker, message);
+            message::run_message(&worker, &message)?;
         }
         Commands::Attach { worker } => {
             println!("Not implemented: attach (worker: {})", worker);

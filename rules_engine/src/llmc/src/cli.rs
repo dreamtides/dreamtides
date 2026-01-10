@@ -62,11 +62,17 @@ pub enum Commands {
 
     /// Start a worker on a task
     Start {
-        /// Worker name
-        worker: String,
+        /// Worker name (optional, selects first idle worker if not specified)
+        #[arg(long)]
+        worker: Option<String>,
 
-        /// Task to assign
-        task: String,
+        /// Prompt text to assign
+        #[arg(long)]
+        prompt: Option<String>,
+
+        /// Path to file containing prompt
+        #[arg(long)]
+        prompt_file: Option<PathBuf>,
     },
 
     /// Send a message to a worker
