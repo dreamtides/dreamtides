@@ -4,6 +4,8 @@ pub mod attach;
 pub mod down;
 pub mod init;
 pub mod message;
+pub mod nuke;
+pub mod rebase;
 pub mod reject;
 pub mod review;
 pub mod start;
