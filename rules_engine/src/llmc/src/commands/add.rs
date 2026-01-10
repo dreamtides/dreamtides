@@ -1,0 +1,162 @@
+use std::fs;
+use std::path::Path;
+use std::time::{SystemTime, UNIX_EPOCH};
+
+use anyhow::{Context, Result, bail};
+
+use super::super::config::Config;
+use super::super::state::{State, WorkerRecord, WorkerStatus};
+use super::super::{config, git, state};
+
+/// Adds a new worker to the LLMC system
+pub fn run_add(name: &str, model: Option<String>, role_prompt: Option<String>) -> Result<()> {
+    validate_worker_name(name)?;
+
+    let llmc_root = config::get_llmc_root();
+    if !llmc_root.exists() {
+        bail!(
+            "LLMC workspace not initialized. Run 'llmc init' first.\n\
+             Expected workspace at: {}",
+            llmc_root.display()
+        );
+    }
+
+    let state_path = state::get_state_path();
+    let mut state = State::load(&state_path)?;
+
+    if state.get_worker(name).is_some() {
+        bail!(
+            "Worker '{}' already exists.\n\
+             Use 'llmc nuke {}' to remove it first, or choose a different name.",
+            name,
+            name
+        );
+    }
+
+    println!("Adding worker: {}", name);
+
+    let branch_name = format!("llmc/{}", name);
+    let worktree_path = llmc_root.join(".worktrees").join(name);
+
+    create_branch(&llmc_root, &branch_name)?;
+    create_worktree_for_worker(&llmc_root, &branch_name, &worktree_path)?;
+    copy_tabula_to_worktree(&llmc_root, &worktree_path)?;
+
+    let now = SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs();
+    let worker_record = WorkerRecord {
+        name: name.to_string(),
+        worktree_path: worktree_path.to_string_lossy().to_string(),
+        branch: branch_name,
+        status: WorkerStatus::Offline,
+        current_prompt: String::new(),
+        created_at_unix: now,
+        last_activity_unix: now,
+        commit_sha: None,
+        session_id: format!("llmc-{}", name),
+        crash_count: 0,
+        last_crash_unix: None,
+    };
+
+    state.add_worker(worker_record);
+    state.save(&state_path)?;
+
+    if model.is_some() || role_prompt.is_some() {
+        add_worker_to_config(name, model, role_prompt)?;
+    }
+
+    println!("✓ Worker '{}' added successfully!", name);
+    println!("\nWorktree: {}", worktree_path.display());
+    println!("Branch: llmc/{}", name);
+    println!("\nNext steps:");
+    println!("  1. Run 'llmc up' to start the daemon and bring this worker online");
+    println!("  2. Run 'llmc start {}' to assign a task", name);
+
+    Ok(())
+}
+
+fn validate_worker_name(name: &str) -> Result<()> {
+    if name.is_empty() {
+        bail!("Worker name cannot be empty");
+    }
+
+    if !name.chars().all(|c| c.is_alphanumeric() || c == '_' || c == '-') {
+        bail!(
+            "Invalid worker name: '{}'\n\
+             Worker names must contain only alphanumeric characters, underscores, and hyphens.",
+            name
+        );
+    }
+
+    Ok(())
+}
+
+fn create_branch(repo: &Path, branch_name: &str) -> Result<()> {
+    println!("Creating branch {}...", branch_name);
+
+    if git::branch_exists(repo, branch_name) {
+        println!("  Branch already exists (reusing)");
+        return Ok(());
+    }
+
+    git::create_branch(repo, branch_name, "HEAD")?;
+    Ok(())
+}
+
+fn create_worktree_for_worker(repo: &Path, branch_name: &str, worktree_path: &Path) -> Result<()> {
+    println!("Creating worktree at {}...", worktree_path.display());
+
+    if worktree_path.exists() {
+        bail!(
+            "Worktree path already exists: {}\n\
+             This should not happen. Please remove it manually and try again.",
+            worktree_path.display()
+        );
+    }
+
+    git::create_worktree(repo, branch_name, worktree_path)?;
+    Ok(())
+}
+
+fn copy_tabula_to_worktree(repo: &Path, worktree_path: &Path) -> Result<()> {
+    let source_tabula = repo.join("Tabula.xlsm");
+
+    if source_tabula.exists() {
+        println!("Copying Tabula.xlsm to worktree...");
+        let target_tabula = worktree_path.join("Tabula.xlsm");
+        fs::copy(&source_tabula, &target_tabula)
+            .context("Failed to copy Tabula.xlsm to worktree")?;
+    }
+
+    Ok(())
+}
+
+fn add_worker_to_config(
+    name: &str,
+    model: Option<String>,
+    role_prompt: Option<String>,
+) -> Result<()> {
+    println!("Adding worker to config.toml...");
+
+    let config_path = config::get_config_path();
+    let mut config_content =
+        fs::read_to_string(&config_path).context("Failed to read config.toml")?;
+
+    let worker_config_section = format!("\n[workers.{}]\n", name);
+
+    let mut worker_lines = Vec::new();
+    if let Some(m) = model {
+        worker_lines.push(format!("model = \"{}\"", m));
+    }
+    if let Some(rp) = role_prompt {
+        worker_lines.push(format!("role_prompt = \"{}\"", rp));
+    }
+
+    let worker_config = format!("{}{}\n", worker_config_section, worker_lines.join("\n"));
+    config_content.push_str(&worker_config);
+
+    fs::write(&config_path, config_content).context("Failed to write config.toml")?;
+
+    Config::load(&config_path)?;
+
+    Ok(())
+}

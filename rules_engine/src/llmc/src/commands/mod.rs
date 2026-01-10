@@ -1,1 +1,2 @@
-// Command implementations - to be implemented
+pub mod add;
+pub mod init;

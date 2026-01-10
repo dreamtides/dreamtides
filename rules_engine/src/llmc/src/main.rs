@@ -13,6 +13,8 @@ use clap::Parser;
 use cli::{Cli, Commands};
 use tracing_subscriber::fmt;
 
+use crate::commands::{add, init};
+
 #[tokio::main]
 async fn main() -> Result<()> {
     fmt::init();
@@ -20,8 +22,8 @@ async fn main() -> Result<()> {
     let cli = Cli::parse();
 
     match cli.command {
-        Commands::Init => {
-            println!("Not implemented: init");
+        Commands::Init { source, target } => {
+            init::run_init(source, target)?;
         }
         Commands::Up => {
             println!("Not implemented: up");
@@ -29,8 +31,8 @@ async fn main() -> Result<()> {
         Commands::Down => {
             println!("Not implemented: down");
         }
-        Commands::Add { name } => {
-            println!("Not implemented: add (worker: {})", name);
+        Commands::Add { name, model, role_prompt } => {
+            add::run_add(&name, model, role_prompt)?;
         }
         Commands::Nuke { name } => {
             println!("Not implemented: nuke (worker: {})", name);

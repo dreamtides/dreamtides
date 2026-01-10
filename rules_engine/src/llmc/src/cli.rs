@@ -1,3 +1,5 @@
+use std::path::PathBuf;
+
 use clap::{Parser, Subcommand};
 
 #[derive(Parser)]
@@ -11,7 +13,15 @@ pub struct Cli {
 #[derive(Subcommand)]
 pub enum Commands {
     /// Initialize a new LLMC workspace
-    Init,
+    Init {
+        /// Path to source repository
+        #[arg(long)]
+        source: Option<PathBuf>,
+
+        /// Target directory for LLMC workspace (default: ~/llmc)
+        #[arg(long)]
+        target: Option<PathBuf>,
+    },
 
     /// Start the LLMC daemon
     Up,
@@ -23,6 +33,14 @@ pub enum Commands {
     Add {
         /// Worker name
         name: String,
+
+        /// Model to use for this worker (overrides default)
+        #[arg(long)]
+        model: Option<String>,
+
+        /// Role prompt for this worker
+        #[arg(long)]
+        role_prompt: Option<String>,
     },
 
     /// Remove a worker and its worktree
