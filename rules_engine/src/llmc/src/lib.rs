@@ -3,6 +3,7 @@ pub mod commands;
 pub mod config;
 pub mod git;
 pub mod patrol;
+pub mod recovery;
 pub mod sound;
 pub mod state;
 pub mod tmux;
