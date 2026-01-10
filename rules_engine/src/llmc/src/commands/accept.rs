@@ -5,9 +5,10 @@ use std::process::Command;
 use anyhow::{Context, Result, bail};
 
 use super::super::state::{self, State, WorkerStatus};
+use super::super::tmux::sender::TmuxSender;
 use super::super::worker::{self, WorkerTransition};
 use super::super::{config, git};
-use super::review;
+use super::{rebase, review};
 
 /// Runs the accept command, accepting a worker's changes and merging to master
 pub fn run_accept(worker: Option<String>) -> Result<()> {
@@ -110,6 +111,59 @@ pub fn run_accept(worker: Option<String>) -> Result<()> {
     println!("✓ Worker '{}' changes accepted!", worker_name);
     println!("  New commit: {}", &new_commit_sha[..7.min(new_commit_sha.len())]);
     println!("  Worker reset to idle state with fresh worktree");
+
+    let other_pending: Vec<_> = state
+        .workers
+        .iter()
+        .filter(|(name, w)| *name != &worker_name && w.status == WorkerStatus::NeedsReview)
+        .map(|(name, _)| name.clone())
+        .collect();
+
+    if !other_pending.is_empty() {
+        tracing::info!("Triggering background rebases for {} pending workers", other_pending.len());
+
+        for pending_worker in other_pending {
+            let pending_record = state.get_worker(&pending_worker).unwrap();
+            let pending_worktree = PathBuf::from(&pending_record.worktree_path);
+            let pending_session = pending_record.session_id.clone();
+
+            match git::rebase_onto(&pending_worktree, "origin/master") {
+                Ok(rebase_result) => {
+                    if rebase_result.success {
+                        tracing::info!("Successfully rebased worker '{}'", pending_worker);
+                    } else {
+                        tracing::info!(
+                            "Worker '{}' has conflicts, marking as rebasing",
+                            pending_worker
+                        );
+                        let worker_mut = state.get_worker_mut(&pending_worker).unwrap();
+                        if let Err(e) =
+                            worker::apply_transition(worker_mut, WorkerTransition::ToRebasing)
+                        {
+                            tracing::warn!("Failed to transition worker to rebasing: {}", e);
+                            continue;
+                        }
+
+                        let conflict_prompt =
+                            rebase::build_conflict_prompt(&rebase_result.conflicts);
+                        let tmux_sender = TmuxSender::new();
+                        if let Err(e) = tmux_sender.send(&pending_session, &conflict_prompt) {
+                            tracing::warn!(
+                                "Failed to send conflict prompt to worker '{}': {}",
+                                pending_worker,
+                                e
+                            );
+                        }
+                    }
+                }
+                Err(e) => {
+                    tracing::warn!("Background rebase failed for {}: {}", pending_worker, e);
+                }
+            }
+        }
+
+        state.save(&state_path)?;
+    }
 
     Ok(())
 }

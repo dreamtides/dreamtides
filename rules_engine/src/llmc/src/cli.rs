@@ -54,7 +54,10 @@ pub enum Commands {
     /// Remove a worker and its worktree
     Nuke {
         /// Worker name to remove
-        name: String,
+        name: Option<String>,
+        /// Remove all workers
+        #[arg(long)]
+        all: bool,
     },
 
     /// Show status of all workers

@@ -66,7 +66,7 @@ pub fn run_rebase(worker: &str) -> Result<()> {
     }
 }
 
-fn build_conflict_prompt(conflicts: &[String]) -> String {
+pub fn build_conflict_prompt(conflicts: &[String]) -> String {
     let mut prompt = String::from(
         "A rebase onto master has encountered conflicts.\n\
          \n\

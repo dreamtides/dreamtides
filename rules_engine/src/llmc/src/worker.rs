@@ -64,10 +64,7 @@ pub fn can_transition(from: &WorkerStatus, to: &WorkerStatus) -> bool {
             WorkerStatus::Working | WorkerStatus::Rejected | WorkerStatus::Rebasing,
             WorkerStatus::NeedsReview
         ) | (WorkerStatus::Working | WorkerStatus::Rebasing, WorkerStatus::NeedsInput)
-            | (
-                WorkerStatus::NeedsReview | WorkerStatus::Rejected | WorkerStatus::Rebasing,
-                WorkerStatus::Idle
-            )
+            | (WorkerStatus::NeedsReview | WorkerStatus::Rejected, WorkerStatus::Idle)
             | (WorkerStatus::NeedsReview | WorkerStatus::Rebasing, WorkerStatus::Rejected)
             | (_, WorkerStatus::Rebasing | WorkerStatus::Error | WorkerStatus::Offline)
     )
@@ -109,6 +106,19 @@ pub fn apply_transition(worker: &mut WorkerRecord, transition: WorkerTransition)
         WorkerTransition::ToNeedsReview { .. } => {}
         _ => {}
     }
+
+    if matches!(transition, WorkerTransition::ToIdle | WorkerTransition::ToNeedsReview { .. })
+        && worker.crash_count > 0
+    {
+        tracing::info!(
+            "Worker {} completed successfully, resetting crash count from {}",
+            worker.name,
+            worker.crash_count
+        );
+        worker.crash_count = 0;
+        worker.last_crash_unix = None;
+    }
+
     worker.status = new_status;
     worker.last_activity_unix = SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs();
     Ok(())

@@ -190,18 +190,13 @@ fn build_full_prompt(
 
 fn copy_tabula_xlsm(config: &Config, worktree_path: &Path) -> Result<()> {
     let source_repo = PathBuf::from(&config.repo.source);
-    let source_xlsm = source_repo.join("client/Assets/StreamingAssets/Tabula.xlsm");
+    let source_xlsm = source_repo.join("Tabula.xlsm");
 
     if !source_xlsm.exists() {
         return Ok(());
     }
 
-    let dest_xlsm = worktree_path.join("client/Assets/StreamingAssets/Tabula.xlsm");
-
-    if let Some(parent) = dest_xlsm.parent() {
-        fs::create_dir_all(parent)
-            .with_context(|| format!("Failed to create directory: {}", parent.display()))?;
-    }
+    let dest_xlsm = worktree_path.join("Tabula.xlsm");
 
     fs::copy(&source_xlsm, &dest_xlsm).with_context(|| {
         format!("Failed to copy {} to {}", source_xlsm.display(), dest_xlsm.display())

@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 use std::fs::{self, OpenOptions};
 use std::io::Write as IoWrite;
 use std::path::{Path, PathBuf};
@@ -192,8 +194,14 @@ impl RecoveryManager {
         Ok(false)
     }
 
-    fn pane_content_changed_significantly(&self, _session_id: &str) -> Result<bool> {
-        Ok(false)
+    fn pane_content_changed_significantly(&self, session_id: &str) -> Result<bool> {
+        let before = session::capture_pane(session_id, 20)?;
+
+        thread::sleep(Duration::from_millis(200));
+
+        let after = session::capture_pane(session_id, 20)?;
+
+        Ok(before != after && after.len() > before.len())
     }
 
     /// Handle session crash recovery

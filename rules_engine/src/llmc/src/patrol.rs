@@ -12,7 +12,7 @@ use crate::tmux::monitor::{ClaudeState, StateDetector};
 use crate::tmux::sender::TmuxSender;
 use crate::tmux::session;
 use crate::worker::{self, WorkerTransition};
-use crate::{git, sound};
+use crate::{git, recovery, sound};
 
 static PATROL_RUNNING: AtomicBool = AtomicBool::new(false);
 
@@ -83,6 +83,21 @@ impl Patrol {
 
             let worker = state.get_worker(&worker_name).unwrap();
             let session_id = worker.session_id.clone();
+
+            if let Some(worker_mut) = state.get_worker_mut(&worker_name)
+                && recovery::should_reset_crash_count(
+                    worker_mut,
+                    SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs(),
+                )
+            {
+                tracing::info!(
+                    "Worker {} crash count expired (24h), resetting from {}",
+                    worker_name,
+                    worker_mut.crash_count
+                );
+                worker_mut.crash_count = 0;
+                worker_mut.last_crash_unix = None;
+            }
 
             if !session::session_exists(&session_id) {
                 tracing::warn!(
@@ -243,14 +258,12 @@ impl Patrol {
             let worker = state.get_worker(&worker_name).unwrap();
             let worktree_path = PathBuf::from(&worker.worktree_path);
             let session_id = worker.session_id.clone();
-            let commit_sha = worker.commit_sha.clone();
-
-            let current_head = git::get_head_commit(&worktree_path)?;
 
             let llmc_root = crate::config::get_llmc_root();
             let master_sha = git::get_head_commit(&llmc_root)?;
+            let merge_base = git::get_merge_base(&worktree_path, "HEAD", "origin/master")?;
 
-            if current_head == master_sha || commit_sha == Some(current_head.clone()) {
+            if merge_base == master_sha {
                 continue;
             }
 

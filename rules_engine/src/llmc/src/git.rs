@@ -164,6 +164,24 @@ pub fn get_head_commit(worktree: &Path) -> Result<String> {
     Ok(String::from_utf8(output.stdout)?.trim().to_string())
 }
 
+/// Gets the merge-base between two refs in a worktree
+pub fn get_merge_base(worktree: &Path, ref1: &str, ref2: &str) -> Result<String> {
+    let output = Command::new("git")
+        .arg("-C")
+        .arg(worktree)
+        .arg("merge-base")
+        .arg(ref1)
+        .arg(ref2)
+        .output()
+        .context("Failed to execute git merge-base")?;
+
+    if !output.status.success() {
+        bail!("Failed to get merge-base: {}", String::from_utf8_lossy(&output.stderr));
+    }
+
+    Ok(String::from_utf8(output.stdout)?.trim().to_string())
+}
+
 /// Checks if there are uncommitted changes in the worktree
 pub fn has_uncommitted_changes(worktree: &Path) -> Result<bool> {
     let output = Command::new("git")

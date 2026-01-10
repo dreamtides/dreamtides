@@ -7,6 +7,7 @@ use std::time::{Duration, SystemTime, UNIX_EPOCH};
 use anyhow::{Context, Result, bail};
 
 use super::super::config::{self, Config};
+use super::super::patrol::Patrol;
 use super::super::state::{self, State, WorkerStatus};
 use super::super::tmux::session;
 use super::super::worker;
@@ -124,20 +125,15 @@ fn start_worker(name: &str, config: &Config, state: &mut State) -> Result<()> {
         );
     }
 
-    if !session::session_exists(&worker_record.session_id) {
-        session::create_session(
-            &worker_record.session_id,
-            &worktree_path,
-            session::DEFAULT_SESSION_WIDTH,
-            session::DEFAULT_SESSION_HEIGHT,
-        )?;
-    }
-
     let worker_config = config
         .get_worker(name)
         .with_context(|| format!("Worker '{}' not found in config", name))?;
 
-    worker::start_claude_in_session(&worker_record.session_id, worker_config)?;
+    if !session::session_exists(&worker_record.session_id) {
+        session::start_worker_session(&worker_record.session_id, &worktree_path, worker_config)?;
+    } else {
+        worker::start_claude_in_session(&worker_record.session_id, worker_config)?;
+    }
 
     let worker_mut = state.get_worker_mut(name).unwrap();
     worker_mut.status = WorkerStatus::Idle;
@@ -153,6 +149,7 @@ fn run_main_loop(
     state: &mut State,
     state_path: &Path,
 ) -> Result<()> {
+    let patrol = Patrol::new(config);
     let patrol_interval = Duration::from_secs(config.defaults.patrol_interval_secs as u64);
     let mut last_patrol = SystemTime::now();
 
@@ -166,6 +163,9 @@ fn run_main_loop(
             && SystemTime::now().duration_since(last_patrol).unwrap_or_default() >= patrol_interval
         {
             println!("Running patrol...");
+            if let Err(e) = patrol.run_patrol(state, config) {
+                tracing::error!("Patrol failed: {}", e);
+            }
             last_patrol = SystemTime::now();
         }
     }

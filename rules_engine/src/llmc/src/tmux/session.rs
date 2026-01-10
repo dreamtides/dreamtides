@@ -1,7 +1,8 @@
 #![allow(dead_code)]
-
 use std::path::Path;
 use std::sync::OnceLock;
+use std::thread;
+use std::time::Duration;
 
 use anyhow::{Context, Result, bail};
 use regex::Regex;
@@ -10,9 +11,11 @@ use tmux_interface::{
     Tmux,
 };
 
+use super::sender::TmuxSender;
+use crate::config::WorkerConfig;
+
 /// Default TMUX session width (wide terminal to prevent message truncation)
 pub const DEFAULT_SESSION_WIDTH: u32 = 500;
-
 /// Default TMUX session height
 pub const DEFAULT_SESSION_HEIGHT: u32 = 100;
 
@@ -121,6 +124,34 @@ pub fn set_env(session: &str, key: &str, value: &str) -> Result<()> {
     Ok(())
 }
 
+/// Starts a complete worker session with Claude Code
+pub fn start_worker_session(name: &str, worktree: &Path, config: &WorkerConfig) -> Result<()> {
+    create_session(name, worktree, DEFAULT_SESSION_WIDTH, DEFAULT_SESSION_HEIGHT)?;
+
+    let llmc_root = crate::config::get_llmc_root();
+    set_env(name, "LLMC_WORKER", name)?;
+    set_env(name, "LLMC_ROOT", llmc_root.to_str().unwrap())?;
+
+    thread::sleep(Duration::from_millis(500));
+
+    let sender = TmuxSender::new();
+    let claude_cmd = build_claude_command(config);
+    sender
+        .send(name, &claude_cmd)
+        .with_context(|| format!("Failed to send Claude command to session '{}'", name))?;
+
+    wait_for_claude_ready(name, Duration::from_secs(30))?;
+
+    accept_bypass_warning(name, &sender)?;
+
+    sender
+        .send(name, "/clear")
+        .with_context(|| format!("Failed to send /clear to session '{}'", name))?;
+    thread::sleep(Duration::from_millis(500));
+
+    Ok(())
+}
+
 /// Converts a worker name to a session name
 pub fn session_name_for_worker(worker: &str) -> String {
     format!("llmc-{}", worker)
@@ -144,6 +175,57 @@ pub fn is_claude_process(cmd: &str) -> bool {
 
     static SEMVER_PATTERN: OnceLock<Regex> = OnceLock::new();
     SEMVER_PATTERN.get_or_init(|| Regex::new(r"^\d+\.\d+\.\d+").unwrap()).is_match(cmd)
+}
+
+fn build_claude_command(config: &WorkerConfig) -> String {
+    let mut cmd = String::from("claude");
+    if let Some(model) = &config.model {
+        cmd.push_str(&format!(" --model {}", model));
+    }
+    cmd.push_str(" --dangerously-skip-permissions");
+    cmd
+}
+
+fn wait_for_claude_ready(session: &str, timeout: Duration) -> Result<()> {
+    const POLL_INTERVAL_MS: u64 = 500;
+    let start = std::time::Instant::now();
+
+    while start.elapsed() < timeout {
+        thread::sleep(Duration::from_millis(POLL_INTERVAL_MS));
+        if let Ok(output) = capture_pane(session, 50) {
+            if output.lines().rev().take(5).any(|line| {
+                let trimmed = line.trim_start();
+                trimmed.starts_with("> ") || trimmed == ">"
+            }) {
+                return Ok(());
+            }
+
+            if let Ok(command) = get_pane_command(session)
+                && !is_claude_process(&command)
+            {
+                bail!(
+                    "Claude process not found in session '{}', got command: {}",
+                    session,
+                    command
+                );
+            }
+        }
+    }
+
+    bail!("Claude did not become ready after {} seconds", timeout.as_secs())
+}
+
+fn accept_bypass_warning(session: &str, sender: &TmuxSender) -> Result<()> {
+    thread::sleep(Duration::from_millis(500));
+    if let Ok(output) = capture_pane(session, 50)
+        && (output.contains("bypass") || output.contains("dangerous"))
+    {
+        sender.send_keys_raw(session, "Down")?;
+        thread::sleep(Duration::from_millis(200));
+        sender.send_keys_raw(session, "Enter")?;
+        thread::sleep(Duration::from_millis(500));
+    }
+    Ok(())
 }
 
 #[cfg(test)]

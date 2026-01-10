@@ -3,6 +3,7 @@ mod commands;
 mod config;
 mod git;
 mod patrol;
+mod recovery;
 mod sound;
 mod state;
 mod tmux;
@@ -43,8 +44,8 @@ async fn main() -> Result<()> {
         Commands::Add { name, model, role_prompt } => {
             add::run_add(&name, model, role_prompt)?;
         }
-        Commands::Nuke { name } => {
-            nuke::run_nuke(&name)?;
+        Commands::Nuke { name, all } => {
+            nuke::run_nuke(name.as_deref(), all)?;
         }
         Commands::Status { json } => {
             status::run_status(json)?;
