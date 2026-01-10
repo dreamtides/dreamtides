@@ -169,9 +169,7 @@ The parser is created once and reused for all cards.
 
 ### 4. Fluent String System
 
-Strings come from two FTL sources:
-- `strings.ftl`: UI strings (generated from current `strings.toml`)
-- `card_rules.ftl`: Card text formatting (already exists)
+Strings come from `strings.ftl` which contains both UI strings and card text formatting.
 
 Loading uses the `fluent` crate:
 

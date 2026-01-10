@@ -47,7 +47,7 @@ impl Tabula {
     pub fn load(source: TabulaSource, base_path: &Path) -> Result<Self, TabulaError> {
         // 1. Load Fluent strings
         let strings = FluentStrings::load(&base_path.join("strings.ftl"))?;
-        let rules_ftl = FluentStrings::load(&base_path.join("card_rules.ftl"))?;
+        let rules_ftl = FluentStrings::load(&base_path.join("strings.ftl"))?;
 
         // 2. Create parser (once for all cards)
         let parser = AbilityParser::new();

@@ -24,7 +24,7 @@ impl FluentRulesTextListener {
     }
 
     pub fn new() -> Result<Self> {
-        Self::with_ftl(include_str!("card_rules.ftl"))
+        Self::with_ftl(include_str!("../../../../../tabula/strings.ftl"))
     }
 }
 

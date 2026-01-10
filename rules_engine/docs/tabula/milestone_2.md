@@ -86,5 +86,5 @@ the existing `rules_engine/tests/parser_v2_tests/tests/card_toml_validation_test
 1. `client/Assets/StreamingAssets/Tabula/test-cards.toml` - Test cards to update
 2. `client/Assets/StreamingAssets/Tabula/dreamwell.toml` - Dreamwell cards
 3. `client/Assets/StreamingAssets/Tabula/cards.toml` - Reference for syntax
-4. 'rules_engine/src/tabula_cli/src/server/listeners/card_rules.ftl' - Fluent selectors for text
+4. 'tabula/strings.ftl' - Fluent selectors for text
 5. `docs/parser_v2_design.md` - Variable system documentation

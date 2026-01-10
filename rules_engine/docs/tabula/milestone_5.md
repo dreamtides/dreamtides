@@ -9,7 +9,7 @@ Implement `fluent_loader.rs` to load and format strings from FTL files.
 1. Create `FluentStrings` struct wrapping `FluentBundle`
 2. Implement `load()` function to parse FTL content
 3. Implement `format()` function for string lookup with arguments
-4. Add support for loading `card_rules.ftl` for ability text formatting
+4. Add support for loading `strings.ftl` for ability text formatting
 5. Write tests for string loading and formatting
 
 ## FluentStrings Struct
@@ -47,7 +47,7 @@ impl FluentStrings {
 
 ## Rules Text Formatting
 
-For card rules text, use the existing `card_rules.ftl`:
+For card rules text, use the existing `strings.ftl`:
 
 ```rust
 pub fn format_rules_text(
@@ -85,7 +85,7 @@ Dissolve = <color=#AA00FF>Dissolve</color>
 
 ## Context Files
 
-1. `src/tabula_cli/src/server/listeners/card_rules.ftl` - Rules text FTL
+1. `tabula/strings.ftl` - Rules text FTL
 2. `src/tabula_cli/src/server/listeners/fluent_rules_text.rs` - Formatting logic
 3. `client/Assets/StreamingAssets/Tabula/strings.toml` - UI strings (to convert)
 4. `src/tabula_data/src/localized_strings.rs` - V1 string handling (for deletion)
