@@ -107,6 +107,15 @@ pub fn run_accept(worker: Option<String>) -> Result<()> {
 
     let new_commit_sha = git::get_head_commit(&worktree_path)?;
 
+    if git::has_uncommitted_changes(&llmc_root)? {
+        bail!(
+            "The llmc root directory has uncommitted changes.\n\
+             This would result in data loss. Please commit or stash your changes first.\n\
+             Directory: {}",
+            llmc_root.display()
+        );
+    }
+
     println!("Syncing local master with origin/master...");
     git::checkout_branch(&llmc_root, "master")?;
     git::reset_to_ref(&llmc_root, "origin/master")?;
@@ -145,6 +154,15 @@ pub fn run_accept(worker: Option<String>) -> Result<()> {
     println!("Fetching commit into source repository...");
     let source_repo = PathBuf::from(&config.repo.source);
     git::fetch_from_local(&source_repo, &llmc_root, &new_commit_sha)?;
+
+    if git::has_uncommitted_changes(&source_repo)? {
+        bail!(
+            "The source repository has uncommitted changes.\n\
+             This would result in data loss. Please commit or stash your changes first.\n\
+             Repository: {}",
+            source_repo.display()
+        );
+    }
 
     println!("Updating source repository...");
     git::checkout_branch(&source_repo, "master")?;
