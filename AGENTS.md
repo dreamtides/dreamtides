@@ -1,6 +1,6 @@
 Please follow all of the "code style" and "validating changes" rules below at all times.
 
-IMPORTANT: Please use `just` commands instead of `cargo`, e.g. `just fmt`, `just check`,
+Please use `just` commands instead of `cargo`, e.g. `just fmt`, `just check`,
 `just-clippy`, `just-test`, `just parser-test`
 
 # CODE STYLE

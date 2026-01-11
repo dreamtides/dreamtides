@@ -91,31 +91,30 @@ pub fn load_last_reviewed() -> Result<Option<String>> {
 }
 
 fn display_diff(worktree_path: &PathBuf, interface: ReviewInterface) -> Result<()> {
+    let current_branch = git::get_current_branch(worktree_path)?;
+    let range = format!("master...{}", current_branch);
+
     match interface {
         ReviewInterface::Difftastic => {
-            let output = Command::new("difft")
-                .arg("--display")
-                .arg("side-by-side")
-                .current_dir(worktree_path)
-                .arg("master")
-                .arg("HEAD")
-                .output()
-                .context("Failed to execute difft. Is difftastic installed?")?;
+            let status = Command::new("git")
+                .arg("-C")
+                .arg(worktree_path)
+                .arg("-c")
+                .arg("diff.external=difft")
+                .arg("diff")
+                .arg(&range)
+                .status()
+                .context("Failed to execute git diff with difftastic")?;
 
-            if !output.status.success() {
-                bail!(
-                    "Failed to generate diff with difftastic: {}",
-                    String::from_utf8_lossy(&output.stderr)
-                );
+            if !status.success() {
+                bail!("git diff failed for {}", range);
             }
-
-            print!("{}", String::from_utf8_lossy(&output.stdout));
         }
         ReviewInterface::VSCode => {
             let output = Command::new("code")
                 .arg("--diff")
                 .arg("master")
-                .arg("HEAD")
+                .arg(&current_branch)
                 .current_dir(worktree_path)
                 .output()
                 .context("Failed to execute VS Code. Is 'code' in PATH?")?;
