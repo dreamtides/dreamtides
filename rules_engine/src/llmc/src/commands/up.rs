@@ -47,7 +47,7 @@ pub fn run_up(no_patrol: bool, verbose: bool) -> Result<()> {
     })
     .context("Failed to set Ctrl-C handler")?;
 
-    run_main_loop(no_patrol, shutdown, &config, &mut state, &state_path)?;
+    run_main_loop(no_patrol, verbose, shutdown, &config, &mut state, &state_path)?;
 
     println!("✓ LLMC daemon stopped");
     Ok(())
@@ -171,6 +171,7 @@ fn start_worker(name: &str, config: &Config, state: &mut State, verbose: bool) -
 
 fn run_main_loop(
     no_patrol: bool,
+    verbose: bool,
     shutdown: Arc<AtomicBool>,
     config: &Config,
     state: &mut State,
@@ -192,7 +193,9 @@ fn run_main_loop(
         if !no_patrol
             && SystemTime::now().duration_since(last_patrol).unwrap_or_default() >= patrol_interval
         {
-            println!("Running patrol...");
+            if verbose {
+                println!("Running patrol...");
+            }
             if let Err(e) = patrol.run_patrol(state, config) {
                 tracing::error!("Patrol failed: {}", e);
             }

@@ -166,7 +166,7 @@ fn create_initial_state(target: &Path) -> Result<()> {
 }
 
 fn copy_tabula_if_present(source: &Path, target: &Path) -> Result<()> {
-    let source_tabula = source.join("Tabula.xlsm");
+    let source_tabula = source.join("client/Assets/StreamingAssets/Tabula.xlsm");
 
     if source_tabula.exists() {
         println!("Copying Tabula.xlsm...");

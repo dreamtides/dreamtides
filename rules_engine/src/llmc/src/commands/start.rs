@@ -186,7 +186,7 @@ fn build_full_prompt(
 
 fn copy_tabula_xlsm(config: &Config, worktree_path: &Path) -> Result<()> {
     let source_repo = PathBuf::from(&config.repo.source);
-    let source_xlsm = source_repo.join("Tabula.xlsm");
+    let source_xlsm = source_repo.join("client/Assets/StreamingAssets/Tabula.xlsm");
 
     if !source_xlsm.exists() {
         return Ok(());
