@@ -150,6 +150,23 @@ pub fn get_current_branch(worktree: &Path) -> Result<String> {
     Ok(String::from_utf8(output.stdout)?.trim().to_string())
 }
 
+/// Gets the commit SHA for a specific ref
+pub fn get_head_commit_of_ref(repo: &Path, ref_name: &str) -> Result<String> {
+    let output = Command::new("git")
+        .arg("-C")
+        .arg(repo)
+        .arg("rev-parse")
+        .arg(ref_name)
+        .output()
+        .context("Failed to execute git rev-parse")?;
+
+    if !output.status.success() {
+        bail!("Failed to get commit for {}: {}", ref_name, String::from_utf8_lossy(&output.stderr));
+    }
+
+    Ok(String::from_utf8(output.stdout)?.trim().to_string())
+}
+
 /// Gets the HEAD commit SHA for a worktree
 pub fn get_head_commit(worktree: &Path) -> Result<String> {
     let output = Command::new("git")
@@ -397,6 +414,24 @@ pub fn fetch_origin(repo: &Path) -> Result<()> {
 
     if !output.status.success() {
         bail!("Failed to fetch from origin: {}", String::from_utf8_lossy(&output.stderr));
+    }
+
+    Ok(())
+}
+
+/// Resets the current branch to the specified ref (hard reset)
+pub fn reset_to_ref(repo: &Path, ref_name: &str) -> Result<()> {
+    let output = Command::new("git")
+        .arg("-C")
+        .arg(repo)
+        .arg("reset")
+        .arg("--hard")
+        .arg(ref_name)
+        .output()
+        .context("Failed to execute git reset")?;
+
+    if !output.status.success() {
+        bail!("Failed to reset to {}: {}", ref_name, String::from_utf8_lossy(&output.stderr));
     }
 
     Ok(())

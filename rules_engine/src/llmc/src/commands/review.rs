@@ -58,6 +58,46 @@ pub fn run_review(worker: Option<String>, interface: ReviewInterface) -> Result<
 
     let worktree_path = PathBuf::from(&worker_record.worktree_path);
 
+    println!("Fetching latest master...");
+    git::fetch_origin(&llmc_root)?;
+
+    let merge_base = git::get_merge_base(&worktree_path, "HEAD", "origin/master")?;
+    let origin_master_sha = git::get_head_commit_of_ref(&llmc_root, "origin/master")?;
+
+    if merge_base != origin_master_sha {
+        println!("Worker needs rebase onto latest master. Rebasing...");
+
+        if git::has_uncommitted_changes(&worktree_path)? {
+            println!("Amending uncommitted changes before rebase...");
+            git::amend_uncommitted_changes(&worktree_path)?;
+        }
+
+        let rebase_result = git::rebase_onto(&worktree_path, "origin/master")?;
+
+        if !rebase_result.success {
+            let (mut state, _) = super::super::state::load_state_with_patrol()?;
+            let worker_mut = state.get_worker_mut(&worker_name).unwrap();
+            super::super::worker::apply_transition(
+                worker_mut,
+                super::super::worker::WorkerTransition::ToRebasing,
+            )?;
+
+            let conflict_prompt = build_conflict_resolution_prompt(&rebase_result.conflicts);
+            let sender = super::super::tmux::sender::TmuxSender::new();
+            sender.send(&worker_mut.session_id, &conflict_prompt)?;
+
+            state.save(&super::super::state::get_state_path())?;
+
+            println!("\n✓ Agent rebase started");
+            println!("  Worker '{}' transitioned to 'rebasing' state", worker_name);
+            println!("  The agent will resolve conflicts and continue the rebase");
+            println!("  Run 'llmc review {}' again once complete", worker_name);
+            return Ok(());
+        }
+
+        println!("✓ Rebased onto latest master");
+    }
+
     let commit_message = git::get_commit_message(&worktree_path, commit_sha)?;
 
     println!("Reviewing: {} ({})", worker_name, worker_record.branch);
@@ -92,7 +132,7 @@ pub fn load_last_reviewed() -> Result<Option<String>> {
 
 fn display_diff(worktree_path: &PathBuf, interface: ReviewInterface) -> Result<()> {
     let current_branch = git::get_current_branch(worktree_path)?;
-    let range = format!("master...{}", current_branch);
+    let range = format!("origin/master...{}", current_branch);
 
     match interface {
         ReviewInterface::Difftastic => {
@@ -165,4 +205,38 @@ fn format_needs_review_workers(state: &State) -> String {
         return "none".to_string();
     }
     needs_review.iter().map(|w| w.name.as_str()).collect::<Vec<_>>().join(", ")
+}
+
+fn build_conflict_resolution_prompt(conflicts: &[String]) -> String {
+    let mut prompt = String::from(
+        "A rebase onto master has encountered conflicts.\n\
+         \n\
+         Conflicting files:\n",
+    );
+
+    for file in conflicts {
+        let conflict_count = count_conflict_markers(file);
+        prompt.push_str(&format!("- {} ({} conflict markers)\n", file, conflict_count));
+    }
+
+    prompt.push_str(
+        "\n\
+         Resolution steps:\n\
+         1. Examine conflict markers (<<<<<<, =======, >>>>>>>)\n\
+         2. Decide how to resolve each conflict\n\
+         3. Remove conflict markers\n\
+         4. Stage resolved files: git add <file>\n\
+         5. Continue rebase: git rebase --continue\n\
+         6. Run validation: just review\n\
+         \n\
+         Notes:\n\
+         - View original versions: git show :2:<file> (ours) :3:<file> (theirs)\n\
+         - To abort: git rebase --abort\n",
+    );
+
+    prompt
+}
+
+fn count_conflict_markers(file: &str) -> usize {
+    std::fs::read_to_string(file).map(|content| content.matches("<<<<<<<").count()).unwrap_or(0)
 }

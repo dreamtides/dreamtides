@@ -79,18 +79,20 @@ pub fn run_accept(worker: Option<String>) -> Result<()> {
     let rebase_result = git::rebase_onto(&worktree_path, "origin/master")?;
 
     if !rebase_result.success {
-        bail!(
-            "Rebase failed with conflicts. Please resolve manually.\n\
-             Conflicted files: {:?}\n\
-             To resolve:\n\
-             1. cd {}\n\
-             2. Resolve conflicts\n\
-             3. git rebase --continue\n\
-             4. Try 'llmc accept {}' again",
-            rebase_result.conflicts,
-            worktree_path.display(),
-            worker_name
-        );
+        let worker_mut = state.get_worker_mut(&worker_name).unwrap();
+        worker::apply_transition(worker_mut, WorkerTransition::ToRebasing)?;
+
+        let conflict_prompt = build_conflict_resolution_prompt(&rebase_result.conflicts);
+        let sender = super::super::tmux::sender::TmuxSender::new();
+        sender.send(&worker_mut.session_id, &conflict_prompt)?;
+
+        state.save(&super::super::state::get_state_path())?;
+
+        println!("\n✓ Agent rebase started");
+        println!("  Worker '{}' transitioned to 'rebasing' state", worker_name);
+        println!("  The agent will resolve conflicts and continue the rebase");
+        println!("  Run 'llmc accept {}' again once complete", worker_name);
+        return Ok(());
     }
 
     println!("Squashing commits...");
@@ -105,8 +107,11 @@ pub fn run_accept(worker: Option<String>) -> Result<()> {
 
     let new_commit_sha = git::get_head_commit(&worktree_path)?;
 
-    println!("Merging to master...");
+    println!("Syncing local master with origin/master...");
+    git::reset_to_ref(&llmc_root, "origin/master")?;
     let master_before = git::get_head_commit(&llmc_root)?;
+
+    println!("Merging to master...");
     git::fast_forward_merge(&llmc_root, &worker_record.branch)?;
     let master_after = git::get_head_commit(&llmc_root)?;
 
@@ -307,4 +312,38 @@ fn format_all_workers(state: &State) -> String {
         return "none".to_string();
     }
     state.workers.keys().map(String::as_str).collect::<Vec<_>>().join(", ")
+}
+
+fn build_conflict_resolution_prompt(conflicts: &[String]) -> String {
+    let mut prompt = String::from(
+        "A rebase onto master has encountered conflicts.\n\
+         \n\
+         Conflicting files:\n",
+    );
+
+    for file in conflicts {
+        let conflict_count = count_conflict_markers(file);
+        prompt.push_str(&format!("- {} ({} conflict markers)\n", file, conflict_count));
+    }
+
+    prompt.push_str(
+        "\n\
+         Resolution steps:\n\
+         1. Examine conflict markers (<<<<<<, =======, >>>>>>>)\n\
+         2. Decide how to resolve each conflict\n\
+         3. Remove conflict markers\n\
+         4. Stage resolved files: git add <file>\n\
+         5. Continue rebase: git rebase --continue\n\
+         6. Run validation: just review\n\
+         \n\
+         Notes:\n\
+         - View original versions: git show :2:<file> (ours) :3:<file> (theirs)\n\
+         - To abort: git rebase --abort\n",
+    );
+
+    prompt
+}
+
+fn count_conflict_markers(file: &str) -> usize {
+    std::fs::read_to_string(file).map(|content| content.matches("<<<<<<<").count()).unwrap_or(0)
 }
