@@ -169,8 +169,9 @@ Repository root: {}
 IMPORTANT INSTRUCTIONS:
 - Follow all conventions specified in CLAUDE.md and other project documentation
 - Run validation commands as specified in the project (e.g., `just fmt`, `just check`, `just clippy`)
-- Create a SINGLE commit with your changes when complete
+- Create a SINGLE commit with all changes when complete (always exit with clean `git status`).
 - DO NOT push to remote - your work will be reviewed and merged by the coordinator
+- Do NOT read or modify files outside of your worktree
 - Use the project's code style and patterns
 
 Please implement the requested changes following these guidelines.
