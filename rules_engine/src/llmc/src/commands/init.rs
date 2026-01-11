@@ -9,14 +9,19 @@ use super::super::config::Config;
 use super::super::state::State;
 
 /// Initializes a new LLMC workspace
-pub fn run_init(source: Option<PathBuf>, target: Option<PathBuf>) -> Result<()> {
+pub fn run_init(source: Option<PathBuf>, target: Option<PathBuf>, force: bool) -> Result<()> {
     let target_dir = target.unwrap_or_else(config::get_llmc_root);
 
     if target_dir.exists() {
-        bail!(
-            "Target directory already exists: {}\nPlease remove it first or specify a different target with --target",
-            target_dir.display()
-        );
+        if force {
+            println!("Removing existing directory at {}", target_dir.display());
+            fs::remove_dir_all(&target_dir).context("Failed to remove existing directory")?;
+        } else {
+            bail!(
+                "Target directory already exists: {}\nPlease remove it first, use --force to overwrite, or specify a different target with --target",
+                target_dir.display()
+            );
+        }
     }
 
     let source_dir = if let Some(src) = source {

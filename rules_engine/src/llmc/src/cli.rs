@@ -25,6 +25,10 @@ pub enum Commands {
         /// Target directory for LLMC workspace (default: ~/llmc)
         #[arg(long)]
         target: Option<PathBuf>,
+
+        /// Remove existing directory if present
+        #[arg(long)]
+        force: bool,
     },
 
     /// Start the LLMC daemon

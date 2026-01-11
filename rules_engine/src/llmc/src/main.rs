@@ -50,7 +50,7 @@ async fn main() -> Result<()> {
     let start_time = std::time::Instant::now();
 
     let result = match cli.command {
-        Commands::Init { source, target } => init::run_init(source, target),
+        Commands::Init { source, target, force } => init::run_init(source, target, force),
         Commands::Up { no_patrol } => up::run_up(no_patrol, cli.verbose),
         Commands::Down { force } => down::run_down(force),
         Commands::Add { name, model, role_prompt } => add::run_add(&name, model, role_prompt),
