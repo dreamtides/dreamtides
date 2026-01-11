@@ -145,4 +145,14 @@ pub enum Commands {
         #[arg(long)]
         rebuild: bool,
     },
+
+    /// Show the last N lines from a worker's session
+    Peek {
+        /// Worker name (optional, defaults to most recently active worker)
+        worker: Option<String>,
+
+        /// Number of lines to display (default: 10)
+        #[arg(short, long, default_value = "10")]
+        lines: u32,
+    },
 }
