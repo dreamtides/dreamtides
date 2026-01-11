@@ -361,18 +361,36 @@ pub fn fetch_origin(repo: &Path) -> Result<()> {
     Ok(())
 }
 
-/// Pulls with rebase from the current branch's upstream
+/// Pulls with rebase from origin/master
 pub fn pull_rebase(worktree: &Path) -> Result<()> {
-    let output = Command::new("git")
+    // Fetch latest changes from origin
+    let fetch_output = Command::new("git")
         .arg("-C")
         .arg(worktree)
-        .arg("pull")
-        .arg("--rebase")
+        .arg("fetch")
+        .arg("origin")
+        .arg("master")
         .output()
-        .context("Failed to execute git pull --rebase")?;
+        .context("Failed to execute git fetch")?;
 
-    if !output.status.success() {
-        bail!("Failed to pull with rebase: {}", String::from_utf8_lossy(&output.stderr));
+    if !fetch_output.status.success() {
+        bail!("Failed to fetch from origin: {}", String::from_utf8_lossy(&fetch_output.stderr));
+    }
+
+    // Rebase current branch onto origin/master
+    let rebase_output = Command::new("git")
+        .arg("-C")
+        .arg(worktree)
+        .arg("rebase")
+        .arg("origin/master")
+        .output()
+        .context("Failed to execute git rebase")?;
+
+    if !rebase_output.status.success() {
+        bail!(
+            "Failed to rebase onto origin/master: {}",
+            String::from_utf8_lossy(&rebase_output.stderr)
+        );
     }
 
     Ok(())

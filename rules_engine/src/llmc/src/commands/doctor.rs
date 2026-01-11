@@ -369,6 +369,100 @@ fn check_git_config(report: &mut DoctorReport) -> Result<()> {
 
     report.checks_passed.push("Git repository exists".to_string());
 
+    // Check that origin remote exists and is accessible
+    let remote_output = Command::new("git")
+        .args(["-C", llmc_root.to_str().unwrap(), "remote", "get-url", "origin"])
+        .output();
+
+    match remote_output {
+        Ok(output) if output.status.success() => {
+            let origin_url = String::from_utf8_lossy(&output.stdout).trim().to_string();
+            report.checks_passed.push(format!("Git origin configured: {}", origin_url));
+
+            // Check if origin is accessible
+            let fetch_check = Command::new("git")
+                .args(["-C", llmc_root.to_str().unwrap(), "fetch", "--dry-run", "origin"])
+                .output();
+
+            if let Ok(fetch_out) = fetch_check {
+                if fetch_out.status.success() {
+                    report.checks_passed.push("Git origin is accessible".to_string());
+                } else {
+                    report.warnings.push(DoctorWarning {
+                        message: "Cannot fetch from origin".to_string(),
+                        details: Some(String::from_utf8_lossy(&fetch_out.stderr).to_string()),
+                    });
+                }
+            }
+        }
+        Ok(_) | Err(_) => {
+            report.errors.push(DoctorError {
+                message: "Git origin remote not configured".to_string(),
+                details: Some(
+                    "Worker branches need origin to fetch updates. \
+                     Run 'git remote add origin <path>' in ~/llmc"
+                        .to_string(),
+                ),
+            });
+        }
+    }
+
+    // Check worker branches can rebase
+    check_worker_branches(report)?;
+
+    Ok(())
+}
+
+fn check_worker_branches(report: &mut DoctorReport) -> Result<()> {
+    let state_path = state::get_state_path();
+    if let Ok(state) = State::load(&state_path) {
+        let llmc_root = config::get_llmc_root();
+
+        #[expect(clippy::iter_over_hash_type)]
+        for worker in state.workers.values() {
+            let branch_check = Command::new("git")
+                .args(["-C", llmc_root.to_str().unwrap(), "rev-parse", "--verify", &worker.branch])
+                .output();
+
+            match branch_check {
+                Ok(output) if output.status.success() => {
+                    // Branch exists, check if it can fetch from origin
+                    let fetch_check = Command::new("git")
+                        .args([
+                            "-C",
+                            &worker.worktree_path,
+                            "fetch",
+                            "--dry-run",
+                            "origin",
+                            "master",
+                        ])
+                        .output();
+
+                    if let Ok(fetch_out) = fetch_check
+                        && !fetch_out.status.success()
+                    {
+                        report.warnings.push(DoctorWarning {
+                            message: format!(
+                                "Worker '{}' cannot fetch from origin/master",
+                                worker.name
+                            ),
+                            details: Some(String::from_utf8_lossy(&fetch_out.stderr).to_string()),
+                        });
+                    }
+                }
+                _ => {
+                    report.warnings.push(DoctorWarning {
+                        message: format!(
+                            "Worker '{}' branch '{}' not found",
+                            worker.name, worker.branch
+                        ),
+                        details: Some("Branch may have been deleted manually".to_string()),
+                    });
+                }
+            }
+        }
+    }
+
     Ok(())
 }
 
