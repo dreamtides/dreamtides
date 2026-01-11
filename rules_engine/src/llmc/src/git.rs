@@ -41,13 +41,16 @@ pub fn create_worktree(repo: &Path, branch: &str, worktree_path: &Path) -> Resul
 }
 
 /// Removes the worktree at the specified path
-pub fn remove_worktree(worktree_path: &Path) -> Result<()> {
-    let output = Command::new("git")
-        .arg("worktree")
-        .arg("remove")
-        .arg(worktree_path)
-        .output()
-        .context("Failed to execute git worktree remove")?;
+pub fn remove_worktree(repo: &Path, worktree_path: &Path, force: bool) -> Result<()> {
+    let mut cmd = Command::new("git");
+    cmd.arg("-C").arg(repo).arg("worktree").arg("remove");
+
+    if force {
+        cmd.arg("--force");
+    }
+
+    let output =
+        cmd.arg(worktree_path).output().context("Failed to execute git worktree remove")?;
 
     if !output.status.success() {
         bail!("Failed to remove worktree: {}", String::from_utf8_lossy(&output.stderr));

@@ -89,16 +89,25 @@ fn nuke_worker(state: &mut State, llmc_root: &Path, worker: &str) -> Result<()> 
 
     println!("Nuking worker '{}'...", worker);
 
-    session::kill_session(&session_id).ok();
-    println!("  ✓ Killed TMUX session: {}", session_id);
-
-    if worktree_path.exists() {
-        git::remove_worktree(&worktree_path).ok();
-        println!("  ✓ Removed worktree: {}", worktree_path.display());
+    if let Err(e) = session::kill_session(&session_id) {
+        eprintln!("  ⚠ Failed to kill TMUX session {}: {}", session_id, e);
+    } else {
+        println!("  ✓ Killed TMUX session: {}", session_id);
     }
 
-    git::delete_branch(llmc_root, &branch, true).ok();
-    println!("  ✓ Deleted branch: {}", branch);
+    if worktree_path.exists() {
+        if let Err(e) = git::remove_worktree(llmc_root, &worktree_path, true) {
+            eprintln!("  ⚠ Failed to remove worktree: {}", e);
+        } else {
+            println!("  ✓ Removed worktree: {}", worktree_path.display());
+        }
+    }
+
+    if let Err(e) = git::delete_branch(llmc_root, &branch, true) {
+        eprintln!("  ⚠ Failed to delete branch {}: {}", branch, e);
+    } else {
+        println!("  ✓ Deleted branch: {}", branch);
+    }
 
     state.remove_worker(worker);
     println!("  ✓ Removed from state.json");

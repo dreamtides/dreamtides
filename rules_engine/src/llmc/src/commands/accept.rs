@@ -94,7 +94,7 @@ pub fn run_accept(worker: Option<String>) -> Result<()> {
     git::fast_forward_merge(&llmc_root, &worker_record.branch)?;
 
     println!("Cleaning up worktree and branch...");
-    git::remove_worktree(&worktree_path)?;
+    git::remove_worktree(&llmc_root, &worktree_path, false)?;
     git::delete_branch(&llmc_root, &worker_record.branch, true)?;
 
     println!("Recreating worker worktree...");

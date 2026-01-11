@@ -272,7 +272,7 @@ mod tests {
 
     #[test]
     fn test_partial_send_status() {
-        let sender = TmuxSender::new();
+        let _sender = TmuxSender::new();
 
         let status = PartialSendStatus::Partial { received: 50, expected: 100 };
         assert!(matches!(status, PartialSendStatus::Partial { .. }));
@@ -289,7 +289,7 @@ mod tests {
 
     #[test]
     fn test_large_message_threshold() {
-        let sender = TmuxSender::new();
+        let _sender = TmuxSender::new();
 
         assert!(999 < LARGE_MESSAGE_THRESHOLD);
         assert!(1024 >= LARGE_MESSAGE_THRESHOLD);
