@@ -22,7 +22,7 @@ pub fn run_accept(worker: Option<String>) -> Result<()> {
         );
     }
 
-    let (mut state, _config) = super::super::state::load_state_with_patrol()?;
+    let (mut state, config) = super::super::state::load_state_with_patrol()?;
 
     let worker_name = if let Some(name) = worker {
         if state.get_worker(&name).is_none() {
@@ -142,20 +142,27 @@ pub fn run_accept(worker: Option<String>) -> Result<()> {
 
     verify_commit_exists(&llmc_root, &new_commit_sha)?;
 
-    println!("Pushing to origin...");
-    git::push_master_to_origin(&llmc_root)?;
+    println!("Updating source repository...");
+    let source_repo = PathBuf::from(&config.repo.source);
+    git::checkout_branch(&source_repo, "master")?;
+    git::reset_to_ref(&source_repo, &new_commit_sha)?;
 
-    git::verify_commit_on_origin(&llmc_root, &new_commit_sha)?;
-    println!(
-        "✓ Commit {} pushed and verified on origin/master",
-        &new_commit_sha[..7.min(new_commit_sha.len())]
-    );
+    let source_head = git::get_head_commit(&source_repo)?;
+    if source_head != new_commit_sha {
+        bail!(
+            "Source repository HEAD ({}) does not match new commit ({})",
+            source_head,
+            new_commit_sha
+        );
+    }
+
+    println!("✓ Source repository updated to {}", &new_commit_sha[..7.min(new_commit_sha.len())]);
 
     println!("Cleaning up worktree and branch...");
     git::remove_worktree(&llmc_root, &worktree_path, false)?;
     git::delete_branch(&llmc_root, &worker_record.branch, true)?;
 
-    println!("Fetching to update origin/master ref...");
+    println!("Syncing llmc repo with source...");
     git::fetch_origin(&llmc_root)?;
 
     println!("Recreating worker worktree...");
