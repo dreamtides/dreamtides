@@ -21,7 +21,7 @@ pub fn run_accept(worker: Option<String>) -> Result<()> {
         );
     }
 
-    let (mut state, _config) = super::load_state_with_patrol()?;
+    let (mut state, _config) = super::super::state::load_state_with_patrol()?;
 
     let worker_name = if let Some(name) = worker {
         if state.get_worker(&name).is_none() {

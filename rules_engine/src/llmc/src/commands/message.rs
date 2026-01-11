@@ -17,7 +17,7 @@ pub fn run_message(worker: &str, message: &str) -> Result<()> {
         );
     }
 
-    let (mut state, _config) = super::load_state_with_patrol()?;
+    let (mut state, _config) = super::super::state::load_state_with_patrol()?;
 
     let worker_record = state.get_worker(worker).ok_or_else(|| {
         anyhow::anyhow!(

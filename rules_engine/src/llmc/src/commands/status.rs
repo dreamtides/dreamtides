@@ -18,7 +18,7 @@ pub fn run_status(json: bool) -> Result<()> {
         );
     }
 
-    let (state, _config) = super::load_state_with_patrol()?;
+    let (state, _config) = super::super::state::load_state_with_patrol()?;
 
     if state.workers.is_empty() {
         if json {

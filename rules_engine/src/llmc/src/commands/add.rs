@@ -138,8 +138,7 @@ fn add_worker_to_config(
     println!("Adding worker to config.toml...");
 
     let config_path = config::get_config_path();
-    let config_content =
-        fs::read_to_string(&config_path).context("Failed to read config.toml")?;
+    let config_content = fs::read_to_string(&config_path).context("Failed to read config.toml")?;
 
     let section_header = format!("[workers.{}]", name);
     let lines: Vec<&str> = config_content.lines().collect();

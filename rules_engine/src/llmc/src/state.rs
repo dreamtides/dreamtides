@@ -1,5 +1,3 @@
-#![allow(dead_code)]
-
 use std::collections::HashMap;
 use std::fs;
 use std::path::{Path, PathBuf};
@@ -8,7 +6,8 @@ use std::time::{SystemTime, UNIX_EPOCH};
 use anyhow::{Context, Result, bail};
 use serde::{Deserialize, Serialize};
 
-use crate::config;
+use super::config::{self, Config};
+use super::patrol::Patrol;
 
 /// Worker state machine states
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
@@ -70,7 +69,6 @@ pub struct State {
 /// Validates state consistency
 pub fn validate_state(state: &State) -> Result<()> {
     let now = SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs();
-
     let mut seen_names = std::collections::HashSet::new();
     #[expect(clippy::iter_over_hash_type)]
     for worker in state.workers.values() {
@@ -78,38 +76,44 @@ pub fn validate_state(state: &State) -> Result<()> {
             bail!("Duplicate worker name: {}", worker.name);
         }
     }
-
     #[expect(clippy::iter_over_hash_type)]
     for (key, worker) in &state.workers {
         if key != &worker.name {
             bail!("Worker key '{}' doesn't match worker name '{}'", key, worker.name);
         }
-
         if worker.status == WorkerStatus::NeedsReview && worker.commit_sha.is_none() {
             bail!("Worker '{}' has status needs_review but no commit_sha", worker.name);
         }
-
         if worker.created_at_unix > now {
             bail!("Worker '{}' has created_at_unix timestamp in the future", worker.name);
         }
-
         if worker.last_activity_unix > now {
             bail!("Worker '{}' has last_activity_unix timestamp in the future", worker.name);
         }
-
         if let Some(last_crash) = worker.last_crash_unix
             && last_crash > now
         {
             bail!("Worker '{}' has last_crash_unix timestamp in the future", worker.name);
         }
     }
-
     Ok(())
 }
 
 /// Returns the path to the state file (~/llmc/state.json)
 pub fn get_state_path() -> PathBuf {
     config::get_llmc_root().join("state.json")
+}
+
+/// Runs patrol to update worker states, then returns the updated state
+pub fn load_state_with_patrol() -> Result<(State, super::config::Config)> {
+    let state_path = get_state_path();
+    let mut state = State::load(&state_path)?;
+    let config_path = config::get_config_path();
+    let config = Config::load(&config_path)?;
+    let patrol = Patrol::new(&config);
+    let _report = patrol.run_patrol(&mut state, &config)?;
+    state.save(&state_path)?;
+    Ok((state, config))
 }
 
 impl State {
@@ -123,43 +127,33 @@ impl State {
         if !path.exists() {
             return Ok(State::new());
         }
-
         let content = fs::read_to_string(path)
             .with_context(|| format!("Failed to read state file: {}", path.display()))?;
-
         let state: State = serde_json::from_str(&content)
             .with_context(|| format!("Failed to parse state file: {}", path.display()))?;
-
         validate_state(&state)?;
-
         Ok(state)
     }
 
     /// Saves state to the given path with atomic writes and backup
     pub fn save(&self, path: &Path) -> Result<()> {
         validate_state(self)?;
-
         if let Some(parent) = path.parent() {
             fs::create_dir_all(parent).with_context(|| {
                 format!("Failed to create state directory: {}", parent.display())
             })?;
         }
-
         let json = serde_json::to_string_pretty(self).context("Failed to serialize state")?;
-
         let temp_path = path.with_extension("tmp");
         fs::write(&temp_path, json)
             .with_context(|| format!("Failed to write temp state file: {}", temp_path.display()))?;
-
         if path.exists() {
             let backup_path = path.with_extension("json.bak");
             fs::copy(path, &backup_path)
                 .with_context(|| format!("Failed to create backup: {}", backup_path.display()))?;
         }
-
         fs::rename(&temp_path, path)
             .with_context(|| "Failed to rename temp file to state file".to_string())?;
-
         Ok(())
     }
 
@@ -200,31 +194,11 @@ impl Default for State {
     }
 }
 
-/// Runs patrol to update worker states, then returns the updated state
-pub fn load_state_with_patrol() -> Result<(State, super::config::Config)> {
-    use super::config::{self, Config};
-    use super::patrol::Patrol;
-
-    let state_path = get_state_path();
-    let mut state = State::load(&state_path)?;
-
-    let config_path = config::get_config_path();
-    let config = Config::load(&config_path)?;
-
-    let patrol = Patrol::new(&config);
-    let _report = patrol.run_patrol(&mut state, &config)?;
-
-    state.save(&state_path)?;
-
-    Ok((state, config))
-}
-
 #[cfg(test)]
 mod tests {
     use tempfile::TempDir;
 
     use super::*;
-
     fn create_test_worker(name: &str) -> WorkerRecord {
         WorkerRecord {
             name: name.to_string(),
@@ -240,160 +214,125 @@ mod tests {
             last_crash_unix: None,
         }
     }
-
     #[test]
     fn test_new_state() {
         let state = State::new();
         assert!(state.workers.is_empty());
     }
-
     #[test]
     fn test_add_and_get_worker() {
         let mut state = State::new();
         let worker = create_test_worker("adam");
-
         state.add_worker(worker.clone());
         assert_eq!(state.workers.len(), 1);
-
         let retrieved = state.get_worker("adam").unwrap();
         assert_eq!(retrieved.name, "adam");
         assert_eq!(retrieved.status, WorkerStatus::Idle);
     }
-
     #[test]
     fn test_get_worker_mut() {
         let mut state = State::new();
         state.add_worker(create_test_worker("adam"));
-
         if let Some(worker) = state.get_worker_mut("adam") {
             worker.status = WorkerStatus::Working;
         }
-
         assert_eq!(state.get_worker("adam").unwrap().status, WorkerStatus::Working);
     }
-
     #[test]
     fn test_remove_worker() {
         let mut state = State::new();
         state.add_worker(create_test_worker("adam"));
         assert_eq!(state.workers.len(), 1);
-
         state.remove_worker("adam");
         assert_eq!(state.workers.len(), 0);
         assert!(state.get_worker("adam").is_none());
     }
-
     #[test]
     fn test_get_idle_workers() {
         let mut state = State::new();
-
         let mut worker1 = create_test_worker("adam");
         worker1.status = WorkerStatus::Idle;
         state.add_worker(worker1);
-
         let mut worker2 = create_test_worker("baker");
         worker2.status = WorkerStatus::Working;
         state.add_worker(worker2);
-
         let mut worker3 = create_test_worker("charlie");
         worker3.status = WorkerStatus::Idle;
         state.add_worker(worker3);
-
         let idle = state.get_idle_workers();
         assert_eq!(idle.len(), 2);
         let names: Vec<&str> = idle.iter().map(|w| w.name.as_str()).collect();
         assert!(names.contains(&"adam"));
         assert!(names.contains(&"charlie"));
     }
-
     #[test]
     fn test_get_workers_needing_review() {
         let mut state = State::new();
-
         let mut worker1 = create_test_worker("adam");
         worker1.status = WorkerStatus::NeedsReview;
         worker1.commit_sha = Some("abc123".to_string());
         state.add_worker(worker1);
-
         let mut worker2 = create_test_worker("baker");
         worker2.status = WorkerStatus::Working;
         state.add_worker(worker2);
-
         let mut worker3 = create_test_worker("charlie");
         worker3.status = WorkerStatus::NeedsReview;
         worker3.commit_sha = Some("def456".to_string());
         state.add_worker(worker3);
-
         let needs_review = state.get_workers_needing_review();
         assert_eq!(needs_review.len(), 2);
         let names: Vec<&str> = needs_review.iter().map(|w| w.name.as_str()).collect();
         assert!(names.contains(&"adam"));
         assert!(names.contains(&"charlie"));
     }
-
     #[test]
     fn test_save_and_load() {
         let dir = TempDir::new().unwrap();
         let state_path = dir.path().join("state.json");
-
         let mut state = State::new();
         state.add_worker(create_test_worker("adam"));
-
         state.save(&state_path).unwrap();
         assert!(state_path.exists());
-
         let loaded = State::load(&state_path).unwrap();
         assert_eq!(loaded.workers.len(), 1);
         assert!(loaded.get_worker("adam").is_some());
     }
-
     #[test]
     fn test_load_nonexistent_file() {
         let dir = TempDir::new().unwrap();
         let state_path = dir.path().join("state.json");
-
         let state = State::load(&state_path).unwrap();
         assert!(state.workers.is_empty());
     }
-
     #[test]
     fn test_atomic_write_creates_backup() {
         let dir = TempDir::new().unwrap();
         let state_path = dir.path().join("state.json");
         let backup_path = dir.path().join("state.json.bak");
-
         let mut state = State::new();
         state.add_worker(create_test_worker("adam"));
         state.save(&state_path).unwrap();
-
         assert!(state_path.exists());
         assert!(!backup_path.exists());
-
         let mut state2 = State::new();
         state2.add_worker(create_test_worker("baker"));
         state2.save(&state_path).unwrap();
-
         assert!(state_path.exists());
         assert!(backup_path.exists());
-
         let backup_state = State::load(&backup_path).unwrap();
         assert!(backup_state.get_worker("adam").is_some());
         assert!(backup_state.get_worker("baker").is_none());
     }
-
     #[test]
     fn test_validate_duplicate_names() {
         let mut state = State::new();
         let worker = create_test_worker("adam");
-
         state.workers.insert("adam".to_string(), worker.clone());
         state.workers.insert("adam_duplicate".to_string(), worker);
-
         let result = validate_state(&state);
         assert!(result.is_err());
         assert!(result.unwrap_err().to_string().contains("Duplicate worker name"));
     }
-
     #[test]
     fn test_validate_needs_review_requires_commit_sha() {
         let mut state = State::new();
@@ -401,27 +340,22 @@ mod tests {
         worker.status = WorkerStatus::NeedsReview;
         worker.commit_sha = None;
         state.add_worker(worker);
-
         let result = validate_state(&state);
         assert!(result.is_err());
         assert!(result.unwrap_err().to_string().contains("needs_review but no commit_sha"));
     }
-
     #[test]
     fn test_validate_future_timestamps() {
         let now = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs();
         let future = now + 10000;
-
         let mut state = State::new();
         let mut worker = create_test_worker("adam");
         worker.created_at_unix = future;
         state.add_worker(worker);
-
         let result = validate_state(&state);
         assert!(result.is_err());
         assert!(result.unwrap_err().to_string().contains("timestamp in the future"));
     }
-
     #[test]
     fn test_worker_status_serialization() {
         let statuses = vec![
@@ -434,40 +368,33 @@ mod tests {
             (WorkerStatus::Error, "\"error\""),
             (WorkerStatus::Offline, "\"offline\""),
         ];
-
         for (status, expected_json) in statuses {
             let json = serde_json::to_string(&status).unwrap();
             assert_eq!(json, expected_json);
-
             let deserialized: WorkerStatus = serde_json::from_str(&json).unwrap();
             assert_eq!(deserialized, status);
         }
     }
-
     #[test]
     fn test_worker_record_serialization() {
         let worker = create_test_worker("adam");
         let json = serde_json::to_string(&worker).unwrap();
         let deserialized: WorkerRecord = serde_json::from_str(&json).unwrap();
-
         assert_eq!(deserialized.name, worker.name);
         assert_eq!(deserialized.worktree_path, worker.worktree_path);
         assert_eq!(deserialized.branch, worker.branch);
         assert_eq!(deserialized.status, worker.status);
     }
-
     #[test]
     fn test_get_state_path() {
         let path = get_state_path();
         assert!(path.ends_with("llmc/state.json"));
     }
-
     #[test]
     fn test_key_name_mismatch() {
         let mut state = State::new();
         let worker = create_test_worker("adam");
         state.workers.insert("wrong_key".to_string(), worker);
-
         let result = validate_state(&state);
         assert!(result.is_err());
         assert!(result.unwrap_err().to_string().contains("doesn't match worker name"));

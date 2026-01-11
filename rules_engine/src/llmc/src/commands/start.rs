@@ -25,7 +25,7 @@ pub fn run_start(
         );
     }
 
-    let (mut state, config) = super::load_state_with_patrol()?;
+    let (mut state, config) = super::super::state::load_state_with_patrol()?;
 
     let worker_name = select_worker(&worker, &config, &state)?;
 

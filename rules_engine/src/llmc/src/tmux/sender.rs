@@ -134,13 +134,25 @@ impl TmuxSender {
         let last_line = lines.last().unwrap_or(&"").trim();
         let second_last_line = lines.iter().rev().nth(1).unwrap_or(&"").trim();
 
-        let input_content = if last_line == ">" || last_line.starts_with("> ") || last_line.starts_with("❯") {
-            last_line.strip_prefix("> ").or_else(|| last_line.strip_prefix("❯")).or(Some("")).map(str::trim)
-        } else if second_last_line == ">" || second_last_line.starts_with("> ") || second_last_line.starts_with("❯") {
-            second_last_line.strip_prefix("> ").or_else(|| second_last_line.strip_prefix("❯")).or(Some("")).map(str::trim)
-        } else {
-            None
-        };
+        let input_content =
+            if last_line == ">" || last_line.starts_with("> ") || last_line.starts_with("❯") {
+                last_line
+                    .strip_prefix("> ")
+                    .or_else(|| last_line.strip_prefix("❯"))
+                    .or(Some(""))
+                    .map(str::trim)
+            } else if second_last_line == ">"
+                || second_last_line.starts_with("> ")
+                || second_last_line.starts_with("❯")
+            {
+                second_last_line
+                    .strip_prefix("> ")
+                    .or_else(|| second_last_line.strip_prefix("❯"))
+                    .or(Some(""))
+                    .map(str::trim)
+            } else {
+                None
+            };
 
         let Some(typed_content) = input_content else {
             return PartialSendStatus::NoInput;

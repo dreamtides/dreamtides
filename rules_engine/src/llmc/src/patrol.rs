@@ -215,10 +215,10 @@ impl Patrol {
         let detector = StateDetector::new(sender);
         let claude_state = detector.detect(session_id)?;
 
-        if matches!(claude_state, ClaudeState::Ready) {
-            if git::has_uncommitted_changes(worktree_path)? {
-                return Ok(WorkerTransition::ToNeedsInput);
-            }
+        if matches!(claude_state, ClaudeState::Ready)
+            && git::has_uncommitted_changes(worktree_path)?
+        {
+            return Ok(WorkerTransition::ToNeedsInput);
         }
 
         Ok(WorkerTransition::None)

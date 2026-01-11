@@ -17,7 +17,7 @@ pub fn run_reject(message: &str) -> Result<()> {
         );
     }
 
-    let (mut state, _config) = super::load_state_with_patrol()?;
+    let (mut state, _config) = super::super::state::load_state_with_patrol()?;
 
     let worker_name = review::load_last_reviewed()?.ok_or_else(|| {
         anyhow::anyhow!("No previously reviewed worker found. Use 'llmc review' first.")

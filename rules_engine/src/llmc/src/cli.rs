@@ -28,11 +28,11 @@ pub enum Commands {
     },
 
     /// Start the LLMC daemon
-Up {
-    /// Disable patrol system
-    #[arg(long)]
-    no_patrol: bool,
-},
+    Up {
+        /// Disable patrol system
+        #[arg(long)]
+        no_patrol: bool,
+    },
 
     /// Stop the LLMC daemon
     Down {
