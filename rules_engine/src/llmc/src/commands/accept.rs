@@ -1,4 +1,5 @@
 use std::fs;
+use std::io::Write;
 use std::path::{Path, PathBuf};
 use std::process::Command;
 
@@ -52,7 +53,25 @@ pub fn run_accept(worker: Option<String>) -> Result<()> {
         git::amend_uncommitted_changes(&worktree_path)?;
     }
 
-    println!("Accepting changes from worker '{}'...", worker_name);
+    let commit_message = git::get_commit_message(&worktree_path, "HEAD")?;
+    println!("\n=== Accept Summary ===");
+    println!("Worker: {}", worker_name);
+    println!("Branch: {}", worker_record.branch);
+    println!("Commit message:\n{}", commit_message.trim());
+    println!("======================\n");
+
+    print!("Accept these changes and merge to master? [y/N]: ");
+    std::io::stdout().flush()?;
+
+    let mut input = String::new();
+    std::io::stdin().read_line(&mut input)?;
+
+    if !matches!(input.trim().to_lowercase().as_str(), "y" | "yes") {
+        println!("Accept cancelled.");
+        return Ok(());
+    }
+
+    println!("\nAccepting changes from worker '{}'...", worker_name);
 
     git::fetch_origin(&llmc_root)?;
 
@@ -87,7 +106,35 @@ pub fn run_accept(worker: Option<String>) -> Result<()> {
     let new_commit_sha = git::get_head_commit(&worktree_path)?;
 
     println!("Merging to master...");
+    let master_before = git::get_head_commit(&llmc_root)?;
     git::fast_forward_merge(&llmc_root, &worker_record.branch)?;
+    let master_after = git::get_head_commit(&llmc_root)?;
+
+    if master_before == master_after {
+        bail!(
+            "Master branch was not updated after merge. This should not happen.\n\
+             Before: {}\n\
+             After: {}",
+            master_before,
+            master_after
+        );
+    }
+
+    if master_after != new_commit_sha {
+        bail!(
+            "Master HEAD ({}) does not match worker commit ({}). This should not happen.",
+            master_after,
+            new_commit_sha
+        );
+    }
+
+    println!(
+        "✓ Master updated: {} -> {}",
+        &master_before[..7.min(master_before.len())],
+        &master_after[..7.min(master_after.len())]
+    );
+
+    verify_commit_exists(&llmc_root, &new_commit_sha)?;
 
     println!("Cleaning up worktree and branch...");
     git::remove_worktree(&llmc_root, &worktree_path, false)?;
@@ -95,7 +142,7 @@ pub fn run_accept(worker: Option<String>) -> Result<()> {
 
     println!("Recreating worker worktree...");
     let branch_name = format!("llmc/{}", worker_name);
-    git::create_branch(&llmc_root, &branch_name, "origin/master")?;
+    git::create_branch(&llmc_root, &branch_name, "master")?;
     git::create_worktree(&llmc_root, &branch_name, &worktree_path)?;
     copy_tabula_to_worktree(&llmc_root, &worktree_path)?;
 
@@ -208,6 +255,28 @@ fn copy_tabula_to_worktree(source_root: &Path, worktree_path: &Path) -> Result<(
             dest_file.display()
         )
     })?;
+
+    Ok(())
+}
+
+fn verify_commit_exists(repo: &Path, commit_sha: &str) -> Result<()> {
+    let output = Command::new("git")
+        .arg("-C")
+        .arg(repo)
+        .arg("cat-file")
+        .arg("-t")
+        .arg(commit_sha)
+        .output()
+        .context("Failed to verify commit exists")?;
+
+    if !output.status.success() {
+        bail!("Commit {} does not exist in repository at {}", commit_sha, repo.display());
+    }
+
+    let obj_type = String::from_utf8_lossy(&output.stdout).trim().to_string();
+    if obj_type != "commit" {
+        bail!("Object {} is a {}, not a commit", commit_sha, obj_type);
+    }
 
     Ok(())
 }
