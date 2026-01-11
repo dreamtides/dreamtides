@@ -23,6 +23,14 @@ pub fn run_up(no_patrol: bool, verbose: bool) -> Result<()> {
         );
     }
 
+    if session::any_llmc_sessions_running()? {
+        bail!(
+            "LLMC is already running. Detected existing llmc-* TMUX sessions.\n\
+             Run 'llmc down' first if you want to restart the daemon.\n\
+             Use 'tmux list-sessions' to see all active sessions."
+        );
+    }
+
     println!("Starting LLMC daemon...");
 
     let config_path = config::get_config_path();

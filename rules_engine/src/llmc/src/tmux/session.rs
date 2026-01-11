@@ -205,6 +205,12 @@ pub fn worker_from_session_name(session: &str) -> Option<String> {
     session.strip_prefix("llmc-").map(str::to_string)
 }
 
+/// Checks if any LLMC sessions are running
+pub fn any_llmc_sessions_running() -> Result<bool> {
+    let sessions = list_sessions()?;
+    Ok(sessions.iter().any(|s| s.starts_with("llmc-")))
+}
+
 /// Checks if a command is a shell
 pub fn is_shell(cmd: &str) -> bool {
     matches!(cmd, "bash" | "zsh" | "sh" | "fish" | "dash")
@@ -389,5 +395,11 @@ mod tests {
         assert!(!is_claude_process("bash"));
         assert!(!is_claude_process("python"));
         assert!(!is_claude_process("some-other-process"));
+    }
+
+    #[test]
+    fn test_any_llmc_sessions_running() {
+        let result = any_llmc_sessions_running();
+        assert!(result.is_ok());
     }
 }

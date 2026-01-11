@@ -6,7 +6,7 @@ use anyhow::{Context, Result, bail};
 
 use super::super::config::{self, Config};
 use super::super::state::{State, WorkerRecord, WorkerStatus};
-use super::super::tmux::sender::TmuxSender;
+use super::super::tmux::{sender::TmuxSender, session};
 use super::super::{git, worker};
 
 /// Runs the start command, assigning a task to an idle worker
@@ -23,6 +23,13 @@ pub fn run_start(
             "LLMC workspace not initialized. Run 'llmc init' first.\n\
              Expected workspace at: {}",
             llmc_root.display()
+        );
+    }
+
+    if !session::any_llmc_sessions_running()? {
+        eprintln!(
+            "Warning: LLMC daemon does not appear to be running (no llmc-* TMUX sessions detected).\n\
+             Run 'llmc up' to start the daemon."
         );
     }
 
