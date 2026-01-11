@@ -6,6 +6,7 @@ use anyhow::{Context, Result, bail};
 
 use super::super::config::Config;
 use super::super::state::{State, WorkerRecord, WorkerStatus};
+use super::super::tmux::session;
 use super::super::{config, git, state};
 
 /// Adds a new worker to the LLMC system
@@ -70,9 +71,19 @@ pub fn run_add(name: &str, model: Option<String>, role_prompt: Option<String>) -
     println!("✓ Worker '{}' added successfully!", name);
     println!("\nWorktree: {}", worktree_path.display());
     println!("Branch: llmc/{}", name);
-    println!("\nNext steps:");
-    println!("  1. Run 'llmc up' to start the daemon and bring this worker online");
-    println!("  2. Run 'llmc start {}' to assign a task", name);
+
+    let daemon_running = is_daemon_running();
+    if daemon_running {
+        println!("\nDaemon is running, starting worker session...");
+        start_worker_immediately(name, &llmc_root)?;
+        println!("✓ Worker session started and ready for tasks");
+        println!("\nNext step:");
+        println!("  Run 'llmc start {}' to assign a task", name);
+    } else {
+        println!("\nNext steps:");
+        println!("  1. Run 'llmc up' to start the daemon and bring this worker online");
+        println!("  2. Run 'llmc start {}' to assign a task", name);
+    }
 
     Ok(())
 }
@@ -200,6 +211,40 @@ fn add_worker_to_config(
     fs::write(&config_path, config_content).context("Failed to write config.toml")?;
 
     Config::load(&config_path)?;
+
+    Ok(())
+}
+
+fn is_daemon_running() -> bool {
+    session::list_sessions()
+        .ok()
+        .map(|sessions| sessions.iter().any(|s| s.starts_with("llmc-")))
+        .unwrap_or(false)
+}
+
+fn start_worker_immediately(name: &str, _llmc_root: &Path) -> Result<()> {
+    let config_path = config::get_config_path();
+    let config = Config::load(&config_path)?;
+    let worker_config = config.get_worker(name).with_context(|| {
+        format!("Worker '{}' not found in config after adding. This should not happen.", name)
+    })?;
+
+    let state_path = state::get_state_path();
+    let mut state = State::load(&state_path)?;
+    let worker_record = state.get_worker(name).with_context(|| {
+        format!("Worker '{}' not found in state after adding. This should not happen.", name)
+    })?;
+
+    let worktree_path = Path::new(&worker_record.worktree_path);
+    let session_id = &worker_record.session_id;
+
+    session::start_worker_session(session_id, worktree_path, worker_config, false)?;
+
+    let worker_mut = state.get_worker_mut(name).unwrap();
+    worker_mut.status = WorkerStatus::Idle;
+    worker_mut.last_activity_unix = SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs();
+
+    state.save(&state_path)?;
 
     Ok(())
 }

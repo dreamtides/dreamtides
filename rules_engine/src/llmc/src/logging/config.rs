@@ -18,7 +18,8 @@ pub fn init_logging(verbose: bool) -> Result<()> {
         .with_current_span(false)
         .with_span_list(false);
     let default_level = if verbose { "info" } else { "warn" };
-    let env_filter = EnvFilter::try_from_env("LLMC_LOG").unwrap_or_else(|_| EnvFilter::new(default_level));
+    let env_filter =
+        EnvFilter::try_from_env("LLMC_LOG").unwrap_or_else(|_| EnvFilter::new(default_level));
     let stderr_layer = fmt::layer().with_writer(std::io::stderr).with_filter(env_filter);
     tracing_subscriber::registry().with(json_layer).with(stderr_layer).init();
     Ok(())
