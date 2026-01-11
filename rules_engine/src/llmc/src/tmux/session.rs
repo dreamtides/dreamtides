@@ -217,13 +217,19 @@ fn wait_for_claude_ready(session: &str, timeout: Duration) -> Result<()> {
 
 fn accept_bypass_warning(session: &str, sender: &TmuxSender) -> Result<()> {
     thread::sleep(Duration::from_millis(500));
-    if let Ok(output) = capture_pane(session, 50)
-        && (output.contains("bypass") || output.contains("dangerous"))
-    {
-        sender.send_keys_raw(session, "Down")?;
-        thread::sleep(Duration::from_millis(200));
-        sender.send_keys_raw(session, "Enter")?;
-        thread::sleep(Duration::from_millis(500));
+    if let Ok(output) = capture_pane(session, 50) {
+        let lower = output.to_lowercase();
+        let has_bypass_warning = lower.contains("bypass")
+            || lower.contains("dangerously")
+            || lower.contains("skip-permissions")
+            || lower.contains("skip permissions");
+
+        if has_bypass_warning {
+            sender.send_keys_raw(session, "Down")?;
+            thread::sleep(Duration::from_millis(200));
+            sender.send_keys_raw(session, "Enter")?;
+            thread::sleep(Duration::from_millis(500));
+        }
     }
     Ok(())
 }

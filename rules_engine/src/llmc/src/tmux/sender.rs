@@ -116,29 +116,66 @@ impl TmuxSender {
     /// Clears the input line by sending Ctrl-U
     pub fn clear_input_line(&self, session: &str) -> Result<()> {
         self.send_keys_raw(session, "C-u")
+            .with_context(|| format!("Failed to clear input line in session '{}'", session))
     }
 
-    /// Detects if a partial send occurred
+    /// Detects if a partial send occurred by examining pane content
     pub fn detect_partial_send(&self, session: &str, expected: &str) -> PartialSendStatus {
-        let Ok(output) = session::capture_pane(session, 5) else {
+        let Ok(output) = session::capture_pane(session, 10) else {
+            tracing::warn!("Failed to capture pane for partial send detection");
             return PartialSendStatus::Unknown;
         };
 
         let lines: Vec<&str> = output.lines().collect();
-        let last_line = lines.last().map(|s| s.trim()).unwrap_or("");
+        if lines.is_empty() {
+            return PartialSendStatus::Unknown;
+        }
 
-        if last_line.is_empty() {
+        let last_line = lines.last().unwrap_or(&"").trim();
+        let second_last_line = lines.iter().rev().nth(1).unwrap_or(&"").trim();
+
+        let input_content = if last_line == ">" || last_line.starts_with("> ") {
+            last_line.strip_prefix("> ").or(Some("")).map(str::trim)
+        } else if second_last_line == ">" || second_last_line.starts_with("> ") {
+            second_last_line.strip_prefix("> ").or(Some("")).map(str::trim)
+        } else {
+            None
+        };
+
+        let Some(typed_content) = input_content else {
+            return PartialSendStatus::NoInput;
+        };
+
+        if typed_content.is_empty() {
             return PartialSendStatus::NoInput;
         }
 
-        if last_line == expected {
+        let expected_trimmed = expected.trim();
+
+        if typed_content == expected_trimmed {
             return PartialSendStatus::Complete;
         }
 
-        if expected.starts_with(last_line) {
+        if expected_trimmed.starts_with(typed_content)
+            && typed_content.len() < expected_trimmed.len()
+        {
+            tracing::debug!(
+                "Partial send detected: received {} of {} chars",
+                typed_content.len(),
+                expected_trimmed.len()
+            );
             return PartialSendStatus::Partial {
-                received: last_line.len(),
-                expected: expected.len(),
+                received: typed_content.len(),
+                expected: expected_trimmed.len(),
+            };
+        }
+
+        let min_len = typed_content.len().min(expected_trimmed.len());
+        if min_len > 10 && typed_content[..min_len] == expected_trimmed[..min_len] {
+            tracing::debug!("Possible partial send with matching prefix detected");
+            return PartialSendStatus::Partial {
+                received: typed_content.len(),
+                expected: expected_trimmed.len(),
             };
         }
 
@@ -147,9 +184,15 @@ impl TmuxSender {
 
     /// Clears the input line and retries sending a message
     pub fn clear_and_retry(&self, session: &str, message: &str) -> Result<()> {
-        self.clear_input_line(session)?;
+        tracing::debug!("Clearing input line and retrying send in session '{}'", session);
+
+        self.clear_input_line(session).context("Failed to clear input line during retry")?;
+
         sleep(Duration::from_millis(100));
-        self.send(session, message)
+
+        self.send(session, message).with_context(|| {
+            format!("Failed to resend message after clearing in session '{}'", session)
+        })
     }
 
     fn send_small_message(&self, session: &str, message: &str) -> Result<()> {

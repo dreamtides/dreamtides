@@ -219,7 +219,14 @@ fn accept_bypass_warning(session: &str, sender: &TmuxSender) -> Result<()> {
     thread::sleep(Duration::from_millis(500));
     let output = session::capture_pane(session, 50)
         .with_context(|| format!("Failed to capture pane for session '{}'", session))?;
-    if output.contains("bypass") || output.contains("dangerous") {
+
+    let lower = output.to_lowercase();
+    let has_bypass_warning = lower.contains("bypass")
+        || lower.contains("dangerously")
+        || lower.contains("skip-permissions")
+        || lower.contains("skip permissions");
+
+    if has_bypass_warning {
         sender.send_keys_raw(session, "Down")?;
         thread::sleep(Duration::from_millis(200));
         sender.send_keys_raw(session, "Enter")?;

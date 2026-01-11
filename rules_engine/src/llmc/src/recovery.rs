@@ -77,12 +77,23 @@ impl RecoveryManager {
 
     /// Handle lost input recovery with retry logic
     pub fn handle_lost_input(&self, worker: &mut Worker, message: &str) -> Result<()> {
-        tracing::warn!("Handling lost input for worker '{}'", worker.name);
+        tracing::warn!(
+            worker = %worker.name,
+            session = %worker.session_id,
+            message_len = message.len(),
+            "Lost input detected, initiating recovery"
+        );
 
         for attempt in 1..=3 {
             let _method = match attempt {
                 1 => {
-                    tracing::info!("Attempt 1: Increasing debounce by 200ms");
+                    tracing::info!(
+                        worker = %worker.name,
+                        attempt,
+                        method = "increased_debounce",
+                        extra_ms = 200,
+                        "Retrying with increased debounce"
+                    );
                     self.log_recovery_action(
                         &worker.name,
                         RecoveryAction::LostInput {
@@ -94,13 +105,23 @@ impl RecoveryManager {
                     )?;
 
                     if self.retry_with_increased_debounce(worker, message, 200)? {
+                        tracing::info!(
+                            worker = %worker.name,
+                            attempt,
+                            "Lost input recovery successful"
+                        );
                         self.mark_recovery_success(&worker.name, attempt)?;
                         return Ok(());
                     }
                     "increased_debounce"
                 }
                 2 => {
-                    tracing::info!("Attempt 2: Using load-buffer method");
+                    tracing::info!(
+                        worker = %worker.name,
+                        attempt,
+                        method = "load_buffer",
+                        "Retrying via load-buffer method"
+                    );
                     self.log_recovery_action(
                         &worker.name,
                         RecoveryAction::LostInput { attempt, method: "load_buffer".to_string() },
@@ -109,13 +130,23 @@ impl RecoveryManager {
                     )?;
 
                     if self.retry_with_load_buffer(worker, message)? {
+                        tracing::info!(
+                            worker = %worker.name,
+                            attempt,
+                            "Lost input recovery successful"
+                        );
                         self.mark_recovery_success(&worker.name, attempt)?;
                         return Ok(());
                     }
                     "load_buffer"
                 }
                 3 => {
-                    tracing::info!("Attempt 3: Respawning Claude");
+                    tracing::info!(
+                        worker = %worker.name,
+                        attempt,
+                        method = "respawn",
+                        "Respawning Claude and retrying"
+                    );
                     self.log_recovery_action(
                         &worker.name,
                         RecoveryAction::LostInput { attempt, method: "respawn".to_string() },
@@ -124,6 +155,11 @@ impl RecoveryManager {
                     )?;
 
                     if self.respawn_and_retry(worker, message)? {
+                        tracing::info!(
+                            worker = %worker.name,
+                            attempt,
+                            "Lost input recovery successful after respawn"
+                        );
                         self.mark_recovery_success(&worker.name, attempt)?;
                         return Ok(());
                     }
@@ -148,15 +184,22 @@ impl RecoveryManager {
         &self,
         worker: &mut Worker,
         message: &str,
-        _extra_ms: u64,
+        extra_ms: u64,
     ) -> Result<bool> {
-        worker.sender.send(&worker.session_id, message)?;
+        let custom_sender = TmuxSender::with_timing(500 + extra_ms as u32, 100, 2000, 3, 200);
+
+        custom_sender
+            .send(&worker.session_id, message)
+            .with_context(|| format!("Failed to send with increased debounce (+{}ms)", extra_ms))?;
 
         self.verify_input_received(&worker.session_id, Duration::from_secs(10))
     }
 
     fn retry_with_load_buffer(&self, worker: &mut Worker, message: &str) -> Result<bool> {
-        worker.sender.send(&worker.session_id, message)?;
+        worker
+            .sender
+            .send_large_message(&worker.session_id, message)
+            .context("Failed to send via load-buffer method")?;
 
         self.verify_input_received(&worker.session_id, Duration::from_secs(10))
     }
@@ -206,13 +249,22 @@ impl RecoveryManager {
 
     /// Handle session crash recovery
     pub fn handle_session_crash(&self, worker: &mut WorkerRecord) -> Result<()> {
-        tracing::warn!("Handling session crash for worker '{}'", worker.name);
+        tracing::warn!(
+            worker = %worker.name,
+            session = %worker.session_id,
+            status = ?worker.status,
+            "Session crash detected, initiating recovery"
+        );
 
         let crash_type = self.classify_crash(&worker.session_id)?;
 
         match crash_type {
             CrashType::UserExit => {
-                tracing::info!("User exit detected, resetting to idle");
+                tracing::info!(
+                    worker = %worker.name,
+                    crash_type = "user_exit",
+                    "Clean exit detected, resetting to idle"
+                );
                 self.log_recovery_action(
                     &worker.name,
                     RecoveryAction::SessionCrash { crash_type: "user_exit".to_string() },
@@ -226,7 +278,12 @@ impl RecoveryManager {
                 Ok(())
             }
             CrashType::RateLimit => {
-                tracing::info!("Rate limit detected, waiting 5 minutes");
+                tracing::warn!(
+                    worker = %worker.name,
+                    crash_type = "rate_limit",
+                    crash_count = worker.crash_count + 1,
+                    "Rate limit detected, waiting 5 minutes before retry"
+                );
                 self.log_recovery_action(
                     &worker.name,
                     RecoveryAction::SessionCrash { crash_type: "rate_limit".to_string() },
@@ -238,6 +295,11 @@ impl RecoveryManager {
 
                 worker.crash_count += 1;
                 if worker.crash_count >= 3 {
+                    tracing::error!(
+                        worker = %worker.name,
+                        crash_count = worker.crash_count,
+                        "Rate limit exceeded after 3 attempts, escalating"
+                    );
                     worker.status = WorkerStatus::Error;
                     self.escalate_crash_to_user(&worker.name, "Rate limit after 3 retries")?;
                     bail!("Rate limit exceeded after 3 attempts");
@@ -250,9 +312,11 @@ impl RecoveryManager {
                 worker.last_crash_unix =
                     Some(SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs());
 
-                tracing::info!(
-                    "Crash detected (count: {}), attempting restart",
-                    worker.crash_count
+                tracing::warn!(
+                    worker = %worker.name,
+                    crash_type = ?crash_type,
+                    crash_count = worker.crash_count,
+                    "Unexpected crash detected, attempting auto-restart"
                 );
                 self.log_recovery_action(
                     &worker.name,
@@ -264,6 +328,12 @@ impl RecoveryManager {
                 )?;
 
                 if worker.crash_count >= 3 {
+                    tracing::error!(
+                        worker = %worker.name,
+                        crash_count = worker.crash_count,
+                        crash_type = ?crash_type,
+                        "Worker crashed 3 times, escalating to user"
+                    );
                     worker.status = WorkerStatus::Error;
                     self.escalate_crash_to_user(
                         &worker.name,
@@ -331,19 +401,68 @@ impl RecoveryManager {
             .output()
             .context("Failed to respawn pane")?;
 
-        Command::new("tmux")
-            .args(["send-keys", "-t", &target, "-l", "claude"])
-            .output()
+        thread::sleep(Duration::from_millis(500));
+
+        let sender = TmuxSender::default();
+        sender
+            .send(session_id, "claude --dangerously-skip-permissions")
             .context("Failed to send claude command")?;
 
-        thread::sleep(Duration::from_millis(100));
+        self.wait_for_claude_ready_after_respawn(session_id)?;
 
-        Command::new("tmux")
-            .args(["send-keys", "-t", &target, "Enter"])
-            .output()
-            .context("Failed to send enter key")?;
+        self.accept_bypass_warning_after_respawn(session_id, &sender)?;
 
-        thread::sleep(Duration::from_secs(2));
+        Ok(())
+    }
+
+    fn wait_for_claude_ready_after_respawn(&self, session_id: &str) -> Result<()> {
+        const MAX_ATTEMPTS: u32 = 60;
+        const POLL_INTERVAL_MS: u64 = 500;
+
+        for _ in 0..MAX_ATTEMPTS {
+            thread::sleep(Duration::from_millis(POLL_INTERVAL_MS));
+
+            let Ok(output) = session::capture_pane(session_id, 50) else {
+                continue;
+            };
+
+            if output.lines().rev().take(5).any(|line| {
+                let trimmed = line.trim_start();
+                trimmed.starts_with("> ") || trimmed == ">"
+            }) {
+                return Ok(());
+            }
+
+            if let Ok(command) = session::get_pane_command(session_id)
+                && session::is_shell(&command)
+            {
+                bail!(
+                    "Claude process exited unexpectedly after respawn, shell detected: {}",
+                    command
+                );
+            }
+        }
+
+        bail!("Claude did not become ready after respawn (30 seconds timeout)")
+    }
+
+    fn accept_bypass_warning_after_respawn(
+        &self,
+        session_id: &str,
+        sender: &TmuxSender,
+    ) -> Result<()> {
+        thread::sleep(Duration::from_millis(500));
+
+        let Ok(output) = session::capture_pane(session_id, 50) else {
+            return Ok(());
+        };
+
+        if output.contains("bypass") || output.contains("dangerous") || output.contains("Bypass") {
+            sender.send_keys_raw(session_id, "Down")?;
+            thread::sleep(Duration::from_millis(200));
+            sender.send_keys_raw(session_id, "Enter")?;
+            thread::sleep(Duration::from_millis(500));
+        }
 
         Ok(())
     }
@@ -503,7 +622,7 @@ impl RecoveryManager {
 
         worker.sender.send(&worker.session_id, message)?;
 
-        Ok(true)
+        self.verify_input_received(&worker.session_id, Duration::from_secs(5))
     }
 
     /// Handle state corruption recovery
@@ -529,13 +648,29 @@ impl RecoveryManager {
             }
         }
 
-        println!("\nState corruption detected and backup unavailable.");
-        println!("Options:");
-        println!("  1. Initialize fresh state (loses worker history)");
-        println!("  2. Run 'llmc doctor --rebuild' to reconstruct from filesystem");
-        println!("\nRecommendation: Try option 2 first to preserve data.");
+        eprintln!("\n╭─────────────────────────────────────────────────────────────╮");
+        eprintln!("│ ⚠️  Critical: State file corruption detected");
+        eprintln!("╰─────────────────────────────────────────────────────────────╯");
+        eprintln!("\n📋 Issue:");
+        eprintln!("  The LLMC state file at {} is corrupted and the backup", state_path.display());
+        eprintln!("  is either missing or also corrupted.");
+        eprintln!("\n💡 Recovery Options:");
+        eprintln!("  1. llmc doctor --rebuild");
+        eprintln!("     Reconstruct state from filesystem (preserves worker data)");
+        eprintln!("     ⭐ RECOMMENDED - Try this first");
+        eprintln!();
+        eprintln!("  2. llmc init --force");
+        eprintln!("     Initialize fresh state (⚠️  LOSES all worker history)");
+        eprintln!();
+        eprintln!("  3. Manual recovery:");
+        eprintln!("     - Check backup: {}", backup_path.display());
+        eprintln!("     - Edit state.json manually if partially readable");
+        eprintln!();
+        eprintln!("⚠️  Do NOT proceed without recovering state to avoid data loss.\n");
 
-        bail!("State file corrupted and cannot be automatically recovered");
+        bail!(
+            "State file corrupted and cannot be automatically recovered. Run 'llmc doctor --rebuild' to attempt recovery."
+        );
     }
 
     fn log_recovery_action(
@@ -570,12 +705,27 @@ impl RecoveryManager {
         Ok(())
     }
 
-    fn capture_pane_output(&self, _worker: &str) -> Result<String> {
-        Ok(String::new())
+    fn capture_pane_output(&self, worker: &str) -> Result<String> {
+        let session_id = format!("llmc-{}", worker);
+        session::capture_pane(&session_id, 30)
+            .context("Failed to capture pane output for diagnostics")
     }
 
-    fn get_git_status(&self, _worker: &str) -> Result<String> {
-        Ok(String::new())
+    fn get_git_status(&self, worker: &str) -> Result<String> {
+        let worktree_path = self
+            .logs_dir
+            .parent()
+            .ok_or_else(|| anyhow::anyhow!("Invalid logs directory"))?
+            .join(".worktrees")
+            .join(worker);
+
+        let output = Command::new("git")
+            .args(["status", "--short"])
+            .current_dir(&worktree_path)
+            .output()
+            .context("Failed to get git status for diagnostics")?;
+
+        Ok(String::from_utf8_lossy(&output.stdout).to_string())
     }
 
     fn escalate_to_user(
@@ -585,31 +735,76 @@ impl RecoveryManager {
         prompt: &str,
         session_id: &str,
     ) -> Result<()> {
-        let pane_output = session::capture_pane(session_id, 20).unwrap_or_default();
+        let pane_output = session::capture_pane(session_id, 30)
+            .unwrap_or_else(|e| format!("[Unable to capture pane output: {}]", e));
+        let git_status = self
+            .get_git_status(worker_name)
+            .unwrap_or_else(|e| format!("[Unable to get git status: {}]", e));
 
-        eprintln!("\nWorker '{}' requires manual intervention.", worker_name);
-        eprintln!("\nError: {}", error);
-        eprintln!("\nDiagnostics:");
-        eprintln!("  - Prompt: \"{}...\"", &prompt[..50.min(prompt.len())]);
-        eprintln!("\nRecent pane output:");
-        let lines: Vec<_> = pane_output.lines().collect();
-        for line in lines.iter().rev().take(10).rev() {
-            eprintln!("  {}", line);
+        eprintln!("\n╭─────────────────────────────────────────────────────────────╮");
+        eprintln!("│ ⚠️  Worker '{}' requires manual intervention", worker_name);
+        eprintln!("╰─────────────────────────────────────────────────────────────╯");
+        eprintln!("\n📋 Error Details:");
+        eprintln!("  {}", error);
+        eprintln!("\n🔍 Diagnostics:");
+        eprintln!(
+            "  Task: \"{}\"",
+            if prompt.len() > 60 { format!("{}...", &prompt[..57]) } else { prompt.to_string() }
+        );
+
+        if !git_status.trim().is_empty() {
+            eprintln!("\n  Git Status:");
+            for line in git_status.lines() {
+                eprintln!("    {}", line);
+            }
         }
-        eprintln!("\nSuggested actions:");
-        eprintln!("  1. llmc attach {}  - Connect to session manually", worker_name);
-        eprintln!("  2. llmc message {} \"...\" - Send follow-up message", worker_name);
-        eprintln!("  3. llmc nuke {} && llmc add {}  - Recreate worker", worker_name, worker_name);
+
+        eprintln!("\n  Recent Terminal Output:");
+        let lines: Vec<_> = pane_output.lines().collect();
+        let display_count = 15.min(lines.len());
+        for line in lines.iter().rev().take(display_count).rev() {
+            eprintln!("    {}", line);
+        }
+
+        eprintln!("\n💡 Suggested Actions:");
+        eprintln!("  1. llmc attach {}          - Interactive session access", worker_name);
+        eprintln!("  2. llmc message {} \"...\"   - Send clarification", worker_name);
+        eprintln!("  3. llmc review {}          - Check current work", worker_name);
+        eprintln!(
+            "  4. llmc nuke {} && llmc add {}  - Full worker reset",
+            worker_name, worker_name
+        );
+        eprintln!("\n📖 Logs: {}/{}.log\n", self.logs_dir.display(), worker_name);
 
         Ok(())
     }
 
     fn escalate_crash_to_user(&self, worker_name: &str, reason: &str) -> Result<()> {
-        eprintln!("\nWorker '{}' requires manual intervention.", worker_name);
-        eprintln!("\nReason: {}", reason);
-        eprintln!("\nSuggested actions:");
-        eprintln!("  1. llmc attach {}  - Connect to session manually", worker_name);
-        eprintln!("  2. llmc nuke {} && llmc add {}  - Recreate worker", worker_name, worker_name);
+        let pane_output = self
+            .capture_pane_output(worker_name)
+            .unwrap_or_else(|e| format!("[Unable to capture output: {}]", e));
+
+        eprintln!("\n╭─────────────────────────────────────────────────────────────╮");
+        eprintln!("│ ⚠️  Worker '{}' crashed and requires intervention", worker_name);
+        eprintln!("╰─────────────────────────────────────────────────────────────╯");
+        eprintln!("\n📋 Crash Details:");
+        eprintln!("  {}", reason);
+
+        eprintln!("\n  Last Terminal Output:");
+        let lines: Vec<_> = pane_output.lines().collect();
+        let display_count = 20.min(lines.len());
+        for line in lines.iter().rev().take(display_count).rev() {
+            eprintln!("    {}", line);
+        }
+
+        eprintln!("\n💡 Recovery Options:");
+        eprintln!("  1. llmc attach {}          - Inspect crash state", worker_name);
+        eprintln!("  2. View logs: {}/{}.log", self.logs_dir.display(), worker_name);
+        eprintln!(
+            "  3. llmc nuke {} && llmc add {}  - Reset worker (loses state)",
+            worker_name, worker_name
+        );
+        eprintln!("\n⚠️  Note: After 3 crashes, manual intervention is required.\n");
 
         Ok(())
     }

@@ -124,9 +124,17 @@ impl StateDetector {
     pub fn accept_bypass_warning(&self, session: &str) -> Result<()> {
         sleep(Duration::from_millis(1000));
         let output = session::capture_pane(session, 30)?;
-        if !output.contains("Bypass Permissions mode") {
+
+        let lower = output.to_lowercase();
+        let has_bypass_warning = lower.contains("bypass")
+            || lower.contains("dangerously")
+            || lower.contains("skip-permissions")
+            || lower.contains("skip permissions");
+
+        if !has_bypass_warning {
             return Ok(());
         }
+
         self.sender.send_keys_raw(session, "Down")?;
         sleep(Duration::from_millis(200));
         self.sender.send_keys_raw(session, "Enter")?;
