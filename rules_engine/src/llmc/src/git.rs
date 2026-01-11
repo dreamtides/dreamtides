@@ -663,6 +663,63 @@ pub fn fetch_origin(repo: &Path) -> Result<()> {
     result
 }
 
+/// Fetches a specific ref from a local repository
+pub fn fetch_from_local(target_repo: &Path, source_repo: &Path, ref_name: &str) -> Result<()> {
+    let start = std::time::Instant::now();
+
+    let output = Command::new("git")
+        .arg("-C")
+        .arg(target_repo)
+        .arg("fetch")
+        .arg(source_repo)
+        .arg(ref_name)
+        .output()
+        .context("Failed to execute git fetch from local repository")?;
+
+    let result = if output.status.success() {
+        Ok(())
+    } else {
+        Err(anyhow::anyhow!(
+            "Failed to fetch {} from {}: {}",
+            ref_name,
+            source_repo.display(),
+            String::from_utf8_lossy(&output.stderr)
+        ))
+    };
+
+    let duration_ms = start.elapsed().as_millis() as u64;
+
+    match &result {
+        Ok(_) => {
+            tracing::debug!(
+                operation = "git_operation",
+                operation_type = "fetch_local",
+                target_repo = %target_repo.display(),
+                source_repo = %source_repo.display(),
+                ref_name,
+                duration_ms,
+                result = "success",
+                "Fetched from local repository"
+            );
+        }
+        Err(e) => {
+            tracing::error!(
+                operation = "git_operation",
+                operation_type = "fetch_local",
+                target_repo = %target_repo.display(),
+                source_repo = %source_repo.display(),
+                ref_name,
+                duration_ms,
+                result = "error",
+                error = %e,
+                "Failed to fetch from local repository"
+            );
+        }
+    }
+
+    result
+}
+
 /// Checks out a branch
 pub fn checkout_branch(repo: &Path, branch: &str) -> Result<()> {
     let output = Command::new("git")

@@ -142,8 +142,11 @@ pub fn run_accept(worker: Option<String>) -> Result<()> {
 
     verify_commit_exists(&llmc_root, &new_commit_sha)?;
 
-    println!("Updating source repository...");
+    println!("Fetching commit into source repository...");
     let source_repo = PathBuf::from(&config.repo.source);
+    git::fetch_from_local(&source_repo, &llmc_root, &new_commit_sha)?;
+
+    println!("Updating source repository...");
     git::checkout_branch(&source_repo, "master")?;
     git::reset_to_ref(&source_repo, &new_commit_sha)?;
 
