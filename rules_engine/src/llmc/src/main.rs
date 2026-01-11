@@ -24,12 +24,27 @@ use crate::commands::{
 async fn main() -> Result<()> {
     let cli = Cli::parse();
 
-    fmt()
-        .with_env_filter(
-            EnvFilter::try_from_env("LLMC_LOG").unwrap_or_else(|_| EnvFilter::new("info")),
-        )
-        .with_writer(std::io::stderr)
-        .init();
+    let log_file = config::get_llmc_root().join("logs").join("llmc.log");
+    if let Some(parent) = log_file.parent() {
+        std::fs::create_dir_all(parent).ok();
+    }
+
+    if let Ok(file) = std::fs::OpenOptions::new().create(true).append(true).open(&log_file) {
+        fmt()
+            .with_env_filter(
+                EnvFilter::try_from_env("LLMC_LOG").unwrap_or_else(|_| EnvFilter::new("info")),
+            )
+            .with_writer(move || file.try_clone().unwrap())
+            .init();
+        eprintln!("LLMC logging to: {}", log_file.display());
+    } else {
+        fmt()
+            .with_env_filter(
+                EnvFilter::try_from_env("LLMC_LOG").unwrap_or_else(|_| EnvFilter::new("info")),
+            )
+            .with_writer(std::io::stderr)
+            .init();
+    }
 
     let result = match cli.command {
         Commands::Init { source, target } => init::run_init(source, target),

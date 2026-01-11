@@ -183,12 +183,19 @@ impl Patrol {
                 WorkerStatus::Rebasing => {
                     self.detect_rebasing_transition(&session_id, &worktree_path)?
                 }
+                WorkerStatus::NeedsInput => self.detect_needs_input_transition(&worktree_path)?,
                 _ => WorkerTransition::None,
             };
 
             if transition != WorkerTransition::None
                 && let Some(w) = state.get_worker_mut(&worker_name)
             {
+                tracing::info!(
+                    "Applying transition for worker '{}': {:?} -> {:?}",
+                    worker_name,
+                    current_status,
+                    transition
+                );
                 worker::apply_transition(w, transition.clone())?;
                 report.transitions_applied.push((worker_name.clone(), transition.clone()));
 
@@ -206,19 +213,54 @@ impl Patrol {
         session_id: &str,
         worktree_path: &Path,
     ) -> Result<WorkerTransition> {
-        if git::has_commits_ahead_of(worktree_path, "origin/master")? {
+        let has_commits = git::has_commits_ahead_of(worktree_path, "origin/master")?;
+        tracing::debug!(
+            "Checking working transition for {}: has_commits={}",
+            session_id,
+            has_commits
+        );
+
+        if has_commits {
             let commit_sha = git::get_head_commit(worktree_path)?;
+            tracing::info!(
+                "Worker {} has commits ahead, transitioning to needs_review (sha: {})",
+                session_id,
+                commit_sha
+            );
             return Ok(WorkerTransition::ToNeedsReview { commit_sha });
         }
 
         let sender = TmuxSender::new();
         let detector = StateDetector::new(sender);
         let claude_state = detector.detect(session_id)?;
+        let has_uncommitted = git::has_uncommitted_changes(worktree_path)?;
 
-        if matches!(claude_state, ClaudeState::Ready)
-            && git::has_uncommitted_changes(worktree_path)?
-        {
+        tracing::debug!(
+            "Worker {} state: claude_state={:?}, has_uncommitted={}",
+            session_id,
+            claude_state,
+            has_uncommitted
+        );
+
+        if matches!(claude_state, ClaudeState::Ready) && has_uncommitted {
+            tracing::info!(
+                "Worker {} is ready with uncommitted changes, transitioning to needs_input",
+                session_id
+            );
             return Ok(WorkerTransition::ToNeedsInput);
+        }
+
+        Ok(WorkerTransition::None)
+    }
+
+    fn detect_needs_input_transition(&self, worktree_path: &Path) -> Result<WorkerTransition> {
+        if git::has_commits_ahead_of(worktree_path, "origin/master")? {
+            let commit_sha = git::get_head_commit(worktree_path)?;
+            tracing::warn!(
+                "Worker in needs_input state has commits ahead (sha: {}), correcting to needs_review",
+                commit_sha
+            );
+            return Ok(WorkerTransition::ToNeedsReview { commit_sha });
         }
 
         Ok(WorkerTransition::None)
@@ -347,6 +389,11 @@ impl Patrol {
                 } else if nudges_sent >= 2
                     && let Some(w) = state.get_worker_mut(&worker_name)
                 {
+                    tracing::warn!(
+                        "Worker '{}' stuck for {} minutes (>= 2 nudges), transitioning to needs_input",
+                        worker_name,
+                        minutes_inactive
+                    );
                     worker::apply_transition(w, WorkerTransition::ToNeedsInput)?;
                     report
                         .transitions_applied

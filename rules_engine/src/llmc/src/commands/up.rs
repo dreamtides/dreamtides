@@ -196,8 +196,31 @@ fn run_main_loop(
             if verbose {
                 println!("Running patrol...");
             }
-            if let Err(e) = patrol.run_patrol(state, config) {
-                tracing::error!("Patrol failed: {}", e);
+            match patrol.run_patrol(state, config) {
+                Ok(report) => {
+                    if !report.transitions_applied.is_empty() {
+                        tracing::info!(
+                            "Patrol applied {} transitions: {:?}",
+                            report.transitions_applied.len(),
+                            report.transitions_applied
+                        );
+                    }
+                    if !report.rebases_triggered.is_empty() {
+                        tracing::info!("Patrol triggered rebases: {:?}", report.rebases_triggered);
+                    }
+                    if !report.stuck_workers_nudged.is_empty() {
+                        tracing::info!(
+                            "Patrol nudged stuck workers: {:?}",
+                            report.stuck_workers_nudged
+                        );
+                    }
+                    if !report.errors.is_empty() {
+                        tracing::error!("Patrol encountered errors: {:?}", report.errors);
+                    }
+                }
+                Err(e) => {
+                    tracing::error!("Patrol failed: {}", e);
+                }
             }
             last_patrol = SystemTime::now();
         }
