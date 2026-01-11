@@ -419,6 +419,23 @@ pub fn fetch_origin(repo: &Path) -> Result<()> {
     Ok(())
 }
 
+/// Checks out a branch
+pub fn checkout_branch(repo: &Path, branch: &str) -> Result<()> {
+    let output = Command::new("git")
+        .arg("-C")
+        .arg(repo)
+        .arg("checkout")
+        .arg(branch)
+        .output()
+        .context("Failed to execute git checkout")?;
+
+    if !output.status.success() {
+        bail!("Failed to checkout {}: {}", branch, String::from_utf8_lossy(&output.stderr));
+    }
+
+    Ok(())
+}
+
 /// Resets the current branch to the specified ref (hard reset)
 pub fn reset_to_ref(repo: &Path, ref_name: &str) -> Result<()> {
     let output = Command::new("git")

@@ -95,19 +95,20 @@ pub fn run_accept(worker: Option<String>) -> Result<()> {
         return Ok(());
     }
 
+    let commit_message = git::get_commit_message(&worktree_path, "HEAD")?;
+    let cleaned_message = git::strip_agent_attribution(&commit_message);
+
     println!("Squashing commits...");
     let base_commit = "origin/master";
     git::squash_commits(&worktree_path, base_commit)?;
 
-    let commit_message = git::get_commit_message(&worktree_path, "HEAD")?;
-    let cleaned_message = git::strip_agent_attribution(&commit_message);
-
-    println!("Amending commit message...");
-    amend_commit_message(&worktree_path, &cleaned_message)?;
+    println!("Creating squashed commit...");
+    create_commit(&worktree_path, &cleaned_message)?;
 
     let new_commit_sha = git::get_head_commit(&worktree_path)?;
 
     println!("Syncing local master with origin/master...");
+    git::checkout_branch(&llmc_root, "master")?;
     git::reset_to_ref(&llmc_root, "origin/master")?;
     let master_before = git::get_head_commit(&llmc_root)?;
 
@@ -239,19 +240,18 @@ pub fn run_accept(worker: Option<String>) -> Result<()> {
     Ok(())
 }
 
-fn amend_commit_message(worktree_path: &Path, message: &str) -> Result<()> {
+fn create_commit(worktree_path: &Path, message: &str) -> Result<()> {
     let output = Command::new("git")
         .arg("-C")
         .arg(worktree_path)
         .arg("commit")
-        .arg("--amend")
         .arg("-m")
         .arg(message)
         .output()
-        .context("Failed to execute git commit --amend")?;
+        .context("Failed to execute git commit")?;
 
     if !output.status.success() {
-        bail!("Failed to amend commit: {}", String::from_utf8_lossy(&output.stderr));
+        bail!("Failed to create commit: {}", String::from_utf8_lossy(&output.stderr));
     }
 
     Ok(())
