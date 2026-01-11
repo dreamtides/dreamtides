@@ -36,6 +36,10 @@ pub enum Commands {
         /// Disable patrol system
         #[arg(long)]
         no_patrol: bool,
+
+        /// Force cleanup of existing sessions before starting
+        #[arg(long)]
+        force: bool,
     },
 
     /// Stop the LLMC daemon

@@ -96,5 +96,36 @@ fn kill_remaining_sessions(state: &mut State, force: bool) -> Result<()> {
         }
     }
 
+    cleanup_orphaned_llmc_sessions(state)?;
+
+    Ok(())
+}
+
+fn cleanup_orphaned_llmc_sessions(state: &State) -> Result<()> {
+    let all_sessions = session::list_sessions()?;
+    let tracked_session_ids: Vec<String> =
+        state.workers.values().map(|w| w.session_id.clone()).collect();
+
+    let orphaned_sessions: Vec<String> = all_sessions
+        .into_iter()
+        .filter(|s| s.starts_with("llmc-") && !tracked_session_ids.contains(s))
+        .collect();
+
+    if orphaned_sessions.is_empty() {
+        return Ok(());
+    }
+
+    println!(
+        "Found {} orphaned LLMC sessions (not tracked in state file), cleaning up...",
+        orphaned_sessions.len()
+    );
+
+    for session_name in &orphaned_sessions {
+        println!("  Killing orphaned session: {}", session_name);
+        if let Err(e) = session::kill_session(session_name) {
+            eprintln!("Warning: Failed to kill orphaned session '{}': {}", session_name, e);
+        }
+    }
+
     Ok(())
 }

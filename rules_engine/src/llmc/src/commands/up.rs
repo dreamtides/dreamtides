@@ -13,7 +13,7 @@ use super::super::tmux::session;
 use super::super::worker;
 
 /// Runs the up command, starting the LLMC daemon
-pub fn run_up(no_patrol: bool, verbose: bool) -> Result<()> {
+pub fn run_up(no_patrol: bool, verbose: bool, force: bool) -> Result<()> {
     let llmc_root = config::get_llmc_root();
     if !llmc_root.exists() {
         bail!(
@@ -23,20 +23,16 @@ pub fn run_up(no_patrol: bool, verbose: bool) -> Result<()> {
         );
     }
 
-    if session::any_llmc_sessions_running()? {
-        bail!(
-            "LLMC is already running. Detected existing llmc-* TMUX sessions.\n\
-             Run 'llmc down' first if you want to restart the daemon.\n\
-             Use 'tmux list-sessions' to see all active sessions."
-        );
-    }
+    let state_path = state::get_state_path();
+    let state = State::load(&state_path)?;
+
+    cleanup_orphaned_sessions(&state, force, verbose)?;
 
     println!("Starting LLMC daemon...");
 
     let config_path = config::get_config_path();
     let config = Config::load(&config_path)?;
 
-    let state_path = state::get_state_path();
     let mut state = State::load(&state_path)?;
 
     ensure_tmux_running()?;
@@ -58,6 +54,70 @@ pub fn run_up(no_patrol: bool, verbose: bool) -> Result<()> {
     run_main_loop(no_patrol, verbose, shutdown, &config, &mut state, &state_path)?;
 
     println!("✓ LLMC daemon stopped");
+    Ok(())
+}
+
+/// Cleans up any orphaned LLMC TMUX sessions that don't correspond to workers
+/// in the state file
+fn cleanup_orphaned_sessions(state: &State, force: bool, verbose: bool) -> Result<()> {
+    let all_sessions = session::list_sessions()?;
+    let llmc_sessions: Vec<String> =
+        all_sessions.into_iter().filter(|s| s.starts_with("llmc-")).collect();
+
+    if llmc_sessions.is_empty() {
+        return Ok(());
+    }
+
+    let tracked_session_ids: Vec<String> =
+        state.workers.values().map(|w| w.session_id.clone()).collect();
+
+    let orphaned_sessions: Vec<String> =
+        llmc_sessions.into_iter().filter(|s| !tracked_session_ids.contains(s)).collect();
+
+    if orphaned_sessions.is_empty() {
+        if !tracked_session_ids.is_empty() {
+            if force {
+                println!(
+                    "Found {} tracked LLMC sessions. Cleaning up due to --force...",
+                    tracked_session_ids.len()
+                );
+                for session_id in &tracked_session_ids {
+                    if verbose {
+                        println!("  Killing session: {}", session_id);
+                    }
+                    session::kill_session(session_id)?;
+                }
+            } else {
+                bail!(
+                    "LLMC workers are already running. Found {} tracked TMUX sessions.\n\
+                     Run 'llmc down' first if you want to restart the daemon, or use 'llmc up --force' to force cleanup.\n\
+                     Use 'tmux list-sessions' to see all active sessions.",
+                    tracked_session_ids.len()
+                );
+            }
+        }
+        return Ok(());
+    }
+
+    println!(
+        "Found {} orphaned LLMC sessions (not tracked in state file):",
+        orphaned_sessions.len()
+    );
+    for session_name in &orphaned_sessions {
+        println!("  - {}", session_name);
+    }
+    println!("Cleaning up orphaned sessions...");
+
+    for session_name in &orphaned_sessions {
+        if verbose {
+            println!("  Killing orphaned session: {}", session_name);
+        }
+        if let Err(e) = session::kill_session(session_name) {
+            eprintln!("Warning: Failed to kill orphaned session '{}': {}", session_name, e);
+        }
+    }
+
+    println!("✓ Cleaned up {} orphaned sessions", orphaned_sessions.len());
     Ok(())
 }
 
