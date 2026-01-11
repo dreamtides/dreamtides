@@ -109,16 +109,6 @@ pub fn run_accept(worker: Option<String>) -> Result<()> {
 
     println!("Syncing local master with origin/master...");
     git::checkout_branch(&llmc_root, "master")?;
-
-    if git::has_uncommitted_changes(&llmc_root)? {
-        bail!(
-            "The master branch in llmc root has uncommitted changes.\n\
-             This would result in data loss. Please commit or stash your changes first.\n\
-             Directory: {}",
-            llmc_root.display()
-        );
-    }
-
     git::reset_to_ref(&llmc_root, "origin/master")?;
     let master_before = git::get_head_commit(&llmc_root)?;
 
