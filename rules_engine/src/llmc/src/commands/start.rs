@@ -1,5 +1,6 @@
 use std::fs;
 use std::path::{Path, PathBuf};
+use std::process::Command;
 
 use anyhow::{Context, Result, bail};
 
@@ -76,10 +77,6 @@ pub fn run_start(
 }
 
 fn validate_prompt_args(prompt: &Option<String>, prompt_file: &Option<PathBuf>) -> Result<()> {
-    if prompt.is_none() && prompt_file.is_none() {
-        bail!("Must provide either --prompt or --prompt-file");
-    }
-
     if prompt.is_some() && prompt_file.is_some() {
         bail!("Cannot provide both --prompt and --prompt-file");
     }
@@ -143,7 +140,35 @@ fn load_prompt_content(prompt: &Option<String>, prompt_file: &Option<PathBuf>) -
         return Ok(content);
     }
 
-    bail!("No prompt provided");
+    open_editor_for_prompt()
+}
+
+fn open_editor_for_prompt() -> Result<String> {
+    let editor = std::env::var("EDITOR").unwrap_or_else(|_| "vi".to_string());
+
+    let temp_dir = std::env::temp_dir();
+    let temp_file = temp_dir.join(format!("llmc-prompt-{}.md", std::process::id()));
+
+    let status = Command::new(&editor)
+        .arg(&temp_file)
+        .status()
+        .with_context(|| format!("Failed to launch editor: {}", editor))?;
+
+    if !status.success() {
+        bail!("Editor exited with non-zero status: {}", status);
+    }
+
+    let content = fs::read_to_string(&temp_file).with_context(|| {
+        format!("Failed to read prompt from temporary file: {}", temp_file.display())
+    })?;
+
+    let _ = fs::remove_file(&temp_file);
+
+    if content.trim().is_empty() {
+        bail!("Prompt cannot be empty");
+    }
+
+    Ok(content)
 }
 
 fn build_full_prompt(
