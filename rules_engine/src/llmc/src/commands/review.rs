@@ -97,7 +97,7 @@ fn display_diff(worktree_path: &PathBuf, interface: ReviewInterface) -> Result<(
                 .arg("--display")
                 .arg("side-by-side")
                 .current_dir(worktree_path)
-                .arg("HEAD~")
+                .arg("master")
                 .arg("HEAD")
                 .output()
                 .context("Failed to execute difft. Is difftastic installed?")?;
@@ -114,7 +114,7 @@ fn display_diff(worktree_path: &PathBuf, interface: ReviewInterface) -> Result<(
         ReviewInterface::VSCode => {
             let output = Command::new("code")
                 .arg("--diff")
-                .arg("HEAD~")
+                .arg("master")
                 .arg("HEAD")
                 .current_dir(worktree_path)
                 .output()

@@ -200,6 +200,25 @@ impl Default for State {
     }
 }
 
+/// Runs patrol to update worker states, then returns the updated state
+pub fn load_state_with_patrol() -> Result<(State, super::config::Config)> {
+    use super::config::{self, Config};
+    use super::patrol::Patrol;
+
+    let state_path = get_state_path();
+    let mut state = State::load(&state_path)?;
+
+    let config_path = config::get_config_path();
+    let config = Config::load(&config_path)?;
+
+    let patrol = Patrol::new(&config);
+    let _report = patrol.run_patrol(&mut state, &config)?;
+
+    state.save(&state_path)?;
+
+    Ok((state, config))
+}
+
 #[cfg(test)]
 mod tests {
     use tempfile::TempDir;
