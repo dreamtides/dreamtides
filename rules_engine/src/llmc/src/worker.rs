@@ -124,6 +124,17 @@ pub fn apply_transition(worker: &mut WorkerRecord, transition: WorkerTransition)
 
     worker.status = new_status;
     worker.last_activity_unix = SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs();
+
+    tracing::info!(
+        operation = "state_transition",
+        worker = &worker.name,
+        from_status = ?old_status,
+        to_status = ?new_status,
+        transition_type = ?transition,
+        commit_sha = ?worker.commit_sha,
+        "Worker state transition"
+    );
+
     Ok(())
 }
 

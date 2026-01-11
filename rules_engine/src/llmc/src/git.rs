@@ -23,6 +23,8 @@ pub struct RebaseResult {
 
 /// Creates a new worktree at the specified path, checking out the given branch
 pub fn create_worktree(repo: &Path, branch: &str, worktree_path: &Path) -> Result<()> {
+    let start = std::time::Instant::now();
+
     let output = Command::new("git")
         .arg("-C")
         .arg(repo)
@@ -33,11 +35,48 @@ pub fn create_worktree(repo: &Path, branch: &str, worktree_path: &Path) -> Resul
         .output()
         .context("Failed to execute git worktree add")?;
 
-    if !output.status.success() {
-        bail!("Failed to create worktree: {}", String::from_utf8_lossy(&output.stderr));
+    let result = if output.status.success() {
+        Ok(())
+    } else {
+        Err(anyhow::anyhow!(
+            "Failed to create worktree: {}",
+            String::from_utf8_lossy(&output.stderr)
+        ))
+    };
+
+    let duration_ms = start.elapsed().as_millis() as u64;
+    let after = crate::logging::git::capture_state(worktree_path).ok();
+
+    match &result {
+        Ok(_) => {
+            tracing::info!(
+                operation = "git_operation",
+                operation_type = "worktree_create",
+                repo_path = %repo.display(),
+                worktree_path = %worktree_path.display(),
+                branch,
+                duration_ms,
+                ?after,
+                result = "success",
+                "Created git worktree"
+            );
+        }
+        Err(e) => {
+            tracing::error!(
+                operation = "git_operation",
+                operation_type = "worktree_create",
+                repo_path = %repo.display(),
+                worktree_path = %worktree_path.display(),
+                branch,
+                duration_ms,
+                result = "error",
+                error = %e,
+                "Failed to create worktree"
+            );
+        }
     }
 
-    Ok(())
+    result
 }
 
 /// Removes the worktree at the specified path
@@ -288,6 +327,9 @@ pub fn amend_uncommitted_changes(worktree: &Path) -> Result<()> {
 
 /// Rebases the worktree onto the target branch
 pub fn rebase_onto(worktree: &Path, target: &str) -> Result<RebaseResult> {
+    let before = crate::logging::git::capture_state(worktree).ok();
+    let start = std::time::Instant::now();
+
     let output = Command::new("git")
         .arg("-C")
         .arg(worktree)
@@ -296,17 +338,66 @@ pub fn rebase_onto(worktree: &Path, target: &str) -> Result<RebaseResult> {
         .output()
         .context("Failed to execute git rebase")?;
 
-    if output.status.success() {
-        return Ok(RebaseResult { success: true, conflicts: vec![] });
+    let result = if output.status.success() {
+        Ok(RebaseResult { success: true, conflicts: vec![] })
+    } else {
+        let stderr = String::from_utf8_lossy(&output.stderr);
+        if stderr.contains("CONFLICT") || stderr.contains("conflict") {
+            let conflicts = get_conflicted_files(worktree)?;
+            Ok(RebaseResult { success: false, conflicts })
+        } else {
+            Err(anyhow::anyhow!("Rebase failed: {stderr}"))
+        }
+    };
+
+    let after = crate::logging::git::capture_state(worktree).ok();
+    let duration_ms = start.elapsed().as_millis() as u64;
+
+    match &result {
+        Ok(rebase_result) if rebase_result.success => {
+            tracing::info!(
+                operation = "git_operation",
+                operation_type = "rebase",
+                repo_path = %worktree.display(),
+                target,
+                duration_ms,
+                ?before,
+                ?after,
+                result = "success",
+                "Git rebase succeeded"
+            );
+        }
+        Ok(rebase_result) => {
+            tracing::warn!(
+                operation = "git_operation",
+                operation_type = "rebase",
+                repo_path = %worktree.display(),
+                target,
+                duration_ms,
+                ?before,
+                ?after,
+                result = "conflict",
+                conflicts = ?rebase_result.conflicts,
+                "Git rebase has conflicts"
+            );
+        }
+        Err(e) => {
+            tracing::error!(
+                operation = "git_operation",
+                operation_type = "rebase",
+                repo_path = %worktree.display(),
+                target,
+                duration_ms,
+                ?before,
+                ?after,
+                result = "error",
+                error = %e,
+                "Git rebase failed"
+            );
+        }
     }
 
-    let stderr = String::from_utf8_lossy(&output.stderr);
-    if stderr.contains("CONFLICT") || stderr.contains("conflict") {
-        let conflicts = get_conflicted_files(worktree)?;
-        Ok(RebaseResult { success: false, conflicts })
-    } else {
-        bail!("Rebase failed: {stderr}");
-    }
+    result
 }
 
 /// Checks if a rebase is currently in progress
@@ -334,6 +425,9 @@ pub fn get_conflicted_files(worktree: &Path) -> Result<Vec<String>> {
 
 /// Aborts an in-progress rebase
 pub fn abort_rebase(worktree: &Path) -> Result<()> {
+    let before = crate::logging::git::capture_state(worktree).ok();
+    let start = std::time::Instant::now();
+
     let output = Command::new("git")
         .arg("-C")
         .arg(worktree)
@@ -342,15 +436,51 @@ pub fn abort_rebase(worktree: &Path) -> Result<()> {
         .output()
         .context("Failed to execute git rebase --abort")?;
 
-    if !output.status.success() {
-        bail!("Failed to abort rebase: {}", String::from_utf8_lossy(&output.stderr));
+    let result = if output.status.success() {
+        Ok(())
+    } else {
+        Err(anyhow::anyhow!("Failed to abort rebase: {}", String::from_utf8_lossy(&output.stderr)))
+    };
+
+    let after = crate::logging::git::capture_state(worktree).ok();
+    let duration_ms = start.elapsed().as_millis() as u64;
+
+    match &result {
+        Ok(_) => {
+            tracing::warn!(
+                operation = "git_operation",
+                operation_type = "rebase_abort",
+                repo_path = %worktree.display(),
+                duration_ms,
+                ?before,
+                ?after,
+                result = "success",
+                "Aborted rebase"
+            );
+        }
+        Err(e) => {
+            tracing::error!(
+                operation = "git_operation",
+                operation_type = "rebase_abort",
+                repo_path = %worktree.display(),
+                duration_ms,
+                ?before,
+                ?after,
+                result = "error",
+                error = %e,
+                "Failed to abort rebase"
+            );
+        }
     }
 
-    Ok(())
+    result
 }
 
 /// Continues an in-progress rebase
 pub fn continue_rebase(worktree: &Path) -> Result<()> {
+    let before = crate::logging::git::capture_state(worktree).ok();
+    let start = std::time::Instant::now();
+
     let output = Command::new("git")
         .arg("-C")
         .arg(worktree)
@@ -359,11 +489,47 @@ pub fn continue_rebase(worktree: &Path) -> Result<()> {
         .output()
         .context("Failed to execute git rebase --continue")?;
 
-    if !output.status.success() {
-        bail!("Failed to continue rebase: {}", String::from_utf8_lossy(&output.stderr));
+    let result = if output.status.success() {
+        Ok(())
+    } else {
+        Err(anyhow::anyhow!(
+            "Failed to continue rebase: {}",
+            String::from_utf8_lossy(&output.stderr)
+        ))
+    };
+
+    let after = crate::logging::git::capture_state(worktree).ok();
+    let duration_ms = start.elapsed().as_millis() as u64;
+
+    match &result {
+        Ok(_) => {
+            tracing::info!(
+                operation = "git_operation",
+                operation_type = "rebase_continue",
+                repo_path = %worktree.display(),
+                duration_ms,
+                ?before,
+                ?after,
+                result = "success",
+                "Continued rebase successfully"
+            );
+        }
+        Err(e) => {
+            tracing::error!(
+                operation = "git_operation",
+                operation_type = "rebase_continue",
+                repo_path = %worktree.display(),
+                duration_ms,
+                ?before,
+                ?after,
+                result = "error",
+                error = %e,
+                "Failed to continue rebase"
+            );
+        }
     }
 
-    Ok(())
+    result
 }
 
 /// Squashes all commits since base into a single commit
@@ -386,6 +552,9 @@ pub fn squash_commits(worktree: &Path, base: &str) -> Result<()> {
 
 /// Performs a fast-forward merge of the specified branch
 pub fn fast_forward_merge(repo: &Path, branch: &str) -> Result<()> {
+    let before = crate::logging::git::capture_state(repo).ok();
+    let start = std::time::Instant::now();
+
     let output = Command::new("git")
         .arg("-C")
         .arg(repo)
@@ -395,15 +564,55 @@ pub fn fast_forward_merge(repo: &Path, branch: &str) -> Result<()> {
         .output()
         .context("Failed to execute git merge --ff-only")?;
 
-    if !output.status.success() {
-        bail!("Failed to fast-forward merge: {}", String::from_utf8_lossy(&output.stderr));
+    let result = if output.status.success() {
+        Ok(())
+    } else {
+        Err(anyhow::anyhow!(
+            "Failed to fast-forward merge: {}",
+            String::from_utf8_lossy(&output.stderr)
+        ))
+    };
+
+    let after = crate::logging::git::capture_state(repo).ok();
+    let duration_ms = start.elapsed().as_millis() as u64;
+
+    match &result {
+        Ok(_) => {
+            tracing::info!(
+                operation = "git_operation",
+                operation_type = "merge_ff",
+                repo_path = %repo.display(),
+                branch,
+                duration_ms,
+                ?before,
+                ?after,
+                result = "success",
+                "Fast-forward merge succeeded"
+            );
+        }
+        Err(e) => {
+            tracing::error!(
+                operation = "git_operation",
+                operation_type = "merge_ff",
+                repo_path = %repo.display(),
+                branch,
+                duration_ms,
+                ?before,
+                ?after,
+                result = "error",
+                error = %e,
+                "Fast-forward merge failed"
+            );
+        }
     }
 
-    Ok(())
+    result
 }
 
 /// Fetches from origin
 pub fn fetch_origin(repo: &Path) -> Result<()> {
+    let start = std::time::Instant::now();
+
     let output = Command::new("git")
         .arg("-C")
         .arg(repo)
@@ -412,11 +621,44 @@ pub fn fetch_origin(repo: &Path) -> Result<()> {
         .output()
         .context("Failed to execute git fetch origin")?;
 
-    if !output.status.success() {
-        bail!("Failed to fetch from origin: {}", String::from_utf8_lossy(&output.stderr));
+    let result = if output.status.success() {
+        Ok(())
+    } else {
+        Err(anyhow::anyhow!(
+            "Failed to fetch from origin: {}",
+            String::from_utf8_lossy(&output.stderr)
+        ))
+    };
+
+    let duration_ms = start.elapsed().as_millis() as u64;
+
+    match &result {
+        Ok(_) => {
+            tracing::debug!(
+                operation = "git_operation",
+                operation_type = "fetch",
+                repo_path = %repo.display(),
+                remote = "origin",
+                duration_ms,
+                result = "success",
+                "Fetched from origin"
+            );
+        }
+        Err(e) => {
+            tracing::error!(
+                operation = "git_operation",
+                operation_type = "fetch",
+                repo_path = %repo.display(),
+                remote = "origin",
+                duration_ms,
+                result = "error",
+                error = %e,
+                "Failed to fetch from origin"
+            );
+        }
     }
 
-    Ok(())
+    result
 }
 
 /// Checks out a branch
@@ -456,6 +698,9 @@ pub fn reset_to_ref(repo: &Path, ref_name: &str) -> Result<()> {
 
 /// Pushes master branch to origin
 pub fn push_master_to_origin(repo: &Path) -> Result<()> {
+    let before = crate::logging::git::capture_state(repo).ok();
+    let start = std::time::Instant::now();
+
     let output = Command::new("git")
         .arg("-C")
         .arg(repo)
@@ -465,11 +710,48 @@ pub fn push_master_to_origin(repo: &Path) -> Result<()> {
         .output()
         .context("Failed to execute git push origin master")?;
 
-    if !output.status.success() {
-        bail!("Failed to push master to origin: {}", String::from_utf8_lossy(&output.stderr));
+    let result = if output.status.success() {
+        Ok(())
+    } else {
+        Err(anyhow::anyhow!(
+            "Failed to push master to origin: {}",
+            String::from_utf8_lossy(&output.stderr)
+        ))
+    };
+
+    let duration_ms = start.elapsed().as_millis() as u64;
+
+    match &result {
+        Ok(_) => {
+            tracing::info!(
+                operation = "git_operation",
+                operation_type = "push",
+                repo_path = %repo.display(),
+                branch = "master",
+                remote = "origin",
+                duration_ms,
+                ?before,
+                result = "success",
+                "Pushed master to origin"
+            );
+        }
+        Err(e) => {
+            tracing::error!(
+                operation = "git_operation",
+                operation_type = "push",
+                repo_path = %repo.display(),
+                branch = "master",
+                remote = "origin",
+                duration_ms,
+                ?before,
+                result = "error",
+                error = %e,
+                "Failed to push master to origin"
+            );
+        }
     }
 
-    Ok(())
+    result
 }
 
 /// Verifies a commit exists on origin/master (after fetching)

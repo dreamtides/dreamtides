@@ -2,6 +2,7 @@ pub mod cli;
 pub mod commands;
 pub mod config;
 pub mod git;
+pub mod logging;
 pub mod patrol;
 pub mod recovery;
 pub mod sound;

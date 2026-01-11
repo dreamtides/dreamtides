@@ -77,11 +77,54 @@ impl TmuxSender {
 
     /// Sends a message to a TMUX session with appropriate debouncing
     pub fn send(&self, session: &str, message: &str) -> Result<()> {
-        if message.len() >= LARGE_MESSAGE_THRESHOLD {
+        let start = std::time::Instant::now();
+        let send_type = if message.len() >= LARGE_MESSAGE_THRESHOLD { "large" } else { "small" };
+        let truncated = if message.len() > 200 {
+            format!("{}...", &message[..200])
+        } else {
+            message.to_string()
+        };
+
+        let result = if message.len() >= LARGE_MESSAGE_THRESHOLD {
             self.send_large_message(session, message)
         } else {
             self.send_small_message(session, message)
+        };
+
+        let duration_ms = start.elapsed().as_millis() as u64;
+        let debounce_ms = self.calculate_delay(message.len()).as_millis() as u64;
+
+        match &result {
+            Ok(_) => {
+                tracing::debug!(
+                    operation = "tmux_send",
+                    session_id = session,
+                    send_type,
+                    message_size_bytes = message.len(),
+                    message_truncated = truncated,
+                    debounce_ms,
+                    duration_ms,
+                    result = "success",
+                    "TMUX send succeeded"
+                );
+            }
+            Err(e) => {
+                tracing::error!(
+                    operation = "tmux_send",
+                    session_id = session,
+                    send_type,
+                    message_size_bytes = message.len(),
+                    message_truncated = truncated,
+                    debounce_ms,
+                    duration_ms,
+                    result = "error",
+                    error = %e,
+                    "TMUX send failed"
+                );
+            }
         }
+
+        result
     }
 
     /// Sends raw keys to a TMUX session without debouncing

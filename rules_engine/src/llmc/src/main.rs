@@ -2,6 +2,7 @@ mod cli;
 mod commands;
 mod config;
 mod git;
+mod logging;
 mod patrol;
 mod recovery;
 mod sound;
@@ -12,7 +13,6 @@ mod worker;
 use anyhow::Result;
 use clap::Parser;
 use cli::{Cli, Commands};
-use tracing_subscriber::{EnvFilter, fmt};
 
 use crate::commands::review::ReviewInterface;
 use crate::commands::{
@@ -24,27 +24,29 @@ use crate::commands::{
 async fn main() -> Result<()> {
     let cli = Cli::parse();
 
-    let log_file = config::get_llmc_root().join("logs").join("llmc.log");
-    if let Some(parent) = log_file.parent() {
-        std::fs::create_dir_all(parent).ok();
+    if let Err(e) = logging::init_logging() {
+        eprintln!("Warning: Failed to initialize logging: {e}");
     }
 
-    if let Ok(file) = std::fs::OpenOptions::new().create(true).append(true).open(&log_file) {
-        fmt()
-            .with_env_filter(
-                EnvFilter::try_from_env("LLMC_LOG").unwrap_or_else(|_| EnvFilter::new("info")),
-            )
-            .with_writer(move || file.try_clone().unwrap())
-            .init();
-        eprintln!("LLMC logging to: {}", log_file.display());
-    } else {
-        fmt()
-            .with_env_filter(
-                EnvFilter::try_from_env("LLMC_LOG").unwrap_or_else(|_| EnvFilter::new("info")),
-            )
-            .with_writer(std::io::stderr)
-            .init();
-    }
+    let command_name = match &cli.command {
+        Commands::Init { .. } => "init",
+        Commands::Up { .. } => "up",
+        Commands::Down { .. } => "down",
+        Commands::Add { .. } => "add",
+        Commands::Nuke { .. } => "nuke",
+        Commands::Status { .. } => "status",
+        Commands::Start { .. } => "start",
+        Commands::Message { .. } => "message",
+        Commands::Attach { .. } => "attach",
+        Commands::Review { .. } => "review",
+        Commands::Reject { .. } => "reject",
+        Commands::Accept { .. } => "accept",
+        Commands::Rebase { .. } => "rebase",
+        Commands::Doctor { .. } => "doctor",
+    };
+
+    tracing::info!(operation = "cli_command", command = command_name, "Command started");
+    let start_time = std::time::Instant::now();
 
     let result = match cli.command {
         Commands::Init { source, target } => init::run_init(source, target),
@@ -78,9 +80,30 @@ async fn main() -> Result<()> {
         Commands::Doctor { repair, rebuild } => doctor::run_doctor(repair, rebuild),
     };
 
-    if let Err(e) = result {
-        display_error(&e, cli.verbose);
-        std::process::exit(1);
+    let duration_ms = start_time.elapsed().as_millis() as u64;
+
+    match &result {
+        Ok(_) => {
+            tracing::info!(
+                operation = "cli_command",
+                command = command_name,
+                duration_ms,
+                result = "success",
+                "Command completed"
+            );
+        }
+        Err(e) => {
+            tracing::error!(
+                operation = "cli_command",
+                command = command_name,
+                duration_ms,
+                result = "error",
+                error = %e,
+                "Command failed"
+            );
+            display_error(e, cli.verbose);
+            std::process::exit(1);
+        }
     }
 
     Ok(())

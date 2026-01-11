@@ -57,9 +57,10 @@ tokio = { version = "1", features = ["full"] }
 toml = "0.8"
 tower = "0.5"
 tracing = "0.1"
+tracing-appender = "0.2"
 tracing-error = "0.2"
 tracing-forest = "0.1"
-tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+tracing-subscriber = { version = "0.3", features = ["env-filter", "json"] }
 umya-spreadsheet = "2"
 uuid = { version = "1", features = ["serde", "v4"] }
 yup-oauth2 = "12"
