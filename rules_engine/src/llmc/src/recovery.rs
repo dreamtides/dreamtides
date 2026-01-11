@@ -428,7 +428,7 @@ impl RecoveryManager {
 
             if output.lines().rev().take(5).any(|line| {
                 let trimmed = line.trim_start();
-                trimmed.starts_with("> ") || trimmed == ">"
+                trimmed.starts_with("> ") || trimmed == ">" || trimmed.starts_with("❯")
             }) {
                 return Ok(());
             }
@@ -612,7 +612,7 @@ impl RecoveryManager {
         thread::sleep(Duration::from_millis(100));
 
         let output = session::capture_pane(&worker.session_id, 5)?;
-        if !output.trim().ends_with('>') && !output.contains("> ") {
+        if !output.trim().ends_with('>') && !output.trim().ends_with('❯') && !output.contains("> ") {
             Command::new("tmux")
                 .args(["send-keys", "-t", &worker.session_id, "C-c"])
                 .output()

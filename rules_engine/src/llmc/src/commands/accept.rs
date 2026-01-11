@@ -49,11 +49,8 @@ pub fn run_accept(worker: Option<String>) -> Result<()> {
     let worktree_path = PathBuf::from(&worker_record.worktree_path);
 
     if git::has_uncommitted_changes(&worktree_path)? {
-        bail!(
-            "Worker '{}' has uncommitted changes. Cannot accept.\n\
-             Please review the worktree and resolve any issues.",
-            worker_name
-        );
+        println!("Worker '{}' has uncommitted changes, amending to commit...", worker_name);
+        git::amend_uncommitted_changes(&worktree_path)?;
     }
 
     println!("Accepting changes from worker '{}'...", worker_name);
@@ -126,6 +123,17 @@ pub fn run_accept(worker: Option<String>) -> Result<()> {
             let pending_record = state.get_worker(&pending_worker).unwrap();
             let pending_worktree = PathBuf::from(&pending_record.worktree_path);
             let pending_session = pending_record.session_id.clone();
+
+            if let Ok(true) = git::has_uncommitted_changes(&pending_worktree) {
+                tracing::info!(
+                    "Worker '{}' has uncommitted changes, amending before rebase",
+                    pending_worker
+                );
+                if let Err(e) = git::amend_uncommitted_changes(&pending_worktree) {
+                    tracing::warn!("Failed to amend changes for {}: {}", pending_worker, e);
+                    continue;
+                }
+            }
 
             match git::rebase_onto(&pending_worktree, "origin/master") {
                 Ok(rebase_result) => {

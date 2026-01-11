@@ -258,7 +258,7 @@ fn wait_for_claude_ready(session: &str, timeout: Duration, verbose: bool) -> Res
             // Check for the '>' prompt (Claude is ready)
             if output.lines().rev().take(5).any(|line| {
                 let trimmed = line.trim_start();
-                trimmed.starts_with("> ") || trimmed == ">"
+                trimmed.starts_with("> ") || trimmed == ">" || trimmed.starts_with("❯")
             }) {
                 if verbose {
                     println!("        [verbose] Found '>' prompt - Claude is ready!");

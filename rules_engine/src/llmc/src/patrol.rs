@@ -206,18 +206,19 @@ impl Patrol {
         session_id: &str,
         worktree_path: &Path,
     ) -> Result<WorkerTransition> {
+        if git::has_commits_ahead_of(worktree_path, "origin/master")? {
+            let commit_sha = git::get_head_commit(worktree_path)?;
+            return Ok(WorkerTransition::ToNeedsReview { commit_sha });
+        }
+
         let sender = TmuxSender::new();
         let detector = StateDetector::new(sender);
-
         let claude_state = detector.detect(session_id)?;
 
         if matches!(claude_state, ClaudeState::Ready) {
             if git::has_uncommitted_changes(worktree_path)? {
                 return Ok(WorkerTransition::ToNeedsInput);
             }
-
-            let commit_sha = git::get_head_commit(worktree_path)?;
-            return Ok(WorkerTransition::ToNeedsReview { commit_sha });
         }
 
         Ok(WorkerTransition::None)
@@ -294,6 +295,14 @@ impl Patrol {
     ) -> Result<()> {
         let llmc_root = crate::config::get_llmc_root();
         git::fetch_origin(&llmc_root)?;
+
+        if git::has_uncommitted_changes(worktree_path)? {
+            tracing::info!(
+                "Worker '{}' has uncommitted changes, amending to commit before rebase",
+                worker_name
+            );
+            git::amend_uncommitted_changes(worktree_path)?;
+        }
 
         let rebase_result = git::rebase_onto(worktree_path, "origin/master")?;
 

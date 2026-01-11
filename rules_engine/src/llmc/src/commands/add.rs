@@ -138,8 +138,38 @@ fn add_worker_to_config(
     println!("Adding worker to config.toml...");
 
     let config_path = config::get_config_path();
-    let mut config_content =
+    let config_content =
         fs::read_to_string(&config_path).context("Failed to read config.toml")?;
+
+    let section_header = format!("[workers.{}]", name);
+    let lines: Vec<&str> = config_content.lines().collect();
+
+    let mut new_lines = Vec::new();
+    let mut skip_section = false;
+
+    for line in lines {
+        let trimmed = line.trim();
+
+        if trimmed == section_header {
+            skip_section = true;
+            continue;
+        }
+
+        if skip_section {
+            if trimmed.starts_with('[') {
+                skip_section = false;
+            } else {
+                continue;
+            }
+        }
+
+        new_lines.push(line);
+    }
+
+    let mut config_content = new_lines.join("\n");
+    if !config_content.ends_with('\n') && !config_content.is_empty() {
+        config_content.push('\n');
+    }
 
     let worker_config_section = format!("\n[workers.{}]\n", name);
 

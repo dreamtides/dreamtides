@@ -192,7 +192,7 @@ fn is_ready_for_input(pane_output: &str) -> bool {
         .lines()
         .rev()
         .take(5)
-        .any(|line| matches!(line.trim_start(), s if s.starts_with("> ") || s == ">"))
+        .any(|line| matches!(line.trim_start(), s if s.starts_with("> ") || s == ">" || s.starts_with("❯")))
 }
 
 fn detect_ask_user_question(output: &str) -> Option<QuestionType> {
@@ -284,7 +284,7 @@ fn classify_ready_state(output: &str) -> ReadyStateType {
 fn has_pending_question(text: &str) -> bool {
     let lines: Vec<&str> = text.lines().collect();
     let last_line = lines.last().map(|s| s.trim()).unwrap_or("");
-    let has_prompt = last_line.starts_with("> ") || last_line == ">";
+    let has_prompt = last_line.starts_with("> ") || last_line == ">" || last_line.starts_with("❯");
     let skip_count = if has_prompt { 1 } else { 0 };
     let question_at_end = text
         .lines()
@@ -445,6 +445,8 @@ mod tests {
         assert!(is_ready_for_input("Some output\n> "));
         assert!(is_ready_for_input("Some output\n>"));
         assert!(is_ready_for_input("Multiple\nlines\nof\noutput\n> "));
+        assert!(is_ready_for_input("Some output\n❯"));
+        assert!(is_ready_for_input("Multiple\nlines\nof\noutput\n❯ "));
         assert!(!is_ready_for_input("Some output\nNo prompt"));
         assert!(!is_ready_for_input("Processing..."));
     }

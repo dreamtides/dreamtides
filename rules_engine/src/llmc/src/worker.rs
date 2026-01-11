@@ -204,7 +204,7 @@ fn wait_for_claude_ready(session: &str) -> Result<()> {
         // Check for the '>' prompt (Claude is ready)
         if output.lines().rev().take(5).any(|line| {
             let trimmed = line.trim_start();
-            trimmed.starts_with("> ") || trimmed == ">"
+            trimmed.starts_with("> ") || trimmed == ">" || trimmed.starts_with("❯")
         }) {
             return Ok(());
         }

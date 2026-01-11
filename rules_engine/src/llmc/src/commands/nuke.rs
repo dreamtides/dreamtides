@@ -1,7 +1,8 @@
+use std::fs;
 use std::io::{self, Write};
 use std::path::{Path, PathBuf};
 
-use anyhow::{Result, bail};
+use anyhow::{Context, Result, bail};
 
 use super::super::state::{self, State};
 use super::super::tmux::session;
@@ -112,6 +113,12 @@ fn nuke_worker(state: &mut State, llmc_root: &Path, worker: &str) -> Result<()> 
     state.remove_worker(worker);
     println!("  ✓ Removed from state.json");
 
+    if let Err(e) = remove_worker_from_config(worker) {
+        eprintln!("  ⚠ Failed to remove worker from config.toml: {}", e);
+    } else {
+        println!("  ✓ Removed from config.toml (if present)");
+    }
+
     Ok(())
 }
 
@@ -150,4 +157,44 @@ fn format_all_workers(state: &State) -> String {
         return "none".to_string();
     }
     state.workers.keys().map(String::as_str).collect::<Vec<_>>().join(", ")
+}
+
+fn remove_worker_from_config(worker: &str) -> Result<()> {
+    let config_path = config::get_config_path();
+    let config_content = fs::read_to_string(&config_path).context("Failed to read config.toml")?;
+
+    let section_header = format!("[workers.{}]", worker);
+    let lines: Vec<&str> = config_content.lines().collect();
+
+    let mut new_lines = Vec::new();
+    let mut skip_section = false;
+
+    for line in lines {
+        let trimmed = line.trim();
+
+        if trimmed == section_header {
+            skip_section = true;
+            continue;
+        }
+
+        if skip_section {
+            if trimmed.starts_with('[') {
+                skip_section = false;
+            } else {
+                continue;
+            }
+        }
+
+        new_lines.push(line);
+    }
+
+    let new_content = new_lines.join("\n");
+    if !new_content.ends_with('\n') && !new_content.is_empty() {
+        fs::write(&config_path, format!("{}\n", new_content))
+            .context("Failed to write config.toml")?;
+    } else {
+        fs::write(&config_path, new_content).context("Failed to write config.toml")?;
+    }
+
+    Ok(())
 }

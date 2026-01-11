@@ -185,6 +185,14 @@ pub fn get_merge_base(worktree: &Path, ref1: &str, ref2: &str) -> Result<String>
     Ok(String::from_utf8(output.stdout)?.trim().to_string())
 }
 
+/// Checks if the worktree has commits ahead of the given ref
+pub fn has_commits_ahead_of(worktree: &Path, base_ref: &str) -> Result<bool> {
+    let head = get_head_commit(worktree)?;
+    let merge_base = get_merge_base(worktree, "HEAD", base_ref)?;
+
+    Ok(head != merge_base)
+}
+
 /// Checks if there are uncommitted changes in the worktree
 pub fn has_uncommitted_changes(worktree: &Path) -> Result<bool> {
     let output = Command::new("git")
@@ -229,6 +237,36 @@ pub fn strip_agent_attribution(message: &str) -> String {
 
     let co_authored_regex = Regex::new(r"\n*Co-Authored-By: Claude[^\n]*").unwrap();
     co_authored_regex.replace_all(&result, "").trim().to_string()
+}
+
+/// Amends uncommitted changes to the most recent commit
+pub fn amend_uncommitted_changes(worktree: &Path) -> Result<()> {
+    let add_output = Command::new("git")
+        .arg("-C")
+        .arg(worktree)
+        .arg("add")
+        .arg("-A")
+        .output()
+        .context("Failed to execute git add -A")?;
+
+    if !add_output.status.success() {
+        bail!("Failed to stage changes: {}", String::from_utf8_lossy(&add_output.stderr));
+    }
+
+    let amend_output = Command::new("git")
+        .arg("-C")
+        .arg(worktree)
+        .arg("commit")
+        .arg("--amend")
+        .arg("--no-edit")
+        .output()
+        .context("Failed to execute git commit --amend")?;
+
+    if !amend_output.status.success() {
+        bail!("Failed to amend commit: {}", String::from_utf8_lossy(&amend_output.stderr));
+    }
+
+    Ok(())
 }
 
 /// Rebases the worktree onto the target branch
