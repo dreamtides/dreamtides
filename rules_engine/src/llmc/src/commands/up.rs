@@ -188,6 +188,7 @@ fn run_main_loop(
         *state = State::load(state_path)?;
 
         poll_worker_states(state)?;
+        start_offline_workers(config, state, verbose)?;
         state.save(state_path)?;
 
         if !no_patrol
@@ -247,6 +248,21 @@ fn poll_worker_states(state: &mut State) -> Result<()> {
                 worker_record.last_activity_unix =
                     SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs();
             }
+        }
+    }
+
+    Ok(())
+}
+
+fn start_offline_workers(config: &Config, state: &mut State, verbose: bool) -> Result<()> {
+    let worker_names: Vec<String> = state.workers.keys().cloned().collect();
+
+    for worker_name in &worker_names {
+        if let Some(worker_record) = state.workers.get(worker_name)
+            && worker_record.status == WorkerStatus::Offline
+        {
+            println!("  Starting offline worker '{}'...", worker_name);
+            start_worker(worker_name, config, state, verbose)?;
         }
     }
 
