@@ -136,6 +136,15 @@ pub fn run_accept(worker: Option<String>) -> Result<()> {
 
     verify_commit_exists(&llmc_root, &new_commit_sha)?;
 
+    println!("Pushing to origin...");
+    git::push_master_to_origin(&llmc_root)?;
+
+    git::verify_commit_on_origin(&llmc_root, &new_commit_sha)?;
+    println!(
+        "✓ Commit {} pushed and verified on origin/master",
+        &new_commit_sha[..7.min(new_commit_sha.len())]
+    );
+
     println!("Cleaning up worktree and branch...");
     git::remove_worktree(&llmc_root, &worktree_path, false)?;
     git::delete_branch(&llmc_root, &worker_record.branch, true)?;

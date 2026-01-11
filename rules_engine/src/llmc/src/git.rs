@@ -402,6 +402,48 @@ pub fn fetch_origin(repo: &Path) -> Result<()> {
     Ok(())
 }
 
+/// Pushes master branch to origin
+pub fn push_master_to_origin(repo: &Path) -> Result<()> {
+    let output = Command::new("git")
+        .arg("-C")
+        .arg(repo)
+        .arg("push")
+        .arg("origin")
+        .arg("master")
+        .output()
+        .context("Failed to execute git push origin master")?;
+
+    if !output.status.success() {
+        bail!("Failed to push master to origin: {}", String::from_utf8_lossy(&output.stderr));
+    }
+
+    Ok(())
+}
+
+/// Verifies a commit exists on origin/master (after fetching)
+pub fn verify_commit_on_origin(repo: &Path, commit_sha: &str) -> Result<()> {
+    fetch_origin(repo)?;
+
+    let output = Command::new("git")
+        .arg("-C")
+        .arg(repo)
+        .arg("merge-base")
+        .arg("--is-ancestor")
+        .arg(commit_sha)
+        .arg("origin/master")
+        .output()
+        .context("Failed to verify commit on origin")?;
+
+    if !output.status.success() {
+        bail!(
+            "CRITICAL: Commit {} is not on origin/master. The push may have failed silently.",
+            commit_sha
+        );
+    }
+
+    Ok(())
+}
+
 /// Pulls with rebase from origin/master
 pub fn pull_rebase(worktree: &Path) -> Result<()> {
     // Fetch latest changes from origin
