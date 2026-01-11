@@ -6,6 +6,10 @@ use clap::{Parser, Subcommand};
 #[command(name = "llmc")]
 #[command(about = "LLMC v2: Agent Coordination System", long_about = None)]
 pub struct Cli {
+    /// Enable verbose error output (includes stack traces)
+    #[arg(long, short, global = true)]
+    pub verbose: bool,
+
     #[command(subcommand)]
     pub command: Commands,
 }
@@ -24,15 +28,11 @@ pub enum Commands {
     },
 
     /// Start the LLMC daemon
-    Up {
-        /// Disable patrol system
-        #[arg(long)]
-        no_patrol: bool,
-
-        /// Enable verbose logging
-        #[arg(long, short)]
-        verbose: bool,
-    },
+Up {
+    /// Disable patrol system
+    #[arg(long)]
+    no_patrol: bool,
+},
 
     /// Stop the LLMC daemon
     Down {

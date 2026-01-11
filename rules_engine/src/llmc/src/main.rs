@@ -22,6 +22,8 @@ use crate::commands::{
 
 #[tokio::main]
 async fn main() -> Result<()> {
+    let cli = Cli::parse();
+
     fmt()
         .with_env_filter(
             EnvFilter::try_from_env("LLMC_LOG").unwrap_or_else(|_| EnvFilter::new("info")),
@@ -29,35 +31,33 @@ async fn main() -> Result<()> {
         .with_writer(std::io::stderr)
         .init();
 
-    let cli = Cli::parse();
-
-    match cli.command {
+    let result = match cli.command {
         Commands::Init { source, target } => {
-            init::run_init(source, target)?;
+            init::run_init(source, target)
         }
-        Commands::Up { no_patrol, verbose } => {
-            up::run_up(no_patrol, verbose)?;
+        Commands::Up { no_patrol } => {
+            up::run_up(no_patrol, cli.verbose)
         }
         Commands::Down { force } => {
-            down::run_down(force)?;
+            down::run_down(force)
         }
         Commands::Add { name, model, role_prompt } => {
-            add::run_add(&name, model, role_prompt)?;
+            add::run_add(&name, model, role_prompt)
         }
         Commands::Nuke { name, all } => {
-            nuke::run_nuke(name.as_deref(), all)?;
+            nuke::run_nuke(name.as_deref(), all)
         }
         Commands::Status { json } => {
-            status::run_status(json)?;
+            status::run_status(json)
         }
         Commands::Start { worker, prompt, prompt_file } => {
-            start::run_start(worker, prompt, prompt_file)?;
+            start::run_start(worker, prompt, prompt_file)
         }
         Commands::Message { worker, message } => {
-            message::run_message(&worker, &message)?;
+            message::run_message(&worker, &message)
         }
         Commands::Attach { worker } => {
-            attach::run_attach(&worker)?;
+            attach::run_attach(&worker)
         }
         Commands::Review { worker, interface } => {
             let interface_enum = match interface.as_str() {
@@ -71,21 +71,34 @@ async fn main() -> Result<()> {
                     std::process::exit(1);
                 }
             };
-            review::run_review(worker, interface_enum)?;
+            review::run_review(worker, interface_enum)
         }
         Commands::Reject { message } => {
-            reject::run_reject(&message)?;
+            reject::run_reject(&message)
         }
         Commands::Accept { worker } => {
-            accept::run_accept(worker)?;
+            accept::run_accept(worker)
         }
         Commands::Rebase { worker } => {
-            rebase::run_rebase(&worker)?;
+            rebase::run_rebase(&worker)
         }
         Commands::Doctor { repair, rebuild } => {
-            doctor::run_doctor(repair, rebuild)?;
+            doctor::run_doctor(repair, rebuild)
         }
+    };
+
+    if let Err(e) = result {
+        display_error(&e, cli.verbose);
+        std::process::exit(1);
     }
 
     Ok(())
+}
+
+fn display_error(error: &anyhow::Error, verbose: bool) {
+    if verbose {
+        eprintln!("Error: {error:?}");
+    } else {
+        eprintln!("Error: {error}");
+    }
 }
