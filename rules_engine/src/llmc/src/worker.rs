@@ -200,12 +200,21 @@ fn wait_for_claude_ready(session: &str) -> Result<()> {
         thread::sleep(Duration::from_millis(POLL_INTERVAL_MS));
         let output = session::capture_pane(session, 50)
             .with_context(|| format!("Failed to capture pane for session '{}'", session))?;
+
+        // Check for the '>' prompt (Claude is ready)
         if output.lines().rev().take(5).any(|line| {
             let trimmed = line.trim_start();
             trimmed.starts_with("> ") || trimmed == ">"
         }) {
             return Ok(());
         }
+
+        // Check for bypass permissions prompt (Claude is waiting for confirmation)
+        let lower = output.to_lowercase();
+        if lower.contains("bypass") && lower.contains("permissions") {
+            return Ok(());
+        }
+
         let command = session::get_pane_command(session)?;
         if !session::is_claude_process(&command) {
             bail!("Claude process not found in session '{}', got command: {}", session, command);

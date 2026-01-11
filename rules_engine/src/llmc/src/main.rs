@@ -35,8 +35,8 @@ async fn main() -> Result<()> {
         Commands::Init { source, target } => {
             init::run_init(source, target)?;
         }
-        Commands::Up { no_patrol } => {
-            up::run_up(no_patrol)?;
+        Commands::Up { no_patrol, verbose } => {
+            up::run_up(no_patrol, verbose)?;
         }
         Commands::Down { force } => {
             down::run_down(force)?;

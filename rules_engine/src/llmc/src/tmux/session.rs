@@ -125,29 +125,72 @@ pub fn set_env(session: &str, key: &str, value: &str) -> Result<()> {
 }
 
 /// Starts a complete worker session with Claude Code
-pub fn start_worker_session(name: &str, worktree: &Path, config: &WorkerConfig) -> Result<()> {
+pub fn start_worker_session(
+    name: &str,
+    worktree: &Path,
+    config: &WorkerConfig,
+    verbose: bool,
+) -> Result<()> {
+    if verbose {
+        println!("      [verbose] Creating TMUX session '{}'", name);
+        println!("      [verbose] Working directory: {}", worktree.display());
+        println!(
+            "      [verbose] Session size: {}x{}",
+            DEFAULT_SESSION_WIDTH, DEFAULT_SESSION_HEIGHT
+        );
+    }
+
     create_session(name, worktree, DEFAULT_SESSION_WIDTH, DEFAULT_SESSION_HEIGHT)?;
+
+    if verbose {
+        println!("      [verbose] TMUX session created successfully");
+    }
 
     let llmc_root = crate::config::get_llmc_root();
     set_env(name, "LLMC_WORKER", name)?;
     set_env(name, "LLMC_ROOT", llmc_root.to_str().unwrap())?;
 
+    if verbose {
+        println!("      [verbose] Environment variables set");
+    }
+
     thread::sleep(Duration::from_millis(500));
 
     let sender = TmuxSender::new();
     let claude_cmd = build_claude_command(config);
+
+    if verbose {
+        println!("      [verbose] Sending Claude command: {}", claude_cmd);
+    }
+
     sender
         .send(name, &claude_cmd)
         .with_context(|| format!("Failed to send Claude command to session '{}'", name))?;
 
-    wait_for_claude_ready(name, Duration::from_secs(30))?;
+    if verbose {
+        println!("      [verbose] Claude command sent, waiting for ready state...");
+    }
 
-    accept_bypass_warning(name, &sender)?;
+    wait_for_claude_ready(name, Duration::from_secs(30), verbose)?;
+
+    if verbose {
+        println!("      [verbose] Claude is ready, checking for bypass warning...");
+    }
+
+    accept_bypass_warning(name, &sender, verbose)?;
+
+    if verbose {
+        println!("      [verbose] Sending /clear command...");
+    }
 
     sender
         .send(name, "/clear")
         .with_context(|| format!("Failed to send /clear to session '{}'", name))?;
     thread::sleep(Duration::from_millis(500));
+
+    if verbose {
+        println!("      [verbose] Worker session startup complete");
+    }
 
     Ok(())
 }
@@ -186,36 +229,97 @@ fn build_claude_command(config: &WorkerConfig) -> String {
     cmd
 }
 
-fn wait_for_claude_ready(session: &str, timeout: Duration) -> Result<()> {
+fn wait_for_claude_ready(session: &str, timeout: Duration, verbose: bool) -> Result<()> {
     const POLL_INTERVAL_MS: u64 = 500;
     let start = std::time::Instant::now();
+    let mut poll_count = 0;
 
     while start.elapsed() < timeout {
         thread::sleep(Duration::from_millis(POLL_INTERVAL_MS));
+        poll_count += 1;
+
+        if verbose {
+            println!(
+                "        [verbose] Poll #{}: Checking Claude readiness ({}s elapsed)",
+                poll_count,
+                start.elapsed().as_secs()
+            );
+        }
+
         if let Ok(output) = capture_pane(session, 50) {
+            if verbose {
+                println!("        [verbose] Captured {} lines of output", output.lines().count());
+                println!("        [verbose] Last 5 lines:");
+                for line in output.lines().rev().take(5) {
+                    println!("        [verbose]   | {}", line);
+                }
+            }
+
+            // Check for the '>' prompt (Claude is ready)
             if output.lines().rev().take(5).any(|line| {
                 let trimmed = line.trim_start();
                 trimmed.starts_with("> ") || trimmed == ">"
             }) {
+                if verbose {
+                    println!("        [verbose] Found '>' prompt - Claude is ready!");
+                }
                 return Ok(());
             }
 
-            if let Ok(command) = get_pane_command(session)
-                && !is_claude_process(&command)
-            {
-                bail!(
-                    "Claude process not found in session '{}', got command: {}",
-                    session,
-                    command
-                );
+            // Check for bypass permissions prompt (Claude is waiting for confirmation)
+            let lower = output.to_lowercase();
+            if lower.contains("bypass") && lower.contains("permissions") {
+                if verbose {
+                    println!(
+                        "        [verbose] Found bypass permissions prompt - Claude is ready (at confirmation)"
+                    );
+                }
+                return Ok(());
             }
+
+            if let Ok(command) = get_pane_command(session) {
+                if verbose {
+                    println!("        [verbose] Pane command: '{}'", command);
+                    println!(
+                        "        [verbose] Is Claude process: {}",
+                        is_claude_process(&command)
+                    );
+                }
+
+                if !is_claude_process(&command) {
+                    bail!(
+                        "Claude process not found in session '{}', got command: {}\n\
+                         Last captured output:\n{}",
+                        session,
+                        command,
+                        output
+                            .lines()
+                            .rev()
+                            .take(20)
+                            .collect::<Vec<_>>()
+                            .iter()
+                            .rev()
+                            .cloned()
+                            .collect::<Vec<_>>()
+                            .join("\n")
+                    );
+                }
+            } else if verbose {
+                println!("        [verbose] Failed to get pane command");
+            }
+        } else if verbose {
+            println!("        [verbose] Failed to capture pane output");
         }
+    }
+
+    if verbose {
+        println!("        [verbose] Timeout reached after {} polls", poll_count);
     }
 
     bail!("Claude did not become ready after {} seconds", timeout.as_secs())
 }
 
-fn accept_bypass_warning(session: &str, sender: &TmuxSender) -> Result<()> {
+fn accept_bypass_warning(session: &str, sender: &TmuxSender, verbose: bool) -> Result<()> {
     thread::sleep(Duration::from_millis(500));
     if let Ok(output) = capture_pane(session, 50) {
         let lower = output.to_lowercase();
@@ -224,12 +328,24 @@ fn accept_bypass_warning(session: &str, sender: &TmuxSender) -> Result<()> {
             || lower.contains("skip-permissions")
             || lower.contains("skip permissions");
 
+        if verbose {
+            println!(
+                "        [verbose] Checking for bypass warning... found: {}",
+                has_bypass_warning
+            );
+        }
+
         if has_bypass_warning {
+            if verbose {
+                println!("        [verbose] Accepting bypass warning (Down + Enter)");
+            }
             sender.send_keys_raw(session, "Down")?;
             thread::sleep(Duration::from_millis(200));
             sender.send_keys_raw(session, "Enter")?;
             thread::sleep(Duration::from_millis(500));
         }
+    } else if verbose {
+        println!("        [verbose] Could not capture pane for bypass warning check");
     }
     Ok(())
 }

@@ -28,6 +28,10 @@ pub enum Commands {
         /// Disable patrol system
         #[arg(long)]
         no_patrol: bool,
+
+        /// Enable verbose logging
+        #[arg(long, short)]
+        verbose: bool,
     },
 
     /// Stop the LLMC daemon

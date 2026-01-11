@@ -13,7 +13,7 @@ use super::super::tmux::session;
 use super::super::worker;
 
 /// Runs the up command, starting the LLMC daemon
-pub fn run_up(no_patrol: bool) -> Result<()> {
+pub fn run_up(no_patrol: bool, verbose: bool) -> Result<()> {
     let llmc_root = config::get_llmc_root();
     if !llmc_root.exists() {
         bail!(
@@ -32,7 +32,7 @@ pub fn run_up(no_patrol: bool) -> Result<()> {
     let mut state = State::load(&state_path)?;
 
     ensure_tmux_running()?;
-    reconcile_and_start_workers(&config, &mut state)?;
+    reconcile_and_start_workers(&config, &mut state, verbose)?;
     state.save(&state_path)?;
 
     println!("✓ All workers started");
@@ -82,7 +82,7 @@ fn start_tmux_server() -> Result<()> {
     Ok(())
 }
 
-fn reconcile_and_start_workers(config: &Config, state: &mut State) -> Result<()> {
+fn reconcile_and_start_workers(config: &Config, state: &mut State, verbose: bool) -> Result<()> {
     println!("Reconciling workers with state...");
 
     let worker_names: Vec<String> = state.workers.keys().cloned().collect();
@@ -101,18 +101,22 @@ fn reconcile_and_start_workers(config: &Config, state: &mut State) -> Result<()>
             && worker_record.status == WorkerStatus::Offline
         {
             println!("  Starting worker '{}'...", worker_name);
-            start_worker(worker_name, config, state)?;
+            start_worker(worker_name, config, state, verbose)?;
         }
     }
 
     Ok(())
 }
 
-fn start_worker(name: &str, config: &Config, state: &mut State) -> Result<()> {
+fn start_worker(name: &str, config: &Config, state: &mut State, verbose: bool) -> Result<()> {
     let worker_record =
         state.get_worker(name).with_context(|| format!("Worker '{}' not found in state", name))?;
 
     let worktree_path = PathBuf::from(&worker_record.worktree_path);
+
+    if verbose {
+        println!("    [verbose] Checking worktree: {}", worktree_path.display());
+    }
 
     if !worktree_path.exists() {
         bail!(
@@ -129,15 +133,38 @@ fn start_worker(name: &str, config: &Config, state: &mut State) -> Result<()> {
         .get_worker(name)
         .with_context(|| format!("Worker '{}' not found in config", name))?;
 
+    if verbose {
+        println!("    [verbose] Session ID: {}", worker_record.session_id);
+        println!(
+            "    [verbose] Session exists: {}",
+            session::session_exists(&worker_record.session_id)
+        );
+    }
+
     if !session::session_exists(&worker_record.session_id) {
-        session::start_worker_session(&worker_record.session_id, &worktree_path, worker_config)?;
+        if verbose {
+            println!("    [verbose] Creating new TMUX session for worker '{}'", name);
+        }
+        session::start_worker_session(
+            &worker_record.session_id,
+            &worktree_path,
+            worker_config,
+            verbose,
+        )?;
     } else {
+        if verbose {
+            println!("    [verbose] Starting Claude in existing session");
+        }
         worker::start_claude_in_session(&worker_record.session_id, worker_config)?;
     }
 
     let worker_mut = state.get_worker_mut(name).unwrap();
     worker_mut.status = WorkerStatus::Idle;
     worker_mut.last_activity_unix = SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs();
+
+    if verbose {
+        println!("    [verbose] Worker '{}' marked as Idle", name);
+    }
 
     Ok(())
 }
