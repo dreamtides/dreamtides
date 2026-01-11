@@ -123,12 +123,23 @@ fn create_worktree_for_worker(repo: &Path, branch_name: &str, worktree_path: &Pa
 fn copy_tabula_to_worktree(repo: &Path, worktree_path: &Path) -> Result<()> {
     let source_tabula = repo.join("Tabula.xlsm");
 
-    if source_tabula.exists() {
-        println!("Copying Tabula.xlsm to worktree...");
-        let target_tabula = worktree_path.join("Tabula.xlsm");
-        fs::copy(&source_tabula, &target_tabula)
-            .context("Failed to copy Tabula.xlsm to worktree")?;
+    if !source_tabula.exists() {
+        return Ok(());
     }
+
+    let target_tabula = worktree_path.join("client/Assets/StreamingAssets/Tabula.xlsm");
+
+    if target_tabula.exists() {
+        return Ok(());
+    }
+
+    println!("Copying Tabula.xlsm to worktree...");
+
+    if let Some(parent) = target_tabula.parent() {
+        fs::create_dir_all(parent).context("Failed to create StreamingAssets directory")?;
+    }
+
+    fs::copy(&source_tabula, &target_tabula).context("Failed to copy Tabula.xlsm to worktree")?;
 
     Ok(())
 }

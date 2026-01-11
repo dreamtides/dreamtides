@@ -254,10 +254,19 @@ fn amend_commit_message(worktree_path: &Path, message: &str) -> Result<()> {
 
 fn copy_tabula_to_worktree(source_root: &Path, worktree_path: &Path) -> Result<()> {
     let source_file = source_root.join("Tabula.xlsm");
-    let dest_file = worktree_path.join("Tabula.xlsm");
+    let dest_file = worktree_path.join("client/Assets/StreamingAssets/Tabula.xlsm");
 
     if !source_file.exists() {
         return Ok(());
+    }
+
+    if dest_file.exists() {
+        return Ok(());
+    }
+
+    if let Some(parent) = dest_file.parent() {
+        fs::create_dir_all(parent)
+            .with_context(|| format!("Failed to create directory {}", parent.display()))?;
     }
 
     fs::copy(&source_file, &dest_file).with_context(|| {

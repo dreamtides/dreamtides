@@ -192,7 +192,16 @@ fn copy_tabula_xlsm(config: &Config, worktree_path: &Path) -> Result<()> {
         return Ok(());
     }
 
-    let dest_xlsm = worktree_path.join("Tabula.xlsm");
+    let dest_xlsm = worktree_path.join("client/Assets/StreamingAssets/Tabula.xlsm");
+
+    if dest_xlsm.exists() {
+        return Ok(());
+    }
+
+    if let Some(parent) = dest_xlsm.parent() {
+        fs::create_dir_all(parent)
+            .with_context(|| format!("Failed to create directory {}", parent.display()))?;
+    }
 
     fs::copy(&source_xlsm, &dest_xlsm).with_context(|| {
         format!("Failed to copy {} to {}", source_xlsm.display(), dest_xlsm.display())
