@@ -107,17 +107,18 @@ pub fn run_accept(worker: Option<String>) -> Result<()> {
 
     let new_commit_sha = git::get_head_commit(&worktree_path)?;
 
+    println!("Syncing local master with origin/master...");
+    git::checkout_branch(&llmc_root, "master")?;
+
     if git::has_uncommitted_changes(&llmc_root)? {
         bail!(
-            "The llmc root directory has uncommitted changes.\n\
+            "The master branch in llmc root has uncommitted changes.\n\
              This would result in data loss. Please commit or stash your changes first.\n\
              Directory: {}",
             llmc_root.display()
         );
     }
 
-    println!("Syncing local master with origin/master...");
-    git::checkout_branch(&llmc_root, "master")?;
     git::reset_to_ref(&llmc_root, "origin/master")?;
     let master_before = git::get_head_commit(&llmc_root)?;
 
@@ -155,17 +156,18 @@ pub fn run_accept(worker: Option<String>) -> Result<()> {
     let source_repo = PathBuf::from(&config.repo.source);
     git::fetch_from_local(&source_repo, &llmc_root, &new_commit_sha)?;
 
+    println!("Updating source repository...");
+    git::checkout_branch(&source_repo, "master")?;
+
     if git::has_uncommitted_changes(&source_repo)? {
         bail!(
-            "The source repository has uncommitted changes.\n\
+            "The master branch in source repository has uncommitted changes.\n\
              This would result in data loss. Please commit or stash your changes first.\n\
              Repository: {}",
             source_repo.display()
         );
     }
 
-    println!("Updating source repository...");
-    git::checkout_branch(&source_repo, "master")?;
     git::reset_to_ref(&source_repo, &new_commit_sha)?;
 
     let source_head = git::get_head_commit(&source_repo)?;
