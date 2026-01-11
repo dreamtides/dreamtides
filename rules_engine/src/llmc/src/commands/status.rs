@@ -5,7 +5,7 @@ use anyhow::{Result, bail};
 use serde::Serialize;
 
 use super::super::config;
-use super::super::state::{self, State, WorkerStatus};
+use super::super::state::{State, WorkerStatus};
 
 /// Runs the status command, displaying the current state of all workers
 pub fn run_status(json: bool) -> Result<()> {
@@ -18,8 +18,7 @@ pub fn run_status(json: bool) -> Result<()> {
         );
     }
 
-    let state_path = state::get_state_path();
-    let state = State::load(&state_path)?;
+    let (state, _config) = super::load_state_with_patrol()?;
 
     if state.workers.is_empty() {
         if json {

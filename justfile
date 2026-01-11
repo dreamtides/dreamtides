@@ -281,6 +281,9 @@ parser-release *args='':
 llmc *args='':
   cargo run --manifest-path rules_engine/Cargo.toml -p llmc -- "$@"
 
+llmc-watch:
+  cargo watch -C rules_engine -w src/llmc -s 'just llmc down 2>/dev/null || true; sleep 1; cargo build -p llmc && just llmc up'
+
 tabula *args='':
   cargo run --manifest-path rules_engine/Cargo.toml -p tabula_cli -- "$@"
 

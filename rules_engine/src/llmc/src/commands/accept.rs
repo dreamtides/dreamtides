@@ -4,7 +4,7 @@ use std::process::Command;
 
 use anyhow::{Context, Result, bail};
 
-use super::super::state::{self, State, WorkerStatus};
+use super::super::state::{State, WorkerStatus};
 use super::super::tmux::sender::TmuxSender;
 use super::super::worker::{self, WorkerTransition};
 use super::super::{config, git};
@@ -21,8 +21,7 @@ pub fn run_accept(worker: Option<String>) -> Result<()> {
         );
     }
 
-    let state_path = state::get_state_path();
-    let mut state = State::load(&state_path)?;
+    let (mut state, _config) = super::load_state_with_patrol()?;
 
     let worker_name = if let Some(name) = worker {
         if state.get_worker(&name).is_none() {
@@ -103,7 +102,7 @@ pub fn run_accept(worker: Option<String>) -> Result<()> {
     let worker_mut = state.get_worker_mut(&worker_name).unwrap();
     worker::apply_transition(worker_mut, WorkerTransition::ToIdle)?;
 
-    state.save(&state_path)?;
+    state.save(&super::super::state::get_state_path())?;
 
     println!("✓ Worker '{}' changes accepted!", worker_name);
     println!("  New commit: {}", &new_commit_sha[..7.min(new_commit_sha.len())]);
@@ -170,7 +169,7 @@ pub fn run_accept(worker: Option<String>) -> Result<()> {
             }
         }
 
-        state.save(&state_path)?;
+        state.save(&super::super::state::get_state_path())?;
     }
 
     Ok(())

@@ -4,7 +4,7 @@ use std::path::{Path, PathBuf};
 use anyhow::{Context, Result, bail};
 
 use super::super::config::{self, Config};
-use super::super::state::{self, State, WorkerRecord, WorkerStatus};
+use super::super::state::{State, WorkerRecord, WorkerStatus};
 use super::super::tmux::sender::TmuxSender;
 use super::super::{git, worker};
 
@@ -25,11 +25,7 @@ pub fn run_start(
         );
     }
 
-    let config_path = config::get_config_path();
-    let config = Config::load(&config_path)?;
-
-    let state_path = state::get_state_path();
-    let mut state = State::load(&state_path)?;
+    let (mut state, config) = super::load_state_with_patrol()?;
 
     let worker_name = select_worker(&worker, &config, &state)?;
 
@@ -73,7 +69,7 @@ pub fn run_start(
         prompt: full_prompt,
     })?;
 
-    state.save(&state_path)?;
+    state.save(&super::super::state::get_state_path())?;
 
     println!("✓ Worker '{}' started on task", worker_name);
     Ok(())

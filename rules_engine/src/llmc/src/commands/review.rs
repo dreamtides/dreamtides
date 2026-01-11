@@ -4,7 +4,7 @@ use std::process::Command;
 
 use anyhow::{Context, Result, bail};
 
-use super::super::state::{self, State, WorkerStatus};
+use super::super::state::{State, WorkerStatus};
 use super::super::{config, git};
 
 #[derive(Debug, Clone, Copy)]
@@ -22,8 +22,7 @@ pub fn run_review(worker: Option<String>, interface: ReviewInterface) -> Result<
         std::process::exit(1);
     }
 
-    let state_path = state::get_state_path();
-    let state = State::load(&state_path)?;
+    let (state, _config) = super::load_state_with_patrol()?;
 
     let worker_name = if let Some(name) = worker {
         if state.get_worker(&name).is_none() {

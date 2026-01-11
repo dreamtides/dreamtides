@@ -2,7 +2,7 @@ use std::time::{SystemTime, UNIX_EPOCH};
 
 use anyhow::{Context, Result, bail};
 
-use super::super::state::{self, State, WorkerStatus};
+use super::super::state::{State, WorkerStatus};
 use super::super::tmux::sender::TmuxSender;
 use super::super::{config, worker};
 
@@ -17,8 +17,7 @@ pub fn run_message(worker: &str, message: &str) -> Result<()> {
         );
     }
 
-    let state_path = state::get_state_path();
-    let mut state = State::load(&state_path)?;
+    let (mut state, _config) = super::load_state_with_patrol()?;
 
     let worker_record = state.get_worker(worker).ok_or_else(|| {
         anyhow::anyhow!(
@@ -50,7 +49,7 @@ pub fn run_message(worker: &str, message: &str) -> Result<()> {
         worker_mut.last_activity_unix = SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs();
     }
 
-    state.save(&state_path)?;
+    state.save(&super::super::state::get_state_path())?;
 
     println!("✓ Message sent to worker '{}'", worker);
     if was_needs_input {
