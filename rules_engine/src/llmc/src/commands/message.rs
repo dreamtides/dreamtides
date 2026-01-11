@@ -2,9 +2,9 @@ use std::time::{SystemTime, UNIX_EPOCH};
 
 use anyhow::{Context, Result, bail};
 
+use super::super::config;
 use super::super::state::{State, WorkerStatus};
 use super::super::tmux::sender::TmuxSender;
-use super::super::{config, worker};
 
 /// Runs the message command, sending a follow-up message to a worker
 pub fn run_message(worker: &str, message: &str) -> Result<()> {
@@ -37,24 +37,12 @@ pub fn run_message(worker: &str, message: &str) -> Result<()> {
         .send(&worker_record.session_id, message)
         .with_context(|| format!("Failed to send message to worker '{}'", worker))?;
 
-    let was_needs_input = worker_record.status == WorkerStatus::NeedsInput;
-
     let worker_mut = state.get_worker_mut(worker).unwrap();
-
-    if was_needs_input {
-        worker::apply_transition(worker_mut, worker::WorkerTransition::ToWorking {
-            prompt: worker_mut.current_prompt.clone(),
-        })?;
-    } else {
-        worker_mut.last_activity_unix = SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs();
-    }
+    worker_mut.last_activity_unix = SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs();
 
     state.save(&super::super::state::get_state_path())?;
 
     println!("✓ Message sent to worker '{}'", worker);
-    if was_needs_input {
-        println!("  Worker transitioned from needs_input to working");
-    }
 
     Ok(())
 }
@@ -62,7 +50,6 @@ pub fn run_message(worker: &str, message: &str) -> Result<()> {
 fn verify_valid_state_for_message(worker: &str, status: WorkerStatus) -> Result<()> {
     match status {
         WorkerStatus::Working
-        | WorkerStatus::NeedsInput
         | WorkerStatus::NeedsReview
         | WorkerStatus::Rejected
         | WorkerStatus::Rebasing
@@ -70,7 +57,7 @@ fn verify_valid_state_for_message(worker: &str, status: WorkerStatus) -> Result<
         _ => {
             bail!(
                 "Worker '{}' is in state {:?}, which cannot receive messages\n\
-                 Valid states for messaging: Working, NeedsInput, NeedsReview, Rejected, Rebasing, Error",
+                 Valid states for messaging: Working, NeedsReview, Rejected, Rebasing, Error",
                 worker,
                 status
             )

@@ -28,8 +28,6 @@ pub enum WorkerTransition {
     ToIdle,
     /// Transition to working state with the given prompt
     ToWorking { prompt: String },
-    /// Transition to needs input state
-    ToNeedsInput,
     /// Transition to needs review state with the commit SHA
     ToNeedsReview { commit_sha: String },
     /// Transition to rejected state with feedback
@@ -57,16 +55,11 @@ pub fn initialize_worker(name: &str, config: &Config, state: &mut State) -> Resu
 pub fn can_transition(from: &WorkerStatus, to: &WorkerStatus) -> bool {
     matches!(
         (from, to),
-        (
-            WorkerStatus::Idle | WorkerStatus::NeedsInput | WorkerStatus::Rebasing,
-            WorkerStatus::Working
-        ) | (
-            WorkerStatus::Working
-                | WorkerStatus::Rejected
-                | WorkerStatus::Rebasing
-                | WorkerStatus::NeedsInput,
-            WorkerStatus::NeedsReview
-        ) | (WorkerStatus::Working | WorkerStatus::Rebasing, WorkerStatus::NeedsInput)
+        (WorkerStatus::Idle | WorkerStatus::Rebasing, WorkerStatus::Working)
+            | (
+                WorkerStatus::Working | WorkerStatus::Rejected | WorkerStatus::Rebasing,
+                WorkerStatus::NeedsReview
+            )
             | (WorkerStatus::NeedsReview | WorkerStatus::Rejected, WorkerStatus::Idle)
             | (WorkerStatus::NeedsReview | WorkerStatus::Rebasing, WorkerStatus::Rejected)
             | (_, WorkerStatus::Rebasing | WorkerStatus::Error | WorkerStatus::Offline)
@@ -83,7 +76,6 @@ pub fn apply_transition(worker: &mut WorkerRecord, transition: WorkerTransition)
             worker.current_prompt = prompt.clone();
             WorkerStatus::Working
         }
-        WorkerTransition::ToNeedsInput => WorkerStatus::NeedsInput,
         WorkerTransition::ToNeedsReview { commit_sha } => {
             worker.commit_sha = Some(commit_sha.clone());
             WorkerStatus::NeedsReview
@@ -275,14 +267,6 @@ mod tests {
     #[test]
     fn test_can_transition_working_to_needs_review() {
         assert!(can_transition(&WorkerStatus::Working, &WorkerStatus::NeedsReview));
-    }
-    #[test]
-    fn test_can_transition_working_to_needs_input() {
-        assert!(can_transition(&WorkerStatus::Working, &WorkerStatus::NeedsInput));
-    }
-    #[test]
-    fn test_can_transition_needs_input_to_working() {
-        assert!(can_transition(&WorkerStatus::NeedsInput, &WorkerStatus::Working));
     }
     #[test]
     fn test_can_transition_needs_review_to_idle() {

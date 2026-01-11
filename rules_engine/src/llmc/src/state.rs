@@ -17,8 +17,6 @@ pub enum WorkerStatus {
     Idle,
     /// Worker is actively implementing a task
     Working,
-    /// Worker stopped without committing, likely waiting for clarification
-    NeedsInput,
     /// Worker completed work and committed, awaiting human review
     NeedsReview,
     /// Work was rejected with feedback, worker is implementing changes
@@ -361,7 +359,6 @@ mod tests {
         let statuses = vec![
             (WorkerStatus::Idle, "\"idle\""),
             (WorkerStatus::Working, "\"working\""),
-            (WorkerStatus::NeedsInput, "\"needs_input\""),
             (WorkerStatus::NeedsReview, "\"needs_review\""),
             (WorkerStatus::Rejected, "\"rejected\""),
             (WorkerStatus::Rebasing, "\"rebasing\""),

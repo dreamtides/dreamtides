@@ -192,10 +192,10 @@ fn attempt_state_repairs(state: &mut State, report: &mut DoctorReport) -> usize 
                 ));
                 repairs += 1;
             } else {
-                worker.status = WorkerStatus::NeedsInput;
+                worker.status = WorkerStatus::Working;
                 worker.commit_sha = None;
                 report.repairs_succeeded.push(format!(
-                    "Reset {} from needs_review to needs_input (no commit found)",
+                    "Reset {} from needs_review to working (no commit found)",
                     worker.name
                 ));
                 repairs += 1;
@@ -203,10 +203,10 @@ fn attempt_state_repairs(state: &mut State, report: &mut DoctorReport) -> usize 
         }
 
         if worker.status == WorkerStatus::Working && worker.current_prompt.is_empty() {
-            worker.status = WorkerStatus::NeedsInput;
+            worker.status = WorkerStatus::Idle;
             report
                 .repairs_succeeded
-                .push(format!("Reset {} from working to needs_input (no prompt)", worker.name));
+                .push(format!("Reset {} from working to idle (no prompt)", worker.name));
             repairs += 1;
         }
 

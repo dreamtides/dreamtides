@@ -133,7 +133,6 @@ fn format_status_json(status: WorkerStatus) -> String {
     match status {
         WorkerStatus::Idle => "idle".to_string(),
         WorkerStatus::Working => "working".to_string(),
-        WorkerStatus::NeedsInput => "needs_input".to_string(),
         WorkerStatus::NeedsReview => "needs_review".to_string(),
         WorkerStatus::Rejected => "rejected".to_string(),
         WorkerStatus::Rebasing => "rebasing".to_string(),
@@ -150,7 +149,6 @@ fn format_status_colored(status: WorkerStatus) -> String {
     let (color_code, text) = match status {
         WorkerStatus::Idle => ("\x1b[32m", "idle"),
         WorkerStatus::Working => ("\x1b[33m", "working"),
-        WorkerStatus::NeedsInput => ("\x1b[36m", "needs_input"),
         WorkerStatus::NeedsReview => ("\x1b[34m", "needs_review"),
         WorkerStatus::Rejected => ("\x1b[31m", "rejected"),
         WorkerStatus::Rebasing => ("\x1b[35m", "rebasing"),

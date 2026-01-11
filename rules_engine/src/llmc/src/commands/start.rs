@@ -6,7 +6,8 @@ use anyhow::{Context, Result, bail};
 
 use super::super::config::{self, Config};
 use super::super::state::{State, WorkerRecord, WorkerStatus};
-use super::super::tmux::{sender::TmuxSender, session};
+use super::super::tmux::sender::TmuxSender;
+use super::super::tmux::session;
 use super::super::{git, worker};
 
 /// Runs the start command, assigning a task to an idle worker

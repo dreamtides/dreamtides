@@ -487,12 +487,11 @@ impl RecoveryManager {
                 return Ok(());
             }
 
-            tracing::info!("No commit found, transitioning to needs_input");
-            worker.status = WorkerStatus::NeedsInput;
+            tracing::info!("No commit found, keeping in working state");
             self.log_recovery_action(
                 &worker.name,
-                RecoveryAction::StuckWorker { action: "no_commit".to_string() },
-                "Transitioned to needs_input",
+                RecoveryAction::StuckWorker { action: "no_commit_keep_working".to_string() },
+                "Keeping in working state (no commit found)",
                 true,
             )?;
             return Ok(());
@@ -519,11 +518,10 @@ impl RecoveryManager {
                     return Ok(());
                 }
 
-                worker.status = WorkerStatus::NeedsInput;
                 self.log_recovery_action(
                     &worker.name,
                     RecoveryAction::StuckWorker { action: "timeout".to_string() },
-                    "Marked as needs_input after timeout",
+                    "Worker still stuck after timeout, keeping in working state",
                     true,
                 )?;
             }
