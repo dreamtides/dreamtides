@@ -35,6 +35,9 @@ pub fn run_add(name: &str, model: Option<String>, role_prompt: Option<String>) -
 
     println!("Adding worker: {}", name);
 
+    println!("Fetching latest master...");
+    git::fetch_origin(&llmc_root)?;
+
     let branch_name = format!("llmc/{}", name);
     let worktree_path = llmc_root.join(".worktrees").join(name);
 
@@ -91,14 +94,14 @@ fn validate_worker_name(name: &str) -> Result<()> {
 }
 
 fn create_branch(repo: &Path, branch_name: &str) -> Result<()> {
-    println!("Creating branch {}...", branch_name);
+    println!("Creating branch {} from origin/master...", branch_name);
 
     if git::branch_exists(repo, branch_name) {
         println!("  Branch already exists (reusing)");
         return Ok(());
     }
 
-    git::create_branch(repo, branch_name, "HEAD")?;
+    git::create_branch(repo, branch_name, "origin/master")?;
     Ok(())
 }
 

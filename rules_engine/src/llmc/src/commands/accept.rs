@@ -149,9 +149,12 @@ pub fn run_accept(worker: Option<String>) -> Result<()> {
     git::remove_worktree(&llmc_root, &worktree_path, false)?;
     git::delete_branch(&llmc_root, &worker_record.branch, true)?;
 
+    println!("Fetching to update origin/master ref...");
+    git::fetch_origin(&llmc_root)?;
+
     println!("Recreating worker worktree...");
     let branch_name = format!("llmc/{}", worker_name);
-    git::create_branch(&llmc_root, &branch_name, "master")?;
+    git::create_branch(&llmc_root, &branch_name, "origin/master")?;
     git::create_worktree(&llmc_root, &branch_name, &worktree_path)?;
     copy_tabula_to_worktree(&llmc_root, &worktree_path)?;
 
