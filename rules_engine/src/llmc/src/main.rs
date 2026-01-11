@@ -25,7 +25,7 @@ use crate::logging::config as log_config;
 async fn main() -> Result<()> {
     let cli = Cli::parse();
 
-    if let Err(e) = log_config::init_logging() {
+    if let Err(e) = log_config::init_logging(cli.verbose) {
         eprintln!("Warning: Failed to initialize logging: {e}");
     }
 
