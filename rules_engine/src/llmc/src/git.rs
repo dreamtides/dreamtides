@@ -6,6 +6,8 @@ use std::process::Command;
 use anyhow::{Context, Result, bail};
 use regex::Regex;
 
+use crate::logging::git as logging_git;
+
 /// Information about a git worktree
 #[derive(Debug, Clone, PartialEq)]
 pub struct WorktreeInfo {
@@ -45,7 +47,7 @@ pub fn create_worktree(repo: &Path, branch: &str, worktree_path: &Path) -> Resul
     };
 
     let duration_ms = start.elapsed().as_millis() as u64;
-    let after = crate::logging::git::capture_state(worktree_path).ok();
+    let after = logging_git::capture_state(worktree_path).ok();
 
     match &result {
         Ok(_) => {
@@ -327,7 +329,7 @@ pub fn amend_uncommitted_changes(worktree: &Path) -> Result<()> {
 
 /// Rebases the worktree onto the target branch
 pub fn rebase_onto(worktree: &Path, target: &str) -> Result<RebaseResult> {
-    let before = crate::logging::git::capture_state(worktree).ok();
+    let before = logging_git::capture_state(worktree).ok();
     let start = std::time::Instant::now();
 
     let output = Command::new("git")
@@ -350,7 +352,7 @@ pub fn rebase_onto(worktree: &Path, target: &str) -> Result<RebaseResult> {
         }
     };
 
-    let after = crate::logging::git::capture_state(worktree).ok();
+    let after = logging_git::capture_state(worktree).ok();
     let duration_ms = start.elapsed().as_millis() as u64;
 
     match &result {
@@ -425,7 +427,7 @@ pub fn get_conflicted_files(worktree: &Path) -> Result<Vec<String>> {
 
 /// Aborts an in-progress rebase
 pub fn abort_rebase(worktree: &Path) -> Result<()> {
-    let before = crate::logging::git::capture_state(worktree).ok();
+    let before = logging_git::capture_state(worktree).ok();
     let start = std::time::Instant::now();
 
     let output = Command::new("git")
@@ -442,7 +444,7 @@ pub fn abort_rebase(worktree: &Path) -> Result<()> {
         Err(anyhow::anyhow!("Failed to abort rebase: {}", String::from_utf8_lossy(&output.stderr)))
     };
 
-    let after = crate::logging::git::capture_state(worktree).ok();
+    let after = logging_git::capture_state(worktree).ok();
     let duration_ms = start.elapsed().as_millis() as u64;
 
     match &result {
@@ -478,7 +480,7 @@ pub fn abort_rebase(worktree: &Path) -> Result<()> {
 
 /// Continues an in-progress rebase
 pub fn continue_rebase(worktree: &Path) -> Result<()> {
-    let before = crate::logging::git::capture_state(worktree).ok();
+    let before = logging_git::capture_state(worktree).ok();
     let start = std::time::Instant::now();
 
     let output = Command::new("git")
@@ -498,7 +500,7 @@ pub fn continue_rebase(worktree: &Path) -> Result<()> {
         ))
     };
 
-    let after = crate::logging::git::capture_state(worktree).ok();
+    let after = logging_git::capture_state(worktree).ok();
     let duration_ms = start.elapsed().as_millis() as u64;
 
     match &result {
@@ -552,7 +554,7 @@ pub fn squash_commits(worktree: &Path, base: &str) -> Result<()> {
 
 /// Performs a fast-forward merge of the specified branch
 pub fn fast_forward_merge(repo: &Path, branch: &str) -> Result<()> {
-    let before = crate::logging::git::capture_state(repo).ok();
+    let before = logging_git::capture_state(repo).ok();
     let start = std::time::Instant::now();
 
     let output = Command::new("git")
@@ -573,7 +575,7 @@ pub fn fast_forward_merge(repo: &Path, branch: &str) -> Result<()> {
         ))
     };
 
-    let after = crate::logging::git::capture_state(repo).ok();
+    let after = logging_git::capture_state(repo).ok();
     let duration_ms = start.elapsed().as_millis() as u64;
 
     match &result {
@@ -698,7 +700,7 @@ pub fn reset_to_ref(repo: &Path, ref_name: &str) -> Result<()> {
 
 /// Pushes master branch to origin
 pub fn push_master_to_origin(repo: &Path) -> Result<()> {
-    let before = crate::logging::git::capture_state(repo).ok();
+    let before = logging_git::capture_state(repo).ok();
     let start = std::time::Instant::now();
 
     let output = Command::new("git")

@@ -19,12 +19,13 @@ use crate::commands::{
     accept, add, attach, doctor, down, init, message, nuke, rebase, reject, review, start, status,
     up,
 };
+use crate::logging::config as log_config;
 
 #[tokio::main]
 async fn main() -> Result<()> {
     let cli = Cli::parse();
 
-    if let Err(e) = logging::init_logging() {
+    if let Err(e) = log_config::init_logging() {
         eprintln!("Warning: Failed to initialize logging: {e}");
     }
 
