@@ -221,6 +221,14 @@ impl Patrol {
         );
 
         if has_commits {
+            if git::has_uncommitted_changes(worktree_path)? {
+                tracing::info!(
+                    "Worker {} has commits and uncommitted changes, amending before transitioning to needs_review",
+                    session_id
+                );
+                git::amend_uncommitted_changes(worktree_path)?;
+            }
+
             let commit_sha = git::get_head_commit(worktree_path)?;
             tracing::info!(
                 "Worker {} has commits ahead, transitioning to needs_review (sha: {})",
@@ -255,6 +263,13 @@ impl Patrol {
 
     fn detect_needs_input_transition(&self, worktree_path: &Path) -> Result<WorkerTransition> {
         if git::has_commits_ahead_of(worktree_path, "origin/master")? {
+            if git::has_uncommitted_changes(worktree_path)? {
+                tracing::info!(
+                    "Worker in needs_input state has uncommitted changes, amending before correcting to needs_review"
+                );
+                git::amend_uncommitted_changes(worktree_path)?;
+            }
+
             let commit_sha = git::get_head_commit(worktree_path)?;
             tracing::warn!(
                 "Worker in needs_input state has commits ahead (sha: {}), correcting to needs_review",
@@ -275,11 +290,25 @@ impl Patrol {
             let output = session::capture_pane(session_id, 50)?;
 
             if output.contains("Successfully rebased") || output.contains("git rebase --continue") {
+                if git::has_uncommitted_changes(worktree_path)? {
+                    tracing::info!(
+                        "Worker {} completed rebase with uncommitted changes, amending",
+                        session_id
+                    );
+                    git::amend_uncommitted_changes(worktree_path)?;
+                }
                 let commit_sha = git::get_head_commit(worktree_path)?;
                 return Ok(WorkerTransition::ToNeedsReview { commit_sha });
             }
 
             if output.contains("rebase --abort") {
+                if git::has_uncommitted_changes(worktree_path)? {
+                    tracing::info!(
+                        "Worker {} aborted rebase with uncommitted changes, amending",
+                        session_id
+                    );
+                    git::amend_uncommitted_changes(worktree_path)?;
+                }
                 return Ok(WorkerTransition::ToNeedsReview {
                     commit_sha: git::get_head_commit(worktree_path)?,
                 });
