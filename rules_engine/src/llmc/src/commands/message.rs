@@ -61,11 +61,16 @@ pub fn run_message(worker: &str, message: &str) -> Result<()> {
 
 fn verify_valid_state_for_message(worker: &str, status: WorkerStatus) -> Result<()> {
     match status {
-        WorkerStatus::Working | WorkerStatus::NeedsInput | WorkerStatus::Rejected => Ok(()),
+        WorkerStatus::Working
+        | WorkerStatus::NeedsInput
+        | WorkerStatus::NeedsReview
+        | WorkerStatus::Rejected
+        | WorkerStatus::Rebasing
+        | WorkerStatus::Error => Ok(()),
         _ => {
             bail!(
                 "Worker '{}' is in state {:?}, which cannot receive messages\n\
-                 Valid states for messaging: Working, NeedsInput, Rejected",
+                 Valid states for messaging: Working, NeedsInput, NeedsReview, Rejected, Rebasing, Error",
                 worker,
                 status
             )
