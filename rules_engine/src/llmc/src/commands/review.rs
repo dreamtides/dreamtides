@@ -17,11 +17,9 @@ pub enum ReviewInterface {
 pub fn run_review(worker: Option<String>, interface: ReviewInterface) -> Result<()> {
     let llmc_root = config::get_llmc_root();
     if !llmc_root.exists() {
-        bail!(
-            "LLMC workspace not initialized. Run 'llmc init' first.\n\
-             Expected workspace at: {}",
-            llmc_root.display()
-        );
+        eprintln!("LLMC workspace not initialized. Run 'llmc init' first.");
+        eprintln!("Expected workspace at: {}", llmc_root.display());
+        std::process::exit(1);
     }
 
     let state_path = state::get_state_path();
@@ -29,18 +27,17 @@ pub fn run_review(worker: Option<String>, interface: ReviewInterface) -> Result<
 
     let worker_name = if let Some(name) = worker {
         if state.get_worker(&name).is_none() {
-            bail!(
-                "Worker '{}' not found\n\
-                 Available workers: {}",
-                name,
-                format_all_workers(&state)
-            );
+            eprintln!("Worker '{}' not found", name);
+            eprintln!("Available workers: {}", format_all_workers(&state));
+            std::process::exit(1);
         }
         name
     } else {
         let needs_review = state.get_workers_needing_review();
         if needs_review.is_empty() {
-            bail!("No workers need review");
+            eprintln!("No workers need review");
+            eprintln!("\nRun 'llmc status' to see current worker states.");
+            std::process::exit(1);
         }
         needs_review[0].name.clone()
     };
@@ -48,13 +45,12 @@ pub fn run_review(worker: Option<String>, interface: ReviewInterface) -> Result<
     let worker_record = state.get_worker(&worker_name).unwrap();
 
     if worker_record.status != WorkerStatus::NeedsReview {
-        bail!(
-            "Worker '{}' is in state {:?}, not needs_review\n\
-             Workers needing review: {}",
-            worker_name,
-            worker_record.status,
-            format_needs_review_workers(&state)
+        eprintln!(
+            "Worker '{}' is in state {:?}, not needs_review",
+            worker_name, worker_record.status
         );
+        eprintln!("Workers needing review: {}", format_needs_review_workers(&state));
+        std::process::exit(1);
     }
 
     let Some(commit_sha) = &worker_record.commit_sha else {

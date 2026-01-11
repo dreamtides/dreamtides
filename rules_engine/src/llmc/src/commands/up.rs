@@ -183,6 +183,9 @@ fn run_main_loop(
     while !shutdown.load(Ordering::SeqCst) {
         thread::sleep(Duration::from_secs(1));
 
+        // Reload state to pick up changes from other commands (e.g., llmc start)
+        *state = State::load(state_path)?;
+
         poll_worker_states(state)?;
         state.save(state_path)?;
 
