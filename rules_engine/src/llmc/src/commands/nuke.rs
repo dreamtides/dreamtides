@@ -50,26 +50,42 @@ pub fn run_nuke(worker: Option<&str>, all: bool) -> Result<()> {
             return Ok(());
         }
 
+        let total_count = worker_names.len();
+        let mut nuked_count = 0;
         for name in worker_names {
-            nuke_worker(&mut state, &llmc_root, &name)?;
+            if nuke_worker(&mut state, &llmc_root, &name)? {
+                nuked_count += 1;
+            }
         }
 
-        state.save(&state_path)?;
-        println!("✓ All workers have been nuked");
+        if nuked_count > 0 {
+            state.save(&state_path)?;
+            println!("✓ {} worker(s) have been nuked", nuked_count);
+            if nuked_count < total_count {
+                tracing::info!(
+                    "Nuked {} out of {} workers (some operations were cancelled)",
+                    nuked_count,
+                    total_count
+                );
+            }
+        } else {
+            tracing::info!("All nuke operations were cancelled");
+        }
     } else {
         let Some(worker) = worker else {
             bail!("Worker name required (or use --all to nuke all workers)");
         };
 
-        nuke_worker(&mut state, &llmc_root, worker)?;
-        state.save(&state_path)?;
-        println!("✓ Worker '{}' has been nuked", worker);
+        if nuke_worker(&mut state, &llmc_root, worker)? {
+            state.save(&state_path)?;
+            println!("✓ Worker '{}' has been nuked", worker);
+        }
     }
 
     Ok(())
 }
 
-fn nuke_worker(state: &mut State, llmc_root: &Path, worker: &str) -> Result<()> {
+fn nuke_worker(state: &mut State, llmc_root: &Path, worker: &str) -> Result<bool> {
     let worker_record = state.get_worker(worker).ok_or_else(|| {
         anyhow::anyhow!(
             "Worker '{}' not found\n\
@@ -84,8 +100,9 @@ fn nuke_worker(state: &mut State, llmc_root: &Path, worker: &str) -> Result<()> 
     let branch = worker_record.branch.clone();
 
     if !confirm_nuke(worker, &session_id, &worktree_path, &branch)? {
+        tracing::info!("User cancelled nuke operation for worker '{}'", worker);
         println!("Cancelled nuking '{}'.", worker);
-        return Ok(());
+        return Ok(false);
     }
 
     println!("Nuking worker '{}'...", worker);
@@ -119,7 +136,8 @@ fn nuke_worker(state: &mut State, llmc_root: &Path, worker: &str) -> Result<()> 
         println!("  ✓ Removed from config.toml (if present)");
     }
 
-    Ok(())
+    tracing::info!("Successfully nuked worker '{}'", worker);
+    Ok(true)
 }
 
 fn confirm_nuke(
