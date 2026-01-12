@@ -2,7 +2,6 @@
 
 ## Overview
 
-- LLMC v2 is a complete rewrite of the LLMC agent coordination system
 - Manages multiple Claude Code CLI sessions running in parallel git worktrees
 - Uses TMUX for persistent session management
 - Enables coordinated development work across multiple workers
