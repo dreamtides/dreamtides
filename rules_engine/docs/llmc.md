@@ -4,6 +4,8 @@
 
 LLMC v2 manages multiple Claude Code CLI sessions running in parallel git worktrees, using TMUX for persistent session management. This enables coordinated development work across multiple workers while maintaining a clean single-commit workflow on the master branch.
 
+These architectural choices deliver three core benefits: improved reliability through persistent sessions that survive temporary failures and maintain worker context across tasks, better debugging via interactive access that allows direct inspection and intervention in worker sessions when needed, and streamlined workflow through automated state management that handles rebasing, conflict detection, and task coordination without manual intervention.
+
 ## Architecture Principles
 
 - Isolated execution environments prevent interference
