@@ -102,6 +102,35 @@ pub fn run_accept(worker: Option<String>) -> Result<()> {
     let base_commit = "origin/master";
     git::squash_commits(&worktree_path, base_commit)?;
 
+    // Check if there are any changes to commit after the squash
+    // This can happen if another worker already merged the same changes
+    if !git::has_staged_changes(&worktree_path)? {
+        println!("\n✓ Worker's changes already incorporated into master");
+        println!("  No new changes to merge - another worker likely made the same changes");
+
+        // Clean up the worker's branch and worktree
+        println!("Cleaning up worktree and branch...");
+        git::remove_worktree(&llmc_root, &worktree_path, false)?;
+        git::delete_branch(&llmc_root, &worker_record.branch, true)?;
+
+        println!("Syncing llmc repo with source...");
+        git::fetch_origin(&llmc_root)?;
+
+        println!("Recreating worker worktree...");
+        let branch_name = format!("llmc/{}", worker_name);
+        git::create_branch(&llmc_root, &branch_name, "origin/master")?;
+        git::create_worktree(&llmc_root, &branch_name, &worktree_path)?;
+        copy_tabula_to_worktree(&llmc_root, &worktree_path)?;
+
+        let worker_mut = state.get_worker_mut(&worker_name).unwrap();
+        worker::apply_transition(worker_mut, WorkerTransition::ToIdle)?;
+
+        state.save(&super::super::state::get_state_path())?;
+
+        println!("✓ Worker '{}' reset to idle state", worker_name);
+        return Ok(());
+    }
+
     println!("Creating squashed commit...");
     create_commit(&worktree_path, &cleaned_message)?;
 

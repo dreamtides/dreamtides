@@ -268,6 +268,22 @@ pub fn has_uncommitted_changes(worktree: &Path) -> Result<bool> {
     Ok(!output.stdout.is_empty())
 }
 
+/// Checks if there are staged changes ready to be committed
+pub fn has_staged_changes(worktree: &Path) -> Result<bool> {
+    let output = Command::new("git")
+        .arg("-C")
+        .arg(worktree)
+        .arg("diff")
+        .arg("--cached")
+        .arg("--quiet")
+        .output()
+        .context("Failed to execute git diff --cached")?;
+
+    // git diff --cached --quiet exits with 1 if there are staged changes, 0 if
+    // there aren't
+    Ok(!output.status.success())
+}
+
 /// Gets the commit message for a specific SHA
 pub fn get_commit_message(worktree: &Path, sha: &str) -> Result<String> {
     let output = Command::new("git")
