@@ -34,6 +34,20 @@ pub fn run_add(name: &str, model: Option<String>, role_prompt: Option<String>) -
         );
     }
 
+    let session_id = format!("llmc-{}", name);
+    if session::session_exists(&session_id) {
+        bail!(
+            "A TMUX session named '{}' already exists.\n\
+             This might be an orphaned session from a previous worker.\n\
+             \n\
+             To fix this:\n\
+             • Run 'llmc doctor --repair' to clean up orphaned sessions automatically\n\
+             • Or manually kill it: tmux kill-session -t {}",
+            session_id,
+            session_id
+        );
+    }
+
     println!("Adding worker: {}", name);
 
     println!("Fetching latest master...");
