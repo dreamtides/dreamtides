@@ -44,7 +44,10 @@ pub fn can_transition(from: &WorkerStatus, to: &WorkerStatus) -> bool {
         (from, to),
         (WorkerStatus::Idle | WorkerStatus::Rebasing, WorkerStatus::Working)
             | (
-                WorkerStatus::Working | WorkerStatus::Rejected | WorkerStatus::Rebasing,
+                WorkerStatus::Idle
+                    | WorkerStatus::Working
+                    | WorkerStatus::Rejected
+                    | WorkerStatus::Rebasing,
                 WorkerStatus::NeedsReview
             )
             | (WorkerStatus::NeedsReview | WorkerStatus::Rejected, WorkerStatus::Idle)
@@ -258,8 +261,8 @@ mod tests {
         assert!(can_transition(&WorkerStatus::Error, &WorkerStatus::Offline));
     }
     #[test]
-    fn test_cannot_transition_idle_to_needs_review() {
-        assert!(!can_transition(&WorkerStatus::Idle, &WorkerStatus::NeedsReview));
+    fn test_can_transition_idle_to_needs_review() {
+        assert!(can_transition(&WorkerStatus::Idle, &WorkerStatus::NeedsReview));
     }
     #[test]
     fn test_cannot_transition_idle_to_rejected() {
@@ -330,7 +333,7 @@ mod tests {
         assert_eq!(worker.commit_sha, Some("abc123".to_string()));
     }
     #[test]
-    fn test_apply_transition_invalid_fails() {
+    fn test_apply_transition_idle_to_needs_review() {
         let mut worker = WorkerRecord {
             name: "test".to_string(),
             worktree_path: "/tmp/test".to_string(),
@@ -344,11 +347,12 @@ mod tests {
             crash_count: 0,
             last_crash_unix: None,
         };
-        let result = apply_transition(&mut worker, WorkerTransition::ToNeedsReview {
+        apply_transition(&mut worker, WorkerTransition::ToNeedsReview {
             commit_sha: "abc123".to_string(),
-        });
-        assert!(result.is_err());
-        assert!(result.unwrap_err().to_string().contains("Invalid transition"));
+        })
+        .unwrap();
+        assert_eq!(worker.status, WorkerStatus::NeedsReview);
+        assert_eq!(worker.commit_sha, Some("abc123".to_string()));
     }
     #[test]
     fn test_apply_transition_none_does_nothing() {

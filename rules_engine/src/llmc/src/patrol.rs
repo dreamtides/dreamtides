@@ -177,6 +177,37 @@ impl Patrol {
             }
 
             if worker_status == WorkerStatus::Idle {
+                match git::has_commits_ahead_of(worktree_path, "origin/master") {
+                    Ok(true) => {
+                        tracing::info!(
+                            "Worker '{}' is idle but has commits ahead of master, transitioning to needs_review",
+                            worker_name
+                        );
+                        if git::has_uncommitted_changes(worktree_path)? {
+                            tracing::info!(
+                                "Worker '{}' has uncommitted changes, amending before transitioning to needs_review",
+                                worker_name
+                            );
+                            git::amend_uncommitted_changes(worktree_path)?;
+                        }
+                        let commit_sha = git::get_head_commit(worktree_path)?;
+                        let transition = WorkerTransition::ToNeedsReview { commit_sha };
+                        if let Some(worker_mut) = state.get_worker_mut(&worker_name) {
+                            worker::apply_transition(worker_mut, transition.clone())?;
+                            report.transitions_applied.push((worker_name.clone(), transition));
+                        }
+                        continue;
+                    }
+                    Ok(false) => {}
+                    Err(e) => {
+                        tracing::warn!(
+                            "Failed to check commits ahead for '{}': {}",
+                            worker_name,
+                            e
+                        );
+                    }
+                }
+
                 match git::is_worktree_clean(worktree_path) {
                     Ok(false) => {
                         tracing::warn!(
