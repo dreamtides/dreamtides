@@ -1,4 +1,4 @@
-use std::path::{Path, PathBuf};
+use std::path::Path;
 use std::thread;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
@@ -14,7 +14,6 @@ use crate::tmux::session;
 pub struct Worker {
     pub name: String,
     pub session_id: String,
-    pub worktree_path: PathBuf,
     pub sender: TmuxSender,
 }
 
@@ -37,17 +36,6 @@ pub enum WorkerTransition {
     ToError { reason: String },
     /// Transition to offline state
     ToOffline,
-}
-
-/// Initializes a worker, creating its session and starting Claude
-pub fn initialize_worker(name: &str, config: &Config, state: &mut State) -> Result<Worker> {
-    let worker_record =
-        state.get_worker(name).with_context(|| format!("Worker '{}' not found in state", name))?;
-    let worker_config = config
-        .get_worker(name)
-        .with_context(|| format!("Worker '{}' not found in config", name))?;
-    start_claude_in_session(&worker_record.session_id, worker_config)?;
-    Ok(Worker::new(worker_config, worker_record))
 }
 
 /// Validates whether a state transition is allowed
@@ -141,43 +129,6 @@ pub fn start_claude_in_session(session: &str, config: &WorkerConfig) -> Result<(
     Ok(())
 }
 
-/// Shuts down a worker gracefully
-pub fn shutdown_worker(worker: &Worker) -> Result<()> {
-    sender_ctrl_c(&worker.sender, &worker.session_id)?;
-    thread::sleep(Duration::from_millis(1000));
-    if session::session_exists(&worker.session_id) {
-        session::kill_session(&worker.session_id)?;
-    }
-    Ok(())
-}
-
-/// Builds the prompt preamble with context and instructions
-pub fn build_prompt_preamble(worker: &Worker) -> String {
-    let repo_root = worker
-        .worktree_path
-        .parent()
-        .and_then(|p| p.parent())
-        .map(|p| p.display().to_string())
-        .unwrap_or_else(|| "unknown".to_string());
-    format!(
-        r#"You are working in a git worktree located at: {}
-Repository root: {}
-
-IMPORTANT INSTRUCTIONS:
-- Follow all conventions specified in CLAUDE.md and other project documentation
-- Run validation commands as specified in the project (e.g., `just fmt`, `just check`, `just clippy`)
-- Create a SINGLE commit with all changes when complete (always exit with clean `git status`).
-- DO NOT push to remote - your work will be reviewed and merged by the coordinator
-- Do NOT read or modify files outside of your worktree
-- Use the project's code style and patterns
-
-Please implement the requested changes following these guidelines.
-"#,
-        worker.worktree_path.display(),
-        repo_root
-    )
-}
-
 /// Resets a worker to clean idle state by discarding changes and resetting to
 /// origin/master
 pub fn reset_worker_to_clean_state(
@@ -214,18 +165,6 @@ pub fn reset_worker_to_clean_state(
             .push(format!("Transitioned worker '{}' from {:?} to Idle", worker_name, old_status));
     }
     Ok(actions)
-}
-
-impl Worker {
-    /// Creates a new Worker from config and state
-    pub fn new(_config: &WorkerConfig, state: &WorkerRecord) -> Worker {
-        Worker {
-            name: state.name.clone(),
-            session_id: state.session_id.clone(),
-            worktree_path: PathBuf::from(&state.worktree_path),
-            sender: TmuxSender::new(),
-        }
-    }
 }
 
 /// Waits for Claude to be ready by polling for the ">" prompt
@@ -270,12 +209,6 @@ fn accept_bypass_warning(session: &str, sender: &TmuxSender) -> Result<()> {
         sender.send_keys_raw(session, "Enter")?;
         thread::sleep(Duration::from_millis(500));
     }
-    Ok(())
-}
-
-/// Sends Ctrl-C to a session
-fn sender_ctrl_c(sender: &TmuxSender, session: &str) -> Result<()> {
-    sender.send_keys_raw(session, "C-c")?;
     Ok(())
 }
 
@@ -435,19 +368,5 @@ mod tests {
         let old_status = worker.status;
         apply_transition(&mut worker, WorkerTransition::None).unwrap();
         assert_eq!(worker.status, old_status);
-    }
-    #[test]
-    fn test_build_prompt_preamble() {
-        let worker = Worker {
-            name: "test".to_string(),
-            session_id: "llmc-test".to_string(),
-            worktree_path: PathBuf::from("/home/user/llmc/.worktrees/test"),
-            sender: TmuxSender::new(),
-        };
-        let preamble = build_prompt_preamble(&worker);
-        assert!(preamble.contains("/home/user/llmc/.worktrees/test"));
-        assert!(preamble.contains("CLAUDE.md"));
-        assert!(preamble.contains("DO NOT push to remote"));
-        assert!(preamble.contains("SINGLE commit"));
     }
 }
