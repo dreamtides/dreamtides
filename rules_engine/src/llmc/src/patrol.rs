@@ -619,10 +619,11 @@ mod tests {
         let conflicts = vec!["src/main.rs".to_string(), "src/lib.rs".to_string()];
         let prompt = build_conflict_prompt(&conflicts);
 
-        assert!(prompt.contains("A rebase onto master has encountered conflicts"));
+        assert!(prompt.contains("REBASE CONFLICT DETECTED"));
         assert!(prompt.contains("src/main.rs"));
         assert!(prompt.contains("src/lib.rs"));
-        assert!(prompt.contains("Resolution steps:"));
+        assert!(prompt.contains("IMPORTANT - Resolution steps (must complete ALL steps):"));
         assert!(prompt.contains("git rebase --continue"));
+        assert!(prompt.contains("Successfully rebased and updated"));
     }
 }
