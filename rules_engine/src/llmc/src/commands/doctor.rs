@@ -267,10 +267,33 @@ fn check_worktrees(report: &mut DoctorReport, repair: bool) -> Result<()> {
         #[expect(clippy::iter_over_hash_type)]
         for worker_name in configured_workers {
             if !found_worktrees.contains(worker_name) {
-                report.warnings.push(DoctorWarning {
-                    message: format!("Worker '{}' worktree missing", worker_name),
-                    details: None,
-                });
+                if repair {
+                    let worker = state.workers.get(worker_name).unwrap();
+                    let worktree_path = std::path::Path::new(&worker.worktree_path);
+                    match super::add::recreate_missing_worktree(
+                        worker_name,
+                        &worker.branch,
+                        worktree_path,
+                    ) {
+                        Ok(()) => {
+                            report.repairs_succeeded.push(format!(
+                                "Recreated missing worktree for worker '{}'",
+                                worker_name
+                            ));
+                        }
+                        Err(e) => {
+                            report.repairs_failed.push(format!(
+                                "Failed to recreate worktree for worker '{}': {}",
+                                worker_name, e
+                            ));
+                        }
+                    }
+                } else {
+                    report.warnings.push(DoctorWarning {
+                        message: format!("Worker '{}' worktree missing", worker_name),
+                        details: None,
+                    });
+                }
             }
         }
     }

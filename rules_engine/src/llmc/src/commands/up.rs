@@ -11,6 +11,7 @@ use super::super::patrol::Patrol;
 use super::super::state::{self, State, WorkerStatus};
 use super::super::tmux::session;
 use super::super::{git, worker};
+use super::add;
 
 /// Runs the up command, starting the LLMC daemon
 pub fn run_up(no_patrol: bool, verbose: bool, force: bool) -> Result<()> {
@@ -193,14 +194,22 @@ fn start_worker(name: &str, config: &Config, state: &mut State, verbose: bool) -
     }
 
     if !worktree_path.exists() {
-        bail!(
-            "Worktree does not exist for worker '{}': {}\n\
-             Run 'llmc nuke {}' and 'llmc add {}' to recreate",
-            name,
-            worktree_path.display(),
-            name,
-            name
-        );
+        println!("  Worker '{}' worktree missing, recreating...", name);
+        match add::recreate_missing_worktree(name, &worker_record.branch, &worktree_path) {
+            Ok(()) => {
+                println!("  ✓ Worktree recreated successfully");
+            }
+            Err(e) => {
+                bail!(
+                    "Failed to recreate worktree for worker '{}': {}\n\
+                     Run 'llmc nuke {}' and 'llmc add {}' to manually recreate",
+                    name,
+                    e,
+                    name,
+                    name
+                );
+            }
+        }
     }
 
     let Some(worker_config) = config.get_worker(name) else {

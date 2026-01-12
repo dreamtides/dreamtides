@@ -100,6 +100,32 @@ pub fn run_add(name: &str, model: Option<String>, role_prompt: Option<String>) -
     Ok(())
 }
 
+/// Recreates a missing worktree for an existing worker
+pub fn recreate_missing_worktree(
+    worker_name: &str,
+    branch_name: &str,
+    worktree_path: &Path,
+) -> Result<()> {
+    let llmc_root = config::get_llmc_root();
+
+    tracing::info!(
+        "Recreating missing worktree for worker '{}' at {}",
+        worker_name,
+        worktree_path.display()
+    );
+
+    git::remove_worktree(&llmc_root, worktree_path, true)
+        .context("Failed to remove stale worktree registration")?;
+
+    git::fetch_origin(&llmc_root).context("Failed to fetch latest master")?;
+
+    create_branch(&llmc_root, branch_name)?;
+    create_worktree_for_worker(&llmc_root, branch_name, worktree_path)?;
+    copy_tabula_to_worktree(&llmc_root, worktree_path)?;
+
+    Ok(())
+}
+
 fn validate_worker_name(name: &str) -> Result<()> {
     if name.is_empty() {
         bail!("Worker name cannot be empty");
