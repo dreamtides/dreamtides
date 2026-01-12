@@ -471,7 +471,8 @@ impl Patrol {
             let worker = state.get_worker_mut(worker_name).unwrap();
             worker::apply_transition(worker, WorkerTransition::ToRebasing)?;
 
-            let conflict_prompt = build_conflict_prompt(&rebase_result.conflicts);
+            let conflict_prompt =
+                build_conflict_prompt(&rebase_result.conflicts, &worker.current_prompt);
 
             let sender = TmuxSender::new();
             sender.send(session_id, &conflict_prompt)?;
@@ -481,14 +482,26 @@ impl Patrol {
     }
 }
 
-fn build_conflict_prompt(conflicts: &[String]) -> String {
+fn build_conflict_prompt(conflicts: &[String], original_task: &str) -> String {
     let mut prompt = String::from(
         "REBASE CONFLICT DETECTED\n\
          \n\
          Master has advanced and your changes need to be rebased. The rebase has encountered conflicts.\n\
-         \n\
-         Conflicting files:\n",
+         \n",
     );
+
+    prompt.push_str(&format!(
+        "IMPORTANT - Your original task:\n\
+         \"{}\"\n\
+         \n\
+         DO NOT restart your task from scratch. Instead, INCORPORATE your existing changes/intent \n\
+         into the new repository state. Your goal is to apply the same logical changes you already \n\
+         made, but adapted to work with the new state of the files after master's changes.\n\
+         \n",
+        original_task.lines().take(3).collect::<Vec<_>>().join(" ")
+    ));
+
+    prompt.push_str("Conflicting files:\n");
 
     for file in conflicts {
         let conflict_count = count_conflict_markers(file);
@@ -499,13 +512,14 @@ fn build_conflict_prompt(conflicts: &[String]) -> String {
         "\n\
          IMPORTANT - Resolution steps (must complete ALL steps):\n\
          1. Read and understand the conflict markers in each file (<<<<<<, =======, >>>>>>>)\n\
-         2. Decide how to resolve each conflict (keep ours, keep theirs, or merge)\n\
-         3. Edit files to remove ALL conflict markers and keep the correct code\n\
-         4. Stage ALL resolved files: git add <file>\n\
-         5. Continue the rebase: git rebase --continue\n\
-         6. Verify success: Look for \"Successfully rebased and updated\" message\n\
-         7. Run validation: just review\n\
-         8. IMPORTANT: If validation modified any files, amend them: git add -A && git commit --amend --no-edit\n\
+         2. Understand what master changed (their version) and what you changed (our version)\n\
+         3. Decide how to INCORPORATE YOUR CHANGES into the new state - do NOT just accept theirs\n\
+         4. Edit files to remove ALL conflict markers and apply your intended changes\n\
+         5. Stage ALL resolved files: git add <file>\n\
+         6. Continue the rebase: git rebase --continue\n\
+         7. Verify success: Look for \"Successfully rebased and updated\" message\n\
+         8. Run validation: just review\n\
+         9. IMPORTANT: If validation modified any files, amend them: git add -A && git commit --amend --no-edit\n\
          \n\
          Helpful commands:\n\
          - View our version: git show :2:<file>\n\
@@ -540,12 +554,15 @@ mod tests {
     #[test]
     fn test_build_conflict_prompt() {
         let conflicts = vec!["src/main.rs".to_string(), "src/lib.rs".to_string()];
-        let prompt = build_conflict_prompt(&conflicts);
+        let original_task = "Fix the authentication bug in the login system";
+        let prompt = build_conflict_prompt(&conflicts, original_task);
 
         assert!(prompt.contains("REBASE CONFLICT DETECTED"));
         assert!(prompt.contains("src/main.rs"));
         assert!(prompt.contains("src/lib.rs"));
         assert!(prompt.contains("IMPORTANT - Resolution steps (must complete ALL steps):"));
+        assert!(prompt.contains("Your original task:"));
+        assert!(prompt.contains("Fix the authentication bug"));
         assert!(prompt.contains("git rebase --continue"));
         assert!(prompt.contains("Successfully rebased and updated"));
     }

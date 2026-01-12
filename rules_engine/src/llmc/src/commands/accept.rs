@@ -80,9 +80,11 @@ pub fn run_accept(worker: Option<String>) -> Result<()> {
 
     if !rebase_result.success {
         let worker_mut = state.get_worker_mut(&worker_name).unwrap();
+        let original_task = worker_mut.current_prompt.clone();
         worker::apply_transition(worker_mut, WorkerTransition::ToRebasing)?;
 
-        let conflict_prompt = build_conflict_resolution_prompt(&rebase_result.conflicts);
+        let conflict_prompt =
+            build_conflict_resolution_prompt(&rebase_result.conflicts, &original_task);
         let sender = super::super::tmux::sender::TmuxSender::new();
         sender.send(&worker_mut.session_id, &conflict_prompt)?;
 
@@ -258,6 +260,7 @@ pub fn run_accept(worker: Option<String>) -> Result<()> {
                             pending_worker
                         );
                         let worker_mut = state.get_worker_mut(&pending_worker).unwrap();
+                        let original_task = worker_mut.current_prompt.clone();
                         if let Err(e) =
                             worker::apply_transition(worker_mut, WorkerTransition::ToRebasing)
                         {
@@ -266,7 +269,7 @@ pub fn run_accept(worker: Option<String>) -> Result<()> {
                         }
 
                         let conflict_prompt =
-                            rebase::build_conflict_prompt(&rebase_result.conflicts);
+                            rebase::build_conflict_prompt(&rebase_result.conflicts, &original_task);
                         let tmux_sender = TmuxSender::new();
                         if let Err(e) = tmux_sender.send(&pending_session, &conflict_prompt) {
                             tracing::warn!(
@@ -363,12 +366,24 @@ fn format_all_workers(state: &State) -> String {
     state.workers.keys().map(String::as_str).collect::<Vec<_>>().join(", ")
 }
 
-fn build_conflict_resolution_prompt(conflicts: &[String]) -> String {
+fn build_conflict_resolution_prompt(conflicts: &[String], original_task: &str) -> String {
     let mut prompt = String::from(
         "A rebase onto master has encountered conflicts.\n\
-         \n\
-         Conflicting files:\n",
+         \n",
     );
+
+    prompt.push_str(&format!(
+        "IMPORTANT - Your original task:\n\
+         \"{}\"\n\
+         \n\
+         DO NOT restart your task from scratch. Instead, INCORPORATE your existing changes/intent \n\
+         into the new repository state. Your goal is to apply the same logical changes you already \n\
+         made, but adapted to work with the new state of the files after master's changes.\n\
+         \n",
+        original_task.lines().take(3).collect::<Vec<_>>().join(" ")
+    ));
+
+    prompt.push_str("Conflicting files:\n");
 
     for file in conflicts {
         let conflict_count = count_conflict_markers(file);
@@ -379,12 +394,13 @@ fn build_conflict_resolution_prompt(conflicts: &[String]) -> String {
         "\n\
          Resolution steps:\n\
          1. Examine conflict markers (<<<<<<, =======, >>>>>>>)\n\
-         2. Decide how to resolve each conflict\n\
-         3. Remove conflict markers\n\
-         4. Stage resolved files: git add <file>\n\
-         5. Continue rebase: git rebase --continue\n\
-         6. Run validation: just review\n\
-         7. IMPORTANT: If validation modified any files, amend them: git add -A && git commit --amend --no-edit\n\
+         2. Understand what master changed (their version) and what you changed (our version)\n\
+         3. Decide how to INCORPORATE YOUR CHANGES into the new state - do NOT just accept theirs\n\
+         4. Remove conflict markers and apply your intended changes\n\
+         5. Stage resolved files: git add <file>\n\
+         6. Continue rebase: git rebase --continue\n\
+         7. Run validation: just review\n\
+         8. IMPORTANT: If validation modified any files, amend them: git add -A && git commit --amend --no-edit\n\
          \n\
          Notes:\n\
          - View original versions: git show :2:<file> (ours) :3:<file> (theirs)\n\
