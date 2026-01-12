@@ -368,6 +368,7 @@ fn poll_worker_states(state: &mut State) -> Result<()> {
 }
 
 fn start_offline_workers(config: &mut Config, state: &mut State, verbose: bool) -> Result<()> {
+    let state_path = state::get_state_path();
     let worker_names: Vec<String> = state.workers.keys().cloned().collect();
 
     let has_offline_workers = worker_names.iter().any(|name| {
@@ -387,7 +388,34 @@ fn start_offline_workers(config: &mut Config, state: &mut State, verbose: bool) 
             && worker_record.status == WorkerStatus::Offline
         {
             println!("  Starting offline worker '{}'...", worker_name);
-            start_worker(worker_name, config, state, verbose)?;
+
+            let session_id = worker_record.session_id.clone();
+            if session::session_exists(&session_id) {
+                if verbose {
+                    println!(
+                        "  [verbose] Session {} already exists, skipping duplicate start",
+                        session_id
+                    );
+                }
+                continue;
+            }
+
+            if let Some(worker_mut) = state.get_worker_mut(worker_name) {
+                worker_mut.status = WorkerStatus::Idle;
+                worker_mut.last_activity_unix =
+                    SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs();
+            }
+            state.save(&state_path)?;
+
+            if let Err(e) = start_worker(worker_name, config, state, verbose) {
+                eprintln!("  Failed to start worker '{}': {}", worker_name, e);
+                if let Some(worker_mut) = state.get_worker_mut(worker_name) {
+                    worker_mut.status = WorkerStatus::Error;
+                    worker_mut.last_activity_unix =
+                        SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs();
+                }
+                state.save(&state_path)?;
+            }
         }
     }
 
