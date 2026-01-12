@@ -48,7 +48,6 @@ Each worker progresses through a well-defined state machine:
      └───────────────────────────────────-┘
 
 Special States:
-- REBASING: Transitional state during rebase operations
 - ERROR: Worker encountered an unrecoverable error
 - OFFLINE: TMUX session not running (needs `llmc up`)
 ```
