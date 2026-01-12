@@ -94,7 +94,31 @@ pub fn remove_worktree(repo: &Path, worktree_path: &Path, force: bool) -> Result
         cmd.arg(worktree_path).output().context("Failed to execute git worktree remove")?;
 
     if !output.status.success() {
-        bail!("Failed to remove worktree: {}", String::from_utf8_lossy(&output.stderr));
+        tracing::warn!("git worktree remove failed: {}", String::from_utf8_lossy(&output.stderr));
+
+        if worktree_path.exists() {
+            tracing::info!(
+                "Attempting manual removal of worktree directory: {}",
+                worktree_path.display()
+            );
+            std::fs::remove_dir_all(worktree_path)
+                .context("Failed to manually remove worktree directory")?;
+        }
+
+        let prune_output = Command::new("git")
+            .arg("-C")
+            .arg(repo)
+            .arg("worktree")
+            .arg("prune")
+            .output()
+            .context("Failed to execute git worktree prune")?;
+
+        if !prune_output.status.success() {
+            tracing::warn!(
+                "git worktree prune failed: {}",
+                String::from_utf8_lossy(&prune_output.stderr)
+            );
+        }
     }
 
     Ok(())

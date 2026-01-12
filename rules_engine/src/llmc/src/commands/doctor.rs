@@ -55,7 +55,7 @@ fn perform_health_checks(repair: bool, yes: bool) -> Result<DoctorReport> {
     check_binaries(&mut report);
     check_config(&mut report)?;
     check_state(&mut report, repair)?;
-    check_worktrees(&mut report);
+    check_worktrees(&mut report, repair)?;
     check_sessions(&mut report, repair)?;
     check_git_config(&mut report)?;
     check_crash_flag(&mut report)?;
@@ -217,7 +217,7 @@ fn get_head_commit(worktree_path: &str) -> Result<String> {
     }
     Ok(String::from_utf8_lossy(&output.stdout).trim().to_string())
 }
-fn check_worktrees(report: &mut DoctorReport) {
+fn check_worktrees(report: &mut DoctorReport, repair: bool) -> Result<()> {
     let llmc_root = config::get_llmc_root();
     let worktrees_dir = llmc_root.join(".worktrees");
     if !worktrees_dir.exists() {
@@ -225,7 +225,7 @@ fn check_worktrees(report: &mut DoctorReport) {
             message: "Worktrees directory not found".to_string(),
             details: Some(format!("Expected: {}", worktrees_dir.display())),
         });
-        return;
+        return Ok(());
     }
     let state_path = state::get_state_path();
     if let Ok(state) = State::load(&state_path) {
@@ -238,10 +238,28 @@ fn check_worktrees(report: &mut DoctorReport) {
                 {
                     found_worktrees.insert(name.to_string());
                     if !configured_workers.contains(&name.to_string()) {
-                        report.warnings.push(DoctorWarning {
-                            message: format!("Orphaned worktree: {}", name),
-                            details: Some("Worktree exists but no worker configured".to_string()),
-                        });
+                        if repair {
+                            match git::remove_worktree(&llmc_root, &entry.path(), true) {
+                                Ok(()) => {
+                                    report
+                                        .repairs_succeeded
+                                        .push(format!("Removed orphaned worktree: {}", name));
+                                }
+                                Err(e) => {
+                                    report.repairs_failed.push(format!(
+                                        "Failed to remove orphaned worktree '{}': {}",
+                                        name, e
+                                    ));
+                                }
+                            }
+                        } else {
+                            report.warnings.push(DoctorWarning {
+                                message: format!("Orphaned worktree: {}", name),
+                                details: Some(
+                                    "Worktree exists but no worker configured".to_string(),
+                                ),
+                            });
+                        }
                     }
                 }
             }
@@ -256,6 +274,7 @@ fn check_worktrees(report: &mut DoctorReport) {
             }
         }
     }
+    Ok(())
 }
 fn check_sessions(report: &mut DoctorReport, repair: bool) -> Result<()> {
     let output = Command::new("tmux").args(["list-sessions", "-F", "#{session_name}"]).output();
