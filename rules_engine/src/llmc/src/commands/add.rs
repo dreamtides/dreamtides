@@ -13,6 +13,10 @@ use super::super::{config, git, state};
 pub fn run_add(name: &str, model: Option<String>, role_prompt: Option<String>) -> Result<()> {
     validate_worker_name(name)?;
 
+    if let Some(ref m) = model {
+        config::validate_model(m)?;
+    }
+
     let llmc_root = config::get_llmc_root();
     if !llmc_root.exists() {
         bail!(

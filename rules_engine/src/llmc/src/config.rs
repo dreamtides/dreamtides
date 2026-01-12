@@ -1,11 +1,12 @@
-#![allow(dead_code)]
-
 use std::collections::HashMap;
 use std::fs;
 use std::path::{Path, PathBuf};
 
 use anyhow::{Context, Result, bail};
 use serde::{Deserialize, Serialize};
+
+/// Valid Claude Code models
+const VALID_MODELS: &[&str] = &["haiku", "sonnet", "opus"];
 
 /// Global LLMC configuration loaded from ~/llmc/config.toml
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -60,8 +61,21 @@ pub fn get_config_path() -> PathBuf {
     get_llmc_root().join("config.toml")
 }
 
+/// Validates a model string against known Claude Code models
+pub fn validate_model(model: &str) -> Result<()> {
+    if !VALID_MODELS.contains(&model) {
+        bail!(
+            "Invalid model: '{}'\n\
+             Valid models are: {}",
+            model,
+            VALID_MODELS.join(", ")
+        );
+    }
+    Ok(())
+}
+
 fn default_model() -> String {
-    "opus".to_string()
+    "sonnet".to_string()
 }
 
 fn default_skip_permissions() -> bool {
@@ -127,17 +141,23 @@ impl Config {
             bail!("defaults.patrol_interval_secs must be greater than 0");
         }
 
+        validate_model(&self.defaults.model)
+            .with_context(|| "Invalid default model in [defaults] section")?;
+
+        #[expect(clippy::iter_over_hash_type)]
+        for (name, worker_config) in &self.workers {
+            if let Some(model) = &worker_config.model {
+                validate_model(model)
+                    .with_context(|| format!("Invalid model for worker '{}'", name))?;
+            }
+        }
+
         Ok(())
     }
 
     /// Gets the configuration for a specific worker
     pub fn get_worker(&self, name: &str) -> Option<&WorkerConfig> {
         self.workers.get(name)
-    }
-
-    /// Gets the model to use for a worker (worker-specific or default)
-    pub fn get_worker_model(&self, name: &str) -> &str {
-        self.workers.get(name).and_then(|w| w.model.as_deref()).unwrap_or(&self.defaults.model)
     }
 }
 
@@ -152,7 +172,7 @@ mod tests {
     #[test]
     fn test_defaults() {
         let defaults = DefaultsConfig::default();
-        assert_eq!(defaults.model, "opus");
+        assert_eq!(defaults.model, "sonnet");
         assert!(defaults.skip_permissions);
         assert_eq!(defaults.allowed_tools.len(), 6);
         assert_eq!(defaults.patrol_interval_secs, 60);
@@ -171,7 +191,7 @@ mod tests {
 
         let config = Config::load(file.path()).unwrap();
         assert_eq!(config.repo.source, "/path/to/repo");
-        assert_eq!(config.defaults.model, "opus");
+        assert_eq!(config.defaults.model, "sonnet");
         assert!(config.workers.is_empty());
     }
 
@@ -218,10 +238,6 @@ mod tests {
         assert_eq!(baker.model, None);
         assert_eq!(baker.role_prompt.as_deref(), Some("You are Baker"));
         assert!(!baker.excluded_from_pool);
-
-        assert_eq!(config.get_worker_model("adam"), "opus");
-        assert_eq!(config.get_worker_model("baker"), "sonnet");
-        assert_eq!(config.get_worker_model("unknown"), "sonnet");
     }
 
     #[test]
@@ -266,5 +282,54 @@ mod tests {
     fn test_get_config_path() {
         let config_path = get_config_path();
         assert!(config_path.ends_with("llmc/config.toml"));
+    }
+
+    #[test]
+    fn test_invalid_default_model() {
+        let toml = r#"
+            [defaults]
+            model = "gpt4"
+
+            [repo]
+            source = "/path/to/repo"
+        "#;
+
+        let mut file = NamedTempFile::new().unwrap();
+        file.write_all(toml.as_bytes()).unwrap();
+
+        let result = Config::load(file.path());
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_invalid_worker_model() {
+        let toml = r#"
+            [repo]
+            source = "/path/to/repo"
+
+            [workers.adam]
+            model = "invalid-model"
+        "#;
+
+        let mut file = NamedTempFile::new().unwrap();
+        file.write_all(toml.as_bytes()).unwrap();
+
+        let result = Config::load(file.path());
+        assert!(result.is_err());
+        assert!(result.unwrap_err().to_string().contains("Invalid"));
+    }
+
+    #[test]
+    fn test_valid_models() {
+        validate_model("haiku").unwrap();
+        validate_model("sonnet").unwrap();
+        validate_model("opus").unwrap();
+    }
+
+    #[test]
+    fn test_invalid_model_validation() {
+        assert!(validate_model("gpt4").is_err());
+        assert!(validate_model("invalid").is_err());
+        assert!(validate_model("").is_err());
     }
 }
