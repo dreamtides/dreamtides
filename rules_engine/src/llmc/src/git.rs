@@ -1,5 +1,3 @@
-#![allow(dead_code)]
-
 use std::path::Path;
 use std::process::Command;
 
@@ -7,14 +5,6 @@ use anyhow::{Context, Result, bail};
 use regex::Regex;
 
 use crate::logging::git as logging_git;
-
-/// Information about a git worktree
-#[derive(Debug, Clone, PartialEq)]
-pub struct WorktreeInfo {
-    pub path: String,
-    pub branch: String,
-    pub is_detached: bool,
-}
 
 /// Result of a rebase operation
 #[derive(Debug, Clone, PartialEq)]
@@ -122,30 +112,6 @@ pub fn remove_worktree(repo: &Path, worktree_path: &Path, force: bool) -> Result
     }
 
     Ok(())
-}
-
-/// Lists all worktrees in the repository
-pub fn list_worktrees(repo: &Path) -> Result<Vec<WorktreeInfo>> {
-    let output = Command::new("git")
-        .arg("-C")
-        .arg(repo)
-        .arg("worktree")
-        .arg("list")
-        .arg("--porcelain")
-        .output()
-        .context("Failed to execute git worktree list")?;
-
-    if !output.status.success() {
-        bail!("Failed to list worktrees: {}", String::from_utf8_lossy(&output.stderr));
-    }
-
-    let stdout = String::from_utf8_lossy(&output.stdout);
-    parse_worktree_list(&stdout)
-}
-
-/// Checks if a worktree exists at the specified path
-pub fn worktree_exists(worktree_path: &Path) -> bool {
-    worktree_path.join(".git").exists()
 }
 
 /// Creates a new branch at the specified start point
@@ -536,62 +502,6 @@ pub fn abort_rebase(worktree: &Path) -> Result<()> {
     result
 }
 
-/// Continues an in-progress rebase
-pub fn continue_rebase(worktree: &Path) -> Result<()> {
-    let before = logging_git::capture_state(worktree).ok();
-    let start = std::time::Instant::now();
-
-    let output = Command::new("git")
-        .arg("-C")
-        .arg(worktree)
-        .arg("rebase")
-        .arg("--continue")
-        .output()
-        .context("Failed to execute git rebase --continue")?;
-
-    let result = if output.status.success() {
-        Ok(())
-    } else {
-        Err(anyhow::anyhow!(
-            "Failed to continue rebase: {}",
-            String::from_utf8_lossy(&output.stderr)
-        ))
-    };
-
-    let after = logging_git::capture_state(worktree).ok();
-    let duration_ms = start.elapsed().as_millis() as u64;
-
-    match &result {
-        Ok(_) => {
-            tracing::info!(
-                operation = "git_operation",
-                operation_type = "rebase_continue",
-                repo_path = %worktree.display(),
-                duration_ms,
-                ?before,
-                ?after,
-                result = "success",
-                "Continued rebase successfully"
-            );
-        }
-        Err(e) => {
-            tracing::error!(
-                operation = "git_operation",
-                operation_type = "rebase_continue",
-                repo_path = %worktree.display(),
-                duration_ms,
-                ?before,
-                ?after,
-                result = "error",
-                error = %e,
-                "Failed to continue rebase"
-            );
-        }
-    }
-
-    result
-}
-
 /// Squashes all commits since base into a single commit
 pub fn squash_commits(worktree: &Path, base: &str) -> Result<()> {
     let output = Command::new("git")
@@ -813,88 +723,6 @@ pub fn reset_to_ref(repo: &Path, ref_name: &str) -> Result<()> {
     Ok(())
 }
 
-/// Pushes master branch to origin
-pub fn push_master_to_origin(repo: &Path) -> Result<()> {
-    let before = logging_git::capture_state(repo).ok();
-    let start = std::time::Instant::now();
-
-    let output = Command::new("git")
-        .arg("-C")
-        .arg(repo)
-        .arg("push")
-        .arg("origin")
-        .arg("master")
-        .output()
-        .context("Failed to execute git push origin master")?;
-
-    let result = if output.status.success() {
-        Ok(())
-    } else {
-        Err(anyhow::anyhow!(
-            "Failed to push master to origin: {}",
-            String::from_utf8_lossy(&output.stderr)
-        ))
-    };
-
-    let duration_ms = start.elapsed().as_millis() as u64;
-
-    match &result {
-        Ok(_) => {
-            tracing::info!(
-                operation = "git_operation",
-                operation_type = "push",
-                repo_path = %repo.display(),
-                branch = "master",
-                remote = "origin",
-                duration_ms,
-                ?before,
-                result = "success",
-                "Pushed master to origin"
-            );
-        }
-        Err(e) => {
-            tracing::error!(
-                operation = "git_operation",
-                operation_type = "push",
-                repo_path = %repo.display(),
-                branch = "master",
-                remote = "origin",
-                duration_ms,
-                ?before,
-                result = "error",
-                error = %e,
-                "Failed to push master to origin"
-            );
-        }
-    }
-
-    result
-}
-
-/// Verifies a commit exists on origin/master (after fetching)
-pub fn verify_commit_on_origin(repo: &Path, commit_sha: &str) -> Result<()> {
-    fetch_origin(repo)?;
-
-    let output = Command::new("git")
-        .arg("-C")
-        .arg(repo)
-        .arg("merge-base")
-        .arg("--is-ancestor")
-        .arg(commit_sha)
-        .arg("origin/master")
-        .output()
-        .context("Failed to verify commit on origin")?;
-
-    if !output.status.success() {
-        bail!(
-            "CRITICAL: Commit {} is not on origin/master. The push may have failed silently.",
-            commit_sha
-        );
-    }
-
-    Ok(())
-}
-
 /// Pulls with rebase from origin/master
 pub fn pull_rebase(worktree: &Path) -> Result<()> {
     // Fetch latest changes from origin
@@ -930,43 +758,6 @@ pub fn pull_rebase(worktree: &Path) -> Result<()> {
     Ok(())
 }
 
-fn parse_worktree_list(output: &str) -> Result<Vec<WorktreeInfo>> {
-    let mut worktrees = Vec::new();
-    let mut current_path = None;
-    let mut current_branch = None;
-    let mut is_detached = false;
-
-    for line in output.lines() {
-        if line.starts_with("worktree ") {
-            if let Some(path) = current_path.take() {
-                worktrees.push(WorktreeInfo {
-                    path,
-                    branch: current_branch.take().unwrap_or_else(|| "HEAD".to_string()),
-                    is_detached,
-                });
-                is_detached = false;
-            }
-            current_path = Some(line.strip_prefix("worktree ").unwrap().to_string());
-        } else if line.starts_with("branch ") {
-            current_branch = line
-                .strip_prefix("branch ")
-                .map(|s| s.strip_prefix("refs/heads/").unwrap_or(s).to_string());
-        } else if line.starts_with("detached") {
-            is_detached = true;
-        }
-    }
-
-    if let Some(path) = current_path {
-        worktrees.push(WorktreeInfo {
-            path,
-            branch: current_branch.unwrap_or_else(|| "HEAD".to_string()),
-            is_detached,
-        });
-    }
-
-    Ok(worktrees)
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -981,31 +772,5 @@ mod tests {
 
         let message3 = "Simple commit";
         assert_eq!(strip_agent_attribution(message3), "Simple commit");
-    }
-
-    #[test]
-    fn test_parse_worktree_list() {
-        let output = "worktree /path/to/repo
-HEAD abc123
-
-worktree /path/to/worktree1
-branch refs/heads/feature
-
-worktree /path/to/worktree2
-HEAD def456
-detached
-";
-
-        let result = parse_worktree_list(output).unwrap();
-        assert_eq!(result.len(), 3);
-        assert_eq!(result[0].path, "/path/to/repo");
-        assert_eq!(result[0].branch, "HEAD");
-        assert!(!result[0].is_detached);
-        assert_eq!(result[1].path, "/path/to/worktree1");
-        assert_eq!(result[1].branch, "feature");
-        assert!(!result[1].is_detached);
-        assert_eq!(result[2].path, "/path/to/worktree2");
-        assert_eq!(result[2].branch, "HEAD");
-        assert!(result[2].is_detached);
     }
 }

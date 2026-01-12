@@ -1,5 +1,3 @@
-#![allow(dead_code)]
-
 use std::path::Path;
 use std::thread;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
@@ -11,13 +9,6 @@ use crate::git;
 use crate::state::{State, WorkerRecord, WorkerStatus};
 use crate::tmux::sender::TmuxSender;
 use crate::tmux::session;
-
-/// Represents a live worker with its session and sender
-pub struct Worker {
-    pub name: String,
-    pub session_id: String,
-    pub sender: TmuxSender,
-}
 
 /// Represents a state transition for a worker
 #[derive(Debug, Clone, PartialEq)]

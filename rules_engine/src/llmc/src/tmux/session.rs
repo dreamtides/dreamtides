@@ -1,4 +1,3 @@
-#![allow(dead_code)]
 use std::path::Path;
 use std::sync::OnceLock;
 use std::thread;
@@ -195,16 +194,6 @@ pub fn start_worker_session(
     Ok(())
 }
 
-/// Converts a worker name to a session name
-pub fn session_name_for_worker(worker: &str) -> String {
-    format!("llmc-{}", worker)
-}
-
-/// Extracts worker name from a session name
-pub fn worker_from_session_name(session: &str) -> Option<String> {
-    session.strip_prefix("llmc-").map(str::to_string)
-}
-
 /// Checks if any LLMC sessions are running
 pub fn any_llmc_sessions_running() -> Result<bool> {
     let sessions = list_sessions()?;
@@ -359,20 +348,6 @@ fn accept_bypass_warning(session: &str, sender: &TmuxSender, verbose: bool) -> R
 #[cfg(test)]
 mod tests {
     use super::*;
-
-    #[test]
-    fn test_session_name_for_worker() {
-        assert_eq!(session_name_for_worker("adam"), "llmc-adam");
-        assert_eq!(session_name_for_worker("baker"), "llmc-baker");
-    }
-
-    #[test]
-    fn test_worker_from_session_name() {
-        assert_eq!(worker_from_session_name("llmc-adam"), Some("adam".to_string()));
-        assert_eq!(worker_from_session_name("llmc-baker"), Some("baker".to_string()));
-        assert_eq!(worker_from_session_name("other-session"), None);
-        assert_eq!(worker_from_session_name("llmc"), None);
-    }
 
     #[test]
     fn test_is_shell() {
