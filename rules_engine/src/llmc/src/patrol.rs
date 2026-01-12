@@ -64,7 +64,11 @@ impl Patrol {
         self.check_session_health(state, config, &mut report)?;
         self.check_state_consistency(state, &mut report)?;
         self.detect_state_transitions(state, config, &mut report)?;
-        self.rebase_pending_reviews(state, &mut report)?;
+
+        let transitioned_workers: std::collections::HashSet<String> =
+            report.transitions_applied.iter().map(|(name, _)| name.clone()).collect();
+
+        self.rebase_pending_reviews(state, &transitioned_workers, &mut report)?;
         self.detect_stuck_workers(state, &mut report)?;
 
         Ok(report)
@@ -236,15 +240,35 @@ impl Patrol {
             if worker_status != WorkerStatus::Rebasing && git::is_rebase_in_progress(worktree_path)
             {
                 tracing::warn!(
-                    "Worker '{}' has orphaned rebase state, marking as error",
-                    worker_name
+                    "Worker '{}' has orphaned rebase state (status: {:?}), attempting cleanup",
+                    worker_name,
+                    worker_status
                 );
-                let transition = WorkerTransition::ToError {
-                    reason: "Orphaned rebase state detected during patrol".to_string(),
-                };
-                if let Some(worker_mut) = state.get_worker_mut(&worker_name) {
-                    worker::apply_transition(worker_mut, transition.clone())?;
-                    report.transitions_applied.push((worker_name.clone(), transition));
+
+                match git::abort_rebase(worktree_path) {
+                    Ok(()) => {
+                        tracing::info!(
+                            "Successfully cleaned up orphaned rebase state for worker '{}'",
+                            worker_name
+                        );
+                    }
+                    Err(e) => {
+                        tracing::error!(
+                            "Failed to clean up orphaned rebase state for worker '{}': {}",
+                            worker_name,
+                            e
+                        );
+                        let transition = WorkerTransition::ToError {
+                            reason: format!(
+                                "Orphaned rebase state detected and cleanup failed: {}",
+                                e
+                            ),
+                        };
+                        if let Some(worker_mut) = state.get_worker_mut(&worker_name) {
+                            worker::apply_transition(worker_mut, transition.clone())?;
+                            report.transitions_applied.push((worker_name.clone(), transition));
+                        }
+                    }
                 }
             }
         }
@@ -335,39 +359,55 @@ impl Patrol {
         session_id: &str,
         worktree_path: &Path,
     ) -> Result<WorkerTransition> {
-        if !git::is_rebase_in_progress(worktree_path) {
-            let output = session::capture_pane(session_id, 50)?;
+        let rebase_in_progress = git::is_rebase_in_progress(worktree_path);
 
-            if output.contains("Successfully rebased") || output.contains("git rebase --continue") {
-                if git::has_uncommitted_changes(worktree_path)? {
-                    tracing::info!(
-                        "Worker {} completed rebase with uncommitted changes, amending",
-                        session_id
-                    );
-                    git::amend_uncommitted_changes(worktree_path)?;
-                }
-                let commit_sha = git::get_head_commit(worktree_path)?;
-                return Ok(WorkerTransition::ToNeedsReview { commit_sha });
-            }
+        if rebase_in_progress {
+            tracing::debug!("Worker {} still has rebase in progress", session_id);
+            return Ok(WorkerTransition::None);
+        }
 
-            if output.contains("rebase --abort") {
-                if git::has_uncommitted_changes(worktree_path)? {
-                    tracing::info!(
-                        "Worker {} aborted rebase with uncommitted changes, amending",
-                        session_id
-                    );
-                    git::amend_uncommitted_changes(worktree_path)?;
-                }
-                return Ok(WorkerTransition::ToNeedsReview {
-                    commit_sha: git::get_head_commit(worktree_path)?,
-                });
+        let output = session::capture_pane(session_id, 50)?;
+
+        let rebase_completed = output.contains("Successfully rebased and updated");
+        let rebase_aborted =
+            output.contains("rebase --abort") && !output.contains("git rebase --abort");
+
+        if rebase_completed {
+            tracing::info!("Worker {} completed rebase successfully", session_id);
+            if git::has_uncommitted_changes(worktree_path)? {
+                tracing::info!(
+                    "Worker {} has uncommitted changes after rebase, amending",
+                    session_id
+                );
+                git::amend_uncommitted_changes(worktree_path)?;
             }
+            let commit_sha = git::get_head_commit(worktree_path)?;
+            return Ok(WorkerTransition::ToNeedsReview { commit_sha });
+        }
+
+        if rebase_aborted {
+            tracing::warn!("Worker {} aborted rebase", session_id);
+            if git::has_uncommitted_changes(worktree_path)? {
+                tracing::info!(
+                    "Worker {} has uncommitted changes after abort, amending",
+                    session_id
+                );
+                git::amend_uncommitted_changes(worktree_path)?;
+            }
+            return Ok(WorkerTransition::ToNeedsReview {
+                commit_sha: git::get_head_commit(worktree_path)?,
+            });
         }
 
         Ok(WorkerTransition::None)
     }
 
-    fn rebase_pending_reviews(&self, state: &mut State, report: &mut PatrolReport) -> Result<()> {
+    fn rebase_pending_reviews(
+        &self,
+        state: &mut State,
+        transitioned_workers: &std::collections::HashSet<String>,
+        report: &mut PatrolReport,
+    ) -> Result<()> {
         let workers_to_rebase: Vec<String> = state
             .workers
             .iter()
@@ -376,9 +416,25 @@ impl Patrol {
             .collect();
 
         for worker_name in workers_to_rebase {
+            if transitioned_workers.contains(&worker_name) {
+                tracing::debug!(
+                    "Skipping rebase for worker '{}' - just transitioned in this patrol run",
+                    worker_name
+                );
+                continue;
+            }
+
             let worker = state.get_worker(&worker_name).unwrap();
             let worktree_path = PathBuf::from(&worker.worktree_path);
             let session_id = worker.session_id.clone();
+
+            if git::is_rebase_in_progress(&worktree_path) {
+                tracing::debug!(
+                    "Skipping rebase for worker '{}' - rebase already in progress",
+                    worker_name
+                );
+                continue;
+            }
 
             let llmc_root = crate::config::get_llmc_root();
             let master_sha = git::get_head_commit(&llmc_root)?;
@@ -493,7 +549,9 @@ impl Patrol {
 
 fn build_conflict_prompt(conflicts: &[String]) -> String {
     let mut prompt = String::from(
-        "A rebase onto master has encountered conflicts.\n\
+        "REBASE CONFLICT DETECTED\n\
+         \n\
+         Master has advanced and your changes need to be rebased. The rebase has encountered conflicts.\n\
          \n\
          Conflicting files:\n",
     );
@@ -505,17 +563,23 @@ fn build_conflict_prompt(conflicts: &[String]) -> String {
 
     prompt.push_str(
         "\n\
-         Resolution steps:\n\
-         1. Examine conflict markers (<<<<<<, =======, >>>>>>>)\n\
-         2. Decide how to resolve each conflict\n\
-         3. Remove conflict markers\n\
-         4. Stage resolved files: git add <file>\n\
-         5. Continue rebase: git rebase --continue\n\
-         6. Run validation: just review\n\
+         IMPORTANT - Resolution steps (must complete ALL steps):\n\
+         1. Read and understand the conflict markers in each file (<<<<<<, =======, >>>>>>>)\n\
+         2. Decide how to resolve each conflict (keep ours, keep theirs, or merge)\n\
+         3. Edit files to remove ALL conflict markers and keep the correct code\n\
+         4. Stage ALL resolved files: git add <file>\n\
+         5. Continue the rebase: git rebase --continue\n\
+         6. Verify success: Look for \"Successfully rebased and updated\" message\n\
+         7. Run validation: just review\n\
          \n\
-         Notes:\n\
-         - View original versions: git show :2:<file> (ours) :3:<file> (theirs)\n\
-         - To abort: git rebase --abort\n",
+         Helpful commands:\n\
+         - View our version: git show :2:<file>\n\
+         - View their version: git show :3:<file>\n\
+         - Check remaining conflicts: git diff --name-only --diff-filter=U\n\
+         - If you need to start over: git rebase --abort\n\
+         \n\
+         CRITICAL: You MUST run 'git rebase --continue' after staging files.\n\
+         Do NOT commit manually. The rebase process handles commits automatically.\n",
     );
 
     prompt

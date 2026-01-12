@@ -369,6 +369,18 @@ pub fn amend_uncommitted_changes(worktree: &Path) -> Result<()> {
 
 /// Rebases the worktree onto the target branch
 pub fn rebase_onto(worktree: &Path, target: &str) -> Result<RebaseResult> {
+    if is_rebase_in_progress(worktree) {
+        tracing::warn!(
+            operation = "git_operation",
+            operation_type = "rebase",
+            repo_path = %worktree.display(),
+            target,
+            result = "skipped",
+            "Skipping rebase - rebase already in progress"
+        );
+        bail!("Cannot start rebase: a rebase is already in progress");
+    }
+
     let before = logging_git::capture_state(worktree).ok();
     let start = std::time::Instant::now();
 
