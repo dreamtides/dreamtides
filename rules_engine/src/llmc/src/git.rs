@@ -407,6 +407,12 @@ pub fn is_rebase_in_progress(worktree: &Path) -> bool {
     worktree.join(".git/rebase-merge").exists() || worktree.join(".git/rebase-apply").exists()
 }
 
+/// Checks if worktree is clean (no uncommitted changes and no rebase in
+/// progress)
+pub fn is_worktree_clean(worktree: &Path) -> Result<bool> {
+    Ok(!has_uncommitted_changes(worktree)? && !is_rebase_in_progress(worktree))
+}
+
 /// Gets the list of files with merge conflicts
 pub fn get_conflicted_files(worktree: &Path) -> Result<Vec<String>> {
     let output = Command::new("git")

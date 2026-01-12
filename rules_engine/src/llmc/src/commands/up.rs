@@ -10,7 +10,7 @@ use super::super::config::{self, Config};
 use super::super::patrol::Patrol;
 use super::super::state::{self, State, WorkerStatus};
 use super::super::tmux::session;
-use super::super::worker;
+use super::super::{git, worker};
 
 /// Runs the up command, starting the LLMC daemon
 pub fn run_up(no_patrol: bool, verbose: bool, force: bool) -> Result<()> {
@@ -24,7 +24,12 @@ pub fn run_up(no_patrol: bool, verbose: bool, force: bool) -> Result<()> {
     }
 
     let state_path = state::get_state_path();
-    let state = State::load(&state_path)?;
+    let mut state = State::load(&state_path)?;
+
+    if state.daemon_running {
+        println!("⚠ Previous daemon crash detected. Running enhanced recovery checks...");
+        tracing::warn!("Daemon crash detected: daemon_running flag was true on startup");
+    }
 
     cleanup_orphaned_sessions(&state, force, verbose)?;
 
@@ -33,7 +38,8 @@ pub fn run_up(no_patrol: bool, verbose: bool, force: bool) -> Result<()> {
     let config_path = config::get_config_path();
     let config = Config::load(&config_path)?;
 
-    let mut state = State::load(&state_path)?;
+    state.daemon_running = true;
+    state.save(&state_path)?;
 
     ensure_tmux_running()?;
     reconcile_and_start_workers(&config, &mut state, verbose)?;
@@ -226,13 +232,26 @@ fn start_worker(name: &str, config: &Config, state: &mut State, verbose: bool) -
         worker::start_claude_in_session(&worker_record.session_id, worker_config)?;
     }
 
-    let worker_mut = state.get_worker_mut(name).unwrap();
-    worker_mut.status = WorkerStatus::Idle;
-    worker_mut.last_activity_unix = SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs();
+    let is_clean = git::is_worktree_clean(&worktree_path).unwrap_or(false);
 
-    if verbose {
-        println!("    [verbose] Worker '{}' marked as Idle", name);
+    let worker_mut = state.get_worker_mut(name).unwrap();
+    if is_clean {
+        worker_mut.status = WorkerStatus::Idle;
+        if verbose {
+            println!("    [verbose] Worker '{}' worktree is clean, marked as Idle", name);
+        }
+    } else {
+        worker_mut.status = WorkerStatus::Error;
+        println!("  ⚠ Worker '{}' has uncommitted changes or incomplete rebase", name);
+        println!(
+            "    Marked as Error. Run 'llmc doctor --fix' or 'llmc reset {}' to recover",
+            name
+        );
+        if verbose {
+            println!("    [verbose] Worker '{}' worktree is dirty, marked as Error", name);
+        }
     }
+    worker_mut.last_activity_unix = SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs();
 
     Ok(())
 }
@@ -339,6 +358,8 @@ fn start_offline_workers(config: &Config, state: &mut State, verbose: bool) -> R
 
 fn graceful_shutdown(config: &Config, state: &mut State) -> Result<()> {
     println!("Shutting down workers...");
+
+    state.daemon_running = false;
 
     let sender = super::super::tmux::sender::TmuxSender::new();
 

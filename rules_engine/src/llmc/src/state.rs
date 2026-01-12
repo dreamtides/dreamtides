@@ -62,6 +62,9 @@ pub struct State {
     /// All workers indexed by name
     #[serde(default)]
     pub workers: HashMap<String, WorkerRecord>,
+    /// Whether the daemon is currently running (for crash detection)
+    #[serde(default)]
+    pub daemon_running: bool,
 }
 
 /// Validates state consistency
@@ -117,7 +120,7 @@ pub fn load_state_with_patrol() -> Result<(State, super::config::Config)> {
 impl State {
     /// Creates a new empty state
     pub fn new() -> State {
-        State { workers: HashMap::new() }
+        State { workers: HashMap::new(), daemon_running: false }
     }
 
     /// Loads state from the given path

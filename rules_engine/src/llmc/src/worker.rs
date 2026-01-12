@@ -1,12 +1,11 @@
-#![allow(dead_code)]
-
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::thread;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 use anyhow::{Context, Result, bail};
 
 use crate::config::{Config, WorkerConfig};
+use crate::git;
 use crate::state::{State, WorkerRecord, WorkerStatus};
 use crate::tmux::sender::TmuxSender;
 use crate::tmux::session;
@@ -101,7 +100,6 @@ pub fn apply_transition(worker: &mut WorkerRecord, transition: WorkerTransition)
         WorkerTransition::ToNeedsReview { .. } => {}
         _ => {}
     }
-
     if matches!(transition, WorkerTransition::ToIdle | WorkerTransition::ToNeedsReview { .. })
         && worker.crash_count > 0
     {
@@ -113,20 +111,13 @@ pub fn apply_transition(worker: &mut WorkerRecord, transition: WorkerTransition)
         worker.crash_count = 0;
         worker.last_crash_unix = None;
     }
-
     worker.status = new_status;
     worker.last_activity_unix = SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs();
-
     tracing::info!(
-        operation = "state_transition",
-        worker = &worker.name,
-        from_status = ?old_status,
-        to_status = ?new_status,
-        transition_type = ?transition,
-        commit_sha = ?worker.commit_sha,
-        "Worker state transition"
+        operation = "state_transition", worker = & worker.name, from_status = ?
+        old_status, to_status = ? new_status, transition_type = ? transition, commit_sha
+        = ? worker.commit_sha, "Worker state transition"
     );
-
     Ok(())
 }
 
@@ -187,6 +178,44 @@ Please implement the requested changes following these guidelines.
     )
 }
 
+/// Resets a worker to clean idle state by discarding changes and resetting to
+/// origin/master
+pub fn reset_worker_to_clean_state(
+    worker_name: &str,
+    state: &mut State,
+    _config: &Config,
+) -> Result<Vec<String>> {
+    let mut actions = Vec::new();
+    let worker = state
+        .get_worker(worker_name)
+        .with_context(|| format!("Worker '{}' not found", worker_name))?;
+    let worktree_path = Path::new(&worker.worktree_path);
+    if !worktree_path.exists() {
+        bail!("Worktree does not exist for worker '{}'", worker_name);
+    }
+    if git::is_rebase_in_progress(worktree_path) {
+        git::abort_rebase(worktree_path).context("Failed to abort rebase")?;
+        actions.push(format!("Aborted in-progress rebase for worker '{}'", worker_name));
+    }
+    if git::has_uncommitted_changes(worktree_path)? {
+        git::reset_to_ref(worktree_path, "HEAD").context("Failed to reset uncommitted changes")?;
+        actions.push(format!("Discarded uncommitted changes for worker '{}'", worker_name));
+    }
+    git::reset_to_ref(worktree_path, "origin/master")
+        .context("Failed to reset to origin/master")?;
+    actions.push(format!("Reset worker '{}' to origin/master", worker_name));
+    let worker_mut = state.get_worker_mut(worker_name).unwrap();
+    worker_mut.current_prompt.clear();
+    worker_mut.commit_sha = None;
+    let old_status = worker_mut.status;
+    if old_status != WorkerStatus::Idle {
+        apply_transition(worker_mut, WorkerTransition::ToIdle)?;
+        actions
+            .push(format!("Transitioned worker '{}' from {:?} to Idle", worker_name, old_status));
+    }
+    Ok(actions)
+}
+
 impl Worker {
     /// Creates a new Worker from config and state
     pub fn new(_config: &WorkerConfig, state: &WorkerRecord) -> Worker {
@@ -207,21 +236,16 @@ fn wait_for_claude_ready(session: &str) -> Result<()> {
         thread::sleep(Duration::from_millis(POLL_INTERVAL_MS));
         let output = session::capture_pane(session, 50)
             .with_context(|| format!("Failed to capture pane for session '{}'", session))?;
-
-        // Check for the '>' prompt (Claude is ready)
         if output.lines().rev().take(5).any(|line| {
             let trimmed = line.trim_start();
             trimmed.starts_with("> ") || trimmed == ">" || trimmed.starts_with("❯")
         }) {
             return Ok(());
         }
-
-        // Check for bypass permissions prompt (Claude is waiting for confirmation)
         let lower = output.to_lowercase();
         if lower.contains("bypass") && lower.contains("permissions") {
             return Ok(());
         }
-
         let command = session::get_pane_command(session)?;
         if !session::is_claude_process(&command) {
             bail!("Claude process not found in session '{}', got command: {}", session, command);
@@ -235,13 +259,11 @@ fn accept_bypass_warning(session: &str, sender: &TmuxSender) -> Result<()> {
     thread::sleep(Duration::from_millis(500));
     let output = session::capture_pane(session, 50)
         .with_context(|| format!("Failed to capture pane for session '{}'", session))?;
-
     let lower = output.to_lowercase();
     let has_bypass_warning = lower.contains("bypass")
         || lower.contains("dangerously")
         || lower.contains("skip-permissions")
         || lower.contains("skip permissions");
-
     if has_bypass_warning {
         sender.send_keys_raw(session, "Down")?;
         thread::sleep(Duration::from_millis(200));

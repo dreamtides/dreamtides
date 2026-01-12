@@ -62,6 +62,7 @@ impl Patrol {
         let mut report = PatrolReport::default();
 
         self.check_session_health(state, config, &mut report)?;
+        self.check_state_consistency(state, &mut report)?;
         self.detect_state_transitions(state, config, &mut report)?;
         self.rebase_pending_reviews(state, &mut report)?;
         self.detect_stuck_workers(state, &mut report)?;
@@ -158,6 +159,65 @@ impl Patrol {
             .get_worker(worker_name)
             .ok_or_else(|| anyhow::anyhow!("Worker config not found"))?;
         worker::start_claude_in_session(session_id, worker_config)?;
+        Ok(())
+    }
+
+    fn check_state_consistency(&self, state: &mut State, report: &mut PatrolReport) -> Result<()> {
+        let worker_names: Vec<String> = state.workers.keys().cloned().collect();
+
+        for worker_name in worker_names {
+            let (worker_status, worktree_path) = {
+                let Some(worker) = state.get_worker(&worker_name) else { continue };
+                (worker.status, worker.worktree_path.clone())
+            };
+
+            let worktree_path = std::path::Path::new(&worktree_path);
+            if !worktree_path.exists() {
+                continue;
+            }
+
+            if worker_status == WorkerStatus::Idle {
+                match git::is_worktree_clean(worktree_path) {
+                    Ok(false) => {
+                        tracing::warn!(
+                            "Worker '{}' is idle but has dirty worktree, marking as error",
+                            worker_name
+                        );
+                        let transition = WorkerTransition::ToError {
+                            reason: "Dirty worktree detected during patrol".to_string(),
+                        };
+                        if let Some(worker_mut) = state.get_worker_mut(&worker_name) {
+                            worker::apply_transition(worker_mut, transition.clone())?;
+                            report.transitions_applied.push((worker_name.clone(), transition));
+                        }
+                    }
+                    Ok(true) => {}
+                    Err(e) => {
+                        tracing::warn!(
+                            "Failed to check worktree cleanliness for '{}': {}",
+                            worker_name,
+                            e
+                        );
+                    }
+                }
+            }
+
+            if worker_status != WorkerStatus::Rebasing && git::is_rebase_in_progress(worktree_path)
+            {
+                tracing::warn!(
+                    "Worker '{}' has orphaned rebase state, marking as error",
+                    worker_name
+                );
+                let transition = WorkerTransition::ToError {
+                    reason: "Orphaned rebase state detected during patrol".to_string(),
+                };
+                if let Some(worker_mut) = state.get_worker_mut(&worker_name) {
+                    worker::apply_transition(worker_mut, transition.clone())?;
+                    report.transitions_applied.push((worker_name.clone(), transition));
+                }
+            }
+        }
+
         Ok(())
     }
 

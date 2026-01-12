@@ -139,11 +139,25 @@ pub enum Commands {
         worker: String,
     },
 
+    /// Reset a worker to clean idle state
+    Reset {
+        /// Worker name to reset
+        worker: String,
+
+        /// Skip confirmation
+        #[arg(long)]
+        yes: bool,
+    },
+
     /// Check system health and configuration
     Doctor {
         /// Attempt to auto-repair detected issues
         #[arg(long)]
         repair: bool,
+
+        /// Skip confirmation prompts (use with --repair)
+        #[arg(long)]
+        yes: bool,
 
         /// Rebuild state from filesystem
         #[arg(long)]

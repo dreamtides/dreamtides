@@ -16,8 +16,8 @@ use cli::{Cli, Commands};
 
 use crate::commands::review::ReviewInterface;
 use crate::commands::{
-    accept, add, attach, doctor, down, init, message, nuke, peek, rebase, reject, review, start,
-    status, up,
+    accept, add, attach, doctor, down, init, message, nuke, peek, rebase, reject, reset, review,
+    start, status, up,
 };
 use crate::logging::config as log_config;
 
@@ -43,6 +43,7 @@ async fn main() -> Result<()> {
         Commands::Reject { .. } => "reject",
         Commands::Accept { .. } => "accept",
         Commands::Rebase { .. } => "rebase",
+        Commands::Reset { .. } => "reset",
         Commands::Doctor { .. } => "doctor",
         Commands::Peek { .. } => "peek",
     };
@@ -79,7 +80,8 @@ async fn main() -> Result<()> {
         Commands::Reject { message } => reject::run_reject(&message),
         Commands::Accept { worker } => accept::run_accept(worker),
         Commands::Rebase { worker } => rebase::run_rebase(&worker),
-        Commands::Doctor { repair, rebuild } => doctor::run_doctor(repair, rebuild),
+        Commands::Reset { worker, yes } => reset::run_reset(&worker, yes),
+        Commands::Doctor { repair, yes, rebuild } => doctor::run_doctor(repair, yes, rebuild),
         Commands::Peek { worker, lines } => peek::run_peek(worker, lines),
     };
 
