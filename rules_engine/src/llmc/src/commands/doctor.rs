@@ -294,13 +294,40 @@ fn check_sessions(report: &mut DoctorReport, repair: bool) -> Result<()> {
             let expected_session = format!("llmc-{}", worker.name);
             if sessions.contains(&expected_session) {
                 if worker.status == WorkerStatus::Offline {
-                    report.warnings.push(DoctorWarning {
-                        message: format!(
-                            "Worker '{}' marked offline but session exists",
-                            worker.name
-                        ),
-                        details: None,
-                    });
+                    if repair {
+                        match Command::new("tmux")
+                            .args(["kill-session", "-t", &expected_session])
+                            .output()
+                        {
+                            Ok(output) if output.status.success() => {
+                                report.repairs_succeeded.push(format!(
+                                    "Killed orphaned session for offline worker '{}'",
+                                    worker.name
+                                ));
+                            }
+                            Ok(output) => {
+                                report.repairs_failed.push(format!(
+                                    "Failed to kill session {}: {}",
+                                    expected_session,
+                                    String::from_utf8_lossy(&output.stderr)
+                                ));
+                            }
+                            Err(e) => {
+                                report.repairs_failed.push(format!(
+                                    "Failed to kill session {}: {}",
+                                    expected_session, e
+                                ));
+                            }
+                        }
+                    } else {
+                        report.warnings.push(DoctorWarning {
+                            message: format!(
+                                "Worker '{}' marked offline but session exists",
+                                worker.name
+                            ),
+                            details: None,
+                        });
+                    }
                 }
             } else if worker.status != WorkerStatus::Offline {
                 if repair {
@@ -576,6 +603,11 @@ fn attempt_worker_repairs(report: &mut DoctorReport, yes: bool) -> Result<()> {
     let config_path = config::get_config_path();
     let mut state = State::load(&state_path)?;
     let config = Config::load(&config_path)?;
+    if state.daemon_running {
+        state.daemon_running = false;
+        state.save(&state_path)?;
+        report.repairs_succeeded.push("Reset daemon_running crash flag".to_string());
+    }
     let mut workers_to_reset: Vec<String> = Vec::new();
     let workers: Vec<_> = state.workers.values().collect();
     for worker in workers {
@@ -590,11 +622,6 @@ fn attempt_worker_repairs(report: &mut DoctorReport, yes: bool) -> Result<()> {
     }
     if workers_to_reset.is_empty() {
         return Ok(());
-    }
-    if state.daemon_running {
-        state.daemon_running = false;
-        state.save(&state_path)?;
-        report.repairs_succeeded.push("Reset daemon_running crash flag".to_string());
     }
     if !yes {
         println!("\nThe following repairs will be performed:");
