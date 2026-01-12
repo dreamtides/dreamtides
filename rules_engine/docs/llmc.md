@@ -12,14 +12,7 @@ LLMC v2 manages multiple Claude Code CLI sessions running in parallel git worktr
 
 ### Key Differences from V1
 
-- **TMUX-based sessions**: Workers are persistent Claude Code sessions in TMUX,
-  not transient subprocesses
-- **Interactive control**: Full interactive access to worker sessions via
-  `llmc attach`
-- **Persistent daemon**: `llmc up` runs continuously, monitoring workers and
-  orchestrating state transitions
-- **Patrol system**: Background process that maintains system health and
-  facilitates rebasing
+LLMC v2 introduces several fundamental architectural changes from the original version. Workers are now persistent Claude Code sessions running in TMUX rather than transient subprocesses, providing greater stability and session continuity. This TMUX-based approach enables full interactive control, allowing developers to attach directly to worker sessions via `llmc attach` for real-time observation and intervention. The system operates through a persistent daemon that runs continuously when `llmc up` is active, continuously monitoring workers and orchestrating state transitions throughout the development workflow. Additionally, v2 includes a patrol system—a background process that maintains system health and facilitates automatic rebasing operations to keep workers synchronized with the master branch.
 
 ## Repository Layout
 
