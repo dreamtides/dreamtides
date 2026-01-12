@@ -2,11 +2,22 @@
 
 ## Overview
 
-LLMC v2 is a complete rewrite of the LLMC agent coordination system that manages multiple Claude Code CLI sessions running in parallel git worktrees. The system uses TMUX for persistent session management, enabling coordinated development work across multiple workers while maintaining a clean single-commit workflow on the master branch.
+- LLMC v2 is a complete rewrite of the LLMC agent coordination system
+- Manages multiple Claude Code CLI sessions running in parallel git worktrees
+- Uses TMUX for persistent session management
+- Enables coordinated development work across multiple workers
+- Maintains a clean single-commit workflow on the master branch
 
 ### Key Differences from V1
 
-LLMC v2 introduces several architectural improvements over the original version. The system offers full interactive control through the `llmc attach` command, allowing direct access to worker sessions when needed. A persistent daemon started via `llmc up` runs continuously in the background, monitoring workers and orchestrating state transitions throughout their lifecycle. Additionally, a patrol system operates as a background process that maintains system health and facilitates automatic rebasing of worker branches.
+- **TMUX-based sessions**: Workers are persistent Claude Code sessions in TMUX,
+  not transient subprocesses
+- **Interactive control**: Full interactive access to worker sessions via
+  `llmc attach`
+- **Persistent daemon**: `llmc up` runs continuously, monitoring workers and
+  orchestrating state transitions
+- **Patrol system**: Background process that maintains system health and
+  facilitates rebasing
 
 ## Repository Layout
 
@@ -48,6 +59,7 @@ Each worker progresses through a well-defined state machine:
      └───────────────────────────────────-┘
 
 Special States:
+- REBASING: Transitional state during rebase operations
 - ERROR: Worker encountered an unrecoverable error
 - OFFLINE: TMUX session not running (needs `llmc up`)
 ```
