@@ -289,7 +289,8 @@ fn run_main_loop(
     state: &mut State,
     state_path: &Path,
 ) -> Result<()> {
-    let patrol = Patrol::new(config);
+    let mut config = config.clone();
+    let patrol = Patrol::new(&config);
     let patrol_interval = Duration::from_secs(config.defaults.patrol_interval_secs as u64);
     let mut last_patrol = SystemTime::now();
 
@@ -300,7 +301,7 @@ fn run_main_loop(
         *state = State::load(state_path)?;
 
         poll_worker_states(state)?;
-        start_offline_workers(config, state, verbose)?;
+        start_offline_workers(&mut config, state, verbose)?;
         state.save(state_path)?;
 
         if !no_patrol
@@ -309,7 +310,7 @@ fn run_main_loop(
             if verbose {
                 println!("Running patrol...");
             }
-            match patrol.run_patrol(state, config) {
+            match patrol.run_patrol(state, &config) {
                 Ok(report) => {
                     if !report.transitions_applied.is_empty() {
                         tracing::info!(
@@ -339,7 +340,7 @@ fn run_main_loop(
         }
     }
 
-    graceful_shutdown(config, state)?;
+    graceful_shutdown(&config, state)?;
     state.save(state_path)?;
 
     Ok(())
@@ -366,8 +367,20 @@ fn poll_worker_states(state: &mut State) -> Result<()> {
     Ok(())
 }
 
-fn start_offline_workers(config: &Config, state: &mut State, verbose: bool) -> Result<()> {
+fn start_offline_workers(config: &mut Config, state: &mut State, verbose: bool) -> Result<()> {
     let worker_names: Vec<String> = state.workers.keys().cloned().collect();
+
+    let has_offline_workers = worker_names.iter().any(|name| {
+        state.workers.get(name).map(|w| w.status == WorkerStatus::Offline).unwrap_or(false)
+    });
+
+    if has_offline_workers {
+        let config_path = config::get_config_path();
+        if verbose {
+            println!("  [verbose] Reloading config before starting offline workers");
+        }
+        *config = Config::load(&config_path).context("Failed to reload config.toml")?;
+    }
 
     for worker_name in &worker_names {
         if let Some(worker_record) = state.workers.get(worker_name)
