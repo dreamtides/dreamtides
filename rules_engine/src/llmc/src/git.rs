@@ -422,7 +422,7 @@ pub fn rebase_onto(worktree: &Path, target: &str) -> Result<RebaseResult> {
             );
         }
         Ok(rebase_result) => {
-            tracing::warn!(
+            tracing::info!(
                 operation = "git_operation",
                 operation_type = "rebase",
                 repo_path = %worktree.display(),
