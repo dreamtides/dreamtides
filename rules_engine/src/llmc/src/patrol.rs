@@ -565,6 +565,7 @@ fn build_conflict_prompt(conflicts: &[String]) -> String {
          5. Continue the rebase: git rebase --continue\n\
          6. Verify success: Look for \"Successfully rebased and updated\" message\n\
          7. Run validation: just review\n\
+         8. IMPORTANT: If validation modified any files, amend them: git add -A && git commit --amend --no-edit\n\
          \n\
          Helpful commands:\n\
          - View our version: git show :2:<file>\n\

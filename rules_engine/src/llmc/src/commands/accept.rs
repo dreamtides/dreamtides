@@ -384,6 +384,7 @@ fn build_conflict_resolution_prompt(conflicts: &[String]) -> String {
          4. Stage resolved files: git add <file>\n\
          5. Continue rebase: git rebase --continue\n\
          6. Run validation: just review\n\
+         7. IMPORTANT: If validation modified any files, amend them: git add -A && git commit --amend --no-edit\n\
          \n\
          Notes:\n\
          - View original versions: git show :2:<file> (ours) :3:<file> (theirs)\n\
