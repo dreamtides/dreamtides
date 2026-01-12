@@ -6,12 +6,7 @@ LLMC v2 is a complete rewrite of the LLMC agent coordination system that manages
 
 ### Key Differences from V1
 
-- **Interactive control**: Full interactive access to worker sessions via
-  `llmc attach`
-- **Persistent daemon**: `llmc up` runs continuously, monitoring workers and
-  orchestrating state transitions
-- **Patrol system**: Background process that maintains system health and
-  facilitates rebasing
+LLMC v2 introduces several architectural improvements over the original version. The system offers full interactive control through the `llmc attach` command, allowing direct access to worker sessions when needed. A persistent daemon started via `llmc up` runs continuously in the background, monitoring workers and orchestrating state transitions throughout their lifecycle. Additionally, a patrol system operates as a background process that maintains system health and facilitates automatic rebasing of worker branches.
 
 ## Repository Layout
 
