@@ -366,6 +366,9 @@ impl Patrol {
             return Ok(WorkerTransition::None);
         }
 
+        // Rebase is complete (one way or another). Check pane output for completion
+        // messages to provide better logging, but always transition to needs_review
+        // since the rebase is no longer in progress.
         let output = session::capture_pane(session_id, 50)?;
 
         let rebase_completed = output.contains("Successfully rebased and updated");
@@ -374,32 +377,23 @@ impl Patrol {
 
         if rebase_completed {
             tracing::info!("Worker {} completed rebase successfully", session_id);
-            if git::has_uncommitted_changes(worktree_path)? {
-                tracing::info!(
-                    "Worker {} has uncommitted changes after rebase, amending",
-                    session_id
-                );
-                git::amend_uncommitted_changes(worktree_path)?;
-            }
-            let commit_sha = git::get_head_commit(worktree_path)?;
-            return Ok(WorkerTransition::ToNeedsReview { commit_sha });
-        }
-
-        if rebase_aborted {
+        } else if rebase_aborted {
             tracing::warn!("Worker {} aborted rebase", session_id);
-            if git::has_uncommitted_changes(worktree_path)? {
-                tracing::info!(
-                    "Worker {} has uncommitted changes after abort, amending",
-                    session_id
-                );
-                git::amend_uncommitted_changes(worktree_path)?;
-            }
-            return Ok(WorkerTransition::ToNeedsReview {
-                commit_sha: git::get_head_commit(worktree_path)?,
-            });
+        } else {
+            tracing::info!(
+                "Worker {} rebase finished (no completion message in pane, assuming success)",
+                session_id
+            );
         }
 
-        Ok(WorkerTransition::None)
+        // Handle any uncommitted changes by amending
+        if git::has_uncommitted_changes(worktree_path)? {
+            tracing::info!("Worker {} has uncommitted changes after rebase, amending", session_id);
+            git::amend_uncommitted_changes(worktree_path)?;
+        }
+
+        let commit_sha = git::get_head_commit(worktree_path)?;
+        Ok(WorkerTransition::ToNeedsReview { commit_sha })
     }
 
     fn rebase_pending_reviews(
