@@ -352,11 +352,28 @@ Runs health checks on the system.
 
 ```bash
 llmc doctor
+llmc doctor --repair
+llmc doctor --repair --yes
+llmc doctor --rebuild
 ```
 
 Checks: required binaries present, state file valid, TMUX sessions match
 workers, worktrees exist and are clean, git configuration correct, no orphaned
 branches.
+
+#### Flags
+
+- `--repair`: Automatically fix detected issues including:
+  - Kill orphaned TMUX sessions (sessions that exist but have no configured worker)
+  - Mark workers as offline when TMUX sessions are missing
+  - Reset workers in error state to clean idle state
+  - Fix state inconsistencies (missing commit_sha, empty prompts, future timestamps)
+  - Reset daemon crash flag
+  - Clean up orphaned git rebase state
+
+- `--yes`: Skip confirmation prompts when used with `--repair`. Useful for automated workflows.
+
+- `--rebuild`: Rebuild state.json from filesystem by scanning worktrees and TMUX sessions. Use when state file is corrupted or lost.
 
 ## Merge Conflict Resolution
 

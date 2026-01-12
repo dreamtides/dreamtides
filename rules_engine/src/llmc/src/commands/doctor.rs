@@ -307,10 +307,32 @@ fn check_sessions(report: &mut DoctorReport, repair: bool) -> Result<()> {
             if let Some(worker_name) = session_name.strip_prefix("llmc-")
                 && !state.workers.contains_key(worker_name)
             {
-                report.warnings.push(DoctorWarning {
-                    message: format!("Orphaned session: {}", session_name),
-                    details: Some("Session exists but no worker configured".to_string()),
-                });
+                if repair {
+                    match Command::new("tmux").args(["kill-session", "-t", session_name]).output() {
+                        Ok(output) if output.status.success() => {
+                            report
+                                .repairs_succeeded
+                                .push(format!("Killed orphaned session: {}", session_name));
+                        }
+                        Ok(output) => {
+                            report.repairs_failed.push(format!(
+                                "Failed to kill session {}: {}",
+                                session_name,
+                                String::from_utf8_lossy(&output.stderr)
+                            ));
+                        }
+                        Err(e) => {
+                            report
+                                .repairs_failed
+                                .push(format!("Failed to kill session {}: {}", session_name, e));
+                        }
+                    }
+                } else {
+                    report.warnings.push(DoctorWarning {
+                        message: format!("Orphaned session: {}", session_name),
+                        details: Some("Session exists but no worker configured".to_string()),
+                    });
+                }
             }
         }
     }
