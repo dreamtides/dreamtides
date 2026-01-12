@@ -6,8 +6,6 @@ LLMC v2 is a complete rewrite of the LLMC agent coordination system that manages
 
 ### Key Differences from V1
 
-- **TMUX-based sessions**: Workers are persistent Claude Code sessions in TMUX,
-  not transient subprocesses
 - **Interactive control**: Full interactive access to worker sessions via
   `llmc attach`
 - **Persistent daemon**: `llmc up` runs continuously, monitoring workers and
