@@ -59,7 +59,14 @@ fn send_shutdown_to_workers(config: &Config, state: &State, force: bool) -> Resu
             } else {
                 println!("  Sending Ctrl-C to worker '{}'...", worker_name);
                 if config.get_worker(worker_name).is_none() {
-                    eprintln!("Warning: Worker '{}' not found in config, skipping", worker_name);
+                    tracing::warn!(
+                        "Worker '{}' exists in state but not in config during shutdown",
+                        worker_name
+                    );
+                    eprintln!(
+                        "Warning: Worker '{}' not found in config.toml, skipping graceful shutdown",
+                        worker_name
+                    );
                     continue;
                 }
 

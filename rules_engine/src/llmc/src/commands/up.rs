@@ -203,9 +203,25 @@ fn start_worker(name: &str, config: &Config, state: &mut State, verbose: bool) -
         );
     }
 
-    let worker_config = config
-        .get_worker(name)
-        .with_context(|| format!("Worker '{}' not found in config", name))?;
+    let Some(worker_config) = config.get_worker(name) else {
+        tracing::warn!(
+            "Worker '{}' exists in state but not in config.toml. This indicates a configuration issue.",
+            name
+        );
+        bail!(
+            "Worker '{}' not found in config.toml\n\
+             The worker exists in state.json but has no corresponding [workers.{}] section in config.toml.\n\n\
+             To fix this:\n\
+             1. Run 'llmc doctor --repair' to diagnose and fix the issue, or\n\
+             2. Manually add a [workers.{}] section to ~/llmc/config.toml, or\n\
+             3. Run 'llmc nuke {}' and 'llmc add {}' to recreate the worker",
+            name,
+            name,
+            name,
+            name,
+            name
+        );
+    };
 
     if verbose {
         println!("    [verbose] Session ID: {}", worker_record.session_id);
@@ -374,7 +390,14 @@ fn graceful_shutdown(config: &Config, state: &mut State) -> Result<()> {
             println!("  Stopping worker '{}'...", worker_name);
 
             if config.get_worker(worker_name).is_none() {
-                eprintln!("Warning: Worker '{}' not found in config, skipping", worker_name);
+                tracing::warn!(
+                    "Worker '{}' exists in state but not in config during shutdown",
+                    worker_name
+                );
+                eprintln!(
+                    "Warning: Worker '{}' not found in config.toml, skipping graceful shutdown",
+                    worker_name
+                );
                 continue;
             }
 

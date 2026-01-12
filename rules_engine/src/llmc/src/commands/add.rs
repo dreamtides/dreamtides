@@ -64,9 +64,7 @@ pub fn run_add(name: &str, model: Option<String>, role_prompt: Option<String>) -
     state.add_worker(worker_record);
     state.save(&state_path)?;
 
-    if model.is_some() || role_prompt.is_some() {
-        add_worker_to_config(name, model, role_prompt)?;
-    }
+    add_worker_to_config(name, model, role_prompt)?;
 
     println!("✓ Worker '{}' added successfully!", name);
     println!("\nWorktree: {}", worktree_path.display());
@@ -203,6 +201,10 @@ fn add_worker_to_config(
     }
     if let Some(rp) = role_prompt {
         worker_lines.push(format!("role_prompt = \"{}\"", rp));
+    }
+
+    if worker_lines.is_empty() {
+        worker_lines.push("# Uses defaults from [defaults] section".to_string());
     }
 
     let worker_config = format!("{}{}\n", worker_config_section, worker_lines.join("\n"));
