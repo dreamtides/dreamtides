@@ -57,8 +57,8 @@ pub fn kill_session(name: &str) -> Result<()> {
 /// Checks if a TMUX session exists
 pub fn session_exists(name: &str) -> bool {
     Tmux::with_command(HasSession::new().target_session(name))
-        .status()
-        .map(|status| status.success())
+        .output()
+        .map(|output| output.success())
         .unwrap_or(false)
 }
 
