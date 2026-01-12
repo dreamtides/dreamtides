@@ -322,12 +322,6 @@ fn run_main_loop(
                     if !report.rebases_triggered.is_empty() {
                         tracing::info!("Patrol triggered rebases: {:?}", report.rebases_triggered);
                     }
-                    if !report.stuck_workers_nudged.is_empty() {
-                        tracing::info!(
-                            "Patrol nudged stuck workers: {:?}",
-                            report.stuck_workers_nudged
-                        );
-                    }
                     if !report.errors.is_empty() {
                         tracing::error!("Patrol encountered errors: {:?}", report.errors);
                     }

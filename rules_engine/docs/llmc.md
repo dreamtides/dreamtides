@@ -8,6 +8,19 @@
 - Enables coordinated development work across multiple workers
 - Maintains a clean single-commit workflow on the master branch
 
+### Design Philosophy
+
+**Deterministic signals only**: LLMC relies exclusively on observable, unambiguous events:
+- Git commits (not "it looks done")
+- Process exit codes (not "it seems stuck")
+- Explicit user commands (not inferred intent)
+
+**No heuristic inference**: Previous systems attempted to "understand" agent output through regex patterns to detect questions, completion, errors, or stuck states. This proved unreliable and complex. LLMC intentionally avoids this.
+
+**Manual intervention over automation**: When issues arise, LLMC surfaces them to the user rather than attempting automatic recovery. Users can always attach directly to workers via `llmc attach`.
+
+**Future evolution**: In a later phase, a dedicated coordinator agent may analyze output and provide intelligent categorization, but the current system deliberately keeps this simple.
+
 ### Key Differences from V1
 
 - **TMUX-based sessions**: Workers are persistent Claude Code sessions in TMUX,
@@ -16,8 +29,8 @@
   `llmc attach`
 - **Persistent daemon**: `llmc up` runs continuously, monitoring workers and
   orchestrating state transitions
-- **Patrol system**: Background process that maintains system health and
-  facilitates rebasing
+- **Patrol system**: Background process that detects commits and maintains rebase health
+- **Simplified state detection**: No regex-based output analysis or heuristics
 
 ## Repository Layout
 
@@ -38,7 +51,7 @@
 
 ## Worker State Machine
 
-Each worker progresses through a well-defined state machine:
+Each worker progresses through a well-defined state machine driven by **deterministic signals only** (git commits, process state, explicit user commands). LLMC does not attempt to infer worker intent from output analysis.
 
 ```
                       ┌─────────────────────────────────────────┐
@@ -47,16 +60,16 @@ Each worker progresses through a well-defined state machine:
 ┌─────────┐      ┌──────────┐      ┌───────────────┐           │
 │  IDLE   │─────▶│ WORKING  │─────▶│ NEEDS_REVIEW  │───────────┤
 └─────────┘ start└──────────┘commit└───────────────┘   accept  │
-     ▲               │                    │                     │
-     │               │ no commit          │ reject              │
-     │               ▼                    ▼                     │
-     │        ┌─────────────┐      ┌──────────┐                │
-     │        │ NEEDS_INPUT │      │ REJECTED │────────────────┘
-     │        └─────────────┘      └──────────┘    completes
-     │               │                    │
-     │               │ message            │ completes
-     │               ▼                    │
-     └───────────────────────────────────-┘
+     ▲                                    │                     │
+     │                                    │ reject              │
+     │                                    ▼                     │
+     │                              ┌──────────┐                │
+     │                              │ REJECTED │────────────────┘
+     │                              └──────────┘    completes
+     │                                    │
+     │                                    │ completes
+     │                                    │
+     └────────────────────────────────────┘
 
 Special States:
 - REBASING: Transitional state during rebase operations
@@ -70,12 +83,20 @@ Special States:
 |-------|-------------|
 | `idle` | Worker has no active task, ready to receive work |
 | `working` | Worker is actively implementing a task |
-| `needs_input` | Worker stopped without committing, likely waiting for clarification |
 | `needs_review` | Worker completed work and committed, awaiting human review |
 | `rejected` | Work was rejected with feedback, worker is implementing changes |
 | `rebasing` | Worker is resolving merge conflicts after a rebase |
 | `error` | Worker is in an error state requiring manual intervention |
 | `offline` | TMUX session is not running |
+
+### State Transition Philosophy
+
+LLMC uses **deterministic signals only** for state transitions:
+- **Git commits**: Worker transitions from `working` → `needs_review` when patrol detects a new commit
+- **Exit codes**: Process crashes detected via TMUX pane exit codes
+- **User commands**: Explicit transitions via `llmc start`, `llmc accept`, `llmc reject`, etc.
+
+**No heuristic analysis**: LLMC does not attempt to detect questions, interpret output for completion indicators, or guess if a worker is "stuck". The user can always attach to a worker via `llmc attach` to interact directly.
 
 ## Configuration
 
@@ -152,9 +173,12 @@ with the worker's worktree as the working directory.
 
 When starting a worker session, the system creates a detached TMUX session,
 sets environment variables for worker identification, launches Claude with
-configured flags, waits for Claude to initialize (polling for the ">" prompt),
+configured flags, waits for Claude to initialize (one-time check for the ">" prompt),
 accepts the bypass permissions warning if shown, sends `/clear`, and marks the
 worker as idle.
+
+**Note**: The ">" prompt check is used only during initial startup to verify Claude
+is ready. LLMC does not use prompt detection for ongoing state management.
 
 ### Reliable Communication
 
@@ -175,28 +199,41 @@ timing, failure recovery, and research results.
 
 ### State Detection
 
-Detecting Claude's state requires parsing terminal output. The system checks
-process health (is Claude running?), looks for the ">" prompt indicating
-readiness, detects permission prompts and questions, and identifies error
-states. The detection hierarchy is: crash > confirmation > question > ready >
-processing.
+**Philosophy**: LLMC relies exclusively on deterministic, observable signals. No regex-based output analysis, no heuristics for "inferring" agent state.
 
-See `llmc2-appendix-claude-state.md` for detailed heuristics and pattern
-matching code.
+**What LLMC monitors:**
+1. **Process health**: Is the Claude process running or has it exited? (via TMUX pane process inspection)
+2. **Exit codes**: Non-zero exit codes (except 130 for SIGINT) indicate crashes
+3. **Git commits**: New commits detected via `git log` trigger state transitions
+4. **Rebase state**: Presence of `.git/rebase-merge` or conflict markers
+
+**What LLMC does NOT do:**
+- ❌ Detect if Claude is "asking a question"
+- ❌ Infer completion from output patterns like "done", "finished", etc.
+- ❌ Detect permission prompts or tool confirmations
+- ❌ Parse output for error messages or "stuck" indicators
+- ❌ Send automatic "nudges" to idle workers
+
+**State detection hierarchy**: `Exited` > `Processing` > `Unknown`
+
+**Rationale**: Complex regex-based state inference proved unreliable and added unnecessary complexity. In a future iteration, a dedicated coordinator agent may be introduced to analyze recent output and categorize it intelligently, but the current system intentionally avoids this.
 
 ## The Patrol System
 
 The Patrol is a background process that runs periodically during `llmc up` to
-maintain system health. It performs four main operations:
+maintain system health. It performs three main operations:
 
 1. **Check session health**: Verify TMUX sessions exist and match state file
-2. **Detect state transitions**: Find workers that have finished but haven't
-   been processed yet
+2. **Detect state transitions**: Find workers that have committed and transition them to `needs_review`
 3. **Rebase pending reviews**: Keep `needs_review` workers rebased on master
-4. **Detect stuck workers**: Find workers that appear stuck
 
 The patrol runs on a configurable interval (default: 60 seconds) unless another
 patrol is already running or the system is shutting down.
+
+**Detection approach**: State transitions are detected via deterministic signals:
+- Git commit detection: `git log -1 --format=%H` to check for new commits
+- Process health: TMUX pane process inspection
+- Rebase status: Checking for `.git/rebase-merge` or conflict markers
 
 ## Command Reference
 
@@ -413,43 +450,22 @@ completion patterns ("Successfully rebased"), and failure patterns ("rebase
 | Failure Mode | Detection | Recovery |
 |--------------|-----------|----------|
 | Worker aborts | `git rebase --abort` in output | Reset to `needs_review`, notify user |
-| Worker stuck | Stuck indicators + timeout | Send help prompt, escalate after 5 min |
-| Persistent conflicts | Multiple continue failures | Send detailed help, escalate after 3 attempts |
-| Validation failure | `just check` fails post-rebase | Send error output, worker fixes |
+| Persistent conflicts | Rebase state persists across patrol runs | User attaches via `llmc attach` to assist |
+| Validation failure | `just check` fails post-rebase | Worker output shows errors, worker fixes or user attaches |
 
-During rebasing, the worker cannot receive new tasks, cannot be reviewed, is
-monitored by patrol for resolution, and timeouts trigger escalation.
+During rebasing, the worker cannot receive new tasks and cannot be reviewed. The user can attach at any time via `llmc attach` to provide direct assistance.
 
-## Failure Recovery
+## Failure Handling
 
-The system must handle several failure modes gracefully. This section summarizes
-the recovery strategies; see `llmc2-appendix-error-recovery.md` for detailed
-decision trees.
+LLMC's approach to failure handling is minimal and deterministic.
 
-### Summary Table
+### Crash Detection
 
-| Failure Mode | Detection | Retries | Escalation |
-|--------------|-----------|---------|------------|
-| Lost input | Ready state persists after send | 3 attempts | Error state, notify user |
-| Session crash | Pane command is shell | Auto-restart | Manual after 3rd crash |
-| Stuck processing | `working` state >30 min | Nudge, then alert | Error after 2nd nudge |
-| Partial send | Incomplete text in pane | Clear and resend | Error after 3 failures |
-| State corruption | JSON parse error | Backup restore | Manual intervention |
+Worker crashes are detected via TMUX pane exit codes:
+- Exit code 0 or 130 (SIGINT): Normal termination
+- Any other exit code: Crash
 
-### Key Principles
-
-1. **Auto-recover when possible**: Most transient failures (lost input, partial
-   sends) should be automatically retried before involving the user.
-
-2. **Preserve work in progress**: When a crash occurs during `working` state,
-   the system attempts to restore context and resume rather than losing progress.
-
-3. **Escalate with context**: When manual intervention is required, provide
-   diagnostic information (logs, pane output, state history) to help the user
-   understand what went wrong.
-
-4. **Fail fast on corruption**: State file corruption requires immediate user
-   attention since recovery involves potentially destructive operations.
+When a crash is detected, patrol marks the worker as having crashed and increments the crash counter. After 24 hours without a crash, the counter resets.
 
 ### State File Integrity
 
@@ -459,6 +475,16 @@ The `state.json` file is protected by:
 - **Pre-write validation**: Schema validation before any write
 - **Automatic backups**: Previous state preserved as `state.json.bak`
 - **Recovery command**: `llmc doctor --repair` attempts automatic repair
+- **Rebuild command**: `llmc doctor --rebuild` reconstructs state from filesystem
+
+### Manual Intervention
+
+LLMC intentionally avoids automatic recovery attempts. When issues occur:
+1. **Session crashes**: User inspects logs and restarts manually
+2. **Workers appear inactive**: User attaches via `llmc attach` to interact directly
+3. **State corruption**: User runs `llmc doctor --rebuild`
+
+**Rationale**: Automatic recovery and "smart" inference of worker state led to unpredictable behavior. The current approach prefers transparency and manual control.
 
 ## Architecture
 
@@ -503,7 +529,7 @@ rules_engine/src/llmc/
 
 Core dependencies: clap for CLI, tokio for async, serde/serde_json/toml for
 serialization, anyhow/thiserror for error handling, tmux_interface for TMUX,
-regex for output parsing, ctrlc for signal handling, tracing for logging.
+ctrlc for signal handling, tracing for logging.
 
 ### Error Handling
 
@@ -529,17 +555,20 @@ if `sound_on_review` is enabled.
 - Debounce: 500ms base + 100ms/KB, capped at 2000ms
 - Enter key: 3 retry attempts with 200ms delays
 - Claude process detection: check for "node", "claude", or semver
-- Prompt readiness: poll for ">" at line start
 - Bypass dialog: Down + Enter sequence
 - Session identity: environment variables
 - Crash detection: tmux pane-died hook
 - Many configuration steps are best-effort (non-fatal)
 
-Key reference files in Gastown (`~/gastown`):
-- `internal/tmux/tmux.go`: SendKeysDebounced, NudgeSession, WaitForClaudeReady
-- `internal/polecat/session_manager.go`: Session lifecycle
-- `internal/agent/state.go`: State management patterns
-- `internal/witness/protocol.go`: Protocol-based message classification
+### Evolution from Gastown
+
+LLMC v2 **simplifies** Gastown's approach:
+- **Removed**: Complex output analysis, nudge system, heuristic "stuck" detection
+- **Removed**: Protocol-based message classification (Witness system)
+- **Kept**: TMUX session management, debounce logic, basic process health checks
+- **Philosophy shift**: From "smart inference" to "deterministic signals only"
+
+Gastown attempted to infer agent state through regex patterns and output analysis. This proved brittle and unpredictable. LLMC v2 instead relies on git commits, exit codes, and explicit user commands.
 
 ## Security Considerations
 
@@ -555,5 +584,3 @@ Key reference files in Gastown (`~/gastown`):
 ## Appendices
 
 - `llmc2-appendix-tmux.md`: TMUX integration details, debounce timing research
-- `llmc2-appendix-claude-state.md`: Claude state detection heuristics
-- `llmc2-appendix-error-recovery.md`: Detailed error recovery decision trees
