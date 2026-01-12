@@ -406,7 +406,14 @@ impl Patrol {
             let worktree_path = PathBuf::from(&worker.worktree_path);
             let session_id = worker.session_id.clone();
 
-            if git::is_rebase_in_progress(&worktree_path) {
+            let rebase_in_progress = git::is_rebase_in_progress(&worktree_path);
+            tracing::debug!(
+                worker = %worker_name,
+                rebase_in_progress,
+                "Checking if rebase is in progress before triggering rebase"
+            );
+
+            if rebase_in_progress {
                 tracing::debug!(
                     "Skipping rebase for worker '{}' - rebase already in progress",
                     worker_name

@@ -335,7 +335,16 @@ pub fn amend_uncommitted_changes(worktree: &Path) -> Result<()> {
 
 /// Rebases the worktree onto the target branch
 pub fn rebase_onto(worktree: &Path, target: &str) -> Result<RebaseResult> {
-    if is_rebase_in_progress(worktree) {
+    let rebase_in_progress = is_rebase_in_progress(worktree);
+    tracing::debug!(
+        operation = "git_operation",
+        operation_type = "rebase_check",
+        repo_path = %worktree.display(),
+        rebase_in_progress,
+        "Checking rebase state before starting rebase"
+    );
+
+    if rebase_in_progress {
         tracing::warn!(
             operation = "git_operation",
             operation_type = "rebase",
@@ -422,7 +431,19 @@ pub fn rebase_onto(worktree: &Path, target: &str) -> Result<RebaseResult> {
 
 /// Checks if a rebase is currently in progress
 pub fn is_rebase_in_progress(worktree: &Path) -> bool {
-    worktree.join(".git/rebase-merge").exists() || worktree.join(".git/rebase-apply").exists()
+    let git_dir = match get_git_dir(worktree) {
+        Ok(dir) => dir,
+        Err(e) => {
+            tracing::warn!(
+                "Failed to get git directory for {}: {}. Assuming no rebase in progress.",
+                worktree.display(),
+                e
+            );
+            return false;
+        }
+    };
+
+    git_dir.join("rebase-merge").exists() || git_dir.join("rebase-apply").exists()
 }
 
 /// Checks if worktree is clean (no uncommitted changes and no rebase in
@@ -756,6 +777,37 @@ pub fn pull_rebase(worktree: &Path) -> Result<()> {
     }
 
     Ok(())
+}
+
+/// Gets the actual git directory path for a worktree.
+/// In a worktree, `.git` is a file containing `gitdir: <path>`, not a
+/// directory.
+fn get_git_dir(worktree: &Path) -> Result<std::path::PathBuf> {
+    let git_file = worktree.join(".git");
+
+    if git_file.is_dir() {
+        return Ok(git_file);
+    }
+
+    if git_file.is_file() {
+        let content = std::fs::read_to_string(&git_file).context("Failed to read .git file")?;
+
+        if let Some(gitdir_line) = content.lines().next()
+            && let Some(path) = gitdir_line.strip_prefix("gitdir: ")
+        {
+            let git_dir = if std::path::Path::new(path).is_absolute() {
+                std::path::PathBuf::from(path)
+            } else {
+                worktree.join(path)
+            };
+
+            if git_dir.exists() {
+                return Ok(git_dir);
+            }
+        }
+    }
+
+    bail!("Could not determine git directory for worktree: {}", worktree.display())
 }
 
 #[cfg(test)]
