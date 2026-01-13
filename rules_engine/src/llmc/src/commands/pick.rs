@@ -132,9 +132,74 @@ pub fn run_pick(worker: &str) -> Result<()> {
     }
 
     let final_commit = git::get_head_commit(&worktree_path)?;
+
+    // Merge the rebased changes into llmc master
+    println!("Syncing local master with origin/master...");
+    git::checkout_branch(&llmc_root, "master")?;
+    git::reset_to_ref(&llmc_root, "origin/master")?;
+    let master_before = git::get_head_commit(&llmc_root)?;
+
+    println!("Merging to master...");
+    git::fast_forward_merge(&llmc_root, &worker_record.branch)?;
+    let master_after = git::get_head_commit(&llmc_root)?;
+
+    if master_before == master_after {
+        bail!(
+            "Master branch was not updated after merge. This should not happen.\n\
+             Before: {}\n\
+             After: {}",
+            master_before,
+            master_after
+        );
+    }
+
+    if master_after != final_commit {
+        bail!(
+            "Master HEAD ({}) does not match worker commit ({}). This should not happen.",
+            master_after,
+            final_commit
+        );
+    }
+
+    println!(
+        "✓ Master updated: {} -> {}",
+        &master_before[..7.min(master_before.len())],
+        &master_after[..7.min(master_after.len())]
+    );
+
+    // Fetch the commit into the source repository
+    println!("Fetching commit into source repository...");
+    let source_repo = PathBuf::from(&_config.repo.source);
+    git::fetch_from_local(&source_repo, &llmc_root, &final_commit)?;
+
+    println!("Updating source repository...");
+    git::checkout_branch(&source_repo, "master")?;
+
+    if git::has_uncommitted_changes(&source_repo)? {
+        bail!(
+            "The master branch in source repository has uncommitted changes.\n\
+             This would result in data loss. Please commit or stash your changes first.\n\
+             Repository: {}",
+            source_repo.display()
+        );
+    }
+
+    git::reset_to_ref(&source_repo, &final_commit)?;
+
+    let source_head = git::get_head_commit(&source_repo)?;
+    if source_head != final_commit {
+        bail!(
+            "Source repository HEAD ({}) does not match new commit ({})",
+            source_head,
+            final_commit
+        );
+    }
+
+    println!("✓ Source repository updated to {}", &final_commit[..7.min(final_commit.len())]);
+
     println!("\n✓ Successfully picked changes from worker '{}'", worker);
     println!("  Final commit: {}", &final_commit[..7.min(final_commit.len())]);
-    println!("  Branch rebased onto origin/master");
+    println!("  Branch rebased onto origin/master and merged to source repository");
 
     Ok(())
 }
