@@ -16,8 +16,8 @@ use cli::{Cli, Commands};
 
 use crate::commands::review::ReviewInterface;
 use crate::commands::{
-    accept, add, attach, doctor, down, init, message, nuke, peek, rebase, reject, reset, review,
-    start, status, up,
+    accept, add, attach, doctor, down, init, message, nuke, peek, pick, rebase, reject, reset,
+    review, start, status, up,
 };
 use crate::logging::config as log_config;
 
@@ -46,6 +46,7 @@ async fn main() -> Result<()> {
         Commands::Reset { .. } => "reset",
         Commands::Doctor { .. } => "doctor",
         Commands::Peek { .. } => "peek",
+        Commands::Pick { .. } => "pick",
     };
 
     tracing::info!(operation = "cli_command", command = command_name, "Command started");
@@ -83,6 +84,7 @@ async fn main() -> Result<()> {
         Commands::Reset { worker, yes } => reset::run_reset(&worker, yes),
         Commands::Doctor { repair, yes, rebuild } => doctor::run_doctor(repair, yes, rebuild),
         Commands::Peek { worker, lines } => peek::run_peek(worker, lines),
+        Commands::Pick { worker } => pick::run_pick(&worker),
     };
 
     let duration_ms = start_time.elapsed().as_millis() as u64;

@@ -173,4 +173,11 @@ pub enum Commands {
         #[arg(short, long, default_value = "10")]
         lines: u32,
     },
+
+    /// Low-level command to grab all changes from a worker and rebase onto
+    /// master
+    Pick {
+        /// Worker name
+        worker: String,
+    },
 }

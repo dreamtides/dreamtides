@@ -7,6 +7,7 @@ pub mod init;
 pub mod message;
 pub mod nuke;
 pub mod peek;
+pub mod pick;
 pub mod rebase;
 pub mod reject;
 pub mod reset;

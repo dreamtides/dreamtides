@@ -56,7 +56,9 @@ pub fn run_peek(worker: Option<String>, lines: u32) -> Result<()> {
     if output.trim().is_empty() {
         println!("(no output captured)");
     } else {
-        println!("{}", output);
+        // Remove trailing blank lines while preserving the content
+        let trimmed_output = trim_trailing_blank_lines(&output);
+        println!("{}", trimmed_output);
     }
 
     Ok(())
@@ -76,4 +78,30 @@ fn format_workers(state: &State) -> String {
         return "none".to_string();
     }
     state.workers.keys().map(String::as_str).collect::<Vec<_>>().join(", ")
+}
+
+/// Removes trailing blank lines from output while preserving content
+fn trim_trailing_blank_lines(output: &str) -> &str {
+    let mut end = output.len();
+    let mut chars = output.char_indices().rev().peekable();
+
+    while let Some((idx, ch)) = chars.next() {
+        if ch == '\n' {
+            // Check if this is a blank line (next char is also newline or we're at start)
+            if let Some(&(_, next_ch)) = chars.peek()
+                && (next_ch == '\n' || next_ch == '\r')
+            {
+                end = idx;
+                continue;
+            }
+            // Found a newline after content, this is where we want to end
+            break;
+        } else if !ch.is_whitespace() {
+            // Found non-whitespace content
+            break;
+        }
+        end = idx;
+    }
+
+    &output[..end]
 }
