@@ -424,7 +424,8 @@ falls back to full rebuild. The index stores the commit hash of its last
 known-good state for comparison.
 
 See [Appendix: Indexing Strategy](appendix_indexing_strategy.md) for the
-complete reconciliation algorithm.
+complete reconciliation algorithm and [Appendix: Indexing Performance](appendix_indexing_performance.md)
+for SQLite tuning and benchmarking guidance.
 
 ### Index Location
 
@@ -640,10 +641,10 @@ following module structure:
    [Appendix: Beads Analysis](appendix_beads_analysis.md) for detailed
    findings on `bd show`, `bd ready`, and `bd list` behaviors to preserve.
 
-2. **Indexing Performance Research**: Research SQLite best practices for
-   incremental indexing and full-text search. Investigate WAL mode,
-   connection pooling, and query optimization strategies for repositories
-   with 10,000+ documents.
+2. ~~**Indexing Performance Research**~~: Complete. See
+   [Appendix: Indexing Performance](appendix_indexing_performance.md) for
+   SQLite best practices including WAL mode, PRAGMA configuration,
+   FTS5 optimization, and benchmarking targets for 10,000+ documents.
 
 3. **Markdown Linter Integration**: Evaluate existing markdown linters
    (markdownlint, remark-lint) for potential integration rather than

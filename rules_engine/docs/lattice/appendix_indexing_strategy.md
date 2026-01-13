@@ -170,16 +170,21 @@ tracked (unstaged modifications).
 
 ### FTS5 Configuration
 
-The index uses SQLite FTS5 for body text search:
+The index uses SQLite FTS5 for body text search with external content:
 
 ```sql
 CREATE VIRTUAL TABLE fts_content USING fts5(
     document_id,
     body,
     content='documents',
-    content_rowid='rowid'
+    content_rowid='rowid',
+    automerge=4
 );
 ```
+
+External content mode (`content='documents'`) avoids storing duplicate body
+text, reducing index size by approximately 40%. The `automerge=4` setting
+balances insert performance with query speed.
 
 ### Triggers for Sync
 
@@ -197,6 +202,18 @@ SELECT document_id FROM fts_content WHERE body MATCH ?
 Results are ranked by BM25. The `lat list --name-contains` flag uses
 FTS for text search.
 
+### FTS Optimization
+
+After full index rebuilds, run optimization to merge all FTS B-trees:
+
+```sql
+INSERT INTO fts_content(fts_content) VALUES('optimize');
+```
+
+This reduces query latency at the cost of a one-time rebuild (1-5 seconds
+for 10,000 documents). See [Appendix: Indexing Performance](appendix_indexing_performance.md)
+for detailed tuning guidance.
+
 ## Transaction Handling
 
 ### Write Operations
@@ -213,25 +230,45 @@ don't block writers due to WAL mode.
 
 ### WAL Mode
 
-The index uses WAL (Write-Ahead Logging) mode:
-- Better concurrency
-- Faster writes
-- Automatic checkpointing
+The index uses WAL (Write-Ahead Logging) mode with these benefits:
+- Concurrent readers and writers (readers don't block writers)
+- 30-60% faster commits with NORMAL synchronous mode
+- Automatic checkpointing at 1000 pages (~4MB)
 
 WAL files (`.lattice/index.sqlite-wal` and `-shm`) are also gitignored.
 
+After bulk operations, run `PRAGMA wal_checkpoint(TRUNCATE)` to reset the
+WAL file size. See [Appendix: Indexing Performance](appendix_indexing_performance.md)
+for checkpoint management details.
+
 ## Performance Considerations
 
-### Connection Pooling
+### Connection Configuration
 
-Since Lattice doesn't run a daemon, each command opens a fresh connection.
-Connection overhead is minimal for SQLite, but prepared statement caching
-is lost between commands.
+Each `lat` command opens a fresh connection with optimized PRAGMAs:
+
+```sql
+PRAGMA journal_mode = WAL;
+PRAGMA synchronous = NORMAL;
+PRAGMA temp_store = MEMORY;
+PRAGMA mmap_size = 268435456;  -- 256MB
+PRAGMA busy_timeout = 5000;
+```
+
+Before closing, run `PRAGMA optimize` to help the query planner.
+
+### Prepared Statement Caching
+
+Use rusqlite's `prepare_cached()` for frequently-executed queries. While
+the cache doesn't persist across commands, it helps within a single
+command that executes the same query multiple times.
 
 ### Batch Operations
 
 Bulk operations (like `lat update` with multiple IDs) batch changes in a
-single transaction for atomicity and performance.
+single transaction for atomicity and performance. Without explicit
+transactions, SQLite creates an implicit transaction per statement,
+adding significant overhead.
 
 ### Index Size
 
@@ -240,7 +277,13 @@ For a repository with N documents and M links:
 - Links table: O(M) rows, typically M = 3-5N
 - FTS index: O(N × average_body_size)
 
-A 10,000 document repository should have an index under 50MB.
+Projections for typical repositories:
+- 1,000 documents: ~8MB total
+- 10,000 documents: ~80MB total
+- 50,000 documents: ~400MB total
+
+See [Appendix: Indexing Performance](appendix_indexing_performance.md) for
+detailed benchmarking targets and tuning guidance.
 
 ## Migration Strategy
 
