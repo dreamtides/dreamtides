@@ -59,7 +59,6 @@ pub fn run_start(
     println!("Pulling latest master into worker '{}'...", worker_name);
     git::pull_rebase(&worktree_path)?;
 
-    println!("Copying Tabula.xlsm to worker worktree...");
     copy_tabula_xlsm(&config, &worktree_path)?;
 
     let user_prompt = load_prompt_content(&prompt, &prompt_file)?;
