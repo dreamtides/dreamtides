@@ -29,8 +29,8 @@ pub fn run_start(
     }
 
     if !session::any_llmc_sessions_running()? {
-        eprintln!(
-            "Warning: LLMC daemon does not appear to be running (no llmc-* TMUX sessions detected).\n\
+        bail!(
+            "LLMC daemon is not running (no llmc-* TMUX sessions detected).\n\
              Run 'llmc up' to start the daemon."
         );
     }
