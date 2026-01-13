@@ -22,7 +22,7 @@ pub fn run_pick(worker: &str) -> Result<()> {
         );
     }
 
-    let (state, _config) = state::load_state_with_patrol()?;
+    let (state, config) = state::load_state_with_patrol()?;
 
     let worker_record = state.get_worker(worker).ok_or_else(|| {
         anyhow::anyhow!(
@@ -131,6 +131,24 @@ pub fn run_pick(worker: &str) -> Result<()> {
         return Ok(());
     }
 
+    // Get commit message and strip agent attribution
+    let commit_message = git::get_commit_message(&worktree_path, "HEAD")?;
+    let cleaned_message = git::strip_agent_attribution(&commit_message);
+
+    println!("Squashing commits...");
+    let base_commit = "origin/master";
+    git::squash_commits(&worktree_path, base_commit)?;
+
+    // Check if there are any changes to commit after the squash
+    if !git::has_staged_changes(&worktree_path)? {
+        println!("\n✓ Worker's changes already incorporated into master");
+        println!("  No new changes to pick - another worker likely made the same changes");
+        return Ok(());
+    }
+
+    println!("Creating squashed commit...");
+    create_commit(&worktree_path, &cleaned_message)?;
+
     let final_commit = git::get_head_commit(&worktree_path)?;
 
     // Merge the rebased changes into llmc master
@@ -169,7 +187,7 @@ pub fn run_pick(worker: &str) -> Result<()> {
 
     // Fetch the commit into the source repository
     println!("Fetching commit into source repository...");
-    let source_repo = PathBuf::from(&_config.repo.source);
+    let source_repo = PathBuf::from(&config.repo.source);
     git::fetch_from_local(&source_repo, &llmc_root, &final_commit)?;
 
     println!("Updating source repository...");
@@ -209,4 +227,21 @@ fn format_all_workers(state: &State) -> String {
         return "none".to_string();
     }
     state.workers.keys().map(String::as_str).collect::<Vec<_>>().join(", ")
+}
+
+fn create_commit(worktree_path: &PathBuf, message: &str) -> Result<()> {
+    let output = Command::new("git")
+        .arg("-C")
+        .arg(worktree_path)
+        .arg("commit")
+        .arg("-m")
+        .arg(message)
+        .output()
+        .context("Failed to execute git commit")?;
+
+    if !output.status.success() {
+        bail!("Failed to create commit: {}", String::from_utf8_lossy(&output.stderr));
+    }
+
+    Ok(())
 }
