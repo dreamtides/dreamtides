@@ -1,0 +1,211 @@
+# Appendix: Git Integration
+
+## Design Philosophy
+
+Lattice uses git as the authoritative store for all document content. The
+SQLite index is derived entirely from git-tracked files. This design ensures
+documents are versioned, mergeable, and recoverable.
+
+## Required Git Operations
+
+### Document Discovery
+
+**Command:** `git ls-files '*.md'`
+
+Returns all tracked markdown files. This excludes gitignored files and
+ensures consistent behavior between clean and dirty working directories.
+
+**Usage:** Full index rebuild, `lat list` without filters.
+
+### Change Detection
+
+**Command:** `git diff --name-only <commit>..HEAD -- '*.md'`
+
+Returns files modified between commits. Used for incremental reconciliation.
+
+**Command:** `git status --porcelain -- '*.md'`
+
+Returns uncommitted changes (staged and unstaged). Used to detect
+modifications not yet in any commit.
+
+### Commit Information
+
+**Command:** `git rev-parse HEAD`
+
+Returns current HEAD commit hash. Stored in index for reconciliation.
+
+**Command:** `git log -1 --format='%H' -- <path>`
+
+Returns last commit touching a specific file. Used for staleness detection.
+
+## Repository State Handling
+
+### Clean State
+
+Repository is clean when:
+- `git status --porcelain` returns empty
+- HEAD points to a branch (not detached)
+- No rebase/merge in progress
+
+In clean state, all git-based operations work normally.
+
+### Dirty Working Directory
+
+When uncommitted changes exist:
+- Document discovery still uses `git ls-files`
+- Untracked .md files are NOT indexed
+- Modified files are detected via `git status`
+- Index reconciliation processes uncommitted modifications
+
+### Detached HEAD
+
+When HEAD is detached (e.g., during bisect):
+- Normal operations continue
+- `last_commit` in index may not match HEAD
+- Reconciliation uses commit comparison where possible
+- Falls back to full rebuild if comparison fails
+
+### In-Progress Operations
+
+During rebase, merge, or cherry-pick:
+- Files may have conflict markers
+- Parse errors are logged as warnings, not failures
+- Conflicted files are skipped from index
+- User is warned about incomplete state
+
+## Client ID Storage
+
+### Configuration File
+
+Client IDs are stored in `~/.lattice.toml`:
+
+```toml
+[clients]
+"/path/to/repo" = "DT"
+"/other/repo" = "K2"
+```
+
+This file persists across repository deletion and re-clone, preserving
+the client's ID assignment.
+
+### ID Selection
+
+When a client first uses Lattice in a repository:
+1. Check if an ID exists in `~/.lattice.toml` for this path
+2. If not, query the repository for all existing client IDs
+3. Generate a random ID avoiding existing IDs
+4. Store the mapping in `~/.lattice.toml`
+
+### ID Length Rules
+
+- Default: 2-character IDs (1024 possible values)
+- 3 characters if >16 known clients (32768 possible)
+- 4 characters if >64 known clients
+- 5 characters if >256 known clients
+
+## Conflict Detection
+
+### First-Commit Check
+
+When `lat check` runs in a pre-commit hook:
+1. Query all existing client IDs in the repository
+2. Check if the committer's client ID is already in use
+3. If collision detected, warn and suggest renumbering
+
+### Renumbering Process
+
+If a new contributor's ID conflicts:
+1. Generate a new unique client ID
+2. Update all Lattice IDs in staged files
+3. Update `~/.lattice.toml`
+4. Re-run `lat check` to verify
+
+### ID Duplication Check
+
+`lat check` always verifies no two documents share the same Lattice ID.
+This catches:
+- Copy-paste errors
+- Failed merge resolutions
+- Manual ID assignment mistakes
+
+## Git Hooks Integration
+
+### Pre-Commit Hook
+
+Recommended pre-commit hook usage:
+
+```bash
+#!/bin/sh
+lat check --staged-only
+```
+
+The `--staged-only` flag limits checking to files in the staging area,
+making the hook fast for incremental commits.
+
+### Pre-Push Hook
+
+Optional pre-push validation:
+
+```bash
+#!/bin/sh
+lat check
+```
+
+Full repository check before pushing ensures consistency.
+
+## Branch Operations
+
+### Merge Handling
+
+During merge:
+- Conflicting documents may have invalid frontmatter
+- Lattice operations log warnings but don't fail
+- After conflict resolution, run `lat check` to verify
+
+### Rebase Handling
+
+During interactive rebase:
+- Documents may be in transitional states
+- Index reconciliation handles missing commits gracefully
+- Full rebuild after rebase completes
+
+## File Operations
+
+### Document Creation
+
+New documents are created as regular files. They become tracked when
+staged and committed. Until committed, they appear in `git status` but
+not in `git ls-files`.
+
+### Document Deletion
+
+Deleting a document removes it from git and triggers index cleanup during
+reconciliation. References to deleted documents become "missing ID" errors
+detected by `lat check`.
+
+### Document Rename
+
+Git detects renames automatically. The index handles path changes during
+reconciliation. Lattice IDs remain stable across renames.
+
+## Performance Notes
+
+### Git Command Overhead
+
+Each git command spawns a subprocess. Lattice minimizes git calls:
+- Single `git ls-files` for full enumeration
+- Single `git diff` for change detection
+- Single `git status` for uncommitted changes
+
+### Large Repositories
+
+For repositories with many files:
+- Git operations are fast (git is optimized for this)
+- Path filtering (`-- '*.md'`) limits scope
+- Only markdown files are processed
+
+### Network Operations
+
+Lattice never performs network git operations (fetch, pull, push). These
+are left to the user's normal git workflow. This prevents unexpected
+network access and authentication issues.
