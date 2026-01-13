@@ -153,22 +153,33 @@ fn display_diff(worktree_path: &PathBuf, interface: ReviewInterface) -> Result<(
             }
         }
         ReviewInterface::VSCode => {
+            // Open the worktree in VSCode
             let output = Command::new("code")
-                .arg("--diff")
-                .arg("master")
-                .arg(&current_branch)
-                .current_dir(worktree_path)
+                .arg(worktree_path)
                 .output()
                 .context("Failed to execute VS Code. Is 'code' in PATH?")?;
 
             if !output.status.success() {
-                bail!(
-                    "Failed to open diff in VS Code: {}",
-                    String::from_utf8_lossy(&output.stderr)
-                );
+                bail!("Failed to open VS Code: {}", String::from_utf8_lossy(&output.stderr));
             }
 
-            println!("Opened diff in VS Code");
+            println!("✓ Opened worktree in VS Code: {}", worktree_path.display());
+            println!();
+            println!("To view the diff:");
+            println!("  1. Open the Source Control panel (View → Source Control or Ctrl+Shift+G)");
+            println!("  2. The changes compared to origin/master will be shown");
+            println!("  3. Click on any file to see its diff");
+            println!();
+            println!("Alternative ways to view changes:");
+            println!("  • Command Palette (Ctrl+Shift+P or Cmd+Shift+P):");
+            println!("    - Search 'Git: View File History' to see commit history");
+            println!("    - Search 'Git: Compare with...' then select 'origin/master'");
+            println!("  • Timeline view (click clock icon in Explorer) shows file history");
+            println!();
+            println!("The worktree is on branch '{}' and includes all changes.", current_branch);
+            println!(
+                "You can edit files directly and they will be reflected in the worker's state."
+            );
         }
     }
 
