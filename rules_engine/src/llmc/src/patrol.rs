@@ -373,6 +373,17 @@ impl Patrol {
         session_id: &str,
         worktree_path: &Path,
     ) -> Result<WorkerTransition> {
+        // Check if worker is stuck at bypass permissions toggle
+        if let Ok(output) = session::capture_pane(session_id, 50)
+            && Self::is_stuck_at_bypass_toggle(&output)
+        {
+            tracing::warn!(
+                "Worker {} stuck at bypass permissions toggle, auto-dismissing",
+                session_id
+            );
+            Self::dismiss_bypass_toggle(session_id)?;
+        }
+
         let has_commits = git::has_commits_ahead_of(worktree_path, "origin/master")?;
         tracing::debug!(
             "Checking working transition for {}: has_commits={}",
@@ -399,6 +410,20 @@ impl Patrol {
         }
 
         Ok(WorkerTransition::None)
+    }
+
+    /// Detects if Claude is stuck at the bypass permissions toggle UI
+    fn is_stuck_at_bypass_toggle(output: &str) -> bool {
+        let lower = output.to_lowercase();
+        lower.contains("bypass permissions") && lower.contains("shift+tab to cycle")
+    }
+
+    /// Dismisses the bypass permissions toggle by pressing Enter
+    fn dismiss_bypass_toggle(session_id: &str) -> Result<()> {
+        let sender = TmuxSender::new();
+        sender.send_keys_raw(session_id, "Enter")?;
+        std::thread::sleep(std::time::Duration::from_millis(500));
+        Ok(())
     }
 
     fn detect_rebasing_transition(
