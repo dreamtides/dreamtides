@@ -226,6 +226,7 @@ fn build_claude_command(config: &WorkerConfig) -> String {
 
 fn wait_for_claude_ready(session: &str, timeout: Duration, verbose: bool) -> Result<()> {
     const POLL_INTERVAL_MS: u64 = 500;
+    const GRACE_PERIOD_SECS: u64 = 5;
     let start = std::time::Instant::now();
     let mut poll_count = 0;
 
@@ -250,7 +251,6 @@ fn wait_for_claude_ready(session: &str, timeout: Duration, verbose: bool) -> Res
                 }
             }
 
-            // Check for the '>' prompt (Claude is ready)
             if output.lines().rev().take(5).any(|line| {
                 let trimmed = line.trim_start();
                 trimmed.starts_with("> ") || trimmed == ">" || trimmed.starts_with("❯")
@@ -261,7 +261,6 @@ fn wait_for_claude_ready(session: &str, timeout: Duration, verbose: bool) -> Res
                 return Ok(());
             }
 
-            // Check for bypass permissions prompt (Claude is waiting for confirmation)
             let lower = output.to_lowercase();
             if lower.contains("bypass") && lower.contains("permissions") {
                 if verbose {
@@ -282,22 +281,31 @@ fn wait_for_claude_ready(session: &str, timeout: Duration, verbose: bool) -> Res
                 }
 
                 if !is_claude_process(&command) {
-                    bail!(
-                        "Claude process not found in session '{}', got command: {}\n\
-                         Last captured output:\n{}",
-                        session,
-                        command,
-                        output
-                            .lines()
-                            .rev()
-                            .take(20)
-                            .collect::<Vec<_>>()
-                            .iter()
-                            .rev()
-                            .cloned()
-                            .collect::<Vec<_>>()
-                            .join("\n")
-                    );
+                    let elapsed_secs = start.elapsed().as_secs();
+                    if elapsed_secs >= GRACE_PERIOD_SECS {
+                        bail!(
+                            "Claude process not found in session '{}' after {}s grace period, got command: {}\n\
+                             Last captured output:\n{}",
+                            session,
+                            GRACE_PERIOD_SECS,
+                            command,
+                            output
+                                .lines()
+                                .rev()
+                                .take(20)
+                                .collect::<Vec<_>>()
+                                .iter()
+                                .rev()
+                                .cloned()
+                                .collect::<Vec<_>>()
+                                .join("\n")
+                        );
+                    } else if verbose {
+                        println!(
+                            "        [verbose] Non-Claude process '{}' detected, but within grace period ({}s < {}s)",
+                            command, elapsed_secs, GRACE_PERIOD_SECS
+                        );
+                    }
                 }
             } else if verbose {
                 println!("        [verbose] Failed to get pane command");
