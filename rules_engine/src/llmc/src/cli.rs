@@ -70,6 +70,11 @@ pub enum Commands {
         /// Remove all workers
         #[arg(long)]
         all: bool,
+        /// Reset worker to idle state instead of removing (kills session,
+        /// removes worktree, creates new session and worktree, preserves
+        /// config)
+        #[arg(long)]
+        reset: bool,
     },
 
     /// Show status of all workers

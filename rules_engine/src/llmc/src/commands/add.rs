@@ -142,6 +142,37 @@ pub fn recreate_missing_worktree(
     Ok(())
 }
 
+pub fn copy_tabula_to_worktree(repo: &Path, worktree_path: &Path) -> Result<()> {
+    let source_tabula = repo.join("Tabula.xlsm");
+
+    if !source_tabula.exists() {
+        return Ok(());
+    }
+
+    let target_tabula = worktree_path.join("client/Assets/StreamingAssets/Tabula.xlsm");
+
+    if target_tabula.exists() {
+        return Ok(());
+    }
+
+    println!("Copying Tabula.xlsm to worktree...");
+
+    if let Some(parent) = target_tabula.parent() {
+        fs::create_dir_all(parent).context("Failed to create StreamingAssets directory")?;
+    }
+
+    fs::copy(&source_tabula, &target_tabula).context("Failed to copy Tabula.xlsm to worktree")?;
+
+    Ok(())
+}
+
+pub fn is_daemon_running() -> bool {
+    session::list_sessions()
+        .ok()
+        .map(|sessions| sessions.iter().any(|s| s.starts_with("llmc-")))
+        .unwrap_or(false)
+}
+
 fn validate_worker_name(name: &str) -> Result<()> {
     if name.is_empty() {
         bail!("Worker name cannot be empty");
@@ -182,30 +213,6 @@ fn create_worktree_for_worker(repo: &Path, branch_name: &str, worktree_path: &Pa
     }
 
     git::create_worktree(repo, branch_name, worktree_path)?;
-    Ok(())
-}
-
-fn copy_tabula_to_worktree(repo: &Path, worktree_path: &Path) -> Result<()> {
-    let source_tabula = repo.join("Tabula.xlsm");
-
-    if !source_tabula.exists() {
-        return Ok(());
-    }
-
-    let target_tabula = worktree_path.join("client/Assets/StreamingAssets/Tabula.xlsm");
-
-    if target_tabula.exists() {
-        return Ok(());
-    }
-
-    println!("Copying Tabula.xlsm to worktree...");
-
-    if let Some(parent) = target_tabula.parent() {
-        fs::create_dir_all(parent).context("Failed to create StreamingAssets directory")?;
-    }
-
-    fs::copy(&source_tabula, &target_tabula).context("Failed to copy Tabula.xlsm to worktree")?;
-
     Ok(())
 }
 
@@ -271,13 +278,6 @@ fn add_worker_to_config(
     Config::load(&config_path)?;
 
     Ok(())
-}
-
-fn is_daemon_running() -> bool {
-    session::list_sessions()
-        .ok()
-        .map(|sessions| sessions.iter().any(|s| s.starts_with("llmc-")))
-        .unwrap_or(false)
 }
 
 fn start_worker_immediately(name: &str) -> Result<()> {
