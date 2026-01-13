@@ -13,12 +13,12 @@ mod worker;
 
 use anyhow::Result;
 use clap::Parser;
-use cli::{Cli, Commands};
+use cli::{Cli, Commands, ConfigAction};
 
 use crate::commands::review::ReviewInterface;
 use crate::commands::{
-    accept, add, attach, doctor, down, init, message, nuke, peek, pick, rebase, reject, reset,
-    review, start, status, up,
+    accept, add, attach, config as config_cmd, doctor, down, init, message, nuke, peek, pick,
+    rebase, reject, reset, review, start, status, up,
 };
 use crate::logging::config as log_config;
 
@@ -48,6 +48,7 @@ async fn main() -> Result<()> {
         Commands::Doctor { .. } => "doctor",
         Commands::Peek { .. } => "peek",
         Commands::Pick { .. } => "pick",
+        Commands::Config { .. } => "config",
     };
 
     tracing::info!(operation = "cli_command", command = command_name, "Command started");
@@ -86,6 +87,10 @@ async fn main() -> Result<()> {
         Commands::Doctor { repair, yes, rebuild } => doctor::run_doctor(repair, yes, rebuild),
         Commands::Peek { worker, lines } => peek::run_peek(worker, lines),
         Commands::Pick { worker } => pick::run_pick(&worker),
+        Commands::Config { action } => match action {
+            ConfigAction::Get { key } => config_cmd::run_config_get(&key),
+            ConfigAction::Set { key, value } => config_cmd::run_config_set(&key, &value),
+        },
     };
 
     let duration_ms = start_time.elapsed().as_millis() as u64;

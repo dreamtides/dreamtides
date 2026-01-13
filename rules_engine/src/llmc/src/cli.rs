@@ -185,4 +185,26 @@ pub enum Commands {
         /// Worker name
         worker: String,
     },
+
+    /// Manage configuration settings
+    Config {
+        #[command(subcommand)]
+        action: ConfigAction,
+    },
+}
+
+#[derive(Subcommand)]
+pub enum ConfigAction {
+    /// Get a configuration value
+    Get {
+        /// Configuration key (e.g., "defaults.model", "workers.adam.model")
+        key: String,
+    },
+    /// Set a configuration value
+    Set {
+        /// Configuration key (e.g., "defaults.model", "workers.adam.model")
+        key: String,
+        /// New value
+        value: String,
+    },
 }
