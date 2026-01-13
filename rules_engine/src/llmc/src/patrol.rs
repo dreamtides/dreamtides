@@ -221,6 +221,69 @@ impl Patrol {
                 }
             }
 
+            // Check if Error workers have recovered
+            if worker_status == WorkerStatus::Error {
+                // Check if worker has commits and should be in needs_review
+                match git::has_commits_ahead_of(worktree_path, "origin/master") {
+                    Ok(true) => {
+                        tracing::info!(
+                            "Worker '{}' in error state has commits ahead of master, recovering to needs_review",
+                            worker_name
+                        );
+                        if git::has_uncommitted_changes(worktree_path)? {
+                            tracing::info!(
+                                "Worker '{}' has uncommitted changes, amending before recovering to needs_review",
+                                worker_name
+                            );
+                            git::amend_uncommitted_changes(worktree_path)?;
+                        }
+                        let commit_sha = git::get_head_commit(worktree_path)?;
+                        let transition = WorkerTransition::ToNeedsReview { commit_sha };
+                        if let Some(worker_mut) = state.get_worker_mut(&worker_name) {
+                            worker::apply_transition(worker_mut, transition.clone())?;
+                            report.transitions_applied.push((worker_name.clone(), transition));
+                        }
+                        continue;
+                    }
+                    Ok(false) => {
+                        // No commits ahead, check if worktree is clean
+                        match git::is_worktree_clean(worktree_path) {
+                            Ok(true) => {
+                                tracing::info!(
+                                    "Worker '{}' in error state has clean worktree, recovering to idle",
+                                    worker_name
+                                );
+                                let transition = WorkerTransition::ToIdle;
+                                if let Some(worker_mut) = state.get_worker_mut(&worker_name) {
+                                    worker::apply_transition(worker_mut, transition.clone())?;
+                                    report
+                                        .transitions_applied
+                                        .push((worker_name.clone(), transition));
+                                }
+                                continue;
+                            }
+                            Ok(false) => {
+                                // Still dirty, keep in error state
+                            }
+                            Err(e) => {
+                                tracing::warn!(
+                                    "Failed to check worktree cleanliness for error worker '{}': {}",
+                                    worker_name,
+                                    e
+                                );
+                            }
+                        }
+                    }
+                    Err(e) => {
+                        tracing::warn!(
+                            "Failed to check commits ahead for error worker '{}': {}",
+                            worker_name,
+                            e
+                        );
+                    }
+                }
+            }
+
             if worker_status != WorkerStatus::Rebasing && git::is_rebase_in_progress(worktree_path)
             {
                 tracing::warn!(
