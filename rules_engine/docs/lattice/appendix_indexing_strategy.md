@@ -35,6 +35,13 @@ Primary document metadata storage.
 - `closed_at` TEXT: ISO 8601 timestamp
 - `body_hash` TEXT: SHA-256 of document body for change detection
 - `indexed_at` TEXT: When this row was last updated
+- `content_length` INTEGER: Body length in characters (for budget-aware pruning)
+- `link_count` INTEGER: Outgoing link count (maintained by trigger)
+- `backlink_count` INTEGER: Incoming link count (maintained by trigger)
+
+The `content_length`, `link_count`, and `backlink_count` columns enable
+budget-aware context pruning without loading document bodies. See
+[Appendix: Context Optimization](appendix_context_optimization.md) for usage.
 
 ### links Table
 
@@ -95,6 +102,36 @@ Per-client document counter state.
 - `client_id` TEXT PRIMARY KEY
 - `next_counter` INTEGER
 
+### directory_roots Table
+
+Precomputed root document chain for fast context gathering.
+
+**Columns:**
+- `directory_path` TEXT PRIMARY KEY: Directory relative path
+- `root_id` TEXT: Root document ID (or NULL if no root)
+- `parent_path` TEXT: Parent directory path
+- `depth` INTEGER: Depth from repository root
+
+**Indexes:** On depth for ordered traversal.
+
+Populated during reconciliation. Invalidated when root documents change.
+
+### content_cache Table
+
+Persistent cache for document body content (L2 cache layer).
+
+**Columns:**
+- `document_id` TEXT PRIMARY KEY: Document Lattice ID
+- `content` TEXT: Cached body text
+- `content_hash` TEXT: SHA-256 for validation
+- `accessed_at` INTEGER: Unix timestamp of last access
+- `file_mtime` INTEGER: File modification time when cached
+
+**Indexes:** On accessed_at for LRU eviction.
+
+See [Appendix: Context Optimization](appendix_context_optimization.md) for
+cache warming, validation, and eviction strategies.
+
 ## Reconciliation Algorithm
 
 ### Trigger Points
@@ -127,6 +164,11 @@ Triggered when:
 - Schema version mismatch
 - Reconciliation encounters unexpected state
 - User runs `lat check --rebuild-index`
+- Shallow clone boundary prevents incremental diff
+- Partial clone triggers unexpected network errors
+
+See [Appendix: Git Edge Cases](appendix_git_edge_cases.md) for detailed
+fallback behavior in non-standard repository configurations.
 
 Full rebuild process:
 1. Delete existing index

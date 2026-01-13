@@ -30,6 +30,9 @@ allows Lattice documents to function as Claude Skills when marked with
 `skill: true` in their frontmatter, with symlinks automatically generated
 in the .claude directory.
 
+See [Appendix: AI Friendliness](appendix_ai_friendliness.md) for critical
+analysis of the current design and recommendations for improvement.
+
 ### Git as Source of Truth
 
 SQLite serves exclusively as a performance cache, never as the canonical data
@@ -219,6 +222,10 @@ first, default 0). The `doc-position` key controls final output ordering,
 with negative values appearing before the main document and positive values
 appearing after.
 
+See [Appendix: Context Optimization](appendix_context_optimization.md) for
+graph traversal optimizations, caching strategies, and performance tuning
+for large repositories (10,000+ documents).
+
 ### Output Format
 
 Context documents are separated by two newlines, with each document's name
@@ -356,9 +363,13 @@ The `lat check` command validates documents and repository state:
 
 The linter integrates mechanically verifiable rules from Claude's Skill
 authoring best practices, including path format validation (no backslashes),
-description length limits, and name format requirements.
+description length limits, and name format requirements. Lattice implements
+lint rules natively in Rust using pulldown-cmark, with optional integration
+to external linters (markdownlint, remark-lint) for comprehensive validation.
 
-See [Appendix: Linter](appendix_linter.md) for the complete rule set.
+See [Appendix: Linter](appendix_linter.md) for the complete rule set and
+[Appendix: Markdown Linter Integration](appendix_markdown_linter_integration.md)
+for external linter evaluation and integration strategy.
 
 ### The Format Command
 
@@ -456,7 +467,10 @@ conflicts from parallel contributors. The system provides guidance for
 renumbering IDs in a contributor's first commit before pushing.
 
 See [Appendix: Git Integration](appendix_git_integration.md) for the
-complete git interaction specification.
+complete git interaction specification and
+[Appendix: Git Edge Cases](appendix_git_edge_cases.md) for behavior in
+non-standard repository configurations (shallow clones, worktrees,
+submodules, etc.).
 
 ## Skill Integration
 
@@ -646,16 +660,18 @@ following module structure:
    SQLite best practices including WAL mode, PRAGMA configuration,
    FTS5 optimization, and benchmarking targets for 10,000+ documents.
 
-3. **Markdown Linter Integration**: Evaluate existing markdown linters
-   (markdownlint, remark-lint) for potential integration rather than
-   implementing lint rules from scratch. Determine which rules align
-   with Claude's Skill best practices.
+3. ~~**Markdown Linter Integration**~~: Complete. See
+   [Appendix: Markdown Linter Integration](appendix_markdown_linter_integration.md)
+   for evaluation of markdownlint and remark-lint, rule alignment with
+   Claude's Skill best practices, and recommendation for native Rust
+   implementation with optional external linter integration.
 
-4. **Git Edge Cases**: Document and test handling for git edge cases:
-   shallow clones, worktrees, submodules, detached HEAD states, in-progress
-   rebases, and partial clones. Define explicit behavior for each scenario.
+4. ~~**Git Edge Cases**~~: Complete. See
+   [Appendix: Git Edge Cases](appendix_git_edge_cases.md) for comprehensive
+   documentation of shallow clones, partial clones, sparse checkout,
+   worktrees, submodules, detached HEAD states, and in-progress operations.
 
-5. **Context Algorithm Optimization**: Profile the context algorithm with
-   large document sets and complex link graphs. Research graph traversal
-   optimizations and caching strategies for repeated `lat show` operations
-   on related documents.
+5. ~~**Context Algorithm Optimization**~~: Complete. See
+   [Appendix: Context Optimization](appendix_context_optimization.md) for
+   graph traversal optimizations, tiered caching strategies, parallel loading,
+   and benchmarking guidelines for repositories with 10,000+ documents.

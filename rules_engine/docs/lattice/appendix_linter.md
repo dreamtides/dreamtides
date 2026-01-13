@@ -281,10 +281,74 @@ Found 1 error, 2 warnings in 2 documents.
 }
 ```
 
+## Additional Formatting Rules
+
+These rules enforce consistent markdown formatting. See
+[Appendix: Markdown Linter Integration](appendix_markdown_linter_integration.md)
+for the research and rationale behind rule selection.
+
+### W013: Trailing Whitespace
+
+Lines end with unnecessary whitespace.
+
+**Detection:** Regex for spaces/tabs at line end.
+
+**Message:** `Warning [W013]: path.md:20 has trailing whitespace`
+
+**Fix:** Run `lat fmt` to strip automatically.
+
+### W014: Multiple Blank Lines
+
+More than one consecutive blank line in document.
+
+**Detection:** Count consecutive newlines > 2.
+
+**Message:** `Warning [W014]: path.md:45 has 3 consecutive blank lines (max: 1)`
+
+**Fix:** Run `lat fmt` to collapse automatically.
+
+### W015: Missing Final Newline
+
+File does not end with a newline character.
+
+**Detection:** Check last byte of file.
+
+**Message:** `Warning [W015]: path.md does not end with newline`
+
+**Fix:** Run `lat fmt` to add automatically.
+
+### W016: Heading Without Blank Lines
+
+Heading not surrounded by blank lines.
+
+**Detection:** Parse heading and check adjacent lines.
+
+**Message:** `Warning [W016]: path.md:30 heading should have blank line before/after`
+
+**Fix:** Run `lat fmt` to insert blank lines.
+
+### W017: List Without Blank Lines
+
+List not surrounded by blank lines.
+
+**Detection:** Parse list and check adjacent lines.
+
+**Message:** `Warning [W017]: path.md:55 list should have blank line before/after`
+
+**Fix:** Run `lat fmt` to insert blank lines.
+
 ## Command Options
 
 - `--errors-only`: Suppress warnings
 - `--path <prefix>`: Check only files under path
-- `--fix`: Auto-fix where possible (W002, W006, W007, W008)
+- `--fix`: Auto-fix where possible (W002, W006, W007, W008, W013-W017)
 - `--staged-only`: Check only staged files (for pre-commit)
 - `--rebuild-index`: Force full index rebuild before checking
+- `--external-linter=<tool>`: Run external linter (markdownlint, remark)
+
+## External Linter Integration
+
+Lattice can optionally delegate to external markdown linters for more
+comprehensive validation. See
+[Appendix: Markdown Linter Integration](appendix_markdown_linter_integration.md)
+for configuration details and rule mapping.

@@ -57,21 +57,15 @@ When uncommitted changes exist:
 - Modified files are detected via `git status`
 - Index reconciliation processes uncommitted modifications
 
-### Detached HEAD
+### Non-Standard Configurations
 
-When HEAD is detached (e.g., during bisect):
-- Normal operations continue
-- `last_commit` in index may not match HEAD
-- Reconciliation uses commit comparison where possible
-- Falls back to full rebuild if comparison fails
+Lattice supports various git repository configurations including shallow
+clones, partial clones, sparse checkout, worktrees, and submodules. Each
+configuration has specific behavior implications.
 
-### In-Progress Operations
-
-During rebase, merge, or cherry-pick:
-- Files may have conflict markers
-- Parse errors are logged as warnings, not failures
-- Conflicted files are skipped from index
-- User is warned about incomplete state
+See [Appendix: Git Edge Cases](appendix_git_edge_cases.md) for comprehensive
+documentation of detection strategies, behavior modifications, and
+recommendations for each configuration.
 
 ## Client ID Storage
 

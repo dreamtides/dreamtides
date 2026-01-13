@@ -184,20 +184,37 @@ If a single context document exceeds the entire budget:
 ### Index Usage
 
 Context gathering uses the index for:
-- `doc-context-for` label lookup (indexed query)
-- Link target resolution (links table)
-- Root document discovery (path prefix query)
+- `doc-context-for` label lookup (indexed query via `document_labels` table)
+- Link target resolution (links table with adjacency counts)
+- Root document discovery (precomputed `directory_roots` table)
+
+The index stores precomputed `content_length`, `link_count`, and `backlink_count`
+columns to enable budget-aware pruning without loading document content.
 
 ### Lazy Content Loading
 
 Document bodies are only loaded when:
-1. The document fits the remaining budget
+1. The document fits the remaining budget (checked via `content_length`)
 2. The document is selected for inclusion
 
 This prevents loading large documents that won't be shown.
 
-### Caching
+### Caching Strategy
 
-Repeated `lat show` commands don't cache context results. Each invocation
-re-runs the algorithm. For repeated queries, consider shell caching or
-tooling integration.
+Lattice implements tiered caching for context assembly:
+
+1. **L1 (per-command)**: In-memory LRU cache for documents loaded within a
+   single command invocation
+2. **L2 (persistent)**: SQLite-backed content cache for cross-command reuse,
+   invalidated by git state changes
+
+Cache warming preloads linked documents in parallel when `lat show` is invoked.
+
+### Parallel Loading
+
+Selected context documents are loaded concurrently using async I/O, with a
+concurrency limit of 10 to avoid file descriptor exhaustion.
+
+See [Appendix: Context Optimization](appendix_context_optimization.md) for the
+complete optimization strategy, benchmarking guidelines, and implementation
+priorities for large repositories.

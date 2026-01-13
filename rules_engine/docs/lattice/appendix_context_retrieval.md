@@ -267,10 +267,18 @@ Document bodies are only loaded when:
 
 Frontmatter is always loaded (small, needed for filtering).
 
-### Caching
+### Caching and Optimization
 
-No persistent caching between commands. Each invocation queries fresh.
-For repeated queries, external caching or tooling integration is recommended.
+Lattice implements a tiered caching strategy for context assembly performance:
+
+- **L1 cache**: In-memory LRU for documents loaded within a command
+- **L2 cache**: Persistent content cache for cross-command reuse
+- **Budget-aware pruning**: Skip candidates that can't fit remaining budget
+- **Parallel loading**: Concurrent I/O for selected context documents
+
+See [Appendix: Context Optimization](appendix_context_optimization.md) for the
+complete optimization strategy, benchmarking guidelines, and implementation
+priorities.
 
 ### Budget Recommendations
 
