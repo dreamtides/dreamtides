@@ -9,6 +9,7 @@ use super::super::state::{State, WorkerRecord, WorkerStatus};
 use super::super::tmux::sender::TmuxSender;
 use super::super::tmux::session;
 use super::super::{git, worker};
+use crate::lock::StateLock;
 
 /// Runs the start command, assigning a task to an idle worker
 pub fn run_start(
@@ -33,6 +34,8 @@ pub fn run_start(
              Run 'llmc up' to start the daemon."
         );
     }
+
+    let _lock = StateLock::acquire()?;
 
     let (mut state, config) = super::super::state::load_state_with_patrol()?;
 

@@ -2,6 +2,7 @@ mod cli;
 mod commands;
 mod config;
 mod git;
+mod lock;
 mod logging;
 mod patrol;
 mod recovery;
