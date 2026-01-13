@@ -1,5 +1,4 @@
 use std::fs;
-use std::io::Write;
 use std::path::{Path, PathBuf};
 use std::process::Command;
 
@@ -60,18 +59,7 @@ pub fn run_accept(worker: Option<String>) -> Result<()> {
     println!("Commit message:\n{}", commit_message.trim());
     println!("======================\n");
 
-    print!("Accept these changes and merge to master? [y/N]: ");
-    std::io::stdout().flush()?;
-
-    let mut input = String::new();
-    std::io::stdin().read_line(&mut input)?;
-
-    if !matches!(input.trim().to_lowercase().as_str(), "y" | "yes") {
-        println!("Accept cancelled.");
-        return Ok(());
-    }
-
-    println!("\nAccepting changes from worker '{}'...", worker_name);
+    println!("Accepting changes from worker '{}'...", worker_name);
 
     git::fetch_origin(&llmc_root)?;
 
