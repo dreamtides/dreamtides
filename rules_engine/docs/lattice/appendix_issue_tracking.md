@@ -88,7 +88,7 @@ lat create issues/backend/performance_optimization.md \
 ```bash
 lat create issues/api/implement_feature.md \
   -d "Implement new API endpoint" \
-  --deps discovered-from:LK1DT
+  --deps discovered-from:LK3DT
 ```
 
 **Use a file for description:**
@@ -207,10 +207,10 @@ track work locally without modifying issue files. See
 Instead of an `in_progress` status, Lattice uses local claiming:
 
 ```bash
-lat claim L1234    # Mark issue as being worked on
+lat claim LB234    # Mark issue as being worked on
 lat ready          # Issue no longer appears (claimed)
-lat show L1234     # Shows "Claimed: yes"
-lat close L1234    # Auto-releases the claim
+lat show LB234     # Shows "Claimed: yes"
+lat close LB234    # Auto-releases the claim
 ```
 
 Claims are stored in `~/.lattice/claims.json`, not in the issue file:

@@ -54,12 +54,12 @@ All links must use **relative file system paths** from the linking document's
 location. Absolute paths and URLs are not supported.
 
 **Valid examples:**
-- `[doc](sibling.md#LK1DT)` - same directory
-- `[doc](../parent/file.md#LK1DT)` - parent directory
-- `[doc](subdir/nested/file.md#LK1DT)` - nested subdirectory
+- `[doc](sibling.md#LK3DT)` - same directory
+- `[doc](../parent/file.md#LK3DT)` - parent directory
+- `[doc](subdir/nested/file.md#LK3DT)` - nested subdirectory
 
 **Invalid examples:**
-- `[doc](/absolute/path.md#LK1DT)` - absolute path
+- `[doc](/absolute/path.md#LK3DT)` - absolute path
 - `[doc](file.md)` - missing Lattice ID fragment (warning)
 - `[doc](https://example.com)` - external URL (not a Lattice link)
 

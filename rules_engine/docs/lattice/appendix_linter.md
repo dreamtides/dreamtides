@@ -344,5 +344,5 @@ List not surrounded by blank lines.
 - `--errors-only`: Suppress warnings
 - `--path <prefix>`: Check only files under path
 - `--fix`: Auto-fix where possible (W002, W006, W007, W008, W013-W017)
-- `--staged-only`: Check only staged files (for pre-commit)
+- `--staged-only`: Check only staged files
 - `--rebuild-index`: Force full index rebuild before checking

@@ -72,7 +72,7 @@ Repository Overview (10 most critical documents):
 
 1. [doc] LROOT: project-overview - High-level project architecture (15 views)
 2. [epic] LAUTH: authentication-system - Auth module epic (12 views)
-3. [P0] LBUG1: fix-login-crash - Critical login bug (8 views)
+3. [P0] LBUGB: fix-login-crash - Critical login bug (8 views)
 ...
 
 View history: 47 documents tracked, 156 total views

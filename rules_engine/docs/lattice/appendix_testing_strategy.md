@@ -161,7 +161,7 @@ Fluent API for creating test documents:
 
 ```rust
 let doc = DocBuilder::new()
-    .id("LTEST1")
+    .id("LTESTB")
     .name("test-doc")
     .issue_type("bug")
     .status("open")

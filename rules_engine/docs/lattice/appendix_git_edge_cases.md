@@ -365,17 +365,6 @@ Error: Lattice requires a working directory.
 This appears to be a bare repository.
 ```
 
-**Server-side hooks:** For pre-receive hooks that need document validation,
-clone to a temporary directory first:
-
-```bash
-# In pre-receive hook
-tmp=$(mktemp -d)
-git clone --local . "$tmp"
-cd "$tmp" && lat check
-rm -rf "$tmp"
-```
-
 ## Summary Table
 
 | Configuration | Support Level | Notes |

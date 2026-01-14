@@ -137,11 +137,10 @@ A Lattice ID is a compact, human-typeable identifier consisting of:
 2. A document counter (minimum 2 digits, RFC 4648 Base32 encoded)
 3. A client identifier (2-5 digits, RFC 4648 Base32 encoded)
 
-Example: `LK1DT` represents document `K1` (decimal 641) from client `DT`.
+Example: `LK3DT` represents document `K3` (decimal 675) from client `DT`.
 
 The Base32 encoding uses the RFC 4648 alphabet: A-Z followed by 2-7. This
-provides 32 characters while remaining case-insensitive and avoiding
-ambiguous characters like 0/O and 1/I/l.
+avoids ambiguous characters like 0/O and 1/I.
 
 See [Appendix: ID System](appendix_id_system.md) for the complete ID
 generation algorithm and collision handling.
@@ -455,9 +454,7 @@ require explicit user or coordinator control.
 
 ### Conflict Handling
 
-When `lat check` runs in pre-commit hooks, it detects potential ID
-conflicts from parallel contributors. The system provides guidance for
-renumbering IDs in a contributor's first commit before pushing.
+`lat check` detects potential ID conflicts from parallel contributors.
 
 See [Appendix: Git Integration](appendix_git_integration.md) for the
 complete git interaction specification and

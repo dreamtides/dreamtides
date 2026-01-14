@@ -26,7 +26,7 @@ lat show <id> --refs
 For issue documents, the output follows `bd show` format:
 
 ```
-L1234: Fix LLMC v2 code review issues
+LB234: Fix LLMC v2 code review issues
 Status: open
 Priority: P0
 Type: epic
@@ -39,7 +39,7 @@ Master epic for addressing bugs and missing features identified in
 comprehensive code review of LLMC v2 implementation.
 
 Parent:
-  L0042: LLMC Development [epic]
+  LAA42: LLMC Development [epic]
 
 Depends on (1):
   L2345: Fix incorrect rebase necessity detection in patrol [P0 - closed]
@@ -50,7 +50,7 @@ Blocks (5):
   ...
 
 Related (1):
-  L5678: llmc-design - LLMC design document [doc]
+  L567C: llmc-design - LLMC design document [doc]
 ```
 
 **Key sections:**
@@ -69,7 +69,7 @@ For knowledge base documents (no `issue-type`), the output emphasizes the
 name and description fields which provide structured metadata:
 
 ```
-L9876: authentication-design
+LDC76: authentication-design
 Description: OAuth 2.0 implementation design for the auth subsystem
 
 ---
@@ -77,7 +77,7 @@ Description: OAuth 2.0 implementation design for the auth subsystem
 ---
 
 Related (2):
-  L1111: security-policy - Security guidelines and threat model [doc]
+  LBBBB: security-policy - Security guidelines and threat model [doc]
   L2222: api-design - REST API design principles [doc]
 ```
 
@@ -108,9 +108,9 @@ is shown. For knowledge base entries, both name and description are displayed.
 
 Examples:
 ```
-L1234: Fix login bug [P0 - open]
-L5678: authentication-design - OAuth 2.0 implementation design [doc]
-L9012: LLMC Development [epic]
+LB234: Fix login bug [P0 - open]
+L567C: authentication-design - OAuth 2.0 implementation design [doc]
+LDAB2: LLMC Development [epic]
 ```
 
 ### Related Document Selection
@@ -155,16 +155,16 @@ agents can use without reading the full body. When present, it appears in
 The `--short` flag produces single-line output:
 
 ```
-$ lat show L1234 --short
-L1234 [open] P0 epic: Fix LLMC v2 code review issues
+$ lat show LB234 --short
+LB234 [open] P0 epic: Fix LLMC v2 code review issues
 ```
 
 Format: `<id> [<status>] <priority> <type>: <name>`
 
 For knowledge base documents:
 ```
-$ lat show L9876 --short
-L9876 [doc]: authentication-design - OAuth 2.0 implementation design
+$ lat show LDC76 --short
+LDC76 [doc]: authentication-design - OAuth 2.0 implementation design
 ```
 
 ### References Format
@@ -172,8 +172,8 @@ L9876 [doc]: authentication-design - OAuth 2.0 implementation design
 The `--refs` flag shows issues that reference this one (reverse lookup):
 
 ```
-$ lat show L1234 --refs
-References to L1234:
+$ lat show LB234 --refs
+References to LB234:
 
   Blocks (5):
     L3456: Fix crash count not being incremented in patrol [P0 - open]
@@ -181,8 +181,8 @@ References to L1234:
     ...
 
   Linked from (2):
-    L7890: sprint-3-planning - Sprint 3 planning document [doc] (line 42)
-    L8901: code-review-checklist - Code review checklist [doc] (line 15)
+    L7CDA: sprint-3-planning - Sprint 3 planning document [doc] (line 42)
+    LCDAB: code-review-checklist - Code review checklist [doc] (line 15)
 ```
 
 ### JSON Output Format
@@ -192,7 +192,7 @@ The `--json` flag produces structured output compatible with `bd show --json`:
 ```json
 [
   {
-    "id": "L1234",
+    "id": "LB234",
     "title": "Fix LLMC v2 code review issues",
     "description": "Master epic for addressing bugs...",
     "status": "open",
@@ -223,13 +223,13 @@ The `--json` flag produces structured output compatible with `bd show --json`:
     ],
     "related": [
       {
-        "id": "L5678",
+        "id": "L567C",
         "name": "llmc-design",
         "description": "LLMC design document"
       }
     ],
     "parent": {
-      "id": "L0042",
+      "id": "LAA42",
       "title": "LLMC Development"
     },
     "claimed": false
@@ -258,12 +258,6 @@ The `--json` flag produces structured output compatible with `bd show --json`:
 | `related` | array | Documents linked from body text |
 | `parent` | object | Directory root document (epic) |
 | `claimed` | bool | Whether locally claimed |
-
-For knowledge base documents, additional keys:
-
-| Key | Type | Description |
-|-----|------|-------------|
-| `name` | string | Document name (lowercase-hyphenated) |
 | `body` | string | Full markdown body content |
 
 ### Multiple Documents
@@ -272,11 +266,11 @@ When showing multiple documents, output is separated by blank lines (text) or
 returned as a JSON array:
 
 ```
-$ lat show L1234 L5678
-L1234: First issue title
+$ lat show LB234 L567C
+LB234: First issue title
 ...
 
-L5678: Second issue title
+L567C: Second issue title
 ...
 ```
 
@@ -300,9 +294,9 @@ lat ready --pretty
 $ lat ready
 Ready work (4 issues with no blockers):
 
-1. [P0] [epic] L1234: Fix LLMC v2 code review issues
-2. [P1] [task] L5678: Convert strings.toml to Fluent format
-3. [P1] [epic] L9012: LLMC v2: Agent Coordination System
+1. [P0] [epic] LB234: Fix LLMC v2 code review issues
+2. [P1] [task] L567C: Convert strings.toml to Fluent format
+3. [P1] [epic] LDAB2: LLMC v2: Agent Coordination System
 4. [P1] [epic] L3456: Tabula V2: Complete Card Data Loading Rewrite
 ```
 
@@ -341,12 +335,12 @@ The `--pretty` flag displays a visual tree with status symbols:
 
 ```
 $ lat ready --pretty
-o P0 L1234 - [EPIC] Fix LLMC v2 code review issues
+o P0 LB234 - [EPIC] Fix LLMC v2 code review issues
 
 o P1 L3456 - [EPIC] Tabula V2: Complete Card Data Loading Rewrite
-|-- o P1 L5678 - Convert strings.toml to Fluent format
+|-- o P1 L567C - Convert strings.toml to Fluent format
 
-o P1 L9012 - [EPIC] LLMC v2: Agent Coordination System
+o P1 LDAB2 - [EPIC] LLMC v2: Agent Coordination System
 
 --------------------------------------------------------------------------------
 Total: 4 issues (4 open, 0 claimed)
@@ -361,7 +355,7 @@ The `--json` flag produces output compatible with `bd ready --json`:
 ```json
 [
   {
-    "id": "L1234",
+    "id": "LB234",
     "title": "Fix LLMC v2 code review issues",
     "description": "Master epic for addressing bugs...",
     "status": "open",
@@ -373,7 +367,7 @@ The `--json` flag produces output compatible with `bd ready --json`:
     "path": "issues/llmc/fix-review-issues.md",
     "labels": [],
     "parent": {
-      "id": "L0042",
+      "id": "LAA42",
       "title": "LLMC Development"
     }
   }
@@ -428,7 +422,7 @@ Always write links in shorthand format using just the Lattice ID:
 
     See [the design doc](LXXXX) for details.
 
-Then run `lat fmt` to expand to full path+fragment format:
+Running `lat fmt` at the end of work will expand to full path+fragment format:
 
     See [the design doc](../path/to/doc.md#LXXXX) for details.
 
@@ -456,7 +450,7 @@ These commands appear in the session protocol output.
 
 The `lat claim` command marks an issue as locally in progress on the current
 machine. This state is NOT stored in markdown files or tracked in git;
-instead it persists to `~/.lattice/claims.json`.
+instead it persists to `~/.lattice/claims/`.
 
 ### Basic Usage
 
@@ -470,60 +464,38 @@ lat claim --gc           # Clean up stale claims
 
 ### Claim Storage
 
-Claims are stored in `~/.lattice/claims.json`, keyed by repository root
-to support multiple Lattice projects on the same machine:
+Each claim is a separate file in `~/.lattice/claims/<repo-hash>/`:
+
+```
+~/.lattice/claims/
+  a1b2c3d4/           # Hash of /path/to/repo1
+    LB234.json
+    L567C.json
+  e5f6g7h8/           # Hash of /path/to/repo2
+    LDAB2.json
+```
+
+The `<repo-hash>` is the first 8 characters of the SHA-256 hash of the
+canonical repository root path. Each claim file contains minimal JSON:
 
 ```json
 {
-  "/path/to/repo1": {
-    "L1234": {
-      "claimed_at": "2026-01-14T10:30:00Z",
-      "work_path": "/path/to/repo1",
-      "hostname": "dev-machine"
-    }
-  },
-  "/path/to/repo2": {
-    "L5678": {
-      "claimed_at": "2026-01-14T11:00:00Z",
-      "work_path": "/path/to/repo2/worktree-feature",
-      "hostname": "dev-machine"
-    }
-  }
+  "claimed_at": "2026-01-14T10:30:00Z",
+  "work_path": "/path/to/repo1/worktree-feature"
 }
 ```
 
-The `work_path` field stores either:
-- The main repository path when claiming from the main checkout
-- The worktree path when claiming from a git worktree
-
-This file is:
-- Shared across multiple git worktrees within the same repository
-- Isolated between different Lattice repositories
-- NOT tracked in version control
-- Updated atomically via file locking
-
-### Atomic Updates
-
-Multiple agents in different worktrees might claim different issues
-simultaneously. Lattice uses file locking to ensure atomic updates:
-
-1. Acquire exclusive lock on `~/.lattice/claims.lock`
-2. Read current claims
-3. Modify claims for the relevant repository
-4. Write updated claims
-5. Release lock
-
-If the lock cannot be acquired within 5 seconds, the operation fails
-with a clear error message.
+File creation and deletion are atomic on POSIX systems, so no explicit
+locking is needed. Claiming creates the file; releasing deletes it.
 
 ### Claim Lifecycle
 
 ```
 lat ready          # Issue shows as "ready"
-lat claim L1234    # Issue now claimed
-lat show L1234     # Shows "Claimed: true" in output
+lat claim LB234    # Issue now claimed
+lat show LB234     # Shows "Claimed: true" in output
 lat ready          # Issue no longer appears (unless --include-claimed)
-lat close L1234    # Closing auto-releases the claim
+lat close LB234    # Closing auto-releases the claim
 ```
 
 ### Auto-Release on State Change
@@ -542,9 +514,9 @@ The `lat claim --gc` command removes stale claims:
 ```
 $ lat claim --gc
 Checking 3 claims...
-Released: L1234 (issue closed)
-Released: L5678 (work path no longer exists)
-Kept: L9012 (active)
+Released: LB234 (issue closed)
+Released: L567C (work path no longer exists)
+Kept: LDAB2 (active)
 ```
 
 A claim is stale if:
@@ -554,25 +526,15 @@ A claim is stale if:
 
 ### Crash Recovery
 
-If an agent crashes while working on an issue, the claim persists. The
-coordinator can release it via:
-
-```
-lat claim --release L1234
-```
-
-Or clear all claims from a specific worktree:
-
-```
-lat claim --release-worktree /path/to/crashed/worktree
-```
+If an agent crashes while working on an issue, the claim persists. Release
+it via `lat claim --release LB234` or delete the claim file directly.
 
 ### Display in lat show
 
 The `lat show` command indicates claim status:
 
 ```
-L1234: Fix LLMC v2 code review issues
+LB234: Fix LLMC v2 code review issues
 Status: open
 Priority: P0
 Type: epic
@@ -591,7 +553,7 @@ Ready work (3 issues with no blockers):
 
 $ lat ready --include-claimed
 Ready work (4 issues, 1 claimed):
-1. [P0] [epic] L1234: Fix LLMC v2... [CLAIMED]
+1. [P0] [epic] LB234: Fix LLMC v2... [CLAIMED]
 ...
 ```
 

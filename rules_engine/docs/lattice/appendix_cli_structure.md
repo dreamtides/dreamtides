@@ -116,7 +116,7 @@ Create new issue document.
 - `-d, --description <text>`: Issue description
 - `--body-file <path>`: Read description from file
 - `-l, --labels <list>`: Comma-separated labels
-- `--deps <spec>`: Dependency (e.g., `discovered-from:LK1DT`)
+- `--deps <spec>`: Dependency (e.g., `discovered-from:LK3DT`)
 
 The path argument specifies both the directory location and filename for the issue.
 For directory root documents (epics), use the `00_` prefix in the filename.

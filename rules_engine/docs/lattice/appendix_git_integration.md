@@ -104,53 +104,11 @@ When a client first uses Lattice in a repository:
 
 ## Conflict Detection
 
-### First-Commit Check
-
-When `lat check` runs in a pre-commit hook:
-1. Query all existing client IDs in the repository
-2. Check if the committer's client ID is already in use
-3. If collision detected, warn and suggest renumbering
-
-### Renumbering Process
-
-If a new contributor's ID conflicts:
-1. Generate a new unique client ID
-2. Update all Lattice IDs in staged files
-3. Update `~/.lattice.toml`
-4. Re-run `lat check` to verify
-
-### ID Duplication Check
-
-`lat check` always verifies no two documents share the same Lattice ID.
-This catches:
+`lat check` verifies no two documents share the same Lattice ID. This catches:
 - Copy-paste errors
 - Failed merge resolutions
 - Manual ID assignment mistakes
-
-## Git Hooks Integration
-
-### Pre-Commit Hook
-
-Recommended pre-commit hook usage:
-
-```bash
-#!/bin/sh
-lat check --staged-only
-```
-
-The `--staged-only` flag limits checking to files in the staging area,
-making the hook fast for incremental commits.
-
-### Pre-Push Hook
-
-Optional pre-push validation:
-
-```bash
-#!/bin/sh
-lat check
-```
-
-Full repository check before pushing ensures consistency.
+- Client ID collisions from parallel contributors
 
 ## Branch Operations
 
