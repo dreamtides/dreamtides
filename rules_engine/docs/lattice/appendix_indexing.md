@@ -1,0 +1,156 @@
+# Appendix: Indexing
+
+This appendix documents the SQLite index schema, reconciliation algorithm, and
+performance tuning. See [Lattice Design](lattice_design.md#index-architecture)
+for an overview.
+
+## Design Principles
+
+The SQLite index is a performance cache, never a source of truth. Any index
+state can be discarded and rebuilt from git. When in doubt, rebuild.
+
+Index location: `.lattice/index.sqlite` (gitignored).
+
+## Schema
+
+### documents
+
+| Column | Type | Description |
+|--------|------|-------------|
+| id | TEXT PK | Lattice ID |
+| parent_id | TEXT | Parent document ID |
+| path | TEXT UNIQUE | Relative path from repo root |
+| name | TEXT | Document name |
+| description | TEXT | Document description |
+| issue_type | TEXT | NULL for knowledge base docs |
+| status | TEXT | Issue status |
+| priority | INTEGER | 0-4 |
+| created_at | TEXT | ISO 8601 |
+| updated_at | TEXT | ISO 8601 |
+| closed_at | TEXT | ISO 8601 |
+| body_hash | TEXT | SHA-256 for change detection |
+| indexed_at | TEXT | Last index update |
+| content_length | INTEGER | Body length |
+| link_count | INTEGER | Outgoing links (trigger-maintained) |
+| backlink_count | INTEGER | Incoming links (trigger-maintained) |
+| view_count | INTEGER | Local view count |
+
+### links
+
+| Column | Type | Description |
+|--------|------|-------------|
+| source_id | TEXT | Linking document |
+| target_id | TEXT | Linked document |
+| link_type | TEXT | 'body' or 'frontmatter' |
+| position | INTEGER | Order in source |
+
+Indexed on source_id and target_id.
+
+### labels
+
+| Column | Type |
+|--------|------|
+| document_id | TEXT |
+| label | TEXT |
+
+Indexed on both columns.
+
+### index_metadata
+
+Single-row table: schema_version, last_commit (git hash), last_indexed.
+
+### client_counters
+
+Per-client document counter: client_id (PK), next_counter.
+
+### directory_roots
+
+Precomputed hierarchy: directory_path (PK), root_id, parent_path, depth.
+
+### content_cache
+
+L2 cache for body content: document_id (PK), content, content_hash,
+accessed_at, file_mtime.
+
+## Reconciliation
+
+Runs at the start of every `lat` command.
+
+**Fast path**: If HEAD unchanged and no uncommitted .md changes, skip.
+
+**Incremental path**: `git diff --name-only <last_commit>..HEAD -- '*.md'`
+to find changed files. Re-parse modified, remove deleted. Check `git status`
+for uncommitted changes.
+
+**Full rebuild**: Triggered by missing index, schema mismatch, errors, or
+`lat check --rebuild-index`. Delete index, create schema, parse all .md files.
+
+Any error during reconciliation triggers full rebuild.
+
+## Full-Text Search
+
+FTS5 with external content mode (no duplicate storage):
+
+```sql
+CREATE VIRTUAL TABLE fts_content USING fts5(
+    document_id, body,
+    content='documents', content_rowid='rowid',
+    automerge=4
+);
+```
+
+Triggers keep FTS in sync. After rebuild, optimize:
+
+```sql
+INSERT INTO fts_content(fts_content) VALUES('optimize');
+```
+
+## SQLite Configuration
+
+Execute on every connection open:
+
+```sql
+PRAGMA journal_mode = WAL;
+PRAGMA synchronous = NORMAL;
+PRAGMA temp_store = MEMORY;
+PRAGMA mmap_size = 268435456;  -- 256MB
+PRAGMA busy_timeout = 5000;
+```
+
+Run `PRAGMA optimize` before closing. After bulk operations:
+`PRAGMA wal_checkpoint(TRUNCATE)`.
+
+**WAL mode**: Concurrent readers/writers, 30-60% faster commits. Auto-checkpoints
+at ~4MB.
+
+**Synchronous NORMAL**: Safe with WAL. Commits in last few ms before power loss
+may roll back—acceptable for a rebuildable cache.
+
+**Memory-mapped I/O**: Set mmap_size to at least expected index size. Disable
+(set to 0) on network filesystems.
+
+## Performance Targets
+
+For 10,000 documents:
+
+| Operation | Target |
+|-----------|--------|
+| Connection open + configure | <5ms |
+| Document lookup by ID | <1ms |
+| FTS search (simple) | <20ms |
+| FTS search (complex) | <50ms |
+| Incremental reconciliation | <500ms |
+| Full rebuild | <30s |
+
+## Size Projections
+
+| Documents | Index Size |
+|-----------|------------|
+| 1,000 | ~8MB |
+| 10,000 | ~80MB |
+| 50,000 | ~400MB |
+
+## Error Recovery
+
+- WAL corruption: Delete `-wal` and `-shm` files; next command rebuilds
+- Index corruption: Delete index file; next command rebuilds

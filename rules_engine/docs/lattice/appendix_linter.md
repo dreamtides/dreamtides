@@ -197,16 +197,6 @@ Path contains backslashes (Windows-style).
 
 **Fix:** Replace backslashes with forward slashes.
 
-### W012: Time-Sensitive Content
-
-Document contains date-specific language.
-
-**Detection:** Regex for patterns like "after August 2025", "by Q4 2024".
-
-**Message:** `Warning [W012]: path.md:45 contains time-sensitive content 'after August 2025'`
-
-**Fix:** Reword to be time-independent or move to "old patterns" section.
-
 ## Skill-Specific Rules
 
 When `skill: true` is present, additional rules apply:

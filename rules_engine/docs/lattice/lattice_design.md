@@ -41,8 +41,8 @@ opportunity.
 The index reconciliation strategy uses git's change detection mechanisms to
 identify stale index entries. When the index cannot be confidently validated,
 Lattice falls back to a full rebuild rather than attempting complex incremental
-repairs. See [Appendix: Indexing Strategy](appendix_indexing_strategy.md) for
-the detailed reconciliation algorithm.
+repairs. See [Appendix: Indexing](appendix_indexing.md) for the schema and
+reconciliation algorithm.
 
 ### Bulletproof Self-Healing
 
@@ -419,9 +419,8 @@ If git state is unclear (detached HEAD, uncommitted changes), the system
 falls back to full rebuild. The index stores the commit hash of its last
 known-good state for comparison.
 
-See [Appendix: Indexing Strategy](appendix_indexing_strategy.md) for the
-complete reconciliation algorithm and [Appendix: Indexing Performance](appendix_indexing_performance.md)
-for SQLite tuning and benchmarking guidance.
+See [Appendix: Indexing](appendix_indexing.md) for the complete schema,
+reconciliation algorithm, and performance tuning.
 
 ### Index Location
 
