@@ -49,7 +49,7 @@ Document cross-references.
 
 **Columns:**
 - `source_id` TEXT: Linking document ID
-- `target_id` TEXT: Linked document/section ID
+- `target_id` TEXT: Linked document ID
 - `link_type` TEXT: 'body' or 'frontmatter'
 - `position` INTEGER: Order in source document
 
@@ -72,17 +72,6 @@ Global context-for declarations.
 **Columns:**
 - `document_id` TEXT: Document declaring context-for
 - `label` TEXT: Label that triggers inclusion
-
-### sections Table
-
-Section ID to document mapping.
-
-**Columns:**
-- `section_id` TEXT PRIMARY KEY: Section's Lattice ID
-- `document_id` TEXT: Parent document ID
-- `header_text` TEXT: Section header content
-- `start_line` INTEGER: Section start in document
-- `end_line` INTEGER: Section end in document
 
 ### index_metadata Table
 

@@ -101,14 +101,8 @@ issue lifecycle state machine.
 ### Document Body
 
 The markdown body follows standard CommonMark syntax with Lattice extensions
-for ID-based linking. Section headers can be annotated with Lattice IDs in
-square brackets to enable granular cross-references:
-
-```
-# [LJCQ2] Error Handling
-```
-
-Links use standard markdown syntax with Lattice IDs replacing URLs:
+for ID-based linking. Links use standard markdown syntax with Lattice IDs
+replacing URLs:
 
 ```
 See the [error handling](LJCQ2) document for more information
@@ -199,8 +193,6 @@ context with a larger budget: `lat show <issue-id> --brief`.
 
 **Incremental Loading:** Load only what you need:
 - `--peek`: Just YAML frontmatter
-- `--sections`: List sections without content
-- `--section "Name"`: Load specific section
 
 See [Appendix: Context Retrieval](appendix_context_retrieval.md) for the
 complete specification of context modes, intents, and loading options.
@@ -242,28 +234,15 @@ fit the budget, showing their names, descriptions, and IDs.
 
 ### Link Types
 
-Lattice supports three link target types:
+Lattice supports document links, which reference a complete document by its ID.
+Links use standard markdown syntax with Lattice IDs replacing URLs:
 
-1. **Document links**: Reference a complete document by its ID
-2. **Section links**: Reference a specific section within a document
-3. **Placeholder links**: Use `LATTICE` as target for auto-completion
-
-Document and section links share the same ID namespace. When the `lat show`
-command encounters a section ID, it includes only that section and its
-subsections, not the entire parent document.
-
-### Link Resolution
-
-The `lat annotate` command resolves placeholder links (`LATTICE`) by
-performing case-insensitive, whitespace-normalized substring matching
-against section headers. If exactly one match exists, the placeholder is
-replaced with the corresponding ID. Ambiguous matches generate warnings.
-
-This command also assigns IDs to unmarked section headers. By default, only
-level-1 headers receive IDs, but flags control deeper annotation.
+```
+See the [error handling](LJCQ2) document for details
+```
 
 See [Appendix: Linking System](appendix_linking_system.md) for the complete
-resolution algorithm and edge cases.
+link format specification and edge cases.
 
 ### Bidirectional References
 

@@ -242,11 +242,7 @@ Direct dependents (documents linking to this):
 Blocking (issues blocked by this):
   LAAAA  implement-oauth [feature/P1/blocked]
 
-Section references:
-  LBBBB references section [L002] (Security Model)
-  LCCCC references section [L005] (Token Format)
-
-Total documents affected: 6
+Total documents affected: 4
 ```
 
 ## Statistics

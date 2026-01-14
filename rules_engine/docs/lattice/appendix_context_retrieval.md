@@ -24,8 +24,6 @@ lat show <id> [options]
 
 **Loading Options:**
 - `--peek`: Show only YAML frontmatter, not body content
-- `--sections`: List section headers with IDs, without content
-- `--section "Name"`: Show only the named section
 - `--raw`: Output without formatting or decorations
 
 **AI Mode:**
@@ -153,34 +151,6 @@ priority: 1
 ```
 
 Token-efficient for scanning multiple documents.
-
-### Section Listing
-
-List sections without content:
-
-```
-lat show <id> --sections
-```
-
-Output:
-```
-# [L001] Introduction
-## [L002] Background
-## [L003] Requirements
-# [L004] Implementation
-## [L005] Architecture
-## [L006] Testing
-# [L007] Conclusion
-```
-
-### Section Loading
-
-Load specific section:
-
-```
-lat show <id> --section "Implementation"
-lat show L004                              # Direct section ID
-```
 
 ## Context Algorithm Details
 

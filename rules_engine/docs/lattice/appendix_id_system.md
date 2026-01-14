@@ -135,14 +135,6 @@ This is determined by:
 
 In practice, client IDs are looked up in the index for disambiguation.
 
-## Section IDs
-
-Section IDs share the same format as document IDs but are stored in
-the `sections` table rather than `documents`. When resolving a link:
-1. Check `documents` table first
-2. If not found, check `sections` table
-3. Section lookup returns the parent document ID and line range
-
 ## ID Generation Algorithm
 
 ```
@@ -170,7 +162,6 @@ function get_or_init_counter(client_id):
 - IDs are always displayed in uppercase
 - Parsing is case-insensitive
 - In markdown links, IDs replace the URL: `[text](LK1DT)`
-- In section headers, IDs are bracketed: `# [LK1DT] Header`
 
 ## Error Cases
 
@@ -181,7 +172,6 @@ function get_or_init_counter(client_id):
 
 **Reference errors:**
 - Unknown ID: Link to `LXXXX` where no document exists
-- Ambiguous section: Multiple sections with same ID (shouldn't happen)
 
 **Generation errors:**
 - Counter overflow: Exceeds Base32 representable range (unlikely: 2^62+)

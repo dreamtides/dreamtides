@@ -34,8 +34,6 @@ details on context options.
 
 **Loading Options:**
 - `--peek`: Show only YAML frontmatter
-- `--sections`: List section headers with IDs
-- `--section "Name"`: Show only named section
 - `--raw`: Output without formatting
 
 **Intent Options:**
@@ -52,15 +50,6 @@ Add Lattice tracking to existing markdown file.
 **Options:**
 - `--name <name>`: Set document name
 - `--description <desc>`: Set description
-
-### lat annotate \<path\> [options]
-
-Assign IDs to sections and resolve placeholder links.
-
-**Options:**
-- `--depth N`: Assign IDs to headers up to depth N (default 1)
-- `--all`: Assign IDs to all header levels
-- `--resolve-only`: Only resolve placeholders
 
 ### lat generate-ids [options]
 

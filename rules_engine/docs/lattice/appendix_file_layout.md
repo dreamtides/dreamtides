@@ -21,7 +21,6 @@ rules_engine/src/lattice/
 │       ├── list_command.rs     # lat list implementation
 │       ├── check_command.rs    # lat check implementation
 │       ├── format_command.rs   # lat fmt implementation
-│       ├── annotate_command.rs # lat annotate implementation
 │       ├── split_command.rs    # lat split implementation
 │       ├── track_command.rs    # lat track implementation
 │       ├── generate_command.rs # lat generate-ids implementation
@@ -74,7 +73,6 @@ rules_engine/src/lattice/
 │   ├── mod.rs                  # Link module root
 │   ├── link_extractor.rs       # Extract links from markdown
 │   ├── link_resolver.rs        # Resolve IDs to paths
-│   ├── placeholder_matcher.rs  # LATTICE placeholder resolution
 │   └── reference_tracker.rs    # Bidirectional reference map
 │
 ├── context/
@@ -224,8 +222,7 @@ git
 
 link
 ├── link_extractor → id
-├── link_resolver → index
-└── placeholder_matcher → index, section_extractor
+└── link_resolver → index
 
 context
 ├── context_algorithm → candidate_gatherer, budget_allocator

@@ -28,8 +28,6 @@ Example: If target has `labels: [authentication]`, find all documents with
 ### Source 2: Body Links
 
 Links appearing in the target document's body text, in document order.
-Both document links and section links qualify. Section links include
-only the referenced section, not the full parent document.
 
 ### Source 3: Directory Roots
 
@@ -84,13 +82,6 @@ Display content includes:
 - Document name as level-1 header: `# document-name`
 - Full body text (markdown content after frontmatter)
 - YAML frontmatter is excluded from context documents
-
-### For Sections
-
-When a link targets a section ID:
-- Header line of the section
-- All content until the next header of equal or higher level
-- Nested subsections are included
 
 ## Output Ordering
 
