@@ -80,7 +80,7 @@ Claude's SKILL.md format. The reserved keys include:
 
 **Issue Tracking Keys:**
 - `issue-type`: bug/feature/task/epic/chore
-- `status`: open/in_progress/blocked/deferred/closed/tombstone/pinned
+- `status`: open/blocked/deferred/closed/tombstone/pinned
 - `priority`: 0-4 (0 highest)
 - `labels`: List of arbitrary string labels
 - `blocking`: List of issue IDs with hard dependencies on this issue
@@ -270,12 +270,12 @@ parent or "epic." This replaces beads' explicit epic/child model.
 Issue status transitions follow a state machine:
 
 ```
-open -> in_progress -> closed
-  |         |            ^
-  |         v            |
-  +---> blocked ------>--+
-  |         |
-  v         v
+open -> closed
+  |       ^
+  |       |
+  +---> blocked -------+
+  |
+  v
 deferred  (back to open when unblocked)
 ```
 
@@ -541,7 +541,7 @@ operation specification.
 Lattice uses the Ayu color theme following beads' UI philosophy:
 
 - **Pass (green)**: Success, completion, ready states
-- **Warn (yellow)**: Attention needed, in-progress
+- **Warn (yellow)**: Attention needed
 - **Fail (red)**: Errors, blocked, critical
 - **Accent (blue)**: Navigation, emphasis, links
 - **Muted (gray)**: De-emphasized, closed, metadata

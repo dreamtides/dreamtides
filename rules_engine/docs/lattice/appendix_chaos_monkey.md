@@ -39,7 +39,7 @@ repeat until system_error or max_ops reached:
 **create_issue**: Create a new issue document
 - Random path (within existing directories)
 - Random type (bug/feature/task/chore)
-- Random status (open/in_progress/blocked)
+- Random status (open/blocked)
 - Random priority (0-4)
 - Random labels (0-5)
 
@@ -172,7 +172,7 @@ Operation details:
   Document: LXXXX (path/to/doc.md)
   Field: status
   Old value: open
-  New value: in_progress
+  New value: blocked
 
 Error output:
   System Error: Index constraint violation at ...

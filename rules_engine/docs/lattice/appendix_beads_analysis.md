@@ -121,7 +121,7 @@ o [orange] dr-ulj - [EPIC] Tabula V2...
 
 o [orange] dr-67z - [EPIC] LLMC v2...
 
-Legend: o open | (o) in progress | (x) blocked | [red] P0 | [orange] P1...
+Legend: o open | (x) blocked | [red] P0 | [orange] P1...
 ```
 
 ### Edge Cases
@@ -169,7 +169,7 @@ dr-2z0 [P1] [bug] open - Fix stuck worker nudging
 ### Filter Categories
 
 **Status Filters**:
-- `--status=open|in_progress|blocked|deferred|closed`
+- `--status=open|blocked|deferred|closed`
 - `--all` includes closed issues
 
 **Time Filters**:
@@ -243,7 +243,7 @@ should implement equivalent parsing for `--updated-after` etc.
 Shows issues in blocked status with blocking relationships:
 ```
 dr-xxx: Issue title
-  Blocked by: dr-yyy (open), dr-zzz (in_progress)
+  Blocked by: dr-yyy (open), dr-zzz (blocked)
 ```
 
 **Lattice Equivalent**: `lat blocked` showing `blocked-by` relationships.

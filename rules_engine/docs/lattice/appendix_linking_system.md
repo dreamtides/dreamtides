@@ -217,7 +217,7 @@ The `lat dep tree` command visualizes blocking relationships:
 
 ```
 LXXXX (open)
-├── blocks: LYYYY (in_progress)
+├── blocks: LYYYY (open)
 │   └── blocks: LZZZZ (open)
 └── blocks: LWWWW (blocked)
 ```

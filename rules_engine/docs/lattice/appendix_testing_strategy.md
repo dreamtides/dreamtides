@@ -230,7 +230,7 @@ fn create_bug_with_all_fields_succeeds() { }
 fn create_without_path_returns_error() { }
 
 #[test]
-fn update_closed_issue_to_in_progress_fails() { }
+fn update_closed_issue_to_open_fails() { }
 ```
 
 ## Performance Requirements

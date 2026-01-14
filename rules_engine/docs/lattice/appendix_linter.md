@@ -55,7 +55,7 @@ A field contains an invalid value.
 
 **Detection:** Validate against allowed values for each field type.
 
-**Message:** `Error [E005]: path.md has invalid status 'doing' (allowed: open, in_progress, blocked, deferred, closed, tombstone, pinned)`
+**Message:** `Error [E005]: path.md has invalid status 'doing' (allowed: open, blocked, deferred, closed, tombstone, pinned)`
 
 **Fix:** Use a valid value.
 

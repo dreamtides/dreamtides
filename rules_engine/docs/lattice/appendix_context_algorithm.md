@@ -134,7 +134,7 @@ When the target is an issue document:
 ### Metadata Display
 
 Issue frontmatter fields are rendered human-readably:
-- Status with color indicator (green for open, yellow for in_progress, etc.)
+- Status with color indicator (green for open, red for blocked, etc.)
 - Priority with P0-P4 label
 - Labels as comma-separated list
 - Blocking/blocked-by as ID lists

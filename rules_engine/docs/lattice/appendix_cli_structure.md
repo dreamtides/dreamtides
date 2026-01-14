@@ -150,7 +150,7 @@ Search and filter documents.
 Default format shows rich metadata inline:
 ```
 LXXXX [bug/P1/open] login-authentication-failure
-LYYYY [feature/P2/in_progress] oauth-implementation
+LYYYY [feature/P2/open] oauth-implementation
 LZZZZ [doc] authentication-design
 ```
 

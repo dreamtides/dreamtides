@@ -29,7 +29,6 @@ document (`!*.md`) and represents a collection of related issues.
 | Status | Description | Appears in `lat ready` |
 |--------|-------------|------------------------|
 | `open` | Ready for work | Yes |
-| `in_progress` | Currently active | No |
 | `blocked` | Waiting on dependencies | No |
 | `deferred` | Intentionally delayed | No |
 | `closed` | Work completed | No |
@@ -42,24 +41,20 @@ document (`!*.md`) and represents a collection of related issues.
               ┌──────────────┐
               │              │
               ▼              │
-  ┌────────► open ◄─────────┼──────────┐
-  │           │              │          │
-  │           ▼              │          │
-  │      in_progress ───────►│          │
-  │           │              │          │
-  │           ▼              │          │
-  │        blocked ─────────►│          │
-  │           │                         │
-  │           ▼                         │
-  │       deferred ────────────────────►│
-  │                                     │
-  │                                     │
-  └─────────── closed ◄─────────────────┘
+  ┌────────► open ◄─────────┤
+  │           │              │
+  │           ▼              │
+  │        blocked ─────────►│
+  │           │              │
+  │           ▼              │
+  │       deferred ──────────┤
+  │                          │
+  │                          │
+  └─────────── closed ◄──────┘
 ```
 
 **Valid transitions:**
-- `open` → `in_progress`, `blocked`, `deferred`, `closed`
-- `in_progress` → `open`, `blocked`, `closed`
+- `open` → `blocked`, `deferred`, `closed`
 - `blocked` → `open`, `deferred` (auto-transitions to open when unblocked)
 - `deferred` → `open`, `closed`
 - `closed` → `open` (via `lat reopen`)
@@ -208,7 +203,7 @@ lattice-id: LXXXX
 name: implement-oauth
 description: Add OAuth 2.0 authentication support
 issue-type: feature
-status: in_progress
+status: open
 priority: 1
 labels: [auth, security]
 blocking: [LYYYY]
