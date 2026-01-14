@@ -44,17 +44,6 @@ Lattice falls back to a full rebuild rather than attempting complex incremental
 repairs. See [Appendix: Indexing Strategy](appendix_indexing_strategy.md) for
 the detailed reconciliation algorithm.
 
-### Stealth Mode Operation
-
-Unlike beads, Lattice never performs git push or sync operations. This
-"stealth mode" design supports multi-agent workflows where:
-
-1. Agents work in isolated git worktrees
-2. A coordinator manages merging and synchronization
-3. Push operations require explicit external control
-
-This model avoids the complexity of distributed sync and agent conflicts.
-
 ### Bulletproof Self-Healing
 
 Lattice aims to be a self-healing abstraction that handles errors gracefully
@@ -197,9 +186,8 @@ visual tree display, and `--json` for full issue details.
 
 ### lat prime
 
-Outputs AI-optimized workflow context. Unlike beads, operates in stealth
-mode with no sync or push operations. Supports custom checklist via
-`.lattice/config.toml` and override via `.lattice/PRIME.md`.
+Outputs AI-optimized workflow context. Supports custom checklist via
+`.lattice/config.toml`.
 
 ### lat claim
 
@@ -208,7 +196,7 @@ stored in `~/.lattice/claims.json`, not in markdown files. Supports
 atomic updates across multiple worktrees and automatic release on
 status change.
 
-See [Appendix: Commands](appendix_commands.md) for complete specifications
+See [Appendix: Workflow](appendix_workflow.md) for complete specifications
 of show, ready, prime, and claim commands.
 
 ## Linking System
@@ -283,7 +271,7 @@ filesystem-centric model. Key differences from beads:
 - Issues require `--path` on creation to specify filesystem location
 - No explicit parent/child relationships; hierarchy comes from directories
 - The `name` field replaces beads' `title` concept
-- No sync command; stealth mode operation only
+- No sync command; Lattice never performs git push operations
 
 See [Appendix: CLI Structure](appendix_cli_structure.md) for the complete
 command reference and [Appendix: Beads Analysis](appendix_beads_analysis.md)
@@ -403,6 +391,13 @@ what needs re-indexing.
 Documents are discovered through git's tracked file list rather than
 filesystem traversal. This ensures gitignored files are excluded and
 provides consistent behavior across operations.
+
+### No Push Operations
+
+Lattice never performs git push or sync operations. This design supports
+multi-agent workflows where agents work in isolated git worktrees and a
+coordinator manages merging and synchronization externally. Push operations
+require explicit user or coordinator control.
 
 ### Conflict Handling
 

@@ -1,4 +1,4 @@
-# Appendix: Show, Ready, Prime, and Claim Commands
+# Appendix: Workflow Commands
 
 This appendix documents the primary workflow commands for viewing documents,
 finding ready work, providing AI context, and claiming issues.
@@ -36,18 +36,18 @@ Master epic for addressing bugs and missing features identified in
 comprehensive code review of LLMC v2 implementation.
 
 Parent:
-  !llmc/overview.md#L0042: LLMC Development
+  L0042: LLMC Development [epic]
 
 Depends on (1):
-  -> L2345: Fix incorrect rebase necessity detection in patrol [P0]
+  L2345: Fix incorrect rebase necessity detection in patrol [P0 - closed]
 
 Blocks (5):
-  <- L3456: Fix crash count not being incremented in patrol [P0 - open]
-  <- L4567: Fix stuck worker nudging to be async [P1 - open]
+  L3456: Fix crash count not being incremented in patrol [P0 - open]
+  L4567: Fix stuck worker nudging to be async [P1 - open]
   ...
 
 Related (1):
-  - L5678: LLMC design document. Purpose summary here.
+  L5678: LLMC design document [doc]
 ```
 
 **Key sections:**
@@ -58,28 +58,67 @@ Related (1):
 - **Parent:** Directory root document (epic context)
 - **Depends on:** Issues in the `blocked-by` field (what this depends on)
 - **Blocks:** Issues in the `blocking` field (what depends on this)
-- **Related:** Other issues/documents linked in the body text
+- **Related:** Other documents linked in the body text
 
 ### Knowledge Base Display Format
 
-For knowledge base documents (no `issue-type`), the output includes the
-name/description distinction:
+For knowledge base documents (no `issue-type`), the output emphasizes the
+name and description fields which provide structured metadata:
 
 ```
 L9876: authentication-design
 Description: OAuth 2.0 implementation design for the auth subsystem
-
-Created: 2026-01-05 09:15
-Updated: 2026-01-12 16:42
 
 ---
 [Full markdown body content here]
 ---
 
 Related (2):
-  - L1111: security-policy. Security requirements for authentication.
-  - L2222: api-design. API endpoint specifications.
+  L1111: security-policy [doc]
+  L2222: api-design [doc]
 ```
+
+**Header components:**
+
+- **ID:** The Lattice ID
+- **Name:** The `name` frontmatter field (lowercase-hyphenated identifier)
+- **Description:** Displayed on its own line, providing the purpose summary
+
+Knowledge base documents do not display timestamps in the default view since
+they typically lack explicit `created-at`/`updated-at` fields. Git history
+can be queried separately if modification dates are needed.
+
+### Document Reference Format
+
+All document references throughout `lat show` output use a consistent format:
+
+```
+<id>: <name> [<type-indicator>]
+```
+
+Where `<type-indicator>` is:
+- For issues: `P<N> - <status>` (e.g., `P0 - open`, `P1 - closed`)
+- For knowledge base: `doc`
+
+Examples:
+```
+L1234: Fix login bug [P0 - open]
+L5678: authentication-design [doc]
+L9012: LLMC Development [epic]
+```
+
+### Related Document Selection
+
+The "Related" section displays documents linked from the body text. A document
+is considered "related" if:
+
+1. **Explicit link:** The body contains a markdown link with the document's
+   Lattice ID (either as `[text](path#ID)` or `[text](ID)`)
+2. **Not a dependency:** The document is not already listed in Depends on,
+   Blocks, or Parent sections
+
+The list is ordered by first appearance in the body text. Maximum 10 related
+documents are shown in text output; use `--json` for complete list.
 
 ### Name vs Description Distinction
 
@@ -130,8 +169,8 @@ References to L1234:
     ...
 
   Linked from (2):
-    L7890: Sprint 3 planning document (line 42)
-    L8901: Code review checklist (line 15)
+    L7890: Sprint 3 planning document [doc] (line 42)
+    L8901: Code review checklist [doc] (line 15)
 ```
 
 ### JSON Output Format
@@ -156,11 +195,9 @@ The `--json` flag produces structured output compatible with `bd show --json`:
       {
         "id": "L2345",
         "title": "Fix incorrect rebase necessity detection in patrol",
-        "description": "Problem: rules_engine/src/llmc/...",
         "status": "closed",
         "priority": 0,
-        "issue_type": "bug",
-        "dependency_type": "blocks"
+        "issue_type": "bug"
       }
     ],
     "dependents": [
@@ -169,14 +206,19 @@ The `--json` flag produces structured output compatible with `bd show --json`:
         "title": "Fix crash count not being incremented in patrol",
         "status": "open",
         "priority": 0,
-        "issue_type": "bug",
-        "dependency_type": "blocks"
+        "issue_type": "bug"
+      }
+    ],
+    "related": [
+      {
+        "id": "L5678",
+        "name": "llmc-design",
+        "description": "LLMC design document"
       }
     ],
     "parent": {
       "id": "L0042",
-      "title": "LLMC Development",
-      "path": "issues/llmc/!overview.md"
+      "title": "LLMC Development"
     },
     "claimed": false
   }
@@ -201,6 +243,7 @@ The `--json` flag produces structured output compatible with `bd show --json`:
 | `labels` | array | List of labels |
 | `dependencies` | array | Issues this depends on (blocked-by) |
 | `dependents` | array | Issues that depend on this (blocking) |
+| `related` | array | Documents linked from body text |
 | `parent` | object | Directory root document (epic) |
 | `claimed` | bool | Whether locally claimed |
 
@@ -319,7 +362,7 @@ The `--json` flag produces output compatible with `bd ready --json`:
     "labels": [],
     "parent": {
       "id": "L0042",
-      "path": "issues/llmc/!overview.md"
+      "title": "LLMC Development"
     }
   }
 ]
@@ -331,15 +374,14 @@ enabling AI agents to understand task context without additional queries.
 ## lat prime
 
 The `lat prime` command outputs AI-optimized workflow context, following
-`bd prime` behavior. Unlike beads, Lattice operates in stealth mode: it
-never runs `git push` or any equivalent sync operation.
+`bd prime` behavior. Lattice never runs `git push` or any equivalent sync
+operation, so the session protocol focuses on local validation and commits.
 
 ### Basic Usage
 
 ```
 lat prime
 lat prime --full
-lat prime --export
 ```
 
 ### Default Output
@@ -367,15 +409,6 @@ Before completing work, run this checklist:
 - `lat close <id>` - Mark issue completed
 ```
 
-### Stealth Mode
-
-Lattice never performs git push operations. The session protocol omits
-push/pull steps because:
-
-1. Multi-agent coordination uses a different model than beads sync
-2. Push operations require explicit user/coordinator control
-3. Agents work in isolated worktrees with coordinator managing merges
-
 ### Custom Checklist
 
 The `.lattice/config.toml` file can specify custom validation commands:
@@ -392,16 +425,6 @@ checklist = [
 ```
 
 These commands appear in the session protocol output.
-
-### Override File
-
-Place a `.lattice/PRIME.md` file to completely override the default output:
-
-```
-$ lat prime --export > .lattice/PRIME.md
-# Edit PRIME.md as needed
-$ lat prime  # Now outputs custom content
-```
 
 ## lat claim
 
@@ -421,22 +444,35 @@ lat claim --gc           # Clean up stale claims
 
 ### Claim Storage
 
-Claims are stored in `~/.lattice/claims.json`:
+Claims are stored in `~/.lattice/claims.json`, keyed by repository root
+to support multiple Lattice projects on the same machine:
 
 ```json
 {
-  "claims": {
+  "/path/to/repo1": {
     "L1234": {
       "claimed_at": "2026-01-14T10:30:00Z",
-      "worktree": "/path/to/worktree",
+      "work_path": "/path/to/repo1",
+      "hostname": "dev-machine"
+    }
+  },
+  "/path/to/repo2": {
+    "L5678": {
+      "claimed_at": "2026-01-14T11:00:00Z",
+      "work_path": "/path/to/repo2/worktree-feature",
       "hostname": "dev-machine"
     }
   }
 }
 ```
 
+The `work_path` field stores either:
+- The main repository path when claiming from the main checkout
+- The worktree path when claiming from a git worktree
+
 This file is:
-- Shared across multiple git worktrees
+- Shared across multiple git worktrees within the same repository
+- Isolated between different Lattice repositories
 - NOT tracked in version control
 - Updated atomically via file locking
 
@@ -447,7 +483,7 @@ simultaneously. Lattice uses file locking to ensure atomic updates:
 
 1. Acquire exclusive lock on `~/.lattice/claims.lock`
 2. Read current claims
-3. Modify claims
+3. Modify claims for the relevant repository
 4. Write updated claims
 5. Release lock
 
@@ -459,7 +495,7 @@ with a clear error message.
 ```
 lat ready          # Issue shows as "ready"
 lat claim L1234    # Issue now claimed
-lat show L1234     # Shows "Claimed: yes" in output
+lat show L1234     # Shows "Claimed: true" in output
 lat ready          # Issue no longer appears (unless --include-claimed)
 lat close L1234    # Closing auto-releases the claim
 ```
@@ -481,13 +517,13 @@ The `lat claim --gc` command removes stale claims:
 $ lat claim --gc
 Checking 3 claims...
 Released: L1234 (issue closed)
-Released: L5678 (worktree no longer exists)
+Released: L5678 (work path no longer exists)
 Kept: L9012 (active)
 ```
 
 A claim is stale if:
 - The issue is no longer open
-- The worktree path no longer exists
+- The work path no longer exists
 - The claim is older than 7 days (configurable)
 
 ### Crash Recovery
@@ -499,10 +535,10 @@ coordinator can release it via:
 lat claim --release L1234
 ```
 
-Or clear all claims from a specific worktree:
+Or clear all claims from a specific work path:
 
 ```
-lat claim --release-worktree /path/to/crashed/worktree
+lat claim --release-path /path/to/crashed/worktree
 ```
 
 ### Display in lat show
@@ -514,7 +550,7 @@ L1234: Fix LLMC v2 code review issues
 Status: open
 Priority: P0
 Type: epic
-Claimed: yes (since 2026-01-14 10:30, worktree: /path/to/work)
+Claimed: true
 ...
 ```
 

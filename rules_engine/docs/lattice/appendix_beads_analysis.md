@@ -249,7 +249,7 @@ The `bd sync` command synchronizes local state with remote:
 
 ### Lattice Adaptation: No Sync Command
 
-Lattice operates in "stealth mode" and never performs sync operations.
+Lattice never performs sync operations.
 This is a fundamental design difference from beads:
 
 1. **No git push**: Lattice never pushes to remote
@@ -343,7 +343,7 @@ Before completing work:
 2. **Section references**: Link to document sections, not just documents
 3. **Knowledge base integration**: Issues and docs share ID space
 4. **Directory roots**: `!*.md` convention for hierarchy
-5. **Stealth mode**: No sync/push operations
+5. **No push operations**: Sync handled externally
 
 ## Implementation Recommendations
 

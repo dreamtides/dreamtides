@@ -268,7 +268,7 @@ for issues.
 | `--parent` | Directory location | Implicit hierarchy |
 | `--title` | `--name` / document name | Mapped to name field |
 | `bd show` | `lat show` | Follows bd format |
-| `bd sync` | Not applicable | Stealth mode |
+| `bd sync` | Not applicable | No push operations |
 | `--status in_progress` | `lat claim` | Local-only tracking |
 | `--assignee` | Not applicable | No assignee concept |
 | epic type | root documents | `!*.md` convention |
