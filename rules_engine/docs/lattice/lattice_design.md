@@ -145,9 +145,9 @@ generation algorithm and collision handling.
 
 ### Client Identification
 
-New clients select a random identifier stored in `~/.lattice.toml`, which
-maps git checkout paths to client IDs. The ID length scales with the number
-of known clients in the repository:
+New clients select a random identifier and store it in `~/.lattice.toml`, which
+maps git checkout paths to client IDs. The ID length scales with the number of
+known clients in the repository:
 
 - 2 digits: Up to 16 clients (1024 possible IDs)
 - 3 digits: 17-64 clients (32768 possible IDs)
@@ -182,7 +182,7 @@ Commands for viewing documents and managing work progress.
 
 **lat show** - Displays document details following `bd show` format. Supports
 single or multiple documents, with `--json`, `--short`, and `--refs` options.
-For issues, output includes name, metadata, description, parent epic,
+Output includes name, metadata, description, parent epic,
 dependencies, and related documents.
 
 **lat ready** - Shows work available to start: open issues with no blockers
@@ -198,21 +198,21 @@ atomic updates across multiple worktrees and automatic release on status change.
 
 See [Appendix: Workflow](appendix_workflow.md) for complete specifications.
 
-### Issue Management
+### Issue and Document Management
 
-Commands for creating and modifying issues.
+Commands for creating and modifying issues and documents.
 
-**lat create** - Creates new issue documents with `lat create <path/to/issue.md>
+**lat create** - Creates new documents with `lat create <path/to/doc.md>
 [options]`. The path specifies both directory location and filename,
-establishing the issue's position in the hierarchy. Supports issue type,
+establishing the document's position in the hierarchy. Supports issue type,
 priority, labels, and dependencies at creation time.
 
-**lat update** - Modifies existing issues with `lat update <id> [id...]
+**lat update** - Modifies existing documents with `lat update <id> [id...]
 [options]`. Supports changing status, priority, type, and managing labels.
 Can update multiple issues atomically, useful for bulk operations like marking
 dependencies as blocked or changing priority across related issues.
 
-**lat close** - Marks issues as closed, accepting single or multiple issue IDs.
+**lat close** - Marks issues as closed, accepting single or multiple lattice IDs.
 Automatically releases any local claims and sets the `closed-at` timestamp.
 Supports `--reason` for documenting why the issue was closed.
 
@@ -236,8 +236,7 @@ repository integrity.
 
 **lat fmt** - Formats documents and normalizes links. Wraps text at 80
 characters, adds missing Lattice ID fragments to links, and updates file paths
-when documents are renamed or moved. The `--add-links` flag converts bare ID
-links to full path+fragment format.
+when documents are renamed or moved.
 
 See [Appendix: Linter](appendix_linter.md) for validation rules and
 [Appendix: CLI Structure](appendix_cli_structure.md) for full command reference.
@@ -255,7 +254,7 @@ See the [error handling](docs/error_handling.md#LJCQ2) document for details
 
 The `lat fmt` command normalizes links and handles several cases:
 - `[text](../path/to/doc.md)` -> fills in Lattice ID if valid document
-- `[text](LJCQ2)` -> adds file path with `--add-links` flag
+- `[text](LJCQ2)` -> adds file path
 - Detects document renames/moves and rewrites links to new paths
 
 All links use relative file system paths from the linking document's location.
@@ -311,7 +310,7 @@ state machine and transition rules.
 The issue CLI follows beads' design philosophy, adapted for Lattice's
 filesystem-centric model. Key differences from beads:
 
-- Issues require `--path` on creation to specify filesystem location
+- Issues require a path on creation to specify filesystem location
 - No explicit parent/child relationships; hierarchy comes from directories
 - The `name` field replaces beads' `title` concept
 - No sync command; Lattice never performs git push operations
@@ -343,8 +342,7 @@ The `lat check` command validates documents and repository state:
 
 The linter integrates mechanically verifiable rules from Claude's Skill
 authoring best practices, including path format validation (no backslashes),
-description length limits, and name format requirements. Lattice implements
-lint rules natively in Rust using pulldown-cmark.
+description length limits, and name format requirements.
 
 See [Appendix: Linter](appendix_linter.md) for the complete rule set.
 
@@ -493,12 +491,6 @@ Each entry includes:
 The `--verbose` flag increases output detail, showing operations that
 would normally be silent. The `--json` flag switches output format for
 programmatic consumption.
-
-### Log Rotation
-
-Log files should be periodically rotated by external tooling. Lattice
-does not implement automatic rotation, as this would require daemon-like
-behavior.
 
 ## Testing Architecture
 
