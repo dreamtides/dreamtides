@@ -1,5 +1,8 @@
 # Appendix: Testing Strategy
 
+This appendix documents the testing architecture for Lattice. For automated
+fuzz testing, see [Appendix: Chaos Monkey](appendix_chaos_monkey.md).
+
 ## Philosophy
 
 Testing in Lattice follows three principles:

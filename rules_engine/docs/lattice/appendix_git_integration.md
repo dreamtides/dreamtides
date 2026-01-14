@@ -1,5 +1,10 @@
 # Appendix: Git Integration
 
+This appendix documents how Lattice interacts with git for document discovery
+and change detection. See
+[Appendix: Git Edge Cases](appendix_git_edge_cases.md) for behavior in
+non-standard repository configurations.
+
 ## Design Philosophy
 
 Lattice uses git as the authoritative store for all document content. The

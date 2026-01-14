@@ -1,5 +1,9 @@
 # Appendix: Linking System
 
+This appendix documents the complete link format specification and edge cases.
+See [Lattice Design](lattice_design.md#linking-system) for an overview of the
+linking system.
+
 ## Link Syntax
 
 Lattice uses standard markdown link syntax with relative file paths and Lattice

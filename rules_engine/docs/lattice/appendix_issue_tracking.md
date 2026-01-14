@@ -1,5 +1,10 @@
 # Appendix: Issue Tracking
 
+This appendix documents the complete issue lifecycle state machine and
+transition rules. See [Lattice Design](lattice_design.md#issue-tracking) for
+an overview, and [Appendix: Beads Analysis](appendix_beads_analysis.md) for
+detailed analysis of beads behaviors that Lattice preserves.
+
 ## Issue vs Knowledge Base Documents
 
 Any Lattice document can be either:
@@ -37,7 +42,7 @@ document (`!*.md`) and represents a collection of related issues.
 
 **Note**: There is no `in_progress` status. Instead, use `lat claim` to
 track work locally without modifying issue files. See
-[Appendix: Commands](appendix_commands.md#lat-claim) for details.
+[Appendix: Workflow](appendix_workflow.md#lat-claim) for details.
 
 ### Transitions
 
@@ -86,7 +91,7 @@ This design supports multi-agent workflows where:
 - A coordinator assigns issues without modifying files
 - Work state doesn't create git conflicts
 
-See [Appendix: Commands](appendix_commands.md#lat-claim) for full claim
+See [Appendix: Workflow](appendix_workflow.md#lat-claim) for full claim
 command documentation.
 
 ## Priority Levels

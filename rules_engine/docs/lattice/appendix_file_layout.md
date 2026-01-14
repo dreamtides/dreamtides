@@ -1,5 +1,9 @@
 # Appendix: File Layout
 
+This appendix documents the Rust source file organization for the Lattice
+implementation. See [Lattice Design](lattice_design.md#project-file-layout)
+for how this relates to the overall architecture.
+
 ## Source Directory Structure
 
 All Rust code lives under `rules_engine/src/lattice/`:

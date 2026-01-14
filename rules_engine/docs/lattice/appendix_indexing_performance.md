@@ -2,7 +2,9 @@
 
 This appendix documents research findings on SQLite performance optimization for
 Lattice's index, targeting repositories with 10,000+ documents while maintaining
-sub-100ms response times for common queries.
+sub-100ms response times for common queries. See
+[Appendix: Indexing Strategy](appendix_indexing_strategy.md) for the
+reconciliation algorithm and schema design.
 
 ## Executive Summary
 

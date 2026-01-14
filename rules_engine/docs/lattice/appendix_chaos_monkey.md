@@ -1,5 +1,9 @@
 # Appendix: Chaos Monkey
 
+This appendix documents the automated fuzz testing system. For the broader
+testing strategy including unit tests and fakes, see
+[Appendix: Testing Strategy](appendix_testing_strategy.md).
+
 ## Purpose
 
 The `lat chaosmonkey` command performs automated fuzz testing to discover

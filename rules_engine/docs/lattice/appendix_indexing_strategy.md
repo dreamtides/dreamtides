@@ -1,5 +1,10 @@
 # Appendix: Indexing Strategy
 
+This appendix documents the SQLite index reconciliation algorithm and schema.
+See [Lattice Design](lattice_design.md#index-architecture) for an overview,
+and [Appendix: Indexing Performance](appendix_indexing_performance.md) for
+SQLite tuning guidance.
+
 ## Design Principles
 
 The SQLite index is a performance cache, never a source of truth. Any index

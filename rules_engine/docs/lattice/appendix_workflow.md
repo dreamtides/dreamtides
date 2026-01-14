@@ -1,7 +1,10 @@
 # Appendix: Workflow Commands
 
 This appendix documents the primary workflow commands for viewing documents,
-finding ready work, providing AI context, and claiming issues.
+finding ready work, providing AI context, and claiming issues. See
+[Lattice Design](lattice_design.md#workflow-commands) for an overview, and
+[Appendix: CLI Structure](appendix_cli_structure.md) for the complete command
+reference including non-workflow commands.
 
 ## lat show
 

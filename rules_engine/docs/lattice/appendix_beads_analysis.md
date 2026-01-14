@@ -4,6 +4,10 @@ This appendix documents the detailed analysis of beads' CLI behavior for
 `bd show`, `bd ready`, and `bd list` commands, identifying patterns to
 preserve and patterns to adapt for Lattice's filesystem-centric model.
 
+For the Lattice implementations of these commands, see:
+- [Appendix: Workflow](appendix_workflow.md) for show, ready, prime, and claim
+- [Appendix: CLI Structure](appendix_cli_structure.md) for the complete command reference
+
 ## Command Analysis: bd show
 
 ### Core Behavior

@@ -1,5 +1,9 @@
 # Appendix: Linter
 
+This appendix documents the complete rule set for the `lat check` command.
+See [Lattice Design](lattice_design.md#linter-and-formatter) for how the
+linter fits into the overall system.
+
 ## Overview
 
 The `lat check` command validates documents and repository state. It

@@ -18,7 +18,7 @@ All commands support:
 ## Workflow Commands
 
 These are the primary commands for AI agent workflows. See
-[Appendix: Commands](appendix_commands.md) for complete specifications.
+[Appendix: Workflow](appendix_workflow.md) for complete specifications.
 
 ### lat show \<id\> [id...] [options]
 

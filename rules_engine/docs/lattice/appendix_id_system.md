@@ -1,5 +1,9 @@
 # Appendix: ID System
 
+This appendix documents the complete ID generation algorithm and collision
+handling. See [Lattice Design](lattice_design.md#the-id-system) for an
+overview of the ID system.
+
 ## ID Format Specification
 
 A Lattice ID consists of three components concatenated without separators:
@@ -41,7 +45,7 @@ Invalid characters (0, 1, 8, 9, non-alphanumeric) cause parse errors.
 
 ### Initial Value
 
-Counters start at 50 (Base32: `1I`) to ensure all IDs have at least 5
+Counters start at 50 (Base32: `BS`) to ensure all IDs have at least 5
 characters total. This provides visual consistency and reduces the
 chance of IDs resembling common words.
 

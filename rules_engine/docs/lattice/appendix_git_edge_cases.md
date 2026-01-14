@@ -1,9 +1,12 @@
 # Appendix: Git Edge Cases
 
 This appendix documents Lattice's behavior in non-standard git repository
-configurations. The design philosophy is **graceful degradation**: Lattice
-should continue operating wherever possible, falling back to full index
-rebuilds when git metadata is unreliable.
+configurations. See [Appendix: Git Integration](appendix_git_integration.md)
+for standard git operations.
+
+The design philosophy is **graceful degradation**: Lattice should continue
+operating wherever possible, falling back to full index rebuilds when git
+metadata is unreliable.
 
 ## Detection Strategy
 
