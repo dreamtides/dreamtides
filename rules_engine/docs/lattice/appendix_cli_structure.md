@@ -206,7 +206,6 @@ Show documents changed since a point in time.
 **Options:**
 - `--since <date>`: Since date/time
 - `--since <commit>`: Since git commit
-- (No option): Since last session
 
 ## Relationship Commands
 
@@ -266,44 +265,6 @@ Repository-wide statistics.
 **Options:**
 - `links`: Detailed link statistics
 - `issues`: Issue statistics by status/priority
-
-## Session Commands
-
-### lat prime [options]
-
-Output session-start context. Called by hooks.
-
-See [Appendix: Session Management](appendix_session_management.md).
-
-**Options:**
-- `--format text|json|minimal`: Output format
-- `--stealth`: Skip sync operations
-- `--no-ready`: Omit ready work list
-- `--no-recent`: Omit recent changes
-
-### lat session start \<id\>
-
-Set current working issue.
-
-### lat session end
-
-Clear current working issue.
-
-### lat session status
-
-Show session state.
-
-### lat session note \<text\>
-
-Add working note to current session.
-
-### lat session notes
-
-List session notes.
-
-### lat session clear
-
-Reset all session state.
 
 ## Setup Commands
 

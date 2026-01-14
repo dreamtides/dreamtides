@@ -308,23 +308,6 @@ See [Appendix: CLI Structure](appendix_cli_structure.md) for the complete
 command reference and [Appendix: Beads Analysis](appendix_beads_analysis.md)
 for detailed analysis of beads behaviors to preserve.
 
-### Session Management
-
-Following beads' successful pattern, Lattice provides session-start context
-via the `lat prime` command. This command outputs workflow instructions,
-current working issue, recent changes, and ready work in a token-efficient
-format (~1-2k characters).
-
-Editor hooks (Claude Code, Cursor, Aider) call `lat prime` automatically on
-session start to ensure AI agents have consistent workflow context.
-
-Change awareness uses date-based filters (`--updated-after`, `--created-after`)
-and the `lat stale` command for finding issues not updated recently. The
-`lat changes` command shows what has changed since a date or git commit.
-
-See [Appendix: Session Management](appendix_session_management.md) for the
-complete session management specification.
-
 ## Linter and Formatter
 
 ### The Check Command
@@ -639,30 +622,3 @@ following module structure:
 - `link/`: Link resolution and reference tracking
 - `context/`: Context algorithm implementation
 - `test/`: Test utilities and fakes
-
-## Follow-Up Work
-
-1. ~~**Beads CLI Analysis**~~: Complete. See
-   [Appendix: Beads Analysis](appendix_beads_analysis.md) for detailed
-   findings on `bd show`, `bd ready`, and `bd list` behaviors to preserve.
-
-2. ~~**Indexing Performance Research**~~: Complete. See
-   [Appendix: Indexing Performance](appendix_indexing_performance.md) for
-   SQLite best practices including WAL mode, PRAGMA configuration,
-   FTS5 optimization, and benchmarking targets for 10,000+ documents.
-
-3. ~~**Markdown Linter Integration**~~: Complete. See
-   [Appendix: Markdown Linter Integration](appendix_markdown_linter_integration.md)
-   for evaluation of markdownlint and remark-lint, rule alignment with
-   Claude's Skill best practices, and recommendation for native Rust
-   implementation with optional external linter integration.
-
-4. ~~**Git Edge Cases**~~: Complete. See
-   [Appendix: Git Edge Cases](appendix_git_edge_cases.md) for comprehensive
-   documentation of shallow clones, partial clones, sparse checkout,
-   worktrees, submodules, detached HEAD states, and in-progress operations.
-
-5. ~~**Context Algorithm Optimization**~~: Complete. See
-   [Appendix: Context Optimization](appendix_context_optimization.md) for
-   graph traversal optimizations, tiered caching strategies, parallel loading,
-   and benchmarking guidelines for repositories with 10,000+ documents.

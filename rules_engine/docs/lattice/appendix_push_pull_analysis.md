@@ -199,8 +199,8 @@ lat similar <id>                 # Semantically related
 1. **Start with pull, add push selectively**: Begin with explicit queries,
    add automatic context only where clearly beneficial.
 
-2. **Use briefings for task start**: Push context at session start, then
-   pull during execution.
+2. **Use briefings for task start**: Push context when beginning work on
+   a task, then pull during execution.
 
 3. **Monitor context efficiency**: Track what pushed content is actually
    used vs ignored.

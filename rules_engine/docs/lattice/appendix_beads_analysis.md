@@ -238,15 +238,6 @@ should implement equivalent parsing for `--updated-after` etc.
 
 ## Additional Commands to Preserve
 
-### bd prime
-
-Session-start context with two modes:
-- **MCP mode**: Minimal (~50 tokens) workflow reminder
-- **CLI mode**: Full command reference (~1-2k tokens)
-
-**Lattice Equivalent**: `lat prime` with `--mcp` and `--full` flags.
-The adaptive behavior based on detection of MCP server is valuable.
-
 ### bd blocked
 
 Shows issues in blocked status with blocking relationships:
@@ -290,7 +281,6 @@ dr-ulj: Title [P1] (open) [READY]
 6. **Filter combinability**: AND logic by default
 7. **Relative date parsing**: `+6h`, `tomorrow`
 8. **JSON output**: All commands support `--json`
-9. **Session context**: `prime` command with modes
 
 ### New Lattice-Specific Features
 
@@ -306,7 +296,6 @@ dr-ulj: Title [P1] (open) [READY]
 1. **Core viewing**: `lat show` with context algorithm
 2. **Work discovery**: `lat ready` with filters and pretty output
 3. **Flexible search**: `lat list` with beads-equivalent filters
-4. **Session management**: `lat prime` with mode detection
 
 ### Test Coverage Priorities
 
