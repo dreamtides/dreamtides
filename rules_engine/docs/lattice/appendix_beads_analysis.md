@@ -322,10 +322,10 @@ Before completing work:
 
 | Beads Concept | Lattice Equivalent |
 |---------------|-------------------|
-| `--parent ID` | `--path <directory>` |
+| `--parent ID` | Directory in path |
 | Epic type | Root document (with `00_` prefix) |
 | Parent-child | Directory siblings |
-| `bd create --parent` | `lat create --path` |
+| `bd create --parent` | `lat create path/to/file.md` |
 | `in_progress` status | `lat claim` (local) |
 | `bd sync` | Not applicable |
 | Assignee field | Not applicable |

@@ -170,41 +170,77 @@ The `lat generate-ids` command pre-allocates IDs for document authors. These
 IDs are not marked as used immediately; only committed documents consume ID
 space. This enables speculative ID generation without waste.
 
-## Workflow Commands
+## Command Overview
 
-Lattice provides four primary commands for document viewing and work
-management, designed for compatibility with beads (`bd`) while supporting
-Lattice's filesystem-centric model.
+Lattice provides commands for document creation, viewing, and work management,
+designed for compatibility with beads (`bd`) while supporting Lattice's
+filesystem-centric model.
 
-### lat show
+### Workflow Commands
 
-Displays document details following `bd show` format. Supports single or
-multiple documents, with `--json`, `--short`, and `--refs` options.
+Commands for viewing documents and managing work progress.
 
-For issues, output includes name, metadata, description (body text),
-parent epic, dependencies, and related documents. For knowledge base
-entries, maintains the name/description distinction with full body content.
+**lat show** - Displays document details following `bd show` format. Supports
+single or multiple documents, with `--json`, `--short`, and `--refs` options.
+For issues, output includes name, metadata, description, parent epic,
+dependencies, and related documents.
 
-### lat ready
+**lat ready** - Shows work available to start: open issues with no blockers
+that are not claimed. Supports `--parent` for directory filtering, `--pretty`
+for visual tree display, and `--json` for full issue details.
 
-Shows work available to start: open issues with no blockers that are not
-claimed. Supports `--parent` for directory filtering, `--pretty` for
-visual tree display, and `--json` for full issue details.
+**lat prime** - Outputs AI-optimized workflow context. Supports custom
+checklist via `.lattice/config.toml`.
 
-### lat prime
+**lat claim** - Marks issues as locally in progress on the current machine.
+Claims are stored in `~/.lattice/claims.json`, not in markdown files. Supports
+atomic updates across multiple worktrees and automatic release on status change.
 
-Outputs AI-optimized workflow context. Supports custom checklist via
-`.lattice/config.toml`.
+See [Appendix: Workflow](appendix_workflow.md) for complete specifications.
 
-### lat claim
+### Issue Management
 
-Marks issues as locally in progress on the current machine. Claims are
-stored in `~/.lattice/claims.json`, not in markdown files. Supports
-atomic updates across multiple worktrees and automatic release on
-status change.
+Commands for creating and modifying issues.
 
-See [Appendix: Workflow](appendix_workflow.md) for complete specifications
-of show, ready, prime, and claim commands.
+**lat create** - Creates new issue documents with `lat create <path/to/issue.md>
+[options]`. The path specifies both directory location and filename,
+establishing the issue's position in the hierarchy. Supports issue type,
+priority, labels, and dependencies at creation time.
+
+**lat update** - Modifies existing issues with `lat update <id> [id...]
+[options]`. Supports changing status, priority, type, and managing labels.
+Can update multiple issues atomically, useful for bulk operations like marking
+dependencies as blocked or changing priority across related issues.
+
+**lat close** - Marks issues as closed, accepting single or multiple issue IDs.
+Automatically releases any local claims and sets the `closed-at` timestamp.
+Supports `--reason` for documenting why the issue was closed.
+
+See [Appendix: Issue Tracking](appendix_issue_tracking.md) for the complete
+issue lifecycle and [Appendix: CLI Structure](appendix_cli_structure.md) for
+full command reference.
+
+### Document Management
+
+Commands for searching, validating, and formatting documents.
+
+**lat list** - Searches and filters documents with flexible query options.
+Supports filtering by status, priority, type, labels, timestamps, and path
+prefix. Returns formatted lists with `--pretty` for visual display or `--json`
+for programmatic access.
+
+**lat check** - Validates documents and repository state before committing.
+Detects duplicate IDs, broken links, invalid frontmatter, circular
+dependencies, and documents exceeding size limits. Essential for maintaining
+repository integrity.
+
+**lat fmt** - Formats documents and normalizes links. Wraps text at 80
+characters, adds missing Lattice ID fragments to links, and updates file paths
+when documents are renamed or moved. The `--add-links` flag converts bare ID
+links to full path+fragment format.
+
+See [Appendix: Linter](appendix_linter.md) for validation rules and
+[Appendix: CLI Structure](appendix_cli_structure.md) for full command reference.
 
 ## Linking System
 

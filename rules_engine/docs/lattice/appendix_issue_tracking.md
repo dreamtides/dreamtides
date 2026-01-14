@@ -27,6 +27,133 @@ are treated as knowledge base entries.
 The `epic` type is special: it typically corresponds to a directory root
 document (files with `00_` prefix) and represents a collection of related issues.
 
+## Creating Issues
+
+### Basic Creation
+
+The `lat create` command creates new issue documents:
+
+```bash
+lat create <path/to/issue.md> [options]
+```
+
+The path argument specifies both the location and filename for the issue. This
+establishes the issue's position in the hierarchy.
+
+### Creating Different Issue Types
+
+**Create a task (default type):**
+```bash
+lat create issues/auth/fix_login_bug.md -d "Users unable to log in after password reset"
+```
+
+**Create a bug with high priority:**
+```bash
+lat create issues/auth/authentication_crash.md \
+  -t bug -p 0 -d "Application crashes on invalid credentials"
+```
+
+**Create a feature:**
+```bash
+lat create issues/auth/oauth_support.md \
+  -t feature -p 1 -d "Add OAuth 2.0 authentication support"
+```
+
+**Create an epic (directory root):**
+```bash
+lat create issues/auth/00_authentication_system.md \
+  -t epic -p 1 -d "Epic tracking all authentication-related work"
+```
+
+Note: For epics, prefix the filename with `00_` to mark it as the highest priority
+document in the directory, serving as the parent/root for other issues in that
+directory. Underscores in filenames are automatically converted to hyphens in the
+YAML `name` field.
+
+### Setting Initial Properties
+
+**Add labels:**
+```bash
+lat create issues/backend/performance_optimization.md \
+  -t task -l performance,backend,database \
+  -d "Optimize database query performance"
+```
+
+**Add dependencies:**
+```bash
+lat create issues/api/implement_feature.md \
+  -d "Implement new API endpoint" \
+  --deps discovered-from:LK1DT
+```
+
+**Use a file for description:**
+```bash
+lat create issues/project/complex_issue.md \
+  --body-file issue_description.md
+```
+
+### Priority Levels
+
+When creating issues, use these priority values:
+
+- `-p 0` or `--priority 0` (P0): Critical issues requiring immediate attention
+- `-p 1` or `--priority 1` (P1): High-priority work for current milestone
+- `-p 2` or `--priority 2` (P2): Medium priority (default if not specified)
+- `-p 3` or `--priority 3` (P3): Low priority, nice-to-have improvements
+- `-p 4` or `--priority 4` (P4): Backlog items for future consideration
+
+### Common Patterns
+
+**Creating a new project area:**
+```bash
+# 1. Create the directory
+mkdir -p issues/new_feature
+
+# 2. Create the epic (root document)
+lat create issues/new_feature/00_new_feature_epic.md \
+  -t epic -p 1 -d "Epic for new feature development"
+
+# 3. Create child issues
+lat create issues/new_feature/implement_backend.md \
+  -t task -p 1 -d "Implement backend API endpoints"
+
+lat create issues/new_feature/add_tests.md \
+  -t task -p 1 -d "Add comprehensive test coverage"
+```
+
+**Creating a bug with context:**
+```bash
+lat create issues/auth/user_cannot_login.md \
+  -t bug -p 0 \
+  -d "Users report login failures after password reset" \
+  -l security,critical
+```
+
+### Path and File Naming
+
+The path argument determines both the directory location and the filename:
+
+```bash
+lat create issues/performance/fix_memory_leak.md
+# Creates: issues/performance/fix_memory_leak.md
+# YAML name field: fix-memory-leak
+```
+
+For root documents (epics), include the `00_` prefix in the filename:
+
+```bash
+lat create issues/performance/00_performance_epic.md
+# Creates: issues/performance/00_performance_epic.md
+# YAML name field: 00_performance-epic
+```
+
+**Important:** Use underscores in file paths (e.g., `fix_memory_leak.md`). These
+are automatically converted to hyphens in the YAML `name` field (e.g.,
+`name: fix-memory-leak`), following Lattice naming conventions.
+
+The directory path establishes the issue's position in the hierarchy, while the
+`00_` prefix marks documents as highest priority within their directory.
+
 ## Status State Machine
 
 ### States
@@ -123,6 +250,9 @@ project/
     ├── 00_api_design.md        # Epic for API (highest priority)
     └── rate_limiting.md        # Issue: implement limits
 ```
+
+Note: File paths use underscores (e.g., `login_bug.md`), which are converted to
+hyphens in YAML names (e.g., `name: login-bug`).
 
 ### Implicit Hierarchy
 
@@ -269,9 +399,10 @@ for issues.
 
 | Beads | Lattice | Notes |
 |-------|---------|-------|
-| `bd create` | `lat create --path` | Path is required |
-| `--parent` | Directory location | Implicit hierarchy |
-| `--title` | `--name` / document name | Mapped to name field |
+| `bd create` | `lat create path/to/file.md` | Path includes filename |
+| `--parent` | Directory in path | Implicit hierarchy |
+| `--title` | `-d` / `--description` | Issue description |
+| `--description` | `-d` / `--description` | Combined with title |
 | `bd show` | `lat show` | Follows bd format |
 | `bd sync` | Not applicable | No push operations |
 | `--status in_progress` | `lat claim` | Local-only tracking |

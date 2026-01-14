@@ -92,12 +92,9 @@ Split document by top-level sections.
 
 ## Issue Commands
 
-### lat create \<name\> [options]
+### lat create \<path/to/issue.md\> [options]
 
 Create new issue document.
-
-**Required:**
-- `--path <dir>`: Directory for issue file
 
 **Options:**
 - `-t, --type <type>`: bug/feature/task/epic/chore (default: task)
@@ -106,6 +103,9 @@ Create new issue document.
 - `--body-file <path>`: Read description from file
 - `-l, --labels <list>`: Comma-separated labels
 - `--deps <spec>`: Dependency (e.g., `discovered-from:LK1DT`)
+
+The path argument specifies both the directory location and filename for the issue.
+For directory root documents (epics), use the `00_` prefix in the filename.
 
 ### lat update \<id\> [id...] [options]
 

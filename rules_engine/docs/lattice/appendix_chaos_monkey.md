@@ -246,10 +246,10 @@ fuzz:
 On failure, create issue with reproduction info:
 
 ```bash
-lat create "Chaos monkey failure: seed $SEED" \
-  --type bug --priority 1 \
-  --path issues/ \
-  --body-file chaosmonkey-$SEED.log
+lat create issues/chaosmonkey_failure_$SEED.md \
+  -t bug -p 1 \
+  -d "Chaos monkey failure: seed $SEED" \
+  --body-file chaosmonkey_$SEED.log
 ```
 
 ### Regression Tests
