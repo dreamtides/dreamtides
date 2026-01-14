@@ -150,7 +150,7 @@ equivalent functionality for directory-scoped queries.
 
 1. **--parent filter**: Replace with `--path` for directory filtering
 2. **Molecule filtering**: Not applicable; use directory structure
-3. **Assignee tracking**: Optional in Lattice (filesystem model)
+3. **Assignee tracking**: Not applicable; use `lat claim` for work tracking
 
 ## Command Analysis: bd list
 
@@ -234,7 +234,42 @@ should implement equivalent parsing for `--updated-after` etc.
 
 1. **--parent filter**: Replace with `--path` prefix filter
 2. **Epic type**: Implicit via root document convention
-3. **assignee**: Optional (not all docs have assignees)
+3. **assignee**: Not applicable; use `lat claim` for local work tracking
+
+## Command Analysis: bd sync
+
+### Core Behavior
+
+The `bd sync` command synchronizes local state with remote:
+1. Export pending changes to JSONL
+2. Commit to git
+3. Pull from remote
+4. Import any updates
+5. Push to remote
+
+### Lattice Adaptation: No Sync Command
+
+Lattice operates in "stealth mode" and never performs sync operations.
+This is a fundamental design difference from beads:
+
+1. **No git push**: Lattice never pushes to remote
+2. **No auto-commit**: Commits are explicit user operations
+3. **Local-only claims**: Work tracking via `lat claim` instead of sync
+
+This design supports multi-agent workflows where:
+- Agents work in isolated git worktrees
+- A coordinator manages merging and synchronization
+- Push operations require explicit external control
+
+### Patterns to Preserve
+
+None. The sync model is intentionally different.
+
+### Patterns to Adapt
+
+1. **in_progress status**: Replace with `lat claim` local tracking
+2. **Remote sync**: External coordinator responsibility
+3. **Conflict detection**: Handled at coordinator level
 
 ## Additional Commands to Preserve
 
@@ -260,6 +295,23 @@ dr-ulj: Title [P1] (open) [READY]
 
 **Lattice Equivalent**: `lat dep tree` with similar visualization.
 
+### bd prime
+
+Outputs AI workflow context:
+```
+# Beads Workflow Context
+
+> **Context Recovery**: Run `bd prime` after compaction or new session
+
+## Session Protocol
+
+Before completing work:
+[ ] 1. bd sync
+...
+```
+
+**Lattice Equivalent**: `lat prime` with modified protocol (no sync step).
+
 ## Summary: Key Adaptations for Lattice
 
 ### Structural Changes
@@ -270,6 +322,9 @@ dr-ulj: Title [P1] (open) [READY]
 | Epic type | Root document (`!*.md`) |
 | Parent-child | Directory siblings |
 | `bd create --parent` | `lat create --path` |
+| `in_progress` status | `lat claim` (local) |
+| `bd sync` | Not applicable |
+| Assignee field | Not applicable |
 
 ### Preserved Behaviors
 
@@ -284,18 +339,20 @@ dr-ulj: Title [P1] (open) [READY]
 
 ### New Lattice-Specific Features
 
-1. **Context inclusion**: `lat show` includes related documents
+1. **Local claiming**: `lat claim` tracks work without file modification
 2. **Section references**: Link to document sections, not just documents
 3. **Knowledge base integration**: Issues and docs share ID space
 4. **Directory roots**: `!*.md` convention for hierarchy
+5. **Stealth mode**: No sync/push operations
 
 ## Implementation Recommendations
 
 ### Priority Order
 
-1. **Core viewing**: `lat show` with context algorithm
+1. **Core viewing**: `lat show` with bd-compatible output
 2. **Work discovery**: `lat ready` with filters and pretty output
 3. **Flexible search**: `lat list` with beads-equivalent filters
+4. **Work tracking**: `lat claim` for local progress tracking
 
 ### Test Coverage Priorities
 
@@ -306,3 +363,4 @@ Focus tests on edge cases identified above:
 - Relative date parsing
 - Large result set pagination
 - Status symbol rendering
+- Claim state display and lifecycle

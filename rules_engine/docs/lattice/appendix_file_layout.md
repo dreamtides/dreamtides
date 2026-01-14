@@ -25,6 +25,8 @@ rules_engine/src/lattice/
 │       ├── track_command.rs    # lat track implementation
 │       ├── generate_command.rs # lat generate-ids implementation
 │       ├── ready_command.rs    # lat ready implementation
+│       ├── prime_command.rs    # lat prime implementation
+│       ├── claim_command.rs    # lat claim implementation
 │       ├── stale_command.rs    # lat stale implementation
 │       ├── dep_command.rs      # lat dep tree implementation
 │       ├── label_command.rs    # lat label add/remove/list
@@ -75,12 +77,11 @@ rules_engine/src/lattice/
 │   ├── link_resolver.rs        # Resolve IDs to paths
 │   └── reference_tracker.rs    # Bidirectional reference map
 │
-├── context/
-│   ├── mod.rs                  # Context module root
-│   ├── context_algorithm.rs    # Document selection logic
-│   ├── candidate_gatherer.rs   # Collect related documents
-│   ├── budget_allocator.rs     # Greedy inclusion logic
-│   └── output_assembler.rs     # Final output construction
+├── claim/
+│   ├── mod.rs                  # Claim module root
+│   ├── claim_store.rs          # ~/.lattice/claims.json management
+│   ├── claim_manager.rs        # Claim/release logic
+│   └── claim_gc.rs             # Stale claim cleanup
 │
 ├── lint/
 │   ├── mod.rs                  # Lint module root
@@ -141,6 +142,7 @@ rules_engine/tests/lattice/
 │   ├── list_tests.rs
 │   ├── check_tests.rs
 │   ├── format_tests.rs
+│   ├── claim_tests.rs
 │   └── chaos_tests.rs
 ├── index_tests/
 │   ├── mod.rs
@@ -175,7 +177,8 @@ Created in the repository root:
 │   ├── index.sqlite-wal        # WAL file (gitignored)
 │   ├── index.sqlite-shm        # Shared memory file (gitignored)
 │   ├── logs.jsonl              # Operation log
-│   └── config.toml             # Local config overrides (optional)
+│   ├── config.toml             # Local config overrides (optional)
+│   └── PRIME.md                # Custom prime output (optional)
 ├── .gitignore                  # Should include .lattice/
 └── .claude/
     └── skills/                 # Symlinks to skill documents
@@ -189,15 +192,17 @@ Created in the repository root:
 ├── [clients]                   # Repository -> client ID mapping
 │   └── "/path/to/repo" = "DT"
 └── [defaults]                  # Optional global defaults
-    ├── context_budget = 5000
     └── line_width = 80
+
+~/.lattice/
+└── claims.json                 # Local claim state (shared across repos)
 ```
 
 ## Module Dependencies
 
 ```
 cli
-├── commands/* → index, document, context, lint, id, issue, skill
+├── commands/* → index, document, lint, id, issue, skill, claim
 ├── arg_parser → (standalone)
 ├── command_dispatch → commands/*
 ├── output_formatter → error
@@ -224,10 +229,10 @@ link
 ├── link_extractor → id
 └── link_resolver → index
 
-context
-├── context_algorithm → candidate_gatherer, budget_allocator
-├── candidate_gatherer → index, link
-└── output_assembler → document
+claim
+├── claim_store → (standalone JSON)
+├── claim_manager → claim_store, index
+└── claim_gc → claim_store, index
 
 lint
 ├── lint_runner → error_rules, warning_rules, skill_rules

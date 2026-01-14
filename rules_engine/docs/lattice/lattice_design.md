@@ -5,8 +5,8 @@
 Lattice is a unified knowledge base and issue tracking system built on markdown
 files stored in git repositories, with SQLite providing an ephemeral index for
 query performance. The system prioritizes document atomicity through strict
-size limits, rich cross-referencing capabilities, and intelligent
-context windowing for document retrieval.
+size limits, rich cross-referencing capabilities, and compatibility with
+AI agent workflows.
 
 The core innovation of Lattice is treating markdown documents as first-class
 database entities while maintaining full git compatibility and human
@@ -44,6 +44,17 @@ Lattice falls back to a full rebuild rather than attempting complex incremental
 repairs. See [Appendix: Indexing Strategy](appendix_indexing_strategy.md) for
 the detailed reconciliation algorithm.
 
+### Stealth Mode Operation
+
+Unlike beads, Lattice never performs git push or sync operations. This
+"stealth mode" design supports multi-agent workflows where:
+
+1. Agents work in isolated git worktrees
+2. A coordinator manages merging and synchronization
+3. Push operations require explicit external control
+
+This model avoids the complexity of distributed sync and agent conflicts.
+
 ### Bulletproof Self-Healing
 
 Lattice aims to be a self-healing abstraction that handles errors gracefully
@@ -72,11 +83,6 @@ Claude's SKILL.md format. The reserved keys include:
 - `lattice-id`: Unique document identifier (required)
 - `name`: Human-readable document name, max 64 lowercase hyphen-separated chars
 - `description`: Purpose description for AI context, max 1024 characters
-
-**Context Control Keys:**
-- `doc-priority`: Integer affecting sort order in context inclusion (default 0)
-- `doc-context-for`: Labels triggering global context inclusion
-- `doc-position`: Integer controlling output order relative to main document
 
 **Issue Tracking Keys:**
 - `issue-type`: bug/feature/task/epic/chore
@@ -121,10 +127,6 @@ directory root documents. These serve as parent context for all documents in
 their directory and provide high-level overviews. The root document's ID
 effectively acts as the parent ID for sibling documents, establishing
 implicit hierarchy without explicit parent-child relationships.
-
-Root documents are automatically included in the context traversal for
-child documents, enabling cascading context inheritance up the filesystem
-hierarchy.
 
 ## The ID System
 
@@ -172,58 +174,42 @@ The `lat generate-ids` command pre-allocates IDs for document authors. These
 IDs are not marked as used immediately; only committed documents consume ID
 space. This enables speculative ID generation without waste.
 
-## Context Algorithm
+## Workflow Commands
 
-### The Show Command
+Lattice provides four primary commands for document viewing and work
+management, designed for compatibility with beads (`bd`) while supporting
+Lattice's filesystem-centric model.
 
-The `lat show <id>` command is the primary interface for viewing documents.
-It supports both "push" context (automatic inclusion) and "pull" context
-(explicit requests). The default behavior is configurable.
+### lat show
 
-**Context Budget:** Automatic context uses a token budget (default ~1250).
-Set to 0 for pure pull behavior: `lat show <id> --context 0`.
+Displays document details following `bd show` format. Supports single or
+multiple documents, with `--json`, `--short`, and `--refs` options.
 
-**Intent-Based Context:** The `--intent` flag selects task-appropriate
-context: `lat show <id> --intent=bug-fix` includes related bugs, error docs,
-and test cases.
+For issues, output includes name, metadata, description (body text),
+parent epic, dependencies, and related documents. For knowledge base
+entries, maintains the name/description distinction with full body content.
 
-**Task Briefing:** The `--brief` flag provides comprehensive task-start
-context with a larger budget: `lat show <issue-id> --brief`.
+### lat ready
 
-**Incremental Loading:** Load only what you need:
-- `--peek`: Just YAML frontmatter
+Shows work available to start: open issues with no blockers that are not
+claimed. Supports `--parent` for directory filtering, `--pretty` for
+visual tree display, and `--json` for full issue details.
 
-See [Appendix: Context Retrieval](appendix_context_retrieval.md) for the
-complete specification of context modes, intents, and loading options.
+### lat prime
 
-See [Appendix: Push vs Pull Analysis](appendix_push_pull_analysis.md) for
-design rationale on automatic vs explicit context.
+Outputs AI-optimized workflow context. Unlike beads, operates in stealth
+mode with no sync or push operations. Supports custom checklist via
+`.lattice/config.toml` and override via `.lattice/PRIME.md`.
 
-### Context Sources
+### lat claim
 
-Documents are considered for inclusion in the following priority order:
+Marks issues as locally in progress on the current machine. Claims are
+stored in `~/.lattice/claims.json`, not in markdown files. Supports
+atomic updates across multiple worktrees and automatic release on
+status change.
 
-1. **doc-context-for matches**: Documents declaring this document's labels
-2. **Body links**: Documents or sections linked in the document body
-3. **Directory roots**: Root documents from this location to repository root
-4. **Frontmatter links**: Documents linked in YAML frontmatter
-
-Documents from all categories are sorted by their `doc-priority` value (higher
-first, default 0). The `doc-position` key controls final output ordering,
-with negative values appearing before the main document and positive values
-appearing after.
-
-### Output Format
-
-Context documents are separated by two newlines, with each document's name
-rendered as a markdown level-1 header. YAML frontmatter is excluded from
-context documents but included for the primary document. For issues, the
-frontmatter is rendered as human-readable metadata following beads'
-`bd show` format.
-
-The References section (default ~125 tokens, configurable via
-`--references N`) lists documents that qualified for inclusion but didn't
-fit the budget, showing their names, descriptions, and IDs.
+See [Appendix: Commands](appendix_commands.md) for complete specifications
+of show, ready, prime, and claim commands.
 
 ## Linking System
 
@@ -237,8 +223,8 @@ See the [error handling](docs/error_handling.md#LJCQ2) document for details
 ```
 
 The `lat fmt` command normalizes links and handles several cases:
-- `[text](../path/to/doc.md)` → fills in Lattice ID if valid document
-- `[text](LJCQ2)` → adds file path with `--add-links` flag
+- `[text](../path/to/doc.md)` -> fills in Lattice ID if valid document
+- `[text](LJCQ2)` -> adds file path with `--add-links` flag
 - Detects document renames/moves and rewrites links to new paths
 
 All links use relative file system paths from the linking document's location.
@@ -282,6 +268,10 @@ deferred  (back to open when unblocked)
 The `tombstone` status represents deleted issues that should not be
 resurrected. The `pinned` status indicates permanent open items.
 
+There is no "in_progress" status in Lattice. Instead, the `lat claim`
+command tracks which machine is working on an issue locally, without
+modifying the issue file.
+
 See [Appendix: Issue Tracking](appendix_issue_tracking.md) for the complete
 state machine and transition rules.
 
@@ -293,7 +283,7 @@ filesystem-centric model. Key differences from beads:
 - Issues require `--path` on creation to specify filesystem location
 - No explicit parent/child relationships; hierarchy comes from directories
 - The `name` field replaces beads' `title` concept
-- Full document text is stored, not just description fields
+- No sync command; stealth mode operation only
 
 See [Appendix: CLI Structure](appendix_cli_structure.md) for the complete
 command reference and [Appendix: Beads Analysis](appendix_beads_analysis.md)
@@ -600,5 +590,5 @@ following module structure:
 - `git/`: Git integration and change detection
 - `format/`: Markdown formatting and wrapping
 - `link/`: Link resolution and reference tracking
-- `context/`: Context algorithm implementation
+- `claim/`: Local claim tracking
 - `test/`: Test utilities and fakes

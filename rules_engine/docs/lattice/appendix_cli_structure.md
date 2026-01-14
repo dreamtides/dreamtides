@@ -15,32 +15,57 @@ All commands support:
 - `--help`: Show command help
 - `--version`: Show version information
 
-## Document Commands
+## Workflow Commands
 
-### lat show \<id\> [options]
+These are the primary commands for AI agent workflows. See
+[Appendix: Commands](appendix_commands.md) for complete specifications.
 
-Display document with context. Primary viewing interface.
+### lat show \<id\> [id...] [options]
 
-See [Appendix: Context Retrieval](appendix_context_retrieval.md) for full
-details on context options.
+Display document details following `bd show` format.
 
-**Context Options:**
-- `--context N`: Character budget for context (default 5000, 0 to disable)
-- `--references N`: Character budget for references (default 500)
-- `--no-context`: Equivalent to `--context 0 --references 0`
-- `--max-context`: Use large budget (100000 chars)
-- `--brief`: Task briefing mode (30000 char budget, comprehensive)
-
-**Loading Options:**
+**Options:**
+- `--short`: Single-line output
+- `--refs`: Show issues that reference this one
 - `--peek`: Show only YAML frontmatter
 - `--raw`: Output without formatting
 
-**Intent Options:**
-- `--intent=implement`: Design docs, API refs, examples
-- `--intent=bug-fix`: Related bugs, error docs, tests
-- `--intent=review`: Change history, test coverage
-- `--intent=understand`: Overview, glossary, architecture
-- `--intent=document`: Style guides, examples
+### lat ready [options]
+
+Find ready work (open status, no blockers, not claimed).
+
+**Options:**
+- `--parent <id>`: Filter to descendants of directory/epic
+- `--priority <N>`: Filter by priority level
+- `--type <type>`: Filter by issue type
+- `--label <list>`: Filter by labels (AND logic)
+- `--label-any <list>`: Filter by labels (OR logic)
+- `--limit <N>`: Maximum issues (default 10)
+- `--include-backlog`: Include P4 issues
+- `--include-claimed`: Include claimed issues
+- `--pretty`: Visual tree display
+- `--sort <policy>`: hybrid/priority/oldest
+
+### lat prime [options]
+
+Output AI workflow context.
+
+**Options:**
+- `--full`: Include additional reference material
+- `--export`: Export for manual editing
+
+### lat claim \<id\> [options]
+
+Mark issue as locally in progress.
+
+**Options:**
+- `--list`: Show all current claims
+- `--release <id>`: Release a specific claim
+- `--release-all`: Release all claims
+- `--release-worktree <path>`: Release claims from specific worktree
+- `--gc`: Clean up stale claims
+
+## Document Commands
 
 ### lat track \<path\> [options]
 
@@ -160,12 +185,6 @@ LXXXX  login-authentication-failure
 LYYYY  oauth-implementation
 ```
 
-### lat ready [options]
-
-Find ready work (open status, no blockers).
-
-**Options:** Same as `lat list`.
-
 ### lat stale [options]
 
 Find issues not updated recently.
@@ -272,7 +291,6 @@ Install Claude Code hooks.
 - `--check`: Check installation status
 - `--remove`: Remove hooks
 - `--project`: Install for project only
-- `--stealth`: Use stealth mode for hooks
 
 ### lat setup cursor
 
@@ -355,5 +373,4 @@ Run fuzz testing.
 
 - `LATTICE_LOG_LEVEL`: error/warn/info/debug/trace
 - `LATTICE_NO_COLOR`: Disable colored output
-- `LATTICE_DEFAULT_CONTEXT`: Default context budget
 - `EDITOR`: Editor for `lat edit`

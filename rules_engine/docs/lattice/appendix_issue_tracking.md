@@ -28,12 +28,16 @@ document (`!*.md`) and represents a collection of related issues.
 
 | Status | Description | Appears in `lat ready` |
 |--------|-------------|------------------------|
-| `open` | Ready for work | Yes |
+| `open` | Ready for work | Yes (unless claimed) |
 | `blocked` | Waiting on dependencies | No |
 | `deferred` | Intentionally delayed | No |
 | `closed` | Work completed | No |
 | `tombstone` | Permanently removed | No |
-| `pinned` | Always open | Yes |
+| `pinned` | Always open | Yes (unless claimed) |
+
+**Note**: There is no `in_progress` status. Instead, use `lat claim` to
+track work locally without modifying issue files. See
+[Appendix: Commands](appendix_commands.md#lat-claim) for details.
 
 ### Transitions
 
@@ -60,6 +64,30 @@ document (`!*.md`) and represents a collection of related issues.
 - `closed` → `open` (via `lat reopen`)
 - `pinned` → `closed` (manual only)
 - `tombstone` → (no transitions, terminal state)
+
+## Work Tracking with lat claim
+
+Instead of an `in_progress` status, Lattice uses local claiming:
+
+```bash
+lat claim L1234    # Mark issue as being worked on
+lat ready          # Issue no longer appears (claimed)
+lat show L1234     # Shows "Claimed: yes"
+lat close L1234    # Auto-releases the claim
+```
+
+Claims are stored in `~/.lattice/claims.json`, not in the issue file:
+- Not tracked in git
+- Shared across worktrees on same machine
+- Atomically updated with file locking
+
+This design supports multi-agent workflows where:
+- Multiple agents work in different worktrees
+- A coordinator assigns issues without modifying files
+- Work state doesn't create git conflicts
+
+See [Appendix: Commands](appendix_commands.md#lat-claim) for full claim
+command documentation.
 
 ## Priority Levels
 
@@ -118,6 +146,7 @@ An issue is "ready" if:
 1. Status is `open` or `pinned`
 2. No `blocked-by` issues are non-closed
 3. Priority is not P4 (backlog)
+4. Not currently claimed (unless `--include-claimed`)
 
 The `lat ready` command returns issues meeting these criteria.
 
@@ -201,7 +230,6 @@ Brief description of the task.
 ---
 lattice-id: LXXXX
 name: implement-oauth
-description: Add OAuth 2.0 authentication support
 issue-type: feature
 status: open
 priority: 1
@@ -212,6 +240,10 @@ discovered-from: [LWWWW]
 created-at: 2024-01-15T10:30:00Z
 updated-at: 2024-01-16T14:22:00Z
 ---
+
+## Description
+
+Add OAuth 2.0 authentication support for the application.
 
 ## Acceptance Criteria
 
@@ -224,6 +256,10 @@ updated-at: 2024-01-16T14:22:00Z
 Initial implementation complete, pending review.
 ```
 
+Note that for issues, the body text serves as the description (matching
+beads behavior). There is no separate `description` frontmatter field
+for issues.
+
 ## CLI Differences from Beads
 
 | Beads | Lattice | Notes |
@@ -231,5 +267,8 @@ Initial implementation complete, pending review.
 | `bd create` | `lat create --path` | Path is required |
 | `--parent` | Directory location | Implicit hierarchy |
 | `--title` | `--name` / document name | Mapped to name field |
-| `bd show` | `lat show` | Includes context |
+| `bd show` | `lat show` | Follows bd format |
+| `bd sync` | Not applicable | Stealth mode |
+| `--status in_progress` | `lat claim` | Local-only tracking |
+| `--assignee` | Not applicable | No assignee concept |
 | epic type | root documents | `!*.md` convention |

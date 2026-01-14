@@ -25,8 +25,6 @@ Primary document metadata storage.
 - `path` TEXT UNIQUE: Relative path from repo root
 - `name` TEXT: Document name from frontmatter
 - `description` TEXT: Document description
-- `doc_priority` INTEGER: Context inclusion priority
-- `doc_position` INTEGER: Output ordering
 - `issue_type` TEXT: NULL for knowledge base docs
 - `status` TEXT: Issue status
 - `priority` INTEGER: Issue priority (0-4)
@@ -35,12 +33,9 @@ Primary document metadata storage.
 - `closed_at` TEXT: ISO 8601 timestamp
 - `body_hash` TEXT: SHA-256 of document body for change detection
 - `indexed_at` TEXT: When this row was last updated
-- `content_length` INTEGER: Body length in characters (for budget-aware pruning)
+- `content_length` INTEGER: Body length in characters
 - `link_count` INTEGER: Outgoing link count (maintained by trigger)
 - `backlink_count` INTEGER: Incoming link count (maintained by trigger)
-
-The `content_length`, `link_count`, and `backlink_count` columns enable
-budget-aware context pruning without loading document bodies.
 
 ### links Table
 
@@ -64,14 +59,6 @@ Document label associations.
 
 **Indexes:** On document_id, on label for label-based queries.
 
-### context_labels Table
-
-Global context-for declarations.
-
-**Columns:**
-- `document_id` TEXT: Document declaring context-for
-- `label` TEXT: Label that triggers inclusion
-
 ### index_metadata Table
 
 Single-row table tracking index state.
@@ -92,7 +79,7 @@ Per-client document counter state.
 
 ### directory_roots Table
 
-Precomputed root document chain for fast context gathering.
+Precomputed root document chain for hierarchy queries.
 
 **Columns:**
 - `directory_path` TEXT PRIMARY KEY: Directory relative path
