@@ -283,9 +283,7 @@ Found 1 error, 2 warnings in 2 documents.
 
 ## Additional Formatting Rules
 
-These rules enforce consistent markdown formatting. See
-[Appendix: Markdown Linter Integration](appendix_markdown_linter_integration.md)
-for the research and rationale behind rule selection.
+These rules enforce consistent markdown formatting.
 
 ### W013: Trailing Whitespace
 
@@ -344,11 +342,3 @@ List not surrounded by blank lines.
 - `--fix`: Auto-fix where possible (W002, W006, W007, W008, W013-W017)
 - `--staged-only`: Check only staged files (for pre-commit)
 - `--rebuild-index`: Force full index rebuild before checking
-- `--external-linter=<tool>`: Run external linter (markdownlint, remark)
-
-## External Linter Integration
-
-Lattice can optionally delegate to external markdown linters for more
-comprehensive validation. See
-[Appendix: Markdown Linter Integration](appendix_markdown_linter_integration.md)
-for configuration details and rule mapping.

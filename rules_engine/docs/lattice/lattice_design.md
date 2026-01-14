@@ -213,10 +213,6 @@ first, default 0). The `doc-position` key controls final output ordering,
 with negative values appearing before the main document and positive values
 appearing after.
 
-See [Appendix: Context Optimization](appendix_context_optimization.md) for
-graph traversal optimizations, caching strategies, and performance tuning
-for large repositories (10,000+ documents).
-
 ### Output Format
 
 Context documents are separated by two newlines, with each document's name
@@ -255,10 +251,6 @@ link format specification and edge cases.
 The index maintains a reverse reference map enabling queries like "what
 documents link to this one?" This powers features like impact analysis
 when modifying or deleting documents.
-
-See [Appendix: Hierarchy and Relationships](appendix_hierarchy_relationships.md)
-for relationship query commands including `lat links-from`, `lat links-to`,
-`lat path`, `lat orphans`, and `lat impact`.
 
 ## Issue Tracking
 
@@ -332,12 +324,9 @@ The `lat check` command validates documents and repository state:
 The linter integrates mechanically verifiable rules from Claude's Skill
 authoring best practices, including path format validation (no backslashes),
 description length limits, and name format requirements. Lattice implements
-lint rules natively in Rust using pulldown-cmark, with optional integration
-to external linters (markdownlint, remark-lint) for comprehensive validation.
+lint rules natively in Rust using pulldown-cmark.
 
-See [Appendix: Linter](appendix_linter.md) for the complete rule set and
-[Appendix: Markdown Linter Integration](appendix_markdown_linter_integration.md)
-for external linter evaluation and integration strategy.
+See [Appendix: Linter](appendix_linter.md) for the complete rule set.
 
 ### The Format Command
 
@@ -386,14 +375,6 @@ in SQLite. Key tables include:
 
 The schema version is tracked for migration support. All tables include
 `indexed_at` timestamps for staleness detection.
-
-Beyond keyword search, Lattice optionally supports semantic search using
-vector embeddings. This enables queries like "find documents about error
-handling" even when documents don't contain those exact words.
-
-See [Appendix: Semantic Search](appendix_semantic_search.md) for the
-embedding model options, vector storage strategies, and Rust crate
-recommendations.
 
 ### Reconciliation Strategy
 

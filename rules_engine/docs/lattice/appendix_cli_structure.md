@@ -176,14 +176,10 @@ Find issues not updated recently.
 
 ### lat search \<query\> [options]
 
-Semantic and keyword search.
-
-See [Appendix: Semantic Search](appendix_semantic_search.md) for details.
+Keyword search across document content.
 
 **Options:**
-- `--mode keyword|semantic|hybrid`: Search mode (default: hybrid)
 - `--limit N`: Maximum results
-- `--threshold F`: Minimum similarity (0.0-1.0)
 - `--path <prefix>`: Restrict to path
 - `--type <type>`: Filter by type
 

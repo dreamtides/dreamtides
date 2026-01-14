@@ -40,8 +40,7 @@ Primary document metadata storage.
 - `backlink_count` INTEGER: Incoming link count (maintained by trigger)
 
 The `content_length`, `link_count`, and `backlink_count` columns enable
-budget-aware context pruning without loading document bodies. See
-[Appendix: Context Optimization](appendix_context_optimization.md) for usage.
+budget-aware context pruning without loading document bodies.
 
 ### links Table
 
@@ -117,9 +116,6 @@ Persistent cache for document body content (L2 cache layer).
 - `file_mtime` INTEGER: File modification time when cached
 
 **Indexes:** On accessed_at for LRU eviction.
-
-See [Appendix: Context Optimization](appendix_context_optimization.md) for
-cache warming, validation, and eviction strategies.
 
 ## Reconciliation Algorithm
 

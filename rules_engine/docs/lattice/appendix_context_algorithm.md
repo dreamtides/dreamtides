@@ -205,7 +205,3 @@ Cache warming preloads linked documents in parallel when `lat show` is invoked.
 
 Selected context documents are loaded concurrently using async I/O, with a
 concurrency limit of 10 to avoid file descriptor exhaustion.
-
-See [Appendix: Context Optimization](appendix_context_optimization.md) for the
-complete optimization strategy, benchmarking guidelines, and implementation
-priorities for large repositories.

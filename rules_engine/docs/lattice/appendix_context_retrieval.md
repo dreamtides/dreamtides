@@ -229,10 +229,6 @@ Lattice implements a tiered caching strategy for context assembly performance:
 - **Budget-aware pruning**: Skip candidates that can't fit remaining budget
 - **Parallel loading**: Concurrent I/O for selected context documents
 
-See [Appendix: Context Optimization](appendix_context_optimization.md) for the
-complete optimization strategy, benchmarking guidelines, and implementation
-priorities.
-
 ### Budget Recommendations
 
 | Use Case | Recommended Budget |
