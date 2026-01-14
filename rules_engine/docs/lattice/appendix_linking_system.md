@@ -2,15 +2,58 @@
 
 ## Link Syntax
 
-Lattice extends standard markdown link syntax to support ID-based references.
+Lattice uses standard markdown link syntax with relative file paths and Lattice
+ID fragments for stable cross-references.
 
 ### Document Links
 
+The canonical link format combines file path with Lattice ID fragment:
+
 ```markdown
-See the [design document](LJCQ2) for details.
+See the [design document](../design/system_overview.md#LJCQ2) for details.
 ```
 
-The URL portion contains only a Lattice ID. The link text is arbitrary.
+**Format components:**
+- Standard markdown link: `[link text](url)`
+- Relative file path: `../design/system_overview.md`
+- URL fragment with Lattice ID: `#LJCQ2`
+
+### Link Authoring Shortcuts
+
+Users can write links in shorthand forms that `lat fmt` will normalize:
+
+**File path only:**
+```markdown
+[design document](../design/system_overview.md)
+```
+If the target is a valid Lattice document, `lat fmt` adds the ID fragment:
+```markdown
+[design document](../design/system_overview.md#LJCQ2)
+```
+
+**Lattice ID only:**
+```markdown
+[design document](LJCQ2)
+```
+With `lat fmt --add-links`, this becomes:
+```markdown
+[design document](../design/system_overview.md#LJCQ2)
+```
+
+### Path Requirements
+
+All links must use **relative file system paths** from the linking document's
+location. Absolute paths and URLs are not supported.
+
+**Valid examples:**
+- `[doc](sibling.md#LK1DT)` - same directory
+- `[doc](../parent/file.md#LK1DT)` - parent directory
+- `[doc](subdir/nested/file.md#LK1DT)` - nested subdirectory
+
+**Invalid examples:**
+- `[doc](/absolute/path.md#LK1DT)` - absolute path
+- `[doc](file.md)` - missing Lattice ID fragment (warning)
+- `[doc](https://example.com)` - external URL (not a Lattice link)
 
 ## Link Storage
 
@@ -33,6 +76,57 @@ The index supports both:
 
 Reverse queries power impact analysis and orphan detection.
 
+## Link Normalization
+
+### The `lat fmt` Command
+
+The formatter handles link normalization and maintenance:
+
+**Basic normalization:**
+```bash
+lat fmt                    # Add ID fragments to file-only links
+lat fmt --add-links        # Convert ID-only links to path+fragment
+```
+
+**Document rename/move detection:**
+
+When documents are renamed or moved, `lat fmt` uses the Lattice ID to find and
+update all links pointing to the old path:
+
+```
+Before move: [doc](../old/location.md#LJCQ2)
+After move:  [doc](../new/location.md#LJCQ2)
+```
+
+The formatter queries the index to find the current path for each Lattice ID
+and rewrites links accordingly. This ensures links remain valid through
+repository reorganization.
+
+### Normalization Algorithm
+
+For each link in each document:
+
+1. **Extract components:** Parse link into text, path, and optional fragment
+2. **Validate fragment:** If fragment present, verify it's a valid Lattice ID
+3. **Resolve target:** Look up document by ID in index
+4. **Check path:** Compare link path to actual document path
+5. **Update if needed:** Rewrite link if path has changed
+6. **Add missing fragment:** If link has path but no fragment, add ID fragment
+7. **Add path (with --add-links):** If link has only ID, prepend relative path
+
+### Path Resolution
+
+Relative paths are computed from the linking document's directory:
+
+```
+Linker: docs/features/auth.md
+Target: docs/design/system.md
+Result: ../design/system.md#LJCQ2
+```
+
+The formatter uses standard filesystem path resolution (`.` and `..`
+normalization) to compute minimal relative paths.
+
 ## Link Validation
 
 ### Missing Targets
@@ -41,6 +135,29 @@ The `lat check` command validates all link targets exist:
 
 ```
 Error: Document LXXXX links to unknown ID LYYYY at line 42
+```
+
+This validates the Lattice ID in the fragment, not the file path. Links are
+resolved by ID first, path second.
+
+### Path Mismatches
+
+If a link's file path doesn't match the target document's actual path:
+
+```
+Warning: Document LXXXX has stale link at line 42
+  Expected: ../design/current.md#LYYYY
+  Found:    ../design/old.md#LYYYY
+  Run: lat fmt to fix
+```
+
+### Missing Fragments
+
+Links with file paths but no Lattice ID fragment generate warnings:
+
+```
+Warning: Link missing Lattice ID at line 42: [text](../doc.md)
+  Run: lat fmt to add fragment
 ```
 
 ### Circular References
@@ -138,7 +255,10 @@ Most linked: LXXXX (45 backlinks)
 ### Link Extraction
 
 During parsing, links are extracted via regex:
-- Body links: `\[([^\]]+)\]\(([A-Z0-9]+)\)`
+- Body links: `\[([^\]]+)\]\(([^)]+)\)`
+- Fragment extraction: `#([A-Z0-9]+)$`
+
+The parser extracts both file paths and Lattice ID fragments from each link.
 
 ### Index Updates
 
@@ -148,3 +268,10 @@ When a document changes:
 3. Insert new link records
 
 This is simpler and faster than diffing.
+
+### Formatter Performance
+
+The `lat fmt` command builds a path→ID mapping from the index before processing
+documents, enabling O(1) ID lookups during link normalization. For large
+repositories (10,000+ documents), this provides significant speedup over
+per-link index queries.

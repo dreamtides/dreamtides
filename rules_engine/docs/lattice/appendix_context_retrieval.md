@@ -180,9 +180,9 @@ lat path <id1> <id2>    # Shortest link path between documents
 LXXXX links to 5 documents:
 
 Body links (3):
-  LYYYY  error-handling        "See the [error handling](LYYYY) docs"
-  LZZZZ  api-reference         "Refer to [API docs](LZZZZ)"
-  LWWWW  testing-guide         "[Testing](LWWWW) section"
+  LYYYY  error-handling        "See the [error handling](../docs/error_handling.md#LYYYY) docs"
+  LZZZZ  api-reference         "Refer to [API docs](api_reference.md#LZZZZ)"
+  LWWWW  testing-guide         "[Testing](testing_guide.md#LWWWW) section"
 
 Frontmatter links (2):
   LAAAA  (blocked-by)
@@ -194,8 +194,8 @@ Frontmatter links (2):
 ```
 LXXXX is linked from 3 documents:
 
-  LCCCC  overview             line 42: "See [authentication](LXXXX)"
-  LDDDD  security-audit       line 15: "Related: [auth design](LXXXX)"
+  LCCCC  overview             line 42: "See [authentication](auth/design.md#LXXXX)"
+  LDDDD  security-audit       line 15: "Related: [auth design](../design/auth.md#LXXXX)"
   LEEEE  sprint-3-plan        frontmatter: blocking
 ```
 

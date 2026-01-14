@@ -97,12 +97,18 @@ issue lifecycle state machine.
 ### Document Body
 
 The markdown body follows standard CommonMark syntax with Lattice extensions
-for ID-based linking. Links use standard markdown syntax with Lattice IDs
-replacing URLs:
+for ID-based linking. Links use standard markdown syntax with relative file
+paths and Lattice IDs as URL fragments:
 
 ```
-See the [error handling](LJCQ2) document for more information
+See the [error handling](error_handling.md#LJCQ2) document for more information
 ```
+
+Users can write partial links like `[text](../path/to/doc.md)` or
+`[text](LJCQ2)`, and the `lat fmt` command will normalize them to include both
+the file path and Lattice ID. The formatter also handles document renames and
+moves, rewriting links based on their Lattice ID to point to updated file
+paths.
 
 The body text has no hard length limit, but the linter warns at 500 lines.
 Documents exceeding this should be split into multiple files using the
@@ -225,14 +231,21 @@ fit the budget, showing their names, descriptions, and IDs.
 
 ## Linking System
 
-### Link Types
+### Link Format
 
-Lattice supports document links, which reference a complete document by its ID.
-Links use standard markdown syntax with Lattice IDs replacing URLs:
+Lattice links use standard markdown syntax combining relative file paths with
+Lattice ID fragments:
 
 ```
-See the [error handling](LJCQ2) document for details
+See the [error handling](docs/error_handling.md#LJCQ2) document for details
 ```
+
+The `lat fmt` command normalizes links and handles several cases:
+- `[text](../path/to/doc.md)` → fills in Lattice ID if valid document
+- `[text](LJCQ2)` → adds file path with `--add-links` flag
+- Detects document renames/moves and rewrites links to new paths
+
+All links use relative file system paths from the linking document's location.
 
 See [Appendix: Linking System](appendix_linking_system.md) for the complete
 link format specification and edge cases.
@@ -352,6 +365,12 @@ The `lat fmt` command applies consistent formatting:
 - Consistent list markers (dashes for unordered)
 - Proper indentation normalization
 - Adding missing `name` fields from document filename
+- Link normalization: adds Lattice ID fragments to file path links
+- Link maintenance: updates paths when documents are renamed or moved
+
+The `--add-links` flag enables converting bare Lattice ID links like
+`[text](LJCQ2)` into full path+fragment links like
+`[text](../docs/error_handling.md#LJCQ2)`.
 
 The formatter attempts to auto-correct issues identified by `lat check`
 when a deterministic fix exists.
