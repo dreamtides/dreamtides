@@ -4,8 +4,8 @@
 
 Lattice is a unified knowledge base and issue tracking system built on markdown
 files stored in git repositories, with SQLite providing an ephemeral index for
-query performance. The system prioritizes AI-friendliness through strict
-document size limits, rich cross-referencing capabilities, and intelligent
+query performance. The system prioritizes document atomicity through strict
+size limits, rich cross-referencing capabilities, and intelligent
 context windowing for document retrieval.
 
 The core innovation of Lattice is treating markdown documents as first-class
@@ -16,22 +16,18 @@ rather than filesystem location.
 
 ## Design Philosophy
 
-### AI-First Document Architecture
+### Document Atomicity
 
-Lattice documents are designed for consumption by AI agents operating under
-context window constraints. The 500-line soft limit per document ensures that
-any single document can be loaded in full without excessive token consumption.
+The 500-line soft limit per document encourages atomic, focused documentation.
 Users are encouraged to split large documents through the `lat split` command,
-and the linter warns when documents exceed this threshold.
+and the linter warns when documents exceed this threshold. This promotes better
+organization and makes documents easier to navigate and reference.
 
 The system draws inspiration from Claude's SKILL.md format, using YAML
 frontmatter for metadata and markdown body for content. This compatibility
 allows Lattice documents to function as Claude Skills when marked with
 `skill: true` in their frontmatter, with symlinks automatically generated
 in the .claude directory.
-
-See [Appendix: AI Friendliness](appendix_ai_friendliness.md) for critical
-analysis of the current design and recommendations for improvement.
 
 ### Git as Source of Truth
 
@@ -180,9 +176,6 @@ It supports both "push" context (automatic inclusion) and "pull" context
 
 **Context Budget:** Automatic context uses a character budget (default 5000).
 Set to 0 for pure pull behavior: `lat show <id> --context 0`.
-
-**AI Mode:** The `--ai` flag optimizes output for AI consumption with no
-automatic context by default: `lat show <id> --ai`.
 
 **Intent-Based Context:** The `--intent` flag selects task-appropriate
 context: `lat show <id> --intent=bug-fix` includes related bugs, error docs,

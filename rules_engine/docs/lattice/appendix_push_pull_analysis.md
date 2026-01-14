@@ -169,19 +169,12 @@ When token budgets are tight:
 
 Lattice provides both models with explicit user control:
 
-### Default: Configurable Push
+### Configurable Push
 
 ```
 lat show <id>                    # Push with default budget
 lat show <id> --context 0        # Pure pull
 lat show <id> --context 10000    # More push
-```
-
-### AI Mode: Default Pull
-
-```
-lat show <id> --ai               # No automatic context
-lat show <id> --ai --context 5000 # Opt-in to push
 ```
 
 ### Task-Specific Push
@@ -234,6 +227,5 @@ Neither pure push nor pure pull is optimal. The best approach:
 - **Configurable defaults** that match the most common use case
 - **Explicit overrides** for both directions
 
-Lattice defaults to moderate push (5000 char budget) for human users who
-benefit from automatic context, and no push (AI mode) for agent users who
-can make their own relevance judgments.
+Lattice defaults to moderate push (5000 char budget) for typical use cases,
+with the budget fully configurable via command-line flags.

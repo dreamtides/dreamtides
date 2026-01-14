@@ -26,10 +26,6 @@ lat show <id> [options]
 - `--peek`: Show only YAML frontmatter, not body content
 - `--raw`: Output without formatting or decorations
 
-**AI Mode:**
-- `--ai`: Optimize output for AI consumption (implies --no-context by default)
-- `--ai --context N`: AI mode with explicit context budget
-
 ### Intent-Based Context
 
 The `--intent` flag provides task-appropriate context selection:
@@ -72,19 +68,6 @@ Related document body...
 # References
 - **other-doc** (LYYYY): Description...
 ```
-
-**AI Mode (`--ai`):**
-```
-[DOCUMENT:LXXXX:document-name]
-Document body text here.
-[/DOCUMENT]
-```
-
-AI mode:
-- Uses bracketed markers instead of markdown headers
-- Omits decorative elements
-- Includes ID in marker for easy reference
-- Defaults to no automatic context
 
 **JSON Mode (`--json`):**
 ```json
@@ -258,7 +241,6 @@ priorities.
 | Normal viewing | Default (5000) |
 | Task briefing | `--brief` (30000) |
 | Comprehensive | `--max-context` (100000) |
-| AI agent | `--ai` (0 by default) |
 
 ## Configuration
 
@@ -270,7 +252,6 @@ Set in `.lattice/config.toml`:
 [show]
 default_context = 5000
 default_references = 500
-ai_mode_context = 0      # Default for --ai
 brief_context = 30000
 ```
 

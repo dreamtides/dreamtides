@@ -10,7 +10,6 @@ detailed logging. The `lat` binary is the single entry point.
 All commands support:
 
 - `--json`: Output in JSON format
-- `--ai`: AI-optimized output (minimal decoration, rich metadata)
 - `--verbose`: Show detailed operation log
 - `--quiet`: Suppress non-error output
 - `--help`: Show command help
