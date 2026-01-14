@@ -47,7 +47,7 @@ Blocks (5):
   ...
 
 Related (1):
-  L5678: LLMC design document [doc]
+  L5678: llmc-design - LLMC design document [doc]
 ```
 
 **Key sections:**
@@ -74,8 +74,8 @@ Description: OAuth 2.0 implementation design for the auth subsystem
 ---
 
 Related (2):
-  L1111: security-policy [doc]
-  L2222: api-design [doc]
+  L1111: security-policy - Security guidelines and threat model [doc]
+  L2222: api-design - REST API design principles [doc]
 ```
 
 **Header components:**
@@ -93,17 +93,20 @@ can be queried separately if modification dates are needed.
 All document references throughout `lat show` output use a consistent format:
 
 ```
-<id>: <name> [<type-indicator>]
+<id>: <name> - <description> [<type-indicator>]
 ```
 
 Where `<type-indicator>` is:
 - For issues: `P<N> - <status>` (e.g., `P0 - open`, `P1 - closed`)
 - For knowledge base: `doc`
 
+For issues, the name IS the title (a short description), so no separate description
+is shown. For knowledge base entries, both name and description are displayed.
+
 Examples:
 ```
 L1234: Fix login bug [P0 - open]
-L5678: authentication-design [doc]
+L5678: authentication-design - OAuth 2.0 implementation design [doc]
 L9012: LLMC Development [epic]
 ```
 
@@ -152,7 +155,7 @@ Format: `<id> [<status>] <priority> <type>: <name>`
 For knowledge base documents:
 ```
 $ lat show L9876 --short
-L9876 [doc]: authentication-design
+L9876 [doc]: authentication-design - OAuth 2.0 implementation design
 ```
 
 ### References Format
@@ -169,8 +172,8 @@ References to L1234:
     ...
 
   Linked from (2):
-    L7890: Sprint 3 planning document [doc] (line 42)
-    L8901: Code review checklist [doc] (line 15)
+    L7890: sprint-3-planning - Sprint 3 planning document [doc] (line 42)
+    L8901: code-review-checklist - Code review checklist [doc] (line 15)
 ```
 
 ### JSON Output Format
