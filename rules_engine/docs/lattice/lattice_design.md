@@ -165,7 +165,7 @@ duplicate Lattice IDs across the repository.
 The document counter increments atomically from SQLite when new IDs are
 requested. To prevent counter reset on repository re-clone, the system
 queries existing documents to find the highest ID for the current client
-and resumes from there. Counters start at 50 (Base32: `1I`) to ensure all
+and resumes from there. Counters start at 50 (Base32: `BS`) to ensure all
 IDs have at least 2 digits.
 
 The `lat generate-ids` command pre-allocates IDs for document authors. These
@@ -180,7 +180,7 @@ The `lat show <id>` command is the primary interface for viewing documents.
 It supports both "push" context (automatic inclusion) and "pull" context
 (explicit requests). The default behavior is configurable.
 
-**Context Budget:** Automatic context uses a character budget (default 5000).
+**Context Budget:** Automatic context uses a token budget (default ~1250).
 Set to 0 for pure pull behavior: `lat show <id> --context 0`.
 
 **Intent-Based Context:** The `--intent` flag selects task-appropriate
@@ -208,7 +208,7 @@ Documents are considered for inclusion in the following priority order:
 3. **Directory roots**: Root documents from this location to repository root
 4. **Frontmatter links**: Documents linked in YAML frontmatter
 
-Within each category, documents sort by their `doc-priority` value (higher
+Documents from all categories are sorted by their `doc-priority` value (higher
 first, default 0). The `doc-position` key controls final output ordering,
 with negative values appearing before the main document and positive values
 appearing after.
@@ -221,7 +221,7 @@ context documents but included for the primary document. For issues, the
 frontmatter is rendered as human-readable metadata following beads'
 `bd show` format.
 
-The References section (default 500 characters, configurable via
+The References section (default ~125 tokens, configurable via
 `--references N`) lists documents that qualified for inclusion but didn't
 fit the budget, showing their names, descriptions, and IDs.
 
@@ -280,8 +280,7 @@ deferred  (back to open when unblocked)
 ```
 
 The `tombstone` status represents deleted issues that should not be
-resurrected. The `pinned` status indicates permanent open items like
-maintenance hooks.
+resurrected. The `pinned` status indicates permanent open items.
 
 See [Appendix: Issue Tracking](appendix_issue_tracking.md) for the complete
 state machine and transition rules.
