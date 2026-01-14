@@ -22,24 +22,28 @@ See the [design document](../design/system_overview.md#LJCQ2) for details.
 - Relative file path: `../design/system_overview.md`
 - URL fragment with Lattice ID: `#LJCQ2`
 
-### Link Authoring Shortcuts
+### Link Authoring (Recommended Workflow)
 
-Users can write links in shorthand forms that `lat fmt` will normalize:
+The recommended workflow for AI agents and humans is to write links using
+**shorthand ID-only format**, then run `lat fmt` to expand them:
 
-**File path only:**
+**Step 1: Write shorthand links:**
+```markdown
+See the [design document](LJCQ2) for architecture details.
+```
+
+**Step 2: Run `lat fmt`** to expand to canonical format:
+```markdown
+See the [design document](../design/system_overview.md#LJCQ2) for architecture details.
+```
+
+This avoids needing to look up or remember file paths when authoring.
+
+**Alternative: File path only** (also normalized by `lat fmt`):
 ```markdown
 [design document](../design/system_overview.md)
 ```
-If the target is a valid Lattice document, `lat fmt` adds the ID fragment:
-```markdown
-[design document](../design/system_overview.md#LJCQ2)
-```
-
-**Lattice ID only:**
-```markdown
-[design document](LJCQ2)
-```
-With `lat fmt --add-links`, this becomes:
+Becomes:
 ```markdown
 [design document](../design/system_overview.md#LJCQ2)
 ```

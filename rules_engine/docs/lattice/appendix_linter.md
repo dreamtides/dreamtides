@@ -27,7 +27,7 @@ Two or more documents share the same Lattice ID.
 
 A link references an ID that doesn't exist.
 
-**Detection:** Compare link targets against documents + sections tables.
+**Detection:** Compare link targets against documents table.
 
 **Message:** `Error [E002]: path.md:42 links to unknown ID LYYYY`
 
@@ -185,7 +185,7 @@ Document contains a link to itself.
 
 **Message:** `Warning [W010]: path.md contains self-reference at line 23`
 
-**Fix:** Remove or replace with section link.
+**Fix:** Remove the self-reference.
 
 ### W011: Backslash in Path
 

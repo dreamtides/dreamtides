@@ -40,12 +40,12 @@ prime, claim, stale, dep, label, close, reopen, edit, chaosmonkey).
 
 **index/** - SQLite database management including schema definitions, migrations,
 connection handling, and query implementations for documents, links, labels,
-sections, and full-text search. Also contains the reconciliation engine for
-syncing git state to the index and counter management for client IDs.
+and full-text search. Also contains the reconciliation engine for syncing git
+state to the index, counter management for client IDs, and view tracking.
 
 **document/** - Document parsing and serialization including YAML frontmatter
 parsing, markdown body handling, frontmatter schema definitions, field validation,
-document writing, section extraction, and body manipulation utilities.
+document writing, and body manipulation utilities.
 
 **git/** - Git integration layer including command execution, operation traits,
 modified file detection, and client configuration management (~/.lattice.toml).
@@ -119,8 +119,8 @@ Created in the repository root:
 
 **.lattice/** - Repository-local Lattice data including the SQLite index database
 (index.sqlite), WAL and shared memory files (gitignored), operation logs
-(logs.jsonl), optional local config overrides (config.toml), and optional custom
-prime output (PRIME.md).
+(logs.jsonl), document view tracking (views.json), optional local config
+overrides (config.toml), and optional custom prime output (PRIME.md).
 
 **.claude/skills/** - Symlinks to skill documents for Claude Code integration.
 Each symlink points to a skill document in the repository.

@@ -27,6 +27,7 @@ Primary document metadata storage.
 
 **Columns:**
 - `id` TEXT PRIMARY KEY: Lattice ID
+- `parent_id` TEXT: Parent document ID (from directory root)
 - `path` TEXT UNIQUE: Relative path from repo root
 - `name` TEXT: Document name from frontmatter
 - `description` TEXT: Document description
@@ -41,6 +42,7 @@ Primary document metadata storage.
 - `content_length` INTEGER: Body length in characters
 - `link_count` INTEGER: Outgoing link count (maintained by trigger)
 - `backlink_count` INTEGER: Incoming link count (maintained by trigger)
+- `view_count` INTEGER: Local view count (from views.json)
 
 ### links Table
 
@@ -167,9 +169,8 @@ Any error during reconciliation triggers full rebuild. Errors include:
 ### Document Hashing
 
 Each document's body (after frontmatter) is hashed with SHA-256. During
-reconciliation, if a document's hash hasn't changed, its links and
-sections aren't re-parsed. Only frontmatter is re-read for metadata
-changes.
+reconciliation, if a document's hash hasn't changed, its links aren't
+re-parsed. Only frontmatter is re-read for metadata changes.
 
 ### Git-Based Detection
 

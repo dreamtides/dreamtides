@@ -344,10 +344,11 @@ Before completing work:
 ### New Lattice-Specific Features
 
 1. **Local claiming**: `lat claim` tracks work without file modification
-2. **Section references**: Link to document sections, not just documents
+2. **Explicit parent-id**: Auto-populated hierarchy via `lat fmt`
 3. **Knowledge base integration**: Issues and docs share ID space
 4. **Directory roots and priority**: `00_*.md` prefix convention for hierarchy and priority
 5. **No push operations**: Sync handled externally
+6. **View tracking**: `lat overview` surfaces frequently-accessed documents
 
 ## Implementation Recommendations
 

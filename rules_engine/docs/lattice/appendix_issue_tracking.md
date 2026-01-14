@@ -14,6 +14,11 @@ Any Lattice document can be either:
 The presence of `issue-type` is the discriminator. Documents without it
 are treated as knowledge base entries.
 
+**Note on `description` field:** For issues, the body text serves as the
+full description. However, issues may optionally include a `description`
+frontmatter field as a one-line summary. This is useful for AI agents that
+need brief context without reading the full body.
+
 ## Issue Types
 
 | Type | Description | Use Case |
@@ -364,7 +369,9 @@ Brief description of the task.
 ```yaml
 ---
 lattice-id: LXXXX
+parent-id: LPARENT
 name: implement-oauth
+description: Add OAuth 2.0 support for Google and GitHub authentication
 issue-type: feature
 status: open
 priority: 1
@@ -391,9 +398,9 @@ Add OAuth 2.0 authentication support for the application.
 Initial implementation complete, pending review.
 ```
 
-Note that for issues, the body text serves as the description (matching
-beads behavior). There is no separate `description` frontmatter field
-for issues.
+The `parent-id` field is auto-populated by `lat fmt` based on the directory's
+root document. The optional `description` field provides a one-line summary;
+the body text contains the full issue details.
 
 ## CLI Differences from Beads
 

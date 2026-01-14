@@ -65,16 +65,12 @@ repeat until system_error or max_ops reached:
 
 **add_link**: Insert link into document body
 - Random source document
-- Random target (document or section)
+- Random target document
 - Random position in body
 
 **remove_link**: Delete link from document
 - Random source document
 - Random link selection
-
-**add_section_id**: Annotate a header
-- Random document with headers
-- Random untagged header
 
 ### Metadata Operations
 

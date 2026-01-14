@@ -138,17 +138,17 @@ Lattice maintains separate semantics for issues and knowledge base entries:
 
 **Issues:**
 - `name`: The issue title (short, descriptive)
-- Body text: The full issue description (replaces beads' description field)
-- No separate `description` frontmatter field
+- `description`: Optional one-line summary for AI context (max 1024 chars)
+- Body text: The full issue description
 
 **Knowledge Base Entries:**
 - `name`: Short identifier (lowercase-hyphenated, max 64 chars)
-- `description`: Purpose summary for AI context (max 1024 chars)
+- `description`: Purpose summary for AI context (max 1024 chars, recommended)
 - Body text: Full document content
 
-This design ensures:
-1. Issues match `bd show` behavior with a single description block
-2. Knowledge base entries retain structured metadata for AI context
+The optional `description` field for issues provides a brief summary that AI
+agents can use without reading the full body. When present, it appears in
+`lat show --short` and `lat overview` output.
 
 ### Short Format
 
@@ -409,16 +409,31 @@ $ lat prime
 Before completing work, run this checklist:
 
 [ ] 1. lat check           (validate documents)
-[ ] 2. git status          (review changes)
-[ ] 3. git add <files>     (stage changes)
-[ ] 4. git commit -m "..." (commit work)
+[ ] 2. lat fmt             (normalize links)
+[ ] 3. git status          (review changes)
+[ ] 4. git add <files>     (stage changes)
+[ ] 5. git commit -m "..." (commit work)
 
 ## Core Commands
 
+- `lat overview` - See most critical documents
 - `lat ready` - Show issues ready to work
 - `lat show <id>` - View issue details
+- `lat show <id> --context` - Full context for AI agents
 - `lat claim <id>` - Claim issue for local work
 - `lat close <id>` - Mark issue completed
+
+## Link Authoring
+
+Always write links in shorthand format using just the Lattice ID:
+
+    See [the design doc](LXXXX) for details.
+
+Then run `lat fmt` to expand to full path+fragment format:
+
+    See [the design doc](../path/to/doc.md#LXXXX) for details.
+
+This avoids needing to look up file paths when authoring documents.
 ```
 
 ### Custom Checklist

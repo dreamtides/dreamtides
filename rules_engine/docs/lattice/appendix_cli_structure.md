@@ -22,7 +22,9 @@ These are the primary commands for AI agent workflows. See
 
 ### lat show \<id\> [id...] [options]
 
-Display document details following `bd show` format.
+Display document details following `bd show` format. Default output includes
+parent, dependencies, blocking issues, and related documents—providing full
+context for AI agents in a single call.
 
 **Options:**
 - `--short`: Single-line output
@@ -48,11 +50,23 @@ Find ready work (open status, no blockers, not claimed).
 
 ### lat prime [options]
 
-Output AI workflow context.
+Output AI workflow context including link authoring guidance.
 
 **Options:**
 - `--full`: Include additional reference material
 - `--export`: Export for manual editing
+
+### lat overview [options]
+
+Show most critical documents based on view frequency, recency, and priority.
+See [Appendix: Overview Command](appendix_overview.md) for ranking algorithm.
+
+**Options:**
+- `--limit <N>`: Maximum documents (default 10)
+- `--type <type>`: Filter by type ('doc' for knowledge base)
+- `--path <prefix>`: Filter to path prefix
+- `--include-closed`: Include closed issues
+- `--reset-views`: Clear local view history
 
 ### lat claim \<id\> [options]
 
@@ -368,6 +382,24 @@ Run fuzz testing.
 - 2: Validation error (document issues)
 - 3: User error (invalid arguments)
 - 4: Not found (ID doesn't exist)
+
+## Structured Error Output
+
+With `--json`, all errors include structured information:
+
+```json
+{
+  "error_code": "E002",
+  "message": "Reference to nonexistent ID",
+  "affected_documents": ["LXXXX"],
+  "location": {"path": "docs/example.md", "line": 42},
+  "suggestion": "Create the target document or correct the ID",
+  "fix_command": "lat create docs/target.md"
+}
+```
+
+Fields vary by error type. The `fix_command` field is present when an
+automated fix is available.
 
 ## Environment Variables
 

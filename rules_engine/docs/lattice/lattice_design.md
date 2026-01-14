@@ -70,8 +70,10 @@ Claude's SKILL.md format. The reserved keys include:
 
 **Identity Keys:**
 - `lattice-id`: Unique document identifier (required)
+- `parent-id`: ID of parent document, auto-populated by `lat fmt` from directory root
 - `name`: Human-readable document name, max 64 lowercase hyphen-separated chars
-- `description`: Purpose description for AI context, max 1024 characters
+- `description`: Purpose summary for AI context, max 1024 characters (optional for
+  issues, recommended for knowledge base documents)
 
 **Issue Tracking Keys:**
 - `issue-type`: bug/feature/task/epic/chore
@@ -109,20 +111,21 @@ The body text has no hard length limit, but the linter warns at 500 lines.
 Documents exceeding this should be split into multiple files using the
 `lat split` command.
 
-### Root Documents and Priority System
+### Root Documents and Hierarchy
 
 Files with names starting with numeric prefixes like `00_`, `01_`, `02_`, etc.
 (e.g., `00_master_plan.md`) indicate document priority within a directory.
-The `00_` prefix marks the highest priority document, typically serving as the
-directory root document that provides parent context and high-level overview
-for all other documents in that directory. The root document's ID effectively
-acts as the parent ID for sibling documents, establishing implicit hierarchy
-without explicit parent-child relationships.
+The `00_` prefix marks the highest priority document, serving as the directory
+root that provides parent context for all other documents in that directory.
+
+The `lat fmt` command automatically populates the `parent-id` field in each
+document's frontmatter based on the directory's root document. This makes
+hierarchy explicit without requiring manual parent specification. Documents
+without a root document in their directory have no `parent-id`.
 
 Higher-numbered prefixes (`01_`, `02_`, etc.) indicate progressively lower
-priority. The `lat show` command considers these priority prefixes when
-deciding between many related documents to mention, preferring lower-numbered
-(higher priority) documents when displaying context.
+priority. Commands like `lat show` and `lat overview` use these prefixes when
+selecting which related documents to highlight.
 
 ## The ID System
 
@@ -182,21 +185,28 @@ Commands for viewing documents and managing work progress.
 
 **lat show** - Displays document details following `bd show` format. Supports
 single or multiple documents, with `--json`, `--short`, and `--refs` options.
-Output includes name, metadata, description, parent epic,
-dependencies, and related documents.
+Default output includes parent, dependencies, blocking issues, and related
+documents—providing full context for AI agents in a single call.
 
 **lat ready** - Shows work available to start: open issues with no blockers
 that are not claimed. Supports `--parent` for directory filtering, `--pretty`
 for visual tree display, and `--json` for full issue details.
 
-**lat prime** - Outputs AI-optimized workflow context. Supports custom
-checklist via `.lattice/config.toml`.
+**lat overview** - Provides repository-level context for AI agents. Shows the
+most critical documents based on view frequency, recency, and priority. Supports
+`--limit`, `--json`, and various filtering options. Tracks local view counts
+in `.lattice/views.json` to surface frequently-referenced documents.
+
+**lat prime** - Outputs AI-optimized workflow context including recommended
+link authoring format (shorthand `[text](ID)` links that `lat fmt` expands).
+Supports custom checklist via `.lattice/config.toml`.
 
 **lat claim** - Marks issues as locally in progress on the current machine.
 Claims are stored in `~/.lattice/claims.json`, not in markdown files. Supports
 atomic updates across multiple worktrees and automatic release on status change.
 
-See [Appendix: Workflow](appendix_workflow.md) for complete specifications.
+See [Appendix: Workflow](appendix_workflow.md) for complete specifications and
+[Appendix: Overview Command](appendix_overview.md) for the ranking algorithm.
 
 ### Issue and Document Management
 
@@ -594,17 +604,28 @@ Following Tufte's principles:
 - File permission issues
 - Unexpected internal states
 
+### Structured Error Output
+
+All errors include structured information for programmatic handling:
+
+```json
+{
+  "error_code": "E002",
+  "message": "Reference to nonexistent ID",
+  "affected_documents": ["LXXXX"],
+  "location": {"path": "docs/example.md", "line": 42},
+  "suggestion": "Create the target document or correct the ID",
+  "fix_command": "lat create docs/target.md"
+}
+```
+
+The `--json` flag ensures all commands output errors in this structured format.
+
 ### Recovery Strategy
 
 For user errors, provide clear guidance on how to fix the issue. For
 system errors, log extensively and suggest running `lat check` or
 rebuilding the index. Never silently ignore errors.
-
-### Defensive Programming
-
-Internal assertions verify invariants. When assertions fail, they generate
-system errors with diagnostic information rather than continuing with
-potentially corrupted state.
 
 ## Project File Layout
 
