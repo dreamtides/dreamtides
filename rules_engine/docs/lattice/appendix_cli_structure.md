@@ -361,17 +361,13 @@ Format documents and normalize links.
 - `--path <prefix>`: Format under path
 - `--check`: Report without modifying
 - `--line-width N`: Wrap width (default 80)
-- `--add-links`: Convert ID-only links to path+fragment format
 
 **Link normalization behavior:**
 
-By default, `lat fmt` performs these operations:
 - Adds Lattice ID fragments to file-path-only links
+- Converts bare ID links `[text](LJCQ2)` to full path+fragment format
 - Updates file paths when documents are renamed or moved
 - Validates Lattice IDs in link fragments
-
-With `--add-links`, additionally:
-- Converts bare ID links `[text](LJCQ2)` to full format `[text](path/to/doc.md#LJCQ2)`
 
 ### lat chaosmonkey [options]
 

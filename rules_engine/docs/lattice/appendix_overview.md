@@ -116,10 +116,98 @@ root_weight = 0.1
 recency_half_life_days = 7
 ```
 
+## Contextual Overview
+
+`lat overview <id>` shows documents relevant to a specific issue. This answers:
+"What do I need to know to work on this task?"
+
+### Relevance Model
+
+Context is determined by graph distance from the target issue:
+
+**Distance 0** (the issue itself):
+- Always included first
+
+**Distance 1** (directly connected):
+- Parent epic (directory root document)
+- `blocked-by` issues (must understand what's blocking)
+- `blocking` issues (understand downstream impact)
+- Documents linked in the issue body
+
+**Distance 2** (one hop away):
+- Sibling issues (same directory, open only)
+- Documents linked from blocked-by issues
+- Parent's parent (grandparent epic)
+
+### Ranking
+
+Within each distance tier, documents are ranked by:
+
+1. **Link type weight:**
+   - `blocked-by`: 1.0 (critical path)
+   - `blocking`: 0.8 (impact awareness)
+   - `parent`: 0.7 (context)
+   - `body-link`: 0.6 (referenced material)
+   - `sibling`: 0.4 (related work)
+
+2. **For issues:** Priority score (P0=1.0 down to P4=0.2)
+
+3. **For body links:** Position in document (earlier = higher)
+
+4. **For siblings:** Priority, then recency
+
+### Output
+
+```
+$ lat overview LB234
+Context for LB234: Fix login timeout bug
+
+Parent:
+  LAA42: [epic] Authentication System
+
+Blocked by (1):
+  LCCCC: [P1 - open] Refactor session handling
+
+Blocks (2):
+  LDDDD: [P0 - open] Release 2.0 checklist
+  LEEEE: [P1 - open] User acceptance testing
+
+Referenced docs (2):
+  LFFFF: auth-design - Authentication architecture
+  LGGGG: session-spec - Session management specification
+
+Siblings (3 of 7 open):
+  LHHHH: [P1] Add OAuth support
+  LJJJJ: [P2] Improve error messages
+  LKKKK: [P2] Add rate limiting
+```
+
+### Limits
+
+Default limits prevent overwhelming output:
+- `blocked-by`: all (usually few)
+- `blocking`: 5
+- Referenced docs: 5
+- Siblings: 5
+
+Override with `--limit <N>` to show more in each category.
+
+### JSON Output
+
+```
+$ lat overview LB234 --json
+```
+
+Returns structured data with the same categories, suitable for programmatic
+consumption by AI agents.
+
 ## Use Cases
 
 **New session orientation:** Run `lat overview` at session start to understand
 which documents have been most relevant to recent work.
+
+**Task context:** Run `lat overview <id>` before starting work on an issue to
+see its dependency graph, referenced documentation, and related tasks.
 
 **Onboarding:** New agents can quickly identify the most-referenced documents
 without traversing the entire repository.

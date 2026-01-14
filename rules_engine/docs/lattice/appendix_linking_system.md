@@ -90,10 +90,8 @@ Reverse queries power impact analysis and orphan detection.
 
 The formatter handles link normalization and maintenance:
 
-**Basic normalization:**
 ```bash
-lat fmt                    # Add ID fragments to file-only links
-lat fmt --add-links        # Convert ID-only links to path+fragment
+lat fmt                    # Normalize all links
 ```
 
 **Document rename/move detection:**
@@ -120,7 +118,7 @@ For each link in each document:
 4. **Check path:** Compare link path to actual document path
 5. **Update if needed:** Rewrite link if path has changed
 6. **Add missing fragment:** If link has path but no fragment, add ID fragment
-7. **Add path (with --add-links):** If link has only ID, prepend relative path
+7. **Add path:** If link has only ID, prepend relative path
 
 ### Path Resolution
 
@@ -175,7 +173,7 @@ which doesn't recursively follow links.
 
 ### Self-References
 
-A document linking to itself is valid but produces a warning:
+A document linking to itself is invalid and produces a warning:
 
 ```
 Warning: Document LXXXX contains self-reference at line 15
@@ -204,32 +202,6 @@ related-ids: [LWWWW]
 
 All IDs in these fields become links with type 'frontmatter'.
 
-## Link Display
-
-### In Document View
-
-Links render with their target's name on hover (in supported terminals)
-and navigate when clicked (in supported environments).
-
-### In List Output
-
-The `lat list` command shows link counts:
-
-```
-LXXXX  my-document  3 links, 2 backlinks
-```
-
-### In Dependency Tree
-
-The `lat dep tree` command visualizes blocking relationships:
-
-```
-LXXXX (open)
-├── blocks: LYYYY (open)
-│   └── blocks: LZZZZ (open)
-└── blocks: LWWWW (blocked)
-```
-
 ## Link Maintenance
 
 ### Broken Link Detection
@@ -249,25 +221,6 @@ $ lat list --no-backlinks
 
 This helps identify disconnected documents.
 
-### Link Statistics
-
-```
-$ lat stats links
-Total links: 1234
-Average per document: 3.2
-Most linked: LXXXX (45 backlinks)
-```
-
-## Performance Notes
-
-### Link Extraction
-
-During parsing, links are extracted via regex:
-- Body links: `\[([^\]]+)\]\(([^)]+)\)`
-- Fragment extraction: `#([A-Z0-9]+)$`
-
-The parser extracts both file paths and Lattice ID fragments from each link.
-
 ### Index Updates
 
 When a document changes:
@@ -276,10 +229,3 @@ When a document changes:
 3. Insert new link records
 
 This is simpler and faster than diffing.
-
-### Formatter Performance
-
-The `lat fmt` command builds a path→ID mapping from the index before processing
-documents, enabling O(1) ID lookups during link normalization. For large
-repositories (10,000+ documents), this provides significant speedup over
-per-link index queries.

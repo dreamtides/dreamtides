@@ -366,11 +366,8 @@ The `lat fmt` command applies consistent formatting:
 - Proper indentation normalization
 - Adding missing `name` fields from document filename
 - Link normalization: adds Lattice ID fragments to file path links
+- Link expansion: converts bare ID links `[text](LJCQ2)` to full path+fragment
 - Link maintenance: updates paths when documents are renamed or moved
-
-The `--add-links` flag enables converting bare Lattice ID links like
-`[text](LJCQ2)` into full path+fragment links like
-`[text](../docs/error_handling.md#LJCQ2)`.
 
 The formatter attempts to auto-correct issues identified by `lat check`
 when a deterministic fix exists.
