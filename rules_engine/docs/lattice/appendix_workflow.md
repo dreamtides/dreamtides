@@ -123,6 +123,12 @@ is considered "related" if:
 2. **Not a dependency:** The document is not already listed in Depends on,
    Blocks, or Parent sections
 
+When multiple related documents exist, the selection considers document priority
+as indicated by filename prefixes (`00_`, `01_`, `02_`, etc.). Documents with
+lower-numbered prefixes (higher priority) are preferred when deciding which
+related documents to highlight. Documents named `00_*` (directory root documents)
+are given highest priority, followed by `01_*`, `02_*`, and so on.
+
 The list is ordered by first appearance in the body text. Maximum 10 related
 documents are shown in text output; use `--json` for complete list.
 

@@ -25,7 +25,7 @@ are treated as knowledge base entries.
 | `chore` | Maintenance | Dependencies, tooling |
 
 The `epic` type is special: it typically corresponds to a directory root
-document (`!*.md`) and represents a collection of related issues.
+document (files with `00_` prefix) and represents a collection of related issues.
 
 ## Status State Machine
 
@@ -114,20 +114,20 @@ Issues are organized by filesystem location:
 
 ```
 project/
-├── !overview.md              # Epic for project
+├── 00_overview.md              # Epic for project (highest priority)
 ├── auth/
-│   ├── !authentication.md    # Epic for auth module
-│   ├── login_bug.md          # Issue: bug in login
-│   └── oauth_feature.md      # Issue: add OAuth
+│   ├── 00_authentication.md    # Epic for auth module (highest priority)
+│   ├── login_bug.md            # Issue: bug in login
+│   └── oauth_feature.md        # Issue: add OAuth
 └── api/
-    ├── !api_design.md        # Epic for API
-    └── rate_limiting.md      # Issue: implement limits
+    ├── 00_api_design.md        # Epic for API (highest priority)
+    └── rate_limiting.md        # Issue: implement limits
 ```
 
 ### Implicit Hierarchy
 
 - All issues in a directory are siblings
-- The directory's root document (`!*.md`) is their parent/epic
+- The directory's root document (with `00_` prefix) is their parent/epic
 - Nesting creates multi-level hierarchy automatically
 
 This replaces beads' explicit `parent` field.
@@ -276,4 +276,4 @@ for issues.
 | `bd sync` | Not applicable | No push operations |
 | `--status in_progress` | `lat claim` | Local-only tracking |
 | `--assignee` | Not applicable | No assignee concept |
-| epic type | root documents | `!*.md` convention |
+| epic type | root documents | `00_*.md` priority prefix convention |

@@ -109,13 +109,20 @@ The body text has no hard length limit, but the linter warns at 500 lines.
 Documents exceeding this should be split into multiple files using the
 `lat split` command.
 
-### Root Documents
+### Root Documents and Priority System
 
-Files named with a leading `!` character (e.g., `!master_plan.md`) are
-directory root documents. These serve as parent context for all documents in
-their directory and provide high-level overviews. The root document's ID
-effectively acts as the parent ID for sibling documents, establishing
-implicit hierarchy without explicit parent-child relationships.
+Files with names starting with numeric prefixes like `00_`, `01_`, `02_`, etc.
+(e.g., `00_master_plan.md`) indicate document priority within a directory.
+The `00_` prefix marks the highest priority document, typically serving as the
+directory root document that provides parent context and high-level overview
+for all other documents in that directory. The root document's ID effectively
+acts as the parent ID for sibling documents, establishing implicit hierarchy
+without explicit parent-child relationships.
+
+Higher-numbered prefixes (`01_`, `02_`, etc.) indicate progressively lower
+priority. The `lat show` command considers these priority prefixes when
+deciding between many related documents to mention, preferring lower-numbered
+(higher priority) documents when displaying context.
 
 ## The ID System
 
@@ -329,8 +336,8 @@ when a deterministic fix exists.
 The `lat split` command takes a large document and divides it by top-level
 sections:
 
-1. The first text block and first section become a root document (`!name.md`)
-2. Each subsequent section becomes a standalone document
+1. The first text block and first section become a root document (`00_name.md`)
+2. Each subsequent section becomes a standalone document with a numeric prefix
 3. The root document receives links to all child documents
 4. All new documents receive generated Lattice IDs
 

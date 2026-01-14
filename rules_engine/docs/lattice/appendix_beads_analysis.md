@@ -323,7 +323,7 @@ Before completing work:
 | Beads Concept | Lattice Equivalent |
 |---------------|-------------------|
 | `--parent ID` | `--path <directory>` |
-| Epic type | Root document (`!*.md`) |
+| Epic type | Root document (with `00_` prefix) |
 | Parent-child | Directory siblings |
 | `bd create --parent` | `lat create --path` |
 | `in_progress` status | `lat claim` (local) |
@@ -346,7 +346,7 @@ Before completing work:
 1. **Local claiming**: `lat claim` tracks work without file modification
 2. **Section references**: Link to document sections, not just documents
 3. **Knowledge base integration**: Issues and docs share ID space
-4. **Directory roots**: `!*.md` convention for hierarchy
+4. **Directory roots and priority**: `00_*.md` prefix convention for hierarchy and priority
 5. **No push operations**: Sync handled externally
 
 ## Implementation Recommendations
