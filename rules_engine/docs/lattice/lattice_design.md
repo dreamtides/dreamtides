@@ -205,7 +205,8 @@ Supports custom checklist via `.lattice/config.toml`.
 Claims are stored in `~/.lattice/claims.json`, not in markdown files. Supports
 atomic updates across multiple worktrees and automatic release on status change.
 
-See [Appendix: Workflow](appendix_workflow.md) for complete specifications and
+See [Appendix: Workflow](appendix_workflow.md) for complete command specifications,
+output formats, and claiming behavior, and
 [Appendix: Overview Command](appendix_overview.md) for the ranking algorithm.
 
 ### Issue and Document Management
@@ -400,6 +401,8 @@ in SQLite. Key tables include:
 - `labels`: Many-to-many document-label relationships
 - `fts_content`: Full-text search index on document body
 - `client_counters`: Per-client document counter state
+- `directory_roots`: Precomputed root document chain for hierarchy queries
+- `content_cache`: Optional L2 cache for document body content
 
 The schema version is tracked for migration support. All tables include
 `indexed_at` timestamps for staleness detection.

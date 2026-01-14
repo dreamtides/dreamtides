@@ -147,7 +147,6 @@ After each operation, validate:
 
 - Closed issues don't appear in `lat ready`
 - Blocked issues show blocking reasons
-- Context budget is respected
 - Search results match filters
 
 ### Recovery Invariants

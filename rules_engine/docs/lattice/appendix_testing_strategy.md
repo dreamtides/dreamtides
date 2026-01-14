@@ -193,33 +193,30 @@ fn test_show_output() {
 }
 ```
 
-Snapshots are stored in `tests/snapshots/` and reviewed on change.
+Snapshots are stored in `rules_engine/tests/lattice/snapshots/` and reviewed on change.
 
 ## Test Organization
 
 ### Directory Structure
 
+Test code lives under `rules_engine/tests/lattice/`:
+
 ```
-tests/
-├── cli/
+rules_engine/tests/lattice/
+├── cli_tests/
 │   ├── create_tests.rs
 │   ├── update_tests.rs
 │   ├── show_tests.rs
 │   └── list_tests.rs
-├── index/
+├── index_tests/
 │   ├── reconcile_tests.rs
 │   └── query_tests.rs
-├── fakes/
-│   ├── fake_git.rs
-│   ├── fake_filesystem.rs
-│   └── fake_clock.rs
-├── helpers/
-│   ├── doc_builder.rs
-│   ├── test_env.rs
-│   └── assertions.rs
+├── integration_tests/
 └── snapshots/
     └── *.snap
 ```
+
+Fake implementations live in the source tree under `rules_engine/src/lattice/test/`.
 
 ### Naming Convention
 
@@ -294,8 +291,8 @@ fn any_valid_id_roundtrips(id: LatticeId) {
 }
 
 #[proptest]
-fn context_budget_never_exceeded(budget: u32, docs: Vec<TestDoc>) {
-    let result = show_with_context(&docs, budget);
-    assert!(result.len() <= budget as usize);
+fn fts_search_returns_valid_results(query: String, docs: Vec<TestDoc>) {
+    let result = search_documents(&docs, &query);
+    assert!(result.iter().all(|d| docs.contains(d)));
 }
 ```

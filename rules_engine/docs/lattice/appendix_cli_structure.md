@@ -224,6 +224,14 @@ Find semantically similar documents.
 - `--limit N`: Maximum results (default 10)
 - `--threshold F`: Minimum similarity
 
+### lat blocked [options]
+
+Show issues in blocked status with their blocking relationships.
+
+**Options:**
+- `--path <prefix>`: Filter to path prefix
+- `--limit N`: Maximum results
+
 ### lat dep tree \<id\>
 
 Display dependency tree with status indicators.

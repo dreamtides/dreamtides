@@ -152,7 +152,8 @@ equivalent functionality for directory-scoped queries.
 
 ### Patterns to Adapt
 
-1. **--parent filter**: Replace with `--path` for directory filtering
+1. **--parent filter**: Lattice retains `--parent <id>` for filtering by epic ID
+   and adds `--path <prefix>` for filtering by filesystem path prefix
 2. **Molecule filtering**: Not applicable; use directory structure
 3. **Assignee tracking**: Not applicable; use `lat claim` for work tracking
 
@@ -236,7 +237,8 @@ should implement equivalent parsing for `--updated-after` etc.
 
 ### Patterns to Adapt
 
-1. **--parent filter**: Replace with `--path` prefix filter
+1. **--parent filter**: Lattice retains `--parent <id>` for filtering by epic ID
+   and adds `--path <prefix>` for filtering by filesystem path prefix
 2. **Epic type**: Implicit via root document convention
 3. **assignee**: Not applicable; use `lat claim` for local work tracking
 
@@ -322,7 +324,7 @@ Before completing work:
 
 | Beads Concept | Lattice Equivalent |
 |---------------|-------------------|
-| `--parent ID` | Directory in path |
+| `--parent ID` | `--parent <id>` or `--path <prefix>` |
 | Epic type | Root document (with `00_` prefix) |
 | Parent-child | Directory siblings |
 | `bd create --parent` | `lat create path/to/file.md` |

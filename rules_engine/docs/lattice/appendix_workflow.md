@@ -418,8 +418,7 @@ Before completing work, run this checklist:
 
 - `lat overview` - See most critical documents
 - `lat ready` - Show issues ready to work
-- `lat show <id>` - View issue details
-- `lat show <id> --context` - Full context for AI agents
+- `lat show <id>` - View issue details (includes parent, dependencies, related)
 - `lat claim <id>` - Claim issue for local work
 - `lat close <id>` - Mark issue completed
 
@@ -562,10 +561,10 @@ coordinator can release it via:
 lat claim --release L1234
 ```
 
-Or clear all claims from a specific work path:
+Or clear all claims from a specific worktree:
 
 ```
-lat claim --release-path /path/to/crashed/worktree
+lat claim --release-worktree /path/to/crashed/worktree
 ```
 
 ### Display in lat show

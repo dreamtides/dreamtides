@@ -407,7 +407,7 @@ the body text contains the full issue details.
 | Beads | Lattice | Notes |
 |-------|---------|-------|
 | `bd create` | `lat create path/to/file.md` | Path includes filename |
-| `--parent` | Directory in path | Implicit hierarchy |
+| `--parent` | `--parent <id>` or `--path <prefix>` | ID or path-based filtering |
 | `--title` | `-d` / `--description` | Issue description |
 | `--description` | `-d` / `--description` | Combined with title |
 | `bd show` | `lat show` | Follows bd format |
