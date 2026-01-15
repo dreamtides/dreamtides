@@ -430,7 +430,7 @@ Before completing work, run this checklist:
 
 - `lat overview` - See most critical documents
 - `lat ready` - Show tasks ready to work
-- `lat show <id>` - View task details (includes parent, dependencies, related)
+- `lat show <id>` - View document/task details (includes parent, dependencies, related)
 - `lat claim <id>` - Claim task for local work
 - `lat close <id>` - Mark task completed
 

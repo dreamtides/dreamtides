@@ -70,7 +70,7 @@ After every operation, validate:
    file, and every file with a Lattice ID is in the index
 2. **ID uniqueness**: No two files share the same Lattice ID
 3. **ID format**: All IDs in the index match the Lattice ID format
-4. **No panics**: Previous operation completed without crashing
+4. **No panics**: Previous operation completed without a panic or system error.
 
 Note: Broken links are **not** invariant violations. Documents may reference
 IDs that no longer exist.

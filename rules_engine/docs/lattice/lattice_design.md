@@ -494,19 +494,26 @@ Following Tufte's principles:
 
 ## Error Handling
 
-### Error Categories
+Error handling in Lattice is divided into *expected* and *unexpected* failure
+states. Expected errors are problems with user input or external systems the
+user manages like the file system, while unexpected errors are internal
+invariants and "impossible" code paths. We call these "system errors". This is a
+similar distinction to HTTP 400-series vs 500-series error codes.
 
-**User Errors (exit code 2+):**
-- Invalid document syntax
-- Missing required fields
-- References to nonexistent IDs
-- Invalid command arguments
+Expected errors like invalid syntax, missing fields, invalid arguments, missing
+files, permission problems, etc are handled via the `thiserror` crate and the
+`LatticeError` enum.
 
-**System Errors (exit code 1, "System Error" output):**
-- Index corruption
-- Git operation failures
-- File permission problems
-- Unexpected internal states
+Unexpected errors like invariant violations, index corruption, git operation
+failures (lattice should ensure valid git state), out of memory errors, etc are
+handled via `panic!` in Rust. Lattice uses the `human-panic` crate to format
+error messages in a clear manner. The [Chaos Monkey](appendix_chaos_monkey.md)
+searches for panics and runs using `RUST_BACKTRACE=1`.
+
+Essentially this distinction is about *ownership*. If it is Lattice's "fault"
+that a problem happened, we should panic. If it was the user's "fault" because
+they did something wrong, we should not. Obviously this a judgment call, in gray
+areas we can default to the panic option.
 
 ### Structured Error Output
 

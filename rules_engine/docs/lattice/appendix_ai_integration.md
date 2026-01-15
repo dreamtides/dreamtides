@@ -26,12 +26,6 @@ lat setup claude --remove # Uninstall
 lat setup claude --project # Project-only (vs global)
 ```
 
-This command installs:
-- `PreToolUse` hooks to guide agents toward `lat show`
-- `UserPromptSubmit` hooks to auto-expand Lattice IDs in prompts
-- CLAUDE.md additions with Lattice workflow instructions
-- Skill symlinks for documents marked `skill: true`
-
 ## Hook Architecture
 
 ## Enforcing `lat show` via PreToolUse
@@ -53,32 +47,3 @@ Claude to use `lat show` instead.
   }
 }
 ```
-
-**Hook script** (`.claude/hooks/lattice-read-guard.py`):
-
-## Auto-expanding Lattice IDs via UserPromptSubmit
-
-When a user mentions a Lattice ID in their prompt, auto-expand it with
-`lat show` output so Claude has full context.
-
-**Hook configuration** (`.claude/settings.json`):
-
-```json
-{
-  "hooks": {
-    "UserPromptSubmit": [
-      {
-        "command": [".claude/hooks/lattice-id-expand.py"]
-      }
-    ]
-  }
-}
-```
-
-**Hook script** (`.claude/hooks/lattice-id-expand.py`):
-
-## Skill Documents
-
-Documents with `skill: true` in frontmatter become Claude Skills via symlinks
-in `.claude/skills/`.
-
