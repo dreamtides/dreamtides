@@ -304,8 +304,7 @@ filesystem-centric model. Key differences from beads:
 - No sync command; Lattice never performs git push operations
 
 See [Appendix: CLI Structure](appendix_cli_structure.md) for the complete
-command reference and [Appendix: Beads Analysis](appendix_beads_analysis.md)
-for detailed analysis of beads behaviors to preserve.
+command reference.
 
 ## Task Templates
 
@@ -430,6 +429,9 @@ Lattice deliberately avoids conflicts with Claude's SKILL.md format. The
 
 When a Lattice document is marked as a skill, `lat check` enforces these
 stricter validation rules.
+
+See [Appendix: Claude Code Integration](appendix_ai_integration.md) for hooks
+that guide agents to use `lat show` and auto-expand Lattice IDs in prompts.
 
 ## Logging and Observability
 
