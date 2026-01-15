@@ -501,8 +501,8 @@ Following Tufte's principles:
 Error handling in Lattice is divided into *expected* and *unexpected* failure
 states. Expected errors are problems with user input or external systems the
 user manages like the file system, while unexpected errors are internal
-invariants and "impossible" code paths. We call these "system errors". This is a
-similar distinction to HTTP 400-series vs 500-series error codes.
+invariants and "impossible" code paths (we call these "system errors"). This is
+a similar distinction to HTTP 400-series vs 500-series error codes.
 
 Expected errors like invalid syntax, missing fields, invalid arguments, missing
 files, permission problems, etc are handled via the `thiserror` crate and the

@@ -369,6 +369,7 @@ List not surrounded by blank lines.
 
 - `--errors-only`: Suppress warnings
 - `--path <prefix>`: Check only files under path
-- `--fix`: Auto-fix where possible (W002, W006, W007, W008, W013-W017)
+- `--fix`: Auto-fix where possible (W006, W007, W008, W013-W017)
 - `--staged-only`: Check only staged files
-- `--rebuild-index`: Force full index rebuild before checking
+- `--rebuild-index`: Force full index rebuild before checking. Useful when the
+  index may be out of sync with the filesystem.

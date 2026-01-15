@@ -216,7 +216,9 @@ Error: Broken link in LXXXXX: target LYYYYY does not exist
 Documents with no incoming links can be found:
 
 ```
-$ lat list --no-backlinks
+$ lat orphans
+$ lat orphans --exclude-roots  # Don't report root documents
+$ lat orphans --path docs/     # Check only under path
 ```
 
 This helps identify disconnected documents.

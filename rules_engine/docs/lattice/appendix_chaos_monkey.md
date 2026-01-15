@@ -94,12 +94,17 @@ maintain link integrity).
 lat chaosmonkey [OPTIONS]
 
 OPTIONS:
-  --seed <N>          Random seed for reproducibility
-  --max-ops <N>       Maximum operations (default: 10000)
-  --operations <list> Include only these operation types
-  --exclude <list>    Exclude these operation types
+  --seed <N>           Random seed for reproducibility
+  --max-ops <N>        Maximum operations (default: 10000)
+  --operations <list>  Include only these operation types
+  --exclude <list>     Exclude these operation types
+  --stop-before-last   Stop before the final operation that would cause failure
 ```
 
 On invariant violation, output includes the seed, operation count, failing
 operation details, and the specific invariant that failed. Re-run with the same
 seed to reproduce.
+
+The `--stop-before-last` flag is useful for debugging: it runs the sequence until
+just before the failing operation, leaving the repository in a state where you can
+manually inspect and reproduce the issue.

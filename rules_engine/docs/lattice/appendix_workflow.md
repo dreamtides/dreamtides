@@ -19,6 +19,8 @@ lat show <id> [<id>...]
 lat show <id> --json
 lat show <id> --short
 lat show <id> --refs
+lat show <id> --peek
+lat show <id> --raw
 ```
 
 ### Task Display Format
@@ -176,6 +178,18 @@ For knowledge base documents:
 $ lat show LDC76X --short
 LDC76X [doc]: authentication-design - OAuth 2.0 implementation design
 ```
+
+### Peek Format
+
+The `--peek` flag shows a condensed preview suitable for quick context:
+
+```
+$ lat show LB234X --peek
+LB234X: fix-review-tasks - Fix LLMC v2 code review tasks [P0/open/epic]
+Parent: LAA42X | Blocks: 5 | Depends: 1
+```
+
+This is useful for getting minimal context when browsing multiple tasks.
 
 ### References Format
 
@@ -406,7 +420,11 @@ operation, so the session protocol focuses on local validation and commits.
 ```
 lat prime
 lat prime --full
+lat prime --export
 ```
+
+The `--export` flag outputs the context in a format suitable for copying into
+external systems or documentation.
 
 ### Default Output
 
@@ -473,11 +491,12 @@ instead it persists to `~/.lattice/claims/`.
 ### Basic Usage
 
 ```
-lat claim <id>           # Claim a task
-lat claim --list         # Show all claims
-lat claim --release <id> # Release a claim
-lat claim --release-all  # Release all claims
-lat claim --gc           # Clean up stale claims
+lat claim <id>                     # Claim a task
+lat claim --list                   # Show all claims
+lat claim --release <id>           # Release a claim
+lat claim --release-all            # Release all claims
+lat claim --release-worktree <path> # Release claims from a specific worktree
+lat claim --gc                     # Clean up stale claims
 ```
 
 ### Claim Storage

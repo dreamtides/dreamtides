@@ -29,15 +29,19 @@ Display document details. Options: `--short`, `--refs`, `--peek`, `--raw`.
 
 Find ready work. Options: `--parent {id}`, `--priority {n}`, `--type {type}`,
 `--label {list}`, `--label-any {list}`, `--limit {n}`, `--include-backlog`,
-`--include-claimed`, `--pretty`, `--sort {policy}`.
+`--include-claimed`, `--pretty`, `--sort {policy}` (hybrid/priority/oldest).
 
 ### lat prime [options]
 
 Output AI workflow context. Options: `--full`, `--export`.
 
-### lat overview [options]
+### lat overview [id] [options]
 
-Show critical documents. See [Appendix: Overview Command](appendix_overview.md).
+Show critical documents. Without arguments, shows repository-level overview ranked
+by view frequency, recency, and filename priority. With an ID argument, shows
+contextual documents relevant to that task. See
+[Appendix: Overview Command](appendix_overview.md).
+
 Options: `--limit {n}`, `--type {type}`, `--path {prefix}`, `--include-closed`,
 `--reset-views`.
 
@@ -158,7 +162,8 @@ Search and filter documents.
 - `--updated-after {date}`: Updated after date
 - `--updated-before {date}`: Updated before date
 - `--discovered-from {id}`: Tasks discovered from specified parent task
-- `--roots-only`: List only directory root documents (`README.md` or `00_*.md`)
+- `--roots-only`: List only directory root documents (files named `README.md` or
+  with `00_` prefix)
 
 **Output Options:**
 - `--limit {n}`: Maximum results
