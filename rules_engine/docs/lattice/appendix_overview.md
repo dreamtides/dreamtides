@@ -8,7 +8,7 @@ into the workflow command set.
 
 The `lat overview` command provides AI agents with a curated list of the most
 critical documents in a repository, reducing the need for exhaustive exploration.
-It ranks documents using local view tracking, recency, and priority signals.
+It ranks documents using local view tracking, recency, and filename priority.
 
 ## View Tracking
 
@@ -34,21 +34,19 @@ Documents are scored using a weighted combination:
 ```
 score = (view_weight * view_score) +
         (recency_weight * recency_score) +
-        (priority_weight * priority_score) +
-        (root_weight * is_root_document)
+        (filename_priority_weight * filename_priority_score)
 ```
 
 **Default weights:**
-- `view_weight`: 0.4
+- `view_weight`: 0.5
 - `recency_weight`: 0.3
-- `priority_weight`: 0.2
-- `root_weight`: 0.1
+- `filename_priority_weight`: 0.2
 
 **Score components:**
 - `view_score`: Normalized view count (0-1), with logarithmic scaling
 - `recency_score`: Decay function based on days since last view
-- `priority_score`: 1.0 for P0, decreasing to 0.2 for P4
-- `is_root_document`: 1.0 if filename is `README.md` or starts with `00_`, else 0.0
+- `filename_priority_score`: Based on filename prefix—`README.md` and `00_*` score
+  1.0, `01_*` scores 0.9, `02_*` scores 0.8, and so on; unprefixed files score 0.5
 
 ## Command Usage
 
@@ -109,10 +107,9 @@ Weights can be customized in `.lattice/config.toml`:
 ```toml
 [overview]
 limit = 10
-view_weight = 0.4
+view_weight = 0.5
 recency_weight = 0.3
-priority_weight = 0.2
-root_weight = 0.1
+filename_priority_weight = 0.2
 recency_half_life_days = 7
 ```
 
@@ -150,11 +147,12 @@ Within each distance tier, documents are ranked by:
    - `body-link`: 0.6 (referenced material)
    - `sibling`: 0.4 (related work)
 
-2. **For tasks:** Priority score (P0=1.0 down to P4=0.2)
+2. **Filename priority:** Documents with `README.md` or `00_*` filenames rank
+   highest, followed by `01_*`, `02_*`, etc. Unprefixed files rank lowest.
 
 3. **For body links:** Position in document (earlier = higher)
 
-4. **For siblings:** Priority, then recency
+4. **For siblings:** Filename priority, then recency
 
 ### Output
 
