@@ -5,11 +5,14 @@ This appendix documents task lifecycle and creation. See
 
 ## Task vs Knowledge Base
 
-Any Lattice document can be either:
-- **Knowledge base**: Has `lattice-id`, `name`, `description`
-- **Task**: Additionally has `task-type` and `status`
+All Lattice documents require `lattice-id`, `name`, and `description`. The
+document type determines additional fields:
 
-The presence of `task-type` is the discriminator.
+- **Knowledge base**: `lattice-id`, `name`, `description` (required)
+- **Task**: Above plus `task-type`, `status`, `priority` (required)
+
+The presence of `task-type` is the discriminator. Use `lat create` with `-t` to
+create tasks, or without `-t` to create knowledge base documents.
 
 ## Task Types
 
@@ -43,25 +46,45 @@ There is no `in_progress` status. Use `lat claim` for local work tracking.
 | P3 | Low: polish, optimization |
 | P4 | Backlog: future ideas |
 
-## Creating Tasks
+## Creating Documents
+
+All documents (tasks and knowledge base) require a description as a positional
+argument:
 
 ```bash
-lat create tasks/auth/fix_login_bug.md -d "Users unable to log in after reset"
-lat create tasks/auth/crash.md -t bug -p 0 -d "Crash on invalid credentials"
-lat create tasks/auth/oauth.md -t feature -p 1 -d "Add OAuth 2.0 support"
-lat create tasks/auth/README.md -t epic -d "Authentication system"
+lat create <path> "<description>" [options]
+```
+
+The `name` field is derived automatically from the filename (underscores become
+hyphens). The description is required for all document types.
+
+To create a **task**, include the `-t` flag. Omitting `-t` creates a **knowledge
+base document**.
+
+Examples:
+
+```bash
+# Knowledge base documents (no -t flag)
+lat create docs/auth/oauth_design.md "OAuth 2.0 implementation design"
+# Creates: name: oauth-design, description: OAuth 2.0 implementation design
+
+# Tasks (with -t flag)
+lat create tasks/auth/fix_login.md "Fix login after password reset" -t bug
+# Creates: name: fix-login, description: Fix login after password reset
+
+lat create tasks/auth/oauth_support.md "Add OAuth 2.0 support" -t feature -p 1
+# Creates: name: oauth-support, description: Add OAuth 2.0 support
+
+lat create tasks/auth/README.md "Authentication system epic" -t epic
+# Creates: name: readme, description: Authentication system epic
 ```
 
 Options:
-- `-t <type>`: Task type (default: task)
-- `-p <0-4>`: Priority (default: 2)
-- `-d <text>`: Description
+- `-t <type>`: Task type (bug/feature/task/epic/chore). Omit for KB documents.
+- `-p <0-4>`: Priority (default: 2, tasks only)
 - `-l <labels>`: Comma-separated labels
 - `--deps discovered-from:<id>`: Add dependency
-- `--body-file <path>`: Read body from file
-
-File paths use underscores (e.g., `fix_login_bug.md`), converted to hyphens
-in YAML names (`name: fix-login-bug`).
+- `--body-file <path>`: Read extended body from file
 
 ## Filesystem Hierarchy
 
@@ -131,9 +154,13 @@ rules and common patterns.
 
 ## Document Structure
 
+Example task document (`tasks/auth/fix_login.md`):
+
 ```yaml
 ---
 lattice-id: LXXXX
+name: fix-login
+description: Fix login after password reset
 task-type: task
 status: open
 priority: 2
@@ -142,8 +169,26 @@ blocked-by: [LZZZZ]
 created-at: 2024-01-15T10:30:00Z
 ---
 
-Description of the task.
+Users receive 401 errors when logging in after using the password reset flow.
+This appears to be a session invalidation issue.
+
+## Reproduction Steps
+
+1. Request password reset
+2. Complete reset flow
+3. Attempt to log in with new password
+4. Observe 401 error
 ```
+
+The `name` field is always derived from the filename (underscores → hyphens,
+lowercase). This is a core Lattice invariant—the linter will warn if `name`
+doesn't match the filename.
+
+The `description` field is the human-readable task title shown in `lat show`
+output and list views. Both `name` and `description` are required.
+
+The markdown body provides extended details: reproduction steps, implementation
+notes, design context, etc.
 
 The `parent-id` field is auto-populated by `lat fmt` from the directory's
 root document. Template content (context and acceptance criteria) is inherited

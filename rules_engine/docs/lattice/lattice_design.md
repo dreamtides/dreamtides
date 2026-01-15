@@ -71,9 +71,16 @@ Claude's SKILL.md format. The reserved keys include:
 **Identity Keys:**
 - `lattice-id`: Unique document identifier (required)
 - `parent-id`: ID of parent document, auto-populated by `lat fmt` from directory root
-- `name`: Human-readable document name, max 64 lowercase hyphen-separated chars
-- `description`: Purpose summary for AI context, max 1024 characters (optional for
-  tasks, recommended for knowledge base documents)
+- `name`: Lowercase-hyphenated identifier derived from filename (required, max 64 chars)
+- `description`: Human-readable summary (required, max 1024 chars)
+
+The `name` field is always derived from the document's filename: underscores
+become hyphens and the `.md` extension is stripped (e.g., `fix_login_bug.md`
+→ `fix-login-bug`). This is a core Lattice invariant enforced by the linter.
+
+For tasks, `description` serves as the display title shown in `lat show` and
+other outputs (e.g., "Fix login bug after password reset"). For knowledge base
+documents, `description` provides a purpose summary for AI context.
 
 **Task Tracking Keys:**
 - `task-type`: bug/feature/task/epic/chore
@@ -190,10 +197,12 @@ output formats, and claiming behavior, and
 
 Commands for creating and modifying tasks and documents.
 
-**lat create** - Creates new documents with `lat create <path/to/doc.md>
-[options]`. The path specifies both directory location and filename,
-establishing the document's position in the hierarchy. Supports task type,
-priority, labels, and dependencies at creation time.
+**lat create** - Creates new documents with `lat create <path> "<description>"
+[options]`. Works for both tasks and knowledge base documents. The `name` field
+is derived from the filename automatically. The description is a required
+positional argument. For tasks, add `-t <type>` to specify task type; omitting
+`-t` creates a knowledge base document. Supports priority, labels, and
+dependencies for tasks.
 
 **lat update** - Modifies existing documents with `lat update <id> [id...]
 [options]`. Supports changing status, priority, type, and managing labels.
@@ -338,13 +347,13 @@ The `lat check` command validates documents and repository state:
 - Duplicate Lattice IDs
 - References to nonexistent IDs
 - Invalid YAML frontmatter keys
-- Missing required fields for task documents
+- Missing required fields (`name`, `description`, and task-specific fields)
+- Name-filename mismatch (name must derive from filename)
 - Invalid status/type/priority values
 - Circular blocking dependencies
 
 **Warning-level checks:**
 - Document exceeds 500 lines
-- Missing `name` or `description` for knowledge base documents
 - Markdown lint problems (inconsistent headers, bare URLs, etc.)
 - Time-sensitive content detection (dates, "after August 2025", etc.)
 - Inconsistent terminology within a document

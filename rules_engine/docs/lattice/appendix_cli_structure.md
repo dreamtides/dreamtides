@@ -76,11 +76,23 @@ Split document by top-level sections.
 See [Appendix: Task Tracking](appendix_task_tracking.md) for task lifecycle,
 status transitions, and template inheritance.
 
-### lat create \<path/to/task.md\> [options]
+### lat create \<path\> "\<description\>" [options]
 
-Create new task document. Options: `-t, --type <type>`, `-p, --priority <N>`,
-`-d, --description <text>`, `--body-file <path>`, `-l, --labels <list>`,
-`--deps <spec>`.
+Create new document (task or knowledge base). The description is a required
+positional argument. The `name` field is derived automatically from the
+filename (underscores → hyphens).
+
+To create a task, include `-t <type>`. Omitting `-t` creates a knowledge base
+document.
+
+Options: `-t, --type <type>`, `-p, --priority <N>`, `--body-file <path>`,
+`-l, --labels <list>`, `--deps <spec>`.
+
+Examples:
+```bash
+lat create docs/auth/oauth_design.md "OAuth 2.0 implementation design"
+lat create tasks/auth/fix_login.md "Fix login after password reset" -t bug -p 1
+```
 
 The path specifies directory location and filename. For epics, use `README.md`
 or `00_` prefix.
@@ -151,17 +163,17 @@ Search and filter documents.
 
 **Output Formats:**
 
-Default format shows rich metadata inline:
+Default format shows rich metadata with name and description:
 ```
-LXXXX [bug/P1/open] login-authentication-failure
-LYYYY [feature/P2/open] oauth-implementation
-LZZZZ [doc] authentication-design
+LXXXX [bug/P1/open] login-failure - Users cannot log in after password reset
+LYYYY [feature/P2/open] oauth-support - Add OAuth 2.0 authentication support
+LZZZZ [doc] authentication-design - OAuth 2.0 implementation design
 ```
 
-Compact format:
+Compact format (name only):
 ```
-LXXXX  login-authentication-failure
-LYYYY  oauth-implementation
+LXXXX  login-failure
+LYYYY  oauth-support
 ```
 
 ### lat stale [options]

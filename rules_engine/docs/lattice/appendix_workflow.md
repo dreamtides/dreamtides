@@ -26,7 +26,7 @@ lat show <id> --refs
 For task documents, the output follows `bd show` format:
 
 ```
-LB234: Fix LLMC v2 code review tasks
+LB234: fix-review-tasks - Fix LLMC v2 code review tasks
 Status: open
 Priority: P0
 Type: epic
@@ -37,7 +37,7 @@ Updated: 2026-01-10 14:37
 Context:
   [Context from ancestor root documents]
 
-Description:
+Body:
 Master epic for addressing bugs and missing features identified in
 comprehensive code review of LLMC v2 implementation.
 
@@ -45,14 +45,14 @@ Acceptance Criteria:
   [Acceptance from ancestor root documents]
 
 Parent:
-  LAA42: LLMC Development [epic]
+  LAA42: llmc-development - LLMC Development [epic]
 
 Depends on (1):
-  L2345: Fix incorrect rebase necessity detection in patrol [P0 - closed]
+  L2345: rebase-detection - Fix incorrect rebase necessity detection [P0 - closed]
 
 Blocks (5):
-  L3456: Fix crash count not being incremented in patrol [P0 - open]
-  L4567: Fix stuck worker nudging to be async [P1 - open]
+  L3456: crash-count - Fix crash count not being incremented [P0 - open]
+  L4567: worker-nudging - Fix stuck worker nudging to be async [P1 - open]
   ...
 
 Related (1):
@@ -61,10 +61,10 @@ Related (1):
 
 **Key sections:**
 
-- **Header line:** ID and name (task title)
+- **Header line:** ID, name (from filename), and description (human-readable title)
 - **Metadata block:** Status, priority, type, timestamps, creator
 - **Context:** Composed from ancestor root documents (if any have Context sections)
-- **Description:** Full markdown body content
+- **Body:** Full markdown body content
 - **Acceptance Criteria:** Composed from ancestor roots (if any have Acceptance sections)
 - **Parent:** Directory root document (epic context)
 - **Depends on:** Tasks in the `blocked-by` field (what this depends on)
@@ -76,12 +76,11 @@ without ancestor Context or Acceptance Criteria sections.
 
 ### Knowledge Base Display Format
 
-For knowledge base documents (no `task-type`), the output emphasizes the
-name and description fields which provide structured metadata:
+For knowledge base documents (no `task-type`), the output uses the same
+`name - description` header format as tasks:
 
 ```
-LDC76: authentication-design
-Description: OAuth 2.0 implementation design for the auth subsystem
+LDC76: authentication-design - OAuth 2.0 implementation design for the auth subsystem
 
 ---
 [Full markdown body content here]
@@ -95,8 +94,8 @@ Related (2):
 **Header components:**
 
 - **ID:** The Lattice ID
-- **Name:** The `name` frontmatter field (lowercase-hyphenated identifier)
-- **Description:** Displayed on its own line, providing the purpose summary
+- **Name:** The `name` frontmatter field (lowercase-hyphenated, derived from filename)
+- **Description:** The human-readable purpose summary
 
 Knowledge base documents do not display timestamps in the default view since
 they typically lack explicit `created-at`/`updated-at` fields. Git history
@@ -114,14 +113,15 @@ Where `<type-indicator>` is:
 - For tasks: `P<N> - <status>` (e.g., `P0 - open`, `P1 - closed`)
 - For knowledge base: `doc`
 
-For tasks, the name IS the title (a short description), so no separate description
-is shown. For knowledge base entries, both name and description are displayed.
+The `name` is the filename-derived identifier (lowercase-hyphenated). The
+`description` is the human-readable summary. This format applies consistently
+to both tasks and knowledge base documents.
 
 Examples:
 ```
-LB234: Fix login bug [P0 - open]
+LB234: fix-login - Fix login after password reset [P0 - open]
 L567C: authentication-design - OAuth 2.0 implementation design [doc]
-LDAB2: LLMC Development [epic]
+LDAB2: llmc-development - LLMC Development epic [epic]
 ```
 
 ### Related Document Selection
@@ -145,21 +145,20 @@ documents are shown in text output; use `--json` for complete list.
 
 ### Name vs Description Distinction
 
-Lattice maintains separate semantics for tasks and knowledge base entries:
+For ALL documents:
+- `name`: Lowercase-hyphenated identifier derived from filename (required, max 64 chars)
+- `description`: Human-readable summary (required, max 1024 chars)
+- Body text: Extended content
 
-**Tasks:**
-- `name`: The task title (short, descriptive)
-- `description`: Optional one-line summary for AI context (max 1024 chars)
-- Body text: The full task description
+The `name` field is always derived from the document's filename (underscores →
+hyphens, `.md` stripped). This is a core Lattice invariant.
 
-**Knowledge Base Entries:**
-- `name`: Short identifier (lowercase-hyphenated, max 64 chars)
-- `description`: Purpose summary for AI context (max 1024 chars, recommended)
-- Body text: Full document content
+For tasks, `description` serves as the display title shown in headers and list
+views (e.g., "Fix login bug after password reset"). For knowledge base documents,
+`description` provides a purpose summary for AI context.
 
-The optional `description` field for tasks provides a brief summary that AI
-agents can use without reading the full body. When present, it appears in
-`lat show --short` and `lat overview` output.
+Both fields are required. The `description` appears in `lat show` headers,
+`lat show --short`, and `lat overview` output.
 
 ### Short Format
 
@@ -167,10 +166,10 @@ The `--short` flag produces single-line output:
 
 ```
 $ lat show LB234 --short
-LB234 [open] P0 epic: Fix LLMC v2 code review tasks
+LB234 [open] P0 epic: fix-review-tasks - Fix LLMC v2 code review tasks
 ```
 
-Format: `<id> [<status>] <priority> <type>: <name>`
+Format: `<id> [<status>] <priority> <type>: <name> - <description>`
 
 For knowledge base documents:
 ```
@@ -187,8 +186,8 @@ $ lat show LB234 --refs
 References to LB234:
 
   Blocks (5):
-    L3456: Fix crash count not being incremented in patrol [P0 - open]
-    L4567: Fix stuck worker nudging to be async [P1 - open]
+    L3456: crash-count - Fix crash count not being incremented [P0 - open]
+    L4567: worker-nudging - Fix stuck worker nudging to be async [P1 - open]
     ...
 
   Linked from (2):
@@ -204,8 +203,9 @@ The `--json` flag produces structured output compatible with `bd show --json`:
 [
   {
     "id": "LB234",
+    "name": "fix-review-tasks",
     "title": "Fix LLMC v2 code review tasks",
-    "description": "Master epic for addressing bugs...",
+    "body": "Master epic for addressing bugs and missing features...",
     "status": "open",
     "priority": 0,
     "task_type": "epic",
@@ -217,6 +217,7 @@ The `--json` flag produces structured output compatible with `bd show --json`:
     "dependencies": [
       {
         "id": "L2345",
+        "name": "rebase-detection",
         "title": "Fix incorrect rebase necessity detection in patrol",
         "status": "closed",
         "priority": 0,
@@ -226,6 +227,7 @@ The `--json` flag produces structured output compatible with `bd show --json`:
     "dependents": [
       {
         "id": "L3456",
+        "name": "crash-count",
         "title": "Fix crash count not being incremented in patrol",
         "status": "open",
         "priority": 0,
@@ -236,11 +238,12 @@ The `--json` flag produces structured output compatible with `bd show --json`:
       {
         "id": "L567C",
         "name": "llmc-design",
-        "description": "LLMC design document"
+        "title": "Design document for LLMC agent coordination system"
       }
     ],
     "parent": {
       "id": "LAA42",
+      "name": "llmc-development",
       "title": "LLMC Development"
     },
     "claimed": false
@@ -253,8 +256,9 @@ The `--json` flag produces structured output compatible with `bd show --json`:
 | Key | Type | Description |
 |-----|------|-------------|
 | `id` | string | Lattice ID |
-| `title` | string | Task name/title (maps from `name` field) |
-| `description` | string | Full body text for tasks, description field for KB |
+| `name` | string | Filename-derived identifier (lowercase-hyphenated) |
+| `title` | string | Human-readable title (maps from `description` field) |
+| `body` | string | Full markdown body content |
 | `status` | string | Task status |
 | `priority` | int | Priority level (0-4) |
 | `task_type` | string | bug/feature/task/epic/chore |
@@ -269,7 +273,10 @@ The `--json` flag produces structured output compatible with `bd show --json`:
 | `related` | array | Documents linked from body text |
 | `parent` | object | Directory root document (epic) |
 | `claimed` | bool | Whether locally claimed |
-| `body` | string | Full markdown body content |
+
+The `title` field maps from the YAML `description` field for backwards
+compatibility with beads. For tasks, this is the task title (e.g., "Fix login
+bug"). For knowledge base documents, this is the purpose summary.
 
 ### Multiple Documents
 

@@ -83,6 +83,41 @@ A Lattice ID doesn't match the expected format.
 
 **Fix:** Use a properly formatted ID.
 
+### E008: Name-Filename Mismatch
+
+The `name` field doesn't match the filename.
+
+**Detection:** Convert filename to expected name (strip `.md`, convert underscores
+to hyphens, lowercase) and compare with `name` field.
+
+**Message:** `Error [E008]: path/fix_login.md has name 'login-fix' but should be 'fix-login' (derived from filename)`
+
+**Fix:** Correct the `name` field to match the filename, or rename the file.
+Run `lat fmt` to auto-correct.
+
+This is a core Lattice invariant: the `name` field must always match the
+filename with underscores converted to hyphens.
+
+### E009: Missing Required Field (Name)
+
+Document lacks required `name` field.
+
+**Detection:** Check `name` field is present.
+
+**Message:** `Error [E009]: path.md is missing required 'name' field`
+
+**Fix:** Add name to frontmatter or run `lat fmt` to auto-populate from filename.
+
+### E010: Missing Required Field (Description)
+
+Document lacks required `description` field.
+
+**Detection:** Check `description` field is present.
+
+**Message:** `Error [E010]: path.md is missing required 'description' field`
+
+**Fix:** Add description explaining the document's purpose (for KB) or task title (for tasks).
+
 ## Warning-Level Rules
 
 These are advisory and don't block operations.
@@ -97,25 +132,13 @@ Document exceeds the recommended 500 line limit.
 
 **Fix:** Split using `lat split` or manually divide content.
 
-### W002: Missing Name
+### W002: (Superseded by E009)
 
-Knowledge base document lacks a `name` field.
+Missing `name` is now an error. See E009.
 
-**Detection:** If no `task-type` and no `name`, warn.
+### W003: (Superseded by E010)
 
-**Message:** `Warning [W002]: path.md is missing 'name' field`
-
-**Fix:** Add name to frontmatter or run `lat fmt`.
-
-### W003: Missing Description
-
-Knowledge base document lacks a `description` field.
-
-**Detection:** If no `task-type` and no `description`, warn.
-
-**Message:** `Warning [W003]: path.md is missing 'description' field`
-
-**Fix:** Add description explaining the document's purpose.
+Missing `description` is now an error. See E010.
 
 ### W004: Name Too Long
 
