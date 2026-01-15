@@ -36,7 +36,8 @@ store. Any SQLite state can be safely deleted and rebuilt from the git
 repository. This design principle means Lattice never runs background daemon
 processes; instead, common maintenance operations execute opportunistically
 before user commands, treating each `lat` invocation as an ad-hoc daemon
-opportunity.
+opportunity. See [Appendix: Startup Operations](appendix_startup_operations.md)
+for the complete list of operations that run on every command.
 
 The index reconciliation strategy uses git's change detection mechanisms to
 identify stale index entries. When the index cannot be confidently validated,
@@ -420,10 +421,12 @@ behavior in non-standard configurations (shallow clones, worktrees, submodules).
 
 ### Automatic Skill Generation
 
-Documents with `skill: true` in their frontmatter automatically become
-Claude Skills. Lattice generates symlinks in `.claude/skills/` pointing
-to the actual Lattice documents, enabling Claude Code to discover them
-without file duplication.
+Documents with `skill: true` in their frontmatter automatically become Claude
+Skills. Lattice generates symlinks in `.claude/skills/` pointing to the actual
+Lattice documents, enabling Claude Code to discover them without file
+duplication. This operation happens transparently as part of startup operations
+on *every* `lat` command invocation.  See [Appendix: Startup
+Operations](appendix_startup_operations.md).
 
 ### Format Compatibility
 
