@@ -78,31 +78,23 @@ definitions.
 **error/** - Error handling including user vs system error types, human-readable
 formatting, and exit code constants.
 
-**test/** - Test utilities and fakes including test environment setup, in-memory
-git fake, in-memory filesystem fake, controllable clock fake, test document
-factory, and custom assertions.
+**test/** - Test utilities including test environment setup, `FakeGit`
+implementation of the `GitOps` trait, and custom assertions.
 
 ## Test Directory Structure
 
 ```
-rules_engine/tests/lattice/
-├── cli_tests/
-├── index_tests/
-├── integration_tests/
-└── snapshots/
+tests/lattice/
+├── commands/
+├── index/
+└── integration/
 ```
 
-### Test Directory Descriptions
+**commands/** - Per-command tests (create, show, list, etc.)
 
-**cli_tests/** - Tests for individual CLI commands (show, create, update, list,
-check, format, claim, chaos).
+**index/** - Reconciliation and query tests
 
-**index_tests/** - Tests for database operations including reconciliation, queries,
-and schema migrations.
-
-**integration_tests/** - End-to-end workflow tests and edge case scenarios.
-
-**snapshots/** - Snapshot test files (*.snap) for output verification.
+**integration/** - Multi-command workflow tests
 
 ## Runtime Directory Structure
 

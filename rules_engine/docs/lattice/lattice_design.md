@@ -506,27 +506,15 @@ All tests exercise the public CLI interface rather than internal APIs.
 This ensures tests validate user-facing behavior and enables safe
 refactoring of internals without test rewrites.
 
-### Fake Implementations
+### GitOps Trait
 
-External dependencies (git, filesystem) are replaced with in-memory fakes
-for test performance. Tests must run fast; a slow test suite is worse
-than no tests because it discourages running them.
-
-The fake git implementation maintains an in-memory commit graph and file
-tree, supporting the git operations Lattice uses (status, diff, log) while
-running entirely in memory.
+All git operations go through the `GitOps` trait, enabling test injection.
+Production uses `RealGit` (shells out to git); tests inject `FakeGit`
+(in-memory state). The filesystem and SQLite use real implementations—they're
+fast enough and catch more edge cases than fakes would.
 
 See [Appendix: Testing Strategy](appendix_testing_strategy.md) for the
 complete testing architecture.
-
-### Test Categories
-
-Tests are organized by category:
-
-- **Happy path**: Normal operation with valid inputs
-- **User errors**: Invalid inputs, malformed documents
-- **System errors**: Index corruption, git failures
-- **Edge cases**: Empty repositories, single documents, maximum sizes
 
 ## Chaos Monkey
 

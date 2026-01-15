@@ -1,298 +1,85 @@
 # Appendix: Testing Strategy
 
-This appendix documents the testing architecture for Lattice. For automated
-fuzz testing, see [Appendix: Chaos Monkey](appendix_chaos_monkey.md).
+This appendix documents the testing architecture. For fuzz testing, see
+[Appendix: Chaos Monkey](appendix_chaos_monkey.md).
 
 ## Philosophy
 
-Testing in Lattice follows three principles:
-1. Black box: Test the CLI interface, not internal APIs
-2. Fast execution: Slow tests discourage running them
-3. Comprehensive coverage: Happy paths, errors, and edge cases
+Tests invoke `lat` commands via inline function calls to `main()`.
 
-## Test Architecture
+Tests are black-box: they exercise the CLI interface, not internal APIs.
 
-### CLI Testing
+## Fake vs Real Analysis
 
-All tests invoke `lat` commands as external processes:
+| Dependency | Decision | Rationale |
+|------------|----------|-----------|
+| Git | **Fake** | Real git is slow (~100ms per repo init). For 1000+ tests, this dominates runtime. |
+| Filesystem | **Real** | tmpdir operations are fast (<1ms). Real filesystem catches encoding, permission, and path edge cases that fakes miss. |
+| SQLite | **Real** | In-memory mode (`:memory:`) is as fast as any fake. Real SQLite catches query edge cases. |
+| Time | **Real** | Timestamps are recorded but not used for logic. Determinism rarely needed. |
+
+## GitOps Trait
+
+All git operations go through the `GitOps` trait:
 
 ```rust
-fn test_create_issue() {
-    let env = TestEnv::new();
-    let result = env.run(&["create", "Test issue", "--path", "tasks/"]);
-    assert!(result.success());
-    assert!(result.stdout.contains("Created:"));
+trait GitOps {
+    fn ls_files(&self, pattern: &str) -> Result<Vec<PathBuf>>;
+    fn diff(&self, from: &str, to: &str, pattern: &str) -> Result<Vec<PathBuf>>;
+    fn status(&self, pattern: &str) -> Result<Vec<StatusEntry>>;
+    fn rev_parse(&self, refname: &str) -> Result<String>;
 }
 ```
 
-This ensures tests validate user-visible behavior, not implementation details.
-
-### Fake Implementations
-
-External dependencies are replaced with in-memory fakes:
-
-**FakeGit:** In-memory commit graph and file tree
-- Supports: status, diff, log, ls-files, rev-parse
-- State: HashMap of paths to content, commit history list
-- No actual git repository on disk
-
-**FakeFileSystem:** Virtual filesystem
-- Supports: read, write, delete, list, exists
-- State: HashMap of paths to content
-- Optional hooks for failure injection
-
-**FakeClock:** Controllable time
-- Fixed or advancing timestamps
-- Enables testing time-dependent behavior
-- No reliance on system clock
-
-### Test Environment
-
-The `TestEnv` struct provides isolated test context:
-
-```rust
-struct TestEnv {
-    fake_git: FakeGit,
-    fake_fs: FakeFileSystem,
-    index_path: PathBuf,  // Temp directory
-    client_id: String,    // Fixed for reproducibility
-}
-```
-
-Each test gets a fresh environment. No state leaks between tests.
-
-## Test Categories
-
-### Happy Path Tests
-
-Normal operation with valid inputs:
-
-- Create document with all fields
-- Update issue status through lifecycle
-- Generate and use IDs
-- Query with various filters
-- Show document with context
-- Format and check documents
-
-### User Error Tests
-
-Invalid inputs that should produce clear errors:
-
-- Malformed YAML frontmatter
-- Invalid field values (status, priority, type)
-- Missing required fields
-- References to nonexistent IDs
-- Invalid command arguments
-- Path outside repository
-
-### System Error Tests
-
-Internal failures that should be handled gracefully:
-
-- Index corruption (malformed SQLite)
-- Git command failures
-- File permission errors
-- Disk full conditions
-- Concurrent modification
-
-### Edge Case Tests
-
-Boundary conditions and unusual states:
-
-- Empty repository (no documents)
-- Single document repository
-- Maximum-size documents (500 lines exactly)
-- Documents with no frontmatter
-- Unicode in document names and content
-- Deep directory nesting
-- Circular link graphs
-
-## Fake Git Implementation
-
-### Interface
-
-```rust
-trait GitOperations {
-    fn status(&self) -> Vec<FileStatus>;
-    fn diff(&self, from: &str, to: &str) -> Vec<PathBuf>;
-    fn ls_files(&self, pattern: &str) -> Vec<PathBuf>;
-    fn rev_parse(&self, ref_name: &str) -> Option<String>;
-    fn log(&self, path: Option<&Path>, limit: usize) -> Vec<Commit>;
-}
-```
-
-### In-Memory State
+Production code uses `RealGit` which shells out to git. Tests inject `FakeGit`
+which maintains in-memory state:
 
 ```rust
 struct FakeGit {
-    files: HashMap<PathBuf, String>,      // Working tree
-    staged: HashSet<PathBuf>,             // Staged files
-    commits: Vec<FakeCommit>,             // Commit history
+    files: HashMap<PathBuf, FileState>,  // Working tree
+    commits: Vec<Commit>,                 // History
     head: String,                         // Current HEAD
-    branches: HashMap<String, String>,    // Branch -> commit
 }
 ```
 
-### Commit Simulation
+The trait is threaded through the codebase via a context parameter. Functions
+that need git access receive `&dyn GitOps`.
 
-```rust
-impl FakeGit {
-    fn commit(&mut self, message: &str) -> String {
-        let hash = generate_hash();
-        let commit = FakeCommit {
-            hash: hash.clone(),
-            parent: Some(self.head.clone()),
-            message: message.to_string(),
-            files: self.staged.clone(),
-        };
-        self.commits.push(commit);
-        self.staged.clear();
-        self.head = hash.clone();
-        hash
-    }
-}
-```
-
-## Test Helpers
-
-### Document Builder
-
-Fluent API for creating test documents:
-
-```rust
-let doc = DocBuilder::new()
-    .id("LTESTB")
-    .name("test-doc")
-    .issue_type("bug")
-    .status("open")
-    .priority(1)
-    .body("Test content")
-    .build();
-```
-
-### Assertion Helpers
-
-Custom assertions for common patterns:
-
-```rust
-fn assert_document_exists(env: &TestEnv, id: &str);
-fn assert_link_exists(env: &TestEnv, from: &str, to: &str);
-fn assert_error_contains(result: &Output, substring: &str);
-fn assert_warning_contains(result: &Output, substring: &str);
-```
-
-### Snapshot Testing
-
-For complex output verification:
-
-```rust
-fn test_show_output() {
-    let env = setup_complex_docs();
-    let result = env.run(&["show", "LMAIN"]);
-    assert_snapshot!("show_with_context", result.stdout);
-}
-```
-
-Snapshots are stored in `rules_engine/tests/lattice/snapshots/` and reviewed on change.
-
-## Test Organization
-
-### Directory Structure
-
-Test code lives under `rules_engine/tests/lattice/`:
+## Test Structure
 
 ```
-rules_engine/tests/lattice/
-├── cli_tests/
-│   ├── create_tests.rs
-│   ├── update_tests.rs
-│   ├── show_tests.rs
-│   └── list_tests.rs
-├── index_tests/
-│   ├── reconcile_tests.rs
-│   └── query_tests.rs
-├── integration_tests/
-└── snapshots/
-    └── *.snap
+tests/lattice/
+├── commands/     # Per-command tests (create, show, list, etc.)
+├── index/        # Reconciliation and query tests
+└── integration/  # Multi-command workflows
 ```
 
-Fake implementations live in the source tree under `rules_engine/src/lattice/test/`.
+Each test:
+1. Creates a temp directory
+2. Runs `lat` commands with `FakeGit` injected
+3. Asserts on stdout, stderr, exit code, and file state
 
-### Naming Convention
+## Test Setup
 
-Test functions describe the scenario:
+Use `lat` commands directly for setup—no separate builder API:
 
 ```rust
 #[test]
-fn create_bug_with_all_fields_succeeds() { }
+fn show_displays_blocking_issues() {
+    let env = TestEnv::new();
+    lat(LatCommand.Create, env, &["tasks/a.md", "-d", "Issue A"]);
+    lat(LatCommand.Create, env, &["tasks/b.md", "-d", "Issue B", "--deps", "blocked-by:LXXXX"]);
 
-#[test]
-fn create_without_path_returns_error() { }
-
-#[test]
-fn update_closed_issue_to_open_fails() { }
-```
-
-## Performance Requirements
-
-### Speed Targets
-
-- Individual test: < 50ms
-- Full test suite: < 10 seconds
-- No network access
-- No disk I/O (except temp SQLite)
-
-### Parallelization
-
-Tests run in parallel by default. Each test uses isolated state.
-Shared fixtures are immutable and thread-safe.
-
-### Profiling
-
-Slow tests are flagged in CI:
-
-```
-Warning: test_large_context_budget took 120ms (limit: 50ms)
-```
-
-## Continuous Integration
-
-### Pre-Commit
-
-Fast subset of tests (~2 seconds):
-- Syntax validation
-- Basic CRUD operations
-- Error message format
-
-### Full Suite
-
-All tests on every PR:
-- All categories
-- Multiple platforms (Linux, macOS)
-- Both debug and release builds
-
-### Coverage
-
-Coverage targets:
-- Line coverage: > 80%
-- Branch coverage: > 70%
-- All error paths exercised
-
-## Property-Based Testing
-
-For complex logic, property tests supplement examples:
-
-```rust
-#[proptest]
-fn any_valid_id_roundtrips(id: LatticeId) {
-    let encoded = id.to_string();
-    let decoded = LatticeId::parse(&encoded).unwrap();
-    assert_eq!(id, decoded);
-}
-
-#[proptest]
-fn fts_search_returns_valid_results(query: String, docs: Vec<TestDoc>) {
-    let result = search_documents(&docs, &query);
-    assert!(result.iter().all(|d| docs.contains(d)));
+    let result = lat(LatCommand.Show, env, &["LYYYY"]);
+    assert!(result.stdout.contains("Blocked by"));
 }
 ```
+
+This tests the actual CLI interface and serves as executable documentation.
+
+## Test Categories
+
+- **Happy path**: Normal operation with valid inputs
+- **User errors**: Invalid inputs producing clear error messages
+- **System errors**: Index corruption, simulated git failures
+- **Edge cases**: Empty repos, unicode, deep nesting, circular links

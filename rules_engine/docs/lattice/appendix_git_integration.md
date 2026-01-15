@@ -11,6 +11,9 @@ Lattice uses git as the authoritative store for all document content. The
 SQLite index is derived entirely from git-tracked files. This design ensures
 documents are versioned, mergeable, and recoverable.
 
+All git operations go through the `GitOps` trait, allowing tests to inject
+a fake implementation. See [Appendix: Testing Strategy](appendix_testing_strategy.md).
+
 ## Required Git Operations
 
 ### Document Discovery
