@@ -120,10 +120,10 @@ prefixed file. Both naming conventions are equally acceptable for marking the
 highest priority document that serves as the directory root, providing parent
 context for all other documents in that directory.
 
-The `lat fmt` command automatically populates the `parent-id` field in each
-document's frontmatter based on the directory's root document. This makes
-hierarchy explicit without requiring manual parent specification. Documents
-without a root document in their directory have no `parent-id`.
+The `lat fmt` and `lat create` commands automatically populate the `parent-id`
+field in each document's frontmatter based on the directory's root document.
+This makes hierarchy explicit without requiring manual parent specification.
+Documents without a root document in their directory have no `parent-id`.
 
 Higher-numbered prefixes (`01_`, `02_`, etc.) indicate progressively lower
 priority. Commands like `lat show` and `lat overview` use these prefixes when
