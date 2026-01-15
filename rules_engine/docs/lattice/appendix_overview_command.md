@@ -28,19 +28,19 @@ Documents are scored using a weighted combination:
 ```
 score = (view_weight * view_score) +
         (recency_weight * recency_score) +
-        (filename_priority_weight * filename_priority_score)
+        (root_weight * root_score)
 ```
 
 **Default weights:**
 - `view_weight`: 0.5
 - `recency_weight`: 0.3
-- `filename_priority_weight`: 0.2
+- `root_weight`: 0.2
 
 **Score components:**
 - `view_score`: Normalized view count (0-1), with logarithmic scaling
 - `recency_score`: Decay function based on days since last view
-- `filename_priority_score`: Based on filename prefix—`README.md` and `00_*` score
-  1.0, `01_*` scores 0.9, `02_*` scores 0.8, and so on; unprefixed files score 0.5
+- `root_score`: 1.0 if the document is a root document (filename matches
+  directory name), 0.5 otherwise
 
 ## Command Usage
 
@@ -83,7 +83,7 @@ Run 'lat overview --reset-views' to clear history
       "id": "LROOTX",
       "name": "project-overview",
       "description": "High-level project architecture",
-      "path": "docs/README.md",
+      "path": "docs/project_overview.md",
       "type": "doc",
       "score": 0.92,
       "view_count": 15,
@@ -108,7 +108,7 @@ Weights can be customized in `.lattice/config.toml`:
 limit = 10
 view_weight = 0.5
 recency_weight = 0.3
-filename_priority_weight = 0.2
+root_weight = 0.2
 recency_half_life_days = 7
 ```
 
@@ -146,12 +146,12 @@ Within each distance tier, documents are ranked by:
    - `body-link`: 0.6 (referenced material)
    - `sibling`: 0.4 (related work)
 
-2. **Filename priority:** Documents with `README.md` or `00_*` filenames rank
-   highest, followed by `01_*`, `02_*`, etc. Unprefixed files rank lowest.
+2. **Root document priority:** Root documents (filename matches directory name)
+   rank higher than non-root documents.
 
 3. **For body links:** Position in document (earlier = higher)
 
-4. **For siblings:** Filename priority, then recency
+4. **For siblings:** Root documents first, then by recency
 
 ### Output
 

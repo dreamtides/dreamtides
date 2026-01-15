@@ -39,15 +39,18 @@ task that is not closed. Once all blockers are closed, the task becomes open.
 
 ### The `.closed/` Directory
 
-Closed tasks reside in a `.closed/` subdirectory under their original parent:
+Closed tasks reside in a `.closed/` subdirectory under the `tasks/` directory:
 
 ```
-tasks/auth/
-├── .closed/
-│   ├── fix_login.md      # Closed task
-│   └── oauth_bug.md      # Closed task
-├── README.md             # Open epic
-└── new_feature.md        # Open task
+auth/
+├── auth.md               # Root document (epic)
+├── docs/
+│   └── auth_design.md    # Knowledge base document
+└── tasks/
+    ├── new_feature.md    # Open task
+    └── .closed/
+        ├── fix_login.md  # Closed task
+        └── oauth_bug.md  # Closed task
 ```
 
 The `.closed/` directory is tracked in git, making closed tasks visible to all
@@ -106,19 +109,20 @@ base document**.
 Examples:
 
 ```bash
-# Knowledge base documents (no -t flag)
-lat create docs/auth/oauth_design.md "OAuth 2.0 implementation design"
+# Root document (matches directory name)
+lat create auth/auth.md "Authentication system epic" -t epic
+# Creates: name: auth, description: Authentication system epic
+
+# Knowledge base documents (no -t flag, in docs/ directory)
+lat create auth/docs/oauth_design.md "OAuth 2.0 implementation design"
 # Creates: name: oauth-design, description: OAuth 2.0 implementation design
 
-# Tasks (with -t flag)
-lat create tasks/auth/fix_login.md "Fix login after password reset" -t bug
+# Tasks (with -t flag, in tasks/ directory)
+lat create auth/tasks/fix_login.md "Fix login after password reset" -t bug
 # Creates: name: fix-login, description: Fix login after password reset
 
-lat create tasks/auth/oauth_support.md "Add OAuth 2.0 support" -t feature -p 1
+lat create auth/tasks/oauth_support.md "Add OAuth 2.0 support" -t feature -p 1
 # Creates: name: oauth-support, description: Add OAuth 2.0 support
-
-lat create tasks/auth/README.md "Authentication system epic" -t epic
-# Creates: name: readme, description: Authentication system epic
 ```
 
 Options:
@@ -131,19 +135,28 @@ Options:
 ## Filesystem Hierarchy
 
 ```
-tasks/
-├── README.md                # Project epic
+project/
+├── project.md               # Project root document
 ├── auth/
-│   ├── README.md            # Auth epic
-│   ├── login_bug.md
-│   └── oauth_feature.md
+│   ├── auth.md              # Auth root document (epic)
+│   ├── docs/
+│   │   └── auth_design.md   # Knowledge base documents
+│   └── tasks/
+│       ├── login_bug.md     # Task documents
+│       ├── oauth_feature.md
+│       └── .closed/
+│           └── old_task.md  # Closed tasks
 └── api/
-    ├── 00_api_design.md     # API epic
-    └── rate_limiting.md
+    ├── api.md               # API root document (epic)
+    ├── docs/
+    │   └── api_spec.md
+    └── tasks/
+        └── rate_limiting.md
 ```
 
-- All tasks in a directory are siblings
-- The root document (`README.md` or `00_*` prefixed file) is their parent/epic
+- Root documents have filenames matching their directory name
+- Tasks live in `tasks/` subdirectories, documents live in `docs/` subdirectories
+- The root document is the parent/epic for all documents in that directory tree
 - Nesting creates multi-level hierarchy
 
 ## Dependencies
@@ -206,9 +219,9 @@ Claims stored in `~/.lattice/claims/`, not in git. See
 
 ## Templates
 
-Tasks automatically inherit context and acceptance criteria from ancestor
-directory root documents (`README.md` or `00_*.md` files). No explicit template
-references are needed—the filesystem hierarchy IS the template structure.
+Tasks automatically inherit context and acceptance criteria from ancestor root
+documents (documents whose filename matches their directory name). No explicit
+template references are needed—the filesystem hierarchy IS the template structure.
 
 Root documents can include `[Lattice] Context` and `[Lattice] Acceptance
 Criteria` headings (any heading level):
@@ -222,7 +235,7 @@ rules and common patterns.
 
 ## Document Structure
 
-Example task document (`tasks/auth/fix_login.md`):
+Example task document (`auth/tasks/fix_login.md`):
 
 ```yaml
 ---
@@ -248,7 +261,7 @@ This appears to be a session invalidation issue.
 ```
 
 When this task is closed via `lat close LXXXXX`, it moves to
-`tasks/auth/.closed/fix_login.md` and all links are updated automatically.
+`auth/tasks/.closed/fix_login.md` and all links are updated automatically.
 
 The `name` field is always derived from the filename (underscores → hyphens,
 lowercase). This is a core Lattice invariant—the linter will warn if `name`

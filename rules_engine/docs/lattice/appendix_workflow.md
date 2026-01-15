@@ -141,11 +141,9 @@ is considered "related" if:
 2. **Not a dependency:** The document is not already listed in Depends on,
    Blocks, or Parent sections
 
-When multiple related documents exist, the selection considers document priority
-as indicated by filename prefixes (`00_`, `01_`, `02_`, etc.). Documents with
-lower-numbered prefixes (higher priority) are preferred when deciding which
-related documents to highlight. Root documents (named `README.md` or `00_*`)
-are given highest priority, followed by `01_*`, `02_*`, and so on.
+When multiple related documents exist, root documents (those whose filename
+matches their directory name) are highlighted preferentially as they typically
+provide important context.
 
 The list is ordered by first appearance in the body text. Maximum 10 related
 documents are shown in text output; use `--json` for complete list.

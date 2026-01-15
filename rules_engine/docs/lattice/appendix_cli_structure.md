@@ -105,12 +105,18 @@ Options: `-t, --type {type}`, `-p, --priority {n}`, `--body-file {path}`,
 
 Examples:
 ```bash
-lat create docs/auth/oauth_design.md "OAuth 2.0 implementation design"
-lat create tasks/auth/fix_login.md "Fix login after password reset" -t bug -p 1
+# Root document (epic)
+lat create auth/auth.md "Authentication system epic" -t epic
+
+# Knowledge base document (in docs/ directory)
+lat create auth/docs/oauth_design.md "OAuth 2.0 implementation design"
+
+# Task (in tasks/ directory)
+lat create auth/tasks/fix_login.md "Fix login after password reset" -t bug -p 1
 ```
 
-The path specifies directory location and filename. For epics, use `README.md`
-or `00_` prefix.
+The path specifies directory location and filename. For root documents (epics),
+use a filename matching the directory name (e.g., `auth/auth.md`).
 
 ### lat update {id} [id...] [options]
 
@@ -186,8 +192,8 @@ Search and filter documents. By default excludes closed tasks.
 - `--updated-after {date}`: Updated after date
 - `--updated-before {date}`: Updated before date
 - `--discovered-from {id}`: Tasks discovered from specified parent task
-- `--roots-only`: List only directory root documents (files named `README.md` or
-  with `00_` prefix)
+- `--roots-only`: List only root documents (files whose name matches their
+  containing directory, e.g., `api/api.md`)
 
 **Output Options:**
 - `--limit {n}`: Maximum results

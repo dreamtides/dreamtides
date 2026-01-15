@@ -24,7 +24,7 @@ line_width = 80               # Default format line width
 | `limit` | int | 10 | Default document count |
 | `view_weight` | float | 0.5 | Weight for view count in ranking |
 | `recency_weight` | float | 0.3 | Weight for last-viewed recency |
-| `filename_priority_weight` | float | 0.2 | Weight for filename prefix priority |
+| `root_weight` | float | 0.2 | Weight for root document priority |
 | `recency_half_life_days` | int | 7 | Days until recency score halves |
 
 ### [prime]

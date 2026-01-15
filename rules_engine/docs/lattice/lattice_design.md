@@ -120,21 +120,41 @@ Documents exceeding this should be split into multiple files using the
 
 ### Root Documents and Hierarchy
 
-Files with names starting with numeric prefixes like `00_`, `01_`, `02_`, etc.
-(e.g., `00_master_plan.md`) indicate document priority within a directory.
-Alternatively, a file named `README.md` serves the same purpose as a `00_`
-prefixed file. Both naming conventions are equally acceptable for marking the
-highest priority document that serves as the directory root, providing parent
-context for all other documents in that directory.
+A **root document** is a document whose filename (without `.md` extension)
+matches its containing directory name. For example, `api/api.md` is a root
+document because the filename `api` matches the directory name `api`. Root
+documents serve as the parent/epic for all other documents in that directory.
+
+The idiomatic Lattice directory structure separates tasks and documentation:
+
+```
+project/
+├── api/
+│   ├── api.md                    # Root document (matches directory name)
+│   ├── docs/
+│   │   ├── api_design.md         # Knowledge base documents
+│   │   └── security_model.md
+│   └── tasks/
+│       ├── implement_auth.md     # Task documents
+│       ├── fix_rate_limit.md
+│       └── .closed/
+│           └── add_logging.md    # Closed tasks
+└── database/
+    ├── database.md               # Root document
+    ├── docs/
+    │   └── schema_design.md
+    └── tasks/
+        └── migrate_tables.md
+```
 
 The `lat fmt` and `lat create` commands automatically populate the `parent-id`
 field in each document's frontmatter based on the directory's root document.
 This makes hierarchy explicit without requiring manual parent specification.
 Documents without a root document in their directory have no `parent-id`.
 
-Higher-numbered prefixes (`01_`, `02_`, etc.) indicate progressively lower
-priority. Commands like `lat show` and `lat overview` use these prefixes when
-selecting which related documents to highlight.
+The linter enforces this structure: documents must be either root documents,
+in a `tasks/` directory, or in a `docs/` directory. See
+[Appendix: Linter](appendix_linter.md) for the complete rule set.
 
 ## The ID System
 
@@ -272,16 +292,17 @@ specification, normalization algorithm, and edge cases.
 ## Task Tracking
 
 Tasks and knowledge base documents share a unified ID space. Hierarchy comes
-from the filesystem: all tasks in a directory are siblings, with the root
-document (`README.md` or `00_*`) as their parent epic.
+from the filesystem: all tasks in a `tasks/` directory are siblings, with the
+directory's root document (filename matching directory name) as their parent
+epic.
 
 Task state is determined by filesystem location, not by a status field:
-- **Open**: Task exists outside of any `.closed/` directory
+- **Open**: Task exists in a `tasks/` directory outside of any `.closed/`
 - **Blocked**: Task has open (non-closed) entries in its `blocked-by` field
-- **Closed**: Task resides in a `.closed/` subdirectory
+- **Closed**: Task resides in a `tasks/.closed/` subdirectory
 
-The `lat close` command moves tasks to `.closed/`, and `lat reopen` moves them
-back. The `lat prune` command permanently deletes closed tasks. There is no
+The `lat close` command moves tasks to `tasks/.closed/`, and `lat reopen` moves
+them back. The `lat prune` command permanently deletes closed tasks. There is no
 `in_progress` status; use `lat claim` for local work tracking.
 
 See [Appendix: Task Tracking](appendix_task_tracking.md) for lifecycle, types,
@@ -289,9 +310,10 @@ priorities, and dependencies.
 
 ## Task Templates
 
-Directory root documents can include `[Lattice] Context` and `[Lattice]
-Acceptance Criteria` sections that compose into descendant tasks at display
-time. Context composes general→specific; acceptance composes specific→general.
+Root documents (those with filenames matching their directory) can include
+`[Lattice] Context` and `[Lattice] Acceptance Criteria` sections that compose
+into descendant tasks at display time. Context composes general→specific;
+acceptance composes specific→general.
 
 See [Appendix: Task Templates](appendix_task_templates.md) for section format
 and composition rules.
@@ -299,8 +321,9 @@ and composition rules.
 ## Linter and Formatter
 
 **`lat check`** validates documents: duplicate/invalid IDs, broken references,
-invalid frontmatter, circular dependencies, missing required fields, and
-`.closed/` directory structure. Warnings for documents exceeding 500 lines.
+invalid frontmatter, circular dependencies, missing required fields, directory
+structure (root/docs/tasks), and document naming conventions. Warnings for
+documents exceeding 500 lines.
 
 **`lat fmt`** normalizes formatting: 80-char wrapping, ATX headers, dash list
 markers. Expands shorthand links, updates paths on rename/move.
@@ -308,8 +331,8 @@ markers. Expands shorthand links, updates paths on rename/move.
 **`lat split`** divides large documents by top-level sections into a root
 document with linked children.
 
-See [Appendix: Linter](appendix_linter.md) for complete rule set (E001-E010,
-W001-W016, S001-S003).
+See [Appendix: Linter](appendix_linter.md) for complete rule set (E001-E012,
+W001-W020, S001-S003).
 
 ## Index Architecture
 

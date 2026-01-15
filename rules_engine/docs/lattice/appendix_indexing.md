@@ -34,10 +34,21 @@ Index location: `.lattice/index.sqlite` (gitignored).
 | link_count | INTEGER | Outgoing links (trigger-maintained) |
 | backlink_count | INTEGER | Incoming links (trigger-maintained) |
 | view_count | INTEGER | Local view count (denormalized from views table) |
+| is_root | INTEGER | 1 if filename matches directory name, 0 otherwise |
+| in_tasks_dir | INTEGER | 1 if path contains `/tasks/`, 0 otherwise |
+| in_docs_dir | INTEGER | 1 if path contains `/docs/`, 0 otherwise |
 
 The `is_closed` column is computed from the `path` column: if the path contains
-`/.closed/` anywhere, the document is closed. This is set during indexing and
-updated when documents are moved via `lat close` or `lat reopen`.
+`/tasks/.closed/` or `/.closed/` anywhere, the document is closed. This is set
+during indexing and updated when documents are moved via `lat close` or
+`lat reopen`.
+
+The `is_root` column is computed by comparing the filename (without `.md`) to
+the containing directory name. For example, `api/api.md` has `is_root = 1`
+because the filename `api` matches the directory name `api`.
+
+The `in_tasks_dir` and `in_docs_dir` columns support lint rule validation for
+the standard directory structure.
 
 ### links
 

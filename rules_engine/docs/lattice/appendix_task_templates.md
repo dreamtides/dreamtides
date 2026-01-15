@@ -7,9 +7,9 @@ This appendix documents the task template system. See
 
 Task templates provide reusable context and acceptance criteria through the
 existing directory hierarchy. Rather than explicit template references, Lattice
-leverages directory root documents (`README.md` or `00_*.md` files) to
-automatically compose template content for all tasks in that directory and its
-subdirectories.
+leverages root documents (documents whose filename matches their directory name,
+e.g., `api/api.md`) to automatically compose template content for all tasks in
+that directory and its subdirectories.
 
 This design requires no additional frontmatter fields. The filesystem hierarchy
 IS the template structure. When a template changes, all tasks in that subtree
@@ -17,19 +17,19 @@ immediately reflect the update at display time.
 
 ## Template Sections in Root Documents
 
-Directory root documents can include two specially-marked sections that serve
-as templates for descendant tasks:
+Root documents (filename matches directory name) can include two specially-marked
+sections that serve as templates for descendant tasks:
 
 ```yaml
 ---
 lattice-id: LXXXXX
 task-type: epic
 priority: 1
-name: api-design
+name: api
 description: API subsystem tasks
 ---
 
-# API Design Epic
+# API Subsystem Epic
 
 Overview of the API subsystem work.
 
@@ -68,26 +68,30 @@ ancestor root documents. Template content composes in hierarchy order:
 
 ```
 project/
-├── README.md            # Project-wide context and acceptance
+├── project.md           # Project-wide context and acceptance
 ├── api/
-│   ├── README.md        # API context and acceptance
-│   └── create/
-│       ├── README.md    # Create-endpoint context and acceptance
-│       └── fix_bug.md   # Task inherits from all three ancestors
+│   ├── api.md           # API context and acceptance
+│   ├── docs/
+│   │   └── api_spec.md  # Knowledge base document
+│   └── tasks/
+│       └── create/
+│           ├── create.md    # Create-endpoint context and acceptance
+│           └── tasks/
+│               └── fix_bug.md   # Task inherits from ancestors
 ```
 
 For `fix_bug.md`, the composition is:
 
 **Context order (general → specific):**
-1. `README.md` (project root) [Lattice] Context section
-2. `api/README.md` [Lattice] Context section
-3. `api/create/README.md` [Lattice] Context section
+1. `project.md` (project root) [Lattice] Context section
+2. `api/api.md` [Lattice] Context section
+3. `api/tasks/create/create.md` [Lattice] Context section
 4. `fix_bug.md` body
 
 **Acceptance order (specific → general):**
-1. `api/create/README.md` [Lattice] Acceptance Criteria section
-2. `api/README.md` [Lattice] Acceptance Criteria section
-3. `README.md` (project root) [Lattice] Acceptance Criteria section
+1. `api/tasks/create/create.md` [Lattice] Acceptance Criteria section
+2. `api/api.md` [Lattice] Acceptance Criteria section
+3. `project.md` (project root) [Lattice] Acceptance Criteria section
 
 This ordering ensures tasks receive appropriately scoped context up front
 (broad project context first, then domain-specific details), while universal
@@ -129,15 +133,15 @@ content without ancestor context or acceptance criteria.
 
 For a document to provide template content to descendants:
 
-1. **Must be a directory root:** Filename is either `README.md` or starts with
-   `00_` prefix (both are equally acceptable)
+1. **Must be a root document:** Filename (without `.md`) matches the containing
+   directory name (e.g., `api/api.md`, `create/create.md`)
 2. **Must have marked sections:** Include `[Lattice] Context` and/or
    `[Lattice] Acceptance Criteria` headings
 3. **Sections are optional:** A root without these sections simply provides
    no template content (descendants still inherit from higher ancestors)
 
-Non-root documents (`01_*.md`, `02_*.md`, or other unprefixed files) never
-provide template content, even if they contain `[Lattice]` sections.
+Non-root documents (those whose filename does not match the directory name)
+never provide template content, even if they contain `[Lattice]` sections.
 
 ## Skipping Levels
 
@@ -146,15 +150,17 @@ in the ancestry chain:
 
 ```
 project/
-├── README.md            # Has [Lattice] Context
+├── project.md           # Has [Lattice] Context
 ├── api/
-│   └── create/
-│       ├── 00_create.md # Has [Lattice] Context (no api/README.md exists)
-│       └── task.md
+│   └── tasks/
+│       └── create/
+│           ├── create.md    # Has [Lattice] Context (no api/api.md exists)
+│           └── tasks/
+│               └── implement_endpoint.md
 ```
 
-Task inherits from `README.md` and `00_create.md` directly. The missing
-`api/README.md` creates no gap—the chain simply doesn't include that level.
+The task inherits from `project.md` and `create.md` directly. The missing
+`api/api.md` creates no gap—the chain simply doesn't include that level.
 
 ## Linter Rules
 
@@ -171,8 +177,9 @@ Template information appears in `lat show --json` output:
   "id": "LZZZZZ",
   "description": "Fix validation bug in create endpoint",
   "ancestors": [
-    {"id": "LPROJX", "name": "project-overview", "path": "README.md"},
-    {"id": "LCREAX", "name": "create-endpoint", "path": "api/create/README.md"}
+    {"id": "LPROJX", "name": "project", "path": "project.md"},
+    {"id": "LAPIXX", "name": "api", "path": "api/api.md"},
+    {"id": "LCREAX", "name": "create", "path": "api/tasks/create/create.md"}
   ],
   "composed_context": "Project context...\nAPI context...\nCreate context...",
   "composed_acceptance": "- [ ] Create checks\n- [ ] API checks\n- [ ] Project checks",

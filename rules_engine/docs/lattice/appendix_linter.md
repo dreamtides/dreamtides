@@ -300,12 +300,61 @@ List not surrounded by blank lines.
 
 Non-root document contains `[Lattice]` template sections.
 
-**Detection:** Check for `[Lattice]` headings in files that are neither
-`README.md` nor `00_*` prefixed.
+**Detection:** Check for `[Lattice]` headings in files that are not root
+documents (filename does not match containing directory name).
 
 **Message:** `Warning [W016]: path/task.md has [Lattice] sections but is not a root`
 
 **Fix:** Move content to the directory's root document or remove sections.
+
+### W017: Document Not in Standard Location
+
+Document is not a root document and is not inside a `tasks/` or `docs/`
+directory.
+
+**Detection:** Check if document is either: (a) a root document (filename
+matches directory name), or (b) its path contains `/tasks/` or `/docs/`.
+
+**Message:** `Warning [W017]: path/loose_doc.md is not in tasks/ or docs/ directory`
+
+**Fix:** Move to appropriate subdirectory: `tasks/` for task documents,
+`docs/` for knowledge base documents.
+
+### W018: Task in docs/ Directory
+
+A task document (has `task-type` field) is located in a `docs/` directory.
+
+**Detection:** Check if path contains `/docs/` and document has `task-type`
+frontmatter field.
+
+**Message:** `Warning [W018]: docs/some_task.md is a task but located in docs/`
+
+**Fix:** Move to the `tasks/` directory instead.
+
+### W019: Knowledge Base Document in tasks/ Directory
+
+A knowledge base document (no `task-type` field) is located in a `tasks/`
+directory.
+
+**Detection:** Check if path contains `/tasks/` and document lacks `task-type`
+frontmatter field.
+
+**Message:** `Warning [W019]: tasks/design_doc.md is a knowledge base document but located in tasks/`
+
+**Fix:** Move to the `docs/` directory instead.
+
+### W020: Invalid Document Name Format
+
+Non-root document name does not follow the required naming convention: at least
+two words, underscore separated, all lowercase.
+
+**Detection:** For non-root documents, check if filename (without `.md`)
+contains at least one underscore and consists only of lowercase letters,
+numbers, and underscores.
+
+**Message:** `Warning [W020]: tasks/fixbug.md should be at least two words (e.g., fix_bug.md)`
+
+**Fix:** Rename file to use underscore-separated lowercase words (minimum 2 words).
 
 ## Skill-Specific Rules
 

@@ -44,8 +44,8 @@ Standard lat commands with random valid and invalid arguments:
 
 - `lat create` with random paths, types, metadata
 - `lat update` with random field changes
-- `lat close` on random tasks (moves to `.closed/`)
-- `lat reopen` on random closed tasks (moves from `.closed/`)
+- `lat close` on random tasks (moves to `tasks/.closed/`)
+- `lat reopen` on random closed tasks (moves from `tasks/.closed/`)
 - `lat prune` with and without `--force`
 - `lat mv` to random destinations
 - `lat search` with random queries
@@ -85,8 +85,11 @@ After every operation, validate:
    (Lattice should ensure valid git state before operating)
 5. **No panics**: Previous operation completed without a panic or system error
 6. **Closed state consistency**: Index `is_closed` matches path containing
-   `/.closed/`
-7. **Link path validity**: After `lat close`/`lat reopen`, all links to moved
+   `/tasks/.closed/` or `/.closed/`
+7. **Root document consistency**: Index `is_root` matches filename = directory name
+8. **Directory structure consistency**: Index `in_tasks_dir` and `in_docs_dir`
+   match path components
+9. **Link path validity**: After `lat close`/`lat reopen`, all links to moved
    documents point to current paths
 
 Note: Broken links are **not** invariant violations. Documents may reference

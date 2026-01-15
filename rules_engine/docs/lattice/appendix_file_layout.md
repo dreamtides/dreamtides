@@ -322,8 +322,9 @@ claim/
 lint/
 ├── mod.rs                  # Module declarations only
 ├── rule_engine.rs          # Execute rules, collect results
-├── error_rules.rs          # E001-E010 (blocking errors)
-├── warning_rules.rs        # W001-W016 (or warning_rules/ directory with per-rule files)
+├── error_rules.rs          # E001-E012 (blocking errors)
+├── warning_rules.rs        # W001-W020 (or warning_rules/ directory with per-rule files)
+├── structure_rules.rs      # W017-W020 (directory structure and naming conventions)
 ├── skill_rules.rs          # S001-S003 (skill document validation)
 ├── result_reporter.rs      # Format and output lint results
 └── autofix_engine.rs       # Apply automatic fixes where possible
@@ -350,7 +351,9 @@ task/
 ├── task_priority.rs        # Priority levels (P0-P4)
 ├── ready_calculator.rs     # Determine which tasks are ready for work
 ├── dependency_graph.rs     # Build and query blocking relationships
-├── closed_directory.rs     # .closed/ directory path utilities
+├── closed_directory.rs     # tasks/.closed/ directory path utilities
+├── root_detection.rs       # Detect root documents (filename matches directory)
+├── directory_structure.rs  # Validate docs/tasks directory structure
 └── template_composer.rs    # Compose context/acceptance from ancestors
 ```
 
