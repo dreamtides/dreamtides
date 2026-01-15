@@ -77,33 +77,14 @@ recommendations for each configuration.
 
 ## Client ID Storage
 
-### Configuration File
+Client IDs are stored in `~/.lattice.toml` keyed by repository path. This file
+persists across repository deletion/re-clone.
 
-Client IDs are stored in `~/.lattice.toml`:
+When first using Lattice in a repository, a random client ID is generated
+avoiding existing IDs and stored in the config.
 
-```toml
-[clients]
-"/path/to/repo" = "DT"
-"/other/repo" = "K2"
-```
-
-This file persists across repository deletion and re-clone, preserving
-the client's ID assignment.
-
-### ID Selection
-
-When a client first uses Lattice in a repository:
-1. Check if an ID exists in `~/.lattice.toml` for this path
-2. If not, query the repository for all existing client IDs
-3. Generate a random ID avoiding existing IDs
-4. Store the mapping in `~/.lattice.toml`
-
-### ID Length Rules
-
-- Default: 3-character IDs (32768 possible values) for 0-16 known clients
-- 4 characters if >16 known clients (1048576 possible)
-- 5 characters if >64 known clients (33554432 possible)
-- 6 characters if >256 known clients (1073741824 possible)
+See [Appendix: ID System](appendix_id_system.md) for ID format, length scaling,
+and generation algorithm.
 
 ## Conflict Detection
 

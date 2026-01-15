@@ -66,18 +66,9 @@ existing backup) and create fresh log file.
 
 ## SQLite Connection Setup
 
-Every database connection executes configuration pragmas:
-
-```sql
-PRAGMA journal_mode = WAL;
-PRAGMA synchronous = NORMAL;
-PRAGMA temp_store = MEMORY;
-PRAGMA mmap_size = 268435456;
-PRAGMA busy_timeout = 5000;
-```
-
-These settings optimize for Lattice's rebuildable-cache use case. See
-[Appendix: Indexing](appendix_indexing.md#sqlite-configuration) for details.
+Every database connection executes WAL mode and performance pragmas. See
+[Appendix: Indexing](appendix_indexing.md#sqlite-configuration) for the
+complete configuration.
 
 ## Performance Budget
 

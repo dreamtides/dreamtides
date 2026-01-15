@@ -40,7 +40,7 @@ Output AI workflow context. Options: `--full`, `--export`.
 Show critical documents. Without arguments, shows repository-level overview ranked
 by view frequency, recency, and filename priority. With an ID argument, shows
 contextual documents relevant to that task. See
-[Appendix: Overview Command](appendix_overview.md).
+[Appendix: Overview Command](appendix_overview_command.md).
 
 Options: `--limit {n}`, `--type {type}`, `--path {prefix}`, `--include-closed`,
 `--reset-views`.

@@ -369,6 +369,9 @@ log/
 
 ### error/
 
+See [Appendix: Error Handling](appendix_error_handling.md) for the error
+philosophy, taxonomy, and patterns.
+
 ```
 error/
 ├── mod.rs                  # Module declarations only

@@ -159,16 +159,9 @@ Task inherits from `README.md` and `00_create.md` directly. The missing
 
 ## Linter Rules
 
-### W023: Template Section in Non-Root
-
-Non-root document contains `[Lattice]` template sections.
-
-**Detection:** Check for `[Lattice]` headings in files that are neither
-`README.md` nor `00_*` prefixed.
-
-**Message:** `Warning [W023]: path/task.md has [Lattice] sections but is not a root`
-
-**Fix:** Move content to the directory's root document or remove sections.
+`lat check` enforces W023: template sections in non-root documents. See
+[Appendix: Linter](appendix_linter.md#w023-template-section-in-non-root)
+for details.
 
 ## JSON Output
 

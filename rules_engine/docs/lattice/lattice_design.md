@@ -139,24 +139,12 @@ selecting which related documents to highlight.
 
 ## The ID System
 
-A Lattice ID is a compact, human-typeable identifier consisting of:
+A Lattice ID is a compact, human-typeable identifier: `L` prefix + Base32
+document counter + Base32 client ID. Example: `LK3DTX` (document 675, client
+DTX). Uses RFC 4648 Base32 (A-Z, 2-7) avoiding ambiguous characters.
 
-1. A literal `L` prefix
-2. A document counter (minimum 2 digits, RFC 4648 Base32 encoded)
-3. A client identifier (3-6 digits, RFC 4648 Base32 encoded)
-
-Example: `LK3DTX` represents document `K3` (decimal 675) from client `DTX`.
-
-The Base32 encoding uses the RFC 4648 alphabet (A-Z followed by 2-7), avoiding
-ambiguous characters like 0/O and 1/I. Client IDs are stored in `~/.lattice.toml`
-and scale in length with the number of known clients. Document counters start at
-50 (Base32: `BS`) to ensure minimum 6-character IDs overall.
-
-Collision detection occurs during `lat check`. The `lat generate-ids` command
-pre-allocates IDs for document authors.
-
-See [Appendix: ID System](appendix_id_system.md) for the complete ID generation
-algorithm, collision handling, and client identification details.
+See [Appendix: ID System](appendix_id_system.md) for generation algorithm,
+collision handling, and client identification.
 
 ## Command Overview
 
@@ -193,7 +181,7 @@ on status change.
 
 See [Appendix: Workflow](appendix_workflow.md) for complete command specifications,
 output formats, and claiming behavior, and
-[Appendix: Overview Command](appendix_overview.md) for the ranking algorithm.
+[Appendix: Overview Command](appendix_overview_command.md) for the ranking algorithm.
 
 ### Task and Document Management
 
@@ -242,259 +230,102 @@ See [Appendix: Linter](appendix_linter.md) for validation rules and
 
 ## Linking System
 
-### Link Format
+Lattice links use standard markdown with relative paths and Lattice ID
+fragments: `[text](path/doc.md#LJCQ2X)`. Write shorthand `[text](LJCQ2X)` and
+`lat fmt` expands to full path. The index maintains bidirectional references
+for impact analysis.
 
-Lattice links use standard markdown syntax combining relative file paths with
-Lattice ID fragments:
-
-```
-See the [error handling](docs/error_handling.md#LJCQ2X) document for details
-```
-
-The `lat fmt` command normalizes links and handles several cases:
-- `[text](../path/to/doc.md)` -> fills in Lattice ID if valid document
-- `[text](LJCQ2X)` -> adds file path
-- Detects document renames/moves and rewrites links to new paths
-
-All links use relative file system paths from the linking document's location.
-
-See [Appendix: Linking System](appendix_linking_system.md) for the complete
-link format specification and edge cases.
-
-### Bidirectional References
-
-The index maintains a reverse reference map enabling queries like "what
-documents link to this one?" This powers features like impact analysis
-when modifying or deleting documents.
+See [Appendix: Linking System](appendix_linking_system.md) for link format
+specification, normalization algorithm, and edge cases.
 
 ## Task Tracking
 
-### Integration with Knowledge Base
+Tasks and knowledge base documents share a unified ID space. Hierarchy comes
+from the filesystem: all tasks in a directory are siblings, with the root
+document (`README.md` or `00_*`) as their parent epic.
 
-Tasks and knowledge base documents share a unified ID space, enabling
-seamless cross-referencing. A task can link to design documents, and
-design documents can reference tasks that track their implementation.
+Status transitions: `open ↔ blocked → closed` (plus `tombstone` for permanent
+deletion). No `in_progress` status; use `lat claim` for local work tracking.
 
-The primary organizational mechanism is the filesystem hierarchy rather
-than explicit parent-child relationships. All tasks in a directory are
-implicitly siblings, with the directory's root document acting as their
-parent or "epic." This replaces beads' explicit epic/child model.
-
-### Task Lifecycle
-
-Task status transitions follow a state machine:
-
-```
-open <---> blocked
-  |           |
-  v           v
-closed <------+
-```
-
-The `tombstone` status represents deleted tasks that should not be
-resurrected.
-
-There is no "in_progress" status in Lattice. Instead, the `lat claim`
-command tracks which machine is working on a task locally, without
-modifying the task file.
-
-See [Appendix: Task Tracking](appendix_task_tracking.md) for the complete
-state machine and transition rules.
-
-### CLI Commands
-
-The task CLI follows beads' design philosophy, adapted for Lattice's
-filesystem-centric model. Key differences from beads:
-
-- Tasks require a path on creation to specify filesystem location
-- No explicit parent/child relationships; hierarchy comes from directories
-- The `name` field replaces beads' `title` concept
-- No sync command; Lattice never performs git push operations
-
-See [Appendix: CLI Structure](appendix_cli_structure.md) for the complete
-command reference.
+See [Appendix: Task Tracking](appendix_task_tracking.md) for lifecycle, types,
+priorities, and dependencies.
 
 ## Task Templates
 
-Task templates provide reusable context and acceptance criteria through the
-existing directory hierarchy. Directory root documents (`README.md` or `00_*.md`
-files) can include `[Lattice] Context` and `[Lattice] Acceptance Criteria`
-headings that automatically compose into all descendant tasks at display time.
+Directory root documents can include `[Lattice] Context` and `[Lattice]
+Acceptance Criteria` sections that compose into descendant tasks at display
+time. Context composes general→specific; acceptance composes specific→general.
 
-This design requires no additional frontmatter fields—the filesystem hierarchy
-IS the template structure. When displaying a task, Lattice walks up the
-directory tree collecting ancestor root documents. Context sections compose
-general-to-specific (project first, then domain, then subdomain). Acceptance
-criteria compose specific-to-general, ensuring universal requirements like
-"create git commit" anchor at the end.
-
-See [Appendix: Task Templates](appendix_task_templates.md) for the complete
-section format, composition rules, and common patterns.
+See [Appendix: Task Templates](appendix_task_templates.md) for section format
+and composition rules.
 
 ## Linter and Formatter
 
-### The Check Command
+**`lat check`** validates documents: duplicate/invalid IDs, broken references,
+invalid frontmatter, circular dependencies, missing required fields. Warnings
+for documents exceeding 500 lines.
 
-The `lat check` command validates documents and repository state:
+**`lat fmt`** normalizes formatting: 80-char wrapping, ATX headers, dash list
+markers. Expands shorthand links, updates paths on rename/move.
 
-**Error-level checks (prevent operations):**
-- Duplicate Lattice IDs
-- Invalid Lattice IDs
-- References to nonexistent IDs
-- Invalid YAML frontmatter keys
-- Missing required fields (`name`, `description`, and task-specific fields)
-- Name-filename mismatch (name must derive from filename)
-- Invalid status/type/priority values
-- Circular blocking dependencies
+**`lat split`** divides large documents by top-level sections into a root
+document with linked children.
 
-**Warning-level checks:**
-- Document exceeds 500 lines
-- Markdown lint problems (inconsistent headers, bare URLs, etc.)
-- Time-sensitive content detection (dates, "after August 2025", etc.)
-- Inconsistent terminology within a document
-
-The linter integrates mechanically verifiable rules from Claude's Skill
-authoring best practices, including path format validation (no backslashes),
-description length limits, and name format requirements.
-
-See [Appendix: Linter](appendix_linter.md) for the complete rule set.
-
-### The Format Command
-
-The `lat fmt` command applies consistent formatting:
-
-- Text wrapping at 80 characters (configurable)
-- Consistent header styles (ATX headers with space after #)
-- Consistent list markers (dashes for unordered)
-- Proper indentation normalization
-- Adding missing `name` fields from document filename
-- Link normalization: adds Lattice ID fragments to file path links
-- Link expansion: converts bare ID links `[text](LJCQ2X)` to full path+fragment
-- Link maintenance: updates paths when documents are renamed or moved
-
-The formatter attempts to auto-correct problems identified by `lat check`
-when a deterministic fix exists.
-
-### The Split Command
-
-The `lat split` command takes a large document and divides it by top-level
-sections:
-
-1. The first text block and first section become a root document (e.g., `README.md`)
-2. Each subsequent section becomes a standalone document with a numeric prefix
-3. The root document receives links to all child documents
-4. All new documents receive generated Lattice IDs
-
-This enables progressive breakdown of monolithic documents into
-AI-friendly sizes.
+See [Appendix: Linter](appendix_linter.md) for complete rule set (E001-E010,
+W001-W017, S001-S003).
 
 ## Index Architecture
 
-The SQLite index stores document metadata, link relationships, and search
-indices. Key tables include `documents`, `links`, `labels`, `fts_content`
-(full-text search), `client_counters`, `directory_roots` (precomputed
-hierarchy), and `content_cache`.
+SQLite index (`.lattice/index.sqlite`, gitignored) stores document metadata,
+links, labels, and FTS5 full-text search. Reconciliation uses git to detect
+changes; falls back to full rebuild when uncertain.
 
-Index reconciliation uses git metadata to determine staleness—querying for
-modified files, re-indexing changes, and falling back to full rebuild when
-git state is unclear. The index lives in `.lattice/index.sqlite` (gitignored).
-
-See [Appendix: Indexing](appendix_indexing.md) for the complete schema,
-reconciliation algorithm, and performance tuning.
+See [Appendix: Indexing](appendix_indexing.md) for schema, reconciliation
+algorithm, and performance tuning.
 
 ## Git Integration
 
-Lattice uses git as the authoritative store. Documents are discovered via
-`git ls-files` (not filesystem traversal), and changes are detected via
-`git diff` and `git status`. Lattice never performs git push or sync
-operations—this supports multi-agent workflows where a coordinator manages
-synchronization externally.
+Git is the authoritative store. Documents discovered via `git ls-files`;
+changes via `git diff`/`git status`. Lattice never performs git push/sync.
 
-See [Appendix: Git Integration](appendix_git_integration.md) for the complete
-specification and [Appendix: Git Edge Cases](appendix_git_edge_cases.md) for
-behavior in non-standard configurations (shallow clones, worktrees, submodules).
+See [Appendix: Git Integration](appendix_git_integration.md) for operations
+and [Appendix: Git Edge Cases](appendix_git_edge_cases.md) for shallow clones,
+worktrees, submodules, etc.
 
 ## Skill Integration
 
-### Automatic Skill Generation
+Documents with `skill: true` become Claude Skills via symlinks in
+`.claude/skills/`. The `name` (max 64 chars) and `description` (max 1024 chars)
+fields follow Claude's SKILL.md validation rules.
 
-Documents with `skill: true` in their frontmatter automatically become Claude
-Skills. Lattice generates symlinks in `.claude/skills/` pointing to the actual
-Lattice documents, enabling Claude Code to discover them without file
-duplication. This operation happens transparently as part of startup operations
-on *every* `lat` command invocation.  See [Appendix: Startup
-Operations](appendix_startup_operations.md).
-
-### Format Compatibility
-
-Lattice deliberately avoids conflicts with Claude's SKILL.md format. The
-`name` and `description` fields follow Claude's validation rules:
-
-- `name`: Max 64 characters, lowercase letters/numbers/hyphens only
-- `description`: Max 1024 characters, non-empty
-
-When a Lattice document is marked as a skill, `lat check` enforces these
-stricter validation rules.
-
-See [Appendix: Claude Code Integration](appendix_ai_integration.md) for hooks
-that guide agents to use `lat show` and auto-expand Lattice IDs in prompts.
+See [Appendix: AI Integration](appendix_ai_integration.md) for hooks and
+[Appendix: Startup Operations](appendix_startup_operations.md) for symlink sync.
 
 ## Configuration
 
-Lattice configuration is layered: built-in defaults, user config
-(`~/.lattice.toml`), repository config (`.lattice/config.toml`), environment
-variables, and command-line flags. See
-[Appendix: Configuration](appendix_configuration.md) for all options.
+Layered: defaults → `~/.lattice.toml` → `.lattice/config.toml` → env vars →
+CLI flags. See [Appendix: Configuration](appendix_configuration.md).
 
-## Logging and Observability
+## Logging
 
-All operations log to `.lattice/logs.jsonl` in newline-delimited JSON, capturing
-timestamps, operation types, details, duration, and success/failure status. The
-`--verbose` flag increases output detail; `--json` switches to structured output.
+Operations log to `.lattice/logs.jsonl` (JSONL). Use `--verbose` for detail,
+`--json` for structured output.
 
-## Testing Architecture
+## Testing
 
-All tests exercise the public CLI interface (black-box testing). Git operations
-go through the `GitOps` trait, enabling test injection—production uses `RealGit`;
-tests inject `FakeGit` (in-memory state). Filesystem and SQLite use real
-implementations for better edge-case coverage.
-
-See [Appendix: Testing Strategy](appendix_testing_strategy.md) for the complete
-testing architecture.
+Black-box CLI tests with `GitOps` trait for injection (`FakeGit` in tests).
+See [Appendix: Testing Strategy](appendix_testing_strategy.md).
 
 ## Chaos Monkey
 
-The `lat chaosmonkey` command performs automated fuzz testing by executing random
-sequences of operations (create, modify, delete, link, git operations) until a
-system error occurs. This surfaces edge cases and interaction bugs that
-deterministic tests miss.
-
-See [Appendix: Chaos Monkey](appendix_chaos_monkey.md) for the complete operation
-specification and invariant definitions.
+`lat chaosmonkey` runs random operations until system error, surfacing edge
+cases. See [Appendix: Chaos Monkey](appendix_chaos_monkey.md).
 
 ## UI Design
 
-### Color Theme
-
-Lattice uses the Ayu color theme following beads' UI philosophy:
-
-- **Pass (green)**: Success, completion, ready states
-- **Warn (yellow)**: Attention needed
-- **Fail (red)**: Errors, blocked, critical
-- **Accent (blue)**: Navigation, emphasis, links
-- **Muted (gray)**: De-emphasized, closed, metadata
-- **Bold**: Command names, flag names
-
-Colors support both light and dark terminal modes through adaptive values.
-
-### Design Principles
-
-Following Tufte's principles:
-
-- Maximize data-ink ratio; color only what demands attention
-- Use whitespace and position for grouping
-- Reserve color for semantic states, not decoration
-- Keep help text copy-paste friendly (no color in examples)
+Ayu color theme: green (success), yellow (warning), red (error), blue (accent),
+gray (muted). Following Tufte's principles—maximize data-ink ratio, reserve
+color for semantic states.
 
 ## Error Handling
 
@@ -516,45 +347,21 @@ searches for panics and runs using `RUST_BACKTRACE=1`.
 
 Essentially this distinction is about *ownership*. If it is Lattice's "fault"
 that a problem happened, we should panic. If it was the user's "fault" because
-they did something wrong, we should not. Obviously this a judgment call, in gray
-areas we can default to the panic option.
+they did something wrong, we should not. Obviously this is a judgment call; in
+gray areas we can default to the panic option.
 
-### Structured Error Output
+For user errors, provide clear guidance on how to fix the problem. For system
+errors, log extensively and suggest running `lat check` or rebuilding the index.
+Never silently ignore errors. The `--json` flag provides structured error output
+for programmatic handling.
 
-All errors include structured information for programmatic handling:
-
-```json
-{
-  "error_code": "E002",
-  "message": "Reference to nonexistent ID",
-  "affected_documents": ["LXXXXX"],
-  "location": {"path": "docs/example.md", "line": 42},
-  "suggestion": "Create the target document or correct the ID",
-  "fix_command": "lat create docs/target.md"
-}
-```
-
-The `--json` flag ensures all commands output errors in this structured format.
-
-### Recovery Strategy
-
-For user errors, provide clear guidance on how to fix the problem. For
-system errors, log extensively and suggest running `lat check` or
-rebuilding the index. Never silently ignore errors.
+See [Appendix: Error Handling](appendix_error_handling.md) for the complete
+error taxonomy, structured output format, recovery strategies, and
+implementation patterns.
 
 ## Project File Layout
 
-See [Appendix: File Layout](appendix_file_layout.md) for the complete
-Rust source file organization.
+Implementation: `rules_engine/src/lattice/` with modules for cli, index,
+document, git, format, link, claim, lint, id, task, skill, log, error, test.
 
-The implementation lives under `rules_engine/src/lattice/` with the
-following module structure:
-
-- `cli/`: Command-line interface and argument parsing
-- `index/`: SQLite schema, queries, and reconciliation
-- `document/`: Parsing, validation, and manipulation
-- `git/`: Git integration and change detection
-- `format/`: Markdown formatting and wrapping
-- `link/`: Link resolution and reference tracking
-- `claim/`: Local claim tracking
-- `test/`: Test utilities and fakes
+See [Appendix: File Layout](appendix_file_layout.md) for detailed structure.
