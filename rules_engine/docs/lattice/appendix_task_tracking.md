@@ -93,36 +93,55 @@ rather than deriving from git history.
 
 ## Creating Documents
 
-All documents (tasks and knowledge base) require a description as a positional
-argument:
+The `lat create` command uses convention-based placement and auto-generated
+filenames to minimize friction:
 
 ```bash
-lat create <path> "<description>" [options]
+lat create <parent> "<description>" [options]
 ```
 
-The `name` field is derived automatically from the filename (underscores become
-hyphens). The description is required for all document types.
+**Auto-placement:** The `-t` flag determines the subdirectory:
+- With `-t`: document is created in `<parent>/tasks/`
+- Without `-t`: document is created in `<parent>/docs/`
 
-To create a **task**, include the `-t` flag. Omitting `-t` creates a **knowledge
-base document**.
+**Auto-naming:** The filename is generated from the description:
+- Extract significant words (skip articles like "the", "a", "an")
+- Convert to lowercase with underscores
+- Cap at ~40 characters
+- Append numeric suffix on collision (`fix_bug.md`, `fix_bug_2.md`)
+
+The `name` field is derived from the generated filename (underscores become
+hyphens). The filename is immutable after creation even if the description
+is later edited.
 
 Examples:
 
 ```bash
-# Root document (matches directory name)
+# Task - auto-placed in auth/tasks/, filename from description
+lat create auth/ "Fix login after password reset" -t bug
+# Creates: auth/tasks/fix_login_after_password_reset.md
+# name: fix-login-after-password-reset
+
+# Knowledge base - auto-placed in auth/docs/
+lat create auth/ "OAuth 2.0 implementation design"
+# Creates: auth/docs/oauth_implementation_design.md
+# name: oauth-implementation-design
+
+# Task with priority
+lat create auth/ "Add OAuth 2.0 support" -t feature -p 1
+# Creates: auth/tasks/add_oauth_support.md
+
+# Root document - explicit path required (filename must match directory)
 lat create auth/auth.md "Authentication system epic" -t epic
-# Creates: name: auth, description: Authentication system epic
+# Creates: auth/auth.md (root document for auth/ hierarchy)
+```
 
-# Knowledge base documents (no -t flag, in docs/ directory)
-lat create auth/docs/oauth_design.md "OAuth 2.0 implementation design"
-# Creates: name: oauth-design, description: OAuth 2.0 implementation design
+**Explicit paths:** You can still specify a full path when you want control
+over the filename:
 
-# Tasks (with -t flag, in tasks/ directory)
-lat create auth/tasks/fix_login.md "Fix login after password reset" -t bug
-# Creates: name: fix-login, description: Fix login after password reset
-
-lat create auth/tasks/oauth_support.md "Add OAuth 2.0 support" -t feature -p 1
-# Creates: name: oauth-support, description: Add OAuth 2.0 support
+```bash
+lat create auth/tasks/oauth_bug.md "Fix OAuth token validation error" -t bug
+# Creates: auth/tasks/oauth_bug.md (explicit short name)
 ```
 
 Options:
@@ -181,9 +200,8 @@ Tracks provenance when work is discovered during another task. This is a soft li
 that does not affect the ready queue.
 
 ```bash
-# Create task with discovered-from link
-lat create tasks/auth/fix_token_bug.md "Fix token validation" -t bug -p 1 \
-  --deps discovered-from:LXXXXX
+# Create task with discovered-from link (auto-placed in auth/tasks/)
+lat create auth/ "Fix token validation" -t bug -p 1 --deps discovered-from:LXXXXX
 
 # Query tasks discovered from a parent
 lat list --discovered-from LXXXXX

@@ -59,9 +59,9 @@ With `--json`, errors include machine-readable fields:
   "category": "validation",
   "message": "Reference to nonexistent ID",
   "affected_documents": ["LXXXXX"],
-  "location": {"path": "docs/auth/login.md", "line": 42, "column": 15},
+  "location": {"path": "auth/docs/login.md", "line": 42, "column": 15},
   "suggestion": "Create the target document or correct the ID",
-  "fix_command": "lat create docs/target.md \"Description\""
+  "fix_command": "lat create auth/ \"Target document description\""
 }
 ```
 
@@ -81,7 +81,8 @@ With `--json`, errors include machine-readable fields:
 | Impossible States | Match arm that should be unreachable |
 
 Use `panic!` with descriptive messages. Use `human-panic` crate for
-user-friendly crash output.
+user-friendly crash output. The [Appendix: Chaos Monkey](appendix_chaos_monkey.md)
+tests for panics and other system errors.
 
 ### When to Panic
 

@@ -116,7 +116,9 @@ hot documents and enabling efficient queries that need body content.
 | last_viewed | TEXT | ISO 8601 timestamp |
 
 View tracking is stored in SQLite (not a separate JSON file) for concurrent
-safety. SQLite handles concurrent reads/writes via WAL mode.
+safety. SQLite handles concurrent reads/writes via WAL mode. See
+[Appendix: Overview Command](appendix_overview_command.md) for how view data
+influences document ranking.
 
 **Denormalization note:** The `documents.view_count` column is a denormalized
 copy of `views.view_count`, maintained by triggers for query performance. This

@@ -207,11 +207,12 @@ output formats, and claiming behavior, and
 
 Commands for creating and modifying tasks and documents.
 
-**lat create** - Creates new documents with `lat create <path> "<description>"
-[options]`. Works for both tasks and knowledge base documents. The `name` field
-is derived from the filename automatically. The description is a required
-positional argument. For tasks, add `-t <type>` to specify task type; omitting
-`-t` creates a knowledge base document. Supports priority, labels, and
+**lat create** - Creates new documents with `lat create <parent> "<description>"
+[options]`. The path argument specifies the parent directory; the filename is
+auto-generated from the description (lowercase, underscores, significant words).
+The `-t` flag determines placement: tasks go to `<parent>/tasks/`, knowledge
+base documents go to `<parent>/docs/`. For root documents, specify the full
+path explicitly (e.g., `api/api.md`). Supports priority, labels, and
 dependencies for tasks.
 
 **lat update** - Modifies existing documents with `lat update <id> [id...]
@@ -257,9 +258,52 @@ when documents are renamed or moved.
 See [Appendix: Linter](appendix_linter.md) for validation rules and
 [Appendix: CLI Structure](appendix_cli_structure.md) for full command reference.
 
+### Query Commands
+
+Commands for searching and filtering documents.
+
+**lat stale** - Find tasks not updated recently, with configurable staleness
+threshold.
+
+**lat blocked** - Show tasks with unresolved blockers. Use `--show-blockers`
+to display what's blocking each task.
+
+**lat changes** - Show documents changed since a date or git commit.
+
+**lat stats** - Display project statistics: document counts by state, priority
+and type breakdowns, recent activity, and health metrics.
+
+### Hierarchy Commands
+
+Commands for navigating the document tree structure.
+
+**lat tree** - Display directory structure with documents. Supports `--depth`,
+`--tasks-only`, and `--docs-only` options.
+
+**lat roots** - List all root documents (those whose filename matches their
+directory name) with child counts.
+
+**lat children** - List documents under a root's directory, optionally
+recursive.
+
+### Relationship Commands
+
+Commands for exploring links between documents.
+
+**lat links-from** - Show documents this document links to.
+
+**lat links-to** - Show documents that link to this document (backlinks).
+
+**lat path** - Find shortest path between two documents.
+
+**lat orphans** - Find documents with no incoming links. Use `--exclude-roots`
+to omit root documents from results.
+
+**lat impact** - Analyze what would be affected by changes to a document.
+
 ### Utility Commands
 
-Additional commands for document maintenance and exploration:
+Additional commands for document maintenance and exploration.
 
 **lat track** - Add Lattice tracking to existing markdown files. Use `--force`
 to regenerate IDs for documents with duplicates.

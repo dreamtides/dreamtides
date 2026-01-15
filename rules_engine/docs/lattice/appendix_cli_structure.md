@@ -91,32 +91,36 @@ pointing to the moved document.
 See [Appendix: Task Tracking](appendix_task_tracking.md) for task lifecycle,
 state transitions, and template inheritance.
 
-### lat create {path} "{description}" [options]
+### lat create {parent} "{description}" [options]
 
-Create new document (task or knowledge base). The description is a required
-positional argument. The `name` field is derived automatically from the
-filename (underscores → hyphens).
+Create new document with convention-based placement and auto-generated filename.
 
-To create a task, include `-t {type}`. Omitting `-t` creates a knowledge base
-document.
+**Auto-placement:** The `-t` flag determines the subdirectory:
+- With `-t {type}`: creates `{parent}/tasks/{filename}.md`
+- Without `-t`: creates `{parent}/docs/{filename}.md`
+
+**Auto-naming:** Filename is generated from description (lowercase, underscores,
+significant words, ~40 char max). Numeric suffix on collision.
 
 Options: `-t, --type {type}`, `-p, --priority {n}`, `--body-file {path}`,
 `-l, --labels {list}`, `--deps {spec}`.
 
 Examples:
 ```bash
-# Root document (epic)
+# Task - auto-placed in auth/tasks/, filename from description
+lat create auth/ "Fix login after password reset" -t bug -p 1
+# → auth/tasks/fix_login_after_password_reset.md
+
+# Knowledge base - auto-placed in auth/docs/
+lat create auth/ "OAuth 2.0 implementation design"
+# → auth/docs/oauth_implementation_design.md
+
+# Root document - explicit path required
 lat create auth/auth.md "Authentication system epic" -t epic
 
-# Knowledge base document (in docs/ directory)
-lat create auth/docs/oauth_design.md "OAuth 2.0 implementation design"
-
-# Task (in tasks/ directory)
-lat create auth/tasks/fix_login.md "Fix login after password reset" -t bug -p 1
+# Explicit filename when you want control
+lat create auth/tasks/oauth_bug.md "Fix OAuth token validation" -t bug
 ```
-
-The path specifies directory location and filename. For root documents (epics),
-use a filename matching the directory name (e.g., `auth/auth.md`).
 
 ### lat update {id} [id...] [options]
 
@@ -396,9 +400,9 @@ With `--json`, all errors include structured information:
   "error_code": "E002",
   "message": "Reference to nonexistent ID",
   "affected_documents": ["LXXXXX"],
-  "location": {"path": "docs/example.md", "line": 42},
+  "location": {"path": "api/docs/example.md", "line": 42},
   "suggestion": "Create the target document or correct the ID",
-  "fix_command": "lat create docs/target.md"
+  "fix_command": "lat create api/ \"Target document description\""
 }
 ```
 
