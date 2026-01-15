@@ -116,8 +116,6 @@ Open task in editor. Human-only.
 - `--name`: Edit name only
 - `--description`: Edit description
 - `--body`: Edit full body
-- `--acceptance`: Edit acceptance criteria
-- `--design-notes`: Edit design notes
 
 ### lat close \<id\> [id...] [options]
 
