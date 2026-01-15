@@ -10,21 +10,31 @@ It executes random sequences of operations until an invariant violation occurs.
 
 ## What Constitutes a Bug
 
-The chaos monkey detects **system failures**, not **user errors**. Key
-distinction:
+The chaos monkey detects **system errors**, not **expected errors**. This
+distinction follows the error handling philosophy in
+[Lattice Design](lattice_design.md#error-handling): if a problem is *Lattice's
+fault*, it's a bug; if it's the *user's fault*, it's expected behavior.
 
-- **Bug**: `lat modify` crashes with a panic
-- **Not a bug**: `lat modify` returns an error because the file doesn't exist
-- **Bug**: Index contains an ID that doesn't exist in the filesystem
-- **Not a bug**: A document contains a link to a deleted document
+**System errors (bugs):**
+- `lat modify` crashes with a panic
+- Index contains an ID that doesn't exist in the filesystem
+- Git operation fails (Lattice should ensure valid git state)
+- Operation claims success but state is wrong
 
-User-facing errors (exit code 1 with a clear error message) are expected
-outcomes for invalid operations. Bugs are:
+**Expected errors (not bugs):**
+- `lat modify` returns an error because the file doesn't exist
+- A document contains a link to a deleted document
+- Invalid syntax, missing fields, or permission problems
 
-1. **Panics**: Any Rust panic is a bug
+Expected errors produce clear error messages with exit code 2 or 3. System
+errors are:
+
+1. **Panics**: Any Rust panic (Lattice's fault, never user's)
 2. **Corrupt state**: Index doesn't match filesystem after any operation
 3. **Invariant violations**: Duplicate IDs, malformed IDs in index
-4. **Silent failures**: Operation claims success but state is wrong
+4. **Git failures**: Git operations that fail when Lattice should have ensured
+   valid state
+5. **Silent failures**: Operation claims success but state is wrong
 
 ## Operations
 
@@ -70,10 +80,13 @@ After every operation, validate:
    file, and every file with a Lattice ID is in the index
 2. **ID uniqueness**: No two files share the same Lattice ID
 3. **ID format**: All IDs in the index match the Lattice ID format
-4. **No panics**: Previous operation completed without a panic or system error.
+4. **Git state validity**: Git operations succeed when Lattice initiates them
+   (Lattice should ensure valid git state before operating)
+5. **No panics**: Previous operation completed without a panic or system error
 
 Note: Broken links are **not** invariant violations. Documents may reference
-IDs that no longer exist.
+IDs that no longer exist—this is an expected error (user's responsibility to
+maintain link integrity).
 
 ## Execution
 
