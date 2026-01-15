@@ -26,15 +26,26 @@ create tasks, or without `-t` to create knowledge base documents.
 
 ## Status
 
-| Status | In `lat ready` |
-|--------|----------------|
-| `open` | Yes (unless claimed) |
-| `blocked` | No |
-| `deferred` | No |
-| `closed` | No |
-| `pinned` | Yes (always) |
+| Status | In `lat ready` | Description |
+|--------|----------------|-------------|
+| `open` | Yes (unless claimed) | Available for work |
+| `blocked` | No | Waiting on dependencies |
+| `closed` | No | Completed |
+| `tombstone` | No | Permanently deleted, should not be resurrected |
+| `pinned` | Yes (always) | Permanent open item, never auto-closes |
 
 There is no `in_progress` status. Use `lat claim` for local work tracking.
+
+## Timestamps
+
+| Field | Auto-set by |
+|-------|-------------|
+| `created-at` | `lat create` (current time) |
+| `updated-at` | `lat update`, `lat fmt` when content changes |
+| `closed-at` | `lat close` (current time) |
+
+All timestamps use ISO 8601 format. If missing, `lat show --json` omits them
+rather than deriving from git history.
 
 ## Priority
 

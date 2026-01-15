@@ -109,6 +109,22 @@ Triggers keep FTS in sync. After rebuild, optimize:
 INSERT INTO fts_content(fts_content) VALUES('optimize');
 ```
 
+### Search Syntax
+
+`lat search` supports FTS5 query syntax:
+
+| Syntax | Example | Matches |
+|--------|---------|---------|
+| Word | `error` | Documents containing "error" |
+| Phrase | `"login bug"` | Exact phrase |
+| AND | `error AND login` | Both terms |
+| OR | `error OR warning` | Either term |
+| NOT | `error NOT test` | First without second |
+| Prefix | `auth*` | Words starting with "auth" |
+| NEAR | `NEAR(error login, 5)` | Terms within 5 words |
+
+Queries are case-insensitive. Stemming is not enabled by default.
+
 ## SQLite Configuration
 
 Execute on every connection open:

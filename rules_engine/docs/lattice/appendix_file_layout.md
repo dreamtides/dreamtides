@@ -184,7 +184,6 @@ commands/
 ├── generate_ids.rs         # lat generate-ids - pre-allocate IDs
 ├── edit_command.rs         # lat edit - open in editor
 ├── search_command.rs       # lat search - full-text search
-├── similar_command.rs      # lat similar - find similar documents
 ├── stale_command.rs        # lat stale - find stale tasks
 ├── blocked_command.rs      # lat blocked - show blocked tasks
 ├── changes_command.rs      # lat changes - show recent changes

@@ -85,7 +85,7 @@ documents, `description` provides a purpose summary for AI context.
 
 **Task Tracking Keys:**
 - `task-type`: bug/feature/task/epic/chore
-- `status`: open/blocked/deferred/closed/tombstone/pinned
+- `status`: open/blocked/closed/tombstone/pinned
 - `priority`: 0-4 (0 highest)
 - `labels`: List of arbitrary string labels
 - `blocking`: List of task IDs with hard dependencies on this task
@@ -285,17 +285,15 @@ parent or "epic." This replaces beads' explicit epic/child model.
 Task status transitions follow a state machine:
 
 ```
-open -> closed
-  |       ^
-  |       |
-  +---> blocked -------+
-  |
-  v
-deferred  (back to open when unblocked)
+open <---> blocked
+  |           |
+  v           v
+closed <------+
 ```
 
 The `tombstone` status represents deleted tasks that should not be
-resurrected. The `pinned` status indicates permanent open items.
+resurrected. The `pinned` status indicates permanent open items that
+always appear in `lat ready`.
 
 There is no "in_progress" status in Lattice. Instead, the `lat claim`
 command tracks which machine is working on a task locally, without
@@ -441,6 +439,13 @@ stricter validation rules.
 
 See [Appendix: Claude Code Integration](appendix_ai_integration.md) for hooks
 that guide agents to use `lat show` and auto-expand Lattice IDs in prompts.
+
+## Configuration
+
+Lattice configuration is layered: built-in defaults, user config
+(`~/.lattice.toml`), repository config (`.lattice/config.toml`), environment
+variables, and command-line flags. See
+[Appendix: Configuration](appendix_configuration.md) for all options.
 
 ## Logging and Observability
 

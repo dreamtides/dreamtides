@@ -107,7 +107,6 @@ Modify existing tasks.
 - `--type <type>`: Change type
 - `--add-labels <list>`: Add labels
 - `--remove-labels <list>`: Remove labels
-- `--progress <N>`: Set progress percentage (0-100)
 
 ### lat edit \<id\> [options]
 
@@ -152,7 +151,6 @@ Search and filter documents.
 - `--updated-after <date>`: Updated after date
 - `--updated-before <date>`: Updated before date
 - `--has-acceptance`: Has acceptance criteria
-- `--progress-below <N>`: Progress under N%
 - `--roots-only`: List only directory root documents (`README.md` or `00_*.md`)
 
 **Output Options:**
@@ -192,14 +190,6 @@ Keyword search across document content.
 - `--limit N`: Maximum results
 - `--path <prefix>`: Restrict to path
 - `--type <type>`: Filter by type
-
-### lat similar \<id\> [options]
-
-Find semantically similar documents.
-
-**Options:**
-- `--limit N`: Maximum results (default 10)
-- `--threshold F`: Minimum similarity
 
 ### lat blocked [options]
 
@@ -272,14 +262,10 @@ List documents under a root's directory.
 - `--tasks`: Only tasks
 - `--docs`: Only knowledge base documents
 
-### lat stats [options]
+### lat stats
 
-Repository-wide statistics.
-
-**Options:**
-- `links`: Detailed link statistics
-- `tasks`: Task statistics by status/priority
-
+Display repository-wide statistics (document counts, task status breakdown,
+link counts).
 
 ## Label Commands
 
@@ -362,3 +348,16 @@ automated fix is available.
 - `LATTICE_LOG_LEVEL`: error/warn/info/debug/trace
 - `LATTICE_NO_COLOR`: Disable colored output
 - `EDITOR`: Editor for `lat edit`
+
+## Shell Completions
+
+Generate shell completion scripts:
+
+```bash
+lat completion bash > ~/.local/share/bash-completion/completions/lat
+lat completion zsh > ~/.zfunc/_lat
+lat completion fish > ~/.config/fish/completions/lat.fish
+```
+
+Completions include command names, flags, and dynamic completion for Lattice
+IDs (queried from index).
