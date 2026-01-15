@@ -61,9 +61,9 @@ state. This logging enables post-hoc debugging when problems arise.
 
 ### YAML Frontmatter
 
-Every Lattice document begins with YAML frontmatter containing at minimum a
-`lattice-id` field. Knowledge base documents should also include `name` and
-`description` fields; omitting these generates linter warnings.
+Every Lattice document begins with YAML frontmatter containing three required
+fields: `lattice-id`, `name`, and `description`. Missing any of these is a
+linter error.
 
 The frontmatter keys are deliberately designed to avoid conflicts with
 Claude's SKILL.md format. The reserved keys include:
