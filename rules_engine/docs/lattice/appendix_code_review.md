@@ -2,6 +2,21 @@
 
 Checklist for reviewing Lattice changes to maintain the "bulletproof" design goal.
 
+## Summary
+
+- **Classify errors:** Expected errors (user's fault) return `LatticeError`; system
+  errors (Lattice's fault) use `panic!`
+- **No silent failures:** Every significant action must be logged via `tracing`
+- **Atomic operations:** Multi-step changes use temp file + rename; partial failures
+  leave consistent state
+- **Index is ephemeral:** Git is always the source of truth; index can be rebuilt
+- **Concurrency safe:** Handle concurrent `lat` invocations, TOCTOU races, SQLite WAL
+- **Performance aware:** No O(n²) algorithms; batch git operations; use indices
+- **Test expected errors:** Each `LatticeError` variant should have test coverage
+- **Avoid `.unwrap()`:** Use `.ok_or(LatticeError::...)?` or explicit panic with reason
+- **Keep it small:** Functions under 50 lines, files under 500 lines
+- **Run benchmarks:** Check for regressions in performance-sensitive code paths
+
 ## Error Handling
 
 - [ ] All failure modes identified and classified (expected vs system error)
@@ -56,6 +71,7 @@ pub fn get_document(index: &Index, id: LatticeId) -> Result<Document, LatticeErr
 - [ ] Git operations batched where possible (single `git ls-files`, not per-file)
 - [ ] SQLite queries use indices; no full table scans for common operations
 - [ ] Large file reads are lazy/streaming where possible
+- [ ] Run benchmarks for performance-sensitive changes (`just bench-lattice`)
 
 ## Test Coverage
 

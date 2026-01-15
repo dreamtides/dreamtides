@@ -40,9 +40,9 @@ prime, claim, stale, dep, label, close, reopen, edit, chaosmonkey).
 
 **index/** - SQLite database management including schema definitions, migrations,
 connection handling, and query implementations for documents, links, labels,
-and full-text search. Also contains the reconciliation engine for syncing git
-state to the index, counter management for client IDs, view tracking for
-`lat overview` (persisted in `.lattice/views.json`), and L2 content caching.
+full-text search, and view tracking (for `lat overview`). Also contains the
+reconciliation engine for syncing git state to the index, counter management
+for client IDs, and L2 content caching.
 
 **document/** - Document parsing and serialization including YAML frontmatter
 parsing, markdown body handling, frontmatter schema definitions, field validation,
@@ -57,8 +57,9 @@ ATX header enforcement, list marker consistency, and overall markdown formatting
 **link/** - Link handling including extraction from markdown, ID resolution to
 file paths, and bidirectional reference tracking.
 
-**claim/** - Work claiming system including claim storage (~/.lattice/claims.json),
-claim/release logic, and stale claim cleanup.
+**claim/** - Work claiming system using atomic file operations. Claims stored as
+individual files in `~/.lattice/claims/<repo-hash>/` for concurrent safety.
+Includes claim/release logic and stale claim cleanup.
 
 **lint/** - Validation and linting including the rule execution engine,
 error-level rules, warning-level rules, skill-specific validations, and result
@@ -111,9 +112,9 @@ Created in the repository root:
 ### Directory Descriptions
 
 **.lattice/** - Repository-local Lattice data including the SQLite index database
-(index.sqlite), WAL and shared memory files (gitignored), operation logs
-(logs.jsonl), document view tracking (views.json), optional local config
-overrides (config.toml), and optional custom prime output (PRIME.md).
+(index.sqlite with view tracking), WAL and shared memory files (gitignored),
+operation logs (logs.jsonl), optional local config overrides (config.toml),
+and optional custom prime output (PRIME.md).
 
 **.claude/skills/** - Symlinks to skill documents for Claude Code integration.
 Each symlink points to a skill document in the repository.
@@ -131,8 +132,9 @@ Each symlink points to a skill document in the repository.
 mappings under [clients] section and optional global defaults under [defaults]
 section.
 
-**~/.lattice/** - User-local Lattice directory containing claims.json for tracking
-claimed work across all repositories.
+**~/.lattice/** - User-local Lattice directory containing per-repository claim
+subdirectories (`claims/<repo-hash>/`). Each claim is a separate file for
+atomic create/delete operations (concurrent-safe).
 
 ## Detailed Rust File Breakdown
 

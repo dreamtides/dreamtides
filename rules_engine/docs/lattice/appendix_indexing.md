@@ -72,6 +72,17 @@ Precomputed hierarchy: directory_path (PK), root_id, parent_path, depth.
 L2 cache for body content: document_id (PK), content, content_hash,
 accessed_at, file_mtime.
 
+### views
+
+| Column | Type | Description |
+|--------|------|-------------|
+| document_id | TEXT PK | Lattice ID |
+| view_count | INTEGER | Total views |
+| last_viewed | TEXT | ISO 8601 timestamp |
+
+View tracking is stored in SQLite (not a separate JSON file) for concurrent
+safety. SQLite handles concurrent reads/writes via WAL mode.
+
 Template content (Context and Acceptance Criteria sections) is resolved at
 query time by walking the `directory_roots` hierarchy. No additional tables
 are needed for template storage.

@@ -309,12 +309,17 @@ CLI flags. See [Appendix: Configuration](appendix_configuration.md).
 ## Logging
 
 Operations log to `.lattice/logs.jsonl` (JSONL). Use `--verbose` for detail,
-`--json` for structured output.
+`--json` for structured output. Logging uses the `tracing` crate.
 
 ## Testing
 
 Black-box CLI tests with `GitOps` trait for injection (`FakeGit` in tests).
 See [Appendix: Testing Strategy](appendix_testing_strategy.md).
+
+## Benchmarking
+
+Criterion benchmarks measure index rebuild, document parsing, and query latency.
+See [Appendix: Benchmarking](appendix_benchmarking.md).
 
 ## Code Review
 

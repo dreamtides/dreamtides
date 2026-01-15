@@ -14,6 +14,20 @@ simplicity—no daemon management, no stale cache problems, no zombie processes.
 All startup operations must complete quickly. The combined overhead should be
 imperceptible for typical repositories (<50ms for most operations).
 
+## Concurrency Requirements
+
+Multiple `lat` processes may run simultaneously (multiple terminals, CI jobs,
+worktrees). All startup operations must be:
+
+**Idempotent:** Running twice produces the same result as running once. No
+operation should fail or corrupt state if another process runs concurrently.
+
+**Atomic:** Use SQLite transactions, temp file + rename, or atomic
+create/delete patterns. Never read-modify-write without locking.
+
+**Tolerant:** If another process is mid-operation, either wait (SQLite
+busy_timeout) or skip gracefully (symlinks, log rotation).
+
 ## Operations
 
 ### Index Reconciliation

@@ -12,20 +12,14 @@ It ranks documents using local view tracking, recency, and filename priority.
 
 ## View Tracking
 
-Lattice tracks document views locally in `.lattice/views.json`:
+Lattice tracks document views in the SQLite index (`views` table) for
+concurrent safety. Views are recorded when:
 
-```json
-{
-  "LXXXXX": {"count": 15, "last_viewed": "2026-01-14T10:30:00Z"},
-  "LYYYYY": {"count": 8, "last_viewed": "2026-01-13T14:00:00Z"}
-}
-```
-
-Views are recorded when:
 - `lat show <id>` is executed
 - `lat overview` includes a document in output (with lower weight)
 
-This file is local-only (not in git) and persists across sessions.
+View data is local-only (index is gitignored) and persists across sessions.
+See [Appendix: Indexing](appendix_indexing.md#views) for schema.
 
 ## Ranking Algorithm
 
