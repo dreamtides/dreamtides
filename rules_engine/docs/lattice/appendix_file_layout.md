@@ -346,7 +346,7 @@ id/
 ```
 task/
 ├── mod.rs                  # Module declarations only
-├── task_types.rs           # TaskType enum (bug, feature, task, epic, chore)
+├── task_types.rs           # TaskType enum (bug, feature, task, chore)
 ├── task_state.rs           # State computation from path (open/blocked/closed)
 ├── task_priority.rs        # Priority levels (P0-P4)
 ├── ready_calculator.rs     # Determine which tasks are ready for work

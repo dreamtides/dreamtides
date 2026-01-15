@@ -21,7 +21,6 @@ create tasks, or without `-t` to create knowledge base documents.
 | `bug` | Defects, regressions |
 | `feature` | User-facing capabilities |
 | `task` | Tests, docs, refactoring |
-| `epic` | Directory root / grouping |
 | `chore` | Dependencies, tooling |
 
 ## Task State
@@ -43,7 +42,7 @@ Closed tasks reside in a `.closed/` subdirectory under the `tasks/` directory:
 
 ```
 auth/
-├── auth.md               # Root document (epic)
+├── auth.md               # Root document (parent for this directory)
 ├── docs/
 │   └── auth_design.md    # Knowledge base document
 └── tasks/
@@ -132,7 +131,7 @@ lat create auth/ "Add OAuth 2.0 support" -t feature -p 1
 # Creates: auth/tasks/add_oauth_support.md
 
 # Root document - explicit path required (filename must match directory)
-lat create auth/auth.md "Authentication system epic" -t epic
+lat create auth/auth.md "Authentication system"
 # Creates: auth/auth.md (root document for auth/ hierarchy)
 ```
 
@@ -145,7 +144,7 @@ lat create auth/tasks/oauth_bug.md "Fix OAuth token validation error" -t bug
 ```
 
 Options:
-- `-t <type>`: Task type (bug/feature/task/epic/chore). Omit for KB documents.
+- `-t <type>`: Task type (bug/feature/task/chore). Omit for KB documents.
 - `-p <0-4>`: Priority (default: 2, tasks only)
 - `-l <labels>`: Comma-separated labels
 - `--deps discovered-from:<id>`: Add dependency
@@ -157,7 +156,7 @@ Options:
 project/
 ├── project.md               # Project root document
 ├── auth/
-│   ├── auth.md              # Auth root document (epic)
+│   ├── auth.md              # Auth root document (parent for auth/)
 │   ├── docs/
 │   │   └── auth_design.md   # Knowledge base documents
 │   └── tasks/
@@ -166,7 +165,7 @@ project/
 │       └── .closed/
 │           └── old_task.md  # Closed tasks
 └── api/
-    ├── api.md               # API root document (epic)
+    ├── api.md               # API root document (parent for api/)
     ├── docs/
     │   └── api_spec.md
     └── tasks/
@@ -175,7 +174,9 @@ project/
 
 - Root documents have filenames matching their directory name
 - Tasks live in `tasks/` subdirectories, documents live in `docs/` subdirectories
-- The root document is the parent/epic for all documents in that directory tree
+- The root document is the parent for all documents in that directory tree
+- Root documents are typically NOT tasks (no `task-type`), but tasks can have
+  other tasks as parents if desired
 - Nesting creates multi-level hierarchy
 
 ## Dependencies

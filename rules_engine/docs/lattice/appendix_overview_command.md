@@ -66,7 +66,7 @@ $ lat overview
 Repository Overview (10 most critical documents):
 
 1. [doc] LROOTX: project-overview - High-level project architecture (15 views)
-2. [epic] LAUTHX: authentication-system - Auth module epic (12 views)
+2. [doc] LAUTHX: authentication-system - Auth module (12 views)
 3. [P0] LBUGBX: fix-login-crash - Critical login bug (8 views)
 ...
 
@@ -125,7 +125,7 @@ Context is determined by graph distance from the target task:
 - Always included first
 
 **Distance 1** (directly connected):
-- Parent epic (directory root document)
+- Parent (directory root document)
 - `blocked-by` tasks (must understand what's blocking)
 - `blocking` tasks (understand downstream impact)
 - Documents linked in the task body
@@ -133,7 +133,7 @@ Context is determined by graph distance from the target task:
 **Distance 2** (one hop away):
 - Sibling tasks (same directory, open only)
 - Documents linked from blocked-by tasks
-- Parent's parent (grandparent epic)
+- Parent's parent (grandparent)
 
 ### Ranking
 
@@ -160,7 +160,7 @@ $ lat overview LB234X
 Context for LB234X: Fix login timeout bug
 
 Parent:
-  LAA42X: [epic] Authentication System
+  LAA42X: [doc] Authentication System
 
 Blocked by (1):
   LCCCCC: [P1] Refactor session handling

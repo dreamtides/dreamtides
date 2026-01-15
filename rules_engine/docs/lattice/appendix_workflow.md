@@ -31,7 +31,7 @@ For task documents, the output follows `bd show` format:
 LB234X: fix-review-tasks - Fix LLMC v2 code review tasks
 State: open
 Priority: P0
-Type: epic
+Type: bug
 Created: 2026-01-10 14:37
 Created by: dthurn
 Updated: 2026-01-10 14:37
@@ -40,14 +40,14 @@ Context:
   [Context from ancestor root documents]
 
 Body:
-Master epic for addressing bugs and missing features identified in
+Master task for addressing bugs and missing features identified in
 comprehensive code review of LLMC v2 implementation.
 
 Acceptance Criteria:
   [Acceptance from ancestor root documents]
 
 Parent:
-  LAA42X: llmc-development - LLMC Development [epic]
+  LAA42X: llmc-development - LLMC Development [doc]
 
 Depends on (1):
   L2345X: rebase-detection - Fix incorrect rebase necessity detection [P0/closed]
@@ -68,7 +68,7 @@ Related (1):
 - **Context:** Composed from ancestor root documents (if any have Context sections)
 - **Body:** Full markdown body content
 - **Acceptance Criteria:** Composed from ancestor roots (if any have Acceptance sections)
-- **Parent:** Directory root document (epic context)
+- **Parent:** Directory root document (provides context)
 - **Depends on:** Tasks in the `blocked-by` field (what this depends on)
 - **Blocks:** Tasks in the `blocking` field (what depends on this)
 - **Related:** Other documents linked in the body text
@@ -128,7 +128,7 @@ Examples:
 LB234X: fix-login - Fix login after password reset [P0]
 L234YX: old-bug - Previously fixed issue [P1/closed]
 L567CX: authentication-design - OAuth 2.0 implementation design [doc]
-LDAB2X: llmc-development - LLMC Development epic [epic]
+LDAB2X: llmc-development - LLMC Development [doc]
 ```
 
 ### Related Document Selection
@@ -171,7 +171,7 @@ The `--short` flag produces single-line output:
 
 ```
 $ lat show LB234X --short
-LB234X [open] P0 epic: fix-review-tasks - Fix LLMC v2 code review tasks
+LB234X [open] P0 bug: fix-review-tasks - Fix LLMC v2 code review tasks
 ```
 
 Format: `<id> [<state>] <priority> <type>: <name> - <description>`
@@ -191,7 +191,7 @@ The `--peek` flag shows a condensed preview suitable for quick context:
 
 ```
 $ lat show LB234X --peek
-LB234X: fix-review-tasks - Fix LLMC v2 code review tasks [P0/open/epic]
+LB234X: fix-review-tasks - Fix LLMC v2 code review tasks [P0/open/bug]
 Parent: LAA42X | Blocks: 5 | Depends: 1
 ```
 
@@ -225,10 +225,10 @@ The `--json` flag produces structured output compatible with `bd show --json`:
     "id": "LB234X",
     "name": "fix-review-tasks",
     "description": "Fix LLMC v2 code review tasks",
-    "body": "Master epic for addressing bugs and missing features...",
+    "body": "Master task for addressing bugs and missing features...",
     "state": "open",
     "priority": 0,
-    "task_type": "epic",
+    "task_type": "bug",
     "created_at": "2026-01-10T14:37:59.351489-08:00",
     "created_by": "dthurn",
     "updated_at": "2026-01-10T14:37:59.351489-08:00",
@@ -281,7 +281,7 @@ The `--json` flag produces structured output compatible with `bd show --json`:
 | `body` | string | Full markdown body content |
 | `state` | string | Computed task state (open/blocked/closed) |
 | `priority` | int | Priority level (0-4) |
-| `task_type` | string | bug/feature/task/epic/chore |
+| `task_type` | string | bug/feature/task/chore |
 | `created_at` | string | ISO 8601 timestamp |
 | `created_by` | string | Creator identifier |
 | `updated_at` | string | ISO 8601 timestamp |
@@ -291,7 +291,7 @@ The `--json` flag produces structured output compatible with `bd show --json`:
 | `dependencies` | array | Tasks this depends on (blocked-by) |
 | `dependents` | array | Tasks that depend on this (blocking) |
 | `related` | array | Documents linked from body text |
-| `parent` | object | Directory root document (epic) |
+| `parent` | object | Directory root document |
 | `claimed` | bool | Whether locally claimed |
 
 The `state` field is computed from filesystem location: `closed` if in a
@@ -334,10 +334,10 @@ lat ready --pretty
 $ lat ready
 Ready work (4 tasks with no blockers):
 
-1. [P0] [epic] LB234X: Fix LLMC v2 code review tasks
+1. [P0] [bug] LB234X: Fix LLMC v2 code review tasks
 2. [P1] [task] L567CX: Convert strings.toml to Fluent format
-3. [P1] [epic] LDAB2X: LLMC v2: Agent Coordination System
-4. [P1] [epic] L3456X: Tabula V2: Complete Card Data Loading Rewrite
+3. [P1] [feature] LDAB2X: LLMC v2: Agent Coordination System
+4. [P1] [feature] L3456X: Tabula V2: Complete Card Data Loading Rewrite
 ```
 
 ### Ready Criteria
@@ -352,7 +352,7 @@ A task is "ready" if:
 
 | Flag | Description |
 |------|-------------|
-| `--parent <id>` | Filter to descendants of this directory/epic |
+| `--parent <id>` | Filter to descendants of this directory |
 | `--priority <N>` | Filter by priority level |
 | `--type <type>` | Filter by task type |
 | `--label <list>` | Filter by labels (AND logic) |
@@ -375,12 +375,12 @@ The `--pretty` flag displays a visual tree with state symbols:
 
 ```
 $ lat ready --pretty
-o P0 LB234X - [EPIC] Fix LLMC v2 code review tasks
+o P0 LB234X - [BUG] Fix LLMC v2 code review tasks
 
-o P1 L3456X - [EPIC] Tabula V2: Complete Card Data Loading Rewrite
+o P1 L3456X - [FEATURE] Tabula V2: Complete Card Data Loading Rewrite
 |-- o P1 L567CX - Convert strings.toml to Fluent format
 
-o P1 LDAB2X - [EPIC] LLMC v2: Agent Coordination System
+o P1 LDAB2X - [FEATURE] LLMC v2: Agent Coordination System
 
 --------------------------------------------------------------------------------
 Total: 4 tasks (4 open, 0 claimed)
@@ -397,10 +397,10 @@ The `--json` flag produces output compatible with `bd ready --json`:
   {
     "id": "LB234X",
     "description": "Fix LLMC v2 code review tasks",
-    "body": "Master epic for addressing bugs...",
+    "body": "Master task for addressing bugs...",
     "state": "open",
     "priority": 0,
-    "task_type": "epic",
+    "task_type": "bug",
     "created_at": "2026-01-10T14:37:59.351489-08:00",
     "created_by": "dthurn",
     "updated_at": "2026-01-10T14:37:59.351489-08:00",
@@ -586,7 +586,7 @@ The `lat show` command indicates claim status:
 LB234X: Fix LLMC v2 code review tasks
 State: open
 Priority: P0
-Type: epic
+Type: bug
 Claimed: true
 ...
 ```
@@ -602,7 +602,7 @@ Ready work (3 tasks with no blockers):
 
 $ lat ready --include-claimed
 Ready work (4 tasks, 1 claimed):
-1. [P0] [epic] LB234X: Fix LLMC v2... [CLAIMED]
+1. [P0] [bug] LB234X: Fix LLMC v2... [CLAIMED]
 ...
 ```
 

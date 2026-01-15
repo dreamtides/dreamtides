@@ -115,8 +115,8 @@ lat create auth/ "Fix login after password reset" -t bug -p 1
 lat create auth/ "OAuth 2.0 implementation design"
 # → auth/docs/oauth_implementation_design.md
 
-# Root document - explicit path required
-lat create auth/auth.md "Authentication system epic" -t epic
+# Root document - explicit path required (typically NOT a task)
+lat create auth/auth.md "Authentication system"
 
 # Explicit filename when you want control
 lat create auth/tasks/oauth_bug.md "Fix OAuth token validation" -t bug

@@ -23,13 +23,11 @@ sections that serve as templates for descendant tasks:
 ```yaml
 ---
 lattice-id: LXXXXX
-task-type: epic
-priority: 1
 name: api
 description: API subsystem tasks
 ---
 
-# API Subsystem Epic
+# API Subsystem
 
 Overview of the API subsystem work.
 
@@ -122,7 +120,7 @@ Acceptance Criteria:
   - [ ] Project-wide checks (git commit, run tests)
 
 Parent:
-  LAAAAA: create-endpoint [epic]
+  LAAAAA: create-endpoint [doc]
 ...
 ```
 

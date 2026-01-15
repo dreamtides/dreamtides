@@ -84,7 +84,7 @@ other outputs (e.g., "Fix login bug after password reset"). For knowledge base
 documents, `description` provides a purpose summary for AI context.
 
 **Task Tracking Keys:**
-- `task-type`: bug/feature/task/epic/chore
+- `task-type`: bug/feature/task/chore
 - `priority`: 0-4 (0 highest)
 - `labels`: List of arbitrary string labels
 - `blocking`: List of task IDs with hard dependencies on this task
@@ -123,7 +123,7 @@ Documents exceeding this should be split into multiple files using the
 A **root document** is a document whose filename (without `.md` extension)
 matches its containing directory name. For example, `api/api.md` is a root
 document because the filename `api` matches the directory name `api`. Root
-documents serve as the parent/epic for all other documents in that directory.
+documents serve as the default parent for all other documents in that directory.
 
 The idiomatic Lattice directory structure separates tasks and documentation:
 
@@ -190,9 +190,7 @@ most critical documents based on view frequency, recency, and priority. Supports
 `--limit`, `--json`, and various filtering options. Tracks local view counts
 in SQLite (concurrent-safe) to surface frequently-referenced documents.
 
-**lat prime** - Outputs AI-optimized workflow context including recommended
-link authoring format (shorthand `[text](ID)` links that `lat fmt` expands).
-Supports custom checklist via `.lattice/config.toml`.
+**lat prime** - Outputs AI-optimized workflow context.
 
 **lat claim** - Marks tasks as locally in progress on the current machine.
 Claims are stored in `~/.lattice/claims/` as one file per claim, not in markdown
@@ -337,8 +335,10 @@ specification, normalization algorithm, and edge cases.
 
 Tasks and knowledge base documents share a unified ID space. Hierarchy comes
 from the filesystem: all tasks in a `tasks/` directory are siblings, with the
-directory's root document (filename matching directory name) as their parent
-epic.
+directory's root document (filename matching directory name) as their parent.
+The parent is typically a root document (not itself a task), though tasks can
+have other tasks as parents if desired—in that case, use the standard task types
+(bug, feature, task, chore) for the parent task.
 
 Task state is determined by filesystem location, not by a status field:
 - **Open**: Task exists in a `tasks/` directory outside of any `.closed/`
