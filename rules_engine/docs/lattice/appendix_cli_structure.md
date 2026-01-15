@@ -165,15 +165,15 @@ Search and filter documents.
 
 Default format shows rich metadata with name and description:
 ```
-LXXXX [bug/P1/open] login-failure - Users cannot log in after password reset
-LYYYY [feature/P2/open] oauth-support - Add OAuth 2.0 authentication support
-LZZZZ [doc] authentication-design - OAuth 2.0 implementation design
+LXXXXX [bug/P1/open] login-failure - Users cannot log in after password reset
+LYYYYY [feature/P2/open] oauth-support - Add OAuth 2.0 authentication support
+LZZZZZ [doc] authentication-design - OAuth 2.0 implementation design
 ```
 
 Compact format (name only):
 ```
-LXXXX  login-failure
-LYYYY  oauth-support
+LXXXXX  login-failure
+LYYYYY  oauth-support
 ```
 
 ### lat stale [options]
@@ -347,7 +347,7 @@ With `--json`, all errors include structured information:
 {
   "error_code": "E002",
   "message": "Reference to nonexistent ID",
-  "affected_documents": ["LXXXX"],
+  "affected_documents": ["LXXXXX"],
   "location": {"path": "docs/example.md", "line": 42},
   "suggestion": "Create the target document or correct the ID",
   "fix_command": "lat create docs/target.md"

@@ -26,7 +26,7 @@ lat show <id> --refs
 For task documents, the output follows `bd show` format:
 
 ```
-LB234: fix-review-tasks - Fix LLMC v2 code review tasks
+LB234X: fix-review-tasks - Fix LLMC v2 code review tasks
 Status: open
 Priority: P0
 Type: epic
@@ -45,18 +45,18 @@ Acceptance Criteria:
   [Acceptance from ancestor root documents]
 
 Parent:
-  LAA42: llmc-development - LLMC Development [epic]
+  LAA42X: llmc-development - LLMC Development [epic]
 
 Depends on (1):
-  L2345: rebase-detection - Fix incorrect rebase necessity detection [P0 - closed]
+  L2345X: rebase-detection - Fix incorrect rebase necessity detection [P0 - closed]
 
 Blocks (5):
-  L3456: crash-count - Fix crash count not being incremented [P0 - open]
-  L4567: worker-nudging - Fix stuck worker nudging to be async [P1 - open]
+  L3456X: crash-count - Fix crash count not being incremented [P0 - open]
+  L4567X: worker-nudging - Fix stuck worker nudging to be async [P1 - open]
   ...
 
 Related (1):
-  L567C: llmc-design - LLMC design document [doc]
+  L567CX: llmc-design - LLMC design document [doc]
 ```
 
 **Key sections:**
@@ -80,15 +80,15 @@ For knowledge base documents (no `task-type`), the output uses the same
 `name - description` header format as tasks:
 
 ```
-LDC76: authentication-design - OAuth 2.0 implementation design for the auth subsystem
+LDC76X: authentication-design - OAuth 2.0 implementation design for the auth subsystem
 
 ---
 [Full markdown body content here]
 ---
 
 Related (2):
-  LBBBB: security-policy - Security guidelines and threat model [doc]
-  L2222: api-design - REST API design principles [doc]
+  LBBBBB: security-policy - Security guidelines and threat model [doc]
+  L2222X: api-design - REST API design principles [doc]
 ```
 
 **Header components:**
@@ -119,9 +119,9 @@ to both tasks and knowledge base documents.
 
 Examples:
 ```
-LB234: fix-login - Fix login after password reset [P0 - open]
-L567C: authentication-design - OAuth 2.0 implementation design [doc]
-LDAB2: llmc-development - LLMC Development epic [epic]
+LB234X: fix-login - Fix login after password reset [P0 - open]
+L567CX: authentication-design - OAuth 2.0 implementation design [doc]
+LDAB2X: llmc-development - LLMC Development epic [epic]
 ```
 
 ### Related Document Selection
@@ -165,16 +165,16 @@ Both fields are required. The `description` appears in `lat show` headers,
 The `--short` flag produces single-line output:
 
 ```
-$ lat show LB234 --short
-LB234 [open] P0 epic: fix-review-tasks - Fix LLMC v2 code review tasks
+$ lat show LB234X --short
+LB234X [open] P0 epic: fix-review-tasks - Fix LLMC v2 code review tasks
 ```
 
 Format: `<id> [<status>] <priority> <type>: <name> - <description>`
 
 For knowledge base documents:
 ```
-$ lat show LDC76 --short
-LDC76 [doc]: authentication-design - OAuth 2.0 implementation design
+$ lat show LDC76X --short
+LDC76X [doc]: authentication-design - OAuth 2.0 implementation design
 ```
 
 ### References Format
@@ -182,17 +182,17 @@ LDC76 [doc]: authentication-design - OAuth 2.0 implementation design
 The `--refs` flag shows tasks that reference this one (reverse lookup):
 
 ```
-$ lat show LB234 --refs
-References to LB234:
+$ lat show LB234X --refs
+References to LB234X:
 
   Blocks (5):
-    L3456: crash-count - Fix crash count not being incremented [P0 - open]
-    L4567: worker-nudging - Fix stuck worker nudging to be async [P1 - open]
+    L3456X: crash-count - Fix crash count not being incremented [P0 - open]
+    L4567X: worker-nudging - Fix stuck worker nudging to be async [P1 - open]
     ...
 
   Linked from (2):
-    L7CDA: sprint-3-planning - Sprint 3 planning document [doc] (line 42)
-    LCDAB: code-review-checklist - Code review checklist [doc] (line 15)
+    L7CDAX: sprint-3-planning - Sprint 3 planning document [doc] (line 42)
+    LCDABX: code-review-checklist - Code review checklist [doc] (line 15)
 ```
 
 ### JSON Output Format
@@ -202,7 +202,7 @@ The `--json` flag produces structured output compatible with `bd show --json`:
 ```json
 [
   {
-    "id": "LB234",
+    "id": "LB234X",
     "name": "fix-review-tasks",
     "title": "Fix LLMC v2 code review tasks",
     "body": "Master epic for addressing bugs and missing features...",
@@ -216,7 +216,7 @@ The `--json` flag produces structured output compatible with `bd show --json`:
     "labels": ["llmc", "code-review"],
     "dependencies": [
       {
-        "id": "L2345",
+        "id": "L2345X",
         "name": "rebase-detection",
         "title": "Fix incorrect rebase necessity detection in patrol",
         "status": "closed",
@@ -226,7 +226,7 @@ The `--json` flag produces structured output compatible with `bd show --json`:
     ],
     "dependents": [
       {
-        "id": "L3456",
+        "id": "L3456X",
         "name": "crash-count",
         "title": "Fix crash count not being incremented in patrol",
         "status": "open",
@@ -236,13 +236,13 @@ The `--json` flag produces structured output compatible with `bd show --json`:
     ],
     "related": [
       {
-        "id": "L567C",
+        "id": "L567CX",
         "name": "llmc-design",
         "title": "Design document for LLMC agent coordination system"
       }
     ],
     "parent": {
-      "id": "LAA42",
+      "id": "LAA42X",
       "name": "llmc-development",
       "title": "LLMC Development"
     },
@@ -284,11 +284,11 @@ When showing multiple documents, output is separated by blank lines (text) or
 returned as a JSON array:
 
 ```
-$ lat show LB234 L567C
-LB234: First task title
+$ lat show LB234X L567CX
+LB234X: First task title
 ...
 
-L567C: Second task title
+L567CX: Second task title
 ...
 ```
 
@@ -312,10 +312,10 @@ lat ready --pretty
 $ lat ready
 Ready work (4 tasks with no blockers):
 
-1. [P0] [epic] LB234: Fix LLMC v2 code review tasks
-2. [P1] [task] L567C: Convert strings.toml to Fluent format
-3. [P1] [epic] LDAB2: LLMC v2: Agent Coordination System
-4. [P1] [epic] L3456: Tabula V2: Complete Card Data Loading Rewrite
+1. [P0] [epic] LB234X: Fix LLMC v2 code review tasks
+2. [P1] [task] L567CX: Convert strings.toml to Fluent format
+3. [P1] [epic] LDAB2X: LLMC v2: Agent Coordination System
+4. [P1] [epic] L3456X: Tabula V2: Complete Card Data Loading Rewrite
 ```
 
 ### Ready Criteria
@@ -353,12 +353,12 @@ The `--pretty` flag displays a visual tree with status symbols:
 
 ```
 $ lat ready --pretty
-o P0 LB234 - [EPIC] Fix LLMC v2 code review tasks
+o P0 LB234X - [EPIC] Fix LLMC v2 code review tasks
 
-o P1 L3456 - [EPIC] Tabula V2: Complete Card Data Loading Rewrite
-|-- o P1 L567C - Convert strings.toml to Fluent format
+o P1 L3456X - [EPIC] Tabula V2: Complete Card Data Loading Rewrite
+|-- o P1 L567CX - Convert strings.toml to Fluent format
 
-o P1 LDAB2 - [EPIC] LLMC v2: Agent Coordination System
+o P1 LDAB2X - [EPIC] LLMC v2: Agent Coordination System
 
 --------------------------------------------------------------------------------
 Total: 4 tasks (4 open, 0 claimed)
@@ -373,7 +373,7 @@ The `--json` flag produces output compatible with `bd ready --json`:
 ```json
 [
   {
-    "id": "LB234",
+    "id": "LB234X",
     "title": "Fix LLMC v2 code review tasks",
     "description": "Master epic for addressing bugs...",
     "status": "open",
@@ -385,7 +385,7 @@ The `--json` flag produces output compatible with `bd ready --json`:
     "path": "tasks/llmc/fix-review-tasks.md",
     "labels": [],
     "parent": {
-      "id": "LAA42",
+      "id": "LAA42X",
       "title": "LLMC Development"
     }
   }
@@ -438,11 +438,11 @@ Before completing work, run this checklist:
 
 Always write links in shorthand format using just the Lattice ID:
 
-    See [the design doc](LXXXX) for details.
+    See [the design doc](LXXXXX) for details.
 
 Running `lat fmt` at the end of work will expand to full path+fragment format:
 
-    See [the design doc](../path/to/doc.md#LXXXX) for details.
+    See [the design doc](../path/to/doc.md#LXXXXX) for details.
 
 This avoids needing to look up file paths when authoring documents.
 ```
@@ -487,10 +487,10 @@ Each claim is a separate file in `~/.lattice/claims/<repo-hash>/`:
 ```
 ~/.lattice/claims/
   a1b2c3d4/           # Hash of /path/to/repo1
-    LB234.json
-    L567C.json
+    LB234X.json
+    L567CX.json
   e5f6g7h8/           # Hash of /path/to/repo2
-    LDAB2.json
+    LDAB2X.json
 ```
 
 The `<repo-hash>` is the first 8 characters of the SHA-256 hash of the
@@ -510,10 +510,10 @@ locking is needed. Claiming creates the file; releasing deletes it.
 
 ```
 lat ready          # Task shows as "ready"
-lat claim LB234    # Task now claimed
-lat show LB234     # Shows "Claimed: true" in output
+lat claim LB234X    # Task now claimed
+lat show LB234X     # Shows "Claimed: true" in output
 lat ready          # Task no longer appears (unless --include-claimed)
-lat close LB234    # Closing auto-releases the claim
+lat close LB234X    # Closing auto-releases the claim
 ```
 
 ### Auto-Release on State Change
@@ -532,9 +532,9 @@ The `lat claim --gc` command removes stale claims:
 ```
 $ lat claim --gc
 Checking 3 claims...
-Released: LB234 (task closed)
-Released: L567C (work path no longer exists)
-Kept: LDAB2 (active)
+Released: LB234X (task closed)
+Released: L567CX (work path no longer exists)
+Kept: LDAB2X (active)
 ```
 
 A claim is stale if:
@@ -545,14 +545,14 @@ A claim is stale if:
 ### Crash Recovery
 
 If an agent crashes while working on a task, the claim persists. Release
-it via `lat claim --release LB234` or delete the claim file directly.
+it via `lat claim --release LB234X` or delete the claim file directly.
 
 ### Display in lat show
 
 The `lat show` command indicates claim status:
 
 ```
-LB234: Fix LLMC v2 code review tasks
+LB234X: Fix LLMC v2 code review tasks
 Status: open
 Priority: P0
 Type: epic
@@ -571,7 +571,7 @@ Ready work (3 tasks with no blockers):
 
 $ lat ready --include-claimed
 Ready work (4 tasks, 1 claimed):
-1. [P0] [epic] LB234: Fix LLMC v2... [CLAIMED]
+1. [P0] [epic] LB234X: Fix LLMC v2... [CLAIMED]
 ...
 ```
 

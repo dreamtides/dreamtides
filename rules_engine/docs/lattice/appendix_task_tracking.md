@@ -107,9 +107,9 @@ tasks/
 ## Dependencies
 
 ```yaml
-blocking: [LYYYY, LZZZZ]   # This task blocks these
-blocked-by: [LWWWW]        # These block this task
-discovered-from: [LXXXX]   # Soft link for provenance
+blocking: [LYYYYY, LZZZZZ]   # This task blocks these
+blocked-by: [LWWWWW]        # These block this task
+discovered-from: [LXXXXX]   # Soft link for provenance
 ```
 
 A task is "ready" if: status is `open`/`pinned`, no open `blocked-by`
@@ -128,9 +128,9 @@ Query with `--label` (AND) or `--label-any` (OR).
 Use `lat claim` instead of status changes:
 
 ```bash
-lat claim LB234    # Mark as being worked on
+lat claim LB234X    # Mark as being worked on
 lat ready          # Task no longer appears
-lat close LB234    # Auto-releases claim
+lat close LB234X    # Auto-releases claim
 ```
 
 Claims stored in `~/.lattice/claims/`, not in git. See
@@ -158,14 +158,14 @@ Example task document (`tasks/auth/fix_login.md`):
 
 ```yaml
 ---
-lattice-id: LXXXX
+lattice-id: LXXXXX
 name: fix-login
 description: Fix login after password reset
 task-type: task
 status: open
 priority: 2
 labels: [auth]
-blocked-by: [LZZZZ]
+blocked-by: [LZZZZZ]
 created-at: 2024-01-15T10:30:00Z
 ---
 

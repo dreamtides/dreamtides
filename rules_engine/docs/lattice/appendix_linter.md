@@ -19,7 +19,7 @@ Two or more documents share the same Lattice ID.
 
 **Detection:** Query documents table grouped by ID, flag groups > 1.
 
-**Message:** `Error [E001]: Duplicate Lattice ID LXXXX found in: path1.md, path2.md`
+**Message:** `Error [E001]: Duplicate Lattice ID LXXXXX found in: path1.md, path2.md`
 
 **Fix:** Regenerate ID for one document using `lat track --force`.
 
@@ -29,7 +29,7 @@ A link references an ID that doesn't exist.
 
 **Detection:** Compare link targets against documents table.
 
-**Message:** `Error [E002]: path.md:42 links to unknown ID LYYYY`
+**Message:** `Error [E002]: path.md:42 links to unknown ID LYYYYY`
 
 **Fix:** Create the target document or correct the ID.
 
@@ -69,7 +69,7 @@ Blocking dependencies form a cycle.
 
 **Detection:** DFS on blocking graph, detect back edges.
 
-**Message:** `Error [E006]: Circular blocking dependency: LXXXX → LYYYY → LZZZZ → LXXXX`
+**Message:** `Error [E006]: Circular blocking dependency: LXXXXX → LYYYYY → LZZZZZ → LXXXXX`
 
 **Fix:** Remove one blocking relationship.
 
@@ -269,7 +269,7 @@ Name contains XML-like tags.
 Checking 234 documents...
 
 path/to/doc1.md:
-  Error [E002]: Line 42 links to unknown ID LYYYY
+  Error [E002]: Line 42 links to unknown ID LYYYYY
   Warning [W001]: 750 lines (recommended max: 500)
 
 path/to/doc2.md:
@@ -288,7 +288,7 @@ Found 1 error, 2 warnings in 2 documents.
       "code": "E002",
       "path": "path/to/doc1.md",
       "line": 42,
-      "message": "links to unknown ID LYYYY"
+      "message": "links to unknown ID LYYYYY"
     }
   ],
   "warnings": [

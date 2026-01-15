@@ -14,13 +14,13 @@ ID fragments for stable cross-references.
 The canonical link format combines file path with Lattice ID fragment:
 
 ```markdown
-See the [design document](../design/system_overview.md#LJCQ2) for details.
+See the [design document](../design/system_overview.md#LJCQ2X) for details.
 ```
 
 **Format components:**
 - Standard markdown link: `[link text](url)`
 - Relative file path: `../design/system_overview.md`
-- URL fragment with Lattice ID: `#LJCQ2`
+- URL fragment with Lattice ID: `#LJCQ2X`
 
 ### Link Authoring (Recommended Workflow)
 
@@ -29,12 +29,12 @@ The recommended workflow for AI agents and humans is to write links using
 
 **Step 1: Write shorthand links:**
 ```markdown
-See the [design document](LJCQ2) for architecture details.
+See the [design document](LJCQ2X) for architecture details.
 ```
 
 **Step 2: Run `lat fmt`** to expand to canonical format:
 ```markdown
-See the [design document](../design/system_overview.md#LJCQ2) for architecture details.
+See the [design document](../design/system_overview.md#LJCQ2X) for architecture details.
 ```
 
 This avoids needing to look up or remember file paths when authoring.
@@ -45,7 +45,7 @@ This avoids needing to look up or remember file paths when authoring.
 ```
 Becomes:
 ```markdown
-[design document](../design/system_overview.md#LJCQ2)
+[design document](../design/system_overview.md#LJCQ2X)
 ```
 
 ### Path Requirements
@@ -54,12 +54,12 @@ All links must use **relative file system paths** from the linking document's
 location. Absolute paths and URLs are not supported.
 
 **Valid examples:**
-- `[doc](sibling.md#LK3DT)` - same directory
-- `[doc](../parent/file.md#LK3DT)` - parent directory
-- `[doc](subdir/nested/file.md#LK3DT)` - nested subdirectory
+- `[doc](sibling.md#LK3DTX)` - same directory
+- `[doc](../parent/file.md#LK3DTX)` - parent directory
+- `[doc](subdir/nested/file.md#LK3DTX)` - nested subdirectory
 
 **Invalid examples:**
-- `[doc](/absolute/path.md#LK3DT)` - absolute path
+- `[doc](/absolute/path.md#LK3DTX)` - absolute path
 - `[doc](file.md)` - missing Lattice ID fragment (warning)
 - `[doc](https://example.com)` - external URL (not a Lattice link)
 
@@ -100,8 +100,8 @@ When documents are renamed or moved, `lat fmt` uses the Lattice ID to find and
 update all links pointing to the old path:
 
 ```
-Before move: [doc](../old/location.md#LJCQ2)
-After move:  [doc](../new/location.md#LJCQ2)
+Before move: [doc](../old/location.md#LJCQ2X)
+After move:  [doc](../new/location.md#LJCQ2X)
 ```
 
 The formatter queries the index to find the current path for each Lattice ID
@@ -127,7 +127,7 @@ Relative paths are computed from the linking document's directory:
 ```
 Linker: docs/features/auth.md
 Target: docs/design/system.md
-Result: ../design/system.md#LJCQ2
+Result: ../design/system.md#LJCQ2X
 ```
 
 The formatter uses standard filesystem path resolution (`.` and `..`
@@ -140,7 +140,7 @@ normalization) to compute minimal relative paths.
 The `lat check` command validates all link targets exist:
 
 ```
-Error: Document LXXXX links to unknown ID LYYYY at line 42
+Error: Document LXXXXX links to unknown ID LYYYYY at line 42
 ```
 
 This validates the Lattice ID in the fragment, not the file path. Links are
@@ -151,9 +151,9 @@ resolved by ID first, path second.
 If a link's file path doesn't match the target document's actual path:
 
 ```
-Warning: Document LXXXX has stale link at line 42
-  Expected: ../design/current.md#LYYYY
-  Found:    ../design/old.md#LYYYY
+Warning: Document LXXXXX has stale link at line 42
+  Expected: ../design/current.md#LYYYYY
+  Found:    ../design/old.md#LYYYYY
   Run: lat fmt to fix
 ```
 
@@ -176,7 +176,7 @@ which doesn't recursively follow links.
 A document linking to itself is invalid and produces a warning:
 
 ```
-Warning: Document LXXXX contains self-reference at line 15
+Warning: Document LXXXXX contains self-reference at line 15
 ```
 
 ## Frontmatter Links
@@ -194,9 +194,9 @@ IDs in these frontmatter fields are indexed as links:
 
 ```yaml
 ---
-lattice-id: LXXXX
-blocking: [LYYYY, LZZZZ]
-related-ids: [LWWWW]
+lattice-id: LXXXXX
+blocking: [LYYYYY, LZZZZZ]
+related-ids: [LWWWWW]
 ---
 ```
 
@@ -208,7 +208,7 @@ All IDs in these fields become links with type 'frontmatter'.
 
 ```
 $ lat check
-Error: Broken link in LXXXX: target LYYYY does not exist
+Error: Broken link in LXXXXX: target LYYYYY does not exist
 ```
 
 ### Orphan Detection

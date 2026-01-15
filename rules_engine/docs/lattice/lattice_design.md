@@ -105,11 +105,11 @@ for ID-based linking. Links use standard markdown syntax with relative file
 paths and Lattice IDs as URL fragments:
 
 ```
-See the [error handling](error_handling.md#LJCQ2) document for more information
+See the [error handling](error_handling.md#LJCQ2X) document for more information
 ```
 
 Users can write partial links like `[text](../path/to/doc.md)` or
-`[text](LJCQ2)`, and the `lat fmt` command will normalize them to include both
+`[text](LJCQ2X)`, and the `lat fmt` command will normalize them to include both
 the file path and Lattice ID. The formatter also handles document renames and
 moves, rewriting links based on their Lattice ID to point to updated file
 paths.
@@ -142,14 +142,14 @@ A Lattice ID is a compact, human-typeable identifier consisting of:
 
 1. A literal `L` prefix
 2. A document counter (minimum 2 digits, RFC 4648 Base32 encoded)
-3. A client identifier (2-5 digits, RFC 4648 Base32 encoded)
+3. A client identifier (3-6 digits, RFC 4648 Base32 encoded)
 
-Example: `LK3DT` represents document `K3` (decimal 675) from client `DT`.
+Example: `LK3DTX` represents document `K3` (decimal 675) from client `DTX`.
 
 The Base32 encoding uses the RFC 4648 alphabet (A-Z followed by 2-7), avoiding
 ambiguous characters like 0/O and 1/I. Client IDs are stored in `~/.lattice.toml`
 and scale in length with the number of known clients. Document counters start at
-50 (Base32: `BS`) to ensure minimum 5-character IDs overall.
+50 (Base32: `BS`) to ensure minimum 6-character IDs overall.
 
 Collision detection occurs during `lat check`. The `lat generate-ids` command
 pre-allocates IDs for document authors.
@@ -247,12 +247,12 @@ Lattice links use standard markdown syntax combining relative file paths with
 Lattice ID fragments:
 
 ```
-See the [error handling](docs/error_handling.md#LJCQ2) document for details
+See the [error handling](docs/error_handling.md#LJCQ2X) document for details
 ```
 
 The `lat fmt` command normalizes links and handles several cases:
 - `[text](../path/to/doc.md)` -> fills in Lattice ID if valid document
-- `[text](LJCQ2)` -> adds file path
+- `[text](LJCQ2X)` -> adds file path
 - Detects document renames/moves and rewrites links to new paths
 
 All links use relative file system paths from the linking document's location.
@@ -330,11 +330,6 @@ general-to-specific (project first, then domain, then subdomain). Acceptance
 criteria compose specific-to-general, ensuring universal requirements like
 "create git commit" anchor at the end.
 
-The `[Lattice]` prefix ensures template sections are intentional—generic
-"Context" headings in regular documents won't accidentally become templates.
-Template changes propagate instantly. The `--raw` flag skips composition to
-show only the task's own content.
-
 See [Appendix: Task Templates](appendix_task_templates.md) for the complete
 section format, composition rules, and common patterns.
 
@@ -346,6 +341,7 @@ The `lat check` command validates documents and repository state:
 
 **Error-level checks (prevent operations):**
 - Duplicate Lattice IDs
+- Invalid Lattice IDs
 - References to nonexistent IDs
 - Invalid YAML frontmatter keys
 - Missing required fields (`name`, `description`, and task-specific fields)
@@ -375,7 +371,7 @@ The `lat fmt` command applies consistent formatting:
 - Proper indentation normalization
 - Adding missing `name` fields from document filename
 - Link normalization: adds Lattice ID fragments to file path links
-- Link expansion: converts bare ID links `[text](LJCQ2)` to full path+fragment
+- Link expansion: converts bare ID links `[text](LJCQ2X)` to full path+fragment
 - Link maintenance: updates paths when documents are renamed or moved
 
 The formatter attempts to auto-correct problems identified by `lat check`
@@ -524,7 +520,7 @@ All errors include structured information for programmatic handling:
 {
   "error_code": "E002",
   "message": "Reference to nonexistent ID",
-  "affected_documents": ["LXXXX"],
+  "affected_documents": ["LXXXXX"],
   "location": {"path": "docs/example.md", "line": 42},
   "suggestion": "Create the target document or correct the ID",
   "fix_command": "lat create docs/target.md"

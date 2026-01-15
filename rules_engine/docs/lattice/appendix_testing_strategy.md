@@ -69,9 +69,9 @@ Use `lat` commands directly for setup—no separate builder API:
 fn show_displays_blocking_tasks() {
     let env = TestEnv::new();
     lat(LatCommand.Create, env, &["tasks/a.md", "-d", "Task A"]);
-    lat(LatCommand.Create, env, &["tasks/b.md", "-d", "Task B", "--deps", "blocked-by:LXXXX"]);
+    lat(LatCommand.Create, env, &["tasks/b.md", "-d", "Task B", "--deps", "blocked-by:LXXXXX"]);
 
-    let result = lat(LatCommand.Show, env, &["LYYYY"]);
+    let result = lat(LatCommand.Show, env, &["LYYYYY"]);
     assert!(result.stdout.contains("Blocked by"));
 }
 ```

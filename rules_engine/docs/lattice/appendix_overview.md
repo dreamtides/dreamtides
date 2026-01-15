@@ -16,8 +16,8 @@ Lattice tracks document views locally in `.lattice/views.json`:
 
 ```json
 {
-  "LXXXX": {"count": 15, "last_viewed": "2026-01-14T10:30:00Z"},
-  "LYYYY": {"count": 8, "last_viewed": "2026-01-13T14:00:00Z"}
+  "LXXXXX": {"count": 15, "last_viewed": "2026-01-14T10:30:00Z"},
+  "LYYYYY": {"count": 8, "last_viewed": "2026-01-13T14:00:00Z"}
 }
 ```
 
@@ -68,9 +68,9 @@ OPTIONS:
 $ lat overview
 Repository Overview (10 most critical documents):
 
-1. [doc] LROOT: project-overview - High-level project architecture (15 views)
-2. [epic] LAUTH: authentication-system - Auth module epic (12 views)
-3. [P0] LBUGB: fix-login-crash - Critical login bug (8 views)
+1. [doc] LROOTX: project-overview - High-level project architecture (15 views)
+2. [epic] LAUTHX: authentication-system - Auth module epic (12 views)
+3. [P0] LBUGBX: fix-login-crash - Critical login bug (8 views)
 ...
 
 View history: 47 documents tracked, 156 total views
@@ -83,7 +83,7 @@ Run 'lat overview --reset-views' to clear history
 {
   "documents": [
     {
-      "id": "LROOT",
+      "id": "LROOTX",
       "name": "project-overview",
       "description": "High-level project architecture",
       "path": "docs/README.md",
@@ -157,27 +157,27 @@ Within each distance tier, documents are ranked by:
 ### Output
 
 ```
-$ lat overview LB234
-Context for LB234: Fix login timeout bug
+$ lat overview LB234X
+Context for LB234X: Fix login timeout bug
 
 Parent:
-  LAA42: [epic] Authentication System
+  LAA42X: [epic] Authentication System
 
 Blocked by (1):
-  LCCCC: [P1 - open] Refactor session handling
+  LCCCCC: [P1 - open] Refactor session handling
 
 Blocks (2):
-  LDDDD: [P0 - open] Release 2.0 checklist
-  LEEEE: [P1 - open] User acceptance testing
+  LDDDDD: [P0 - open] Release 2.0 checklist
+  LEEEEE: [P1 - open] User acceptance testing
 
 Referenced docs (2):
-  LFFFF: auth-design - Authentication architecture
-  LGGGG: session-spec - Session management specification
+  LFFFFF: auth-design - Authentication architecture
+  LGGGGG: session-spec - Session management specification
 
 Siblings (3 of 7 open):
-  LHHHH: [P1] Add OAuth support
-  LJJJJ: [P2] Improve error messages
-  LKKKK: [P2] Add rate limiting
+  LHHHHH: [P1] Add OAuth support
+  LJJJJJ: [P2] Improve error messages
+  LKKKKK: [P2] Add rate limiting
 ```
 
 ### Limits
@@ -193,7 +193,7 @@ Override with `--limit <N>` to show more in each category.
 ### JSON Output
 
 ```
-$ lat overview LB234 --json
+$ lat overview LB234X --json
 ```
 
 Returns structured data with the same categories, suitable for programmatic

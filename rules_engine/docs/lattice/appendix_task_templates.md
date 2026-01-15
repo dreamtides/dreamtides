@@ -22,7 +22,7 @@ as templates for descendant tasks:
 
 ```yaml
 ---
-lattice-id: LXXXX
+lattice-id: LXXXXX
 task-type: epic
 status: open
 priority: 1
@@ -99,8 +99,8 @@ requirements anchor the acceptance criteria at the end.
 The `lat show` command composes ancestor templates with task content:
 
 ```
-$ lat show LZZZZ
-LZZZZ: Fix validation bug in create endpoint
+$ lat show LZZZZZ
+LZZZZZ: Fix validation bug in create endpoint
 Status: open
 Priority: P2
 Type: task
@@ -119,7 +119,7 @@ Acceptance Criteria:
   - [ ] Project-wide checks (git commit, run tests)
 
 Parent:
-  LAAAA: create-endpoint [epic]
+  LAAAAA: create-endpoint [epic]
 ...
 ```
 
@@ -176,11 +176,11 @@ Template information appears in `lat show --json` output:
 
 ```json
 {
-  "id": "LZZZZ",
+  "id": "LZZZZZ",
   "title": "Fix validation bug in create endpoint",
   "ancestors": [
-    {"id": "LPROJ", "name": "project-overview", "path": "README.md"},
-    {"id": "LCREA", "name": "create-endpoint", "path": "api/create/README.md"}
+    {"id": "LPROJX", "name": "project-overview", "path": "README.md"},
+    {"id": "LCREAX", "name": "create-endpoint", "path": "api/create/README.md"}
   ],
   "composed_context": "Project context...\nAPI context...\nCreate context...",
   "composed_acceptance": "- [ ] Create checks\n- [ ] API checks\n- [ ] Project checks",

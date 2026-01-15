@@ -146,9 +146,9 @@ a document outside the sparse checkout, Lattice offers to expand the
 sparse pattern:
 
 ```
-Document LXYZ is outside your sparse checkout.
+Document LXYZAB is outside your sparse checkout.
 Run: git sparse-checkout add path/to/document.md
-Then retry: lat show LXYZ
+Then retry: lat show LXYZAB
 ```
 
 **Configuration:** The `[sparse]` section in `.lattice/config.toml`
