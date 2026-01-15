@@ -88,6 +88,7 @@ for uncommitted changes.
 
 **Full rebuild**: Triggered by missing index, schema mismatch, errors, or
 `lat check --rebuild-index`. Delete index, create schema, parse all .md files.
+Schema version is stored in `index_metadata`; version mismatch triggers rebuild.
 
 Any error during reconciliation triggers full rebuild.
 

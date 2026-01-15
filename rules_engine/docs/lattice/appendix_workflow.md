@@ -321,7 +321,7 @@ Ready work (4 tasks with no blockers):
 ### Ready Criteria
 
 A task is "ready" if:
-1. Status is `open` or `pinned`
+1. Status is `open`
 2. All `blocked-by` tasks are closed
 3. Priority is not P4 (backlog) unless `--include-backlog`
 4. Not currently claimed (unless `--include-claimed`)

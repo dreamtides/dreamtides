@@ -85,7 +85,7 @@ documents, `description` provides a purpose summary for AI context.
 
 **Task Tracking Keys:**
 - `task-type`: bug/feature/task/epic/chore
-- `status`: open/blocked/closed/tombstone/pinned
+- `status`: open/blocked/closed/tombstone
 - `priority`: 0-4 (0 highest)
 - `labels`: List of arbitrary string labels
 - `blocking`: List of task IDs with hard dependencies on this task
@@ -292,8 +292,7 @@ closed <------+
 ```
 
 The `tombstone` status represents deleted tasks that should not be
-resurrected. The `pinned` status indicates permanent open items that
-always appear in `lat ready`.
+resurrected.
 
 There is no "in_progress" status in Lattice. Instead, the `lat claim`
 command tracks which machine is working on a task locally, without

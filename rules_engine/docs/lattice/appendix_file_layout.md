@@ -190,7 +190,6 @@ commands/
 ├── tree_command.rs         # lat tree - directory structure display
 ├── roots_command.rs        # lat roots - list root documents
 ├── children_command.rs     # lat children - list directory contents
-├── stats_command.rs        # lat stats - repository statistics
 ├── dep_command.rs          # lat dep - dependency management (add, tree)
 ├── label_command.rs        # lat label - label management (add, remove, list)
 ├── links_from.rs           # lat links-from - outgoing links

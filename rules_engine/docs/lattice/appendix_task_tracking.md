@@ -32,7 +32,6 @@ create tasks, or without `-t` to create knowledge base documents.
 | `blocked` | No | Waiting on dependencies |
 | `closed` | No | Completed |
 | `tombstone` | No | Permanently deleted, should not be resurrected |
-| `pinned` | Yes (always) | Permanent open item, never auto-closes |
 
 There is no `in_progress` status. Use `lat claim` for local work tracking.
 
@@ -123,8 +122,8 @@ blocked-by: [LWWWWW]        # These block this task
 discovered-from: [LXXXXX]   # Soft link for provenance
 ```
 
-A task is "ready" if: status is `open`/`pinned`, no open `blocked-by`
-tasks, priority is not P4, and not claimed.
+A task is "ready" if: status is `open`, no open `blocked-by` tasks,
+priority is not P4, and not claimed.
 
 ## Labels
 

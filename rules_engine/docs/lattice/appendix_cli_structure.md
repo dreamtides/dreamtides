@@ -262,11 +262,6 @@ List documents under a root's directory.
 - `--tasks`: Only tasks
 - `--docs`: Only knowledge base documents
 
-### lat stats
-
-Display repository-wide statistics (document counts, task status breakdown,
-link counts).
-
 ## Label Commands
 
 ### lat label add \<id\> [id...] \<label\>
