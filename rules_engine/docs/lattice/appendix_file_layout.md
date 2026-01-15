@@ -41,7 +41,8 @@ prime, claim, stale, dep, label, close, reopen, edit, chaosmonkey).
 **index/** - SQLite database management including schema definitions, migrations,
 connection handling, and query implementations for documents, links, labels,
 and full-text search. Also contains the reconciliation engine for syncing git
-state to the index, counter management for client IDs, and view tracking.
+state to the index, counter management for client IDs, view tracking for
+`lat overview` (persisted in `.lattice/views.json`), and L2 content caching.
 
 **document/** - Document parsing and serialization including YAML frontmatter
 parsing, markdown body handling, frontmatter schema definitions, field validation,
@@ -167,17 +168,33 @@ complexity warrants (e.g., `show_format.rs` for display logic).
 ```
 commands/
 ├── mod.rs                  # Module declarations only
-├── show_command.rs         # lat show (or show/ directory if complex etc)
+├── show_command/           # lat show - display document details
+│   ├── mod.rs              # Module declarations only
+│   ├── show_executor.rs    # Entry point, orchestration, template composition
+│   ├── document_formatter.rs # Task and KB formatting, references, dependencies
+│   └── output_formats.rs   # --short, --refs, and --json output modes
 ├── create_command.rs       # lat create - new document creation
 ├── update_command.rs       # lat update - modify existing documents
 ├── close_command.rs        # lat close - mark tasks closed
 ├── reopen_command.rs       # lat reopen - reopen closed tasks
-├── list_command.rs         # lat list - search and filter documents
-├── ready_command.rs        # lat ready - show available work
+├── list_command/           # lat list - search and filter documents
+│   ├── mod.rs              # Module declarations only
+│   ├── list_executor.rs    # Entry point and orchestration
+│   ├── filter_builder.rs   # Parse all filter options, build SQL queries
+│   └── list_output.rs      # Rich/compact/oneline formatting, sort ordering
+├── ready_command/          # lat ready - show available work
+│   ├── mod.rs              # Module declarations only
+│   ├── ready_executor.rs   # Entry point and orchestration
+│   ├── ready_filter.rs     # Ready criteria, blocker resolution, claim filtering
+│   └── ready_output.rs     # Sort policies, --pretty tree, --json output
 ├── overview_command.rs     # lat overview - repository-level context
 ├── prime_command.rs        # lat prime - AI workflow context
 ├── claim_command.rs        # lat claim - local work tracking
-├── check_command.rs        # lat check - validation and linting
+├── check_command/          # lat check - validation and linting
+│   ├── mod.rs              # Module declarations only
+│   ├── check_executor.rs   # Entry point, document validation orchestration
+│   ├── check_fixes.rs      # --staged-only filtering, --fix application, result aggregation
+│   └── check_output.rs     # Text and --json error output formatting
 ├── format_command.rs       # lat fmt - formatting and link normalization
 ├── split_command.rs        # lat split - divide large documents
 ├── mv_command.rs           # lat mv - move document to new location
@@ -200,6 +217,7 @@ commands/
 ├── orphans_command.rs      # lat orphans - find unlinked documents
 ├── impact_command.rs       # lat impact - change impact analysis
 ├── setup_command.rs        # lat setup - install hooks and config
+├── completion_command.rs   # lat completion - generate shell completions
 └── chaos_monkey.rs         # lat chaosmonkey - fuzz testing
 ```
 
@@ -214,7 +232,11 @@ index/
 ├── link_queries.rs         # Link table queries (outgoing, incoming)
 ├── label_queries.rs        # Label queries and management
 ├── fulltext_search.rs      # FTS5 configuration and search queries
-├── reconciliation_engine.rs # Sync git state to index (fast/incremental/full)
+├── reconciliation/          # Sync git state to index (fast/incremental/full)
+│   ├── mod.rs               # Module declarations only
+│   ├── reconciliation_coordinator.rs # Entry point, strategy selection
+│   ├── sync_strategies.rs   # Fast path, incremental sync, full rebuild
+│   └── change_detection.rs  # Change detection, schema migration
 ├── client_counters.rs      # Per-client document counter management
 ├── directory_roots.rs      # Precomputed hierarchy queries
 ├── content_cache.rs        # L2 content cache management
@@ -269,7 +291,11 @@ link/
 ├── mod.rs                  # Module declarations only
 ├── link_extractor.rs       # Parse markdown to find links
 ├── link_resolver.rs        # Resolve IDs to file paths
-├── link_normalizer.rs      # Add missing fragments, update stale paths
+├── link_normalization/     # Add missing fragments, update stale paths
+│   ├── mod.rs              # Module declarations only
+│   ├── normalization_executor.rs # Entry point, orchestration
+│   ├── link_analysis.rs    # Fragment validation, path resolution
+│   └── link_transforms.rs  # Stale path updates, fragment injection, shorthand expansion
 ├── reference_tracker.rs    # Bidirectional reference queries
 └── frontmatter_links.rs    # Extract links from frontmatter fields
 ```

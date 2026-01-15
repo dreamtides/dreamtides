@@ -100,10 +100,10 @@ When a client first uses Lattice in a repository:
 
 ### ID Length Rules
 
-- Default: 2-character IDs (1024 possible values)
-- 3 characters if >16 known clients (32768 possible)
-- 4 characters if >64 known clients
-- 5 characters if >256 known clients
+- Default: 3-character IDs (32768 possible values) for 0-16 known clients
+- 4 characters if >16 known clients (1048576 possible)
+- 5 characters if >64 known clients (33554432 possible)
+- 6 characters if >256 known clients (1073741824 possible)
 
 ## Conflict Detection
 
