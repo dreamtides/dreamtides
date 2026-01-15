@@ -186,8 +186,9 @@ link authoring format (shorthand `[text](ID)` links that `lat fmt` expands).
 Supports custom checklist via `.lattice/config.toml`.
 
 **lat claim** - Marks tasks as locally in progress on the current machine.
-Claims are stored in `~/.lattice/claims.json`, not in markdown files. Supports
-atomic updates across multiple worktrees and automatic release on status change.
+Claims are stored in `~/.lattice/claims/` as one file per claim, not in markdown
+files. Supports atomic updates across multiple worktrees and automatic release
+on status change.
 
 See [Appendix: Workflow](appendix_workflow.md) for complete command specifications,
 output formats, and claiming behavior, and
