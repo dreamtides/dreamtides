@@ -170,7 +170,7 @@ Template information appears in `lat show --json` output:
 ```json
 {
   "id": "LZZZZZ",
-  "title": "Fix validation bug in create endpoint",
+  "description": "Fix validation bug in create endpoint",
   "ancestors": [
     {"id": "LPROJX", "name": "project-overview", "path": "README.md"},
     {"id": "LCREAX", "name": "create-endpoint", "path": "api/create/README.md"}

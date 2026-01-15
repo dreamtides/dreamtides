@@ -59,7 +59,7 @@ recovery scenarios:
 - Modify file contents (header corruption, body changes)
 - Rename/move files via filesystem
 - Create duplicate IDs across files
-- Delete/corrupt `.lattice/index.db`
+- Delete/corrupt `.lattice/index.sqlite`
 - Modify index database directly
 
 ### Git Operations

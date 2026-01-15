@@ -59,6 +59,7 @@ Add Lattice tracking to existing markdown file.
 **Options:**
 - `--name {name}`: Set document name
 - `--description {desc}`: Set description
+- `--force`: Regenerate ID even if document already has one (for resolving duplicates)
 
 ### lat generate-ids [options]
 
@@ -316,7 +317,7 @@ List all labels with counts.
 ### lat setup claude [options]
 
 Install Claude Code hooks and configuration. See
-[Appendix: Claude Code Integration](appendix_ai_integration.md) for hook details.
+[Appendix: AI Integration](appendix_ai_integration.md) for hook details.
 
 Options: `--check`, `--remove`, `--project`.
 

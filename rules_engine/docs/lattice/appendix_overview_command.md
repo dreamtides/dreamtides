@@ -94,6 +94,8 @@ Run 'lat overview --reset-views' to clear history
 }
 ```
 
+Field names match the YAML frontmatter for consistency across all JSON outputs.
+
 ## Configuration
 
 Weights can be customized in `.lattice/config.toml`:

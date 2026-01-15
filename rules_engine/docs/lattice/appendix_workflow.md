@@ -63,7 +63,7 @@ Related (1):
 
 **Key sections:**
 
-- **Header line:** ID, name (from filename), and description (human-readable title)
+- **Header line:** ID, name (from filename), and description (human-readable description)
 - **Metadata block:** Status, priority, type, timestamps, creator
 - **Context:** Composed from ancestor root documents (if any have Context sections)
 - **Body:** Full markdown body content
@@ -155,7 +155,7 @@ For ALL documents:
 The `name` field is always derived from the document's filename (underscores →
 hyphens, `.md` stripped). This is a core Lattice invariant.
 
-For tasks, `description` serves as the display title shown in headers and list
+For tasks, `description` serves as the display description shown in headers and list
 views (e.g., "Fix login bug after password reset"). For knowledge base documents,
 `description` provides a purpose summary for AI context.
 
@@ -218,7 +218,7 @@ The `--json` flag produces structured output compatible with `bd show --json`:
   {
     "id": "LB234X",
     "name": "fix-review-tasks",
-    "title": "Fix LLMC v2 code review tasks",
+    "description": "Fix LLMC v2 code review tasks",
     "body": "Master epic for addressing bugs and missing features...",
     "status": "open",
     "priority": 0,
@@ -232,7 +232,7 @@ The `--json` flag produces structured output compatible with `bd show --json`:
       {
         "id": "L2345X",
         "name": "rebase-detection",
-        "title": "Fix incorrect rebase necessity detection in patrol",
+        "description": "Fix incorrect rebase necessity detection in patrol",
         "status": "closed",
         "priority": 0,
         "task_type": "bug"
@@ -242,7 +242,7 @@ The `--json` flag produces structured output compatible with `bd show --json`:
       {
         "id": "L3456X",
         "name": "crash-count",
-        "title": "Fix crash count not being incremented in patrol",
+        "description": "Fix crash count not being incremented in patrol",
         "status": "open",
         "priority": 0,
         "task_type": "bug"
@@ -252,13 +252,13 @@ The `--json` flag produces structured output compatible with `bd show --json`:
       {
         "id": "L567CX",
         "name": "llmc-design",
-        "title": "Design document for LLMC agent coordination system"
+        "description": "Design document for LLMC agent coordination system"
       }
     ],
     "parent": {
       "id": "LAA42X",
       "name": "llmc-development",
-      "title": "LLMC Development"
+      "description": "LLMC Development"
     },
     "claimed": false
   }
@@ -271,7 +271,7 @@ The `--json` flag produces structured output compatible with `bd show --json`:
 |-----|------|-------------|
 | `id` | string | Lattice ID |
 | `name` | string | Filename-derived identifier (lowercase-hyphenated) |
-| `title` | string | Human-readable title (maps from `description` field) |
+| `description` | string | Human-readable description (task title or KB purpose summary) |
 | `body` | string | Full markdown body content |
 | `status` | string | Task status |
 | `priority` | int | Priority level (0-4) |
@@ -288,9 +288,9 @@ The `--json` flag produces structured output compatible with `bd show --json`:
 | `parent` | object | Directory root document (epic) |
 | `claimed` | bool | Whether locally claimed |
 
-The `title` field maps from the YAML `description` field for backwards
-compatibility with beads. For tasks, this is the task title (e.g., "Fix login
-bug"). For knowledge base documents, this is the purpose summary.
+The `description` field matches the YAML frontmatter field name. For tasks, this
+is the task title (e.g., "Fix login bug"). For knowledge base documents, this is
+the purpose summary.
 
 ### Multiple Documents
 
@@ -299,10 +299,10 @@ returned as a JSON array:
 
 ```
 $ lat show LB234X L567CX
-LB234X: First task title
+LB234X: First task description
 ...
 
-L567CX: Second task title
+L567CX: Second task description
 ...
 ```
 
@@ -388,8 +388,8 @@ The `--json` flag produces output compatible with `bd ready --json`:
 [
   {
     "id": "LB234X",
-    "title": "Fix LLMC v2 code review tasks",
-    "description": "Master epic for addressing bugs...",
+    "description": "Fix LLMC v2 code review tasks",
+    "body": "Master epic for addressing bugs...",
     "status": "open",
     "priority": 0,
     "task_type": "epic",
@@ -400,14 +400,15 @@ The `--json` flag produces output compatible with `bd ready --json`:
     "labels": [],
     "parent": {
       "id": "LAA42X",
-      "title": "LLMC Development"
+      "description": "LLMC Development"
     }
   }
 ]
 ```
 
-The JSON output includes the full description text for each ready task,
-enabling AI agents to understand task context without additional queries.
+Field names match the YAML frontmatter: `description` for the task title, `body`
+for markdown content. The JSON output includes the full body text for each ready
+task, enabling AI agents to understand task context without additional queries.
 
 ## lat prime
 

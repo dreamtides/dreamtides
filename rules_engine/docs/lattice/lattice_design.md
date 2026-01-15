@@ -272,7 +272,7 @@ markers. Expands shorthand links, updates paths on rename/move.
 document with linked children.
 
 See [Appendix: Linter](appendix_linter.md) for complete rule set (E001-E010,
-W001-W017, S001-S003).
+W001-W017, W023, S001-S003).
 
 ## Index Architecture
 
