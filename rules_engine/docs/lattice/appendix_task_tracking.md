@@ -122,6 +122,32 @@ blocked-by: [LWWWWW]        # These block this task
 discovered-from: [LXXXXX]   # Soft link for provenance
 ```
 
+### Dependency Types
+
+| Type | Semantic | Affects `lat ready`? |
+|------|----------|----------------------|
+| `blocking` | This task must close before targets can start | Yes |
+| `blocked-by` | This task cannot start until targets close | Yes |
+| `discovered-from` | This task was found while working on target | No |
+
+### discovered-from
+
+Tracks provenance when work is discovered during another task. This is a soft link
+that does not affect the ready queue.
+
+```bash
+# Create task with discovered-from link
+lat create tasks/auth/fix_token_bug.md "Fix token validation" -t bug -p 1 \
+  --deps discovered-from:LXXXXX
+
+# Query tasks discovered from a parent
+lat list --discovered-from LXXXXX
+
+# View in lat show output
+lat show LYYYYY --json
+# Output includes: "discovered-from": ["LXXXXX"]
+```
+
 A task is "ready" if: status is `open`, no open `blocked-by` tasks,
 priority is not P4, and not claimed.
 

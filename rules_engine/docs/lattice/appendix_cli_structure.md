@@ -148,7 +148,7 @@ Search and filter documents.
 - `--created-before <date>`: Created before date
 - `--updated-after <date>`: Updated after date
 - `--updated-before <date>`: Updated before date
-- `--has-acceptance`: Has acceptance criteria
+- `--discovered-from <id>`: Tasks discovered from specified parent task
 - `--roots-only`: List only directory root documents (`README.md` or `00_*.md`)
 
 **Output Options:**
