@@ -113,6 +113,22 @@ lat close LB234    # Auto-releases claim
 Claims stored in `~/.lattice/claims/`, not in git. See
 [Appendix: Workflow](appendix_workflow.md#lat-claim).
 
+## Templates
+
+Tasks automatically inherit context and acceptance criteria from ancestor
+directory root documents (`00_*.md` files). No explicit template references
+are needed—the filesystem hierarchy IS the template structure.
+
+Root documents can include `[Lattice] Context` and `[Lattice] Acceptance
+Criteria` headings (any heading level):
+- Context sections prepend to descendant task bodies (general → specific)
+- Acceptance sections append to descendant tasks (specific → general)
+
+Changes to root documents propagate instantly to all descendant tasks.
+
+See [Appendix: Task Templates](appendix_task_templates.md) for composition
+rules and common patterns.
+
 ## Document Structure
 
 ```yaml
@@ -130,4 +146,5 @@ Description of the task.
 ```
 
 The `parent-id` field is auto-populated by `lat fmt` from the directory's
-root document.
+root document. Template content (context and acceptance criteria) is inherited
+automatically from ancestor root documents based on filesystem location.

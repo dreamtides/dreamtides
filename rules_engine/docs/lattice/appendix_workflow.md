@@ -34,9 +34,15 @@ Created: 2026-01-10 14:37
 Created by: dthurn
 Updated: 2026-01-10 14:37
 
+Context:
+  [Context from ancestor root documents]
+
 Description:
 Master epic for addressing bugs and missing features identified in
 comprehensive code review of LLMC v2 implementation.
+
+Acceptance Criteria:
+  [Acceptance from ancestor root documents]
 
 Parent:
   LAA42: LLMC Development [epic]
@@ -57,11 +63,16 @@ Related (1):
 
 - **Header line:** ID and name (task title)
 - **Metadata block:** Status, priority, type, timestamps, creator
+- **Context:** Composed from ancestor root documents (if any have Context sections)
 - **Description:** Full markdown body content
+- **Acceptance Criteria:** Composed from ancestor roots (if any have Acceptance sections)
 - **Parent:** Directory root document (epic context)
 - **Depends on:** Tasks in the `blocked-by` field (what this depends on)
 - **Blocks:** Tasks in the `blocking` field (what depends on this)
 - **Related:** Other documents linked in the body text
+
+The `--raw` flag skips template composition, showing only the task's own content
+without ancestor Context or Acceptance Criteria sections.
 
 ### Knowledge Base Display Format
 

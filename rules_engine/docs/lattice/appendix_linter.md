@@ -197,6 +197,18 @@ Path contains backslashes (Windows-style).
 
 **Fix:** Replace backslashes with forward slashes.
 
+## Template Rules
+
+### W023: Template Section in Non-Root
+
+Non-root document contains `[Lattice]` template sections.
+
+**Detection:** Check for `[Lattice]` headings in non-`00_` prefixed files.
+
+**Message:** `Warning [W023]: path/task.md has [Lattice] sections but is not a root`
+
+**Fix:** Move content to the directory's root document or remove sections.
+
 ## Skill-Specific Rules
 
 When `skill: true` is present, additional rules apply:

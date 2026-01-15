@@ -120,6 +120,7 @@ Create new task document.
 
 The path argument specifies both the directory location and filename for the task.
 For directory root documents (epics), use the `00_` prefix in the filename.
+Template content is inherited automatically from ancestor root documents.
 
 ### lat update \<id\> [id...] [options]
 
@@ -177,6 +178,7 @@ Search and filter documents.
 - `--updated-before <date>`: Updated before date
 - `--has-acceptance`: Has acceptance criteria
 - `--progress-below <N>`: Progress under N%
+- `--roots-only`: List only directory root documents (`00_*.md`)
 
 **Output Options:**
 - `--limit N`: Maximum results

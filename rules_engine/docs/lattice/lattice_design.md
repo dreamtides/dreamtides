@@ -329,6 +329,28 @@ See [Appendix: CLI Structure](appendix_cli_structure.md) for the complete
 command reference and [Appendix: Beads Analysis](appendix_beads_analysis.md)
 for detailed analysis of beads behaviors to preserve.
 
+## Task Templates
+
+Task templates provide reusable context and acceptance criteria through the
+existing directory hierarchy. Directory root documents (`00_*.md` files) can
+include `[Lattice] Context` and `[Lattice] Acceptance Criteria` headings that
+automatically compose into all descendant tasks at display time.
+
+This design requires no additional frontmatter fields—the filesystem hierarchy
+IS the template structure. When displaying a task, Lattice walks up the
+directory tree collecting ancestor root documents. Context sections compose
+general-to-specific (project first, then domain, then subdomain). Acceptance
+criteria compose specific-to-general, ensuring universal requirements like
+"create git commit" anchor at the end.
+
+The `[Lattice]` prefix ensures template sections are intentional—generic
+"Context" headings in regular documents won't accidentally become templates.
+Template changes propagate instantly. The `--raw` flag skips composition to
+show only the task's own content.
+
+See [Appendix: Task Templates](appendix_task_templates.md) for the complete
+section format, composition rules, and common patterns.
+
 ## Linter and Formatter
 
 ### The Check Command

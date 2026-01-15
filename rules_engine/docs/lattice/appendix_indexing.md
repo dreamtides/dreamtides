@@ -72,6 +72,10 @@ Precomputed hierarchy: directory_path (PK), root_id, parent_path, depth.
 L2 cache for body content: document_id (PK), content, content_hash,
 accessed_at, file_mtime.
 
+Template content (Context and Acceptance Criteria sections) is resolved at
+query time by walking the `directory_roots` hierarchy. No additional tables
+are needed for template storage.
+
 ## Reconciliation
 
 Runs at the start of every `lat` command.
