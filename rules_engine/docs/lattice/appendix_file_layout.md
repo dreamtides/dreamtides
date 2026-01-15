@@ -70,8 +70,9 @@ reporting.
 **id/** - Lattice ID system including ID type definitions, base32 encoding/decoding,
 ID generation, and client ID selection logic.
 
-**task/** - Task management including type/status/priority enumerations, status
-transition state machine, ready work calculation, and dependency graph management.
+**task/** - Task management including type/priority enumerations, state
+computation from filesystem paths, ready work calculation, and dependency graph
+management.
 
 **skill/** - Skill document integration including symlink creation for .claude/
 directory.
@@ -181,6 +182,7 @@ commands/
 ├── update_command.rs       # lat update - modify existing documents
 ├── close_command.rs        # lat close - mark tasks closed
 ├── reopen_command.rs       # lat reopen - reopen closed tasks
+├── prune_command.rs        # lat prune - permanently delete closed tasks
 ├── list_command/           # lat list - search and filter documents
 │   ├── mod.rs              # Module declarations only
 │   ├── list_executor.rs    # Entry point and orchestration
@@ -344,10 +346,11 @@ id/
 task/
 ├── mod.rs                  # Module declarations only
 ├── task_types.rs           # TaskType enum (bug, feature, task, epic, chore)
-├── task_status.rs          # Status enum and transition validation
+├── task_state.rs           # State computation from path (open/blocked/closed)
 ├── task_priority.rs        # Priority levels (P0-P4)
 ├── ready_calculator.rs     # Determine which tasks are ready for work
 ├── dependency_graph.rs     # Build and query blocking relationships
+├── closed_directory.rs     # .closed/ directory path utilities
 └── template_composer.rs    # Compose context/acceptance from ancestors
 ```
 

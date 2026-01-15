@@ -47,9 +47,9 @@ YAML frontmatter contains an unrecognized key.
 
 Task document lacks required fields.
 
-**Detection:** If `task-type` present, require `status` and `priority`.
+**Detection:** If `task-type` present, require `priority`.
 
-**Message:** `Error [E004]: path.md is a task but missing 'status' field`
+**Message:** `Error [E004]: path.md is a task but missing 'priority' field`
 
 **Fix:** Add the required field.
 
@@ -59,7 +59,7 @@ A field contains an invalid value.
 
 **Detection:** Validate against allowed values for each field type.
 
-**Message:** `Error [E005]: path.md has invalid status 'doing' (allowed: open, blocked, closed, tombstone)`
+**Message:** `Error [E005]: path.md has invalid priority '5' (allowed: 0-4)`
 
 **Fix:** Use a valid value.
 
@@ -117,6 +117,27 @@ Document lacks required `description` field.
 **Message:** `Error [E010]: path.md is missing required 'description' field`
 
 **Fix:** Add description explaining the document's purpose (for KB) or task title (for tasks).
+
+### E011: Invalid Closed Directory Structure
+
+A `.closed/` directory contains invalid structure.
+
+**Detection:** Check that `.closed/` directories only contain task documents and
+are not nested (no `.closed/.closed/`).
+
+**Message:** `Error [E011]: path/.closed/.closed/ is a nested closed directory`
+
+**Fix:** Move documents to parent `.closed/` or restructure.
+
+### E012: Non-Task in Closed Directory
+
+A knowledge base document (no `task-type`) is in a `.closed/` directory.
+
+**Detection:** Check documents in `.closed/` directories have `task-type` field.
+
+**Message:** `Error [E012]: path/.closed/doc.md is a knowledge base document in closed directory`
+
+**Fix:** Move to parent directory or convert to task.
 
 ## Warning-Level Rules
 

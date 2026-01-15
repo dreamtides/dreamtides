@@ -27,9 +27,10 @@ Display document details. Options: `--short`, `--refs`, `--peek`, `--raw`.
 
 ### lat ready [options]
 
-Find ready work. Options: `--parent {id}`, `--priority {n}`, `--type {type}`,
-`--label {list}`, `--label-any {list}`, `--limit {n}`, `--include-backlog`,
-`--include-claimed`, `--pretty`, `--sort {policy}` (hybrid/priority/oldest).
+Find ready work (tasks not in `.closed/`, with all blockers closed). Options:
+`--parent {id}`, `--priority {n}`, `--type {type}`, `--label {list}`,
+`--label-any {list}`, `--limit {n}`, `--include-backlog`, `--include-claimed`,
+`--pretty`, `--sort {policy}` (hybrid/priority/oldest).
 
 ### lat prime [options]
 
@@ -88,7 +89,7 @@ pointing to the moved document.
 ## Task Commands
 
 See [Appendix: Task Tracking](appendix_task_tracking.md) for task lifecycle,
-status transitions, and template inheritance.
+state transitions, and template inheritance.
 
 ### lat create {path} "{description}" [options]
 
@@ -113,10 +114,9 @@ or `00_` prefix.
 
 ### lat update {id} [id...] [options]
 
-Modify existing tasks.
+Modify existing tasks. To change task state, use `lat close` or `lat reopen`.
 
 **Options:**
-- `--status {status}`: Change status
 - `--priority {n}`: Change priority
 - `--type {type}`: Change type
 - `--add-labels {list}`: Add labels
@@ -133,23 +133,46 @@ Open task in editor. Human-only.
 
 ### lat close {id} [id...] [options]
 
-Mark tasks as closed.
+Close tasks by moving them to `.closed/` subdirectory. Updates all links to
+point to the new path (like `lat mv`). Sets `closed-at` timestamp.
 
 **Options:**
-- `--reason {text}`: Closure reason
+- `--reason {text}`: Closure reason (appended to document body)
+- `--dry-run`: Preview without moving
 
 ### lat reopen {id} [id...]
 
-Change closed tasks to open.
+Reopen closed tasks by moving them from `.closed/` back to their original
+parent directory. Updates all links to the restored path.
+
+**Options:**
+- `--dry-run`: Preview without moving
+
+### lat prune {path} [options]
+### lat prune --all [options]
+
+Permanently delete closed tasks. Requires either a path argument or `--all`.
+
+**Behavior:**
+- Removes tasks from `.closed/` directories
+- Removes references from `blocking`, `blocked-by`, `discovered-from` fields
+- Inline markdown links to pruned tasks produce an error unless `--force`
+
+**Options:**
+- `--all`: Prune all closed tasks in the repository (required if no path given)
+- `--force`: Convert inline links to plain text instead of erroring
+- `--dry-run`: Preview without deleting
 
 ## Query Commands
 
 ### lat list [options]
 
-Search and filter documents.
+Search and filter documents. By default excludes closed tasks.
 
 **Filter Options:**
-- `--status {status}`: Filter by status
+- `--state {state}`: Filter by state (open/blocked/closed)
+- `--include-closed`: Include tasks in `.closed/` directories
+- `--closed-only`: Show only closed tasks
 - `--priority {n}`: Exact priority
 - `--priority-min {n}`: Minimum priority
 - `--priority-max {n}`: Maximum priority
@@ -176,9 +199,14 @@ Search and filter documents.
 
 Default format shows rich metadata with name and description:
 ```
-LXXXXX [bug/P1/open] login-failure - Users cannot log in after password reset
-LYYYYY [feature/P2/open] oauth-support - Add OAuth 2.0 authentication support
+LXXXXX [bug/P1] login-failure - Users cannot log in after password reset
+LYYYYY [feature/P2] oauth-support - Add OAuth 2.0 authentication support
 LZZZZZ [doc] authentication-design - OAuth 2.0 implementation design
+```
+
+With `--include-closed`, closed tasks show their state:
+```
+LAAAAA [task/P2/closed] old-feature - Previously completed feature
 ```
 
 Compact format (name only):
@@ -206,11 +234,12 @@ Keyword search across document content.
 
 ### lat blocked [options]
 
-Show tasks in blocked status with their blocking relationships.
+Show tasks with unresolved blockers (open tasks in their `blocked-by` field).
 
 **Options:**
 - `--path {prefix}`: Filter to path prefix
 - `--limit {n}`: Maximum results
+- `--show-blockers`: Display the blocking tasks for each result
 
 ### lat dep add {id} {depends-on-id}
 
@@ -222,7 +251,7 @@ Remove dependency relationship.
 
 ### lat dep tree {id}
 
-Display dependency tree with status indicators.
+Display dependency tree with state indicators (open/blocked/closed).
 
 ### lat changes [options]
 
@@ -234,7 +263,7 @@ Show documents changed since a point in time.
 
 ### lat stats [options]
 
-Display project statistics: document counts, open/closed/blocked by status,
+Display project statistics: document counts by state (open/blocked/closed),
 priority and type breakdowns, recent activity, and health metrics.
 
 Follows the flags and output format of `bd stats`.

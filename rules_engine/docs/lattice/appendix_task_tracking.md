@@ -9,7 +9,7 @@ All Lattice documents require `lattice-id`, `name`, and `description`. The
 document type determines additional fields:
 
 - **Knowledge base**: `lattice-id`, `name`, `description` (required)
-- **Task**: Above plus `task-type`, `status`, `priority` (required)
+- **Task**: Above plus `task-type`, `priority` (required)
 
 The presence of `task-type` is the discriminator. Use `lat create` with `-t` to
 create tasks, or without `-t` to create knowledge base documents.
@@ -24,14 +24,46 @@ create tasks, or without `-t` to create knowledge base documents.
 | `epic` | Directory root / grouping |
 | `chore` | Dependencies, tooling |
 
-## Status
+## Task State
 
-| Status | In `lat ready` | Description |
-|--------|----------------|-------------|
-| `open` | Yes (unless claimed) | Available for work |
-| `blocked` | No | Waiting on dependencies |
-| `closed` | No | Completed |
-| `tombstone` | No | Permanently deleted, should not be resurrected |
+Task state is determined by filesystem location, not by a YAML field:
+
+| State | Filesystem Location | In `lat ready` | Description |
+|-------|---------------------|----------------|-------------|
+| Open | Not in `.closed/` | Yes (unless blocked/claimed) | Available for work |
+| Blocked | Not in `.closed/`, has open `blocked-by` | No | Waiting on dependencies |
+| Closed | In `.closed/` subdirectory | No | Completed |
+
+A task is **blocked** when any entry in its `blocked-by` field references a
+task that is not closed. Once all blockers are closed, the task becomes open.
+
+### The `.closed/` Directory
+
+Closed tasks reside in a `.closed/` subdirectory under their original parent:
+
+```
+tasks/auth/
+├── .closed/
+│   ├── fix_login.md      # Closed task
+│   └── oauth_bug.md      # Closed task
+├── README.md             # Open epic
+└── new_feature.md        # Open task
+```
+
+The `.closed/` directory is tracked in git, making closed tasks visible to all
+collaborators. Use `lat prune` to permanently remove closed tasks.
+
+### State Transitions
+
+```
+         lat close
+  open ───────────────► closed
+    ▲                      │
+    │ (blockers closed)    │ lat reopen
+    │                      ▼
+blocked ◄─────────────── open
+         (add blocked-by)
+```
 
 There is no `in_progress` status. Use `lat claim` for local work tracking.
 
@@ -148,7 +180,7 @@ lat show LYYYYY --json
 # Output includes: "discovered-from": ["LXXXXX"]
 ```
 
-A task is "ready" if: status is `open`, no open `blocked-by` tasks,
+A task is "ready" if: not in `.closed/`, all `blocked-by` tasks are closed,
 priority is not P4, and not claimed.
 
 ## Labels
@@ -161,7 +193,7 @@ Query with `--label` (AND) or `--label-any` (OR).
 
 ## Work Tracking
 
-Use `lat claim` instead of status changes:
+Use `lat claim` for local work tracking:
 
 ```bash
 lat claim LB234X    # Mark as being worked on
@@ -198,7 +230,6 @@ lattice-id: LXXXXX
 name: fix-login
 description: Fix login after password reset
 task-type: task
-status: open
 priority: 2
 labels: [auth]
 blocked-by: [LZZZZZ]
@@ -215,6 +246,9 @@ This appears to be a session invalidation issue.
 3. Attempt to log in with new password
 4. Observe 401 error
 ```
+
+When this task is closed via `lat close LXXXXX`, it moves to
+`tasks/auth/.closed/fix_login.md` and all links are updated automatically.
 
 The `name` field is always derived from the filename (underscores → hyphens,
 lowercase). This is a core Lattice invariant—the linter will warn if `name`

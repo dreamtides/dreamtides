@@ -85,7 +85,6 @@ documents, `description` provides a purpose summary for AI context.
 
 **Task Tracking Keys:**
 - `task-type`: bug/feature/task/epic/chore
-- `status`: open/blocked/closed/tombstone
 - `priority`: 0-4 (0 highest)
 - `labels`: List of arbitrary string labels
 - `blocking`: List of task IDs with hard dependencies on this task
@@ -161,9 +160,10 @@ single or multiple documents, with `--json`, `--short`, and `--refs` options.
 Default output includes parent, dependencies, blocking tasks, and related
 documents—providing full context for AI agents in a single call.
 
-**lat ready** - Shows work available to start: open tasks with no blockers
-that are not claimed. Supports `--parent` for directory filtering, `--pretty`
-for visual tree display, and `--json` for full task details.
+**lat ready** - Shows work available to start: tasks that are not closed, have
+no open blockers, and are not claimed. Supports `--parent` for directory
+filtering, `--pretty` for visual tree display, and `--json` for full task
+details.
 
 **lat overview** - Provides repository-level context for AI agents. Shows the
 most critical documents based on view frequency, recency, and priority. Supports
@@ -177,7 +177,7 @@ Supports custom checklist via `.lattice/config.toml`.
 **lat claim** - Marks tasks as locally in progress on the current machine.
 Claims are stored in `~/.lattice/claims/` as one file per claim, not in markdown
 files. Supports atomic updates across multiple worktrees and automatic release
-on status change.
+when tasks are closed.
 
 See [Appendix: Workflow](appendix_workflow.md) for complete command specifications,
 output formats, and claiming behavior, and
@@ -195,13 +195,21 @@ positional argument. For tasks, add `-t <type>` to specify task type; omitting
 dependencies for tasks.
 
 **lat update** - Modifies existing documents with `lat update <id> [id...]
-[options]`. Supports changing status, priority, type, and managing labels.
-Can update multiple tasks atomically, useful for bulk operations like marking
-dependencies as blocked or changing priority across related tasks.
+[options]`. Supports changing priority, type, and managing labels. To change
+task state, use `lat close` or `lat reopen`. Can update multiple tasks
+atomically, useful for bulk operations like changing priority across related
+tasks.
 
-**lat close** - Marks tasks as closed, accepting single or multiple lattice IDs.
-Automatically releases any local claims and sets the `closed-at` timestamp.
-Supports `--reason` for documenting why the task was closed.
+**lat close** - Closes tasks by moving them to a `.closed/` subdirectory under
+their current location (e.g., `api/tasks/foo.md` → `api/tasks/.closed/foo.md`).
+All markdown links to closed tasks are automatically rewritten to the new path,
+similar to `lat mv`. Sets the `closed-at` timestamp and releases any local claims.
+
+**lat prune** - Permanently removes closed tasks from the repository. Requires
+either a path argument or `--all` to prune all closed tasks. YAML frontmatter
+references to pruned tasks are removed automatically. Inline markdown links to
+pruned tasks produce an error unless `--force` is passed, which converts them
+to plain text.
 
 See [Appendix: Task Tracking](appendix_task_tracking.md) for the complete
 task lifecycle and [Appendix: CLI Structure](appendix_cli_structure.md) for
@@ -212,9 +220,10 @@ full command reference.
 Commands for searching, validating, and formatting documents.
 
 **lat list** - Searches and filters documents with flexible query options.
-Supports filtering by status, priority, type, labels, timestamps, and path
-prefix. Returns formatted lists with `--pretty` for visual display or `--json`
-for programmatic access.
+Supports filtering by state (open/blocked/closed), priority, type, labels,
+timestamps, and path prefix. By default excludes closed tasks; use
+`--include-closed` to see them. Returns formatted lists with `--pretty` for
+visual display or `--json` for programmatic access.
 
 **lat check** - Validates documents and repository state before committing.
 Detects duplicate IDs, broken links, invalid frontmatter, circular
@@ -237,7 +246,8 @@ to regenerate IDs for documents with duplicates.
 
 **lat edit** - Open document in editor (human-only, not for AI agents).
 
-**lat reopen** - Change closed tasks back to open status.
+**lat reopen** - Reopens closed tasks by moving them from `.closed/` back to
+their original parent directory. All links are rewritten to the restored path.
 
 **lat generate-ids** - Pre-allocate IDs for offline authoring.
 
@@ -265,8 +275,14 @@ Tasks and knowledge base documents share a unified ID space. Hierarchy comes
 from the filesystem: all tasks in a directory are siblings, with the root
 document (`README.md` or `00_*`) as their parent epic.
 
-Status transitions: `open ↔ blocked → closed` (plus `tombstone` for permanent
-deletion). No `in_progress` status; use `lat claim` for local work tracking.
+Task state is determined by filesystem location, not by a status field:
+- **Open**: Task exists outside of any `.closed/` directory
+- **Blocked**: Task has open (non-closed) entries in its `blocked-by` field
+- **Closed**: Task resides in a `.closed/` subdirectory
+
+The `lat close` command moves tasks to `.closed/`, and `lat reopen` moves them
+back. The `lat prune` command permanently deletes closed tasks. There is no
+`in_progress` status; use `lat claim` for local work tracking.
 
 See [Appendix: Task Tracking](appendix_task_tracking.md) for lifecycle, types,
 priorities, and dependencies.
@@ -283,8 +299,8 @@ and composition rules.
 ## Linter and Formatter
 
 **`lat check`** validates documents: duplicate/invalid IDs, broken references,
-invalid frontmatter, circular dependencies, missing required fields. Warnings
-for documents exceeding 500 lines.
+invalid frontmatter, circular dependencies, missing required fields, and
+`.closed/` directory structure. Warnings for documents exceeding 500 lines.
 
 **`lat fmt`** normalizes formatting: 80-char wrapping, ATX headers, dash list
 markers. Expands shorthand links, updates paths on rename/move.

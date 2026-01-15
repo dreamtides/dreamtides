@@ -231,3 +231,40 @@ When a document changes:
 3. Insert new link records
 
 This is simpler and faster than diffing.
+
+## Closed Task Link Handling
+
+When tasks are closed via `lat close`, they move to a `.closed/` subdirectory.
+All links pointing to the task are automatically updated to the new path:
+
+```
+Before close: [task](../auth/fix_login.md#LXXXXX)
+After close:  [task](../auth/.closed/fix_login.md#LXXXXX)
+```
+
+This rewriting happens automatically during `lat close`, similar to `lat mv`.
+The Lattice ID in the fragment remains unchanged, only the path updates.
+
+### Reopening Tasks
+
+When `lat reopen` moves a task back from `.closed/`, links are rewritten again:
+
+```
+Before reopen: [task](../auth/.closed/fix_login.md#LXXXXX)
+After reopen:  [task](../auth/fix_login.md#LXXXXX)
+```
+
+### Pruning Tasks
+
+When `lat prune <path>` or `lat prune --all` permanently deletes closed tasks:
+
+1. **YAML frontmatter references** (`blocking`, `blocked-by`, `discovered-from`)
+   are automatically removed from all documents
+2. **Inline markdown links** produce an error by default
+3. With `--force`, inline links are converted to plain text:
+   ```
+   Before prune: See [the old task](../auth/.closed/fix_login.md#LXXXXX) for context.
+   After prune:  See the old task for context.
+   ```
+
+The index is updated to remove all references to pruned documents.

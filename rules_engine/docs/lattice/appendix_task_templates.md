@@ -24,7 +24,6 @@ as templates for descendant tasks:
 ---
 lattice-id: LXXXXX
 task-type: epic
-status: open
 priority: 1
 name: api-design
 description: API subsystem tasks
@@ -101,7 +100,7 @@ The `lat show` command composes ancestor templates with task content:
 ```
 $ lat show LZZZZZ
 LZZZZZ: Fix validation bug in create endpoint
-Status: open
+State: open
 Priority: P2
 Type: task
 

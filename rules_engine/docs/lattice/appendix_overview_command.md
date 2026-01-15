@@ -51,10 +51,13 @@ OPTIONS:
   --limit <N>         Maximum documents (default 10)
   --type <type>       Filter by task type or 'doc' for knowledge base
   --path <prefix>     Filter to path prefix
-  --include-closed    Include closed tasks
+  --include-closed    Include tasks in .closed/ directories
   --reset-views       Clear view history
   --json              Structured output
 ```
+
+By default, `lat overview` excludes tasks in `.closed/` directories. Use
+`--include-closed` to see recently-viewed closed tasks in the overview.
 
 ### Default Output
 
@@ -160,11 +163,11 @@ Parent:
   LAA42X: [epic] Authentication System
 
 Blocked by (1):
-  LCCCCC: [P1 - open] Refactor session handling
+  LCCCCC: [P1] Refactor session handling
 
 Blocks (2):
-  LDDDDD: [P0 - open] Release 2.0 checklist
-  LEEEEE: [P1 - open] User acceptance testing
+  LDDDDD: [P0] Release 2.0 checklist
+  LEEEEE: [P1] User acceptance testing
 
 Referenced docs (2):
   LFFFFF: auth-design - Authentication architecture
@@ -175,6 +178,9 @@ Siblings (3 of 7 open):
   LJJJJJ: [P2] Improve error messages
   LKKKKK: [P2] Add rate limiting
 ```
+
+Tasks in `.closed/` directories show `[P<N>/closed]` indicator when displayed
+via `--include-closed`.
 
 ### Limits
 

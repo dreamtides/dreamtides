@@ -23,7 +23,7 @@ Index location: `.lattice/index.sqlite` (gitignored).
 | name | TEXT | Document name |
 | description | TEXT | Document description |
 | task_type | TEXT | NULL for knowledge base docs |
-| status | TEXT | Task status |
+| is_closed | INTEGER | 1 if path contains `/.closed/`, 0 otherwise |
 | priority | INTEGER | 0-4 |
 | created_at | TEXT | ISO 8601 |
 | updated_at | TEXT | ISO 8601 |
@@ -34,6 +34,10 @@ Index location: `.lattice/index.sqlite` (gitignored).
 | link_count | INTEGER | Outgoing links (trigger-maintained) |
 | backlink_count | INTEGER | Incoming links (trigger-maintained) |
 | view_count | INTEGER | Local view count (denormalized from views table) |
+
+The `is_closed` column is computed from the `path` column: if the path contains
+`/.closed/` anywhere, the document is closed. This is set during indexing and
+updated when documents are moved via `lat close` or `lat reopen`.
 
 ### links
 

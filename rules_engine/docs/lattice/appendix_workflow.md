@@ -29,7 +29,7 @@ For task documents, the output follows `bd show` format:
 
 ```
 LB234X: fix-review-tasks - Fix LLMC v2 code review tasks
-Status: open
+State: open
 Priority: P0
 Type: epic
 Created: 2026-01-10 14:37
@@ -50,11 +50,11 @@ Parent:
   LAA42X: llmc-development - LLMC Development [epic]
 
 Depends on (1):
-  L2345X: rebase-detection - Fix incorrect rebase necessity detection [P0 - closed]
+  L2345X: rebase-detection - Fix incorrect rebase necessity detection [P0/closed]
 
 Blocks (5):
-  L3456X: crash-count - Fix crash count not being incremented [P0 - open]
-  L4567X: worker-nudging - Fix stuck worker nudging to be async [P1 - open]
+  L3456X: crash-count - Fix crash count not being incremented [P0]
+  L4567X: worker-nudging - Fix stuck worker nudging to be async [P1]
   ...
 
 Related (1):
@@ -64,7 +64,7 @@ Related (1):
 **Key sections:**
 
 - **Header line:** ID, name (from filename), and description (human-readable description)
-- **Metadata block:** Status, priority, type, timestamps, creator
+- **Metadata block:** State (open/blocked/closed), priority, type, timestamps, creator
 - **Context:** Composed from ancestor root documents (if any have Context sections)
 - **Body:** Full markdown body content
 - **Acceptance Criteria:** Composed from ancestor roots (if any have Acceptance sections)
@@ -72,6 +72,9 @@ Related (1):
 - **Depends on:** Tasks in the `blocked-by` field (what this depends on)
 - **Blocks:** Tasks in the `blocking` field (what depends on this)
 - **Related:** Other documents linked in the body text
+
+State is computed from filesystem location: tasks in `.closed/` directories are
+closed, tasks with open blockers are blocked, all others are open.
 
 The `--raw` flag skips template composition, showing only the task's own content
 without ancestor Context or Acceptance Criteria sections.
@@ -112,7 +115,8 @@ All document references throughout `lat show` output use a consistent format:
 ```
 
 Where `<type-indicator>` is:
-- For tasks: `P<N> - <status>` (e.g., `P0 - open`, `P1 - closed`)
+- For open tasks: `P<N>` (e.g., `P0`, `P1`)
+- For closed tasks: `P<N>/closed` (e.g., `P0/closed`)
 - For knowledge base: `doc`
 
 The `name` is the filename-derived identifier (lowercase-hyphenated). The
@@ -121,7 +125,8 @@ to both tasks and knowledge base documents.
 
 Examples:
 ```
-LB234X: fix-login - Fix login after password reset [P0 - open]
+LB234X: fix-login - Fix login after password reset [P0]
+L234YX: old-bug - Previously fixed issue [P1/closed]
 L567CX: authentication-design - OAuth 2.0 implementation design [doc]
 LDAB2X: llmc-development - LLMC Development epic [epic]
 ```
@@ -171,7 +176,10 @@ $ lat show LB234X --short
 LB234X [open] P0 epic: fix-review-tasks - Fix LLMC v2 code review tasks
 ```
 
-Format: `<id> [<status>] <priority> <type>: <name> - <description>`
+Format: `<id> [<state>] <priority> <type>: <name> - <description>`
+
+State is `open`, `blocked`, or `closed` (derived from filesystem location and
+blocker resolution).
 
 For knowledge base documents:
 ```
@@ -220,7 +228,7 @@ The `--json` flag produces structured output compatible with `bd show --json`:
     "name": "fix-review-tasks",
     "description": "Fix LLMC v2 code review tasks",
     "body": "Master epic for addressing bugs and missing features...",
-    "status": "open",
+    "state": "open",
     "priority": 0,
     "task_type": "epic",
     "created_at": "2026-01-10T14:37:59.351489-08:00",
@@ -233,7 +241,7 @@ The `--json` flag produces structured output compatible with `bd show --json`:
         "id": "L2345X",
         "name": "rebase-detection",
         "description": "Fix incorrect rebase necessity detection in patrol",
-        "status": "closed",
+        "state": "closed",
         "priority": 0,
         "task_type": "bug"
       }
@@ -243,7 +251,7 @@ The `--json` flag produces structured output compatible with `bd show --json`:
         "id": "L3456X",
         "name": "crash-count",
         "description": "Fix crash count not being incremented in patrol",
-        "status": "open",
+        "state": "open",
         "priority": 0,
         "task_type": "bug"
       }
@@ -273,7 +281,7 @@ The `--json` flag produces structured output compatible with `bd show --json`:
 | `name` | string | Filename-derived identifier (lowercase-hyphenated) |
 | `description` | string | Human-readable description (task title or KB purpose summary) |
 | `body` | string | Full markdown body content |
-| `status` | string | Task status |
+| `state` | string | Computed task state (open/blocked/closed) |
 | `priority` | int | Priority level (0-4) |
 | `task_type` | string | bug/feature/task/epic/chore |
 | `created_at` | string | ISO 8601 timestamp |
@@ -288,9 +296,11 @@ The `--json` flag produces structured output compatible with `bd show --json`:
 | `parent` | object | Directory root document (epic) |
 | `claimed` | bool | Whether locally claimed |
 
-The `description` field matches the YAML frontmatter field name. For tasks, this
-is the task title (e.g., "Fix login bug"). For knowledge base documents, this is
-the purpose summary.
+The `state` field is computed from filesystem location: `closed` if in a
+`.closed/` directory, `blocked` if any `blocked-by` entries reference open
+tasks, otherwise `open`. The `description` field matches the YAML frontmatter
+field name. For tasks, this is the task title (e.g., "Fix login bug"). For
+knowledge base documents, this is the purpose summary.
 
 ### Multiple Documents
 
@@ -308,8 +318,8 @@ L567CX: Second task description
 
 ## lat ready
 
-The `lat ready` command shows work available to start: tasks that are open,
-have no blockers, and are not claimed.
+The `lat ready` command shows work available to start: tasks that are not
+closed (not in `.closed/`), have all blockers closed, and are not claimed.
 
 ### Basic Usage
 
@@ -335,8 +345,8 @@ Ready work (4 tasks with no blockers):
 ### Ready Criteria
 
 A task is "ready" if:
-1. Status is `open`
-2. All `blocked-by` tasks are closed
+1. Not in a `.closed/` directory
+2. All `blocked-by` tasks are closed (in `.closed/`)
 3. Priority is not P4 (backlog) unless `--include-backlog`
 4. Not currently claimed (unless `--include-claimed`)
 
@@ -363,7 +373,7 @@ A task is "ready" if:
 
 ### Pretty Format
 
-The `--pretty` flag displays a visual tree with status symbols:
+The `--pretty` flag displays a visual tree with state symbols:
 
 ```
 $ lat ready --pretty
@@ -390,7 +400,7 @@ The `--json` flag produces output compatible with `bd ready --json`:
     "id": "LB234X",
     "description": "Fix LLMC v2 code review tasks",
     "body": "Master epic for addressing bugs...",
-    "status": "open",
+    "state": "open",
     "priority": 0,
     "task_type": "epic",
     "created_at": "2026-01-10T14:37:59.351489-08:00",
@@ -407,8 +417,10 @@ The `--json` flag produces output compatible with `bd ready --json`:
 ```
 
 Field names match the YAML frontmatter: `description` for the task title, `body`
-for markdown content. The JSON output includes the full body text for each ready
-task, enabling AI agents to understand task context without additional queries.
+for markdown content. The `state` field is always `open` for ready tasks (tasks
+with blockers or closed tasks are never ready). The JSON output includes the
+full body text for each ready task, enabling AI agents to understand task
+context without additional queries.
 
 ## lat prime
 
@@ -538,12 +550,13 @@ lat close LB234X    # Closing auto-releases the claim
 
 ### Auto-Release on State Change
 
-When a task's status changes (closed, blocked, etc.), its claim is
-automatically released. This happens during:
+When a task becomes closed, its claim is automatically released. This happens
+during:
 
-- `lat close <id>`
-- `lat update <id> --status blocked`
-- Any operation that modifies task status
+- `lat close <id>` (moves task to `.closed/`)
+
+Claims are NOT released when a task becomes blocked (blockers are added), since
+the task may still be actively worked on.
 
 ### Stale Claim Detection
 
@@ -558,7 +571,7 @@ Kept: LDAB2X (active)
 ```
 
 A claim is stale if:
-- The task is no longer open
+- The task is in a `.closed/` directory
 - The work path no longer exists
 - The claim is older than 7 days (configurable)
 
@@ -573,7 +586,7 @@ The `lat show` command indicates claim status:
 
 ```
 LB234X: Fix LLMC v2 code review tasks
-Status: open
+State: open
 Priority: P0
 Type: epic
 Claimed: true
