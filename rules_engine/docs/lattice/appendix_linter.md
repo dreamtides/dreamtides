@@ -132,111 +132,157 @@ Document exceeds the recommended 500 line limit.
 
 **Fix:** Split using `lat split` or manually divide content.
 
-### W002: (Superseded by E009)
-
-Missing `name` is now an error. See E009.
-
-### W003: (Superseded by E010)
-
-Missing `description` is now an error. See E010.
-
-### W004: Name Too Long
+### W002: Name Too Long
 
 Document name exceeds 64 characters.
 
 **Detection:** Validate name field length.
 
-**Message:** `Warning [W004]: path.md name is 78 characters (max: 64)`
+**Message:** `Warning [W002]: path.md name is 78 characters (max: 64)`
 
 **Fix:** Shorten the name.
 
-### W005: Description Too Long
+### W003: Description Too Long
 
 Description exceeds 1024 characters.
 
 **Detection:** Validate description field length.
 
-**Message:** `Warning [W005]: path.md description is 1200 characters (max: 1024)`
+**Message:** `Warning [W003]: path.md description is 1200 characters (max: 1024)`
 
 **Fix:** Shorten the description.
 
-### W006: Invalid Name Characters
+### W004: Invalid Name Characters
 
 Name contains characters other than lowercase letters, numbers, hyphens.
 
 **Detection:** Regex validation on name field.
 
-**Message:** `Warning [W006]: path.md name 'My_Document' contains invalid characters (use lowercase-hyphen-format)`
+**Message:** `Warning [W004]: path.md name 'My_Document' contains invalid characters (use lowercase-hyphen-format)`
 
 **Fix:** Rename using only lowercase letters, numbers, and hyphens.
 
-### W007: Inconsistent Header Style
+### W005: Inconsistent Header Style
 
 Document mixes ATX (`#`) and setext (underline) headers.
 
 **Detection:** Parse header styles, flag if both present.
 
-**Message:** `Warning [W007]: path.md mixes header styles (use ATX # headers consistently)`
+**Message:** `Warning [W005]: path.md mixes header styles (use ATX # headers consistently)`
 
 **Fix:** Convert all headers to ATX style.
 
-### W008: Inconsistent List Markers
+### W006: Inconsistent List Markers
 
 Document mixes list markers (`-`, `*`, `+`).
 
 **Detection:** Parse list markers, flag if multiple types.
 
-**Message:** `Warning [W008]: path.md mixes list markers (use - consistently)`
+**Message:** `Warning [W006]: path.md mixes list markers (use - consistently)`
 
 **Fix:** Convert all list markers to dashes.
 
-### W009: Bare URL
+### W007: Bare URL
 
 URL appears without markdown link syntax.
 
 **Detection:** Regex for URLs not inside `[]()` or `<>`.
 
-**Message:** `Warning [W009]: path.md:15 has bare URL (use [text](url) format)`
+**Message:** `Warning [W007]: path.md:15 has bare URL (use [text](url) format)`
 
 **Fix:** Convert to markdown link or angle-bracket URL.
 
-### W010: Self-Reference
+### W008: Self-Reference
 
 Document contains a link to itself.
 
 **Detection:** Check if any link target equals document's own ID.
 
-**Message:** `Warning [W010]: path.md contains self-reference at line 23`
+**Message:** `Warning [W008]: path.md contains self-reference at line 23`
 
 **Fix:** Remove the self-reference.
 
-### W011: Backslash in Path
+### W009: Backslash in Path
 
 Path contains backslashes (Windows-style).
 
 **Detection:** Check paths in links for backslash characters.
 
-**Message:** `Warning [W011]: path.md:30 uses backslash in path (use forward slashes)`
+**Message:** `Warning [W009]: path.md:30 uses backslash in path (use forward slashes)`
 
 **Fix:** Replace backslashes with forward slashes.
 
-### W012: Link Path Mismatch
+### W010: Link Path Mismatch
 
-Reserved. Link path validation is covered by `lat check` and documented in
-[Appendix: Linking System](appendix_linking_system.md#path-mismatches).
+Link file path doesn't match the target document's actual location.
 
-## Template Rules
+**Detection:** Compare link path against document's current path in index.
 
-*Note: W018-W022 are reserved for future template validation rules.*
+**Message:** `Warning [W010]: path.md:30 has stale link path (expected ../new/location.md#LYYYYY)`
 
-### W023: Template Section in Non-Root
+**Fix:** Run `lat fmt` to update link paths automatically.
+
+See [Appendix: Linking System](appendix_linking_system.md#path-mismatches) for
+details on path validation.
+
+### W011: Trailing Whitespace
+
+Lines end with unnecessary whitespace.
+
+**Detection:** Regex for spaces/tabs at line end.
+
+**Message:** `Warning [W011]: path.md:20 has trailing whitespace`
+
+**Fix:** Run `lat fmt` to strip automatically.
+
+### W012: Multiple Blank Lines
+
+More than one consecutive blank line in document.
+
+**Detection:** Count consecutive newlines > 2.
+
+**Message:** `Warning [W012]: path.md:45 has 3 consecutive blank lines (max: 1)`
+
+**Fix:** Run `lat fmt` to collapse automatically.
+
+### W013: Missing Final Newline
+
+File does not end with a newline character.
+
+**Detection:** Check last byte of file.
+
+**Message:** `Warning [W013]: path.md does not end with newline`
+
+**Fix:** Run `lat fmt` to add automatically.
+
+### W014: Heading Without Blank Lines
+
+Heading not surrounded by blank lines.
+
+**Detection:** Parse heading and check adjacent lines.
+
+**Message:** `Warning [W014]: path.md:30 heading should have blank line before/after`
+
+**Fix:** Run `lat fmt` to insert blank lines.
+
+### W015: List Without Blank Lines
+
+List not surrounded by blank lines.
+
+**Detection:** Parse list and check adjacent lines.
+
+**Message:** `Warning [W015]: path.md:55 list should have blank line before/after`
+
+**Fix:** Run `lat fmt` to insert blank lines.
+
+### W016: Template Section in Non-Root
 
 Non-root document contains `[Lattice]` template sections.
 
 **Detection:** Check for `[Lattice]` headings in files that are neither
 `README.md` nor `00_*` prefixed.
 
-**Message:** `Warning [W023]: path/task.md has [Lattice] sections but is not a root`
+**Message:** `Warning [W016]: path/task.md has [Lattice] sections but is not a root`
 
 **Fix:** Move content to the directory's root document or remove sections.
 
@@ -280,7 +326,7 @@ path/to/doc1.md:
   Warning [W001]: 750 lines (recommended max: 500)
 
 path/to/doc2.md:
-  Warning [W004]: name is 78 characters (max: 64)
+  Warning [W002]: name is 78 characters (max: 64)
 
 Found 1 error, 2 warnings in 2 documents.
 ```
@@ -305,7 +351,7 @@ Found 1 error, 2 warnings in 2 documents.
       "message": "750 lines (recommended max: 500)"
     },
     {
-      "code": "W004",
+      "code": "W002",
       "path": "path/to/doc2.md",
       "message": "name is 78 characters (max: 64)"
     }
@@ -318,65 +364,11 @@ Found 1 error, 2 warnings in 2 documents.
 }
 ```
 
-## Additional Formatting Rules
-
-These rules enforce consistent markdown formatting.
-
-### W013: Trailing Whitespace
-
-Lines end with unnecessary whitespace.
-
-**Detection:** Regex for spaces/tabs at line end.
-
-**Message:** `Warning [W013]: path.md:20 has trailing whitespace`
-
-**Fix:** Run `lat fmt` to strip automatically.
-
-### W014: Multiple Blank Lines
-
-More than one consecutive blank line in document.
-
-**Detection:** Count consecutive newlines > 2.
-
-**Message:** `Warning [W014]: path.md:45 has 3 consecutive blank lines (max: 1)`
-
-**Fix:** Run `lat fmt` to collapse automatically.
-
-### W015: Missing Final Newline
-
-File does not end with a newline character.
-
-**Detection:** Check last byte of file.
-
-**Message:** `Warning [W015]: path.md does not end with newline`
-
-**Fix:** Run `lat fmt` to add automatically.
-
-### W016: Heading Without Blank Lines
-
-Heading not surrounded by blank lines.
-
-**Detection:** Parse heading and check adjacent lines.
-
-**Message:** `Warning [W016]: path.md:30 heading should have blank line before/after`
-
-**Fix:** Run `lat fmt` to insert blank lines.
-
-### W017: List Without Blank Lines
-
-List not surrounded by blank lines.
-
-**Detection:** Parse list and check adjacent lines.
-
-**Message:** `Warning [W017]: path.md:55 list should have blank line before/after`
-
-**Fix:** Run `lat fmt` to insert blank lines.
-
 ## Command Options
 
 - `--errors-only`: Suppress warnings
 - `--path <prefix>`: Check only files under path
-- `--fix`: Auto-fix where possible (W006, W007, W008, W013-W017)
+- `--fix`: Auto-fix where possible (W004-W006, W011-W015)
 - `--staged-only`: Check only staged files
 - `--rebuild-index`: Force full index rebuild before checking. Useful when the
   index may be out of sync with the filesystem.

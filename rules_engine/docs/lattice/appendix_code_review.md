@@ -4,18 +4,24 @@ Checklist for reviewing Lattice changes to maintain the "bulletproof" design goa
 
 ## Summary
 
-- **Classify errors:** Expected errors (user's fault) return `LatticeError`; system
-  errors (Lattice's fault) use `panic!`
+- **Classify errors:** Expected errors (user's fault) return `LatticeError`;
+  system errors (Lattice's fault) use `panic!`
 - **No silent failures:** Every significant action must be logged via `tracing`
-- **Atomic operations:** Multi-step changes use temp file + rename; partial failures
-  leave consistent state
-- **Index is ephemeral:** Git is always the source of truth; index can be rebuilt
-- **Concurrency safe:** Handle concurrent `lat` invocations, TOCTOU races, SQLite WAL
+- **High quality logs:** Always analyze logs for usefulness
+- **Atomic operations:** Multi-step changes use temp file + rename; partial
+  failures leave consistent state
+- **Concurrency safe:** Handle concurrent `lat` invocations, TOCTOU races,
+  SQLite WAL
 - **Performance aware:** No O(n²) algorithms; batch git operations; use indices
-- **Test expected errors:** Each `LatticeError` variant should have test coverage
-- **Avoid `.unwrap()`:** Use `.ok_or(LatticeError::...)?` or explicit panic with reason
+- **Test expected errors:** Each `LatticeError` variant should have test
+  coverage
+- **High quality tests:** Tests are not repetitive and have good assertion messages
+- **Avoid `.unwrap()`:** Use `.ok_or(LatticeError::...)?` or explicit panic with
+  reason
 - **Keep it small:** Functions under 50 lines, files under 500 lines
-- **Run benchmarks:** Check for regressions in performance-sensitive code paths
+- **Avoid code duplication:** Search for opportunities to factor out shared code
+- **Ensure docs are updated:** Verify relevant markdown documentation is
+  still accurate
 
 ## Error Handling
 
@@ -30,7 +36,6 @@ All code must use the `tracing` crate. Silent operations are a critical design
 flaw—every significant action should be traceable in logs.
 
 **Required logging:**
-- [ ] Entry/exit of public functions (`#[instrument]` or manual spans)
 - [ ] All git operations with command and result
 - [ ] All SQLite queries with affected rows
 - [ ] All file system operations (read, write, delete)
@@ -38,10 +43,9 @@ flaw—every significant action should be traceable in logs.
 - [ ] State observations (unexpected conditions, recovery actions)
 
 **Log levels:** `error!` (operation failed), `warn!` (degraded/recoverable),
-`info!` (milestones), `debug!` (--verbose detail), `trace!` (dev only)
+`info!` (milestones), `debug!` (--verbose detail)
 
 ```rust
-#[instrument(skip(index), fields(id = %id))]
 pub fn get_document(index: &Index, id: LatticeId) -> Result<Document, LatticeError> {
     let doc = index.get(&id).ok_or_else(|| {
         warn!(%id, "document not found");
@@ -114,3 +118,4 @@ special characters, shell metacharacters
 - [ ] No `.unwrap()`; use `.ok_or(LatticeError::...)?` or `.unwrap_or_else(|| panic!())`
 - [ ] Panics only for invariant violations (Lattice's fault, not user's)
 - [ ] Follow patterns in existing code; maintain consistency
+- [ ] Use complex rust features like generics/traits only as a last resort

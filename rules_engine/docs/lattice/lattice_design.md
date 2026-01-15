@@ -228,6 +228,27 @@ when documents are renamed or moved.
 See [Appendix: Linter](appendix_linter.md) for validation rules and
 [Appendix: CLI Structure](appendix_cli_structure.md) for full command reference.
 
+### Utility Commands
+
+Additional commands for document maintenance and exploration:
+
+**lat track** - Add Lattice tracking to existing markdown files. Use `--force`
+to regenerate IDs for documents with duplicates.
+
+**lat edit** - Open document in editor (human-only, not for AI agents).
+
+**lat reopen** - Change closed tasks back to open status.
+
+**lat generate-ids** - Pre-allocate IDs for offline authoring.
+
+**lat mv** - Move document to new location, updating `parent-id` and all links.
+
+**lat search** - Full-text search across document content using FTS5 queries.
+
+**lat dep** - Manage dependencies: `add`, `remove`, and `tree` subcommands.
+
+**lat label** - Manage labels: `add`, `remove`, `list`, and `list-all` subcommands.
+
 ## Linking System
 
 Lattice links use standard markdown with relative paths and Lattice ID
@@ -272,7 +293,7 @@ markers. Expands shorthand links, updates paths on rename/move.
 document with linked children.
 
 See [Appendix: Linter](appendix_linter.md) for complete rule set (E001-E010,
-W001-W017, W023, S001-S003).
+W001-W016, S001-S003).
 
 ## Index Architecture
 

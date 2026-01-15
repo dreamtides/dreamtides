@@ -159,8 +159,8 @@ Task inherits from `README.md` and `00_create.md` directly. The missing
 
 ## Linter Rules
 
-`lat check` enforces W023: template sections in non-root documents. See
-[Appendix: Linter](appendix_linter.md#w023-template-section-in-non-root)
+`lat check` enforces W016: template sections in non-root documents. See
+[Appendix: Linter](appendix_linter.md#w016-template-section-in-non-root)
 for details.
 
 ## JSON Output

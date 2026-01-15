@@ -33,7 +33,7 @@ Index location: `.lattice/index.sqlite` (gitignored).
 | content_length | INTEGER | Body length |
 | link_count | INTEGER | Outgoing links (trigger-maintained) |
 | backlink_count | INTEGER | Incoming links (trigger-maintained) |
-| view_count | INTEGER | Local view count |
+| view_count | INTEGER | Local view count (denormalized from views table) |
 
 ### links
 
@@ -70,7 +70,11 @@ Precomputed hierarchy: directory_path (PK), root_id, parent_path, depth.
 ### content_cache
 
 L2 cache for document body content, reducing filesystem reads for frequently
-accessed documents.
+accessed documents. This cache is particularly useful for:
+
+- `lat show` when displaying multiple documents (avoids repeated file reads)
+- `lat search` result snippets (avoids reading entire files for context)
+- Template composition (caches ancestor document content for efficient lookup)
 
 | Column | Type | Description |
 |--------|------|-------------|
@@ -84,6 +88,10 @@ accessed documents.
 current filesystem mtime. Stale entries are refreshed on access. Least-recently
 accessed entries are evicted when cache exceeds 100 documents.
 
+**Why "L2":** The L1 cache is the operating system's filesystem cache. This L2
+cache provides an additional layer within SQLite, avoiding syscall overhead for
+hot documents and enabling efficient queries that need body content.
+
 ### views
 
 | Column | Type | Description |
@@ -94,6 +102,12 @@ accessed entries are evicted when cache exceeds 100 documents.
 
 View tracking is stored in SQLite (not a separate JSON file) for concurrent
 safety. SQLite handles concurrent reads/writes via WAL mode.
+
+**Denormalization note:** The `documents.view_count` column is a denormalized
+copy of `views.view_count`, maintained by triggers for query performance. This
+allows `lat overview` ranking queries to sort by view count without joining
+tables. The `views` table is the source of truth; triggers update
+`documents.view_count` when views are recorded.
 
 Template content (Context and Acceptance Criteria sections) is resolved at
 query time by walking the `directory_roots` hierarchy. No additional tables

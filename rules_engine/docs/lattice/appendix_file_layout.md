@@ -320,9 +320,8 @@ claim/
 lint/
 ├── mod.rs                  # Module declarations only
 ├── rule_engine.rs          # Execute rules, collect results
-├── error_rules.rs          # E001-E007 (blocking errors)
-├── warning_rules.rs        # W001-W017 (or warning_rules/ directory with per-rule files)
-├── template_rules.rs       # W023 and template-specific validation
+├── error_rules.rs          # E001-E010 (blocking errors)
+├── warning_rules.rs        # W001-W016 (or warning_rules/ directory with per-rule files)
 ├── skill_rules.rs          # S001-S003 (skill document validation)
 ├── result_reporter.rs      # Format and output lint results
 └── autofix_engine.rs       # Apply automatic fixes where possible
