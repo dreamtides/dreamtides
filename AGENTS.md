@@ -89,7 +89,7 @@ Card data lives in `rules_engine/tabula/cards.toml`. Do NOT read this file direc
 
 # TASK TRACKING
 
-When ending a session or when discover work outside of the scope of the current session,
+When ending a session or when you discover work outside of the scope of the current session,
 please track it via the `bd` task software. If a prompt references something with a `dr-`
 prefix, like `dr-l3x`, this is a `bd` isssue id. When asked to work on a task, please
 close it when complete.

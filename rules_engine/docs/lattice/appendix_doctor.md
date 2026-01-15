@@ -187,7 +187,7 @@ The `--fix` flag automatically repairs these issues:
 
 | Issue | Manual Action |
 |-------|---------------|
-| Missing `.lattice/` directory | Run `lat init` (if implemented) or create manually |
+| Missing `.lattice/` directory | Create `.lattice/` directory manually |
 | Invalid config syntax | Edit config file |
 | Git conflicts | Resolve conflicts with git |
 | Duplicate IDs in files | Use `lat track --force` to regenerate |
