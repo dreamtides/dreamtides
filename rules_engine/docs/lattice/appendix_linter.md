@@ -246,6 +246,19 @@ Link file path doesn't match the target document's actual location.
 See [Appendix: Linking System](appendix_linking_system.md#path-mismatches) for
 details on path validation.
 
+### W010b: Missing Link Fragment
+
+Link has file path but no Lattice ID fragment.
+
+**Detection:** Parse links in document body, check for missing `#LXXXXX` fragment.
+
+**Message:** `Warning [W010b]: path.md:42 link missing Lattice ID fragment: [text](../doc.md)`
+
+**Fix:** Run `lat fmt` to add fragment automatically.
+
+See [Appendix: Linking System](appendix_linking_system.md#missing-fragments) for
+details on link normalization.
+
 ### W011: Trailing Whitespace
 
 Lines end with unnecessary whitespace.

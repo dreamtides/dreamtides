@@ -8,7 +8,7 @@ into the workflow command set.
 
 The `lat overview` command provides AI agents with a curated list of the most
 critical documents in a repository, reducing the need for exhaustive exploration.
-It ranks documents using local view tracking, recency, and filename priority.
+It ranks documents using local view tracking, recency, and root document priority.
 
 ## View Tracking
 

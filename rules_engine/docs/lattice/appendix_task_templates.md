@@ -111,7 +111,7 @@ Context:
   [API context]
   [Create-endpoint context]
 
-Description:
+Body:
   The validation logic incorrectly rejects valid input when...
 
 Acceptance Criteria:

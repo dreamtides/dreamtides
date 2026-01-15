@@ -29,9 +29,9 @@ Task state is determined by filesystem location, not by a YAML field:
 
 | State | Filesystem Location | In `lat ready` | Description |
 |-------|---------------------|----------------|-------------|
-| Open | Not in `.closed/` | Yes (unless blocked/claimed) | Available for work |
+| Open | Not in any `.closed/` directory | Yes (unless blocked/claimed) | Available for work |
 | Blocked | Not in `.closed/`, has open `blocked-by` | No | Waiting on dependencies |
-| Closed | In `.closed/` subdirectory | No | Completed |
+| Closed | In a `.closed/` subdirectory (typically `tasks/.closed/`) | No | Completed |
 
 A task is **blocked** when any entry in its `blocked-by` field references a
 task that is not closed. Once all blockers are closed, the task becomes open.
@@ -53,7 +53,9 @@ auth/
 ```
 
 The `.closed/` directory is tracked in git, making closed tasks visible to all
-collaborators. Use `lat prune` to permanently remove closed tasks.
+collaborators. Use `lat prune` to permanently remove closed tasks. See
+[Appendix: CLI Structure](appendix_cli_structure.md#lat-prune-path-options) for
+full `lat prune` documentation including `--force` behavior.
 
 ### State Transitions
 

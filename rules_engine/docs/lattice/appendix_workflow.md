@@ -33,7 +33,6 @@ State: open
 Priority: P0
 Type: bug
 Created: 2026-01-10 14:37
-Created by: dthurn
 Updated: 2026-01-10 14:37
 
 Context:
@@ -158,9 +157,9 @@ For ALL documents:
 The `name` field is always derived from the document's filename (underscores →
 hyphens, `.md` stripped). This is a core Lattice invariant.
 
-For tasks, `description` serves as the display description shown in headers and list
-views (e.g., "Fix login bug after password reset"). For knowledge base documents,
-`description` provides a purpose summary for AI context.
+For tasks, `description` serves as the human-readable task title shown in headers
+and list views (e.g., "Fix login bug after password reset"). For knowledge base
+documents, `description` provides a purpose summary for AI context.
 
 Both fields are required. The `description` appears in `lat show` headers,
 `lat show --short`, and `lat overview` output.
@@ -230,7 +229,6 @@ The `--json` flag produces structured output compatible with `bd show --json`:
     "priority": 0,
     "task_type": "bug",
     "created_at": "2026-01-10T14:37:59.351489-08:00",
-    "created_by": "dthurn",
     "updated_at": "2026-01-10T14:37:59.351489-08:00",
     "path": "tasks/llmc/fix-review-tasks.md",
     "labels": ["llmc", "code-review"],
@@ -283,7 +281,6 @@ The `--json` flag produces structured output compatible with `bd show --json`:
 | `priority` | int | Priority level (0-4) |
 | `task_type` | string | bug/feature/task/chore |
 | `created_at` | string | ISO 8601 timestamp |
-| `created_by` | string | Creator identifier |
 | `updated_at` | string | ISO 8601 timestamp |
 | `closed_at` | string | ISO 8601 timestamp (if closed) |
 | `path` | string | Relative file path |
@@ -402,7 +399,6 @@ The `--json` flag produces output compatible with `bd ready --json`:
     "priority": 0,
     "task_type": "bug",
     "created_at": "2026-01-10T14:37:59.351489-08:00",
-    "created_by": "dthurn",
     "updated_at": "2026-01-10T14:37:59.351489-08:00",
     "path": "tasks/llmc/fix-review-tasks.md",
     "labels": [],

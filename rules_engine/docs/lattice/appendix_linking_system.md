@@ -159,12 +159,14 @@ Warning: Document LXXXXX has stale link at line 42
 
 ### Missing Fragments
 
-Links with file paths but no Lattice ID fragment generate warnings:
+Links with file paths but no Lattice ID fragment generate warnings (W010b):
 
 ```
-Warning: Link missing Lattice ID at line 42: [text](../doc.md)
+Warning [W010b]: path.md:42 link missing Lattice ID fragment: [text](../doc.md)
   Run: lat fmt to add fragment
 ```
+
+See [Appendix: Linter](appendix_linter.md#w010b-missing-link-fragment) for details.
 
 ### Circular References
 

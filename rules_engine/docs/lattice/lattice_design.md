@@ -79,9 +79,9 @@ The `name` field is always derived from the document's filename: underscores
 become hyphens and the `.md` extension is stripped (e.g., `fix_login_bug.md`
 → `fix-login-bug`). This is a core Lattice invariant enforced by the linter.
 
-For tasks, `description` serves as the display title shown in `lat show` and
-other outputs (e.g., "Fix login bug after password reset"). For knowledge base
-documents, `description` provides a purpose summary for AI context.
+For tasks, `description` serves as the human-readable task title shown in
+`lat show` and other outputs (e.g., "Fix login bug after password reset"). For
+knowledge base documents, `description` provides a purpose summary for AI context.
 
 **Task Tracking Keys:**
 - `task-type`: bug/feature/task/chore
@@ -186,9 +186,10 @@ filtering, `--pretty` for visual tree display, and `--json` for full task
 details.
 
 **lat overview** - Provides repository-level context for AI agents. Shows the
-most critical documents based on view frequency, recency, and priority. Supports
-`--limit`, `--json`, and various filtering options. Tracks local view counts
-in SQLite (concurrent-safe) to surface frequently-referenced documents.
+most critical documents based on view frequency, recency, and root document
+priority. Supports `--limit`, `--json`, and various filtering options. Tracks
+local view counts in SQLite (concurrent-safe) to surface frequently-referenced
+documents.
 
 **lat prime** - Outputs AI-optimized workflow context.
 
@@ -206,11 +207,11 @@ output formats, and claiming behavior, and
 Commands for creating and modifying tasks and documents.
 
 **lat create** - Creates new documents with `lat create <parent> "<description>"
-[options]`. The path argument specifies the parent directory; the filename is
-auto-generated from the description (lowercase, underscores, significant words).
-The `-t` flag determines placement: tasks go to `<parent>/tasks/`, knowledge
-base documents go to `<parent>/docs/`. For root documents, specify the full
-path explicitly (e.g., `api/api.md`). Supports priority, labels, and
+[options]`. The `<parent>` argument specifies the parent directory; the filename
+is auto-generated from the description (lowercase, underscores, significant
+words). The `-t` flag determines placement: tasks go to `<parent>/tasks/`,
+knowledge base documents go to `<parent>/docs/`. For root documents, specify the
+full path explicitly (e.g., `api/api.md`). Supports priority, labels, and
 dependencies for tasks.
 
 **lat update** - Modifies existing documents with `lat update <id> [id...]
@@ -245,9 +246,9 @@ timestamps, and path prefix. By default excludes closed tasks; use
 visual display or `--json` for programmatic access.
 
 **lat check** - Validates documents and repository state before committing.
-Detects duplicate IDs, broken links, invalid frontmatter, circular
-dependencies, and documents exceeding size limits. Essential for maintaining
-repository integrity.
+Detects duplicate IDs, broken links, invalid frontmatter, and circular
+dependencies. Warns about documents exceeding the 500-line size limit. Essential
+for maintaining repository integrity.
 
 **lat fmt** - Formats documents and normalizes links. Wraps text at 80
 characters, adds missing Lattice ID fragments to links, and updates file paths
@@ -341,9 +342,9 @@ have other tasks as parents if desired—in that case, use the standard task typ
 (bug, feature, task, chore) for the parent task.
 
 Task state is determined by filesystem location, not by a status field:
-- **Open**: Task exists in a `tasks/` directory outside of any `.closed/`
+- **Open**: Task exists outside of any `.closed/` directory
 - **Blocked**: Task has open (non-closed) entries in its `blocked-by` field
-- **Closed**: Task resides in a `tasks/.closed/` subdirectory
+- **Closed**: Task resides in a `.closed/` subdirectory (typically `tasks/.closed/`)
 
 The `lat close` command moves tasks to `tasks/.closed/`, and `lat reopen` moves
 them back. The `lat prune` command permanently deletes closed tasks. There is no

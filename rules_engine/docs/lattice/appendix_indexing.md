@@ -82,6 +82,10 @@ Per-client document counter: client_id (PK), next_counter.
 
 Precomputed hierarchy: directory_path (PK), root_id, parent_path, depth.
 
+Used for efficient template composition when walking ancestor chains. See
+[Appendix: Task Templates](appendix_task_templates.md#hierarchy-composition) for
+how this supports context and acceptance criteria inheritance.
+
 ### content_cache
 
 L2 cache for document body content, reducing filesystem reads for frequently

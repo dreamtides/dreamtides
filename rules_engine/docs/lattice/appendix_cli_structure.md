@@ -253,15 +253,22 @@ Show tasks with unresolved blockers (open tasks in their `blocked-by` field).
 
 ### lat dep add {id} {depends-on-id}
 
-Add dependency (first task depends on second). Updates `blocked-by` field.
+Add dependency (first task depends on second). Updates `blocked-by` field of the
+first task to include the second task's ID. Also updates the `blocking` field of
+the second task to include the first task's ID, maintaining bidirectional
+consistency.
 
 ### lat dep remove {id} {depends-on-id}
 
-Remove dependency relationship.
+Remove dependency relationship. Removes the second task from the first task's
+`blocked-by` field, and removes the first task from the second task's `blocking`
+field. If removing the last blocker from a blocked task, that task becomes ready.
 
 ### lat dep tree {id}
 
-Display dependency tree with state indicators (open/blocked/closed).
+Display dependency tree with state indicators (open/blocked/closed). Shows both
+upstream dependencies (what this task depends on) and downstream dependents
+(what depends on this task).
 
 ### lat changes [options]
 
@@ -372,8 +379,12 @@ Validate documents and repository. Options: `--path {prefix}`, `--errors-only`,
 
 ### lat fmt [options]
 
-Format documents and normalize links. Options: `--path {prefix}`, `--check`,
-`--line-width {n}`.
+Format documents and normalize links.
+
+**Options:**
+- `--path {prefix}`: Only format files under this path
+- `--check`: Check formatting without modifying files (exit code 1 if changes needed)
+- `--line-width {n}`: Override text wrap column (default: 80)
 
 Link normalization: adds Lattice ID fragments, expands bare ID links, updates
 paths on rename/move.
@@ -387,7 +398,7 @@ Options: `--seed {n}`, `--max-ops {n}`, `--operations {list}`, `--stop-before-la
 
 - 0: Success
 - 1: System error (internal failure)
-- 2: Validation error (document tasks)
+- 2: Validation error (invalid document content)
 - 3: User error (invalid arguments)
 - 4: Not found (ID doesn't exist)
 
