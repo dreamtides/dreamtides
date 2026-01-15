@@ -370,6 +370,12 @@ invalid frontmatter, circular dependencies, missing required fields, directory
 structure (root/docs/tasks), and document naming conventions. Warnings for
 documents exceeding 500 lines.
 
+**`lat doctor`** validates system health: index integrity, git repository state,
+configuration, claims, and skill symlinks. Use `lat check` for document content
+issues, `lat doctor` for infrastructure issues. See
+[Appendix: Doctor Command](appendix_doctor.md) for the complete check list and
+fix capabilities.
+
 **`lat fmt`** normalizes formatting: 80-char wrapping, ATX headers, dash list
 markers. Expands shorthand links, updates paths on rename/move.
 

@@ -389,6 +389,22 @@ Format documents and normalize links.
 Link normalization: adds Lattice ID fragments, expands bare ID links, updates
 paths on rename/move.
 
+### lat doctor [options]
+
+Diagnose system health issues distinct from document validation (`lat check`).
+While `lat check` validates document content (frontmatter, links, structure),
+`lat doctor` validates the Lattice installation and infrastructure.
+
+See [Appendix: Doctor Command](appendix_doctor.md) for check categories, output
+format, and fixable issues.
+
+**Options:**
+- `--fix`: Automatically repair issues where possible
+- `--dry-run`: Preview fixes without applying (requires `--fix`)
+- `--deep`: Run additional integrity checks (slower)
+- `--json`: Machine-readable output
+- `--quiet`: Only show warnings and errors
+
 ### lat chaosmonkey [options]
 
 Run fuzz testing. See [Appendix: Chaos Monkey](appendix_chaos_monkey.md).
