@@ -1,8 +1,9 @@
 # Appendix: Git Edge Cases
 
 This appendix documents Lattice's behavior in non-standard git repository
-configurations. See [Appendix: Git Integration](appendix_git_integration.md)
-for standard git operations.
+configurations. See [Lattice Design](lattice_design.md#git-integration) for
+an overview and [Appendix: Git Integration](appendix_git_integration.md) for
+standard git operations.
 
 The design philosophy is **graceful degradation**: Lattice should continue
 operating wherever possible, falling back to full index rebuilds when git

@@ -1,9 +1,10 @@
 # Appendix: CLI Structure
 
-## Command Overview
+This appendix provides a concise reference for all `lat` commands. See
+[Lattice Design](lattice_design.md#command-overview) for conceptual overview.
 
-All commands support `--json` for structured output and `--verbose` for
-detailed logging. The `lat` binary is the single entry point.
+For detailed specifications of workflow commands, see
+[Appendix: Workflow](appendix_workflow.md).
 
 ## Global Options
 
@@ -17,67 +18,33 @@ All commands support:
 
 ## Workflow Commands
 
-These are the primary commands for AI agent workflows. See
-[Appendix: Workflow](appendix_workflow.md) for complete specifications.
+See [Appendix: Workflow](appendix_workflow.md) for detailed specifications
+including output formats, JSON schemas, and behavioral details.
 
 ### lat show \<id\> [id...] [options]
 
-Display document details following `bd show` format. Default output includes
-parent, dependencies, blocking tasks, and related documents—providing full
-context for AI agents in a single call.
-
-**Options:**
-- `--short`: Single-line output
-- `--refs`: Show tasks that reference this one
-- `--peek`: Show only YAML frontmatter
-- `--raw`: Output without formatting
+Display document details. Options: `--short`, `--refs`, `--peek`, `--raw`.
 
 ### lat ready [options]
 
-Find ready work (open status, no blockers, not claimed).
-
-**Options:**
-- `--parent <id>`: Filter to descendants of directory/epic
-- `--priority <N>`: Filter by priority level
-- `--type <type>`: Filter by task type
-- `--label <list>`: Filter by labels (AND logic)
-- `--label-any <list>`: Filter by labels (OR logic)
-- `--limit <N>`: Maximum tasks (default 10)
-- `--include-backlog`: Include P4 tasks
-- `--include-claimed`: Include claimed tasks
-- `--pretty`: Visual tree display
-- `--sort <policy>`: hybrid/priority/oldest
+Find ready work. Options: `--parent <id>`, `--priority <N>`, `--type <type>`,
+`--label <list>`, `--label-any <list>`, `--limit <N>`, `--include-backlog`,
+`--include-claimed`, `--pretty`, `--sort <policy>`.
 
 ### lat prime [options]
 
-Output AI workflow context including link authoring guidance.
-
-**Options:**
-- `--full`: Include additional reference material
-- `--export`: Export for manual editing
+Output AI workflow context. Options: `--full`, `--export`.
 
 ### lat overview [options]
 
-Show most critical documents based on view frequency, recency, and priority.
-See [Appendix: Overview Command](appendix_overview.md) for ranking algorithm.
-
-**Options:**
-- `--limit <N>`: Maximum documents (default 10)
-- `--type <type>`: Filter by type ('doc' for knowledge base)
-- `--path <prefix>`: Filter to path prefix
-- `--include-closed`: Include closed tasks
-- `--reset-views`: Clear local view history
+Show critical documents. See [Appendix: Overview Command](appendix_overview.md).
+Options: `--limit <N>`, `--type <type>`, `--path <prefix>`, `--include-closed`,
+`--reset-views`.
 
 ### lat claim \<id\> [options]
 
-Mark task as locally in progress.
-
-**Options:**
-- `--list`: Show all current claims
-- `--release <id>`: Release a specific claim
-- `--release-all`: Release all claims
-- `--release-worktree <path>`: Release claims from specific worktree
-- `--gc`: Clean up stale claims
+Mark task as locally in progress. Options: `--list`, `--release <id>`,
+`--release-all`, `--release-worktree <path>`, `--gc`.
 
 ## Document Commands
 
@@ -106,22 +73,17 @@ Split document by top-level sections.
 
 ## Task Commands
 
+See [Appendix: Task Tracking](appendix_task_tracking.md) for task lifecycle,
+status transitions, and template inheritance.
+
 ### lat create \<path/to/task.md\> [options]
 
-Create new task document.
+Create new task document. Options: `-t, --type <type>`, `-p, --priority <N>`,
+`-d, --description <text>`, `--body-file <path>`, `-l, --labels <list>`,
+`--deps <spec>`.
 
-**Options:**
-- `-t, --type <type>`: bug/feature/task/epic/chore (default: task)
-- `-p, --priority <N>`: 0-4, 0 highest (default: 2)
-- `-d, --description <text>`: Task description
-- `--body-file <path>`: Read description from file
-- `-l, --labels <list>`: Comma-separated labels
-- `--deps <spec>`: Dependency (e.g., `discovered-from:LK3DT`)
-
-The path argument specifies both the directory location and filename for the task.
-For directory root documents (epics), use either `README.md` or the `00_` prefix
-in the filename (both are equally acceptable). Template content is inherited
-automatically from ancestor root documents.
+The path specifies directory location and filename. For epics, use `README.md`
+or `00_` prefix.
 
 ### lat update \<id\> [id...] [options]
 
@@ -306,24 +268,6 @@ Repository-wide statistics.
 - `links`: Detailed link statistics
 - `tasks`: Task statistics by status/priority
 
-## Setup Commands
-
-### lat setup claude [options]
-
-Install Claude Code hooks.
-
-**Options:**
-- `--check`: Check installation status
-- `--remove`: Remove hooks
-- `--project`: Install for project only
-
-### lat setup cursor
-
-Install Cursor IDE rules.
-
-### lat setup aider
-
-Install Aider configuration.
 
 ## Label Commands
 
@@ -345,42 +289,26 @@ List all labels with counts.
 
 ## Maintenance Commands
 
+See [Appendix: Linter](appendix_linter.md) for validation rules and
+[Appendix: Linking System](appendix_linking_system.md) for link format details.
+
 ### lat check [options]
 
-Validate documents and repository.
-
-**Options:**
-- `--path <prefix>`: Check under path
-- `--errors-only`: Suppress warnings
-- `--fix`: Auto-fix where possible
-- `--staged-only`: Check staged files only
-- `--rebuild-index`: Force index rebuild
+Validate documents and repository. Options: `--path <prefix>`, `--errors-only`,
+`--fix`, `--staged-only`, `--rebuild-index`.
 
 ### lat fmt [options]
 
-Format documents and normalize links.
+Format documents and normalize links. Options: `--path <prefix>`, `--check`,
+`--line-width N`.
 
-**Options:**
-- `--path <prefix>`: Format under path
-- `--check`: Report without modifying
-- `--line-width N`: Wrap width (default 80)
-
-**Link normalization behavior:**
-
-- Adds Lattice ID fragments to file-path-only links
-- Converts bare ID links `[text](LJCQ2)` to full path+fragment format
-- Updates file paths when documents are renamed or moved
-- Validates Lattice IDs in link fragments
+Link normalization: adds Lattice ID fragments, expands bare ID links, updates
+paths on rename/move.
 
 ### lat chaosmonkey [options]
 
-Run fuzz testing.
-
-**Options:**
-- `--seed N`: Random seed
-- `--max-ops N`: Maximum operations
-- `--operations <list>`: Restrict operation types
-- `--stop-before-last`: Stop before failing operation
+Run fuzz testing. See [Appendix: Chaos Monkey](appendix_chaos_monkey.md).
+Options: `--seed N`, `--max-ops N`, `--operations <list>`, `--stop-before-last`.
 
 ## Exit Codes
 

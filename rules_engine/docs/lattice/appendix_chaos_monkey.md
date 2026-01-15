@@ -1,5 +1,10 @@
 # Appendix: Chaos Monkey
 
+This appendix documents the chaos monkey fuzz testing system. See
+[Lattice Design](lattice_design.md#chaos-monkey) for an overview and
+[Appendix: Testing Strategy](appendix_testing_strategy.md) for the broader
+testing architecture.
+
 The `lat chaosmonkey` command performs automated fuzz testing to discover bugs.
 It executes random sequences of operations until an invariant violation occurs.
 

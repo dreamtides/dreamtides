@@ -131,8 +131,6 @@ selecting which related documents to highlight.
 
 ## The ID System
 
-### Lattice ID Format
-
 A Lattice ID is a compact, human-typeable identifier consisting of:
 
 1. A literal `L` prefix
@@ -141,38 +139,16 @@ A Lattice ID is a compact, human-typeable identifier consisting of:
 
 Example: `LK3DT` represents document `K3` (decimal 675) from client `DT`.
 
-The Base32 encoding uses the RFC 4648 alphabet: A-Z followed by 2-7. This
-avoids ambiguous characters like 0/O and 1/I.
+The Base32 encoding uses the RFC 4648 alphabet (A-Z followed by 2-7), avoiding
+ambiguous characters like 0/O and 1/I. Client IDs are stored in `~/.lattice.toml`
+and scale in length with the number of known clients. Document counters start at
+50 (Base32: `BS`) to ensure minimum 5-character IDs overall.
 
-See [Appendix: ID System](appendix_id_system.md) for the complete ID
-generation algorithm and collision handling.
+Collision detection occurs during `lat check`. The `lat generate-ids` command
+pre-allocates IDs for document authors.
 
-### Client Identification
-
-New clients select a random identifier and store it in `~/.lattice.toml`, which
-maps git checkout paths to client IDs. The ID length scales with the number of
-known clients in the repository:
-
-- 2 digits: Up to 16 clients (1024 possible IDs)
-- 3 digits: 17-64 clients (32768 possible IDs)
-- 4 digits: 65-256 clients (1048576 possible IDs)
-- 5 digits: 257+ clients (33554432 possible IDs)
-
-Collision detection occurs during `lat check` and is specifically enforced
-for new contributors' first commits. The `lat check` command identifies any
-duplicate Lattice IDs across the repository.
-
-### Document Counter
-
-The document counter increments atomically from SQLite when new IDs are
-requested. To prevent counter reset on repository re-clone, the system
-queries existing documents to find the highest ID for the current client
-and resumes from there. Counters start at 50 (Base32: `BS`) to ensure all
-IDs have at least 2 digits.
-
-The `lat generate-ids` command pre-allocates IDs for document authors. These
-IDs are not marked as used immediately; only committed documents consume ID
-space. This enables speculative ID generation without waste.
+See [Appendix: ID System](appendix_id_system.md) for the complete ID generation
+algorithm, collision handling, and client identification details.
 
 ## Command Overview
 
@@ -411,76 +387,29 @@ AI-friendly sizes.
 
 ## Index Architecture
 
-### SQLite Schema
+The SQLite index stores document metadata, link relationships, and search
+indices. Key tables include `documents`, `links`, `labels`, `fts_content`
+(full-text search), `client_counters`, `directory_roots` (precomputed
+hierarchy), and `content_cache`.
 
-The index stores document metadata, link relationships, and search indices
-in SQLite. Key tables include:
-
-- `documents`: Core document metadata (id, path, frontmatter fields)
-- `links`: Source->target relationships with link types
-- `labels`: Many-to-many document-label relationships
-- `fts_content`: Full-text search index on document body
-- `client_counters`: Per-client document counter state
-- `directory_roots`: Precomputed root document chain for hierarchy queries
-- `content_cache`: Optional L2 cache for document body content
-
-The schema version is tracked for migration support. All tables include
-`indexed_at` timestamps for staleness detection.
-
-### Reconciliation Strategy
-
-Index reconciliation uses git metadata to determine staleness:
-
-1. Query git for files modified since last index update
-2. Re-parse and re-index modified documents
-3. Remove index entries for deleted documents
-4. Update the index watermark commit hash
-
-If git state is unclear (detached HEAD, uncommitted changes), the system
-falls back to full rebuild. The index stores the commit hash of its last
-known-good state for comparison.
+Index reconciliation uses git metadata to determine staleness—querying for
+modified files, re-indexing changes, and falling back to full rebuild when
+git state is unclear. The index lives in `.lattice/index.sqlite` (gitignored).
 
 See [Appendix: Indexing](appendix_indexing.md) for the complete schema,
 reconciliation algorithm, and performance tuning.
 
-### Index Location
-
-The index lives in `.lattice/index.sqlite` within the repository root.
-This directory also contains `logs.jsonl` for operation logging. The
-entire `.lattice` directory should be gitignored as it contains ephemeral
-cache data.
-
 ## Git Integration
 
-### Change Detection
+Lattice uses git as the authoritative store. Documents are discovered via
+`git ls-files` (not filesystem traversal), and changes are detected via
+`git diff` and `git status`. Lattice never performs git push or sync
+operations—this supports multi-agent workflows where a coordinator manages
+synchronization externally.
 
-Lattice uses `git diff --name-only` and `git status` to identify changed
-files since the last index update. The index stores the HEAD commit hash
-at the time of its last update; comparing against current HEAD reveals
-what needs re-indexing.
-
-### Document Discovery
-
-Documents are discovered through git's tracked file list rather than
-filesystem traversal. This ensures gitignored files are excluded and
-provides consistent behavior across operations.
-
-### No Push Operations
-
-Lattice never performs git push or sync operations. This design supports
-multi-agent workflows where agents work in isolated git worktrees and a
-coordinator manages merging and synchronization externally. Push operations
-require explicit user or coordinator control.
-
-### Conflict Handling
-
-`lat check` detects potential ID conflicts from parallel contributors.
-
-See [Appendix: Git Integration](appendix_git_integration.md) for the
-complete git interaction specification and
-[Appendix: Git Edge Cases](appendix_git_edge_cases.md) for behavior in
-non-standard repository configurations (shallow clones, worktrees,
-submodules, etc.).
+See [Appendix: Git Integration](appendix_git_integration.md) for the complete
+specification and [Appendix: Git Edge Cases](appendix_git_edge_cases.md) for
+behavior in non-standard configurations (shallow clones, worktrees, submodules).
 
 ## Skill Integration
 
@@ -504,73 +433,29 @@ stricter validation rules.
 
 ## Logging and Observability
 
-### Log Format
-
-All operations log to `.lattice/logs.jsonl` in newline-delimited JSON.
-Each entry includes:
-
-- Timestamp (ISO 8601 with microseconds)
-- Operation type (user_command, git_operation, sqlite_query, observation)
-- Operation details (command args, query text, observation text)
-- Duration (milliseconds)
-- Success/failure status
-- Error details (if applicable)
-
-### Verbosity Control
-
-The `--verbose` flag increases output detail, showing operations that
-would normally be silent. The `--json` flag switches output format for
-programmatic consumption.
+All operations log to `.lattice/logs.jsonl` in newline-delimited JSON, capturing
+timestamps, operation types, details, duration, and success/failure status. The
+`--verbose` flag increases output detail; `--json` switches to structured output.
 
 ## Testing Architecture
 
-### Black Box Testing
+All tests exercise the public CLI interface (black-box testing). Git operations
+go through the `GitOps` trait, enabling test injection—production uses `RealGit`;
+tests inject `FakeGit` (in-memory state). Filesystem and SQLite use real
+implementations for better edge-case coverage.
 
-All tests exercise the public CLI interface rather than internal APIs.
-This ensures tests validate user-facing behavior and enables safe
-refactoring of internals without test rewrites.
-
-### GitOps Trait
-
-All git operations go through the `GitOps` trait, enabling test injection.
-Production uses `RealGit` (shells out to git); tests inject `FakeGit`
-(in-memory state). The filesystem and SQLite use real implementations—they're
-fast enough and catch more edge cases than fakes would.
-
-See [Appendix: Testing Strategy](appendix_testing_strategy.md) for the
-complete testing architecture.
+See [Appendix: Testing Strategy](appendix_testing_strategy.md) for the complete
+testing architecture.
 
 ## Chaos Monkey
 
-### Purpose
+The `lat chaosmonkey` command performs automated fuzz testing by executing random
+sequences of operations (create, modify, delete, link, git operations) until a
+system error occurs. This surfaces edge cases and interaction bugs that
+deterministic tests miss.
 
-The `lat chaosmonkey` command performs automated fuzz testing by executing
-random sequences of Lattice operations until a system error occurs. This
-surfaces edge cases and interaction bugs that deterministic tests miss.
-
-### Operation Types
-
-The chaos monkey executes high-level concepts rather than raw CLI commands:
-
-- Create document with random content
-- Modify document content
-- Add/remove links
-- Change document metadata
-- Move documents between directories
-- Delete documents
-- Perform git operations (commit, branch, merge)
-
-### Error Reporting
-
-When a system error occurs, the chaos monkey outputs:
-
-- The operation sequence that triggered the error
-- Current repository state
-- Relevant log entries
-- A minimal reproduction case when determinable
-
-See [Appendix: Chaos Monkey](appendix_chaos_monkey.md) for the complete
-operation specification.
+See [Appendix: Chaos Monkey](appendix_chaos_monkey.md) for the complete operation
+specification and invariant definitions.
 
 ## UI Design
 
