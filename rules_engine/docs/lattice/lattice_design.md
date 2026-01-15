@@ -168,7 +168,7 @@ for visual tree display, and `--json` for full task details.
 **lat overview** - Provides repository-level context for AI agents. Shows the
 most critical documents based on view frequency, recency, and priority. Supports
 `--limit`, `--json`, and various filtering options. Tracks local view counts
-in `.lattice/views.json` to surface frequently-referenced documents.
+in SQLite (concurrent-safe) to surface frequently-referenced documents.
 
 **lat prime** - Outputs AI-optimized workflow context including recommended
 link authoring format (shorthand `[text](ID)` links that `lat fmt` expands).

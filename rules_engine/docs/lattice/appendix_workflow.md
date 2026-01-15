@@ -615,5 +615,5 @@ which machine is working on a task, not who. This design:
 All four commands are read-only with respect to repository files. The
 claim command modifies only the user's local `~/.lattice/` directory.
 
-For Claude Code hooks that enforce `lat show` usage and auto-expand Lattice IDs,
-see [Appendix: Claude Code Integration](appendix_ai_integration.md).
+For Claude Code hooks that enforce `lat show` usage, see
+[Appendix: AI Integration](appendix_ai_integration.md).

@@ -220,7 +220,14 @@ Path contains backslashes (Windows-style).
 
 **Fix:** Replace backslashes with forward slashes.
 
+### W012: Link Path Mismatch
+
+Reserved. Link path validation is covered by `lat check` and documented in
+[Appendix: Linking System](appendix_linking_system.md#path-mismatches).
+
 ## Template Rules
+
+*Note: W018-W022 are reserved for future template validation rules.*
 
 ### W023: Template Section in Non-Root
 
@@ -273,7 +280,7 @@ path/to/doc1.md:
   Warning [W001]: 750 lines (recommended max: 500)
 
 path/to/doc2.md:
-  Warning [W003]: Missing 'description' field
+  Warning [W004]: name is 78 characters (max: 64)
 
 Found 1 error, 2 warnings in 2 documents.
 ```
@@ -298,9 +305,9 @@ Found 1 error, 2 warnings in 2 documents.
       "message": "750 lines (recommended max: 500)"
     },
     {
-      "code": "W003",
+      "code": "W004",
       "path": "path/to/doc2.md",
-      "message": "missing 'description' field"
+      "message": "name is 78 characters (max: 64)"
     }
   ],
   "summary": {

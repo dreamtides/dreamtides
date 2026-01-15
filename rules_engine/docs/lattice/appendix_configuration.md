@@ -1,7 +1,7 @@
 # Appendix: Configuration
 
 This appendix documents all configuration options. See
-[Lattice Design](lattice_design.md#document-structure) for context.
+[Lattice Design](lattice_design.md#configuration) for context.
 
 ## User Configuration (~/.lattice.toml)
 

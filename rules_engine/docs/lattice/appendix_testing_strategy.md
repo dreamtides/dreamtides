@@ -1,7 +1,7 @@
 # Appendix: Testing Strategy
 
 This appendix documents the testing architecture. See
-[Lattice Design](lattice_design.md#testing-architecture) for an overview.
+[Lattice Design](lattice_design.md#testing) for an overview.
 For fuzz testing, see [Appendix: Chaos Monkey](appendix_chaos_monkey.md).
 
 ## Philosophy

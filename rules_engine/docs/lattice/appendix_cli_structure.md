@@ -211,6 +211,14 @@ Show tasks in blocked status with their blocking relationships.
 - `--path {prefix}`: Filter to path prefix
 - `--limit {n}`: Maximum results
 
+### lat dep add {id} {depends-on-id}
+
+Add dependency (first task depends on second). Updates `blocked-by` field.
+
+### lat dep remove {id} {depends-on-id}
+
+Remove dependency relationship.
+
 ### lat dep tree {id}
 
 Display dependency tree with status indicators.

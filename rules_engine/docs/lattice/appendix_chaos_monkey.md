@@ -16,13 +16,13 @@ distinction follows the error handling philosophy in
 fault*, it's a bug; if it's the *user's fault*, it's expected behavior.
 
 **System errors (bugs):**
-- `lat modify` crashes with a panic
+- `lat update` crashes with a panic
 - Index contains an ID that doesn't exist in the filesystem
 - Git operation fails (Lattice should ensure valid git state)
 - Operation claims success but state is wrong
 
 **Expected errors (not bugs):**
-- `lat modify` returns an error because the file doesn't exist
+- `lat update` returns an error because the document doesn't exist
 - A document contains a link to a deleted document
 - Invalid syntax, missing fields, or permission problems
 
@@ -43,12 +43,11 @@ errors are:
 Standard lat commands with random valid and invalid arguments:
 
 - `lat create` with random paths, types, metadata
-- `lat modify` with random field changes
-- `lat delete` on random documents
-- `lat move` to random destinations
+- `lat update` with random field changes
+- `lat close` on random tasks
+- `lat mv` to random destinations
 - `lat search` with random queries
-- `lat link` and `lat unlink` between random documents
-- `lat rebuild` at random points
+- `lat check --rebuild-index` at random points
 
 ### Low-Level (filesystem)
 

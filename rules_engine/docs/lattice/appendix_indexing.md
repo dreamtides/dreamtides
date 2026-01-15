@@ -69,8 +69,20 @@ Precomputed hierarchy: directory_path (PK), root_id, parent_path, depth.
 
 ### content_cache
 
-L2 cache for body content: document_id (PK), content, content_hash,
-accessed_at, file_mtime.
+L2 cache for document body content, reducing filesystem reads for frequently
+accessed documents.
+
+| Column | Type | Description |
+|--------|------|-------------|
+| document_id | TEXT PK | Lattice ID |
+| content | TEXT | Full document body |
+| content_hash | TEXT | SHA-256 for invalidation |
+| accessed_at | TEXT | Last access timestamp |
+| file_mtime | INTEGER | File mtime at cache time |
+
+**Cache policy:** Entries are validated by comparing `file_mtime` against
+current filesystem mtime. Stale entries are refreshed on access. Least-recently
+accessed entries are evicted when cache exceeds 100 documents.
 
 ### views
 

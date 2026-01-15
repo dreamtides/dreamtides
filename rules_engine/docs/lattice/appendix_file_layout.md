@@ -35,8 +35,10 @@ rules_engine/src/lattice/
 dispatch, output formatting, and color theme definitions.
 
 **cli/commands/** - Individual command implementations for each `lat` subcommand
-(show, create, update, list, check, format, split, track, generate-ids, ready,
-prime, claim, stale, dep, label, close, reopen, edit, chaosmonkey).
+(show, create, update, close, reopen, list, ready, overview, prime, claim,
+check, fmt, split, mv, track, generate-ids, search, stale, blocked, changes,
+stats, tree, roots, children, dep, label, links-from, links-to, path, orphans,
+impact, setup, completion, edit, chaosmonkey).
 
 **index/** - SQLite database management including schema definitions, migrations,
 connection handling, and query implementations for documents, links, labels,
@@ -197,7 +199,7 @@ commands/
 │   ├── check_executor.rs   # Entry point, document validation orchestration
 │   ├── check_fixes.rs      # --staged-only filtering, --fix application, result aggregation
 │   └── check_output.rs     # Text and --json error output formatting
-├── format_command.rs       # lat fmt - formatting and link normalization
+├── fmt_command.rs          # lat fmt - formatting and link normalization
 ├── split_command.rs        # lat split - divide large documents
 ├── mv_command.rs           # lat mv - move document to new location
 ├── track_command.rs        # lat track - add tracking to existing files
@@ -408,7 +410,7 @@ tests/lattice/
 │   ├── close_tests.rs
 │   ├── ready_tests.rs
 │   ├── check_tests.rs
-│   ├── format_tests.rs
+│   ├── fmt_tests.rs
 │   ├── claim_tests.rs
 │   ├── overview_tests.rs
 │   ├── search_tests.rs
