@@ -116,13 +116,4 @@ Operations log to `.lattice/logs.jsonl` (JSONL format):
 
 Levels: `error`, `warn`, `info`, `debug` (--verbose), `trace` (dev only).
 
-## Implementation Checklist
-
-When adding new functionality:
-
-- [ ] Identify all failure modes
-- [ ] Classify each as expected vs system error
-- [ ] For expected: create LatticeError variant with helpful message
-- [ ] For system: add panic! with explanation
-- [ ] Add structured JSON output for expected errors
-- [ ] Write tests for error cases
+See [Appendix: Code Review](appendix_code_review.md) for implementation checklist.

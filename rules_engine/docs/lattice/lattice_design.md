@@ -316,6 +316,12 @@ Operations log to `.lattice/logs.jsonl` (JSONL). Use `--verbose` for detail,
 Black-box CLI tests with `GitOps` trait for injection (`FakeGit` in tests).
 See [Appendix: Testing Strategy](appendix_testing_strategy.md).
 
+## Code Review
+
+All Lattice changes should be reviewed against the checklist in
+[Appendix: Code Review](appendix_code_review.md), covering error handling,
+logging, concurrency, data integrity, performance, and code organization.
+
 ## Chaos Monkey
 
 `lat chaosmonkey` runs random operations until system error, surfacing edge
