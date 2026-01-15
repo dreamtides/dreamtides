@@ -35,6 +35,8 @@ Claude to use `lat show` instead.
 
 **Hook configuration** (`.claude/settings.json`):
 
+Hooks should be configured as follows:
+
 ```json
 {
   "hooks": {
@@ -47,3 +49,6 @@ Claude to use `lat show` instead.
   }
 }
 ```
+
+The `lattice-read-guard.py` script should be produced by Lattice to enforce this
+behavior.

@@ -167,7 +167,7 @@ complexity warrants (e.g., `show_format.rs` for display logic).
 ```
 commands/
 ├── mod.rs                  # Module declarations only
-├── show_command.rs         # lat show (or show/ directory if complex)
+├── show_command.rs         # lat show (or show/ directory if complex etc)
 ├── create_command.rs       # lat create - new document creation
 ├── update_command.rs       # lat update - modify existing documents
 ├── close_command.rs        # lat close - mark tasks closed
@@ -180,6 +180,7 @@ commands/
 ├── check_command.rs        # lat check - validation and linting
 ├── format_command.rs       # lat fmt - formatting and link normalization
 ├── split_command.rs        # lat split - divide large documents
+├── mv_command.rs           # lat mv - move document to new location
 ├── track_command.rs        # lat track - add tracking to existing files
 ├── generate_ids.rs         # lat generate-ids - pre-allocate IDs
 ├── edit_command.rs         # lat edit - open in editor
@@ -187,6 +188,7 @@ commands/
 ├── stale_command.rs        # lat stale - find stale tasks
 ├── blocked_command.rs      # lat blocked - show blocked tasks
 ├── changes_command.rs      # lat changes - show recent changes
+├── stats_command.rs        # lat stats - project statistics and health
 ├── tree_command.rs         # lat tree - directory structure display
 ├── roots_command.rs        # lat roots - list root documents
 ├── children_command.rs     # lat children - list directory contents
@@ -380,7 +382,9 @@ tests/lattice/
 │   ├── overview_tests.rs
 │   ├── search_tests.rs
 │   ├── label_tests.rs
-│   └── dep_tests.rs
+│   ├── dep_tests.rs
+│   ├── stats_tests.rs
+│   └── mv_tests.rs
 ├── index/
 │   ├── mod.rs                 # Module declarations only
 │   ├── reconciliation_tests.rs
