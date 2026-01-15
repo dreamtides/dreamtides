@@ -137,7 +137,7 @@ is considered "related" if:
 When multiple related documents exist, the selection considers document priority
 as indicated by filename prefixes (`00_`, `01_`, `02_`, etc.). Documents with
 lower-numbered prefixes (higher priority) are preferred when deciding which
-related documents to highlight. Documents named `00_*` (directory root documents)
+related documents to highlight. Root documents (named `README.md` or `00_*`)
 are given highest priority, followed by `01_*`, `02_*`, and so on.
 
 The list is ordered by first appearance in the body text. Maximum 10 related

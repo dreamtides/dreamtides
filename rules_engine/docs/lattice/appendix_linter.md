@@ -203,7 +203,8 @@ Path contains backslashes (Windows-style).
 
 Non-root document contains `[Lattice]` template sections.
 
-**Detection:** Check for `[Lattice]` headings in non-`00_` prefixed files.
+**Detection:** Check for `[Lattice]` headings in files that are neither
+`README.md` nor `00_*` prefixed.
 
 **Message:** `Warning [W023]: path/task.md has [Lattice] sections but is not a root`
 

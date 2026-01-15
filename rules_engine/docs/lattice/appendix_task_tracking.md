@@ -49,7 +49,7 @@ There is no `in_progress` status. Use `lat claim` for local work tracking.
 lat create tasks/auth/fix_login_bug.md -d "Users unable to log in after reset"
 lat create tasks/auth/crash.md -t bug -p 0 -d "Crash on invalid credentials"
 lat create tasks/auth/oauth.md -t feature -p 1 -d "Add OAuth 2.0 support"
-lat create tasks/auth/00_auth_epic.md -t epic -d "Authentication system"
+lat create tasks/auth/README.md -t epic -d "Authentication system"
 ```
 
 Options:
@@ -67,9 +67,9 @@ in YAML names (`name: fix-login-bug`).
 
 ```
 tasks/
-├── 00_overview.md           # Project epic
+├── README.md                # Project epic
 ├── auth/
-│   ├── 00_authentication.md # Auth epic
+│   ├── README.md            # Auth epic
 │   ├── login_bug.md
 │   └── oauth_feature.md
 └── api/
@@ -78,7 +78,7 @@ tasks/
 ```
 
 - All tasks in a directory are siblings
-- The `00_` prefixed file is their parent/epic
+- The root document (`README.md` or `00_*` prefixed file) is their parent/epic
 - Nesting creates multi-level hierarchy
 
 ## Dependencies
@@ -116,8 +116,8 @@ Claims stored in `~/.lattice/claims/`, not in git. See
 ## Templates
 
 Tasks automatically inherit context and acceptance criteria from ancestor
-directory root documents (`00_*.md` files). No explicit template references
-are needed—the filesystem hierarchy IS the template structure.
+directory root documents (`README.md` or `00_*.md` files). No explicit template
+references are needed—the filesystem hierarchy IS the template structure.
 
 Root documents can include `[Lattice] Context` and `[Lattice] Acceptance
 Criteria` headings (any heading level):

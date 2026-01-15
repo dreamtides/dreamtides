@@ -48,7 +48,7 @@ score = (view_weight * view_score) +
 - `view_score`: Normalized view count (0-1), with logarithmic scaling
 - `recency_score`: Decay function based on days since last view
 - `priority_score`: 1.0 for P0, decreasing to 0.2 for P4
-- `is_root_document`: 1.0 if filename starts with `00_`, else 0.0
+- `is_root_document`: 1.0 if filename is `README.md` or starts with `00_`, else 0.0
 
 ## Command Usage
 
@@ -88,7 +88,7 @@ Run 'lat overview --reset-views' to clear history
       "id": "LROOT",
       "name": "project-overview",
       "description": "High-level project architecture",
-      "path": "docs/00_overview.md",
+      "path": "docs/README.md",
       "type": "doc",
       "score": 0.92,
       "view_count": 15,

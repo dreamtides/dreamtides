@@ -325,7 +325,7 @@ Before completing work:
 | Beads Concept | Lattice Equivalent |
 |---------------|-------------------|
 | `--parent ID` | `--parent <id>` or `--path <prefix>` |
-| Epic type | Root document (with `00_` prefix) |
+| Epic type | Root document (`README.md` or `00_*` prefix) |
 | Parent-child | Directory siblings |
 | `bd create --parent` | `lat create path/to/file.md` |
 | `in_progress` status | `lat claim` (local) |
@@ -348,7 +348,7 @@ Before completing work:
 1. **Local claiming**: `lat claim` tracks work without file modification
 2. **Explicit parent-id**: Auto-populated hierarchy via `lat fmt`
 3. **Knowledge base integration**: Tasks and docs share ID space
-4. **Directory roots and priority**: `00_*.md` prefix convention for hierarchy and priority
+4. **Directory roots and priority**: `README.md` or `00_*.md` convention for hierarchy and priority
 5. **No push operations**: Sync handled externally
 6. **View tracking**: `lat overview` surfaces frequently-accessed documents
 

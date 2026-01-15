@@ -115,8 +115,10 @@ Documents exceeding this should be split into multiple files using the
 
 Files with names starting with numeric prefixes like `00_`, `01_`, `02_`, etc.
 (e.g., `00_master_plan.md`) indicate document priority within a directory.
-The `00_` prefix marks the highest priority document, serving as the directory
-root that provides parent context for all other documents in that directory.
+Alternatively, a file named `README.md` serves the same purpose as a `00_`
+prefixed file. Both naming conventions are equally acceptable for marking the
+highest priority document that serves as the directory root, providing parent
+context for all other documents in that directory.
 
 The `lat fmt` command automatically populates the `parent-id` field in each
 document's frontmatter based on the directory's root document. This makes
@@ -332,9 +334,9 @@ for detailed analysis of beads behaviors to preserve.
 ## Task Templates
 
 Task templates provide reusable context and acceptance criteria through the
-existing directory hierarchy. Directory root documents (`00_*.md` files) can
-include `[Lattice] Context` and `[Lattice] Acceptance Criteria` headings that
-automatically compose into all descendant tasks at display time.
+existing directory hierarchy. Directory root documents (`README.md` or `00_*.md`
+files) can include `[Lattice] Context` and `[Lattice] Acceptance Criteria`
+headings that automatically compose into all descendant tasks at display time.
 
 This design requires no additional frontmatter fields—the filesystem hierarchy
 IS the template structure. When displaying a task, Lattice walks up the
@@ -399,7 +401,7 @@ when a deterministic fix exists.
 The `lat split` command takes a large document and divides it by top-level
 sections:
 
-1. The first text block and first section become a root document (`00_name.md`)
+1. The first text block and first section become a root document (e.g., `README.md`)
 2. Each subsequent section becomes a standalone document with a numeric prefix
 3. The root document receives links to all child documents
 4. All new documents receive generated Lattice IDs

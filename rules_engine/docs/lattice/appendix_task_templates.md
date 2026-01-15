@@ -7,8 +7,9 @@ This appendix documents the task template system. See
 
 Task templates provide reusable context and acceptance criteria through the
 existing directory hierarchy. Rather than explicit template references, Lattice
-leverages directory root documents (`00_*.md` files) to automatically compose
-template content for all tasks in that directory and its subdirectories.
+leverages directory root documents (`README.md` or `00_*.md` files) to
+automatically compose template content for all tasks in that directory and its
+subdirectories.
 
 This design requires no additional frontmatter fields. The filesystem hierarchy
 IS the template structure. When a template changes, all tasks in that subtree
@@ -68,26 +69,26 @@ ancestor root documents. Template content composes in hierarchy order:
 
 ```
 project/
-├── 00_project.md        # Project-wide context and acceptance
+├── README.md            # Project-wide context and acceptance
 ├── api/
-│   ├── 00_api.md        # API context and acceptance
+│   ├── README.md        # API context and acceptance
 │   └── create/
-│       ├── 00_create.md # Create-endpoint context and acceptance
+│       ├── README.md    # Create-endpoint context and acceptance
 │       └── fix_bug.md   # Task inherits from all three ancestors
 ```
 
 For `fix_bug.md`, the composition is:
 
 **Context order (general → specific):**
-1. `00_project.md` [Lattice] Context section
-2. `api/00_api.md` [Lattice] Context section
-3. `api/create/00_create.md` [Lattice] Context section
+1. `README.md` (project root) [Lattice] Context section
+2. `api/README.md` [Lattice] Context section
+3. `api/create/README.md` [Lattice] Context section
 4. `fix_bug.md` body
 
 **Acceptance order (specific → general):**
-1. `api/create/00_create.md` [Lattice] Acceptance Criteria section
-2. `api/00_api.md` [Lattice] Acceptance Criteria section
-3. `00_project.md` [Lattice] Acceptance Criteria section
+1. `api/create/README.md` [Lattice] Acceptance Criteria section
+2. `api/README.md` [Lattice] Acceptance Criteria section
+3. `README.md` (project root) [Lattice] Acceptance Criteria section
 
 This ordering ensures tasks receive appropriately scoped context up front
 (broad project context first, then domain-specific details), while universal
@@ -129,14 +130,15 @@ content without ancestor context or acceptance criteria.
 
 For a document to provide template content to descendants:
 
-1. **Must be a directory root:** Filename starts with `00_` prefix
+1. **Must be a directory root:** Filename is either `README.md` or starts with
+   `00_` prefix (both are equally acceptable)
 2. **Must have marked sections:** Include `[Lattice] Context` and/or
    `[Lattice] Acceptance Criteria` headings
 3. **Sections are optional:** A root without these sections simply provides
    no template content (descendants still inherit from higher ancestors)
 
-Non-root documents (`01_*.md`, `02_*.md`, or unprefixed files) never provide
-template content, even if they contain `[Lattice]` sections.
+Non-root documents (`01_*.md`, `02_*.md`, or other unprefixed files) never
+provide template content, even if they contain `[Lattice]` sections.
 
 ## Skipping Levels
 
@@ -145,15 +147,15 @@ in the ancestry chain:
 
 ```
 project/
-├── 00_project.md        # Has [Lattice] Context
+├── README.md            # Has [Lattice] Context
 ├── api/
 │   └── create/
-│       ├── 00_create.md # Has [Lattice] Context (no 00_api.md exists)
+│       ├── 00_create.md # Has [Lattice] Context (no api/README.md exists)
 │       └── task.md
 ```
 
-Task inherits from `00_project.md` and `00_create.md` directly. The missing
-`api/00_api.md` creates no gap—the chain simply doesn't include that level.
+Task inherits from `README.md` and `00_create.md` directly. The missing
+`api/README.md` creates no gap—the chain simply doesn't include that level.
 
 ## Linter Rules
 
@@ -161,7 +163,8 @@ Task inherits from `00_project.md` and `00_create.md` directly. The missing
 
 Non-root document contains `[Lattice]` template sections.
 
-**Detection:** Check for `[Lattice]` headings in non-`00_` prefixed files.
+**Detection:** Check for `[Lattice]` headings in files that are neither
+`README.md` nor `00_*` prefixed.
 
 **Message:** `Warning [W023]: path/task.md has [Lattice] sections but is not a root`
 
@@ -176,8 +179,8 @@ Template information appears in `lat show --json` output:
   "id": "LZZZZ",
   "title": "Fix validation bug in create endpoint",
   "ancestors": [
-    {"id": "LPROJ", "name": "project-overview", "path": "00_project.md"},
-    {"id": "LCREA", "name": "create-endpoint", "path": "api/create/00_create.md"}
+    {"id": "LPROJ", "name": "project-overview", "path": "README.md"},
+    {"id": "LCREA", "name": "create-endpoint", "path": "api/create/README.md"}
   ],
   "composed_context": "Project context...\nAPI context...\nCreate context...",
   "composed_acceptance": "- [ ] Create checks\n- [ ] API checks\n- [ ] Project checks",
