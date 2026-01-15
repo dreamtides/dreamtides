@@ -57,9 +57,9 @@ lat overview [OPTIONS]
 
 OPTIONS:
   --limit <N>         Maximum documents (default 10)
-  --type <type>       Filter by issue type or 'doc' for knowledge base
+  --type <type>       Filter by task type or 'doc' for knowledge base
   --path <prefix>     Filter to path prefix
-  --include-closed    Include closed issues
+  --include-closed    Include closed tasks
   --reset-views       Clear view history
   --json              Structured output
 ```
@@ -118,25 +118,25 @@ recency_half_life_days = 7
 
 ## Contextual Overview
 
-`lat overview <id>` shows documents relevant to a specific issue. This answers:
+`lat overview <id>` shows documents relevant to a specific task. This answers:
 "What do I need to know to work on this task?"
 
 ### Relevance Model
 
-Context is determined by graph distance from the target issue:
+Context is determined by graph distance from the target task:
 
-**Distance 0** (the issue itself):
+**Distance 0** (the task itself):
 - Always included first
 
 **Distance 1** (directly connected):
 - Parent epic (directory root document)
-- `blocked-by` issues (must understand what's blocking)
-- `blocking` issues (understand downstream impact)
-- Documents linked in the issue body
+- `blocked-by` tasks (must understand what's blocking)
+- `blocking` tasks (understand downstream impact)
+- Documents linked in the task body
 
 **Distance 2** (one hop away):
-- Sibling issues (same directory, open only)
-- Documents linked from blocked-by issues
+- Sibling tasks (same directory, open only)
+- Documents linked from blocked-by tasks
 - Parent's parent (grandparent epic)
 
 ### Ranking
@@ -150,7 +150,7 @@ Within each distance tier, documents are ranked by:
    - `body-link`: 0.6 (referenced material)
    - `sibling`: 0.4 (related work)
 
-2. **For issues:** Priority score (P0=1.0 down to P4=0.2)
+2. **For tasks:** Priority score (P0=1.0 down to P4=0.2)
 
 3. **For body links:** Position in document (earlier = higher)
 
@@ -206,7 +206,7 @@ consumption by AI agents.
 **New session orientation:** Run `lat overview` at session start to understand
 which documents have been most relevant to recent work.
 
-**Task context:** Run `lat overview <id>` before starting work on an issue to
+**Task context:** Run `lat overview <id>` before starting work on a task to
 see its dependency graph, referenced documentation, and related tasks.
 
 **Onboarding:** New agents can quickly identify the most-referenced documents

@@ -22,8 +22,8 @@ Index location: `.lattice/index.sqlite` (gitignored).
 | path | TEXT UNIQUE | Relative path from repo root |
 | name | TEXT | Document name |
 | description | TEXT | Document description |
-| issue_type | TEXT | NULL for knowledge base docs |
-| status | TEXT | Issue status |
+| task_type | TEXT | NULL for knowledge base docs |
+| status | TEXT | Task status |
 | priority | INTEGER | 0-4 |
 | created_at | TEXT | ISO 8601 |
 | updated_at | TEXT | ISO 8601 |

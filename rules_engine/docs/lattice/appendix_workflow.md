@@ -1,7 +1,7 @@
 # Appendix: Workflow Commands
 
 This appendix documents the primary workflow commands for viewing documents,
-finding ready work, providing AI context, and claiming issues. See
+finding ready work, providing AI context, and claiming tasks. See
 [Lattice Design](lattice_design.md#workflow-commands) for an overview, and
 [Appendix: CLI Structure](appendix_cli_structure.md) for the complete command
 reference including non-workflow commands.
@@ -21,12 +21,12 @@ lat show <id> --short
 lat show <id> --refs
 ```
 
-### Issue Display Format
+### Task Display Format
 
-For issue documents, the output follows `bd show` format:
+For task documents, the output follows `bd show` format:
 
 ```
-LB234: Fix LLMC v2 code review issues
+LB234: Fix LLMC v2 code review tasks
 Status: open
 Priority: P0
 Type: epic
@@ -55,17 +55,17 @@ Related (1):
 
 **Key sections:**
 
-- **Header line:** ID and name (issue title)
+- **Header line:** ID and name (task title)
 - **Metadata block:** Status, priority, type, timestamps, creator
 - **Description:** Full markdown body content
 - **Parent:** Directory root document (epic context)
-- **Depends on:** Issues in the `blocked-by` field (what this depends on)
-- **Blocks:** Issues in the `blocking` field (what depends on this)
+- **Depends on:** Tasks in the `blocked-by` field (what this depends on)
+- **Blocks:** Tasks in the `blocking` field (what depends on this)
 - **Related:** Other documents linked in the body text
 
 ### Knowledge Base Display Format
 
-For knowledge base documents (no `issue-type`), the output emphasizes the
+For knowledge base documents (no `task-type`), the output emphasizes the
 name and description fields which provide structured metadata:
 
 ```
@@ -100,10 +100,10 @@ All document references throughout `lat show` output use a consistent format:
 ```
 
 Where `<type-indicator>` is:
-- For issues: `P<N> - <status>` (e.g., `P0 - open`, `P1 - closed`)
+- For tasks: `P<N> - <status>` (e.g., `P0 - open`, `P1 - closed`)
 - For knowledge base: `doc`
 
-For issues, the name IS the title (a short description), so no separate description
+For tasks, the name IS the title (a short description), so no separate description
 is shown. For knowledge base entries, both name and description are displayed.
 
 Examples:
@@ -134,19 +134,19 @@ documents are shown in text output; use `--json` for complete list.
 
 ### Name vs Description Distinction
 
-Lattice maintains separate semantics for issues and knowledge base entries:
+Lattice maintains separate semantics for tasks and knowledge base entries:
 
-**Issues:**
-- `name`: The issue title (short, descriptive)
+**Tasks:**
+- `name`: The task title (short, descriptive)
 - `description`: Optional one-line summary for AI context (max 1024 chars)
-- Body text: The full issue description
+- Body text: The full task description
 
 **Knowledge Base Entries:**
 - `name`: Short identifier (lowercase-hyphenated, max 64 chars)
 - `description`: Purpose summary for AI context (max 1024 chars, recommended)
 - Body text: Full document content
 
-The optional `description` field for issues provides a brief summary that AI
+The optional `description` field for tasks provides a brief summary that AI
 agents can use without reading the full body. When present, it appears in
 `lat show --short` and `lat overview` output.
 
@@ -156,7 +156,7 @@ The `--short` flag produces single-line output:
 
 ```
 $ lat show LB234 --short
-LB234 [open] P0 epic: Fix LLMC v2 code review issues
+LB234 [open] P0 epic: Fix LLMC v2 code review tasks
 ```
 
 Format: `<id> [<status>] <priority> <type>: <name>`
@@ -169,7 +169,7 @@ LDC76 [doc]: authentication-design - OAuth 2.0 implementation design
 
 ### References Format
 
-The `--refs` flag shows issues that reference this one (reverse lookup):
+The `--refs` flag shows tasks that reference this one (reverse lookup):
 
 ```
 $ lat show LB234 --refs
@@ -193,15 +193,15 @@ The `--json` flag produces structured output compatible with `bd show --json`:
 [
   {
     "id": "LB234",
-    "title": "Fix LLMC v2 code review issues",
+    "title": "Fix LLMC v2 code review tasks",
     "description": "Master epic for addressing bugs...",
     "status": "open",
     "priority": 0,
-    "issue_type": "epic",
+    "task_type": "epic",
     "created_at": "2026-01-10T14:37:59.351489-08:00",
     "created_by": "dthurn",
     "updated_at": "2026-01-10T14:37:59.351489-08:00",
-    "path": "issues/llmc/fix-review-issues.md",
+    "path": "tasks/llmc/fix-review-tasks.md",
     "labels": ["llmc", "code-review"],
     "dependencies": [
       {
@@ -209,7 +209,7 @@ The `--json` flag produces structured output compatible with `bd show --json`:
         "title": "Fix incorrect rebase necessity detection in patrol",
         "status": "closed",
         "priority": 0,
-        "issue_type": "bug"
+        "task_type": "bug"
       }
     ],
     "dependents": [
@@ -218,7 +218,7 @@ The `--json` flag produces structured output compatible with `bd show --json`:
         "title": "Fix crash count not being incremented in patrol",
         "status": "open",
         "priority": 0,
-        "issue_type": "bug"
+        "task_type": "bug"
       }
     ],
     "related": [
@@ -242,19 +242,19 @@ The `--json` flag produces structured output compatible with `bd show --json`:
 | Key | Type | Description |
 |-----|------|-------------|
 | `id` | string | Lattice ID |
-| `title` | string | Issue name/title (maps from `name` field) |
-| `description` | string | Full body text for issues, description field for KB |
-| `status` | string | Issue status |
+| `title` | string | Task name/title (maps from `name` field) |
+| `description` | string | Full body text for tasks, description field for KB |
+| `status` | string | Task status |
 | `priority` | int | Priority level (0-4) |
-| `issue_type` | string | bug/feature/task/epic/chore |
+| `task_type` | string | bug/feature/task/epic/chore |
 | `created_at` | string | ISO 8601 timestamp |
 | `created_by` | string | Creator identifier |
 | `updated_at` | string | ISO 8601 timestamp |
 | `closed_at` | string | ISO 8601 timestamp (if closed) |
 | `path` | string | Relative file path |
 | `labels` | array | List of labels |
-| `dependencies` | array | Issues this depends on (blocked-by) |
-| `dependents` | array | Issues that depend on this (blocking) |
+| `dependencies` | array | Tasks this depends on (blocked-by) |
+| `dependents` | array | Tasks that depend on this (blocking) |
 | `related` | array | Documents linked from body text |
 | `parent` | object | Directory root document (epic) |
 | `claimed` | bool | Whether locally claimed |
@@ -267,16 +267,16 @@ returned as a JSON array:
 
 ```
 $ lat show LB234 L567C
-LB234: First issue title
+LB234: First task title
 ...
 
-L567C: Second issue title
+L567C: Second task title
 ...
 ```
 
 ## lat ready
 
-The `lat ready` command shows work available to start: issues that are open,
+The `lat ready` command shows work available to start: tasks that are open,
 have no blockers, and are not claimed.
 
 ### Basic Usage
@@ -292,9 +292,9 @@ lat ready --pretty
 
 ```
 $ lat ready
-Ready work (4 issues with no blockers):
+Ready work (4 tasks with no blockers):
 
-1. [P0] [epic] LB234: Fix LLMC v2 code review issues
+1. [P0] [epic] LB234: Fix LLMC v2 code review tasks
 2. [P1] [task] L567C: Convert strings.toml to Fluent format
 3. [P1] [epic] LDAB2: LLMC v2: Agent Coordination System
 4. [P1] [epic] L3456: Tabula V2: Complete Card Data Loading Rewrite
@@ -302,9 +302,9 @@ Ready work (4 issues with no blockers):
 
 ### Ready Criteria
 
-An issue is "ready" if:
+A task is "ready" if:
 1. Status is `open` or `pinned`
-2. All `blocked-by` issues are closed
+2. All `blocked-by` tasks are closed
 3. Priority is not P4 (backlog) unless `--include-backlog`
 4. Not currently claimed (unless `--include-claimed`)
 
@@ -314,12 +314,12 @@ An issue is "ready" if:
 |------|-------------|
 | `--parent <id>` | Filter to descendants of this directory/epic |
 | `--priority <N>` | Filter by priority level |
-| `--type <type>` | Filter by issue type |
+| `--type <type>` | Filter by task type |
 | `--label <list>` | Filter by labels (AND logic) |
 | `--label-any <list>` | Filter by labels (OR logic) |
-| `--limit <N>` | Maximum issues (default 10) |
-| `--include-backlog` | Include P4 issues |
-| `--include-claimed` | Include claimed issues |
+| `--limit <N>` | Maximum tasks (default 10) |
+| `--include-backlog` | Include P4 tasks |
+| `--include-claimed` | Include claimed tasks |
 
 ### Sort Policies
 
@@ -335,7 +335,7 @@ The `--pretty` flag displays a visual tree with status symbols:
 
 ```
 $ lat ready --pretty
-o P0 LB234 - [EPIC] Fix LLMC v2 code review issues
+o P0 LB234 - [EPIC] Fix LLMC v2 code review tasks
 
 o P1 L3456 - [EPIC] Tabula V2: Complete Card Data Loading Rewrite
 |-- o P1 L567C - Convert strings.toml to Fluent format
@@ -343,7 +343,7 @@ o P1 L3456 - [EPIC] Tabula V2: Complete Card Data Loading Rewrite
 o P1 LDAB2 - [EPIC] LLMC v2: Agent Coordination System
 
 --------------------------------------------------------------------------------
-Total: 4 issues (4 open, 0 claimed)
+Total: 4 tasks (4 open, 0 claimed)
 
 Legend: o open | x claimed | (blocked) | P0 P1 P2 P3 P4
 ```
@@ -356,15 +356,15 @@ The `--json` flag produces output compatible with `bd ready --json`:
 [
   {
     "id": "LB234",
-    "title": "Fix LLMC v2 code review issues",
+    "title": "Fix LLMC v2 code review tasks",
     "description": "Master epic for addressing bugs...",
     "status": "open",
     "priority": 0,
-    "issue_type": "epic",
+    "task_type": "epic",
     "created_at": "2026-01-10T14:37:59.351489-08:00",
     "created_by": "dthurn",
     "updated_at": "2026-01-10T14:37:59.351489-08:00",
-    "path": "issues/llmc/fix-review-issues.md",
+    "path": "tasks/llmc/fix-review-tasks.md",
     "labels": [],
     "parent": {
       "id": "LAA42",
@@ -374,7 +374,7 @@ The `--json` flag produces output compatible with `bd ready --json`:
 ]
 ```
 
-The JSON output includes the full description text for each ready issue,
+The JSON output includes the full description text for each ready task,
 enabling AI agents to understand task context without additional queries.
 
 ## lat prime
@@ -411,10 +411,10 @@ Before completing work, run this checklist:
 ## Core Commands
 
 - `lat overview` - See most critical documents
-- `lat ready` - Show issues ready to work
-- `lat show <id>` - View issue details (includes parent, dependencies, related)
-- `lat claim <id>` - Claim issue for local work
-- `lat close <id>` - Mark issue completed
+- `lat ready` - Show tasks ready to work
+- `lat show <id>` - View task details (includes parent, dependencies, related)
+- `lat claim <id>` - Claim task for local work
+- `lat close <id>` - Mark task completed
 
 ## Link Authoring
 
@@ -448,14 +448,14 @@ These commands appear in the session protocol output.
 
 ## lat claim
 
-The `lat claim` command marks an issue as locally in progress on the current
+The `lat claim` command marks a task as locally in progress on the current
 machine. This state is NOT stored in markdown files or tracked in git;
 instead it persists to `~/.lattice/claims/`.
 
 ### Basic Usage
 
 ```
-lat claim <id>           # Claim an issue
+lat claim <id>           # Claim a task
 lat claim --list         # Show all claims
 lat claim --release <id> # Release a claim
 lat claim --release-all  # Release all claims
@@ -491,21 +491,21 @@ locking is needed. Claiming creates the file; releasing deletes it.
 ### Claim Lifecycle
 
 ```
-lat ready          # Issue shows as "ready"
-lat claim LB234    # Issue now claimed
+lat ready          # Task shows as "ready"
+lat claim LB234    # Task now claimed
 lat show LB234     # Shows "Claimed: true" in output
-lat ready          # Issue no longer appears (unless --include-claimed)
+lat ready          # Task no longer appears (unless --include-claimed)
 lat close LB234    # Closing auto-releases the claim
 ```
 
 ### Auto-Release on State Change
 
-When an issue's status changes (closed, blocked, etc.), its claim is
+When a task's status changes (closed, blocked, etc.), its claim is
 automatically released. This happens during:
 
 - `lat close <id>`
 - `lat update <id> --status blocked`
-- Any operation that modifies issue status
+- Any operation that modifies task status
 
 ### Stale Claim Detection
 
@@ -514,19 +514,19 @@ The `lat claim --gc` command removes stale claims:
 ```
 $ lat claim --gc
 Checking 3 claims...
-Released: LB234 (issue closed)
+Released: LB234 (task closed)
 Released: L567C (work path no longer exists)
 Kept: LDAB2 (active)
 ```
 
 A claim is stale if:
-- The issue is no longer open
+- The task is no longer open
 - The work path no longer exists
 - The claim is older than 7 days (configurable)
 
 ### Crash Recovery
 
-If an agent crashes while working on an issue, the claim persists. Release
+If an agent crashes while working on a task, the claim persists. Release
 it via `lat claim --release LB234` or delete the claim file directly.
 
 ### Display in lat show
@@ -534,7 +534,7 @@ it via `lat claim --release LB234` or delete the claim file directly.
 The `lat show` command indicates claim status:
 
 ```
-LB234: Fix LLMC v2 code review issues
+LB234: Fix LLMC v2 code review tasks
 Status: open
 Priority: P0
 Type: epic
@@ -544,15 +544,15 @@ Claimed: true
 
 ### Display in lat ready
 
-By default, `lat ready` excludes claimed issues:
+By default, `lat ready` excludes claimed tasks:
 
 ```
 $ lat ready
-Ready work (3 issues with no blockers):
+Ready work (3 tasks with no blockers):
 ...
 
 $ lat ready --include-claimed
-Ready work (4 issues, 1 claimed):
+Ready work (4 tasks, 1 claimed):
 1. [P0] [epic] LB234: Fix LLMC v2... [CLAIMED]
 ...
 ```
@@ -560,11 +560,11 @@ Ready work (4 issues, 1 claimed):
 ### No Assignee Concept
 
 Lattice intentionally has no "assignee" field. The claim system tracks
-which machine is working on an issue, not who. This design:
+which machine is working on a task, not who. This design:
 
 1. Supports multi-agent workflows where work is coordinated externally
 2. Avoids stale assignee data when agents are replaced
-3. Keeps issue files clean of operational state
+3. Keeps task files clean of operational state
 
 ## Command Summary
 

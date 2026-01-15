@@ -2,7 +2,7 @@
 
 ## Executive Summary
 
-Lattice is a unified knowledge base and issue tracking system built on markdown
+Lattice is a unified knowledge base and task tracking system built on markdown
 files stored in git repositories, with SQLite providing an ephemeral index for
 query performance. The system prioritizes document atomicity through strict
 size limits, rich cross-referencing capabilities, and compatibility with
@@ -55,7 +55,7 @@ system distinguishes between user errors (invalid input) and system errors
 Silent failure is treated as a critical design flaw. All operations log
 extensively to `.lattice/logs.jsonl`, capturing user operations, git
 operations, SQLite operations, and general observations about repository
-state. This logging enables post-hoc debugging when issues arise.
+state. This logging enables post-hoc debugging when problems arise.
 
 ## Document Structure
 
@@ -73,23 +73,23 @@ Claude's SKILL.md format. The reserved keys include:
 - `parent-id`: ID of parent document, auto-populated by `lat fmt` from directory root
 - `name`: Human-readable document name, max 64 lowercase hyphen-separated chars
 - `description`: Purpose summary for AI context, max 1024 characters (optional for
-  issues, recommended for knowledge base documents)
+  tasks, recommended for knowledge base documents)
 
-**Issue Tracking Keys:**
-- `issue-type`: bug/feature/task/epic/chore
+**Task Tracking Keys:**
+- `task-type`: bug/feature/task/epic/chore
 - `status`: open/blocked/deferred/closed/tombstone/pinned
 - `priority`: 0-4 (0 highest)
 - `labels`: List of arbitrary string labels
-- `blocking`: List of issue IDs with hard dependencies on this issue
-- `blocked-by`: List of issue IDs this issue depends on
-- `discovered-from`: List of parent issues from which this was discovered
+- `blocking`: List of task IDs with hard dependencies on this task
+- `blocked-by`: List of task IDs this task depends on
+- `discovered-from`: List of parent tasks from which this was discovered
 - `created-at`, `updated-at`, `closed-at`: ISO 8601 timestamps
 
 **Skill Integration Keys:**
 - `skill`: Boolean enabling Claude Skill generation
 
-See [Appendix: Issue Tracking](appendix_issue_tracking.md) for the complete
-issue lifecycle state machine.
+See [Appendix: Task Tracking](appendix_task_tracking.md) for the complete
+task lifecycle state machine.
 
 ### Document Body
 
@@ -184,12 +184,12 @@ Commands for viewing documents and managing work progress.
 
 **lat show** - Displays document details following `bd show` format. Supports
 single or multiple documents, with `--json`, `--short`, and `--refs` options.
-Default output includes parent, dependencies, blocking issues, and related
+Default output includes parent, dependencies, blocking tasks, and related
 documents—providing full context for AI agents in a single call.
 
-**lat ready** - Shows work available to start: open issues with no blockers
+**lat ready** - Shows work available to start: open tasks with no blockers
 that are not claimed. Supports `--parent` for directory filtering, `--pretty`
-for visual tree display, and `--json` for full issue details.
+for visual tree display, and `--json` for full task details.
 
 **lat overview** - Provides repository-level context for AI agents. Shows the
 most critical documents based on view frequency, recency, and priority. Supports
@@ -200,7 +200,7 @@ in `.lattice/views.json` to surface frequently-referenced documents.
 link authoring format (shorthand `[text](ID)` links that `lat fmt` expands).
 Supports custom checklist via `.lattice/config.toml`.
 
-**lat claim** - Marks issues as locally in progress on the current machine.
+**lat claim** - Marks tasks as locally in progress on the current machine.
 Claims are stored in `~/.lattice/claims.json`, not in markdown files. Supports
 atomic updates across multiple worktrees and automatic release on status change.
 
@@ -208,26 +208,26 @@ See [Appendix: Workflow](appendix_workflow.md) for complete command specificatio
 output formats, and claiming behavior, and
 [Appendix: Overview Command](appendix_overview.md) for the ranking algorithm.
 
-### Issue and Document Management
+### Task and Document Management
 
-Commands for creating and modifying issues and documents.
+Commands for creating and modifying tasks and documents.
 
 **lat create** - Creates new documents with `lat create <path/to/doc.md>
 [options]`. The path specifies both directory location and filename,
-establishing the document's position in the hierarchy. Supports issue type,
+establishing the document's position in the hierarchy. Supports task type,
 priority, labels, and dependencies at creation time.
 
 **lat update** - Modifies existing documents with `lat update <id> [id...]
 [options]`. Supports changing status, priority, type, and managing labels.
-Can update multiple issues atomically, useful for bulk operations like marking
-dependencies as blocked or changing priority across related issues.
+Can update multiple tasks atomically, useful for bulk operations like marking
+dependencies as blocked or changing priority across related tasks.
 
-**lat close** - Marks issues as closed, accepting single or multiple lattice IDs.
+**lat close** - Marks tasks as closed, accepting single or multiple lattice IDs.
 Automatically releases any local claims and sets the `closed-at` timestamp.
-Supports `--reason` for documenting why the issue was closed.
+Supports `--reason` for documenting why the task was closed.
 
-See [Appendix: Issue Tracking](appendix_issue_tracking.md) for the complete
-issue lifecycle and [Appendix: CLI Structure](appendix_cli_structure.md) for
+See [Appendix: Task Tracking](appendix_task_tracking.md) for the complete
+task lifecycle and [Appendix: CLI Structure](appendix_cli_structure.md) for
 full command reference.
 
 ### Document Management
@@ -278,22 +278,22 @@ The index maintains a reverse reference map enabling queries like "what
 documents link to this one?" This powers features like impact analysis
 when modifying or deleting documents.
 
-## Issue Tracking
+## Task Tracking
 
 ### Integration with Knowledge Base
 
-Issues and knowledge base documents share a unified ID space, enabling
-seamless cross-referencing. An issue can link to design documents, and
-design documents can reference issues that track their implementation.
+Tasks and knowledge base documents share a unified ID space, enabling
+seamless cross-referencing. A task can link to design documents, and
+design documents can reference tasks that track their implementation.
 
 The primary organizational mechanism is the filesystem hierarchy rather
-than explicit parent-child relationships. All issues in a directory are
+than explicit parent-child relationships. All tasks in a directory are
 implicitly siblings, with the directory's root document acting as their
 parent or "epic." This replaces beads' explicit epic/child model.
 
-### Issue Lifecycle
+### Task Lifecycle
 
-Issue status transitions follow a state machine:
+Task status transitions follow a state machine:
 
 ```
 open -> closed
@@ -305,22 +305,22 @@ open -> closed
 deferred  (back to open when unblocked)
 ```
 
-The `tombstone` status represents deleted issues that should not be
+The `tombstone` status represents deleted tasks that should not be
 resurrected. The `pinned` status indicates permanent open items.
 
 There is no "in_progress" status in Lattice. Instead, the `lat claim`
-command tracks which machine is working on an issue locally, without
-modifying the issue file.
+command tracks which machine is working on a task locally, without
+modifying the task file.
 
-See [Appendix: Issue Tracking](appendix_issue_tracking.md) for the complete
+See [Appendix: Task Tracking](appendix_task_tracking.md) for the complete
 state machine and transition rules.
 
 ### CLI Commands
 
-The issue CLI follows beads' design philosophy, adapted for Lattice's
+The task CLI follows beads' design philosophy, adapted for Lattice's
 filesystem-centric model. Key differences from beads:
 
-- Issues require a path on creation to specify filesystem location
+- Tasks require a path on creation to specify filesystem location
 - No explicit parent/child relationships; hierarchy comes from directories
 - The `name` field replaces beads' `title` concept
 - No sync command; Lattice never performs git push operations
@@ -335,18 +335,18 @@ for detailed analysis of beads behaviors to preserve.
 
 The `lat check` command validates documents and repository state:
 
-**Error-level issues (prevent operations):**
+**Error-level checks (prevent operations):**
 - Duplicate Lattice IDs
 - References to nonexistent IDs
 - Invalid YAML frontmatter keys
-- Missing required fields for issue documents
+- Missing required fields for task documents
 - Invalid status/type/priority values
 - Circular blocking dependencies
 
-**Warning-level issues:**
+**Warning-level checks:**
 - Document exceeds 500 lines
 - Missing `name` or `description` for knowledge base documents
-- Markdown lint issues (inconsistent headers, bare URLs, etc.)
+- Markdown lint problems (inconsistent headers, bare URLs, etc.)
 - Time-sensitive content detection (dates, "after August 2025", etc.)
 - Inconsistent terminology within a document
 
@@ -369,7 +369,7 @@ The `lat fmt` command applies consistent formatting:
 - Link expansion: converts bare ID links `[text](LJCQ2)` to full path+fragment
 - Link maintenance: updates paths when documents are renamed or moved
 
-The formatter attempts to auto-correct issues identified by `lat check`
+The formatter attempts to auto-correct problems identified by `lat check`
 when a deterministic fix exists.
 
 ### The Split Command
@@ -585,7 +585,7 @@ Following Tufte's principles:
 **System Errors (exit code 1, "System Error" output):**
 - Index corruption
 - Git operation failures
-- File permission issues
+- File permission problems
 - Unexpected internal states
 
 ### Structured Error Output
@@ -607,7 +607,7 @@ The `--json` flag ensures all commands output errors in this structured format.
 
 ### Recovery Strategy
 
-For user errors, provide clear guidance on how to fix the issue. For
+For user errors, provide clear guidance on how to fix the problem. For
 system errors, log extensively and suggest running `lat check` or
 rebuilding the index. Never silently ignore errors.
 

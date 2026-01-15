@@ -168,4 +168,4 @@ For repositories with many files:
 
 Lattice never performs network git operations (fetch, pull, push). These
 are left to the user's normal git workflow. This prevents unexpected
-network access and authentication issues.
+network access and authentication problems.

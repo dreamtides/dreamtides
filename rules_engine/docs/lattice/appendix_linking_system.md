@@ -185,9 +185,9 @@ Warning: Document LXXXX contains self-reference at line 15
 
 IDs in these frontmatter fields are indexed as links:
 
-- `blocking`: Issues this blocks
-- `blocked-by`: Issues blocking this
-- `discovered-from`: Parent issues
+- `blocking`: Tasks this blocks
+- `blocked-by`: Tasks blocking this
+- `discovered-from`: Parent tasks
 - Any custom field with `*-id` or `*-ids` suffix
 
 ### Example

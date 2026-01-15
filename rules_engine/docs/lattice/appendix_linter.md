@@ -7,7 +7,7 @@ linter fits into the overall system.
 ## Overview
 
 The `lat check` command validates documents and repository state. It
-distinguishes between errors (blocking issues) and warnings (advisory).
+distinguishes between errors (blocking problems) and warnings (advisory).
 
 ## Error-Level Rules
 
@@ -45,11 +45,11 @@ YAML frontmatter contains an unrecognized key.
 
 ### E004: Missing Required Field
 
-Issue document lacks required fields.
+Task document lacks required fields.
 
-**Detection:** If `issue-type` present, require `status` and `priority`.
+**Detection:** If `task-type` present, require `status` and `priority`.
 
-**Message:** `Error [E004]: path.md is an issue but missing 'status' field`
+**Message:** `Error [E004]: path.md is a task but missing 'status' field`
 
 **Fix:** Add the required field.
 
@@ -101,7 +101,7 @@ Document exceeds the recommended 500 line limit.
 
 Knowledge base document lacks a `name` field.
 
-**Detection:** If no `issue-type` and no `name`, warn.
+**Detection:** If no `task-type` and no `name`, warn.
 
 **Message:** `Warning [W002]: path.md is missing 'name' field`
 
@@ -111,7 +111,7 @@ Knowledge base document lacks a `name` field.
 
 Knowledge base document lacks a `description` field.
 
-**Detection:** If no `issue-type` and no `description`, warn.
+**Detection:** If no `task-type` and no `description`, warn.
 
 **Message:** `Warning [W003]: path.md is missing 'description' field`
 

@@ -22,7 +22,7 @@ rules_engine/src/lattice/
 ├── claim/
 ├── lint/
 ├── id/
-├── issue/
+├── task/
 ├── skill/
 ├── log/
 ├── error/
@@ -66,7 +66,7 @@ reporting.
 **id/** - Lattice ID system including ID type definitions, base32 encoding/decoding,
 ID generation, and client ID selection logic.
 
-**issue/** - Issue management including type/status/priority enumerations, status
+**task/** - Task management including type/status/priority enumerations, status
 transition state machine, ready work calculation, and dependency graph management.
 
 **skill/** - Skill document integration including symlink creation for .claude/

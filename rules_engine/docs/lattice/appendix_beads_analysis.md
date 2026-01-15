@@ -12,12 +12,12 @@ For the Lattice implementations of these commands, see:
 
 ### Core Behavior
 
-The `bd show <id>` command displays complete issue details including:
+The `bd show <id>` command displays complete task details including:
 
 1. **Header line**: ID, title
 2. **Metadata block**: Status, priority, type, timestamps, creator
 3. **Description**: Full markdown body
-4. **Children section**: List of child issues with status indicators
+4. **Children section**: List of child tasks with status indicators
 
 Example output structure:
 ```
@@ -42,16 +42,16 @@ Children (21):
 | Flag | Behavior |
 |------|----------|
 | `--short` | Single-line output: `id [status] priority type: title` |
-| `--refs` | Reverse lookup showing what references this issue |
+| `--refs` | Reverse lookup showing what references this task |
 | `--thread` | Full conversation thread for messages |
 | `--json` | Structured JSON output with all fields |
 
 ### Edge Cases
 
-**Ambiguous ID Resolution**: When an ID prefix matches multiple issues,
+**Ambiguous ID Resolution**: When an ID prefix matches multiple tasks,
 beads returns an error with suggestions:
 ```
-ambiguous ID "dr-2" matches 8 issues: [dr-2z0 dr-2pp ...]
+ambiguous ID "dr-2" matches 8 tasks: [dr-2z0 dr-2pp ...]
 Use more characters to disambiguate
 ```
 
@@ -85,12 +85,12 @@ sibling documents in the same directory with similar status indicators.
 
 The `bd ready` command shows work available to start:
 - Status is `open` or `pinned`
-- No blocking dependencies (all `blocked-by` issues are closed)
+- No blocking dependencies (all `blocked-by` tasks are closed)
 - Default excludes P4 (backlog) priorities
 
 Default output:
 ```
-Ready work (3 issues with no blockers):
+Ready work (3 tasks with no blockers):
 
 1. [P1] [epic] dr-ulj: Tabula V2: Complete Card Data Loading Rewrite
 2. [P1] [task] dr-ulj.1: Convert strings.toml...
@@ -109,12 +109,12 @@ Ready work (3 issues with no blockers):
 
 | Flag | Behavior |
 |------|----------|
-| `--limit N` | Maximum issues (default 10) |
-| `--type T` | Filter by issue type |
+| `--limit N` | Maximum tasks (default 10) |
+| `--type T` | Filter by task type |
 | `--pretty` | Tree format with status symbols |
 | `--parent ID` | Filter to descendants of an epic |
 | `--assignee` | Filter by assignee |
-| `--unassigned` | Only unassigned issues |
+| `--unassigned` | Only unassigned tasks |
 
 ### Pretty Format
 
@@ -130,9 +130,9 @@ Legend: o open | (x) blocked | [red] P0 | [orange] P1...
 
 ### Edge Cases
 
-**Empty Results**: When no issues are ready:
+**Empty Results**: When no tasks are ready:
 ```
-No ready work found (all issues have blocking dependencies)
+No ready work found (all tasks have blocking dependencies)
 ```
 
 **Lattice Adaptation**: Lattice should provide the same clear empty-state
@@ -161,13 +161,13 @@ equivalent functionality for directory-scoped queries.
 
 ### Core Behavior
 
-The `bd list` command provides flexible issue querying with extensive
-filtering. Default shows open issues sorted by priority.
+The `bd list` command provides flexible task querying with extensive
+filtering. Default shows open tasks sorted by priority.
 
 Default output:
 ```
 dr-5dl [P0] [bug] open - Fix crash count not being incremented
-dr-t0z [P0] [epic] open - Fix LLMC v2 code review issues
+dr-t0z [P0] [epic] open - Fix LLMC v2 code review tasks
 dr-2z0 [P1] [bug] open - Fix stuck worker nudging
 ```
 
@@ -175,7 +175,7 @@ dr-2z0 [P1] [bug] open - Fix stuck worker nudging
 
 **Status Filters**:
 - `--status=open|blocked|deferred|closed`
-- `--all` includes closed issues
+- `--all` includes closed tasks
 
 **Time Filters**:
 - `--created-after`, `--created-before`
@@ -221,7 +221,7 @@ Lattice should preserve this pagination behavior.
 error. This is correct behavior (empty results != error).
 
 **Combining Filters**: Filters combine with AND logic. `--status=open
---priority 0` shows open P0 issues only.
+--priority 0` shows open P0 tasks only.
 
 **Relative Dates**: Beads parses `+6h`, `tomorrow`, `next monday`. Lattice
 should implement equivalent parsing for `--updated-after` etc.
@@ -281,9 +281,9 @@ None. The sync model is intentionally different.
 
 ### bd blocked
 
-Shows issues in blocked status with blocking relationships:
+Shows tasks in blocked status with blocking relationships:
 ```
-dr-xxx: Issue title
+dr-xxx: Task title
   Blocked by: dr-yyy (open), dr-zzz (blocked)
 ```
 
@@ -291,7 +291,7 @@ dr-xxx: Issue title
 
 ### bd dep tree
 
-Visualizes dependency graph for an issue:
+Visualizes dependency graph for an task:
 ```
 Dependency tree for dr-ulj:
 dr-ulj: Title [P1] (open) [READY]
@@ -347,7 +347,7 @@ Before completing work:
 
 1. **Local claiming**: `lat claim` tracks work without file modification
 2. **Explicit parent-id**: Auto-populated hierarchy via `lat fmt`
-3. **Knowledge base integration**: Issues and docs share ID space
+3. **Knowledge base integration**: Tasks and docs share ID space
 4. **Directory roots and priority**: `00_*.md` prefix convention for hierarchy and priority
 5. **No push operations**: Sync handled externally
 6. **View tracking**: `lat overview` surfaces frequently-accessed documents

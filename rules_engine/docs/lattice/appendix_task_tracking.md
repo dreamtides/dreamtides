@@ -1,17 +1,17 @@
-# Appendix: Issue Tracking
+# Appendix: Task Tracking
 
-This appendix documents issue lifecycle and creation. See
-[Lattice Design](lattice_design.md#issue-tracking) for an overview.
+This appendix documents task lifecycle and creation. See
+[Lattice Design](lattice_design.md#task-tracking) for an overview.
 
-## Issue vs Knowledge Base
+## Task vs Knowledge Base
 
 Any Lattice document can be either:
 - **Knowledge base**: Has `lattice-id`, `name`, `description`
-- **Issue**: Additionally has `issue-type` and `status`
+- **Task**: Additionally has `task-type` and `status`
 
-The presence of `issue-type` is the discriminator.
+The presence of `task-type` is the discriminator.
 
-## Issue Types
+## Task Types
 
 | Type | Use Case |
 |------|----------|
@@ -43,7 +43,7 @@ There is no `in_progress` status. Use `lat claim` for local work tracking.
 | P3 | Low: polish, optimization |
 | P4 | Backlog: future ideas |
 
-## Creating Issues
+## Creating Tasks
 
 ```bash
 lat create tasks/auth/fix_login_bug.md -d "Users unable to log in after reset"
@@ -53,7 +53,7 @@ lat create tasks/auth/00_auth_epic.md -t epic -d "Authentication system"
 ```
 
 Options:
-- `-t <type>`: Issue type (default: task)
+- `-t <type>`: Task type (default: task)
 - `-p <0-4>`: Priority (default: 2)
 - `-d <text>`: Description
 - `-l <labels>`: Comma-separated labels
@@ -77,20 +77,20 @@ tasks/
     └── rate_limiting.md
 ```
 
-- All issues in a directory are siblings
+- All tasks in a directory are siblings
 - The `00_` prefixed file is their parent/epic
 - Nesting creates multi-level hierarchy
 
 ## Dependencies
 
 ```yaml
-blocking: [LYYYY, LZZZZ]   # This issue blocks these
-blocked-by: [LWWWW]        # These block this issue
+blocking: [LYYYY, LZZZZ]   # This task blocks these
+blocked-by: [LWWWW]        # These block this task
 discovered-from: [LXXXX]   # Soft link for provenance
 ```
 
-An issue is "ready" if: status is `open`/`pinned`, no open `blocked-by`
-issues, priority is not P4, and not claimed.
+A task is "ready" if: status is `open`/`pinned`, no open `blocked-by`
+tasks, priority is not P4, and not claimed.
 
 ## Labels
 
@@ -106,7 +106,7 @@ Use `lat claim` instead of status changes:
 
 ```bash
 lat claim LB234    # Mark as being worked on
-lat ready          # Issue no longer appears
+lat ready          # Task no longer appears
 lat close LB234    # Auto-releases claim
 ```
 
@@ -118,7 +118,7 @@ Claims stored in `~/.lattice/claims/`, not in git. See
 ```yaml
 ---
 lattice-id: LXXXX
-issue-type: task
+task-type: task
 status: open
 priority: 2
 labels: [auth]

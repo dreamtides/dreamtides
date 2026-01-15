@@ -23,12 +23,12 @@ These are the primary commands for AI agent workflows. See
 ### lat show \<id\> [id...] [options]
 
 Display document details following `bd show` format. Default output includes
-parent, dependencies, blocking issues, and related documents—providing full
+parent, dependencies, blocking tasks, and related documents—providing full
 context for AI agents in a single call.
 
 **Options:**
 - `--short`: Single-line output
-- `--refs`: Show issues that reference this one
+- `--refs`: Show tasks that reference this one
 - `--peek`: Show only YAML frontmatter
 - `--raw`: Output without formatting
 
@@ -39,12 +39,12 @@ Find ready work (open status, no blockers, not claimed).
 **Options:**
 - `--parent <id>`: Filter to descendants of directory/epic
 - `--priority <N>`: Filter by priority level
-- `--type <type>`: Filter by issue type
+- `--type <type>`: Filter by task type
 - `--label <list>`: Filter by labels (AND logic)
 - `--label-any <list>`: Filter by labels (OR logic)
-- `--limit <N>`: Maximum issues (default 10)
-- `--include-backlog`: Include P4 issues
-- `--include-claimed`: Include claimed issues
+- `--limit <N>`: Maximum tasks (default 10)
+- `--include-backlog`: Include P4 tasks
+- `--include-claimed`: Include claimed tasks
 - `--pretty`: Visual tree display
 - `--sort <policy>`: hybrid/priority/oldest
 
@@ -65,12 +65,12 @@ See [Appendix: Overview Command](appendix_overview.md) for ranking algorithm.
 - `--limit <N>`: Maximum documents (default 10)
 - `--type <type>`: Filter by type ('doc' for knowledge base)
 - `--path <prefix>`: Filter to path prefix
-- `--include-closed`: Include closed issues
+- `--include-closed`: Include closed tasks
 - `--reset-views`: Clear local view history
 
 ### lat claim \<id\> [options]
 
-Mark issue as locally in progress.
+Mark task as locally in progress.
 
 **Options:**
 - `--list`: Show all current claims
@@ -104,26 +104,26 @@ Split document by top-level sections.
 - `--output-dir <dir>`: Directory for split files
 - `--dry-run`: Preview without writing
 
-## Issue Commands
+## Task Commands
 
-### lat create \<path/to/issue.md\> [options]
+### lat create \<path/to/task.md\> [options]
 
-Create new issue document.
+Create new task document.
 
 **Options:**
 - `-t, --type <type>`: bug/feature/task/epic/chore (default: task)
 - `-p, --priority <N>`: 0-4, 0 highest (default: 2)
-- `-d, --description <text>`: Issue description
+- `-d, --description <text>`: Task description
 - `--body-file <path>`: Read description from file
 - `-l, --labels <list>`: Comma-separated labels
 - `--deps <spec>`: Dependency (e.g., `discovered-from:LK3DT`)
 
-The path argument specifies both the directory location and filename for the issue.
+The path argument specifies both the directory location and filename for the task.
 For directory root documents (epics), use the `00_` prefix in the filename.
 
 ### lat update \<id\> [id...] [options]
 
-Modify existing issues.
+Modify existing tasks.
 
 **Options:**
 - `--status <status>`: Change status
@@ -135,7 +135,7 @@ Modify existing issues.
 
 ### lat edit \<id\> [options]
 
-Open issue in editor. Human-only.
+Open task in editor. Human-only.
 
 **Options:**
 - `--name`: Edit name only
@@ -146,14 +146,14 @@ Open issue in editor. Human-only.
 
 ### lat close \<id\> [id...] [options]
 
-Mark issues as closed.
+Mark tasks as closed.
 
 **Options:**
 - `--reason <text>`: Closure reason
 
 ### lat reopen \<id\> [id...]
 
-Change closed issues to open.
+Change closed tasks to open.
 
 ## Query Commands
 
@@ -201,7 +201,7 @@ LYYYY  oauth-implementation
 
 ### lat stale [options]
 
-Find issues not updated recently.
+Find tasks not updated recently.
 
 **Options:**
 - `--days N`: Staleness threshold (default 30)
@@ -226,7 +226,7 @@ Find semantically similar documents.
 
 ### lat blocked [options]
 
-Show issues in blocked status with their blocking relationships.
+Show tasks in blocked status with their blocking relationships.
 
 **Options:**
 - `--path <prefix>`: Filter to path prefix
@@ -279,7 +279,7 @@ Display directory structure with documents.
 **Options:**
 - `--depth N`: Maximum depth
 - `--counts`: Show document counts
-- `--issues-only`: Only show issue directories
+- `--tasks-only`: Only show task directories
 - `--docs-only`: Only show documentation directories
 
 ### lat roots
@@ -292,7 +292,7 @@ List documents under a root's directory.
 
 **Options:**
 - `--recursive`: Include nested directories
-- `--issues`: Only issues
+- `--tasks`: Only tasks
 - `--docs`: Only knowledge base documents
 
 ### lat stats [options]
@@ -301,7 +301,7 @@ Repository-wide statistics.
 
 **Options:**
 - `links`: Detailed link statistics
-- `issues`: Issue statistics by status/priority
+- `tasks`: Task statistics by status/priority
 
 ## Setup Commands
 
@@ -383,7 +383,7 @@ Run fuzz testing.
 
 - 0: Success
 - 1: System error (internal failure)
-- 2: Validation error (document issues)
+- 2: Validation error (document tasks)
 - 3: User error (invalid arguments)
 - 4: Not found (ID doesn't exist)
 
