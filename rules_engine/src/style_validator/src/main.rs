@@ -12,6 +12,7 @@ mod inline_use_statements;
 mod mod_lib_files;
 mod pub_use;
 mod qualified_imports;
+mod tests_directory;
 mod violation;
 
 use file_scanner::{find_cargo_toml_files, find_rust_files};
@@ -149,6 +150,16 @@ fn main() -> Result<()> {
             Err(e) => {
                 eprintln!("Error checking {}: {}", file.display(), e);
             }
+        }
+    }
+
+    // Check for tests directories under src/
+    match tests_directory::check_src_directory(rules_engine_path) {
+        Ok(violations) => {
+            all_violations.extend(violations);
+        }
+        Err(e) => {
+            eprintln!("Error checking tests directories: {e}");
         }
     }
 

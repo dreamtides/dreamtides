@@ -254,7 +254,7 @@ skill: true
     assert_eq!(fm.lattice_id.as_str(), "LXYZAB");
     assert_eq!(fm.name, "fix-login");
     assert_eq!(fm.description, "Fix login after password reset");
-    assert_eq!(fm.parent_id.as_ref().map(|id| id.as_str()), Some("LABCDT"));
+    assert_eq!(fm.parent_id.as_ref().map(LatticeId::as_str), Some("LABCDT"));
     assert_eq!(fm.task_type, Some(TaskType::Bug));
     assert_eq!(fm.priority, Some(1));
     assert_eq!(fm.labels, vec!["auth", "security"]);

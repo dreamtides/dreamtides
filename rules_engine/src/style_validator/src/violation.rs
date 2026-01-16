@@ -23,6 +23,7 @@ pub enum ViolationKind {
     CodeOrder,
     MissingDocCommentImport,
     InlineTestModule,
+    TestsDirectoryInSrc,
 }
 
 impl ViolationKind {
@@ -60,6 +61,9 @@ impl ViolationKind {
             }
             ViolationKind::InlineTestModule => {
                 "inline test module not permitted (place tests in the /tests/ directory instead)"
+            }
+            ViolationKind::TestsDirectoryInSrc => {
+                "tests directory not permitted under src/ (place tests in rules_engine/tests/ instead)"
             }
         }
     }
