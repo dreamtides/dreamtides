@@ -783,7 +783,7 @@ fn run_rebuild() -> Result<()> {
             crash_count: 0,
             last_crash_unix: None,
             on_complete_sent_unix: None,
-            skip_self_review: false,
+            self_review: false,
         };
         workers.insert(name.clone(), worker);
     }

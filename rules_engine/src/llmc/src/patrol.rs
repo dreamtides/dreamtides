@@ -4,7 +4,7 @@ use std::time::{SystemTime, UNIX_EPOCH};
 
 use anyhow::Result;
 
-use crate::config::{Config, OnCompleteConfig};
+use crate::config::{Config, SelfReviewConfig};
 use crate::state::{self, State, WorkerStatus};
 use crate::tmux::sender::TmuxSender;
 use crate::tmux::session;
@@ -49,7 +49,7 @@ impl Patrol {
         self.check_session_health(state, config, &mut report)?;
         self.check_state_consistency(state, &mut report)?;
         self.detect_state_transitions(state, config, &mut report)?;
-        self.send_pending_on_complete_prompts(state, config)?;
+        self.send_pending_self_review_prompts(state, config)?;
         self.detect_reviewing_amendments(state, &mut report)?;
 
         let transitioned_workers: std::collections::HashSet<String> =
@@ -338,7 +338,7 @@ impl Patrol {
             let current_status = worker.status;
             let session_id = worker.session_id.clone();
             let worktree_path = PathBuf::from(&worker.worktree_path);
-            let skip_self_review = worker.skip_self_review;
+            let self_review_enabled = worker.self_review;
 
             let transition = match current_status {
                 WorkerStatus::Working => {
@@ -363,13 +363,13 @@ impl Patrol {
                 report.transitions_applied.push((worker_name.clone(), transition.clone()));
 
                 if matches!(transition, WorkerTransition::ToNeedsReview { .. }) {
-                    // If skip_self_review is set, mark on_complete as already sent
+                    // If self_review is NOT enabled, mark on_complete as already sent
                     // so the worker goes directly to human review without self-review
-                    if skip_self_review {
+                    if !self_review_enabled {
                         let now = SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs();
                         w.on_complete_sent_unix = Some(now);
                         tracing::info!(
-                            "Worker '{}' has skip_self_review set, skipping on_complete prompt",
+                            "Worker '{}' does not have self_review enabled, skipping self-review",
                             worker_name
                         );
                     }
@@ -381,7 +381,7 @@ impl Patrol {
         Ok(())
     }
 
-    fn send_pending_on_complete_prompts(&self, state: &mut State, config: &Config) -> Result<()> {
+    fn send_pending_self_review_prompts(&self, state: &mut State, config: &Config) -> Result<()> {
         let now = SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs();
         let delay_secs: u64 = 10;
 
@@ -394,18 +394,29 @@ impl Patrol {
                 continue;
             }
 
+            // Skip if self-review is not enabled for this worker
+            if !worker.self_review {
+                continue;
+            }
+
+            // Skip if self-review prompt already sent
             if worker.on_complete_sent_unix.is_some() {
                 continue;
             }
 
-            let Some(on_complete) = get_on_complete_config(config, &worker_name) else {
+            // Get self-review config from defaults
+            let Some(self_review_config) = get_self_review_config(config) else {
+                tracing::warn!(
+                    "Worker '{}' has self_review enabled but no self_review config in defaults",
+                    worker_name
+                );
                 continue;
             };
 
             let elapsed = now.saturating_sub(worker.last_activity_unix);
             if elapsed < delay_secs {
                 tracing::debug!(
-                    "Worker '{}' needs on_complete but only {}s elapsed (need {}s)",
+                    "Worker '{}' needs self-review but only {}s elapsed (need {}s)",
                     worker_name,
                     elapsed,
                     delay_secs
@@ -414,7 +425,7 @@ impl Patrol {
             }
 
             tracing::info!(
-                "Worker '{}' eligible for on_complete ({}s after completion)",
+                "Worker '{}' eligible for self-review ({}s after completion)",
                 worker_name,
                 elapsed
             );
@@ -429,7 +440,7 @@ impl Patrol {
             let state_path = state::get_state_path();
             if let Err(e) = state.save(&state_path) {
                 tracing::error!(
-                    "Failed to save state before sending on_complete to '{}': {}",
+                    "Failed to save state before sending self-review to '{}': {}",
                     worker_name,
                     e
                 );
@@ -442,9 +453,11 @@ impl Patrol {
                 worker_name
             );
 
-            if let Err(e) = send_on_complete_prompt(&session_id, on_complete, &original_prompt) {
+            if let Err(e) =
+                send_self_review_prompt(&session_id, self_review_config, &original_prompt)
+            {
                 tracing::error!(
-                    "Failed to send on_complete prompt to worker '{}': {}",
+                    "Failed to send self-review prompt to worker '{}': {}",
                     worker_name,
                     e
                 );
@@ -764,37 +777,31 @@ fn count_conflict_markers(file: &str) -> usize {
     std::fs::read_to_string(file).map(|content| content.matches("<<<<<<<").count()).unwrap_or(0)
 }
 
-fn get_on_complete_config<'a>(
-    config: &'a Config,
-    worker_name: &str,
-) -> Option<&'a OnCompleteConfig> {
-    config
-        .get_worker(worker_name)
-        .and_then(|w| w.on_complete.as_ref())
-        .or(config.defaults.on_complete.as_ref())
+fn get_self_review_config(config: &Config) -> Option<&SelfReviewConfig> {
+    config.defaults.self_review.as_ref()
 }
 
-fn send_on_complete_prompt(
+fn send_self_review_prompt(
     session_id: &str,
-    on_complete: &OnCompleteConfig,
+    self_review_config: &SelfReviewConfig,
     original_prompt: &str,
 ) -> Result<()> {
     let sender = TmuxSender::new();
 
-    if on_complete.clear {
-        tracing::info!("Sending /clear before on_complete prompt to session '{}'", session_id);
+    if self_review_config.clear {
+        tracing::info!("Sending /clear before self-review prompt to session '{}'", session_id);
         sender.send(session_id, "/clear")?;
         std::thread::sleep(std::time::Duration::from_secs(2));
     }
 
-    let mut prompt = on_complete.prompt.clone();
+    let mut prompt = self_review_config.prompt.clone();
 
-    if on_complete.include_original && !original_prompt.is_empty() {
+    if self_review_config.include_original && !original_prompt.is_empty() {
         prompt.push_str("\n\n--- Original Prompt ---\n\n");
         prompt.push_str(original_prompt);
     }
 
-    tracing::info!("Sending on_complete prompt to session '{}'", session_id);
+    tracing::info!("Sending self-review prompt to session '{}'", session_id);
     sender.send(session_id, &prompt)?;
 
     Ok(())

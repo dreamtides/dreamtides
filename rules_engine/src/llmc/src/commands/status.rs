@@ -49,11 +49,11 @@ pub fn run_status(json: bool) -> Result<()> {
 }
 
 /// Returns the effective status for display purposes.
-/// Workers in `NeedsReview` that haven't received their on_complete prompt yet
+/// Workers in `NeedsReview` that haven't received their self-review prompt yet
 /// are shown as `Reviewing` since they're still in the self-review phase.
 fn get_effective_status(worker: &WorkerRecord, config: &Config) -> WorkerStatus {
     if worker.status == WorkerStatus::NeedsReview && !state::is_truly_needs_review(worker, config) {
-        // Worker is in NeedsReview but hasn't had on_complete prompt sent yet
+        // Worker is in NeedsReview but hasn't had self-review prompt sent yet
         // Show as Reviewing since they're in the pre-self-review phase
         WorkerStatus::Reviewing
     } else {

@@ -132,6 +132,7 @@ You are Baker, focused on UI and user experience.
 | `sound_on_review` | bool | `true` | Play terminal bell when work needs review |
 | `role_prompt` | string | `""` | Additional context for the worker |
 | `excluded_from_pool` | bool | `false` | Exclude from automatic task assignment |
+| `self_review` | bool | `false` | Enable self-review phase for this worker |
 
 ### Editor Integration
 
@@ -174,7 +175,7 @@ TMUX session identifier.
 | `last_activity_unix` | u64 | Unix timestamp of last state change |
 | `commit_sha` | Option<string> | SHA of commit awaiting review |
 | `session_id` | string | TMUX session identifier |
-| `skip_self_review` | bool | If true, skip self-review phase (on_complete prompt) but still require human review |
+| `self_review` | bool | If true, enable self-review phase for this task |
 
 ## TMUX Integration
 
@@ -307,7 +308,7 @@ llmc start --prompt-file task.md
 llmc start --prompt-cmd "bd show dr-abc"
 llmc start --worker adam --prompt "..."
 llmc start --worker adam  # Opens $EDITOR for prompt
-llmc start --skip-self-review --prompt "Quick task"  # Skip self-review phase
+llmc start --self-review --prompt "Task needing review"  # Enable self-review phase
 ```
 
 If no prompt source is provided (`--prompt`, `--prompt-file`, or `--prompt-cmd`),
@@ -319,11 +320,10 @@ Selects worker (specified or first idle from pool), verifies idle state, pulls
 latest master into worktree, copies `Tabula.xlsm`, builds full prompt with
 preamble, sends `/clear` and prompt, updates state to `working`.
 
-The `--skip-self-review` flag causes the worker to skip the self-review phase
-(on_complete prompt) when it completes its work. The worker will still transition
-to `needs_review` state for human review, but without first performing a self-review.
-This is useful for tasks where you want faster human review without waiting for
-the automatic self-review process.
+The `--self-review` flag enables the self-review phase when the worker completes
+its work. When enabled, the worker will receive the self-review prompt from
+`[defaults.self_review]` before transitioning to `needs_review` for human review.
+By default, self-review is disabled and workers go directly to human review.
 
 The `--prompt-cmd` option executes the specified shell command and uses its
 stdout as the prompt. This is useful for generating prompts from issue trackers

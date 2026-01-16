@@ -59,10 +59,10 @@ pub struct WorkerRecord {
     /// Unix timestamp when the on_complete prompt was sent (None if not sent)
     #[serde(default)]
     pub on_complete_sent_unix: Option<u64>,
-    /// If true, skip the self-review phase (on_complete prompt) but still
-    /// require human review
+    /// If true, enable the self-review phase for this task. Self-review sends
+    /// the self_review prompt to the worker before human review.
     #[serde(default)]
-    pub skip_self_review: bool,
+    pub self_review: bool,
 }
 
 /// State file tracking all workers and their status
@@ -79,8 +79,9 @@ pub struct State {
 /// Returns true if a worker is truly ready for human review.
 ///
 /// A worker in `NeedsReview` state is NOT ready for human review if:
-/// - It has an on_complete config (worker-level or defaults), AND
-/// - The on_complete prompt has not yet been sent (`on_complete_sent_unix` is
+/// - Self-review is enabled for the worker (`self_review == true`)
+/// - A self_review prompt is configured (in defaults)
+/// - The self_review prompt has not yet been sent (`on_complete_sent_unix` is
 ///   None)
 ///
 /// In this case, the worker is in a transitional state waiting for the
@@ -90,20 +91,20 @@ pub fn is_truly_needs_review(worker: &WorkerRecord, config: &Config) -> bool {
         return false;
     }
 
-    // Check if there's an on_complete config for this worker
-    let has_on_complete = config
-        .get_worker(&worker.name)
-        .and_then(|w| w.on_complete.as_ref())
-        .or(config.defaults.on_complete.as_ref())
-        .is_some();
-
-    // If there's no on_complete config, the worker is truly ready for review
-    if !has_on_complete {
+    // If self-review is not enabled for this worker, ready for human review
+    if !worker.self_review {
         return true;
     }
 
-    // If on_complete prompt has been sent, the worker has completed self-review
-    // and is now truly ready for human review
+    // Self-review is enabled. Check if there's a self_review prompt configured.
+    let has_prompt = config.defaults.self_review.is_some();
+
+    // If no prompt configured, can't do self-review, so ready for human review
+    if !has_prompt {
+        return true;
+    }
+
+    // Self-review is enabled and prompt exists. Ready only if prompt was sent.
     worker.on_complete_sent_unix.is_some()
 }
 
@@ -272,7 +273,7 @@ mod tests {
             crash_count: 0,
             last_crash_unix: None,
             on_complete_sent_unix: None,
-            skip_self_review: false,
+            self_review: false,
         }
     }
     #[test]

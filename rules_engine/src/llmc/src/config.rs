@@ -31,7 +31,7 @@ pub struct DefaultsConfig {
     pub patrol_interval_secs: u32,
     #[serde(default = "default_sound_on_review")]
     pub sound_on_review: bool,
-    pub on_complete: Option<OnCompleteConfig>,
+    pub self_review: Option<SelfReviewConfig>,
 }
 
 /// Repository configuration
@@ -47,15 +47,15 @@ pub struct WorkerConfig {
     pub role_prompt: Option<String>,
     #[serde(default = "default_excluded_from_pool")]
     pub excluded_from_pool: bool,
-    pub on_complete: Option<OnCompleteConfig>,
+    /// If true, enable self-review for this worker using the
+    /// defaults.self_review prompt
     #[serde(default)]
-    pub skip_self_review: Option<bool>,
+    pub self_review: Option<bool>,
 }
 
-/// Configuration for the "on complete" prompt sent when a worker finishes a
-/// task
+/// Configuration for the self-review prompt sent when a worker finishes a task
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct OnCompleteConfig {
+pub struct SelfReviewConfig {
     pub prompt: String,
     #[serde(default)]
     pub include_original: bool,
@@ -128,7 +128,7 @@ impl Default for DefaultsConfig {
             allowed_tools: default_allowed_tools(),
             patrol_interval_secs: default_patrol_interval_secs(),
             sound_on_review: default_sound_on_review(),
-            on_complete: None,
+            self_review: None,
         }
     }
 }
@@ -191,7 +191,7 @@ mod tests {
         assert_eq!(defaults.model, "sonnet");
         assert!(defaults.skip_permissions);
         assert_eq!(defaults.allowed_tools.len(), 6);
-        assert_eq!(defaults.patrol_interval_secs, 60);
+        assert_eq!(defaults.patrol_interval_secs, 30);
         assert!(defaults.sound_on_review);
     }
 
@@ -228,7 +228,7 @@ mod tests {
             model = "opus"
             role_prompt = "You are Adam"
             excluded_from_pool = true
-            skip_self_review = true
+            self_review = true
 
             [workers.baker]
             role_prompt = "You are Baker"
@@ -250,13 +250,13 @@ mod tests {
         assert_eq!(adam.model.as_deref(), Some("opus"));
         assert_eq!(adam.role_prompt.as_deref(), Some("You are Adam"));
         assert!(adam.excluded_from_pool);
-        assert_eq!(adam.skip_self_review, Some(true));
+        assert_eq!(adam.self_review, Some(true));
 
         let baker = config.get_worker("baker").unwrap();
         assert_eq!(baker.model, None);
         assert_eq!(baker.role_prompt.as_deref(), Some("You are Baker"));
         assert!(!baker.excluded_from_pool);
-        assert_eq!(baker.skip_self_review, None);
+        assert_eq!(baker.self_review, None);
     }
 
     #[test]

@@ -102,10 +102,10 @@ pub enum Commands {
         #[arg(long)]
         prompt_cmd: Option<String>,
 
-        /// Skip self-review phase; worker goes directly to needs_review without
-        /// on_complete prompt
+        /// Enable self-review phase; worker performs self-review before human
+        /// review
         #[arg(long)]
-        skip_self_review: bool,
+        self_review: bool,
     },
 
     /// Send a message to a worker

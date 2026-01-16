@@ -46,9 +46,9 @@ pub fn run_review(worker: Option<String>, interface: ReviewInterface) -> Result<
     // Check if worker is truly ready for human review
     if !state::is_truly_needs_review(worker_record, &config) {
         if worker_record.status == WorkerStatus::NeedsReview {
-            // Worker is in NeedsReview but waiting for on_complete prompt
+            // Worker is in NeedsReview but waiting for self-review prompt
             eprintln!(
-                "Worker '{}' is awaiting self-review (on_complete prompt not yet sent)",
+                "Worker '{}' is awaiting self-review (self-review prompt not yet sent)",
                 worker_name
             );
             eprintln!("The worker will be ready for human review after completing self-review.");

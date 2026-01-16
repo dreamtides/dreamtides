@@ -18,7 +18,7 @@ pub fn run_start(
     prompt: Option<String>,
     prompt_file: Option<PathBuf>,
     prompt_cmd: Option<String>,
-    skip_self_review: bool,
+    self_review: bool,
 ) -> Result<()> {
     validate_prompt_args(&prompt, &prompt_file, &prompt_cmd)?;
     validate_worker_args(&worker, &prefix)?;
@@ -82,19 +82,19 @@ pub fn run_start(
     let worker_mut =
         state.get_worker_mut(&worker_name).expect("Worker disappeared after validation");
     // Use CLI flag if set, otherwise check worker config
-    worker_mut.skip_self_review = skip_self_review
-        || config.get_worker(&worker_name).and_then(|c| c.skip_self_review).unwrap_or(false);
+    worker_mut.self_review =
+        self_review || config.get_worker(&worker_name).and_then(|c| c.self_review).unwrap_or(false);
     worker::apply_transition(worker_mut, worker::WorkerTransition::ToWorking {
         prompt: full_prompt,
     })?;
 
-    let skip_review_enabled =
-        state.get_worker(&worker_name).map(|w| w.skip_self_review).unwrap_or(false);
+    let self_review_enabled =
+        state.get_worker(&worker_name).map(|w| w.self_review).unwrap_or(false);
 
     state.save(&super::super::state::get_state_path())?;
 
-    if skip_review_enabled {
-        println!("✓ Worker '{}' started on task (self-review phase will be skipped)", worker_name);
+    if self_review_enabled {
+        println!("✓ Worker '{}' started on task (self-review enabled)", worker_name);
     } else {
         println!("✓ Worker '{}' started on task", worker_name);
     }
