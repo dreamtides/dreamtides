@@ -94,7 +94,7 @@ pub fn apply_transition(worker: &mut WorkerRecord, transition: WorkerTransition)
         WorkerTransition::ToIdle => {
             worker.current_prompt.clear();
             worker.commit_sha = None;
-            worker.skip_review = false;
+            worker.skip_self_review = false;
         }
         WorkerTransition::ToWorking { .. } => {
             worker.on_complete_sent_unix = None;
@@ -299,7 +299,7 @@ mod tests {
             crash_count: 0,
             last_crash_unix: None,
             on_complete_sent_unix: None,
-            skip_review: false,
+            skip_self_review: false,
         };
         apply_transition(&mut worker, WorkerTransition::ToIdle).unwrap();
         assert_eq!(worker.status, WorkerStatus::Idle);
@@ -321,7 +321,7 @@ mod tests {
             crash_count: 0,
             last_crash_unix: None,
             on_complete_sent_unix: None,
-            skip_review: false,
+            skip_self_review: false,
         };
         apply_transition(&mut worker, WorkerTransition::ToWorking {
             prompt: "Test prompt".to_string(),
@@ -345,7 +345,7 @@ mod tests {
             crash_count: 0,
             last_crash_unix: None,
             on_complete_sent_unix: None,
-            skip_review: false,
+            skip_self_review: false,
         };
         apply_transition(&mut worker, WorkerTransition::ToNeedsReview {
             commit_sha: "abc123".to_string(),
@@ -369,7 +369,7 @@ mod tests {
             crash_count: 0,
             last_crash_unix: None,
             on_complete_sent_unix: None,
-            skip_review: false,
+            skip_self_review: false,
         };
         apply_transition(&mut worker, WorkerTransition::ToNeedsReview {
             commit_sha: "abc123".to_string(),
@@ -393,7 +393,7 @@ mod tests {
             crash_count: 0,
             last_crash_unix: None,
             on_complete_sent_unix: None,
-            skip_review: false,
+            skip_self_review: false,
         };
         let old_status = worker.status;
         apply_transition(&mut worker, WorkerTransition::None).unwrap();
@@ -430,7 +430,7 @@ mod tests {
             crash_count: 0,
             last_crash_unix: None,
             on_complete_sent_unix: None,
-            skip_review: false,
+            skip_self_review: false,
         };
         apply_transition(&mut worker, WorkerTransition::ToReviewing).unwrap();
         assert_eq!(worker.status, WorkerStatus::Reviewing);

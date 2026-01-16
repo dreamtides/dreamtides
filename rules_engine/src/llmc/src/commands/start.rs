@@ -14,12 +14,14 @@ use crate::lock::StateLock;
 /// Runs the start command, assigning a task to an idle worker
 pub fn run_start(
     worker: Option<String>,
+    prefix: Option<String>,
     prompt: Option<String>,
     prompt_file: Option<PathBuf>,
     prompt_cmd: Option<String>,
-    skip_review: bool,
+    skip_self_review: bool,
 ) -> Result<()> {
     validate_prompt_args(&prompt, &prompt_file, &prompt_cmd)?;
+    validate_worker_args(&worker, &prefix)?;
 
     let llmc_root = config::get_llmc_root();
     if !llmc_root.exists() {
@@ -41,7 +43,7 @@ pub fn run_start(
 
     let (mut state, config) = super::super::state::load_state_with_patrol()?;
 
-    let worker_name = select_worker(&worker, &config, &state)?;
+    let worker_name = select_worker(&worker, &prefix, &config, &state)?;
 
     let worker_record =
         state.get_worker(&worker_name).context("Worker not found after selection")?;
@@ -77,16 +79,17 @@ pub fn run_start(
         .send(&worker_record.session_id, &full_prompt)
         .with_context(|| format!("Failed to send prompt to worker '{}'", worker_name))?;
 
-    let worker_mut = state.get_worker_mut(&worker_name).unwrap();
-    worker_mut.skip_review = skip_review;
+    let worker_mut =
+        state.get_worker_mut(&worker_name).expect("Worker disappeared after validation");
+    worker_mut.skip_self_review = skip_self_review;
     worker::apply_transition(worker_mut, worker::WorkerTransition::ToWorking {
         prompt: full_prompt,
     })?;
 
     state.save(&super::super::state::get_state_path())?;
 
-    if skip_review {
-        println!("✓ Worker '{}' started on task (review phase will be skipped)", worker_name);
+    if skip_self_review {
+        println!("✓ Worker '{}' started on task (self-review phase will be skipped)", worker_name);
     } else {
         println!("✓ Worker '{}' started on task", worker_name);
     }
@@ -114,7 +117,20 @@ fn validate_prompt_args(
     Ok(())
 }
 
-fn select_worker(worker: &Option<String>, config: &Config, state: &State) -> Result<String> {
+fn validate_worker_args(worker: &Option<String>, prefix: &Option<String>) -> Result<()> {
+    if worker.is_some() && prefix.is_some() {
+        bail!("Cannot provide both --worker and --prefix");
+    }
+    Ok(())
+}
+
+fn select_worker(
+    worker: &Option<String>,
+    prefix: &Option<String>,
+    config: &Config,
+    state: &State,
+) -> Result<String> {
+    // If a specific worker name is provided, use that worker
     if let Some(name) = worker {
         if state.get_worker(name).is_none() {
             bail!(
@@ -129,12 +145,41 @@ fn select_worker(worker: &Option<String>, config: &Config, state: &State) -> Res
 
     let idle_workers = state.get_idle_workers();
 
-    let available: Vec<_> = idle_workers
+    // Filter to only non-excluded workers
+    let mut available: Vec<_> = idle_workers
         .iter()
         .filter(|w| config.get_worker(&w.name).map(|c| !c.excluded_from_pool).unwrap_or(false))
         .collect();
 
-    if available.is_empty() {
+    // If a prefix is provided, further filter to workers matching that prefix
+    if let Some(prefix) = prefix {
+        available.retain(|w| w.name.starts_with(prefix));
+
+        if available.is_empty() {
+            let all_matching: Vec<_> = state
+                .workers
+                .values()
+                .filter(|w| w.name.starts_with(prefix))
+                .map(|w| format!("{} ({:?})", w.name, w.status))
+                .collect();
+
+            if all_matching.is_empty() {
+                bail!(
+                    "No workers found with prefix '{}'\n\
+                     Available workers: {}",
+                    prefix,
+                    format_all_workers(state)
+                );
+            } else {
+                bail!(
+                    "No idle workers available with prefix '{}'\n\n\
+                     Workers matching prefix:\n  {}",
+                    prefix,
+                    all_matching.join("\n  ")
+                );
+            }
+        }
+    } else if available.is_empty() {
         bail!(
             "No idle workers available\n\n\
              Current worker states:\n{}",

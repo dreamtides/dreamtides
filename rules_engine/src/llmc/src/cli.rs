@@ -90,6 +90,11 @@ pub enum Commands {
         #[arg(long)]
         worker: Option<String>,
 
+        /// Worker name prefix (selects first idle worker whose name starts with
+        /// prefix)
+        #[arg(long)]
+        prefix: Option<String>,
+
         /// Prompt text to assign
         #[arg(long)]
         prompt: Option<String>,
@@ -102,9 +107,10 @@ pub enum Commands {
         #[arg(long)]
         prompt_cmd: Option<String>,
 
-        /// Skip review phase; worker returns to idle when work is complete
+        /// Skip self-review phase; worker goes directly to needs_review without
+        /// on_complete prompt
         #[arg(long)]
-        skip_review: bool,
+        skip_self_review: bool,
     },
 
     /// Send a message to a worker

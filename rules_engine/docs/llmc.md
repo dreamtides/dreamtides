@@ -174,7 +174,7 @@ TMUX session identifier.
 | `last_activity_unix` | u64 | Unix timestamp of last state change |
 | `commit_sha` | Option<string> | SHA of commit awaiting review |
 | `session_id` | string | TMUX session identifier |
-| `skip_review` | bool | If true, skip review phase and return to idle on completion |
+| `skip_self_review` | bool | If true, skip self-review phase (on_complete prompt) but still require human review |
 
 ## TMUX Integration
 
@@ -307,7 +307,7 @@ llmc start --prompt-file task.md
 llmc start --prompt-cmd "bd show dr-abc"
 llmc start --worker adam --prompt "..."
 llmc start --worker adam  # Opens $EDITOR for prompt
-llmc start --skip-review --prompt "Quick task"  # Skip review phase
+llmc start --skip-self-review --prompt "Quick task"  # Skip self-review phase
 ```
 
 If no prompt source is provided (`--prompt`, `--prompt-file`, or `--prompt-cmd`),
@@ -319,11 +319,11 @@ Selects worker (specified or first idle from pool), verifies idle state, pulls
 latest master into worktree, copies `Tabula.xlsm`, builds full prompt with
 preamble, sends `/clear` and prompt, updates state to `working`.
 
-The `--skip-review` flag causes the worker to transition directly back to `idle`
-state when it completes its work (creates a commit), bypassing the `needs_review`
-state entirely. This is useful for quick tasks that don't require human review.
-The commit remains on the worker's branch and will be included in subsequent tasks
-via rebase; use `llmc nuke --reset <worker>` to discard uncommitted changes if needed.
+The `--skip-self-review` flag causes the worker to skip the self-review phase
+(on_complete prompt) when it completes its work. The worker will still transition
+to `needs_review` state for human review, but without first performing a self-review.
+This is useful for tasks where you want faster human review without waiting for
+the automatic self-review process.
 
 The `--prompt-cmd` option executes the specified shell command and uses its
 stdout as the prompt. This is useful for generating prompts from issue trackers

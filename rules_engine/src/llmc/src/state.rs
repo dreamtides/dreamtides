@@ -59,10 +59,10 @@ pub struct WorkerRecord {
     /// Unix timestamp when the on_complete prompt was sent (None if not sent)
     #[serde(default)]
     pub on_complete_sent_unix: Option<u64>,
-    /// If true, skip the review phase and transition directly to idle when work
-    /// is complete
+    /// If true, skip the self-review phase (on_complete prompt) but still
+    /// require human review
     #[serde(default)]
-    pub skip_review: bool,
+    pub skip_self_review: bool,
 }
 
 /// State file tracking all workers and their status
@@ -272,7 +272,7 @@ mod tests {
             crash_count: 0,
             last_crash_unix: None,
             on_complete_sent_unix: None,
-            skip_review: false,
+            skip_self_review: false,
         }
     }
     #[test]

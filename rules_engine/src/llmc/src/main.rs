@@ -62,8 +62,8 @@ async fn main() -> Result<()> {
         Commands::Add { name, model, role_prompt } => add::run_add(&name, model, role_prompt),
         Commands::Nuke { name, all, reset } => nuke::run_nuke(name.as_deref(), all, reset),
         Commands::Status { json } => status::run_status(json),
-        Commands::Start { worker, prompt, prompt_file, prompt_cmd, skip_review } => {
-            start::run_start(worker, prompt, prompt_file, prompt_cmd, skip_review)
+        Commands::Start { worker, prefix, prompt, prompt_file, prompt_cmd, skip_self_review } => {
+            start::run_start(worker, prefix, prompt, prompt_file, prompt_cmd, skip_self_review)
         }
         Commands::Message { worker, message } => message::run_message(&worker, message),
         Commands::Attach { worker } => attach::run_attach(&worker),
