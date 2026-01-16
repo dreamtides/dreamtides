@@ -18,7 +18,15 @@ pub fn run_status(json: bool) -> Result<()> {
         );
     }
 
-    let (state, config) = super::super::state::load_state_with_patrol()?;
+    let (state, config) = match state::load_state_with_patrol() {
+        Ok(result) => result,
+        Err(e) => {
+            eprintln!("\x1b[33mWarning: Patrol failed, showing raw state: {}\x1b[0m", e);
+            let state = State::load(&state::get_state_path())?;
+            let config = Config::load(&config::get_config_path())?;
+            (state, config)
+        }
+    };
 
     if state.workers.is_empty() {
         if json {

@@ -33,7 +33,6 @@ pub enum WorkerTransition {
     ToOffline,
 }
 
-/// Validates whether a state transition is allowed
 pub fn can_transition(from: &WorkerStatus, to: &WorkerStatus) -> bool {
     matches!(
         (from, to),
@@ -48,7 +47,10 @@ pub fn can_transition(from: &WorkerStatus, to: &WorkerStatus) -> bool {
             )
             | (WorkerStatus::NeedsReview, WorkerStatus::Reviewing)
             | (
-                WorkerStatus::NeedsReview | WorkerStatus::Reviewing | WorkerStatus::Rejected,
+                WorkerStatus::Working
+                    | WorkerStatus::NeedsReview
+                    | WorkerStatus::Reviewing
+                    | WorkerStatus::Rejected,
                 WorkerStatus::Idle
             )
             | (
@@ -276,6 +278,11 @@ mod tests {
     #[test]
     fn test_cannot_transition_idle_to_rejected() {
         assert!(!can_transition(&WorkerStatus::Idle, &WorkerStatus::Rejected));
+    }
+
+    #[test]
+    fn test_can_transition_working_to_idle() {
+        assert!(can_transition(&WorkerStatus::Working, &WorkerStatus::Idle));
     }
     #[test]
     fn test_apply_transition_to_idle_clears_state() {
