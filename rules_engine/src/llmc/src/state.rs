@@ -44,6 +44,9 @@ pub struct WorkerRecord {
     pub status: WorkerStatus,
     /// Full prompt text for current task
     pub current_prompt: String,
+    /// Command used to generate the prompt (e.g., "bd show dr-abc"), if any
+    #[serde(default)]
+    pub prompt_cmd: Option<String>,
     /// Unix timestamp of worker creation
     pub created_at_unix: u64,
     /// Unix timestamp of last state change
@@ -266,6 +269,7 @@ mod tests {
             branch: format!("llmc/{}", name),
             status: WorkerStatus::Idle,
             current_prompt: String::new(),
+            prompt_cmd: None,
             created_at_unix: 1000000000,
             last_activity_unix: 1000000000,
             commit_sha: None,

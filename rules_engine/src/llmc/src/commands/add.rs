@@ -78,6 +78,7 @@ pub fn run_add(
         branch: branch_name,
         status: WorkerStatus::Offline,
         current_prompt: String::new(),
+        prompt_cmd: None,
         created_at_unix: now,
         last_activity_unix: now,
         commit_sha: None,

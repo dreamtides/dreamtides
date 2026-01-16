@@ -18,7 +18,7 @@ pub enum WorkerTransition {
     /// Transition to idle state
     ToIdle,
     /// Transition to working state with the given prompt
-    ToWorking { prompt: String },
+    ToWorking { prompt: String, prompt_cmd: Option<String> },
     /// Transition to needs review state with the commit SHA
     ToNeedsReview { commit_sha: String },
     /// Transition to reviewing state (on_complete prompt sent)
@@ -68,8 +68,9 @@ pub fn apply_transition(worker: &mut WorkerRecord, transition: WorkerTransition)
     let new_status = match &transition {
         WorkerTransition::None => return Ok(()),
         WorkerTransition::ToIdle => WorkerStatus::Idle,
-        WorkerTransition::ToWorking { prompt } => {
+        WorkerTransition::ToWorking { prompt, prompt_cmd } => {
             worker.current_prompt = prompt.clone();
+            worker.prompt_cmd = prompt_cmd.clone();
             WorkerStatus::Working
         }
         WorkerTransition::ToNeedsReview { commit_sha } => {
@@ -93,6 +94,7 @@ pub fn apply_transition(worker: &mut WorkerRecord, transition: WorkerTransition)
     match &transition {
         WorkerTransition::ToIdle => {
             worker.current_prompt.clear();
+            worker.prompt_cmd = None;
             worker.commit_sha = None;
             worker.self_review = false;
         }
@@ -292,6 +294,7 @@ mod tests {
             branch: "llmc/test".to_string(),
             status: WorkerStatus::NeedsReview,
             current_prompt: "Some prompt".to_string(),
+            prompt_cmd: None,
             created_at_unix: 1000000000,
             last_activity_unix: 1000000000,
             commit_sha: Some("abc123".to_string()),
@@ -314,6 +317,7 @@ mod tests {
             branch: "llmc/test".to_string(),
             status: WorkerStatus::Idle,
             current_prompt: String::new(),
+            prompt_cmd: None,
             created_at_unix: 1000000000,
             last_activity_unix: 1000000000,
             commit_sha: None,
@@ -325,6 +329,7 @@ mod tests {
         };
         apply_transition(&mut worker, WorkerTransition::ToWorking {
             prompt: "Test prompt".to_string(),
+            prompt_cmd: None,
         })
         .unwrap();
         assert_eq!(worker.status, WorkerStatus::Working);
@@ -338,6 +343,7 @@ mod tests {
             branch: "llmc/test".to_string(),
             status: WorkerStatus::Working,
             current_prompt: "Test prompt".to_string(),
+            prompt_cmd: None,
             created_at_unix: 1000000000,
             last_activity_unix: 1000000000,
             commit_sha: None,
@@ -362,6 +368,7 @@ mod tests {
             branch: "llmc/test".to_string(),
             status: WorkerStatus::Idle,
             current_prompt: String::new(),
+            prompt_cmd: None,
             created_at_unix: 1000000000,
             last_activity_unix: 1000000000,
             commit_sha: None,
@@ -386,6 +393,7 @@ mod tests {
             branch: "llmc/test".to_string(),
             status: WorkerStatus::Working,
             current_prompt: "Test".to_string(),
+            prompt_cmd: None,
             created_at_unix: 1000000000,
             last_activity_unix: 1000000000,
             commit_sha: None,
@@ -423,6 +431,7 @@ mod tests {
             branch: "llmc/test".to_string(),
             status: WorkerStatus::NeedsReview,
             current_prompt: "Test prompt".to_string(),
+            prompt_cmd: None,
             created_at_unix: 1000000000,
             last_activity_unix: 1000000000,
             commit_sha: Some("abc123".to_string()),

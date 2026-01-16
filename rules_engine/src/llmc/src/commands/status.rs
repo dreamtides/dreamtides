@@ -73,6 +73,7 @@ struct WorkerStatusOutput {
     branch: String,
     time_in_state_secs: u64,
     commit_sha: Option<String>,
+    prompt_cmd: Option<String>,
     prompt_excerpt: Option<String>,
 }
 
@@ -88,6 +89,7 @@ fn output_json(state: &State, config: &Config, now: u64) -> Result<()> {
                 branch: w.branch.clone(),
                 time_in_state_secs: now.saturating_sub(w.last_activity_unix),
                 commit_sha: w.commit_sha.clone(),
+                prompt_cmd: w.prompt_cmd.clone(),
                 prompt_excerpt: if w.current_prompt.is_empty() {
                     None
                 } else {
@@ -124,6 +126,10 @@ fn output_text(state: &State, config: &Config, now: u64) {
 
         if let Some(sha) = &worker.commit_sha {
             parts.push(format!("[{}]", &sha[..7.min(sha.len())]));
+        }
+
+        if let Some(cmd) = &worker.prompt_cmd {
+            parts.push(format!("({})", cmd));
         }
 
         if !worker.current_prompt.is_empty() && effective_status != WorkerStatus::Idle {

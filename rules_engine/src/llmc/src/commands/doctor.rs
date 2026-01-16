@@ -776,6 +776,7 @@ fn run_rebuild() -> Result<()> {
             branch,
             status,
             current_prompt: String::new(),
+            prompt_cmd: None,
             created_at_unix: now,
             last_activity_unix: now,
             commit_sha: None,

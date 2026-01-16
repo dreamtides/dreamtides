@@ -86,6 +86,7 @@ pub fn run_start(
         self_review || config.get_worker(&worker_name).and_then(|c| c.self_review).unwrap_or(false);
     worker::apply_transition(worker_mut, worker::WorkerTransition::ToWorking {
         prompt: full_prompt,
+        prompt_cmd: prompt_cmd.clone(),
     })?;
 
     let self_review_enabled =

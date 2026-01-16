@@ -174,6 +174,7 @@ TMUX session identifier.
 | `branch` | string | Git branch name (`llmc/<name>`) |
 | `status` | Status | Current worker state |
 | `current_prompt` | string | Full prompt text for current task |
+| `prompt_cmd` | Option<string> | Command used to generate the prompt (e.g., "bd show dr-abc") |
 | `created_at_unix` | u64 | Unix timestamp of worker creation |
 | `last_activity_unix` | u64 | Unix timestamp of last state change |
 | `commit_sha` | Option<string> | SHA of commit awaiting review |
@@ -301,7 +302,7 @@ Kills TMUX session, removes worktree, deletes branch, removes from state.
 
 ### `llmc status`
 
-Displays status of all workers.
+Displays status of all workers. For each worker, shows name, status, branch, time in current state, commit SHA (if awaiting review), prompt command (if started with `--prompt-cmd`), and prompt excerpt.
 
 ```bash
 llmc status [--json]
