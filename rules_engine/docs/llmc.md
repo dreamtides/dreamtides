@@ -273,11 +273,17 @@ llmc down [--force]
 Adds a new worker to the system.
 
 ```bash
-llmc add <name> [--model <model>] [--role-prompt <prompt>]
+llmc add <name> [--model <model>] [--role-prompt <prompt>] [--excluded-from-pool] [--self-review]
 ```
 
 Creates git worktree on branch `llmc/<name>`, copies `Tabula.xlsm`, adds worker
-to state, and signals `llmc up` to create the session.
+to state and config.toml, and signals `llmc up` to create the session.
+
+Flags:
+- `--model`: Override the default model for this worker
+- `--role-prompt`: Set a role-specific prompt/context for this worker
+- `--excluded-from-pool`: Exclude this worker from automatic task assignment
+- `--self-review`: Enable self-review phase by default for this worker's tasks
 
 ### `llmc nuke <name>`
 

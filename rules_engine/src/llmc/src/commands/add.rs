@@ -10,7 +10,13 @@ use super::super::tmux::session;
 use super::super::{config, git, state};
 
 /// Adds a new worker to the LLMC system
-pub fn run_add(name: &str, model: Option<String>, role_prompt: Option<String>) -> Result<()> {
+pub fn run_add(
+    name: &str,
+    model: Option<String>,
+    role_prompt: Option<String>,
+    excluded_from_pool: bool,
+    self_review: bool,
+) -> Result<()> {
     validate_worker_name(name)?;
 
     if let Some(ref m) = model {
@@ -78,13 +84,13 @@ pub fn run_add(name: &str, model: Option<String>, role_prompt: Option<String>) -
         crash_count: 0,
         last_crash_unix: None,
         on_complete_sent_unix: None,
-        self_review: false,
+        self_review,
     };
 
     state.add_worker(worker_record);
     state.save(&state_path)?;
 
-    add_worker_to_config(name, model, role_prompt)?;
+    add_worker_to_config(name, model, role_prompt, excluded_from_pool, self_review)?;
 
     println!("✓ Worker '{}' added successfully!", name);
     println!("\nWorktree: {}", worktree_path.display());
@@ -222,6 +228,8 @@ fn add_worker_to_config(
     name: &str,
     model: Option<String>,
     role_prompt: Option<String>,
+    excluded_from_pool: bool,
+    self_review: bool,
 ) -> Result<()> {
     println!("Adding worker to config.toml...");
 
@@ -266,6 +274,12 @@ fn add_worker_to_config(
     }
     if let Some(rp) = role_prompt {
         worker_lines.push(format!("role_prompt = \"{}\"", rp));
+    }
+    if excluded_from_pool {
+        worker_lines.push("excluded_from_pool = true".to_string());
+    }
+    if self_review {
+        worker_lines.push("self_review = true".to_string());
     }
 
     if worker_lines.is_empty() {

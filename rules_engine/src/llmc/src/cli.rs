@@ -61,6 +61,14 @@ pub enum Commands {
         /// Role prompt for this worker
         #[arg(long)]
         role_prompt: Option<String>,
+
+        /// Exclude this worker from automatic task assignment pool
+        #[arg(long)]
+        excluded_from_pool: bool,
+
+        /// Enable self-review phase for this worker
+        #[arg(long)]
+        self_review: bool,
     },
 
     /// Remove a worker and its worktree
