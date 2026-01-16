@@ -38,6 +38,12 @@ pub fn suggestion(error: &LatticeError) -> Option<String> {
         LatticeError::YamlParseError { .. } => {
             Some("Check YAML syntax: proper indentation, colons, and quotes".to_string())
         }
+        LatticeError::ConfigParseError { path, .. } => {
+            Some(format!("Check TOML syntax in {path}", path = path.display()))
+        }
+        LatticeError::ConfigValidationError { field, .. } => {
+            Some(format!("Check the valid values for the '{field}' configuration field"))
+        }
         LatticeError::DocumentNotFound { id } => {
             Some(format!("Verify the ID '{id}' is correct or run 'lat list' to find documents"))
         }
@@ -111,6 +117,7 @@ pub fn error_path(error: &LatticeError) -> Option<&PathBuf> {
         | LatticeError::DocumentTooLarge { path, .. }
         | LatticeError::InvalidStructure { path, .. }
         | LatticeError::YamlParseError { path, .. }
+        | LatticeError::ConfigParseError { path, .. }
         | LatticeError::InvalidPath { path, .. }
         | LatticeError::PathOutsideRepository { path }
         | LatticeError::FileNotFound { path }
@@ -123,6 +130,7 @@ pub fn error_path(error: &LatticeError) -> Option<&PathBuf> {
 
         LatticeError::MalformedId { .. }
         | LatticeError::CircularDependency { .. }
+        | LatticeError::ConfigValidationError { .. }
         | LatticeError::InvalidArgument { .. }
         | LatticeError::UnknownOption { .. }
         | LatticeError::ConflictingOptions { .. }

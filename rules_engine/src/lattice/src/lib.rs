@@ -1,5 +1,6 @@
 pub mod claim;
 pub mod cli;
+pub mod config;
 pub mod document;
 pub mod error;
 pub mod format;

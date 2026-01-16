@@ -43,6 +43,12 @@ pub enum LatticeError {
     #[error("YAML parsing failed in {path}: {reason}")]
     YamlParseError { path: PathBuf, reason: String },
 
+    #[error("Failed to parse configuration file {path}: {reason}")]
+    ConfigParseError { path: PathBuf, reason: String },
+
+    #[error("Invalid configuration value for '{field}': {reason}")]
+    ConfigValidationError { field: String, reason: String },
+
     // ========================================================================
     // User Input Errors (Exit Code 3)
     // Invalid command-line arguments or user input.
@@ -141,7 +147,9 @@ impl LatticeError {
             | LatticeError::InvalidFieldValue { .. }
             | LatticeError::DocumentTooLarge { .. }
             | LatticeError::InvalidStructure { .. }
-            | LatticeError::YamlParseError { .. } => exit_codes::VALIDATION_ERROR,
+            | LatticeError::YamlParseError { .. }
+            | LatticeError::ConfigParseError { .. }
+            | LatticeError::ConfigValidationError { .. } => exit_codes::VALIDATION_ERROR,
 
             LatticeError::InvalidArgument { .. }
             | LatticeError::UnknownOption { .. }
@@ -182,27 +190,29 @@ impl LatticeError {
             LatticeError::DocumentTooLarge { .. } => "E008",
             LatticeError::InvalidStructure { .. } => "E009",
             LatticeError::YamlParseError { .. } => "E010",
-            LatticeError::InvalidArgument { .. } => "E011",
-            LatticeError::UnknownOption { .. } => "E012",
-            LatticeError::InvalidPath { .. } => "E013",
-            LatticeError::PathOutsideRepository { .. } => "E014",
-            LatticeError::ConflictingOptions { .. } => "E015",
-            LatticeError::MissingArgument { .. } => "E016",
-            LatticeError::InvalidIdArgument { .. } => "E017",
-            LatticeError::OperationNotAllowed { .. } => "E018",
-            LatticeError::DocumentNotFound { .. } => "E019",
-            LatticeError::FileNotFound { .. } => "E020",
-            LatticeError::NoResults { .. } => "E021",
-            LatticeError::RootDocumentNotFound { .. } => "E022",
-            LatticeError::ParentNotFound { .. } => "E023",
-            LatticeError::ClaimNotFound { .. } => "E024",
-            LatticeError::LabelNotFound { .. } => "E025",
-            LatticeError::PermissionDenied { .. } => "E026",
-            LatticeError::ReadError { .. } => "E027",
-            LatticeError::WriteError { .. } => "E028",
-            LatticeError::GitError { .. } => "E029",
-            LatticeError::DatabaseError { .. } => "E030",
-            LatticeError::IndexCorrupted { .. } => "E031",
+            LatticeError::ConfigParseError { .. } => "E011",
+            LatticeError::ConfigValidationError { .. } => "E012",
+            LatticeError::InvalidArgument { .. } => "E013",
+            LatticeError::UnknownOption { .. } => "E014",
+            LatticeError::InvalidPath { .. } => "E015",
+            LatticeError::PathOutsideRepository { .. } => "E016",
+            LatticeError::ConflictingOptions { .. } => "E017",
+            LatticeError::MissingArgument { .. } => "E018",
+            LatticeError::InvalidIdArgument { .. } => "E019",
+            LatticeError::OperationNotAllowed { .. } => "E020",
+            LatticeError::DocumentNotFound { .. } => "E021",
+            LatticeError::FileNotFound { .. } => "E022",
+            LatticeError::NoResults { .. } => "E023",
+            LatticeError::RootDocumentNotFound { .. } => "E024",
+            LatticeError::ParentNotFound { .. } => "E025",
+            LatticeError::ClaimNotFound { .. } => "E026",
+            LatticeError::LabelNotFound { .. } => "E027",
+            LatticeError::PermissionDenied { .. } => "E028",
+            LatticeError::ReadError { .. } => "E029",
+            LatticeError::WriteError { .. } => "E030",
+            LatticeError::GitError { .. } => "E031",
+            LatticeError::DatabaseError { .. } => "E032",
+            LatticeError::IndexCorrupted { .. } => "E033",
         }
     }
 
