@@ -25,6 +25,7 @@ Please use `just` commands instead of `cargo`, e.g. `just fmt`, `just check`,
 - Use modern Rust features such as let-else statements and "{inline:?}" variable formatting
 - Do not add code to `mod.rs` or `lib.rs` files except for module declarations
 - Do not add `use` declarations within function bodies, only place them at the top of files
+- Qualify imports via `crate::`, not via `super::`
 
 
 # VALIDATING CHANGES
