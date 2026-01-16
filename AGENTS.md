@@ -26,7 +26,7 @@ Please use `just` commands instead of `cargo`, e.g. `just fmt`, `just check`,
 - Do not add code to `mod.rs` or `lib.rs` files except for module declarations
 - Do not add `use` declarations within function bodies, only place them at the top of files
 - Qualify imports via `crate::`, not via `super::`
-
+- Do not write inline `mod tests {` tests, place them in the `/tests/` directory
 
 # VALIDATING CHANGES
 

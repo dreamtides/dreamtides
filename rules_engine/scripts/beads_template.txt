@@ -47,7 +47,6 @@ Critical points:
 ## Completion Checklist
 
 1. Run `just fmt` then `just review`
-2. Add '# MANUAL TESTING INSTRUCTIONS' section to bead (< 10 lines)
-3. Close the bead via `bd close <id>`
-4. Create git commit with detailed description
-
+2. Create git commit with detailed description and a '# MANUAL TESTING
+   INSTRUCTIONS' commit message section (< 10 lines) with information about
+   how to validate changes.

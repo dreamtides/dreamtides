@@ -15,7 +15,8 @@ Checklist for reviewing Lattice changes to maintain the "bulletproof" design goa
 - **Performance aware:** No O(n²) algorithms; batch git operations; use indices
 - **Test expected errors:** Each `LatticeError` variant should have test
   coverage
-- **High quality tests:** Tests are not repetitive and have good assertion messages
+- **High quality tests:** Tests use public APIs, are not repetitive, and have
+  good assertion messages, exist in /tests/ directory (not in `mod tests {}`.)
 - **Avoid `.unwrap()`:** Use `.ok_or(LatticeError::...)?` or explicit panic with
   reason
 - **Keep it small:** Functions under 50 lines, files under 500 lines
@@ -54,6 +55,8 @@ Checklist for reviewing Lattice changes to maintain the "bulletproof" design goa
 
 ## Testing
 
+- [ ] Tests in the /tests/ directory, NOT inline in Rust files
+- [ ] Tests use public APIs, not test-only helpers
 - [ ] Happy path and each expected error case covered
 - [ ] Tests are not repetitive—don't test the same thing twice
 - [ ] Assertion messages explain what failed and why

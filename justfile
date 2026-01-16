@@ -298,6 +298,11 @@ tabula *args='':
 
 tabula-validate:
   #!/usr/bin/env bash
+  spreadsheet="client/Assets/StreamingAssets/Tabula.xlsm"
+  if [ ! -f "$spreadsheet" ]; then
+      echo "Warning: Tabula spreadsheet not found at $spreadsheet, skipping validation"
+      exit 0
+  fi
   output=$(cargo run --manifest-path rules_engine/Cargo.toml -p tabula_cli -- validate 2>&1)
   if [ $? -ne 0 ]; then
       echo "$output"
