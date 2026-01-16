@@ -372,7 +372,6 @@ impl Patrol {
     fn send_pending_on_complete_prompts(&self, state: &mut State, config: &Config) -> Result<()> {
         let now = SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs();
         let delay_secs: u64 = 30;
-        let debounce_secs: u64 = 300;
 
         let worker_names: Vec<String> = state.workers.keys().cloned().collect();
 
@@ -383,23 +382,7 @@ impl Patrol {
                 continue;
             }
 
-            if let Some(sent_unix) = worker.on_complete_sent_unix {
-                let since_sent = now.saturating_sub(sent_unix);
-                tracing::debug!(
-                    "Worker '{}' on_complete already sent {}s ago, skipping",
-                    worker_name,
-                    since_sent
-                );
-                if since_sent < debounce_secs {
-                    continue;
-                }
-                tracing::warn!(
-                    "Worker '{}' on_complete was sent {}s ago (>{}s debounce), \
-                     but still in needs_review - not resending",
-                    worker_name,
-                    since_sent,
-                    debounce_secs
-                );
+            if worker.on_complete_sent_unix.is_some() {
                 continue;
             }
 
