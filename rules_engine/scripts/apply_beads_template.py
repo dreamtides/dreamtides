@@ -6,6 +6,13 @@ Leaf issues are those that have no children in the beads hierarchy.
 The template file should contain {{TASK_BODY}} which will be replaced
 with each issue's current description.
 
+The template uses markers to support idempotent updates:
+- <!-- BEADS_TEMPLATE_START --> / <!-- BEADS_TEMPLATE_END --> wrap the entire template
+- <!-- BEADS_TASK_BODY_START --> / <!-- BEADS_TASK_BODY_END --> wrap the task body
+
+When re-running on an already-templated issue, the script extracts the preserved
+task body and applies the updated template. Issues are skipped if unchanged.
+
 Usage:
     python apply_beads_template.py <parent_id> <template_file> [--dry-run]
 
@@ -20,6 +27,38 @@ import sys
 import tempfile
 from pathlib import Path
 from typing import Any
+
+# Markers for idempotent template application
+TEMPLATE_START = "<!-- BEADS_TEMPLATE_START -->"
+TEMPLATE_END = "<!-- BEADS_TEMPLATE_END -->"
+TASK_BODY_START = "<!-- BEADS_TASK_BODY_START -->"
+TASK_BODY_END = "<!-- BEADS_TASK_BODY_END -->"
+
+
+def extract_task_body(content: str) -> str | None:
+    """Extract the task body from an already-templated issue."""
+    if TASK_BODY_START not in content or TASK_BODY_END not in content:
+        return None
+
+    start_idx = content.find(TASK_BODY_START)
+    end_idx = content.find(TASK_BODY_END)
+
+    if start_idx == -1 or end_idx == -1 or start_idx >= end_idx:
+        return None
+
+    body = content[start_idx + len(TASK_BODY_START) : end_idx]
+    if body.startswith("\n"):
+        body = body[1:]
+    if body.endswith("\n"):
+        body = body[:-1]
+    return body
+
+
+def apply_template(template: str, task_body: str) -> str:
+    """Apply template to a task body, wrapping with appropriate markers."""
+    marked_body = f"{TASK_BODY_START}\n{task_body}\n{TASK_BODY_END}"
+    content = template.replace("{{TASK_BODY}}", marked_body)
+    return f"{TEMPLATE_START}\n{content}\n{TEMPLATE_END}"
 
 
 def bd_command(args: list[str], check: bool = True) -> subprocess.CompletedProcess:
@@ -148,28 +187,46 @@ def main():
         print(f"  {leaf}: {title}")
     print()
 
-    if args.dry_run:
-        print("[DRY RUN] Would apply template to the above issues.")
-        return
-
     # Apply template
-    success = 0
+    updated = 0
+    skipped = 0
     failed = 0
     for leaf_id in leaves:
-        print(f"Updating {leaf_id}...", end=" ", flush=True)
+        print(f"Processing {leaf_id}...", end=" ", flush=True)
         try:
             issue = get_issue_details(leaf_id)
             current_body = issue.get("description", "")
-            new_body = template.replace("{{TASK_BODY}}", current_body)
+
+            # Check if already templated - extract preserved task body
+            extracted = extract_task_body(current_body)
+            task_body = extracted if extracted is not None else current_body
+
+            # Apply template with markers
+            new_body = apply_template(template, task_body)
+
+            # Skip if unchanged
+            if new_body == current_body:
+                print("unchanged")
+                skipped += 1
+                continue
+
+            if args.dry_run:
+                print("would update")
+                updated += 1
+                continue
+
             update_issue_body(leaf_id, new_body)
-            print("done")
-            success += 1
+            print("updated")
+            updated += 1
         except Exception as e:
             print(f"FAILED: {e}")
             failed += 1
 
     print()
-    print(f"Updated {success}/{len(leaves)} issues.")
+    if args.dry_run:
+        print(f"[DRY RUN] Would update {updated}, skip {skipped} unchanged.")
+    else:
+        print(f"Updated {updated}, skipped {skipped} unchanged, {failed} failed.")
     if failed > 0:
         sys.exit(1)
 
