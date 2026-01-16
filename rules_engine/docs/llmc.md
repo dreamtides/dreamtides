@@ -116,6 +116,25 @@ You are Baker, focused on UI and user experience.
 | `role_prompt` | string | `""` | Additional context for the worker |
 | `excluded_from_pool` | bool | `false` | Exclude from automatic task assignment |
 
+### Editor Integration
+
+Several commands open `$EDITOR` when a message or prompt is not provided on the
+command line. This follows the pattern established by tools like `git commit`.
+The editor used is determined by:
+
+1. `$EDITOR` environment variable (preferred)
+2. `$VISUAL` environment variable (fallback)
+3. `vi` (default if neither is set)
+
+Commands that support editor integration:
+- `llmc start`: Opens editor for prompt when no `--prompt*` option given
+- `llmc message`: Opens editor for message when message argument omitted
+- `llmc reject`: Opens editor for feedback, pre-populated with reviewed diff
+
+The operation is aborted if the editor exits with a non-zero status or if the
+content is empty/whitespace-only after stripping comment lines (lines starting
+with `#`).
+
 ## Data Model
 
 ### State File (`~/llmc/state.json`)
@@ -269,7 +288,13 @@ llmc start --prompt "Implement feature X"
 llmc start --prompt-file task.md
 llmc start --prompt-cmd "bd show dr-abc"
 llmc start --worker adam --prompt "..."
+llmc start --worker adam  # Opens $EDITOR for prompt
 ```
+
+If no prompt source is provided (`--prompt`, `--prompt-file`, or `--prompt-cmd`),
+opens `$EDITOR` for composing the prompt interactively. The editor opens with a
+template explaining the expected format. Empty or whitespace-only content aborts
+the operation.
 
 Selects worker (specified or first idle from pool), verifies idle state, pulls
 latest master into worktree, copies `Tabula.xlsm`, builds full prompt with
@@ -283,13 +308,17 @@ The prompt preamble includes worktree location, repository root, instructions
 to follow AGENTS.md conventions, run validation commands, create a single
 commit, and not push to remote.
 
-### `llmc message <worker> <message>`
+### `llmc message <worker> [message]`
 
 Sends a message to a worker.
 
 ```bash
 llmc message adam "Use the existing auth helper instead"
+llmc message adam  # Opens $EDITOR for message
 ```
+
+If no message is provided, opens `$EDITOR` for composing the message
+interactively. Empty or whitespace-only content aborts the operation.
 
 ### `llmc attach <worker>`
 
@@ -317,7 +346,12 @@ Sends feedback to the most recently reviewed worker.
 
 ```bash
 llmc reject "Please add error handling for the API call"
+llmc reject  # Opens $EDITOR for feedback
 ```
+
+If no message is provided, opens `$EDITOR` for composing the rejection feedback.
+The editor opens pre-populated with the diff that was reviewed, allowing inline
+comments. Empty or whitespace-only content aborts the operation.
 
 Does NOT send `/clear` (preserves context), sends reject message with original
 diff context, updates state to `rejected`.

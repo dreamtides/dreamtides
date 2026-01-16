@@ -108,8 +108,8 @@ pub enum Commands {
         /// Worker name
         worker: String,
 
-        /// Message to send
-        message: String,
+        /// Message to send (opens $EDITOR if not provided)
+        message: Option<String>,
     },
 
     /// Attach to a worker's TMUX session
@@ -131,8 +131,8 @@ pub enum Commands {
 
     /// Reject a worker's work and request changes
     Reject {
-        /// Reason for rejection
-        message: String,
+        /// Reason for rejection (opens $EDITOR with diff if not provided)
+        message: Option<String>,
     },
 
     /// Accept a worker's work and merge

@@ -2,12 +2,12 @@ use std::time::{SystemTime, UNIX_EPOCH};
 
 use anyhow::{Context, Result, bail};
 
-use super::super::config;
-use super::super::state::{State, WorkerStatus};
-use super::super::tmux::sender::TmuxSender;
+use crate::state::{State, WorkerStatus};
+use crate::tmux::sender::TmuxSender;
+use crate::{config, editor};
 
 /// Runs the message command, sending a follow-up message to a worker
-pub fn run_message(worker: &str, message: &str) -> Result<()> {
+pub fn run_message(worker: &str, message: Option<String>) -> Result<()> {
     let llmc_root = config::get_llmc_root();
     if !llmc_root.exists() {
         bail!(
@@ -17,7 +17,7 @@ pub fn run_message(worker: &str, message: &str) -> Result<()> {
         );
     }
 
-    let (mut state, _config) = super::super::state::load_state_with_patrol()?;
+    let (mut state, _config) = crate::state::load_state_with_patrol()?;
 
     let worker_record = state.get_worker(worker).ok_or_else(|| {
         anyhow::anyhow!(
@@ -30,17 +30,28 @@ pub fn run_message(worker: &str, message: &str) -> Result<()> {
 
     verify_valid_state_for_message(worker, worker_record.status)?;
 
+    let message_text = match message {
+        Some(m) if !m.trim().is_empty() => m,
+        Some(_) => bail!("Message cannot be empty"),
+        None => {
+            let template = "# Enter your message to the worker below.\n\
+                            # Lines starting with '#' will be ignored.\n\
+                            # Save and close the editor to send, or leave empty to abort.\n\n";
+            editor::open_editor(Some(template), "message")?
+        }
+    };
+
     println!("Sending message to worker '{}'...", worker);
 
     let tmux_sender = TmuxSender::new();
     tmux_sender
-        .send(&worker_record.session_id, message)
+        .send(&worker_record.session_id, &message_text)
         .with_context(|| format!("Failed to send message to worker '{}'", worker))?;
 
     let worker_mut = state.get_worker_mut(worker).unwrap();
     worker_mut.last_activity_unix = SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs();
 
-    state.save(&super::super::state::get_state_path())?;
+    state.save(&crate::state::get_state_path())?;
 
     println!("✓ Message sent to worker '{}'", worker);
 

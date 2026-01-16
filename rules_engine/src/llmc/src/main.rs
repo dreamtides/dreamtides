@@ -1,6 +1,7 @@
 mod cli;
 mod commands;
 mod config;
+mod editor;
 mod git;
 mod lock;
 mod logging;
@@ -64,7 +65,7 @@ async fn main() -> Result<()> {
         Commands::Start { worker, prompt, prompt_file, prompt_cmd } => {
             start::run_start(worker, prompt, prompt_file, prompt_cmd)
         }
-        Commands::Message { worker, message } => message::run_message(&worker, &message),
+        Commands::Message { worker, message } => message::run_message(&worker, message),
         Commands::Attach { worker } => attach::run_attach(&worker),
         Commands::Review { worker, interface } => {
             let interface_enum = match interface.as_str() {
@@ -80,7 +81,7 @@ async fn main() -> Result<()> {
             };
             review::run_review(worker, interface_enum)
         }
-        Commands::Reject { message } => reject::run_reject(&message),
+        Commands::Reject { message } => reject::run_reject(message),
         Commands::Accept { worker } => accept::run_accept(worker),
         Commands::Rebase { worker } => rebase::run_rebase(&worker),
         Commands::Reset { worker, yes } => reset::run_reset(&worker, yes),
