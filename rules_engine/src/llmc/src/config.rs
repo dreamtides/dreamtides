@@ -31,6 +31,7 @@ pub struct DefaultsConfig {
     pub patrol_interval_secs: u32,
     #[serde(default = "default_sound_on_review")]
     pub sound_on_review: bool,
+    pub on_complete: Option<OnCompleteConfig>,
 }
 
 /// Repository configuration
@@ -46,6 +47,18 @@ pub struct WorkerConfig {
     pub role_prompt: Option<String>,
     #[serde(default = "default_excluded_from_pool")]
     pub excluded_from_pool: bool,
+    pub on_complete: Option<OnCompleteConfig>,
+}
+
+/// Configuration for the "on complete" prompt sent when a worker finishes a
+/// task
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct OnCompleteConfig {
+    pub prompt: String,
+    #[serde(default)]
+    pub include_original: bool,
+    #[serde(default)]
+    pub clear: bool,
 }
 
 /// Returns the LLMC root directory (~/llmc)
@@ -113,6 +126,7 @@ impl Default for DefaultsConfig {
             allowed_tools: default_allowed_tools(),
             patrol_interval_secs: default_patrol_interval_secs(),
             sound_on_review: default_sound_on_review(),
+            on_complete: None,
         }
     }
 }

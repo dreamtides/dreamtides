@@ -82,6 +82,9 @@ pub fn apply_transition(worker: &mut WorkerRecord, transition: WorkerTransition)
             worker.current_prompt.clear();
             worker.commit_sha = None;
         }
+        WorkerTransition::ToWorking { .. } => {
+            worker.on_complete_sent = false;
+        }
         WorkerTransition::ToNeedsReview { .. } => {}
         _ => {}
     }
@@ -276,6 +279,7 @@ mod tests {
             session_id: "llmc-test".to_string(),
             crash_count: 0,
             last_crash_unix: None,
+            on_complete_sent: false,
         };
         apply_transition(&mut worker, WorkerTransition::ToIdle).unwrap();
         assert_eq!(worker.status, WorkerStatus::Idle);
@@ -296,6 +300,7 @@ mod tests {
             session_id: "llmc-test".to_string(),
             crash_count: 0,
             last_crash_unix: None,
+            on_complete_sent: false,
         };
         apply_transition(&mut worker, WorkerTransition::ToWorking {
             prompt: "Test prompt".to_string(),
@@ -318,6 +323,7 @@ mod tests {
             session_id: "llmc-test".to_string(),
             crash_count: 0,
             last_crash_unix: None,
+            on_complete_sent: false,
         };
         apply_transition(&mut worker, WorkerTransition::ToNeedsReview {
             commit_sha: "abc123".to_string(),
@@ -340,6 +346,7 @@ mod tests {
             session_id: "llmc-test".to_string(),
             crash_count: 0,
             last_crash_unix: None,
+            on_complete_sent: false,
         };
         apply_transition(&mut worker, WorkerTransition::ToNeedsReview {
             commit_sha: "abc123".to_string(),
@@ -362,6 +369,7 @@ mod tests {
             session_id: "llmc-test".to_string(),
             crash_count: 0,
             last_crash_unix: None,
+            on_complete_sent: false,
         };
         let old_status = worker.status;
         apply_transition(&mut worker, WorkerTransition::None).unwrap();

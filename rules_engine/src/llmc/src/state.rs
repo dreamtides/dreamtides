@@ -54,6 +54,9 @@ pub struct WorkerRecord {
     pub crash_count: u32,
     /// Unix timestamp of last crash
     pub last_crash_unix: Option<u64>,
+    /// Whether the on_complete prompt has been sent for the current task
+    #[serde(default)]
+    pub on_complete_sent: bool,
 }
 
 /// State file tracking all workers and their status
@@ -213,6 +216,7 @@ mod tests {
             session_id: format!("llmc-{}", name),
             crash_count: 0,
             last_crash_unix: None,
+            on_complete_sent: false,
         }
     }
     #[test]

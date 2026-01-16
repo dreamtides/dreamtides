@@ -4,7 +4,7 @@ use std::time::{SystemTime, UNIX_EPOCH};
 
 use anyhow::Result;
 
-use crate::config::Config;
+use crate::config::{Config, OnCompleteConfig};
 use crate::state::{State, WorkerStatus};
 use crate::tmux::sender::TmuxSender;
 use crate::tmux::session;
@@ -361,6 +361,24 @@ impl Patrol {
 
                 if matches!(transition, WorkerTransition::ToNeedsReview { .. }) {
                     let _ = sound::play_bell(config);
+
+                    if !w.on_complete_sent
+                        && let Some(on_complete) = get_on_complete_config(config, &worker_name)
+                    {
+                        let original_prompt = w.current_prompt.clone();
+                        let session_id = w.session_id.clone();
+                        w.on_complete_sent = true;
+
+                        if let Err(e) =
+                            send_on_complete_prompt(&session_id, on_complete, &original_prompt)
+                        {
+                            tracing::error!(
+                                "Failed to send on_complete prompt to worker '{}': {}",
+                                worker_name,
+                                e
+                            );
+                        }
+                    }
                 }
             }
         }
@@ -624,6 +642,42 @@ fn build_conflict_prompt(conflicts: &[String], original_task: &str) -> String {
 
 fn count_conflict_markers(file: &str) -> usize {
     std::fs::read_to_string(file).map(|content| content.matches("<<<<<<<").count()).unwrap_or(0)
+}
+
+fn get_on_complete_config<'a>(
+    config: &'a Config,
+    worker_name: &str,
+) -> Option<&'a OnCompleteConfig> {
+    config
+        .get_worker(worker_name)
+        .and_then(|w| w.on_complete.as_ref())
+        .or(config.defaults.on_complete.as_ref())
+}
+
+fn send_on_complete_prompt(
+    session_id: &str,
+    on_complete: &OnCompleteConfig,
+    original_prompt: &str,
+) -> Result<()> {
+    let sender = TmuxSender::new();
+
+    if on_complete.clear {
+        tracing::info!("Sending /clear before on_complete prompt to session '{}'", session_id);
+        sender.send(session_id, "/clear")?;
+        std::thread::sleep(std::time::Duration::from_secs(2));
+    }
+
+    let mut prompt = on_complete.prompt.clone();
+
+    if on_complete.include_original && !original_prompt.is_empty() {
+        prompt.push_str("\n\n--- Original Prompt ---\n\n");
+        prompt.push_str(original_prompt);
+    }
+
+    tracing::info!("Sending on_complete prompt to session '{}'", session_id);
+    sender.send(session_id, &prompt)?;
+
+    Ok(())
 }
 
 #[cfg(test)]

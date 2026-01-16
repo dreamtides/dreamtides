@@ -77,6 +77,7 @@ pub fn run_add(name: &str, model: Option<String>, role_prompt: Option<String>) -
         session_id: format!("llmc-{}", name),
         crash_count: 0,
         last_crash_unix: None,
+        on_complete_sent: false,
     };
 
     state.add_worker(worker_record);
