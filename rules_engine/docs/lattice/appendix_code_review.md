@@ -56,7 +56,9 @@ Checklist for reviewing Lattice changes to maintain the "bulletproof" design goa
 ## Testing
 
 - [ ] Tests in the /tests/ directory, NOT inline in Rust files
-- [ ] Tests use public APIs, not test-only helpers
+- [ ] Tests use public APIs only, if you can't reach it via the public API don't
+  test it.
+- [ ] Do not add `#[cfg(test)]` helpers only for use in tests
 - [ ] Happy path and each expected error case covered
 - [ ] Tests are not repetitive—don't test the same thing twice
 - [ ] Assertion messages explain what failed and why
@@ -73,17 +75,15 @@ Checklist for reviewing Lattice changes to maintain the "bulletproof" design goa
 ## Edge Cases
 
 **File system:** TOCTOU races, permission denied, disk full, symlinks, unicode
-
 **Git state:** Uncommitted changes, detached HEAD, shallow clone, conflicts
-
 **Documents:** Malformed frontmatter, circular deps, duplicate IDs
-
 **Index:** Missing/corrupted, out of sync, concurrent access
 
 **User input:** Invalid IDs, empty/long strings, special characters
 
 ## Code Style
 
+- [ ] Do not allow or expect dead_code. Delete dead code.
 - [ ] Functions return `Result<T, LatticeError>`, not `Option` for errors
 - [ ] Panics only for invariant violations (Lattice's fault, not user's)
 - [ ] Follow patterns in existing code; maintain consistency
