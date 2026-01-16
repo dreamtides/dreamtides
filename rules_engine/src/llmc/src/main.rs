@@ -60,7 +60,7 @@ async fn main() -> Result<()> {
         Commands::Up { no_patrol, force } => up::run_up(no_patrol, cli.verbose, force),
         Commands::Down { force } => down::run_down(force),
         Commands::Add { name, model, role_prompt } => add::run_add(&name, model, role_prompt),
-        Commands::Nuke { name, all, reset } => nuke::run_nuke(name.as_deref(), all, reset),
+        Commands::Nuke { name, all } => nuke::run_nuke(name.as_deref(), all),
         Commands::Status { json } => status::run_status(json),
         Commands::Start { worker, prefix, prompt, prompt_file, prompt_cmd, skip_self_review } => {
             start::run_start(worker, prefix, prompt, prompt_file, prompt_cmd, skip_self_review)
