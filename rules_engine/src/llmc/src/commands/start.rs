@@ -81,14 +81,19 @@ pub fn run_start(
 
     let worker_mut =
         state.get_worker_mut(&worker_name).expect("Worker disappeared after validation");
-    worker_mut.skip_self_review = skip_self_review;
+    // Use CLI flag if set, otherwise check worker config
+    worker_mut.skip_self_review = skip_self_review
+        || config.get_worker(&worker_name).and_then(|c| c.skip_self_review).unwrap_or(false);
     worker::apply_transition(worker_mut, worker::WorkerTransition::ToWorking {
         prompt: full_prompt,
     })?;
 
+    let skip_review_enabled =
+        state.get_worker(&worker_name).map(|w| w.skip_self_review).unwrap_or(false);
+
     state.save(&super::super::state::get_state_path())?;
 
-    if skip_self_review {
+    if skip_review_enabled {
         println!("✓ Worker '{}' started on task (self-review phase will be skipped)", worker_name);
     } else {
         println!("✓ Worker '{}' started on task", worker_name);

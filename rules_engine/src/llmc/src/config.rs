@@ -48,6 +48,8 @@ pub struct WorkerConfig {
     #[serde(default = "default_excluded_from_pool")]
     pub excluded_from_pool: bool,
     pub on_complete: Option<OnCompleteConfig>,
+    #[serde(default)]
+    pub skip_self_review: Option<bool>,
 }
 
 /// Configuration for the "on complete" prompt sent when a worker finishes a
@@ -226,6 +228,7 @@ mod tests {
             model = "opus"
             role_prompt = "You are Adam"
             excluded_from_pool = true
+            skip_self_review = true
 
             [workers.baker]
             role_prompt = "You are Baker"
@@ -247,11 +250,13 @@ mod tests {
         assert_eq!(adam.model.as_deref(), Some("opus"));
         assert_eq!(adam.role_prompt.as_deref(), Some("You are Adam"));
         assert!(adam.excluded_from_pool);
+        assert_eq!(adam.skip_self_review, Some(true));
 
         let baker = config.get_worker("baker").unwrap();
         assert_eq!(baker.model, None);
         assert_eq!(baker.role_prompt.as_deref(), Some("You are Baker"));
         assert!(!baker.excluded_from_pool);
+        assert_eq!(baker.skip_self_review, None);
     }
 
     #[test]
