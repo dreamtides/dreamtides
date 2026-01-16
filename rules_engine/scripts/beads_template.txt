@@ -15,11 +15,11 @@ Please complete exactly one task, provided below.
 
 Issue IDs with `dr-` prefix (e.g., `dr-l3x`) are `bd` issues. Close your task when complete.
 
-- Track discovered work via `bd create` (see AGENTS.md for full command reference)
+- DO NOT `bd close` this bead yourself! The coordinator will do so.
 - Use TodoWrite for in-session progress tracking
 - Do NOT run `bd sync`
 - Do not modify files outside your task scope; file new beads instead
-
+- Track discovered work via `bd create` (see AGENTS.md for full command reference)
 
 # ACCEPTANCE CRITERIA
 
