@@ -49,6 +49,7 @@ impl Patrol {
         self.check_session_health(state, config, &mut report)?;
         self.check_state_consistency(state, &mut report)?;
         self.detect_state_transitions(state, config, &mut report)?;
+        self.send_pending_on_complete_prompts(state, config)?;
 
         let transitioned_workers: std::collections::HashSet<String> =
             report.transitions_applied.iter().map(|(name, _)| name.clone()).collect();
@@ -361,25 +362,65 @@ impl Patrol {
 
                 if matches!(transition, WorkerTransition::ToNeedsReview { .. }) {
                     let _ = sound::play_bell(config);
-
-                    if !w.on_complete_sent
-                        && let Some(on_complete) = get_on_complete_config(config, &worker_name)
-                    {
-                        let original_prompt = w.current_prompt.clone();
-                        let session_id = w.session_id.clone();
-                        w.on_complete_sent = true;
-
-                        if let Err(e) =
-                            send_on_complete_prompt(&session_id, on_complete, &original_prompt)
-                        {
-                            tracing::error!(
-                                "Failed to send on_complete prompt to worker '{}': {}",
-                                worker_name,
-                                e
-                            );
-                        }
-                    }
                 }
+            }
+        }
+
+        Ok(())
+    }
+
+    fn send_pending_on_complete_prompts(&self, state: &mut State, config: &Config) -> Result<()> {
+        let now = SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs();
+        let delay_secs = 30;
+
+        let worker_names: Vec<String> = state.workers.keys().cloned().collect();
+
+        for worker_name in worker_names {
+            let worker = state.get_worker(&worker_name).unwrap();
+
+            if worker.status != WorkerStatus::NeedsReview {
+                continue;
+            }
+
+            if worker.on_complete_sent {
+                continue;
+            }
+
+            let Some(on_complete) = get_on_complete_config(config, &worker_name) else {
+                continue;
+            };
+
+            let elapsed = now.saturating_sub(worker.last_activity_unix);
+            if elapsed < delay_secs {
+                tracing::debug!(
+                    "Worker '{}' needs on_complete but only {}s elapsed (need {}s)",
+                    worker_name,
+                    elapsed,
+                    delay_secs
+                );
+                continue;
+            }
+
+            tracing::info!(
+                "Sending on_complete prompt to worker '{}' ({}s after completion)",
+                worker_name,
+                elapsed
+            );
+
+            let original_prompt = worker.current_prompt.clone();
+            let session_id = worker.session_id.clone();
+
+            if let Err(e) = send_on_complete_prompt(&session_id, on_complete, &original_prompt) {
+                tracing::error!(
+                    "Failed to send on_complete prompt to worker '{}': {}",
+                    worker_name,
+                    e
+                );
+                continue;
+            }
+
+            if let Some(w) = state.get_worker_mut(&worker_name) {
+                w.on_complete_sent = true;
             }
         }
 
