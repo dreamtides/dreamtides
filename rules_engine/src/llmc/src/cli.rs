@@ -97,6 +97,10 @@ pub enum Commands {
         /// Path to file containing prompt
         #[arg(long)]
         prompt_file: Option<PathBuf>,
+
+        /// Command to execute, using its output as the prompt
+        #[arg(long)]
+        prompt_cmd: Option<String>,
     },
 
     /// Send a message to a worker

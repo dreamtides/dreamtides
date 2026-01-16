@@ -267,12 +267,17 @@ Assigns a task to an idle worker.
 ```bash
 llmc start --prompt "Implement feature X"
 llmc start --prompt-file task.md
+llmc start --prompt-cmd "bd show dr-abc"
 llmc start --worker adam --prompt "..."
 ```
 
 Selects worker (specified or first idle from pool), verifies idle state, pulls
 latest master into worktree, copies `Tabula.xlsm`, builds full prompt with
 preamble, sends `/clear` and prompt, updates state to `working`.
+
+The `--prompt-cmd` option executes the specified shell command and uses its
+stdout as the prompt. This is useful for generating prompts from issue trackers
+or other tools that produce detailed task descriptions.
 
 The prompt preamble includes worktree location, repository root, instructions
 to follow AGENTS.md conventions, run validation commands, create a single

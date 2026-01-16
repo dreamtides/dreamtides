@@ -16,8 +16,9 @@ pub fn run_start(
     worker: Option<String>,
     prompt: Option<String>,
     prompt_file: Option<PathBuf>,
+    prompt_cmd: Option<String>,
 ) -> Result<()> {
-    validate_prompt_args(&prompt, &prompt_file)?;
+    validate_prompt_args(&prompt, &prompt_file, &prompt_cmd)?;
 
     let llmc_root = config::get_llmc_root();
     if !llmc_root.exists() {
@@ -61,7 +62,7 @@ pub fn run_start(
 
     copy_tabula_xlsm(&config, &worktree_path)?;
 
-    let user_prompt = load_prompt_content(&prompt, &prompt_file)?;
+    let user_prompt = load_prompt_content(&prompt, &prompt_file, &prompt_cmd)?;
     let full_prompt = build_full_prompt(worker_record, &config, &worker_name, &user_prompt)?;
 
     println!("Sending prompt to worker '{}'...", worker_name);
@@ -86,9 +87,16 @@ pub fn run_start(
     Ok(())
 }
 
-fn validate_prompt_args(prompt: &Option<String>, prompt_file: &Option<PathBuf>) -> Result<()> {
-    if prompt.is_some() && prompt_file.is_some() {
-        bail!("Cannot provide both --prompt and --prompt-file");
+fn validate_prompt_args(
+    prompt: &Option<String>,
+    prompt_file: &Option<PathBuf>,
+    prompt_cmd: &Option<String>,
+) -> Result<()> {
+    let specified_count =
+        prompt.is_some() as u8 + prompt_file.is_some() as u8 + prompt_cmd.is_some() as u8;
+
+    if specified_count > 1 {
+        bail!("Cannot provide more than one of --prompt, --prompt-file, or --prompt-cmd");
     }
 
     if let Some(file) = prompt_file
@@ -131,7 +139,11 @@ fn select_worker(worker: &Option<String>, config: &Config, state: &State) -> Res
     Ok(available[0].name.clone())
 }
 
-fn load_prompt_content(prompt: &Option<String>, prompt_file: &Option<PathBuf>) -> Result<String> {
+fn load_prompt_content(
+    prompt: &Option<String>,
+    prompt_file: &Option<PathBuf>,
+    prompt_cmd: &Option<String>,
+) -> Result<String> {
     if let Some(text) = prompt {
         if text.trim().is_empty() {
             bail!("Prompt cannot be empty");
@@ -150,7 +162,42 @@ fn load_prompt_content(prompt: &Option<String>, prompt_file: &Option<PathBuf>) -
         return Ok(content);
     }
 
+    if let Some(cmd) = prompt_cmd {
+        return execute_prompt_command(cmd);
+    }
+
     open_editor_for_prompt()
+}
+
+fn execute_prompt_command(cmd: &str) -> Result<String> {
+    println!("Executing prompt command: {}", cmd);
+
+    let output = Command::new("sh")
+        .arg("-c")
+        .arg(cmd)
+        .output()
+        .with_context(|| format!("Failed to execute prompt command: {cmd}"))?;
+
+    if !output.status.success() {
+        let stderr = String::from_utf8_lossy(&output.stderr);
+        bail!(
+            "Prompt command failed with exit code {:?}\nCommand: {}\nStderr: {}",
+            output.status.code(),
+            cmd,
+            stderr.trim()
+        );
+    }
+
+    let content = String::from_utf8(output.stdout)
+        .with_context(|| "Prompt command output is not valid UTF-8")?;
+
+    if content.trim().is_empty() {
+        bail!("Prompt command produced empty output: {}", cmd);
+    }
+
+    println!("Prompt command generated {} bytes of output", content.len());
+
+    Ok(content)
 }
 
 fn open_editor_for_prompt() -> Result<String> {
