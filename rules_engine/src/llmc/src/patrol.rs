@@ -5,7 +5,7 @@ use std::time::{SystemTime, UNIX_EPOCH};
 use anyhow::Result;
 
 use crate::config::{Config, OnCompleteConfig};
-use crate::state::{State, WorkerStatus};
+use crate::state::{self, State, WorkerStatus};
 use crate::tmux::sender::TmuxSender;
 use crate::tmux::session;
 use crate::worker::{self, WorkerTransition};
@@ -371,7 +371,8 @@ impl Patrol {
 
     fn send_pending_on_complete_prompts(&self, state: &mut State, config: &Config) -> Result<()> {
         let now = SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs();
-        let delay_secs = 30;
+        let delay_secs: u64 = 30;
+        let debounce_secs: u64 = 300;
 
         let worker_names: Vec<String> = state.workers.keys().cloned().collect();
 
@@ -382,7 +383,23 @@ impl Patrol {
                 continue;
             }
 
-            if worker.on_complete_sent {
+            if let Some(sent_unix) = worker.on_complete_sent_unix {
+                let since_sent = now.saturating_sub(sent_unix);
+                tracing::debug!(
+                    "Worker '{}' on_complete already sent {}s ago, skipping",
+                    worker_name,
+                    since_sent
+                );
+                if since_sent < debounce_secs {
+                    continue;
+                }
+                tracing::warn!(
+                    "Worker '{}' on_complete was sent {}s ago (>{}s debounce), \
+                     but still in needs_review - not resending",
+                    worker_name,
+                    since_sent,
+                    debounce_secs
+                );
                 continue;
             }
 
@@ -402,7 +419,7 @@ impl Patrol {
             }
 
             tracing::info!(
-                "Sending on_complete prompt to worker '{}' ({}s after completion)",
+                "Worker '{}' eligible for on_complete ({}s after completion)",
                 worker_name,
                 elapsed
             );
@@ -410,17 +427,32 @@ impl Patrol {
             let original_prompt = worker.current_prompt.clone();
             let session_id = worker.session_id.clone();
 
-            if let Err(e) = send_on_complete_prompt(&session_id, on_complete, &original_prompt) {
+            if let Some(w) = state.get_worker_mut(&worker_name) {
+                w.on_complete_sent_unix = Some(now);
+            }
+
+            let state_path = state::get_state_path();
+            if let Err(e) = state.save(&state_path) {
                 tracing::error!(
-                    "Failed to send on_complete prompt to worker '{}': {}",
+                    "Failed to save state before sending on_complete to '{}': {}",
                     worker_name,
                     e
                 );
                 continue;
             }
 
-            if let Some(w) = state.get_worker_mut(&worker_name) {
-                w.on_complete_sent = true;
+            tracing::info!(
+                "State saved with on_complete_sent_unix={} for worker '{}', now sending prompt",
+                now,
+                worker_name
+            );
+
+            if let Err(e) = send_on_complete_prompt(&session_id, on_complete, &original_prompt) {
+                tracing::error!(
+                    "Failed to send on_complete prompt to worker '{}': {}",
+                    worker_name,
+                    e
+                );
             }
         }
 

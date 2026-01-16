@@ -782,7 +782,7 @@ fn run_rebuild() -> Result<()> {
             session_id: session_name,
             crash_count: 0,
             last_crash_unix: None,
-            on_complete_sent: false,
+            on_complete_sent_unix: None,
         };
         workers.insert(name.clone(), worker);
     }

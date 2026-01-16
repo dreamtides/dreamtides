@@ -4,7 +4,8 @@ You are implementing the Lattice document management tool.
 
 Primary design doc: @rules_engine/docs/lattice/lattice_design.md
 
-Please complete exactly one task bead, provided below.
+Please complete exactly one task, provided below. Do not
+perform any `bd` task operations, they will fail.
 
 
 # YOUR TASK

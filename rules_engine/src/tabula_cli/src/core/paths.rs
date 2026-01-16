@@ -22,11 +22,24 @@ pub fn default_toml_dir() -> Result<PathBuf> {
 }
 
 pub fn backup_dir_for(root: &Path) -> PathBuf {
-    root.join(".git/excel-backups")
+    git_dir_for(root).join("excel-backups")
 }
 
 pub fn image_cache_dir_for(root: &Path) -> PathBuf {
-    root.join(".git/xlsm_image_cache")
+    git_dir_for(root).join("xlsm_image_cache")
+}
+
+fn git_dir_for(root: &Path) -> PathBuf {
+    let git_path = root.join(".git");
+    if git_path.is_file() {
+        // Git worktree: .git is a file containing "gitdir: /path/to/git/dir"
+        if let Ok(content) = std::fs::read_to_string(&git_path)
+            && let Some(gitdir) = content.strip_prefix("gitdir: ")
+        {
+            return PathBuf::from(gitdir.trim());
+        }
+    }
+    git_path
 }
 
 fn locate_project_root(start: &Path) -> Result<PathBuf> {
