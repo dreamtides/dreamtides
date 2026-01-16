@@ -148,7 +148,10 @@ impl State {
             })?;
         }
         let json = serde_json::to_string_pretty(self).context("Failed to serialize state")?;
-        let temp_path = path.with_extension("tmp");
+        // Use PID-based temp file to avoid race conditions when multiple processes
+        // (e.g., llmc accept and llmc up with patrol) save state concurrently
+        let temp_filename = format!("state.{}.tmp", std::process::id());
+        let temp_path = path.with_file_name(&temp_filename);
         fs::write(&temp_path, json)
             .with_context(|| format!("Failed to write temp state file: {}", temp_path.display()))?;
         if path.exists() {
@@ -156,8 +159,13 @@ impl State {
             fs::copy(path, &backup_path)
                 .with_context(|| format!("Failed to create backup: {}", backup_path.display()))?;
         }
-        fs::rename(&temp_path, path)
-            .with_context(|| "Failed to rename temp file to state file".to_string())?;
+        fs::rename(&temp_path, path).with_context(|| {
+            format!(
+                "Failed to rename temp file {} to state file {}",
+                temp_path.display(),
+                path.display()
+            )
+        })?;
         Ok(())
     }
 

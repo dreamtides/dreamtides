@@ -46,6 +46,6 @@ Critical points:
 ## Completion Checklist
 
 1. Run `just fmt` then `just review`
-2. Create git commit with detailed description and a '# MANUAL TESTING
-   INSTRUCTIONS' commit message section (< 10 lines) with information about
+2. Create git commit with detailed description and a '# Manual Testing
+   Instructions' commit message section (< 10 lines) with information about
    how to validate changes.
