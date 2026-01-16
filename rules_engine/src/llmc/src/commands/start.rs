@@ -17,6 +17,7 @@ pub fn run_start(
     prompt: Option<String>,
     prompt_file: Option<PathBuf>,
     prompt_cmd: Option<String>,
+    skip_review: bool,
 ) -> Result<()> {
     validate_prompt_args(&prompt, &prompt_file, &prompt_cmd)?;
 
@@ -77,13 +78,18 @@ pub fn run_start(
         .with_context(|| format!("Failed to send prompt to worker '{}'", worker_name))?;
 
     let worker_mut = state.get_worker_mut(&worker_name).unwrap();
+    worker_mut.skip_review = skip_review;
     worker::apply_transition(worker_mut, worker::WorkerTransition::ToWorking {
         prompt: full_prompt,
     })?;
 
     state.save(&super::super::state::get_state_path())?;
 
-    println!("✓ Worker '{}' started on task", worker_name);
+    if skip_review {
+        println!("✓ Worker '{}' started on task (review phase will be skipped)", worker_name);
+    } else {
+        println!("✓ Worker '{}' started on task", worker_name);
+    }
     Ok(())
 }
 

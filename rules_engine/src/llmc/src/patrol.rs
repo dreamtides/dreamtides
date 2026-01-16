@@ -338,6 +338,7 @@ impl Patrol {
             let current_status = worker.status;
             let session_id = worker.session_id.clone();
             let worktree_path = PathBuf::from(&worker.worktree_path);
+            let skip_review = worker.skip_review;
 
             let transition = match current_status {
                 WorkerStatus::Working => {
@@ -348,6 +349,19 @@ impl Patrol {
                 }
                 _ => WorkerTransition::None,
             };
+
+            // If skip_review is set and we would transition to NeedsReview,
+            // transition directly to Idle instead
+            let transition =
+                if skip_review && matches!(transition, WorkerTransition::ToNeedsReview { .. }) {
+                    tracing::info!(
+                        "Worker '{}' has skip_review set, transitioning directly to idle",
+                        worker_name
+                    );
+                    WorkerTransition::ToIdle
+                } else {
+                    transition
+                };
 
             if transition != WorkerTransition::None
                 && let Some(w) = state.get_worker_mut(&worker_name)

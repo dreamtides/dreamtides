@@ -78,6 +78,7 @@ pub fn run_add(name: &str, model: Option<String>, role_prompt: Option<String>) -
         crash_count: 0,
         last_crash_unix: None,
         on_complete_sent_unix: None,
+        skip_review: false,
     };
 
     state.add_worker(worker_record);

@@ -101,6 +101,10 @@ pub enum Commands {
         /// Command to execute, using its output as the prompt
         #[arg(long)]
         prompt_cmd: Option<String>,
+
+        /// Skip review phase; worker returns to idle when work is complete
+        #[arg(long)]
+        skip_review: bool,
     },
 
     /// Send a message to a worker
