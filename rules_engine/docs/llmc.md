@@ -11,6 +11,9 @@ These architectural choices deliver three core benefits: improved reliability th
 - Isolated execution environments prevent interference
 - Declarative state management enables recovery
 - Human-in-the-loop review ensures quality
+- **Daemon never crashes**: The daemon is designed to stay running through any
+  transient errors. Config reload failures, state file issues, and worker start
+  failures are all logged but never terminate the daemon. Only Ctrl-C stops it.
 
 ### Key Differences from V1
 
@@ -518,6 +521,24 @@ monitored by patrol for resolution, and timeouts trigger escalation.
 The system must handle several failure modes gracefully. This section summarizes
 the recovery strategies; see `llmc2-appendix-error-recovery.md` for detailed
 decision trees.
+
+### Daemon Resilience (Never Crash)
+
+The `llmc up` daemon is designed around a "never crash" philosophy. The daemon
+main loop catches all errors and continues running. Specifically:
+
+- **Config reload failures**: If `config.toml` cannot be reloaded (e.g., syntax
+  error, file locked), the daemon continues with the existing configuration.
+- **State file errors**: If `state.json` cannot be loaded or saved, the daemon
+  logs the error and continues with the in-memory state.
+- **Worker start failures**: Individual worker failures don't affect other
+  workers. Failed workers are marked as `error` state.
+- **Lock contention**: If the state lock cannot be acquired (another command is
+  running), the daemon skips that iteration and tries again next cycle.
+
+The daemon tracks consecutive errors and warns the user if there are persistent
+issues (10+ consecutive errors), but never terminates due to these errors. Only
+Ctrl-C (graceful shutdown) stops the daemon.
 
 ### Summary Table
 
