@@ -1,5 +1,6 @@
 mod commands;
 mod config_tests;
+mod frontmatter_parser_tests;
 mod frontmatter_schema_tests;
 mod git;
 mod id;
