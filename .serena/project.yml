@@ -1,6 +1,5 @@
 languages:
 - rust
-- typescript
 
 encoding: "utf-8"
 
