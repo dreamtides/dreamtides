@@ -111,8 +111,8 @@ tests for panics and other system errors.
 Operations log to `.lattice/logs.jsonl` (JSONL format):
 
 ```json
-{"ts":"2026-01-15T10:30:00Z","level":"info","op":"show","id":"LXXXXX","duration_ms":5}
-{"ts":"2026-01-15T10:30:01Z","level":"error","op":"check","code":"E002","path":"docs/a.md"}
+{"timestamp":"2026-01-15T10:30:00Z","level":"info","category":"command","message":"lat show","duration_us":5000,"details":{"id":"LXXXXX"}}
+{"timestamp":"2026-01-15T10:30:01Z","level":"error","category":"observation","message":"Validation error E002","details":{"code":"E002","path":"docs/a.md"}}
 ```
 
 Levels: `error`, `warn`, `info`, `debug` (--verbose), `trace` (dev only).
