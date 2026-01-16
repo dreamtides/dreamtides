@@ -1,5 +1,5 @@
 use std::fs;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use std::time::{SystemTime, UNIX_EPOCH};
 
 use anyhow::{Context, Result, bail};
@@ -176,7 +176,8 @@ pub fn copy_tabula_to_worktree(repo: &Path, worktree_path: &Path) -> Result<()> 
     Ok(())
 }
 
-/// Creates .serena/project.yml in the worktree with a unique project name.
+/// Creates .serena/project.yml in the worktree with a unique project name
+/// and registers the project path in Serena's global config.
 /// This file is gitignored, so each worktree gets its own copy.
 pub fn create_serena_project(worktree_path: &Path, worker_name: &str) -> Result<()> {
     let serena_dir = worktree_path.join(".serena");
@@ -209,6 +210,9 @@ included_optional_tools: []
     fs::write(&project_yml, content).context("Failed to write .serena/project.yml")?;
     println!("Created Serena project config: dreamtides-{}", worker_name);
 
+    // Register the project in Serena's global config
+    register_serena_project(worktree_path)?;
+
     Ok(())
 }
 
@@ -217,6 +221,44 @@ pub fn is_daemon_running() -> bool {
         .ok()
         .map(|sessions| sessions.iter().any(|s| s.starts_with("llmc-")))
         .unwrap_or(false)
+}
+
+/// Registers a project path in Serena's global config
+/// (~/.serena/serena_config.yml)
+fn register_serena_project(worktree_path: &Path) -> Result<()> {
+    let home = std::env::var("HOME").context("HOME environment variable not set")?;
+    let config_path = PathBuf::from(home).join(".serena/serena_config.yml");
+
+    if !config_path.exists() {
+        return Ok(());
+    }
+
+    let content = fs::read_to_string(&config_path).context("Failed to read Serena config")?;
+    let worktree_str = worktree_path.to_string_lossy();
+
+    // Check if already registered
+    if content.contains(&*worktree_str) {
+        return Ok(());
+    }
+
+    // Find the projects: section and add the new path
+    let updated = if let Some(pos) = content.find("\nprojects:\n") {
+        let insert_pos = pos + "\nprojects:\n".len();
+        let (before, after) = content.split_at(insert_pos);
+        format!("{}- {}\n{}", before, worktree_str, after)
+    } else if let Some(pos) = content.find("projects:\n") {
+        let insert_pos = pos + "projects:\n".len();
+        let (before, after) = content.split_at(insert_pos);
+        format!("{}- {}\n{}", before, worktree_str, after)
+    } else {
+        // No projects section found, append one
+        format!("{}\nprojects:\n- {}\n", content.trim_end(), worktree_str)
+    };
+
+    fs::write(&config_path, updated).context("Failed to update Serena config")?;
+    println!("Registered project with Serena: {}", worktree_str);
+
+    Ok(())
 }
 
 fn validate_worker_name(name: &str) -> Result<()> {

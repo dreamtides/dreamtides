@@ -58,7 +58,7 @@ Foundation → Git Layer → Document Model → Index Core → CLI Framework
 
 ---
 
-## Feature: Foundation
+## Feature: Foundation [DONE]
 
 **Goal:** Core types, error handling, logging, configuration—everything needed
 before any module can function.
@@ -123,7 +123,7 @@ System](appendix_id_system.md)
 
 ---
 
-## Feature: Git Layer
+## Feature: Git Layer [ONGOING]
 
 **Goal:** Abstract git operations behind a trait for testing. Implement document
 discovery and change detection.
@@ -177,7 +177,7 @@ discovery and change detection.
 
 ---
 
-## Feature: Document Model
+## Feature: Document Model [ONGOING]
 
 **Goal:** Parse and serialize Lattice documents. Validate frontmatter fields.
 
