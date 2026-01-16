@@ -4,8 +4,8 @@ use std::time::{SystemTime, UNIX_EPOCH};
 use anyhow::{Result, bail};
 use serde::Serialize;
 
-use super::super::config;
-use super::super::state::{State, WorkerStatus};
+use crate::config::{self, Config};
+use crate::state::{self, State, WorkerRecord, WorkerStatus};
 
 /// Runs the status command, displaying the current state of all workers
 pub fn run_status(json: bool) -> Result<()> {
@@ -18,7 +18,7 @@ pub fn run_status(json: bool) -> Result<()> {
         );
     }
 
-    let (state, _config) = super::super::state::load_state_with_patrol()?;
+    let (state, config) = super::super::state::load_state_with_patrol()?;
 
     if state.workers.is_empty() {
         if json {
@@ -32,12 +32,25 @@ pub fn run_status(json: bool) -> Result<()> {
     let now = SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs();
 
     if json {
-        output_json(&state, now)?;
+        output_json(&state, &config, now)?;
     } else {
-        output_text(&state, now);
+        output_text(&state, &config, now);
     }
 
     Ok(())
+}
+
+/// Returns the effective status for display purposes.
+/// Workers in `NeedsReview` that haven't received their on_complete prompt yet
+/// are shown as `Reviewing` since they're still in the self-review phase.
+fn get_effective_status(worker: &WorkerRecord, config: &Config) -> WorkerStatus {
+    if worker.status == WorkerStatus::NeedsReview && !state::is_truly_needs_review(worker, config) {
+        // Worker is in NeedsReview but hasn't had on_complete prompt sent yet
+        // Show as Reviewing since they're in the pre-self-review phase
+        WorkerStatus::Reviewing
+    } else {
+        worker.status
+    }
 }
 
 #[derive(Serialize)]
@@ -55,21 +68,24 @@ struct WorkerStatusOutput {
     prompt_excerpt: Option<String>,
 }
 
-fn output_json(state: &State, now: u64) -> Result<()> {
+fn output_json(state: &State, config: &Config, now: u64) -> Result<()> {
     let workers: Vec<WorkerStatusOutput> = state
         .workers
         .values()
-        .map(|w| WorkerStatusOutput {
-            name: w.name.clone(),
-            status: format_status_json(w.status),
-            branch: w.branch.clone(),
-            time_in_state_secs: now.saturating_sub(w.last_activity_unix),
-            commit_sha: w.commit_sha.clone(),
-            prompt_excerpt: if w.current_prompt.is_empty() {
-                None
-            } else {
-                Some(truncate_prompt(&w.current_prompt, 50))
-            },
+        .map(|w| {
+            let effective_status = get_effective_status(w, config);
+            WorkerStatusOutput {
+                name: w.name.clone(),
+                status: format_status_json(effective_status),
+                branch: w.branch.clone(),
+                time_in_state_secs: now.saturating_sub(w.last_activity_unix),
+                commit_sha: w.commit_sha.clone(),
+                prompt_excerpt: if w.current_prompt.is_empty() {
+                    None
+                } else {
+                    Some(truncate_prompt(&w.current_prompt, 50))
+                },
+            }
         })
         .collect();
 
@@ -79,7 +95,7 @@ fn output_json(state: &State, now: u64) -> Result<()> {
     Ok(())
 }
 
-fn output_text(state: &State, now: u64) {
+fn output_text(state: &State, config: &Config, now: u64) {
     println!("WORKERS");
     println!("───────");
 
@@ -87,7 +103,8 @@ fn output_text(state: &State, now: u64) {
     workers.sort_by(|a, b| a.name.cmp(&b.name));
 
     for worker in workers {
-        let status_str = format_status_colored(worker.status);
+        let effective_status = get_effective_status(worker, config);
+        let status_str = format_status_colored(effective_status);
         let time_str = format_duration(now.saturating_sub(worker.last_activity_unix));
 
         let mut parts = vec![
@@ -101,7 +118,7 @@ fn output_text(state: &State, now: u64) {
             parts.push(format!("[{}]", &sha[..7.min(sha.len())]));
         }
 
-        if !worker.current_prompt.is_empty() && worker.status != WorkerStatus::Idle {
+        if !worker.current_prompt.is_empty() && effective_status != WorkerStatus::Idle {
             let excerpt = truncate_prompt(&worker.current_prompt, 50);
             parts.push(format!("\"{}...\"", excerpt));
         }
@@ -110,14 +127,15 @@ fn output_text(state: &State, now: u64) {
     }
 
     println!();
-    print_summary(state);
+    print_summary(state, config);
 }
 
-fn print_summary(state: &State) {
+fn print_summary(state: &State, config: &Config) {
     let mut status_counts: HashMap<WorkerStatus, usize> = HashMap::new();
     let workers: Vec<_> = state.workers.values().collect();
     for worker in workers {
-        *status_counts.entry(worker.status).or_insert(0) += 1;
+        let effective_status = get_effective_status(worker, config);
+        *status_counts.entry(effective_status).or_insert(0) += 1;
     }
 
     let total = state.workers.len();

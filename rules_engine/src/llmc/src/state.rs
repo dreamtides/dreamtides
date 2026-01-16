@@ -76,6 +76,37 @@ pub struct State {
     pub daemon_running: bool,
 }
 
+/// Returns true if a worker is truly ready for human review.
+///
+/// A worker in `NeedsReview` state is NOT ready for human review if:
+/// - It has an on_complete config (worker-level or defaults), AND
+/// - The on_complete prompt has not yet been sent (`on_complete_sent_unix` is
+///   None)
+///
+/// In this case, the worker is in a transitional state waiting for the
+/// self-review prompt to be sent.
+pub fn is_truly_needs_review(worker: &WorkerRecord, config: &Config) -> bool {
+    if worker.status != WorkerStatus::NeedsReview {
+        return false;
+    }
+
+    // Check if there's an on_complete config for this worker
+    let has_on_complete = config
+        .get_worker(&worker.name)
+        .and_then(|w| w.on_complete.as_ref())
+        .or(config.defaults.on_complete.as_ref())
+        .is_some();
+
+    // If there's no on_complete config, the worker is truly ready for review
+    if !has_on_complete {
+        return true;
+    }
+
+    // If on_complete prompt has been sent, the worker has completed self-review
+    // and is now truly ready for human review
+    worker.on_complete_sent_unix.is_some()
+}
+
 /// Validates state consistency
 pub fn validate_state(state: &State) -> Result<()> {
     let now = SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs();
@@ -200,9 +231,19 @@ impl State {
         self.workers.values().filter(|w| w.status == WorkerStatus::Idle).collect()
     }
 
-    /// Gets all workers needing review
+    /// Gets all workers with NeedsReview status (regardless of on_complete
+    /// state). Use `get_workers_truly_needing_review()` to get only workers
+    /// ready for human review.
+    #[cfg(test)]
     pub fn get_workers_needing_review(&self) -> Vec<&WorkerRecord> {
         self.workers.values().filter(|w| w.status == WorkerStatus::NeedsReview).collect()
+    }
+
+    /// Gets all workers that are truly ready for human review.
+    /// This excludes workers in `NeedsReview` state that are still waiting for
+    /// the on_complete self-review prompt to be sent.
+    pub fn get_workers_truly_needing_review(&self, config: &Config) -> Vec<&WorkerRecord> {
+        self.workers.values().filter(|w| is_truly_needs_review(w, config)).collect()
     }
 }
 

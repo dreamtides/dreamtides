@@ -38,22 +38,22 @@ LLMC v2 introduces several fundamental architectural changes from the original v
 Each worker progresses through a well-defined state machine:
 
 ```
-                      ┌─────────────────────────────────────────┐
-                      │                                         │
-                      ▼                                         │
-┌─────────┐      ┌──────────┐      ┌───────────────┐           │
-│  IDLE   │─────▶│ WORKING  │─────▶│ NEEDS_REVIEW  │───────────┤
-└─────────┘ start└──────────┘commit└───────────────┘   accept  │
-     ▲               │                    │                     │
-     │               │ no commit          │ reject              │
-     │               ▼                    ▼                     │
-     │        ┌─────────────┐      ┌──────────┐                │
-     │        │ NEEDS_INPUT │      │ REJECTED │────────────────┘
-     │        └─────────────┘      └──────────┘    completes
-     │               │                    │
-     │               │ message            │ completes
-     │               ▼                    │
-     └───────────────────────────────────-┘
+                      ┌─────────────────────────────────────────────────────┐
+                      │                                                     │
+                      ▼                                                     │
+┌─────────┐      ┌──────────┐      ┌───────────┐      ┌───────────────┐   │
+│  IDLE   │─────▶│ WORKING  │─────▶│ REVIEWING │─────▶│ NEEDS_REVIEW  │───┤
+└─────────┘ start└──────────┘commit└───────────┘amend └───────────────┘   │
+     ▲               │              on_complete              │         accept
+     │               │ no commit                             │             │
+     │               ▼                                       │ reject      │
+     │        ┌─────────────┐                          ┌──────────┐       │
+     │        │ NEEDS_INPUT │                          │ REJECTED │───────┘
+     │        └─────────────┘                          └──────────┘completes
+     │               │                                       │
+     │               │ message                               │ completes
+     │               ▼                                       │
+     └───────────────────────────────────────────────────────┘
 
 Special States:
 - REBASING: Transitional state during rebase operations
@@ -68,11 +68,28 @@ Special States:
 | `idle` | Worker has no active task, ready to receive work |
 | `working` | Worker is actively implementing a task |
 | `needs_input` | Worker stopped without committing, likely waiting for clarification |
-| `needs_review` | Worker completed work and committed, awaiting human review |
+| `reviewing` | Worker is performing self-review (on_complete prompt active) |
+| `needs_review` | Worker completed self-review, awaiting human review |
 | `rejected` | Work was rejected with feedback, worker is implementing changes |
 | `rebasing` | Worker is resolving merge conflicts after a rebase |
 | `error` | Worker is in an error state requiring manual intervention |
 | `offline` | TMUX session is not running |
+
+### Reviewing vs Needs Review
+
+When a worker completes their task and commits, they enter a self-review phase:
+
+1. **Worker commits** → Internal state transitions to `needs_review` (but displayed as `reviewing`)
+2. **On-complete prompt sent** → Worker receives self-review instructions
+3. **Worker performs self-review** → State is `reviewing`, worker is actively checking their work
+4. **Worker amends commit** → State transitions to `needs_review` (ready for human review)
+
+The `llmc status` command shows the **effective** state:
+- A worker in the pre-self-review phase (waiting for on_complete prompt) is shown as `reviewing`
+- A worker actively performing self-review is shown as `reviewing`
+- A worker who has completed self-review is shown as `needs_review`
+
+This ensures `needs_review` only appears when the worker is truly ready for human review.
 
 ## Configuration
 

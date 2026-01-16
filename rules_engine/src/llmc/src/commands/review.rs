@@ -4,8 +4,8 @@ use std::process::Command;
 
 use anyhow::{Context, Result, bail};
 
-use super::super::state::{State, WorkerStatus};
-use super::super::{config, git};
+use crate::state::{self, State, WorkerStatus};
+use crate::{config, git};
 
 #[derive(Debug, Clone, Copy)]
 pub enum ReviewInterface {
@@ -22,7 +22,7 @@ pub fn run_review(worker: Option<String>, interface: ReviewInterface) -> Result<
         std::process::exit(1);
     }
 
-    let (state, _config) = super::super::state::load_state_with_patrol()?;
+    let (state, config) = super::super::state::load_state_with_patrol()?;
 
     let worker_name = if let Some(name) = worker {
         if state.get_worker(&name).is_none() {
@@ -32,7 +32,7 @@ pub fn run_review(worker: Option<String>, interface: ReviewInterface) -> Result<
         }
         name
     } else {
-        let needs_review = state.get_workers_needing_review();
+        let needs_review = state.get_workers_truly_needing_review(&config);
         if needs_review.is_empty() {
             eprintln!("No workers need review");
             eprintln!("\nRun 'llmc status' to see current worker states.");
@@ -43,12 +43,27 @@ pub fn run_review(worker: Option<String>, interface: ReviewInterface) -> Result<
 
     let worker_record = state.get_worker(&worker_name).unwrap();
 
-    if worker_record.status != WorkerStatus::NeedsReview {
-        eprintln!(
-            "Worker '{}' is in state {:?}, not needs_review",
-            worker_name, worker_record.status
-        );
-        eprintln!("Workers needing review: {}", format_needs_review_workers(&state));
+    // Check if worker is truly ready for human review
+    if !state::is_truly_needs_review(worker_record, &config) {
+        if worker_record.status == WorkerStatus::NeedsReview {
+            // Worker is in NeedsReview but waiting for on_complete prompt
+            eprintln!(
+                "Worker '{}' is awaiting self-review (on_complete prompt not yet sent)",
+                worker_name
+            );
+            eprintln!("The worker will be ready for human review after completing self-review.");
+            eprintln!("\nRun 'llmc status' to see current worker states.");
+        } else if worker_record.status == WorkerStatus::Reviewing {
+            eprintln!("Worker '{}' is currently performing self-review", worker_name);
+            eprintln!("Wait for the worker to complete self-review before reviewing.");
+            eprintln!("\nRun 'llmc status' to see current worker states.");
+        } else {
+            eprintln!(
+                "Worker '{}' is in state {:?}, not needs_review",
+                worker_name, worker_record.status
+            );
+            eprintln!("Workers needing review: {}", format_needs_review_workers(&state, &config));
+        }
         std::process::exit(1);
     }
 
@@ -212,8 +227,8 @@ fn format_all_workers(state: &State) -> String {
     state.workers.keys().map(String::as_str).collect::<Vec<_>>().join(", ")
 }
 
-fn format_needs_review_workers(state: &State) -> String {
-    let needs_review = state.get_workers_needing_review();
+fn format_needs_review_workers(state: &State, config: &super::super::config::Config) -> String {
+    let needs_review = state.get_workers_truly_needing_review(config);
     if needs_review.is_empty() {
         return "none".to_string();
     }
