@@ -126,6 +126,15 @@ parser-test-insta *args='':
     fi
     cd rules_engine && RUST_MIN_STACK=8388608 cargo insta test --accept -p parser_v2_tests -- $TEST_THREADS "$@"
 
+lattice *args='':
+    cargo run --manifest-path rules_engine/Cargo.toml --bin lat -- "$@"
+
+lattice-test *args='':
+    cargo test --manifest-path rules_engine/Cargo.toml -p lattice_tests "$@"
+
+lattice-bench *args='':
+    cargo criterion --manifest-path rules_engine/Cargo.toml -p lattice_benchmarks -- "$@"
+
 doc:
     cargo doc --manifest-path rules_engine/Cargo.toml
 

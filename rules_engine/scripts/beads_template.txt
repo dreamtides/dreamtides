@@ -1,0 +1,122 @@
+# INTRODUCTION
+
+You are working on implementing the Lattice document management tool. The primary
+design document for Lattice is @rules_engine/docs/lattice/lattice_design.md
+
+
+# YOUR TASK
+
+{{TASK_BODY}}
+
+
+# TASK TRACKING
+
+When you discover work outside of the scope of the current session, please track it
+via the `bd` task software. If a prompt references something with a `dr-`
+prefix, like `dr-l3x`, this is a `bd` isssue id. When asked to work on a task, please
+close it when complete.
+
+## Core Rules
+- Track strategic work in beads (multi-session, dependencies, discovered work)
+- Use `bd create` for issues, TodoWrite for simple single-session execution
+- When in doubt, prefer bd—persistence you don't need beats lost context
+- Session management: check `bd ready` for available work
+
+## Essential Commands
+
+### Finding Work
+- `bd list --status=open` - All open issues
+- `bd list --status=in_progress` - Your active work
+- `bd show <id>` - Detailed issue view with dependencies
+
+### Creating & Updating
+- `bd create --title="..." --type=task|bug|feature --priority=2` - New issue
+  - Priority: 0-4 or P0-P4 (0=critical, 2=medium, 4=backlog). NOT "high"/"medium"/"low"
+- `bd update <id> --status=in_progress` - Claim work
+- `bd update <id> --assignee=username` - Assign to someone
+- `bd close <id>` - Mark complete
+- `bd close <id1> <id2> ...` - Close multiple issues at once (more efficient)
+- `bd close <id> --reason="explanation"` - Close with reason
+
+### Dependencies & Blocking
+- `bd dep add <issue> <depends-on>` - Add dependency (issue depends on depends-on)
+- `bd blocked` - Show all blocked issues
+- `bd show <id>` - See what's blocking/blocked by this issue
+
+### Sync & Collaboration
+
+DO NOT RUN `bd sync` ever. We do not use this workflow.
+
+**Completing work:**
+```bash
+bd close <id1> <id2> ...    # Close all completed issues at once
+```
+
+**Creating dependent work:**
+```bash
+# Run bd create commands in parallel (use subagents for many items)
+bd create --title="Implement feature X" --type=feature
+bd create --title="Write tests for X" --type=task
+bd dep add beads-yyy beads-xxx  # Tests depend on Feature (Feature blocks tests)
+```
+
+
+# ACCEPTANCE CRITERIA
+
+Please use the TodoWrite tool to track progress on this task and adherence to acceptance criteria.
+
+## Code Style
+
+Please follow all code style rules in AGENTS.md, in particular:
+
+- Function calls and enum values have exactly one qualifier, struct names and enum types have zero qualifiers
+- Do not "pub use" anything
+- Do not add code to `mod.rs` or `lib.rs` files except for module declarations
+- Do not add `use` declarations within function bodies, only place them at the top of files
+
+## Code Review
+
+Once complete, please perform a review of your work against the code review guidelines
+in @rules_engine/docs/lattice/appendix_code_review.md, in particular:
+
+- **Classify errors:** Expected errors (user's fault) return `LatticeError`;
+  system errors (Lattice's fault) use `panic!`
+- **No silent failures:** Every significant action must be logged via `tracing`
+- **High quality logs:** Always analyze logs for usefulness
+- **Atomic operations:** Multi-step changes use temp file + rename; partial
+  failures leave consistent state
+- **Concurrency safe:** Handle concurrent `lat` invocations, TOCTOU races,
+  SQLite WAL
+- **Performance aware:** No O(n²) algorithms; batch git operations; use indices
+- **Test expected errors:** Each `LatticeError` variant should have test
+  coverage
+- **High quality tests:** Tests are not repetitive and have good assertion messages
+- **Avoid `.unwrap()`:** Use `.ok_or(LatticeError::...)?` or explicit panic with
+  reason
+- **Keep it small:** Functions under 50 lines, files under 500 lines
+- **Avoid code duplication:** Search for opportunities to factor out shared code
+- **Ensure docs are updated:** Verify relevant markdown documentation is
+  still accurate
+
+## File Follow-up tasks
+
+If there is work remaining for this task or you notice a problem elsewhere, please
+file a new task via `bd create`.
+
+Do not modify files outside of your task scope, file beads to track issues instead.
+
+## Formatting, Linting, and Checking
+
+When work is complete, please run `just fmt` and then `just review` to validate your changes.
+
+## Create git commit
+
+After completing all of the above steps, please create a git commit with a detailed description
+of your changes. When asked to modify your work, please amend this commit.
+
+
+## Testing Instructions
+
+After completing work, please mark the bead closed and update its text with a
+'# MANUAL TESTING INSTRUCTIONS' section, with short (<10 lines) instructions
+on how to manually verify your changes.
