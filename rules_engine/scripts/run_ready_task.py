@@ -30,7 +30,7 @@ def run_command(args: list[str], capture: bool = True) -> subprocess.CompletedPr
 
 
 def find_ready_task() -> dict | None:
-    """Find a ready task under dr-epv."""
+    """Find a ready task under dr-epv that is not already in_progress."""
     result = run_command(["bd", "ready", "--parent=dr-epv", "--type=task", "--json"])
     if result.returncode != 0:
         print(f"Error finding ready task: {result.stderr}", file=sys.stderr)
@@ -43,10 +43,12 @@ def find_ready_task() -> dict | None:
 
     try:
         tasks = json.loads(output)
-        if not tasks:
-            print("No ready tasks found under dr-epv", file=sys.stderr)
+        # Filter out tasks that are already in_progress
+        open_tasks = [t for t in tasks if t.get("status") != "in_progress"]
+        if not open_tasks:
+            print("No ready tasks found under dr-epv (all ready tasks are in_progress)", file=sys.stderr)
             return None
-        return tasks[0]
+        return open_tasks[0]
     except json.JSONDecodeError as e:
         print(f"Error parsing task list: {e}", file=sys.stderr)
         return None
@@ -112,7 +114,7 @@ def main():
             sys.exit(0)
 
     # Step 4: Mark task as in_progress so it no longer appears in bd ready
-    result = run_command(["bd", "update", task_id, "--status=in_progress"])
+    result = run_command(["bd", "update", task_id, "--status", "in_progress"])
     if result.returncode != 0:
         print(f"Warning: Failed to mark task as in_progress: {result.stderr}", file=sys.stderr)
 
