@@ -298,14 +298,22 @@ fn run_main_loop(
     while !shutdown.load(Ordering::SeqCst) {
         thread::sleep(Duration::from_secs(1));
 
-        {
-            let _lock = StateLock::acquire()?;
-            // Reload state to pick up changes from other commands (e.g., llmc start)
-            *state = State::load(state_path)?;
+        // Try to acquire the state lock - if we can't, another command is running
+        // and we should just skip this iteration. The daemon should never crash
+        // due to lock contention.
+        match StateLock::acquire() {
+            Ok(_lock) => {
+                // Reload state to pick up changes from other commands (e.g., llmc start)
+                *state = State::load(state_path)?;
 
-            poll_worker_states(state)?;
-            start_offline_workers(&mut config, state, verbose)?;
-            state.save(state_path)?;
+                poll_worker_states(state)?;
+                start_offline_workers(&mut config, state, verbose)?;
+                state.save(state_path)?;
+            }
+            Err(e) => {
+                // Log at debug level since this is expected when other commands are running
+                tracing::debug!("Skipping main loop iteration - failed to acquire lock: {}", e);
+            }
         }
 
         if !no_patrol
