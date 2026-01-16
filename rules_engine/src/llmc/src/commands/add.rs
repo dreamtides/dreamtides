@@ -69,6 +69,7 @@ pub fn run_add(
     create_branch(&llmc_root, &branch_name)?;
     create_worktree_for_worker(&llmc_root, &branch_name, &worktree_path)?;
     copy_tabula_to_worktree(&llmc_root, &worktree_path)?;
+    create_serena_project(&worktree_path, name)?;
 
     let now = SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs();
     let worker_record = WorkerRecord {
@@ -146,6 +147,7 @@ pub fn recreate_missing_worktree(
     create_branch(&llmc_root, branch_name)?;
     create_worktree_for_worker(&llmc_root, branch_name, worktree_path)?;
     copy_tabula_to_worktree(&llmc_root, worktree_path)?;
+    create_serena_project(worktree_path, worker_name)?;
 
     Ok(())
 }
@@ -170,6 +172,42 @@ pub fn copy_tabula_to_worktree(repo: &Path, worktree_path: &Path) -> Result<()> 
     }
 
     fs::copy(&source_tabula, &target_tabula).context("Failed to copy Tabula.xlsm to worktree")?;
+
+    Ok(())
+}
+
+/// Creates .serena/project.yml in the worktree with a unique project name.
+/// This file is gitignored, so each worktree gets its own copy.
+pub fn create_serena_project(worktree_path: &Path, worker_name: &str) -> Result<()> {
+    let serena_dir = worktree_path.join(".serena");
+    let project_yml = serena_dir.join("project.yml");
+
+    fs::create_dir_all(&serena_dir).context("Failed to create .serena directory")?;
+
+    let content = format!(
+        r#"languages:
+- rust
+
+encoding: "utf-8"
+
+ignore_all_files_in_gitignore: true
+
+ignored_paths: []
+
+read_only: false
+
+excluded_tools: []
+
+initial_prompt: ""
+
+project_name: "dreamtides-{}"
+included_optional_tools: []
+"#,
+        worker_name
+    );
+
+    fs::write(&project_yml, content).context("Failed to write .serena/project.yml")?;
+    println!("Created Serena project config: dreamtides-{}", worker_name);
 
     Ok(())
 }

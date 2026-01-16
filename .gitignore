@@ -21,3 +21,6 @@ state.json
 
 # bv (beads viewer) local config and caches
 .bv/
+
+# Serena (per-worktree config, created by llmc)
+.serena/

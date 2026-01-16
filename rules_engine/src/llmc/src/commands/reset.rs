@@ -110,6 +110,9 @@ fn reset_worker(state: &mut State, llmc_root: &Path, worker: &str, yes: bool) ->
     // Copy Tabula.xlsm
     add::copy_tabula_to_worktree(llmc_root, &worktree_path)?;
 
+    // Create Serena project config
+    add::create_serena_project(&worktree_path, worker)?;
+
     // Reset worker state
     let worker_mut = state.get_worker_mut(worker).unwrap();
     worker_mut.status = WorkerStatus::Idle;
