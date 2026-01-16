@@ -233,6 +233,22 @@ pub fn get_merge_base(worktree: &Path, ref1: &str, ref2: &str) -> Result<String>
     Ok(String::from_utf8(output.stdout)?.trim().to_string())
 }
 
+/// Checks if `ancestor` is an ancestor of `descendant`
+pub fn is_ancestor(worktree: &Path, ancestor: &str, descendant: &str) -> Result<bool> {
+    let output = Command::new("git")
+        .arg("-C")
+        .arg(worktree)
+        .arg("merge-base")
+        .arg("--is-ancestor")
+        .arg(ancestor)
+        .arg(descendant)
+        .output()
+        .context("Failed to execute git merge-base --is-ancestor")?;
+
+    // --is-ancestor exits 0 if true, 1 if false, other codes for errors
+    Ok(output.status.success())
+}
+
 /// Checks if the worktree has commits ahead of the given ref
 pub fn has_commits_ahead_of(worktree: &Path, base_ref: &str) -> Result<bool> {
     let head = get_head_commit(worktree)?;

@@ -169,6 +169,56 @@ impl Patrol {
             if worker_status == WorkerStatus::Idle {
                 match git::has_commits_ahead_of(worktree_path, "origin/master") {
                     Ok(true) => {
+                        // Check if origin/master is an ancestor of HEAD. If not, the histories
+                        // have diverged (e.g., due to external amend/rebase of the source repo).
+                        // In that case, rebase the idle worker instead of transitioning to
+                        // needs_review.
+                        let is_linear = git::is_ancestor(worktree_path, "origin/master", "HEAD")
+                            .unwrap_or(false);
+                        if !is_linear {
+                            tracing::info!(
+                                "Worker '{}' is idle with diverged history (origin/master not an ancestor of HEAD), rebasing to sync",
+                                worker_name
+                            );
+                            match git::rebase_onto(worktree_path, "origin/master") {
+                                Ok(result) if result.success => {
+                                    tracing::info!(
+                                        "Successfully rebased idle worker '{}' onto origin/master",
+                                        worker_name
+                                    );
+                                }
+                                Ok(result) => {
+                                    // Rebase had conflicts - this shouldn't happen for an idle
+                                    // worker with no changes. Mark as error.
+                                    tracing::error!(
+                                        "Rebase of idle worker '{}' had conflicts: {:?}",
+                                        worker_name,
+                                        result.conflicts
+                                    );
+                                    let transition = WorkerTransition::ToError {
+                                        reason: format!(
+                                            "Unexpected conflicts when rebasing idle worker: {:?}",
+                                            result.conflicts
+                                        ),
+                                    };
+                                    if let Some(worker_mut) = state.get_worker_mut(&worker_name) {
+                                        worker::apply_transition(worker_mut, transition.clone())?;
+                                        report
+                                            .transitions_applied
+                                            .push((worker_name.clone(), transition));
+                                    }
+                                }
+                                Err(e) => {
+                                    tracing::warn!(
+                                        "Failed to rebase idle worker '{}': {}",
+                                        worker_name,
+                                        e
+                                    );
+                                }
+                            }
+                            continue;
+                        }
+
                         tracing::info!(
                             "Worker '{}' is idle but has commits ahead of master, transitioning to needs_review",
                             worker_name
