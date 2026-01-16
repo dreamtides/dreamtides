@@ -1,0 +1,15 @@
+mod check_tests;
+mod claim_tests;
+mod close_tests;
+mod create_tests;
+mod dep_tests;
+mod fmt_tests;
+mod label_tests;
+mod list_tests;
+mod mv_tests;
+mod overview_tests;
+mod ready_tests;
+mod search_tests;
+mod show_tests;
+mod stats_tests;
+mod update_tests;

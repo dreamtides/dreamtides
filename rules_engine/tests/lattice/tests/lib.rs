@@ -1,1 +1,3 @@
-mod lattice;
+mod commands;
+mod index;
+mod integration;

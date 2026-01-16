@@ -1,1 +1,12 @@
+pub mod client_counters;
+pub mod connection_pool;
+pub mod content_cache;
+pub mod directory_roots;
+pub mod document_queries;
+pub mod fulltext_search;
+pub mod index_metadata;
+pub mod label_queries;
+pub mod link_queries;
 pub mod reconciliation;
+pub mod schema_definition;
+pub mod view_tracking;
