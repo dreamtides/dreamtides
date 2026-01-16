@@ -21,6 +21,8 @@ pub enum WorkerTransition {
     ToWorking { prompt: String },
     /// Transition to needs review state with the commit SHA
     ToNeedsReview { commit_sha: String },
+    /// Transition to reviewing state (on_complete prompt sent)
+    ToReviewing,
     /// Transition to rejected state with feedback
     ToRejected { feedback: String },
     /// Transition to rebasing state
@@ -40,11 +42,19 @@ pub fn can_transition(from: &WorkerStatus, to: &WorkerStatus) -> bool {
                 WorkerStatus::Idle
                     | WorkerStatus::Working
                     | WorkerStatus::Rejected
-                    | WorkerStatus::Rebasing,
+                    | WorkerStatus::Rebasing
+                    | WorkerStatus::Reviewing,
                 WorkerStatus::NeedsReview
             )
-            | (WorkerStatus::NeedsReview | WorkerStatus::Rejected, WorkerStatus::Idle)
-            | (WorkerStatus::NeedsReview | WorkerStatus::Rebasing, WorkerStatus::Rejected)
+            | (WorkerStatus::NeedsReview, WorkerStatus::Reviewing)
+            | (
+                WorkerStatus::NeedsReview | WorkerStatus::Reviewing | WorkerStatus::Rejected,
+                WorkerStatus::Idle
+            )
+            | (
+                WorkerStatus::NeedsReview | WorkerStatus::Reviewing | WorkerStatus::Rebasing,
+                WorkerStatus::Rejected
+            )
             | (WorkerStatus::Error, WorkerStatus::NeedsReview | WorkerStatus::Idle)
             | (_, WorkerStatus::Rebasing | WorkerStatus::Error | WorkerStatus::Offline)
     )
@@ -65,6 +75,7 @@ pub fn apply_transition(worker: &mut WorkerRecord, transition: WorkerTransition)
             WorkerStatus::NeedsReview
         }
         WorkerTransition::ToRejected { .. } => WorkerStatus::Rejected,
+        WorkerTransition::ToReviewing => WorkerStatus::Reviewing,
         WorkerTransition::ToRebasing => WorkerStatus::Rebasing,
         WorkerTransition::ToError { .. } => WorkerStatus::Error,
         WorkerTransition::ToOffline => WorkerStatus::Offline,
@@ -374,5 +385,41 @@ mod tests {
         let old_status = worker.status;
         apply_transition(&mut worker, WorkerTransition::None).unwrap();
         assert_eq!(worker.status, old_status);
+    }
+    #[test]
+    fn test_can_transition_needs_review_to_reviewing() {
+        assert!(can_transition(&WorkerStatus::NeedsReview, &WorkerStatus::Reviewing));
+    }
+    #[test]
+    fn test_can_transition_reviewing_to_needs_review() {
+        assert!(can_transition(&WorkerStatus::Reviewing, &WorkerStatus::NeedsReview));
+    }
+    #[test]
+    fn test_can_transition_reviewing_to_idle() {
+        assert!(can_transition(&WorkerStatus::Reviewing, &WorkerStatus::Idle));
+    }
+    #[test]
+    fn test_can_transition_reviewing_to_rejected() {
+        assert!(can_transition(&WorkerStatus::Reviewing, &WorkerStatus::Rejected));
+    }
+    #[test]
+    fn test_apply_transition_to_reviewing() {
+        let mut worker = WorkerRecord {
+            name: "test".to_string(),
+            worktree_path: "/tmp/test".to_string(),
+            branch: "llmc/test".to_string(),
+            status: WorkerStatus::NeedsReview,
+            current_prompt: "Test prompt".to_string(),
+            created_at_unix: 1000000000,
+            last_activity_unix: 1000000000,
+            commit_sha: Some("abc123".to_string()),
+            session_id: "llmc-test".to_string(),
+            crash_count: 0,
+            last_crash_unix: None,
+            on_complete_sent_unix: None,
+        };
+        apply_transition(&mut worker, WorkerTransition::ToReviewing).unwrap();
+        assert_eq!(worker.status, WorkerStatus::Reviewing);
+        assert_eq!(worker.commit_sha, Some("abc123".to_string()));
     }
 }

@@ -50,6 +50,7 @@ impl Patrol {
         self.check_state_consistency(state, &mut report)?;
         self.detect_state_transitions(state, config, &mut report)?;
         self.send_pending_on_complete_prompts(state, config)?;
+        self.detect_reviewing_amendments(state, &mut report)?;
 
         let transitioned_workers: std::collections::HashSet<String> =
             report.transitions_applied.iter().map(|(name, _)| name.clone()).collect();
@@ -436,6 +437,83 @@ impl Patrol {
                     worker_name,
                     e
                 );
+            } else if let Some(w) = state.get_worker_mut(&worker_name) {
+                if let Err(e) = worker::apply_transition(w, WorkerTransition::ToReviewing) {
+                    tracing::error!(
+                        "Failed to transition worker '{}' to Reviewing: {}",
+                        worker_name,
+                        e
+                    );
+                } else {
+                    tracing::info!("Worker '{}' transitioned to Reviewing state", worker_name);
+                    let state_path = state::get_state_path();
+                    if let Err(e) = state.save(&state_path) {
+                        tracing::error!(
+                            "Failed to save state after transitioning '{}' to Reviewing: {}",
+                            worker_name,
+                            e
+                        );
+                    }
+                }
+            }
+        }
+
+        Ok(())
+    }
+
+    fn detect_reviewing_amendments(
+        &self,
+        state: &mut State,
+        report: &mut PatrolReport,
+    ) -> Result<()> {
+        let worker_names: Vec<String> = state.workers.keys().cloned().collect();
+
+        for worker_name in worker_names {
+            let worker = state.get_worker(&worker_name).unwrap();
+
+            if worker.status != WorkerStatus::Reviewing {
+                continue;
+            }
+
+            let Some(stored_sha) = &worker.commit_sha else {
+                tracing::warn!(
+                    "Worker '{}' in Reviewing state has no stored commit_sha",
+                    worker_name
+                );
+                continue;
+            };
+
+            let worktree_path = PathBuf::from(&worker.worktree_path);
+            let current_sha = match git::get_head_commit(&worktree_path) {
+                Ok(sha) => sha,
+                Err(e) => {
+                    tracing::warn!("Failed to get HEAD commit for worker '{}': {}", worker_name, e);
+                    continue;
+                }
+            };
+
+            if &current_sha != stored_sha {
+                tracing::info!(
+                    "Worker '{}' commit SHA changed from {} to {} - transitioning back to NeedsReview",
+                    worker_name,
+                    &stored_sha[..7.min(stored_sha.len())],
+                    &current_sha[..7.min(current_sha.len())]
+                );
+
+                let transition = WorkerTransition::ToNeedsReview { commit_sha: current_sha };
+                if let Some(w) = state.get_worker_mut(&worker_name) {
+                    if let Err(e) = worker::apply_transition(w, transition.clone()) {
+                        report.errors.push(format!(
+                            "Failed to transition worker '{}' from Reviewing to NeedsReview: {}",
+                            worker_name, e
+                        ));
+                    } else {
+                        report.transitions_applied.push((worker_name.clone(), transition));
+                        let _ = sound::play_bell(&crate::config::Config::load(
+                            &crate::config::get_config_path(),
+                        )?);
+                    }
+                }
             }
         }
 

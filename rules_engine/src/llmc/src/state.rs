@@ -19,6 +19,8 @@ pub enum WorkerStatus {
     Working,
     /// Worker completed work and committed, awaiting human review
     NeedsReview,
+    /// Worker received on_complete prompt and is performing self-review
+    Reviewing,
     /// Work was rejected with feedback, worker is implementing changes
     Rejected,
     /// Worker is resolving merge conflicts after a rebase
@@ -375,6 +377,7 @@ mod tests {
             (WorkerStatus::Idle, "\"idle\""),
             (WorkerStatus::Working, "\"working\""),
             (WorkerStatus::NeedsReview, "\"needs_review\""),
+            (WorkerStatus::Reviewing, "\"reviewing\""),
             (WorkerStatus::Rejected, "\"rejected\""),
             (WorkerStatus::Rebasing, "\"rebasing\""),
             (WorkerStatus::Error, "\"error\""),
