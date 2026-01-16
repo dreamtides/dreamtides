@@ -107,7 +107,7 @@ fn default_allowed_tools() -> Vec<String> {
 }
 
 fn default_patrol_interval_secs() -> u32 {
-    60
+    30
 }
 
 fn default_sound_on_review() -> bool {

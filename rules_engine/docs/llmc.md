@@ -407,6 +407,32 @@ llmc rebase adam
 Fetches latest master, attempts rebase. If conflicts occur, marks worker as
 `rebasing` and sends conflict resolution prompt to worker.
 
+### `llmc reset <worker>`
+
+Resets a worker to clean idle state by completely tearing down and rebuilding
+its worktree and session.
+
+```bash
+llmc reset adam
+llmc reset adam --yes  # Skip confirmation
+```
+
+This command performs a complete teardown and rebuild:
+- Kills the TMUX session
+- Removes the worktree completely
+- Deletes the branch
+- Creates a new branch from origin/master
+- Creates a new worktree
+- Copies Tabula.xlsm
+- Resets worker state to Idle
+- Starts a new TMUX session (if daemon is running)
+
+Configuration in config.toml is preserved. Any uncommitted work will be LOST.
+
+This is more destructive than `llmc doctor --repair`, which only cleans up git
+state without removing the worktree. Use `reset` when you want a completely
+fresh environment for the worker.
+
 ### `llmc doctor`
 
 Runs health checks on the system.
