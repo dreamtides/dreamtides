@@ -7,6 +7,7 @@ use anyhow::{Context, Result, bail};
 
 use super::super::config::{self as config, Config};
 use super::super::git;
+use super::super::lock::StateLock;
 use super::super::state::{self, State, WorkerStatus};
 use super::super::tmux::session;
 use super::add;
@@ -24,6 +25,7 @@ pub fn run_nuke(worker: Option<&str>, all: bool, reset: bool) -> Result<()> {
     if reset && all {
         bail!("Cannot specify both --reset and --all");
     }
+    let _lock = StateLock::acquire()?;
     let state_path = state::get_state_path();
     let mut state = State::load(&state_path)?;
     if all {

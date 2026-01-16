@@ -7,6 +7,7 @@ use std::time::{Duration, SystemTime, UNIX_EPOCH};
 use anyhow::{Context, Result, bail};
 
 use super::super::config::{self, Config};
+use super::super::lock::StateLock;
 use super::super::patrol::Patrol;
 use super::super::state::{self, State, WorkerStatus};
 use super::super::tmux::session;
@@ -297,12 +298,15 @@ fn run_main_loop(
     while !shutdown.load(Ordering::SeqCst) {
         thread::sleep(Duration::from_secs(1));
 
-        // Reload state to pick up changes from other commands (e.g., llmc start)
-        *state = State::load(state_path)?;
+        {
+            let _lock = StateLock::acquire()?;
+            // Reload state to pick up changes from other commands (e.g., llmc start)
+            *state = State::load(state_path)?;
 
-        poll_worker_states(state)?;
-        start_offline_workers(&mut config, state, verbose)?;
-        state.save(state_path)?;
+            poll_worker_states(state)?;
+            start_offline_workers(&mut config, state, verbose)?;
+            state.save(state_path)?;
+        }
 
         if !no_patrol
             && SystemTime::now().duration_since(last_patrol).unwrap_or_default() >= patrol_interval
