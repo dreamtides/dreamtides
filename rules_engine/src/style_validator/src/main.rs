@@ -7,6 +7,7 @@ mod code_order;
 mod direct_function_imports;
 mod doc_comment_links;
 mod file_scanner;
+mod inline_tests;
 mod inline_use_statements;
 mod mod_lib_files;
 mod pub_use;
@@ -85,6 +86,15 @@ fn main() -> Result<()> {
         }
 
         match doc_comment_links::check_file(file) {
+            Ok(violations) => {
+                all_violations.extend(violations);
+            }
+            Err(e) => {
+                eprintln!("Error checking {}: {}", file.display(), e);
+            }
+        }
+
+        match inline_tests::check_file(file, rules_engine_path) {
             Ok(violations) => {
                 all_violations.extend(violations);
             }

@@ -22,6 +22,7 @@ pub enum ViolationKind {
     InlineUseStatement,
     CodeOrder,
     MissingDocCommentImport,
+    InlineTestModule,
 }
 
 impl ViolationKind {
@@ -56,6 +57,9 @@ impl ViolationKind {
             }
             ViolationKind::MissingDocCommentImport => {
                 "doc comment references type not imported in use statements"
+            }
+            ViolationKind::InlineTestModule => {
+                "inline test module not permitted (place tests in the /tests/ directory instead)"
             }
         }
     }
