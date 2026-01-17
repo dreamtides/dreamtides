@@ -178,13 +178,35 @@ fn reconcile_and_start_workers(config: &Config, state: &mut State, verbose: bool
         }
     }
 
+    // Track worker start failures - individual failures don't crash the daemon
+    let mut failed_workers: Vec<String> = Vec::new();
+
     for worker_name in &worker_names {
         if let Some(worker_record) = state.workers.get(worker_name)
             && worker_record.status == WorkerStatus::Offline
         {
             println!("  Starting worker '{}'...", worker_name);
-            start_worker(worker_name, config, state, verbose)?;
+            // Individual worker start failure shouldn't crash the daemon
+            if let Err(e) = start_worker(worker_name, config, state, verbose) {
+                tracing::error!("Failed to start worker '{}': {}", worker_name, e);
+                eprintln!("  ⚠ Failed to start worker '{}': {}", worker_name, e);
+                failed_workers.push(worker_name.clone());
+                // Mark as error so it doesn't keep retrying
+                if let Some(worker_mut) = state.get_worker_mut(worker_name) {
+                    worker_mut.status = WorkerStatus::Error;
+                    worker_mut.last_activity_unix = unix_timestamp_now();
+                }
+            }
         }
+    }
+
+    if !failed_workers.is_empty() {
+        eprintln!(
+            "  ⚠ {} worker(s) failed to start: {}",
+            failed_workers.len(),
+            failed_workers.join(", ")
+        );
+        eprintln!("    Run 'llmc doctor --repair' to fix or 'llmc reset <worker>' to recreate");
     }
 
     Ok(())
