@@ -16,6 +16,10 @@ pub struct GlobalOptions {
     /// Suppress non-error output.
     #[arg(long, short = 'q', global = true)]
     pub quiet: bool,
+
+    /// Skip startup operations (debugging only).
+    #[arg(long, global = true, hide = true)]
+    pub no_startup: bool,
 }
 
 impl GlobalOptions {

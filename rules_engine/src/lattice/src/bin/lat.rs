@@ -1,7 +1,9 @@
-use lattice::cli::argument_parser;
+use std::process::ExitCode;
 
-fn main() {
+use lattice::cli::{argument_parser, command_dispatch};
+
+fn main() -> ExitCode {
     human_panic::setup_panic!();
-    let _args = argument_parser::parse();
-    println!("Lattice: command dispatch not yet implemented");
+    let args = argument_parser::parse();
+    command_dispatch::run(args)
 }
