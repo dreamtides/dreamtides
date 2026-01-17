@@ -1,22 +1,29 @@
 #!/usr/bin/env python3
 """
-Find a ready task and run it as an LLMC prompt.
+Find a ready task and run it as an LLMC prompt, or accept completed work.
 
 Usage:
     ./run_ready_task.py              # Shows task summary and asks for confirmation
     ./run_ready_task.py --immediate  # Skips confirmation and starts immediately
+    ./run_ready_task.py accept       # Accept the only worker with an assigned bead
+    ./run_ready_task.py accept <worker>  # Accept a specific worker's work
 """
 
 import argparse
 import json
 import subprocess
 import sys
+from pathlib import Path
+
+LLMC_DIR = Path.home() / "llmc"
+BEAD_ASSIGNMENTS_FILE = LLMC_DIR / "bead_assignments.json"
 
 
 class Colors:
     GREEN = "\033[32m"
     YELLOW = "\033[33m"
     CYAN = "\033[36m"
+    RED = "\033[31m"
     RESET = "\033[0m"
     BOLD = "\033[1m"
 
@@ -27,6 +34,58 @@ def run_command(args: list[str], capture: bool = True) -> subprocess.CompletedPr
         return subprocess.run(args, capture_output=True, text=True)
     else:
         return subprocess.run(args)
+
+
+def load_bead_assignments() -> dict[str, str]:
+    """Load the bead assignments from disk."""
+    if not BEAD_ASSIGNMENTS_FILE.exists():
+        return {}
+    try:
+        with open(BEAD_ASSIGNMENTS_FILE) as f:
+            return json.load(f)
+    except (json.JSONDecodeError, IOError):
+        return {}
+
+
+def save_bead_assignments(assignments: dict[str, str]) -> None:
+    """Save the bead assignments to disk."""
+    BEAD_ASSIGNMENTS_FILE.parent.mkdir(parents=True, exist_ok=True)
+    with open(BEAD_ASSIGNMENTS_FILE, "w") as f:
+        json.dump(assignments, f, indent=2)
+
+
+def get_assigned_worker(worker: str | None) -> tuple[str, str] | None:
+    """
+    Get the worker and bead ID to accept.
+
+    If worker is specified, return that worker's assignment.
+    If not specified and exactly one worker has an assignment, return that.
+    Otherwise return None.
+    """
+    assignments = load_bead_assignments()
+
+    if not assignments:
+        print(f"{Colors.RED}No bead assignments found.{Colors.RESET}", file=sys.stderr)
+        return None
+
+    if worker:
+        if worker not in assignments:
+            print(f"{Colors.RED}Worker '{worker}' has no assigned bead.{Colors.RESET}", file=sys.stderr)
+            print(f"Workers with assignments: {', '.join(assignments.keys())}", file=sys.stderr)
+            return None
+        return (worker, assignments[worker])
+
+    # No worker specified - check if exactly one assignment exists
+    if len(assignments) == 1:
+        worker, bead_id = next(iter(assignments.items()))
+        return (worker, bead_id)
+
+    # Multiple assignments - user must specify
+    print(f"{Colors.RED}Multiple workers have bead assignments. Please specify a worker.{Colors.RESET}", file=sys.stderr)
+    print(f"Workers with assignments:", file=sys.stderr)
+    for w, b in assignments.items():
+        print(f"  {w}: {b}", file=sys.stderr)
+    return None
 
 
 def find_ready_task() -> dict | None:
@@ -73,8 +132,30 @@ def confirm_start() -> bool:
         return False
 
 
-def run_llmc(task_id: str) -> int:
-    """Run LLMC with the task as prompt."""
+def get_started_worker() -> str | None:
+    """Get the worker that was started by parsing llmc start output."""
+    # We'll capture the worker name from llmc status after starting
+    result = run_command(["just", "llmc", "status", "--json"])
+    if result.returncode != 0:
+        return None
+
+    try:
+        data = json.loads(result.stdout)
+        workers = data.get("workers", [])
+        # Find the most recently started working worker
+        for worker in workers:
+            if worker.get("status") == "working":
+                return worker.get("name")
+    except json.JSONDecodeError:
+        pass
+    return None
+
+
+def run_llmc(task_id: str) -> tuple[int, str | None]:
+    """
+    Run LLMC with the task as prompt.
+    Returns (return_code, worker_name).
+    """
     cmd = [
         "just", "llmc", "start",
         "--self-review",
@@ -83,23 +164,22 @@ def run_llmc(task_id: str) -> int:
     ]
     print(f"\n{Colors.CYAN}Running: {' '.join(cmd)}{Colors.RESET}\n")
     result = run_command(cmd, capture=False)
-    return result.returncode
+
+    # Get the worker that was assigned
+    worker = None
+    if result.returncode == 0:
+        worker = get_started_worker()
+
+    return result.returncode, worker
 
 
-def main():
-    parser = argparse.ArgumentParser(description="Find a ready task and run it as an LLMC prompt")
-    parser.add_argument(
-        "--immediate",
-        action="store_true",
-        help="Skip confirmation and start immediately"
-    )
-    args = parser.parse_args()
-
+def cmd_start(args: argparse.Namespace) -> int:
+    """Handle the start command (default behavior)."""
     # Step 1: Find a ready task
     print(f"{Colors.BOLD}Finding ready task under dr-epv...{Colors.RESET}")
     task = find_ready_task()
     if not task:
-        sys.exit(1)
+        return 1
 
     task_id = task["id"]
 
@@ -111,7 +191,7 @@ def main():
     if not args.immediate:
         if not confirm_start():
             print("Cancelled.")
-            sys.exit(0)
+            return 0
 
     # Step 4: Mark task as in_progress so it no longer appears in bd ready
     result = run_command(["bd", "update", task_id, "--status", "in_progress"])
@@ -119,7 +199,91 @@ def main():
         print(f"Warning: Failed to mark task as in_progress: {result.stderr}", file=sys.stderr)
 
     # Step 5: Run LLMC
-    sys.exit(run_llmc(task_id))
+    returncode, worker = run_llmc(task_id)
+
+    # Step 6: Save the bead assignment if successful
+    if returncode == 0 and worker:
+        assignments = load_bead_assignments()
+        assignments[worker] = task_id
+        save_bead_assignments(assignments)
+        print(f"{Colors.GREEN}Assigned bead {task_id} to worker {worker}{Colors.RESET}")
+
+    return returncode
+
+
+def cmd_accept(args: argparse.Namespace) -> int:
+    """Handle the accept command."""
+    assignment = get_assigned_worker(args.worker)
+    if not assignment:
+        return 1
+
+    worker, bead_id = assignment
+
+    print(f"{Colors.BOLD}Accepting work from {worker} (bead: {bead_id})...{Colors.RESET}")
+
+    # Run llmc accept
+    cmd = ["just", "llmc", "accept", worker]
+    print(f"{Colors.CYAN}Running: {' '.join(cmd)}{Colors.RESET}\n")
+    result = run_command(cmd, capture=False)
+
+    if result.returncode != 0:
+        print(f"\n{Colors.RED}Accept failed. Bead {bead_id} NOT closed.{Colors.RESET}", file=sys.stderr)
+        return result.returncode
+
+    # Accept succeeded - close the bead
+    print(f"\n{Colors.BOLD}Closing bead {bead_id}...{Colors.RESET}")
+    close_result = run_command(["bd", "close", bead_id])
+    if close_result.returncode != 0:
+        print(f"{Colors.RED}Warning: Failed to close bead: {close_result.stderr}{Colors.RESET}", file=sys.stderr)
+    else:
+        print(f"{Colors.GREEN}Closed bead {bead_id}{Colors.RESET}")
+
+    # Remove the assignment
+    assignments = load_bead_assignments()
+    if worker in assignments:
+        del assignments[worker]
+        save_bead_assignments(assignments)
+
+    return 0
+
+
+def main():
+    parser = argparse.ArgumentParser(
+        description="Find a ready task and run it as an LLMC prompt, or accept completed work"
+    )
+    subparsers = parser.add_subparsers(dest="command")
+
+    # Start command (implicit default)
+    start_parser = subparsers.add_parser("start", help="Start a new task (default)")
+    start_parser.add_argument(
+        "--immediate",
+        action="store_true",
+        help="Skip confirmation and start immediately"
+    )
+
+    # Accept command
+    accept_parser = subparsers.add_parser("accept", help="Accept a worker's completed work")
+    accept_parser.add_argument(
+        "worker",
+        nargs="?",
+        default=None,
+        help="Worker name (optional if only one worker has an assignment)"
+    )
+
+    # Also support --immediate at the top level for backwards compatibility
+    parser.add_argument(
+        "--immediate",
+        action="store_true",
+        help="Skip confirmation and start immediately (for start command)"
+    )
+
+    args = parser.parse_args()
+
+    if args.command == "accept":
+        sys.exit(cmd_accept(args))
+    else:
+        # Default to start behavior (with or without explicit "start" command)
+        sys.exit(cmd_start(args))
 
 
 if __name__ == "__main__":
