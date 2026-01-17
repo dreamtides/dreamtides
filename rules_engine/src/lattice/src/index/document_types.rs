@@ -1,3 +1,44 @@
+//! Index-specific document types for SQLite query results.
+//!
+//! This module defines types for document metadata stored in the SQLite index,
+//! distinct from the [`Document`] type used when parsing documents from the
+//! filesystem.
+//!
+//! # Type Distinction
+//!
+//! **[`DocumentRow`]** represents cached metadata from the index:
+//! - Contains all frontmatter fields (id, name, description, task_type, etc.)
+//! - Includes computed fields derived from paths (is_closed, is_root, in_tasks_dir)
+//! - Includes index-specific fields (indexed_at, body_hash, link/backlink counts)
+//! - Does NOT contain the document body (only content_length for size checks)
+//!
+//! **[`Document`]** (in `document::document_reader`) represents a fully parsed document:
+//! - Contains the parsed [`Frontmatter`] struct
+//! - Contains the original YAML string (for round-trip fidelity)
+//! - Contains the full markdown body content
+//!
+//! # When to Use Each Type
+//!
+//! Use **`DocumentRow`** for:
+//! - Listing and filtering documents (`lat list`, `lat ready`)
+//! - Querying metadata without reading files (`lat blocked`, `lat stale`)
+//! - Computing statistics and aggregations (`lat stats`)
+//! - Any operation where body content is not needed
+//!
+//! Use **`Document`** for:
+//! - Displaying full document content (`lat show` without `--short`)
+//! - Template composition (reading `[Lattice] Context` sections)
+//! - Document modification and formatting (`lat fmt`, `lat update`)
+//! - Any operation that reads or writes body content
+//!
+//! # Additional Types
+//!
+//! - [`InsertDocument`]: Data for inserting new documents into the index
+//! - [`UpdateBuilder`]: Builder pattern for partial document updates
+//!
+//! [`Document`]: crate::document::document_reader::Document
+//! [`Frontmatter`]: crate::document::frontmatter_schema::Frontmatter
+
 use std::path::Path;
 
 use chrono::{DateTime, Utc};
@@ -6,6 +47,10 @@ use rusqlite::{Error as SqliteError, Row};
 use crate::document::frontmatter_schema::TaskType;
 
 /// A document row from the SQLite index.
+///
+/// This type represents cached document metadata for efficient queries without
+/// filesystem access. It contains all frontmatter fields plus index-specific
+/// computed fields, but excludes the document body.
 #[derive(Debug, Clone)]
 pub struct DocumentRow {
     pub id: String,

@@ -245,6 +245,8 @@ index/
 │   └── change_detection.rs  # Change detection, schema migration
 ├── client_counters.rs      # Per-client document counter management
 ├── directory_roots.rs      # Precomputed hierarchy queries
+├── document_types.rs       # Index-specific document types distinct from parsed documents
+├── document_filter.rs      # Query filter building and SQL generation
 ├── content_cache.rs        # L2 content cache management
 ├── view_tracking.rs        # Document view counts (views table in SQLite index)
 └── index_metadata.rs       # Schema version, last commit tracking
