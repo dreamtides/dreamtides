@@ -349,14 +349,20 @@ fn detect_changes_returns_uncommitted_files_when_present() {
 // ============================================================================
 
 #[test]
-fn incremental_sync_returns_correct_counts() {
+fn incremental_sync_skips_nonexistent_files() {
     let temp_dir = TempDir::new().expect("failed to create temp dir");
-    let conn = connection_pool::open_memory_connection().expect("should open in-memory connection");
+    let lattice_dir = temp_dir.path().join(".lattice");
+    std::fs::create_dir_all(&lattice_dir).expect("failed to create .lattice dir");
 
+    let conn = connection_pool::open_connection(temp_dir.path())
+        .expect("should open connection successfully");
+    schema_definition::create_schema(&conn).expect("should create schema");
+
+    // Provide paths to files that don't exist on disk
     let change_info = ChangeInfo {
-        modified_files: vec![PathBuf::from("a.md"), PathBuf::from("b.md")],
+        modified_files: vec![PathBuf::from("nonexistent1.md"), PathBuf::from("nonexistent2.md")],
         deleted_files: vec![PathBuf::from("removed.md")],
-        uncommitted_files: vec![PathBuf::from("wip.md")],
+        uncommitted_files: vec![PathBuf::from("nonexistent3.md")],
         current_head: Some("abc123".to_string()),
         last_indexed_commit: Some("def456".to_string()),
     };
@@ -365,17 +371,23 @@ fn incremental_sync_returns_correct_counts() {
     let result = sync_strategies::incremental_sync(temp_dir.path(), &git, &conn, &change_info)
         .expect("incremental_sync should succeed");
 
-    // files_updated = modified_files + uncommitted_files = 2 + 1 = 3
-    assert_eq!(result.files_updated, 3, "Should count modified and uncommitted files");
-    // files_removed = deleted_files = 1
-    assert_eq!(result.files_removed, 1, "Should count deleted files");
+    // Files don't exist, so they're skipped
+    assert_eq!(result.files_updated, 0, "Should skip nonexistent modified files");
+    // Deleted files are also counted as "not found" since they don't exist in index
+    assert_eq!(result.files_removed, 0, "Should report 0 removed for files not in index");
 }
 
 #[test]
-fn full_rebuild_returns_document_count() {
+fn full_rebuild_skips_nonexistent_files() {
     let temp_dir = TempDir::new().expect("failed to create temp dir");
-    let conn = connection_pool::open_memory_connection().expect("should open in-memory connection");
+    let lattice_dir = temp_dir.path().join(".lattice");
+    std::fs::create_dir_all(&lattice_dir).expect("failed to create .lattice dir");
 
+    let conn = connection_pool::open_connection(temp_dir.path())
+        .expect("should open connection successfully");
+    schema_definition::create_schema(&conn).expect("should create schema");
+
+    // Provide paths to files that don't exist on disk
     let git = FakeGit::with_ls_files(vec![
         PathBuf::from("docs/readme.md"),
         PathBuf::from("tasks/task1.md"),
@@ -385,7 +397,8 @@ fn full_rebuild_returns_document_count() {
     let result = sync_strategies::full_rebuild(temp_dir.path(), &git, &conn)
         .expect("full_rebuild should succeed");
 
-    assert_eq!(result.documents_indexed, 3, "Should count all markdown files");
+    // Files don't exist on disk, so 0 documents are indexed
+    assert_eq!(result.documents_indexed, 0, "Should skip nonexistent files");
 }
 
 // ============================================================================
@@ -491,4 +504,480 @@ fn reconcile_returns_incremental_when_uncommitted_changes_present() {
         matches!(result, ReconciliationResult::Incremental { .. }),
         "Should return Incremental when uncommitted changes present, got: {result:?}"
     );
+}
+
+// ============================================================================
+// sync_strategies tests with actual documents
+// ============================================================================
+
+/// Helper to create a valid Lattice document in the filesystem.
+fn create_lattice_document(dir: &std::path::Path, relative_path: &str, id: &str, name: &str) {
+    let full_path = dir.join(relative_path);
+    if let Some(parent) = full_path.parent() {
+        std::fs::create_dir_all(parent).expect("should create parent dirs");
+    }
+    let content = format!(
+        r#"---
+lattice-id: {}
+name: {}
+description: Test document {}
+---
+
+# {}
+
+This is the body content.
+"#,
+        id, name, name, name
+    );
+    std::fs::write(&full_path, content).expect("should write document");
+}
+
+/// Helper to create a document with labels.
+fn create_document_with_labels(
+    dir: &std::path::Path,
+    relative_path: &str,
+    id: &str,
+    name: &str,
+    labels: &[&str],
+) {
+    let full_path = dir.join(relative_path);
+    if let Some(parent) = full_path.parent() {
+        std::fs::create_dir_all(parent).expect("should create parent dirs");
+    }
+    let labels_yaml = labels.iter().map(|l| format!("  - {l}")).collect::<Vec<_>>().join("\n");
+    let content = format!(
+        r#"---
+lattice-id: {}
+name: {}
+description: Test document with labels
+labels:
+{}
+---
+
+# {}
+
+Document body.
+"#,
+        id, name, labels_yaml, name
+    );
+    std::fs::write(&full_path, content).expect("should write document");
+}
+
+/// Helper to create a document with links.
+fn create_document_with_links(
+    dir: &std::path::Path,
+    relative_path: &str,
+    id: &str,
+    name: &str,
+    link_target: &str,
+) {
+    let full_path = dir.join(relative_path);
+    if let Some(parent) = full_path.parent() {
+        std::fs::create_dir_all(parent).expect("should create parent dirs");
+    }
+    let content = format!(
+        r#"---
+lattice-id: {}
+name: {}
+description: Test document with links
+---
+
+# {}
+
+See the [other document](#{}).
+"#,
+        id, name, name, link_target
+    );
+    std::fs::write(&full_path, content).expect("should write document");
+}
+
+#[test]
+fn full_rebuild_indexes_actual_documents() {
+    let temp_dir = TempDir::new().expect("failed to create temp dir");
+    let lattice_dir = temp_dir.path().join(".lattice");
+    std::fs::create_dir_all(&lattice_dir).expect("failed to create .lattice dir");
+
+    // Create actual Lattice documents
+    create_lattice_document(temp_dir.path(), "doc1.md", "LABC23", "doc-one");
+    create_lattice_document(temp_dir.path(), "doc2.md", "LDEF45", "doc-two");
+    create_lattice_document(temp_dir.path(), "subdir/doc3.md", "LGHI67", "doc-three");
+
+    let conn = connection_pool::open_connection(temp_dir.path())
+        .expect("should open connection successfully");
+    schema_definition::create_schema(&conn).expect("should create schema");
+
+    let git = FakeGit::with_ls_files(vec![
+        PathBuf::from("doc1.md"),
+        PathBuf::from("doc2.md"),
+        PathBuf::from("subdir/doc3.md"),
+    ]);
+
+    let result = sync_strategies::full_rebuild(temp_dir.path(), &git, &conn)
+        .expect("full_rebuild should succeed");
+
+    assert_eq!(result.documents_indexed, 3, "Should index all 3 documents");
+
+    // Verify documents are in the database
+    let doc1 = lattice::index::document_queries::lookup_by_id(&conn, "LABC23")
+        .expect("lookup should succeed");
+    assert!(doc1.is_some(), "Document LABC23 should be in index");
+    assert_eq!(doc1.unwrap().name, "doc-one", "Document name should match");
+}
+
+#[test]
+fn full_rebuild_indexes_labels() {
+    let temp_dir = TempDir::new().expect("failed to create temp dir");
+    let lattice_dir = temp_dir.path().join(".lattice");
+    std::fs::create_dir_all(&lattice_dir).expect("failed to create .lattice dir");
+
+    create_document_with_labels(temp_dir.path(), "labeled.md", "LLAB23", "labeled-doc", &[
+        "urgent", "backend",
+    ]);
+
+    let conn = connection_pool::open_connection(temp_dir.path())
+        .expect("should open connection successfully");
+    schema_definition::create_schema(&conn).expect("should create schema");
+
+    let git = FakeGit::with_ls_files(vec![PathBuf::from("labeled.md")]);
+
+    sync_strategies::full_rebuild(temp_dir.path(), &git, &conn)
+        .expect("full_rebuild should succeed");
+
+    // Verify labels are in the database
+    let labels =
+        lattice::index::label_queries::get_labels(&conn, "LLAB23").expect("should get labels");
+    assert_eq!(labels.len(), 2, "Should have 2 labels");
+    assert!(labels.contains(&"urgent".to_string()), "Should have urgent label");
+    assert!(labels.contains(&"backend".to_string()), "Should have backend label");
+}
+
+#[test]
+fn full_rebuild_indexes_body_links() {
+    let temp_dir = TempDir::new().expect("failed to create temp dir");
+    let lattice_dir = temp_dir.path().join(".lattice");
+    std::fs::create_dir_all(&lattice_dir).expect("failed to create .lattice dir");
+
+    create_lattice_document(temp_dir.path(), "target.md", "LTGT23", "target-doc");
+    create_document_with_links(temp_dir.path(), "source.md", "LSRC23", "source-doc", "LTGT23");
+
+    let conn = connection_pool::open_connection(temp_dir.path())
+        .expect("should open connection successfully");
+    schema_definition::create_schema(&conn).expect("should create schema");
+
+    let git = FakeGit::with_ls_files(vec![PathBuf::from("target.md"), PathBuf::from("source.md")]);
+
+    sync_strategies::full_rebuild(temp_dir.path(), &git, &conn)
+        .expect("full_rebuild should succeed");
+
+    // Verify links are in the database
+    let outgoing =
+        lattice::index::link_queries::query_outgoing(&conn, "LSRC23").expect("should get links");
+    assert_eq!(outgoing.len(), 1, "Should have 1 outgoing link");
+    assert_eq!(outgoing[0].target_id, "LTGT23", "Link target should match");
+}
+
+#[test]
+fn full_rebuild_skips_files_with_conflict_markers() {
+    let temp_dir = TempDir::new().expect("failed to create temp dir");
+    let lattice_dir = temp_dir.path().join(".lattice");
+    std::fs::create_dir_all(&lattice_dir).expect("failed to create .lattice dir");
+
+    // Create a normal document
+    create_lattice_document(temp_dir.path(), "normal.md", "LNRM23", "normal-doc");
+
+    // Create a document with conflict markers
+    let conflicted_path = temp_dir.path().join("conflicted.md");
+    std::fs::write(
+        &conflicted_path,
+        r#"---
+lattice-id: LCFL23
+name: conflicted-doc
+description: Document with conflicts
+---
+
+<<<<<<< HEAD
+This is my version.
+=======
+This is their version.
+>>>>>>> branch
+"#,
+    )
+    .expect("should write conflicted document");
+
+    let conn = connection_pool::open_connection(temp_dir.path())
+        .expect("should open connection successfully");
+    schema_definition::create_schema(&conn).expect("should create schema");
+
+    let git =
+        FakeGit::with_ls_files(vec![PathBuf::from("normal.md"), PathBuf::from("conflicted.md")]);
+
+    let result = sync_strategies::full_rebuild(temp_dir.path(), &git, &conn)
+        .expect("full_rebuild should succeed");
+
+    assert_eq!(result.documents_indexed, 1, "Should only index 1 document (skip conflicted)");
+
+    // Verify normal document is indexed
+    let normal = lattice::index::document_queries::lookup_by_id(&conn, "LNRM23")
+        .expect("lookup should succeed");
+    assert!(normal.is_some(), "Normal document should be indexed");
+
+    // Verify conflicted document is NOT indexed
+    let conflicted = lattice::index::document_queries::lookup_by_id(&conn, "LCFL23")
+        .expect("lookup should succeed");
+    assert!(conflicted.is_none(), "Conflicted document should NOT be indexed");
+}
+
+#[test]
+fn full_rebuild_skips_non_lattice_documents() {
+    let temp_dir = TempDir::new().expect("failed to create temp dir");
+    let lattice_dir = temp_dir.path().join(".lattice");
+    std::fs::create_dir_all(&lattice_dir).expect("failed to create .lattice dir");
+
+    // Create a valid Lattice document
+    create_lattice_document(temp_dir.path(), "valid.md", "LVLD23", "valid-doc");
+
+    // Create a plain markdown file (no frontmatter)
+    let plain_path = temp_dir.path().join("plain.md");
+    std::fs::write(&plain_path, "# Just a plain markdown file\n\nNo frontmatter here.")
+        .expect("should write plain markdown");
+
+    let conn = connection_pool::open_connection(temp_dir.path())
+        .expect("should open connection successfully");
+    schema_definition::create_schema(&conn).expect("should create schema");
+
+    let git = FakeGit::with_ls_files(vec![PathBuf::from("valid.md"), PathBuf::from("plain.md")]);
+
+    let result = sync_strategies::full_rebuild(temp_dir.path(), &git, &conn)
+        .expect("full_rebuild should succeed");
+
+    assert_eq!(result.documents_indexed, 1, "Should only index valid Lattice document");
+}
+
+#[test]
+fn incremental_sync_adds_new_document() {
+    let temp_dir = TempDir::new().expect("failed to create temp dir");
+    let lattice_dir = temp_dir.path().join(".lattice");
+    std::fs::create_dir_all(&lattice_dir).expect("failed to create .lattice dir");
+
+    let conn = connection_pool::open_connection(temp_dir.path())
+        .expect("should open connection successfully");
+    schema_definition::create_schema(&conn).expect("should create schema");
+
+    // Create a new document
+    create_lattice_document(temp_dir.path(), "new.md", "LNEW23", "new-doc");
+
+    let change_info = ChangeInfo {
+        modified_files: vec![PathBuf::from("new.md")],
+        deleted_files: vec![],
+        uncommitted_files: vec![],
+        current_head: Some("abc123".to_string()),
+        last_indexed_commit: Some("def456".to_string()),
+    };
+
+    let git = FakeGit::new();
+    let result = sync_strategies::incremental_sync(temp_dir.path(), &git, &conn, &change_info)
+        .expect("incremental_sync should succeed");
+
+    assert_eq!(result.files_updated, 1, "Should have updated 1 file");
+    assert_eq!(result.files_removed, 0, "Should have removed 0 files");
+
+    // Verify document is in the database
+    let doc = lattice::index::document_queries::lookup_by_id(&conn, "LNEW23")
+        .expect("lookup should succeed");
+    assert!(doc.is_some(), "New document should be in index");
+}
+
+#[test]
+fn incremental_sync_removes_deleted_document() {
+    let temp_dir = TempDir::new().expect("failed to create temp dir");
+    let lattice_dir = temp_dir.path().join(".lattice");
+    std::fs::create_dir_all(&lattice_dir).expect("failed to create .lattice dir");
+
+    let conn = connection_pool::open_connection(temp_dir.path())
+        .expect("should open connection successfully");
+    schema_definition::create_schema(&conn).expect("should create schema");
+
+    // First, add a document to the index
+    create_lattice_document(temp_dir.path(), "to-delete.md", "LDEL23", "delete-me");
+
+    let git = FakeGit::with_ls_files(vec![PathBuf::from("to-delete.md")]);
+    sync_strategies::full_rebuild(temp_dir.path(), &git, &conn)
+        .expect("initial full_rebuild should succeed");
+
+    // Verify document is initially present
+    let doc = lattice::index::document_queries::lookup_by_id(&conn, "LDEL23")
+        .expect("lookup should succeed");
+    assert!(doc.is_some(), "Document should be in index initially");
+
+    // Now simulate deletion (remove from filesystem and mark as deleted in
+    // change_info)
+    std::fs::remove_file(temp_dir.path().join("to-delete.md"))
+        .expect("should delete document file");
+
+    let change_info = ChangeInfo {
+        modified_files: vec![],
+        deleted_files: vec![PathBuf::from("to-delete.md")],
+        uncommitted_files: vec![],
+        current_head: Some("new123".to_string()),
+        last_indexed_commit: Some("old456".to_string()),
+    };
+
+    let git2 = FakeGit::new();
+    let result = sync_strategies::incremental_sync(temp_dir.path(), &git2, &conn, &change_info)
+        .expect("incremental_sync should succeed");
+
+    assert_eq!(result.files_removed, 1, "Should have removed 1 file");
+
+    // Verify document is no longer in the database
+    let doc = lattice::index::document_queries::lookup_by_id(&conn, "LDEL23")
+        .expect("lookup should succeed");
+    assert!(doc.is_none(), "Deleted document should be removed from index");
+}
+
+#[test]
+fn incremental_sync_updates_existing_document() {
+    let temp_dir = TempDir::new().expect("failed to create temp dir");
+    let lattice_dir = temp_dir.path().join(".lattice");
+    std::fs::create_dir_all(&lattice_dir).expect("failed to create .lattice dir");
+
+    let conn = connection_pool::open_connection(temp_dir.path())
+        .expect("should open connection successfully");
+    schema_definition::create_schema(&conn).expect("should create schema");
+
+    // Create initial document
+    create_lattice_document(temp_dir.path(), "existing.md", "LEXS23", "old-name");
+
+    let git = FakeGit::with_ls_files(vec![PathBuf::from("existing.md")]);
+    sync_strategies::full_rebuild(temp_dir.path(), &git, &conn)
+        .expect("initial full_rebuild should succeed");
+
+    // Verify initial state
+    let doc = lattice::index::document_queries::lookup_by_id(&conn, "LEXS23")
+        .expect("lookup should succeed")
+        .expect("document should exist");
+    assert_eq!(doc.name, "old-name", "Initial name should match");
+
+    // Update the document with new content
+    let updated_path = temp_dir.path().join("existing.md");
+    std::fs::write(
+        &updated_path,
+        r#"---
+lattice-id: LEXS23
+name: new-name
+description: Updated description
+---
+
+# Updated Content
+
+New body text.
+"#,
+    )
+    .expect("should update document");
+
+    let change_info = ChangeInfo {
+        modified_files: vec![PathBuf::from("existing.md")],
+        deleted_files: vec![],
+        uncommitted_files: vec![],
+        current_head: Some("new123".to_string()),
+        last_indexed_commit: Some("old456".to_string()),
+    };
+
+    let git2 = FakeGit::new();
+    sync_strategies::incremental_sync(temp_dir.path(), &git2, &conn, &change_info)
+        .expect("incremental_sync should succeed");
+
+    // Verify updated state
+    let doc = lattice::index::document_queries::lookup_by_id(&conn, "LEXS23")
+        .expect("lookup should succeed")
+        .expect("document should still exist");
+    assert_eq!(doc.name, "new-name", "Updated name should match");
+    assert_eq!(doc.description, "Updated description", "Updated description should match");
+}
+
+#[test]
+fn incremental_sync_skips_conflicted_files() {
+    let temp_dir = TempDir::new().expect("failed to create temp dir");
+    let lattice_dir = temp_dir.path().join(".lattice");
+    std::fs::create_dir_all(&lattice_dir).expect("failed to create .lattice dir");
+
+    let conn = connection_pool::open_connection(temp_dir.path())
+        .expect("should open connection successfully");
+    schema_definition::create_schema(&conn).expect("should create schema");
+
+    // Create a conflicted document
+    let conflicted_path = temp_dir.path().join("conflicted.md");
+    std::fs::write(
+        &conflicted_path,
+        r#"---
+lattice-id: LCNF23
+name: conflicted
+description: Document with merge conflict
+---
+
+<<<<<<< HEAD
+Local changes
+=======
+Remote changes
+>>>>>>> origin/main
+"#,
+    )
+    .expect("should write conflicted document");
+
+    let change_info = ChangeInfo {
+        modified_files: vec![PathBuf::from("conflicted.md")],
+        deleted_files: vec![],
+        uncommitted_files: vec![],
+        current_head: Some("abc123".to_string()),
+        last_indexed_commit: Some("def456".to_string()),
+    };
+
+    let git = FakeGit::new();
+    let result = sync_strategies::incremental_sync(temp_dir.path(), &git, &conn, &change_info)
+        .expect("incremental_sync should succeed");
+
+    assert_eq!(result.files_updated, 0, "Should not have updated conflicted file");
+
+    // Verify conflicted document is NOT in the database
+    let doc = lattice::index::document_queries::lookup_by_id(&conn, "LCNF23")
+        .expect("lookup should succeed");
+    assert!(doc.is_none(), "Conflicted document should not be indexed");
+}
+
+#[test]
+fn full_rebuild_populates_fts_index() {
+    let temp_dir = TempDir::new().expect("failed to create temp dir");
+    let lattice_dir = temp_dir.path().join(".lattice");
+    std::fs::create_dir_all(&lattice_dir).expect("failed to create .lattice dir");
+
+    // Create a document with searchable content
+    let doc_path = temp_dir.path().join("searchable.md");
+    std::fs::write(
+        &doc_path,
+        r#"---
+lattice-id: LSRCH2
+name: searchable-doc
+description: A document with unique searchable content
+---
+
+# Searchable Document
+
+This document contains the word xylophone which is unique.
+"#,
+    )
+    .expect("should write searchable document");
+
+    let conn = connection_pool::open_connection(temp_dir.path())
+        .expect("should open connection successfully");
+    schema_definition::create_schema(&conn).expect("should create schema");
+
+    let git = FakeGit::with_ls_files(vec![PathBuf::from("searchable.md")]);
+
+    sync_strategies::full_rebuild(temp_dir.path(), &git, &conn)
+        .expect("full_rebuild should succeed");
+
+    // Search for the unique word
+    let results =
+        lattice::index::fulltext_search::search(&conn, "xylophone").expect("search should succeed");
+    assert_eq!(results.len(), 1, "Should find exactly one document with 'xylophone'");
+    assert_eq!(results[0].document_id, "LSRCH2", "Found document ID should match");
 }
