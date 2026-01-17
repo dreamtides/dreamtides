@@ -84,30 +84,58 @@ pub fn remove_worktree(repo: &Path, worktree_path: &Path, force: bool) -> Result
         cmd.arg(worktree_path).output().context("Failed to execute git worktree remove")?;
 
     if !output.status.success() {
-        tracing::warn!("git worktree remove failed: {}", String::from_utf8_lossy(&output.stderr));
+        let stderr = String::from_utf8_lossy(&output.stderr);
+        tracing::warn!("git worktree remove failed: {}", stderr);
+
+        // If we didn't use --force, retry with --force
+        if !force {
+            tracing::info!("Retrying worktree removal with --force");
+            let force_output = Command::new("git")
+                .arg("-C")
+                .arg(repo)
+                .arg("worktree")
+                .arg("remove")
+                .arg("--force")
+                .arg(worktree_path)
+                .output()
+                .context("Failed to execute git worktree remove --force")?;
+
+            if force_output.status.success() {
+                return Ok(());
+            }
+            tracing::warn!(
+                "git worktree remove --force also failed: {}",
+                String::from_utf8_lossy(&force_output.stderr)
+            );
+        }
+
+        // Prune first to clean up any stale worktree references
+        let _ = Command::new("git").arg("-C").arg(repo).arg("worktree").arg("prune").output();
 
         if worktree_path.exists() {
             tracing::info!(
                 "Attempting manual removal of worktree directory: {}",
                 worktree_path.display()
             );
-            std::fs::remove_dir_all(worktree_path)
-                .context("Failed to manually remove worktree directory")?;
-        }
+            std::fs::remove_dir_all(worktree_path).with_context(|| {
+                format!("Failed to manually remove worktree directory: {}", worktree_path.display())
+            })?;
 
-        let prune_output = Command::new("git")
-            .arg("-C")
-            .arg(repo)
-            .arg("worktree")
-            .arg("prune")
-            .output()
-            .context("Failed to execute git worktree prune")?;
+            // Prune again after manual removal
+            let prune_output = Command::new("git")
+                .arg("-C")
+                .arg(repo)
+                .arg("worktree")
+                .arg("prune")
+                .output()
+                .context("Failed to execute git worktree prune")?;
 
-        if !prune_output.status.success() {
-            tracing::warn!(
-                "git worktree prune failed: {}",
-                String::from_utf8_lossy(&prune_output.stderr)
-            );
+            if !prune_output.status.success() {
+                tracing::warn!(
+                    "git worktree prune failed: {}",
+                    String::from_utf8_lossy(&prune_output.stderr)
+                );
+            }
         }
     }
 

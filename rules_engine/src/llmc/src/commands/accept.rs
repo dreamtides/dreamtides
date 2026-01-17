@@ -118,9 +118,9 @@ pub fn run_accept(worker: Option<String>, force: bool, json: bool) -> Result<()>
         println!("\n✓ Worker's changes already incorporated into master");
         println!("  No new changes to merge - another worker likely made the same changes");
 
-        // Clean up the worker's branch and worktree
+        // Clean up the worker's branch and worktree (use force since we're recreating)
         println!("Cleaning up worktree and branch...");
-        git::remove_worktree(&llmc_root, &worktree_path, false)?;
+        git::remove_worktree(&llmc_root, &worktree_path, true)?;
         git::delete_branch(&llmc_root, &worker_record.branch, true)?;
 
         println!("Syncing llmc repo with source...");
@@ -221,8 +221,9 @@ pub fn run_accept(worker: Option<String>, force: bool, json: bool) -> Result<()>
 
     println!("✓ Source repository updated to {}", &new_commit_sha[..7.min(new_commit_sha.len())]);
 
+    // Clean up the worker's branch and worktree (use force since we're recreating)
     println!("Cleaning up worktree and branch...");
-    git::remove_worktree(&llmc_root, &worktree_path, false)?;
+    git::remove_worktree(&llmc_root, &worktree_path, true)?;
     git::delete_branch(&llmc_root, &worker_record.branch, true)?;
 
     println!("Syncing llmc repo with source...");
