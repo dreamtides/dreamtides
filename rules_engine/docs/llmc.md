@@ -464,7 +464,13 @@ llmc review baker    # Reviews specific worker
 llmc review --interface difftastic  # Default
 llmc review --interface vscode      # Open in VS Code
 llmc review --name-only              # Show only changed file names
+llmc review baker --force            # Force review regardless of worker state
 ```
+
+The `--force` flag bypasses state validation, allowing review of a worker
+regardless of its current state. This is useful when a worker is stuck in an
+intermediate state (e.g., `reviewing`) but you need to see its diff anyway.
+When using `--force`, you must specify a worker name.
 
 ### `llmc reject [message]`
 
@@ -489,13 +495,18 @@ Accepts a worker's changes and merges to master.
 ```bash
 llmc accept        # Accepts most recently reviewed worker
 llmc accept baker
+llmc accept baker --force  # Force accept regardless of worker state
 ```
 
-Verifies `needs_review` state, ensures clean worktree, rebases onto master,
-squashes to single commit, strips agent attribution ("Generated with",
-"Co-Authored-By"), fast-forward merges to master, removes worktree and branch,
-resets worker to `idle` with new worktree, triggers background rebase for other
-`needs_review` workers.
+Verifies `needs_review` state (unless `--force` is used), ensures clean
+worktree, rebases onto master, squashes to single commit, strips agent
+attribution ("Generated with", "Co-Authored-By"), fast-forward merges to
+master, removes worktree and branch, resets worker to `idle` with new worktree,
+triggers background rebase for other `needs_review` workers.
+
+The `--force` flag bypasses state validation, allowing accept of a worker
+regardless of its current state. When using `--force`, you must specify a
+worker name.
 
 ### `llmc rebase <worker>`
 

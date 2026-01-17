@@ -18,6 +18,7 @@ pub fn run_review(
     worker: Option<String>,
     interface: ReviewInterface,
     name_only: bool,
+    force: bool,
     json: bool,
 ) -> Result<()> {
     let llmc_root = config::get_llmc_root();
@@ -37,6 +38,10 @@ pub fn run_review(
         }
         name
     } else {
+        if force {
+            eprintln!("--force requires specifying a worker name");
+            std::process::exit(1);
+        }
         let needs_review = state.get_workers_truly_needing_review(&config);
         if needs_review.is_empty() {
             eprintln!("No workers need review");
@@ -48,8 +53,8 @@ pub fn run_review(
 
     let worker_record = state.get_worker(&worker_name).unwrap();
 
-    // Check if worker is truly ready for human review
-    if !state::is_truly_needs_review(worker_record, &config) {
+    // Check if worker is truly ready for human review (skip if --force)
+    if !force && !state::is_truly_needs_review(worker_record, &config) {
         if worker_record.status == WorkerStatus::NeedsReview {
             // Worker is in NeedsReview but waiting for self-review prompt
             eprintln!(
@@ -69,10 +74,18 @@ pub fn run_review(
             );
             eprintln!("Workers needing review: {}", format_needs_review_workers(&state, &config));
         }
+        eprintln!("\nUse --force to review regardless of worker state.");
         std::process::exit(1);
     }
 
-    let Some(commit_sha) = &worker_record.commit_sha else {
+    // Get commit SHA, or fall back to HEAD if force and no commit_sha
+    let commit_sha = if let Some(sha) = &worker_record.commit_sha {
+        sha.clone()
+    } else if force {
+        // When forcing, use HEAD as the commit to review
+        let worktree_path = PathBuf::from(&worker_record.worktree_path);
+        git::get_head_commit(&worktree_path)?
+    } else {
         bail!("Worker '{}' has no commit SHA", worker_name);
     };
 
@@ -143,7 +156,7 @@ pub fn run_review(
         }
     }
 
-    let commit_message = git::get_commit_message(&worktree_path, commit_sha)?;
+    let commit_message = git::get_commit_message(&worktree_path, &commit_sha)?;
 
     if json {
         eprintln!("Reviewing: {} ({})", worker_name, worker_record.branch);

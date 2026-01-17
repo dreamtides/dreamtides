@@ -169,6 +169,10 @@ pub enum Commands {
         #[arg(long)]
         name_only: bool,
 
+        /// Force review regardless of worker state
+        #[arg(long)]
+        force: bool,
+
         /// Output in JSON format
         #[arg(long)]
         json: bool,
@@ -189,6 +193,10 @@ pub enum Commands {
         /// Worker name (optional, accepts most recently reviewed worker if not
         /// specified)
         worker: Option<String>,
+
+        /// Force accept regardless of worker state
+        #[arg(long)]
+        force: bool,
 
         /// Output in JSON format
         #[arg(long)]

@@ -11,7 +11,7 @@ use super::super::{config, git};
 use super::{rebase, review};
 
 /// Runs the accept command, accepting a worker's changes and merging to master
-pub fn run_accept(worker: Option<String>, json: bool) -> Result<()> {
+pub fn run_accept(worker: Option<String>, force: bool, json: bool) -> Result<()> {
     let llmc_root = config::get_llmc_root();
     if !llmc_root.exists() {
         bail!(
@@ -34,6 +34,9 @@ pub fn run_accept(worker: Option<String>, json: bool) -> Result<()> {
         }
         name
     } else {
+        if force {
+            bail!("--force requires specifying a worker name");
+        }
         review::load_last_reviewed()?.ok_or_else(|| {
             anyhow::anyhow!("No worker specified and no previously reviewed worker found")
         })?
@@ -41,8 +44,14 @@ pub fn run_accept(worker: Option<String>, json: bool) -> Result<()> {
 
     let worker_record = state.get_worker(&worker_name).unwrap();
 
-    if worker_record.status != WorkerStatus::NeedsReview {
-        bail!("Worker '{}' is in state {:?}, not needs_review", worker_name, worker_record.status);
+    // Check worker state (skip if --force)
+    if !force && worker_record.status != WorkerStatus::NeedsReview {
+        bail!(
+            "Worker '{}' is in state {:?}, not needs_review\n\
+             Use --force to accept regardless of worker state.",
+            worker_name,
+            worker_record.status
+        );
     }
 
     let worktree_path = PathBuf::from(&worker_record.worktree_path);

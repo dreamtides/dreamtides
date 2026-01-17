@@ -73,7 +73,7 @@ async fn main() -> Result<()> {
         Commands::Message { worker, message, json } => message::run_message(&worker, message, json),
         Commands::Attach { target } => attach::run_attach(&target),
         Commands::Console => console::run_console(),
-        Commands::Review { worker, interface, name_only, json } => {
+        Commands::Review { worker, interface, name_only, force, json } => {
             let interface_enum = match interface.as_str() {
                 "difftastic" => ReviewInterface::Difftastic,
                 "vscode" => ReviewInterface::VSCode,
@@ -85,10 +85,10 @@ async fn main() -> Result<()> {
                     std::process::exit(1);
                 }
             };
-            review::run_review(worker, interface_enum, name_only, json)
+            review::run_review(worker, interface_enum, name_only, force, json)
         }
         Commands::Reject { message, json } => reject::run_reject(message, json),
-        Commands::Accept { worker, json } => accept::run_accept(worker, json),
+        Commands::Accept { worker, force, json } => accept::run_accept(worker, force, json),
         Commands::Rebase { worker, json } => rebase::run_rebase(&worker, json),
         Commands::Reset { worker, yes, json } => reset::run_reset(&worker, yes, json),
         Commands::Doctor { repair, yes, rebuild, json } => {
