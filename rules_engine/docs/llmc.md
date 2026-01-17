@@ -344,6 +344,32 @@ The prompt preamble includes worktree location, repository root, instructions
 to follow AGENTS.md conventions, run validation commands, create a single
 commit, and not push to remote.
 
+**Important: Path References in Prompts**
+
+When writing prompts that reference files, always use **relative paths** like
+`@rules_engine/src/foo.rs` rather than absolute paths to the source repository.
+
+Claude Code's `@path` syntax follows whatever path is given literally. If you
+write `@/Users/you/Documents/main-repo/src/file.rs`, the worker will access
+that exact path in the main repository, not the corresponding file in its
+worktree. This can cause workers to accidentally modify the main repository
+instead of their isolated worktree.
+
+LLMC detects when prompts contain absolute paths to the source repository and
+will warn you before proceeding. If warned, abort and fix your paths:
+
+```
+⚠️  WARNING: Source repository paths detected in prompt!
+
+The worker's working directory is: /Users/you/llmc/.worktrees/adam
+
+But your prompt contains absolute paths to the source repository:
+  Source repo: /Users/you/Documents/main-repo
+
+  Found:     @/Users/you/Documents/main-repo/src/foo.rs
+  Suggested: @src/foo.rs
+```
+
 ### `llmc message <worker> [message]`
 
 Sends a message to a worker.
@@ -693,6 +719,12 @@ Key reference files in Gastown (`~/gastown`):
    prevent special character interpretation.
 
 3. **State file**: Contains prompts and paths but should not contain secrets.
+
+4. **Path references in prompts**: Prompts containing absolute paths to the
+   source repository can cause workers to accidentally modify the main repo
+   instead of their worktree. LLMC detects and warns about such paths before
+   starting a task. Always use relative paths like `@rules_engine/src/...`
+   instead of absolute paths.
 
 ## Appendices
 

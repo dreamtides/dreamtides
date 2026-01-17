@@ -1,8 +1,10 @@
 use std::fs;
+use std::io::{self, Write};
 use std::path::{Path, PathBuf};
 use std::process::Command;
 
 use anyhow::{Context, Result, bail};
+use regex::Regex;
 
 use super::super::config::{self, Config};
 use super::super::state::{State, WorkerRecord, WorkerStatus};
@@ -66,6 +68,10 @@ pub fn run_start(
     copy_tabula_xlsm(&config, &worktree_path)?;
 
     let user_prompt = load_prompt_content(&prompt, &prompt_file, &prompt_cmd)?;
+
+    // Warn if the prompt contains absolute paths to the source repository
+    warn_about_source_repo_paths(&user_prompt, &config, &worktree_path)?;
+
     let full_prompt = build_full_prompt(worker_record, &config, &worker_name, &user_prompt)?;
 
     println!("Sending prompt to worker '{}'...", worker_name);
@@ -375,4 +381,74 @@ fn format_worker_states(state: &State) -> String {
         .map(|w| format!("  {} - {:?}", w.name, w.status))
         .collect::<Vec<_>>()
         .join("\n")
+}
+
+/// Detects if the prompt contains absolute paths pointing to the source
+/// repository instead of relative paths. This is a common mistake that can
+/// cause workers to modify the main repo instead of their worktree.
+///
+/// Returns a vector of (original_path, suggested_relative_path) pairs.
+fn detect_source_repo_paths(prompt: &str, config: &Config) -> Vec<(String, String)> {
+    let source_path = PathBuf::from(&config.repo.source);
+    let source_str = source_path.to_string_lossy();
+
+    // Look for @path references that point to the source repo
+    // Matches patterns like @/path/to/source/repo/...
+    let pattern = format!(r#"@"?{}/?([\w/._-]*)"?"#, regex::escape(&source_str));
+    let re = Regex::new(&pattern).expect("Invalid regex pattern");
+
+    let mut found_paths = Vec::new();
+    for cap in re.captures_iter(prompt) {
+        let full_match = cap.get(0).unwrap().as_str().to_string();
+        let relative_part = cap.get(1).map_or("", |m| m.as_str());
+
+        // Suggest using a relative path instead
+        let suggested =
+            if relative_part.is_empty() { "@.".to_string() } else { format!("@{}", relative_part) };
+
+        found_paths.push((full_match, suggested));
+    }
+
+    found_paths
+}
+
+/// Warns the user about source repo paths in the prompt and asks for
+/// confirmation before proceeding.
+fn warn_about_source_repo_paths(prompt: &str, config: &Config, worktree_path: &Path) -> Result<()> {
+    let problematic_paths = detect_source_repo_paths(prompt, config);
+
+    if problematic_paths.is_empty() {
+        return Ok(());
+    }
+
+    eprintln!("\n⚠️  WARNING: Source repository paths detected in prompt!\n");
+    eprintln!("The worker's working directory is: {}\n", worktree_path.display());
+    eprintln!("But your prompt contains absolute paths to the source repository:");
+    eprintln!("  Source repo: {}\n", config.repo.source);
+
+    for (original, suggested) in &problematic_paths {
+        eprintln!("  Found:     {}", original);
+        eprintln!("  Suggested: {}\n", suggested);
+    }
+
+    eprintln!("Using absolute paths to the source repository will cause the");
+    eprintln!("worker to modify files in the main repo instead of its worktree.");
+    eprintln!();
+    eprintln!("Recommendations:");
+    eprintln!("  • Use relative paths like @rules_engine/src/...");
+    eprintln!("  • Or use the worktree path: @{}/...", worktree_path.display());
+    eprintln!();
+
+    eprint!("Continue anyway? [y/N] ");
+    io::stderr().flush()?;
+
+    let mut input = String::new();
+    io::stdin().read_line(&mut input)?;
+
+    if !input.trim().eq_ignore_ascii_case("y") {
+        bail!("Aborted by user. Please fix the paths in your prompt and try again.");
+    }
+
+    eprintln!();
+    Ok(())
 }
