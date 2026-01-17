@@ -24,6 +24,7 @@ pub enum ViolationKind {
     MissingDocCommentImport,
     InlineTestModule,
     TestsDirectoryInSrc,
+    WorkspaceDependencyNotUsed,
 }
 
 impl ViolationKind {
@@ -64,6 +65,9 @@ impl ViolationKind {
             }
             ViolationKind::TestsDirectoryInSrc => {
                 "tests directory not permitted under src/ (place tests in rules_engine/tests/ instead)"
+            }
+            ViolationKind::WorkspaceDependencyNotUsed => {
+                "dependency must use 'workspace = true' (versions should be specified in root Cargo.toml)"
             }
         }
     }

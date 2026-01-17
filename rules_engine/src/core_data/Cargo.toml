@@ -12,7 +12,7 @@ doctest = false
 bench = false
 
 [dependencies]
-derive_more = { version = "1", features = ["full"] }
+derive_more = { workspace = true }
 enumset = { workspace = true }
 fluent = { workspace = true }
 schemars = { workspace = true }

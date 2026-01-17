@@ -711,20 +711,6 @@ dependencies = [
 
 [[package]]
 name = "chumsky"
-version = "0.10.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "14377e276b2c8300513dff55ba4cc4142b44e5d6de6d00eb5b2307d650bb4ec1"
-dependencies = [
- "hashbrown 0.15.2",
- "regex-automata 0.3.9",
- "serde",
- "stacker",
- "unicode-ident",
- "unicode-segmentation",
-]
-
-[[package]]
-name = "chumsky"
 version = "0.12.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4ba4a05c9ce83b07de31b31c874e87c069881ac4355db9e752e3a55c11ec75a6"
@@ -2709,7 +2695,7 @@ version = "0.0.0"
 dependencies = [
  "ability_data",
  "ariadne",
- "chumsky 0.10.1",
+ "chumsky",
  "core_data",
 ]
 
@@ -2751,7 +2737,7 @@ version = "0.1.0"
 dependencies = [
  "ability_data",
  "ariadne",
- "chumsky 0.12.0",
+ "chumsky",
  "clap",
  "core_data",
  "criterion",
@@ -2769,7 +2755,7 @@ name = "parser_v2_benchmarks"
 version = "0.1.0"
 dependencies = [
  "ability_data",
- "chumsky 0.12.0",
+ "chumsky",
  "core_data",
  "criterion",
  "parser_v2",
@@ -2782,7 +2768,7 @@ name = "parser_v2_tests"
 version = "0.1.0"
 dependencies = [
  "ability_data",
- "chumsky 0.12.0",
+ "chumsky",
  "core_data",
  "insta",
  "parser_v2",

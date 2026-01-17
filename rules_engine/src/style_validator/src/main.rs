@@ -14,6 +14,7 @@ mod pub_use;
 mod qualified_imports;
 mod tests_directory;
 mod violation;
+mod workspace_dependencies;
 
 use file_scanner::{find_cargo_toml_files, find_rust_files};
 
@@ -146,6 +147,22 @@ fn main() -> Result<()> {
                 } else {
                     all_violations.extend(violations);
                 }
+            }
+            Err(e) => {
+                eprintln!("Error checking {}: {}", file.display(), e);
+            }
+        }
+    }
+
+    // Check workspace dependencies for child crates under src/
+    let src_path = rules_engine_path.join("src");
+    let src_cargo_toml_files: Vec<_> =
+        cargo_toml_files.iter().filter(|file| file.starts_with(&src_path)).collect();
+
+    for file in &src_cargo_toml_files {
+        match workspace_dependencies::check_file(file) {
+            Ok(violations) => {
+                all_violations.extend(violations);
             }
             Err(e) => {
                 eprintln!("Error checking {}: {}", file.display(), e);

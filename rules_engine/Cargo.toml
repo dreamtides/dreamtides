@@ -20,6 +20,7 @@ clap = { version = "4", features = ["derive"] }
 convert_case = "0.8"
 criterion = { version = "0.5.1", features = ["html_reports"] }
 ctrlc = "3"
+derive_more = { version = "1", features = ["full"] }
 ego-tree = "0.10"
 either = "1"
 enum-iterator = "2"
@@ -35,7 +36,10 @@ insta = { version = "1", features = ["ron"] }
 ordered-float = "5"
 parking_lot = "0.12"
 petgraph = "0.8"
+prettyplease = "0.2"
+proc-macro2 = { version = "1", features = ["span-locations"] }
 proptest = "1"
+quote = "1"
 rand = "0.9"
 rand_xoshiro = { version = "0.7", features = ["serde"] }
 rayon = "1"
@@ -53,6 +57,7 @@ serde_yaml = "0.9"
 sha2 = "0.10"
 strum = { version = "0.27", features = ["derive"] }
 strum_macros = "0.27"
+syn = { version = "2", features = ["full", "visit", "visit-mut"] }
 tempfile = "3"
 thiserror = "2"
 tmux_interface = "0.3"
@@ -66,6 +71,7 @@ tracing-forest = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter", "json"] }
 umya-spreadsheet = "2"
 uuid = { version = "1", features = ["serde", "v4"] }
+walkdir = "2"
 yup-oauth2 = "12"
 zip = "4"
 
