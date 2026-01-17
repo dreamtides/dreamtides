@@ -186,15 +186,21 @@ fn reconcile_and_start_workers(config: &Config, state: &mut State, verbose: bool
             && worker_record.status == WorkerStatus::Offline
         {
             println!("  Starting worker '{}'...", worker_name);
-            // Individual worker start failure shouldn't crash the daemon
-            if let Err(e) = start_worker(worker_name, config, state, verbose) {
-                tracing::error!("Failed to start worker '{}': {}", worker_name, e);
+            // Use self-healing recovery: retry with session cleanup on failure
+            if let Err(e) = start_worker_with_recovery(worker_name, config, state, verbose) {
+                tracing::error!(
+                    "Failed to start worker '{}' after recovery attempts: {}",
+                    worker_name,
+                    e
+                );
                 eprintln!("  ⚠ Failed to start worker '{}': {}", worker_name, e);
                 failed_workers.push(worker_name.clone());
-                // Mark as error so it doesn't keep retrying
+                // Mark as error so it doesn't keep retrying aggressively
                 if let Some(worker_mut) = state.get_worker_mut(worker_name) {
                     worker_mut.status = WorkerStatus::Error;
                     worker_mut.last_activity_unix = unix_timestamp_now();
+                    worker_mut.crash_count = worker_mut.crash_count.saturating_add(1);
+                    worker_mut.last_crash_unix = Some(unix_timestamp_now());
                 }
             }
         }
@@ -206,10 +212,89 @@ fn reconcile_and_start_workers(config: &Config, state: &mut State, verbose: bool
             failed_workers.len(),
             failed_workers.join(", ")
         );
-        eprintln!("    Run 'llmc doctor --repair' to fix or 'llmc reset <worker>' to recreate");
+        eprintln!("    The daemon will continue and retry these workers periodically.");
     }
 
     Ok(())
+}
+
+/// Attempts to start a worker with self-healing recovery.
+/// If the initial start fails, kills any stale session and retries.
+/// On success, resets the crash count to provide positive feedback.
+fn start_worker_with_recovery(
+    name: &str,
+    config: &Config,
+    state: &mut State,
+    verbose: bool,
+) -> Result<()> {
+    const MAX_RETRIES: u32 = 2;
+
+    // First attempt
+    match start_worker(name, config, state, verbose) {
+        Ok(()) => {
+            // Reset crash count on successful start
+            if let Some(worker_mut) = state.get_worker_mut(name)
+                && worker_mut.crash_count > 0
+            {
+                tracing::info!(
+                    "Worker '{}' started successfully, resetting crash count from {}",
+                    name,
+                    worker_mut.crash_count
+                );
+                worker_mut.crash_count = 0;
+                worker_mut.last_crash_unix = None;
+            }
+            return Ok(());
+        }
+        Err(e) => {
+            tracing::warn!("Worker '{}' initial start failed: {}. Attempting recovery...", name, e);
+            println!("    Initial start failed, attempting self-healing recovery...");
+        }
+    }
+
+    // Recovery attempts
+    for attempt in 1..=MAX_RETRIES {
+        let session_id = state
+            .get_worker(name)
+            .map(|w| w.session_id.clone())
+            .unwrap_or_else(|| format!("llmc-{}", name));
+
+        // Kill any stale session
+        if session::session_exists(&session_id) {
+            println!("    Killing stale session '{}'...", session_id);
+            if let Err(e) = session::kill_session(&session_id) {
+                tracing::warn!("Failed to kill stale session '{}': {}", session_id, e);
+            }
+            // Wait for session cleanup
+            thread::sleep(Duration::from_millis(500));
+        }
+
+        // Wait before retry with exponential backoff
+        let delay = Duration::from_secs(attempt as u64);
+        println!("    Retry {}/{} after {}s delay...", attempt, MAX_RETRIES, attempt);
+        thread::sleep(delay);
+
+        match start_worker(name, config, state, verbose) {
+            Ok(()) => {
+                println!("    ✓ Recovery successful on retry {}", attempt);
+                tracing::info!("Worker '{}' recovered successfully on retry {}", name, attempt);
+                // Reset crash count on successful recovery
+                if let Some(worker_mut) = state.get_worker_mut(name) {
+                    worker_mut.crash_count = 0;
+                    worker_mut.last_crash_unix = None;
+                }
+                return Ok(());
+            }
+            Err(e) => {
+                tracing::warn!("Worker '{}' recovery attempt {} failed: {}", name, attempt, e);
+                if attempt == MAX_RETRIES {
+                    return Err(e);
+                }
+            }
+        }
+    }
+
+    unreachable!()
 }
 
 fn start_worker(name: &str, config: &Config, state: &mut State, verbose: bool) -> Result<()> {
@@ -441,29 +526,64 @@ fn run_main_loop(
     Ok(())
 }
 
-/// Polls worker states to detect disappeared sessions. This function is
-/// infallible - it will never crash the daemon.
+/// Polls worker states to detect disappeared sessions and retry failed workers.
+/// This function is infallible - it will never crash the daemon.
+///
+/// Self-healing behavior:
+/// - Detects workers whose sessions have disappeared and marks them offline
+/// - Retries Error workers after a cooldown period (exponential backoff based
+///   on crash count)
 fn poll_worker_states(state: &mut State) {
     let worker_names: Vec<String> = state.workers.keys().cloned().collect();
+    let now = unix_timestamp_now();
 
     for worker_name in &worker_names {
         if let Some(worker_record) = state.workers.get_mut(worker_name) {
+            // Skip already offline workers
             if worker_record.status == WorkerStatus::Offline {
                 continue;
             }
 
-            if !session::session_exists(&worker_record.session_id) {
+            // Detect disappeared sessions
+            if worker_record.status != WorkerStatus::Error
+                && !session::session_exists(&worker_record.session_id)
+            {
                 println!("  Worker '{}' session disappeared, marking offline", worker_record.name);
                 worker_record.status = WorkerStatus::Offline;
-                worker_record.last_activity_unix = unix_timestamp_now();
+                worker_record.last_activity_unix = now;
+                continue;
+            }
+
+            // Self-healing: retry Error workers after cooldown
+            if worker_record.status == WorkerStatus::Error {
+                // Calculate cooldown based on crash count (exponential backoff, max 30 minutes)
+                let base_cooldown_secs = 60u64; // 1 minute base
+                let backoff_factor = 2u64.pow(worker_record.crash_count.min(5));
+                let cooldown_secs = (base_cooldown_secs * backoff_factor).min(30 * 60);
+
+                let time_since_error = now.saturating_sub(worker_record.last_activity_unix);
+                if time_since_error >= cooldown_secs {
+                    println!(
+                        "  Worker '{}' cooldown expired ({}s), marking offline for retry",
+                        worker_record.name, cooldown_secs
+                    );
+                    tracing::info!(
+                        "Worker '{}' transitioning from Error to Offline for self-healing retry (crash_count={})",
+                        worker_record.name,
+                        worker_record.crash_count
+                    );
+                    worker_record.status = WorkerStatus::Offline;
+                    worker_record.last_activity_unix = now;
+                }
             }
         }
     }
 }
 
-/// Attempts to start any offline workers. This function is designed to be
-/// resilient - individual worker failures are logged but don't stop other
-/// workers from being started.
+/// Attempts to start any offline workers with self-healing recovery.
+/// Individual worker failures are logged but don't stop other workers from
+/// being started. The daemon continues running and will retry failed workers
+/// on subsequent iterations.
 fn start_offline_workers(config: &mut Config, state: &mut State, verbose: bool) -> Result<()> {
     let worker_names: Vec<String> = state.workers.keys().cloned().collect();
 
@@ -511,15 +631,17 @@ fn start_offline_workers(config: &mut Config, state: &mut State, verbose: bool) 
             }
 
             println!("  Starting offline worker '{}'...", worker_name);
-            // Individual worker start failure shouldn't prevent other workers from starting
-            if let Err(e) = start_worker(worker_name, config, state, verbose) {
-                tracing::error!("Failed to start worker '{}': {}", worker_name, e);
+            // Use self-healing recovery: retry with session cleanup on failure
+            if let Err(e) = start_worker_with_recovery(worker_name, config, state, verbose) {
+                tracing::error!("Failed to start worker '{}' after recovery: {}", worker_name, e);
                 eprintln!("  ⚠ Failed to start worker '{}': {}", worker_name, e);
                 failed_workers.push(worker_name.clone());
                 // Mark as error so we don't keep retrying every second
                 if let Some(worker_mut) = state.get_worker_mut(worker_name) {
                     worker_mut.status = WorkerStatus::Error;
                     worker_mut.last_activity_unix = unix_timestamp_now();
+                    worker_mut.crash_count = worker_mut.crash_count.saturating_add(1);
+                    worker_mut.last_crash_unix = Some(unix_timestamp_now());
                 }
             }
         }
