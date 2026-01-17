@@ -1,7 +1,7 @@
 use std::path::{Path, PathBuf};
 
 use rusqlite::Connection;
-use tracing::{debug, trace};
+use tracing::{debug, trace, warn};
 
 use crate::error::error_types::LatticeError;
 use crate::git::git_ops::GitOps;
@@ -79,13 +79,23 @@ pub struct ChangeInfo {
 ///
 /// # Errors
 ///
-/// Returns `LatticeError` if git operations fail or database queries fail.
+/// Returns `LatticeError` if git operations fail. Database errors when reading
+/// the last indexed commit are handled gracefully by treating them as "no last
+/// commit", which triggers the full rebuild path.
 pub fn detect_changes(
     git: &dyn GitOps,
     conn: &Connection,
     repo_root: &Path,
 ) -> Result<ChangeInfo, LatticeError> {
-    let last_indexed_commit = index_metadata::get_last_commit(conn)?;
+    // Get last indexed commit, handling errors gracefully by treating them as "no
+    // last commit" which will trigger a full rebuild path
+    let last_indexed_commit = match index_metadata::get_last_commit(conn) {
+        Ok(commit) => commit,
+        Err(e) => {
+            warn!(error = %e, "Failed to get last indexed commit (will trigger full rebuild)");
+            None
+        }
+    };
     let current_head = git.rev_parse("HEAD").ok();
 
     debug!(?last_indexed_commit, ?current_head, "Checking for changes since last index");

@@ -90,9 +90,11 @@ pub fn incremental_sync(
         }
     }
 
-    // Update last indexed commit
-    if let Some(commit) = &change_info.current_head {
-        index_metadata::set_last_commit(conn, Some(commit))?;
+    // Update last indexed commit (non-fatal if this fails)
+    if let Some(commit) = &change_info.current_head
+        && let Err(e) = index_metadata::set_last_commit(conn, Some(commit))
+    {
+        warn!(error = %e, "Failed to update last indexed commit (non-fatal)");
     }
 
     info!(files_updated, files_removed, "Incremental sync complete");
@@ -144,9 +146,11 @@ pub fn full_rebuild(
     // Update directory roots based on indexed documents
     rebuild_directory_roots(conn)?;
 
-    // Set last indexed commit to current HEAD
-    if let Ok(head) = git.rev_parse("HEAD") {
-        index_metadata::set_last_commit(conn, Some(&head))?;
+    // Set last indexed commit to current HEAD (non-fatal if this fails)
+    if let Ok(head) = git.rev_parse("HEAD")
+        && let Err(e) = index_metadata::set_last_commit(conn, Some(&head))
+    {
+        warn!(error = %e, "Failed to update last indexed commit (non-fatal)");
     }
 
     // Optimize FTS index after bulk load

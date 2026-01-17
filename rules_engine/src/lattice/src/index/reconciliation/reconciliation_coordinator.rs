@@ -8,7 +8,7 @@ use crate::error::error_types::LatticeError;
 use crate::git::git_ops::GitOps;
 use crate::index::reconciliation::change_detection::ChangeInfo;
 use crate::index::reconciliation::{change_detection, sync_strategies};
-use crate::index::{connection_pool, schema_definition};
+use crate::index::{connection_pool, index_metadata, schema_definition};
 
 /// Outcome of a reconciliation operation.
 ///
@@ -122,6 +122,11 @@ fn reconcile_inner(
 
     if change_info.is_fast_path() {
         debug!("Fast path: no changes detected");
+        // Update the last indexed timestamp even on fast path to record successful
+        // verification
+        if let Err(e) = index_metadata::touch_last_indexed(conn) {
+            warn!(error = %e, "Failed to update last indexed timestamp (non-fatal)");
+        }
         return Ok(ReconciliationResult::Skipped);
     }
 
