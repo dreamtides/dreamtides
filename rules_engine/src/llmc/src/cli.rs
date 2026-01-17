@@ -157,8 +157,12 @@ pub enum Commands {
         target: String,
     },
 
-    /// Create a new interactive console session
-    Console,
+    /// Create a new interactive console session or attach to an existing one
+    Console {
+        /// Console name (e.g., "console1"); creates if missing, attaches if
+        /// exists
+        name: Option<String>,
+    },
 
     /// Review a worker's completed work
     Review {

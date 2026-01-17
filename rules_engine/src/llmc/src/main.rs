@@ -42,7 +42,7 @@ async fn main() -> Result<()> {
         Commands::Start { .. } => "start",
         Commands::Message { .. } => "message",
         Commands::Attach { .. } => "attach",
-        Commands::Console => "console",
+        Commands::Console { .. } => "console",
         Commands::Review { .. } => "review",
         Commands::Reject { .. } => "reject",
         Commands::Accept { .. } => "accept",
@@ -72,7 +72,7 @@ async fn main() -> Result<()> {
         }
         Commands::Message { worker, message, json } => message::run_message(&worker, message, json),
         Commands::Attach { target } => attach::run_attach(&target),
-        Commands::Console => console::run_console(),
+        Commands::Console { name } => console::run_console(name.as_deref()),
         Commands::Review { worker, interface, name_only, force, json } => {
             let interface_enum = match interface.as_str() {
                 "difftastic" => ReviewInterface::Difftastic,

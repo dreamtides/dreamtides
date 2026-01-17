@@ -11,8 +11,9 @@ use super::super::tmux::session::{self, DEFAULT_SESSION_HEIGHT, DEFAULT_SESSION_
 /// Prefix for console session names
 pub const CONSOLE_PREFIX: &str = "llmc-console";
 
-/// Runs the console command, creating a new console session and attaching to it
-pub fn run_console() -> Result<()> {
+/// Runs the console command, creating a new console session or attaching to an
+/// existing one
+pub fn run_console(name: Option<&str>) -> Result<()> {
     let llmc_root = config::get_llmc_root();
     if !llmc_root.exists() {
         bail!(
@@ -20,6 +21,18 @@ pub fn run_console() -> Result<()> {
              Expected workspace at: {}",
             llmc_root.display()
         );
+    }
+
+    // If a name was provided, check if the session already exists
+    if let Some(requested_name) = name {
+        let session_name = normalize_console_name(requested_name);
+        if session::session_exists(&session_name) {
+            println!("Attaching to existing console session: {}", session_name);
+            let err =
+                Command::new("tmux").arg("attach-session").arg("-t").arg(&session_name).exec();
+            return Err(anyhow::anyhow!("Failed to exec tmux attach-session: {}", err));
+        }
+        // Session doesn't exist, we'll create it below with this name
     }
 
     let config_path = config::get_config_path();
@@ -35,8 +48,12 @@ pub fn run_console() -> Result<()> {
         );
     }
 
-    // Find next available console number
-    let session_name = find_next_console_name()?;
+    // Determine session name: use provided name or find next available
+    let session_name = if let Some(requested_name) = name {
+        normalize_console_name(requested_name)
+    } else {
+        find_next_console_name()?
+    };
     println!("Creating console session: {}", session_name);
     println!("Working directory: {}", working_dir.display());
 
