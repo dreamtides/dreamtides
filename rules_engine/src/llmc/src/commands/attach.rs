@@ -5,9 +5,11 @@ use anyhow::{Context, Result, bail};
 
 use super::super::config;
 use super::super::state::{self, State};
+use super::super::tmux::session;
+use super::console;
 
-/// Runs the attach command, connecting to a worker's TMUX session
-pub fn run_attach(worker: &str) -> Result<()> {
+/// Runs the attach command, connecting to a worker's or console's TMUX session
+pub fn run_attach(target: &str) -> Result<()> {
     let llmc_root = config::get_llmc_root();
     if !llmc_root.exists() {
         bail!(
@@ -17,6 +19,41 @@ pub fn run_attach(worker: &str) -> Result<()> {
         );
     }
 
+    // Check if this is a console session
+    if console::is_console_name(target) {
+        return attach_to_console(target);
+    }
+
+    // Otherwise, treat as a worker
+    attach_to_worker(target)
+}
+
+/// Attaches to a console session
+fn attach_to_console(name: &str) -> Result<()> {
+    let session_id = console::normalize_console_name(name);
+
+    if !session::session_exists(&session_id) {
+        let consoles = console::list_console_sessions()?;
+        let available = if consoles.is_empty() {
+            "none (run 'llmc console' to create one)".to_string()
+        } else {
+            consoles.join(", ")
+        };
+        bail!(
+            "Console session '{}' does not exist\n\
+             Available consoles: {}",
+            session_id,
+            available
+        );
+    }
+
+    let err = Command::new("tmux").arg("attach-session").arg("-t").arg(&session_id).exec();
+
+    Err(anyhow::anyhow!("Failed to exec tmux attach-session: {}", err))
+}
+
+/// Attaches to a worker session
+fn attach_to_worker(worker: &str) -> Result<()> {
     let state_path = state::get_state_path();
     let state = State::load(&state_path)?;
 

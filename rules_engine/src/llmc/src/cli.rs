@@ -146,11 +146,14 @@ pub enum Commands {
         json: bool,
     },
 
-    /// Attach to a worker's TMUX session
+    /// Attach to a worker's or console's TMUX session
     Attach {
-        /// Worker name
-        worker: String,
+        /// Worker or console name (e.g., "adam", "console1", "llmc-console1")
+        target: String,
     },
+
+    /// Create a new interactive console session
+    Console,
 
     /// Review a worker's completed work
     Review {

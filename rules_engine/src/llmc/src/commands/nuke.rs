@@ -8,8 +8,10 @@ use super::super::lock::StateLock;
 use super::super::state::{self, State};
 use super::super::tmux::session;
 use super::super::{config, git};
-/// Runs the nuke command, permanently removing a worker
-pub fn run_nuke(worker: Option<&str>, all: bool, json: bool) -> Result<()> {
+use super::console;
+
+/// Runs the nuke command, permanently removing a worker or console session
+pub fn run_nuke(name: Option<&str>, all: bool, json: bool) -> Result<()> {
     let llmc_root = config::get_llmc_root();
     if !llmc_root.exists() {
         bail!(
@@ -18,12 +20,21 @@ pub fn run_nuke(worker: Option<&str>, all: bool, json: bool) -> Result<()> {
             llmc_root.display()
         );
     }
+
+    // Check if this is a console session (consoles don't need state lock or state
+    // modification)
+    if let Some(name) = name
+        && console::is_console_name(name)
+    {
+        return nuke_console(name, json);
+    }
+
     let _lock = StateLock::acquire()?;
     let state_path = state::get_state_path();
     let mut state = State::load(&state_path)?;
     let mut removed_workers = Vec::new();
     if all {
-        if worker.is_some() {
+        if name.is_some() {
             bail!("Cannot specify both --all and a worker name");
         }
         let worker_names: Vec<_> = state.workers.keys().cloned().collect();
@@ -67,7 +78,7 @@ pub fn run_nuke(worker: Option<&str>, all: bool, json: bool) -> Result<()> {
             println!("✓ {} worker(s) have been nuked", removed_workers.len());
         }
     } else {
-        let Some(worker) = worker else {
+        let Some(worker) = name else {
             bail!("Worker name required (or use --all to nuke all workers)");
         };
         if nuke_worker(&mut state, &llmc_root, worker)? {
@@ -86,6 +97,53 @@ pub fn run_nuke(worker: Option<&str>, all: bool, json: bool) -> Result<()> {
             });
         }
     }
+    Ok(())
+}
+
+/// Nukes a console session (just kills the TMUX session)
+fn nuke_console(name: &str, json: bool) -> Result<()> {
+    let session_id = console::normalize_console_name(name);
+
+    if !session::session_exists(&session_id) {
+        let consoles = console::list_console_sessions()?;
+        let available = if consoles.is_empty() { "none".to_string() } else { consoles.join(", ") };
+        bail!(
+            "Console session '{}' does not exist\n\
+             Available consoles: {}",
+            session_id,
+            available
+        );
+    }
+
+    // Confirm before nuking
+    if !json {
+        println!(
+            "This will terminate console session '{}'.\n\
+             \n\
+             Proceed? [y/N] ",
+            session_id
+        );
+        io::stdout().flush()?;
+        let mut input = String::new();
+        io::stdin().read_line(&mut input)?;
+        if !input.trim().eq_ignore_ascii_case("y") {
+            println!("Cancelled.");
+            return Ok(());
+        }
+    }
+
+    if let Err(e) = session::kill_session(&session_id) {
+        bail!("Failed to kill console session '{}': {}", session_id, e);
+    }
+
+    if json {
+        crate::json_output::print_json(&crate::json_output::NukeOutput {
+            workers_removed: vec![session_id.clone()],
+        });
+    } else {
+        println!("✓ Console session '{}' has been terminated", session_id);
+    }
+
     Ok(())
 }
 fn nuke_worker(state: &mut State, llmc_root: &Path, worker: &str) -> Result<bool> {

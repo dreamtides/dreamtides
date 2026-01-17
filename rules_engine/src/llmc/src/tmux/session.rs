@@ -231,16 +231,7 @@ pub fn is_claude_process(cmd: &str) -> bool {
     SEMVER_PATTERN.get_or_init(|| Regex::new(r"^\d+\.\d+\.\d+").unwrap()).is_match(cmd)
 }
 
-fn build_claude_command(config: &WorkerConfig) -> String {
-    let mut cmd = String::from("claude");
-    if let Some(model) = &config.model {
-        cmd.push_str(&format!(" --model {}", model));
-    }
-    cmd.push_str(" --dangerously-skip-permissions");
-    cmd
-}
-
-fn wait_for_claude_ready(session: &str, timeout: Duration, verbose: bool) -> Result<()> {
+pub fn wait_for_claude_ready(session: &str, timeout: Duration, verbose: bool) -> Result<()> {
     const POLL_INTERVAL_MS: u64 = 500;
     const GRACE_PERIOD_SECS: u64 = 5;
     let start = std::time::Instant::now();
@@ -338,7 +329,7 @@ fn wait_for_claude_ready(session: &str, timeout: Duration, verbose: bool) -> Res
     bail!("Claude did not become ready after {} seconds", timeout.as_secs())
 }
 
-fn accept_bypass_warning(session: &str, sender: &TmuxSender, verbose: bool) -> Result<()> {
+pub fn accept_bypass_warning(session: &str, sender: &TmuxSender, verbose: bool) -> Result<()> {
     thread::sleep(Duration::from_millis(500));
     if let Ok(output) = capture_pane(session, 50) {
         let lower = output.to_lowercase();
@@ -367,6 +358,15 @@ fn accept_bypass_warning(session: &str, sender: &TmuxSender, verbose: bool) -> R
         println!("        [verbose] Could not capture pane for bypass warning check");
     }
     Ok(())
+}
+
+fn build_claude_command(config: &WorkerConfig) -> String {
+    let mut cmd = String::from("claude");
+    if let Some(model) = &config.model {
+        cmd.push_str(&format!(" --model {}", model));
+    }
+    cmd.push_str(" --dangerously-skip-permissions");
+    cmd
 }
 
 #[cfg(test)]

@@ -330,14 +330,19 @@ Flags:
 
 ### `llmc nuke <name>`
 
-Permanently removes a worker.
+Permanently removes a worker or console session.
 
 ```bash
-llmc nuke <name>
-llmc nuke --all
+llmc nuke adam          # Remove worker "adam"
+llmc nuke console1      # Remove console session "console1"
+llmc nuke --all         # Remove all workers (not consoles)
 ```
 
-Kills TMUX session, removes worktree, deletes branch, removes from state.
+For workers: Kills TMUX session, removes worktree, deletes branch, removes from
+state.
+
+For console sessions: Only kills the TMUX session (consoles have no worktree,
+branch, or state).
 
 ### `llmc status`
 
@@ -420,13 +425,33 @@ llmc message adam  # Opens $EDITOR for message
 If no message is provided, opens `$EDITOR` for composing the message
 interactively. Empty or whitespace-only content aborts the operation.
 
-### `llmc attach <worker>`
+### `llmc attach <target>`
 
-Attaches to a worker's TMUX session for interactive use.
+Attaches to a worker's or console's TMUX session for interactive use.
 
 ```bash
-llmc attach adam
+llmc attach adam        # Attach to worker "adam"
+llmc attach console1    # Attach to console session "console1"
+llmc attach llmc-console1  # Also works with full session name
 ```
+
+### `llmc console`
+
+Creates a new interactive console session and attaches to it. Console sessions
+provide manual agent interaction via the same TMUX interface as workers, but
+without creating a worker or worktree.
+
+```bash
+llmc console
+```
+
+Session names are automatically assigned as "llmc-console1", "llmc-console2",
+etc. The session runs in the LLMC root directory with the default model
+configuration.
+
+Console sessions can be:
+- Attached to later with `llmc attach console1`
+- Terminated with `llmc nuke console1`
 
 ### `llmc review [worker]`
 

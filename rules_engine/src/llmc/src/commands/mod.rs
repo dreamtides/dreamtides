@@ -2,6 +2,7 @@ pub mod accept;
 pub mod add;
 pub mod attach;
 pub mod config;
+pub mod console;
 pub mod doctor;
 pub mod down;
 pub mod init;

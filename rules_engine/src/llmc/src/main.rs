@@ -19,8 +19,8 @@ use llmc::json_output;
 
 use crate::commands::review::ReviewInterface;
 use crate::commands::{
-    accept, add, attach, config as config_cmd, doctor, down, init, message, nuke, peek, pick,
-    rebase, reject, reset, review, start, status, up,
+    accept, add, attach, config as config_cmd, console, doctor, down, init, message, nuke, peek,
+    pick, rebase, reject, reset, review, start, status, up,
 };
 use crate::logging::config as log_config;
 
@@ -42,6 +42,7 @@ async fn main() -> Result<()> {
         Commands::Start { .. } => "start",
         Commands::Message { .. } => "message",
         Commands::Attach { .. } => "attach",
+        Commands::Console => "console",
         Commands::Review { .. } => "review",
         Commands::Reject { .. } => "reject",
         Commands::Accept { .. } => "accept",
@@ -70,7 +71,8 @@ async fn main() -> Result<()> {
             start::run_start(worker, prefix, prompt, prompt_file, prompt_cmd, self_review, json)
         }
         Commands::Message { worker, message, json } => message::run_message(&worker, message, json),
-        Commands::Attach { worker } => attach::run_attach(&worker),
+        Commands::Attach { target } => attach::run_attach(&target),
+        Commands::Console => console::run_console(),
         Commands::Review { worker, interface, name_only, json } => {
             let interface_enum = match interface.as_str() {
                 "difftastic" => ReviewInterface::Difftastic,
