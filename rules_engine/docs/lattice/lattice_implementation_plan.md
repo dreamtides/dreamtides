@@ -235,7 +235,7 @@ Tracking](appendix_task_tracking.md)
 
 ---
 
-## Feature: Index Core [ONGOING]
+## Feature: Index Core [DONE]
 
 **Goal:** SQLite schema, connection management, and core queries. No
 reconciliation yet.
@@ -317,9 +317,48 @@ reconciliation yet.
 - Evict least-recently-accessed when >100 documents cached
 - Used by `lat show`, `lat search` snippets, template composition
 
+#### I9: Index Metadata (`index/index_metadata.rs`)
+**Files:** `index/index_metadata.rs`
+
+- Get/set last indexed commit hash
+- Get/set last indexed timestamp
+- Support for reconciliation fast-path checks
+
+#### I10: Client Counters (`index/client_counters.rs`)
+**Files:** `index/client_counters.rs`
+
+- Get and increment counter atomically (for ID generation)
+- Set counter value (for counter recovery)
+- Set counter if higher (for scanning existing documents)
+- List all client counters
+
+#### I11: Directory Roots (`index/directory_roots.rs`)
+**Files:** `index/directory_roots.rs`
+
+- Upsert directory root entries
+- Get ancestors for template composition
+- Get children for hierarchy queries
+- List roots at depth, list all roots
+
+#### I12: Document Types (`index/document_types.rs`)
+**Files:** `index/document_types.rs`
+
+- `DocumentRow` struct for query results
+- `InsertDocument` struct for insertions
+- `UpdateBuilder` for partial updates
+- Row-to-struct conversion with datetime parsing
+
+#### I13: Document Filter (`index/document_filter.rs`)
+**Files:** `index/document_filter.rs`
+
+- `DocumentFilter` struct with all query criteria
+- `DocumentState` enum (Open, Blocked, Closed)
+- `SortColumn` and `SortOrder` enums
+- SQL query building from filter criteria
+
 ---
 
-## Feature: CLI Framework [ONGOING]
+## Feature: CLI Framework [DONE]
 
 **Goal:** Argument parsing, command dispatch, output formatting. Skeleton for
 all commands.
@@ -458,12 +497,15 @@ lists (flags, arguments, output modes), implementers should reference
   parsing
 - Log warning for skipped conflicted files
 
-#### R4: Index Metadata (`index/index_metadata.rs`)
-**Files:** `index/index_metadata.rs`
+#### R4: Index Metadata Integration
+**Files:** Uses `index/index_metadata.rs` (I9)
 
-- Store/retrieve schema version
-- Store/retrieve last indexed commit
-- Store/retrieve last indexed timestamp
+- Use I9 query functions for fast-path checks
+- Update last_commit after successful reconciliation
+- Update last_indexed timestamp
+
+**Note:** Query functions are implemented in Index Core (I9). This work item
+integrates those functions into the reconciliation workflow.
 
 ---
 
@@ -1140,12 +1182,15 @@ Linking System](appendix_linking_system.md)
 - Extract section content up to next heading of same/higher level
 - Handle any heading level (# through ######)
 
-#### TM3: Directory Roots Table (`index/directory_roots.rs`)
-**Files:** `index/directory_roots.rs`
+#### TM3: Directory Roots Population
+**Files:** Uses `index/directory_roots.rs` (I11)
 
-- Populate during reconciliation
-- Store: directory_path, root_id, parent_path, depth
-- Query ancestors for template composition
+- Populate directory_roots table during reconciliation
+- Compute depth and parent_path for each root document
+- Update entries when documents are moved
+
+**Note:** Query functions are implemented in Index Core (I11). This work item
+populates the table during index reconciliation.
 
 ---
 

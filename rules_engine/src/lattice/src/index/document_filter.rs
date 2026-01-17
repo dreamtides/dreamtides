@@ -13,6 +13,7 @@ pub struct DocumentFilter {
     pub labels_all: Vec<String>,
     pub labels_any: Vec<String>,
     pub path_prefix: Option<String>,
+    pub name_contains: Option<String>,
     pub created_after: Option<DateTime<Utc>>,
     pub created_before: Option<DateTime<Utc>>,
     pub updated_after: Option<DateTime<Utc>>,
@@ -132,6 +133,12 @@ impl DocumentFilter {
         self
     }
 
+    /// Filters by name substring match.
+    pub fn with_name_contains(mut self, substring: impl Into<String>) -> Self {
+        self.name_contains = Some(substring.into());
+        self
+    }
+
     /// Filters by root document status.
     pub fn with_is_root(mut self, is_root: bool) -> Self {
         self.is_root = Some(is_root);
@@ -245,6 +252,11 @@ fn append_filter_conditions(
     if let Some(prefix) = &filter.path_prefix {
         sql.push_str(" AND path LIKE ?");
         params.push(Box::new(format!("{prefix}%")));
+    }
+
+    if let Some(substring) = &filter.name_contains {
+        sql.push_str(" AND name LIKE ?");
+        params.push(Box::new(format!("%{substring}%")));
     }
 
     if let Some(dt) = filter.created_after {
