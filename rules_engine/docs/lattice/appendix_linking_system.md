@@ -73,7 +73,7 @@ The `links` table stores:
 |--------|-------------|
 | source_id | Document containing the link |
 | target_id | Referenced document |
-| link_type | 'body' or 'frontmatter' |
+| link_type | Link type (see [Appendix: Indexing](appendix_indexing.md#links)) |
 | position | Order within source (0-indexed) |
 
 ### Bidirectional Queries
@@ -202,7 +202,10 @@ related-ids: [LWWWWW]
 ---
 ```
 
-All IDs in these fields become links with type 'frontmatter'.
+Each field creates links with its own type: `blocking` links use type `blocking`,
+`blocked-by` links use type `blocked_by`, and `discovered-from` links use type
+`discovered_from`. See [Appendix: Indexing](appendix_indexing.md#links) for the
+complete list of link types.
 
 ## Link Maintenance
 
