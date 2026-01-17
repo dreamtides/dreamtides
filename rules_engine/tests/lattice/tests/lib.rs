@@ -1,3 +1,4 @@
+mod color_theme_tests;
 mod commands;
 mod config_tests;
 mod document_reader_tests;
