@@ -235,7 +235,7 @@ Tracking](appendix_task_tracking.md)
 
 ---
 
-## Feature: Index Core
+## Feature: Index Core [ONGOING]
 
 **Goal:** SQLite schema, connection management, and core queries. No
 reconciliation yet.
@@ -319,7 +319,7 @@ reconciliation yet.
 
 ---
 
-## Feature: CLI Framework
+## Feature: CLI Framework [ONGOING]
 
 **Goal:** Argument parsing, command dispatch, output formatting. Skeleton for
 all commands.
