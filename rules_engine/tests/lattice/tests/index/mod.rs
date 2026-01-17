@@ -6,3 +6,4 @@ mod link_queries_tests;
 mod query_tests;
 mod reconciliation_tests;
 mod schema_definition_tests;
+mod view_tracking_tests;
