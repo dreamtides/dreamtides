@@ -155,6 +155,7 @@ fn create_labels_table(conn: &Connection) -> Result<(), LatticeError> {
 
 fn create_index_metadata_table(conn: &Connection) -> Result<(), LatticeError> {
     debug!("Creating index_metadata table");
+    // Use strftime to produce RFC3339-compatible format for timestamp parsing
     conn.execute_batch(&format!(
         "
         CREATE TABLE index_metadata (
@@ -165,7 +166,7 @@ fn create_index_metadata_table(conn: &Connection) -> Result<(), LatticeError> {
         );
 
         INSERT INTO index_metadata (id, schema_version, last_indexed)
-        VALUES (1, {SCHEMA_VERSION}, datetime('now'));
+        VALUES (1, {SCHEMA_VERSION}, strftime('%Y-%m-%dT%H:%M:%SZ', 'now'));
         "
     ))
     .map_err(|e| LatticeError::DatabaseError {

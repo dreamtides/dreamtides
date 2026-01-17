@@ -94,11 +94,12 @@ pub fn get_last_indexed(conn: &Connection) -> Result<Option<DateTime<Utc>>, Latt
 
 /// Updates the last indexed commit hash.
 pub fn set_last_commit(conn: &Connection, commit: Option<&str>) -> Result<(), LatticeError> {
-    debug!(?commit, "Updating last indexed commit");
+    let timestamp = Utc::now().to_rfc3339();
+    debug!(?commit, %timestamp, "Updating last indexed commit");
 
     conn.execute(
-        "UPDATE index_metadata SET last_commit = ?, last_indexed = datetime('now') WHERE id = 1",
-        [commit],
+        "UPDATE index_metadata SET last_commit = ?1, last_indexed = ?2 WHERE id = 1",
+        rusqlite::params![commit, timestamp],
     )
     .map_err(|e| LatticeError::DatabaseError {
         reason: format!("Failed to update last commit: {e}"),
@@ -109,9 +110,10 @@ pub fn set_last_commit(conn: &Connection, commit: Option<&str>) -> Result<(), La
 
 /// Updates the last indexed timestamp to the current time.
 pub fn touch_last_indexed(conn: &Connection) -> Result<(), LatticeError> {
-    debug!("Updating last indexed timestamp");
+    let timestamp = Utc::now().to_rfc3339();
+    debug!(%timestamp, "Updating last indexed timestamp");
 
-    conn.execute("UPDATE index_metadata SET last_indexed = datetime('now') WHERE id = 1", [])
+    conn.execute("UPDATE index_metadata SET last_indexed = ?1 WHERE id = 1", [&timestamp])
         .map_err(|e| LatticeError::DatabaseError {
             reason: format!("Failed to update last indexed: {e}"),
         })?;
