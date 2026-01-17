@@ -1,3 +1,4 @@
+mod client_counters_tests;
 mod connection_pool_tests;
 mod content_cache_tests;
 mod document_queries_tests;

@@ -6,46 +6,27 @@ use crate::error::error_types::LatticeError;
 /// Gets the next counter value for a client, creating the record if needed.
 ///
 /// Returns the current counter value and increments it in the database.
-/// This is an atomic operation suitable for ID generation.
+/// This is an atomic operation suitable for ID generation - uses a single
+/// SQL statement with UPSERT and RETURNING to avoid race conditions.
 pub fn get_and_increment(conn: &Connection, client_id: &str) -> Result<u64, LatticeError> {
     debug!(client_id, "Getting and incrementing counter");
 
-    let current: Option<i64> = conn
+    // Atomic upsert: inserts with next_counter=1 (returning 0) or increments
+    // existing (returning old value). Single statement prevents race conditions.
+    let counter: i64 = conn
         .query_row(
-            "SELECT next_counter FROM client_counters WHERE client_id = ?",
+            "INSERT INTO client_counters (client_id, next_counter) VALUES (?1, 1)
+             ON CONFLICT(client_id) DO UPDATE SET next_counter = next_counter + 1
+             RETURNING next_counter - 1",
             [client_id],
             |row| row.get(0),
         )
-        .optional()
         .map_err(|e| LatticeError::DatabaseError {
-            reason: format!("Failed to query counter for client {client_id}: {e}"),
+            reason: format!("Failed to get and increment counter for client {client_id}: {e}"),
         })?;
 
-    match current {
-        Some(counter) => {
-            conn.execute(
-                "UPDATE client_counters SET next_counter = next_counter + 1 WHERE client_id = ?",
-                [client_id],
-            )
-            .map_err(|e| LatticeError::DatabaseError {
-                reason: format!("Failed to increment counter for client {client_id}: {e}"),
-            })?;
-
-            debug!(client_id, counter, "Incremented existing counter");
-            Ok(counter as u64)
-        }
-        None => {
-            conn.execute("INSERT INTO client_counters (client_id, next_counter) VALUES (?, 1)", [
-                client_id,
-            ])
-            .map_err(|e| LatticeError::DatabaseError {
-                reason: format!("Failed to create counter for client {client_id}: {e}"),
-            })?;
-
-            debug!(client_id, "Created new counter starting at 0");
-            Ok(0)
-        }
-    }
+    debug!(client_id, counter, "Got and incremented counter");
+    Ok(counter as u64)
 }
 
 /// Gets the current counter value for a client without incrementing.
