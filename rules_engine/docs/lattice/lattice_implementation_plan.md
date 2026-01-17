@@ -123,7 +123,7 @@ System](appendix_id_system.md)
 
 ---
 
-## Feature: Git Layer [ONGOING]
+## Feature: Git Layer [DONE]
 
 **Goal:** Abstract git operations behind a trait for testing. Implement document
 discovery and change detection.
@@ -177,7 +177,7 @@ discovery and change detection.
 
 ---
 
-## Feature: Document Model [ONGOING]
+## Feature: Document Model [DONE]
 
 **Goal:** Parse and serialize Lattice documents. Validate frontmatter fields.
 

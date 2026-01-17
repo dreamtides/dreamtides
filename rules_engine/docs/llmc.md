@@ -231,7 +231,8 @@ maintain system health. It performs four main operations:
 1. **Check session health**: Verify TMUX sessions exist and match state file
 2. **Detect state transitions**: Find workers that have finished but haven't
    been processed yet
-3. **Rebase pending reviews**: Keep `needs_review` workers rebased on master
+3. **Rebase pending reviews**: Keep `needs_review` workers rebased on master,
+   and detect workers whose work was already merged (resetting them to idle)
 4. **Detect stuck workers**: Find workers that appear stuck
 
 The patrol runs on a configurable interval (default: 60 seconds) unless another

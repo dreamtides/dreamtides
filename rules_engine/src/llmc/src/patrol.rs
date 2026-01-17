@@ -675,17 +675,17 @@ impl Patrol {
         transitioned_workers: &std::collections::HashSet<String>,
         report: &mut PatrolReport,
     ) -> Result<()> {
-        let workers_to_rebase: Vec<String> = state
+        let workers_to_check: Vec<String> = state
             .workers
             .iter()
             .filter(|(_, w)| w.status == WorkerStatus::NeedsReview)
             .map(|(name, _)| name.clone())
             .collect();
 
-        for worker_name in workers_to_rebase {
+        for worker_name in workers_to_check {
             if transitioned_workers.contains(&worker_name) {
                 tracing::debug!(
-                    "Skipping rebase for worker '{}' - just transitioned in this patrol run",
+                    "Skipping rebase check for worker '{}' - just transitioned in this patrol run",
                     worker_name
                 );
                 continue;
@@ -710,17 +710,42 @@ impl Patrol {
                 continue;
             }
 
-            let llmc_root = crate::config::get_llmc_root();
-            let master_sha = git::get_head_commit(&llmc_root)?;
+            let has_commits_ahead = git::has_commits_ahead_of(&worktree_path, "origin/master")?;
+            let worker_head = git::get_head_commit(&worktree_path)?;
+
+            if !has_commits_ahead {
+                tracing::info!(
+                    worker = %worker_name,
+                    worker_head = %worker_head,
+                    "Worker is in needs_review but has no commits ahead of origin/master - work was already merged, resetting to idle"
+                );
+                let worker_mut = state.get_worker_mut(&worker_name).unwrap();
+                worker::apply_transition(worker_mut, WorkerTransition::ToIdle)?;
+                report.transitions_applied.push((worker_name.clone(), WorkerTransition::ToIdle));
+                continue;
+            }
+
+            let origin_master_sha = git::get_head_commit_of_ref(&worktree_path, "origin/master")?;
             let merge_base = git::get_merge_base(&worktree_path, "HEAD", "origin/master")?;
 
-            if merge_base == master_sha {
+            tracing::debug!(
+                worker = %worker_name,
+                worker_head = %worker_head,
+                origin_master = %origin_master_sha,
+                merge_base = %merge_base,
+                "Checking if rebase is needed"
+            );
+
+            if merge_base == origin_master_sha {
+                tracing::debug!("Worker '{}' is already rebased onto origin/master", worker_name);
                 continue;
             }
 
             tracing::info!(
-                "Master has advanced - rebasing worker '{}' in needs_review",
-                worker_name
+                worker = %worker_name,
+                merge_base = %merge_base,
+                origin_master = %origin_master_sha,
+                "Master has advanced - rebasing worker in needs_review"
             );
 
             match self.trigger_rebase(&worker_name, &worktree_path, &session_id, state) {
