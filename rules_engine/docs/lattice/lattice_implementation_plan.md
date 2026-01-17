@@ -317,45 +317,6 @@ reconciliation yet.
 - Evict least-recently-accessed when >100 documents cached
 - Used by `lat show`, `lat search` snippets, template composition
 
-#### I9: Index Metadata (`index/index_metadata.rs`)
-**Files:** `index/index_metadata.rs`
-
-- Get/set last indexed commit hash
-- Get/set last indexed timestamp
-- Support for reconciliation fast-path checks
-
-#### I10: Client Counters (`index/client_counters.rs`)
-**Files:** `index/client_counters.rs`
-
-- Get and increment counter atomically (for ID generation)
-- Set counter value (for counter recovery)
-- Set counter if higher (for scanning existing documents)
-- List all client counters
-
-#### I11: Directory Roots (`index/directory_roots.rs`)
-**Files:** `index/directory_roots.rs`
-
-- Upsert directory root entries
-- Get ancestors for template composition
-- Get children for hierarchy queries
-- List roots at depth, list all roots
-
-#### I12: Document Types (`index/document_types.rs`)
-**Files:** `index/document_types.rs`
-
-- `DocumentRow` struct for query results
-- `InsertDocument` struct for insertions
-- `UpdateBuilder` for partial updates
-- Row-to-struct conversion with datetime parsing
-
-#### I13: Document Filter (`index/document_filter.rs`)
-**Files:** `index/document_filter.rs`
-
-- `DocumentFilter` struct with all query criteria
-- `DocumentState` enum (Open, Blocked, Closed)
-- `SortColumn` and `SortOrder` enums
-- SQL query building from filter criteria
-
 ---
 
 ## Feature: CLI Framework [DONE]
@@ -415,6 +376,68 @@ Design: UI Design](lattice_design.md#ui-design)
 - Process `--json`, `--verbose`, `--quiet` flags
 - Configure logging level based on flags
 - Output mode selection (text/json/quiet)
+
+---
+
+## Feature: Index Core (Continued)
+
+**Goal:** Additional Index Core functionality discovered during post-implementation
+review that supports Reconciliation and other features.
+
+**Depends on:** Index Core
+
+**Exports:**
+- Index metadata query functions for reconciliation fast-path
+- Client counter management for ID generation
+- Directory roots hierarchy queries for template composition
+- Document filter name search capability
+
+### Work Items
+
+#### I9: Index Metadata Query Functions (`index/index_metadata.rs`)
+**Files:** `index/index_metadata.rs`
+
+- `get_metadata()` - retrieves full IndexMetadata struct
+- `get_last_commit()` - gets last indexed git commit hash
+- `get_last_indexed()` - gets last indexed timestamp
+- `set_last_commit()` - updates commit hash and touches timestamp
+- `touch_last_indexed()` - updates timestamp only
+
+#### I10: Client Counters Query Functions (`index/client_counters.rs`)
+**Files:** `index/client_counters.rs`
+
+- `get_and_increment()` - atomic get-and-increment for ID generation
+- `get_counter()` - read current counter without incrementing
+- `set_counter()` - set counter value (for recovery)
+- `set_counter_if_higher()` - conditional set for recovery
+- `list_all()` - list all client counters
+- `delete()` - remove a client's counter
+
+#### I11: Directory Roots Hierarchy Queries (`index/directory_roots.rs`)
+**Files:** `index/directory_roots.rs`
+
+- `upsert()` - insert or update directory root entry
+- `get()` - get full DirectoryRoot entry
+- `get_root_id()` - get just the root document ID
+- `get_ancestors()` - get all ancestors ordered root-to-parent
+- `get_children()` - get immediate child directories
+- `list_at_depth()` - list all roots at a specific depth
+- `list_all()` - list all roots ordered by depth then path
+- `delete()` - remove a directory root entry
+- `clear_all()` - clear all entries (for full rebuild)
+
+#### I12: Document Types Documentation
+**Files:** `index/document_types.rs`
+
+- Add module documentation explaining `IndexedDocument` vs parsed `Document`
+- Document the separation between index cache and full document parsing
+
+#### I13: Document Filter Documentation
+**Files:** `index/document_filter.rs`
+
+- Add module documentation for `DocumentFilter` builder pattern
+- Document `name_contains` filter for substring matching on document names
+- Document available filter criteria and sort options
 
 ---
 
