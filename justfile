@@ -36,8 +36,7 @@ check-warnings:
 
 build:
     #!/usr/bin/env bash
-    # Use classic linker to avoid assertion failures with long symbol names in ld_new
-    output=$(RUSTFLAGS="-C link-arg=-Wl,-ld_classic" cargo build --manifest-path rules_engine/Cargo.toml --all-targets --all-features 2>&1)
+    output=$(cargo build --manifest-path rules_engine/Cargo.toml --all-targets --all-features 2>&1)
     if [ $? -eq 0 ]; then
         echo "Build passed"
     else
