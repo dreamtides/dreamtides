@@ -49,6 +49,27 @@ impl Patrol {
         self.check_session_health(state, config, &mut report)?;
         self.check_state_consistency(state, &mut report)?;
         self.detect_state_transitions(state, config, &mut report)?;
+
+        // Save state immediately after transitions are applied to prevent losing
+        // them when the main loop reloads state from disk. This is critical for
+        // the self-review flow: without this save, NeedsReview transitions are lost
+        // and the 10s delay in send_pending_self_review_prompts never completes.
+        if !report.transitions_applied.is_empty() {
+            let state_path = state::get_state_path();
+            if let Err(e) = state.save(&state_path) {
+                tracing::error!(
+                    "Failed to save state after {} transitions (self-review may not trigger): {}",
+                    report.transitions_applied.len(),
+                    e
+                );
+            } else {
+                tracing::debug!(
+                    "Saved state after {} transitions",
+                    report.transitions_applied.len()
+                );
+            }
+        }
+
         self.send_pending_self_review_prompts(state, config)?;
         self.detect_reviewing_amendments(state, &mut report)?;
 
@@ -466,10 +487,12 @@ impl Patrol {
             let elapsed = now.saturating_sub(worker.last_activity_unix);
             if elapsed < delay_secs {
                 tracing::debug!(
-                    "Worker '{}' needs self-review but only {}s elapsed (need {}s)",
-                    worker_name,
-                    elapsed,
-                    delay_secs
+                    worker = %worker_name,
+                    elapsed_secs = elapsed,
+                    delay_secs,
+                    last_activity_unix = worker.last_activity_unix,
+                    now_unix = now,
+                    "Waiting for self-review delay"
                 );
                 continue;
             }
