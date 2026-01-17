@@ -164,10 +164,13 @@ def get_started_worker() -> str | None:
     try:
         data = json.loads(result.stdout)
         workers = data.get("workers", [])
-        # Find the most recently started working worker
-        for worker in workers:
-            if worker.get("status") == "working":
-                return worker.get("name")
+        # Find the most recently started working worker (smallest time_in_state)
+        working = [w for w in workers if w.get("status") == "working"]
+        if not working:
+            return None
+        # Sort by time_in_state_secs ascending (most recent first)
+        working.sort(key=lambda w: w.get("time_in_state_secs", float("inf")))
+        return working[0].get("name")
     except json.JSONDecodeError:
         pass
     return None
