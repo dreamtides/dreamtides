@@ -12,7 +12,8 @@ Commands:
     task_runner review --interface vscode
     task_runner review --name-only
 
-    task_runner accept             Accept most recently reviewed worker, close bead
+    task_runner accept [worker]    Accept worker (default: most recently reviewed), close bead
+    task_runner accept opus1       Accept specific worker
 
 Options:
     --verbose, -v    Enable debug logging
@@ -262,10 +263,10 @@ def cmd_review(args: argparse.Namespace) -> int:
 
 def cmd_accept(args: argparse.Namespace) -> int:
     state = load_state()
-    worker = state.get("last_reviewed_worker")
+    worker = args.worker or state.get("last_reviewed_worker")
 
     if not worker:
-        print(f"{Colors.RED}No recently reviewed worker. Run 'task_runner review' first.{Colors.RESET}", file=sys.stderr)
+        print(f"{Colors.RED}No worker specified and no recently reviewed worker. Provide a worker name or run 'task_runner review' first.{Colors.RESET}", file=sys.stderr)
         return 1
 
     bead_id = state.get("worker_beads", {}).get(worker)
@@ -350,7 +351,12 @@ def main():
     )
 
     # accept command
-    subparsers.add_parser("accept", help="Accept most recently reviewed work")
+    accept_parser = subparsers.add_parser("accept", help="Accept most recently reviewed work")
+    accept_parser.add_argument(
+        "worker",
+        nargs="?",
+        help="Specific worker to accept (default: most recently reviewed)"
+    )
 
     args = parser.parse_args()
 
