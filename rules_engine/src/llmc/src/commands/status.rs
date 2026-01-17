@@ -172,7 +172,7 @@ fn output_text(state: &State, config: &Config, now: u64) {
         for session_id in consoles {
             // Extract short name (e.g., "llmc-console1" -> "console1")
             let name = session_id.strip_prefix(CONSOLE_PREFIX).unwrap_or(&session_id);
-            println!("{:<12} active", name);
+            println!("console{:<12} active", name);
         }
     }
 
