@@ -534,13 +534,39 @@ main loop catches all errors and continues running. Specifically:
 - **State file errors**: If `state.json` cannot be loaded or saved, the daemon
   logs the error and continues with the in-memory state.
 - **Worker start failures**: Individual worker failures don't affect other
-  workers. Failed workers are marked as `error` state.
+  workers. The daemon attempts self-healing recovery (kill stale session, retry
+  with backoff) before marking workers as `error` state.
 - **Lock contention**: If the state lock cannot be acquired (another command is
   running), the daemon skips that iteration and tries again next cycle.
 
 The daemon tracks consecutive errors and warns the user if there are persistent
 issues (10+ consecutive errors), but never terminates due to these errors. Only
 Ctrl-C (graceful shutdown) stops the daemon.
+
+### Self-Healing Recovery
+
+LLMC is designed to be self-healing. When workers fail to start:
+
+1. **Immediate retry with cleanup**: If a worker fails to start, the daemon
+   kills any stale TMUX session and retries up to 2 times with exponential
+   backoff (1s, 2s delays).
+
+2. **Error state with cooldown**: If all retries fail, the worker is marked as
+   `error` state with an increasing crash count.
+
+3. **Automatic retry after cooldown**: Error workers automatically transition
+   back to `offline` state after a cooldown period, triggering another recovery
+   attempt. The cooldown uses exponential backoff based on crash count:
+   - 1st failure: 1 minute cooldown
+   - 2nd failure: 2 minute cooldown
+   - 3rd failure: 4 minute cooldown
+   - ...up to 30 minute maximum
+
+4. **Crash count reset**: When a worker starts successfully, its crash count
+   resets to zero, providing positive feedback to the self-healing system.
+
+This means transient failures (Claude not starting, network issues, resource
+contention) are automatically recovered without manual intervention.
 
 ### Summary Table
 
