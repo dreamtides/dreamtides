@@ -5,7 +5,7 @@ Find a ready task and run it as an LLMC prompt, or accept completed work.
 Usage:
     ./run_ready_task.py              # Shows task summary and asks for confirmation
     ./run_ready_task.py --immediate  # Skips confirmation and starts immediately
-    ./run_ready_task.py accept       # Accept the only worker with an assigned bead
+    ./run_ready_task.py accept       # Accept the most recently reviewed worker
     ./run_ready_task.py accept <worker>  # Accept a specific worker's work
 """
 
@@ -17,6 +17,7 @@ from pathlib import Path
 
 LLMC_DIR = Path.home() / "llmc"
 BEAD_ASSIGNMENTS_FILE = LLMC_DIR / "bead_assignments.json"
+MASTER_REPO = Path.home() / "Documents" / "GoogleDrive" / "dreamtides"
 
 
 class Colors:
@@ -28,12 +29,14 @@ class Colors:
     BOLD = "\033[1m"
 
 
-def run_command(args: list[str], capture: bool = True) -> subprocess.CompletedProcess:
+def run_command(
+    args: list[str], capture: bool = True, cwd: Path | None = None
+) -> subprocess.CompletedProcess:
     """Run a command and return the result."""
     if capture:
-        return subprocess.run(args, capture_output=True, text=True)
+        return subprocess.run(args, capture_output=True, text=True, cwd=cwd)
     else:
-        return subprocess.run(args)
+        return subprocess.run(args, cwd=cwd)
 
 
 def load_bead_assignments() -> dict[str, str]:
@@ -54,38 +57,57 @@ def save_bead_assignments(assignments: dict[str, str]) -> None:
         json.dump(assignments, f, indent=2)
 
 
-def get_assigned_worker(worker: str | None) -> tuple[str, str] | None:
+def get_most_recently_reviewed_worker() -> str | None:
+    """Get the most recently reviewed worker from llmc status."""
+    result = run_command(["just", "llmc", "status", "--json"])
+    if result.returncode != 0:
+        return None
+
+    try:
+        data = json.loads(result.stdout)
+        workers = data.get("workers", [])
+        # Find workers in needs_review state, sorted by time_in_state (smallest = most recent)
+        reviewing = [w for w in workers if w.get("status") in ("needs_review", "reviewing")]
+        if not reviewing:
+            return None
+        # Sort by time_in_state_secs ascending (most recent first)
+        reviewing.sort(key=lambda w: w.get("time_in_state_secs", float("inf")))
+        return reviewing[0].get("name")
+    except json.JSONDecodeError:
+        return None
+
+
+def get_worker_to_accept(worker: str | None) -> tuple[str, str] | None:
     """
     Get the worker and bead ID to accept.
 
-    If worker is specified, return that worker's assignment.
-    If not specified and exactly one worker has an assignment, return that.
-    Otherwise return None.
+    If worker is specified, use that worker.
+    If not specified, use the most recently reviewed worker (like llmc accept).
+    Returns (worker_name, bead_id) or None if not found.
     """
     assignments = load_bead_assignments()
 
-    if not assignments:
-        print(f"{Colors.RED}No bead assignments found.{Colors.RESET}", file=sys.stderr)
-        return None
-
     if worker:
+        # Specific worker requested
         if worker not in assignments:
             print(f"{Colors.RED}Worker '{worker}' has no assigned bead.{Colors.RESET}", file=sys.stderr)
-            print(f"Workers with assignments: {', '.join(assignments.keys())}", file=sys.stderr)
+            if assignments:
+                print(f"Workers with assignments: {', '.join(assignments.keys())}", file=sys.stderr)
             return None
         return (worker, assignments[worker])
 
-    # No worker specified - check if exactly one assignment exists
-    if len(assignments) == 1:
-        worker, bead_id = next(iter(assignments.items()))
-        return (worker, bead_id)
+    # No worker specified - use most recently reviewed (like llmc accept)
+    most_recent = get_most_recently_reviewed_worker()
+    if not most_recent:
+        print(f"{Colors.RED}No workers in needs_review state.{Colors.RESET}", file=sys.stderr)
+        return None
 
-    # Multiple assignments - user must specify
-    print(f"{Colors.RED}Multiple workers have bead assignments. Please specify a worker.{Colors.RESET}", file=sys.stderr)
-    print(f"Workers with assignments:", file=sys.stderr)
-    for w, b in assignments.items():
-        print(f"  {w}: {b}", file=sys.stderr)
-    return None
+    if most_recent not in assignments:
+        print(f"{Colors.RED}Worker '{most_recent}' is ready for review but has no assigned bead.{Colors.RESET}", file=sys.stderr)
+        print(f"You may need to manually run: just llmc accept {most_recent}", file=sys.stderr)
+        return None
+
+    return (most_recent, assignments[most_recent])
 
 
 def find_ready_task() -> dict | None:
@@ -173,6 +195,37 @@ def run_llmc(task_id: str) -> tuple[int, str | None]:
     return result.returncode, worker
 
 
+def amend_commit_with_bead(bead_id: str) -> bool:
+    """Amend the latest commit on master to record the bead closure."""
+    # Get the current commit message
+    result = run_command(["git", "log", "-1", "--format=%B"], cwd=MASTER_REPO)
+    if result.returncode != 0:
+        print(f"{Colors.RED}Warning: Failed to get commit message: {result.stderr}{Colors.RESET}", file=sys.stderr)
+        return False
+
+    original_message = result.stdout.strip()
+
+    # Check if bead ID is already in the message
+    if bead_id in original_message:
+        print(f"{Colors.YELLOW}Bead ID already in commit message, skipping amend.{Colors.RESET}")
+        return True
+
+    # Append the bead closure note
+    new_message = f"{original_message}\n\nCloses {bead_id}"
+
+    # Amend the commit
+    result = run_command(
+        ["git", "commit", "--amend", "-m", new_message],
+        cwd=MASTER_REPO
+    )
+    if result.returncode != 0:
+        print(f"{Colors.RED}Warning: Failed to amend commit: {result.stderr}{Colors.RESET}", file=sys.stderr)
+        return False
+
+    print(f"{Colors.GREEN}Amended commit with 'Closes {bead_id}'{Colors.RESET}")
+    return True
+
+
 def cmd_start(args: argparse.Namespace) -> int:
     """Handle the start command (default behavior)."""
     # Step 1: Find a ready task
@@ -213,7 +266,7 @@ def cmd_start(args: argparse.Namespace) -> int:
 
 def cmd_accept(args: argparse.Namespace) -> int:
     """Handle the accept command."""
-    assignment = get_assigned_worker(args.worker)
+    assignment = get_worker_to_accept(args.worker)
     if not assignment:
         return 1
 
@@ -237,6 +290,10 @@ def cmd_accept(args: argparse.Namespace) -> int:
         print(f"{Colors.RED}Warning: Failed to close bead: {close_result.stderr}{Colors.RESET}", file=sys.stderr)
     else:
         print(f"{Colors.GREEN}Closed bead {bead_id}{Colors.RESET}")
+
+    # Amend the commit to record the bead closure
+    print(f"{Colors.BOLD}Amending commit...{Colors.RESET}")
+    amend_commit_with_bead(bead_id)
 
     # Remove the assignment
     assignments = load_bead_assignments()
@@ -267,7 +324,7 @@ def main():
         "worker",
         nargs="?",
         default=None,
-        help="Worker name (optional if only one worker has an assignment)"
+        help="Worker name (optional, defaults to most recently reviewed)"
     )
 
     # Also support --immediate at the top level for backwards compatibility
