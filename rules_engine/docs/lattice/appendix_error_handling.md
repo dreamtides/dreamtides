@@ -49,6 +49,21 @@ Every error message must include:
 2. **Where:** File path, line number, document ID
 3. **How to fix:** Actionable suggestion or command
 
+### Helpful Error Features
+
+**Unknown Frontmatter Key Suggestions:** When a user includes an unknown key in
+YAML frontmatter (e.g., `lattice_id` instead of `lattice-id`), Lattice uses edit
+distance (Levenshtein) to suggest the closest valid key:
+
+```
+Error: Unknown frontmatter key 'lattice_id' in auth/tasks/fix_bug.md
+       Did you mean 'lattice-id'?
+```
+
+The suggestion threshold is 3 edits. Keys more distant than this receive a
+generic "see documentation" message instead of a potentially confusing
+suggestion.
+
 ### Structured Output
 
 With `--json`, errors include machine-readable fields:

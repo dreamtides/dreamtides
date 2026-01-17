@@ -103,9 +103,10 @@ System](appendix_id_system.md)
   when repo re-cloned
 
 #### F3: Logging (`log/`)
-**Files:** `log/jsonl_writer.rs`, `log/log_entry.rs`, `log/log_reader.rs`
+**Files:** `log/jsonl_writer.rs`, `log/log_entry.rs`, `log/log_reader.rs`,
+`log/log_init.rs`, `log/tracing_layer.rs`
 
-- Configure `tracing` crate with JSONL subscriber
+- Configure `tracing` crate with JSONL subscriber via custom layer
 - Write to `.lattice/logs.jsonl`
 - Log entry struct: timestamp, level, operation, duration, details
 - Log rotation: rename to `.1` when >10MB
@@ -1352,6 +1353,22 @@ Structure](appendix_cli_structure.md#shell-completions)
 - Multi-command workflow tests
 - Git edge case tests
 - Template composition tests
+
+#### TS7: Foundation Edge Case Tests (`tests/lattice/foundation/`)
+**Files:** `tests/lattice/foundation/*.rs`
+
+Tests for edge cases in Foundation, Git Layer, and Document Model:
+
+- **Log rotation:** Test behavior when `.1` file already exists, verify atomic
+  rotation
+- **Client ID collision:** Test ID generation when random ID collides with
+  existing client
+- **Counter recovery:** Test scanning documents with mixed client ID lengths
+  (3, 4, 5, 6 chars)
+- **Unknown frontmatter key suggestions:** Test edit distance calculation and
+  suggestion threshold
+- **Partial/treeless clone detection:** Test behavior differences between
+  blobless and treeless clones
 
 ---
 
