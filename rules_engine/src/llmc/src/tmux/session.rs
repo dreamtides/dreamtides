@@ -18,13 +18,22 @@ pub const DEFAULT_SESSION_WIDTH: u32 = 500;
 /// Default TMUX session height
 pub const DEFAULT_SESSION_HEIGHT: u32 = 100;
 
-/// Creates a detached TMUX session with specified dimensions
 pub fn create_session(name: &str, cwd: &Path, width: u32, height: u32) -> Result<()> {
     if session_exists(name) {
         bail!("Session '{}' already exists", name);
     }
 
     let cwd_str = cwd.to_string_lossy();
+
+    tracing::info!(
+        operation = "session_create",
+        session = name,
+        working_directory = %cwd_str,
+        width,
+        height,
+        "Creating TMUX session with working directory"
+    );
+
     let new_session = NewSession::new()
         .detached()
         .session_name(name)
@@ -36,6 +45,13 @@ pub fn create_session(name: &str, cwd: &Path, width: u32, height: u32) -> Result
         .add_command(new_session)
         .output()
         .with_context(|| format!("Failed to create TMUX session '{}'", name))?;
+
+    tracing::debug!(
+        operation = "session_create",
+        session = name,
+        result = "success",
+        "TMUX session created successfully"
+    );
 
     Ok(())
 }

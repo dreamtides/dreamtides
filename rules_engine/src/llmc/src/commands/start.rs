@@ -66,6 +66,7 @@ pub fn run_start(
     git::pull_rebase(&worktree_path)?;
 
     copy_tabula_xlsm(&config, &worktree_path)?;
+    copy_serena_config(&config, &worktree_path)?;
 
     let user_prompt = load_prompt_content(&prompt, &prompt_file, &prompt_cmd)?;
 
@@ -73,6 +74,23 @@ pub fn run_start(
     warn_about_source_repo_paths(&user_prompt, &config, &worktree_path)?;
 
     let full_prompt = build_full_prompt(worker_record, &config, &worker_name, &user_prompt)?;
+
+    // Log full prompt content for debugging
+    tracing::info!(
+        operation = "worker_start",
+        worker = %worker_name,
+        worktree = %worktree_path.display(),
+        prompt_length = full_prompt.len(),
+        prompt_cmd = ?prompt_cmd,
+        self_review,
+        "Starting worker with prompt"
+    );
+    tracing::debug!(
+        operation = "worker_start_prompt",
+        worker = %worker_name,
+        full_prompt = %full_prompt,
+        "Full prompt content being sent to worker"
+    );
 
     println!("Sending prompt to worker '{}'...", worker_name);
     let tmux_sender = TmuxSender::new();
@@ -355,6 +373,50 @@ fn copy_tabula_xlsm(config: &Config, worktree_path: &Path) -> Result<()> {
     Ok(())
 }
 
+fn copy_serena_config(config: &Config, worktree_path: &Path) -> Result<()> {
+    let source_repo = PathBuf::from(&config.repo.source);
+    let source_serena = source_repo.join(".serena");
+
+    if !source_serena.exists() {
+        return Ok(());
+    }
+
+    let dest_serena = worktree_path.join(".serena");
+
+    // If destination already exists, check if it needs updating
+    if dest_serena.exists() {
+        return Ok(());
+    }
+
+    // Create the .serena directory in the worktree
+    fs::create_dir_all(&dest_serena)
+        .with_context(|| format!("Failed to create directory {}", dest_serena.display()))?;
+
+    // Copy all files from source .serena to worktree .serena
+    for entry in fs::read_dir(&source_serena)? {
+        let entry = entry?;
+        let file_name = entry.file_name();
+        let source_file = entry.path();
+        let dest_file = dest_serena.join(&file_name);
+
+        // Skip directories (like memories) - only copy config files
+        if source_file.is_file() {
+            fs::copy(&source_file, &dest_file).with_context(|| {
+                format!("Failed to copy {} to {}", source_file.display(), dest_file.display())
+            })?;
+        }
+    }
+
+    tracing::debug!(
+        operation = "copy_serena_config",
+        source = %source_serena.display(),
+        dest = %dest_serena.display(),
+        "Copied Serena config to worktree"
+    );
+
+    Ok(())
+}
+
 fn format_idle_workers(state: &State) -> String {
     let idle = state.get_idle_workers();
     if idle.is_empty() {
@@ -412,14 +474,22 @@ fn detect_source_repo_paths(prompt: &str, config: &Config) -> Vec<(String, Strin
     found_paths
 }
 
-/// Warns the user about source repo paths in the prompt and asks for
-/// confirmation before proceeding.
 fn warn_about_source_repo_paths(prompt: &str, config: &Config, worktree_path: &Path) -> Result<()> {
     let problematic_paths = detect_source_repo_paths(prompt, config);
 
     if problematic_paths.is_empty() {
         return Ok(());
     }
+
+    // Log the detected paths for debugging
+    tracing::warn!(
+        operation = "path_detection",
+        source_repo = %config.repo.source,
+        worktree = %worktree_path.display(),
+        detected_count = problematic_paths.len(),
+        detected_paths = ?problematic_paths,
+        "Source repository paths detected in prompt - worker may modify main repo instead of worktree"
+    );
 
     eprintln!("\n⚠️  WARNING: Source repository paths detected in prompt!\n");
     eprintln!("The worker's working directory is: {}\n", worktree_path.display());
@@ -446,8 +516,19 @@ fn warn_about_source_repo_paths(prompt: &str, config: &Config, worktree_path: &P
     io::stdin().read_line(&mut input)?;
 
     if !input.trim().eq_ignore_ascii_case("y") {
+        tracing::info!(
+            operation = "path_detection",
+            result = "aborted",
+            "User aborted start due to source repo paths in prompt"
+        );
         bail!("Aborted by user. Please fix the paths in your prompt and try again.");
     }
+
+    tracing::warn!(
+        operation = "path_detection",
+        result = "user_override",
+        "User chose to proceed despite source repo paths in prompt"
+    );
 
     eprintln!();
     Ok(())
