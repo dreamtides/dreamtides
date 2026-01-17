@@ -398,7 +398,9 @@ detection results across invocations for faster startup:
   "is_sparse": false,
   "is_worktree": false,
   "main_git_dir": "/project/.git",
+  "worktree_git_dir": null,
   "has_submodules": true,
+  "is_bare": false,
   "in_progress_op": null
 }
 ```
