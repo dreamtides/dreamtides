@@ -8,6 +8,18 @@ pub const SCHEMA_VERSION: u32 = 2;
 /// Maximum number of documents to keep in the content cache.
 pub const CONTENT_CACHE_MAX_ENTRIES: u32 = 100;
 
+/// Drops all existing tables and recreates the schema from scratch.
+///
+/// This is used for full index rebuilds when the schema version changes or the
+/// index is corrupted. Unlike deleting the database file, this preserves the
+/// file handle, which is important when the connection was opened before the
+/// rebuild decision was made.
+pub fn reset_schema(conn: &Connection) -> Result<(), LatticeError> {
+    info!("Resetting Lattice index schema");
+    drop_all_tables(conn)?;
+    create_schema(conn)
+}
+
 /// Creates all Lattice index tables, indices, and triggers.
 ///
 /// This function should be called once when initializing a new index database.
@@ -327,5 +339,27 @@ fn create_fts_triggers(conn: &Connection) -> Result<(), LatticeError> {
     )
     .map_err(|e| LatticeError::DatabaseError {
         reason: format!("Failed to create FTS triggers: {e}"),
+    })
+}
+
+fn drop_all_tables(conn: &Connection) -> Result<(), LatticeError> {
+    debug!("Dropping all existing tables");
+    // Drop tables in reverse dependency order. FTS5 virtual table must be dropped
+    // explicitly. Triggers and indices are dropped automatically with their tables.
+    conn.execute_batch(
+        "
+        DROP TABLE IF EXISTS fts_content;
+        DROP TABLE IF EXISTS views;
+        DROP TABLE IF EXISTS content_cache;
+        DROP TABLE IF EXISTS directory_roots;
+        DROP TABLE IF EXISTS client_counters;
+        DROP TABLE IF EXISTS labels;
+        DROP TABLE IF EXISTS links;
+        DROP TABLE IF EXISTS index_metadata;
+        DROP TABLE IF EXISTS documents;
+        ",
+    )
+    .map_err(|e| LatticeError::DatabaseError {
+        reason: format!("Failed to drop existing tables: {e}"),
     })
 }

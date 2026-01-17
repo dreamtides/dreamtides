@@ -15,6 +15,7 @@ use crate::error::exit_codes;
 use crate::git::git_ops::GitOps;
 use crate::git::real_git::RealGit;
 use crate::index::connection_pool;
+use crate::index::reconciliation::reconciliation_coordinator;
 use crate::log::log_init::{self, LogConfig, Verbosity};
 
 /// Maximum startup time before emitting a debug warning (100ms).
@@ -183,8 +184,13 @@ fn run_startup_operations(context: &CommandContext) -> LatticeResult<()> {
 /// Fast path (~1ms): Skip if HEAD unchanged and no uncommitted .md changes.
 /// Incremental path (~50-500ms): Re-parse modified documents.
 /// Full rebuild (seconds): Triggered by missing index or corruption.
-fn run_index_reconciliation(_context: &CommandContext) -> LatticeResult<()> {
-    debug!("Index reconciliation: not yet implemented, skipping");
+fn run_index_reconciliation(context: &CommandContext) -> LatticeResult<()> {
+    let result = reconciliation_coordinator::reconcile(
+        &context.repo_root,
+        context.git.as_ref(),
+        &context.conn,
+    )?;
+    debug!(?result, "Index reconciliation completed");
     Ok(())
 }
 

@@ -185,11 +185,10 @@ fn perform_full_rebuild(
 ) -> Result<ReconciliationResult, LatticeError> {
     info!("Performing full index rebuild");
 
-    // Delete existing index data
-    connection_pool::delete_index(repo_root)?;
-
-    // Create fresh schema
-    schema_definition::create_schema(conn)?;
+    // Reset schema by dropping all tables and recreating them.
+    // We cannot delete the index file here because `conn` is already open to it;
+    // deleting would orphan the file handle and cause schema to be lost on close.
+    schema_definition::reset_schema(conn)?;
 
     // Index all documents
     let result = sync_strategies::full_rebuild(repo_root, git, conn)?;

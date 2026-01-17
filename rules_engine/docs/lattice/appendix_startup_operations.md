@@ -99,7 +99,7 @@ Target startup overhead for a 10,000-document repository:
 | SQLite connection | <5ms | Pragma execution |
 | **Total (fast path)** | **<20ms** | |
 
-If startup exceeds 100ms, emit a debug log entry for investigation.
+If startup exceeds 100ms, emit a warning log entry for investigation.
 
 ## Skipping Startup Operations
 

@@ -151,8 +151,9 @@ to find changed files. Re-parse modified, remove deleted. Check `git status`
 for uncommitted changes.
 
 **Full rebuild**: Triggered by missing index, schema mismatch, errors, or
-`lat check --rebuild-index`. Delete index, create schema, parse all .md files.
-Schema version is stored in `index_metadata`; version mismatch triggers rebuild.
+`lat check --rebuild-index`. Drop all tables, recreate schema, parse all .md
+files. Schema version is stored in `index_metadata`; version mismatch triggers
+rebuild.
 
 Any error during reconciliation triggers full rebuild.
 
