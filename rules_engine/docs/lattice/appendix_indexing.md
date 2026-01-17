@@ -156,13 +156,16 @@ FTS5 with external content mode (no duplicate storage):
 
 ```sql
 CREATE VIRTUAL TABLE fts_content USING fts5(
-    document_id, body,
+    body,
     content='documents', content_rowid='rowid',
-    automerge=4
+    tokenize='unicode61'
 );
+
+PRAGMA fts5_automerge = 4;
 ```
 
-Triggers keep FTS in sync. After rebuild, optimize:
+Triggers keep FTS in sync (insert/delete on documents table). After rebuild,
+optimize:
 
 ```sql
 INSERT INTO fts_content(fts_content) VALUES('optimize');

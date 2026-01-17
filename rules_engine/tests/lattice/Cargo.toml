@@ -17,6 +17,7 @@ lattice = { path = "../../src/lattice" }
 chrono = { workspace = true }
 owo-colors = { workspace = true }
 rand = { workspace = true }
+rusqlite = { workspace = true }
 serde_json = { workspace = true }
 serde_yaml = { workspace = true }
 tempfile = { workspace = true }
