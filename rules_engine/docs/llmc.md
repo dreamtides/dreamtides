@@ -261,7 +261,7 @@ This outputs a JSON document describing all command outputs, their fields, and t
 ### Commands Supporting JSON Output
 
 The following commands support `--json`:
-- `llmc status` - Worker status information
+- `llmc status` - Worker and console session status information
 - `llmc start` - Started worker details
 - `llmc add` - New worker details
 - `llmc nuke` - Removed workers list
@@ -346,7 +346,7 @@ branch, or state).
 
 ### `llmc status`
 
-Displays status of all workers. For each worker, shows name, status, branch, time in current state, commit SHA (if awaiting review), prompt command (if started with `--prompt-cmd`), and prompt excerpt.
+Displays status of all workers and active console sessions. For each worker, shows name, status, branch, time in current state, commit SHA (if awaiting review), prompt command (if started with `--prompt-cmd`), and prompt excerpt. Active console sessions are listed separately with their session names.
 
 ```bash
 llmc status [--json]
@@ -446,8 +446,8 @@ llmc console
 ```
 
 Session names are automatically assigned as "llmc-console1", "llmc-console2",
-etc. The session runs in the LLMC root directory with the default model
-configuration.
+etc. The session runs in the master repository directory (configured via
+`repo.source` in config.toml) with the default model configuration.
 
 Console sessions can be:
 - Attached to later with `llmc attach console1`

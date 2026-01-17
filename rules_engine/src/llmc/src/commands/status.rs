@@ -4,6 +4,8 @@ use std::time::{SystemTime, UNIX_EPOCH};
 use anyhow::{Result, bail};
 use serde::Serialize;
 
+use super::console;
+use super::console::CONSOLE_PREFIX;
 use crate::config::{self, Config};
 use crate::state::{self, State, WorkerRecord, WorkerStatus};
 
@@ -64,6 +66,13 @@ fn get_effective_status(worker: &WorkerRecord, config: &Config) -> WorkerStatus 
 #[derive(Serialize)]
 struct StatusOutput {
     workers: Vec<WorkerStatusOutput>,
+    consoles: Vec<ConsoleStatusOutput>,
+}
+
+#[derive(Serialize)]
+struct ConsoleStatusOutput {
+    name: String,
+    session_id: String,
 }
 
 #[derive(Serialize)]
@@ -99,7 +108,18 @@ fn output_json(state: &State, config: &Config, now: u64) -> Result<()> {
         })
         .collect();
 
-    let output = StatusOutput { workers };
+    // List active console sessions
+    let consoles: Vec<ConsoleStatusOutput> = console::list_console_sessions()
+        .unwrap_or_default()
+        .into_iter()
+        .map(|session_id| {
+            // Extract short name from session_id (e.g., "llmc-console1" -> "console1")
+            let name = session_id.strip_prefix(CONSOLE_PREFIX).unwrap_or(&session_id).to_string();
+            ConsoleStatusOutput { name, session_id }
+        })
+        .collect();
+
+    let output = StatusOutput { workers, consoles };
     println!("{}", serde_json::to_string_pretty(&output)?);
 
     Ok(())
@@ -138,6 +158,22 @@ fn output_text(state: &State, config: &Config, now: u64) {
         }
 
         println!("{}", parts.join(" "));
+    }
+
+    // Show console sessions if any exist
+    if let Ok(consoles) = console::list_console_sessions()
+        && !consoles.is_empty()
+    {
+        println!();
+        println!("CONSOLES");
+        println!("────────");
+        let mut consoles = consoles;
+        consoles.sort();
+        for session_id in consoles {
+            // Extract short name (e.g., "llmc-console1" -> "console1")
+            let name = session_id.strip_prefix(CONSOLE_PREFIX).unwrap_or(&session_id);
+            println!("{:<12} active", name);
+        }
     }
 
     println!();

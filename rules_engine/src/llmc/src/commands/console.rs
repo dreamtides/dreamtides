@@ -25,14 +25,25 @@ pub fn run_console() -> Result<()> {
     let config_path = config::get_config_path();
     let config = Config::load(&config_path)?;
 
+    // Use the master repo as the working directory for consoles
+    let working_dir = std::path::PathBuf::from(&config.repo.source);
+    if !working_dir.exists() {
+        bail!(
+            "Master repository not found at: {}\n\
+             Check the repo.source setting in config.toml",
+            working_dir.display()
+        );
+    }
+
     // Find next available console number
     let session_name = find_next_console_name()?;
     println!("Creating console session: {}", session_name);
+    println!("Working directory: {}", working_dir.display());
 
-    // Create the session in the LLMC root directory (no worktree needed)
+    // Create the session in the master repo directory
     session::create_session(
         &session_name,
-        &llmc_root,
+        &working_dir,
         DEFAULT_SESSION_WIDTH,
         DEFAULT_SESSION_HEIGHT,
     )
