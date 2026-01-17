@@ -63,13 +63,17 @@ pub fn run_start(
 
     let worktree_path = PathBuf::from(&worker_record.worktree_path);
 
-    println!("Pulling latest master into worker '{}'...", worker_name);
+    if json {
+        eprintln!("Pulling latest master into worker '{}'...", worker_name);
+    } else {
+        println!("Pulling latest master into worker '{}'...", worker_name);
+    }
     git::pull_rebase(&worktree_path)?;
 
     copy_tabula_xlsm(&config, &worktree_path)?;
     copy_serena_config(&config, &worktree_path)?;
 
-    let user_prompt = load_prompt_content(&prompt, &prompt_file, &prompt_cmd)?;
+    let user_prompt = load_prompt_content(&prompt, &prompt_file, &prompt_cmd, json)?;
 
     // Warn if the prompt contains absolute paths to the source repository
     warn_about_source_repo_paths(&user_prompt, &config, &worktree_path)?;
@@ -93,7 +97,11 @@ pub fn run_start(
         "Full prompt content being sent to worker"
     );
 
-    println!("Sending prompt to worker '{}'...", worker_name);
+    if json {
+        eprintln!("Sending prompt to worker '{}'...", worker_name);
+    } else {
+        println!("Sending prompt to worker '{}'...", worker_name);
+    }
     let tmux_sender = TmuxSender::new();
 
     tmux_sender
@@ -235,6 +243,7 @@ fn load_prompt_content(
     prompt: &Option<String>,
     prompt_file: &Option<PathBuf>,
     prompt_cmd: &Option<String>,
+    json: bool,
 ) -> Result<String> {
     if let Some(text) = prompt {
         if text.trim().is_empty() {
@@ -255,14 +264,18 @@ fn load_prompt_content(
     }
 
     if let Some(cmd) = prompt_cmd {
-        return execute_prompt_command(cmd);
+        return execute_prompt_command(cmd, json);
     }
 
     open_editor_for_prompt()
 }
 
-fn execute_prompt_command(cmd: &str) -> Result<String> {
-    println!("Executing prompt command: {}", cmd);
+fn execute_prompt_command(cmd: &str, json: bool) -> Result<String> {
+    if json {
+        eprintln!("Executing prompt command: {}", cmd);
+    } else {
+        println!("Executing prompt command: {}", cmd);
+    }
 
     let output = Command::new("sh")
         .arg("-c")
@@ -287,7 +300,11 @@ fn execute_prompt_command(cmd: &str) -> Result<String> {
         bail!("Prompt command produced empty output: {}", cmd);
     }
 
-    println!("Prompt command generated {} bytes of output", content.len());
+    if json {
+        eprintln!("Prompt command generated {} bytes of output", content.len());
+    } else {
+        println!("Prompt command generated {} bytes of output", content.len());
+    }
 
     Ok(content)
 }

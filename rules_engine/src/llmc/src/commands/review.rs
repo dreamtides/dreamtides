@@ -78,17 +78,29 @@ pub fn run_review(
 
     let worktree_path = PathBuf::from(&worker_record.worktree_path);
 
-    println!("Fetching latest master...");
+    if json {
+        eprintln!("Fetching latest master...");
+    } else {
+        println!("Fetching latest master...");
+    }
     git::fetch_origin(&llmc_root)?;
 
     let merge_base = git::get_merge_base(&worktree_path, "HEAD", "origin/master")?;
     let origin_master_sha = git::get_head_commit_of_ref(&llmc_root, "origin/master")?;
 
     if merge_base != origin_master_sha {
-        println!("Worker needs rebase onto latest master. Rebasing...");
+        if json {
+            eprintln!("Worker needs rebase onto latest master. Rebasing...");
+        } else {
+            println!("Worker needs rebase onto latest master. Rebasing...");
+        }
 
         if git::has_uncommitted_changes(&worktree_path)? {
-            println!("Amending uncommitted changes before rebase...");
+            if json {
+                eprintln!("Amending uncommitted changes before rebase...");
+            } else {
+                println!("Amending uncommitted changes before rebase...");
+            }
             git::amend_uncommitted_changes(&worktree_path)?;
         }
 
@@ -110,24 +122,44 @@ pub fn run_review(
 
             state.save(&super::super::state::get_state_path())?;
 
-            println!("\n✓ Agent rebase started");
-            println!("  Worker '{}' transitioned to 'rebasing' state", worker_name);
-            println!("  The agent will resolve conflicts and continue the rebase");
-            println!("  Run 'llmc review {}' again once complete", worker_name);
+            if json {
+                eprintln!("\n✓ Agent rebase started");
+                eprintln!("  Worker '{}' transitioned to 'rebasing' state", worker_name);
+                eprintln!("  The agent will resolve conflicts and continue the rebase");
+                eprintln!("  Run 'llmc review {}' again once complete", worker_name);
+            } else {
+                println!("\n✓ Agent rebase started");
+                println!("  Worker '{}' transitioned to 'rebasing' state", worker_name);
+                println!("  The agent will resolve conflicts and continue the rebase");
+                println!("  Run 'llmc review {}' again once complete", worker_name);
+            }
             return Ok(());
         }
 
-        println!("✓ Rebased onto latest master");
+        if json {
+            eprintln!("✓ Rebased onto latest master");
+        } else {
+            println!("✓ Rebased onto latest master");
+        }
     }
 
     let commit_message = git::get_commit_message(&worktree_path, commit_sha)?;
 
-    println!("Reviewing: {} ({})", worker_name, worker_record.branch);
-    println!("Commit: {}", &commit_sha[..7.min(commit_sha.len())]);
-    println!("Prompt: \"{}...\"", truncate_prompt(&worker_record.current_prompt, 50));
-    println!();
-    println!("{}", commit_message);
-    println!();
+    if json {
+        eprintln!("Reviewing: {} ({})", worker_name, worker_record.branch);
+        eprintln!("Commit: {}", &commit_sha[..7.min(commit_sha.len())]);
+        eprintln!("Prompt: \"{}...\"", truncate_prompt(&worker_record.current_prompt, 50));
+        eprintln!();
+        eprintln!("{}", commit_message);
+        eprintln!();
+    } else {
+        println!("Reviewing: {} ({})", worker_name, worker_record.branch);
+        println!("Commit: {}", &commit_sha[..7.min(commit_sha.len())]);
+        println!("Prompt: \"{}...\"", truncate_prompt(&worker_record.current_prompt, 50));
+        println!();
+        println!("{}", commit_message);
+        println!();
+    }
 
     if json {
         let changed_files = get_changed_files(&worktree_path)?;
