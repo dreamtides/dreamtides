@@ -379,7 +379,7 @@ Design: UI Design](lattice_design.md#ui-design)
 
 ---
 
-## Feature: Index Core (Continued)
+## Feature: Index Core (Continued) [ONGOING]
 
 **Goal:** Additional Index Core functionality discovered during post-implementation
 review that supports Reconciliation and other features.
@@ -441,7 +441,7 @@ review that supports Reconciliation and other features.
 
 ---
 
-## Feature: First Working Command (lat show)
+## Feature: First Working Command (lat show) [ONGOING]
 
 **Goal:** End-to-end working `lat show` command. Validates entire pipeline.
 
