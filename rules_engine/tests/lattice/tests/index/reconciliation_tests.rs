@@ -3,7 +3,7 @@ use std::sync::Mutex;
 
 use lattice::error::error_types::LatticeError;
 use lattice::git::git_ops::{FileStatus, GitOps};
-use lattice::index::reconciliation::change_detection::{self, ChangeInfo};
+use lattice::index::reconciliation::change_detection::{self, ChangeInfo, ChangeStatus};
 use lattice::index::reconciliation::reconciliation_coordinator::{self, ReconciliationResult};
 use lattice::index::reconciliation::sync_strategies;
 use lattice::index::{connection_pool, schema_definition};
@@ -213,6 +213,86 @@ fn change_info_default_is_empty() {
 }
 
 // ============================================================================
+// ChangeStatus tests
+// ============================================================================
+
+#[test]
+fn change_status_returns_no_changes_when_all_empty_and_commits_match() {
+    let info = ChangeInfo {
+        modified_files: vec![],
+        deleted_files: vec![],
+        uncommitted_files: vec![],
+        current_head: Some("abc123".to_string()),
+        last_indexed_commit: Some("abc123".to_string()),
+    };
+    assert_eq!(
+        info.status(),
+        ChangeStatus::NoChanges,
+        "Status should be NoChanges when all empty and commits match"
+    );
+}
+
+#[test]
+fn change_status_returns_committed_changes_when_only_committed_changes() {
+    let info = ChangeInfo {
+        modified_files: vec![PathBuf::from("doc.md")],
+        deleted_files: vec![],
+        uncommitted_files: vec![],
+        current_head: Some("def456".to_string()),
+        last_indexed_commit: Some("abc123".to_string()),
+    };
+    assert_eq!(
+        info.status(),
+        ChangeStatus::CommittedChanges,
+        "Status should be CommittedChanges when only committed changes exist"
+    );
+}
+
+#[test]
+fn change_status_returns_uncommitted_changes_when_only_uncommitted() {
+    let info = ChangeInfo {
+        modified_files: vec![],
+        deleted_files: vec![],
+        uncommitted_files: vec![PathBuf::from("wip.md")],
+        current_head: Some("abc123".to_string()),
+        last_indexed_commit: Some("abc123".to_string()),
+    };
+    assert_eq!(
+        info.status(),
+        ChangeStatus::UncommittedChanges,
+        "Status should be UncommittedChanges when only uncommitted changes exist"
+    );
+}
+
+#[test]
+fn change_status_returns_both_when_committed_and_uncommitted() {
+    let info = ChangeInfo {
+        modified_files: vec![PathBuf::from("doc.md")],
+        deleted_files: vec![],
+        uncommitted_files: vec![PathBuf::from("wip.md")],
+        current_head: Some("def456".to_string()),
+        last_indexed_commit: Some("abc123".to_string()),
+    };
+    assert_eq!(
+        info.status(),
+        ChangeStatus::Both,
+        "Status should be Both when both committed and uncommitted changes exist"
+    );
+}
+
+#[test]
+fn change_info_total_changes_sums_all_file_lists() {
+    let info = ChangeInfo {
+        modified_files: vec![PathBuf::from("a.md"), PathBuf::from("b.md")],
+        deleted_files: vec![PathBuf::from("c.md")],
+        uncommitted_files: vec![PathBuf::from("d.md")],
+        current_head: Some("def456".to_string()),
+        last_indexed_commit: Some("abc123".to_string()),
+    };
+    assert_eq!(info.total_changes(), 4, "total_changes should sum all three file lists");
+}
+
+// ============================================================================
 // change_detection::detect_changes tests
 // ============================================================================
 
@@ -231,8 +311,8 @@ fn detect_changes_returns_fast_path_when_head_matches_last_indexed_and_clean() {
         .expect("should update last_commit");
 
     let git = FakeGit::new();
-    let info =
-        change_detection::detect_changes(&git, &conn).expect("detect_changes should succeed");
+    let info = change_detection::detect_changes(&git, &conn, temp_dir.path())
+        .expect("detect_changes should succeed");
 
     assert!(info.is_fast_path(), "Should detect fast path when HEAD matches last indexed commit");
 }
@@ -257,8 +337,8 @@ fn detect_changes_returns_uncommitted_files_when_present() {
         worktree_status: ' ',
     }]);
 
-    let info =
-        change_detection::detect_changes(&git, &conn).expect("detect_changes should succeed");
+    let info = change_detection::detect_changes(&git, &conn, temp_dir.path())
+        .expect("detect_changes should succeed");
 
     assert!(!info.is_fast_path(), "Should not be fast path when uncommitted files present");
     assert_eq!(info.uncommitted_files.len(), 1, "Should have one uncommitted file");

@@ -118,7 +118,7 @@ fn reconcile_inner(
     }
 
     // Try fast path
-    let change_info = change_detection::detect_changes(git, conn)?;
+    let change_info = change_detection::detect_changes(git, conn, repo_root)?;
 
     if change_info.is_fast_path() {
         debug!("Fast path: no changes detected");
