@@ -7,6 +7,7 @@ use rusqlite::Connection;
 use tracing::{debug, error, info, warn};
 
 use crate::cli::argument_parser::{Command, Lat};
+use crate::cli::commands::show_command::show_executor;
 use crate::cli::global_options::GlobalOptions;
 use crate::config::config_loader;
 use crate::config::config_schema::Config;
@@ -254,13 +255,11 @@ fn run_log_rotation(repo_root: &Path) -> LatticeResult<()> {
 }
 
 /// Dispatches to the appropriate command handler.
-fn dispatch_command(_context: CommandContext, command: Command) -> LatticeResult<()> {
+fn dispatch_command(context: CommandContext, command: Command) -> LatticeResult<()> {
     match command {
-        Command::Show(_args) => {
+        Command::Show(args) => {
             info!("Dispatching to show command");
-            Err(LatticeError::OperationNotAllowed {
-                reason: "show command not yet implemented".to_string(),
-            })
+            show_executor::execute(context, args)
         }
         Command::Create(_args) => {
             info!("Dispatching to create command");

@@ -1,1 +1,289 @@
+use std::path::Path;
 
+use rusqlite::Connection;
+use tracing::{debug, info};
+
+use crate::cli::command_dispatch::{CommandContext, LatticeResult};
+use crate::cli::commands::show_command::document_formatter::{self, OutputMode, ShowOutput};
+use crate::cli::workflow_args::ShowArgs;
+use crate::document::document_reader;
+use crate::document::frontmatter_schema::TaskType;
+use crate::error::error_types::LatticeError;
+use crate::index::document_types::DocumentRow;
+use crate::index::link_queries::{self, LinkRow, LinkType};
+use crate::index::{document_queries, label_queries};
+
+/// State of a task document.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum TaskState {
+    Open,
+    Blocked,
+    Closed,
+}
+
+/// A reference to another document, used in parent/deps/blocking/related
+/// sections.
+#[derive(Debug, Clone)]
+pub struct DocumentRef {
+    pub id: String,
+    pub name: String,
+    pub description: String,
+    pub task_type: Option<TaskType>,
+    pub priority: Option<u8>,
+    pub is_closed: bool,
+}
+
+/// Executes the `lat show` command.
+///
+/// Looks up each document by ID, retrieves its content and relationships,
+/// and formats the output according to the specified mode.
+pub fn execute(context: CommandContext, args: ShowArgs) -> LatticeResult<()> {
+    info!(ids = ?args.ids, "Executing show command");
+    let mode = determine_output_mode(&args);
+
+    for (index, id) in args.ids.iter().enumerate() {
+        if index > 0 && !context.global.json {
+            println!();
+        }
+        show_document(&context, id, mode)?;
+    }
+
+    Ok(())
+}
+
+/// Relationship data for a document: (parent, dependencies, blocking, related).
+type RelationshipData = (Option<DocumentRef>, Vec<DocumentRef>, Vec<DocumentRef>, Vec<DocumentRef>);
+
+/// Determines the output mode based on command-line flags.
+fn determine_output_mode(args: &ShowArgs) -> OutputMode {
+    if args.short {
+        OutputMode::Short
+    } else if args.peek {
+        OutputMode::Peek
+    } else if args.refs {
+        OutputMode::Refs
+    } else if args.raw {
+        OutputMode::Raw
+    } else {
+        OutputMode::Full
+    }
+}
+
+/// Shows a single document.
+fn show_document(context: &CommandContext, id: &str, mode: OutputMode) -> LatticeResult<()> {
+    debug!(id, ?mode, "Looking up document");
+
+    let doc_row = document_queries::lookup_by_id(&context.conn, id)?
+        .ok_or_else(|| LatticeError::DocumentNotFound { id: id.to_string() })?;
+
+    let output = build_show_output(context, &doc_row, mode)?;
+    document_formatter::print_output(&output, mode, context.global.json);
+
+    Ok(())
+}
+
+/// Builds the complete output data for a document.
+fn build_show_output(
+    context: &CommandContext,
+    doc_row: &DocumentRow,
+    mode: OutputMode,
+) -> LatticeResult<ShowOutput> {
+    let state = compute_task_state(&context.conn, doc_row)?;
+    let labels = label_queries::get_labels(&context.conn, &doc_row.id)?;
+
+    // Load body content for full/raw modes
+    let body = if mode == OutputMode::Full || mode == OutputMode::Raw {
+        Some(load_body_content(&context.repo_root, &doc_row.path)?)
+    } else {
+        None
+    };
+
+    // Load relationships for full/refs modes
+    let (parent, dependencies, blocking, related) =
+        if mode == OutputMode::Full || mode == OutputMode::Refs {
+            load_relationships(context, doc_row)?
+        } else {
+            (None, Vec::new(), Vec::new(), Vec::new())
+        };
+
+    Ok(ShowOutput {
+        id: doc_row.id.clone(),
+        name: doc_row.name.clone(),
+        description: doc_row.description.clone(),
+        path: doc_row.path.clone(),
+        state,
+        priority: doc_row.priority,
+        task_type: doc_row.task_type,
+        labels,
+        created_at: doc_row.created_at,
+        updated_at: doc_row.updated_at,
+        closed_at: doc_row.closed_at,
+        body,
+        parent,
+        dependencies,
+        blocking,
+        related,
+        claimed: false, // Claims not yet implemented
+    })
+}
+
+/// Computes the task state from filesystem path and blocker status.
+///
+/// - Closed: Task is in a `.closed/` directory
+/// - Blocked: Task has open (non-closed) blockers
+/// - Open: All other tasks
+fn compute_task_state(conn: &Connection, doc_row: &DocumentRow) -> LatticeResult<TaskState> {
+    if doc_row.is_closed {
+        return Ok(TaskState::Closed);
+    }
+
+    // Check if any blockers are still open
+    let blocked_by_links =
+        link_queries::query_outgoing_by_type(conn, &doc_row.id, LinkType::BlockedBy)?;
+
+    for link in blocked_by_links {
+        if let Some(blocker) = document_queries::lookup_by_id(conn, &link.target_id)?
+            && !blocker.is_closed
+        {
+            debug!(
+                document_id = doc_row.id,
+                blocker_id = blocker.id,
+                "Document blocked by open task"
+            );
+            return Ok(TaskState::Blocked);
+        }
+    }
+
+    Ok(TaskState::Open)
+}
+
+/// Loads the markdown body content from the filesystem.
+fn load_body_content(repo_root: &Path, relative_path: &str) -> LatticeResult<String> {
+    let full_path = repo_root.join(relative_path);
+    debug!(path = %full_path.display(), "Loading document body");
+
+    let doc = document_reader::read(&full_path)?;
+    Ok(doc.body)
+}
+
+/// Loads relationship data: parent, dependencies, blocking tasks, and related
+/// docs.
+fn load_relationships(
+    context: &CommandContext,
+    doc_row: &DocumentRow,
+) -> LatticeResult<RelationshipData> {
+    // Parent document
+    let parent = if let Some(parent_id) = &doc_row.parent_id {
+        document_queries::lookup_by_id(&context.conn, parent_id)?
+            .map(|row| DocumentRef::from_row(&row))
+    } else {
+        None
+    };
+
+    // Dependencies (blocked-by): documents this task depends on
+    let blocked_by_links =
+        link_queries::query_outgoing_by_type(&context.conn, &doc_row.id, LinkType::BlockedBy)?;
+    let dependencies = load_document_refs(&context.conn, &blocked_by_links)?;
+
+    // Blocking: documents that depend on this task
+    let blocking_links =
+        link_queries::query_incoming_by_type(&context.conn, &doc_row.id, LinkType::BlockedBy)?;
+    let blocking = load_document_refs_from_sources(&context.conn, &blocking_links)?;
+
+    // Related: body links excluding parent, dependencies, and blocking
+    let body_links =
+        link_queries::query_outgoing_by_type(&context.conn, &doc_row.id, LinkType::Body)?;
+    let related = filter_related_docs(&context.conn, &body_links, &parent, &dependencies)?;
+
+    Ok((parent, dependencies, blocking, related))
+}
+
+/// Loads DocumentRef structs for a list of link targets.
+fn load_document_refs(conn: &Connection, links: &[LinkRow]) -> LatticeResult<Vec<DocumentRef>> {
+    let mut refs = Vec::new();
+    for link in links {
+        if let Some(row) = document_queries::lookup_by_id(conn, &link.target_id)? {
+            refs.push(DocumentRef::from_row(&row));
+        }
+    }
+    Ok(refs)
+}
+
+/// Loads DocumentRef structs from link sources (for incoming links).
+fn load_document_refs_from_sources(
+    conn: &Connection,
+    links: &[LinkRow],
+) -> LatticeResult<Vec<DocumentRef>> {
+    let mut refs = Vec::new();
+    for link in links {
+        if let Some(row) = document_queries::lookup_by_id(conn, &link.source_id)? {
+            refs.push(DocumentRef::from_row(&row));
+        }
+    }
+    Ok(refs)
+}
+
+/// Filters body links to find related documents, excluding
+/// parent/deps/blocking.
+fn filter_related_docs(
+    conn: &Connection,
+    body_links: &[LinkRow],
+    parent: &Option<DocumentRef>,
+    dependencies: &[DocumentRef],
+) -> LatticeResult<Vec<DocumentRef>> {
+    let mut related = Vec::new();
+    let parent_id = parent.as_ref().map(|p| p.id.as_str());
+    let dep_ids: Vec<&str> = dependencies.iter().map(|d| d.id.as_str()).collect();
+
+    for link in body_links {
+        // Skip if this is the parent
+        if parent_id == Some(link.target_id.as_str()) {
+            continue;
+        }
+        // Skip if this is a dependency
+        if dep_ids.contains(&link.target_id.as_str()) {
+            continue;
+        }
+        if let Some(row) = document_queries::lookup_by_id(conn, &link.target_id)? {
+            related.push(DocumentRef::from_row(&row));
+        }
+    }
+
+    Ok(related)
+}
+
+impl std::fmt::Display for TaskState {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            TaskState::Open => write!(f, "open"),
+            TaskState::Blocked => write!(f, "blocked"),
+            TaskState::Closed => write!(f, "closed"),
+        }
+    }
+}
+
+impl DocumentRef {
+    /// Creates a DocumentRef from a DocumentRow.
+    pub fn from_row(row: &DocumentRow) -> Self {
+        Self {
+            id: row.id.clone(),
+            name: row.name.clone(),
+            description: row.description.clone(),
+            task_type: row.task_type,
+            priority: row.priority,
+            is_closed: row.is_closed,
+        }
+    }
+
+    /// Returns the type indicator string for display.
+    ///
+    /// For tasks: `P<N>` or `P<N>/closed`
+    /// For knowledge base: `doc`
+    pub fn type_indicator(&self) -> String {
+        if let Some(priority) = self.priority {
+            if self.is_closed { format!("P{priority}/closed") } else { format!("P{priority}") }
+        } else {
+            "doc".to_string()
+        }
+    }
+}

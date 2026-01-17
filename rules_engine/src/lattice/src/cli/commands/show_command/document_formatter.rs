@@ -1,1 +1,288 @@
+//! Formatting for `lat show` command output.
+//!
+//! Formats documents for display in various modes: full, short, peek, refs,
+//! and raw. Supports both text and JSON output formats.
+use chrono::{DateTime, Utc};
+use serde::Serialize;
+use serde::ser::SerializeStruct;
 
+use crate::cli::color_theme;
+use crate::cli::commands::show_command::show_executor::{DocumentRef, TaskState};
+use crate::document::frontmatter_schema::TaskType;
+/// Output mode for the show command.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum OutputMode {
+    /// Full document details with body and relationships.
+    Full,
+    /// Single-line summary output.
+    Short,
+    /// Condensed preview suitable for quick context.
+    Peek,
+    /// Show documents that reference this one.
+    Refs,
+    /// Show raw markdown body content.
+    Raw,
+}
+/// Complete output data for a document.
+#[derive(Debug, Clone, Serialize)]
+pub struct ShowOutput {
+    pub id: String,
+    pub name: String,
+    pub description: String,
+    pub path: String,
+    pub state: TaskState,
+    pub priority: Option<u8>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub task_type: Option<TaskType>,
+    pub labels: Vec<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub created_at: Option<DateTime<Utc>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_at: Option<DateTime<Utc>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub closed_at: Option<DateTime<Utc>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub body: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub parent: Option<DocumentRef>,
+    pub dependencies: Vec<DocumentRef>,
+    pub blocking: Vec<DocumentRef>,
+    pub related: Vec<DocumentRef>,
+    pub claimed: bool,
+}
+/// Prints the show output in the appropriate format.
+pub fn print_output(output: &ShowOutput, mode: OutputMode, json: bool) {
+    if json {
+        print_json(output);
+    } else {
+        match mode {
+            OutputMode::Full => print_full(output),
+            OutputMode::Short => print_short(output),
+            OutputMode::Peek => print_peek(output),
+            OutputMode::Refs => print_refs(output),
+            OutputMode::Raw => print_raw(output),
+        }
+    }
+}
+/// Prints JSON output.
+fn print_json(output: &ShowOutput) {
+    let json_output = serde_json::json!([output]);
+    println!("{}", serde_json::to_string_pretty(&json_output).unwrap_or_default());
+}
+/// Prints full document details.
+fn print_full(output: &ShowOutput) {
+    print_header(output);
+    println!();
+    if output.task_type.is_some() {
+        print_task_metadata(output);
+        println!();
+    }
+    if let Some(body) = &output.body {
+        println!("{}:", color_theme::bold("Body"));
+        println!("{body}");
+    }
+    if let Some(parent) = &output.parent {
+        println!();
+        println!("{}:", color_theme::bold("Parent"));
+        println!("  {}", format_doc_ref(parent));
+    }
+    if !output.dependencies.is_empty() {
+        println!();
+        println!("{}:", color_theme::bold(format!("Depends on ({})", output.dependencies.len())));
+        for dep in &output.dependencies {
+            println!("  {}", format_doc_ref(dep));
+        }
+    }
+    if !output.blocking.is_empty() {
+        println!();
+        println!("{}:", color_theme::bold(format!("Blocks ({})", output.blocking.len())));
+        for blocker in &output.blocking {
+            println!("  {}", format_doc_ref(blocker));
+        }
+    }
+    if !output.related.is_empty() {
+        println!();
+        println!("{}:", color_theme::bold(format!("Related ({})", output.related.len())));
+        for rel in &output.related {
+            println!("  {}", format_doc_ref(rel));
+        }
+    }
+}
+/// Prints the header line: `ID: name - description`.
+fn print_header(output: &ShowOutput) {
+    println!(
+        "{}: {} - {}",
+        color_theme::lattice_id(&output.id),
+        color_theme::bold(&output.name),
+        &output.description
+    );
+}
+/// Prints task metadata block.
+fn print_task_metadata(output: &ShowOutput) {
+    let state_styled = match output.state {
+        TaskState::Open => color_theme::status_open(&output.state),
+        TaskState::Blocked => color_theme::status_blocked(&output.state),
+        TaskState::Closed => color_theme::status_closed(&output.state),
+    };
+    println!("State: {state_styled}");
+    if let Some(p) = output.priority {
+        println!("Priority: {}", color_theme::priority(format!("P{p}")));
+    }
+    if let Some(t) = &output.task_type {
+        println!("Type: {}", color_theme::task_type(t));
+    }
+    if let Some(created) = output.created_at {
+        println!("Created: {}", format_timestamp(created));
+    }
+    if let Some(updated) = output.updated_at {
+        println!("Updated: {}", format_timestamp(updated));
+    }
+    if let Some(closed) = output.closed_at {
+        println!("Closed: {}", format_timestamp(closed));
+    }
+    if !output.labels.is_empty() {
+        let labels_str =
+            output.labels.iter().map(|l| format!("[{l}]")).collect::<Vec<_>>().join(" ");
+        println!("Labels: {}", color_theme::label(labels_str));
+    }
+    if output.claimed {
+        println!("Claimed: {}", color_theme::warning("true"));
+    }
+}
+/// Prints short single-line output.
+///
+/// Format: `<id> [<state>] <priority> <type>: <name> - <description>`
+fn print_short(output: &ShowOutput) {
+    let state_styled = match output.state {
+        TaskState::Open => color_theme::status_open(format!("[{}]", output.state)),
+        TaskState::Blocked => color_theme::status_blocked(format!("[{}]", output.state)),
+        TaskState::Closed => color_theme::status_closed(format!("[{}]", output.state)),
+    };
+    if let Some(task_type) = &output.task_type {
+        let priority_str = output.priority.map(|p| format!("P{p}")).unwrap_or_default();
+        println!(
+            "{} {} {} {}: {} - {}",
+            color_theme::lattice_id(&output.id),
+            state_styled,
+            color_theme::priority(&priority_str),
+            color_theme::task_type(task_type),
+            output.name,
+            output.description
+        );
+    } else {
+        println!(
+            "{} [{}]: {} - {}",
+            color_theme::lattice_id(&output.id),
+            color_theme::muted("doc"),
+            output.name,
+            output.description
+        );
+    }
+}
+/// Prints peek format (condensed preview).
+///
+/// Format:
+/// ```text
+/// ID: name - description [P0/open/type]
+/// Parent: XXXX | Blocks: N | Depends: N
+/// ```
+fn print_peek(output: &ShowOutput) {
+    if let Some(task_type) = &output.task_type {
+        let priority_str = output.priority.map(|p| format!("P{p}")).unwrap_or_default();
+        println!(
+            "{}: {} - {} [{}/{}/{}]",
+            color_theme::lattice_id(&output.id),
+            output.name,
+            output.description,
+            color_theme::priority(&priority_str),
+            output.state,
+            color_theme::task_type(task_type)
+        );
+    } else {
+        println!(
+            "{}: {} - {} [{}]",
+            color_theme::lattice_id(&output.id),
+            output.name,
+            output.description,
+            color_theme::muted("doc")
+        );
+    }
+    let parent_info =
+        output.parent.as_ref().map(|p| p.id.clone()).unwrap_or_else(|| "-".to_string());
+    println!(
+        "Parent: {} | Blocks: {} | Depends: {}",
+        color_theme::lattice_id(&parent_info),
+        output.blocking.len(),
+        output.dependencies.len()
+    );
+}
+/// Prints refs format (documents that reference this one).
+fn print_refs(output: &ShowOutput) {
+    println!("References to {}:", color_theme::lattice_id(&output.id));
+    println!();
+    if !output.blocking.is_empty() {
+        println!("  {}:", color_theme::bold(format!("Blocks ({})", output.blocking.len())));
+        for blocker in &output.blocking {
+            println!("    {}", format_doc_ref(blocker));
+        }
+    }
+    if output.blocking.is_empty() {
+        println!("  {}", color_theme::muted("No references found"));
+    }
+}
+/// Prints raw markdown body content.
+fn print_raw(output: &ShowOutput) {
+    if let Some(body) = &output.body {
+        print!("{body}");
+    }
+}
+/// Formats a document reference for display.
+///
+/// Format: `<id>: <name> - <description> [<type-indicator>]`
+fn format_doc_ref(doc_ref: &DocumentRef) -> String {
+    format!(
+        "{}: {} - {} [{}]",
+        color_theme::lattice_id(&doc_ref.id),
+        doc_ref.name,
+        doc_ref.description,
+        type_indicator_styled(doc_ref)
+    )
+}
+/// Returns a styled type indicator for a document reference.
+fn type_indicator_styled(doc_ref: &DocumentRef) -> impl std::fmt::Display {
+    let indicator = doc_ref.type_indicator();
+    if doc_ref.is_closed {
+        color_theme::status_closed(indicator)
+    } else if doc_ref.task_type.is_some() {
+        color_theme::priority(indicator)
+    } else {
+        color_theme::muted(indicator)
+    }
+}
+/// Formats a timestamp for display.
+fn format_timestamp(dt: DateTime<Utc>) -> String {
+    dt.format("%Y-%m-%d %H:%M").to_string()
+}
+impl Serialize for TaskState {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(&self.to_string())
+    }
+}
+impl Serialize for DocumentRef {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        let mut state = serializer.serialize_struct("DocumentRef", 6)?;
+        state.serialize_field("id", &self.id)?;
+        state.serialize_field("name", &self.name)?;
+        state.serialize_field("description", &self.description)?;
+        state.serialize_field("task_type", &self.task_type)?;
+        state.serialize_field("priority", &self.priority)?;
+        state.serialize_field("state", if self.is_closed { "closed" } else { "open" })?;
+        state.end()
+    }
+}

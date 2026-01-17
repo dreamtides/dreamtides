@@ -1,1 +1,449 @@
+//! Tests for the `lat show` command.
 
+use std::fs;
+
+use lattice::cli::command_dispatch::{CommandContext, create_context};
+use lattice::cli::commands::show_command::document_formatter::{OutputMode, ShowOutput};
+use lattice::cli::commands::show_command::show_executor::{DocumentRef, TaskState};
+use lattice::cli::global_options::GlobalOptions;
+use lattice::cli::workflow_args::ShowArgs;
+use lattice::document::frontmatter_schema::TaskType;
+use lattice::error::error_types::LatticeError;
+use lattice::index::document_types::InsertDocument;
+use lattice::index::link_queries::{self, InsertLink, LinkType};
+use lattice::index::{document_queries, label_queries, schema_definition};
+use rusqlite::Connection;
+
+fn create_test_repo() -> (tempfile::TempDir, CommandContext) {
+    let temp_dir = tempfile::tempdir().expect("Failed to create temp dir");
+    let repo_root = temp_dir.path();
+
+    fs::create_dir(repo_root.join(".git")).expect("Failed to create .git");
+
+    let global = GlobalOptions::default();
+    let context = create_context(repo_root, &global).expect("Failed to create context");
+
+    // Create the schema for tests
+    schema_definition::create_schema(&context.conn).expect("Failed to create schema");
+
+    (temp_dir, context)
+}
+
+fn create_test_document(id: &str, path: &str, name: &str, description: &str) -> InsertDocument {
+    InsertDocument::new(
+        id.to_string(),
+        None,
+        path.to_string(),
+        name.to_string(),
+        description.to_string(),
+        None,
+        None,
+        None,
+        None,
+        None,
+        "abc123".to_string(),
+        100,
+    )
+}
+
+fn create_task_document(
+    id: &str,
+    path: &str,
+    name: &str,
+    description: &str,
+    priority: u8,
+) -> InsertDocument {
+    InsertDocument::new(
+        id.to_string(),
+        None,
+        path.to_string(),
+        name.to_string(),
+        description.to_string(),
+        Some(TaskType::Task),
+        Some(priority),
+        None,
+        None,
+        None,
+        "def456".to_string(),
+        200,
+    )
+}
+
+fn insert_doc(conn: &Connection, doc: &InsertDocument) {
+    document_queries::insert(conn, doc).expect("Failed to insert document");
+}
+
+// ============================================================================
+// TaskState Tests
+// ============================================================================
+
+#[test]
+fn task_state_display_formats_correctly() {
+    assert_eq!(TaskState::Open.to_string(), "open");
+    assert_eq!(TaskState::Blocked.to_string(), "blocked");
+    assert_eq!(TaskState::Closed.to_string(), "closed");
+}
+
+// ============================================================================
+// DocumentRef Tests
+// ============================================================================
+
+#[test]
+fn document_ref_type_indicator_for_task() {
+    let doc_ref = DocumentRef {
+        id: "LTESTA".to_string(),
+        name: "test-task".to_string(),
+        description: "Test task".to_string(),
+        task_type: Some(TaskType::Bug),
+        priority: Some(1),
+        is_closed: false,
+    };
+
+    assert_eq!(doc_ref.type_indicator(), "P1");
+}
+
+#[test]
+fn document_ref_type_indicator_for_closed_task() {
+    let doc_ref = DocumentRef {
+        id: "LTESTB".to_string(),
+        name: "closed-task".to_string(),
+        description: "Closed task".to_string(),
+        task_type: Some(TaskType::Feature),
+        priority: Some(0),
+        is_closed: true,
+    };
+
+    assert_eq!(doc_ref.type_indicator(), "P0/closed");
+}
+
+#[test]
+fn document_ref_type_indicator_for_knowledge_base() {
+    let doc_ref = DocumentRef {
+        id: "LTESTC".to_string(),
+        name: "kb-doc".to_string(),
+        description: "Knowledge base doc".to_string(),
+        task_type: None,
+        priority: None,
+        is_closed: false,
+    };
+
+    assert_eq!(doc_ref.type_indicator(), "doc");
+}
+
+// ============================================================================
+// OutputMode Tests
+// ============================================================================
+
+#[test]
+fn output_mode_equality() {
+    assert_eq!(OutputMode::Full, OutputMode::Full);
+    assert_eq!(OutputMode::Short, OutputMode::Short);
+    assert_ne!(OutputMode::Full, OutputMode::Short);
+}
+
+// ============================================================================
+// ShowOutput Tests
+// ============================================================================
+
+#[test]
+fn show_output_serializes_to_json() {
+    let output = ShowOutput {
+        id: "LTESTA".to_string(),
+        name: "test-doc".to_string(),
+        description: "Test document".to_string(),
+        path: "test/test-doc.md".to_string(),
+        state: TaskState::Open,
+        priority: Some(1),
+        task_type: Some(TaskType::Bug),
+        labels: vec!["label1".to_string(), "label2".to_string()],
+        created_at: None,
+        updated_at: None,
+        closed_at: None,
+        body: Some("Body content".to_string()),
+        parent: None,
+        dependencies: Vec::new(),
+        blocking: Vec::new(),
+        related: Vec::new(),
+        claimed: false,
+    };
+
+    let json = serde_json::to_string(&output).expect("Should serialize to JSON");
+    assert!(json.contains("\"id\":\"LTESTA\""));
+    assert!(json.contains("\"state\":\"open\""));
+    assert!(json.contains("\"task_type\":\"bug\""));
+}
+
+// ============================================================================
+// Integration Tests
+// ============================================================================
+
+#[test]
+fn show_command_returns_document_not_found_for_missing_id() {
+    let (_temp_dir, context) = create_test_repo();
+
+    let args = ShowArgs {
+        ids: vec!["LNFXYZ".to_string()],
+        short: false,
+        refs: false,
+        peek: false,
+        raw: false,
+    };
+
+    let result = lattice::cli::commands::show_command::show_executor::execute(context, args);
+
+    assert!(result.is_err(), "Should return error for missing document");
+    if let Err(LatticeError::DocumentNotFound { id }) = result {
+        assert_eq!(id, "LNFXYZ", "Error should contain the missing ID");
+    } else {
+        panic!("Expected DocumentNotFound error");
+    }
+}
+
+#[test]
+fn show_command_finds_existing_document() {
+    let (temp_dir, context) = create_test_repo();
+
+    // Create a document file
+    let doc_path = temp_dir.path().join("docs").join("test.md");
+    fs::create_dir_all(doc_path.parent().unwrap()).expect("Create dirs");
+    fs::write(
+        &doc_path,
+        "---\nlattice-id: LDOCAA\nname: test\ndescription: Test document\n---\n\nBody content.",
+    )
+    .expect("Write doc");
+
+    // Insert into index
+    let doc = create_test_document("LDOCAA", "docs/test.md", "test", "Test document");
+    insert_doc(&context.conn, &doc);
+
+    let args = ShowArgs {
+        ids: vec!["LDOCAA".to_string()],
+        short: false,
+        refs: false,
+        peek: false,
+        raw: false,
+    };
+
+    let result = lattice::cli::commands::show_command::show_executor::execute(context, args);
+
+    assert!(result.is_ok(), "Should succeed for existing document: {:?}", result);
+}
+
+#[test]
+fn show_command_handles_task_with_closed_state() {
+    let (temp_dir, context) = create_test_repo();
+
+    // Create a closed task
+    let doc_path = temp_dir.path().join("tasks").join(".closed").join("done.md");
+    fs::create_dir_all(doc_path.parent().unwrap()).expect("Create dirs");
+    fs::write(
+        &doc_path,
+        "---\nlattice-id: LDONEX\nname: done\ndescription: Done task\ntask-type: task\npriority: 1\n---\n\nCompleted.",
+    )
+    .expect("Write doc");
+
+    // Insert into index (is_closed is computed from path)
+    let doc = create_task_document("LDONEX", "tasks/.closed/done.md", "done", "Done task", 1);
+    insert_doc(&context.conn, &doc);
+
+    let row = document_queries::lookup_by_id(&context.conn, "LDONEX")
+        .expect("Lookup should succeed")
+        .expect("Document should exist");
+
+    assert!(row.is_closed, "Document should be marked as closed based on path");
+}
+
+#[test]
+fn show_command_handles_blocked_task() {
+    let (temp_dir, context) = create_test_repo();
+
+    // Create blocker task (open)
+    let blocker_path = temp_dir.path().join("tasks").join("blocker.md");
+    fs::create_dir_all(blocker_path.parent().unwrap()).expect("Create dirs");
+    fs::write(
+        &blocker_path,
+        "---\nlattice-id: LBLKRA\nname: blocker\ndescription: Blocking task\ntask-type: task\npriority: 0\n---\n\nBlocks others.",
+    )
+    .expect("Write blocker doc");
+
+    // Create blocked task
+    let blocked_path = temp_dir.path().join("tasks").join("blocked.md");
+    fs::write(
+        &blocked_path,
+        "---\nlattice-id: LBLKDA\nname: blocked\ndescription: Blocked task\ntask-type: task\npriority: 1\nblocked-by:\n  - LBLKRA\n---\n\nWaiting.",
+    )
+    .expect("Write blocked doc");
+
+    // Insert documents into index
+    let blocker_doc =
+        create_task_document("LBLKRA", "tasks/blocker.md", "blocker", "Blocking task", 0);
+    let blocked_doc =
+        create_task_document("LBLKDA", "tasks/blocked.md", "blocked", "Blocked task", 1);
+    insert_doc(&context.conn, &blocker_doc);
+    insert_doc(&context.conn, &blocked_doc);
+
+    // Add blocked-by link
+    let link = InsertLink {
+        source_id: "LBLKDA",
+        target_id: "LBLKRA",
+        link_type: LinkType::BlockedBy,
+        position: 0,
+    };
+    link_queries::insert_for_document(&context.conn, &[link]).expect("Insert link");
+
+    // Verify state computation
+    let args = ShowArgs {
+        ids: vec!["LBLKDA".to_string()],
+        short: false,
+        refs: false,
+        peek: false,
+        raw: false,
+    };
+
+    let result = lattice::cli::commands::show_command::show_executor::execute(context, args);
+    assert!(result.is_ok(), "Should succeed: {:?}", result);
+}
+
+#[test]
+fn show_command_handles_multiple_ids() {
+    let (temp_dir, context) = create_test_repo();
+
+    // Create two documents
+    let doc1_path = temp_dir.path().join("doc1.md");
+    let doc2_path = temp_dir.path().join("doc2.md");
+
+    fs::write(
+        &doc1_path,
+        "---\nlattice-id: LMULTA\nname: doc1\ndescription: First doc\n---\n\nBody 1.",
+    )
+    .expect("Write doc1");
+    fs::write(
+        &doc2_path,
+        "---\nlattice-id: LMULT2\nname: doc2\ndescription: Second doc\n---\n\nBody 2.",
+    )
+    .expect("Write doc2");
+
+    let doc1 = create_test_document("LMULTA", "doc1.md", "doc1", "First doc");
+    let doc2 = create_test_document("LMULT2", "doc2.md", "doc2", "Second doc");
+    insert_doc(&context.conn, &doc1);
+    insert_doc(&context.conn, &doc2);
+
+    let args = ShowArgs {
+        ids: vec!["LMULTA".to_string(), "LMULT2".to_string()],
+        short: false,
+        refs: false,
+        peek: false,
+        raw: false,
+    };
+
+    let result = lattice::cli::commands::show_command::show_executor::execute(context, args);
+    assert!(result.is_ok(), "Should handle multiple documents: {:?}", result);
+}
+
+#[test]
+fn show_command_loads_labels() {
+    let (temp_dir, context) = create_test_repo();
+
+    let doc_path = temp_dir.path().join("test.md");
+    fs::write(
+        &doc_path,
+        "---\nlattice-id: LLABEL\nname: labeled\ndescription: Labeled doc\nlabels:\n  - foo\n  - bar\n---\n\nContent.",
+    )
+    .expect("Write doc");
+
+    let doc = create_test_document("LLABEL", "test.md", "labeled", "Labeled doc");
+    insert_doc(&context.conn, &doc);
+
+    // Add labels to index
+    label_queries::add(&context.conn, "LLABEL", "foo").expect("Add label foo");
+    label_queries::add(&context.conn, "LLABEL", "bar").expect("Add label bar");
+
+    let args = ShowArgs {
+        ids: vec!["LLABEL".to_string()],
+        short: false,
+        refs: false,
+        peek: false,
+        raw: false,
+    };
+
+    let result = lattice::cli::commands::show_command::show_executor::execute(context, args);
+    assert!(result.is_ok(), "Should succeed with labels: {:?}", result);
+}
+
+#[test]
+fn show_command_with_short_flag() {
+    let (temp_dir, context) = create_test_repo();
+
+    let doc_path = temp_dir.path().join("test.md");
+    fs::write(
+        &doc_path,
+        "---\nlattice-id: LSHORT\nname: short-test\ndescription: Short test\n---\n\nBody.",
+    )
+    .expect("Write doc");
+
+    let doc = create_test_document("LSHORT", "test.md", "short-test", "Short test");
+    insert_doc(&context.conn, &doc);
+
+    let args = ShowArgs {
+        ids: vec!["LSHORT".to_string()],
+        short: true,
+        refs: false,
+        peek: false,
+        raw: false,
+    };
+
+    let result = lattice::cli::commands::show_command::show_executor::execute(context, args);
+    assert!(result.is_ok(), "Short mode should succeed: {:?}", result);
+}
+
+#[test]
+fn show_command_with_peek_flag() {
+    let (temp_dir, context) = create_test_repo();
+
+    let doc_path = temp_dir.path().join("test.md");
+    fs::write(
+        &doc_path,
+        "---\nlattice-id: LPEEKA\nname: peek-test\ndescription: Peek test\n---\n\nBody.",
+    )
+    .expect("Write doc");
+
+    let doc = create_test_document("LPEEKA", "test.md", "peek-test", "Peek test");
+    insert_doc(&context.conn, &doc);
+
+    let args = ShowArgs {
+        ids: vec!["LPEEKA".to_string()],
+        short: false,
+        refs: false,
+        peek: true,
+        raw: false,
+    };
+
+    let result = lattice::cli::commands::show_command::show_executor::execute(context, args);
+    assert!(result.is_ok(), "Peek mode should succeed: {:?}", result);
+}
+
+#[test]
+fn show_command_with_raw_flag() {
+    let (temp_dir, context) = create_test_repo();
+
+    let doc_path = temp_dir.path().join("test.md");
+    fs::write(
+        &doc_path,
+        "---\nlattice-id: LRAWAB\nname: raw-test\ndescription: Raw test\n---\n\nRaw body content.",
+    )
+    .expect("Write doc");
+
+    let doc = create_test_document("LRAWAB", "test.md", "raw-test", "Raw test");
+    insert_doc(&context.conn, &doc);
+
+    let args = ShowArgs {
+        ids: vec!["LRAWAB".to_string()],
+        short: false,
+        refs: false,
+        peek: false,
+        raw: true,
+    };
+
+    let result = lattice::cli::commands::show_command::show_executor::execute(context, args);
+    assert!(result.is_ok(), "Raw mode should succeed: {:?}", result);
+}
