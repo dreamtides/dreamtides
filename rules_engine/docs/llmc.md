@@ -400,6 +400,7 @@ llmc review          # Reviews oldest pending worker
 llmc review baker    # Reviews specific worker
 llmc review --interface difftastic  # Default
 llmc review --interface vscode      # Open in VS Code
+llmc review --name-only              # Show only changed file names
 ```
 
 ### `llmc reject [message]`

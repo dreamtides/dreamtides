@@ -14,7 +14,11 @@ pub enum ReviewInterface {
 }
 
 /// Runs the review command, showing a diff for a worker awaiting review
-pub fn run_review(worker: Option<String>, interface: ReviewInterface) -> Result<()> {
+pub fn run_review(
+    worker: Option<String>,
+    interface: ReviewInterface,
+    name_only: bool,
+) -> Result<()> {
     let llmc_root = config::get_llmc_root();
     if !llmc_root.exists() {
         eprintln!("LLMC workspace not initialized. Run 'llmc init' first.");
@@ -124,7 +128,7 @@ pub fn run_review(worker: Option<String>, interface: ReviewInterface) -> Result<
     println!("{}", commit_message);
     println!();
 
-    display_diff(&worktree_path, interface)?;
+    display_diff(&worktree_path, interface, name_only)?;
 
     println!();
     println!("Commands:");
@@ -147,9 +151,32 @@ pub fn load_last_reviewed() -> Result<Option<String>> {
     Ok(Some(contents.trim().to_string()))
 }
 
-fn display_diff(worktree_path: &PathBuf, interface: ReviewInterface) -> Result<()> {
+fn display_diff(
+    worktree_path: &PathBuf,
+    interface: ReviewInterface,
+    name_only: bool,
+) -> Result<()> {
     let current_branch = git::get_current_branch(worktree_path)?;
     let range = format!("origin/master...{}", current_branch);
+
+    // If name_only flag is set, just show file names regardless of interface
+    if name_only {
+        let output = Command::new("git")
+            .arg("-C")
+            .arg(worktree_path)
+            .arg("diff")
+            .arg("--name-only")
+            .arg(&range)
+            .output()
+            .context("Failed to execute git diff --name-only")?;
+
+        if !output.status.success() {
+            bail!("git diff --name-only failed for {}", range);
+        }
+
+        print!("{}", String::from_utf8_lossy(&output.stdout));
+        return Ok(());
+    }
 
     match interface {
         ReviewInterface::Difftastic => {

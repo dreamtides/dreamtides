@@ -69,7 +69,7 @@ async fn main() -> Result<()> {
         }
         Commands::Message { worker, message } => message::run_message(&worker, message),
         Commands::Attach { worker } => attach::run_attach(&worker),
-        Commands::Review { worker, interface } => {
+        Commands::Review { worker, interface, name_only } => {
             let interface_enum = match interface.as_str() {
                 "difftastic" => ReviewInterface::Difftastic,
                 "vscode" => ReviewInterface::VSCode,
@@ -81,7 +81,7 @@ async fn main() -> Result<()> {
                     std::process::exit(1);
                 }
             };
-            review::run_review(worker, interface_enum)
+            review::run_review(worker, interface_enum, name_only)
         }
         Commands::Reject { message } => reject::run_reject(message),
         Commands::Accept { worker } => accept::run_accept(worker),

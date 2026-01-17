@@ -140,6 +140,10 @@ pub enum Commands {
         /// Interface to use for displaying the diff
         #[arg(long, default_value = "difftastic")]
         interface: String,
+
+        /// Show only the names of changed files (no diff content)
+        #[arg(long)]
+        name_only: bool,
     },
 
     /// Reject a worker's work and request changes
