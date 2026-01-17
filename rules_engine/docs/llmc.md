@@ -305,11 +305,15 @@ saving final state.
 
 ### `llmc down`
 
-Stops all worker sessions.
+Stops all worker sessions. By default, console sessions persist across restarts.
 
 ```bash
-llmc down [--force]
+llmc down [--force] [--kill-consoles]
 ```
+
+Flags:
+- `--force`: Kill sessions immediately without graceful shutdown
+- `--kill-consoles`: Also kill console sessions (by default, consoles persist)
 
 ### `llmc add <name>`
 
@@ -449,9 +453,11 @@ Session names are automatically assigned as "llmc-console1", "llmc-console2",
 etc. The session runs in the master repository directory (configured via
 `repo.source` in config.toml) with the default model configuration.
 
-Console sessions can be:
-- Attached to later with `llmc attach console1`
-- Terminated with `llmc nuke console1`
+Console sessions:
+- **Persist across `llmc down`/`llmc up` restarts** (unlike workers)
+- Can be attached to later with `llmc attach console1`
+- Can be terminated with `llmc nuke console1`
+- Can be killed during shutdown with `llmc down --kill-consoles`
 
 ### `llmc review [worker]`
 

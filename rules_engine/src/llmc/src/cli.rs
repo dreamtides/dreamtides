@@ -48,6 +48,11 @@ pub enum Commands {
         #[arg(long)]
         force: bool,
 
+        /// Also kill console sessions (by default, consoles persist across
+        /// restarts)
+        #[arg(long)]
+        kill_consoles: bool,
+
         /// Output in JSON format
         #[arg(long)]
         json: bool,

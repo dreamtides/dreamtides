@@ -61,7 +61,7 @@ async fn main() -> Result<()> {
     let result = match cli.command {
         Commands::Init { source, target, force } => init::run_init(source, target, force),
         Commands::Up { no_patrol, force } => up::run_up(no_patrol, cli.verbose, force),
-        Commands::Down { force, json } => down::run_down(force, json),
+        Commands::Down { force, kill_consoles, json } => down::run_down(force, kill_consoles, json),
         Commands::Add { name, model, role_prompt, excluded_from_pool, self_review, json } => {
             add::run_add(&name, model, role_prompt, excluded_from_pool, self_review, json)
         }

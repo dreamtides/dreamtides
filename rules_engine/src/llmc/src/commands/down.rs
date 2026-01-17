@@ -6,9 +6,10 @@ use anyhow::{Context, Result, bail};
 use super::super::config::{self, Config};
 use super::super::state::{self, State, WorkerStatus};
 use super::super::tmux::session;
+use super::console::CONSOLE_PREFIX;
 
 /// Runs the down command, stopping all worker sessions
-pub fn run_down(force: bool, json: bool) -> Result<()> {
+pub fn run_down(force: bool, kill_consoles: bool, json: bool) -> Result<()> {
     let llmc_root = config::get_llmc_root();
     if !llmc_root.exists() {
         bail!(
@@ -40,6 +41,10 @@ pub fn run_down(force: bool, json: bool) -> Result<()> {
     }
 
     kill_remaining_sessions(&mut state, force)?;
+
+    // Clean up orphaned sessions, optionally including console sessions
+    cleanup_orphaned_llmc_sessions(&state, kill_consoles, json)?;
+
     state.save(&state_path)?;
 
     if json {
@@ -114,35 +119,72 @@ fn kill_remaining_sessions(state: &mut State, force: bool) -> Result<()> {
         }
     }
 
-    cleanup_orphaned_llmc_sessions(state)?;
-
     Ok(())
 }
 
-fn cleanup_orphaned_llmc_sessions(state: &State) -> Result<()> {
+fn cleanup_orphaned_llmc_sessions(state: &State, kill_consoles: bool, json: bool) -> Result<()> {
     let all_sessions = session::list_sessions()?;
     let tracked_session_ids: Vec<String> =
         state.workers.values().map(|w| w.session_id.clone()).collect();
 
+    // Filter orphaned sessions, optionally preserving console sessions
     let orphaned_sessions: Vec<String> = all_sessions
         .into_iter()
-        .filter(|s| s.starts_with("llmc-") && !tracked_session_ids.contains(s))
+        .filter(|s| {
+            // Must be an LLMC session
+            if !s.starts_with("llmc-") {
+                return false;
+            }
+            // Must not be tracked
+            if tracked_session_ids.contains(s) {
+                return false;
+            }
+            // Skip console sessions unless --kill-consoles is specified
+            if !kill_consoles && s.starts_with(CONSOLE_PREFIX) {
+                return false;
+            }
+            true
+        })
         .collect();
 
+    // Count console sessions that are being preserved
+    let preserved_consoles: Vec<String> = if !kill_consoles {
+        session::list_sessions()?.into_iter().filter(|s| s.starts_with(CONSOLE_PREFIX)).collect()
+    } else {
+        vec![]
+    };
+
     if orphaned_sessions.is_empty() {
+        if !preserved_consoles.is_empty() && !json {
+            println!(
+                "  {} console session(s) preserved (use --kill-consoles to stop them)",
+                preserved_consoles.len()
+            );
+        }
         return Ok(());
     }
 
-    println!(
-        "Found {} orphaned LLMC sessions (not tracked in state file), cleaning up...",
-        orphaned_sessions.len()
-    );
+    if !json {
+        println!(
+            "Found {} orphaned LLMC sessions (not tracked in state file), cleaning up...",
+            orphaned_sessions.len()
+        );
+    }
 
     for session_name in &orphaned_sessions {
-        println!("  Killing orphaned session: {}", session_name);
+        if !json {
+            println!("  Killing orphaned session: {}", session_name);
+        }
         if let Err(e) = session::kill_session(session_name) {
             eprintln!("Warning: Failed to kill orphaned session '{}': {}", session_name, e);
         }
+    }
+
+    if !preserved_consoles.is_empty() && !json {
+        println!(
+            "  {} console session(s) preserved (use --kill-consoles to stop them)",
+            preserved_consoles.len()
+        );
     }
 
     Ok(())
