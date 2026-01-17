@@ -1,6 +1,7 @@
 mod client_counters_tests;
 mod connection_pool_tests;
 mod content_cache_tests;
+mod directory_roots_tests;
 mod document_queries_tests;
 mod fts_tests;
 mod label_queries_tests;

@@ -79,10 +79,13 @@ pub fn get(conn: &Connection, directory_path: &str) -> Result<Option<DirectoryRo
     Ok(result)
 }
 
-/// Gets all ancestors of a directory, ordered from root (depth 0) to immediate
-/// parent.
+/// Gets the ancestor chain for a directory, including the directory itself.
 ///
-/// Returns an empty vector if the directory has no ancestors in the hierarchy.
+/// Returns entries ordered from root (depth 0) to the queried directory.
+/// This is designed for template composition where you need to walk from the
+/// root down to the current directory collecting context from each level.
+///
+/// Returns an empty vector if the directory is not in the hierarchy.
 pub fn get_ancestors(
     conn: &Connection,
     directory_path: &str,
