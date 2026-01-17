@@ -439,23 +439,30 @@ llmc attach console1    # Attach to console session "console1"
 llmc attach llmc-console1  # Also works with full session name
 ```
 
-### `llmc console`
+### `llmc console [name]`
 
-Creates a new interactive console session and attaches to it. Console sessions
-provide manual agent interaction via the same TMUX interface as workers, but
-without creating a worker or worktree.
+Creates a new interactive console session and attaches to it, or attaches to an
+existing console session if it already exists. Console sessions provide manual
+agent interaction via the same TMUX interface as workers, but without creating
+a worker or worktree.
 
 ```bash
-llmc console
+llmc console           # Creates console with next available number (console1, console2, etc.)
+llmc console console1  # Attaches to console1 if it exists, creates it if not
+llmc console mytest    # Creates/attaches to llmc-mytest
 ```
 
-Session names are automatically assigned as "llmc-console1", "llmc-console2",
-etc. The session runs in the master repository directory (configured via
+When a name is provided, the command will attach to the existing session if it
+exists, or create a new session with that name if it doesn't. When no name is
+provided, session names are automatically assigned as "llmc-console1",
+"llmc-console2", etc.
+
+The session runs in the master repository directory (configured via
 `repo.source` in config.toml) with the default model configuration.
 
 Console sessions:
 - **Persist across `llmc down`/`llmc up` restarts** (unlike workers)
-- Can be attached to later with `llmc attach console1`
+- Can be attached to later with `llmc attach console1` or `llmc console console1`
 - Can be terminated with `llmc nuke console1`
 - Can be killed during shutdown with `llmc down --kill-consoles`
 
@@ -708,6 +715,18 @@ LLMC is designed to be self-healing. When workers fail to start:
 This means transient failures (Claude not starting, network issues, resource
 contention) are automatically recovered without manual intervention.
 
+### Git Lock File Handling
+
+Git operations can encounter lock file errors when another git process is
+running concurrently (e.g., `git push` running while LLMC performs a rebase).
+LLMC handles this gracefully:
+
+- Operations that encounter `index.lock` errors are automatically retried
+- Up to 5 retry attempts with 500ms delay between each
+- Applies to: `fetch_origin`, `pull_rebase`, `rebase_onto`, `abort_rebase`,
+  `checkout_branch`, `reset_to_ref`
+- Concurrent operations like `git push` are safe to run alongside LLMC
+
 ### Summary Table
 
 | Failure Mode | Detection | Retries | Escalation |
@@ -717,6 +736,7 @@ contention) are automatically recovered without manual intervention.
 | Stuck processing | `working` state >30 min | Nudge, then alert | Error after 2nd nudge |
 | Partial send | Incomplete text in pane | Clear and resend | Error after 3 failures |
 | State corruption | JSON parse error | Backup restore | Manual intervention |
+| Git lock file | `index.lock` error in stderr | 5 attempts, 500ms delay | Error after exhausted |
 
 ### Key Principles
 

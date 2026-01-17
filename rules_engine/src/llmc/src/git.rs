@@ -1,10 +1,17 @@
 use std::path::Path;
 use std::process::Command;
+use std::thread;
+use std::time::Duration;
 
 use anyhow::{Context, Result, bail};
 use regex::Regex;
 
 use crate::logging::git as logging_git;
+
+/// Maximum number of retries for git operations that encounter lock file errors
+const GIT_LOCK_RETRY_COUNT: u32 = 5;
+/// Delay between retries when a lock file is encountered (milliseconds)
+const GIT_LOCK_RETRY_DELAY_MS: u64 = 500;
 
 /// Result of a rebase operation
 #[derive(Debug, Clone, PartialEq)]
@@ -377,7 +384,6 @@ pub fn amend_uncommitted_changes(worktree: &Path) -> Result<()> {
     Ok(())
 }
 
-/// Rebases the worktree onto the target branch
 pub fn rebase_onto(worktree: &Path, target: &str) -> Result<RebaseResult> {
     let rebase_in_progress = is_rebase_in_progress(worktree);
     tracing::debug!(
@@ -403,31 +409,31 @@ pub fn rebase_onto(worktree: &Path, target: &str) -> Result<RebaseResult> {
     let before = logging_git::capture_state(worktree).ok();
     let start = std::time::Instant::now();
 
-    let output = Command::new("git")
-        .arg("-C")
-        .arg(worktree)
-        .arg("rebase")
-        .arg(target)
-        .output()
-        .context("Failed to execute git rebase")?;
-
-    let result = if output.status.success() {
-        Ok(RebaseResult { success: true, conflicts: vec![] })
-    } else {
-        let stderr = String::from_utf8_lossy(&output.stderr);
-        if stderr.contains("CONFLICT") || stderr.contains("conflict") {
-            let conflicts = get_conflicted_files(worktree)?;
-            Ok(RebaseResult { success: false, conflicts })
-        } else {
-            Err(anyhow::anyhow!("Rebase failed: {stderr}"))
+    let mut last_error: Option<String> = None;
+    for attempt in 0..=GIT_LOCK_RETRY_COUNT {
+        if attempt > 0 {
+            tracing::debug!(
+                operation = "git_operation",
+                operation_type = "rebase",
+                repo_path = %worktree.display(),
+                target,
+                attempt,
+                "Retrying rebase after lock file error"
+            );
+            thread::sleep(Duration::from_millis(GIT_LOCK_RETRY_DELAY_MS));
         }
-    };
 
-    let after = logging_git::capture_state(worktree).ok();
-    let duration_ms = start.elapsed().as_millis() as u64;
+        let output = Command::new("git")
+            .arg("-C")
+            .arg(worktree)
+            .arg("rebase")
+            .arg(target)
+            .output()
+            .context("Failed to execute git rebase")?;
 
-    match &result {
-        Ok(rebase_result) if rebase_result.success => {
+        if output.status.success() {
+            let after = logging_git::capture_state(worktree).ok();
+            let duration_ms = start.elapsed().as_millis() as u64;
             tracing::info!(
                 operation = "git_operation",
                 operation_type = "rebase",
@@ -437,10 +443,19 @@ pub fn rebase_onto(worktree: &Path, target: &str) -> Result<RebaseResult> {
                 ?before,
                 ?after,
                 result = "success",
+                retries = attempt,
                 "Git rebase succeeded"
             );
+            return Ok(RebaseResult { success: true, conflicts: vec![] });
         }
-        Ok(rebase_result) => {
+
+        let stderr = String::from_utf8_lossy(&output.stderr);
+
+        // Check for conflicts (not retryable)
+        if stderr.contains("CONFLICT") || stderr.contains("conflict") {
+            let after = logging_git::capture_state(worktree).ok();
+            let duration_ms = start.elapsed().as_millis() as u64;
+            let conflicts = get_conflicted_files(worktree)?;
             tracing::info!(
                 operation = "git_operation",
                 operation_type = "rebase",
@@ -450,27 +465,63 @@ pub fn rebase_onto(worktree: &Path, target: &str) -> Result<RebaseResult> {
                 ?before,
                 ?after,
                 result = "conflict",
-                conflicts = ?rebase_result.conflicts,
+                conflicts = ?conflicts,
                 "Git rebase has conflicts"
             );
+            return Ok(RebaseResult { success: false, conflicts });
         }
-        Err(e) => {
-            tracing::error!(
+
+        // Check for lock file error (retryable)
+        if is_lock_file_error(&stderr) {
+            tracing::warn!(
                 operation = "git_operation",
                 operation_type = "rebase",
                 repo_path = %worktree.display(),
                 target,
-                duration_ms,
-                ?before,
-                ?after,
-                result = "error",
-                error = %e,
-                "Git rebase failed"
+                attempt,
+                max_retries = GIT_LOCK_RETRY_COUNT,
+                "Git lock file detected, will retry"
             );
+            last_error = Some(stderr.to_string());
+            continue;
         }
+
+        // Other error (not retryable)
+        let after = logging_git::capture_state(worktree).ok();
+        let duration_ms = start.elapsed().as_millis() as u64;
+        tracing::error!(
+            operation = "git_operation",
+            operation_type = "rebase",
+            repo_path = %worktree.display(),
+            target,
+            duration_ms,
+            ?before,
+            ?after,
+            result = "error",
+            error = %stderr,
+            "Git rebase failed"
+        );
+        return Err(anyhow::anyhow!("Rebase failed: {stderr}"));
     }
 
-    result
+    // All retries exhausted
+    let after = logging_git::capture_state(worktree).ok();
+    let duration_ms = start.elapsed().as_millis() as u64;
+    let error_msg = last_error.unwrap_or_else(|| "Unknown error".to_string());
+    tracing::error!(
+        operation = "git_operation",
+        operation_type = "rebase",
+        repo_path = %worktree.display(),
+        target,
+        duration_ms,
+        ?before,
+        ?after,
+        result = "error",
+        error = %error_msg,
+        retries = GIT_LOCK_RETRY_COUNT,
+        "Git rebase failed after all retries"
+    );
+    Err(anyhow::anyhow!("Rebase failed after {} retries: {}", GIT_LOCK_RETRY_COUNT, error_msg))
 }
 
 /// Checks if a rebase is currently in progress
@@ -514,30 +565,34 @@ pub fn get_conflicted_files(worktree: &Path) -> Result<Vec<String>> {
     Ok(String::from_utf8(output.stdout)?.lines().map(str::to_string).collect())
 }
 
-/// Aborts an in-progress rebase
 pub fn abort_rebase(worktree: &Path) -> Result<()> {
     let before = logging_git::capture_state(worktree).ok();
     let start = std::time::Instant::now();
+    let mut last_error: Option<String> = None;
 
-    let output = Command::new("git")
-        .arg("-C")
-        .arg(worktree)
-        .arg("rebase")
-        .arg("--abort")
-        .output()
-        .context("Failed to execute git rebase --abort")?;
+    for attempt in 0..=GIT_LOCK_RETRY_COUNT {
+        if attempt > 0 {
+            tracing::debug!(
+                operation = "git_operation",
+                operation_type = "rebase_abort",
+                repo_path = %worktree.display(),
+                attempt,
+                "Retrying rebase abort after lock file error"
+            );
+            thread::sleep(Duration::from_millis(GIT_LOCK_RETRY_DELAY_MS));
+        }
 
-    let result = if output.status.success() {
-        Ok(())
-    } else {
-        Err(anyhow::anyhow!("Failed to abort rebase: {}", String::from_utf8_lossy(&output.stderr)))
-    };
+        let output = Command::new("git")
+            .arg("-C")
+            .arg(worktree)
+            .arg("rebase")
+            .arg("--abort")
+            .output()
+            .context("Failed to execute git rebase --abort")?;
 
-    let after = logging_git::capture_state(worktree).ok();
-    let duration_ms = start.elapsed().as_millis() as u64;
-
-    match &result {
-        Ok(_) => {
+        if output.status.success() {
+            let after = logging_git::capture_state(worktree).ok();
+            let duration_ms = start.elapsed().as_millis() as u64;
             tracing::warn!(
                 operation = "git_operation",
                 operation_type = "rebase_abort",
@@ -546,25 +601,64 @@ pub fn abort_rebase(worktree: &Path) -> Result<()> {
                 ?before,
                 ?after,
                 result = "success",
+                retries = attempt,
                 "Aborted rebase"
             );
+            return Ok(());
         }
-        Err(e) => {
-            tracing::error!(
+
+        let stderr = String::from_utf8_lossy(&output.stderr);
+        if is_lock_file_error(&stderr) {
+            tracing::warn!(
                 operation = "git_operation",
                 operation_type = "rebase_abort",
                 repo_path = %worktree.display(),
-                duration_ms,
-                ?before,
-                ?after,
-                result = "error",
-                error = %e,
-                "Failed to abort rebase"
+                attempt,
+                max_retries = GIT_LOCK_RETRY_COUNT,
+                "Git lock file detected during rebase abort, will retry"
             );
+            last_error = Some(stderr.to_string());
+            continue;
         }
+
+        // Non-retryable error
+        let after = logging_git::capture_state(worktree).ok();
+        let duration_ms = start.elapsed().as_millis() as u64;
+        tracing::error!(
+            operation = "git_operation",
+            operation_type = "rebase_abort",
+            repo_path = %worktree.display(),
+            duration_ms,
+            ?before,
+            ?after,
+            result = "error",
+            error = %stderr,
+            "Failed to abort rebase"
+        );
+        return Err(anyhow::anyhow!("Failed to abort rebase: {}", stderr));
     }
 
-    result
+    // All retries exhausted
+    let after = logging_git::capture_state(worktree).ok();
+    let duration_ms = start.elapsed().as_millis() as u64;
+    let error_msg = last_error.unwrap_or_else(|| "Unknown error".to_string());
+    tracing::error!(
+        operation = "git_operation",
+        operation_type = "rebase_abort",
+        repo_path = %worktree.display(),
+        duration_ms,
+        ?before,
+        ?after,
+        result = "error",
+        error = %error_msg,
+        retries = GIT_LOCK_RETRY_COUNT,
+        "Failed to abort rebase after all retries"
+    );
+    Err(anyhow::anyhow!(
+        "Failed to abort rebase after {} retries: {}",
+        GIT_LOCK_RETRY_COUNT,
+        error_msg
+    ))
 }
 
 /// Squashes all commits since base into a single commit
@@ -644,31 +738,33 @@ pub fn fast_forward_merge(repo: &Path, branch: &str) -> Result<()> {
     result
 }
 
-/// Fetches from origin
 pub fn fetch_origin(repo: &Path) -> Result<()> {
     let start = std::time::Instant::now();
+    let mut last_error: Option<String> = None;
 
-    let output = Command::new("git")
-        .arg("-C")
-        .arg(repo)
-        .arg("fetch")
-        .arg("origin")
-        .output()
-        .context("Failed to execute git fetch origin")?;
+    for attempt in 0..=GIT_LOCK_RETRY_COUNT {
+        if attempt > 0 {
+            tracing::debug!(
+                operation = "git_operation",
+                operation_type = "fetch",
+                repo_path = %repo.display(),
+                remote = "origin",
+                attempt,
+                "Retrying fetch after lock file error"
+            );
+            thread::sleep(Duration::from_millis(GIT_LOCK_RETRY_DELAY_MS));
+        }
 
-    let result = if output.status.success() {
-        Ok(())
-    } else {
-        Err(anyhow::anyhow!(
-            "Failed to fetch from origin: {}",
-            String::from_utf8_lossy(&output.stderr)
-        ))
-    };
+        let output = Command::new("git")
+            .arg("-C")
+            .arg(repo)
+            .arg("fetch")
+            .arg("origin")
+            .output()
+            .context("Failed to execute git fetch origin")?;
 
-    let duration_ms = start.elapsed().as_millis() as u64;
-
-    match &result {
-        Ok(_) => {
+        if output.status.success() {
+            let duration_ms = start.elapsed().as_millis() as u64;
             tracing::debug!(
                 operation = "git_operation",
                 operation_type = "fetch",
@@ -676,24 +772,61 @@ pub fn fetch_origin(repo: &Path) -> Result<()> {
                 remote = "origin",
                 duration_ms,
                 result = "success",
+                retries = attempt,
                 "Fetched from origin"
             );
+            return Ok(());
         }
-        Err(e) => {
-            tracing::error!(
+
+        let stderr = String::from_utf8_lossy(&output.stderr);
+        if is_lock_file_error(&stderr) {
+            tracing::warn!(
                 operation = "git_operation",
                 operation_type = "fetch",
                 repo_path = %repo.display(),
                 remote = "origin",
-                duration_ms,
-                result = "error",
-                error = %e,
-                "Failed to fetch from origin"
+                attempt,
+                max_retries = GIT_LOCK_RETRY_COUNT,
+                "Git lock file detected, will retry"
             );
+            last_error = Some(stderr.to_string());
+            continue;
         }
+
+        // Non-retryable error
+        let duration_ms = start.elapsed().as_millis() as u64;
+        tracing::error!(
+            operation = "git_operation",
+            operation_type = "fetch",
+            repo_path = %repo.display(),
+            remote = "origin",
+            duration_ms,
+            result = "error",
+            error = %stderr,
+            "Failed to fetch from origin"
+        );
+        return Err(anyhow::anyhow!("Failed to fetch from origin: {}", stderr));
     }
 
-    result
+    // All retries exhausted
+    let duration_ms = start.elapsed().as_millis() as u64;
+    let error_msg = last_error.unwrap_or_else(|| "Unknown error".to_string());
+    tracing::error!(
+        operation = "git_operation",
+        operation_type = "fetch",
+        repo_path = %repo.display(),
+        remote = "origin",
+        duration_ms,
+        result = "error",
+        error = %error_msg,
+        retries = GIT_LOCK_RETRY_COUNT,
+        "Failed to fetch from origin after all retries"
+    );
+    Err(anyhow::anyhow!(
+        "Failed to fetch from origin after {} retries: {}",
+        GIT_LOCK_RETRY_COUNT,
+        error_msg
+    ))
 }
 
 /// Fetches a specific ref from a local repository
@@ -753,74 +886,211 @@ pub fn fetch_from_local(target_repo: &Path, source_repo: &Path, ref_name: &str) 
     result
 }
 
-/// Checks out a branch
 pub fn checkout_branch(repo: &Path, branch: &str) -> Result<()> {
-    let output = Command::new("git")
-        .arg("-C")
-        .arg(repo)
-        .arg("checkout")
-        .arg(branch)
-        .output()
-        .context("Failed to execute git checkout")?;
+    let mut last_error: Option<String> = None;
 
-    if !output.status.success() {
-        bail!("Failed to checkout {}: {}", branch, String::from_utf8_lossy(&output.stderr));
+    for attempt in 0..=GIT_LOCK_RETRY_COUNT {
+        if attempt > 0 {
+            tracing::debug!(
+                operation = "git_operation",
+                operation_type = "checkout",
+                repo_path = %repo.display(),
+                branch,
+                attempt,
+                "Retrying checkout after lock file error"
+            );
+            thread::sleep(Duration::from_millis(GIT_LOCK_RETRY_DELAY_MS));
+        }
+
+        let output = Command::new("git")
+            .arg("-C")
+            .arg(repo)
+            .arg("checkout")
+            .arg(branch)
+            .output()
+            .context("Failed to execute git checkout")?;
+
+        if output.status.success() {
+            return Ok(());
+        }
+
+        let stderr = String::from_utf8_lossy(&output.stderr);
+        if is_lock_file_error(&stderr) {
+            tracing::warn!(
+                operation = "git_operation",
+                operation_type = "checkout",
+                repo_path = %repo.display(),
+                branch,
+                attempt,
+                max_retries = GIT_LOCK_RETRY_COUNT,
+                "Git lock file detected during checkout, will retry"
+            );
+            last_error = Some(stderr.to_string());
+            continue;
+        }
+
+        bail!("Failed to checkout {}: {}", branch, stderr);
     }
 
-    Ok(())
+    bail!(
+        "Failed to checkout {} after {} retries: {}",
+        branch,
+        GIT_LOCK_RETRY_COUNT,
+        last_error.unwrap_or_else(|| "Unknown error".to_string())
+    )
 }
 
-/// Resets the current branch to the specified ref (hard reset)
 pub fn reset_to_ref(repo: &Path, ref_name: &str) -> Result<()> {
-    let output = Command::new("git")
-        .arg("-C")
-        .arg(repo)
-        .arg("reset")
-        .arg("--hard")
-        .arg(ref_name)
-        .output()
-        .context("Failed to execute git reset")?;
+    let mut last_error: Option<String> = None;
 
-    if !output.status.success() {
-        bail!("Failed to reset to {}: {}", ref_name, String::from_utf8_lossy(&output.stderr));
+    for attempt in 0..=GIT_LOCK_RETRY_COUNT {
+        if attempt > 0 {
+            tracing::debug!(
+                operation = "git_operation",
+                operation_type = "reset",
+                repo_path = %repo.display(),
+                ref_name,
+                attempt,
+                "Retrying reset after lock file error"
+            );
+            thread::sleep(Duration::from_millis(GIT_LOCK_RETRY_DELAY_MS));
+        }
+
+        let output = Command::new("git")
+            .arg("-C")
+            .arg(repo)
+            .arg("reset")
+            .arg("--hard")
+            .arg(ref_name)
+            .output()
+            .context("Failed to execute git reset")?;
+
+        if output.status.success() {
+            return Ok(());
+        }
+
+        let stderr = String::from_utf8_lossy(&output.stderr);
+        if is_lock_file_error(&stderr) {
+            tracing::warn!(
+                operation = "git_operation",
+                operation_type = "reset",
+                repo_path = %repo.display(),
+                ref_name,
+                attempt,
+                max_retries = GIT_LOCK_RETRY_COUNT,
+                "Git lock file detected during reset, will retry"
+            );
+            last_error = Some(stderr.to_string());
+            continue;
+        }
+
+        bail!("Failed to reset to {}: {}", ref_name, stderr);
     }
 
-    Ok(())
+    bail!(
+        "Failed to reset to {} after {} retries: {}",
+        ref_name,
+        GIT_LOCK_RETRY_COUNT,
+        last_error.unwrap_or_else(|| "Unknown error".to_string())
+    )
 }
 
-/// Pulls with rebase from origin/master
 pub fn pull_rebase(worktree: &Path) -> Result<()> {
-    // Fetch latest changes from origin
-    let fetch_output = Command::new("git")
-        .arg("-C")
-        .arg(worktree)
-        .arg("fetch")
-        .arg("origin")
-        .arg("master")
-        .output()
-        .context("Failed to execute git fetch")?;
+    // Fetch latest changes from origin (with retry for lock files)
+    for attempt in 0..=GIT_LOCK_RETRY_COUNT {
+        if attempt > 0 {
+            tracing::debug!(
+                operation = "git_operation",
+                operation_type = "fetch",
+                repo_path = %worktree.display(),
+                attempt,
+                "Retrying fetch after lock file error"
+            );
+            thread::sleep(Duration::from_millis(GIT_LOCK_RETRY_DELAY_MS));
+        }
 
-    if !fetch_output.status.success() {
-        bail!("Failed to fetch from origin: {}", String::from_utf8_lossy(&fetch_output.stderr));
+        let fetch_output = Command::new("git")
+            .arg("-C")
+            .arg(worktree)
+            .arg("fetch")
+            .arg("origin")
+            .arg("master")
+            .output()
+            .context("Failed to execute git fetch")?;
+
+        if fetch_output.status.success() {
+            break;
+        }
+
+        let stderr = String::from_utf8_lossy(&fetch_output.stderr);
+        if is_lock_file_error(&stderr) && attempt < GIT_LOCK_RETRY_COUNT {
+            tracing::warn!(
+                operation = "git_operation",
+                operation_type = "fetch",
+                repo_path = %worktree.display(),
+                attempt,
+                max_retries = GIT_LOCK_RETRY_COUNT,
+                "Git lock file detected during fetch, will retry"
+            );
+            continue;
+        }
+        bail!("Failed to fetch from origin: {}", stderr);
     }
 
-    // Rebase current branch onto origin/master
-    let rebase_output = Command::new("git")
-        .arg("-C")
-        .arg(worktree)
-        .arg("rebase")
-        .arg("origin/master")
-        .output()
-        .context("Failed to execute git rebase")?;
+    // Rebase current branch onto origin/master (with retry for lock files)
+    let mut last_error: Option<String> = None;
+    for attempt in 0..=GIT_LOCK_RETRY_COUNT {
+        if attempt > 0 {
+            tracing::debug!(
+                operation = "git_operation",
+                operation_type = "pull_rebase",
+                repo_path = %worktree.display(),
+                attempt,
+                "Retrying rebase after lock file error"
+            );
+            thread::sleep(Duration::from_millis(GIT_LOCK_RETRY_DELAY_MS));
+        }
 
-    if !rebase_output.status.success() {
-        bail!(
-            "Failed to rebase onto origin/master: {}",
-            String::from_utf8_lossy(&rebase_output.stderr)
-        );
+        let rebase_output = Command::new("git")
+            .arg("-C")
+            .arg(worktree)
+            .arg("rebase")
+            .arg("origin/master")
+            .output()
+            .context("Failed to execute git rebase")?;
+
+        if rebase_output.status.success() {
+            return Ok(());
+        }
+
+        let stderr = String::from_utf8_lossy(&rebase_output.stderr);
+        if is_lock_file_error(&stderr) {
+            tracing::warn!(
+                operation = "git_operation",
+                operation_type = "pull_rebase",
+                repo_path = %worktree.display(),
+                attempt,
+                max_retries = GIT_LOCK_RETRY_COUNT,
+                "Git lock file detected during rebase, will retry"
+            );
+            last_error = Some(stderr.to_string());
+            continue;
+        }
+        bail!("Failed to rebase onto origin/master: {}", stderr);
     }
 
-    Ok(())
+    bail!(
+        "Failed to rebase onto origin/master after {} retries: {}",
+        GIT_LOCK_RETRY_COUNT,
+        last_error.unwrap_or_else(|| "Unknown error".to_string())
+    )
+}
+
+/// Checks if a git error message indicates a lock file conflict
+fn is_lock_file_error(stderr: &str) -> bool {
+    stderr.contains("index.lock': File exists")
+        || stderr.contains("Unable to create")
+            && (stderr.contains(".lock': File exists") || stderr.contains("lock file exists"))
 }
 
 /// Gets the actual git directory path for a worktree.

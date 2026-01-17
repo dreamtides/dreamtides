@@ -197,41 +197,22 @@ impl Patrol {
                         let is_linear = git::is_ancestor(worktree_path, "origin/master", "HEAD")
                             .unwrap_or(false);
                         if !is_linear {
+                            // Idle workers with diverged history should be reset, not rebased.
+                            // They have no work to preserve, so just sync to origin/master.
                             tracing::info!(
-                                "Worker '{}' is idle with diverged history (origin/master not an ancestor of HEAD), rebasing to sync",
+                                "Worker '{}' is idle with diverged history (origin/master not an ancestor of HEAD), resetting to origin/master",
                                 worker_name
                             );
-                            match git::rebase_onto(worktree_path, "origin/master") {
-                                Ok(result) if result.success => {
+                            match git::reset_to_ref(worktree_path, "origin/master") {
+                                Ok(()) => {
                                     tracing::info!(
-                                        "Successfully rebased idle worker '{}' onto origin/master",
+                                        "Successfully reset idle worker '{}' to origin/master",
                                         worker_name
                                     );
                                 }
-                                Ok(result) => {
-                                    // Rebase had conflicts - this shouldn't happen for an idle
-                                    // worker with no changes. Mark as error.
-                                    tracing::error!(
-                                        "Rebase of idle worker '{}' had conflicts: {:?}",
-                                        worker_name,
-                                        result.conflicts
-                                    );
-                                    let transition = WorkerTransition::ToError {
-                                        reason: format!(
-                                            "Unexpected conflicts when rebasing idle worker: {:?}",
-                                            result.conflicts
-                                        ),
-                                    };
-                                    if let Some(worker_mut) = state.get_worker_mut(&worker_name) {
-                                        worker::apply_transition(worker_mut, transition.clone())?;
-                                        report
-                                            .transitions_applied
-                                            .push((worker_name.clone(), transition));
-                                    }
-                                }
                                 Err(e) => {
                                     tracing::warn!(
-                                        "Failed to rebase idle worker '{}': {}",
+                                        "Failed to reset idle worker '{}' to origin/master: {}",
                                         worker_name,
                                         e
                                     );
