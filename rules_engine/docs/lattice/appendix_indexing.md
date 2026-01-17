@@ -158,20 +158,22 @@ Any error during reconciliation triggers full rebuild.
 
 ## Full-Text Search
 
-FTS5 with external content mode (no duplicate storage):
+FTS5 stores document body content directly (the documents table contains only
+metadata, not body text). This enables snippet extraction for search results.
+The FTS index is the only place body content is stored in SQLite; the filesystem
+remains the source of truth.
 
 ```sql
 CREATE VIRTUAL TABLE fts_content USING fts5(
+    document_id UNINDEXED,
     body,
-    content='documents', content_rowid='rowid',
     tokenize='unicode61'
 );
-
-PRAGMA fts5_automerge = 4;
 ```
 
-Triggers keep FTS in sync (insert/delete on documents table). After rebuild,
-optimize:
+A delete trigger cleans up FTS entries when documents are removed. The
+`fulltext_search` module provides `index_document` and `index_batch` functions
+to populate the FTS index during reconciliation. After rebuild, optimize:
 
 ```sql
 INSERT INTO fts_content(fts_content) VALUES('optimize');

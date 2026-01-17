@@ -4,7 +4,7 @@ use tracing::{debug, info};
 use crate::error::error_types::LatticeError;
 
 /// Current schema version. Increment when schema changes require rebuild.
-pub const SCHEMA_VERSION: u32 = 1;
+pub const SCHEMA_VERSION: u32 = 2;
 /// Maximum number of documents to keep in the content cache.
 pub const CONTENT_CACHE_MAX_ENTRIES: u32 = 100;
 
@@ -241,16 +241,17 @@ fn create_views_table(conn: &Connection) -> Result<(), LatticeError> {
 
 fn create_fts_table(conn: &Connection) -> Result<(), LatticeError> {
     debug!("Creating FTS5 full-text search table");
+    // Store body directly in FTS5 (not external content mode).
+    // The document_id column is unindexed - used only for joining back to
+    // documents. Body content is stored only in FTS5 (filesystem is source of
+    // truth).
     conn.execute_batch(
         "
         CREATE VIRTUAL TABLE fts_content USING fts5(
+            document_id UNINDEXED,
             body,
-            content='documents',
-            content_rowid='rowid',
             tokenize='unicode61'
         );
-
-        PRAGMA fts5_automerge = 4;
         ",
     )
     .map_err(|e| LatticeError::DatabaseError {
@@ -312,20 +313,14 @@ fn create_view_count_triggers(conn: &Connection) -> Result<(), LatticeError> {
 
 fn create_fts_triggers(conn: &Connection) -> Result<(), LatticeError> {
     debug!("Creating FTS5 sync triggers");
+    // FTS content is managed by fulltext_search module functions.
+    // We only need a trigger to clean up FTS when documents are deleted.
     conn.execute_batch(
         "
-        -- Sync FTS index when document inserted
-        CREATE TRIGGER trg_fts_insert AFTER INSERT ON documents
-        BEGIN
-            INSERT INTO fts_content(rowid, body)
-            SELECT rowid, '' FROM documents WHERE id = NEW.id;
-        END;
-
-        -- Sync FTS index when document deleted
+        -- Clean up FTS index when document deleted
         CREATE TRIGGER trg_fts_delete AFTER DELETE ON documents
         BEGIN
-            INSERT INTO fts_content(fts_content, rowid, body)
-            VALUES('delete', OLD.rowid, '');
+            DELETE FROM fts_content WHERE document_id = OLD.id;
         END;
         ",
     )
