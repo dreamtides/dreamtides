@@ -28,16 +28,43 @@ pub struct DoctorError {
     pub message: String,
     pub details: Option<String>,
 }
-pub fn run_doctor(repair: bool, yes: bool, rebuild: bool) -> Result<()> {
+#[expect(clippy::fn_params_excessive_bools)]
+pub fn run_doctor(repair: bool, yes: bool, rebuild: bool, json: bool) -> Result<()> {
     if rebuild {
         return run_rebuild();
     }
-    let report = perform_health_checks(repair, yes)?;
-    display_report(&report);
-    if !report.errors.is_empty() && !repair {
-        println!("\nRepairs needed: {}", report.errors.len());
-        println!("Run 'llmc doctor --repair' to attempt fixes.");
+    let report = perform_health_checks(repair, yes || json)?;
+
+    if json {
+        let mut issues = Vec::new();
+        for warning in &report.warnings {
+            issues.push(crate::json_output::DoctorIssue {
+                category: "warning".to_string(),
+                description: warning.message.clone(),
+                severity: "warning".to_string(),
+            });
+        }
+        for error in &report.errors {
+            issues.push(crate::json_output::DoctorIssue {
+                category: "error".to_string(),
+                description: error.message.clone(),
+                severity: "error".to_string(),
+            });
+        }
+        let output = crate::json_output::DoctorOutput {
+            healthy: report.errors.is_empty(),
+            issues,
+            repairs: report.repairs_succeeded.clone(),
+        };
+        crate::json_output::print_json(&output);
+    } else {
+        display_report(&report);
+        if !report.errors.is_empty() && !repair {
+            println!("\nRepairs needed: {}", report.errors.len());
+            println!("Run 'llmc doctor --repair' to attempt fixes.");
+        }
     }
+
     if report.errors.is_empty() {
         Ok(())
     } else {

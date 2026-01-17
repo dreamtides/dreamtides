@@ -15,6 +15,7 @@ mod worker;
 use anyhow::Result;
 use clap::Parser;
 use cli::{Cli, Commands, ConfigAction};
+use llmc::json_output;
 
 use crate::commands::review::ReviewInterface;
 use crate::commands::{
@@ -50,6 +51,7 @@ async fn main() -> Result<()> {
         Commands::Peek { .. } => "peek",
         Commands::Pick { .. } => "pick",
         Commands::Config { .. } => "config",
+        Commands::Schema => "schema",
     };
 
     tracing::info!(operation = "cli_command", command = command_name, "Command started");
@@ -58,18 +60,18 @@ async fn main() -> Result<()> {
     let result = match cli.command {
         Commands::Init { source, target, force } => init::run_init(source, target, force),
         Commands::Up { no_patrol, force } => up::run_up(no_patrol, cli.verbose, force),
-        Commands::Down { force } => down::run_down(force),
-        Commands::Add { name, model, role_prompt, excluded_from_pool, self_review } => {
-            add::run_add(&name, model, role_prompt, excluded_from_pool, self_review)
+        Commands::Down { force, json } => down::run_down(force, json),
+        Commands::Add { name, model, role_prompt, excluded_from_pool, self_review, json } => {
+            add::run_add(&name, model, role_prompt, excluded_from_pool, self_review, json)
         }
-        Commands::Nuke { name, all } => nuke::run_nuke(name.as_deref(), all),
+        Commands::Nuke { name, all, json } => nuke::run_nuke(name.as_deref(), all, json),
         Commands::Status { json } => status::run_status(json),
-        Commands::Start { worker, prefix, prompt, prompt_file, prompt_cmd, self_review } => {
-            start::run_start(worker, prefix, prompt, prompt_file, prompt_cmd, self_review)
+        Commands::Start { worker, prefix, prompt, prompt_file, prompt_cmd, self_review, json } => {
+            start::run_start(worker, prefix, prompt, prompt_file, prompt_cmd, self_review, json)
         }
-        Commands::Message { worker, message } => message::run_message(&worker, message),
+        Commands::Message { worker, message, json } => message::run_message(&worker, message, json),
         Commands::Attach { worker } => attach::run_attach(&worker),
-        Commands::Review { worker, interface, name_only } => {
+        Commands::Review { worker, interface, name_only, json } => {
             let interface_enum = match interface.as_str() {
                 "difftastic" => ReviewInterface::Difftastic,
                 "vscode" => ReviewInterface::VSCode,
@@ -81,19 +83,25 @@ async fn main() -> Result<()> {
                     std::process::exit(1);
                 }
             };
-            review::run_review(worker, interface_enum, name_only)
+            review::run_review(worker, interface_enum, name_only, json)
         }
-        Commands::Reject { message } => reject::run_reject(message),
-        Commands::Accept { worker } => accept::run_accept(worker),
-        Commands::Rebase { worker } => rebase::run_rebase(&worker),
-        Commands::Reset { worker, yes } => reset::run_reset(&worker, yes),
-        Commands::Doctor { repair, yes, rebuild } => doctor::run_doctor(repair, yes, rebuild),
-        Commands::Peek { worker, lines } => peek::run_peek(worker, lines),
-        Commands::Pick { worker } => pick::run_pick(&worker),
+        Commands::Reject { message, json } => reject::run_reject(message, json),
+        Commands::Accept { worker, json } => accept::run_accept(worker, json),
+        Commands::Rebase { worker, json } => rebase::run_rebase(&worker, json),
+        Commands::Reset { worker, yes, json } => reset::run_reset(&worker, yes, json),
+        Commands::Doctor { repair, yes, rebuild, json } => {
+            doctor::run_doctor(repair, yes, rebuild, json)
+        }
+        Commands::Peek { worker, lines, json } => peek::run_peek(worker, lines, json),
+        Commands::Pick { worker, json } => pick::run_pick(&worker, json),
         Commands::Config { action } => match action {
             ConfigAction::Get { key } => config_cmd::run_config_get(&key),
             ConfigAction::Set { key, value } => config_cmd::run_config_set(&key, &value),
         },
+        Commands::Schema => {
+            json_output::print_json_schema();
+            Ok(())
+        }
     };
 
     let duration_ms = start_time.elapsed().as_millis() as u64;

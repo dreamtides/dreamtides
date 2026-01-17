@@ -238,6 +238,44 @@ maintain system health. It performs four main operations:
 The patrol runs on a configurable interval (default: 60 seconds) unless another
 patrol is already running or the system is shutting down.
 
+## JSON Output
+
+Most LLMC commands support a `--json` flag that outputs structured JSON instead of human-readable text. This is useful for scripting and integration with other tools.
+
+```bash
+llmc status --json
+llmc start --worker adam --prompt "Task" --json
+llmc review --json
+```
+
+### JSON Schema
+
+Use `llmc schema` to view the complete JSON schema documentation:
+
+```bash
+llmc schema
+```
+
+This outputs a JSON document describing all command outputs, their fields, and types.
+
+### Commands Supporting JSON Output
+
+The following commands support `--json`:
+- `llmc status` - Worker status information
+- `llmc start` - Started worker details
+- `llmc add` - New worker details
+- `llmc nuke` - Removed workers list
+- `llmc message` - Message delivery confirmation
+- `llmc review` - Review details and changed files
+- `llmc reject` - Rejection status
+- `llmc accept` - Merge results
+- `llmc rebase` - Rebase results and conflicts
+- `llmc reset` - Reset status
+- `llmc doctor` - Health check results
+- `llmc peek` - Terminal output lines
+- `llmc pick` - Pick operation results
+- `llmc down` - Stopped workers list
+
 ## Command Reference
 
 ### `llmc init`
@@ -500,6 +538,39 @@ branches.
 
 - `--rebuild`: Rebuild state.json from filesystem by scanning worktrees and TMUX sessions. Use when state file is corrupted or lost.
 
+### `llmc schema`
+
+Displays the JSON schema documentation for all LLMC command outputs.
+
+```bash
+llmc schema
+```
+
+Outputs a JSON document describing the structure of JSON output for each command that supports the `--json` flag. Useful for understanding the exact fields and types returned by each command.
+
+### `llmc peek <worker>`
+
+Shows recent terminal output from a worker's session.
+
+```bash
+llmc peek adam
+llmc peek adam --lines 100
+llmc peek adam --json
+```
+
+Useful for checking a worker's progress without attaching to its session.
+
+### `llmc pick <worker>`
+
+Grabs the current changes from a worker's worktree without going through the full review process.
+
+```bash
+llmc pick adam
+llmc pick adam --json
+```
+
+Creates a commit from the worker's current state and cherry-picks it to master.
+
 ## Merge Conflict Resolution
 
 Merge conflicts can occur during patrol rebases, manual rebases, or accept
@@ -641,6 +712,7 @@ rules_engine/src/llmc/
     ├── cli.rs            # clap command definitions
     ├── config.rs         # Configuration loading
     ├── state.rs          # State file operations
+    ├── json_output.rs    # JSON output types and schema
     ├── tmux/
     │   ├── mod.rs
     │   ├── session.rs    # Session management
@@ -664,7 +736,10 @@ rules_engine/src/llmc/
     │   ├── reject.rs
     │   ├── accept.rs
     │   ├── rebase.rs
-    │   └── doctor.rs
+    │   ├── reset.rs
+    │   ├── doctor.rs
+    │   ├── peek.rs
+    │   └── pick.rs
     └── sound.rs          # Terminal bell/sounds
 ```
 

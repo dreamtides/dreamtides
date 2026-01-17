@@ -3,6 +3,7 @@ pub mod commands;
 pub mod config;
 pub mod editor;
 pub mod git;
+pub mod json_output;
 pub mod lock;
 pub mod logging;
 pub mod patrol;

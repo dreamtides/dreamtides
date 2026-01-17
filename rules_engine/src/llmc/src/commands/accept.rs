@@ -11,7 +11,7 @@ use super::super::{config, git};
 use super::{rebase, review};
 
 /// Runs the accept command, accepting a worker's changes and merging to master
-pub fn run_accept(worker: Option<String>) -> Result<()> {
+pub fn run_accept(worker: Option<String>, json: bool) -> Result<()> {
     let llmc_root = config::get_llmc_root();
     if !llmc_root.exists() {
         bail!(
@@ -78,10 +78,21 @@ pub fn run_accept(worker: Option<String>) -> Result<()> {
 
         state.save(&super::super::state::get_state_path())?;
 
-        println!("\n✓ Agent rebase started");
-        println!("  Worker '{}' transitioned to 'rebasing' state", worker_name);
-        println!("  The agent will resolve conflicts and continue the rebase");
-        println!("  Run 'llmc accept {}' again once complete", worker_name);
+        if json {
+            let output = crate::json_output::AcceptOutput {
+                worker: worker_name.clone(),
+                commit_sha: String::new(),
+                commit_message: String::new(),
+                status: "rebasing".to_string(),
+                needs_conflict_resolution: true,
+            };
+            crate::json_output::print_json(&output);
+        } else {
+            println!("\n✓ Agent rebase started");
+            println!("  Worker '{}' transitioned to 'rebasing' state", worker_name);
+            println!("  The agent will resolve conflicts and continue the rebase");
+            println!("  Run 'llmc accept {}' again once complete", worker_name);
+        }
         return Ok(());
     }
 
@@ -117,7 +128,18 @@ pub fn run_accept(worker: Option<String>) -> Result<()> {
 
         state.save(&super::super::state::get_state_path())?;
 
-        println!("✓ Worker '{}' reset to idle state", worker_name);
+        if json {
+            let output = crate::json_output::AcceptOutput {
+                worker: worker_name.clone(),
+                commit_sha: String::new(),
+                commit_message: "No changes (already incorporated)".to_string(),
+                status: "idle".to_string(),
+                needs_conflict_resolution: false,
+            };
+            crate::json_output::print_json(&output);
+        } else {
+            println!("✓ Worker '{}' reset to idle state", worker_name);
+        }
         return Ok(());
     }
 
@@ -208,9 +230,20 @@ pub fn run_accept(worker: Option<String>) -> Result<()> {
 
     state.save(&super::super::state::get_state_path())?;
 
-    println!("✓ Worker '{}' changes accepted!", worker_name);
-    println!("  New commit: {}", &new_commit_sha[..7.min(new_commit_sha.len())]);
-    println!("  Worker reset to idle state with fresh worktree");
+    if json {
+        let output = crate::json_output::AcceptOutput {
+            worker: worker_name.clone(),
+            commit_sha: new_commit_sha.clone(),
+            commit_message: cleaned_message.clone(),
+            status: "idle".to_string(),
+            needs_conflict_resolution: false,
+        };
+        crate::json_output::print_json(&output);
+    } else {
+        println!("✓ Worker '{}' changes accepted!", worker_name);
+        println!("  New commit: {}", &new_commit_sha[..7.min(new_commit_sha.len())]);
+        println!("  Worker reset to idle state with fresh worktree");
+    }
 
     let other_pending: Vec<_> = state
         .workers

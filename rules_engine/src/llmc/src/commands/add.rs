@@ -16,6 +16,7 @@ pub fn run_add(
     role_prompt: Option<String>,
     excluded_from_pool: bool,
     self_review: bool,
+    json: bool,
 ) -> Result<()> {
     validate_worker_name(name)?;
 
@@ -92,14 +93,14 @@ pub fn run_add(
     state.add_worker(worker_record);
     state.save(&state_path)?;
 
+    let model_for_output = model.clone();
     add_worker_to_config(name, model, role_prompt, excluded_from_pool, self_review)?;
 
-    println!("✓ Worker '{}' added successfully!", name);
-    println!("\nWorktree: {}", worktree_path.display());
-    println!("Branch: llmc/{}", name);
-
     let daemon_running = is_daemon_running();
-    if daemon_running {
+    if daemon_running && !json {
+        println!("✓ Worker '{}' added successfully!", name);
+        println!("\nWorktree: {}", worktree_path.display());
+        println!("Branch: llmc/{}", name);
         println!("\nDaemon is running, starting worker session...");
         match start_worker_immediately(name) {
             Ok(()) => {
@@ -117,10 +118,25 @@ pub fn run_add(
                 );
             }
         }
-    } else {
+    } else if daemon_running {
+        let _ = start_worker_immediately(name);
+    } else if !json {
+        println!("✓ Worker '{}' added successfully!", name);
+        println!("\nWorktree: {}", worktree_path.display());
+        println!("Branch: llmc/{}", name);
         println!("\nNext steps:");
         println!("  1. Run 'llmc up' to start the daemon and bring this worker online");
         println!("  2. Run 'llmc start {}' to assign a task", name);
+    }
+
+    if json {
+        let output = crate::json_output::AddOutput {
+            worker: name.to_string(),
+            branch: format!("llmc/{}", name),
+            worktree_path: worktree_path.to_string_lossy().to_string(),
+            model: model_for_output.unwrap_or_else(|| "default".to_string()),
+        };
+        crate::json_output::print_json(&output);
     }
 
     Ok(())

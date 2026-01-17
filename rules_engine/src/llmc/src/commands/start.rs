@@ -21,6 +21,7 @@ pub fn run_start(
     prompt_file: Option<PathBuf>,
     prompt_cmd: Option<String>,
     self_review: bool,
+    json: bool,
 ) -> Result<()> {
     validate_prompt_args(&prompt, &prompt_file, &prompt_cmd)?;
     validate_worker_args(&worker, &prefix)?;
@@ -118,7 +119,17 @@ pub fn run_start(
 
     state.save(&super::super::state::get_state_path())?;
 
-    if self_review_enabled {
+    if json {
+        let worker_record = state.get_worker(&worker_name).unwrap();
+        let output = crate::json_output::StartOutput {
+            worker: worker_name,
+            status: "working".to_string(),
+            self_review_enabled,
+            worktree_path: worker_record.worktree_path.clone(),
+            branch: worker_record.branch.clone(),
+        };
+        crate::json_output::print_json(&output);
+    } else if self_review_enabled {
         println!("✓ Worker '{}' started on task (self-review enabled)", worker_name);
     } else {
         println!("✓ Worker '{}' started on task", worker_name);

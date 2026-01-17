@@ -8,7 +8,7 @@ use super::super::state::{self, State, WorkerStatus};
 use super::super::tmux::session;
 
 /// Runs the down command, stopping all worker sessions
-pub fn run_down(force: bool) -> Result<()> {
+pub fn run_down(force: bool, json: bool) -> Result<()> {
     let llmc_root = config::get_llmc_root();
     if !llmc_root.exists() {
         bail!(
@@ -24,19 +24,30 @@ pub fn run_down(force: bool) -> Result<()> {
     let state_path = state::get_state_path();
     let mut state = State::load(&state_path)?;
 
-    println!("Stopping LLMC workers...");
+    if !json {
+        println!("Stopping LLMC workers...");
+    }
+
+    let worker_names: Vec<String> = state.workers.keys().cloned().collect();
 
     send_shutdown_to_workers(&config, &state, force)?;
 
     if !force {
-        println!("Waiting for graceful exit...");
+        if !json {
+            println!("Waiting for graceful exit...");
+        }
         thread::sleep(Duration::from_secs(5));
     }
 
     kill_remaining_sessions(&mut state, force)?;
     state.save(&state_path)?;
 
-    println!("✓ All workers stopped");
+    if json {
+        let output = crate::json_output::DownOutput { workers_stopped: worker_names };
+        crate::json_output::print_json(&output);
+    } else {
+        println!("✓ All workers stopped");
+    }
     Ok(())
 }
 

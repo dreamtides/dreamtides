@@ -9,7 +9,7 @@ use super::super::state::{self, State};
 use super::super::tmux::session;
 use super::super::{config, git};
 /// Runs the nuke command, permanently removing a worker
-pub fn run_nuke(worker: Option<&str>, all: bool) -> Result<()> {
+pub fn run_nuke(worker: Option<&str>, all: bool, json: bool) -> Result<()> {
     let llmc_root = config::get_llmc_root();
     if !llmc_root.exists() {
         bail!(
@@ -21,46 +21,50 @@ pub fn run_nuke(worker: Option<&str>, all: bool) -> Result<()> {
     let _lock = StateLock::acquire()?;
     let state_path = state::get_state_path();
     let mut state = State::load(&state_path)?;
+    let mut removed_workers = Vec::new();
     if all {
         if worker.is_some() {
             bail!("Cannot specify both --all and a worker name");
         }
         let worker_names: Vec<_> = state.workers.keys().cloned().collect();
         if worker_names.is_empty() {
-            println!("No workers to nuke.");
+            if json {
+                crate::json_output::print_json(&crate::json_output::NukeOutput {
+                    workers_removed: vec![],
+                });
+            } else {
+                println!("No workers to nuke.");
+            }
             return Ok(());
         }
-        println!("This will permanently delete {} workers:", worker_names.len());
-        for name in &worker_names {
-            println!("  - {}", name);
+        if !json {
+            println!("This will permanently delete {} workers:", worker_names.len());
+            for name in &worker_names {
+                println!("  - {}", name);
+            }
+            println!("\nProceed? [y/N] ");
+            io::stdout().flush()?;
+            let mut input = String::new();
+            io::stdin().read_line(&mut input)?;
+            if !input.trim().eq_ignore_ascii_case("y") {
+                println!("Cancelled.");
+                return Ok(());
+            }
         }
-        println!("\nProceed? [y/N] ");
-        io::stdout().flush()?;
-        let mut input = String::new();
-        io::stdin().read_line(&mut input)?;
-        if !input.trim().eq_ignore_ascii_case("y") {
-            println!("Cancelled.");
-            return Ok(());
-        }
-        let total_count = worker_names.len();
-        let mut nuked_count = 0;
         for name in worker_names {
             if nuke_worker(&mut state, &llmc_root, &name)? {
-                nuked_count += 1;
+                removed_workers.push(name);
             }
         }
-        if nuked_count > 0 {
+        if !removed_workers.is_empty() {
             state.save(&state_path)?;
-            println!("✓ {} worker(s) have been nuked", nuked_count);
-            if nuked_count < total_count {
-                tracing::info!(
-                    "Nuked {} out of {} workers (some operations were cancelled)",
-                    nuked_count,
-                    total_count
-                );
-            }
-        } else {
-            tracing::info!("All nuke operations were cancelled");
+        }
+        if json {
+            crate::json_output::print_json(&crate::json_output::NukeOutput {
+                workers_removed: removed_workers,
+            });
+        } else if !removed_workers.is_empty() {
+            println!("✓ {} worker(s) have been nuked", removed_workers.len());
         }
     } else {
         let Some(worker) = worker else {
@@ -68,7 +72,18 @@ pub fn run_nuke(worker: Option<&str>, all: bool) -> Result<()> {
         };
         if nuke_worker(&mut state, &llmc_root, worker)? {
             state.save(&state_path)?;
-            println!("✓ Worker '{}' has been nuked", worker);
+            removed_workers.push(worker.to_string());
+            if json {
+                crate::json_output::print_json(&crate::json_output::NukeOutput {
+                    workers_removed: removed_workers,
+                });
+            } else {
+                println!("✓ Worker '{}' has been nuked", worker);
+            }
+        } else if json {
+            crate::json_output::print_json(&crate::json_output::NukeOutput {
+                workers_removed: vec![],
+            });
         }
     }
     Ok(())

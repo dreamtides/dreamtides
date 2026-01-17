@@ -8,7 +8,7 @@ use super::super::worker::{self, WorkerTransition};
 use super::super::{config, git};
 
 /// Runs the rebase command, manually triggering a rebase for a worker
-pub fn run_rebase(worker: &str) -> Result<()> {
+pub fn run_rebase(worker: &str, json: bool) -> Result<()> {
     let llmc_root = config::get_llmc_root();
     if !llmc_root.exists() {
         bail!(
@@ -42,10 +42,21 @@ pub fn run_rebase(worker: &str) -> Result<()> {
         .with_context(|| format!("Failed to rebase worker '{}'", worker))?;
 
     if rebase_result.success {
-        println!("✓ Worker '{}' successfully rebased onto master", worker);
+        if json {
+            let output = crate::json_output::RebaseOutput {
+                worker: worker.to_string(),
+                success: true,
+                conflicts: Vec::new(),
+            };
+            crate::json_output::print_json(&output);
+        } else {
+            println!("✓ Worker '{}' successfully rebased onto master", worker);
+        }
         Ok(())
     } else {
-        println!("⚠ Rebase encountered conflicts in {} file(s)", rebase_result.conflicts.len());
+        if !json {
+            println!("⚠ Rebase encountered conflicts in {} file(s)", rebase_result.conflicts.len());
+        }
 
         let worker_mut = state.get_worker_mut(worker).unwrap();
         let original_task = worker_mut.current_prompt.clone();
@@ -54,14 +65,25 @@ pub fn run_rebase(worker: &str) -> Result<()> {
 
         let conflict_prompt = build_conflict_prompt(&rebase_result.conflicts, &original_task);
 
-        println!("Sending conflict resolution instructions to worker...");
+        if !json {
+            println!("Sending conflict resolution instructions to worker...");
+        }
         let tmux_sender = TmuxSender::new();
         tmux_sender
             .send(&session_id, &conflict_prompt)
             .with_context(|| format!("Failed to send conflict prompt to worker '{}'", worker))?;
 
-        println!("✓ Worker '{}' marked as rebasing", worker);
-        println!("  Conflict resolution prompt sent to worker");
+        if json {
+            let output = crate::json_output::RebaseOutput {
+                worker: worker.to_string(),
+                success: false,
+                conflicts: rebase_result.conflicts.clone(),
+            };
+            crate::json_output::print_json(&output);
+        } else {
+            println!("✓ Worker '{}' marked as rebasing", worker);
+            println!("  Conflict resolution prompt sent to worker");
+        }
 
         Ok(())
     }

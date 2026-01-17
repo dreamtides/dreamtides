@@ -13,7 +13,7 @@ use super::add;
 
 /// Runs the reset command, resetting a worker to clean idle state by removing
 /// and recreating its worktree and session
-pub fn run_reset(worker_name: &str, yes: bool) -> Result<()> {
+pub fn run_reset(worker_name: &str, yes: bool, json: bool) -> Result<()> {
     let llmc_root = config::get_llmc_root();
     if !llmc_root.exists() {
         bail!(
@@ -27,9 +27,23 @@ pub fn run_reset(worker_name: &str, yes: bool) -> Result<()> {
     let state_path = state::get_state_path();
     let mut state = State::load(&state_path)?;
 
-    if reset_worker(&mut state, &llmc_root, worker_name, yes)? {
+    let previous_status = state
+        .get_worker(worker_name)
+        .map(|w| format!("{:?}", w.status).to_lowercase())
+        .unwrap_or_else(|| "unknown".to_string());
+
+    if reset_worker(&mut state, &llmc_root, worker_name, yes || json)? {
         state.save(&state_path)?;
-        println!("✓ Worker '{}' has been reset to idle state", worker_name);
+        if json {
+            let output = crate::json_output::ResetOutput {
+                worker: worker_name.to_string(),
+                previous_status,
+                new_status: "idle".to_string(),
+            };
+            crate::json_output::print_json(&output);
+        } else {
+            println!("✓ Worker '{}' has been reset to idle state", worker_name);
+        }
     }
 
     Ok(())

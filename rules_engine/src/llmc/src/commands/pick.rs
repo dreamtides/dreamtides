@@ -12,7 +12,7 @@ use super::super::{config, git};
 /// 2. Stages everything
 /// 3. Amends to the current commit
 /// 4. Rebases onto master
-pub fn run_pick(worker: &str) -> Result<()> {
+pub fn run_pick(worker: &str, json: bool) -> Result<()> {
     let llmc_root = config::get_llmc_root();
     if !llmc_root.exists() {
         bail!(
@@ -215,9 +215,18 @@ pub fn run_pick(worker: &str) -> Result<()> {
 
     println!("✓ Source repository updated to {}", &final_commit[..7.min(final_commit.len())]);
 
-    println!("\n✓ Successfully picked changes from worker '{}'", worker);
-    println!("  Final commit: {}", &final_commit[..7.min(final_commit.len())]);
-    println!("  Branch rebased onto origin/master and merged to source repository");
+    if json {
+        let output = crate::json_output::PickOutput {
+            worker: worker.to_string(),
+            success: true,
+            commit_sha: Some(final_commit.clone()),
+        };
+        crate::json_output::print_json(&output);
+    } else {
+        println!("\n✓ Successfully picked changes from worker '{}'", worker);
+        println!("  Final commit: {}", &final_commit[..7.min(final_commit.len())]);
+        println!("  Branch rebased onto origin/master and merged to source repository");
+    }
 
     Ok(())
 }

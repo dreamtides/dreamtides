@@ -4,7 +4,7 @@ use super::super::config;
 use super::super::state::{self, State};
 use super::super::tmux::session;
 
-pub fn run_peek(worker: Option<String>, lines: u32) -> Result<()> {
+pub fn run_peek(worker: Option<String>, lines: u32, json: bool) -> Result<()> {
     let llmc_root = config::get_llmc_root();
     if !llmc_root.exists() {
         bail!(
@@ -53,7 +53,15 @@ pub fn run_peek(worker: Option<String>, lines: u32) -> Result<()> {
     let output = session::capture_pane(session_id, lines)
         .with_context(|| format!("Failed to capture pane for worker '{}'", worker_name))?;
 
-    if output.trim().is_empty() {
+    if json {
+        let lines: Vec<String> = if output.trim().is_empty() {
+            Vec::new()
+        } else {
+            output.lines().map(std::string::ToString::to_string).collect()
+        };
+        let json_output = crate::json_output::PeekOutput { worker: worker_name, lines };
+        crate::json_output::print_json(&json_output);
+    } else if output.trim().is_empty() {
         println!("(no output captured)");
     } else {
         // Remove trailing blank lines while preserving the content

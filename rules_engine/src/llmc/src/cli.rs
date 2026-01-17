@@ -47,6 +47,10 @@ pub enum Commands {
         /// Force shutdown (kill sessions immediately)
         #[arg(long)]
         force: bool,
+
+        /// Output in JSON format
+        #[arg(long)]
+        json: bool,
     },
 
     /// Add a new worker to the pool
@@ -69,15 +73,24 @@ pub enum Commands {
         /// Enable self-review phase for this worker
         #[arg(long)]
         self_review: bool,
+
+        /// Output in JSON format
+        #[arg(long)]
+        json: bool,
     },
 
     /// Remove a worker and its worktree
     Nuke {
         /// Worker name to remove
         name: Option<String>,
+
         /// Remove all workers
         #[arg(long)]
         all: bool,
+
+        /// Output in JSON format
+        #[arg(long)]
+        json: bool,
     },
 
     /// Show status of all workers
@@ -114,6 +127,10 @@ pub enum Commands {
         /// review
         #[arg(long)]
         self_review: bool,
+
+        /// Output in JSON format
+        #[arg(long)]
+        json: bool,
     },
 
     /// Send a message to a worker
@@ -123,6 +140,10 @@ pub enum Commands {
 
         /// Message to send (opens $EDITOR if not provided)
         message: Option<String>,
+
+        /// Output in JSON format
+        #[arg(long)]
+        json: bool,
     },
 
     /// Attach to a worker's TMUX session
@@ -144,12 +165,20 @@ pub enum Commands {
         /// Show only the names of changed files (no diff content)
         #[arg(long)]
         name_only: bool,
+
+        /// Output in JSON format
+        #[arg(long)]
+        json: bool,
     },
 
     /// Reject a worker's work and request changes
     Reject {
         /// Reason for rejection (opens $EDITOR with diff if not provided)
         message: Option<String>,
+
+        /// Output in JSON format
+        #[arg(long)]
+        json: bool,
     },
 
     /// Accept a worker's work and merge
@@ -157,12 +186,20 @@ pub enum Commands {
         /// Worker name (optional, accepts most recently reviewed worker if not
         /// specified)
         worker: Option<String>,
+
+        /// Output in JSON format
+        #[arg(long)]
+        json: bool,
     },
 
     /// Rebase a worker's branch
     Rebase {
         /// Worker name
         worker: String,
+
+        /// Output in JSON format
+        #[arg(long)]
+        json: bool,
     },
 
     /// Reset a worker to clean idle state
@@ -173,6 +210,10 @@ pub enum Commands {
         /// Skip confirmation
         #[arg(long)]
         yes: bool,
+
+        /// Output in JSON format
+        #[arg(long)]
+        json: bool,
     },
 
     /// Check system health and configuration
@@ -188,6 +229,10 @@ pub enum Commands {
         /// Rebuild state from filesystem
         #[arg(long)]
         rebuild: bool,
+
+        /// Output in JSON format
+        #[arg(long)]
+        json: bool,
     },
 
     /// Show the last N lines from a worker's session
@@ -198,6 +243,10 @@ pub enum Commands {
         /// Number of lines to display (default: 10)
         #[arg(short, long, default_value = "10")]
         lines: u32,
+
+        /// Output in JSON format
+        #[arg(long)]
+        json: bool,
     },
 
     /// Low-level command to grab all changes from a worker and rebase onto
@@ -205,6 +254,10 @@ pub enum Commands {
     Pick {
         /// Worker name
         worker: String,
+
+        /// Output in JSON format
+        #[arg(long)]
+        json: bool,
     },
 
     /// Manage configuration settings
@@ -212,6 +265,9 @@ pub enum Commands {
         #[command(subcommand)]
         action: ConfigAction,
     },
+
+    /// Show JSON schema documentation for all commands
+    Schema,
 }
 
 #[derive(Subcommand)]

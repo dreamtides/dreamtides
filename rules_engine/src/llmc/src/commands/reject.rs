@@ -10,7 +10,7 @@ use crate::{config, editor, git, worker};
 
 /// Runs the reject command, sending feedback to the most recently reviewed
 /// worker
-pub fn run_reject(message: Option<String>) -> Result<()> {
+pub fn run_reject(message: Option<String>, json: bool) -> Result<()> {
     let llmc_root = config::get_llmc_root();
     if !llmc_root.exists() {
         bail!(
@@ -85,8 +85,17 @@ pub fn run_reject(message: Option<String>) -> Result<()> {
 
     state.save(&crate::state::get_state_path())?;
 
-    println!("✓ Rejection sent to worker '{}'", worker_name);
-    println!("  Worker transitioned to rejected state");
+    if json {
+        let output = crate::json_output::RejectOutput {
+            worker: worker_name.clone(),
+            previous_status: "needs_review".to_string(),
+            new_status: "rejected".to_string(),
+        };
+        crate::json_output::print_json(&output);
+    } else {
+        println!("✓ Rejection sent to worker '{}'", worker_name);
+        println!("  Worker transitioned to rejected state");
+    }
 
     Ok(())
 }

@@ -7,7 +7,7 @@ use crate::tmux::sender::TmuxSender;
 use crate::{config, editor};
 
 /// Runs the message command, sending a follow-up message to a worker
-pub fn run_message(worker: &str, message: Option<String>) -> Result<()> {
+pub fn run_message(worker: &str, message: Option<String>, json: bool) -> Result<()> {
     let llmc_root = config::get_llmc_root();
     if !llmc_root.exists() {
         bail!(
@@ -53,7 +53,13 @@ pub fn run_message(worker: &str, message: Option<String>) -> Result<()> {
 
     state.save(&crate::state::get_state_path())?;
 
-    println!("✓ Message sent to worker '{}'", worker);
+    if json {
+        let output =
+            crate::json_output::MessageOutput { worker: worker.to_string(), message_sent: true };
+        crate::json_output::print_json(&output);
+    } else {
+        println!("✓ Message sent to worker '{}'", worker);
+    }
 
     Ok(())
 }

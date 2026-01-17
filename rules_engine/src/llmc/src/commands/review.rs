@@ -18,6 +18,7 @@ pub fn run_review(
     worker: Option<String>,
     interface: ReviewInterface,
     name_only: bool,
+    json: bool,
 ) -> Result<()> {
     let llmc_root = config::get_llmc_root();
     if !llmc_root.exists() {
@@ -128,12 +129,23 @@ pub fn run_review(
     println!("{}", commit_message);
     println!();
 
-    display_diff(&worktree_path, interface, name_only)?;
+    if json {
+        let changed_files = get_changed_files(&worktree_path)?;
+        let output = crate::json_output::ReviewOutput {
+            worker: worker_name.clone(),
+            status: format!("{:?}", worker_record.status).to_lowercase(),
+            commit_sha: worker_record.commit_sha.clone(),
+            changed_files,
+        };
+        crate::json_output::print_json(&output);
+    } else {
+        display_diff(&worktree_path, interface, name_only)?;
 
-    println!();
-    println!("Commands:");
-    println!("  llmc accept        Accept these changes");
-    println!("  llmc reject \"...\"  Request changes");
+        println!();
+        println!("Commands:");
+        println!("  llmc accept        Accept these changes");
+        println!("  llmc reject \"...\"  Request changes");
+    }
 
     save_last_reviewed(&worker_name)?;
 
@@ -149,6 +161,29 @@ pub fn load_last_reviewed() -> Result<Option<String>> {
     let contents = fs::read_to_string(&last_reviewed_path)
         .with_context(|| format!("Failed to read {}", last_reviewed_path.display()))?;
     Ok(Some(contents.trim().to_string()))
+}
+
+fn get_changed_files(worktree_path: &PathBuf) -> Result<Vec<String>> {
+    let current_branch = git::get_current_branch(worktree_path)?;
+    let range = format!("origin/master...{}", current_branch);
+
+    let output = std::process::Command::new("git")
+        .arg("-C")
+        .arg(worktree_path)
+        .arg("diff")
+        .arg("--name-only")
+        .arg(&range)
+        .output()
+        .context("Failed to execute git diff --name-only")?;
+
+    if !output.status.success() {
+        bail!("git diff --name-only failed for {}", range);
+    }
+
+    Ok(String::from_utf8_lossy(&output.stdout)
+        .lines()
+        .map(std::string::ToString::to_string)
+        .collect())
 }
 
 fn display_diff(
