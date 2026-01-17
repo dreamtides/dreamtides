@@ -7,7 +7,8 @@ Commands:
     task_runner start --worker X   Use specific worker
     task_runner start --immediate  Skip confirmation prompt
 
-    task_runner review             Review oldest pending worker (wraps llmc review)
+    task_runner review [worker]    Review pending worker (wraps llmc review)
+    task_runner review opus1       Review specific worker
     task_runner review --interface vscode
     task_runner review --name-only
 
@@ -19,6 +20,7 @@ Options:
 
 import argparse
 import json
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -206,15 +208,11 @@ def cmd_start(args: argparse.Namespace) -> int:
 
 
 def cmd_review(args: argparse.Namespace) -> int:
-    # Build llmc review command with passthrough flags
-    cmd = ["just", "llmc", "review", "--json"]
-    if args.interface:
-        cmd.extend(["--interface", args.interface])
-    if args.name_only:
-        cmd.append("--name-only")
-
-    print(f"{Colors.CYAN}Running: {' '.join(cmd)}{Colors.RESET}\n")
-    result = run_command(cmd, capture=True)
+    # First, get worker info via JSON to track state
+    json_cmd = ["just", "llmc", "review", "--json"]
+    if args.worker:
+        json_cmd.append(args.worker)
+    result = run_command(json_cmd, capture=True)
 
     if result.returncode != 0:
         print(f"{Colors.RED}llmc review failed{Colors.RESET}", file=sys.stderr)
@@ -225,43 +223,41 @@ def cmd_review(args: argparse.Namespace) -> int:
         return result.returncode
 
     # Parse JSON to get worker and record it
+    worker = None
+    bead_id = None
     try:
         data = json.loads(result.stdout)
         worker = data.get("worker")
-        changed_files = data.get("changed_files", [])
-
-        print(f"{Colors.BOLD}Reviewing: {worker}{Colors.RESET}")
-        print(f"  Status: {data.get('status', 'N/A')}")
-        print(f"  Commit: {data.get('commit_sha', 'N/A')}")
-        if changed_files:
-            print(f"  Changed files ({len(changed_files)}):")
-            for f in changed_files[:10]:
-                print(f"    {f}")
-            if len(changed_files) > 10:
-                print(f"    ... and {len(changed_files) - 10} more")
     except json.JSONDecodeError:
         print(f"{Colors.YELLOW}Warning: Could not parse review output{Colors.RESET}", file=sys.stderr)
         if result.stdout:
             print(result.stdout)
-        return 0
 
-    if not worker:
-        print(f"{Colors.YELLOW}No worker in response{Colors.RESET}", file=sys.stderr)
-        return 0
+    if worker:
+        # Record last reviewed worker
+        state = load_state()
+        state["last_reviewed_worker"] = worker
+        save_state(state)
+        log(f"Recorded last_reviewed_worker: {worker}")
 
-    # Record last reviewed worker
-    state = load_state()
-    state["last_reviewed_worker"] = worker
-    save_state(state)
-    log(f"Recorded last_reviewed_worker: {worker}")
+        # Show bead assignment if known
+        bead_id = state.get("worker_beads", {}).get(worker)
+        if bead_id:
+            print(f"{Colors.CYAN}Bead: {bead_id}{Colors.RESET}")
+            print(f"To accept: task_runner accept\n")
 
-    # Show bead assignment if known
-    bead_id = state.get("worker_beads", {}).get(worker)
-    if bead_id:
-        print(f"\n{Colors.CYAN}Bead: {bead_id}{Colors.RESET}")
-        print(f"To accept: task_runner accept")
+    # Build the actual review command (without --json) for interactive diff
+    cmd = ["just", "llmc", "review"]
+    if args.worker:
+        cmd.append(args.worker)
+    if args.interface:
+        cmd.extend(["--interface", args.interface])
+    if args.name_only:
+        cmd.append("--name-only")
 
-    return 0
+    # Exec to the review command to show the diff interface
+    log(f"Exec: {' '.join(cmd)}")
+    os.execvp(cmd[0], cmd)
 
 
 def cmd_accept(args: argparse.Namespace) -> int:
@@ -337,6 +333,11 @@ def main():
 
     # review command
     review_parser = subparsers.add_parser("review", help="Review pending work")
+    review_parser.add_argument(
+        "worker",
+        nargs="?",
+        help="Specific worker to review (default: oldest pending)"
+    )
     review_parser.add_argument(
         "--interface", "-i",
         choices=["difftastic", "vscode"],
