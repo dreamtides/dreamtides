@@ -97,6 +97,7 @@ fn document_ref_type_indicator_for_task() {
         task_type: Some(TaskType::Bug),
         priority: Some(1),
         is_closed: false,
+        is_root: false,
     };
 
     assert_eq!(doc_ref.type_indicator(), "P1");
@@ -111,6 +112,7 @@ fn document_ref_type_indicator_for_closed_task() {
         task_type: Some(TaskType::Feature),
         priority: Some(0),
         is_closed: true,
+        is_root: false,
     };
 
     assert_eq!(doc_ref.type_indicator(), "P0/closed");
@@ -125,6 +127,7 @@ fn document_ref_type_indicator_for_knowledge_base() {
         task_type: None,
         priority: None,
         is_closed: false,
+        is_root: false,
     };
 
     assert_eq!(doc_ref.type_indicator(), "doc");
@@ -446,4 +449,156 @@ fn show_command_with_raw_flag() {
 
     let result = lattice::cli::commands::show_command::show_executor::execute(context, args);
     assert!(result.is_ok(), "Raw mode should succeed: {:?}", result);
+}
+
+// ============================================================================
+// Knowledge Base Document Tests
+// ============================================================================
+
+#[test]
+fn document_ref_from_row_includes_is_root() {
+    let (_temp_dir, context) = create_test_repo();
+
+    // Create a root document (path api/api.md - filename matches directory name)
+    let root_doc = InsertDocument::new(
+        "LROOTX".to_string(),
+        None,
+        "api/api.md".to_string(),
+        "api".to_string(),
+        "API root document".to_string(),
+        None,
+        None,
+        None,
+        None,
+        None,
+        "hash123".to_string(),
+        100,
+    );
+    insert_doc(&context.conn, &root_doc);
+
+    let row = document_queries::lookup_by_id(&context.conn, "LROOTX")
+        .expect("Lookup should succeed")
+        .expect("Document should exist");
+
+    let doc_ref = DocumentRef::from_row(&row);
+    assert!(doc_ref.is_root, "Root document should have is_root = true");
+}
+
+#[test]
+fn document_ref_from_row_non_root() {
+    let (_temp_dir, context) = create_test_repo();
+
+    // Create a non-root document
+    let doc = create_test_document("LNROOT", "api/docs/readme.md", "readme", "API readme");
+    insert_doc(&context.conn, &doc);
+
+    let row = document_queries::lookup_by_id(&context.conn, "LNROOT")
+        .expect("Lookup should succeed")
+        .expect("Document should exist");
+
+    let doc_ref = DocumentRef::from_row(&row);
+    assert!(!doc_ref.is_root, "Non-root document should have is_root = false");
+}
+
+#[test]
+fn show_command_includes_related_documents() {
+    let (temp_dir, context) = create_test_repo();
+
+    // Create main document
+    let main_path = temp_dir.path().join("main.md");
+    fs::write(
+        &main_path,
+        "---\nlattice-id: LMAINX\nname: main\ndescription: Main document\n---\n\nSee [related](LRELAX) for more info.",
+    )
+    .expect("Write main doc");
+
+    // Create related document
+    let related_path = temp_dir.path().join("related.md");
+    fs::write(
+        &related_path,
+        "---\nlattice-id: LRELAX\nname: related\ndescription: Related document\n---\n\nRelated content.",
+    )
+    .expect("Write related doc");
+
+    let main_doc = create_test_document("LMAINX", "main.md", "main", "Main document");
+    let related_doc = create_test_document("LRELAX", "related.md", "related", "Related document");
+    insert_doc(&context.conn, &main_doc);
+    insert_doc(&context.conn, &related_doc);
+
+    // Add body link
+    let link = InsertLink {
+        source_id: "LMAINX",
+        target_id: "LRELAX",
+        link_type: LinkType::Body,
+        position: 0,
+    };
+    link_queries::insert_for_document(&context.conn, &[link]).expect("Insert link");
+
+    let args = ShowArgs {
+        ids: vec!["LMAINX".to_string()],
+        short: false,
+        refs: false,
+        peek: false,
+        raw: false,
+    };
+
+    let result = lattice::cli::commands::show_command::show_executor::execute(context, args);
+    assert!(result.is_ok(), "Should succeed with related docs: {:?}", result);
+}
+
+#[test]
+fn show_command_excludes_blocking_from_related() {
+    let (temp_dir, context) = create_test_repo();
+
+    // Create main task
+    let main_path = temp_dir.path().join("tasks").join("main.md");
+    fs::create_dir_all(main_path.parent().unwrap()).expect("Create dirs");
+    fs::write(
+        &main_path,
+        "---\nlattice-id: LBLKMN\nname: main\ndescription: Main task\ntask-type: task\npriority: 1\nblocking:\n  - LBLKOT\n---\n\nMain task body.",
+    )
+    .expect("Write main doc");
+
+    // Create blocked-by task (will be in blocking list)
+    let other_path = temp_dir.path().join("tasks").join("other.md");
+    fs::write(
+        &other_path,
+        "---\nlattice-id: LBLKOT\nname: other\ndescription: Other task\ntask-type: task\npriority: 1\nblocked-by:\n  - LBLKMN\n---\n\nOther task.",
+    )
+    .expect("Write other doc");
+
+    let main_doc = create_task_document("LBLKMN", "tasks/main.md", "main", "Main task", 1);
+    let other_doc = create_task_document("LBLKOT", "tasks/other.md", "other", "Other task", 1);
+    insert_doc(&context.conn, &main_doc);
+    insert_doc(&context.conn, &other_doc);
+
+    // Add blocked-by link from other to main
+    let blocked_link = InsertLink {
+        source_id: "LBLKOT",
+        target_id: "LBLKMN",
+        link_type: LinkType::BlockedBy,
+        position: 0,
+    };
+    link_queries::insert_for_document(&context.conn, &[blocked_link])
+        .expect("Insert blocked-by link");
+
+    // Also add body link from main to other (to test exclusion from related)
+    let body_link = InsertLink {
+        source_id: "LBLKMN",
+        target_id: "LBLKOT",
+        link_type: LinkType::Body,
+        position: 0,
+    };
+    link_queries::insert_for_document(&context.conn, &[body_link]).expect("Insert body link");
+
+    let args = ShowArgs {
+        ids: vec!["LBLKMN".to_string()],
+        short: false,
+        refs: false,
+        peek: false,
+        raw: false,
+    };
+
+    let result = lattice::cli::commands::show_command::show_executor::execute(context, args);
+    assert!(result.is_ok(), "Should succeed: {:?}", result);
 }

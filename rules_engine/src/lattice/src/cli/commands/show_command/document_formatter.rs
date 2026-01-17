@@ -1,7 +1,3 @@
-//! Formatting for `lat show` command output.
-//!
-//! Formats documents for display in various modes: full, short, peek, refs,
-//! and raw. Supports both text and JSON output formats.
 use chrono::{DateTime, Utc};
 use serde::Serialize;
 use serde::ser::SerializeStruct;
@@ -9,6 +5,10 @@ use serde::ser::SerializeStruct;
 use crate::cli::color_theme;
 use crate::cli::commands::show_command::show_executor::{DocumentRef, TaskState};
 use crate::document::frontmatter_schema::TaskType;
+
+/// Maximum number of related documents shown in text output.
+const MAX_RELATED_TEXT_OUTPUT: usize = 10;
+
 /// Output mode for the show command.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum OutputMode {
@@ -23,6 +23,7 @@ pub enum OutputMode {
     /// Show raw markdown body content.
     Raw,
 }
+
 /// Complete output data for a document.
 #[derive(Debug, Clone, Serialize)]
 pub struct ShowOutput {
@@ -50,6 +51,7 @@ pub struct ShowOutput {
     pub related: Vec<DocumentRef>,
     pub claimed: bool,
 }
+
 /// Prints the show output in the appropriate format.
 pub fn print_output(output: &ShowOutput, mode: OutputMode, json: bool) {
     if json {
@@ -64,22 +66,32 @@ pub fn print_output(output: &ShowOutput, mode: OutputMode, json: bool) {
         }
     }
 }
+
 /// Prints JSON output.
 fn print_json(output: &ShowOutput) {
     let json_output = serde_json::json!([output]);
     println!("{}", serde_json::to_string_pretty(&json_output).unwrap_or_default());
 }
+
 /// Prints full document details.
 fn print_full(output: &ShowOutput) {
     print_header(output);
     println!();
     if output.task_type.is_some() {
+        // Task document format
         print_task_metadata(output);
         println!();
-    }
-    if let Some(body) = &output.body {
-        println!("{}:", color_theme::bold("Body"));
-        println!("{body}");
+        if let Some(body) = &output.body {
+            println!("{}:", color_theme::bold("Body"));
+            println!("{body}");
+        }
+    } else {
+        // Knowledge base document format: body between separators
+        if let Some(body) = &output.body {
+            println!("{}", color_theme::muted("---"));
+            println!("{body}");
+            println!("{}", color_theme::muted("---"));
+        }
     }
     if let Some(parent) = &output.parent {
         println!();
@@ -100,14 +112,42 @@ fn print_full(output: &ShowOutput) {
             println!("  {}", format_doc_ref(blocker));
         }
     }
-    if !output.related.is_empty() {
-        println!();
-        println!("{}:", color_theme::bold(format!("Related ({})", output.related.len())));
-        for rel in &output.related {
-            println!("  {}", format_doc_ref(rel));
-        }
+    print_related_section(&output.related);
+}
+
+/// Prints the related documents section.
+///
+/// For text output, limits to MAX_RELATED_TEXT_OUTPUT documents.
+/// JSON output includes all related documents (handled separately).
+fn print_related_section(related: &[DocumentRef]) {
+    if related.is_empty() {
+        return;
+    }
+    println!();
+    let display_count = related.len().min(MAX_RELATED_TEXT_OUTPUT);
+    let total_count = related.len();
+
+    if display_count < total_count {
+        println!("{}:", color_theme::bold(format!("Related ({display_count} of {total_count})")));
+    } else {
+        println!("{}:", color_theme::bold(format!("Related ({total_count})")));
+    }
+
+    for rel in related.iter().take(MAX_RELATED_TEXT_OUTPUT) {
+        println!("  {}", format_doc_ref(rel));
+    }
+
+    if display_count < total_count {
+        println!(
+            "  {}",
+            color_theme::muted(format!(
+                "... and {} more (use --json for full list)",
+                total_count - display_count
+            ))
+        );
     }
 }
+
 /// Prints the header line: `ID: name - description`.
 fn print_header(output: &ShowOutput) {
     println!(
@@ -117,6 +157,7 @@ fn print_header(output: &ShowOutput) {
         &output.description
     );
 }
+
 /// Prints task metadata block.
 fn print_task_metadata(output: &ShowOutput) {
     let state_styled = match output.state {
@@ -149,6 +190,7 @@ fn print_task_metadata(output: &ShowOutput) {
         println!("Claimed: {}", color_theme::warning("true"));
     }
 }
+
 /// Prints short single-line output.
 ///
 /// Format: `<id> [<state>] <priority> <type>: <name> - <description>`
@@ -179,6 +221,7 @@ fn print_short(output: &ShowOutput) {
         );
     }
 }
+
 /// Prints peek format (condensed preview).
 ///
 /// Format:
@@ -216,6 +259,7 @@ fn print_peek(output: &ShowOutput) {
         output.dependencies.len()
     );
 }
+
 /// Prints refs format (documents that reference this one).
 fn print_refs(output: &ShowOutput) {
     println!("References to {}:", color_theme::lattice_id(&output.id));
@@ -230,12 +274,14 @@ fn print_refs(output: &ShowOutput) {
         println!("  {}", color_theme::muted("No references found"));
     }
 }
+
 /// Prints raw markdown body content.
 fn print_raw(output: &ShowOutput) {
     if let Some(body) = &output.body {
         print!("{body}");
     }
 }
+
 /// Formats a document reference for display.
 ///
 /// Format: `<id>: <name> - <description> [<type-indicator>]`
@@ -248,6 +294,7 @@ fn format_doc_ref(doc_ref: &DocumentRef) -> String {
         type_indicator_styled(doc_ref)
     )
 }
+
 /// Returns a styled type indicator for a document reference.
 fn type_indicator_styled(doc_ref: &DocumentRef) -> impl std::fmt::Display {
     let indicator = doc_ref.type_indicator();
@@ -259,10 +306,12 @@ fn type_indicator_styled(doc_ref: &DocumentRef) -> impl std::fmt::Display {
         color_theme::muted(indicator)
     }
 }
+
 /// Formats a timestamp for display.
 fn format_timestamp(dt: DateTime<Utc>) -> String {
     dt.format("%Y-%m-%d %H:%M").to_string()
 }
+
 impl Serialize for TaskState {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
@@ -271,18 +320,20 @@ impl Serialize for TaskState {
         serializer.serialize_str(&self.to_string())
     }
 }
+
 impl Serialize for DocumentRef {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
         S: serde::Serializer,
     {
-        let mut state = serializer.serialize_struct("DocumentRef", 6)?;
+        let mut state = serializer.serialize_struct("DocumentRef", 7)?;
         state.serialize_field("id", &self.id)?;
         state.serialize_field("name", &self.name)?;
         state.serialize_field("description", &self.description)?;
         state.serialize_field("task_type", &self.task_type)?;
         state.serialize_field("priority", &self.priority)?;
         state.serialize_field("state", if self.is_closed { "closed" } else { "open" })?;
+        state.serialize_field("is_root", &self.is_root)?;
         state.end()
     }
 }

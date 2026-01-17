@@ -31,6 +31,7 @@ pub struct DocumentRef {
     pub task_type: Option<TaskType>,
     pub priority: Option<u8>,
     pub is_closed: bool,
+    pub is_root: bool,
 }
 
 /// Executes the `lat show` command.
@@ -193,7 +194,8 @@ fn load_relationships(
     // Related: body links excluding parent, dependencies, and blocking
     let body_links =
         link_queries::query_outgoing_by_type(&context.conn, &doc_row.id, LinkType::Body)?;
-    let related = filter_related_docs(&context.conn, &body_links, &parent, &dependencies)?;
+    let related =
+        filter_related_docs(&context.conn, &body_links, &parent, &dependencies, &blocking)?;
 
     Ok((parent, dependencies, blocking, related))
 }
@@ -225,15 +227,20 @@ fn load_document_refs_from_sources(
 
 /// Filters body links to find related documents, excluding
 /// parent/deps/blocking.
+///
+/// Sorts results with root documents first, then by order of first appearance
+/// in body text.
 fn filter_related_docs(
     conn: &Connection,
     body_links: &[LinkRow],
     parent: &Option<DocumentRef>,
     dependencies: &[DocumentRef],
+    blocking: &[DocumentRef],
 ) -> LatticeResult<Vec<DocumentRef>> {
     let mut related = Vec::new();
     let parent_id = parent.as_ref().map(|p| p.id.as_str());
     let dep_ids: Vec<&str> = dependencies.iter().map(|d| d.id.as_str()).collect();
+    let blocking_ids: Vec<&str> = blocking.iter().map(|b| b.id.as_str()).collect();
 
     for link in body_links {
         // Skip if this is the parent
@@ -244,10 +251,17 @@ fn filter_related_docs(
         if dep_ids.contains(&link.target_id.as_str()) {
             continue;
         }
+        // Skip if this is a blocking task
+        if blocking_ids.contains(&link.target_id.as_str()) {
+            continue;
+        }
         if let Some(row) = document_queries::lookup_by_id(conn, &link.target_id)? {
             related.push(DocumentRef::from_row(&row));
         }
     }
+
+    // Sort with root documents first (for preferential highlighting)
+    related.sort_by(|a, b| b.is_root.cmp(&a.is_root));
 
     Ok(related)
 }
@@ -272,6 +286,7 @@ impl DocumentRef {
             task_type: row.task_type,
             priority: row.priority,
             is_closed: row.is_closed,
+            is_root: row.is_root,
         }
     }
 
