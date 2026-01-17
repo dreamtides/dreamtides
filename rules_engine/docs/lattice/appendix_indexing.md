@@ -56,8 +56,14 @@ the standard directory structure.
 |--------|------|-------------|
 | source_id | TEXT | Linking document |
 | target_id | TEXT | Linked document |
-| link_type | TEXT | 'body' or 'frontmatter' |
+| link_type | TEXT | Link type (see below) |
 | position | INTEGER | Order in source |
+
+The `link_type` column identifies where the link appears and its semantic meaning:
+- `body`: Link appears in the markdown body content
+- `blocked_by`: Link from `blocked-by` frontmatter field (source is blocked by target)
+- `blocking`: Link from `blocking` frontmatter field (source blocks target)
+- `discovered_from`: Link from `discovered-from` frontmatter field
 
 Indexed on source_id and target_id.
 
