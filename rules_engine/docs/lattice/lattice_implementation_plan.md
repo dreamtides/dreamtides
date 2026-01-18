@@ -441,7 +441,7 @@ review that supports Reconciliation and other features.
 
 ---
 
-## Feature: First Working Command (lat show) [ONGOING]
+## Feature: First Working Command (lat show) [DONE]
 
 **Goal:** End-to-end working `lat show` command. Validates entire pipeline.
 
@@ -475,12 +475,16 @@ lists (flags, arguments, output modes), implementers should reference
 **Reference:** [Appendix: Startup Operations](appendix_startup_operations.md)
 
 - Index reconciliation (calls into index module)
-- Skill symlink sync
-- Claim cleanup
+- Skill symlink sync *(placeholder until Skill Integration feature)*
+- Claim cleanup *(placeholder until Claim System feature)*
 - Log rotation
 - Performance budget: <100ms total for all startup operations combined
 - Hidden `--no-startup` flag for debugging (skips all startup ops, may cause stale data)
 - Emit debug log entry if startup exceeds 100ms for investigation
+
+**Note:** Skill symlink sync and claim cleanup are implemented as no-op placeholders
+in the First Working Command milestone. They will be completed when their dependent
+features (Skill Integration and Claim System respectively) are implemented.
 
 ---
 

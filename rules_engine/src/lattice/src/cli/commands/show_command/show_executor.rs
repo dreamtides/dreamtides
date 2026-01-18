@@ -11,7 +11,7 @@ use crate::document::frontmatter_schema::TaskType;
 use crate::error::error_types::LatticeError;
 use crate::index::document_types::DocumentRow;
 use crate::index::link_queries::{self, LinkRow, LinkType};
-use crate::index::{document_queries, label_queries};
+use crate::index::{document_queries, label_queries, view_tracking};
 
 /// State of a task document.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -79,6 +79,9 @@ fn show_document(context: &CommandContext, id: &str, mode: OutputMode) -> Lattic
 
     let doc_row = document_queries::lookup_by_id(&context.conn, id)?
         .ok_or_else(|| LatticeError::DocumentNotFound { id: id.to_string() })?;
+
+    // Record view for tracking (view count used by lat overview ranking)
+    view_tracking::record_view(&context.conn, id)?;
 
     let output = build_show_output(context, &doc_row, mode)?;
     document_formatter::print_output(&output, mode, context.global.json);

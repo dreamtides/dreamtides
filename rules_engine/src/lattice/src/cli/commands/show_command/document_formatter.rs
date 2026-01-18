@@ -78,8 +78,8 @@ pub fn print_output(output: &ShowOutput, mode: OutputMode, json: bool) {
 /// For text output, separates documents with blank lines.
 pub fn print_outputs(outputs: &[ShowOutput], mode: OutputMode, json: bool) {
     if json {
-        let json_str =
-            serde_json::to_string_pretty(&outputs).expect("ShowOutput serialization should never fail");
+        let json_str = serde_json::to_string_pretty(&outputs)
+            .expect("ShowOutput serialization should never fail");
         println!("{json_str}");
     } else {
         for (index, output) in outputs.iter().enumerate() {

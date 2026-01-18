@@ -721,3 +721,84 @@ fn show_command_peek_mode_displays_parent_and_counts() {
     let result = lattice::cli::commands::show_command::show_executor::execute(context, args);
     assert!(result.is_ok(), "Peek mode should succeed: {:?}", result);
 }
+
+// ============================================================================
+// View Tracking Tests
+// ============================================================================
+
+#[test]
+fn show_command_records_view() {
+    let (temp_dir, context) = create_test_repo();
+
+    let doc_path = temp_dir.path().join("test.md");
+    fs::write(
+        &doc_path,
+        "---\nlattice-id: LVIEWX\nname: view-test\ndescription: View test\n---\n\nBody.",
+    )
+    .expect("Write doc");
+
+    let doc = create_test_document("LVIEWX", "test.md", "view-test", "View test");
+    insert_doc(&context.conn, &doc);
+
+    // Verify initial view count is 0
+    let initial_count = lattice::index::view_tracking::get_view_count(&context.conn, "LVIEWX")
+        .expect("Get initial count");
+    assert_eq!(initial_count, 0, "Initial view count should be 0");
+
+    // Show the document
+    let args = ShowArgs {
+        ids: vec!["LVIEWX".to_string()],
+        short: false,
+        refs: false,
+        peek: false,
+        raw: false,
+    };
+    let result = lattice::cli::commands::show_command::show_executor::execute(context, args);
+    assert!(result.is_ok(), "Show should succeed: {:?}", result);
+
+    // Re-create context to get fresh connection
+    let global = GlobalOptions::default();
+    let context2 = create_context(temp_dir.path(), &global).expect("Create context");
+
+    // Verify view count was incremented
+    let new_count = lattice::index::view_tracking::get_view_count(&context2.conn, "LVIEWX")
+        .expect("Get new count");
+    assert_eq!(new_count, 1, "View count should be 1 after show");
+}
+
+#[test]
+fn show_command_increments_view_count_multiple_times() {
+    let (temp_dir, context) = create_test_repo();
+
+    let doc_path = temp_dir.path().join("test.md");
+    fs::write(
+        &doc_path,
+        "---\nlattice-id: LMULVW\nname: multi-view\ndescription: Multi view test\n---\n\nBody.",
+    )
+    .expect("Write doc");
+
+    let doc = create_test_document("LMULVW", "test.md", "multi-view", "Multi view test");
+    insert_doc(&context.conn, &doc);
+
+    // Show the document twice
+    for i in 1..=2 {
+        let global = GlobalOptions::default();
+        let ctx = create_context(temp_dir.path(), &global).expect("Create context");
+        let args = ShowArgs {
+            ids: vec!["LMULVW".to_string()],
+            short: false,
+            refs: false,
+            peek: false,
+            raw: false,
+        };
+        let result = lattice::cli::commands::show_command::show_executor::execute(ctx, args);
+        assert!(result.is_ok(), "Show {} should succeed: {:?}", i, result);
+    }
+
+    // Verify view count is 2
+    let global = GlobalOptions::default();
+    let ctx = create_context(temp_dir.path(), &global).expect("Create context");
+    let count =
+        lattice::index::view_tracking::get_view_count(&ctx.conn, "LMULVW").expect("Get count");
+    assert_eq!(count, 2, "View count should be 2 after showing twice");
+}
