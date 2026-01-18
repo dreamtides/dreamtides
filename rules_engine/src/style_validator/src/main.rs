@@ -12,6 +12,7 @@ mod inline_use_statements;
 mod mod_lib_files;
 mod pub_use;
 mod qualified_imports;
+mod super_self_imports;
 mod test_file_naming;
 mod tests_directory;
 mod violation;
@@ -77,6 +78,22 @@ fn main() -> Result<()> {
                 if !violations.is_empty() && fix_mode {
                     println!("Fixing inline use statements in {}", file.display());
                     if let Err(e) = inline_use_statements::fix_file(file) {
+                        eprintln!("Error fixing {}: {}", file.display(), e);
+                    }
+                } else {
+                    all_violations.extend(violations);
+                }
+            }
+            Err(e) => {
+                eprintln!("Error checking {}: {}", file.display(), e);
+            }
+        }
+
+        match super_self_imports::check_file(file) {
+            Ok(violations) => {
+                if !violations.is_empty() && fix_mode {
+                    println!("Fixing super/self imports in {}", file.display());
+                    if let Err(e) = super_self_imports::fix_file(file, rules_engine_path) {
                         eprintln!("Error fixing {}: {}", file.display(), e);
                     }
                 } else {

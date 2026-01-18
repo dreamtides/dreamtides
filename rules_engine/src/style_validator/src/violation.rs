@@ -26,6 +26,7 @@ pub enum ViolationKind {
     TestsDirectoryInSrc,
     WorkspaceDependencyNotUsed,
     TestFileNamingConvention,
+    SuperOrSelfImport,
 }
 
 impl ViolationKind {
@@ -72,6 +73,9 @@ impl ViolationKind {
             }
             ViolationKind::TestFileNamingConvention => {
                 "test file must end in _tests.rs (not _test.rs)"
+            }
+            ViolationKind::SuperOrSelfImport => {
+                "use super:: or self:: import not permitted (use crate:: instead)"
             }
         }
     }
