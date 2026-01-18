@@ -161,6 +161,7 @@ cli/
 ├── output_format.rs        # Text/JSON/pretty output helpers
 ├── color_theme.rs          # Ayu color theme definitions, terminal detection
 ├── global_options.rs       # --json, --verbose, --quiet handling
+├── task_args.rs            # Argument structs for task commands (Create/Update/Close/Reopen/Prune)
 └── commands/
     └── mod.rs              # Module declarations only
 ```
@@ -183,6 +184,7 @@ commands/
 ├── close_command.rs        # lat close - mark tasks closed
 ├── reopen_command.rs       # lat reopen - reopen closed tasks
 ├── prune_command.rs        # lat prune - permanently delete closed tasks
+├── document_move_ops.rs    # Shared operations for moving documents and rewriting links
 ├── list_command/           # lat list - search and filter documents
 │   ├── mod.rs              # Module declarations only
 │   ├── list_executor.rs    # Entry point and orchestration
@@ -415,6 +417,8 @@ tests/lattice/
 │   ├── update_tests.rs
 │   ├── list_tests.rs
 │   ├── close_tests.rs
+│   ├── reopen_tests.rs
+│   ├── prune_tests.rs
 │   ├── ready_tests.rs
 │   ├── check_tests.rs
 │   ├── fmt_tests.rs
