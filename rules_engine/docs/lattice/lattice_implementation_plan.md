@@ -1631,15 +1631,15 @@ Foundation ───────────────────────
 These features can be developed in parallel after their dependencies are met:
 
 **After Foundation:**
-- Git Layer
-- CLI Framework
+- Git Layer [DONE]
+- CLI Framework [DONE]
 
 **After Foundation + Git Layer + Document Model + Index Core:**
-- First Working Command
-- Index Reconciliation
-- Link System
-- Task System
-- Claim System (only needs Foundation + Task types)
+- First Working Command [DONE]
+- Index Reconciliation [DONE]
+- Link System [DONE]
+- Task System [DONE]
+- Claim System (only needs Foundation + Task types) [DONE]
 
 **After Link/Task Systems:**
 - Linting & Formatting
