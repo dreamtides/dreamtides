@@ -111,12 +111,17 @@ pub fn set_env(session: &str, key: &str, value: &str) -> Result<()> {
     }
     Ok(())
 }
-/// Starts a complete worker session with Claude Code
+/// Starts a complete worker session with Claude Code.
+///
+/// If `use_hooks_session_lifecycle` is true, this function will not poll for
+/// Claude readiness - instead, the daemon relies on the SessionStart hook
+/// to transition the worker from Offline to Idle.
 pub fn start_worker_session(
     name: &str,
     worktree: &Path,
     config: &WorkerConfig,
     verbose: bool,
+    use_hooks_session_lifecycle: bool,
 ) -> Result<()> {
     if verbose {
         println!("      [verbose] Creating TMUX session '{}'", name);
@@ -145,21 +150,29 @@ pub fn start_worker_session(
     sender
         .send(name, &claude_cmd)
         .with_context(|| format!("Failed to send Claude command to session '{}'", name))?;
-    if verbose {
-        println!("      [verbose] Claude command sent, waiting for ready state...");
+    if use_hooks_session_lifecycle {
+        if verbose {
+            println!(
+                "      [verbose] Using hooks for session lifecycle, not polling for ready state"
+            );
+        }
+    } else {
+        if verbose {
+            println!("      [verbose] Claude command sent, waiting for ready state...");
+        }
+        wait_for_claude_ready(name, Duration::from_secs(30), verbose)?;
+        if verbose {
+            println!("      [verbose] Claude is ready, checking for bypass warning...");
+        }
+        accept_bypass_warning(name, &sender, verbose)?;
+        if verbose {
+            println!("      [verbose] Sending /clear command...");
+        }
+        sender
+            .send(name, "/clear")
+            .with_context(|| format!("Failed to send /clear to session '{}'", name))?;
+        thread::sleep(Duration::from_millis(500));
     }
-    wait_for_claude_ready(name, Duration::from_secs(30), verbose)?;
-    if verbose {
-        println!("      [verbose] Claude is ready, checking for bypass warning...");
-    }
-    accept_bypass_warning(name, &sender, verbose)?;
-    if verbose {
-        println!("      [verbose] Sending /clear command...");
-    }
-    sender
-        .send(name, "/clear")
-        .with_context(|| format!("Failed to send /clear to session '{}'", name))?;
-    thread::sleep(Duration::from_millis(500));
     if verbose {
         println!("      [verbose] Worker session startup complete");
     }

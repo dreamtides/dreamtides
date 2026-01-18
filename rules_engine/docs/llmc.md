@@ -167,6 +167,7 @@ You are Baker, focused on UI and user experience.
 | `role_prompt` | string | `""` | Additional context for the worker |
 | `excluded_from_pool` | bool | `false` | Exclude from automatic task assignment |
 | `self_review` | object | - | Self-review configuration (see below) |
+| `hooks_session_lifecycle` | bool | `true` | Use Claude Code hooks for session lifecycle detection instead of TMUX polling |
 
 ### Self-Review Configuration
 

@@ -134,8 +134,19 @@ pub fn apply_transition(worker: &mut WorkerRecord, transition: WorkerTransition)
     );
     Ok(())
 }
-/// Starts Claude in a TMUX session with appropriate configuration
-pub fn start_claude_in_session(session: &str, config: &WorkerConfig) -> Result<()> {
+/// Starts Claude in a TMUX session with appropriate configuration.
+///
+/// If `use_hooks_session_lifecycle` is true, this function will not poll for
+/// Claude readiness - instead, the daemon relies on the SessionStart hook
+/// to transition the worker from Offline to Idle.
+///
+/// If `use_hooks_session_lifecycle` is false, this function uses the legacy
+/// polling approach to wait for Claude to become ready.
+pub fn start_claude_in_session(
+    session: &str,
+    config: &WorkerConfig,
+    use_hooks_session_lifecycle: bool,
+) -> Result<()> {
     let sender = TmuxSender::new();
     let mut claude_cmd = String::from("claude");
     if let Some(model) = &config.model {
@@ -145,12 +156,19 @@ pub fn start_claude_in_session(session: &str, config: &WorkerConfig) -> Result<(
     sender
         .send(session, &claude_cmd)
         .with_context(|| format!("Failed to send Claude command to session '{}'", session))?;
-    wait_for_claude_ready(session)?;
-    accept_bypass_warning(session, &sender)?;
-    sender
-        .send(session, "/clear")
-        .with_context(|| format!("Failed to send /clear to session '{}'", session))?;
-    thread::sleep(Duration::from_millis(500));
+    if use_hooks_session_lifecycle {
+        tracing::debug!(
+            "Using hooks for session lifecycle - not polling for Claude readiness in session '{}'",
+            session
+        );
+    } else {
+        wait_for_claude_ready(session)?;
+        accept_bypass_warning(session, &sender)?;
+        sender
+            .send(session, "/clear")
+            .with_context(|| format!("Failed to send /clear to session '{}'", session))?;
+        thread::sleep(Duration::from_millis(500));
+    }
     Ok(())
 }
 /// Resets a worker to clean idle state by discarding changes and resetting to

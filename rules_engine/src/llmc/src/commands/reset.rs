@@ -113,13 +113,20 @@ fn reset_worker(state: &mut State, llmc_root: &Path, worker: &str, yes: bool) ->
     worker_mut.last_crash_unix = None;
     println!("  ✓ Reset state to Idle");
     let daemon_running = add::is_daemon_running();
+    let use_hooks = cfg.defaults.hooks_session_lifecycle;
     if daemon_running {
         println!("  Starting new TMUX session...");
         if let Some(wc) = worker_config {
-            match session::start_worker_session(&session_id, &worktree_path, &wc, false) {
+            match session::start_worker_session(&session_id, &worktree_path, &wc, false, use_hooks)
+            {
                 Ok(()) => {
                     println!("  ✓ Started new TMUX session: {}", session_id);
-                    println!("  ✓ Worker is ready for tasks");
+                    if use_hooks {
+                        println!("  Worker will become Idle once Claude is ready (via hook)");
+                        worker_mut.status = WorkerStatus::Offline;
+                    } else {
+                        println!("  ✓ Worker is ready for tasks");
+                    }
                 }
                 Err(e) => {
                     eprintln!("  ⚠ Failed to start TMUX session: {}", e);
