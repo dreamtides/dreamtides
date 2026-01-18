@@ -13,6 +13,7 @@ mod mv_tests;
 mod overview_tests;
 mod ready_tests;
 mod reopen_tests;
+mod roots_tests;
 mod search_tests;
 mod show_tests;
 mod stale_cleanup_tests;

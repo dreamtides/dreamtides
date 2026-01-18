@@ -13,8 +13,8 @@ use crate::cli::commands::ready_command::ready_executor;
 use crate::cli::commands::show_command::show_executor;
 use crate::cli::commands::{
     blocked_command, changes_command, claim_command, close_command, create_command, generate_ids,
-    reopen_command, search_command, stale_command, stats_command, track_command, tree_command,
-    update_command,
+    reopen_command, roots_command, search_command, stale_command, stats_command, track_command,
+    tree_command, update_command,
 };
 use crate::cli::global_options::GlobalOptions;
 use crate::config::config_loader;
@@ -337,11 +337,9 @@ fn dispatch_command(context: CommandContext, command: Command) -> LatticeResult<
             info!("Dispatching to tree command");
             tree_command::execute(context, args)
         }
-        Command::Roots(_args) => {
+        Command::Roots(args) => {
             info!("Dispatching to roots command");
-            Err(LatticeError::OperationNotAllowed {
-                reason: "roots command not yet implemented".to_string(),
-            })
+            roots_command::execute(context, args)
         }
         Command::Children(_args) => {
             info!("Dispatching to children command");
