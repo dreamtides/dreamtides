@@ -92,6 +92,11 @@ pub struct DocumentFilter {
     /// Include only documents closed at or before this timestamp.
     pub closed_before: Option<DateTime<Utc>>,
 
+    /// Filter to tasks discovered from a specific parent document.
+    /// Returns documents that have the specified ID in their discovered-from
+    /// frontmatter field.
+    pub discovered_from: Option<String>,
+
     /// Filter by root document status. Root documents have a filename
     /// matching their containing directory (e.g., `api/api.md`).
     pub is_root: Option<bool>,
@@ -139,7 +144,7 @@ pub enum DocumentState {
 ///
 /// Default is [`SortColumn::UpdatedAt`], which surfaces recently modified
 /// documents first when combined with descending order.
-#[derive(Debug, Clone, Copy, Default)]
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
 pub enum SortColumn {
     /// Sort by last modification timestamp (default).
     #[default]
@@ -171,7 +176,7 @@ pub enum SortColumn {
 ///
 /// Default is [`SortOrder::Descending`], which shows highest values or
 /// most recent timestamps first.
-#[derive(Debug, Clone, Copy, Default)]
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
 pub enum SortOrder {
     /// Sort from highest to lowest (default).
     /// For timestamps: newest first. For priority: P0 first.
@@ -341,6 +346,12 @@ impl DocumentFilter {
         self.closed_before = Some(dt);
         self
     }
+
+    /// Filters to tasks discovered from the specified parent document.
+    pub fn with_discovered_from(mut self, parent_id: impl Into<String>) -> Self {
+        self.discovered_from = Some(parent_id.into());
+        self
+    }
 }
 
 fn append_filter_conditions(
@@ -448,6 +459,19 @@ fn append_filter_conditions(
     if let Some(dt) = filter.closed_before {
         sql.push_str(" AND closed_at <= ?");
         params.push(Box::new(dt.to_rfc3339()));
+    }
+
+    if let Some(parent_id) = &filter.discovered_from {
+        sql.push_str(
+            " AND EXISTS (
+                SELECT 1 FROM links l
+                JOIN documents d2 ON l.target_id = d2.id
+                WHERE l.source_id = documents.id
+                AND l.link_type = 'discovered_from'
+                AND d2.lattice_id = ?
+            )",
+        );
+        params.push(Box::new(parent_id.clone()));
     }
 
     if let Some(v) = filter.is_root {
