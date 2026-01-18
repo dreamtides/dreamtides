@@ -3,12 +3,14 @@ use std::path::Path;
 use rusqlite::Connection;
 use tracing::{debug, info};
 
+use crate::claim::claim_operations;
 use crate::cli::command_dispatch::{CommandContext, LatticeResult};
 use crate::cli::commands::show_command::document_formatter::{self, OutputMode, ShowOutput};
 use crate::cli::workflow_args::ShowArgs;
 use crate::document::document_reader;
 use crate::document::frontmatter_schema::TaskType;
 use crate::error::error_types::LatticeError;
+use crate::id::lattice_id::LatticeId;
 use crate::index::document_types::DocumentRow;
 use crate::index::link_queries::{self, LinkRow, LinkType};
 use crate::index::{document_queries, label_queries, view_tracking};
@@ -108,6 +110,10 @@ fn build_show_output(
             (None, Vec::new(), Vec::new(), Vec::new(), Vec::new())
         };
 
+    // Check claim status for tasks
+    let claimed =
+        if doc_row.task_type.is_some() { check_claim_status(context, &doc_row.id) } else { false };
+
     Ok(ShowOutput {
         id: doc_row.id.clone(),
         name: doc_row.name.clone(),
@@ -126,7 +132,7 @@ fn build_show_output(
         blocking,
         related,
         backlinks,
-        claimed: false, // Claims not yet implemented
+        claimed,
     })
 }
 
@@ -240,6 +246,28 @@ fn filter_related_docs(
     related.sort_by(|a, b| b.is_root.cmp(&a.is_root));
 
     Ok(related)
+}
+
+/// Checks claim status for a task, returning false on error.
+///
+/// We use a helper function to log a warning if claim status cannot be checked.
+/// This avoids silent failures per the code review guidelines.
+fn check_claim_status(context: &CommandContext, id_str: &str) -> bool {
+    let id = match LatticeId::parse(id_str) {
+        Ok(id) => id,
+        Err(e) => {
+            tracing::warn!(id = id_str, error = %e, "Failed to parse ID for claim check");
+            return false;
+        }
+    };
+
+    match claim_operations::is_claimed(&context.repo_root, &id) {
+        Ok(claimed) => claimed,
+        Err(e) => {
+            tracing::warn!(id = id_str, error = %e, "Failed to check claim status");
+            false
+        }
+    }
 }
 
 impl DocumentRef {

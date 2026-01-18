@@ -476,15 +476,15 @@ lists (flags, arguments, output modes), implementers should reference
 
 - Index reconciliation (calls into index module)
 - Skill symlink sync *(placeholder until Skill Integration feature)*
-- Claim cleanup *(placeholder until Claim System feature)*
+- Claim cleanup ✅ (calls `stale_cleanup::cleanup_stale_claims`)
 - Log rotation
 - Performance budget: <100ms total for all startup operations combined
 - Hidden `--no-startup` flag for debugging (skips all startup ops, may cause stale data)
 - Emit debug log entry if startup exceeds 100ms for investigation
 
-**Note:** Skill symlink sync and claim cleanup are implemented as no-op placeholders
-in the First Working Command milestone. They will be completed when their dependent
-features (Skill Integration and Claim System respectively) are implemented.
+**Note:** Skill symlink sync is implemented as a no-op placeholder in the First
+Working Command milestone. It will be completed when the Skill Integration
+feature is implemented.
 
 ---
 
@@ -1158,7 +1158,7 @@ Linking System](appendix_linking_system.md)
 
 ---
 
-## Feature: Claim System [ONGOING]
+## Feature: Claim System [DONE]
 
 **Goal:** Local work tracking without git-tracked state.
 
@@ -1200,6 +1200,18 @@ Linking System](appendix_linking_system.md)
 - `lat claim --release-all` - release all
 - `lat claim --release-worktree <path>` - release by worktree
 - `lat claim --gc` - garbage collection
+
+### Integration Points
+
+The following integration points connect claims to other features:
+
+- **Startup cleanup (S2):** `run_claim_cleanup()` in `command_dispatch.rs` runs
+  stale claim cleanup on every command. ✅ DONE
+- **lat show (S1):** `show_executor.rs` displays claim status in output. ✅ DONE
+- **lat close (TC3):** Close Command will auto-release claims when tasks are
+  closed. *Pending - part of Core Task Commands feature.*
+- **lat ready (Q2):** Ready Command will filter out claimed tasks by default.
+  *Pending - part of Query Commands feature.*
 
 ---
 

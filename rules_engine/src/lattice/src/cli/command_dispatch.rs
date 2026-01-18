@@ -6,6 +6,7 @@ use std::time::Instant;
 use rusqlite::Connection;
 use tracing::{debug, error, info, warn};
 
+use crate::claim::stale_cleanup;
 use crate::cli::argument_parser::{Command, Lat};
 use crate::cli::commands::show_command::show_executor;
 use crate::cli::commands::{claim_command, generate_ids, track_command};
@@ -211,8 +212,22 @@ fn run_skill_symlink_sync(_context: &CommandContext) -> LatticeResult<()> {
 /// - The referenced task no longer exists
 /// - The task is in a .closed/ directory
 /// - The worktree path no longer exists
-fn run_claim_cleanup(_context: &CommandContext) -> LatticeResult<()> {
-    debug!("Claim cleanup: not yet implemented, skipping");
+/// - The claim is older than the configured threshold (default 7 days)
+fn run_claim_cleanup(context: &CommandContext) -> LatticeResult<()> {
+    let summary = stale_cleanup::cleanup_stale_claims(
+        &context.conn,
+        &context.repo_root,
+        &context.config.claim,
+    )?;
+
+    if summary.total() > 0 {
+        debug!(
+            released = summary.released.len(),
+            kept = summary.kept.len(),
+            errors = summary.errors.len(),
+            "Claim cleanup completed during startup"
+        );
+    }
     Ok(())
 }
 
