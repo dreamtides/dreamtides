@@ -1,4 +1,5 @@
-use std::io::ErrorKind;
+use std::fs::OpenOptions;
+use std::io::{ErrorKind, Write};
 use std::path::{Path, PathBuf};
 
 use chrono::{DateTime, Utc};
@@ -19,6 +20,14 @@ pub struct ClaimData {
     pub claimed_at: DateTime<Utc>,
     /// Path to the worktree from which this task was claimed.
     pub work_path: PathBuf,
+}
+
+/// Result of attempting to write a claim exclusively.
+pub enum WriteClaimResult {
+    /// Successfully created the claim file.
+    Created,
+    /// The claim file already exists.
+    AlreadyExists,
 }
 
 /// Returns the claims directory path for the given repository.
@@ -75,6 +84,51 @@ pub fn write_claim(path: &Path, claim: &ClaimData) -> LatticeResult<()> {
 
     info!(path = %path.display(), "Wrote claim file");
     Ok(())
+}
+
+/// Writes a claim to the specified path atomically, failing if the file exists.
+///
+/// Creates parent directories if they don't exist. Uses `create_new` for
+/// atomic exclusive creation to avoid TOCTOU races.
+///
+/// Returns `AlreadyExists` if the file already exists.
+pub fn write_claim_exclusive(path: &Path, claim: &ClaimData) -> LatticeResult<WriteClaimResult> {
+    if let Some(parent) = path.parent() {
+        std::fs::create_dir_all(parent).map_err(|e| {
+            warn!(path = %parent.display(), error = %e, "Failed to create claims directory");
+            LatticeError::WriteError { path: parent.to_path_buf(), reason: e.to_string() }
+        })?;
+    }
+
+    let content = serde_json::to_string_pretty(claim).map_err(|e| LatticeError::WriteError {
+        path: path.to_path_buf(),
+        reason: format!("Failed to serialize claim: {e}"),
+    })?;
+
+    // Use create_new for atomic exclusive creation
+    let mut file = match OpenOptions::new().write(true).create_new(true).open(path) {
+        Ok(f) => f,
+        Err(e) if e.kind() == ErrorKind::AlreadyExists => {
+            debug!(path = %path.display(), "Claim file already exists");
+            return Ok(WriteClaimResult::AlreadyExists);
+        }
+        Err(e) => {
+            warn!(path = %path.display(), error = %e, "Failed to create claim file");
+            return Err(LatticeError::WriteError {
+                path: path.to_path_buf(),
+                reason: e.to_string(),
+            });
+        }
+    };
+
+    file.write_all(content.as_bytes()).map_err(|e| {
+        warn!(path = %path.display(), error = %e, "Failed to write claim file");
+        let _ = std::fs::remove_file(path);
+        LatticeError::WriteError { path: path.to_path_buf(), reason: e.to_string() }
+    })?;
+
+    info!(path = %path.display(), "Wrote claim file exclusively");
+    Ok(WriteClaimResult::Created)
 }
 
 /// Reads a claim from the specified path if it exists.
