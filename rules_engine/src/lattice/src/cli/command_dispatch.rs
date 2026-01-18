@@ -8,7 +8,7 @@ use tracing::{debug, error, info, warn};
 
 use crate::cli::argument_parser::{Command, Lat};
 use crate::cli::commands::show_command::show_executor;
-use crate::cli::commands::{claim_command, generate_ids};
+use crate::cli::commands::{claim_command, generate_ids, track_command};
 use crate::cli::global_options::GlobalOptions;
 use crate::config::config_loader;
 use crate::config::config_schema::Config;
@@ -410,11 +410,9 @@ fn dispatch_command(context: CommandContext, command: Command) -> LatticeResult<
                 reason: "prime command not yet implemented".to_string(),
             })
         }
-        Command::Track(_args) => {
+        Command::Track(args) => {
             info!("Dispatching to track command");
-            Err(LatticeError::OperationNotAllowed {
-                reason: "track command not yet implemented".to_string(),
-            })
+            track_command::execute(context, args)
         }
         Command::GenerateIds(args) => {
             info!("Dispatching to generate-ids command");

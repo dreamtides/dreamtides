@@ -1,1 +1,187 @@
+use std::fs;
+use std::io::ErrorKind;
+use std::path::Path;
 
+use chrono::Utc;
+use tracing::info;
+
+use crate::cli::command_dispatch::{CommandContext, LatticeResult};
+use crate::cli::task_args::TrackArgs;
+use crate::document::document_writer::{self, WriteOptions};
+use crate::document::frontmatter_schema::Frontmatter;
+use crate::document::{document_reader, field_validation, frontmatter_parser};
+use crate::error::error_types::LatticeError;
+use crate::git::client_config;
+use crate::id::id_generator::INITIAL_COUNTER;
+use crate::id::lattice_id::LatticeId;
+use crate::index::{client_counters, document_queries};
+
+/// Executes the `lat track` command.
+///
+/// Adds Lattice tracking to an existing markdown file by generating a new
+/// Lattice ID and adding frontmatter. If the file already has a Lattice ID,
+/// requires `--force` to regenerate.
+pub fn execute(context: CommandContext, args: TrackArgs) -> LatticeResult<()> {
+    info!(path = args.path, force = args.force, "Executing track command");
+
+    let file_path = context.repo_root.join(&args.path);
+    let content = read_file_content(&file_path)?;
+    let name = field_validation::derive_name_from_path(&file_path).ok_or_else(|| {
+        LatticeError::InvalidArgument {
+            message: format!("Cannot derive name from path: {}", file_path.display()),
+        }
+    })?;
+
+    field_validation::validate_name_only(&name)?;
+    field_validation::validate_description_only(&args.description)?;
+
+    let (frontmatter, body) = if document_reader::content_is_lattice_document(&content) {
+        handle_existing_document(&context, &file_path, &content, &name, &args)?
+    } else {
+        create_new_frontmatter(&context, &name, &args)?
+    };
+
+    document_writer::write_new(&frontmatter, &body, &file_path, &WriteOptions::with_timestamp())?;
+
+    if context.global.json {
+        let json = serde_json::json!({
+            "id": frontmatter.lattice_id.to_string(),
+            "path": args.path,
+            "name": name,
+        });
+        println!("{}", serde_json::to_string_pretty(&json).unwrap_or_default());
+    } else {
+        println!("{} {}", frontmatter.lattice_id, args.path);
+    }
+
+    info!(
+        id = %frontmatter.lattice_id,
+        path = args.path,
+        "Document tracked"
+    );
+    Ok(())
+}
+
+/// Handles a file that already has YAML frontmatter.
+fn handle_existing_document(
+    context: &CommandContext,
+    path: &Path,
+    content: &str,
+    name: &str,
+    args: &TrackArgs,
+) -> LatticeResult<(Frontmatter, String)> {
+    let parsed = frontmatter_parser::parse(content, path)?;
+
+    if !args.force {
+        return Err(LatticeError::OperationNotAllowed {
+            reason: format!(
+                "Document {} already has Lattice ID {}. Use --force to regenerate.",
+                path.display(),
+                parsed.frontmatter.lattice_id
+            ),
+        });
+    }
+
+    info!(
+        old_id = %parsed.frontmatter.lattice_id,
+        "Regenerating ID for existing document"
+    );
+
+    let new_id = generate_new_id(context)?;
+    let frontmatter = Frontmatter {
+        lattice_id: new_id,
+        name: name.to_string(),
+        description: args.description.clone(),
+        parent_id: parsed.frontmatter.parent_id,
+        task_type: parsed.frontmatter.task_type,
+        priority: parsed.frontmatter.priority,
+        labels: parsed.frontmatter.labels,
+        blocking: parsed.frontmatter.blocking,
+        blocked_by: parsed.frontmatter.blocked_by,
+        discovered_from: parsed.frontmatter.discovered_from,
+        created_at: parsed.frontmatter.created_at,
+        updated_at: Some(Utc::now()),
+        closed_at: parsed.frontmatter.closed_at,
+        skill: parsed.frontmatter.skill,
+    };
+
+    Ok((frontmatter, parsed.body))
+}
+
+/// Creates new frontmatter for a file without existing Lattice tracking.
+fn create_new_frontmatter(
+    context: &CommandContext,
+    name: &str,
+    args: &TrackArgs,
+) -> LatticeResult<(Frontmatter, String)> {
+    let content = read_file_content(&context.repo_root.join(&args.path))?;
+    let new_id = generate_new_id(context)?;
+    let now = Utc::now();
+
+    let frontmatter = Frontmatter {
+        lattice_id: new_id,
+        name: name.to_string(),
+        description: args.description.clone(),
+        parent_id: None,
+        task_type: None,
+        priority: None,
+        labels: Vec::new(),
+        blocking: Vec::new(),
+        blocked_by: Vec::new(),
+        discovered_from: Vec::new(),
+        created_at: Some(now),
+        updated_at: Some(now),
+        closed_at: None,
+        skill: false,
+    };
+
+    Ok((frontmatter, content))
+}
+
+/// Generates a new Lattice ID, ensuring uniqueness.
+fn generate_new_id(context: &CommandContext) -> LatticeResult<LatticeId> {
+    let client_id = get_or_create_client_id(context)?;
+
+    loop {
+        let counter = client_counters::get_and_increment(&context.conn, &client_id)?;
+        let effective_counter = counter + INITIAL_COUNTER;
+        let id = LatticeId::from_parts(effective_counter, &client_id);
+
+        if !document_queries::exists(&context.conn, id.as_str())? {
+            info!(id = %id, "Generated new Lattice ID");
+            return Ok(id);
+        }
+
+        info!(id = %id, "ID collision detected, generating new ID");
+    }
+}
+
+/// Gets the client ID for this repository, creating one if needed.
+fn get_or_create_client_id(context: &CommandContext) -> LatticeResult<String> {
+    if let Some(client_id) = client_config::get_client_id(&context.repo_root)? {
+        return Ok(client_id);
+    }
+
+    let client_id = client_config::generate_client_id();
+    client_config::set_client_id(&context.repo_root, &client_id)?;
+    info!(client_id, "Created new client ID");
+    Ok(client_id)
+}
+
+/// Reads file content with UTF-8 encoding.
+fn read_file_content(path: &Path) -> LatticeResult<String> {
+    let bytes = fs::read(path).map_err(|e| {
+        if e.kind() == ErrorKind::NotFound {
+            LatticeError::FileNotFound { path: path.to_path_buf() }
+        } else if e.kind() == ErrorKind::PermissionDenied {
+            LatticeError::PermissionDenied { path: path.to_path_buf() }
+        } else {
+            LatticeError::ReadError { path: path.to_path_buf(), reason: e.to_string() }
+        }
+    })?;
+
+    String::from_utf8(bytes).map_err(|e| LatticeError::ReadError {
+        path: path.to_path_buf(),
+        reason: format!("invalid UTF-8 encoding: {e}"),
+    })
+}

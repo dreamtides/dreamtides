@@ -110,13 +110,8 @@ pub struct TrackArgs {
     /// Path to markdown file.
     pub path: String,
 
-    /// Set document name.
-    #[arg(long)]
-    pub name: Option<String>,
-
-    /// Set description.
-    #[arg(long)]
-    pub description: Option<String>,
+    /// Human-readable description (required).
+    pub description: String,
 
     /// Regenerate ID even if present.
     #[arg(long)]

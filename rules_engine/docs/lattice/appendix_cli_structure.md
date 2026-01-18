@@ -53,14 +53,28 @@ Mark task as locally in progress. Options: `--list`, `--release {id}`,
 
 ## Document Commands
 
-### lat track {path} [options]
+### lat track {path} "{description}" [options]
 
-Add Lattice tracking to existing markdown file.
+Add Lattice tracking to existing markdown file by generating a new Lattice ID
+and adding frontmatter with the required fields.
+
+**Arguments:**
+- `{path}`: Path to the markdown file to track
+- `{description}`: Human-readable description (required)
+
+**Behavior:**
+- Derives `name` from the filename (underscores → hyphens, lowercase)
+- Generates a new unique Lattice ID
+- Adds frontmatter with `lattice-id`, `name`, `description`, and timestamps
+- If the file already has frontmatter with a Lattice ID, requires `--force`
 
 **Options:**
-- `--name {name}`: Set document name
-- `--description {desc}`: Set description
 - `--force`: Regenerate ID even if document already has one (for resolving duplicates)
+
+**Example:**
+```bash
+lat track docs/api_design.md "API design document for the authentication service"
+```
 
 ### lat generate-ids [options]
 
