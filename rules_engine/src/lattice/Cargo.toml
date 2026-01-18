@@ -23,6 +23,7 @@ chrono = { workspace = true }
 clap = { workspace = true }
 human-panic = { workspace = true }
 owo-colors = { workspace = true }
+pulldown-cmark = { workspace = true }
 rand = { workspace = true }
 regex = { workspace = true }
 rusqlite = { workspace = true }

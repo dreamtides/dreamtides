@@ -10,5 +10,6 @@ mod git;
 mod id;
 mod index;
 mod integration;
+mod link;
 mod log_tests;
 mod markdown_body_tests;

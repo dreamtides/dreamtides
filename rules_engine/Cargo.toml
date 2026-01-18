@@ -40,6 +40,7 @@ petgraph = "0.8"
 prettyplease = "0.2"
 proc-macro2 = { version = "1", features = ["span-locations"] }
 proptest = "1"
+pulldown-cmark = "0.13"
 quote = "1"
 rand = "0.9"
 rand_xoshiro = { version = "0.7", features = ["serde"] }
