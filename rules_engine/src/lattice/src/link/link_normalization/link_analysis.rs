@@ -91,6 +91,27 @@ pub fn analyze(
     }
 }
 
+/// Normalizes a path by removing `.` and `..` components.
+pub fn normalize_path(path: &str) -> String {
+    let path = Path::new(path);
+    let mut components = Vec::new();
+
+    for component in path.components() {
+        match component {
+            std::path::Component::ParentDir => {
+                components.pop();
+            }
+            std::path::Component::CurDir => {}
+            _ => {
+                components.push(component);
+            }
+        }
+    }
+
+    let result: std::path::PathBuf = components.into_iter().collect();
+    result.to_string_lossy().to_string()
+}
+
 /// Analyzes a shorthand ID-only link (e.g., `[text](LJCQ2X)`).
 ///
 /// These links need to be expanded to include the relative path to the target.
@@ -221,25 +242,4 @@ fn resolve_link_path(source_path: &Path, link_path: &str) -> String {
     let source_dir = source_path.parent().unwrap_or(Path::new(""));
     let joined = source_dir.join(link_path);
     joined.to_string_lossy().to_string()
-}
-
-/// Normalizes a path by removing `.` and `..` components.
-fn normalize_path(path: &str) -> String {
-    let path = Path::new(path);
-    let mut components = Vec::new();
-
-    for component in path.components() {
-        match component {
-            std::path::Component::ParentDir => {
-                components.pop();
-            }
-            std::path::Component::CurDir => {}
-            _ => {
-                components.push(component);
-            }
-        }
-    }
-
-    let result: std::path::PathBuf = components.into_iter().collect();
-    result.to_string_lossy().to_string()
 }

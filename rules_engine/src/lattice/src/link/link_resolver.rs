@@ -136,21 +136,12 @@ pub fn resolve_batch(
     target_ids.iter().map(|id| resolve(conn, source_path, id)).collect()
 }
 
-/// Computes the relative path from a source document to a target document.
-///
-/// The relative path is computed from the source document's parent directory
-/// to the target document's path, using `.` and `..` as needed.
-fn compute_relative_path(source_path: &Path, target_path: &Path) -> PathBuf {
-    let source_dir = source_path.parent().unwrap_or(Path::new(""));
-    relative_path_between(source_dir, target_path)
-}
-
 /// Computes a relative path from a base directory to a target path.
 ///
 /// Uses standard filesystem conventions:
 /// - `.` for same directory
 /// - `..` for parent directory traversal
-fn relative_path_between(base: &Path, target: &Path) -> PathBuf {
+pub fn relative_path_between(base: &Path, target: &Path) -> PathBuf {
     let base_components: Vec<_> = base.components().collect();
     let target_components: Vec<_> = target.components().collect();
 
@@ -169,4 +160,13 @@ fn relative_path_between(base: &Path, target: &Path) -> PathBuf {
     }
 
     if result.as_os_str().is_empty() { PathBuf::from(".") } else { result }
+}
+
+/// Computes the relative path from a source document to a target document.
+///
+/// The relative path is computed from the source document's parent directory
+/// to the target document's path, using `.` and `..` as needed.
+fn compute_relative_path(source_path: &Path, target_path: &Path) -> PathBuf {
+    let source_dir = source_path.parent().unwrap_or(Path::new(""));
+    relative_path_between(source_dir, target_path)
 }

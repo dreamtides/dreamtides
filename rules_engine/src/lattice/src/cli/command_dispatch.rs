@@ -12,8 +12,8 @@ use crate::cli::commands::list_command::list_executor;
 use crate::cli::commands::ready_command::ready_executor;
 use crate::cli::commands::show_command::show_executor;
 use crate::cli::commands::{
-    blocked_command, changes_command, claim_command, create_command, generate_ids, search_command,
-    track_command, update_command,
+    blocked_command, changes_command, claim_command, close_command, create_command, generate_ids,
+    search_command, track_command, update_command,
 };
 use crate::cli::global_options::GlobalOptions;
 use crate::config::config_loader;
@@ -290,11 +290,9 @@ fn dispatch_command(context: CommandContext, command: Command) -> LatticeResult<
             info!("Dispatching to update command");
             update_command::execute(context, args)
         }
-        Command::Close(_args) => {
+        Command::Close(args) => {
             info!("Dispatching to close command");
-            Err(LatticeError::OperationNotAllowed {
-                reason: "close command not yet implemented".to_string(),
-            })
+            close_command::execute(context, args)
         }
         Command::Reopen(_args) => {
             info!("Dispatching to reopen command");
