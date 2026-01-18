@@ -88,6 +88,9 @@ pub fn suggestion(error: &LatticeError) -> Option<String> {
         | LatticeError::OperationNotAllowed { .. } => {
             Some("Run 'lat --help' for usage".to_string())
         }
+        LatticeError::PathAlreadyExists { path } => {
+            Some(format!("Remove or rename the existing file at {path}", path = path.display()))
+        }
     }
 }
 
@@ -124,7 +127,8 @@ pub fn error_path(error: &LatticeError) -> Option<&PathBuf> {
         | LatticeError::RootDocumentNotFound { path }
         | LatticeError::PermissionDenied { path }
         | LatticeError::ReadError { path, .. }
-        | LatticeError::WriteError { path, .. } => Some(path),
+        | LatticeError::WriteError { path, .. }
+        | LatticeError::PathAlreadyExists { path } => Some(path),
 
         LatticeError::DuplicateId { path1, .. } => Some(path1),
 

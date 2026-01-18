@@ -77,6 +77,9 @@ pub enum LatticeError {
     #[error("Cannot perform operation: {reason}")]
     OperationNotAllowed { reason: String },
 
+    #[error("Path already exists: {path}")]
+    PathAlreadyExists { path: PathBuf },
+
     // ========================================================================
     // Not Found Errors (Exit Code 4)
     // Requested resources do not exist.
@@ -158,7 +161,8 @@ impl LatticeError {
             | LatticeError::ConflictingOptions { .. }
             | LatticeError::MissingArgument { .. }
             | LatticeError::InvalidIdArgument { .. }
-            | LatticeError::OperationNotAllowed { .. } => exit_codes::USER_INPUT_ERROR,
+            | LatticeError::OperationNotAllowed { .. }
+            | LatticeError::PathAlreadyExists { .. } => exit_codes::USER_INPUT_ERROR,
 
             LatticeError::DocumentNotFound { .. }
             | LatticeError::FileNotFound { .. }
@@ -200,6 +204,7 @@ impl LatticeError {
             LatticeError::MissingArgument { .. } => "E018",
             LatticeError::InvalidIdArgument { .. } => "E019",
             LatticeError::OperationNotAllowed { .. } => "E020",
+            LatticeError::PathAlreadyExists { .. } => "E034",
             LatticeError::DocumentNotFound { .. } => "E021",
             LatticeError::FileNotFound { .. } => "E022",
             LatticeError::NoResults { .. } => "E023",
