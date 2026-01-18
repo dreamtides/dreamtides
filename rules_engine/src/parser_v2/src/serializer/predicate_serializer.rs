@@ -2,9 +2,8 @@ use ability_data::predicate::{CardPredicate, Predicate};
 use ability_data::variable_value::VariableValue;
 use text_formatting::FormattedText;
 
-use super::{serializer_utils, text_formatting};
+use crate::parser_v2::serializer::{serializer_utils, text_formatting};
 use crate::variables::parser_bindings::VariableBindings;
-
 pub fn serialize_predicate(predicate: &Predicate, bindings: &mut VariableBindings) -> String {
     match predicate {
         Predicate::This => "this character".to_string(),
@@ -38,7 +37,6 @@ pub fn serialize_predicate(predicate: &Predicate, bindings: &mut VariableBinding
         }
     }
 }
-
 pub fn serialize_predicate_plural(
     predicate: &Predicate,
     bindings: &mut VariableBindings,
@@ -72,7 +70,6 @@ pub fn serialize_predicate_plural(
         }
     }
 }
-
 pub fn predicate_base_text(predicate: &Predicate, bindings: &mut VariableBindings) -> String {
     match predicate {
         Predicate::This => "this character".to_string(),
@@ -105,21 +102,18 @@ pub fn predicate_base_text(predicate: &Predicate, bindings: &mut VariableBinding
         }
     }
 }
-
 pub fn serialize_your_predicate(
     card_predicate: &CardPredicate,
     bindings: &mut VariableBindings,
 ) -> String {
     your_predicate_formatted(card_predicate, bindings).without_article()
 }
-
 pub fn serialize_enemy_predicate(
     card_predicate: &CardPredicate,
     bindings: &mut VariableBindings,
 ) -> String {
     enemy_predicate_formatted(card_predicate, bindings).without_article()
 }
-
 pub fn serialize_card_predicate(
     card_predicate: &CardPredicate,
     bindings: &mut VariableBindings,
@@ -135,11 +129,13 @@ pub fn serialize_card_predicate(
         CardPredicate::Fast { target } => {
             format!("a {{fast}} {}", serialize_fast_target(target, bindings))
         }
-        CardPredicate::CardWithCost { target, cost_operator, .. } => format!(
-            "{} with cost {{e}} {}",
-            serialize_card_predicate(target, bindings),
-            serializer_utils::serialize_operator(cost_operator)
-        ),
+        CardPredicate::CardWithCost { target, cost_operator, .. } => {
+            format!(
+                "{} with cost {{e}} {}",
+                serialize_card_predicate(target, bindings),
+                serializer_utils::serialize_operator(cost_operator)
+            )
+        }
         CardPredicate::CharacterWithMaterializedAbility => {
             "a character with a {materialized} ability".to_string()
         }
@@ -198,7 +194,6 @@ pub fn serialize_card_predicate(
         }
     }
 }
-
 pub fn serialize_card_predicate_plural(
     card_predicate: &CardPredicate,
     bindings: &mut VariableBindings,
@@ -255,11 +250,13 @@ pub fn serialize_card_predicate_plural(
         CardPredicate::Fast { target } => {
             format!("fast {}", serialize_card_predicate_plural(target, bindings))
         }
-        CardPredicate::CardWithCost { target, cost_operator, .. } => format!(
-            "{} with cost {{e}} {}",
-            serialize_card_predicate_plural(target, bindings),
-            serializer_utils::serialize_operator(cost_operator)
-        ),
+        CardPredicate::CardWithCost { target, cost_operator, .. } => {
+            format!(
+                "{} with cost {{e}} {}",
+                serialize_card_predicate_plural(target, bindings),
+                serializer_utils::serialize_operator(cost_operator)
+            )
+        }
         CardPredicate::CharacterWithMaterializedAbility => {
             "characters with {materialized} abilities".to_string()
         }
@@ -277,7 +274,6 @@ pub fn serialize_card_predicate_plural(
         }
     }
 }
-
 pub fn serialize_fast_target(
     card_predicate: &CardPredicate,
     bindings: &mut VariableBindings,
@@ -355,7 +351,6 @@ pub fn serialize_fast_target(
         }
     }
 }
-
 pub fn serialize_for_each_predicate(
     predicate: &Predicate,
     bindings: &mut VariableBindings,
@@ -411,12 +406,9 @@ pub fn serialize_for_each_predicate(
         Predicate::Your(CardPredicate::CharacterWithSpark(_, operator)) => {
             format!("ally with spark {{s}} {}", serializer_utils::serialize_operator(operator))
         }
-        predicate => {
-            format!("each {}", predicate_base_text(predicate, bindings))
-        }
+        predicate => format!("each {}", predicate_base_text(predicate, bindings)),
     }
 }
-
 fn your_predicate_formatted(
     card_predicate: &CardPredicate,
     bindings: &mut VariableBindings,
@@ -494,7 +486,6 @@ fn your_predicate_formatted(
         )),
     }
 }
-
 fn enemy_predicate_formatted(
     card_predicate: &CardPredicate,
     bindings: &mut VariableBindings,
@@ -571,7 +562,6 @@ fn enemy_predicate_formatted(
         )),
     }
 }
-
 fn serialize_your_predicate_plural(
     card_predicate: &CardPredicate,
     bindings: &mut VariableBindings,
@@ -600,11 +590,13 @@ fn serialize_your_predicate_plural(
         CardPredicate::CharacterWithMultiActivatedAbility => {
             "allies with activated abilities".to_string()
         }
-        CardPredicate::CardWithCost { target, cost_operator, .. } => format!(
-            "{} with cost {{e}} {}",
-            serialize_your_predicate_plural(target, bindings),
-            serializer_utils::serialize_operator(cost_operator)
-        ),
+        CardPredicate::CardWithCost { target, cost_operator, .. } => {
+            format!(
+                "{} with cost {{e}} {}",
+                serialize_your_predicate_plural(target, bindings),
+                serializer_utils::serialize_operator(cost_operator)
+            )
+        }
         CardPredicate::CharacterWithCostComparedToControlled { target, count_matching, .. } => {
             format!(
                 "{} with cost less than the number of allied {}",
@@ -650,7 +642,6 @@ fn serialize_your_predicate_plural(
         }
     }
 }
-
 fn serialize_enemy_predicate_plural(
     card_predicate: &CardPredicate,
     bindings: &mut VariableBindings,
@@ -661,6 +652,8 @@ fn serialize_enemy_predicate_plural(
             bindings.insert("subtype".to_string(), VariableValue::Subtype(*subtype));
             "enemy {plural-subtype}".to_string()
         }
-        _ => format!("enemy {}", serialize_card_predicate_plural(card_predicate, bindings)),
+        _ => {
+            format!("enemy {}", serialize_card_predicate_plural(card_predicate, bindings))
+        }
     }
 }

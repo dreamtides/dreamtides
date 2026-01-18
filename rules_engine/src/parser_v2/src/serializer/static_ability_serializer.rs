@@ -2,13 +2,12 @@ use ability_data::condition::Condition;
 use ability_data::static_ability::{StandardStaticAbility, StaticAbility};
 use ability_data::variable_value::VariableValue;
 
-use super::{
+use crate::parser_v2::serializer::{
     condition_serializer, cost_serializer, effect_serializer, predicate_serializer,
     serializer_utils, text_formatting,
 };
 use crate::variables::parser_bindings::VariableBindings;
 use crate::variables::parser_substitutions;
-
 pub fn serialize_static_ability(
     static_ability: &StaticAbility,
     bindings: &mut VariableBindings,
@@ -58,7 +57,6 @@ pub fn serialize_static_ability(
         }
     }
 }
-
 pub fn serialize_standard_static_ability(
     ability: &StandardStaticAbility,
     bindings: &mut VariableBindings,

@@ -6,9 +6,9 @@ use std::time::{SystemTime, UNIX_EPOCH};
 
 use anyhow::{Context, Result, bail};
 
-use super::super::config::{self, Config};
-use super::super::state::{self, State, WorkerRecord, WorkerStatus};
-use super::super::{git, worker};
+use crate::llmc::config::{self, Config};
+use crate::llmc::state::{self, State, WorkerRecord, WorkerStatus};
+use crate::llmc::{git, worker};
 /// Result of a doctor check
 #[derive(Debug, Clone)]
 pub struct DoctorReport {
@@ -34,7 +34,6 @@ pub fn run_doctor(repair: bool, yes: bool, rebuild: bool, json: bool) -> Result<
         return run_rebuild();
     }
     let report = perform_health_checks(repair, yes || json)?;
-
     if json {
         let mut issues = Vec::new();
         for warning in &report.warnings {
@@ -64,7 +63,6 @@ pub fn run_doctor(repair: bool, yes: bool, rebuild: bool, json: bool) -> Result<
             println!("Run 'llmc doctor --repair' to attempt fixes.");
         }
     }
-
     if report.errors.is_empty() {
         Ok(())
     } else {

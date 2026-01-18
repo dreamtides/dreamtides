@@ -5,9 +5,7 @@ use std::time::Duration;
 use anyhow::{Context, Result, bail};
 use tempfile::NamedTempFile;
 use tmux_interface::{LoadBuffer, PasteBuffer, SendKeys, Tmux};
-
 const LARGE_MESSAGE_THRESHOLD: usize = 1024;
-
 /// Handles reliable message sending to TMUX sessions with debouncing
 #[derive(Clone)]
 pub struct TmuxSender {
@@ -22,13 +20,11 @@ pub struct TmuxSender {
     /// Delay between Enter retries (default: 200ms)
     enter_retry_delay_ms: u32,
 }
-
 impl Default for TmuxSender {
     fn default() -> Self {
         Self::new()
     }
 }
-
 impl TmuxSender {
     /// Creates a new TmuxSender with default timing parameters
     pub fn new() -> Self {
@@ -50,16 +46,13 @@ impl TmuxSender {
         } else {
             message.to_string()
         };
-
         let result = if message.len() >= LARGE_MESSAGE_THRESHOLD {
             self.send_large_message(session, message)
         } else {
             self.send_small_message(session, message)
         };
-
         let duration_ms = start.elapsed().as_millis() as u64;
         let debounce_ms = self.calculate_delay(message.len()).as_millis() as u64;
-
         match &result {
             Ok(_) => {
                 tracing::debug!(
@@ -76,20 +69,13 @@ impl TmuxSender {
             }
             Err(e) => {
                 tracing::error!(
-                    operation = "tmux_send",
-                    session_id = session,
-                    send_type,
-                    message_size_bytes = message.len(),
-                    message_truncated = truncated,
-                    debounce_ms,
-                    duration_ms,
-                    result = "error",
-                    error = %e,
+                    operation = "tmux_send", session_id = session, send_type,
+                    message_size_bytes = message.len(), message_truncated = truncated,
+                    debounce_ms, duration_ms, result = "error", error = % e,
                     "TMUX send failed"
                 );
             }
         }
-
         result
     }
 
@@ -105,20 +91,16 @@ impl TmuxSender {
     pub fn send_large_message(&self, session: &str, message: &str) -> Result<()> {
         let tmp = NamedTempFile::new().context("Failed to create temporary file")?;
         fs::write(tmp.path(), message).context("Failed to write message to temp file")?;
-
         Tmux::with_command(
             LoadBuffer::new().buffer_name("prompt").path(tmp.path().to_string_lossy().as_ref()),
         )
         .output()
         .with_context(|| format!("Failed to load buffer in session '{}'", session))?;
-
         Tmux::with_command(PasteBuffer::new().target_pane(session).buffer_name("prompt"))
             .output()
             .with_context(|| format!("Failed to paste buffer in session '{}'", session))?;
-
         let delay = self.calculate_delay(message.len());
         sleep(delay);
-
         self.send_enter_with_retry(session)
     }
 
@@ -126,10 +108,8 @@ impl TmuxSender {
         Tmux::with_command(SendKeys::new().target_pane(session).disable_lookup().key(message))
             .output()
             .with_context(|| format!("Failed to send message to session '{}'", session))?;
-
         let delay = self.calculate_delay(message.len());
         sleep(delay);
-
         self.send_enter_with_retry(session)
     }
 
@@ -138,7 +118,6 @@ impl TmuxSender {
             if attempt > 0 {
                 sleep(Duration::from_millis(self.enter_retry_delay_ms as u64));
             }
-
             if Tmux::with_command(SendKeys::new().target_pane(session).key("Enter"))
                 .output()
                 .is_ok()
@@ -146,7 +125,6 @@ impl TmuxSender {
                 return Ok(());
             }
         }
-
         bail!(
             "Failed to send Enter after {} attempts to session '{}'",
             self.enter_retry_count,
@@ -160,11 +138,9 @@ impl TmuxSender {
         Duration::from_millis(delay.min(self.max_debounce_ms) as u64)
     }
 }
-
 #[cfg(test)]
 mod tests {
-    use super::*;
-
+    use crate::llmc::tmux::sender::*;
     #[test]
     fn test_default_sender() {
         let sender = TmuxSender::new();
@@ -174,11 +150,9 @@ mod tests {
         assert_eq!(sender.enter_retry_count, 3);
         assert_eq!(sender.enter_retry_delay_ms, 200);
     }
-
     #[test]
     fn test_calculate_delay() {
         let sender = TmuxSender::new();
-
         assert_eq!(sender.calculate_delay(0), Duration::from_millis(500));
         assert_eq!(sender.calculate_delay(512), Duration::from_millis(500));
         assert_eq!(sender.calculate_delay(1024), Duration::from_millis(600));
@@ -186,11 +160,9 @@ mod tests {
         assert_eq!(sender.calculate_delay(10240), Duration::from_millis(1500));
         assert_eq!(sender.calculate_delay(102400), Duration::from_millis(2000));
     }
-
     #[test]
     fn test_large_message_threshold() {
         let _sender = TmuxSender::new();
-
         assert!(999 < LARGE_MESSAGE_THRESHOLD);
         assert!(1024 >= LARGE_MESSAGE_THRESHOLD);
     }

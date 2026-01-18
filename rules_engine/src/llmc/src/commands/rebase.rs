@@ -2,11 +2,10 @@ use std::path::PathBuf;
 
 use anyhow::{Context, Result, bail};
 
-use super::super::state::{self, State};
-use super::super::tmux::sender::TmuxSender;
-use super::super::worker::{self, WorkerTransition};
-use super::super::{config, git};
-
+use crate::llmc::state::{self, State};
+use crate::llmc::tmux::sender::TmuxSender;
+use crate::llmc::worker::{self, WorkerTransition};
+use crate::llmc::{config, git};
 /// Runs the rebase command, manually triggering a rebase for a worker
 pub fn run_rebase(worker: &str, json: bool) -> Result<()> {
     let llmc_root = config::get_llmc_root();
@@ -17,10 +16,8 @@ pub fn run_rebase(worker: &str, json: bool) -> Result<()> {
             llmc_root.display()
         );
     }
-
     let state_path = state::get_state_path();
     let mut state = State::load(&state_path)?;
-
     let worker_record = state.get_worker(worker).ok_or_else(|| {
         anyhow::anyhow!(
             "Worker '{}' not found\n\
@@ -29,18 +26,14 @@ pub fn run_rebase(worker: &str, json: bool) -> Result<()> {
             format_all_workers(&state)
         )
     })?;
-
     let worktree_path = PathBuf::from(&worker_record.worktree_path);
     let session_id = worker_record.session_id.clone();
-
     println!("Fetching latest master...");
     git::fetch_origin(&llmc_root)
         .with_context(|| format!("Failed to fetch origin for worker '{}'", worker))?;
-
     println!("Rebasing worker '{}' onto master...", worker);
     let rebase_result = git::rebase_onto(&worktree_path, "origin/master")
         .with_context(|| format!("Failed to rebase worker '{}'", worker))?;
-
     if rebase_result.success {
         if json {
             let output = crate::json_output::RebaseOutput {
@@ -57,14 +50,11 @@ pub fn run_rebase(worker: &str, json: bool) -> Result<()> {
         if !json {
             println!("⚠ Rebase encountered conflicts in {} file(s)", rebase_result.conflicts.len());
         }
-
         let worker_mut = state.get_worker_mut(worker).unwrap();
         let original_task = worker_mut.current_prompt.clone();
         worker::apply_transition(worker_mut, WorkerTransition::ToRebasing)?;
         state.save(&state_path)?;
-
         let conflict_prompt = build_conflict_prompt(&rebase_result.conflicts, &original_task);
-
         if !json {
             println!("Sending conflict resolution instructions to worker...");
         }
@@ -72,7 +62,6 @@ pub fn run_rebase(worker: &str, json: bool) -> Result<()> {
         tmux_sender
             .send(&session_id, &conflict_prompt)
             .with_context(|| format!("Failed to send conflict prompt to worker '{}'", worker))?;
-
         if json {
             let output = crate::json_output::RebaseOutput {
                 worker: worker.to_string(),
@@ -84,37 +73,35 @@ pub fn run_rebase(worker: &str, json: bool) -> Result<()> {
             println!("✓ Worker '{}' marked as rebasing", worker);
             println!("  Conflict resolution prompt sent to worker");
         }
-
         Ok(())
     }
 }
-
 pub fn build_conflict_prompt(conflicts: &[String], original_task: &str) -> String {
     let mut prompt = String::from(
         "A rebase onto master has encountered conflicts.\n\
          \n",
     );
-
-    prompt.push_str(&format!(
-        "IMPORTANT - Your original task:\n\
+    prompt
+        .push_str(
+            &format!(
+                "IMPORTANT - Your original task:\n\
          \"{}\"\n\
          \n\
          DO NOT restart your task from scratch. Instead, INCORPORATE your existing changes/intent \n\
          into the new repository state. Your goal is to apply the same logical changes you already \n\
          made, but adapted to work with the new state of the files after master's changes.\n\
          \n",
-        original_task.lines().take(3).collect::<Vec<_>>().join(" ")
-    ));
-
+                original_task.lines().take(3).collect::< Vec < _ >> ().join(" ")
+            ),
+        );
     prompt.push_str("Conflicting files:\n");
-
     for file in conflicts {
         let conflict_count = count_conflict_markers(file);
         prompt.push_str(&format!("- {} ({} conflict markers)\n", file, conflict_count));
     }
-
-    prompt.push_str(
-        "\n\
+    prompt
+        .push_str(
+            "\n\
          Resolution steps:\n\
          1. Examine conflict markers (<<<<<<, =======, >>>>>>>)\n\
          2. Understand what master changed (their version) and what you changed (our version)\n\
@@ -128,15 +115,12 @@ pub fn build_conflict_prompt(conflicts: &[String], original_task: &str) -> Strin
          Notes:\n\
          - View original versions: git show :2:<file> (ours) :3:<file> (theirs)\n\
          - To abort: git rebase --abort\n",
-    );
-
+        );
     prompt
 }
-
 fn count_conflict_markers(file: &str) -> usize {
     std::fs::read_to_string(file).map(|content| content.matches("<<<<<<<").count()).unwrap_or(0)
 }
-
 fn format_all_workers(state: &State) -> String {
     if state.workers.is_empty() {
         return "none".to_string();

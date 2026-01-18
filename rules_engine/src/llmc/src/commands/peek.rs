@@ -1,9 +1,8 @@
 use anyhow::{Context, Result, bail};
 
-use super::super::config;
-use super::super::state::{self, State};
-use super::super::tmux::session;
-
+use crate::llmc::config;
+use crate::llmc::state::{self, State};
+use crate::llmc::tmux::session;
 pub fn run_peek(worker: Option<String>, lines: u32, json: bool) -> Result<()> {
     let llmc_root = config::get_llmc_root();
     if !llmc_root.exists() {
@@ -13,14 +12,11 @@ pub fn run_peek(worker: Option<String>, lines: u32, json: bool) -> Result<()> {
             llmc_root.display()
         );
     }
-
     let state_path = state::get_state_path();
     let state = State::load(&state_path)?;
-
     if state.workers.is_empty() {
         bail!("No workers configured. Run 'llmc add <name>' to add a worker.");
     }
-
     let worker_name = if let Some(name) = worker {
         if !state.workers.contains_key(&name) {
             bail!(
@@ -34,13 +30,10 @@ pub fn run_peek(worker: Option<String>, lines: u32, json: bool) -> Result<()> {
     } else {
         select_most_recent_worker(&state)?
     };
-
     let worker_record = state
         .get_worker(&worker_name)
         .ok_or_else(|| anyhow::anyhow!("Worker '{}' not found", worker_name))?;
-
     let session_id = &worker_record.session_id;
-
     if !session::session_exists(session_id) {
         bail!(
             "TMUX session '{}' does not exist for worker '{}'\n\
@@ -49,10 +42,8 @@ pub fn run_peek(worker: Option<String>, lines: u32, json: bool) -> Result<()> {
             worker_name
         );
     }
-
     let output = session::capture_pane(session_id, lines)
         .with_context(|| format!("Failed to capture pane for worker '{}'", worker_name))?;
-
     if json {
         let lines: Vec<String> = if output.trim().is_empty() {
             Vec::new()
@@ -64,14 +55,11 @@ pub fn run_peek(worker: Option<String>, lines: u32, json: bool) -> Result<()> {
     } else if output.trim().is_empty() {
         println!("(no output captured)");
     } else {
-        // Remove trailing blank lines while preserving the content
         let trimmed_output = trim_trailing_blank_lines(&output);
         println!("{}", trimmed_output);
     }
-
     Ok(())
 }
-
 fn select_most_recent_worker(state: &State) -> Result<String> {
     state
         .workers
@@ -80,36 +68,29 @@ fn select_most_recent_worker(state: &State) -> Result<String> {
         .map(|w| w.name.clone())
         .ok_or_else(|| anyhow::anyhow!("No workers available"))
 }
-
 fn format_workers(state: &State) -> String {
     if state.workers.is_empty() {
         return "none".to_string();
     }
     state.workers.keys().map(String::as_str).collect::<Vec<_>>().join(", ")
 }
-
 /// Removes trailing blank lines from output while preserving content
 fn trim_trailing_blank_lines(output: &str) -> &str {
     let mut end = output.len();
     let mut chars = output.char_indices().rev().peekable();
-
     while let Some((idx, ch)) = chars.next() {
         if ch == '\n' {
-            // Check if this is a blank line (next char is also newline or we're at start)
             if let Some(&(_, next_ch)) = chars.peek()
                 && (next_ch == '\n' || next_ch == '\r')
             {
                 end = idx;
                 continue;
             }
-            // Found a newline after content, this is where we want to end
             break;
         } else if !ch.is_whitespace() {
-            // Found non-whitespace content
             break;
         }
         end = idx;
     }
-
     &output[..end]
 }

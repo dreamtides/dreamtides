@@ -3,11 +3,10 @@ use std::time::Duration;
 
 use anyhow::{Context, Result, bail};
 
-use super::super::config::{self, Config};
-use super::super::state::{self, State, WorkerStatus};
-use super::super::tmux::session;
-use super::console::CONSOLE_PREFIX;
-
+use crate::llmc::commands::console::CONSOLE_PREFIX;
+use crate::llmc::config::{self, Config};
+use crate::llmc::state::{self, State, WorkerStatus};
+use crate::llmc::tmux::session;
 /// Runs the down command, stopping all worker sessions
 pub fn run_down(force: bool, kill_consoles: bool, json: bool) -> Result<()> {
     let llmc_root = config::get_llmc_root();
@@ -18,35 +17,24 @@ pub fn run_down(force: bool, kill_consoles: bool, json: bool) -> Result<()> {
             llmc_root.display()
         );
     }
-
     let config_path = config::get_config_path();
     let config = Config::load(&config_path)?;
-
     let state_path = state::get_state_path();
     let mut state = State::load(&state_path)?;
-
     if !json {
         println!("Stopping LLMC workers...");
     }
-
     let worker_names: Vec<String> = state.workers.keys().cloned().collect();
-
     send_shutdown_to_workers(&config, &state, force)?;
-
     if !force {
         if !json {
             println!("Waiting for graceful exit...");
         }
         thread::sleep(Duration::from_secs(5));
     }
-
     kill_remaining_sessions(&mut state, force)?;
-
-    // Clean up orphaned sessions, optionally including console sessions
     cleanup_orphaned_llmc_sessions(&state, kill_consoles, json)?;
-
     state.save(&state_path)?;
-
     if json {
         let output = crate::json_output::DownOutput { workers_stopped: worker_names };
         crate::json_output::print_json(&output);
@@ -55,20 +43,16 @@ pub fn run_down(force: bool, kill_consoles: bool, json: bool) -> Result<()> {
     }
     Ok(())
 }
-
 fn send_shutdown_to_workers(config: &Config, state: &State, force: bool) -> Result<()> {
     let worker_names: Vec<String> = state.workers.keys().cloned().collect();
-
     for worker_name in &worker_names {
         if let Some(worker_record) = state.workers.get(worker_name) {
             if worker_record.status == WorkerStatus::Offline {
                 continue;
             }
-
             if !session::session_exists(&worker_record.session_id) {
                 continue;
             }
-
             if force {
                 println!("  Force-killing worker '{}'...", worker_name);
                 session::kill_session(&worker_record.session_id)?;
@@ -85,7 +69,6 @@ fn send_shutdown_to_workers(config: &Config, state: &State, force: bool) -> Resu
                     );
                     continue;
                 }
-
                 let sender = super::super::tmux::sender::TmuxSender::new();
                 if let Err(e) = sender.send_keys_raw(&worker_record.session_id, "C-c") {
                     eprintln!("Warning: Failed to send Ctrl-C to worker '{}': {}", worker_name, e);
@@ -93,13 +76,10 @@ fn send_shutdown_to_workers(config: &Config, state: &State, force: bool) -> Resu
             }
         }
     }
-
     Ok(())
 }
-
 fn kill_remaining_sessions(state: &mut State, force: bool) -> Result<()> {
     let worker_names: Vec<String> = state.workers.keys().cloned().collect();
-
     for worker_name in &worker_names {
         if let Some(worker_record) = state.workers.get_mut(worker_name) {
             if session::session_exists(&worker_record.session_id) {
@@ -118,42 +98,32 @@ fn kill_remaining_sessions(state: &mut State, force: bool) -> Result<()> {
             worker_record.status = WorkerStatus::Offline;
         }
     }
-
     Ok(())
 }
-
 fn cleanup_orphaned_llmc_sessions(state: &State, kill_consoles: bool, json: bool) -> Result<()> {
     let all_sessions = session::list_sessions()?;
     let tracked_session_ids: Vec<String> =
         state.workers.values().map(|w| w.session_id.clone()).collect();
-
-    // Filter orphaned sessions, optionally preserving console sessions
     let orphaned_sessions: Vec<String> = all_sessions
         .into_iter()
         .filter(|s| {
-            // Must be an LLMC session
             if !s.starts_with("llmc-") {
                 return false;
             }
-            // Must not be tracked
             if tracked_session_ids.contains(s) {
                 return false;
             }
-            // Skip console sessions unless --kill-consoles is specified
             if !kill_consoles && s.starts_with(CONSOLE_PREFIX) {
                 return false;
             }
             true
         })
         .collect();
-
-    // Count console sessions that are being preserved
     let preserved_consoles: Vec<String> = if !kill_consoles {
         session::list_sessions()?.into_iter().filter(|s| s.starts_with(CONSOLE_PREFIX)).collect()
     } else {
         vec![]
     };
-
     if orphaned_sessions.is_empty() {
         if !preserved_consoles.is_empty() && !json {
             println!(
@@ -163,14 +133,12 @@ fn cleanup_orphaned_llmc_sessions(state: &State, kill_consoles: bool, json: bool
         }
         return Ok(());
     }
-
     if !json {
         println!(
             "Found {} orphaned LLMC sessions (not tracked in state file), cleaning up...",
             orphaned_sessions.len()
         );
     }
-
     for session_name in &orphaned_sessions {
         if !json {
             println!("  Killing orphaned session: {}", session_name);
@@ -179,13 +147,11 @@ fn cleanup_orphaned_llmc_sessions(state: &State, kill_consoles: bool, json: bool
             eprintln!("Warning: Failed to kill orphaned session '{}': {}", session_name, e);
         }
     }
-
     if !preserved_consoles.is_empty() && !json {
         println!(
             "  {} console session(s) preserved (use --kill-consoles to stop them)",
             preserved_consoles.len()
         );
     }
-
     Ok(())
 }

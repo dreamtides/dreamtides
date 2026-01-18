@@ -10,65 +10,49 @@ use tmux_interface::{
     Tmux,
 };
 
-use super::sender::TmuxSender;
 use crate::config::WorkerConfig;
-
+use crate::llmc::tmux::sender::TmuxSender;
 /// Default TMUX session width (wide terminal to prevent message truncation)
 pub const DEFAULT_SESSION_WIDTH: u32 = 500;
 /// Default TMUX session height
 pub const DEFAULT_SESSION_HEIGHT: u32 = 100;
-
 pub fn create_session(name: &str, cwd: &Path, width: u32, height: u32) -> Result<()> {
     if session_exists(name) {
         bail!("Session '{}' already exists", name);
     }
-
     let cwd_str = cwd.to_string_lossy();
-
     tracing::info!(
-        operation = "session_create",
-        session = name,
-        working_directory = %cwd_str,
-        width,
-        height,
-        "Creating TMUX session with working directory"
+        operation = "session_create", session = name, working_directory = % cwd_str,
+        width, height, "Creating TMUX session with working directory"
     );
-
     let new_session = NewSession::new()
         .detached()
         .session_name(name)
         .start_directory(cwd_str.as_ref())
         .width(width as usize)
         .height(height as usize);
-
     Tmux::new()
         .add_command(new_session)
         .output()
         .with_context(|| format!("Failed to create TMUX session '{}'", name))?;
-
     tracing::debug!(
         operation = "session_create",
         session = name,
         result = "success",
         "TMUX session created successfully"
     );
-
     Ok(())
 }
-
 /// Kills a TMUX session by name
 pub fn kill_session(name: &str) -> Result<()> {
     if !session_exists(name) {
         return Ok(());
     }
-
     Tmux::with_command(KillSession::new().target_session(name))
         .output()
         .with_context(|| format!("Failed to kill TMUX session '{}'", name))?;
-
     Ok(())
 }
-
 /// Checks if a TMUX session exists
 pub fn session_exists(name: &str) -> bool {
     Tmux::with_command(HasSession::new().target_session(name))
@@ -76,11 +60,9 @@ pub fn session_exists(name: &str) -> bool {
         .map(|output| output.success())
         .unwrap_or(false)
 }
-
 /// Lists all active TMUX session names
 pub fn list_sessions() -> Result<Vec<String>> {
     let output = Tmux::with_command(ListSessions::new().format("#{session_name}")).output();
-
     match output {
         Ok(output) => {
             if output.success() {
@@ -92,7 +74,6 @@ pub fn list_sessions() -> Result<Vec<String>> {
         Err(e) => bail!("Failed to list TMUX sessions: {}", e),
     }
 }
-
 /// Gets the command running in the session's active pane
 pub fn get_pane_command(session: &str) -> Result<String> {
     let output = Tmux::with_command(
@@ -100,14 +81,11 @@ pub fn get_pane_command(session: &str) -> Result<String> {
     )
     .output()
     .with_context(|| format!("Failed to get pane command for session '{}'", session))?;
-
     if !output.success() {
         bail!("Session '{}' not found or inaccessible", session);
     }
-
     Ok(output.to_string().trim().to_string())
 }
-
 /// Captures recent lines from the session's active pane
 pub fn capture_pane(session: &str, lines: u32) -> Result<String> {
     let output = Tmux::with_command(
@@ -115,14 +93,11 @@ pub fn capture_pane(session: &str, lines: u32) -> Result<String> {
     )
     .output()
     .with_context(|| format!("Failed to capture pane for session '{}'", session))?;
-
     if !output.success() {
         bail!("Session '{}' not found or inaccessible", session);
     }
-
     Ok(output.to_string())
 }
-
 /// Sets an environment variable in the session
 pub fn set_env(session: &str, key: &str, value: &str) -> Result<()> {
     let output =
@@ -131,14 +106,11 @@ pub fn set_env(session: &str, key: &str, value: &str) -> Result<()> {
             .with_context(|| {
                 format!("Failed to set environment variable in session '{}'", session)
             })?;
-
     if !output.success() {
         bail!("Failed to set environment variable '{}' in session '{}'", key, session);
     }
-
     Ok(())
 }
-
 /// Starts a complete worker session with Claude Code
 pub fn start_worker_session(
     name: &str,
@@ -154,93 +126,70 @@ pub fn start_worker_session(
             DEFAULT_SESSION_WIDTH, DEFAULT_SESSION_HEIGHT
         );
     }
-
     create_session(name, worktree, DEFAULT_SESSION_WIDTH, DEFAULT_SESSION_HEIGHT)?;
-
     if verbose {
         println!("      [verbose] TMUX session created successfully");
     }
-
     let llmc_root = crate::config::get_llmc_root();
     set_env(name, "LLMC_WORKER", name)?;
     set_env(name, "LLMC_ROOT", llmc_root.to_str().unwrap())?;
-
     if verbose {
         println!("      [verbose] Environment variables set");
     }
-
     thread::sleep(Duration::from_millis(500));
-
     let sender = TmuxSender::new();
     let claude_cmd = build_claude_command(config);
-
     if verbose {
         println!("      [verbose] Sending Claude command: {}", claude_cmd);
     }
-
     sender
         .send(name, &claude_cmd)
         .with_context(|| format!("Failed to send Claude command to session '{}'", name))?;
-
     if verbose {
         println!("      [verbose] Claude command sent, waiting for ready state...");
     }
-
     wait_for_claude_ready(name, Duration::from_secs(30), verbose)?;
-
     if verbose {
         println!("      [verbose] Claude is ready, checking for bypass warning...");
     }
-
     accept_bypass_warning(name, &sender, verbose)?;
-
     if verbose {
         println!("      [verbose] Sending /clear command...");
     }
-
     sender
         .send(name, "/clear")
         .with_context(|| format!("Failed to send /clear to session '{}'", name))?;
     thread::sleep(Duration::from_millis(500));
-
     if verbose {
         println!("      [verbose] Worker session startup complete");
     }
-
     Ok(())
 }
-
 /// Checks if any LLMC sessions are running
 pub fn any_llmc_sessions_running() -> Result<bool> {
     let sessions = list_sessions()?;
     Ok(sessions.iter().any(|s| s.starts_with("llmc-")))
 }
-
 /// Checks if a command is a shell
 pub fn is_shell(cmd: &str) -> bool {
     matches!(cmd, "bash" | "zsh" | "sh" | "fish" | "dash")
 }
-
 /// Checks if a command is a Claude process
 pub fn is_claude_process(cmd: &str) -> bool {
     if matches!(cmd, "node" | "claude") {
         return true;
     }
-
     static SEMVER_PATTERN: OnceLock<Regex> = OnceLock::new();
     SEMVER_PATTERN.get_or_init(|| Regex::new(r"^\d+\.\d+\.\d+").unwrap()).is_match(cmd)
 }
-
 pub fn wait_for_claude_ready(session: &str, timeout: Duration, verbose: bool) -> Result<()> {
     const POLL_INTERVAL_MS: u64 = 500;
     const GRACE_PERIOD_SECS: u64 = 5;
     let start = std::time::Instant::now();
     let mut poll_count = 0;
-
     while start.elapsed() < timeout {
         thread::sleep(Duration::from_millis(POLL_INTERVAL_MS));
         poll_count += 1;
-
         if verbose {
             println!(
                 "        [verbose] Poll #{}: Checking Claude readiness ({}s elapsed)",
@@ -248,7 +197,6 @@ pub fn wait_for_claude_ready(session: &str, timeout: Duration, verbose: bool) ->
                 start.elapsed().as_secs()
             );
         }
-
         if let Ok(output) = capture_pane(session, 50) {
             if verbose {
                 println!("        [verbose] Captured {} lines of output", output.lines().count());
@@ -257,7 +205,6 @@ pub fn wait_for_claude_ready(session: &str, timeout: Duration, verbose: bool) ->
                     println!("        [verbose]   | {}", line);
                 }
             }
-
             if output.lines().rev().take(5).any(|line| {
                 let trimmed = line.trim_start();
                 trimmed.starts_with("> ") || trimmed == ">" || trimmed.starts_with("❯")
@@ -267,7 +214,6 @@ pub fn wait_for_claude_ready(session: &str, timeout: Duration, verbose: bool) ->
                 }
                 return Ok(());
             }
-
             let lower = output.to_lowercase();
             if lower.contains("bypass") && lower.contains("permissions") {
                 if verbose {
@@ -277,7 +223,6 @@ pub fn wait_for_claude_ready(session: &str, timeout: Duration, verbose: bool) ->
                 }
                 return Ok(());
             }
-
             if let Ok(command) = get_pane_command(session) {
                 if verbose {
                     println!("        [verbose] Pane command: '{}'", command);
@@ -286,7 +231,6 @@ pub fn wait_for_claude_ready(session: &str, timeout: Duration, verbose: bool) ->
                         is_claude_process(&command)
                     );
                 }
-
                 if !is_claude_process(&command) {
                     let elapsed_secs = start.elapsed().as_secs();
                     if elapsed_secs >= GRACE_PERIOD_SECS {
@@ -321,14 +265,11 @@ pub fn wait_for_claude_ready(session: &str, timeout: Duration, verbose: bool) ->
             println!("        [verbose] Failed to capture pane output");
         }
     }
-
     if verbose {
         println!("        [verbose] Timeout reached after {} polls", poll_count);
     }
-
     bail!("Claude did not become ready after {} seconds", timeout.as_secs())
 }
-
 pub fn accept_bypass_warning(session: &str, sender: &TmuxSender, verbose: bool) -> Result<()> {
     thread::sleep(Duration::from_millis(500));
     if let Ok(output) = capture_pane(session, 50) {
@@ -337,14 +278,12 @@ pub fn accept_bypass_warning(session: &str, sender: &TmuxSender, verbose: bool) 
             || lower.contains("dangerously")
             || lower.contains("skip-permissions")
             || lower.contains("skip permissions");
-
         if verbose {
             println!(
                 "        [verbose] Checking for bypass warning... found: {}",
                 has_bypass_warning
             );
         }
-
         if has_bypass_warning {
             if verbose {
                 println!("        [verbose] Accepting bypass warning (Down + Enter)");
@@ -359,7 +298,6 @@ pub fn accept_bypass_warning(session: &str, sender: &TmuxSender, verbose: bool) 
     }
     Ok(())
 }
-
 fn build_claude_command(config: &WorkerConfig) -> String {
     let mut cmd = String::from("claude");
     if let Some(model) = &config.model {
@@ -368,11 +306,9 @@ fn build_claude_command(config: &WorkerConfig) -> String {
     cmd.push_str(" --dangerously-skip-permissions");
     cmd
 }
-
 #[cfg(test)]
 mod tests {
-    use super::*;
-
+    use crate::llmc::tmux::session::*;
     #[test]
     fn test_is_shell() {
         assert!(is_shell("bash"));
@@ -384,7 +320,6 @@ mod tests {
         assert!(!is_shell("claude"));
         assert!(!is_shell("python"));
     }
-
     #[test]
     fn test_is_claude_process() {
         assert!(is_claude_process("node"));
@@ -395,7 +330,6 @@ mod tests {
         assert!(!is_claude_process("python"));
         assert!(!is_claude_process("some-other-process"));
     }
-
     #[test]
     fn test_any_llmc_sessions_running() {
         let result = any_llmc_sessions_running();

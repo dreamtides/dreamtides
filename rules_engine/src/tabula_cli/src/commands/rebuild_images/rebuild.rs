@@ -8,10 +8,9 @@ use tempfile::NamedTempFile;
 use zip::write::FileOptions;
 use zip::{CompressionMethod, ZipArchive, ZipWriter};
 
-use super::url::UrlDownloader;
-use super::{cache, url};
 use crate::core::paths;
-
+use crate::tabula_cli::commands::rebuild_images::url::UrlDownloader;
+use crate::tabula_cli::commands::rebuild_images::{cache, url};
 pub fn rebuild_images(xlsm_path: Option<PathBuf>, from_urls: bool, auto: bool) -> Result<()> {
     let source = resolve_xlsm_path(xlsm_path)?;
     if from_urls && auto {
@@ -32,7 +31,6 @@ pub fn rebuild_images(xlsm_path: Option<PathBuf>, from_urls: bool, auto: bool) -
         cache::rebuild_from_cache(&source)
     }
 }
-
 pub fn rebuild_images_from_urls_with_downloader(
     xlsm_path: Option<PathBuf>,
     downloader: &UrlDownloader,
@@ -40,21 +38,18 @@ pub fn rebuild_images_from_urls_with_downloader(
     let source = resolve_xlsm_path(xlsm_path)?;
     url::rebuild_from_urls_with_downloader(&source, downloader)
 }
-
 #[derive(Clone)]
 pub(super) struct FileRecord {
     pub name: String,
     pub data: Vec<u8>,
     pub compression: CompressionMethod,
 }
-
 pub(super) fn resolve_xlsm_path(xlsm_path: Option<PathBuf>) -> Result<PathBuf> {
     match xlsm_path {
         Some(path) => Ok(path),
         None => paths::default_xlsm_path(),
     }
 }
-
 pub(super) fn read_zip(path: &Path) -> Result<(Vec<FileRecord>, Vec<String>)> {
     let file = fs::File::open(path)
         .with_context(|| format!("Cannot open spreadsheet at {}", path.display()))?;
@@ -62,7 +57,6 @@ pub(super) fn read_zip(path: &Path) -> Result<(Vec<FileRecord>, Vec<String>)> {
     let mut file_order = Vec::new();
     let mut dirs = Vec::new();
     let mut records = Vec::new();
-
     for i in 0..archive.len() {
         let mut entry = archive.by_index(i)?;
         let name = entry.name().to_string();
@@ -78,7 +72,6 @@ pub(super) fn read_zip(path: &Path) -> Result<(Vec<FileRecord>, Vec<String>)> {
         let compression = entry.compression();
         records.push(FileRecord { name, data, compression });
     }
-
     for dir in dirs {
         records.push(FileRecord {
             name: dir,
@@ -86,10 +79,8 @@ pub(super) fn read_zip(path: &Path) -> Result<(Vec<FileRecord>, Vec<String>)> {
             compression: CompressionMethod::Stored,
         });
     }
-
     Ok((records, file_order))
 }
-
 pub(super) fn write_zip(
     path: &Path,
     records: Vec<FileRecord>,
@@ -108,7 +99,6 @@ pub(super) fn write_zip(
     for record in records {
         record_map.insert(record.name.clone(), record);
     }
-
     for name in file_order {
         if let Some(record) = record_map.get(name) {
             if name.ends_with('/') {
@@ -119,12 +109,10 @@ pub(super) fn write_zip(
             writer.write_all(&record.data)?;
         }
     }
-
     writer.finish()?;
     temp.persist(path)?;
     Ok(())
 }
-
 fn start_entry(
     writer: &mut ZipWriter<std::fs::File>,
     name: &str,
@@ -137,7 +125,6 @@ fn start_entry(
     writer.start_file(name, options)?;
     Ok(())
 }
-
 fn start_dir(writer: &mut ZipWriter<std::fs::File>, name: &str) -> Result<()> {
     let time =
         zip::DateTime::from_date_and_time(1980, 1, 1, 0, 0, 0).context("Invalid ZIP timestamp")?;

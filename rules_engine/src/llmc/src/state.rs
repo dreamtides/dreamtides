@@ -6,9 +6,8 @@ use std::time::{SystemTime, UNIX_EPOCH};
 use anyhow::{Context, Result, bail};
 use serde::{Deserialize, Serialize};
 
-use super::config::{self, Config};
-use super::patrol::Patrol;
-
+use crate::llmc::config::{self, Config};
+use crate::llmc::patrol::Patrol;
 /// Worker state machine states
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
@@ -30,7 +29,6 @@ pub enum WorkerStatus {
     /// TMUX session is not running
     Offline,
 }
-
 /// Record for a single worker in the LLMC system
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct WorkerRecord {
@@ -67,7 +65,6 @@ pub struct WorkerRecord {
     #[serde(default)]
     pub self_review: bool,
 }
-
 /// State file tracking all workers and their status
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct State {
@@ -78,7 +75,6 @@ pub struct State {
     #[serde(default)]
     pub daemon_running: bool,
 }
-
 /// Returns true if a worker is truly ready for human review.
 ///
 /// A worker in `NeedsReview` state is NOT ready for human review if:
@@ -93,24 +89,15 @@ pub fn is_truly_needs_review(worker: &WorkerRecord, config: &Config) -> bool {
     if worker.status != WorkerStatus::NeedsReview {
         return false;
     }
-
-    // If self-review is not enabled for this worker, ready for human review
     if !worker.self_review {
         return true;
     }
-
-    // Self-review is enabled. Check if there's a self_review prompt configured.
     let has_prompt = config.defaults.self_review.is_some();
-
-    // If no prompt configured, can't do self-review, so ready for human review
     if !has_prompt {
         return true;
     }
-
-    // Self-review is enabled and prompt exists. Ready only if prompt was sent.
     worker.on_complete_sent_unix.is_some()
 }
-
 /// Validates state consistency
 pub fn validate_state(state: &State) -> Result<()> {
     let now = SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs();
@@ -143,12 +130,10 @@ pub fn validate_state(state: &State) -> Result<()> {
     }
     Ok(())
 }
-
 /// Returns the path to the state file (~/llmc/state.json)
 pub fn get_state_path() -> PathBuf {
     config::get_llmc_root().join("state.json")
 }
-
 /// Runs patrol to update worker states, then returns the updated state
 pub fn load_state_with_patrol() -> Result<(State, super::config::Config)> {
     let state_path = get_state_path();
@@ -160,7 +145,6 @@ pub fn load_state_with_patrol() -> Result<(State, super::config::Config)> {
     state.save(&state_path)?;
     Ok((state, config))
 }
-
 impl State {
     /// Creates a new empty state
     pub fn new() -> State {
@@ -189,8 +173,6 @@ impl State {
             })?;
         }
         let json = serde_json::to_string_pretty(self).context("Failed to serialize state")?;
-        // Use PID-based temp file to avoid race conditions when multiple processes
-        // (e.g., llmc accept and llmc up with patrol) save state concurrently
         let temp_filename = format!("state.{}.tmp", std::process::id());
         let temp_path = path.with_file_name(&temp_filename);
         fs::write(&temp_path, json)
@@ -250,18 +232,16 @@ impl State {
         self.workers.values().filter(|w| is_truly_needs_review(w, config)).collect()
     }
 }
-
 impl Default for State {
     fn default() -> Self {
         State::new()
     }
 }
-
 #[cfg(test)]
 mod tests {
     use tempfile::TempDir;
 
-    use super::*;
+    use crate::llmc::state::*;
     fn create_test_worker(name: &str) -> WorkerRecord {
         WorkerRecord {
             name: name.to_string(),

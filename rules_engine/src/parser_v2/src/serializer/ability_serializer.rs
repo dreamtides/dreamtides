@@ -2,19 +2,17 @@ use ability_data::ability::Ability;
 use ability_data::named_ability::NamedAbility;
 use ability_data::trigger_event::TriggerEvent;
 
-use super::{
+use crate::parser_v2::serializer::{
     cost_serializer, effect_serializer, serializer_utils, static_ability_serializer,
     trigger_serializer,
 };
 use crate::variables::parser_bindings::VariableBindings;
-
 /// Result of serializing an ability, containing both the text and variable
 /// bindings.
 pub struct SerializedAbility {
     pub text: String,
     pub variables: VariableBindings,
 }
-
 /// Serializes an ability into its rules text and variable bindings.
 pub fn serialize_ability(ability: &Ability) -> SerializedAbility {
     let mut variables = VariableBindings::new();
@@ -89,10 +87,8 @@ pub fn serialize_ability(ability: &Ability) -> SerializedAbility {
             &static_ability_serializer::serialize_static_ability(static_ability, &mut variables),
         ),
     };
-
     SerializedAbility { text, variables }
 }
-
 fn serialize_named_ability(named: &NamedAbility, variables: &mut VariableBindings) -> String {
     match named {
         NamedAbility::Reclaim(_) => "{ReclaimForCost}".to_string(),

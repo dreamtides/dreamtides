@@ -2,8 +2,7 @@ use std::fs;
 
 use anyhow::{Context, Result, bail};
 
-use super::super::config::{self, Config};
-
+use crate::llmc::config::{self, Config};
 pub fn run_config_get(key: &str) -> Result<()> {
     let config_path = config::get_config_path();
     if !config_path.exists() {
@@ -13,15 +12,11 @@ pub fn run_config_get(key: &str) -> Result<()> {
             config_path.display()
         );
     }
-
     let config = Config::load(&config_path)?;
-
     let value = get_config_value(&config, key)?;
     println!("{}", value);
-
     Ok(())
 }
-
 pub fn run_config_set(key: &str, value: &str) -> Result<()> {
     let config_path = config::get_config_path();
     if !config_path.exists() {
@@ -31,24 +26,17 @@ pub fn run_config_set(key: &str, value: &str) -> Result<()> {
             config_path.display()
         );
     }
-
     validate_config_key(key)?;
     validate_config_value(key, value)?;
-
     set_config_value(&config_path, key, value)?;
-
     println!("✓ Configuration updated: {} = {}", key, value);
-
     let config = Config::load(&config_path)?;
     let actual_value = get_config_value(&config, key)?;
     println!("Verified: {}", actual_value);
-
     Ok(())
 }
-
 fn get_config_value(config: &Config, key: &str) -> Result<String> {
     let parts: Vec<&str> = key.split('.').collect();
-
     match parts.as_slice() {
         ["defaults", "model"] => Ok(config.defaults.model.clone()),
         ["defaults", "skip_permissions"] => Ok(config.defaults.skip_permissions.to_string()),
@@ -93,8 +81,9 @@ fn get_config_value(config: &Config, key: &str) -> Result<String> {
             })?;
             Ok(worker_config.excluded_from_pool.to_string())
         }
-        _ => bail!(
-            "Invalid configuration key: '{}'\n\
+        _ => {
+            bail!(
+                "Invalid configuration key: '{}'\n\
              \n\
              Valid keys:\n\
              Defaults:\n\
@@ -108,16 +97,14 @@ fn get_config_value(config: &Config, key: &str) -> Result<String> {
              - workers.<worker>.model\n\
              - workers.<worker>.role_prompt\n\
              - workers.<worker>.excluded_from_pool",
-            key
-        ),
+                key
+            )
+        }
     }
 }
-
 fn set_config_value(config_path: &std::path::Path, key: &str, value: &str) -> Result<()> {
     let config_content = fs::read_to_string(config_path).context("Failed to read config.toml")?;
-
     let parts: Vec<&str> = key.split('.').collect();
-
     let new_content = match parts.as_slice() {
         ["defaults", field] => set_defaults_field(&config_content, field, value)?,
         ["workers", worker_name, field] => {
@@ -125,27 +112,21 @@ fn set_config_value(config_path: &std::path::Path, key: &str, value: &str) -> Re
         }
         _ => bail!("Invalid configuration key: '{}'", key),
     };
-
     fs::write(config_path, new_content).context("Failed to write config.toml")?;
-
     Ok(())
 }
-
 fn set_defaults_field(content: &str, field: &str, value: &str) -> Result<String> {
     let lines: Vec<&str> = content.lines().collect();
     let mut new_lines: Vec<String> = Vec::new();
     let mut in_defaults_section = false;
     let mut field_updated = false;
-
     for line in &lines {
         let trimmed = line.trim();
-
         if trimmed == "[defaults]" {
             in_defaults_section = true;
             new_lines.push(line.to_string());
             continue;
         }
-
         if in_defaults_section {
             if trimmed.starts_with('[') && trimmed != "[defaults]" {
                 if !field_updated {
@@ -159,10 +140,8 @@ fn set_defaults_field(content: &str, field: &str, value: &str) -> Result<String>
                 continue;
             }
         }
-
         new_lines.push(line.to_string());
     }
-
     if in_defaults_section && !field_updated {
         new_lines.push(format_field_line(field, value)?);
     } else if !field_updated {
@@ -176,17 +155,14 @@ fn set_defaults_field(content: &str, field: &str, value: &str) -> Result<String>
                 break;
             }
         }
-
         if insert_pos == 0 {
             new_lines.insert(0, format_field_line(field, value)?);
         } else {
             new_lines.insert(insert_pos, format_field_line(field, value)?);
         }
     }
-
     Ok(new_lines.join("\n") + "\n")
 }
-
 fn set_worker_field(content: &str, worker_name: &str, field: &str, value: &str) -> Result<String> {
     let lines: Vec<&str> = content.lines().collect();
     let mut new_lines: Vec<String> = Vec::new();
@@ -194,17 +170,14 @@ fn set_worker_field(content: &str, worker_name: &str, field: &str, value: &str) 
     let mut in_worker_section = false;
     let mut field_updated = false;
     let mut section_exists = false;
-
     for line in &lines {
         let trimmed = line.trim();
-
         if trimmed == section_header {
             in_worker_section = true;
             section_exists = true;
             new_lines.push(line.to_string());
             continue;
         }
-
         if in_worker_section {
             if trimmed.starts_with('[') && trimmed != section_header {
                 if !field_updated {
@@ -218,10 +191,8 @@ fn set_worker_field(content: &str, worker_name: &str, field: &str, value: &str) 
                 continue;
             }
         }
-
         new_lines.push(line.to_string());
     }
-
     if !section_exists {
         bail!(
             "Worker '{}' not found in configuration.\n\
@@ -230,14 +201,11 @@ fn set_worker_field(content: &str, worker_name: &str, field: &str, value: &str) 
             worker_name
         );
     }
-
     if in_worker_section && !field_updated {
         new_lines.push(format_field_line(field, value)?);
     }
-
     Ok(new_lines.join("\n") + "\n")
 }
-
 fn format_field_line(field: &str, value: &str) -> Result<String> {
     match field {
         "model" | "role_prompt" => Ok(format!("{} = \"{}\"", field, value)),
@@ -261,10 +229,8 @@ fn format_field_line(field: &str, value: &str) -> Result<String> {
         _ => bail!("Unknown field: '{}'", field),
     }
 }
-
 fn validate_config_key(key: &str) -> Result<()> {
     let parts: Vec<&str> = key.split('.').collect();
-
     match parts.as_slice() {
         ["defaults", field] => {
             let valid_fields = [
@@ -296,19 +262,19 @@ fn validate_config_key(key: &str) -> Result<()> {
             }
             Ok(())
         }
-        _ => bail!(
-            "Invalid configuration key format: '{}'\n\
+        _ => {
+            bail!(
+                "Invalid configuration key format: '{}'\n\
              Expected formats:\n\
              - defaults.<field>\n\
              - workers.<worker>.<field>",
-            key
-        ),
+                key
+            )
+        }
     }
 }
-
 fn validate_config_value(key: &str, value: &str) -> Result<()> {
     let parts: Vec<&str> = key.split('.').collect();
-
     match parts.last() {
         Some(&"model") => {
             config::validate_model(value)?;
@@ -328,10 +294,8 @@ fn validate_config_value(key: &str, value: &str) -> Result<()> {
         }
         _ => {}
     }
-
     Ok(())
 }
-
 fn get_worker_names(config: &Config) -> String {
     let mut names: Vec<&String> = config.workers.keys().collect();
     names.sort();

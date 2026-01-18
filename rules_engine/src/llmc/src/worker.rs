@@ -9,7 +9,6 @@ use crate::git;
 use crate::state::{State, WorkerRecord, WorkerStatus};
 use crate::tmux::sender::TmuxSender;
 use crate::tmux::session;
-
 /// Represents a state transition for a worker
 #[derive(Debug, Clone, PartialEq)]
 pub enum WorkerTransition {
@@ -32,7 +31,6 @@ pub enum WorkerTransition {
     /// Transition to offline state
     ToOffline,
 }
-
 pub fn can_transition(from: &WorkerStatus, to: &WorkerStatus) -> bool {
     matches!(
         (from, to),
@@ -62,7 +60,6 @@ pub fn can_transition(from: &WorkerStatus, to: &WorkerStatus) -> bool {
             | (_, WorkerStatus::Rebasing | WorkerStatus::Error | WorkerStatus::Offline)
     )
 }
-
 /// Applies a state transition to a worker record
 pub fn apply_transition(worker: &mut WorkerRecord, transition: WorkerTransition) -> Result<()> {
     let old_status = worker.status;
@@ -100,11 +97,9 @@ pub fn apply_transition(worker: &mut WorkerRecord, transition: WorkerTransition)
                 || worker.self_review;
             if had_stale_state {
                 tracing::info!(
-                    worker = %worker.name,
-                    had_prompt = !worker.current_prompt.is_empty(),
-                    prompt_cmd = ?worker.prompt_cmd,
-                    commit_sha = ?worker.commit_sha,
-                    self_review = worker.self_review,
+                    worker = % worker.name, had_prompt = ! worker.current_prompt
+                    .is_empty(), prompt_cmd = ? worker.prompt_cmd, commit_sha = ? worker
+                    .commit_sha, self_review = worker.self_review,
                     "Clearing stale worker state during transition to Idle"
                 );
             }
@@ -139,7 +134,6 @@ pub fn apply_transition(worker: &mut WorkerRecord, transition: WorkerTransition)
     );
     Ok(())
 }
-
 /// Starts Claude in a TMUX session with appropriate configuration
 pub fn start_claude_in_session(session: &str, config: &WorkerConfig) -> Result<()> {
     let sender = TmuxSender::new();
@@ -159,7 +153,6 @@ pub fn start_claude_in_session(session: &str, config: &WorkerConfig) -> Result<(
     thread::sleep(Duration::from_millis(500));
     Ok(())
 }
-
 /// Resets a worker to clean idle state by discarding changes and resetting to
 /// origin/master
 pub fn reset_worker_to_clean_state(
@@ -197,7 +190,6 @@ pub fn reset_worker_to_clean_state(
     }
     Ok(actions)
 }
-
 /// Waits for Claude to be ready by polling for the ">" prompt
 fn wait_for_claude_ready(session: &str) -> Result<()> {
     const MAX_ATTEMPTS: u32 = 60;
@@ -223,7 +215,6 @@ fn wait_for_claude_ready(session: &str) -> Result<()> {
     }
     bail!("Claude did not become ready after 30 seconds");
 }
-
 /// Accepts the bypass permissions warning if present
 fn accept_bypass_warning(session: &str, sender: &TmuxSender) -> Result<()> {
     thread::sleep(Duration::from_millis(500));
@@ -242,10 +233,9 @@ fn accept_bypass_warning(session: &str, sender: &TmuxSender) -> Result<()> {
     }
     Ok(())
 }
-
 #[cfg(test)]
 mod tests {
-    use super::*;
+    use crate::llmc::worker::*;
     #[test]
     fn test_can_transition_idle_to_working() {
         assert!(can_transition(&WorkerStatus::Idle, &WorkerStatus::Working));
@@ -296,7 +286,6 @@ mod tests {
     fn test_cannot_transition_idle_to_rejected() {
         assert!(!can_transition(&WorkerStatus::Idle, &WorkerStatus::Rejected));
     }
-
     #[test]
     fn test_can_transition_working_to_idle() {
         assert!(can_transition(&WorkerStatus::Working, &WorkerStatus::Idle));

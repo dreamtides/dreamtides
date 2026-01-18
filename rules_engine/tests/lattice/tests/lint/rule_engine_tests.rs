@@ -4,8 +4,8 @@ use lattice::document::frontmatter_schema::TaskType;
 use lattice::index::document_types::InsertDocument;
 use lattice::index::{document_queries, schema_definition};
 use lattice::lint::rule_engine::{
-    execute_rules, execute_rules_on_documents, LintConfig, LintContext, LintDocument, LintResult,
-    LintRule, LintSummary, Severity,
+    LintConfig, LintContext, LintDocument, LintResult, LintRule, LintSummary, Severity,
+    execute_rules, execute_rules_on_documents,
 };
 use rusqlite::Connection;
 use tempfile::TempDir;

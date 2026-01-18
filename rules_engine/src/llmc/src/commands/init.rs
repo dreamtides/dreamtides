@@ -4,14 +4,12 @@ use std::process::Command;
 
 use anyhow::{Context, Result, bail};
 
-use super::super::config;
-use super::super::config::Config;
-use super::super::state::State;
-
+use crate::llmc::config;
+use crate::llmc::config::Config;
+use crate::llmc::state::State;
 /// Initializes a new LLMC workspace
 pub fn run_init(source: Option<PathBuf>, target: Option<PathBuf>, force: bool) -> Result<()> {
     let target_dir = target.unwrap_or_else(config::get_llmc_root);
-
     if target_dir.exists() {
         if force {
             println!("Removing existing directory at {}", target_dir.display());
@@ -23,7 +21,6 @@ pub fn run_init(source: Option<PathBuf>, target: Option<PathBuf>, force: bool) -
             );
         }
     }
-
     let source_dir = if let Some(src) = source {
         src
     } else {
@@ -32,18 +29,14 @@ pub fn run_init(source: Option<PathBuf>, target: Option<PathBuf>, force: bool) -
             .context("Could not determine home directory")?;
         PathBuf::from(home).join("Documents/GoogleDrive/dreamtides")
     };
-
     if !source_dir.exists() {
         bail!("Source directory does not exist: {}", source_dir.display());
     }
-
     if !is_git_repo(&source_dir)? {
         bail!("Source directory is not a git repository: {}", source_dir.display());
     }
-
     println!("Initializing LLMC workspace at {}", target_dir.display());
     println!("Source repository: {}", source_dir.display());
-
     clone_repository(&source_dir, &target_dir)?;
     configure_git(&target_dir)?;
     install_lfs_if_available(&target_dir);
@@ -51,23 +44,18 @@ pub fn run_init(source: Option<PathBuf>, target: Option<PathBuf>, force: bool) -
     create_config_file(&target_dir, &source_dir)?;
     create_initial_state(&target_dir)?;
     copy_tabula_if_present(&source_dir, &target_dir)?;
-
     println!("\n✓ LLMC workspace initialized successfully!");
     println!("\nNext steps:");
     println!("  1. Review and customize ~/llmc/config.toml");
     println!("  2. Run 'llmc add <name>' to create workers");
     println!("  3. Run 'llmc up' to start the daemon");
-
     Ok(())
 }
-
 fn is_git_repo(path: &Path) -> Result<bool> {
     Ok(path.join(".git").exists())
 }
-
 fn clone_repository(source: &Path, target: &Path) -> Result<()> {
     println!("Cloning repository with --local...");
-
     let output = Command::new("git")
         .arg("clone")
         .arg("--local")
@@ -75,17 +63,13 @@ fn clone_repository(source: &Path, target: &Path) -> Result<()> {
         .arg(target)
         .output()
         .context("Failed to execute git clone")?;
-
     if !output.status.success() {
         bail!("Failed to clone repository: {}", String::from_utf8_lossy(&output.stderr));
     }
-
     Ok(())
 }
-
 fn configure_git(repo: &Path) -> Result<()> {
     println!("Configuring git rerere...");
-
     let output = Command::new("git")
         .arg("-C")
         .arg(repo)
@@ -94,19 +78,14 @@ fn configure_git(repo: &Path) -> Result<()> {
         .arg("true")
         .output()
         .context("Failed to configure git rerere")?;
-
     if !output.status.success() {
         eprintln!("Warning: Failed to enable git rerere (non-fatal)");
     }
-
     Ok(())
 }
-
 fn install_lfs_if_available(repo: &Path) {
     println!("Installing git LFS hooks (if available)...");
-
     let output = Command::new("git").arg("-C").arg(repo).arg("lfs").arg("install").output();
-
     match output {
         Ok(out) if out.status.success() => {
             println!("✓ Git LFS installed");
@@ -116,24 +95,17 @@ fn install_lfs_if_available(repo: &Path) {
         }
     }
 }
-
 fn create_directory_structure(target: &Path) -> Result<()> {
     println!("Creating directory structure...");
-
     fs::create_dir_all(target.join("logs")).context("Failed to create logs directory")?;
-
     fs::create_dir_all(target.join(".worktrees"))
         .context("Failed to create .worktrees directory")?;
-
     Ok(())
 }
-
 fn create_config_file(target: &Path, source: &Path) -> Result<()> {
     println!("Creating config.toml...");
-
     let config_path = target.join("config.toml");
     let source_str = source.to_string_lossy();
-
     let config_content = format!(
         r#"[defaults]
 model = "opus"
@@ -152,27 +124,19 @@ source = "{}"
 "#,
         source_str
     );
-
     fs::write(&config_path, config_content).context("Failed to write config.toml")?;
-
     let _ = Config::load(&config_path)?;
-
     Ok(())
 }
-
 fn create_initial_state(target: &Path) -> Result<()> {
     println!("Creating state.json...");
-
     let state_path = target.join("state.json");
     let state = State::new();
     state.save(&state_path)?;
-
     Ok(())
 }
-
 fn copy_tabula_if_present(source: &Path, target: &Path) -> Result<()> {
     let source_tabula = source.join("client/Assets/StreamingAssets/Tabula.xlsm");
-
     if source_tabula.exists() {
         println!("Copying Tabula.xlsm...");
         let target_tabula = target.join("Tabula.xlsm");
@@ -180,6 +144,5 @@ fn copy_tabula_if_present(source: &Path, target: &Path) -> Result<()> {
     } else {
         println!("  Tabula.xlsm not found in source (skipping)");
     }
-
     Ok(())
 }

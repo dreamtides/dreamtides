@@ -1,10 +1,9 @@
 use anyhow::{Context, Result};
 use sha2::{Digest, Sha256};
 
-use super::model::{
+use crate::tabula_cli::server::model::{
     Change, ChangedRange, HorizontalAlignment, PROTOCOL_VERSION, Request, Response, ResponseStatus,
 };
-
 pub fn parse_request(body: &[u8]) -> Result<Request> {
     let text = std::str::from_utf8(body).context("Request body is not valid UTF-8")?;
     let mut request_id = None;
@@ -12,7 +11,6 @@ pub fn parse_request(body: &[u8]) -> Result<Request> {
     let mut workbook_mtime = None;
     let mut workbook_size = None;
     let mut changed_range = None;
-
     for line in text.lines() {
         let line = line.trim();
         if line.is_empty() {
@@ -21,12 +19,10 @@ pub fn parse_request(body: &[u8]) -> Result<Request> {
         if line == "TABULA/1" {
             continue;
         }
-
         let parts: Vec<&str> = line.splitn(2, ' ').collect();
         if parts.len() < 2 {
             continue;
         }
-
         match parts[0] {
             "REQUEST_ID" => {
                 request_id = Some(percent_decode(parts[1])?);
@@ -52,7 +48,6 @@ pub fn parse_request(body: &[u8]) -> Result<Request> {
             _ => {}
         }
     }
-
     Ok(Request {
         request_id: request_id.context("Missing REQUEST_ID")?,
         workbook_path: workbook_path.context("Missing WORKBOOK_PATH")?,
@@ -61,38 +56,29 @@ pub fn parse_request(body: &[u8]) -> Result<Request> {
         changed_range,
     })
 }
-
 pub fn serialize_response(response: &Response) -> String {
     let mut lines = vec![PROTOCOL_VERSION.to_string()];
-
     if let Some(ref request_id) = response.request_id {
         lines.push(format!("REQUEST_ID {}", percent_encode(request_id.as_str())));
     }
-
     match response.status {
         ResponseStatus::Ok => lines.push("STATUS ok".to_string()),
         ResponseStatus::Error => lines.push("STATUS error".to_string()),
     }
-
     if let Some(retry_after_ms) = response.retry_after_ms {
         lines.push(format!("RETRY_AFTER_MS {retry_after_ms}"));
     }
-
     for warning in &response.warnings {
         lines.push(format!("WARNING {}", percent_encode(warning)));
     }
-
     for change in &response.changes {
         lines.push(serialize_change(change));
     }
-
     if let Some(ref changeset_id) = response.changeset_id {
         lines.push(format!("CHANGESET_ID {}", percent_encode(changeset_id.as_str())));
     }
-
     lines.join("\n") + "\n"
 }
-
 pub fn compute_changeset_id(
     workbook_path: &str,
     workbook_mtime: i64,
@@ -109,7 +95,6 @@ pub fn compute_changeset_id(
     let hash = hasher.finalize();
     format!("{hash:x}")
 }
-
 fn serialize_change(change: &Change) -> String {
     match change {
         Change::SetBold { sheet, cell, bold } => {
@@ -292,7 +277,6 @@ fn serialize_change(change: &Change) -> String {
         }
     }
 }
-
 fn percent_encode(s: &str) -> String {
     let mut encoded = String::new();
     for byte in s.bytes() {
@@ -307,7 +291,6 @@ fn percent_encode(s: &str) -> String {
     }
     encoded
 }
-
 fn percent_decode(s: &str) -> Result<String> {
     let mut decoded = Vec::new();
     let mut bytes = s.bytes();

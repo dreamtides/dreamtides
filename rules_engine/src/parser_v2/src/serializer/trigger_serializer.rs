@@ -1,10 +1,9 @@
 use ability_data::trigger_event::{PlayerTurn, TriggerEvent, TriggerKeyword};
 use ability_data::variable_value::VariableValue;
 
-use super::predicate_serializer;
+use crate::parser_v2::serializer::predicate_serializer;
 use crate::variables::parser_bindings::VariableBindings;
 use crate::variables::parser_substitutions;
-
 pub fn serialize_trigger_event(trigger: &TriggerEvent, bindings: &mut VariableBindings) -> String {
     match trigger {
         TriggerEvent::Keywords(keywords) if keywords.len() == 1 => {
@@ -133,7 +132,6 @@ pub fn serialize_trigger_event(trigger: &TriggerEvent, bindings: &mut VariableBi
         }
     }
 }
-
 pub fn serialize_keyword(keyword: &TriggerKeyword) -> String {
     match keyword {
         TriggerKeyword::Judgment => "Judgment".to_string(),

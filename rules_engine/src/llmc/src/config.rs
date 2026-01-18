@@ -4,10 +4,8 @@ use std::path::{Path, PathBuf};
 
 use anyhow::{Context, Result, bail};
 use serde::{Deserialize, Serialize};
-
 /// Valid Claude Code models
 const VALID_MODELS: &[&str] = &["haiku", "sonnet", "opus"];
-
 /// Global LLMC configuration loaded from ~/llmc/config.toml
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Config {
@@ -17,7 +15,6 @@ pub struct Config {
     #[serde(default)]
     pub workers: HashMap<String, WorkerConfig>,
 }
-
 /// Default values for worker configuration
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct DefaultsConfig {
@@ -33,13 +30,11 @@ pub struct DefaultsConfig {
     pub sound_on_review: bool,
     pub self_review: Option<SelfReviewConfig>,
 }
-
 /// Repository configuration
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct RepoConfig {
     pub source: String,
 }
-
 /// Per-worker configuration
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct WorkerConfig {
@@ -52,7 +47,6 @@ pub struct WorkerConfig {
     #[serde(default)]
     pub self_review: Option<bool>,
 }
-
 /// Configuration for the self-review prompt sent when a worker finishes a task
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SelfReviewConfig {
@@ -62,7 +56,6 @@ pub struct SelfReviewConfig {
     #[serde(default)]
     pub clear: bool,
 }
-
 /// Returns the LLMC root directory (~/llmc)
 pub fn get_llmc_root() -> PathBuf {
     let home = std::env::var("HOME")
@@ -70,12 +63,10 @@ pub fn get_llmc_root() -> PathBuf {
         .expect("Could not determine home directory");
     PathBuf::from(home).join("llmc")
 }
-
 /// Returns the path to the config file (~/llmc/config.toml)
 pub fn get_config_path() -> PathBuf {
     get_llmc_root().join("config.toml")
 }
-
 /// Validates a model string against known Claude Code models
 pub fn validate_model(model: &str) -> Result<()> {
     if !VALID_MODELS.contains(&model) {
@@ -88,15 +79,12 @@ pub fn validate_model(model: &str) -> Result<()> {
     }
     Ok(())
 }
-
 fn default_model() -> String {
     "sonnet".to_string()
 }
-
 fn default_skip_permissions() -> bool {
     true
 }
-
 fn default_allowed_tools() -> Vec<String> {
     vec![
         "Bash".to_string(),
@@ -107,19 +95,15 @@ fn default_allowed_tools() -> Vec<String> {
         "Grep".to_string(),
     ]
 }
-
 fn default_patrol_interval_secs() -> u32 {
     30
 }
-
 fn default_sound_on_review() -> bool {
     true
 }
-
 fn default_excluded_from_pool() -> bool {
     false
 }
-
 impl Default for DefaultsConfig {
     fn default() -> Self {
         DefaultsConfig {
@@ -132,18 +116,14 @@ impl Default for DefaultsConfig {
         }
     }
 }
-
 impl Config {
     /// Loads configuration from the given path
     pub fn load(path: &Path) -> Result<Config> {
         let content = fs::read_to_string(path)
             .with_context(|| format!("Failed to read config file: {}", path.display()))?;
-
         let config: Config = toml::from_str(&content)
             .with_context(|| format!("Failed to parse config file: {}", path.display()))?;
-
         config.validate()?;
-
         Ok(config)
     }
 
@@ -152,14 +132,11 @@ impl Config {
         if self.repo.source.is_empty() {
             bail!("repo.source is required in config.toml");
         }
-
         if self.defaults.patrol_interval_secs == 0 {
             bail!("defaults.patrol_interval_secs must be greater than 0");
         }
-
         validate_model(&self.defaults.model)
             .with_context(|| "Invalid default model in [defaults] section")?;
-
         #[expect(clippy::iter_over_hash_type)]
         for (name, worker_config) in &self.workers {
             if let Some(model) = &worker_config.model {
@@ -167,7 +144,6 @@ impl Config {
                     .with_context(|| format!("Invalid model for worker '{}'", name))?;
             }
         }
-
         Ok(())
     }
 
@@ -176,15 +152,13 @@ impl Config {
         self.workers.get(name)
     }
 }
-
 #[cfg(test)]
 mod tests {
     use std::io::Write;
 
     use tempfile::NamedTempFile;
 
-    use super::*;
-
+    use crate::llmc::config::*;
     #[test]
     fn test_defaults() {
         let defaults = DefaultsConfig::default();
@@ -194,23 +168,19 @@ mod tests {
         assert_eq!(defaults.patrol_interval_secs, 30);
         assert!(defaults.sound_on_review);
     }
-
     #[test]
     fn test_minimal_config() {
         let toml = r#"
             [repo]
             source = "/path/to/repo"
         "#;
-
         let mut file = NamedTempFile::new().unwrap();
         file.write_all(toml.as_bytes()).unwrap();
-
         let config = Config::load(file.path()).unwrap();
         assert_eq!(config.repo.source, "/path/to/repo");
         assert_eq!(config.defaults.model, "sonnet");
         assert!(config.workers.is_empty());
     }
-
     #[test]
     fn test_full_config() {
         let toml = r#"
@@ -233,46 +203,37 @@ mod tests {
             [workers.baker]
             role_prompt = "You are Baker"
         "#;
-
         let mut file = NamedTempFile::new().unwrap();
         file.write_all(toml.as_bytes()).unwrap();
-
         let config = Config::load(file.path()).unwrap();
         assert_eq!(config.defaults.model, "sonnet");
         assert!(!config.defaults.skip_permissions);
         assert_eq!(config.defaults.allowed_tools, vec!["Bash", "Read"]);
         assert_eq!(config.defaults.patrol_interval_secs, 120);
         assert!(!config.defaults.sound_on_review);
-
         assert_eq!(config.repo.source, "/path/to/repo");
-
         let adam = config.get_worker("adam").unwrap();
         assert_eq!(adam.model.as_deref(), Some("opus"));
         assert_eq!(adam.role_prompt.as_deref(), Some("You are Adam"));
         assert!(adam.excluded_from_pool);
         assert_eq!(adam.self_review, Some(true));
-
         let baker = config.get_worker("baker").unwrap();
         assert_eq!(baker.model, None);
         assert_eq!(baker.role_prompt.as_deref(), Some("You are Baker"));
         assert!(!baker.excluded_from_pool);
         assert_eq!(baker.self_review, None);
     }
-
     #[test]
     fn test_missing_repo_source() {
         let toml = r#"
             [defaults]
             model = "opus"
         "#;
-
         let mut file = NamedTempFile::new().unwrap();
         file.write_all(toml.as_bytes()).unwrap();
-
         let result = Config::load(file.path());
         assert!(result.is_err());
     }
-
     #[test]
     fn test_invalid_patrol_interval() {
         let toml = r#"
@@ -282,27 +243,22 @@ mod tests {
             [repo]
             source = "/path/to/repo"
         "#;
-
         let mut file = NamedTempFile::new().unwrap();
         file.write_all(toml.as_bytes()).unwrap();
-
         let result = Config::load(file.path());
         assert!(result.is_err());
         assert!(result.unwrap_err().to_string().contains("patrol_interval_secs"));
     }
-
     #[test]
     fn test_get_llmc_root() {
         let root = get_llmc_root();
         assert!(root.ends_with("llmc"));
     }
-
     #[test]
     fn test_get_config_path() {
         let config_path = get_config_path();
         assert!(config_path.ends_with("llmc/config.toml"));
     }
-
     #[test]
     fn test_invalid_default_model() {
         let toml = r#"
@@ -312,14 +268,11 @@ mod tests {
             [repo]
             source = "/path/to/repo"
         "#;
-
         let mut file = NamedTempFile::new().unwrap();
         file.write_all(toml.as_bytes()).unwrap();
-
         let result = Config::load(file.path());
         assert!(result.is_err());
     }
-
     #[test]
     fn test_invalid_worker_model() {
         let toml = r#"
@@ -329,22 +282,18 @@ mod tests {
             [workers.adam]
             model = "invalid-model"
         "#;
-
         let mut file = NamedTempFile::new().unwrap();
         file.write_all(toml.as_bytes()).unwrap();
-
         let result = Config::load(file.path());
         assert!(result.is_err());
         assert!(result.unwrap_err().to_string().contains("Invalid"));
     }
-
     #[test]
     fn test_valid_models() {
         validate_model("haiku").unwrap();
         validate_model("sonnet").unwrap();
         validate_model("opus").unwrap();
     }
-
     #[test]
     fn test_invalid_model_validation() {
         assert!(validate_model("gpt4").is_err());

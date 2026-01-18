@@ -11,22 +11,18 @@ use reqwest::header::{
 };
 use roxmltree::Document;
 
-use super::rebuild::{self, FileRecord};
-
+use crate::tabula_cli::commands::rebuild_images::rebuild::{self, FileRecord};
 const MAIN_NS: &str = "http://schemas.openxmlformats.org/spreadsheetml/2006/main";
 const REL_NS: &str = "http://schemas.openxmlformats.org/officeDocument/2006/relationships";
 const PACKAGE_REL_NS: &str = "http://schemas.openxmlformats.org/package/2006/relationships";
 const WEB_IMAGE_NS: &str =
     "http://schemas.microsoft.com/office/spreadsheetml/2020/richdatawebimage";
 const RICH_DATA_NS: &str = "http://schemas.microsoft.com/office/spreadsheetml/2017/richdata";
-
 pub type UrlDownloader =
     dyn Fn(&BTreeMap<usize, String>, &mut Vec<String>) -> Result<BTreeMap<usize, Vec<u8>>>;
-
 pub fn rebuild_from_urls(source: &Path) -> Result<()> {
     rebuild_from_urls_with_downloader(source, &download_images)
 }
-
 pub fn rebuild_from_urls_with_downloader(source: &Path, downloader: &UrlDownloader) -> Result<()> {
     let (records, file_order) = rebuild::read_zip(source).with_context(|| {
         format!("File {path} is not a valid XLSM archive", path = source.display())
@@ -34,57 +30,46 @@ pub fn rebuild_from_urls_with_downloader(source: &Path, downloader: &UrlDownload
     let mut record_map: BTreeMap<String, FileRecord> =
         records.into_iter().map(|record| (record.name.clone(), record)).collect();
     let mut warnings = Vec::new();
-
     let workbook_rels = require_record(&record_map, "xl/_rels/workbook.xml.rels")?;
     let workbook_xml = require_record(&record_map, "xl/workbook.xml")?;
     let sheets = parse_sheets(workbook_xml, workbook_rels)?;
-
     let metadata_xml = require_record(&record_map, "xl/metadata.xml")?;
     let rich_values_xml = require_record(&record_map, "xl/richData/rdrichvalue.xml")?;
     let vm_to_identifier = vm_identifier_map(metadata_xml, rich_values_xml)?;
-
     let web_image_xml = require_record(&record_map, "xl/richData/rdRichValueWebImage.xml")?;
     let web_image_rels_xml =
         require_record(&record_map, "xl/richData/_rels/rdRichValueWebImage.xml.rels")?;
     let mut relationships = parse_relationships(web_image_rels_xml)?;
     let web_images = parse_web_images(web_image_xml, &relationships)?;
-
     let cells = parse_image_cells(&sheets, &vm_to_identifier, &record_map, &mut warnings)?;
     if cells.is_empty() {
         bail!("No IMAGE() formulas with metadata were found");
     }
-
     let identifier_urls = compute_urls(source, &cells, &mut warnings)?;
     for idx in 0..web_images.len() {
         if !identifier_urls.contains_key(&idx) {
             warnings.push(format!("Identifier {idx} had no IMAGE() URL; skipped"));
         }
     }
-
     let downloads = downloader(&identifier_urls, &mut warnings)?;
     if !warnings.is_empty() {
         for warning in &warnings {
             eprintln!("warning: {warning}");
         }
     }
-
     if downloads.is_empty() {
         bail!("No images were downloaded from IMAGE() formulas");
     }
-
     apply_downloads(&mut record_map, &web_images, &downloads, &mut warnings)?;
     update_relationship_targets(&mut relationships, &web_images, &identifier_urls);
     write_relationships(&mut record_map, relationships)?;
-
     rebuild::write_zip(source, record_map.into_values().collect(), &file_order)
 }
-
 #[derive(Clone)]
 struct WebImage {
     address_rid: String,
     image_path: String,
 }
-
 #[derive(Clone)]
 struct Relationship {
     id: String,
@@ -92,12 +77,10 @@ struct Relationship {
     type_name: String,
     mode: Option<String>,
 }
-
 struct SheetInfo {
     name: String,
     path: String,
 }
-
 struct ImageCell {
     sheet: String,
     cell_ref: String,
@@ -108,26 +91,22 @@ struct ImageCell {
     cell_col: u32,
     cell_row: u32,
 }
-
 fn require_record<'a>(records: &'a BTreeMap<String, FileRecord>, name: &str) -> Result<&'a [u8]> {
     records
         .get(name)
         .map(|record| record.data.as_slice())
         .ok_or_else(|| anyhow::anyhow!("Spreadsheet is missing entry {}", name))
 }
-
 fn parse_doc(xml: &[u8]) -> Result<Document<'_>> {
     let text = std::str::from_utf8(xml).context("XML data is not valid UTF-8")?;
     Document::parse(text).context("Failed to parse XML")
 }
-
 fn parse_sheets(workbook_xml: &[u8], workbook_rels: &[u8]) -> Result<Vec<SheetInfo>> {
     let relationships = parse_relationships(workbook_rels)?;
     let mut rel_map = HashMap::new();
     for rel in relationships {
         rel_map.insert(rel.id, rel.target);
     }
-
     let doc = parse_doc(workbook_xml)?;
     let mut sheets = Vec::new();
     for node in doc.descendants().filter(|n| n.has_tag_name((MAIN_NS, "sheet"))) {
@@ -142,7 +121,6 @@ fn parse_sheets(workbook_xml: &[u8], workbook_rels: &[u8]) -> Result<Vec<SheetIn
     }
     Ok(sheets)
 }
-
 fn parse_relationships(xml: &[u8]) -> Result<Vec<Relationship>> {
     let doc = parse_doc(xml)?;
     let mut relationships = Vec::new();
@@ -159,7 +137,6 @@ fn parse_relationships(xml: &[u8]) -> Result<Vec<Relationship>> {
     }
     Ok(relationships)
 }
-
 fn parse_web_images(xml: &[u8], relationships: &[Relationship]) -> Result<Vec<WebImage>> {
     let rel_map: HashMap<_, _> = relationships.iter().map(|rel| (rel.id.as_str(), rel)).collect();
     let doc = parse_doc(xml)?;
@@ -187,7 +164,6 @@ fn parse_web_images(xml: &[u8], relationships: &[Relationship]) -> Result<Vec<We
     }
     Ok(images)
 }
-
 fn normalize_media_path(target: &str) -> Result<String> {
     let path = Path::new("xl/richData").join(target);
     let normalized = path.components().fold(PathBuf::new(), |mut acc, comp| {
@@ -200,11 +176,9 @@ fn normalize_media_path(target: &str) -> Result<String> {
     });
     Ok(normalized.to_string_lossy().to_string())
 }
-
 fn vm_identifier_map(metadata_xml: &[u8], rich_values_xml: &[u8]) -> Result<Vec<usize>> {
     let identifiers = parse_rich_value_identifiers(rich_values_xml)?;
     let doc = parse_doc(metadata_xml)?;
-
     let future = doc
         .descendants()
         .find(|n| n.has_tag_name((MAIN_NS, "futureMetadata")))
@@ -222,7 +196,6 @@ fn vm_identifier_map(metadata_xml: &[u8], rich_values_xml: &[u8]) -> Result<Vec<
             .context("rvb index is invalid")?;
         future_to_rv.push(idx);
     }
-
     let value_meta = doc
         .descendants()
         .find(|n| n.has_tag_name((MAIN_NS, "valueMetadata")))
@@ -246,10 +219,8 @@ fn vm_identifier_map(metadata_xml: &[u8], rich_values_xml: &[u8]) -> Result<Vec<
             .with_context(|| format!("Rich value {rv_idx} is out of range"))?;
         vm_to_identifier.push(*identifier);
     }
-
     Ok(vm_to_identifier)
 }
-
 fn parse_rich_value_identifiers(xml: &[u8]) -> Result<Vec<usize>> {
     let doc = parse_doc(xml)?;
     let mut identifiers = Vec::new();
@@ -267,7 +238,6 @@ fn parse_rich_value_identifiers(xml: &[u8]) -> Result<Vec<usize>> {
     }
     Ok(identifiers)
 }
-
 fn parse_image_cells(
     sheets: &[SheetInfo],
     vm_to_identifier: &[usize],
@@ -288,7 +258,6 @@ fn parse_image_cells(
                 shared_formulas.insert(si.to_string(), (text.to_string(), anchor.to_string()));
             }
         }
-
         for node in doc.descendants().filter(|n| n.has_tag_name((MAIN_NS, "c"))) {
             let Some(cell_ref) = node.attribute("r") else { continue };
             let vm_index = match node.attribute("vm") {
@@ -345,11 +314,9 @@ fn parse_image_cells(
             } else {
                 (raw_formula, cell_ref.to_string())
             };
-
             if !formula_text.to_uppercase().contains("IMAGE(") {
                 continue;
             }
-
             let (cell_col, cell_row) = match parse_cell_position(cell_ref) {
                 Ok(pos) => pos,
                 Err(err) => {
@@ -381,7 +348,6 @@ fn parse_image_cells(
     }
     Ok(cells)
 }
-
 fn compute_urls(
     path: &Path,
     cells: &[ImageCell],
@@ -391,7 +357,6 @@ fn compute_urls(
         .with_context(|| format!("Cannot open spreadsheet at {}", path.display()))?;
     let mut ranges: HashMap<String, Range<Data>> = HashMap::new();
     let mut identifier_urls = BTreeMap::new();
-
     for cell in cells {
         if !ranges.contains_key(&cell.sheet) {
             let range = match workbook.worksheet_range(&cell.sheet) {
@@ -427,10 +392,8 @@ fn compute_urls(
             identifier_urls.insert(cell.identifier, url);
         }
     }
-
     Ok(identifier_urls)
 }
-
 fn evaluate_formula(
     formula: &str,
     range: &Range<Data>,
@@ -456,7 +419,6 @@ fn evaluate_formula(
     }
     Ok(output)
 }
-
 fn first_image_argument(formula: &str) -> Result<String> {
     let upper = formula.to_uppercase();
     let start =
@@ -486,25 +448,21 @@ fn first_image_argument(formula: &str) -> Result<String> {
     }
     Ok(argument.trim().to_string())
 }
-
 enum ExprPart {
     Literal(String),
     Reference(CellReference),
 }
-
 struct CellReference {
     col: i32,
     row: i32,
     col_abs: bool,
     row_abs: bool,
 }
-
 fn parse_expression_parts(expr: &str) -> Result<Vec<ExprPart>> {
     let mut parts = Vec::new();
     let mut current = String::new();
     let mut in_quotes = false;
     let mut depth = 0i32;
-
     for ch in expr.chars() {
         if ch == '"' {
             in_quotes = !in_quotes;
@@ -532,7 +490,6 @@ fn parse_expression_parts(expr: &str) -> Result<Vec<ExprPart>> {
     }
     Ok(parts)
 }
-
 fn parse_part(text: &str) -> Result<ExprPart> {
     if text.starts_with('"') && text.ends_with('"') && text.len() >= 2 {
         let inner = &text[1..text.len() - 1];
@@ -541,7 +498,6 @@ fn parse_part(text: &str) -> Result<ExprPart> {
     }
     Ok(ExprPart::Reference(parse_reference(text)?))
 }
-
 fn parse_reference(text: &str) -> Result<CellReference> {
     let mut chars = text.chars().peekable();
     let mut col_abs = false;
@@ -579,7 +535,6 @@ fn parse_reference(text: &str) -> Result<CellReference> {
     let row = row_digits.parse::<i32>().context("Row index is invalid")?;
     Ok(CellReference { col, row, col_abs, row_abs })
 }
-
 fn column_index(text: &str) -> Result<i32> {
     let mut value = 0i32;
     for ch in text.chars() {
@@ -590,7 +545,6 @@ fn column_index(text: &str) -> Result<i32> {
     }
     Ok(value)
 }
-
 fn cell_value(range: &Range<Data>, row: usize, col: usize) -> Result<String> {
     let cell = range.get((row, col)).ok_or_else(|| anyhow::anyhow!("Cell is out of bounds"))?;
     match cell {
@@ -611,7 +565,6 @@ fn cell_value(range: &Range<Data>, row: usize, col: usize) -> Result<String> {
         Data::Error(e) => bail!("Cell contains error {e:?}"),
     }
 }
-
 fn parse_cell_position(cell_ref: &str) -> Result<(u32, u32)> {
     let reference = parse_reference(cell_ref)?;
     if reference.col < 1 || reference.row < 1 {
@@ -619,18 +572,18 @@ fn parse_cell_position(cell_ref: &str) -> Result<(u32, u32)> {
     }
     Ok((reference.col as u32, reference.row as u32))
 }
-
 fn download_images(
     urls: &BTreeMap<usize, String>,
     warnings: &mut Vec<String>,
 ) -> Result<BTreeMap<usize, Vec<u8>>> {
     let mut headers = HeaderMap::new();
-    headers.insert(
-        USER_AGENT,
-        HeaderValue::from_static(
-            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
-        ),
-    );
+    headers
+        .insert(
+            USER_AGENT,
+            HeaderValue::from_static(
+                "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+            ),
+        );
     headers.insert(
         ACCEPT,
         HeaderValue::from_static("image/avif,image/webp,image/apng,image/*,*/*;q=0.8"),
@@ -668,7 +621,6 @@ fn download_images(
     }
     Ok(results)
 }
-
 fn apply_downloads(
     records: &mut BTreeMap<String, FileRecord>,
     web_images: &[WebImage],
@@ -691,7 +643,6 @@ fn apply_downloads(
     }
     Ok(())
 }
-
 fn update_relationship_targets(
     relationships: &mut [Relationship],
     web_images: &[WebImage],
@@ -711,7 +662,6 @@ fn update_relationship_targets(
         }
     }
 }
-
 fn write_relationships(
     records: &mut BTreeMap<String, FileRecord>,
     relationships: Vec<Relationship>,
@@ -724,7 +674,6 @@ fn write_relationships(
     record.data = xml.into_bytes();
     Ok(())
 }
-
 fn render_relationships(relationships: &[Relationship]) -> String {
     let mut xml = String::from(r#"<?xml version="1.0" encoding="UTF-8" standalone="yes"?>"#);
     xml.push_str(
@@ -746,7 +695,6 @@ fn render_relationships(relationships: &[Relationship]) -> String {
     xml.push_str("</Relationships>");
     xml
 }
-
 fn xml_escape(text: &str) -> String {
     text.replace('&', "&amp;")
         .replace('<', "&lt;")

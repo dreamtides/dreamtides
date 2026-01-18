@@ -13,15 +13,14 @@ use tokio::net::TcpListener;
 use tokio::sync::oneshot::{Receiver, Sender};
 use tokio::sync::{Mutex, oneshot};
 
-use super::listener_runner::{self, ListenerContext};
-use super::model::{Response, ResponseStatus};
-use super::server_config::ServerConfig;
-use super::{serialization, server_workbook_snapshot};
 use crate::server::listeners::conditional_formatting::ConditionalFormattingListener;
 use crate::server::listeners::ensure_uuid::EnsureUuidListener;
 use crate::server::listeners::fluent_rules_text::FluentRulesTextListener;
 use crate::server::listeners::partial_formatting::PartialFormattingListener;
-
+use crate::tabula_cli::server::listener_runner::{self, ListenerContext};
+use crate::tabula_cli::server::model::{Response, ResponseStatus};
+use crate::tabula_cli::server::server_config::ServerConfig;
+use crate::tabula_cli::server::{serialization, server_workbook_snapshot};
 pub async fn serve(config: ServerConfig) -> Result<()> {
     let (shutdown_tx, shutdown_rx) = oneshot::channel();
     let state = Arc::new(ServerState {
@@ -41,7 +40,6 @@ pub async fn serve(config: ServerConfig) -> Result<()> {
         .with_context(|| format!("Server failed on {addr}"))?;
     Ok(())
 }
-
 async fn handle_notify(State(state): State<Arc<ServerState>>, body: Bytes) -> impl IntoResponse {
     let response = match serialization::parse_request(&body) {
         Ok(request) => {
@@ -55,20 +53,17 @@ async fn handle_notify(State(state): State<Arc<ServerState>>, body: Bytes) -> im
                     cached_response.clone(),
                 );
             }
-
             let workbook_path = request.workbook_path.clone();
             let expected_metadata = server_workbook_snapshot::FileMetadata {
                 size: request.workbook_size,
                 mtime: request.workbook_mtime,
             };
-
             let snapshot_result = tokio::task::spawn_blocking(move || {
                 let path = std::path::Path::new(&workbook_path);
                 server_workbook_snapshot::read_snapshot(path, Some(expected_metadata))
             })
             .await
             .unwrap_or_else(|e| Err(anyhow::anyhow!("Task join error: {}", e)));
-
             match snapshot_result {
                 Ok(snapshot) => {
                     let context = ListenerContext {
@@ -76,18 +71,15 @@ async fn handle_notify(State(state): State<Arc<ServerState>>, body: Bytes) -> im
                         workbook_path: request.workbook_path.clone(),
                         changed_range: request.changed_range.clone(),
                     };
-
                     let listeners = build_listeners();
                     let listener_result =
                         listener_runner::run_listeners(&listeners, &snapshot, &context);
-
                     let changeset_id = serialization::compute_changeset_id(
                         &request.workbook_path,
                         request.workbook_mtime,
                         request.workbook_size,
                         &listener_result.changes,
                     );
-
                     let response = Response {
                         request_id: Some(request.request_id),
                         status: ResponseStatus::Ok,
@@ -96,7 +88,6 @@ async fn handle_notify(State(state): State<Arc<ServerState>>, body: Bytes) -> im
                         changes: listener_result.changes,
                         changeset_id: Some(changeset_id.clone()),
                     };
-
                     let serialized = serialization::serialize_response(&response);
                     cache.insert(cache_key, serialized.clone());
                     response
@@ -120,17 +111,14 @@ async fn handle_notify(State(state): State<Arc<ServerState>>, body: Bytes) -> im
             changeset_id: None,
         },
     };
-
     if state.once
         && let Some(sender) = state.shutdown.lock().await.take()
     {
         let _ = sender.send(());
     }
-
     let serialized = serialization::serialize_response(&response);
     (StatusCode::OK, [(header::CONTENT_TYPE, "text/plain; charset=utf-8")], serialized)
 }
-
 async fn shutdown_signal(once: bool, shutdown_rx: Receiver<()>) {
     if once {
         let _ = shutdown_rx.await;
@@ -138,14 +126,12 @@ async fn shutdown_signal(once: bool, shutdown_rx: Receiver<()>) {
         future::pending::<()>().await;
     }
 }
-
 fn build_listeners() -> Vec<Box<dyn super::listener_runner::Listener>> {
     let mut listeners: Vec<Box<dyn super::listener_runner::Listener>> = vec![
         Box::new(ConditionalFormattingListener),
         Box::new(PartialFormattingListener),
         Box::new(EnsureUuidListener),
     ];
-
     match FluentRulesTextListener::new() {
         Ok(listener) => {
             listeners.push(Box::new(listener));
@@ -154,10 +140,8 @@ fn build_listeners() -> Vec<Box<dyn super::listener_runner::Listener>> {
             eprintln!("Failed to initialize FluentRulesTextListener: {e}");
         }
     }
-
     listeners
 }
-
 struct ServerState {
     once: bool,
     shutdown: Mutex<Option<Sender<()>>>,

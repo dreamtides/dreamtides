@@ -8,18 +8,16 @@ use tempfile::{Builder, NamedTempFile};
 use zip::write::FileOptions;
 use zip::{CompressionMethod, DateTime, ZipArchive, ZipWriter};
 
-use super::{toml_compare, workbook_snapshot, xlsm_toml_compare};
 use crate::commands::rebuild_images::rebuild;
 use crate::commands::{build_xls, strip_images};
 use crate::core::{column_names, excel_reader, paths, toml_data};
-
+use crate::tabula_cli::commands::validate::{toml_compare, workbook_snapshot, xlsm_toml_compare};
 #[derive(Clone, Copy)]
 pub struct ValidateConfig {
     pub strip_images: bool,
     pub report_all: bool,
     pub verbose: bool,
 }
-
 pub fn validate(
     config: ValidateConfig,
     toml_dir: Option<PathBuf>,
@@ -39,7 +37,6 @@ pub fn validate(
         validate_standard(config, &toml_dir, &template, temp_dir.path())
     }
 }
-
 fn validate_standard(
     config: ValidateConfig,
     toml_dir: &Path,
@@ -54,7 +51,6 @@ fn validate_standard(
     }
     Ok(())
 }
-
 fn validate_with_strip_images(
     config: ValidateConfig,
     toml_dir: &Path,
@@ -84,7 +80,6 @@ fn validate_with_strip_images(
     }
     Ok(())
 }
-
 fn run_roundtrip(
     config: ValidateConfig,
     toml_dir: &Path,
@@ -105,21 +100,18 @@ fn run_roundtrip(
     workbook_snapshot::compare_workbooks(template, &output_path, config, errors)?;
     Ok(output_path)
 }
-
 fn resolve_toml_dir(toml_dir: Option<PathBuf>) -> Result<PathBuf> {
     match toml_dir {
         Some(path) => Ok(path),
         None => paths::default_toml_dir(),
     }
 }
-
 fn resolve_xlsm_path(xlsm_path: Option<PathBuf>) -> Result<PathBuf> {
     match xlsm_path {
         Some(path) => Ok(path),
         None => paths::default_xlsm_path(),
     }
 }
-
 fn extract_tables_to_dir(xlsm_path: &Path, output_dir: &Path) -> Result<()> {
     let tables = excel_reader::extract_tables(xlsm_path)?;
     fs::create_dir_all(output_dir)
@@ -134,7 +126,6 @@ fn extract_tables_to_dir(xlsm_path: &Path, output_dir: &Path) -> Result<()> {
     }
     Ok(())
 }
-
 fn output_file_name(template: &Path, prefix: &str) -> String {
     let base = template
         .file_name()
@@ -142,7 +133,6 @@ fn output_file_name(template: &Path, prefix: &str) -> String {
         .unwrap_or_else(|| "output.xlsm".to_string());
     if prefix.is_empty() { base } else { format!("{prefix}_{base}") }
 }
-
 fn compare_media_files(
     original: &Path,
     rebuilt: &Path,
@@ -185,7 +175,6 @@ fn compare_media_files(
     }
     Ok(())
 }
-
 fn ensure_media_entries(target: &Path, expected: &BTreeMap<String, Vec<u8>>) -> Result<()> {
     let (records, mut order) = read_zip_records(target)?;
     let mut record_map: BTreeMap<_, _> =
@@ -216,7 +205,6 @@ fn ensure_media_entries(target: &Path, expected: &BTreeMap<String, Vec<u8>>) -> 
         Ok(())
     }
 }
-
 fn copy_missing_entries(source: &Path, target: &Path) -> Result<()> {
     let (target_records, mut target_order) = read_zip_records(target)?;
     let target_names: BTreeSet<_> = target_records.iter().map(|r| r.name.clone()).collect();
@@ -241,7 +229,6 @@ fn copy_missing_entries(source: &Path, target: &Path) -> Result<()> {
     }
     Ok(())
 }
-
 fn media_files(path: &Path) -> Result<BTreeMap<String, Vec<u8>>> {
     let file = fs::File::open(path)
         .with_context(|| format!("Cannot open spreadsheet at {}", path.display()))?;
@@ -265,7 +252,6 @@ fn media_files(path: &Path) -> Result<BTreeMap<String, Vec<u8>>> {
     }
     Ok(map)
 }
-
 #[derive(Clone)]
 struct ZipRecord {
     name: String,
@@ -273,7 +259,6 @@ struct ZipRecord {
     compression: CompressionMethod,
     is_dir: bool,
 }
-
 fn read_zip_records(path: &Path) -> Result<(Vec<ZipRecord>, Vec<String>)> {
     let file = fs::File::open(path)
         .with_context(|| format!("Cannot open spreadsheet at {}", path.display()))?;
@@ -302,7 +287,6 @@ fn read_zip_records(path: &Path) -> Result<(Vec<ZipRecord>, Vec<String>)> {
     }
     Ok((records, order))
 }
-
 fn write_zip_records(path: &Path, records: Vec<ZipRecord>, order: &[String]) -> Result<()> {
     let parent = path.parent().unwrap_or(Path::new("."));
     let temp = NamedTempFile::new_in(parent)
@@ -334,7 +318,6 @@ fn write_zip_records(path: &Path, records: Vec<ZipRecord>, order: &[String]) -> 
     temp.persist(path)?;
     Ok(())
 }
-
 pub(super) fn record_error(errors: &mut Vec<String>, report_all: bool, message: String) -> bool {
     errors.push(message);
     !report_all
