@@ -8,6 +8,7 @@ use tracing::{debug, error, info, warn};
 
 use crate::claim::stale_cleanup;
 use crate::cli::argument_parser::{Command, Lat};
+use crate::cli::commands::check_command::check_executor;
 use crate::cli::commands::list_command::list_executor;
 use crate::cli::commands::ready_command::ready_executor;
 use crate::cli::commands::show_command::show_executor;
@@ -437,11 +438,9 @@ fn dispatch_command(context: CommandContext, command: Command) -> LatticeResult<
                 reason: "fmt command not yet implemented".to_string(),
             })
         }
-        Command::Check(_args) => {
+        Command::Check(args) => {
             info!("Dispatching to check command");
-            Err(LatticeError::OperationNotAllowed {
-                reason: "check command not yet implemented".to_string(),
-            })
+            check_executor::execute(context, args)
         }
         Command::Doctor(_args) => {
             info!("Dispatching to doctor command");
