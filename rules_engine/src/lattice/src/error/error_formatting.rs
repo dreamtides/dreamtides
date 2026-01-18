@@ -91,6 +91,12 @@ pub fn suggestion(error: &LatticeError) -> Option<String> {
         LatticeError::PathAlreadyExists { path } => {
             Some(format!("Remove or rename the existing file at {path}", path = path.display()))
         }
+        LatticeError::FmtCheckFailed { .. } => {
+            Some("Run 'lat fmt' to format the files".to_string())
+        }
+        LatticeError::FmtErrors { .. } => {
+            Some("Check the error messages above and fix the issues".to_string())
+        }
     }
 }
 
@@ -148,7 +154,9 @@ pub fn error_path(error: &LatticeError) -> Option<&PathBuf> {
         | LatticeError::LabelNotFound { .. }
         | LatticeError::GitError { .. }
         | LatticeError::DatabaseError { .. }
-        | LatticeError::IndexCorrupted { .. } => None,
+        | LatticeError::IndexCorrupted { .. }
+        | LatticeError::FmtCheckFailed { .. }
+        | LatticeError::FmtErrors { .. } => None,
     }
 }
 

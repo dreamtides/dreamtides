@@ -126,6 +126,16 @@ pub enum LatticeError {
 
     #[error("Index is corrupted: {reason}")]
     IndexCorrupted { reason: String },
+
+    // ========================================================================
+    // Formatting Errors (Exit Code 1 for check mode, 2 for errors)
+    // Used by the fmt command.
+    // ========================================================================
+    #[error("{count} file(s) need formatting")]
+    FmtCheckFailed { count: usize },
+
+    #[error("{count} error(s) occurred during formatting")]
+    FmtErrors { count: usize },
 }
 
 /// Error categories for structured output.
@@ -178,6 +188,9 @@ impl LatticeError {
             | LatticeError::GitError { .. }
             | LatticeError::DatabaseError { .. }
             | LatticeError::IndexCorrupted { .. } => exit_codes::USER_INPUT_ERROR,
+
+            LatticeError::FmtCheckFailed { .. } => exit_codes::CHECK_FAILED,
+            LatticeError::FmtErrors { .. } => exit_codes::VALIDATION_ERROR,
         }
     }
 
@@ -218,6 +231,8 @@ impl LatticeError {
             LatticeError::GitError { .. } => "E031",
             LatticeError::DatabaseError { .. } => "E032",
             LatticeError::IndexCorrupted { .. } => "E033",
+            LatticeError::FmtCheckFailed { .. } => "E035",
+            LatticeError::FmtErrors { .. } => "E036",
         }
     }
 

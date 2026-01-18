@@ -23,6 +23,11 @@ pub const USER_INPUT_ERROR: u8 = 3;
 /// A requested resource does not exist.
 pub const NOT_FOUND: u8 = 4;
 
+/// Check mode found changes needed (used by `lat fmt --check`).
+///
+/// Files need formatting but weren't modified due to check mode.
+pub const CHECK_FAILED: u8 = 1;
+
 pub fn success() -> ExitCode {
     ExitCode::from(SUCCESS)
 }
