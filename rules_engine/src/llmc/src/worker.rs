@@ -94,6 +94,20 @@ pub fn apply_transition(worker: &mut WorkerRecord, transition: WorkerTransition)
     }
     match &transition {
         WorkerTransition::ToIdle => {
+            let had_stale_state = !worker.current_prompt.is_empty()
+                || worker.prompt_cmd.is_some()
+                || worker.commit_sha.is_some()
+                || worker.self_review;
+            if had_stale_state {
+                tracing::info!(
+                    worker = %worker.name,
+                    had_prompt = !worker.current_prompt.is_empty(),
+                    prompt_cmd = ?worker.prompt_cmd,
+                    commit_sha = ?worker.commit_sha,
+                    self_review = worker.self_review,
+                    "Clearing stale worker state during transition to Idle"
+                );
+            }
             worker.current_prompt.clear();
             worker.prompt_cmd = None;
             worker.commit_sha = None;

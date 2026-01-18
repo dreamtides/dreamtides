@@ -73,13 +73,24 @@ pub fn run_start(
     // but has commits ahead of origin/master, those are leftover from a prior task
     // that was already merged (or rejected). Reset to origin/master to start clean.
     if git::has_commits_ahead_of(&worktree_path, "origin/master")? {
-        tracing::info!(
+        let stale_head = git::get_head_commit(&worktree_path)?;
+        let stale_msg = git::get_commit_message(&worktree_path, &stale_head)
+            .unwrap_or_else(|_| "<unknown>".to_string());
+        let first_line = stale_msg.lines().next().unwrap_or("<empty>");
+        let origin_master = git::get_head_commit_of_ref(&worktree_path, "origin/master")?;
+
+        tracing::warn!(
             worker = %worker_name,
-            "Worker has stale commits from previous task, resetting to origin/master"
+            stale_commit_sha = %stale_head,
+            stale_commit_msg = %first_line,
+            origin_master = %origin_master,
+            "Worker has stale commits from previous task, resetting to origin/master before starting new task"
         );
         if !json {
             println!(
-                "  Resetting worker to origin/master (removing stale commits from previous task)..."
+                "  Resetting worker to origin/master (removing stale commit: {} - {})",
+                &stale_head[..8],
+                first_line
             );
         }
         git::reset_to_ref(&worktree_path, "origin/master")?;

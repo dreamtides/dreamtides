@@ -611,19 +611,26 @@ impl Patrol {
         );
 
         if has_commits {
+            let commit_sha = git::get_head_commit(worktree_path)?;
+            let commit_msg = git::get_commit_message(worktree_path, &commit_sha)
+                .unwrap_or_else(|_| "<unknown>".to_string());
+            let first_line = commit_msg.lines().next().unwrap_or("<empty>");
+
             if git::has_uncommitted_changes(worktree_path)? {
                 tracing::info!(
-                    "Worker {} has commits and uncommitted changes, amending before transitioning to needs_review",
-                    session_id
+                    worker = %session_id,
+                    commit_sha = %commit_sha,
+                    commit_msg = %first_line,
+                    "Worker has commits and uncommitted changes, amending before transitioning to needs_review"
                 );
                 git::amend_uncommitted_changes(worktree_path)?;
             }
 
-            let commit_sha = git::get_head_commit(worktree_path)?;
             tracing::info!(
-                "Worker {} has commits ahead, transitioning to needs_review (sha: {})",
-                session_id,
-                commit_sha
+                worker = %session_id,
+                commit_sha = %commit_sha,
+                commit_msg = %first_line,
+                "Worker has commits ahead of origin/master, transitioning to needs_review"
             );
             return Ok(WorkerTransition::ToNeedsReview { commit_sha });
         }
@@ -716,11 +723,16 @@ impl Patrol {
 
             let has_commits_ahead = git::has_commits_ahead_of(&worktree_path, "origin/master")?;
             let worker_head = git::get_head_commit(&worktree_path)?;
+            let origin_master_sha = git::get_head_commit_of_ref(&worktree_path, "origin/master")?;
 
             if !has_commits_ahead {
+                let expected_sha = worker.commit_sha.as_deref().unwrap_or("<none>");
                 tracing::info!(
                     worker = %worker_name,
                     worker_head = %worker_head,
+                    origin_master = %origin_master_sha,
+                    expected_commit_sha = %expected_sha,
+                    heads_match = (worker_head == origin_master_sha),
                     "Worker is in needs_review but has no commits ahead of origin/master - work was already merged, resetting to idle"
                 );
                 let worker_mut = state.get_worker_mut(&worker_name).unwrap();
@@ -729,7 +741,6 @@ impl Patrol {
                 continue;
             }
 
-            let origin_master_sha = git::get_head_commit_of_ref(&worktree_path, "origin/master")?;
             let merge_base = git::get_merge_base(&worktree_path, "HEAD", "origin/master")?;
 
             tracing::debug!(
