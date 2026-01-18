@@ -3,6 +3,7 @@ mod commands;
 mod config;
 mod editor;
 mod git;
+mod ipc;
 mod lock;
 mod logging;
 mod patrol;
@@ -14,13 +15,13 @@ mod worker;
 
 use anyhow::Result;
 use clap::Parser;
-use cli::{Cli, Commands, ConfigAction};
+use cli::{Cli, Commands, ConfigAction, HookAction};
 use llmc::json_output;
 
 use crate::commands::review::ReviewInterface;
 use crate::commands::{
-    accept, add, attach, config as config_cmd, console, doctor, down, init, message, nuke, peek,
-    pick, rebase, reject, reset, review, start, status, up,
+    accept, add, attach, config as config_cmd, console, doctor, down, hook, init, message, nuke,
+    peek, pick, rebase, reject, reset, review, start, status, up,
 };
 use crate::logging::config as log_config;
 
@@ -53,6 +54,7 @@ async fn main() -> Result<()> {
         Commands::Pick { .. } => "pick",
         Commands::Config { .. } => "config",
         Commands::Schema => "schema",
+        Commands::Hook { .. } => "hook",
     };
 
     tracing::info!(operation = "cli_command", command = command_name, "Command started");
@@ -104,6 +106,14 @@ async fn main() -> Result<()> {
             json_output::print_json_schema();
             Ok(())
         }
+        Commands::Hook { action } => match action {
+            HookAction::Stop { worker } => hook::run_hook_stop(&worker),
+            HookAction::SessionStart { worker } => hook::run_hook_session_start(&worker),
+            HookAction::SessionEnd { worker, reason } => {
+                hook::run_hook_session_end(&worker, &reason)
+            }
+            HookAction::PostBash { worker } => hook::run_hook_post_bash(&worker),
+        },
     };
 
     let duration_ms = start_time.elapsed().as_millis() as u64;

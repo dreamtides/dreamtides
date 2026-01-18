@@ -61,6 +61,7 @@ pub fn run_add(
     create_worktree_for_worker(&llmc_root, &branch_name, &worktree_path)?;
     copy_tabula_to_worktree(&llmc_root, &worktree_path)?;
     create_serena_project(&worktree_path, name)?;
+    create_claude_hook_settings(&worktree_path, name)?;
     let now = SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs();
     let worker_record = WorkerRecord {
         name: name.to_string(),
@@ -144,6 +145,7 @@ pub fn recreate_missing_worktree(
     create_worktree_for_worker(&llmc_root, branch_name, worktree_path)?;
     copy_tabula_to_worktree(&llmc_root, worktree_path)?;
     create_serena_project(worktree_path, worker_name)?;
+    create_claude_hook_settings(worktree_path, worker_name)?;
     Ok(())
 }
 pub fn copy_tabula_to_worktree(repo: &Path, worktree_path: &Path) -> Result<()> {
@@ -200,6 +202,54 @@ pub fn is_daemon_running() -> bool {
         .ok()
         .map(|sessions| sessions.iter().any(|s| s.starts_with("llmc-")))
         .unwrap_or(false)
+}
+
+fn create_claude_hook_settings(worktree_path: &Path, worker_name: &str) -> Result<()> {
+    let claude_dir = worktree_path.join(".claude");
+    let settings_path = claude_dir.join("settings.json");
+    fs::create_dir_all(&claude_dir).context("Failed to create .claude directory")?;
+    let llmc_bin = std::env::current_exe()
+        .unwrap_or_else(|_| PathBuf::from("llmc"))
+        .to_string_lossy()
+        .to_string();
+    let settings = serde_json::json!({
+        "hooks": {
+            "Stop": [{
+                "hooks": [{
+                    "type": "command",
+                    "command": format!("{} hook stop --worker {}", llmc_bin, worker_name),
+                    "timeout": 5
+                }]
+            }],
+            "SessionStart": [{
+                "hooks": [{
+                    "type": "command",
+                    "command": format!("{} hook session-start --worker {}", llmc_bin, worker_name),
+                    "timeout": 5
+                }]
+            }],
+            "SessionEnd": [{
+                "hooks": [{
+                    "type": "command",
+                    "command": format!("{} hook session-end --worker {} --reason \"session_end\"", llmc_bin, worker_name),
+                    "timeout": 5
+                }]
+            }],
+            "PostToolUse": [{
+                "matcher": "Bash",
+                "hooks": [{
+                    "type": "command",
+                    "command": format!("{} hook post-bash --worker {}", llmc_bin, worker_name),
+                    "timeout": 5
+                }]
+            }]
+        }
+    });
+    let content =
+        serde_json::to_string_pretty(&settings).context("Failed to serialize hook settings")?;
+    fs::write(&settings_path, content).context("Failed to write .claude/settings.json")?;
+    println!("Created Claude hook settings for worker '{}'", worker_name);
+    Ok(())
 }
 /// Registers a project path in Serena's global config
 /// (~/.serena/serena_config.yml)

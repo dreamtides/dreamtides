@@ -5,6 +5,7 @@ pub mod config;
 pub mod console;
 pub mod doctor;
 pub mod down;
+pub mod hook;
 pub mod init;
 pub mod message;
 pub mod nuke;

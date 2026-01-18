@@ -5,9 +5,12 @@ use std::thread;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 use anyhow::{Context, Result, bail};
+use tokio::sync::mpsc::Receiver;
 
 use crate::commands::add;
 use crate::config::{self, Config};
+use crate::ipc::messages::HookMessage;
+use crate::ipc::socket;
 use crate::lock::StateLock;
 use crate::patrol::Patrol;
 use crate::state::{self, State, WorkerStatus};
@@ -40,6 +43,21 @@ pub fn run_up(no_patrol: bool, verbose: bool, force: bool) -> Result<()> {
     reconcile_and_start_workers(&config, &mut state, verbose)?;
     state.save(&state_path)?;
     println!("✓ All workers started");
+    let socket_path = socket::get_socket_path();
+    let ipc_receiver = match socket::spawn_ipc_listener(socket_path.clone()) {
+        Ok(rx) => {
+            println!("✓ IPC listener started at {}", socket_path.display());
+            Some(rx)
+        }
+        Err(e) => {
+            tracing::warn!("Failed to start IPC listener (daemon continuing without hooks): {}", e);
+            eprintln!(
+                "Warning: Failed to start IPC listener: {}\nDaemon will continue without hook support.",
+                e
+            );
+            None
+        }
+    };
     println!("Entering main loop (Ctrl-C to stop)...\n");
     let shutdown = Arc::new(AtomicBool::new(false));
     let shutdown_clone = Arc::clone(&shutdown);
@@ -48,7 +66,7 @@ pub fn run_up(no_patrol: bool, verbose: bool, force: bool) -> Result<()> {
         shutdown_clone.store(true, Ordering::SeqCst);
     })
     .context("Failed to set Ctrl-C handler")?;
-    run_main_loop(no_patrol, verbose, shutdown, &config, &mut state, &state_path)?;
+    run_main_loop(no_patrol, verbose, shutdown, &config, &mut state, &state_path, ipc_receiver)?;
     println!("✓ LLMC daemon stopped");
     Ok(())
 }
@@ -356,6 +374,7 @@ fn run_main_loop(
     config: &Config,
     state: &mut State,
     state_path: &Path,
+    mut ipc_receiver: Option<Receiver<HookMessage>>,
 ) -> Result<()> {
     let mut config = config.clone();
     let patrol = Patrol::new(&config);
@@ -367,6 +386,14 @@ fn run_main_loop(
     let error_warning_interval = Duration::from_secs(300);
     while !shutdown.load(Ordering::SeqCst) {
         thread::sleep(Duration::from_secs(1));
+        if let Some(ref mut rx) = ipc_receiver {
+            while let Ok(msg) = rx.try_recv() {
+                tracing::info!("Received hook event: {:?} (id: {})", msg.event, msg.id);
+                if verbose {
+                    println!("  [hook] Received event: {:?}", msg.event);
+                }
+            }
+        }
         let mut iteration_had_error = false;
         match StateLock::acquire() {
             Ok(_lock) => {

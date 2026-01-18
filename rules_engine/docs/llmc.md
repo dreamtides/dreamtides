@@ -43,6 +43,7 @@ synchronized with the master branch.
 ~/llmc/                           # LLMC root directory
 ├── config.toml                   # Global configuration
 ├── state.json                    # Worker registry and state
+├── llmc.sock                     # Unix socket for hook IPC (runtime)
 ├── logs/                         # Per-worker logs
 │   └── <worker>.log
 ├── .worktrees/                   # Git worktrees (one per worker)
@@ -824,6 +825,10 @@ rules_engine/src/llmc/
     │   ├── mod.rs
     │   ├── session.rs    # Session management
     │   └── sender.rs     # Reliable input sending
+    ├── ipc/
+    │   ├── mod.rs
+    │   ├── messages.rs   # Hook event types
+    │   └── socket.rs     # Unix socket listener/client
     ├── logging/
     │   ├── mod.rs
     │   ├── types.rs      # Log entry types
@@ -856,7 +861,8 @@ rules_engine/src/llmc/
         ├── doctor.rs
         ├── config.rs
         ├── peek.rs
-        └── pick.rs
+        ├── pick.rs
+        └── hook.rs           # Hook callbacks (internal)
 ```
 
 ### Dependencies

@@ -288,6 +288,43 @@ pub enum Commands {
 
     /// Show JSON schema documentation for all commands
     Schema,
+
+    /// Hook callback from Claude Code (internal use)
+    Hook {
+        #[command(subcommand)]
+        action: HookAction,
+    },
+}
+
+#[derive(Subcommand)]
+pub enum HookAction {
+    /// Notify daemon that a worker session stopped
+    Stop {
+        /// Worker name
+        #[arg(long)]
+        worker: String,
+    },
+    /// Notify daemon of session start
+    SessionStart {
+        /// Worker name
+        #[arg(long)]
+        worker: String,
+    },
+    /// Notify daemon of session end
+    SessionEnd {
+        /// Worker name
+        #[arg(long)]
+        worker: String,
+        /// Reason for session end
+        #[arg(long, default_value = "unknown")]
+        reason: String,
+    },
+    /// Notify daemon of bash command completion
+    PostBash {
+        /// Worker name
+        #[arg(long)]
+        worker: String,
+    },
 }
 
 #[derive(Subcommand)]
