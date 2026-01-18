@@ -1,3 +1,21 @@
+//! Query and update functions for the `index_metadata` table.
+//!
+//! This module provides functions to read and write index metadata, which
+//! tracks the state of the SQLite index relative to the git repository.
+//!
+//! # Index Metadata Fields
+//!
+//! - **schema_version**: Current schema version for migration compatibility
+//! - **last_commit**: Git commit hash that the index was last synced to
+//! - **last_indexed**: Timestamp of the last successful index update
+//!
+//! # Usage
+//!
+//! These functions are primarily used by the reconciliation system to:
+//! - Determine if the index is up-to-date (fast-path check)
+//! - Record successful sync operations
+//! - Detect schema version mismatches requiring full rebuild
+
 use chrono::{DateTime, Utc};
 use rusqlite::Connection;
 use tracing::debug;

@@ -1,3 +1,22 @@
+//! Persistent client counter storage for ID generation.
+//!
+//! This module manages the `client_counters` table, which stores the next
+//! available document counter for each client ID. Each Lattice installation
+//! has a unique client ID, and counters are used to generate unique document
+//! IDs.
+//!
+//! # Atomic Operations
+//!
+//! The [`get_and_increment`] function uses SQLite's UPSERT with RETURNING to
+//! provide atomic get-and-increment semantics, preventing race conditions
+//! when multiple processes generate IDs concurrently.
+//!
+//! # Counter Recovery
+//!
+//! When a repository is re-cloned, counters can be recovered by scanning
+//! existing documents and using [`set_counter_if_higher`] to ensure the
+//! counter is always greater than any existing document's counter value.
+
 use rusqlite::{Connection, OptionalExtension};
 use tracing::debug;
 

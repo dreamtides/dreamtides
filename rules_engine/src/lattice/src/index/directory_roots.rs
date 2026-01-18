@@ -1,3 +1,22 @@
+//! Hierarchy queries for root documents and directory structure.
+//!
+//! This module manages the `directory_roots` table, which tracks root documents
+//! (documents whose filename matches their containing directory) and their
+//! hierarchical relationships.
+//!
+//! # Root Documents
+//!
+//! A root document (e.g., `api/api.md`) serves as the parent for all other
+//! documents in its directory tree. The `directory_roots` table caches this
+//! hierarchy for efficient ancestor and descendant queries.
+//!
+//! # Template Composition
+//!
+//! The [`get_ancestors`] function is designed for template composition, where
+//! context and acceptance criteria from ancestor root documents are composed
+//! into descendant tasks. Ancestors are returned in root-to-parent order for
+//! proper composition semantics.
+
 use rusqlite::{Connection, OptionalExtension};
 use tracing::debug;
 

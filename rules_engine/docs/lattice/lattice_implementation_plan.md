@@ -379,7 +379,7 @@ Design: UI Design](lattice_design.md#ui-design)
 
 ---
 
-## Feature: Index Core (Continued) [ONGOING]
+## Feature: Index Core (Continued) [DONE]
 
 **Goal:** Additional Index Core functionality discovered during post-implementation
 review that supports Reconciliation and other features.
@@ -429,7 +429,7 @@ review that supports Reconciliation and other features.
 #### I12: Document Types Documentation
 **Files:** `index/document_types.rs`
 
-- Add module documentation explaining `IndexedDocument` vs parsed `Document`
+- Add module documentation explaining `DocumentRow` vs parsed `Document`
 - Document the separation between index cache and full document parsing
 
 #### I13: Document Filter Documentation
