@@ -70,25 +70,11 @@ pub fn output_json(
     Ok(())
 }
 
-/// Formats a document in rich format: `LXXXXX [bug/P1] name - description`
-///
-/// For closed tasks: `LXXXXX [task/P2/closed] name - description`
-/// For knowledge base: `LXXXXX [doc] name - description`
-fn format_rich(doc: &DocumentRow) -> String {
-    let type_indicator = format_type_indicator(doc);
-    format!("{} [{}] {} - {}", doc.id, type_indicator, doc.name, doc.description)
-}
-
-/// Formats a document in compact format: `LXXXXX  name`
-fn format_compact(doc: &DocumentRow) -> String {
-    format!("{}  {}", doc.id, doc.name)
-}
-
 /// Formats the type indicator for display.
 ///
 /// - Tasks: `bug/P1` or `task/P2/closed`
 /// - Knowledge base: `doc`
-fn format_type_indicator(doc: &DocumentRow) -> String {
+pub fn format_type_indicator(doc: &DocumentRow) -> String {
     match doc.task_type {
         Some(task_type) => {
             let type_str = format_task_type(task_type);
@@ -103,18 +89,32 @@ fn format_type_indicator(doc: &DocumentRow) -> String {
     }
 }
 
-fn format_priority(priority: Option<u8>) -> String {
+pub fn format_priority(priority: Option<u8>) -> String {
     match priority {
         Some(p) => format!("P{p}"),
         None => "P2".to_string(),
     }
 }
 
-fn format_task_type(task_type: TaskType) -> String {
+pub fn format_task_type(task_type: TaskType) -> String {
     match task_type {
         TaskType::Bug => "bug".to_string(),
         TaskType::Feature => "feature".to_string(),
         TaskType::Task => "task".to_string(),
         TaskType::Chore => "chore".to_string(),
     }
+}
+
+/// Formats a document in rich format: `LXXXXX [bug/P1] name - description`
+///
+/// For closed tasks: `LXXXXX [task/P2/closed] name - description`
+/// For knowledge base: `LXXXXX [doc] name - description`
+fn format_rich(doc: &DocumentRow) -> String {
+    let type_indicator = format_type_indicator(doc);
+    format!("{} [{}] {} - {}", doc.id, type_indicator, doc.name, doc.description)
+}
+
+/// Formats a document in compact format: `LXXXXX  name`
+fn format_compact(doc: &DocumentRow) -> String {
+    format!("{}  {}", doc.id, doc.name)
 }
