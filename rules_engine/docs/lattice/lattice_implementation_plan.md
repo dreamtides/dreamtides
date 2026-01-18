@@ -536,7 +536,7 @@ integrates those functions into the reconciliation workflow.
 
 ---
 
-## Feature: Link System
+## Feature: Link System [ONGOING]
 
 **Goal:** Extract, normalize, and track links between documents.
 
@@ -593,7 +593,7 @@ integrates those functions into the reconciliation workflow.
 
 ---
 
-## Feature: Task System
+## Feature: Task System [ONGOING]
 
 **Goal:** Task types, states, dependencies, and ready calculation.
 
@@ -1139,7 +1139,7 @@ Linking System](appendix_linking_system.md)
 
 ---
 
-## Feature: Claim System
+## Feature: Claim System [ONGOING]
 
 **Goal:** Local work tracking without git-tracked state.
 
