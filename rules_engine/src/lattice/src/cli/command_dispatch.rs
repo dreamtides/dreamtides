@@ -10,7 +10,9 @@ use crate::claim::stale_cleanup;
 use crate::cli::argument_parser::{Command, Lat};
 use crate::cli::commands::ready_command::ready_executor;
 use crate::cli::commands::show_command::show_executor;
-use crate::cli::commands::{claim_command, create_command, generate_ids, track_command};
+use crate::cli::commands::{
+    claim_command, create_command, generate_ids, track_command, update_command,
+};
 use crate::cli::global_options::GlobalOptions;
 use crate::config::config_loader;
 use crate::config::config_schema::Config;
@@ -282,11 +284,9 @@ fn dispatch_command(context: CommandContext, command: Command) -> LatticeResult<
             info!("Dispatching to create command");
             create_command::execute(context, args)
         }
-        Command::Update(_args) => {
+        Command::Update(args) => {
             info!("Dispatching to update command");
-            Err(LatticeError::OperationNotAllowed {
-                reason: "update command not yet implemented".to_string(),
-            })
+            update_command::execute(context, args)
         }
         Command::Close(_args) => {
             info!("Dispatching to close command");
