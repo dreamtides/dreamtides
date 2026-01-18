@@ -116,7 +116,9 @@ pub fn execute_rules(
     rules: &[&dyn LintRule],
     config: &LintConfig,
 ) -> Result<LintSummary, LatticeError> {
-    let filter = DocumentFilter::default();
+    // Include closed documents for linting - rules like E011/E012 need to check
+    // them
+    let filter = DocumentFilter::including_closed();
     let all_docs = document_queries::query(ctx.conn, &filter)?;
 
     let docs_to_check: Vec<_> = all_docs
