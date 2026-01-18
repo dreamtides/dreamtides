@@ -514,8 +514,9 @@ llmc accept baker --force  # Force accept regardless of worker state
 Verifies `needs_review` state (unless `--force` is used), ensures clean
 worktree, rebases onto master, squashes to single commit, strips agent
 attribution ("Generated with", "Co-Authored-By"), fast-forward merges to
-master, removes worktree and branch, resets worker to `idle` with new worktree,
-triggers background rebase for other `needs_review` workers.
+master, removes worktree and branch, resets worker to `idle` with new worktree.
+Other `needs_review` workers will be rebased by the patrol system on its next
+run.
 
 The `--force` flag bypasses state validation, allowing accept of a worker
 regardless of its current state. When using `--force`, you must specify a
