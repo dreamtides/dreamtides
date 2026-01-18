@@ -1,7 +1,14 @@
-# Environment Setup
+---
+lattice-id: LBSWQN
+name: environment-setup
+description: |-
+  This document records the exact steps followed to make the Dreamtides rules engine
+  repository buildable and ready for day-to-day development.
+created-at: 2026-01-18T05:52:12.687012Z
+updated-at: 2026-01-18T05:52:12.687029Z
+---
 
-This document records the exact steps followed to make the Dreamtides rules engine
-repository buildable and ready for day-to-day development.
+# Environment Setup
 
 ## 1. Verify the Rust toolchain
 

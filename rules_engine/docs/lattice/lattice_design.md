@@ -1,3 +1,13 @@
+---
+lattice-id: LBTWQN
+name: lattice-design
+description:  |-
+  Master technical design document for the `lat` command and lattice knowledge
+  base and task tracking system
+created-at: 2026-01-18T05:53:44.399328Z
+updated-at: 2026-01-18T05:53:44.399331Z
+---
+
 # Lattice Document System Technical Design
 
 ## Executive Summary
