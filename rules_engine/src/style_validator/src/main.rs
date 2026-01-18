@@ -12,6 +12,7 @@ mod inline_use_statements;
 mod mod_lib_files;
 mod pub_use;
 mod qualified_imports;
+mod test_file_naming;
 mod tests_directory;
 mod violation;
 mod workspace_dependencies;
@@ -177,6 +178,16 @@ fn main() -> Result<()> {
         }
         Err(e) => {
             eprintln!("Error checking tests directories: {e}");
+        }
+    }
+
+    // Check for test files not following _tests.rs naming convention
+    match test_file_naming::check_tests_directory(rules_engine_path) {
+        Ok(violations) => {
+            all_violations.extend(violations);
+        }
+        Err(e) => {
+            eprintln!("Error checking test file naming: {e}");
         }
     }
 

@@ -25,6 +25,7 @@ pub enum ViolationKind {
     InlineTestModule,
     TestsDirectoryInSrc,
     WorkspaceDependencyNotUsed,
+    TestFileNamingConvention,
 }
 
 impl ViolationKind {
@@ -68,6 +69,9 @@ impl ViolationKind {
             }
             ViolationKind::WorkspaceDependencyNotUsed => {
                 "dependency must use 'workspace = true' (versions should be specified in root Cargo.toml)"
+            }
+            ViolationKind::TestFileNamingConvention => {
+                "test file must end in _tests.rs (not _test.rs)"
             }
         }
     }

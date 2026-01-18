@@ -1,1 +1,1 @@
-pub mod reclaim_test;
+pub mod reclaim_tests;

@@ -2,7 +2,7 @@ mod counterspell_tests;
 mod discard_cards_tests;
 mod dissolve_effect_tests;
 mod draw_card_effect_tests;
-mod foresee_test;
+mod foresee_tests;
 mod gain_energy_effect_tests;
 mod gain_points_effect_tests;
 mod prevent_dissolve_this_turn_tests;
