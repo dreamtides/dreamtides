@@ -940,7 +940,7 @@ Task Tracking](appendix_task_tracking.md)
 
 ---
 
-## Feature: Hierarchy Commands [ONGOING]
+## Feature: Hierarchy Commands [DONE]
 
 **Goal:** Navigate document tree structure.
 
