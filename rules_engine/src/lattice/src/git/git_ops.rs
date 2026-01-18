@@ -64,6 +64,38 @@ pub trait GitOps: Send + Sync {
     ///
     /// Returns `Ok(None)` if the key does not exist.
     fn config_get(&self, key: &str) -> Result<Option<String>, LatticeError>;
+
+    /// Returns files changed between two commits with their change status.
+    ///
+    /// Equivalent to: `git diff --name-status <from_commit>..<to_commit> --
+    /// '<pattern>'`
+    ///
+    /// Returns a list of `(status_char, path)` tuples where status_char is:
+    /// - 'A' for added files
+    /// - 'M' for modified files
+    /// - 'D' for deleted files
+    fn diff_name_status(
+        &self,
+        from_commit: &str,
+        to_commit: &str,
+        pattern: &str,
+    ) -> Result<Vec<FileChange>, LatticeError>;
+
+    /// Returns the oldest commit hash since the given date.
+    ///
+    /// Equivalent to: `git rev-list --since=<date> --reverse HEAD | head -1`
+    ///
+    /// Returns `Ok(None)` if no commits exist since the given date.
+    fn oldest_commit_since(&self, date: &str) -> Result<Option<String>, LatticeError>;
+}
+
+/// Represents a file change from git diff --name-status.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct FileChange {
+    /// The change status character: 'A' (added), 'M' (modified), 'D' (deleted).
+    pub status: char,
+    /// File path relative to the repository root.
+    pub path: std::path::PathBuf,
 }
 
 /// Represents the status of a file in the git working tree.

@@ -4,7 +4,7 @@ use std::process::Command;
 use tracing::{debug, trace};
 
 use crate::error::error_types::LatticeError;
-use crate::git::git_ops::{FileStatus, GitOps};
+use crate::git::git_ops::{FileChange, FileStatus, GitOps};
 
 /// Production implementation of GitOps that shells out to the git CLI.
 ///
@@ -136,5 +136,44 @@ impl GitOps for RealGit {
             }
             Err(e) => Err(e),
         }
+    }
+
+    fn diff_name_status(
+        &self,
+        from_commit: &str,
+        to_commit: &str,
+        pattern: &str,
+    ) -> Result<Vec<FileChange>, LatticeError> {
+        let range = format!("{from_commit}..{to_commit}");
+        let output = self.run_git(&["diff", "--name-status", &range, "--", pattern])?;
+        let mut changes = Vec::new();
+
+        for line in output.lines() {
+            if line.is_empty() {
+                continue;
+            }
+            // Format: "X\tpath" where X is status char and \t is tab
+            let mut parts = line.splitn(2, '\t');
+            let status_str = parts.next().unwrap_or("");
+            let path_str = parts.next().unwrap_or("");
+
+            if path_str.is_empty() {
+                continue;
+            }
+
+            let status = status_str.chars().next().unwrap_or('M');
+            changes.push(FileChange { status, path: PathBuf::from(path_str) });
+        }
+
+        Ok(changes)
+    }
+
+    fn oldest_commit_since(&self, date: &str) -> Result<Option<String>, LatticeError> {
+        let since_arg = format!("--since={date}");
+        let output = self.run_git(&["rev-list", &since_arg, "--reverse", "HEAD"])?;
+
+        // Get the first line (oldest commit since the date)
+        let commit = output.lines().next().map(|s| s.trim().to_string());
+        Ok(commit.filter(|s| !s.is_empty()))
     }
 }

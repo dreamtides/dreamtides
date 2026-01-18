@@ -2,7 +2,7 @@ use std::path::PathBuf;
 use std::sync::Mutex;
 
 use lattice::error::error_types::LatticeError;
-use lattice::git::git_ops::{FileStatus, GitOps};
+use lattice::git::git_ops::{FileChange, FileStatus, GitOps};
 use lattice::index::reconciliation::change_detection::{self, ChangeInfo, ChangeStatus};
 use lattice::index::reconciliation::reconciliation_coordinator::{self, ReconciliationResult};
 use lattice::index::reconciliation::sync_strategies;
@@ -90,6 +90,19 @@ impl GitOps for FakeGit {
     }
 
     fn config_get(&self, _key: &str) -> Result<Option<String>, LatticeError> {
+        Ok(None)
+    }
+
+    fn diff_name_status(
+        &self,
+        _from_commit: &str,
+        _to_commit: &str,
+        _pattern: &str,
+    ) -> Result<Vec<FileChange>, LatticeError> {
+        Ok(Vec::new())
+    }
+
+    fn oldest_commit_since(&self, _date: &str) -> Result<Option<String>, LatticeError> {
         Ok(None)
     }
 }

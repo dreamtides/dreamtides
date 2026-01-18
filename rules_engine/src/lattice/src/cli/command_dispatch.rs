@@ -12,7 +12,7 @@ use crate::cli::commands::list_command::list_executor;
 use crate::cli::commands::ready_command::ready_executor;
 use crate::cli::commands::show_command::show_executor;
 use crate::cli::commands::{
-    claim_command, create_command, generate_ids, track_command, update_command,
+    changes_command, claim_command, create_command, generate_ids, track_command, update_command,
 };
 use crate::cli::global_options::GlobalOptions;
 use crate::config::config_loader;
@@ -333,11 +333,9 @@ fn dispatch_command(context: CommandContext, command: Command) -> LatticeResult<
                 reason: "blocked command not yet implemented".to_string(),
             })
         }
-        Command::Changes(_args) => {
+        Command::Changes(args) => {
             info!("Dispatching to changes command");
-            Err(LatticeError::OperationNotAllowed {
-                reason: "changes command not yet implemented".to_string(),
-            })
+            changes_command::execute(context, args)
         }
         Command::Stats(_args) => {
             info!("Dispatching to stats command");

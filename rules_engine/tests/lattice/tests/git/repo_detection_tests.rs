@@ -4,7 +4,7 @@ use std::path::PathBuf;
 use std::sync::Mutex;
 
 use lattice::error::error_types::LatticeError;
-use lattice::git::git_ops::{FileStatus, GitOps};
+use lattice::git::git_ops::{FileChange, FileStatus, GitOps};
 use lattice::git::repo_detection::{InProgressOp, RepoConfig};
 
 /// A test double for GitOps that returns configured responses for repo
@@ -74,6 +74,19 @@ impl GitOps for FakeGit {
     fn config_get(&self, key: &str) -> Result<Option<String>, LatticeError> {
         let values = self.config_values.lock().unwrap();
         Ok(values.get(key).cloned().flatten())
+    }
+
+    fn diff_name_status(
+        &self,
+        _from_commit: &str,
+        _to_commit: &str,
+        _pattern: &str,
+    ) -> Result<Vec<FileChange>, LatticeError> {
+        Ok(Vec::new())
+    }
+
+    fn oldest_commit_since(&self, _date: &str) -> Result<Option<String>, LatticeError> {
+        Ok(None)
     }
 }
 
