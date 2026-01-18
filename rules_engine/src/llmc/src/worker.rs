@@ -235,7 +235,7 @@ fn accept_bypass_warning(session: &str, sender: &TmuxSender) -> Result<()> {
 }
 #[cfg(test)]
 mod tests {
-    use crate::llmc::worker::*;
+    use crate::worker::*;
     #[test]
     fn test_can_transition_idle_to_working() {
         assert!(can_transition(&WorkerStatus::Idle, &WorkerStatus::Working));

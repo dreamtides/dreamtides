@@ -8,9 +8,9 @@ use tempfile::NamedTempFile;
 use zip::write::FileOptions;
 use zip::{CompressionMethod, ZipArchive, ZipWriter};
 
+use crate::commands::rebuild_images::url::UrlDownloader;
+use crate::commands::rebuild_images::{cache, url};
 use crate::core::paths;
-use crate::tabula_cli::commands::rebuild_images::url::UrlDownloader;
-use crate::tabula_cli::commands::rebuild_images::{cache, url};
 pub fn rebuild_images(xlsm_path: Option<PathBuf>, from_urls: bool, auto: bool) -> Result<()> {
     let source = resolve_xlsm_path(xlsm_path)?;
     if from_urls && auto {

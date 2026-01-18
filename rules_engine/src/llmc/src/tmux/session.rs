@@ -11,7 +11,7 @@ use tmux_interface::{
 };
 
 use crate::config::WorkerConfig;
-use crate::llmc::tmux::sender::TmuxSender;
+use crate::tmux::sender::TmuxSender;
 /// Default TMUX session width (wide terminal to prevent message truncation)
 pub const DEFAULT_SESSION_WIDTH: u32 = 500;
 /// Default TMUX session height
@@ -308,7 +308,7 @@ fn build_claude_command(config: &WorkerConfig) -> String {
 }
 #[cfg(test)]
 mod tests {
-    use crate::llmc::tmux::session::*;
+    use crate::tmux::session::*;
     #[test]
     fn test_is_shell() {
         assert!(is_shell("bash"));

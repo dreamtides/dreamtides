@@ -11,7 +11,7 @@ use reqwest::header::{
 };
 use roxmltree::Document;
 
-use crate::tabula_cli::commands::rebuild_images::rebuild::{self, FileRecord};
+use crate::commands::rebuild_images::rebuild::{self, FileRecord};
 const MAIN_NS: &str = "http://schemas.openxmlformats.org/spreadsheetml/2006/main";
 const REL_NS: &str = "http://schemas.openxmlformats.org/officeDocument/2006/relationships";
 const PACKAGE_REL_NS: &str = "http://schemas.openxmlformats.org/package/2006/relationships";

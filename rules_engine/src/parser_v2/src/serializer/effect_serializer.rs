@@ -6,7 +6,7 @@ use ability_data::standard_effect::StandardEffect;
 use ability_data::trigger_event::TriggerEvent;
 use ability_data::variable_value::VariableValue;
 
-use crate::parser_v2::serializer::{
+use crate::serializer::{
     condition_serializer, cost_serializer, predicate_serializer, serializer_utils,
     static_ability_serializer, text_formatting, trigger_serializer,
 };

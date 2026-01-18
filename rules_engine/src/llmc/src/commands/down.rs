@@ -3,10 +3,10 @@ use std::time::Duration;
 
 use anyhow::{Context, Result, bail};
 
-use crate::llmc::commands::console::CONSOLE_PREFIX;
-use crate::llmc::config::{self, Config};
-use crate::llmc::state::{self, State, WorkerStatus};
-use crate::llmc::tmux::session;
+use crate::commands::console::CONSOLE_PREFIX;
+use crate::config::{self, Config};
+use crate::state::{self, State, WorkerStatus};
+use crate::tmux::session;
 /// Runs the down command, stopping all worker sessions
 pub fn run_down(force: bool, kill_consoles: bool, json: bool) -> Result<()> {
     let llmc_root = config::get_llmc_root();

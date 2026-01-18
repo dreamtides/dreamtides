@@ -6,9 +6,9 @@ use std::time::{SystemTime, UNIX_EPOCH};
 
 use anyhow::{Context, Result, bail};
 
-use crate::llmc::config::{self, Config};
-use crate::llmc::state::{self, State, WorkerRecord, WorkerStatus};
-use crate::llmc::{git, worker};
+use crate::config::{self, Config};
+use crate::state::{self, State, WorkerRecord, WorkerStatus};
+use crate::{git, worker};
 /// Result of a doctor check
 #[derive(Debug, Clone)]
 pub struct DoctorReport {

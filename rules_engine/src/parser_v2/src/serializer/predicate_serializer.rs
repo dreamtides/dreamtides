@@ -2,7 +2,7 @@ use ability_data::predicate::{CardPredicate, Predicate};
 use ability_data::variable_value::VariableValue;
 use text_formatting::FormattedText;
 
-use crate::parser_v2::serializer::{serializer_utils, text_formatting};
+use crate::serializer::{serializer_utils, text_formatting};
 use crate::variables::parser_bindings::VariableBindings;
 pub fn serialize_predicate(predicate: &Predicate, bindings: &mut VariableBindings) -> String {
     match predicate {

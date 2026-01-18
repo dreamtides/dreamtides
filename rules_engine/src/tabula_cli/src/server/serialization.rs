@@ -1,7 +1,7 @@
 use anyhow::{Context, Result};
 use sha2::{Digest, Sha256};
 
-use crate::tabula_cli::server::model::{
+use crate::server::model::{
     Change, ChangedRange, HorizontalAlignment, PROTOCOL_VERSION, Request, Response, ResponseStatus,
 };
 pub fn parse_request(body: &[u8]) -> Result<Request> {

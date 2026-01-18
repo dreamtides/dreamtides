@@ -6,14 +6,14 @@ use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 use anyhow::{Context, Result, bail};
 
-use crate::llmc::commands::add;
-use crate::llmc::config::{self, Config};
-use crate::llmc::lock::StateLock;
-use crate::llmc::patrol::Patrol;
-use crate::llmc::state::{self, State, WorkerStatus};
-use crate::llmc::tmux::session;
-use crate::llmc::worker::WorkerTransition;
-use crate::llmc::{git, worker};
+use crate::commands::add;
+use crate::config::{self, Config};
+use crate::lock::StateLock;
+use crate::patrol::Patrol;
+use crate::state::{self, State, WorkerStatus};
+use crate::tmux::session;
+use crate::worker::WorkerTransition;
+use crate::{git, worker};
 /// Runs the up command, starting the LLMC daemon
 pub fn run_up(no_patrol: bool, verbose: bool, force: bool) -> Result<()> {
     let llmc_root = config::get_llmc_root();

@@ -3,10 +3,10 @@ use std::process::Command;
 
 use anyhow::{Context, Result, bail};
 
-use crate::llmc::commands::console;
-use crate::llmc::config;
-use crate::llmc::state::{self, State};
-use crate::llmc::tmux::session;
+use crate::commands::console;
+use crate::config;
+use crate::state::{self, State};
+use crate::tmux::session;
 /// Runs the attach command, connecting to a worker's or console's TMUX session
 pub fn run_attach(target: &str) -> Result<()> {
     let llmc_root = config::get_llmc_root();

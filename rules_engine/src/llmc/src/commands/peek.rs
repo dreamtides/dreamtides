@@ -1,8 +1,8 @@
 use anyhow::{Context, Result, bail};
 
-use crate::llmc::config;
-use crate::llmc::state::{self, State};
-use crate::llmc::tmux::session;
+use crate::config;
+use crate::state::{self, State};
+use crate::tmux::session;
 pub fn run_peek(worker: Option<String>, lines: u32, json: bool) -> Result<()> {
     let llmc_root = config::get_llmc_root();
     if !llmc_root.exists() {

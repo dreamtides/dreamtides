@@ -5,8 +5,8 @@ use std::path::{Path, PathBuf};
 use anyhow::{Context, Result, bail};
 use serde::Deserialize;
 
+use crate::commands::rebuild_images::rebuild::{self, FileRecord};
 use crate::core::paths;
-use crate::tabula_cli::commands::rebuild_images::rebuild::{self, FileRecord};
 const MANIFEST_FILENAME: &str = "_xlsm_manifest.json";
 pub fn rebuild_from_cache(source: &Path) -> Result<()> {
     let git_root = paths::git_root_for(source)?;

@@ -1,8 +1,8 @@
 use anyhow::{Context, Result};
 
-use crate::tabula_cli::server::listener_runner::{Listener, ListenerContext, ListenerResult};
-use crate::tabula_cli::server::model::{Change, Span};
-use crate::tabula_cli::server::server_workbook_snapshot::{CellValue, WorkbookSnapshot};
+use crate::server::listener_runner::{Listener, ListenerContext, ListenerResult};
+use crate::server::model::{Change, Span};
+use crate::server::server_workbook_snapshot::{CellValue, WorkbookSnapshot};
 pub struct PartialFormattingListener;
 impl Listener for PartialFormattingListener {
     fn name(&self) -> &str {

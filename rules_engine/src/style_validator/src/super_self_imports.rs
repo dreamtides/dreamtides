@@ -163,8 +163,24 @@ fn convert_use_tree_with_prefix(tree: &UseTree, prefix_segments: &[String]) -> O
     }
 }
 
-fn get_module_path_from_file(path: &Path, rules_engine_path: &Path) -> Vec<String> {
-    let relative = path.strip_prefix(rules_engine_path).ok();
+fn find_crate_root(path: &Path) -> Option<PathBuf> {
+    let mut current = path.parent()?;
+    loop {
+        let cargo_toml = current.join("Cargo.toml");
+        if cargo_toml.exists() {
+            return Some(current.to_path_buf());
+        }
+        current = current.parent()?;
+    }
+}
+
+fn get_module_path_from_file(path: &Path, _rules_engine_path: &Path) -> Vec<String> {
+    let Some(crate_root) = find_crate_root(path) else {
+        return Vec::new();
+    };
+
+    let src_dir = crate_root.join("src");
+    let relative = path.strip_prefix(&src_dir).ok();
     let Some(relative) = relative else {
         return Vec::new();
     };
@@ -173,11 +189,9 @@ fn get_module_path_from_file(path: &Path, rules_engine_path: &Path) -> Vec<Strin
     for component in relative.components() {
         if let std::path::Component::Normal(os_str) = component {
             if let Some(s) = os_str.to_str() {
-                if s != "src" {
-                    let name = s.trim_end_matches(".rs");
-                    if name != "mod" && name != "lib" {
-                        segments.push(name.to_string());
-                    }
+                let name = s.trim_end_matches(".rs");
+                if name != "mod" && name != "lib" {
+                    segments.push(name.to_string());
                 }
             }
         }

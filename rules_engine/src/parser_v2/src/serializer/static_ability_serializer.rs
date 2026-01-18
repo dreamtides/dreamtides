@@ -2,7 +2,7 @@ use ability_data::condition::Condition;
 use ability_data::static_ability::{StandardStaticAbility, StaticAbility};
 use ability_data::variable_value::VariableValue;
 
-use crate::parser_v2::serializer::{
+use crate::serializer::{
     condition_serializer, cost_serializer, effect_serializer, predicate_serializer,
     serializer_utils, text_formatting,
 };

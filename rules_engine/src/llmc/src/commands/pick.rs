@@ -3,8 +3,8 @@ use std::process::Command;
 
 use anyhow::{Context, Result, bail};
 
-use crate::llmc::state::{self, State};
-use crate::llmc::{config, git};
+use crate::state::{self, State};
+use crate::{config, git};
 /// Runs the pick command, which grabs all changes from a worker and rebases
 /// onto master This is a low-level failure mitigation command that:
 /// 1. Adds all untracked files

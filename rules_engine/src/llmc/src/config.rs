@@ -158,7 +158,7 @@ mod tests {
 
     use tempfile::NamedTempFile;
 
-    use crate::llmc::config::*;
+    use crate::config::*;
     #[test]
     fn test_defaults() {
         let defaults = DefaultsConfig::default();

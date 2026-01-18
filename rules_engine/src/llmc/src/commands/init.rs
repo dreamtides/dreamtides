@@ -4,9 +4,9 @@ use std::process::Command;
 
 use anyhow::{Context, Result, bail};
 
-use crate::llmc::config;
-use crate::llmc::config::Config;
-use crate::llmc::state::State;
+use crate::config;
+use crate::config::Config;
+use crate::state::State;
 /// Initializes a new LLMC workspace
 pub fn run_init(source: Option<PathBuf>, target: Option<PathBuf>, force: bool) -> Result<()> {
     let target_dir = target.unwrap_or_else(config::get_llmc_root);

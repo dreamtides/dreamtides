@@ -4,12 +4,12 @@ use std::time::{SystemTime, UNIX_EPOCH};
 
 use anyhow::{Result, bail};
 
-use crate::llmc::commands::add;
-use crate::llmc::config::{self, Config};
-use crate::llmc::git;
-use crate::llmc::lock::StateLock;
-use crate::llmc::state::{self, State, WorkerStatus};
-use crate::llmc::tmux::session;
+use crate::commands::add;
+use crate::config::{self, Config};
+use crate::git;
+use crate::lock::StateLock;
+use crate::state::{self, State, WorkerStatus};
+use crate::tmux::session;
 /// Runs the reset command, resetting a worker to clean idle state by removing
 /// and recreating its worktree and session
 pub fn run_reset(worker_name: &str, yes: bool, json: bool) -> Result<()> {

@@ -138,7 +138,7 @@ fn levenshtein(a: &str, b: &str) -> usize {
 }
 #[cfg(test)]
 mod tests {
-    use crate::parser_v2::error::parser_error_suggestions::*;
+    use crate::error::parser_error_suggestions::*;
     #[test]
     fn test_levenshtein_identical() {
         assert_eq!(levenshtein("test", "test"), 0);

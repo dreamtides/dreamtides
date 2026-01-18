@@ -6,7 +6,7 @@ use std::time::{Duration, Instant};
 
 use anyhow::{Context, Result, bail};
 
-use crate::llmc::config;
+use crate::config;
 /// RAII guard for a file-based lock
 /// The lock is released when this struct is dropped
 pub struct StateLock {
@@ -121,7 +121,7 @@ fn is_process_running(pid: u32) -> bool {
 mod tests {
     use tempfile::TempDir;
 
-    use crate::llmc::lock::*;
+    use crate::lock::*;
     #[test]
     fn test_acquire_lock() {
         let dir = TempDir::new().unwrap();

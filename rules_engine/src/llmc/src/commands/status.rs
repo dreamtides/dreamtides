@@ -4,9 +4,9 @@ use std::time::{SystemTime, UNIX_EPOCH};
 use anyhow::{Result, bail};
 use serde::Serialize;
 
+use crate::commands::console;
+use crate::commands::console::CONSOLE_PREFIX;
 use crate::config::{self, Config};
-use crate::llmc::commands::console;
-use crate::llmc::commands::console::CONSOLE_PREFIX;
 use crate::state::{self, State, WorkerRecord, WorkerStatus};
 /// Runs the status command, displaying the current state of all workers
 pub fn run_status(json: bool) -> Result<()> {

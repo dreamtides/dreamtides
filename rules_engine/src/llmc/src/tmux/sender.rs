@@ -140,7 +140,7 @@ impl TmuxSender {
 }
 #[cfg(test)]
 mod tests {
-    use crate::llmc::tmux::sender::*;
+    use crate::tmux::sender::*;
     #[test]
     fn test_default_sender() {
         let sender = TmuxSender::new();

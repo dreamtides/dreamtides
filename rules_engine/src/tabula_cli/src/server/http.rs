@@ -13,14 +13,14 @@ use tokio::net::TcpListener;
 use tokio::sync::oneshot::{Receiver, Sender};
 use tokio::sync::{Mutex, oneshot};
 
+use crate::server::listener_runner::{self, ListenerContext};
 use crate::server::listeners::conditional_formatting::ConditionalFormattingListener;
 use crate::server::listeners::ensure_uuid::EnsureUuidListener;
 use crate::server::listeners::fluent_rules_text::FluentRulesTextListener;
 use crate::server::listeners::partial_formatting::PartialFormattingListener;
-use crate::tabula_cli::server::listener_runner::{self, ListenerContext};
-use crate::tabula_cli::server::model::{Response, ResponseStatus};
-use crate::tabula_cli::server::server_config::ServerConfig;
-use crate::tabula_cli::server::{serialization, server_workbook_snapshot};
+use crate::server::model::{Response, ResponseStatus};
+use crate::server::server_config::ServerConfig;
+use crate::server::{serialization, server_workbook_snapshot};
 pub async fn serve(config: ServerConfig) -> Result<()> {
     let (shutdown_tx, shutdown_rx) = oneshot::channel();
     let state = Arc::new(ServerState {

@@ -9,9 +9,9 @@ use zip::write::FileOptions;
 use zip::{CompressionMethod, DateTime, ZipArchive, ZipWriter};
 
 use crate::commands::rebuild_images::rebuild;
+use crate::commands::validate::{toml_compare, workbook_snapshot, xlsm_toml_compare};
 use crate::commands::{build_xls, strip_images};
 use crate::core::{column_names, excel_reader, paths, toml_data};
-use crate::tabula_cli::commands::validate::{toml_compare, workbook_snapshot, xlsm_toml_compare};
 #[derive(Clone, Copy)]
 pub struct ValidateConfig {
     pub strip_images: bool,

@@ -2,7 +2,7 @@ use ability_data::collection_expression::CollectionExpression;
 use ability_data::cost::Cost;
 use ability_data::variable_value::VariableValue;
 
-use crate::parser_v2::serializer::predicate_serializer;
+use crate::serializer::predicate_serializer;
 use crate::variables::parser_bindings::VariableBindings;
 use crate::variables::parser_substitutions;
 pub fn serialize_cost(cost: &Cost, bindings: &mut VariableBindings) -> String {

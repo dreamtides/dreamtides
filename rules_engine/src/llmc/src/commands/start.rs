@@ -6,12 +6,12 @@ use std::process::Command;
 use anyhow::{Context, Result, bail};
 use regex::Regex;
 
-use crate::llmc::config::{self, Config};
-use crate::llmc::state::{State, WorkerRecord, WorkerStatus};
-use crate::llmc::tmux::sender::TmuxSender;
-use crate::llmc::tmux::session;
-use crate::llmc::{git, worker};
+use crate::config::{self, Config};
 use crate::lock::StateLock;
+use crate::state::{State, WorkerRecord, WorkerStatus};
+use crate::tmux::sender::TmuxSender;
+use crate::tmux::session;
+use crate::{git, worker};
 /// Runs the start command, assigning a task to an idle worker
 pub fn run_start(
     worker: Option<String>,

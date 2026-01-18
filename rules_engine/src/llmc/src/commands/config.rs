@@ -2,7 +2,7 @@ use std::fs;
 
 use anyhow::{Context, Result, bail};
 
-use crate::llmc::config::{self, Config};
+use crate::config::{self, Config};
 pub fn run_config_get(key: &str) -> Result<()> {
     let config_path = config::get_config_path();
     if !config_path.exists() {

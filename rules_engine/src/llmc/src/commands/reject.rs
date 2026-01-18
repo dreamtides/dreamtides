@@ -3,7 +3,7 @@ use std::process::Command;
 
 use anyhow::{Context, Result, bail};
 
-use crate::llmc::commands::review;
+use crate::commands::review;
 use crate::state::WorkerStatus;
 use crate::tmux::sender::TmuxSender;
 use crate::{config, editor, git, worker};

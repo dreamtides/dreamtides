@@ -10,7 +10,7 @@ use umya_spreadsheet::structs::{
 };
 use umya_spreadsheet::{DataValidationValues, Worksheet};
 
-use crate::tabula_cli::commands::validate::runner::{self, ValidateConfig};
+use crate::commands::validate::runner::{self, ValidateConfig};
 #[derive(Clone)]
 pub(super) struct WorkbookSnapshot {
     sheets: Vec<String>,

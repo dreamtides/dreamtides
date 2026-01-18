@@ -4,10 +4,10 @@ use std::time::{SystemTime, UNIX_EPOCH};
 
 use anyhow::{Context, Result, bail};
 
-use crate::llmc::config::Config;
-use crate::llmc::state::{State, WorkerRecord, WorkerStatus};
-use crate::llmc::tmux::session;
-use crate::llmc::{config, git, state};
+use crate::config::Config;
+use crate::state::{State, WorkerRecord, WorkerStatus};
+use crate::tmux::session;
+use crate::{config, git, state};
 /// Adds a new worker to the LLMC system
 pub fn run_add(
     name: &str,

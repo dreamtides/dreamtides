@@ -835,7 +835,7 @@ fn get_git_dir(worktree: &Path) -> Result<std::path::PathBuf> {
 }
 #[cfg(test)]
 mod tests {
-    use crate::llmc::git::*;
+    use crate::git::*;
     #[test]
     fn test_strip_agent_attribution() {
         let message = "Fix bug\n\nCo-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>";

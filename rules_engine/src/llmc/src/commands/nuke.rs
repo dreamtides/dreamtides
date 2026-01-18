@@ -4,11 +4,11 @@ use std::path::{Path, PathBuf};
 
 use anyhow::{Context, Result, bail};
 
-use crate::llmc::commands::console;
-use crate::llmc::lock::StateLock;
-use crate::llmc::state::{self, State};
-use crate::llmc::tmux::session;
-use crate::llmc::{config, git};
+use crate::commands::console;
+use crate::lock::StateLock;
+use crate::state::{self, State};
+use crate::tmux::session;
+use crate::{config, git};
 /// Runs the nuke command, permanently removing a worker or console session
 pub fn run_nuke(name: Option<&str>, all: bool, json: bool) -> Result<()> {
     let llmc_root = config::get_llmc_root();

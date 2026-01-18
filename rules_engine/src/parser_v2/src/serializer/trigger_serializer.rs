@@ -1,7 +1,7 @@
 use ability_data::trigger_event::{PlayerTurn, TriggerEvent, TriggerKeyword};
 use ability_data::variable_value::VariableValue;
 
-use crate::parser_v2::serializer::predicate_serializer;
+use crate::serializer::predicate_serializer;
 use crate::variables::parser_bindings::VariableBindings;
 use crate::variables::parser_substitutions;
 pub fn serialize_trigger_event(trigger: &TriggerEvent, bindings: &mut VariableBindings) -> String {

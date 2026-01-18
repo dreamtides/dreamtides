@@ -2,7 +2,7 @@ use ability_data::ability::Ability;
 use ability_data::named_ability::NamedAbility;
 use ability_data::trigger_event::TriggerEvent;
 
-use crate::parser_v2::serializer::{
+use crate::serializer::{
     cost_serializer, effect_serializer, serializer_utils, static_ability_serializer,
     trigger_serializer,
 };

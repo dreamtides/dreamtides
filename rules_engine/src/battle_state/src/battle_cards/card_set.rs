@@ -269,7 +269,7 @@ impl<T: CardIdType> CardSet<T> {
 #[cfg(test)]
 mod tests {
     use crate::battle::card_id::{CharacterId, HandCardId};
-    use crate::battle_state::battle_cards::card_set::*;
+    use crate::battle_cards::card_set::*;
     fn test_card_id(id: usize) -> CharacterId {
         CharacterId(CardId(id))
     }

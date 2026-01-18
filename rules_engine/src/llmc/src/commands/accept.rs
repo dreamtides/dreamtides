@@ -4,10 +4,10 @@ use std::process::Command;
 
 use anyhow::{Context, Result, bail};
 
-use crate::llmc::commands::review;
-use crate::llmc::state::{State, WorkerStatus};
-use crate::llmc::worker::{self, WorkerTransition};
-use crate::llmc::{config, git};
+use crate::commands::review;
+use crate::state::{State, WorkerStatus};
+use crate::worker::{self, WorkerTransition};
+use crate::{config, git};
 /// Runs the accept command, accepting a worker's changes and merging to master
 pub fn run_accept(worker: Option<String>, force: bool, json: bool) -> Result<()> {
     let llmc_root = config::get_llmc_root();

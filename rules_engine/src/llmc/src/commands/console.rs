@@ -4,9 +4,9 @@ use std::time::Duration;
 
 use anyhow::{Context, Result, bail};
 
-use crate::llmc::config::{self, Config, WorkerConfig};
-use crate::llmc::tmux::sender::TmuxSender;
-use crate::llmc::tmux::session::{self, DEFAULT_SESSION_HEIGHT, DEFAULT_SESSION_WIDTH};
+use crate::config::{self, Config, WorkerConfig};
+use crate::tmux::sender::TmuxSender;
+use crate::tmux::session::{self, DEFAULT_SESSION_HEIGHT, DEFAULT_SESSION_WIDTH};
 /// Prefix for console session names
 pub const CONSOLE_PREFIX: &str = "llmc-console";
 /// Runs the console command, creating a new console session or attaching to an

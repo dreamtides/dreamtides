@@ -17,7 +17,7 @@ mod tests {
     use std::collections::HashMap;
 
     use crate::config::{Config, DefaultsConfig, RepoConfig};
-    use crate::llmc::sound::*;
+    use crate::sound::*;
     #[test]
     fn test_play_bell_enabled() {
         let config = Config {

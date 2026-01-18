@@ -5,8 +5,8 @@ use std::path::Path;
 use anyhow::{Context, Result, bail};
 use toml::{Table, Value};
 
+use crate::commands::validate::runner;
 use crate::core::{column_names, toml_data};
-use crate::tabula_cli::commands::validate::runner;
 #[derive(Clone)]
 struct ParsedTomlTable {
     normalized_name: String,

@@ -765,7 +765,7 @@ fn send_self_review_prompt(
 }
 #[cfg(test)]
 mod tests {
-    use crate::llmc::patrol::*;
+    use crate::patrol::*;
     #[test]
     fn test_patrol_report_default() {
         let report = PatrolReport::default();

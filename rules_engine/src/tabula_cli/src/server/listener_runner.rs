@@ -2,8 +2,8 @@ use std::collections::BTreeMap;
 
 use anyhow::Result;
 
-use crate::tabula_cli::server::model::{Change, ChangedRange};
-use crate::tabula_cli::server::server_workbook_snapshot::WorkbookSnapshot;
+use crate::server::model::{Change, ChangedRange};
+use crate::server::server_workbook_snapshot::WorkbookSnapshot;
 pub trait Listener: Send + Sync {
     fn name(&self) -> &str;
     fn run(&self, snapshot: &WorkbookSnapshot, context: &ListenerContext)

@@ -6,8 +6,8 @@ use std::time::{SystemTime, UNIX_EPOCH};
 use anyhow::{Context, Result, bail};
 use serde::{Deserialize, Serialize};
 
-use crate::llmc::config::{self, Config};
-use crate::llmc::patrol::Patrol;
+use crate::config::{self, Config};
+use crate::patrol::Patrol;
 /// Worker state machine states
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
@@ -241,7 +241,7 @@ impl Default for State {
 mod tests {
     use tempfile::TempDir;
 
-    use crate::llmc::state::*;
+    use crate::state::*;
     fn create_test_worker(name: &str) -> WorkerRecord {
         WorkerRecord {
             name: name.to_string(),
