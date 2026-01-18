@@ -342,7 +342,7 @@ impl Patrol {
             let worktree_path = PathBuf::from(&worker.worktree_path);
             let self_review_enabled = worker.self_review;
             let transition = match current_status {
-                WorkerStatus::Working => {
+                WorkerStatus::Working | WorkerStatus::Rejected => {
                     self.detect_working_transition(&session_id, &worktree_path)?
                 }
                 WorkerStatus::Rebasing => {
