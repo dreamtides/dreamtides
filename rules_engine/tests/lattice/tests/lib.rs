@@ -1,3 +1,4 @@
+mod closed_directory_tests;
 mod color_theme_tests;
 mod commands;
 mod config_tests;
