@@ -2,9 +2,17 @@
 
 ## Overview
 
-LLMC v2 manages multiple Claude Code CLI sessions running in parallel git worktrees, using TMUX for persistent session management. This enables coordinated development work across multiple workers while maintaining a clean single-commit workflow on the master branch.
+LLMC v2 manages multiple Claude Code CLI sessions running in parallel git
+worktrees, using TMUX for persistent session management. This enables
+coordinated development work across multiple workers while maintaining a clean
+single-commit workflow on the master branch.
 
-These architectural choices deliver three core benefits: improved reliability through persistent sessions that survive temporary failures and maintain worker context across tasks, better debugging via interactive access that allows direct inspection and intervention in worker sessions when needed, and streamlined workflow through automated state management that handles rebasing, conflict detection, and task coordination without manual intervention.
+These architectural choices deliver three core benefits: improved reliability
+through persistent sessions that survive temporary failures and maintain worker
+context across tasks, better debugging via interactive access that allows direct
+inspection and intervention in worker sessions when needed, and streamlined
+workflow through automated state management that handles rebasing, conflict
+detection, and task coordination without manual intervention.
 
 ## Architecture Principles
 
@@ -17,7 +25,17 @@ These architectural choices deliver three core benefits: improved reliability th
 
 ### Key Differences from V1
 
-LLMC v2 introduces several fundamental architectural changes from the original version. Workers are now persistent Claude Code sessions running in TMUX rather than transient subprocesses, providing greater stability and session continuity. This TMUX-based approach enables full interactive control, allowing developers to attach directly to worker sessions via `llmc attach` for real-time observation and intervention. The system operates through a persistent daemon that runs continuously when `llmc up` is active, continuously monitoring workers and orchestrating state transitions throughout the development workflow. Additionally, v2 includes a patrol system—a background process that maintains system health and facilitates automatic rebasing operations to keep workers synchronized with the master branch.
+LLMC v2 introduces several fundamental architectural changes from the original
+version. Workers are now persistent Claude Code sessions running in TMUX rather
+than transient subprocesses, providing greater stability and session continuity.
+This TMUX-based approach enables full interactive control, allowing developers
+to attach directly to worker sessions via `llmc attach` for real-time
+observation and intervention. The system operates through a persistent daemon
+that runs continuously when `llmc up` is active, continuously monitoring workers
+and orchestrating state transitions throughout the development workflow.
+Additionally, v2 includes a patrol system—a background process that maintains
+system health and facilitates automatic rebasing operations to keep workers
+synchronized with the master branch.
 
 ## Repository Layout
 
@@ -47,15 +65,15 @@ Each worker progresses through a well-defined state machine:
 ┌─────────┐      ┌──────────┐      ┌───────────┐      ┌───────────────┐   │
 │  IDLE   │─────▶│ WORKING  │─────▶│ REVIEWING │─────▶│ NEEDS_REVIEW  │───┤
 └─────────┘ start└──────────┘commit└───────────┘amend └───────────────┘   │
-     ▲               │              on_complete              │         accept
-     │               │ no commit                             │             │
-     │               ▼                                       │ reject      │
-     │        ┌─────────────┐                          ┌──────────┐       │
-     │        │ NEEDS_INPUT │                          │ REJECTED │───────┘
-     │        └─────────────┘                          └──────────┘completes
-     │               │                                       │
-     │               │ message                               │ completes
-     │               ▼                                       │
+     ▲                              on_complete              │         accept
+     │                                                       │             │
+     │                                                       │ reject      │
+     │                                                 ┌──────────┐       │
+     │                                                 │ REJECTED │───────┘
+     │                                                 └──────────┘completes
+     │                                                       │
+     │                                                       │ completes
+     │                                                       │
      └───────────────────────────────────────────────────────┘
 
 Special States:
@@ -70,8 +88,7 @@ Special States:
 |-------|-------------|
 | `idle` | Worker has no active task, ready to receive work |
 | `working` | Worker is actively implementing a task |
-| `needs_input` | Worker stopped without committing, likely waiting for clarification |
-| `reviewing` | Worker is performing self-review (on_complete prompt active) |
+| `reviewing` | Worker received on_complete prompt, performing self-review |
 | `needs_review` | Worker completed self-review, awaiting human review |
 | `rejected` | Work was rejected with feedback, worker is implementing changes |
 | `rebasing` | Worker is resolving merge conflicts after a rebase |
@@ -82,17 +99,22 @@ Special States:
 
 When a worker completes their task and commits, they enter a self-review phase:
 
-1. **Worker commits** → Internal state transitions to `needs_review` (but displayed as `reviewing`)
+1. **Worker commits** → Internal state transitions to `needs_review` (but
+   displayed as `reviewing`)
 2. **On-complete prompt sent** → Worker receives self-review instructions
-3. **Worker performs self-review** → State is `reviewing`, worker is actively checking their work
-4. **Worker amends commit** → State transitions to `needs_review` (ready for human review)
+3. **Worker performs self-review** → State is `reviewing`, worker is actively
+   checking their work
+4. **Worker amends commit** → State transitions to `needs_review` (ready for
+   human review)
 
 The `llmc status` command shows the **effective** state:
-- A worker in the pre-self-review phase (waiting for on_complete prompt) is shown as `reviewing`
+- A worker in the pre-self-review phase (waiting for on_complete prompt) is
+  shown as `reviewing`
 - A worker actively performing self-review is shown as `reviewing`
 - A worker who has completed self-review is shown as `needs_review`
 
-This ensures `needs_review` only appears when the worker is truly ready for human review.
+This ensures `needs_review` only appears when the worker is truly ready for
+human review.
 
 ## Configuration
 
@@ -100,11 +122,19 @@ Configuration is stored in `~/llmc/config.toml`:
 
 ```toml
 [defaults]
-model = "opus"
+model = "sonnet"
 skip_permissions = true
 allowed_tools = ["Bash", "Edit", "Read", "Write", "Glob", "Grep"]
-patrol_interval_secs = 60
+patrol_interval_secs = 30
 sound_on_review = true
+
+[defaults.self_review]
+prompt = """
+Review your work. Check for errors, style issues, and test coverage.
+Amend your commit with any fixes.
+"""
+include_original = false
+clear = false
 
 [repo]
 source = "~/Documents/GoogleDrive/dreamtides"
@@ -128,14 +158,24 @@ You are Baker, focused on UI and user experience.
 
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
-| `model` | string | `"opus"` | Claude model to use |
+| `model` | string | `"sonnet"` | Claude model to use (haiku, sonnet, opus) |
 | `skip_permissions` | bool | `true` | Use `--dangerously-skip-permissions` |
 | `allowed_tools` | string[] | see above | Tools to allow via `--allowedTools` |
-| `patrol_interval_secs` | u32 | `60` | Seconds between patrol runs |
+| `patrol_interval_secs` | u32 | `30` | Seconds between patrol runs |
 | `sound_on_review` | bool | `true` | Play terminal bell when work needs review |
 | `role_prompt` | string | `""` | Additional context for the worker |
 | `excluded_from_pool` | bool | `false` | Exclude from automatic task assignment |
-| `self_review` | bool | `false` | Enable self-review phase for this worker |
+| `self_review` | object | - | Self-review configuration (see below) |
+
+### Self-Review Configuration
+
+The `[defaults.self_review]` section configures the self-review prompt:
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `prompt` | string | required | The prompt sent to workers for self-review |
+| `include_original` | bool | `false` | Include the original task prompt |
+| `clear` | bool | `false` | Send `/clear` before the self-review prompt |
 
 ### Editor Integration
 
@@ -174,11 +214,14 @@ TMUX session identifier.
 | `branch` | string | Git branch name (`llmc/<name>`) |
 | `status` | Status | Current worker state |
 | `current_prompt` | string | Full prompt text for current task |
-| `prompt_cmd` | Option<string> | Command used to generate the prompt (e.g., "bd show dr-abc") |
+| `prompt_cmd` | Option<string> | Command used to generate the prompt |
 | `created_at_unix` | u64 | Unix timestamp of worker creation |
 | `last_activity_unix` | u64 | Unix timestamp of last state change |
 | `commit_sha` | Option<string> | SHA of commit awaiting review |
 | `session_id` | string | TMUX session identifier |
+| `crash_count` | u32 | Number of crashes (for error recovery) |
+| `last_crash_unix` | Option<u64> | Unix timestamp of last crash |
+| `on_complete_sent_unix` | Option<u64> | When self-review prompt was sent |
 | `self_review` | bool | If true, enable self-review phase for this task |
 
 ## TMUX Integration
@@ -189,11 +232,11 @@ with the worker's worktree as the working directory.
 
 ### Session Startup
 
-When starting a worker session, the system creates a detached TMUX session,
-sets environment variables for worker identification, launches Claude with
-configured flags, waits for Claude to initialize (polling for the ">" prompt),
-accepts the bypass permissions warning if shown, sends `/clear`, and marks the
-worker as idle.
+When starting a worker session, the system creates a detached TMUX session, sets
+environment variables for worker identification, launches Claude with configured
+flags, waits for Claude to initialize (polling for the ">" prompt), accepts the
+bypass permissions warning if shown, sends `/clear`, and marks the worker as
+idle.
 
 ### Reliable Communication
 
@@ -203,8 +246,8 @@ uses a multi-phase approach: send text in literal mode, calculate a debounce
 delay based on message size (500ms base + 100ms per KB, capped at 2000ms), then
 send Enter with retry logic.
 
-For large prompts (>1KB), use TMUX's `load-buffer` from a temporary file,
-then `paste-buffer`, to avoid shell command-line limits.
+For large prompts (>1KB), use TMUX's `load-buffer` from a temporary file, then
+`paste-buffer`, to avoid shell command-line limits.
 
 **Important**: Create sessions with wide terminals (`-x 500`) to prevent message
 truncation.
@@ -226,21 +269,25 @@ matching code.
 ## The Patrol System
 
 The Patrol is a background process that runs periodically during `llmc up` to
-maintain system health. It performs four main operations:
+maintain system health. It performs these main operations:
 
 1. **Check session health**: Verify TMUX sessions exist and match state file
 2. **Detect state transitions**: Find workers that have finished but haven't
    been processed yet
-3. **Rebase pending reviews**: Keep `needs_review` workers rebased on master,
+3. **Send pending self-review prompts**: Trigger self-review for workers that
+   committed
+4. **Detect reviewing amendments**: Transition workers who completed self-review
+5. **Rebase pending reviews**: Keep `needs_review` workers rebased on master,
    and detect workers whose work was already merged (resetting them to idle)
-4. **Detect stuck workers**: Find workers that appear stuck
 
-The patrol runs on a configurable interval (default: 60 seconds) unless another
+The patrol runs on a configurable interval (default: 30 seconds) unless another
 patrol is already running or the system is shutting down.
 
 ## JSON Output
 
-Most LLMC commands support a `--json` flag that outputs structured JSON instead of human-readable text. This is useful for scripting and integration with other tools.
+Most LLMC commands support a `--json` flag that outputs structured JSON instead
+of human-readable text. This is useful for scripting and integration with other
+tools.
 
 ```bash
 llmc status --json
@@ -256,7 +303,8 @@ Use `llmc schema` to view the complete JSON schema documentation:
 llmc schema
 ```
 
-This outputs a JSON document describing all command outputs, their fields, and types.
+This outputs a JSON document describing all command outputs, their fields, and
+types.
 
 ### Commands Supporting JSON Output
 
@@ -283,25 +331,34 @@ The following commands support `--json`:
 Initializes a new LLMC project directory.
 
 ```bash
-llmc init [--source <path>] [--target <path>]
+llmc init [--source <path>] [--target <path>] [--force]
 ```
 
 Clones source repository with `--local`, configures git rerere, installs LFS,
 creates directory structure, initializes state files, and copies `Tabula.xlsm`
 if present.
 
+Flags:
+- `--source`: Path to source repository
+- `--target`: Target directory for LLMC workspace (default: ~/llmc)
+- `--force`: Remove existing directory if present
+
 ### `llmc up`
 
 Starts the LLMC daemon, bringing up all worker sessions.
 
 ```bash
-llmc up [--no-patrol]
+llmc up [--no-patrol] [--force]
 ```
 
-Loads configuration, starts TMUX server, creates worktrees and sessions for
-each worker, enters main loop monitoring for state changes and running patrol.
-Handles graceful shutdown on Ctrl-C by sending Ctrl-C to each session and
-saving final state.
+Loads configuration, starts TMUX server, creates worktrees and sessions for each
+worker, enters main loop monitoring for state changes and running patrol.
+Handles graceful shutdown on Ctrl-C by sending Ctrl-C to each session and saving
+final state.
+
+Flags:
+- `--no-patrol`: Disable patrol system
+- `--force`: Force cleanup of existing sessions before starting
 
 ### `llmc down`
 
@@ -350,7 +407,10 @@ branch, or state).
 
 ### `llmc status`
 
-Displays status of all workers and active console sessions. For each worker, shows name, status, branch, time in current state, commit SHA (if awaiting review), prompt command (if started with `--prompt-cmd`), and prompt excerpt. Active console sessions are listed separately with their session names.
+Displays status of all workers and active console sessions. For each worker,
+shows name, status, branch, time in current state, commit SHA (if awaiting
+review), prompt command (if started with `--prompt-cmd`), and prompt excerpt.
+Active console sessions are listed separately with their session names.
 
 ```bash
 llmc status [--json]
@@ -365,31 +425,31 @@ llmc start --prompt "Implement feature X"
 llmc start --prompt-file task.md
 llmc start --prompt-cmd "bd show dr-abc"
 llmc start --worker adam --prompt "..."
+llmc start --prefix a --prompt "..."   # Select first idle worker starting with "a"
 llmc start --worker adam  # Opens $EDITOR for prompt
-llmc start --self-review --prompt "Task needing review"  # Enable self-review phase
+llmc start --self-review --prompt "Task needing review"
 ```
 
-If no prompt source is provided (`--prompt`, `--prompt-file`, or `--prompt-cmd`),
-opens `$EDITOR` for composing the prompt interactively. The editor opens with a
-template explaining the expected format. Empty or whitespace-only content aborts
-the operation.
+If no prompt source is provided (`--prompt`, `--prompt-file`, or
+`--prompt-cmd`), opens `$EDITOR` for composing the prompt interactively. The
+editor opens with a template explaining the expected format. Empty or
+whitespace-only content aborts the operation.
 
 Selects worker (specified or first idle from pool), verifies idle state, pulls
 latest master into worktree, copies `Tabula.xlsm`, builds full prompt with
 preamble, sends `/clear` and prompt, updates state to `working`.
 
-The `--self-review` flag enables the self-review phase when the worker completes
-its work. When enabled, the worker will receive the self-review prompt from
-`[defaults.self_review]` before transitioning to `needs_review` for human review.
-By default, self-review is disabled and workers go directly to human review.
+Flags:
+- `--worker`: Specify worker by exact name
+- `--prefix`: Select first idle worker whose name starts with this prefix
+- `--prompt`: Prompt text to assign
+- `--prompt-file`: Path to file containing prompt
+- `--prompt-cmd`: Command to execute, using its output as the prompt
+- `--self-review`: Enable the self-review phase for this task
 
-The `--prompt-cmd` option executes the specified shell command and uses its
-stdout as the prompt. This is useful for generating prompts from issue trackers
-or other tools that produce detailed task descriptions.
-
-The prompt preamble includes worktree location, repository root, instructions
-to follow AGENTS.md conventions, run validation commands, create a single
-commit, and not push to remote.
+The prompt preamble includes worktree location, repository root, instructions to
+follow AGENTS.md conventions, run validation commands, create a single commit,
+and not push to remote.
 
 **Important: Path References in Prompts**
 
@@ -397,25 +457,8 @@ When writing prompts that reference files, always use **relative paths** like
 `@rules_engine/src/foo.rs` rather than absolute paths to the source repository.
 
 Claude Code's `@path` syntax follows whatever path is given literally. If you
-write `@/Users/you/Documents/main-repo/src/file.rs`, the worker will access
-that exact path in the main repository, not the corresponding file in its
-worktree. This can cause workers to accidentally modify the main repository
-instead of their isolated worktree.
-
-LLMC detects when prompts contain absolute paths to the source repository and
-will warn you before proceeding. If warned, abort and fix your paths:
-
-```
-⚠️  WARNING: Source repository paths detected in prompt!
-
-The worker's working directory is: /Users/you/llmc/.worktrees/adam
-
-But your prompt contains absolute paths to the source repository:
-  Source repo: /Users/you/Documents/main-repo
-
-  Found:     @/Users/you/Documents/main-repo/src/foo.rs
-  Suggested: @src/foo.rs
-```
+write `@/Users/you/Documents/main-repo/src/file.rs`, the worker will access that
+exact path in the main repository, not the corresponding file in its worktree.
 
 ### `llmc message <worker> [message]`
 
@@ -443,8 +486,8 @@ llmc attach llmc-console1  # Also works with full session name
 
 Creates a new interactive console session and attaches to it, or attaches to an
 existing console session if it already exists. Console sessions provide manual
-agent interaction via the same TMUX interface as workers, but without creating
-a worker or worktree.
+agent interaction via the same TMUX interface as workers, but without creating a
+worker or worktree.
 
 ```bash
 llmc console           # Creates console with next available number (console1, console2, etc.)
@@ -462,7 +505,8 @@ The session runs in the master repository directory (configured via
 
 Console sessions:
 - **Persist across `llmc down`/`llmc up` restarts** (unlike workers)
-- Can be attached to later with `llmc attach console1` or `llmc console console1`
+- Can be attached to later with `llmc attach console1` or `llmc console
+  console1`
 - Can be terminated with `llmc nuke console1`
 - Can be killed during shutdown with `llmc down --kill-consoles`
 
@@ -482,8 +526,8 @@ llmc review baker --force            # Force review regardless of worker state
 
 The `--force` flag bypasses state validation, allowing review of a worker
 regardless of its current state. This is useful when a worker is stuck in an
-intermediate state (e.g., `reviewing`) but you need to see its diff anyway.
-When using `--force`, you must specify a worker name.
+intermediate state (e.g., `reviewing`) but you need to see its diff anyway. When
+using `--force`, you must specify a worker name.
 
 ### `llmc reject [message]`
 
@@ -513,14 +557,13 @@ llmc accept baker --force  # Force accept regardless of worker state
 
 Verifies `needs_review` state (unless `--force` is used), ensures clean
 worktree, rebases onto master, squashes to single commit, strips agent
-attribution ("Generated with", "Co-Authored-By"), fast-forward merges to
-master, removes worktree and branch, resets worker to `idle` with new worktree.
-Other `needs_review` workers will be rebased by the patrol system on its next
-run.
+attribution ("Generated with", "Co-Authored-By"), fast-forward merges to master,
+removes worktree and branch, resets worker to `idle` with new worktree. Other
+`needs_review` workers will be rebased by the patrol system on its next run.
 
 The `--force` flag bypasses state validation, allowing accept of a worker
-regardless of its current state. When using `--force`, you must specify a
-worker name.
+regardless of its current state. When using `--force`, you must specify a worker
+name.
 
 ### `llmc rebase <worker>`
 
@@ -577,16 +620,31 @@ branches.
 #### Flags
 
 - `--repair`: Automatically fix detected issues including:
-  - Kill orphaned TMUX sessions (sessions that exist but have no configured worker)
+  - Kill orphaned TMUX sessions (sessions that exist but have no configured
+    worker)
   - Mark workers as offline when TMUX sessions are missing
   - Reset workers in error state to clean idle state
-  - Fix state inconsistencies (missing commit_sha, empty prompts, future timestamps)
+  - Fix state inconsistencies (missing commit_sha, empty prompts, future
+    timestamps)
   - Reset daemon crash flag
   - Clean up orphaned git rebase state
 
-- `--yes`: Skip confirmation prompts when used with `--repair`. Useful for automated workflows.
+- `--yes`: Skip confirmation prompts when used with `--repair`. Useful for
+  automated workflows.
 
-- `--rebuild`: Rebuild state.json from filesystem by scanning worktrees and TMUX sessions. Use when state file is corrupted or lost.
+- `--rebuild`: Rebuild state.json from filesystem by scanning worktrees and TMUX
+  sessions. Use when state file is corrupted or lost.
+
+### `llmc config`
+
+Manage configuration settings.
+
+```bash
+llmc config get defaults.model
+llmc config get workers.adam.model
+llmc config set defaults.model opus
+llmc config set workers.adam.excluded_from_pool true
+```
 
 ### `llmc schema`
 
@@ -596,23 +654,28 @@ Displays the JSON schema documentation for all LLMC command outputs.
 llmc schema
 ```
 
-Outputs a JSON document describing the structure of JSON output for each command that supports the `--json` flag. Useful for understanding the exact fields and types returned by each command.
+Outputs a JSON document describing the structure of JSON output for each command
+that supports the `--json` flag. Useful for understanding the exact fields and
+types returned by each command.
 
-### `llmc peek <worker>`
+### `llmc peek [worker]`
 
 Shows recent terminal output from a worker's session.
 
 ```bash
+llmc peek              # Peek at most recently active worker
 llmc peek adam
 llmc peek adam --lines 100
 llmc peek adam --json
 ```
 
-Useful for checking a worker's progress without attaching to its session.
+Useful for checking a worker's progress without attaching to its session. If no
+worker is specified, defaults to the most recently active worker.
 
 ### `llmc pick <worker>`
 
-Grabs the current changes from a worker's worktree without going through the full review process.
+Grabs the current changes from a worker's worktree without going through the
+full review process.
 
 ```bash
 llmc pick adam
@@ -625,7 +688,8 @@ Creates a commit from the worker's current state and cherry-picks it to master.
 
 Merge conflicts can occur during patrol rebases, manual rebases, or accept
 operations. The system detects conflicts by checking for `.git/rebase-merge` or
-`.git/rebase-apply` directories and running `git diff --name-only --diff-filter=U`.
+`.git/rebase-apply` directories and running `git diff --name-only
+--diff-filter=U`.
 
 ### Conflict Types
 
@@ -640,11 +704,6 @@ When presenting conflicts to a worker, provide a high-level summary (why
 rebasing, how many files), a file list with conflict types and marker counts,
 conflict details showing actual conflicted regions with context, and clear
 step-by-step resolution instructions.
-
-The conflict resolution prompt template explains the situation, lists conflicts,
-provides resolution steps (examine markers, decide resolution, remove markers,
-stage files, continue rebase, run validation), and includes notes about viewing
-original versions via `git show :2:<file>` and `:3:<file>`.
 
 ### Detecting Resolution Completion
 
@@ -668,9 +727,7 @@ monitored by patrol for resolution, and timeouts trigger escalation.
 
 ## Failure Recovery
 
-The system must handle several failure modes gracefully. This section summarizes
-the recovery strategies; see `llmc2-appendix-error-recovery.md` for detailed
-decision trees.
+The system must handle several failure modes gracefully.
 
 ### Daemon Resilience (Never Crash)
 
@@ -713,20 +770,15 @@ LLMC is designed to be self-healing. When workers fail to start:
 4. **Crash count reset**: When a worker starts successfully, its crash count
    resets to zero, providing positive feedback to the self-healing system.
 
-This means transient failures (Claude not starting, network issues, resource
-contention) are automatically recovered without manual intervention.
-
 ### Git Lock File Handling
 
 Git operations can encounter lock file errors when another git process is
-running concurrently (e.g., `git push` running while LLMC performs a rebase).
-LLMC handles this gracefully:
+running concurrently. LLMC handles this gracefully:
 
 - Operations that encounter `index.lock` errors are automatically retried
 - Up to 5 retry attempts with 500ms delay between each
 - Applies to: `fetch_origin`, `pull_rebase`, `rebase_onto`, `abort_rebase`,
   `checkout_branch`, `reset_to_ref`
-- Concurrent operations like `git push` are safe to run alongside LLMC
 - Stale rebase state (orphaned `rebase-merge` directories) is automatically
   cleaned up before starting new rebases
 
@@ -741,21 +793,6 @@ LLMC handles this gracefully:
 | State corruption | JSON parse error | Backup restore | Manual intervention |
 | Git lock file | `index.lock` error in stderr | 5 attempts, 500ms delay | Error after exhausted |
 
-### Key Principles
-
-1. **Auto-recover when possible**: Most transient failures (lost input, partial
-   sends) should be automatically retried before involving the user.
-
-2. **Preserve work in progress**: When a crash occurs during `working` state,
-   the system attempts to restore context and resume rather than losing progress.
-
-3. **Escalate with context**: When manual intervention is required, provide
-   diagnostic information (logs, pane output, state history) to help the user
-   understand what went wrong.
-
-4. **Fail fast on corruption**: State file corruption requires immediate user
-   attention since recovery involves potentially destructive operations.
-
 ### State File Integrity
 
 The `state.json` file is protected by:
@@ -764,6 +801,7 @@ The `state.json` file is protected by:
 - **Pre-write validation**: Schema validation before any write
 - **Automatic backups**: Previous state preserved as `state.json.bak`
 - **Recovery command**: `llmc doctor --repair` attempts automatic repair
+- **State locking**: File-based locks prevent concurrent modifications
 
 ## Architecture
 
@@ -774,38 +812,51 @@ rules_engine/src/llmc/
 ├── Cargo.toml
 └── src/
     ├── main.rs           # CLI entrypoint
+    ├── lib.rs            # Library exports
     ├── cli.rs            # clap command definitions
     ├── config.rs         # Configuration loading
     ├── state.rs          # State file operations
     ├── json_output.rs    # JSON output types and schema
+    ├── lock.rs           # State file locking
+    ├── editor.rs         # $EDITOR integration
+    ├── recovery.rs       # Crash recovery helpers
     ├── tmux/
     │   ├── mod.rs
     │   ├── session.rs    # Session management
-    │   ├── sender.rs     # Reliable input sending
-    │   └── monitor.rs    # Output monitoring
+    │   └── sender.rs     # Reliable input sending
+    ├── logging/
+    │   ├── mod.rs
+    │   ├── types.rs      # Log entry types
+    │   ├── config.rs     # Log configuration
+    │   ├── git.rs        # Git operation logging
+    │   ├── state.rs      # State change logging
+    │   ├── tmux.rs       # TMUX operation logging
+    │   └── writer.rs     # Log file writer
     ├── patrol.rs         # Patrol system
     ├── git.rs            # Git operations
     ├── worker.rs         # Worker lifecycle
-    ├── commands/
-    │   ├── mod.rs
-    │   ├── init.rs
-    │   ├── up.rs
-    │   ├── down.rs
-    │   ├── add.rs
-    │   ├── nuke.rs
-    │   ├── status.rs
-    │   ├── start.rs
-    │   ├── message.rs
-    │   ├── attach.rs
-    │   ├── review.rs
-    │   ├── reject.rs
-    │   ├── accept.rs
-    │   ├── rebase.rs
-    │   ├── reset.rs
-    │   ├── doctor.rs
-    │   ├── peek.rs
-    │   └── pick.rs
-    └── sound.rs          # Terminal bell/sounds
+    ├── sound.rs          # Terminal bell/sounds
+    └── commands/
+        ├── mod.rs
+        ├── init.rs
+        ├── up.rs
+        ├── down.rs
+        ├── add.rs
+        ├── nuke.rs
+        ├── status.rs
+        ├── start.rs
+        ├── message.rs
+        ├── attach.rs
+        ├── console.rs
+        ├── review.rs
+        ├── reject.rs
+        ├── accept.rs
+        ├── rebase.rs
+        ├── reset.rs
+        ├── doctor.rs
+        ├── config.rs
+        ├── peek.rs
+        └── pick.rs
 ```
 
 ### Dependencies
@@ -852,9 +903,9 @@ Key reference files in Gastown (`~/gastown`):
 
 ## Security Considerations
 
-1. **Skip permissions mode**: Workers use `--dangerously-skip-permissions`.
-   This is acceptable because workers operate in isolated worktrees, have no
-   network access to remotes, and require human review before merge.
+1. **Skip permissions mode**: Workers use `--dangerously-skip-permissions`. This
+   is acceptable because workers operate in isolated worktrees, have no network
+   access to remotes, and require human review before merge.
 
 2. **Prompt injection**: Prompts sent via tmux literal mode (`-l` flag) to
    prevent special character interpretation.
