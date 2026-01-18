@@ -124,6 +124,54 @@ pub fn all_warning_rules() -> Vec<Box<dyn LintRule>> {
     ]
 }
 
+pub fn is_setext_underline(line: &str) -> bool {
+    let trimmed = line.trim();
+    if trimmed.is_empty() {
+        return false;
+    }
+    trimmed.chars().all(|c| c == '=' || c == '-') && trimmed.len() >= 3
+}
+
+pub fn is_atx_heading(line: &str) -> bool {
+    let trimmed = line.trim_start();
+    if !trimmed.starts_with('#') {
+        return false;
+    }
+
+    let hash_count = trimmed.chars().take_while(|&c| c == '#').count();
+    if hash_count > 6 {
+        return false;
+    }
+
+    let after_hashes = &trimmed[hash_count..];
+    after_hashes.is_empty() || after_hashes.starts_with(' ')
+}
+
+pub fn is_list_line(line: &str) -> bool {
+    let trimmed = line.trim_start();
+    if trimmed.starts_with("- ") || trimmed.starts_with("* ") || trimmed.starts_with("+ ") {
+        return true;
+    }
+
+    let mut chars = trimmed.chars().peekable();
+    if chars.peek().is_some_and(char::is_ascii_digit) {
+        while chars.peek().is_some_and(char::is_ascii_digit) {
+            chars.next();
+        }
+        let delimiter = chars.next();
+        if matches!(delimiter, Some('.' | ')')) && chars.next() == Some(' ') {
+            return true;
+        }
+    }
+
+    false
+}
+
+pub fn is_list_continuation(line: &str) -> bool {
+    let leading_spaces = line.len() - line.trim_start().len();
+    leading_spaces >= 2
+}
+
 impl LintRule for DocumentTooLargeRule {
     fn codes(&self) -> &[&str] {
         &["W001"]
@@ -793,14 +841,6 @@ impl LintRule for TemplateSectionInNonRootRule {
     }
 }
 
-fn is_setext_underline(line: &str) -> bool {
-    let trimmed = line.trim();
-    if trimmed.is_empty() {
-        return false;
-    }
-    trimmed.chars().all(|c| c == '=' || c == '-') && trimmed.len() >= 3
-}
-
 fn extract_list_marker(line: &str) -> Option<char> {
     let mut chars = line.chars();
     match chars.next()? {
@@ -848,46 +888,6 @@ fn is_url_in_markdown_link(line: &str, url: &str) -> bool {
         }
     }
     false
-}
-
-fn is_atx_heading(line: &str) -> bool {
-    let trimmed = line.trim_start();
-    if !trimmed.starts_with('#') {
-        return false;
-    }
-
-    let hash_count = trimmed.chars().take_while(|&c| c == '#').count();
-    if hash_count > 6 {
-        return false;
-    }
-
-    let after_hashes = &trimmed[hash_count..];
-    after_hashes.is_empty() || after_hashes.starts_with(' ')
-}
-
-fn is_list_line(line: &str) -> bool {
-    let trimmed = line.trim_start();
-    if trimmed.starts_with("- ") || trimmed.starts_with("* ") || trimmed.starts_with("+ ") {
-        return true;
-    }
-
-    let mut chars = trimmed.chars().peekable();
-    if chars.peek().is_some_and(char::is_ascii_digit) {
-        while chars.peek().is_some_and(char::is_ascii_digit) {
-            chars.next();
-        }
-        let delimiter = chars.next();
-        if matches!(delimiter, Some('.' | ')')) && chars.next() == Some(' ') {
-            return true;
-        }
-    }
-
-    false
-}
-
-fn is_list_continuation(line: &str) -> bool {
-    let leading_spaces = line.len() - line.trim_start().len();
-    leading_spaces >= 2
 }
 
 fn normalize_path(path: &Path) -> std::path::PathBuf {

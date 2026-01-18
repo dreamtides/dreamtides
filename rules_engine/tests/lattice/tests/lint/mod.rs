@@ -1,3 +1,4 @@
+mod autofix_engine_tests;
 mod error_rules_tests;
 mod result_reporter_tests;
 mod rule_engine_tests;

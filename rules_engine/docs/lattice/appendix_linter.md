@@ -452,7 +452,7 @@ Found 1 error, 2 warnings in 2 documents.
 
 - `--errors-only`: Suppress warnings
 - `--path <prefix>`: Check only files under path
-- `--fix`: Auto-fix where possible (W004-W006, W011-W015)
+- `--fix`: Auto-fix where possible (E008, W004-W006, W011-W015)
 - `--staged-only`: Check only staged files
 - `--rebuild-index`: Force full index rebuild before checking. Useful when the
   index may be out of sync with the filesystem.
