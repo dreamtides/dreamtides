@@ -536,7 +536,7 @@ integrates those functions into the reconciliation workflow.
 
 ---
 
-## Feature: Link System [ONGOING]
+## Feature: Link System [DONE]
 
 **Goal:** Extract, normalize, and track links between documents.
 
@@ -557,7 +557,7 @@ integrates those functions into the reconciliation workflow.
 - Parse markdown to find all links
 - Extract link text, path, and fragment
 - Handle shorthand ID-only links
-- Extract links from frontmatter fields (`blocking`, `blocked-by`, etc.)
+- Classify links: Canonical, ShorthandId, PathOnly, External, Other
 
 #### L2: Link Resolver (`link/link_resolver.rs`)
 **Files:** `link/link_resolver.rs`
@@ -590,6 +590,25 @@ integrates those functions into the reconciliation workflow.
 - Extract IDs from `blocking`, `blocked-by`, `discovered-from`
 - Handle custom `*-id` and `*-ids` fields
 - Mark link type as 'frontmatter' in index
+
+### Post-Implementation Notes
+
+**Integration with Index Reconciliation:** The index reconciliation module
+(`index/reconciliation/sync_strategies.rs`) has its own link ID extraction in
+`extract_body_link_ids()` rather than using `link_extractor`. This is a minor
+code duplication that can be refactored later. The reconciliation only needs
+target IDs, so the current simple implementation is sufficient. A future
+refactoring could call `link_extractor::extract()` and map results to IDs.
+
+**Dependent Features Not Yet Implemented:**
+- Commands that use link rewriting: `lat close`, `lat reopen`, `lat prune`,
+  `lat mv`, `lat fmt`
+- Relationship commands: `lat links-from`, `lat links-to`, `lat orphans`,
+  `lat impact`, `lat path`
+- Lint rules for link validation: W008 (self-reference), W010 (path mismatch),
+  W010b (missing fragment), E002 (missing reference target)
+
+These features will use the Link System exports when implemented.
 
 ---
 
