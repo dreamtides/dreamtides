@@ -350,7 +350,8 @@ A knowledge base document (no `task-type` field) is located in a `tasks/`
 directory.
 
 **Detection:** Check if path contains `/tasks/` and document lacks `task-type`
-frontmatter field.
+frontmatter field. Documents in `.closed/` subdirectories are exempt from this
+warning (they may have been tasks that were closed).
 
 **Message:** `Warning [W019]: tasks/design_doc.md is a knowledge base document but located in tasks/`
 
