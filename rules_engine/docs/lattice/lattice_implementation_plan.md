@@ -682,7 +682,7 @@ These features will use the Link System exports when implemented.
 
 ---
 
-## Feature: Linting and Formatting
+## Feature: Linting and Formatting [ONGOING]
 
 **Goal:** Validate documents (`lat check`) and normalize formatting (`lat fmt`).
 
@@ -811,7 +811,7 @@ and Formatter](lattice_design.md#linter-and-formatter)
 
 ---
 
-## Feature: Core Task Commands
+## Feature: Core Task Commands [ONGOING]
 
 **Goal:** Create, update, close, reopen, prune commands.
 
@@ -871,7 +871,7 @@ Task Tracking](appendix_task_tracking.md)
 
 ---
 
-## Feature: Query Commands
+## Feature: Query Commands [ONGOING]
 
 **Goal:** List, search, and filter documents.
 
@@ -940,7 +940,7 @@ Task Tracking](appendix_task_tracking.md)
 
 ---
 
-## Feature: Hierarchy Commands
+## Feature: Hierarchy Commands [ONGOING]
 
 **Goal:** Navigate document tree structure.
 
