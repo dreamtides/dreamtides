@@ -9,6 +9,7 @@ use lattice::cli::task_args::{CreateArgs, UpdateArgs};
 use lattice::document::document_reader;
 use lattice::document::frontmatter_schema::TaskType;
 use lattice::error::error_types::LatticeError;
+use lattice::git::client_config::FakeClientIdStore;
 use lattice::index::{document_queries, label_queries, schema_definition};
 
 fn create_test_repo() -> (tempfile::TempDir, CommandContext) {
@@ -18,7 +19,8 @@ fn create_test_repo() -> (tempfile::TempDir, CommandContext) {
     fs::create_dir(repo_root.join(".git")).expect("Failed to create .git");
 
     let global = GlobalOptions::default();
-    let context = create_context(repo_root, &global).expect("Failed to create context");
+    let mut context = create_context(repo_root, &global).expect("Failed to create context");
+    context.client_id_store = Box::new(FakeClientIdStore::new("WQN"));
 
     schema_definition::create_schema(&context.conn).expect("Failed to create schema");
 
@@ -37,7 +39,8 @@ fn create_task(context: &CommandContext, parent: &str, description: &str) -> Str
     };
 
     let global = GlobalOptions::default();
-    let ctx = create_context(&context.repo_root, &global).expect("Create context");
+    let mut ctx = create_context(&context.repo_root, &global).expect("Create context");
+    ctx.client_id_store = Box::new(FakeClientIdStore::new("WQN"));
 
     create_command::execute(ctx, args).expect("Create task");
 
@@ -57,7 +60,8 @@ fn create_kb_doc(context: &CommandContext, parent: &str, description: &str) -> S
     };
 
     let global = GlobalOptions::default();
-    let ctx = create_context(&context.repo_root, &global).expect("Create context");
+    let mut ctx = create_context(&context.repo_root, &global).expect("Create context");
+    ctx.client_id_store = Box::new(FakeClientIdStore::new("WQN"));
 
     create_command::execute(ctx, args).expect("Create KB doc");
 
@@ -91,7 +95,8 @@ fn update_changes_task_priority() {
     args.priority = Some(0);
 
     let global = GlobalOptions::default();
-    let ctx = create_context(temp_dir.path(), &global).expect("Create context");
+    let mut ctx = create_context(temp_dir.path(), &global).expect("Create context");
+    ctx.client_id_store = Box::new(FakeClientIdStore::new("WQN"));
 
     let result = update_command::execute(ctx, args);
     assert!(result.is_ok(), "Update should succeed: {:?}", result);
@@ -120,7 +125,8 @@ fn update_rejects_invalid_priority() {
     args.priority = Some(5);
 
     let global = GlobalOptions::default();
-    let ctx = create_context(temp_dir.path(), &global).expect("Create context");
+    let mut ctx = create_context(temp_dir.path(), &global).expect("Create context");
+    ctx.client_id_store = Box::new(FakeClientIdStore::new("WQN"));
 
     let result = update_command::execute(ctx, args);
     assert!(result.is_err(), "Update should fail for invalid priority");
@@ -145,7 +151,8 @@ fn update_rejects_priority_on_kb_document() {
     args.priority = Some(1);
 
     let global = GlobalOptions::default();
-    let ctx = create_context(temp_dir.path(), &global).expect("Create context");
+    let mut ctx = create_context(temp_dir.path(), &global).expect("Create context");
+    ctx.client_id_store = Box::new(FakeClientIdStore::new("WQN"));
 
     let result = update_command::execute(ctx, args);
     assert!(result.is_err(), "Update should fail for KB document priority");
@@ -174,7 +181,8 @@ fn update_changes_task_type() {
     args.r#type = Some(TaskType::Bug);
 
     let global = GlobalOptions::default();
-    let ctx = create_context(temp_dir.path(), &global).expect("Create context");
+    let mut ctx = create_context(temp_dir.path(), &global).expect("Create context");
+    ctx.client_id_store = Box::new(FakeClientIdStore::new("WQN"));
 
     let result = update_command::execute(ctx, args);
     assert!(result.is_ok(), "Update should succeed: {:?}", result);
@@ -207,7 +215,8 @@ fn update_converts_kb_to_task() {
     args.r#type = Some(TaskType::Task);
 
     let global = GlobalOptions::default();
-    let ctx = create_context(temp_dir.path(), &global).expect("Create context");
+    let mut ctx = create_context(temp_dir.path(), &global).expect("Create context");
+    ctx.client_id_store = Box::new(FakeClientIdStore::new("WQN"));
 
     let result = update_command::execute(ctx, args);
     assert!(result.is_ok(), "Update should succeed: {:?}", result);
@@ -236,7 +245,8 @@ fn update_adds_labels() {
     args.add_labels = vec!["urgent".to_string(), "frontend".to_string()];
 
     let global = GlobalOptions::default();
-    let ctx = create_context(temp_dir.path(), &global).expect("Create context");
+    let mut ctx = create_context(temp_dir.path(), &global).expect("Create context");
+    ctx.client_id_store = Box::new(FakeClientIdStore::new("WQN"));
 
     let result = update_command::execute(ctx, args);
     assert!(result.is_ok(), "Update should succeed: {:?}", result);
@@ -274,7 +284,8 @@ fn update_removes_labels() {
     };
 
     let global = GlobalOptions::default();
-    let ctx = create_context(temp_dir.path(), &global).expect("Create context");
+    let mut ctx = create_context(temp_dir.path(), &global).expect("Create context");
+    ctx.client_id_store = Box::new(FakeClientIdStore::new("WQN"));
     create_command::execute(ctx, args).expect("Create task");
 
     let task_id = document_queries::all_ids(&context.conn)
@@ -287,7 +298,8 @@ fn update_removes_labels() {
     update_args.remove_labels = vec!["urgent".to_string()];
 
     let global = GlobalOptions::default();
-    let ctx = create_context(temp_dir.path(), &global).expect("Create context");
+    let mut ctx = create_context(temp_dir.path(), &global).expect("Create context");
+    ctx.client_id_store = Box::new(FakeClientIdStore::new("WQN"));
 
     let result = update_command::execute(ctx, update_args);
     assert!(result.is_ok(), "Update should succeed: {:?}", result);
@@ -314,7 +326,8 @@ fn update_handles_multiple_ids() {
     args.priority = Some(1);
 
     let global = GlobalOptions::default();
-    let ctx = create_context(temp_dir.path(), &global).expect("Create context");
+    let mut ctx = create_context(temp_dir.path(), &global).expect("Create context");
+    ctx.client_id_store = Box::new(FakeClientIdStore::new("WQN"));
 
     let result = update_command::execute(ctx, args);
     assert!(result.is_ok(), "Batch update should succeed: {:?}", result);
@@ -341,7 +354,8 @@ fn update_fails_for_nonexistent_id() {
     let args = update_args(vec!["LNONEXIST"]);
 
     let global = GlobalOptions::default();
-    let ctx = create_context(temp_dir.path(), &global).expect("Create context");
+    let mut ctx = create_context(temp_dir.path(), &global).expect("Create context");
+    ctx.client_id_store = Box::new(FakeClientIdStore::new("WQN"));
 
     let mut args = args;
     args.priority = Some(1);
@@ -368,7 +382,8 @@ fn update_fails_with_no_changes() {
     let args = update_args(vec![&task_id]);
 
     let global = GlobalOptions::default();
-    let ctx = create_context(temp_dir.path(), &global).expect("Create context");
+    let mut ctx = create_context(temp_dir.path(), &global).expect("Create context");
+    ctx.client_id_store = Box::new(FakeClientIdStore::new("WQN"));
 
     let result = update_command::execute(ctx, args);
     assert!(result.is_err(), "Update should fail with no changes specified");
@@ -403,7 +418,8 @@ fn update_sets_updated_at_timestamp() {
     args.priority = Some(0);
 
     let global = GlobalOptions::default();
-    let ctx = create_context(temp_dir.path(), &global).expect("Create context");
+    let mut ctx = create_context(temp_dir.path(), &global).expect("Create context");
+    ctx.client_id_store = Box::new(FakeClientIdStore::new("WQN"));
 
     update_command::execute(ctx, args).expect("Update should succeed");
 

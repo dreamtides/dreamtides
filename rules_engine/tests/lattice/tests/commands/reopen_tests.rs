@@ -9,6 +9,7 @@ use lattice::cli::task_args::{CloseArgs, CreateArgs, ReopenArgs};
 use lattice::document::document_reader;
 use lattice::document::frontmatter_schema::TaskType;
 use lattice::error::error_types::LatticeError;
+use lattice::git::client_config::FakeClientIdStore;
 use lattice::index::{document_queries, schema_definition};
 use lattice::task::closed_directory;
 
@@ -19,7 +20,8 @@ fn create_test_repo() -> (tempfile::TempDir, CommandContext) {
     fs::create_dir(repo_root.join(".git")).expect("Failed to create .git");
 
     let global = GlobalOptions::default();
-    let context = create_context(repo_root, &global).expect("Failed to create context");
+    let mut context = create_context(repo_root, &global).expect("Failed to create context");
+    context.client_id_store = Box::new(FakeClientIdStore::new("WQN"));
 
     schema_definition::create_schema(&context.conn).expect("Failed to create schema");
 
@@ -38,7 +40,8 @@ fn create_task(context: &CommandContext, parent: &str, description: &str) -> Str
     };
 
     let global = GlobalOptions::default();
-    let ctx = create_context(&context.repo_root, &global).expect("Create context");
+    let mut ctx = create_context(&context.repo_root, &global).expect("Create context");
+    ctx.client_id_store = Box::new(FakeClientIdStore::new("WQN"));
 
     create_command::execute(ctx, args).expect("Create task");
 
@@ -58,7 +61,8 @@ fn create_kb_doc(context: &CommandContext, parent: &str, description: &str) -> S
     };
 
     let global = GlobalOptions::default();
-    let ctx = create_context(&context.repo_root, &global).expect("Create context");
+    let mut ctx = create_context(&context.repo_root, &global).expect("Create context");
+    ctx.client_id_store = Box::new(FakeClientIdStore::new("WQN"));
 
     create_command::execute(ctx, args).expect("Create KB doc");
 
@@ -69,7 +73,8 @@ fn create_kb_doc(context: &CommandContext, parent: &str, description: &str) -> S
 fn close_task(temp_dir: &tempfile::TempDir, task_id: &str) {
     let args = CloseArgs { ids: vec![task_id.to_string()], reason: None, dry_run: false };
     let global = GlobalOptions::default();
-    let ctx = create_context(temp_dir.path(), &global).expect("Create context");
+    let mut ctx = create_context(temp_dir.path(), &global).expect("Create context");
+    ctx.client_id_store = Box::new(FakeClientIdStore::new("WQN"));
     close_command::execute(ctx, args).expect("Close task");
 }
 
@@ -100,7 +105,8 @@ fn reopen_moves_task_from_closed_directory() {
     let args = reopen_args(vec![&task_id]);
 
     let global = GlobalOptions::default();
-    let ctx = create_context(temp_dir.path(), &global).expect("Create context");
+    let mut ctx = create_context(temp_dir.path(), &global).expect("Create context");
+    ctx.client_id_store = Box::new(FakeClientIdStore::new("WQN"));
 
     let result = reopen_command::execute(ctx, args);
     assert!(result.is_ok(), "Reopen should succeed: {:?}", result);
@@ -135,7 +141,8 @@ fn reopen_clears_closed_at_timestamp() {
     let args = reopen_args(vec![&task_id]);
 
     let global = GlobalOptions::default();
-    let ctx = create_context(temp_dir.path(), &global).expect("Create context");
+    let mut ctx = create_context(temp_dir.path(), &global).expect("Create context");
+    ctx.client_id_store = Box::new(FakeClientIdStore::new("WQN"));
 
     reopen_command::execute(ctx, args).expect("Reopen should succeed");
 
@@ -167,7 +174,8 @@ fn reopen_rejects_non_closed_task() {
     let args = reopen_args(vec![&task_id]);
 
     let global = GlobalOptions::default();
-    let ctx = create_context(temp_dir.path(), &global).expect("Create context");
+    let mut ctx = create_context(temp_dir.path(), &global).expect("Create context");
+    ctx.client_id_store = Box::new(FakeClientIdStore::new("WQN"));
 
     let result = reopen_command::execute(ctx, args);
     assert!(result.is_err(), "Reopen should fail for non-closed task");
@@ -191,7 +199,8 @@ fn reopen_rejects_kb_document() {
     let args = reopen_args(vec![&doc_id]);
 
     let global = GlobalOptions::default();
-    let ctx = create_context(temp_dir.path(), &global).expect("Create context");
+    let mut ctx = create_context(temp_dir.path(), &global).expect("Create context");
+    ctx.client_id_store = Box::new(FakeClientIdStore::new("WQN"));
 
     let result = reopen_command::execute(ctx, args);
     assert!(result.is_err(), "Reopen should fail for KB document");
@@ -211,7 +220,8 @@ fn reopen_fails_for_nonexistent_id() {
     let args = reopen_args(vec!["LNONEXIST"]);
 
     let global = GlobalOptions::default();
-    let ctx = create_context(temp_dir.path(), &global).expect("Create context");
+    let mut ctx = create_context(temp_dir.path(), &global).expect("Create context");
+    ctx.client_id_store = Box::new(FakeClientIdStore::new("WQN"));
 
     let result = reopen_command::execute(ctx, args);
     assert!(result.is_err(), "Reopen should fail for nonexistent ID");
@@ -243,7 +253,8 @@ fn reopen_fails_if_target_path_exists() {
     let args = reopen_args(vec![&task_id]);
 
     let global = GlobalOptions::default();
-    let ctx = create_context(temp_dir.path(), &global).expect("Create context");
+    let mut ctx = create_context(temp_dir.path(), &global).expect("Create context");
+    ctx.client_id_store = Box::new(FakeClientIdStore::new("WQN"));
 
     let result = reopen_command::execute(ctx, args);
     assert!(result.is_err(), "Reopen should fail when target path exists");
@@ -276,7 +287,8 @@ fn reopen_dry_run_does_not_move_file() {
     let args = ReopenArgs { ids: vec![task_id.clone()], dry_run: true };
 
     let global = GlobalOptions::default();
-    let ctx = create_context(temp_dir.path(), &global).expect("Create context");
+    let mut ctx = create_context(temp_dir.path(), &global).expect("Create context");
+    ctx.client_id_store = Box::new(FakeClientIdStore::new("WQN"));
 
     let result = reopen_command::execute(ctx, args);
     assert!(result.is_ok(), "Dry run should succeed: {:?}", result);
@@ -310,7 +322,8 @@ fn reopen_handles_multiple_ids() {
     let args = reopen_args(vec![&task1_id, &task2_id]);
 
     let global = GlobalOptions::default();
-    let ctx = create_context(temp_dir.path(), &global).expect("Create context");
+    let mut ctx = create_context(temp_dir.path(), &global).expect("Create context");
+    ctx.client_id_store = Box::new(FakeClientIdStore::new("WQN"));
 
     let result = reopen_command::execute(ctx, args);
     assert!(result.is_ok(), "Batch reopen should succeed: {:?}", result);
@@ -398,7 +411,8 @@ See the [fix login bug](../tasks/.closed/{task_filename}#{task_id}) task for det
     let args = reopen_args(vec![&task_id]);
 
     let global = GlobalOptions::default();
-    let ctx = create_context(temp_dir.path(), &global).expect("Create context");
+    let mut ctx = create_context(temp_dir.path(), &global).expect("Create context");
+    ctx.client_id_store = Box::new(FakeClientIdStore::new("WQN"));
 
     reopen_command::execute(ctx, args).expect("Reopen should succeed");
 

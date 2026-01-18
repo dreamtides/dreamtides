@@ -8,6 +8,7 @@ use lattice::cli::global_options::GlobalOptions;
 use lattice::cli::query_args::SearchArgs;
 use lattice::document::frontmatter_schema::TaskType;
 use lattice::error::error_types::LatticeError;
+use lattice::git::client_config::FakeClientIdStore;
 use lattice::index::document_types::InsertDocument;
 use lattice::index::{document_queries, fulltext_search, schema_definition};
 
@@ -18,7 +19,8 @@ fn create_test_repo() -> (tempfile::TempDir, CommandContext) {
     fs::create_dir(repo_root.join(".git")).expect("Failed to create .git");
 
     let global = GlobalOptions::default();
-    let context = create_context(repo_root, &global).expect("Failed to create context");
+    let mut context = create_context(repo_root, &global).expect("Failed to create context");
+    context.client_id_store = Box::new(FakeClientIdStore::new("WQN"));
 
     schema_definition::create_schema(&context.conn).expect("Failed to create schema");
 
@@ -408,7 +410,8 @@ fn search_with_json_output() {
     fs::create_dir(repo_root.join(".git")).expect("Failed to create .git");
 
     let global = GlobalOptions { json: true, ..GlobalOptions::default() };
-    let context = create_context(repo_root, &global).expect("Failed to create context");
+    let mut context = create_context(repo_root, &global).expect("Failed to create context");
+    context.client_id_store = Box::new(FakeClientIdStore::new("WQN"));
 
     schema_definition::create_schema(&context.conn).expect("Failed to create schema");
 

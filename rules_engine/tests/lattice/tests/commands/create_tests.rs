@@ -8,6 +8,7 @@ use lattice::cli::global_options::GlobalOptions;
 use lattice::cli::task_args::CreateArgs;
 use lattice::document::frontmatter_schema::TaskType;
 use lattice::error::error_types::LatticeError;
+use lattice::git::client_config::FakeClientIdStore;
 use lattice::index::{document_queries, schema_definition};
 
 fn create_test_repo() -> (tempfile::TempDir, CommandContext) {
@@ -17,7 +18,8 @@ fn create_test_repo() -> (tempfile::TempDir, CommandContext) {
     fs::create_dir(repo_root.join(".git")).expect("Failed to create .git");
 
     let global = GlobalOptions::default();
-    let context = create_context(repo_root, &global).expect("Failed to create context");
+    let mut context = create_context(repo_root, &global).expect("Failed to create context");
+    context.client_id_store = Box::new(FakeClientIdStore::new("WQN"));
 
     schema_definition::create_schema(&context.conn).expect("Failed to create schema");
 
@@ -120,7 +122,8 @@ fn create_handles_collision_with_numeric_suffix() {
     assert!(result1.is_ok(), "First create should succeed: {:?}", result1);
 
     let global = GlobalOptions::default();
-    let context2 = create_context(temp_dir.path(), &global).expect("Create context");
+    let mut context2 = create_context(temp_dir.path(), &global).expect("Create context");
+    context2.client_id_store = Box::new(FakeClientIdStore::new("WQN"));
 
     let args2 = create_args("api/", "Test document");
     let result2 = create_command::execute(context2, args2);
@@ -424,7 +427,8 @@ fn create_adds_document_to_index() {
     assert!(result.is_ok(), "Create should succeed: {:?}", result);
 
     let global = GlobalOptions::default();
-    let context2 = create_context(temp_dir.path(), &global).expect("Create context");
+    let mut context2 = create_context(temp_dir.path(), &global).expect("Create context");
+    context2.client_id_store = Box::new(FakeClientIdStore::new("WQN"));
 
     let exists = document_queries::exists_at_path(&context2.conn, "api/docs/indexed_document.md")
         .expect("Query should succeed");
@@ -443,7 +447,8 @@ fn create_indexes_task_type_correctly() {
     assert!(result.is_ok(), "Create should succeed: {:?}", result);
 
     let global = GlobalOptions::default();
-    let context2 = create_context(temp_dir.path(), &global).expect("Create context");
+    let mut context2 = create_context(temp_dir.path(), &global).expect("Create context");
+    context2.client_id_store = Box::new(FakeClientIdStore::new("WQN"));
 
     let row = document_queries::lookup_by_path(&context2.conn, "api/tasks/bug_fix_task.md")
         .expect("Query should succeed")
@@ -527,7 +532,8 @@ fn create_at_existing_explicit_path_fails() {
     assert!(result1.is_ok(), "First create should succeed: {:?}", result1);
 
     let global = GlobalOptions::default();
-    let context2 = create_context(temp_dir.path(), &global).expect("Create context");
+    let mut context2 = create_context(temp_dir.path(), &global).expect("Create context");
+    context2.client_id_store = Box::new(FakeClientIdStore::new("WQN"));
 
     let args2 = CreateArgs {
         parent: "docs/existing.md".to_string(),

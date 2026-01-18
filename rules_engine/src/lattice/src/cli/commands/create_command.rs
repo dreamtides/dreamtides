@@ -214,7 +214,10 @@ fn read_body_file(args: &CreateArgs) -> LatticeResult<String> {
 
 /// Generates a new unique Lattice ID.
 fn generate_new_id(context: &CommandContext) -> LatticeResult<LatticeId> {
-    let client_id = get_or_create_client_id(context)?;
+    let client_id = client_config::get_or_create_client_id(
+        context.client_id_store.as_ref(),
+        &context.repo_root,
+    )?;
 
     loop {
         let counter = client_counters::get_and_increment(&context.conn, &client_id)?;
@@ -228,18 +231,6 @@ fn generate_new_id(context: &CommandContext) -> LatticeResult<LatticeId> {
 
         info!(id = %id, "ID collision detected, generating new ID");
     }
-}
-
-/// Gets the client ID for this repository, creating one if needed.
-fn get_or_create_client_id(context: &CommandContext) -> LatticeResult<String> {
-    if let Some(client_id) = client_config::get_client_id(&context.repo_root)? {
-        return Ok(client_id);
-    }
-
-    let client_id = client_config::generate_client_id();
-    client_config::set_client_id(&context.repo_root, &client_id)?;
-    info!(client_id, "Created new client ID");
-    Ok(client_id)
 }
 
 /// Finds the parent-id for a document based on directory root lookup.

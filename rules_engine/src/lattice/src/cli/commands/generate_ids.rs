@@ -15,7 +15,10 @@ use crate::index::client_counters;
 pub fn execute(context: CommandContext, args: GenerateIdsArgs) -> LatticeResult<()> {
     info!(count = args.count, "Executing generate-ids command");
 
-    let client_id = get_or_create_client_id(&context)?;
+    let client_id = client_config::get_or_create_client_id(
+        context.client_id_store.as_ref(),
+        &context.repo_root,
+    )?;
     let ids = generate_ids(&context, &client_id, args.count)?;
 
     if context.global.json {
@@ -29,18 +32,6 @@ pub fn execute(context: CommandContext, args: GenerateIdsArgs) -> LatticeResult<
 
     info!(count = ids.len(), "Generated IDs");
     Ok(())
-}
-
-/// Gets the client ID for this repository, creating one if needed.
-fn get_or_create_client_id(context: &CommandContext) -> LatticeResult<String> {
-    if let Some(client_id) = client_config::get_client_id(&context.repo_root)? {
-        return Ok(client_id);
-    }
-
-    let client_id = client_config::generate_client_id();
-    client_config::set_client_id(&context.repo_root, &client_id)?;
-    info!(client_id, "Created new client ID");
-    Ok(client_id)
 }
 
 /// Generates the requested number of IDs, persisting counter state.

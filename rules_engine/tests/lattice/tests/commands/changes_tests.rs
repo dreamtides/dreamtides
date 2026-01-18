@@ -9,6 +9,7 @@ use lattice::cli::global_options::GlobalOptions;
 use lattice::cli::query_args::ChangesArgs;
 use lattice::config::config_schema::Config;
 use lattice::error::error_types::LatticeError;
+use lattice::git::client_config::FakeClientIdStore;
 use lattice::git::git_ops::{FileChange, FileStatus, GitOps};
 use lattice::index::document_types::InsertDocument;
 use lattice::index::{document_queries, schema_definition};
@@ -138,6 +139,7 @@ fn create_test_context(git: FakeGit) -> (tempfile::TempDir, CommandContext) {
         config: Config::default(),
         repo_root,
         global: GlobalOptions::default(),
+        client_id_store: Box::new(FakeClientIdStore::new("WQN")),
     };
 
     (temp_dir, context)

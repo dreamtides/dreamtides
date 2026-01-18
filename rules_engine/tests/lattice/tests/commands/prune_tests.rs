@@ -9,6 +9,7 @@ use lattice::cli::task_args::{CloseArgs, CreateArgs, PruneArgs};
 use lattice::document::document_reader;
 use lattice::document::frontmatter_schema::TaskType;
 use lattice::error::error_types::LatticeError;
+use lattice::git::client_config::FakeClientIdStore;
 use lattice::index::{document_queries, link_queries, schema_definition};
 
 fn create_test_repo() -> (tempfile::TempDir, CommandContext) {
@@ -18,7 +19,8 @@ fn create_test_repo() -> (tempfile::TempDir, CommandContext) {
     fs::create_dir(repo_root.join(".git")).expect("Failed to create .git");
 
     let global = GlobalOptions::default();
-    let context = create_context(repo_root, &global).expect("Failed to create context");
+    let mut context = create_context(repo_root, &global).expect("Failed to create context");
+    context.client_id_store = Box::new(FakeClientIdStore::new("WQN"));
 
     schema_definition::create_schema(&context.conn).expect("Failed to create schema");
 
@@ -37,7 +39,8 @@ fn create_task(context: &CommandContext, parent: &str, description: &str) -> Str
     };
 
     let global = GlobalOptions::default();
-    let ctx = create_context(&context.repo_root, &global).expect("Create context");
+    let mut ctx = create_context(&context.repo_root, &global).expect("Create context");
+    ctx.client_id_store = Box::new(FakeClientIdStore::new("WQN"));
 
     create_command::execute(ctx, args).expect("Create task");
 
@@ -48,7 +51,8 @@ fn create_task(context: &CommandContext, parent: &str, description: &str) -> Str
 fn close_task(temp_dir: &tempfile::TempDir, task_id: &str) {
     let args = CloseArgs { ids: vec![task_id.to_string()], reason: None, dry_run: false };
     let global = GlobalOptions::default();
-    let ctx = create_context(temp_dir.path(), &global).expect("Create context");
+    let mut ctx = create_context(temp_dir.path(), &global).expect("Create context");
+    ctx.client_id_store = Box::new(FakeClientIdStore::new("WQN"));
     close_command::execute(ctx, args).expect("Close task");
 }
 
@@ -78,7 +82,8 @@ fn prune_deletes_closed_task() {
 
     let args = prune_args_all();
     let global = GlobalOptions::default();
-    let ctx = create_context(temp_dir.path(), &global).expect("Create context");
+    let mut ctx = create_context(temp_dir.path(), &global).expect("Create context");
+    ctx.client_id_store = Box::new(FakeClientIdStore::new("WQN"));
 
     let result = prune_command::execute(ctx, args);
     assert!(result.is_ok(), "Prune should succeed: {:?}", result);
@@ -102,7 +107,8 @@ fn prune_with_path_only_deletes_under_path() {
 
     let args = prune_args_path("api/");
     let global = GlobalOptions::default();
-    let ctx = create_context(temp_dir.path(), &global).expect("Create context");
+    let mut ctx = create_context(temp_dir.path(), &global).expect("Create context");
+    ctx.client_id_store = Box::new(FakeClientIdStore::new("WQN"));
 
     prune_command::execute(ctx, args).expect("Prune should succeed");
 
@@ -123,7 +129,8 @@ fn prune_does_not_delete_open_tasks() {
 
     let args = prune_args_all();
     let global = GlobalOptions::default();
-    let ctx = create_context(temp_dir.path(), &global).expect("Create context");
+    let mut ctx = create_context(temp_dir.path(), &global).expect("Create context");
+    ctx.client_id_store = Box::new(FakeClientIdStore::new("WQN"));
 
     prune_command::execute(ctx, args).expect("Prune should succeed (no closed tasks)");
 
@@ -142,7 +149,8 @@ fn prune_requires_path_or_all() {
     let args = PruneArgs { path: None, all: false, force: false, dry_run: false };
 
     let global = GlobalOptions::default();
-    let ctx = create_context(temp_dir.path(), &global).expect("Create context");
+    let mut ctx = create_context(temp_dir.path(), &global).expect("Create context");
+    ctx.client_id_store = Box::new(FakeClientIdStore::new("WQN"));
 
     let result = prune_command::execute(ctx, args);
     assert!(result.is_err(), "Prune should fail without path or --all");
@@ -163,7 +171,8 @@ fn prune_rejects_path_and_all_together() {
         PruneArgs { path: Some("api/".to_string()), all: true, force: false, dry_run: false };
 
     let global = GlobalOptions::default();
-    let ctx = create_context(temp_dir.path(), &global).expect("Create context");
+    let mut ctx = create_context(temp_dir.path(), &global).expect("Create context");
+    ctx.client_id_store = Box::new(FakeClientIdStore::new("WQN"));
 
     let result = prune_command::execute(ctx, args);
     assert!(result.is_err(), "Prune should fail with both path and --all");
@@ -192,7 +201,8 @@ fn prune_dry_run_does_not_delete() {
     let args = PruneArgs { path: None, all: true, force: false, dry_run: true };
 
     let global = GlobalOptions::default();
-    let ctx = create_context(temp_dir.path(), &global).expect("Create context");
+    let mut ctx = create_context(temp_dir.path(), &global).expect("Create context");
+    ctx.client_id_store = Box::new(FakeClientIdStore::new("WQN"));
 
     prune_command::execute(ctx, args).expect("Dry run should succeed");
 
@@ -248,7 +258,8 @@ fn prune_removes_yaml_blocking_references() {
 
     let args = prune_args_all();
     let global = GlobalOptions::default();
-    let ctx = create_context(temp_dir.path(), &global).expect("Create context");
+    let mut ctx = create_context(temp_dir.path(), &global).expect("Create context");
+    ctx.client_id_store = Box::new(FakeClientIdStore::new("WQN"));
 
     prune_command::execute(ctx, args).expect("Prune should succeed");
 
@@ -320,7 +331,8 @@ See the [pruned task](../tasks/.closed/{task_filename}#{task_id}) for details.
 
     let args = prune_args_all();
     let global = GlobalOptions::default();
-    let ctx = create_context(temp_dir.path(), &global).expect("Create context");
+    let mut ctx = create_context(temp_dir.path(), &global).expect("Create context");
+    ctx.client_id_store = Box::new(FakeClientIdStore::new("WQN"));
 
     let result = prune_command::execute(ctx, args);
     assert!(result.is_err(), "Prune should fail when inline links exist without --force");
@@ -390,7 +402,8 @@ See the [pruned task](../tasks/.closed/{task_filename}#{task_id}) for details.
 
     let args = PruneArgs { path: None, all: true, force: true, dry_run: false };
     let global = GlobalOptions::default();
-    let ctx = create_context(temp_dir.path(), &global).expect("Create context");
+    let mut ctx = create_context(temp_dir.path(), &global).expect("Create context");
+    ctx.client_id_store = Box::new(FakeClientIdStore::new("WQN"));
 
     prune_command::execute(ctx, args).expect("Prune with force should succeed");
 
@@ -426,7 +439,8 @@ fn prune_handles_multiple_closed_tasks() {
 
     let args = prune_args_all();
     let global = GlobalOptions::default();
-    let ctx = create_context(temp_dir.path(), &global).expect("Create context");
+    let mut ctx = create_context(temp_dir.path(), &global).expect("Create context");
+    ctx.client_id_store = Box::new(FakeClientIdStore::new("WQN"));
 
     prune_command::execute(ctx, args).expect("Prune should succeed");
 
@@ -454,7 +468,8 @@ fn prune_removes_all_link_entries() {
 
     let args = prune_args_all();
     let global = GlobalOptions::default();
-    let ctx = create_context(temp_dir.path(), &global).expect("Create context");
+    let mut ctx = create_context(temp_dir.path(), &global).expect("Create context");
+    ctx.client_id_store = Box::new(FakeClientIdStore::new("WQN"));
 
     prune_command::execute(ctx, args).expect("Prune should succeed");
 
@@ -479,7 +494,8 @@ fn prune_succeeds_with_no_closed_tasks() {
 
     let args = prune_args_all();
     let global = GlobalOptions::default();
-    let ctx = create_context(temp_dir.path(), &global).expect("Create context");
+    let mut ctx = create_context(temp_dir.path(), &global).expect("Create context");
+    ctx.client_id_store = Box::new(FakeClientIdStore::new("WQN"));
 
     let result = prune_command::execute(ctx, args);
     assert!(result.is_ok(), "Prune should succeed with no closed tasks: {:?}", result);

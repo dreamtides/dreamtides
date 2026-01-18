@@ -9,6 +9,7 @@ use lattice::cli::commands::stats_command;
 use lattice::cli::global_options::GlobalOptions;
 use lattice::cli::query_args::StatsArgs;
 use lattice::document::frontmatter_schema::TaskType;
+use lattice::git::client_config::FakeClientIdStore;
 use lattice::index::document_types::InsertDocument;
 use lattice::index::{document_queries, link_queries, schema_definition};
 
@@ -26,7 +27,8 @@ fn create_test_repo() -> (tempfile::TempDir, lattice::cli::command_dispatch::Com
     fs::create_dir_all(repo_root.join("api/docs")).expect("Failed to create api/docs");
 
     let global = GlobalOptions::default();
-    let context = create_context(repo_root, &global).expect("Failed to create context");
+    let mut context = create_context(repo_root, &global).expect("Failed to create context");
+    context.client_id_store = Box::new(FakeClientIdStore::new("WQN"));
     schema_definition::create_schema(&context.conn).expect("Failed to create schema");
 
     (temp_dir, context)
@@ -164,7 +166,8 @@ fn stats_command_succeeds_with_json_output() {
 
     let mut global = GlobalOptions::default();
     global.json = true;
-    let context = create_context(repo_root, &global).expect("Failed to create context");
+    let mut context = create_context(repo_root, &global).expect("Failed to create context");
+    context.client_id_store = Box::new(FakeClientIdStore::new("WQN"));
     schema_definition::create_schema(&context.conn).expect("Failed to create schema");
 
     let task =

@@ -9,6 +9,7 @@ use lattice::cli::global_options::GlobalOptions;
 use lattice::cli::workflow_args::ShowArgs;
 use lattice::document::frontmatter_schema::TaskType;
 use lattice::error::error_types::LatticeError;
+use lattice::git::client_config::FakeClientIdStore;
 use lattice::index::document_types::InsertDocument;
 use lattice::index::link_queries::{self, InsertLink, LinkType};
 use lattice::index::{document_queries, label_queries, schema_definition};
@@ -22,7 +23,8 @@ fn create_test_repo() -> (tempfile::TempDir, CommandContext) {
     fs::create_dir(repo_root.join(".git")).expect("Failed to create .git");
 
     let global = GlobalOptions::default();
-    let context = create_context(repo_root, &global).expect("Failed to create context");
+    let mut context = create_context(repo_root, &global).expect("Failed to create context");
+    context.client_id_store = Box::new(FakeClientIdStore::new("WQN"));
 
     // Create the schema for tests
     schema_definition::create_schema(&context.conn).expect("Failed to create schema");
@@ -759,7 +761,8 @@ fn show_command_records_view() {
 
     // Re-create context to get fresh connection
     let global = GlobalOptions::default();
-    let context2 = create_context(temp_dir.path(), &global).expect("Create context");
+    let mut context2 = create_context(temp_dir.path(), &global).expect("Create context");
+    context2.client_id_store = Box::new(FakeClientIdStore::new("WQN"));
 
     // Verify view count was incremented
     let new_count = lattice::index::view_tracking::get_view_count(&context2.conn, "LVIEWX")
@@ -784,7 +787,8 @@ fn show_command_increments_view_count_multiple_times() {
     // Show the document twice
     for i in 1..=2 {
         let global = GlobalOptions::default();
-        let ctx = create_context(temp_dir.path(), &global).expect("Create context");
+        let mut ctx = create_context(temp_dir.path(), &global).expect("Create context");
+        ctx.client_id_store = Box::new(FakeClientIdStore::new("WQN"));
         let args = ShowArgs {
             ids: vec!["LMULVW".to_string()],
             short: false,
@@ -798,7 +802,8 @@ fn show_command_increments_view_count_multiple_times() {
 
     // Verify view count is 2
     let global = GlobalOptions::default();
-    let ctx = create_context(temp_dir.path(), &global).expect("Create context");
+    let mut ctx = create_context(temp_dir.path(), &global).expect("Create context");
+    ctx.client_id_store = Box::new(FakeClientIdStore::new("WQN"));
     let count =
         lattice::index::view_tracking::get_view_count(&ctx.conn, "LMULVW").expect("Get count");
     assert_eq!(count, 2, "View count should be 2 after showing twice");

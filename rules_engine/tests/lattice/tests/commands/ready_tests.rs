@@ -11,6 +11,7 @@ use lattice::cli::global_options::GlobalOptions;
 use lattice::cli::shared_options::{FilterOptions, ReadySortPolicy};
 use lattice::cli::workflow_args::ReadyArgs;
 use lattice::document::frontmatter_schema::TaskType;
+use lattice::git::client_config::FakeClientIdStore;
 use lattice::id::lattice_id::LatticeId;
 use lattice::index::document_types::InsertDocument;
 use lattice::index::link_queries::{InsertLink, LinkType};
@@ -25,7 +26,8 @@ fn create_test_repo() -> (tempfile::TempDir, lattice::cli::command_dispatch::Com
     fs::create_dir_all(repo_root.join("api/docs")).expect("Failed to create api/docs");
 
     let global = GlobalOptions::default();
-    let context = create_context(repo_root, &global).expect("Failed to create context");
+    let mut context = create_context(repo_root, &global).expect("Failed to create context");
+    context.client_id_store = Box::new(FakeClientIdStore::new("WQN"));
     schema_definition::create_schema(&context.conn).expect("Failed to create schema");
 
     (temp_dir, context)

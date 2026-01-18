@@ -21,6 +21,7 @@ use crate::config::config_loader;
 use crate::config::config_schema::Config;
 use crate::error::error_types::LatticeError;
 use crate::error::exit_codes;
+use crate::git::client_config::{ClientIdStore, RealClientIdStore};
 use crate::git::git_ops::GitOps;
 use crate::git::real_git::RealGit;
 use crate::index::connection_pool;
@@ -38,14 +39,15 @@ pub type LatticeResult<T> = Result<T, LatticeError>;
 /// Shared context passed to all command handlers.
 ///
 /// Contains all state needed by command handlers: Git operations, database
-/// connection, configuration, and global options. Created once during startup
-/// and threaded through to handlers.
+/// connection, configuration, client ID storage, and global options. Created
+/// once during startup and threaded through to handlers.
 pub struct CommandContext {
     pub git: Box<dyn GitOps>,
     pub conn: Connection,
     pub config: Config,
     pub repo_root: PathBuf,
     pub global: GlobalOptions,
+    pub client_id_store: Box<dyn ClientIdStore>,
 }
 
 /// Executes the parsed CLI arguments and returns the appropriate exit code.
@@ -143,6 +145,7 @@ pub fn create_context(repo_root: &Path, global: &GlobalOptions) -> LatticeResult
 
     connection_pool::ensure_lattice_dir(repo_root)?;
     let conn = connection_pool::open_connection(repo_root)?;
+    let client_id_store = Box::new(RealClientIdStore::new());
 
     Ok(CommandContext {
         git,
@@ -150,6 +153,7 @@ pub fn create_context(repo_root: &Path, global: &GlobalOptions) -> LatticeResult
         config,
         repo_root: repo_root.to_path_buf(),
         global: global.clone(),
+        client_id_store,
     })
 }
 
