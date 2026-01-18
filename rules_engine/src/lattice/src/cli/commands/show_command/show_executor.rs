@@ -12,14 +12,7 @@ use crate::error::error_types::LatticeError;
 use crate::index::document_types::DocumentRow;
 use crate::index::link_queries::{self, LinkRow, LinkType};
 use crate::index::{document_queries, label_queries, view_tracking};
-
-/// State of a task document.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum TaskState {
-    Open,
-    Blocked,
-    Closed,
-}
+use crate::task::task_state;
 
 /// A reference to another document, used in parent/deps/blocking/related
 /// sections.
@@ -95,7 +88,8 @@ fn build_show_output(
     doc_row: &DocumentRow,
     mode: OutputMode,
 ) -> LatticeResult<ShowOutput> {
-    let state = compute_task_state(&context.conn, doc_row)?;
+    let state =
+        task_state::compute_state_with_blockers(&context.conn, &doc_row.id, doc_row.is_closed)?;
     let labels = label_queries::get_labels(&context.conn, &doc_row.id)?;
 
     // Load body content for full/raw modes
@@ -134,36 +128,6 @@ fn build_show_output(
         backlinks,
         claimed: false, // Claims not yet implemented
     })
-}
-
-/// Computes the task state from filesystem path and blocker status.
-///
-/// - Closed: Task is in a `.closed/` directory
-/// - Blocked: Task has open (non-closed) blockers
-/// - Open: All other tasks
-fn compute_task_state(conn: &Connection, doc_row: &DocumentRow) -> LatticeResult<TaskState> {
-    if doc_row.is_closed {
-        return Ok(TaskState::Closed);
-    }
-
-    // Check if any blockers are still open
-    let blocked_by_links =
-        link_queries::query_outgoing_by_type(conn, &doc_row.id, LinkType::BlockedBy)?;
-
-    for link in blocked_by_links {
-        if let Some(blocker) = document_queries::lookup_by_id(conn, &link.target_id)?
-            && !blocker.is_closed
-        {
-            debug!(
-                document_id = doc_row.id,
-                blocker_id = blocker.id,
-                "Document blocked by open task"
-            );
-            return Ok(TaskState::Blocked);
-        }
-    }
-
-    Ok(TaskState::Open)
 }
 
 /// Loads the markdown body content from the filesystem.
@@ -276,16 +240,6 @@ fn filter_related_docs(
     related.sort_by(|a, b| b.is_root.cmp(&a.is_root));
 
     Ok(related)
-}
-
-impl std::fmt::Display for TaskState {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            TaskState::Open => write!(f, "open"),
-            TaskState::Blocked => write!(f, "blocked"),
-            TaskState::Closed => write!(f, "closed"),
-        }
-    }
 }
 
 impl DocumentRef {

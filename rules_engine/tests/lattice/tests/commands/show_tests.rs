@@ -4,7 +4,7 @@ use std::fs;
 
 use lattice::cli::command_dispatch::{CommandContext, create_context};
 use lattice::cli::commands::show_command::document_formatter::{OutputMode, ShowOutput};
-use lattice::cli::commands::show_command::show_executor::{DocumentRef, TaskState};
+use lattice::cli::commands::show_command::show_executor::DocumentRef;
 use lattice::cli::global_options::GlobalOptions;
 use lattice::cli::workflow_args::ShowArgs;
 use lattice::document::frontmatter_schema::TaskType;
@@ -12,6 +12,7 @@ use lattice::error::error_types::LatticeError;
 use lattice::index::document_types::InsertDocument;
 use lattice::index::link_queries::{self, InsertLink, LinkType};
 use lattice::index::{document_queries, label_queries, schema_definition};
+use lattice::task::task_state::TaskState;
 use rusqlite::Connection;
 
 fn create_test_repo() -> (tempfile::TempDir, CommandContext) {

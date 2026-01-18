@@ -5,6 +5,7 @@ use serde::Serialize;
 use crate::cli::color_theme;
 use crate::document::frontmatter_schema::TaskType;
 use crate::id::lattice_id::LatticeId;
+use crate::task::task_state::TaskState;
 /// Unicode box-drawing characters for tree display.
 pub mod tree_chars {
     /// Vertical line: │
@@ -36,18 +37,6 @@ pub enum OutputFormat {
     Json,
     /// Visual output with colors and box-drawing characters.
     Pretty,
-}
-
-/// Task state computed from filesystem location and dependencies.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
-#[serde(rename_all = "lowercase")]
-pub enum TaskState {
-    /// Task is in `.closed/` directory.
-    Closed,
-    /// Task has open (non-closed) entries in `blocked-by` field.
-    Blocked,
-    /// Task exists outside `.closed/` with no open blockers.
-    Open,
 }
 
 /// Type indicator for document references.
@@ -210,16 +199,6 @@ impl OutputFormat {
     /// Returns true if JSON output is selected.
     pub fn is_json(&self) -> bool {
         matches!(self, OutputFormat::Json)
-    }
-}
-
-impl fmt::Display for TaskState {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            TaskState::Closed => write!(f, "closed"),
-            TaskState::Blocked => write!(f, "blocked"),
-            TaskState::Open => write!(f, "open"),
-        }
     }
 }
 

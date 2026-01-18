@@ -3,8 +3,9 @@ use serde::Serialize;
 use serde::ser::SerializeStruct;
 
 use crate::cli::color_theme;
-use crate::cli::commands::show_command::show_executor::{DocumentRef, TaskState};
+use crate::cli::commands::show_command::show_executor::DocumentRef;
 use crate::document::frontmatter_schema::TaskType;
+use crate::task::task_state::TaskState;
 
 /// Maximum number of related documents shown in text output.
 const MAX_RELATED_TEXT_OUTPUT: usize = 10;
@@ -357,15 +358,6 @@ fn type_indicator_styled(doc_ref: &DocumentRef) -> impl std::fmt::Display {
 /// Formats a timestamp for display.
 fn format_timestamp(dt: DateTime<Utc>) -> String {
     dt.format("%Y-%m-%d %H:%M").to_string()
-}
-
-impl Serialize for TaskState {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(&self.to_string())
-    }
 }
 
 impl Serialize for DocumentRef {
