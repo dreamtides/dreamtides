@@ -56,6 +56,19 @@ def run_command(
         return subprocess.run(args, cwd=cwd)
 
 
+def extract_json(text: str) -> dict | None:
+    """Extract a JSON object from mixed text output."""
+    # Find the first { and last } to extract the JSON object
+    start = text.find('{')
+    end = text.rfind('}')
+    if start == -1 or end == -1 or start >= end:
+        return None
+    try:
+        return json.loads(text[start:end + 1])
+    except json.JSONDecodeError:
+        return None
+
+
 def load_state() -> dict:
     if not STATE_FILE.exists():
         log(f"State file does not exist: {STATE_FILE}")
@@ -183,17 +196,18 @@ def cmd_start(args: argparse.Namespace) -> int:
         return result.returncode
 
     # Parse JSON to get worker name
-    try:
-        data = json.loads(result.stdout)
-        worker = data.get("worker")
-        print(f"{Colors.GREEN}Started: {worker}{Colors.RESET}")
-        print(f"  Branch: {data.get('branch', 'N/A')}")
-        print(f"  Self-review: {data.get('self_review_enabled', False)}")
-    except json.JSONDecodeError as e:
-        print(f"{Colors.YELLOW}Warning: Could not parse output{Colors.RESET}", file=sys.stderr)
+    data = extract_json(result.stdout)
+    if data is None:
+        print(f"{Colors.RED}Error: Could not parse JSON from llmc output{Colors.RESET}", file=sys.stderr)
+        log(f"Raw stdout: {result.stdout!r}")
         if result.stdout:
             print(result.stdout)
         return 1
+
+    worker = data.get("worker")
+    print(f"{Colors.GREEN}Started: {worker}{Colors.RESET}")
+    print(f"  Branch: {data.get('branch', 'N/A')}")
+    print(f"  Self-review: {data.get('self_review_enabled', False)}")
 
     if not worker:
         print(f"{Colors.RED}No worker in response{Colors.RESET}", file=sys.stderr)
@@ -226,13 +240,14 @@ def cmd_review(args: argparse.Namespace) -> int:
     # Parse JSON to get worker and record it
     worker = None
     bead_id = None
-    try:
-        data = json.loads(result.stdout)
-        worker = data.get("worker")
-    except json.JSONDecodeError:
+    data = extract_json(result.stdout)
+    if data is None:
         print(f"{Colors.YELLOW}Warning: Could not parse review output{Colors.RESET}", file=sys.stderr)
+        log(f"Raw stdout: {result.stdout!r}")
         if result.stdout:
             print(result.stdout)
+    else:
+        worker = data.get("worker")
 
     if worker:
         # Record last reviewed worker
