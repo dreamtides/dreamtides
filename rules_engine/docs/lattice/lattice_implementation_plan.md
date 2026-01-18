@@ -612,7 +612,7 @@ These features will use the Link System exports when implemented.
 
 ---
 
-## Feature: Task System [ONGOING]
+## Feature: Task System [DONE]
 
 **Goal:** Task types, states, dependencies, and ready calculation.
 
