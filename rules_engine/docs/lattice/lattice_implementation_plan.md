@@ -484,7 +484,7 @@ lists (flags, arguments, output modes), implementers should reference
 
 ---
 
-## Feature: Index Reconciliation [ONGOING]
+## Feature: Index Reconciliation [DONE]
 
 **Goal:** Keep SQLite index in sync with git repository state.
 

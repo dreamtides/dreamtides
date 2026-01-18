@@ -207,25 +207,6 @@ pub fn get_changed_files(
     Ok((modified, deleted))
 }
 
-/// Gets markdown files with uncommitted changes (staged or unstaged).
-///
-/// This function queries `git status` for any markdown files that have been
-/// modified but not yet committed. This includes:
-/// - Staged changes (in the index)
-/// - Unstaged changes (in the working tree)
-/// - Untracked markdown files
-///
-/// # Arguments
-///
-/// * `git` - Git operations trait object
-///
-/// # Returns
-///
-/// A list of paths (relative to repo root) with uncommitted changes.
-pub fn get_uncommitted_changes(git: &dyn GitOps) -> Result<Vec<PathBuf>, LatticeError> {
-    get_uncommitted_markdown_files(git)
-}
-
 impl ChangeInfo {
     /// Returns the classification of changes detected.
     ///
