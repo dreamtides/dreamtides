@@ -8,6 +8,7 @@ use tracing::{debug, error, info, warn};
 
 use crate::claim::stale_cleanup;
 use crate::cli::argument_parser::{Command, Lat};
+use crate::cli::commands::list_command::list_executor;
 use crate::cli::commands::ready_command::ready_executor;
 use crate::cli::commands::show_command::show_executor;
 use crate::cli::commands::{
@@ -306,11 +307,9 @@ fn dispatch_command(context: CommandContext, command: Command) -> LatticeResult<
                 reason: "prune command not yet implemented".to_string(),
             })
         }
-        Command::List(_args) => {
+        Command::List(args) => {
             info!("Dispatching to list command");
-            Err(LatticeError::OperationNotAllowed {
-                reason: "list command not yet implemented".to_string(),
-            })
+            list_executor::execute(context, args)
         }
         Command::Ready(args) => {
             info!("Dispatching to ready command");

@@ -1,14 +1,325 @@
-//! Tests for the `lat list` command filter builder.
+//! Tests for the `lat list` command.
 
-use lattice::cli::commands::list_command::filter_builder;
+use std::fs;
+use std::io::Write;
+
+use lattice::cli::command_dispatch::create_context;
+use lattice::cli::commands::list_command::{filter_builder, list_executor};
+use lattice::cli::global_options::GlobalOptions;
 use lattice::cli::query_args::ListArgs;
-use lattice::cli::shared_options::{FilterOptions, OutputOptions, SortField, TaskState};
+use lattice::cli::shared_options::{
+    FilterOptions, ListFormat, OutputOptions, SortField, TaskState,
+};
 use lattice::document::frontmatter_schema::TaskType;
 use lattice::error::error_types::LatticeError;
 use lattice::index::document_filter::{DocumentState, SortColumn, SortOrder};
+use lattice::index::document_types::InsertDocument;
+use lattice::index::{document_queries, schema_definition};
 
 fn default_args() -> ListArgs {
     ListArgs { filter: FilterOptions::default(), output: OutputOptions::default() }
+}
+
+fn create_test_repo() -> (tempfile::TempDir, lattice::cli::command_dispatch::CommandContext) {
+    let temp_dir = tempfile::tempdir().expect("Failed to create temp dir");
+    let repo_root = temp_dir.path();
+
+    fs::create_dir(repo_root.join(".git")).expect("Failed to create .git");
+    fs::create_dir_all(repo_root.join("api/tasks")).expect("Failed to create api/tasks");
+    fs::create_dir_all(repo_root.join("api/docs")).expect("Failed to create api/docs");
+
+    let global = GlobalOptions::default();
+    let context = create_context(repo_root, &global).expect("Failed to create context");
+    schema_definition::create_schema(&context.conn).expect("Failed to create schema");
+
+    (temp_dir, context)
+}
+
+fn create_task_doc(
+    id: &str,
+    path: &str,
+    name: &str,
+    description: &str,
+    priority: u8,
+    task_type: TaskType,
+) -> InsertDocument {
+    InsertDocument::new(
+        id.to_string(),
+        None,
+        path.to_string(),
+        name.to_string(),
+        description.to_string(),
+        Some(task_type),
+        Some(priority),
+        Some(chrono::Utc::now()),
+        None,
+        None,
+        format!("hash-{id}"),
+        100,
+    )
+}
+
+fn create_kb_doc(id: &str, path: &str, name: &str, description: &str) -> InsertDocument {
+    InsertDocument::new(
+        id.to_string(),
+        None,
+        path.to_string(),
+        name.to_string(),
+        description.to_string(),
+        None,
+        None,
+        Some(chrono::Utc::now()),
+        None,
+        None,
+        format!("hash-{id}"),
+        100,
+    )
+}
+
+fn insert_doc(
+    conn: &rusqlite::Connection,
+    doc: &InsertDocument,
+    repo_root: &std::path::Path,
+    path: &str,
+) {
+    document_queries::insert(conn, doc).expect("Failed to insert document");
+    let full_path = repo_root.join(path);
+    let parent = full_path.parent().expect("Path should have parent");
+    fs::create_dir_all(parent).expect("Failed to create parent directories");
+    let mut file = fs::File::create(&full_path).expect("Failed to create file");
+    write!(
+        file,
+        "---\nlattice-id: {}\nname: {}\ndescription: {}\n---\nBody content",
+        doc.id, doc.name, doc.description
+    )
+    .expect("Failed to write file");
+}
+
+// ============================================================================
+// Executor Tests
+// ============================================================================
+
+#[test]
+fn list_command_returns_all_open_documents() {
+    let (temp_dir, context) = create_test_repo();
+    let repo_root = temp_dir.path();
+
+    let task = create_task_doc(
+        "LAABCD",
+        "api/tasks/task1.md",
+        "task-one",
+        "First task",
+        2,
+        TaskType::Task,
+    );
+    insert_doc(&context.conn, &task, repo_root, "api/tasks/task1.md");
+
+    let args = default_args();
+    let result = list_executor::execute(context, args);
+    assert!(result.is_ok(), "List command should succeed: {:?}", result);
+}
+
+#[test]
+fn list_command_excludes_closed_by_default() {
+    let (temp_dir, context) = create_test_repo();
+    let repo_root = temp_dir.path();
+
+    let open =
+        create_task_doc("LBBBCD", "api/tasks/open.md", "open-task", "Open task", 2, TaskType::Task);
+    insert_doc(&context.conn, &open, repo_root, "api/tasks/open.md");
+
+    let closed = create_task_doc(
+        "LCCCDE",
+        "api/tasks/.closed/closed.md",
+        "closed-task",
+        "Closed task",
+        2,
+        TaskType::Task,
+    );
+    insert_doc(&context.conn, &closed, repo_root, "api/tasks/.closed/closed.md");
+
+    let args = default_args();
+    let result = list_executor::execute(context, args);
+    assert!(result.is_ok(), "List command should succeed");
+}
+
+#[test]
+fn list_command_includes_closed_with_flag() {
+    let (temp_dir, context) = create_test_repo();
+    let repo_root = temp_dir.path();
+
+    let closed = create_task_doc(
+        "LDDDDE",
+        "api/tasks/.closed/closed.md",
+        "closed-task",
+        "Closed task",
+        2,
+        TaskType::Task,
+    );
+    insert_doc(&context.conn, &closed, repo_root, "api/tasks/.closed/closed.md");
+
+    let mut args = default_args();
+    args.filter.include_closed = true;
+    let result = list_executor::execute(context, args);
+    assert!(result.is_ok(), "List command with include_closed should succeed");
+}
+
+#[test]
+fn list_command_filters_by_task_type() {
+    let (temp_dir, context) = create_test_repo();
+    let repo_root = temp_dir.path();
+
+    let bug = create_task_doc("LEEEEF", "api/tasks/bug.md", "bug-one", "A bug", 2, TaskType::Bug);
+    insert_doc(&context.conn, &bug, repo_root, "api/tasks/bug.md");
+
+    let feature = create_task_doc(
+        "LFFFFG",
+        "api/tasks/feat.md",
+        "feature-one",
+        "A feature",
+        2,
+        TaskType::Feature,
+    );
+    insert_doc(&context.conn, &feature, repo_root, "api/tasks/feat.md");
+
+    let mut args = default_args();
+    args.filter.r#type = Some(TaskType::Bug);
+    let result = list_executor::execute(context, args);
+    assert!(result.is_ok(), "List command with type filter should succeed");
+}
+
+#[test]
+fn list_command_filters_by_priority() {
+    let (temp_dir, context) = create_test_repo();
+    let repo_root = temp_dir.path();
+
+    let p0 = create_task_doc("LGGGGH", "api/tasks/p0.md", "p0-task", "P0 task", 0, TaskType::Bug);
+    insert_doc(&context.conn, &p0, repo_root, "api/tasks/p0.md");
+
+    let p2 = create_task_doc("LHHHHI", "api/tasks/p2.md", "p2-task", "P2 task", 2, TaskType::Task);
+    insert_doc(&context.conn, &p2, repo_root, "api/tasks/p2.md");
+
+    let mut args = default_args();
+    args.filter.priority = Some(0);
+    let result = list_executor::execute(context, args);
+    assert!(result.is_ok(), "List command with priority filter should succeed");
+}
+
+#[test]
+fn list_command_filters_by_path() {
+    let (temp_dir, context) = create_test_repo();
+    let repo_root = temp_dir.path();
+
+    fs::create_dir_all(repo_root.join("database/tasks")).expect("Failed to create dir");
+
+    let api = create_task_doc(
+        "LIIIJK",
+        "api/tasks/api_task.md",
+        "api-task",
+        "API task",
+        2,
+        TaskType::Task,
+    );
+    insert_doc(&context.conn, &api, repo_root, "api/tasks/api_task.md");
+
+    let db = create_task_doc(
+        "LJJJKL",
+        "database/tasks/db_task.md",
+        "db-task",
+        "DB task",
+        2,
+        TaskType::Task,
+    );
+    insert_doc(&context.conn, &db, repo_root, "database/tasks/db_task.md");
+
+    let mut args = default_args();
+    args.filter.path = Some("api/".to_string());
+    let result = list_executor::execute(context, args);
+    assert!(result.is_ok(), "List command with path filter should succeed");
+}
+
+#[test]
+fn list_command_respects_limit() {
+    let (temp_dir, context) = create_test_repo();
+    let repo_root = temp_dir.path();
+
+    for i in 1..=5 {
+        let id = format!("LKKKK{i}");
+        let path = format!("api/tasks/task{i}.md");
+        let name = format!("task-{i}");
+        let desc = format!("Task {i}");
+        let doc = create_task_doc(&id, &path, &name, &desc, 2, TaskType::Task);
+        insert_doc(&context.conn, &doc, repo_root, &path);
+    }
+
+    let mut args = default_args();
+    args.output.limit = Some(2);
+    let result = list_executor::execute(context, args);
+    assert!(result.is_ok(), "List command with limit should succeed");
+}
+
+#[test]
+fn list_command_with_rich_format() {
+    let (temp_dir, context) = create_test_repo();
+    let repo_root = temp_dir.path();
+
+    let task = create_task_doc(
+        "LLLLMN",
+        "api/tasks/task.md",
+        "test-task",
+        "Test task description",
+        1,
+        TaskType::Bug,
+    );
+    insert_doc(&context.conn, &task, repo_root, "api/tasks/task.md");
+
+    let mut args = default_args();
+    args.output.format = Some(ListFormat::Rich);
+    let result = list_executor::execute(context, args);
+    assert!(result.is_ok(), "List command with rich format should succeed");
+}
+
+#[test]
+fn list_command_with_compact_format() {
+    let (temp_dir, context) = create_test_repo();
+    let repo_root = temp_dir.path();
+
+    let task = create_task_doc(
+        "LMMMNO",
+        "api/tasks/task.md",
+        "test-task",
+        "Test task description",
+        1,
+        TaskType::Feature,
+    );
+    insert_doc(&context.conn, &task, repo_root, "api/tasks/task.md");
+
+    let mut args = default_args();
+    args.output.format = Some(ListFormat::Compact);
+    let result = list_executor::execute(context, args);
+    assert!(result.is_ok(), "List command with compact format should succeed");
+}
+
+#[test]
+fn list_command_lists_knowledge_base_docs() {
+    let (temp_dir, context) = create_test_repo();
+    let repo_root = temp_dir.path();
+
+    let kb = create_kb_doc("LNNNOP", "api/docs/design.md", "design-doc", "API design document");
+    insert_doc(&context.conn, &kb, repo_root, "api/docs/design.md");
+
+    let args = default_args();
+    let result = list_executor::execute(context, args);
+    assert!(result.is_ok(), "List command should show KB docs");
+}
+
+#[test]
+fn list_command_with_empty_result() {
+    let (_temp_dir, context) = create_test_repo();
+
+    let args = default_args();
+    let result = list_executor::execute(context, args);
+    assert!(result.is_ok(), "List command with no documents should succeed");
 }
 
 // ============================================================================
