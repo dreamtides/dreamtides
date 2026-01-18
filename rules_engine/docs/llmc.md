@@ -727,6 +727,8 @@ LLMC handles this gracefully:
 - Applies to: `fetch_origin`, `pull_rebase`, `rebase_onto`, `abort_rebase`,
   `checkout_branch`, `reset_to_ref`
 - Concurrent operations like `git push` are safe to run alongside LLMC
+- Stale rebase state (orphaned `rebase-merge` directories) is automatically
+  cleaned up before starting new rebases
 
 ### Summary Table
 

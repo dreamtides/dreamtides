@@ -395,15 +395,22 @@ pub fn rebase_onto(worktree: &Path, target: &str) -> Result<RebaseResult> {
     );
 
     if rebase_in_progress {
-        tracing::warn!(
+        tracing::info!(
             operation = "git_operation",
             operation_type = "rebase",
             repo_path = %worktree.display(),
             target,
-            result = "skipped",
-            "Skipping rebase - rebase already in progress"
+            "Stale rebase state detected, cleaning up before starting new rebase"
         );
-        bail!("Cannot start rebase: a rebase is already in progress");
+        if let Err(e) = abort_rebase(worktree) {
+            tracing::warn!(
+                operation = "git_operation",
+                operation_type = "rebase",
+                repo_path = %worktree.display(),
+                error = %e,
+                "Failed to abort stale rebase, will attempt to proceed anyway"
+            );
+        }
     }
 
     let before = logging_git::capture_state(worktree).ok();
