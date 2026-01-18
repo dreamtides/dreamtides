@@ -1,3 +1,4 @@
+mod blocked_tests;
 mod changes_tests;
 mod check_tests;
 mod claim_tests;
