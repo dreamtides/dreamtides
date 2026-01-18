@@ -14,6 +14,7 @@ mod id;
 mod index;
 mod integration;
 mod link;
+mod lint;
 mod log_tests;
 mod markdown_body_tests;
 mod ready_calculator_tests;
