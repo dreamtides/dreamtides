@@ -5,9 +5,11 @@ use std::process::Command;
 use anyhow::{Context, Result, bail};
 
 use crate::commands::review;
+use crate::lock::StateLock;
 use crate::state::{State, WorkerStatus};
 use crate::worker::{self, WorkerTransition};
 use crate::{config, git};
+
 /// Runs the accept command, accepting a worker's changes and merging to master
 pub fn run_accept(worker: Option<String>, force: bool, json: bool) -> Result<()> {
     let llmc_root = config::get_llmc_root();
@@ -18,6 +20,7 @@ pub fn run_accept(worker: Option<String>, force: bool, json: bool) -> Result<()>
             llmc_root.display()
         );
     }
+    let _lock = StateLock::acquire()?;
     let (mut state, config) = super::super::state::load_state_with_patrol()?;
     let worker_name = if let Some(name) = worker {
         if state.get_worker(&name).is_none() {

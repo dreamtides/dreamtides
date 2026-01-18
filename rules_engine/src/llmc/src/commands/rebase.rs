@@ -2,10 +2,12 @@ use std::path::PathBuf;
 
 use anyhow::{Context, Result, bail};
 
+use crate::lock::StateLock;
 use crate::state::{self, State};
 use crate::tmux::sender::TmuxSender;
 use crate::worker::{self, WorkerTransition};
 use crate::{config, git};
+
 /// Runs the rebase command, manually triggering a rebase for a worker
 pub fn run_rebase(worker: &str, json: bool) -> Result<()> {
     let llmc_root = config::get_llmc_root();
@@ -16,6 +18,7 @@ pub fn run_rebase(worker: &str, json: bool) -> Result<()> {
             llmc_root.display()
         );
     }
+    let _lock = StateLock::acquire()?;
     let state_path = state::get_state_path();
     let mut state = State::load(&state_path)?;
     let worker_record = state.get_worker(worker).ok_or_else(|| {

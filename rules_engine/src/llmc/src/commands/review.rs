@@ -4,6 +4,7 @@ use std::process::Command;
 
 use anyhow::{Context, Result, bail};
 
+use crate::lock::StateLock;
 use crate::state::{self, State, WorkerStatus};
 use crate::{config, git};
 
@@ -27,7 +28,7 @@ pub fn run_review(
         eprintln!("Expected workspace at: {}", llmc_root.display());
         std::process::exit(1);
     }
-
+    let _lock = StateLock::acquire()?;
     let (state, config) = super::super::state::load_state_with_patrol()?;
 
     let worker_name = if let Some(name) = worker {

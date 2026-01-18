@@ -3,8 +3,10 @@ use std::process::Command;
 
 use anyhow::{Context, Result, bail};
 
+use crate::lock::StateLock;
 use crate::state::{self, State};
 use crate::{config, git};
+
 /// Runs the pick command, which grabs all changes from a worker and rebases
 /// onto master This is a low-level failure mitigation command that:
 /// 1. Adds all untracked files
@@ -20,6 +22,7 @@ pub fn run_pick(worker: &str, json: bool) -> Result<()> {
             llmc_root.display()
         );
     }
+    let _lock = StateLock::acquire()?;
     let (state, config) = state::load_state_with_patrol()?;
     let worker_record = state.get_worker(worker).ok_or_else(|| {
         anyhow::anyhow!(

@@ -2,6 +2,7 @@ use std::time::{SystemTime, UNIX_EPOCH};
 
 use anyhow::{Context, Result, bail};
 
+use crate::lock::StateLock;
 use crate::state::{State, WorkerStatus};
 use crate::tmux::sender::TmuxSender;
 use crate::{config, editor};
@@ -16,7 +17,7 @@ pub fn run_message(worker: &str, message: Option<String>, json: bool) -> Result<
             llmc_root.display()
         );
     }
-
+    let _lock = StateLock::acquire()?;
     let (mut state, _config) = crate::state::load_state_with_patrol()?;
 
     let worker_record = state.get_worker(worker).ok_or_else(|| {

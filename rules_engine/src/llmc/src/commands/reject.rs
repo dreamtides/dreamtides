@@ -4,9 +4,11 @@ use std::process::Command;
 use anyhow::{Context, Result, bail};
 
 use crate::commands::review;
+use crate::lock::StateLock;
 use crate::state::WorkerStatus;
 use crate::tmux::sender::TmuxSender;
 use crate::{config, editor, git, worker};
+
 /// Runs the reject command, sending feedback to the most recently reviewed
 /// worker
 pub fn run_reject(message: Option<String>, json: bool) -> Result<()> {
@@ -18,6 +20,7 @@ pub fn run_reject(message: Option<String>, json: bool) -> Result<()> {
             llmc_root.display()
         );
     }
+    let _lock = StateLock::acquire()?;
     let (mut state, _config) = crate::state::load_state_with_patrol()?;
     let worker_name = review::load_last_reviewed()?.ok_or_else(|| {
         anyhow::anyhow!("No previously reviewed worker found. Use 'llmc review' first.")
