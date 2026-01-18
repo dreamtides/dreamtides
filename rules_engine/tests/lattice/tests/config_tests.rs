@@ -279,36 +279,36 @@ fn validate_config_accepts_valid_config() {
 
 #[test]
 fn validate_client_id_accepts_valid_ids() {
-    assert!(validate_client_id("DT").is_ok(), "Should accept 2-char ID");
     assert!(validate_client_id("K2X").is_ok(), "Should accept 3-char ID");
     assert!(validate_client_id("AB7Z").is_ok(), "Should accept 4-char ID");
-    assert!(validate_client_id("2345").is_ok(), "Should accept numeric ID");
+    assert!(validate_client_id("234AB").is_ok(), "Should accept 5-char ID");
+    assert!(validate_client_id("ABCDEF").is_ok(), "Should accept 6-char ID");
 }
 
 #[test]
 fn validate_client_id_rejects_too_short() {
-    let result = validate_client_id("A");
+    let result = validate_client_id("AB");
 
-    assert!(result.is_err(), "Should reject 1-char ID");
+    assert!(result.is_err(), "Should reject 2-char ID");
     let err = result.unwrap_err();
-    assert!(err.to_string().contains("2-4"), "Error should mention valid length");
+    assert!(err.to_string().contains("3-6"), "Error should mention valid length");
 }
 
 #[test]
 fn validate_client_id_rejects_too_long() {
-    let result = validate_client_id("ABCDE");
+    let result = validate_client_id("ABCDEFG");
 
-    assert!(result.is_err(), "Should reject 5-char ID");
+    assert!(result.is_err(), "Should reject 7-char ID");
     let err = result.unwrap_err();
-    assert!(err.to_string().contains("2-4"), "Error should mention valid length");
+    assert!(err.to_string().contains("3-6"), "Error should mention valid length");
 }
 
 #[test]
 fn validate_client_id_rejects_invalid_characters() {
-    assert!(validate_client_id("ab").is_err(), "Should reject lowercase letters");
-    assert!(validate_client_id("01").is_err(), "Should reject digits 0 and 1");
-    assert!(validate_client_id("A-").is_err(), "Should reject special characters");
-    assert!(validate_client_id("A8").is_err(), "Should reject digits 8 and 9");
+    assert!(validate_client_id("abc").is_err(), "Should reject lowercase letters");
+    assert!(validate_client_id("012").is_err(), "Should reject digits 0 and 1");
+    assert!(validate_client_id("A-B").is_err(), "Should reject special characters");
+    assert!(validate_client_id("A89").is_err(), "Should reject digits 8 and 9");
 }
 
 #[test]
@@ -316,7 +316,7 @@ fn generate_client_id_produces_valid_id() {
     let client_id = generate_client_id();
 
     assert!(validate_client_id(&client_id).is_ok(), "Generated ID should be valid: {client_id}");
-    assert!(client_id.len() >= 2, "Generated ID should be at least 2 chars");
+    assert!(client_id.len() >= 3, "Generated ID should be at least 3 chars");
 }
 
 #[test]

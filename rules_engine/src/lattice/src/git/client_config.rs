@@ -75,12 +75,12 @@ pub fn set_client_id(repo_root: &Path, client_id: &str) -> Result<(), LatticeErr
 
 /// Validates that a client ID is well-formed.
 ///
-/// Client IDs must be 2-4 uppercase Base32 characters (A-Z, 2-7).
+/// Client IDs must be 3-6 uppercase Base32 characters (A-Z, 2-7).
 pub fn validate_client_id(client_id: &str) -> Result<(), LatticeError> {
-    if client_id.len() < 2 || client_id.len() > 4 {
+    if client_id.len() < 3 || client_id.len() > 6 {
         return Err(LatticeError::ConfigValidationError {
             field: "client_id".to_string(),
-            reason: format!("Client ID must be 2-4 characters, got {} characters", client_id.len()),
+            reason: format!("Client ID must be 3-6 characters, got {} characters", client_id.len()),
         });
     }
     if !client_id.chars().all(|c| c.is_ascii_uppercase() || ('2'..='7').contains(&c)) {
@@ -133,6 +133,7 @@ pub fn remove_client_id(repo_root: &Path) -> Result<bool, LatticeError> {
 /// Generates a unique client ID based on the machine and user.
 ///
 /// Uses a hash of hostname and username, encoded as Base32.
+/// Returns a 3-character client ID (the minimum length per the ID system spec).
 pub fn generate_client_id() -> String {
     let hostname = std::env::var("HOSTNAME")
         .or_else(|_| std::env::var("COMPUTERNAME"))
@@ -145,8 +146,8 @@ pub fn generate_client_id() -> String {
     hasher.update(username.as_bytes());
     let hash = hasher.finalize();
     let base32_chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
-    let mut result = String::with_capacity(2);
-    for &byte in hash.iter().take(2) {
+    let mut result = String::with_capacity(3);
+    for &byte in hash.iter().take(3) {
         let index = (byte as usize) % 32;
         result.push(base32_chars.chars().nth(index).unwrap_or('A'));
     }
