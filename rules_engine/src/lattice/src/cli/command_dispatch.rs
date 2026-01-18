@@ -7,6 +7,7 @@ use rusqlite::Connection;
 use tracing::{debug, error, info, warn};
 
 use crate::cli::argument_parser::{Command, Lat};
+use crate::cli::commands::claim_command;
 use crate::cli::commands::show_command::show_executor;
 use crate::cli::global_options::GlobalOptions;
 use crate::config::config_loader;
@@ -393,11 +394,9 @@ fn dispatch_command(context: CommandContext, command: Command) -> LatticeResult<
                 reason: "impact command not yet implemented".to_string(),
             })
         }
-        Command::Claim(_args) => {
+        Command::Claim(args) => {
             info!("Dispatching to claim command");
-            Err(LatticeError::OperationNotAllowed {
-                reason: "claim command not yet implemented".to_string(),
-            })
+            claim_command::execute(context, args)
         }
         Command::Overview(_args) => {
             info!("Dispatching to overview command");
