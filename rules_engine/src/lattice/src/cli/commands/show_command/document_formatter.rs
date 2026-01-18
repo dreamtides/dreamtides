@@ -1,6 +1,6 @@
 use chrono::{DateTime, Utc};
-use serde::ser::SerializeStruct;
 use serde::Serialize;
+use serde::ser::SerializeStruct;
 
 use crate::cli::color_theme;
 use crate::cli::commands::show_command::show_executor::{DocumentRef, TaskState};

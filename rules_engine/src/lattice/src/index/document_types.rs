@@ -8,11 +8,14 @@
 //!
 //! **[`DocumentRow`]** represents cached metadata from the index:
 //! - Contains all frontmatter fields (id, name, description, task_type, etc.)
-//! - Includes computed fields derived from paths (is_closed, is_root, in_tasks_dir)
-//! - Includes index-specific fields (indexed_at, body_hash, link/backlink counts)
+//! - Includes computed fields derived from paths (is_closed, is_root,
+//!   in_tasks_dir)
+//! - Includes index-specific fields (indexed_at, body_hash, link/backlink
+//!   counts)
 //! - Does NOT contain the document body (only content_length for size checks)
 //!
-//! **[`Document`]** (in `document::document_reader`) represents a fully parsed document:
+//! **[`Document`]** (in `document::document_reader`) represents a fully parsed
+//! document:
 //! - Contains the parsed [`Frontmatter`] struct
 //! - Contains the original YAML string (for round-trip fidelity)
 //! - Contains the full markdown body content

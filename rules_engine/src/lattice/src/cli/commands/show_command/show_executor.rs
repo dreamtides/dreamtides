@@ -55,13 +55,8 @@ pub fn execute(context: CommandContext, args: ShowArgs) -> LatticeResult<()> {
 /// Relationship data for a document.
 ///
 /// Fields: (parent, dependencies, blocking, related, backlinks).
-type RelationshipData = (
-    Option<DocumentRef>,
-    Vec<DocumentRef>,
-    Vec<DocumentRef>,
-    Vec<DocumentRef>,
-    Vec<DocumentRef>,
-);
+type RelationshipData =
+    (Option<DocumentRef>, Vec<DocumentRef>, Vec<DocumentRef>, Vec<DocumentRef>, Vec<DocumentRef>);
 
 /// Determines the output mode based on command-line flags.
 fn determine_output_mode(args: &ShowArgs) -> OutputMode {

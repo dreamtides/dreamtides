@@ -1,60 +1,185 @@
+//! Query builder for document filtering and sorting.
+//!
+//! Provides [`DocumentFilter`] using a builder pattern for SQL query
+//! construction.
+//!
+//! # Example
+//!
+//! ```ignore
+//! let filter = DocumentFilter::new()
+//!     .with_state(DocumentState::Open)
+//!     .with_priority_range(0, 2)
+//!     .with_labels_all(vec!["urgent".into()])
+//!     .sort_by(SortColumn::Priority)
+//!     .limit(10);
+//! ```
+//!
+//! # Available Filters
+//!
+//! - **State**: open, blocked, closed (via [`DocumentFilter::with_state`])
+//! - **Priority**: exact or range (P0-P4)
+//! - **Type**: bug, feature, task, chore
+//! - **Labels**: AND semantics (`labels_all`) or OR semantics (`labels_any`)
+//! - **Path/Name**: prefix matching, substring search (`name_contains`)
+//! - **Directory**: root status, tasks/ or docs/ membership
+//! - **Timestamps**: created/updated/closed with before/after bounds
+//!
+//! # Sorting
+//!
+//! Use [`SortColumn`] (UpdatedAt, CreatedAt, Priority, Name, Path, ViewCount)
+//! and [`SortOrder`] (Ascending, Descending). Default: UpdatedAt descending.
+//!
+//! # Pagination
+//!
+//! Use `limit()` and `offset()` for paginated results.
+
 use chrono::{DateTime, Utc};
 
 use crate::document::frontmatter_schema::TaskType;
 
-/// Filter criteria for querying documents.
+/// Filter criteria for querying documents from the index.
+///
+/// Uses a builder pattern for fluent configuration. By default, excludes
+/// closed documents; use [`DocumentFilter::including_closed`] to include them.
 #[derive(Debug, Clone, Default)]
 pub struct DocumentFilter {
+    /// Whether to include closed documents in results. Default: `false`.
     pub include_closed: bool,
+
+    /// Filter by document state (open, blocked, or closed).
     pub state: Option<DocumentState>,
+
+    /// Filter by exact priority value (0-4, where 0 is highest priority).
     pub priority: Option<u8>,
+
+    /// Filter by priority range (min, max), inclusive on both ends.
     pub priority_range: Option<(u8, u8)>,
+
+    /// Filter by task type (bug, feature, task, chore).
     pub task_type: Option<TaskType>,
+
+    /// Require ALL of these labels (AND semantics).
+    /// Document must have every label in this list.
     pub labels_all: Vec<String>,
+
+    /// Require ANY of these labels (OR semantics).
+    /// Document must have at least one label from this list.
     pub labels_any: Vec<String>,
+
+    /// Filter by path prefix. Documents whose path starts with this string
+    /// are included.
     pub path_prefix: Option<String>,
+
+    /// Filter by name substring. Documents whose name contains this
+    /// substring (case-sensitive) are included.
     pub name_contains: Option<String>,
+
+    /// Include only documents created at or after this timestamp.
     pub created_after: Option<DateTime<Utc>>,
+
+    /// Include only documents created at or before this timestamp.
     pub created_before: Option<DateTime<Utc>>,
+
+    /// Include only documents updated at or after this timestamp.
     pub updated_after: Option<DateTime<Utc>>,
+
+    /// Include only documents updated at or before this timestamp.
     pub updated_before: Option<DateTime<Utc>>,
+
+    /// Include only documents closed at or after this timestamp.
     pub closed_after: Option<DateTime<Utc>>,
+
+    /// Include only documents closed at or before this timestamp.
     pub closed_before: Option<DateTime<Utc>>,
+
+    /// Filter by root document status. Root documents have a filename
+    /// matching their containing directory (e.g., `api/api.md`).
     pub is_root: Option<bool>,
+
+    /// Filter by tasks/ directory membership.
     pub in_tasks_dir: Option<bool>,
+
+    /// Filter by docs/ directory membership.
     pub in_docs_dir: Option<bool>,
+
+    /// Column to sort results by. Default: [`SortColumn::UpdatedAt`].
     pub sort_by: SortColumn,
+
+    /// Sort order for results. Default: [`SortOrder::Descending`].
     pub sort_order: SortOrder,
+
+    /// Maximum number of results to return.
     pub limit: Option<u32>,
+
+    /// Number of results to skip (for pagination).
     pub offset: Option<u32>,
 }
 
-/// Document state based on is_closed flag and blocked-by relationships.
+/// Document state determined by filesystem location and dependencies.
+///
+/// State is derived from two factors:
+/// 1. Whether the document resides in a `.closed/` directory
+/// 2. Whether the document has open (non-closed) blocked-by dependencies
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DocumentState {
+    /// Document is not closed and has no open blockers.
+    /// Available for work.
     Open,
+
+    /// Document has at least one open blocked-by dependency.
+    /// Cannot be worked on until blockers are resolved.
     Blocked,
+
+    /// Document resides in a `.closed/` subdirectory.
+    /// Task has been completed.
     Closed,
 }
 
-/// Column to sort results by.
+/// Column to sort query results by.
+///
+/// Default is [`SortColumn::UpdatedAt`], which surfaces recently modified
+/// documents first when combined with descending order.
 #[derive(Debug, Clone, Copy, Default)]
 pub enum SortColumn {
+    /// Sort by last modification timestamp (default).
     #[default]
     UpdatedAt,
+
+    /// Sort by document creation timestamp.
     CreatedAt,
+
+    /// Sort by task closure timestamp.
+    /// Documents without `closed_at` sort last.
     ClosedAt,
+
+    /// Sort by task priority (P0-P4).
+    /// Lower numbers indicate higher priority.
     Priority,
+
+    /// Sort alphabetically by document name.
     Name,
+
+    /// Sort alphabetically by file path.
     Path,
+
+    /// Sort by local view count (tracked in SQLite index).
+    /// Used by `lat overview` to surface frequently-referenced documents.
     ViewCount,
 }
 
 /// Sort order for query results.
+///
+/// Default is [`SortOrder::Descending`], which shows highest values or
+/// most recent timestamps first.
 #[derive(Debug, Clone, Copy, Default)]
 pub enum SortOrder {
+    /// Sort from highest to lowest (default).
+    /// For timestamps: newest first. For priority: P0 first.
     #[default]
     Descending,
+
+    /// Sort from lowest to highest.
+    /// For timestamps: oldest first. For priority: P4 first.
     Ascending,
 }
 
@@ -178,6 +303,42 @@ impl DocumentFilter {
     /// Sets the result offset for pagination.
     pub fn offset(mut self, offset: u32) -> Self {
         self.offset = Some(offset);
+        self
+    }
+
+    /// Filters to documents created at or after the given timestamp.
+    pub fn with_created_after(mut self, dt: DateTime<Utc>) -> Self {
+        self.created_after = Some(dt);
+        self
+    }
+
+    /// Filters to documents created at or before the given timestamp.
+    pub fn with_created_before(mut self, dt: DateTime<Utc>) -> Self {
+        self.created_before = Some(dt);
+        self
+    }
+
+    /// Filters to documents updated at or after the given timestamp.
+    pub fn with_updated_after(mut self, dt: DateTime<Utc>) -> Self {
+        self.updated_after = Some(dt);
+        self
+    }
+
+    /// Filters to documents updated at or before the given timestamp.
+    pub fn with_updated_before(mut self, dt: DateTime<Utc>) -> Self {
+        self.updated_before = Some(dt);
+        self
+    }
+
+    /// Filters to documents closed at or after the given timestamp.
+    pub fn with_closed_after(mut self, dt: DateTime<Utc>) -> Self {
+        self.closed_after = Some(dt);
+        self
+    }
+
+    /// Filters to documents closed at or before the given timestamp.
+    pub fn with_closed_before(mut self, dt: DateTime<Utc>) -> Self {
+        self.closed_before = Some(dt);
         self
     }
 }
