@@ -61,8 +61,10 @@ symlinks to match current state.
 Stale claims are detected and cleaned up. A claim is stale if:
 
 - The referenced task no longer exists
-- The task is in a `tasks/.closed/` directory
+- The task is in a `.closed/` directory
 - The worktree path no longer exists
+- The claim age exceeds threshold (default 7 days, configurable via
+  `stale_days` in `ClaimConfig`)
 
 **Operation**: Scan `~/.lattice/claims/<repo-hash>/` directory, validate each
 claim file against current repository state. Check task paths in index to

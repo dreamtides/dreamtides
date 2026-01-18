@@ -12,5 +12,6 @@ mod overview_tests;
 mod ready_tests;
 mod search_tests;
 mod show_tests;
+mod stale_cleanup_tests;
 mod stats_tests;
 mod update_tests;
