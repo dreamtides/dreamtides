@@ -1,6 +1,6 @@
 use chrono::{DateTime, Utc};
-use serde::Serialize;
 use serde::ser::SerializeStruct;
+use serde::Serialize;
 
 use crate::cli::color_theme;
 use crate::cli::commands::show_command::show_executor::{DocumentRef, TaskState};
@@ -47,8 +47,13 @@ pub struct ShowOutput {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub parent: Option<DocumentRef>,
     pub dependencies: Vec<DocumentRef>,
+    #[serde(rename = "dependents")]
     pub blocking: Vec<DocumentRef>,
     pub related: Vec<DocumentRef>,
+    /// Incoming body links (documents that link to this one).
+    /// Not included in JSON output, only used for --refs display.
+    #[serde(skip_serializing)]
+    pub backlinks: Vec<DocumentRef>,
     pub claimed: bool,
 }
 
@@ -70,7 +75,9 @@ pub fn print_output(output: &ShowOutput, mode: OutputMode, json: bool) {
 /// Prints JSON output.
 fn print_json(output: &ShowOutput) {
     let json_output = serde_json::json!([output]);
-    println!("{}", serde_json::to_string_pretty(&json_output).unwrap_or_default());
+    let json_str = serde_json::to_string_pretty(&json_output)
+        .expect("ShowOutput serialization should never fail");
+    println!("{json_str}");
 }
 
 /// Prints full document details.
@@ -264,13 +271,28 @@ fn print_peek(output: &ShowOutput) {
 fn print_refs(output: &ShowOutput) {
     println!("References to {}:", color_theme::lattice_id(&output.id));
     println!();
-    if !output.blocking.is_empty() {
+
+    let has_blocks = !output.blocking.is_empty();
+    let has_backlinks = !output.backlinks.is_empty();
+
+    if has_blocks {
         println!("  {}:", color_theme::bold(format!("Blocks ({})", output.blocking.len())));
         for blocker in &output.blocking {
             println!("    {}", format_doc_ref(blocker));
         }
     }
-    if output.blocking.is_empty() {
+
+    if has_backlinks {
+        if has_blocks {
+            println!();
+        }
+        println!("  {}:", color_theme::bold(format!("Linked from ({})", output.backlinks.len())));
+        for backlink in &output.backlinks {
+            println!("    {}", format_doc_ref(backlink));
+        }
+    }
+
+    if !has_blocks && !has_backlinks {
         println!("  {}", color_theme::muted("No references found"));
     }
 }

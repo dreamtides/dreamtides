@@ -167,6 +167,7 @@ fn show_output_serializes_to_json() {
         dependencies: Vec::new(),
         blocking: Vec::new(),
         related: Vec::new(),
+        backlinks: Vec::new(),
         claimed: false,
     };
 
@@ -174,6 +175,11 @@ fn show_output_serializes_to_json() {
     assert!(json.contains("\"id\":\"LTESTA\""));
     assert!(json.contains("\"state\":\"open\""));
     assert!(json.contains("\"task_type\":\"bug\""));
+    // Verify blocking is renamed to dependents in JSON
+    assert!(json.contains("\"dependents\""));
+    assert!(!json.contains("\"blocking\""));
+    // Verify backlinks is not included in JSON (skip_serializing)
+    assert!(!json.contains("\"backlinks\""));
 }
 
 // ============================================================================
@@ -601,4 +607,117 @@ fn show_command_excludes_blocking_from_related() {
 
     let result = lattice::cli::commands::show_command::show_executor::execute(context, args);
     assert!(result.is_ok(), "Should succeed: {:?}", result);
+}
+
+#[test]
+fn show_command_with_refs_flag_finds_backlinks() {
+    let (temp_dir, context) = create_test_repo();
+
+    // Create target document (the one we'll show with --refs)
+    let target_path = temp_dir.path().join("target.md");
+    fs::write(
+        &target_path,
+        "---\nlattice-id: LTRGTX\nname: target\ndescription: Target document\n---\n\nTarget content.",
+    )
+    .expect("Write target doc");
+
+    // Create source document that links to target
+    let source_path = temp_dir.path().join("source.md");
+    fs::write(
+        &source_path,
+        "---\nlattice-id: LSRCXX\nname: source\ndescription: Source document\n---\n\nSee [target](LTRGTX).",
+    )
+    .expect("Write source doc");
+
+    let target_doc = create_test_document("LTRGTX", "target.md", "target", "Target document");
+    let source_doc = create_test_document("LSRCXX", "source.md", "source", "Source document");
+    insert_doc(&context.conn, &target_doc);
+    insert_doc(&context.conn, &source_doc);
+
+    // Add body link from source to target
+    let body_link = InsertLink {
+        source_id: "LSRCXX",
+        target_id: "LTRGTX",
+        link_type: LinkType::Body,
+        position: 0,
+    };
+    link_queries::insert_for_document(&context.conn, &[body_link]).expect("Insert body link");
+
+    // Show target with --refs flag
+    let args = ShowArgs {
+        ids: vec!["LTRGTX".to_string()],
+        short: false,
+        refs: true,
+        peek: false,
+        raw: false,
+    };
+
+    let result = lattice::cli::commands::show_command::show_executor::execute(context, args);
+    assert!(result.is_ok(), "Refs mode should succeed: {:?}", result);
+}
+
+#[test]
+fn show_command_peek_mode_displays_parent_and_counts() {
+    let (temp_dir, context) = create_test_repo();
+
+    // Create root document (parent)
+    let root_path = temp_dir.path().join("api").join("api.md");
+    fs::create_dir_all(root_path.parent().unwrap()).expect("Create api dir");
+    fs::write(
+        &root_path,
+        "---\nlattice-id: LROOTA\nname: api\ndescription: API root\n---\n\nRoot content.",
+    )
+    .expect("Write root doc");
+
+    // Create task document with parent
+    let task_path = temp_dir.path().join("api").join("tasks").join("my-task.md");
+    fs::create_dir_all(task_path.parent().unwrap()).expect("Create tasks dir");
+    fs::write(
+        &task_path,
+        "---\nlattice-id: LTASKP\nname: my-task\ndescription: My task\ntask-type: task\npriority: 1\nparent-id: LROOTA\n---\n\nTask body.",
+    )
+    .expect("Write task doc");
+
+    let root_doc = InsertDocument::new(
+        "LROOTA".to_string(),
+        None,
+        "api/api.md".to_string(),
+        "api".to_string(),
+        "API root".to_string(),
+        None,
+        None,
+        None,
+        None,
+        None,
+        "hash1".to_string(),
+        100,
+    );
+    let task_doc = InsertDocument::new(
+        "LTASKP".to_string(),
+        Some("LROOTA".to_string()),
+        "api/tasks/my-task.md".to_string(),
+        "my-task".to_string(),
+        "My task".to_string(),
+        Some(TaskType::Task),
+        Some(1),
+        None,
+        None,
+        None,
+        "hash2".to_string(),
+        200,
+    );
+    insert_doc(&context.conn, &root_doc);
+    insert_doc(&context.conn, &task_doc);
+
+    // Show task with --peek flag
+    let args = ShowArgs {
+        ids: vec!["LTASKP".to_string()],
+        short: false,
+        refs: false,
+        peek: true,
+        raw: false,
+    };
+
+    let result = lattice::cli::commands::show_command::show_executor::execute(context, args);
+    assert!(result.is_ok(), "Peek mode should succeed: {:?}", result);
 }

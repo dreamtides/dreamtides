@@ -52,8 +52,16 @@ pub fn execute(context: CommandContext, args: ShowArgs) -> LatticeResult<()> {
     Ok(())
 }
 
-/// Relationship data for a document: (parent, dependencies, blocking, related).
-type RelationshipData = (Option<DocumentRef>, Vec<DocumentRef>, Vec<DocumentRef>, Vec<DocumentRef>);
+/// Relationship data for a document.
+///
+/// Fields: (parent, dependencies, blocking, related, backlinks).
+type RelationshipData = (
+    Option<DocumentRef>,
+    Vec<DocumentRef>,
+    Vec<DocumentRef>,
+    Vec<DocumentRef>,
+    Vec<DocumentRef>,
+);
 
 /// Determines the output mode based on command-line flags.
 fn determine_output_mode(args: &ShowArgs) -> OutputMode {
@@ -99,12 +107,13 @@ fn build_show_output(
         None
     };
 
-    // Load relationships for full/refs modes
-    let (parent, dependencies, blocking, related) =
-        if mode == OutputMode::Full || mode == OutputMode::Refs {
+    // Load relationships for full/peek/refs modes
+    // Peek needs parent and counts; full/refs need all relationship data
+    let (parent, dependencies, blocking, related, backlinks) =
+        if mode == OutputMode::Full || mode == OutputMode::Peek || mode == OutputMode::Refs {
             load_relationships(context, doc_row)?
         } else {
-            (None, Vec::new(), Vec::new(), Vec::new())
+            (None, Vec::new(), Vec::new(), Vec::new(), Vec::new())
         };
 
     Ok(ShowOutput {
@@ -124,6 +133,7 @@ fn build_show_output(
         dependencies,
         blocking,
         related,
+        backlinks,
         claimed: false, // Claims not yet implemented
     })
 }
@@ -167,8 +177,7 @@ fn load_body_content(repo_root: &Path, relative_path: &str) -> LatticeResult<Str
     Ok(doc.body)
 }
 
-/// Loads relationship data: parent, dependencies, blocking tasks, and related
-/// docs.
+/// Loads relationship data: parent, dependencies, blocking, related, backlinks.
 fn load_relationships(
     context: &CommandContext,
     doc_row: &DocumentRow,
@@ -197,7 +206,12 @@ fn load_relationships(
     let related =
         filter_related_docs(&context.conn, &body_links, &parent, &dependencies, &blocking)?;
 
-    Ok((parent, dependencies, blocking, related))
+    // Backlinks: incoming body links (documents that link to this one)
+    let incoming_body_links =
+        link_queries::query_incoming_by_type(&context.conn, &doc_row.id, LinkType::Body)?;
+    let backlinks = load_document_refs_from_sources(&context.conn, &incoming_body_links)?;
+
+    Ok((parent, dependencies, blocking, related, backlinks))
 }
 
 /// Loads DocumentRef structs for a list of link targets.
