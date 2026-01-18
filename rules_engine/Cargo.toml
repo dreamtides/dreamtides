@@ -72,6 +72,7 @@ tracing-error = "0.2"
 tracing-forest = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter", "json"] }
 umya-spreadsheet = "2"
+unicode-width = "0.2"
 uuid = { version = "1", features = ["serde", "v4"] }
 walkdir = "2"
 yup-oauth2 = "12"

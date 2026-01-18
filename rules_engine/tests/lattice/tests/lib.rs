@@ -22,3 +22,4 @@ mod root_detection_tests;
 mod task_priority_tests;
 mod task_state_tests;
 mod task_types_tests;
+mod text_wrapper_tests;

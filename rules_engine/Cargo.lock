@@ -2210,6 +2210,7 @@ dependencies = [
  "tracing",
  "tracing-appender",
  "tracing-subscriber",
+ "unicode-width 0.2.2",
  "uuid",
 ]
 
@@ -2236,6 +2237,7 @@ dependencies = [
  "serde_yaml",
  "tempfile",
  "toml 0.8.23",
+ "unicode-width 0.2.2",
 ]
 
 [[package]]
