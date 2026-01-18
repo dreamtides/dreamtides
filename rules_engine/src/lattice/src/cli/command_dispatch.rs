@@ -12,7 +12,8 @@ use crate::cli::commands::list_command::list_executor;
 use crate::cli::commands::ready_command::ready_executor;
 use crate::cli::commands::show_command::show_executor;
 use crate::cli::commands::{
-    changes_command, claim_command, create_command, generate_ids, track_command, update_command,
+    changes_command, claim_command, create_command, generate_ids, search_command, track_command,
+    update_command,
 };
 use crate::cli::global_options::GlobalOptions;
 use crate::config::config_loader;
@@ -315,11 +316,9 @@ fn dispatch_command(context: CommandContext, command: Command) -> LatticeResult<
             info!("Dispatching to ready command");
             ready_executor::execute(context, args)
         }
-        Command::Search(_args) => {
+        Command::Search(args) => {
             info!("Dispatching to search command");
-            Err(LatticeError::OperationNotAllowed {
-                reason: "search command not yet implemented".to_string(),
-            })
+            search_command::execute(context, args)
         }
         Command::Stale(_args) => {
             info!("Dispatching to stale command");
