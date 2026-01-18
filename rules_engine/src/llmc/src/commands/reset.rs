@@ -131,7 +131,10 @@ fn reset_worker(state: &mut State, llmc_root: &Path, worker: &str, yes: bool) ->
     let worker_mut = state.get_worker_mut(worker).unwrap();
     worker_mut.status = WorkerStatus::Idle;
     worker_mut.current_prompt.clear();
+    worker_mut.prompt_cmd = None;
     worker_mut.commit_sha = None;
+    worker_mut.self_review = false;
+    worker_mut.on_complete_sent_unix = None;
     worker_mut.last_activity_unix = SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs();
     worker_mut.crash_count = 0;
     worker_mut.last_crash_unix = None;

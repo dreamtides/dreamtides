@@ -213,6 +213,10 @@ fn attempt_state_repairs(state: &mut State, report: &mut DoctorReport) -> usize 
         }
         if worker.status == WorkerStatus::Working && worker.current_prompt.is_empty() {
             worker.status = WorkerStatus::Idle;
+            worker.current_prompt.clear();
+            worker.prompt_cmd = None;
+            worker.commit_sha = None;
+            worker.self_review = false;
             report
                 .repairs_succeeded
                 .push(format!("Reset {} from working to idle (no prompt)", worker.name));

@@ -11,6 +11,7 @@ use super::super::lock::StateLock;
 use super::super::patrol::Patrol;
 use super::super::state::{self, State, WorkerStatus};
 use super::super::tmux::session;
+use super::super::worker::WorkerTransition;
 use super::super::{git, worker};
 use super::add;
 
@@ -375,12 +376,26 @@ fn start_worker(name: &str, config: &Config, state: &mut State, verbose: bool) -
 
     let worker_mut = state.get_worker_mut(name).unwrap();
     if is_clean {
-        worker_mut.status = WorkerStatus::Idle;
+        if let Err(e) = worker::apply_transition(worker_mut, WorkerTransition::ToIdle) {
+            tracing::warn!("Failed to transition worker '{}' to Idle: {}", name, e);
+            worker_mut.status = WorkerStatus::Idle;
+            worker_mut.current_prompt.clear();
+            worker_mut.prompt_cmd = None;
+            worker_mut.commit_sha = None;
+            worker_mut.self_review = false;
+            worker_mut.last_activity_unix = unix_timestamp_now();
+        }
         if verbose {
             println!("    [verbose] Worker '{}' worktree is clean, marked as Idle", name);
         }
     } else {
-        worker_mut.status = WorkerStatus::Error;
+        if let Err(e) = worker::apply_transition(worker_mut, WorkerTransition::ToError {
+            reason: "Uncommitted changes or incomplete rebase at startup".to_string(),
+        }) {
+            tracing::warn!("Failed to transition worker '{}' to Error: {}", name, e);
+            worker_mut.status = WorkerStatus::Error;
+            worker_mut.last_activity_unix = unix_timestamp_now();
+        }
         println!("  ⚠ Worker '{}' has uncommitted changes or incomplete rebase", name);
         println!(
             "    Marked as Error. Run 'llmc doctor --fix' or 'llmc reset {}' to recover",
@@ -390,7 +405,6 @@ fn start_worker(name: &str, config: &Config, state: &mut State, verbose: bool) -
             println!("    [verbose] Worker '{}' worktree is dirty, marked as Error", name);
         }
     }
-    worker_mut.last_activity_unix = unix_timestamp_now();
 
     Ok(())
 }
@@ -623,8 +637,15 @@ fn start_offline_workers(config: &mut Config, state: &mut State, verbose: bool) 
                         worker_name
                     );
                 }
-                if let Some(worker_mut) = state.get_worker_mut(worker_name) {
+                if let Some(worker_mut) = state.get_worker_mut(worker_name)
+                    && let Err(e) = worker::apply_transition(worker_mut, WorkerTransition::ToIdle)
+                {
+                    tracing::warn!("Failed to transition worker '{}' to Idle: {}", worker_name, e);
                     worker_mut.status = WorkerStatus::Idle;
+                    worker_mut.current_prompt.clear();
+                    worker_mut.prompt_cmd = None;
+                    worker_mut.commit_sha = None;
+                    worker_mut.self_review = false;
                     worker_mut.last_activity_unix = unix_timestamp_now();
                 }
                 continue;

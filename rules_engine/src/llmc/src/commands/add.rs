@@ -417,6 +417,10 @@ fn start_worker_immediately(name: &str) -> Result<()> {
 
     let worker_mut = state.get_worker_mut(name).unwrap();
     worker_mut.status = WorkerStatus::Idle;
+    worker_mut.current_prompt.clear();
+    worker_mut.prompt_cmd = None;
+    worker_mut.commit_sha = None;
+    worker_mut.self_review = false;
     worker_mut.last_activity_unix = SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs();
 
     state.save(&state_path)?;

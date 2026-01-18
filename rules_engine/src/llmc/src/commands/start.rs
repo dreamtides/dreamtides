@@ -68,6 +68,23 @@ pub fn run_start(
     } else {
         println!("Pulling latest master into worker '{}'...", worker_name);
     }
+
+    // First, check for stale commits from a previous task. If the worker is idle
+    // but has commits ahead of origin/master, those are leftover from a prior task
+    // that was already merged (or rejected). Reset to origin/master to start clean.
+    if git::has_commits_ahead_of(&worktree_path, "origin/master")? {
+        tracing::info!(
+            worker = %worker_name,
+            "Worker has stale commits from previous task, resetting to origin/master"
+        );
+        if !json {
+            println!(
+                "  Resetting worker to origin/master (removing stale commits from previous task)..."
+            );
+        }
+        git::reset_to_ref(&worktree_path, "origin/master")?;
+    }
+
     git::pull_rebase(&worktree_path)?;
 
     copy_tabula_xlsm(&config, &worktree_path)?;

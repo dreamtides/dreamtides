@@ -50,7 +50,8 @@ pub fn can_transition(from: &WorkerStatus, to: &WorkerStatus) -> bool {
                 WorkerStatus::Working
                     | WorkerStatus::NeedsReview
                     | WorkerStatus::Reviewing
-                    | WorkerStatus::Rejected,
+                    | WorkerStatus::Rejected
+                    | WorkerStatus::Offline,
                 WorkerStatus::Idle
             )
             | (
