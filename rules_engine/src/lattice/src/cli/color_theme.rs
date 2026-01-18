@@ -132,6 +132,11 @@ pub fn status_closed<T: Display>(value: T) -> Styled<T> {
     Styled { value, style: Style::new().color(AYU_MUTED) }
 }
 
+/// Formats a priority bar based on priority level.
+pub fn priority_bar<T: Display>(value: T, _priority: u8) -> Styled<T> {
+    Styled { value, style: Style::new().color(AYU_ACCENT) }
+}
+
 /// Creates a custom-styled text wrapper.
 pub fn styled<T: Display>(value: T, color: Rgb) -> Styled<T> {
     Styled { value, style: Style::new().color(color) }
