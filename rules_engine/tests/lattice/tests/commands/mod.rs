@@ -1,6 +1,7 @@
 mod blocked_tests;
 mod changes_tests;
 mod check_tests;
+mod children_tests;
 mod claim_tests;
 mod close_tests;
 mod create_tests;
