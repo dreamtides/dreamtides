@@ -16,6 +16,7 @@ mod link;
 mod log_tests;
 mod markdown_body_tests;
 mod ready_calculator_tests;
+mod root_detection_tests;
 mod task_priority_tests;
 mod task_state_tests;
 mod task_types_tests;
