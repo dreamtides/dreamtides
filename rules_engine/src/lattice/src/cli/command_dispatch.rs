@@ -8,6 +8,7 @@ use tracing::{debug, error, info, warn};
 
 use crate::claim::stale_cleanup;
 use crate::cli::argument_parser::{Command, Lat};
+use crate::cli::commands::ready_command::ready_executor;
 use crate::cli::commands::show_command::show_executor;
 use crate::cli::commands::{claim_command, generate_ids, track_command};
 use crate::cli::global_options::GlobalOptions;
@@ -313,11 +314,9 @@ fn dispatch_command(context: CommandContext, command: Command) -> LatticeResult<
                 reason: "list command not yet implemented".to_string(),
             })
         }
-        Command::Ready(_args) => {
+        Command::Ready(args) => {
             info!("Dispatching to ready command");
-            Err(LatticeError::OperationNotAllowed {
-                reason: "ready command not yet implemented".to_string(),
-            })
+            ready_executor::execute(context, args)
         }
         Command::Search(_args) => {
             info!("Dispatching to search command");

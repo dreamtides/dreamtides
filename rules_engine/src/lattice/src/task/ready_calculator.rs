@@ -57,6 +57,9 @@ pub struct ReadyFilter {
     /// Filter by task type (bug, feature, task, chore).
     pub task_type: Option<TaskType>,
 
+    /// Filter by exact priority level (0-4).
+    pub priority: Option<u8>,
+
     /// Require ALL of these labels (AND semantics).
     pub labels_all: Vec<String>,
 
@@ -202,6 +205,12 @@ impl ReadyFilter {
         self
     }
 
+    /// Filters by exact priority level (0-4).
+    pub fn with_priority(mut self, priority: u8) -> Self {
+        self.priority = Some(priority);
+        self
+    }
+
     /// Requires all specified labels (AND semantics).
     pub fn with_labels_all(mut self, labels: Vec<String>) -> Self {
         self.labels_all = labels;
@@ -289,6 +298,12 @@ fn append_ready_conditions(
     if let Some(tt) = filter.task_type {
         sql.push_str(" AND task_type = ?");
         params.push(Box::new(tt.to_string()));
+    }
+
+    // Optional exact priority filter
+    if let Some(priority) = filter.priority {
+        sql.push_str(" AND priority = ?");
+        params.push(Box::new(priority as i32));
     }
 
     // Label filters (AND semantics)
