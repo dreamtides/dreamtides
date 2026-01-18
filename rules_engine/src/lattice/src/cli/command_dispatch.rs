@@ -7,8 +7,8 @@ use rusqlite::Connection;
 use tracing::{debug, error, info, warn};
 
 use crate::cli::argument_parser::{Command, Lat};
-use crate::cli::commands::claim_command;
 use crate::cli::commands::show_command::show_executor;
+use crate::cli::commands::{claim_command, generate_ids};
 use crate::cli::global_options::GlobalOptions;
 use crate::config::config_loader;
 use crate::config::config_schema::Config;
@@ -416,11 +416,9 @@ fn dispatch_command(context: CommandContext, command: Command) -> LatticeResult<
                 reason: "track command not yet implemented".to_string(),
             })
         }
-        Command::GenerateIds(_args) => {
+        Command::GenerateIds(args) => {
             info!("Dispatching to generate-ids command");
-            Err(LatticeError::OperationNotAllowed {
-                reason: "generate-ids command not yet implemented".to_string(),
-            })
+            generate_ids::execute(context, args)
         }
         Command::Split(_args) => {
             info!("Dispatching to split command");
