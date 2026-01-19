@@ -18,6 +18,7 @@ pub mod link_display;
 pub mod links_from;
 pub mod links_to;
 pub mod list_command;
+pub mod mcp_command;
 pub mod mv_command;
 pub mod orphans_command;
 pub mod overview_command;

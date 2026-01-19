@@ -112,6 +112,12 @@ pub enum Command {
     /// Run fuzz testing.
     #[command(name = "chaosmonkey")]
     ChaosMonkey(ChaosMonkeyArgs),
+    /// Handle MCP (Model Context Protocol) tool invocations.
+    ///
+    /// This command is invoked by Claude Code, not directly by users.
+    /// It reads a JSON-RPC request from stdin and writes a response to stdout.
+    #[command(hide = true)]
+    Mcp,
 }
 
 /// Parses command-line arguments using Clap.
