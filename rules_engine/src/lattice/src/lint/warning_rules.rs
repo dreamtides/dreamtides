@@ -446,10 +446,11 @@ impl LintRule for BareUrlRule {
             for m in url_regex.find_iter(line) {
                 let url = m.as_str();
                 if !is_url_in_markdown_link(line, url) {
+                    let file_line = document.body_start_line + line_num;
                     let message = "has bare URL (use [text](url) format)";
-                    debug!(path = %doc.row.path, line = line_num + 1, url = %url, "Bare URL found");
+                    debug!(path = %doc.row.path, line = file_line, url = %url, "Bare URL found");
                     results.push(
-                        LintResult::warning("W007", &doc.row.path, message).with_line(line_num + 1),
+                        LintResult::warning("W007", &doc.row.path, message).with_line(file_line),
                     );
                 }
             }
@@ -484,10 +485,11 @@ impl LintRule for SelfReferenceRule {
             if let Some(fragment) = &link.fragment
                 && fragment.as_str() == doc.row.id
             {
-                let message = format!("contains self-reference at line {}", link.line);
-                debug!(path = %doc.row.path, line = link.line, "Self-reference found");
+                let file_line = document.body_start_line + link.line - 1;
+                let message = format!("contains self-reference at line {file_line}");
+                debug!(path = %doc.row.path, line = file_line, "Self-reference found");
                 results
-                    .push(LintResult::warning("W008", &doc.row.path, message).with_line(link.line));
+                    .push(LintResult::warning("W008", &doc.row.path, message).with_line(file_line));
             }
         }
 
@@ -520,10 +522,11 @@ impl LintRule for BackslashInPathRule {
             if let Some(path) = &link.path
                 && path.contains('\\')
             {
+                let file_line = document.body_start_line + link.line - 1;
                 let message = "uses backslash in path (use forward slashes)";
-                debug!(path = %doc.row.path, line = link.line, link_path = %path, "Backslash in path");
+                debug!(path = %doc.row.path, line = file_line, link_path = %path, "Backslash in path");
                 results
-                    .push(LintResult::warning("W009", &doc.row.path, message).with_line(link.line));
+                    .push(LintResult::warning("W009", &doc.row.path, message).with_line(file_line));
             }
         }
 
@@ -577,6 +580,7 @@ impl LintRule for LinkPathMismatchRule {
             let target_path = Path::new(&target_doc.path);
 
             if normalized != target_path {
+                let file_line = document.body_start_line + link.line - 1;
                 let expected_rel = compute_relative_path(source_dir, target_path);
                 let message = format!(
                     "has stale link path (expected {}#{})",
@@ -585,13 +589,13 @@ impl LintRule for LinkPathMismatchRule {
                 );
                 debug!(
                     path = %doc.row.path,
-                    line = link.line,
+                    line = file_line,
                     found = %link_path,
                     expected = %expected_rel.display(),
                     "Link path mismatch"
                 );
                 results
-                    .push(LintResult::warning("W010", &doc.row.path, message).with_line(link.line));
+                    .push(LintResult::warning("W010", &doc.row.path, message).with_line(file_line));
             }
         }
 
@@ -625,11 +629,12 @@ impl LintRule for MissingLinkFragmentRule {
                 && link.fragment.is_none()
                 && path.ends_with(".md")
             {
+                let file_line = document.body_start_line + link.line - 1;
                 let message =
                     format!("link missing Lattice ID fragment: [{}]({})", link.text, path);
-                debug!(path = %doc.row.path, line = link.line, link_path = %path, "Missing fragment");
+                debug!(path = %doc.row.path, line = file_line, link_path = %path, "Missing fragment");
                 results.push(
-                    LintResult::warning("W010b", &doc.row.path, message).with_line(link.line),
+                    LintResult::warning("W010b", &doc.row.path, message).with_line(file_line),
                 );
             }
         }
@@ -660,10 +665,10 @@ impl LintRule for TrailingWhitespaceRule {
 
         for (line_num, line) in document.body.lines().enumerate() {
             if line != line.trim_end() {
+                let file_line = document.body_start_line + line_num;
                 let message = "has trailing whitespace";
-                results.push(
-                    LintResult::warning("W011", &doc.row.path, message).with_line(line_num + 1),
-                );
+                results
+                    .push(LintResult::warning("W011", &doc.row.path, message).with_line(file_line));
             }
         }
 
@@ -702,7 +707,7 @@ impl LintRule for MultipleBlankLinesRule {
         for (line_num, line) in document.body.lines().enumerate() {
             if line.trim().is_empty() {
                 if consecutive_blank == 0 {
-                    blank_start_line = line_num + 1;
+                    blank_start_line = document.body_start_line + line_num;
                 }
                 consecutive_blank += 1;
             } else {
@@ -806,8 +811,10 @@ impl LintRule for HeadingWithoutBlankLinesRule {
             let needs_blank_after = i < lines.len() - 1 && !lines[i + 1].trim().is_empty();
 
             if needs_blank_before || needs_blank_after {
+                let file_line = document.body_start_line + i;
                 let message = "heading should have blank line before/after";
-                results.push(LintResult::warning("W014", &doc.row.path, message).with_line(i + 1));
+                results
+                    .push(LintResult::warning("W014", &doc.row.path, message).with_line(file_line));
             }
         }
 
@@ -860,17 +867,19 @@ impl LintRule for ListWithoutBlankLinesRule {
 
                 let prev_is_blank = i == 0 || lines[i - 1].trim().is_empty();
                 if !prev_is_blank {
+                    let file_line = document.body_start_line + i;
                     let message = "list should have blank line before";
-                    results
-                        .push(LintResult::warning("W015", &doc.row.path, message).with_line(i + 1));
+                    results.push(
+                        LintResult::warning("W015", &doc.row.path, message).with_line(file_line),
+                    );
                 }
             } else if !is_list_item && in_list && !line.trim().is_empty() {
                 if !is_list_continuation(line) {
                     in_list = false;
+                    let file_line = document.body_start_line + list_start;
                     let message = "list should have blank line after";
                     results.push(
-                        LintResult::warning("W015", &doc.row.path, message)
-                            .with_line(list_start + 1),
+                        LintResult::warning("W015", &doc.row.path, message).with_line(file_line),
                     );
                 }
             } else if line.trim().is_empty() {
@@ -909,10 +918,11 @@ impl LintRule for TemplateSectionInNonRootRule {
 
         for (line_num, line) in document.body.lines().enumerate() {
             if lattice_heading_regex.is_match(line) {
+                let file_line = document.body_start_line + line_num;
                 let message = "has [Lattice] sections but is not a root document";
-                debug!(path = %doc.row.path, line = line_num + 1, "Template section in non-root");
+                debug!(path = %doc.row.path, line = file_line, "Template section in non-root");
                 return vec![
-                    LintResult::warning("W016", &doc.row.path, message).with_line(line_num + 1),
+                    LintResult::warning("W016", &doc.row.path, message).with_line(file_line),
                 ];
             }
         }

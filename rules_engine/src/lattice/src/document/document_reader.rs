@@ -16,6 +16,8 @@ pub struct Document {
     pub raw_yaml: String,
     /// The markdown body content.
     pub body: String,
+    /// The 1-indexed line number where the body starts in the original file.
+    pub body_start_line: usize,
 }
 
 /// Result of reading a document with additional diagnostics.
@@ -118,7 +120,12 @@ fn parse_content_with_diagnostics(
 
 /// Converts ParsedFrontmatter to Document.
 fn document_from_parsed(parsed: ParsedFrontmatter) -> Document {
-    Document { frontmatter: parsed.frontmatter, raw_yaml: parsed.raw_yaml, body: parsed.body }
+    Document {
+        frontmatter: parsed.frontmatter,
+        raw_yaml: parsed.raw_yaml,
+        body: parsed.body,
+        body_start_line: parsed.body_start_line,
+    }
 }
 
 impl Document {

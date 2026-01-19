@@ -209,8 +209,12 @@ fn format_single_document(
         return Ok(SingleFormatResult::WouldModify);
     }
 
-    let updated_document =
-        document_reader::Document { frontmatter, raw_yaml: document.raw_yaml, body };
+    let updated_document = document_reader::Document {
+        frontmatter,
+        raw_yaml: document.raw_yaml,
+        body,
+        body_start_line: document.body_start_line,
+    };
     document_writer::write(&updated_document, absolute_path, &WriteOptions::with_timestamp())?;
 
     debug!(path = %relative_path.display(), "Document formatted");

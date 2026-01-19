@@ -986,6 +986,49 @@ More text.
     assert!(summary.results[0].message.contains("blank line before/after"));
 }
 
+#[test]
+fn w014_line_numbers_account_for_frontmatter() {
+    let conn = create_test_db();
+    let temp_dir = TempDir::new().expect("Failed to create temp dir");
+
+    // This document has:
+    // Line 1:  ---
+    // Line 2:  lattice-id: LDOCAA
+    // Line 3:  name: line-test
+    // Line 4:  description: Test line numbers
+    // Line 5:  ---
+    // Line 6:  (empty)
+    // Line 7:  Some text.
+    // Line 8:  # Heading <- This is the issue (no blank before)
+    // Line 9:  More text.
+    //
+    // The heading without blank line is on FILE LINE 8.
+    // The body starts at line 7, so it's BODY LINE 2.
+    // Bug: code reports body line (2) not file line (8).
+    let content = "---\nlattice-id: LDOCAA\nname: line-test\ndescription: Test line numbers\n---\n\nSome text.\n# Heading\nMore text.\n";
+    create_temp_document(&temp_dir, "line_test.md", content);
+
+    let doc = create_kb_document("LDOCAA", "line_test.md", "line-test");
+    document_queries::insert(&conn, &doc).expect("Insert should succeed");
+
+    let ctx = LintContext::new(&conn, temp_dir.path());
+    let config = LintConfig::default();
+
+    let rule = HeadingWithoutBlankLinesRule;
+    let rules: Vec<&dyn LintRule> = vec![&rule];
+    let summary = execute_rules(&ctx, &rules, &config).expect("Execute should succeed");
+
+    assert_eq!(summary.warning_count, 1, "Should detect heading warning");
+
+    let result = &summary.results[0];
+    assert_eq!(
+        result.line,
+        Some(8),
+        "Line number should be 8 (file line), not 2 (body line). Got {:?}",
+        result.line
+    );
+}
+
 // =============================================================================
 // W015: List Without Blank Lines
 // =============================================================================

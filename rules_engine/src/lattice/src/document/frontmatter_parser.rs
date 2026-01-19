@@ -34,6 +34,8 @@ pub struct ParsedFrontmatter {
     pub raw_yaml: String,
     /// The markdown body content after the frontmatter.
     pub body: String,
+    /// The 1-indexed line number where the body starts in the original file.
+    pub body_start_line: usize,
 }
 
 /// Unknown keys found during frontmatter parsing.
@@ -47,9 +49,9 @@ pub struct UnknownKey {
 
 /// Parses frontmatter from markdown content.
 pub fn parse(content: &str, path: &Path) -> Result<ParsedFrontmatter, LatticeError> {
-    let (raw_yaml, body) = extract_yaml(content, path)?;
+    let (raw_yaml, body, body_start_line) = extract_yaml(content, path)?;
     let frontmatter = parse_yaml(&raw_yaml, path)?;
-    Ok(ParsedFrontmatter { frontmatter, raw_yaml, body })
+    Ok(ParsedFrontmatter { frontmatter, raw_yaml, body, body_start_line })
 }
 
 /// Parses frontmatter with detection of unknown keys.
@@ -57,10 +59,10 @@ pub fn parse_with_unknown_key_detection(
     content: &str,
     path: &Path,
 ) -> Result<(ParsedFrontmatter, Vec<UnknownKey>), LatticeError> {
-    let (raw_yaml, body) = extract_yaml(content, path)?;
+    let (raw_yaml, body, body_start_line) = extract_yaml(content, path)?;
     let unknown_keys = detect_unknown_keys(&raw_yaml, path)?;
     let frontmatter = parse_yaml(&raw_yaml, path)?;
-    Ok((ParsedFrontmatter { frontmatter, raw_yaml, body }, unknown_keys))
+    Ok((ParsedFrontmatter { frontmatter, raw_yaml, body, body_start_line }, unknown_keys))
 }
 
 /// Serializes frontmatter to YAML string.
@@ -84,7 +86,9 @@ pub fn format_document(frontmatter: &Frontmatter, body: &str) -> Result<String, 
 }
 
 /// Extracts the YAML frontmatter and body from markdown content.
-fn extract_yaml(content: &str, path: &Path) -> Result<(String, String), LatticeError> {
+/// Returns (raw_yaml, body, body_start_line) where body_start_line is
+/// 1-indexed.
+fn extract_yaml(content: &str, path: &Path) -> Result<(String, String, usize), LatticeError> {
     let content = content.trim_start_matches('\u{feff}');
 
     if !content.starts_with(FRONTMATTER_DELIMITER) {
@@ -117,14 +121,19 @@ fn extract_yaml(content: &str, path: &Path) -> Result<(String, String), LatticeE
         });
     }
 
-    let body_start = FRONTMATTER_DELIMITER.len() + closing_pos + FRONTMATTER_DELIMITER.len();
-    let body = if body_start < content.len() {
-        content[body_start..].trim_start_matches(['\n', '\r']).to_string()
-    } else {
-        String::new()
-    };
+    let body_start_byte = FRONTMATTER_DELIMITER.len() + closing_pos + FRONTMATTER_DELIMITER.len();
 
-    Ok((yaml_trimmed.to_string(), body))
+    let body_with_leading =
+        if body_start_byte < content.len() { &content[body_start_byte..] } else { "" };
+    let trimmed_body = body_with_leading.trim_start_matches(['\n', '\r']);
+    let leading_whitespace_len = body_with_leading.len() - trimmed_body.len();
+
+    // Count newlines in everything before the actual body content starts.
+    // body_start_line is 1-indexed: line 1 has 0 newlines before it.
+    let content_before_body = &content[..body_start_byte + leading_whitespace_len];
+    let body_start_line = content_before_body.matches('\n').count() + 1;
+
+    Ok((yaml_trimmed.to_string(), trimmed_body.to_string(), body_start_line))
 }
 
 /// Finds the position of the closing `---` delimiter.
