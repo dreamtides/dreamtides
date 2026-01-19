@@ -5,16 +5,12 @@ use crate::id::lattice_id::LatticeId;
 
 /// Maximum length for the `name` field in characters.
 pub const MAX_NAME_LENGTH: usize = 64;
-
 /// Maximum length for the `description` field in characters.
 pub const MAX_DESCRIPTION_LENGTH: usize = 1024;
-
 /// Minimum priority value (highest priority).
 pub const MIN_PRIORITY: u8 = 0;
-
 /// Maximum priority value (lowest priority / backlog).
 pub const MAX_PRIORITY: u8 = 4;
-
 /// Default priority for new tasks.
 pub const DEFAULT_PRIORITY: u8 = 2;
 
@@ -157,6 +153,44 @@ pub struct Frontmatter {
     /// document. The `name` and `description` fields must follow Claude's
     /// SKILL.md validation rules.
     #[serde(default, skip_serializing_if = "is_false")]
+    pub skill: bool,
+}
+
+/// Lenient frontmatter that allows `lattice_id` to be missing.
+///
+/// Used by `lat track` to parse existing markdown files that have YAML
+/// frontmatter but no `lattice-id` field yet. This allows preserving other
+/// frontmatter fields while adding the missing ID.
+#[derive(Debug, Clone, PartialEq, Eq, Deserialize)]
+#[serde(rename_all = "kebab-case")]
+pub struct LenientFrontmatter {
+    #[serde(default)]
+    pub lattice_id: Option<LatticeId>,
+    #[serde(default)]
+    pub name: Option<String>,
+    #[serde(default)]
+    pub description: Option<String>,
+    #[serde(default)]
+    pub parent_id: Option<LatticeId>,
+    #[serde(default)]
+    pub task_type: Option<TaskType>,
+    #[serde(default)]
+    pub priority: Option<u8>,
+    #[serde(default)]
+    pub labels: Vec<String>,
+    #[serde(default)]
+    pub blocking: Vec<LatticeId>,
+    #[serde(default)]
+    pub blocked_by: Vec<LatticeId>,
+    #[serde(default)]
+    pub discovered_from: Vec<LatticeId>,
+    #[serde(default)]
+    pub created_at: Option<DateTime<Utc>>,
+    #[serde(default)]
+    pub updated_at: Option<DateTime<Utc>>,
+    #[serde(default)]
+    pub closed_at: Option<DateTime<Utc>>,
+    #[serde(default)]
     pub skill: bool,
 }
 

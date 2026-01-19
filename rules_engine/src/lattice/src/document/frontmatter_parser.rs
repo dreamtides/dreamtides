@@ -3,7 +3,7 @@ use std::path::Path;
 
 use serde_yaml::{Error as YamlError, Value};
 
-use crate::document::frontmatter_schema::Frontmatter;
+use crate::document::frontmatter_schema::{Frontmatter, LenientFrontmatter};
 use crate::error::error_types::LatticeError;
 
 const FRONTMATTER_DELIMITER: &str = "---";
@@ -47,6 +47,13 @@ pub struct UnknownKey {
     pub suggestion: Option<String>,
 }
 
+/// Result of lenient parsing that allows missing `lattice-id`.
+#[derive(Debug, Clone)]
+pub struct ParsedLenientFrontmatter {
+    pub frontmatter: LenientFrontmatter,
+    pub body: String,
+}
+
 /// Parses frontmatter from markdown content.
 pub fn parse(content: &str, path: &Path) -> Result<ParsedFrontmatter, LatticeError> {
     let (raw_yaml, body, body_start_line) = extract_yaml(content, path)?;
@@ -61,6 +68,19 @@ pub fn parse(content: &str, path: &Path) -> Result<ParsedFrontmatter, LatticeErr
 pub fn extract_body(content: &str, path: &Path) -> Result<String, LatticeError> {
     let (_, body, _) = extract_yaml(content, path)?;
     Ok(body)
+}
+
+/// Parses frontmatter leniently, allowing `lattice-id` to be missing.
+///
+/// Used by `lat track` to handle markdown files that have YAML frontmatter
+/// but are missing the `lattice-id` field. This allows preserving other
+/// frontmatter fields while adding the missing ID.
+pub fn parse_lenient(content: &str, path: &Path) -> Result<ParsedLenientFrontmatter, LatticeError> {
+    let (raw_yaml, body, _) = extract_yaml(content, path)?;
+    let frontmatter: LenientFrontmatter = serde_yaml::from_str(&raw_yaml).map_err(|e| {
+        LatticeError::YamlParseError { path: path.to_path_buf(), reason: format_yaml_error(e) }
+    })?;
+    Ok(ParsedLenientFrontmatter { frontmatter, body })
 }
 
 /// Parses frontmatter with detection of unknown keys.

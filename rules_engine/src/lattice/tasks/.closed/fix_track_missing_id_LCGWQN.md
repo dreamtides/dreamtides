@@ -6,7 +6,8 @@ parent-id: LCEWQN
 task-type: bug
 priority: 1
 created-at: 2026-01-19T05:15:00Z
-updated-at: 2026-01-19T05:20:00Z
+updated-at: 2026-01-19T20:05:00.576390Z
+closed-at: 2026-01-19T20:05:00.576390Z
 ---
 
 # lat track fails when lattice-id is missing

@@ -107,12 +107,56 @@ fn handle_existing_document(
 
             Ok((frontmatter, parsed.body))
         }
-        Err(e) => {
+        Err(strict_parse_error) => {
+            handle_missing_or_invalid_id(context, path, content, name, args, strict_parse_error)
+        }
+    }
+}
+
+/// Handles documents where the strict parser failed.
+///
+/// Uses lenient parsing to determine if the `lattice-id` field is missing
+/// (a valid case for `lat track`) versus invalid (requires `--force`).
+fn handle_missing_or_invalid_id(
+    context: &CommandContext,
+    path: &Path,
+    content: &str,
+    name: &str,
+    args: &TrackArgs,
+    strict_parse_error: LatticeError,
+) -> LatticeResult<(Frontmatter, String)> {
+    match frontmatter_parser::parse_lenient(content, path) {
+        Ok(lenient) if lenient.frontmatter.lattice_id.is_none() => {
+            info!("Frontmatter missing lattice-id, adding tracking");
+            let new_id = generate_new_id(context)?;
+            let now = Utc::now();
+            let lf = lenient.frontmatter;
+
+            let frontmatter = Frontmatter {
+                lattice_id: new_id,
+                name: name.to_string(),
+                description: args.description.clone(),
+                parent_id: lf.parent_id,
+                task_type: lf.task_type,
+                priority: lf.priority,
+                labels: lf.labels,
+                blocking: lf.blocking,
+                blocked_by: lf.blocked_by,
+                discovered_from: lf.discovered_from,
+                created_at: lf.created_at.or(Some(now)),
+                updated_at: Some(now),
+                closed_at: lf.closed_at,
+                skill: lf.skill,
+            };
+
+            Ok((frontmatter, lenient.body))
+        }
+        _ => {
             if !args.force {
-                return Err(e);
+                return Err(strict_parse_error);
             }
 
-            info!("Frontmatter invalid, using --force to regenerate: {e}");
+            info!("Frontmatter invalid, using --force to regenerate: {strict_parse_error}");
             let body = frontmatter_parser::extract_body(content, path)?;
             let new_id = generate_new_id(context)?;
             let now = Utc::now();

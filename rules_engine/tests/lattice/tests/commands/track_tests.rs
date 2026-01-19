@@ -133,3 +133,33 @@ fn track_without_force_reports_invalid_id() {
     let result = track_command::execute(context, args);
     assert!(result.is_err(), "Track without --force should fail for invalid ID");
 }
+
+// ============================================================================
+// Missing lattice-id Tests
+// ============================================================================
+
+#[test]
+fn track_adds_lattice_id_to_file_with_frontmatter_but_no_id() {
+    let env = TestEnv::new();
+    env.create_dir("docs");
+    env.write_file(
+        "docs/test.md",
+        "---\nname: existing-name\ndescription: Existing description\n---\n\n# Content\n\nBody text.\n",
+    );
+
+    let global = GlobalOptions::default();
+    let args = track_args("docs/test.md", "New description", false);
+    let (temp, _context) = env.into_parts();
+    let context = create_context_from_env_temp(&temp, &global);
+
+    let result = track_command::execute(context, args);
+    assert!(result.is_ok(), "Track should succeed for frontmatter without lattice-id: {result:?}");
+
+    let new_doc = document_reader::read(&temp.path().join("docs/test.md")).expect("Read document");
+    assert!(
+        new_doc.frontmatter.lattice_id.as_str().starts_with('L'),
+        "Should have valid Lattice ID"
+    );
+    assert_eq!(new_doc.frontmatter.description, "New description");
+    assert!(new_doc.body.contains("# Content"), "Should preserve body");
+}
