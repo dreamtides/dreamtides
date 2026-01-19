@@ -43,13 +43,11 @@ pub fn run_hook_session_start(worker: &str) -> Result<()> {
     Ok(())
 }
 
-pub fn run_hook_session_end(worker: &str, reason: &str) -> Result<()> {
-    let _input = read_stdin_json()?;
-    let event = HookEvent::SessionEnd {
-        worker: worker.to_string(),
-        reason: reason.to_string(),
-        timestamp: get_timestamp(),
-    };
+pub fn run_hook_session_end(worker: &str, cli_reason: &str) -> Result<()> {
+    let input = read_stdin_json()?;
+    let reason = input.reason.unwrap_or_else(|| cli_reason.to_string());
+    let event =
+        HookEvent::SessionEnd { worker: worker.to_string(), reason, timestamp: get_timestamp() };
     let socket_path = socket::get_socket_path();
     let rt = Builder::new_current_thread().enable_all().build()?;
     let response = rt.block_on(socket::send_event(&socket_path, event))?;

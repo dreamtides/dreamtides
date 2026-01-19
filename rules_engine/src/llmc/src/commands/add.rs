@@ -232,7 +232,7 @@ pub fn create_claude_hook_settings(worktree_path: &Path, worker_name: &str) -> R
             "SessionEnd": [{
                 "hooks": [{
                     "type": "command",
-                    "command": format!("{} hook session-end --worker {} --reason \"session_end\"", llmc_bin, worker_name),
+                    "command": format!("{} hook session-end --worker {}", llmc_bin, worker_name),
                     "timeout": 5
                 }]
             }],

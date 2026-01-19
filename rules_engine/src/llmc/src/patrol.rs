@@ -255,6 +255,56 @@ impl Patrol {
                     }
                 }
             }
+            // Fallback: detect Working/Rejected workers with commits where Stop hook may
+            // have failed
+            if matches!(worker_status, WorkerStatus::Working | WorkerStatus::Rejected) {
+                let now = SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs();
+                let last_activity =
+                    state.get_worker(&worker_name).map(|w| w.last_activity_unix).unwrap_or(now);
+                let elapsed_secs = now.saturating_sub(last_activity);
+                const FALLBACK_DELAY_SECS: u64 = 300;
+
+                if elapsed_secs >= FALLBACK_DELAY_SECS {
+                    match git::has_commits_ahead_of(worktree_path, "origin/master") {
+                        Ok(true) => {
+                            tracing::warn!(
+                                "Worker '{}' in {:?} state has commits ahead of master for {}s (Stop hook may have failed), recovering to needs_review",
+                                worker_name,
+                                worker_status,
+                                elapsed_secs
+                            );
+                            if git::has_uncommitted_changes(worktree_path)? {
+                                tracing::info!(
+                                    "Worker '{}' has uncommitted changes, amending before recovering to needs_review",
+                                    worker_name
+                                );
+                                git::amend_uncommitted_changes(worktree_path)?;
+                            }
+                            let commit_sha = git::get_head_commit(worktree_path)?;
+                            let transition = WorkerTransition::ToNeedsReview { commit_sha };
+                            if let Some(worker_mut) = state.get_worker_mut(&worker_name) {
+                                let self_review_enabled = worker_mut.self_review;
+                                worker::apply_transition(worker_mut, transition.clone())?;
+                                report.transitions_applied.push((worker_name.clone(), transition));
+                                if self_review_enabled {
+                                    worker_mut.pending_self_review = true;
+                                } else {
+                                    worker_mut.on_complete_sent_unix = Some(now);
+                                }
+                            }
+                            continue;
+                        }
+                        Ok(false) => {}
+                        Err(e) => {
+                            tracing::warn!(
+                                "Failed to check commits ahead for working worker '{}': {}",
+                                worker_name,
+                                e
+                            );
+                        }
+                    }
+                }
+            }
             if worker_status != WorkerStatus::Rebasing && git::is_rebase_in_progress(worktree_path)
             {
                 tracing::warn!(
@@ -347,7 +397,7 @@ impl Patrol {
             if worker.status != WorkerStatus::NeedsReview {
                 continue;
             }
-            if !worker.self_review {
+            if !worker.pending_self_review {
                 continue;
             }
             if worker.on_complete_sent_unix.is_some() {
@@ -355,7 +405,7 @@ impl Patrol {
             }
             let Some(self_review_config) = get_self_review_config(config) else {
                 tracing::warn!(
-                    "Worker '{}' has self_review enabled but no self_review config in defaults",
+                    "Worker '{}' has pending_self_review but no self_review config in defaults",
                     worker_name
                 );
                 continue;
@@ -402,6 +452,7 @@ impl Patrol {
                     e
                 );
             } else if let Some(w) = state.get_worker_mut(&worker_name) {
+                w.pending_self_review = false;
                 if let Err(e) = worker::apply_transition(w, WorkerTransition::ToReviewing) {
                     tracing::error!(
                         "Failed to transition worker '{}' to Reviewing: {}",
