@@ -1017,7 +1017,7 @@ Linking System](appendix_linking_system.md)
 
 ---
 
-## Feature: Dependency Commands
+## Feature: Dependency Commands [ONGOING]
 
 **Goal:** Manage task dependencies.
 
@@ -1051,7 +1051,7 @@ Linking System](appendix_linking_system.md)
 
 ---
 
-## Feature: Label Commands
+## Feature: Label Commands [ONGOING]
 
 **Goal:** Manage document labels.
 
@@ -1077,7 +1077,7 @@ Linking System](appendix_linking_system.md)
 
 ---
 
-## Feature: Utility Commands
+## Feature: Utility Commands [ONGOING]
 
 **Goal:** Document maintenance and exploration.
 
@@ -1126,7 +1126,7 @@ Linking System](appendix_linking_system.md)
 
 ---
 
-## Feature: Overview and Prime Commands
+## Feature: Overview and Prime Commands [ONGOING]
 
 **Goal:** AI-optimized context commands.
 
