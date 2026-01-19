@@ -16,7 +16,7 @@ use crate::cli::commands::{
     blocked_command, changes_command, children_command, claim_command, close_command,
     create_command, fmt_command, generate_ids, impact_command, links_from, links_to, mcp_command,
     orphans_command, path_command, prune_command, reopen_command, roots_command, search_command,
-    stale_command, stats_command, track_command, tree_command, update_command,
+    setup_command, stale_command, stats_command, track_command, tree_command, update_command,
 };
 use crate::cli::global_options::GlobalOptions;
 use crate::config::config_loader;
@@ -437,11 +437,9 @@ fn dispatch_command(context: CommandContext, command: Command) -> LatticeResult<
                 reason: "doctor command not yet implemented".to_string(),
             })
         }
-        Command::Setup(_args) => {
+        Command::Setup(args) => {
             info!("Dispatching to setup command");
-            Err(LatticeError::OperationNotAllowed {
-                reason: "setup command not yet implemented".to_string(),
-            })
+            setup_command::execute(context, args)
         }
         Command::Completion(_args) => {
             info!("Dispatching to completion command");
