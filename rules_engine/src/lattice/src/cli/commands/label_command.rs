@@ -1,11 +1,14 @@
 use chrono::Utc;
+use serde::Serialize;
 use tracing::info;
 
 use crate::cli::command_dispatch::{CommandContext, LatticeResult};
 use crate::cli::structure_args::{LabelArgs, LabelCommand};
+use crate::cli::{color_theme, output_format};
 use crate::document::document_reader;
 use crate::document::document_writer::{self, WriteOptions};
 use crate::error::error_types::LatticeError;
+use crate::index::label_queries::LabelCount;
 use crate::index::{document_queries, label_queries};
 
 /// Executes the `lat label` command.
@@ -15,12 +18,8 @@ pub fn execute(context: CommandContext, args: LabelArgs) -> LatticeResult<()> {
     match args.command {
         LabelCommand::Add { ids, label } => execute_add(context, ids, label),
         LabelCommand::Remove { ids, label } => execute_remove(context, ids, label),
-        LabelCommand::List { .. } => Err(LatticeError::OperationNotAllowed {
-            reason: "label list subcommand not yet implemented".to_string(),
-        }),
-        LabelCommand::ListAll => Err(LatticeError::OperationNotAllowed {
-            reason: "label list-all subcommand not yet implemented".to_string(),
-        }),
+        LabelCommand::List { id } => execute_list(context, id),
+        LabelCommand::ListAll => execute_list_all(context),
     }
 }
 
@@ -205,5 +204,120 @@ fn print_output(
             let status = if result.changed { action } else { "unchanged" };
             println!("  {} {} ({})", result.id, result.path, status);
         }
+    }
+}
+
+/// Output structure for listing labels on a single document.
+#[derive(Serialize)]
+struct ListLabelsOutput {
+    id: String,
+    name: String,
+    labels: Vec<String>,
+}
+
+/// Output structure for listing all labels with counts.
+#[derive(Serialize)]
+struct LabelWithCount {
+    label: String,
+    count: u64,
+}
+
+/// Executes the `lat label list` subcommand.
+///
+/// Lists all labels on a specific document, sorted alphabetically.
+fn execute_list(context: CommandContext, id: String) -> LatticeResult<()> {
+    info!(id = %id, "Executing label list command");
+
+    let doc_row = document_queries::lookup_by_id(&context.conn, &id)?
+        .ok_or_else(|| LatticeError::DocumentNotFound { id: id.clone() })?;
+
+    let labels = label_queries::get_labels(&context.conn, &id)?;
+
+    info!(id = %id, count = labels.len(), "Labels retrieved for document");
+
+    if context.global.json {
+        output_list_json(&doc_row.id, &doc_row.name, &labels)?;
+    } else {
+        output_list_text(&doc_row.id, &doc_row.name, &labels);
+    }
+
+    Ok(())
+}
+
+/// Outputs label list in JSON format.
+fn output_list_json(id: &str, name: &str, labels: &[String]) -> LatticeResult<()> {
+    let output =
+        ListLabelsOutput { id: id.to_string(), name: name.to_string(), labels: labels.to_vec() };
+
+    let json_str = output_format::output_json(&output).map_err(|e| {
+        LatticeError::OperationNotAllowed { reason: format!("Failed to serialize JSON: {e}") }
+    })?;
+
+    println!("{json_str}");
+    Ok(())
+}
+
+/// Outputs label list in text format.
+fn output_list_text(id: &str, name: &str, labels: &[String]) {
+    let id_str = color_theme::lattice_id(id);
+    let name_str = color_theme::bold(name);
+
+    println!("Labels for {id_str} ({name_str}):");
+    if labels.is_empty() {
+        println!("  {}", color_theme::muted("(no labels)"));
+    } else {
+        for label in labels {
+            println!("  {label}");
+        }
+    }
+}
+
+/// Executes the `lat label list-all` subcommand.
+///
+/// Lists all unique labels in the repository with their document counts.
+fn execute_list_all(context: CommandContext) -> LatticeResult<()> {
+    info!("Executing label list-all command");
+
+    let label_counts = label_queries::list_all(&context.conn)?;
+
+    info!(count = label_counts.len(), "Labels retrieved");
+
+    if context.global.json {
+        output_list_all_json(&label_counts)?;
+    } else {
+        output_list_all_text(&label_counts);
+    }
+
+    Ok(())
+}
+
+/// Outputs all labels in JSON format.
+fn output_list_all_json(label_counts: &[LabelCount]) -> LatticeResult<()> {
+    let output: Vec<LabelWithCount> = label_counts
+        .iter()
+        .map(|lc| LabelWithCount { label: lc.label.clone(), count: lc.count })
+        .collect();
+
+    let json_str = output_format::output_json_array(&output).map_err(|e| {
+        LatticeError::OperationNotAllowed { reason: format!("Failed to serialize JSON: {e}") }
+    })?;
+
+    println!("{json_str}");
+    Ok(())
+}
+
+/// Outputs all labels in text format.
+fn output_list_all_text(label_counts: &[LabelCount]) {
+    if label_counts.is_empty() {
+        println!("No labels found.");
+        return;
+    }
+
+    let count_str = output_format::format_count(label_counts.len(), "label", "labels");
+    println!("{count_str}:");
+
+    for lc in label_counts {
+        let count_display = color_theme::muted(format!("({})", lc.count));
+        println!("  {} {count_display}", lc.label);
     }
 }
