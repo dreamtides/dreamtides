@@ -115,7 +115,15 @@ pub fn run_start(
     })?;
     let self_review_enabled =
         state.get_worker(&worker_name).map(|w| w.self_review).unwrap_or(false);
-    state.save(&super::super::state::get_state_path())?;
+    let state_path = super::super::state::get_state_path();
+    state.save(&state_path)?;
+    tracing::info!(
+        operation = "worker_start_complete",
+        worker = %worker_name,
+        state_path = %state_path.display(),
+        self_review = self_review_enabled,
+        "Worker started and state saved successfully"
+    );
     if json {
         let worker_record = state.get_worker(&worker_name).unwrap();
         let output = crate::json_output::StartOutput {

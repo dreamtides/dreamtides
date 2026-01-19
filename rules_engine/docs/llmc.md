@@ -259,8 +259,11 @@ timing, failure recovery, and research results.
 ### State Detection
 
 LLMC uses Claude Code hooks for real-time state detection:
-- **SessionStart**: Fired when Claude is ready, transitions worker to Idle
-- **SessionEnd**: Fired when Claude exits, transitions worker to Offline
+- **SessionStart**: Fired when Claude is ready, transitions worker from Offline to
+  Idle. If worker is already active (e.g., after `/clear`), preserves current state.
+- **SessionEnd**: Fired when Claude exits. With `reason="logout"`, gracefully
+  transitions to Offline. With `reason="clear"` (from `/clear` command), ignored
+  since Claude restarts immediately. Other reasons treated as crashes.
 - **Stop**: Fired when Claude completes a task, transitions worker to NeedsReview
 
 This event-driven approach provides sub-second detection latency.

@@ -642,10 +642,14 @@ fn handle_session_start(
             );
         }
     } else {
-        tracing::debug!(
+        // This is expected after /clear - the session restarts but the worker is still
+        // Working. Log at info level to help track these events for debugging.
+        tracing::info!(
             worker = %worker_name,
+            session_id = %session_id,
             current_status = ?worker.status,
-            "SessionStart hook received but worker is not Offline, ignoring"
+            has_prompt = !worker.current_prompt.is_empty(),
+            "SessionStart hook received but worker is not Offline, preserving current state"
         );
     }
 
@@ -672,6 +676,18 @@ fn handle_session_end(
         tracing::debug!(
             worker = %worker_name,
             "SessionEnd hook received but worker is already Offline, ignoring"
+        );
+        return Ok(());
+    }
+
+    // "clear" happens when /clear is sent - not a real session end, Claude restarts
+    // immediately. "logout" is a normal exit (e.g., user typed /exit).
+    // Any other reason (e.g., "error", "crash") is treated as an unexpected crash.
+    if reason == "clear" {
+        tracing::debug!(
+            worker = %worker_name,
+            current_status = ?worker.status,
+            "SessionEnd hook with reason='clear' ignored - /clear causes immediate session restart"
         );
         return Ok(());
     }
