@@ -1215,7 +1215,7 @@ The following integration points connect claims to other features:
 
 ---
 
-## Feature: Template System [ONGOING]
+## Feature: Template System [DONE]
 
 **Goal:** Compose context and acceptance criteria from ancestor root documents.
 
@@ -1647,7 +1647,7 @@ These features can be developed in parallel after their dependencies are met:
 - Query Commands [DONE]
 - Hierarchy Commands [DONE]
 - Relationship Commands
-- Template System
+- Template System [DONE]
 
 **Standalone (after respective dependencies):**
 - Testing Infrastructure (after Git Layer)
