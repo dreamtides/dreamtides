@@ -1,6 +1,5 @@
 use std::os::unix::process::CommandExt;
 use std::process::Command;
-use std::time::Duration;
 
 use anyhow::{Context, Result, bail};
 
@@ -65,12 +64,7 @@ pub fn run_console(name: Option<&str>) -> Result<()> {
     sender
         .send(&session_name, &claude_cmd)
         .with_context(|| format!("Failed to send Claude command to session '{}'", session_name))?;
-    if let Err(e) = session::wait_for_claude_ready(&session_name, Duration::from_secs(30), false) {
-        let _ = session::kill_session(&session_name);
-        return Err(e);
-    }
-    session::accept_bypass_warning(&session_name, &sender, false)?;
-    println!("Console ready. Attaching to session...");
+    println!("Attaching to session...");
     let err = Command::new("tmux").arg("attach-session").arg("-t").arg(&session_name).exec();
     Err(anyhow::anyhow!("Failed to exec tmux attach-session: {}", err))
 }

@@ -971,7 +971,7 @@ Task Tracking](appendix_task_tracking.md)
 
 ---
 
-## Feature: Relationship Commands
+## Feature: Relationship Commands [ONGOING]
 
 **Goal:** Explore links between documents.
 
@@ -1642,10 +1642,10 @@ These features can be developed in parallel after their dependencies are met:
 - Claim System (only needs Foundation + Task types) [DONE]
 
 **After Link/Task Systems:**
-- Linting & Formatting
-- Core Task Commands
-- Query Commands
-- Hierarchy Commands
+- Linting & Formatting [DONE]
+- Core Task Commands [DONE]
+- Query Commands [DONE]
+- Hierarchy Commands [DONE]
 - Relationship Commands
 - Template System
 

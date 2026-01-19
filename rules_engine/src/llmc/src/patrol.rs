@@ -39,14 +39,7 @@ pub fn handle_hook_event(event: &HookEvent, state: &mut State, config: &Config) 
             handle_session_end(worker, reason, *timestamp, state, config)?;
         }
         HookEvent::Stop { worker, timestamp, .. } => {
-            if config.defaults.hooks_task_completion {
-                handle_stop(worker, *timestamp, state, config)?;
-            } else {
-                tracing::debug!(
-                    "Ignoring Stop event for '{}' (hooks_task_completion disabled)",
-                    worker
-                );
-            }
+            handle_stop(worker, *timestamp, state, config)?;
         }
         HookEvent::PostBash { .. } => {
             tracing::debug!("Ignoring PostBash event (not yet implemented): {:?}", event);
@@ -72,9 +65,9 @@ impl Patrol {
 
     fn run_patrol_impl(&self, state: &mut State, config: &Config) -> Result<PatrolReport> {
         let mut report = PatrolReport::default();
-        self.check_session_health(state, config, &mut report)?;
+        self.check_session_health(state, &mut report)?;
         self.check_state_consistency(state, &mut report)?;
-        self.detect_state_transitions(state, config, &mut report)?;
+        self.detect_state_transitions(state, &mut report)?;
         if !report.transitions_applied.is_empty() {
             let state_path = state::get_state_path();
             if let Err(e) = state.save(&state_path) {
@@ -91,25 +84,16 @@ impl Patrol {
             }
         }
         self.send_pending_self_review_prompts(state, config)?;
-        self.detect_reviewing_amendments(state, config, &mut report)?;
         let transitioned_workers: std::collections::HashSet<String> =
             report.transitions_applied.iter().map(|(name, _)| name.clone()).collect();
         self.rebase_pending_reviews(state, &transitioned_workers, &mut report)?;
         Ok(report)
     }
 
-    fn check_session_health(
-        &self,
-        state: &mut State,
-        config: &Config,
-        report: &mut PatrolReport,
-    ) -> Result<()> {
+    fn check_session_health(&self, state: &mut State, report: &mut PatrolReport) -> Result<()> {
         let worker_names: Vec<String> = state.workers.keys().cloned().collect();
-        let use_hooks = config.defaults.hooks_session_lifecycle;
         for worker_name in worker_names {
             report.sessions_checked += 1;
-            let worker = state.get_worker(&worker_name).unwrap();
-            let session_id = worker.session_id.clone();
             if let Some(worker_mut) = state.get_worker_mut(&worker_name)
                 && recovery::should_reset_crash_count(
                     worker_mut,
@@ -124,69 +108,7 @@ impl Patrol {
                 worker_mut.crash_count = 0;
                 worker_mut.last_crash_unix = None;
             }
-            if use_hooks {
-                continue;
-            }
-            if !session::session_exists(&session_id) {
-                tracing::warn!(
-                    "Worker '{}' session '{}' not found - marking offline",
-                    worker_name,
-                    session_id
-                );
-                if let Some(w) = state.get_worker_mut(&worker_name)
-                    && let Err(e) = worker::apply_transition(w, WorkerTransition::ToOffline)
-                {
-                    report
-                        .errors
-                        .push(format!("Failed to mark worker '{}' offline: {}", worker_name, e));
-                }
-                continue;
-            }
-            let pane_command = session::get_pane_command(&session_id).unwrap_or_default();
-            if session::is_shell(&pane_command) {
-                tracing::warn!(
-                    "Worker '{}' Claude process crashed - attempting restart",
-                    worker_name
-                );
-                let worker = state.get_worker(&worker_name).unwrap();
-                let worktree_path = PathBuf::from(&worker.worktree_path);
-                if let Err(e) =
-                    self.attempt_restart(&worker_name, &session_id, &worktree_path, config)
-                {
-                    report
-                        .errors
-                        .push(format!("Failed to restart worker '{}': {}", worker_name, e));
-                    if let Some(w) = state.get_worker_mut(&worker_name)
-                        && let Err(e) = worker::apply_transition(w, WorkerTransition::ToError {
-                            reason: "Claude crashed".to_string(),
-                        })
-                    {
-                        report.errors.push(format!(
-                            "Failed to mark worker '{}' as error: {}",
-                            worker_name, e
-                        ));
-                    }
-                }
-            }
         }
-        Ok(())
-    }
-
-    fn attempt_restart(
-        &self,
-        worker_name: &str,
-        session_id: &str,
-        _worktree_path: &Path,
-        config: &Config,
-    ) -> Result<()> {
-        let worker_config = config
-            .get_worker(worker_name)
-            .ok_or_else(|| anyhow::anyhow!("Worker config not found"))?;
-        worker::start_claude_in_session(
-            session_id,
-            worker_config,
-            config.defaults.hooks_session_lifecycle,
-        )?;
         Ok(())
     }
 
@@ -370,13 +292,7 @@ impl Patrol {
         Ok(())
     }
 
-    fn detect_state_transitions(
-        &self,
-        state: &mut State,
-        config: &Config,
-        report: &mut PatrolReport,
-    ) -> Result<()> {
-        let use_hooks_task_completion = config.defaults.hooks_task_completion;
+    fn detect_state_transitions(&self, state: &mut State, report: &mut PatrolReport) -> Result<()> {
         let worker_names: Vec<String> = state.workers.keys().cloned().collect();
         for worker_name in worker_names {
             let worker = state.get_worker(&worker_name).unwrap();
@@ -385,17 +301,6 @@ impl Patrol {
             let worktree_path = PathBuf::from(&worker.worktree_path);
             let self_review_enabled = worker.self_review;
             let transition = match current_status {
-                WorkerStatus::Working | WorkerStatus::Rejected => {
-                    if use_hooks_task_completion {
-                        tracing::debug!(
-                            worker = %worker_name,
-                            "Skipping git polling for Working/Rejected worker (hooks_task_completion enabled)"
-                        );
-                        WorkerTransition::None
-                    } else {
-                        self.detect_working_transition(&session_id, &worktree_path)?
-                    }
-                }
                 WorkerStatus::Rebasing => {
                     self.detect_rebasing_transition(&session_id, &worktree_path)?
                 }
@@ -427,7 +332,6 @@ impl Patrol {
                             worker_name
                         );
                     }
-                    let _ = sound::play_bell(config);
                 }
             }
         }
@@ -518,97 +422,6 @@ impl Patrol {
             }
         }
         Ok(())
-    }
-
-    fn detect_reviewing_amendments(
-        &self,
-        state: &mut State,
-        config: &Config,
-        report: &mut PatrolReport,
-    ) -> Result<()> {
-        if config.defaults.hooks_task_completion {
-            tracing::debug!("Skipping detect_reviewing_amendments (hooks_task_completion enabled)");
-            return Ok(());
-        }
-        let worker_names: Vec<String> = state.workers.keys().cloned().collect();
-        for worker_name in worker_names {
-            let worker = state.get_worker(&worker_name).unwrap();
-            if worker.status != WorkerStatus::Reviewing {
-                continue;
-            }
-            let Some(stored_sha) = &worker.commit_sha else {
-                tracing::warn!(
-                    "Worker '{}' in Reviewing state has no stored commit_sha",
-                    worker_name
-                );
-                continue;
-            };
-            let worktree_path = PathBuf::from(&worker.worktree_path);
-            let current_sha = match git::get_head_commit(&worktree_path) {
-                Ok(sha) => sha,
-                Err(e) => {
-                    tracing::warn!("Failed to get HEAD commit for worker '{}': {}", worker_name, e);
-                    continue;
-                }
-            };
-            if &current_sha != stored_sha {
-                tracing::info!(
-                    "Worker '{}' commit SHA changed from {} to {} - transitioning back to NeedsReview",
-                    worker_name,
-                    &stored_sha[..7.min(stored_sha.len())],
-                    &current_sha[..7.min(current_sha.len())]
-                );
-                let transition = WorkerTransition::ToNeedsReview { commit_sha: current_sha };
-                if let Some(w) = state.get_worker_mut(&worker_name) {
-                    if let Err(e) = worker::apply_transition(w, transition.clone()) {
-                        report.errors.push(format!(
-                            "Failed to transition worker '{}' from Reviewing to NeedsReview: {}",
-                            worker_name, e
-                        ));
-                    } else {
-                        report.transitions_applied.push((worker_name.clone(), transition));
-                        let _ = sound::play_bell(&crate::config::Config::load(
-                            &crate::config::get_config_path(),
-                        )?);
-                    }
-                }
-            }
-        }
-        Ok(())
-    }
-
-    fn detect_working_transition(
-        &self,
-        session_id: &str,
-        worktree_path: &Path,
-    ) -> Result<WorkerTransition> {
-        let has_commits = git::has_commits_ahead_of(worktree_path, "origin/master")?;
-        tracing::debug!(
-            "Checking working transition for {}: has_commits={}",
-            session_id,
-            has_commits
-        );
-        if has_commits {
-            let commit_sha = git::get_head_commit(worktree_path)?;
-            let commit_msg = git::get_commit_message(worktree_path, &commit_sha)
-                .unwrap_or_else(|_| "<unknown>".to_string());
-            let first_line = commit_msg.lines().next().unwrap_or("<empty>");
-            if git::has_uncommitted_changes(worktree_path)? {
-                tracing::info!(
-                    worker = % session_id, commit_sha = % commit_sha, commit_msg = %
-                    first_line,
-                    "Worker has commits and uncommitted changes, amending before transitioning to needs_review"
-                );
-                git::amend_uncommitted_changes(worktree_path)?;
-            }
-            tracing::info!(
-                worker = % session_id, commit_sha = % commit_sha, commit_msg = %
-                first_line,
-                "Worker has commits ahead of origin/master, transitioning to needs_review"
-            );
-            return Ok(WorkerTransition::ToNeedsReview { commit_sha });
-        }
-        Ok(WorkerTransition::None)
     }
 
     fn detect_rebasing_transition(
@@ -1055,7 +868,6 @@ mod tests {
     use std::collections::HashMap;
 
     use crate::config::{DefaultsConfig, RepoConfig};
-    use crate::ipc::messages::HookEvent;
     use crate::patrol::*;
     use crate::state::WorkerRecord;
 
@@ -1079,7 +891,7 @@ mod tests {
         }
     }
 
-    fn create_test_config(hooks_task_completion: bool) -> Config {
+    fn create_test_config() -> Config {
         Config {
             defaults: DefaultsConfig {
                 model: "opus".to_string(),
@@ -1088,8 +900,6 @@ mod tests {
                 patrol_interval_secs: 60,
                 sound_on_review: false,
                 self_review: None,
-                hooks_session_lifecycle: true,
-                hooks_task_completion,
             },
             repo: RepoConfig { source: "/test".to_string() },
             workers: HashMap::new(),
@@ -1099,7 +909,7 @@ mod tests {
     #[test]
     fn test_handle_stop_unknown_worker() {
         let mut state = State::new();
-        let config = create_test_config(true);
+        let config = create_test_config();
         let result = handle_stop("unknown_worker", 12345, &mut state, &config);
         assert!(result.is_ok());
     }
@@ -1109,27 +919,10 @@ mod tests {
         let mut state = State::new();
         let worker = create_test_worker("adam");
         state.add_worker(worker);
-        let config = create_test_config(true);
+        let config = create_test_config();
         let result = handle_stop("adam", 12345, &mut state, &config);
         assert!(result.is_ok());
         assert_eq!(state.get_worker("adam").unwrap().status, WorkerStatus::Idle);
-    }
-
-    #[test]
-    fn test_handle_hook_event_stop_disabled() {
-        let mut state = State::new();
-        let mut worker = create_test_worker("adam");
-        worker.status = WorkerStatus::Working;
-        state.add_worker(worker);
-        let config = create_test_config(false);
-        let event = HookEvent::Stop {
-            worker: "adam".to_string(),
-            session_id: "test-session".to_string(),
-            timestamp: 12345,
-        };
-        let result = handle_hook_event(&event, &mut state, &config);
-        assert!(result.is_ok());
-        assert_eq!(state.get_worker("adam").unwrap().status, WorkerStatus::Working);
     }
 
     #[test]

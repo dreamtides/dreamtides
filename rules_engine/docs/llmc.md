@@ -167,8 +167,6 @@ You are Baker, focused on UI and user experience.
 | `role_prompt` | string | `""` | Additional context for the worker |
 | `excluded_from_pool` | bool | `false` | Exclude from automatic task assignment |
 | `self_review` | object | - | Self-review configuration (see below) |
-| `hooks_session_lifecycle` | bool | `true` | Use Claude Code hooks for session lifecycle detection instead of TMUX polling |
-| `hooks_task_completion` | bool | `true` | Use Claude Code Stop hook for task completion detection instead of git polling |
 
 ### Self-Review Configuration
 
@@ -179,29 +177,6 @@ The `[defaults.self_review]` section configures the self-review prompt:
 | `prompt` | string | required | The prompt sent to workers for self-review |
 | `include_original` | bool | `false` | Include the original task prompt |
 | `clear` | bool | `false` | Send `/clear` before the self-review prompt |
-
-### Hook Feature Flags
-
-LLMC uses Claude Code hooks for real-time event detection. If you experience issues
-with hook-based detection, you can disable these features to fall back to polling:
-
-```toml
-[defaults]
-# Disable session lifecycle hooks (fall back to TMUX process polling)
-hooks_session_lifecycle = false
-
-# Disable task completion hooks (fall back to git commit polling)
-hooks_task_completion = false
-```
-
-**When to disable hooks:**
-- If hooks are not firing (check `~/llmc/logs/` for hook events)
-- If workers are not detected as online after startup
-- If task completion is not being detected
-- During debugging to isolate hook-related issues
-
-**Note:** Polling-based detection has higher latency (up to 30 seconds) compared to
-hooks (typically under 1 second). Re-enable hooks once the underlying issue is resolved.
 
 ### Editor Integration
 
@@ -259,10 +234,10 @@ with the worker's worktree as the working directory.
 ### Session Startup
 
 When starting a worker session, the system creates a detached TMUX session, sets
-environment variables for worker identification, launches Claude with configured
-flags, waits for Claude to initialize (polling for the ">" prompt), accepts the
-bypass permissions warning if shown, sends `/clear`, and marks the worker as
-idle.
+environment variables for worker identification (`LLMC_WORKER`, `LLMC_ROOT`), and
+launches Claude with configured flags. The daemon relies on Claude Code hooks
+(specifically the SessionStart hook) to detect when Claude is ready, transitioning
+the worker from Offline to Idle.
 
 ### Reliable Communication
 
@@ -283,28 +258,32 @@ timing, failure recovery, and research results.
 
 ### State Detection
 
-Detecting Claude's state requires parsing terminal output. The system checks
-process health (is Claude running?), looks for the ">" prompt indicating
-readiness, detects permission prompts and questions, and identifies error
-states. The detection hierarchy is: crash > confirmation > question > ready >
-processing.
+LLMC uses Claude Code hooks for real-time state detection:
+- **SessionStart**: Fired when Claude is ready, transitions worker to Idle
+- **SessionEnd**: Fired when Claude exits, transitions worker to Offline
+- **Stop**: Fired when Claude completes a task, transitions worker to NeedsReview
 
-See `llmc2-appendix-claude-state.md` for detailed heuristics and pattern
-matching code.
+This event-driven approach provides sub-second detection latency.
+
+For rebase detection, the patrol system periodically checks git status to
+identify conflict states that require human intervention.
 
 ## The Patrol System
 
 The Patrol is a background process that runs periodically during `llmc up` to
 maintain system health. It performs these main operations:
 
-1. **Check session health**: Verify TMUX sessions exist and match state file
-2. **Detect state transitions**: Find workers that have finished but haven't
-   been processed yet
-3. **Send pending self-review prompts**: Trigger self-review for workers that
-   committed
-4. **Detect reviewing amendments**: Transition workers who completed self-review
-5. **Rebase pending reviews**: Keep `needs_review` workers rebased on master,
+1. **Check session health**: Verify TMUX sessions exist, reset crash counts for
+   healthy workers
+2. **Send pending self-review prompts**: Trigger self-review for workers that
+   committed work and have pending_self_review set
+3. **Rebase pending reviews**: Keep `needs_review` workers rebased on master,
    and detect workers whose work was already merged (resetting them to idle)
+4. **Detect rebase conflicts**: Transition workers to Rebasing state when git
+   detects conflicts that require human intervention
+
+State transitions for task completion are now handled by Claude Code hooks
+(SessionStart, SessionEnd, Stop) rather than polling.
 
 The patrol runs on a configurable interval (default: 30 seconds) unless another
 patrol is already running or the system is shutting down.

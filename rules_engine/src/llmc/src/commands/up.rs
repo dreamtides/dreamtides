@@ -315,7 +315,6 @@ fn start_worker(name: &str, config: &Config, state: &mut State, verbose: bool) -
             session::session_exists(&worker_record.session_id)
         );
     }
-    let use_hooks = config.defaults.hooks_session_lifecycle;
     if !session::session_exists(&worker_record.session_id) {
         if verbose {
             println!("    [verbose] Creating new TMUX session for worker '{}'", name);
@@ -325,49 +324,25 @@ fn start_worker(name: &str, config: &Config, state: &mut State, verbose: bool) -
             &worktree_path,
             worker_config,
             verbose,
-            use_hooks,
         )?;
     } else {
         if verbose {
             println!("    [verbose] Starting Claude in existing session");
         }
-        worker::start_claude_in_session(&worker_record.session_id, worker_config, use_hooks)?;
+        worker::start_claude_in_session(&worker_record.session_id, worker_config)?;
     }
     let is_clean = git::is_worktree_clean(&worktree_path).unwrap_or(false);
     let worker_mut = state.get_worker_mut(name).unwrap();
     if is_clean {
-        if use_hooks {
-            // When using hooks, set worker to Offline so SessionStart hook can
-            // transition it to Idle. This ensures correct behavior when daemon
-            // restarts and workers were previously in non-Offline states.
-            if let Err(e) = worker::apply_transition(worker_mut, WorkerTransition::ToOffline) {
-                tracing::warn!(
-                    "Failed to transition worker '{}' to Offline for hooks: {}",
-                    name,
-                    e
-                );
-                worker_mut.status = WorkerStatus::Offline;
-            }
-            if verbose {
-                println!(
-                    "    [verbose] Worker '{}' worktree is clean; waiting for SessionStart hook",
-                    name
-                );
-            }
-        } else {
-            if let Err(e) = worker::apply_transition(worker_mut, WorkerTransition::ToIdle) {
-                tracing::warn!("Failed to transition worker '{}' to Idle: {}", name, e);
-                worker_mut.status = WorkerStatus::Idle;
-                worker_mut.current_prompt.clear();
-                worker_mut.prompt_cmd = None;
-                worker_mut.commit_sha = None;
-                worker_mut.self_review = false;
-                worker_mut.pending_self_review = false;
-                worker_mut.last_activity_unix = unix_timestamp_now();
-            }
-            if verbose {
-                println!("    [verbose] Worker '{}' worktree is clean, marked as Idle", name);
-            }
+        if let Err(e) = worker::apply_transition(worker_mut, WorkerTransition::ToOffline) {
+            tracing::warn!("Failed to transition worker '{}' to Offline for hooks: {}", name, e);
+            worker_mut.status = WorkerStatus::Offline;
+        }
+        if verbose {
+            println!(
+                "    [verbose] Worker '{}' worktree is clean; waiting for SessionStart hook",
+                name
+            );
         }
     } else {
         if let Err(e) = worker::apply_transition(worker_mut, WorkerTransition::ToError {
@@ -429,22 +404,20 @@ fn run_main_loop(
                         iteration_had_error = true;
                     }
                 }
-                if config.defaults.hooks_session_lifecycle {
-                    for msg in &pending_hook_events {
-                        if let Err(e) = patrol::handle_hook_event(&msg.event, state, &config) {
-                            tracing::error!("Error handling hook event {:?}: {}", msg.event, e);
-                            iteration_had_error = true;
-                        }
-                    }
-                    if !pending_hook_events.is_empty()
-                        && let Err(e) = state.save(state_path)
-                    {
-                        tracing::error!(
-                            "Failed to save state after hook events (daemon continuing): {}",
-                            e
-                        );
+                for msg in &pending_hook_events {
+                    if let Err(e) = patrol::handle_hook_event(&msg.event, state, &config) {
+                        tracing::error!("Error handling hook event {:?}: {}", msg.event, e);
                         iteration_had_error = true;
                     }
+                }
+                if !pending_hook_events.is_empty()
+                    && let Err(e) = state.save(state_path)
+                {
+                    tracing::error!(
+                        "Failed to save state after hook events (daemon continuing): {}",
+                        e
+                    );
+                    iteration_had_error = true;
                 }
                 poll_worker_states(state);
                 if let Err(e) = start_offline_workers(&mut config, state, verbose) {

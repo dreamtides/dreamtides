@@ -29,10 +29,6 @@ pub struct DefaultsConfig {
     #[serde(default = "default_sound_on_review")]
     pub sound_on_review: bool,
     pub self_review: Option<SelfReviewConfig>,
-    #[serde(default = "default_hooks_session_lifecycle")]
-    pub hooks_session_lifecycle: bool,
-    #[serde(default = "default_hooks_task_completion")]
-    pub hooks_task_completion: bool,
 }
 /// Repository configuration
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -105,12 +101,6 @@ fn default_patrol_interval_secs() -> u32 {
 fn default_sound_on_review() -> bool {
     true
 }
-fn default_hooks_session_lifecycle() -> bool {
-    true
-}
-fn default_hooks_task_completion() -> bool {
-    true
-}
 fn default_excluded_from_pool() -> bool {
     false
 }
@@ -123,8 +113,6 @@ impl Default for DefaultsConfig {
             patrol_interval_secs: default_patrol_interval_secs(),
             sound_on_review: default_sound_on_review(),
             self_review: None,
-            hooks_session_lifecycle: default_hooks_session_lifecycle(),
-            hooks_task_completion: default_hooks_task_completion(),
         }
     }
 }

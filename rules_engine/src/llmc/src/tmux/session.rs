@@ -1,13 +1,10 @@
 use std::path::Path;
-use std::sync::OnceLock;
 use std::thread;
 use std::time::Duration;
 
 use anyhow::{Context, Result, bail};
-use regex::Regex;
 use tmux_interface::{
-    CapturePane, DisplayMessage, HasSession, KillSession, ListSessions, NewSession, SetEnvironment,
-    Tmux,
+    CapturePane, HasSession, KillSession, ListSessions, NewSession, SetEnvironment, Tmux,
 };
 
 use crate::config::WorkerConfig;
@@ -74,18 +71,6 @@ pub fn list_sessions() -> Result<Vec<String>> {
         Err(e) => bail!("Failed to list TMUX sessions: {}", e),
     }
 }
-/// Gets the command running in the session's active pane
-pub fn get_pane_command(session: &str) -> Result<String> {
-    let output = Tmux::with_command(
-        DisplayMessage::new().target_pane(session).print().message("#{pane_current_command}"),
-    )
-    .output()
-    .with_context(|| format!("Failed to get pane command for session '{}'", session))?;
-    if !output.success() {
-        bail!("Session '{}' not found or inaccessible", session);
-    }
-    Ok(output.to_string().trim().to_string())
-}
 /// Captures recent lines from the session's active pane
 pub fn capture_pane(session: &str, lines: u32) -> Result<String> {
     let output = Tmux::with_command(
@@ -113,15 +98,13 @@ pub fn set_env(session: &str, key: &str, value: &str) -> Result<()> {
 }
 /// Starts a complete worker session with Claude Code.
 ///
-/// If `use_hooks_session_lifecycle` is true, this function will not poll for
-/// Claude readiness - instead, the daemon relies on the SessionStart hook
-/// to transition the worker from Offline to Idle.
+/// The daemon relies on the SessionStart hook to transition the worker from
+/// Offline to Idle when Claude is ready.
 pub fn start_worker_session(
     name: &str,
     worktree: &Path,
     config: &WorkerConfig,
     verbose: bool,
-    use_hooks_session_lifecycle: bool,
 ) -> Result<()> {
     if verbose {
         println!("      [verbose] Creating TMUX session '{}'", name);
@@ -150,29 +133,6 @@ pub fn start_worker_session(
     sender
         .send(name, &claude_cmd)
         .with_context(|| format!("Failed to send Claude command to session '{}'", name))?;
-    if use_hooks_session_lifecycle {
-        if verbose {
-            println!(
-                "      [verbose] Using hooks for session lifecycle, not polling for ready state"
-            );
-        }
-    } else {
-        if verbose {
-            println!("      [verbose] Claude command sent, waiting for ready state...");
-        }
-        wait_for_claude_ready(name, Duration::from_secs(30), verbose)?;
-        if verbose {
-            println!("      [verbose] Claude is ready, checking for bypass warning...");
-        }
-        accept_bypass_warning(name, &sender, verbose)?;
-        if verbose {
-            println!("      [verbose] Sending /clear command...");
-        }
-        sender
-            .send(name, "/clear")
-            .with_context(|| format!("Failed to send /clear to session '{}'", name))?;
-        thread::sleep(Duration::from_millis(500));
-    }
     if verbose {
         println!("      [verbose] Worker session startup complete");
     }
@@ -182,134 +142,6 @@ pub fn start_worker_session(
 pub fn any_llmc_sessions_running() -> Result<bool> {
     let sessions = list_sessions()?;
     Ok(sessions.iter().any(|s| s.starts_with("llmc-")))
-}
-/// Checks if a command is a shell
-pub fn is_shell(cmd: &str) -> bool {
-    matches!(cmd, "bash" | "zsh" | "sh" | "fish" | "dash")
-}
-/// Checks if a command is a Claude process
-pub fn is_claude_process(cmd: &str) -> bool {
-    if matches!(cmd, "node" | "claude") {
-        return true;
-    }
-    static SEMVER_PATTERN: OnceLock<Regex> = OnceLock::new();
-    SEMVER_PATTERN.get_or_init(|| Regex::new(r"^\d+\.\d+\.\d+").unwrap()).is_match(cmd)
-}
-pub fn wait_for_claude_ready(session: &str, timeout: Duration, verbose: bool) -> Result<()> {
-    const POLL_INTERVAL_MS: u64 = 500;
-    const GRACE_PERIOD_SECS: u64 = 5;
-    let start = std::time::Instant::now();
-    let mut poll_count = 0;
-    while start.elapsed() < timeout {
-        thread::sleep(Duration::from_millis(POLL_INTERVAL_MS));
-        poll_count += 1;
-        if verbose {
-            println!(
-                "        [verbose] Poll #{}: Checking Claude readiness ({}s elapsed)",
-                poll_count,
-                start.elapsed().as_secs()
-            );
-        }
-        if let Ok(output) = capture_pane(session, 50) {
-            if verbose {
-                println!("        [verbose] Captured {} lines of output", output.lines().count());
-                println!("        [verbose] Last 5 lines:");
-                for line in output.lines().rev().take(5) {
-                    println!("        [verbose]   | {}", line);
-                }
-            }
-            if output.lines().rev().take(5).any(|line| {
-                let trimmed = line.trim_start();
-                trimmed.starts_with("> ") || trimmed == ">" || trimmed.starts_with("❯")
-            }) {
-                if verbose {
-                    println!("        [verbose] Found '>' prompt - Claude is ready!");
-                }
-                return Ok(());
-            }
-            let lower = output.to_lowercase();
-            if lower.contains("bypass") && lower.contains("permissions") {
-                if verbose {
-                    println!(
-                        "        [verbose] Found bypass permissions prompt - Claude is ready (at confirmation)"
-                    );
-                }
-                return Ok(());
-            }
-            if let Ok(command) = get_pane_command(session) {
-                if verbose {
-                    println!("        [verbose] Pane command: '{}'", command);
-                    println!(
-                        "        [verbose] Is Claude process: {}",
-                        is_claude_process(&command)
-                    );
-                }
-                if !is_claude_process(&command) {
-                    let elapsed_secs = start.elapsed().as_secs();
-                    if elapsed_secs >= GRACE_PERIOD_SECS {
-                        bail!(
-                            "Claude process not found in session '{}' after {}s grace period, got command: {}\n\
-                             Last captured output:\n{}",
-                            session,
-                            GRACE_PERIOD_SECS,
-                            command,
-                            output
-                                .lines()
-                                .rev()
-                                .take(20)
-                                .collect::<Vec<_>>()
-                                .iter()
-                                .rev()
-                                .cloned()
-                                .collect::<Vec<_>>()
-                                .join("\n")
-                        );
-                    } else if verbose {
-                        println!(
-                            "        [verbose] Non-Claude process '{}' detected, but within grace period ({}s < {}s)",
-                            command, elapsed_secs, GRACE_PERIOD_SECS
-                        );
-                    }
-                }
-            } else if verbose {
-                println!("        [verbose] Failed to get pane command");
-            }
-        } else if verbose {
-            println!("        [verbose] Failed to capture pane output");
-        }
-    }
-    if verbose {
-        println!("        [verbose] Timeout reached after {} polls", poll_count);
-    }
-    bail!("Claude did not become ready after {} seconds", timeout.as_secs())
-}
-pub fn accept_bypass_warning(session: &str, sender: &TmuxSender, verbose: bool) -> Result<()> {
-    thread::sleep(Duration::from_millis(500));
-    if let Ok(output) = capture_pane(session, 50) {
-        let lower = output.to_lowercase();
-        let has_bypass_warning = lower.contains("bypass")
-            || lower.contains("dangerously")
-            || lower.contains("skip-permissions")
-            || lower.contains("skip permissions");
-        if verbose {
-            println!(
-                "        [verbose] Checking for bypass warning... found: {}",
-                has_bypass_warning
-            );
-        }
-        if has_bypass_warning {
-            if verbose {
-                println!("        [verbose] Accepting bypass warning (Down + Enter)");
-            }
-            sender.send_keys_raw(session, "Down")?;
-            thread::sleep(Duration::from_millis(200));
-            sender.send_keys_raw(session, "Enter")?;
-            thread::sleep(Duration::from_millis(500));
-        }
-    } else if verbose {
-        println!("        [verbose] Could not capture pane for bypass warning check");
-    }
-    Ok(())
 }
 fn build_claude_command(config: &WorkerConfig) -> String {
     let mut cmd = String::from("claude");
@@ -322,27 +154,6 @@ fn build_claude_command(config: &WorkerConfig) -> String {
 #[cfg(test)]
 mod tests {
     use crate::tmux::session::*;
-    #[test]
-    fn test_is_shell() {
-        assert!(is_shell("bash"));
-        assert!(is_shell("zsh"));
-        assert!(is_shell("sh"));
-        assert!(is_shell("fish"));
-        assert!(is_shell("dash"));
-        assert!(!is_shell("node"));
-        assert!(!is_shell("claude"));
-        assert!(!is_shell("python"));
-    }
-    #[test]
-    fn test_is_claude_process() {
-        assert!(is_claude_process("node"));
-        assert!(is_claude_process("claude"));
-        assert!(is_claude_process("2.0.76"));
-        assert!(is_claude_process("1.0.0"));
-        assert!(!is_claude_process("bash"));
-        assert!(!is_claude_process("python"));
-        assert!(!is_claude_process("some-other-process"));
-    }
     #[test]
     fn test_any_llmc_sessions_running() {
         let result = any_llmc_sessions_running();

@@ -1,6 +1,5 @@
 use std::path::Path;
-use std::thread;
-use std::time::{Duration, SystemTime, UNIX_EPOCH};
+use std::time::{SystemTime, UNIX_EPOCH};
 
 use anyhow::{Context, Result, bail};
 
@@ -8,7 +7,6 @@ use crate::config::{Config, WorkerConfig};
 use crate::git;
 use crate::state::{State, WorkerRecord, WorkerStatus};
 use crate::tmux::sender::TmuxSender;
-use crate::tmux::session;
 /// Represents a state transition for a worker
 #[derive(Debug, Clone, PartialEq)]
 pub enum WorkerTransition {
@@ -136,17 +134,9 @@ pub fn apply_transition(worker: &mut WorkerRecord, transition: WorkerTransition)
 }
 /// Starts Claude in a TMUX session with appropriate configuration.
 ///
-/// If `use_hooks_session_lifecycle` is true, this function will not poll for
-/// Claude readiness - instead, the daemon relies on the SessionStart hook
-/// to transition the worker from Offline to Idle.
-///
-/// If `use_hooks_session_lifecycle` is false, this function uses the legacy
-/// polling approach to wait for Claude to become ready.
-pub fn start_claude_in_session(
-    session: &str,
-    config: &WorkerConfig,
-    use_hooks_session_lifecycle: bool,
-) -> Result<()> {
+/// The daemon relies on the SessionStart hook to transition the worker
+/// from Offline to Idle when Claude is ready.
+pub fn start_claude_in_session(session: &str, config: &WorkerConfig) -> Result<()> {
     let sender = TmuxSender::new();
     let mut claude_cmd = String::from("claude");
     if let Some(model) = &config.model {
@@ -156,19 +146,7 @@ pub fn start_claude_in_session(
     sender
         .send(session, &claude_cmd)
         .with_context(|| format!("Failed to send Claude command to session '{}'", session))?;
-    if use_hooks_session_lifecycle {
-        tracing::debug!(
-            "Using hooks for session lifecycle - not polling for Claude readiness in session '{}'",
-            session
-        );
-    } else {
-        wait_for_claude_ready(session)?;
-        accept_bypass_warning(session, &sender)?;
-        sender
-            .send(session, "/clear")
-            .with_context(|| format!("Failed to send /clear to session '{}'", session))?;
-        thread::sleep(Duration::from_millis(500));
-    }
+    tracing::debug!("Claude command sent to session '{}' - waiting for SessionStart hook", session);
     Ok(())
 }
 /// Resets a worker to clean idle state by discarding changes and resetting to
@@ -207,49 +185,6 @@ pub fn reset_worker_to_clean_state(
             .push(format!("Transitioned worker '{}' from {:?} to Idle", worker_name, old_status));
     }
     Ok(actions)
-}
-/// Waits for Claude to be ready by polling for the ">" prompt
-fn wait_for_claude_ready(session: &str) -> Result<()> {
-    const MAX_ATTEMPTS: u32 = 60;
-    const POLL_INTERVAL_MS: u64 = 500;
-    for _ in 0..MAX_ATTEMPTS {
-        thread::sleep(Duration::from_millis(POLL_INTERVAL_MS));
-        let output = session::capture_pane(session, 50)
-            .with_context(|| format!("Failed to capture pane for session '{}'", session))?;
-        if output.lines().rev().take(5).any(|line| {
-            let trimmed = line.trim_start();
-            trimmed.starts_with("> ") || trimmed == ">" || trimmed.starts_with("❯")
-        }) {
-            return Ok(());
-        }
-        let lower = output.to_lowercase();
-        if lower.contains("bypass") && lower.contains("permissions") {
-            return Ok(());
-        }
-        let command = session::get_pane_command(session)?;
-        if !session::is_claude_process(&command) {
-            bail!("Claude process not found in session '{}', got command: {}", session, command);
-        }
-    }
-    bail!("Claude did not become ready after 30 seconds");
-}
-/// Accepts the bypass permissions warning if present
-fn accept_bypass_warning(session: &str, sender: &TmuxSender) -> Result<()> {
-    thread::sleep(Duration::from_millis(500));
-    let output = session::capture_pane(session, 50)
-        .with_context(|| format!("Failed to capture pane for session '{}'", session))?;
-    let lower = output.to_lowercase();
-    let has_bypass_warning = lower.contains("bypass")
-        || lower.contains("dangerously")
-        || lower.contains("skip-permissions")
-        || lower.contains("skip permissions");
-    if has_bypass_warning {
-        sender.send_keys_raw(session, "Down")?;
-        thread::sleep(Duration::from_millis(200));
-        sender.send_keys_raw(session, "Enter")?;
-        thread::sleep(Duration::from_millis(500));
-    }
-    Ok(())
 }
 #[cfg(test)]
 mod tests {
