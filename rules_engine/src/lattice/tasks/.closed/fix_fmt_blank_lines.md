@@ -6,7 +6,8 @@ parent-id: LCEWQN
 task-type: bug
 priority: 2
 created-at: 2026-01-19T05:15:00Z
-updated-at: 2026-01-19T05:20:00Z
+updated-at: 2026-01-19T18:22:13.283441Z
+closed-at: 2026-01-19T18:22:13.283440Z
 ---
 
 # lat fmt produces output that fails lat check

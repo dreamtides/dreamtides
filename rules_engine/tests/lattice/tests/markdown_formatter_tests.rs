@@ -329,3 +329,51 @@ fn format_summary_has_errors() {
     let summary = format_directory(dir.path(), &config).unwrap();
     assert!(!summary.has_errors(), "Empty directory should have no errors");
 }
+
+// =============================================================================
+// Consecutive Blank Lines Regression Tests
+// =============================================================================
+
+#[test]
+fn format_content_consecutive_headings_no_double_blanks() {
+    let config = FormatConfig::default();
+    let content = "## Heading 1\n## Heading 2\n";
+    let (result, _modified) = format_content(content, &config);
+    assert!(
+        !result.contains("\n\n\n"),
+        "Consecutive headings should not produce consecutive blank lines.\nResult:\n{result}"
+    );
+}
+
+#[test]
+fn format_content_heading_followed_by_list_no_double_blanks() {
+    let config = FormatConfig::default();
+    let content = "## Heading\n- Item 1\n- Item 2\n";
+    let (result, _modified) = format_content(content, &config);
+    assert!(
+        !result.contains("\n\n\n"),
+        "Heading followed by list should not produce consecutive blank lines.\nResult:\n{result}"
+    );
+}
+
+#[test]
+fn format_content_list_followed_by_heading_no_double_blanks() {
+    let config = FormatConfig::default();
+    let content = "- Item 1\n- Item 2\n## Heading\n";
+    let (result, _modified) = format_content(content, &config);
+    assert!(
+        !result.contains("\n\n\n"),
+        "List followed by heading should not produce consecutive blank lines.\nResult:\n{result}"
+    );
+}
+
+#[test]
+fn format_content_multiple_blank_lines_after_formatting_still_collapsed() {
+    let config = FormatConfig::default();
+    let content = "## Heading 1\n\n\n## Heading 2\n";
+    let (result, _modified) = format_content(content, &config);
+    assert!(
+        !result.contains("\n\n\n"),
+        "Multiple blank lines should remain collapsed after all formatting.\nResult:\n{result}"
+    );
+}
