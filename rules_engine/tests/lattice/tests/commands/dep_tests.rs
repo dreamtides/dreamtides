@@ -1,1 +1,443 @@
+//! Tests for the `lat dep` command.
 
+use std::fs;
+use std::io::Write;
+
+use chrono::Utc;
+use lattice::cli::commands::dep_command;
+use lattice::cli::structure_args::{DepArgs, DepCommand};
+use lattice::document::frontmatter_schema::TaskType;
+use lattice::index::document_types::InsertDocument;
+use lattice::index::link_queries::{InsertLink, LinkType};
+use lattice::index::{document_queries, link_queries};
+use lattice::test::test_environment::TestEnv;
+use lattice::test::test_fixtures::TaskDocBuilder;
+
+fn create_task_doc(
+    id: &str,
+    path: &str,
+    name: &str,
+    description: &str,
+    priority: u8,
+    task_type: TaskType,
+) -> InsertDocument {
+    let mut doc = InsertDocument::new(
+        id.to_string(),
+        None,
+        path.to_string(),
+        name.to_string(),
+        description.to_string(),
+        Some(task_type),
+        Some(priority),
+        Some(Utc::now()),
+        None,
+        None,
+        format!("hash-{id}"),
+        100,
+    );
+    doc.in_tasks_dir = path.contains("/tasks/");
+    doc
+}
+
+fn insert_doc(env: &TestEnv, doc: &InsertDocument, path: &str) {
+    document_queries::insert(env.conn(), doc).expect("Failed to insert document");
+    let full_path = env.repo_root().join(path);
+    let parent = full_path.parent().expect("Path should have parent");
+    fs::create_dir_all(parent).expect("Failed to create parent directories");
+    let mut file = fs::File::create(&full_path).expect("Failed to create file");
+    write!(
+        file,
+        "---\nlattice-id: {}\nname: {}\ndescription: {}\ntask-type: {}\npriority: {}\n---\nBody content",
+        doc.id,
+        doc.name,
+        doc.description,
+        match doc.task_type {
+            Some(TaskType::Bug) => "bug",
+            Some(TaskType::Feature) => "feature",
+            Some(TaskType::Task) => "task",
+            Some(TaskType::Chore) => "chore",
+            None => "task",
+        },
+        doc.priority.unwrap_or(2)
+    )
+    .expect("Failed to write file");
+}
+
+fn add_dependency(env: &TestEnv, source_id: &str, target_id: &str) {
+    let blocked_by =
+        InsertLink { source_id, target_id, link_type: LinkType::BlockedBy, position: 0 };
+    link_queries::insert_for_document(env.conn(), &[blocked_by]).expect("Failed to insert link");
+
+    let blocking = InsertLink {
+        source_id: target_id,
+        target_id: source_id,
+        link_type: LinkType::Blocking,
+        position: 0,
+    };
+    link_queries::insert_for_document(env.conn(), &[blocking]).expect("Failed to insert link");
+}
+
+// ============================================================================
+// lat dep tree Tests
+// ============================================================================
+
+#[test]
+fn dep_tree_shows_no_dependencies_for_isolated_task() {
+    let env = TestEnv::new();
+    env.create_dir("api/tasks");
+
+    let task = create_task_doc(
+        "LAABCD",
+        "api/tasks/task1.md",
+        "task-one",
+        "First task",
+        2,
+        TaskType::Task,
+    );
+    insert_doc(&env, &task, "api/tasks/task1.md");
+
+    let args = DepArgs { command: DepCommand::Tree { id: "LAABCD".to_string(), json: false } };
+    let (_temp, context) = env.into_parts();
+    let result = dep_command::execute(context, args);
+    assert!(result.is_ok(), "dep tree should succeed for task with no dependencies");
+}
+
+#[test]
+fn dep_tree_shows_upstream_dependencies() {
+    let env = TestEnv::new();
+    env.create_dir("api/tasks");
+
+    let task1 = create_task_doc(
+        "LBBCDE",
+        "api/tasks/task1.md",
+        "child-task",
+        "Child task",
+        2,
+        TaskType::Task,
+    );
+    insert_doc(&env, &task1, "api/tasks/task1.md");
+
+    let task2 = create_task_doc(
+        "LCCDFF",
+        "api/tasks/task2.md",
+        "parent-task",
+        "Parent task",
+        1,
+        TaskType::Feature,
+    );
+    insert_doc(&env, &task2, "api/tasks/task2.md");
+
+    add_dependency(&env, "LBBCDE", "LCCDFF");
+
+    let args = DepArgs { command: DepCommand::Tree { id: "LBBCDE".to_string(), json: false } };
+    let (_temp, context) = env.into_parts();
+    let result = dep_command::execute(context, args);
+    assert!(result.is_ok(), "dep tree should succeed showing upstream dependencies");
+}
+
+#[test]
+fn dep_tree_shows_downstream_dependents() {
+    let env = TestEnv::new();
+    env.create_dir("api/tasks");
+
+    let task1 = create_task_doc(
+        "LDDEGF",
+        "api/tasks/task1.md",
+        "blocking-task",
+        "Blocking task",
+        1,
+        TaskType::Feature,
+    );
+    insert_doc(&env, &task1, "api/tasks/task1.md");
+
+    let task2 = create_task_doc(
+        "LEEFHG",
+        "api/tasks/task2.md",
+        "blocked-task",
+        "Blocked task",
+        2,
+        TaskType::Task,
+    );
+    insert_doc(&env, &task2, "api/tasks/task2.md");
+
+    add_dependency(&env, "LEEFHG", "LDDEGF");
+
+    let args = DepArgs { command: DepCommand::Tree { id: "LDDEGF".to_string(), json: false } };
+    let (_temp, context) = env.into_parts();
+    let result = dep_command::execute(context, args);
+    assert!(result.is_ok(), "dep tree should succeed showing downstream dependents");
+}
+
+#[test]
+fn dep_tree_shows_both_directions() {
+    let env = TestEnv::new();
+    env.create_dir("api/tasks");
+
+    let task1 = create_task_doc(
+        "LFFGIH",
+        "api/tasks/upstream.md",
+        "upstream-task",
+        "Upstream task",
+        1,
+        TaskType::Feature,
+    );
+    insert_doc(&env, &task1, "api/tasks/upstream.md");
+
+    let task2 = create_task_doc(
+        "LGGHJI",
+        "api/tasks/middle.md",
+        "middle-task",
+        "Middle task",
+        2,
+        TaskType::Task,
+    );
+    insert_doc(&env, &task2, "api/tasks/middle.md");
+
+    let task3 = create_task_doc(
+        "LHHIKJ",
+        "api/tasks/downstream.md",
+        "downstream-task",
+        "Downstream task",
+        2,
+        TaskType::Task,
+    );
+    insert_doc(&env, &task3, "api/tasks/downstream.md");
+
+    add_dependency(&env, "LGGHJI", "LFFGIH");
+    add_dependency(&env, "LHHIKJ", "LGGHJI");
+
+    let args = DepArgs { command: DepCommand::Tree { id: "LGGHJI".to_string(), json: false } };
+    let (_temp, context) = env.into_parts();
+    let result = dep_command::execute(context, args);
+    assert!(result.is_ok(), "dep tree should show dependencies in both directions");
+}
+
+#[test]
+fn dep_tree_returns_json_output() {
+    let env = TestEnv::new().with_json_output();
+    env.create_dir("api/tasks");
+
+    let task = create_task_doc(
+        "LIIJLK",
+        "api/tasks/task1.md",
+        "test-task",
+        "Test task",
+        2,
+        TaskType::Task,
+    );
+    insert_doc(&env, &task, "api/tasks/task1.md");
+
+    let args = DepArgs { command: DepCommand::Tree { id: "LIIJLK".to_string(), json: true } };
+    let (_temp, context) = env.into_parts();
+    let result = dep_command::execute(context, args);
+    assert!(result.is_ok(), "dep tree should succeed with json flag");
+}
+
+#[test]
+fn dep_tree_errors_for_nonexistent_task() {
+    let env = TestEnv::new();
+    env.create_dir("api/tasks");
+
+    let args = DepArgs { command: DepCommand::Tree { id: "LNONEX".to_string(), json: false } };
+    let (_temp, context) = env.into_parts();
+    let result = dep_command::execute(context, args);
+    assert!(result.is_err(), "dep tree should error for nonexistent task ID");
+}
+
+// ============================================================================
+// lat dep add Tests
+// ============================================================================
+
+#[test]
+fn dep_add_creates_dependency() {
+    let env = TestEnv::new();
+    env.create_dir("api/tasks");
+
+    let task1 = create_task_doc(
+        "LJJKML",
+        "api/tasks/task1.md",
+        "child-task",
+        "Child task",
+        2,
+        TaskType::Task,
+    );
+    insert_doc(&env, &task1, "api/tasks/task1.md");
+
+    let task2 = create_task_doc(
+        "LKKLNM",
+        "api/tasks/task2.md",
+        "parent-task",
+        "Parent task",
+        1,
+        TaskType::Feature,
+    );
+    insert_doc(&env, &task2, "api/tasks/task2.md");
+
+    let args = DepArgs {
+        command: DepCommand::Add { id: "LJJKML".to_string(), depends_on: "LKKLNM".to_string() },
+    };
+    let (_temp, context) = env.into_parts();
+    let result = dep_command::execute(context, args);
+    assert!(result.is_ok(), "dep add should succeed for valid task IDs");
+}
+
+#[test]
+fn dep_add_errors_for_nonexistent_source() {
+    let env = TestEnv::new();
+    env.create_dir("api/tasks");
+
+    let task = create_task_doc(
+        "LLLMON",
+        "api/tasks/task1.md",
+        "existing-task",
+        "Existing task",
+        2,
+        TaskType::Task,
+    );
+    insert_doc(&env, &task, "api/tasks/task1.md");
+
+    let args = DepArgs {
+        command: DepCommand::Add { id: "LNONEX".to_string(), depends_on: "LLLMON".to_string() },
+    };
+    let (_temp, context) = env.into_parts();
+    let result = dep_command::execute(context, args);
+    assert!(result.is_err(), "dep add should error when source task doesn't exist");
+}
+
+#[test]
+fn dep_add_errors_for_nonexistent_target() {
+    let env = TestEnv::new();
+    env.create_dir("api/tasks");
+
+    let task = create_task_doc(
+        "LMMNPO",
+        "api/tasks/task1.md",
+        "existing-task",
+        "Existing task",
+        2,
+        TaskType::Task,
+    );
+    insert_doc(&env, &task, "api/tasks/task1.md");
+
+    let args = DepArgs {
+        command: DepCommand::Add { id: "LMMNPO".to_string(), depends_on: "LNONEX".to_string() },
+    };
+    let (_temp, context) = env.into_parts();
+    let result = dep_command::execute(context, args);
+    assert!(result.is_err(), "dep add should error when target task doesn't exist");
+}
+
+// ============================================================================
+// lat dep remove Tests
+// ============================================================================
+
+#[test]
+fn dep_remove_deletes_dependency() {
+    let env = TestEnv::new();
+    env.create_dir("api/tasks");
+
+    // Create parent task (the blocking task)
+    let parent = TaskDocBuilder::new("Parent task")
+        .id("LOOPRQ")
+        .priority(1)
+        .task_type("feature")
+        .blocking(vec!["LNNOQP"])
+        .build();
+    env.write_file("api/tasks/parent.md", &parent.content);
+
+    // Create child task that is blocked by parent
+    let child = TaskDocBuilder::new("Child task")
+        .id("LNNOQP")
+        .priority(2)
+        .task_type("task")
+        .blocked_by(vec!["LOOPRQ"])
+        .build();
+    env.write_file("api/tasks/child.md", &child.content);
+
+    // Insert documents into the index
+    let parent_doc = create_task_doc(
+        "LOOPRQ",
+        "api/tasks/parent.md",
+        "parent-task",
+        "Parent task",
+        1,
+        TaskType::Feature,
+    );
+    document_queries::insert(env.conn(), &parent_doc).expect("Insert parent doc");
+
+    let child_doc = create_task_doc(
+        "LNNOQP",
+        "api/tasks/child.md",
+        "child-task",
+        "Child task",
+        2,
+        TaskType::Task,
+    );
+    document_queries::insert(env.conn(), &child_doc).expect("Insert child doc");
+
+    // Add the links to the index
+    add_dependency(&env, "LNNOQP", "LOOPRQ");
+
+    let args = DepArgs {
+        command: DepCommand::Remove { id: "LNNOQP".to_string(), depends_on: "LOOPRQ".to_string() },
+    };
+    let (_temp, context) = env.into_parts();
+    let result = dep_command::execute(context, args);
+    assert!(result.is_ok(), "dep remove should succeed for existing dependency: {:?}", result);
+}
+
+#[test]
+fn dep_remove_errors_for_nonexistent_dependency() {
+    let env = TestEnv::new();
+    env.create_dir("api/tasks");
+
+    let task1 = create_task_doc(
+        "LPPQSR",
+        "api/tasks/task1.md",
+        "task-one",
+        "First task",
+        2,
+        TaskType::Task,
+    );
+    insert_doc(&env, &task1, "api/tasks/task1.md");
+
+    let task2 = create_task_doc(
+        "LQQRTS",
+        "api/tasks/task2.md",
+        "task-two",
+        "Second task",
+        1,
+        TaskType::Feature,
+    );
+    insert_doc(&env, &task2, "api/tasks/task2.md");
+
+    let args = DepArgs {
+        command: DepCommand::Remove { id: "LPPQSR".to_string(), depends_on: "LQQRTS".to_string() },
+    };
+    let (_temp, context) = env.into_parts();
+    let result = dep_command::execute(context, args);
+    assert!(result.is_err(), "dep remove should error when dependency doesn't exist");
+}
+
+#[test]
+fn dep_remove_errors_for_nonexistent_source() {
+    let env = TestEnv::new();
+    env.create_dir("api/tasks");
+
+    let task = create_task_doc(
+        "LRRSUT",
+        "api/tasks/task1.md",
+        "existing-task",
+        "Existing task",
+        2,
+        TaskType::Task,
+    );
+    insert_doc(&env, &task, "api/tasks/task1.md");
+
+    let args = DepArgs {
+        command: DepCommand::Remove { id: "LNONEX".to_string(), depends_on: "LRRSUT".to_string() },
+    };
+    let (_temp, context) = env.into_parts();
+    let result = dep_command::execute(context, args);
+    assert!(result.is_err(), "dep remove should error when source task doesn't exist");
+}

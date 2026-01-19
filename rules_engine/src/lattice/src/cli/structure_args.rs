@@ -61,7 +61,13 @@ pub enum DepCommand {
     /// Remove dependency relationship.
     Remove { id: String, depends_on: String },
     /// Display dependency tree.
-    Tree { id: String },
+    Tree {
+        /// Task ID to display tree for.
+        id: String,
+        /// Output as JSON.
+        #[arg(long)]
+        json: bool,
+    },
 }
 
 /// Arguments for `lat label`.

@@ -66,6 +66,9 @@ pub fn suggestion(error: &LatticeError) -> Option<String> {
         LatticeError::LabelNotFound { label } => {
             Some(format!("Run 'lat label add <id> {label}' to create the label"))
         }
+        LatticeError::DependencyNotFound { source_id, target_id } => {
+            Some(format!("Run 'lat dep add {source_id} {target_id}' to create the dependency"))
+        }
         LatticeError::PermissionDenied { .. } => {
             Some("Check file permissions and try again".to_string())
         }
@@ -112,6 +115,9 @@ pub fn affected_documents(error: &LatticeError) -> Vec<String> {
         LatticeError::DocumentNotFound { id } => vec![id.clone()],
         LatticeError::ParentNotFound { id } => vec![id.clone()],
         LatticeError::ClaimNotFound { id } => vec![id.clone()],
+        LatticeError::DependencyNotFound { source_id, target_id } => {
+            vec![source_id.clone(), target_id.clone()]
+        }
         _ => vec![],
     }
 }
@@ -152,6 +158,7 @@ pub fn error_path(error: &LatticeError) -> Option<&PathBuf> {
         | LatticeError::ParentNotFound { .. }
         | LatticeError::ClaimNotFound { .. }
         | LatticeError::LabelNotFound { .. }
+        | LatticeError::DependencyNotFound { .. }
         | LatticeError::GitError { .. }
         | LatticeError::DatabaseError { .. }
         | LatticeError::IndexCorrupted { .. }

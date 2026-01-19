@@ -105,6 +105,9 @@ pub enum LatticeError {
     #[error("Label not found: {label}")]
     LabelNotFound { label: String },
 
+    #[error("Dependency from {source_id} to {target_id} does not exist")]
+    DependencyNotFound { source_id: String, target_id: String },
+
     // ========================================================================
     // I/O Errors (various exit codes depending on context)
     // File system and external system errors.
@@ -180,7 +183,8 @@ impl LatticeError {
             | LatticeError::RootDocumentNotFound { .. }
             | LatticeError::ParentNotFound { .. }
             | LatticeError::ClaimNotFound { .. }
-            | LatticeError::LabelNotFound { .. } => exit_codes::NOT_FOUND,
+            | LatticeError::LabelNotFound { .. }
+            | LatticeError::DependencyNotFound { .. } => exit_codes::NOT_FOUND,
 
             LatticeError::PermissionDenied { .. }
             | LatticeError::ReadError { .. }
@@ -225,6 +229,7 @@ impl LatticeError {
             LatticeError::ParentNotFound { .. } => "E025",
             LatticeError::ClaimNotFound { .. } => "E026",
             LatticeError::LabelNotFound { .. } => "E027",
+            LatticeError::DependencyNotFound { .. } => "E037",
             LatticeError::PermissionDenied { .. } => "E028",
             LatticeError::ReadError { .. } => "E029",
             LatticeError::WriteError { .. } => "E030",

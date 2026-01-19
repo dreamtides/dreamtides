@@ -278,11 +278,14 @@ Remove dependency relationship. Removes the second task from the first task's
 `blocked-by` field, and removes the first task from the second task's `blocking`
 field. If removing the last blocker from a blocked task, that task becomes ready.
 
-### lat dep tree {id}
+### lat dep tree {id} [options]
 
 Display dependency tree with state indicators (open/blocked/closed). Shows both
 upstream dependencies (what this task depends on) and downstream dependents
 (what depends on this task).
+
+**Options:**
+- `--json`: Output as structured JSON
 
 ### lat changes [options]
 
