@@ -682,7 +682,7 @@ These features will use the Link System exports when implemented.
 
 ---
 
-## Feature: Linting and Formatting [ONGOING]
+## Feature: Linting and Formatting [DONE]
 
 **Goal:** Validate documents (`lat check`) and normalize formatting (`lat fmt`).
 
@@ -811,7 +811,7 @@ and Formatter](lattice_design.md#linter-and-formatter)
 
 ---
 
-## Feature: Core Task Commands [ONGOING]
+## Feature: Core Task Commands [DONE]
 
 **Goal:** Create, update, close, reopen, prune commands.
 
@@ -871,7 +871,7 @@ Task Tracking](appendix_task_tracking.md)
 
 ---
 
-## Feature: Query Commands [ONGOING]
+## Feature: Query Commands [DONE]
 
 **Goal:** List, search, and filter documents.
 
@@ -971,7 +971,7 @@ Task Tracking](appendix_task_tracking.md)
 
 ---
 
-## Feature: Relationship Commands [ONGOING]
+## Feature: Relationship Commands [DONE]
 
 **Goal:** Explore links between documents.
 
@@ -1402,7 +1402,7 @@ Structure](appendix_cli_structure.md#shell-completions)
 
 ---
 
-## Feature: Testing Infrastructure [ONGOING]
+## Feature: Testing Infrastructure [DONE]
 
 **Goal:** Test utilities, FakeGit, assertions.
 

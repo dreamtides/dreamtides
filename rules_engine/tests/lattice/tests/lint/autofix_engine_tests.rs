@@ -222,3 +222,88 @@ fn fix_list_blank_lines_preserves_existing() {
     let input = "text\n\n- item\n\nmore\n";
     assert_eq!(fix_list_blank_lines(input), input, "existing blank lines should be preserved");
 }
+
+#[test]
+fn fix_setext_headers_preserves_code_blocks() {
+    let input = "```yaml\n---\nname: test\n---\n```\n";
+    assert_eq!(
+        fix_setext_headers(input),
+        input,
+        "content inside code blocks should not be modified"
+    );
+}
+
+#[test]
+fn fix_setext_headers_preserves_code_blocks_with_setext_like_content() {
+    let input = "```\nTitle\n=====\n```\n";
+    assert_eq!(
+        fix_setext_headers(input),
+        input,
+        "setext-like headers inside code blocks should not be converted"
+    );
+}
+
+#[test]
+fn fix_heading_blank_lines_preserves_code_blocks() {
+    let input = "```\n# Not a heading\nsome text\n```\n";
+    assert_eq!(
+        fix_heading_blank_lines(input),
+        input,
+        "ATX-like headings inside code blocks should not get blank lines added"
+    );
+}
+
+#[test]
+fn fix_heading_blank_lines_preserves_code_blocks_with_hash() {
+    let input = "text\n\n```python\n# this is a comment\nprint('hello')\n```\n";
+    assert_eq!(
+        fix_heading_blank_lines(input),
+        input,
+        "Python comments inside code blocks should not be treated as headings"
+    );
+}
+
+#[test]
+fn fix_list_markers_preserves_code_blocks() {
+    let input = "```\n* item\n+ item\n```\n";
+    assert_eq!(
+        fix_list_markers(input),
+        input,
+        "list markers inside code blocks should not be converted"
+    );
+}
+
+#[test]
+fn fix_list_markers_preserves_yaml_code_blocks() {
+    let input = "```yaml\nlist:\n  - item1\n  * item2\n```\n";
+    let expected = "```yaml\nlist:\n  - item1\n  * item2\n```\n";
+    assert_eq!(
+        fix_list_markers(input),
+        expected,
+        "YAML content inside code blocks should not have markers converted"
+    );
+}
+
+#[test]
+fn fix_multiple_blank_lines_preserves_code_blocks() {
+    let input = "```\ncode\n\n\nmore code\n```\n";
+    assert_eq!(
+        fix_multiple_blank_lines(input),
+        input,
+        "multiple blank lines inside code blocks should be preserved"
+    );
+}
+
+#[test]
+fn fix_operations_work_outside_code_blocks() {
+    let input = "```\n# code comment\n```\n\nTitle\n=====\n\ntext\n# Real Heading\nmore\n";
+    let after_setext = fix_setext_headers(&input);
+    assert!(
+        after_setext.contains("# Title"),
+        "setext header outside code block should be converted"
+    );
+    assert!(
+        after_setext.contains("```\n# code comment\n```"),
+        "code block content should be preserved"
+    );
+}

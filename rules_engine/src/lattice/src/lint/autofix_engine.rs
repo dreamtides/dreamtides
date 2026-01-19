@@ -98,7 +98,25 @@ pub fn fix_trailing_whitespace(body: &str) -> String {
 pub fn fix_multiple_blank_lines(body: &str) -> String {
     let mut result = Vec::new();
     let mut prev_blank = false;
+    let mut in_code_fence = false;
+    let mut current_fence = "";
     for line in body.lines() {
+        if !in_code_fence && is_fenced_code_start(line) {
+            in_code_fence = true;
+            current_fence = extract_fence(line);
+            result.push(line);
+            prev_blank = false;
+            continue;
+        }
+        if in_code_fence {
+            result.push(line);
+            if is_matching_fence_end(line, current_fence) {
+                in_code_fence = false;
+                current_fence = "";
+            }
+            prev_blank = false;
+            continue;
+        }
         let is_blank = line.trim().is_empty();
         if is_blank && prev_blank {
             continue;
@@ -119,9 +137,25 @@ pub fn fix_setext_headers(body: &str) -> String {
     let lines: Vec<&str> = body.lines().collect();
     let mut result = Vec::new();
     let mut skip_next = false;
+    let mut in_code_fence = false;
+    let mut current_fence = "";
     for (i, line) in lines.iter().enumerate() {
         if skip_next {
             skip_next = false;
+            continue;
+        }
+        if !in_code_fence && is_fenced_code_start(line) {
+            in_code_fence = true;
+            current_fence = extract_fence(line);
+            result.push((*line).to_string());
+            continue;
+        }
+        if in_code_fence {
+            result.push((*line).to_string());
+            if is_matching_fence_end(line, current_fence) {
+                in_code_fence = false;
+                current_fence = "";
+            }
             continue;
         }
         if i + 1 < lines.len() && warning_rules::is_setext_underline(lines[i + 1]) {
@@ -141,28 +175,58 @@ pub fn fix_setext_headers(body: &str) -> String {
 
 /// Converts all list markers to dashes.
 pub fn fix_list_markers(body: &str) -> String {
-    body.lines()
-        .map(|line| {
-            let trimmed = line.trim_start();
-            let indent = &line[..line.len() - trimmed.len()];
-            if let Some(rest) = trimmed.strip_prefix("* ") {
-                format!("{indent}- {rest}")
-            } else if let Some(rest) = trimmed.strip_prefix("+ ") {
-                format!("{indent}- {rest}")
-            } else {
-                line.to_string()
+    let mut result = Vec::new();
+    let mut in_code_fence = false;
+    let mut current_fence = "";
+    for line in body.lines() {
+        if !in_code_fence && is_fenced_code_start(line) {
+            in_code_fence = true;
+            current_fence = extract_fence(line);
+            result.push(line.to_string());
+            continue;
+        }
+        if in_code_fence {
+            result.push(line.to_string());
+            if is_matching_fence_end(line, current_fence) {
+                in_code_fence = false;
+                current_fence = "";
             }
-        })
-        .collect::<Vec<_>>()
-        .join("\n")
-        + if body.ends_with('\n') { "\n" } else { "" }
+            continue;
+        }
+        let trimmed = line.trim_start();
+        let indent = &line[..line.len() - trimmed.len()];
+        if let Some(rest) = trimmed.strip_prefix("* ") {
+            result.push(format!("{indent}- {rest}"));
+        } else if let Some(rest) = trimmed.strip_prefix("+ ") {
+            result.push(format!("{indent}- {rest}"));
+        } else {
+            result.push(line.to_string());
+        }
+    }
+    result.join("\n") + if body.ends_with('\n') { "\n" } else { "" }
 }
 
 /// Inserts blank lines before and after headings as needed.
 pub fn fix_heading_blank_lines(body: &str) -> String {
     let lines: Vec<&str> = body.lines().collect();
     let mut result = Vec::new();
+    let mut in_code_fence = false;
+    let mut current_fence = "";
     for (i, line) in lines.iter().enumerate() {
+        if !in_code_fence && is_fenced_code_start(line) {
+            in_code_fence = true;
+            current_fence = extract_fence(line);
+            result.push((*line).to_string());
+            continue;
+        }
+        if in_code_fence {
+            result.push((*line).to_string());
+            if is_matching_fence_end(line, current_fence) {
+                in_code_fence = false;
+                current_fence = "";
+            }
+            continue;
+        }
         let is_heading = warning_rules::is_atx_heading(line);
         let prev_blank = i == 0 || lines[i - 1].trim().is_empty();
         let next_blank = i == lines.len() - 1 || lines[i + 1].trim().is_empty();
@@ -182,7 +246,23 @@ pub fn fix_list_blank_lines(body: &str) -> String {
     let lines: Vec<&str> = body.lines().collect();
     let mut result = Vec::new();
     let mut in_list = false;
+    let mut in_code_fence = false;
+    let mut current_fence = "";
     for (i, line) in lines.iter().enumerate() {
+        if !in_code_fence && is_fenced_code_start(line) {
+            in_code_fence = true;
+            current_fence = extract_fence(line);
+            result.push((*line).to_string());
+            continue;
+        }
+        if in_code_fence {
+            result.push((*line).to_string());
+            if is_matching_fence_end(line, current_fence) {
+                in_code_fence = false;
+                current_fence = "";
+            }
+            continue;
+        }
         let is_list_item = warning_rules::is_list_line(line);
         let is_blank = line.trim().is_empty();
         let is_continuation = warning_rules::is_list_continuation(line);
@@ -203,6 +283,27 @@ pub fn fix_list_blank_lines(body: &str) -> String {
         result.push((*line).to_string());
     }
     result.join("\n") + if body.ends_with('\n') { "\n" } else { "" }
+}
+
+fn is_fenced_code_start(line: &str) -> bool {
+    let trimmed = line.trim_start();
+    trimmed.starts_with("```") || trimmed.starts_with("~~~")
+}
+
+fn extract_fence(line: &str) -> &'static str {
+    let trimmed = line.trim_start();
+    if trimmed.starts_with("```") {
+        "```"
+    } else if trimmed.starts_with("~~~") {
+        "~~~"
+    } else {
+        ""
+    }
+}
+
+fn is_matching_fence_end(line: &str, fence: &str) -> bool {
+    let trimmed = line.trim();
+    trimmed == fence || (trimmed.starts_with(fence) && trimmed[fence.len()..].trim().is_empty())
 }
 
 impl AutofixSummary {
