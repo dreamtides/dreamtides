@@ -85,11 +85,12 @@ pub struct State {
 /// A worker in `NeedsReview` state is NOT ready for human review if:
 /// - Self-review is enabled for the worker (`self_review == true`)
 /// - A self_review prompt is configured (in defaults)
-/// - The self_review prompt has not yet been sent (`on_complete_sent_unix` is
-///   None)
+/// - AND one of these transitional conditions is true:
+///   - `pending_self_review` is true (waiting for prompt to be sent)
+///   - `on_complete_sent_unix` is None (prompt not yet sent)
 ///
-/// In this case, the worker is in a transitional state waiting for the
-/// self-review prompt to be sent.
+/// In these cases, the worker is in a transitional state and should be
+/// displayed as "reviewing" rather than "needs_review".
 pub fn is_truly_needs_review(worker: &WorkerRecord, config: &Config) -> bool {
     if worker.status != WorkerStatus::NeedsReview {
         return false;
@@ -100,6 +101,9 @@ pub fn is_truly_needs_review(worker: &WorkerRecord, config: &Config) -> bool {
     let has_prompt = config.defaults.self_review.is_some();
     if !has_prompt {
         return true;
+    }
+    if worker.pending_self_review {
+        return false;
     }
     worker.on_complete_sent_unix.is_some()
 }

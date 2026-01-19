@@ -9,8 +9,23 @@ use crate::ipc::socket;
 
 const CONNECT_TIMEOUT: Duration = Duration::from_secs(3);
 
+/// Handles Stop hooks - the primary mechanism for detecting task completion.
+///
+/// This is critical for state transitions: when Claude stops working, this
+/// hook fires and triggers the transition from Working -> NeedsReview (or
+/// Reviewing -> NeedsReview for self-review completion).
 pub async fn run_hook_stop(worker: &str) -> Result<()> {
-    let input = read_stdin_json()?;
+    let input = match read_stdin_json() {
+        Ok(input) => input,
+        Err(e) => {
+            tracing::warn!(
+                worker = worker,
+                error = %e,
+                "Stop hook: failed to parse stdin JSON, using defaults"
+            );
+            ClaudeHookInput::default()
+        }
+    };
     let event = HookEvent::Stop {
         worker: worker.to_string(),
         session_id: input.session_id.unwrap_or_default(),
@@ -20,8 +35,21 @@ pub async fn run_hook_stop(worker: &str) -> Result<()> {
     Ok(())
 }
 
+/// Handles SessionStart hooks - detects when Claude is ready to work.
+///
+/// Fired when a worker's Claude session starts up successfully.
 pub async fn run_hook_session_start(worker: &str) -> Result<()> {
-    let input = read_stdin_json()?;
+    let input = match read_stdin_json() {
+        Ok(input) => input,
+        Err(e) => {
+            tracing::warn!(
+                worker = worker,
+                error = %e,
+                "SessionStart hook: failed to parse stdin JSON, using defaults"
+            );
+            ClaudeHookInput::default()
+        }
+    };
     let event = HookEvent::SessionStart {
         worker: worker.to_string(),
         session_id: input.session_id.unwrap_or_default(),
@@ -31,8 +59,21 @@ pub async fn run_hook_session_start(worker: &str) -> Result<()> {
     Ok(())
 }
 
+/// Handles SessionEnd hooks - detects when Claude exits.
+///
+/// Fired when a worker's Claude session ends (crash, shutdown, etc).
 pub async fn run_hook_session_end(worker: &str, cli_reason: &str) -> Result<()> {
-    let input = read_stdin_json()?;
+    let input = match read_stdin_json() {
+        Ok(input) => input,
+        Err(e) => {
+            tracing::warn!(
+                worker = worker,
+                error = %e,
+                "SessionEnd hook: failed to parse stdin JSON, using defaults"
+            );
+            ClaudeHookInput::default()
+        }
+    };
     let reason = input.reason.unwrap_or_else(|| cli_reason.to_string());
     let event =
         HookEvent::SessionEnd { worker: worker.to_string(), reason, timestamp: get_timestamp() };
@@ -40,46 +81,47 @@ pub async fn run_hook_session_end(worker: &str, cli_reason: &str) -> Result<()> 
     Ok(())
 }
 
-pub async fn run_hook_post_bash(worker: &str) -> Result<()> {
-    let input = read_stdin_json()?;
-    let command = input
-        .tool_input
-        .as_ref()
-        .and_then(|v: &serde_json::Value| v.get("command"))
-        .and_then(|v: &serde_json::Value| v.as_str())
-        .map(String::from);
-    let event = HookEvent::PostBash {
-        worker: worker.to_string(),
-        command,
-        exit_code: None,
-        timestamp: get_timestamp(),
-    };
-    send_event_gracefully(event, "post_bash").await;
-    Ok(())
-}
-
+/// Sends a hook event to the daemon without printing errors to stderr.
+///
+/// Claude Code interprets any stderr output from hooks as an error, which
+/// causes confusing "hook error" messages. Instead, we log issues via tracing
+/// (which goes to the log file) and silently return on expected conditions
+/// like the daemon not running.
 async fn send_event_gracefully(event: HookEvent, hook_name: &str) {
     let socket_path = socket::get_socket_path();
 
     if !socket_path.exists() {
-        eprintln!("Hook {hook_name}: llmc daemon not running (socket not found)");
+        tracing::debug!(
+            hook = hook_name,
+            socket_path = %socket_path.display(),
+            "Hook skipped: daemon not running (socket not found)"
+        );
         return;
     }
 
     let send_future = socket::send_event(&socket_path, event);
     match timeout(CONNECT_TIMEOUT, send_future).await {
         Ok(Ok(response)) => {
-            if !response.success
-                && let Some(err) = response.error
-            {
-                eprintln!("Hook {hook_name} error: {err}");
+            if !response.success {
+                let err = response.error.as_deref().unwrap_or("unknown error");
+                tracing::warn!(hook = hook_name, error = err, "Hook event rejected by daemon");
+            } else {
+                tracing::debug!(hook = hook_name, "Hook event sent successfully");
             }
         }
         Ok(Err(e)) => {
-            eprintln!("Hook {hook_name} failed: {e}");
+            tracing::warn!(
+                hook = hook_name,
+                error = %e,
+                "Hook failed to send event to daemon"
+            );
         }
         Err(_) => {
-            eprintln!("Hook {hook_name} timed out connecting to daemon");
+            tracing::warn!(
+                hook = hook_name,
+                timeout_secs = CONNECT_TIMEOUT.as_secs(),
+                "Hook timed out connecting to daemon"
+            );
         }
     }
 }
@@ -95,16 +137,7 @@ fn read_stdin_json() -> Result<ClaudeHookInput> {
         input.push_str(&line?);
     }
     if input.is_empty() {
-        return Ok(ClaudeHookInput {
-            session_id: None,
-            transcript_path: None,
-            cwd: None,
-            hook_event_name: None,
-            tool_name: None,
-            tool_input: None,
-            tool_response: None,
-            reason: None,
-        });
+        return Ok(ClaudeHookInput::default());
     }
     serde_json::from_str(&input).context("Failed to parse hook input JSON from stdin")
 }

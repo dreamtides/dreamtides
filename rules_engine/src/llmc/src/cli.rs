@@ -319,12 +319,6 @@ pub enum HookAction {
         #[arg(long, default_value = "unknown")]
         reason: String,
     },
-    /// Notify daemon of bash command completion
-    PostBash {
-        /// Worker name
-        #[arg(long)]
-        worker: String,
-    },
 }
 
 #[derive(Subcommand)]

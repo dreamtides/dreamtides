@@ -41,9 +41,6 @@ pub fn handle_hook_event(event: &HookEvent, state: &mut State, config: &Config) 
         HookEvent::Stop { worker, timestamp, .. } => {
             handle_stop(worker, *timestamp, state, config)?;
         }
-        HookEvent::PostBash { .. } => {
-            tracing::debug!("Ignoring PostBash event (not yet implemented): {:?}", event);
-        }
     }
     Ok(())
 }

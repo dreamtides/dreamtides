@@ -7,7 +7,6 @@ pub enum HookEvent {
     SessionStart { worker: String, session_id: String, timestamp: u64 },
     SessionEnd { worker: String, reason: String, timestamp: u64 },
     Stop { worker: String, session_id: String, timestamp: u64 },
-    PostBash { worker: String, command: Option<String>, exit_code: Option<i32>, timestamp: u64 },
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -23,7 +22,7 @@ pub struct HookResponse {
     pub error: Option<String>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct ClaudeHookInput {
     pub session_id: Option<String>,
     pub transcript_path: Option<String>,

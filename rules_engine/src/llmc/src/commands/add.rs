@@ -235,14 +235,6 @@ pub fn create_claude_hook_settings(worktree_path: &Path, worker_name: &str) -> R
                     "command": format!("{} hook session-end --worker {}", llmc_bin, worker_name),
                     "timeout": 5
                 }]
-            }],
-            "PostToolUse": [{
-                "matcher": "Bash",
-                "hooks": [{
-                    "type": "command",
-                    "command": format!("{} hook post-bash --worker {}", llmc_bin, worker_name),
-                    "timeout": 5
-                }]
             }]
         }
     });

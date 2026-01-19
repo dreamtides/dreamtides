@@ -145,7 +145,6 @@ async fn handle_hook_action(action: HookAction) -> Result<()> {
         HookAction::SessionEnd { worker, reason } => {
             hook::run_hook_session_end(&worker, &reason).await
         }
-        HookAction::PostBash { worker } => hook::run_hook_post_bash(&worker).await,
     }
 }
 
