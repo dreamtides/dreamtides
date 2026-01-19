@@ -41,29 +41,25 @@ to register Lattice as an MCP tool provider.
 - Preserves other MCP servers in the configuration
 - Exits cleanly if Lattice was not installed
 
-### Stateless Invocation
+### MCP Protocol
 
-Lattice uses a **stateless one-shot** MCP architecture rather than a persistent
-server. Each tool invocation spawns a fresh `lat mcp` process:
+Lattice implements the standard MCP (Model Context Protocol) server protocol.
+When invoked, `lat mcp` runs as a continuous server process:
 
 ```
-Claude Code → spawns `lat mcp` → reads JSON-RPC request from stdin
-                                → executes operation
-                                → writes JSON-RPC response to stdout
-                                → exits
+Claude Code → spawns `lat mcp` → server loop: reads JSON-RPC requests from stdin
+                                            → executes operation
+                                            → writes JSON-RPC response to stdout
+                                → exits when stdin closes
 ```
 
-**Benefits of stateless design:**
-- No long-running process to manage
-- Each invocation is isolated
-- Easier to test (pipe JSON in, check JSON out)
-- Natural fit with existing CLI architecture
-- No protocol loop or connection state
+**Supported MCP methods:**
+- `initialize` - Protocol handshake, returns server capabilities
+- `tools/list` - Returns available tools and their schemas
+- `tools/call` - Executes a tool with the provided arguments
 
-The `lat mcp` command reads a single JSON-RPC tool invocation from stdin,
-executes it using the same code paths as the CLI, and writes the response to
-stdout. It is invoked automatically by Claude Code and not intended for direct
-user invocation.
+The server uses newline-delimited JSON-RPC 2.0 over stdin/stdout. It is invoked
+automatically by Claude Code and not intended for direct user invocation.
 
 ### Tool Design Philosophy
 

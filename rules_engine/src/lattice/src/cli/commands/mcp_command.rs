@@ -33,7 +33,6 @@ mod error_codes {
 }
 
 /// JSON-RPC error codes.
-#[expect(dead_code, reason = "Defined for completeness per JSON-RPC spec")]
 mod rpc_error_codes {
     pub const PARSE_ERROR: i32 = -32700;
     pub const INVALID_REQUEST: i32 = -32600;
@@ -50,21 +49,50 @@ const MAX_FILENAME_LENGTH: usize = 40;
 
 /// Executes the `lat mcp` command.
 ///
-/// Reads a single JSON-RPC request from stdin, executes the requested tool,
-/// and writes the JSON-RPC response to stdout.
+/// Runs an MCP server loop, reading JSON-RPC requests from stdin and writing
+/// responses to stdout. The server continues until stdin is closed.
 pub fn execute(context: CommandContext) -> LatticeResult<()> {
-    info!("Starting MCP command");
+    info!("Starting MCP server");
 
-    // Read request from stdin
-    let request = read_request()?;
+    let stdin = io::stdin();
+    let reader = stdin.lock();
 
-    // Process the request
-    let response = process_request(&context, request);
+    for line in reader.lines() {
+        let line = match line {
+            Ok(l) => l,
+            Err(e) => {
+                info!(error = %e, "Error reading from stdin, exiting");
+                break;
+            }
+        };
 
-    // Write response to stdout
-    write_response(&response)?;
+        if line.is_empty() {
+            continue;
+        }
 
-    info!("MCP command completed");
+        let request: JsonRpcRequest = match serde_json::from_str(&line) {
+            Ok(req) => req,
+            Err(e) => {
+                let error_response = JsonRpcResponse {
+                    jsonrpc: "2.0".to_string(),
+                    id: Value::Null,
+                    result: None,
+                    error: Some(JsonRpcError {
+                        code: rpc_error_codes::PARSE_ERROR,
+                        message: format!("Invalid JSON: {e}"),
+                        data: None,
+                    }),
+                };
+                write_response(&error_response)?;
+                continue;
+            }
+        };
+
+        let response = process_request(&context, request);
+        write_response(&response)?;
+    }
+
+    info!("MCP server exiting");
     Ok(())
 }
 
@@ -154,25 +182,6 @@ struct CreateResult {
     name: String,
 }
 
-/// Reads a JSON-RPC request from stdin.
-fn read_request() -> LatticeResult<JsonRpcRequest> {
-    let stdin = io::stdin();
-    let mut input = String::new();
-
-    for line in stdin.lock().lines() {
-        let line = line.map_err(|e| LatticeError::ReadError {
-            path: PathBuf::from("<stdin>"),
-            reason: e.to_string(),
-        })?;
-        input.push_str(&line);
-        input.push('\n');
-    }
-
-    serde_json::from_str(&input).map_err(|e| LatticeError::InvalidArgument {
-        message: format!("Invalid JSON-RPC request: {e}"),
-    })
-}
-
 /// Writes a JSON-RPC response to stdout.
 fn write_response(response: &JsonRpcResponse) -> LatticeResult<()> {
     let output = serde_json::to_string(response).map_err(|e| LatticeError::InvalidArgument {
@@ -200,8 +209,10 @@ fn process_request(context: &CommandContext, request: JsonRpcRequest) -> JsonRpc
         );
     }
 
-    // Dispatch to the appropriate tool
+    // Dispatch to the appropriate method
     let result = match request.method.as_str() {
+        "initialize" => handle_initialize(),
+        "tools/list" => handle_tools_list(),
         "tools/call" => handle_tools_call(context, &request.params),
         _ => Err(mcp_error(
             rpc_error_codes::METHOD_NOT_FOUND,
@@ -219,6 +230,110 @@ fn process_request(context: &CommandContext, request: JsonRpcRequest) -> JsonRpc
             error: Some(err),
         },
     }
+}
+
+/// Handles the MCP initialize request.
+fn handle_initialize() -> Result<serde_json::Value, JsonRpcError> {
+    info!("Handling MCP initialize");
+    Ok(serde_json::json!({
+        "protocolVersion": "2024-11-05",
+        "capabilities": {
+            "tools": {}
+        },
+        "serverInfo": {
+            "name": "lattice",
+            "version": env!("CARGO_PKG_VERSION")
+        }
+    }))
+}
+
+/// Handles the MCP tools/list request.
+fn handle_tools_list() -> Result<serde_json::Value, JsonRpcError> {
+    info!("Handling MCP tools/list");
+    Ok(serde_json::json!({
+        "tools": [
+            {
+                "name": "lattice_create_task",
+                "description": "Creates a task document with auto-generated filename. Tasks are placed in {directory}/tasks/ with filenames derived from the description.",
+                "inputSchema": {
+                    "type": "object",
+                    "properties": {
+                        "directory": {
+                            "type": "string",
+                            "description": "Parent directory path (e.g., 'api/')"
+                        },
+                        "description": {
+                            "type": "string",
+                            "description": "Human-readable task title (max 1024 chars)"
+                        },
+                        "task_type": {
+                            "type": "string",
+                            "enum": ["bug", "feature", "task", "chore"],
+                            "description": "Task type"
+                        },
+                        "body": {
+                            "type": "string",
+                            "description": "Markdown body content"
+                        },
+                        "priority": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 4,
+                            "default": 2,
+                            "description": "Priority 0-4 (0=highest, 4=lowest)"
+                        },
+                        "labels": {
+                            "type": "array",
+                            "items": {"type": "string"},
+                            "description": "List of labels"
+                        },
+                        "blocked_by": {
+                            "type": "array",
+                            "items": {"type": "string"},
+                            "description": "List of blocking task IDs"
+                        },
+                        "discovered_from": {
+                            "type": "array",
+                            "items": {"type": "string"},
+                            "description": "List of parent task IDs for provenance"
+                        }
+                    },
+                    "required": ["directory", "description", "task_type", "body"]
+                }
+            },
+            {
+                "name": "lattice_create_document",
+                "description": "Creates a knowledge base document. Documents are placed in {directory}/docs/ with the specified name.",
+                "inputSchema": {
+                    "type": "object",
+                    "properties": {
+                        "directory": {
+                            "type": "string",
+                            "description": "Parent directory path (e.g., 'api/')"
+                        },
+                        "name": {
+                            "type": "string",
+                            "description": "Document name (becomes filename, max 64 chars)"
+                        },
+                        "description": {
+                            "type": "string",
+                            "description": "Human-readable description (max 1024 chars)"
+                        },
+                        "body": {
+                            "type": "string",
+                            "description": "Markdown body content"
+                        },
+                        "labels": {
+                            "type": "array",
+                            "items": {"type": "string"},
+                            "description": "List of labels"
+                        }
+                    },
+                    "required": ["directory", "name", "description", "body"]
+                }
+            }
+        ]
+    }))
 }
 
 /// Handles a tools/call request.
