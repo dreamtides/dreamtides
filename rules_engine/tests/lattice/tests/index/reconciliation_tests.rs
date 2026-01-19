@@ -1206,6 +1206,55 @@ fn full_rebuild_populates_directory_roots() {
 // ============================================================================
 
 #[test]
+fn full_rebuild_does_not_flag_decorative_equals_as_conflict_markers() {
+    let temp_dir = TempDir::new().expect("failed to create temp dir");
+    let lattice_dir = temp_dir.path().join(".lattice");
+    std::fs::create_dir_all(&lattice_dir).expect("failed to create .lattice dir");
+
+    // Create a document with decorative equals signs in code block (not conflict
+    // markers)
+    let doc_path = temp_dir.path().join("decorative.md");
+    std::fs::write(
+        &doc_path,
+        r#"---
+lattice-id: LDECO3
+name: decorative-doc
+description: Document with decorative equals signs
+---
+
+# Example Code
+
+```rust
+println!("======= decorative header =======");
+```
+
+The equals signs above are decorative, not conflict markers.
+"#,
+    )
+    .expect("should write document");
+
+    let conn = connection_pool::open_connection(temp_dir.path())
+        .expect("should open connection successfully");
+    schema_definition::create_schema(&conn).expect("should create schema");
+
+    let git = FakeGit::with_ls_files(vec![PathBuf::from("decorative.md")]);
+
+    let result = sync_strategies::full_rebuild(temp_dir.path(), &git, &conn)
+        .expect("full_rebuild should succeed");
+
+    // The document should be indexed, not skipped
+    assert_eq!(
+        result.documents_indexed, 1,
+        "Document with decorative equals signs should be indexed (not flagged as conflict)"
+    );
+
+    // Verify the document is actually in the database
+    let doc = lattice::index::document_queries::lookup_by_id(&conn, "LDECO3")
+        .expect("lookup should succeed");
+    assert!(doc.is_some(), "Document with decorative equals should be indexed");
+}
+
+#[test]
 fn reconcile_removes_document_when_file_is_deleted_but_uncommitted() {
     let temp_dir = TempDir::new().expect("failed to create temp dir");
     let lattice_dir = temp_dir.path().join(".lattice");

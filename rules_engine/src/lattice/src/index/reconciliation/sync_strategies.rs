@@ -496,6 +496,10 @@ fn upsert_directory_root(conn: &Connection, path: &Path) -> Result<(), LatticeEr
 }
 
 /// Checks if a file contains git conflict markers.
+///
+/// Git conflict markers must appear at the start of a line (after optional
+/// whitespace) and all three marker types must be present to indicate an
+/// actual unresolved merge conflict.
 fn has_conflict_markers(path: &Path) -> Result<bool, LatticeError> {
     let content = match std::fs::read_to_string(path) {
         Ok(c) => c,
@@ -508,15 +512,30 @@ fn has_conflict_markers(path: &Path) -> Result<bool, LatticeError> {
         }
     };
 
-    // Check for common conflict markers
-    let has_markers =
-        content.contains("<<<<<<<") || content.contains("=======") || content.contains(">>>>>>>");
+    // Check for conflict markers at the start of lines.
+    // All three marker types must be present to indicate an actual conflict.
+    let mut has_ours = false;
+    let mut has_separator = false;
+    let mut has_theirs = false;
 
-    if has_markers {
+    for line in content.lines() {
+        let trimmed = line.trim_start();
+        if trimmed.starts_with("<<<<<<<") {
+            has_ours = true;
+        } else if trimmed.starts_with("=======") {
+            has_separator = true;
+        } else if trimmed.starts_with(">>>>>>>") {
+            has_theirs = true;
+        }
+    }
+
+    let has_conflict = has_ours && has_separator && has_theirs;
+
+    if has_conflict {
         debug!(path = %path.display(), "Detected conflict markers in file");
     }
 
-    Ok(has_markers)
+    Ok(has_conflict)
 }
 
 /// Computes SHA-256 hash of content as a hex string.
