@@ -10,6 +10,14 @@ use crate::task::task_state::TaskState;
 /// Maximum number of related documents shown in text output.
 const MAX_RELATED_TEXT_OUTPUT: usize = 10;
 
+/// An ancestor root document reference for JSON output.
+#[derive(Debug, Clone, Serialize)]
+pub struct AncestorRef {
+    pub id: String,
+    pub name: String,
+    pub path: String,
+}
+
 /// Output mode for the show command.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum OutputMode {
@@ -43,6 +51,16 @@ pub struct ShowOutput {
     pub updated_at: Option<DateTime<Utc>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub closed_at: Option<DateTime<Utc>>,
+    /// Ancestor root documents in hierarchy order (root-most first).
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    pub ancestors: Vec<AncestorRef>,
+    /// Composed context from ancestor root documents (general → specific).
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub composed_context: Option<String>,
+    /// Composed acceptance criteria from ancestor root documents (specific →
+    /// general).
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub composed_acceptance: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub body: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -111,20 +129,12 @@ fn print_full(output: &ShowOutput) {
     print_header(output);
     println!();
     if output.task_type.is_some() {
-        // Task document format
         print_task_metadata(output);
-        println!();
-        if let Some(body) = &output.body {
-            println!("{}:", color_theme::bold("Body"));
-            println!("{body}");
-        }
-    } else {
-        // Knowledge base document format: body between separators
-        if let Some(body) = &output.body {
-            println!("{}", color_theme::muted("---"));
-            println!("{body}");
-            println!("{}", color_theme::muted("---"));
-        }
+        print_template_content(output);
+    } else if let Some(body) = &output.body {
+        println!("{}", color_theme::muted("---"));
+        println!("{body}");
+        println!("{}", color_theme::muted("---"));
     }
     if let Some(parent) = &output.parent {
         println!();
@@ -146,6 +156,28 @@ fn print_full(output: &ShowOutput) {
         }
     }
     print_related_section(&output.related);
+}
+
+/// Prints template-composed content sections for tasks.
+///
+/// Displays: Context (from ancestors), Body, Acceptance Criteria (from
+/// ancestors).
+fn print_template_content(output: &ShowOutput) {
+    println!();
+    if let Some(context) = &output.composed_context {
+        println!("{}:", color_theme::bold("Context"));
+        println!("{context}");
+        println!();
+    }
+    if let Some(body) = &output.body {
+        println!("{}:", color_theme::bold("Body"));
+        println!("{body}");
+    }
+    if let Some(acceptance) = &output.composed_acceptance {
+        println!();
+        println!("{}:", color_theme::bold("Acceptance Criteria"));
+        println!("{acceptance}");
+    }
 }
 
 /// Prints the related documents section.

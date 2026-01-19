@@ -3,13 +3,16 @@
 use std::fs;
 
 use lattice::cli::command_dispatch::{CommandContext, create_context};
-use lattice::cli::commands::show_command::document_formatter::{OutputMode, ShowOutput};
+use lattice::cli::commands::show_command::document_formatter::{
+    AncestorRef, OutputMode, ShowOutput,
+};
 use lattice::cli::commands::show_command::show_executor::DocumentRef;
 use lattice::cli::global_options::GlobalOptions;
 use lattice::cli::workflow_args::ShowArgs;
 use lattice::document::frontmatter_schema::TaskType;
 use lattice::error::error_types::LatticeError;
 use lattice::git::client_config::FakeClientIdStore;
+use lattice::index::directory_roots::{DirectoryRoot, upsert};
 use lattice::index::document_types::InsertDocument;
 use lattice::index::link_queries::{self, InsertLink, LinkType};
 use lattice::index::{document_queries, label_queries, schema_definition};
@@ -165,6 +168,9 @@ fn show_output_serializes_to_json() {
         created_at: None,
         updated_at: None,
         closed_at: None,
+        ancestors: Vec::new(),
+        composed_context: None,
+        composed_acceptance: None,
         body: Some("Body content".to_string()),
         parent: None,
         dependencies: Vec::new(),
@@ -178,11 +184,12 @@ fn show_output_serializes_to_json() {
     assert!(json.contains("\"id\":\"LTESTA\""));
     assert!(json.contains("\"state\":\"open\""));
     assert!(json.contains("\"task_type\":\"bug\""));
-    // Verify blocking is renamed to dependents in JSON
-    assert!(json.contains("\"dependents\""));
-    assert!(!json.contains("\"blocking\""));
-    // Verify backlinks is not included in JSON (skip_serializing)
-    assert!(!json.contains("\"backlinks\""));
+    assert!(json.contains("\"dependents\""), "blocking should be renamed to dependents in JSON");
+    assert!(!json.contains("\"blocking\""), "blocking should not appear in JSON");
+    assert!(
+        !json.contains("\"backlinks\""),
+        "backlinks should not appear in JSON (skip_serializing)"
+    );
 }
 
 // ============================================================================
@@ -807,4 +814,329 @@ fn show_command_increments_view_count_multiple_times() {
     let count =
         lattice::index::view_tracking::get_view_count(&ctx.conn, "LMULVW").expect("Get count");
     assert_eq!(count, 2, "View count should be 2 after showing twice");
+}
+
+// ============================================================================
+// Template Composition Integration Tests
+// ============================================================================
+
+fn make_root(path: &str, id: &str, parent: Option<&str>, depth: u32) -> DirectoryRoot {
+    DirectoryRoot {
+        directory_path: path.to_string(),
+        root_id: id.to_string(),
+        parent_path: parent.map(|s| s.to_string()),
+        depth,
+    }
+}
+
+fn create_template_hierarchy(temp_dir: &tempfile::TempDir) {
+    let root = temp_dir.path();
+
+    fs::create_dir_all(root.join("project")).expect("Create project");
+    fs::create_dir_all(root.join("project/api")).expect("Create api");
+    fs::create_dir_all(root.join("project/api/tasks")).expect("Create tasks");
+
+    fs::write(
+        root.join("project/project.md"),
+        r#"---
+lattice-id: LPRJZA
+name: project
+description: Project root
+---
+
+# Project
+
+## [Lattice] Context
+
+This is project-wide context.
+All tasks inherit this.
+
+## [Lattice] Acceptance Criteria
+
+- [ ] All tests pass
+- [ ] Code reviewed
+"#,
+    )
+    .expect("Write project.md");
+
+    fs::write(
+        root.join("project/api/api.md"),
+        r#"---
+lattice-id: LAPIZA
+name: api
+description: API subsystem
+---
+
+# API
+
+## [Lattice] Context
+
+API-specific context here.
+Handle REST conventions.
+
+## [Lattice] Acceptance Criteria
+
+- [ ] API docs updated
+- [ ] Backward compatible
+"#,
+    )
+    .expect("Write api.md");
+
+    fs::write(
+        root.join("project/api/tasks/fix_bug.md"),
+        r#"---
+lattice-id: LBUGZA
+name: fix-bug
+description: Fix validation bug
+task-type: bug
+priority: 1
+---
+
+# Fix Validation Bug
+
+The validation logic is broken.
+"#,
+    )
+    .expect("Write fix_bug.md");
+}
+
+#[test]
+fn show_command_includes_composed_templates_for_tasks() {
+    let (temp_dir, context) = create_test_repo();
+    create_template_hierarchy(&temp_dir);
+
+    let project_doc = InsertDocument::new(
+        "LPRJZA".to_string(),
+        None,
+        "project/project.md".to_string(),
+        "project".to_string(),
+        "Project root".to_string(),
+        None,
+        None,
+        None,
+        None,
+        None,
+        "hash1".to_string(),
+        100,
+    );
+    let api_doc = InsertDocument::new(
+        "LAPIZA".to_string(),
+        Some("LPRJZA".to_string()),
+        "project/api/api.md".to_string(),
+        "api".to_string(),
+        "API subsystem".to_string(),
+        None,
+        None,
+        None,
+        None,
+        None,
+        "hash2".to_string(),
+        200,
+    );
+    let task_doc = InsertDocument::new(
+        "LBUGZA".to_string(),
+        Some("LAPIZA".to_string()),
+        "project/api/tasks/fix_bug.md".to_string(),
+        "fix-bug".to_string(),
+        "Fix validation bug".to_string(),
+        Some(TaskType::Bug),
+        Some(1),
+        None,
+        None,
+        None,
+        "hash3".to_string(),
+        300,
+    );
+    insert_doc(&context.conn, &project_doc);
+    insert_doc(&context.conn, &api_doc);
+    insert_doc(&context.conn, &task_doc);
+
+    upsert(&context.conn, &make_root("project", "LPRJZA", None, 0)).expect("Insert project root");
+    upsert(&context.conn, &make_root("project/api", "LAPIZA", Some("project"), 1))
+        .expect("Insert api root");
+
+    let args = ShowArgs {
+        ids: vec!["LBUGZA".to_string()],
+        short: false,
+        refs: false,
+        peek: false,
+        raw: false,
+    };
+
+    let result = lattice::cli::commands::show_command::show_executor::execute(context, args);
+    assert!(result.is_ok(), "Show should succeed with templates: {:?}", result);
+}
+
+#[test]
+fn show_command_raw_mode_skips_template_composition() {
+    let (temp_dir, context) = create_test_repo();
+    create_template_hierarchy(&temp_dir);
+
+    let project_doc = InsertDocument::new(
+        "LPRJZA".to_string(),
+        None,
+        "project/project.md".to_string(),
+        "project".to_string(),
+        "Project root".to_string(),
+        None,
+        None,
+        None,
+        None,
+        None,
+        "hash1".to_string(),
+        100,
+    );
+    let api_doc = InsertDocument::new(
+        "LAPIZA".to_string(),
+        Some("LPRJZA".to_string()),
+        "project/api/api.md".to_string(),
+        "api".to_string(),
+        "API subsystem".to_string(),
+        None,
+        None,
+        None,
+        None,
+        None,
+        "hash2".to_string(),
+        200,
+    );
+    let task_doc = InsertDocument::new(
+        "LBUGZA".to_string(),
+        Some("LAPIZA".to_string()),
+        "project/api/tasks/fix_bug.md".to_string(),
+        "fix-bug".to_string(),
+        "Fix validation bug".to_string(),
+        Some(TaskType::Bug),
+        Some(1),
+        None,
+        None,
+        None,
+        "hash3".to_string(),
+        300,
+    );
+    insert_doc(&context.conn, &project_doc);
+    insert_doc(&context.conn, &api_doc);
+    insert_doc(&context.conn, &task_doc);
+
+    upsert(&context.conn, &make_root("project", "LPRJZA", None, 0)).expect("Insert project root");
+    upsert(&context.conn, &make_root("project/api", "LAPIZA", Some("project"), 1))
+        .expect("Insert api root");
+
+    let args = ShowArgs {
+        ids: vec!["LBUGZA".to_string()],
+        short: false,
+        refs: false,
+        peek: false,
+        raw: true,
+    };
+
+    let result = lattice::cli::commands::show_command::show_executor::execute(context, args);
+    assert!(result.is_ok(), "Raw mode should succeed: {:?}", result);
+}
+
+#[test]
+fn show_command_knowledge_base_document_skips_template_composition() {
+    let (temp_dir, context) = create_test_repo();
+
+    fs::create_dir_all(temp_dir.path().join("docs")).expect("Create docs");
+    fs::write(
+        temp_dir.path().join("docs/readme.md"),
+        "---\nlattice-id: LRDMEA\nname: readme\ndescription: Project readme\n---\n\nReadme body.",
+    )
+    .expect("Write readme");
+
+    let doc = create_test_document("LRDMEA", "docs/readme.md", "readme", "Project readme");
+    insert_doc(&context.conn, &doc);
+
+    let args = ShowArgs {
+        ids: vec!["LRDMEA".to_string()],
+        short: false,
+        refs: false,
+        peek: false,
+        raw: false,
+    };
+
+    let result = lattice::cli::commands::show_command::show_executor::execute(context, args);
+    assert!(result.is_ok(), "KB doc should succeed without templates: {:?}", result);
+}
+
+#[test]
+fn show_output_serializes_template_fields_in_json() {
+    let output = ShowOutput {
+        id: "LTMPLZ".to_string(),
+        name: "template-test".to_string(),
+        description: "Template test task".to_string(),
+        path: "project/api/tasks/test.md".to_string(),
+        state: TaskState::Open,
+        priority: Some(1),
+        task_type: Some(TaskType::Task),
+        labels: Vec::new(),
+        created_at: None,
+        updated_at: None,
+        closed_at: None,
+        ancestors: vec![
+            AncestorRef {
+                id: "LPRJZA".to_string(),
+                name: "project".to_string(),
+                path: "project/project.md".to_string(),
+            },
+            AncestorRef {
+                id: "LAPIZA".to_string(),
+                name: "api".to_string(),
+                path: "project/api/api.md".to_string(),
+            },
+        ],
+        composed_context: Some("Project context\n\nAPI context".to_string()),
+        composed_acceptance: Some("- [ ] API docs\n\n- [ ] Tests pass".to_string()),
+        body: Some("Task body".to_string()),
+        parent: None,
+        dependencies: Vec::new(),
+        blocking: Vec::new(),
+        related: Vec::new(),
+        backlinks: Vec::new(),
+        claimed: false,
+    };
+
+    let json = serde_json::to_string(&output).expect("Should serialize to JSON");
+
+    assert!(json.contains("\"ancestors\""), "Should include ancestors field");
+    assert!(json.contains("\"composed_context\""), "Should include composed_context field");
+    assert!(json.contains("\"composed_acceptance\""), "Should include composed_acceptance field");
+    assert!(json.contains("LPRJZA"), "Should include project ancestor ID");
+    assert!(json.contains("LAPIZA"), "Should include api ancestor ID");
+    assert!(json.contains("Project context"), "Should include context content");
+    assert!(json.contains("API docs"), "Should include acceptance content");
+}
+
+#[test]
+fn show_output_omits_empty_template_fields_in_json() {
+    let output = ShowOutput {
+        id: "LNOTML".to_string(),
+        name: "no-template".to_string(),
+        description: "No template task".to_string(),
+        path: "tasks/test.md".to_string(),
+        state: TaskState::Open,
+        priority: Some(2),
+        task_type: Some(TaskType::Task),
+        labels: Vec::new(),
+        created_at: None,
+        updated_at: None,
+        closed_at: None,
+        ancestors: Vec::new(),
+        composed_context: None,
+        composed_acceptance: None,
+        body: Some("Body".to_string()),
+        parent: None,
+        dependencies: Vec::new(),
+        blocking: Vec::new(),
+        related: Vec::new(),
+        backlinks: Vec::new(),
+        claimed: false,
+    };
+
+    let json = serde_json::to_string(&output).expect("Should serialize to JSON");
+
+    assert!(!json.contains("\"ancestors\""), "Should omit empty ancestors");
+    assert!(!json.contains("\"composed_context\""), "Should omit null composed_context");
+    assert!(!json.contains("\"composed_acceptance\""), "Should omit null composed_acceptance");
 }

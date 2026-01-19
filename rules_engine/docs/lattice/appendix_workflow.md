@@ -225,6 +225,11 @@ The `--json` flag produces structured output compatible with `bd show --json`:
     "name": "fix-review-tasks",
     "description": "Fix LLMC v2 code review tasks",
     "body": "Master task for addressing bugs and missing features...",
+    "ancestors": [
+      {"id": "LAA42X", "name": "llmc", "path": "tasks/llmc/llmc.md"}
+    ],
+    "composed_context": "Context from ancestor root documents...",
+    "composed_acceptance": "- [ ] All tests pass\n- [ ] Code reviewed",
     "state": "open",
     "priority": 0,
     "task_type": "bug",
@@ -277,6 +282,9 @@ The `--json` flag produces structured output compatible with `bd show --json`:
 | `name` | string | Filename-derived identifier (lowercase-hyphenated) |
 | `description` | string | Human-readable description (task title or KB purpose summary) |
 | `body` | string | Full markdown body content |
+| `ancestors` | array | Root documents in hierarchy order (tasks only, omitted if empty) |
+| `composed_context` | string | Context composed from ancestors (tasks only, omitted if null) |
+| `composed_acceptance` | string | Acceptance criteria composed from ancestors (tasks only, omitted if null) |
 | `state` | string | Computed task state (open/blocked/closed) |
 | `priority` | int | Priority level (0-4) |
 | `task_type` | string | bug/feature/task/chore |

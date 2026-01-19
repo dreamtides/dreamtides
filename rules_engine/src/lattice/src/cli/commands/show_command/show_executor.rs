@@ -5,7 +5,9 @@ use tracing::{debug, info};
 
 use crate::claim::claim_operations;
 use crate::cli::command_dispatch::{CommandContext, LatticeResult};
-use crate::cli::commands::show_command::document_formatter::{self, OutputMode, ShowOutput};
+use crate::cli::commands::show_command::document_formatter::{
+    self, AncestorRef, OutputMode, ShowOutput,
+};
 use crate::cli::workflow_args::ShowArgs;
 use crate::document::document_reader;
 use crate::document::frontmatter_schema::TaskType;
@@ -14,7 +16,7 @@ use crate::id::lattice_id::LatticeId;
 use crate::index::document_types::DocumentRow;
 use crate::index::link_queries::{self, LinkRow, LinkType};
 use crate::index::{document_queries, label_queries, view_tracking};
-use crate::task::task_state;
+use crate::task::{task_state, template_composer};
 
 /// A reference to another document, used in parent/deps/blocking/related
 /// sections.
@@ -94,15 +96,12 @@ fn build_show_output(
         task_state::compute_state_with_blockers(&context.conn, &doc_row.id, doc_row.is_closed)?;
     let labels = label_queries::get_labels(&context.conn, &doc_row.id)?;
 
-    // Load body content for full/raw modes
     let body = if mode == OutputMode::Full || mode == OutputMode::Raw {
         Some(load_body_content(&context.repo_root, &doc_row.path)?)
     } else {
         None
     };
 
-    // Load relationships for full/peek/refs modes
-    // Peek needs parent and counts; full/refs need all relationship data
     let (parent, dependencies, blocking, related, backlinks) =
         if mode == OutputMode::Full || mode == OutputMode::Peek || mode == OutputMode::Refs {
             load_relationships(context, doc_row)?
@@ -110,7 +109,13 @@ fn build_show_output(
             (None, Vec::new(), Vec::new(), Vec::new(), Vec::new())
         };
 
-    // Check claim status for tasks
+    let (ancestors, composed_context, composed_acceptance) =
+        if doc_row.task_type.is_some() && mode == OutputMode::Full {
+            load_template_content(context, &doc_row.path)?
+        } else {
+            (Vec::new(), None, None)
+        };
+
     let claimed =
         if doc_row.task_type.is_some() { check_claim_status(context, &doc_row.id) } else { false };
 
@@ -126,6 +131,9 @@ fn build_show_output(
         created_at: doc_row.created_at,
         updated_at: doc_row.updated_at,
         closed_at: doc_row.closed_at,
+        ancestors,
+        composed_context,
+        composed_acceptance,
         body,
         parent,
         dependencies,
@@ -143,6 +151,43 @@ fn load_body_content(repo_root: &Path, relative_path: &str) -> LatticeResult<Str
 
     let doc = document_reader::read(&full_path)?;
     Ok(doc.body)
+}
+
+/// Template content for a document.
+///
+/// Fields: (ancestors, composed_context, composed_acceptance).
+type TemplateContent = (Vec<AncestorRef>, Option<String>, Option<String>);
+
+/// Loads template content from ancestor root documents.
+///
+/// Returns ancestors, composed context, and composed acceptance criteria.
+/// For non-task documents, returns empty content.
+fn load_template_content(
+    context: &CommandContext,
+    doc_path: &str,
+) -> LatticeResult<TemplateContent> {
+    let path = Path::new(doc_path);
+    let ancestors = load_ancestor_refs(context, path)?;
+    let composed = template_composer::compose_templates(&context.conn, path, &context.repo_root)?;
+    Ok((ancestors, composed.context, composed.acceptance_criteria))
+}
+
+/// Loads ancestor references for JSON output.
+fn load_ancestor_refs(
+    context: &CommandContext,
+    doc_path: &Path,
+) -> LatticeResult<Vec<AncestorRef>> {
+    let dir_roots = template_composer::find_ancestor_roots(&context.conn, doc_path)?;
+    let mut refs = Vec::new();
+
+    for root in dir_roots {
+        let doc_path = template_composer::compute_root_doc_path(&root.directory_path);
+        if let Some(row) = document_queries::lookup_by_id(&context.conn, &root.root_id)? {
+            refs.push(AncestorRef { id: root.root_id, name: row.name, path: doc_path });
+        }
+    }
+
+    Ok(refs)
 }
 
 /// Loads relationship data: parent, dependencies, blocking, related, backlinks.

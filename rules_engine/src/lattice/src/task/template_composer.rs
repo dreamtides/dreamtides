@@ -10,10 +10,8 @@ use crate::index::directory_roots::{self, DirectoryRoot};
 
 /// Prefix for Lattice template sections in markdown headings.
 const LATTICE_SECTION_PREFIX: &str = "[Lattice]";
-
 /// The context section name.
 const CONTEXT_SECTION: &str = "Context";
-
 /// The acceptance criteria section name.
 const ACCEPTANCE_CRITERIA_SECTION: &str = "Acceptance Criteria";
 
@@ -183,6 +181,63 @@ pub fn extract_template_sections(body: &str) -> ExtractedSections {
     sections
 }
 
+/// Finds ancestor root documents for a document by walking up the directory
+/// tree.
+///
+/// This function walks up from the document's parent directory until it finds
+/// a directory that has an entry in the `directory_roots` table. From there,
+/// it retrieves the full ancestor chain.
+///
+/// This handles the case where a document is in a directory (like `tasks/`)
+/// that doesn't have its own root document.
+pub fn find_ancestor_roots(
+    conn: &Connection,
+    document_path: &Path,
+) -> Result<Vec<DirectoryRoot>, LatticeError> {
+    let mut current_dir = document_path.parent();
+
+    while let Some(dir) = current_dir {
+        let dir_str = dir.to_string_lossy().to_string();
+
+        if dir_str.is_empty() {
+            break;
+        }
+
+        let ancestors = directory_roots::get_ancestors(conn, &dir_str)?;
+        if !ancestors.is_empty() {
+            debug!(
+                document_path = %document_path.display(),
+                starting_dir = dir_str,
+                ancestor_count = ancestors.len(),
+                "Found ancestor roots starting from directory"
+            );
+            return Ok(ancestors);
+        }
+
+        current_dir = dir.parent();
+    }
+
+    debug!(
+        document_path = %document_path.display(),
+        "No directory roots found in any ancestor directory"
+    );
+    Ok(Vec::new())
+}
+
+/// Computes the root document path from a directory path.
+///
+/// For directory `api/tasks`, returns `api/tasks/tasks.md`.
+pub fn compute_root_doc_path(directory_path: &str) -> String {
+    let dir_name =
+        Path::new(directory_path).file_name().and_then(|n| n.to_str()).unwrap_or(directory_path);
+
+    if directory_path.is_empty() {
+        format!("{dir_name}.md")
+    } else {
+        format!("{directory_path}/{dir_name}.md")
+    }
+}
+
 /// Type of Lattice template section.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 enum SectionType {
@@ -283,62 +338,5 @@ fn get_heading_level(line: &str) -> Option<usize> {
         Some(hash_count)
     } else {
         None
-    }
-}
-
-/// Finds ancestor root documents for a document by walking up the directory
-/// tree.
-///
-/// This function walks up from the document's parent directory until it finds
-/// a directory that has an entry in the `directory_roots` table. From there,
-/// it retrieves the full ancestor chain.
-///
-/// This handles the case where a document is in a directory (like `tasks/`)
-/// that doesn't have its own root document.
-fn find_ancestor_roots(
-    conn: &Connection,
-    document_path: &Path,
-) -> Result<Vec<DirectoryRoot>, LatticeError> {
-    let mut current_dir = document_path.parent();
-
-    while let Some(dir) = current_dir {
-        let dir_str = dir.to_string_lossy().to_string();
-
-        if dir_str.is_empty() {
-            break;
-        }
-
-        let ancestors = directory_roots::get_ancestors(conn, &dir_str)?;
-        if !ancestors.is_empty() {
-            debug!(
-                document_path = %document_path.display(),
-                starting_dir = dir_str,
-                ancestor_count = ancestors.len(),
-                "Found ancestor roots starting from directory"
-            );
-            return Ok(ancestors);
-        }
-
-        current_dir = dir.parent();
-    }
-
-    debug!(
-        document_path = %document_path.display(),
-        "No directory roots found in any ancestor directory"
-    );
-    Ok(Vec::new())
-}
-
-/// Computes the root document path from a directory path.
-///
-/// For directory `api/tasks`, returns `api/tasks/tasks.md`.
-fn compute_root_doc_path(directory_path: &str) -> String {
-    let dir_name =
-        Path::new(directory_path).file_name().and_then(|n| n.to_str()).unwrap_or(directory_path);
-
-    if directory_path.is_empty() {
-        format!("{dir_name}.md")
-    } else {
-        format!("{directory_path}/{dir_name}.md")
     }
 }
