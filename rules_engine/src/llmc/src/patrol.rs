@@ -276,12 +276,22 @@ impl Patrol {
                         } else if let Some(first_detected) = commits_first_detected {
                             let elapsed_since_commits = now.saturating_sub(first_detected);
                             if elapsed_since_commits >= FALLBACK_DELAY_SECS {
+                                let hook_config_path =
+                                    worktree_path.join(".claude").join("settings.json");
+                                let hook_config_missing = !hook_config_path.exists();
                                 tracing::warn!(
                                     worker = %worker_name,
                                     status = ?worker_status,
                                     elapsed_since_commits_secs = elapsed_since_commits,
-                                    "Stop hook likely failed - commits detected {}s ago but no Stop hook received, recovering to needs_review",
-                                    elapsed_since_commits
+                                    hook_config_missing = hook_config_missing,
+                                    "FALLBACK RECOVERY: Stop hook didn't fire - commits detected {}s ago. \
+                                     {}. Recovering worker to needs_review state.",
+                                    elapsed_since_commits,
+                                    if hook_config_missing {
+                                        "Hook config is MISSING - this is likely the cause"
+                                    } else {
+                                        "Hook config exists but hook may have timed out or failed"
+                                    }
                                 );
                                 if git::has_uncommitted_changes(worktree_path)? {
                                     tracing::info!(
@@ -309,12 +319,26 @@ impl Patrol {
                                 }
                                 continue;
                             } else {
-                                tracing::debug!(
-                                    worker = %worker_name,
-                                    elapsed_since_commits_secs = elapsed_since_commits,
-                                    remaining_secs = FALLBACK_DELAY_SECS - elapsed_since_commits,
-                                    "Waiting for Stop hook or fallback timeout"
-                                );
+                                let hook_config_path =
+                                    worktree_path.join(".claude").join("settings.json");
+                                let hook_config_exists = hook_config_path.exists();
+                                if !hook_config_exists {
+                                    tracing::warn!(
+                                        worker = %worker_name,
+                                        elapsed_since_commits_secs = elapsed_since_commits,
+                                        remaining_secs = FALLBACK_DELAY_SECS - elapsed_since_commits,
+                                        hook_config_path = %hook_config_path.display(),
+                                        "Stop hook likely not configured - .claude/settings.json missing! \
+                                         Waiting for fallback timeout (restart 'llmc up' to regenerate hook config)"
+                                    );
+                                } else {
+                                    tracing::info!(
+                                        worker = %worker_name,
+                                        elapsed_since_commits_secs = elapsed_since_commits,
+                                        remaining_secs = FALLBACK_DELAY_SECS - elapsed_since_commits,
+                                        "Waiting for Stop hook or fallback timeout"
+                                    );
+                                }
                             }
                         }
                     }

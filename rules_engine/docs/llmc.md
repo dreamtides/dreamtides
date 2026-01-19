@@ -243,6 +243,11 @@ launches Claude with configured flags. The daemon relies on Claude Code hooks
 (specifically the SessionStart hook) to detect when Claude is ready, transitioning
 the worker from Offline to Idle.
 
+**Hook Configuration**: The daemon automatically ensures that each worker has the
+required `.claude/settings.json` hook configuration file. If the file is missing
+(e.g., for workers created before hooks were implemented), it is regenerated
+during `llmc up`.
+
 ### Reliable Communication
 
 The most critical component is reliable message delivery. TMUX `send-keys` can
@@ -285,6 +290,11 @@ workers from getting stuck in Working state indefinitely.
 The 5-minute timer starts from when commits were **first detected**, not from
 when the worker started working. This avoids false positives when workers commit
 early and continue working.
+
+**Diagnostic Logging**: During fallback detection, the patrol logs warnings if a
+worker's `.claude/settings.json` hook config is missing, as this is the most
+common cause of hooks not firing. The logs will suggest restarting `llmc up` to
+regenerate the missing config.
 
 For rebase detection, the patrol system periodically checks git status to
 identify conflict states that require human intervention.

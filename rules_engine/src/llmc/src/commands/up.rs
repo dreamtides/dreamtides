@@ -289,6 +289,7 @@ fn start_worker(name: &str, config: &Config, state: &mut State, verbose: bool) -
             }
         }
     }
+    ensure_hook_config_exists(&worktree_path, name, verbose)?;
     let Some(worker_config) = config.get_worker(name) else {
         tracing::warn!(
             "Worker '{}' exists in state but not in config.toml. This indicates a configuration issue.",
@@ -363,6 +364,37 @@ fn start_worker(name: &str, config: &Config, state: &mut State, verbose: bool) -
     }
     Ok(())
 }
+
+fn ensure_hook_config_exists(worktree_path: &Path, worker_name: &str, verbose: bool) -> Result<()> {
+    let settings_path = worktree_path.join(".claude").join("settings.json");
+    if !settings_path.exists() {
+        tracing::warn!(
+            worker = %worker_name,
+            path = %settings_path.display(),
+            "Claude hook settings missing - hooks will not fire without this file. Regenerating..."
+        );
+        println!("  ⚠ Worker '{}' missing Claude hook config, regenerating...", worker_name);
+        add::create_claude_hook_settings(worktree_path, worker_name)?;
+        tracing::info!(
+            worker = %worker_name,
+            "Successfully regenerated Claude hook settings"
+        );
+        if verbose {
+            println!(
+                "    [verbose] Regenerated .claude/settings.json for worker '{}'",
+                worker_name
+            );
+        }
+    } else if verbose {
+        println!(
+            "    [verbose] Worker '{}' has Claude hook config at {}",
+            worker_name,
+            settings_path.display()
+        );
+    }
+    Ok(())
+}
+
 /// Main daemon loop. Implements a NEVER CRASH philosophy - all errors are
 /// logged and the daemon continues running. Only Ctrl-C will stop the daemon.
 fn run_main_loop(
