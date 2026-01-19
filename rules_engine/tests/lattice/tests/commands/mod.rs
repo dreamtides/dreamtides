@@ -14,6 +14,7 @@ mod links_to_tests;
 mod list_tests;
 mod mv_tests;
 mod overview_tests;
+mod path_tests;
 mod prune_tests;
 mod ready_tests;
 mod reopen_tests;
