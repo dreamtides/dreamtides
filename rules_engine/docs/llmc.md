@@ -119,6 +119,11 @@ The `llmc status` command shows the **effective** state:
 This ensures `needs_review` only appears when the worker is truly ready for
 human review.
 
+**Note on Rebasing**: When a worker in `needs_review` is rebased (either
+automatically by patrol or manually), they remain in `needs_review` after the
+rebase completes. Rebasing does not re-trigger the self-review phase since the
+worker already completed self-review before the rebase started.
+
 ## Configuration
 
 Configuration is stored in `~/llmc/config.toml`:

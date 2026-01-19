@@ -405,7 +405,6 @@ impl Patrol {
             let worker = state.get_worker(&worker_name).unwrap();
             let current_status = worker.status;
             let worktree_path = PathBuf::from(&worker.worktree_path);
-            let self_review_enabled = worker.self_review;
             let transition = match current_status {
                 WorkerStatus::Rebasing => {
                     self.detect_rebasing_transition(&worker_name, &worktree_path)?
@@ -424,20 +423,15 @@ impl Patrol {
                 worker::apply_transition(w, transition.clone())?;
                 report.transitions_applied.push((worker_name.clone(), transition.clone()));
                 if matches!(transition, WorkerTransition::ToNeedsReview { .. }) {
-                    if self_review_enabled {
-                        w.pending_self_review = true;
-                        tracing::info!(
-                            "Worker '{}' has self_review enabled, queuing self-review",
-                            worker_name
-                        );
-                    } else {
-                        let now = SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs();
-                        w.on_complete_sent_unix = Some(now);
-                        tracing::info!(
-                            "Worker '{}' does not have self_review enabled, skipping self-review",
-                            worker_name
-                        );
-                    }
+                    // Worker is transitioning from Rebasing -> NeedsReview.
+                    // Self-review (if enabled) was already completed before the rebase started,
+                    // so we mark self-review as complete and don't re-queue it.
+                    let now = SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs();
+                    w.on_complete_sent_unix = Some(now);
+                    tracing::info!(
+                        "Worker '{}' rebase complete, ready for human review",
+                        worker_name
+                    );
                 }
             }
         }
