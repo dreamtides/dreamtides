@@ -252,52 +252,89 @@ impl Patrol {
                 }
             }
             // Fallback: detect Working/Rejected workers with commits where Stop hook may
-            // have failed
+            // have failed. We track when commits were FIRST DETECTED (not when work
+            // started) to avoid false positives when workers commit early and continue.
             if matches!(worker_status, WorkerStatus::Working | WorkerStatus::Rejected) {
                 let now = SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs();
-                let last_activity =
-                    state.get_worker(&worker_name).map(|w| w.last_activity_unix).unwrap_or(now);
-                let elapsed_secs = now.saturating_sub(last_activity);
                 const FALLBACK_DELAY_SECS: u64 = 300;
 
-                if elapsed_secs >= FALLBACK_DELAY_SECS {
-                    match git::has_commits_ahead_of(worktree_path, "origin/master") {
-                        Ok(true) => {
-                            tracing::warn!(
-                                "Worker '{}' in {:?} state has commits ahead of master for {}s (Stop hook may have failed), recovering to needs_review",
-                                worker_name,
-                                worker_status,
-                                elapsed_secs
+                match git::has_commits_ahead_of(worktree_path, "origin/master") {
+                    Ok(true) => {
+                        let commits_first_detected = state
+                            .get_worker(&worker_name)
+                            .and_then(|w| w.commits_first_detected_unix);
+
+                        if commits_first_detected.is_none() {
+                            tracing::info!(
+                                worker = %worker_name,
+                                status = ?worker_status,
+                                "Commits first detected ahead of master, starting fallback timer"
                             );
-                            if git::has_uncommitted_changes(worktree_path)? {
-                                tracing::info!(
-                                    "Worker '{}' has uncommitted changes, amending before recovering to needs_review",
-                                    worker_name
+                            if let Some(w) = state.get_worker_mut(&worker_name) {
+                                w.commits_first_detected_unix = Some(now);
+                            }
+                        } else if let Some(first_detected) = commits_first_detected {
+                            let elapsed_since_commits = now.saturating_sub(first_detected);
+                            if elapsed_since_commits >= FALLBACK_DELAY_SECS {
+                                tracing::warn!(
+                                    worker = %worker_name,
+                                    status = ?worker_status,
+                                    elapsed_since_commits_secs = elapsed_since_commits,
+                                    "Stop hook likely failed - commits detected {}s ago but no Stop hook received, recovering to needs_review",
+                                    elapsed_since_commits
                                 );
-                                git::amend_uncommitted_changes(worktree_path)?;
-                            }
-                            let commit_sha = git::get_head_commit(worktree_path)?;
-                            let transition = WorkerTransition::ToNeedsReview { commit_sha };
-                            if let Some(worker_mut) = state.get_worker_mut(&worker_name) {
-                                let self_review_enabled = worker_mut.self_review;
-                                worker::apply_transition(worker_mut, transition.clone())?;
-                                report.transitions_applied.push((worker_name.clone(), transition));
-                                if self_review_enabled {
-                                    worker_mut.pending_self_review = true;
-                                } else {
-                                    worker_mut.on_complete_sent_unix = Some(now);
+                                if git::has_uncommitted_changes(worktree_path)? {
+                                    tracing::info!(
+                                        worker = %worker_name,
+                                        "Worker has uncommitted changes, amending before recovering to needs_review"
+                                    );
+                                    git::amend_uncommitted_changes(worktree_path)?;
                                 }
+                                let commit_sha = git::get_head_commit(worktree_path)?;
+                                let transition = WorkerTransition::ToNeedsReview {
+                                    commit_sha: commit_sha.clone(),
+                                };
+                                if let Some(worker_mut) = state.get_worker_mut(&worker_name) {
+                                    let self_review_enabled = worker_mut.self_review;
+                                    worker::apply_transition(worker_mut, transition.clone())?;
+                                    worker_mut.commits_first_detected_unix = None;
+                                    report
+                                        .transitions_applied
+                                        .push((worker_name.clone(), transition));
+                                    if self_review_enabled {
+                                        worker_mut.pending_self_review = true;
+                                    } else {
+                                        worker_mut.on_complete_sent_unix = Some(now);
+                                    }
+                                }
+                                continue;
+                            } else {
+                                tracing::debug!(
+                                    worker = %worker_name,
+                                    elapsed_since_commits_secs = elapsed_since_commits,
+                                    remaining_secs = FALLBACK_DELAY_SECS - elapsed_since_commits,
+                                    "Waiting for Stop hook or fallback timeout"
+                                );
                             }
-                            continue;
                         }
-                        Ok(false) => {}
-                        Err(e) => {
-                            tracing::warn!(
-                                "Failed to check commits ahead for working worker '{}': {}",
-                                worker_name,
-                                e
+                    }
+                    Ok(false) => {
+                        if let Some(w) = state.get_worker_mut(&worker_name)
+                            && w.commits_first_detected_unix.is_some()
+                        {
+                            tracing::debug!(
+                                worker = %worker_name,
+                                "No commits ahead of master, clearing commits_first_detected_unix"
                             );
+                            w.commits_first_detected_unix = None;
                         }
+                    }
+                    Err(e) => {
+                        tracing::warn!(
+                            worker = %worker_name,
+                            error = %e,
+                            "Failed to check commits ahead of origin/master"
+                        );
                     }
                 }
             }
@@ -764,6 +801,7 @@ fn handle_stop(
             let transition = WorkerTransition::ToNeedsReview { commit_sha };
             if let Some(w) = state.get_worker_mut(worker_name) {
                 worker::apply_transition(w, transition)?;
+                w.commits_first_detected_unix = None;
                 if self_review_enabled {
                     w.pending_self_review = true;
                     tracing::info!(
@@ -816,6 +854,7 @@ fn handle_stop(
                         e
                     );
                 } else {
+                    w.commits_first_detected_unix = None;
                     let _ = sound::play_bell(config);
                 }
             }
@@ -931,6 +970,7 @@ mod tests {
             on_complete_sent_unix: None,
             self_review: false,
             pending_self_review: false,
+            commits_first_detected_unix: None,
         }
     }
 

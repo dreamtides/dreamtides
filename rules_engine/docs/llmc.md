@@ -224,6 +224,8 @@ TMUX session identifier.
 | `last_crash_unix` | Option<u64> | Unix timestamp of last crash |
 | `on_complete_sent_unix` | Option<u64> | When self-review prompt was sent |
 | `self_review` | bool | If true, enable self-review phase for this task |
+| `pending_self_review` | bool | If true, self-review prompt pending |
+| `commits_first_detected_unix` | Option<u64> | When commits were first detected (for fallback timing) |
 
 ## TMUX Integration
 
@@ -267,6 +269,19 @@ LLMC uses Claude Code hooks for real-time state detection:
 - **Stop**: Fired when Claude completes a task, transitions worker to NeedsReview
 
 This event-driven approach provides sub-second detection latency.
+
+### Fallback Detection
+
+As a safety net for cases where the Stop hook fails to fire or is delayed, the
+patrol system monitors Working/Rejected workers for commits ahead of master.
+When commits are first detected, the patrol records the timestamp in
+`commits_first_detected_unix`. If 5 minutes pass without a Stop hook arriving,
+the patrol recovers the worker to NeedsReview state automatically. This prevents
+workers from getting stuck in Working state indefinitely.
+
+The 5-minute timer starts from when commits were **first detected**, not from
+when the worker started working. This avoids false positives when workers commit
+early and continue working.
 
 For rebase detection, the patrol system periodically checks git status to
 identify conflict states that require human intervention.

@@ -69,6 +69,12 @@ pub struct WorkerRecord {
     /// transitions to NeedsReview.
     #[serde(default)]
     pub pending_self_review: bool,
+    /// Unix timestamp when commits ahead of master were first detected for a
+    /// Working/Rejected worker. Used for fallback recovery timing - we wait
+    /// 5 minutes from when commits were first seen, not from when work started.
+    /// Reset when worker transitions out of Working/Rejected state.
+    #[serde(default)]
+    pub commits_first_detected_unix: Option<u64>,
 }
 /// State file tracking all workers and their status
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -268,6 +274,7 @@ mod tests {
             on_complete_sent_unix: None,
             self_review: false,
             pending_self_review: false,
+            commits_first_detected_unix: None,
         }
     }
     #[test]

@@ -816,6 +816,7 @@ fn run_rebuild() -> Result<()> {
             on_complete_sent_unix: None,
             self_review: false,
             pending_self_review: false,
+            commits_first_detected_unix: None,
         };
         workers.insert(name.clone(), worker);
     }

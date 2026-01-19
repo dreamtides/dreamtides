@@ -15,8 +15,18 @@ const CONNECT_TIMEOUT: Duration = Duration::from_secs(3);
 /// hook fires and triggers the transition from Working -> NeedsReview (or
 /// Reviewing -> NeedsReview for self-review completion).
 pub async fn run_hook_stop(worker: &str) -> Result<()> {
+    let start_time = std::time::Instant::now();
+    let timestamp = get_timestamp();
+    tracing::info!(worker = worker, timestamp = timestamp, "Stop hook invoked");
     let input = match read_stdin_json() {
-        Ok(input) => input,
+        Ok(input) => {
+            tracing::debug!(
+                worker = worker,
+                session_id = ?input.session_id,
+                "Stop hook: parsed stdin JSON successfully"
+            );
+            input
+        }
         Err(e) => {
             tracing::warn!(
                 worker = worker,
@@ -26,12 +36,10 @@ pub async fn run_hook_stop(worker: &str) -> Result<()> {
             ClaudeHookInput::default()
         }
     };
-    let event = HookEvent::Stop {
-        worker: worker.to_string(),
-        session_id: input.session_id.unwrap_or_default(),
-        timestamp: get_timestamp(),
-    };
-    send_event_gracefully(event, "stop").await;
+    let session_id = input.session_id.unwrap_or_default();
+    let event =
+        HookEvent::Stop { worker: worker.to_string(), session_id: session_id.clone(), timestamp };
+    send_event_gracefully(event, "stop", worker, &session_id, start_time).await;
     Ok(())
 }
 
@@ -39,6 +47,9 @@ pub async fn run_hook_stop(worker: &str) -> Result<()> {
 ///
 /// Fired when a worker's Claude session starts up successfully.
 pub async fn run_hook_session_start(worker: &str) -> Result<()> {
+    let start_time = std::time::Instant::now();
+    let timestamp = get_timestamp();
+    tracing::info!(worker = worker, timestamp = timestamp, "SessionStart hook invoked");
     let input = match read_stdin_json() {
         Ok(input) => input,
         Err(e) => {
@@ -50,12 +61,13 @@ pub async fn run_hook_session_start(worker: &str) -> Result<()> {
             ClaudeHookInput::default()
         }
     };
+    let session_id = input.session_id.unwrap_or_default();
     let event = HookEvent::SessionStart {
         worker: worker.to_string(),
-        session_id: input.session_id.unwrap_or_default(),
-        timestamp: get_timestamp(),
+        session_id: session_id.clone(),
+        timestamp,
     };
-    send_event_gracefully(event, "session_start").await;
+    send_event_gracefully(event, "session_start", worker, &session_id, start_time).await;
     Ok(())
 }
 
@@ -63,6 +75,14 @@ pub async fn run_hook_session_start(worker: &str) -> Result<()> {
 ///
 /// Fired when a worker's Claude session ends (crash, shutdown, etc).
 pub async fn run_hook_session_end(worker: &str, cli_reason: &str) -> Result<()> {
+    let start_time = std::time::Instant::now();
+    let timestamp = get_timestamp();
+    tracing::info!(
+        worker = worker,
+        cli_reason = cli_reason,
+        timestamp = timestamp,
+        "SessionEnd hook invoked"
+    );
     let input = match read_stdin_json() {
         Ok(input) => input,
         Err(e) => {
@@ -76,8 +96,8 @@ pub async fn run_hook_session_end(worker: &str, cli_reason: &str) -> Result<()> 
     };
     let reason = input.reason.unwrap_or_else(|| cli_reason.to_string());
     let event =
-        HookEvent::SessionEnd { worker: worker.to_string(), reason, timestamp: get_timestamp() };
-    send_event_gracefully(event, "session_end").await;
+        HookEvent::SessionEnd { worker: worker.to_string(), reason: reason.clone(), timestamp };
+    send_event_gracefully(event, "session_end", worker, &reason, start_time).await;
     Ok(())
 }
 
@@ -87,13 +107,23 @@ pub async fn run_hook_session_end(worker: &str, cli_reason: &str) -> Result<()> 
 /// causes confusing "hook error" messages. Instead, we log issues via tracing
 /// (which goes to the log file) and silently return on expected conditions
 /// like the daemon not running.
-async fn send_event_gracefully(event: HookEvent, hook_name: &str) {
+async fn send_event_gracefully(
+    event: HookEvent,
+    hook_name: &str,
+    worker: &str,
+    context: &str,
+    start_time: std::time::Instant,
+) {
     let socket_path = socket::get_socket_path();
 
     if !socket_path.exists() {
-        tracing::debug!(
+        let elapsed_ms = start_time.elapsed().as_millis();
+        tracing::warn!(
             hook = hook_name,
+            worker = worker,
+            context = context,
             socket_path = %socket_path.display(),
+            elapsed_ms = elapsed_ms,
             "Hook skipped: daemon not running (socket not found)"
         );
         return;
@@ -102,24 +132,46 @@ async fn send_event_gracefully(event: HookEvent, hook_name: &str) {
     let send_future = socket::send_event(&socket_path, event);
     match timeout(CONNECT_TIMEOUT, send_future).await {
         Ok(Ok(response)) => {
+            let elapsed_ms = start_time.elapsed().as_millis();
             if !response.success {
                 let err = response.error.as_deref().unwrap_or("unknown error");
-                tracing::warn!(hook = hook_name, error = err, "Hook event rejected by daemon");
+                tracing::warn!(
+                    hook = hook_name,
+                    worker = worker,
+                    context = context,
+                    error = err,
+                    elapsed_ms = elapsed_ms,
+                    "Hook event rejected by daemon"
+                );
             } else {
-                tracing::debug!(hook = hook_name, "Hook event sent successfully");
+                tracing::info!(
+                    hook = hook_name,
+                    worker = worker,
+                    context = context,
+                    elapsed_ms = elapsed_ms,
+                    "Hook event sent successfully"
+                );
             }
         }
         Ok(Err(e)) => {
+            let elapsed_ms = start_time.elapsed().as_millis();
             tracing::warn!(
                 hook = hook_name,
+                worker = worker,
+                context = context,
                 error = %e,
+                elapsed_ms = elapsed_ms,
                 "Hook failed to send event to daemon"
             );
         }
         Err(_) => {
+            let elapsed_ms = start_time.elapsed().as_millis();
             tracing::warn!(
                 hook = hook_name,
+                worker = worker,
+                context = context,
                 timeout_secs = CONNECT_TIMEOUT.as_secs(),
+                elapsed_ms = elapsed_ms,
                 "Hook timed out connecting to daemon"
             );
         }

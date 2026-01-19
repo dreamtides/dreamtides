@@ -105,9 +105,11 @@ pub fn apply_transition(worker: &mut WorkerRecord, transition: WorkerTransition)
             worker.prompt_cmd = None;
             worker.commit_sha = None;
             worker.self_review = false;
+            worker.commits_first_detected_unix = None;
         }
         WorkerTransition::ToWorking { .. } => {
             worker.on_complete_sent_unix = None;
+            worker.commits_first_detected_unix = None;
         }
         WorkerTransition::ToNeedsReview { .. } => {}
         _ => {}
@@ -261,6 +263,7 @@ mod tests {
             on_complete_sent_unix: None,
             self_review: false,
             pending_self_review: false,
+            commits_first_detected_unix: None,
         };
         apply_transition(&mut worker, WorkerTransition::ToIdle).unwrap();
         assert_eq!(worker.status, WorkerStatus::Idle);
@@ -285,6 +288,7 @@ mod tests {
             on_complete_sent_unix: None,
             self_review: false,
             pending_self_review: false,
+            commits_first_detected_unix: None,
         };
         apply_transition(&mut worker, WorkerTransition::ToWorking {
             prompt: "Test prompt".to_string(),
@@ -312,6 +316,7 @@ mod tests {
             on_complete_sent_unix: None,
             self_review: false,
             pending_self_review: false,
+            commits_first_detected_unix: None,
         };
         apply_transition(&mut worker, WorkerTransition::ToNeedsReview {
             commit_sha: "abc123".to_string(),
@@ -338,6 +343,7 @@ mod tests {
             on_complete_sent_unix: None,
             self_review: false,
             pending_self_review: false,
+            commits_first_detected_unix: None,
         };
         apply_transition(&mut worker, WorkerTransition::ToNeedsReview {
             commit_sha: "abc123".to_string(),
@@ -364,6 +370,7 @@ mod tests {
             on_complete_sent_unix: None,
             self_review: false,
             pending_self_review: false,
+            commits_first_detected_unix: None,
         };
         let old_status = worker.status;
         apply_transition(&mut worker, WorkerTransition::None).unwrap();
@@ -403,6 +410,7 @@ mod tests {
             on_complete_sent_unix: None,
             self_review: false,
             pending_self_review: false,
+            commits_first_detected_unix: None,
         };
         apply_transition(&mut worker, WorkerTransition::ToReviewing).unwrap();
         assert_eq!(worker.status, WorkerStatus::Reviewing);
