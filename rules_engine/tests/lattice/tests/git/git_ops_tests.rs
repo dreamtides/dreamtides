@@ -86,6 +86,41 @@ fn file_status_handles_both_staged_and_modified() {
     );
 }
 
+#[test]
+fn file_status_is_deleted_returns_true_for_worktree_deletion() {
+    let status =
+        FileStatus { path: PathBuf::from("deleted.md"), index_status: ' ', worktree_status: 'D' };
+
+    assert!(status.is_deleted(), "File deleted in worktree should return true for is_deleted");
+}
+
+#[test]
+fn file_status_is_deleted_returns_true_for_staged_deletion() {
+    let status =
+        FileStatus { path: PathBuf::from("deleted.md"), index_status: 'D', worktree_status: ' ' };
+
+    assert!(
+        status.is_deleted(),
+        "File deleted in index (staged) should return true for is_deleted"
+    );
+}
+
+#[test]
+fn file_status_is_deleted_returns_false_for_modified_file() {
+    let status =
+        FileStatus { path: PathBuf::from("modified.md"), index_status: 'M', worktree_status: 'M' };
+
+    assert!(!status.is_deleted(), "Modified file should return false for is_deleted");
+}
+
+#[test]
+fn file_status_is_deleted_returns_false_for_untracked_file() {
+    let status =
+        FileStatus { path: PathBuf::from("untracked.md"), index_status: '?', worktree_status: '?' };
+
+    assert!(!status.is_deleted(), "Untracked file should return false for is_deleted");
+}
+
 // ============================================================================
 // FileChange tests
 // ============================================================================

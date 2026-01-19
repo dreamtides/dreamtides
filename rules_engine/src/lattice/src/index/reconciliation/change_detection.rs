@@ -107,7 +107,7 @@ pub fn detect_changes(
     {
         trace!("HEAD unchanged, checking for uncommitted changes");
         let uncommitted = get_uncommitted_markdown_files(git)?;
-        if uncommitted.is_empty() {
+        if uncommitted.modified.is_empty() && uncommitted.deleted.is_empty() {
             debug!("Fast path: no changes detected");
             return Ok(ChangeInfo {
                 modified_files: Vec::new(),
@@ -117,18 +117,22 @@ pub fn detect_changes(
                 last_indexed_commit: last_indexed_commit.clone(),
             });
         }
-        debug!(uncommitted_count = uncommitted.len(), "Found uncommitted changes only");
+        debug!(
+            uncommitted_modified = uncommitted.modified.len(),
+            uncommitted_deleted = uncommitted.deleted.len(),
+            "Found uncommitted changes only"
+        );
         return Ok(ChangeInfo {
             modified_files: Vec::new(),
-            deleted_files: Vec::new(),
-            uncommitted_files: uncommitted,
+            deleted_files: uncommitted.deleted,
+            uncommitted_files: uncommitted.modified,
             current_head: current_head.clone(),
             last_indexed_commit: last_indexed_commit.clone(),
         });
     }
 
     // Get modified/deleted files since last indexed commit
-    let (modified_files, deleted_files) =
+    let (modified_files, mut deleted_files) =
         if let (Some(last), Some(current)) = (&last_indexed_commit, &current_head) {
             get_changed_files(git, last, current, repo_root)?
         } else {
@@ -137,19 +141,20 @@ pub fn detect_changes(
             (Vec::new(), Vec::new())
         };
 
-    let uncommitted_files = get_uncommitted_markdown_files(git)?;
+    let uncommitted = get_uncommitted_markdown_files(git)?;
+    deleted_files.extend(uncommitted.deleted);
 
     debug!(
         modified_count = modified_files.len(),
         deleted_count = deleted_files.len(),
-        uncommitted_count = uncommitted_files.len(),
+        uncommitted_count = uncommitted.modified.len(),
         "Change detection complete"
     );
 
     Ok(ChangeInfo {
         modified_files,
         deleted_files,
-        uncommitted_files,
+        uncommitted_files: uncommitted.modified,
         current_head,
         last_indexed_commit,
     })
@@ -256,10 +261,30 @@ impl ChangeInfo {
     }
 }
 
+/// Result of detecting uncommitted markdown files.
+struct UncommittedChanges {
+    /// Files that have been modified (staged or unstaged) but not deleted.
+    modified: Vec<PathBuf>,
+    /// Files that have been deleted (staged or unstaged).
+    deleted: Vec<PathBuf>,
+}
+
 /// Internal implementation of uncommitted file detection.
-fn get_uncommitted_markdown_files(git: &dyn GitOps) -> Result<Vec<PathBuf>, LatticeError> {
+fn get_uncommitted_markdown_files(git: &dyn GitOps) -> Result<UncommittedChanges, LatticeError> {
     let statuses = git.status("*.md")?;
-    let paths: Vec<PathBuf> = statuses.into_iter().map(|s| s.path).collect();
-    trace!(count = paths.len(), "Found uncommitted markdown files");
-    Ok(paths)
+    let mut modified = Vec::new();
+    let mut deleted = Vec::new();
+    for status in statuses {
+        if status.is_deleted() {
+            deleted.push(status.path);
+        } else {
+            modified.push(status.path);
+        }
+    }
+    trace!(
+        modified_count = modified.len(),
+        deleted_count = deleted.len(),
+        "Found uncommitted markdown files"
+    );
+    Ok(UncommittedChanges { modified, deleted })
 }

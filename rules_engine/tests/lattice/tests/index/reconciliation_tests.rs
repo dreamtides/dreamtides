@@ -1200,3 +1200,52 @@ fn full_rebuild_populates_directory_roots() {
         lattice::index::directory_roots::get_root_id(&conn, "docs").expect("should succeed");
     assert_eq!(docs_root, None, "docs should NOT be in directory_roots (readme.md is not root)");
 }
+
+// ============================================================================
+// Regression tests for deleted file handling
+// ============================================================================
+
+#[test]
+fn reconcile_removes_document_when_file_is_deleted_but_uncommitted() {
+    let temp_dir = TempDir::new().expect("failed to create temp dir");
+    let lattice_dir = temp_dir.path().join(".lattice");
+    std::fs::create_dir_all(&lattice_dir).expect("failed to create .lattice dir");
+
+    let conn = connection_pool::open_connection(temp_dir.path())
+        .expect("should open connection successfully");
+    schema_definition::create_schema(&conn).expect("should create schema");
+
+    create_lattice_document(temp_dir.path(), "to-delete.md", "LDELUN", "delete-uncommitted");
+
+    let git = FakeGit::with_ls_files(vec![PathBuf::from("to-delete.md")]);
+    sync_strategies::full_rebuild(temp_dir.path(), &git, &conn)
+        .expect("initial full_rebuild should succeed");
+
+    let doc = lattice::index::document_queries::lookup_by_id(&conn, "LDELUN")
+        .expect("lookup should succeed");
+    assert!(doc.is_some(), "Document should be in index initially");
+
+    conn.execute("UPDATE index_metadata SET last_commit = 'abc123def456' WHERE id = 1", [])
+        .expect("should update last_commit");
+
+    std::fs::remove_file(temp_dir.path().join("to-delete.md"))
+        .expect("should delete document file");
+
+    let git2 = FakeGit::with_status(vec![FileStatus {
+        path: PathBuf::from("to-delete.md"),
+        index_status: ' ',
+        worktree_status: 'D',
+    }]);
+
+    let result = reconciliation_coordinator::reconcile(temp_dir.path(), &git2, &conn)
+        .expect("reconcile should succeed");
+
+    assert!(
+        matches!(result, ReconciliationResult::Incremental { files_removed: 1, .. }),
+        "Should have removed 1 file, got: {result:?}"
+    );
+
+    let doc = lattice::index::document_queries::lookup_by_id(&conn, "LDELUN")
+        .expect("lookup should succeed");
+    assert!(doc.is_none(), "Deleted document should be removed from index");
+}

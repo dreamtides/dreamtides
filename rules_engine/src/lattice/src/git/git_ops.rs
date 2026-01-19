@@ -131,4 +131,9 @@ impl FileStatus {
     pub fn is_untracked(&self) -> bool {
         self.index_status == '?' && self.worktree_status == '?'
     }
+
+    /// Returns true if the file has been deleted (staged or unstaged).
+    pub fn is_deleted(&self) -> bool {
+        self.index_status == 'D' || self.worktree_status == 'D'
+    }
 }
