@@ -74,54 +74,64 @@ interface UniverSpreadsheetProps {
   width?: string | number;
   height?: string | number;
   data?: TomlTableData;
+  onChange?: (data: TomlTableData) => void;
 }
 
 export const UniverSpreadsheet = forwardRef<
   UniverSpreadsheetHandle,
   UniverSpreadsheetProps
->(function UniverSpreadsheet({ width = "100%", height = "600px", data }, ref) {
+>(function UniverSpreadsheet(
+  { width = "100%", height = "600px", data, onChange },
+  ref
+) {
   const containerRef = useRef<HTMLDivElement>(null);
   const univerRef = useRef<Univer | null>(null);
   const univerAPIRef = useRef<FUniver | null>(null);
   const headersRef = useRef<string[]>([]);
+  const onChangeRef = useRef(onChange);
+  const isLoadingRef = useRef(false);
 
-  useImperativeHandle(ref, () => ({
-    getData: () => {
-      const sheet = univerAPIRef.current?.getActiveWorkbook()?.getActiveSheet();
-      if (!sheet || headersRef.current.length === 0) return null;
+  onChangeRef.current = onChange;
 
-      const headers = headersRef.current;
-      const rows: (string | number | boolean | null)[][] = [];
-      let rowIndex = 2;
-      let hasData = true;
+  const extractData = (): TomlTableData | null => {
+    const sheet = univerAPIRef.current?.getActiveWorkbook()?.getActiveSheet();
+    if (!sheet || headersRef.current.length === 0) return null;
 
-      while (hasData) {
-        const row: (string | number | boolean | null)[] = [];
-        let rowHasContent = false;
+    const headers = headersRef.current;
+    const rows: (string | number | boolean | null)[][] = [];
+    let rowIndex = 2;
+    let hasData = true;
 
-        for (let colIndex = 0; colIndex < headers.length; colIndex++) {
-          const colLetter = getColumnLetter(colIndex);
-          const cellAddress = `${colLetter}${rowIndex}`;
-          const cellValue = sheet.getRange(cellAddress)?.getValue();
+    while (hasData) {
+      const row: (string | number | boolean | null)[] = [];
+      let rowHasContent = false;
 
-          if (cellValue !== undefined && cellValue !== null && cellValue !== "") {
-            rowHasContent = true;
-            row.push(cellValue as string | number | boolean);
-          } else {
-            row.push(null);
-          }
-        }
+      for (let colIndex = 0; colIndex < headers.length; colIndex++) {
+        const colLetter = getColumnLetter(colIndex);
+        const cellAddress = `${colLetter}${rowIndex}`;
+        const cellValue = sheet.getRange(cellAddress)?.getValue();
 
-        if (rowHasContent) {
-          rows.push(row);
-          rowIndex++;
+        if (cellValue !== undefined && cellValue !== null && cellValue !== "") {
+          rowHasContent = true;
+          row.push(cellValue as string | number | boolean);
         } else {
-          hasData = false;
+          row.push(null);
         }
       }
 
-      return { headers, rows };
-    },
+      if (rowHasContent) {
+        rows.push(row);
+        rowIndex++;
+      } else {
+        hasData = false;
+      }
+    }
+
+    return { headers, rows };
+  };
+
+  useImperativeHandle(ref, () => ({
+    getData: extractData,
   }));
 
   useEffect(() => {
@@ -173,33 +183,51 @@ export const UniverSpreadsheet = forwardRef<
 
     const univerAPI = FUniver.newAPI(univer);
     univerAPIRef.current = univerAPI;
-    const sheet = univerAPI.getActiveWorkbook()?.getActiveSheet();
 
-    if (sheet && data) {
-      headersRef.current = data.headers;
-
-      data.headers.forEach((header, colIndex) => {
-        const colLetter = getColumnLetter(colIndex);
-        const range = sheet.getRange(`${colLetter}1`);
-        range?.setValue(header);
-        range?.setFontWeight("bold");
-      });
-
-      data.rows.forEach((row, rowIndex) => {
-        row.forEach((cellValue, colIndex) => {
-          const colLetter = getColumnLetter(colIndex);
-          const cellAddress = `${colLetter}${rowIndex + 2}`;
-          const displayValue = cellValue === null ? "" : cellValue;
-          sheet.getRange(cellAddress)?.setValue(displayValue);
-        });
-      });
-    }
+    univerAPI.onCommandExecuted((command) => {
+      if (isLoadingRef.current) return;
+      if (
+        command.id === "sheet.mutation.set-range-values" ||
+        command.id === "sheet.command.set-range-values"
+      ) {
+        const newData = extractData();
+        if (newData && onChangeRef.current) {
+          onChangeRef.current(newData);
+        }
+      }
+    });
 
     return () => {
       univer.dispose();
       univerRef.current = null;
       univerAPIRef.current = null;
     };
+  }, []);
+
+  useEffect(() => {
+    const sheet = univerAPIRef.current?.getActiveWorkbook()?.getActiveSheet();
+    if (!sheet || !data) return;
+
+    isLoadingRef.current = true;
+    headersRef.current = data.headers;
+
+    data.headers.forEach((header, colIndex) => {
+      const colLetter = getColumnLetter(colIndex);
+      const range = sheet.getRange(`${colLetter}1`);
+      range?.setValue(header);
+      range?.setFontWeight("bold");
+    });
+
+    data.rows.forEach((row, rowIndex) => {
+      row.forEach((cellValue, colIndex) => {
+        const colLetter = getColumnLetter(colIndex);
+        const cellAddress = `${colLetter}${rowIndex + 2}`;
+        const displayValue = cellValue === null ? "" : cellValue;
+        sheet.getRange(cellAddress)?.setValue(displayValue);
+      });
+    });
+
+    isLoadingRef.current = false;
   }, [data]);
 
   return (

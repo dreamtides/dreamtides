@@ -113,15 +113,10 @@ fn json_to_toml_edit_value(value: &serde_json::Value) -> Option<toml_edit::Item>
     match value {
         serde_json::Value::Null => None,
         serde_json::Value::Bool(b) => Some(toml_edit::value(*b)),
-        serde_json::Value::Number(n) => {
-            if let Some(i) = n.as_i64() {
-                Some(toml_edit::value(i))
-            } else if let Some(f) = n.as_f64() {
-                Some(toml_edit::value(f))
-            } else {
-                None
-            }
-        }
+        serde_json::Value::Number(n) => n
+            .as_i64()
+            .map(toml_edit::value)
+            .or_else(|| n.as_f64().map(toml_edit::value)),
         serde_json::Value::String(s) => Some(toml_edit::value(s.as_str())),
         serde_json::Value::Array(_) | serde_json::Value::Object(_) => None,
     }

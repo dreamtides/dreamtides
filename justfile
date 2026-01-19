@@ -6,7 +6,7 @@ code-review: check-format build workspace-lints clippy style-validator test tabu
 code-review-rsync: rsync-for-review
     cd ~/dreamtides_tests && just code-review || (osascript -e 'display dialog "Review failed" with icon stop'; exit 1)
 
-review: check-snapshots check-format build clippy style-validator tabula-validate test 
+review: check-snapshots check-format build clippy style-validator tabula-validate test tv-check tv-clippy
 
 check:
     #!/usr/bin/env bash
@@ -542,3 +542,23 @@ prune-remote-branches:
 
 tv-dev:
     cd ./rules_engine/src/tv && pnpm tauri dev
+
+tv-check:
+    #!/usr/bin/env bash
+    output=$(cargo check --manifest-path rules_engine/src/tv/src-tauri/Cargo.toml 2>&1)
+    if [ $? -eq 0 ]; then
+        echo "TV check passed"
+    else
+        echo "$output"
+        exit 1
+    fi
+
+tv-clippy:
+    #!/usr/bin/env bash
+    output=$(cargo clippy --manifest-path rules_engine/src/tv/src-tauri/Cargo.toml -- -D warnings -D clippy::all 2>&1)
+    if [ $? -eq 0 ]; then
+        echo "TV clippy passed"
+    else
+        echo "$output"
+        exit 1
+    fi

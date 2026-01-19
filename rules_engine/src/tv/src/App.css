@@ -37,31 +37,29 @@ h1 {
   font-size: 1.5em;
 }
 
-.toolbar {
+.status-bar {
+  height: 20px;
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 8px 0;
-  margin-bottom: 8px;
+  padding: 0 4px;
+  font-size: 12px;
 }
 
-.save-button {
-  padding: 8px 16px;
-  background-color: #4a90d9;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 14px;
+.status {
+  padding: 2px 8px;
+  border-radius: 3px;
 }
 
-.save-button:hover {
-  background-color: #357abd;
-}
-
-.save-status {
-  font-size: 14px;
+.status.saving {
   color: #666;
+}
+
+.status.saved {
+  color: #2e7d32;
+}
+
+.status.error {
+  color: #d93025;
 }
 
 .error {
@@ -73,5 +71,13 @@ h1 {
   :root {
     color: #f6f6f6;
     background-color: #2f2f2f;
+  }
+
+  .status.saving {
+    color: #aaa;
+  }
+
+  .status.saved {
+    color: #81c784;
   }
 }
