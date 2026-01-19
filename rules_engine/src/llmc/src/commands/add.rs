@@ -205,7 +205,7 @@ pub fn is_daemon_running() -> bool {
         .unwrap_or(false)
 }
 
-fn create_claude_hook_settings(worktree_path: &Path, worker_name: &str) -> Result<()> {
+pub fn create_claude_hook_settings(worktree_path: &Path, worker_name: &str) -> Result<()> {
     let claude_dir = worktree_path.join(".claude");
     let settings_path = claude_dir.join("settings.json");
     fs::create_dir_all(&claude_dir).context("Failed to create .claude directory")?;

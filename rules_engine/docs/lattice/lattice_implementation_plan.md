@@ -1402,7 +1402,7 @@ Structure](appendix_cli_structure.md#shell-completions)
 
 ---
 
-## Feature: Testing Infrastructure
+## Feature: Testing Infrastructure [ONGOING]
 
 **Goal:** Test utilities, FakeGit, assertions.
 

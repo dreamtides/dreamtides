@@ -101,6 +101,7 @@ fn reset_worker(state: &mut State, llmc_root: &Path, worker: &str, yes: bool) ->
     println!("  ✓ Created worktree: {}", worktree_path.display());
     add::copy_tabula_to_worktree(llmc_root, &worktree_path)?;
     add::create_serena_project(&worktree_path, worker)?;
+    add::create_claude_hook_settings(&worktree_path, worker)?;
     let worker_mut = state.get_worker_mut(worker).unwrap();
     worker_mut.status = WorkerStatus::Idle;
     worker_mut.current_prompt.clear();
