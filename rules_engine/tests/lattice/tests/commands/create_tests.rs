@@ -2,28 +2,21 @@
 
 use std::fs;
 
-use lattice::cli::command_dispatch::{CommandContext, create_context};
+use lattice::cli::command_dispatch::CommandContext;
 use lattice::cli::commands::create_command;
 use lattice::cli::global_options::GlobalOptions;
 use lattice::cli::task_args::CreateArgs;
 use lattice::document::frontmatter_schema::TaskType;
 use lattice::error::error_types::LatticeError;
 use lattice::git::client_config::FakeClientIdStore;
-use lattice::index::{document_queries, schema_definition};
+use lattice::index::document_queries;
+use lattice::test::test_environment::TestEnv;
 
-fn create_test_repo() -> (tempfile::TempDir, CommandContext) {
-    let temp_dir = tempfile::tempdir().expect("Failed to create temp dir");
-    let repo_root = temp_dir.path();
-
-    fs::create_dir(repo_root.join(".git")).expect("Failed to create .git");
-
-    let global = GlobalOptions::default();
-    let mut context = create_context(repo_root, &global).expect("Failed to create context");
+fn create_context_from_env(env: &TestEnv, global: &GlobalOptions) -> CommandContext {
+    let mut context = lattice::cli::command_dispatch::create_context(env.repo_root(), global)
+        .expect("Create context");
     context.client_id_store = Box::new(FakeClientIdStore::new("WQN"));
-
-    schema_definition::create_schema(&context.conn).expect("Failed to create schema");
-
-    (temp_dir, context)
+    context
 }
 
 fn create_args(parent: &str, description: &str) -> CreateArgs {
@@ -56,50 +49,50 @@ fn create_task_args(parent: &str, description: &str, task_type: TaskType) -> Cre
 
 #[test]
 fn create_generates_filename_from_description() {
-    let (temp_dir, context) = create_test_repo();
-
-    fs::create_dir_all(temp_dir.path().join("api/docs")).expect("Create dirs");
+    let env = TestEnv::new();
+    env.create_dir("api/docs");
 
     let args = create_args("api/", "OAuth implementation design");
+    let (_temp, context) = env.into_parts();
     let result = create_command::execute(context, args);
 
     assert!(result.is_ok(), "Create should succeed: {:?}", result);
 
-    let doc_path = temp_dir.path().join("api/docs/oauth_implementation_design.md");
+    let doc_path = _temp.path().join("api/docs/oauth_implementation_design.md");
     assert!(doc_path.exists(), "Document should be created at generated path");
 }
 
 #[test]
 fn create_skips_articles_in_filename() {
-    let (temp_dir, context) = create_test_repo();
-
-    fs::create_dir_all(temp_dir.path().join("api/docs")).expect("Create dirs");
+    let env = TestEnv::new();
+    env.create_dir("api/docs");
 
     let args = create_args("api/", "Fix the login bug in the auth system");
+    let (_temp, context) = env.into_parts();
     let result = create_command::execute(context, args);
 
     assert!(result.is_ok(), "Create should succeed: {:?}", result);
 
-    let doc_path = temp_dir.path().join("api/docs/fix_login_bug_auth_system.md");
+    let doc_path = _temp.path().join("api/docs/fix_login_bug_auth_system.md");
     assert!(doc_path.exists(), "Document should skip articles in filename: {}", doc_path.display());
 }
 
 #[test]
 fn create_truncates_long_filenames() {
-    let (temp_dir, context) = create_test_repo();
-
-    fs::create_dir_all(temp_dir.path().join("api/docs")).expect("Create dirs");
+    let env = TestEnv::new();
+    env.create_dir("api/docs");
 
     let args = create_args(
         "api/",
         "This is a very long description that should be truncated to approximately forty characters",
     );
+    let (_temp, context) = env.into_parts();
     let result = create_command::execute(context, args);
 
     assert!(result.is_ok(), "Create should succeed: {:?}", result);
 
     let entries: Vec<_> =
-        fs::read_dir(temp_dir.path().join("api/docs")).expect("Read dir").flatten().collect();
+        fs::read_dir(_temp.path().join("api/docs")).expect("Read dir").flatten().collect();
     assert_eq!(entries.len(), 1, "Should have exactly one document");
 
     let filename = entries[0].file_name().to_string_lossy().to_string();
@@ -113,24 +106,21 @@ fn create_truncates_long_filenames() {
 
 #[test]
 fn create_handles_collision_with_numeric_suffix() {
-    let (temp_dir, context) = create_test_repo();
-
-    fs::create_dir_all(temp_dir.path().join("api/docs")).expect("Create dirs");
+    let env = TestEnv::new();
+    env.create_dir("api/docs");
 
     let args1 = create_args("api/", "Test document");
-    let result1 = create_command::execute(context, args1);
+    let context1 = create_context_from_env(&env, &GlobalOptions::default());
+    let result1 = create_command::execute(context1, args1);
     assert!(result1.is_ok(), "First create should succeed: {:?}", result1);
 
-    let global = GlobalOptions::default();
-    let mut context2 = create_context(temp_dir.path(), &global).expect("Create context");
-    context2.client_id_store = Box::new(FakeClientIdStore::new("WQN"));
-
     let args2 = create_args("api/", "Test document");
+    let context2 = create_context_from_env(&env, &GlobalOptions::default());
     let result2 = create_command::execute(context2, args2);
     assert!(result2.is_ok(), "Second create should succeed: {:?}", result2);
 
-    let first_path = temp_dir.path().join("api/docs/test_document.md");
-    let second_path = temp_dir.path().join("api/docs/test_document_2.md");
+    let first_path = env.repo_root().join("api/docs/test_document.md");
+    let second_path = env.repo_root().join("api/docs/test_document_2.md");
 
     assert!(first_path.exists(), "First document should exist");
     assert!(second_path.exists(), "Second document should exist with numeric suffix");
@@ -142,16 +132,16 @@ fn create_handles_collision_with_numeric_suffix() {
 
 #[test]
 fn create_places_task_in_tasks_directory() {
-    let (temp_dir, context) = create_test_repo();
-
-    fs::create_dir_all(temp_dir.path().join("api")).expect("Create api dir");
+    let env = TestEnv::new();
+    env.create_dir("api");
 
     let args = create_task_args("api/", "Fix login bug", TaskType::Bug);
+    let (_temp, context) = env.into_parts();
     let result = create_command::execute(context, args);
 
     assert!(result.is_ok(), "Create should succeed: {:?}", result);
 
-    let doc_path = temp_dir.path().join("api/tasks/fix_login_bug.md");
+    let doc_path = _temp.path().join("api/tasks/fix_login_bug.md");
     assert!(doc_path.exists(), "Task should be placed in tasks/ directory");
 
     let content = fs::read_to_string(&doc_path).expect("Read doc");
@@ -160,16 +150,16 @@ fn create_places_task_in_tasks_directory() {
 
 #[test]
 fn create_places_knowledge_base_in_docs_directory() {
-    let (temp_dir, context) = create_test_repo();
-
-    fs::create_dir_all(temp_dir.path().join("api")).expect("Create api dir");
+    let env = TestEnv::new();
+    env.create_dir("api");
 
     let args = create_args("api/", "API design document");
+    let (_temp, context) = env.into_parts();
     let result = create_command::execute(context, args);
 
     assert!(result.is_ok(), "Create should succeed: {:?}", result);
 
-    let doc_path = temp_dir.path().join("api/docs/api_design_document.md");
+    let doc_path = _temp.path().join("api/docs/api_design_document.md");
     assert!(doc_path.exists(), "KB document should be placed in docs/ directory");
 
     let content = fs::read_to_string(&doc_path).expect("Read doc");
@@ -178,9 +168,8 @@ fn create_places_knowledge_base_in_docs_directory() {
 
 #[test]
 fn create_with_explicit_path_uses_exact_path() {
-    let (temp_dir, context) = create_test_repo();
-
-    fs::create_dir_all(temp_dir.path().join("custom")).expect("Create custom dir");
+    let env = TestEnv::new();
+    env.create_dir("custom");
 
     let args = CreateArgs {
         parent: "custom/my_custom_doc.md".to_string(),
@@ -191,11 +180,12 @@ fn create_with_explicit_path_uses_exact_path() {
         labels: Vec::new(),
         deps: None,
     };
+    let (_temp, context) = env.into_parts();
     let result = create_command::execute(context, args);
 
     assert!(result.is_ok(), "Create should succeed: {:?}", result);
 
-    let doc_path = temp_dir.path().join("custom/my_custom_doc.md");
+    let doc_path = _temp.path().join("custom/my_custom_doc.md");
     assert!(doc_path.exists(), "Document should be at exact specified path");
 }
 
@@ -205,16 +195,16 @@ fn create_with_explicit_path_uses_exact_path() {
 
 #[test]
 fn create_generates_valid_lattice_id() {
-    let (temp_dir, context) = create_test_repo();
-
-    fs::create_dir_all(temp_dir.path().join("api/docs")).expect("Create dirs");
+    let env = TestEnv::new();
+    env.create_dir("api/docs");
 
     let args = create_args("api/", "Test document");
+    let (_temp, context) = env.into_parts();
     let result = create_command::execute(context, args);
 
     assert!(result.is_ok(), "Create should succeed: {:?}", result);
 
-    let doc_path = temp_dir.path().join("api/docs/test_document.md");
+    let doc_path = _temp.path().join("api/docs/test_document.md");
     let content = fs::read_to_string(&doc_path).expect("Read doc");
 
     assert!(content.contains("lattice-id: L"), "Should contain a Lattice ID starting with L");
@@ -222,16 +212,16 @@ fn create_generates_valid_lattice_id() {
 
 #[test]
 fn create_derives_name_from_filename() {
-    let (temp_dir, context) = create_test_repo();
-
-    fs::create_dir_all(temp_dir.path().join("api/docs")).expect("Create dirs");
+    let env = TestEnv::new();
+    env.create_dir("api/docs");
 
     let args = create_args("api/", "Fix login bug");
+    let (_temp, context) = env.into_parts();
     let result = create_command::execute(context, args);
 
     assert!(result.is_ok(), "Create should succeed: {:?}", result);
 
-    let doc_path = temp_dir.path().join("api/docs/fix_login_bug.md");
+    let doc_path = _temp.path().join("api/docs/fix_login_bug.md");
     let content = fs::read_to_string(&doc_path).expect("Read doc");
 
     assert!(
@@ -242,16 +232,16 @@ fn create_derives_name_from_filename() {
 
 #[test]
 fn create_sets_description_from_argument() {
-    let (temp_dir, context) = create_test_repo();
-
-    fs::create_dir_all(temp_dir.path().join("api/docs")).expect("Create dirs");
+    let env = TestEnv::new();
+    env.create_dir("api/docs");
 
     let args = create_args("api/", "My wonderful description");
+    let (_temp, context) = env.into_parts();
     let result = create_command::execute(context, args);
 
     assert!(result.is_ok(), "Create should succeed: {:?}", result);
 
-    let doc_path = temp_dir.path().join("api/docs/my_wonderful_description.md");
+    let doc_path = _temp.path().join("api/docs/my_wonderful_description.md");
     let content = fs::read_to_string(&doc_path).expect("Read doc");
 
     assert!(
@@ -262,16 +252,16 @@ fn create_sets_description_from_argument() {
 
 #[test]
 fn create_task_sets_default_priority() {
-    let (temp_dir, context) = create_test_repo();
-
-    fs::create_dir_all(temp_dir.path().join("api")).expect("Create api dir");
+    let env = TestEnv::new();
+    env.create_dir("api");
 
     let args = create_task_args("api/", "Test task", TaskType::Task);
+    let (_temp, context) = env.into_parts();
     let result = create_command::execute(context, args);
 
     assert!(result.is_ok(), "Create should succeed: {:?}", result);
 
-    let doc_path = temp_dir.path().join("api/tasks/test_task.md");
+    let doc_path = _temp.path().join("api/tasks/test_task.md");
     let content = fs::read_to_string(&doc_path).expect("Read doc");
 
     assert!(content.contains("priority: 2"), "Default priority should be 2");
@@ -279,9 +269,8 @@ fn create_task_sets_default_priority() {
 
 #[test]
 fn create_task_with_custom_priority() {
-    let (temp_dir, context) = create_test_repo();
-
-    fs::create_dir_all(temp_dir.path().join("api")).expect("Create api dir");
+    let env = TestEnv::new();
+    env.create_dir("api");
 
     let args = CreateArgs {
         parent: "api/".to_string(),
@@ -292,11 +281,12 @@ fn create_task_with_custom_priority() {
         labels: Vec::new(),
         deps: None,
     };
+    let (_temp, context) = env.into_parts();
     let result = create_command::execute(context, args);
 
     assert!(result.is_ok(), "Create should succeed: {:?}", result);
 
-    let doc_path = temp_dir.path().join("api/tasks/urgent_bug.md");
+    let doc_path = _temp.path().join("api/tasks/urgent_bug.md");
     let content = fs::read_to_string(&doc_path).expect("Read doc");
 
     assert!(content.contains("priority: 0"), "Priority should be 0");
@@ -304,16 +294,16 @@ fn create_task_with_custom_priority() {
 
 #[test]
 fn create_sets_timestamps() {
-    let (temp_dir, context) = create_test_repo();
-
-    fs::create_dir_all(temp_dir.path().join("api/docs")).expect("Create dirs");
+    let env = TestEnv::new();
+    env.create_dir("api/docs");
 
     let args = create_args("api/", "Test document");
+    let (_temp, context) = env.into_parts();
     let result = create_command::execute(context, args);
 
     assert!(result.is_ok(), "Create should succeed: {:?}", result);
 
-    let doc_path = temp_dir.path().join("api/docs/test_document.md");
+    let doc_path = _temp.path().join("api/docs/test_document.md");
     let content = fs::read_to_string(&doc_path).expect("Read doc");
 
     assert!(content.contains("created-at:"), "Should have created-at timestamp");
@@ -326,9 +316,8 @@ fn create_sets_timestamps() {
 
 #[test]
 fn create_with_labels() {
-    let (temp_dir, context) = create_test_repo();
-
-    fs::create_dir_all(temp_dir.path().join("api")).expect("Create api dir");
+    let env = TestEnv::new();
+    env.create_dir("api");
 
     let args = CreateArgs {
         parent: "api/".to_string(),
@@ -339,11 +328,12 @@ fn create_with_labels() {
         labels: vec!["security".to_string(), "urgent".to_string()],
         deps: None,
     };
+    let (_temp, context) = env.into_parts();
     let result = create_command::execute(context, args);
 
     assert!(result.is_ok(), "Create should succeed: {:?}", result);
 
-    let doc_path = temp_dir.path().join("api/tasks/labeled_task.md");
+    let doc_path = _temp.path().join("api/tasks/labeled_task.md");
     let content = fs::read_to_string(&doc_path).expect("Read doc");
 
     assert!(content.contains("labels:"), "Should have labels section");
@@ -357,9 +347,8 @@ fn create_with_labels() {
 
 #[test]
 fn create_with_discovered_from() {
-    let (temp_dir, context) = create_test_repo();
-
-    fs::create_dir_all(temp_dir.path().join("api")).expect("Create api dir");
+    let env = TestEnv::new();
+    env.create_dir("api");
 
     let args = CreateArgs {
         parent: "api/".to_string(),
@@ -370,11 +359,12 @@ fn create_with_discovered_from() {
         labels: Vec::new(),
         deps: Some("discovered-from:LPARENT".to_string()),
     };
+    let (_temp, context) = env.into_parts();
     let result = create_command::execute(context, args);
 
     assert!(result.is_ok(), "Create should succeed: {:?}", result);
 
-    let doc_path = temp_dir.path().join("api/tasks/discovered_task.md");
+    let doc_path = _temp.path().join("api/tasks/discovered_task.md");
     let content = fs::read_to_string(&doc_path).expect("Read doc");
 
     assert!(content.contains("discovered-from:"), "Should have discovered-from field");
@@ -383,9 +373,8 @@ fn create_with_discovered_from() {
 
 #[test]
 fn create_with_invalid_deps_format_fails() {
-    let (temp_dir, context) = create_test_repo();
-
-    fs::create_dir_all(temp_dir.path().join("api")).expect("Create api dir");
+    let env = TestEnv::new();
+    env.create_dir("api");
 
     let args = CreateArgs {
         parent: "api/".to_string(),
@@ -396,6 +385,7 @@ fn create_with_invalid_deps_format_fails() {
         labels: Vec::new(),
         deps: Some("invalid-format:LTEST".to_string()),
     };
+    let (_temp, context) = env.into_parts();
     let result = create_command::execute(context, args);
 
     assert!(result.is_err(), "Should fail with invalid deps format");
@@ -417,40 +407,32 @@ fn create_with_invalid_deps_format_fails() {
 
 #[test]
 fn create_adds_document_to_index() {
-    let (temp_dir, context) = create_test_repo();
-
-    fs::create_dir_all(temp_dir.path().join("api/docs")).expect("Create dirs");
+    let env = TestEnv::new();
+    env.create_dir("api/docs");
 
     let args = create_args("api/", "Indexed document");
+    let context = create_context_from_env(&env, &GlobalOptions::default());
     let result = create_command::execute(context, args);
 
     assert!(result.is_ok(), "Create should succeed: {:?}", result);
 
-    let global = GlobalOptions::default();
-    let mut context2 = create_context(temp_dir.path(), &global).expect("Create context");
-    context2.client_id_store = Box::new(FakeClientIdStore::new("WQN"));
-
-    let exists = document_queries::exists_at_path(&context2.conn, "api/docs/indexed_document.md")
+    let exists = document_queries::exists_at_path(env.conn(), "api/docs/indexed_document.md")
         .expect("Query should succeed");
     assert!(exists, "Document should be in index");
 }
 
 #[test]
 fn create_indexes_task_type_correctly() {
-    let (temp_dir, context) = create_test_repo();
-
-    fs::create_dir_all(temp_dir.path().join("api")).expect("Create api dir");
+    let env = TestEnv::new();
+    env.create_dir("api");
 
     let args = create_task_args("api/", "Bug fix task", TaskType::Bug);
+    let context = create_context_from_env(&env, &GlobalOptions::default());
     let result = create_command::execute(context, args);
 
     assert!(result.is_ok(), "Create should succeed: {:?}", result);
 
-    let global = GlobalOptions::default();
-    let mut context2 = create_context(temp_dir.path(), &global).expect("Create context");
-    context2.client_id_store = Box::new(FakeClientIdStore::new("WQN"));
-
-    let row = document_queries::lookup_by_path(&context2.conn, "api/tasks/bug_fix_task.md")
+    let row = document_queries::lookup_by_path(env.conn(), "api/tasks/bug_fix_task.md")
         .expect("Query should succeed")
         .expect("Document should exist");
 
@@ -463,9 +445,8 @@ fn create_indexes_task_type_correctly() {
 
 #[test]
 fn create_with_priority_without_type_fails() {
-    let (temp_dir, context) = create_test_repo();
-
-    fs::create_dir_all(temp_dir.path().join("api")).expect("Create api dir");
+    let env = TestEnv::new();
+    env.create_dir("api");
 
     let args = CreateArgs {
         parent: "api/".to_string(),
@@ -476,6 +457,7 @@ fn create_with_priority_without_type_fails() {
         labels: Vec::new(),
         deps: None,
     };
+    let (_temp, context) = env.into_parts();
     let result = create_command::execute(context, args);
 
     assert!(result.is_err(), "Should fail when setting priority without task type");
@@ -489,9 +471,8 @@ fn create_with_priority_without_type_fails() {
 
 #[test]
 fn create_with_invalid_priority_fails() {
-    let (temp_dir, context) = create_test_repo();
-
-    fs::create_dir_all(temp_dir.path().join("api")).expect("Create api dir");
+    let env = TestEnv::new();
+    env.create_dir("api");
 
     let args = CreateArgs {
         parent: "api/".to_string(),
@@ -502,6 +483,7 @@ fn create_with_invalid_priority_fails() {
         labels: Vec::new(),
         deps: None,
     };
+    let (_temp, context) = env.into_parts();
     let result = create_command::execute(context, args);
 
     assert!(result.is_err(), "Should fail with invalid priority");
@@ -515,9 +497,8 @@ fn create_with_invalid_priority_fails() {
 
 #[test]
 fn create_at_existing_explicit_path_fails() {
-    let (temp_dir, context) = create_test_repo();
-
-    fs::create_dir_all(temp_dir.path().join("docs")).expect("Create docs dir");
+    let env = TestEnv::new();
+    env.create_dir("docs");
 
     let args1 = CreateArgs {
         parent: "docs/existing.md".to_string(),
@@ -528,12 +509,9 @@ fn create_at_existing_explicit_path_fails() {
         labels: Vec::new(),
         deps: None,
     };
-    let result1 = create_command::execute(context, args1);
+    let context1 = create_context_from_env(&env, &GlobalOptions::default());
+    let result1 = create_command::execute(context1, args1);
     assert!(result1.is_ok(), "First create should succeed: {:?}", result1);
-
-    let global = GlobalOptions::default();
-    let mut context2 = create_context(temp_dir.path(), &global).expect("Create context");
-    context2.client_id_store = Box::new(FakeClientIdStore::new("WQN"));
 
     let args2 = CreateArgs {
         parent: "docs/existing.md".to_string(),
@@ -544,6 +522,7 @@ fn create_at_existing_explicit_path_fails() {
         labels: Vec::new(),
         deps: None,
     };
+    let context2 = create_context_from_env(&env, &GlobalOptions::default());
     let result2 = create_command::execute(context2, args2);
 
     assert!(result2.is_err(), "Should fail when explicit path exists");
@@ -561,11 +540,10 @@ fn create_at_existing_explicit_path_fails() {
 
 #[test]
 fn create_with_body_file() {
-    let (temp_dir, context) = create_test_repo();
+    let env = TestEnv::new();
+    env.create_dir("api/docs");
 
-    fs::create_dir_all(temp_dir.path().join("api/docs")).expect("Create dirs");
-
-    let body_file_path = temp_dir.path().join("body_content.txt");
+    let body_file_path = env.repo_root().join("body_content.txt");
     fs::write(&body_file_path, "This is the document body content.\n\n## Section\n\nMore content.")
         .expect("Write body file");
 
@@ -578,11 +556,12 @@ fn create_with_body_file() {
         labels: Vec::new(),
         deps: None,
     };
+    let (_temp, context) = env.into_parts();
     let result = create_command::execute(context, args);
 
     assert!(result.is_ok(), "Create should succeed: {:?}", result);
 
-    let doc_path = temp_dir.path().join("api/docs/document_with_body.md");
+    let doc_path = _temp.path().join("api/docs/document_with_body.md");
     let content = fs::read_to_string(&doc_path).expect("Read doc");
 
     assert!(content.contains("This is the document body content"), "Should contain body content");
@@ -591,9 +570,8 @@ fn create_with_body_file() {
 
 #[test]
 fn create_with_nonexistent_body_file_fails() {
-    let (temp_dir, context) = create_test_repo();
-
-    fs::create_dir_all(temp_dir.path().join("api/docs")).expect("Create dirs");
+    let env = TestEnv::new();
+    env.create_dir("api/docs");
 
     let args = CreateArgs {
         parent: "api/".to_string(),
@@ -604,6 +582,7 @@ fn create_with_nonexistent_body_file_fails() {
         labels: Vec::new(),
         deps: None,
     };
+    let (_temp, context) = env.into_parts();
     let result = create_command::execute(context, args);
 
     assert!(result.is_err(), "Should fail with nonexistent body file");
@@ -632,15 +611,16 @@ fn create_task_with_all_types() {
     ];
 
     for (task_type, type_str) in task_types {
-        let (temp_dir, context) = create_test_repo();
-        fs::create_dir_all(temp_dir.path().join("api")).expect("Create api dir");
+        let env = TestEnv::new();
+        env.create_dir("api");
 
         let args = create_task_args("api/", &format!("Test {} task", type_str), task_type);
+        let (_temp, context) = env.into_parts();
         let result = create_command::execute(context, args);
 
         assert!(result.is_ok(), "Create {} task should succeed: {:?}", type_str, result);
 
-        let entries: Vec<_> = fs::read_dir(temp_dir.path().join("api/tasks"))
+        let entries: Vec<_> = fs::read_dir(_temp.path().join("api/tasks"))
             .expect("Read tasks dir")
             .flatten()
             .collect();

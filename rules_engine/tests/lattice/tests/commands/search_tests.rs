@@ -1,31 +1,12 @@
 //! Tests for the `lat search` command.
 
-use std::fs;
-
-use lattice::cli::command_dispatch::{CommandContext, create_context};
 use lattice::cli::commands::search_command;
-use lattice::cli::global_options::GlobalOptions;
 use lattice::cli::query_args::SearchArgs;
 use lattice::document::frontmatter_schema::TaskType;
 use lattice::error::error_types::LatticeError;
-use lattice::git::client_config::FakeClientIdStore;
 use lattice::index::document_types::InsertDocument;
-use lattice::index::{document_queries, fulltext_search, schema_definition};
-
-fn create_test_repo() -> (tempfile::TempDir, CommandContext) {
-    let temp_dir = tempfile::tempdir().expect("Failed to create temp dir");
-    let repo_root = temp_dir.path();
-
-    fs::create_dir(repo_root.join(".git")).expect("Failed to create .git");
-
-    let global = GlobalOptions::default();
-    let mut context = create_context(repo_root, &global).expect("Failed to create context");
-    context.client_id_store = Box::new(FakeClientIdStore::new("WQN"));
-
-    schema_definition::create_schema(&context.conn).expect("Failed to create schema");
-
-    (temp_dir, context)
-}
+use lattice::index::{document_queries, fulltext_search};
+use lattice::test::test_environment::TestEnv;
 
 fn search_args(query: &str) -> SearchArgs {
     SearchArgs { query: query.to_string(), limit: None, path: None, r#type: None }
@@ -82,10 +63,10 @@ fn insert_task(
 
 #[test]
 fn search_finds_matching_document() {
-    let (_temp_dir, context) = create_test_repo();
+    let env = TestEnv::new();
 
     insert_document(
-        &context.conn,
+        env.conn(),
         "LDOC01",
         "api/docs/authentication.md",
         "authentication",
@@ -93,6 +74,7 @@ fn search_finds_matching_document() {
     );
 
     let args = search_args("OAuth2");
+    let (_temp, context) = env.into_parts();
     let result = search_command::execute(context, args);
 
     assert!(result.is_ok(), "Search should succeed: {:?}", result);
@@ -100,10 +82,10 @@ fn search_finds_matching_document() {
 
 #[test]
 fn search_returns_no_results_for_unmatched_query() {
-    let (_temp_dir, context) = create_test_repo();
+    let env = TestEnv::new();
 
     insert_document(
-        &context.conn,
+        env.conn(),
         "LDOC02",
         "api/docs/database.md",
         "database",
@@ -111,6 +93,7 @@ fn search_returns_no_results_for_unmatched_query() {
     );
 
     let args = search_args("zyxwvnonexistent");
+    let (_temp, context) = env.into_parts();
     let result = search_command::execute(context, args);
 
     assert!(result.is_ok(), "Search with no results should still succeed: {:?}", result);
@@ -118,18 +101,18 @@ fn search_returns_no_results_for_unmatched_query() {
 
 #[test]
 fn search_finds_multiple_documents() {
-    let (_temp_dir, context) = create_test_repo();
+    let env = TestEnv::new();
 
-    insert_document(&context.conn, "LDOC03", "api/docs/auth.md", "auth", "Error handling in login");
+    insert_document(env.conn(), "LDOC03", "api/docs/auth.md", "auth", "Error handling in login");
     insert_document(
-        &context.conn,
+        env.conn(),
         "LDOC04",
         "api/docs/errors.md",
         "errors",
         "Error reporting service",
     );
     insert_document(
-        &context.conn,
+        env.conn(),
         "LDOC05",
         "api/docs/logging.md",
         "logging",
@@ -137,6 +120,7 @@ fn search_finds_multiple_documents() {
     );
 
     let args = search_args("Error");
+    let (_temp, context) = env.into_parts();
     let result = search_command::execute(context, args);
 
     assert!(result.is_ok(), "Search should succeed: {:?}", result);
@@ -148,9 +132,10 @@ fn search_finds_multiple_documents() {
 
 #[test]
 fn search_empty_query_fails() {
-    let (_temp_dir, context) = create_test_repo();
+    let env = TestEnv::new();
 
     let args = search_args("");
+    let (_temp, context) = env.into_parts();
     let result = search_command::execute(context, args);
 
     assert!(result.is_err(), "Empty query should fail");
@@ -164,9 +149,10 @@ fn search_empty_query_fails() {
 
 #[test]
 fn search_whitespace_only_query_fails() {
-    let (_temp_dir, context) = create_test_repo();
+    let env = TestEnv::new();
 
     let args = search_args("   ");
+    let (_temp, context) = env.into_parts();
     let result = search_command::execute(context, args);
 
     assert!(result.is_err(), "Whitespace-only query should fail");
@@ -174,10 +160,11 @@ fn search_whitespace_only_query_fails() {
 
 #[test]
 fn search_very_long_query_fails() {
-    let (_temp_dir, context) = create_test_repo();
+    let env = TestEnv::new();
 
     let long_query = "a".repeat(1001);
     let args = search_args(&long_query);
+    let (_temp, context) = env.into_parts();
     let result = search_command::execute(context, args);
 
     assert!(result.is_err(), "Very long query should fail");
@@ -199,17 +186,17 @@ fn search_very_long_query_fails() {
 
 #[test]
 fn search_with_path_filter_restricts_results() {
-    let (_temp_dir, context) = create_test_repo();
+    let env = TestEnv::new();
 
     insert_document(
-        &context.conn,
+        env.conn(),
         "LDOC06",
         "api/docs/errors.md",
         "errors",
         "Error handling patterns",
     );
     insert_document(
-        &context.conn,
+        env.conn(),
         "LDOC07",
         "database/docs/errors.md",
         "db-errors",
@@ -222,6 +209,7 @@ fn search_with_path_filter_restricts_results() {
         path: Some("api/".to_string()),
         r#type: None,
     };
+    let (_temp, context) = env.into_parts();
     let result = search_command::execute(context, args);
 
     assert!(result.is_ok(), "Search with path filter should succeed: {:?}", result);
@@ -229,10 +217,10 @@ fn search_with_path_filter_restricts_results() {
 
 #[test]
 fn search_with_nonmatching_path_returns_no_results() {
-    let (_temp_dir, context) = create_test_repo();
+    let env = TestEnv::new();
 
     insert_document(
-        &context.conn,
+        env.conn(),
         "LDOC08",
         "api/docs/feature.md",
         "feature",
@@ -245,6 +233,7 @@ fn search_with_nonmatching_path_returns_no_results() {
         path: Some("database/".to_string()),
         r#type: None,
     };
+    let (_temp, context) = env.into_parts();
     let result = search_command::execute(context, args);
 
     assert!(result.is_ok(), "Search with no matching path should succeed: {:?}", result);
@@ -256,10 +245,10 @@ fn search_with_nonmatching_path_returns_no_results() {
 
 #[test]
 fn search_with_type_filter_restricts_to_task_type() {
-    let (_temp_dir, context) = create_test_repo();
+    let env = TestEnv::new();
 
     insert_task(
-        &context.conn,
+        env.conn(),
         "LDOC09",
         "api/tasks/fix_bug.md",
         "fix-bug",
@@ -267,7 +256,7 @@ fn search_with_type_filter_restricts_to_task_type() {
         TaskType::Bug,
     );
     insert_task(
-        &context.conn,
+        env.conn(),
         "LDOC10",
         "api/tasks/add_feature.md",
         "add-feature",
@@ -281,6 +270,7 @@ fn search_with_type_filter_restricts_to_task_type() {
         path: None,
         r#type: Some(TaskType::Bug),
     };
+    let (_temp, context) = env.into_parts();
     let result = search_command::execute(context, args);
 
     assert!(result.is_ok(), "Search with type filter should succeed: {:?}", result);
@@ -288,10 +278,10 @@ fn search_with_type_filter_restricts_to_task_type() {
 
 #[test]
 fn search_type_filter_excludes_non_tasks() {
-    let (_temp_dir, context) = create_test_repo();
+    let env = TestEnv::new();
 
     insert_document(
-        &context.conn,
+        env.conn(),
         "LDOC11",
         "api/docs/auth.md",
         "auth",
@@ -304,6 +294,7 @@ fn search_type_filter_excludes_non_tasks() {
         path: None,
         r#type: Some(TaskType::Bug),
     };
+    let (_temp, context) = env.into_parts();
     let result = search_command::execute(context, args);
 
     assert!(result.is_ok(), "Search with type filter should succeed: {:?}", result);
@@ -315,12 +306,12 @@ fn search_type_filter_excludes_non_tasks() {
 
 #[test]
 fn search_with_limit_respects_limit() {
-    let (_temp_dir, context) = create_test_repo();
+    let env = TestEnv::new();
 
     for i in 1..=10 {
         let id = format!("LDOC{:02}", 11 + i);
         insert_document(
-            &context.conn,
+            env.conn(),
             &id,
             &format!("docs/doc{i}.md"),
             &format!("doc{i}"),
@@ -330,6 +321,7 @@ fn search_with_limit_respects_limit() {
 
     let args =
         SearchArgs { query: "searchable".to_string(), limit: Some(3), path: None, r#type: None };
+    let (_temp, context) = env.into_parts();
     let result = search_command::execute(context, args);
 
     assert!(result.is_ok(), "Search with limit should succeed: {:?}", result);
@@ -337,12 +329,12 @@ fn search_with_limit_respects_limit() {
 
 #[test]
 fn search_default_limit_is_reasonable() {
-    let (_temp_dir, context) = create_test_repo();
+    let env = TestEnv::new();
 
     for i in 1..=30 {
         let id = format!("LDOC{:02}", 30 + i);
         insert_document(
-            &context.conn,
+            env.conn(),
             &id,
             &format!("docs/doc{i}.md"),
             &format!("doc{i}"),
@@ -351,6 +343,7 @@ fn search_default_limit_is_reasonable() {
     }
 
     let args = search_args("matches");
+    let (_temp, context) = env.into_parts();
     let result = search_command::execute(context, args);
 
     assert!(result.is_ok(), "Search with many results should succeed: {:?}", result);
@@ -362,17 +355,11 @@ fn search_default_limit_is_reasonable() {
 
 #[test]
 fn search_phrase_query() {
-    let (_temp_dir, context) = create_test_repo();
+    let env = TestEnv::new();
 
+    insert_document(env.conn(), "LDOC61", "docs/exact.md", "exact", "The exact phrase match here");
     insert_document(
-        &context.conn,
-        "LDOC61",
-        "docs/exact.md",
-        "exact",
-        "The exact phrase match here",
-    );
-    insert_document(
-        &context.conn,
+        env.conn(),
         "LDOC62",
         "docs/partial.md",
         "partial",
@@ -380,6 +367,7 @@ fn search_phrase_query() {
     );
 
     let args = search_args("\"phrase match\"");
+    let (_temp, context) = env.into_parts();
     let result = search_command::execute(context, args);
 
     assert!(result.is_ok(), "Phrase search should succeed: {:?}", result);
@@ -387,12 +375,13 @@ fn search_phrase_query() {
 
 #[test]
 fn search_prefix_query() {
-    let (_temp_dir, context) = create_test_repo();
+    let env = TestEnv::new();
 
-    insert_document(&context.conn, "LDOC63", "docs/auth.md", "auth", "Authentication service");
-    insert_document(&context.conn, "LDOC64", "docs/authz.md", "authz", "Authorization rules");
+    insert_document(env.conn(), "LDOC63", "docs/auth.md", "auth", "Authentication service");
+    insert_document(env.conn(), "LDOC64", "docs/authz.md", "authz", "Authorization rules");
 
     let args = search_args("auth*");
+    let (_temp, context) = env.into_parts();
     let result = search_command::execute(context, args);
 
     assert!(result.is_ok(), "Prefix search should succeed: {:?}", result);
@@ -404,20 +393,12 @@ fn search_prefix_query() {
 
 #[test]
 fn search_with_json_output() {
-    let temp_dir = tempfile::tempdir().expect("Failed to create temp dir");
-    let repo_root = temp_dir.path();
+    let env = TestEnv::new().with_json_output();
 
-    fs::create_dir(repo_root.join(".git")).expect("Failed to create .git");
-
-    let global = GlobalOptions { json: true, ..GlobalOptions::default() };
-    let mut context = create_context(repo_root, &global).expect("Failed to create context");
-    context.client_id_store = Box::new(FakeClientIdStore::new("WQN"));
-
-    schema_definition::create_schema(&context.conn).expect("Failed to create schema");
-
-    insert_document(&context.conn, "LDOC65", "docs/test.md", "test", "Test document content");
+    insert_document(env.conn(), "LDOC65", "docs/test.md", "test", "Test document content");
 
     let args = search_args("Test");
+    let (_temp, context) = env.into_parts();
     let result = search_command::execute(context, args);
 
     assert!(result.is_ok(), "Search with JSON output should succeed: {:?}", result);
@@ -429,17 +410,12 @@ fn search_with_json_output() {
 
 #[test]
 fn search_special_characters_in_query() {
-    let (_temp_dir, context) = create_test_repo();
+    let env = TestEnv::new();
 
-    insert_document(
-        &context.conn,
-        "LDOC66",
-        "docs/code.md",
-        "code",
-        "Function foo_bar returns int",
-    );
+    insert_document(env.conn(), "LDOC66", "docs/code.md", "code", "Function foo_bar returns int");
 
     let args = search_args("foo_bar");
+    let (_temp, context) = env.into_parts();
     let result = search_command::execute(context, args);
 
     assert!(result.is_ok(), "Search with underscores should succeed: {:?}", result);
@@ -447,12 +423,13 @@ fn search_special_characters_in_query() {
 
 #[test]
 fn search_document_removed_from_index() {
-    let (_temp_dir, context) = create_test_repo();
+    let env = TestEnv::new();
 
-    fulltext_search::index_document(&context.conn, "LGHOST", "Ghost document content")
+    fulltext_search::index_document(env.conn(), "LGHOST", "Ghost document content")
         .expect("Index should succeed");
 
     let args = search_args("Ghost");
+    let (_temp, context) = env.into_parts();
     let result = search_command::execute(context, args);
 
     assert!(result.is_ok(), "Search should handle missing document gracefully: {:?}", result);

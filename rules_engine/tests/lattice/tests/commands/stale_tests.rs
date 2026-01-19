@@ -4,35 +4,17 @@ use std::fs;
 use std::io::Write;
 
 use chrono::{Duration, Utc};
-use lattice::cli::command_dispatch::create_context;
 use lattice::cli::commands::stale_command;
-use lattice::cli::global_options::GlobalOptions;
 use lattice::cli::query_args::StaleArgs;
 use lattice::cli::shared_options::{FilterOptions, ListFormat, OutputOptions, SortField};
 use lattice::document::frontmatter_schema::TaskType;
 use lattice::error::error_types::LatticeError;
-use lattice::git::client_config::FakeClientIdStore;
+use lattice::index::document_queries;
 use lattice::index::document_types::InsertDocument;
-use lattice::index::{document_queries, schema_definition};
+use lattice::test::test_environment::TestEnv;
 
 fn default_args() -> StaleArgs {
     StaleArgs { days: 30, filter: FilterOptions::default(), output: OutputOptions::default() }
-}
-
-fn create_test_repo() -> (tempfile::TempDir, lattice::cli::command_dispatch::CommandContext) {
-    let temp_dir = tempfile::tempdir().expect("Failed to create temp dir");
-    let repo_root = temp_dir.path();
-
-    fs::create_dir(repo_root.join(".git")).expect("Failed to create .git");
-    fs::create_dir_all(repo_root.join("api/tasks")).expect("Failed to create api/tasks");
-    fs::create_dir_all(repo_root.join("api/docs")).expect("Failed to create api/docs");
-
-    let global = GlobalOptions::default();
-    let mut context = create_context(repo_root, &global).expect("Failed to create context");
-    context.client_id_store = Box::new(FakeClientIdStore::new("WQN"));
-    schema_definition::create_schema(&context.conn).expect("Failed to create schema");
-
-    (temp_dir, context)
 }
 
 fn create_task_doc_with_timestamp(
@@ -60,14 +42,9 @@ fn create_task_doc_with_timestamp(
     )
 }
 
-fn insert_doc(
-    conn: &rusqlite::Connection,
-    doc: &InsertDocument,
-    repo_root: &std::path::Path,
-    path: &str,
-) {
-    document_queries::insert(conn, doc).expect("Failed to insert document");
-    let full_path = repo_root.join(path);
+fn insert_doc(env: &TestEnv, doc: &InsertDocument, path: &str) {
+    document_queries::insert(env.conn(), doc).expect("Failed to insert document");
+    let full_path = env.repo_root().join(path);
     let parent = full_path.parent().expect("Path should have parent");
     fs::create_dir_all(parent).expect("Failed to create parent directories");
     let mut file = fs::File::create(&full_path).expect("Failed to create file");
@@ -85,8 +62,10 @@ fn insert_doc(
 
 #[test]
 fn stale_command_returns_documents_older_than_threshold() {
-    let (temp_dir, context) = create_test_repo();
-    let repo_root = temp_dir.path();
+    let env = TestEnv::new();
+    env.create_dir("docs");
+    env.create_dir("api");
+    env.create_dir("api/tasks");
 
     let stale_date = Utc::now() - Duration::days(45);
     let stale = create_task_doc_with_timestamp(
@@ -98,7 +77,7 @@ fn stale_command_returns_documents_older_than_threshold() {
         TaskType::Task,
         stale_date,
     );
-    insert_doc(&context.conn, &stale, repo_root, "api/tasks/old_task.md");
+    insert_doc(&env, &stale, "api/tasks/old_task.md");
 
     let recent_date = Utc::now() - Duration::days(5);
     let recent = create_task_doc_with_timestamp(
@@ -110,17 +89,20 @@ fn stale_command_returns_documents_older_than_threshold() {
         TaskType::Task,
         recent_date,
     );
-    insert_doc(&context.conn, &recent, repo_root, "api/tasks/new_task.md");
+    insert_doc(&env, &recent, "api/tasks/new_task.md");
 
     let args = default_args();
+    let (_temp, context) = env.into_parts();
     let result = stale_command::execute(context, args);
     assert!(result.is_ok(), "Stale command should succeed: {:?}", result);
 }
 
 #[test]
 fn stale_command_with_custom_days_threshold() {
-    let (temp_dir, context) = create_test_repo();
-    let repo_root = temp_dir.path();
+    let env = TestEnv::new();
+    env.create_dir("docs");
+    env.create_dir("api");
+    env.create_dir("api/tasks");
 
     let fifteen_days_old = Utc::now() - Duration::days(15);
     let task = create_task_doc_with_timestamp(
@@ -132,18 +114,22 @@ fn stale_command_with_custom_days_threshold() {
         TaskType::Task,
         fifteen_days_old,
     );
-    insert_doc(&context.conn, &task, repo_root, "api/tasks/fifteen.md");
+    insert_doc(&env, &task, "api/tasks/fifteen.md");
 
     let mut args = default_args();
     args.days = 10;
+    let (_temp, context) = env.into_parts();
     let result = stale_command::execute(context, args);
     assert!(result.is_ok(), "Stale command with custom days should succeed");
 }
 
 #[test]
 fn stale_command_excludes_closed_by_default() {
-    let (temp_dir, context) = create_test_repo();
-    let repo_root = temp_dir.path();
+    let env = TestEnv::new();
+    env.create_dir("docs");
+    env.create_dir("api");
+    env.create_dir("api/tasks");
+    env.create_dir("api/tasks/.closed");
 
     let stale_date = Utc::now() - Duration::days(60);
 
@@ -156,7 +142,7 @@ fn stale_command_excludes_closed_by_default() {
         TaskType::Task,
         stale_date,
     );
-    insert_doc(&context.conn, &open, repo_root, "api/tasks/open_stale.md");
+    insert_doc(&env, &open, "api/tasks/open_stale.md");
 
     let closed = create_task_doc_with_timestamp(
         "LCLOSE",
@@ -167,17 +153,20 @@ fn stale_command_excludes_closed_by_default() {
         TaskType::Task,
         stale_date,
     );
-    insert_doc(&context.conn, &closed, repo_root, "api/tasks/.closed/closed_stale.md");
+    insert_doc(&env, &closed, "api/tasks/.closed/closed_stale.md");
 
     let args = default_args();
+    let (_temp, context) = env.into_parts();
     let result = stale_command::execute(context, args);
     assert!(result.is_ok(), "Stale command should succeed");
 }
 
 #[test]
 fn stale_command_with_empty_results() {
-    let (temp_dir, context) = create_test_repo();
-    let repo_root = temp_dir.path();
+    let env = TestEnv::new();
+    env.create_dir("docs");
+    env.create_dir("api");
+    env.create_dir("api/tasks");
 
     let recent_date = Utc::now() - Duration::days(5);
     let recent = create_task_doc_with_timestamp(
@@ -189,9 +178,10 @@ fn stale_command_with_empty_results() {
         TaskType::Task,
         recent_date,
     );
-    insert_doc(&context.conn, &recent, repo_root, "api/tasks/recent.md");
+    insert_doc(&env, &recent, "api/tasks/recent.md");
 
     let args = default_args();
+    let (_temp, context) = env.into_parts();
     let result = stale_command::execute(context, args);
     assert!(result.is_ok(), "Stale command with no stale docs should succeed");
 }
@@ -202,8 +192,10 @@ fn stale_command_with_empty_results() {
 
 #[test]
 fn stale_command_filters_by_priority() {
-    let (temp_dir, context) = create_test_repo();
-    let repo_root = temp_dir.path();
+    let env = TestEnv::new();
+    env.create_dir("docs");
+    env.create_dir("api");
+    env.create_dir("api/tasks");
 
     let stale_date = Utc::now() - Duration::days(45);
 
@@ -216,7 +208,7 @@ fn stale_command_filters_by_priority() {
         TaskType::Bug,
         stale_date,
     );
-    insert_doc(&context.conn, &p0, repo_root, "api/tasks/p0_stale.md");
+    insert_doc(&env, &p0, "api/tasks/p0_stale.md");
 
     let p2 = create_task_doc_with_timestamp(
         "LSTLP2",
@@ -227,18 +219,21 @@ fn stale_command_filters_by_priority() {
         TaskType::Task,
         stale_date,
     );
-    insert_doc(&context.conn, &p2, repo_root, "api/tasks/p2_stale.md");
+    insert_doc(&env, &p2, "api/tasks/p2_stale.md");
 
     let mut args = default_args();
     args.filter.priority = Some(0);
+    let (_temp, context) = env.into_parts();
     let result = stale_command::execute(context, args);
     assert!(result.is_ok(), "Stale command with priority filter should succeed");
 }
 
 #[test]
 fn stale_command_filters_by_type() {
-    let (temp_dir, context) = create_test_repo();
-    let repo_root = temp_dir.path();
+    let env = TestEnv::new();
+    env.create_dir("docs");
+    env.create_dir("api");
+    env.create_dir("api/tasks");
 
     let stale_date = Utc::now() - Duration::days(45);
 
@@ -251,7 +246,7 @@ fn stale_command_filters_by_type() {
         TaskType::Bug,
         stale_date,
     );
-    insert_doc(&context.conn, &bug, repo_root, "api/tasks/bug_stale.md");
+    insert_doc(&env, &bug, "api/tasks/bug_stale.md");
 
     let feature = create_task_doc_with_timestamp(
         "LSTLFT",
@@ -262,20 +257,23 @@ fn stale_command_filters_by_type() {
         TaskType::Feature,
         stale_date,
     );
-    insert_doc(&context.conn, &feature, repo_root, "api/tasks/feat_stale.md");
+    insert_doc(&env, &feature, "api/tasks/feat_stale.md");
 
     let mut args = default_args();
     args.filter.r#type = Some(TaskType::Bug);
+    let (_temp, context) = env.into_parts();
     let result = stale_command::execute(context, args);
     assert!(result.is_ok(), "Stale command with type filter should succeed");
 }
 
 #[test]
 fn stale_command_filters_by_path() {
-    let (temp_dir, context) = create_test_repo();
-    let repo_root = temp_dir.path();
-
-    fs::create_dir_all(repo_root.join("database/tasks")).expect("Failed to create dir");
+    let env = TestEnv::new();
+    env.create_dir("docs");
+    env.create_dir("api");
+    env.create_dir("api/tasks");
+    env.create_dir("database");
+    env.create_dir("database/tasks");
 
     let stale_date = Utc::now() - Duration::days(45);
 
@@ -288,7 +286,7 @@ fn stale_command_filters_by_path() {
         TaskType::Task,
         stale_date,
     );
-    insert_doc(&context.conn, &api, repo_root, "api/tasks/api_stale.md");
+    insert_doc(&env, &api, "api/tasks/api_stale.md");
 
     let db = create_task_doc_with_timestamp(
         "LSTDBS",
@@ -299,10 +297,11 @@ fn stale_command_filters_by_path() {
         TaskType::Task,
         stale_date,
     );
-    insert_doc(&context.conn, &db, repo_root, "database/tasks/db_stale.md");
+    insert_doc(&env, &db, "database/tasks/db_stale.md");
 
     let mut args = default_args();
     args.filter.path = Some("api/".to_string());
+    let (_temp, context) = env.into_parts();
     let result = stale_command::execute(context, args);
     assert!(result.is_ok(), "Stale command with path filter should succeed");
 }
@@ -313,8 +312,10 @@ fn stale_command_filters_by_path() {
 
 #[test]
 fn stale_command_with_rich_format() {
-    let (temp_dir, context) = create_test_repo();
-    let repo_root = temp_dir.path();
+    let env = TestEnv::new();
+    env.create_dir("docs");
+    env.create_dir("api");
+    env.create_dir("api/tasks");
 
     let stale_date = Utc::now() - Duration::days(45);
     let task = create_task_doc_with_timestamp(
@@ -326,18 +327,21 @@ fn stale_command_with_rich_format() {
         TaskType::Bug,
         stale_date,
     );
-    insert_doc(&context.conn, &task, repo_root, "api/tasks/stale.md");
+    insert_doc(&env, &task, "api/tasks/stale.md");
 
     let mut args = default_args();
     args.output.format = Some(ListFormat::Rich);
+    let (_temp, context) = env.into_parts();
     let result = stale_command::execute(context, args);
     assert!(result.is_ok(), "Stale command with rich format should succeed");
 }
 
 #[test]
 fn stale_command_with_compact_format() {
-    let (temp_dir, context) = create_test_repo();
-    let repo_root = temp_dir.path();
+    let env = TestEnv::new();
+    env.create_dir("docs");
+    env.create_dir("api");
+    env.create_dir("api/tasks");
 
     let stale_date = Utc::now() - Duration::days(45);
     let task = create_task_doc_with_timestamp(
@@ -349,18 +353,21 @@ fn stale_command_with_compact_format() {
         TaskType::Feature,
         stale_date,
     );
-    insert_doc(&context.conn, &task, repo_root, "api/tasks/stale.md");
+    insert_doc(&env, &task, "api/tasks/stale.md");
 
     let mut args = default_args();
     args.output.format = Some(ListFormat::Compact);
+    let (_temp, context) = env.into_parts();
     let result = stale_command::execute(context, args);
     assert!(result.is_ok(), "Stale command with compact format should succeed");
 }
 
 #[test]
 fn stale_command_respects_limit() {
-    let (temp_dir, context) = create_test_repo();
-    let repo_root = temp_dir.path();
+    let env = TestEnv::new();
+    env.create_dir("docs");
+    env.create_dir("api");
+    env.create_dir("api/tasks");
 
     let stale_date = Utc::now() - Duration::days(45);
 
@@ -378,11 +385,12 @@ fn stale_command_respects_limit() {
             TaskType::Task,
             stale_date - Duration::days(i64::from(i)),
         );
-        insert_doc(&context.conn, &doc, repo_root, &path);
+        insert_doc(&env, &doc, &path);
     }
 
     let mut args = default_args();
     args.output.limit = Some(2);
+    let (_temp, context) = env.into_parts();
     let result = stale_command::execute(context, args);
     assert!(result.is_ok(), "Stale command with limit should succeed");
 }
@@ -393,8 +401,10 @@ fn stale_command_respects_limit() {
 
 #[test]
 fn stale_command_sorts_by_oldest_first_by_default() {
-    let (temp_dir, context) = create_test_repo();
-    let repo_root = temp_dir.path();
+    let env = TestEnv::new();
+    env.create_dir("docs");
+    env.create_dir("api");
+    env.create_dir("api/tasks");
 
     let oldest = create_task_doc_with_timestamp(
         "LOLDST",
@@ -405,7 +415,7 @@ fn stale_command_sorts_by_oldest_first_by_default() {
         TaskType::Task,
         Utc::now() - Duration::days(90),
     );
-    insert_doc(&context.conn, &oldest, repo_root, "api/tasks/oldest.md");
+    insert_doc(&env, &oldest, "api/tasks/oldest.md");
 
     let newer = create_task_doc_with_timestamp(
         "LNEWER",
@@ -416,17 +426,20 @@ fn stale_command_sorts_by_oldest_first_by_default() {
         TaskType::Task,
         Utc::now() - Duration::days(35),
     );
-    insert_doc(&context.conn, &newer, repo_root, "api/tasks/newer.md");
+    insert_doc(&env, &newer, "api/tasks/newer.md");
 
     let args = default_args();
+    let (_temp, context) = env.into_parts();
     let result = stale_command::execute(context, args);
     assert!(result.is_ok(), "Stale command should succeed");
 }
 
 #[test]
 fn stale_command_with_reverse_sort() {
-    let (temp_dir, context) = create_test_repo();
-    let repo_root = temp_dir.path();
+    let env = TestEnv::new();
+    env.create_dir("docs");
+    env.create_dir("api");
+    env.create_dir("api/tasks");
 
     let oldest = create_task_doc_with_timestamp(
         "LOLD2",
@@ -437,7 +450,7 @@ fn stale_command_with_reverse_sort() {
         TaskType::Task,
         Utc::now() - Duration::days(90),
     );
-    insert_doc(&context.conn, &oldest, repo_root, "api/tasks/oldest.md");
+    insert_doc(&env, &oldest, "api/tasks/oldest.md");
 
     let newer = create_task_doc_with_timestamp(
         "LNEW2",
@@ -448,18 +461,21 @@ fn stale_command_with_reverse_sort() {
         TaskType::Task,
         Utc::now() - Duration::days(35),
     );
-    insert_doc(&context.conn, &newer, repo_root, "api/tasks/newer.md");
+    insert_doc(&env, &newer, "api/tasks/newer.md");
 
     let mut args = default_args();
     args.output.reverse = true;
+    let (_temp, context) = env.into_parts();
     let result = stale_command::execute(context, args);
     assert!(result.is_ok(), "Stale command with reverse should succeed");
 }
 
 #[test]
 fn stale_command_with_explicit_sort_field() {
-    let (temp_dir, context) = create_test_repo();
-    let repo_root = temp_dir.path();
+    let env = TestEnv::new();
+    env.create_dir("docs");
+    env.create_dir("api");
+    env.create_dir("api/tasks");
 
     let stale_date = Utc::now() - Duration::days(45);
 
@@ -472,7 +488,7 @@ fn stale_command_with_explicit_sort_field() {
         TaskType::Bug,
         stale_date,
     );
-    insert_doc(&context.conn, &p0, repo_root, "api/tasks/p0.md");
+    insert_doc(&env, &p0, "api/tasks/p0.md");
 
     let p3 = create_task_doc_with_timestamp(
         "LSRTP3",
@@ -483,10 +499,11 @@ fn stale_command_with_explicit_sort_field() {
         TaskType::Task,
         stale_date,
     );
-    insert_doc(&context.conn, &p3, repo_root, "api/tasks/p3.md");
+    insert_doc(&env, &p3, "api/tasks/p3.md");
 
     let mut args = default_args();
     args.output.sort = Some(SortField::Priority);
+    let (_temp, context) = env.into_parts();
     let result = stale_command::execute(context, args);
     assert!(result.is_ok(), "Stale command with priority sort should succeed");
 }
@@ -497,10 +514,14 @@ fn stale_command_with_explicit_sort_field() {
 
 #[test]
 fn stale_command_rejects_conflicting_updated_before() {
-    let (_temp_dir, context) = create_test_repo();
+    let env = TestEnv::new();
+    env.create_dir("docs");
+    env.create_dir("api");
+    env.create_dir("api/tasks");
 
     let mut args = default_args();
     args.filter.updated_before = Some("2024-01-01".to_string());
+    let (_temp, context) = env.into_parts();
     let result = stale_command::execute(context, args);
 
     assert!(result.is_err(), "Should reject conflicting --updated-before");
@@ -518,8 +539,10 @@ fn stale_command_rejects_conflicting_updated_before() {
 
 #[test]
 fn stale_command_with_zero_days_threshold() {
-    let (temp_dir, context) = create_test_repo();
-    let repo_root = temp_dir.path();
+    let env = TestEnv::new();
+    env.create_dir("docs");
+    env.create_dir("api");
+    env.create_dir("api/tasks");
 
     let yesterday = Utc::now() - Duration::days(1);
     let task = create_task_doc_with_timestamp(
@@ -531,18 +554,21 @@ fn stale_command_with_zero_days_threshold() {
         TaskType::Task,
         yesterday,
     );
-    insert_doc(&context.conn, &task, repo_root, "api/tasks/yesterday.md");
+    insert_doc(&env, &task, "api/tasks/yesterday.md");
 
     let mut args = default_args();
     args.days = 0;
+    let (_temp, context) = env.into_parts();
     let result = stale_command::execute(context, args);
     assert!(result.is_ok(), "Stale command with 0 days should succeed");
 }
 
 #[test]
 fn stale_command_with_large_days_threshold() {
-    let (temp_dir, context) = create_test_repo();
-    let repo_root = temp_dir.path();
+    let env = TestEnv::new();
+    env.create_dir("docs");
+    env.create_dir("api");
+    env.create_dir("api/tasks");
 
     let recent = Utc::now() - Duration::days(30);
     let task = create_task_doc_with_timestamp(
@@ -554,18 +580,22 @@ fn stale_command_with_large_days_threshold() {
         TaskType::Task,
         recent,
     );
-    insert_doc(&context.conn, &task, repo_root, "api/tasks/recent.md");
+    insert_doc(&env, &task, "api/tasks/recent.md");
 
     let mut args = default_args();
     args.days = 365;
+    let (_temp, context) = env.into_parts();
     let result = stale_command::execute(context, args);
     assert!(result.is_ok(), "Stale command with large threshold should succeed");
 }
 
 #[test]
 fn stale_command_with_include_closed_flag() {
-    let (temp_dir, context) = create_test_repo();
-    let repo_root = temp_dir.path();
+    let env = TestEnv::new();
+    env.create_dir("docs");
+    env.create_dir("api");
+    env.create_dir("api/tasks");
+    env.create_dir("api/tasks/.closed");
 
     let stale_date = Utc::now() - Duration::days(45);
 
@@ -578,10 +608,11 @@ fn stale_command_with_include_closed_flag() {
         TaskType::Task,
         stale_date,
     );
-    insert_doc(&context.conn, &closed, repo_root, "api/tasks/.closed/old_closed.md");
+    insert_doc(&env, &closed, "api/tasks/.closed/old_closed.md");
 
     let mut args = default_args();
     args.filter.include_closed = true;
+    let (_temp, context) = env.into_parts();
     let result = stale_command::execute(context, args);
     assert!(result.is_ok(), "Stale command with include_closed should succeed");
 }

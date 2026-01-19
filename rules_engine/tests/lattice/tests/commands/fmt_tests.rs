@@ -3,29 +3,12 @@
 use std::fs;
 use std::io::Write;
 
-use lattice::cli::command_dispatch::{CommandContext, create_context};
 use lattice::cli::commands::fmt_command;
-use lattice::cli::global_options::GlobalOptions;
 use lattice::cli::maintenance_args::FmtArgs;
 use lattice::document::document_reader;
-use lattice::git::client_config::FakeClientIdStore;
+use lattice::index::document_queries;
 use lattice::index::document_types::InsertDocument;
-use lattice::index::{document_queries, schema_definition};
-
-fn create_test_repo() -> (tempfile::TempDir, CommandContext) {
-    let temp_dir = tempfile::tempdir().expect("Failed to create temp dir");
-    let repo_root = temp_dir.path();
-
-    fs::create_dir(repo_root.join(".git")).expect("Failed to create .git");
-
-    let global = GlobalOptions::default();
-    let mut context = create_context(repo_root, &global).expect("Failed to create context");
-    context.client_id_store = Box::new(FakeClientIdStore::new("WQN"));
-
-    schema_definition::create_schema(&context.conn).expect("Failed to create schema");
-
-    (temp_dir, context)
-}
+use lattice::test::test_environment::TestEnv;
 
 fn default_args() -> FmtArgs {
     FmtArgs { path: None, check: false, line_width: None }
@@ -77,13 +60,12 @@ fn write_doc_file(
 
 #[test]
 fn fmt_formats_document_body_with_trailing_whitespace() {
-    let (temp_dir, context) = create_test_repo();
-    let repo_root = temp_dir.path();
+    let env = TestEnv::new();
 
     let doc = create_doc("LABCDE", "api/api.md", "api", "API root document");
-    insert_doc(&context.conn, &doc, repo_root);
+    insert_doc(env.conn(), &doc, env.repo_root());
     write_doc_file(
-        repo_root,
+        env.repo_root(),
         "api/api.md",
         "LABCDE",
         "api",
@@ -92,21 +74,21 @@ fn fmt_formats_document_body_with_trailing_whitespace() {
     );
 
     let args = default_args();
+    let (_temp, context) = env.into_parts();
     let _result = fmt_command::execute(context, args);
 
-    let content = fs::read_to_string(repo_root.join("api/api.md")).expect("Read file");
+    let content = fs::read_to_string(_temp.path().join("api/api.md")).expect("Read file");
     assert!(!content.contains("   \n"), "Trailing whitespace should be removed");
 }
 
 #[test]
 fn fmt_leaves_already_formatted_document_unchanged() {
-    let (temp_dir, context) = create_test_repo();
-    let repo_root = temp_dir.path();
+    let env = TestEnv::new();
 
     let doc = create_doc("LABCDE", "api/api.md", "api", "API root document");
-    insert_doc(&context.conn, &doc, repo_root);
+    insert_doc(env.conn(), &doc, env.repo_root());
     write_doc_file(
-        repo_root,
+        env.repo_root(),
         "api/api.md",
         "LABCDE",
         "api",
@@ -114,8 +96,9 @@ fn fmt_leaves_already_formatted_document_unchanged() {
         "Clean content with no issues.\n",
     );
 
-    let original_content = fs::read_to_string(repo_root.join("api/api.md")).expect("Read file");
-    let original_mtime = fs::metadata(repo_root.join("api/api.md"))
+    let original_content =
+        fs::read_to_string(env.repo_root().join("api/api.md")).expect("Read file");
+    let original_mtime = fs::metadata(env.repo_root().join("api/api.md"))
         .expect("Metadata")
         .modified()
         .expect("Modified time");
@@ -123,10 +106,11 @@ fn fmt_leaves_already_formatted_document_unchanged() {
     std::thread::sleep(std::time::Duration::from_millis(10));
 
     let args = default_args();
+    let (_temp, context) = env.into_parts();
     let _result = fmt_command::execute(context, args);
 
-    let new_content = fs::read_to_string(repo_root.join("api/api.md")).expect("Read file");
-    let new_mtime = fs::metadata(repo_root.join("api/api.md"))
+    let new_content = fs::read_to_string(_temp.path().join("api/api.md")).expect("Read file");
+    let new_mtime = fs::metadata(_temp.path().join("api/api.md"))
         .expect("Metadata")
         .modified()
         .expect("Modified time");
@@ -145,13 +129,12 @@ fn fmt_leaves_already_formatted_document_unchanged() {
 
 #[test]
 fn fmt_check_mode_does_not_modify_files() {
-    let (temp_dir, context) = create_test_repo();
-    let repo_root = temp_dir.path();
+    let env = TestEnv::new();
 
     let doc = create_doc("LABCDE", "api/api.md", "api", "API root document");
-    insert_doc(&context.conn, &doc, repo_root);
+    insert_doc(env.conn(), &doc, env.repo_root());
     write_doc_file(
-        repo_root,
+        env.repo_root(),
         "api/api.md",
         "LABCDE",
         "api",
@@ -159,12 +142,14 @@ fn fmt_check_mode_does_not_modify_files() {
         "Content with trailing spaces   \n",
     );
 
-    let original_content = fs::read_to_string(repo_root.join("api/api.md")).expect("Read file");
+    let original_content =
+        fs::read_to_string(env.repo_root().join("api/api.md")).expect("Read file");
 
     let args = FmtArgs { check: true, ..default_args() };
+    let (_temp, context) = env.into_parts();
     let _result = fmt_command::execute(context, args);
 
-    let new_content = fs::read_to_string(repo_root.join("api/api.md")).expect("Read file");
+    let new_content = fs::read_to_string(_temp.path().join("api/api.md")).expect("Read file");
     assert_eq!(original_content, new_content, "Check mode should not modify files");
 }
 
@@ -174,16 +159,15 @@ fn fmt_check_mode_does_not_modify_files() {
 
 #[test]
 fn fmt_with_path_filter_only_formats_matching_documents() {
-    let (temp_dir, context) = create_test_repo();
-    let repo_root = temp_dir.path();
+    let env = TestEnv::new();
 
     let api_doc = create_doc("LAPIDE", "api/api.md", "api", "API root");
     let db_doc = create_doc("LDBDEF", "database/database.md", "database", "Database root");
-    insert_doc(&context.conn, &api_doc, repo_root);
-    insert_doc(&context.conn, &db_doc, repo_root);
+    insert_doc(env.conn(), &api_doc, env.repo_root());
+    insert_doc(env.conn(), &db_doc, env.repo_root());
 
     write_doc_file(
-        repo_root,
+        env.repo_root(),
         "api/api.md",
         "LAPIDE",
         "api",
@@ -191,7 +175,7 @@ fn fmt_with_path_filter_only_formats_matching_documents() {
         "API content with trailing   \n",
     );
     write_doc_file(
-        repo_root,
+        env.repo_root(),
         "database/database.md",
         "LDBDEF",
         "database",
@@ -200,11 +184,12 @@ fn fmt_with_path_filter_only_formats_matching_documents() {
     );
 
     let args = FmtArgs { path: Some("api/".to_string()), ..default_args() };
+    let (_temp, context) = env.into_parts();
     let _result = fmt_command::execute(context, args);
 
-    let api_content = fs::read_to_string(repo_root.join("api/api.md")).expect("Read api file");
+    let api_content = fs::read_to_string(_temp.path().join("api/api.md")).expect("Read api file");
     let db_content =
-        fs::read_to_string(repo_root.join("database/database.md")).expect("Read db file");
+        fs::read_to_string(_temp.path().join("database/database.md")).expect("Read db file");
 
     assert!(!api_content.contains("   \n"), "API doc should be formatted");
     assert!(db_content.contains("   \n"), "Database doc should NOT be formatted (filtered out)");
@@ -216,13 +201,12 @@ fn fmt_with_path_filter_only_formats_matching_documents() {
 
 #[test]
 fn fmt_corrects_name_field_to_match_filename() {
-    let (temp_dir, context) = create_test_repo();
-    let repo_root = temp_dir.path();
+    let env = TestEnv::new();
 
     let doc = create_doc("LABCDE", "api/api.md", "wrong-name", "API root document");
-    insert_doc(&context.conn, &doc, repo_root);
+    insert_doc(env.conn(), &doc, env.repo_root());
     write_doc_file(
-        repo_root,
+        env.repo_root(),
         "api/api.md",
         "LABCDE",
         "wrong-name",
@@ -231,21 +215,21 @@ fn fmt_corrects_name_field_to_match_filename() {
     );
 
     let args = default_args();
+    let (_temp, context) = env.into_parts();
     let _result = fmt_command::execute(context, args);
 
-    let document = document_reader::read(&repo_root.join("api/api.md")).expect("Read document");
+    let document = document_reader::read(&_temp.path().join("api/api.md")).expect("Read document");
     assert_eq!(document.frontmatter.name, "api", "Name should be corrected to match filename");
 }
 
 #[test]
 fn fmt_converts_underscores_to_hyphens_in_name() {
-    let (temp_dir, context) = create_test_repo();
-    let repo_root = temp_dir.path();
+    let env = TestEnv::new();
 
     let doc = create_doc("LABCDE", "api/api_design.md", "api-design", "API design document");
-    insert_doc(&context.conn, &doc, repo_root);
+    insert_doc(env.conn(), &doc, env.repo_root());
     write_doc_file(
-        repo_root,
+        env.repo_root(),
         "api/api_design.md",
         "LABCDE",
         "api_design",
@@ -254,10 +238,11 @@ fn fmt_converts_underscores_to_hyphens_in_name() {
     );
 
     let args = default_args();
+    let (_temp, context) = env.into_parts();
     let _result = fmt_command::execute(context, args);
 
     let document =
-        document_reader::read(&repo_root.join("api/api_design.md")).expect("Read document");
+        document_reader::read(&_temp.path().join("api/api_design.md")).expect("Read document");
     assert_eq!(
         document.frontmatter.name, "api-design",
         "Underscores in filename should become hyphens in name"
@@ -270,17 +255,16 @@ fn fmt_converts_underscores_to_hyphens_in_name() {
 
 #[test]
 fn fmt_sets_parent_id_from_root_document() {
-    let (temp_dir, context) = create_test_repo();
-    let repo_root = temp_dir.path();
+    let env = TestEnv::new();
 
     let root = create_doc("LROOTD", "api/api.md", "api", "API root");
     let child = create_doc("LCHLDD", "api/docs/design.md", "design", "Design doc");
-    insert_doc(&context.conn, &root, repo_root);
-    insert_doc(&context.conn, &child, repo_root);
+    insert_doc(env.conn(), &root, env.repo_root());
+    insert_doc(env.conn(), &child, env.repo_root());
 
-    write_doc_file(repo_root, "api/api.md", "LROOTD", "api", "API root", "Root content.\n");
+    write_doc_file(env.repo_root(), "api/api.md", "LROOTD", "api", "API root", "Root content.\n");
     write_doc_file(
-        repo_root,
+        env.repo_root(),
         "api/docs/design.md",
         "LCHLDD",
         "design",
@@ -289,9 +273,11 @@ fn fmt_sets_parent_id_from_root_document() {
     );
 
     let args = default_args();
+    let (_temp, context) = env.into_parts();
     let _result = fmt_command::execute(context, args);
 
-    let document = document_reader::read(&repo_root.join("api/docs/design.md")).expect("Read doc");
+    let document =
+        document_reader::read(&_temp.path().join("api/docs/design.md")).expect("Read doc");
     assert_eq!(
         document.frontmatter.parent_id.map(|id| id.to_string()),
         Some("LROOTD".to_string()),
@@ -301,13 +287,13 @@ fn fmt_sets_parent_id_from_root_document() {
 
 #[test]
 fn fmt_clears_parent_id_when_no_root_exists() {
-    let (temp_dir, context) = create_test_repo();
-    let repo_root = temp_dir.path();
+    let env = TestEnv::new();
+    env.create_dir("orphan");
 
     let orphan = create_doc("LORPHD", "orphan/orphan.md", "orphan", "Orphan doc");
-    insert_doc(&context.conn, &orphan, repo_root);
+    insert_doc(env.conn(), &orphan, env.repo_root());
 
-    let mut file = fs::File::create(repo_root.join("orphan/orphan.md")).expect("Create file");
+    let mut file = fs::File::create(env.repo_root().join("orphan/orphan.md")).expect("Create file");
     write!(
         file,
         "---\nlattice-id: LORPHD\nname: orphan\ndescription: Orphan doc\nparent-id: LOLDDE\n---\nContent.\n"
@@ -315,9 +301,10 @@ fn fmt_clears_parent_id_when_no_root_exists() {
     .expect("Write file");
 
     let args = default_args();
+    let (_temp, context) = env.into_parts();
     let _result = fmt_command::execute(context, args);
 
-    let document = document_reader::read(&repo_root.join("orphan/orphan.md")).expect("Read doc");
+    let document = document_reader::read(&_temp.path().join("orphan/orphan.md")).expect("Read doc");
     assert!(
         document.frontmatter.parent_id.is_none(),
         "Parent ID should be cleared when no root document exists"
@@ -330,15 +317,14 @@ fn fmt_clears_parent_id_when_no_root_exists() {
 
 #[test]
 fn fmt_respects_custom_line_width() {
-    let (temp_dir, context) = create_test_repo();
-    let repo_root = temp_dir.path();
+    let env = TestEnv::new();
 
     let doc = create_doc("LABCDE", "api/api.md", "api", "API root document");
-    insert_doc(&context.conn, &doc, repo_root);
+    insert_doc(env.conn(), &doc, env.repo_root());
 
     let long_line = "A ".repeat(50);
     write_doc_file(
-        repo_root,
+        env.repo_root(),
         "api/api.md",
         "LABCDE",
         "api",
@@ -347,9 +333,10 @@ fn fmt_respects_custom_line_width() {
     );
 
     let args = FmtArgs { line_width: Some(40), ..default_args() };
+    let (_temp, context) = env.into_parts();
     let _result = fmt_command::execute(context, args);
 
-    let content = fs::read_to_string(repo_root.join("api/api.md")).expect("Read file");
+    let content = fs::read_to_string(_temp.path().join("api/api.md")).expect("Read file");
     let body_start = content.rfind("---\n").unwrap() + 4;
     let body = &content[body_start..];
 
@@ -366,9 +353,10 @@ fn fmt_respects_custom_line_width() {
 
 #[test]
 fn fmt_succeeds_on_empty_repository() {
-    let (_temp_dir, context) = create_test_repo();
+    let env = TestEnv::new();
 
     let args = default_args();
+    let (_temp, context) = env.into_parts();
     let result = fmt_command::execute(context, args);
 
     assert!(result.is_ok(), "Fmt should succeed on empty repo");
@@ -380,17 +368,16 @@ fn fmt_succeeds_on_empty_repository() {
 
 #[test]
 fn fmt_formats_multiple_documents() {
-    let (temp_dir, context) = create_test_repo();
-    let repo_root = temp_dir.path();
+    let env = TestEnv::new();
 
     let doc1 = create_doc("LDOCDE", "api/api.md", "api", "API root");
     let doc2 = create_doc("LDOCDF", "api/docs/design.md", "design", "Design doc");
-    insert_doc(&context.conn, &doc1, repo_root);
-    insert_doc(&context.conn, &doc2, repo_root);
+    insert_doc(env.conn(), &doc1, env.repo_root());
+    insert_doc(env.conn(), &doc2, env.repo_root());
 
-    write_doc_file(repo_root, "api/api.md", "LDOCDE", "api", "API root", "Content 1   \n");
+    write_doc_file(env.repo_root(), "api/api.md", "LDOCDE", "api", "API root", "Content 1   \n");
     write_doc_file(
-        repo_root,
+        env.repo_root(),
         "api/docs/design.md",
         "LDOCDF",
         "design",
@@ -399,10 +386,12 @@ fn fmt_formats_multiple_documents() {
     );
 
     let args = default_args();
+    let (_temp, context) = env.into_parts();
     let _result = fmt_command::execute(context, args);
 
-    let content1 = fs::read_to_string(repo_root.join("api/api.md")).expect("Read file 1");
-    let content2 = fs::read_to_string(repo_root.join("api/docs/design.md")).expect("Read file 2");
+    let content1 = fs::read_to_string(_temp.path().join("api/api.md")).expect("Read file 1");
+    let content2 =
+        fs::read_to_string(_temp.path().join("api/docs/design.md")).expect("Read file 2");
 
     assert!(!content1.contains("   \n"), "First document should be formatted");
     assert!(!content2.contains("   \n"), "Second document should be formatted");

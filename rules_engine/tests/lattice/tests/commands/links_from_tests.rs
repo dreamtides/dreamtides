@@ -4,33 +4,16 @@ use std::fs;
 use std::io::Write;
 
 use chrono::Utc;
-use lattice::cli::command_dispatch::create_context;
 use lattice::cli::commands::links_from;
-use lattice::cli::global_options::GlobalOptions;
 use lattice::cli::structure_args::LinksFromArgs;
 use lattice::error::error_types::LatticeError;
-use lattice::git::client_config::FakeClientIdStore;
+use lattice::index::document_queries;
 use lattice::index::document_types::InsertDocument;
-use lattice::index::link_queries::{InsertLink, LinkType};
-use lattice::index::{document_queries, link_queries, schema_definition};
+use lattice::index::link_queries::{self, InsertLink, LinkType};
+use lattice::test::test_environment::TestEnv;
 
 fn default_args(id: &str) -> LinksFromArgs {
     LinksFromArgs { id: id.to_string() }
-}
-
-fn create_test_repo() -> (tempfile::TempDir, lattice::cli::command_dispatch::CommandContext) {
-    let temp_dir = tempfile::tempdir().expect("Failed to create temp dir");
-    let repo_root = temp_dir.path();
-
-    fs::create_dir(repo_root.join(".git")).expect("Failed to create .git");
-    fs::create_dir_all(repo_root.join("docs")).expect("Failed to create docs");
-
-    let global = GlobalOptions::default();
-    let mut context = create_context(repo_root, &global).expect("Failed to create context");
-    context.client_id_store = Box::new(FakeClientIdStore::new("WQN"));
-    schema_definition::create_schema(&context.conn).expect("Failed to create schema");
-
-    (temp_dir, context)
 }
 
 fn create_doc(id: &str, path: &str, name: &str, description: &str) -> InsertDocument {
@@ -80,53 +63,56 @@ fn insert_link(conn: &rusqlite::Connection, source_id: &str, target_id: &str, po
 
 #[test]
 fn links_from_succeeds_with_no_outgoing_links() {
-    let (temp_dir, context) = create_test_repo();
-    let repo_root = temp_dir.path();
+    let env = TestEnv::new();
+    env.create_dir("docs");
 
     let doc = create_doc("LAABCD", "docs/doc1.md", "doc1", "First document");
-    insert_doc(&context.conn, &doc, repo_root, "docs/doc1.md");
+    insert_doc(env.conn(), &doc, env.repo_root(), "docs/doc1.md");
 
     let args = default_args("LAABCD");
+    let (_temp, context) = env.into_parts();
     let result = links_from::execute(context, args);
     assert!(result.is_ok(), "links-from should succeed with no outgoing links");
 }
 
 #[test]
 fn links_from_lists_single_outgoing_link() {
-    let (temp_dir, context) = create_test_repo();
-    let repo_root = temp_dir.path();
+    let env = TestEnv::new();
+    env.create_dir("docs");
 
     let doc1 = create_doc("LBBCDE", "docs/doc1.md", "doc1", "First document");
-    insert_doc(&context.conn, &doc1, repo_root, "docs/doc1.md");
+    insert_doc(env.conn(), &doc1, env.repo_root(), "docs/doc1.md");
 
     let doc2 = create_doc("LCCDEF", "docs/doc2.md", "doc2", "Second document");
-    insert_doc(&context.conn, &doc2, repo_root, "docs/doc2.md");
+    insert_doc(env.conn(), &doc2, env.repo_root(), "docs/doc2.md");
 
-    insert_link(&context.conn, "LBBCDE", "LCCDEF", 0);
+    insert_link(env.conn(), "LBBCDE", "LCCDEF", 0);
 
     let args = default_args("LBBCDE");
+    let (_temp, context) = env.into_parts();
     let result = links_from::execute(context, args);
     assert!(result.is_ok(), "links-from should list single outgoing link");
 }
 
 #[test]
 fn links_from_lists_multiple_outgoing_links() {
-    let (temp_dir, context) = create_test_repo();
-    let repo_root = temp_dir.path();
+    let env = TestEnv::new();
+    env.create_dir("docs");
 
     let doc1 = create_doc("LDDEFG", "docs/doc1.md", "doc1", "First document");
-    insert_doc(&context.conn, &doc1, repo_root, "docs/doc1.md");
+    insert_doc(env.conn(), &doc1, env.repo_root(), "docs/doc1.md");
 
     let doc2 = create_doc("LEEFGH", "docs/doc2.md", "doc2", "Second document");
-    insert_doc(&context.conn, &doc2, repo_root, "docs/doc2.md");
+    insert_doc(env.conn(), &doc2, env.repo_root(), "docs/doc2.md");
 
     let doc3 = create_doc("LFFGHI", "docs/doc3.md", "doc3", "Third document");
-    insert_doc(&context.conn, &doc3, repo_root, "docs/doc3.md");
+    insert_doc(env.conn(), &doc3, env.repo_root(), "docs/doc3.md");
 
-    insert_link(&context.conn, "LDDEFG", "LEEFGH", 0);
-    insert_link(&context.conn, "LDDEFG", "LFFGHI", 1);
+    insert_link(env.conn(), "LDDEFG", "LEEFGH", 0);
+    insert_link(env.conn(), "LDDEFG", "LFFGHI", 1);
 
     let args = default_args("LDDEFG");
+    let (_temp, context) = env.into_parts();
     let result = links_from::execute(context, args);
     assert!(result.is_ok(), "links-from should list multiple outgoing links");
 }
@@ -137,17 +123,17 @@ fn links_from_lists_multiple_outgoing_links() {
 
 #[test]
 fn links_from_shows_different_link_types() {
-    let (temp_dir, context) = create_test_repo();
-    let repo_root = temp_dir.path();
+    let env = TestEnv::new();
+    env.create_dir("docs");
 
     let doc1 = create_doc("LGGHIJ", "docs/doc1.md", "doc1", "First document");
-    insert_doc(&context.conn, &doc1, repo_root, "docs/doc1.md");
+    insert_doc(env.conn(), &doc1, env.repo_root(), "docs/doc1.md");
 
     let doc2 = create_doc("LHHIJK", "docs/doc2.md", "doc2", "Second document");
-    insert_doc(&context.conn, &doc2, repo_root, "docs/doc2.md");
+    insert_doc(env.conn(), &doc2, env.repo_root(), "docs/doc2.md");
 
     let doc3 = create_doc("LIIJKL", "docs/doc3.md", "doc3", "Third document");
-    insert_doc(&context.conn, &doc3, repo_root, "docs/doc3.md");
+    insert_doc(env.conn(), &doc3, env.repo_root(), "docs/doc3.md");
 
     let body_link = InsertLink {
         source_id: "LGGHIJ",
@@ -161,10 +147,11 @@ fn links_from_shows_different_link_types() {
         link_type: LinkType::BlockedBy,
         position: 1,
     };
-    link_queries::insert_for_document(&context.conn, &[body_link, blocked_by_link])
+    link_queries::insert_for_document(env.conn(), &[body_link, blocked_by_link])
         .expect("Failed to insert links");
 
     let args = default_args("LGGHIJ");
+    let (_temp, context) = env.into_parts();
     let result = links_from::execute(context, args);
     assert!(result.is_ok(), "links-from should show different link types");
 }
@@ -175,9 +162,11 @@ fn links_from_shows_different_link_types() {
 
 #[test]
 fn links_from_fails_for_nonexistent_id() {
-    let (_temp_dir, context) = create_test_repo();
+    let env = TestEnv::new();
+    env.create_dir("docs");
 
     let args = default_args("LJJKLM");
+    let (_temp, context) = env.into_parts();
     let result = links_from::execute(context, args);
     assert!(
         matches!(result, Err(LatticeError::DocumentNotFound { .. })),
@@ -191,19 +180,20 @@ fn links_from_fails_for_nonexistent_id() {
 
 #[test]
 fn links_from_handles_dangling_links_gracefully() {
-    let (temp_dir, context) = create_test_repo();
-    let repo_root = temp_dir.path();
+    let env = TestEnv::new();
+    env.create_dir("docs");
 
     let doc1 = create_doc("LKKLMN", "docs/doc1.md", "doc1", "First document");
-    insert_doc(&context.conn, &doc1, repo_root, "docs/doc1.md");
+    insert_doc(env.conn(), &doc1, env.repo_root(), "docs/doc1.md");
 
     let doc2 = create_doc("LLLMNO", "docs/doc2.md", "doc2", "Second document");
-    insert_doc(&context.conn, &doc2, repo_root, "docs/doc2.md");
+    insert_doc(env.conn(), &doc2, env.repo_root(), "docs/doc2.md");
 
-    insert_link(&context.conn, "LKKLMN", "LLLMNO", 0);
-    insert_link(&context.conn, "LKKLMN", "LNONEXISTENT", 1);
+    insert_link(env.conn(), "LKKLMN", "LLLMNO", 0);
+    insert_link(env.conn(), "LKKLMN", "LNONEXISTENT", 1);
 
     let args = default_args("LKKLMN");
+    let (_temp, context) = env.into_parts();
     let result = links_from::execute(context, args);
     assert!(result.is_ok(), "links-from should handle dangling links gracefully: {:?}", result);
 }
@@ -214,49 +204,33 @@ fn links_from_handles_dangling_links_gracefully() {
 
 #[test]
 fn links_from_json_output() {
-    let temp_dir = tempfile::tempdir().expect("Failed to create temp dir");
-    let repo_root = temp_dir.path();
-
-    fs::create_dir(repo_root.join(".git")).expect("Failed to create .git");
-    fs::create_dir_all(repo_root.join("docs")).expect("Failed to create docs");
-
-    let mut global = GlobalOptions::default();
-    global.json = true;
-    let mut context = create_context(repo_root, &global).expect("Failed to create context");
-    context.client_id_store = Box::new(FakeClientIdStore::new("WQN"));
-    schema_definition::create_schema(&context.conn).expect("Failed to create schema");
+    let env = TestEnv::new().with_json_output();
+    env.create_dir("docs");
 
     let doc1 = create_doc("LMMNOP", "docs/doc1.md", "doc1", "First document");
-    insert_doc(&context.conn, &doc1, repo_root, "docs/doc1.md");
+    insert_doc(env.conn(), &doc1, env.repo_root(), "docs/doc1.md");
 
     let doc2 = create_doc("LNNOPQ", "docs/doc2.md", "doc2", "Second document");
-    insert_doc(&context.conn, &doc2, repo_root, "docs/doc2.md");
+    insert_doc(env.conn(), &doc2, env.repo_root(), "docs/doc2.md");
 
-    insert_link(&context.conn, "LMMNOP", "LNNOPQ", 0);
+    insert_link(env.conn(), "LMMNOP", "LNNOPQ", 0);
 
     let args = default_args("LMMNOP");
+    let (_temp, context) = env.into_parts();
     let result = links_from::execute(context, args);
     assert!(result.is_ok(), "links-from should produce JSON output");
 }
 
 #[test]
 fn links_from_json_output_empty() {
-    let temp_dir = tempfile::tempdir().expect("Failed to create temp dir");
-    let repo_root = temp_dir.path();
-
-    fs::create_dir(repo_root.join(".git")).expect("Failed to create .git");
-    fs::create_dir_all(repo_root.join("docs")).expect("Failed to create docs");
-
-    let mut global = GlobalOptions::default();
-    global.json = true;
-    let mut context = create_context(repo_root, &global).expect("Failed to create context");
-    context.client_id_store = Box::new(FakeClientIdStore::new("WQN"));
-    schema_definition::create_schema(&context.conn).expect("Failed to create schema");
+    let env = TestEnv::new().with_json_output();
+    env.create_dir("docs");
 
     let doc = create_doc("LOOPQR", "docs/doc1.md", "doc1", "First document");
-    insert_doc(&context.conn, &doc, repo_root, "docs/doc1.md");
+    insert_doc(env.conn(), &doc, env.repo_root(), "docs/doc1.md");
 
     let args = default_args("LOOPQR");
+    let (_temp, context) = env.into_parts();
     let result = links_from::execute(context, args);
     assert!(result.is_ok(), "links-from should produce empty JSON array");
 }

@@ -1,8 +1,6 @@
 //! Tests for the `lat update` command.
 
-use std::fs;
-
-use lattice::cli::command_dispatch::{CommandContext, create_context};
+use lattice::cli::command_dispatch::CommandContext;
 use lattice::cli::commands::{create_command, update_command};
 use lattice::cli::global_options::GlobalOptions;
 use lattice::cli::task_args::{CreateArgs, UpdateArgs};
@@ -10,24 +8,10 @@ use lattice::document::document_reader;
 use lattice::document::frontmatter_schema::TaskType;
 use lattice::error::error_types::LatticeError;
 use lattice::git::client_config::FakeClientIdStore;
-use lattice::index::{document_queries, label_queries, schema_definition};
+use lattice::index::{document_queries, label_queries};
+use lattice::test::test_environment::TestEnv;
 
-fn create_test_repo() -> (tempfile::TempDir, CommandContext) {
-    let temp_dir = tempfile::tempdir().expect("Failed to create temp dir");
-    let repo_root = temp_dir.path();
-
-    fs::create_dir(repo_root.join(".git")).expect("Failed to create .git");
-
-    let global = GlobalOptions::default();
-    let mut context = create_context(repo_root, &global).expect("Failed to create context");
-    context.client_id_store = Box::new(FakeClientIdStore::new("WQN"));
-
-    schema_definition::create_schema(&context.conn).expect("Failed to create schema");
-
-    (temp_dir, context)
-}
-
-fn create_task(context: &CommandContext, parent: &str, description: &str) -> String {
+fn create_task(env: &TestEnv, parent: &str, description: &str) -> String {
     let args = CreateArgs {
         parent: parent.to_string(),
         description: description.to_string(),
@@ -39,16 +23,15 @@ fn create_task(context: &CommandContext, parent: &str, description: &str) -> Str
     };
 
     let global = GlobalOptions::default();
-    let mut ctx = create_context(&context.repo_root, &global).expect("Create context");
-    ctx.client_id_store = Box::new(FakeClientIdStore::new("WQN"));
+    let context = create_context_from_env(env, &global);
 
-    create_command::execute(ctx, args).expect("Create task");
+    create_command::execute(context, args).expect("Create task");
 
-    let docs = document_queries::all_ids(&context.conn).expect("Query IDs");
+    let docs = document_queries::all_ids(env.conn()).expect("Query IDs");
     docs.into_iter().last().expect("Should have created a document")
 }
 
-fn create_kb_doc(context: &CommandContext, parent: &str, description: &str) -> String {
+fn create_kb_doc(env: &TestEnv, parent: &str, description: &str) -> String {
     let args = CreateArgs {
         parent: parent.to_string(),
         description: description.to_string(),
@@ -60,13 +43,19 @@ fn create_kb_doc(context: &CommandContext, parent: &str, description: &str) -> S
     };
 
     let global = GlobalOptions::default();
-    let mut ctx = create_context(&context.repo_root, &global).expect("Create context");
-    ctx.client_id_store = Box::new(FakeClientIdStore::new("WQN"));
+    let context = create_context_from_env(env, &global);
 
-    create_command::execute(ctx, args).expect("Create KB doc");
+    create_command::execute(context, args).expect("Create KB doc");
 
-    let docs = document_queries::all_ids(&context.conn).expect("Query IDs");
+    let docs = document_queries::all_ids(env.conn()).expect("Query IDs");
     docs.into_iter().last().expect("Should have created a document")
+}
+
+fn create_context_from_env(env: &TestEnv, global: &GlobalOptions) -> CommandContext {
+    let mut context = lattice::cli::command_dispatch::create_context(env.repo_root(), global)
+        .expect("Create context");
+    context.client_id_store = Box::new(FakeClientIdStore::new("WQN"));
+    context
 }
 
 fn update_args(ids: Vec<&str>) -> UpdateArgs {
@@ -85,29 +74,27 @@ fn update_args(ids: Vec<&str>) -> UpdateArgs {
 
 #[test]
 fn update_changes_task_priority() {
-    let (temp_dir, context) = create_test_repo();
+    let env = TestEnv::new();
+    env.create_dir("api/tasks");
 
-    fs::create_dir_all(temp_dir.path().join("api/tasks")).expect("Create dirs");
-
-    let task_id = create_task(&context, "api/", "Fix login bug");
+    let task_id = create_task(&env, "api/", "Fix login bug");
 
     let mut args = update_args(vec![&task_id]);
     args.priority = Some(0);
 
     let global = GlobalOptions::default();
-    let mut ctx = create_context(temp_dir.path(), &global).expect("Create context");
-    ctx.client_id_store = Box::new(FakeClientIdStore::new("WQN"));
+    let ctx = create_context_from_env(&env, &global);
 
     let result = update_command::execute(ctx, args);
     assert!(result.is_ok(), "Update should succeed: {:?}", result);
 
-    let doc_row = document_queries::lookup_by_id(&context.conn, &task_id)
+    let doc_row = document_queries::lookup_by_id(env.conn(), &task_id)
         .expect("Query")
         .expect("Document should exist");
 
     assert_eq!(doc_row.priority, Some(0), "Priority should be updated in index");
 
-    let doc_path = temp_dir.path().join(&doc_row.path);
+    let doc_path = env.repo_root().join(&doc_row.path);
     let document = document_reader::read(&doc_path).expect("Read document");
 
     assert_eq!(document.frontmatter.priority, Some(0), "Priority should be updated in file");
@@ -115,18 +102,16 @@ fn update_changes_task_priority() {
 
 #[test]
 fn update_rejects_invalid_priority() {
-    let (temp_dir, context) = create_test_repo();
+    let env = TestEnv::new();
+    env.create_dir("api/tasks");
 
-    fs::create_dir_all(temp_dir.path().join("api/tasks")).expect("Create dirs");
-
-    let task_id = create_task(&context, "api/", "Fix login bug");
+    let task_id = create_task(&env, "api/", "Fix login bug");
 
     let mut args = update_args(vec![&task_id]);
     args.priority = Some(5);
 
     let global = GlobalOptions::default();
-    let mut ctx = create_context(temp_dir.path(), &global).expect("Create context");
-    ctx.client_id_store = Box::new(FakeClientIdStore::new("WQN"));
+    let ctx = create_context_from_env(&env, &global);
 
     let result = update_command::execute(ctx, args);
     assert!(result.is_err(), "Update should fail for invalid priority");
@@ -141,18 +126,16 @@ fn update_rejects_invalid_priority() {
 
 #[test]
 fn update_rejects_priority_on_kb_document() {
-    let (temp_dir, context) = create_test_repo();
+    let env = TestEnv::new();
+    env.create_dir("api/docs");
 
-    fs::create_dir_all(temp_dir.path().join("api/docs")).expect("Create dirs");
-
-    let doc_id = create_kb_doc(&context, "api/", "Design document");
+    let doc_id = create_kb_doc(&env, "api/", "Design document");
 
     let mut args = update_args(vec![&doc_id]);
     args.priority = Some(1);
 
     let global = GlobalOptions::default();
-    let mut ctx = create_context(temp_dir.path(), &global).expect("Create context");
-    ctx.client_id_store = Box::new(FakeClientIdStore::new("WQN"));
+    let ctx = create_context_from_env(&env, &global);
 
     let result = update_command::execute(ctx, args);
     assert!(result.is_err(), "Update should fail for KB document priority");
@@ -171,29 +154,27 @@ fn update_rejects_priority_on_kb_document() {
 
 #[test]
 fn update_changes_task_type() {
-    let (temp_dir, context) = create_test_repo();
+    let env = TestEnv::new();
+    env.create_dir("api/tasks");
 
-    fs::create_dir_all(temp_dir.path().join("api/tasks")).expect("Create dirs");
-
-    let task_id = create_task(&context, "api/", "Fix login bug");
+    let task_id = create_task(&env, "api/", "Fix login bug");
 
     let mut args = update_args(vec![&task_id]);
     args.r#type = Some(TaskType::Bug);
 
     let global = GlobalOptions::default();
-    let mut ctx = create_context(temp_dir.path(), &global).expect("Create context");
-    ctx.client_id_store = Box::new(FakeClientIdStore::new("WQN"));
+    let ctx = create_context_from_env(&env, &global);
 
     let result = update_command::execute(ctx, args);
     assert!(result.is_ok(), "Update should succeed: {:?}", result);
 
-    let doc_row = document_queries::lookup_by_id(&context.conn, &task_id)
+    let doc_row = document_queries::lookup_by_id(env.conn(), &task_id)
         .expect("Query")
         .expect("Document should exist");
 
     assert_eq!(doc_row.task_type, Some(TaskType::Bug), "Task type should be updated in index");
 
-    let doc_path = temp_dir.path().join(&doc_row.path);
+    let doc_path = env.repo_root().join(&doc_row.path);
     let document = document_reader::read(&doc_path).expect("Read document");
 
     assert_eq!(
@@ -205,23 +186,21 @@ fn update_changes_task_type() {
 
 #[test]
 fn update_converts_kb_to_task() {
-    let (temp_dir, context) = create_test_repo();
+    let env = TestEnv::new();
+    env.create_dir("api/docs");
 
-    fs::create_dir_all(temp_dir.path().join("api/docs")).expect("Create dirs");
-
-    let doc_id = create_kb_doc(&context, "api/", "Design document");
+    let doc_id = create_kb_doc(&env, "api/", "Design document");
 
     let mut args = update_args(vec![&doc_id]);
     args.r#type = Some(TaskType::Task);
 
     let global = GlobalOptions::default();
-    let mut ctx = create_context(temp_dir.path(), &global).expect("Create context");
-    ctx.client_id_store = Box::new(FakeClientIdStore::new("WQN"));
+    let ctx = create_context_from_env(&env, &global);
 
     let result = update_command::execute(ctx, args);
     assert!(result.is_ok(), "Update should succeed: {:?}", result);
 
-    let doc_row = document_queries::lookup_by_id(&context.conn, &doc_id)
+    let doc_row = document_queries::lookup_by_id(env.conn(), &doc_id)
         .expect("Query")
         .expect("Document should exist");
 
@@ -235,30 +214,28 @@ fn update_converts_kb_to_task() {
 
 #[test]
 fn update_adds_labels() {
-    let (temp_dir, context) = create_test_repo();
+    let env = TestEnv::new();
+    env.create_dir("api/tasks");
 
-    fs::create_dir_all(temp_dir.path().join("api/tasks")).expect("Create dirs");
-
-    let task_id = create_task(&context, "api/", "Fix login bug");
+    let task_id = create_task(&env, "api/", "Fix login bug");
 
     let mut args = update_args(vec![&task_id]);
     args.add_labels = vec!["urgent".to_string(), "frontend".to_string()];
 
     let global = GlobalOptions::default();
-    let mut ctx = create_context(temp_dir.path(), &global).expect("Create context");
-    ctx.client_id_store = Box::new(FakeClientIdStore::new("WQN"));
+    let ctx = create_context_from_env(&env, &global);
 
     let result = update_command::execute(ctx, args);
     assert!(result.is_ok(), "Update should succeed: {:?}", result);
 
-    let labels = label_queries::get_labels(&context.conn, &task_id).expect("Query labels");
+    let labels = label_queries::get_labels(env.conn(), &task_id).expect("Query labels");
     assert!(labels.contains(&"urgent".to_string()), "Should have urgent label");
     assert!(labels.contains(&"frontend".to_string()), "Should have frontend label");
 
-    let doc_row = document_queries::lookup_by_id(&context.conn, &task_id)
+    let doc_row = document_queries::lookup_by_id(env.conn(), &task_id)
         .expect("Query")
         .expect("Document should exist");
-    let doc_path = temp_dir.path().join(&doc_row.path);
+    let doc_path = env.repo_root().join(&doc_row.path);
     let document = document_reader::read(&doc_path).expect("Read document");
 
     assert!(
@@ -269,9 +246,8 @@ fn update_adds_labels() {
 
 #[test]
 fn update_removes_labels() {
-    let (temp_dir, context) = create_test_repo();
-
-    fs::create_dir_all(temp_dir.path().join("api/tasks")).expect("Create dirs");
+    let env = TestEnv::new();
+    env.create_dir("api/tasks");
 
     let args = CreateArgs {
         parent: "api/".to_string(),
@@ -284,11 +260,10 @@ fn update_removes_labels() {
     };
 
     let global = GlobalOptions::default();
-    let mut ctx = create_context(temp_dir.path(), &global).expect("Create context");
-    ctx.client_id_store = Box::new(FakeClientIdStore::new("WQN"));
+    let ctx = create_context_from_env(&env, &global);
     create_command::execute(ctx, args).expect("Create task");
 
-    let task_id = document_queries::all_ids(&context.conn)
+    let task_id = document_queries::all_ids(env.conn())
         .expect("Query")
         .into_iter()
         .last()
@@ -298,13 +273,12 @@ fn update_removes_labels() {
     update_args.remove_labels = vec!["urgent".to_string()];
 
     let global = GlobalOptions::default();
-    let mut ctx = create_context(temp_dir.path(), &global).expect("Create context");
-    ctx.client_id_store = Box::new(FakeClientIdStore::new("WQN"));
+    let ctx = create_context_from_env(&env, &global);
 
     let result = update_command::execute(ctx, update_args);
     assert!(result.is_ok(), "Update should succeed: {:?}", result);
 
-    let labels = label_queries::get_labels(&context.conn, &task_id).expect("Query labels");
+    let labels = label_queries::get_labels(env.conn(), &task_id).expect("Query labels");
     assert!(!labels.contains(&"urgent".to_string()), "Should not have urgent label");
     assert!(labels.contains(&"frontend".to_string()), "Should still have frontend label");
 }
@@ -315,29 +289,25 @@ fn update_removes_labels() {
 
 #[test]
 fn update_handles_multiple_ids() {
-    let (temp_dir, context) = create_test_repo();
+    let env = TestEnv::new();
+    env.create_dir("api/tasks");
 
-    fs::create_dir_all(temp_dir.path().join("api/tasks")).expect("Create dirs");
-
-    let task1_id = create_task(&context, "api/", "First task");
-    let task2_id = create_task(&context, "api/", "Second task");
+    let task1_id = create_task(&env, "api/", "First task");
+    let task2_id = create_task(&env, "api/", "Second task");
 
     let mut args = update_args(vec![&task1_id, &task2_id]);
     args.priority = Some(1);
 
     let global = GlobalOptions::default();
-    let mut ctx = create_context(temp_dir.path(), &global).expect("Create context");
-    ctx.client_id_store = Box::new(FakeClientIdStore::new("WQN"));
+    let ctx = create_context_from_env(&env, &global);
 
     let result = update_command::execute(ctx, args);
     assert!(result.is_ok(), "Batch update should succeed: {:?}", result);
 
-    let doc1 = document_queries::lookup_by_id(&context.conn, &task1_id)
-        .expect("Query")
-        .expect("First doc");
-    let doc2 = document_queries::lookup_by_id(&context.conn, &task2_id)
-        .expect("Query")
-        .expect("Second doc");
+    let doc1 =
+        document_queries::lookup_by_id(env.conn(), &task1_id).expect("Query").expect("First doc");
+    let doc2 =
+        document_queries::lookup_by_id(env.conn(), &task2_id).expect("Query").expect("Second doc");
 
     assert_eq!(doc1.priority, Some(1), "First task priority should be updated");
     assert_eq!(doc2.priority, Some(1), "Second task priority should be updated");
@@ -349,16 +319,13 @@ fn update_handles_multiple_ids() {
 
 #[test]
 fn update_fails_for_nonexistent_id() {
-    let (temp_dir, _context) = create_test_repo();
+    let env = TestEnv::new();
 
-    let args = update_args(vec!["LNONEXIST"]);
+    let mut args = update_args(vec!["LNONEXIST"]);
+    args.priority = Some(1);
 
     let global = GlobalOptions::default();
-    let mut ctx = create_context(temp_dir.path(), &global).expect("Create context");
-    ctx.client_id_store = Box::new(FakeClientIdStore::new("WQN"));
-
-    let mut args = args;
-    args.priority = Some(1);
+    let ctx = create_context_from_env(&env, &global);
 
     let result = update_command::execute(ctx, args);
     assert!(result.is_err(), "Update should fail for nonexistent ID");
@@ -373,17 +340,15 @@ fn update_fails_for_nonexistent_id() {
 
 #[test]
 fn update_fails_with_no_changes() {
-    let (temp_dir, context) = create_test_repo();
+    let env = TestEnv::new();
+    env.create_dir("api/tasks");
 
-    fs::create_dir_all(temp_dir.path().join("api/tasks")).expect("Create dirs");
-
-    let task_id = create_task(&context, "api/", "Fix login bug");
+    let task_id = create_task(&env, "api/", "Fix login bug");
 
     let args = update_args(vec![&task_id]);
 
     let global = GlobalOptions::default();
-    let mut ctx = create_context(temp_dir.path(), &global).expect("Create context");
-    ctx.client_id_store = Box::new(FakeClientIdStore::new("WQN"));
+    let ctx = create_context_from_env(&env, &global);
 
     let result = update_command::execute(ctx, args);
     assert!(result.is_err(), "Update should fail with no changes specified");
@@ -402,14 +367,13 @@ fn update_fails_with_no_changes() {
 
 #[test]
 fn update_sets_updated_at_timestamp() {
-    let (temp_dir, context) = create_test_repo();
+    let env = TestEnv::new();
+    env.create_dir("api/tasks");
 
-    fs::create_dir_all(temp_dir.path().join("api/tasks")).expect("Create dirs");
-
-    let task_id = create_task(&context, "api/", "Fix login bug");
+    let task_id = create_task(&env, "api/", "Fix login bug");
 
     let doc_row_before =
-        document_queries::lookup_by_id(&context.conn, &task_id).expect("Query").expect("Document");
+        document_queries::lookup_by_id(env.conn(), &task_id).expect("Query").expect("Document");
     let updated_before = doc_row_before.updated_at;
 
     std::thread::sleep(std::time::Duration::from_millis(10));
@@ -418,13 +382,12 @@ fn update_sets_updated_at_timestamp() {
     args.priority = Some(0);
 
     let global = GlobalOptions::default();
-    let mut ctx = create_context(temp_dir.path(), &global).expect("Create context");
-    ctx.client_id_store = Box::new(FakeClientIdStore::new("WQN"));
+    let ctx = create_context_from_env(&env, &global);
 
     update_command::execute(ctx, args).expect("Update should succeed");
 
     let doc_row_after =
-        document_queries::lookup_by_id(&context.conn, &task_id).expect("Query").expect("Document");
+        document_queries::lookup_by_id(env.conn(), &task_id).expect("Query").expect("Document");
 
     assert!(doc_row_after.updated_at > updated_before, "updated_at should be newer after update");
 }

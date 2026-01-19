@@ -1,36 +1,16 @@
 //! Tests for the `lat blocked` command.
 
-use std::fs;
-use std::io::Write;
-
-use lattice::cli::command_dispatch::create_context;
 use lattice::cli::commands::blocked_command;
-use lattice::cli::global_options::GlobalOptions;
 use lattice::cli::query_args::BlockedArgs;
 use lattice::document::frontmatter_schema::TaskType;
-use lattice::git::client_config::FakeClientIdStore;
 use lattice::index::document_types::InsertDocument;
 use lattice::index::link_queries::{InsertLink, LinkType};
-use lattice::index::{document_queries, link_queries, schema_definition};
+use lattice::index::{document_queries, link_queries};
+use lattice::test::test_environment::TestEnv;
+use lattice::test::test_fixtures::TaskDocBuilder;
 
 fn default_args() -> BlockedArgs {
     BlockedArgs { path: None, limit: None, show_blockers: false }
-}
-
-fn create_test_repo() -> (tempfile::TempDir, lattice::cli::command_dispatch::CommandContext) {
-    let temp_dir = tempfile::tempdir().expect("Failed to create temp dir");
-    let repo_root = temp_dir.path();
-
-    fs::create_dir(repo_root.join(".git")).expect("Failed to create .git");
-    fs::create_dir_all(repo_root.join("api/tasks")).expect("Failed to create api/tasks");
-    fs::create_dir_all(repo_root.join("api/docs")).expect("Failed to create api/docs");
-
-    let global = GlobalOptions::default();
-    let mut context = create_context(repo_root, &global).expect("Failed to create context");
-    context.client_id_store = Box::new(FakeClientIdStore::new("WQN"));
-    schema_definition::create_schema(&context.conn).expect("Failed to create schema");
-
-    (temp_dir, context)
 }
 
 fn create_task_doc(
@@ -57,41 +37,26 @@ fn create_task_doc(
     )
 }
 
-fn insert_doc(
-    conn: &rusqlite::Connection,
-    doc: &InsertDocument,
-    repo_root: &std::path::Path,
-    path: &str,
-) {
-    document_queries::insert(conn, doc).expect("Failed to insert document");
-    let full_path = repo_root.join(path);
-    let parent = full_path.parent().expect("Path should have parent");
-    fs::create_dir_all(parent).expect("Failed to create parent directories");
-    let mut file = fs::File::create(&full_path).expect("Failed to create file");
-    write!(
-        file,
-        "---\nlattice-id: {}\nname: {}\ndescription: {}\n---\nBody content",
-        doc.id, doc.name, doc.description
-    )
-    .expect("Failed to write file");
-}
-
-fn add_blocking_link(conn: &rusqlite::Connection, blocked_id: &str, blocker_id: &str) {
+fn add_blocking_link(env: &TestEnv, blocked_id: &str, blocker_id: &str) {
     let link = InsertLink {
         source_id: blocked_id,
         target_id: blocker_id,
         link_type: LinkType::BlockedBy,
         position: 0,
     };
-    link_queries::insert_for_document(conn, &[link]).expect("Failed to insert link");
+    link_queries::insert_for_document(env.conn(), &[link]).expect("Failed to insert link");
 }
 
 #[test]
 fn blocked_command_returns_empty_when_no_blocked_tasks() {
-    let (_temp_dir, context) = create_test_repo();
-    let repo_root = _temp_dir.path();
+    let env = TestEnv::new();
 
-    let task = create_task_doc(
+    let task = TaskDocBuilder::new("First task").id("LAABCD").priority(2).build();
+    env.create_dir("api/tasks");
+    env.write_file("api/tasks/task1.md", &task.content);
+    env.fake_git().track_file("api/tasks/task1.md");
+
+    let insert_doc = create_task_doc(
         "LAABCD",
         "api/tasks/task1.md",
         "task-one",
@@ -99,7 +64,9 @@ fn blocked_command_returns_empty_when_no_blocked_tasks() {
         2,
         TaskType::Task,
     );
-    insert_doc(&context.conn, &task, repo_root, "api/tasks/task1.md");
+    document_queries::insert(env.conn(), &insert_doc).expect("Insert doc");
+
+    let (_temp, context) = env.into_parts();
 
     let args = default_args();
     let result = blocked_command::execute(context, args);
@@ -108,10 +75,21 @@ fn blocked_command_returns_empty_when_no_blocked_tasks() {
 
 #[test]
 fn blocked_command_finds_blocked_task() {
-    let (_temp_dir, context) = create_test_repo();
-    let repo_root = _temp_dir.path();
+    let env = TestEnv::new();
 
-    let blocker = create_task_doc(
+    let blocker = TaskDocBuilder::new("Blocking task").id("LBLOCK").priority(1).build();
+    let blocked = TaskDocBuilder::new("Task blocked by another")
+        .id("LBLKD2")
+        .priority(2)
+        .blocked_by(vec!["LBLOCK"])
+        .build();
+
+    env.create_dir("api/tasks");
+    env.write_file("api/tasks/blocker.md", &blocker.content);
+    env.write_file("api/tasks/blocked.md", &blocked.content);
+    env.fake_git().track_files(["api/tasks/blocker.md", "api/tasks/blocked.md"]);
+
+    let blocker_doc = create_task_doc(
         "LBLOCK",
         "api/tasks/blocker.md",
         "blocker-task",
@@ -119,9 +97,7 @@ fn blocked_command_finds_blocked_task() {
         1,
         TaskType::Task,
     );
-    insert_doc(&context.conn, &blocker, repo_root, "api/tasks/blocker.md");
-
-    let blocked = create_task_doc(
+    let blocked_doc = create_task_doc(
         "LBLKD2",
         "api/tasks/blocked.md",
         "blocked-task",
@@ -129,8 +105,11 @@ fn blocked_command_finds_blocked_task() {
         2,
         TaskType::Task,
     );
-    insert_doc(&context.conn, &blocked, repo_root, "api/tasks/blocked.md");
-    add_blocking_link(&context.conn, "LBLKD2", "LBLOCK");
+    document_queries::insert(env.conn(), &blocker_doc).expect("Insert blocker");
+    document_queries::insert(env.conn(), &blocked_doc).expect("Insert blocked");
+    add_blocking_link(&env, "LBLKD2", "LBLOCK");
+
+    let (_temp, context) = env.into_parts();
 
     let args = default_args();
     let result = blocked_command::execute(context, args);
@@ -139,11 +118,23 @@ fn blocked_command_finds_blocked_task() {
 
 #[test]
 fn blocked_command_excludes_tasks_blocked_by_closed_tasks() {
-    let (_temp_dir, context) = create_test_repo();
-    let repo_root = _temp_dir.path();
-    fs::create_dir_all(repo_root.join("api/tasks/.closed")).expect("Failed to create .closed dir");
+    let env = TestEnv::new();
 
-    let closed_blocker = create_task_doc(
+    let closed_blocker =
+        TaskDocBuilder::new("Closed blocking task").id("LCLOSE").priority(1).build();
+    let maybe_blocked = TaskDocBuilder::new("Task blocked by closed task")
+        .id("LMAYBE")
+        .priority(2)
+        .blocked_by(vec!["LCLOSE"])
+        .build();
+
+    env.create_dir("api/tasks/.closed");
+    env.write_file("api/tasks/.closed/closed_blocker.md", &closed_blocker.content);
+    env.write_file("api/tasks/maybe_blocked.md", &maybe_blocked.content);
+    env.fake_git()
+        .track_files(["api/tasks/.closed/closed_blocker.md", "api/tasks/maybe_blocked.md"]);
+
+    let closed_blocker_doc = create_task_doc(
         "LCLOSE",
         "api/tasks/.closed/closed_blocker.md",
         "closed-blocker",
@@ -151,9 +142,7 @@ fn blocked_command_excludes_tasks_blocked_by_closed_tasks() {
         1,
         TaskType::Task,
     );
-    insert_doc(&context.conn, &closed_blocker, repo_root, "api/tasks/.closed/closed_blocker.md");
-
-    let maybe_blocked = create_task_doc(
+    let maybe_blocked_doc = create_task_doc(
         "LMAYBE",
         "api/tasks/maybe_blocked.md",
         "maybe-blocked",
@@ -161,8 +150,11 @@ fn blocked_command_excludes_tasks_blocked_by_closed_tasks() {
         2,
         TaskType::Task,
     );
-    insert_doc(&context.conn, &maybe_blocked, repo_root, "api/tasks/maybe_blocked.md");
-    add_blocking_link(&context.conn, "LMAYBE", "LCLOSE");
+    document_queries::insert(env.conn(), &closed_blocker_doc).expect("Insert closed blocker");
+    document_queries::insert(env.conn(), &maybe_blocked_doc).expect("Insert maybe blocked");
+    add_blocking_link(&env, "LMAYBE", "LCLOSE");
+
+    let (_temp, context) = env.into_parts();
 
     let args = default_args();
     let result = blocked_command::execute(context, args);
@@ -171,11 +163,32 @@ fn blocked_command_excludes_tasks_blocked_by_closed_tasks() {
 
 #[test]
 fn blocked_command_filters_by_path() {
-    let (_temp_dir, context) = create_test_repo();
-    let repo_root = _temp_dir.path();
-    fs::create_dir_all(repo_root.join("database/tasks")).expect("Failed to create database/tasks");
+    let env = TestEnv::new();
 
-    let blocker = create_task_doc(
+    let blocker = TaskDocBuilder::new("Blocking task").id("LBLOCK").priority(1).build();
+    let api_blocked = TaskDocBuilder::new("API blocked task")
+        .id("LAPIBL")
+        .priority(2)
+        .blocked_by(vec!["LBLOCK"])
+        .build();
+    let db_blocked = TaskDocBuilder::new("DB blocked task")
+        .id("LDBBLK")
+        .priority(2)
+        .blocked_by(vec!["LBLOCK"])
+        .build();
+
+    env.create_dir("api/tasks");
+    env.create_dir("database/tasks");
+    env.write_file("api/tasks/blocker.md", &blocker.content);
+    env.write_file("api/tasks/api_blocked.md", &api_blocked.content);
+    env.write_file("database/tasks/db_blocked.md", &db_blocked.content);
+    env.fake_git().track_files([
+        "api/tasks/blocker.md",
+        "api/tasks/api_blocked.md",
+        "database/tasks/db_blocked.md",
+    ]);
+
+    let blocker_doc = create_task_doc(
         "LBLOCK",
         "api/tasks/blocker.md",
         "blocker",
@@ -183,9 +196,7 @@ fn blocked_command_filters_by_path() {
         1,
         TaskType::Task,
     );
-    insert_doc(&context.conn, &blocker, repo_root, "api/tasks/blocker.md");
-
-    let api_blocked = create_task_doc(
+    let api_blocked_doc = create_task_doc(
         "LAPIBL",
         "api/tasks/api_blocked.md",
         "api-blocked",
@@ -193,10 +204,7 @@ fn blocked_command_filters_by_path() {
         2,
         TaskType::Task,
     );
-    insert_doc(&context.conn, &api_blocked, repo_root, "api/tasks/api_blocked.md");
-    add_blocking_link(&context.conn, "LAPIBL", "LBLOCK");
-
-    let db_blocked = create_task_doc(
+    let db_blocked_doc = create_task_doc(
         "LDBBLK",
         "database/tasks/db_blocked.md",
         "db-blocked",
@@ -204,8 +212,13 @@ fn blocked_command_filters_by_path() {
         2,
         TaskType::Task,
     );
-    insert_doc(&context.conn, &db_blocked, repo_root, "database/tasks/db_blocked.md");
-    add_blocking_link(&context.conn, "LDBBLK", "LBLOCK");
+    document_queries::insert(env.conn(), &blocker_doc).expect("Insert blocker");
+    document_queries::insert(env.conn(), &api_blocked_doc).expect("Insert api blocked");
+    document_queries::insert(env.conn(), &db_blocked_doc).expect("Insert db blocked");
+    add_blocking_link(&env, "LAPIBL", "LBLOCK");
+    add_blocking_link(&env, "LDBBLK", "LBLOCK");
+
+    let (_temp, context) = env.into_parts();
 
     let mut args = default_args();
     args.path = Some("api/".to_string());
@@ -215,10 +228,14 @@ fn blocked_command_filters_by_path() {
 
 #[test]
 fn blocked_command_respects_limit() {
-    let (_temp_dir, context) = create_test_repo();
-    let repo_root = _temp_dir.path();
+    let env = TestEnv::new();
 
-    let blocker = create_task_doc(
+    let blocker = TaskDocBuilder::new("Blocking task").id("LBLOCK").priority(1).build();
+    env.create_dir("api/tasks");
+    env.write_file("api/tasks/blocker.md", &blocker.content);
+    env.fake_git().track_file("api/tasks/blocker.md");
+
+    let blocker_doc = create_task_doc(
         "LBLOCK",
         "api/tasks/blocker.md",
         "blocker",
@@ -226,17 +243,23 @@ fn blocked_command_respects_limit() {
         1,
         TaskType::Task,
     );
-    insert_doc(&context.conn, &blocker, repo_root, "api/tasks/blocker.md");
+    document_queries::insert(env.conn(), &blocker_doc).expect("Insert blocker");
 
     for i in 1..=5 {
         let id = format!("LBLK{i:02}");
         let path = format!("api/tasks/blocked{i}.md");
         let name = format!("blocked-{i}");
         let desc = format!("Blocked task {i}");
+        let task =
+            TaskDocBuilder::new(&desc).id(&id).priority(2).blocked_by(vec!["LBLOCK"]).build();
+        env.write_file(&path, &task.content);
+        env.fake_git().track_file(&path);
         let doc = create_task_doc(&id, &path, &name, &desc, 2, TaskType::Task);
-        insert_doc(&context.conn, &doc, repo_root, &path);
-        add_blocking_link(&context.conn, &id, "LBLOCK");
+        document_queries::insert(env.conn(), &doc).expect("Insert doc");
+        add_blocking_link(&env, &id, "LBLOCK");
     }
+
+    let (_temp, context) = env.into_parts();
 
     let mut args = default_args();
     args.limit = Some(2);
@@ -246,10 +269,21 @@ fn blocked_command_respects_limit() {
 
 #[test]
 fn blocked_command_with_show_blockers_flag() {
-    let (_temp_dir, context) = create_test_repo();
-    let repo_root = _temp_dir.path();
+    let env = TestEnv::new();
 
-    let blocker = create_task_doc(
+    let blocker = TaskDocBuilder::new("Blocking task").id("LBLOCK").priority(1).build();
+    let blocked = TaskDocBuilder::new("Task blocked by another")
+        .id("LBLKD2")
+        .priority(2)
+        .blocked_by(vec!["LBLOCK"])
+        .build();
+
+    env.create_dir("api/tasks");
+    env.write_file("api/tasks/blocker.md", &blocker.content);
+    env.write_file("api/tasks/blocked.md", &blocked.content);
+    env.fake_git().track_files(["api/tasks/blocker.md", "api/tasks/blocked.md"]);
+
+    let blocker_doc = create_task_doc(
         "LBLOCK",
         "api/tasks/blocker.md",
         "blocker-task",
@@ -257,9 +291,7 @@ fn blocked_command_with_show_blockers_flag() {
         1,
         TaskType::Task,
     );
-    insert_doc(&context.conn, &blocker, repo_root, "api/tasks/blocker.md");
-
-    let blocked = create_task_doc(
+    let blocked_doc = create_task_doc(
         "LBLKD2",
         "api/tasks/blocked.md",
         "blocked-task",
@@ -267,8 +299,11 @@ fn blocked_command_with_show_blockers_flag() {
         2,
         TaskType::Task,
     );
-    insert_doc(&context.conn, &blocked, repo_root, "api/tasks/blocked.md");
-    add_blocking_link(&context.conn, "LBLKD2", "LBLOCK");
+    document_queries::insert(env.conn(), &blocker_doc).expect("Insert blocker");
+    document_queries::insert(env.conn(), &blocked_doc).expect("Insert blocked");
+    add_blocking_link(&env, "LBLKD2", "LBLOCK");
+
+    let (_temp, context) = env.into_parts();
 
     let mut args = default_args();
     args.show_blockers = true;
@@ -278,10 +313,27 @@ fn blocked_command_with_show_blockers_flag() {
 
 #[test]
 fn blocked_command_with_multiple_blockers() {
-    let (_temp_dir, context) = create_test_repo();
-    let repo_root = _temp_dir.path();
+    let env = TestEnv::new();
 
-    let blocker1 = create_task_doc(
+    let blocker1 = TaskDocBuilder::new("First blocker").id("LBLK01").priority(1).build();
+    let blocker2 = TaskDocBuilder::new("Second blocker").id("LBLK02").priority(1).build();
+    let blocked = TaskDocBuilder::new("Task blocked by two tasks")
+        .id("LBLKD3")
+        .priority(2)
+        .blocked_by(vec!["LBLK01", "LBLK02"])
+        .build();
+
+    env.create_dir("api/tasks");
+    env.write_file("api/tasks/blocker1.md", &blocker1.content);
+    env.write_file("api/tasks/blocker2.md", &blocker2.content);
+    env.write_file("api/tasks/blocked.md", &blocked.content);
+    env.fake_git().track_files([
+        "api/tasks/blocker1.md",
+        "api/tasks/blocker2.md",
+        "api/tasks/blocked.md",
+    ]);
+
+    let blocker1_doc = create_task_doc(
         "LBLK01",
         "api/tasks/blocker1.md",
         "blocker-one",
@@ -289,9 +341,7 @@ fn blocked_command_with_multiple_blockers() {
         1,
         TaskType::Task,
     );
-    insert_doc(&context.conn, &blocker1, repo_root, "api/tasks/blocker1.md");
-
-    let blocker2 = create_task_doc(
+    let blocker2_doc = create_task_doc(
         "LBLK02",
         "api/tasks/blocker2.md",
         "blocker-two",
@@ -299,9 +349,7 @@ fn blocked_command_with_multiple_blockers() {
         1,
         TaskType::Task,
     );
-    insert_doc(&context.conn, &blocker2, repo_root, "api/tasks/blocker2.md");
-
-    let blocked = create_task_doc(
+    let blocked_doc = create_task_doc(
         "LBLKD3",
         "api/tasks/blocked.md",
         "multi-blocked",
@@ -309,9 +357,13 @@ fn blocked_command_with_multiple_blockers() {
         2,
         TaskType::Task,
     );
-    insert_doc(&context.conn, &blocked, repo_root, "api/tasks/blocked.md");
-    add_blocking_link(&context.conn, "LBLKD3", "LBLK01");
-    add_blocking_link(&context.conn, "LBLKD3", "LBLK02");
+    document_queries::insert(env.conn(), &blocker1_doc).expect("Insert blocker1");
+    document_queries::insert(env.conn(), &blocker2_doc).expect("Insert blocker2");
+    document_queries::insert(env.conn(), &blocked_doc).expect("Insert blocked");
+    add_blocking_link(&env, "LBLKD3", "LBLK01");
+    add_blocking_link(&env, "LBLKD3", "LBLK02");
+
+    let (_temp, context) = env.into_parts();
 
     let mut args = default_args();
     args.show_blockers = true;
@@ -321,11 +373,21 @@ fn blocked_command_with_multiple_blockers() {
 
 #[test]
 fn blocked_command_excludes_closed_tasks() {
-    let (_temp_dir, context) = create_test_repo();
-    let repo_root = _temp_dir.path();
-    fs::create_dir_all(repo_root.join("api/tasks/.closed")).expect("Failed to create .closed dir");
+    let env = TestEnv::new();
 
-    let blocker = create_task_doc(
+    let blocker = TaskDocBuilder::new("Blocking task").id("LBLOCK").priority(1).build();
+    let closed_blocked = TaskDocBuilder::new("Closed task that was blocked")
+        .id("LCLSBL")
+        .priority(2)
+        .blocked_by(vec!["LBLOCK"])
+        .build();
+
+    env.create_dir("api/tasks/.closed");
+    env.write_file("api/tasks/blocker.md", &blocker.content);
+    env.write_file("api/tasks/.closed/closed_blocked.md", &closed_blocked.content);
+    env.fake_git().track_files(["api/tasks/blocker.md", "api/tasks/.closed/closed_blocked.md"]);
+
+    let blocker_doc = create_task_doc(
         "LBLOCK",
         "api/tasks/blocker.md",
         "blocker",
@@ -333,9 +395,7 @@ fn blocked_command_excludes_closed_tasks() {
         1,
         TaskType::Task,
     );
-    insert_doc(&context.conn, &blocker, repo_root, "api/tasks/blocker.md");
-
-    let closed_blocked = create_task_doc(
+    let closed_blocked_doc = create_task_doc(
         "LCLSBL",
         "api/tasks/.closed/closed_blocked.md",
         "closed-blocked",
@@ -343,8 +403,11 @@ fn blocked_command_excludes_closed_tasks() {
         2,
         TaskType::Task,
     );
-    insert_doc(&context.conn, &closed_blocked, repo_root, "api/tasks/.closed/closed_blocked.md");
-    add_blocking_link(&context.conn, "LCLSBL", "LBLOCK");
+    document_queries::insert(env.conn(), &blocker_doc).expect("Insert blocker");
+    document_queries::insert(env.conn(), &closed_blocked_doc).expect("Insert closed blocked");
+    add_blocking_link(&env, "LCLSBL", "LBLOCK");
+
+    let (_temp, context) = env.into_parts();
 
     let args = default_args();
     let result = blocked_command::execute(context, args);
@@ -353,10 +416,21 @@ fn blocked_command_excludes_closed_tasks() {
 
 #[test]
 fn blocked_command_json_output() {
-    let (_temp_dir, mut context) = create_test_repo();
-    let repo_root = _temp_dir.path();
+    let env = TestEnv::new();
 
-    let blocker = create_task_doc(
+    let blocker = TaskDocBuilder::new("Blocking task").id("LBLOCK").priority(1).build();
+    let blocked = TaskDocBuilder::new("Task blocked by another")
+        .id("LBLKD2")
+        .priority(2)
+        .blocked_by(vec!["LBLOCK"])
+        .build();
+
+    env.create_dir("api/tasks");
+    env.write_file("api/tasks/blocker.md", &blocker.content);
+    env.write_file("api/tasks/blocked.md", &blocked.content);
+    env.fake_git().track_files(["api/tasks/blocker.md", "api/tasks/blocked.md"]);
+
+    let blocker_doc = create_task_doc(
         "LBLOCK",
         "api/tasks/blocker.md",
         "blocker-task",
@@ -364,9 +438,7 @@ fn blocked_command_json_output() {
         1,
         TaskType::Task,
     );
-    insert_doc(&context.conn, &blocker, repo_root, "api/tasks/blocker.md");
-
-    let blocked = create_task_doc(
+    let blocked_doc = create_task_doc(
         "LBLKD2",
         "api/tasks/blocked.md",
         "blocked-task",
@@ -374,10 +446,13 @@ fn blocked_command_json_output() {
         2,
         TaskType::Task,
     );
-    insert_doc(&context.conn, &blocked, repo_root, "api/tasks/blocked.md");
-    add_blocking_link(&context.conn, "LBLKD2", "LBLOCK");
+    document_queries::insert(env.conn(), &blocker_doc).expect("Insert blocker");
+    document_queries::insert(env.conn(), &blocked_doc).expect("Insert blocked");
+    add_blocking_link(&env, "LBLKD2", "LBLOCK");
 
-    context.global.json = true;
+    let mut env = env.with_json_output();
+    let (_temp, context) = env.into_parts();
+
     let args = default_args();
     let result = blocked_command::execute(context, args);
     assert!(result.is_ok(), "Blocked command with JSON output should succeed");

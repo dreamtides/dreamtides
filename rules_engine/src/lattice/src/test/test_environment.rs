@@ -27,7 +27,7 @@ pub const DEFAULT_TEST_CLIENT_ID: &str = "WQN";
 /// let env = TestEnv::new();
 /// env.create_dir("api/tasks");
 /// env.create_document("api/api.md", "LAPIXX", "api", "API root document");
-/// let context = env.into_context();
+/// let (_temp, context) = env.into_parts();
 /// // Use context to run commands
 /// ```
 pub struct TestEnv {
@@ -41,7 +41,7 @@ pub struct TestEnv {
     /// Fake client ID store for ID generation.
     client_id: String,
 
-    /// In-memory SQLite connection.
+    /// SQLite connection to the test database.
     conn: Connection,
 
     /// Repository root path (same as temp_dir.path()).
@@ -60,9 +60,12 @@ impl TestEnv {
     /// Sets up:
     /// - Fresh temp directory
     /// - `.git` directory marker
-    /// - `.lattice` directory
-    /// - In-memory SQLite with schema initialized
+    /// - `.lat` directory with file-based SQLite database
+    /// - Database schema initialized
     /// - FakeGit and FakeClientIdStore instances
+    ///
+    /// Uses file-based SQLite so that test helper functions can create
+    /// additional contexts via `create_context` that share the same database.
     ///
     /// # Panics
     ///
@@ -81,10 +84,13 @@ impl TestEnv {
         debug!(?repo_root, "Creating test environment");
 
         fs::create_dir(repo_root.join(".git")).expect("Failed to create .git directory");
-        fs::create_dir(repo_root.join(".lattice")).expect("Failed to create .lattice directory");
+        connection_pool::ensure_lattice_dir(&repo_root)
+            .expect("Failed to create .lat directory for test");
 
-        let conn = connection_pool::open_memory_connection()
-            .expect("Failed to open in-memory SQLite connection");
+        // Use file-based database so that subsequent calls to create_context
+        // from test helpers can access the same database with the schema.
+        let conn =
+            connection_pool::open_connection(&repo_root).expect("Failed to open SQLite connection");
         schema_definition::create_schema(&conn).expect("Failed to create database schema");
 
         let fake_git = FakeGit::new();
@@ -158,17 +164,29 @@ impl TestEnv {
 
     /// Creates a CommandContext from this test environment.
     ///
-    /// The context takes ownership of the connection and git instance.
-    /// This consumes the TestEnv.
-    pub fn into_context(self) -> CommandContext {
-        CommandContext {
+    /// Returns both the CommandContext and the TempDir. The TempDir must be
+    /// held alive for the duration of the test to prevent the directory from
+    /// being deleted while the context still references it.
+    ///
+    /// # Example
+    ///
+    /// ```ignore
+    /// let env = TestEnv::new();
+    /// env.create_dir("api/tasks");
+    /// let (_temp, context) = env.into_parts();
+    /// // Use context for commands
+    /// // _temp keeps the directory alive
+    /// ```
+    pub fn into_parts(self) -> (TempDir, CommandContext) {
+        let context = CommandContext {
             git: Box::new(self.fake_git),
             conn: self.conn,
             config: self.config,
             repo_root: self.repo_root,
             global: self.global,
             client_id_store: Box::new(FakeClientIdStore::new(&self.client_id)),
-        }
+        };
+        (self._temp_dir, context)
     }
 
     /// Creates a directory structure under the repo root.

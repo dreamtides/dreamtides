@@ -4,15 +4,14 @@ use std::fs;
 use std::io::Write;
 use std::process::ExitCode;
 
-use lattice::cli::command_dispatch::create_context;
 use lattice::cli::commands::check_command::check_output;
-use lattice::cli::global_options::GlobalOptions;
 use lattice::cli::maintenance_args::CheckArgs;
 use lattice::document::frontmatter_schema::TaskType;
 use lattice::error::exit_codes;
+use lattice::index::document_queries;
 use lattice::index::document_types::InsertDocument;
-use lattice::index::{document_queries, schema_definition};
 use lattice::lint::rule_engine::LintSummary;
+use lattice::test::test_environment::TestEnv;
 
 fn default_args() -> CheckArgs {
     CheckArgs {
@@ -22,21 +21,6 @@ fn default_args() -> CheckArgs {
         staged_only: false,
         rebuild_index: false,
     }
-}
-
-fn create_test_repo() -> (tempfile::TempDir, lattice::cli::command_dispatch::CommandContext) {
-    let temp_dir = tempfile::tempdir().expect("Failed to create temp dir");
-    let repo_root = temp_dir.path();
-
-    fs::create_dir(repo_root.join(".git")).expect("Failed to create .git");
-    fs::create_dir_all(repo_root.join("api/tasks")).expect("Failed to create api/tasks");
-    fs::create_dir_all(repo_root.join("api/docs")).expect("Failed to create api/docs");
-
-    let global = GlobalOptions::default();
-    let context = create_context(repo_root, &global).expect("Failed to create context");
-    schema_definition::create_schema(&context.conn).expect("Failed to create schema");
-
-    (temp_dir, context)
 }
 
 fn create_valid_doc(id: &str, path: &str, name: &str, description: &str) -> InsertDocument {
@@ -127,18 +111,19 @@ fn default_args_has_no_filters() {
 
 #[test]
 fn check_with_valid_document_shows_clean_summary() {
-    let (temp_dir, context) = create_test_repo();
-    let repo_root = temp_dir.path();
+    let env = TestEnv::new();
+    env.create_dir("api/tasks");
+    env.create_dir("api/docs");
 
     let doc = create_valid_doc("LABC01", "api/api.md", "api", "API root document");
-    insert_doc(&context.conn, &doc, repo_root, "api/api.md");
+    insert_doc(env.conn(), &doc, env.repo_root(), "api/api.md");
 
     // Use the lint engine directly to verify behavior without exit
     let rules = lattice::lint::error_rules::all_error_rules();
     let rule_refs: Vec<&dyn lattice::lint::rule_engine::LintRule> =
         rules.iter().map(|r| r.as_ref()).collect();
     let config = lattice::lint::rule_engine::LintConfig::default();
-    let ctx = lattice::lint::rule_engine::LintContext::new(&context.conn, repo_root);
+    let ctx = lattice::lint::rule_engine::LintContext::new(env.conn(), env.repo_root());
 
     let summary = lattice::lint::rule_engine::execute_rules(&ctx, &rule_refs, &config)
         .expect("Check should succeed");
@@ -150,22 +135,22 @@ fn check_with_valid_document_shows_clean_summary() {
 
 #[test]
 fn check_with_path_filter_limits_scope() {
-    let (temp_dir, context) = create_test_repo();
-    let repo_root = temp_dir.path();
-
-    fs::create_dir_all(repo_root.join("database/docs")).expect("Failed to create dir");
+    let env = TestEnv::new();
+    env.create_dir("api/tasks");
+    env.create_dir("api/docs");
+    env.create_dir("database/docs");
 
     let api = create_valid_doc("LAPI01", "api/api.md", "api", "API root");
-    insert_doc(&context.conn, &api, repo_root, "api/api.md");
+    insert_doc(env.conn(), &api, env.repo_root(), "api/api.md");
 
     let db = create_valid_doc("LDB001", "database/database.md", "database", "Database root");
-    insert_doc(&context.conn, &db, repo_root, "database/database.md");
+    insert_doc(env.conn(), &db, env.repo_root(), "database/database.md");
 
     let rules = lattice::lint::error_rules::all_error_rules();
     let rule_refs: Vec<&dyn lattice::lint::rule_engine::LintRule> =
         rules.iter().map(|r| r.as_ref()).collect();
     let config = lattice::lint::rule_engine::LintConfig::default().with_path_prefix("api/");
-    let ctx = lattice::lint::rule_engine::LintContext::new(&context.conn, repo_root);
+    let ctx = lattice::lint::rule_engine::LintContext::new(env.conn(), env.repo_root());
 
     let summary = lattice::lint::rule_engine::execute_rules(&ctx, &rule_refs, &config)
         .expect("Check should succeed");
@@ -175,19 +160,20 @@ fn check_with_path_filter_limits_scope() {
 
 #[test]
 fn check_errors_only_filters_warnings() {
-    let (temp_dir, context) = create_test_repo();
-    let repo_root = temp_dir.path();
+    let env = TestEnv::new();
+    env.create_dir("api/tasks");
+    env.create_dir("api/docs");
 
     // Create a document that will trigger a warning (too long name)
     let doc = create_valid_doc("LABC01", "api/api.md", "api", "A description that is valid");
-    insert_doc(&context.conn, &doc, repo_root, "api/api.md");
+    insert_doc(env.conn(), &doc, env.repo_root(), "api/api.md");
 
     // Use warning rules
     let rules = lattice::lint::warning_rules::all_warning_rules();
     let rule_refs: Vec<&dyn lattice::lint::rule_engine::LintRule> =
         rules.iter().map(|r| r.as_ref()).collect();
     let config = lattice::lint::rule_engine::LintConfig::default().with_errors_only(true);
-    let ctx = lattice::lint::rule_engine::LintContext::new(&context.conn, repo_root);
+    let ctx = lattice::lint::rule_engine::LintContext::new(env.conn(), env.repo_root());
 
     let summary = lattice::lint::rule_engine::execute_rules(&ctx, &rule_refs, &config)
         .expect("Check should succeed");
@@ -197,14 +183,15 @@ fn check_errors_only_filters_warnings() {
 
 #[test]
 fn check_with_empty_repo_succeeds() {
-    let (_temp_dir, context) = create_test_repo();
-    let repo_root = context.repo_root.clone();
+    let env = TestEnv::new();
+    env.create_dir("api/tasks");
+    env.create_dir("api/docs");
 
     let rules = lattice::lint::error_rules::all_error_rules();
     let rule_refs: Vec<&dyn lattice::lint::rule_engine::LintRule> =
         rules.iter().map(|r| r.as_ref()).collect();
     let config = lattice::lint::rule_engine::LintConfig::default();
-    let ctx = lattice::lint::rule_engine::LintContext::new(&context.conn, &repo_root);
+    let ctx = lattice::lint::rule_engine::LintContext::new(env.conn(), env.repo_root());
 
     let summary = lattice::lint::rule_engine::execute_rules(&ctx, &rule_refs, &config)
         .expect("Check should succeed on empty repo");
@@ -215,20 +202,21 @@ fn check_with_empty_repo_succeeds() {
 
 #[test]
 fn check_reports_missing_priority_for_task() {
-    let (temp_dir, context) = create_test_repo();
-    let repo_root = temp_dir.path();
+    let env = TestEnv::new();
+    env.create_dir("api/tasks");
+    env.create_dir("api/docs");
 
     // Create a task without priority by setting task_type but no priority
     let mut doc = create_valid_doc("LTASK1", "api/tasks/task-one.md", "task-one", "A task");
     doc.task_type = Some(TaskType::Task);
     doc.priority = None;
-    insert_doc(&context.conn, &doc, repo_root, "api/tasks/task-one.md");
+    insert_doc(env.conn(), &doc, env.repo_root(), "api/tasks/task-one.md");
 
     let rules = lattice::lint::error_rules::all_error_rules();
     let rule_refs: Vec<&dyn lattice::lint::rule_engine::LintRule> =
         rules.iter().map(|r| r.as_ref()).collect();
     let config = lattice::lint::rule_engine::LintConfig::default();
-    let ctx = lattice::lint::rule_engine::LintContext::new(&context.conn, repo_root);
+    let ctx = lattice::lint::rule_engine::LintContext::new(env.conn(), env.repo_root());
 
     let summary = lattice::lint::rule_engine::execute_rules(&ctx, &rule_refs, &config)
         .expect("Check should succeed");
@@ -242,18 +230,19 @@ fn check_reports_missing_priority_for_task() {
 
 #[test]
 fn check_reports_name_mismatch() {
-    let (temp_dir, context) = create_test_repo();
-    let repo_root = temp_dir.path();
+    let env = TestEnv::new();
+    env.create_dir("api/tasks");
+    env.create_dir("api/docs");
 
     // Create a document where name doesn't match filename
     let doc = create_valid_doc("LDOC01", "api/api.md", "wrong-name", "Description");
-    insert_doc(&context.conn, &doc, repo_root, "api/api.md");
+    insert_doc(env.conn(), &doc, env.repo_root(), "api/api.md");
 
     let rules = lattice::lint::error_rules::all_error_rules();
     let rule_refs: Vec<&dyn lattice::lint::rule_engine::LintRule> =
         rules.iter().map(|r| r.as_ref()).collect();
     let config = lattice::lint::rule_engine::LintConfig::default();
-    let ctx = lattice::lint::rule_engine::LintContext::new(&context.conn, repo_root);
+    let ctx = lattice::lint::rule_engine::LintContext::new(env.conn(), env.repo_root());
 
     let summary = lattice::lint::rule_engine::execute_rules(&ctx, &rule_refs, &config)
         .expect("Check should succeed");
@@ -267,20 +256,21 @@ fn check_reports_name_mismatch() {
 
 #[test]
 fn check_summary_counts_affected_documents_correctly() {
-    let (temp_dir, context) = create_test_repo();
-    let repo_root = temp_dir.path();
+    let env = TestEnv::new();
+    env.create_dir("api/tasks");
+    env.create_dir("api/docs");
 
     // Create two docs with issues
     let doc1 = create_valid_doc("LDOC01", "api/api.md", "wrong-one", "Description 1");
     let doc2 = create_valid_doc("LDOC02", "api/docs/design.md", "wrong-two", "Description 2");
-    insert_doc(&context.conn, &doc1, repo_root, "api/api.md");
-    insert_doc(&context.conn, &doc2, repo_root, "api/docs/design.md");
+    insert_doc(env.conn(), &doc1, env.repo_root(), "api/api.md");
+    insert_doc(env.conn(), &doc2, env.repo_root(), "api/docs/design.md");
 
     let rules = lattice::lint::error_rules::all_error_rules();
     let rule_refs: Vec<&dyn lattice::lint::rule_engine::LintRule> =
         rules.iter().map(|r| r.as_ref()).collect();
     let config = lattice::lint::rule_engine::LintConfig::default();
-    let ctx = lattice::lint::rule_engine::LintContext::new(&context.conn, repo_root);
+    let ctx = lattice::lint::rule_engine::LintContext::new(env.conn(), env.repo_root());
 
     let summary = lattice::lint::rule_engine::execute_rules(&ctx, &rule_refs, &config)
         .expect("Check should succeed");

@@ -4,33 +4,16 @@ use std::fs;
 use std::io::Write;
 
 use chrono::Utc;
-use lattice::cli::command_dispatch::create_context;
 use lattice::cli::commands::path_command;
-use lattice::cli::global_options::GlobalOptions;
 use lattice::cli::structure_args::PathArgs;
 use lattice::error::error_types::LatticeError;
-use lattice::git::client_config::FakeClientIdStore;
+use lattice::index::document_queries;
 use lattice::index::document_types::InsertDocument;
-use lattice::index::link_queries::{InsertLink, LinkType};
-use lattice::index::{document_queries, link_queries, schema_definition};
+use lattice::index::link_queries::{self, InsertLink, LinkType};
+use lattice::test::test_environment::TestEnv;
 
 fn default_args(id1: &str, id2: &str) -> PathArgs {
     PathArgs { id1: id1.to_string(), id2: id2.to_string() }
-}
-
-fn create_test_repo() -> (tempfile::TempDir, lattice::cli::command_dispatch::CommandContext) {
-    let temp_dir = tempfile::tempdir().expect("Failed to create temp dir");
-    let repo_root = temp_dir.path();
-
-    fs::create_dir(repo_root.join(".git")).expect("Failed to create .git");
-    fs::create_dir_all(repo_root.join("docs")).expect("Failed to create docs");
-
-    let global = GlobalOptions::default();
-    let mut context = create_context(repo_root, &global).expect("Failed to create context");
-    context.client_id_store = Box::new(FakeClientIdStore::new("PTH"));
-    schema_definition::create_schema(&context.conn).expect("Failed to create schema");
-
-    (temp_dir, context)
 }
 
 fn create_doc(id: &str, path: &str, name: &str, description: &str) -> InsertDocument {
@@ -80,13 +63,14 @@ fn insert_link(conn: &rusqlite::Connection, source_id: &str, target_id: &str, po
 
 #[test]
 fn path_same_document() {
-    let (temp_dir, context) = create_test_repo();
-    let repo_root = temp_dir.path();
+    let env = TestEnv::new();
+    env.create_dir("docs");
 
     let doc = create_doc("LPAAAA", "docs/doc1.md", "doc1", "First document");
-    insert_doc(&context.conn, &doc, repo_root, "docs/doc1.md");
+    insert_doc(env.conn(), &doc, env.repo_root(), "docs/doc1.md");
 
     let args = default_args("LPAAAA", "LPAAAA");
+    let (_temp, context) = env.into_parts();
     let result = path_command::execute(context, args);
     assert!(result.is_ok(), "path should succeed when source equals target");
 }
@@ -97,18 +81,19 @@ fn path_same_document() {
 
 #[test]
 fn path_direct_link() {
-    let (temp_dir, context) = create_test_repo();
-    let repo_root = temp_dir.path();
+    let env = TestEnv::new();
+    env.create_dir("docs");
 
     let doc1 = create_doc("LPBBBB", "docs/doc1.md", "doc1", "First document");
-    insert_doc(&context.conn, &doc1, repo_root, "docs/doc1.md");
+    insert_doc(env.conn(), &doc1, env.repo_root(), "docs/doc1.md");
 
     let doc2 = create_doc("LPCCCC", "docs/doc2.md", "doc2", "Second document");
-    insert_doc(&context.conn, &doc2, repo_root, "docs/doc2.md");
+    insert_doc(env.conn(), &doc2, env.repo_root(), "docs/doc2.md");
 
-    insert_link(&context.conn, "LPBBBB", "LPCCCC", 0);
+    insert_link(env.conn(), "LPBBBB", "LPCCCC", 0);
 
     let args = default_args("LPBBBB", "LPCCCC");
+    let (_temp, context) = env.into_parts();
     let result = path_command::execute(context, args);
     assert!(result.is_ok(), "path should find direct link");
 }
@@ -119,48 +104,50 @@ fn path_direct_link() {
 
 #[test]
 fn path_two_hops() {
-    let (temp_dir, context) = create_test_repo();
-    let repo_root = temp_dir.path();
+    let env = TestEnv::new();
+    env.create_dir("docs");
 
     let doc1 = create_doc("LPDDDD", "docs/doc1.md", "doc1", "First document");
-    insert_doc(&context.conn, &doc1, repo_root, "docs/doc1.md");
+    insert_doc(env.conn(), &doc1, env.repo_root(), "docs/doc1.md");
 
     let doc2 = create_doc("LPEEEE", "docs/doc2.md", "doc2", "Second document");
-    insert_doc(&context.conn, &doc2, repo_root, "docs/doc2.md");
+    insert_doc(env.conn(), &doc2, env.repo_root(), "docs/doc2.md");
 
     let doc3 = create_doc("LPFFFF", "docs/doc3.md", "doc3", "Third document");
-    insert_doc(&context.conn, &doc3, repo_root, "docs/doc3.md");
+    insert_doc(env.conn(), &doc3, env.repo_root(), "docs/doc3.md");
 
-    insert_link(&context.conn, "LPDDDD", "LPEEEE", 0);
-    insert_link(&context.conn, "LPEEEE", "LPFFFF", 0);
+    insert_link(env.conn(), "LPDDDD", "LPEEEE", 0);
+    insert_link(env.conn(), "LPEEEE", "LPFFFF", 0);
 
     let args = default_args("LPDDDD", "LPFFFF");
+    let (_temp, context) = env.into_parts();
     let result = path_command::execute(context, args);
     assert!(result.is_ok(), "path should find two-hop path");
 }
 
 #[test]
 fn path_three_hops() {
-    let (temp_dir, context) = create_test_repo();
-    let repo_root = temp_dir.path();
+    let env = TestEnv::new();
+    env.create_dir("docs");
 
     let doc1 = create_doc("LPGGGG", "docs/doc1.md", "doc1", "First document");
-    insert_doc(&context.conn, &doc1, repo_root, "docs/doc1.md");
+    insert_doc(env.conn(), &doc1, env.repo_root(), "docs/doc1.md");
 
     let doc2 = create_doc("LPHHHH", "docs/doc2.md", "doc2", "Second document");
-    insert_doc(&context.conn, &doc2, repo_root, "docs/doc2.md");
+    insert_doc(env.conn(), &doc2, env.repo_root(), "docs/doc2.md");
 
     let doc3 = create_doc("LPIIII", "docs/doc3.md", "doc3", "Third document");
-    insert_doc(&context.conn, &doc3, repo_root, "docs/doc3.md");
+    insert_doc(env.conn(), &doc3, env.repo_root(), "docs/doc3.md");
 
     let doc4 = create_doc("LPJJJJ", "docs/doc4.md", "doc4", "Fourth document");
-    insert_doc(&context.conn, &doc4, repo_root, "docs/doc4.md");
+    insert_doc(env.conn(), &doc4, env.repo_root(), "docs/doc4.md");
 
-    insert_link(&context.conn, "LPGGGG", "LPHHHH", 0);
-    insert_link(&context.conn, "LPHHHH", "LPIIII", 0);
-    insert_link(&context.conn, "LPIIII", "LPJJJJ", 0);
+    insert_link(env.conn(), "LPGGGG", "LPHHHH", 0);
+    insert_link(env.conn(), "LPHHHH", "LPIIII", 0);
+    insert_link(env.conn(), "LPIIII", "LPJJJJ", 0);
 
     let args = default_args("LPGGGG", "LPJJJJ");
+    let (_temp, context) = env.into_parts();
     let result = path_command::execute(context, args);
     assert!(result.is_ok(), "path should find three-hop path");
 }
@@ -171,34 +158,36 @@ fn path_three_hops() {
 
 #[test]
 fn path_no_connection() {
-    let (temp_dir, context) = create_test_repo();
-    let repo_root = temp_dir.path();
+    let env = TestEnv::new();
+    env.create_dir("docs");
 
     let doc1 = create_doc("LPKKKK", "docs/doc1.md", "doc1", "First document");
-    insert_doc(&context.conn, &doc1, repo_root, "docs/doc1.md");
+    insert_doc(env.conn(), &doc1, env.repo_root(), "docs/doc1.md");
 
     let doc2 = create_doc("LPLLLL", "docs/doc2.md", "doc2", "Second document");
-    insert_doc(&context.conn, &doc2, repo_root, "docs/doc2.md");
+    insert_doc(env.conn(), &doc2, env.repo_root(), "docs/doc2.md");
 
     let args = default_args("LPKKKK", "LPLLLL");
+    let (_temp, context) = env.into_parts();
     let result = path_command::execute(context, args);
     assert!(result.is_ok(), "path command should succeed even when no path exists");
 }
 
 #[test]
 fn path_reverse_direction_not_found() {
-    let (temp_dir, context) = create_test_repo();
-    let repo_root = temp_dir.path();
+    let env = TestEnv::new();
+    env.create_dir("docs");
 
     let doc1 = create_doc("LPMMMM", "docs/doc1.md", "doc1", "First document");
-    insert_doc(&context.conn, &doc1, repo_root, "docs/doc1.md");
+    insert_doc(env.conn(), &doc1, env.repo_root(), "docs/doc1.md");
 
     let doc2 = create_doc("LPNNNN", "docs/doc2.md", "doc2", "Second document");
-    insert_doc(&context.conn, &doc2, repo_root, "docs/doc2.md");
+    insert_doc(env.conn(), &doc2, env.repo_root(), "docs/doc2.md");
 
-    insert_link(&context.conn, "LPMMMM", "LPNNNN", 0);
+    insert_link(env.conn(), "LPMMMM", "LPNNNN", 0);
 
     let args = default_args("LPNNNN", "LPMMMM");
+    let (_temp, context) = env.into_parts();
     let result = path_command::execute(context, args);
     assert!(result.is_ok(), "path command should succeed when reverse path doesn't exist");
 }
@@ -209,13 +198,14 @@ fn path_reverse_direction_not_found() {
 
 #[test]
 fn path_source_not_found() {
-    let (temp_dir, context) = create_test_repo();
-    let repo_root = temp_dir.path();
+    let env = TestEnv::new();
+    env.create_dir("docs");
 
     let doc = create_doc("LPOOOO", "docs/doc1.md", "doc1", "First document");
-    insert_doc(&context.conn, &doc, repo_root, "docs/doc1.md");
+    insert_doc(env.conn(), &doc, env.repo_root(), "docs/doc1.md");
 
     let args = default_args("LNONEX", "LPOOOO");
+    let (_temp, context) = env.into_parts();
     let result = path_command::execute(context, args);
     assert!(
         matches!(result, Err(LatticeError::DocumentNotFound { .. })),
@@ -225,13 +215,14 @@ fn path_source_not_found() {
 
 #[test]
 fn path_target_not_found() {
-    let (temp_dir, context) = create_test_repo();
-    let repo_root = temp_dir.path();
+    let env = TestEnv::new();
+    env.create_dir("docs");
 
     let doc = create_doc("LPPPPP", "docs/doc1.md", "doc1", "First document");
-    insert_doc(&context.conn, &doc, repo_root, "docs/doc1.md");
+    insert_doc(env.conn(), &doc, env.repo_root(), "docs/doc1.md");
 
     let args = default_args("LPPPPP", "LNONEX");
+    let (_temp, context) = env.into_parts();
     let result = path_command::execute(context, args);
     assert!(
         matches!(result, Err(LatticeError::DocumentNotFound { .. })),
@@ -245,27 +236,28 @@ fn path_target_not_found() {
 
 #[test]
 fn path_finds_shortest_when_multiple_paths_exist() {
-    let (temp_dir, context) = create_test_repo();
-    let repo_root = temp_dir.path();
+    let env = TestEnv::new();
+    env.create_dir("docs");
 
     let doc1 = create_doc("LPQQQQ", "docs/doc1.md", "doc1", "First document");
-    insert_doc(&context.conn, &doc1, repo_root, "docs/doc1.md");
+    insert_doc(env.conn(), &doc1, env.repo_root(), "docs/doc1.md");
 
     let doc2 = create_doc("LPRRRR", "docs/doc2.md", "doc2", "Second document");
-    insert_doc(&context.conn, &doc2, repo_root, "docs/doc2.md");
+    insert_doc(env.conn(), &doc2, env.repo_root(), "docs/doc2.md");
 
     let doc3 = create_doc("LPSSSS", "docs/doc3.md", "doc3", "Third document");
-    insert_doc(&context.conn, &doc3, repo_root, "docs/doc3.md");
+    insert_doc(env.conn(), &doc3, env.repo_root(), "docs/doc3.md");
 
     let doc4 = create_doc("LPTTTT", "docs/doc4.md", "doc4", "Fourth document");
-    insert_doc(&context.conn, &doc4, repo_root, "docs/doc4.md");
+    insert_doc(env.conn(), &doc4, env.repo_root(), "docs/doc4.md");
 
-    insert_link(&context.conn, "LPQQQQ", "LPTTTT", 0);
-    insert_link(&context.conn, "LPQQQQ", "LPRRRR", 1);
-    insert_link(&context.conn, "LPRRRR", "LPSSSS", 0);
-    insert_link(&context.conn, "LPSSSS", "LPTTTT", 0);
+    insert_link(env.conn(), "LPQQQQ", "LPTTTT", 0);
+    insert_link(env.conn(), "LPQQQQ", "LPRRRR", 1);
+    insert_link(env.conn(), "LPRRRR", "LPSSSS", 0);
+    insert_link(env.conn(), "LPSSSS", "LPTTTT", 0);
 
     let args = default_args("LPQQQQ", "LPTTTT");
+    let (_temp, context) = env.into_parts();
     let result = path_command::execute(context, args);
     assert!(result.is_ok(), "path should find shortest path when multiple paths exist");
 }
@@ -276,52 +268,36 @@ fn path_finds_shortest_when_multiple_paths_exist() {
 
 #[test]
 fn path_json_output_with_path() {
-    let temp_dir = tempfile::tempdir().expect("Failed to create temp dir");
-    let repo_root = temp_dir.path();
-
-    fs::create_dir(repo_root.join(".git")).expect("Failed to create .git");
-    fs::create_dir_all(repo_root.join("docs")).expect("Failed to create docs");
-
-    let mut global = GlobalOptions::default();
-    global.json = true;
-    let mut context = create_context(repo_root, &global).expect("Failed to create context");
-    context.client_id_store = Box::new(FakeClientIdStore::new("PTH"));
-    schema_definition::create_schema(&context.conn).expect("Failed to create schema");
+    let env = TestEnv::new().with_json_output();
+    env.create_dir("docs");
 
     let doc1 = create_doc("LPUUUU", "docs/doc1.md", "doc1", "First document");
-    insert_doc(&context.conn, &doc1, repo_root, "docs/doc1.md");
+    insert_doc(env.conn(), &doc1, env.repo_root(), "docs/doc1.md");
 
     let doc2 = create_doc("LPVVVV", "docs/doc2.md", "doc2", "Second document");
-    insert_doc(&context.conn, &doc2, repo_root, "docs/doc2.md");
+    insert_doc(env.conn(), &doc2, env.repo_root(), "docs/doc2.md");
 
-    insert_link(&context.conn, "LPUUUU", "LPVVVV", 0);
+    insert_link(env.conn(), "LPUUUU", "LPVVVV", 0);
 
     let args = default_args("LPUUUU", "LPVVVV");
+    let (_temp, context) = env.into_parts();
     let result = path_command::execute(context, args);
     assert!(result.is_ok(), "path should produce JSON output");
 }
 
 #[test]
 fn path_json_output_no_path() {
-    let temp_dir = tempfile::tempdir().expect("Failed to create temp dir");
-    let repo_root = temp_dir.path();
-
-    fs::create_dir(repo_root.join(".git")).expect("Failed to create .git");
-    fs::create_dir_all(repo_root.join("docs")).expect("Failed to create docs");
-
-    let mut global = GlobalOptions::default();
-    global.json = true;
-    let mut context = create_context(repo_root, &global).expect("Failed to create context");
-    context.client_id_store = Box::new(FakeClientIdStore::new("PTH"));
-    schema_definition::create_schema(&context.conn).expect("Failed to create schema");
+    let env = TestEnv::new().with_json_output();
+    env.create_dir("docs");
 
     let doc1 = create_doc("LPWWWW", "docs/doc1.md", "doc1", "First document");
-    insert_doc(&context.conn, &doc1, repo_root, "docs/doc1.md");
+    insert_doc(env.conn(), &doc1, env.repo_root(), "docs/doc1.md");
 
     let doc2 = create_doc("LPXXXX", "docs/doc2.md", "doc2", "Second document");
-    insert_doc(&context.conn, &doc2, repo_root, "docs/doc2.md");
+    insert_doc(env.conn(), &doc2, env.repo_root(), "docs/doc2.md");
 
     let args = default_args("LPWWWW", "LPXXXX");
+    let (_temp, context) = env.into_parts();
     let result = path_command::execute(context, args);
     assert!(result.is_ok(), "path should produce JSON output even when no path exists");
 }
