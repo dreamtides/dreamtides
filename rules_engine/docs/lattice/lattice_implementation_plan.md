@@ -1215,7 +1215,7 @@ The following integration points connect claims to other features:
 
 ---
 
-## Feature: Template System
+## Feature: Template System [ONGOING]
 
 **Goal:** Compose context and acceptance criteria from ancestor root documents.
 
