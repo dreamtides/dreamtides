@@ -441,3 +441,163 @@ fn dep_remove_errors_for_nonexistent_source() {
     let result = dep_command::execute(context, args);
     assert!(result.is_err(), "dep remove should error when source task doesn't exist");
 }
+
+// ============================================================================
+// lat dep add Edge Case Tests
+// ============================================================================
+
+#[test]
+fn dep_add_errors_for_self_dependency() {
+    let env = TestEnv::new();
+    env.create_dir("api/tasks");
+
+    let task = create_task_doc(
+        "LSSTVU",
+        "api/tasks/task1.md",
+        "self-task",
+        "Task that tries to depend on itself",
+        2,
+        TaskType::Task,
+    );
+    insert_doc(&env, &task, "api/tasks/task1.md");
+
+    let args = DepArgs {
+        command: DepCommand::Add { id: "LSSTVU".to_string(), depends_on: "LSSTVU".to_string() },
+    };
+    let (_temp, context) = env.into_parts();
+    let result = dep_command::execute(context, args);
+    assert!(result.is_err(), "dep add should error for self-dependency");
+    let err = result.unwrap_err();
+    assert!(
+        err.to_string().contains("self-dependency"),
+        "Error message should mention self-dependency: {err}"
+    );
+}
+
+#[test]
+fn dep_add_errors_for_cycle() {
+    let env = TestEnv::new();
+    env.create_dir("api/tasks");
+
+    let task1 = TaskDocBuilder::new("Task A")
+        .id("LTTUWV")
+        .priority(2)
+        .task_type("task")
+        .blocked_by(vec!["LUUVXW"])
+        .build();
+    env.write_file("api/tasks/task_a.md", &task1.content);
+
+    let task1_doc =
+        create_task_doc("LTTUWV", "api/tasks/task_a.md", "task-a", "Task A", 2, TaskType::Task);
+    document_queries::insert(env.conn(), &task1_doc).expect("Insert task A");
+
+    let task2 = TaskDocBuilder::new("Task B")
+        .id("LUUVXW")
+        .priority(2)
+        .task_type("task")
+        .blocking(vec!["LTTUWV"])
+        .build();
+    env.write_file("api/tasks/task_b.md", &task2.content);
+
+    let task2_doc =
+        create_task_doc("LUUVXW", "api/tasks/task_b.md", "task-b", "Task B", 2, TaskType::Task);
+    document_queries::insert(env.conn(), &task2_doc).expect("Insert task B");
+
+    add_dependency(&env, "LTTUWV", "LUUVXW");
+
+    let args = DepArgs {
+        command: DepCommand::Add { id: "LUUVXW".to_string(), depends_on: "LTTUWV".to_string() },
+    };
+    let (_temp, context) = env.into_parts();
+    let result = dep_command::execute(context, args);
+    assert!(result.is_err(), "dep add should error when it would create a cycle");
+}
+
+#[test]
+fn dep_add_succeeds_when_dependency_already_exists() {
+    let env = TestEnv::new();
+    env.create_dir("api/tasks");
+
+    let task1 = TaskDocBuilder::new("Child task")
+        .id("LVVWYX")
+        .priority(2)
+        .task_type("task")
+        .blocked_by(vec!["LWWXZY"])
+        .build();
+    env.write_file("api/tasks/child.md", &task1.content);
+
+    let task1_doc = create_task_doc(
+        "LVVWYX",
+        "api/tasks/child.md",
+        "child-task",
+        "Child task",
+        2,
+        TaskType::Task,
+    );
+    document_queries::insert(env.conn(), &task1_doc).expect("Insert child");
+
+    let task2 = TaskDocBuilder::new("Parent task")
+        .id("LWWXZY")
+        .priority(1)
+        .task_type("feature")
+        .blocking(vec!["LVVWYX"])
+        .build();
+    env.write_file("api/tasks/parent.md", &task2.content);
+
+    let task2_doc = create_task_doc(
+        "LWWXZY",
+        "api/tasks/parent.md",
+        "parent-task",
+        "Parent task",
+        1,
+        TaskType::Feature,
+    );
+    document_queries::insert(env.conn(), &task2_doc).expect("Insert parent");
+
+    add_dependency(&env, "LVVWYX", "LWWXZY");
+
+    let args = DepArgs {
+        command: DepCommand::Add { id: "LVVWYX".to_string(), depends_on: "LWWXZY".to_string() },
+    };
+    let (_temp, context) = env.into_parts();
+    let result = dep_command::execute(context, args);
+    assert!(result.is_ok(), "dep add should succeed (no-op) when dependency already exists");
+}
+
+#[test]
+fn dep_add_warns_when_target_is_closed() {
+    let env = TestEnv::new();
+    env.create_dir("api/tasks/.closed");
+
+    let open_task = create_task_doc(
+        "LXXY2Z",
+        "api/tasks/open_task.md",
+        "open-task",
+        "Open task",
+        2,
+        TaskType::Task,
+    );
+    insert_doc(&env, &open_task, "api/tasks/open_task.md");
+
+    let mut closed_task = create_task_doc(
+        "LYY23A",
+        "api/tasks/.closed/closed_task.md",
+        "closed-task",
+        "Closed task",
+        1,
+        TaskType::Feature,
+    );
+    closed_task.is_closed = true;
+    insert_doc(&env, &closed_task, "api/tasks/.closed/closed_task.md");
+
+    let args = DepArgs {
+        command: DepCommand::Add { id: "LXXY2Z".to_string(), depends_on: "LYY23A".to_string() },
+    };
+    let (_temp, context) = env.into_parts();
+    let result = dep_command::execute(context, args);
+    assert!(
+        result.is_ok(),
+        "dep add should succeed even when target is closed (with warning): {:?}",
+        result
+    );
+}

@@ -35,6 +35,12 @@ pub fn execute(context: CommandContext, args: DepArgs) -> LatticeResult<()> {
 fn add_dependency(context: CommandContext, id: &str, depends_on: &str) -> LatticeResult<()> {
     info!("Adding dependency: {} depends on {}", id, depends_on);
 
+    if id == depends_on {
+        return Err(LatticeError::InvalidArgument {
+            message: format!("Cannot add self-dependency: {id} cannot depend on itself"),
+        });
+    }
+
     let source_doc = document_queries::lookup_by_id(&context.conn, id)?
         .ok_or_else(|| LatticeError::DocumentNotFound { id: id.to_string() })?;
     let target_doc = document_queries::lookup_by_id(&context.conn, depends_on)?
@@ -53,8 +59,12 @@ fn add_dependency(context: CommandContext, id: &str, depends_on: &str) -> Lattic
 
     if source_document.frontmatter.blocked_by.contains(&target_lattice_id) {
         warn!(source = id, target = depends_on, "Dependency already exists");
-        println!("{} already depends on {}", id, depends_on);
+        output_add_result(&context, id, depends_on, false, "Dependency already exists");
         return Ok(());
+    }
+
+    if target_doc.is_closed {
+        warn!(target = depends_on, "Target task is already closed");
     }
 
     source_document.frontmatter.blocked_by.push(target_lattice_id);
@@ -85,15 +95,53 @@ fn add_dependency(context: CommandContext, id: &str, depends_on: &str) -> Lattic
     }])?;
 
     info!(source = id, target = depends_on, "Dependency added");
-    println!(
-        "Added dependency: {} {} {} {}",
-        color_theme::lattice_id(id),
-        color_theme::muted("depends on"),
-        color_theme::lattice_id(depends_on),
-        color_theme::success("✓")
+    output_add_result(
+        &context,
+        id,
+        depends_on,
+        true,
+        if target_doc.is_closed { "Target task is already closed" } else { "" },
     );
 
     Ok(())
+}
+
+/// Outputs the result of adding a dependency.
+fn output_add_result(
+    context: &CommandContext,
+    source_id: &str,
+    target_id: &str,
+    changed: bool,
+    warning: &str,
+) {
+    if context.global.json {
+        let mut output = serde_json::json!({
+            "source_id": source_id,
+            "target_id": target_id,
+            "changed": changed,
+        });
+        if !warning.is_empty() {
+            output["warning"] = serde_json::json!(warning);
+        }
+        println!(
+            "{}",
+            output_format::output_json(&output)
+                .unwrap_or_else(|_| panic!("JSON serialization failed"))
+        );
+    } else if changed {
+        let warning_suffix =
+            if warning.is_empty() { String::new() } else { format!(" ({})", warning) };
+        println!(
+            "Added dependency: {} {} {} {}{}",
+            color_theme::lattice_id(source_id),
+            color_theme::muted("depends on"),
+            color_theme::lattice_id(target_id),
+            color_theme::success("✓"),
+            color_theme::warning(&warning_suffix)
+        );
+    } else {
+        println!("{} already depends on {}", source_id, target_id);
+    }
 }
 
 /// Removes a dependency relationship.
