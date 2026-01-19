@@ -19,7 +19,7 @@ Checklist for reviewing Lattice changes to maintain the "bulletproof" design goa
   good assertion messages, exist in /tests/ directory (not in `mod tests {}`.)
 - **Avoid `.unwrap()`:** Use `.ok_or(LatticeError::...)?` or explicit panic with
   reason
-- **Keep it small:** Functions under 50 lines, files under 500 lines
+- **Keep it small:** Try for functions under 50 lines, files under 500 lines
 - **Avoid code duplication:** Search for opportunities to factor out shared code
 - **Ensure docs are updated:** Verify relevant markdown documentation is
   still accurate

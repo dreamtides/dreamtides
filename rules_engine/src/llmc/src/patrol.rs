@@ -8,7 +8,6 @@ use crate::config::{Config, SelfReviewConfig};
 use crate::ipc::messages::HookEvent;
 use crate::state::{self, State, WorkerStatus};
 use crate::tmux::sender::TmuxSender;
-use crate::tmux::session;
 use crate::worker::{self, WorkerTransition};
 use crate::{git, recovery, sound};
 
@@ -344,12 +343,11 @@ impl Patrol {
         for worker_name in worker_names {
             let worker = state.get_worker(&worker_name).unwrap();
             let current_status = worker.status;
-            let session_id = worker.session_id.clone();
             let worktree_path = PathBuf::from(&worker.worktree_path);
             let self_review_enabled = worker.self_review;
             let transition = match current_status {
                 WorkerStatus::Rebasing => {
-                    self.detect_rebasing_transition(&session_id, &worktree_path)?
+                    self.detect_rebasing_transition(&worker_name, &worktree_path)?
                 }
                 _ => WorkerTransition::None,
             };
@@ -474,30 +472,16 @@ impl Patrol {
 
     fn detect_rebasing_transition(
         &self,
-        session_id: &str,
+        worker_name: &str,
         worktree_path: &Path,
     ) -> Result<WorkerTransition> {
-        let rebase_in_progress = git::is_rebase_in_progress(worktree_path);
-        if rebase_in_progress {
-            tracing::debug!("Worker {} still has rebase in progress", session_id);
+        if git::is_rebase_in_progress(worktree_path) {
+            tracing::debug!("Worker {} still has rebase in progress", worker_name);
             return Ok(WorkerTransition::None);
         }
-        let output = session::capture_pane(session_id, 50)?;
-        let rebase_completed = output.contains("Successfully rebased and updated");
-        let rebase_aborted =
-            output.contains("rebase --abort") && !output.contains("git rebase --abort");
-        if rebase_completed {
-            tracing::info!("Worker {} completed rebase successfully", session_id);
-        } else if rebase_aborted {
-            tracing::warn!("Worker {} aborted rebase", session_id);
-        } else {
-            tracing::info!(
-                "Worker {} rebase finished (no completion message in pane, assuming success)",
-                session_id
-            );
-        }
+        tracing::info!("Worker {} rebase finished", worker_name);
         if git::has_uncommitted_changes(worktree_path)? {
-            tracing::info!("Worker {} has uncommitted changes after rebase, amending", session_id);
+            tracing::info!("Worker {} has uncommitted changes after rebase, amending", worker_name);
             git::amend_uncommitted_changes(worktree_path)?;
         }
         let commit_sha = git::get_head_commit(worktree_path)?;
@@ -869,8 +853,7 @@ fn build_conflict_prompt(conflicts: &[String], original_task: &str) -> String {
         );
     prompt.push_str("Conflicting files:\n");
     for file in conflicts {
-        let conflict_count = count_conflict_markers(file);
-        prompt.push_str(&format!("- {} ({} conflict markers)\n", file, conflict_count));
+        prompt.push_str(&format!("- {}\n", file));
     }
     prompt
         .push_str(
@@ -896,10 +879,6 @@ fn build_conflict_prompt(conflicts: &[String], original_task: &str) -> String {
          Do NOT commit manually. The rebase process handles commits automatically.\n",
         );
     prompt
-}
-
-fn count_conflict_markers(file: &str) -> usize {
-    std::fs::read_to_string(file).map(|content| content.matches("<<<<<<<").count()).unwrap_or(0)
 }
 
 fn get_self_review_config(config: &Config) -> Option<&SelfReviewConfig> {

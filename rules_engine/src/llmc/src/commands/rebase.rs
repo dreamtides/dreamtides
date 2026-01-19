@@ -99,8 +99,7 @@ pub fn build_conflict_prompt(conflicts: &[String], original_task: &str) -> Strin
         );
     prompt.push_str("Conflicting files:\n");
     for file in conflicts {
-        let conflict_count = count_conflict_markers(file);
-        prompt.push_str(&format!("- {} ({} conflict markers)\n", file, conflict_count));
+        prompt.push_str(&format!("- {}\n", file));
     }
     prompt
         .push_str(
@@ -121,9 +120,7 @@ pub fn build_conflict_prompt(conflicts: &[String], original_task: &str) -> Strin
         );
     prompt
 }
-fn count_conflict_markers(file: &str) -> usize {
-    std::fs::read_to_string(file).map(|content| content.matches("<<<<<<<").count()).unwrap_or(0)
-}
+
 fn format_all_workers(state: &State) -> String {
     if state.workers.is_empty() {
         return "none".to_string();
