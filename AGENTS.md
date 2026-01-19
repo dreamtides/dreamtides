@@ -88,66 +88,53 @@ Your current working directory is `rules_engine/`. The `justfile` and similar ar
 
 Card data lives in `rules_engine/tabula/cards.toml`. Do NOT read this file directly, it is much too large.
 
-# TASK TRACKING
+# LATTICE
 
 When ending a session or when you discover work outside of the scope of the current session,
-please track it via the `bd` task software. If a prompt references something with a `dr-`
-prefix, like `dr-l3x`, this is a `bd` isssue id. When asked to work on a task, please
+please track it via the `lat` task software. If a prompt references something with a `L`
+prefix, like `LCEWQN`, this is a lattice id. When asked to work on a task, please
 close it when complete.
 
 ## Core Rules
-- Track strategic work in beads (multi-session, dependencies, discovered work)
-- Use `bd create` for issues, TodoWrite for simple single-session execution
-- When in doubt, prefer bd—persistence you don't need beats lost context
-- Session management: check `bd ready` for available work
+- Track strategic work in lattice (multi-session, dependencies, discovered work)
+- Use the `lattice_create_task` MCP tool for issues, TodoWrite for simple single-session execution
+- When in doubt, prefer lattice—persistence you don't need beats lost context
 
 ## Essential Commands
 
 ### Finding Work
-- `bd list --status=open` - All open issues
-- `bd list --status=in_progress` - Your active work
-- `bd show <id>` - Detailed issue view with dependencies
+- `lat show <id>` - Detailed issue view with dependencies
 
 ### Creating & Updating
-- `bd create --title="..." --type=task|bug|feature --priority=2` - New issue
-  - Priority: 0-4 or P0-P4 (0=critical, 2=medium, 4=backlog). NOT "high"/"medium"/"low"
-- `bd update <id> --status=in_progress` - Claim work
-- `bd update <id> --assignee=username` - Assign to someone
-- `bd close <id>` - Mark complete
-- `bd close <id1> <id2> ...` - Close multiple issues at once (more efficient)
-- `bd close <id> --reason="explanation"` - Close with reason
+- `lattice_create_task` MCP or `lat create` CLI to create tasks
+  - Lattice tasks *must* give in a target directory, co-located with code.
+- `lat claim <id>` - Mark a task as "in progress"
+- `lat close <id>` - Mark complete
+- `lat close <id1> <id2> ...` - Close multiple issues at once (more efficient)
 - **Tip**: When creating multiple issues/tasks/epics, use parallel subagents for efficiency
 
 ### Dependencies & Blocking
-- `bd dep add <issue> <depends-on>` - Add dependency (issue depends on depends-on)
-- `bd blocked` - Show all blocked issues
-- `bd show <id>` - See what's blocking/blocked by this issue
-
-### Sync & Collaboration
-
-DO NOT RUN `bd sync` ever. We do not use this workflow.
-
-### Project Health
-- `bd stats` - Project statistics (open/closed/blocked counts)
-- `bd doctor` - Check for issues (sync problems, missing hooks)
+- `lat dep add <issue> <depends-on>` - Add dependency (issue depends on depends-on)
+- `lat blocked` - Show all blocked issues
+- `lat show <id>` - See what's blocking/blocked by this issue
 
 ## Common Workflows
 
 **Starting work:**
 ```bash
-bd show <id>       # Review issue details
-bd update <id> --status=in_progress  # Claim it
+lat show <id> # Review issue details
+lat claim <id> # Claim it
 ```
 
 **Completing work:**
 ```bash
-bd close <id1> <id2> ...    # Close all completed issues at once
+lat close <id1> <id2> ...    # Close all completed issues at once
 ```
 
 **Creating dependent work:**
 ```bash
 # Run bd create commands in parallel (use subagents for many items)
-bd create --title="Implement feature X" --type=feature
-bd create --title="Write tests for X" --type=task
-bd dep add beads-yyy beads-xxx  # Tests depend on Feature (Feature blocks tests)
+lat create "path/to/dir" "Implement feature X" --type=feature
+lat create "path/to/dir" "Write tests for X" --type=task
+lat dep add LID1 LID2  # Tests depend on Feature (Feature blocks tests)
 ```
