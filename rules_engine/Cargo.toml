@@ -1,5 +1,6 @@
 [workspace]
 members = ["benchmarks/*", "src/*", "tests/*"]
+exclude = ["src/tv"]
 resolver = "2"
 
 [workspace.dependencies]
