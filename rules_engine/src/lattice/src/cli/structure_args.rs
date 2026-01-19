@@ -59,7 +59,13 @@ pub enum DepCommand {
     /// Add dependency (first depends on second).
     Add { id: String, depends_on: String },
     /// Remove dependency relationship.
-    Remove { id: String, depends_on: String },
+    Remove {
+        id: String,
+        depends_on: String,
+        /// Output as JSON.
+        #[arg(long)]
+        json: bool,
+    },
     /// Display dependency tree.
     Tree {
         /// Task ID to display tree for.

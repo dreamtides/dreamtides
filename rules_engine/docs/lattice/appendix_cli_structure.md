@@ -272,11 +272,15 @@ first task to include the second task's ID. Also updates the `blocking` field of
 the second task to include the first task's ID, maintaining bidirectional
 consistency.
 
-### lat dep remove {id} {depends-on-id}
+### lat dep remove {id} {depends-on-id} [options]
 
 Remove dependency relationship. Removes the second task from the first task's
 `blocked-by` field, and removes the first task from the second task's `blocking`
 field. If removing the last blocker from a blocked task, that task becomes ready.
+
+**Options:**
+- `--json`: Output as structured JSON with source_id, target_id, and became_ready
+  fields
 
 ### lat dep tree {id} [options]
 

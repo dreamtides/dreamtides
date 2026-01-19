@@ -21,7 +21,9 @@ use crate::task::dependency_graph::{DependencyGraph, TreeDirection, TreeNode};
 pub fn execute(context: CommandContext, args: DepArgs) -> LatticeResult<()> {
     match args.command {
         DepCommand::Add { id, depends_on } => add_dependency(context, &id, &depends_on),
-        DepCommand::Remove { id, depends_on } => remove_dependency(context, &id, &depends_on),
+        DepCommand::Remove { id, depends_on, json } => {
+            remove_dependency(context, &id, &depends_on, json)
+        }
         DepCommand::Tree { id, json } => show_dependency_tree(context, &id, json),
     }
 }
@@ -144,13 +146,26 @@ fn output_add_result(
     }
 }
 
+/// JSON output for dependency removal.
+#[derive(Serialize)]
+struct DepRemoveJson {
+    source_id: String,
+    target_id: String,
+    became_ready: bool,
+}
+
 /// Removes a dependency relationship.
 ///
 /// Updates both documents' frontmatter:
 /// - Removes `depends_on` from `id`'s blocked-by list
 /// - Removes `id` from `depends_on`'s blocking list
-#[instrument(skip(context), fields(source = %id, target = %depends_on))]
-fn remove_dependency(context: CommandContext, id: &str, depends_on: &str) -> LatticeResult<()> {
+#[instrument(skip(context), fields(source = %id, target = %depends_on, json = json))]
+fn remove_dependency(
+    context: CommandContext,
+    id: &str,
+    depends_on: &str,
+    json: bool,
+) -> LatticeResult<()> {
     info!("Removing dependency: {} no longer depends on {}", id, depends_on);
 
     let source_doc = document_queries::lookup_by_id(&context.conn, id)?
@@ -179,6 +194,8 @@ fn remove_dependency(context: CommandContext, id: &str, depends_on: &str) -> Lat
     source_document.frontmatter.blocked_by.retain(|dep| dep != &target_lattice_id);
     target_document.frontmatter.blocking.retain(|dep| dep != &source_lattice_id);
 
+    let became_ready = source_document.frontmatter.blocked_by.is_empty();
+
     document_writer::update_frontmatter(
         &source_path,
         &source_document.frontmatter,
@@ -193,14 +210,34 @@ fn remove_dependency(context: CommandContext, id: &str, depends_on: &str) -> Lat
     link_queries::delete_by_source_and_target(&context.conn, id, depends_on)?;
     link_queries::delete_by_source_and_target(&context.conn, depends_on, id)?;
 
-    info!(source = id, target = depends_on, "Dependency removed");
-    println!(
-        "Removed dependency: {} {} {} {}",
-        color_theme::lattice_id(id),
-        color_theme::muted("no longer depends on"),
-        color_theme::lattice_id(depends_on),
-        color_theme::success("✓")
-    );
+    info!(source = id, target = depends_on, became_ready, "Dependency removed");
+
+    if json {
+        println!(
+            "{}",
+            serde_json::to_string(&DepRemoveJson {
+                source_id: id.to_string(),
+                target_id: depends_on.to_string(),
+                became_ready,
+            })
+            .unwrap_or_else(|e| panic!("Failed to serialize JSON: {e}"))
+        );
+    } else {
+        println!(
+            "Removed dependency: {} {} {} {}",
+            color_theme::lattice_id(id),
+            color_theme::muted("no longer depends on"),
+            color_theme::lattice_id(depends_on),
+            color_theme::success("✓")
+        );
+        if became_ready {
+            println!(
+                "{} {} is now ready (no remaining blockers)",
+                color_theme::success("→"),
+                color_theme::lattice_id(id)
+            );
+        }
+    }
 
     Ok(())
 }

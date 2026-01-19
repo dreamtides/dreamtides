@@ -379,7 +379,11 @@ fn dep_remove_deletes_dependency() {
     add_dependency(&env, "LNNOQP", "LOOPRQ");
 
     let args = DepArgs {
-        command: DepCommand::Remove { id: "LNNOQP".to_string(), depends_on: "LOOPRQ".to_string() },
+        command: DepCommand::Remove {
+            id: "LNNOQP".to_string(),
+            depends_on: "LOOPRQ".to_string(),
+            json: false,
+        },
     };
     let (_temp, context) = env.into_parts();
     let result = dep_command::execute(context, args);
@@ -412,7 +416,11 @@ fn dep_remove_errors_for_nonexistent_dependency() {
     insert_doc(&env, &task2, "api/tasks/task2.md");
 
     let args = DepArgs {
-        command: DepCommand::Remove { id: "LPPQSR".to_string(), depends_on: "LQQRTS".to_string() },
+        command: DepCommand::Remove {
+            id: "LPPQSR".to_string(),
+            depends_on: "LQQRTS".to_string(),
+            json: false,
+        },
     };
     let (_temp, context) = env.into_parts();
     let result = dep_command::execute(context, args);
@@ -435,7 +443,11 @@ fn dep_remove_errors_for_nonexistent_source() {
     insert_doc(&env, &task, "api/tasks/task1.md");
 
     let args = DepArgs {
-        command: DepCommand::Remove { id: "LNONEX".to_string(), depends_on: "LRRSUT".to_string() },
+        command: DepCommand::Remove {
+            id: "LNONEX".to_string(),
+            depends_on: "LRRSUT".to_string(),
+            json: false,
+        },
     };
     let (_temp, context) = env.into_parts();
     let result = dep_command::execute(context, args);
@@ -600,4 +612,145 @@ fn dep_add_warns_when_target_is_closed() {
         "dep add should succeed even when target is closed (with warning): {:?}",
         result
     );
+}
+
+// ============================================================================
+// lat dep remove Additional Tests
+// ============================================================================
+
+#[test]
+fn dep_remove_errors_for_nonexistent_target() {
+    let env = TestEnv::new();
+    env.create_dir("api/tasks");
+
+    let task = create_task_doc(
+        "LSSTUV",
+        "api/tasks/task1.md",
+        "existing-task",
+        "Existing task",
+        2,
+        TaskType::Task,
+    );
+    insert_doc(&env, &task, "api/tasks/task1.md");
+
+    let args = DepArgs {
+        command: DepCommand::Remove {
+            id: "LSSTUV".to_string(),
+            depends_on: "LNONEX".to_string(),
+            json: false,
+        },
+    };
+    let (_temp, context) = env.into_parts();
+    let result = dep_command::execute(context, args);
+    assert!(result.is_err(), "dep remove should error when target task doesn't exist");
+}
+
+#[test]
+fn dep_remove_returns_json_output() {
+    let env = TestEnv::new();
+    env.create_dir("api/tasks");
+
+    let parent = TaskDocBuilder::new("Parent task")
+        .id("LTTUVU")
+        .priority(1)
+        .task_type("feature")
+        .blocking(vec!["LUUVWX"])
+        .build();
+    env.write_file("api/tasks/parent.md", &parent.content);
+
+    let child = TaskDocBuilder::new("Child task")
+        .id("LUUVWX")
+        .priority(2)
+        .task_type("task")
+        .blocked_by(vec!["LTTUVU"])
+        .build();
+    env.write_file("api/tasks/child.md", &child.content);
+
+    let parent_doc = create_task_doc(
+        "LTTUVU",
+        "api/tasks/parent.md",
+        "parent-task",
+        "Parent task",
+        1,
+        TaskType::Feature,
+    );
+    document_queries::insert(env.conn(), &parent_doc).expect("Insert parent doc");
+
+    let child_doc = create_task_doc(
+        "LUUVWX",
+        "api/tasks/child.md",
+        "child-task",
+        "Child task",
+        2,
+        TaskType::Task,
+    );
+    document_queries::insert(env.conn(), &child_doc).expect("Insert child doc");
+
+    add_dependency(&env, "LUUVWX", "LTTUVU");
+
+    let args = DepArgs {
+        command: DepCommand::Remove {
+            id: "LUUVWX".to_string(),
+            depends_on: "LTTUVU".to_string(),
+            json: true,
+        },
+    };
+    let (_temp, context) = env.into_parts();
+    let result = dep_command::execute(context, args);
+    assert!(result.is_ok(), "dep remove with --json should succeed: {:?}", result);
+}
+
+#[test]
+fn dep_remove_marks_task_as_ready_when_last_blocker_removed() {
+    let env = TestEnv::new();
+    env.create_dir("api/tasks");
+
+    let blocker = TaskDocBuilder::new("Blocker task")
+        .id("LVVWXY")
+        .priority(1)
+        .task_type("feature")
+        .blocking(vec!["LWWXYZ"])
+        .build();
+    env.write_file("api/tasks/blocker.md", &blocker.content);
+
+    let blocked = TaskDocBuilder::new("Blocked task")
+        .id("LWWXYZ")
+        .priority(2)
+        .task_type("task")
+        .blocked_by(vec!["LVVWXY"])
+        .build();
+    env.write_file("api/tasks/blocked.md", &blocked.content);
+
+    let blocker_doc = create_task_doc(
+        "LVVWXY",
+        "api/tasks/blocker.md",
+        "blocker-task",
+        "Blocker task",
+        1,
+        TaskType::Feature,
+    );
+    document_queries::insert(env.conn(), &blocker_doc).expect("Insert blocker doc");
+
+    let blocked_doc = create_task_doc(
+        "LWWXYZ",
+        "api/tasks/blocked.md",
+        "blocked-task",
+        "Blocked task",
+        2,
+        TaskType::Task,
+    );
+    document_queries::insert(env.conn(), &blocked_doc).expect("Insert blocked doc");
+
+    add_dependency(&env, "LWWXYZ", "LVVWXY");
+
+    let args = DepArgs {
+        command: DepCommand::Remove {
+            id: "LWWXYZ".to_string(),
+            depends_on: "LVVWXY".to_string(),
+            json: false,
+        },
+    };
+    let (_temp, context) = env.into_parts();
+    let result = dep_command::execute(context, args);
+    assert!(result.is_ok(), "dep remove should succeed: {:?}", result);
 }
