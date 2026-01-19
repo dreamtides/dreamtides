@@ -13,6 +13,7 @@ mod links_from_tests;
 mod links_to_tests;
 mod list_tests;
 mod mv_tests;
+mod orphans_tests;
 mod overview_tests;
 mod path_tests;
 mod prune_tests;
