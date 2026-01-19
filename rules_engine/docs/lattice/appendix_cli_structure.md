@@ -372,15 +372,6 @@ List labels on document.
 
 List all labels with counts.
 
-## Setup Commands
-
-### lat setup claude [options]
-
-Install Claude Code hooks and configuration. See
-[Appendix: AI Integration](appendix_ai_integration.md) for hook details.
-
-Options: `--check`, `--remove`, `--project`.
-
 ## Maintenance Commands
 
 See [Appendix: Linter](appendix_linter.md) for validation rules and

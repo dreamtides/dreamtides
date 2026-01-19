@@ -16,49 +16,7 @@ AI agents benefit from using Lattice commands rather than direct file reads:
 - **View tracking** improves `lat overview` recommendations over time
 
 Direct file reads miss template composition and don't contribute to view
-tracking. The hooks below encourage or enforce command usage.
-
-## Installation
-
-```bash
-lat setup claude          # Install hooks and configuration
-lat setup claude --check  # Verify installation status
-lat setup claude --remove # Uninstall
-lat setup claude --project # Project-only (vs global)
-```
-
-## Read Guard Hook
-
-The `lat setup claude` command installs a PreToolUse hook that intercepts file
-reads to Lattice documents and redirects agents to use `lat show`.
-
-**Hook configuration** (`.claude/settings.json`):
-
-```json
-{
-  "hooks": {
-    "PreToolUse": [
-      {
-        "matcher": "Read",
-        "command": [".claude/hooks/lattice-read-guard.py"]
-      }
-    ]
-  }
-}
-```
-
-**Hook behavior:**
-
-1. Intercepts `Read` tool calls
-2. Checks if target file has Lattice frontmatter (contains `lattice-id:`)
-3. If yes, blocks the read and returns guidance:
-   ```
-   This is a Lattice document. Use `lat show <id>` instead of direct reads.
-   Benefits: composed templates, dependency info, view tracking.
-   Document ID: LXXXXX
-   Run: lat show LXXXXX
-   ```
-4. If no, allows the read to proceed normally
+tracking.
 
 ## Skill Documents
 

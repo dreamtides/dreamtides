@@ -224,7 +224,6 @@ commands/
 ├── path_command.rs         # lat path - find path between documents
 ├── orphans_command.rs      # lat orphans - find unlinked documents
 ├── impact_command.rs       # lat impact - change impact analysis
-├── setup_command.rs        # lat setup - install hooks and config
 ├── completion_command.rs   # lat completion - generate shell completions
 └── chaos_monkey.rs         # lat chaosmonkey - fuzz testing
 ```

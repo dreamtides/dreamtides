@@ -419,7 +419,7 @@ Documents with `skill: true` become Claude Skills via symlinks in
 `.claude/skills/`. The `name` (max 64 chars) and `description` (max 1024 chars)
 fields follow Claude's SKILL.md validation rules.
 
-See [Appendix: AI Integration](appendix_ai_integration.md) for hooks and
+See [Appendix: AI Integration](appendix_ai_integration.md) for details and
 [Appendix: Startup Operations](appendix_startup_operations.md) for symlink sync.
 
 ## Configuration

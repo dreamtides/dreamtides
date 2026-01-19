@@ -1254,7 +1254,7 @@ populates the table during index reconciliation.
 
 ## Feature: Skill Integration
 
-**Goal:** Claude Code skill symlinks and hooks.
+**Goal:** Claude Code skill symlinks.
 
 **Depends on:** Document Model, Index Core
 
@@ -1277,20 +1277,6 @@ Design: Skill Integration](lattice_design.md#skill-integration)
 - Validate skill requirements: name max 64 chars, no reserved words, no XML
 - Description non-empty, max 1024 chars
 - Used by lint rules S001-S003
-
-#### SK3: Setup Command (`cli/commands/setup_command.rs`)
-**Files:** `cli/commands/setup_command.rs`, embedded Python hook script
-
-- `lat setup claude` - install hooks and config
-- `--check` - verify installation
-- `--remove` - uninstall
-- `--project` - project-only vs global
-- Create `.claude/hooks/lattice-read-guard.py`:
-  - Intercept Read tool calls
-  - Check if target file contains `lattice-id:` in frontmatter
-  - If yes: block read, return guidance with document ID and `lat show` command
-  - If no: allow read to proceed
-- Update `.claude/settings.json` with PreToolUse hook configuration
 
 ---
 
