@@ -82,11 +82,11 @@ fn get_settings_path(repo_root: &Path, project: bool) -> LatticeResult<PathBuf> 
 }
 
 /// Returns the path to the lat binary.
+///
+/// Uses just "lat" to resolve via PATH, making the configuration portable
+/// across machines and installation methods.
 fn get_lat_binary_path() -> LatticeResult<PathBuf> {
-    env::current_exe().map_err(|e| LatticeError::ReadError {
-        path: PathBuf::from("lat"),
-        reason: format!("Failed to determine lat binary path: {e}"),
-    })
+    Ok(PathBuf::from("lat"))
 }
 
 /// Checks the installation status.

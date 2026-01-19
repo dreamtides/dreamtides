@@ -88,6 +88,15 @@ pub fn execute(context: CommandContext) -> LatticeResult<()> {
             }
         };
 
+        // Notifications (no id field) don't get responses per JSON-RPC spec
+        let is_notification = request.id.is_none();
+
+        if is_notification {
+            // Handle notifications silently - they don't get responses
+            handle_notification(&request.method);
+            continue;
+        }
+
         let response = process_request(&context, request);
         write_response(&response)?;
     }
@@ -97,10 +106,13 @@ pub fn execute(context: CommandContext) -> LatticeResult<()> {
 }
 
 /// JSON-RPC request envelope.
+///
+/// For notifications (messages that don't expect a response), `id` is None.
 #[derive(Debug, Deserialize)]
 struct JsonRpcRequest {
     jsonrpc: String,
-    id: serde_json::Value,
+    #[serde(default)]
+    id: Option<serde_json::Value>,
     method: String,
     #[serde(default)]
     params: serde_json::Value,
@@ -197,12 +209,33 @@ fn write_response(response: &JsonRpcResponse) -> LatticeResult<()> {
     Ok(())
 }
 
+/// Handles JSON-RPC notifications (messages without id).
+///
+/// Notifications don't receive responses per the JSON-RPC spec.
+fn handle_notification(method: &str) {
+    match method {
+        "notifications/initialized" => {
+            info!("Received initialized notification");
+        }
+        "notifications/cancelled" => {
+            info!("Received cancelled notification");
+        }
+        _ => {
+            info!(method = method, "Received unknown notification");
+        }
+    }
+}
+
 /// Processes a JSON-RPC request and returns the response.
 fn process_request(context: &CommandContext, request: JsonRpcRequest) -> JsonRpcResponse {
+    // Extract id, defaulting to Null (should never happen since we check for
+    // notifications first)
+    let id = request.id.unwrap_or(Value::Null);
+
     // Validate JSON-RPC version
     if request.jsonrpc != "2.0" {
         return error_response(
-            request.id,
+            id,
             rpc_error_codes::INVALID_REQUEST,
             "Invalid JSON-RPC version",
             None,
@@ -222,13 +255,10 @@ fn process_request(context: &CommandContext, request: JsonRpcRequest) -> JsonRpc
     };
 
     match result {
-        Ok(value) => success_response(request.id, value),
-        Err(err) => JsonRpcResponse {
-            jsonrpc: "2.0".to_string(),
-            id: request.id,
-            result: None,
-            error: Some(err),
-        },
+        Ok(value) => success_response(id.clone(), value),
+        Err(err) => {
+            JsonRpcResponse { jsonrpc: "2.0".to_string(), id, result: None, error: Some(err) }
+        }
     }
 }
 
