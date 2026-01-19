@@ -106,14 +106,7 @@ async fn main() -> Result<()> {
             json_output::print_json_schema();
             Ok(())
         }
-        Commands::Hook { action } => match action {
-            HookAction::Stop { worker } => hook::run_hook_stop(&worker),
-            HookAction::SessionStart { worker } => hook::run_hook_session_start(&worker),
-            HookAction::SessionEnd { worker, reason } => {
-                hook::run_hook_session_end(&worker, &reason)
-            }
-            HookAction::PostBash { worker } => hook::run_hook_post_bash(&worker),
-        },
+        Commands::Hook { action } => handle_hook_action(action).await,
     };
 
     let duration_ms = start_time.elapsed().as_millis() as u64;
@@ -143,6 +136,17 @@ async fn main() -> Result<()> {
     }
 
     Ok(())
+}
+
+async fn handle_hook_action(action: HookAction) -> Result<()> {
+    match action {
+        HookAction::Stop { worker } => hook::run_hook_stop(&worker).await,
+        HookAction::SessionStart { worker } => hook::run_hook_session_start(&worker).await,
+        HookAction::SessionEnd { worker, reason } => {
+            hook::run_hook_session_end(&worker, &reason).await
+        }
+        HookAction::PostBash { worker } => hook::run_hook_post_bash(&worker).await,
+    }
 }
 
 fn display_error(error: &anyhow::Error, verbose: bool) {
