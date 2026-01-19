@@ -66,11 +66,12 @@ pub struct FormatError {
 /// Formats markdown content by applying all enabled operations.
 ///
 /// Operations are applied in the following order:
-/// 1. Whitespace cleaning (trailing spaces, multiple blank lines)
+/// 1. Whitespace cleaning (trailing spaces)
 /// 2. Header normalization (setext to ATX, blank line spacing)
 /// 3. List normalization (markers to dashes, blank line spacing)
 /// 4. Text wrapping at configured width
-/// 5. Final newline enforcement
+/// 5. Multiple blank line collapsing (after spacing operations)
+/// 6. Final newline enforcement
 ///
 /// Returns the formatted content and whether any changes were made.
 pub fn format_content(content: &str, config: &FormatConfig) -> (String, bool) {
@@ -79,7 +80,6 @@ pub fn format_content(content: &str, config: &FormatConfig) -> (String, bool) {
 
     if config.clean_whitespace {
         result = autofix_engine::fix_trailing_whitespace(&result);
-        result = autofix_engine::fix_multiple_blank_lines(&result);
     }
 
     if config.normalize_headers {
@@ -96,6 +96,10 @@ pub fn format_content(content: &str, config: &FormatConfig) -> (String, bool) {
         let wrap_config = WrapConfig::new(config.line_width);
         let wrap_result = text_wrapper::wrap(&result, &wrap_config);
         result = wrap_result.content;
+    }
+
+    if config.clean_whitespace {
+        result = autofix_engine::fix_multiple_blank_lines(&result);
     }
 
     if config.ensure_final_newline {
