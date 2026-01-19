@@ -25,5 +25,6 @@ mod root_detection_tests;
 mod task_priority_tests;
 mod task_state_tests;
 mod task_types_tests;
+mod template_composer_tests;
 mod text_wrapper_tests;
 mod whitespace_cleaner_tests;
