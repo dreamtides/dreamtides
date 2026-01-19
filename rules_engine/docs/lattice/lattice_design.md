@@ -86,8 +86,12 @@ Claude's SKILL.md format. The reserved keys include:
 - `description`: Human-readable summary (required, max 1024 chars)
 
 The `name` field is always derived from the document's filename: underscores
-become hyphens and the `.md` extension is stripped (e.g., `fix_login_bug.md`
-→ `fix-login-bug`). This is a core Lattice invariant enforced by the linter.
+become hyphens and the `.md` extension is stripped. Filenames may optionally
+include a trailing lattice ID suffix (e.g., `fix_login_bug_LABCDEF.md`), which
+is stripped when deriving the name. Examples:
+- `fix_login_bug.md` → `fix-login-bug`
+- `fix_login_bug_LABCDEF.md` → `fix-login-bug` (ID suffix stripped)
+This is a core Lattice invariant enforced by the linter.
 
 For tasks, `description` serves as the human-readable task title shown in
 `lat show` and other outputs (e.g., "Fix login bug after password reset"). For
@@ -420,7 +424,10 @@ Lattice provides two integration points for AI coding agents:
 **MCP Tools:** The `lat setup claude` command registers Lattice MCP tools
 (`lattice_create_task`, `lattice_create_document`) with Claude Code. Each tool
 invocation runs a stateless `lat mcp` command, enabling agents to create
-documents with structured input and avoiding shell escaping issues.
+documents with structured input and avoiding shell escaping issues. The
+`lattice_create_task` tool appends the lattice ID to the filename (e.g.,
+`fix_login_bug_LABCDEF.md`) for uniqueness; the `name` field is derived without
+this suffix.
 
 **Skill Documents:** Documents with `skill: true` become Claude Skills via
 symlinks in `.claude/skills/`. The `name` (max 64 chars) and `description`

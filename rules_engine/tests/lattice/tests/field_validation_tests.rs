@@ -232,6 +232,67 @@ fn derives_name_from_path_correctly() {
     );
 }
 
+#[test]
+fn derives_name_stripping_lattice_id_suffix() {
+    assert_eq!(
+        field_validation::derive_name_from_path(Path::new("fix_login_bug_LABCDEF.md")),
+        Some("fix-login-bug".to_string()),
+        "Should strip trailing lattice ID suffix"
+    );
+
+    assert_eq!(
+        field_validation::derive_name_from_path(Path::new("tasks/verify_task_filing_LCSWQN.md")),
+        Some("verify-task-filing".to_string()),
+        "Should strip lattice ID from nested path"
+    );
+
+    assert_eq!(
+        field_validation::derive_name_from_path(Path::new("my_task_labcdef.md")),
+        Some("my-task".to_string()),
+        "Should strip lowercase lattice ID suffix"
+    );
+}
+
+#[test]
+fn derives_name_preserves_non_id_suffixes() {
+    assert_eq!(
+        field_validation::derive_name_from_path(Path::new("task_v2.md")),
+        Some("task-v2".to_string()),
+        "Should not strip short suffixes that look like IDs but are too short"
+    );
+
+    assert_eq!(
+        field_validation::derive_name_from_path(Path::new("task_ABC.md")),
+        Some("task-abc".to_string()),
+        "Should not strip suffix missing L prefix"
+    );
+
+    assert_eq!(
+        field_validation::derive_name_from_path(Path::new("task_L12.md")),
+        Some("task-l12".to_string()),
+        "Should not strip suffix too short to be valid ID"
+    );
+
+    assert_eq!(
+        field_validation::derive_name_from_path(Path::new("process_log_file.md")),
+        Some("process-log-file".to_string()),
+        "Should not strip words starting with L that aren't IDs"
+    );
+}
+
+#[test]
+fn accepts_name_with_lattice_id_suffix_in_filename() {
+    let mut fm = sample_kb_frontmatter();
+    fm.name = "fix-login-bug".to_string();
+    let result = field_validation::validate(&fm, Path::new("fix_login_bug_LABCDEF.md"));
+
+    assert!(
+        result.is_valid(),
+        "Should accept name matching filename with lattice ID stripped: {:?}",
+        result.errors
+    );
+}
+
 // =============================================================================
 // Description Validation
 // =============================================================================

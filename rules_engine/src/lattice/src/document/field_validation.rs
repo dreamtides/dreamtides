@@ -4,6 +4,7 @@ use crate::document::frontmatter_schema::{
     Frontmatter, MAX_DESCRIPTION_LENGTH, MAX_NAME_LENGTH, MAX_PRIORITY, MIN_PRIORITY,
 };
 use crate::error::error_types::LatticeError;
+use crate::id::lattice_id::MIN_ID_LENGTH;
 
 /// A single field validation error with field name and reason.
 #[derive(Debug, Clone)]
@@ -47,11 +48,14 @@ pub fn validate(frontmatter: &Frontmatter, path: &Path) -> ValidationResult {
 
 /// Derives the expected name from a file path.
 ///
-/// Converts filename to name format: strips `.md` extension, converts
-/// underscores to hyphens, and lowercases.
+/// Converts filename to name format: strips `.md` extension, strips any
+/// trailing lattice ID suffix (e.g., `_LABCDEF`), converts underscores to
+/// hyphens, and lowercases. This allows filenames like `my_task_LABCDEF.md` to
+/// produce name `my-task`.
 pub fn derive_name_from_path(path: &Path) -> Option<String> {
     let stem = path.file_stem()?.to_str()?;
-    Some(stem.to_lowercase().replace('_', "-"))
+    let stem_without_id = strip_lattice_id_suffix(stem);
+    Some(stem_without_id.to_lowercase().replace('_', "-"))
 }
 
 /// Validates a single name string without path context.
@@ -106,6 +110,34 @@ pub fn validate_priority_only(priority: u8) -> Result<(), LatticeError> {
     }
 
     Ok(())
+}
+
+/// Strips a trailing lattice ID suffix from a filename stem.
+///
+/// Lattice IDs start with 'L' followed by Base32 characters (A-Z, 2-7).
+/// If the stem ends with `_L{Base32}`, the suffix is stripped.
+fn strip_lattice_id_suffix(stem: &str) -> &str {
+    if let Some(last_underscore) = stem.rfind('_') {
+        let potential_id = &stem[last_underscore + 1..];
+        if looks_like_lattice_id(potential_id) {
+            return &stem[..last_underscore];
+        }
+    }
+    stem
+}
+
+/// Checks if a string looks like a valid Lattice ID.
+fn looks_like_lattice_id(s: &str) -> bool {
+    if s.len() < MIN_ID_LENGTH {
+        return false;
+    }
+    let first = s.chars().next().unwrap_or('\0');
+    if first != 'L' && first != 'l' {
+        return false;
+    }
+    s[1..]
+        .chars()
+        .all(|c| c.is_ascii_uppercase() || c.is_ascii_lowercase() || ('2'..='7').contains(&c))
 }
 
 impl FieldError {
