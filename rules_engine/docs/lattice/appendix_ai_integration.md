@@ -4,20 +4,6 @@ This appendix documents AI agent integration. See
 [Lattice Design](lattice_design.md#skill-integration) for Lattice's general
 approach to AI compatibility and [Appendix: Workflow](appendix_workflow.md) for
 command specifications.
-
-## Design Goals
-
-AI agents benefit from using Lattice commands rather than direct file reads:
-
-- **`lat show`** provides composed template content, dependencies, and related
-  documents in a single call
-- **`lat ready`** surfaces actionable work without manual filtering
-- **`lat overview`** provides curated context for session orientation
-- **View tracking** improves `lat overview` recommendations over time
-
-Direct file reads miss template composition and don't contribute to view
-tracking.
-
 ## Skill Documents
 
 Documents with `skill: true` in frontmatter become Claude Skills via automatic

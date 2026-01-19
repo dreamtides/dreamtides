@@ -2,11 +2,12 @@
 lattice-id: LCJWQN
 name: fix-check-line-numbers
 description: Line numbers in lat check warnings are incorrect or offset
+parent-id: LCEWQN
 task-type: bug
 priority: 2
-parent-id: LCEWQN
-created-at: 2026-01-19T05:15:00.000000Z
-updated-at: 2026-01-19T05:15:00.000000Z
+created-at: 2026-01-19T05:15:00Z
+updated-at: 2026-01-19T17:47:23.504773Z
+closed-at: 2026-01-19T17:47:23.504773Z
 ---
 
 # Line numbers in lat check warnings are incorrect
