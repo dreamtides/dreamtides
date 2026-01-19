@@ -207,6 +207,18 @@ pub fn is_daemon_running() -> bool {
 }
 
 pub fn create_claude_hook_settings(worktree_path: &Path, worker_name: &str) -> Result<()> {
+    create_claude_hook_settings_impl(worktree_path, worker_name, false)
+}
+
+pub fn create_claude_hook_settings_silent(worktree_path: &Path, worker_name: &str) -> Result<()> {
+    create_claude_hook_settings_impl(worktree_path, worker_name, true)
+}
+
+fn create_claude_hook_settings_impl(
+    worktree_path: &Path,
+    worker_name: &str,
+    silent: bool,
+) -> Result<()> {
     let claude_dir = worktree_path.join(".claude");
     let settings_path = claude_dir.join("settings.json");
     fs::create_dir_all(&claude_dir).context("Failed to create .claude directory")?;
@@ -242,7 +254,9 @@ pub fn create_claude_hook_settings(worktree_path: &Path, worker_name: &str) -> R
     let content =
         serde_json::to_string_pretty(&settings).context("Failed to serialize hook settings")?;
     fs::write(&settings_path, content).context("Failed to write .claude/settings.json")?;
-    println!("Created Claude hook settings for worker '{}'", worker_name);
+    if !silent {
+        println!("Created Claude hook settings for worker '{}'", worker_name);
+    }
     Ok(())
 }
 /// Registers a project path in Serena's global config

@@ -249,9 +249,11 @@ launches Claude with configured flags. The daemon relies on Claude Code hooks
 the worker from Offline to Idle.
 
 **Hook Configuration**: The daemon automatically ensures that each worker has the
-required `.claude/settings.json` hook configuration file. If the file is missing
-(e.g., for workers created before hooks were implemented), it is regenerated
-during `llmc up`.
+required `.claude/settings.json` hook configuration file. This file is silently
+regenerated during `llmc up` if it is missing. Note that Claude Code may reset
+or clear this file when it exits, so regeneration on startup is expected and
+normal behavior. The regeneration happens automatically without any warning
+messages unless verbose mode is enabled.
 
 ### Reliable Communication
 

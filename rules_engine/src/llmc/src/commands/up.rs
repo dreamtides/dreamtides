@@ -368,17 +368,12 @@ fn start_worker(name: &str, config: &Config, state: &mut State, verbose: bool) -
 fn ensure_hook_config_exists(worktree_path: &Path, worker_name: &str, verbose: bool) -> Result<()> {
     let settings_path = worktree_path.join(".claude").join("settings.json");
     if !settings_path.exists() {
-        tracing::warn!(
+        tracing::debug!(
             worker = %worker_name,
             path = %settings_path.display(),
-            "Claude hook settings missing - hooks will not fire without this file. Regenerating..."
+            "Claude hook settings not found, regenerating (this is normal after Claude Code exits)"
         );
-        println!("  ⚠ Worker '{}' missing Claude hook config, regenerating...", worker_name);
-        add::create_claude_hook_settings(worktree_path, worker_name)?;
-        tracing::info!(
-            worker = %worker_name,
-            "Successfully regenerated Claude hook settings"
-        );
+        add::create_claude_hook_settings_silent(worktree_path, worker_name)?;
         if verbose {
             println!(
                 "    [verbose] Regenerated .claude/settings.json for worker '{}'",
