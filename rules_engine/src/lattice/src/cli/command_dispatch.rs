@@ -15,7 +15,7 @@ use crate::cli::commands::show_command::show_executor;
 use crate::cli::commands::{
     blocked_command, changes_command, children_command, claim_command, close_command,
     create_command, dep_command, fmt_command, generate_ids, impact_command, label_command,
-    links_from, links_to, mcp_command, orphans_command, path_command, prune_command,
+    links_from, links_to, mcp_command, mv_command, orphans_command, path_command, prune_command,
     reopen_command, roots_command, search_command, setup_command, stale_command, stats_command,
     track_command, tree_command, update_command,
 };
@@ -408,11 +408,9 @@ fn dispatch_command(context: CommandContext, command: Command) -> LatticeResult<
                 reason: "split command not yet implemented".to_string(),
             })
         }
-        Command::Mv(_args) => {
+        Command::Mv(args) => {
             info!("Dispatching to mv command");
-            Err(LatticeError::OperationNotAllowed {
-                reason: "mv command not yet implemented".to_string(),
-            })
+            mv_command::execute(context, args)
         }
         Command::Edit(_args) => {
             info!("Dispatching to edit command");
