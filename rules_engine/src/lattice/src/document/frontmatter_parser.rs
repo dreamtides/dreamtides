@@ -54,6 +54,15 @@ pub fn parse(content: &str, path: &Path) -> Result<ParsedFrontmatter, LatticeErr
     Ok(ParsedFrontmatter { frontmatter, raw_yaml, body, body_start_line })
 }
 
+/// Extracts just the body from a document with frontmatter.
+///
+/// This is useful when the frontmatter is invalid (e.g., malformed lattice-id)
+/// but we still want to recover the body content.
+pub fn extract_body(content: &str, path: &Path) -> Result<String, LatticeError> {
+    let (_, body, _) = extract_yaml(content, path)?;
+    Ok(body)
+}
+
 /// Parses frontmatter with detection of unknown keys.
 pub fn parse_with_unknown_key_detection(
     content: &str,

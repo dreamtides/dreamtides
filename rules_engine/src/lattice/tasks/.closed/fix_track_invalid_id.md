@@ -2,11 +2,12 @@
 lattice-id: LCFWQN
 name: fix-track-invalid-id
 description: lat track cannot recover from invalid lattice-id values
+parent-id: LCEWQN
 task-type: bug
 priority: 2
-parent-id: LCEWQN
-created-at: 2026-01-19T05:15:00.000000Z
-updated-at: 2026-01-19T05:15:00.000000Z
+created-at: 2026-01-19T05:15:00Z
+updated-at: 2026-01-19T18:41:05.937785Z
+closed-at: 2026-01-19T18:41:05.937785Z
 ---
 
 # lat track cannot recover from invalid lattice-id

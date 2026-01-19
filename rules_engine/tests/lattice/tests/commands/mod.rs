@@ -26,5 +26,6 @@ mod show_tests;
 mod stale_cleanup_tests;
 mod stale_tests;
 mod stats_tests;
+mod track_tests;
 mod tree_tests;
 mod update_tests;

@@ -70,42 +70,73 @@ fn handle_existing_document(
     name: &str,
     args: &TrackArgs,
 ) -> LatticeResult<(Frontmatter, String)> {
-    let parsed = frontmatter_parser::parse(content, path)?;
+    match frontmatter_parser::parse(content, path) {
+        Ok(parsed) => {
+            if !args.force {
+                return Err(LatticeError::OperationNotAllowed {
+                    reason: format!(
+                        "Document {} already has Lattice ID {}. Use --force to regenerate.",
+                        path.display(),
+                        parsed.frontmatter.lattice_id
+                    ),
+                });
+            }
 
-    if !args.force {
-        return Err(LatticeError::OperationNotAllowed {
-            reason: format!(
-                "Document {} already has Lattice ID {}. Use --force to regenerate.",
-                path.display(),
-                parsed.frontmatter.lattice_id
-            ),
-        });
+            info!(
+                old_id = %parsed.frontmatter.lattice_id,
+                "Regenerating ID for existing document"
+            );
+
+            let new_id = generate_new_id(context)?;
+            let frontmatter = Frontmatter {
+                lattice_id: new_id,
+                name: name.to_string(),
+                description: args.description.clone(),
+                parent_id: parsed.frontmatter.parent_id,
+                task_type: parsed.frontmatter.task_type,
+                priority: parsed.frontmatter.priority,
+                labels: parsed.frontmatter.labels,
+                blocking: parsed.frontmatter.blocking,
+                blocked_by: parsed.frontmatter.blocked_by,
+                discovered_from: parsed.frontmatter.discovered_from,
+                created_at: parsed.frontmatter.created_at,
+                updated_at: Some(Utc::now()),
+                closed_at: parsed.frontmatter.closed_at,
+                skill: parsed.frontmatter.skill,
+            };
+
+            Ok((frontmatter, parsed.body))
+        }
+        Err(e) => {
+            if !args.force {
+                return Err(e);
+            }
+
+            info!("Frontmatter invalid, using --force to regenerate: {e}");
+            let body = frontmatter_parser::extract_body(content, path)?;
+            let new_id = generate_new_id(context)?;
+            let now = Utc::now();
+
+            let frontmatter = Frontmatter {
+                lattice_id: new_id,
+                name: name.to_string(),
+                description: args.description.clone(),
+                parent_id: None,
+                task_type: None,
+                priority: None,
+                labels: Vec::new(),
+                blocking: Vec::new(),
+                blocked_by: Vec::new(),
+                discovered_from: Vec::new(),
+                created_at: Some(now),
+                updated_at: Some(now),
+                closed_at: None,
+                skill: false,
+            };
+
+            Ok((frontmatter, body))
+        }
     }
-
-    info!(
-        old_id = %parsed.frontmatter.lattice_id,
-        "Regenerating ID for existing document"
-    );
-
-    let new_id = generate_new_id(context)?;
-    let frontmatter = Frontmatter {
-        lattice_id: new_id,
-        name: name.to_string(),
-        description: args.description.clone(),
-        parent_id: parsed.frontmatter.parent_id,
-        task_type: parsed.frontmatter.task_type,
-        priority: parsed.frontmatter.priority,
-        labels: parsed.frontmatter.labels,
-        blocking: parsed.frontmatter.blocking,
-        blocked_by: parsed.frontmatter.blocked_by,
-        discovered_from: parsed.frontmatter.discovered_from,
-        created_at: parsed.frontmatter.created_at,
-        updated_at: Some(Utc::now()),
-        closed_at: parsed.frontmatter.closed_at,
-        skill: parsed.frontmatter.skill,
-    };
-
-    Ok((frontmatter, parsed.body))
 }
 
 /// Creates new frontmatter for a file without existing Lattice tracking.
