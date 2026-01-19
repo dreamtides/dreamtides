@@ -18,17 +18,22 @@ via CLI.
 lat setup claude              # Install MCP in Claude Code
 lat setup claude --check      # Verify installation
 lat setup claude --remove     # Remove Claude integration
+lat setup claude --project    # Install in project-local .mcp.json
 ```
 
-The `lat setup claude` command modifies the Claude Code MCP configuration
-(typically `~/.claude/settings.json` or project-local `.claude/settings.json`)
-to register Lattice as an MCP tool provider.
+The `lat setup claude` command registers Lattice as an MCP tool provider in
+Claude Code's configuration.
+
+**Configuration locations:**
+- **User scope (default):** `~/.claude.json` top-level `mcpServers` - available
+  across all projects
+- **Project scope (`--project`):** `.mcp.json` in the repo root - shared with
+  team via version control
 
 **Installation behavior:**
-- Detects project root via git repository
-- Adds `lattice` entry to the `mcpServers` configuration
-- Configures the command to run `lat mcp` with the project path
-- Creates any missing directories
+- Adds `lattice` entry to the `mcpServers` configuration with `type: stdio`
+- Configures the command to run `lat mcp`
+- Preserves existing MCP servers and other settings
 
 **Check behavior (`--check`):**
 - Verifies MCP configuration exists and is valid JSON
