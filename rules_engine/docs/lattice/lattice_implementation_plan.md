@@ -1126,7 +1126,7 @@ Linking System](appendix_linking_system.md)
 
 ---
 
-## Feature: Overview and Prime Commands [ONGOING]
+## Feature: Overview and Prime Commands [DONE]
 
 **Goal:** AI-optimized context commands.
 
