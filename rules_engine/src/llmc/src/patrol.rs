@@ -783,6 +783,7 @@ fn handle_stop(
                 let transition = WorkerTransition::ToNoChanges;
                 if let Some(w) = state.get_worker_mut(worker_name) {
                     worker::apply_transition(w, transition)?;
+                    w.pending_self_review = false;
                 }
                 let _ = sound::play_bell(config);
                 return Ok(());
@@ -869,6 +870,7 @@ fn handle_stop(
                     );
                 } else {
                     w.commits_first_detected_unix = None;
+                    w.pending_self_review = false;
                     let _ = sound::play_bell(config);
                 }
             }
