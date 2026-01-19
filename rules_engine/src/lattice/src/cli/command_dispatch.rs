@@ -14,8 +14,9 @@ use crate::cli::commands::ready_command::ready_executor;
 use crate::cli::commands::show_command::show_executor;
 use crate::cli::commands::{
     blocked_command, changes_command, children_command, claim_command, close_command,
-    create_command, fmt_command, generate_ids, prune_command, reopen_command, roots_command,
-    search_command, stale_command, stats_command, track_command, tree_command, update_command,
+    create_command, fmt_command, generate_ids, links_from, prune_command, reopen_command,
+    roots_command, search_command, stale_command, stats_command, track_command, tree_command,
+    update_command,
 };
 use crate::cli::global_options::GlobalOptions;
 use crate::config::config_loader;
@@ -360,11 +361,9 @@ fn dispatch_command(context: CommandContext, command: Command) -> LatticeResult<
                 reason: "label command not yet implemented".to_string(),
             })
         }
-        Command::LinksFrom(_args) => {
+        Command::LinksFrom(args) => {
             info!("Dispatching to links-from command");
-            Err(LatticeError::OperationNotAllowed {
-                reason: "links-from command not yet implemented".to_string(),
-            })
+            links_from::execute(context, args)
         }
         Command::LinksTo(_args) => {
             info!("Dispatching to links-to command");
