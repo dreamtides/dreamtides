@@ -413,14 +413,22 @@ See [Appendix: Git Integration](appendix_git_integration.md) for operations
 and [Appendix: Git Edge Cases](appendix_git_edge_cases.md) for shallow clones,
 worktrees, submodules, etc.
 
-## Skill Integration
+## AI Integration
 
-Documents with `skill: true` become Claude Skills via symlinks in
-`.claude/skills/`. The `name` (max 64 chars) and `description` (max 1024 chars)
-fields follow Claude's SKILL.md validation rules.
+Lattice provides two integration points for AI coding agents:
 
-See [Appendix: AI Integration](appendix_ai_integration.md) for details and
-[Appendix: Startup Operations](appendix_startup_operations.md) for symlink sync.
+**MCP Tools:** The `lat setup claude` command registers Lattice MCP tools
+(`lattice_create_task`, `lattice_create_document`) with Claude Code. Each tool
+invocation runs a stateless `lat mcp` command, enabling agents to create
+documents with structured input and avoiding shell escaping issues.
+
+**Skill Documents:** Documents with `skill: true` become Claude Skills via
+symlinks in `.claude/skills/`. The `name` (max 64 chars) and `description`
+(max 1024 chars) fields follow Claude's SKILL.md validation rules.
+
+See [Appendix: AI Integration](appendix_ai_integration.md) for MCP tool
+specifications and [Appendix: Startup Operations](appendix_startup_operations.md)
+for symlink sync.
 
 ## Configuration
 

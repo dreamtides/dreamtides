@@ -415,6 +415,49 @@ format, and fixable issues.
 Run fuzz testing. See [Appendix: Chaos Monkey](appendix_chaos_monkey.md).
 Options: `--seed {n}`, `--max-ops {n}`, `--operations {list}`, `--stop-before-last`.
 
+## Integration Commands
+
+### lat setup claude [options]
+
+Configure Lattice integration with Claude Code via MCP. See
+[Appendix: AI Integration](appendix_ai_integration.md#mcp-server) for full
+MCP server documentation.
+
+**Default behavior (no flags):**
+- Installs Lattice MCP server in Claude Code configuration
+- Detects project root and configures server with project path
+- Creates `.claude/settings.json` if needed
+
+**Options:**
+- `--check`: Verify installation without modifying configuration
+- `--remove`: Remove Lattice from Claude Code configuration
+- `--global`: Modify `~/.claude/settings.json` instead of project-local config
+- `--dry-run`: Preview changes without writing (with `--check` or default install)
+
+**Exit codes:**
+- 0: Success (install/remove completed, or `--check` passed)
+- 1: System error
+- 2: Configuration error (with `--check`: installation invalid or missing)
+
+### lat mcp
+
+Execute a single MCP tool invocation. This command is invoked automatically by
+Claude Code and is not intended for direct user invocation.
+
+**Behavior:**
+- Reads a JSON-RPC request from stdin
+- Executes the requested tool (`lattice_create_task` or `lattice_create_document`)
+- Writes a JSON-RPC response to stdout
+- Exits immediately after processing
+
+**Options:**
+- `--project {path}`: Override project root (default: current directory)
+
+**Example invocation (for testing):**
+```bash
+echo '{"method":"lattice_create_document","params":{...}}' | lat mcp
+```
+
 ## Exit Codes
 
 - 0: Success
