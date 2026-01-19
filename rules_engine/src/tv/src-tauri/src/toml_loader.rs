@@ -3,7 +3,6 @@ use std::fs;
 use std::path::PathBuf;
 
 use serde::{Deserialize, Serialize};
-use toml::map::Map;
 
 #[derive(Serialize, Deserialize)]
 pub struct TomlTableData {
@@ -58,28 +57,34 @@ pub fn save_toml_table(
     table_name: String,
     data: TomlTableData,
 ) -> Result<(), String> {
-    let mut tables = Vec::new();
-    for row in &data.rows {
-        let mut table = Map::new();
-        for (i, header) in data.headers.iter().enumerate() {
-            if let Some(json_val) = row.get(i) {
-                if !json_val.is_null() {
-                    if let Some(toml_val) = json_to_toml_value(json_val) {
-                        table.insert(header.clone(), toml_val);
+    let path = PathBuf::from(&file_path);
+    let content = fs::read_to_string(&path)
+        .map_err(|e| format!("Failed to read file {}: {}", file_path, e))?;
+    let mut doc: toml_edit::DocumentMut =
+        content.parse().map_err(|e| format!("Failed to parse TOML: {}", e))?;
+
+    let array = doc
+        .get_mut(&table_name)
+        .and_then(|v| v.as_array_of_tables_mut())
+        .ok_or_else(|| format!("Table '{}' not found or not an array of tables", table_name))?;
+
+    for (row_idx, row) in data.rows.iter().enumerate() {
+        let Some(table) = array.get_mut(row_idx) else {
+            break;
+        };
+
+        for (col_idx, header) in data.headers.iter().enumerate() {
+            if let Some(json_val) = row.get(col_idx) {
+                if let Some(existing) = table.get_mut(header) {
+                    if let Some(new_val) = json_to_toml_edit_value(json_val) {
+                        *existing = new_val;
                     }
                 }
             }
         }
-        tables.push(toml::Value::Table(table));
     }
 
-    let mut root = Map::new();
-    root.insert(table_name, toml::Value::Array(tables));
-    let toml_string =
-        toml::to_string_pretty(&toml::Value::Table(root)).map_err(|e| format!("{}", e))?;
-
-    let path = PathBuf::from(&file_path);
-    fs::write(&path, toml_string)
+    fs::write(&path, doc.to_string())
         .map_err(|e| format!("Failed to write file {}: {}", file_path, e))?;
 
     Ok(())
@@ -104,32 +109,20 @@ fn toml_value_to_json(value: &toml::Value) -> serde_json::Value {
     }
 }
 
-fn json_to_toml_value(value: &serde_json::Value) -> Option<toml::Value> {
+fn json_to_toml_edit_value(value: &serde_json::Value) -> Option<toml_edit::Item> {
     match value {
         serde_json::Value::Null => None,
-        serde_json::Value::Bool(b) => Some(toml::Value::Boolean(*b)),
+        serde_json::Value::Bool(b) => Some(toml_edit::value(*b)),
         serde_json::Value::Number(n) => {
             if let Some(i) = n.as_i64() {
-                Some(toml::Value::Integer(i))
+                Some(toml_edit::value(i))
             } else if let Some(f) = n.as_f64() {
-                Some(toml::Value::Float(f))
+                Some(toml_edit::value(f))
             } else {
                 None
             }
         }
-        serde_json::Value::String(s) => Some(toml::Value::String(s.clone())),
-        serde_json::Value::Array(arr) => {
-            let toml_arr: Vec<toml::Value> = arr.iter().filter_map(json_to_toml_value).collect();
-            Some(toml::Value::Array(toml_arr))
-        }
-        serde_json::Value::Object(obj) => {
-            let mut map = Map::new();
-            for (k, v) in obj {
-                if let Some(tv) = json_to_toml_value(v) {
-                    map.insert(k.clone(), tv);
-                }
-            }
-            Some(toml::Value::Table(map))
-        }
+        serde_json::Value::String(s) => Some(toml_edit::value(s.as_str())),
+        serde_json::Value::Array(_) | serde_json::Value::Object(_) => None,
     }
 }
