@@ -62,7 +62,7 @@ Each test:
 
 ## Test Setup
 
-Use `lat` commands directly for setup—no separate builder API:
+For simple scenarios, use `lat` commands directly:
 
 ```rust
 #[test]
@@ -76,7 +76,25 @@ fn show_displays_blocking_tasks() {
 }
 ```
 
-This tests the actual CLI interface and serves as executable documentation.
+For complex repository state (hierarchies, dependency chains, cross-links), use
+fixture builders from `test_fixtures`:
+
+```rust
+#[test]
+fn blocked_shows_tasks_with_unresolved_blockers() {
+    let env = TestEnv::new();
+    let (id_a, id_b, id_c) = setup_dependency_chain(&env);
+
+    let result = lat(LatCommand.Blocked, env, &[]);
+    // Task B and C are blocked; Task A is not
+    assert!(result.stdout.contains(&id_b));
+}
+```
+
+Fixture builders create valid Lattice documents directly on the filesystem,
+bypassing `lat create`. This is efficient for setting up complex initial state.
+Tests should still use `lat` commands for assertions—maintaining black-box
+testing of the CLI interface.
 
 ## Test Categories
 
