@@ -1,7 +1,8 @@
-use serde::Serialize;
 use tracing::{debug, info, instrument};
 
 use crate::cli::command_dispatch::{CommandContext, LatticeResult};
+use crate::cli::commands::link_display;
+use crate::cli::commands::link_display::LinkDocumentInfo;
 use crate::cli::structure_args::LinksFromArgs;
 use crate::cli::{color_theme, output_format};
 use crate::error::error_types::LatticeError;
@@ -34,21 +35,6 @@ pub fn execute(context: CommandContext, args: LinksFromArgs) -> LatticeResult<()
     Ok(())
 }
 
-/// Information about a linked document for display and JSON output.
-#[derive(Debug, Clone, Serialize)]
-struct LinkedDocumentInfo {
-    id: String,
-    name: String,
-    description: String,
-    path: String,
-    link_type: String,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    task_type: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    priority: Option<u8>,
-    is_closed: bool,
-}
-
 /// Resolves link rows to document information.
 ///
 /// Looks up each linked document by its target ID. Links to non-existent
@@ -57,13 +43,13 @@ struct LinkedDocumentInfo {
 fn resolve_linked_documents(
     context: &CommandContext,
     links: &[LinkRow],
-) -> LatticeResult<Vec<LinkedDocumentInfo>> {
+) -> LatticeResult<Vec<LinkDocumentInfo>> {
     let mut results = Vec::with_capacity(links.len());
 
     for link in links {
         match document_queries::lookup_by_id(&context.conn, &link.target_id)? {
             Some(doc) => {
-                results.push(LinkedDocumentInfo {
+                results.push(LinkDocumentInfo {
                     id: doc.id,
                     name: doc.name,
                     description: doc.description,
@@ -87,7 +73,7 @@ fn resolve_linked_documents(
 }
 
 /// Outputs linked documents in text format.
-fn output_text(documents: &[LinkedDocumentInfo], source_name: &str) {
+fn output_text(documents: &[LinkDocumentInfo], source_name: &str) {
     if documents.is_empty() {
         println!("No outgoing links from {}.", source_name);
         return;
@@ -100,7 +86,7 @@ fn output_text(documents: &[LinkedDocumentInfo], source_name: &str) {
 
     for doc in documents {
         let id_str = color_theme::lattice_id(&doc.id);
-        let type_str = format_type_priority(doc);
+        let type_str = link_display::format_type_priority(doc);
         let name_str = color_theme::bold(&doc.name);
         let status_str =
             if doc.is_closed { color_theme::muted("[closed]").to_string() } else { String::new() };
@@ -112,19 +98,8 @@ fn output_text(documents: &[LinkedDocumentInfo], source_name: &str) {
     }
 }
 
-/// Formats the type and priority indicator for a document.
-fn format_type_priority(doc: &LinkedDocumentInfo) -> String {
-    match (&doc.task_type, doc.priority) {
-        (Some(task_type), Some(priority)) => {
-            color_theme::task_type(format!("[{}/P{}]", task_type, priority)).to_string()
-        }
-        (Some(task_type), None) => color_theme::task_type(format!("[{}]", task_type)).to_string(),
-        (None, _) => color_theme::muted("[doc]").to_string(),
-    }
-}
-
 /// Outputs linked documents in JSON format.
-fn output_json(documents: &[LinkedDocumentInfo]) -> LatticeResult<()> {
+fn output_json(documents: &[LinkDocumentInfo]) -> LatticeResult<()> {
     let json_str = output_format::output_json_array(documents).map_err(|e| {
         LatticeError::OperationNotAllowed { reason: format!("Failed to serialize JSON: {e}") }
     })?;

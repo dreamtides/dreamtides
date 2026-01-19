@@ -10,6 +10,7 @@ mod dispatch_tests;
 mod fmt_tests;
 mod label_tests;
 mod links_from_tests;
+mod links_to_tests;
 mod list_tests;
 mod mv_tests;
 mod overview_tests;
