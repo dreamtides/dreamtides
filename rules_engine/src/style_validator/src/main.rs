@@ -33,9 +33,12 @@ fn main() -> Result<()> {
     let mut all_violations = Vec::new();
     let style_validator_path = Path::new(env!("CARGO_MANIFEST_DIR"));
 
-    // Filter out style_validator's own files
-    let rust_files: Vec<_> =
-        rust_files.into_iter().filter(|file| !file.starts_with(style_validator_path)).collect();
+    // Filter out style_validator's own files and tv/ (separate Tauri app)
+    let tv_path = rules_engine_path.join("src").join("tv");
+    let rust_files: Vec<_> = rust_files
+        .into_iter()
+        .filter(|file| !file.starts_with(style_validator_path) && !file.starts_with(&tv_path))
+        .collect();
 
     // Run per-file checks
     for file in &rust_files {
@@ -173,9 +176,13 @@ fn main() -> Result<()> {
     }
 
     // Check workspace dependencies for child crates under src/
+    // Note: src/tv/ is allowlisted because it's a separate Tauri app with its own
+    // dependencies
     let src_path = rules_engine_path.join("src");
-    let src_cargo_toml_files: Vec<_> =
-        cargo_toml_files.iter().filter(|file| file.starts_with(&src_path)).collect();
+    let src_cargo_toml_files: Vec<_> = cargo_toml_files
+        .iter()
+        .filter(|file| file.starts_with(&src_path) && !file.starts_with(&tv_path))
+        .collect();
 
     for file in &src_cargo_toml_files {
         match workspace_dependencies::check_file(file) {

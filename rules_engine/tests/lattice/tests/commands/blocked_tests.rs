@@ -450,7 +450,7 @@ fn blocked_command_json_output() {
     document_queries::insert(env.conn(), &blocked_doc).expect("Insert blocked");
     add_blocking_link(&env, "LBLKD2", "LBLOCK");
 
-    let mut env = env.with_json_output();
+    let env = env.with_json_output();
     let (_temp, context) = env.into_parts();
 
     let args = default_args();
