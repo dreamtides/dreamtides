@@ -374,68 +374,70 @@ completion detection. Consider keeping git polling as a fallback initially.
 
 ---
 
-### Milestone 4: PostToolUse Hook for Git Operations
+### ~~Milestone 4: PostToolUse Hook for Git Operations~~ (Deprecated)
 
-**Goal:** Detect git commits in real-time instead of polling.
+**Status:** This milestone has been deprecated and will not be implemented.
 
-**Scope:**
-- Implement PostToolUse(Bash) hook to detect `git commit`
-- Detect `git rebase --continue` completion
-- Detect `git rebase --abort`
-- Remove git polling from patrol
+**Original Goal:** Detect git commits in real-time via PostToolUse(Bash) hook.
 
-**Files to Modify:**
-- `patrol.rs` - Add PostBash event handling
-- `git.rs` - Simplify to just state queries (no polling helpers)
+**Why This Is Unnecessary:**
 
-**Command Detection Patterns:**
+The Stop hook (Milestone 3) already provides correct task completion detection.
+Triggering state transitions on individual git commands would cause bugs:
 
-```rust
-fn is_git_commit_command(command: &str) -> bool {
-    command.contains("git commit") ||
-    command.contains("git rebase --continue")
-}
+1. **Spurious transitions:** An agent may make multiple commits during a task.
+   Transitioning to NeedsReview on the first commit would interrupt the agent
+   while it's still working.
 
-fn is_git_abort_command(command: &str) -> bool {
-    command.contains("git rebase --abort")
-}
+2. **Wrong semantic:** "Did the agent run `git commit`?" is not the same as
+   "Is the agent done with its task?" The Stop hook answers the correct question.
 
-// PostBash handler
-HookEvent::PostBash { worker, command, exit_code, .. } => {
-    if exit_code == 0 {
-        if is_git_commit_command(&command) {
-            // Trigger state transition check
-            handle_possible_commit(&worker, state)?;
-        } else if is_git_abort_command(&command) {
-            // Rebase aborted, may need to handle
-            handle_rebase_abort(&worker, state)?;
-        }
-    }
-}
-```
+3. **Complexity for no benefit:** PostToolUse fires on every Bash command,
+   requiring filtering logic that adds maintenance burden without improving
+   detection accuracy.
 
-**Estimated Complexity:** Medium
-**Can be done in one session:** Yes
+**What About Rebase Detection?**
+
+The Rebasing state is triggered when LLMC initiates a rebase, not when the agent
+runs git commands. When a worker is in Rebasing state:
+- The agent runs `git rebase --continue` or resolves conflicts
+- The agent eventually stops (Stop hook fires)
+- The Stop hook handler checks git state and transitions appropriately
+
+The existing rebase detection in `detect_rebasing_transition()` handles edge
+cases like conflict resolution. This polling can remain as a fallback or be
+removed in Milestone 4 cleanup.
+
+**Recommendation:** Skip this milestone entirely. The Stop hook provides
+semantically correct task completion detection.
 
 ---
 
-### Milestone 5: Cleanup and Optimization
+### Milestone 4: Cleanup and Optimization
 
-**Goal:** Remove all polling fallbacks and legacy detection code.
+**Goal:** Remove polling fallbacks and legacy detection code now that hooks
+provide reliable state detection.
 
 **Scope:**
-- Remove polling loop from patrol (keep only event handling)
-- Remove TMUX pane capture code
-- Remove all `wait_for_*` polling functions
+- Remove `hooks_session_lifecycle` and `hooks_task_completion` feature flags
+- Remove TMUX pane capture code used for state detection
+- Remove git polling from patrol (keep git utilities for state queries)
+- Simplify patrol to pure event handling + periodic maintenance
 - Update documentation
-- Performance optimization
 
 **Files to Modify:**
-- `patrol.rs` - Remove polling, pure event-driven
-- `tmux/session.rs` - Remove `capture_pane()`, detection regexes
-- `worker.rs` - Clean up legacy startup flow
-- `config.rs` - Remove polling-related settings
+- `patrol.rs` - Remove `detect_state_transitions()` git polling, simplify to
+  event-driven + maintenance tasks only
+- `tmux/session.rs` - Remove `capture_pane()`, `wait_for_claude_ready()`,
+  process detection functions
+- `config.rs` - Remove feature flags, keep `patrol_interval_secs` for
+  maintenance tasks (rebasing, self-review sending)
 - `docs/llmc.md` - Update architecture documentation
+
+**Keep:**
+- Git utility functions (still used for state queries on Stop hook)
+- Rebase triggering logic (maintenance task, not polling-based detection)
+- Self-review prompt sending (maintenance task)
 
 **Estimated Complexity:** Medium
 **Can be done in one session:** Yes
@@ -581,8 +583,8 @@ Each milestone includes a feature flag for rollback:
 # Feature flags for hook migration
 hooks_session_lifecycle = true   # Milestone 2
 hooks_task_completion = true     # Milestone 3
-hooks_git_detection = true       # Milestone 4
-polling_fallback = false         # Disable after Milestone 5
+# Note: hooks_git_detection was planned for Milestone 4 but deprecated
+# The Stop hook provides sufficient task completion detection
 ```
 
 ---
@@ -629,10 +631,10 @@ polling_fallback = false         # Disable after Milestone 5
 | 1: Hook Infrastructure | 1 session | None |
 | 2: Session Lifecycle | 1 session | Milestone 1 |
 | 3: Task Completion | 1-2 sessions | Milestone 2 |
-| 4: Git Detection | 1 session | Milestone 3 |
-| 5: Cleanup | 1 session | Milestone 4 |
+| ~~4: Git Detection~~ | ~~1 session~~ | ~~Milestone 3~~ | (Deprecated)
+| 4: Cleanup | 1 session | Milestone 3 |
 
-**Total: 5-6 agent sessions**
+**Total: 4-5 agent sessions**
 
 ---
 
@@ -649,7 +651,7 @@ polling_fallback = false         # Disable after Milestone 5
 - `ipc/messages.rs` (~100 lines)
 - `bin/llmc-hook.rs` (~150 lines)
 
-### Files to Delete (Milestone 5)
+### Files to Delete (Milestone 4: Cleanup)
 - Pane capture regex patterns
 - Polling helper functions
 - TMUX ready-wait loops
