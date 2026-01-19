@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { forwardRef, useEffect, useImperativeHandle, useRef } from "react";
 import {
   LocaleType,
   mergeLocales,
@@ -66,19 +66,63 @@ export interface TomlTableData {
   rows: (string | number | boolean | null)[][];
 }
 
+export interface UniverSpreadsheetHandle {
+  getData: () => TomlTableData | null;
+}
+
 interface UniverSpreadsheetProps {
   width?: string | number;
   height?: string | number;
   data?: TomlTableData;
 }
 
-export function UniverSpreadsheet({
-  width = "100%",
-  height = "600px",
-  data,
-}: UniverSpreadsheetProps) {
+export const UniverSpreadsheet = forwardRef<
+  UniverSpreadsheetHandle,
+  UniverSpreadsheetProps
+>(function UniverSpreadsheet({ width = "100%", height = "600px", data }, ref) {
   const containerRef = useRef<HTMLDivElement>(null);
   const univerRef = useRef<Univer | null>(null);
+  const univerAPIRef = useRef<FUniver | null>(null);
+  const headersRef = useRef<string[]>([]);
+
+  useImperativeHandle(ref, () => ({
+    getData: () => {
+      const sheet = univerAPIRef.current?.getActiveWorkbook()?.getActiveSheet();
+      if (!sheet || headersRef.current.length === 0) return null;
+
+      const headers = headersRef.current;
+      const rows: (string | number | boolean | null)[][] = [];
+      let rowIndex = 2;
+      let hasData = true;
+
+      while (hasData) {
+        const row: (string | number | boolean | null)[] = [];
+        let rowHasContent = false;
+
+        for (let colIndex = 0; colIndex < headers.length; colIndex++) {
+          const colLetter = getColumnLetter(colIndex);
+          const cellAddress = `${colLetter}${rowIndex}`;
+          const cellValue = sheet.getRange(cellAddress)?.getValue();
+
+          if (cellValue !== undefined && cellValue !== null && cellValue !== "") {
+            rowHasContent = true;
+            row.push(cellValue as string | number | boolean);
+          } else {
+            row.push(null);
+          }
+        }
+
+        if (rowHasContent) {
+          rows.push(row);
+          rowIndex++;
+        } else {
+          hasData = false;
+        }
+      }
+
+      return { headers, rows };
+    },
+  }));
 
   useEffect(() => {
     if (!containerRef.current || univerRef.current) return;
@@ -128,9 +172,12 @@ export function UniverSpreadsheet({
     univer.createUnit(UniverInstanceType.UNIVER_SHEET, {});
 
     const univerAPI = FUniver.newAPI(univer);
+    univerAPIRef.current = univerAPI;
     const sheet = univerAPI.getActiveWorkbook()?.getActiveSheet();
 
     if (sheet && data) {
+      headersRef.current = data.headers;
+
       data.headers.forEach((header, colIndex) => {
         const colLetter = getColumnLetter(colIndex);
         const range = sheet.getRange(`${colLetter}1`);
@@ -151,6 +198,7 @@ export function UniverSpreadsheet({
     return () => {
       univer.dispose();
       univerRef.current = null;
+      univerAPIRef.current = null;
     };
   }, [data]);
 
@@ -163,7 +211,7 @@ export function UniverSpreadsheet({
       }}
     />
   );
-}
+});
 
 function getColumnLetter(index: number): string {
   let result = "";
