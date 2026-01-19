@@ -994,3 +994,209 @@ This document contains the word xylophone which is unique.
     assert_eq!(results.len(), 1, "Should find exactly one document with 'xylophone'");
     assert_eq!(results[0].document_id, "LSRCH2", "Found document ID should match");
 }
+
+// ============================================================================
+// directory_roots incremental sync tests
+// ============================================================================
+
+/// Helper to create a root document (filename matches directory).
+fn create_root_document(dir: &std::path::Path, subdir: &str, id: &str) {
+    let relative_path = format!("{}/{}.md", subdir, subdir);
+    create_lattice_document(dir, &relative_path, id, subdir);
+}
+
+#[test]
+fn incremental_sync_adds_new_root_document_to_directory_roots() {
+    let temp_dir = TempDir::new().expect("failed to create temp dir");
+    let lattice_dir = temp_dir.path().join(".lattice");
+    std::fs::create_dir_all(&lattice_dir).expect("failed to create .lattice dir");
+
+    let conn = connection_pool::open_connection(temp_dir.path())
+        .expect("should open connection successfully");
+    schema_definition::create_schema(&conn).expect("should create schema");
+
+    // Create a root document: api/api.md
+    create_root_document(temp_dir.path(), "api", "LAPI23");
+
+    let change_info = ChangeInfo {
+        modified_files: vec![PathBuf::from("api/api.md")],
+        deleted_files: vec![],
+        uncommitted_files: vec![],
+        current_head: Some("abc123".to_string()),
+        last_indexed_commit: Some("def456".to_string()),
+    };
+
+    let git = FakeGit::new();
+    let result = sync_strategies::incremental_sync(temp_dir.path(), &git, &conn, &change_info)
+        .expect("incremental_sync should succeed");
+
+    assert_eq!(result.files_updated, 1, "Should have updated 1 file");
+
+    // Verify directory_roots entry was created
+    let root_id = lattice::index::directory_roots::get_root_id(&conn, "api")
+        .expect("get_root_id should succeed");
+    assert_eq!(root_id, Some("LAPI23".to_string()), "directory_roots should have the root doc ID");
+}
+
+#[test]
+fn incremental_sync_removes_deleted_root_from_directory_roots() {
+    let temp_dir = TempDir::new().expect("failed to create temp dir");
+    let lattice_dir = temp_dir.path().join(".lattice");
+    std::fs::create_dir_all(&lattice_dir).expect("failed to create .lattice dir");
+
+    let conn = connection_pool::open_connection(temp_dir.path())
+        .expect("should open connection successfully");
+    schema_definition::create_schema(&conn).expect("should create schema");
+
+    // First, create and index a root document
+    create_root_document(temp_dir.path(), "api", "LAPI24");
+
+    let git = FakeGit::with_ls_files(vec![PathBuf::from("api/api.md")]);
+    sync_strategies::full_rebuild(temp_dir.path(), &git, &conn)
+        .expect("initial full_rebuild should succeed");
+
+    // Verify directory_roots entry exists
+    let root_id = lattice::index::directory_roots::get_root_id(&conn, "api")
+        .expect("get_root_id should succeed");
+    assert_eq!(root_id, Some("LAPI24".to_string()), "Root should be in directory_roots initially");
+
+    // Delete the file
+    std::fs::remove_file(temp_dir.path().join("api/api.md")).expect("should delete root doc");
+
+    let change_info = ChangeInfo {
+        modified_files: vec![],
+        deleted_files: vec![PathBuf::from("api/api.md")],
+        uncommitted_files: vec![],
+        current_head: Some("new123".to_string()),
+        last_indexed_commit: Some("old456".to_string()),
+    };
+
+    let git2 = FakeGit::new();
+    sync_strategies::incremental_sync(temp_dir.path(), &git2, &conn, &change_info)
+        .expect("incremental_sync should succeed");
+
+    // Verify directory_roots entry was removed
+    let root_id = lattice::index::directory_roots::get_root_id(&conn, "api")
+        .expect("get_root_id should succeed");
+    assert_eq!(root_id, None, "directory_roots entry should be removed after deletion");
+}
+
+#[test]
+fn incremental_sync_does_not_affect_directory_roots_for_non_root_documents() {
+    let temp_dir = TempDir::new().expect("failed to create temp dir");
+    let lattice_dir = temp_dir.path().join(".lattice");
+    std::fs::create_dir_all(&lattice_dir).expect("failed to create .lattice dir");
+
+    let conn = connection_pool::open_connection(temp_dir.path())
+        .expect("should open connection successfully");
+    schema_definition::create_schema(&conn).expect("should create schema");
+
+    // Create a non-root document: api/readme.md (not api/api.md)
+    create_lattice_document(temp_dir.path(), "api/readme.md", "LRDM23", "readme");
+
+    let change_info = ChangeInfo {
+        modified_files: vec![PathBuf::from("api/readme.md")],
+        deleted_files: vec![],
+        uncommitted_files: vec![],
+        current_head: Some("abc123".to_string()),
+        last_indexed_commit: Some("def456".to_string()),
+    };
+
+    let git = FakeGit::new();
+    sync_strategies::incremental_sync(temp_dir.path(), &git, &conn, &change_info)
+        .expect("incremental_sync should succeed");
+
+    // Verify NO directory_roots entry was created for api/
+    let root_id = lattice::index::directory_roots::get_root_id(&conn, "api")
+        .expect("get_root_id should succeed");
+    assert_eq!(root_id, None, "Non-root document should not create directory_roots entry");
+}
+
+#[test]
+fn incremental_sync_handles_root_document_move() {
+    let temp_dir = TempDir::new().expect("failed to create temp dir");
+    let lattice_dir = temp_dir.path().join(".lattice");
+    std::fs::create_dir_all(&lattice_dir).expect("failed to create .lattice dir");
+
+    let conn = connection_pool::open_connection(temp_dir.path())
+        .expect("should open connection successfully");
+    schema_definition::create_schema(&conn).expect("should create schema");
+
+    // First, create and index a root document at api/api.md
+    create_root_document(temp_dir.path(), "api", "LMOV25");
+
+    let git = FakeGit::with_ls_files(vec![PathBuf::from("api/api.md")]);
+    sync_strategies::full_rebuild(temp_dir.path(), &git, &conn)
+        .expect("initial full_rebuild should succeed");
+
+    // Verify initial state
+    let api_root =
+        lattice::index::directory_roots::get_root_id(&conn, "api").expect("should succeed");
+    assert_eq!(api_root, Some("LMOV25".to_string()), "api should have root initially");
+
+    // Simulate a move: delete old, create at new location
+    std::fs::remove_file(temp_dir.path().join("api/api.md")).expect("should delete old");
+    create_root_document(temp_dir.path(), "core", "LMOV25");
+
+    let change_info = ChangeInfo {
+        modified_files: vec![PathBuf::from("core/core.md")],
+        deleted_files: vec![PathBuf::from("api/api.md")],
+        uncommitted_files: vec![],
+        current_head: Some("new123".to_string()),
+        last_indexed_commit: Some("old456".to_string()),
+    };
+
+    let git2 = FakeGit::new();
+    sync_strategies::incremental_sync(temp_dir.path(), &git2, &conn, &change_info)
+        .expect("incremental_sync should succeed");
+
+    // Verify old directory_roots entry was removed
+    let api_root =
+        lattice::index::directory_roots::get_root_id(&conn, "api").expect("should succeed");
+    assert_eq!(api_root, None, "Old api root should be removed");
+
+    // Verify new directory_roots entry was created
+    let core_root =
+        lattice::index::directory_roots::get_root_id(&conn, "core").expect("should succeed");
+    assert_eq!(core_root, Some("LMOV25".to_string()), "New core root should be created");
+}
+
+#[test]
+fn full_rebuild_populates_directory_roots() {
+    let temp_dir = TempDir::new().expect("failed to create temp dir");
+    let lattice_dir = temp_dir.path().join(".lattice");
+    std::fs::create_dir_all(&lattice_dir).expect("failed to create .lattice dir");
+
+    // Create multiple root documents
+    create_root_document(temp_dir.path(), "api", "LAPIDR");
+    create_root_document(temp_dir.path(), "core", "LCORDR");
+    // Create a non-root document
+    create_lattice_document(temp_dir.path(), "docs/readme.md", "LRDMDR", "readme");
+
+    let conn = connection_pool::open_connection(temp_dir.path())
+        .expect("should open connection successfully");
+    schema_definition::create_schema(&conn).expect("should create schema");
+
+    let git = FakeGit::with_ls_files(vec![
+        PathBuf::from("api/api.md"),
+        PathBuf::from("core/core.md"),
+        PathBuf::from("docs/readme.md"),
+    ]);
+
+    sync_strategies::full_rebuild(temp_dir.path(), &git, &conn)
+        .expect("full_rebuild should succeed");
+
+    // Verify root documents are in directory_roots
+    let api_root =
+        lattice::index::directory_roots::get_root_id(&conn, "api").expect("should succeed");
+    assert_eq!(api_root, Some("LAPIDR".to_string()), "api should be in directory_roots");
+
+    let core_root =
+        lattice::index::directory_roots::get_root_id(&conn, "core").expect("should succeed");
+    assert_eq!(core_root, Some("LCORDR".to_string()), "core should be in directory_roots");
+
+    // Verify non-root document is NOT in directory_roots
+    let docs_root =
+        lattice::index::directory_roots::get_root_id(&conn, "docs").expect("should succeed");
+    assert_eq!(docs_root, None, "docs should NOT be in directory_roots (readme.md is not root)");
+}

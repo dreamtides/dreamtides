@@ -10,6 +10,7 @@ use crate::document::document_reader;
 use crate::document::frontmatter_schema::Frontmatter;
 use crate::error::error_types::LatticeError;
 use crate::git::git_ops::GitOps;
+use crate::index::directory_roots::DirectoryRoot;
 use crate::index::document_filter::DocumentFilter;
 use crate::index::document_types::InsertDocument;
 use crate::index::link_queries::{InsertLink, LinkType};
@@ -18,6 +19,7 @@ use crate::index::{
     directory_roots, document_queries, fulltext_search, index_metadata, label_queries,
     link_queries, schema_definition,
 };
+use crate::task::root_detection;
 
 /// Result of an incremental sync operation.
 #[derive(Debug, Clone)]
@@ -68,6 +70,11 @@ pub fn incremental_sync(
 
     // Process deleted files first
     for path in &change_info.deleted_files {
+        // If this was a root document, remove its directory_roots entry
+        if root_detection::is_root_document(path) {
+            remove_directory_root(conn, path)?;
+        }
+
         if remove_document_by_path(conn, repo_root, path)? {
             files_removed += 1;
         }
@@ -80,7 +87,13 @@ pub fn incremental_sync(
     // Process modified/uncommitted files
     for path in files_to_update {
         match upsert_document(conn, repo_root, path) {
-            Ok(true) => files_updated += 1,
+            Ok(true) => {
+                files_updated += 1;
+                // If this is a root document, update its directory_roots entry
+                if root_detection::is_root_document(path) {
+                    upsert_directory_root(conn, path)?;
+                }
+            }
             Ok(false) => {
                 debug!(path = %path.display(), "Document skipped (conflict markers or not a lattice doc)");
             }
@@ -420,29 +433,65 @@ fn rebuild_directory_roots(conn: &Connection) -> Result<(), LatticeError> {
         document_queries::query(conn, &DocumentFilter::including_closed().with_is_root(true))?;
 
     for doc in roots {
-        // Extract directory path from document path
         let path = Path::new(&doc.path);
-        if let Some(parent) = path.parent() {
-            let dir_path = parent.to_string_lossy().to_string();
-
-            // Compute depth (number of path components)
-            let depth = parent.components().count() as u32;
-
-            // Find parent directory's root
-            let parent_path = parent.parent().map(|p| p.to_string_lossy().to_string());
-
-            let root = directory_roots::DirectoryRoot {
-                directory_path: dir_path,
-                root_id: doc.id.clone(),
-                parent_path,
-                depth,
-            };
-
-            directory_roots::upsert(conn, &root)?;
+        if let Some(root_entry) = build_directory_root(path, &doc.id) {
+            directory_roots::upsert(conn, &root_entry)?;
         }
     }
 
     debug!("Directory roots rebuilt");
+    Ok(())
+}
+
+/// Builds a DirectoryRoot entry from a document path and ID.
+///
+/// Returns `None` if the path has no parent directory.
+fn build_directory_root(path: &Path, doc_id: &str) -> Option<DirectoryRoot> {
+    let parent = path.parent()?;
+    let dir_path = parent.to_string_lossy().to_string();
+    let depth = parent.components().count() as u32;
+    let parent_path = parent.parent().map(|p| p.to_string_lossy().to_string());
+
+    Some(DirectoryRoot {
+        directory_path: dir_path,
+        root_id: doc_id.to_string(),
+        parent_path,
+        depth,
+    })
+}
+
+/// Removes a directory root entry for a root document path.
+fn remove_directory_root(conn: &Connection, path: &Path) -> Result<(), LatticeError> {
+    if let Some(parent) = path.parent() {
+        let dir_path = parent.to_string_lossy().to_string();
+        if directory_roots::delete(conn, &dir_path)? {
+            debug!(path = %path.display(), dir_path, "Removed directory root entry");
+        }
+    }
+    Ok(())
+}
+
+/// Upserts a directory root entry for a root document path.
+///
+/// Looks up the document by path to get its ID, then creates/updates the
+/// directory_roots entry.
+fn upsert_directory_root(conn: &Connection, path: &Path) -> Result<(), LatticeError> {
+    let path_str = path.to_string_lossy().to_string();
+
+    let Some(doc) = document_queries::lookup_by_path(conn, &path_str)? else {
+        debug!(path = %path.display(), "Cannot upsert directory root: document not found");
+        return Ok(());
+    };
+
+    if let Some(root_entry) = build_directory_root(path, &doc.id) {
+        directory_roots::upsert(conn, &root_entry)?;
+        debug!(
+            path = %path.display(),
+            dir_path = root_entry.directory_path,
+            "Upserted directory root entry"
+        );
+    }
+
     Ok(())
 }
 
