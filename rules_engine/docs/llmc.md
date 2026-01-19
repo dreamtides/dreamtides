@@ -81,6 +81,7 @@ Special States:
 - REBASING: Transitional state during rebase operations
 - ERROR: Worker encountered an unrecoverable error
 - OFFLINE: TMUX session not running (needs `llmc up`)
+- NO_CHANGES: Task completed without any code changes (e.g., review tasks)
 ```
 
 ### State Definitions
@@ -95,6 +96,7 @@ Special States:
 | `rebasing` | Worker is resolving merge conflicts after a rebase |
 | `error` | Worker is in an error state requiring manual intervention |
 | `offline` | TMUX session is not running |
+| `no_changes` | Task completed without any code changes |
 
 ### Reviewing vs Needs Review
 
@@ -266,7 +268,8 @@ LLMC uses Claude Code hooks for real-time state detection:
 - **SessionEnd**: Fired when Claude exits. With `reason="logout"`, gracefully
   transitions to Offline. With `reason="clear"` (from `/clear` command), ignored
   since Claude restarts immediately. Other reasons treated as crashes.
-- **Stop**: Fired when Claude completes a task, transitions worker to NeedsReview
+- **Stop**: Fired when Claude completes a task. If commits exist, transitions to
+  NeedsReview. If no commits exist (e.g., review-only task), transitions to NoChanges.
 
 This event-driven approach provides sub-second detection latency.
 

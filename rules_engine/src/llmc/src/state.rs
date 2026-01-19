@@ -28,6 +28,8 @@ pub enum WorkerStatus {
     Error,
     /// TMUX session is not running
     Offline,
+    /// Worker completed task without making any commits
+    NoChanges,
 }
 /// Record for a single worker in the LLMC system
 #[derive(Debug, Clone, Serialize, Deserialize)]

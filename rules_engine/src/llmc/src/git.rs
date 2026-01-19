@@ -308,6 +308,32 @@ pub fn amend_uncommitted_changes(worktree: &Path) -> Result<()> {
     }
     Ok(())
 }
+
+/// Creates a new commit from uncommitted changes when no prior commit exists
+pub fn create_uncommitted_changes_commit(worktree: &Path) -> Result<()> {
+    let add_output = Command::new("git")
+        .arg("-C")
+        .arg(worktree)
+        .arg("add")
+        .arg("-A")
+        .output()
+        .context("Failed to execute git add -A")?;
+    if !add_output.status.success() {
+        bail!("Failed to stage changes: {}", String::from_utf8_lossy(&add_output.stderr));
+    }
+    let commit_output = Command::new("git")
+        .arg("-C")
+        .arg(worktree)
+        .arg("commit")
+        .arg("-m")
+        .arg("Work in progress (uncommitted changes from Stop hook)")
+        .output()
+        .context("Failed to execute git commit")?;
+    if !commit_output.status.success() {
+        bail!("Failed to create commit: {}", String::from_utf8_lossy(&commit_output.stderr));
+    }
+    Ok(())
+}
 pub fn rebase_onto(worktree: &Path, target: &str) -> Result<RebaseResult> {
     let rebase_in_progress = is_rebase_in_progress(worktree);
     tracing::debug!(

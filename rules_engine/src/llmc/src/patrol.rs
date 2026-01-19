@@ -774,19 +774,33 @@ fn handle_stop(
                     return Ok(());
                 }
             };
-            if !has_commits {
-                tracing::debug!(
+            let has_uncommitted = git::has_uncommitted_changes(&worktree_path)?;
+            if !has_commits && !has_uncommitted {
+                tracing::warn!(
                     worker = %worker_name,
-                    "Stop hook: no commits ahead of origin/master, worker still thinking"
+                    "Stop hook: task completed without any commits, transitioning to NoChanges"
                 );
+                let transition = WorkerTransition::ToNoChanges;
+                if let Some(w) = state.get_worker_mut(worker_name) {
+                    worker::apply_transition(w, transition)?;
+                }
+                let _ = sound::play_bell(config);
                 return Ok(());
             }
-            if git::has_uncommitted_changes(&worktree_path)? {
-                tracing::info!(
-                    worker = %worker_name,
-                    "Stop hook: worker has uncommitted changes, amending to existing commit"
-                );
-                git::amend_uncommitted_changes(&worktree_path)?;
+            if has_uncommitted {
+                if has_commits {
+                    tracing::info!(
+                        worker = %worker_name,
+                        "Stop hook: worker has uncommitted changes, amending to existing commit"
+                    );
+                    git::amend_uncommitted_changes(&worktree_path)?;
+                } else {
+                    tracing::info!(
+                        worker = %worker_name,
+                        "Stop hook: worker has uncommitted changes but no commit, creating commit"
+                    );
+                    git::create_uncommitted_changes_commit(&worktree_path)?;
+                }
             }
             let commit_sha = git::get_head_commit(&worktree_path)?;
             let commit_msg = git::get_commit_message(&worktree_path, &commit_sha)

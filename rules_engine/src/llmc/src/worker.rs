@@ -28,26 +28,30 @@ pub enum WorkerTransition {
     ToError { reason: String },
     /// Transition to offline state
     ToOffline,
+    /// Transition to no_changes state (task completed without commits)
+    ToNoChanges,
 }
 pub fn can_transition(from: &WorkerStatus, to: &WorkerStatus) -> bool {
     matches!(
         (from, to),
-        (WorkerStatus::Idle | WorkerStatus::Rebasing, WorkerStatus::Working)
-            | (
-                WorkerStatus::Idle
-                    | WorkerStatus::Working
-                    | WorkerStatus::Rejected
-                    | WorkerStatus::Rebasing
-                    | WorkerStatus::Reviewing,
-                WorkerStatus::NeedsReview
-            )
-            | (WorkerStatus::NeedsReview, WorkerStatus::Reviewing)
+        (
+            WorkerStatus::Idle | WorkerStatus::Rebasing | WorkerStatus::NoChanges,
+            WorkerStatus::Working
+        ) | (
+            WorkerStatus::Idle
+                | WorkerStatus::Working
+                | WorkerStatus::Rejected
+                | WorkerStatus::Rebasing
+                | WorkerStatus::Reviewing,
+            WorkerStatus::NeedsReview
+        ) | (WorkerStatus::NeedsReview, WorkerStatus::Reviewing)
             | (
                 WorkerStatus::Working
                     | WorkerStatus::NeedsReview
                     | WorkerStatus::Reviewing
                     | WorkerStatus::Rejected
-                    | WorkerStatus::Offline,
+                    | WorkerStatus::Offline
+                    | WorkerStatus::NoChanges,
                 WorkerStatus::Idle
             )
             | (
@@ -55,6 +59,7 @@ pub fn can_transition(from: &WorkerStatus, to: &WorkerStatus) -> bool {
                 WorkerStatus::Rejected
             )
             | (WorkerStatus::Error, WorkerStatus::NeedsReview | WorkerStatus::Idle)
+            | (WorkerStatus::Working | WorkerStatus::Rejected, WorkerStatus::NoChanges)
             | (_, WorkerStatus::Rebasing | WorkerStatus::Error | WorkerStatus::Offline)
     )
 }
@@ -78,6 +83,7 @@ pub fn apply_transition(worker: &mut WorkerRecord, transition: WorkerTransition)
         WorkerTransition::ToRebasing => WorkerStatus::Rebasing,
         WorkerTransition::ToError { .. } => WorkerStatus::Error,
         WorkerTransition::ToOffline => WorkerStatus::Offline,
+        WorkerTransition::ToNoChanges => WorkerStatus::NoChanges,
     };
     if !can_transition(&old_status, &new_status) {
         bail!(
@@ -112,10 +118,17 @@ pub fn apply_transition(worker: &mut WorkerRecord, transition: WorkerTransition)
             worker.commits_first_detected_unix = None;
         }
         WorkerTransition::ToNeedsReview { .. } => {}
+        WorkerTransition::ToNoChanges => {
+            worker.commits_first_detected_unix = None;
+        }
         _ => {}
     }
-    if matches!(transition, WorkerTransition::ToIdle | WorkerTransition::ToNeedsReview { .. })
-        && worker.crash_count > 0
+    if matches!(
+        transition,
+        WorkerTransition::ToIdle
+            | WorkerTransition::ToNeedsReview { .. }
+            | WorkerTransition::ToNoChanges
+    ) && worker.crash_count > 0
     {
         tracing::info!(
             "Worker {} completed successfully, resetting crash count from {}",

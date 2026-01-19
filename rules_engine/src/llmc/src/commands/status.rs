@@ -173,6 +173,7 @@ fn format_status_json(status: WorkerStatus) -> String {
         WorkerStatus::Rebasing => "rebasing".to_string(),
         WorkerStatus::Error => "error".to_string(),
         WorkerStatus::Offline => "offline".to_string(),
+        WorkerStatus::NoChanges => "no_changes".to_string(),
     }
 }
 fn format_status_colored(status: WorkerStatus) -> String {
@@ -188,6 +189,7 @@ fn format_status_colored(status: WorkerStatus) -> String {
         WorkerStatus::Rebasing => ("\x1b[35m", "rebasing"),
         WorkerStatus::Error => ("\x1b[1;31m", "error"),
         WorkerStatus::Offline => ("\x1b[90m", "offline"),
+        WorkerStatus::NoChanges => ("\x1b[93m", "no_changes"),
     };
     format!("{}{}\x1b[0m", color_code, text)
 }
