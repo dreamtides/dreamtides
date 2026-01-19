@@ -8,6 +8,7 @@ mod create_tests;
 mod dep_tests;
 mod dispatch_tests;
 mod fmt_tests;
+mod impact_tests;
 mod label_tests;
 mod links_from_tests;
 mod links_to_tests;

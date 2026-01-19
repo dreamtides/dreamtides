@@ -14,9 +14,9 @@ use crate::cli::commands::ready_command::ready_executor;
 use crate::cli::commands::show_command::show_executor;
 use crate::cli::commands::{
     blocked_command, changes_command, children_command, claim_command, close_command,
-    create_command, fmt_command, generate_ids, links_from, links_to, orphans_command, path_command,
-    prune_command, reopen_command, roots_command, search_command, stale_command, stats_command,
-    track_command, tree_command, update_command,
+    create_command, fmt_command, generate_ids, impact_command, links_from, links_to,
+    orphans_command, path_command, prune_command, reopen_command, roots_command, search_command,
+    stale_command, stats_command, track_command, tree_command, update_command,
 };
 use crate::cli::global_options::GlobalOptions;
 use crate::config::config_loader;
@@ -377,11 +377,9 @@ fn dispatch_command(context: CommandContext, command: Command) -> LatticeResult<
             info!("Dispatching to orphans command");
             orphans_command::execute(context, args)
         }
-        Command::Impact(_args) => {
+        Command::Impact(args) => {
             info!("Dispatching to impact command");
-            Err(LatticeError::OperationNotAllowed {
-                reason: "impact command not yet implemented".to_string(),
-            })
+            impact_command::execute(context, args)
         }
         Command::Claim(args) => {
             info!("Dispatching to claim command");
