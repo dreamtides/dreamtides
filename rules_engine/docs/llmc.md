@@ -180,6 +180,29 @@ The `[defaults.self_review]` section configures the self-review prompt:
 | `include_original` | bool | `false` | Include the original task prompt |
 | `clear` | bool | `false` | Send `/clear` before the self-review prompt |
 
+### Hook Feature Flags
+
+LLMC uses Claude Code hooks for real-time event detection. If you experience issues
+with hook-based detection, you can disable these features to fall back to polling:
+
+```toml
+[defaults]
+# Disable session lifecycle hooks (fall back to TMUX process polling)
+hooks_session_lifecycle = false
+
+# Disable task completion hooks (fall back to git commit polling)
+hooks_task_completion = false
+```
+
+**When to disable hooks:**
+- If hooks are not firing (check `~/llmc/logs/` for hook events)
+- If workers are not detected as online after startup
+- If task completion is not being detected
+- During debugging to isolate hook-related issues
+
+**Note:** Polling-based detection has higher latency (up to 30 seconds) compared to
+hooks (typically under 1 second). Re-enable hooks once the underlying issue is resolved.
+
 ### Editor Integration
 
 Several commands open `$EDITOR` when a message or prompt is not provided on the

@@ -91,7 +91,7 @@ impl Patrol {
             }
         }
         self.send_pending_self_review_prompts(state, config)?;
-        self.detect_reviewing_amendments(state, &mut report)?;
+        self.detect_reviewing_amendments(state, config, &mut report)?;
         let transitioned_workers: std::collections::HashSet<String> =
             report.transitions_applied.iter().map(|(name, _)| name.clone()).collect();
         self.rebase_pending_reviews(state, &transitioned_workers, &mut report)?;
@@ -523,8 +523,13 @@ impl Patrol {
     fn detect_reviewing_amendments(
         &self,
         state: &mut State,
+        config: &Config,
         report: &mut PatrolReport,
     ) -> Result<()> {
+        if config.defaults.hooks_task_completion {
+            tracing::debug!("Skipping detect_reviewing_amendments (hooks_task_completion enabled)");
+            return Ok(());
+        }
         let worker_names: Vec<String> = state.workers.keys().cloned().collect();
         for worker_name in worker_names {
             let worker = state.get_worker(&worker_name).unwrap();
@@ -863,10 +868,10 @@ fn handle_stop(
             let has_commits = match git::has_commits_ahead_of(&worktree_path, "origin/master") {
                 Ok(v) => v,
                 Err(e) => {
-                    tracing::debug!(
+                    tracing::warn!(
                         worker = %worker_name,
                         error = %e,
-                        "Stop hook: failed to check commits, ignoring"
+                        "Stop hook: failed to check commits ahead of origin/master"
                     );
                     return Ok(());
                 }
@@ -1047,7 +1052,86 @@ fn send_self_review_prompt(
 
 #[cfg(test)]
 mod tests {
+    use std::collections::HashMap;
+
+    use crate::config::{DefaultsConfig, RepoConfig};
+    use crate::ipc::messages::HookEvent;
     use crate::patrol::*;
+    use crate::state::WorkerRecord;
+
+    fn create_test_worker(name: &str) -> WorkerRecord {
+        WorkerRecord {
+            name: name.to_string(),
+            worktree_path: format!("/tmp/llmc/.worktrees/{}", name),
+            branch: format!("llmc/{}", name),
+            status: WorkerStatus::Idle,
+            current_prompt: String::new(),
+            prompt_cmd: None,
+            created_at_unix: 1000000000,
+            last_activity_unix: 1000000000,
+            commit_sha: None,
+            session_id: format!("llmc-{}", name),
+            crash_count: 0,
+            last_crash_unix: None,
+            on_complete_sent_unix: None,
+            self_review: false,
+            pending_self_review: false,
+        }
+    }
+
+    fn create_test_config(hooks_task_completion: bool) -> Config {
+        Config {
+            defaults: DefaultsConfig {
+                model: "opus".to_string(),
+                skip_permissions: true,
+                allowed_tools: vec![],
+                patrol_interval_secs: 60,
+                sound_on_review: false,
+                self_review: None,
+                hooks_session_lifecycle: true,
+                hooks_task_completion,
+            },
+            repo: RepoConfig { source: "/test".to_string() },
+            workers: HashMap::new(),
+        }
+    }
+
+    #[test]
+    fn test_handle_stop_unknown_worker() {
+        let mut state = State::new();
+        let config = create_test_config(true);
+        let result = handle_stop("unknown_worker", 12345, &mut state, &config);
+        assert!(result.is_ok());
+    }
+
+    #[test]
+    fn test_handle_stop_idle_worker_ignored() {
+        let mut state = State::new();
+        let worker = create_test_worker("adam");
+        state.add_worker(worker);
+        let config = create_test_config(true);
+        let result = handle_stop("adam", 12345, &mut state, &config);
+        assert!(result.is_ok());
+        assert_eq!(state.get_worker("adam").unwrap().status, WorkerStatus::Idle);
+    }
+
+    #[test]
+    fn test_handle_hook_event_stop_disabled() {
+        let mut state = State::new();
+        let mut worker = create_test_worker("adam");
+        worker.status = WorkerStatus::Working;
+        state.add_worker(worker);
+        let config = create_test_config(false);
+        let event = HookEvent::Stop {
+            worker: "adam".to_string(),
+            session_id: "test-session".to_string(),
+            timestamp: 12345,
+        };
+        let result = handle_hook_event(&event, &mut state, &config);
+        assert!(result.is_ok());
+        assert_eq!(state.get_worker("adam").unwrap().status, WorkerStatus::Working);
+    }
+
     #[test]
     fn test_patrol_report_default() {
         let report = PatrolReport::default();
