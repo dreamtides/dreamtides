@@ -1161,3 +1161,129 @@ fn all_warning_rules_are_warning_severity() {
         );
     }
 }
+
+#[test]
+fn w014_should_ignore_content_inside_code_blocks() {
+    let conn = create_test_db();
+    let temp_dir = TempDir::new().expect("Failed to create temp dir");
+
+    let content = r#"---
+lattice-id: LDOCAA
+name: code-block-doc
+description: Doc with code block containing heading-like content
+---
+
+Here is some configuration:
+
+```toml
+[defaults]
+timeout = 30
+
+# This is a TOML comment that looks like a markdown heading
+port = 8080
+
+[workers.adam]
+threads = 4
+```
+
+More text after the code block.
+"#;
+    create_temp_document(&temp_dir, "code_block_doc.md", content);
+
+    let doc = create_kb_document("LDOCAA", "code_block_doc.md", "code-block-doc");
+    document_queries::insert(&conn, &doc).expect("Insert should succeed");
+
+    let ctx = LintContext::new(&conn, temp_dir.path());
+    let config = LintConfig::default();
+
+    let rule = HeadingWithoutBlankLinesRule;
+    let rules: Vec<&dyn LintRule> = vec![&rule];
+    let summary = execute_rules(&ctx, &rules, &config).expect("Execute should succeed");
+
+    assert_eq!(
+        summary.warning_count, 0,
+        "Should not detect heading warnings inside code blocks, but got: {:?}",
+        summary.results
+    );
+}
+
+#[test]
+fn w014_should_ignore_content_inside_tilde_code_blocks() {
+    let conn = create_test_db();
+    let temp_dir = TempDir::new().expect("Failed to create temp dir");
+
+    let content = r#"---
+lattice-id: LDOCAA
+name: tilde-fence-doc
+description: Doc with tilde code block
+---
+
+Here is a bash script:
+
+~~~bash
+# This is a bash comment that looks like a markdown heading
+echo "hello"
+
+# Another comment
+~~~
+
+More text.
+"#;
+    create_temp_document(&temp_dir, "tilde_fence_doc.md", content);
+
+    let doc = create_kb_document("LDOCAA", "tilde_fence_doc.md", "tilde-fence-doc");
+    document_queries::insert(&conn, &doc).expect("Insert should succeed");
+
+    let ctx = LintContext::new(&conn, temp_dir.path());
+    let config = LintConfig::default();
+
+    let rule = HeadingWithoutBlankLinesRule;
+    let rules: Vec<&dyn LintRule> = vec![&rule];
+    let summary = execute_rules(&ctx, &rules, &config).expect("Execute should succeed");
+
+    assert_eq!(
+        summary.warning_count, 0,
+        "Should not detect heading warnings inside tilde code blocks, but got: {:?}",
+        summary.results
+    );
+}
+
+#[test]
+fn w014_should_still_detect_issues_outside_code_blocks() {
+    let conn = create_test_db();
+    let temp_dir = TempDir::new().expect("Failed to create temp dir");
+
+    let content = r#"---
+lattice-id: LDOCAA
+name: mixed-doc
+description: Doc with code blocks and real headings
+---
+
+Some intro text.
+# Heading Without Blank Line Before
+More text.
+
+```toml
+# This comment inside code block should be ignored
+[section]
+```
+
+"#;
+    create_temp_document(&temp_dir, "mixed_doc.md", content);
+
+    let doc = create_kb_document("LDOCAA", "mixed_doc.md", "mixed-doc");
+    document_queries::insert(&conn, &doc).expect("Insert should succeed");
+
+    let ctx = LintContext::new(&conn, temp_dir.path());
+    let config = LintConfig::default();
+
+    let rule = HeadingWithoutBlankLinesRule;
+    let rules: Vec<&dyn LintRule> = vec![&rule];
+    let summary = execute_rules(&ctx, &rules, &config).expect("Execute should succeed");
+
+    assert_eq!(
+        summary.warning_count, 1,
+        "Should detect heading without blank line outside code block"
+    );
+    assert!(summary.results[0].message.contains("blank line before/after"));
+}

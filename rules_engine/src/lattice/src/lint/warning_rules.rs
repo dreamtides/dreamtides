@@ -172,6 +172,31 @@ pub fn is_list_continuation(line: &str) -> bool {
     leading_spaces >= 2
 }
 
+/// Returns true if the line starts a fenced code block (``` or ~~~).
+pub fn is_fenced_code_start(line: &str) -> bool {
+    let trimmed = line.trim_start();
+    trimmed.starts_with("```") || trimmed.starts_with("~~~")
+}
+
+/// Returns the fence pattern if the line starts a fenced code block, None
+/// otherwise.
+pub fn extract_fence(line: &str) -> Option<&'static str> {
+    let trimmed = line.trim_start();
+    if trimmed.starts_with("```") {
+        Some("```")
+    } else if trimmed.starts_with("~~~") {
+        Some("~~~")
+    } else {
+        None
+    }
+}
+
+/// Returns true if the line ends a fenced code block with the matching fence.
+pub fn is_matching_fence_end(line: &str, fence: &str) -> bool {
+    let trimmed = line.trim();
+    trimmed == fence || (trimmed.starts_with(fence) && trimmed[fence.len()..].trim().is_empty())
+}
+
 impl LintRule for DocumentTooLargeRule {
     fn codes(&self) -> &[&str] {
         &["W001"]
@@ -296,8 +321,21 @@ impl LintRule for InconsistentHeaderStyleRule {
         let lines: Vec<&str> = document.body.lines().collect();
         let mut has_atx = false;
         let mut has_setext = false;
+        let mut current_fence: Option<&'static str> = None;
 
         for (i, line) in lines.iter().enumerate() {
+            if let Some(fence) = current_fence {
+                if is_matching_fence_end(line, fence) {
+                    current_fence = None;
+                }
+                continue;
+            }
+
+            if let Some(fence) = extract_fence(line) {
+                current_fence = Some(fence);
+                continue;
+            }
+
             if line.starts_with('#') && !line.starts_with("#!") {
                 has_atx = true;
             }
@@ -336,8 +374,21 @@ impl LintRule for InconsistentListMarkersRule {
         };
 
         let mut markers_found = Vec::new();
+        let mut current_fence: Option<&'static str> = None;
 
         for line in document.body.lines() {
+            if let Some(fence) = current_fence {
+                if is_matching_fence_end(line, fence) {
+                    current_fence = None;
+                }
+                continue;
+            }
+
+            if let Some(fence) = extract_fence(line) {
+                current_fence = Some(fence);
+                continue;
+            }
+
             let trimmed = line.trim_start();
             if let Some(marker) = extract_list_marker(trimmed)
                 && !markers_found.contains(&marker)
@@ -378,14 +429,17 @@ impl LintRule for BareUrlRule {
         let url_regex = Regex::new(r"https?://[^\s\)>\]]+")
             .unwrap_or_else(|e| panic!("Invalid URL regex: {e}"));
 
-        let mut in_code_block = false;
+        let mut current_fence: Option<&'static str> = None;
         for (line_num, line) in document.body.lines().enumerate() {
-            let trimmed = line.trim_start();
-            if trimmed.starts_with("```") || trimmed.starts_with("~~~") {
-                in_code_block = !in_code_block;
+            if let Some(fence) = current_fence {
+                if is_matching_fence_end(line, fence) {
+                    current_fence = None;
+                }
                 continue;
             }
-            if in_code_block {
+
+            if let Some(fence) = extract_fence(line) {
+                current_fence = Some(fence);
                 continue;
             }
 
@@ -729,8 +783,21 @@ impl LintRule for HeadingWithoutBlankLinesRule {
 
         let lines: Vec<&str> = document.body.lines().collect();
         let mut results = Vec::new();
+        let mut current_fence: Option<&'static str> = None;
 
         for (i, line) in lines.iter().enumerate() {
+            if let Some(fence) = current_fence {
+                if is_matching_fence_end(line, fence) {
+                    current_fence = None;
+                }
+                continue;
+            }
+
+            if let Some(fence) = extract_fence(line) {
+                current_fence = Some(fence);
+                continue;
+            }
+
             if !is_atx_heading(line) {
                 continue;
             }
@@ -770,8 +837,21 @@ impl LintRule for ListWithoutBlankLinesRule {
         let mut results = Vec::new();
         let mut in_list = false;
         let mut list_start = 0;
+        let mut current_fence: Option<&'static str> = None;
 
         for (i, line) in lines.iter().enumerate() {
+            if let Some(fence) = current_fence {
+                if is_matching_fence_end(line, fence) {
+                    current_fence = None;
+                }
+                continue;
+            }
+
+            if let Some(fence) = extract_fence(line) {
+                current_fence = Some(fence);
+                continue;
+            }
+
             let is_list_item = is_list_line(line);
 
             if is_list_item && !in_list {
