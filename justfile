@@ -539,3 +539,6 @@ prune-remote-branches:
     echo "Deleting remote branch: $b"
         git push -d origin "$b" || true
     done
+
+tv-dev:
+    cd ./rules_engine/src/tv && pnpm tauri dev
