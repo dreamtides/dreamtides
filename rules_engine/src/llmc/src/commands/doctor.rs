@@ -215,6 +215,7 @@ fn attempt_state_repairs(state: &mut State, report: &mut DoctorReport) -> usize 
             worker.prompt_cmd = None;
             worker.commit_sha = None;
             worker.self_review = false;
+            worker.pending_self_review = false;
             report
                 .repairs_succeeded
                 .push(format!("Reset {} from working to idle (no prompt)", worker.name));
@@ -814,6 +815,7 @@ fn run_rebuild() -> Result<()> {
             last_crash_unix: None,
             on_complete_sent_unix: None,
             self_review: false,
+            pending_self_review: false,
         };
         workers.insert(name.clone(), worker);
     }

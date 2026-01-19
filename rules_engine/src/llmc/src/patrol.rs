@@ -28,8 +28,8 @@ pub struct PatrolReport {
 
 /// Handles a hook event from Claude Code, applying state transitions as needed.
 ///
-/// This function processes SessionStart and SessionEnd events to detect when
-/// workers come online or crash/shutdown.
+/// This function processes SessionStart, SessionEnd, and Stop events to detect
+/// when workers come online, crash/shutdown, or complete their current task.
 pub fn handle_hook_event(event: &HookEvent, state: &mut State, config: &Config) -> Result<()> {
     match event {
         HookEvent::SessionStart { worker, session_id, timestamp } => {
@@ -38,8 +38,18 @@ pub fn handle_hook_event(event: &HookEvent, state: &mut State, config: &Config) 
         HookEvent::SessionEnd { worker, reason, timestamp } => {
             handle_session_end(worker, reason, *timestamp, state, config)?;
         }
-        HookEvent::Stop { .. } | HookEvent::PostBash { .. } => {
-            tracing::debug!("Ignoring hook event (not handled in session lifecycle): {:?}", event);
+        HookEvent::Stop { worker, timestamp, .. } => {
+            if config.defaults.hooks_task_completion {
+                handle_stop(worker, *timestamp, state, config)?;
+            } else {
+                tracing::debug!(
+                    "Ignoring Stop event for '{}' (hooks_task_completion disabled)",
+                    worker
+                );
+            }
+        }
+        HookEvent::PostBash { .. } => {
+            tracing::debug!("Ignoring PostBash event (not yet implemented): {:?}", event);
         }
     }
     Ok(())
@@ -366,6 +376,7 @@ impl Patrol {
         config: &Config,
         report: &mut PatrolReport,
     ) -> Result<()> {
+        let use_hooks_task_completion = config.defaults.hooks_task_completion;
         let worker_names: Vec<String> = state.workers.keys().cloned().collect();
         for worker_name in worker_names {
             let worker = state.get_worker(&worker_name).unwrap();
@@ -375,7 +386,15 @@ impl Patrol {
             let self_review_enabled = worker.self_review;
             let transition = match current_status {
                 WorkerStatus::Working | WorkerStatus::Rejected => {
-                    self.detect_working_transition(&session_id, &worktree_path)?
+                    if use_hooks_task_completion {
+                        tracing::debug!(
+                            worker = %worker_name,
+                            "Skipping git polling for Working/Rejected worker (hooks_task_completion enabled)"
+                        );
+                        WorkerTransition::None
+                    } else {
+                        self.detect_working_transition(&session_id, &worktree_path)?
+                    }
                 }
                 WorkerStatus::Rebasing => {
                     self.detect_rebasing_transition(&session_id, &worktree_path)?
@@ -394,7 +413,13 @@ impl Patrol {
                 worker::apply_transition(w, transition.clone())?;
                 report.transitions_applied.push((worker_name.clone(), transition.clone()));
                 if matches!(transition, WorkerTransition::ToNeedsReview { .. }) {
-                    if !self_review_enabled {
+                    if self_review_enabled {
+                        w.pending_self_review = true;
+                        tracing::info!(
+                            "Worker '{}' has self_review enabled, queuing self-review",
+                            worker_name
+                        );
+                    } else {
                         let now = SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs();
                         w.on_complete_sent_unix = Some(now);
                         tracing::info!(
@@ -816,6 +841,127 @@ fn handle_session_end(
         }
     }
 
+    Ok(())
+}
+
+fn handle_stop(
+    worker_name: &str,
+    _timestamp: u64,
+    state: &mut State,
+    config: &Config,
+) -> Result<()> {
+    let Some(worker) = state.get_worker(worker_name) else {
+        tracing::warn!("Stop hook received for unknown worker '{}'", worker_name);
+        return Ok(());
+    };
+    let current_status = worker.status;
+    let worktree_path = PathBuf::from(&worker.worktree_path);
+    let self_review_enabled = worker.self_review;
+    let stored_sha = worker.commit_sha.clone();
+    match current_status {
+        WorkerStatus::Working | WorkerStatus::Rejected => {
+            let has_commits = match git::has_commits_ahead_of(&worktree_path, "origin/master") {
+                Ok(v) => v,
+                Err(e) => {
+                    tracing::debug!(
+                        worker = %worker_name,
+                        error = %e,
+                        "Stop hook: failed to check commits, ignoring"
+                    );
+                    return Ok(());
+                }
+            };
+            if !has_commits {
+                tracing::debug!(
+                    worker = %worker_name,
+                    "Stop hook: no commits ahead of origin/master, worker still thinking"
+                );
+                return Ok(());
+            }
+            if git::has_uncommitted_changes(&worktree_path)? {
+                tracing::info!(
+                    worker = %worker_name,
+                    "Stop hook: worker has uncommitted changes, amending to existing commit"
+                );
+                git::amend_uncommitted_changes(&worktree_path)?;
+            }
+            let commit_sha = git::get_head_commit(&worktree_path)?;
+            let commit_msg = git::get_commit_message(&worktree_path, &commit_sha)
+                .unwrap_or_else(|_| "<unknown>".to_string());
+            let first_line = commit_msg.lines().next().unwrap_or("<empty>");
+            tracing::info!(
+                worker = %worker_name,
+                commit_sha = %commit_sha,
+                commit_msg = %first_line,
+                "Stop hook: transitioning worker to NeedsReview"
+            );
+            let transition = WorkerTransition::ToNeedsReview { commit_sha };
+            if let Some(w) = state.get_worker_mut(worker_name) {
+                worker::apply_transition(w, transition)?;
+                if self_review_enabled {
+                    w.pending_self_review = true;
+                    tracing::info!(
+                        worker = %worker_name,
+                        "Stop hook: queued self-review for next maintenance tick"
+                    );
+                } else {
+                    let now = SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs();
+                    w.on_complete_sent_unix = Some(now);
+                    tracing::info!(
+                        worker = %worker_name,
+                        "Stop hook: self_review disabled, skipping self-review"
+                    );
+                }
+                let _ = sound::play_bell(config);
+            }
+        }
+        WorkerStatus::Reviewing => {
+            let current_sha = match git::get_head_commit(&worktree_path) {
+                Ok(sha) => sha,
+                Err(e) => {
+                    tracing::warn!(
+                        "Stop hook: failed to get HEAD for Reviewing worker '{}': {}",
+                        worker_name,
+                        e
+                    );
+                    return Ok(());
+                }
+            };
+            let sha_changed = stored_sha.as_ref() != Some(&current_sha);
+            if sha_changed {
+                tracing::info!(
+                    worker = %worker_name,
+                    old_sha = ?stored_sha,
+                    new_sha = %current_sha,
+                    "Stop hook: Reviewing worker amended commit, transitioning to NeedsReview"
+                );
+            } else {
+                tracing::info!(
+                    worker = %worker_name,
+                    "Stop hook: self-review complete, transitioning to NeedsReview"
+                );
+            }
+            let transition = WorkerTransition::ToNeedsReview { commit_sha: current_sha };
+            if let Some(w) = state.get_worker_mut(worker_name) {
+                if let Err(e) = worker::apply_transition(w, transition) {
+                    tracing::error!(
+                        "Stop hook: failed to transition Reviewing worker '{}' to NeedsReview: {}",
+                        worker_name,
+                        e
+                    );
+                } else {
+                    let _ = sound::play_bell(config);
+                }
+            }
+        }
+        _ => {
+            tracing::debug!(
+                worker = %worker_name,
+                status = ?current_status,
+                "Stop hook: ignoring for worker not in Working/Rejected/Reviewing state"
+            );
+        }
+    }
     Ok(())
 }
 

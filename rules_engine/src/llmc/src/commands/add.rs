@@ -78,6 +78,7 @@ pub fn run_add(
         last_crash_unix: None,
         on_complete_sent_unix: None,
         self_review,
+        pending_self_review: false,
     };
     state.add_worker(worker_record);
     state.save(&state_path)?;
@@ -394,6 +395,7 @@ fn start_worker_immediately(name: &str) -> Result<()> {
         worker_mut.prompt_cmd = None;
         worker_mut.commit_sha = None;
         worker_mut.self_review = false;
+        worker_mut.pending_self_review = false;
         worker_mut.last_activity_unix = SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs();
         state.save(&state_path)?;
     }

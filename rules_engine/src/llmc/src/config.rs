@@ -31,6 +31,8 @@ pub struct DefaultsConfig {
     pub self_review: Option<SelfReviewConfig>,
     #[serde(default = "default_hooks_session_lifecycle")]
     pub hooks_session_lifecycle: bool,
+    #[serde(default = "default_hooks_task_completion")]
+    pub hooks_task_completion: bool,
 }
 /// Repository configuration
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -106,6 +108,9 @@ fn default_sound_on_review() -> bool {
 fn default_hooks_session_lifecycle() -> bool {
     true
 }
+fn default_hooks_task_completion() -> bool {
+    true
+}
 fn default_excluded_from_pool() -> bool {
     false
 }
@@ -119,6 +124,7 @@ impl Default for DefaultsConfig {
             sound_on_review: default_sound_on_review(),
             self_review: None,
             hooks_session_lifecycle: default_hooks_session_lifecycle(),
+            hooks_task_completion: default_hooks_task_completion(),
         }
     }
 }

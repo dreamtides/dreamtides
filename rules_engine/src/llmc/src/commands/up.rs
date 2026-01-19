@@ -362,6 +362,7 @@ fn start_worker(name: &str, config: &Config, state: &mut State, verbose: bool) -
                 worker_mut.prompt_cmd = None;
                 worker_mut.commit_sha = None;
                 worker_mut.self_review = false;
+                worker_mut.pending_self_review = false;
                 worker_mut.last_activity_unix = unix_timestamp_now();
             }
             if verbose {
@@ -608,6 +609,7 @@ fn start_offline_workers(config: &mut Config, state: &mut State, verbose: bool) 
                     worker_mut.prompt_cmd = None;
                     worker_mut.commit_sha = None;
                     worker_mut.self_review = false;
+                    worker_mut.pending_self_review = false;
                     worker_mut.last_activity_unix = unix_timestamp_now();
                 }
                 continue;

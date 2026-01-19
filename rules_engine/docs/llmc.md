@@ -168,6 +168,7 @@ You are Baker, focused on UI and user experience.
 | `excluded_from_pool` | bool | `false` | Exclude from automatic task assignment |
 | `self_review` | object | - | Self-review configuration (see below) |
 | `hooks_session_lifecycle` | bool | `true` | Use Claude Code hooks for session lifecycle detection instead of TMUX polling |
+| `hooks_task_completion` | bool | `true` | Use Claude Code Stop hook for task completion detection instead of git polling |
 
 ### Self-Review Configuration
 

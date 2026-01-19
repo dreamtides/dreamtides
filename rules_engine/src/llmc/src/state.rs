@@ -64,6 +64,11 @@ pub struct WorkerRecord {
     /// the self_review prompt to the worker before human review.
     #[serde(default)]
     pub self_review: bool,
+    /// If true, a self-review prompt should be sent on the next maintenance
+    /// tick. Set by the Stop hook when a worker with self_review enabled
+    /// transitions to NeedsReview.
+    #[serde(default)]
+    pub pending_self_review: bool,
 }
 /// State file tracking all workers and their status
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -258,6 +263,7 @@ mod tests {
             last_crash_unix: None,
             on_complete_sent_unix: None,
             self_review: false,
+            pending_self_review: false,
         }
     }
     #[test]
