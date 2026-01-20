@@ -73,6 +73,10 @@ Report all issues using the `lattice_create_task()` MCP tool:
 
 **Directory**: `rules_engine/src/lattice/tasks/qa/`
 
+> **IMPORTANT**: The directory parameter must be exactly `rules_engine/src/lattice/tasks/qa/`
+> (including the `/qa/` suffix). Do NOT use `rules_engine/src/lattice/` or
+> `rules_engine/src/lattice/tasks/` alone.
+
 **Required fields**:
 - `description`: Brief summary of the issue
 - `task_type`: Usually `bug`

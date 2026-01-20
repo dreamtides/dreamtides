@@ -263,7 +263,8 @@ rm -rf "$TEST_DIR"
 
 ## Expected Issues to Report
 
-Report any of the following as bugs under `rules_engine/src/lattice/tasks/qa/`:
+Report any of the following as bugs using the `lattice_create_task()` MCP tool with
+directory `rules_engine/src/lattice/tasks/qa/` (the full path including `/qa/` is required):
 
 1. Files created in wrong directory (tasks in docs/, docs in tasks/)
 2. Missing or incorrect frontmatter fields
