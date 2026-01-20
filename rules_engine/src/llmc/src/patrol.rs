@@ -83,6 +83,21 @@ impl Patrol {
         let transitioned_workers: std::collections::HashSet<String> =
             report.transitions_applied.iter().map(|(name, _)| name.clone()).collect();
         self.rebase_pending_reviews(state, &transitioned_workers, &mut report)?;
+        if !report.rebases_triggered.is_empty() {
+            let state_path = state::get_state_path();
+            if let Err(e) = state.save(&state_path) {
+                tracing::error!(
+                    "Failed to save state after {} rebases triggered: {}",
+                    report.rebases_triggered.len(),
+                    e
+                );
+            } else {
+                tracing::debug!(
+                    "Saved state after {} rebases triggered",
+                    report.rebases_triggered.len()
+                );
+            }
+        }
         Ok(report)
     }
 
