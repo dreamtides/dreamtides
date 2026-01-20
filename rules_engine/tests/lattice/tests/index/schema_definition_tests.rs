@@ -102,8 +102,6 @@ fn documents_table_has_expected_columns() {
         "backlink_count",
         "view_count",
         "is_root",
-        "in_tasks_dir",
-        "in_docs_dir",
     ];
     for col in &expected {
         assert!(columns.contains(&col.to_string()), "documents table should have column: {col}");

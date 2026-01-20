@@ -60,7 +60,7 @@ fn create_generates_filename_from_description() {
 
     assert!(result.is_ok(), "Create should succeed: {:?}", result);
 
-    let doc_path = _temp.path().join("api/docs/oauth_implementation_design.md");
+    let doc_path = _temp.path().join("api/oauth_implementation_design.md");
     assert!(doc_path.exists(), "Document should be created at generated path");
 }
 
@@ -75,14 +75,14 @@ fn create_skips_articles_in_filename() {
 
     assert!(result.is_ok(), "Create should succeed: {:?}", result);
 
-    let doc_path = _temp.path().join("api/docs/fix_login_bug_auth_system.md");
+    let doc_path = _temp.path().join("api/fix_login_bug_auth_system.md");
     assert!(doc_path.exists(), "Document should skip articles in filename: {}", doc_path.display());
 }
 
 #[test]
 fn create_truncates_long_filenames() {
     let env = TestEnv::new();
-    env.create_dir("api/docs");
+    env.create_dir("api");
 
     let args = create_args(
         "api/",
@@ -93,8 +93,11 @@ fn create_truncates_long_filenames() {
 
     assert!(result.is_ok(), "Create should succeed: {:?}", result);
 
-    let entries: Vec<_> =
-        fs::read_dir(_temp.path().join("api/docs")).expect("Read dir").flatten().collect();
+    let entries: Vec<_> = fs::read_dir(_temp.path().join("api"))
+        .expect("Read dir")
+        .flatten()
+        .filter(|e| e.path().extension().is_some_and(|ext| ext == "md"))
+        .collect();
     assert_eq!(entries.len(), 1, "Should have exactly one document");
 
     let filename = entries[0].file_name().to_string_lossy().to_string();
@@ -121,19 +124,19 @@ fn create_handles_collision_with_numeric_suffix() {
     let result2 = create_command::execute(context2, args2);
     assert!(result2.is_ok(), "Second create should succeed: {:?}", result2);
 
-    let first_path = env.repo_root().join("api/docs/test_document.md");
-    let second_path = env.repo_root().join("api/docs/test_document_2.md");
+    let first_path = env.repo_root().join("api/test_document.md");
+    let second_path = env.repo_root().join("api/test_document_2.md");
 
     assert!(first_path.exists(), "First document should exist");
     assert!(second_path.exists(), "Second document should exist with numeric suffix");
 }
 
 // ============================================================================
-// Auto-Placement Tests
+// Placement Tests
 // ============================================================================
 
 #[test]
-fn create_places_task_in_tasks_directory() {
+fn create_places_task_in_specified_directory() {
     let env = TestEnv::new();
     env.create_dir("api");
 
@@ -143,15 +146,15 @@ fn create_places_task_in_tasks_directory() {
 
     assert!(result.is_ok(), "Create should succeed: {:?}", result);
 
-    let doc_path = _temp.path().join("api/tasks/fix_login_bug.md");
-    assert!(doc_path.exists(), "Task should be placed in tasks/ directory");
+    let doc_path = _temp.path().join("api/fix_login_bug.md");
+    assert!(doc_path.exists(), "Task should be placed directly in the specified directory");
 
     let content = fs::read_to_string(&doc_path).expect("Read doc");
     assert!(content.contains("task-type: bug"), "Document should have task-type: bug");
 }
 
 #[test]
-fn create_places_knowledge_base_in_docs_directory() {
+fn create_places_knowledge_base_in_specified_directory() {
     let env = TestEnv::new();
     env.create_dir("api");
 
@@ -161,8 +164,8 @@ fn create_places_knowledge_base_in_docs_directory() {
 
     assert!(result.is_ok(), "Create should succeed: {:?}", result);
 
-    let doc_path = _temp.path().join("api/docs/api_design_document.md");
-    assert!(doc_path.exists(), "KB document should be placed in docs/ directory");
+    let doc_path = _temp.path().join("api/api_design_document.md");
+    assert!(doc_path.exists(), "KB document should be placed directly in the specified directory");
 
     let content = fs::read_to_string(&doc_path).expect("Read doc");
     assert!(!content.contains("task-type"), "KB document should not have task-type");
@@ -207,7 +210,7 @@ fn create_generates_valid_lattice_id() {
 
     assert!(result.is_ok(), "Create should succeed: {:?}", result);
 
-    let doc_path = _temp.path().join("api/docs/test_document.md");
+    let doc_path = _temp.path().join("api/test_document.md");
     let content = fs::read_to_string(&doc_path).expect("Read doc");
 
     assert!(content.contains("lattice-id: L"), "Should contain a Lattice ID starting with L");
@@ -224,7 +227,7 @@ fn create_derives_name_from_filename() {
 
     assert!(result.is_ok(), "Create should succeed: {:?}", result);
 
-    let doc_path = _temp.path().join("api/docs/fix_login_bug.md");
+    let doc_path = _temp.path().join("api/fix_login_bug.md");
     let content = fs::read_to_string(&doc_path).expect("Read doc");
 
     assert!(
@@ -244,7 +247,7 @@ fn create_sets_description_from_argument() {
 
     assert!(result.is_ok(), "Create should succeed: {:?}", result);
 
-    let doc_path = _temp.path().join("api/docs/my_wonderful_description.md");
+    let doc_path = _temp.path().join("api/my_wonderful_description.md");
     let content = fs::read_to_string(&doc_path).expect("Read doc");
 
     assert!(
@@ -264,7 +267,7 @@ fn create_task_sets_default_priority() {
 
     assert!(result.is_ok(), "Create should succeed: {:?}", result);
 
-    let doc_path = _temp.path().join("api/tasks/test_task.md");
+    let doc_path = _temp.path().join("api/test_task.md");
     let content = fs::read_to_string(&doc_path).expect("Read doc");
 
     assert!(content.contains("priority: 2"), "Default priority should be 2");
@@ -290,7 +293,7 @@ fn create_task_with_custom_priority() {
 
     assert!(result.is_ok(), "Create should succeed: {:?}", result);
 
-    let doc_path = _temp.path().join("api/tasks/urgent_bug.md");
+    let doc_path = _temp.path().join("api/urgent_bug.md");
     let content = fs::read_to_string(&doc_path).expect("Read doc");
 
     assert!(content.contains("priority: 0"), "Priority should be 0");
@@ -307,7 +310,7 @@ fn create_sets_timestamps() {
 
     assert!(result.is_ok(), "Create should succeed: {:?}", result);
 
-    let doc_path = _temp.path().join("api/docs/test_document.md");
+    let doc_path = _temp.path().join("api/test_document.md");
     let content = fs::read_to_string(&doc_path).expect("Read doc");
 
     assert!(content.contains("created-at:"), "Should have created-at timestamp");
@@ -338,7 +341,7 @@ fn create_with_labels() {
 
     assert!(result.is_ok(), "Create should succeed: {:?}", result);
 
-    let doc_path = _temp.path().join("api/tasks/labeled_task.md");
+    let doc_path = _temp.path().join("api/labeled_task.md");
     let content = fs::read_to_string(&doc_path).expect("Read doc");
 
     assert!(content.contains("labels:"), "Should have labels section");
@@ -370,7 +373,7 @@ fn create_with_discovered_from() {
 
     assert!(result.is_ok(), "Create should succeed: {:?}", result);
 
-    let doc_path = _temp.path().join("api/tasks/discovered_task.md");
+    let doc_path = _temp.path().join("api/discovered_task.md");
     let content = fs::read_to_string(&doc_path).expect("Read doc");
 
     assert!(content.contains("discovered-from:"), "Should have discovered-from field");
@@ -423,7 +426,7 @@ fn create_adds_document_to_index() {
 
     assert!(result.is_ok(), "Create should succeed: {:?}", result);
 
-    let exists = document_queries::exists_at_path(env.conn(), "api/docs/indexed_document.md")
+    let exists = document_queries::exists_at_path(env.conn(), "api/indexed_document.md")
         .expect("Query should succeed");
     assert!(exists, "Document should be in index");
 }
@@ -439,7 +442,7 @@ fn create_indexes_task_type_correctly() {
 
     assert!(result.is_ok(), "Create should succeed: {:?}", result);
 
-    let row = document_queries::lookup_by_path(env.conn(), "api/tasks/bug_fix_task.md")
+    let row = document_queries::lookup_by_path(env.conn(), "api/bug_fix_task.md")
         .expect("Query should succeed")
         .expect("Document should exist");
 
@@ -573,7 +576,7 @@ fn create_with_body_file() {
 
     assert!(result.is_ok(), "Create should succeed: {:?}", result);
 
-    let doc_path = _temp.path().join("api/docs/document_with_body.md");
+    let doc_path = _temp.path().join("api/document_with_body.md");
     let content = fs::read_to_string(&doc_path).expect("Read doc");
 
     assert!(content.contains("This is the document body content"), "Should contain body content");
@@ -633,9 +636,10 @@ fn create_task_with_all_types() {
 
         assert!(result.is_ok(), "Create {} task should succeed: {:?}", type_str, result);
 
-        let entries: Vec<_> = fs::read_dir(_temp.path().join("api/tasks"))
-            .expect("Read tasks dir")
+        let entries: Vec<_> = fs::read_dir(_temp.path().join("api"))
+            .expect("Read api dir")
             .flatten()
+            .filter(|e| e.path().extension().is_some_and(|ext| ext == "md"))
             .collect();
         assert_eq!(entries.len(), 1, "Should have one task for {}", type_str);
 

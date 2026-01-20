@@ -12,7 +12,7 @@ use lattice::index::document_types::InsertDocument;
 use lattice::test::test_environment::TestEnv;
 
 fn default_args() -> TreeArgs {
-    TreeArgs { path: None, depth: None, counts: false, tasks_only: false, docs_only: false }
+    TreeArgs { path: None, depth: None, counts: false }
 }
 
 fn create_task_doc(
@@ -23,7 +23,7 @@ fn create_task_doc(
     priority: u8,
     task_type: TaskType,
 ) -> InsertDocument {
-    let mut doc = InsertDocument::new(
+    InsertDocument::new(
         id.to_string(),
         None,
         path.to_string(),
@@ -37,13 +37,11 @@ fn create_task_doc(
         format!("hash-{id}"),
         100,
         false,
-    );
-    doc.in_tasks_dir = path.contains("/tasks/");
-    doc
+    )
 }
 
 fn create_kb_doc(id: &str, path: &str, name: &str, description: &str) -> InsertDocument {
-    let mut doc = InsertDocument::new(
+    InsertDocument::new(
         id.to_string(),
         None,
         path.to_string(),
@@ -57,9 +55,7 @@ fn create_kb_doc(id: &str, path: &str, name: &str, description: &str) -> InsertD
         format!("hash-{id}"),
         100,
         false,
-    );
-    doc.in_docs_dir = path.contains("/docs/");
-    doc
+    )
 }
 
 fn insert_doc(env: &TestEnv, doc: &InsertDocument, path: &str) {
@@ -222,75 +218,6 @@ fn tree_command_depth_zero_shows_only_top_level() {
     let (_temp, context) = env.into_parts();
     let result = tree_command::execute(context, args);
     assert!(result.is_ok(), "Tree command should handle depth 0");
-}
-
-// ============================================================================
-// Filter Option Tests
-// ============================================================================
-
-#[test]
-fn tree_command_tasks_only_filter() {
-    let env = TestEnv::new();
-    env.create_dir("docs");
-    env.create_dir("api");
-    env.create_dir("api/tasks");
-
-    let task = create_task_doc(
-        "LHHIJK",
-        "api/tasks/task1.md",
-        "task-one",
-        "First task",
-        2,
-        TaskType::Task,
-    );
-    insert_doc(&env, &task, "api/tasks/task1.md");
-
-    let kb = create_kb_doc("LIIJKL", "api/docs/design.md", "design-doc", "API design");
-    insert_doc(&env, &kb, "api/docs/design.md");
-
-    let args = TreeArgs { tasks_only: true, ..default_args() };
-    let (_temp, context) = env.into_parts();
-    let result = tree_command::execute(context, args);
-    assert!(result.is_ok(), "Tree command should filter to tasks only");
-}
-
-#[test]
-fn tree_command_docs_only_filter() {
-    let env = TestEnv::new();
-    env.create_dir("docs");
-    env.create_dir("api");
-    env.create_dir("api/tasks");
-
-    let task = create_task_doc(
-        "LJJKLM",
-        "api/tasks/task1.md",
-        "task-one",
-        "First task",
-        2,
-        TaskType::Task,
-    );
-    insert_doc(&env, &task, "api/tasks/task1.md");
-
-    let kb = create_kb_doc("LKKLMN", "api/docs/design.md", "design-doc", "API design");
-    insert_doc(&env, &kb, "api/docs/design.md");
-
-    let args = TreeArgs { docs_only: true, ..default_args() };
-    let (_temp, context) = env.into_parts();
-    let result = tree_command::execute(context, args);
-    assert!(result.is_ok(), "Tree command should filter to docs only");
-}
-
-#[test]
-fn tree_command_conflicting_filters_returns_error() {
-    let env = TestEnv::new();
-    env.create_dir("docs");
-    env.create_dir("api");
-    env.create_dir("api/tasks");
-
-    let args = TreeArgs { tasks_only: true, docs_only: true, ..default_args() };
-    let (_temp, context) = env.into_parts();
-    let result = tree_command::execute(context, args);
-    assert!(result.is_err(), "Tree command should error on conflicting filters");
 }
 
 // ============================================================================

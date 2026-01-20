@@ -13,14 +13,6 @@ pub struct TreeArgs {
     /// Show document counts.
     #[arg(long)]
     pub counts: bool,
-
-    /// Only show task directories.
-    #[arg(long)]
-    pub tasks_only: bool,
-
-    /// Only show documentation directories.
-    #[arg(long)]
-    pub docs_only: bool,
 }
 
 /// Arguments for `lat roots`.
@@ -36,14 +28,6 @@ pub struct ChildrenArgs {
     /// Include nested directories.
     #[arg(long)]
     pub recursive: bool,
-
-    /// Only show tasks.
-    #[arg(long)]
-    pub tasks: bool,
-
-    /// Only show KB documents.
-    #[arg(long)]
-    pub docs: bool,
 }
 
 /// Arguments for `lat dep`.

@@ -1,6 +1,5 @@
 pub mod closed_directory;
 pub mod dependency_graph;
-pub mod directory_structure;
 pub mod ready_calculator;
 pub mod root_detection;
 pub mod task_priority;

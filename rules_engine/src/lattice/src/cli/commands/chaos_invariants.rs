@@ -43,8 +43,6 @@ pub enum InvariantKind {
     ClosedStateInconsistency,
     /// Index is_root doesn't match filename.
     RootStateInconsistency,
-    /// Index in_tasks_dir or in_docs_dir doesn't match path.
-    DirectoryStateInconsistency,
     /// Git operation failed unexpectedly.
     GitOperationFailed,
     /// Link path in document doesn't match current file location.
@@ -60,7 +58,6 @@ pub fn check_all(conn: &Connection, repo_root: &Path) -> Result<(), InvariantVio
     check_id_format(conn)?;
     check_closed_state_consistency(conn)?;
     check_root_state_consistency(conn)?;
-    check_directory_state_consistency(conn)?;
     check_git_state_validity(repo_root)?;
     check_link_path_validity(conn, repo_root)?;
     Ok(())
@@ -84,7 +81,6 @@ impl InvariantKind {
             InvariantKind::Panic => "panic",
             InvariantKind::ClosedStateInconsistency => "closed-state-mismatch",
             InvariantKind::RootStateInconsistency => "root-state-mismatch",
-            InvariantKind::DirectoryStateInconsistency => "directory-state-mismatch",
             InvariantKind::GitOperationFailed => "git-operation-failed",
             InvariantKind::LinkPathMismatch => "link-path-mismatch",
         }
@@ -254,43 +250,6 @@ fn check_root_state_consistency(conn: &Connection) -> Result<(), InvariantViolat
                     if is_root_by_path { "is" } else { "is not" }
                 ),
                 affected_paths: vec![path],
-                affected_ids: vec![doc.id],
-            });
-        }
-    }
-
-    Ok(())
-}
-
-/// Checks that in_tasks_dir and in_docs_dir match path components (invariant
-/// 8).
-fn check_directory_state_consistency(conn: &Connection) -> Result<(), InvariantViolation> {
-    let docs = query_all_docs(conn, InvariantKind::DirectoryStateInconsistency)?;
-
-    for doc in docs {
-        let in_tasks = doc.path.contains("/tasks/");
-        let in_docs = doc.path.contains("/docs/");
-
-        if doc.in_tasks_dir != in_tasks {
-            return Err(InvariantViolation {
-                invariant: InvariantKind::DirectoryStateInconsistency,
-                description: format!(
-                    "Document {} has in_tasks_dir={} but path '{}'",
-                    doc.id, doc.in_tasks_dir, doc.path
-                ),
-                affected_paths: vec![PathBuf::from(&doc.path)],
-                affected_ids: vec![doc.id],
-            });
-        }
-
-        if doc.in_docs_dir != in_docs {
-            return Err(InvariantViolation {
-                invariant: InvariantKind::DirectoryStateInconsistency,
-                description: format!(
-                    "Document {} has in_docs_dir={} but path '{}'",
-                    doc.id, doc.in_docs_dir, doc.path
-                ),
-                affected_paths: vec![PathBuf::from(&doc.path)],
                 affected_ids: vec![doc.id],
             });
         }

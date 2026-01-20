@@ -21,7 +21,7 @@
 //! - **Type**: bug, feature, task, chore
 //! - **Labels**: AND semantics (`labels_all`) or OR semantics (`labels_any`)
 //! - **Path/Name**: prefix matching, substring search (`name_contains`)
-//! - **Directory**: root status, tasks/ or docs/ membership
+//! - **Directory**: root status
 //! - **Timestamps**: created/updated/closed with before/after bounds
 //!
 //! # Sorting
@@ -100,12 +100,6 @@ pub struct DocumentFilter {
     /// Filter by root document status. Root documents have a filename
     /// matching their containing directory (e.g., `api/api.md`).
     pub is_root: Option<bool>,
-
-    /// Filter by tasks/ directory membership.
-    pub in_tasks_dir: Option<bool>,
-
-    /// Filter by docs/ directory membership.
-    pub in_docs_dir: Option<bool>,
 
     /// Filter by skill flag. When `Some(true)`, returns only skill-enabled
     /// documents. When `Some(false)`, returns only non-skill documents.
@@ -276,18 +270,6 @@ impl DocumentFilter {
     /// Filters by root document status.
     pub fn with_is_root(mut self, is_root: bool) -> Self {
         self.is_root = Some(is_root);
-        self
-    }
-
-    /// Filters by tasks directory membership.
-    pub fn with_in_tasks_dir(mut self, in_tasks_dir: bool) -> Self {
-        self.in_tasks_dir = Some(in_tasks_dir);
-        self
-    }
-
-    /// Filters by docs directory membership.
-    pub fn with_in_docs_dir(mut self, in_docs_dir: bool) -> Self {
-        self.in_docs_dir = Some(in_docs_dir);
         self
     }
 
@@ -486,16 +468,6 @@ fn append_filter_conditions(
 
     if let Some(v) = filter.is_root {
         sql.push_str(" AND is_root = ?");
-        params.push(Box::new(v as i32));
-    }
-
-    if let Some(v) = filter.in_tasks_dir {
-        sql.push_str(" AND in_tasks_dir = ?");
-        params.push(Box::new(v as i32));
-    }
-
-    if let Some(v) = filter.in_docs_dir {
-        sql.push_str(" AND in_docs_dir = ?");
         params.push(Box::new(v as i32));
     }
 

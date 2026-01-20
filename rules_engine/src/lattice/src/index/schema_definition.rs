@@ -112,8 +112,6 @@ fn create_documents_table(conn: &Connection) -> Result<(), LatticeError> {
             backlink_count INTEGER NOT NULL DEFAULT 0,
             view_count INTEGER NOT NULL DEFAULT 0,
             is_root INTEGER NOT NULL DEFAULT 0,
-            in_tasks_dir INTEGER NOT NULL DEFAULT 0,
-            in_docs_dir INTEGER NOT NULL DEFAULT 0,
             skill INTEGER NOT NULL DEFAULT 0
         );
 

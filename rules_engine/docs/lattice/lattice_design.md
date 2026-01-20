@@ -148,36 +148,35 @@ recognized as a root indicator.
 It is an error to have both forms in the same directory (see E013). Root
 documents serve as the default parent for all other documents in that directory.
 
-The idiomatic Lattice directory structure separates tasks and documentation:
+Example directory structure:
 
 ```
 project/
 ├── api/
 │   ├── api.md                    # Root document (matches directory name)
-│   ├── docs/
-│   │   ├── api_design.md         # Knowledge base documents
-│   │   └── security_model.md
-│   └── tasks/
-│       ├── implement_auth.md     # Task documents
-│       ├── fix_rate_limit.md
-│       └── .closed/
-│           └── add_logging.md    # Closed tasks
+│   ├── api_design.md             # Knowledge base document
+│   ├── security_model.md
+│   ├── implement_auth.md         # Task document
+│   ├── fix_rate_limit.md
+│   └── .closed/
+│       └── add_logging.md        # Closed task
 └── database/
     ├── database.md               # Root document
-    ├── docs/
-    │   └── schema_design.md
-    └── tasks/
-        └── migrate_tables.md
+    ├── schema_design.md
+    └── migrate_tables.md
 ```
+
+Directory organization is a user convention; Lattice does not enforce any
+particular structure beyond root documents and `.closed/` directories. Users
+may organize documents however they prefer (e.g., separate `tasks/` and `docs/`
+subdirectories, flat structures, or any other arrangement).
 
 The `lat fmt` and `lat create` commands automatically populate the `parent-id`
 field in each document's frontmatter based on the directory's root document.
 This makes hierarchy explicit without requiring manual parent specification.
 Documents without a root document in their directory have no `parent-id`.
 
-The linter enforces this structure: documents must be either root documents,
-in a `tasks/` directory, or in a `docs/` directory. See
-[Appendix: Linter](appendix_linter.md) for the complete rule set.
+See [Appendix: Linter](appendix_linter.md) for the complete rule set.
 
 ## The ID System
 
@@ -242,13 +241,13 @@ Commands for creating and modifying tasks and documents.
 **lat create** - Creates new documents with `lat create <parent> "<description>"
 [options]`. The `<parent>` argument specifies the parent directory; the filename
 is auto-generated from the description (lowercase, underscores, significant
-words). The `-t` flag determines placement: tasks go to `<parent>/tasks/`,
-knowledge base documents go to `<parent>/docs/`. For root documents, specify the
-full path explicitly (e.g., `api/api.md`). Supports priority, labels, and
-dependencies for tasks. Use `--interactive` (`-i`) to prompt for the parent
-directory (with tab completion) and open `$EDITOR` for writing body content;
-the description and filename are auto-generated from the body text. The last
-used parent directory is remembered for subsequent interactive calls.
+words). Documents are created directly in the specified directory. For root
+documents, specify the full path explicitly (e.g., `api/api.md`). Supports
+priority, labels, and dependencies for tasks. Use `--interactive` (`-i`) to
+prompt for the parent directory (with tab completion) and open `$EDITOR` for
+writing body content; the description and filename are auto-generated from the
+body text. The last used parent directory is remembered for subsequent
+interactive calls.
 
 **lat update** - Modifies existing documents with `lat update <id> [id...]
 [options]`. Supports changing priority, type, and managing labels. To change
@@ -312,8 +311,8 @@ and type breakdowns, recent activity, and health metrics.
 
 Commands for navigating the document tree structure.
 
-**lat tree** - Display directory structure with documents. Supports `--depth`,
-`--tasks-only`, and `--docs-only` options.
+**lat tree** - Display directory structure with documents. Supports `--depth`
+option.
 
 **lat roots** - List all root documents (those whose filename matches their
 directory name) with child counts.
@@ -371,7 +370,7 @@ specification, normalization algorithm, and edge cases.
 ## Task Tracking
 
 Tasks and knowledge base documents share a unified ID space. Hierarchy comes
-from the filesystem: all tasks in a `tasks/` directory are siblings, with the
+from the filesystem: documents in the same directory are siblings, with the
 directory's root document (filename matching directory name) as their parent.
 The parent is typically a root document (not itself a task), though tasks can
 have other tasks as parents if desired—in that case, use the standard task types
@@ -380,11 +379,12 @@ have other tasks as parents if desired—in that case, use the standard task typ
 Task state is determined by filesystem location, not by a status field:
 - **Open**: Task exists outside of any `.closed/` directory
 - **Blocked**: Task has open (non-closed) entries in its `blocked-by` field
-- **Closed**: Task resides in a `.closed/` subdirectory (typically `tasks/.closed/`)
+- **Closed**: Task resides in a `.closed/` subdirectory
 
-The `lat close` command moves tasks to `tasks/.closed/`, and `lat reopen` moves
-them back. The `lat prune` command permanently deletes closed tasks. There is no
-`in_progress` status; use `lat claim` for local work tracking.
+The `lat close` command moves tasks to a `.closed/` subdirectory under their
+current location, and `lat reopen` moves them back. The `lat prune` command
+permanently deletes closed tasks. There is no `in_progress` status; use
+`lat claim` for local work tracking.
 
 See [Appendix: Task Tracking](appendix_task_tracking.md) for lifecycle, types,
 priorities, and dependencies.
@@ -402,9 +402,8 @@ and composition rules.
 ## Linter and Formatter
 
 **`lat check`** validates documents: duplicate/invalid IDs, broken references,
-invalid frontmatter, circular dependencies, missing required fields, directory
-structure (root/docs/tasks), and document naming conventions. Warnings for
-documents exceeding 500 lines.
+invalid frontmatter, circular dependencies, missing required fields, and
+document naming conventions. Warnings for documents exceeding 500 lines.
 
 **`lat doctor`** validates system health: index integrity, git repository state,
 configuration, claims, and skill symlinks. Use `lat check` for document content

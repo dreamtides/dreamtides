@@ -90,12 +90,7 @@ fn query_blocked_tasks(
 
 /// Builds a document filter from CLI arguments.
 fn build_filter(args: &BlockedArgs) -> DocumentFilter {
-    DocumentFilter {
-        include_closed: false,
-        in_tasks_dir: Some(true),
-        path_prefix: args.path.clone(),
-        ..Default::default()
-    }
+    DocumentFilter { include_closed: false, path_prefix: args.path.clone(), ..Default::default() }
 }
 
 /// Finds all open blockers for a given document.

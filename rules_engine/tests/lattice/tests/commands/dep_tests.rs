@@ -21,7 +21,7 @@ fn create_task_doc(
     priority: u8,
     task_type: TaskType,
 ) -> InsertDocument {
-    let mut doc = InsertDocument::new(
+    InsertDocument::new(
         id.to_string(),
         None,
         path.to_string(),
@@ -35,9 +35,7 @@ fn create_task_doc(
         format!("hash-{id}"),
         100,
         false,
-    );
-    doc.in_tasks_dir = path.contains("/tasks/");
-    doc
+    )
 }
 
 fn insert_doc(env: &TestEnv, doc: &InsertDocument, path: &str) {

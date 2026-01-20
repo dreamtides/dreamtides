@@ -7,8 +7,6 @@ use crate::error::error_types::LatticeError;
 
 /// Path segment that indicates a task is in a closed directory.
 const CLOSED_DIR_SEGMENT: &str = "/.closed/";
-/// Tasks directory name where closed tasks are typically located.
-const TASKS_DIR_NAME: &str = "tasks";
 /// Directory name for closed tasks.
 pub const CLOSED_DIR_NAME: &str = ".closed";
 
@@ -197,19 +195,14 @@ pub fn ensure_closed_dir(parent_path: &Path, repo_root: &Path) -> Result<PathBuf
 
 /// Validates that a path follows the expected closed directory structure.
 ///
-/// The closed directory should be an immediate child of a `tasks/` directory.
-/// This function checks for common structural issues.
-///
 /// # Arguments
 ///
 /// * `path` - Path to validate
 ///
 /// # Errors
 ///
-/// Returns `LatticeError::InvalidStructure` if:
-/// - Path contains nested `.closed/` directories
-/// - `.closed/` is not a child of a `tasks/` directory (warning only, not
-///   enforced)
+/// Returns `LatticeError::InvalidStructure` if the path contains nested
+/// `.closed/` directories.
 pub fn validate_closed_path_structure(path: &Path) -> Result<(), LatticeError> {
     let path_str = path.to_string_lossy();
 
@@ -220,24 +213,10 @@ pub fn validate_closed_path_structure(path: &Path) -> Result<(), LatticeError> {
         });
     }
 
-    if is_in_closed(&path_str) && !is_closed_under_tasks(path) {
-        debug!(
-            path = %path.display(),
-            ".closed directory is not under tasks/ - this is unusual but allowed"
-        );
-    }
-
     Ok(())
 }
 
 /// Checks if the path contains multiple `.closed/` segments.
 fn has_nested_closed(path: &str) -> bool {
     path.matches(CLOSED_DIR_SEGMENT).count() > 1
-}
-
-/// Checks if the `.closed/` directory is an immediate child of a `tasks/`
-/// directory.
-fn is_closed_under_tasks(path: &Path) -> bool {
-    let path_str = path.to_string_lossy();
-    path_str.contains(&format!("/{TASKS_DIR_NAME}/{CLOSED_DIR_NAME}/"))
 }

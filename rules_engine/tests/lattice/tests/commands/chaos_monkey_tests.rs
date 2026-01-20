@@ -222,7 +222,6 @@ fn invariant_kind_name_returns_kebab_case_names() {
     assert_eq!(InvariantKind::Panic.name(), "panic");
     assert_eq!(InvariantKind::ClosedStateInconsistency.name(), "closed-state-mismatch");
     assert_eq!(InvariantKind::RootStateInconsistency.name(), "root-state-mismatch");
-    assert_eq!(InvariantKind::DirectoryStateInconsistency.name(), "directory-state-mismatch");
     assert_eq!(InvariantKind::GitOperationFailed.name(), "git-operation-failed");
     assert_eq!(InvariantKind::LinkPathMismatch.name(), "link-path-mismatch");
 }

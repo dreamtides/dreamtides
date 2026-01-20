@@ -326,15 +326,17 @@ fn close_handles_multiple_ids() {
 #[test]
 fn close_rewrites_incoming_links() {
     let env = TestEnv::new();
-    env.create_dir("api/tasks");
-    env.create_dir("api/docs");
+    env.create_dir("api");
 
     let task_id = create_task(&env, "api/", "Fix login bug");
 
     let task_row =
         document_queries::lookup_by_id(env.conn(), &task_id).expect("Query").expect("Task");
     let task_path = task_row.path.clone();
+    let task_filename = std::path::Path::new(&task_path).file_name().unwrap().to_string_lossy();
 
+    // Create a linking document in the same directory with a relative link to the
+    // task
     let linking_doc_content = format!(
         r#"---
 lattice-id: LDOCABC
@@ -344,19 +346,19 @@ created-at: 2026-01-01T00:00:00Z
 updated-at: 2026-01-01T00:00:00Z
 ---
 
-See the [fix login bug](../tasks/{task_filename}#{task_id}) task for details.
+See the [fix login bug]({task_filename}#{task_id}) task for details.
 "#,
-        task_filename = std::path::Path::new(&task_path).file_name().unwrap().to_string_lossy(),
+        task_filename = task_filename,
         task_id = task_id
     );
 
-    let doc_path = env.repo_root().join("api/docs/design_doc.md");
+    let doc_path = env.repo_root().join("api/design_doc.md");
     fs::write(&doc_path, &linking_doc_content).expect("Write linking doc");
 
     let insert_doc = lattice::index::document_types::InsertDocument::new(
         "LDOCABC".to_string(),
         None,
-        "api/docs/design_doc.md".to_string(),
+        "api/design_doc.md".to_string(),
         "design-doc".to_string(),
         "Design document".to_string(),
         None,

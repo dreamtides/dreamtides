@@ -14,7 +14,7 @@ use lattice::index::document_types::InsertDocument;
 use lattice::test::test_environment::TestEnv;
 
 fn default_args(root_id: &str) -> ChildrenArgs {
-    ChildrenArgs { root_id: root_id.to_string(), recursive: false, tasks: false, docs: false }
+    ChildrenArgs { root_id: root_id.to_string(), recursive: false }
 }
 
 fn create_root_doc(id: &str, path: &str, name: &str, description: &str) -> InsertDocument {
@@ -59,7 +59,6 @@ fn create_task_doc(
         100,
         false,
     );
-    doc.in_tasks_dir = true;
     doc.is_closed = path.contains("/.closed/");
     doc
 }
@@ -71,7 +70,7 @@ fn create_docs_doc(
     name: &str,
     description: &str,
 ) -> InsertDocument {
-    let mut doc = InsertDocument::new(
+    InsertDocument::new(
         id.to_string(),
         Some(parent_id.to_string()),
         path.to_string(),
@@ -85,9 +84,7 @@ fn create_docs_doc(
         format!("hash-{id}"),
         100,
         false,
-    );
-    doc.in_docs_dir = true;
-    doc
+    )
 }
 
 fn insert_doc(
@@ -126,8 +123,7 @@ fn insert_root(conn: &rusqlite::Connection, directory_path: &str, root_id: &str,
 #[test]
 fn children_command_succeeds_with_no_children() {
     let env = TestEnv::new();
-    env.create_dir("api/tasks");
-    env.create_dir("api/docs");
+    env.create_dir("api");
 
     let root_doc = create_root_doc("LAABCD", "api/api.md", "api", "API root document");
     insert_doc(env.conn(), &root_doc, env.repo_root(), "api/api.md");
@@ -143,7 +139,6 @@ fn children_command_succeeds_with_no_children() {
 fn children_command_lists_task_children() {
     let env = TestEnv::new();
     env.create_dir("api/tasks");
-    env.create_dir("api/docs");
 
     let root_doc = create_root_doc("LBBCDE", "api/api.md", "api", "API root document");
     insert_doc(env.conn(), &root_doc, env.repo_root(), "api/api.md");
@@ -164,7 +159,6 @@ fn children_command_lists_task_children() {
 #[test]
 fn children_command_lists_docs_children() {
     let env = TestEnv::new();
-    env.create_dir("api/tasks");
     env.create_dir("api/docs");
 
     let root_doc = create_root_doc("LEGHIJ", "api/api.md", "api", "API root document");
@@ -203,76 +197,6 @@ fn children_command_lists_mixed_children() {
 }
 
 // ============================================================================
-// Filtering Tests
-// ============================================================================
-
-#[test]
-fn children_command_filters_to_tasks_only() {
-    let env = TestEnv::new();
-    env.create_dir("api/tasks");
-    env.create_dir("api/docs");
-
-    let root_doc = create_root_doc("LJLMNO", "api/api.md", "api", "API root document");
-    insert_doc(env.conn(), &root_doc, env.repo_root(), "api/api.md");
-    insert_root(env.conn(), "api", "LJLMNO", 0);
-
-    let task1 = create_task_doc("LKMNOP", "LJLMNO", "api/tasks/task1.md", "task1", "First task");
-    insert_doc(env.conn(), &task1, env.repo_root(), "api/tasks/task1.md");
-
-    let doc1 = create_docs_doc("LLNOPQ", "LJLMNO", "api/docs/design.md", "design", "Design doc");
-    insert_doc(env.conn(), &doc1, env.repo_root(), "api/docs/design.md");
-
-    let args =
-        ChildrenArgs { root_id: "LJLMNO".to_string(), recursive: false, tasks: true, docs: false };
-    let (_temp, context) = env.into_parts();
-    let result = children_command::execute(context, args);
-    assert!(result.is_ok(), "Children command should filter to tasks only");
-}
-
-#[test]
-fn children_command_filters_to_docs_only() {
-    let env = TestEnv::new();
-    env.create_dir("api/tasks");
-    env.create_dir("api/docs");
-
-    let root_doc = create_root_doc("LMOPQR", "api/api.md", "api", "API root document");
-    insert_doc(env.conn(), &root_doc, env.repo_root(), "api/api.md");
-    insert_root(env.conn(), "api", "LMOPQR", 0);
-
-    let task1 = create_task_doc("LNPQRS", "LMOPQR", "api/tasks/task1.md", "task1", "First task");
-    insert_doc(env.conn(), &task1, env.repo_root(), "api/tasks/task1.md");
-
-    let doc1 = create_docs_doc("LOQRST", "LMOPQR", "api/docs/design.md", "design", "Design doc");
-    insert_doc(env.conn(), &doc1, env.repo_root(), "api/docs/design.md");
-
-    let args =
-        ChildrenArgs { root_id: "LMOPQR".to_string(), recursive: false, tasks: false, docs: true };
-    let (_temp, context) = env.into_parts();
-    let result = children_command::execute(context, args);
-    assert!(result.is_ok(), "Children command should filter to docs only");
-}
-
-#[test]
-fn children_command_rejects_conflicting_filters() {
-    let env = TestEnv::new();
-    env.create_dir("api/tasks");
-    env.create_dir("api/docs");
-
-    let root_doc = create_root_doc("LPRSTU", "api/api.md", "api", "API root document");
-    insert_doc(env.conn(), &root_doc, env.repo_root(), "api/api.md");
-    insert_root(env.conn(), "api", "LPRSTU", 0);
-
-    let args =
-        ChildrenArgs { root_id: "LPRSTU".to_string(), recursive: false, tasks: true, docs: true };
-    let (_temp, context) = env.into_parts();
-    let result = children_command::execute(context, args);
-    assert!(
-        matches!(result, Err(LatticeError::ConflictingOptions { .. })),
-        "Children command should reject --tasks and --docs together"
-    );
-}
-
-// ============================================================================
 // Recursive Tests
 // ============================================================================
 
@@ -280,7 +204,6 @@ fn children_command_rejects_conflicting_filters() {
 fn children_command_non_recursive_excludes_nested() {
     let env = TestEnv::new();
     env.create_dir("api/tasks");
-    env.create_dir("api/docs");
     env.create_dir("api/auth/tasks");
 
     let root_doc = create_root_doc("LQSTUV", "api/api.md", "api", "API root document");
@@ -307,7 +230,6 @@ fn children_command_non_recursive_excludes_nested() {
 fn children_command_recursive_includes_nested() {
     let env = TestEnv::new();
     env.create_dir("api/tasks");
-    env.create_dir("api/docs");
     env.create_dir("api/auth/tasks");
 
     let root_doc = create_root_doc("LUWXYZ", "api/api.md", "api", "API root document");
@@ -321,8 +243,7 @@ fn children_command_recursive_includes_nested() {
         create_task_doc("LWYZAB", "LUWXYZ", "api/auth/tasks/nested.md", "nested", "Nested task");
     insert_doc(env.conn(), &nested_task, env.repo_root(), "api/auth/tasks/nested.md");
 
-    let args =
-        ChildrenArgs { root_id: "LUWXYZ".to_string(), recursive: true, tasks: false, docs: false };
+    let args = ChildrenArgs { root_id: "LUWXYZ".to_string(), recursive: true };
     let (_temp, context) = env.into_parts();
     let result = children_command::execute(context, args);
     assert!(result.is_ok(), "Recursive should include nested directories");
@@ -348,7 +269,6 @@ fn children_command_fails_for_nonexistent_id() {
 fn children_command_fails_for_non_root_document() {
     let env = TestEnv::new();
     env.create_dir("api/tasks");
-    env.create_dir("api/docs");
 
     let root_doc = create_root_doc("LYABCD", "api/api.md", "api", "API root document");
     insert_doc(env.conn(), &root_doc, env.repo_root(), "api/api.md");
@@ -375,7 +295,6 @@ fn children_command_fails_for_non_root_document() {
 fn children_command_includes_closed_tasks() {
     let env = TestEnv::new();
     env.create_dir("api/tasks");
-    env.create_dir("api/docs");
     env.create_dir("api/tasks/.closed");
 
     let root_doc = create_root_doc("LAADEF", "api/api.md", "api", "API root document");
@@ -404,7 +323,6 @@ fn children_command_includes_closed_tasks() {
 fn children_command_json_output() {
     let env = TestEnv::new().with_json_output();
     env.create_dir("api/tasks");
-    env.create_dir("api/docs");
 
     let root_doc = create_root_doc("LADGHI", "api/api.md", "api", "API root document");
     insert_doc(env.conn(), &root_doc, env.repo_root(), "api/api.md");

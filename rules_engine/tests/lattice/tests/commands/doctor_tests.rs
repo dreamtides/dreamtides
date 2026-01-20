@@ -420,8 +420,6 @@ mod core_checks {
                 body_hash: "hash123".to_string(),
                 content_length: 100,
                 is_root: true,
-                in_tasks_dir: false,
-                in_docs_dir: false,
                 skill: false,
             },
         )
@@ -657,8 +655,6 @@ mod index_checks {
             body_hash: "hash123".to_string(),
             content_length: 100,
             is_root: true,
-            in_tasks_dir: false,
-            in_docs_dir: false,
             skill: false,
         })
         .expect("Insert document");
@@ -691,8 +687,6 @@ mod index_checks {
             body_hash: "hash123".to_string(),
             content_length: 100,
             is_root: false,
-            in_tasks_dir: false,
-            in_docs_dir: false,
             skill: false,
         })
         .expect("Insert document");
@@ -738,8 +732,6 @@ mod index_checks {
             body_hash: "hash123".to_string(),
             content_length: 100,
             is_root: true,
-            in_tasks_dir: false,
-            in_docs_dir: false,
             skill: false,
         })
         .expect("Insert document");
@@ -794,8 +786,6 @@ mod index_checks {
             body_hash: "hash1".to_string(),
             content_length: 100,
             is_root: false,
-            in_tasks_dir: false,
-            in_docs_dir: false,
             skill: false,
         })
         .expect("Insert document");
@@ -831,8 +821,6 @@ mod index_checks {
             body_hash: "hash1".to_string(),
             content_length: 100,
             is_root: false,
-            in_tasks_dir: true,
-            in_docs_dir: false,
             skill: false,
         })
         .expect("Insert document");
@@ -868,8 +856,6 @@ mod index_checks {
             body_hash: "hash1".to_string(),
             content_length: 100,
             is_root: false,
-            in_tasks_dir: true,
-            in_docs_dir: false,
             skill: false,
         })
         .expect("Insert document");
@@ -910,8 +896,6 @@ mod index_checks {
             body_hash: "hash123".to_string(),
             content_length: 100,
             is_root: true,
-            in_tasks_dir: false,
-            in_docs_dir: false,
             skill: false,
         })
         .expect("Insert document");
@@ -947,8 +931,6 @@ mod index_checks {
             body_hash: "hash123".to_string(),
             content_length: 100,
             is_root: true,
-            in_tasks_dir: false,
-            in_docs_dir: false,
             skill: false,
         })
         .expect("Insert document");
@@ -990,8 +972,6 @@ mod index_checks {
             body_hash: "hash1".to_string(),
             content_length: 100,
             is_root: true,
-            in_tasks_dir: false,
-            in_docs_dir: false,
             skill: false,
         })
         .expect("Insert parent");
@@ -1011,8 +991,6 @@ mod index_checks {
             body_hash: "hash2".to_string(),
             content_length: 100,
             is_root: false,
-            in_tasks_dir: false,
-            in_docs_dir: true,
             skill: false,
         })
         .expect("Insert child");
@@ -1048,8 +1026,6 @@ mod index_checks {
             body_hash: "hash1".to_string(),
             content_length: 100,
             is_root: false,
-            in_tasks_dir: false,
-            in_docs_dir: true,
             skill: false,
         })
         .expect("Insert orphan");
@@ -1614,8 +1590,6 @@ mod claim_checks {
             body_hash: "hash1".to_string(),
             content_length: 100,
             is_root: false,
-            in_tasks_dir: true,
-            in_docs_dir: false,
             skill: false,
         })
         .expect("Insert task");
@@ -1683,8 +1657,6 @@ mod claim_checks {
             body_hash: "hash1".to_string(),
             content_length: 100,
             is_root: false,
-            in_tasks_dir: true,
-            in_docs_dir: false,
             skill: false,
         })
         .expect("Insert closed task");
@@ -1801,8 +1773,6 @@ mod claim_checks {
             body_hash: "hash1".to_string(),
             content_length: 100,
             is_root: false,
-            in_tasks_dir: true,
-            in_docs_dir: false,
             skill: false,
         })
         .expect("Insert task");
@@ -1900,8 +1870,6 @@ mod skills_checks {
             body_hash: "test-hash".to_string(),
             content_length: 100,
             is_root: false,
-            in_tasks_dir: false,
-            in_docs_dir: true,
             skill: true,
         }
     }
@@ -2543,8 +2511,6 @@ mod fixer_tests {
             body_hash: "hash1".to_string(),
             content_length: 100,
             is_root: false,
-            in_tasks_dir: true,
-            in_docs_dir: false,
             skill: false,
         })
         .expect("Insert closed task");
@@ -2642,8 +2608,6 @@ mod fixer_tests {
             body_hash: "hash1".to_string(),
             content_length: 100,
             is_root: false,
-            in_tasks_dir: true,
-            in_docs_dir: false,
             skill: false,
         })
         .expect("Insert task");
@@ -2699,8 +2663,6 @@ mod fixer_tests {
             body_hash: "hash123".to_string(),
             content_length: 100,
             is_root: false,
-            in_tasks_dir: false,
-            in_docs_dir: false,
             skill: false,
         })
         .expect("Insert document");
@@ -2769,8 +2731,6 @@ mod fixer_tests {
             body_hash: "test-hash".to_string(),
             content_length: 100,
             is_root: false,
-            in_tasks_dir: false,
-            in_docs_dir: true,
             skill: true,
         })
         .expect("Insert skill doc");

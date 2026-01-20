@@ -83,31 +83,6 @@ fn insert_document_sets_is_root_correctly() {
 }
 
 #[test]
-fn insert_document_sets_directory_flags() {
-    let conn = create_test_db();
-    let task = create_test_document("LTASK", "api/tasks/fix_bug.md", "fix-bug");
-    let doc = create_test_document("LDOCS", "api/docs/design.md", "design");
-    let other = create_test_document("LOTHR", "api/other.md", "other");
-
-    insert(&conn, &task).expect("Insert task should succeed");
-    insert(&conn, &doc).expect("Insert doc should succeed");
-    insert(&conn, &other).expect("Insert other should succeed");
-
-    let task_row = lookup_by_id(&conn, "LTASK").expect("Lookup should succeed").unwrap();
-    let doc_row = lookup_by_id(&conn, "LDOCS").expect("Lookup should succeed").unwrap();
-    let other_row = lookup_by_id(&conn, "LOTHR").expect("Lookup should succeed").unwrap();
-
-    assert!(task_row.in_tasks_dir, "Task should be in tasks dir");
-    assert!(!task_row.in_docs_dir, "Task should not be in docs dir");
-
-    assert!(!doc_row.in_tasks_dir, "Doc should not be in tasks dir");
-    assert!(doc_row.in_docs_dir, "Doc should be in docs dir");
-
-    assert!(!other_row.in_tasks_dir, "Other should not be in tasks dir");
-    assert!(!other_row.in_docs_dir, "Other should not be in docs dir");
-}
-
-#[test]
 fn insert_document_sets_is_closed() {
     let conn = create_test_db();
     let open_task = create_test_document("LOPEN", "api/tasks/open.md", "open");
@@ -442,22 +417,6 @@ fn query_filters_by_is_root() {
 
     assert_eq!(results.len(), 1, "Should find one root document");
     assert_eq!(results[0].id, "LROOT");
-}
-
-#[test]
-fn query_filters_by_in_tasks_dir() {
-    let conn = create_test_db();
-    let docs = vec![
-        create_test_document("LTASK", "api/tasks/fix.md", "fix"),
-        create_test_document("LDOCS", "api/docs/design.md", "design"),
-    ];
-    insert_batch(&conn, &docs).expect("Batch insert should succeed");
-
-    let filter = DocumentFilter::including_closed().with_in_tasks_dir(true);
-    let results = query(&conn, &filter).expect("Query should succeed");
-
-    assert_eq!(results.len(), 1, "Should find one task");
-    assert_eq!(results[0].id, "LTASK");
 }
 
 #[test]

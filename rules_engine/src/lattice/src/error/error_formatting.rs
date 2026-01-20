@@ -33,7 +33,7 @@ pub fn suggestion(error: &LatticeError) -> Option<String> {
             path = path.display()
         )),
         LatticeError::InvalidStructure { .. } => {
-            Some("Documents must be root documents, in docs/, or in tasks/".to_string())
+            Some("Check the document path structure".to_string())
         }
         LatticeError::YamlParseError { .. } => {
             Some("Check YAML syntax: proper indentation, colons, and quotes".to_string())

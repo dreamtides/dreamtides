@@ -42,7 +42,7 @@ fn create_child_doc(
     name: &str,
     description: &str,
 ) -> InsertDocument {
-    let mut doc = InsertDocument::new(
+    InsertDocument::new(
         id.to_string(),
         Some(parent_id.to_string()),
         path.to_string(),
@@ -56,10 +56,7 @@ fn create_child_doc(
         format!("hash-{id}"),
         100,
         false,
-    );
-    doc.in_docs_dir = path.contains("/docs/");
-    doc.in_tasks_dir = path.contains("/tasks/");
-    doc
+    )
 }
 
 fn insert_doc(env: &TestEnv, doc: &InsertDocument, path: &str) {

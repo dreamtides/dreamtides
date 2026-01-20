@@ -8,8 +8,7 @@
 //!
 //! **[`DocumentRow`]** represents cached metadata from the index:
 //! - Contains all frontmatter fields (id, name, description, task_type, etc.)
-//! - Includes computed fields derived from paths (is_closed, is_root,
-//!   in_tasks_dir)
+//! - Includes computed fields derived from paths (is_closed, is_root)
 //! - Includes index-specific fields (indexed_at, body_hash, link/backlink
 //!   counts)
 //! - Does NOT contain the document body (only content_length for size checks)
@@ -74,8 +73,6 @@ pub struct DocumentRow {
     pub backlink_count: i32,
     pub view_count: i32,
     pub is_root: bool,
-    pub in_tasks_dir: bool,
-    pub in_docs_dir: bool,
     pub skill: bool,
 }
 
@@ -96,8 +93,6 @@ pub struct InsertDocument {
     pub body_hash: String,
     pub content_length: i64,
     pub is_root: bool,
-    pub in_tasks_dir: bool,
-    pub in_docs_dir: bool,
     pub skill: bool,
 }
 
@@ -122,8 +117,6 @@ pub struct UpdateBuilder<'a> {
     body_hash: Option<&'a str>,
     content_length: Option<i64>,
     is_root: Option<bool>,
-    in_tasks_dir: Option<bool>,
-    in_docs_dir: Option<bool>,
     skill: Option<bool>,
 }
 
@@ -154,8 +147,6 @@ pub fn row_to_document(row: &Row) -> Result<DocumentRow, SqliteError> {
 
     let is_closed: i32 = row.get("is_closed")?;
     let is_root: i32 = row.get("is_root")?;
-    let in_tasks_dir: i32 = row.get("in_tasks_dir")?;
-    let in_docs_dir: i32 = row.get("in_docs_dir")?;
     let skill: i32 = row.get("skill")?;
 
     let priority_i32: Option<i32> = row.get("priority")?;
@@ -180,8 +171,6 @@ pub fn row_to_document(row: &Row) -> Result<DocumentRow, SqliteError> {
         backlink_count: row.get("backlink_count")?,
         view_count: row.get("view_count")?,
         is_root: is_root != 0,
-        in_tasks_dir: in_tasks_dir != 0,
-        in_docs_dir: in_docs_dir != 0,
         skill: skill != 0,
     })
 }
@@ -264,18 +253,6 @@ impl<'a> UpdateBuilder<'a> {
         self
     }
 
-    /// Sets in_tasks_dir.
-    pub fn in_tasks_dir(mut self, in_tasks_dir: bool) -> Self {
-        self.in_tasks_dir = Some(in_tasks_dir);
-        self
-    }
-
-    /// Sets in_docs_dir.
-    pub fn in_docs_dir(mut self, in_docs_dir: bool) -> Self {
-        self.in_docs_dir = Some(in_docs_dir);
-        self
-    }
-
     /// Returns the parent_id update value if set.
     #[expect(clippy::option_option)]
     pub(crate) fn get_parent_id(&self) -> Option<Option<&'a str>> {
@@ -340,16 +317,6 @@ impl<'a> UpdateBuilder<'a> {
         self.is_root
     }
 
-    /// Returns the in_tasks_dir update value if set.
-    pub(crate) fn get_in_tasks_dir(&self) -> Option<bool> {
-        self.in_tasks_dir
-    }
-
-    /// Returns the in_docs_dir update value if set.
-    pub(crate) fn get_in_docs_dir(&self) -> Option<bool> {
-        self.in_docs_dir
-    }
-
     /// Sets skill.
     pub fn skill(mut self, skill: bool) -> Self {
         self.skill = Some(skill);
@@ -382,8 +349,6 @@ impl InsertDocument {
     ) -> Self {
         let is_closed = path.contains("/.closed/");
         let is_root = compute_is_root(&path);
-        let in_tasks_dir = path.contains("/tasks/");
-        let in_docs_dir = path.contains("/docs/");
 
         Self {
             id,
@@ -400,8 +365,6 @@ impl InsertDocument {
             body_hash,
             content_length,
             is_root,
-            in_tasks_dir,
-            in_docs_dir,
             skill,
         }
     }

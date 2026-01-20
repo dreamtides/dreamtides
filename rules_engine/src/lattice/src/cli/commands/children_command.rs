@@ -16,14 +16,7 @@ use crate::index::document_types::DocumentRow;
 /// containing directory name, e.g., `api/api.md`).
 #[instrument(skip_all, name = "children_command", fields(root_id = %args.root_id))]
 pub fn execute(context: CommandContext, args: ChildrenArgs) -> LatticeResult<()> {
-    info!(root_id = %args.root_id, recursive = args.recursive, tasks = args.tasks, docs = args.docs, "Executing children command");
-
-    if args.tasks && args.docs {
-        return Err(LatticeError::ConflictingOptions {
-            option1: "--tasks".to_string(),
-            option2: "--docs".to_string(),
-        });
-    }
+    info!(root_id = %args.root_id, recursive = args.recursive, "Executing children command");
 
     let root_doc = lookup_root_document(&context, &args.root_id)?;
     let directory_path = extract_directory_path(&root_doc.path);
@@ -53,8 +46,6 @@ struct ChildDocumentInfo {
     #[serde(skip_serializing_if = "Option::is_none")]
     priority: Option<u8>,
     is_closed: bool,
-    in_tasks_dir: bool,
-    in_docs_dir: bool,
 }
 
 /// Looks up a document by ID and verifies it is a root document.
@@ -94,17 +85,11 @@ fn fetch_children(
 ) -> LatticeResult<Vec<ChildDocumentInfo>> {
     let path_prefix = format!("{directory_path}/");
 
-    let mut filter = DocumentFilter::including_closed()
+    let filter = DocumentFilter::including_closed()
         .with_path_prefix(path_prefix)
         .with_is_root(false)
         .sort_by(SortColumn::Path)
         .sort_order(SortOrder::Ascending);
-
-    if args.tasks {
-        filter = filter.with_in_tasks_dir(true);
-    } else if args.docs {
-        filter = filter.with_in_docs_dir(true);
-    }
 
     let documents = document_queries::query(&context.conn, &filter)?;
     debug!(count = documents.len(), "Retrieved documents from index");
@@ -120,8 +105,6 @@ fn fetch_children(
             task_type: doc.task_type.map(|t| t.to_string()),
             priority: doc.priority,
             is_closed: doc.is_closed,
-            in_tasks_dir: doc.in_tasks_dir,
-            in_docs_dir: doc.in_docs_dir,
         })
         .collect();
 
@@ -130,8 +113,8 @@ fn fetch_children(
 
 /// Checks if a document is a direct child of the given directory.
 ///
-/// A document is a direct child if it is in `{directory}/docs/` or
-/// `{directory}/tasks/` with no additional nesting.
+/// A document is a direct child if it is one level deep under the directory,
+/// possibly within a `.closed/` subdirectory.
 fn is_direct_child(directory_path: &str, doc_path: &str) -> bool {
     let Some(relative) = doc_path.strip_prefix(directory_path) else {
         return false;
@@ -140,11 +123,7 @@ fn is_direct_child(directory_path: &str, doc_path: &str) -> bool {
     let relative = relative.strip_prefix('/').unwrap_or(relative);
 
     let parts: Vec<&str> = relative.split('/').collect();
-    match parts.as_slice() {
-        [subdir, _filename] if *subdir == "docs" || *subdir == "tasks" => true,
-        [subdir, ".closed", _filename] if *subdir == "tasks" => true,
-        _ => false,
-    }
+    matches!(parts.as_slice(), [_filename] | [".closed", _filename])
 }
 
 /// Outputs child documents in text format.
@@ -182,7 +161,6 @@ fn format_type_priority(child: &ChildDocumentInfo) -> String {
             color_theme::task_type(format!("[{}/P{}]", task_type, priority)).to_string()
         }
         (Some(task_type), None) => color_theme::task_type(format!("[{}]", task_type)).to_string(),
-        (None, _) if child.in_docs_dir => color_theme::muted("[doc]").to_string(),
         (None, _) => String::new(),
     }
 }

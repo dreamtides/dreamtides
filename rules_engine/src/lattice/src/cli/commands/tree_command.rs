@@ -17,18 +17,10 @@ use crate::index::document_types::DocumentRow;
 /// Executes the `lat tree` command.
 ///
 /// Displays directory structure with Lattice documents, similar to the Unix
-/// `tree` command. Shows documents with their status (open/blocked/closed)
-/// and supports filtering by task/docs directories.
+/// `tree` command. Shows documents with their status (open/blocked/closed).
 #[instrument(skip_all, name = "tree_command", fields(path = ?args.path))]
 pub fn execute(context: CommandContext, args: TreeArgs) -> LatticeResult<()> {
     info!(?args.path, depth = ?args.depth, counts = args.counts, "Executing tree command");
-
-    if args.tasks_only && args.docs_only {
-        return Err(LatticeError::ConflictingOptions {
-            option1: "--tasks-only".to_string(),
-            option2: "--docs-only".to_string(),
-        });
-    }
 
     let documents = fetch_documents(&context, &args)?;
     debug!(count = documents.len(), "Fetched documents for tree");
@@ -119,12 +111,6 @@ fn fetch_documents(
 
     if let Some(ref path) = args.path {
         filter = filter.with_path_prefix(path.clone());
-    }
-
-    if args.tasks_only {
-        filter.in_tasks_dir = Some(true);
-    } else if args.docs_only {
-        filter.in_docs_dir = Some(true);
     }
 
     document_queries::query(&context.conn, &filter)

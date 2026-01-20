@@ -131,7 +131,7 @@ fn validate_args(args: &ResolvedArgs) -> LatticeResult<()> {
 /// Resolves the file path for the new document.
 ///
 /// If `parent` ends in `.md`, it's an explicit path.
-/// Otherwise, auto-place based on task type.
+/// Otherwise, auto-generate filename and place in the parent directory.
 fn resolve_file_path(context: &CommandContext, args: &ResolvedArgs) -> LatticeResult<PathBuf> {
     let parent = &args.parent;
 
@@ -145,9 +145,7 @@ fn resolve_file_path(context: &CommandContext, args: &ResolvedArgs) -> LatticeRe
         return Ok(path);
     }
 
-    let base_dir = context.repo_root.join(parent.trim_end_matches('/'));
-    let subdir = if args.r#type.is_some() { "tasks" } else { "docs" };
-    let target_dir = base_dir.join(subdir);
+    let target_dir = context.repo_root.join(parent.trim_end_matches('/'));
 
     let filename = generate_filename_from_description(&args.description);
     let final_path =

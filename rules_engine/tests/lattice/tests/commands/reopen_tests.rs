@@ -329,8 +329,7 @@ fn reopen_handles_multiple_ids() {
 #[test]
 fn reopen_rewrites_incoming_links() {
     let env = TestEnv::new();
-    env.create_dir("api/tasks");
-    env.create_dir("api/docs");
+    env.create_dir("api");
 
     let task_id = create_task(&env, "api/", "Fix login bug");
 
@@ -341,6 +340,8 @@ fn reopen_rewrites_incoming_links() {
 
     close_task(&env, &task_id);
 
+    // Create a linking document in the same directory with a relative link to
+    // .closed/
     let linking_doc_content = format!(
         r#"---
 lattice-id: LDOCABC
@@ -350,17 +351,17 @@ created-at: 2026-01-01T00:00:00Z
 updated-at: 2026-01-01T00:00:00Z
 ---
 
-See the [fix login bug](../tasks/.closed/{task_filename}#{task_id}) task for details.
+See the [fix login bug](.closed/{task_filename}#{task_id}) task for details.
 "#
     );
 
-    let doc_path = env.repo_root().join("api/docs/design_doc.md");
+    let doc_path = env.repo_root().join("api/design_doc.md");
     fs::write(&doc_path, &linking_doc_content).expect("Write linking doc");
 
     let insert_doc = lattice::index::document_types::InsertDocument::new(
         "LDOCABC".to_string(),
         None,
-        "api/docs/design_doc.md".to_string(),
+        "api/design_doc.md".to_string(),
         "design-doc".to_string(),
         "Design document".to_string(),
         None,
@@ -398,8 +399,8 @@ See the [fix login bug](../tasks/.closed/{task_filename}#{task_id}) task for det
         updated_content
     );
     assert!(
-        updated_content.contains(&format!("../tasks/{task_filename}")),
-        "Link should point to original tasks/ location: {}",
+        updated_content.contains(&task_filename),
+        "Link should point to reopened task: {}",
         updated_content
     );
 }

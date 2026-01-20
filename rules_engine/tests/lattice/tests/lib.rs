@@ -3,7 +3,6 @@ mod color_theme_tests;
 mod commands;
 mod config_tests;
 mod dependency_graph_tests;
-mod directory_structure_tests;
 mod document_reader_tests;
 mod document_writer_tests;
 mod field_validation_tests;

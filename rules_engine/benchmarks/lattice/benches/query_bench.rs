@@ -132,7 +132,6 @@ fn list_multiple_criteria(c: &mut Criterion) {
                     .with_task_type(TaskType::Task)
                     .with_priority_range(1, 3)
                     .with_state(DocumentState::Open)
-                    .with_in_tasks_dir(true)
                     .sort_by(SortColumn::Priority)
                     .sort_order(SortOrder::Ascending)
                     .limit(50);

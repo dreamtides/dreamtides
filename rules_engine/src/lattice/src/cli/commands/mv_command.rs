@@ -11,7 +11,7 @@ use crate::document::{document_reader, field_validation, frontmatter_parser};
 use crate::error::error_types::LatticeError;
 use crate::index::document_types::UpdateBuilder;
 use crate::index::{directory_roots, document_queries};
-use crate::task::{closed_directory, directory_structure, root_detection};
+use crate::task::{closed_directory, root_detection};
 
 /// Executes the `lat mv` command.
 ///
@@ -178,20 +178,8 @@ fn find_parent_id_for_path(
         return Ok(None);
     }
 
-    let lookup_dir = if directory_structure::is_in_tasks_dir(&dir_path)
-        || directory_structure::is_in_docs_dir(&dir_path)
-    {
-        Path::new(&dir_path).parent().map(|p| p.to_string_lossy().to_string()).unwrap_or_default()
-    } else {
-        dir_path.clone()
-    };
-
-    if lookup_dir.is_empty() {
-        return Ok(None);
-    }
-
-    if let Some(root_id) = directory_roots::get_root_id(&context.conn, &lookup_dir)? {
-        debug!(dir_path, lookup_dir, root_id, "Found parent-id via directory_roots");
+    if let Some(root_id) = directory_roots::get_root_id(&context.conn, &dir_path)? {
+        debug!(dir_path, root_id, "Found parent-id via directory_roots");
         return Ok(Some(root_id));
     }
 
@@ -268,8 +256,6 @@ fn update_index(
     let now = Utc::now();
 
     let is_root = root_detection::is_root_document(new_path);
-    let in_tasks_dir = directory_structure::is_in_tasks_dir(&new_path_str);
-    let in_docs_dir = directory_structure::is_in_docs_dir(&new_path_str);
     let is_closed = closed_directory::is_in_closed(&new_path_str);
 
     let builder = UpdateBuilder::new()
@@ -277,8 +263,6 @@ fn update_index(
         .name(new_name)
         .parent_id(new_parent_id)
         .is_root(is_root)
-        .in_tasks_dir(in_tasks_dir)
-        .in_docs_dir(in_docs_dir)
         .is_closed(is_closed)
         .updated_at(now);
 
@@ -290,8 +274,6 @@ fn update_index(
         new_name,
         ?new_parent_id,
         is_root,
-        in_tasks_dir,
-        in_docs_dir,
         "Index updated for moved document"
     );
     Ok(())

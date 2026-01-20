@@ -73,16 +73,15 @@ fn mv_args(id: &str, new_path: &str) -> MvArgs {
 #[test]
 fn mv_moves_document_to_new_location() {
     let env = TestEnv::new();
-    env.create_dir("api/tasks");
-    env.create_dir("api/docs");
+    env.create_dir("api");
 
     let doc_id = create_kb_doc(&env, "api/", "Design document");
 
     let doc_row = document_queries::lookup_by_id(env.conn(), &doc_id).expect("Query").unwrap();
     let original_path = doc_row.path.clone();
-    assert!(original_path.contains("api/docs/"), "Should be in api/docs/: {}", original_path);
+    assert!(original_path.starts_with("api/"), "Should be in api/: {}", original_path);
 
-    let args = mv_args(&doc_id, "api/docs/new_design.md");
+    let args = mv_args(&doc_id, "api/new_design.md");
 
     let global = GlobalOptions::default();
     let ctx = create_context_from_env(&env, &global);
@@ -91,11 +90,11 @@ fn mv_moves_document_to_new_location() {
     assert!(result.is_ok(), "Mv should succeed: {:?}", result);
 
     let doc_row = document_queries::lookup_by_id(env.conn(), &doc_id).expect("Query").unwrap();
-    assert_eq!(doc_row.path, "api/docs/new_design.md", "Path should be updated in index");
+    assert_eq!(doc_row.path, "api/new_design.md", "Path should be updated in index");
     assert_eq!(doc_row.name, "new-design", "Name should be derived from new filename");
 
     let old_file = env.repo_root().join(&original_path);
-    let new_file = env.repo_root().join("api/docs/new_design.md");
+    let new_file = env.repo_root().join("api/new_design.md");
     assert!(!old_file.exists(), "Old file should not exist");
     assert!(new_file.exists(), "New file should exist");
 }
@@ -110,7 +109,7 @@ fn mv_updates_name_field_from_new_filename() {
     let doc_row = document_queries::lookup_by_id(env.conn(), &doc_id).expect("Query").unwrap();
     assert_eq!(doc_row.name, "original-name", "Initial name should be derived from description");
 
-    let args = mv_args(&doc_id, "api/docs/renamed_document.md");
+    let args = mv_args(&doc_id, "api/renamed_document.md");
 
     let global = GlobalOptions::default();
     let ctx = create_context_from_env(&env, &global);
@@ -194,8 +193,7 @@ fn mv_to_different_directory_updates_parent_id() {
 #[test]
 fn mv_rewrites_incoming_links() {
     let env = TestEnv::new();
-    env.create_dir("api/tasks");
-    env.create_dir("api/docs");
+    env.create_dir("api");
 
     let task_id = create_task(&env, "api/", "Fix login bug");
 
@@ -203,6 +201,7 @@ fn mv_rewrites_incoming_links() {
     let task_filename =
         std::path::Path::new(&task_row.path).file_name().unwrap().to_string_lossy().to_string();
 
+    // Create a linking document in the same directory with a relative link
     let linking_doc_content = format!(
         r#"---
 lattice-id: LDOCABC
@@ -212,17 +211,17 @@ created-at: 2026-01-01T00:00:00Z
 updated-at: 2026-01-01T00:00:00Z
 ---
 
-See the [fix login bug](../tasks/{task_filename}#{task_id}) task for details.
+See the [fix login bug]({task_filename}#{task_id}) task for details.
 "#
     );
 
-    let doc_path = env.repo_root().join("api/docs/design_doc.md");
+    let doc_path = env.repo_root().join("api/design_doc.md");
     fs::write(&doc_path, &linking_doc_content).expect("Write linking doc");
 
     let insert_doc = lattice::index::document_types::InsertDocument::new(
         "LDOCABC".to_string(),
         None,
-        "api/docs/design_doc.md".to_string(),
+        "api/design_doc.md".to_string(),
         "design-doc".to_string(),
         "Design document".to_string(),
         None,
@@ -245,7 +244,7 @@ See the [fix login bug](../tasks/{task_filename}#{task_id}) task for details.
     lattice::index::link_queries::insert_for_document(env.conn(), &[insert_link])
         .expect("Insert link");
 
-    let args = mv_args(&task_id, "api/tasks/renamed_task.md");
+    let args = mv_args(&task_id, "api/renamed_task.md");
 
     let global = GlobalOptions::default();
     let ctx = create_context_from_env(&env, &global);
@@ -276,7 +275,7 @@ fn mv_dry_run_does_not_move_file() {
     let original_name = doc_row.name.clone();
 
     let args =
-        MvArgs { id: doc_id.clone(), new_path: "api/docs/new_name.md".to_string(), dry_run: true };
+        MvArgs { id: doc_id.clone(), new_path: "api/new_name.md".to_string(), dry_run: true };
 
     let global = GlobalOptions::default();
     let ctx = create_context_from_env(&env, &global);
@@ -289,7 +288,7 @@ fn mv_dry_run_does_not_move_file() {
     assert_eq!(doc_row.name, original_name, "Name should not change in dry run");
 
     let original_file = env.repo_root().join(&original_path);
-    let new_file = env.repo_root().join("api/docs/new_name.md");
+    let new_file = env.repo_root().join("api/new_name.md");
     assert!(original_file.exists(), "Original file should still exist");
     assert!(!new_file.exists(), "New file should not exist in dry run");
 }
@@ -329,7 +328,7 @@ fn mv_fails_for_nonexistent_id() {
     let env = TestEnv::new();
     env.create_dir("api/docs");
 
-    let args = mv_args("LNONEXIST", "api/docs/some_doc.md");
+    let args = mv_args("LNONEXIST", "api/some_doc.md");
 
     let global = GlobalOptions::default();
     let ctx = create_context_from_env(&env, &global);
@@ -348,12 +347,12 @@ fn mv_fails_for_nonexistent_id() {
 #[test]
 fn mv_fails_when_moving_into_closed_directory() {
     let env = TestEnv::new();
-    env.create_dir("api/docs");
-    env.create_dir("api/tasks/.closed");
+    env.create_dir("api");
+    env.create_dir("api/.closed");
 
     let doc_id = create_kb_doc(&env, "api/", "Design document");
 
-    let args = mv_args(&doc_id, "api/tasks/.closed/design_document.md");
+    let args = mv_args(&doc_id, "api/.closed/design_document.md");
 
     let global = GlobalOptions::default();
     let ctx = create_context_from_env(&env, &global);
@@ -401,7 +400,7 @@ fn mv_fails_when_target_missing_md_extension() {
 
     let doc_id = create_kb_doc(&env, "api/", "Design document");
 
-    let args = mv_args(&doc_id, "api/docs/no_extension");
+    let args = mv_args(&doc_id, "api/no_extension");
 
     let global = GlobalOptions::default();
     let ctx = create_context_from_env(&env, &global);

@@ -284,7 +284,7 @@ fn handle_tools_list() -> Result<serde_json::Value, JsonRpcError> {
         "tools": [
             {
                 "name": "lattice_create_task",
-                "description": "Creates a task document with auto-generated filename. Tasks are placed in {directory}/tasks/ with filenames derived from the description.",
+                "description": "Creates a task document with auto-generated filename in the specified directory.",
                 "inputSchema": {
                     "type": "object",
                     "properties": {
@@ -333,7 +333,7 @@ fn handle_tools_list() -> Result<serde_json::Value, JsonRpcError> {
             },
             {
                 "name": "lattice_create_document",
-                "description": "Creates a knowledge base document. Documents are placed in {directory}/docs/ with the specified name.",
+                "description": "Creates a knowledge base document in the specified directory.",
                 "inputSchema": {
                     "type": "object",
                     "properties": {
