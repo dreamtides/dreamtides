@@ -1,9 +1,5 @@
-use tracing::debug;
-
 use crate::lint::rule_engine::{LintContext, LintDocument, LintResult, LintRule};
-
-/// Reserved words that cannot appear in skill names.
-const RESERVED_WORDS: &[&str] = &["anthropic", "claude"];
+use crate::skill::skill_validation;
 
 /// S001: Name contains reserved word.
 ///
@@ -51,13 +47,8 @@ impl LintRule for NameContainsReservedWordRule {
             return vec![];
         }
 
-        let name_lower = document.frontmatter.name.to_lowercase();
-        for reserved in RESERVED_WORDS {
-            if name_lower.contains(reserved) {
-                let message = format!("skill name cannot contain '{reserved}'");
-                debug!(path = %doc.row.path, name = %document.frontmatter.name, reserved, "Skill name contains reserved word");
-                return vec![LintResult::error("S001", &doc.row.path, message)];
-            }
+        if let Some(error) = skill_validation::check_reserved_words(&document.frontmatter.name) {
+            return vec![LintResult::error(error.code, &doc.row.path, error.message)];
         }
 
         vec![]
@@ -86,10 +77,10 @@ impl LintRule for DescriptionEmptyRule {
             return vec![];
         }
 
-        if document.frontmatter.description.trim().is_empty() {
-            let message = "skill must have non-empty description";
-            debug!(path = %doc.row.path, "Skill has empty description");
-            return vec![LintResult::error("S002", &doc.row.path, message)];
+        if let Some(error) =
+            skill_validation::check_description_empty(&document.frontmatter.description)
+        {
+            return vec![LintResult::error(error.code, &doc.row.path, error.message)];
         }
 
         vec![]
@@ -118,11 +109,8 @@ impl LintRule for NameContainsXmlRule {
             return vec![];
         }
 
-        let name = &document.frontmatter.name;
-        if name.contains('<') || name.contains('>') {
-            let message = "skill name cannot contain XML tags";
-            debug!(path = %doc.row.path, name, "Skill name contains XML characters");
-            return vec![LintResult::error("S003", &doc.row.path, message)];
+        if let Some(error) = skill_validation::check_xml_characters(&document.frontmatter.name) {
+            return vec![LintResult::error(error.code, &doc.row.path, error.message)];
         }
 
         vec![]

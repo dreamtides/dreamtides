@@ -23,6 +23,7 @@ mod markdown_body_tests;
 mod markdown_formatter_tests;
 mod ready_calculator_tests;
 mod root_detection_tests;
+mod skill;
 mod task_priority_tests;
 mod task_state_tests;
 mod task_types_tests;
