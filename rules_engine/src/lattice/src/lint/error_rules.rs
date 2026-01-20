@@ -72,6 +72,12 @@ pub struct NestedClosedRule;
 /// A knowledge base document (no `task-type`) is in a `.closed/` directory.
 pub struct NonTaskInClosedRule;
 
+/// E013: Duplicate root documents.
+///
+/// A directory contains both standard (`dir/dir.md`) and underscore-prefixed
+/// (`dir/_dir.md`) root documents.
+pub struct DuplicateRootDocumentsRule;
+
 /// Returns all error-level lint rules.
 pub fn all_error_rules() -> Vec<Box<dyn LintRule>> {
     vec![
@@ -87,6 +93,7 @@ pub fn all_error_rules() -> Vec<Box<dyn LintRule>> {
         Box::new(MissingDescriptionRule),
         Box::new(NestedClosedRule),
         Box::new(NonTaskInClosedRule),
+        Box::new(DuplicateRootDocumentsRule),
     ]
 }
 
@@ -424,6 +431,60 @@ impl LintRule for NonTaskInClosedRule {
         }
 
         vec![]
+    }
+}
+
+impl LintRule for DuplicateRootDocumentsRule {
+    fn codes(&self) -> &[&str] {
+        &["E013"]
+    }
+
+    fn name(&self) -> &str {
+        "duplicate-root-documents"
+    }
+
+    fn check(&self, doc: &LintDocument, ctx: &LintContext<'_>) -> Vec<LintResult> {
+        // Only check root documents
+        if !doc.row.is_root {
+            return vec![];
+        }
+
+        let path = Path::new(&doc.row.path);
+        let Some(file_stem) = path.file_stem().and_then(|s| s.to_str()) else {
+            return vec![];
+        };
+
+        // Determine if this is the underscore-prefixed form
+        let is_underscore_prefixed = file_stem.starts_with('_');
+        if !is_underscore_prefixed {
+            // Only report from the underscore-prefixed one to avoid duplicate errors
+            return vec![];
+        }
+
+        // Get the directory and compute the standard root path
+        let Some(parent) = path.parent() else {
+            return vec![];
+        };
+        let Some(dir_name) = parent.file_name().and_then(|s| s.to_str()) else {
+            return vec![];
+        };
+
+        let standard_root_path = parent.join(format!("{dir_name}.md"));
+
+        // Check if the standard form also exists
+        match document_queries::lookup_by_path(
+            ctx.connection(),
+            standard_root_path.to_string_lossy().as_ref(),
+        ) {
+            Ok(Some(_)) => {
+                let message = format!(
+                    "Directory '{}/' has both {}.md and _{}.md as root documents; remove one",
+                    dir_name, dir_name, dir_name
+                );
+                vec![LintResult::error("E013", &doc.row.path, message)]
+            }
+            _ => vec![],
+        }
     }
 }
 

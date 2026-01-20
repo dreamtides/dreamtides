@@ -139,6 +139,17 @@ A knowledge base document (no `task-type`) is in a `.closed/` directory.
 
 **Fix:** Move to parent directory or convert to task.
 
+### E013: Duplicate Root Documents
+
+A directory contains both standard and underscore-prefixed root documents.
+
+**Detection:** Check if both `dir/dir.md` and `dir/_dir.md` exist.
+
+**Message:** `Error [E013]: Directory 'api/' has both api.md and _api.md as root documents; remove one`
+
+**Fix:** Remove one of the root documents. Keep the standard form (`dir.md`) or
+the underscore-prefixed form (`_dir.md`), but not both.
+
 ## Warning-Level Rules
 
 These are advisory and don't block operations.

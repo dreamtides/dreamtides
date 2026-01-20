@@ -12,8 +12,10 @@ const MD_EXTENSION: &str = "md";
 /// Checks if a path represents a root document.
 ///
 /// A root document has a filename (without `.md` extension) that matches its
-/// containing directory name. For example:
+/// containing directory name, optionally prefixed with an underscore. For
+/// example:
 /// - `api/api.md` → root (filename "api" matches directory "api")
+/// - `api/_api.md` → root (underscore-prefixed form)
 /// - `auth/auth.md` → root
 /// - `auth/tasks/login.md` → NOT root (filename "login" ≠ directory "tasks")
 ///
@@ -48,7 +50,7 @@ pub fn is_root_document(path: &Path) -> bool {
         return false;
     };
 
-    let is_root = file_stem == parent_name;
+    let is_root = file_stem == parent_name || file_stem == format!("_{parent_name}");
 
     debug!(
         path = %path.display(),
@@ -92,6 +94,30 @@ pub fn root_document_path_for(dir_path: &Path) -> Option<PathBuf> {
     Some(root_path)
 }
 
+/// Returns all possible root document paths for a directory.
+///
+/// Given a directory path, returns both the standard root document path
+/// (`dir/dir.md`) and the underscore-prefixed form (`dir/_dir.md`).
+///
+/// # Arguments
+///
+/// * `dir_path` - Path to a directory (relative to repo root)
+///
+/// # Returns
+///
+/// A vector containing both possible root document paths. The standard form
+/// is returned first, followed by the underscore-prefixed form.
+/// Returns an empty vector if the directory path has no name component.
+pub fn root_document_paths_for(dir_path: &Path) -> Vec<PathBuf> {
+    let Some(dir_name) = dir_path.file_name().and_then(|s| s.to_str()) else {
+        return vec![];
+    };
+    vec![
+        dir_path.join(format!("{dir_name}.{MD_EXTENSION}")),
+        dir_path.join(format!("_{dir_name}.{MD_EXTENSION}")),
+    ]
+}
+
 /// Finds the root document for a given document path.
 ///
 /// Walks up the directory tree from the document's parent directory to find
@@ -99,8 +125,8 @@ pub fn root_document_path_for(dir_path: &Path) -> Option<PathBuf> {
 /// document found.
 ///
 /// For example, given `api/tasks/fix_bug.md`, this would search:
-/// 1. `api/tasks/tasks.md` (not found - tasks directories don't have roots)
-/// 2. `api/api.md` (found - return this)
+/// 1. `api/tasks/tasks.md` or `api/tasks/_tasks.md` (not found)
+/// 2. `api/api.md` or `api/_api.md` (found - return this)
 ///
 /// # Arguments
 ///
@@ -115,7 +141,7 @@ pub fn find_root_for(doc_path: &Path, repo_root: &Path) -> Option<PathBuf> {
     let mut current_dir = doc_path.parent()?;
 
     while !current_dir.as_os_str().is_empty() {
-        if let Some(root_path) = root_document_path_for(current_dir) {
+        for root_path in root_document_paths_for(current_dir) {
             let absolute_root = repo_root.join(&root_path);
             if absolute_root.is_file() {
                 info!(
@@ -218,10 +244,11 @@ pub fn find_ancestors(doc_path: &Path, repo_root: &Path) -> Vec<PathBuf> {
     };
 
     while !current_dir.as_os_str().is_empty() {
-        if let Some(root_path) = root_document_path_for(current_dir) {
+        for root_path in root_document_paths_for(current_dir) {
             let absolute_root = repo_root.join(&root_path);
             if absolute_root.is_file() {
                 ancestors.push(root_path);
+                break; // Found root for this directory, move to parent
             }
         }
         if let Some(parent) = current_dir.parent() {
@@ -281,7 +308,7 @@ fn find_root_starting_from(start_dir: &Path, repo_root: &Path) -> Option<PathBuf
     let mut current_dir = start_dir;
 
     loop {
-        if let Some(root_path) = root_document_path_for(current_dir) {
+        for root_path in root_document_paths_for(current_dir) {
             let absolute_root = repo_root.join(&root_path);
             if absolute_root.is_file() {
                 debug!(

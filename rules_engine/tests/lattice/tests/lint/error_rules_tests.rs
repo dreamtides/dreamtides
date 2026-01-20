@@ -848,9 +848,9 @@ fn e012_non_task_in_closed_no_error_for_kb_outside_closed() {
 // =============================================================================
 
 #[test]
-fn all_error_rules_returns_twelve_rules() {
+fn all_error_rules_returns_thirteen_rules() {
     let rules = all_error_rules();
-    assert_eq!(rules.len(), 12, "Should have 12 error rules");
+    assert_eq!(rules.len(), 13, "Should have 13 error rules");
 }
 
 #[test]
@@ -861,7 +861,7 @@ fn all_error_rules_covers_all_error_codes() {
 
     let expected = vec![
         "E001", "E002", "E003", "E004", "E005", "E006", "E007", "E008", "E009", "E010", "E011",
-        "E012",
+        "E012", "E013",
     ];
 
     assert_eq!(codes, expected, "All error codes should be covered");
