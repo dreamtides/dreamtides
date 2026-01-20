@@ -7,7 +7,7 @@ use crate::cli::command_dispatch::{CommandContext, LatticeResult};
 use crate::cli::commands::doctor_command::doctor_types::{
     CheckCategory, CheckResult, CheckStatus, DoctorConfig,
 };
-use crate::cli::commands::doctor_command::{config_checks, git_checks, index_checks};
+use crate::cli::commands::doctor_command::{claim_checks, config_checks, git_checks, index_checks};
 use crate::index::schema_definition;
 
 /// Runs all doctor checks and returns the results.
@@ -272,15 +272,8 @@ fn run_config_checks(context: &CommandContext) -> LatticeResult<Vec<CheckResult>
 }
 
 /// Runs claims checks.
-fn run_claims_checks(_context: &CommandContext) -> LatticeResult<Vec<CheckResult>> {
-    // Placeholder - actual claim checking will be implemented in later tasks
-    let results = vec![CheckResult::info(
-        CheckCategory::Claims,
-        "Claims Check",
-        "Claims validation not yet implemented",
-    )];
-
-    Ok(results)
+fn run_claims_checks(context: &CommandContext) -> LatticeResult<Vec<CheckResult>> {
+    claim_checks::run_claim_checks(&context.conn, &context.repo_root)
 }
 
 /// Runs skills checks.

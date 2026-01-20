@@ -1543,3 +1543,322 @@ mod config_checks {
         assert_eq!(config_checks.len(), 4, "Should have exactly 4 configuration checks");
     }
 }
+
+mod claim_checks {
+    use std::path::PathBuf;
+
+    use lattice::claim::claim_operations;
+    use lattice::cli::commands::doctor_command::doctor_checks;
+    use lattice::cli::commands::doctor_command::doctor_types::{
+        CheckCategory, CheckStatus, DoctorConfig,
+    };
+    use lattice::id::lattice_id::LatticeId;
+    use lattice::index::document_queries;
+    use lattice::index::document_types::InsertDocument;
+    use lattice::test::test_environment::TestEnv;
+
+    fn find_check<'a>(
+        results: &'a [lattice::cli::commands::doctor_command::doctor_types::CheckResult],
+        category: CheckCategory,
+        name: &str,
+    ) -> Option<&'a lattice::cli::commands::doctor_command::doctor_types::CheckResult> {
+        results.iter().find(|r| r.category == category && r.name == name)
+    }
+
+    #[test]
+    fn active_claims_check_passes_when_no_claims() {
+        let env = TestEnv::new();
+        let (_temp, context) = env.into_parts();
+        let config = DoctorConfig::default();
+
+        let results = doctor_checks::run_all_checks(&context, &config).expect("Run checks");
+
+        let check = find_check(&results, CheckCategory::Claims, "Active Claims")
+            .expect("Active Claims check should be present");
+        assert_eq!(check.status, CheckStatus::Passed, "Active Claims should pass with no claims");
+        assert!(
+            check.message.contains("No claims"),
+            "Message should indicate no claims: {}",
+            check.message
+        );
+    }
+
+    #[test]
+    fn active_claims_check_shows_count_when_claims_exist() {
+        let env = TestEnv::new();
+
+        // Create a valid Lattice ID
+        let id = LatticeId::from_parts(100, "ABC");
+        let id_str = id.as_str();
+
+        env.create_dir("api/tasks");
+        env.create_task("api/tasks/task1.md", id_str, "task1", "Task 1", "task", 1);
+
+        let (_temp, context) = env.into_parts();
+
+        // Insert the task into the index
+        document_queries::insert(&context.conn, &InsertDocument {
+            id: id_str.to_string(),
+            parent_id: None,
+            path: "api/tasks/task1.md".to_string(),
+            name: "task1".to_string(),
+            description: "Task 1".to_string(),
+            task_type: Some(lattice::document::frontmatter_schema::TaskType::Task),
+            is_closed: false,
+            priority: Some(1),
+            created_at: None,
+            updated_at: None,
+            closed_at: None,
+            body_hash: "hash1".to_string(),
+            content_length: 100,
+            is_root: false,
+            in_tasks_dir: true,
+            in_docs_dir: false,
+            skill: false,
+        })
+        .expect("Insert task");
+
+        // Create a claim for the task using the actual worktree path
+        let work_path = context.repo_root.clone();
+        claim_operations::claim_task(&context.repo_root, &id, &work_path).expect("Claim task");
+
+        let config = DoctorConfig::default();
+        let results = doctor_checks::run_all_checks(&context, &config).expect("Run checks");
+
+        let check = find_check(&results, CheckCategory::Claims, "Active Claims")
+            .expect("Active Claims check should be present");
+        assert_eq!(
+            check.status,
+            CheckStatus::Passed,
+            "Active Claims should pass with valid claims"
+        );
+        assert!(
+            check.message.contains("1 active"),
+            "Message should show claim count: {}",
+            check.message
+        );
+    }
+
+    #[test]
+    fn stale_claims_check_passes_when_no_stale_claims() {
+        let env = TestEnv::new();
+        let (_temp, context) = env.into_parts();
+        let config = DoctorConfig::default();
+
+        let results = doctor_checks::run_all_checks(&context, &config).expect("Run checks");
+
+        let check = find_check(&results, CheckCategory::Claims, "Stale Claims")
+            .expect("Stale Claims check should be present");
+        assert_eq!(check.status, CheckStatus::Passed, "Stale Claims should pass with no claims");
+    }
+
+    #[test]
+    fn stale_claims_check_warns_when_task_is_closed() {
+        let env = TestEnv::new();
+
+        // Create a valid Lattice ID
+        let id = LatticeId::from_parts(200, "ABC");
+        let id_str = id.as_str();
+
+        env.create_dir("api/tasks/.closed");
+        env.create_task("api/tasks/.closed/done.md", id_str, "done", "Done task", "task", 1);
+
+        let (_temp, context) = env.into_parts();
+
+        // Insert the closed task into the index
+        document_queries::insert(&context.conn, &InsertDocument {
+            id: id_str.to_string(),
+            parent_id: None,
+            path: "api/tasks/.closed/done.md".to_string(),
+            name: "done".to_string(),
+            description: "Done task".to_string(),
+            task_type: Some(lattice::document::frontmatter_schema::TaskType::Task),
+            is_closed: true,
+            priority: Some(1),
+            created_at: None,
+            updated_at: None,
+            closed_at: None,
+            body_hash: "hash1".to_string(),
+            content_length: 100,
+            is_root: false,
+            in_tasks_dir: true,
+            in_docs_dir: false,
+            skill: false,
+        })
+        .expect("Insert closed task");
+
+        // Create a claim for the closed task
+        let work_path = context.repo_root.clone();
+        claim_operations::claim_task(&context.repo_root, &id, &work_path).expect("Claim task");
+
+        let config = DoctorConfig::default();
+        let results = doctor_checks::run_all_checks(&context, &config).expect("Run checks");
+
+        let check = find_check(&results, CheckCategory::Claims, "Stale Claims")
+            .expect("Stale Claims check should be present");
+        assert_eq!(
+            check.status,
+            CheckStatus::Warning,
+            "Stale Claims should warn when claim exists for closed task"
+        );
+        assert!(check.fixable, "Stale claims should be fixable");
+        assert!(
+            check.details.iter().any(|d| d.contains(id_str)),
+            "Details should mention the stale claim ID: {:?}",
+            check.details
+        );
+    }
+
+    #[test]
+    fn missing_tasks_check_passes_when_no_missing_tasks() {
+        let env = TestEnv::new();
+        let (_temp, context) = env.into_parts();
+        let config = DoctorConfig::default();
+
+        let results = doctor_checks::run_all_checks(&context, &config).expect("Run checks");
+
+        let check = find_check(&results, CheckCategory::Claims, "Missing Tasks")
+            .expect("Missing Tasks check should be present");
+        assert_eq!(check.status, CheckStatus::Passed, "Missing Tasks should pass with no claims");
+    }
+
+    #[test]
+    fn missing_tasks_check_warns_when_task_deleted() {
+        let env = TestEnv::new();
+        let (_temp, context) = env.into_parts();
+
+        // Create a valid Lattice ID for a task that doesn't exist in the index
+        let id = LatticeId::from_parts(300, "ABC");
+        let id_str = id.as_str();
+
+        // Create a claim for a task that doesn't exist in the index
+        let work_path = context.repo_root.clone();
+        claim_operations::claim_task(&context.repo_root, &id, &work_path).expect("Claim task");
+
+        let config = DoctorConfig::default();
+        let results = doctor_checks::run_all_checks(&context, &config).expect("Run checks");
+
+        let check = find_check(&results, CheckCategory::Claims, "Missing Tasks")
+            .expect("Missing Tasks check should be present");
+        assert_eq!(
+            check.status,
+            CheckStatus::Warning,
+            "Missing Tasks should warn when claim references non-existent task"
+        );
+        assert!(check.fixable, "Missing tasks claims should be fixable");
+        assert!(
+            check.details.iter().any(|d| d.contains(id_str)),
+            "Details should mention the missing task ID: {:?}",
+            check.details
+        );
+    }
+
+    #[test]
+    fn orphaned_worktrees_check_passes_when_no_orphaned_worktrees() {
+        let env = TestEnv::new();
+        let (_temp, context) = env.into_parts();
+        let config = DoctorConfig::default();
+
+        let results = doctor_checks::run_all_checks(&context, &config).expect("Run checks");
+
+        let check = find_check(&results, CheckCategory::Claims, "Orphaned Worktrees")
+            .expect("Orphaned Worktrees check should be present");
+        assert_eq!(
+            check.status,
+            CheckStatus::Passed,
+            "Orphaned Worktrees should pass with no claims"
+        );
+    }
+
+    #[test]
+    fn orphaned_worktrees_check_warns_when_work_path_missing() {
+        let env = TestEnv::new();
+
+        // Create a valid Lattice ID
+        let id = LatticeId::from_parts(400, "ABC");
+        let id_str = id.as_str();
+
+        env.create_dir("api/tasks");
+        env.create_task("api/tasks/task1.md", id_str, "task1", "Task 1", "task", 1);
+
+        let (_temp, context) = env.into_parts();
+
+        // Insert the task into the index
+        document_queries::insert(&context.conn, &InsertDocument {
+            id: id_str.to_string(),
+            parent_id: None,
+            path: "api/tasks/task1.md".to_string(),
+            name: "task1".to_string(),
+            description: "Task 1".to_string(),
+            task_type: Some(lattice::document::frontmatter_schema::TaskType::Task),
+            is_closed: false,
+            priority: Some(1),
+            created_at: None,
+            updated_at: None,
+            closed_at: None,
+            body_hash: "hash1".to_string(),
+            content_length: 100,
+            is_root: false,
+            in_tasks_dir: true,
+            in_docs_dir: false,
+            skill: false,
+        })
+        .expect("Insert task");
+
+        // Create a claim with a non-existent work path
+        let work_path = PathBuf::from("/nonexistent/worktree/path/that/does/not/exist");
+        claim_operations::claim_task(&context.repo_root, &id, &work_path).expect("Claim task");
+
+        let config = DoctorConfig::default();
+        let results = doctor_checks::run_all_checks(&context, &config).expect("Run checks");
+
+        let check = find_check(&results, CheckCategory::Claims, "Orphaned Worktrees")
+            .expect("Orphaned Worktrees check should be present");
+        assert_eq!(
+            check.status,
+            CheckStatus::Warning,
+            "Orphaned Worktrees should warn when work path doesn't exist"
+        );
+        assert!(check.fixable, "Orphaned worktree claims should be fixable");
+        assert!(
+            check.details.iter().any(|d| d.contains(id_str)),
+            "Details should mention the task ID: {:?}",
+            check.details
+        );
+        assert!(
+            check.details.iter().any(|d| d.contains("nonexistent")),
+            "Details should mention the missing path: {:?}",
+            check.details
+        );
+    }
+
+    #[test]
+    fn all_claim_checks_are_present() {
+        let env = TestEnv::new();
+        let (_temp, context) = env.into_parts();
+        let config = DoctorConfig::default();
+
+        let results = doctor_checks::run_all_checks(&context, &config).expect("Run checks");
+
+        let claim_checks: Vec<_> =
+            results.iter().filter(|r| r.category == CheckCategory::Claims).collect();
+
+        assert!(
+            claim_checks.iter().any(|c| c.name == "Active Claims"),
+            "Should have Active Claims check"
+        );
+        assert!(
+            claim_checks.iter().any(|c| c.name == "Stale Claims"),
+            "Should have Stale Claims check"
+        );
+        assert!(
+            claim_checks.iter().any(|c| c.name == "Missing Tasks"),
+            "Should have Missing Tasks check"
+        );
+        assert!(
+            claim_checks.iter().any(|c| c.name == "Orphaned Worktrees"),
+            "Should have Orphaned Worktrees check"
+        );
+        assert_eq!(claim_checks.len(), 4, "Should have exactly 4 claims checks");
+    }
+}

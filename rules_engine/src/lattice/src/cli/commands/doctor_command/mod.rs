@@ -1,3 +1,4 @@
+pub mod claim_checks;
 pub mod config_checks;
 pub mod doctor_checks;
 pub mod doctor_executor;
