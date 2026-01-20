@@ -34,6 +34,7 @@ fn create_kb_document(id: &str, path: &str, name: &str) -> InsertDocument {
         None,
         "abc123".to_string(),
         100,
+        false,
     )
 }
 
@@ -62,6 +63,7 @@ fn create_document_with_name_length(id: &str, path: &str, name_len: usize) -> In
         None,
         "abc123".to_string(),
         100,
+        false,
     )
 }
 
@@ -84,6 +86,7 @@ fn create_document_with_description_length(
         None,
         "abc123".to_string(),
         100,
+        false,
     )
 }
 
@@ -273,6 +276,7 @@ fn w004_detects_uppercase_in_name() {
         None,
         "abc123".to_string(),
         100,
+        false,
     );
     document_queries::insert(&conn, &doc).expect("Insert should succeed");
 
@@ -304,6 +308,7 @@ fn w004_detects_underscore_in_name() {
         None,
         "abc123".to_string(),
         100,
+        false,
     );
     document_queries::insert(&conn, &doc).expect("Insert should succeed");
 

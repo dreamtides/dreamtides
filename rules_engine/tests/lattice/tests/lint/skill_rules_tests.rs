@@ -30,6 +30,7 @@ fn create_kb_document(id: &str, path: &str, name: &str, description: &str) -> In
         None,
         "abc123".to_string(),
         100,
+        false,
     )
 }
 

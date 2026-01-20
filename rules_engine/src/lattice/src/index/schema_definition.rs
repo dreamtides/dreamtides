@@ -4,7 +4,7 @@ use tracing::{debug, info};
 use crate::error::error_types::LatticeError;
 
 /// Current schema version. Increment when schema changes require rebuild.
-pub const SCHEMA_VERSION: u32 = 2;
+pub const SCHEMA_VERSION: u32 = 3;
 /// Maximum number of documents to keep in the content cache.
 pub const CONTENT_CACHE_MAX_ENTRIES: u32 = 100;
 
@@ -113,11 +113,13 @@ fn create_documents_table(conn: &Connection) -> Result<(), LatticeError> {
             view_count INTEGER NOT NULL DEFAULT 0,
             is_root INTEGER NOT NULL DEFAULT 0,
             in_tasks_dir INTEGER NOT NULL DEFAULT 0,
-            in_docs_dir INTEGER NOT NULL DEFAULT 0
+            in_docs_dir INTEGER NOT NULL DEFAULT 0,
+            skill INTEGER NOT NULL DEFAULT 0
         );
 
         CREATE INDEX idx_documents_path ON documents(path);
         CREATE INDEX idx_documents_name ON documents(name);
+        CREATE INDEX idx_documents_skill ON documents(skill) WHERE skill = 1;
         ",
     )
     .map_err(|e| LatticeError::DatabaseError {

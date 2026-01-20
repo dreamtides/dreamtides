@@ -34,6 +34,7 @@ fn create_kb_document(id: &str, path: &str, name: &str) -> InsertDocument {
         None,
         "abc123".to_string(),
         100,
+        false,
     )
 }
 
@@ -51,6 +52,7 @@ fn create_task_document(id: &str, path: &str, name: &str, priority: u8) -> Inser
         None,
         "def456".to_string(),
         200,
+        false,
     )
 }
 
@@ -68,6 +70,7 @@ fn create_task_without_priority(id: &str, path: &str, name: &str) -> InsertDocum
         None,
         "def456".to_string(),
         200,
+        false,
     )
 }
 
@@ -85,6 +88,7 @@ fn create_document_with_empty_name(id: &str, path: &str) -> InsertDocument {
         None,
         "abc123".to_string(),
         100,
+        false,
     )
 }
 
@@ -102,6 +106,7 @@ fn create_document_with_empty_description(id: &str, path: &str, name: &str) -> I
         None,
         "abc123".to_string(),
         100,
+        false,
     )
 }
 
@@ -398,6 +403,7 @@ fn e005_invalid_priority_detects_out_of_range() {
         None,
         "abc123".to_string(),
         100,
+        false,
     );
     document_queries::insert(&conn, &doc).expect("Insert should succeed");
 
@@ -704,6 +710,7 @@ fn e011_nested_closed_detects_nested_directories() {
         None,
         "abc123".to_string(),
         100,
+        false,
     );
     document_queries::insert(&conn, &doc).expect("Insert should succeed");
 
@@ -736,6 +743,7 @@ fn e011_nested_closed_no_error_for_single_closed() {
         None,
         "abc123".to_string(),
         100,
+        false,
     );
     document_queries::insert(&conn, &doc).expect("Insert should succeed");
 
@@ -774,6 +782,7 @@ fn e012_non_task_in_closed_detects_kb_in_closed() {
         None,
         "abc123".to_string(),
         100,
+        false,
     );
     document_queries::insert(&conn, &doc).expect("Insert should succeed");
 
@@ -806,6 +815,7 @@ fn e012_non_task_in_closed_no_error_for_task_in_closed() {
         None,
         "abc123".to_string(),
         100,
+        false,
     );
     document_queries::insert(&conn, &doc).expect("Insert should succeed");
 

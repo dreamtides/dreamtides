@@ -68,6 +68,7 @@ Content for the third section goes here.
         None,
         "hash123".to_string(),
         content.len() as i64,
+        false,
     );
     document_queries::insert(env.conn(), &insert_doc).expect("Insert document");
 }
@@ -339,6 +340,7 @@ Third section content.
         None,
         "hash123".to_string(),
         content.len() as i64,
+        false,
     );
     document_queries::insert(env.conn(), &insert_doc).expect("Insert document");
 
@@ -390,6 +392,7 @@ Just some plain text content.
         None,
         "hash123".to_string(),
         content.len() as i64,
+        false,
     );
     document_queries::insert(env.conn(), &insert_doc).expect("Insert document");
 
@@ -441,6 +444,7 @@ This document has only one H1 section.
         None,
         "hash123".to_string(),
         content.len() as i64,
+        false,
     );
     document_queries::insert(env.conn(), &insert_doc).expect("Insert document");
 

@@ -334,6 +334,7 @@ See the [pruned task](../tasks/.closed/{task_filename}#{task_id}) for details.
         None,
         "hash123".to_string(),
         100,
+        false,
     );
     document_queries::insert(&context.conn, &insert_doc).expect("Insert doc");
 
@@ -408,6 +409,7 @@ See the [pruned task](../tasks/.closed/{task_filename}#{task_id}) for details.
         None,
         "hash123".to_string(),
         100,
+        false,
     );
     document_queries::insert(&context.conn, &insert_doc).expect("Insert doc");
 

@@ -370,6 +370,7 @@ fn insert_into_index(
         None,
         compute_hash(body),
         body.len() as i64,
+        frontmatter.skill,
     );
 
     document_queries::insert(&context.conn, &doc)?;

@@ -247,6 +247,7 @@ fn insert_or_update_document(
         doc.frontmatter.closed_at,
         body_hash,
         doc.body.len() as i64,
+        doc.frontmatter.skill,
     );
     document_queries::insert(conn, &insert_doc)?;
 

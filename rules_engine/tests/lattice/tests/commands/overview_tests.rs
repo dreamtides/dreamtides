@@ -30,6 +30,7 @@ fn create_test_document(
         None,
         format!("hash-{id}"),
         100,
+        false,
     )
 }
 
@@ -407,6 +408,7 @@ fn overview_contextual_returns_parent_document() {
         None,
         "hash-LCTXTKWQN".to_string(),
         100,
+        false,
     );
     document_queries::insert(env.conn(), &insert_root).expect("Insert root");
     document_queries::insert(env.conn(), &insert_task).expect("Insert task");
@@ -591,6 +593,7 @@ fn overview_contextual_includes_siblings() {
         None,
         "hash-LSIBT1CTXWQN".to_string(),
         100,
+        false,
     );
     let insert_task2 = InsertDocument::new(
         "LSIBT2CTXWQN".to_string(),
@@ -605,6 +608,7 @@ fn overview_contextual_includes_siblings() {
         None,
         "hash-LSIBT2CTXWQN".to_string(),
         100,
+        false,
     );
     document_queries::insert(env.conn(), &insert_root).expect("Insert root");
     document_queries::insert(env.conn(), &insert_task1).expect("Insert task1");
@@ -711,6 +715,7 @@ fn overview_contextual_respects_limit_for_categories() {
             None,
             format!("hash-LCATLM{i:02}WQN"),
             100,
+            false,
         );
         document_queries::insert(env.conn(), &insert).expect("Insert task");
     }

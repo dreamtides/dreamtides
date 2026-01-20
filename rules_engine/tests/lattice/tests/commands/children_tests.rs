@@ -31,6 +31,7 @@ fn create_root_doc(id: &str, path: &str, name: &str, description: &str) -> Inser
         None,
         format!("hash-{id}"),
         100,
+        false,
     );
     doc.is_root = true;
     doc
@@ -56,6 +57,7 @@ fn create_task_doc(
         None,
         format!("hash-{id}"),
         100,
+        false,
     );
     doc.in_tasks_dir = true;
     doc.is_closed = path.contains("/.closed/");
@@ -82,6 +84,7 @@ fn create_docs_doc(
         None,
         format!("hash-{id}"),
         100,
+        false,
     );
     doc.in_docs_dir = true;
     doc

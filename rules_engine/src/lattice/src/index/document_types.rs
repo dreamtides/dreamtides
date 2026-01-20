@@ -76,6 +76,7 @@ pub struct DocumentRow {
     pub is_root: bool,
     pub in_tasks_dir: bool,
     pub in_docs_dir: bool,
+    pub skill: bool,
 }
 
 /// Data for inserting a new document into the index.
@@ -97,6 +98,7 @@ pub struct InsertDocument {
     pub is_root: bool,
     pub in_tasks_dir: bool,
     pub in_docs_dir: bool,
+    pub skill: bool,
 }
 
 /// Builder for updating document fields.
@@ -122,6 +124,7 @@ pub struct UpdateBuilder<'a> {
     is_root: Option<bool>,
     in_tasks_dir: Option<bool>,
     in_docs_dir: Option<bool>,
+    skill: Option<bool>,
 }
 
 /// Converts a SQLite row to a DocumentRow.
@@ -153,6 +156,7 @@ pub fn row_to_document(row: &Row) -> Result<DocumentRow, SqliteError> {
     let is_root: i32 = row.get("is_root")?;
     let in_tasks_dir: i32 = row.get("in_tasks_dir")?;
     let in_docs_dir: i32 = row.get("in_docs_dir")?;
+    let skill: i32 = row.get("skill")?;
 
     let priority_i32: Option<i32> = row.get("priority")?;
     let priority = priority_i32.map(|p| p as u8);
@@ -178,6 +182,7 @@ pub fn row_to_document(row: &Row) -> Result<DocumentRow, SqliteError> {
         is_root: is_root != 0,
         in_tasks_dir: in_tasks_dir != 0,
         in_docs_dir: in_docs_dir != 0,
+        skill: skill != 0,
     })
 }
 
@@ -344,6 +349,17 @@ impl<'a> UpdateBuilder<'a> {
     pub(crate) fn get_in_docs_dir(&self) -> Option<bool> {
         self.in_docs_dir
     }
+
+    /// Sets skill.
+    pub fn skill(mut self, skill: bool) -> Self {
+        self.skill = Some(skill);
+        self
+    }
+
+    /// Returns the skill update value if set.
+    pub(crate) fn get_skill(&self) -> Option<bool> {
+        self.skill
+    }
 }
 
 impl InsertDocument {
@@ -362,6 +378,7 @@ impl InsertDocument {
         closed_at: Option<DateTime<Utc>>,
         body_hash: String,
         content_length: i64,
+        skill: bool,
     ) -> Self {
         let is_closed = path.contains("/.closed/");
         let is_root = compute_is_root(&path);
@@ -385,6 +402,7 @@ impl InsertDocument {
             is_root,
             in_tasks_dir,
             in_docs_dir,
+            skill,
         }
     }
 }

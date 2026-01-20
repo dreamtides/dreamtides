@@ -364,6 +364,7 @@ See the [fix login bug](../tasks/{task_filename}#{task_id}) task for details.
         None,
         "hash123".to_string(),
         100,
+        false,
     );
     lattice::index::document_queries::insert(env.conn(), &insert_doc).expect("Insert doc");
 

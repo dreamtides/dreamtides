@@ -34,6 +34,7 @@ fn create_task_doc(
         None,
         format!("hash-{id}"),
         100,
+        false,
     );
     doc.in_tasks_dir = path.contains("/tasks/");
     doc

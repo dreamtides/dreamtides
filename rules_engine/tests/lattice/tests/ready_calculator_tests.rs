@@ -38,6 +38,7 @@ fn insert_task(
         None,
         format!("hash-{id}"),
         100,
+        false,
     );
     document_queries::insert(conn, &doc).expect("Failed to insert document");
 }
@@ -168,6 +169,7 @@ fn query_ready_tasks_excludes_non_task_documents() {
         None,
         "hash-kb".to_string(),
         200,
+        false,
     );
     document_queries::insert(&conn, &kb_doc).expect("Failed to insert KB doc");
 

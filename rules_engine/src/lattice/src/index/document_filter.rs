@@ -107,6 +107,10 @@ pub struct DocumentFilter {
     /// Filter by docs/ directory membership.
     pub in_docs_dir: Option<bool>,
 
+    /// Filter by skill flag. When `Some(true)`, returns only skill-enabled
+    /// documents. When `Some(false)`, returns only non-skill documents.
+    pub skill: Option<bool>,
+
     /// Column to sort results by. Default: [`SortColumn::UpdatedAt`].
     pub sort_by: SortColumn,
 
@@ -284,6 +288,12 @@ impl DocumentFilter {
     /// Filters by docs directory membership.
     pub fn with_in_docs_dir(mut self, in_docs_dir: bool) -> Self {
         self.in_docs_dir = Some(in_docs_dir);
+        self
+    }
+
+    /// Filters by skill flag.
+    pub fn with_skill(mut self, skill: bool) -> Self {
+        self.skill = Some(skill);
         self
     }
 
@@ -486,6 +496,11 @@ fn append_filter_conditions(
 
     if let Some(v) = filter.in_docs_dir {
         sql.push_str(" AND in_docs_dir = ?");
+        params.push(Box::new(v as i32));
+    }
+
+    if let Some(v) = filter.skill {
+        sql.push_str(" AND skill = ?");
         params.push(Box::new(v as i32));
     }
 }

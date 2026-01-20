@@ -29,6 +29,7 @@ fn create_root_doc(id: &str, path: &str, name: &str, description: &str) -> Inser
         None,
         format!("hash-{id}"),
         100,
+        false,
     );
     doc.is_root = true;
     doc
@@ -54,6 +55,7 @@ fn create_child_doc(
         None,
         format!("hash-{id}"),
         100,
+        false,
     );
     doc.in_docs_dir = path.contains("/docs/");
     doc.in_tasks_dir = path.contains("/tasks/");

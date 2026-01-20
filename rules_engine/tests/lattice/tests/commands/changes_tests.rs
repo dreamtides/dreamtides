@@ -159,6 +159,7 @@ fn insert_test_document(conn: &Connection, id: &str, path: &str, name: &str, des
         None,
         "abc123".to_string(),
         100,
+        false,
     );
     document_queries::insert(conn, &doc).expect("Failed to insert document");
 }

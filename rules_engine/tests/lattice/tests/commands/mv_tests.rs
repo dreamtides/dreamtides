@@ -147,6 +147,7 @@ fn mv_to_different_directory_updates_parent_id() {
         None,
         "hash_db".to_string(),
         50,
+        false,
     );
     lattice::index::document_queries::insert(env.conn(), &db_root_insert).expect("Insert db root");
 
@@ -229,6 +230,7 @@ See the [fix login bug](../tasks/{task_filename}#{task_id}) task for details.
         None,
         "hash123".to_string(),
         100,
+        false,
     );
     lattice::index::document_queries::insert(env.conn(), &insert_doc).expect("Insert doc");
 

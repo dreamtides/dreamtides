@@ -30,6 +30,7 @@ fn create_test_document(id: &str, path: &str, name: &str) -> InsertDocument {
         None,
         "abc123".to_string(),
         100,
+        false,
     )
 }
 
@@ -47,6 +48,7 @@ fn create_task_document(id: &str, path: &str, name: &str, priority: u8) -> Inser
         None,
         "def456".to_string(),
         200,
+        false,
     )
 }
 

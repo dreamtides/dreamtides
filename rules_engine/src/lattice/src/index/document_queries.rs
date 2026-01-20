@@ -14,8 +14,8 @@ pub fn insert(conn: &Connection, doc: &InsertDocument) -> Result<(), LatticeErro
         "INSERT INTO documents (
             id, parent_id, path, name, description, task_type, is_closed, priority,
             created_at, updated_at, closed_at, body_hash, indexed_at, content_length,
-            is_root, in_tasks_dir, in_docs_dir
-        ) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, datetime('now'), ?13, ?14, ?15, ?16)",
+            is_root, in_tasks_dir, in_docs_dir, skill
+        ) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, datetime('now'), ?13, ?14, ?15, ?16, ?17)",
         params![
             doc.id,
             doc.parent_id,
@@ -33,6 +33,7 @@ pub fn insert(conn: &Connection, doc: &InsertDocument) -> Result<(), LatticeErro
             doc.is_root as i32,
             doc.in_tasks_dir as i32,
             doc.in_docs_dir as i32,
+            doc.skill as i32,
         ],
     )
     .map_err(|e| LatticeError::DatabaseError {
@@ -128,6 +129,10 @@ pub fn update(conn: &Connection, id: &str, builder: &UpdateBuilder) -> Result<bo
     }
     if let Some(v) = builder.get_in_docs_dir() {
         sql.push_str(", in_docs_dir = ?");
+        params_vec.push(Box::new(v as i32));
+    }
+    if let Some(v) = builder.get_skill() {
+        sql.push_str(", skill = ?");
         params_vec.push(Box::new(v as i32));
     }
 

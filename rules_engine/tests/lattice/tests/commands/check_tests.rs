@@ -37,6 +37,7 @@ fn create_valid_doc(id: &str, path: &str, name: &str, description: &str) -> Inse
         None,
         format!("hash-{id}"),
         100,
+        false,
     )
 }
 

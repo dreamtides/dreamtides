@@ -36,6 +36,7 @@ fn create_task_doc(
         None,
         format!("hash-{id}"),
         100,
+        false,
     );
     doc.in_tasks_dir = path.contains("/tasks/");
     doc
@@ -55,6 +56,7 @@ fn create_kb_doc(id: &str, path: &str, name: &str, description: &str) -> InsertD
         None,
         format!("hash-{id}"),
         100,
+        false,
     );
     doc.in_docs_dir = path.contains("/docs/");
     doc

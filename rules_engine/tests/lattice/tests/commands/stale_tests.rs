@@ -39,6 +39,7 @@ fn create_task_doc_with_timestamp(
         None,
         format!("hash-{id}"),
         100,
+        false,
     )
 }
 

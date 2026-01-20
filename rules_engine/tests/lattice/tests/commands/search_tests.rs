@@ -26,6 +26,7 @@ fn insert_document(conn: &rusqlite::Connection, id: &str, path: &str, name: &str
         None,
         "abc123".to_string(),
         100,
+        false,
     );
     document_queries::insert(conn, &doc).expect("Failed to insert document");
     fulltext_search::index_document(conn, id, body).expect("Failed to index document");
@@ -52,6 +53,7 @@ fn insert_task(
         None,
         "abc123".to_string(),
         100,
+        false,
     );
     document_queries::insert(conn, &doc).expect("Failed to insert document");
     fulltext_search::index_document(conn, id, body).expect("Failed to index document");

@@ -33,6 +33,7 @@ fn create_test_document(id: &str, path: &str) -> InsertDocument {
         None,
         "abc123".to_string(),
         100,
+        false,
     )
 }
 

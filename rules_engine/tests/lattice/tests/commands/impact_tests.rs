@@ -47,6 +47,7 @@ fn create_doc(id: &str, path: &str, name: &str, description: &str) -> InsertDocu
         None,
         format!("hash-{id}"),
         100,
+        false,
     )
 }
 

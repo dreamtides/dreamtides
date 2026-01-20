@@ -29,6 +29,7 @@ fn create_kb_document(id: &str, path: &str, name: &str) -> InsertDocument {
         None,
         "abc123".to_string(),
         100,
+        false,
     )
 }
 
@@ -46,6 +47,7 @@ fn create_task_document(id: &str, path: &str, name: &str, priority: u8) -> Inser
         None,
         "def456".to_string(),
         200,
+        false,
     )
 }
 
@@ -304,6 +306,7 @@ fn w019_no_warning_for_kb_in_closed() {
         None,
         "abc123".to_string(),
         100,
+        false,
     );
     document_queries::insert(&conn, &doc).expect("Insert should succeed");
 

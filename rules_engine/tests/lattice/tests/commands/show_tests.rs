@@ -40,6 +40,7 @@ fn create_test_document(id: &str, path: &str, name: &str, description: &str) -> 
         None,
         "abc123".to_string(),
         100,
+        false,
     )
 }
 
@@ -63,6 +64,7 @@ fn create_task_document(
         None,
         "def456".to_string(),
         200,
+        false,
     )
 }
 
@@ -497,6 +499,7 @@ fn document_ref_from_row_includes_is_root() {
         None,
         "hash123".to_string(),
         100,
+        false,
     );
     document_queries::insert(env.conn(), &insert_doc).expect("Insert doc");
 
@@ -691,6 +694,7 @@ fn show_command_peek_mode_displays_parent_and_counts() {
         None,
         "hash1".to_string(),
         100,
+        false,
     );
     let task_doc = InsertDocument::new(
         "LTASKP".to_string(),
@@ -705,6 +709,7 @@ fn show_command_peek_mode_displays_parent_and_counts() {
         None,
         "hash2".to_string(),
         200,
+        false,
     );
     document_queries::insert(env.conn(), &root_doc).expect("Insert root");
     document_queries::insert(env.conn(), &task_doc).expect("Insert task");
@@ -892,6 +897,7 @@ fn show_command_includes_composed_templates_for_tasks() {
         None,
         "hash1".to_string(),
         100,
+        false,
     );
     let api_doc = InsertDocument::new(
         "LAPIZA".to_string(),
@@ -906,6 +912,7 @@ fn show_command_includes_composed_templates_for_tasks() {
         None,
         "hash2".to_string(),
         200,
+        false,
     );
     let task_doc = InsertDocument::new(
         "LBUGZA".to_string(),
@@ -920,6 +927,7 @@ fn show_command_includes_composed_templates_for_tasks() {
         None,
         "hash3".to_string(),
         300,
+        false,
     );
     insert_doc(&context.conn, &project_doc);
     insert_doc(&context.conn, &api_doc);
@@ -959,6 +967,7 @@ fn show_command_raw_mode_skips_template_composition() {
         None,
         "hash1".to_string(),
         100,
+        false,
     );
     let api_doc = InsertDocument::new(
         "LAPIZA".to_string(),
@@ -973,6 +982,7 @@ fn show_command_raw_mode_skips_template_composition() {
         None,
         "hash2".to_string(),
         200,
+        false,
     );
     let task_doc = InsertDocument::new(
         "LBUGZA".to_string(),
@@ -987,6 +997,7 @@ fn show_command_raw_mode_skips_template_composition() {
         None,
         "hash3".to_string(),
         300,
+        false,
     );
     insert_doc(&context.conn, &project_doc);
     insert_doc(&context.conn, &api_doc);

@@ -40,6 +40,7 @@ fn create_task_doc(
         None,
         format!("hash-{id}"),
         100,
+        false,
     )
 }
 
@@ -57,6 +58,7 @@ fn create_kb_doc(id: &str, path: &str, name: &str, description: &str) -> InsertD
         None,
         format!("hash-{id}"),
         100,
+        false,
     )
 }
 

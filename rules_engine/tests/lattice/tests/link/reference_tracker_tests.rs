@@ -26,6 +26,7 @@ fn create_test_document(id: &str, path: &str, name: &str) -> InsertDocument {
         None,
         "abc123".to_string(),
         100,
+        false,
     )
 }
 
@@ -229,6 +230,7 @@ fn reference_includes_full_document_metadata() {
         None,
         "hash123".to_string(),
         500,
+        false,
     );
     document_queries::insert(&conn, &doc).expect("Insert should succeed");
     setup_documents(&conn, &["LSRCJ"]);

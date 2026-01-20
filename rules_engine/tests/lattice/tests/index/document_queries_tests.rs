@@ -29,6 +29,7 @@ fn create_test_document(id: &str, path: &str, name: &str) -> InsertDocument {
         None,
         "abc123".to_string(),
         100,
+        false,
     )
 }
 
@@ -46,6 +47,7 @@ fn create_task_document(id: &str, path: &str, name: &str, priority: u8) -> Inser
         None,
         "def456".to_string(),
         200,
+        false,
     )
 }
 
@@ -379,6 +381,7 @@ fn query_filters_by_task_type() {
             None,
             "hash".to_string(),
             100,
+            false,
         ),
     )
     .expect("Insert bug should succeed");
@@ -397,6 +400,7 @@ fn query_filters_by_task_type() {
             None,
             "hash".to_string(),
             100,
+            false,
         ),
     )
     .expect("Insert feature should succeed");
@@ -628,6 +632,7 @@ fn insert_document_preserves_task_type() {
         None,
         "hash".to_string(),
         100,
+        false,
     );
 
     insert(&conn, &doc).expect("Insert should succeed");

@@ -24,6 +24,7 @@ clap = { workspace = true }
 clap_complete = { workspace = true }
 human-panic = { workspace = true }
 owo-colors = { workspace = true }
+pathdiff = { workspace = true }
 pulldown-cmark = { workspace = true }
 rand = { workspace = true }
 regex = { workspace = true }

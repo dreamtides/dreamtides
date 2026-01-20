@@ -27,6 +27,7 @@ fn insert_task(conn: &rusqlite::Connection, id: &str, path: &str) {
         None,
         format!("hash-{id}"),
         100,
+        false,
     );
     document_queries::insert(conn, &doc).expect("Failed to insert document");
 }
@@ -325,6 +326,7 @@ fn tree_node_includes_state_information() {
         None,
         "hash-closed".to_string(),
         100,
+        false,
     );
     document_queries::insert(&conn, &closed_doc).expect("Failed to insert");
 
