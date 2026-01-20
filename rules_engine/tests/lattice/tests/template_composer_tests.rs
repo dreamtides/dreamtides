@@ -684,8 +684,6 @@ The thing is broken.
             body_hash: "test".to_string(),
             content_length: 100,
             is_root: true,
-            in_tasks_dir: true,
-            in_docs_dir: false,
             skill: false,
         },
     )
