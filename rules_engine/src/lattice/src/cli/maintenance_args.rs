@@ -101,12 +101,16 @@ pub struct ChaosMonkeyArgs {
     pub seed: Option<u64>,
 
     /// Maximum operations to run.
-    #[arg(long)]
-    pub max_ops: Option<usize>,
+    #[arg(long, default_value = "10000")]
+    pub max_ops: usize,
 
-    /// Operations to run (comma-separated).
+    /// Operations to include (comma-separated). If empty, all operations run.
     #[arg(long, value_delimiter = ',')]
     pub operations: Vec<String>,
+
+    /// Operations to exclude (comma-separated).
+    #[arg(long, value_delimiter = ',')]
+    pub exclude: Vec<String>,
 
     /// Stop before the last (failing) operation.
     #[arg(long)]
