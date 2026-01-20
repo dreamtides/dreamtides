@@ -50,6 +50,7 @@ Standard lat commands with random valid and invalid arguments:
 - `lat mv` to random destinations
 - `lat search` with random queries
 - `lat check --rebuild-index` at random points
+- `lat dep add/remove` with random task pairs
 
 ### Low-Level (filesystem)
 

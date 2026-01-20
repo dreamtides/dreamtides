@@ -1,5 +1,6 @@
 pub mod blocked_command;
 pub mod changes_command;
+pub mod chaos_generators;
 pub mod chaos_monkey;
 pub mod check_command;
 pub mod children_command;

@@ -52,6 +52,10 @@ pub enum OperationType {
     GitCommit,
     /// Git checkout to a branch.
     GitCheckout,
+    /// Add a dependency between tasks via `lat dep add`.
+    DepAdd,
+    /// Remove a dependency between tasks via `lat dep remove`.
+    DepRemove,
 }
 
 /// Details of an invariant violation detected by chaos monkey.
@@ -206,6 +210,8 @@ impl OperationType {
             OperationType::FilesystemModify,
             OperationType::GitCommit,
             OperationType::GitCheckout,
+            OperationType::DepAdd,
+            OperationType::DepRemove,
         ]
     }
 
@@ -225,6 +231,8 @@ impl OperationType {
             OperationType::FilesystemModify => "fs-modify",
             OperationType::GitCommit => "git-commit",
             OperationType::GitCheckout => "git-checkout",
+            OperationType::DepAdd => "dep-add",
+            OperationType::DepRemove => "dep-remove",
         }
     }
 
@@ -244,6 +252,8 @@ impl OperationType {
             "fs-modify" | "fsmodify" | "filesystem-modify" => Some(OperationType::FilesystemModify),
             "git-commit" | "gitcommit" => Some(OperationType::GitCommit),
             "git-checkout" | "gitcheckout" => Some(OperationType::GitCheckout),
+            "dep-add" | "depadd" => Some(OperationType::DepAdd),
+            "dep-remove" | "depremove" => Some(OperationType::DepRemove),
             _ => None,
         }
     }
@@ -509,14 +519,12 @@ fn execute_operation_with_panic_capture(
     }
 }
 
-/// Executes a single operation. Placeholder for now.
-///
-/// This will be implemented by the operation generators task (dr-epv.27.2).
+/// Executes a single operation by dispatching to the appropriate generator.
 fn execute_single_operation(
-    _state: &mut ChaosMonkeyState,
-    _op_type: OperationType,
+    state: &mut ChaosMonkeyState,
+    op_type: OperationType,
 ) -> Result<(), LatticeError> {
-    Ok(())
+    super::chaos_generators::execute_operation(state, op_type)
 }
 
 /// Creates a filter that matches all documents including closed ones.
