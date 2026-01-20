@@ -23,6 +23,7 @@ mod reopen_tests;
 mod roots_tests;
 mod search_tests;
 mod show_tests;
+mod split_tests;
 mod stale_cleanup_tests;
 mod stale_tests;
 mod stats_tests;

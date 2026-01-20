@@ -17,7 +17,7 @@ use crate::cli::commands::{
     create_command, dep_command, fmt_command, generate_ids, impact_command, label_command,
     links_from, links_to, mcp_command, mv_command, orphans_command, overview_command, path_command,
     prime_command, prune_command, reopen_command, roots_command, search_command, setup_command,
-    stale_command, stats_command, track_command, tree_command, update_command,
+    split_command, stale_command, stats_command, track_command, tree_command, update_command,
 };
 use crate::cli::global_options::GlobalOptions;
 use crate::config::config_loader;
@@ -398,11 +398,9 @@ fn dispatch_command(context: CommandContext, command: Command) -> LatticeResult<
             info!("Dispatching to generate-ids command");
             generate_ids::execute(context, args)
         }
-        Command::Split(_args) => {
+        Command::Split(args) => {
             info!("Dispatching to split command");
-            Err(LatticeError::OperationNotAllowed {
-                reason: "split command not yet implemented".to_string(),
-            })
+            split_command::execute(context, args)
         }
         Command::Mv(args) => {
             info!("Dispatching to mv command");
