@@ -27,13 +27,14 @@ fn create_context_from_env(env: &TestEnv, global: &GlobalOptions) -> CommandCont
 
 fn create_task(env: &TestEnv, parent: &str, description: &str) -> String {
     let args = CreateArgs {
-        parent: parent.to_string(),
-        description: description.to_string(),
+        parent: Some(parent.to_string()),
+        description: Some(description.to_string()),
         r#type: Some(TaskType::Task),
         priority: Some(2),
         body_file: None,
         labels: Vec::new(),
         deps: None,
+        interactive: false,
     };
 
     let global = GlobalOptions::default();
@@ -251,13 +252,14 @@ fn create_succeeds_despite_ls_files_failure() {
     // Create may fail or succeed depending on whether it uses ls-files
     // The important thing is it handles the error gracefully
     let args = CreateArgs {
-        parent: "api/".to_string(),
-        description: "Task with ls-files failure".to_string(),
+        parent: Some("api/".to_string()),
+        description: Some("Task with ls-files failure".to_string()),
         r#type: Some(TaskType::Task),
         priority: Some(2),
         body_file: None,
         labels: Vec::new(),
         deps: None,
+        interactive: false,
     };
 
     let global = GlobalOptions::default();
@@ -306,13 +308,14 @@ fn operations_continue_after_failure_cleared() {
 
     // Try to create (may fail)
     let args = CreateArgs {
-        parent: "api/".to_string(),
-        description: "Task during failure".to_string(),
+        parent: Some("api/".to_string()),
+        description: Some("Task during failure".to_string()),
         r#type: Some(TaskType::Task),
         priority: Some(2),
         body_file: None,
         labels: Vec::new(),
         deps: None,
+        interactive: false,
     };
     let global = GlobalOptions::default();
     let ctx = create_context_from_env(&env, &global);

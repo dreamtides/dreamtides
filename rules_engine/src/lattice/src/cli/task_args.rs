@@ -7,10 +7,12 @@ use crate::document::frontmatter_schema::TaskType;
 #[derive(Args, Debug)]
 pub struct CreateArgs {
     /// Parent directory or explicit path.
-    pub parent: String,
+    #[arg(required_unless_present = "interactive")]
+    pub parent: Option<String>,
 
     /// Task/document description.
-    pub description: String,
+    #[arg(required_unless_present = "interactive")]
+    pub description: Option<String>,
 
     /// Task type (makes this a task instead of KB document).
     #[arg(long, short = 't', value_parser = shared_options::parse_task_type)]
@@ -31,6 +33,11 @@ pub struct CreateArgs {
     /// Dependencies specification.
     #[arg(long)]
     pub deps: Option<String>,
+
+    /// Interactive mode: prompts for parent directory and opens editor for
+    /// body.
+    #[arg(long, short = 'i')]
+    pub interactive: bool,
 }
 
 /// Arguments for `lat update`.

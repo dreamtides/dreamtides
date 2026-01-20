@@ -246,7 +246,10 @@ is auto-generated from the description (lowercase, underscores, significant
 words). The `-t` flag determines placement: tasks go to `<parent>/tasks/`,
 knowledge base documents go to `<parent>/docs/`. For root documents, specify the
 full path explicitly (e.g., `api/api.md`). Supports priority, labels, and
-dependencies for tasks.
+dependencies for tasks. Use `--interactive` (`-i`) to prompt for the parent
+directory (with tab completion) and open `$EDITOR` for writing body content;
+the description and filename are auto-generated from the body text. The last
+used parent directory is remembered for subsequent interactive calls.
 
 **lat update** - Modifies existing documents with `lat update <id> [id...]
 [options]`. Supports changing priority, type, and managing labels. To change

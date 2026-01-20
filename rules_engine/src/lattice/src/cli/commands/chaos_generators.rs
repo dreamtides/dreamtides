@@ -115,17 +115,18 @@ fn generate_create(state: &mut ChaosMonkeyState) -> Result<(), LatticeError> {
     let is_task = state.random_bool();
 
     let args = CreateArgs {
-        parent: "project".to_string(),
-        description: random_description(state),
+        parent: Some("project".to_string()),
+        description: Some(random_description(state)),
         r#type: if is_task { Some(random_task_type(state)) } else { None },
         priority: if is_task { Some(state.random_range(0, 5) as u8) } else { None },
         body_file: None,
         labels: random_labels(state),
         deps: None,
+        interactive: false,
     };
 
     info!(
-        description = args.description,
+        description = ?args.description,
         is_task,
         priority = ?args.priority,
         "Generating create operation"

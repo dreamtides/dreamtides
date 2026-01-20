@@ -16,6 +16,7 @@ pub mod edit_command;
 pub mod fmt_command;
 pub mod generate_ids;
 pub mod impact_command;
+pub mod interactive_create;
 pub mod label_command;
 pub mod link_display;
 pub mod links_from;

@@ -22,13 +22,14 @@ fn create_context_from_env(env: &TestEnv, global: &GlobalOptions) -> CommandCont
 
 fn create_task(env: &TestEnv, parent: &str, description: &str) -> String {
     let args = CreateArgs {
-        parent: parent.to_string(),
-        description: description.to_string(),
+        parent: Some(parent.to_string()),
+        description: Some(description.to_string()),
         r#type: Some(TaskType::Task),
         priority: None,
         body_file: None,
         labels: Vec::new(),
         deps: None,
+        interactive: false,
     };
 
     let global = GlobalOptions::default();
@@ -42,13 +43,14 @@ fn create_task(env: &TestEnv, parent: &str, description: &str) -> String {
 
 fn create_kb_doc(env: &TestEnv, parent: &str, description: &str) -> String {
     let args = CreateArgs {
-        parent: parent.to_string(),
-        description: description.to_string(),
+        parent: Some(parent.to_string()),
+        description: Some(description.to_string()),
         r#type: None,
         priority: None,
         body_file: None,
         labels: Vec::new(),
         deps: None,
+        interactive: false,
     };
 
     let global = GlobalOptions::default();

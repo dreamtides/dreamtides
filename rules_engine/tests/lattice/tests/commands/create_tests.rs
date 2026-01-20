@@ -21,25 +21,27 @@ fn create_context_from_env(env: &TestEnv, global: &GlobalOptions) -> CommandCont
 
 fn create_args(parent: &str, description: &str) -> CreateArgs {
     CreateArgs {
-        parent: parent.to_string(),
-        description: description.to_string(),
+        parent: Some(parent.to_string()),
+        description: Some(description.to_string()),
         r#type: None,
         priority: None,
         body_file: None,
         labels: Vec::new(),
         deps: None,
+        interactive: false,
     }
 }
 
 fn create_task_args(parent: &str, description: &str, task_type: TaskType) -> CreateArgs {
     CreateArgs {
-        parent: parent.to_string(),
-        description: description.to_string(),
+        parent: Some(parent.to_string()),
+        description: Some(description.to_string()),
         r#type: Some(task_type),
         priority: None,
         body_file: None,
         labels: Vec::new(),
         deps: None,
+        interactive: false,
     }
 }
 
@@ -172,13 +174,14 @@ fn create_with_explicit_path_uses_exact_path() {
     env.create_dir("custom");
 
     let args = CreateArgs {
-        parent: "custom/my_custom_doc.md".to_string(),
-        description: "My custom document".to_string(),
+        parent: Some("custom/my_custom_doc.md".to_string()),
+        description: Some("My custom document".to_string()),
         r#type: None,
         priority: None,
         body_file: None,
         labels: Vec::new(),
         deps: None,
+        interactive: false,
     };
     let (_temp, context) = env.into_parts();
     let result = create_command::execute(context, args);
@@ -273,13 +276,14 @@ fn create_task_with_custom_priority() {
     env.create_dir("api");
 
     let args = CreateArgs {
-        parent: "api/".to_string(),
-        description: "Urgent bug".to_string(),
+        parent: Some("api/".to_string()),
+        description: Some("Urgent bug".to_string()),
         r#type: Some(TaskType::Bug),
         priority: Some(0),
         body_file: None,
         labels: Vec::new(),
         deps: None,
+        interactive: false,
     };
     let (_temp, context) = env.into_parts();
     let result = create_command::execute(context, args);
@@ -320,13 +324,14 @@ fn create_with_labels() {
     env.create_dir("api");
 
     let args = CreateArgs {
-        parent: "api/".to_string(),
-        description: "Labeled task".to_string(),
+        parent: Some("api/".to_string()),
+        description: Some("Labeled task".to_string()),
         r#type: Some(TaskType::Task),
         priority: None,
         body_file: None,
         labels: vec!["security".to_string(), "urgent".to_string()],
         deps: None,
+        interactive: false,
     };
     let (_temp, context) = env.into_parts();
     let result = create_command::execute(context, args);
@@ -351,13 +356,14 @@ fn create_with_discovered_from() {
     env.create_dir("api");
 
     let args = CreateArgs {
-        parent: "api/".to_string(),
-        description: "Discovered task".to_string(),
+        parent: Some("api/".to_string()),
+        description: Some("Discovered task".to_string()),
         r#type: Some(TaskType::Bug),
         priority: None,
         body_file: None,
         labels: Vec::new(),
         deps: Some("discovered-from:LPARENT".to_string()),
+        interactive: false,
     };
     let (_temp, context) = env.into_parts();
     let result = create_command::execute(context, args);
@@ -377,13 +383,14 @@ fn create_with_invalid_deps_format_fails() {
     env.create_dir("api");
 
     let args = CreateArgs {
-        parent: "api/".to_string(),
-        description: "Test task".to_string(),
+        parent: Some("api/".to_string()),
+        description: Some("Test task".to_string()),
         r#type: Some(TaskType::Task),
         priority: None,
         body_file: None,
         labels: Vec::new(),
         deps: Some("invalid-format:LTEST".to_string()),
+        interactive: false,
     };
     let (_temp, context) = env.into_parts();
     let result = create_command::execute(context, args);
@@ -449,13 +456,14 @@ fn create_with_priority_without_type_fails() {
     env.create_dir("api");
 
     let args = CreateArgs {
-        parent: "api/".to_string(),
-        description: "Test document".to_string(),
+        parent: Some("api/".to_string()),
+        description: Some("Test document".to_string()),
         r#type: None,
         priority: Some(1),
         body_file: None,
         labels: Vec::new(),
         deps: None,
+        interactive: false,
     };
     let (_temp, context) = env.into_parts();
     let result = create_command::execute(context, args);
@@ -475,13 +483,14 @@ fn create_with_invalid_priority_fails() {
     env.create_dir("api");
 
     let args = CreateArgs {
-        parent: "api/".to_string(),
-        description: "Test task".to_string(),
+        parent: Some("api/".to_string()),
+        description: Some("Test task".to_string()),
         r#type: Some(TaskType::Task),
         priority: Some(5),
         body_file: None,
         labels: Vec::new(),
         deps: None,
+        interactive: false,
     };
     let (_temp, context) = env.into_parts();
     let result = create_command::execute(context, args);
@@ -501,26 +510,28 @@ fn create_at_existing_explicit_path_fails() {
     env.create_dir("docs");
 
     let args1 = CreateArgs {
-        parent: "docs/existing.md".to_string(),
-        description: "First document".to_string(),
+        parent: Some("docs/existing.md".to_string()),
+        description: Some("First document".to_string()),
         r#type: None,
         priority: None,
         body_file: None,
         labels: Vec::new(),
         deps: None,
+        interactive: false,
     };
     let context1 = create_context_from_env(&env, &GlobalOptions::default());
     let result1 = create_command::execute(context1, args1);
     assert!(result1.is_ok(), "First create should succeed: {:?}", result1);
 
     let args2 = CreateArgs {
-        parent: "docs/existing.md".to_string(),
-        description: "Second document".to_string(),
+        parent: Some("docs/existing.md".to_string()),
+        description: Some("Second document".to_string()),
         r#type: None,
         priority: None,
         body_file: None,
         labels: Vec::new(),
         deps: None,
+        interactive: false,
     };
     let context2 = create_context_from_env(&env, &GlobalOptions::default());
     let result2 = create_command::execute(context2, args2);
@@ -548,13 +559,14 @@ fn create_with_body_file() {
         .expect("Write body file");
 
     let args = CreateArgs {
-        parent: "api/".to_string(),
-        description: "Document with body".to_string(),
+        parent: Some("api/".to_string()),
+        description: Some("Document with body".to_string()),
         r#type: None,
         priority: None,
         body_file: Some(body_file_path.to_string_lossy().to_string()),
         labels: Vec::new(),
         deps: None,
+        interactive: false,
     };
     let (_temp, context) = env.into_parts();
     let result = create_command::execute(context, args);
@@ -574,13 +586,14 @@ fn create_with_nonexistent_body_file_fails() {
     env.create_dir("api/docs");
 
     let args = CreateArgs {
-        parent: "api/".to_string(),
-        description: "Test document".to_string(),
+        parent: Some("api/".to_string()),
+        description: Some("Test document".to_string()),
         r#type: None,
         priority: None,
         body_file: Some("/nonexistent/path/body.txt".to_string()),
         labels: Vec::new(),
         deps: None,
+        interactive: false,
     };
     let (_temp, context) = env.into_parts();
     let result = create_command::execute(context, args);

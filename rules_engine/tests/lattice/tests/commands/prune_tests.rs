@@ -16,13 +16,14 @@ use lattice::test::test_environment::TestEnv;
 
 fn create_task(context: &CommandContext, parent: &str, description: &str) -> String {
     let args = CreateArgs {
-        parent: parent.to_string(),
-        description: description.to_string(),
+        parent: Some(parent.to_string()),
+        description: Some(description.to_string()),
         r#type: Some(TaskType::Task),
         priority: None,
         body_file: None,
         labels: Vec::new(),
         deps: None,
+        interactive: false,
     };
 
     let global = GlobalOptions::default();

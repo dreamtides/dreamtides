@@ -8,10 +8,11 @@ use sha2::{Digest, Sha256};
 use tracing::info;
 
 use crate::cli::command_dispatch::{CommandContext, LatticeResult};
+use crate::cli::commands::interactive_create;
 use crate::cli::task_args::CreateArgs;
 use crate::document::document_writer::{self, WriteOptions};
 use crate::document::field_validation;
-use crate::document::frontmatter_schema::{DEFAULT_PRIORITY, Frontmatter};
+use crate::document::frontmatter_schema::{DEFAULT_PRIORITY, Frontmatter, TaskType};
 use crate::error::error_types::LatticeError;
 use crate::git::client_config;
 use crate::id::id_generator::INITIAL_COUNTER;
@@ -27,19 +28,53 @@ const MAX_FILENAME_LENGTH: usize = 40;
 /// Executes the `lat create` command.
 ///
 /// Creates a new document with convention-based placement and auto-generated
-/// filename.
+/// filename. Supports an interactive mode that prompts for parent directory
+/// and opens an editor for body text.
 pub fn execute(context: CommandContext, args: CreateArgs) -> LatticeResult<()> {
     info!(
-        parent = args.parent,
-        description = args.description,
+        parent = ?args.parent,
+        description = ?args.description,
         task_type = ?args.r#type,
         priority = ?args.priority,
+        interactive = args.interactive,
         "Executing create command"
     );
 
-    validate_args(&args)?;
+    let (resolved_args, body) = if args.interactive {
+        let input = interactive_create::run_interactive_prompts(&context)?;
+        let resolved = ResolvedArgs {
+            parent: input.parent,
+            description: input.description,
+            r#type: args.r#type,
+            priority: args.priority,
+            labels: args.labels.clone(),
+            deps: args.deps.clone(),
+        };
+        (resolved, input.body)
+    } else {
+        let parent = args
+            .parent
+            .clone()
+            .ok_or_else(|| LatticeError::MissingArgument { argument: "parent".to_string() })?;
+        let description = args
+            .description
+            .clone()
+            .ok_or_else(|| LatticeError::MissingArgument { argument: "description".to_string() })?;
+        let body = read_body_file(&args)?;
+        let resolved = ResolvedArgs {
+            parent,
+            description,
+            r#type: args.r#type,
+            priority: args.priority,
+            labels: args.labels.clone(),
+            deps: args.deps.clone(),
+        };
+        (resolved, body)
+    };
 
-    let file_path = resolve_file_path(&context, &args)?;
+    validate_args(&resolved_args)?;
+
+    let file_path = resolve_file_path(&context, &resolved_args)?;
     let name = field_validation::derive_name_from_path(&file_path).ok_or_else(|| {
         LatticeError::InvalidArgument {
             message: format!("Cannot derive name from path: {}", file_path.display()),
@@ -47,14 +82,13 @@ pub fn execute(context: CommandContext, args: CreateArgs) -> LatticeResult<()> {
     })?;
 
     field_validation::validate_name_only(&name)?;
-    field_validation::validate_description_only(&args.description)?;
+    field_validation::validate_description_only(&resolved_args.description)?;
 
-    let body = read_body_file(&args)?;
     let new_id = generate_new_id(&context)?;
     let parent_id = find_parent_id(&context, &file_path)?;
-    let discovered_from = parse_deps(&args.deps)?;
+    let discovered_from = parse_deps(&resolved_args.deps)?;
 
-    let frontmatter = build_frontmatter(&new_id, &name, &args, parent_id, discovered_from);
+    let frontmatter = build_frontmatter(&new_id, &name, &resolved_args, parent_id, discovered_from);
     document_writer::write_new(&frontmatter, &body, &file_path, &WriteOptions::with_parents())?;
 
     insert_into_index(&context, &frontmatter, &file_path, &body)?;
@@ -69,8 +103,18 @@ pub fn execute(context: CommandContext, args: CreateArgs) -> LatticeResult<()> {
     Ok(())
 }
 
+/// Resolved arguments after interactive prompts or command-line parsing.
+struct ResolvedArgs {
+    parent: String,
+    description: String,
+    r#type: Option<TaskType>,
+    priority: Option<u8>,
+    labels: Vec<String>,
+    deps: Option<String>,
+}
+
 /// Validates command arguments before processing.
-fn validate_args(args: &CreateArgs) -> LatticeResult<()> {
+fn validate_args(args: &ResolvedArgs) -> LatticeResult<()> {
     if let Some(priority) = args.priority {
         field_validation::validate_priority_only(priority)?;
     }
@@ -88,7 +132,7 @@ fn validate_args(args: &CreateArgs) -> LatticeResult<()> {
 ///
 /// If `parent` ends in `.md`, it's an explicit path.
 /// Otherwise, auto-place based on task type.
-fn resolve_file_path(context: &CommandContext, args: &CreateArgs) -> LatticeResult<PathBuf> {
+fn resolve_file_path(context: &CommandContext, args: &ResolvedArgs) -> LatticeResult<PathBuf> {
     let parent = &args.parent;
 
     if parent.ends_with(".md") {
@@ -303,7 +347,7 @@ fn parse_deps(deps: &Option<String>) -> LatticeResult<Vec<LatticeId>> {
 fn build_frontmatter(
     id: &LatticeId,
     name: &str,
-    args: &CreateArgs,
+    args: &ResolvedArgs,
     parent_id: Option<LatticeId>,
     discovered_from: Vec<LatticeId>,
 ) -> Frontmatter {
