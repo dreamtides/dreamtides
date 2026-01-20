@@ -6,3 +6,4 @@ pub mod doctor_output;
 pub mod doctor_types;
 pub mod git_checks;
 pub mod index_checks;
+pub mod skills_checks;

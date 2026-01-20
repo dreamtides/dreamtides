@@ -1862,3 +1862,287 @@ mod claim_checks {
         assert_eq!(claim_checks.len(), 4, "Should have exactly 4 claims checks");
     }
 }
+
+mod skills_checks {
+    use std::os::unix::fs::symlink;
+
+    use lattice::cli::commands::doctor_command::doctor_checks;
+    use lattice::cli::commands::doctor_command::doctor_types::{
+        CheckCategory, CheckStatus, DoctorConfig,
+    };
+    use lattice::index::document_queries;
+    use lattice::index::document_types::InsertDocument;
+    use lattice::test::test_environment::TestEnv;
+
+    fn find_check<'a>(
+        results: &'a [lattice::cli::commands::doctor_command::doctor_types::CheckResult],
+        category: CheckCategory,
+        name: &str,
+    ) -> Option<&'a lattice::cli::commands::doctor_command::doctor_types::CheckResult> {
+        results.iter().find(|r| r.category == category && r.name == name)
+    }
+
+    fn create_skill_document(id: &str, name: &str) -> InsertDocument {
+        InsertDocument {
+            id: id.to_string(),
+            parent_id: None,
+            path: format!("docs/{name}.md"),
+            name: name.to_string(),
+            description: format!("Test skill document {name}"),
+            task_type: None,
+            is_closed: false,
+            priority: None,
+            created_at: None,
+            updated_at: None,
+            closed_at: None,
+            body_hash: "test-hash".to_string(),
+            content_length: 100,
+            is_root: false,
+            in_tasks_dir: false,
+            in_docs_dir: true,
+            skill: true,
+        }
+    }
+
+    #[test]
+    fn no_skills_directory_returns_info() {
+        let env = TestEnv::new();
+        let (_temp, context) = env.into_parts();
+        let config = DoctorConfig::default();
+
+        let results = doctor_checks::run_all_checks(&context, &config).expect("Run checks");
+
+        let check = find_check(&results, CheckCategory::Skills, "Skills Directory")
+            .expect("Skills Directory check should be present");
+        assert_eq!(
+            check.status,
+            CheckStatus::Info,
+            "Should be Info when no .claude/skills/ directory"
+        );
+    }
+
+    #[test]
+    fn empty_skills_directory_with_no_skill_docs_returns_info() {
+        let env = TestEnv::new();
+        env.create_dir(".claude/skills");
+        let (_temp, context) = env.into_parts();
+        let config = DoctorConfig::default();
+
+        let results = doctor_checks::run_all_checks(&context, &config).expect("Run checks");
+
+        let validity_check = find_check(&results, CheckCategory::Skills, "Symlink Validity")
+            .expect("Symlink Validity check should be present");
+        assert_eq!(
+            validity_check.status,
+            CheckStatus::Info,
+            "Should be Info when no symlinks to validate"
+        );
+    }
+
+    #[test]
+    fn valid_symlinks_pass_validity_check() {
+        let env = TestEnv::new();
+        env.create_dir(".claude/skills");
+        env.create_dir("docs");
+        env.write_file(
+            "docs/test-skill.md",
+            "---\nlattice-id: LABCDE\nname: test-skill\ndescription: Test\nskill: true\n---\n\nBody",
+        );
+
+        let doc = create_skill_document("LABCDE", "test-skill");
+        document_queries::insert(env.conn(), &doc).expect("Insert skill doc");
+
+        let skills_dir = env.path(".claude/skills");
+        let target = std::path::Path::new("../../docs/test-skill.md");
+        symlink(target, skills_dir.join("test-skill.md")).expect("Create symlink");
+
+        let (_temp, context) = env.into_parts();
+        let config = DoctorConfig::default();
+
+        let results = doctor_checks::run_all_checks(&context, &config).expect("Run checks");
+
+        let check = find_check(&results, CheckCategory::Skills, "Symlink Validity")
+            .expect("Symlink Validity check should be present");
+        assert_eq!(check.status, CheckStatus::Passed, "Should pass when symlinks are valid");
+    }
+
+    #[test]
+    fn broken_symlink_returns_warning() {
+        let env = TestEnv::new();
+        env.create_dir(".claude/skills");
+
+        let skills_dir = env.path(".claude/skills");
+        let target = std::path::Path::new("../../docs/nonexistent.md");
+        symlink(target, skills_dir.join("broken-skill.md")).expect("Create symlink");
+
+        let (_temp, context) = env.into_parts();
+        let config = DoctorConfig::default();
+
+        let results = doctor_checks::run_all_checks(&context, &config).expect("Run checks");
+
+        let check = find_check(&results, CheckCategory::Skills, "Symlink Validity")
+            .expect("Symlink Validity check should be present");
+        assert_eq!(check.status, CheckStatus::Warning, "Should warn on broken symlink");
+        assert!(check.fixable, "Broken symlinks should be fixable");
+        assert!(
+            check.details.contains(&"broken-skill".to_string()),
+            "Details should contain broken symlink name: {:?}",
+            check.details
+        );
+    }
+
+    #[test]
+    fn skill_doc_without_symlink_returns_warning() {
+        let env = TestEnv::new();
+        env.create_dir(".claude/skills");
+        env.create_dir("docs");
+        env.write_file(
+            "docs/missing-link.md",
+            "---\nlattice-id: LMISSX\nname: missing-link\ndescription: Test\nskill: true\n---\n\nBody",
+        );
+
+        let doc = create_skill_document("LMISSX", "missing-link");
+        document_queries::insert(env.conn(), &doc).expect("Insert skill doc");
+
+        let (_temp, context) = env.into_parts();
+        let config = DoctorConfig::default();
+
+        let results = doctor_checks::run_all_checks(&context, &config).expect("Run checks");
+
+        let check = find_check(&results, CheckCategory::Skills, "Symlink Coverage")
+            .expect("Symlink Coverage check should be present");
+        assert_eq!(check.status, CheckStatus::Warning, "Should warn when skill doc lacks symlink");
+        assert!(check.fixable, "Missing symlinks should be fixable");
+        assert!(
+            check.details.contains(&"missing-link".to_string()),
+            "Details should contain missing symlink name: {:?}",
+            check.details
+        );
+    }
+
+    #[test]
+    fn all_skill_docs_with_symlinks_pass_coverage_check() {
+        let env = TestEnv::new();
+        env.create_dir(".claude/skills");
+        env.create_dir("docs");
+        env.write_file(
+            "docs/covered-skill.md",
+            "---\nlattice-id: LCOVRD\nname: covered-skill\ndescription: Test\nskill: true\n---\n\nBody",
+        );
+
+        let doc = create_skill_document("LCOVRD", "covered-skill");
+        document_queries::insert(env.conn(), &doc).expect("Insert skill doc");
+
+        let skills_dir = env.path(".claude/skills");
+        let target = std::path::Path::new("../../docs/covered-skill.md");
+        symlink(target, skills_dir.join("covered-skill.md")).expect("Create symlink");
+
+        let (_temp, context) = env.into_parts();
+        let config = DoctorConfig::default();
+
+        let results = doctor_checks::run_all_checks(&context, &config).expect("Run checks");
+
+        let check = find_check(&results, CheckCategory::Skills, "Symlink Coverage")
+            .expect("Symlink Coverage check should be present");
+        assert_eq!(
+            check.status,
+            CheckStatus::Passed,
+            "Should pass when all skill docs have symlinks"
+        );
+    }
+
+    #[test]
+    fn stale_symlink_returns_warning() {
+        let env = TestEnv::new();
+        env.create_dir(".claude/skills");
+        env.create_dir("docs");
+        env.create_dir("docs/new-location");
+
+        env.write_file(
+            "docs/new-location/moved-skill.md",
+            "---\nlattice-id: LMOVED\nname: moved-skill\ndescription: Test\nskill: true\n---\n\nBody",
+        );
+
+        let mut doc = create_skill_document("LMOVED", "moved-skill");
+        doc.path = "docs/new-location/moved-skill.md".to_string();
+        document_queries::insert(env.conn(), &doc).expect("Insert skill doc");
+
+        let skills_dir = env.path(".claude/skills");
+        let old_target = std::path::Path::new("../../docs/moved-skill.md");
+        std::fs::write(env.path("docs/moved-skill.md"), "old file content")
+            .expect("Create old file");
+        symlink(old_target, skills_dir.join("moved-skill.md")).expect("Create symlink to old path");
+
+        let (_temp, context) = env.into_parts();
+        let config = DoctorConfig::default();
+
+        let results = doctor_checks::run_all_checks(&context, &config).expect("Run checks");
+
+        let check = find_check(&results, CheckCategory::Skills, "Symlink Staleness")
+            .expect("Symlink Staleness check should be present");
+        assert_eq!(
+            check.status,
+            CheckStatus::Warning,
+            "Should warn when symlink points to old path"
+        );
+        assert!(check.fixable, "Stale symlinks should be fixable");
+    }
+
+    #[test]
+    fn current_symlinks_pass_staleness_check() {
+        let env = TestEnv::new();
+        env.create_dir(".claude/skills");
+        env.create_dir("docs");
+        env.write_file(
+            "docs/current-skill.md",
+            "---\nlattice-id: LCURNT\nname: current-skill\ndescription: Test\nskill: true\n---\n\nBody",
+        );
+
+        let doc = create_skill_document("LCURNT", "current-skill");
+        document_queries::insert(env.conn(), &doc).expect("Insert skill doc");
+
+        let skills_dir = env.path(".claude/skills");
+        let target = std::path::Path::new("../../docs/current-skill.md");
+        symlink(target, skills_dir.join("current-skill.md")).expect("Create symlink");
+
+        let (_temp, context) = env.into_parts();
+        let config = DoctorConfig::default();
+
+        let results = doctor_checks::run_all_checks(&context, &config).expect("Run checks");
+
+        let check = find_check(&results, CheckCategory::Skills, "Symlink Staleness")
+            .expect("Symlink Staleness check should be present");
+        assert_eq!(
+            check.status,
+            CheckStatus::Passed,
+            "Should pass when symlinks point to current paths"
+        );
+    }
+
+    #[test]
+    fn all_skills_checks_are_present() {
+        let env = TestEnv::new();
+        env.create_dir(".claude/skills");
+        let (_temp, context) = env.into_parts();
+        let config = DoctorConfig::default();
+
+        let results = doctor_checks::run_all_checks(&context, &config).expect("Run checks");
+
+        let skills_checks: Vec<_> =
+            results.iter().filter(|r| r.category == CheckCategory::Skills).collect();
+
+        assert!(
+            skills_checks.iter().any(|c| c.name == "Symlink Validity"),
+            "Should have Symlink Validity check"
+        );
+        assert!(
+            skills_checks.iter().any(|c| c.name == "Symlink Coverage"),
+            "Should have Symlink Coverage check"
+        );
+        assert!(
+            skills_checks.iter().any(|c| c.name == "Symlink Staleness"),
+            "Should have Symlink Staleness check"
+        );
+        assert_eq!(skills_checks.len(), 3, "Should have exactly 3 skills checks");
+    }
+}

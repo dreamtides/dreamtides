@@ -7,7 +7,9 @@ use crate::cli::command_dispatch::{CommandContext, LatticeResult};
 use crate::cli::commands::doctor_command::doctor_types::{
     CheckCategory, CheckResult, CheckStatus, DoctorConfig,
 };
-use crate::cli::commands::doctor_command::{claim_checks, config_checks, git_checks, index_checks};
+use crate::cli::commands::doctor_command::{
+    claim_checks, config_checks, git_checks, index_checks, skills_checks,
+};
 use crate::index::schema_definition;
 
 /// Runs all doctor checks and returns the results.
@@ -278,44 +280,5 @@ fn run_claims_checks(context: &CommandContext) -> LatticeResult<Vec<CheckResult>
 
 /// Runs skills checks.
 fn run_skills_checks(context: &CommandContext) -> LatticeResult<Vec<CheckResult>> {
-    let mut results = Vec::new();
-
-    // Check .claude/skills directory
-    let skills_dir = context.repo_root.join(".claude").join("skills");
-    if skills_dir.exists() {
-        match std::fs::read_dir(&skills_dir) {
-            Ok(entries) => {
-                let symlink_count = entries.count();
-                if symlink_count > 0 {
-                    results.push(CheckResult::passed(
-                        CheckCategory::Skills,
-                        "Symlinks",
-                        format!("{symlink_count} skill symlink(s) found"),
-                    ));
-                } else {
-                    results.push(CheckResult::info(
-                        CheckCategory::Skills,
-                        "Symlinks",
-                        "No skill symlinks",
-                    ));
-                }
-            }
-            Err(e) => {
-                warn!(?e, "Failed to read skills directory");
-                results.push(CheckResult::warning(
-                    CheckCategory::Skills,
-                    "Symlinks",
-                    format!("Cannot read .claude/skills/: {e}"),
-                ));
-            }
-        }
-    } else {
-        results.push(CheckResult::info(
-            CheckCategory::Skills,
-            "Symlinks",
-            "No .claude/skills/ directory",
-        ));
-    }
-
-    Ok(results)
+    skills_checks::run_skills_checks(context)
 }
