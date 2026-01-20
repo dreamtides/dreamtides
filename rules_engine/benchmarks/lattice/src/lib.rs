@@ -3,4 +3,5 @@
 //! Provides test repository generators for benchmarking index operations,
 //! document parsing, and query performance.
 
+pub mod document_generators;
 pub mod test_repo;

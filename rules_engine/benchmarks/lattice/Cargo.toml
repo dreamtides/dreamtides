@@ -18,6 +18,12 @@ harness = false
 test = false
 doctest = false
 
+[[bench]]
+name = "document_bench"
+harness = false
+test = false
+doctest = false
+
 [dependencies]
 lattice = { path = "../../src/lattice" }
 
