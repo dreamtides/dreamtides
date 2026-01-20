@@ -1,5 +1,6 @@
 mod blocked_tests;
 mod changes_tests;
+mod chaos_monkey_tests;
 mod check_tests;
 mod children_tests;
 mod claim_tests;

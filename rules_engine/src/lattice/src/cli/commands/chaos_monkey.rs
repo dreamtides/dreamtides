@@ -2,6 +2,7 @@
 //!
 //! Executes random sequences of operations to discover bugs by checking
 //! invariants after each operation. See appendix_chaos_monkey.md for details.
+use std::collections::HashMap;
 use std::fs;
 use std::panic::{self, AssertUnwindSafe};
 use std::path::{Path, PathBuf};
@@ -340,7 +341,7 @@ impl ChaosMonkeyState {
     /// Preserves the repository for debugging by preventing temp directory
     /// cleanup. Returns the path where the repository is preserved.
     pub fn preserve_repo(&mut self) -> Option<PathBuf> {
-        self.temp_dir.take().map(|td| td.into_path())
+        self.temp_dir.take().map(TempDir::keep)
     }
 
     /// Gets recent git log for debugging context.
@@ -662,7 +663,9 @@ fn print_operation_statistics(history: &[OperationRecord]) {
     let mut sorted_ops: Vec<_> = counts.into_iter().collect();
     sorted_ops.sort_by(|a, b| b.1.0.cmp(&a.1.0));
     for (op_type, (total, succeeded)) in sorted_ops {
-        let success_rate = if total > 0 { (succeeded * 100) / total } else { 0 };
+        #[expect(clippy::cast_precision_loss, reason = "precise percentage not required")]
+        let success_rate =
+            if total > 0 { ((succeeded as f64 / total as f64) * 100.0) as usize } else { 0 };
         println!(
             "  {}: {} ({} succeeded, {}% success rate)",
             op_type.name(),
