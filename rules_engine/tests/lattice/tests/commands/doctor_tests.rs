@@ -335,3 +335,281 @@ fn doctor_report_includes_version() {
     let report = DoctorReport::new(vec![]);
     assert!(!report.version.is_empty(), "Report should include version string");
 }
+
+// ============================================================================
+// Core System Check Integration Tests
+// ============================================================================
+
+mod core_checks {
+    use std::fs;
+
+    use lattice::cli::commands::doctor_command::doctor_checks;
+    use lattice::cli::commands::doctor_command::doctor_types::{
+        CheckCategory, CheckStatus, DoctorConfig,
+    };
+    use lattice::test::test_environment::TestEnv;
+
+    fn find_check<'a>(
+        results: &'a [lattice::cli::commands::doctor_command::doctor_types::CheckResult],
+        category: CheckCategory,
+        name: &str,
+    ) -> Option<&'a lattice::cli::commands::doctor_command::doctor_types::CheckResult> {
+        results.iter().find(|r| r.category == category && r.name == name)
+    }
+
+    #[test]
+    fn installation_check_passes_with_lattice_directory() {
+        let env = TestEnv::new();
+        let (_temp, context) = env.into_parts();
+        let config = DoctorConfig::default();
+
+        let results = doctor_checks::run_all_checks(&context, &config).expect("Run checks");
+
+        let check = find_check(&results, CheckCategory::Core, "Installation")
+            .expect("Installation check should be present");
+        assert_eq!(
+            check.status,
+            CheckStatus::Passed,
+            "Installation check should pass when .lattice/ exists"
+        );
+        assert!(check.message.contains(".lattice/"), "Message should mention .lattice/ directory");
+    }
+
+    #[test]
+    fn installation_check_fails_without_lattice_directory() {
+        let env = TestEnv::new();
+        let (_temp, context) = env.into_parts();
+
+        fs::remove_dir_all(context.repo_root.join(".lattice")).expect("Remove .lattice dir");
+
+        let config = DoctorConfig::default();
+        let results = doctor_checks::run_all_checks(&context, &config).expect("Run checks");
+
+        let check = find_check(&results, CheckCategory::Core, "Installation")
+            .expect("Installation check should be present");
+        assert_eq!(
+            check.status,
+            CheckStatus::Error,
+            "Installation check should fail when .lattice/ is missing"
+        );
+    }
+
+    #[test]
+    fn index_check_passes_and_reports_document_count() {
+        let env = TestEnv::new();
+        env.create_dir("api/tasks");
+        env.create_document("api/api.md", "LAPIXX", "api", "API root");
+        let (_temp, context) = env.into_parts();
+
+        lattice::index::document_queries::insert(
+            &context.conn,
+            &lattice::index::document_types::InsertDocument {
+                id: "LAPIXX".to_string(),
+                parent_id: None,
+                path: "api/api.md".to_string(),
+                name: "api".to_string(),
+                description: "API root".to_string(),
+                task_type: None,
+                is_closed: false,
+                priority: None,
+                created_at: None,
+                updated_at: None,
+                closed_at: None,
+                body_hash: "hash123".to_string(),
+                content_length: 100,
+                is_root: true,
+                in_tasks_dir: false,
+                in_docs_dir: false,
+            },
+        )
+        .expect("Insert document");
+
+        let config = DoctorConfig::default();
+        let results = doctor_checks::run_all_checks(&context, &config).expect("Run checks");
+
+        let check = find_check(&results, CheckCategory::Core, "Index Database")
+            .expect("Index check should be present");
+        assert_eq!(check.status, CheckStatus::Passed, "Index check should pass");
+        assert!(
+            check.message.contains("1 documents"),
+            "Message should include document count: {}",
+            check.message
+        );
+    }
+
+    #[test]
+    fn index_check_fails_without_index_file() {
+        let env = TestEnv::new();
+        let (_temp, context) = env.into_parts();
+
+        fs::remove_file(context.repo_root.join(".lattice/index.sqlite"))
+            .expect("Remove index file");
+
+        let config = DoctorConfig::default();
+        let results = doctor_checks::run_all_checks(&context, &config).expect("Run checks");
+
+        let check = find_check(&results, CheckCategory::Core, "Index Database")
+            .expect("Index check should be present");
+        assert_eq!(
+            check.status,
+            CheckStatus::Error,
+            "Index check should fail when index.sqlite is missing"
+        );
+        assert!(check.fixable, "Missing index should be fixable");
+    }
+
+    #[test]
+    fn schema_version_check_passes_with_current_version() {
+        let env = TestEnv::new();
+        let (_temp, context) = env.into_parts();
+        let config = DoctorConfig::default();
+
+        let results = doctor_checks::run_all_checks(&context, &config).expect("Run checks");
+
+        let check = find_check(&results, CheckCategory::Core, "Schema Version")
+            .expect("Schema version check should be present");
+        assert_eq!(
+            check.status,
+            CheckStatus::Passed,
+            "Schema version check should pass with current version"
+        );
+        assert!(
+            check.message.contains("current"),
+            "Message should indicate version is current: {}",
+            check.message
+        );
+    }
+
+    #[test]
+    fn schema_version_check_warns_on_mismatch() {
+        let env = TestEnv::new();
+        let (_temp, context) = env.into_parts();
+
+        context
+            .conn
+            .execute("UPDATE index_metadata SET schema_version = 999 WHERE id = 1", [])
+            .expect("Set outdated schema version");
+
+        let config = DoctorConfig::default();
+        let results = doctor_checks::run_all_checks(&context, &config).expect("Run checks");
+
+        let check = find_check(&results, CheckCategory::Core, "Schema Version")
+            .expect("Schema version check should be present");
+        assert_eq!(
+            check.status,
+            CheckStatus::Warning,
+            "Schema version check should warn on mismatch"
+        );
+        assert!(check.fixable, "Schema mismatch should be fixable");
+        assert!(
+            check.message.contains("999"),
+            "Message should include old version: {}",
+            check.message
+        );
+    }
+
+    #[test]
+    fn wal_health_check_passes_with_no_wal_files() {
+        let env = TestEnv::new();
+        let (_temp, context) = env.into_parts();
+        let config = DoctorConfig::default();
+
+        let wal_path = context.repo_root.join(".lattice/index.sqlite-wal");
+        let shm_path = context.repo_root.join(".lattice/index.sqlite-shm");
+        if wal_path.exists() {
+            fs::remove_file(&wal_path).ok();
+        }
+        if shm_path.exists() {
+            fs::remove_file(&shm_path).ok();
+        }
+
+        let results = doctor_checks::run_all_checks(&context, &config).expect("Run checks");
+
+        let check = find_check(&results, CheckCategory::Core, "WAL Health")
+            .expect("WAL health check should be present");
+        assert_eq!(check.status, CheckStatus::Passed, "WAL health should pass with no WAL files");
+        assert!(
+            check.message.contains("clean state"),
+            "Message should indicate clean state: {}",
+            check.message
+        );
+    }
+
+    #[test]
+    fn wal_health_check_detects_orphan_wal_without_shm() {
+        let env = TestEnv::new();
+        let (_temp, context) = env.into_parts();
+
+        let wal_path = context.repo_root.join(".lattice/index.sqlite-wal");
+        let shm_path = context.repo_root.join(".lattice/index.sqlite-shm");
+
+        fs::write(&wal_path, vec![0u8; 4096]).expect("Create WAL file");
+        if shm_path.exists() {
+            fs::remove_file(&shm_path).expect("Remove SHM file");
+        }
+
+        let config = DoctorConfig::default();
+        let results = doctor_checks::run_all_checks(&context, &config).expect("Run checks");
+
+        let check = find_check(&results, CheckCategory::Core, "WAL Health")
+            .expect("WAL health check should be present");
+        assert_eq!(check.status, CheckStatus::Error, "WAL health should fail with orphan WAL file");
+        assert!(check.fixable, "WAL corruption should be fixable");
+        assert!(
+            check.details.iter().any(|d| d.contains("without SHM")),
+            "Details should mention missing SHM: {:?}",
+            check.details
+        );
+    }
+
+    #[test]
+    fn wal_health_check_detects_empty_wal_file() {
+        let env = TestEnv::new();
+        let (_temp, context) = env.into_parts();
+
+        let wal_path = context.repo_root.join(".lattice/index.sqlite-wal");
+        let shm_path = context.repo_root.join(".lattice/index.sqlite-shm");
+
+        fs::write(&wal_path, "").expect("Create empty WAL file");
+        fs::write(&shm_path, vec![0u8; 32768]).expect("Create SHM file");
+
+        let config = DoctorConfig::default();
+        let results = doctor_checks::run_all_checks(&context, &config).expect("Run checks");
+
+        let check = find_check(&results, CheckCategory::Core, "WAL Health")
+            .expect("WAL health check should be present");
+        assert_eq!(check.status, CheckStatus::Error, "WAL health should fail with empty WAL file");
+        assert!(
+            check.details.iter().any(|d| d.contains("empty")),
+            "Details should mention empty file: {:?}",
+            check.details
+        );
+    }
+
+    #[test]
+    fn all_core_checks_are_present() {
+        let env = TestEnv::new();
+        let (_temp, context) = env.into_parts();
+        let config = DoctorConfig::default();
+
+        let results = doctor_checks::run_all_checks(&context, &config).expect("Run checks");
+
+        let core_checks: Vec<_> =
+            results.iter().filter(|r| r.category == CheckCategory::Core).collect();
+
+        assert!(
+            core_checks.iter().any(|c| c.name == "Installation"),
+            "Should have Installation check"
+        );
+        assert!(
+            core_checks.iter().any(|c| c.name == "Index Database"),
+            "Should have Index Database check"
+        );
+        assert!(
+            core_checks.iter().any(|c| c.name == "Schema Version"),
+            "Should have Schema Version check"
+        );
+        assert!(core_checks.iter().any(|c| c.name == "WAL Health"), "Should have WAL Health check");
+        assert_eq!(core_checks.len(), 4, "Should have exactly 4 core checks");
+    }
+}
