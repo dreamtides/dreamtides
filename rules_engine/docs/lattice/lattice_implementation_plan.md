@@ -1252,7 +1252,7 @@ populates the table during index reconciliation.
 
 ---
 
-## Feature: Skill Integration
+## Feature: Skill Integration [ONGOING]
 
 **Goal:** Claude Code skill symlinks.
 
@@ -1280,7 +1280,7 @@ Design: Skill Integration](lattice_design.md#skill-integration)
 
 ---
 
-## Feature: Doctor Command
+## Feature: Doctor Command [ONGOING]
 
 **Goal:** System health diagnostics and auto-fix.
 
@@ -1367,7 +1367,7 @@ Implement fixes from [Appendix: Doctor Command - Fixable Issues](appendix_doctor
 
 ---
 
-## Feature: Shell Completions
+## Feature: Shell Completions [ONGOING]
 
 **Goal:** Generate shell completion scripts.
 
@@ -1461,7 +1461,7 @@ Tests for edge cases in Foundation, Git Layer, and Document Model:
 
 ---
 
-## Feature: Benchmarking
+## Feature: Benchmarking [ONGOING]
 
 **Goal:** Performance measurement with Criterion.
 
@@ -1497,7 +1497,7 @@ Tests for edge cases in Foundation, Git Layer, and Document Model:
 
 ---
 
-## Feature: Chaos Monkey
+## Feature: Chaos Monkey [ONGOING]
 
 **Goal:** Fuzz testing for robustness.
 
