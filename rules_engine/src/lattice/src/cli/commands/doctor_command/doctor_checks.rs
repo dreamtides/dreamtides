@@ -7,7 +7,7 @@ use crate::cli::command_dispatch::{CommandContext, LatticeResult};
 use crate::cli::commands::doctor_command::doctor_types::{
     CheckCategory, CheckResult, CheckStatus, DoctorConfig,
 };
-use crate::cli::commands::doctor_command::index_checks;
+use crate::cli::commands::doctor_command::{git_checks, index_checks};
 use crate::index::schema_definition;
 
 /// Runs all doctor checks and returns the results.
@@ -263,17 +263,7 @@ fn run_index_checks(
 
 /// Runs git integration checks.
 fn run_git_checks(context: &CommandContext) -> LatticeResult<Vec<CheckResult>> {
-    let mut results = Vec::new();
-
-    // Check if we're in a git repository
-    let git_dir = context.repo_root.join(".git");
-    if git_dir.exists() {
-        results.push(CheckResult::passed(CheckCategory::Git, "Repository", "Valid git repository"));
-    } else {
-        results.push(CheckResult::error(CheckCategory::Git, "Repository", "Not a git repository"));
-    }
-
-    Ok(results)
+    git_checks::run_git_checks(context)
 }
 
 /// Runs configuration checks.

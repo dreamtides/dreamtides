@@ -329,6 +329,15 @@ impl FakeGit {
 
     /// Resolves a ref (branch name, tag, or commit hash) to a commit hash.
     fn resolve_ref(&self, git_ref: &str) -> Option<String> {
+        // Handle --abbrev-ref HEAD: returns branch name or "HEAD" if detached
+        if git_ref == "--abbrev-ref HEAD" {
+            let head = self.head.lock().unwrap_or_else(PoisonError::into_inner);
+            return match &*head {
+                HeadState::Branch(branch) => Some(branch.clone()),
+                HeadState::Detached(_) => Some("HEAD".to_string()),
+            };
+        }
+
         // Check for HEAD
         if git_ref == "HEAD" {
             return Some(self.resolve_head_commit());

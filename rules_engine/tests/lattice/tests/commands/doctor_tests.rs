@@ -1103,3 +1103,213 @@ mod index_checks {
         assert_eq!(index_checks.len(), 6, "Should have exactly 6 index integrity checks");
     }
 }
+
+mod git_checks {
+    use lattice::cli::commands::doctor_command::doctor_checks;
+    use lattice::cli::commands::doctor_command::doctor_types::{
+        CheckCategory, CheckStatus, DoctorConfig,
+    };
+    use lattice::test::test_environment::TestEnv;
+
+    fn find_check<'a>(
+        results: &'a [lattice::cli::commands::doctor_command::doctor_types::CheckResult],
+        category: CheckCategory,
+        name: &str,
+    ) -> Option<&'a lattice::cli::commands::doctor_command::doctor_types::CheckResult> {
+        results.iter().find(|r| r.category == category && r.name == name)
+    }
+
+    #[test]
+    fn repository_check_passes_for_valid_git_repo() {
+        let env = TestEnv::new();
+        // Add a commit so rev_parse("HEAD") works
+        env.fake_git().add_commit("abc123", "Initial commit", vec![]);
+        let (_temp, context) = env.into_parts();
+        let config = DoctorConfig::default();
+
+        let results = doctor_checks::run_all_checks(&context, &config).expect("Run checks");
+
+        let check = find_check(&results, CheckCategory::Git, "Repository")
+            .expect("Repository check should be present");
+        assert_eq!(
+            check.status,
+            CheckStatus::Passed,
+            "Repository check should pass for valid git repo"
+        );
+        assert!(
+            check.message.contains("Valid"),
+            "Message should indicate valid repository: {}",
+            check.message
+        );
+    }
+
+    #[test]
+    fn repository_check_fails_when_rev_parse_fails() {
+        use lattice::test::fake_git::FailingOperation;
+
+        let env = TestEnv::new();
+        // Inject failure for rev_parse to simulate invalid git repository
+        env.fake_git().inject_failure(FailingOperation::RevParse, "not a git repository");
+        let (_temp, context) = env.into_parts();
+        let config = DoctorConfig::default();
+
+        let results = doctor_checks::run_all_checks(&context, &config).expect("Run checks");
+
+        let check = find_check(&results, CheckCategory::Git, "Repository")
+            .expect("Repository check should be present");
+        assert_eq!(
+            check.status,
+            CheckStatus::Error,
+            "Repository check should fail when HEAD cannot be resolved"
+        );
+    }
+
+    #[test]
+    fn configuration_check_passes_with_standard_repo() {
+        let env = TestEnv::new();
+        env.fake_git().add_commit("abc123", "Initial commit", vec![]);
+        let (_temp, context) = env.into_parts();
+        let config = DoctorConfig::default();
+
+        let results = doctor_checks::run_all_checks(&context, &config).expect("Run checks");
+
+        let check = find_check(&results, CheckCategory::Git, "Configuration")
+            .expect("Configuration check should be present");
+        assert_eq!(
+            check.status,
+            CheckStatus::Passed,
+            "Configuration check should pass for standard repo"
+        );
+        assert!(
+            check.message.contains("Standard") || check.message.contains("no edge cases"),
+            "Message should indicate standard config: {}",
+            check.message
+        );
+    }
+
+    #[test]
+    fn working_tree_check_passes_with_clean_state() {
+        let env = TestEnv::new();
+        env.fake_git().add_commit("abc123", "Initial commit", vec![]);
+        let (_temp, context) = env.into_parts();
+        let config = DoctorConfig::default();
+
+        let results = doctor_checks::run_all_checks(&context, &config).expect("Run checks");
+
+        let check = find_check(&results, CheckCategory::Git, "Working Tree")
+            .expect("Working Tree check should be present");
+        assert_eq!(
+            check.status,
+            CheckStatus::Passed,
+            "Working Tree check should pass with clean state"
+        );
+        assert!(
+            check.message.contains("Clean") || check.message.contains("no in-progress"),
+            "Message should indicate clean state: {}",
+            check.message
+        );
+    }
+
+    #[test]
+    fn head_state_check_passes_when_on_branch() {
+        let env = TestEnv::new();
+        env.fake_git().add_commit("abc123", "Initial commit", vec![]);
+        // FakeGit defaults to being on 'main' branch
+        let (_temp, context) = env.into_parts();
+        let config = DoctorConfig::default();
+
+        let results = doctor_checks::run_all_checks(&context, &config).expect("Run checks");
+
+        let check = find_check(&results, CheckCategory::Git, "HEAD State")
+            .expect("HEAD State check should be present");
+        assert_eq!(
+            check.status,
+            CheckStatus::Passed,
+            "HEAD State check should pass when on a branch"
+        );
+        assert!(
+            check.message.contains("branch"),
+            "Message should mention branch: {}",
+            check.message
+        );
+    }
+
+    #[test]
+    fn head_state_check_reports_detached_head() {
+        let env = TestEnv::new();
+        env.fake_git().add_commit("abc123def456", "Initial commit", vec![]);
+        env.fake_git().detach_head("abc123def456");
+        let (_temp, context) = env.into_parts();
+        let config = DoctorConfig::default();
+
+        let results = doctor_checks::run_all_checks(&context, &config).expect("Run checks");
+
+        let check = find_check(&results, CheckCategory::Git, "HEAD State")
+            .expect("HEAD State check should be present");
+        assert_eq!(
+            check.status,
+            CheckStatus::Info,
+            "HEAD State check should be Info for detached HEAD"
+        );
+        assert!(
+            check.message.to_lowercase().contains("detached"),
+            "Message should mention detached: {}",
+            check.message
+        );
+    }
+
+    #[test]
+    fn working_tree_check_warns_on_in_progress_merge() {
+        use std::fs;
+
+        let env = TestEnv::new();
+        env.fake_git().add_commit("abc123", "Initial commit", vec![]);
+
+        // Create MERGE_HEAD file to simulate in-progress merge
+        let merge_head_path = env.repo_root().join(".git").join("MERGE_HEAD");
+        fs::write(&merge_head_path, "deadbeef1234567890").expect("Create MERGE_HEAD");
+
+        let (_temp, context) = env.into_parts();
+        let config = DoctorConfig::default();
+
+        let results = doctor_checks::run_all_checks(&context, &config).expect("Run checks");
+
+        let check = find_check(&results, CheckCategory::Git, "Working Tree")
+            .expect("Working Tree check should be present");
+        assert_eq!(
+            check.status,
+            CheckStatus::Warning,
+            "Working Tree check should warn when merge is in progress"
+        );
+        assert!(
+            check.message.to_lowercase().contains("merge"),
+            "Message should mention merge: {}",
+            check.message
+        );
+    }
+
+    #[test]
+    fn all_git_checks_are_present() {
+        let env = TestEnv::new();
+        env.fake_git().add_commit("abc123", "Initial commit", vec![]);
+        let (_temp, context) = env.into_parts();
+        let config = DoctorConfig::default();
+
+        let results = doctor_checks::run_all_checks(&context, &config).expect("Run checks");
+
+        let git_checks: Vec<_> =
+            results.iter().filter(|r| r.category == CheckCategory::Git).collect();
+
+        assert!(git_checks.iter().any(|c| c.name == "Repository"), "Should have Repository check");
+        assert!(
+            git_checks.iter().any(|c| c.name == "Configuration"),
+            "Should have Configuration check"
+        );
+        assert!(
+            git_checks.iter().any(|c| c.name == "Working Tree"),
+            "Should have Working Tree check"
+        );
+        assert!(git_checks.iter().any(|c| c.name == "HEAD State"), "Should have HEAD State check");
+        assert_eq!(git_checks.len(), 4, "Should have exactly 4 git integration checks");
+    }
+}
