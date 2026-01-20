@@ -90,7 +90,24 @@ pub enum SetupCommand {
 #[derive(Args, Debug)]
 pub struct CompletionArgs {
     /// Shell to generate completions for.
-    pub shell: Shell,
+    ///
+    /// Required unless --ids is specified.
+    pub shell: Option<Shell>,
+
+    /// Output Lattice IDs for dynamic completion.
+    ///
+    /// When specified, outputs matching Lattice IDs (one per line) instead of
+    /// generating a shell completion script. Used by shell completion scripts
+    /// for dynamic ID completion.
+    #[arg(long, hide = true)]
+    pub ids: bool,
+
+    /// Optional prefix to filter IDs.
+    ///
+    /// Only used with --ids. When specified, only IDs starting with this prefix
+    /// are returned.
+    #[arg(long, hide = true)]
+    pub prefix: Option<String>,
 }
 
 /// Arguments for `lat chaosmonkey`.

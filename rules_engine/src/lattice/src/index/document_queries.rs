@@ -459,3 +459,50 @@ pub fn all_paths(conn: &Connection) -> Result<Vec<String>, LatticeError> {
 
     Ok(rows)
 }
+
+/// Returns document IDs matching the given prefix, limited to a maximum count.
+///
+/// Used for shell completion to provide dynamic ID suggestions. Returns IDs
+/// sorted alphabetically for consistent ordering.
+pub fn ids_by_prefix(
+    conn: &Connection,
+    prefix: Option<&str>,
+    limit: usize,
+) -> Result<Vec<String>, LatticeError> {
+    debug!(prefix = prefix, limit, "Querying IDs by prefix");
+
+    let rows = if let Some(p) = prefix.filter(|s| !s.is_empty()) {
+        let pattern = format!("{p}%");
+        let mut stmt = conn
+            .prepare("SELECT id FROM documents WHERE id LIKE ?1 ORDER BY id LIMIT ?2")
+            .map_err(|e| LatticeError::DatabaseError {
+                reason: format!("Failed to prepare ids_by_prefix query: {e}"),
+            })?;
+        stmt.query_map(params![pattern, limit as i64], |row| row.get(0))
+            .map_err(|e| LatticeError::DatabaseError {
+                reason: format!("Failed to query IDs by prefix: {e}"),
+            })?
+            .collect::<Result<Vec<String>, _>>()
+            .map_err(|e| LatticeError::DatabaseError {
+                reason: format!("Failed to collect IDs: {e}"),
+            })?
+    } else {
+        let mut stmt =
+            conn.prepare("SELECT id FROM documents ORDER BY id LIMIT ?1").map_err(|e| {
+                LatticeError::DatabaseError {
+                    reason: format!("Failed to prepare ids_by_prefix query: {e}"),
+                }
+            })?;
+        stmt.query_map(params![limit as i64], |row| row.get(0))
+            .map_err(|e| LatticeError::DatabaseError {
+                reason: format!("Failed to query all IDs: {e}"),
+            })?
+            .collect::<Result<Vec<String>, _>>()
+            .map_err(|e| LatticeError::DatabaseError {
+                reason: format!("Failed to collect IDs: {e}"),
+            })?
+    };
+
+    debug!(count = rows.len(), "IDs returned for completion");
+    Ok(rows)
+}

@@ -430,7 +430,8 @@ fn dispatch_command(context: CommandContext, command: Command) -> LatticeResult<
         }
         Command::Completion(args) => {
             info!("Dispatching to completion command");
-            completion_command::execute(args)
+            let conn = if args.ids { Some(&context.conn) } else { None };
+            completion_command::execute(args, conn)
         }
         Command::ChaosMonkey(args) => {
             info!("Dispatching to chaosmonkey command");
