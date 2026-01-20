@@ -17,6 +17,7 @@ mod mv_tests;
 mod orphans_tests;
 mod overview_tests;
 mod path_tests;
+mod prime_tests;
 mod prune_tests;
 mod ready_tests;
 mod reopen_tests;
