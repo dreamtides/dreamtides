@@ -92,7 +92,8 @@ implementation of the `GitOps` trait, and custom assertions.
 tests/lattice/
 ├── commands/
 ├── index/
-└── integration/
+├── integration/
+└── skill/
 ```
 
 **commands/** - Per-command tests (create, show, list, etc.)
@@ -100,6 +101,8 @@ tests/lattice/
 **index/** - Reconciliation and query tests
 
 **integration/** - Multi-command workflow tests
+
+**skill/** - Skill validation and symlink management tests
 
 ## Runtime Directory Structure
 
@@ -433,11 +436,16 @@ tests/lattice/
 │   ├── reconciliation_tests.rs
 │   ├── query_tests.rs
 │   └── fts_tests.rs
-└── integration/
+├── integration/
+│   ├── mod.rs                 # Module declarations only
+│   ├── workflow_tests.rs      # Multi-command sequences
+│   ├── git_edge_tests.rs      # Shallow clones, worktrees, etc.
+│   └── template_tests.rs      # Template composition workflows
+└── skill/
     ├── mod.rs                 # Module declarations only
-    ├── workflow_tests.rs      # Multi-command sequences
-    ├── git_edge_tests.rs      # Shallow clones, worktrees, etc.
-    └── template_tests.rs      # Template composition workflows
+    ├── skill_validation_tests.rs  # Validation function tests
+    ├── skill_integration_tests.rs # End-to-end workflow tests
+    └── symlink_manager_tests.rs   # Symlink creation and management tests
 ```
 
 ## Implementation Guidance

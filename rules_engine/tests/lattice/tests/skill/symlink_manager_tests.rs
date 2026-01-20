@@ -365,3 +365,181 @@ fn sync_result_default_is_all_zeros() {
     assert_eq!(result.removed, 0);
     assert_eq!(result.orphans_cleaned, 0);
 }
+
+// =============================================================================
+// Concurrency and race condition tests
+// =============================================================================
+
+#[test]
+fn sync_symlinks_handles_concurrent_sync_operations() {
+    // Simulates two lat processes trying to sync at the same time.
+    // Both should succeed without corrupting the symlink state.
+    let temp_dir = setup_temp_repo();
+    let conn1 = create_test_db();
+    let conn2 = create_test_db();
+
+    // Create document file
+    fs::write(temp_dir.path().join("docs/skill.md"), "# Skill").expect("write");
+
+    // Insert same skill document into both connections
+    let doc = create_skill_document("LSKILL", "docs/skill.md", "skill");
+    document_queries::insert(&conn1, &doc).expect("insert into conn1");
+    document_queries::insert(&conn2, &doc).expect("insert into conn2");
+
+    // Run sync from both "processes" - both should succeed
+    let result1 = sync_symlinks(&conn1, temp_dir.path()).expect("first sync should succeed");
+    let result2 = sync_symlinks(&conn2, temp_dir.path()).expect("second sync should succeed");
+
+    // First sync creates, second finds it unchanged
+    assert_eq!(result1.created, 1, "First sync should create the symlink");
+    assert_eq!(result2.created, 0, "Second sync should find symlink already exists");
+    assert_eq!(result2.updated, 0, "Second sync should not need to update");
+
+    // Symlink should exist and point to correct target
+    let symlink_path = temp_dir.path().join(".claude/skills/skill.md");
+    assert!(symlink_path.is_symlink(), "Symlink should exist after concurrent syncs");
+}
+
+#[test]
+fn sync_symlinks_handles_file_deleted_between_query_and_sync() {
+    // Simulates race condition where document file is deleted after
+    // querying the index but before creating the symlink.
+    let temp_dir = setup_temp_repo();
+    let conn = create_test_db();
+
+    // Create document file
+    let doc_path = temp_dir.path().join("docs/skill.md");
+    fs::write(&doc_path, "# Skill").expect("write");
+
+    // Insert skill document into index
+    let doc = create_skill_document("LSKILL", "docs/skill.md", "skill");
+    document_queries::insert(&conn, &doc).expect("insert");
+
+    // Delete the file to simulate race condition
+    fs::remove_file(&doc_path).expect("delete file");
+
+    // Sync should still succeed (symlink will be created but point to non-existent
+    // file)
+    let result = sync_symlinks(&conn, temp_dir.path()).expect("sync should succeed");
+
+    // The symlink is created but points to a non-existent file
+    // The cleanup_orphaned_symlinks phase will then clean it up
+    // This verifies the sync doesn't panic when the file is missing
+    assert!(
+        result.created == 1 || result.orphans_cleaned >= 1,
+        "Should either create symlink or clean orphan"
+    );
+}
+
+#[test]
+fn sync_symlinks_handles_skill_flag_removed_between_syncs() {
+    // Simulates race condition where skill flag is removed after first sync
+    // but before second sync starts.
+    let temp_dir = setup_temp_repo();
+    let conn = create_test_db();
+
+    // Create document file and insert as skill
+    fs::write(temp_dir.path().join("docs/skill.md"), "# Skill").expect("write");
+    let doc = create_skill_document("LSKILL", "docs/skill.md", "skill");
+    document_queries::insert(&conn, &doc).expect("insert");
+
+    // First sync creates symlink
+    let result1 = sync_symlinks(&conn, temp_dir.path()).expect("first sync");
+    assert_eq!(result1.created, 1);
+
+    // Simulate removing skill flag: delete document and reinsert without skill
+    document_queries::delete_by_id(&conn, "LSKILL").expect("delete");
+    let non_skill_doc = create_non_skill_document("LSKILL", "docs/skill.md", "skill");
+    document_queries::insert(&conn, &non_skill_doc).expect("reinsert as non-skill");
+
+    // Second sync should remove the now-stale symlink
+    let result2 = sync_symlinks(&conn, temp_dir.path()).expect("second sync");
+    assert_eq!(result2.removed, 1, "Should remove symlink when skill flag is removed");
+
+    let symlink_path = temp_dir.path().join(".claude/skills/skill.md");
+    assert!(!symlink_path.exists(), "Symlink should be removed");
+}
+
+#[test]
+fn sync_symlinks_handles_document_moved_between_syncs() {
+    // Simulates race condition where document is moved to new path
+    // between two sync operations.
+    let temp_dir = setup_temp_repo();
+    let conn = create_test_db();
+
+    // Create initial document
+    fs::create_dir_all(temp_dir.path().join("old")).expect("create old dir");
+    fs::write(temp_dir.path().join("old/skill.md"), "# Skill").expect("write");
+    let doc = create_skill_document("LSKILL", "old/skill.md", "skill");
+    document_queries::insert(&conn, &doc).expect("insert");
+
+    // First sync
+    let result1 = sync_symlinks(&conn, temp_dir.path()).expect("first sync");
+    assert_eq!(result1.created, 1);
+
+    // Simulate document move: delete and reinsert with new path
+    document_queries::delete_by_id(&conn, "LSKILL").expect("delete");
+    fs::create_dir_all(temp_dir.path().join("new")).expect("create new dir");
+    fs::write(temp_dir.path().join("new/skill.md"), "# Skill").expect("write new");
+    let moved_doc = create_skill_document("LSKILL", "new/skill.md", "skill");
+    document_queries::insert(&conn, &moved_doc).expect("reinsert with new path");
+
+    // Second sync should update symlink to point to new location
+    let result2 = sync_symlinks(&conn, temp_dir.path()).expect("second sync");
+    assert_eq!(result2.updated, 1, "Should update symlink to new path");
+
+    let symlink_path = temp_dir.path().join(".claude/skills/skill.md");
+    let target = fs::read_link(&symlink_path).expect("read symlink");
+    assert!(
+        target.to_string_lossy().contains("new/skill.md"),
+        "Symlink should point to new location"
+    );
+}
+
+#[test]
+fn sync_symlinks_handles_symlink_manually_deleted_between_syncs() {
+    // Simulates external process deleting symlink between sync operations.
+    let temp_dir = setup_temp_repo();
+    let conn = create_test_db();
+
+    // Create document and sync
+    fs::write(temp_dir.path().join("docs/skill.md"), "# Skill").expect("write");
+    let doc = create_skill_document("LSKILL", "docs/skill.md", "skill");
+    document_queries::insert(&conn, &doc).expect("insert");
+
+    let result1 = sync_symlinks(&conn, temp_dir.path()).expect("first sync");
+    assert_eq!(result1.created, 1);
+
+    // Manually delete the symlink (simulating external process)
+    let symlink_path = temp_dir.path().join(".claude/skills/skill.md");
+    fs::remove_file(&symlink_path).expect("manually delete symlink");
+
+    // Second sync should recreate the symlink
+    let result2 = sync_symlinks(&conn, temp_dir.path()).expect("second sync");
+    assert_eq!(result2.created, 1, "Should recreate manually deleted symlink");
+    assert!(symlink_path.is_symlink(), "Symlink should be recreated");
+}
+
+#[test]
+fn sync_symlinks_handles_skills_dir_deleted_between_syncs() {
+    // Simulates .claude/skills directory being deleted externally.
+    let temp_dir = setup_temp_repo();
+    let conn = create_test_db();
+
+    // Create document and sync
+    fs::write(temp_dir.path().join("docs/skill.md"), "# Skill").expect("write");
+    let doc = create_skill_document("LSKILL", "docs/skill.md", "skill");
+    document_queries::insert(&conn, &doc).expect("insert");
+
+    let result1 = sync_symlinks(&conn, temp_dir.path()).expect("first sync");
+    assert_eq!(result1.created, 1);
+
+    // Delete the entire skills directory
+    let skills_dir = temp_dir.path().join(".claude/skills");
+    fs::remove_dir_all(&skills_dir).expect("delete skills dir");
+
+    // Second sync should recreate directory and symlink
+    let result2 = sync_symlinks(&conn, temp_dir.path()).expect("second sync");
+    assert_eq!(result2.created, 1, "Should recreate symlink after directory deleted");
+    assert!(skills_dir.exists(), "Skills directory should be recreated");
+}

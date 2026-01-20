@@ -45,6 +45,20 @@ fn check_reserved_words_allows_partial_match() {
     assert!(result.is_none(), "Should not match partial word 'cloud' vs 'claude'");
 }
 
+#[test]
+fn check_reserved_words_detects_embedded_claude() {
+    let result = check_reserved_words("my-claude-powered-tool");
+    assert!(result.is_some(), "Should detect 'claude' embedded in string");
+    assert_eq!(result.unwrap().code, "S001");
+}
+
+#[test]
+fn check_reserved_words_detects_mixed_case_anthropic() {
+    let result = check_reserved_words("AnThRoPiC-sdk");
+    assert!(result.is_some(), "Should detect mixed case 'anthropic'");
+    assert_eq!(result.unwrap().code, "S001");
+}
+
 // =============================================================================
 // check_description_empty (S002)
 // =============================================================================
@@ -69,6 +83,26 @@ fn check_description_empty_detects_whitespace_only() {
 fn check_description_empty_allows_valid_description() {
     let result = check_description_empty("A valid description");
     assert!(result.is_none());
+}
+
+#[test]
+fn check_description_empty_allows_minimal_valid_description() {
+    let result = check_description_empty("X");
+    assert!(result.is_none(), "Single character description should be valid");
+}
+
+#[test]
+fn check_description_empty_detects_newlines_only() {
+    let result = check_description_empty("\n\n\n");
+    assert!(result.is_some());
+    assert_eq!(result.unwrap().code, "S002");
+}
+
+#[test]
+fn check_description_empty_detects_tabs_and_spaces() {
+    let result = check_description_empty("\t  \t  ");
+    assert!(result.is_some());
+    assert_eq!(result.unwrap().code, "S002");
 }
 
 // =============================================================================
@@ -104,9 +138,43 @@ fn check_xml_characters_allows_valid_name() {
     assert!(result.is_none());
 }
 
+#[test]
+fn check_xml_characters_allows_hyphens_and_underscores() {
+    let result = check_xml_characters("my_skill-name_v2");
+    assert!(result.is_none());
+}
+
+#[test]
+fn check_xml_characters_detects_self_closing_tag() {
+    let result = check_xml_characters("my-<br/>-skill");
+    assert!(result.is_some());
+    assert_eq!(result.unwrap().code, "S003");
+}
+
+#[test]
+fn check_xml_characters_detects_only_less_than() {
+    let result = check_xml_characters("value<10");
+    assert!(result.is_some());
+    assert_eq!(result.unwrap().code, "S003");
+}
+
+#[test]
+fn check_xml_characters_detects_only_greater_than() {
+    let result = check_xml_characters("value>10");
+    assert!(result.is_some());
+    assert_eq!(result.unwrap().code, "S003");
+}
+
 // =============================================================================
 // check_name_length (W002)
 // =============================================================================
+
+#[test]
+fn check_name_length_allows_63_chars() {
+    let name = "a".repeat(63);
+    let result = check_name_length(&name);
+    assert!(result.is_none(), "63 chars should be within limit");
+}
 
 #[test]
 fn check_name_length_allows_64_chars() {
@@ -126,9 +194,22 @@ fn check_name_length_warns_on_65_chars() {
     assert!(error.message.contains("max: 64"));
 }
 
+#[test]
+fn check_name_length_allows_empty_name() {
+    let result = check_name_length("");
+    assert!(result.is_none(), "Empty name passes length check (other validations catch empty)");
+}
+
 // =============================================================================
 // check_description_length (W003)
 // =============================================================================
+
+#[test]
+fn check_description_length_allows_1023_chars() {
+    let desc = "a".repeat(1023);
+    let result = check_description_length(&desc);
+    assert!(result.is_none(), "1023 chars should be within limit");
+}
 
 #[test]
 fn check_description_length_allows_1024_chars() {
@@ -146,6 +227,16 @@ fn check_description_length_warns_on_1025_chars() {
     assert_eq!(error.code, "W003");
     assert!(error.message.contains("1025 characters"));
     assert!(error.message.contains("max: 1024"));
+}
+
+#[test]
+fn check_description_length_warns_on_very_long_description() {
+    let desc = "a".repeat(5000);
+    let result = check_description_length(&desc);
+    assert!(result.is_some());
+    let error = result.unwrap();
+    assert_eq!(error.code, "W003");
+    assert!(error.message.contains("5000 characters"));
 }
 
 // =============================================================================
@@ -196,6 +287,42 @@ fn validate_skill_collects_all_validation_errors() {
     let result = validate_skill("claude", "");
     assert!(!result.is_valid());
     assert_eq!(result.errors.len(), 2, "Should have S001 and S002 errors");
+}
+
+#[test]
+fn validate_skill_with_all_errors_at_once() {
+    // Name has: reserved word (S001), XML char (S003), over length (W002)
+    // Description has: empty (S002), and if we pass a long empty-ish string with <
+    // we get length warning
+    let long_name_with_issues = format!("<claude>{}", "x".repeat(70));
+    let result = validate_skill(&long_name_with_issues, "");
+
+    assert!(!result.is_valid());
+    // Should have S001 (reserved), S003 (XML), W002 (length), S002 (empty desc)
+    assert!(result.errors.iter().any(|e| e.code == "S001"), "Should have reserved word error");
+    assert!(result.errors.iter().any(|e| e.code == "S003"), "Should have XML char error");
+    assert!(result.errors.iter().any(|e| e.code == "W002"), "Should have name length warning");
+    assert!(result.errors.iter().any(|e| e.code == "S002"), "Should have empty description error");
+}
+
+#[test]
+fn validate_skill_valid_at_max_lengths() {
+    let name = "x".repeat(64);
+    let description = "y".repeat(1024);
+    let result = validate_skill(&name, &description);
+    assert!(result.is_valid(), "Max-length name and description should be valid");
+    assert!(result.errors.is_empty());
+}
+
+#[test]
+fn validate_skill_warnings_only_when_lengths_exceeded() {
+    let name = "x".repeat(100);
+    let description = "y".repeat(2000);
+    let result = validate_skill(&name, &description);
+
+    // These are just warnings, not blocking errors
+    assert!(!result.has_errors(), "Length issues are warnings, not errors");
+    assert_eq!(result.warnings_only().len(), 2, "Should have two length warnings");
 }
 
 // =============================================================================
