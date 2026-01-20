@@ -159,7 +159,8 @@ impl Completer for PathCompleter {
                             .to_string_lossy()
                             .to_string();
                         let display = format!("{}/", relative);
-                        candidates.push(Pair { display: display.clone(), replacement: display });
+                        let replacement = format!("{}/", name);
+                        candidates.push(Pair { display, replacement });
                     }
                 }
             }
