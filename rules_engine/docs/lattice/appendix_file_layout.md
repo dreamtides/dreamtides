@@ -448,6 +448,66 @@ tests/lattice/
     └── symlink_manager_tests.rs   # Symlink creation and management tests
 ```
 
+## Benchmark Directory Structure
+
+Criterion benchmarks for measuring performance live in a separate crate:
+
+```
+rules_engine/benchmarks/lattice/
+├── benches/
+│   ├── lattice_benchmarks.rs  # Core benchmarks: index rebuild, document parsing, connection setup
+│   ├── index_bench.rs         # Index benchmarks: full rebuild, incremental sync, lookups, FTS
+│   ├── document_bench.rs      # Document benchmarks: frontmatter parsing, link extraction, formatting
+│   └── query_bench.rs         # Query benchmarks: lat list filtering, lat ready, lat overview
+└── src/
+    ├── lib.rs                 # Re-exports benchmark utilities
+    ├── test_repo.rs           # Test repository generators with configurable document counts
+    └── document_generators.rs # Document content generators for various frontmatter configurations
+```
+
+### Benchmark File Descriptions
+
+**benches/lattice_benchmarks.rs** - Primary benchmark harness with core performance measurements
+for index rebuild at various scales, document parsing (single and batch), index rebuild
+scaling analysis, and SQLite connection/schema setup overhead.
+
+**benches/index_bench.rs** - Index-focused benchmarks measuring full index rebuild at 10-1000
+documents, incremental reconciliation after file changes, document lookups by ID/name/path,
+and FTS5 full-text search query performance.
+
+**benches/document_bench.rs** - Document operation benchmarks covering frontmatter parsing at
+various complexity levels (minimal to full), markdown body parsing at different sizes, link
+extraction from both body and frontmatter, and document formatting operations.
+
+**benches/query_bench.rs** - Query command benchmarks measuring `lat list` with various filter
+combinations, `lat ready` task filtering and claim resolution, and `lat overview` ranking
+algorithm performance.
+
+**src/test_repo.rs** - Provides `RepoConfig` struct for configuring test repository generation
+with customizable document counts, task fractions, dependency rates, and link density. Used
+by all benchmark modules to create consistent test data.
+
+**src/document_generators.rs** - Functions for generating document content with specific
+characteristics: minimal frontmatter, full frontmatter with all fields, frontmatter with
+dependencies, labels, and links, body content with configurable sizes and link counts.
+
+### Running Benchmarks
+
+Run all Lattice benchmarks:
+```bash
+just bench-lattice
+```
+
+Run specific benchmark groups:
+```bash
+just bench-lattice -- index_rebuild
+just bench-lattice -- document_parsing
+just bench-lattice -- list_filtering
+```
+
+HTML reports are generated in `target/criterion/` with detailed performance analysis,
+regression detection, and comparison charts.
+
 ## Implementation Guidance
 
 **When to create additional files:**
