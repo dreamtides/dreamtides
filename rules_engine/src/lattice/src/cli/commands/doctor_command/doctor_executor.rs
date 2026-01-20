@@ -1,10 +1,13 @@
+use std::io::{self, Write};
 use std::process::ExitCode;
 
 use tracing::{info, instrument};
 
 use crate::cli::command_dispatch::{CommandContext, LatticeResult};
 use crate::cli::commands::doctor_command::doctor_types::{DoctorConfig, DoctorReport};
-use crate::cli::commands::doctor_command::{doctor_checks, doctor_output, doctor_types};
+use crate::cli::commands::doctor_command::{
+    doctor_checks, doctor_fixer, doctor_output, doctor_types,
+};
 use crate::cli::maintenance_args::DoctorArgs;
 use crate::cli::output_format::OutputFormat;
 use crate::error::error_types::LatticeError;
@@ -15,6 +18,7 @@ pub fn execute(context: CommandContext, args: DoctorArgs) -> LatticeResult<()> {
     info!(
         fix = args.fix,
         dry_run = args.dry_run,
+        yes = args.yes,
         deep = args.deep,
         quiet = args.quiet,
         "Executing doctor command"
@@ -29,6 +33,19 @@ pub fn execute(context: CommandContext, args: DoctorArgs) -> LatticeResult<()> {
     let output_format = OutputFormat::from_flags(context.global.json, false);
     doctor_output::output_report(&report, output_format, &config);
 
+    // Apply fixes if requested
+    if config.fix {
+        let fixable_count = report.checks.iter().filter(|c| c.fixable).count();
+        if fixable_count > 0 {
+            if should_apply_fixes(&config, fixable_count)? {
+                let fix_report = doctor_fixer::apply_fixes(&context, &config, &report.checks)?;
+                doctor_output::output_fix_report(&fix_report, output_format, &config);
+            }
+        } else {
+            info!("No fixable issues found");
+        }
+    }
+
     exit_with_code(&report)
 }
 
@@ -40,7 +57,38 @@ fn validate_args(args: &DoctorArgs) -> LatticeResult<()> {
             option2: "--fix (required when using --dry-run)".to_string(),
         });
     }
+    if args.yes && !args.fix {
+        return Err(LatticeError::ConflictingOptions {
+            option1: "--yes".to_string(),
+            option2: "--fix (required when using --yes)".to_string(),
+        });
+    }
     Ok(())
+}
+
+/// Determines whether to apply fixes based on config.
+///
+/// Returns true if fixes should be applied, false if user declined.
+fn should_apply_fixes(config: &DoctorConfig, fixable_count: usize) -> LatticeResult<bool> {
+    // In dry-run mode, always "apply" to show what would be done
+    if config.dry_run {
+        return Ok(true);
+    }
+
+    // With --yes flag, skip confirmation
+    if config.yes {
+        return Ok(true);
+    }
+
+    // Prompt for confirmation
+    print!("\n{} fixable issue(s) found. Apply fixes? [y/N] ", fixable_count);
+    io::stdout().flush().expect("Failed to flush stdout");
+
+    let mut input = String::new();
+    io::stdin().read_line(&mut input).expect("Failed to read user input");
+
+    let response = input.trim().to_lowercase();
+    Ok(response == "y" || response == "yes")
 }
 
 /// Determines the exit code based on the doctor report.

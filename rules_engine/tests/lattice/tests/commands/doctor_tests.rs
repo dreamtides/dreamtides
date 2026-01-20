@@ -10,7 +10,7 @@ use lattice::cli::maintenance_args::DoctorArgs;
 use lattice::error::exit_codes;
 
 fn default_args() -> DoctorArgs {
-    DoctorArgs { fix: false, dry_run: false, deep: false, quiet: false }
+    DoctorArgs { fix: false, dry_run: false, yes: false, deep: false, quiet: false }
 }
 
 // ============================================================================
@@ -104,17 +104,19 @@ fn doctor_config_from_default_args() {
 
     assert!(!config.fix);
     assert!(!config.dry_run);
+    assert!(!config.yes);
     assert!(!config.deep);
     assert!(!config.quiet);
 }
 
 #[test]
 fn doctor_config_preserves_all_flags() {
-    let args = DoctorArgs { fix: true, dry_run: true, deep: true, quiet: true };
+    let args = DoctorArgs { fix: true, dry_run: true, yes: true, deep: true, quiet: true };
     let config = DoctorConfig::from(&args);
 
     assert!(config.fix);
     assert!(config.dry_run);
+    assert!(config.yes);
     assert!(config.deep);
     assert!(config.quiet);
 }
@@ -2306,7 +2308,7 @@ mod dry_run_validation {
 
     #[test]
     fn dry_run_without_fix_returns_error() {
-        let args = DoctorArgs { fix: false, dry_run: true, deep: false, quiet: false };
+        let args = DoctorArgs { fix: false, dry_run: true, yes: false, deep: false, quiet: false };
 
         let result = validate_args(&args);
 
@@ -2322,7 +2324,7 @@ mod dry_run_validation {
 
     #[test]
     fn dry_run_with_fix_is_valid() {
-        let args = DoctorArgs { fix: true, dry_run: true, deep: false, quiet: false };
+        let args = DoctorArgs { fix: true, dry_run: true, yes: false, deep: false, quiet: false };
 
         let result = validate_args(&args);
 
@@ -2331,7 +2333,7 @@ mod dry_run_validation {
 
     #[test]
     fn fix_without_dry_run_is_valid() {
-        let args = DoctorArgs { fix: true, dry_run: false, deep: false, quiet: false };
+        let args = DoctorArgs { fix: true, dry_run: false, yes: false, deep: false, quiet: false };
 
         let result = validate_args(&args);
 
@@ -2340,7 +2342,7 @@ mod dry_run_validation {
 
     #[test]
     fn default_args_are_valid() {
-        let args = DoctorArgs { fix: false, dry_run: false, deep: false, quiet: false };
+        let args = DoctorArgs { fix: false, dry_run: false, yes: false, deep: false, quiet: false };
 
         let result = validate_args(&args);
 
@@ -2437,6 +2439,390 @@ mod deep_mode {
                 non_deep_check.category.display_name(),
                 non_deep_check.name
             );
+        }
+    }
+}
+
+// ============================================================================
+// Doctor Fixer Tests
+// ============================================================================
+
+mod fixer_tests {
+    use std::fs;
+    use std::path::PathBuf;
+
+    use lattice::claim::claim_operations;
+    use lattice::cli::commands::doctor_command::doctor_checks;
+    use lattice::cli::commands::doctor_command::doctor_fixer::{self, FixReport};
+    use lattice::cli::commands::doctor_command::doctor_types::{
+        CheckCategory, CheckStatus, DoctorConfig,
+    };
+    use lattice::id::lattice_id::LatticeId;
+    use lattice::index::document_queries;
+    use lattice::index::document_types::InsertDocument;
+    use lattice::test::test_environment::TestEnv;
+
+    fn find_check<'a>(
+        results: &'a [lattice::cli::commands::doctor_command::doctor_types::CheckResult],
+        category: CheckCategory,
+        name: &str,
+    ) -> Option<&'a lattice::cli::commands::doctor_command::doctor_types::CheckResult> {
+        results.iter().find(|r| r.category == category && r.name == name)
+    }
+
+    // ---- FixReport Tests ----
+
+    #[test]
+    fn fix_report_starts_empty() {
+        let report = FixReport::default();
+        assert_eq!(report.applied, 0);
+        assert_eq!(report.failed, 0);
+        assert!(report.applied_descriptions.is_empty());
+        assert!(report.failed_descriptions.is_empty());
+    }
+
+    // ---- Dry-Run Mode Tests ----
+
+    #[test]
+    fn dry_run_reports_what_would_be_done_for_claims() {
+        let env = TestEnv::new();
+        let (_temp, context) = env.into_parts();
+
+        // Create a claim for a task that doesn't exist in the index
+        let id = LatticeId::from_parts(100, "DRY");
+        claim_operations::claim_task(&context.repo_root, &id, &context.repo_root)
+            .expect("Claim task");
+
+        let config =
+            DoctorConfig { fix: true, dry_run: true, yes: true, deep: false, quiet: false };
+
+        let checks = doctor_checks::run_all_checks(&context, &config).expect("Run checks");
+        let report = doctor_fixer::apply_fixes(&context, &config, &checks).expect("Apply fixes");
+
+        // Claim should still exist after dry run
+        assert!(
+            claim_operations::get_claim(&context.repo_root, &id).expect("Check claim").is_some(),
+            "Claim should still exist after dry run"
+        );
+
+        // Report should indicate what would be done
+        assert!(
+            report.applied_descriptions.iter().any(|d| d.contains("Would")),
+            "Dry run should report what would be done: {:?}",
+            report.applied_descriptions
+        );
+    }
+
+    // ---- Claims Fix Tests ----
+
+    #[test]
+    fn fix_releases_stale_claims_for_closed_tasks() {
+        let env = TestEnv::new();
+
+        let id = LatticeId::from_parts(500, "ABC");
+        let id_str = id.as_str();
+
+        env.create_dir("api/tasks/.closed");
+        env.create_task("api/tasks/.closed/done.md", id_str, "done", "Done task", "task", 1);
+
+        let (_temp, context) = env.into_parts();
+
+        // Insert the closed task into the index
+        document_queries::insert(&context.conn, &InsertDocument {
+            id: id_str.to_string(),
+            parent_id: None,
+            path: "api/tasks/.closed/done.md".to_string(),
+            name: "done".to_string(),
+            description: "Done task".to_string(),
+            task_type: Some(lattice::document::frontmatter_schema::TaskType::Task),
+            is_closed: true,
+            priority: Some(1),
+            created_at: None,
+            updated_at: None,
+            closed_at: None,
+            body_hash: "hash1".to_string(),
+            content_length: 100,
+            is_root: false,
+            in_tasks_dir: true,
+            in_docs_dir: false,
+            skill: false,
+        })
+        .expect("Insert closed task");
+
+        // Create a claim for the closed task
+        let work_path = context.repo_root.clone();
+        claim_operations::claim_task(&context.repo_root, &id, &work_path).expect("Claim task");
+
+        // Verify claim exists
+        assert!(
+            claim_operations::get_claim(&context.repo_root, &id).expect("Check claim").is_some(),
+            "Claim should exist before fix"
+        );
+
+        let config =
+            DoctorConfig { fix: true, dry_run: false, yes: true, deep: false, quiet: false };
+        let checks = doctor_checks::run_all_checks(&context, &config).expect("Run checks");
+
+        let report = doctor_fixer::apply_fixes(&context, &config, &checks).expect("Apply fixes");
+
+        // Verify claim was released
+        assert!(
+            claim_operations::get_claim(&context.repo_root, &id).expect("Check claim").is_none(),
+            "Claim should be released after fix"
+        );
+
+        assert!(
+            report.applied_descriptions.iter().any(|d| d.contains(id_str)),
+            "Report should mention released claim: {:?}",
+            report.applied_descriptions
+        );
+    }
+
+    #[test]
+    fn fix_releases_claims_for_missing_tasks() {
+        let env = TestEnv::new();
+        let (_temp, context) = env.into_parts();
+
+        // Create a claim for a task that doesn't exist in the index
+        let id = LatticeId::from_parts(600, "ABC");
+        let id_str = id.as_str();
+        let work_path = context.repo_root.clone();
+        claim_operations::claim_task(&context.repo_root, &id, &work_path).expect("Claim task");
+
+        // Verify claim exists
+        assert!(
+            claim_operations::get_claim(&context.repo_root, &id).expect("Check claim").is_some(),
+            "Claim should exist before fix"
+        );
+
+        let config =
+            DoctorConfig { fix: true, dry_run: false, yes: true, deep: false, quiet: false };
+        let checks = doctor_checks::run_all_checks(&context, &config).expect("Run checks");
+
+        let report = doctor_fixer::apply_fixes(&context, &config, &checks).expect("Apply fixes");
+
+        // Verify claim was released
+        assert!(
+            claim_operations::get_claim(&context.repo_root, &id).expect("Check claim").is_none(),
+            "Claim should be released after fix"
+        );
+
+        assert!(
+            report.applied_descriptions.iter().any(|d| d.contains(id_str)),
+            "Report should mention released claim: {:?}",
+            report.applied_descriptions
+        );
+    }
+
+    #[test]
+    fn fix_releases_claims_for_orphaned_worktrees() {
+        let env = TestEnv::new();
+
+        let id = LatticeId::from_parts(700, "ABC");
+        let id_str = id.as_str();
+
+        env.create_dir("api/tasks");
+        env.create_task("api/tasks/task1.md", id_str, "task1", "Task 1", "task", 1);
+
+        let (_temp, context) = env.into_parts();
+
+        // Insert task into the index
+        document_queries::insert(&context.conn, &InsertDocument {
+            id: id_str.to_string(),
+            parent_id: None,
+            path: "api/tasks/task1.md".to_string(),
+            name: "task1".to_string(),
+            description: "Task 1".to_string(),
+            task_type: Some(lattice::document::frontmatter_schema::TaskType::Task),
+            is_closed: false,
+            priority: Some(1),
+            created_at: None,
+            updated_at: None,
+            closed_at: None,
+            body_hash: "hash1".to_string(),
+            content_length: 100,
+            is_root: false,
+            in_tasks_dir: true,
+            in_docs_dir: false,
+            skill: false,
+        })
+        .expect("Insert task");
+
+        // Create a claim with a non-existent work path
+        let work_path = PathBuf::from("/nonexistent/worktree/path");
+        claim_operations::claim_task(&context.repo_root, &id, &work_path).expect("Claim task");
+
+        // Verify claim exists
+        assert!(
+            claim_operations::get_claim(&context.repo_root, &id).expect("Check claim").is_some(),
+            "Claim should exist before fix"
+        );
+
+        let config =
+            DoctorConfig { fix: true, dry_run: false, yes: true, deep: false, quiet: false };
+        let checks = doctor_checks::run_all_checks(&context, &config).expect("Run checks");
+
+        let report = doctor_fixer::apply_fixes(&context, &config, &checks).expect("Apply fixes");
+
+        // Verify claim was released
+        assert!(
+            claim_operations::get_claim(&context.repo_root, &id).expect("Check claim").is_none(),
+            "Claim should be released after fix"
+        );
+
+        assert!(
+            report.applied_descriptions.iter().any(|d| d.contains(id_str)),
+            "Report should mention released claim: {:?}",
+            report.applied_descriptions
+        );
+    }
+
+    // ---- Index Fix Tests ----
+
+    #[test]
+    fn fix_deletes_wal_files_during_index_rebuild() {
+        let env = TestEnv::new();
+
+        // Insert a document that's missing from disk to trigger filesystem sync issue
+        document_queries::insert(env.conn(), &InsertDocument {
+            id: "LMISSING".to_string(),
+            parent_id: None,
+            path: "missing/doc.md".to_string(),
+            name: "doc".to_string(),
+            description: "Missing doc".to_string(),
+            task_type: None,
+            is_closed: false,
+            priority: None,
+            created_at: None,
+            updated_at: None,
+            closed_at: None,
+            body_hash: "hash123".to_string(),
+            content_length: 100,
+            is_root: false,
+            in_tasks_dir: false,
+            in_docs_dir: false,
+            skill: false,
+        })
+        .expect("Insert document");
+
+        let (_temp, context) = env.into_parts();
+
+        // Create WAL and SHM files (both present - normal WAL state)
+        let wal_path = context.repo_root.join(".lattice/index.sqlite-wal");
+        let shm_path = context.repo_root.join(".lattice/index.sqlite-shm");
+        fs::write(&wal_path, vec![0u8; 4096]).expect("Create WAL file");
+        fs::write(&shm_path, vec![0u8; 32768]).expect("Create SHM file");
+
+        let config =
+            DoctorConfig { fix: true, dry_run: false, yes: true, deep: false, quiet: false };
+
+        let checks = doctor_checks::run_all_checks(&context, &config).expect("Run checks");
+
+        // Should detect filesystem sync issue
+        let fs_check = find_check(&checks, CheckCategory::Index, "Filesystem Sync")
+            .expect("Filesystem Sync check should be present");
+        assert_eq!(fs_check.status, CheckStatus::Error, "Should detect filesystem sync issue");
+
+        let report = doctor_fixer::apply_fixes(&context, &config, &checks).expect("Apply fixes");
+
+        // WAL files should be deleted as part of rebuild
+        assert!(!wal_path.exists(), "WAL file should be deleted after fix");
+        assert!(!shm_path.exists(), "SHM file should be deleted after fix");
+
+        // Report should show the rebuild
+        assert!(
+            report
+                .applied_descriptions
+                .iter()
+                .any(|d| d.to_lowercase().contains("rebuild") || d.to_lowercase().contains("wal")),
+            "Report should mention rebuild or WAL deletion: {:?}",
+            report.applied_descriptions
+        );
+    }
+
+    // ---- Skills Fix Tests ----
+
+    #[test]
+    fn fix_syncs_skill_symlinks() {
+        use std::os::unix::fs::symlink;
+
+        let env = TestEnv::new();
+        env.create_dir(".claude/skills");
+        env.create_dir("docs");
+        env.write_file(
+            "docs/test-skill.md",
+            "---\nlattice-id: LSKILL\nname: test-skill\ndescription: Test\nskill: true\n---\n\nBody",
+        );
+
+        document_queries::insert(env.conn(), &InsertDocument {
+            id: "LSKILL".to_string(),
+            parent_id: None,
+            path: "docs/test-skill.md".to_string(),
+            name: "test-skill".to_string(),
+            description: "Test".to_string(),
+            task_type: None,
+            is_closed: false,
+            priority: None,
+            created_at: None,
+            updated_at: None,
+            closed_at: None,
+            body_hash: "test-hash".to_string(),
+            content_length: 100,
+            is_root: false,
+            in_tasks_dir: false,
+            in_docs_dir: true,
+            skill: true,
+        })
+        .expect("Insert skill doc");
+
+        // Create a broken symlink to trigger skills fix
+        let skills_dir = env.path(".claude/skills");
+        let target = std::path::Path::new("../../docs/nonexistent.md");
+        symlink(target, skills_dir.join("broken-skill.md")).expect("Create broken symlink");
+
+        let (_temp, context) = env.into_parts();
+
+        let config =
+            DoctorConfig { fix: true, dry_run: false, yes: true, deep: false, quiet: false };
+        let checks = doctor_checks::run_all_checks(&context, &config).expect("Run checks");
+
+        // Should detect symlink issues
+        let validity_check = find_check(&checks, CheckCategory::Skills, "Symlink Validity")
+            .expect("Symlink Validity check should be present");
+        assert_eq!(validity_check.status, CheckStatus::Warning, "Should detect broken symlink");
+
+        let report = doctor_fixer::apply_fixes(&context, &config, &checks).expect("Apply fixes");
+
+        // Report should mention symlink operations
+        assert!(
+            report.applied_descriptions.iter().any(|d| d.to_lowercase().contains("symlink")),
+            "Report should mention symlink operations: {:?}",
+            report.applied_descriptions
+        );
+    }
+
+    // ---- No Fixes Needed Tests ----
+
+    #[test]
+    fn no_fixes_applied_when_all_checks_pass() {
+        let env = TestEnv::new();
+        let (_temp, context) = env.into_parts();
+
+        let config =
+            DoctorConfig { fix: true, dry_run: false, yes: true, deep: false, quiet: false };
+        let checks = doctor_checks::run_all_checks(&context, &config).expect("Run checks");
+
+        // With a clean environment, there should be no fixable issues
+        let fixable: Vec<_> = checks
+            .iter()
+            .filter(|c| c.fixable && matches!(c.status, CheckStatus::Warning | CheckStatus::Error))
+            .collect();
+
+        let report = doctor_fixer::apply_fixes(&context, &config, &checks).expect("Apply fixes");
+
+        if fixable.is_empty() {
+            assert_eq!(report.applied, 0, "No fixes should be applied when no fixable issues");
+            assert_eq!(report.failed, 0, "No failures when no fixable issues");
         }
     }
 }

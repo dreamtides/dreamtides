@@ -1,4 +1,5 @@
 use crate::cli::color_theme;
+use crate::cli::commands::doctor_command::doctor_fixer::FixReport;
 use crate::cli::commands::doctor_command::doctor_types::{
     CheckCategory, CheckStatus, DoctorConfig, DoctorReport,
 };
@@ -9,6 +10,14 @@ pub fn output_report(report: &DoctorReport, format: OutputFormat, config: &Docto
     match format {
         OutputFormat::Json => output_json(report),
         OutputFormat::Text | OutputFormat::Pretty => output_text(report, config),
+    }
+}
+
+/// Outputs the fix report in the appropriate format.
+pub fn output_fix_report(report: &FixReport, format: OutputFormat, config: &DoctorConfig) {
+    match format {
+        OutputFormat::Json => output_fix_json(report),
+        OutputFormat::Text | OutputFormat::Pretty => output_fix_text(report, config),
     }
 }
 
@@ -93,6 +102,82 @@ fn output_text(report: &DoctorReport, config: &DoctorConfig) {
                 }
             }
         }
+    }
+}
+
+/// Outputs the fix report in JSON format.
+fn output_fix_json(report: &FixReport) {
+    #[derive(serde::Serialize)]
+    struct FixReportJson<'a> {
+        applied: usize,
+        failed: usize,
+        applied_descriptions: &'a [String],
+        failed_descriptions: &'a [String],
+    }
+
+    let json_report = FixReportJson {
+        applied: report.applied,
+        failed: report.failed,
+        applied_descriptions: &report.applied_descriptions,
+        failed_descriptions: &report.failed_descriptions,
+    };
+
+    let json = serde_json::to_string_pretty(&json_report)
+        .unwrap_or_else(|e| panic!("Failed to serialize fix report to JSON: {e}"));
+    println!("{json}");
+}
+
+/// Outputs the fix report in text format.
+fn output_fix_text(report: &FixReport, config: &DoctorConfig) {
+    let use_color = color_theme::colors_enabled();
+    let prefix = if config.dry_run { "DRY RUN: " } else { "" };
+
+    println!();
+    println!("{}FIX RESULTS", prefix);
+    println!("──────────────────────────────────────────");
+
+    if report.applied > 0 {
+        if use_color {
+            println!(
+                "{} {} fix{} applied:",
+                color_theme::success("✓"),
+                report.applied,
+                if report.applied == 1 { "" } else { "es" }
+            );
+        } else {
+            println!(
+                "✓ {} fix{} applied:",
+                report.applied,
+                if report.applied == 1 { "" } else { "es" }
+            );
+        }
+        for desc in &report.applied_descriptions {
+            println!("  • {}", desc);
+        }
+    }
+
+    if report.failed > 0 {
+        if use_color {
+            println!(
+                "{} {} fix{} failed:",
+                color_theme::error("✖"),
+                report.failed,
+                if report.failed == 1 { "" } else { "es" }
+            );
+        } else {
+            println!(
+                "✖ {} fix{} failed:",
+                report.failed,
+                if report.failed == 1 { "" } else { "es" }
+            );
+        }
+        for desc in &report.failed_descriptions {
+            println!("  • {}", desc);
+        }
+    }
+
+    if report.applied == 0 && report.failed == 0 {
+        println!("No fixes applied.");
     }
 }
 

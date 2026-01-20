@@ -49,9 +49,13 @@ pub struct DoctorArgs {
     #[arg(long)]
     pub fix: bool,
 
-    /// Preview fixes without applying.
+    /// Preview fixes without applying (requires --fix).
     #[arg(long)]
     pub dry_run: bool,
+
+    /// Skip confirmation prompts (requires --fix).
+    #[arg(long, short = 'y')]
+    pub yes: bool,
 
     /// Run additional integrity checks.
     #[arg(long)]

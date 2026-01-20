@@ -96,6 +96,8 @@ pub struct DoctorConfig {
     pub fix: bool,
     /// Whether to preview fixes without applying them.
     pub dry_run: bool,
+    /// Whether to skip confirmation prompts.
+    pub yes: bool,
     /// Whether to run additional thorough checks.
     pub deep: bool,
     /// Whether to only show warnings and errors (quiet mode).
@@ -318,6 +320,12 @@ impl DoctorReport {
 
 impl From<&DoctorArgs> for DoctorConfig {
     fn from(args: &DoctorArgs) -> Self {
-        Self { fix: args.fix, dry_run: args.dry_run, deep: args.deep, quiet: args.quiet }
+        Self {
+            fix: args.fix,
+            dry_run: args.dry_run,
+            yes: args.yes,
+            deep: args.deep,
+            quiet: args.quiet,
+        }
     }
 }
