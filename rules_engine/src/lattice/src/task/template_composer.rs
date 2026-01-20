@@ -7,6 +7,7 @@ use tracing::{debug, info};
 use crate::document::document_reader;
 use crate::error::error_types::LatticeError;
 use crate::index::directory_roots::{self, DirectoryRoot};
+use crate::index::document_queries;
 
 /// Prefix for Lattice template sections in markdown headings.
 const LATTICE_SECTION_PREFIX: &str = "[Lattice]";
@@ -88,7 +89,23 @@ pub fn compose_templates(
     let mut contributor_ids: Vec<String> = Vec::new();
 
     for ancestor in &ancestors {
-        let root_doc_path = compute_root_doc_path(&ancestor.directory_path);
+        // Look up the actual document path by ID instead of computing it from
+        // the directory path. This correctly handles 00_-prefixed root documents
+        // whose filenames don't match the directory name.
+        //
+        // Fall back to computed path if the document isn't in the index yet
+        // (e.g., during initial indexing or in test environments).
+        let root_doc_path = match document_queries::lookup_by_id(conn, &ancestor.root_id)? {
+            Some(row) => row.path,
+            None => {
+                debug!(
+                    root_id = ancestor.root_id,
+                    directory_path = ancestor.directory_path,
+                    "Root document not found in index, using computed path"
+                );
+                compute_root_doc_path(&ancestor.directory_path)
+            }
+        };
         let absolute_path = repo_root.join(&root_doc_path);
 
         let document = match document_reader::read(&absolute_path) {

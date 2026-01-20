@@ -613,3 +613,111 @@ Deep nested context.
     assert!(sections.context.is_some(), "Should find h6 context");
     assert!(sections.context.unwrap().contains("Deep nested context"));
 }
+
+#[test]
+fn compose_templates_works_with_00_prefixed_root() {
+    let conn = create_test_db();
+    let temp_dir = TempDir::new().expect("Create temp dir");
+
+    fs::create_dir_all(temp_dir.path().join("project/tasks")).expect("Create dirs");
+
+    // Create a 00_-prefixed root document with template sections
+    fs::write(
+        temp_dir.path().join("project/tasks/00_task_template.md"),
+        r#"---
+lattice-id: LAATZA
+name: 00-task-template
+description: Task template for project
+---
+
+# Task Template
+
+## [Lattice] Context
+
+This is context from the 00_-prefixed root.
+Important guidelines here.
+
+## [Lattice] Acceptance Criteria
+
+- [ ] Follow the template guidelines
+- [ ] Complete all checklist items
+"#,
+    )
+    .expect("Write 00_task_template.md");
+
+    // Create a task in the same directory
+    fs::write(
+        temp_dir.path().join("project/tasks/fix_something.md"),
+        r#"---
+lattice-id: LTSKZE
+name: fix-something
+description: Fix something important
+task-type: bug
+priority: 2
+---
+
+# Fix Something
+
+The thing is broken.
+"#,
+    )
+    .expect("Write task.md");
+
+    // Register the directory root with the 00_ root's ID
+    upsert(&conn, &make_root("project/tasks", "LAATZA", None, 0)).expect("Insert 00_ root");
+
+    // Insert the 00_ root document into the documents table so lookup_by_id works
+    lattice::index::document_queries::insert(
+        &conn,
+        &lattice::index::document_types::InsertDocument {
+            id: "LAATZA".to_string(),
+            path: "project/tasks/00_task_template.md".to_string(),
+            name: "00-task-template".to_string(),
+            description: "Task template for project".to_string(),
+            parent_id: None,
+            task_type: None,
+            is_closed: false,
+            priority: None,
+            created_at: None,
+            updated_at: None,
+            closed_at: None,
+            body_hash: "test".to_string(),
+            content_length: 100,
+            is_root: true,
+            in_tasks_dir: true,
+            in_docs_dir: false,
+            skill: false,
+        },
+    )
+    .expect("Insert document");
+
+    let result =
+        compose_templates(&conn, "project/tasks/fix_something.md".as_ref(), temp_dir.path())
+            .expect("Should succeed");
+
+    assert!(
+        result.context.is_some(),
+        "Should extract context from 00_-prefixed root, got: {result:?}"
+    );
+    assert!(
+        result.acceptance_criteria.is_some(),
+        "Should extract acceptance criteria from 00_-prefixed root"
+    );
+
+    let context = result.context.unwrap();
+    assert!(
+        context.contains("00_-prefixed root"),
+        "Context should contain the template content, got: {context}"
+    );
+
+    let acceptance = result.acceptance_criteria.unwrap();
+    assert!(
+        acceptance.contains("Follow the template guidelines"),
+        "Acceptance should contain template criteria, got: {acceptance}"
+    );
+
+    assert!(
+        result.contributor_ids.contains(&"LAATZA".to_string()),
+        "Should track 00_ root as contributor"
+    );
+}

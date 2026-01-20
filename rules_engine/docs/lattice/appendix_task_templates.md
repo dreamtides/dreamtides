@@ -7,9 +7,10 @@ This appendix documents the task template system. See
 
 Task templates provide reusable context and acceptance criteria through the
 existing directory hierarchy. Rather than explicit template references, Lattice
-leverages root documents (documents whose filename matches their directory name,
-e.g., `api/api.md`) to automatically compose template content for all tasks in
-that directory and its subdirectories.
+leverages root documents to automatically compose template content for all tasks
+in that directory and its subdirectories. A root document is either:
+- A document whose filename matches its directory name (e.g., `api/api.md`)
+- A document whose filename starts with `00_` (e.g., `tasks/00_template.md`)
 
 This design requires no additional frontmatter fields. The filesystem hierarchy
 IS the template structure. When a template changes, all tasks in that subtree
@@ -17,8 +18,9 @@ immediately reflect the update at display time.
 
 ## Template Sections in Root Documents
 
-Root documents (filename matches directory name) can include two specially-marked
-sections that serve as templates for descendant tasks:
+Root documents (filename matches directory name, or starts with `00_`) can
+include two specially-marked sections that serve as templates for descendant
+tasks:
 
 ```yaml
 ---
@@ -132,14 +134,16 @@ content without ancestor context or acceptance criteria.
 For a document to provide template content to descendants:
 
 1. **Must be a root document:** Filename (without `.md`) matches the containing
-   directory name (e.g., `api/api.md`, `create/create.md`)
+   directory name (e.g., `api/api.md`) OR starts with `00_` (e.g.,
+   `tasks/00_template.md`)
 2. **Must have marked sections:** Include `[Lattice] Context` and/or
    `[Lattice] Acceptance Criteria` headings
 3. **Sections are optional:** A root without these sections simply provides
    no template content (descendants still inherit from higher ancestors)
 
-Non-root documents (those whose filename does not match the directory name)
-never provide template content, even if they contain `[Lattice]` sections.
+Non-root documents (those whose filename does not match the directory name and
+does not start with `00_`) never provide template content, even if they contain
+`[Lattice]` sections.
 
 ## Skipping Levels
 

@@ -193,9 +193,10 @@ fn load_ancestor_refs(
     let mut refs = Vec::new();
 
     for root in dir_roots {
-        let doc_path = template_composer::compute_root_doc_path(&root.directory_path);
+        // Use the actual document path from the index instead of computing it
+        // from the directory path. This handles 00_-prefixed roots correctly.
         if let Some(row) = document_queries::lookup_by_id(&context.conn, &root.root_id)? {
-            refs.push(AncestorRef { id: root.root_id, name: row.name, path: doc_path });
+            refs.push(AncestorRef { id: root.root_id, name: row.name, path: row.path });
         }
     }
 
