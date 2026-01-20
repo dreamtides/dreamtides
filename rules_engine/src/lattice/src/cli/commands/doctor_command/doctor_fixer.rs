@@ -12,7 +12,7 @@ use crate::cli::commands::doctor_command::doctor_types::{
 use crate::error::error_types::LatticeError;
 use crate::id::lattice_id::LatticeId;
 use crate::index::reconciliation::reconciliation_coordinator;
-use crate::index::schema_definition;
+use crate::index::{connection_pool, schema_definition};
 use crate::skill::symlink_manager;
 use crate::task::root_detection;
 
@@ -133,17 +133,28 @@ fn apply_index_fixes(
     report: &mut FixReport,
 ) -> LatticeResult<()> {
     let lattice_dir = context.repo_root.join(".lattice");
-
-    // Delete WAL and SHM files if they exist
     let wal_path = lattice_dir.join("index.sqlite-wal");
     let shm_path = lattice_dir.join("index.sqlite-shm");
 
+    // Checkpoint the WAL first to ensure any pending data is flushed to the main
+    // database. This is safer than deleting WAL files which could lose data.
+    // The TRUNCATE mode resets the WAL to zero bytes after checkpointing.
     if wal_path.exists() || shm_path.exists() {
         if config.dry_run {
-            info!("Would delete WAL/SHM files");
-            report.add_applied("Would delete WAL/SHM files");
+            info!("Would checkpoint WAL to flush pending changes");
+            report.add_applied("Would checkpoint WAL");
         } else {
-            delete_wal_files(&wal_path, &shm_path, report);
+            match connection_pool::checkpoint(&context.conn) {
+                Ok(()) => {
+                    debug!("WAL checkpointed successfully");
+                    report.add_applied("Checkpointed WAL (flushed pending changes)");
+                }
+                Err(e) => {
+                    // Checkpoint failed - WAL may be corrupted. Fall back to deleting.
+                    warn!("WAL checkpoint failed: {}. Falling back to file deletion.", e);
+                    delete_wal_files(&wal_path, &shm_path, report);
+                }
+            }
         }
     }
 
@@ -176,6 +187,13 @@ fn apply_index_fixes(
                 report.add_failed(msg);
             }
         }
+    }
+
+    // After rebuild, checkpoint again to clean up any WAL from the rebuild
+    if !config.dry_run
+        && let Err(e) = connection_pool::checkpoint(&context.conn)
+    {
+        warn!("Post-rebuild checkpoint failed: {}", e);
     }
 
     Ok(())

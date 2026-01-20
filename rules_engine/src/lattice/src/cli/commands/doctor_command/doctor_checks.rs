@@ -213,7 +213,16 @@ fn check_wal_health(lattice_dir: &std::path::Path, doc_count: i64) -> CheckResul
     }
 }
 
-/// Verifies a WAL file can be opened and has reasonable size.
+/// Verifies a WAL file can be opened and has reasonable structure.
+///
+/// SQLite WAL files have a 32-byte header followed by frames. Each frame
+/// consists of a 24-byte header plus one page of data (typically 4096 bytes).
+/// So valid WAL sizes are: 32 + (n * 4120) for 4KB pages, or 32 + (n * 1048)
+/// for 1KB pages. The modulo-4096 check was incorrect and flagged valid files.
+///
+/// We now only check for clearly invalid states:
+/// - Empty file (0 bytes) - corrupted
+/// - File smaller than header (< 32 bytes) - corrupted
 fn check_wal_file_health(wal_path: &std::path::Path) -> Result<(), String> {
     match File::open(wal_path) {
         Ok(file) => {
@@ -224,8 +233,12 @@ fn check_wal_file_health(wal_path: &std::path::Path) -> Result<(), String> {
                 return Err("WAL file is empty (may be corrupted)".to_string());
             }
 
-            if size % 4096 != 0 && size > 4096 {
-                return Err(format!("WAL file has unusual size ({size} bytes)"));
+            // WAL header is 32 bytes. A file smaller than this is definitely corrupted.
+            const WAL_HEADER_SIZE: u64 = 32;
+            if size < WAL_HEADER_SIZE {
+                return Err(format!(
+                    "WAL file is too small ({size} bytes, header requires {WAL_HEADER_SIZE})"
+                ));
             }
 
             Ok(())

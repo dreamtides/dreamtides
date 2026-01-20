@@ -2644,7 +2644,7 @@ mod fixer_tests {
     // ---- Index Fix Tests ----
 
     #[test]
-    fn fix_deletes_wal_files_during_index_rebuild() {
+    fn fix_checkpoints_wal_during_index_rebuild() {
         let env = TestEnv::new();
 
         // Insert a document that's missing from disk to trigger filesystem sync issue
@@ -2687,18 +2687,107 @@ mod fixer_tests {
 
         let report = doctor_fixer::apply_fixes(&context, &config, &checks).expect("Apply fixes");
 
-        // WAL files should be deleted as part of rebuild
-        assert!(!wal_path.exists(), "WAL file should be deleted after fix");
-        assert!(!shm_path.exists(), "SHM file should be deleted after fix");
-
-        // Report should show the rebuild
+        // Report should show the checkpoint and rebuild
+        assert!(
+            report.applied_descriptions.iter().any(|d| d.to_lowercase().contains("checkpoint")),
+            "Report should mention checkpointing: {:?}",
+            report.applied_descriptions
+        );
         assert!(
             report
                 .applied_descriptions
                 .iter()
-                .any(|d| d.to_lowercase().contains("rebuild") || d.to_lowercase().contains("wal")),
-            "Report should mention rebuild or WAL deletion: {:?}",
+                .any(|d| d.contains("Rebuilt") || d.contains("rebuilt")),
+            "Report should mention rebuild: {:?}",
             report.applied_descriptions
+        );
+    }
+
+    // ---- WAL Health Fix Tests ----
+
+    #[test]
+    fn fix_resolves_wal_health_issues_via_checkpoint() {
+        let env = TestEnv::new();
+        let (_temp, context) = env.into_parts();
+
+        // Create a WAL file with a non-multiple-of-4096 size.
+        // This is actually NORMAL for SQLite WAL files because:
+        // - WAL has a 32-byte header
+        // - Each frame has a 24-byte header + page_size bytes
+        // - With 4096-byte pages, each frame is 4120 bytes
+        // - So total = 32 + (n * 4120), which is never a multiple of 4096
+        //
+        // The original check `size % 4096 != 0 && size > 4096` incorrectly
+        // flagged valid WAL files as "unusual size".
+        let wal_path = context.repo_root.join(".lattice/index.sqlite-wal");
+        let shm_path = context.repo_root.join(".lattice/index.sqlite-shm");
+
+        // Write a WAL file with size 4152 bytes (32 header + 4120 frame)
+        // This simulates a valid WAL with one uncommitted frame
+        fs::write(&wal_path, vec![0u8; 4152]).expect("Create WAL file");
+        fs::write(&shm_path, vec![0u8; 32768]).expect("Create SHM file");
+
+        let config = DoctorConfig::default();
+        let checks = doctor_checks::run_all_checks(&context, &config).expect("Run checks");
+
+        // The WAL health check should pass for a properly-sized WAL file
+        // (This test will fail until the size check is fixed)
+        let wal_check = find_check(&checks, CheckCategory::Core, "WAL Health")
+            .expect("WAL Health check should be present");
+        assert_eq!(
+            wal_check.status,
+            CheckStatus::Passed,
+            "WAL file with valid frame structure (4152 bytes = 32 header + 4120 frame) \
+             should be considered healthy, not unusual: {:?}",
+            wal_check.details
+        );
+    }
+
+    #[test]
+    fn fix_actually_fixes_wal_issues() {
+        let env = TestEnv::new();
+        let (_temp, context) = env.into_parts();
+
+        // Create WAL file with orphan WAL (no SHM) - a real issue that needs fixing
+        let wal_path = context.repo_root.join(".lattice/index.sqlite-wal");
+        let shm_path = context.repo_root.join(".lattice/index.sqlite-shm");
+
+        fs::write(&wal_path, vec![0u8; 4096]).expect("Create WAL file");
+        // Intentionally don't create SHM file - this is a real issue
+        if shm_path.exists() {
+            fs::remove_file(&shm_path).ok();
+        }
+
+        // First check: should detect the issue
+        let config = DoctorConfig::default();
+        let checks = doctor_checks::run_all_checks(&context, &config).expect("Run checks");
+        let wal_check = find_check(&checks, CheckCategory::Core, "WAL Health")
+            .expect("WAL Health check should be present");
+        assert_eq!(
+            wal_check.status,
+            CheckStatus::Error,
+            "Orphan WAL without SHM should be detected as an error"
+        );
+
+        // Now run the fix
+        let fix_config =
+            DoctorConfig { fix: true, dry_run: false, yes: true, deep: false, quiet: false };
+        let fix_checks =
+            doctor_checks::run_all_checks(&context, &fix_config).expect("Run checks for fix");
+        doctor_fixer::apply_fixes(&context, &fix_config, &fix_checks).expect("Apply fixes");
+
+        // After fix: run checks again - the issue should be resolved
+        let post_fix_checks =
+            doctor_checks::run_all_checks(&context, &config).expect("Run post-fix checks");
+        let post_fix_wal_check = find_check(&post_fix_checks, CheckCategory::Core, "WAL Health")
+            .expect("WAL Health check should be present after fix");
+
+        assert!(
+            post_fix_wal_check.status == CheckStatus::Passed,
+            "WAL Health should pass after running --fix. \
+             Status: {:?}, Details: {:?}",
+            post_fix_wal_check.status,
+            post_fix_wal_check.details
         );
     }
 

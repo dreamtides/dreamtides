@@ -8,7 +8,8 @@ labels:
 - doctor
 - sqlite
 created-at: 2026-01-20T06:52:53.816299Z
-updated-at: 2026-01-20T06:52:53.816299Z
+updated-at: 2026-01-20T15:15:56.101007Z
+closed-at: 2026-01-20T15:15:56.101007Z
 ---
 
 ## Context
