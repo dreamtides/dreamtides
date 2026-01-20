@@ -20,8 +20,7 @@ use criterion::{BatchSize, BenchmarkId, Criterion, criterion_group, criterion_ma
 use lattice::index::reconciliation::change_detection::ChangeInfo;
 use lattice::index::reconciliation::{reconciliation_coordinator, sync_strategies};
 use lattice::index::{connection_pool, document_queries, fulltext_search, schema_definition};
-use lattice::test::fake_git::FakeGit;
-use lattice_benchmarks::test_repo::{RepoConfig, generate_repo, list_markdown_files};
+use lattice_benchmarks::test_repo::{IndexedRepo, list_markdown_files, setup_indexed_repo};
 use tracing::Level;
 
 /// Benchmark full index rebuild from scratch at different scales.
@@ -39,7 +38,7 @@ fn full_index_rebuild(c: &mut Criterion) {
             group.bench_with_input(BenchmarkId::from_parameter(size), &size, |b, &size| {
                 b.iter_batched(
                     || setup_indexed_repo(size),
-                    |(repo, fake_git, _conn)| {
+                    |IndexedRepo { repo, fake_git, conn: _conn }| {
                         // Create a fresh connection to measure rebuild from scratch
                         let conn = connection_pool::open_memory_connection()
                             .expect("Failed to open memory connection");
@@ -72,7 +71,7 @@ fn incremental_sync_single_file(c: &mut Criterion) {
             group.bench_with_input(BenchmarkId::new("base_docs", size), &size, |b, &size| {
                 b.iter_batched(
                     || {
-                        let (repo, fake_git, conn) = setup_indexed_repo(size);
+                        let IndexedRepo { repo, fake_git, conn } = setup_indexed_repo(size);
                         // Pick a file to "modify"
                         let files = list_markdown_files(&repo.root);
                         let modified_file = files.first().cloned().unwrap_or_default();
@@ -127,7 +126,8 @@ fn incremental_sync_batch(c: &mut Criterion) {
                 |b, &change_count| {
                     b.iter_batched(
                         || {
-                            let (repo, fake_git, conn) = setup_indexed_repo(base_size);
+                            let IndexedRepo { repo, fake_git, conn } =
+                                setup_indexed_repo(base_size);
                             let files = list_markdown_files(&repo.root);
 
                             // Select files to "modify"
@@ -171,7 +171,7 @@ fn lookup_by_id(c: &mut Criterion) {
 
     let error_subscriber = tracing_subscriber::fmt().with_max_level(Level::ERROR).finish();
     tracing::subscriber::with_default(error_subscriber, || {
-        let (repo, _fake_git, conn) = setup_indexed_repo(500);
+        let IndexedRepo { repo, fake_git: _fake_git, conn } = setup_indexed_repo(500);
 
         // Get some document IDs to look up
         let ids: Vec<_> = repo.document_ids.iter().take(100).cloned().collect();
@@ -203,7 +203,7 @@ fn lookup_by_path(c: &mut Criterion) {
 
     let error_subscriber = tracing_subscriber::fmt().with_max_level(Level::ERROR).finish();
     tracing::subscriber::with_default(error_subscriber, || {
-        let (repo, _fake_git, conn) = setup_indexed_repo(500);
+        let IndexedRepo { repo, fake_git: _fake_git, conn } = setup_indexed_repo(500);
         let files = list_markdown_files(&repo.root);
 
         // Collect relative paths for lookup
@@ -241,7 +241,7 @@ fn lookup_by_name(c: &mut Criterion) {
 
     let error_subscriber = tracing_subscriber::fmt().with_max_level(Level::ERROR).finish();
     tracing::subscriber::with_default(error_subscriber, || {
-        let (_repo, _fake_git, conn) = setup_indexed_repo(500);
+        let IndexedRepo { repo: _repo, fake_git: _fake_git, conn } = setup_indexed_repo(500);
 
         // Use known name patterns from generated repos
         let names = vec![
@@ -275,7 +275,7 @@ fn fts_single_word(c: &mut Criterion) {
 
     let error_subscriber = tracing_subscriber::fmt().with_max_level(Level::ERROR).finish();
     tracing::subscriber::with_default(error_subscriber, || {
-        let (_repo, _fake_git, conn) = setup_indexed_repo(500);
+        let IndexedRepo { repo: _repo, fake_git: _fake_git, conn } = setup_indexed_repo(500);
 
         // Search for common words that appear in generated documents
         let queries = vec!["overview", "module", "documentation", "task", "requirements"];
@@ -302,7 +302,7 @@ fn fts_phrase_search(c: &mut Criterion) {
 
     let error_subscriber = tracing_subscriber::fmt().with_max_level(Level::ERROR).finish();
     tracing::subscriber::with_default(error_subscriber, || {
-        let (_repo, _fake_git, conn) = setup_indexed_repo(500);
+        let IndexedRepo { repo: _repo, fake_git: _fake_git, conn } = setup_indexed_repo(500);
 
         // Phrase queries using FTS5 syntax
         let phrase_queries =
@@ -330,7 +330,7 @@ fn fts_with_limit(c: &mut Criterion) {
 
     let error_subscriber = tracing_subscriber::fmt().with_max_level(Level::ERROR).finish();
     tracing::subscriber::with_default(error_subscriber, || {
-        let (_repo, _fake_git, conn) = setup_indexed_repo(500);
+        let IndexedRepo { repo: _repo, fake_git: _fake_git, conn } = setup_indexed_repo(500);
 
         // Compare limited vs unlimited search
         group.bench_function("unlimited", |b| {
@@ -359,7 +359,7 @@ fn fts_boolean_search(c: &mut Criterion) {
 
     let error_subscriber = tracing_subscriber::fmt().with_max_level(Level::ERROR).finish();
     tracing::subscriber::with_default(error_subscriber, || {
-        let (_repo, _fake_git, conn) = setup_indexed_repo(500);
+        let IndexedRepo { repo: _repo, fake_git: _fake_git, conn } = setup_indexed_repo(500);
 
         // Boolean queries using FTS5 syntax
         group.bench_function("and_query", |b| {
@@ -380,31 +380,6 @@ fn fts_boolean_search(c: &mut Criterion) {
     });
 
     group.finish();
-}
-
-/// Helper: Creates a test repo, indexes it, and returns all components.
-fn setup_indexed_repo(
-    size: usize,
-) -> (lattice_benchmarks::test_repo::TestRepo, FakeGit, rusqlite::Connection) {
-    let config = RepoConfig::with_document_count(size);
-    let repo = generate_repo(&config);
-    let fake_git = FakeGit::new();
-
-    // Track all markdown files with fake git
-    let files = list_markdown_files(&repo.root);
-    for file in &files {
-        if let Ok(relative) = file.strip_prefix(&repo.root) {
-            fake_git.track_file(relative);
-        }
-    }
-
-    // Create and populate index
-    let conn = connection_pool::open_memory_connection().expect("Failed to open memory connection");
-    schema_definition::create_schema(&conn).expect("Failed to create schema");
-    reconciliation_coordinator::reconcile(&repo.root, &fake_git, &conn)
-        .expect("Failed to build initial index");
-
-    (repo, fake_git, conn)
 }
 
 criterion_group!(

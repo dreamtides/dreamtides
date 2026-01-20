@@ -7,6 +7,7 @@ use std::fs;
 use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicU64, Ordering};
 
+use lattice::test::fake_git::FakeGit;
 use tempfile::TempDir;
 
 /// Counter for generating unique IDs across all benchmark runs.
@@ -396,4 +397,56 @@ fn collect_markdown_files(dir: &Path, files: &mut Vec<PathBuf>) {
             files.push(path);
         }
     }
+}
+
+/// Result of setting up an indexed repository for benchmarking.
+///
+/// Contains the test repository, fake git implementation, and SQLite
+/// connection.
+pub struct IndexedRepo {
+    /// The test repository with generated documents.
+    pub repo: TestRepo,
+    /// Fake git implementation with tracked files.
+    pub fake_git: FakeGit,
+    /// SQLite connection with populated index.
+    pub conn: rusqlite::Connection,
+}
+
+/// Creates a test repo with the given document count, indexes it, and returns
+/// all components.
+///
+/// This is the primary setup function for benchmarks that need an indexed
+/// repository with configurable size.
+pub fn setup_indexed_repo(size: usize) -> IndexedRepo {
+    let config = RepoConfig::with_document_count(size);
+    setup_indexed_repo_with_config(&config)
+}
+
+/// Creates a test repo with custom config, indexes it, and returns all
+/// components.
+///
+/// Use this when you need control over task fraction, dependencies, labels,
+/// etc.
+pub fn setup_indexed_repo_with_config(config: &RepoConfig) -> IndexedRepo {
+    use lattice::index::reconciliation::reconciliation_coordinator;
+    use lattice::index::{connection_pool, schema_definition};
+
+    let repo = generate_repo(config);
+    let fake_git = FakeGit::new();
+
+    // Track all markdown files with fake git
+    let files = list_markdown_files(&repo.root);
+    for file in &files {
+        if let Ok(relative) = file.strip_prefix(&repo.root) {
+            fake_git.track_file(relative);
+        }
+    }
+
+    // Create and populate index
+    let conn = connection_pool::open_memory_connection().expect("Failed to open memory connection");
+    schema_definition::create_schema(&conn).expect("Failed to create schema");
+    reconciliation_coordinator::reconcile(&repo.root, &fake_git, &conn)
+        .expect("Failed to build initial index");
+
+    IndexedRepo { repo, fake_git, conn }
 }

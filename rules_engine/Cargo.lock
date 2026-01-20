@@ -2229,6 +2229,7 @@ dependencies = [
 name = "lattice_benchmarks"
 version = "0.0.0"
 dependencies = [
+ "chrono",
  "criterion",
  "fastrand",
  "lattice",
