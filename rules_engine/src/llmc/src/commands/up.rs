@@ -455,8 +455,10 @@ fn run_main_loop(
             }
         }
         let mut iteration_had_error = false;
+        let mut lock_acquired = false;
         match StateLock::acquire() {
             Ok(_lock) => {
+                lock_acquired = true;
                 match State::load(state_path) {
                     Ok(new_state) => *state = new_state,
                     Err(e) => {
@@ -513,6 +515,7 @@ fn run_main_loop(
             last_error_warning = SystemTime::now();
         }
         if !no_patrol
+            && lock_acquired
             && SystemTime::now().duration_since(last_patrol).unwrap_or_default() >= patrol_interval
         {
             if verbose {
