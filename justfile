@@ -135,6 +135,10 @@ lattice-test *args='':
 lattice-bench *args='':
     cargo criterion --manifest-path rules_engine/Cargo.toml -p lattice_benchmarks -- "$@"
 
+# Alias for lattice-bench (documented in lattice design docs)
+bench-lattice *args='':
+    cargo criterion --manifest-path rules_engine/Cargo.toml -p lattice_benchmarks -- "$@"
+
 doc:
     cargo doc --manifest-path rules_engine/Cargo.toml
 

@@ -25,7 +25,7 @@ measuring latency of common operations to detect regressions and guide optimizat
 
 ## Implementation
 
-Benchmarks live in `rules_engine/benches/lattice/` with one file per category:
+Benchmarks live in `rules_engine/benchmarks/lattice/` with one file per category:
 
 ```rust
 use criterion::{criterion_group, criterion_main, Criterion, BenchmarkId};

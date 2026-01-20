@@ -15,6 +15,8 @@ doctest = false
 [dependencies]
 lattice = { path = "../../src/lattice" }
 
+fastrand = { workspace = true }
+tempfile = { workspace = true }
 tracing = { workspace = true }
 tracing-subscriber = { workspace = true }
 
