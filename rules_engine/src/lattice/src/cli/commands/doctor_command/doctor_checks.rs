@@ -7,7 +7,7 @@ use crate::cli::command_dispatch::{CommandContext, LatticeResult};
 use crate::cli::commands::doctor_command::doctor_types::{
     CheckCategory, CheckResult, CheckStatus, DoctorConfig,
 };
-use crate::cli::commands::doctor_command::{git_checks, index_checks};
+use crate::cli::commands::doctor_command::{config_checks, git_checks, index_checks};
 use crate::index::schema_definition;
 
 /// Runs all doctor checks and returns the results.
@@ -268,52 +268,7 @@ fn run_git_checks(context: &CommandContext) -> LatticeResult<Vec<CheckResult>> {
 
 /// Runs configuration checks.
 fn run_config_checks(context: &CommandContext) -> LatticeResult<Vec<CheckResult>> {
-    let mut results = Vec::new();
-
-    // Check repo config
-    let repo_config_path = context.repo_root.join(".lattice").join("config.toml");
-    if repo_config_path.exists() {
-        results.push(CheckResult::passed(
-            CheckCategory::Config,
-            "Repo Config",
-            ".lattice/config.toml valid",
-        ));
-    } else {
-        results.push(CheckResult::info(
-            CheckCategory::Config,
-            "Repo Config",
-            "No .lattice/config.toml (using defaults)",
-        ));
-    }
-
-    // Client ID check
-    match context.client_id_store.get(&context.repo_root) {
-        Ok(Some(client_id)) => {
-            results.push(CheckResult::passed(
-                CheckCategory::Config,
-                "Client ID",
-                format!("Assigned: {client_id}"),
-            ));
-        }
-        Ok(None) => {
-            results.push(
-                CheckResult::warning(CheckCategory::Config, "Client ID", "No client ID assigned")
-                    .with_fix("lat doctor --fix"),
-            );
-        }
-        Err(_) => {
-            results.push(
-                CheckResult::warning(
-                    CheckCategory::Config,
-                    "Client ID",
-                    "Could not read client ID",
-                )
-                .with_fix("lat doctor --fix"),
-            );
-        }
-    }
-
-    Ok(results)
+    config_checks::run_config_checks(context)
 }
 
 /// Runs claims checks.

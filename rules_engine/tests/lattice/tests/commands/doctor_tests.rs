@@ -1313,3 +1313,233 @@ mod git_checks {
         assert_eq!(git_checks.len(), 4, "Should have exactly 4 git integration checks");
     }
 }
+
+mod config_checks {
+    use lattice::cli::commands::doctor_command::doctor_checks;
+    use lattice::cli::commands::doctor_command::doctor_types::{
+        CheckCategory, CheckStatus, DoctorConfig,
+    };
+    use lattice::test::test_environment::TestEnv;
+
+    fn find_check<'a>(
+        results: &'a [lattice::cli::commands::doctor_command::doctor_types::CheckResult],
+        category: CheckCategory,
+        name: &str,
+    ) -> Option<&'a lattice::cli::commands::doctor_command::doctor_types::CheckResult> {
+        results.iter().find(|r| r.category == category && r.name == name)
+    }
+
+    #[test]
+    fn user_config_check_is_present() {
+        // Note: This test is environment-dependent because it reads the real
+        // ~/.lattice.toml file. The check should be Info (file not found) or
+        // Passed (valid file found).
+        let env = TestEnv::new();
+        let (_temp, context) = env.into_parts();
+        let config = DoctorConfig::default();
+
+        let results = doctor_checks::run_all_checks(&context, &config).expect("Run checks");
+
+        let check = find_check(&results, CheckCategory::Config, "User Config")
+            .expect("User Config check should be present");
+        assert!(
+            check.status == CheckStatus::Info || check.status == CheckStatus::Passed,
+            "User Config should be Info (no file) or Passed (valid file): {:?}",
+            check.status
+        );
+    }
+
+    #[test]
+    fn repo_config_check_passes_when_file_not_present() {
+        let env = TestEnv::new();
+        let (_temp, context) = env.into_parts();
+        let config = DoctorConfig::default();
+
+        let results = doctor_checks::run_all_checks(&context, &config).expect("Run checks");
+
+        let check = find_check(&results, CheckCategory::Config, "Repo Config")
+            .expect("Repo Config check should be present");
+        assert_eq!(
+            check.status,
+            CheckStatus::Info,
+            "Repo Config should be Info when file not present"
+        );
+        assert!(
+            check.message.contains("defaults") || check.message.contains("No"),
+            "Message should indicate using defaults: {}",
+            check.message
+        );
+    }
+
+    #[test]
+    fn repo_config_check_passes_when_file_is_valid() {
+        let env = TestEnv::new();
+        env.write_file(
+            ".lattice/config.toml",
+            "[format]\nline_width = 100\n[logging]\nlevel = \"warn\"\n",
+        );
+        let (_temp, context) = env.into_parts();
+        let config = DoctorConfig::default();
+
+        let results = doctor_checks::run_all_checks(&context, &config).expect("Run checks");
+
+        let check = find_check(&results, CheckCategory::Config, "Repo Config")
+            .expect("Repo Config check should be present");
+        assert_eq!(check.status, CheckStatus::Passed, "Repo Config should pass for valid TOML");
+        assert!(
+            check.message.contains("valid"),
+            "Message should indicate valid config: {}",
+            check.message
+        );
+    }
+
+    #[test]
+    fn repo_config_check_warns_on_parse_error() {
+        let env = TestEnv::new();
+        env.write_file(".lattice/config.toml", "this is not valid toml {{{{");
+        let (_temp, context) = env.into_parts();
+        let config = DoctorConfig::default();
+
+        let results = doctor_checks::run_all_checks(&context, &config).expect("Run checks");
+
+        let check = find_check(&results, CheckCategory::Config, "Repo Config")
+            .expect("Repo Config check should be present");
+        assert_eq!(check.status, CheckStatus::Warning, "Repo Config should warn on parse error");
+        assert!(
+            check.message.contains("parse error") || check.message.contains("error"),
+            "Message should indicate parse error: {}",
+            check.message
+        );
+    }
+
+    #[test]
+    fn client_id_check_passes_when_assigned() {
+        let env = TestEnv::new();
+        let (_temp, context) = env.into_parts();
+
+        // Set a client ID for this repository
+        context.client_id_store.set(&context.repo_root, "DTX").expect("Set client ID");
+
+        let config = DoctorConfig::default();
+        let results = doctor_checks::run_all_checks(&context, &config).expect("Run checks");
+
+        let check = find_check(&results, CheckCategory::Config, "Client ID")
+            .expect("Client ID check should be present");
+        assert_eq!(check.status, CheckStatus::Passed, "Client ID should pass when assigned");
+        assert!(
+            check.message.contains("Assigned") || check.message.contains("DTX"),
+            "Message should show assigned client ID: {}",
+            check.message
+        );
+    }
+
+    #[test]
+    fn client_id_check_warns_when_not_assigned() {
+        use lattice::git::client_config::FakeClientIdStore;
+
+        let env = TestEnv::new();
+        let (_temp, mut context) = env.into_parts();
+
+        // Replace with a FakeClientIdStore that has no client ID set
+        context.client_id_store = Box::new(FakeClientIdStore::new(""));
+        let config = DoctorConfig::default();
+
+        let results = doctor_checks::run_all_checks(&context, &config).expect("Run checks");
+
+        let check = find_check(&results, CheckCategory::Config, "Client ID")
+            .expect("Client ID check should be present");
+        assert_eq!(check.status, CheckStatus::Warning, "Client ID should warn when not assigned");
+        assert!(check.fixable, "Missing client ID should be fixable");
+    }
+
+    #[test]
+    fn config_values_check_passes_with_defaults() {
+        let env = TestEnv::new();
+        let (_temp, context) = env.into_parts();
+        let config = DoctorConfig::default();
+
+        let results = doctor_checks::run_all_checks(&context, &config).expect("Run checks");
+
+        let check = find_check(&results, CheckCategory::Config, "Config Values")
+            .expect("Config Values check should be present");
+        assert_eq!(check.status, CheckStatus::Passed, "Config Values should pass with defaults");
+        assert!(
+            check.message.contains("valid") || check.message.contains("within"),
+            "Message should indicate valid values: {}",
+            check.message
+        );
+    }
+
+    #[test]
+    fn config_values_check_warns_on_invalid_log_level() {
+        let env = TestEnv::new();
+        env.write_file(".lattice/config.toml", "[logging]\nlevel = \"invalid\"\n");
+        let (_temp, context) = env.into_parts();
+        let config = DoctorConfig::default();
+
+        let results = doctor_checks::run_all_checks(&context, &config).expect("Run checks");
+
+        let check = find_check(&results, CheckCategory::Config, "Config Values")
+            .expect("Config Values check should be present");
+        assert_eq!(
+            check.status,
+            CheckStatus::Warning,
+            "Config Values should warn on invalid log level"
+        );
+        assert!(
+            check.message.contains("log") || check.message.contains("level"),
+            "Message should mention log level: {}",
+            check.message
+        );
+    }
+
+    #[test]
+    fn config_values_check_warns_on_negative_weights() {
+        let env = TestEnv::new();
+        env.write_file(".lattice/config.toml", "[overview]\nview_weight = -0.5\n");
+        let (_temp, context) = env.into_parts();
+        let config = DoctorConfig::default();
+
+        let results = doctor_checks::run_all_checks(&context, &config).expect("Run checks");
+
+        let check = find_check(&results, CheckCategory::Config, "Config Values")
+            .expect("Config Values check should be present");
+        assert_eq!(
+            check.status,
+            CheckStatus::Warning,
+            "Config Values should warn on negative weights"
+        );
+        assert!(
+            check.message.contains("weight") || check.message.contains("Weight"),
+            "Message should mention weights: {}",
+            check.message
+        );
+    }
+
+    #[test]
+    fn all_config_checks_are_present() {
+        let env = TestEnv::new();
+        let (_temp, context) = env.into_parts();
+        let config = DoctorConfig::default();
+
+        let results = doctor_checks::run_all_checks(&context, &config).expect("Run checks");
+
+        let config_checks: Vec<_> =
+            results.iter().filter(|r| r.category == CheckCategory::Config).collect();
+
+        assert!(
+            config_checks.iter().any(|c| c.name == "User Config"),
+            "Should have User Config check"
+        );
+        assert!(
+            config_checks.iter().any(|c| c.name == "Repo Config"),
+            "Should have Repo Config check"
+        );
+        assert!(config_checks.iter().any(|c| c.name == "Client ID"), "Should have Client ID check");
+        assert!(
+            config_checks.iter().any(|c| c.name == "Config Values"),
+            "Should have Config Values check"
+        );
+        assert_eq!(config_checks.len(), 4, "Should have exactly 4 configuration checks");
+    }
+}
