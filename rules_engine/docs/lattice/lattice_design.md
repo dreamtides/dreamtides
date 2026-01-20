@@ -217,9 +217,8 @@ documents.
 **lat prime** - Outputs AI-optimized workflow context.
 
 **lat claim** - Marks tasks as locally in progress on the current machine.
-Claims are stored in `~/.lattice/claims/` as one file per claim, not in markdown
-files. Supports atomic updates across multiple worktrees and automatic release
-when tasks are closed.
+Claims are stored in `.lattice/claims/` (gitignored) as one file per claim, not
+in markdown files. Supports automatic release when tasks are closed.
 
 **lat pop** - The primary interface for AI agents to start work. Combines
 `lat ready`, `lat claim`, and `lat show` into a single operation: finds the

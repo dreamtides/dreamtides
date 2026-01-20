@@ -1,7 +1,8 @@
 //! Claim operations for task management.
 //!
 //! This module provides operations for claiming, releasing, and querying task
-//! claims. Claims are local to the machine and stored in `~/.lattice/claims/`.
+//! claims. Claims are local to the machine and stored in `.lattice/claims/`
+//! under the project root (gitignored).
 
 use std::path::Path;
 

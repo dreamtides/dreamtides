@@ -3,7 +3,6 @@ use std::io::{ErrorKind, Write};
 use std::path::{Path, PathBuf};
 
 use chrono::{DateTime, Utc};
-use sha2::{Digest, Sha256};
 use tracing::{debug, info, warn};
 
 use crate::cli::command_dispatch::LatticeResult;
@@ -32,21 +31,14 @@ pub enum WriteClaimResult {
 
 /// Returns the claims directory path for the given repository.
 ///
-/// Path format: `~/.lattice/claims/<repo-hash>/`
-/// where `<repo-hash>` is the first 8 characters of the SHA-256 hash
-/// of the canonical repository root path.
+/// Path format: `<repo_root>/.lattice/claims/`
 pub fn claim_dir_path(repo_root: &Path) -> LatticeResult<PathBuf> {
-    let base = lattice_base_dir().ok_or_else(|| LatticeError::WriteError {
-        path: PathBuf::from("~/.lattice"),
-        reason: "Could not determine home directory".to_string(),
-    })?;
-    let repo_hash = compute_repo_hash(repo_root)?;
-    Ok(base.join("claims").join(repo_hash))
+    Ok(repo_root.join(".lattice").join("claims"))
 }
 
 /// Returns the claim file path for a specific task in a repository.
 ///
-/// Path format: `~/.lattice/claims/<repo-hash>/<lattice-id>.json`
+/// Path format: `<repo_root>/.lattice/claims/<lattice-id>.json`
 pub fn claim_file_path(repo_root: &Path, id: &LatticeId) -> LatticeResult<PathBuf> {
     let dir = claim_dir_path(repo_root)?;
     Ok(dir.join(format!("{}.json", id.as_str())))
@@ -189,40 +181,4 @@ impl ClaimData {
     pub fn new(work_path: PathBuf) -> Self {
         Self { claimed_at: Utc::now(), work_path }
     }
-}
-
-/// Returns the user's home directory.
-fn home_dir() -> Option<PathBuf> {
-    std::env::var_os("HOME").map(PathBuf::from).or({
-        #[cfg(target_os = "windows")]
-        {
-            std::env::var_os("USERPROFILE").map(PathBuf::from)
-        }
-        #[cfg(not(target_os = "windows"))]
-        {
-            None
-        }
-    })
-}
-
-/// Returns the base Lattice directory path (`~/.lattice/`).
-///
-/// Returns `None` if the home directory cannot be determined.
-fn lattice_base_dir() -> Option<PathBuf> {
-    home_dir().map(|home| home.join(".lattice"))
-}
-
-/// Computes the repository hash: first 8 characters of SHA-256 of canonical
-/// path.
-fn compute_repo_hash(repo_root: &Path) -> LatticeResult<String> {
-    let canonical = repo_root.canonicalize().map_err(|e| LatticeError::ReadError {
-        path: repo_root.to_path_buf(),
-        reason: format!("Failed to canonicalize repository path: {e}"),
-    })?;
-    let path_str = canonical.to_string_lossy();
-    let mut hasher = Sha256::new();
-    hasher.update(path_str.as_bytes());
-    let hash = hasher.finalize();
-    // Take first 4 bytes and format as 8 hex characters
-    Ok(format!("{:02x}{:02x}{:02x}{:02x}", hash[0], hash[1], hash[2], hash[3]))
 }

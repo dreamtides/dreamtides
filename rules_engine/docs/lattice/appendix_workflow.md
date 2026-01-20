@@ -501,7 +501,7 @@ These commands appear in the session protocol output.
 
 The `lat claim` command marks a task as locally in progress on the current
 machine. This state is NOT stored in markdown files or tracked in git;
-instead it persists to `~/.lattice/claims/`.
+instead it persists to `.lattice/claims/` under the project root (gitignored).
 
 ### Basic Usage
 
@@ -516,19 +516,18 @@ lat claim --gc                     # Clean up stale claims
 
 ### Claim Storage
 
-Each claim is a separate file in `~/.lattice/claims/<repo-hash>/`:
+Each claim is a separate file in `.lattice/claims/` under the project root:
 
 ```
-~/.lattice/claims/
-  a1b2c3d4/           # Hash of /path/to/repo1
-    LB234X.json
-    L567CX.json
-  e5f6g7h8/           # Hash of /path/to/repo2
-    LDAB2X.json
+project/
+  .lattice/
+    claims/
+      LB234X.json
+      L567CX.json
 ```
 
-The `<repo-hash>` is the first 8 characters of the SHA-256 hash of the
-canonical repository root path. Each claim file contains minimal JSON:
+The `.lattice/` directory is gitignored and used for local state including
+the SQLite index, logs, and claims. Each claim file contains minimal JSON:
 
 ```json
 {
@@ -626,7 +625,8 @@ which machine is working on a task, not who. This design:
 | `lat show` | View document details | No |
 | `lat ready` | Find available work | No |
 | `lat prime` | AI workflow context | No |
-| `lat claim` | Track local work | No (uses ~/.lattice/) |
+| `lat claim` | Track local work | No (uses .lattice/claims/) |
 
-All four commands are read-only with respect to repository files. The
-claim command modifies only the user's local `~/.lattice/` directory.
+All four commands are read-only with respect to repository markdown files.
+The claim command modifies only the local `.lattice/claims/` directory,
+which is gitignored.
