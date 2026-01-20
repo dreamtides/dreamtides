@@ -418,5 +418,5 @@ fn compute_is_root(path: &str) -> bool {
     let Some(parent_name) = parent.file_name().and_then(|s| s.to_str()) else {
         return false;
     };
-    file_stem == parent_name || file_stem == format!("_{parent_name}")
+    file_stem == parent_name || file_stem.starts_with("00_")
 }

@@ -74,8 +74,8 @@ pub struct NonTaskInClosedRule;
 
 /// E013: Duplicate root documents.
 ///
-/// A directory contains both standard (`dir/dir.md`) and underscore-prefixed
-/// (`dir/_dir.md`) root documents.
+/// A directory contains both a standard root document (`dir/dir.md`) and a
+/// `00_`-prefixed root document (e.g., `dir/00_design.md`).
 pub struct DuplicateRootDocumentsRule;
 
 /// Returns all error-level lint rules.
@@ -454,10 +454,10 @@ impl LintRule for DuplicateRootDocumentsRule {
             return vec![];
         };
 
-        // Determine if this is the underscore-prefixed form
-        let is_underscore_prefixed = file_stem.starts_with('_');
-        if !is_underscore_prefixed {
-            // Only report from the underscore-prefixed one to avoid duplicate errors
+        // Determine if this is a 00_ prefixed root
+        let is_00_prefixed = file_stem.starts_with("00_");
+        if !is_00_prefixed {
+            // Only report from the 00_ prefixed one to avoid duplicate errors
             return vec![];
         }
 
@@ -478,8 +478,10 @@ impl LintRule for DuplicateRootDocumentsRule {
         ) {
             Ok(Some(_)) => {
                 let message = format!(
-                    "Directory '{}/' has both {}.md and _{}.md as root documents; remove one",
-                    dir_name, dir_name, dir_name
+                    "Directory '{}/' has both {}.md and {} as root documents; remove one",
+                    dir_name,
+                    dir_name,
+                    path.file_name().and_then(|n| n.to_str()).unwrap_or("00_*.md")
                 );
                 vec![LintResult::error("E013", &doc.row.path, message)]
             }

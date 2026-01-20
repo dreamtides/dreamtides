@@ -986,9 +986,7 @@ fn is_root_document(path: &Path) -> bool {
     let parent_name =
         path.parent().and_then(|p| p.file_name()).and_then(|n| n.to_str()).unwrap_or("");
 
-    let stem_without_underscore = file_stem.strip_prefix('_').unwrap_or(file_stem);
-
-    stem_without_underscore == parent_name
+    file_stem == parent_name || file_stem.starts_with("00_")
 }
 
 /// Prints the chaos monkey result.

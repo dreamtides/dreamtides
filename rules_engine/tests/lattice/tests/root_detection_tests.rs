@@ -443,60 +443,59 @@ fn find_ancestors_preserves_order() {
 }
 
 // ============================================================================
-// Underscore-prefixed root document tests
+// 00_-prefixed root document tests
 // ============================================================================
 
 #[test]
-fn is_root_document_returns_true_for_underscore_prefixed_root() {
+fn is_root_document_returns_true_for_00_prefixed_root() {
     assert!(
-        is_root_document(Path::new("api/_api.md")),
-        "api/_api.md should be detected as root document"
+        is_root_document(Path::new("api/00_design.md")),
+        "api/00_design.md should be detected as root document"
     );
 }
 
 #[test]
-fn is_root_document_returns_true_for_nested_underscore_prefixed_root() {
+fn is_root_document_returns_true_for_nested_00_prefixed_root() {
     assert!(
-        is_root_document(Path::new("project/api/v2/_v2.md")),
-        "project/api/v2/_v2.md should be detected as root document"
+        is_root_document(Path::new("project/api/v2/00_overview.md")),
+        "project/api/v2/00_overview.md should be detected as root document"
     );
 }
 
 #[test]
-fn is_root_document_returns_false_for_arbitrary_underscore_prefix() {
+fn is_root_document_returns_false_for_01_prefix() {
     assert!(
-        !is_root_document(Path::new("api/_other.md")),
-        "api/_other.md should NOT be root - filename doesn't match directory"
+        !is_root_document(Path::new("api/01_intro.md")),
+        "api/01_intro.md should NOT be root - only 00_ prefix is root"
     );
 }
 
 #[test]
-fn is_root_document_returns_false_for_double_underscore() {
+fn is_root_document_returns_false_for_underscore_prefix() {
     assert!(
-        !is_root_document(Path::new("api/__api.md")),
-        "api/__api.md should NOT be root - double underscore"
+        !is_root_document(Path::new("api/_api.md")),
+        "api/_api.md should NOT be root - underscore prefix is no longer supported"
     );
 }
 
 #[test]
-fn root_document_paths_for_returns_both_variants() {
+fn root_document_paths_for_returns_standard_form_only() {
     let paths = root_document_paths_for(Path::new("api"));
-    assert_eq!(paths.len(), 2, "Should return both variants");
-    assert_eq!(paths[0].as_path(), Path::new("api/api.md"), "First should be standard form");
-    assert_eq!(paths[1].as_path(), Path::new("api/_api.md"), "Second should be underscore form");
+    assert_eq!(paths.len(), 1, "Should return only standard form");
+    assert_eq!(paths[0].as_path(), Path::new("api/api.md"), "Should be standard form");
 }
 
 #[test]
-fn find_root_for_finds_underscore_prefixed_root() {
+fn find_root_for_finds_00_prefixed_root() {
     let temp_dir = TempDir::new().expect("Create temp dir");
     let root = temp_dir.path();
 
     fs::create_dir_all(root.join("api/tasks")).expect("Create api/tasks");
     fs::write(
-        root.join("api/_api.md"),
-        "---\nlattice-id: LAPIXX\nname: api\ndescription: API module\n---\n",
+        root.join("api/00_design.md"),
+        "---\nlattice-id: LAPIXX\nname: design\ndescription: API design\n---\n",
     )
-    .expect("Write _api.md");
+    .expect("Write 00_design.md");
     fs::write(
         root.join("api/tasks/fix_bug.md"),
         "---\nlattice-id: LBUGZZ\nname: fix-bug\ndescription: Fix bug\ntask-type: bug\npriority: 1\n---\n",
@@ -507,22 +506,22 @@ fn find_root_for_finds_underscore_prefixed_root() {
 
     assert_eq!(
         result.expect("Should find root").as_path(),
-        Path::new("api/_api.md"),
-        "Task should find underscore-prefixed root document"
+        Path::new("api/00_design.md"),
+        "Task should find 00_ prefixed root document"
     );
 }
 
 #[test]
-fn compute_parent_id_works_with_underscore_prefixed_root() {
+fn compute_parent_id_works_with_00_prefixed_root() {
     let temp_dir = TempDir::new().expect("Create temp dir");
     let root = temp_dir.path();
 
     fs::create_dir_all(root.join("api/tasks")).expect("Create api/tasks");
     fs::write(
-        root.join("api/_api.md"),
-        "---\nlattice-id: LAPIXX\nname: api\ndescription: API module\n---\n",
+        root.join("api/00_design.md"),
+        "---\nlattice-id: LAPIXX\nname: design\ndescription: API design\n---\n",
     )
-    .expect("Write _api.md");
+    .expect("Write 00_design.md");
     fs::write(
         root.join("api/tasks/fix_bug.md"),
         "---\nlattice-id: LBUGZZ\nname: fix-bug\ndescription: Fix bug\ntask-type: bug\npriority: 1\n---\n",
@@ -534,20 +533,26 @@ fn compute_parent_id_works_with_underscore_prefixed_root() {
     assert_eq!(
         result.expect("Should compute parent ID").as_str(),
         "LAPIXX",
-        "Parent ID should be from underscore-prefixed root"
+        "Parent ID should be from 00_ prefixed root"
     );
 }
 
 #[test]
-fn find_ancestors_finds_underscore_prefixed_root() {
+fn find_ancestors_finds_00_prefixed_root() {
     let temp_dir = TempDir::new().expect("Create temp dir");
     let root = temp_dir.path();
 
     fs::create_dir_all(root.join("a/b/tasks")).expect("Create nested dirs");
-    fs::write(root.join("a/_a.md"), "---\nlattice-id: LAXXXX\nname: a\ndescription: A\n---\n")
-        .expect("Write _a.md");
-    fs::write(root.join("a/b/_b.md"), "---\nlattice-id: LBXXXX\nname: b\ndescription: B\n---\n")
-        .expect("Write _b.md");
+    fs::write(
+        root.join("a/00_overview.md"),
+        "---\nlattice-id: LAXXXX\nname: overview\ndescription: A\n---\n",
+    )
+    .expect("Write 00_overview.md");
+    fs::write(
+        root.join("a/b/00_design.md"),
+        "---\nlattice-id: LBXXXX\nname: design\ndescription: B\n---\n",
+    )
+    .expect("Write 00_design.md");
     fs::write(
         root.join("a/b/tasks/task.md"),
         "---\nlattice-id: LTXXXX\nname: task\ndescription: Task\ntask-type: task\npriority: 2\n---\n",
@@ -557,12 +562,12 @@ fn find_ancestors_finds_underscore_prefixed_root() {
     let ancestors = find_ancestors(Path::new("a/b/tasks/task.md"), root);
 
     assert_eq!(ancestors.len(), 2, "Should find two ancestors");
-    assert_eq!(ancestors[0].as_path(), Path::new("a/b/_b.md"));
-    assert_eq!(ancestors[1].as_path(), Path::new("a/_a.md"));
+    assert_eq!(ancestors[0].as_path(), Path::new("a/b/00_design.md"));
+    assert_eq!(ancestors[1].as_path(), Path::new("a/00_overview.md"));
 }
 
 #[test]
-fn find_root_for_prefers_standard_form_over_underscore() {
+fn find_root_for_prefers_standard_form_over_00_prefix() {
     let temp_dir = TempDir::new().expect("Create temp dir");
     let root = temp_dir.path();
 
@@ -574,10 +579,10 @@ fn find_root_for_prefers_standard_form_over_underscore() {
     )
     .expect("Write api.md");
     fs::write(
-        root.join("api/_api.md"),
-        "---\nlattice-id: LAPIUN\nname: api\ndescription: API underscore\n---\n",
+        root.join("api/00_design.md"),
+        "---\nlattice-id: LAPI00\nname: design\ndescription: API 00_ form\n---\n",
     )
-    .expect("Write _api.md");
+    .expect("Write 00_design.md");
     fs::write(
         root.join("api/tasks/fix_bug.md"),
         "---\nlattice-id: LBUGZZ\nname: fix-bug\ndescription: Fix bug\ntask-type: bug\npriority: 1\n---\n",

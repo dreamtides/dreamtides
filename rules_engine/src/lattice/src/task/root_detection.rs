@@ -11,13 +11,14 @@ const MD_EXTENSION: &str = "md";
 
 /// Checks if a path represents a root document.
 ///
-/// A root document has a filename (without `.md` extension) that matches its
-/// containing directory name, optionally prefixed with an underscore. For
-/// example:
-/// - `api/api.md` → root (filename "api" matches directory "api")
-/// - `api/_api.md` → root (underscore-prefixed form)
-/// - `auth/auth.md` → root
-/// - `auth/tasks/login.md` → NOT root (filename "login" ≠ directory "tasks")
+/// A root document is either:
+/// - A file whose name (without `.md` extension) matches its containing
+///   directory name (e.g., `api/api.md`)
+/// - A file whose name starts with `00_` prefix (e.g., `lattice/00_design.md`)
+///
+/// The `00_` prefix indicates a document that is part of a numbered series
+/// (00_, 01_, 02_, etc.) where the 00_ document serves as the root. This
+/// convention is not enforced by Lattice.
 ///
 /// This function examines the path structure only; it does not access the
 /// filesystem or validate that the file exists.
@@ -50,7 +51,9 @@ pub fn is_root_document(path: &Path) -> bool {
         return false;
     };
 
-    let is_root = file_stem == parent_name || file_stem == format!("_{parent_name}");
+    let is_standard_root = file_stem == parent_name;
+    let is_00_root = file_stem.starts_with("00_");
+    let is_root = is_standard_root || is_00_root;
 
     debug!(
         path = %path.display(),
@@ -94,10 +97,12 @@ pub fn root_document_path_for(dir_path: &Path) -> Option<PathBuf> {
     Some(root_path)
 }
 
-/// Returns all possible root document paths for a directory.
+/// Returns the possible root document path for a directory (standard form
+/// only).
 ///
-/// Given a directory path, returns both the standard root document path
-/// (`dir/dir.md`) and the underscore-prefixed form (`dir/_dir.md`).
+/// Given a directory path, returns the standard root document path
+/// (`dir/dir.md`). For `00_`-prefixed roots, use `find_00_root_in_directory`
+/// which requires filesystem access since the filename is not predictable.
 ///
 /// # Arguments
 ///
@@ -105,17 +110,48 @@ pub fn root_document_path_for(dir_path: &Path) -> Option<PathBuf> {
 ///
 /// # Returns
 ///
-/// A vector containing both possible root document paths. The standard form
-/// is returned first, followed by the underscore-prefixed form.
+/// A vector containing the standard root document path.
 /// Returns an empty vector if the directory path has no name component.
 pub fn root_document_paths_for(dir_path: &Path) -> Vec<PathBuf> {
     let Some(dir_name) = dir_path.file_name().and_then(|s| s.to_str()) else {
         return vec![];
     };
-    vec![
-        dir_path.join(format!("{dir_name}.{MD_EXTENSION}")),
-        dir_path.join(format!("_{dir_name}.{MD_EXTENSION}")),
-    ]
+    vec![dir_path.join(format!("{dir_name}.{MD_EXTENSION}"))]
+}
+
+/// Finds a `00_`-prefixed root document in a directory.
+///
+/// Scans the given directory for any file matching the pattern `00_*.md`.
+/// If multiple such files exist, returns the first one found (alphabetically).
+///
+/// # Arguments
+///
+/// * `dir_path` - Path to the directory (relative to repo root)
+/// * `repo_root` - Absolute path to the repository root
+///
+/// # Returns
+///
+/// The relative path to the `00_`-prefixed root document, or `None` if none
+/// exists.
+pub fn find_00_root_in_directory(dir_path: &Path, repo_root: &Path) -> Option<PathBuf> {
+    let absolute_dir = repo_root.join(dir_path);
+    let entries = std::fs::read_dir(&absolute_dir).ok()?;
+
+    let mut candidates: Vec<PathBuf> = entries
+        .filter_map(std::result::Result::ok)
+        .filter_map(|entry| {
+            let file_name = entry.file_name();
+            let name_str = file_name.to_str()?;
+            if name_str.starts_with("00_") && name_str.ends_with(".md") {
+                Some(dir_path.join(name_str))
+            } else {
+                None
+            }
+        })
+        .collect();
+
+    candidates.sort();
+    candidates.into_iter().next()
 }
 
 /// Finds the root document for a given document path.
@@ -125,8 +161,10 @@ pub fn root_document_paths_for(dir_path: &Path) -> Vec<PathBuf> {
 /// document found.
 ///
 /// For example, given `api/tasks/fix_bug.md`, this would search:
-/// 1. `api/tasks/tasks.md` or `api/tasks/_tasks.md` (not found)
-/// 2. `api/api.md` or `api/_api.md` (found - return this)
+/// 1. `api/tasks/tasks.md` or `api/tasks/00_*.md` (not found)
+/// 2. `api/api.md` or `api/00_*.md` (found - return this)
+///
+/// Standard form roots (`dir/dir.md`) take priority over `00_`-prefixed roots.
 ///
 /// # Arguments
 ///
@@ -141,6 +179,7 @@ pub fn find_root_for(doc_path: &Path, repo_root: &Path) -> Option<PathBuf> {
     let mut current_dir = doc_path.parent()?;
 
     while !current_dir.as_os_str().is_empty() {
+        // First check standard form
         for root_path in root_document_paths_for(current_dir) {
             let absolute_root = repo_root.join(&root_path);
             if absolute_root.is_file() {
@@ -151,6 +190,15 @@ pub fn find_root_for(doc_path: &Path, repo_root: &Path) -> Option<PathBuf> {
                 );
                 return Some(root_path);
             }
+        }
+        // Then check for 00_ prefix roots
+        if let Some(root_path) = find_00_root_in_directory(current_dir, repo_root) {
+            info!(
+                doc_path = %doc_path.display(),
+                root_path = %root_path.display(),
+                "Found 00_ root document for path"
+            );
+            return Some(root_path);
         }
         current_dir = current_dir.parent()?;
     }
@@ -244,12 +292,19 @@ pub fn find_ancestors(doc_path: &Path, repo_root: &Path) -> Vec<PathBuf> {
     };
 
     while !current_dir.as_os_str().is_empty() {
+        // First check standard form
+        let mut found = false;
         for root_path in root_document_paths_for(current_dir) {
             let absolute_root = repo_root.join(&root_path);
             if absolute_root.is_file() {
                 ancestors.push(root_path);
-                break; // Found root for this directory, move to parent
+                found = true;
+                break;
             }
+        }
+        // Then check for 00_ prefix roots if no standard found
+        if !found && let Some(root_path) = find_00_root_in_directory(current_dir, repo_root) {
+            ancestors.push(root_path);
         }
         if let Some(parent) = current_dir.parent() {
             current_dir = parent;
@@ -308,6 +363,7 @@ fn find_root_starting_from(start_dir: &Path, repo_root: &Path) -> Option<PathBuf
     let mut current_dir = start_dir;
 
     loop {
+        // First check standard form
         for root_path in root_document_paths_for(current_dir) {
             let absolute_root = repo_root.join(&root_path);
             if absolute_root.is_file() {
@@ -318,6 +374,15 @@ fn find_root_starting_from(start_dir: &Path, repo_root: &Path) -> Option<PathBuf
                 );
                 return Some(root_path);
             }
+        }
+        // Then check for 00_ prefix roots
+        if let Some(root_path) = find_00_root_in_directory(current_dir, repo_root) {
+            debug!(
+                start_dir = %start_dir.display(),
+                root_path = %root_path.display(),
+                "Found 00_ root document starting from directory"
+            );
+            return Some(root_path);
         }
         current_dir = current_dir.parent()?;
         if current_dir.as_os_str().is_empty() {

@@ -134,16 +134,19 @@ Documents exceeding this should be split into multiple files using the
 
 ### Root Documents and Hierarchy
 
-A **root document** is a document whose filename (without `.md` extension)
-matches its containing directory name, optionally prefixed with an underscore.
-For example:
-- `api/api.md` is a root document (filename `api` matches directory `api`)
-- `api/_api.md` is also a valid root document (underscore-prefixed form)
+A **root document** is either:
+- A document whose filename (without `.md` extension) matches its containing
+  directory name (e.g., `api/api.md`)
+- A document whose filename starts with `00_` (e.g., `lattice/00_design.md`)
 
-The underscore-prefixed form is useful when you want root documents to sort
-first in directory listings. It is an error to have both forms in the same
-directory (see E013). Root documents serve as the default parent for all other
-documents in that directory.
+The `00_` prefix indicates a document that is part of a numbered series (00_,
+01_, 02_, etc.) where the 00_ document serves as the root. This convention is
+useful when you want to organize related documents in a sequence. The numbered
+series convention is not enforced by Lattice; only the `00_` prefix is
+recognized as a root indicator.
+
+It is an error to have both forms in the same directory (see E013). Root
+documents serve as the default parent for all other documents in that directory.
 
 The idiomatic Lattice directory structure separates tasks and documentation:
 
