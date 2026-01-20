@@ -14,8 +14,6 @@ Primary design doc: @rules_engine/docs/lattice/lattice_design.md
 
 Code: @rules_engine/src/lattice/
 
-# [Lattice] Acceptance Criteria
-
 ## Instructions
 
 Please do the following:
@@ -26,7 +24,7 @@ Please do the following:
 3) Think one level deeper: How can we prevent this *category* of problems? How
    can the system be overall more robust / self-healing?
 
-## Acceptance Criteria
+# [Lattice] Acceptance Criteria
 
 When complete, please:
 
