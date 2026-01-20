@@ -21,6 +21,7 @@ bench = false
 [dependencies]
 chrono = { workspace = true }
 clap = { workspace = true }
+clap_complete = { workspace = true }
 human-panic = { workspace = true }
 owo-colors = { workspace = true }
 pulldown-cmark = { workspace = true }

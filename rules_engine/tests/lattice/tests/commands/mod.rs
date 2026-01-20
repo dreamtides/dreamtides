@@ -4,6 +4,7 @@ mod check_tests;
 mod children_tests;
 mod claim_tests;
 mod close_tests;
+mod completion_tests;
 mod create_tests;
 mod dep_tests;
 mod dispatch_tests;
