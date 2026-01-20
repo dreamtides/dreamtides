@@ -80,11 +80,16 @@ impl Patrol {
             }
         }
         self.send_pending_self_review_prompts(state, config)?;
+        self.send_pending_rebase_prompts(state)?;
         let transitioned_workers: std::collections::HashSet<String> =
             report.transitions_applied.iter().map(|(name, _)| name.clone()).collect();
         self.rebase_pending_reviews(state, &transitioned_workers, &mut report)?;
         if !report.rebases_triggered.is_empty() {
             let state_path = state::get_state_path();
+            tracing::info!(
+                rebases = ?report.rebases_triggered,
+                "Saving state after rebases triggered"
+            );
             if let Err(e) = state.save(&state_path) {
                 tracing::error!(
                     "Failed to save state after {} rebases triggered: {}",
@@ -92,7 +97,7 @@ impl Patrol {
                     e
                 );
             } else {
-                tracing::debug!(
+                tracing::info!(
                     "Saved state after {} rebases triggered",
                     report.rebases_triggered.len()
                 );
@@ -140,6 +145,33 @@ impl Patrol {
                         let is_linear = git::is_ancestor(worktree_path, "origin/master", "HEAD")
                             .unwrap_or(false);
                         if !is_linear {
+                            // Before resetting, check if there's a rebase in progress
+                            // which would indicate the worker was rebasing when daemon restarted
+                            if git::is_rebase_in_progress(worktree_path) {
+                                tracing::warn!(
+                                    worker = %worker_name,
+                                    "Idle worker has diverged history AND active rebase - \
+                                     this indicates the worker was rebasing when daemon restarted. \
+                                     Transitioning to Rebasing state instead of resetting."
+                                );
+                                if let Some(w) = state.get_worker_mut(&worker_name) {
+                                    if let Err(e) =
+                                        worker::apply_transition(w, WorkerTransition::ToRebasing)
+                                    {
+                                        tracing::error!(
+                                            "Failed to transition worker '{}' to Rebasing: {}",
+                                            worker_name,
+                                            e
+                                        );
+                                    } else {
+                                        report.transitions_applied.push((
+                                            worker_name.clone(),
+                                            WorkerTransition::ToRebasing,
+                                        ));
+                                    }
+                                }
+                                continue;
+                            }
                             tracing::info!(
                                 "Worker '{}' is idle with diverged history (origin/master not an ancestor of HEAD), resetting to origin/master",
                                 worker_name
@@ -534,6 +566,74 @@ impl Patrol {
                             e
                         );
                     }
+                }
+            }
+        }
+        Ok(())
+    }
+
+    fn send_pending_rebase_prompts(&self, state: &mut State) -> Result<()> {
+        let worker_names: Vec<String> = state.workers.keys().cloned().collect();
+        for worker_name in worker_names {
+            let worker = state.get_worker(&worker_name).unwrap();
+            if worker.status != WorkerStatus::Rebasing {
+                continue;
+            }
+            if !worker.pending_rebase_prompt {
+                continue;
+            }
+            let worktree_path = PathBuf::from(&worker.worktree_path);
+            if !git::is_rebase_in_progress(&worktree_path) {
+                tracing::info!(
+                    worker = %worker_name,
+                    "Worker has pending rebase prompt but rebase is no longer in progress, clearing flag"
+                );
+                if let Some(w) = state.get_worker_mut(&worker_name) {
+                    w.pending_rebase_prompt = false;
+                }
+                continue;
+            }
+            let conflicts = match git::get_conflicted_files(&worktree_path) {
+                Ok(c) => c,
+                Err(e) => {
+                    tracing::warn!(
+                        worker = %worker_name,
+                        error = %e,
+                        "Failed to get conflicted files, will retry next patrol"
+                    );
+                    continue;
+                }
+            };
+            let original_prompt = worker.current_prompt.clone();
+            let session_id = worker.session_id.clone();
+            tracing::info!(
+                worker = %worker_name,
+                conflicts = ?conflicts,
+                "Sending rebase conflict prompt to worker after daemon restart"
+            );
+            let conflict_prompt = build_conflict_prompt(&conflicts, &original_prompt);
+            let sender = TmuxSender::new();
+            if let Err(e) = sender.send(&session_id, &conflict_prompt) {
+                tracing::error!(
+                    worker = %worker_name,
+                    error = %e,
+                    "Failed to send rebase conflict prompt"
+                );
+            } else {
+                tracing::info!(
+                    worker = %worker_name,
+                    "Rebase conflict prompt sent successfully"
+                );
+                if let Some(w) = state.get_worker_mut(&worker_name) {
+                    w.pending_rebase_prompt = false;
+                }
+                let state_path = state::get_state_path();
+                if let Err(e) = state.save(&state_path) {
+                    tracing::error!(
+                        "Failed to save state after sending rebase prompt to '{}': {}",
+                        worker_name,
+                        e
+                    );
                 }
             }
         }
@@ -1020,6 +1120,7 @@ mod tests {
             self_review: false,
             pending_self_review: false,
             commits_first_detected_unix: None,
+            pending_rebase_prompt: false,
         }
     }
 

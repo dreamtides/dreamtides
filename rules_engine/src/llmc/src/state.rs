@@ -77,6 +77,11 @@ pub struct WorkerRecord {
     /// Reset when worker transitions out of Working/Rejected state.
     #[serde(default)]
     pub commits_first_detected_unix: Option<u64>,
+    /// If true, a rebase conflict prompt should be sent on the next patrol run.
+    /// Set when a worker is detected in Rebasing state at startup (e.g., after
+    /// daemon restart) without having received a conflict prompt.
+    #[serde(default)]
+    pub pending_rebase_prompt: bool,
 }
 /// State file tracking all workers and their status
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -277,6 +282,7 @@ mod tests {
             self_review: false,
             pending_self_review: false,
             commits_first_detected_unix: None,
+            pending_rebase_prompt: false,
         }
     }
     #[test]

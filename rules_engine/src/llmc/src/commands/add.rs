@@ -80,6 +80,7 @@ pub fn run_add(
         self_review,
         pending_self_review: false,
         commits_first_detected_unix: None,
+        pending_rebase_prompt: false,
     };
     state.add_worker(worker_record);
     state.save(&state_path)?;

@@ -233,6 +233,7 @@ TMUX session identifier.
 | `self_review` | bool | If true, enable self-review phase for this task |
 | `pending_self_review` | bool | If true, self-review prompt pending |
 | `commits_first_detected_unix` | Option<u64> | When commits were first detected (for fallback timing) |
+| `pending_rebase_prompt` | bool | If true, rebase conflict prompt needs to be sent |
 
 ## TMUX Integration
 
@@ -315,9 +316,11 @@ maintain system health. It performs these main operations:
    healthy workers
 2. **Send pending self-review prompts**: Trigger self-review for workers that
    committed work and have pending_self_review set
-3. **Rebase pending reviews**: Keep `needs_review` workers rebased on master,
+3. **Send pending rebase prompts**: Send conflict prompts to workers restored to
+   Rebasing state after daemon restart
+4. **Rebase pending reviews**: Keep `needs_review` workers rebased on master,
    and detect workers whose work was already merged (resetting them to idle)
-4. **Detect rebase conflicts**: Transition workers to Rebasing state when git
+5. **Detect rebase conflicts**: Transition workers to Rebasing state when git
    detects conflicts that require human intervention
 
 State transitions for task completion are now handled by Claude Code hooks

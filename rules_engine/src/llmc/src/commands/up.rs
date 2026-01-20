@@ -162,14 +162,28 @@ fn reconcile_and_start_workers(config: &Config, state: &mut State, verbose: bool
         if let Some(worker_record) = state.workers.get_mut(worker_name)
             && !session::session_exists(&worker_record.session_id)
         {
-            println!("  Worker '{}' session not found, marking offline", worker_name);
-            worker_record.status = WorkerStatus::Offline;
+            // Preserve Rebasing state - it indicates important context about a rebase in
+            // progress The startup code will detect this and handle it
+            // appropriately
+            if worker_record.status == WorkerStatus::Rebasing {
+                println!(
+                    "  Worker '{}' session not found but has Rebasing state, preserving state",
+                    worker_name
+                );
+            } else {
+                println!("  Worker '{}' session not found, marking offline", worker_name);
+                worker_record.status = WorkerStatus::Offline;
+            }
         }
     }
     let mut failed_workers: Vec<String> = Vec::new();
     for worker_name in &worker_names {
+        // Start workers that are Offline OR Rebasing (Rebasing workers need sessions
+        // too)
         if let Some(worker_record) = state.workers.get(worker_name)
-            && worker_record.status == WorkerStatus::Offline
+            && (worker_record.status == WorkerStatus::Offline
+                || (worker_record.status == WorkerStatus::Rebasing
+                    && !session::session_exists(&worker_record.session_id)))
         {
             println!("  Starting worker '{}'...", worker_name);
             if let Err(e) = start_worker_with_recovery(worker_name, config, state, verbose) {
@@ -345,15 +359,34 @@ fn start_worker(name: &str, config: &Config, state: &mut State, verbose: bool) -
                 name
             );
         }
+    } else if git::is_rebase_in_progress(&worktree_path) {
+        // Worker has an active rebase - transition to Rebasing state instead of Error
+        // This preserves the rebase state across daemon restarts
+        tracing::info!(
+            worker = %name,
+            "Worker has active rebase in progress at startup, transitioning to Rebasing"
+        );
+        if let Err(e) = worker::apply_transition(worker_mut, WorkerTransition::ToRebasing) {
+            tracing::warn!("Failed to transition worker '{}' to Rebasing: {}", name, e);
+            worker_mut.status = WorkerStatus::Rebasing;
+            worker_mut.last_activity_unix = unix_timestamp_now();
+        }
+        // Queue a conflict prompt to be sent by the patrol
+        worker_mut.pending_rebase_prompt = true;
+        println!("  ⚠ Worker '{}' has an active rebase in progress", name);
+        println!("    Claude will receive a rebase conflict prompt once ready.");
+        if verbose {
+            println!("    [verbose] Worker '{}' has active rebase, marked as Rebasing", name);
+        }
     } else {
         if let Err(e) = worker::apply_transition(worker_mut, WorkerTransition::ToError {
-            reason: "Uncommitted changes or incomplete rebase at startup".to_string(),
+            reason: "Uncommitted changes at startup".to_string(),
         }) {
             tracing::warn!("Failed to transition worker '{}' to Error: {}", name, e);
             worker_mut.status = WorkerStatus::Error;
             worker_mut.last_activity_unix = unix_timestamp_now();
         }
-        println!("  ⚠ Worker '{}' has uncommitted changes or incomplete rebase", name);
+        println!("  ⚠ Worker '{}' has uncommitted changes", name);
         println!(
             "    Marked as Error. Run 'llmc doctor --fix' or 'llmc reset {}' to recover",
             name
@@ -672,7 +705,13 @@ fn graceful_shutdown(config: &Config, state: &mut State) -> Result<()> {
             {
                 eprintln!("Warning: Failed to kill session '{}': {}", worker_record.session_id, e);
             }
-            worker_record.status = WorkerStatus::Offline;
+            // Preserve certain states that represent important context that shouldn't be
+            // lost Rebasing state indicates a rebase is in progress with
+            // potential conflicts The startup code will detect this and handle
+            // it appropriately
+            if worker_record.status != WorkerStatus::Rebasing {
+                worker_record.status = WorkerStatus::Offline;
+            }
         }
     }
     Ok(())
