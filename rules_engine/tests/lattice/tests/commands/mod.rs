@@ -7,6 +7,7 @@ mod close_tests;
 mod create_tests;
 mod dep_tests;
 mod dispatch_tests;
+mod doctor_tests;
 mod fmt_tests;
 mod impact_tests;
 mod label_tests;

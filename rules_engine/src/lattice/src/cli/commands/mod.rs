@@ -8,6 +8,7 @@ pub mod close_command;
 pub mod completion_command;
 pub mod create_command;
 pub mod dep_command;
+pub mod doctor_command;
 pub mod document_move_ops;
 pub mod edit_command;
 pub mod fmt_command;
