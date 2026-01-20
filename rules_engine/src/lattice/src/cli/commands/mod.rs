@@ -26,6 +26,7 @@ pub mod mv_command;
 pub mod orphans_command;
 pub mod overview_command;
 pub mod path_command;
+pub mod pop_command;
 pub mod prime_command;
 pub mod prune_command;
 pub mod ready_command;

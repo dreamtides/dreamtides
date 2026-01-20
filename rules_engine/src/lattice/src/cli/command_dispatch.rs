@@ -17,9 +17,9 @@ use crate::cli::commands::{
     blocked_command, changes_command, chaos_monkey, children_command, claim_command, close_command,
     completion_command, create_command, dep_command, edit_command, fmt_command, generate_ids,
     impact_command, label_command, links_from, links_to, mcp_command, mv_command, orphans_command,
-    overview_command, path_command, prime_command, prune_command, reopen_command, roots_command,
-    search_command, setup_command, split_command, stale_command, stats_command, track_command,
-    tree_command, update_command,
+    overview_command, path_command, pop_command, prime_command, prune_command, reopen_command,
+    roots_command, search_command, setup_command, split_command, stale_command, stats_command,
+    track_command, tree_command, update_command,
 };
 use crate::cli::global_options::GlobalOptions;
 use crate::config::config_loader;
@@ -383,6 +383,10 @@ fn dispatch_command(context: CommandContext, command: Command) -> LatticeResult<
         Command::Claim(args) => {
             info!("Dispatching to claim command");
             claim_command::execute(context, args)
+        }
+        Command::Pop(args) => {
+            info!("Dispatching to pop command");
+            pop_command::execute(context, args)
         }
         Command::Overview(args) => {
             info!("Dispatching to overview command");

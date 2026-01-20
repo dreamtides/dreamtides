@@ -49,6 +49,18 @@ pub fn execute(context: CommandContext, args: ShowArgs) -> LatticeResult<()> {
     Ok(())
 }
 
+/// Builds full ShowOutput for a document row.
+///
+/// This is the public entry point for other commands (like `lat pop`) that need
+/// to build complete document output. Includes body, relationships, and
+/// template content.
+pub fn build_full_output(
+    context: &CommandContext,
+    doc_row: &DocumentRow,
+) -> LatticeResult<ShowOutput> {
+    build_show_output(context, doc_row, OutputMode::Full)
+}
+
 /// Relationship data for a document.
 ///
 /// Fields: (parent, dependencies, blocking, related, backlinks).

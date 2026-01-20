@@ -100,6 +100,9 @@ pub fn suggestion(error: &LatticeError) -> Option<String> {
         LatticeError::FmtErrors { .. } => {
             Some("Check the error messages above and fix the issues".to_string())
         }
+        LatticeError::NoReadyTasks => {
+            Some("Try 'lat ready --include-backlog' or use broader filters".to_string())
+        }
     }
 }
 
@@ -159,6 +162,7 @@ pub fn error_path(error: &LatticeError) -> Option<&PathBuf> {
         | LatticeError::ClaimNotFound { .. }
         | LatticeError::LabelNotFound { .. }
         | LatticeError::DependencyNotFound { .. }
+        | LatticeError::NoReadyTasks
         | LatticeError::GitError { .. }
         | LatticeError::DatabaseError { .. }
         | LatticeError::IndexCorrupted { .. }

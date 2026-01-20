@@ -221,6 +221,17 @@ Claims are stored in `~/.lattice/claims/` as one file per claim, not in markdown
 files. Supports atomic updates across multiple worktrees and automatic release
 when tasks are closed.
 
+**lat pop** - The primary interface for AI agents to start work. Combines
+`lat ready`, `lat claim`, and `lat show` into a single operation: finds the
+highest-priority ready task (sorted by priority then age), claims it, and
+outputs full context. Returns error code 4 (E038) if no ready tasks are
+available. Supports `--json` output (recommended for programmatic use),
+`--dry-run` to preview without claiming, `--no-claim` to skip claiming, and
+all filter options from `lat ready` (`--type`, `--priority`, `--label`, etc.).
+JSON output includes the complete ShowOutput structure with task metadata, body,
+composed context and acceptance criteria from ancestor templates, dependencies,
+dependents, and related documents.
+
 See [Appendix: Workflow](appendix_workflow.md) for complete command specifications,
 output formats, and claiming behavior, and
 [Appendix: Overview Command](appendix_overview_command.md) for the ranking algorithm.

@@ -120,3 +120,34 @@ pub struct ClaimArgs {
     #[arg(long)]
     pub gc: bool,
 }
+
+/// Arguments for `lat pop`.
+///
+/// Combines `lat ready`, `lat claim`, and `lat show` into a single operation
+/// optimized for AI agents. Finds the highest-priority ready task, claims it,
+/// and outputs full context for starting work.
+#[derive(Args, Debug)]
+pub struct PopArgs {
+    #[command(flatten)]
+    pub filter: FilterOptions,
+
+    /// Include backlog items (P4).
+    #[arg(long)]
+    pub include_backlog: bool,
+
+    /// Sort policy for ready work ordering.
+    #[arg(long, value_enum, default_value_t)]
+    pub sort: ReadySortPolicy,
+
+    /// Show what would be claimed without actually claiming.
+    #[arg(long)]
+    pub dry_run: bool,
+
+    /// Include raw markdown body (default: true for JSON, false for text).
+    #[arg(long)]
+    pub raw: bool,
+
+    /// Skip claiming (useful for testing or inspection).
+    #[arg(long)]
+    pub no_claim: bool,
+}

@@ -15,7 +15,7 @@ use crate::cli::task_args::{
     CloseArgs, CreateArgs, EditArgs, GenerateIdsArgs, MvArgs, PruneArgs, ReopenArgs, SplitArgs,
     TrackArgs, UpdateArgs,
 };
-use crate::cli::workflow_args::{ClaimArgs, OverviewArgs, PrimeArgs, ReadyArgs, ShowArgs};
+use crate::cli::workflow_args::{ClaimArgs, OverviewArgs, PopArgs, PrimeArgs, ReadyArgs, ShowArgs};
 
 /// Lattice document management system.
 ///
@@ -84,6 +84,11 @@ pub enum Command {
     Impact(ImpactArgs),
     /// Mark task as locally in progress.
     Claim(ClaimArgs),
+    /// Find highest-priority ready task, claim it, and show context.
+    ///
+    /// Combines `lat ready`, `lat claim`, and `lat show` into a single
+    /// operation optimized for AI agents starting work on tasks.
+    Pop(PopArgs),
     /// Show critical documents for context.
     Overview(OverviewArgs),
     /// Output AI workflow context.

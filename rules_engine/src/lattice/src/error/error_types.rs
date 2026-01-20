@@ -108,6 +108,9 @@ pub enum LatticeError {
     #[error("Dependency from {source_id} to {target_id} does not exist")]
     DependencyNotFound { source_id: String, target_id: String },
 
+    #[error("No ready tasks available")]
+    NoReadyTasks,
+
     // ========================================================================
     // I/O Errors (various exit codes depending on context)
     // File system and external system errors.
@@ -184,7 +187,8 @@ impl LatticeError {
             | LatticeError::ParentNotFound { .. }
             | LatticeError::ClaimNotFound { .. }
             | LatticeError::LabelNotFound { .. }
-            | LatticeError::DependencyNotFound { .. } => exit_codes::NOT_FOUND,
+            | LatticeError::DependencyNotFound { .. }
+            | LatticeError::NoReadyTasks => exit_codes::NOT_FOUND,
 
             LatticeError::PermissionDenied { .. }
             | LatticeError::ReadError { .. }
@@ -230,6 +234,7 @@ impl LatticeError {
             LatticeError::ClaimNotFound { .. } => "E026",
             LatticeError::LabelNotFound { .. } => "E027",
             LatticeError::DependencyNotFound { .. } => "E037",
+            LatticeError::NoReadyTasks => "E038",
             LatticeError::PermissionDenied { .. } => "E028",
             LatticeError::ReadError { .. } => "E029",
             LatticeError::WriteError { .. } => "E030",
