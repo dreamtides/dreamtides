@@ -405,6 +405,25 @@ pub fn rebase_onto(worktree: &Path, target: &str) -> Result<RebaseResult> {
             last_error = Some(stderr.to_string());
             continue;
         }
+        if stderr.contains("already a rebase-merge directory")
+            || stderr.contains("already a rebase-apply directory")
+        {
+            tracing::warn!(
+                operation = "git_operation", operation_type = "rebase", repo_path = %
+                worktree.display(), target, attempt,
+                "Stale rebase directory detected, attempting force cleanup and retry"
+            );
+            if let Err(e) = force_cleanup_rebase_state(worktree) {
+                tracing::error!(
+                    operation = "git_operation", operation_type = "rebase", repo_path = %
+                    worktree.display(), error = % e,
+                    "Failed to force cleanup rebase state"
+                );
+            } else {
+                last_error = Some(stderr.to_string());
+                continue;
+            }
+        }
         let after = logging_git::capture_state(worktree).ok();
         let duration_ms = start.elapsed().as_millis() as u64;
         tracing::error!(
@@ -438,6 +457,33 @@ pub fn is_rebase_in_progress(worktree: &Path) -> bool {
         }
     };
     git_dir.join("rebase-merge").exists() || git_dir.join("rebase-apply").exists()
+}
+/// Forcefully removes rebase state directories (rebase-merge and rebase-apply).
+/// This is used as a fallback when `git rebase --abort` fails because git
+/// doesn't recognize the rebase state as valid.
+pub fn force_cleanup_rebase_state(worktree: &Path) -> Result<()> {
+    let git_dir = get_git_dir(worktree)?;
+    let rebase_merge = git_dir.join("rebase-merge");
+    let rebase_apply = git_dir.join("rebase-apply");
+    let mut removed_any = false;
+    if rebase_merge.exists() {
+        std::fs::remove_dir_all(&rebase_merge).with_context(|| {
+            format!("Failed to remove rebase-merge directory: {}", rebase_merge.display())
+        })?;
+        tracing::info!("Forcefully removed rebase-merge directory: {}", rebase_merge.display());
+        removed_any = true;
+    }
+    if rebase_apply.exists() {
+        std::fs::remove_dir_all(&rebase_apply).with_context(|| {
+            format!("Failed to remove rebase-apply directory: {}", rebase_apply.display())
+        })?;
+        tracing::info!("Forcefully removed rebase-apply directory: {}", rebase_apply.display());
+        removed_any = true;
+    }
+    if !removed_any {
+        tracing::debug!("No rebase state directories found to clean up");
+    }
+    Ok(())
 }
 /// Checks if worktree is clean (no uncommitted changes and no rebase in
 /// progress)
@@ -498,6 +544,37 @@ pub fn abort_rebase(worktree: &Path) -> Result<()> {
             );
             last_error = Some(stderr.to_string());
             continue;
+        }
+        if stderr.contains("No rebase in progress") {
+            tracing::warn!(
+                operation = "git_operation", operation_type = "rebase_abort", repo_path =
+                % worktree.display(),
+                "Git says no rebase in progress, attempting force cleanup of rebase directories"
+            );
+            match force_cleanup_rebase_state(worktree) {
+                Ok(()) => {
+                    let after = logging_git::capture_state(worktree).ok();
+                    let duration_ms = start.elapsed().as_millis() as u64;
+                    tracing::info!(
+                        operation = "git_operation", operation_type = "rebase_abort",
+                        repo_path = % worktree.display(), duration_ms, ? before, ? after,
+                        result = "success_via_force_cleanup",
+                        "Cleaned up orphaned rebase state via force removal"
+                    );
+                    return Ok(());
+                }
+                Err(e) => {
+                    let after = logging_git::capture_state(worktree).ok();
+                    let duration_ms = start.elapsed().as_millis() as u64;
+                    tracing::error!(
+                        operation = "git_operation", operation_type = "rebase_abort",
+                        repo_path = % worktree.display(), duration_ms, ? before, ? after,
+                        result = "error", error = % e,
+                        "Failed to force cleanup orphaned rebase state"
+                    );
+                    return Err(e.context("Failed to force cleanup orphaned rebase state"));
+                }
+            }
         }
         let after = logging_git::capture_state(worktree).ok();
         let duration_ms = start.elapsed().as_millis() as u64;
