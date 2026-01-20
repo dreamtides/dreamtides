@@ -87,6 +87,10 @@ pub struct ChaosMonkeyResult {
     pub failing_operation: Option<OperationRecord>,
     /// History of all operations executed.
     pub operation_history: Vec<OperationRecord>,
+    /// Path to preserved repository for debugging (only set on failure).
+    pub preserved_repo_path: Option<PathBuf>,
+    /// Git log from repository at time of failure.
+    pub git_log: Option<String>,
 }
 /// State for a chaos monkey run.
 pub struct ChaosMonkeyState {
@@ -94,8 +98,8 @@ pub struct ChaosMonkeyState {
     rng: StdRng,
     /// Seed used for the RNG.
     seed: u64,
-    /// Temp directory containing the test repository.
-    _temp_dir: TempDir,
+    /// Temp directory containing the test repository (None if preserved).
+    temp_dir: Option<TempDir>,
     /// Path to the test repository.
     repo_root: PathBuf,
     /// Operation types to run.
@@ -227,7 +231,7 @@ impl ChaosMonkeyState {
         Ok(Self {
             rng,
             seed,
-            _temp_dir: temp_dir,
+            temp_dir: Some(temp_dir),
             repo_root,
             enabled_operations,
             max_ops,
@@ -332,6 +336,26 @@ impl ChaosMonkeyState {
     pub fn last_operation(&self) -> Option<&OperationRecord> {
         self.operation_history.last()
     }
+
+    /// Preserves the repository for debugging by preventing temp directory
+    /// cleanup. Returns the path where the repository is preserved.
+    pub fn preserve_repo(&mut self) -> Option<PathBuf> {
+        self.temp_dir.take().map(|td| td.into_path())
+    }
+
+    /// Gets recent git log for debugging context.
+    pub fn get_git_log(&self) -> Option<String> {
+        let output = Command::new("git")
+            .args(["log", "--oneline", "-10"])
+            .current_dir(&self.repo_root)
+            .output()
+            .ok()?;
+        if output.status.success() {
+            Some(String::from_utf8_lossy(&output.stdout).to_string())
+        } else {
+            None
+        }
+    }
 }
 /// Main chaos monkey loop.
 fn run_chaos_loop(state: &mut ChaosMonkeyState) -> LatticeResult<ChaosMonkeyResult> {
@@ -349,12 +373,16 @@ fn run_chaos_loop(state: &mut ChaosMonkeyState) -> LatticeResult<ChaosMonkeyResu
                 violation: None,
                 failing_operation: None,
                 operation_history: state.operation_history().to_vec(),
+                preserved_repo_path: None,
+                git_log: None,
             });
         }
         let op_type = state.select_operation();
         debug!(op_type = op_type.name(), "Selected operation");
         let result = execute_operation_with_panic_capture(state, op_type);
         if let Err(violation) = result {
+            let git_log = state.get_git_log();
+            let preserved_path = state.preserve_repo();
             if state.should_stop_before() {
                 warn!(
                     op_number = state.operations_completed(),
@@ -368,6 +396,8 @@ fn run_chaos_loop(state: &mut ChaosMonkeyState) -> LatticeResult<ChaosMonkeyResu
                     violation: Some(violation),
                     failing_operation: state.last_operation().cloned(),
                     operation_history: state.operation_history().to_vec(),
+                    preserved_repo_path: preserved_path,
+                    git_log,
                 });
             }
             error!(
@@ -383,6 +413,8 @@ fn run_chaos_loop(state: &mut ChaosMonkeyState) -> LatticeResult<ChaosMonkeyResu
                 violation: Some(violation),
                 failing_operation: state.last_operation().cloned(),
                 operation_history: state.operation_history().to_vec(),
+                preserved_repo_path: preserved_path,
+                git_log,
             });
         }
         if state.operations_completed().is_multiple_of(100) {
@@ -552,42 +584,91 @@ fn print_result(result: &ChaosMonkeyResult) {
     println!();
     println!("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
     if result.success {
-        println!("✅ Chaos Monkey completed successfully!");
-        println!("   Operations: {}/{}", result.operations_completed, result.max_ops);
-        println!("   Seed: {}", result.seed);
+        print_success_result(result);
     } else {
-        println!("❌ Chaos Monkey found an invariant violation!");
-        println!();
-        println!("   Seed: {}", result.seed);
-        println!("   Operations completed: {}", result.operations_completed);
-        if let Some(ref violation) = result.violation {
-            println!();
-            println!("   Invariant: {}", violation.invariant.name());
-            println!("   Description: {}", violation.description);
-            if !violation.affected_paths.is_empty() {
-                println!("   Affected paths:");
-                for path in &violation.affected_paths {
-                    println!("     - {}", path.display());
-                }
-            }
-            if !violation.affected_ids.is_empty() {
-                println!("   Affected IDs:");
-                for id in &violation.affected_ids {
-                    println!("     - {id}");
-                }
-            }
-        }
-        if let Some(ref op) = result.failing_operation {
-            println!();
-            println!("   Failing operation #{}: {}", op.number, op.op_type.name());
-            println!("   Description: {}", op.description);
-            if let Some(ref err) = op.error_message {
-                println!("   Error: {err}");
-            }
-        }
-        println!();
-        println!("   To reproduce, run:");
-        println!("     lat chaosmonkey --seed {}", result.seed);
+        print_failure_result(result);
     }
     println!("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+}
+
+/// Prints a successful chaos monkey run result with statistics.
+fn print_success_result(result: &ChaosMonkeyResult) {
+    println!("✅ CHAOS MONKEY SUCCESS");
+    println!();
+    println!("Seed: {}", result.seed);
+    println!("Operations: {}/{}", result.operations_completed, result.max_ops);
+    println!();
+    println!("Operation distribution:");
+    print_operation_statistics(&result.operation_history);
+}
+
+/// Prints a failed chaos monkey run result with debugging information.
+fn print_failure_result(result: &ChaosMonkeyResult) {
+    println!("❌ CHAOS MONKEY FAILURE");
+    println!();
+    println!("Seed: {}", result.seed);
+    println!("Operations: {}", result.operations_completed);
+    if let Some(ref op) = result.failing_operation {
+        println!("Failed at: {} (operation #{})", op.description, op.number);
+    }
+    println!();
+    if let Some(ref violation) = result.violation {
+        println!("Invariant violated: {}", violation.invariant.name());
+        println!("  {}", violation.description);
+        if !violation.affected_ids.is_empty() {
+            for id in &violation.affected_ids {
+                println!("  ID: {id}");
+            }
+        }
+        if !violation.affected_paths.is_empty() {
+            for path in &violation.affected_paths {
+                println!("  Path: {}", path.display());
+            }
+        }
+    }
+    println!();
+    println!(
+        "Reproduce: lat chaosmonkey --seed {} --max-ops {}",
+        result.seed,
+        result.operations_completed + 1
+    );
+    println!(
+        "Debug:     lat chaosmonkey --seed {} --max-ops {} --stop-before-last",
+        result.seed, result.operations_completed
+    );
+    if let Some(ref path) = result.preserved_repo_path {
+        println!();
+        println!("Repository preserved at: {}", path.display());
+    }
+    if let Some(ref git_log) = result.git_log {
+        println!();
+        println!("Git history:");
+        for line in git_log.lines().take(10) {
+            println!("  {line}");
+        }
+    }
+}
+
+/// Computes and prints operation type distribution statistics.
+fn print_operation_statistics(history: &[OperationRecord]) {
+    let mut counts: HashMap<OperationType, (usize, usize)> = HashMap::new();
+    for record in history {
+        let entry = counts.entry(record.op_type).or_insert((0, 0));
+        entry.0 += 1;
+        if record.succeeded {
+            entry.1 += 1;
+        }
+    }
+    let mut sorted_ops: Vec<_> = counts.into_iter().collect();
+    sorted_ops.sort_by(|a, b| b.1.0.cmp(&a.1.0));
+    for (op_type, (total, succeeded)) in sorted_ops {
+        let success_rate = if total > 0 { (succeeded * 100) / total } else { 0 };
+        println!(
+            "  {}: {} ({} succeeded, {}% success rate)",
+            op_type.name(),
+            total,
+            succeeded,
+            success_rate
+        );
+    }
 }
