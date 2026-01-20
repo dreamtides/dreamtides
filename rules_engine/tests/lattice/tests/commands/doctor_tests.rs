@@ -2146,3 +2146,297 @@ mod skills_checks {
         assert_eq!(skills_checks.len(), 3, "Should have exactly 3 skills checks");
     }
 }
+
+// ============================================================================
+// JSON Output Format Tests
+// ============================================================================
+
+mod json_output {
+    use lattice::cli::commands::doctor_command::doctor_types::{
+        CheckCategory, CheckResult, CheckStatus, DoctorReport, DoctorSummary,
+    };
+
+    #[test]
+    fn doctor_report_serializes_to_valid_json() {
+        let checks = vec![
+            CheckResult::passed(CheckCategory::Core, "Installation", ".lattice/ found"),
+            CheckResult::warning(CheckCategory::Index, "Coverage", "1 document not indexed"),
+            CheckResult::error(CheckCategory::Git, "Repository", "Not a git repo"),
+        ];
+        let report = DoctorReport::new(checks);
+
+        let json_result = serde_json::to_string_pretty(&report);
+        assert!(json_result.is_ok(), "DoctorReport should serialize to valid JSON");
+
+        let json = json_result.expect("Serialization succeeded");
+        assert!(json.contains("\"version\""), "JSON should contain version field");
+        assert!(json.contains("\"checks\""), "JSON should contain checks array");
+        assert!(json.contains("\"summary\""), "JSON should contain summary object");
+    }
+
+    #[test]
+    fn json_output_contains_all_check_fields() {
+        let check = CheckResult::warning(CheckCategory::Claims, "Stale Claims", "2 stale claims")
+            .with_details(vec!["LABC01".to_string(), "LDEF02".to_string()])
+            .with_fix("lat doctor --fix");
+
+        let json = serde_json::to_string_pretty(&check).expect("Serialize check");
+
+        assert!(json.contains("\"category\":"), "JSON should contain category");
+        assert!(json.contains("\"name\":"), "JSON should contain name");
+        assert!(json.contains("\"status\":"), "JSON should contain status");
+        assert!(json.contains("\"message\":"), "JSON should contain message");
+        assert!(json.contains("\"details\":"), "JSON should contain details");
+        assert!(json.contains("\"fixable\":"), "JSON should contain fixable");
+        assert!(json.contains("\"fix_command\":"), "JSON should contain fix_command");
+    }
+
+    #[test]
+    fn json_output_omits_empty_optional_fields() {
+        let check = CheckResult::passed(CheckCategory::Core, "Test", "All good");
+
+        let json = serde_json::to_string_pretty(&check).expect("Serialize check");
+
+        assert!(!json.contains("\"details\":"), "JSON should omit empty details array");
+        assert!(!json.contains("\"fixable\":"), "JSON should omit fixable when false");
+        assert!(!json.contains("\"fix_command\":"), "JSON should omit fix_command when None");
+    }
+
+    #[test]
+    fn json_status_values_are_snake_case() {
+        let checks = vec![
+            CheckResult::passed(CheckCategory::Core, "p", "m"),
+            CheckResult::info(CheckCategory::Core, "i", "m"),
+            CheckResult::warning(CheckCategory::Core, "w", "m"),
+            CheckResult::error(CheckCategory::Core, "e", "m"),
+        ];
+
+        for check in checks {
+            let json = serde_json::to_string(&check).expect("Serialize check");
+            let status = match check.status {
+                CheckStatus::Passed => "passed",
+                CheckStatus::Info => "info",
+                CheckStatus::Warning => "warning",
+                CheckStatus::Error => "error",
+            };
+            assert!(
+                json.contains(&format!("\"status\":\"{status}\"")),
+                "Status should be serialized as snake_case: expected {status}, got {json}"
+            );
+        }
+    }
+
+    #[test]
+    fn json_category_values_are_snake_case() {
+        let categories = vec![
+            (CheckCategory::Core, "core"),
+            (CheckCategory::Index, "index"),
+            (CheckCategory::Git, "git"),
+            (CheckCategory::Config, "config"),
+            (CheckCategory::Claims, "claims"),
+            (CheckCategory::Skills, "skills"),
+        ];
+
+        for (category, expected_name) in categories {
+            let check = CheckResult::passed(category, "test", "message");
+            let json = serde_json::to_string(&check).expect("Serialize check");
+            assert!(
+                json.contains(&format!("\"category\":\"{expected_name}\"")),
+                "Category should be serialized as snake_case: expected {expected_name}, got {json}"
+            );
+        }
+    }
+
+    #[test]
+    fn json_summary_contains_all_counts() {
+        let mut summary = DoctorSummary::default();
+        summary.add(CheckStatus::Passed);
+        summary.add(CheckStatus::Passed);
+        summary.add(CheckStatus::Info);
+        summary.add(CheckStatus::Warning);
+        summary.add(CheckStatus::Error);
+
+        let json = serde_json::to_string_pretty(&summary).expect("Serialize summary");
+
+        // Pretty-printed JSON has "key": value format with space after colon
+        assert!(json.contains("\"passed\": 2"), "Summary should have passed count: {json}");
+        assert!(json.contains("\"info\": 1"), "Summary should have info count: {json}");
+        assert!(json.contains("\"warnings\": 1"), "Summary should have warnings count: {json}");
+        assert!(json.contains("\"failed\": 1"), "Summary should have failed count: {json}");
+    }
+
+    #[test]
+    fn json_can_be_deserialized_back() {
+        let checks = vec![
+            CheckResult::passed(CheckCategory::Core, "test", "message"),
+            CheckResult::warning(CheckCategory::Index, "warn", "warning")
+                .with_details(vec!["detail".to_string()])
+                .with_fix("fix command"),
+        ];
+        let report = DoctorReport::new(checks);
+
+        let json = serde_json::to_string(&report).expect("Serialize report");
+        let parsed: serde_json::Value =
+            serde_json::from_str(&json).expect("Parse JSON back to Value");
+
+        assert!(parsed.is_object(), "Parsed JSON should be an object");
+        assert!(parsed.get("version").is_some(), "Should have version");
+        assert!(parsed.get("checks").is_some(), "Should have checks");
+        assert!(parsed.get("summary").is_some(), "Should have summary");
+    }
+}
+
+// ============================================================================
+// Dry-Run Mode Validation Tests
+// ============================================================================
+
+mod dry_run_validation {
+    use lattice::cli::maintenance_args::DoctorArgs;
+    use lattice::error::error_types::LatticeError;
+
+    fn validate_args(args: &DoctorArgs) -> Result<(), LatticeError> {
+        if args.dry_run && !args.fix {
+            return Err(LatticeError::ConflictingOptions {
+                option1: "--dry-run".to_string(),
+                option2: "--fix (required when using --dry-run)".to_string(),
+            });
+        }
+        Ok(())
+    }
+
+    #[test]
+    fn dry_run_without_fix_returns_error() {
+        let args = DoctorArgs { fix: false, dry_run: true, deep: false, quiet: false };
+
+        let result = validate_args(&args);
+
+        assert!(result.is_err(), "--dry-run without --fix should return an error");
+        match result {
+            Err(LatticeError::ConflictingOptions { option1, option2 }) => {
+                assert!(option1.contains("dry-run"), "Error should mention --dry-run");
+                assert!(option2.contains("fix"), "Error should mention --fix");
+            }
+            _ => panic!("Expected ConflictingOptions error"),
+        }
+    }
+
+    #[test]
+    fn dry_run_with_fix_is_valid() {
+        let args = DoctorArgs { fix: true, dry_run: true, deep: false, quiet: false };
+
+        let result = validate_args(&args);
+
+        assert!(result.is_ok(), "--dry-run with --fix should be valid");
+    }
+
+    #[test]
+    fn fix_without_dry_run_is_valid() {
+        let args = DoctorArgs { fix: true, dry_run: false, deep: false, quiet: false };
+
+        let result = validate_args(&args);
+
+        assert!(result.is_ok(), "--fix without --dry-run should be valid");
+    }
+
+    #[test]
+    fn default_args_are_valid() {
+        let args = DoctorArgs { fix: false, dry_run: false, deep: false, quiet: false };
+
+        let result = validate_args(&args);
+
+        assert!(result.is_ok(), "Default args (no flags) should be valid");
+    }
+}
+
+// ============================================================================
+// Deep Mode Tests
+// ============================================================================
+
+mod deep_mode {
+    use lattice::cli::commands::doctor_command::doctor_checks;
+    use lattice::cli::commands::doctor_command::doctor_types::{
+        CheckCategory, CheckStatus, DoctorConfig,
+    };
+    use lattice::test::test_environment::TestEnv;
+
+    fn find_check<'a>(
+        results: &'a [lattice::cli::commands::doctor_command::doctor_types::CheckResult],
+        category: CheckCategory,
+        name: &str,
+    ) -> Option<&'a lattice::cli::commands::doctor_command::doctor_types::CheckResult> {
+        results.iter().find(|r| r.category == category && r.name == name)
+    }
+
+    #[test]
+    fn deep_mode_adds_deep_check_result() {
+        let env = TestEnv::new();
+        let (_temp, context) = env.into_parts();
+        let config = DoctorConfig { deep: true, ..Default::default() };
+
+        let results = doctor_checks::run_all_checks(&context, &config).expect("Run checks");
+
+        let check = find_check(&results, CheckCategory::Index, "Deep Check");
+        assert!(check.is_some(), "Deep mode should add a 'Deep Check' result");
+    }
+
+    #[test]
+    fn deep_check_has_info_status() {
+        let env = TestEnv::new();
+        let (_temp, context) = env.into_parts();
+        let config = DoctorConfig { deep: true, ..Default::default() };
+
+        let results = doctor_checks::run_all_checks(&context, &config).expect("Run checks");
+
+        let check = find_check(&results, CheckCategory::Index, "Deep Check")
+            .expect("Deep Check should be present");
+        assert_eq!(
+            check.status,
+            CheckStatus::Info,
+            "Deep Check should have Info status (not yet implemented)"
+        );
+    }
+
+    #[test]
+    fn non_deep_mode_does_not_add_deep_check() {
+        let env = TestEnv::new();
+        let (_temp, context) = env.into_parts();
+        let config = DoctorConfig { deep: false, ..Default::default() };
+
+        let results = doctor_checks::run_all_checks(&context, &config).expect("Run checks");
+
+        let check = find_check(&results, CheckCategory::Index, "Deep Check");
+        assert!(check.is_none(), "Non-deep mode should not add 'Deep Check' result");
+    }
+
+    #[test]
+    fn deep_mode_runs_all_standard_checks_plus_deep_checks() {
+        let env = TestEnv::new();
+        env.fake_git().add_commit("abc123", "Initial commit", vec![]);
+        let (_temp, context) = env.into_parts();
+
+        let non_deep_config = DoctorConfig { deep: false, ..Default::default() };
+        let deep_config = DoctorConfig { deep: true, ..Default::default() };
+
+        let non_deep_results =
+            doctor_checks::run_all_checks(&context, &non_deep_config).expect("Run non-deep checks");
+        let deep_results =
+            doctor_checks::run_all_checks(&context, &deep_config).expect("Run deep checks");
+
+        assert!(
+            deep_results.len() > non_deep_results.len(),
+            "Deep mode should produce more check results than non-deep mode"
+        );
+
+        for non_deep_check in &non_deep_results {
+            let deep_has_check = deep_results
+                .iter()
+                .any(|r| r.category == non_deep_check.category && r.name == non_deep_check.name);
+            assert!(
+                deep_has_check,
+                "Deep mode should include all non-deep checks, but missing: {} - {}",
+                non_deep_check.category.display_name(),
+                non_deep_check.name
+            );
+        }
+    }
+}

@@ -228,7 +228,18 @@ commands/
 ├── orphans_command.rs      # lat orphans - find unlinked documents
 ├── impact_command.rs       # lat impact - change impact analysis
 ├── completion_command.rs   # lat completion - generate shell completions
-└── chaos_monkey.rs         # lat chaosmonkey - fuzz testing
+├── chaos_monkey.rs         # lat chaosmonkey - fuzz testing
+└── doctor_command/         # lat doctor - system health diagnostics
+    ├── mod.rs              # Module declarations only
+    ├── doctor_executor.rs  # Entry point and orchestration
+    ├── doctor_output.rs    # Text and JSON output formatting
+    ├── doctor_types.rs     # CheckResult, DoctorReport, DoctorConfig types
+    ├── doctor_checks.rs    # Core check orchestration
+    ├── index_checks.rs     # Index integrity checks
+    ├── git_checks.rs       # Git integration checks
+    ├── config_checks.rs    # Configuration checks
+    ├── claim_checks.rs     # Claim checks (stale, missing, orphaned)
+    └── skills_checks.rs    # Skill symlink checks
 ```
 
 ### index/
@@ -430,7 +441,8 @@ tests/lattice/
 │   ├── label_tests.rs
 │   ├── dep_tests.rs
 │   ├── stats_tests.rs
-│   └── mv_tests.rs
+│   ├── mv_tests.rs
+│   └── doctor_tests.rs        # Doctor command tests
 ├── index/
 │   ├── mod.rs                 # Module declarations only
 │   ├── reconciliation_tests.rs
