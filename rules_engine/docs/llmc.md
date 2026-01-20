@@ -234,6 +234,7 @@ TMUX session identifier.
 | `pending_self_review` | bool | If true, self-review prompt pending |
 | `commits_first_detected_unix` | Option<u64> | When commits were first detected (for fallback timing) |
 | `pending_rebase_prompt` | bool | If true, rebase conflict prompt needs to be sent |
+| `error_reason` | Option<string> | Reason for entering error state (used to determine recovery behavior) |
 
 ## TMUX Integration
 
@@ -622,14 +623,16 @@ llmc rebase adam
 Fetches latest master, attempts rebase. If conflicts occur, marks worker as
 `rebasing` and sends conflict resolution prompt to worker.
 
-### `llmc reset <worker>`
+### `llmc reset [worker]`
 
-Resets a worker to clean idle state by completely tearing down and rebuilding
-its worktree and session.
+Resets a worker (or all workers) to clean idle state by completely tearing down
+and rebuilding worktrees and sessions.
 
 ```bash
-llmc reset adam
+llmc reset adam        # Reset specific worker
 llmc reset adam --yes  # Skip confirmation
+llmc reset --all       # Reset all workers
+llmc reset --all --yes # Reset all workers without confirmation
 ```
 
 This command performs a complete teardown and rebuild:
@@ -644,9 +647,14 @@ This command performs a complete teardown and rebuild:
 
 Configuration in config.toml is preserved. Any uncommitted work will be LOST.
 
+Flags:
+- `--all`: Reset all workers instead of a single worker
+- `--yes`: Skip confirmation prompt
+
 This is more destructive than `llmc doctor --repair`, which only cleans up git
 state without removing the worktree. Use `reset` when you want a completely
-fresh environment for the worker.
+fresh environment for the worker. Use `--all` when you want to completely reset
+the entire LLMC system to a clean state.
 
 ### `llmc doctor`
 
@@ -815,6 +823,13 @@ LLMC is designed to be self-healing. When workers fail to start:
 
 4. **Crash count reset**: When a worker starts successfully, its crash count
    resets to zero, providing positive feedback to the self-healing system.
+
+5. **Dirty worktree errors**: If an idle worker is found to have uncommitted
+   changes (dirty worktree), it is marked as `error` with reason "Dirty worktree
+   detected during patrol". Unlike other errors, dirty worktree errors do **not**
+   auto-recover even if the worktree later becomes clean, because this could
+   indicate lost uncommitted work. Use `llmc reset <worker>` to manually recover
+   from this state.
 
 ### Git Lock File Handling
 

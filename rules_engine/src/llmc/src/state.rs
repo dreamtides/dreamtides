@@ -82,6 +82,11 @@ pub struct WorkerRecord {
     /// daemon restart) without having received a conflict prompt.
     #[serde(default)]
     pub pending_rebase_prompt: bool,
+    /// Reason the worker entered error state, if any. Used to determine
+    /// recovery behavior - some error types (like dirty worktree) should
+    /// not auto-recover.
+    #[serde(default)]
+    pub error_reason: Option<String>,
 }
 /// State file tracking all workers and their status
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -283,6 +288,7 @@ mod tests {
             pending_self_review: false,
             commits_first_detected_unix: None,
             pending_rebase_prompt: false,
+            error_reason: None,
         }
     }
     #[test]

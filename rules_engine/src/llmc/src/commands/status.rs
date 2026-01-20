@@ -72,6 +72,8 @@ struct WorkerStatusOutput {
     commit_sha: Option<String>,
     prompt_cmd: Option<String>,
     prompt_excerpt: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    error_reason: Option<String>,
 }
 fn output_json(state: &State, config: &Config, now: u64) -> Result<()> {
     let workers: Vec<WorkerStatusOutput> = state
@@ -91,6 +93,7 @@ fn output_json(state: &State, config: &Config, now: u64) -> Result<()> {
                 } else {
                     Some(truncate_prompt(&w.current_prompt, 50))
                 },
+                error_reason: w.error_reason.clone(),
             }
         })
         .collect();
@@ -126,6 +129,11 @@ fn output_text(state: &State, config: &Config, now: u64) {
         }
         if let Some(cmd) = &worker.prompt_cmd {
             parts.push(format!("({})", cmd));
+        }
+        if effective_status == WorkerStatus::Error
+            && let Some(reason) = &worker.error_reason
+        {
+            parts.push(format!("({})", reason));
         }
         if !worker.current_prompt.is_empty() && effective_status != WorkerStatus::Idle {
             let excerpt = truncate_prompt(&worker.current_prompt, 50);

@@ -12,7 +12,7 @@ use crate::state::{self, State, WorkerStatus};
 use crate::tmux::session;
 /// Runs the reset command, resetting a worker to clean idle state by removing
 /// and recreating its worktree and session
-pub fn run_reset(worker_name: &str, yes: bool, json: bool) -> Result<()> {
+pub fn run_reset(worker_name: Option<String>, all: bool, yes: bool, json: bool) -> Result<()> {
     let llmc_root = config::get_llmc_root();
     if !llmc_root.exists() {
         bail!(
@@ -21,18 +21,27 @@ pub fn run_reset(worker_name: &str, yes: bool, json: bool) -> Result<()> {
             llmc_root.display()
         );
     }
+    if all {
+        return run_reset_all(&llmc_root, yes, json);
+    }
+    let Some(worker_name) = worker_name else {
+        bail!(
+            "Worker name required. Use --all to reset all workers.\n\
+             Usage: llmc reset <worker> or llmc reset --all"
+        );
+    };
     let _lock = StateLock::acquire()?;
     let state_path = state::get_state_path();
     let mut state = State::load(&state_path)?;
     let previous_status = state
-        .get_worker(worker_name)
+        .get_worker(&worker_name)
         .map(|w| format!("{:?}", w.status).to_lowercase())
         .unwrap_or_else(|| "unknown".to_string());
-    if reset_worker(&mut state, &llmc_root, worker_name, yes || json)? {
+    if reset_worker(&mut state, &llmc_root, &worker_name, yes || json)? {
         state.save(&state_path)?;
         if json {
             let output = crate::json_output::ResetOutput {
-                worker: worker_name.to_string(),
+                worker: worker_name.clone(),
                 previous_status,
                 new_status: "idle".to_string(),
             };
@@ -42,6 +51,95 @@ pub fn run_reset(worker_name: &str, yes: bool, json: bool) -> Result<()> {
         }
     }
     Ok(())
+}
+
+fn run_reset_all(llmc_root: &Path, yes: bool, json: bool) -> Result<()> {
+    let _lock = StateLock::acquire()?;
+    let state_path = state::get_state_path();
+    let mut state = State::load(&state_path)?;
+    let worker_names: Vec<String> = state.workers.keys().cloned().collect();
+    if worker_names.is_empty() {
+        if json {
+            let output = crate::json_output::ResetAllOutput {
+                workers_reset: vec![],
+                message: "No workers to reset".to_string(),
+            };
+            crate::json_output::print_json(&output);
+        } else {
+            println!("No workers to reset.");
+        }
+        return Ok(());
+    }
+    if !yes && !json && !confirm_reset_all(&worker_names)? {
+        println!("Cancelled.");
+        return Ok(());
+    }
+    if !json {
+        println!("Resetting {} workers...\n", worker_names.len());
+    }
+    let mut results = Vec::new();
+    for worker_name in &worker_names {
+        let previous_status = state
+            .get_worker(worker_name)
+            .map(|w| format!("{:?}", w.status).to_lowercase())
+            .unwrap_or_else(|| "unknown".to_string());
+        if !json {
+            println!("--- {} ---", worker_name);
+        }
+        match reset_worker(&mut state, llmc_root, worker_name, true) {
+            Ok(true) => {
+                results.push(crate::json_output::ResetOutput {
+                    worker: worker_name.clone(),
+                    previous_status,
+                    new_status: "idle".to_string(),
+                });
+                if !json {
+                    println!();
+                }
+            }
+            Ok(false) => {
+                if !json {
+                    println!("  Skipped.\n");
+                }
+            }
+            Err(e) => {
+                if !json {
+                    eprintln!("  ✗ Failed: {}\n", e);
+                }
+            }
+        }
+    }
+    state.save(&state_path)?;
+    if json {
+        let output = crate::json_output::ResetAllOutput {
+            workers_reset: results,
+            message: format!("Reset {} workers", worker_names.len()),
+        };
+        crate::json_output::print_json(&output);
+    } else {
+        println!("✓ All workers have been reset");
+    }
+    Ok(())
+}
+
+fn confirm_reset_all(worker_names: &[String]) -> Result<bool> {
+    println!(
+        "This will reset ALL {} workers to clean idle state:\n\n\
+         Workers: {}\n\n\
+         Each worker will have its:\n\
+         - TMUX session killed\n\
+         - Worktree removed and recreated from origin/master\n\
+         - Branch deleted and recreated\n\
+         - Any uncommitted work LOST\n\n\
+         Configuration in config.toml will be preserved.\n\n\
+         Proceed? [y/N] ",
+        worker_names.len(),
+        worker_names.join(", ")
+    );
+    io::stdout().flush()?;
+    let mut input = String::new();
+    io::stdin().read_line(&mut input)?;
+    Ok(input.trim().eq_ignore_ascii_case("y"))
 }
 fn reset_worker(state: &mut State, llmc_root: &Path, worker: &str, yes: bool) -> Result<bool> {
     let worker_record = state.get_worker(worker).ok_or_else(|| {
@@ -113,6 +211,7 @@ fn reset_worker(state: &mut State, llmc_root: &Path, worker: &str, yes: bool) ->
     worker_mut.last_activity_unix = SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs();
     worker_mut.crash_count = 0;
     worker_mut.last_crash_unix = None;
+    worker_mut.error_reason = None;
     println!("  ✓ Reset state to Idle");
     let daemon_running = add::is_daemon_running();
     if daemon_running {

@@ -201,6 +201,12 @@ pub struct ResetOutput {
 }
 
 #[derive(Debug, Clone, Serialize)]
+pub struct ResetAllOutput {
+    pub workers_reset: Vec<ResetOutput>,
+    pub message: String,
+}
+
+#[derive(Debug, Clone, Serialize)]
 pub struct DoctorOutput {
     pub healthy: bool,
     pub issues: Vec<DoctorIssue>,

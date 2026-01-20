@@ -92,7 +92,7 @@ async fn main() -> Result<()> {
         Commands::Reject { message, json } => reject::run_reject(message, json),
         Commands::Accept { worker, force, json } => accept::run_accept(worker, force, json),
         Commands::Rebase { worker, json } => rebase::run_rebase(&worker, json),
-        Commands::Reset { worker, yes, json } => reset::run_reset(&worker, yes, json),
+        Commands::Reset { worker, all, yes, json } => reset::run_reset(worker, all, yes, json),
         Commands::Doctor { repair, yes, rebuild, json } => {
             doctor::run_doctor(repair, yes, rebuild, json)
         }

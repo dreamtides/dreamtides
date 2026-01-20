@@ -224,8 +224,12 @@ pub enum Commands {
 
     /// Reset a worker to clean idle state
     Reset {
-        /// Worker name to reset
-        worker: String,
+        /// Worker name to reset (required unless --all is used)
+        worker: Option<String>,
+
+        /// Reset all workers
+        #[arg(long)]
+        all: bool,
 
         /// Skip confirmation
         #[arg(long)]

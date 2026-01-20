@@ -13,6 +13,8 @@ use crate::{git, recovery, sound};
 
 static PATROL_RUNNING: AtomicBool = AtomicBool::new(false);
 
+pub const DIRTY_WORKTREE_ERROR: &str = "Dirty worktree detected during patrol";
+
 /// Patrol system configuration
 pub struct Patrol {}
 
@@ -227,9 +229,8 @@ impl Patrol {
                             "Worker '{}' is idle but has dirty worktree, marking as error",
                             worker_name
                         );
-                        let transition = WorkerTransition::ToError {
-                            reason: "Dirty worktree detected during patrol".to_string(),
-                        };
+                        let transition =
+                            WorkerTransition::ToError { reason: DIRTY_WORKTREE_ERROR.to_string() };
                         if let Some(worker_mut) = state.get_worker_mut(&worker_name) {
                             worker::apply_transition(worker_mut, transition.clone())?;
                             report.transitions_applied.push((worker_name.clone(), transition));
@@ -269,16 +270,30 @@ impl Patrol {
                     }
                     Ok(false) => match git::is_worktree_clean(worktree_path) {
                         Ok(true) => {
-                            tracing::info!(
-                                "Worker '{}' in error state has clean worktree, recovering to idle",
-                                worker_name
-                            );
-                            let transition = WorkerTransition::ToIdle;
-                            if let Some(worker_mut) = state.get_worker_mut(&worker_name) {
-                                worker::apply_transition(worker_mut, transition.clone())?;
-                                report.transitions_applied.push((worker_name.clone(), transition));
+                            let error_reason = state
+                                .get_worker(&worker_name)
+                                .and_then(|w| w.error_reason.as_deref());
+                            if error_reason == Some(DIRTY_WORKTREE_ERROR) {
+                                tracing::warn!(
+                                    "Worker '{}' was in error due to dirty worktree, worktree is now clean. \
+                                     Uncommitted changes may have been lost. Use 'llmc reset {}' to recover.",
+                                    worker_name,
+                                    worker_name
+                                );
+                            } else {
+                                tracing::info!(
+                                    "Worker '{}' in error state has clean worktree, recovering to idle",
+                                    worker_name
+                                );
+                                let transition = WorkerTransition::ToIdle;
+                                if let Some(worker_mut) = state.get_worker_mut(&worker_name) {
+                                    worker::apply_transition(worker_mut, transition.clone())?;
+                                    report
+                                        .transitions_applied
+                                        .push((worker_name.clone(), transition));
+                                }
+                                continue;
                             }
-                            continue;
                         }
                         Ok(false) => {}
                         Err(e) => {
@@ -1121,6 +1136,7 @@ mod tests {
             pending_self_review: false,
             commits_first_detected_unix: None,
             pending_rebase_prompt: false,
+            error_reason: None,
         }
     }
 

@@ -112,14 +112,22 @@ pub fn apply_transition(worker: &mut WorkerRecord, transition: WorkerTransition)
             worker.commit_sha = None;
             worker.self_review = false;
             worker.commits_first_detected_unix = None;
+            worker.error_reason = None;
         }
         WorkerTransition::ToWorking { .. } => {
             worker.on_complete_sent_unix = None;
             worker.commits_first_detected_unix = None;
+            worker.error_reason = None;
         }
-        WorkerTransition::ToNeedsReview { .. } => {}
+        WorkerTransition::ToNeedsReview { .. } => {
+            worker.error_reason = None;
+        }
         WorkerTransition::ToNoChanges => {
             worker.commits_first_detected_unix = None;
+            worker.error_reason = None;
+        }
+        WorkerTransition::ToError { reason } => {
+            worker.error_reason = Some(reason.clone());
         }
         _ => {}
     }
@@ -278,6 +286,7 @@ mod tests {
             pending_self_review: false,
             commits_first_detected_unix: None,
             pending_rebase_prompt: false,
+            error_reason: None,
         };
         apply_transition(&mut worker, WorkerTransition::ToIdle).unwrap();
         assert_eq!(worker.status, WorkerStatus::Idle);
@@ -304,6 +313,7 @@ mod tests {
             pending_self_review: false,
             commits_first_detected_unix: None,
             pending_rebase_prompt: false,
+            error_reason: None,
         };
         apply_transition(&mut worker, WorkerTransition::ToWorking {
             prompt: "Test prompt".to_string(),
@@ -333,6 +343,7 @@ mod tests {
             pending_self_review: false,
             commits_first_detected_unix: None,
             pending_rebase_prompt: false,
+            error_reason: None,
         };
         apply_transition(&mut worker, WorkerTransition::ToNeedsReview {
             commit_sha: "abc123".to_string(),
@@ -361,6 +372,7 @@ mod tests {
             pending_self_review: false,
             commits_first_detected_unix: None,
             pending_rebase_prompt: false,
+            error_reason: None,
         };
         apply_transition(&mut worker, WorkerTransition::ToNeedsReview {
             commit_sha: "abc123".to_string(),
@@ -389,6 +401,7 @@ mod tests {
             pending_self_review: false,
             commits_first_detected_unix: None,
             pending_rebase_prompt: false,
+            error_reason: None,
         };
         let old_status = worker.status;
         apply_transition(&mut worker, WorkerTransition::None).unwrap();
@@ -430,6 +443,7 @@ mod tests {
             pending_self_review: false,
             commits_first_detected_unix: None,
             pending_rebase_prompt: false,
+            error_reason: None,
         };
         apply_transition(&mut worker, WorkerTransition::ToReviewing).unwrap();
         assert_eq!(worker.status, WorkerStatus::Reviewing);
