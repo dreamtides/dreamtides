@@ -2231,6 +2231,7 @@ dependencies = [
  "criterion",
  "fastrand",
  "lattice",
+ "rusqlite",
  "tempfile",
  "tracing",
  "tracing-subscriber",
