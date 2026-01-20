@@ -420,6 +420,7 @@ mod core_checks {
                 is_root: true,
                 in_tasks_dir: false,
                 in_docs_dir: false,
+                skill: false,
             },
         )
         .expect("Insert document");
@@ -611,5 +612,494 @@ mod core_checks {
         );
         assert!(core_checks.iter().any(|c| c.name == "WAL Health"), "Should have WAL Health check");
         assert_eq!(core_checks.len(), 4, "Should have exactly 4 core checks");
+    }
+}
+
+mod index_checks {
+    use lattice::cli::commands::doctor_command::doctor_checks;
+    use lattice::cli::commands::doctor_command::doctor_types::{
+        CheckCategory, CheckStatus, DoctorConfig,
+    };
+    use lattice::index::document_queries;
+    use lattice::index::document_types::InsertDocument;
+    use lattice::test::test_environment::TestEnv;
+
+    fn find_check<'a>(
+        results: &'a [lattice::cli::commands::doctor_command::doctor_types::CheckResult],
+        category: CheckCategory,
+        name: &str,
+    ) -> Option<&'a lattice::cli::commands::doctor_command::doctor_types::CheckResult> {
+        results.iter().find(|r| r.category == category && r.name == name)
+    }
+
+    #[test]
+    fn filesystem_sync_passes_when_all_indexed_documents_exist() {
+        let env = TestEnv::new();
+        env.create_dir("api");
+        env.create_document("api/api.md", "LAPIXX", "api", "API root");
+
+        let (_temp, context) = env.into_parts();
+
+        document_queries::insert(&context.conn, &InsertDocument {
+            id: "LAPIXX".to_string(),
+            parent_id: None,
+            path: "api/api.md".to_string(),
+            name: "api".to_string(),
+            description: "API root".to_string(),
+            task_type: None,
+            is_closed: false,
+            priority: None,
+            created_at: None,
+            updated_at: None,
+            closed_at: None,
+            body_hash: "hash123".to_string(),
+            content_length: 100,
+            is_root: true,
+            in_tasks_dir: false,
+            in_docs_dir: false,
+            skill: false,
+        })
+        .expect("Insert document");
+
+        let config = DoctorConfig::default();
+        let results = doctor_checks::run_all_checks(&context, &config).expect("Run checks");
+
+        let check = find_check(&results, CheckCategory::Index, "Filesystem Sync")
+            .expect("Filesystem Sync check should be present");
+        assert_eq!(check.status, CheckStatus::Passed, "Should pass when all docs exist on disk");
+    }
+
+    #[test]
+    fn filesystem_sync_fails_when_indexed_document_missing_from_disk() {
+        let env = TestEnv::new();
+        let (_temp, context) = env.into_parts();
+
+        document_queries::insert(&context.conn, &InsertDocument {
+            id: "LMISSING".to_string(),
+            parent_id: None,
+            path: "missing/doc.md".to_string(),
+            name: "doc".to_string(),
+            description: "Missing doc".to_string(),
+            task_type: None,
+            is_closed: false,
+            priority: None,
+            created_at: None,
+            updated_at: None,
+            closed_at: None,
+            body_hash: "hash123".to_string(),
+            content_length: 100,
+            is_root: false,
+            in_tasks_dir: false,
+            in_docs_dir: false,
+            skill: false,
+        })
+        .expect("Insert document");
+
+        let config = DoctorConfig::default();
+        let results = doctor_checks::run_all_checks(&context, &config).expect("Run checks");
+
+        let check = find_check(&results, CheckCategory::Index, "Filesystem Sync")
+            .expect("Filesystem Sync check should be present");
+        assert_eq!(
+            check.status,
+            CheckStatus::Error,
+            "Should fail when indexed doc missing from disk"
+        );
+        assert!(check.fixable, "Missing file issue should be fixable");
+        assert!(
+            check.details.iter().any(|d| d.contains("LMISSING")),
+            "Details should mention missing doc ID"
+        );
+    }
+
+    #[test]
+    fn coverage_passes_when_all_documents_indexed() {
+        let env = TestEnv::new();
+        env.create_dir("api");
+        env.create_document("api/api.md", "LAPIXX", "api", "API root");
+        env.fake_git().track_files(["api/api.md"]);
+
+        let (_temp, context) = env.into_parts();
+
+        document_queries::insert(&context.conn, &InsertDocument {
+            id: "LAPIXX".to_string(),
+            parent_id: None,
+            path: "api/api.md".to_string(),
+            name: "api".to_string(),
+            description: "API root".to_string(),
+            task_type: None,
+            is_closed: false,
+            priority: None,
+            created_at: None,
+            updated_at: None,
+            closed_at: None,
+            body_hash: "hash123".to_string(),
+            content_length: 100,
+            is_root: true,
+            in_tasks_dir: false,
+            in_docs_dir: false,
+            skill: false,
+        })
+        .expect("Insert document");
+
+        let config = DoctorConfig::default();
+        let results = doctor_checks::run_all_checks(&context, &config).expect("Run checks");
+
+        let check = find_check(&results, CheckCategory::Index, "Coverage")
+            .expect("Coverage check should be present");
+        assert_eq!(check.status, CheckStatus::Passed, "Should pass when all docs are indexed");
+    }
+
+    #[test]
+    fn coverage_warns_when_document_not_indexed() {
+        let env = TestEnv::new();
+        env.create_dir("api");
+        env.create_document("api/api.md", "LAPIXX", "api", "API root");
+        env.fake_git().track_files(["api/api.md"]);
+
+        let (_temp, context) = env.into_parts();
+
+        let config = DoctorConfig::default();
+        let results = doctor_checks::run_all_checks(&context, &config).expect("Run checks");
+
+        let check = find_check(&results, CheckCategory::Index, "Coverage")
+            .expect("Coverage check should be present");
+        assert_eq!(check.status, CheckStatus::Warning, "Should warn when doc not indexed");
+        assert!(check.fixable, "Unindexed document issue should be fixable");
+        assert!(
+            check.details.iter().any(|d| d.contains("LAPIXX")),
+            "Details should mention unindexed doc ID"
+        );
+    }
+
+    #[test]
+    fn duplicate_ids_passes_when_no_duplicates() {
+        let env = TestEnv::new();
+        let (_temp, context) = env.into_parts();
+
+        document_queries::insert(&context.conn, &InsertDocument {
+            id: "LONE01".to_string(),
+            parent_id: None,
+            path: "doc1.md".to_string(),
+            name: "doc1".to_string(),
+            description: "Doc 1".to_string(),
+            task_type: None,
+            is_closed: false,
+            priority: None,
+            created_at: None,
+            updated_at: None,
+            closed_at: None,
+            body_hash: "hash1".to_string(),
+            content_length: 100,
+            is_root: false,
+            in_tasks_dir: false,
+            in_docs_dir: false,
+            skill: false,
+        })
+        .expect("Insert document");
+
+        let config = DoctorConfig::default();
+        let results = doctor_checks::run_all_checks(&context, &config).expect("Run checks");
+
+        let check = find_check(&results, CheckCategory::Index, "No Duplicates")
+            .expect("No Duplicates check should be present");
+        assert_eq!(check.status, CheckStatus::Passed, "Should pass with no duplicates");
+    }
+
+    #[test]
+    fn closed_state_passes_when_consistent() {
+        let env = TestEnv::new();
+        env.create_dir("api/tasks/.closed");
+        env.create_document("api/tasks/.closed/done.md", "LDONE1", "done", "Done task");
+
+        let (_temp, context) = env.into_parts();
+
+        document_queries::insert(&context.conn, &InsertDocument {
+            id: "LDONE1".to_string(),
+            parent_id: None,
+            path: "api/tasks/.closed/done.md".to_string(),
+            name: "done".to_string(),
+            description: "Done task".to_string(),
+            task_type: Some(lattice::document::frontmatter_schema::TaskType::Task),
+            is_closed: true,
+            priority: None,
+            created_at: None,
+            updated_at: None,
+            closed_at: None,
+            body_hash: "hash1".to_string(),
+            content_length: 100,
+            is_root: false,
+            in_tasks_dir: true,
+            in_docs_dir: false,
+            skill: false,
+        })
+        .expect("Insert document");
+
+        let config = DoctorConfig::default();
+        let results = doctor_checks::run_all_checks(&context, &config).expect("Run checks");
+
+        let check = find_check(&results, CheckCategory::Index, "Closed State")
+            .expect("Closed State check should be present");
+        assert_eq!(check.status, CheckStatus::Passed, "Should pass when is_closed matches path");
+    }
+
+    #[test]
+    fn closed_state_warns_when_flag_inconsistent_with_path() {
+        let env = TestEnv::new();
+        env.create_dir("api/tasks");
+        env.create_document("api/tasks/open.md", "LOPEN1", "open", "Open task");
+
+        let (_temp, context) = env.into_parts();
+
+        document_queries::insert(&context.conn, &InsertDocument {
+            id: "LOPEN1".to_string(),
+            parent_id: None,
+            path: "api/tasks/open.md".to_string(),
+            name: "open".to_string(),
+            description: "Open task".to_string(),
+            task_type: Some(lattice::document::frontmatter_schema::TaskType::Task),
+            is_closed: true,
+            priority: None,
+            created_at: None,
+            updated_at: None,
+            closed_at: None,
+            body_hash: "hash1".to_string(),
+            content_length: 100,
+            is_root: false,
+            in_tasks_dir: true,
+            in_docs_dir: false,
+            skill: false,
+        })
+        .expect("Insert document");
+
+        let config = DoctorConfig::default();
+        let results = doctor_checks::run_all_checks(&context, &config).expect("Run checks");
+
+        let check = find_check(&results, CheckCategory::Index, "Closed State")
+            .expect("Closed State check should be present");
+        assert_eq!(
+            check.status,
+            CheckStatus::Warning,
+            "Should warn when is_closed=true but path not in .closed/"
+        );
+        assert!(check.fixable, "Closed state mismatch should be fixable");
+    }
+
+    #[test]
+    fn root_state_passes_when_consistent() {
+        let env = TestEnv::new();
+        env.create_dir("api");
+        env.create_document("api/api.md", "LAPIXX", "api", "API root");
+
+        let (_temp, context) = env.into_parts();
+
+        document_queries::insert(&context.conn, &InsertDocument {
+            id: "LAPIXX".to_string(),
+            parent_id: None,
+            path: "api/api.md".to_string(),
+            name: "api".to_string(),
+            description: "API root".to_string(),
+            task_type: None,
+            is_closed: false,
+            priority: None,
+            created_at: None,
+            updated_at: None,
+            closed_at: None,
+            body_hash: "hash123".to_string(),
+            content_length: 100,
+            is_root: true,
+            in_tasks_dir: false,
+            in_docs_dir: false,
+            skill: false,
+        })
+        .expect("Insert document");
+
+        let config = DoctorConfig::default();
+        let results = doctor_checks::run_all_checks(&context, &config).expect("Run checks");
+
+        let check = find_check(&results, CheckCategory::Index, "Root State")
+            .expect("Root State check should be present");
+        assert_eq!(check.status, CheckStatus::Passed, "Should pass when is_root matches path");
+    }
+
+    #[test]
+    fn root_state_warns_when_flag_inconsistent() {
+        let env = TestEnv::new();
+        env.create_dir("api");
+        env.create_document("api/other.md", "LOTHER", "other", "Not a root");
+
+        let (_temp, context) = env.into_parts();
+
+        document_queries::insert(&context.conn, &InsertDocument {
+            id: "LOTHER".to_string(),
+            parent_id: None,
+            path: "api/other.md".to_string(),
+            name: "other".to_string(),
+            description: "Not a root".to_string(),
+            task_type: None,
+            is_closed: false,
+            priority: None,
+            created_at: None,
+            updated_at: None,
+            closed_at: None,
+            body_hash: "hash123".to_string(),
+            content_length: 100,
+            is_root: true,
+            in_tasks_dir: false,
+            in_docs_dir: false,
+            skill: false,
+        })
+        .expect("Insert document");
+
+        let config = DoctorConfig::default();
+        let results = doctor_checks::run_all_checks(&context, &config).expect("Run checks");
+
+        let check = find_check(&results, CheckCategory::Index, "Root State")
+            .expect("Root State check should be present");
+        assert_eq!(
+            check.status,
+            CheckStatus::Warning,
+            "Should warn when is_root=true but path doesn't match directory"
+        );
+        assert!(check.fixable, "Root state mismatch should be fixable");
+    }
+
+    #[test]
+    fn parent_consistency_passes_when_all_parents_exist() {
+        let env = TestEnv::new();
+        env.create_dir("api/docs");
+        env.create_document("api/api.md", "LPARENT", "api", "Parent");
+        env.create_document("api/docs/child.md", "LCHILD1", "child", "Child");
+
+        let (_temp, context) = env.into_parts();
+
+        document_queries::insert(&context.conn, &InsertDocument {
+            id: "LPARENT".to_string(),
+            parent_id: None,
+            path: "api/api.md".to_string(),
+            name: "api".to_string(),
+            description: "Parent".to_string(),
+            task_type: None,
+            is_closed: false,
+            priority: None,
+            created_at: None,
+            updated_at: None,
+            closed_at: None,
+            body_hash: "hash1".to_string(),
+            content_length: 100,
+            is_root: true,
+            in_tasks_dir: false,
+            in_docs_dir: false,
+            skill: false,
+        })
+        .expect("Insert parent");
+
+        document_queries::insert(&context.conn, &InsertDocument {
+            id: "LCHILD1".to_string(),
+            parent_id: Some("LPARENT".to_string()),
+            path: "api/docs/child.md".to_string(),
+            name: "child".to_string(),
+            description: "Child".to_string(),
+            task_type: None,
+            is_closed: false,
+            priority: None,
+            created_at: None,
+            updated_at: None,
+            closed_at: None,
+            body_hash: "hash2".to_string(),
+            content_length: 100,
+            is_root: false,
+            in_tasks_dir: false,
+            in_docs_dir: true,
+            skill: false,
+        })
+        .expect("Insert child");
+
+        let config = DoctorConfig::default();
+        let results = doctor_checks::run_all_checks(&context, &config).expect("Run checks");
+
+        let check = find_check(&results, CheckCategory::Index, "Parent Consistency")
+            .expect("Parent Consistency check should be present");
+        assert_eq!(check.status, CheckStatus::Passed, "Should pass when all parents exist");
+    }
+
+    #[test]
+    fn parent_consistency_warns_when_parent_missing() {
+        let env = TestEnv::new();
+        env.create_dir("api/docs");
+        env.create_document("api/docs/orphan.md", "LORPHAN", "orphan", "Orphan");
+
+        let (_temp, context) = env.into_parts();
+
+        document_queries::insert(&context.conn, &InsertDocument {
+            id: "LORPHAN".to_string(),
+            parent_id: Some("LMISSING".to_string()),
+            path: "api/docs/orphan.md".to_string(),
+            name: "orphan".to_string(),
+            description: "Orphan".to_string(),
+            task_type: None,
+            is_closed: false,
+            priority: None,
+            created_at: None,
+            updated_at: None,
+            closed_at: None,
+            body_hash: "hash1".to_string(),
+            content_length: 100,
+            is_root: false,
+            in_tasks_dir: false,
+            in_docs_dir: true,
+            skill: false,
+        })
+        .expect("Insert orphan");
+
+        let config = DoctorConfig::default();
+        let results = doctor_checks::run_all_checks(&context, &config).expect("Run checks");
+
+        let check = find_check(&results, CheckCategory::Index, "Parent Consistency")
+            .expect("Parent Consistency check should be present");
+        assert_eq!(
+            check.status,
+            CheckStatus::Warning,
+            "Should warn when parent_id references non-existent doc"
+        );
+        assert!(
+            check.details.iter().any(|d| d.contains("LORPHAN") && d.contains("LMISSING")),
+            "Details should mention orphan and missing parent IDs"
+        );
+    }
+
+    #[test]
+    fn all_index_checks_are_present() {
+        let env = TestEnv::new();
+        let (_temp, context) = env.into_parts();
+        let config = DoctorConfig::default();
+
+        let results = doctor_checks::run_all_checks(&context, &config).expect("Run checks");
+
+        let index_checks: Vec<_> =
+            results.iter().filter(|r| r.category == CheckCategory::Index).collect();
+
+        assert!(
+            index_checks.iter().any(|c| c.name == "Filesystem Sync"),
+            "Should have Filesystem Sync check"
+        );
+        assert!(index_checks.iter().any(|c| c.name == "Coverage"), "Should have Coverage check");
+        assert!(
+            index_checks.iter().any(|c| c.name == "No Duplicates"),
+            "Should have No Duplicates check"
+        );
+        assert!(
+            index_checks.iter().any(|c| c.name == "Closed State"),
+            "Should have Closed State check"
+        );
+        assert!(
+            index_checks.iter().any(|c| c.name == "Root State"),
+            "Should have Root State check"
+        );
+        assert!(
+            index_checks.iter().any(|c| c.name == "Parent Consistency"),
+            "Should have Parent Consistency check"
+        );
+        assert_eq!(index_checks.len(), 6, "Should have exactly 6 index integrity checks");
     }
 }

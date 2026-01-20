@@ -7,6 +7,7 @@ use crate::cli::command_dispatch::{CommandContext, LatticeResult};
 use crate::cli::commands::doctor_command::doctor_types::{
     CheckCategory, CheckResult, CheckStatus, DoctorConfig,
 };
+use crate::cli::commands::doctor_command::index_checks;
 use crate::index::schema_definition;
 
 /// Runs all doctor checks and returns the results.
@@ -257,47 +258,7 @@ fn run_index_checks(
     context: &CommandContext,
     config: &DoctorConfig,
 ) -> LatticeResult<Vec<CheckResult>> {
-    let mut results = Vec::new();
-
-    // Basic index check - count documents
-    match context.conn.query_row("SELECT COUNT(*) FROM documents", [], |row| row.get::<_, i64>(0)) {
-        Ok(doc_count) if doc_count > 0 => {
-            results.push(CheckResult::passed(
-                CheckCategory::Index,
-                "Filesystem Sync",
-                format!("{doc_count} documents in index"),
-            ));
-        }
-        Ok(_) => {
-            results.push(CheckResult::info(
-                CheckCategory::Index,
-                "Filesystem Sync",
-                "No documents indexed",
-            ));
-        }
-        Err(e) => {
-            warn!(?e, "Failed to query document count in index checks");
-            results.push(
-                CheckResult::error(
-                    CheckCategory::Index,
-                    "Filesystem Sync",
-                    format!("Cannot query documents: {e}"),
-                )
-                .with_fix("lat doctor --fix"),
-            );
-        }
-    }
-
-    // Deep checks run additional validations
-    if config.deep {
-        results.push(CheckResult::info(
-            CheckCategory::Index,
-            "Deep Check",
-            "Deep index validation not yet implemented",
-        ));
-    }
-
-    Ok(results)
+    index_checks::run_index_checks(context, config)
 }
 
 /// Runs git integration checks.
