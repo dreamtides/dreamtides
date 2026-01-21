@@ -7,6 +7,7 @@ use std::time::{Duration, SystemTime, UNIX_EPOCH};
 use anyhow::{Context, Result, bail};
 use tokio::sync::mpsc::Receiver;
 
+use crate::auto_mode::auto_config::ResolvedAutoConfig;
 use crate::commands::add;
 use crate::config::{self, Config};
 use crate::ipc::messages::HookMessage;
@@ -17,8 +18,29 @@ use crate::state::{self, State, WorkerStatus};
 use crate::tmux::session;
 use crate::worker::WorkerTransition;
 use crate::{git, patrol, worker};
+
+/// Options for the up command
+pub struct UpOptions {
+    pub no_patrol: bool,
+    pub verbose: bool,
+    pub force: bool,
+    pub auto: bool,
+    pub task_pool_command: Option<String>,
+    pub concurrency: Option<u32>,
+    pub post_accept_command: Option<String>,
+}
+
 /// Runs the up command, starting the LLMC daemon
-pub fn run_up(no_patrol: bool, verbose: bool, force: bool) -> Result<()> {
+pub fn run_up(options: UpOptions) -> Result<()> {
+    let UpOptions {
+        no_patrol,
+        verbose,
+        force,
+        auto,
+        task_pool_command,
+        concurrency,
+        post_accept_command,
+    } = options;
     let llmc_root = config::get_llmc_root();
     if !llmc_root.exists() {
         bail!(
@@ -27,6 +49,37 @@ pub fn run_up(no_patrol: bool, verbose: bool, force: bool) -> Result<()> {
             llmc_root.display()
         );
     }
+    let config_path = config::get_config_path();
+    let config = Config::load(&config_path)?;
+    let _resolved_auto_config = if auto {
+        let resolved = ResolvedAutoConfig::resolve(
+            config.auto.as_ref(),
+            task_pool_command.as_deref(),
+            concurrency,
+            post_accept_command.as_deref(),
+        );
+        match resolved {
+            Some(cfg) => {
+                tracing::info!(
+                    "Auto mode enabled with task_pool_command={:?}, concurrency={}, post_accept_command={:?}",
+                    cfg.task_pool_command,
+                    cfg.concurrency,
+                    cfg.post_accept_command
+                );
+                Some(cfg)
+            }
+            None => {
+                bail!(
+                    "Auto mode requires a task pool command.\n\
+                     Either:\n\
+                     - Add [auto] section with task_pool_command in config.toml, or\n\
+                     - Use --task-pool-command <CMD> flag"
+                );
+            }
+        }
+    } else {
+        None
+    };
     let state_path = state::get_state_path();
     let mut state = State::load(&state_path)?;
     if state.daemon_running {
@@ -35,8 +88,6 @@ pub fn run_up(no_patrol: bool, verbose: bool, force: bool) -> Result<()> {
     }
     cleanup_orphaned_sessions(&state, force, verbose)?;
     println!("Starting LLMC daemon...");
-    let config_path = config::get_config_path();
-    let config = Config::load(&config_path)?;
     state.daemon_running = true;
     state.save(&state_path)?;
     ensure_tmux_running()?;

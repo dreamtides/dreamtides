@@ -16,7 +16,8 @@ blocking:
 blocked-by:
 - LDVWQN
 created-at: 2026-01-21T04:00:03.358885Z
-updated-at: 2026-01-21T04:10:09.673749Z
+updated-at: 2026-01-21T04:47:48.934584Z
+closed-at: 2026-01-21T04:47:48.934584Z
 ---
 
 ## Overview

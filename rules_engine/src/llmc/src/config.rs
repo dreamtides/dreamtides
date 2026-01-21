@@ -4,6 +4,8 @@ use std::path::{Path, PathBuf};
 
 use anyhow::{Context, Result, bail};
 use serde::{Deserialize, Serialize};
+
+use crate::auto_mode::auto_config::AutoConfig;
 /// Valid Claude Code models
 const VALID_MODELS: &[&str] = &["haiku", "sonnet", "opus"];
 /// Global LLMC configuration loaded from ~/llmc/config.toml
@@ -14,6 +16,8 @@ pub struct Config {
     pub repo: RepoConfig,
     #[serde(default)]
     pub workers: HashMap<String, WorkerConfig>,
+    /// Configuration for autonomous operation mode
+    pub auto: Option<AutoConfig>,
 }
 /// Default values for worker configuration
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -299,5 +303,143 @@ mod tests {
         assert!(validate_model("gpt4").is_err());
         assert!(validate_model("invalid").is_err());
         assert!(validate_model("").is_err());
+    }
+    #[test]
+    fn test_auto_config_parsing() {
+        let toml = r#"
+            [repo]
+            source = "/path/to/repo"
+
+            [auto]
+            task_pool_command = "lat next"
+            concurrency = 3
+            post_accept_command = "just test"
+        "#;
+        let mut file = NamedTempFile::new().unwrap();
+        file.write_all(toml.as_bytes()).unwrap();
+        let config = Config::load(file.path()).unwrap();
+        let auto = config.auto.as_ref().unwrap();
+        assert_eq!(auto.task_pool_command.as_deref(), Some("lat next"));
+        assert_eq!(auto.concurrency, 3);
+        assert_eq!(auto.post_accept_command.as_deref(), Some("just test"));
+    }
+    #[test]
+    fn test_auto_config_defaults() {
+        let toml = r#"
+            [repo]
+            source = "/path/to/repo"
+
+            [auto]
+            task_pool_command = "lat next"
+        "#;
+        let mut file = NamedTempFile::new().unwrap();
+        file.write_all(toml.as_bytes()).unwrap();
+        let config = Config::load(file.path()).unwrap();
+        let auto = config.auto.as_ref().unwrap();
+        assert_eq!(auto.task_pool_command.as_deref(), Some("lat next"));
+        assert_eq!(auto.concurrency, 1);
+        assert_eq!(auto.post_accept_command, None);
+    }
+    #[test]
+    fn test_auto_config_not_present() {
+        let toml = r#"
+            [repo]
+            source = "/path/to/repo"
+        "#;
+        let mut file = NamedTempFile::new().unwrap();
+        file.write_all(toml.as_bytes()).unwrap();
+        let config = Config::load(file.path()).unwrap();
+        assert!(config.auto.is_none());
+    }
+    #[test]
+    fn test_auto_config_empty_section() {
+        let toml = r#"
+            [repo]
+            source = "/path/to/repo"
+
+            [auto]
+        "#;
+        let mut file = NamedTempFile::new().unwrap();
+        file.write_all(toml.as_bytes()).unwrap();
+        let config = Config::load(file.path()).unwrap();
+        let auto = config.auto.as_ref().unwrap();
+        assert_eq!(auto.task_pool_command, None);
+        assert_eq!(auto.concurrency, 1);
+    }
+    #[test]
+    fn test_resolved_auto_config_from_toml() {
+        use crate::auto_mode::auto_config::{AutoConfig as AC, ResolvedAutoConfig};
+        let toml_config = AC {
+            task_pool_command: Some("lat next".to_string()),
+            concurrency: 3,
+            post_accept_command: Some("just test".to_string()),
+        };
+        let resolved = ResolvedAutoConfig::resolve(Some(&toml_config), None, None, None).unwrap();
+        assert_eq!(resolved.task_pool_command, "lat next");
+        assert_eq!(resolved.concurrency, 3);
+        assert_eq!(resolved.post_accept_command, Some("just test".to_string()));
+    }
+    #[test]
+    fn test_resolved_auto_config_cli_overrides() {
+        use crate::auto_mode::auto_config::{AutoConfig as AC, ResolvedAutoConfig};
+        let toml_config = AC {
+            task_pool_command: Some("lat next".to_string()),
+            concurrency: 3,
+            post_accept_command: Some("just test".to_string()),
+        };
+        let resolved = ResolvedAutoConfig::resolve(
+            Some(&toml_config),
+            Some("custom cmd"),
+            Some(5),
+            Some("custom post"),
+        )
+        .unwrap();
+        assert_eq!(resolved.task_pool_command, "custom cmd");
+        assert_eq!(resolved.concurrency, 5);
+        assert_eq!(resolved.post_accept_command, Some("custom post".to_string()));
+    }
+    #[test]
+    fn test_resolved_auto_config_cli_only() {
+        use crate::auto_mode::auto_config::ResolvedAutoConfig;
+        let resolved =
+            ResolvedAutoConfig::resolve(None, Some("cli cmd"), Some(2), Some("cli post")).unwrap();
+        assert_eq!(resolved.task_pool_command, "cli cmd");
+        assert_eq!(resolved.concurrency, 2);
+        assert_eq!(resolved.post_accept_command, Some("cli post".to_string()));
+    }
+    #[test]
+    fn test_resolved_auto_config_missing_task_pool_command() {
+        use crate::auto_mode::auto_config::{AutoConfig as AC, ResolvedAutoConfig};
+        let toml_config = AC { task_pool_command: None, concurrency: 3, post_accept_command: None };
+        let resolved = ResolvedAutoConfig::resolve(Some(&toml_config), None, None, None);
+        assert!(resolved.is_none());
+    }
+    #[test]
+    fn test_resolved_auto_config_no_config_no_cli() {
+        use crate::auto_mode::auto_config::ResolvedAutoConfig;
+        let resolved = ResolvedAutoConfig::resolve(None, None, None, None);
+        assert!(resolved.is_none());
+    }
+    #[test]
+    fn test_resolved_auto_config_partial_cli_override() {
+        use crate::auto_mode::auto_config::{AutoConfig as AC, ResolvedAutoConfig};
+        let toml_config = AC {
+            task_pool_command: Some("lat next".to_string()),
+            concurrency: 3,
+            post_accept_command: Some("just test".to_string()),
+        };
+        let resolved =
+            ResolvedAutoConfig::resolve(Some(&toml_config), None, Some(10), None).unwrap();
+        assert_eq!(resolved.task_pool_command, "lat next");
+        assert_eq!(resolved.concurrency, 10);
+        assert_eq!(resolved.post_accept_command, Some("just test".to_string()));
+    }
+    #[test]
+    fn test_auto_config_default() {
+        use crate::auto_mode::auto_config::AutoConfig as AC;
+        let config = AC::default();
+        assert_eq!(config.task_pool_command, None);
+        assert_eq!(config.concurrency, 1);
+        assert_eq!(config.post_accept_command, None);
     }
 }

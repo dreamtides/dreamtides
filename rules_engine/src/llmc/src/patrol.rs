@@ -1152,6 +1152,7 @@ mod tests {
             },
             repo: RepoConfig { source: "/test".to_string() },
             workers: HashMap::new(),
+            auto: None,
         }
     }
 

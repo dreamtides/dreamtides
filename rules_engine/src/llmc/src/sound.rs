@@ -31,6 +31,7 @@ mod tests {
             },
             repo: RepoConfig { source: "/test".to_string() },
             workers: HashMap::new(),
+            auto: None,
         };
         let result = play_bell(&config);
         assert!(result.is_ok());
@@ -48,6 +49,7 @@ mod tests {
             },
             repo: RepoConfig { source: "/test".to_string() },
             workers: HashMap::new(),
+            auto: None,
         };
         let result = play_bell(&config);
         assert!(result.is_ok());

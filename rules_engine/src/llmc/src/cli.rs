@@ -40,6 +40,23 @@ pub enum Commands {
         /// Force cleanup of existing sessions before starting
         #[arg(long)]
         force: bool,
+
+        /// Enable autonomous operation mode
+        #[arg(long)]
+        auto: bool,
+
+        /// Shell command that prints a new task description to stdout (auto
+        /// mode)
+        #[arg(long)]
+        task_pool_command: Option<String>,
+
+        /// Number of auto workers to run simultaneously (auto mode)
+        #[arg(long)]
+        concurrency: Option<u32>,
+
+        /// Shell command invoked after accepting a worker's changes (auto mode)
+        #[arg(long)]
+        post_accept_command: Option<String>,
     },
 
     /// Stop the LLMC daemon

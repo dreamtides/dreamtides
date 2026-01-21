@@ -1,3 +1,4 @@
+mod auto_mode;
 mod cli;
 mod commands;
 mod config;
@@ -6,6 +7,7 @@ mod git;
 mod ipc;
 mod lock;
 mod logging;
+mod overseer_mode;
 mod patrol;
 mod recovery;
 mod sound;
@@ -62,7 +64,22 @@ async fn main() -> Result<()> {
 
     let result = match cli.command {
         Commands::Init { source, target, force } => init::run_init(source, target, force),
-        Commands::Up { no_patrol, force } => up::run_up(no_patrol, cli.verbose, force),
+        Commands::Up {
+            no_patrol,
+            force,
+            auto,
+            task_pool_command,
+            concurrency,
+            post_accept_command,
+        } => up::run_up(up::UpOptions {
+            no_patrol,
+            verbose: cli.verbose,
+            force,
+            auto,
+            task_pool_command,
+            concurrency,
+            post_accept_command,
+        }),
         Commands::Down { force, kill_consoles, json } => down::run_down(force, kill_consoles, json),
         Commands::Add { name, model, role_prompt, excluded_from_pool, self_review, json } => {
             add::run_add(&name, model, role_prompt, excluded_from_pool, self_review, json)
