@@ -127,7 +127,16 @@ pub fn query_ready_tasks(
     debug!(count = rows.len(), "Ready query returned results before claim filtering");
 
     let mut results = Vec::new();
+    let limit = filter.limit.map(|l| l as usize);
+
     for document in rows {
+        // Stop early if we've hit the limit
+        if let Some(max) = limit
+            && results.len() >= max
+        {
+            break;
+        }
+
         let id = LatticeId::parse(&document.id)?;
         let claimed = claim_operations::is_claimed(repo_root, &id)?;
 
@@ -243,7 +252,12 @@ fn build_ready_query(filter: &ReadyFilter) -> (String, Vec<Box<dyn rusqlite::ToS
     append_ready_conditions(&mut sql, &mut params, filter);
     append_ready_sort(&mut sql, filter);
 
-    if let Some(limit) = filter.limit {
+    // Only apply SQL-level limit if we're including claimed tasks
+    // (claim filtering happens after SQL, so limit must be applied afterward when
+    // filtering)
+    if filter.include_claimed
+        && let Some(limit) = filter.limit
+    {
         sql.push_str(" LIMIT ?");
         params.push(Box::new(limit as i64));
     }
@@ -271,13 +285,21 @@ fn append_ready_conditions(
     // Not closed
     sql.push_str(" AND is_closed = 0");
 
-    // Not blocked (no open tasks in blocked-by)
+    // Not blocked: check both blocked_by links (this doc is source) and
+    // blocking links (this doc is target) to find all open blockers
     sql.push_str(
         " AND NOT EXISTS (
             SELECT 1 FROM links l
             JOIN documents d2 ON l.target_id = d2.id
             WHERE l.source_id = documents.id
             AND l.link_type = 'blocked_by'
+            AND d2.is_closed = 0
+        )
+        AND NOT EXISTS (
+            SELECT 1 FROM links l
+            JOIN documents d2 ON l.source_id = d2.id
+            WHERE l.target_id = documents.id
+            AND l.link_type = 'blocking'
             AND d2.is_closed = 0
         )",
     );
