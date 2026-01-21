@@ -180,18 +180,17 @@ See [Appendix: Linter](appendix_linter.md) for the complete rule set.
 
 ## The ID System
 
-A Lattice ID is a compact, human-typeable 6-character identifier: `L` prefix +
-5 Base32 characters encoding a scrambled 25-bit payload. Example: `LJCQ2X`.
-Uses RFC 4648 Base32 (A-Z, 2-7) avoiding ambiguous characters.
+A Lattice ID is a compact, human-typeable identifier with minimum 6 characters:
+`L` prefix + Base32 document counter (2+ digits) + Base32 client ID (3-6 digits).
+Example: `LJCQ2X`. Uses RFC 4648 Base32 (A-Z, 2-7) avoiding ambiguous characters.
 
-The payload combines a 10-bit client partition with a 15-bit document counter,
-then applies an 8-round Feistel permutation keyed by the repository's initial
-commit hash. This ensures consecutive IDs from the same client appear visually
-distinct (e.g., `LJCQ2X`, `LWN5RP`, `L4DKAT`) while remaining deterministic
-across all clients.
+The counter and client ID are concatenated and scrambled using an 8-round Feistel
+permutation with hardcoded keys before encoding. This ensures consecutive IDs
+appear visually distinct (e.g., `LJCQ2X`, `LWN5RP`, `L4DKAT`) while remaining
+deterministic and reversible across all clients.
 
-See [Appendix: ID System](appendix_id_system.md) for the permutation algorithm,
-client partition assignment, and collision handling.
+See [Appendix: ID System](appendix_id_system.md) for the scrambling algorithm,
+client ID selection, and collision handling.
 
 ## Command Overview
 
