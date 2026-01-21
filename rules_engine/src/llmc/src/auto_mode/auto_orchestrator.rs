@@ -6,7 +6,7 @@ use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 use anyhow::{Context, Result, bail};
 use tokio::sync::mpsc::Receiver;
-use tracing::{error, info, warn};
+use tracing::{debug, error, info, warn};
 
 use crate::auto_mode::auto_accept::{self, AutoAcceptResult};
 use crate::auto_mode::auto_config::{AutoConfig, ResolvedAutoConfig};
@@ -139,9 +139,12 @@ fn run_orchestration_loop(
 
     let patrol = Patrol::new(llmc_config);
     let mut shutdown_error: Option<String> = None;
+    let mut iteration_count: u64 = 0;
+    let loop_start_time = std::time::Instant::now();
 
     while !shutdown.load(Ordering::SeqCst) && shutdown_error.is_none() {
         thread::sleep(Duration::from_secs(1));
+        iteration_count += 1;
 
         // Collect pending hook events
         let mut pending_hook_events: Vec<HookMessage> = Vec::new();
@@ -165,6 +168,41 @@ fn run_orchestration_loop(
             }
         };
 
+        // Log worker states at the start of each iteration for diagnostics
+        let auto_worker_states: Vec<(&str, WorkerStatus)> = state
+            .workers
+            .values()
+            .filter(|w| auto_workers::is_auto_worker(&w.name))
+            .map(|w| (w.name.as_str(), w.status))
+            .collect();
+        debug!(
+            iteration = iteration_count,
+            elapsed_secs = loop_start_time.elapsed().as_secs(),
+            hook_events_received = pending_hook_events.len(),
+            ?auto_worker_states,
+            "Auto mode loop iteration"
+        );
+
+        // Warn if workers are stuck in Offline state for too long (no SessionStart
+        // hook)
+        for (name, status) in &auto_worker_states {
+            if *status == WorkerStatus::Offline
+                && iteration_count > 5
+                && pending_hook_events.is_empty()
+            {
+                warn!(
+                    worker = %name,
+                    iteration = iteration_count,
+                    elapsed_secs = loop_start_time.elapsed().as_secs(),
+                    "Worker still in Offline state after {} iterations - \
+                     SessionStart hook may not be firing. Check if Claude started correctly \
+                     and hook config exists at .worktrees/{}/.claude/settings.json",
+                    iteration_count,
+                    name
+                );
+            }
+        }
+
         // Reload config for fresh worker configs (needed after auto workers are
         // created)
         let fresh_config = match Config::load(&config_path) {
@@ -181,10 +219,22 @@ fn run_orchestration_loop(
                 error!("Error handling hook event {:?}: {}", msg.event, e);
             }
         }
-        if !pending_hook_events.is_empty()
-            && let Err(e) = state.save(&state_path)
-        {
-            error!("Failed to save state after hook events: {}", e);
+        if !pending_hook_events.is_empty() {
+            // Log state after processing hooks for diagnostics
+            let states_after: Vec<(&str, WorkerStatus)> = state
+                .workers
+                .values()
+                .filter(|w| auto_workers::is_auto_worker(&w.name))
+                .map(|w| (w.name.as_str(), w.status))
+                .collect();
+            info!(
+                hooks_processed = pending_hook_events.len(),
+                ?states_after,
+                "Processed hook events"
+            );
+            if let Err(e) = state.save(&state_path) {
+                error!("Failed to save state after hook events: {}", e);
+            }
         }
 
         // Process idle auto workers - assign tasks

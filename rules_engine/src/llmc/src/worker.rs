@@ -3,10 +3,9 @@ use std::time::{SystemTime, UNIX_EPOCH};
 
 use anyhow::{Context, Result, bail};
 
-use crate::config::{Config, WorkerConfig};
+use crate::config::Config;
 use crate::git;
 use crate::state::{State, WorkerRecord, WorkerStatus};
-use crate::tmux::sender::TmuxSender;
 /// Represents a state transition for a worker
 #[derive(Debug, Clone, PartialEq)]
 pub enum WorkerTransition {
@@ -153,23 +152,6 @@ pub fn apply_transition(worker: &mut WorkerRecord, transition: WorkerTransition)
         old_status, to_status = ? new_status, transition_type = ? transition, commit_sha
         = ? worker.commit_sha, "Worker state transition"
     );
-    Ok(())
-}
-/// Starts Claude in a TMUX session with appropriate configuration.
-///
-/// The daemon relies on the SessionStart hook to transition the worker
-/// from Offline to Idle when Claude is ready.
-pub fn start_claude_in_session(session: &str, config: &WorkerConfig) -> Result<()> {
-    let sender = TmuxSender::new();
-    let mut claude_cmd = String::from("claude");
-    if let Some(model) = &config.model {
-        claude_cmd.push_str(&format!(" --model {}", model));
-    }
-    claude_cmd.push_str(" --dangerously-skip-permissions");
-    sender
-        .send(session, &claude_cmd)
-        .with_context(|| format!("Failed to send Claude command to session '{}'", session))?;
-    tracing::debug!("Claude command sent to session '{}' - waiting for SessionStart hook", session);
     Ok(())
 }
 /// Resets a worker to clean idle state by discarding changes and resetting to

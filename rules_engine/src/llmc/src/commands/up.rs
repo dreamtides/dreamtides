@@ -404,22 +404,50 @@ fn start_worker(name: &str, config: &Config, state: &mut State, verbose: bool) -
             session::session_exists(&worker_record.session_id)
         );
     }
-    if !session::session_exists(&worker_record.session_id) {
+    // Always kill and recreate the session to ensure a clean state. If we try to
+    // reuse an existing session where Claude is already running, the claude command
+    // would be interpreted as user input rather than starting a new Claude
+    // instance.
+    if session::session_exists(&worker_record.session_id) {
         if verbose {
-            println!("    [verbose] Creating new TMUX session for worker '{}'", name);
+            println!(
+                "    [verbose] Killing existing session '{}' to ensure clean state",
+                worker_record.session_id
+            );
         }
-        session::start_worker_session(
-            &worker_record.session_id,
-            &worktree_path,
-            worker_config,
-            verbose,
-        )?;
-    } else {
-        if verbose {
-            println!("    [verbose] Starting Claude in existing session");
+        tracing::debug!(
+            worker = %name,
+            session_id = %worker_record.session_id,
+            "Killing existing session to ensure clean state on startup"
+        );
+        if let Err(e) = session::kill_session(&worker_record.session_id) {
+            tracing::warn!(
+                worker = %name,
+                error = %e,
+                "Failed to kill existing session, attempting to create new one anyway"
+            );
         }
-        worker::start_claude_in_session(&worker_record.session_id, worker_config)?;
     }
+    if verbose {
+        println!("    [verbose] Creating new TMUX session for worker '{}'", name);
+    }
+    tracing::info!(
+        worker = %name,
+        session_id = %worker_record.session_id,
+        worktree = %worktree_path.display(),
+        "Creating new TMUX session for worker"
+    );
+    session::start_worker_session(
+        &worker_record.session_id,
+        &worktree_path,
+        worker_config,
+        verbose,
+    )?;
+    tracing::info!(
+        worker = %name,
+        session_id = %worker_record.session_id,
+        "TMUX session created successfully, waiting for SessionStart hook"
+    );
     let is_clean = git::is_worktree_clean(&worktree_path).unwrap_or(false);
     let worker_mut = state.get_worker_mut(name).unwrap();
     if is_clean {

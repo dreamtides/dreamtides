@@ -6,7 +6,7 @@ use std::path::Path;
 use std::time::{SystemTime, UNIX_EPOCH};
 
 use anyhow::{Context, Result};
-use tracing::info;
+use tracing::{info, warn};
 
 use crate::commands::add;
 use crate::config::Config;
@@ -62,11 +62,14 @@ pub fn ensure_auto_workers_exist(
     Ok(worker_names)
 }
 
-/// Starts the TMUX session for an auto worker if not already running.
+/// Ensures the TMUX session for an auto worker is running with a fresh Claude
+/// instance.
+///
+/// If a session already exists, it is killed and recreated to ensure Claude
+/// starts fresh. This avoids issues where Claude may already be running and the
+/// claude command would be interpreted as user input rather than starting a new
+/// instance.
 pub fn start_auto_worker_session(worker: &WorkerRecord, config: &Config) -> Result<()> {
-    if session::session_exists(&worker.session_id) {
-        return Ok(());
-    }
     let worktree_path = std::path::Path::new(&worker.worktree_path);
     let Some(worker_config) = config.get_worker(&worker.name) else {
         anyhow::bail!(
@@ -75,6 +78,30 @@ pub fn start_auto_worker_session(worker: &WorkerRecord, config: &Config) -> Resu
             worker.name
         );
     };
+
+    // Always kill and recreate to ensure clean state
+    if session::session_exists(&worker.session_id) {
+        info!(
+            worker = %worker.name,
+            session_id = %worker.session_id,
+            "Killing existing auto worker session to ensure clean state"
+        );
+        if let Err(e) = session::kill_session(&worker.session_id) {
+            warn!(
+                worker = %worker.name,
+                error = %e,
+                "Failed to kill existing session, attempting to create new one anyway"
+            );
+        }
+    }
+
+    info!(
+        worker = %worker.name,
+        session_id = %worker.session_id,
+        worktree = %worktree_path.display(),
+        "Creating new TMUX session for auto worker"
+    );
+
     session::start_worker_session(&worker.session_id, worktree_path, worker_config, false)
         .with_context(|| format!("Failed to start session for auto worker '{}'", worker.name))
 }
