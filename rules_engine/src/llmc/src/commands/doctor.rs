@@ -819,6 +819,7 @@ fn run_rebuild() -> Result<()> {
             commits_first_detected_unix: None,
             pending_rebase_prompt: false,
             error_reason: None,
+            auto_retry_count: 0,
         };
         workers.insert(name.clone(), worker);
     }

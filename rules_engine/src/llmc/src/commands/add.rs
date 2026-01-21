@@ -82,6 +82,7 @@ pub fn run_add(
         commits_first_detected_unix: None,
         pending_rebase_prompt: false,
         error_reason: None,
+        auto_retry_count: 0,
     };
     state.add_worker(worker_record);
     state.save(&state_path)?;

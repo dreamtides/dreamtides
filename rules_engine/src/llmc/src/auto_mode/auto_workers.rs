@@ -152,6 +152,7 @@ fn create_auto_worker(state: &mut State, config: &Config, name: &str) -> Result<
         commits_first_detected_unix: None,
         pending_rebase_prompt: false,
         error_reason: None,
+        auto_retry_count: 0,
     };
     state.add_worker(worker_record);
     add_auto_worker_to_config(name, config)?;

@@ -8,7 +8,7 @@ updated-at: 2026-01-21T04:14:09.630657Z
 
 # [Lattice] Context
 
-You are working on implementing featuers for the llmc 'auto' and 'overseer' functionality.
+You are working on implementing features for the llmc 'auto' and 'overseer' functionality.
 
 Please run `lat show LDBWQN` to view the primary design document.
 

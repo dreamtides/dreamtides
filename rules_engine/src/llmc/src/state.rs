@@ -87,6 +87,11 @@ pub struct WorkerRecord {
     /// not auto-recover.
     #[serde(default)]
     pub error_reason: Option<String>,
+    /// Number of auto mode retry attempts for transient failures. Reset on
+    /// successful task completion. Used by patrol to track recovery attempts
+    /// before escalating to hard failure.
+    #[serde(default)]
+    pub auto_retry_count: u32,
 }
 /// State file tracking all workers and their status
 #[derive(Debug, Clone, Serialize, Deserialize)]

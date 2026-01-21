@@ -88,6 +88,7 @@ fn test_apply_transition_to_idle_clears_state() {
         commits_first_detected_unix: None,
         pending_rebase_prompt: false,
         error_reason: None,
+        auto_retry_count: 0,
     };
     apply_transition(&mut worker, WorkerTransition::ToIdle).unwrap();
     assert_eq!(worker.status, WorkerStatus::Idle);
@@ -116,6 +117,7 @@ fn test_apply_transition_to_working_sets_prompt() {
         commits_first_detected_unix: None,
         pending_rebase_prompt: false,
         error_reason: None,
+        auto_retry_count: 0,
     };
     apply_transition(&mut worker, WorkerTransition::ToWorking {
         prompt: "Test prompt".to_string(),
@@ -147,6 +149,7 @@ fn test_apply_transition_to_needs_review_sets_commit_sha() {
         commits_first_detected_unix: None,
         pending_rebase_prompt: false,
         error_reason: None,
+        auto_retry_count: 0,
     };
     apply_transition(&mut worker, WorkerTransition::ToNeedsReview {
         commit_sha: "abc123".to_string(),
@@ -177,6 +180,7 @@ fn test_apply_transition_idle_to_needs_review() {
         commits_first_detected_unix: None,
         pending_rebase_prompt: false,
         error_reason: None,
+        auto_retry_count: 0,
     };
     apply_transition(&mut worker, WorkerTransition::ToNeedsReview {
         commit_sha: "abc123".to_string(),
@@ -207,6 +211,7 @@ fn test_apply_transition_none_does_nothing() {
         commits_first_detected_unix: None,
         pending_rebase_prompt: false,
         error_reason: None,
+        auto_retry_count: 0,
     };
     let old_status = worker.status;
     apply_transition(&mut worker, WorkerTransition::None).unwrap();
@@ -254,6 +259,7 @@ fn test_apply_transition_to_reviewing() {
         commits_first_detected_unix: None,
         pending_rebase_prompt: false,
         error_reason: None,
+        auto_retry_count: 0,
     };
     apply_transition(&mut worker, WorkerTransition::ToReviewing).unwrap();
     assert_eq!(worker.status, WorkerStatus::Reviewing);

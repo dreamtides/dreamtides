@@ -23,6 +23,7 @@ fn create_test_worker(name: &str) -> WorkerRecord {
         commits_first_detected_unix: None,
         pending_rebase_prompt: false,
         error_reason: None,
+        auto_retry_count: 0,
     }
 }
 

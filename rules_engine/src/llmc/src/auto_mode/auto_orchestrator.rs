@@ -11,6 +11,7 @@ use tracing::{error, info, warn};
 
 use crate::auto_mode::auto_accept::{self, AutoAcceptResult};
 use crate::auto_mode::auto_config::{AutoConfig, ResolvedAutoConfig};
+use crate::auto_mode::auto_failure::{self, HardFailure, RecoveryResult, TransientFailure};
 use crate::auto_mode::auto_logging::{AutoLogger, TaskResult};
 use crate::auto_mode::heartbeat_thread::{DaemonRegistration, HeartbeatThread};
 use crate::auto_mode::task_pool::{self, TaskPoolResult};
@@ -167,6 +168,15 @@ fn run_orchestration_loop(
             Err(e) => {
                 error!("Patrol failed: {}", e);
             }
+        }
+
+        // Handle transient failures with recovery attempts
+        if let Some(hard_failure) =
+            handle_auto_failures(&mut state, llmc_config, logger, &state_path)
+        {
+            logger.log_error("auto_failure", &hard_failure.to_string());
+            shutdown_error = Some(hard_failure.to_string());
+            break;
         }
 
         // Save state after patrol
@@ -328,6 +338,9 @@ fn process_completed_workers(
 
         match auto_accept::auto_accept_worker(&worker_name, state, llmc_config, logger) {
             Ok(result) => {
+                // Reset retry count on successful completion
+                auto_failure::reset_retry_count(state, &worker_name);
+
                 match &result {
                     AutoAcceptResult::Accepted { commit_sha } => {
                         logger.log_task_completed(&worker_name, TaskResult::NeedsReview);
@@ -401,4 +414,79 @@ fn graceful_shutdown(_config: &Config, state: &mut State) -> Result<()> {
 
     info!("Graceful shutdown complete");
     Ok(())
+}
+
+/// Handles auto mode failures by detecting transient failures and attempting
+/// recovery.
+///
+/// Returns `Some(HardFailure)` if a hard failure is detected that requires
+/// immediate shutdown. Returns `None` if no hard failures were detected.
+fn handle_auto_failures(
+    state: &mut State,
+    config: &Config,
+    _logger: &AutoLogger,
+    state_path: &std::path::Path,
+) -> Option<HardFailure> {
+    // First check for existing hard failures (workers in error state)
+    if let Some(hard_failure) = auto_failure::check_for_hard_failures(state) {
+        error!(
+            failure = %hard_failure,
+            "Detected hard failure, triggering shutdown"
+        );
+        return Some(hard_failure);
+    }
+
+    // Detect transient failures
+    let transient_failures = auto_failure::detect_transient_failures(state);
+    if transient_failures.is_empty() {
+        return None;
+    }
+
+    // Attempt recovery for each transient failure
+    for failure in transient_failures {
+        info!(failure = %failure, "Detected transient failure, attempting recovery");
+
+        match auto_failure::attempt_recovery(&failure, state, config) {
+            Ok(RecoveryResult::Recovered) => {
+                info!(failure = %failure, "Recovery successful");
+            }
+            Ok(RecoveryResult::RetryNeeded) => {
+                warn!(failure = %failure, "Recovery needs retry on next patrol cycle");
+            }
+            Ok(RecoveryResult::EscalateToHardFailure(hard_failure)) => {
+                error!(
+                    failure = %failure,
+                    hard_failure = %hard_failure,
+                    "Transient failure escalated to hard failure"
+                );
+                return Some(hard_failure);
+            }
+            Err(e) => {
+                error!(
+                    failure = %failure,
+                    error = %e,
+                    "Recovery attempt failed with error"
+                );
+                return Some(HardFailure::WorkerRetriesExhausted {
+                    worker_name: get_worker_name_from_failure(&failure),
+                    retry_count: 0,
+                });
+            }
+        }
+    }
+
+    // Save state after recovery attempts
+    if let Err(e) = state.save(state_path) {
+        error!("Failed to save state after recovery attempts: {}", e);
+    }
+
+    None
+}
+
+/// Extracts the worker name from a transient failure.
+fn get_worker_name_from_failure(failure: &TransientFailure) -> String {
+    match failure {
+        TransientFailure::SessionCrash { worker_name }
+        | TransientFailure::TmuxSessionMissing { worker_name } => worker_name.clone(),
+    }
 }
