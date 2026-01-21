@@ -1,3 +1,4 @@
+pub mod daemon_control;
 pub mod health_monitor;
 pub mod overseer_config;
 pub mod overseer_loop;
