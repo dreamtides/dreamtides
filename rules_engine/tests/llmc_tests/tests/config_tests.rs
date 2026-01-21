@@ -1,7 +1,9 @@
 use std::io::Write;
+use std::time::Duration;
 
 use llmc::auto_mode::auto_config::{AutoConfig, ResolvedAutoConfig};
 use llmc::config::{Config, get_config_path, get_llmc_root, validate_model};
+use llmc::overseer_mode::overseer_config::OverseerConfig;
 use tempfile::NamedTempFile;
 
 #[test]
@@ -296,4 +298,134 @@ fn test_auto_config_default() {
     assert_eq!(config.task_pool_command, None);
     assert_eq!(config.concurrency, 1);
     assert_eq!(config.post_accept_command, None);
+}
+
+#[test]
+fn test_overseer_config_parsing() {
+    let toml = r#"
+        [repo]
+        source = "/path/to/repo"
+
+        [overseer]
+        remediation_prompt = "Fix any issues and restart"
+        heartbeat_timeout_secs = 60
+        stall_timeout_secs = 7200
+        restart_cooldown_secs = 120
+    "#;
+    let mut file = NamedTempFile::new().unwrap();
+    file.write_all(toml.as_bytes()).unwrap();
+    let config = Config::load(file.path()).unwrap();
+    let overseer = config.overseer.as_ref().unwrap();
+    assert_eq!(overseer.remediation_prompt.as_deref(), Some("Fix any issues and restart"));
+    assert_eq!(overseer.heartbeat_timeout_secs, 60);
+    assert_eq!(overseer.stall_timeout_secs, 7200);
+    assert_eq!(overseer.restart_cooldown_secs, 120);
+}
+
+#[test]
+fn test_overseer_config_defaults() {
+    let toml = r#"
+        [repo]
+        source = "/path/to/repo"
+
+        [overseer]
+        remediation_prompt = "Fix issues"
+    "#;
+    let mut file = NamedTempFile::new().unwrap();
+    file.write_all(toml.as_bytes()).unwrap();
+    let config = Config::load(file.path()).unwrap();
+    let overseer = config.overseer.as_ref().unwrap();
+    assert_eq!(overseer.remediation_prompt.as_deref(), Some("Fix issues"));
+    assert_eq!(overseer.heartbeat_timeout_secs, 30, "heartbeat_timeout_secs should default to 30");
+    assert_eq!(overseer.stall_timeout_secs, 3600, "stall_timeout_secs should default to 3600");
+    assert_eq!(overseer.restart_cooldown_secs, 60, "restart_cooldown_secs should default to 60");
+}
+
+#[test]
+fn test_overseer_config_not_present() {
+    let toml = r#"
+        [repo]
+        source = "/path/to/repo"
+    "#;
+    let mut file = NamedTempFile::new().unwrap();
+    file.write_all(toml.as_bytes()).unwrap();
+    let config = Config::load(file.path()).unwrap();
+    assert!(config.overseer.is_none());
+}
+
+#[test]
+fn test_overseer_config_empty_section() {
+    let toml = r#"
+        [repo]
+        source = "/path/to/repo"
+
+        [overseer]
+    "#;
+    let mut file = NamedTempFile::new().unwrap();
+    file.write_all(toml.as_bytes()).unwrap();
+    let config = Config::load(file.path()).unwrap();
+    let overseer = config.overseer.as_ref().unwrap();
+    assert_eq!(overseer.remediation_prompt, None);
+    assert_eq!(overseer.heartbeat_timeout_secs, 30);
+    assert_eq!(overseer.stall_timeout_secs, 3600);
+    assert_eq!(overseer.restart_cooldown_secs, 60);
+}
+
+#[test]
+fn test_overseer_config_default_struct() {
+    let config = OverseerConfig::default();
+    assert_eq!(config.remediation_prompt, None);
+    assert_eq!(config.heartbeat_timeout_secs, 30);
+    assert_eq!(config.stall_timeout_secs, 3600);
+    assert_eq!(config.restart_cooldown_secs, 60);
+}
+
+#[test]
+fn test_overseer_config_accessors() {
+    let config = OverseerConfig {
+        remediation_prompt: Some("Test prompt".to_string()),
+        heartbeat_timeout_secs: 45,
+        stall_timeout_secs: 1800,
+        restart_cooldown_secs: 90,
+    };
+    assert_eq!(config.get_remediation_prompt(), Some("Test prompt"));
+    assert_eq!(config.get_heartbeat_timeout(), Duration::from_secs(45));
+    assert_eq!(config.get_stall_timeout(), Duration::from_secs(1800));
+    assert_eq!(config.get_restart_cooldown(), Duration::from_secs(90));
+}
+
+#[test]
+fn test_config_overseer_accessors_with_overseer() {
+    let toml = r#"
+        [repo]
+        source = "/path/to/repo"
+
+        [overseer]
+        remediation_prompt = "Test remediation"
+        heartbeat_timeout_secs = 45
+        stall_timeout_secs = 1800
+        restart_cooldown_secs = 90
+    "#;
+    let mut file = NamedTempFile::new().unwrap();
+    file.write_all(toml.as_bytes()).unwrap();
+    let config = Config::load(file.path()).unwrap();
+    assert_eq!(config.get_remediation_prompt(), Some("Test remediation"));
+    assert_eq!(config.get_heartbeat_timeout(), Duration::from_secs(45));
+    assert_eq!(config.get_stall_timeout(), Duration::from_secs(1800));
+    assert_eq!(config.get_restart_cooldown(), Duration::from_secs(90));
+}
+
+#[test]
+fn test_config_overseer_accessors_without_overseer() {
+    let toml = r#"
+        [repo]
+        source = "/path/to/repo"
+    "#;
+    let mut file = NamedTempFile::new().unwrap();
+    file.write_all(toml.as_bytes()).unwrap();
+    let config = Config::load(file.path()).unwrap();
+    assert_eq!(config.get_remediation_prompt(), None);
+    assert_eq!(config.get_heartbeat_timeout(), Duration::from_secs(30));
+    assert_eq!(config.get_stall_timeout(), Duration::from_secs(3600));
+    assert_eq!(config.get_restart_cooldown(), Duration::from_secs(60));
 }

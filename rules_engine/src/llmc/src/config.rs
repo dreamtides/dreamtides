@@ -1,11 +1,13 @@
 use std::collections::HashMap;
 use std::fs;
 use std::path::{Path, PathBuf};
+use std::time::Duration;
 
 use anyhow::{Context, Result, bail};
 use serde::{Deserialize, Serialize};
 
 use crate::auto_mode::auto_config::AutoConfig;
+use crate::overseer_mode::overseer_config::OverseerConfig;
 /// Valid Claude Code models
 const VALID_MODELS: &[&str] = &["haiku", "sonnet", "opus"];
 /// Global LLMC configuration loaded from ~/llmc/config.toml
@@ -18,6 +20,8 @@ pub struct Config {
     pub workers: HashMap<String, WorkerConfig>,
     /// Configuration for autonomous operation mode
     pub auto: Option<AutoConfig>,
+    /// Configuration for the overseer supervisor process
+    pub overseer: Option<OverseerConfig>,
 }
 /// Default values for worker configuration
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -148,11 +152,55 @@ impl Config {
                     .with_context(|| format!("Invalid model for worker '{}'", name))?;
             }
         }
+        if self.get_heartbeat_timeout().is_zero() {
+            bail!("overseer.heartbeat_timeout_secs must be greater than 0");
+        }
+        if self.get_stall_timeout().is_zero() {
+            bail!("overseer.stall_timeout_secs must be greater than 0");
+        }
+        if self.get_restart_cooldown().is_zero() {
+            bail!("overseer.restart_cooldown_secs must be greater than 0");
+        }
+        if let Some(prompt) = self.get_remediation_prompt()
+            && prompt.is_empty()
+        {
+            bail!("overseer.remediation_prompt cannot be empty");
+        }
         Ok(())
     }
 
     /// Gets the configuration for a specific worker
     pub fn get_worker(&self, name: &str) -> Option<&WorkerConfig> {
         self.workers.get(name)
+    }
+
+    /// Returns the remediation prompt from overseer config, if configured.
+    pub fn get_remediation_prompt(&self) -> Option<&str> {
+        self.overseer.as_ref().and_then(|o| o.get_remediation_prompt())
+    }
+
+    /// Returns the heartbeat timeout from overseer config, or the default
+    /// (30s).
+    pub fn get_heartbeat_timeout(&self) -> Duration {
+        self.overseer
+            .as_ref()
+            .map(OverseerConfig::get_heartbeat_timeout)
+            .unwrap_or_else(|| Duration::from_secs(30))
+    }
+
+    /// Returns the stall timeout from overseer config, or the default (3600s).
+    pub fn get_stall_timeout(&self) -> Duration {
+        self.overseer
+            .as_ref()
+            .map(OverseerConfig::get_stall_timeout)
+            .unwrap_or_else(|| Duration::from_secs(3600))
+    }
+
+    /// Returns the restart cooldown from overseer config, or the default (60s).
+    pub fn get_restart_cooldown(&self) -> Duration {
+        self.overseer
+            .as_ref()
+            .map(OverseerConfig::get_restart_cooldown)
+            .unwrap_or_else(|| Duration::from_secs(60))
     }
 }

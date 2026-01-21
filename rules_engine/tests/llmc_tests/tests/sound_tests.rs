@@ -17,6 +17,7 @@ fn test_play_bell_enabled() {
         repo: RepoConfig { source: "/test".to_string() },
         workers: HashMap::new(),
         auto: None,
+        overseer: None,
     };
     let result = play_bell(&config);
     assert!(result.is_ok());
@@ -36,6 +37,7 @@ fn test_play_bell_disabled() {
         repo: RepoConfig { source: "/test".to_string() },
         workers: HashMap::new(),
         auto: None,
+        overseer: None,
     };
     let result = play_bell(&config);
     assert!(result.is_ok());
