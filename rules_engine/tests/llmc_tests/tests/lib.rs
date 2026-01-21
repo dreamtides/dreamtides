@@ -2,6 +2,7 @@ mod auto_mode;
 mod config_tests;
 mod git_tests;
 mod lock_tests;
+mod overseer;
 mod patrol_tests;
 mod remediation_executor_tests;
 mod remediation_prompt_tests;
