@@ -8,6 +8,7 @@ use anyhow::{Context, Result, bail};
 use tokio::sync::mpsc::Receiver;
 
 use crate::auto_mode::auto_config::ResolvedAutoConfig;
+use crate::auto_mode::auto_orchestrator;
 use crate::commands::add;
 use crate::config::{self, Config};
 use crate::ipc::messages::HookMessage;
@@ -51,35 +52,36 @@ pub fn run_up(options: UpOptions) -> Result<()> {
     }
     let config_path = config::get_config_path();
     let config = Config::load(&config_path)?;
-    let _resolved_auto_config = if auto {
+    if auto {
         let resolved = ResolvedAutoConfig::resolve(
             config.auto.as_ref(),
             task_pool_command.as_deref(),
             concurrency,
             post_accept_command.as_deref(),
         );
-        match resolved {
-            Some(cfg) => {
-                tracing::info!(
-                    "Auto mode enabled with task_pool_command={:?}, concurrency={}, post_accept_command={:?}",
-                    cfg.task_pool_command,
-                    cfg.concurrency,
-                    cfg.post_accept_command
-                );
-                Some(cfg)
-            }
-            None => {
-                bail!(
-                    "Auto mode requires a task pool command.\n\
-                     Either:\n\
-                     - Add [auto] section with task_pool_command in config.toml, or\n\
-                     - Use --task-pool-command <CMD> flag"
-                );
-            }
-        }
-    } else {
-        None
-    };
+        let Some(auto_config) = resolved else {
+            bail!(
+                "Auto mode requires a task pool command.\n\
+                 Either:\n\
+                 - Add [auto] section with task_pool_command in config.toml, or\n\
+                 - Use --task-pool-command <CMD> flag"
+            );
+        };
+        tracing::info!(
+            "Auto mode enabled with task_pool_command={:?}, concurrency={}, post_accept_command={:?}",
+            auto_config.task_pool_command,
+            auto_config.concurrency,
+            auto_config.post_accept_command
+        );
+        let shutdown = Arc::new(AtomicBool::new(false));
+        let shutdown_clone = Arc::clone(&shutdown);
+        ctrlc::set_handler(move || {
+            println!("\nReceived Ctrl-C, shutting down gracefully...");
+            shutdown_clone.store(true, Ordering::SeqCst);
+        })
+        .context("Failed to set Ctrl-C handler")?;
+        return auto_orchestrator::run_auto_mode(&config, &auto_config, shutdown);
+    }
     let state_path = state::get_state_path();
     let mut state = State::load(&state_path)?;
     if state.daemon_running {
