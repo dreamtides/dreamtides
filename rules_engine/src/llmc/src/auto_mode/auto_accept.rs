@@ -10,6 +10,7 @@ use tracing::{error, info};
 use crate::auto_mode::auto_config::AutoConfig;
 use crate::auto_mode::auto_logging::{AutoLogger, CommandResult};
 use crate::auto_mode::auto_workers;
+use crate::commands::add;
 use crate::config::Config;
 use crate::state::{State, WorkerStatus};
 use crate::worker::{self, WorkerTransition};
@@ -373,6 +374,21 @@ fn reset_worker_to_idle(
     copy_tabula_to_worktree(&llmc_root, &worktree_path).map_err(|e| AutoAcceptError {
         worker_name: worker_name.to_string(),
         message: format!("Failed to copy Tabula: {e}"),
+    })?;
+
+    // Recreate Serena project config (ensures MCP tools work on the worktree, not
+    // master)
+    add::create_serena_project(&worktree_path, worker_name).map_err(|e| AutoAcceptError {
+        worker_name: worker_name.to_string(),
+        message: format!("Failed to create Serena project: {e}"),
+    })?;
+
+    // Recreate Claude hook settings
+    add::create_claude_hook_settings_silent(&worktree_path, worker_name).map_err(|e| {
+        AutoAcceptError {
+            worker_name: worker_name.to_string(),
+            message: format!("Failed to create Claude hook settings: {e}"),
+        }
     })?;
 
     // Update worker state

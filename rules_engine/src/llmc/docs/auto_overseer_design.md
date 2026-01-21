@@ -510,36 +510,43 @@ src/
 
 ---
 
-## Known Issues & Limitations
+## Serena MCP Integration with Worktrees
 
-### MCP Plugin Conflicts with Worktrees
+### Background
 
-**Issue**: Claude Code MCP plugins (like Serena) are globally configured and may
-point at the master repository rather than worker worktrees. When auto workers
-use MCP tools, edits may go to the master repository instead of the worktree.
+Claude Code MCP plugins (like Serena) operate on configured projects, not the
+working directory. For LLMC workers in git worktrees, this could cause Serena
+to edit the master repository instead of the worktree.
 
-**Root Cause**:
-- Auto workers run Claude Code in git worktrees (e.g., `~/.worktrees/auto-1`)
-- Claude Code loads globally-enabled MCP plugins (e.g., Serena)
-- MCP plugins are configured with their own project paths, typically the master repo
-- Serena tools (`replace_content`, `replace_symbol_body`, etc.) operate on their
-  configured project, not the Claude Code working directory
-- Git commits happen correctly in the worktree, but MCP edits go to master
-- Result: duplicate/inconsistent edits across both locations
+### Solution
 
-**Symptoms**:
-- Uncommitted changes appearing in the master repository
-- Changes in master match (or nearly match) committed changes in worktree
-- Master changes may be unformatted while worktree changes are formatted (post `just fmt`)
+LLMC creates a unique Serena project for each worktree:
 
-**Workarounds**:
-1. **Disable MCP plugins for auto workers**: Launch Claude Code with
-   `--disable-plugins` or similar flag when starting auto worker sessions
-2. **Use built-in Claude tools only**: Ensure tasks don't trigger MCP tool usage
-3. **Manually clean master after runs**: Discard uncommitted changes in master
+1. **On worker creation** (`llmc add`, auto worker creation):
+   - Creates `.serena/project.yml` with unique `project_name: "dreamtides-{worker}"`
+   - Registers the worktree path in Serena's global config (`~/.serena/serena_config.yml`)
 
-**Future Solution**: Add a `disable_mcp` configuration option to `[auto]` section
-that causes auto workers to launch Claude Code without MCP plugins enabled.
+2. **On worker reset** (after task completion in auto mode):
+   - Recreates `.serena/project.yml` for the fresh worktree
+   - Ensures the worktree remains registered with Serena
+
+This ensures that when Claude uses Serena tools, they operate on the correct
+worktree project rather than the master repository.
+
+### Implementation Details
+
+- `create_serena_project()` in `commands/add.rs` creates the `.serena/project.yml`
+- `register_serena_project()` adds the worktree path to Serena's global `projects:` list
+- `reset_worker_to_idle()` in `auto_mode/auto_accept.rs` calls `create_serena_project()`
+  after recreating the worktree
+
+### Troubleshooting
+
+If you see uncommitted changes in the master repository that match worktree commits:
+
+1. Check if the worktree has a `.serena/project.yml` file
+2. Verify the project is registered in `~/.serena/serena_config.yml`
+3. Ensure the `project_name` in the worktree differs from the master repo
 
 ---
 
