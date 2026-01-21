@@ -186,7 +186,10 @@ impl Validator for PathCompleter {}
 
 impl Helper for PathCompleter {}
 
-/// Prompts user for parent directory with tab completion.
+/// Prompts user for parent directory with tab completion and history.
+///
+/// Supports up/down arrow keys to navigate through previously used parent
+/// directories. History is persisted to `~/.lattice/create_parent_history`.
 fn prompt_for_parent(context: &CommandContext) -> LatticeResult<String> {
     let default_parent = user_state::get_last_create_parent().unwrap_or_default();
 
@@ -197,6 +200,18 @@ fn prompt_for_parent(context: &CommandContext) -> LatticeResult<String> {
         LatticeError::OperationNotAllowed { reason: format!("Failed to initialize readline: {e}") }
     })?;
     editor.set_helper(Some(completer));
+
+    if let Some(history_path) = user_state::create_parent_history_path() {
+        if let Err(e) = editor.load_history(&history_path) {
+            debug!(
+                path = %history_path.display(),
+                error = %e,
+                "Failed to load parent history (may not exist yet)"
+            );
+        } else {
+            debug!(path = %history_path.display(), "Loaded parent history");
+        }
+    }
 
     let prompt = if default_parent.is_empty() {
         "Parent directory: ".to_string()
@@ -229,6 +244,27 @@ fn prompt_for_parent(context: &CommandContext) -> LatticeResult<String> {
 
                 if let Err(e) = user_state::set_last_create_parent(&parent, &context.repo_root) {
                     debug!(error = %e, "Failed to save last create parent");
+                }
+
+                if let Some(history_path) = user_state::create_parent_history_path() {
+                    if let Some(history_dir) = history_path.parent()
+                        && let Err(e) = std::fs::create_dir_all(history_dir)
+                    {
+                        debug!(
+                            path = %history_dir.display(),
+                            error = %e,
+                            "Failed to create history directory"
+                        );
+                    }
+                    if let Err(e) = editor.save_history(&history_path) {
+                        debug!(
+                            path = %history_path.display(),
+                            error = %e,
+                            "Failed to save parent history"
+                        );
+                    } else {
+                        debug!(path = %history_path.display(), "Saved parent history");
+                    }
                 }
 
                 return Ok(parent);

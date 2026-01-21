@@ -86,6 +86,14 @@ pub fn get_last_create_parent() -> Option<String> {
     read_state().ok().and_then(|s| s.last_create_parent)
 }
 
+/// Returns the path to the create parent history file.
+///
+/// This file stores the history of parent directories used with
+/// `lat create --interactive` for arrow key navigation.
+pub fn create_parent_history_path() -> Option<PathBuf> {
+    lattice_base_dir().map(|base| base.join("create_parent_history"))
+}
+
 /// Returns the user's home directory.
 fn home_dir() -> Option<PathBuf> {
     std::env::var_os("HOME").map(PathBuf::from).or({

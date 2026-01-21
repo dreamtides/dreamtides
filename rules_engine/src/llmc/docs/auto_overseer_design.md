@@ -510,6 +510,39 @@ src/
 
 ---
 
+## Known Issues & Limitations
+
+### MCP Plugin Conflicts with Worktrees
+
+**Issue**: Claude Code MCP plugins (like Serena) are globally configured and may
+point at the master repository rather than worker worktrees. When auto workers
+use MCP tools, edits may go to the master repository instead of the worktree.
+
+**Root Cause**:
+- Auto workers run Claude Code in git worktrees (e.g., `~/.worktrees/auto-1`)
+- Claude Code loads globally-enabled MCP plugins (e.g., Serena)
+- MCP plugins are configured with their own project paths, typically the master repo
+- Serena tools (`replace_content`, `replace_symbol_body`, etc.) operate on their
+  configured project, not the Claude Code working directory
+- Git commits happen correctly in the worktree, but MCP edits go to master
+- Result: duplicate/inconsistent edits across both locations
+
+**Symptoms**:
+- Uncommitted changes appearing in the master repository
+- Changes in master match (or nearly match) committed changes in worktree
+- Master changes may be unformatted while worktree changes are formatted (post `just fmt`)
+
+**Workarounds**:
+1. **Disable MCP plugins for auto workers**: Launch Claude Code with
+   `--disable-plugins` or similar flag when starting auto worker sessions
+2. **Use built-in Claude tools only**: Ensure tasks don't trigger MCP tool usage
+3. **Manually clean master after runs**: Discard uncommitted changes in master
+
+**Future Solution**: Add a `disable_mcp` configuration option to `[auto]` section
+that causes auto workers to launch Claude Code without MCP plugins enabled.
+
+---
+
 ## Implementation Order
 
 Tasks should be implemented in this sequence:
