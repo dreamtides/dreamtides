@@ -13,6 +13,8 @@ doctest = false
 bench = false
 
 [dependencies]
+lattice = { path = "../lattice" }
+
 anyhow = { workspace = true }
 chrono = { workspace = true }
 clap = { workspace = true }

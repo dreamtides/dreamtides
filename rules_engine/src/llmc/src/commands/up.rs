@@ -5,6 +5,7 @@ use std::thread;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 use anyhow::{Context, Result, bail};
+use lattice::cli::color_theme;
 use tokio::sync::mpsc::Receiver;
 
 use crate::auto_mode::auto_config::ResolvedAutoConfig;
@@ -84,11 +85,16 @@ pub fn run_up(options: UpOptions) -> Result<()> {
     let state_path = state::get_state_path();
     let mut state = State::load(&state_path)?;
     if state.daemon_running {
-        println!("⚠ Previous daemon crash detected. Running enhanced recovery checks...");
+        println!(
+            "{}",
+            color_theme::warning(
+                "⚠ Previous daemon crash detected. Running enhanced recovery checks..."
+            )
+        );
         tracing::warn!("Daemon crash detected: daemon_running flag was true on startup");
     }
     cleanup_orphaned_sessions(&state, force, verbose)?;
-    println!("Starting LLMC daemon...");
+    println!("{}", color_theme::dim("Starting LLMC daemon..."));
     state.daemon_running = true;
     state.save(&state_path)?;
     ensure_tmux_running()?;
@@ -99,7 +105,13 @@ pub fn run_up(options: UpOptions) -> Result<()> {
     let socket_path = socket::get_socket_path();
     let ipc_receiver = match socket::spawn_ipc_listener(socket_path.clone()) {
         Ok(rx) => {
-            println!("✓ IPC listener started at {}", socket_path.display());
+            println!(
+                "{}",
+                color_theme::success(format!(
+                    "✓ IPC listener started at {}",
+                    socket_path.display()
+                ))
+            );
             Some(rx)
         }
         Err(e) => {
@@ -114,23 +126,23 @@ pub fn run_up(options: UpOptions) -> Result<()> {
 
     reconcile_and_start_workers(&config, &mut state, verbose)?;
     state.save(&state_path)?;
-    println!("✓ All workers started");
+    println!("{}", color_theme::success("✓ All workers started"));
 
     let shutdown = Arc::new(AtomicBool::new(false));
     let shutdown_clone = Arc::clone(&shutdown);
     ctrlc::set_handler(move || {
-        println!("\nReceived Ctrl-C, shutting down gracefully...");
+        println!("\n{}", color_theme::dim("Received Ctrl-C, shutting down gracefully..."));
         shutdown_clone.store(true, Ordering::SeqCst);
     })
     .context("Failed to set Ctrl-C handler")?;
 
     // Branch to either auto mode or normal mode
     if let Some(ref auto_cfg) = auto_config {
-        println!("Entering auto mode loop (Ctrl-C to stop)...\n");
+        println!("{}\n", color_theme::dim("Entering auto mode loop (Ctrl-C to stop)..."));
         auto_orchestrator::run_auto_mode(&config, auto_cfg, shutdown, ipc_receiver)?;
-        println!("✓ LLMC auto mode daemon stopped");
+        println!("{}", color_theme::success("✓ LLMC auto mode daemon stopped"));
     } else {
-        println!("Entering main loop (Ctrl-C to stop)...\n");
+        println!("{}\n", color_theme::dim("Entering main loop (Ctrl-C to stop)..."));
         run_main_loop(
             no_patrol,
             verbose,
@@ -140,7 +152,7 @@ pub fn run_up(options: UpOptions) -> Result<()> {
             &state_path,
             ipc_receiver,
         )?;
-        println!("✓ LLMC daemon stopped");
+        println!("{}", color_theme::success("✓ LLMC daemon stopped"));
     }
     Ok(())
 }
@@ -166,12 +178,18 @@ fn cleanup_orphaned_sessions(state: &State, force: bool, verbose: bool) -> Resul
         if !tracked_session_ids.is_empty() {
             if force {
                 println!(
-                    "Found {} tracked LLMC sessions. Cleaning up due to --force...",
-                    tracked_session_ids.len()
+                    "{}",
+                    color_theme::dim(format!(
+                        "Found {} tracked LLMC sessions. Cleaning up due to --force...",
+                        tracked_session_ids.len()
+                    ))
                 );
                 for session_id in &tracked_session_ids {
                     if verbose {
-                        println!("  Killing session: {}", session_id);
+                        println!(
+                            "  {}",
+                            color_theme::muted(format!("Killing session: {}", session_id))
+                        );
                     }
                     session::kill_session(session_id)?;
                 }
@@ -187,27 +205,42 @@ fn cleanup_orphaned_sessions(state: &State, force: bool, verbose: bool) -> Resul
         return Ok(());
     }
     println!(
-        "Found {} orphaned LLMC sessions (not tracked in state file):",
-        orphaned_sessions.len()
+        "{}",
+        color_theme::dim(format!(
+            "Found {} orphaned LLMC sessions (not tracked in state file):",
+            orphaned_sessions.len()
+        ))
     );
     for session_name in &orphaned_sessions {
-        println!("  - {}", session_name);
+        println!("  {}", color_theme::muted(format!("- {}", session_name)));
     }
-    println!("Cleaning up orphaned sessions...");
+    println!("{}", color_theme::dim("Cleaning up orphaned sessions..."));
     for session_name in &orphaned_sessions {
         if verbose {
-            println!("  Killing orphaned session: {}", session_name);
+            println!(
+                "  {}",
+                color_theme::muted(format!("Killing orphaned session: {}", session_name))
+            );
         }
         if let Err(e) = session::kill_session(session_name) {
-            eprintln!("Warning: Failed to kill orphaned session '{}': {}", session_name, e);
+            eprintln!(
+                "{}",
+                color_theme::warning(format!(
+                    "Warning: Failed to kill orphaned session '{}': {}",
+                    session_name, e
+                ))
+            );
         }
     }
-    println!("✓ Cleaned up {} orphaned sessions", orphaned_sessions.len());
+    println!(
+        "{}",
+        color_theme::success(format!("✓ Cleaned up {} orphaned sessions", orphaned_sessions.len()))
+    );
     Ok(())
 }
 fn ensure_tmux_running() -> Result<()> {
     if !is_tmux_server_running() {
-        println!("Starting TMUX server...");
+        println!("{}", color_theme::dim("Starting TMUX server..."));
         start_tmux_server()?;
     }
     Ok(())
@@ -230,7 +263,7 @@ fn start_tmux_server() -> Result<()> {
     Ok(())
 }
 fn reconcile_and_start_workers(config: &Config, state: &mut State, verbose: bool) -> Result<()> {
-    println!("Reconciling workers with state...");
+    println!("{}", color_theme::dim("Reconciling workers with state..."));
     let worker_names: Vec<String> = state.workers.keys().cloned().collect();
     for worker_name in &worker_names {
         if let Some(worker_record) = state.workers.get_mut(worker_name)
@@ -241,11 +274,20 @@ fn reconcile_and_start_workers(config: &Config, state: &mut State, verbose: bool
             // appropriately
             if worker_record.status == WorkerStatus::Rebasing {
                 println!(
-                    "  Worker '{}' session not found but has Rebasing state, preserving state",
-                    worker_name
+                    "  {}",
+                    color_theme::muted(format!(
+                        "Worker '{}' session not found but has Rebasing state, preserving state",
+                        worker_name
+                    ))
                 );
             } else {
-                println!("  Worker '{}' session not found, marking offline", worker_name);
+                println!(
+                    "  {}",
+                    color_theme::muted(format!(
+                        "Worker '{}' session not found, marking offline",
+                        worker_name
+                    ))
+                );
                 worker_record.status = WorkerStatus::Offline;
             }
         }
@@ -259,14 +301,20 @@ fn reconcile_and_start_workers(config: &Config, state: &mut State, verbose: bool
                 || (worker_record.status == WorkerStatus::Rebasing
                     && !session::session_exists(&worker_record.session_id)))
         {
-            println!("  Starting worker '{}'...", worker_name);
+            println!("  {}", color_theme::dim(format!("Starting worker '{}'...", worker_name)));
             if let Err(e) = start_worker_with_recovery(worker_name, config, state, verbose) {
                 tracing::error!(
                     "Failed to start worker '{}' after recovery attempts: {}",
                     worker_name,
                     e
                 );
-                eprintln!("  ⚠ Failed to start worker '{}': {}", worker_name, e);
+                eprintln!(
+                    "  {}",
+                    color_theme::warning(format!(
+                        "⚠ Failed to start worker '{}': {}",
+                        worker_name, e
+                    ))
+                );
                 failed_workers.push(worker_name.clone());
                 if let Some(worker_mut) = state.get_worker_mut(worker_name) {
                     worker_mut.status = WorkerStatus::Error;
@@ -279,11 +327,17 @@ fn reconcile_and_start_workers(config: &Config, state: &mut State, verbose: bool
     }
     if !failed_workers.is_empty() {
         eprintln!(
-            "  ⚠ {} worker(s) failed to start: {}",
-            failed_workers.len(),
-            failed_workers.join(", ")
+            "  {}",
+            color_theme::warning(format!(
+                "⚠ {} worker(s) failed to start: {}",
+                failed_workers.len(),
+                failed_workers.join(", ")
+            ))
         );
-        eprintln!("    The daemon will continue and retry these workers periodically.");
+        eprintln!(
+            "    {}",
+            color_theme::muted("The daemon will continue and retry these workers periodically.")
+        );
     }
     Ok(())
 }
@@ -314,7 +368,10 @@ fn start_worker_with_recovery(
         }
         Err(e) => {
             tracing::warn!("Worker '{}' initial start failed: {}. Attempting recovery...", name, e);
-            println!("    Initial start failed, attempting self-healing recovery...");
+            println!(
+                "    {}",
+                color_theme::muted("Initial start failed, attempting self-healing recovery...")
+            );
         }
     }
     for attempt in 1..=MAX_RETRIES {
@@ -323,18 +380,30 @@ fn start_worker_with_recovery(
             .map(|w| w.session_id.clone())
             .unwrap_or_else(|| format!("llmc-{}", name));
         if session::session_exists(&session_id) {
-            println!("    Killing stale session '{}'...", session_id);
+            println!(
+                "    {}",
+                color_theme::muted(format!("Killing stale session '{}'...", session_id))
+            );
             if let Err(e) = session::kill_session(&session_id) {
                 tracing::warn!("Failed to kill stale session '{}': {}", session_id, e);
             }
             thread::sleep(Duration::from_millis(500));
         }
         let delay = Duration::from_secs(attempt as u64);
-        println!("    Retry {}/{} after {}s delay...", attempt, MAX_RETRIES, attempt);
+        println!(
+            "    {}",
+            color_theme::muted(format!(
+                "Retry {}/{} after {}s delay...",
+                attempt, MAX_RETRIES, attempt
+            ))
+        );
         thread::sleep(delay);
         match start_worker(name, config, state, verbose) {
             Ok(()) => {
-                println!("    ✓ Recovery successful on retry {}", attempt);
+                println!(
+                    "    {}",
+                    color_theme::success(format!("✓ Recovery successful on retry {}", attempt))
+                );
                 tracing::info!("Worker '{}' recovered successfully on retry {}", name, attempt);
                 if let Some(worker_mut) = state.get_worker_mut(name) {
                     worker_mut.crash_count = 0;
@@ -357,13 +426,19 @@ fn start_worker(name: &str, config: &Config, state: &mut State, verbose: bool) -
         state.get_worker(name).with_context(|| format!("Worker '{}' not found in state", name))?;
     let worktree_path = PathBuf::from(&worker_record.worktree_path);
     if verbose {
-        println!("    [verbose] Checking worktree: {}", worktree_path.display());
+        println!(
+            "    {}",
+            color_theme::muted(format!("[verbose] Checking worktree: {}", worktree_path.display()))
+        );
     }
     if !worktree_path.exists() {
-        println!("  Worker '{}' worktree missing, recreating...", name);
+        println!(
+            "  {}",
+            color_theme::dim(format!("Worker '{}' worktree missing, recreating...", name))
+        );
         match add::recreate_missing_worktree(name, &worker_record.branch, &worktree_path) {
             Ok(()) => {
-                println!("  ✓ Worktree recreated successfully");
+                println!("  {}", color_theme::success("✓ Worktree recreated successfully"));
             }
             Err(e) => {
                 bail!(
@@ -398,10 +473,16 @@ fn start_worker(name: &str, config: &Config, state: &mut State, verbose: bool) -
         );
     };
     if verbose {
-        println!("    [verbose] Session ID: {}", worker_record.session_id);
         println!(
-            "    [verbose] Session exists: {}",
-            session::session_exists(&worker_record.session_id)
+            "    {}",
+            color_theme::muted(format!("[verbose] Session ID: {}", worker_record.session_id))
+        );
+        println!(
+            "    {}",
+            color_theme::muted(format!(
+                "[verbose] Session exists: {}",
+                session::session_exists(&worker_record.session_id)
+            ))
         );
     }
     // Always kill and recreate the session to ensure a clean state. If we try to
@@ -411,8 +492,11 @@ fn start_worker(name: &str, config: &Config, state: &mut State, verbose: bool) -
     if session::session_exists(&worker_record.session_id) {
         if verbose {
             println!(
-                "    [verbose] Killing existing session '{}' to ensure clean state",
-                worker_record.session_id
+                "    {}",
+                color_theme::muted(format!(
+                    "[verbose] Killing existing session '{}' to ensure clean state",
+                    worker_record.session_id
+                ))
             );
         }
         tracing::debug!(
@@ -429,7 +513,13 @@ fn start_worker(name: &str, config: &Config, state: &mut State, verbose: bool) -
         }
     }
     if verbose {
-        println!("    [verbose] Creating new TMUX session for worker '{}'", name);
+        println!(
+            "    {}",
+            color_theme::muted(format!(
+                "[verbose] Creating new TMUX session for worker '{}'",
+                name
+            ))
+        );
     }
     tracing::info!(
         worker = %name,
@@ -457,8 +547,11 @@ fn start_worker(name: &str, config: &Config, state: &mut State, verbose: bool) -
         }
         if verbose {
             println!(
-                "    [verbose] Worker '{}' worktree is clean; waiting for SessionStart hook",
-                name
+                "    {}",
+                color_theme::muted(format!(
+                    "[verbose] Worker '{}' worktree is clean; waiting for SessionStart hook",
+                    name
+                ))
             );
         }
     } else if git::is_rebase_in_progress(&worktree_path) {
@@ -475,10 +568,22 @@ fn start_worker(name: &str, config: &Config, state: &mut State, verbose: bool) -
         }
         // Queue a conflict prompt to be sent by the patrol
         worker_mut.pending_rebase_prompt = true;
-        println!("  ⚠ Worker '{}' has an active rebase in progress", name);
-        println!("    Claude will receive a rebase conflict prompt once ready.");
+        println!(
+            "  {}",
+            color_theme::warning(format!("⚠ Worker '{}' has an active rebase in progress", name))
+        );
+        println!(
+            "    {}",
+            color_theme::muted("Claude will receive a rebase conflict prompt once ready.")
+        );
         if verbose {
-            println!("    [verbose] Worker '{}' has active rebase, marked as Rebasing", name);
+            println!(
+                "    {}",
+                color_theme::muted(format!(
+                    "[verbose] Worker '{}' has active rebase, marked as Rebasing",
+                    name
+                ))
+            );
         }
     } else {
         if let Err(e) = worker::apply_transition(worker_mut, WorkerTransition::ToError {
@@ -488,13 +593,25 @@ fn start_worker(name: &str, config: &Config, state: &mut State, verbose: bool) -
             worker_mut.status = WorkerStatus::Error;
             worker_mut.last_activity_unix = unix_timestamp_now();
         }
-        println!("  ⚠ Worker '{}' has uncommitted changes", name);
         println!(
-            "    Marked as Error. Run 'llmc doctor --fix' or 'llmc reset {}' to recover",
-            name
+            "  {}",
+            color_theme::warning(format!("⚠ Worker '{}' has uncommitted changes", name))
+        );
+        println!(
+            "    {}",
+            color_theme::muted(format!(
+                "Marked as Error. Run 'llmc doctor --fix' or 'llmc reset {}' to recover",
+                name
+            ))
         );
         if verbose {
-            println!("    [verbose] Worker '{}' worktree is dirty, marked as Error", name);
+            println!(
+                "    {}",
+                color_theme::muted(format!(
+                    "[verbose] Worker '{}' worktree is dirty, marked as Error",
+                    name
+                ))
+            );
         }
     }
     Ok(())
@@ -511,15 +628,21 @@ fn ensure_hook_config_exists(worktree_path: &Path, worker_name: &str, verbose: b
         add::create_claude_hook_settings_silent(worktree_path, worker_name)?;
         if verbose {
             println!(
-                "    [verbose] Regenerated .claude/settings.json for worker '{}'",
-                worker_name
+                "    {}",
+                color_theme::muted(format!(
+                    "[verbose] Regenerated .claude/settings.json for worker '{}'",
+                    worker_name
+                ))
             );
         }
     } else if verbose {
         println!(
-            "    [verbose] Worker '{}' has Claude hook config at {}",
-            worker_name,
-            settings_path.display()
+            "    {}",
+            color_theme::muted(format!(
+                "[verbose] Worker '{}' has Claude hook config at {}",
+                worker_name,
+                settings_path.display()
+            ))
         );
     }
     Ok(())
@@ -551,7 +674,10 @@ fn run_main_loop(
             while let Ok(msg) = rx.try_recv() {
                 tracing::info!("Received hook event: {:?} (id: {})", msg.event, msg.id);
                 if verbose {
-                    println!("  [hook] Received event: {:?}", msg.event);
+                    println!(
+                        "  {}",
+                        color_theme::muted(format!("[hook] Received event: {:?}", msg.event))
+                    );
                 }
                 pending_hook_events.push(msg);
             }
@@ -607,8 +733,11 @@ fn run_main_loop(
                 >= error_warning_interval
         {
             eprintln!(
-                "⚠ Warning: {} consecutive errors in daemon main loop. Check logs at ~/llmc/logs/ for details.",
-                consecutive_errors
+                "{}",
+                color_theme::warning(format!(
+                    "⚠ Warning: {} consecutive errors in daemon main loop. Check logs at ~/llmc/logs/ for details.",
+                    consecutive_errors
+                ))
             );
             tracing::warn!(
                 "Daemon has had {} consecutive errors - check logs for details",
@@ -621,7 +750,7 @@ fn run_main_loop(
             && SystemTime::now().duration_since(last_patrol).unwrap_or_default() >= patrol_interval
         {
             if verbose {
-                println!("Running patrol...");
+                println!("{}", color_theme::muted("Running patrol..."));
             }
             match patrol.run_patrol(state, &config) {
                 Ok(report) => {
@@ -648,11 +777,17 @@ fn run_main_loop(
     }
     if let Err(e) = graceful_shutdown(&config, state) {
         tracing::error!("Error during graceful shutdown: {}", e);
-        eprintln!("Warning: Error during graceful shutdown: {}", e);
+        eprintln!(
+            "{}",
+            color_theme::warning(format!("Warning: Error during graceful shutdown: {}", e))
+        );
     }
     if let Err(e) = state.save(state_path) {
         tracing::error!("Failed to save final state: {}", e);
-        eprintln!("Warning: Failed to save final state: {}", e);
+        eprintln!(
+            "{}",
+            color_theme::warning(format!("Warning: Failed to save final state: {}", e))
+        );
     }
     Ok(())
 }
@@ -674,7 +809,13 @@ fn poll_worker_states(state: &mut State) {
             if worker_record.status != WorkerStatus::Error
                 && !session::session_exists(&worker_record.session_id)
             {
-                println!("  Worker '{}' session disappeared, marking offline", worker_record.name);
+                println!(
+                    "  {}",
+                    color_theme::muted(format!(
+                        "Worker '{}' session disappeared, marking offline",
+                        worker_record.name
+                    ))
+                );
                 worker_record.status = WorkerStatus::Offline;
                 worker_record.last_activity_unix = now;
                 continue;
@@ -686,8 +827,11 @@ fn poll_worker_states(state: &mut State) {
                 let time_since_error = now.saturating_sub(worker_record.last_activity_unix);
                 if time_since_error >= cooldown_secs {
                     println!(
-                        "  Worker '{}' cooldown expired ({}s), marking offline for retry",
-                        worker_record.name, cooldown_secs
+                        "  {}",
+                        color_theme::muted(format!(
+                            "Worker '{}' cooldown expired ({}s), marking offline for retry",
+                            worker_record.name, cooldown_secs
+                        ))
                     );
                     tracing::info!(
                         "Worker '{}' transitioning from Error to Offline for self-healing retry (crash_count={})",
@@ -713,14 +857,20 @@ fn start_offline_workers(config: &mut Config, state: &mut State, verbose: bool) 
     if has_offline_workers {
         let config_path = config::get_config_path();
         if verbose {
-            println!("  [verbose] Reloading config before starting offline workers");
+            println!(
+                "  {}",
+                color_theme::muted("[verbose] Reloading config before starting offline workers")
+            );
         }
         match Config::load(&config_path) {
             Ok(new_config) => *config = new_config,
             Err(e) => {
                 tracing::warn!("Failed to reload config.toml (using existing): {}", e);
                 if verbose {
-                    println!("  [verbose] Config reload failed, using existing config");
+                    println!(
+                        "  {}",
+                        color_theme::muted("[verbose] Config reload failed, using existing config")
+                    );
                 }
             }
         }
@@ -734,8 +884,11 @@ fn start_offline_workers(config: &mut Config, state: &mut State, verbose: bool) 
             if session::session_exists(&session_id) {
                 if verbose {
                     println!(
-                        "  [verbose] Worker '{}' session already exists, marking as idle",
-                        worker_name
+                        "  {}",
+                        color_theme::muted(format!(
+                            "[verbose] Worker '{}' session already exists, marking as idle",
+                            worker_name
+                        ))
                     );
                 }
                 if let Some(worker_mut) = state.get_worker_mut(worker_name)
@@ -752,10 +905,19 @@ fn start_offline_workers(config: &mut Config, state: &mut State, verbose: bool) 
                 }
                 continue;
             }
-            println!("  Starting offline worker '{}'...", worker_name);
+            println!(
+                "  {}",
+                color_theme::dim(format!("Starting offline worker '{}'...", worker_name))
+            );
             if let Err(e) = start_worker_with_recovery(worker_name, config, state, verbose) {
                 tracing::error!("Failed to start worker '{}' after recovery: {}", worker_name, e);
-                eprintln!("  ⚠ Failed to start worker '{}': {}", worker_name, e);
+                eprintln!(
+                    "  {}",
+                    color_theme::warning(format!(
+                        "⚠ Failed to start worker '{}': {}",
+                        worker_name, e
+                    ))
+                );
                 failed_workers.push(worker_name.clone());
                 if let Some(worker_mut) = state.get_worker_mut(worker_name) {
                     worker_mut.status = WorkerStatus::Error;
@@ -776,7 +938,7 @@ fn start_offline_workers(config: &mut Config, state: &mut State, verbose: bool) 
     Ok(())
 }
 fn graceful_shutdown(config: &Config, state: &mut State) -> Result<()> {
-    println!("Shutting down workers...");
+    println!("{}", color_theme::dim("Shutting down workers..."));
     state.daemon_running = false;
     let sender = super::super::tmux::sender::TmuxSender::new();
     let worker_names: Vec<String> = state.workers.keys().cloned().collect();
@@ -785,20 +947,29 @@ fn graceful_shutdown(config: &Config, state: &mut State) -> Result<()> {
             if worker_record.status == WorkerStatus::Offline {
                 continue;
             }
-            println!("  Stopping worker '{}'...", worker_name);
+            println!("  {}", color_theme::muted(format!("Stopping worker '{}'...", worker_name)));
             if config.get_worker(worker_name).is_none() {
                 tracing::warn!(
                     "Worker '{}' exists in state but not in config during shutdown",
                     worker_name
                 );
                 eprintln!(
-                    "Warning: Worker '{}' not found in config.toml, skipping graceful shutdown",
-                    worker_name
+                    "{}",
+                    color_theme::warning(format!(
+                        "Warning: Worker '{}' not found in config.toml, skipping graceful shutdown",
+                        worker_name
+                    ))
                 );
                 continue;
             }
             if let Err(e) = sender.send_keys_raw(&worker_record.session_id, "C-c") {
-                eprintln!("Warning: Failed to send Ctrl-C to worker '{}': {}", worker_name, e);
+                eprintln!(
+                    "{}",
+                    color_theme::warning(format!(
+                        "Warning: Failed to send Ctrl-C to worker '{}': {}",
+                        worker_name, e
+                    ))
+                );
             }
         }
     }
@@ -808,7 +979,13 @@ fn graceful_shutdown(config: &Config, state: &mut State) -> Result<()> {
             if session::session_exists(&worker_record.session_id)
                 && let Err(e) = session::kill_session(&worker_record.session_id)
             {
-                eprintln!("Warning: Failed to kill session '{}': {}", worker_record.session_id, e);
+                eprintln!(
+                    "{}",
+                    color_theme::warning(format!(
+                        "Warning: Failed to kill session '{}': {}",
+                        worker_record.session_id, e
+                    ))
+                );
             }
             // Preserve certain states that represent important context that shouldn't be
             // lost Rebasing state indicates a rebase is in progress with

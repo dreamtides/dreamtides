@@ -5,6 +5,7 @@ use std::thread;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 use anyhow::{Context, Result, bail};
+use lattice::cli::color_theme;
 use tokio::sync::mpsc::Receiver;
 use tracing::{debug, error, info, warn};
 
@@ -44,11 +45,14 @@ pub fn run_auto_mode(
     let instance_id = heartbeat_thread::generate_instance_id();
     let logger = AutoLogger::new().context("Failed to initialize auto mode logger")?;
 
-    println!("Auto mode configuration:");
-    println!("  Task pool command: {}", auto_config.task_pool_command);
-    println!("  Concurrency: {}", auto_config.concurrency);
+    println!("{}", color_theme::dim("Auto mode configuration:"));
+    println!(
+        "  {}",
+        color_theme::muted(format!("Task pool command: {}", auto_config.task_pool_command))
+    );
+    println!("  {}", color_theme::muted(format!("Concurrency: {}", auto_config.concurrency)));
     if let Some(ref cmd) = auto_config.post_accept_command {
-        println!("  Post-accept command: {}", cmd);
+        println!("  {}", color_theme::muted(format!("Post-accept command: {}", cmd)));
     }
 
     info!(
@@ -124,7 +128,7 @@ fn run_orchestration_loop(
 
         // Start sessions for all auto workers
         for name in &worker_names {
-            println!("  Starting auto worker '{}'...", name);
+            println!("  {}", color_theme::dim(format!("Starting auto worker '{}'...", name)));
             if let Some(worker) = state.get_worker(name)
                 && let Err(e) = auto_workers::start_auto_worker_session(worker, &fresh_config)
             {
@@ -133,7 +137,10 @@ fn run_orchestration_loop(
             }
         }
 
-        println!("✓ {} auto worker(s) initialized", worker_names.len());
+        println!(
+            "{}",
+            color_theme::success(format!("✓ {} auto worker(s) initialized", worker_names.len()))
+        );
         info!(workers = ?worker_names, "Auto workers initialized");
     }
 
@@ -336,7 +343,13 @@ fn process_idle_workers(
         match task_result {
             TaskPoolResult::Task(task) => {
                 let task_preview: String = task.chars().take(60).collect();
-                println!("  [{}] Assigning task: {}...", worker_name, task_preview);
+                println!(
+                    "  {}",
+                    color_theme::accent(format!(
+                        "[{}] Assigning task: {}...",
+                        worker_name, task_preview
+                    ))
+                );
                 info!(worker = %worker_name, task_len = task.len(), "Assigning task to worker");
                 assign_task_to_worker(state, llmc_config, &worker_name, &task, logger)?;
             }
@@ -344,7 +357,13 @@ fn process_idle_workers(
                 // No tasks available, skip this worker
             }
             TaskPoolResult::Error(e) => {
-                eprintln!("  [{}] Task pool command failed: {}", worker_name, e);
+                eprintln!(
+                    "  {}",
+                    color_theme::error(format!(
+                        "[{}] Task pool command failed: {}",
+                        worker_name, e
+                    ))
+                );
                 error!(worker = %worker_name, error = %e, "Task pool command failed");
                 return Err(e.into());
             }
@@ -447,7 +466,10 @@ fn process_completed_workers(
         .collect();
 
     for worker_name in completed_workers {
-        println!("  [{}] Processing completed work...", worker_name);
+        println!(
+            "  {}",
+            color_theme::dim(format!("[{}] Processing completed work...", worker_name))
+        );
         info!(worker = %worker_name, "Processing completed worker");
 
         // Get auto config for post_accept_command
@@ -469,9 +491,12 @@ fn process_completed_workers(
                         state.source_repo_dirty_backoff_secs = None;
 
                         println!(
-                            "  [{}] ✓ Changes accepted ({})",
-                            worker_name,
-                            &commit_sha[..8.min(commit_sha.len())]
+                            "  {}",
+                            color_theme::success(format!(
+                                "[{}] ✓ Changes accepted ({})",
+                                worker_name,
+                                &commit_sha[..8.min(commit_sha.len())]
+                            ))
                         );
                         logger.log_task_completed(&worker_name, TaskResult::NeedsReview);
                         info!(worker = %worker_name, commit = %commit_sha, "Worker changes accepted");
@@ -483,7 +508,13 @@ fn process_completed_workers(
                             &auto_cfg,
                             logger,
                         ) {
-                            eprintln!("  [{}] Post-accept command failed: {}", worker_name, e);
+                            eprintln!(
+                                "  {}",
+                                color_theme::error(format!(
+                                    "[{}] Post-accept command failed: {}",
+                                    worker_name, e
+                                ))
+                            );
                             error!(worker = %worker_name, error = %e, "Post-accept command failed");
                             return Err(e.into());
                         }
@@ -493,7 +524,10 @@ fn process_completed_workers(
                         state.source_repo_dirty_retry_after_unix = None;
                         state.source_repo_dirty_backoff_secs = None;
 
-                        println!("  [{}] No changes to accept", worker_name);
+                        println!(
+                            "  {}",
+                            color_theme::muted(format!("[{}] No changes to accept", worker_name))
+                        );
                         logger.log_task_completed(&worker_name, TaskResult::NoChanges);
                         info!(worker = %worker_name, "Worker completed with no changes");
                     }
@@ -513,9 +547,11 @@ fn process_completed_workers(
                         state.source_repo_dirty_retry_after_unix = Some(retry_after);
 
                         println!(
-                            "  [{}] Source repository has uncommitted changes. \
-                             Will retry in {} seconds.",
-                            worker_name, next_backoff
+                            "  {}",
+                            color_theme::warning(format!(
+                                "[{}] Source repository has uncommitted changes. Will retry in {} seconds.",
+                                worker_name, next_backoff
+                            ))
                         );
                         warn!(
                             worker = %worker_name,
@@ -527,7 +563,10 @@ fn process_completed_workers(
                 }
             }
             Err(e) => {
-                eprintln!("  [{}] Auto accept failed: {}", worker_name, e);
+                eprintln!(
+                    "  {}",
+                    color_theme::error(format!("[{}] Auto accept failed: {}", worker_name, e))
+                );
                 error!(worker = %worker_name, error = %e, "Auto accept failed");
                 return Err(e.into());
             }
@@ -539,7 +578,7 @@ fn process_completed_workers(
 
 /// Performs graceful shutdown of all auto workers.
 fn graceful_shutdown(_config: &Config, state: &mut State) -> Result<()> {
-    println!("Shutting down auto workers...");
+    println!("{}", color_theme::dim("Shutting down auto workers..."));
     info!("Initiating graceful shutdown of auto workers");
     let tmux_sender = TmuxSender::new();
 
