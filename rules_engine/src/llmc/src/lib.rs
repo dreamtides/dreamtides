@@ -1,3 +1,4 @@
+pub mod auto_mode;
 pub mod cli;
 pub mod commands;
 pub mod config;
@@ -7,6 +8,7 @@ pub mod ipc;
 pub mod json_output;
 pub mod lock;
 pub mod logging;
+pub mod overseer_mode;
 pub mod patrol;
 pub mod recovery;
 pub mod sound;

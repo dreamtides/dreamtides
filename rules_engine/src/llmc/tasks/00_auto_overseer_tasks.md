@@ -14,7 +14,7 @@ Please run `lat show LDBWQN` to view the primary design document.
 
 llmc code: `@rules_engine/src/llmc/`
 
-Read `@rules_engine/docs/llmc.md` for context on the llmc system.
+See `@rules_engine/docs/llmc.md` for broader context on the llmc system.
 
 Please report any *other* issues you notice via the `lattice_create_task()` MCP
 tool, in the `rules_engine/src/llmc` parent directory
