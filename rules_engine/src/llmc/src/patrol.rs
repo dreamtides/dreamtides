@@ -46,6 +46,195 @@ pub fn handle_hook_event(event: &HookEvent, state: &mut State, config: &Config) 
     Ok(())
 }
 
+pub fn handle_stop(
+    worker_name: &str,
+    _timestamp: u64,
+    state: &mut State,
+    config: &Config,
+) -> Result<()> {
+    let Some(worker) = state.get_worker(worker_name) else {
+        tracing::warn!("Stop hook received for unknown worker '{}'", worker_name);
+        return Ok(());
+    };
+    let current_status = worker.status;
+    let worktree_path = PathBuf::from(&worker.worktree_path);
+    let self_review_enabled = worker.self_review;
+    let stored_sha = worker.commit_sha.clone();
+    match current_status {
+        WorkerStatus::Working | WorkerStatus::Rejected => {
+            let has_commits = match git::has_commits_ahead_of(&worktree_path, "origin/master") {
+                Ok(v) => v,
+                Err(e) => {
+                    tracing::warn!(
+                        worker = %worker_name,
+                        error = %e,
+                        "Stop hook: failed to check commits ahead of origin/master"
+                    );
+                    return Ok(());
+                }
+            };
+            let has_uncommitted = git::has_uncommitted_changes(&worktree_path)?;
+            if !has_commits && !has_uncommitted {
+                tracing::warn!(
+                    worker = %worker_name,
+                    "Stop hook: task completed without any commits, transitioning to NoChanges"
+                );
+                let transition = WorkerTransition::ToNoChanges;
+                if let Some(w) = state.get_worker_mut(worker_name) {
+                    worker::apply_transition(w, transition)?;
+                    w.pending_self_review = false;
+                }
+                let _ = sound::play_bell(config);
+                return Ok(());
+            }
+            if has_uncommitted {
+                if has_commits {
+                    tracing::info!(
+                        worker = %worker_name,
+                        "Stop hook: worker has uncommitted changes, amending to existing commit"
+                    );
+                    git::amend_uncommitted_changes(&worktree_path)?;
+                } else {
+                    tracing::info!(
+                        worker = %worker_name,
+                        "Stop hook: worker has uncommitted changes but no commit, creating commit"
+                    );
+                    git::create_uncommitted_changes_commit(&worktree_path)?;
+                }
+            }
+            let commit_sha = git::get_head_commit(&worktree_path)?;
+            let commit_msg = git::get_commit_message(&worktree_path, &commit_sha)
+                .unwrap_or_else(|_| "<unknown>".to_string());
+            let first_line = commit_msg.lines().next().unwrap_or("<empty>");
+            tracing::info!(
+                worker = %worker_name,
+                commit_sha = %commit_sha,
+                commit_msg = %first_line,
+                "Stop hook: transitioning worker to NeedsReview"
+            );
+            let transition = WorkerTransition::ToNeedsReview { commit_sha };
+            if let Some(w) = state.get_worker_mut(worker_name) {
+                worker::apply_transition(w, transition)?;
+                w.commits_first_detected_unix = None;
+                if self_review_enabled {
+                    w.pending_self_review = true;
+                    tracing::info!(
+                        worker = %worker_name,
+                        "Stop hook: queued self-review for next maintenance tick"
+                    );
+                } else {
+                    let now = SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs();
+                    w.on_complete_sent_unix = Some(now);
+                    tracing::info!(
+                        worker = %worker_name,
+                        "Stop hook: self_review disabled, skipping self-review"
+                    );
+                }
+                let _ = sound::play_bell(config);
+            }
+        }
+        WorkerStatus::Reviewing => {
+            let current_sha = match git::get_head_commit(&worktree_path) {
+                Ok(sha) => sha,
+                Err(e) => {
+                    tracing::warn!(
+                        "Stop hook: failed to get HEAD for Reviewing worker '{}': {}",
+                        worker_name,
+                        e
+                    );
+                    return Ok(());
+                }
+            };
+            let sha_changed = stored_sha.as_ref() != Some(&current_sha);
+            if sha_changed {
+                tracing::info!(
+                    worker = %worker_name,
+                    old_sha = ?stored_sha,
+                    new_sha = %current_sha,
+                    "Stop hook: Reviewing worker amended commit, transitioning to NeedsReview"
+                );
+            } else {
+                tracing::info!(
+                    worker = %worker_name,
+                    "Stop hook: self-review complete, transitioning to NeedsReview"
+                );
+            }
+            let transition = WorkerTransition::ToNeedsReview { commit_sha: current_sha };
+            if let Some(w) = state.get_worker_mut(worker_name) {
+                if let Err(e) = worker::apply_transition(w, transition) {
+                    tracing::error!(
+                        "Stop hook: failed to transition Reviewing worker '{}' to NeedsReview: {}",
+                        worker_name,
+                        e
+                    );
+                } else {
+                    w.commits_first_detected_unix = None;
+                    w.pending_self_review = false;
+                    let _ = sound::play_bell(config);
+                }
+            }
+        }
+        _ => {
+            tracing::debug!(
+                worker = %worker_name,
+                status = ?current_status,
+                "Stop hook: ignoring for worker not in Working/Rejected/Reviewing state"
+            );
+        }
+    }
+    Ok(())
+}
+
+pub fn build_conflict_prompt(conflicts: &[String], original_task: &str) -> String {
+    let mut prompt = String::from(
+        "REBASE CONFLICT DETECTED\n\
+         \n\
+         Master has advanced and your changes need to be rebased. The rebase has encountered conflicts.\n\
+         \n",
+    );
+    prompt
+        .push_str(
+            &format!(
+                "IMPORTANT - Your original task:\n\
+         \"{}\"\n\
+         \n\
+         DO NOT restart your task from scratch. Instead, INCORPORATE your existing changes/intent \n\
+         into the new repository state. Your goal is to apply the same logical changes you already \n\
+         made, but adapted to work with the new state of the files after master's changes.\n\
+         \n",
+                original_task.lines().take(3).collect::< Vec < _ >> ().join(" ")
+            ),
+        );
+    prompt.push_str("Conflicting files:\n");
+    for file in conflicts {
+        prompt.push_str(&format!("- {}\n", file));
+    }
+    prompt
+        .push_str(
+            "\n\
+         IMPORTANT - Resolution steps (must complete ALL steps):\n\
+         1. Read and understand the conflict markers in each file (<<<<<<, =======, >>>>>>>)\n\
+         2. Understand what master changed (their version) and what you changed (our version)\n\
+         3. Decide how to INCORPORATE YOUR CHANGES into the new state - do NOT just accept theirs\n\
+         4. Edit files to remove ALL conflict markers and apply your intended changes\n\
+         5. Stage ALL resolved files: git add <file>\n\
+         6. Continue the rebase: git rebase --continue\n\
+         7. Verify success: Look for \"Successfully rebased and updated\" message\n\
+         8. Run validation: just review\n\
+         9. IMPORTANT: If validation modified any files, amend them: git add -A && git commit --amend --no-edit\n\
+         \n\
+         Helpful commands:\n\
+         - View our version: git show :2:<file>\n\
+         - View their version: git show :3:<file>\n\
+         - Check remaining conflicts: git diff --name-only --diff-filter=U\n\
+         - If you need to start over: git rebase --abort\n\
+         \n\
+         CRITICAL: You MUST run 'git rebase --continue' after staging files.\n\
+         Do NOT commit manually. The rebase process handles commits automatically.\n",
+        );
+    prompt
+}
+
 impl Patrol {
     pub fn new(_config: &Config) -> Self {
         Self {}
@@ -895,195 +1084,6 @@ fn handle_session_end(
     Ok(())
 }
 
-fn handle_stop(
-    worker_name: &str,
-    _timestamp: u64,
-    state: &mut State,
-    config: &Config,
-) -> Result<()> {
-    let Some(worker) = state.get_worker(worker_name) else {
-        tracing::warn!("Stop hook received for unknown worker '{}'", worker_name);
-        return Ok(());
-    };
-    let current_status = worker.status;
-    let worktree_path = PathBuf::from(&worker.worktree_path);
-    let self_review_enabled = worker.self_review;
-    let stored_sha = worker.commit_sha.clone();
-    match current_status {
-        WorkerStatus::Working | WorkerStatus::Rejected => {
-            let has_commits = match git::has_commits_ahead_of(&worktree_path, "origin/master") {
-                Ok(v) => v,
-                Err(e) => {
-                    tracing::warn!(
-                        worker = %worker_name,
-                        error = %e,
-                        "Stop hook: failed to check commits ahead of origin/master"
-                    );
-                    return Ok(());
-                }
-            };
-            let has_uncommitted = git::has_uncommitted_changes(&worktree_path)?;
-            if !has_commits && !has_uncommitted {
-                tracing::warn!(
-                    worker = %worker_name,
-                    "Stop hook: task completed without any commits, transitioning to NoChanges"
-                );
-                let transition = WorkerTransition::ToNoChanges;
-                if let Some(w) = state.get_worker_mut(worker_name) {
-                    worker::apply_transition(w, transition)?;
-                    w.pending_self_review = false;
-                }
-                let _ = sound::play_bell(config);
-                return Ok(());
-            }
-            if has_uncommitted {
-                if has_commits {
-                    tracing::info!(
-                        worker = %worker_name,
-                        "Stop hook: worker has uncommitted changes, amending to existing commit"
-                    );
-                    git::amend_uncommitted_changes(&worktree_path)?;
-                } else {
-                    tracing::info!(
-                        worker = %worker_name,
-                        "Stop hook: worker has uncommitted changes but no commit, creating commit"
-                    );
-                    git::create_uncommitted_changes_commit(&worktree_path)?;
-                }
-            }
-            let commit_sha = git::get_head_commit(&worktree_path)?;
-            let commit_msg = git::get_commit_message(&worktree_path, &commit_sha)
-                .unwrap_or_else(|_| "<unknown>".to_string());
-            let first_line = commit_msg.lines().next().unwrap_or("<empty>");
-            tracing::info!(
-                worker = %worker_name,
-                commit_sha = %commit_sha,
-                commit_msg = %first_line,
-                "Stop hook: transitioning worker to NeedsReview"
-            );
-            let transition = WorkerTransition::ToNeedsReview { commit_sha };
-            if let Some(w) = state.get_worker_mut(worker_name) {
-                worker::apply_transition(w, transition)?;
-                w.commits_first_detected_unix = None;
-                if self_review_enabled {
-                    w.pending_self_review = true;
-                    tracing::info!(
-                        worker = %worker_name,
-                        "Stop hook: queued self-review for next maintenance tick"
-                    );
-                } else {
-                    let now = SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs();
-                    w.on_complete_sent_unix = Some(now);
-                    tracing::info!(
-                        worker = %worker_name,
-                        "Stop hook: self_review disabled, skipping self-review"
-                    );
-                }
-                let _ = sound::play_bell(config);
-            }
-        }
-        WorkerStatus::Reviewing => {
-            let current_sha = match git::get_head_commit(&worktree_path) {
-                Ok(sha) => sha,
-                Err(e) => {
-                    tracing::warn!(
-                        "Stop hook: failed to get HEAD for Reviewing worker '{}': {}",
-                        worker_name,
-                        e
-                    );
-                    return Ok(());
-                }
-            };
-            let sha_changed = stored_sha.as_ref() != Some(&current_sha);
-            if sha_changed {
-                tracing::info!(
-                    worker = %worker_name,
-                    old_sha = ?stored_sha,
-                    new_sha = %current_sha,
-                    "Stop hook: Reviewing worker amended commit, transitioning to NeedsReview"
-                );
-            } else {
-                tracing::info!(
-                    worker = %worker_name,
-                    "Stop hook: self-review complete, transitioning to NeedsReview"
-                );
-            }
-            let transition = WorkerTransition::ToNeedsReview { commit_sha: current_sha };
-            if let Some(w) = state.get_worker_mut(worker_name) {
-                if let Err(e) = worker::apply_transition(w, transition) {
-                    tracing::error!(
-                        "Stop hook: failed to transition Reviewing worker '{}' to NeedsReview: {}",
-                        worker_name,
-                        e
-                    );
-                } else {
-                    w.commits_first_detected_unix = None;
-                    w.pending_self_review = false;
-                    let _ = sound::play_bell(config);
-                }
-            }
-        }
-        _ => {
-            tracing::debug!(
-                worker = %worker_name,
-                status = ?current_status,
-                "Stop hook: ignoring for worker not in Working/Rejected/Reviewing state"
-            );
-        }
-    }
-    Ok(())
-}
-
-fn build_conflict_prompt(conflicts: &[String], original_task: &str) -> String {
-    let mut prompt = String::from(
-        "REBASE CONFLICT DETECTED\n\
-         \n\
-         Master has advanced and your changes need to be rebased. The rebase has encountered conflicts.\n\
-         \n",
-    );
-    prompt
-        .push_str(
-            &format!(
-                "IMPORTANT - Your original task:\n\
-         \"{}\"\n\
-         \n\
-         DO NOT restart your task from scratch. Instead, INCORPORATE your existing changes/intent \n\
-         into the new repository state. Your goal is to apply the same logical changes you already \n\
-         made, but adapted to work with the new state of the files after master's changes.\n\
-         \n",
-                original_task.lines().take(3).collect::< Vec < _ >> ().join(" ")
-            ),
-        );
-    prompt.push_str("Conflicting files:\n");
-    for file in conflicts {
-        prompt.push_str(&format!("- {}\n", file));
-    }
-    prompt
-        .push_str(
-            "\n\
-         IMPORTANT - Resolution steps (must complete ALL steps):\n\
-         1. Read and understand the conflict markers in each file (<<<<<<, =======, >>>>>>>)\n\
-         2. Understand what master changed (their version) and what you changed (our version)\n\
-         3. Decide how to INCORPORATE YOUR CHANGES into the new state - do NOT just accept theirs\n\
-         4. Edit files to remove ALL conflict markers and apply your intended changes\n\
-         5. Stage ALL resolved files: git add <file>\n\
-         6. Continue the rebase: git rebase --continue\n\
-         7. Verify success: Look for \"Successfully rebased and updated\" message\n\
-         8. Run validation: just review\n\
-         9. IMPORTANT: If validation modified any files, amend them: git add -A && git commit --amend --no-edit\n\
-         \n\
-         Helpful commands:\n\
-         - View our version: git show :2:<file>\n\
-         - View their version: git show :3:<file>\n\
-         - Check remaining conflicts: git diff --name-only --diff-filter=U\n\
-         - If you need to start over: git rebase --abort\n\
-         \n\
-         CRITICAL: You MUST run 'git rebase --continue' after staging files.\n\
-         Do NOT commit manually. The rebase process handles commits automatically.\n",
-        );
-    prompt
-}
-
 fn get_self_review_config(config: &Config) -> Option<&SelfReviewConfig> {
     config.defaults.self_review.as_ref()
 }
@@ -1107,94 +1107,4 @@ fn send_self_review_prompt(
     tracing::info!("Sending self-review prompt to session '{}'", session_id);
     sender.send(session_id, &prompt)?;
     Ok(())
-}
-
-#[cfg(test)]
-mod tests {
-    use std::collections::HashMap;
-
-    use crate::config::{DefaultsConfig, RepoConfig};
-    use crate::patrol::*;
-    use crate::state::WorkerRecord;
-
-    fn create_test_worker(name: &str) -> WorkerRecord {
-        WorkerRecord {
-            name: name.to_string(),
-            worktree_path: format!("/tmp/llmc/.worktrees/{}", name),
-            branch: format!("llmc/{}", name),
-            status: WorkerStatus::Idle,
-            current_prompt: String::new(),
-            prompt_cmd: None,
-            created_at_unix: 1000000000,
-            last_activity_unix: 1000000000,
-            commit_sha: None,
-            session_id: format!("llmc-{}", name),
-            crash_count: 0,
-            last_crash_unix: None,
-            on_complete_sent_unix: None,
-            self_review: false,
-            pending_self_review: false,
-            commits_first_detected_unix: None,
-            pending_rebase_prompt: false,
-            error_reason: None,
-        }
-    }
-
-    fn create_test_config() -> Config {
-        Config {
-            defaults: DefaultsConfig {
-                model: "opus".to_string(),
-                skip_permissions: true,
-                allowed_tools: vec![],
-                patrol_interval_secs: 60,
-                sound_on_review: false,
-                self_review: None,
-            },
-            repo: RepoConfig { source: "/test".to_string() },
-            workers: HashMap::new(),
-            auto: None,
-        }
-    }
-
-    #[test]
-    fn test_handle_stop_unknown_worker() {
-        let mut state = State::new();
-        let config = create_test_config();
-        let result = handle_stop("unknown_worker", 12345, &mut state, &config);
-        assert!(result.is_ok());
-    }
-
-    #[test]
-    fn test_handle_stop_idle_worker_ignored() {
-        let mut state = State::new();
-        let worker = create_test_worker("adam");
-        state.add_worker(worker);
-        let config = create_test_config();
-        let result = handle_stop("adam", 12345, &mut state, &config);
-        assert!(result.is_ok());
-        assert_eq!(state.get_worker("adam").unwrap().status, WorkerStatus::Idle);
-    }
-
-    #[test]
-    fn test_patrol_report_default() {
-        let report = PatrolReport::default();
-        assert_eq!(report.sessions_checked, 0);
-        assert!(report.transitions_applied.is_empty());
-        assert!(report.rebases_triggered.is_empty());
-        assert!(report.errors.is_empty());
-    }
-    #[test]
-    fn test_build_conflict_prompt() {
-        let conflicts = vec!["src/main.rs".to_string(), "src/lib.rs".to_string()];
-        let original_task = "Fix the authentication bug in the login system";
-        let prompt = build_conflict_prompt(&conflicts, original_task);
-        assert!(prompt.contains("REBASE CONFLICT DETECTED"));
-        assert!(prompt.contains("src/main.rs"));
-        assert!(prompt.contains("src/lib.rs"));
-        assert!(prompt.contains("IMPORTANT - Resolution steps (must complete ALL steps):"));
-        assert!(prompt.contains("Your original task:"));
-        assert!(prompt.contains("Fix the authentication bug"));
-        assert!(prompt.contains("git rebase --continue"));
-        assert!(prompt.contains("Successfully rebased and updated"));
-    }
 }

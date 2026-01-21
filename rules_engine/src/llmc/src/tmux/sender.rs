@@ -5,20 +5,20 @@ use std::time::Duration;
 use anyhow::{Context, Result, bail};
 use tempfile::NamedTempFile;
 use tmux_interface::{LoadBuffer, PasteBuffer, SendKeys, Tmux};
-const LARGE_MESSAGE_THRESHOLD: usize = 1024;
+pub const LARGE_MESSAGE_THRESHOLD: usize = 1024;
 /// Handles reliable message sending to TMUX sessions with debouncing
 #[derive(Clone)]
 pub struct TmuxSender {
     /// Base delay in milliseconds (default: 500ms)
-    debounce_base_ms: u32,
+    pub debounce_base_ms: u32,
     /// Additional delay per KB (default: 100ms)
-    debounce_per_kb_ms: u32,
+    pub debounce_per_kb_ms: u32,
     /// Maximum debounce delay cap (default: 2000ms)
-    max_debounce_ms: u32,
+    pub max_debounce_ms: u32,
     /// Number of Enter retry attempts (default: 3)
-    enter_retry_count: u32,
+    pub enter_retry_count: u32,
     /// Delay between Enter retries (default: 200ms)
-    enter_retry_delay_ms: u32,
+    pub enter_retry_delay_ms: u32,
 }
 impl Default for TmuxSender {
     fn default() -> Self {
@@ -132,38 +132,9 @@ impl TmuxSender {
         )
     }
 
-    fn calculate_delay(&self, message_len: usize) -> Duration {
+    pub fn calculate_delay(&self, message_len: usize) -> Duration {
         let kb_count = message_len.saturating_div(1024) as u32;
         let delay = self.debounce_base_ms + kb_count * self.debounce_per_kb_ms;
         Duration::from_millis(delay.min(self.max_debounce_ms) as u64)
-    }
-}
-#[cfg(test)]
-mod tests {
-    use crate::tmux::sender::*;
-    #[test]
-    fn test_default_sender() {
-        let sender = TmuxSender::new();
-        assert_eq!(sender.debounce_base_ms, 500);
-        assert_eq!(sender.debounce_per_kb_ms, 100);
-        assert_eq!(sender.max_debounce_ms, 2000);
-        assert_eq!(sender.enter_retry_count, 3);
-        assert_eq!(sender.enter_retry_delay_ms, 200);
-    }
-    #[test]
-    fn test_calculate_delay() {
-        let sender = TmuxSender::new();
-        assert_eq!(sender.calculate_delay(0), Duration::from_millis(500));
-        assert_eq!(sender.calculate_delay(512), Duration::from_millis(500));
-        assert_eq!(sender.calculate_delay(1024), Duration::from_millis(600));
-        assert_eq!(sender.calculate_delay(2048), Duration::from_millis(700));
-        assert_eq!(sender.calculate_delay(10240), Duration::from_millis(1500));
-        assert_eq!(sender.calculate_delay(102400), Duration::from_millis(2000));
-    }
-    #[test]
-    fn test_large_message_threshold() {
-        let _sender = TmuxSender::new();
-        assert!(999 < LARGE_MESSAGE_THRESHOLD);
-        assert!(1024 >= LARGE_MESSAGE_THRESHOLD);
     }
 }

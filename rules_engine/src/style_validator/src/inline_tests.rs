@@ -8,15 +8,6 @@ use syn::{File, Item, ItemMod};
 use crate::violation::{StyleViolation, ViolationKind};
 
 const WHITELISTED_FILES: &[&str] = &[
-    "src/llmc/src/config.rs",
-    "src/llmc/src/sound.rs",
-    "src/llmc/src/worker.rs",
-    "src/llmc/src/git.rs",
-    "src/llmc/src/state.rs",
-    "src/llmc/src/tmux/session.rs",
-    "src/llmc/src/tmux/sender.rs",
-    "src/llmc/src/lock.rs",
-    "src/llmc/src/patrol.rs",
     "src/parser_v2/src/error/parser_error_suggestions.rs",
     "src/battle_state/src/battle_cards/card_set.rs",
 ];

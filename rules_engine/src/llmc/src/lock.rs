@@ -7,11 +7,38 @@ use std::time::{Duration, Instant};
 use anyhow::{Context, Result, bail};
 
 use crate::config;
+
 /// RAII guard for a file-based lock
 /// The lock is released when this struct is dropped
 pub struct StateLock {
     lock_path: PathBuf,
 }
+
+/// Checks if a process with the given PID is running
+pub fn is_process_running(pid: u32) -> bool {
+    #[cfg(unix)]
+    {
+        use std::process::Command;
+        Command::new("kill")
+            .arg("-0")
+            .arg(pid.to_string())
+            .output()
+            .map(|o| o.status.success())
+            .unwrap_or(false)
+    }
+    #[cfg(windows)]
+    {
+        use std::process::Command;
+        Command::new("tasklist")
+            .args(["/FI", &format!("PID eq {}", pid), "/NH"])
+            .output()
+            .and_then(|output| {
+                Ok(String::from_utf8_lossy(&output.stdout).contains(&pid.to_string()))
+            })
+            .unwrap_or(false)
+    }
+}
+
 impl StateLock {
     /// Acquires the state lock, blocking until available or timeout
     ///
@@ -51,7 +78,7 @@ impl StateLock {
     }
 
     /// Attempts to acquire the lock atomically
-    fn try_acquire_lock(lock_path: &Path) -> Result<Self> {
+    pub fn try_acquire_lock(lock_path: &Path) -> Result<Self> {
         let mut file = OpenOptions::new()
             .write(true)
             .create_new(true)
@@ -64,7 +91,7 @@ impl StateLock {
 
     /// Attempts to clean up a stale lock file
     /// Returns true if a stale lock was removed
-    fn try_clean_stale_lock(lock_path: &Path) -> Result<bool> {
+    pub fn try_clean_stale_lock(lock_path: &Path) -> Result<bool> {
         if !lock_path.exists() {
             return Ok(false);
         }
@@ -85,86 +112,13 @@ impl StateLock {
         Ok(false)
     }
 }
+
 impl Drop for StateLock {
     fn drop(&mut self) {
         let _ = fs::remove_file(&self.lock_path);
     }
 }
+
 fn get_lock_path() -> PathBuf {
     config::get_llmc_root().join("state.lock")
-}
-/// Checks if a process with the given PID is running
-fn is_process_running(pid: u32) -> bool {
-    #[cfg(unix)]
-    {
-        use std::process::Command;
-        Command::new("kill")
-            .arg("-0")
-            .arg(pid.to_string())
-            .output()
-            .map(|o| o.status.success())
-            .unwrap_or(false)
-    }
-    #[cfg(windows)]
-    {
-        use std::process::Command;
-        Command::new("tasklist")
-            .args(["/FI", &format!("PID eq {}", pid), "/NH"])
-            .output()
-            .and_then(|output| {
-                Ok(String::from_utf8_lossy(&output.stdout).contains(&pid.to_string()))
-            })
-            .unwrap_or(false)
-    }
-}
-#[cfg(test)]
-mod tests {
-    use tempfile::TempDir;
-
-    use crate::lock::*;
-    #[test]
-    fn test_acquire_lock() {
-        let dir = TempDir::new().unwrap();
-        let lock_path = dir.path().join("test.lock");
-        let _lock = StateLock::try_acquire_lock(&lock_path).unwrap();
-        assert!(lock_path.exists());
-        let content = fs::read_to_string(&lock_path).unwrap();
-        assert!(content.contains(&std::process::id().to_string()));
-    }
-    #[test]
-    fn test_lock_prevents_concurrent_acquisition() {
-        let dir = TempDir::new().unwrap();
-        let lock_path = dir.path().join("test.lock");
-        let _lock1 = StateLock::try_acquire_lock(&lock_path).unwrap();
-        let result = StateLock::try_acquire_lock(&lock_path);
-        assert!(result.is_err());
-    }
-    #[test]
-    fn test_lock_released_on_drop() {
-        let dir = TempDir::new().unwrap();
-        let lock_path = dir.path().join("test.lock");
-        {
-            let _lock = StateLock::try_acquire_lock(&lock_path).unwrap();
-            assert!(lock_path.exists());
-        }
-        assert!(!lock_path.exists());
-    }
-    #[test]
-    fn test_stale_lock_cleanup() {
-        let dir = TempDir::new().unwrap();
-        let lock_path = dir.path().join("test.lock");
-        fs::write(&lock_path, "999999999\n").unwrap();
-        let cleaned = StateLock::try_clean_stale_lock(&lock_path).unwrap();
-        assert!(cleaned);
-        assert!(!lock_path.exists());
-    }
-    #[test]
-    fn test_is_process_running_self() {
-        let my_pid = std::process::id();
-        assert!(is_process_running(my_pid));
-    }
-    #[test]
-    fn test_is_process_running_invalid() {
-        assert!(!is_process_running(999999999));
-    }
 }

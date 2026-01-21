@@ -151,12 +151,3 @@ fn build_claude_command(config: &WorkerConfig) -> String {
     cmd.push_str(" --dangerously-skip-permissions");
     cmd
 }
-#[cfg(test)]
-mod tests {
-    use crate::tmux::session::*;
-    #[test]
-    fn test_any_llmc_sessions_running() {
-        let result = any_llmc_sessions_running();
-        assert!(result.is_ok());
-    }
-}
