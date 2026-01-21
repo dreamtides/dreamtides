@@ -158,7 +158,7 @@ fn convert_sort_policy(cli_policy: CliSortPolicy) -> ReadySortPolicy {
 
 /// Handles the case when no ready tasks are available.
 fn handle_no_tasks(_context: &CommandContext, _args: &PopArgs) -> LatticeResult<()> {
-    Err(LatticeError::NoReadyTasks)
+    Ok(())
 }
 
 /// Outputs the pop result in the appropriate format.

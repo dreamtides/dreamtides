@@ -227,7 +227,7 @@ in markdown files. Supports automatic release when tasks are closed.
 **lat pop** - The primary interface for AI agents to start work. Combines
 `lat ready`, `lat claim`, and `lat show` into a single operation: finds the
 highest-priority ready task (sorted by priority then age), claims it, and
-outputs full context. Exits silently with error code 4 (E038) if no ready tasks
+outputs full context. Returns silently with exit code 0 if no ready tasks
 are available (no output to stdout or stderr). Supports `--json` output (recommended for programmatic use),
 `--dry-run` to preview without claiming, `--no-claim` to skip claiming,
 `--max-claims` to fail if too many active claims exist, and all filter options
