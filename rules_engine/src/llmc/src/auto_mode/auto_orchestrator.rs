@@ -40,6 +40,13 @@ pub fn run_auto_mode(
     let instance_id = heartbeat_thread::generate_instance_id();
     let logger = AutoLogger::new().context("Failed to initialize auto mode logger")?;
 
+    println!("Auto mode configuration:");
+    println!("  Task pool command: {}", auto_config.task_pool_command);
+    println!("  Concurrency: {}", auto_config.concurrency);
+    if let Some(ref cmd) = auto_config.post_accept_command {
+        println!("  Post-accept command: {}", cmd);
+    }
+
     info!(
         instance_id = %instance_id,
         concurrency = auto_config.concurrency,
@@ -100,6 +107,7 @@ fn run_orchestration_loop(
 
         // Start sessions for all auto workers
         for name in &worker_names {
+            println!("  Starting auto worker '{}'...", name);
             if let Some(worker) = state.get_worker(name)
                 && let Err(e) = auto_workers::start_auto_worker_session(worker, llmc_config)
             {
@@ -108,6 +116,7 @@ fn run_orchestration_loop(
             }
         }
 
+        println!("✓ {} auto worker(s) initialized", worker_names.len());
         info!(workers = ?worker_names, "Auto workers initialized");
     }
 
@@ -228,6 +237,8 @@ fn process_idle_workers(
 
         match task_result {
             TaskPoolResult::Task(task) => {
+                let task_preview: String = task.chars().take(60).collect();
+                println!("  [{}] Assigning task: {}...", worker_name, task_preview);
                 info!(worker = %worker_name, task_len = task.len(), "Assigning task to worker");
                 assign_task_to_worker(state, llmc_config, &worker_name, &task, logger)?;
             }
@@ -235,6 +246,7 @@ fn process_idle_workers(
                 // No tasks available, skip this worker
             }
             TaskPoolResult::Error(e) => {
+                eprintln!("  [{}] Task pool command failed: {}", worker_name, e);
                 error!(worker = %worker_name, error = %e, "Task pool command failed");
                 return Err(e.into());
             }
@@ -327,6 +339,7 @@ fn process_completed_workers(
         .collect();
 
     for worker_name in completed_workers {
+        println!("  [{}] Processing completed work...", worker_name);
         info!(worker = %worker_name, "Processing completed worker");
 
         // Get auto config for post_accept_command
@@ -343,6 +356,11 @@ fn process_completed_workers(
 
                 match &result {
                     AutoAcceptResult::Accepted { commit_sha } => {
+                        println!(
+                            "  [{}] ✓ Changes accepted ({})",
+                            worker_name,
+                            &commit_sha[..8.min(commit_sha.len())]
+                        );
                         logger.log_task_completed(&worker_name, TaskResult::NeedsReview);
                         info!(worker = %worker_name, commit = %commit_sha, "Worker changes accepted");
 
@@ -353,17 +371,20 @@ fn process_completed_workers(
                             &auto_cfg,
                             logger,
                         ) {
+                            eprintln!("  [{}] Post-accept command failed: {}", worker_name, e);
                             error!(worker = %worker_name, error = %e, "Post-accept command failed");
                             return Err(e.into());
                         }
                     }
                     AutoAcceptResult::NoChanges => {
+                        println!("  [{}] No changes to accept", worker_name);
                         logger.log_task_completed(&worker_name, TaskResult::NoChanges);
                         info!(worker = %worker_name, "Worker completed with no changes");
                     }
                 }
             }
             Err(e) => {
+                eprintln!("  [{}] Auto accept failed: {}", worker_name, e);
                 error!(worker = %worker_name, error = %e, "Auto accept failed");
                 return Err(e.into());
             }
@@ -375,6 +396,7 @@ fn process_completed_workers(
 
 /// Performs graceful shutdown of all auto workers.
 fn graceful_shutdown(_config: &Config, state: &mut State) -> Result<()> {
+    println!("Shutting down auto workers...");
     info!("Initiating graceful shutdown of auto workers");
     let tmux_sender = TmuxSender::new();
 
