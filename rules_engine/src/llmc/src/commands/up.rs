@@ -92,9 +92,10 @@ pub fn run_up(options: UpOptions) -> Result<()> {
     state.daemon_running = true;
     state.save(&state_path)?;
     ensure_tmux_running()?;
-    reconcile_and_start_workers(&config, &mut state, verbose)?;
-    state.save(&state_path)?;
-    println!("✓ All workers started");
+
+    // Start IPC listener BEFORE workers so SessionStart hooks can connect
+    // immediately when Claude starts. Without this, there's a race condition where
+    // hooks fire before the socket exists and are silently dropped.
     let socket_path = socket::get_socket_path();
     let ipc_receiver = match socket::spawn_ipc_listener(socket_path.clone()) {
         Ok(rx) => {
@@ -110,6 +111,11 @@ pub fn run_up(options: UpOptions) -> Result<()> {
             None
         }
     };
+
+    reconcile_and_start_workers(&config, &mut state, verbose)?;
+    state.save(&state_path)?;
+    println!("✓ All workers started");
+
     let shutdown = Arc::new(AtomicBool::new(false));
     let shutdown_clone = Arc::clone(&shutdown);
     ctrlc::set_handler(move || {
