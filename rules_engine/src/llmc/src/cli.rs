@@ -63,7 +63,21 @@ pub enum Commands {
     ///
     /// The overseer monitors the auto mode daemon, detects failures, and uses
     /// Claude Code to remediate issues. Requires [overseer] section in config.
-    Overseer,
+    Overseer {
+        /// Shell command that prints a new task description to stdout (passed
+        /// to daemon)
+        #[arg(long)]
+        task_pool_command: Option<String>,
+
+        /// Number of auto workers to run simultaneously (passed to daemon)
+        #[arg(long)]
+        concurrency: Option<u32>,
+
+        /// Shell command invoked after accepting a worker's changes (passed to
+        /// daemon)
+        #[arg(long)]
+        post_accept_command: Option<String>,
+    },
 
     /// Stop the LLMC daemon
     Down {

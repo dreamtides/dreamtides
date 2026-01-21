@@ -38,7 +38,7 @@ async fn main() -> Result<()> {
     let command_name = match &cli.command {
         Commands::Init { .. } => "init",
         Commands::Up { .. } => "up",
-        Commands::Overseer => "overseer",
+        Commands::Overseer { .. } => "overseer",
         Commands::Down { .. } => "down",
         Commands::Add { .. } => "add",
         Commands::Nuke { .. } => "nuke",
@@ -81,7 +81,9 @@ async fn main() -> Result<()> {
             concurrency,
             post_accept_command,
         }),
-        Commands::Overseer => overseer::run_overseer(),
+        Commands::Overseer { task_pool_command, concurrency, post_accept_command } => {
+            overseer::run_overseer(task_pool_command, concurrency, post_accept_command)
+        }
         Commands::Down { force, kill_consoles, json } => down::run_down(force, kill_consoles, json),
         Commands::Add { name, model, role_prompt, excluded_from_pool, self_review, json } => {
             add::run_add(&name, model, role_prompt, excluded_from_pool, self_review, json)

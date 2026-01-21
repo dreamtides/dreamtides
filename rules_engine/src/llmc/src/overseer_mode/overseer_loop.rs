@@ -10,6 +10,7 @@ use anyhow::{Context, Result, bail};
 use tracing::{debug, error, info, warn};
 
 use crate::auto_mode::heartbeat_thread;
+use crate::commands::overseer::OverseerDaemonOptions;
 use crate::config::{self, Config};
 use crate::overseer_mode::daemon_control::{self, TerminationResult};
 use crate::overseer_mode::health_monitor::{ExpectedDaemon, HealthMonitor, HealthStatus};
@@ -28,7 +29,7 @@ const DAEMON_STARTUP_POLL_INTERVAL_MS: u64 = 500;
 /// 3. On failure, terminates daemon and runs remediation
 /// 4. Detects failure spirals (repeated failures within cooldown)
 /// 5. Handles Ctrl-C for graceful shutdown
-pub fn run_overseer(config: &Config) -> Result<()> {
+pub fn run_overseer(config: &Config, daemon_options: &OverseerDaemonOptions) -> Result<()> {
     let overseer_config = validate_overseer_config(config)?;
     info!("Starting overseer supervisor");
 
@@ -51,7 +52,7 @@ pub fn run_overseer(config: &Config) -> Result<()> {
             break;
         }
 
-        let mut daemon_handle = start_daemon_and_wait_for_registration(&shutdown)?;
+        let mut daemon_handle = start_daemon_and_wait_for_registration(&shutdown, daemon_options)?;
         let daemon_start_time = Instant::now();
         println!(
             "✓ Daemon started (PID: {}, instance: {})",
@@ -168,12 +169,31 @@ fn validate_overseer_config(config: &Config) -> Result<OverseerConfig> {
 /// Spawns the daemon as a child process with captured stdout/stderr, pipes
 /// daemon output to the overseer's stdout, and waits for the daemon to register
 /// via heartbeat file.
-fn start_daemon_and_wait_for_registration(shutdown: &Arc<AtomicBool>) -> Result<DaemonHandle> {
+fn start_daemon_and_wait_for_registration(
+    shutdown: &Arc<AtomicBool>,
+    daemon_options: &OverseerDaemonOptions,
+) -> Result<DaemonHandle> {
     info!("Starting daemon");
     println!("Starting daemon...");
 
+    let mut args = vec!["up".to_string(), "--auto".to_string()];
+    if let Some(ref cmd) = daemon_options.task_pool_command {
+        args.push("--task-pool-command".to_string());
+        args.push(cmd.clone());
+    }
+    if let Some(n) = daemon_options.concurrency {
+        args.push("--concurrency".to_string());
+        args.push(n.to_string());
+    }
+    if let Some(ref cmd) = daemon_options.post_accept_command {
+        args.push("--post-accept-command".to_string());
+        args.push(cmd.clone());
+    }
+
+    debug!(args = ?args, "Starting daemon with arguments");
+
     let mut child = Command::new("llmc")
-        .args(["up", "--auto"])
+        .args(&args)
         .stdout(Stdio::piped())
         .stderr(Stdio::piped())
         .spawn()
