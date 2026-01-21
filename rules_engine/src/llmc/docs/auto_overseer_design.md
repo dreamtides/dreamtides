@@ -129,8 +129,25 @@ Two categories of errors:
 **Transient failures** (patrol attempts automatic recovery):
 - Worker Claude Code crashes → patrol restarts session (up to 2 retries with backoff)
 - TMUX session disappears → patrol recreates session
+- Source repository has uncommitted changes → exponential backoff retry (see below)
 - If patrol recovery succeeds, daemon continues normally
 - If patrol retries exhausted → escalates to hard failure
+
+**Source repository dirty handling:**
+
+When the daemon attempts to accept a worker's changes but the source repository
+(the main development directory) has uncommitted changes, the daemon does NOT
+shut down. Instead, it implements exponential backoff:
+
+- First detection: wait 60 seconds before retry
+- Each subsequent detection: double the wait time (120s, 240s, 480s, ...)
+- Maximum backoff: 1 hour
+- Backoff state is persisted in `state.json` to survive daemon restarts
+- On successful accept or NoChanges, backoff state is cleared
+- Prints message to stdout: "Source repository has uncommitted changes. Will retry in N seconds."
+
+This allows the daemon to continue running while a developer commits or stashes
+their changes in the source repository.
 
 **Hard failures** (immediate shutdown):
 - `task_pool_command` returns non-zero
@@ -390,6 +407,7 @@ Recovery classification:
 | 13 | Merge conflict during accept | Git rebase conflict status | Daemon shuts down; overseer resolves or resets | AI |
 | 14 | Master diverged significantly | Many conflicts | Daemon shuts down; overseer may need retries | AI |
 | 15 | Git lock file stuck | Git lock error | Daemon shuts down; overseer removes lock | AI |
+| 15a | Source repo has uncommitted changes | Dirty repo check | Exponential backoff retry (60s, 120s, 240s, ..., max 1hr) | AUTO |
 
 ### System Resource Failures
 
@@ -422,7 +440,7 @@ Recovery classification:
 
 | Type | Count | Scope |
 |------|-------|-------|
-| AUTO | 4 | Empty task pool, single worker/session crash (patrol recovers), overseer session crash |
+| AUTO | 5 | Empty task pool, single worker/session crash (patrol recovers), overseer session crash, source repo dirty |
 | AI | 17 | Repeated crashes, conflicts, config errors, most operational failures |
 | HUMAN | 6 | Resource exhaustion, network, failure spirals |
 
@@ -438,6 +456,8 @@ Recovery classification:
 - Add `auto_workers: Vec<String>` to track which workers are auto-managed
 - Add `overseer_active: bool` to indicate overseer presence
 - Add `last_task_completion_unix: Option<u64>` for stall detection
+- Add `source_repo_dirty_retry_after_unix: Option<u64>` for source repo dirty backoff timing
+- Add `source_repo_dirty_backoff_secs: Option<u64>` for current backoff value (60s, 120s, ...)
 
 ### New Files in `.llmc/`
 

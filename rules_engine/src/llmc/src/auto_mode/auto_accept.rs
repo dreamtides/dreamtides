@@ -15,13 +15,14 @@ use crate::state::{State, WorkerStatus};
 use crate::worker::{self, WorkerTransition};
 use crate::{config, git};
 
-/// Result of an auto accept operation.
 #[derive(Debug)]
 pub enum AutoAcceptResult {
     /// Worker changes successfully merged to master.
     Accepted { commit_sha: String },
     /// Worker had no changes, reset to idle.
     NoChanges,
+    /// Source repository has uncommitted changes, retry later.
+    SourceRepoDirty,
 }
 
 /// Error during auto accept that should trigger daemon shutdown.
@@ -168,6 +169,17 @@ fn accept_and_merge(
     let worktree_path = PathBuf::from(&worker.worktree_path);
     let branch = worker.branch.clone();
 
+    // Check source repository for uncommitted changes EARLY, before any work.
+    // This allows us to return SourceRepoDirty without modifying any state,
+    // enabling clean retry with exponential backoff.
+    let source_repo = PathBuf::from(&config.repo.source);
+    if git::has_uncommitted_changes(&source_repo).map_err(|e| AutoAcceptError {
+        worker_name: worker_name.to_string(),
+        message: format!("Failed to check uncommitted changes in source repo: {e}"),
+    })? {
+        return Ok(AutoAcceptResult::SourceRepoDirty);
+    }
+
     info!(worker = %worker_name, "Starting auto accept workflow");
 
     // Amend any uncommitted changes before proceeding
@@ -289,20 +301,12 @@ fn accept_and_merge(
     })?;
 
     // Update source repository
+    // Note: We already checked for uncommitted changes at the start of this
+    // function, so we can proceed directly to resetting.
     git::checkout_branch(&source_repo, "master").map_err(|e| AutoAcceptError {
         worker_name: worker_name.to_string(),
         message: format!("Failed to checkout master in source repo: {e}"),
     })?;
-
-    if git::has_uncommitted_changes(&source_repo).map_err(|e| AutoAcceptError {
-        worker_name: worker_name.to_string(),
-        message: format!("Failed to check uncommitted changes in source repo: {e}"),
-    })? {
-        return Err(AutoAcceptError {
-            worker_name: worker_name.to_string(),
-            message: "Source repository has uncommitted changes".to_string(),
-        });
-    }
 
     git::reset_to_ref(&source_repo, &new_commit_sha).map_err(|e| AutoAcceptError {
         worker_name: worker_name.to_string(),

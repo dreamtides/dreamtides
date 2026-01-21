@@ -93,7 +93,6 @@ pub struct WorkerRecord {
     #[serde(default)]
     pub auto_retry_count: u32,
 }
-/// State file tracking all workers and their status
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct State {
     /// All workers indexed by name
@@ -112,6 +111,13 @@ pub struct State {
     /// overseer)
     #[serde(default)]
     pub last_task_completion_unix: Option<u64>,
+    /// Unix timestamp after which to retry accepting when source repo is dirty
+    #[serde(default)]
+    pub source_repo_dirty_retry_after_unix: Option<u64>,
+    /// Current backoff in seconds for source repo dirty retry (starts at 60,
+    /// doubles)
+    #[serde(default)]
+    pub source_repo_dirty_backoff_secs: Option<u64>,
 }
 /// Returns true if a worker is truly ready for human review.
 ///
@@ -196,6 +202,8 @@ impl State {
             auto_mode: false,
             auto_workers: Vec::new(),
             last_task_completion_unix: None,
+            source_repo_dirty_retry_after_unix: None,
+            source_repo_dirty_backoff_secs: None,
         }
     }
 

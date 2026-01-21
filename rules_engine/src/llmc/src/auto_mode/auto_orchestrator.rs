@@ -1,10 +1,8 @@
-#![allow(dead_code)]
-
 use std::path::PathBuf;
 use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::thread;
-use std::time::Duration;
+use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 use anyhow::{Context, Result, bail};
 use tokio::sync::mpsc::Receiver;
@@ -26,6 +24,9 @@ use crate::state::{self, State, WorkerStatus};
 use crate::tmux::sender::TmuxSender;
 use crate::tmux::session;
 use crate::worker::{self, WorkerTransition};
+
+const INITIAL_SOURCE_REPO_DIRTY_BACKOFF_SECS: u64 = 60;
+const MAX_SOURCE_REPO_DIRTY_BACKOFF_SECS: u64 = 3600;
 
 /// Runs the auto mode daemon.
 ///
@@ -375,6 +376,16 @@ fn process_completed_workers(
     auto_config: &ResolvedAutoConfig,
     logger: &AutoLogger,
 ) -> Result<()> {
+    // Check if we're in a backoff period due to source repo being dirty
+    if let Some(retry_after) = state.source_repo_dirty_retry_after_unix {
+        let now = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs();
+        if now < retry_after {
+            let remaining = retry_after - now;
+            info!(retry_in_secs = remaining, "Source repo dirty, waiting before retry");
+            return Ok(());
+        }
+    }
+
     let completed_workers: Vec<String> = state
         .workers
         .values()
@@ -403,6 +414,10 @@ fn process_completed_workers(
 
                 match &result {
                     AutoAcceptResult::Accepted { commit_sha } => {
+                        // Clear source repo dirty backoff on successful accept
+                        state.source_repo_dirty_retry_after_unix = None;
+                        state.source_repo_dirty_backoff_secs = None;
+
                         println!(
                             "  [{}] ✓ Changes accepted ({})",
                             worker_name,
@@ -424,9 +439,40 @@ fn process_completed_workers(
                         }
                     }
                     AutoAcceptResult::NoChanges => {
+                        // Clear source repo dirty backoff on successful accept
+                        state.source_repo_dirty_retry_after_unix = None;
+                        state.source_repo_dirty_backoff_secs = None;
+
                         println!("  [{}] No changes to accept", worker_name);
                         logger.log_task_completed(&worker_name, TaskResult::NoChanges);
                         info!(worker = %worker_name, "Worker completed with no changes");
+                    }
+                    AutoAcceptResult::SourceRepoDirty => {
+                        // Calculate exponential backoff
+                        let current_backoff = state.source_repo_dirty_backoff_secs.unwrap_or(0);
+                        let next_backoff = if current_backoff == 0 {
+                            INITIAL_SOURCE_REPO_DIRTY_BACKOFF_SECS
+                        } else {
+                            (current_backoff * 2).min(MAX_SOURCE_REPO_DIRTY_BACKOFF_SECS)
+                        };
+
+                        let now = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs();
+                        let retry_after = now + next_backoff;
+
+                        state.source_repo_dirty_backoff_secs = Some(next_backoff);
+                        state.source_repo_dirty_retry_after_unix = Some(retry_after);
+
+                        println!(
+                            "  [{}] Source repository has uncommitted changes. \
+                             Will retry in {} seconds.",
+                            worker_name, next_backoff
+                        );
+                        warn!(
+                            worker = %worker_name,
+                            backoff_secs = next_backoff,
+                            retry_after_unix = retry_after,
+                            "Source repository dirty, scheduling retry with exponential backoff"
+                        );
                     }
                 }
             }

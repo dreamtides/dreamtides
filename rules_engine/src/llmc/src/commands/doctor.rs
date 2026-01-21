@@ -834,6 +834,8 @@ fn run_rebuild() -> Result<()> {
             auto_mode: false,
             auto_workers: Vec::new(),
             last_task_completion_unix: None,
+            source_repo_dirty_retry_after_unix: None,
+            source_repo_dirty_backoff_secs: None,
         };
         let state_path = state::get_state_path();
         state.save(&state_path)?;
