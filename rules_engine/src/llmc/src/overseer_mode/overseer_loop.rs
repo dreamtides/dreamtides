@@ -176,7 +176,13 @@ fn start_daemon_and_wait_for_registration(
     info!("Starting daemon");
     println!("Starting daemon...");
 
-    let mut args = vec!["up".to_string(), "--auto".to_string()];
+    // Clean up stale registration files from any previous daemon instance.
+    // This ensures we wait for the new daemon's registration rather than
+    // reading a stale file from a crashed daemon.
+    daemon_control::cleanup_registration_files();
+
+    // Use --force to clean up any stale sessions from previous runs
+    let mut args = vec!["up".to_string(), "--auto".to_string(), "--force".to_string()];
     if let Some(ref cmd) = daemon_options.task_pool_command {
         args.push("--task-pool-command".to_string());
         args.push(cmd.clone());

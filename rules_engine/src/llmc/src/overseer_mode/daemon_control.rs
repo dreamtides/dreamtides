@@ -1,12 +1,10 @@
-#![allow(dead_code)]
-
 use std::time::{Duration, Instant};
 use std::{fs, thread};
 
 use anyhow::{Context, Result};
 use tracing::{debug, error, info, warn};
 
-use crate::auto_mode::heartbeat_thread::{self, DaemonRegistration};
+use crate::auto_mode::heartbeat_thread;
 use crate::overseer_mode::health_monitor::ExpectedDaemon;
 
 const TERMINATION_GRACE_PERIOD_SECS: u64 = 30;
@@ -55,18 +53,42 @@ pub fn terminate_daemon(expected: &ExpectedDaemon) -> Result<TerminationResult> 
     }
 }
 
-/// Attempts to read the daemon registration and terminate the daemon.
+/// Cleans up stale daemon registration and heartbeat files.
 ///
-/// This is a convenience function that reads the current daemon registration
-/// and terminates it if present. Returns Ok(None) if no daemon is registered.
-pub fn terminate_current_daemon() -> Result<Option<TerminationResult>> {
-    let Some(registration) = heartbeat_thread::read_daemon_registration() else {
-        info!("No daemon registration found, nothing to terminate");
-        return Ok(None);
-    };
+/// This should be called before starting a new daemon to ensure we don't
+/// read stale registration data from a previous daemon instance.
+pub fn cleanup_registration_files() {
+    let registration_path = heartbeat_thread::daemon_registration_path();
+    if registration_path.exists() {
+        match fs::remove_file(&registration_path) {
+            Ok(()) => {
+                debug!(path = %registration_path.display(), "Removed daemon registration file");
+            }
+            Err(e) => {
+                warn!(
+                    path = %registration_path.display(),
+                    error = %e,
+                    "Failed to remove daemon registration file"
+                );
+            }
+        }
+    }
 
-    let expected = expected_from_registration(&registration);
-    terminate_daemon(&expected).map(Some)
+    let heartbeat_path = heartbeat_thread::heartbeat_path();
+    if heartbeat_path.exists() {
+        match fs::remove_file(&heartbeat_path) {
+            Ok(()) => {
+                debug!(path = %heartbeat_path.display(), "Removed heartbeat file");
+            }
+            Err(e) => {
+                warn!(
+                    path = %heartbeat_path.display(),
+                    error = %e,
+                    "Failed to remove heartbeat file"
+                );
+            }
+        }
+    }
 }
 
 /// Verifies process identity and performs termination.
@@ -208,48 +230,4 @@ fn is_process_running(pid: u32) -> bool {
 #[cfg(not(unix))]
 fn is_process_running(_pid: u32) -> bool {
     true
-}
-
-/// Cleans up stale daemon registration and heartbeat files.
-fn cleanup_registration_files() {
-    let registration_path = heartbeat_thread::daemon_registration_path();
-    if registration_path.exists() {
-        match fs::remove_file(&registration_path) {
-            Ok(()) => {
-                debug!(path = %registration_path.display(), "Removed daemon registration file");
-            }
-            Err(e) => {
-                warn!(
-                    path = %registration_path.display(),
-                    error = %e,
-                    "Failed to remove daemon registration file"
-                );
-            }
-        }
-    }
-
-    let heartbeat_path = heartbeat_thread::heartbeat_path();
-    if heartbeat_path.exists() {
-        match fs::remove_file(&heartbeat_path) {
-            Ok(()) => {
-                debug!(path = %heartbeat_path.display(), "Removed heartbeat file");
-            }
-            Err(e) => {
-                warn!(
-                    path = %heartbeat_path.display(),
-                    error = %e,
-                    "Failed to remove heartbeat file"
-                );
-            }
-        }
-    }
-}
-
-/// Creates an ExpectedDaemon from a DaemonRegistration.
-fn expected_from_registration(reg: &DaemonRegistration) -> ExpectedDaemon {
-    ExpectedDaemon {
-        pid: reg.pid,
-        start_time_unix: reg.start_time_unix,
-        instance_id: reg.instance_id.clone(),
-    }
 }
