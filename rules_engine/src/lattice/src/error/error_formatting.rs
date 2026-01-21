@@ -103,6 +103,10 @@ pub fn suggestion(error: &LatticeError) -> Option<String> {
         LatticeError::NoReadyTasks => {
             Some("Try 'lat ready --include-backlog' or use broader filters".to_string())
         }
+        LatticeError::ClaimLimitExceeded { .. } => Some(
+            "Release existing claims with 'lat claim --release <id>' or increase --max-claims"
+                .to_string(),
+        ),
     }
 }
 
@@ -163,6 +167,7 @@ pub fn error_path(error: &LatticeError) -> Option<&PathBuf> {
         | LatticeError::LabelNotFound { .. }
         | LatticeError::DependencyNotFound { .. }
         | LatticeError::NoReadyTasks
+        | LatticeError::ClaimLimitExceeded { .. }
         | LatticeError::GitError { .. }
         | LatticeError::DatabaseError { .. }
         | LatticeError::IndexCorrupted { .. }

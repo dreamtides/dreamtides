@@ -150,4 +150,8 @@ pub struct PopArgs {
     /// Skip claiming (useful for testing or inspection).
     #[arg(long)]
     pub no_claim: bool,
+
+    /// Maximum number of active claims allowed before failing.
+    #[arg(long)]
+    pub max_claims: Option<usize>,
 }

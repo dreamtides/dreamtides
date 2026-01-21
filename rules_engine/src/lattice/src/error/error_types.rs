@@ -80,6 +80,9 @@ pub enum LatticeError {
     #[error("Path already exists: {path}")]
     PathAlreadyExists { path: PathBuf },
 
+    #[error("Claim limit exceeded: {current} active claims (max: {max})")]
+    ClaimLimitExceeded { current: usize, max: usize },
+
     // ========================================================================
     // Not Found Errors (Exit Code 4)
     // Requested resources do not exist.
@@ -178,7 +181,8 @@ impl LatticeError {
             | LatticeError::MissingArgument { .. }
             | LatticeError::InvalidIdArgument { .. }
             | LatticeError::OperationNotAllowed { .. }
-            | LatticeError::PathAlreadyExists { .. } => exit_codes::USER_INPUT_ERROR,
+            | LatticeError::PathAlreadyExists { .. }
+            | LatticeError::ClaimLimitExceeded { .. } => exit_codes::USER_INPUT_ERROR,
 
             LatticeError::DocumentNotFound { .. }
             | LatticeError::FileNotFound { .. }
@@ -226,6 +230,7 @@ impl LatticeError {
             LatticeError::InvalidIdArgument { .. } => "E019",
             LatticeError::OperationNotAllowed { .. } => "E020",
             LatticeError::PathAlreadyExists { .. } => "E034",
+            LatticeError::ClaimLimitExceeded { .. } => "E039",
             LatticeError::DocumentNotFound { .. } => "E021",
             LatticeError::FileNotFound { .. } => "E022",
             LatticeError::NoResults { .. } => "E023",

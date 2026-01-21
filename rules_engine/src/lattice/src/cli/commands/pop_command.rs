@@ -47,6 +47,15 @@ pub fn execute(context: CommandContext, args: PopArgs) -> LatticeResult<()> {
 
     let should_claim = !args.dry_run && !args.no_claim;
     if should_claim {
+        if let Some(max_claims) = args.max_claims {
+            let current_claims = claim_operations::list_claims(&context.repo_root)?.len();
+            if current_claims >= max_claims {
+                return Err(LatticeError::ClaimLimitExceeded {
+                    current: current_claims,
+                    max: max_claims,
+                });
+            }
+        }
         let id = LatticeId::parse(&task.document.id)?;
         claim_operations::claim_task(&context.repo_root, &id, &context.repo_root)?;
         info!(id = task.document.id.as_str(), "Claimed task");
