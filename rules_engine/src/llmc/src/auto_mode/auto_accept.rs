@@ -13,8 +13,9 @@ use crate::auto_mode::auto_workers;
 use crate::commands::add;
 use crate::config::Config;
 use crate::state::{State, WorkerStatus};
+use crate::tmux::sender::TmuxSender;
 use crate::worker::{self, WorkerTransition};
-use crate::{config, git};
+use crate::{config, git, patrol};
 
 #[derive(Debug)]
 pub enum AutoAcceptResult {
@@ -24,6 +25,8 @@ pub enum AutoAcceptResult {
     NoChanges,
     /// Source repository has uncommitted changes, retry later.
     SourceRepoDirty,
+    /// Rebase conflict occurred, worker is now in Rebasing state resolving it.
+    RebaseConflict { conflicts: Vec<String> },
 }
 
 /// Error during auto accept that should trigger daemon shutdown.
@@ -210,15 +213,41 @@ fn accept_and_merge(
         })?;
 
     if !rebase_result.success {
-        // In auto mode, rebase conflicts are hard errors (triggers shutdown)
-        logger.log_accept_failure(worker_name, "Rebase conflict during auto accept");
-        return Err(AutoAcceptError {
+        // Transition worker to Rebasing state and send conflict prompt
+        info!(
+            worker = %worker_name,
+            conflicts = ?rebase_result.conflicts,
+            "Rebase conflict detected, transitioning worker to Rebasing state"
+        );
+
+        let worker = state.get_worker_mut(worker_name).ok_or_else(|| AutoAcceptError {
             worker_name: worker_name.to_string(),
-            message: format!(
-                "Rebase conflict during auto accept. Conflicting files: {}",
-                rebase_result.conflicts.join(", ")
-            ),
-        });
+            message: "Worker not found after rebase conflict".to_string(),
+        })?;
+        let session_id = worker.session_id.clone();
+        let current_prompt = worker.current_prompt.clone();
+
+        worker::apply_transition(worker, WorkerTransition::ToRebasing).map_err(|e| {
+            AutoAcceptError {
+                worker_name: worker_name.to_string(),
+                message: format!("Failed to transition to Rebasing: {e}"),
+            }
+        })?;
+
+        // Send conflict prompt to worker
+        let conflict_prompt =
+            patrol::build_conflict_prompt(&rebase_result.conflicts, &current_prompt);
+        let sender = TmuxSender::new();
+        sender.send(&session_id, &conflict_prompt).map_err(|e| AutoAcceptError {
+            worker_name: worker_name.to_string(),
+            message: format!("Failed to send conflict prompt: {e}"),
+        })?;
+
+        logger.log_accept_failure(
+            worker_name,
+            &format!("Rebase conflict - worker resolving: {}", rebase_result.conflicts.join(", ")),
+        );
+        return Ok(AutoAcceptResult::RebaseConflict { conflicts: rebase_result.conflicts });
     }
 
     // Get commit message and strip agent attribution

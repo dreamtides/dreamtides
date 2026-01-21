@@ -111,8 +111,8 @@ These features transform LLMC from a human-in-the-loop system to a fully autonom
    - If no_changes: reset worker to idle, continue
    - Execute accept workflow:
      - Rebase onto master
-     - If rebase fails (conflict after worker marked ready): log error, initiate shutdown
-     - Note: Workers entering `rebasing` state during work is normal, not an error
+     - If rebase fails (conflict): transition worker to `rebasing` state, send conflict
+       prompt, continue (worker resolves conflict, returns to `needs_review`, accept retried)
      - Squash commits, strip attribution
      - Fast-forward merge to master
    - If `post_accept_command` configured:
@@ -130,6 +130,7 @@ Two categories of errors:
 - Worker Claude Code crashes → patrol restarts session (up to 2 retries with backoff)
 - TMUX session disappears → patrol recreates session
 - Source repository has uncommitted changes → exponential backoff retry (see below)
+- Rebase conflict during accept → worker transitions to `rebasing`, resolves conflict, accept retried
 - If patrol recovery succeeds, daemon continues normally
 - If patrol retries exhausted → escalates to hard failure
 
@@ -404,7 +405,7 @@ Recovery classification:
 
 | # | Failure | Detection | Recovery | Type |
 |---|---------|-----------|----------|------|
-| 13 | Merge conflict during accept | Git rebase conflict status | Daemon shuts down; overseer resolves or resets | AI |
+| 13 | Merge conflict during accept | Git rebase conflict status | Worker transitions to `rebasing`, resolves conflict, accept retried | AUTO |
 | 14 | Master diverged significantly | Many conflicts | Daemon shuts down; overseer may need retries | AI |
 | 15 | Git lock file stuck | Git lock error | Daemon shuts down; overseer removes lock | AI |
 | 15a | Source repo has uncommitted changes | Dirty repo check | Exponential backoff retry (60s, 120s, 240s, ..., max 1hr) | AUTO |
@@ -440,8 +441,8 @@ Recovery classification:
 
 | Type | Count | Scope |
 |------|-------|-------|
-| AUTO | 5 | Empty task pool, single worker/session crash (patrol recovers), overseer session crash, source repo dirty |
-| AI | 17 | Repeated crashes, conflicts, config errors, most operational failures |
+| AUTO | 6 | Empty task pool, single worker/session crash (patrol recovers), overseer session crash, source repo dirty, rebase conflicts during accept |
+| AI | 16 | Repeated crashes, severe conflicts, config errors, most operational failures |
 | HUMAN | 6 | Resource exhaustion, network, failure spirals |
 
 **Design principle:** Patrol handles transient failures automatically. AI remediation for persistent operational issues. Human intervention only for external/environmental issues or failure spirals.

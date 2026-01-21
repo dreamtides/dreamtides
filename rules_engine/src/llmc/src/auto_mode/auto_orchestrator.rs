@@ -560,6 +560,24 @@ fn process_completed_workers(
                             "Source repository dirty, scheduling retry with exponential backoff"
                         );
                     }
+                    AutoAcceptResult::RebaseConflict { conflicts } => {
+                        // Worker is now in Rebasing state, resolving conflicts.
+                        // Next iteration will detect completion and retry accept.
+                        println!(
+                            "  {}",
+                            color_theme::warning(format!(
+                                "[{}] Rebase conflict detected - worker resolving {} conflicting file(s)",
+                                worker_name,
+                                conflicts.len()
+                            ))
+                        );
+                        info!(
+                            worker = %worker_name,
+                            conflict_count = conflicts.len(),
+                            ?conflicts,
+                            "Worker entered Rebasing state to resolve conflicts"
+                        );
+                    }
                 }
             }
             Err(e) => {
