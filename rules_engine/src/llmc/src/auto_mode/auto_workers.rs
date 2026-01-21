@@ -128,6 +128,7 @@ pub fn clear_auto_mode_state(state: &mut State) {
 pub fn set_auto_mode_active(state: &mut State, worker_names: Vec<String>) {
     state.auto_mode = true;
     state.auto_workers = worker_names;
+    record_task_completion(state);
 }
 
 /// Updates the last task completion timestamp.

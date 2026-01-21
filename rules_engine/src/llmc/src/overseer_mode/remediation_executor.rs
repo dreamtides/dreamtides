@@ -15,8 +15,9 @@ use std::time::{Duration, Instant};
 
 use anyhow::{Context, Result, bail};
 use chrono::Utc;
-use tokio::runtime::Runtime;
+use tokio::runtime::Handle;
 use tokio::sync::mpsc::Receiver;
+use tokio::task::block_in_place;
 use tokio::time;
 use tracing::{debug, error, info, warn};
 
@@ -53,7 +54,6 @@ pub fn execute_remediation(
     overseer_session::clear_overseer_session().context("Failed to clear overseer session")?;
     write_log_entry(&mut log_file, "Cleared overseer session")?;
 
-    let rt = Runtime::new().context("Failed to create tokio runtime")?;
     let ipc_receiver = start_ipc_listener_for_remediation()?;
     write_log_entry(&mut log_file, "Started IPC listener for completion detection")?;
 
@@ -64,8 +64,10 @@ pub fn execute_remediation(
     write_log_entry(&mut log_file, &format!("Sent remediation prompt ({} chars)", prompt.len()))?;
 
     println!("Waiting for remediation to complete...");
-    let completion_result =
-        rt.block_on(async { wait_for_completion(ipc_receiver, shutdown, &mut log_file).await });
+    let completion_result = block_in_place(|| {
+        Handle::current()
+            .block_on(async { wait_for_completion(ipc_receiver, shutdown, &mut log_file).await })
+    });
 
     let elapsed = start_time.elapsed();
     capture_and_log_output(&mut log_file)?;

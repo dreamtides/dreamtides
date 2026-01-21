@@ -15,6 +15,7 @@ use crate::config::{self, Config};
 use crate::ipc::messages::HookMessage;
 use crate::ipc::socket;
 use crate::lock::StateLock;
+use crate::overseer_mode::overseer_session;
 use crate::patrol::Patrol;
 use crate::state::{self, State, WorkerStatus};
 use crate::tmux::session;
@@ -172,19 +173,32 @@ fn cleanup_orphaned_sessions(state: &State, force: bool, verbose: bool) -> Resul
     }
     let tracked_session_ids: Vec<String> =
         state.workers.values().map(|w| w.session_id.clone()).collect();
-    let orphaned_sessions: Vec<String> =
-        llmc_sessions.into_iter().filter(|s| !tracked_session_ids.contains(s)).collect();
+    let orphaned_sessions: Vec<String> = llmc_sessions
+        .into_iter()
+        .filter(|s| {
+            if tracked_session_ids.contains(s) {
+                return false;
+            }
+            if overseer_session::is_overseer_session(s) {
+                tracing::info!(session = %s, "Preserving overseer session during cleanup");
+                return false;
+            }
+            true
+        })
+        .collect();
+    let running_tracked_sessions: Vec<&String> =
+        tracked_session_ids.iter().filter(|s| session::session_exists(s)).collect();
     if orphaned_sessions.is_empty() {
-        if !tracked_session_ids.is_empty() {
+        if !running_tracked_sessions.is_empty() {
             if force {
                 println!(
                     "{}",
                     color_theme::dim(format!(
                         "Found {} tracked LLMC sessions. Cleaning up due to --force...",
-                        tracked_session_ids.len()
+                        running_tracked_sessions.len()
                     ))
                 );
-                for session_id in &tracked_session_ids {
+                for session_id in &running_tracked_sessions {
                     if verbose {
                         println!(
                             "  {}",
@@ -198,7 +212,7 @@ fn cleanup_orphaned_sessions(state: &State, force: bool, verbose: bool) -> Resul
                     "LLMC workers are already running. Found {} tracked TMUX sessions.\n\
                      Run 'llmc down' first if you want to restart the daemon, or use 'llmc up --force' to force cleanup.\n\
                      Use 'tmux list-sessions' to see all active sessions.",
-                    tracked_session_ids.len()
+                    running_tracked_sessions.len()
                 );
             }
         }
