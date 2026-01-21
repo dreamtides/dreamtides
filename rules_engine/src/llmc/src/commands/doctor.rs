@@ -827,7 +827,13 @@ fn run_rebuild() -> Result<()> {
     let mut input = String::new();
     io::stdin().read_line(&mut input)?;
     if input.trim().to_lowercase() == "y" {
-        let state = State { workers, daemon_running: false };
+        let state = State {
+            workers,
+            daemon_running: false,
+            auto_mode: false,
+            auto_workers: Vec::new(),
+            last_task_completion_unix: None,
+        };
         let state_path = state::get_state_path();
         state.save(&state_path)?;
         println!("State saved to {}", state_path.display());

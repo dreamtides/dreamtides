@@ -97,6 +97,16 @@ pub struct State {
     /// Whether the daemon is currently running (for crash detection)
     #[serde(default)]
     pub daemon_running: bool,
+    /// Whether the daemon is running in auto mode
+    #[serde(default)]
+    pub auto_mode: bool,
+    /// Names of workers that are auto-managed (auto-1, auto-2, etc.)
+    #[serde(default)]
+    pub auto_workers: Vec<String>,
+    /// Unix timestamp of the last task completion (for stall detection in
+    /// overseer)
+    #[serde(default)]
+    pub last_task_completion_unix: Option<u64>,
 }
 /// Returns true if a worker is truly ready for human review.
 ///
@@ -175,7 +185,13 @@ pub fn load_state_with_patrol() -> Result<(State, super::config::Config)> {
 impl State {
     /// Creates a new empty state
     pub fn new() -> State {
-        State { workers: HashMap::new(), daemon_running: false }
+        State {
+            workers: HashMap::new(),
+            daemon_running: false,
+            auto_mode: false,
+            auto_workers: Vec::new(),
+            last_task_completion_unix: None,
+        }
     }
 
     /// Loads state from the given path

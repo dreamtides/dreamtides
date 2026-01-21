@@ -6,6 +6,7 @@ use std::process::Command;
 use anyhow::{Context, Result, bail};
 use regex::Regex;
 
+use crate::auto_mode::auto_workers;
 use crate::config::{self, Config};
 use crate::lock::StateLock;
 use crate::state::{State, WorkerRecord, WorkerStatus};
@@ -41,6 +42,14 @@ pub fn run_start(
     let _lock = StateLock::acquire()?;
     let (mut state, config) = super::super::state::load_state_with_patrol()?;
     let worker_name = select_worker(&worker, &prefix, &config, &state)?;
+    if auto_workers::is_auto_worker(&worker_name) {
+        bail!(
+            "Cannot manually start auto worker '{}'.\n\
+             Auto workers (auto-1, auto-2, etc.) are managed by the auto mode daemon.\n\
+             Use 'llmc start' with a regular worker, or run 'llmc up --auto' to start auto mode.",
+            worker_name
+        );
+    }
     let worker_record =
         state.get_worker(&worker_name).context("Worker not found after selection")?;
     if worker_record.status != WorkerStatus::Idle {
