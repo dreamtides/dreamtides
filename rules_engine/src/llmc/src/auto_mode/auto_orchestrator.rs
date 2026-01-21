@@ -128,7 +128,7 @@ fn run_orchestration_loop(
 
         // Start sessions for all auto workers
         for name in &worker_names {
-            println!("  {}", color_theme::dim(format!("Starting auto worker '{}'...", name)));
+            println!("{}", color_theme::dim(format!("Starting auto worker '{}'...", name)));
             if let Some(worker) = state.get_worker(name)
                 && let Err(e) = auto_workers::start_auto_worker_session(worker, &fresh_config)
             {
@@ -342,9 +342,17 @@ fn process_idle_workers(
 
         match task_result {
             TaskPoolResult::Task(task) => {
-                let task_preview: String = task.chars().take(60).collect();
+                // Skip the first line (task ID like "LDWWQN: task-name") and use the rest as
+                // task content
+                let task_content =
+                    task.lines().skip(1).collect::<Vec<_>>().join("\n").trim().to_string();
+                let task_preview: String = if task_content.is_empty() {
+                    task.chars().take(60).collect()
+                } else {
+                    task_content.chars().take(60).collect()
+                };
                 println!(
-                    "  {}",
+                    "{}",
                     color_theme::accent(format!(
                         "[{}] Assigning task: {}...",
                         worker_name, task_preview
@@ -358,7 +366,7 @@ fn process_idle_workers(
             }
             TaskPoolResult::Error(e) => {
                 eprintln!(
-                    "  {}",
+                    "{}",
                     color_theme::error(format!(
                         "[{}] Task pool command failed: {}",
                         worker_name, e
@@ -466,10 +474,7 @@ fn process_completed_workers(
         .collect();
 
     for worker_name in completed_workers {
-        println!(
-            "  {}",
-            color_theme::dim(format!("[{}] Processing completed work...", worker_name))
-        );
+        println!("{}", color_theme::dim(format!("[{}] Processing completed work...", worker_name)));
         info!(worker = %worker_name, "Processing completed worker");
 
         // Get auto config for post_accept_command
@@ -491,7 +496,7 @@ fn process_completed_workers(
                         state.source_repo_dirty_backoff_secs = None;
 
                         println!(
-                            "  {}",
+                            "{}",
                             color_theme::success(format!(
                                 "[{}] ✓ Changes accepted ({})",
                                 worker_name,
@@ -509,7 +514,7 @@ fn process_completed_workers(
                             logger,
                         ) {
                             eprintln!(
-                                "  {}",
+                                "{}",
                                 color_theme::error(format!(
                                     "[{}] Post-accept command failed: {}",
                                     worker_name, e
@@ -525,7 +530,7 @@ fn process_completed_workers(
                         state.source_repo_dirty_backoff_secs = None;
 
                         println!(
-                            "  {}",
+                            "{}",
                             color_theme::muted(format!("[{}] No changes to accept", worker_name))
                         );
                         logger.log_task_completed(&worker_name, TaskResult::NoChanges);
@@ -547,11 +552,8 @@ fn process_completed_workers(
                         state.source_repo_dirty_retry_after_unix = Some(retry_after);
 
                         println!(
-                            "  {}",
-                            color_theme::warning(format!(
-                                "[{}] Source repository has uncommitted changes. Will retry in {} seconds.",
-                                worker_name, next_backoff
-                            ))
+                            "[{}] Source repository has uncommitted changes. Will retry in {} seconds.",
+                            worker_name, next_backoff
                         );
                         warn!(
                             worker = %worker_name,
@@ -564,12 +566,9 @@ fn process_completed_workers(
                         // Worker is now in Rebasing state, resolving conflicts.
                         // Next iteration will detect completion and retry accept.
                         println!(
-                            "  {}",
-                            color_theme::warning(format!(
-                                "[{}] Rebase conflict detected - worker resolving {} conflicting file(s)",
-                                worker_name,
-                                conflicts.len()
-                            ))
+                            "[{}] Rebase conflict detected - worker resolving {} conflicting file(s)",
+                            worker_name,
+                            conflicts.len()
                         );
                         info!(
                             worker = %worker_name,
@@ -582,7 +581,7 @@ fn process_completed_workers(
             }
             Err(e) => {
                 eprintln!(
-                    "  {}",
+                    "{}",
                     color_theme::error(format!("[{}] Auto accept failed: {}", worker_name, e))
                 );
                 error!(worker = %worker_name, error = %e, "Auto accept failed");

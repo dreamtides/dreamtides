@@ -3,6 +3,7 @@ use std::sync::atomic::{AtomicBool, Ordering};
 use std::time::{SystemTime, UNIX_EPOCH};
 
 use anyhow::Result;
+use lattice::cli::color_theme;
 
 use crate::config::{Config, SelfReviewConfig};
 use crate::ipc::messages::HookEvent;
@@ -673,12 +674,21 @@ impl Patrol {
                 );
                 worker::apply_transition(w, transition.clone())?;
                 report.transitions_applied.push((worker_name.clone(), transition.clone()));
-                if matches!(transition, WorkerTransition::ToNeedsReview { .. }) {
+                if matches!(transition, WorkerTransition::ToNeedsReview { .. })
+                    && current_status == WorkerStatus::Rebasing
+                {
                     // Worker is transitioning from Rebasing -> NeedsReview.
                     // Self-review (if enabled) was already completed before the rebase started,
                     // so we mark self-review as complete and don't re-queue it.
                     let now = SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs();
                     w.on_complete_sent_unix = Some(now);
+                    println!(
+                        "{}",
+                        color_theme::success(format!(
+                            "[{}] ✓ Rebase conflict resolved",
+                            worker_name
+                        ))
+                    );
                     tracing::info!(
                         "Worker '{}' rebase complete, ready for human review",
                         worker_name

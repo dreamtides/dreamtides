@@ -1,9 +1,8 @@
-#![allow(dead_code)]
-
-use std::path::PathBuf;
-use std::process::Command;
+use std::io::{BufRead, BufReader};
+use std::process::{Child, Command, Stdio};
 use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
+use std::thread::JoinHandle;
 use std::time::{Duration, Instant};
 use std::{fs, thread};
 
@@ -52,15 +51,21 @@ pub fn run_overseer(config: &Config) -> Result<()> {
             break;
         }
 
-        let expected = start_daemon_and_wait_for_registration(&shutdown)?;
+        let mut daemon_handle = start_daemon_and_wait_for_registration(&shutdown)?;
         let daemon_start_time = Instant::now();
-        println!("✓ Daemon started (PID: {}, instance: {})", expected.pid, expected.instance_id);
+        println!(
+            "✓ Daemon started (PID: {}, instance: {})",
+            daemon_handle.expected.pid, daemon_handle.expected.instance_id
+        );
 
-        let failure = run_monitor_loop(&mut monitor, &expected, &shutdown);
+        let failure = run_monitor_loop(&mut monitor, &daemon_handle.expected, &shutdown);
 
         if shutdown.load(Ordering::SeqCst) {
             info!("Shutdown requested during monitoring, terminating daemon");
-            terminate_daemon_gracefully(&expected);
+            terminate_daemon_gracefully(&daemon_handle.expected);
+            // Also kill the child process directly in case terminate_daemon_gracefully
+            // fails
+            let _ = daemon_handle.child.kill();
             break;
         }
 
@@ -71,7 +76,9 @@ pub fn run_overseer(config: &Config) -> Result<()> {
         println!("⚠ Daemon failure detected: {}", failure_status.describe());
         info!(failure = ?failure_status, "Daemon failure detected");
 
-        terminate_daemon_gracefully(&expected);
+        terminate_daemon_gracefully(&daemon_handle.expected);
+        // Also kill the child process directly to ensure cleanup
+        let _ = daemon_handle.child.kill();
 
         if is_failure_spiral(daemon_start_time, &overseer_config) {
             error!("Failure spiral detected - daemon failed within cooldown period");
@@ -114,11 +121,16 @@ pub fn run_overseer(config: &Config) -> Result<()> {
     Ok(())
 }
 
-/// Returns the path where manual intervention files are created.
-pub fn manual_intervention_path(timestamp: &str) -> PathBuf {
-    config::get_llmc_root()
-        .join(".llmc")
-        .join(format!("manual_intervention_needed_{}.txt", timestamp))
+/// Handle to a running daemon process with output piping threads.
+struct DaemonHandle {
+    child: Child,
+    expected: ExpectedDaemon,
+    /// Handle to the stdout piping thread (if daemon was started with output
+    /// capture).
+    _stdout_thread: Option<JoinHandle<()>>,
+    /// Handle to the stderr piping thread (if daemon was started with output
+    /// capture).
+    _stderr_thread: Option<JoinHandle<()>>,
 }
 
 /// Validates that the overseer configuration is present and complete.
@@ -151,22 +163,69 @@ fn validate_overseer_config(config: &Config) -> Result<OverseerConfig> {
     Ok(overseer_config.clone())
 }
 
-/// Starts the daemon via shell command and waits for registration.
-fn start_daemon_and_wait_for_registration(shutdown: &Arc<AtomicBool>) -> Result<ExpectedDaemon> {
-    info!("Starting daemon via shell command");
+/// Starts the daemon and waits for registration.
+///
+/// Spawns the daemon as a child process with captured stdout/stderr, pipes
+/// daemon output to the overseer's stdout, and waits for the daemon to register
+/// via heartbeat file.
+fn start_daemon_and_wait_for_registration(shutdown: &Arc<AtomicBool>) -> Result<DaemonHandle> {
+    info!("Starting daemon");
     println!("Starting daemon...");
 
-    let output = Command::new("sh")
-        .args(["-c", "llmc up --auto &"])
+    let mut child = Command::new("llmc")
+        .args(["up", "--auto"])
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped())
         .spawn()
         .context("Failed to spawn daemon process")?;
 
-    debug!(shell_pid = output.id(), "Daemon shell process spawned");
+    debug!(child_pid = child.id(), "Daemon child process spawned");
+
+    // Spawn thread to pipe daemon stdout to overseer stdout
+    let stdout = child.stdout.take();
+    let stdout_thread = stdout.map(|stdout| {
+        thread::spawn(move || {
+            let reader = BufReader::new(stdout);
+            for line in reader.lines() {
+                match line {
+                    Ok(line) => println!("{}", line),
+                    Err(e) => {
+                        debug!("Daemon stdout read error: {}", e);
+                        break;
+                    }
+                }
+            }
+        })
+    });
+
+    // Spawn thread to pipe daemon stderr to overseer stderr
+    let stderr = child.stderr.take();
+    let stderr_thread = stderr.map(|stderr| {
+        thread::spawn(move || {
+            let reader = BufReader::new(stderr);
+            for line in reader.lines() {
+                match line {
+                    Ok(line) => eprintln!("{}", line),
+                    Err(e) => {
+                        debug!("Daemon stderr read error: {}", e);
+                        break;
+                    }
+                }
+            }
+        })
+    });
 
     let deadline = Instant::now() + Duration::from_secs(DAEMON_STARTUP_TIMEOUT_SECS);
     while Instant::now() < deadline {
         if shutdown.load(Ordering::SeqCst) {
+            // Clean up child process on shutdown
+            let _ = child.kill();
             bail!("Shutdown requested during daemon startup");
+        }
+
+        // Check if child process exited unexpectedly
+        if let Ok(Some(status)) = child.try_wait() {
+            bail!("Daemon process exited unexpectedly during startup with status: {}", status);
         }
 
         if let Some(registration) = heartbeat_thread::read_daemon_registration() {
@@ -176,12 +235,20 @@ fn start_daemon_and_wait_for_registration(shutdown: &Arc<AtomicBool>) -> Result<
                 start_time = registration.start_time_unix,
                 "Daemon registered successfully"
             );
-            return Ok(ExpectedDaemon::from_registration(&registration));
+            let expected = ExpectedDaemon::from_registration(&registration);
+            return Ok(DaemonHandle {
+                child,
+                expected,
+                _stdout_thread: stdout_thread,
+                _stderr_thread: stderr_thread,
+            });
         }
 
         thread::sleep(Duration::from_millis(DAEMON_STARTUP_POLL_INTERVAL_MS));
     }
 
+    // Clean up child process on timeout
+    let _ = child.kill();
     bail!(
         "Daemon failed to register within {} seconds.\n\
          Check logs at ~/llmc/logs/ for details.",
