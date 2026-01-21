@@ -7,6 +7,7 @@ use std::time::{SystemTime, UNIX_EPOCH};
 use anyhow::{Context, Result, bail};
 
 use crate::config::{self, Config};
+use crate::overseer_mode::overseer_session;
 use crate::state::{self, State, WorkerRecord, WorkerStatus};
 use crate::{git, worker};
 /// Result of a doctor check
@@ -406,6 +407,13 @@ fn check_sessions(report: &mut DoctorReport, repair: bool) -> Result<()> {
             if let Some(worker_name) = session_name.strip_prefix("llmc-")
                 && !state.workers.contains_key(worker_name)
             {
+                if overseer_session::is_overseer_session(session_name) {
+                    tracing::debug!(
+                        session = session_name,
+                        "Skipping overseer session in orphaned session check"
+                    );
+                    continue;
+                }
                 if repair {
                     match Command::new("tmux").args(["kill-session", "-t", session_name]).output() {
                         Ok(output) if output.status.success() => {

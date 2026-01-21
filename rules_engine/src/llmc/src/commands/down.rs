@@ -5,6 +5,7 @@ use anyhow::{Context, Result, bail};
 
 use crate::commands::console::CONSOLE_PREFIX;
 use crate::config::{self, Config};
+use crate::overseer_mode::overseer_session;
 use crate::state::{self, State, WorkerStatus};
 use crate::tmux::session;
 /// Runs the down command, stopping all worker sessions
@@ -114,6 +115,10 @@ fn cleanup_orphaned_llmc_sessions(state: &State, kill_consoles: bool, json: bool
                 return false;
             }
             if !kill_consoles && s.starts_with(CONSOLE_PREFIX) {
+                return false;
+            }
+            if overseer_session::is_overseer_session(s) {
+                tracing::info!(session = %s, "Preserving overseer session during cleanup");
                 return false;
             }
             true
