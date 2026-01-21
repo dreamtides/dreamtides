@@ -12,13 +12,10 @@ updated-at: 2026-01-21T01:25:55.793113Z
 
 This document specifies two new LLMC features for autonomous operation:
 
-- **`llmc up --auto`**: A daemon mode that autonomously assigns tasks to
-  workers, accepts completed work, and shuts down gracefully on errors
-- **`llmc overseer`**: A higher-level supervisor that monitors the daemon,
-  detects failures, and uses Claude Code to remediate issues
+- **`llmc up --auto`**: A daemon mode that autonomously assigns tasks to workers, accepts completed work, and shuts down gracefully on errors
+- **`llmc overseer`**: A higher-level supervisor that monitors the daemon, detects failures, and uses Claude Code to remediate issues
 
-These features transform LLMC from a human-in-the-loop system to a fully
-autonomous task execution pipeline.
+These features transform LLMC from a human-in-the-loop system to a fully autonomous task execution pipeline.
 
 ---
 
@@ -26,14 +23,10 @@ autonomous task execution pipeline.
 
 ### Behavioral Changes
 
-- Normal `llmc up` philosophy: "stay alive at all costs" - absorb errors,
-  continue running
-- Auto mode philosophy: "execute graceful shutdown on any error" - preserve
-  worktree state, terminate cleanly
-- Auto mode bypasses the human review step (`llmc review`); changes are accepted
-  automatically
-- Auto workers are segregated from manual workers in status display and cannot
-  receive `llmc start` tasks
+- Normal `llmc up` philosophy: "stay alive at all costs" - absorb errors, continue running
+- Auto mode philosophy: "execute graceful shutdown on any error" - preserve worktree state, terminate cleanly
+- Auto mode bypasses the human review step (`llmc review`); changes are accepted automatically
+- Auto workers are segregated from manual workers in status display and cannot receive `llmc start` tasks
 
 ### Configuration
 
@@ -41,34 +34,25 @@ autonomous task execution pipeline.
 
 - `task_pool_command` (required)
   - Shell command that prints a new task description to stdout
-  - Should mark tasks as "in progress" internally so subsequent calls return
-    different tasks
+  - The command is responsible for tracking task state; LLMC does not mark tasks as claimed
+  - Expectation: subsequent invocations return different tasks (command manages its own queue)
   - Exit code 0 with empty stdout: no tasks available, daemon waits
   - Exit code non-zero: error condition, triggers shutdown
-  - Command runs in caller's shell environment ($PATH, working directory, env
-    vars)
+  - Command runs in caller's shell environment ($PATH, working directory, env vars)
   - Stdout logged to `logs/task_pool.log`
 
 - `concurrency` (optional, default: 1)
   - Number of auto workers to run simultaneously
-  - Auto workers are created on demand if they don't exist (named `auto-1`,
-    `auto-2`, etc.)
+  - Auto workers are created on demand if they don't exist (named `auto-1`, `auto-2`, etc.)
 
 - `post_accept_command` (optional)
-  - Shell command invoked after successfully rebasing a worker's changes onto
-    master
+  - Shell command invoked after successfully rebasing a worker's changes onto master
   - May be long-running (tests, validation, deployment)
   - Daemon blocks until completion before proceeding
   - Exit code non-zero: error condition, triggers shutdown
   - Stdout logged to `logs/post_accept.log`
 
-- `restart_cooldown_secs` (optional, default: 60)
-  - Minimum time daemon must stay healthy after start before errors no longer
-    trigger termination
-  - Used by overseer to detect failure spirals
-
-- Inherits all `[defaults]` options (model, skip_permissions, allowed_tools,
-  etc.)
+- Inherits all `[defaults]` options (model, skip_permissions, allowed_tools, etc.)
   - Per-worker overrides not supported for auto workers
 
 #### CLI Flags
@@ -98,8 +82,7 @@ autonomous task execution pipeline.
 #### Command Restrictions
 
 - `llmc start` rejects auto workers with clear error message
-- All other commands work normally: `attach`, `peek`, `reset`, `nuke`, `pick`,
-  etc.
+- All other commands work normally: `attach`, `peek`, `reset`, `nuke`, `pick`, etc.
 - `llmc nuke --all` removes auto workers; `llmc reset --all` resets them
 
 ### Daemon Loop
@@ -128,7 +111,8 @@ autonomous task execution pipeline.
    - If no_changes: reset worker to idle, continue
    - Execute accept workflow:
      - Rebase onto master
-     - If conflict: log error, initiate shutdown
+     - If rebase fails (conflict after worker marked ready): log error, initiate shutdown
+     - Note: Workers entering `rebasing` state during work is normal, not an error
      - Squash commits, strip attribution
      - Fast-forward merge to master
    - If `post_accept_command` configured:
@@ -140,22 +124,29 @@ autonomous task execution pipeline.
 
 #### Error Handling
 
-- Any unexpected error triggers shutdown sequence:
-  - Log detailed error with context (worker, state, command output)
-  - Set `shutdown_requested` flag
-  - Allow current operations to drain (with timeout)
-  - Execute `llmc down` logic: graceful Ctrl-C to workers, then kill
-  - Preserve all worktree state (no cleanup)
-  - Exit with non-zero code
+Two categories of errors:
 
-- Error conditions that trigger shutdown:
-  - `task_pool_command` returns non-zero
-  - `post_accept_command` returns non-zero
-  - Worker enters error state
-  - Rebase conflict during accept
-  - State file corruption
-  - TMUX session unexpectedly missing
-  - Hook IPC failures
+**Transient failures** (patrol attempts automatic recovery):
+- Worker Claude Code crashes → patrol restarts session (up to 2 retries with backoff)
+- TMUX session disappears → patrol recreates session
+- If patrol recovery succeeds, daemon continues normally
+- If patrol retries exhausted → escalates to hard failure
+
+**Hard failures** (immediate shutdown):
+- `task_pool_command` returns non-zero
+- `post_accept_command` returns non-zero
+- Worker enters error state (after patrol retries exhausted)
+- Rebase failure during accept (after worker was ready)
+- State file corruption
+- Hook IPC failures
+
+Shutdown sequence for hard failures:
+- Log detailed error with context (worker, state, command output)
+- Set `shutdown_requested` flag
+- Allow current operations to drain (with timeout)
+- Execute `llmc down` logic: graceful Ctrl-C to workers, then kill
+- Preserve all worktree state (no cleanup)
+- Exit with non-zero code
 
 #### Heartbeat Mechanism
 
@@ -171,10 +162,8 @@ autonomous task execution pipeline.
 - New dedicated log files:
   - `logs/task_pool.log`: All task pool command invocations and output
   - `logs/post_accept.log`: All post accept command invocations and output
-  - `logs/auto.log`: Auto-specific daemon events (task assignments, accepts,
-    errors)
-- Each log entry includes timestamp, worker name (if applicable), and full
-  command output
+  - `logs/auto.log`: Auto-specific daemon events (task assignments, accepts, errors)
+- Each log entry includes timestamp, worker name (if applicable), and full command output
 
 ---
 
@@ -183,10 +172,10 @@ autonomous task execution pipeline.
 ### Behavioral Overview
 
 - Long-running supervisor process that manages the entire auto pipeline
-- Starts daemon, monitors health, terminates on failure, remediates via Claude
-  Code
+- Starts daemon, monitors health, terminates on failure, remediates via Claude Code
 - Designed for unattended multi-day operation
 - Single point of control for autonomous LLMC operation
+- Terminated via Ctrl-C
 
 ### Architecture
 
@@ -235,41 +224,39 @@ autonomous task execution pipeline.
    - Verify PID matches expected
    - Verify `start_time_unix` matches
    - Verify `instance_id` matches
-   - If mismatch: daemon restarted unexpectedly, investigate
+   - If mismatch: daemon restarted unexpectedly, treat as failure
 
 2. **Heartbeat Check**
    - Read `.llmc/auto.heartbeat`
-   - If file missing or timestamp stale (>30 seconds): daemon hung
+   - If file missing or timestamp stale (>heartbeat_timeout_secs): daemon hung
 
 3. **Log Monitoring**
    - Tail daemon log file
-   - Parse for ERROR and WARN level entries
-   - Track error frequency and patterns
+   - ANY ERROR or WARN level entry triggers immediate failure handling
+   - No thresholds or windowing - single warning/error means failure
 
 4. **Progress Tracking**
    - Monitor for task completions
-   - Detect stalled state (no progress for extended period)
+   - Detect stalled state (no progress for stall_timeout_secs)
 
 #### Failure Detection
 
-- Missing heartbeat for >30 seconds
+- Any ERROR or WARN in daemon logs
+- Missing heartbeat for >heartbeat_timeout_secs
 - Daemon process terminated (PID no longer exists)
 - PID reuse detection (same PID, different start time or instance ID)
-- Repeated errors in logs (>N errors in M seconds)
-- Stalled progress (no task completions for configurable period)
+- Stalled progress (no task completions for stall_timeout_secs)
 
 ### Daemon Termination Protocol
 
 When failure detected:
 
 1. Log failure details with full context
-2. Wait grace period (10 seconds) - daemon may self-recover
-3. Re-verify failure persists and process identity matches
-4. Send SIGTERM to daemon PID
-5. Wait grace period (30 seconds) for graceful shutdown
-6. If still running: send SIGKILL
-7. Verify daemon fully terminated
-8. Enter remediation mode
+2. Immediately send SIGTERM to daemon PID (no waiting for self-recovery)
+3. Wait grace period (30 seconds) for graceful shutdown
+4. If still running: send SIGKILL
+5. Verify daemon fully terminated
+6. Enter remediation mode
 
 ### Remediation
 
@@ -294,17 +281,14 @@ When failure detected:
    - Git status summary
 
 3. Append recovery instructions:
-   - "After fixing the issue, exit normally. The overseer will restart the
-     daemon."
-   - "If the issue cannot be fixed, create a file
-     `.llmc/manual_intervention_needed.txt` with explanation."
+   - "After fixing the issue, exit normally. The overseer will restart the daemon."
+   - "If the issue cannot be fixed, create a file `.llmc/manual_intervention_needed_<timestamp>.txt` with explanation."
 
 #### Remediation Execution
 
 1. Send `/clear` to overseer Claude Code session
 2. Send constructed prompt
-3. Monitor for completion via hooks (same mechanism as worker completion
-   detection)
+3. Monitor for completion via hooks (same mechanism as worker completion detection)
 4. Wait for Claude Code to exit its task
 
 #### Remediation Logging
@@ -323,7 +307,7 @@ When failure detected:
 
 ### Restart After Remediation
 
-1. Check for `.llmc/manual_intervention_needed.txt`
+1. Check for any `.llmc/manual_intervention_needed_*.txt` files
    - If exists: log contents, terminate overseer with clear message
 2. Start daemon via shell: `llmc up --auto`
 3. Watch for successful registration
@@ -337,8 +321,7 @@ When failure detected:
   - Overseer terminates with detailed error message
   - Human intervention required
 
-- Rationale: Some failures are not code-fixable (disk full, network down, API
-  limits)
+- Rationale: Some failures are not code-fixable (disk full, network down, API limits)
 - Prevents infinite loop of remediation attempts
 
 ### TMUX Session Protection
@@ -346,7 +329,7 @@ When failure detected:
 - Existing "kill all tmux sessions" logic in LLMC must exclude `llmc-overseer`
 - `llmc down` should NOT terminate overseer session
 - `llmc nuke --all` should NOT terminate overseer session
-- Only `llmc overseer stop` (new command) terminates overseer
+- Only Ctrl-C on overseer process terminates the overseer
 
 ### Configuration
 
@@ -359,12 +342,6 @@ When failure detected:
 - `heartbeat_timeout_secs` (optional, default: 30)
   - How long before missing heartbeat triggers failure
 
-- `log_error_threshold` (optional, default: 5)
-  - Number of errors in log within window to trigger failure
-
-- `log_error_window_secs` (optional, default: 60)
-  - Time window for error threshold
-
 - `stall_timeout_secs` (optional, default: 3600)
   - How long without task completion before considered stalled
 
@@ -374,9 +351,82 @@ When failure detected:
 ### CLI Interface
 
 - `llmc overseer`: Start overseer (foreground, Ctrl-C to stop)
-- `llmc overseer start`: Start overseer (daemonized, returns immediately)
-- `llmc overseer stop`: Terminate overseer and daemon gracefully
-- `llmc overseer status`: Show overseer and daemon status
+
+---
+
+## Failure Scenarios & Mitigation
+
+Recovery classification:
+- **AUTO**: System recovers automatically without external intervention
+- **AI**: Overseer invokes Claude Code remediation
+- **HUMAN**: Requires human intervention; overseer terminates
+
+### Task Pool Command Failures
+
+| # | Failure | Detection | Recovery | Type |
+|---|---------|-----------|----------|------|
+| 1 | Command returns non-zero exit | Daemon checks exit code | Daemon shuts down; overseer remediates | AI |
+| 2 | Command hangs indefinitely | Heartbeat stale | Overseer kills daemon; remediates | AI |
+| 3 | Command returns empty repeatedly | N/A - expected | Daemon waits for tasks | AUTO |
+| 4 | Command returns duplicate tasks | Not detectable | External issue; may double-process | HUMAN |
+
+### Worker Failures
+
+| # | Failure | Detection | Recovery | Type |
+|---|---------|-----------|----------|------|
+| 5 | Worker Claude Code crashes (once) | Patrol detects | Patrol restarts session automatically | AUTO |
+| 6 | Worker crashes repeatedly | Patrol retries exhausted | Daemon shuts down; overseer investigates | AI |
+| 7 | Worker hangs (infinite loop) | Fallback timeout (5 min) | Daemon shuts down; overseer investigates | AI |
+| 8 | Worker enters error state | State logged as ERROR | Daemon shuts down; overseer resets worker | AI |
+| 9 | TMUX session killed (once) | Patrol health check | Patrol recreates session | AUTO |
+| 10 | TMUX session killed repeatedly | Patrol retries exhausted | Daemon shuts down; overseer restarts | AI |
+| 11 | Worker worktree git corruption | Git operations fail | Daemon shuts down; overseer recreates worker | AI |
+| 12 | Worker code fails tests | post_accept_command non-zero | Daemon shuts down; overseer may fix or revert | AI |
+
+### Accept Workflow Failures
+
+| # | Failure | Detection | Recovery | Type |
+|---|---------|-----------|----------|------|
+| 13 | Merge conflict during accept | Git rebase conflict status | Daemon shuts down; overseer resolves or resets | AI |
+| 14 | Master diverged significantly | Many conflicts | Daemon shuts down; overseer may need retries | AI |
+| 15 | Git lock file stuck | Git lock error | Daemon shuts down; overseer removes lock | AI |
+
+### System Resource Failures
+
+| # | Failure | Detection | Recovery | Type |
+|---|---------|-----------|----------|------|
+| 16 | Disk full | Write operations fail | AI also fails; failure spiral terminates | HUMAN |
+| 17 | Out of memory (OOM) | Daemon disappears | Overseer detects; systemic issue | HUMAN |
+| 18 | Claude API rate limits | Worker errors | Daemon shuts down; AI may add delays | AI |
+| 19 | Network connectivity loss | API calls fail | AI cannot fix external network | HUMAN |
+
+### State & Configuration Failures
+
+| # | Failure | Detection | Recovery | Type |
+|---|---------|-----------|----------|------|
+| 20 | state.json corruption | JSON parse error | Overseer runs `llmc doctor --rebuild` | AI |
+| 21 | config.toml syntax error | TOML parse error | Overseer fixes TOML syntax | AI |
+| 22 | Hook IPC socket failure | Socket operations fail | Overseer recreates socket | AI |
+| 23 | .llmc directory permissions | File operations fail | Overseer fixes permissions | AI |
+
+### Overseer-Level Failures
+
+| # | Failure | Detection | Recovery | Type |
+|---|---------|-----------|----------|------|
+| 24 | Overseer Claude session crashes | Overseer monitors session | Overseer restarts Claude automatically | AUTO |
+| 25 | Remediation produces invalid fix | Daemon fails within cooldown | Failure spiral; overseer terminates | HUMAN |
+| 26 | Remediation hangs | Hook never fires | May hang; consider timeout in future | HUMAN |
+| 27 | Daemon restarts unexpectedly | PID/instance_id mismatch | Overseer kills daemon, remediates | AI |
+
+### Summary
+
+| Type | Count | Scope |
+|------|-------|-------|
+| AUTO | 4 | Empty task pool, single worker/session crash (patrol recovers), overseer session crash |
+| AI | 17 | Repeated crashes, conflicts, config errors, most operational failures |
+| HUMAN | 6 | Resource exhaustion, network, failure spirals |
+
+**Design principle:** Patrol handles transient failures automatically. AI remediation for persistent operational issues. Human intervention only for external/environmental issues or failure spirals.
 
 ---
 
@@ -393,27 +443,30 @@ When failure detected:
 
 - `daemon.json`: Daemon registration (pid, start_time, instance_id, log_file)
 - `auto.heartbeat`: Heartbeat file (timestamp, instance_id)
-- `manual_intervention_needed.txt`: Created by remediation Claude if unfixable
 - `overseer.json`: Overseer registration (similar to daemon.json)
+- `manual_intervention_needed_<timestamp>.txt`: Created by remediation if unfixable
 
 ### Module Structure
+
+All new Rust source files use minimum 2-word names:
 
 ```
 src/
   commands/
-    up.rs          # Extend with --auto handling
-    overseer.rs    # New: overseer command implementation
-  auto/
-    mod.rs         # Auto mode orchestration
-    config.rs      # Auto configuration parsing
-    worker.rs      # Auto worker lifecycle
-    accept.rs      # Auto accept workflow
-    heartbeat.rs   # Heartbeat thread
-  overseer/
-    mod.rs         # Overseer main loop
-    monitor.rs     # Health monitoring
-    remediation.rs # Remediation prompt construction and execution
-    session.rs     # Overseer Claude Code session management
+    up_command.rs           # Extend with --auto handling
+    overseer_command.rs     # New: overseer command implementation
+  auto_mode/
+    auto_orchestrator.rs    # Auto mode main orchestration
+    auto_config.rs          # Auto configuration parsing
+    auto_workers.rs         # Auto worker lifecycle
+    auto_accept.rs          # Auto accept workflow
+    heartbeat_thread.rs     # Heartbeat background thread
+  overseer_mode/
+    overseer_loop.rs        # Overseer main loop
+    health_monitor.rs       # Health monitoring
+    remediation_prompt.rs   # Prompt construction
+    remediation_executor.rs # Remediation execution
+    overseer_session.rs     # Overseer Claude Code session management
 ```
 
 ### Testing Strategy
@@ -425,21 +478,6 @@ src/
 - Failure injection tests for graceful shutdown
 - Overseer tests with mock daemon
 
-### Security Considerations
-
-- Shell commands execute with user privileges
-- No additional sandboxing for auto workers (same as manual workers)
-- Remediation Claude has full repo access (intentional for fixing issues)
-- Log files may contain sensitive task descriptions
-
-### Operational Guidelines
-
-- Start with low concurrency and increase gradually
-- Monitor remediation logs for common issues
-- Configure stall timeout based on typical task duration
-- Review remediation prompt effectiveness periodically
-- Set up external alerting on overseer termination
-
 ---
 
 ## Migration and Compatibility
@@ -450,11 +488,31 @@ src/
 - Configuration additions are purely additive
 - State file changes are backward compatible (new optional fields)
 
-## Future Considerations
+---
 
-- Task prioritization in pool
-- Dynamic concurrency scaling
-- Task timeout configuration
-- Partial acceptance (accept some workers, remediate others)
-- Metrics and observability integration
-- Remote notification on failures
+## Implementation Order
+
+Tasks should be implemented in this sequence:
+
+1. LDVWQN - Add module structure for auto_mode and overseer_mode
+2. LDCWQN - Add auto configuration parsing to config.rs
+3. LDFWQN - Implement heartbeat mechanism for auto mode daemon
+4. LDUWQN - Create dedicated log files for auto mode operations
+5. LDEWQN - Implement auto worker creation and lifecycle management
+6. LDGWQN - Implement task pool command execution
+7. LDHWQN - Implement auto accept workflow
+8. LDIWQN - Implement auto mode daemon main loop
+9. LDJWQN - Implement transient vs hard failure handling in auto mode
+10. LDDWQN - Add overseer configuration parsing
+11. LDKWQN - Implement overseer Claude Code session management
+12. LDLWQN - Implement daemon health monitoring for overseer
+13. LDMWQN - Implement daemon termination protocol for overseer
+14. LDNWQN - Implement remediation prompt construction
+15. LDOWQN - Implement remediation execution and logging
+16. LDPWQN - Implement overseer main loop with failure spiral detection
+17. LDTWQN - Integrate --auto flag into llmc up command
+18. LDSWQN - Add llmc overseer CLI command
+19. LDQWQN - Update llmc status to display auto workers and overseer state
+20. LDRWQN - Protect overseer TMUX session from kill operations
+21. LDWWQN - Write integration tests for auto mode
+22. LDXWQN - Write integration tests for overseer
