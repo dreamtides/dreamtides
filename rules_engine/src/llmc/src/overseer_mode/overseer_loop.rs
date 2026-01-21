@@ -176,6 +176,11 @@ fn start_daemon_and_wait_for_registration(
     info!("Starting daemon");
     println!("Starting daemon...");
 
+    // Clean up any existing LLMC sessions from a previous daemon instance.
+    // This is necessary because the overseer may have crashed while sessions
+    // were still running.
+    daemon_control::cleanup_existing_sessions()?;
+
     // Clean up stale registration files from any previous daemon instance.
     // This ensures we wait for the new daemon's registration rather than
     // reading a stale file from a crashed daemon.

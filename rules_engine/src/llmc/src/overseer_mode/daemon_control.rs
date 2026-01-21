@@ -91,6 +91,33 @@ pub fn cleanup_registration_files() {
     }
 }
 
+/// Cleans up any existing LLMC sessions before starting a new daemon.
+///
+/// This runs `llmc down --force` to ensure any stale sessions from a
+/// previous daemon instance are terminated. This is necessary because
+/// the overseer may have crashed while sessions were still running.
+pub fn cleanup_existing_sessions() -> Result<()> {
+    info!("Cleaning up any existing LLMC sessions before daemon startup");
+
+    let output = std::process::Command::new("llmc")
+        .args(["down", "--force"])
+        .output()
+        .context("Failed to run 'llmc down --force'")?;
+
+    if !output.status.success() {
+        let stderr = String::from_utf8_lossy(&output.stderr);
+        warn!(
+            exit_code = output.status.code(),
+            stderr = %stderr,
+            "llmc down --force returned non-zero exit code (continuing anyway)"
+        );
+    } else {
+        debug!("Successfully cleaned up existing sessions");
+    }
+
+    Ok(())
+}
+
 /// Verifies process identity and performs termination.
 fn verify_and_terminate(expected: &ExpectedDaemon) -> Result<TerminationResult> {
     if !is_process_running(expected.pid) {
