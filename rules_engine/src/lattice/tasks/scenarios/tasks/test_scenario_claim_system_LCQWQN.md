@@ -2,6 +2,7 @@
 lattice-id: LCQWQN
 name: test-scenario-claim-system
 description: 'Test Scenario: Claim System'
+parent-id: LCEWQN
 task-type: task
 priority: 2
 labels:
@@ -9,12 +10,13 @@ labels:
 - manual-test
 - scenario
 created-at: 2026-01-20T06:17:15.139979Z
-updated-at: 2026-01-20T06:17:15.139979Z
+updated-at: 2026-01-21T22:32:22.855812Z
 ---
 
 # Test Scenario: Claim System
 
-See [Agent Manual Testing Guide](../../docs/agent_manual_testing.md#LCBWQN) for
+See [Agent Manual Testing Guide](../../../docs/agent_manual_testing.md#LCBWQN)
+for
 general testing instructions.
 
 ## Objective
@@ -69,6 +71,7 @@ lat claim $ALPHA_ID
 ```
 
 **Verify**:
+
 - Command succeeds
 - Claim file created in `~/.lattice/claims/<repo-hash>/`
 
@@ -79,6 +82,7 @@ lat show $ALPHA_ID
 ```
 
 **Verify**:
+
 - Output shows "Claimed: true" or similar indicator
 
 **Step 1.3**: Verify claimed task in JSON.
@@ -88,6 +92,7 @@ lat show $ALPHA_ID --json
 ```
 
 **Verify**:
+
 - JSON has `"claimed": true`
 
 ### Part 2: Claims and Ready Queue
@@ -99,6 +104,7 @@ lat ready
 ```
 
 **Verify**:
+
 - Task Alpha NOT shown (it's claimed)
 - Tasks Beta and Gamma shown
 
@@ -109,6 +115,7 @@ lat ready --include-claimed
 ```
 
 **Verify**:
+
 - Task Alpha IS shown
 - Marked as claimed (e.g., [CLAIMED] indicator)
 
@@ -121,6 +128,7 @@ lat claim --list
 ```
 
 **Verify**:
+
 - Shows Alpha is claimed
 - Shows claim timestamp
 - Shows work path (current directory)
@@ -133,6 +141,7 @@ lat claim --list
 ```
 
 **Verify**:
+
 - Both Alpha and Beta shown as claimed
 
 ### Part 4: Release Claims
@@ -144,6 +153,7 @@ lat claim --release $ALPHA_ID
 ```
 
 **Verify**:
+
 - Command succeeds
 - Alpha no longer claimed
 
@@ -154,6 +164,7 @@ lat claim --list
 ```
 
 **Verify**:
+
 - Only Beta shown (Alpha released)
 
 ```bash
@@ -161,6 +172,7 @@ lat ready
 ```
 
 **Verify**:
+
 - Alpha now appears in ready list (no longer claimed)
 
 ### Part 5: Release All Claims
@@ -174,6 +186,7 @@ lat claim --list
 ```
 
 **Verify**:
+
 - Alpha, Beta, Gamma all claimed
 
 **Step 5.2**: Release all.
@@ -183,6 +196,7 @@ lat claim --release-all
 ```
 
 **Verify**:
+
 - All claims released
 
 **Step 5.3**: Verify.
@@ -192,6 +206,7 @@ lat claim --list
 ```
 
 **Verify**:
+
 - No claims listed
 
 ### Part 6: Auto-Release on Close
@@ -205,6 +220,7 @@ lat close $ALPHA_ID
 ```
 
 **Verify**:
+
 - Task closed successfully
 
 **Step 6.2**: Verify claim auto-released.
@@ -214,6 +230,7 @@ lat claim --list
 ```
 
 **Verify**:
+
 - Alpha NOT in claim list (auto-released on close)
 
 ### Part 7: Claiming Closed Tasks
@@ -225,6 +242,7 @@ lat claim $ALPHA_ID  # Alpha is closed
 ```
 
 **Verify**:
+
 - Should fail or warn (can't claim closed task)
 
 ### Part 8: Claiming Blocked Tasks
@@ -243,6 +261,7 @@ lat claim $BETA_ID
 ```
 
 **Verify**:
+
 - May succeed or warn (policy decision)
 - If succeeds, task is claimed even though blocked
 
@@ -262,6 +281,7 @@ lat claim --gc
 ```
 
 **Verify**:
+
 - Reports any stale claims cleaned up
 - Claims for closed tasks removed
 
@@ -274,6 +294,7 @@ lat claim LNONEXISTENT
 ```
 
 **Verify**:
+
 - Fails with not found error
 - Exit code 4
 
@@ -286,6 +307,7 @@ lat claim $ALPHA_ID
 ```
 
 **Verify**:
+
 - Second claim is idempotent (no error)
 - Still only one claim entry
 
@@ -296,6 +318,7 @@ lat claim --release $BETA_ID  # Not currently claimed
 ```
 
 **Verify**:
+
 - Handles gracefully (no error or clear message)
 
 ### Part 11: Claim Storage Location
@@ -308,6 +331,7 @@ ls ~/.lattice/claims/ 2>/dev/null || echo "No claims directory"
 ```
 
 **Verify**:
+
 - Claims directory exists after claiming
 - Subdirectory named by repo hash
 
@@ -338,6 +362,7 @@ lat claim --list
 ```
 
 **Verify**:
+
 - Claims from second repo NOT shown
 - Only shows claims for current repo
 
@@ -361,6 +386,7 @@ lat doctor
 ```
 
 **Verify**:
+
 - Doctor warns about stale claim (if any)
 
 **Step 13.2**: Doctor fix cleans claims.
@@ -371,6 +397,7 @@ lat claim --list
 ```
 
 **Verify**:
+
 - Stale claims cleaned up
 
 ## Cleanup

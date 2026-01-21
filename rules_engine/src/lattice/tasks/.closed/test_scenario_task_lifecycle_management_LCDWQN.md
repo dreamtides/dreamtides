@@ -2,6 +2,7 @@
 lattice-id: LCDWQN
 name: test-scenario-task-lifecycle-management
 description: 'Test Scenario: Task Lifecycle Management'
+parent-id: LCEWQN
 task-type: task
 priority: 2
 labels:
@@ -9,7 +10,7 @@ labels:
 - manual-test
 - scenario
 created-at: 2026-01-20T06:13:20.678397Z
-updated-at: 2026-01-20T06:13:20.678397Z
+updated-at: 2026-01-21T22:31:38.523149Z
 ---
 
 # Test Scenario: Task Lifecycle Management
@@ -63,6 +64,7 @@ lat close $BUG_ID
 ```
 
 **Verify**:
+
 - Task file moved from `auth/tasks/` to `auth/tasks/.closed/`
 - Original file no longer exists at old path
 - `.closed/` directory created if it didn't exist
@@ -75,6 +77,7 @@ lat show $BUG_ID
 ```
 
 **Verify**:
+
 - State shows as "closed"
 - Path in output shows `.closed/` in path
 
@@ -85,6 +88,7 @@ lat list
 ```
 
 **Verify**:
+
 - Closed task NOT shown (default excludes closed)
 
 ```bash
@@ -92,6 +96,7 @@ lat list --include-closed
 ```
 
 **Verify**:
+
 - Closed task IS shown
 - Shows closed indicator
 
@@ -102,6 +107,7 @@ lat ready
 ```
 
 **Verify**:
+
 - Closed task not in ready list
 
 ### Part 2: Close Multiple Tasks
@@ -113,6 +119,7 @@ lat close $FEATURE_ID $TASK_ID
 ```
 
 **Verify**:
+
 - Both tasks moved to `.closed/`
 - Both have `closed-at` timestamps
 
@@ -125,6 +132,7 @@ lat reopen $BUG_ID
 ```
 
 **Verify**:
+
 - Task moved back from `auth/tasks/.closed/` to `auth/tasks/`
 - `closed-at` timestamp removed or cleared
 - State shows as "open" in `lat show`
@@ -136,6 +144,7 @@ lat ready
 ```
 
 **Verify**:
+
 - Reopened task appears (if no blockers)
 
 ### Part 4: Close with Reason
@@ -147,6 +156,7 @@ lat close $BUG_ID --reason "Fixed in commit abc123"
 ```
 
 **Verify**:
+
 - Task closed successfully
 - Reason text appended to document body
 
@@ -157,6 +167,7 @@ lat show $BUG_ID
 ```
 
 **Verify**:
+
 - Body includes the closure reason
 
 ### Part 5: Prune Operations
@@ -170,6 +181,7 @@ lat prune $CLOSED_PATH
 ```
 
 **Verify**:
+
 - Task file permanently deleted
 - `lat show` for that ID returns "not found"
 - `lat list --include-closed` no longer shows it
@@ -181,6 +193,7 @@ lat prune
 ```
 
 **Verify**:
+
 - Command fails (requires path or --all)
 - Exit code 3 (user error)
 
@@ -196,6 +209,7 @@ lat prune --all
 ```
 
 **Verify**:
+
 - All closed tasks deleted
 - `auth/tasks/.closed/` directory may be empty or removed
 - No closed tasks in `lat list --include-closed`
@@ -223,6 +237,7 @@ lat prune auth/tasks/.closed/
 ```
 
 **Verify**:
+
 - If there are inline markdown links TO the pruned task, command should error
 - Use `--force` to convert links to plain text
 
@@ -233,6 +248,7 @@ lat prune auth/tasks/.closed/ --force
 ```
 
 **Verify**:
+
 - Task deleted
 - Inline links converted to plain text
 
@@ -245,6 +261,7 @@ lat close $MAIN_ID --dry-run
 ```
 
 **Verify**:
+
 - Shows what would happen
 - Task NOT actually moved
 
@@ -256,6 +273,7 @@ lat reopen $MAIN_ID --dry-run
 ```
 
 **Verify**:
+
 - Shows what would happen
 - Task NOT actually moved back
 
@@ -266,6 +284,7 @@ lat prune --all --dry-run
 ```
 
 **Verify**:
+
 - Shows what would be deleted
 - Nothing actually deleted
 
@@ -279,6 +298,7 @@ lat close $MAIN_ID
 ```
 
 **Verify**:
+
 - Second close is idempotent or gives clear message
 - No error
 
@@ -290,6 +310,7 @@ lat reopen $MAIN_ID
 ```
 
 **Verify**:
+
 - Second reopen is idempotent or gives clear message
 - No error
 
@@ -301,6 +322,7 @@ lat reopen LNONEXISTENT
 ```
 
 **Verify**:
+
 - Clear error message
 - Exit code 4 (not found)
 

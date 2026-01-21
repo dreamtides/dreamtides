@@ -1,5 +1,5 @@
 ---
-lattice-id: LCIWQN
+lattice-id: LIDWQN
 name: test-scenario-overseer-failure-spiral-pr
 description: 'Test Scenario: Overseer Failure Spiral Prevention'
 parent-id: LB5WQN
@@ -12,16 +12,17 @@ labels:
 - overseer
 - failure-spiral
 blocked-by:
-- LCHWQN
+- LICWQN
 created-at: 2026-01-21T22:06:36.953507Z
-updated-at: 2026-01-21T22:06:36.953507Z
+updated-at: 2026-01-21T22:31:38.834603Z
 ---
 
 # Test Scenario: Overseer Failure Spiral Prevention
 
 ## Objective
 
-Verify that the overseer correctly detects failure spirals (daemon failing within
+Verify that the overseer correctly detects failure spirals (daemon failing
+within
 restart_cooldown_secs of last start), prevents infinite remediation loops, and
 terminates with a clear error message requiring human intervention.
 
@@ -36,6 +37,7 @@ terminates with a clear error message requiring human intervention.
 ## Differentiating Errors from Normal Operations
 
 **Error indicators (that are bugs, not expected failures):**
+
 - Overseer enters infinite remediation loop
 - Failure spiral not detected
 - Manual intervention file not checked
@@ -43,6 +45,7 @@ terminates with a clear error message requiring human intervention.
 - Cooldown timer not tracked correctly
 
 **Expected behavior in this test:**
+
 - Daemon fails repeatedly within cooldown period
 - Overseer detects failure spiral
 - Overseer terminates (does not attempt more remediation)
@@ -110,7 +113,7 @@ sleep 5
 # Wait for daemon to fail
 for i in {1..30}; do
     echo "=== Check $i ==="
-    
+
     # Check daemon status
     if [ -f ~/llmc/.llmc/daemon.json ]; then
         DAEMON_PID=$(cat ~/llmc/.llmc/daemon.json | jq '.pid')
@@ -118,15 +121,16 @@ for i in {1..30}; do
             echo "Daemon has died"
         fi
     fi
-    
+
     # Check for remediation activity
     ls ~/llmc/logs/remediation_*.txt 2>/dev/null | head -3
-    
+
     sleep 3
 done
 ```
 
 **Verify**:
+
 - Daemon fails due to task pool error
 - Overseer detects failure
 - First remediation attempt initiated
@@ -147,15 +151,16 @@ for i in {1..60}; do
         echo "Overseer terminated (expected for failure spiral)"
         break
     fi
-    
+
     # Check for failure spiral log messages
     grep -i "spiral\|cooldown\|repeated\|manual" ~/llmc/logs/auto.log 2>/dev/null | tail -5
-    
+
     sleep 3
 done
 ```
 
 **Verify**:
+
 - Daemon fails again within 30 seconds of restart
 - Overseer detects failure spiral
 - Overseer does NOT attempt another remediation
@@ -170,6 +175,7 @@ echo "Overseer exit code: $EXIT_CODE"
 ```
 
 **Verify**:
+
 - Overseer terminates (non-zero exit code expected)
 - Termination is graceful (not a crash)
 
@@ -182,6 +188,7 @@ cat ~/llmc/logs/auto.log | tail -30
 ```
 
 **Verify**:
+
 - Clear message about failure spiral detected
 - Message indicates human intervention required
 - Message includes relevant context (failure count, timing)
@@ -198,6 +205,7 @@ echo "Remediation attempts: $REMEDIATION_COUNT"
 ```
 
 **Verify**:
+
 - Small number of remediation logs (1-2)
 - Not dozens (which would indicate failed prevention)
 
@@ -266,6 +274,7 @@ echo "Exit code: $EXIT_CODE"
 ```
 
 **Verify**:
+
 - Overseer detects manual_intervention_needed_*.txt
 - Overseer logs the file contents
 - Overseer terminates with clear message
@@ -277,6 +286,7 @@ cat ~/llmc/logs/auto.log | grep -i "manual\|intervention" | tail -10
 ```
 
 **Verify**:
+
 - Log shows manual intervention file was found
 - Log includes file contents
 - Clear message about human action needed
@@ -307,17 +317,18 @@ for i in {1..10}; do
         echo "Daemon start time: $START_TIME"
         START_TIMES="$START_TIMES $START_TIME"
     fi
-    
+
     if ! kill -0 $OVERSEER_PID 2>/dev/null; then
         echo "Overseer terminated"
         break
     fi
-    
+
     sleep 5
 done
 ```
 
 **Verify**:
+
 - Start times are tracked
 - Failure within cooldown of LAST start triggers spiral detection
 - Not based on first-ever start
@@ -338,6 +349,7 @@ echo "a new failure should trigger normal remediation, not spiral detection"
 ```
 
 **Verify** (conceptually):
+
 - Daemon running > restart_cooldown_secs clears failure tracking
 - Subsequent failure triggers normal remediation
 - Only rapid successive failures trigger spiral
@@ -383,6 +395,7 @@ llmc nuke --all --yes 2>/dev/null || true
 ## Abort Conditions
 
 **Abort the test and file a task if:**
+
 - Infinite remediation loop occurs
 - System resources exhausted
 - State corruption from rapid daemon restarts
@@ -393,6 +406,7 @@ llmc nuke --all --yes 2>/dev/null || true
 
 This test validates a critical safety mechanism. Without failure spiral
 prevention, the overseer could:
+
 - Exhaust API quotas with repeated Claude calls
 - Fill disk with remediation logs
 - Create system instability with rapid process cycling

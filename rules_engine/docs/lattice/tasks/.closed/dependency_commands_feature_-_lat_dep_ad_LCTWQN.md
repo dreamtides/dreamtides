@@ -7,22 +7,27 @@ priority: 1
 labels:
 - lattice
 created-at: 2026-01-19T20:04:54.001404Z
-updated-at: 2026-01-19T20:07:05.882323Z
+updated-at: 2026-01-21T22:31:38.488857Z
 closed-at: 2026-01-19T20:07:05.882323Z
 ---
 
 ## Goal
 
 Implement the `lat dep` subcommands for managing task dependencies:
+
 - `lat dep add` - Add a dependency relationship
 - `lat dep remove` - Remove a dependency relationship
 - `lat dep tree` - Display dependency tree visualization
 
 ## References
 
-- Feature specification: @rules_engine/docs/lattice/lattice_implementation_plan.md (Feature: Dependency Commands)
-- CLI specification: @rules_engine/docs/lattice/appendix_cli_structure.md (lat dep commands)
-- Task tracking: @rules_engine/docs/lattice/appendix_task_tracking.md (Dependencies section)
+- Feature specification:
+  @rules_engine/docs/lattice/lattice_implementation_plan.md (Feature: Dependency
+  Commands)
+- CLI specification: @rules_engine/docs/lattice/appendix_cli_structure.md (lat
+  dep commands)
+- Task tracking: @rules_engine/docs/lattice/appendix_task_tracking.md
+  (Dependencies section)
 
 ## Dependencies
 

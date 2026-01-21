@@ -1,5 +1,5 @@
 ---
-lattice-id: LCFWQN
+lattice-id: LIAWQN
 name: test-scenario-source-repository-dirty-ba
 description: 'Test Scenario: Source Repository Dirty Backoff'
 parent-id: LB5WQN
@@ -12,9 +12,9 @@ labels:
 - auto-mode
 - dirty-repo
 blocked-by:
-- LCEWQN
+- LH7WQN
 created-at: 2026-01-21T22:03:45.116204Z
-updated-at: 2026-01-21T22:03:45.116204Z
+updated-at: 2026-01-21T22:31:38.844656Z
 ---
 
 # Test Scenario: Source Repository Dirty Backoff
@@ -35,6 +35,7 @@ of immediate shutdown.
 ## Differentiating Errors from Normal Operations
 
 **Error indicators:**
+
 - Daemon crashes when source repo is dirty
 - No backoff retry (immediate failure)
 - Backoff state not persisted across daemon restarts
@@ -42,6 +43,7 @@ of immediate shutdown.
 - Incorrect backoff timing (not exponential)
 
 **Normal operations (expected in this test):**
+
 - Message: "Source repository has uncommitted changes. Will retry in N seconds."
 - Exponential backoff: 60s → 120s → 240s → ...
 - Daemon continues running during backoff
@@ -110,19 +112,20 @@ cd ~/llmc
 for i in {1..60}; do
     STATUS=$(llmc status --json 2>/dev/null | jq -r '.workers[] | select(.name == "auto-1") | .status' 2>/dev/null)
     echo "Worker status: $STATUS"
-    
+
     # Check daemon output for backoff message
     cat ~/llmc/logs/auto.log 2>/dev/null | grep -i "uncommitted\|retry\|backoff" | tail -3
-    
+
     if [ "$STATUS" = "needs_review" ]; then
         echo "Worker ready for accept - should trigger dirty repo check"
     fi
-    
+
     sleep 5
 done
 ```
 
 **Verify**:
+
 - Daemon detects uncommitted changes
 - Daemon logs "Source repository has uncommitted changes" message
 - Daemon does NOT shut down
@@ -138,18 +141,19 @@ echo "Monitoring backoff intervals (this takes several minutes)..."
 
 for i in {1..20}; do
     cat ~/llmc/logs/auto.log 2>/dev/null | grep -i "retry in" | tail -5
-    
+
     # Check if daemon still running
     if ! kill -0 $DAEMON_PID 2>/dev/null; then
         echo "ERROR: Daemon terminated unexpectedly"
         break
     fi
-    
+
     sleep 30
 done
 ```
 
 **Verify**:
+
 - First retry: ~60 seconds
 - Second retry: ~120 seconds (2x)
 - Intervals double each time
@@ -162,6 +166,7 @@ cat ~/llmc/state.json | jq '.source_repo_dirty_retry_after_unix, .source_repo_di
 ```
 
 **Verify**:
+
 - `source_repo_dirty_retry_after_unix` is set (future timestamp)
 - `source_repo_dirty_backoff_secs` shows current backoff value
 
@@ -184,17 +189,18 @@ cd ~/llmc
 for i in {1..60}; do
     STATUS=$(llmc status --json 2>/dev/null | jq -r '.workers[] | select(.name == "auto-1") | .status' 2>/dev/null)
     echo "Worker status: $STATUS"
-    
+
     if [ "$STATUS" = "idle" ]; then
         echo "Worker returned to idle - accept succeeded!"
         break
     fi
-    
+
     sleep 5
 done
 ```
 
 **Verify**:
+
 - Accept succeeds after source repo is clean
 - Worker returns to idle state
 - File exists in master repo
@@ -206,6 +212,7 @@ cat ~/llmc/state.json | jq '.source_repo_dirty_retry_after_unix, .source_repo_di
 ```
 
 **Verify**:
+
 - Backoff fields are null/cleared
 - Ready for normal operation
 
@@ -260,6 +267,7 @@ fi
 ```
 
 **Verify**:
+
 - Backoff state survives daemon restart
 - Doesn't reset to initial 60s value
 
@@ -273,10 +281,12 @@ cat ~/llmc/state.json | jq '.source_repo_dirty_backoff_secs'
 ```
 
 **Note**: This test is time-consuming. For practical testing:
+
 - Verify the backoff math in code review
 - Or let daemon run for extended period and check max value
 
 **Verify**:
+
 - Backoff caps at 3600 seconds (1 hour)
 - Does not continue doubling beyond cap
 
@@ -330,6 +340,7 @@ cat ~/llmc/state.json | jq '.source_repo_dirty_retry_after_unix, .source_repo_di
 ```
 
 **Verify**:
+
 - NoChanges completion clears any backoff state
 - Daemon ready for next task
 
@@ -368,6 +379,7 @@ llmc nuke --all --yes 2>/dev/null || true
 ## Abort Conditions
 
 **Abort the test and file a task if:**
+
 - Daemon crashes when source repo is dirty
 - State file corruption from backoff state
 - Accept proceeds despite dirty repo

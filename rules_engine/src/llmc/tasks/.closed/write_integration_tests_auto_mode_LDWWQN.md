@@ -2,6 +2,7 @@
 lattice-id: LDWWQN
 name: write-integration-tests-auto-mode
 description: Write integration tests for auto mode
+parent-id: LBSWQN
 task-type: task
 priority: 2
 labels:
@@ -13,13 +14,14 @@ blocked-by:
 - LDTWQN
 - LDRWQN
 created-at: 2026-01-21T04:03:13.156452Z
-updated-at: 2026-01-21T19:12:48.652150Z
+updated-at: 2026-01-21T22:31:38.789869Z
 closed-at: 2026-01-21T19:12:48.652150Z
 ---
 
 ## Overview
 
-Write integration tests that verify the auto mode functionality works correctly end-to-end.
+Write integration tests that verify the auto mode functionality works correctly
+end-to-end.
 
 ## Implementation Steps
 

@@ -3,7 +3,7 @@ lattice-id: LDBWQN
 name: auto-overseer-design
 description: Technical design for llmc auto mode and overseer command
 created-at: 2026-01-21T01:25:55.793081Z
-updated-at: 2026-01-21T01:25:55.793113Z
+updated-at: 2026-01-21T22:31:38.653047Z
 ---
 
 # Auto Mode and Overseer Technical Design
@@ -12,10 +12,13 @@ updated-at: 2026-01-21T01:25:55.793113Z
 
 This document specifies two new LLMC features for autonomous operation:
 
-- **`llmc up --auto`**: A daemon mode that autonomously assigns tasks to workers, accepts completed work, and shuts down gracefully on errors
-- **`llmc overseer`**: A higher-level supervisor that monitors the daemon, detects failures, and uses Claude Code to remediate issues
+- **`llmc up --auto`**: A daemon mode that autonomously assigns tasks to
+  workers, accepts completed work, and shuts down gracefully on errors
+- **`llmc overseer`**: A higher-level supervisor that monitors the daemon,
+  detects failures, and uses Claude Code to remediate issues
 
-These features transform LLMC from a human-in-the-loop system to a fully autonomous task execution pipeline.
+These features transform LLMC from a human-in-the-loop system to a fully
+autonomous task execution pipeline.
 
 ---
 
@@ -23,10 +26,14 @@ These features transform LLMC from a human-in-the-loop system to a fully autonom
 
 ### Behavioral Changes
 
-- Normal `llmc up` philosophy: "stay alive at all costs" - absorb errors, continue running
-- Auto mode philosophy: "execute graceful shutdown on any error" - preserve worktree state, terminate cleanly
-- Auto mode bypasses the human review step (`llmc review`); changes are accepted automatically
-- Auto workers are segregated from manual workers in status display and cannot receive `llmc start` tasks
+- Normal `llmc up` philosophy: "stay alive at all costs" - absorb errors,
+  continue running
+- Auto mode philosophy: "execute graceful shutdown on any error" - preserve
+  worktree state, terminate cleanly
+- Auto mode bypasses the human review step (`llmc review`); changes are accepted
+  automatically
+- Auto workers are segregated from manual workers in status display and cannot
+  receive `llmc start` tasks
 
 ### Configuration
 
@@ -34,25 +41,31 @@ These features transform LLMC from a human-in-the-loop system to a fully autonom
 
 - `task_pool_command` (required)
   - Shell command that prints a new task description to stdout
-  - The command is responsible for tracking task state; LLMC does not mark tasks as claimed
-  - Expectation: subsequent invocations return different tasks (command manages its own queue)
+  - The command is responsible for tracking task state; LLMC does not mark tasks
+    as claimed
+  - Expectation: subsequent invocations return different tasks (command manages
+    its own queue)
   - Exit code 0 with empty stdout: no tasks available, daemon waits
   - Exit code non-zero: error condition, triggers shutdown
-  - Command runs in caller's shell environment ($PATH, working directory, env vars)
+  - Command runs in caller's shell environment ($PATH, working directory, env
+    vars)
   - Stdout logged to `logs/task_pool.log`
 
 - `concurrency` (optional, default: 1)
   - Number of auto workers to run simultaneously
-  - Auto workers are created on demand if they don't exist (named `auto-1`, `auto-2`, etc.)
+  - Auto workers are created on demand if they don't exist (named `auto-1`,
+    `auto-2`, etc.)
 
 - `post_accept_command` (optional)
-  - Shell command invoked after successfully rebasing a worker's changes onto master
+  - Shell command invoked after successfully rebasing a worker's changes onto
+    master
   - May be long-running (tests, validation, deployment)
   - Daemon blocks until completion before proceeding
   - Exit code non-zero: error condition, triggers shutdown
   - Stdout logged to `logs/post_accept.log`
 
-- Inherits all `[defaults]` options (model, skip_permissions, allowed_tools, etc.)
+- Inherits all ` [defaults] ` options (model, skip_permissions, allowed_tools,
+  etc.)
   - Per-worker overrides not supported for auto workers
 
 #### CLI Flags
@@ -82,7 +95,8 @@ These features transform LLMC from a human-in-the-loop system to a fully autonom
 #### Command Restrictions
 
 - `llmc start` rejects auto workers with clear error message
-- All other commands work normally: `attach`, `peek`, `reset`, `nuke`, `pick`, etc.
+- All other commands work normally: `attach`, `peek`, `reset`, `nuke`, `pick`,
+  etc.
 - `llmc nuke --all` removes auto workers; `llmc reset --all` resets them
 
 ### Daemon Loop
@@ -127,10 +141,14 @@ These features transform LLMC from a human-in-the-loop system to a fully autonom
 Two categories of errors:
 
 **Transient failures** (patrol attempts automatic recovery):
-- Worker Claude Code crashes → patrol restarts session (up to 2 retries with backoff)
+
+- Worker Claude Code crashes → patrol restarts session (up to 2 retries with
+  backoff)
 - TMUX session disappears → patrol recreates session
-- Source repository has uncommitted changes → exponential backoff retry (see below)
-- Rebase conflict during accept → worker transitions to `rebasing`, resolves conflict, accept retried
+- Source repository has uncommitted changes → exponential backoff retry (see
+  below)
+- Rebase conflict during accept → worker transitions to `rebasing`, resolves
+  conflict, accept retried
 - If patrol recovery succeeds, daemon continues normally
 - If patrol retries exhausted → escalates to hard failure
 
@@ -145,12 +163,14 @@ shut down. Instead, it implements exponential backoff:
 - Maximum backoff: 1 hour
 - Backoff state is persisted in `state.json` to survive daemon restarts
 - On successful accept or NoChanges, backoff state is cleared
-- Prints message to stdout: "Source repository has uncommitted changes. Will retry in N seconds."
+- Prints message to stdout: "Source repository has uncommitted changes. Will
+  retry in N seconds."
 
 This allows the daemon to continue running while a developer commits or stashes
 their changes in the source repository.
 
 **Hard failures** (immediate shutdown):
+
 - `task_pool_command` returns non-zero
 - `post_accept_command` returns non-zero
 - Worker enters error state (after patrol retries exhausted)
@@ -159,6 +179,7 @@ their changes in the source repository.
 - Hook IPC failures
 
 Shutdown sequence for hard failures:
+
 - Log detailed error with context (worker, state, command output)
 - Set `shutdown_requested` flag
 - Allow current operations to drain (with timeout)
@@ -180,8 +201,10 @@ Shutdown sequence for hard failures:
 - New dedicated log files:
   - `logs/task_pool.log`: All task pool command invocations and output
   - `logs/post_accept.log`: All post accept command invocations and output
-  - `logs/auto.log`: Auto-specific daemon events (task assignments, accepts, errors)
-- Each log entry includes timestamp, worker name (if applicable), and full command output
+  - `logs/auto.log`: Auto-specific daemon events (task assignments, accepts,
+    errors)
+- Each log entry includes timestamp, worker name (if applicable), and full
+  command output
 
 ---
 
@@ -190,7 +213,8 @@ Shutdown sequence for hard failures:
 ### Behavioral Overview
 
 - Long-running supervisor process that manages the entire auto pipeline
-- Starts daemon, monitors health, terminates on failure, remediates via Claude Code
+- Starts daemon, monitors health, terminates on failure, remediates via Claude
+  Code
 - Designed for unattended multi-day operation
 - Single point of control for autonomous LLMC operation
 - Terminated via Ctrl-C
@@ -299,14 +323,17 @@ When failure detected:
    - Git status summary
 
 3. Append recovery instructions:
-   - "After fixing the issue, exit normally. The overseer will restart the daemon."
-   - "If the issue cannot be fixed, create a file `.llmc/manual_intervention_needed_<timestamp>.txt` with explanation."
+   - "After fixing the issue, exit normally. The overseer will restart the
+     daemon."
+   - "If the issue cannot be fixed, create a file
+     `.llmc/manual_intervention_needed_<timestamp>.txt` with explanation."
 
 #### Remediation Execution
 
 1. Send `/clear` to overseer Claude Code session
 2. Send constructed prompt
-3. Monitor for completion via hooks (same mechanism as worker completion detection)
+3. Monitor for completion via hooks (same mechanism as worker completion
+   detection)
 4. Wait for Claude Code to exit its task
 
 #### Remediation Logging
@@ -339,7 +366,8 @@ When failure detected:
   - Overseer terminates with detailed error message
   - Human intervention required
 
-- Rationale: Some failures are not code-fixable (disk full, network down, API limits)
+- Rationale: Some failures are not code-fixable (disk full, network down, API
+  limits)
 - Prevents infinite loop of remediation attempts
 
 ### TMUX Session Protection
@@ -375,6 +403,7 @@ When failure detected:
 ## Failure Scenarios & Mitigation
 
 Recovery classification:
+
 - **AUTO**: System recovers automatically without external intervention
 - **AI**: Overseer invokes Claude Code remediation
 - **HUMAN**: Requires human intervention; overseer terminates
@@ -445,7 +474,9 @@ Recovery classification:
 | AI | 16 | Repeated crashes, severe conflicts, config errors, most operational failures |
 | HUMAN | 6 | Resource exhaustion, network, failure spirals |
 
-**Design principle:** Patrol handles transient failures automatically. AI remediation for persistent operational issues. Human intervention only for external/environmental issues or failure spirals.
+**Design principle:** Patrol handles transient failures automatically. AI
+remediation for persistent operational issues. Human intervention only for
+external/environmental issues or failure spirals.
 
 ---
 
@@ -457,15 +488,18 @@ Recovery classification:
 - Add `auto_workers: Vec<String>` to track which workers are auto-managed
 - Add `overseer_active: bool` to indicate overseer presence
 - Add `last_task_completion_unix: Option<u64>` for stall detection
-- Add `source_repo_dirty_retry_after_unix: Option<u64>` for source repo dirty backoff timing
-- Add `source_repo_dirty_backoff_secs: Option<u64>` for current backoff value (60s, 120s, ...)
+- Add `source_repo_dirty_retry_after_unix: Option<u64>` for source repo dirty
+  backoff timing
+- Add `source_repo_dirty_backoff_secs: Option<u64>` for current backoff value
+  (60s, 120s, ...)
 
 ### New Files in `.llmc/`
 
 - `daemon.json`: Daemon registration (pid, start_time, instance_id, log_file)
 - `auto.heartbeat`: Heartbeat file (timestamp, instance_id)
 - `overseer.json`: Overseer registration (similar to daemon.json)
-- `manual_intervention_needed_<timestamp>.txt`: Created by remediation if unfixable
+- `manual_intervention_needed_<timestamp>.txt`: Created by remediation if
+  unfixable
 
 ### Module Structure
 
@@ -524,8 +558,10 @@ to edit the master repository instead of the worktree.
 LLMC creates a unique Serena project for each worktree:
 
 1. **On worker creation** (`llmc add`, auto worker creation):
-   - Creates `.serena/project.yml` with unique `project_name: "dreamtides-{worker}"`
-   - Registers the worktree path in Serena's global config (`~/.serena/serena_config.yml`)
+   - Creates `.serena/project.yml` with unique `project_name:
+     "dreamtides-{worker}"`
+   - Registers the worktree path in Serena's global config
+     (`~/.serena/serena_config.yml`)
 
 2. **On worker reset** (after task completion in auto mode):
    - Recreates `.serena/project.yml` for the fresh worktree
@@ -536,14 +572,18 @@ worktree project rather than the master repository.
 
 ### Implementation Details
 
-- `create_serena_project()` in `commands/add.rs` creates the `.serena/project.yml`
-- `register_serena_project()` adds the worktree path to Serena's global `projects:` list
-- `reset_worker_to_idle()` in `auto_mode/auto_accept.rs` calls `create_serena_project()`
+- `create_serena_project()` in `commands/add.rs` creates the
+  `.serena/project.yml`
+- `register_serena_project()` adds the worktree path to Serena's global
+  `projects:` list
+- `reset_worker_to_idle()` in `auto_mode/auto_accept.rs` calls
+  `create_serena_project()`
   after recreating the worktree
 
 ### Troubleshooting
 
-If you see uncommitted changes in the master repository that match worktree commits:
+If you see uncommitted changes in the master repository that match worktree
+commits:
 
 1. Check if the worktree has a `.serena/project.yml` file
 2. Verify the project is registered in `~/.serena/serena_config.yml`

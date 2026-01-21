@@ -1,12 +1,12 @@
 ---
-lattice-id: LBVWQN
+lattice-id: LRNWQN
 name: architecture-comparison
 description: |-
   Comparison of current dual-repository LLMC architecture vs new unified
   worktree architecture with diagrams.
-parent-id: LBUWQN
+parent-id: LRMWQN
 created-at: 2026-01-19T05:00:00Z
-updated-at: 2026-01-19T05:08:18.073587Z
+updated-at: 2026-01-21T22:38:24.838425Z
 ---
 
 # Architecture Comparison

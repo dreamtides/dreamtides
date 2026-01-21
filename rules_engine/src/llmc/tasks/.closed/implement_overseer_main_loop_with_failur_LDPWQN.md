@@ -2,6 +2,7 @@
 lattice-id: LDPWQN
 name: implement-overseer-main-loop-with-failur
 description: Implement overseer main loop with failure spiral detection
+parent-id: LBSWQN
 task-type: feature
 priority: 1
 labels:
@@ -17,13 +18,14 @@ blocked-by:
 - LDMWQN
 - LDOWQN
 created-at: 2026-01-21T04:02:14.885465Z
-updated-at: 2026-01-21T15:17:24.013710Z
+updated-at: 2026-01-21T22:31:38.743177Z
 closed-at: 2026-01-21T15:17:24.013710Z
 ---
 
 ## Overview
 
-Implement the main overseer loop that monitors the daemon, triggers remediation on failures, and prevents infinite failure spirals.
+Implement the main overseer loop that monitors the daemon, triggers remediation
+on failures, and prevents infinite failure spirals.
 
 ## Implementation Steps
 

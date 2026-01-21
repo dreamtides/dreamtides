@@ -2,6 +2,7 @@
 lattice-id: LDKWQN
 name: implement-overseer-claude-code-session-m
 description: Implement overseer Claude Code session management
+parent-id: LBSWQN
 task-type: feature
 priority: 1
 labels:
@@ -16,13 +17,14 @@ blocked-by:
 - LDDWQN
 - LDIWQN
 created-at: 2026-01-21T04:01:28.826051Z
-updated-at: 2026-01-21T13:48:48.596304Z
+updated-at: 2026-01-21T22:31:38.737166Z
 closed-at: 2026-01-21T13:48:48.596304Z
 ---
 
 ## Overview
 
-Implement management of the dedicated Claude Code session used by the overseer for remediation tasks.
+Implement management of the dedicated Claude Code session used by the overseer
+for remediation tasks.
 
 ## Implementation Steps
 
@@ -33,7 +35,8 @@ Implement management of the dedicated Claude Code session used by the overseer f
 
 2. **Session creation**:
    - Create TMUX session if it doesn't exist
-   - Start Claude Code with standard flags (model from config, skip_permissions, etc.)
+   - Start Claude Code with standard flags (model from config, skip_permissions,
+     etc.)
    - Set environment variables for identification (LLMC_OVERSEER=true)
    - Use wide terminal width to prevent truncation
 

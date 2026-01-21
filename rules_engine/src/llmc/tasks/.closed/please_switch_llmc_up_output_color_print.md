@@ -2,13 +2,15 @@
 lattice-id: LBUWQN
 name: please-switch-llmc-up-output-color-print
 description: Please switch llmc up output color printed lines using AYU theme eg when task is assigned when it is completed etc
+parent-id: LBSWQN
 task-type: feature
 priority: 1
 created-at: 2026-01-21T13:58:01.019598Z
-updated-at: 2026-01-21T13:58:46.531251Z
+updated-at: 2026-01-21T22:38:24.924152Z
 ---
 
-Please switch `llmc up` output to color printed lines using the AYU theme, e.g. when a task is assigned, when it is completed, etc:
+Please switch `llmc up` output to color printed lines using the AYU theme, e.g.
+when a task is assigned, when it is completed, etc:
 
 /// Green for success states (Ayu green)
 pub const AYU_SUCCESS: Rgb = Rgb(149, 230, 203);

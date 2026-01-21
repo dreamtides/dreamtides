@@ -2,6 +2,7 @@
 lattice-id: LCCWQN
 name: test-scenario-document-creation-basic-op
 description: 'Test Scenario: Document Creation and Basic Operations'
+parent-id: LCEWQN
 task-type: task
 priority: 2
 labels:
@@ -9,7 +10,7 @@ labels:
 - manual-test
 - scenario
 created-at: 2026-01-20T06:13:20.569307Z
-updated-at: 2026-01-20T06:13:20.569307Z
+updated-at: 2026-01-21T22:31:38.516841Z
 ---
 
 # Test Scenario: Document Creation and Basic Operations
@@ -45,6 +46,7 @@ lat create api/api.md "API System Root"
 ```
 
 **Verify**:
+
 - File exists at `api/api.md`
 - Frontmatter has `lattice-id`, `name: api`, `description: API System Root`
 - No `task-type` or `priority` fields (this is a knowledge base document)
@@ -57,6 +59,7 @@ lat show <id-from-step-1.1>
 ```
 
 **Verify**:
+
 - Output shows `<id>: api - API System Root`
 - Type shows as `[doc]` not a task type
 
@@ -69,8 +72,10 @@ lat create api/ "Fix authentication token expiry" -t bug -p 1
 ```
 
 **Verify**:
+
 - File created in `api/tasks/` directory (NOT `api/`)
-- Filename is auto-generated from description (e.g., `fix_authentication_token_expiry.md`)
+- Filename is auto-generated from description (e.g.,
+  `fix_authentication_token_expiry.md`)
 - `task-type: bug` in frontmatter
 - `priority: 1` in frontmatter
 - `parent-id` references the api root document ID from Step 1.1
@@ -83,6 +88,7 @@ lat create api/ "Add OAuth 2.0 support" -t feature -p 2 -l auth,security
 ```
 
 **Verify**:
+
 - File in `api/tasks/`
 - `task-type: feature`
 - `priority: 2`
@@ -96,6 +102,7 @@ lat create api/ "Write unit tests for auth module" -t task -p 3
 ```
 
 **Verify**:
+
 - `task-type: task`
 - `priority: 3`
 
@@ -106,6 +113,7 @@ lat create api/ "Update dependencies" -t chore -p 4
 ```
 
 **Verify**:
+
 - `task-type: chore`
 - `priority: 4` (backlog)
 
@@ -118,6 +126,7 @@ lat create api/ "OAuth 2.0 implementation design"
 ```
 
 **Verify**:
+
 - File created in `api/docs/` directory (NOT `api/tasks/`)
 - No `task-type` field
 - No `priority` field
@@ -132,6 +141,7 @@ lat show <bug-task-id> --short
 ```
 
 **Verify**:
+
 - Single line output
 - Format: `<id> [open] P1 bug: <name> - <description>`
 
@@ -142,8 +152,10 @@ lat show <bug-task-id> --json
 ```
 
 **Verify**:
+
 - Valid JSON output
-- Contains all expected fields: `id`, `name`, `description`, `state`, `priority`,
+- Contains all expected fields: `id`, `name`, `description`, `state`,
+  `priority`,
   `task_type`, `created_at`, `path`, `parent`
 - `state` is `"open"`
 
@@ -154,6 +166,7 @@ lat show <bug-id> <feature-id> <kb-doc-id>
 ```
 
 **Verify**:
+
 - All three documents displayed
 - Separated by blank lines
 
@@ -164,6 +177,7 @@ lat show <bug-task-id> --peek
 ```
 
 **Verify**:
+
 - Condensed two-line output
 - Shows parent and counts
 
@@ -176,6 +190,7 @@ lat list
 ```
 
 **Verify**:
+
 - Shows all created documents (root, tasks, kb doc)
 - Does not show closed tasks (none exist yet)
 
@@ -186,6 +201,7 @@ lat list --type bug
 ```
 
 **Verify**:
+
 - Only shows the bug task
 
 **Step 5.3**: List by path prefix.
@@ -195,6 +211,7 @@ lat list --path api/tasks/
 ```
 
 **Verify**:
+
 - Only shows tasks, not the root or kb document
 
 ### Part 6: Edge Cases
@@ -206,6 +223,7 @@ lat create api/ "This is a very long description that should be truncated when g
 ```
 
 **Verify**:
+
 - Filename is truncated to reasonable length (~40 chars)
 - Full description preserved in frontmatter
 
@@ -216,6 +234,7 @@ lat create api/ "Fix bug: user's data isn't saved (issue #123)" -t bug
 ```
 
 **Verify**:
+
 - Filename sanitizes special characters
 - Description preserved exactly
 
@@ -226,6 +245,7 @@ lat create nonexistent/ "Some task" -t task
 ```
 
 **Verify**:
+
 - Command fails with appropriate error
 - Exit code is 3 (user error)
 
@@ -238,6 +258,7 @@ git status
 ```
 
 **Verify**:
+
 - All `.md` files are committed
 - `.lattice/` directory contents are tracked appropriately
 
@@ -250,6 +271,7 @@ lat stats
 ```
 
 **Verify**:
+
 - Shows document counts by type
 - Shows counts by priority
 - Shows counts by state (all should be "open")
@@ -263,8 +285,10 @@ rm -rf "$TEST_DIR"
 
 ## Expected Issues to Report
 
-Report any of the following as bugs using the `lattice_create_task()` MCP tool with
-directory `rules_engine/src/lattice/tasks/qa/` (the full path including `/qa/` is required):
+Report any of the following as bugs using the `lattice_create_task()` MCP tool
+with
+directory `rules_engine/src/lattice/tasks/qa/` (the full path including `/qa/`
+is required):
 
 1. Files created in wrong directory (tasks in docs/, docs in tasks/)
 2. Missing or incorrect frontmatter fields

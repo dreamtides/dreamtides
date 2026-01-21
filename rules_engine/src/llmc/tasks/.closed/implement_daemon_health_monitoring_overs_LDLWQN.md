@@ -2,6 +2,7 @@
 lattice-id: LDLWQN
 name: implement-daemon-health-monitoring-overs
 description: Implement daemon health monitoring for overseer
+parent-id: LBSWQN
 task-type: feature
 priority: 1
 labels:
@@ -16,13 +17,14 @@ blocked-by:
 - LDFWQN
 - LDKWQN
 created-at: 2026-01-21T04:01:29.130792Z
-updated-at: 2026-01-21T14:01:40.009797Z
+updated-at: 2026-01-21T22:31:38.718344Z
 closed-at: 2026-01-21T14:01:40.009797Z
 ---
 
 ## Overview
 
-Implement the health monitoring system that the overseer uses to detect daemon failures.
+Implement the health monitoring system that the overseer uses to detect daemon
+failures.
 
 ## Implementation Steps
 
@@ -55,7 +57,8 @@ Implement the health monitoring system that the overseer uses to detect daemon f
 
 6. **Health check aggregation**:
    - `check_daemon_health() -> HealthStatus`
-   - HealthStatus enum: Healthy, ProcessGone, HeartbeatStale, LogError(String), Stalled, IdentityMismatch
+   - HealthStatus enum: Healthy, ProcessGone, HeartbeatStale, LogError(String),
+     Stalled, IdentityMismatch
    - Return first detected failure (priority order)
 
 ## Acceptance Criteria

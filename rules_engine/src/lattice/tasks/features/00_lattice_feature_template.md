@@ -2,8 +2,9 @@
 lattice-id: LBWWQN
 name: 00-lattice-feature-template
 description: task template for lattice features
+parent-id: LCEWQN
 created-at: 2026-01-21T17:00:09.704290Z
-updated-at: 2026-01-21T17:00:09.704313Z
+updated-at: 2026-01-21T22:31:38.534818Z
 ---
 
 # [Lattice] Context
@@ -28,8 +29,11 @@ When complete, please:
 ## Code Style
 
 Follow all rules in AGENTS.md. Key project-specific conventions:
-- Function calls and enum values: exactly one qualifier (e.g., `move_card::run()`)
-- Struct/enum type names: zero qualifiers (e.g., `BattleState`, not `battle::BattleState`)
+
+- Function calls and enum values: exactly one qualifier (e.g.,
+  `move_card::run()`)
+- Struct/enum type names: zero qualifiers (e.g., `BattleState`, not
+  `battle::BattleState`)
 - No `pub use` declarations
 - No code in `mod.rs`/`lib.rs` except module declarations
 - No `use` declarations inside function bodies
@@ -39,6 +43,7 @@ Follow all rules in AGENTS.md. Key project-specific conventions:
 Review your work against @rules_engine/docs/lattice/appendix_code_review.md.
 
 Critical points:
+
 - Expected errors → `LatticeError`; system errors → `panic!` with reason
 - Write high-quality, non duplicative tests
 - Create high-quality, useful logs via `tracing`

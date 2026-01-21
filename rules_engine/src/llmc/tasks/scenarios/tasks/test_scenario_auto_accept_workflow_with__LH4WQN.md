@@ -1,5 +1,5 @@
 ---
-lattice-id: LCBWQN
+lattice-id: LH4WQN
 name: test-scenario-auto-accept-workflow-with-
 description: 'Test Scenario: Auto Accept Workflow with Rebase and Squash'
 parent-id: LB5WQN
@@ -12,17 +12,18 @@ labels:
 - auto-mode
 - accept
 blocked-by:
-- LCAWQN
+- LH3WQN
 created-at: 2026-01-21T22:00:37.426141Z
-updated-at: 2026-01-21T22:00:37.426141Z
+updated-at: 2026-01-21T22:31:38.801638Z
 ---
 
 # Test Scenario: Auto Accept Workflow with Rebase and Squash
 
 ## Objective
 
-Verify that the auto accept workflow correctly rebases worker changes onto master,
-squashes multiple commits into a single commit, strips agent attribution, and 
+Verify that the auto accept workflow correctly rebases worker changes onto
+master,
+squashes multiple commits into a single commit, strips agent attribution, and
 performs a fast-forward merge.
 
 ## Prerequisites
@@ -35,14 +36,17 @@ performs a fast-forward merge.
 ## Differentiating Errors from Normal Operations
 
 **Error indicators:**
+
 - Rebase failures that trigger daemon shutdown
 - Non-fast-forward merges (merge commits in history)
-- Attribution markers remaining in commit messages ("Generated with", "Co-Authored-By")
+- Attribution markers remaining in commit messages ("Generated with",
+  "Co-Authored-By")
 - Multiple commits per task in master history
 - Worker not reset to idle after accept
 - Git lock errors persisting after retries
 
 **Normal operations:**
+
 - Temporary rebase-in-progress state during accept
 - Brief delay while squashing commits
 - Worker transitioning through needs_review before auto-accept
@@ -66,7 +70,7 @@ if [ ! -f "$MARKER" ]; then
 Create a feature that involves multiple commits:
 1. First, create a file called accept_test_part1.txt with content "Part 1"
 2. Commit that change with message "Add part 1"
-3. Then create a file called accept_test_part2.txt with content "Part 2"  
+3. Then create a file called accept_test_part2.txt with content "Part 2"
 4. Commit that change with message "Add part 2"
 5. Finally create accept_test_combined.txt with content "Combined feature"
 6. Commit that with message "Add combined"
@@ -115,11 +119,11 @@ sleep 30
 for i in {1..60}; do
     WORKER_STATUS=$(llmc status --json 2>/dev/null | jq -r '.workers[] | select(.name == "auto-1") | .status' 2>/dev/null)
     echo "Worker status: $WORKER_STATUS"
-    
+
     # Check commits in worktree
     cd ~/llmc/.worktrees/auto-1 2>/dev/null && git log --oneline -5 2>/dev/null
     cd ~/llmc
-    
+
     if [ "$WORKER_STATUS" = "idle" ]; then
         echo "Task completed"
         break
@@ -129,6 +133,7 @@ done
 ```
 
 **Verify**:
+
 - Worker creates multiple commits during task
 - Worker transitions through working → needs_review → idle
 
@@ -142,6 +147,7 @@ git log --oneline -10
 ```
 
 **Verify**:
+
 - Only ONE new commit since $MASTER_HEAD_BEFORE
 - Multiple worker commits squashed into single commit
 - Commit message is reasonable (not "Add part 1\nAdd part 2\nAdd combined")
@@ -156,6 +162,7 @@ cat accept_test_combined.txt
 ```
 
 **Verify**:
+
 - All 3 files exist
 - Content is correct
 - All in single commit
@@ -169,6 +176,7 @@ git log -1 --format="%B"
 ```
 
 **Verify**:
+
 - No "Generated with Claude" or similar
 - No "Co-Authored-By: Claude" or similar
 - Clean commit message
@@ -180,6 +188,7 @@ git log -1 --format="%an <%ae>"
 ```
 
 **Verify**:
+
 - Author is NOT "Claude" or similar
 - Author matches repository configuration
 
@@ -193,6 +202,7 @@ git log --oneline $MASTER_HEAD_BEFORE..HEAD
 ```
 
 **Verify**:
+
 - Linear history (no merge commits)
 - Only new commits from auto worker
 
@@ -203,6 +213,7 @@ git branch -a | grep "llmc/auto-1" || echo "Branch correctly deleted"
 ```
 
 **Verify**:
+
 - No `llmc/auto-1` branch exists after accept
 
 ### Part 5: Worker Reset Verification
@@ -214,6 +225,7 @@ llmc status
 ```
 
 **Verify**:
+
 - Worker `auto-1` is in `idle` state
 - Worker has fresh worktree
 - No pending task
@@ -229,6 +241,7 @@ git log -1 --oneline
 ```
 
 **Verify**:
+
 - Worktree is clean (no uncommitted changes)
 - Worktree HEAD matches master HEAD
 
@@ -241,6 +254,7 @@ cat ~/llmc/logs/auto.log | grep -i "accept\|rebase\|squash\|merge" | tail -20
 ```
 
 **Verify**:
+
 - Log shows rebase operation
 - Log shows squash operation
 - Log shows successful merge
@@ -285,6 +299,7 @@ llmc nuke --all --yes 2>/dev/null || true
 ## Abort Conditions
 
 **Abort the test and file a task if:**
+
 - Accept corrupts git history
 - Worker gets stuck in needs_review indefinitely
 - Daemon crashes during accept

@@ -1,10 +1,10 @@
 ---
-lattice-id: LBXWQN
+lattice-id: LRPWQN
 name: configuration-changes
 description: New configuration schema and resolution logic for unified LLMC architecture.
-parent-id: LBUWQN
+parent-id: LRMWQN
 created-at: 2026-01-19T05:00:00Z
-updated-at: 2026-01-19T05:08:18.096166Z
+updated-at: 2026-01-21T22:38:24.854913Z
 ---
 
 # Configuration Changes

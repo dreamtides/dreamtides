@@ -2,6 +2,7 @@
 lattice-id: LDXWQN
 name: write-integration-tests-overseer
 description: Write integration tests for overseer
+parent-id: LBSWQN
 task-type: task
 priority: 2
 labels:
@@ -12,7 +13,7 @@ blocked-by:
 - LDPWQN
 - LDRWQN
 created-at: 2026-01-21T04:03:13.357144Z
-updated-at: 2026-01-21T19:14:12.283967Z
+updated-at: 2026-01-21T22:31:38.795461Z
 closed-at: 2026-01-21T19:14:12.283967Z
 ---
 

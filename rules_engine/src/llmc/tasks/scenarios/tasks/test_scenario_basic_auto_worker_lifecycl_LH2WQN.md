@@ -1,5 +1,5 @@
 ---
-lattice-id: LB7WQN
+lattice-id: LH2WQN
 name: test-scenario-basic-auto-worker-lifecycl
 description: 'Test Scenario: Basic Auto Worker Lifecycle'
 parent-id: LB5WQN
@@ -11,14 +11,15 @@ labels:
 - scenario
 - auto-mode
 created-at: 2026-01-21T21:59:20.029973Z
-updated-at: 2026-01-21T21:59:20.029973Z
+updated-at: 2026-01-21T22:31:38.813068Z
 ---
 
 # Test Scenario: Basic Auto Worker Lifecycle
 
 ## Objective
 
-Verify that auto mode correctly creates auto workers, assigns tasks from the task pool, 
+Verify that auto mode correctly creates auto workers, assigns tasks from the
+task pool,
 and handles task completion with automatic acceptance.
 
 ## Prerequisites
@@ -30,6 +31,7 @@ and handles task completion with automatic acceptance.
 ## Differentiating Errors from Normal Operations
 
 **Error indicators to watch for:**
+
 - Any `ERROR` or `WARN` messages in `~/llmc/logs/auto.log`
 - Non-zero exit codes from `llmc up --auto`
 - Workers in `error` state in `llmc status`
@@ -37,6 +39,7 @@ and handles task completion with automatic acceptance.
 - Daemon shutting down unexpectedly
 
 **Normal operations:**
+
 - Workers cycling through `idle` → `working` → `needs_review` → `idle`
 - Empty task pool causing workers to wait (not an error)
 - Self-review prompts being sent
@@ -86,8 +89,10 @@ sleep 5
 ```
 
 **Verify**:
+
 - Daemon starts without errors
-- `~/llmc/.llmc/daemon.json` exists and contains `pid`, `start_time_unix`, `instance_id`
+- `~/llmc/.llmc/daemon.json` exists and contains `pid`, `start_time_unix`,
+  `instance_id`
 - `~/llmc/.llmc/auto.heartbeat` exists and is being updated
 
 **Step 1.2**: Check auto worker creation.
@@ -97,6 +102,7 @@ llmc status
 ```
 
 **Verify**:
+
 - Auto worker `auto-1` exists
 - Status shows "Auto Workers" section
 - Worker is in `idle` or `working` state
@@ -118,6 +124,7 @@ done
 ```
 
 **Verify**:
+
 - Task was assigned to auto-1
 - Worker completed the task
 - Changes were automatically accepted (no manual `llmc review` needed)
@@ -132,6 +139,7 @@ cat test_auto_task.txt
 ```
 
 **Verify**:
+
 - File `test_auto_task.txt` exists in master repo
 - Contains "Hello from auto mode"
 
@@ -144,6 +152,7 @@ cat ~/llmc/logs/auto.log | tail -50
 ```
 
 **Verify**:
+
 - Log contains task assignment event
 - Log contains task completion/accept event
 - No ERROR or WARN entries
@@ -155,6 +164,7 @@ cat ~/llmc/logs/task_pool.log | tail -20
 ```
 
 **Verify**:
+
 - Shows task pool command invocations
 - Shows the task description that was returned
 
@@ -168,6 +178,7 @@ wait $DAEMON_PID 2>/dev/null
 ```
 
 **Verify**:
+
 - Daemon shuts down gracefully
 - Exit code is 0
 - Workers are stopped
@@ -206,6 +217,7 @@ llmc nuke --all --yes 2>/dev/null || true
 ## Abort Conditions
 
 **Abort the test and file a task if:**
+
 - Daemon crashes on startup
 - Auto worker creation fails
 - Task assignment hangs for more than 10 minutes

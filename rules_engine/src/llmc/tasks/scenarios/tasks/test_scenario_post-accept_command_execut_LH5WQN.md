@@ -1,5 +1,5 @@
 ---
-lattice-id: LCCWQN
+lattice-id: LH5WQN
 name: test-scenario-post-accept-command-execut
 description: 'Test Scenario: Post-Accept Command Execution'
 parent-id: LB5WQN
@@ -12,9 +12,9 @@ labels:
 - auto-mode
 - post-accept
 blocked-by:
-- LCBWQN
+- LH4WQN
 created-at: 2026-01-21T22:01:20.201938Z
-updated-at: 2026-01-21T22:01:20.201938Z
+updated-at: 2026-01-21T22:31:38.839311Z
 ---
 
 # Test Scenario: Post-Accept Command Execution
@@ -22,7 +22,8 @@ updated-at: 2026-01-21T22:01:20.201938Z
 ## Objective
 
 Verify that the `post_accept_command` configuration is correctly executed after
-a worker's changes are merged to master, that the daemon blocks until completion,
+a worker's changes are merged to master, that the daemon blocks until
+completion,
 and that failures trigger graceful shutdown.
 
 ## Prerequisites
@@ -35,6 +36,7 @@ and that failures trigger graceful shutdown.
 ## Differentiating Errors from Normal Operations
 
 **Error indicators:**
+
 - Post-accept command not executed
 - Daemon not blocking during post-accept execution
 - Non-zero exit from post-accept not triggering shutdown
@@ -42,6 +44,7 @@ and that failures trigger graceful shutdown.
 - Next task assigned before post-accept completes
 
 **Normal operations:**
+
 - Delay between accept and next task assignment (post-accept running)
 - Post-accept command output appearing in logs
 - Daemon blocking while post-accept runs
@@ -135,6 +138,7 @@ sleep 10
 ```
 
 **Verify**:
+
 - File `post_accept_test_1.txt` exists in master
 - Post-accept command was executed
 
@@ -145,6 +149,7 @@ cat ~/llmc/logs/post_accept.log
 ```
 
 **Verify**:
+
 - Log shows "Post-accept starting" message
 - Log shows "Running validation" message
 - Log shows "Validation passed" message
@@ -160,6 +165,7 @@ cat ~/llmc/logs/auto.log | grep -i "post.accept\|block\|wait" | tail -10
 ```
 
 **Verify**:
+
 - Log shows daemon waiting for post-accept completion
 - No new task assigned during post-accept execution
 
@@ -180,6 +186,7 @@ cat ~/llmc/logs/post_accept.log | grep "completed\|starting"
 ```
 
 **Verify**:
+
 - Second post-accept only starts after first completes
 - Time gap matches expected blocking behavior
 
@@ -219,6 +226,7 @@ done
 ```
 
 **Verify**:
+
 - Daemon shuts down after post-accept failure
 - Exit code is non-zero
 
@@ -230,6 +238,7 @@ cat ~/llmc/logs/post_accept.log | tail -10
 ```
 
 **Verify**:
+
 - Log shows post-accept failure
 - Log shows graceful shutdown initiated
 - Error details captured
@@ -277,6 +286,7 @@ done
 ```
 
 **Verify**:
+
 - Duration includes post-accept wait time (should be at least 30 seconds)
 - No next task assigned during wait
 
@@ -314,6 +324,7 @@ llmc nuke --all --yes 2>/dev/null || true
 ## Abort Conditions
 
 **Abort the test and file a task if:**
+
 - Post-accept script never invoked
 - Daemon crashes instead of graceful shutdown on failure
 - Post-accept has access to wrong repository

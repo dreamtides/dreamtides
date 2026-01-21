@@ -1,12 +1,12 @@
 ---
-lattice-id: LBZWQN
-parent-id: LBUWQN
+lattice-id: LRRWQN
 name: git-operation-safety
 description: |-
   Pre-operation checks, atomic operations, and worktree safety for unified
   architecture.
-created-at: 2026-01-19T05:00:00.000000Z
-updated-at: 2026-01-19T05:00:00.000000Z
+parent-id: LRMWQN
+created-at: 2026-01-19T05:00:00Z
+updated-at: 2026-01-21T22:38:24.870345Z
 ---
 
 # Git Operation Safety

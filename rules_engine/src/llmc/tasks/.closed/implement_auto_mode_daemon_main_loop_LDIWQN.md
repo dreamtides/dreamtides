@@ -2,6 +2,7 @@
 lattice-id: LDIWQN
 name: implement-auto-mode-daemon-main-loop
 description: Implement auto mode daemon main loop
+parent-id: LBSWQN
 task-type: feature
 priority: 1
 labels:
@@ -18,13 +19,14 @@ blocked-by:
 - LDHWQN
 - LDFWQN
 created-at: 2026-01-21T04:00:48.442009Z
-updated-at: 2026-01-21T05:51:22.412527Z
+updated-at: 2026-01-21T22:31:38.704819Z
 closed-at: 2026-01-21T05:51:22.412527Z
 ---
 
 ## Overview
 
-Implement the main orchestration loop for auto mode that coordinates task assignment, completion detection, and automatic acceptance.
+Implement the main orchestration loop for auto mode that coordinates task
+assignment, completion detection, and automatic acceptance.
 
 ## Implementation Steps
 

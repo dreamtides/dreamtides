@@ -1,12 +1,12 @@
 ---
 lattice-id: LB7WQN
-parent-id: LBUWQN
 name: logging-specification
 description: |-
   Log levels, structured log fields, and key operations to log for unified
   architecture.
-created-at: 2026-01-19T05:00:00.000000Z
-updated-at: 2026-01-19T05:00:00.000000Z
+parent-id: LRMWQN
+created-at: 2026-01-19T05:00:00Z
+updated-at: 2026-01-21T22:38:24.875705Z
 ---
 
 # Logging Specification

@@ -1,12 +1,12 @@
 ---
-lattice-id: LB3WQN
-parent-id: LBUWQN
+lattice-id: LRHWQN
 name: recovery-tools
 description: |-
   Doctor enhancements, salvage command, rescue command, and automatic
   self-healing in patrol.
-created-at: 2026-01-19T05:00:00.000000Z
-updated-at: 2026-01-19T05:00:00.000000Z
+parent-id: LRMWQN
+created-at: 2026-01-19T05:00:00Z
+updated-at: 2026-01-21T22:38:24.886942Z
 ---
 
 # Recovery Tools

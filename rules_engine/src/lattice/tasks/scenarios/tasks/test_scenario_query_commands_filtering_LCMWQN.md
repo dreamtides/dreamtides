@@ -2,6 +2,7 @@
 lattice-id: LCMWQN
 name: test-scenario-query-commands-filtering
 description: 'Test Scenario: Query Commands and Filtering'
+parent-id: LCEWQN
 task-type: task
 priority: 2
 labels:
@@ -9,12 +10,13 @@ labels:
 - manual-test
 - scenario
 created-at: 2026-01-20T06:15:47.313110Z
-updated-at: 2026-01-20T06:15:47.313110Z
+updated-at: 2026-01-21T22:32:22.896179Z
 ---
 
 # Test Scenario: Query Commands and Filtering
 
-See [Agent Manual Testing Guide](../../docs/agent_manual_testing.md#LCBWQN) for
+See [Agent Manual Testing Guide](../../../docs/agent_manual_testing.md#LCBWQN)
+for
 general testing instructions.
 
 ## Objective
@@ -76,6 +78,7 @@ lat list
 ```
 
 **Verify**:
+
 - Shows all open tasks and KB documents
 - Does NOT show closed tasks
 - Shows ID, type/priority indicator, name, description
@@ -87,6 +90,7 @@ lat list --include-closed
 ```
 
 **Verify**:
+
 - Shows closed task
 - Closed tasks have `/closed` indicator
 
@@ -97,6 +101,7 @@ lat list --closed-only
 ```
 
 **Verify**:
+
 - Only shows the closed task
 
 ### Part 2: Type Filtering
@@ -108,6 +113,7 @@ lat list --type bug
 ```
 
 **Verify**:
+
 - Only shows bug tasks
 - Features, tasks, chores not shown
 
@@ -118,6 +124,7 @@ lat list --type feature
 ```
 
 **Verify**:
+
 - Only shows feature tasks
 
 **Step 2.3**: Combine type with path.
@@ -127,6 +134,7 @@ lat list --type bug --path auth/
 ```
 
 **Verify**:
+
 - Only shows auth bugs
 
 ### Part 3: Priority Filtering
@@ -138,6 +146,7 @@ lat list --priority 0
 ```
 
 **Verify**:
+
 - Only shows P0 tasks
 
 **Step 3.2**: Filter by priority range.
@@ -147,6 +156,7 @@ lat list --priority-min 0 --priority-max 1
 ```
 
 **Verify**:
+
 - Shows P0 and P1 tasks only
 
 **Step 3.3**: Exclude backlog (P4).
@@ -156,6 +166,7 @@ lat list --priority-max 3
 ```
 
 **Verify**:
+
 - P4 tasks not shown
 
 ### Part 4: Label Filtering
@@ -167,6 +178,7 @@ lat list --label security
 ```
 
 **Verify**:
+
 - Only shows documents with "security" label
 
 **Step 4.2**: Filter by multiple labels (AND logic).
@@ -176,6 +188,7 @@ lat list --label security,urgent
 ```
 
 **Verify**:
+
 - Only shows documents with BOTH labels
 
 **Step 4.3**: Filter by any label (OR logic).
@@ -185,6 +198,7 @@ lat list --label-any security,graphql
 ```
 
 **Verify**:
+
 - Shows documents with EITHER label
 
 ### Part 5: Path Filtering
@@ -196,6 +210,7 @@ lat list --path auth/
 ```
 
 **Verify**:
+
 - Only shows documents under auth/
 
 **Step 5.2**: Filter by nested path.
@@ -205,6 +220,7 @@ lat list --path auth/tasks/
 ```
 
 **Verify**:
+
 - Only shows tasks under auth/, not root or docs
 
 ### Part 6: Date Filtering
@@ -217,6 +233,7 @@ lat list --created-after $TODAY
 ```
 
 **Verify**:
+
 - Shows documents created today
 
 **Step 6.2**: Filter by update date.
@@ -226,6 +243,7 @@ lat list --updated-after $TODAY
 ```
 
 **Verify**:
+
 - Shows recently updated documents
 
 ### Part 7: Output Formats
@@ -237,6 +255,7 @@ lat list --json
 ```
 
 **Verify**:
+
 - Valid JSON array
 - Each item has id, name, description, state, etc.
 
@@ -247,6 +266,7 @@ lat list --format compact
 ```
 
 **Verify**:
+
 - Shorter output, just ID and name
 
 **Step 7.3**: One-line format.
@@ -256,6 +276,7 @@ lat list --format oneline
 ```
 
 **Verify**:
+
 - One document per line
 
 ### Part 8: Sorting
@@ -267,6 +288,7 @@ lat list --sort priority
 ```
 
 **Verify**:
+
 - P0 tasks first, then P1, etc.
 
 **Step 8.2**: Sort by creation date.
@@ -276,6 +298,7 @@ lat list --sort created
 ```
 
 **Verify**:
+
 - Oldest first
 
 **Step 8.3**: Reverse sort.
@@ -285,6 +308,7 @@ lat list --sort created --reverse
 ```
 
 **Verify**:
+
 - Newest first
 
 ### Part 9: Ready Command
@@ -296,6 +320,7 @@ lat ready
 ```
 
 **Verify**:
+
 - Shows open tasks with no blockers
 - Does NOT show P4 (backlog) by default
 - Does NOT show closed tasks
@@ -307,6 +332,7 @@ lat ready --include-backlog
 ```
 
 **Verify**:
+
 - P4 tasks now included
 
 **Step 9.3**: Filter ready by priority.
@@ -316,6 +342,7 @@ lat ready --priority 0
 ```
 
 **Verify**:
+
 - Only P0 ready tasks
 
 **Step 9.4**: Pretty format.
@@ -325,6 +352,7 @@ lat ready --pretty
 ```
 
 **Verify**:
+
 - Visual tree format
 - Legend shown
 
@@ -335,6 +363,7 @@ lat ready --json
 ```
 
 **Verify**:
+
 - Valid JSON array
 - Contains body text for AI context
 
@@ -356,6 +385,7 @@ lat blocked
 ```
 
 **Verify**:
+
 - Shows TASK2 (blocked by TASK1)
 
 **Step 10.3**: Show blockers.
@@ -365,6 +395,7 @@ lat blocked --show-blockers
 ```
 
 **Verify**:
+
 - Shows what's blocking each task
 
 ### Part 11: Search Command
@@ -376,6 +407,7 @@ lat search "security"
 ```
 
 **Verify**:
+
 - Shows documents containing "security"
 
 **Step 11.2**: Search with path filter.
@@ -385,6 +417,7 @@ lat search "fix" --path auth/
 ```
 
 **Verify**:
+
 - Only searches in auth/
 
 **Step 11.3**: Search with type filter.
@@ -394,6 +427,7 @@ lat search "bug" --type bug
 ```
 
 **Verify**:
+
 - Only searches bug tasks
 
 ### Part 12: Stats Command
@@ -405,6 +439,7 @@ lat stats
 ```
 
 **Verify**:
+
 - Shows document counts by type
 - Shows counts by priority
 - Shows counts by state
@@ -416,6 +451,7 @@ lat stats --path auth/
 ```
 
 **Verify**:
+
 - Stats scoped to auth/ only
 
 ### Part 13: Stale Command
@@ -427,6 +463,7 @@ lat stale --days 0
 ```
 
 **Verify**:
+
 - Shows tasks updated more than 0 days ago (all of them)
 
 **Step 13.2**: Find stale with reasonable threshold.
@@ -436,6 +473,7 @@ lat stale --days 30
 ```
 
 **Verify**:
+
 - No tasks shown (all created today)
 
 ### Part 14: Changes Command
@@ -449,6 +487,7 @@ lat changes --since $COMMIT
 ```
 
 **Verify**:
+
 - Shows documents changed since commit
 
 ### Part 15: Roots Only Filter
@@ -460,6 +499,7 @@ lat list --roots-only
 ```
 
 **Verify**:
+
 - Only shows auth.md, api.md, database.md
 - Does NOT show tasks or docs
 
@@ -472,6 +512,7 @@ lat list --limit 3
 ```
 
 **Verify**:
+
 - Only shows 3 documents
 
 **Step 16.2**: Combine limit with sort.
@@ -481,6 +522,7 @@ lat list --sort priority --limit 3
 ```
 
 **Verify**:
+
 - Shows top 3 by priority
 
 ## Cleanup

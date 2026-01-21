@@ -2,6 +2,7 @@
 lattice-id: LCPWQN
 name: test-scenario-doctor-system-health
 description: 'Test Scenario: Doctor and System Health'
+parent-id: LCEWQN
 task-type: task
 priority: 2
 labels:
@@ -9,12 +10,13 @@ labels:
 - manual-test
 - scenario
 created-at: 2026-01-20T06:15:47.815772Z
-updated-at: 2026-01-20T06:15:47.815772Z
+updated-at: 2026-01-21T22:32:22.869018Z
 ---
 
 # Test Scenario: Doctor and System Health
 
-See [Agent Manual Testing Guide](../../docs/agent_manual_testing.md#LCBWQN) for
+See [Agent Manual Testing Guide](../../../docs/agent_manual_testing.md#LCBWQN)
+for
 general testing instructions.
 
 ## Objective
@@ -55,8 +57,10 @@ lat doctor
 ```
 
 **Verify**:
+
 - All checks pass (✓)
-- Shows check categories: Core System, Index Integrity, Git Integration, Configuration
+- Shows check categories: Core System, Index Integrity, Git Integration,
+  Configuration
 - Exit code 0
 
 **Step 1.2**: JSON output.
@@ -66,6 +70,7 @@ lat doctor --json
 ```
 
 **Verify**:
+
 - Valid JSON with `checks` array and `summary`
 - All statuses are "passed"
 
@@ -85,6 +90,7 @@ lat doctor
 ```
 
 **Verify**:
+
 - Index Integrity check fails
 - Shows indexed ID doesn't have corresponding file
 - Suggests fix
@@ -96,6 +102,7 @@ lat doctor --fix
 ```
 
 **Verify**:
+
 - Index rebuilt
 - No more errors
 
@@ -106,6 +113,7 @@ lat doctor
 ```
 
 **Verify**:
+
 - All checks pass now
 
 ### Part 3: Missing Index
@@ -123,6 +131,7 @@ lat doctor
 ```
 
 **Verify**:
+
 - Core System check fails: index missing
 - Suggests rebuild
 
@@ -133,6 +142,7 @@ lat doctor --fix
 ```
 
 **Verify**:
+
 - Index rebuilt from filesystem
 - Documents re-indexed
 
@@ -143,6 +153,7 @@ lat show $ROOT_ID
 ```
 
 **Verify**:
+
 - Document still accessible after rebuild
 
 ### Part 4: WAL Corruption Simulation
@@ -161,6 +172,7 @@ lat doctor
 ```
 
 **Verify**:
+
 - WAL health check warns or errors
 - Suggests cleanup
 
@@ -171,6 +183,7 @@ lat doctor --fix
 ```
 
 **Verify**:
+
 - WAL files cleaned up
 - Index functional
 
@@ -183,6 +196,7 @@ lat doctor
 ```
 
 **Verify**:
+
 - Git Integration check passes
 - Shows repository valid
 
@@ -209,6 +223,7 @@ lat doctor
 ```
 
 **Verify**:
+
 - Git Integration shows warning about merge in progress
 - Info level, not blocking error
 
@@ -235,6 +250,7 @@ lat doctor
 ```
 
 **Verify**:
+
 - Configuration check fails
 - Shows parse error
 
@@ -246,6 +262,7 @@ lat doctor
 ```
 
 **Verify**:
+
 - Config check passes (no config = valid)
 
 ### Part 7: Closed State Consistency
@@ -272,6 +289,7 @@ lat doctor
 ```
 
 **Verify**:
+
 - Closed State check warns: is_closed mismatch
 - File path doesn't match indexed closed state
 
@@ -282,6 +300,7 @@ lat doctor --fix
 ```
 
 **Verify**:
+
 - Index updated to match filesystem state
 
 ### Part 8: Deep Mode
@@ -293,6 +312,7 @@ lat doctor --deep
 ```
 
 **Verify**:
+
 - Additional checks run
 - Takes longer
 - More thorough validation
@@ -307,6 +327,7 @@ lat doctor --fix --dry-run
 ```
 
 **Verify**:
+
 - Shows what would be fixed
 - Index NOT actually rebuilt
 
@@ -317,6 +338,7 @@ ls .lattice/index.sqlite
 ```
 
 **Verify**:
+
 - File does not exist (dry-run didn't create it)
 
 **Step 9.3**: Actually fix.
@@ -334,6 +356,7 @@ lat doctor --quiet
 ```
 
 **Verify**:
+
 - Only warnings and errors shown
 - Passed checks not listed
 
@@ -361,6 +384,7 @@ lat check
 ```
 
 **Verify**:
+
 - lat doctor: system healthy (broken link is content issue)
 - lat check: E002 error (broken link detected)
 

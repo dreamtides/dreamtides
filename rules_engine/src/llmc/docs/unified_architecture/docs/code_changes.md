@@ -1,10 +1,10 @@
 ---
-lattice-id: LBYWQN
+lattice-id: LRQWQN
 name: code-changes
 description: File-by-file implementation guide for unified LLMC architecture migration.
-parent-id: LBUWQN
+parent-id: LRMWQN
 created-at: 2026-01-19T05:00:00Z
-updated-at: 2026-01-19T05:08:18.088062Z
+updated-at: 2026-01-21T22:38:24.849251Z
 ---
 
 # Code Changes by File

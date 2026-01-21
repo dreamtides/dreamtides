@@ -2,6 +2,7 @@
 lattice-id: LCKWQN
 name: test-scenario-dependency-blocking-relati
 description: 'Test Scenario: Dependency and Blocking Relationships'
+parent-id: LCEWQN
 task-type: task
 priority: 2
 labels:
@@ -9,12 +10,13 @@ labels:
 - manual-test
 - scenario
 created-at: 2026-01-20T06:13:20.827488Z
-updated-at: 2026-01-20T06:13:20.827488Z
+updated-at: 2026-01-21T22:32:22.863815Z
 ---
 
 # Test Scenario: Dependency and Blocking Relationships
 
-See [Agent Manual Testing Guide](../../docs/agent_manual_testing.md#LCBWQN) for
+See [Agent Manual Testing Guide](../../../docs/agent_manual_testing.md#LCBWQN)
+for
 general testing instructions.
 
 ## Objective
@@ -65,6 +67,7 @@ lat dep add $B_ID $A_ID
 ```
 
 **Verify**:
+
 - Task B's frontmatter has `blocked-by: [$A_ID]`
 - Task A's frontmatter has `blocking: [$B_ID]`
 - Bidirectional consistency maintained
@@ -76,6 +79,7 @@ lat show $B_ID
 ```
 
 **Verify**:
+
 - State shows as "blocked"
 - "Depends on" section lists Task A
 
@@ -86,6 +90,7 @@ lat ready
 ```
 
 **Verify**:
+
 - Task A IS in ready list (no blockers)
 - Task B is NOT in ready list (blocked)
 - Task C is still ready (no dependencies yet)
@@ -100,8 +105,10 @@ lat dep add $C_ID $B_ID
 ```
 
 **Verify**:
+
 - Task C's frontmatter has `blocked-by: [$B_ID]`
-- Task B's frontmatter has `blocking: [$C_ID]` (in addition to being blocked-by A)
+- Task B's frontmatter has `blocking: [$C_ID] ` (in addition to being blocked-by
+  A)
 
 **Step 2.2**: Check ready queue with chain.
 
@@ -110,6 +117,7 @@ lat ready
 ```
 
 **Verify**:
+
 - Only Task A and Task D are ready
 - B and C are blocked
 
@@ -120,6 +128,7 @@ lat blocked
 ```
 
 **Verify**:
+
 - Shows B and C
 - Does NOT show A or D
 
@@ -130,6 +139,7 @@ lat blocked --show-blockers
 ```
 
 **Verify**:
+
 - Shows what's blocking each task
 - B blocked by A
 - C blocked by B
@@ -143,6 +153,7 @@ lat dep tree $C_ID
 ```
 
 **Verify**:
+
 - Shows C depends on B depends on A
 - Tree structure visible
 
@@ -153,6 +164,7 @@ lat dep tree $C_ID --json
 ```
 
 **Verify**:
+
 - Valid JSON output
 - Contains dependency chain
 
@@ -165,6 +177,7 @@ lat close $A_ID
 ```
 
 **Verify**:
+
 - Task A moved to `.closed/`
 
 **Step 4.2**: Check if B is now ready.
@@ -174,6 +187,7 @@ lat ready
 ```
 
 **Verify**:
+
 - Task B IS now in ready list (A is closed)
 - Task C is still blocked (B is not closed)
 
@@ -182,6 +196,7 @@ lat show $B_ID
 ```
 
 **Verify**:
+
 - State shows as "open" (not blocked)
 - "Depends on" shows A as closed
 
@@ -193,6 +208,7 @@ lat ready
 ```
 
 **Verify**:
+
 - Task C is now ready
 
 ### Part 5: Dependency Removal
@@ -211,6 +227,7 @@ lat dep remove $B_ID $A_ID
 ```
 
 **Verify**:
+
 - B's `blocked-by` no longer contains A
 - A's `blocking` no longer contains B
 - B is now ready (assuming no other blockers)
@@ -222,6 +239,7 @@ lat dep remove $C_ID $B_ID --json
 ```
 
 **Verify**:
+
 - JSON output includes `became_ready: true` (since C's only blocker removed)
 
 ### Part 6: Circular Dependency Detection
@@ -238,6 +256,7 @@ lat dep add $A_ID $C_ID
 ```
 
 **Verify**:
+
 - Command should fail with E006 (circular blocking)
 - Clear error message about the cycle
 - No changes made to any documents
@@ -249,6 +268,7 @@ lat show $A_ID --json | grep blocked-by
 ```
 
 **Verify**:
+
 - A has no `blocked-by` (cycle not created)
 
 ### Part 7: discovered-from Links
@@ -261,6 +281,7 @@ DISC_ID=$(ls project/tasks/*.md | tail -1 | xargs grep "lattice-id:" | cut -d' '
 ```
 
 **Verify**:
+
 - Task has `discovered-from: [$A_ID]`
 - NOT blocked (discovered-from is soft link)
 
@@ -271,6 +292,7 @@ lat list --discovered-from $A_ID
 ```
 
 **Verify**:
+
 - Shows the discovered issue task
 
 ### Part 8: Multiple Blockers
@@ -286,6 +308,7 @@ lat dep add $MULTI_ID $D_ID
 ```
 
 **Verify**:
+
 - Task has `blocked-by: [$A_ID, $D_ID]`
 - Task is blocked
 
@@ -297,6 +320,7 @@ lat show $MULTI_ID
 ```
 
 **Verify**:
+
 - Task still blocked (D is still open)
 
 **Step 8.3**: Close second blocker.
@@ -307,6 +331,7 @@ lat ready
 ```
 
 **Verify**:
+
 - Task is now ready (all blockers closed)
 
 ### Part 9: Edge Cases
@@ -319,6 +344,7 @@ lat dep add $A_ID $A_ID
 ```
 
 **Verify**:
+
 - Should fail (self-dependency is cycle)
 - Clear error message
 
@@ -329,6 +355,7 @@ lat dep add $A_ID LNONEXISTENT
 ```
 
 **Verify**:
+
 - Should fail with not found error
 - Exit code 4
 
@@ -339,6 +366,7 @@ lat dep remove $A_ID $D_ID  # A doesn't depend on D
 ```
 
 **Verify**:
+
 - Should handle gracefully (no-op or clear message)
 
 ## Cleanup

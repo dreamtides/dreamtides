@@ -1,12 +1,12 @@
 ---
-lattice-id: LBWWQN
+lattice-id: LROWQN
 name: detailed-design
 description: |-
   Repository concepts, key design decisions, and state file changes for the
   unified architecture migration.
-parent-id: LBUWQN
+parent-id: LRMWQN
 created-at: 2026-01-19T05:00:00Z
-updated-at: 2026-01-19T05:08:18.102826Z
+updated-at: 2026-01-21T22:38:24.859914Z
 ---
 
 # Detailed Design

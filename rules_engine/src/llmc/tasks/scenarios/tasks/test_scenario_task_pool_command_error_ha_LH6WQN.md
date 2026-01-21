@@ -1,5 +1,5 @@
 ---
-lattice-id: LCDWQN
+lattice-id: LH6WQN
 name: test-scenario-task-pool-command-error-ha
 description: 'Test Scenario: Task Pool Command Error Handling'
 parent-id: LB5WQN
@@ -12,9 +12,9 @@ labels:
 - auto-mode
 - error-handling
 blocked-by:
-- LCCWQN
+- LH5WQN
 created-at: 2026-01-21T22:01:59.228753Z
-updated-at: 2026-01-21T22:01:59.228753Z
+updated-at: 2026-01-21T22:31:38.850822Z
 ---
 
 # Test Scenario: Task Pool Command Error Handling
@@ -34,12 +34,15 @@ non-zero exit codes and command hangs, triggering appropriate graceful shutdown.
 ## Differentiating Errors from Normal Operations
 
 **Error indicators (expected in this test):**
+
 - Task pool command returning non-zero exit code → daemon should shutdown
-- Task pool command hanging → heartbeat should become stale, overseer should detect
+- Task pool command hanging → heartbeat should become stale, overseer should
+  detect
 - ERROR entries in auto.log for task pool failures
 - Daemon exit code non-zero after shutdown
 
 **Normal operations:**
+
 - Empty stdout with exit code 0 = no tasks available (not an error)
 - Task pool called repeatedly while workers idle
 - Brief delays between task pool invocations
@@ -101,6 +104,7 @@ echo "Daemon exit code: $EXIT_CODE"
 ```
 
 **Verify**:
+
 - Daemon shuts down (doesn't keep running)
 - Exit code is non-zero
 - Shutdown is graceful (not a crash)
@@ -113,6 +117,7 @@ cat ~/llmc/logs/task_pool.log | tail -10
 ```
 
 **Verify**:
+
 - auto.log shows task pool command failure
 - task_pool.log shows stderr output "database connection failed"
 - Logs indicate graceful shutdown initiated
@@ -154,10 +159,10 @@ for i in {1..90}; do
         echo "Daemon terminated"
         break
     fi
-    
+
     STATUS=$(llmc status --json 2>/dev/null | jq -r '.workers[] | select(.name == "auto-1") | .status' 2>/dev/null)
     echo "Worker status: $STATUS (iteration $i)"
-    
+
     sleep 5
 done
 
@@ -167,6 +172,7 @@ echo "Final exit code: $EXIT_CODE"
 ```
 
 **Verify**:
+
 - First task is assigned and completes
 - Second task pool call fails
 - Daemon shuts down after failure
@@ -210,6 +216,7 @@ llmc status
 ```
 
 **Verify**:
+
 - Daemon remains running
 - Workers stay in idle state
 - No error logged
@@ -224,6 +231,7 @@ cat ~/llmc/logs/task_pool.log | wc -l
 ```
 
 **Verify**:
+
 - Task pool called multiple times
 - Reasonable interval between calls
 
@@ -264,6 +272,7 @@ echo "Exit code: $?"
 ```
 
 **Verify**:
+
 - Non-zero exit code detected despite partial output
 - Daemon shuts down
 - Partial output logged but not used as task
@@ -297,6 +306,7 @@ cat ~/llmc/logs/auto.log | tail -10
 ```
 
 **Verify**:
+
 - Clear error about command not found
 - Daemon shuts down gracefully
 - Helpful error message in logs
@@ -338,6 +348,7 @@ llmc nuke --all --yes 2>/dev/null || true
 ## Abort Conditions
 
 **Abort the test and file a task if:**
+
 - Daemon crashes (segfault, panic) instead of graceful shutdown
 - Task pool failure causes state file corruption
 - Worker receives partial/invalid task

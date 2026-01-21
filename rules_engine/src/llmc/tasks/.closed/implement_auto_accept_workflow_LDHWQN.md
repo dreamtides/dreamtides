@@ -2,6 +2,7 @@
 lattice-id: LDHWQN
 name: implement-auto-accept-workflow
 description: Implement auto accept workflow
+parent-id: LBSWQN
 task-type: feature
 priority: 1
 labels:
@@ -13,13 +14,14 @@ blocking:
 blocked-by:
 - LDEWQN
 created-at: 2026-01-21T04:00:48.185613Z
-updated-at: 2026-01-21T05:42:00.315647Z
+updated-at: 2026-01-21T22:31:38.698811Z
 closed-at: 2026-01-21T05:42:00.315647Z
 ---
 
 ## Overview
 
-Implement the automatic acceptance workflow that merges completed worker changes to master without human review, and executes the optional post-accept command.
+Implement the automatic acceptance workflow that merges completed worker changes
+to master without human review, and executes the optional post-accept command.
 
 ## Implementation Steps
 

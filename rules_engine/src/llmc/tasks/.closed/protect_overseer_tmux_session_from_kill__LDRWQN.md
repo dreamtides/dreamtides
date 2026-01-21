@@ -2,6 +2,7 @@
 lattice-id: LDRWQN
 name: protect-overseer-tmux-session-from-kill-
 description: Protect overseer TMUX session from kill operations
+parent-id: LBSWQN
 task-type: feature
 priority: 2
 labels:
@@ -15,13 +16,14 @@ blocked-by:
 - LDKWQN
 - LDQWQN
 created-at: 2026-01-21T04:02:15.329191Z
-updated-at: 2026-01-21T18:16:31.727962Z
+updated-at: 2026-01-21T22:31:38.778Z
 closed-at: 2026-01-21T18:16:31.727962Z
 ---
 
 ## Overview
 
-Ensure that the overseer TMUX session is protected from operations that kill TMUX sessions, preventing accidental termination of the overseer.
+Ensure that the overseer TMUX session is protected from operations that kill
+TMUX sessions, preventing accidental termination of the overseer.
 
 ## Implementation Steps
 

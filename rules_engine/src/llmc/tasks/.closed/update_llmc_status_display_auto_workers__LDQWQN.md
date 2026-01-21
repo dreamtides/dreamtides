@@ -2,6 +2,7 @@
 lattice-id: LDQWQN
 name: update-llmc-status-display-auto-workers-
 description: Update llmc status to display auto workers and overseer state
+parent-id: LBSWQN
 task-type: feature
 priority: 2
 labels:
@@ -15,19 +16,21 @@ blocked-by:
 - LDPWQN
 - LDSWQN
 created-at: 2026-01-21T04:02:15.180960Z
-updated-at: 2026-01-21T17:10:28.876553Z
+updated-at: 2026-01-21T22:31:38.783984Z
 closed-at: 2026-01-21T17:10:28.876553Z
 ---
 
 ## Overview
 
-Update the `llmc status` command to display auto workers in a separate section and show overseer state when active.
+Update the `llmc status` command to display auto workers in a separate section
+and show overseer state when active.
 
 ## Implementation Steps
 
 1. **Auto workers section**:
    - Add new section header: "Auto Workers" (separate from regular workers)
-   - Display each auto worker with: name, status, current task (truncated), time in state
+   - Display each auto worker with: name, status, current task (truncated), time
+     in state
    - Add summary line: "Auto Mode: N workers, M tasks completed"
    - Only show this section when auto mode is active
 

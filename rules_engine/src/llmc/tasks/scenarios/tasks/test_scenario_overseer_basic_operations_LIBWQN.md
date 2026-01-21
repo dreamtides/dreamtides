@@ -1,5 +1,5 @@
 ---
-lattice-id: LCGWQN
+lattice-id: LIBWQN
 name: test-scenario-overseer-basic-operations
 description: 'Test Scenario: Overseer Basic Operations'
 parent-id: LB5WQN
@@ -11,9 +11,9 @@ labels:
 - scenario
 - overseer
 blocked-by:
-- LCFWQN
+- LIAWQN
 created-at: 2026-01-21T22:04:42.982376Z
-updated-at: 2026-01-21T22:04:42.982376Z
+updated-at: 2026-01-21T22:31:38.823585Z
 ---
 
 # Test Scenario: Overseer Basic Operations
@@ -35,6 +35,7 @@ handles Ctrl-C shutdown.
 ## Differentiating Errors from Normal Operations
 
 **Error indicators:**
+
 - Overseer fails to start daemon
 - Daemon registration file not created
 - Heartbeat not detected
@@ -43,6 +44,7 @@ handles Ctrl-C shutdown.
 - `llmc status` not showing "Overseer" section
 
 **Normal operations:**
+
 - Overseer starts daemon via shell command
 - Daemon creates registration file
 - Heartbeat updated every 5 seconds
@@ -118,6 +120,7 @@ sleep 10
 ```
 
 **Verify**:
+
 - Overseer process starts without error
 - No immediate crash or termination
 
@@ -129,6 +132,7 @@ cat ~/llmc/.llmc/daemon.json | jq '.'
 ```
 
 **Verify**:
+
 - `daemon.json` exists
 - Contains `pid`, `start_time_unix`, `instance_id`, `log_file`
 - PID is valid (process exists)
@@ -154,6 +158,7 @@ fi
 ```
 
 **Verify**:
+
 - `auto.heartbeat` exists
 - Timestamp updates every ~5 seconds
 - `instance_id` matches daemon registration
@@ -167,6 +172,7 @@ tmux list-sessions | grep llmc-overseer
 ```
 
 **Verify**:
+
 - Session `llmc-overseer` exists
 - Session is in master repository directory
 
@@ -177,6 +183,7 @@ tmux capture-pane -t llmc-overseer -p | tail -20
 ```
 
 **Verify**:
+
 - Claude Code is running in the session
 - No errors visible
 
@@ -191,6 +198,7 @@ echo "Overseer session should still exist after llmc down"
 ```
 
 **Verify**:
+
 - `llmc down` does NOT kill overseer session
 - Overseer session persists
 
@@ -207,6 +215,7 @@ llmc status
 ```
 
 **Verify**:
+
 - Status shows "Overseer" section (if overseer running)
 - Shows daemon PID and uptime
 - Shows overseer state
@@ -218,6 +227,7 @@ llmc status --json | jq '.overseer'
 ```
 
 **Verify**:
+
 - Overseer information in JSON output
 - Includes state, daemon_pid, uptime
 
@@ -232,6 +242,7 @@ cat ~/llmc/logs/auto.log | tail -5
 ```
 
 **Verify**:
+
 - Daemon logs are being written
 - No errors that would trigger overseer intervention
 
@@ -242,7 +253,7 @@ cat ~/llmc/logs/auto.log | tail -5
 for i in {1..60}; do
     TASK_COUNT=$(ls ~/Documents/GoogleDrive/dreamtides/overseer_test_*.txt 2>/dev/null | wc -l)
     echo "Completed tasks: $TASK_COUNT"
-    
+
     if [ "$TASK_COUNT" -ge 2 ]; then
         echo "Tasks completing successfully"
         break
@@ -252,6 +263,7 @@ done
 ```
 
 **Verify**:
+
 - Tasks are completing
 - Overseer observes progress (no stall detection)
 
@@ -278,6 +290,7 @@ echo "Overseer exit code: $EXIT_CODE"
 ```
 
 **Verify**:
+
 - Overseer shuts down gracefully
 - Exit code is 0
 - Daemon is also terminated
@@ -293,6 +306,7 @@ tmux list-sessions | grep llmc-overseer || echo "Overseer session terminated (ex
 ```
 
 **Verify**:
+
 - Daemon process is stopped
 - State is clean
 
@@ -316,6 +330,7 @@ echo "Original: PID=$ORIGINAL_PID, Instance=$ORIGINAL_INSTANCE"
 ```
 
 **Verify**:
+
 - `instance_id` is unique (UUID format)
 - Each daemon start generates new `instance_id`
 
@@ -357,6 +372,7 @@ llmc nuke --all --yes 2>/dev/null || true
 ## Abort Conditions
 
 **Abort the test and file a task if:**
+
 - Overseer panics on startup
 - Daemon and overseer interfere with each other
 - State file corruption

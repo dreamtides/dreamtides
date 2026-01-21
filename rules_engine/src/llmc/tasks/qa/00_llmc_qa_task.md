@@ -2,8 +2,9 @@
 lattice-id: LB6WQN
 name: 00-llmc-qa-task
 description: llmc qa task
+parent-id: LBSWQN
 created-at: 2026-01-21T21:52:25.653169Z
-updated-at: 2026-01-21T21:52:25.653170Z
+updated-at: 2026-01-21T22:38:24.948147Z
 ---
 
 # [Lattice] Context
@@ -40,8 +41,11 @@ When complete, please:
 ## Code Style
 
 Follow all rules in AGENTS.md. Key project-specific conventions:
-- Function calls and enum values: exactly one qualifier (e.g., `move_card::run()`)
-- Struct/enum type names: zero qualifiers (e.g., `BattleState`, not `battle::BattleState`)
+
+- Function calls and enum values: exactly one qualifier (e.g.,
+  `move_card::run()`)
+- Struct/enum type names: zero qualifiers (e.g., `BattleState`, not
+  `battle::BattleState`)
 - No `pub use` declarations
 - No code in `mod.rs`/`lib.rs` except module declarations
 - No `use` declarations inside function bodies
@@ -51,6 +55,7 @@ Follow all rules in AGENTS.md. Key project-specific conventions:
 Review your work against @rules_engine/docs/lattice/appendix_code_review.md.
 
 Critical points:
+
 - Write high-quality, non duplicative tests
 - Create high-quality, useful logs via `tracing`
 - Functions < 50 lines, files < 500 lines

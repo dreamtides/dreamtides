@@ -2,6 +2,7 @@
 lattice-id: LDGWQN
 name: implement-task-pool-command-execution
 description: Implement task pool command execution
+parent-id: LBSWQN
 task-type: feature
 priority: 1
 labels:
@@ -14,19 +15,22 @@ blocked-by:
 - LDCWQN
 - LDEWQN
 created-at: 2026-01-21T04:00:47.924244Z
-updated-at: 2026-01-21T05:32:54.517066Z
+updated-at: 2026-01-21T22:31:38.759668Z
 closed-at: 2026-01-21T05:32:54.517066Z
 ---
 
 ## Overview
 
-Implement the task pool command execution that fetches new tasks for auto workers by running a user-configured shell command.
+Implement the task pool command execution that fetches new tasks for auto
+workers by running a user-configured shell command.
 
 ## Implementation Steps
 
 1. **Create task_pool.rs** under `src/auto_mode/`:
-   - Define `TaskPoolResult` enum: `Task(String)`, `NoTasksAvailable`, `Error(String)`
-   - Implement `execute_task_pool_command(command: &str) -> Result<TaskPoolResult>`
+   - Define `TaskPoolResult` enum: `Task(String)`, `NoTasksAvailable`,
+     `Error(String)`
+   - Implement `execute_task_pool_command(command: &str) ->
+     Result<TaskPoolResult>`
 
 2. **Shell command execution**:
    - Execute command using the caller's shell environment

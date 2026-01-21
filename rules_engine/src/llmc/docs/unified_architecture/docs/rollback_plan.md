@@ -4,9 +4,9 @@ name: rollback-plan
 description: |-
   Rollback procedures if migration fails mid-way or issues are discovered
   post-migration.
-parent-id: LBUWQN
+parent-id: LRMWQN
 created-at: 2026-01-19T05:00:00Z
-updated-at: 2026-01-19T05:08:18.120600Z
+updated-at: 2026-01-21T22:38:24.892440Z
 ---
 
 # Rollback Plan

@@ -2,6 +2,7 @@
 lattice-id: LCNWQN
 name: test-scenario-hierarchy-structure-comman
 description: 'Test Scenario: Hierarchy and Structure Commands'
+parent-id: LCEWQN
 task-type: task
 priority: 2
 labels:
@@ -9,12 +10,13 @@ labels:
 - manual-test
 - scenario
 created-at: 2026-01-20T06:15:47.486596Z
-updated-at: 2026-01-20T06:15:47.486596Z
+updated-at: 2026-01-21T22:32:22.875066Z
 ---
 
 # Test Scenario: Hierarchy and Structure Commands
 
-See [Agent Manual Testing Guide](../../docs/agent_manual_testing.md#LCBWQN) for
+See [Agent Manual Testing Guide](../../../docs/agent_manual_testing.md#LCBWQN)
+for
 general testing instructions.
 
 ## Objective
@@ -76,6 +78,7 @@ lat tree
 ```
 
 **Verify**:
+
 - Shows hierarchical structure
 - Displays all directories with documents
 - Shows document counts or names
@@ -87,6 +90,7 @@ lat tree project/backend/
 ```
 
 **Verify**:
+
 - Only shows backend subtree
 - Includes auth/ and api/
 
@@ -97,6 +101,7 @@ lat tree --depth 1
 ```
 
 **Verify**:
+
 - Only shows one level deep
 
 **Step 1.4**: Tree with counts.
@@ -106,6 +111,7 @@ lat tree --counts
 ```
 
 **Verify**:
+
 - Shows document counts per directory
 
 **Step 1.5**: Tasks only tree.
@@ -115,6 +121,7 @@ lat tree --tasks-only
 ```
 
 **Verify**:
+
 - Only shows tasks/ directories
 - Hides docs/ directories
 
@@ -125,6 +132,7 @@ lat tree --docs-only
 ```
 
 **Verify**:
+
 - Only shows docs/ directories
 - Hides tasks/ directories
 
@@ -137,6 +145,7 @@ lat roots
 ```
 
 **Verify**:
+
 - Shows project.md, backend.md, auth.md, api.md, frontend.md
 - Shows child counts for each
 
@@ -147,6 +156,7 @@ lat roots --json
 ```
 
 **Verify**:
+
 - Valid JSON array
 - Each root has id, path, child_count
 
@@ -159,6 +169,7 @@ lat children $AUTH_ID
 ```
 
 **Verify**:
+
 - Shows tasks and docs under auth/
 - Does NOT show documents from other directories
 
@@ -169,6 +180,7 @@ lat children $BACKEND_ID --recursive
 ```
 
 **Verify**:
+
 - Shows all documents under backend/
 - Includes nested auth/ and api/ documents
 
@@ -179,6 +191,7 @@ lat children $AUTH_ID --tasks
 ```
 
 **Verify**:
+
 - Only shows tasks, not KB docs
 
 **Step 3.4**: Children docs only.
@@ -188,6 +201,7 @@ lat children $AUTH_ID --docs
 ```
 
 **Verify**:
+
 - Only shows KB docs, not tasks
 
 ### Part 4: Parent-ID Verification
@@ -199,6 +213,7 @@ lat show <auth-task-id> --json
 ```
 
 **Verify**:
+
 - `parent.id` matches $AUTH_ID
 - Parent is the auth.md root document
 
@@ -209,6 +224,7 @@ lat show <api-task-id> --json
 ```
 
 **Verify**:
+
 - Parent is the api.md root document
 
 **Step 4.3**: Format to update parent-ids.
@@ -222,6 +238,7 @@ lat fmt
 ```
 
 **Verify**:
+
 - parent-id is restored by lat fmt
 
 ### Part 5: Move and Parent Update
@@ -234,6 +251,7 @@ lat mv $TASK_ID project/backend/api/tasks/moved_task.md
 ```
 
 **Verify**:
+
 - File moved to new location
 - parent-id updated to API_ID
 - name updated to "moved-task"
@@ -245,6 +263,7 @@ lat show $TASK_ID --json
 ```
 
 **Verify**:
+
 - Parent now shows api.md root
 
 ### Part 6: Overview Command
@@ -256,6 +275,7 @@ lat overview
 ```
 
 **Verify**:
+
 - Shows critical documents
 - Prioritizes root documents
 
@@ -266,6 +286,7 @@ lat overview $AUTH_ID
 ```
 
 **Verify**:
+
 - Shows documents relevant to auth context
 
 **Step 6.3**: Overview with limit.
@@ -275,6 +296,7 @@ lat overview --limit 5
 ```
 
 **Verify**:
+
 - Only shows 5 documents
 
 **Step 6.4**: Overview JSON.
@@ -284,6 +306,7 @@ lat overview --json
 ```
 
 **Verify**:
+
 - Valid JSON array
 
 ### Part 7: Alternative Root Document Format
@@ -314,6 +337,7 @@ lat roots
 ```
 
 **Verify**:
+
 - Shows 00_overview.md as a root
 
 **Step 7.3**: Verify parent-id uses 00_ root.
@@ -323,6 +347,7 @@ lat show <config-task-id> --json
 ```
 
 **Verify**:
+
 - Parent is LCONFIG (the 00_overview.md)
 
 ### Part 8: Duplicate Root Detection
@@ -350,6 +375,7 @@ lat check
 ```
 
 **Verify**:
+
 - E013 error: duplicate root documents in same directory
 
 ### Part 9: Edge Cases
@@ -378,6 +404,7 @@ lat show LORPHAN --json
 ```
 
 **Verify**:
+
 - No parent (directory has no root document)
 
 **Step 9.3**: Children of non-root document.
@@ -387,6 +414,7 @@ lat children LORPHAN
 ```
 
 **Verify**:
+
 - Should handle gracefully (not a root document)
 
 ## Cleanup

@@ -2,6 +2,7 @@
 lattice-id: LDFWQN
 name: implement-heartbeat-mechanism-auto-mode-
 description: Implement heartbeat mechanism for auto mode daemon
+parent-id: LBSWQN
 task-type: feature
 priority: 1
 labels:
@@ -16,19 +17,22 @@ blocked-by:
 - LDVWQN
 - LDCWQN
 created-at: 2026-01-21T04:00:04.049346Z
-updated-at: 2026-01-21T04:56:22.852563Z
+updated-at: 2026-01-21T22:31:38.730847Z
 closed-at: 2026-01-21T04:56:22.852563Z
 ---
 
 ## Overview
 
-Implement the heartbeat mechanism that allows external processes (like the overseer) to detect if the auto daemon is running and healthy.
+Implement the heartbeat mechanism that allows external processes (like the
+overseer) to detect if the auto daemon is running and healthy.
 
 ## Implementation Steps
 
 1. **Create heartbeat_thread.rs** under `src/auto_mode/`:
-   - Define heartbeat file format: `{"timestamp_unix": N, "instance_id": "UUID"}`
-   - Implement background thread that updates `.llmc/auto.heartbeat` every 5 seconds
+   - Define heartbeat file format: `{"timestamp_unix": N, "instance_id":
+     "UUID"}`
+   - Implement background thread that updates `.llmc/auto.heartbeat` every 5
+     seconds
    - Use atomic writes (temp file + rename) to prevent partial reads
    - Thread should be resilient to transient I/O errors (log and retry)
 

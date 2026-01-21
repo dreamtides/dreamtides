@@ -2,6 +2,7 @@
 lattice-id: LDMWQN
 name: implement-daemon-termination-protocol-ov
 description: Implement daemon termination protocol for overseer
+parent-id: LBSWQN
 task-type: feature
 priority: 1
 labels:
@@ -14,13 +15,14 @@ blocking:
 blocked-by:
 - LDLWQN
 created-at: 2026-01-21T04:01:29.437932Z
-updated-at: 2026-01-21T14:49:21.763536Z
+updated-at: 2026-01-21T22:31:38.724743Z
 closed-at: 2026-01-21T14:49:21.763536Z
 ---
 
 ## Overview
 
-Implement the protocol the overseer uses to terminate a failed daemon process before entering remediation.
+Implement the protocol the overseer uses to terminate a failed daemon process
+before entering remediation.
 
 ## Implementation Steps
 

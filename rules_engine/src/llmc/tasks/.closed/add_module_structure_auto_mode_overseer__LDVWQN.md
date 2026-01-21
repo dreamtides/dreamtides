@@ -2,6 +2,7 @@
 lattice-id: LDVWQN
 name: add-module-structure-auto-mode-overseer-
 description: Add module structure for auto_mode and overseer_mode
+parent-id: LBSWQN
 task-type: task
 priority: 0
 labels:
@@ -14,13 +15,15 @@ blocking:
 - LDUWQN
 - LDCWQN
 created-at: 2026-01-21T04:02:53.062125Z
-updated-at: 2026-01-21T04:27:51.149124Z
+updated-at: 2026-01-21T22:31:38.678798Z
 closed-at: 2026-01-21T04:27:51.149124Z
 ---
 
 ## Overview
 
-Create the module directory structure and mod.rs files for the new auto_mode and overseer_mode modules. This is a prerequisite for all other implementation tasks.
+Create the module directory structure and mod.rs files for the new auto_mode and
+overseer_mode modules. This is a prerequisite for all other implementation
+tasks.
 
 ## Implementation Steps
 

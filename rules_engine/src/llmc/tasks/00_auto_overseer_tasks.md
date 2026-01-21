@@ -3,12 +3,13 @@ lattice-id: LBSWQN
 name: 00-auto-overseer-tasks
 description: Task template for auto overseer
 created-at: 2026-01-21T04:14:09.630622Z
-updated-at: 2026-01-21T04:14:09.630657Z
+updated-at: 2026-01-21T22:38:24.930997Z
 ---
 
 # [Lattice] Context
 
-You are working on implementing features for the llmc 'auto' and 'overseer' functionality.
+You are working on implementing features for the llmc 'auto' and 'overseer'
+functionality.
 
 Please run `lat show LDBWQN` to view the primary design document.
 
@@ -33,8 +34,11 @@ When complete, please:
 ## Code Style
 
 Follow all rules in AGENTS.md. Key project-specific conventions:
-- Function calls and enum values: exactly one qualifier (e.g., `move_card::run()`)
-- Struct/enum type names: zero qualifiers (e.g., `BattleState`, not `battle::BattleState`)
+
+- Function calls and enum values: exactly one qualifier (e.g.,
+  `move_card::run()`)
+- Struct/enum type names: zero qualifiers (e.g., `BattleState`, not
+  `battle::BattleState`)
 - No `pub use` declarations
 - No code in `mod.rs`/`lib.rs` except module declarations
 - No `use` declarations inside function bodies
@@ -44,6 +48,7 @@ Follow all rules in AGENTS.md. Key project-specific conventions:
 Review your work against @rules_engine/docs/lattice/appendix_code_review.md.
 
 Critical points:
+
 - Expected errors → `LatticeError`; system errors → `panic!` with reason
 - Write high-quality, non duplicative tests
 - Create high-quality, useful logs via `tracing`

@@ -2,6 +2,7 @@
 lattice-id: LDJWQN
 name: implement-transient-vs-hard-failure-hand
 description: Implement transient vs hard failure handling in auto mode
+parent-id: LBSWQN
 task-type: feature
 priority: 1
 labels:
@@ -13,13 +14,14 @@ blocking:
 blocked-by:
 - LDIWQN
 created-at: 2026-01-21T04:00:48.594696Z
-updated-at: 2026-01-21T06:04:52.193758Z
+updated-at: 2026-01-21T22:31:38.766091Z
 closed-at: 2026-01-21T06:04:52.193758Z
 ---
 
 ## Overview
 
-Implement the two-tier error handling system that distinguishes between transient failures (patrol can recover) and hard failures (trigger shutdown).
+Implement the two-tier error handling system that distinguishes between
+transient failures (patrol can recover) and hard failures (trigger shutdown).
 
 ## Implementation Steps
 

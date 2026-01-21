@@ -7,12 +7,13 @@ labels:
 - testing
 - documentation
 created-at: 2026-01-20T06:11:03.923739Z
-updated-at: 2026-01-20T06:11:03.923739Z
+updated-at: 2026-01-21T22:31:38.503909Z
 ---
 
 # Agent Manual Testing Guide
 
-This document provides instructions for AI agents executing manual test scenarios
+This document provides instructions for AI agents executing manual test
+scenarios
 for the Lattice system.
 
 ## Test Environment Setup
@@ -57,11 +58,13 @@ repository. All operations occur in the temporary directory.
 ### Error Classification
 
 **Blocking Errors** (abort test):
+
 - Panic/crash in `lat` command
 - Index corruption that prevents further operations
 - System error (exit code 1)
 
 **Non-Blocking Errors** (continue and report):
+
 - Unexpected output format
 - Missing expected warning
 - Incorrect state after operation
@@ -73,11 +76,13 @@ Report all issues using the `lattice_create_task()` MCP tool:
 
 **Directory**: `rules_engine/src/lattice/tasks/qa/`
 
-> **IMPORTANT**: The directory parameter must be exactly `rules_engine/src/lattice/tasks/qa/`
+> **IMPORTANT**: The directory parameter must be exactly
+> `rules_engine/src/lattice/tasks/qa/`
 > (including the `/qa/` suffix). Do NOT use `rules_engine/src/lattice/` or
 > `rules_engine/src/lattice/tasks/` alone.
 
 **Required fields**:
+
 - `description`: Brief summary of the issue
 - `task_type`: Usually `bug`
 - `priority`: 1 for crashes/data loss, 2 for functional bugs, 3 for cosmetic
@@ -114,6 +119,7 @@ JSON output shows `"labels": []` - labels not saved
 ### Expected Errors (Not Bugs)
 
 These are intentional error handling:
+
 - `lat show LNONEXISTENT` → "Error: Document not found" (exit 4)
 - `lat create` without required args → Usage error (exit 3)
 - `lat check` finding broken links → Reports error E002 (exit 2)
@@ -122,6 +128,7 @@ These are intentional error handling:
 ### System Errors (Bugs to Report)
 
 These indicate implementation problems:
+
 - Any Rust panic or stack trace
 - Exit code 1 (system error)
 - Index doesn't match filesystem after any `lat` operation
@@ -131,6 +138,7 @@ These indicate implementation problems:
 ## Command Reference
 
 ### Document Creation
+
 ```bash
 # Task with auto-placement
 lat create <parent>/ "<description>" -t <type> [-p <priority>] [-l <labels>]
@@ -145,6 +153,7 @@ lat create <path>/<dir>.md "<description>"
 ```
 
 ### Task Lifecycle
+
 ```bash
 lat close <id>           # Move to .closed/
 lat reopen <id>          # Move from .closed/
@@ -153,6 +162,7 @@ lat prune --all          # Delete all closed tasks
 ```
 
 ### Queries
+
 ```bash
 lat show <id>            # Display document
 lat list [options]       # Search/filter
@@ -162,6 +172,7 @@ lat search "<query>"     # Full-text search
 ```
 
 ### Validation
+
 ```bash
 lat check                # Validate all documents
 lat check --fix          # Auto-fix issues
@@ -170,6 +181,7 @@ lat doctor --fix         # Fix system issues
 ```
 
 ### Dependencies
+
 ```bash
 lat dep add <task> <depends-on>    # Task depends on depends-on
 lat dep remove <task> <depends-on>
@@ -177,6 +189,7 @@ lat dep tree <task>                # Show dependency tree
 ```
 
 ### Links
+
 ```bash
 lat fmt                  # Normalize all links
 lat links-from <id>      # Outgoing links

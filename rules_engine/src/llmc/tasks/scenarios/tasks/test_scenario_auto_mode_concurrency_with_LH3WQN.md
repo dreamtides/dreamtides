@@ -1,5 +1,5 @@
 ---
-lattice-id: LCAWQN
+lattice-id: LH3WQN
 name: test-scenario-auto-mode-concurrency-with
 description: 'Test Scenario: Auto Mode Concurrency with Multiple Workers'
 parent-id: LB5WQN
@@ -12,17 +12,19 @@ labels:
 - auto-mode
 - concurrency
 blocked-by:
-- LB7WQN
+- LH2WQN
 created-at: 2026-01-21T21:59:55.443775Z
-updated-at: 2026-01-21T21:59:55.443775Z
+updated-at: 2026-01-21T22:31:38.807512Z
 ---
 
 # Test Scenario: Auto Mode Concurrency with Multiple Workers
 
 ## Objective
 
-Verify that auto mode correctly manages multiple concurrent auto workers, distributing
-tasks appropriately and handling simultaneous completions without race conditions.
+Verify that auto mode correctly manages multiple concurrent auto workers,
+distributing
+tasks appropriately and handling simultaneous completions without race
+conditions.
 
 ## Prerequisites
 
@@ -34,6 +36,7 @@ tasks appropriately and handling simultaneous completions without race condition
 ## Differentiating Errors from Normal Operations
 
 **Error indicators:**
+
 - Workers receiving duplicate tasks
 - Race conditions during accept (git conflicts between auto workers)
 - Workers stuck waiting when tasks are available
@@ -42,6 +45,7 @@ tasks appropriately and handling simultaneous completions without race condition
 - Deadlock symptoms (all workers idle despite tasks available)
 
 **Normal operations:**
+
 - Workers processing tasks at different speeds
 - Some workers idle while others work (if fewer tasks than workers)
 - Sequential commits to master (one at a time)
@@ -98,6 +102,7 @@ sleep 10
 ```
 
 **Verify**:
+
 - Both `auto-1` and `auto-2` workers are created
 - `llmc status` shows both under "Auto Workers" section
 - Both workers show in separate TMUX sessions (`llmc-auto-1`, `llmc-auto-2`)
@@ -109,6 +114,7 @@ llmc status --json | jq '.workers[] | select(.name | startswith("auto-")) | {nam
 ```
 
 **Verify**:
+
 - Each worker has distinct worktree path
 - Worktrees are at `.worktrees/auto-1` and `.worktrees/auto-2`
 
@@ -126,6 +132,7 @@ done
 ```
 
 **Verify**:
+
 - Both workers receive tasks
 - Workers may be in different states simultaneously (one working, one idle)
 - No worker receives a duplicate task
@@ -145,6 +152,7 @@ done
 ```
 
 **Verify**:
+
 - All 4 files created: `concurrent_test_1.txt` through `concurrent_test_4.txt`
 - Each file has correct content
 - No duplicate files
@@ -159,6 +167,7 @@ git log --oneline -10
 ```
 
 **Verify**:
+
 - 4 separate commits for the 4 tasks
 - No merge commits (all fast-forward)
 - Commits appear in order (may not be task order, depends on completion order)
@@ -170,6 +179,7 @@ git log --format="%h %s" -10 | grep -i "concurrent_test"
 ```
 
 **Verify**:
+
 - Each task has exactly one commit
 - No partial commits or duplicates
 
@@ -183,6 +193,7 @@ cat ~/llmc/logs/auto.log | grep -i "idle\|task\|assign" | tail -30
 ```
 
 **Verify**:
+
 - Tasks are only assigned when workers are idle
 - No task is lost when workers are busy
 - Daemon correctly waits for available workers
@@ -197,6 +208,7 @@ kill -SIGINT $DAEMON_PID
 ```
 
 **Verify**:
+
 - Shutdown initiates gracefully
 - Active workers receive shutdown signal (Ctrl-C to Claude)
 
@@ -208,6 +220,7 @@ echo "Exit code: $?"
 ```
 
 **Verify**:
+
 - All workers stopped
 - Worktrees preserved (not deleted)
 - Exit code is 0 for graceful shutdown
@@ -248,6 +261,7 @@ llmc nuke --all --yes 2>/dev/null || true
 ## Abort Conditions
 
 **Abort the test and file a task if:**
+
 - Daemon panics during concurrent operations
 - Git repository becomes corrupted
 - Workers interfere with each other's worktrees

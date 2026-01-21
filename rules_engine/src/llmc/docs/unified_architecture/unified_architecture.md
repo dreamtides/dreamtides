@@ -1,11 +1,11 @@
 ---
-lattice-id: LBUWQN
+lattice-id: LRMWQN
 name: unified-architecture
 description: |-
   Migration design from dual-repository LLMC architecture to unified worktree
   architecture for simplified git operations and improved reliability.
 created-at: 2026-01-19T05:00:00Z
-updated-at: 2026-01-19T05:08:18.140125Z
+updated-at: 2026-01-21T22:38:47.395069Z
 ---
 
 # LLMC Unified Architecture: Technical Design
@@ -35,25 +35,35 @@ all existing functionality.
 
 This design is split into the following sections:
 
-- [Architecture Comparison](docs/architecture_comparison.md#LBVWQN) - Current vs
+- [Architecture Comparison](../../../lattice/.closed/please_investigate_following_lattice_iss.md#LBVWQN)
+  - Current vs
   new architecture diagrams and comparison
-- [Detailed Design](docs/detailed_design.md#LBWWQN) - Repository concepts, key
+- [Detailed Design](../../../lattice/tasks/features/00_lattice_feature_template.md#LBWWQN)
+  - Repository concepts, key
   decisions, and state file changes
-- [Configuration Changes](docs/configuration_changes.md#LBXWQN) - New config
+- [Configuration Changes](../../../lattice/tasks/features/.closed/i_would_like_lat_create_--interactive_be.md#LBXWQN)
+  - New config
   schema and resolution logic
-- [Code Changes](docs/code_changes.md#LBYWQN) - File-by-file implementation
+- [Code Changes](../../tasks/features/00_llmc_features.md#LBYWQN) - File-by-file
+  implementation
   guide
-- [Git Operation Safety](docs/git_operation_safety.md#LBZWQN) - Pre-operation
+- [Git Operation Safety](../../tasks/.closed/please_restructure_llmc_daemon_output_be.md#LBZWQN)
+  - Pre-operation
   checks and atomic operations
-- [Edge Cases](docs/edge_cases.md#LB2WQN) - Git state edge cases and failure
+- [Edge Cases](../../tasks/features/.closed/when_there_are_no_tasks_available_from_t.md#LB2WQN)
+  - Git state edge cases and failure
   recovery
-- [Recovery Tools](docs/recovery_tools.md#LB3WQN) - Doctor, salvage, and rescue
+- [Recovery Tools](../../../../.closed/please_create_file_named_bananatesttxt_w.md#LB3WQN)
+  - Doctor, salvage, and rescue
   commands
-- [Migration Plan](docs/migration_plan.md#LB4WQN) - Steps and verification
+- [Migration Plan](../../../../.closed/delete_banana_testtxt_file.md#LB4WQN) -
+  Steps and verification
   checklist
-- [Session Specifications](docs/session_specifications.md#LB5WQN) - Opus session
+- [Session Specifications](../../tasks/scenarios/00_llmc_scenarios.md#LB5WQN) -
+  Opus session
   prompts
-- [Testing Procedures](docs/testing_procedures.md#LB6WQN) - Unit tests and
+- [Testing Procedures](../../tasks/qa/00_llmc_qa_task.md#LB6WQN) - Unit tests
+  and
   integration testing checklist
 - [Logging Specification](docs/logging_specification.md#LB7WQN) - Log levels and
   structured fields

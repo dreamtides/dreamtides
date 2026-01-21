@@ -2,6 +2,7 @@
 lattice-id: LCRWQN
 name: test-scenario-mcp-tool-integration
 description: 'Test Scenario: MCP Tool Integration'
+parent-id: LCEWQN
 task-type: task
 priority: 2
 labels:
@@ -9,12 +10,13 @@ labels:
 - manual-test
 - scenario
 created-at: 2026-01-20T06:17:15.352136Z
-updated-at: 2026-01-20T06:17:15.352136Z
+updated-at: 2026-01-21T22:32:22.891003Z
 ---
 
 # Test Scenario: MCP Tool Integration
 
-See [Agent Manual Testing Guide](../../docs/agent_manual_testing.md#LCBWQN) for
+See [Agent Manual Testing Guide](../../../docs/agent_manual_testing.md#LCBWQN)
+for
 general testing instructions.
 
 ## Objective
@@ -56,6 +58,7 @@ echo '{"jsonrpc":"2.0","id":1,"method":"tools/list"}' | lat mcp --project "$TEST
 ```
 
 **Verify**:
+
 - Valid JSON-RPC response
 - Contains `lattice_create_task` tool
 - Contains `lattice_create_document` tool
@@ -87,6 +90,7 @@ EOF
 ```
 
 **Verify response**:
+
 - `result` contains `lattice_id`, `path`, `name`
 - `path` is under `project/tasks/`
 - Filename includes lattice ID suffix
@@ -98,6 +102,7 @@ cat project/tasks/*.md | head -20
 ```
 
 **Verify**:
+
 - File created with correct content
 - Frontmatter has all fields
 - Labels included
@@ -130,6 +135,7 @@ EOF
 ```
 
 **Verify**:
+
 - Task created successfully
 - All fields populated
 
@@ -159,6 +165,7 @@ EOF
 ```
 
 **Verify**:
+
 - Task created with blocked-by field set
 - First task has blocking field updated
 
@@ -186,6 +193,7 @@ EOF
 ```
 
 **Verify response**:
+
 - `result` contains `lattice_id`, `path`, `name`
 - `path` is `project/docs/authentication_design.md`
 - Filename does NOT include lattice ID
@@ -196,6 +204,7 @@ cat project/docs/authentication_design.md
 ```
 
 **Verify**:
+
 - File created at correct path
 - name field is "authentication-design" (hyphens)
 - No task-type or priority fields
@@ -224,6 +233,7 @@ EOF
 ```
 
 **Verify**:
+
 - Labels included in frontmatter
 
 ### Part 4: Error Handling
@@ -250,6 +260,7 @@ EOF
 ```
 
 **Verify**:
+
 - Error response with INVALID_DIRECTORY code
 - Clear error message
 
@@ -275,6 +286,7 @@ EOF
 ```
 
 **Verify**:
+
 - Error response with INVALID_TASK_TYPE code
 
 **Step 4.3**: Invalid priority.
@@ -300,6 +312,7 @@ EOF
 ```
 
 **Verify**:
+
 - Error response with INVALID_PRIORITY code
 
 **Step 4.4**: Name too long.
@@ -325,6 +338,7 @@ EOF
 ```
 
 **Verify**:
+
 - Error response with NAME_TOO_LONG code
 
 ### Part 5: Setup Claude Command
@@ -336,6 +350,7 @@ lat setup claude --check
 ```
 
 **Verify**:
+
 - Reports whether Lattice is installed
 - Exit code 0 if installed, 2 if not
 
@@ -346,6 +361,7 @@ lat setup claude --dry-run
 ```
 
 **Verify**:
+
 - Shows what would be configured
 - Does NOT modify any files
 
@@ -356,6 +372,7 @@ lat setup claude --project
 ```
 
 **Verify**:
+
 - Creates or modifies `.mcp.json` in project root
 - Contains lattice entry
 
@@ -364,6 +381,7 @@ cat .mcp.json
 ```
 
 **Verify**:
+
 - Valid JSON
 - Has `mcpServers.lattice` entry
 - Command points to `lat mcp`
@@ -375,6 +393,7 @@ lat setup claude --check
 ```
 
 **Verify**:
+
 - Reports installation valid
 - Exit code 0
 
@@ -385,6 +404,7 @@ lat setup claude --remove
 ```
 
 **Verify**:
+
 - Lattice entry removed from config
 - Other MCP servers preserved (if any)
 
@@ -417,6 +437,7 @@ cat project/tasks/*parent*.md 2>/dev/null || cat project/tasks/*.md | tail -1
 ```
 
 **Verify**:
+
 - parent-id field references the project root document
 
 ### Part 7: Filename Generation
@@ -428,6 +449,7 @@ ls project/tasks/
 ```
 
 **Verify**:
+
 - Task filenames include lattice ID suffix (e.g., `fix_bug_LXXXXX.md`)
 
 **Step 7.2**: Document filename does not include ID.
@@ -437,6 +459,7 @@ ls project/docs/
 ```
 
 **Verify**:
+
 - Document filenames are just the name (e.g., `authentication_design.md`)
 - No lattice ID in filename
 
@@ -469,6 +492,7 @@ grep -A 10 "Code example" project/tasks/*special*.md
 ```
 
 **Verify**:
+
 - All special characters preserved
 - Code blocks intact
 - JSON not mangled
@@ -501,6 +525,7 @@ wait
 ```
 
 **Verify**:
+
 - All 5 tasks created
 - No ID collisions
 - No file conflicts

@@ -2,6 +2,7 @@
 lattice-id: LCOWQN
 name: test-scenario-linter-validation-fixes
 description: 'Test Scenario: Linter Validation and Fixes'
+parent-id: LCEWQN
 task-type: task
 priority: 2
 labels:
@@ -9,12 +10,13 @@ labels:
 - manual-test
 - scenario
 created-at: 2026-01-20T06:15:47.675663Z
-updated-at: 2026-01-20T06:15:47.675663Z
+updated-at: 2026-01-21T22:32:22.886294Z
 ---
 
 # Test Scenario: Linter Validation and Fixes
 
-See [Agent Manual Testing Guide](../../docs/agent_manual_testing.md#LCBWQN) for
+See [Agent Manual Testing Guide](../../../docs/agent_manual_testing.md#LCBWQN)
+for
 general testing instructions.
 
 ## Objective
@@ -75,6 +77,7 @@ lat check
 ```
 
 **Verify**:
+
 - E001 error reported
 - Both file paths shown
 - Exit code 2
@@ -100,6 +103,7 @@ lat check
 ```
 
 **Verify**:
+
 - E002 error for missing target LNOTREAL
 - Shows file and line number
 
@@ -125,6 +129,7 @@ lat check
 ```
 
 **Verify**:
+
 - E003 error for 'priortiy'
 - Suggests 'priority'
 
@@ -150,6 +155,7 @@ lat check
 ```
 
 **Verify**:
+
 - E004 error: task missing priority
 
 #### E005: Invalid Field Value
@@ -175,6 +181,7 @@ lat check
 ```
 
 **Verify**:
+
 - E005 error: priority 99 invalid (allowed 0-4)
 
 #### E006: Circular Blocking
@@ -210,6 +217,7 @@ lat check
 ```
 
 **Verify**:
+
 - E006 error: circular blocking dependency
 
 #### E007: Invalid ID Format
@@ -231,6 +239,7 @@ lat check
 ```
 
 **Verify**:
+
 - E007 error: malformed lattice-id
 
 #### E008: Name-Filename Mismatch
@@ -252,6 +261,7 @@ lat check
 ```
 
 **Verify**:
+
 - E008 error: name should be 'my-document'
 
 ### Part 2: Warning Detection (W-codes)
@@ -287,6 +297,7 @@ lat check
 ```
 
 **Verify**:
+
 - W001 warning: 600+ lines (recommended max 500)
 
 #### W002/W003: Name/Description Too Long
@@ -309,6 +320,7 @@ lat check
 ```
 
 **Verify**:
+
 - W002 warning: name too long
 
 #### W017: Document Not in Standard Location
@@ -330,6 +342,7 @@ lat check
 ```
 
 **Verify**:
+
 - W017 warning: not in tasks/ or docs/ directory
 
 #### W018: Task in docs/ Directory
@@ -353,6 +366,7 @@ lat check
 ```
 
 **Verify**:
+
 - W018 warning: task in docs/ directory
 
 ### Part 3: Auto-Fix with lat check --fix
@@ -367,7 +381,7 @@ name: wrong-name
 description: Has fixable name mismatch
 ---
 
-Content.   
+Content.
 EOF
 ```
 
@@ -376,6 +390,7 @@ lat check --fix
 ```
 
 **Verify**:
+
 - E008 (name mismatch) fixed automatically
 - name field updated to 'fixable'
 
@@ -401,7 +416,7 @@ Multiple blank lines above.
 *   Wrong list marker
 +   Another wrong marker
 
-Line with trailing spaces.    
+Line with trailing spaces.
 
 No final newline
 EOF
@@ -420,6 +435,7 @@ cat project/docs/messy.md
 ```
 
 **Verify**:
+
 - Single blank line between sections
 - Consistent list markers (-)
 - Trailing whitespace removed
@@ -465,6 +481,7 @@ cat project/docs/links_test.md
 ```
 
 **Verify**:
+
 - First link expanded to include path: `../project.md#$ROOT_ID`
 - Second link has fragment added: `messy.md#LMESSY1`
 
@@ -477,6 +494,7 @@ lat check --errors-only
 ```
 
 **Verify**:
+
 - Only shows E-codes, not W-codes
 
 **Step 6.2**: Path-scoped check.
@@ -486,6 +504,7 @@ lat check --path project/docs/
 ```
 
 **Verify**:
+
 - Only checks docs/, not tasks/
 
 **Step 6.3**: Staged-only check.
@@ -496,6 +515,7 @@ lat check --staged-only
 ```
 
 **Verify**:
+
 - Only checks staged files
 
 ### Part 7: JSON Output
@@ -507,6 +527,7 @@ lat check --json
 ```
 
 **Verify**:
+
 - Valid JSON output
 - Contains `documents_checked`, `errors`, `warnings`, `summary`
 

@@ -2,6 +2,7 @@
 lattice-id: LCLWQN
 name: test-scenario-linking-system-normalizati
 description: 'Test Scenario: Linking System and Normalization'
+parent-id: LCEWQN
 task-type: task
 priority: 2
 labels:
@@ -9,12 +10,13 @@ labels:
 - manual-test
 - scenario
 created-at: 2026-01-20T06:13:20.935399Z
-updated-at: 2026-01-20T06:13:20.935399Z
+updated-at: 2026-01-21T22:32:22.880087Z
 ---
 
 # Test Scenario: Linking System and Normalization
 
-See [Agent Manual Testing Guide](../../docs/agent_manual_testing.md#LCBWQN) for
+See [Agent Manual Testing Guide](../../../docs/agent_manual_testing.md#LCBWQN)
+for
 general testing instructions.
 
 ## Objective
@@ -95,10 +97,12 @@ lat fmt
 ```
 
 **Verify in `docs/api/endpoints.md`**:
+
 - Link changed from `[architecture doc](LTEST01)` to
   `[architecture doc](../design/architecture.md#LTEST01)`
 
 **Verify in `docs/design/data_model.md`**:
+
 - Link `[link](LTEST01)` expanded to include path and fragment
 - Link `[endpoints](../api/endpoints.md)` now includes `#LTEST02` fragment
 
@@ -111,6 +115,7 @@ lat check
 ```
 
 **Verify**:
+
 - No E002 errors (missing reference targets)
 - No W010 warnings (stale link paths) after fmt
 - No W010b warnings (missing fragments) after fmt
@@ -134,6 +139,7 @@ lat check
 ```
 
 **Verify**:
+
 - E002 error reported for broken link to LNONEXIST
 - Shows file path and line number
 
@@ -146,6 +152,7 @@ lat links-to LTEST01
 ```
 
 **Verify**:
+
 - Shows `docs/api/endpoints.md`
 - Shows `docs/design/data_model.md`
 
@@ -156,6 +163,7 @@ lat links-from LTEST01
 ```
 
 **Verify**:
+
 - Shows nothing or empty (architecture has no outgoing links in body)
 
 **Step 3.3**: Check links from data_model.
@@ -165,6 +173,7 @@ lat links-from LTEST03
 ```
 
 **Verify**:
+
 - Shows LTEST01 (architecture)
 - Shows LTEST02 (endpoints)
 
@@ -177,9 +186,12 @@ lat mv LTEST01 docs/new_location/architecture.md
 ```
 
 **Verify**:
+
 - File moved to `docs/new_location/architecture.md`
-- In `docs/api/endpoints.md`: link updated to `../new_location/architecture.md#LTEST01`
-- In `docs/design/data_model.md`: link updated to `../new_location/architecture.md#LTEST01`
+- In `docs/api/endpoints.md`: link updated to
+  `../new_location/architecture.md#LTEST01`
+- In `docs/design/data_model.md`: link updated to
+  `../new_location/architecture.md#LTEST01`
 
 **Step 4.2**: Verify links still resolve.
 
@@ -188,6 +200,7 @@ lat check
 ```
 
 **Verify**:
+
 - No E002 or W010 errors
 
 **Step 4.3**: Verify backlinks still work.
@@ -197,6 +210,7 @@ lat links-to LTEST01
 ```
 
 **Verify**:
+
 - Still shows the linking documents
 
 ### Part 5: Link Updates on Close/Reopen
@@ -225,6 +239,7 @@ lat close $TASK_ID
 ```
 
 **Verify in `docs/design/data_model.md`**:
+
 - Link path updated to include `.closed/` in path
 
 **Step 5.3**: Reopen the task.
@@ -234,6 +249,7 @@ lat reopen $TASK_ID
 ```
 
 **Verify**:
+
 - Link path updated back to non-.closed path
 
 ### Part 6: Related Documents in Show
@@ -245,6 +261,7 @@ lat show LTEST03
 ```
 
 **Verify**:
+
 - "Related" section shows LTEST01 and LTEST02
 - Shows document titles/descriptions
 
@@ -255,6 +272,7 @@ lat show LTEST03 --json
 ```
 
 **Verify**:
+
 - `related` array contains the linked documents
 - Each has `id`, `name`, `description`
 
@@ -283,6 +301,7 @@ lat orphans
 ```
 
 **Verify**:
+
 - Shows LTEST05 (orphan.md)
 
 **Step 7.3**: Exclude roots from orphan list.
@@ -292,6 +311,7 @@ lat orphans --exclude-roots
 ```
 
 **Verify**:
+
 - Root documents not listed as orphans
 
 ### Part 8: Path Finding
@@ -303,6 +323,7 @@ lat path LTEST02 LTEST01
 ```
 
 **Verify**:
+
 - Shows path: LTEST02 → LTEST01 (direct link)
 
 **Step 8.2**: Find longer path.
@@ -313,6 +334,7 @@ lat path LTEST03 LTEST01
 ```
 
 **Verify**:
+
 - Shows direct or indirect path
 
 ### Part 9: Impact Analysis
@@ -324,6 +346,7 @@ lat impact LTEST01
 ```
 
 **Verify**:
+
 - Shows documents that reference LTEST01
 - Helps understand change impact
 
@@ -346,6 +369,7 @@ lat check
 ```
 
 **Verify**:
+
 - W008 warning about self-reference
 
 **Step 10.2**: Link with correct path but wrong fragment.
@@ -365,6 +389,7 @@ lat check
 ```
 
 **Verify**:
+
 - Should detect fragment doesn't match file's ID (or path doesn't match ID)
 
 **Step 10.3**: External URL (not a Lattice link).
@@ -384,6 +409,7 @@ lat check
 ```
 
 **Verify**:
+
 - External URL not treated as Lattice link
 - No errors about it
 

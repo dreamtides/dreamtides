@@ -1,10 +1,10 @@
 ---
-lattice-id: LB6WQN
+lattice-id: LRKWQN
 name: testing-procedures
 description: Unit test additions, integration test script, and manual testing checklists.
-parent-id: LBUWQN
+parent-id: LRMWQN
 created-at: 2026-01-19T05:00:00Z
-updated-at: 2026-01-19T05:08:18.132983Z
+updated-at: 2026-01-21T22:38:24.903881Z
 ---
 
 # Testing Procedures

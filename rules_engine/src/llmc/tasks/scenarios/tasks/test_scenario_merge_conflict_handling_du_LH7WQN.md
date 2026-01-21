@@ -1,5 +1,5 @@
 ---
-lattice-id: LCEWQN
+lattice-id: LH7WQN
 name: test-scenario-merge-conflict-handling-du
 description: 'Test Scenario: Merge Conflict Handling During Auto Accept'
 parent-id: LB5WQN
@@ -12,17 +12,19 @@ labels:
 - auto-mode
 - merge-conflict
 blocked-by:
-- LCDWQN
+- LH6WQN
 created-at: 2026-01-21T22:02:47.025721Z
-updated-at: 2026-01-21T22:02:47.025721Z
+updated-at: 2026-01-21T22:31:38.818295Z
 ---
 
 # Test Scenario: Merge Conflict Handling During Auto Accept
 
 ## Objective
 
-Verify that auto mode correctly handles merge conflicts during the accept workflow,
-transitioning workers to `rebasing` state, sending conflict prompts, and successfully
+Verify that auto mode correctly handles merge conflicts during the accept
+workflow,
+transitioning workers to `rebasing` state, sending conflict prompts, and
+successfully
 completing accept after worker resolves conflicts.
 
 ## Prerequisites
@@ -35,6 +37,7 @@ completing accept after worker resolves conflicts.
 ## Differentiating Errors from Normal Operations
 
 **Error indicators:**
+
 - Worker stuck in `rebasing` state indefinitely (>10 minutes)
 - Daemon crashes on conflict detection
 - Conflict not detected (accept proceeds with merge commits)
@@ -42,6 +45,7 @@ completing accept after worker resolves conflicts.
 - Conflict resolution prompt malformed
 
 **Normal operations:**
+
 - Worker transitioning to `rebasing` state during conflict
 - Worker receiving conflict resolution prompt
 - Worker successfully resolving conflicts
@@ -143,17 +147,18 @@ cd ~/llmc
 for i in {1..60}; do
     STATUS=$(llmc status --json 2>/dev/null | jq -r '.workers[] | select(.name == "auto-1") | .status' 2>/dev/null)
     echo "Worker status: $STATUS"
-    
+
     if [ "$STATUS" = "rebasing" ]; then
         echo "Conflict detected - worker in rebasing state"
         break
     fi
-    
+
     sleep 5
 done
 ```
 
 **Verify**:
+
 - Worker transitions to `rebasing` state
 - Daemon does NOT shut down
 
@@ -164,6 +169,7 @@ llmc peek auto-1 --lines 100 | tail -50
 ```
 
 **Verify**:
+
 - Worker received conflict resolution prompt
 - Prompt includes information about conflicting files
 - Prompt includes resolution instructions
@@ -177,19 +183,20 @@ llmc peek auto-1 --lines 100 | tail -50
 for i in {1..90}; do
     STATUS=$(llmc status --json 2>/dev/null | jq -r '.workers[] | select(.name == "auto-1") | .status' 2>/dev/null)
     echo "Worker status: $STATUS (iteration $i)"
-    
+
     if [ "$STATUS" = "idle" ]; then
         echo "Worker returned to idle - conflict resolved and accepted"
         break
     elif [ "$STATUS" = "needs_review" ]; then
         echo "Worker completed conflict resolution - awaiting auto-accept"
     fi
-    
+
     sleep 5
 done
 ```
 
 **Verify**:
+
 - Worker eventually returns to `idle` state
 - Worker successfully resolved the conflict
 - Changes were accepted
@@ -203,6 +210,7 @@ git log --oneline -5
 ```
 
 **Verify**:
+
 - File contains worker's change (not master's conflicting change, unless merged)
 - Git history shows successful merge/rebase
 - No merge commits (fast-forward only)
@@ -216,6 +224,7 @@ cat ~/llmc/logs/auto.log | grep -i "conflict\|rebase\|resolv" | tail -20
 ```
 
 **Verify**:
+
 - Log shows conflict detection
 - Log shows transition to rebasing state
 - Log shows conflict resolution prompt sent
@@ -307,12 +316,12 @@ cd ~/llmc
 for i in {1..120}; do
     STATUS=$(llmc status --json 2>/dev/null | jq -r '.workers[] | select(.name == "auto-1") | .status' 2>/dev/null)
     echo "Worker status: $STATUS"
-    
+
     if [ "$STATUS" = "idle" ] || [ "$STATUS" = "error" ]; then
         echo "Final state reached: $STATUS"
         break
     fi
-    
+
     sleep 5
 done
 
@@ -323,6 +332,7 @@ git log --oneline -5
 ```
 
 **Verify**:
+
 - Worker either resolves complex conflict or escalates appropriately
 - No daemon crash
 - State is consistent (idle or error, not stuck)
@@ -365,6 +375,7 @@ llmc nuke --all --yes 2>/dev/null || true
 ## Abort Conditions
 
 **Abort the test and file a task if:**
+
 - Git repository becomes corrupted
 - Worker worktree left in unrecoverable state
 - Daemon panics during conflict handling

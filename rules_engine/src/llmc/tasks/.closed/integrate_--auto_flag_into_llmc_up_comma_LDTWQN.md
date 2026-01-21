@@ -2,6 +2,7 @@
 lattice-id: LDTWQN
 name: integrate---auto-flag-into-llmc-up-comma
 description: Integrate --auto flag into llmc up command
+parent-id: LBSWQN
 task-type: feature
 priority: 2
 labels:
@@ -15,13 +16,14 @@ blocked-by:
 - LDIWQN
 - LDJWQN
 created-at: 2026-01-21T04:02:52.569768Z
-updated-at: 2026-01-21T06:11:11.439973Z
+updated-at: 2026-01-21T22:31:38.771599Z
 closed-at: 2026-01-21T06:11:11.439973Z
 ---
 
 ## Overview
 
-Integrate the `--auto` flag and related options into the existing `llmc up` command, branching to auto mode when specified.
+Integrate the `--auto` flag and related options into the existing `llmc up`
+command, branching to auto mode when specified.
 
 ## Implementation Steps
 

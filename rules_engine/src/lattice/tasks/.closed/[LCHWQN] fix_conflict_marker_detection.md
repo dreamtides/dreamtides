@@ -1,12 +1,12 @@
 ---
 lattice-id: LCHWQN
-name: fix-conflict-marker-detection
+name: '[lchwqn] fix-conflict-marker-detection'
 description: Conflict marker detection flags decorative equals signs in code
 parent-id: LCEWQN
 task-type: bug
 priority: 3
 created-at: 2026-01-19T05:15:00Z
-updated-at: 2026-01-19T16:14:45.531618Z
+updated-at: 2026-01-21T22:31:38.509745Z
 closed-at: 2026-01-19T16:14:45.531618Z
 ---
 

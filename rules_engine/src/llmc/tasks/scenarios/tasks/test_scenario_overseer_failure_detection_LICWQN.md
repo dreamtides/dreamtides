@@ -1,5 +1,5 @@
 ---
-lattice-id: LCHWQN
+lattice-id: LICWQN
 name: test-scenario-overseer-failure-detection
 description: 'Test Scenario: Overseer Failure Detection and Remediation'
 parent-id: LB5WQN
@@ -12,9 +12,9 @@ labels:
 - overseer
 - remediation
 blocked-by:
-- LCGWQN
+- LIBWQN
 created-at: 2026-01-21T22:05:41.880949Z
-updated-at: 2026-01-21T22:05:41.880949Z
+updated-at: 2026-01-21T22:31:38.829615Z
 ---
 
 # Test Scenario: Overseer Failure Detection and Remediation
@@ -36,6 +36,7 @@ remediation prompts, and executes remediation via Claude Code.
 ## Differentiating Errors from Normal Operations
 
 **Error indicators:**
+
 - Overseer doesn't detect daemon failure
 - Remediation prompt not sent to overseer session
 - Remediation logs not created
@@ -44,6 +45,7 @@ remediation prompts, and executes remediation via Claude Code.
 - Remediation session hangs indefinitely
 
 **Normal operations:**
+
 - Brief delay between failure detection and termination
 - Overseer session receiving remediation prompt
 - Remediation attempting to fix issues
@@ -143,18 +145,19 @@ echo "Daemon killed - heartbeat will become stale"
 # Monitor overseer behavior
 for i in {1..30}; do
     echo "=== Check $i ==="
-    
+
     # Check if overseer detected the failure
     cat ~/llmc/logs/auto.log 2>/dev/null | tail -5
-    
+
     # Check for remediation session activity
     tmux capture-pane -t llmc-overseer -p 2>/dev/null | tail -10
-    
+
     sleep 5
 done
 ```
 
 **Verify**:
+
 - Overseer detects stale heartbeat within ~15 seconds
 - Overseer logs failure detection
 - Remediation prompt is sent to overseer Claude session
@@ -202,15 +205,16 @@ for i in {1..60}; do
     if grep -i "error\|fatal" ~/llmc/logs/auto.log 2>/dev/null | tail -3; then
         echo "Error logged"
     fi
-    
+
     # Check overseer state
     llmc status 2>/dev/null | grep -i "overseer\|remediat" || true
-    
+
     sleep 5
 done
 ```
 
 **Verify**:
+
 - ERROR entry in daemon log triggers overseer
 - Overseer initiates remediation
 - Remediation prompt includes log context
@@ -232,6 +236,7 @@ fi
 ```
 
 **Verify**:
+
 - Remediation log created with timestamp
 - Contains user-configured remediation_prompt
 - Contains failure type
@@ -248,6 +253,7 @@ fi
 ```
 
 **Verify**:
+
 - Structured sections present
 - Error context is specific, not generic
 
@@ -261,6 +267,7 @@ tmux capture-pane -t llmc-overseer -p | tail -30
 ```
 
 **Verify**:
+
 - Claude Code received the remediation prompt
 - Claude Code is actively working on the issue
 
@@ -274,6 +281,7 @@ fi
 ```
 
 **Verify**:
+
 - Session cleared before new remediation prompt
 
 ### Part 5: Daemon Restart After Remediation
@@ -290,12 +298,13 @@ for i in {1..60}; do
             break
         fi
     fi
-    
+
     sleep 5
 done
 ```
 
 **Verify**:
+
 - New daemon started after remediation
 - New instance_id generated
 - Daemon running normally
@@ -308,6 +317,7 @@ cat ~/llmc/.llmc/auto.heartbeat | jq '.'
 ```
 
 **Verify**:
+
 - System recovered
 - Heartbeat active
 - Workers operational
@@ -325,6 +335,7 @@ fi
 ```
 
 **Verify**:
+
 - Full prompt captured
 - All tool calls logged
 - All tool outputs logged
@@ -345,6 +356,7 @@ echo "Verify: If no task completions for stall_timeout, overseer should interven
 ```
 
 **Verify** (conceptually):
+
 - No task completion for stall_timeout_secs triggers remediation
 - Stall is different from empty task pool (idle is not stall)
 
@@ -387,6 +399,7 @@ llmc nuke --all --yes 2>/dev/null || true
 ## Abort Conditions
 
 **Abort the test and file a task if:**
+
 - Overseer crashes during remediation
 - Remediation corrupts state
 - Multiple concurrent remediations triggered

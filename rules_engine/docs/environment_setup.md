@@ -1,30 +1,34 @@
 ---
-lattice-id: LBSWQN
+lattice-id: LRLWQN
 name: environment-setup
 description: |-
   This document records the exact steps followed to make the Dreamtides rules engine
   repository buildable and ready for day-to-day development.
 created-at: 2026-01-18T05:52:12.687012Z
-updated-at: 2026-01-18T05:52:12.687029Z
+updated-at: 2026-01-21T22:31:38.473833Z
 ---
 
 # Environment Setup
 
 ## 1. Verify the Rust toolchain
 
-1. Checked the installed compiler and Cargo versions to confirm the toolchain was
+1. Checked the installed compiler and Cargo versions to confirm the toolchain
+   was
    available:
    ```bash
    rustc --version
    cargo --version
    ```
-2. Ensured the stable components Clippy and rustfmt were installed. This completed
+2. Ensured the stable components Clippy and rustfmt were installed. This
+   completed
    almost instantly:
    ```bash
    rustup component add clippy rustfmt
    ```
-3. The `just fmt` recipe runs `cargo +nightly fmt`, so also installed the nightly
-   rustfmt component before trying to format again. The download and install took
+3. The `just fmt` recipe runs `cargo +nightly fmt`, so also installed the
+   nightly
+   rustfmt component before trying to format again. The download and install
+   took
    roughly 30 seconds on my machine:
    ```bash
    rustup component add rustfmt --toolchain nightly > /dev/null
@@ -44,7 +48,8 @@ just --version            # verified the install succeeded
 ## 3. Install workspace lint support
 
 Running `just review` shells out to `cargo workspace-lints`. That subcommand was
-not present by default, so I installed it separately. The install and build phase
+not present by default, so I installed it separately. The install and build
+phase
 completed in about 90 seconds:
 
 ```bash
@@ -58,8 +63,10 @@ requested by the repository instructions. Timings below reflect the waits seen
 on a fresh build; once the workspace cache is warm the commands finish much
 faster.
 
-1. **Format:** The first formatting attempt triggered a nightly toolchain download
-   and then failed until the nightly rustfmt component was installed (see step 1).
+1. **Format:** The first formatting attempt triggered a nightly toolchain
+   download
+   and then failed until the nightly rustfmt component was installed (see step
+   1).
    After installing that component, `just fmt` completed in about 1.5 seconds.
    ```bash
    just fmt
@@ -73,15 +80,18 @@ faster.
    just clippy
    ```
 4. **Review:** The first invocation of the review pipeline rebuilt the entire
-   workspace, ran `cargo workspace-lints`, and executed the full test suite. That
-   initial build took just under 22 minutes and failed until `cargo-workspace-lints`
+   workspace, ran `cargo workspace-lints`, and executed the full test suite.
+   That
+   initial build took just under 22 minutes and failed until
+   `cargo-workspace-lints`
    was installed. After installing it, re-running
    ```bash
    CARGO_BUILD_JOBS=1 just review
    ```
    completed successfully in about 1 minute 20 seconds thanks to cached build
    artifacts. The command runs `cargo +nightly fmt --check`, `cargo build`,
-   `cargo workspace-lints`, `cargo clippy`, and `cargo test`, so expect the first
+   `cargo workspace-lints`, `cargo clippy`, and `cargo test`, so expect the
+   first
    clean run to take the longest.
 
 Following these steps left the repository fully formatted, linted, and with all

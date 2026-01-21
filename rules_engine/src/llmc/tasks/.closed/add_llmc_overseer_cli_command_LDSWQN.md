@@ -2,6 +2,7 @@
 lattice-id: LDSWQN
 name: add-llmc-overseer-cli-command
 description: Add llmc overseer CLI command
+parent-id: LBSWQN
 task-type: feature
 priority: 2
 labels:
@@ -14,7 +15,7 @@ blocked-by:
 - LDPWQN
 - LDTWQN
 created-at: 2026-01-21T04:02:52.268229Z
-updated-at: 2026-01-21T17:00:05.263957Z
+updated-at: 2026-01-21T22:31:38.672874Z
 closed-at: 2026-01-21T17:00:05.263957Z
 ---
 

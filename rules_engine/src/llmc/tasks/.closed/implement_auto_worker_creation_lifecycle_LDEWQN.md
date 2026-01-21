@@ -2,6 +2,7 @@
 lattice-id: LDEWQN
 name: implement-auto-worker-creation-lifecycle
 description: Implement auto worker creation and lifecycle management
+parent-id: LBSWQN
 task-type: feature
 priority: 1
 labels:
@@ -16,13 +17,14 @@ blocked-by:
 - LDCWQN
 - LDUWQN
 created-at: 2026-01-21T04:00:03.919357Z
-updated-at: 2026-01-21T05:28:06.118248Z
+updated-at: 2026-01-21T22:31:38.711151Z
 closed-at: 2026-01-21T05:28:06.118248Z
 ---
 
 ## Overview
 
-Implement the auto worker management system that creates and tracks workers specifically for autonomous operation (auto-1, auto-2, etc.).
+Implement the auto worker management system that creates and tracks workers
+specifically for autonomous operation (auto-1, auto-2, etc.).
 
 ## Implementation Steps
 
@@ -45,7 +47,8 @@ Implement the auto worker management system that creates and tracks workers spec
 
 4. **Add command restriction enforcement**:
    - Modify `llmc start` command to reject auto workers with clear error message
-   - Ensure other commands (`attach`, `peek`, `reset`, `nuke`, `pick`) work normally
+   - Ensure other commands (`attach`, `peek`, `reset`, `nuke`, `pick`) work
+     normally
 
 5. **Handle auto worker cleanup**:
    - `llmc nuke --all` should include auto workers

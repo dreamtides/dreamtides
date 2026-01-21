@@ -1,11 +1,11 @@
 ---
 lattice-id: LBTWQN
 name: lattice-design
-description:  |-
+description: |-
   Master technical design document for the `lat` command and lattice knowledge
   base and task tracking system
 created-at: 2026-01-18T05:53:44.399328Z
-updated-at: 2026-01-18T05:53:44.399331Z
+updated-at: 2026-01-21T22:31:38.481497Z
 ---
 
 # Lattice Document System Technical Design
@@ -80,24 +80,31 @@ The frontmatter keys are deliberately designed to avoid conflicts with
 Claude's SKILL.md format. The reserved keys include:
 
 **Identity Keys:**
+
 - `lattice-id`: Unique document identifier (required)
-- `parent-id`: ID of parent document, auto-populated by `lat fmt` from directory root
-- `name`: Lowercase-hyphenated identifier derived from filename (required, max 64 chars)
+- `parent-id`: ID of parent document, auto-populated by `lat fmt` from directory
+  root
+- `name`: Lowercase-hyphenated identifier derived from filename (required, max
+  64 chars)
 - `description`: Human-readable summary (required, max 1024 chars)
 
 The `name` field is always derived from the document's filename: underscores
 become hyphens and the `.md` extension is stripped. Filenames may optionally
 include a trailing lattice ID suffix (e.g., `fix_login_bug_LABCDEF.md`), which
 is stripped when deriving the name. Examples:
+
 - `fix_login_bug.md` → `fix-login-bug`
 - `fix_login_bug_LABCDEF.md` → `fix-login-bug` (ID suffix stripped)
+
 This is a core Lattice invariant enforced by the linter.
 
 For tasks, `description` serves as the human-readable task title shown in
 `lat show` and other outputs (e.g., "Fix login bug after password reset"). For
-knowledge base documents, `description` provides a purpose summary for AI context.
+knowledge base documents, `description` provides a purpose summary for AI
+context.
 
 **Task Tracking Keys:**
+
 - `task-type`: bug/feature/task/chore
 - `priority`: 0-4 (0 highest)
 - `labels`: List of arbitrary string labels
@@ -107,6 +114,7 @@ knowledge base documents, `description` provides a purpose summary for AI contex
 - `created-at`, `updated-at`, `closed-at`: ISO 8601 timestamps
 
 **Skill Integration Keys:**
+
 - `skill`: Boolean enabling Claude Skill generation
 
 See [Appendix: Task Tracking](appendix_task_tracking.md) for the complete
@@ -135,6 +143,7 @@ Documents exceeding this should be split into multiple files using the
 ### Root Documents and Hierarchy
 
 A **root document** is either:
+
 - A document whose filename (without `.md` extension) matches its containing
   directory name (e.g., `api/api.md`)
 - A document whose filename starts with `00_` (e.g., `lattice/00_design.md`)
@@ -181,10 +190,13 @@ See [Appendix: Linter](appendix_linter.md) for the complete rule set.
 ## The ID System
 
 A Lattice ID is a compact, human-typeable identifier with minimum 6 characters:
-`L` prefix + Base32 document counter (2+ digits) + Base32 client ID (3-6 digits).
-Example: `LJCQ2X`. Uses RFC 4648 Base32 (A-Z, 2-7) avoiding ambiguous characters.
+`L` prefix + Base32 document counter (2+ digits) + Base32 client ID (3-6
+digits).
+Example: `LJCQ2X`. Uses RFC 4648 Base32 (A-Z, 2-7) avoiding ambiguous
+characters.
 
-The counter and client ID are concatenated and scrambled using an 8-round Feistel
+The counter and client ID are concatenated and scrambled using an 8-round
+Feistel
 permutation with hardcoded keys before encoding. This ensures consecutive IDs
 appear visually distinct (e.g., `LJCQ2X`, `LWN5RP`, `L4DKAT`) while remaining
 deterministic and reversible across all clients.
@@ -228,7 +240,8 @@ in markdown files. Supports automatic release when tasks are closed.
 `lat ready`, `lat claim`, and `lat show` into a single operation: finds the
 highest-priority ready task (sorted by priority then age), claims it, and
 outputs full context. Returns silently with exit code 0 if no ready tasks
-are available (no output to stdout or stderr). Supports `--json` output (recommended for programmatic use),
+are available (no output to stdout or stderr). Supports `--json` output
+(recommended for programmatic use),
 `--dry-run` to preview without claiming, `--no-claim` to skip claiming,
 `--max-claims` to fail if too many active claims exist, and all filter options
 from `lat ready` (`--type`, `--priority`, `--label`, etc.).
@@ -236,9 +249,11 @@ JSON output includes the complete ShowOutput structure with task metadata, body,
 composed context and acceptance criteria from ancestor templates, dependencies,
 dependents, and related documents.
 
-See [Appendix: Workflow](appendix_workflow.md) for complete command specifications,
+See [Appendix: Workflow](appendix_workflow.md) for complete command
+specifications,
 output formats, and claiming behavior, and
-[Appendix: Overview Command](appendix_overview_command.md) for the ranking algorithm.
+[Appendix: Overview Command](appendix_overview_command.md) for the ranking
+algorithm.
 
 ### Task and Document Management
 
@@ -267,7 +282,8 @@ tasks.
 **lat close** - Closes tasks by moving them to a `.closed/` subdirectory under
 their current location (e.g., `api/tasks/foo.md` → `api/tasks/.closed/foo.md`).
 All markdown links to closed tasks are automatically rewritten to the new path,
-similar to `lat mv`. Sets the `closed-at` timestamp and releases any local claims.
+similar to `lat mv`. Sets the `closed-at` timestamp and releases any local
+claims.
 
 **lat prune** - Permanently removes closed tasks from the repository. Requires
 either a path argument or `--all` to prune all closed tasks. YAML frontmatter
@@ -364,7 +380,8 @@ their original parent directory. All links are rewritten to the restored path.
 
 **lat dep** - Manage dependencies: `add`, `remove`, and `tree` subcommands.
 
-**lat label** - Manage labels: `add`, `remove`, `list`, and `list-all` subcommands.
+**lat label** - Manage labels: `add`, `remove`, `list`, and `list-all`
+subcommands.
 
 ## Linking System
 
@@ -386,6 +403,7 @@ have other tasks as parents if desired—in that case, use the standard task typ
 (bug, feature, task, chore) for the parent task.
 
 Task state is determined by filesystem location, not by a status field:
+
 - **Open**: Task exists outside of any `.closed/` directory
 - **Blocked**: Task has open (non-closed) entries in its `blocked-by` field
 - **Closed**: Task resides in a `.closed/` subdirectory
@@ -464,7 +482,8 @@ symlinks in `.claude/skills/`. The `name` (max 64 chars) and `description`
 (max 1024 chars) fields follow Claude's SKILL.md validation rules.
 
 See [Appendix: AI Integration](appendix_ai_integration.md) for MCP tool
-specifications and [Appendix: Startup Operations](appendix_startup_operations.md)
+specifications and
+[Appendix: Startup Operations](appendix_startup_operations.md)
 for symlink sync.
 
 ## Configuration
