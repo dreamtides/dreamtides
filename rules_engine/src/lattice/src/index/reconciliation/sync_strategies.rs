@@ -224,10 +224,14 @@ fn insert_or_update_document(
     let doc_id = doc.frontmatter.lattice_id.as_str();
     let path_str = path.to_string_lossy().to_string();
 
-    // For upserts, remove existing entry if present (by ID or path)
+    // For upserts, clear existing entry if present (by ID or path).
+    // We use clear_document_for_reindex instead of remove_document_by_id because
+    // we only want to delete outgoing links (source), not incoming links (target).
+    // Deleting incoming links would break other documents' blocked-by
+    // relationships.
     if is_upsert {
-        let _ = remove_document_by_id(conn, doc_id);
-        let _ = remove_document_by_path_str(conn, &path_str);
+        let _ = clear_document_for_reindex(conn, doc_id);
+        let _ = clear_document_by_path_str(conn, &path_str);
     }
 
     // Compute body hash for change detection
@@ -280,7 +284,7 @@ fn remove_document_by_path(
     Ok(removed)
 }
 
-/// Removes a document from the index by path string.
+/// Removes a document from the index by path string (for permanent deletion).
 fn remove_document_by_path_str(conn: &Connection, path: &str) -> Result<bool, LatticeError> {
     if let Some(doc) = document_queries::lookup_by_path(conn, path)? {
         remove_document_by_id(conn, &doc.id)?;
@@ -289,12 +293,28 @@ fn remove_document_by_path_str(conn: &Connection, path: &str) -> Result<bool, La
     Ok(false)
 }
 
+/// Clears a document's index data for reindexing (by path string).
+///
+/// Unlike `remove_document_by_path_str`, this preserves incoming links from
+/// other documents to avoid breaking blocked-by relationships during batch
+/// updates.
+fn clear_document_by_path_str(conn: &Connection, path: &str) -> Result<bool, LatticeError> {
+    if let Some(doc) = document_queries::lookup_by_path(conn, path)? {
+        clear_document_for_reindex(conn, &doc.id)?;
+        return Ok(true);
+    }
+    Ok(false)
+}
+
 /// Removes a document and all its associated data from the index.
+///
+/// This is used for permanent deletion and removes both outgoing links (from
+/// this document) and incoming links (to this document from others).
 fn remove_document_by_id(conn: &Connection, id: &str) -> Result<bool, LatticeError> {
     // Delete links from this document
     link_queries::delete_by_source(conn, id)?;
 
-    // Delete links to this document
+    // Delete links to this document (only for permanent deletion)
     link_queries::delete_by_target(conn, id)?;
 
     // Delete labels
@@ -302,6 +322,26 @@ fn remove_document_by_id(conn: &Connection, id: &str) -> Result<bool, LatticeErr
 
     // Delete from FTS (handled by trigger on document deletion)
     // Delete document (triggers FTS cleanup)
+    document_queries::delete_by_id(conn, id)
+}
+
+/// Clears a document's index data for reindexing.
+///
+/// Unlike `remove_document_by_id`, this does NOT delete incoming links (links
+/// from other documents to this one). This is important during incremental
+/// sync where multiple documents are processed: if document A has a blocked-by
+/// link to document B, and both are modified, we don't want processing B to
+/// delete the link from A.
+fn clear_document_for_reindex(conn: &Connection, id: &str) -> Result<bool, LatticeError> {
+    // Delete only outgoing links (from this document)
+    link_queries::delete_by_source(conn, id)?;
+
+    // Do NOT delete incoming links - other documents' relationships are preserved
+
+    // Delete labels (will be reindexed)
+    label_queries::delete_for_document(conn, id)?;
+
+    // Delete document (triggers FTS cleanup, will be reinserted)
     document_queries::delete_by_id(conn, id)
 }
 
