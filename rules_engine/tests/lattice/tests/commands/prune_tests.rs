@@ -24,6 +24,7 @@ fn create_task(context: &CommandContext, parent: &str, description: &str) -> Str
         labels: Vec::new(),
         deps: None,
         interactive: false,
+        commit: false,
     };
 
     let global = GlobalOptions::default();

@@ -29,6 +29,7 @@ fn create_args(parent: &str, description: &str) -> CreateArgs {
         labels: Vec::new(),
         deps: None,
         interactive: false,
+        commit: false,
     }
 }
 
@@ -42,6 +43,7 @@ fn create_task_args(parent: &str, description: &str, task_type: TaskType) -> Cre
         labels: Vec::new(),
         deps: None,
         interactive: false,
+        commit: false,
     }
 }
 
@@ -185,6 +187,7 @@ fn create_with_explicit_path_uses_exact_path() {
         labels: Vec::new(),
         deps: None,
         interactive: false,
+        commit: false,
     };
     let (_temp, context) = env.into_parts();
     let result = create_command::execute(context, args);
@@ -287,6 +290,7 @@ fn create_task_with_custom_priority() {
         labels: Vec::new(),
         deps: None,
         interactive: false,
+        commit: false,
     };
     let (_temp, context) = env.into_parts();
     let result = create_command::execute(context, args);
@@ -335,6 +339,7 @@ fn create_with_labels() {
         labels: vec!["security".to_string(), "urgent".to_string()],
         deps: None,
         interactive: false,
+        commit: false,
     };
     let (_temp, context) = env.into_parts();
     let result = create_command::execute(context, args);
@@ -367,6 +372,7 @@ fn create_with_discovered_from() {
         labels: Vec::new(),
         deps: Some("discovered-from:LPARENT".to_string()),
         interactive: false,
+        commit: false,
     };
     let (_temp, context) = env.into_parts();
     let result = create_command::execute(context, args);
@@ -394,6 +400,7 @@ fn create_with_invalid_deps_format_fails() {
         labels: Vec::new(),
         deps: Some("invalid-format:LTEST".to_string()),
         interactive: false,
+        commit: false,
     };
     let (_temp, context) = env.into_parts();
     let result = create_command::execute(context, args);
@@ -467,6 +474,7 @@ fn create_with_priority_without_type_fails() {
         labels: Vec::new(),
         deps: None,
         interactive: false,
+        commit: false,
     };
     let (_temp, context) = env.into_parts();
     let result = create_command::execute(context, args);
@@ -494,6 +502,7 @@ fn create_with_invalid_priority_fails() {
         labels: Vec::new(),
         deps: None,
         interactive: false,
+        commit: false,
     };
     let (_temp, context) = env.into_parts();
     let result = create_command::execute(context, args);
@@ -521,6 +530,7 @@ fn create_at_existing_explicit_path_fails() {
         labels: Vec::new(),
         deps: None,
         interactive: false,
+        commit: false,
     };
     let context1 = create_context_from_env(&env, &GlobalOptions::default());
     let result1 = create_command::execute(context1, args1);
@@ -535,6 +545,7 @@ fn create_at_existing_explicit_path_fails() {
         labels: Vec::new(),
         deps: None,
         interactive: false,
+        commit: false,
     };
     let context2 = create_context_from_env(&env, &GlobalOptions::default());
     let result2 = create_command::execute(context2, args2);
@@ -570,6 +581,7 @@ fn create_with_body_file() {
         labels: Vec::new(),
         deps: None,
         interactive: false,
+        commit: false,
     };
     let (_temp, context) = env.into_parts();
     let result = create_command::execute(context, args);
@@ -597,6 +609,7 @@ fn create_with_nonexistent_body_file_fails() {
         labels: Vec::new(),
         deps: None,
         interactive: false,
+        commit: false,
     };
     let (_temp, context) = env.into_parts();
     let result = create_command::execute(context, args);

@@ -11,8 +11,8 @@ use crate::cli::command_dispatch::{CommandContext, LatticeResult};
 use crate::cli::commands::interactive_create;
 use crate::cli::task_args::CreateArgs;
 use crate::document::document_writer::{self, WriteOptions};
-use crate::document::field_validation;
 use crate::document::frontmatter_schema::{DEFAULT_PRIORITY, Frontmatter, TaskType};
+use crate::document::{field_validation, frontmatter_parser};
 use crate::error::error_types::LatticeError;
 use crate::git::client_config;
 use crate::id::id_generator::INITIAL_COUNTER;
@@ -92,6 +92,10 @@ pub fn execute(context: CommandContext, args: CreateArgs) -> LatticeResult<()> {
     document_writer::write_new(&frontmatter, &body, &file_path, &WriteOptions::with_parents())?;
 
     insert_into_index(&context, &frontmatter, &file_path, &body)?;
+
+    if args.commit {
+        commit_document(&context, &frontmatter, &file_path, &body)?;
+    }
 
     print_output(&context, &frontmatter, &file_path);
 
@@ -415,6 +419,33 @@ fn compute_hash(content: &str) -> String {
     let mut hasher = Sha256::new();
     hasher.update(content.as_bytes());
     format!("{:x}", hasher.finalize())
+}
+
+/// Creates a git commit for the new document.
+fn commit_document(
+    context: &CommandContext,
+    frontmatter: &Frontmatter,
+    file_path: &Path,
+    body: &str,
+) -> LatticeResult<()> {
+    let relative_path = file_path.strip_prefix(&context.repo_root).unwrap_or(file_path);
+
+    let type_label = match frontmatter.task_type {
+        Some(TaskType::Bug) => "bug report",
+        Some(TaskType::Feature) => "feature request",
+        Some(TaskType::Task) => "task",
+        Some(TaskType::Chore) => "chore",
+        None => "document",
+    };
+
+    let document_content = frontmatter_parser::format_document(frontmatter, body)?;
+    let commit_message =
+        format!("Create {} {}\n\n{}", type_label, frontmatter.lattice_id, document_content);
+
+    context.git.commit_file(relative_path, &commit_message)?;
+
+    info!(id = %frontmatter.lattice_id, "Created git commit for document");
+    Ok(())
 }
 
 /// Prints output in the appropriate format.

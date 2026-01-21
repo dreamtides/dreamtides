@@ -121,6 +121,10 @@ impl GitOps for FakeGit {
         let mut result = self.oldest_commit_since_result.lock().unwrap();
         std::mem::replace(&mut *result, Ok(None))
     }
+
+    fn commit_file(&self, _path: &std::path::Path, _message: &str) -> Result<(), LatticeError> {
+        Ok(())
+    }
 }
 
 fn create_test_context(git: FakeGit) -> (tempfile::TempDir, CommandContext) {

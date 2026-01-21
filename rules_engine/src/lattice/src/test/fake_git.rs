@@ -89,6 +89,7 @@ pub enum FailingOperation {
     ConfigGet,
     DiffNameStatus,
     OldestCommitSince,
+    CommitFile,
     /// All operations will fail.
     All,
 }
@@ -518,6 +519,12 @@ impl GitOps for FakeGit {
         let hash = result.map(|c| c.hash.clone());
         debug!(date, found = hash.is_some(), "FakeGit oldest_commit_since");
         Ok(hash)
+    }
+
+    fn commit_file(&self, path: &std::path::Path, message: &str) -> Result<(), LatticeError> {
+        self.check_failure(FailingOperation::CommitFile)?;
+        debug!(path = %path.display(), message, "FakeGit commit_file (no-op in tests)");
+        Ok(())
     }
 }
 

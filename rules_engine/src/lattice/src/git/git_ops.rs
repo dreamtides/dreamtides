@@ -87,6 +87,13 @@ pub trait GitOps: Send + Sync {
     ///
     /// Returns `Ok(None)` if no commits exist since the given date.
     fn oldest_commit_since(&self, date: &str) -> Result<Option<String>, LatticeError>;
+
+    /// Stages a file and creates a commit with the given message.
+    ///
+    /// Equivalent to: `git add <path> && git commit -m <message>`
+    ///
+    /// The path should be relative to the repository root.
+    fn commit_file(&self, path: &std::path::Path, message: &str) -> Result<(), LatticeError>;
 }
 
 /// Represents a file change from git diff --name-status.

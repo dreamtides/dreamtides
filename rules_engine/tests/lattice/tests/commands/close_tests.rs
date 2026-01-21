@@ -31,6 +31,7 @@ fn create_task(env: &TestEnv, parent: &str, description: &str) -> String {
         labels: Vec::new(),
         deps: None,
         interactive: false,
+        commit: false,
     };
 
     let global = GlobalOptions::default();
@@ -52,6 +53,7 @@ fn create_kb_doc(env: &TestEnv, parent: &str, description: &str) -> String {
         labels: Vec::new(),
         deps: None,
         interactive: false,
+        commit: false,
     };
 
     let global = GlobalOptions::default();

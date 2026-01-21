@@ -123,6 +123,7 @@ fn generate_create(state: &mut ChaosMonkeyState) -> Result<(), LatticeError> {
         labels: random_labels(state),
         deps: None,
         interactive: false,
+        commit: false,
     };
 
     info!(

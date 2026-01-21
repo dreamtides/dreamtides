@@ -176,4 +176,15 @@ impl GitOps for RealGit {
         let commit = output.lines().next().map(|s| s.trim().to_string());
         Ok(commit.filter(|s| !s.is_empty()))
     }
+
+    fn commit_file(&self, path: &std::path::Path, message: &str) -> Result<(), LatticeError> {
+        let path_str = path.to_str().ok_or_else(|| LatticeError::InvalidPath {
+            path: path.to_path_buf(),
+            reason: "path contains invalid UTF-8".to_string(),
+        })?;
+
+        self.run_git(&["add", "--", path_str])?;
+        self.run_git(&["commit", "-m", message])?;
+        Ok(())
+    }
 }

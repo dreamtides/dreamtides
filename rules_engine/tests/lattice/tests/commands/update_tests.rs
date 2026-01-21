@@ -21,6 +21,7 @@ fn create_task(env: &TestEnv, parent: &str, description: &str) -> String {
         labels: Vec::new(),
         deps: None,
         interactive: false,
+        commit: false,
     };
 
     let global = GlobalOptions::default();
@@ -42,6 +43,7 @@ fn create_kb_doc(env: &TestEnv, parent: &str, description: &str) -> String {
         labels: Vec::new(),
         deps: None,
         interactive: false,
+        commit: false,
     };
 
     let global = GlobalOptions::default();
@@ -260,6 +262,7 @@ fn update_removes_labels() {
         labels: vec!["urgent".to_string(), "frontend".to_string()],
         deps: None,
         interactive: false,
+        commit: false,
     };
 
     let global = GlobalOptions::default();

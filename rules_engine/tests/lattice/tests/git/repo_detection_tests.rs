@@ -88,6 +88,10 @@ impl GitOps for FakeGit {
     fn oldest_commit_since(&self, _date: &str) -> Result<Option<String>, LatticeError> {
         Ok(None)
     }
+
+    fn commit_file(&self, _path: &std::path::Path, _message: &str) -> Result<(), LatticeError> {
+        Ok(())
+    }
 }
 
 #[test]

@@ -254,7 +254,10 @@ priority, labels, and dependencies for tasks. Use `--interactive` (`-i`) to
 prompt for the parent directory (with tab completion) and open `$EDITOR` for
 writing body content; the description and filename are auto-generated from the
 body text. The last used parent directory is remembered for subsequent
-interactive calls.
+interactive calls. Use `--commit` (`-c`) to create a git commit after document
+creation; the commit message includes the full document text with the first line
+formatted as "Create {type} {id}" (e.g., "Create feature request L34567"). This
+works with both regular and interactive mode.
 
 **lat update** - Modifies existing documents with `lat update <id> [id...]
 [options]`. Supports changing priority, type, and managing labels. To change

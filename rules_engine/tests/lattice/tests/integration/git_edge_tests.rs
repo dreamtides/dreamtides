@@ -35,6 +35,7 @@ fn create_task(env: &TestEnv, parent: &str, description: &str) -> String {
         labels: Vec::new(),
         deps: None,
         interactive: false,
+        commit: false,
     };
 
     let global = GlobalOptions::default();
@@ -260,6 +261,7 @@ fn create_succeeds_despite_ls_files_failure() {
         labels: Vec::new(),
         deps: None,
         interactive: false,
+        commit: false,
     };
 
     let global = GlobalOptions::default();
@@ -316,6 +318,7 @@ fn operations_continue_after_failure_cleared() {
         labels: Vec::new(),
         deps: None,
         interactive: false,
+        commit: false,
     };
     let global = GlobalOptions::default();
     let ctx = create_context_from_env(&env, &global);

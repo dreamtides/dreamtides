@@ -25,6 +25,7 @@ fn create_task(env: &TestEnv, parent: &str, description: &str) -> String {
         labels: Vec::new(),
         deps: None,
         interactive: false,
+        commit: false,
     };
 
     let global = GlobalOptions::default();
@@ -51,6 +52,7 @@ fn create_task_with_labels(
         labels: labels.into_iter().map(String::from).collect(),
         deps: None,
         interactive: false,
+        commit: false,
     };
 
     let global = GlobalOptions::default();
@@ -708,6 +710,7 @@ fn label_operations_work_on_kb_documents() {
         labels: Vec::new(),
         deps: None,
         interactive: false,
+        commit: false,
     };
 
     let global = GlobalOptions::default();

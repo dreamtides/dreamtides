@@ -38,6 +38,12 @@ pub struct CreateArgs {
     /// body.
     #[arg(long, short = 'i')]
     pub interactive: bool,
+
+    /// Create a git commit after creating the document. The commit message
+    /// includes the full document text with the first line as "Create {type}
+    /// {id}".
+    #[arg(long, short = 'c')]
+    pub commit: bool,
 }
 
 /// Arguments for `lat update`.
