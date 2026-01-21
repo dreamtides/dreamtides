@@ -126,7 +126,15 @@ fn run_orchestration_loop(
         let fresh_config =
             Config::load(&config_path).context("Failed to reload config after creating workers")?;
 
-        // Start sessions for all auto workers
+        // Start sessions for all auto workers.
+        // IMPORTANT: start_auto_worker_session kills and recreates sessions to ensure
+        // clean state. After starting sessions, we must set workers to Offline because:
+        // 1. Any SessionStart hooks from sessions started by
+        //    reconcile_and_start_workers (before this function) are now stale since
+        //    those sessions were killed.
+        // 2. The new sessions need time to start and fire their own SessionStart hooks.
+        // 3. If workers were left in Idle state (from stale hooks),
+        //    process_idle_workers would assign tasks to workers that aren't ready.
         for name in &worker_names {
             println!("{}", color_theme::dim(format!("Starting auto worker '{}'...", name)));
             if let Some(worker) = state.get_worker(name)
@@ -137,11 +145,33 @@ fn run_orchestration_loop(
             }
         }
 
+        // Set all auto workers to Offline after starting sessions. They will transition
+        // to Idle when the new sessions fire SessionStart hooks.
+        for name in &worker_names {
+            if let Some(worker) = state.get_worker_mut(name) {
+                worker.status = WorkerStatus::Offline;
+            }
+        }
+        state.save(&state_path)?;
+
         println!(
             "{}",
             color_theme::success(format!("✓ {} auto worker(s) initialized", worker_names.len()))
         );
         info!(workers = ?worker_names, "Auto workers initialized");
+    }
+
+    // Drain any pending hook events that were received before we started the loop.
+    // These are likely stale hooks from sessions that were killed and recreated
+    // above.
+    if let Some(ref mut rx) = ipc_receiver {
+        let mut drained = 0;
+        while rx.try_recv().is_ok() {
+            drained += 1;
+        }
+        if drained > 0 {
+            info!(count = drained, "Drained stale hook events from IPC channel");
+        }
     }
 
     let patrol = Patrol::new(llmc_config);
