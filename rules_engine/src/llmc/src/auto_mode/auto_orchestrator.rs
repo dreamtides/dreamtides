@@ -1,6 +1,404 @@
-// TODO: Main orchestration for auto mode daemon
-//
-// Responsibilities:
-// - Daemon startup and shutdown
-// - Main loop coordination
-// - Error handling and graceful termination
+#![allow(dead_code)]
+
+use std::path::PathBuf;
+use std::sync::Arc;
+use std::sync::atomic::{AtomicBool, Ordering};
+use std::thread;
+use std::time::Duration;
+
+use anyhow::{Context, Result, bail};
+use tracing::{error, info, warn};
+
+use crate::auto_mode::auto_accept::{self, AutoAcceptResult};
+use crate::auto_mode::auto_config::{AutoConfig, ResolvedAutoConfig};
+use crate::auto_mode::auto_logging::{AutoLogger, TaskResult};
+use crate::auto_mode::heartbeat_thread::{DaemonRegistration, HeartbeatThread};
+use crate::auto_mode::task_pool::{self, TaskPoolResult};
+use crate::auto_mode::{auto_logging, auto_workers, heartbeat_thread};
+use crate::config::Config;
+use crate::git;
+use crate::lock::StateLock;
+use crate::patrol::Patrol;
+use crate::state::{self, State, WorkerStatus};
+use crate::tmux::sender::TmuxSender;
+use crate::tmux::session;
+use crate::worker::{self, WorkerTransition};
+
+/// Runs the auto mode daemon.
+///
+/// This is the main entry point for autonomous operation. It orchestrates:
+/// - Task assignment from the task pool to idle auto workers
+/// - Automatic acceptance of completed worker changes
+/// - Patrol operations for health monitoring
+/// - Graceful shutdown on errors or Ctrl-C
+pub fn run_auto_mode(
+    llmc_config: &Config,
+    auto_config: &ResolvedAutoConfig,
+    shutdown: Arc<AtomicBool>,
+) -> Result<()> {
+    let instance_id = heartbeat_thread::generate_instance_id();
+    let logger = AutoLogger::new().context("Failed to initialize auto mode logger")?;
+
+    info!(
+        instance_id = %instance_id,
+        concurrency = auto_config.concurrency,
+        task_pool_command = %auto_config.task_pool_command,
+        "Starting auto mode daemon"
+    );
+
+    // Register daemon
+    let log_file = auto_logging::auto_log_path().to_string_lossy().to_string();
+    let registration = DaemonRegistration::new(&instance_id, &log_file);
+    registration.write().context("Failed to write daemon registration")?;
+    logger.log_daemon_startup(&instance_id, auto_config.concurrency);
+
+    // Start heartbeat thread
+    let mut heartbeat = HeartbeatThread::start(&instance_id);
+
+    // Run the main orchestration loop
+    let result =
+        run_orchestration_loop(llmc_config, auto_config, &instance_id, &logger, shutdown.clone());
+
+    // Cleanup on exit
+    heartbeat.stop();
+    let shutdown_reason = match &result {
+        Ok(()) => "Normal shutdown (Ctrl-C)",
+        Err(e) => &format!("Error: {}", e),
+    };
+    logger.log_daemon_shutdown(&instance_id, shutdown_reason);
+    if let Err(e) = DaemonRegistration::remove() {
+        warn!("Failed to remove daemon registration: {}", e);
+    }
+
+    result
+}
+
+fn run_orchestration_loop(
+    llmc_config: &Config,
+    auto_config: &ResolvedAutoConfig,
+    _instance_id: &str,
+    logger: &AutoLogger,
+    shutdown: Arc<AtomicBool>,
+) -> Result<()> {
+    let state_path = state::get_state_path();
+    let patrol_interval = Duration::from_secs(llmc_config.defaults.patrol_interval_secs as u64);
+
+    // Load initial state and ensure auto workers exist
+    {
+        let _lock = StateLock::acquire()?;
+        let mut state = State::load(&state_path)?;
+
+        let worker_names = auto_workers::ensure_auto_workers_exist(
+            &mut state,
+            llmc_config,
+            auto_config.concurrency,
+        )?;
+        auto_workers::set_auto_mode_active(&mut state, worker_names.clone());
+        state.daemon_running = true;
+        state.save(&state_path)?;
+
+        // Start sessions for all auto workers
+        for name in &worker_names {
+            if let Some(worker) = state.get_worker(name)
+                && let Err(e) = auto_workers::start_auto_worker_session(worker, llmc_config)
+            {
+                error!(worker = %name, error = %e, "Failed to start auto worker session");
+                return Err(e);
+            }
+        }
+
+        info!(workers = ?worker_names, "Auto workers initialized");
+    }
+
+    let patrol = Patrol::new(llmc_config);
+    let mut shutdown_error: Option<String> = None;
+
+    while !shutdown.load(Ordering::SeqCst) && shutdown_error.is_none() {
+        thread::sleep(Duration::from_secs(1));
+
+        let lock_result = StateLock::acquire();
+        let Ok(_lock) = lock_result else {
+            continue;
+        };
+
+        let mut state = match State::load(&state_path) {
+            Ok(s) => s,
+            Err(e) => {
+                error!("Failed to load state: {}", e);
+                continue;
+            }
+        };
+
+        // Process idle auto workers - assign tasks
+        if let Err(e) = process_idle_workers(&mut state, llmc_config, auto_config, logger) {
+            logger.log_error("process_idle_workers", &e.to_string());
+            shutdown_error = Some(e.to_string());
+            break;
+        }
+
+        // Process completed workers - auto accept
+        if let Err(e) = process_completed_workers(&mut state, llmc_config, auto_config, logger) {
+            logger.log_error("process_completed_workers", &e.to_string());
+            shutdown_error = Some(e.to_string());
+            break;
+        }
+
+        // Save state after processing
+        if let Err(e) = state.save(&state_path) {
+            error!("Failed to save state: {}", e);
+        }
+
+        // Run patrol
+        match patrol.run_patrol(&mut state, llmc_config) {
+            Ok(report) => {
+                if !report.transitions_applied.is_empty() {
+                    info!(
+                        "Patrol applied {} transitions: {:?}",
+                        report.transitions_applied.len(),
+                        report.transitions_applied
+                    );
+                }
+                if !report.errors.is_empty() {
+                    for err in &report.errors {
+                        error!("Patrol error: {}", err);
+                    }
+                }
+            }
+            Err(e) => {
+                error!("Patrol failed: {}", e);
+            }
+        }
+
+        // Save state after patrol
+        if let Err(e) = state.save(&state_path) {
+            error!("Failed to save state after patrol: {}", e);
+        }
+
+        // Sleep for patrol interval (minus 1 second we already slept)
+        let sleep_duration = patrol_interval.saturating_sub(Duration::from_secs(1));
+        let sleep_chunks = sleep_duration.as_millis().saturating_div(100);
+        for _ in 0..sleep_chunks {
+            if shutdown.load(Ordering::SeqCst) || shutdown_error.is_some() {
+                break;
+            }
+            thread::sleep(Duration::from_millis(100));
+        }
+    }
+
+    // Graceful shutdown
+    {
+        let _lock = StateLock::acquire()?;
+        let mut state = State::load(&state_path)?;
+        graceful_shutdown(llmc_config, &mut state)?;
+        state.daemon_running = false;
+        auto_workers::clear_auto_mode_state(&mut state);
+        state.save(&state_path)?;
+    }
+
+    if let Some(err) = shutdown_error {
+        bail!("Auto mode daemon shutdown due to error: {}", err);
+    }
+
+    Ok(())
+}
+
+/// Processes idle auto workers by assigning tasks from the task pool.
+fn process_idle_workers(
+    state: &mut State,
+    llmc_config: &Config,
+    auto_config: &ResolvedAutoConfig,
+    logger: &AutoLogger,
+) -> Result<()> {
+    let idle_workers: Vec<String> =
+        auto_workers::get_idle_auto_workers(state).iter().map(|w| w.name.clone()).collect();
+
+    for worker_name in idle_workers {
+        let task_result =
+            task_pool::execute_task_pool_command(&auto_config.task_pool_command, logger);
+
+        match task_result {
+            TaskPoolResult::Task(task) => {
+                info!(worker = %worker_name, task_len = task.len(), "Assigning task to worker");
+                assign_task_to_worker(state, llmc_config, &worker_name, &task, logger)?;
+            }
+            TaskPoolResult::NoTasksAvailable => {
+                // No tasks available, skip this worker
+            }
+            TaskPoolResult::Error(e) => {
+                error!(worker = %worker_name, error = %e, "Task pool command failed");
+                return Err(e.into());
+            }
+        }
+    }
+
+    Ok(())
+}
+
+/// Assigns a task to an idle auto worker.
+fn assign_task_to_worker(
+    state: &mut State,
+    _llmc_config: &Config,
+    worker_name: &str,
+    task: &str,
+    logger: &AutoLogger,
+) -> Result<()> {
+    let worker = state.get_worker(worker_name).context("Worker not found")?;
+    let worktree_path = PathBuf::from(&worker.worktree_path);
+    let session_id = worker.session_id.clone();
+
+    // Pull latest master
+    if git::has_commits_ahead_of(&worktree_path, "origin/master")? {
+        info!(worker = %worker_name, "Resetting stale commits before starting task");
+        git::reset_to_ref(&worktree_path, "origin/master")?;
+    }
+    git::pull_rebase(&worktree_path)?;
+
+    // Build prompt
+    let full_prompt = build_auto_prompt(&worktree_path, task)?;
+
+    // Send to worker
+    let tmux_sender = TmuxSender::new();
+    tmux_sender.send(&session_id, "/clear")?;
+    tmux_sender.send(&session_id, &full_prompt)?;
+
+    // Update state
+    let worker_mut = state.get_worker_mut(worker_name).context("Worker not found")?;
+    worker::apply_transition(worker_mut, WorkerTransition::ToWorking {
+        prompt: full_prompt,
+        prompt_cmd: None,
+    })?;
+
+    logger.log_task_assigned(worker_name, task);
+    info!(worker = %worker_name, "Task assigned successfully");
+
+    Ok(())
+}
+
+/// Builds the full prompt for an auto worker task.
+fn build_auto_prompt(worktree_path: &std::path::Path, task: &str) -> Result<String> {
+    let repo_root = worktree_path
+        .parent()
+        .and_then(|p| p.parent())
+        .context("Could not determine repository root")?;
+
+    let prompt = format!(
+        "You are working in: {}\n\
+         Repository root: {}\n\
+         \n\
+         Follow the conventions in AGENTS.md\n\
+         Run validation commands before committing\n\
+         Create a single commit with your changes\n\
+         Do NOT push to remote\n\
+         \n\
+         {}",
+        worktree_path.display(),
+        repo_root.display(),
+        task
+    );
+
+    Ok(prompt)
+}
+
+/// Processes completed auto workers by running auto accept.
+fn process_completed_workers(
+    state: &mut State,
+    llmc_config: &Config,
+    auto_config: &ResolvedAutoConfig,
+    logger: &AutoLogger,
+) -> Result<()> {
+    let completed_workers: Vec<String> = state
+        .workers
+        .values()
+        .filter(|w| {
+            auto_workers::is_auto_worker(&w.name)
+                && (w.status == WorkerStatus::NeedsReview || w.status == WorkerStatus::NoChanges)
+        })
+        .map(|w| w.name.clone())
+        .collect();
+
+    for worker_name in completed_workers {
+        info!(worker = %worker_name, "Processing completed worker");
+
+        // Get auto config for post_accept_command
+        let auto_cfg = AutoConfig {
+            task_pool_command: Some(auto_config.task_pool_command.clone()),
+            concurrency: auto_config.concurrency,
+            post_accept_command: auto_config.post_accept_command.clone(),
+        };
+
+        match auto_accept::auto_accept_worker(&worker_name, state, llmc_config, logger) {
+            Ok(result) => {
+                match &result {
+                    AutoAcceptResult::Accepted { commit_sha } => {
+                        logger.log_task_completed(&worker_name, TaskResult::NeedsReview);
+                        info!(worker = %worker_name, commit = %commit_sha, "Worker changes accepted");
+
+                        // Run post-accept command if configured
+                        if let Err(e) = auto_accept::execute_post_accept_command(
+                            &worker_name,
+                            commit_sha,
+                            &auto_cfg,
+                            logger,
+                        ) {
+                            error!(worker = %worker_name, error = %e, "Post-accept command failed");
+                            return Err(e.into());
+                        }
+                    }
+                    AutoAcceptResult::NoChanges => {
+                        logger.log_task_completed(&worker_name, TaskResult::NoChanges);
+                        info!(worker = %worker_name, "Worker completed with no changes");
+                    }
+                }
+            }
+            Err(e) => {
+                error!(worker = %worker_name, error = %e, "Auto accept failed");
+                return Err(e.into());
+            }
+        }
+    }
+
+    Ok(())
+}
+
+/// Performs graceful shutdown of all auto workers.
+fn graceful_shutdown(_config: &Config, state: &mut State) -> Result<()> {
+    info!("Initiating graceful shutdown of auto workers");
+    let tmux_sender = TmuxSender::new();
+
+    let auto_worker_names: Vec<String> =
+        state.workers.keys().filter(|name| auto_workers::is_auto_worker(name)).cloned().collect();
+
+    // Send Ctrl-C to all auto workers
+    for worker_name in &auto_worker_names {
+        if let Some(worker) = state.get_worker(worker_name) {
+            if worker.status == WorkerStatus::Offline {
+                continue;
+            }
+            info!(worker = %worker_name, "Sending Ctrl-C to worker");
+            if let Err(e) = tmux_sender.send_keys_raw(&worker.session_id, "C-c") {
+                warn!(worker = %worker_name, error = %e, "Failed to send Ctrl-C");
+            }
+        }
+    }
+
+    // Wait for workers to stop gracefully
+    thread::sleep(Duration::from_millis(500));
+
+    // Kill remaining sessions
+    for worker_name in &auto_worker_names {
+        if let Some(worker) = state.get_worker_mut(worker_name)
+            && session::session_exists(&worker.session_id)
+        {
+            if let Err(e) = session::kill_session(&worker.session_id) {
+                warn!(worker = %worker_name, error = %e, "Failed to kill session");
+            }
+            // Preserve rebasing state for recovery
+            if worker.status != WorkerStatus::Rebasing {
+                worker.status = WorkerStatus::Offline;
+            }
+        }
+    }
+
+    info!("Graceful shutdown complete");
+    Ok(())
+}

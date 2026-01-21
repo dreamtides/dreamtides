@@ -13,7 +13,8 @@ blocking:
 blocked-by:
 - LDEWQN
 created-at: 2026-01-21T04:00:48.185613Z
-updated-at: 2026-01-21T04:06:50.816385Z
+updated-at: 2026-01-21T05:42:00.315647Z
+closed-at: 2026-01-21T05:42:00.315647Z
 ---
 
 ## Overview
