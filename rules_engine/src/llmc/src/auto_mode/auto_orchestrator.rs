@@ -7,6 +7,7 @@ use std::thread;
 use std::time::Duration;
 
 use anyhow::{Context, Result, bail};
+use tokio::sync::mpsc::Receiver;
 use tracing::{error, info, warn};
 
 use crate::auto_mode::auto_accept::{self, AutoAcceptResult};
@@ -18,8 +19,9 @@ use crate::auto_mode::task_pool::{self, TaskPoolResult};
 use crate::auto_mode::{auto_logging, auto_workers, heartbeat_thread};
 use crate::config::Config;
 use crate::git;
+use crate::ipc::messages::HookMessage;
 use crate::lock::StateLock;
-use crate::patrol::Patrol;
+use crate::patrol::{self, Patrol};
 use crate::state::{self, State, WorkerStatus};
 use crate::tmux::sender::TmuxSender;
 use crate::tmux::session;
@@ -36,6 +38,7 @@ pub fn run_auto_mode(
     llmc_config: &Config,
     auto_config: &ResolvedAutoConfig,
     shutdown: Arc<AtomicBool>,
+    ipc_receiver: Option<Receiver<HookMessage>>,
 ) -> Result<()> {
     let instance_id = heartbeat_thread::generate_instance_id();
     let logger = AutoLogger::new().context("Failed to initialize auto mode logger")?;
@@ -64,8 +67,14 @@ pub fn run_auto_mode(
     let mut heartbeat = HeartbeatThread::start(&instance_id);
 
     // Run the main orchestration loop
-    let result =
-        run_orchestration_loop(llmc_config, auto_config, &instance_id, &logger, shutdown.clone());
+    let result = run_orchestration_loop(
+        llmc_config,
+        auto_config,
+        &instance_id,
+        &logger,
+        shutdown.clone(),
+        ipc_receiver,
+    );
 
     // Cleanup on exit
     heartbeat.stop();
@@ -87,8 +96,10 @@ fn run_orchestration_loop(
     _instance_id: &str,
     logger: &AutoLogger,
     shutdown: Arc<AtomicBool>,
+    mut ipc_receiver: Option<Receiver<HookMessage>>,
 ) -> Result<()> {
     let state_path = state::get_state_path();
+    let config_path = crate::config::get_config_path();
     let patrol_interval = Duration::from_secs(llmc_config.defaults.patrol_interval_secs as u64);
 
     // Load initial state and ensure auto workers exist
@@ -105,11 +116,16 @@ fn run_orchestration_loop(
         state.daemon_running = true;
         state.save(&state_path)?;
 
+        // Reload config after creating new workers since ensure_auto_workers_exist
+        // may have added new workers to config.toml
+        let fresh_config =
+            Config::load(&config_path).context("Failed to reload config after creating workers")?;
+
         // Start sessions for all auto workers
         for name in &worker_names {
             println!("  Starting auto worker '{}'...", name);
             if let Some(worker) = state.get_worker(name)
-                && let Err(e) = auto_workers::start_auto_worker_session(worker, llmc_config)
+                && let Err(e) = auto_workers::start_auto_worker_session(worker, &fresh_config)
             {
                 error!(worker = %name, error = %e, "Failed to start auto worker session");
                 return Err(e);
@@ -126,6 +142,15 @@ fn run_orchestration_loop(
     while !shutdown.load(Ordering::SeqCst) && shutdown_error.is_none() {
         thread::sleep(Duration::from_secs(1));
 
+        // Collect pending hook events
+        let mut pending_hook_events: Vec<HookMessage> = Vec::new();
+        if let Some(ref mut rx) = ipc_receiver {
+            while let Ok(msg) = rx.try_recv() {
+                info!("Received hook event: {:?} (id: {})", msg.event, msg.id);
+                pending_hook_events.push(msg);
+            }
+        }
+
         let lock_result = StateLock::acquire();
         let Ok(_lock) = lock_result else {
             continue;
@@ -138,6 +163,28 @@ fn run_orchestration_loop(
                 continue;
             }
         };
+
+        // Reload config for fresh worker configs (needed after auto workers are
+        // created)
+        let fresh_config = match Config::load(&config_path) {
+            Ok(c) => c,
+            Err(e) => {
+                error!("Failed to reload config: {}", e);
+                continue;
+            }
+        };
+
+        // Process hook events (transitions workers from Offline -> Idle, etc.)
+        for msg in &pending_hook_events {
+            if let Err(e) = patrol::handle_hook_event(&msg.event, &mut state, &fresh_config) {
+                error!("Error handling hook event {:?}: {}", msg.event, e);
+            }
+        }
+        if !pending_hook_events.is_empty()
+            && let Err(e) = state.save(&state_path)
+        {
+            error!("Failed to save state after hook events: {}", e);
+        }
 
         // Process idle auto workers - assign tasks
         if let Err(e) = process_idle_workers(&mut state, llmc_config, auto_config, logger) {

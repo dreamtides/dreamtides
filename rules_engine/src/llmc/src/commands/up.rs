@@ -121,7 +121,7 @@ pub fn run_up(options: UpOptions) -> Result<()> {
     // Branch to either auto mode or normal mode
     if let Some(ref auto_cfg) = auto_config {
         println!("Entering auto mode loop (Ctrl-C to stop)...\n");
-        auto_orchestrator::run_auto_mode(&config, auto_cfg, shutdown)?;
+        auto_orchestrator::run_auto_mode(&config, auto_cfg, shutdown, ipc_receiver)?;
         println!("✓ LLMC auto mode daemon stopped");
     } else {
         println!("Entering main loop (Ctrl-C to stop)...\n");
