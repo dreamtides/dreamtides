@@ -102,6 +102,9 @@ pub fn run(args: Lat) -> ExitCode {
             exit_codes::success()
         }
         Err(e) => {
+            if e.is_silent() {
+                return ExitCode::from(e.exit_code());
+            }
             error!(error = %e, error_code = e.error_code(), "Command failed");
             if args.global.json {
                 print_json_error(&e);

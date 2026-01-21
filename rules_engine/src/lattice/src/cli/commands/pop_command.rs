@@ -70,28 +70,6 @@ pub fn execute(context: CommandContext, args: PopArgs) -> LatticeResult<()> {
     Ok(())
 }
 
-/// JSON output when no ready tasks are available.
-#[derive(Debug, Clone, Serialize)]
-struct NoTasksOutput {
-    message: String,
-    filters_applied: FiltersApplied,
-}
-
-/// Summary of filters that were applied.
-#[derive(Debug, Clone, Serialize)]
-struct FiltersApplied {
-    #[serde(skip_serializing_if = "Option::is_none")]
-    path: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    task_type: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    priority: Option<u8>,
-    #[serde(skip_serializing_if = "Vec::is_empty")]
-    labels: Vec<String>,
-    include_backlog: bool,
-    sort: String,
-}
-
 /// Builds a ReadyFilter from PopArgs.
 fn build_filter(context: &CommandContext, args: &PopArgs) -> LatticeResult<ReadyFilter> {
     let mut filter = ReadyFilter::new();
@@ -179,45 +157,8 @@ fn convert_sort_policy(cli_policy: CliSortPolicy) -> ReadySortPolicy {
 }
 
 /// Handles the case when no ready tasks are available.
-fn handle_no_tasks(context: &CommandContext, args: &PopArgs) -> LatticeResult<()> {
-    if context.global.json {
-        let output = NoTasksOutput {
-            message: "No ready tasks available".to_string(),
-            filters_applied: build_filters_applied(args),
-        };
-        let json_str = serde_json::to_string_pretty(&output)
-            .expect("NoTasksOutput serialization should not fail");
-        println!("{json_str}");
-    } else {
-        println!("No ready tasks available");
-        if has_filters(args) {
-            println!("(filters may be restricting results)");
-        }
-    }
-
+fn handle_no_tasks(_context: &CommandContext, _args: &PopArgs) -> LatticeResult<()> {
     Err(LatticeError::NoReadyTasks)
-}
-
-/// Builds a summary of applied filters for JSON output.
-fn build_filters_applied(args: &PopArgs) -> FiltersApplied {
-    FiltersApplied {
-        path: args.filter.path.clone().or(args.filter.parent.clone()),
-        task_type: args.filter.r#type.map(|t| format!("{t:?}").to_lowercase()),
-        priority: args.filter.priority,
-        labels: args.filter.label.clone(),
-        include_backlog: args.include_backlog,
-        sort: format!("{:?}", args.sort).to_lowercase(),
-    }
-}
-
-/// Returns true if any filters are applied.
-fn has_filters(args: &PopArgs) -> bool {
-    args.filter.path.is_some()
-        || args.filter.parent.is_some()
-        || args.filter.r#type.is_some()
-        || args.filter.priority.is_some()
-        || !args.filter.label.is_empty()
-        || !args.filter.label_any.is_empty()
 }
 
 /// Outputs the pop result in the appropriate format.

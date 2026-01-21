@@ -206,6 +206,15 @@ impl LatticeError {
         }
     }
 
+    /// Returns true if this error should produce no user-facing output.
+    ///
+    /// Silent errors still return a non-zero exit code but do not print any
+    /// messages to stdout or stderr. This is useful for programmatic use cases
+    /// where the exit code alone is sufficient.
+    pub fn is_silent(&self) -> bool {
+        matches!(self, LatticeError::NoReadyTasks)
+    }
+
     /// Returns the error code string (e.g., "E001", "E002").
     pub fn error_code(&self) -> &'static str {
         match self {
