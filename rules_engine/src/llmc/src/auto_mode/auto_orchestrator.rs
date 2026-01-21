@@ -148,6 +148,7 @@ fn run_orchestration_loop(
     let mut shutdown_error: Option<String> = None;
     let mut iteration_count: u64 = 0;
     let loop_start_time = std::time::Instant::now();
+    let mut waiting_for_tasks_printed = false;
 
     while !shutdown.load(Ordering::SeqCst) && shutdown_error.is_none() {
         thread::sleep(Duration::from_secs(1));
@@ -245,10 +246,30 @@ fn run_orchestration_loop(
         }
 
         // Process idle auto workers - assign tasks
-        if let Err(e) = process_idle_workers(&mut state, llmc_config, auto_config, logger) {
-            logger.log_error("process_idle_workers", &e.to_string());
-            shutdown_error = Some(e.to_string());
-            break;
+        let any_task_assigned =
+            match process_idle_workers(&mut state, llmc_config, auto_config, logger) {
+                Ok(assigned) => assigned,
+                Err(e) => {
+                    logger.log_error("process_idle_workers", &e.to_string());
+                    shutdown_error = Some(e.to_string());
+                    break;
+                }
+            };
+
+        // Track when all workers are idle with no tasks available
+        if any_task_assigned {
+            waiting_for_tasks_printed = false;
+        } else {
+            let all_workers_idle = state
+                .workers
+                .values()
+                .filter(|w| auto_workers::is_auto_worker(&w.name))
+                .all(|w| w.status == WorkerStatus::Idle);
+            if all_workers_idle && !waiting_for_tasks_printed {
+                println!("{}", color_theme::muted("Waiting for tasks..."));
+                info!("All workers idle, waiting for tasks from task pool");
+                waiting_for_tasks_printed = true;
+            }
         }
 
         // Process completed workers - auto accept
@@ -327,14 +348,18 @@ fn run_orchestration_loop(
 }
 
 /// Processes idle auto workers by assigning tasks from the task pool.
+///
+/// Returns `true` if any task was assigned to a worker, `false` otherwise.
 fn process_idle_workers(
     state: &mut State,
     llmc_config: &Config,
     auto_config: &ResolvedAutoConfig,
     logger: &AutoLogger,
-) -> Result<()> {
+) -> Result<bool> {
     let idle_workers: Vec<String> =
         auto_workers::get_idle_auto_workers(state).iter().map(|w| w.name.clone()).collect();
+
+    let mut any_task_assigned = false;
 
     for worker_name in idle_workers {
         let task_result =
@@ -360,6 +385,7 @@ fn process_idle_workers(
                 );
                 info!(worker = %worker_name, task_len = task.len(), "Assigning task to worker");
                 assign_task_to_worker(state, llmc_config, &worker_name, &task, logger)?;
+                any_task_assigned = true;
             }
             TaskPoolResult::NoTasksAvailable => {
                 // No tasks available, skip this worker
@@ -378,7 +404,7 @@ fn process_idle_workers(
         }
     }
 
-    Ok(())
+    Ok(any_task_assigned)
 }
 
 /// Assigns a task to an idle auto worker.
