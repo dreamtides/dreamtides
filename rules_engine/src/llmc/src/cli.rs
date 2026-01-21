@@ -59,6 +59,12 @@ pub enum Commands {
         post_accept_command: Option<String>,
     },
 
+    /// Start the overseer supervisor process
+    ///
+    /// The overseer monitors the auto mode daemon, detects failures, and uses
+    /// Claude Code to remediate issues. Requires [overseer] section in config.
+    Overseer,
+
     /// Stop the LLMC daemon
     Down {
         /// Force shutdown (kill sessions immediately)

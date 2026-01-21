@@ -23,7 +23,7 @@ use llmc::json_output;
 use crate::commands::review::ReviewInterface;
 use crate::commands::{
     accept, add, attach, config as config_cmd, console, doctor, down, hook, init, message, nuke,
-    peek, pick, rebase, reject, reset, review, start, status, up,
+    overseer, peek, pick, rebase, reject, reset, review, start, status, up,
 };
 use crate::logging::config as log_config;
 
@@ -38,6 +38,7 @@ async fn main() -> Result<()> {
     let command_name = match &cli.command {
         Commands::Init { .. } => "init",
         Commands::Up { .. } => "up",
+        Commands::Overseer => "overseer",
         Commands::Down { .. } => "down",
         Commands::Add { .. } => "add",
         Commands::Nuke { .. } => "nuke",
@@ -80,6 +81,7 @@ async fn main() -> Result<()> {
             concurrency,
             post_accept_command,
         }),
+        Commands::Overseer => overseer::run_overseer(),
         Commands::Down { force, kill_consoles, json } => down::run_down(force, kill_consoles, json),
         Commands::Add { name, model, role_prompt, excluded_from_pool, self_review, json } => {
             add::run_add(&name, model, role_prompt, excluded_from_pool, self_review, json)

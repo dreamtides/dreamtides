@@ -9,6 +9,7 @@ pub mod hook;
 pub mod init;
 pub mod message;
 pub mod nuke;
+pub mod overseer;
 pub mod peek;
 pub mod pick;
 pub mod rebase;
