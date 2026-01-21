@@ -60,3 +60,10 @@ parent directory
   pkill -f "llmc up" || true
   lat close <TASK-ID>
   just llmc reset --all --yes  # if workers in bad state
+
+# [Lattice] Acceptance Criteria
+
+When complete, please:
+
+1) Run `lat close <ID>` to mark the issue as complete
+2) Create a git commit with a description of your work
