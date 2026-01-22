@@ -36,7 +36,9 @@ pub struct TaskPoolError {
 /// Exit code interpretation:
 /// - Exit 0 + non-empty stdout = Task available (stdout is the task)
 /// - Exit 0 + empty stdout = No tasks available (not an error)
-/// - Non-zero exit = Error condition (triggers daemon shutdown)
+/// - Exit 3 (E039 - claim limit exceeded) = No tasks available (not an error)
+/// - Exit 4 (E038 - no ready tasks) = No tasks available (not an error)
+/// - Other non-zero exit = Error condition (triggers daemon shutdown)
 pub fn execute_task_pool_command(command: &str, logger: &AutoLogger) -> TaskPoolResult {
     info!(command = %command, "Executing task pool command");
     let start = Instant::now();
@@ -116,6 +118,17 @@ fn handle_failed_execution(
     stdout: &str,
     stderr: &str,
 ) -> TaskPoolResult {
+    // Exit code 3 (E039 - claim limit exceeded) and exit code 4 (E038 - no ready
+    // tasks) are not errors - they just mean no tasks are available right now.
+    if exit_code == 3 || exit_code == 4 {
+        debug!(
+            command = %command,
+            exit_code = exit_code,
+            "Task pool command returned no tasks (expected exit code)"
+        );
+        return TaskPoolResult::NoTasksAvailable;
+    }
+
     error!(
         command = %command,
         exit_code = exit_code,

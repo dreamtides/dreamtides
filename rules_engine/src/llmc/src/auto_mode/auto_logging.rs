@@ -227,7 +227,12 @@ impl AutoLogger {
 
     /// Logs a task pool command invocation.
     pub fn log_task_pool(&self, result: &CommandResult) {
-        let level = if result.exit_code == 0 { LogLevel::Info } else { LogLevel::Error };
+        // Exit codes 0, 3 (claim limit), and 4 (no ready tasks) are not errors
+        let level = if result.exit_code == 0 || result.exit_code == 3 || result.exit_code == 4 {
+            LogLevel::Info
+        } else {
+            LogLevel::Error
+        };
         let entry = TaskPoolLogEntry {
             timestamp: timestamp_now(),
             level,
