@@ -354,6 +354,16 @@ When failure detected:
    detection)
 4. Wait for Claude Code to exit its task
 
+#### Remediation Console Output
+
+The overseer prints colored messages to stdout to indicate remediation status:
+
+- **Red** (`⚠ Entering remediation mode...`): When remediation starts
+- **Green** (`✓ Remediation completed in N.Ns`): On successful completion
+- **Green** (`✓ Remediation complete. Restarting daemon...`): Before daemon restart
+- **Yellow** (`⚠ Remediation interrupted`): If shutdown signal received
+- **Yellow** (`⚠ Remediation issue: ...`): On timeout or other errors
+
 #### Remediation Logging
 
 - Each remediation logged to `logs/remediation_<timestamp>.txt`:

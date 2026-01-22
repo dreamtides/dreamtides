@@ -80,17 +80,17 @@ pub fn execute_remediation(
                 &format!("Remediation completed successfully in {:.1}s", elapsed.as_secs_f64()),
             )?;
             info!(elapsed_secs = elapsed.as_secs(), "Remediation completed successfully");
-            println!("✓ Remediation completed in {:.1}s", elapsed.as_secs_f64());
+            println!("\x1b[1;32m✓ Remediation completed in {:.1}s\x1b[0m", elapsed.as_secs_f64());
         }
         Ok(false) => {
             write_log_entry(&mut log_file, "Remediation interrupted by shutdown signal")?;
             info!("Remediation interrupted by shutdown signal");
-            println!("⚠ Remediation interrupted");
+            println!("\x1b[1;33m⚠ Remediation interrupted\x1b[0m");
         }
         Err(e) => {
             write_log_entry(&mut log_file, &format!("Remediation failed: {}", e))?;
             error!(error = %e, "Remediation failed");
-            println!("⚠ Remediation issue: {}", e);
+            println!("\x1b[1;33m⚠ Remediation issue: {}\x1b[0m", e);
         }
     }
 

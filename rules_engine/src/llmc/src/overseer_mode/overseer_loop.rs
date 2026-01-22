@@ -109,7 +109,7 @@ pub fn run_overseer(config: &Config, daemon_options: &OverseerDaemonOptions) -> 
             bail!("Manual intervention required - see .llmc/manual_intervention_needed_*.txt");
         }
 
-        println!("Entering remediation mode...");
+        println!("\x1b[1;31m⚠ Entering remediation mode...\x1b[0m");
         run_remediation(&failure_status, config, &shutdown_count)?;
 
         if shutdown_count.load(Ordering::SeqCst) > 0 {
@@ -122,7 +122,7 @@ pub fn run_overseer(config: &Config, daemon_options: &OverseerDaemonOptions) -> 
             bail!("Manual intervention required - see .llmc/manual_intervention_needed_*.txt");
         }
 
-        println!("Remediation complete. Restarting daemon...");
+        println!("\x1b[1;32m✓ Remediation complete. Restarting daemon...\x1b[0m");
     }
 
     println!("✓ Overseer shutdown complete");

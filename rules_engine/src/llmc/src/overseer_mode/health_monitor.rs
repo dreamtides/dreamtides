@@ -10,6 +10,7 @@ use tracing::{debug, info, warn};
 
 use crate::auto_mode::heartbeat_thread::DaemonRegistration;
 use crate::auto_mode::{auto_logging, heartbeat_thread};
+use crate::logging::config as logging_config;
 use crate::overseer_mode::overseer_config::OverseerConfig;
 use crate::state::{self, State};
 /// Result of a daemon health check.
@@ -212,7 +213,7 @@ impl HealthMonitor {
     pub fn new(config: OverseerConfig) -> Self {
         let auto_log_path = auto_logging::auto_log_path();
         let auto_log_tailer = LogTailer::new(auto_log_path);
-        let main_log_path = crate::logging::config::get_log_path();
+        let main_log_path = logging_config::get_log_path();
         let main_log_tailer = LogTailer::new(main_log_path);
         HealthMonitor { config, auto_log_tailer, main_log_tailer }
     }
