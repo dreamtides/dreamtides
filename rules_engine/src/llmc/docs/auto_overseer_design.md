@@ -560,8 +560,9 @@ to edit the master repository instead of the worktree.
 LLMC creates a unique Serena project for each worktree:
 
 1. **On worker creation** (`llmc add`, auto worker creation):
-   - Creates `.serena/project.yml` with unique `project_name:
-     "dreamtides-{worker}"`
+   - Creates `.serena/project.yml` with unique `project_name` using the session
+     name format `{session_prefix}-{worker}` (e.g., `llmc-adam` or
+     `llmc-test-123-adam` for custom LLMC_ROOT)
    - Registers the worktree path in Serena's global config
      (`~/.serena/serena_config.yml`)
 

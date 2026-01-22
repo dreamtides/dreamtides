@@ -172,10 +172,14 @@ pub fn copy_tabula_to_worktree(repo: &Path, worktree_path: &Path) -> Result<()> 
 /// Creates .serena/project.yml in the worktree with a unique project name
 /// and registers the project path in Serena's global config.
 /// This file is gitignored, so each worktree gets its own copy.
+///
+/// The project name uses the session prefix to ensure uniqueness across
+/// different LLMC instances running in different directories.
 pub fn create_serena_project(worktree_path: &Path, worker_name: &str) -> Result<()> {
     let serena_dir = worktree_path.join(".serena");
     let project_yml = serena_dir.join("project.yml");
     fs::create_dir_all(&serena_dir).context("Failed to create .serena directory")?;
+    let project_name = config::get_worker_session_name(worker_name);
     let content = format!(
         r#"languages:
 - rust
@@ -192,13 +196,12 @@ excluded_tools: []
 
 initial_prompt: ""
 
-project_name: "dreamtides-{}"
+project_name: "{project_name}"
 included_optional_tools: []
-"#,
-        worker_name
+"#
     );
     fs::write(&project_yml, content).context("Failed to write .serena/project.yml")?;
-    println!("Created Serena project config: dreamtides-{}", worker_name);
+    println!("Created Serena project config: {}", project_name);
     register_serena_project(worktree_path)?;
     Ok(())
 }
