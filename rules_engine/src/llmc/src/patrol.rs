@@ -13,6 +13,8 @@ use crate::tmux::session;
 use crate::worker::{self, WorkerTransition};
 use crate::{git, recovery, sound};
 
+const OVERSEER_WORKER_NAME: &str = "overseer";
+
 static PATROL_RUNNING: AtomicBool = AtomicBool::new(false);
 
 pub const DIRTY_WORKTREE_ERROR: &str = "Dirty worktree detected during patrol";
@@ -54,6 +56,14 @@ pub fn handle_stop(
     state: &mut State,
     config: &Config,
 ) -> Result<()> {
+    if is_overseer_worker(worker_name) {
+        tracing::debug!(
+            worker = %worker_name,
+            "Stop hook from overseer session, ignoring"
+        );
+        return Ok(());
+    }
+
     let Some(worker) = state.get_worker(worker_name) else {
         tracing::warn!("Stop hook received for unknown worker '{}'", worker_name);
         return Ok(());
@@ -235,6 +245,10 @@ pub fn build_conflict_prompt(conflicts: &[String], original_task: &str) -> Strin
          Do NOT commit manually. The rebase process handles commits automatically.\n",
         );
     prompt
+}
+
+fn is_overseer_worker(worker_name: &str) -> bool {
+    worker_name == OVERSEER_WORKER_NAME
 }
 
 impl Patrol {
@@ -1017,6 +1031,15 @@ fn handle_session_start(
     _timestamp: u64,
     state: &mut State,
 ) -> Result<()> {
+    if is_overseer_worker(worker_name) {
+        tracing::debug!(
+            worker = %worker_name,
+            session_id = %session_id,
+            "SessionStart hook from overseer session, ignoring"
+        );
+        return Ok(());
+    }
+
     let Some(worker) = state.get_worker(worker_name) else {
         tracing::warn!(
             "SessionStart hook received for unknown worker '{}' (session: {})",
@@ -1063,6 +1086,15 @@ fn handle_session_end(
     state: &mut State,
     _config: &Config,
 ) -> Result<()> {
+    if is_overseer_worker(worker_name) {
+        tracing::debug!(
+            worker = %worker_name,
+            reason = %reason,
+            "SessionEnd hook from overseer session, ignoring"
+        );
+        return Ok(());
+    }
+
     let Some(worker) = state.get_worker(worker_name) else {
         tracing::warn!(
             "SessionEnd hook received for unknown worker '{}' (reason: {})",
