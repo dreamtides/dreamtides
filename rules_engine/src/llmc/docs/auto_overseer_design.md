@@ -110,12 +110,10 @@ autonomous task execution pipeline.
    - `instance_id`: Random UUID
    - `log_file`: Path to daemon log
 3. Create/verify auto workers exist
-4. Start/restart sessions for all auto workers
-5. Set all auto workers to Offline status (to ensure stale hooks from killed
-   sessions don't cause premature task assignment)
-6. Drain any stale hook events from IPC channel
-7. Start heartbeat thread (updates `.llmc/auto.heartbeat` every 5 seconds)
-8. Enter main loop
+4. Start sessions only for auto workers that don't already have running sessions
+   (sessions may already exist from `reconcile_and_start_workers` in `llmc up`)
+5. Start heartbeat thread (updates `.llmc/auto.heartbeat` every 5 seconds)
+6. Enter main loop
 
 #### Main Loop (Per Cycle)
 

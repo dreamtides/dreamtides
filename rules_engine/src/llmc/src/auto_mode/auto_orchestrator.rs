@@ -126,52 +126,30 @@ fn run_orchestration_loop(
         let fresh_config =
             Config::load(&config_path).context("Failed to reload config after creating workers")?;
 
-        // Start sessions for all auto workers.
-        // IMPORTANT: start_auto_worker_session kills and recreates sessions to ensure
-        // clean state. After starting sessions, we must set workers to Offline because:
-        // 1. Any SessionStart hooks from sessions started by
-        //    reconcile_and_start_workers (before this function) are now stale since
-        //    those sessions were killed.
-        // 2. The new sessions need time to start and fire their own SessionStart hooks.
-        // 3. If workers were left in Idle state (from stale hooks),
-        //    process_idle_workers would assign tasks to workers that aren't ready.
+        // Only start sessions for auto workers that don't already have running
+        // sessions. Sessions may already exist if they were started by
+        // reconcile_and_start_workers (which runs before this function). We
+        // don't want to kill and restart those sessions because:
+        // 1. The existing sessions may have already fired SessionStart hooks
+        // 2. Killing them would create stale hooks that cause race conditions
+        // 3. The SessionStart hooks from the existing sessions are the correct ones
         for name in &worker_names {
-            println!("{}", color_theme::dim(format!("Starting auto worker '{}'...", name)));
             if let Some(worker) = state.get_worker(name)
-                && let Err(e) = auto_workers::start_auto_worker_session(worker, &fresh_config)
+                && !session::session_exists(&worker.session_id)
             {
-                error!(worker = %name, error = %e, "Failed to start auto worker session");
-                return Err(e);
+                println!("{}", color_theme::dim(format!("Starting auto worker '{}'...", name)));
+                if let Err(e) = auto_workers::start_auto_worker_session(worker, &fresh_config) {
+                    error!(worker = %name, error = %e, "Failed to start auto worker session");
+                    return Err(e);
+                }
             }
         }
-
-        // Set all auto workers to Offline after starting sessions. They will transition
-        // to Idle when the new sessions fire SessionStart hooks.
-        for name in &worker_names {
-            if let Some(worker) = state.get_worker_mut(name) {
-                worker.status = WorkerStatus::Offline;
-            }
-        }
-        state.save(&state_path)?;
 
         println!(
             "{}",
             color_theme::success(format!("✓ {} auto worker(s) initialized", worker_names.len()))
         );
         info!(workers = ?worker_names, "Auto workers initialized");
-    }
-
-    // Drain any pending hook events that were received before we started the loop.
-    // These are likely stale hooks from sessions that were killed and recreated
-    // above.
-    if let Some(ref mut rx) = ipc_receiver {
-        let mut drained = 0;
-        while rx.try_recv().is_ok() {
-            drained += 1;
-        }
-        if drained > 0 {
-            info!(count = drained, "Drained stale hook events from IPC channel");
-        }
     }
 
     let patrol = Patrol::new(llmc_config);
