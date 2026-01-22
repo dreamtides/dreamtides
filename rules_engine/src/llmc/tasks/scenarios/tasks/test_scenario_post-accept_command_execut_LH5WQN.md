@@ -15,8 +15,10 @@ labels:
 blocked-by:
 - LH4WQN
 - LD4WQN
+- LD5WQN
+- LD6WQN
 created-at: 2026-01-21T22:01:20.201938Z
-updated-at: 2026-01-22T06:40:36.990910Z
+updated-at: 2026-01-22T07:32:57.548102Z
 ---
 
 # Test Scenario: Post-Accept Command Execution
