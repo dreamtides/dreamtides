@@ -27,6 +27,7 @@ Please use `just` commands instead of `cargo`, e.g. `just fmt`, `just check`,
 - Do not add `use` declarations within function bodies, only place them at the top of files
 - Qualify imports via `crate::`, not via `super::`
 - Do not write inline `mod tests {` tests, place them in the `/tests/` directory
+- Do not write code only used by tests. Test against real public API.
 
 # VALIDATING CHANGES
 
