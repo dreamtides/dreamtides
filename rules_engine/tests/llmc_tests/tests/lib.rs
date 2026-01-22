@@ -1,6 +1,7 @@
 mod auto_mode;
 mod config_tests;
 mod git_tests;
+mod hook_settings_tests;
 mod lock_tests;
 mod overseer;
 mod patrol_tests;

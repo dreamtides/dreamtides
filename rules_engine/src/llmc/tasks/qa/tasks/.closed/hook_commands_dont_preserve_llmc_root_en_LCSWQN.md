@@ -12,7 +12,8 @@ labels:
 - multi-instance
 - bug
 created-at: 2026-01-22T03:00:53.833494Z
-updated-at: 2026-01-22T03:00:53.833494Z
+updated-at: 2026-01-22T04:50:34.825519Z
+closed-at: 2026-01-22T04:50:34.825519Z
 ---
 
 # Bug: Hook Commands Don't Preserve LLMC_ROOT Environment Variable
