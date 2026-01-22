@@ -19,7 +19,7 @@ See `@rules_engine/docs/llmc.md` for broader context on the llmc system.
 
 Please report all issues encountered during this test via the
 `lattice_create_task()` MCP tool, in the `rules_engine/src/llmc/tasks/qa/`
-parent directory.
+parent directory. File bugs at priority 1.
 
 You MUST put the label `llmc-auto` on every task you file.
 
