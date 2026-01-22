@@ -14,8 +14,9 @@ labels:
 - llmc-auto
 blocked-by:
 - LH2WQN
+- LDZWQN
 created-at: 2026-01-21T21:59:55.443775Z
-updated-at: 2026-01-21T22:31:38.807512Z
+updated-at: 2026-01-22T04:12:10.099277Z
 ---
 
 # Test Scenario: Auto Mode Concurrency with Multiple Workers
