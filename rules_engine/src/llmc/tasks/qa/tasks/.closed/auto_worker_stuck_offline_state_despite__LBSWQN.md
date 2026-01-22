@@ -10,7 +10,8 @@ labels:
 - auto-mode
 - bug
 created-at: 2026-01-22T02:55:25.045522Z
-updated-at: 2026-01-22T02:55:25.045522Z
+updated-at: 2026-01-22T04:41:02.883169Z
+closed-at: 2026-01-22T04:41:02.883168Z
 ---
 
 # Bug: Auto Worker Stuck in 'offline' State

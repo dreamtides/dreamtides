@@ -9,6 +9,7 @@ use crate::config::{Config, SelfReviewConfig};
 use crate::ipc::messages::HookEvent;
 use crate::state::{self, State, WorkerStatus};
 use crate::tmux::sender::TmuxSender;
+use crate::tmux::session;
 use crate::worker::{self, WorkerTransition};
 use crate::{git, recovery, sound};
 
@@ -657,10 +658,12 @@ impl Patrol {
             let worker = state.get_worker(&worker_name).unwrap();
             let current_status = worker.status;
             let worktree_path = PathBuf::from(&worker.worktree_path);
+            let session_id = worker.session_id.clone();
             let transition = match current_status {
                 WorkerStatus::Rebasing => {
                     self.detect_rebasing_transition(&worker_name, &worktree_path)?
                 }
+                WorkerStatus::Offline => self.detect_offline_transition(&worker_name, &session_id),
                 _ => WorkerTransition::None,
             };
             if transition != WorkerTransition::None
@@ -692,6 +695,18 @@ impl Patrol {
                     tracing::info!(
                         "Worker '{}' rebase complete, ready for human review",
                         worker_name
+                    );
+                }
+                if transition == WorkerTransition::ToIdle && current_status == WorkerStatus::Offline
+                {
+                    // Worker transitioning from Offline -> Idle via patrol fallback.
+                    // This happens when SessionStart hook fails to fire but session exists.
+                    println!(
+                        "{}",
+                        color_theme::success(format!(
+                            "[{}] ✓ Worker ready (via patrol fallback)",
+                            worker_name
+                        ))
                     );
                 }
             }
@@ -870,6 +885,23 @@ impl Patrol {
         }
         let commit_sha = git::get_head_commit(worktree_path)?;
         Ok(WorkerTransition::ToNeedsReview { commit_sha })
+    }
+
+    /// Detects if an offline worker's session is actually running.
+    ///
+    /// This is a fallback mechanism for when SessionStart hooks fail to fire.
+    /// If the tmux session exists, we transition the worker to Idle.
+    fn detect_offline_transition(&self, worker_name: &str, session_id: &str) -> WorkerTransition {
+        if session::session_exists(session_id) {
+            tracing::info!(
+                worker = %worker_name,
+                session_id = %session_id,
+                "Patrol detected running session for offline worker (SessionStart hook fallback)"
+            );
+            WorkerTransition::ToIdle
+        } else {
+            WorkerTransition::None
+        }
     }
 
     fn rebase_pending_reviews(
