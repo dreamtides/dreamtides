@@ -19,9 +19,10 @@ detection, and task coordination without manual intervention.
 - Isolated execution environments prevent interference
 - Declarative state management enables recovery
 - Human-in-the-loop review ensures quality
-- **Daemon never crashes**: The daemon is designed to stay running through any
-  transient errors. Config reload failures, state file issues, and worker start
-  failures are all logged but never terminate the daemon. Only Ctrl-C stops it.
+- **Fail-fast daemon**: The daemon executes graceful shutdown on errors rather
+  than attempting to continue in a degraded state. This allows the overseer to
+  investigate and remediate issues automatically. Worktree state is preserved
+  during shutdown for debugging.
 
 ### Key Differences from V1
 
@@ -847,53 +848,46 @@ monitored by patrol for resolution, and timeouts trigger escalation.
 
 The system must handle several failure modes gracefully.
 
-### Daemon Resilience (Never Crash)
+### Daemon Error Handling (Fail-Fast)
 
-The `llmc up` daemon is designed around a "never crash" philosophy. The daemon
-main loop catches all errors and continues running. Specifically:
+The `llmc up` daemon is designed around a "fail-fast" philosophy. When errors
+occur, the daemon executes a graceful shutdown rather than continuing in a
+degraded state. This design enables the overseer to detect failures and
+remediate them automatically.
 
-- **Config reload failures**: If `config.toml` cannot be reloaded (e.g., syntax
-  error, file locked), the daemon continues with the existing configuration.
-- **State file errors**: If `state.json` cannot be loaded or saved, the daemon
-  logs the error and continues with the in-memory state.
-- **Worker start failures**: Individual worker failures don't affect other
-  workers. The daemon attempts self-healing recovery (kill stale session, retry
-  with backoff) before marking workers as `error` state.
-- **Lock contention**: If the state lock cannot be acquired (another command is
-  running), the daemon skips that iteration and tries again next cycle.
+Error categories and their handling:
 
-The daemon tracks consecutive errors and warns the user if there are persistent
-issues (10+ consecutive errors), but never terminates due to these errors. Only
-Ctrl-C (graceful shutdown) stops the daemon.
+- **Config errors**: Configuration parse failures or invalid settings trigger
+  shutdown. The overseer can fix config issues and restart the daemon.
+- **State file errors**: Corruption or access failures in `state.json` trigger
+  shutdown with preserved worktree state for investigation.
+- **Worker failures**: After limited retry attempts (with backoff), persistent
+  worker failures trigger daemon shutdown.
+- **Task pool errors**: Non-zero exit codes from the task pool command trigger
+  shutdown (except exit code 4 which indicates no tasks available).
+- **Post-accept command errors**: Failures in the post-accept command trigger
+  shutdown (though the commit has already been merged).
 
-### Self-Healing Recovery
+Graceful shutdown preserves all worktree state and logs detailed error context
+for debugging. The overseer monitors for daemon termination and enters
+remediation mode to diagnose and fix the underlying issue.
 
-LLMC is designed to be self-healing. When workers fail to start:
+### Worker Recovery
 
-1. **Immediate retry with cleanup**: If a worker fails to start, the daemon
+When workers encounter transient failures, the patrol system attempts limited
+recovery before escalating:
+
+1. **Immediate retry with cleanup**: If a worker session crashes, the patrol
    kills any stale TMUX session and retries up to 2 times with exponential
    backoff (1s, 2s delays).
 
-2. **Error state with cooldown**: If all retries fail, the worker is marked as
-   `error` state with an increasing crash count.
+2. **Escalation to daemon shutdown**: If patrol retries are exhausted, the
+   daemon enters graceful shutdown. The overseer then investigates and
+   remediates the issue.
 
-3. **Automatic retry after cooldown**: Error workers automatically transition
-   back to `offline` state after a cooldown period, triggering another recovery
-   attempt. The cooldown uses exponential backoff based on crash count:
-   - 1st failure: 1 minute cooldown
-   - 2nd failure: 2 minute cooldown
-   - 3rd failure: 4 minute cooldown
-   - ...up to 30 minute maximum
-
-4. **Crash count reset**: When a worker starts successfully, its crash count
-   resets to zero, providing positive feedback to the self-healing system.
-
-5. **Dirty worktree errors**: If an idle worker is found to have uncommitted
-   changes (dirty worktree), it is marked as `error` with reason "Dirty worktree
-   detected during patrol". Unlike other errors, dirty worktree errors do **not**
-   auto-recover even if the worktree later becomes clean, because this could
-   indicate lost uncommitted work. Use `llmc reset <worker>` to manually recover
-   from this state.
+3. **Dirty worktree errors**: If an idle worker has uncommitted changes (dirty
+   worktree), the daemon shuts down with a detailed error. This may indicate
+   lost uncommitted work or state corruption that requires investigation.
 
 ### Git Lock File Handling
 

@@ -120,6 +120,9 @@ pub struct State {
     /// doubles)
     #[serde(default)]
     pub source_repo_dirty_backoff_secs: Option<u64>,
+    /// Number of times we've retried due to source repo being dirty
+    #[serde(default)]
+    pub source_repo_dirty_retry_count: Option<u32>,
 }
 /// Returns true if a worker is truly ready for human review.
 ///
@@ -206,6 +209,7 @@ impl State {
             last_task_completion_unix: None,
             source_repo_dirty_retry_after_unix: None,
             source_repo_dirty_backoff_secs: None,
+            source_repo_dirty_retry_count: None,
         }
     }
 

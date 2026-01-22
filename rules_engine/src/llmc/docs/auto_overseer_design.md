@@ -26,14 +26,12 @@ autonomous task execution pipeline.
 
 ### Behavioral Changes
 
-- Normal `llmc up` philosophy: "stay alive at all costs" - absorb errors,
-  continue running
-- Auto mode philosophy: "execute graceful shutdown on any error" - preserve
-  worktree state, terminate cleanly
 - Auto mode bypasses the human review step (`llmc review`); changes are accepted
   automatically
 - Auto workers are segregated from manual workers in status display and cannot
   receive `llmc start` tasks
+- Both auto mode and normal mode follow the fail-fast philosophy: errors trigger
+  graceful shutdown so the overseer can investigate and remediate
 
 ### Configuration
 
@@ -120,60 +118,74 @@ autonomous task execution pipeline.
 1. Check for shutdown signal (Ctrl-C)
 2. For each idle auto worker:
    - Execute `task_pool_command`
-   - If stdout empty: skip worker this cycle
-   - If non-zero exit: log error, initiate shutdown
+   - If stdout empty OR expected "no tasks" exit code: skip worker this cycle
+   - If unexpected error: log error, continue to next worker
    - If stdout non-empty: assign task to worker (same as `llmc start`)
 3. For each worker that has completed (needs_review or no_changes):
    - If no_changes: reset worker to idle, continue
    - Execute accept workflow:
      - Rebase onto master
-     - If rebase fails (conflict): transition worker to `rebasing` state, send conflict
-       prompt, continue (worker resolves conflict, returns to `needs_review`, accept retried)
+     - If rebase fails (conflict): transition worker to `rebasing` state, send
+       conflict prompt, continue (worker resolves conflict, returns to
+       `needs_review`, accept retried)
      - Squash commits, strip attribution
      - Fast-forward merge to master
    - If `post_accept_command` configured:
      - Execute command
-     - If non-zero exit: log error, initiate shutdown
+     - If non-zero exit: log warning, continue (commit already merged)
    - Reset worker to idle
 4. Run patrol (session health, rebasing in-flight workers, etc.)
 5. Sleep patrol_interval_secs
 
 #### Error Handling
 
-Two categories of errors:
+Three categories of conditions:
+
+**Expected operational states** (not errors, handled automatically):
+
+- Task pool returns no tasks (exit 0 with empty stdout) → wait for tasks
+- Task pool returns "no ready tasks" (exit 4) → wait for tasks
+- Source repository has uncommitted changes → exponential backoff with retry limit (see below)
+- Rebase conflict during accept → worker transitions to `rebasing`, resolves
+
+These are normal conditions during autonomous operation, not errors. The daemon
+continues running without logging errors or triggering remediation.
+
+Note: Task pool returning "claim limit exceeded" (exit 3) is treated as a **hard
+failure**, not an expected state. This exit code indicates workers are not
+properly releasing claims, which is a bug that requires investigation.
 
 **Transient failures** (patrol attempts automatic recovery):
 
 - Worker Claude Code crashes → patrol restarts session (up to 2 retries with
   backoff)
 - TMUX session disappears → patrol recreates session
-- Source repository has uncommitted changes → exponential backoff retry (see
-  below)
-- Rebase conflict during accept → worker transitions to `rebasing`, resolves
-  conflict, accept retried
 - If patrol recovery succeeds, daemon continues normally
-- If patrol retries exhausted → escalates to hard failure
+- If patrol retries exhausted → daemon shuts down for overseer remediation
 
 **Source repository dirty handling:**
 
 When the daemon attempts to accept a worker's changes but the source repository
-(the main development directory) has uncommitted changes, the daemon does NOT
-shut down. Instead, it implements exponential backoff:
+(the main development directory) has uncommitted changes, it implements
+exponential backoff with a retry limit:
 
 - First detection: wait 60 seconds before retry
 - Each subsequent detection: double the wait time (120s, 240s, 480s, ...)
-- Maximum backoff: 1 hour
+- Maximum backoff: 1 hour per retry
+- Maximum retries: 10 (then daemon shuts down for overseer remediation)
 - Backoff state is persisted in `state.json` to survive daemon restarts
 - On successful accept or NoChanges, backoff state is cleared
 - Prints message to stdout: "Source repository has uncommitted changes. Will
-  retry in N seconds."
+  retry in N seconds (attempt X/10)."
 
-This allows the daemon to continue running while a developer commits or stashes
-their changes in the source repository.
+This allows the daemon to wait while a developer commits or stashes their
+changes, but eventually gives up so the overseer can investigate if the issue
+persists.
 
 **Hard failures** (immediate shutdown):
 
-- `task_pool_command` returns non-zero
+- `task_pool_command` returns non-zero (except exit code 4 which means no tasks)
+- `task_pool_command` returns exit code 3 (claim limit exceeded - indicates bug)
 - `post_accept_command` returns non-zero
 - Worker enters error state (after patrol retries exhausted)
 - Rebase failure during accept (after worker was ready)
@@ -467,7 +479,7 @@ Recovery classification:
 | 13 | Merge conflict during accept | Git rebase conflict status | Worker transitions to `rebasing`, resolves conflict, accept retried | AUTO |
 | 14 | Master diverged significantly | Many conflicts | Daemon shuts down; overseer may need retries | AI |
 | 15 | Git lock file stuck | Git lock error | Daemon shuts down; overseer removes lock | AI |
-| 15a | Source repo has uncommitted changes | Dirty repo check | Exponential backoff retry (60s, 120s, 240s, ..., max 1hr) | AUTO |
+| 15a | Source repo has uncommitted changes | Dirty repo check | Exponential backoff (max 10 retries), then daemon shuts down | AUTO→AI |
 
 ### System Resource Failures
 
@@ -501,13 +513,15 @@ Recovery classification:
 
 | Type | Count | Scope |
 |------|-------|-------|
-| AUTO | 6 | Empty task pool, single worker/session crash (patrol recovers), overseer session crash, source repo dirty, rebase conflicts during accept |
-| AI | 16 | Repeated crashes, severe conflicts, config errors, most operational failures |
+| AUTO | 5 | Empty task pool, single worker/session crash (patrol recovers), overseer session crash, rebase conflicts during accept |
+| AUTO→AI | 1 | Source repo dirty (auto retry with limit, then AI remediation) |
+| AI | 17 | Repeated crashes, severe conflicts, config errors, claim limit exceeded, most operational failures |
 | HUMAN | 6 | Resource exhaustion, network, failure spirals |
 
-**Design principle:** Patrol handles transient failures automatically. AI
-remediation for persistent operational issues. Human intervention only for
-external/environmental issues or failure spirals.
+**Design principle:** Patrol handles transient failures automatically. Limited
+retries for transient conditions (dirty source repo) escalate to AI remediation
+if not resolved. Human intervention only for external/environmental issues or
+failure spirals.
 
 ---
 
@@ -523,6 +537,8 @@ external/environmental issues or failure spirals.
   backoff timing
 - Add `source_repo_dirty_backoff_secs: Option<u64>` for current backoff value
   (60s, 120s, ...)
+- Add `source_repo_dirty_retry_count: Option<u32>` for tracking retry attempts
+  (max 10)
 
 ### New Files in `.llmc/`
 

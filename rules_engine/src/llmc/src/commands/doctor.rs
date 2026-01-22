@@ -847,6 +847,7 @@ fn run_rebuild() -> Result<()> {
             last_task_completion_unix: None,
             source_repo_dirty_retry_after_unix: None,
             source_repo_dirty_backoff_secs: None,
+            source_repo_dirty_retry_count: None,
         };
         let state_path = state::get_state_path();
         state.save(&state_path)?;

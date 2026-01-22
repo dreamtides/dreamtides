@@ -235,8 +235,9 @@ impl AutoLogger {
 
     /// Logs a task pool command invocation.
     pub fn log_task_pool(&self, result: &CommandResult) {
-        // Exit codes 0, 3 (claim limit), and 4 (no ready tasks) are not errors
-        let level = if result.exit_code == 0 || result.exit_code == 3 || result.exit_code == 4 {
+        // Exit codes 0 and 4 (no ready tasks) are not errors.
+        // Exit code 3 (claim limit exceeded) IS an error - indicates claim leak.
+        let level = if result.exit_code == 0 || result.exit_code == 4 {
             LogLevel::Info
         } else {
             LogLevel::Error

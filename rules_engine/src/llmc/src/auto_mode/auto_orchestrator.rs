@@ -28,6 +28,7 @@ use crate::worker::{self, WorkerTransition};
 
 const INITIAL_SOURCE_REPO_DIRTY_BACKOFF_SECS: u64 = 60;
 const MAX_SOURCE_REPO_DIRTY_BACKOFF_SECS: u64 = 3600;
+const MAX_SOURCE_REPO_DIRTY_RETRIES: u32 = 10;
 
 /// Runs the auto mode daemon.
 ///
@@ -566,6 +567,7 @@ fn process_completed_workers(
                         // Clear source repo dirty backoff on successful accept
                         state.source_repo_dirty_retry_after_unix = None;
                         state.source_repo_dirty_backoff_secs = None;
+                        state.source_repo_dirty_retry_count = None;
 
                         println!(
                             "{}",
@@ -610,6 +612,7 @@ fn process_completed_workers(
                         // Clear source repo dirty backoff - the accept itself succeeded
                         state.source_repo_dirty_retry_after_unix = None;
                         state.source_repo_dirty_backoff_secs = None;
+                        state.source_repo_dirty_retry_count = None;
 
                         // Print success with warning about cleanup failure
                         println!(
@@ -667,6 +670,7 @@ fn process_completed_workers(
                         // Clear source repo dirty backoff on successful accept
                         state.source_repo_dirty_retry_after_unix = None;
                         state.source_repo_dirty_backoff_secs = None;
+                        state.source_repo_dirty_retry_count = None;
 
                         println!(
                             "{}",
@@ -680,6 +684,24 @@ fn process_completed_workers(
                         auto_accept::release_task_pool_claims(&source_repo, logger);
                     }
                     AutoAcceptResult::SourceRepoDirty => {
+                        // Increment retry count and check if we've exceeded the limit
+                        let retry_count = state.source_repo_dirty_retry_count.unwrap_or(0) + 1;
+                        state.source_repo_dirty_retry_count = Some(retry_count);
+
+                        if retry_count > MAX_SOURCE_REPO_DIRTY_RETRIES {
+                            error!(
+                                worker = %worker_name,
+                                retry_count,
+                                max_retries = MAX_SOURCE_REPO_DIRTY_RETRIES,
+                                "Source repository dirty retry limit exceeded"
+                            );
+                            return Err(anyhow::anyhow!(
+                                "Source repository has uncommitted changes. Retry limit ({}) exceeded. \
+                                 Please commit or stash changes in the source repository.",
+                                MAX_SOURCE_REPO_DIRTY_RETRIES
+                            ));
+                        }
+
                         // Calculate exponential backoff
                         let current_backoff = state.source_repo_dirty_backoff_secs.unwrap_or(0);
                         let next_backoff = if current_backoff == 0 {
@@ -695,13 +717,15 @@ fn process_completed_workers(
                         state.source_repo_dirty_retry_after_unix = Some(retry_after);
 
                         println!(
-                            "[{}] Source repository has uncommitted changes. Will retry in {} seconds.",
-                            worker_name, next_backoff
+                            "[{}] Source repository has uncommitted changes. Will retry in {} seconds (attempt {}/{}).",
+                            worker_name, next_backoff, retry_count, MAX_SOURCE_REPO_DIRTY_RETRIES
                         );
                         info!(
                             worker = %worker_name,
                             backoff_secs = next_backoff,
                             retry_after_unix = retry_after,
+                            retry_count,
+                            max_retries = MAX_SOURCE_REPO_DIRTY_RETRIES,
                             "Source repository dirty, scheduling retry with exponential backoff"
                         );
                     }

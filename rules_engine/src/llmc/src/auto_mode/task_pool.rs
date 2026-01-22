@@ -35,7 +35,7 @@ pub struct TaskPoolError {
 /// Exit code interpretation:
 /// - Exit 0 + non-empty stdout = Task available (stdout is the task)
 /// - Exit 0 + empty stdout = No tasks available (not an error)
-/// - Exit 3 (E039 - claim limit exceeded) = No tasks available (not an error)
+/// - Exit 3 (E039 - claim limit exceeded) = Error condition (claim leak bug)
 /// - Exit 4 (E038 - no ready tasks) = No tasks available (not an error)
 /// - Other non-zero exit = Error condition (triggers daemon shutdown)
 pub fn execute_task_pool_command(command: &str, logger: &AutoLogger) -> TaskPoolResult {
@@ -117,9 +117,13 @@ fn handle_failed_execution(
     stdout: &str,
     stderr: &str,
 ) -> TaskPoolResult {
-    // Exit code 3 (E039 - claim limit exceeded) and exit code 4 (E038 - no ready
-    // tasks) are not errors - they just mean no tasks are available right now.
-    if exit_code == 3 || exit_code == 4 {
+    // Exit code 4 (E038 - no ready tasks) is not an error - it just means no
+    // tasks are available right now.
+    //
+    // Note: Exit code 3 (E039 - claim limit exceeded) IS treated as an error
+    // because it indicates workers are not properly releasing claims, which is
+    // a bug that the overseer should investigate.
+    if exit_code == 4 {
         debug!(
             command = %command,
             exit_code = exit_code,
