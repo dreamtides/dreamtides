@@ -83,6 +83,7 @@ pub fn run_auto_mode(
 
     // Cleanup on exit
     heartbeat.stop();
+    auto_accept::release_all_task_pool_claims(&logger);
     let shutdown_reason = match &result {
         Ok(()) => "Normal shutdown (Ctrl-C)",
         Err(e) => &format!("Error: {}", e),
@@ -572,6 +573,11 @@ fn process_completed_workers(
                         logger.log_task_completed(&worker_name, TaskResult::NeedsReview);
                         info!(worker = %worker_name, commit = %commit_sha, "Worker changes accepted");
 
+                        // Release task pool claims BEFORE post-accept command to ensure
+                        // claims are released even if post-accept fails
+                        let source_repo = PathBuf::from(&llmc_config.repo.source);
+                        auto_accept::release_task_pool_claims(&source_repo, logger);
+
                         // Run post-accept command if configured
                         debug!(
                             worker = %worker_name,
@@ -594,10 +600,6 @@ fn process_completed_workers(
                             error!(worker = %worker_name, error = %e, "Post-accept command failed");
                             return Err(e.into());
                         }
-
-                        // Release task pool claims (for lattice-based task pools)
-                        let source_repo = PathBuf::from(&llmc_config.repo.source);
-                        auto_accept::release_task_pool_claims(&source_repo, logger);
                     }
                     AutoAcceptResult::AcceptedWithCleanupFailure { commit_sha, cleanup_error } => {
                         // Clear source repo dirty backoff - the accept itself succeeded
@@ -628,6 +630,11 @@ fn process_completed_workers(
                             "Worker changes accepted but cleanup failed - continuing with other workers"
                         );
 
+                        // Release task pool claims BEFORE post-accept command to ensure
+                        // claims are released even if post-accept fails
+                        let source_repo = PathBuf::from(&llmc_config.repo.source);
+                        auto_accept::release_task_pool_claims(&source_repo, logger);
+
                         // Still run post-accept command since the accept succeeded
                         debug!(
                             worker = %worker_name,
@@ -650,10 +657,6 @@ fn process_completed_workers(
                             error!(worker = %worker_name, error = %e, "Post-accept command failed");
                             return Err(e.into());
                         }
-
-                        // Release task pool claims (for lattice-based task pools)
-                        let source_repo = PathBuf::from(&llmc_config.repo.source);
-                        auto_accept::release_task_pool_claims(&source_repo, logger);
                     }
                     AutoAcceptResult::NoChanges => {
                         // Clear source repo dirty backoff on successful accept

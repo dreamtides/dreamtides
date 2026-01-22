@@ -225,6 +225,56 @@ pub fn release_task_pool_claims(source_repo: &Path, logger: &AutoLogger) {
     }
 }
 
+/// Releases all task pool claims on daemon shutdown.
+///
+/// This is called during daemon shutdown to ensure no claims are left dangling.
+/// Uses `lat claim --release-all` to release all claims regardless of worktree.
+pub fn release_all_task_pool_claims(logger: &AutoLogger) {
+    let command = "lat claim --release-all";
+    info!(command = %command, "Releasing all task pool claims on shutdown");
+
+    let start = Instant::now();
+    let output = Command::new("lat").args(["claim", "--release-all"]).output();
+    let duration = start.elapsed();
+
+    match output {
+        Ok(output) => {
+            let stdout = String::from_utf8_lossy(&output.stdout).to_string();
+            let stderr = String::from_utf8_lossy(&output.stderr).to_string();
+            let exit_code = output.status.code().unwrap_or(-1);
+
+            let cmd_result = CommandResult {
+                command: command.to_string(),
+                exit_code,
+                duration,
+                stdout: stdout.clone(),
+                stderr: stderr.clone(),
+            };
+            logger.log_task_pool(&cmd_result);
+
+            if output.status.success() {
+                info!(
+                    duration_ms = %duration.as_millis(),
+                    stdout = %stdout.trim(),
+                    "All task pool claims released successfully"
+                );
+            } else {
+                debug!(
+                    exit_code = %exit_code,
+                    stderr = %stderr.trim(),
+                    "Task pool claim release-all command returned non-zero"
+                );
+            }
+        }
+        Err(e) => {
+            debug!(
+                error = %e,
+                "lat command not found - skipping claim release"
+            );
+        }
+    }
+}
+
 impl std::fmt::Display for AutoAcceptError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "Auto accept failed for worker '{}': {}", self.worker_name, self.message)
