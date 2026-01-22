@@ -11,7 +11,8 @@ labels:
 - auto-mode
 - llmc-auto
 created-at: 2026-01-22T04:33:57.229906Z
-updated-at: 2026-01-22T04:33:57.229906Z
+updated-at: 2026-01-22T05:09:29.157142Z
+closed-at: 2026-01-22T05:09:29.157141Z
 ---
 
 # Test Scenario: Auto Worker Stuck Offline Despite Running Session
