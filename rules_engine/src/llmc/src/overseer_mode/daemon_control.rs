@@ -2,7 +2,7 @@ use std::time::{Duration, Instant};
 use std::{fs, thread};
 
 use anyhow::{Context, Result};
-use tracing::{debug, error, info, warn};
+use tracing::{debug, error, info};
 
 use crate::auto_mode::heartbeat_thread;
 use crate::overseer_mode::health_monitor::ExpectedDaemon;
@@ -65,7 +65,7 @@ pub fn cleanup_registration_files() {
                 debug!(path = %registration_path.display(), "Removed daemon registration file");
             }
             Err(e) => {
-                warn!(
+                info!(
                     path = %registration_path.display(),
                     error = %e,
                     "Failed to remove daemon registration file"
@@ -81,7 +81,7 @@ pub fn cleanup_registration_files() {
                 debug!(path = %heartbeat_path.display(), "Removed heartbeat file");
             }
             Err(e) => {
-                warn!(
+                info!(
                     path = %heartbeat_path.display(),
                     error = %e,
                     "Failed to remove heartbeat file"
@@ -106,7 +106,7 @@ pub fn cleanup_existing_sessions() -> Result<()> {
 
     if !output.status.success() {
         let stderr = String::from_utf8_lossy(&output.stderr);
-        warn!(
+        info!(
             exit_code = output.status.code(),
             stderr = %stderr,
             "llmc down --force returned non-zero exit code (continuing anyway)"
@@ -126,7 +126,7 @@ fn verify_and_terminate(expected: &ExpectedDaemon) -> Result<TerminationResult> 
     }
 
     if let Err(reason) = verify_process_identity(expected) {
-        warn!(
+        info!(
             pid = expected.pid,
             reason = %reason,
             "Process identity verification failed, proceeding anyway"
@@ -144,7 +144,7 @@ fn verify_and_terminate(expected: &ExpectedDaemon) -> Result<TerminationResult> 
         thread::sleep(Duration::from_millis(TERMINATION_POLL_INTERVAL_MS));
     }
 
-    warn!(
+    info!(
         pid = expected.pid,
         grace_period_secs = TERMINATION_GRACE_PERIOD_SECS,
         "Process did not terminate after SIGTERM, sending SIGKILL"
@@ -219,7 +219,7 @@ fn send_sigterm(pid: u32) -> Result<()> {
 
 #[cfg(not(unix))]
 fn send_sigterm(pid: u32) -> Result<()> {
-    warn!(pid, "SIGTERM not supported on this platform, skipping");
+    info!(pid, "SIGTERM not supported on this platform, skipping");
     Ok(())
 }
 
@@ -244,7 +244,7 @@ fn send_sigkill(pid: u32) -> Result<()> {
 
 #[cfg(not(unix))]
 fn send_sigkill(pid: u32) -> Result<()> {
-    warn!(pid, "SIGKILL not supported on this platform, skipping");
+    info!(pid, "SIGKILL not supported on this platform, skipping");
     Ok(())
 }
 

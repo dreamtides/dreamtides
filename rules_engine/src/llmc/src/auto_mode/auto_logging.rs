@@ -9,7 +9,7 @@ use std::time::{Duration, SystemTime, UNIX_EPOCH};
 use anyhow::{Context, Result};
 use chrono::{DateTime, Utc};
 use serde::Serialize;
-use tracing::{error, warn};
+use tracing::{error, info};
 
 use crate::config;
 
@@ -361,13 +361,13 @@ impl AutoLogger {
     /// Should be called before shutdown to ensure all entries are written.
     pub fn flush(&self) {
         if let Err(e) = self.task_pool.lock().unwrap().flush() {
-            warn!("Failed to flush task_pool.log: {}", e);
+            info!("Failed to flush task_pool.log: {}", e);
         }
         if let Err(e) = self.post_accept.lock().unwrap().flush() {
-            warn!("Failed to flush post_accept.log: {}", e);
+            info!("Failed to flush post_accept.log: {}", e);
         }
         if let Err(e) = self.auto.lock().unwrap().flush() {
-            warn!("Failed to flush auto.log: {}", e);
+            info!("Failed to flush auto.log: {}", e);
         }
     }
 }

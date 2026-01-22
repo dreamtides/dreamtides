@@ -48,7 +48,7 @@ pub fn is_overseer_session_healthy() -> bool {
             is_active
         }
         Err(e) => {
-            tracing::warn!(
+            tracing::info!(
                 session = &get_overseer_session_name(),
                 error = %e,
                 "Failed to capture overseer session pane - session may be restarting or \

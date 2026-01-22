@@ -10,7 +10,7 @@ use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 use anyhow::{Context, Result};
 use serde::{Deserialize, Serialize};
-use tracing::{error, info, warn};
+use tracing::{error, info};
 use uuid::Uuid;
 
 use crate::config;
@@ -75,12 +75,12 @@ pub fn read_daemon_registration() -> Option<DaemonRegistration> {
         Ok(content) => match serde_json::from_str(&content) {
             Ok(registration) => Some(registration),
             Err(e) => {
-                warn!("Failed to parse daemon registration: {}", e);
+                info!("Failed to parse daemon registration: {}", e);
                 None
             }
         },
         Err(e) => {
-            warn!("Failed to read daemon registration: {}", e);
+            info!("Failed to read daemon registration: {}", e);
             None
         }
     }
@@ -96,12 +96,12 @@ pub fn read_heartbeat() -> Option<Heartbeat> {
         Ok(content) => match serde_json::from_str(&content) {
             Ok(heartbeat) => Some(heartbeat),
             Err(e) => {
-                warn!("Failed to parse heartbeat: {}", e);
+                info!("Failed to parse heartbeat: {}", e);
                 None
             }
         },
         Err(e) => {
-            warn!("Failed to read heartbeat: {}", e);
+            info!("Failed to read heartbeat: {}", e);
             None
         }
     }

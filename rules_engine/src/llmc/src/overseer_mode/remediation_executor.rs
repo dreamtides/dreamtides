@@ -19,7 +19,7 @@ use tokio::runtime::Handle;
 use tokio::sync::mpsc::Receiver;
 use tokio::task::block_in_place;
 use tokio::time;
-use tracing::{debug, error, info, warn};
+use tracing::{debug, error, info};
 
 use crate::config::Config;
 use crate::ipc::messages::{HookEvent, HookMessage};
@@ -139,7 +139,7 @@ async fn wait_for_completion(
             Ok(Some(msg)) => {
                 let event_desc = format!("{:?}", msg.event);
                 write_log_entry(log_file, &format!("Received hook event: {}", event_desc))
-                    .unwrap_or_else(|e| warn!(error = %e, "Failed to write log entry"));
+                    .unwrap_or_else(|e| info!(error = %e, "Failed to write log entry"));
 
                 info!(event = ?msg.event, "Received hook event during remediation");
 
@@ -153,7 +153,7 @@ async fn wait_for_completion(
                 if let HookEvent::SessionEnd { worker, reason, .. } = &msg.event
                     && worker == "overseer"
                 {
-                    warn!(reason = %reason, "Overseer session ended during remediation");
+                    error!(reason = %reason, "Overseer session ended during remediation");
                     bail!("Overseer session ended unexpectedly: {}", reason);
                 }
             }
@@ -217,7 +217,7 @@ fn capture_and_log_output(log_file: &mut File) -> Result<()> {
             writeln!(log_file, "```")?;
         }
         Err(e) => {
-            warn!(error = %e, "Failed to capture overseer output");
+            info!(error = %e, "Failed to capture overseer output");
             writeln!(log_file, "(Failed to capture: {})", e)?;
         }
     }

@@ -139,7 +139,7 @@ async fn send_event_gracefully(
             let elapsed_ms = start_time.elapsed().as_millis();
             if !response.success {
                 let err = response.error.as_deref().unwrap_or("unknown error");
-                tracing::warn!(
+                tracing::error!(
                     hook = hook_name,
                     worker = worker,
                     context = context,

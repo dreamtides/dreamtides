@@ -398,7 +398,7 @@ impl Patrol {
                                     );
                                 }
                                 Err(e) => {
-                                    tracing::warn!(
+                                    tracing::error!(
                                         worker = %worker_name,
                                         error = %e,
                                         "Failed to reset idle worker to origin/master. Worker may \
@@ -441,7 +441,7 @@ impl Patrol {
                 }
                 match git::is_worktree_clean(worktree_path) {
                     Ok(false) => {
-                        tracing::warn!(
+                        tracing::error!(
                             worker = %worker_name,
                             worktree = %worktree_path.display(),
                             "Worker is idle but has dirty worktree - possible uncommitted work. \
@@ -496,7 +496,7 @@ impl Patrol {
                                 .get_worker(&worker_name)
                                 .and_then(|w| w.error_reason.as_deref());
                             if error_reason == Some(DIRTY_WORKTREE_ERROR) {
-                                tracing::warn!(
+                                tracing::info!(
                                     "Worker '{}' was in error due to dirty worktree, worktree is now clean. \
                                      Uncommitted changes may have been lost. Use 'llmc reset {}' to recover.",
                                     worker_name,
@@ -567,7 +567,7 @@ impl Patrol {
                                 let hook_config_path =
                                     worktree_path.join(".claude").join("settings.json");
                                 let hook_config_missing = !hook_config_path.exists();
-                                tracing::warn!(
+                                tracing::info!(
                                     worker = %worker_name,
                                     status = ?worker_status,
                                     elapsed_since_commits_secs = elapsed_since_commits,
@@ -611,7 +611,7 @@ impl Patrol {
                                     worktree_path.join(".claude").join("settings.json");
                                 let hook_config_exists = hook_config_path.exists();
                                 if !hook_config_exists {
-                                    tracing::warn!(
+                                    tracing::error!(
                                         worker = %worker_name,
                                         elapsed_since_commits_secs = elapsed_since_commits,
                                         remaining_secs = FALLBACK_DELAY_SECS - elapsed_since_commits,
@@ -864,7 +864,7 @@ impl Patrol {
             let conflicts = match git::get_conflicted_files(&worktree_path) {
                 Ok(c) => c,
                 Err(e) => {
-                    tracing::warn!(
+                    tracing::info!(
                         worker = %worker_name,
                         error = %e,
                         "Failed to get conflicted files, will retry next patrol"
@@ -1173,7 +1173,7 @@ fn handle_session_end(
         if is_crash {
             w.crash_count = w.crash_count.saturating_add(1);
             w.last_crash_unix = Some(timestamp);
-            tracing::warn!(
+            tracing::error!(
                 worker = %worker_name,
                 crash_count = w.crash_count,
                 reason = %reason,

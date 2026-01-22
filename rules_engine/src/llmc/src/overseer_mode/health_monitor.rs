@@ -6,7 +6,7 @@ use std::path::PathBuf;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 use serde::Deserialize;
-use tracing::{debug, info, warn};
+use tracing::{debug, info};
 
 use crate::auto_mode::heartbeat_thread::DaemonRegistration;
 use crate::auto_mode::{auto_logging, heartbeat_thread};
@@ -147,7 +147,7 @@ impl LogTailer {
         let metadata = match fs::metadata(&self.path) {
             Ok(m) => m,
             Err(e) => {
-                warn!("Failed to read log file metadata: {}", e);
+                info!("Failed to read log file metadata: {}", e);
                 return entries;
             }
         };
@@ -169,13 +169,13 @@ impl LogTailer {
         let file = match File::open(&self.path) {
             Ok(f) => f,
             Err(e) => {
-                warn!("Failed to open log file: {}", e);
+                info!("Failed to open log file: {}", e);
                 return entries;
             }
         };
         let mut reader = BufReader::new(file);
         if let Err(e) = reader.seek(SeekFrom::Start(self.last_position)) {
-            warn!("Failed to seek in log file: {}", e);
+            info!("Failed to seek in log file: {}", e);
             return entries;
         }
         let mut line = String::new();
@@ -185,7 +185,7 @@ impl LogTailer {
                 Ok(0) => break,
                 Ok(_) => entries.push(line.trim_end().to_string()),
                 Err(e) => {
-                    warn!("Error reading log file: {}", e);
+                    info!("Error reading log file: {}", e);
                     break;
                 }
             }
@@ -351,7 +351,7 @@ impl HealthMonitor {
         let state = match State::load(&state_path) {
             Ok(s) => s,
             Err(e) => {
-                warn!("Failed to load state for progress check: {}", e);
+                info!("Failed to load state for progress check: {}", e);
                 return None;
             }
         };

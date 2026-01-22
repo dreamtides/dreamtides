@@ -1,7 +1,7 @@
 #![allow(dead_code, reason = "Some types and variants are defined for future use by overseer")]
 
 use anyhow::Result;
-use tracing::{error, info, warn};
+use tracing::{error, info};
 
 use crate::auto_mode::auto_workers;
 use crate::state::{State, WorkerRecord, WorkerStatus};
@@ -263,7 +263,7 @@ fn recover_missing_session(
             Ok(RecoveryResult::Recovered)
         }
         Err(e) => {
-            warn!(
+            info!(
                 worker = %worker_name,
                 error = %e,
                 "Failed to restart TMUX session, will retry"

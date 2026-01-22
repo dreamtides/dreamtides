@@ -73,7 +73,7 @@ pub fn run_start(
             .unwrap_or_else(|_| "<unknown>".to_string());
         let first_line = stale_msg.lines().next().unwrap_or("<empty>");
         let origin_master = git::get_head_commit_of_ref(&worktree_path, "origin/master")?;
-        tracing::warn!(
+        tracing::info!(
             worker = % worker_name, stale_commit_sha = % stale_head, stale_commit_msg = %
             first_line, origin_master = % origin_master,
             "Worker has stale commits from previous task, resetting to origin/master before starting new task"
@@ -435,7 +435,7 @@ fn warn_about_source_repo_paths(prompt: &str, config: &Config, worktree_path: &P
     if problematic_paths.is_empty() {
         return Ok(());
     }
-    tracing::warn!(
+    tracing::error!(
         operation = "path_detection", source_repo = % config.repo.source, worktree = %
         worktree_path.display(), detected_count = problematic_paths.len(), detected_paths
         = ? problematic_paths,
@@ -468,7 +468,7 @@ fn warn_about_source_repo_paths(prompt: &str, config: &Config, worktree_path: &P
         );
         bail!("Aborted by user. Please fix the paths in your prompt and try again.");
     }
-    tracing::warn!(
+    tracing::info!(
         operation = "path_detection",
         result = "user_override",
         "User chose to proceed despite source repo paths in prompt"

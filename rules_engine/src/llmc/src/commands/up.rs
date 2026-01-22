@@ -478,7 +478,7 @@ fn start_worker(name: &str, config: &Config, state: &mut State, verbose: bool) -
     }
     ensure_hook_config_exists(&worktree_path, name, verbose)?;
     let Some(worker_config) = config.get_worker(name) else {
-        tracing::warn!(
+        tracing::error!(
             "Worker '{}' exists in state but not in config.toml. This indicates a configuration issue.",
             name
         );
@@ -781,7 +781,7 @@ fn run_main_loop(
                     config::get_llmc_root().display()
                 ))
             );
-            tracing::warn!(
+            tracing::error!(
                 "Daemon has had {} consecutive errors - check logs for details",
                 consecutive_errors
             );
@@ -1001,7 +1001,7 @@ fn graceful_shutdown(config: &Config, state: &mut State) -> Result<()> {
             }
             println!("  {}", color_theme::muted(format!("Stopping worker '{}'...", worker_name)));
             if config.get_worker(worker_name).is_none() {
-                tracing::warn!(
+                tracing::error!(
                     "Worker '{}' exists in state but not in config during shutdown",
                     worker_name
                 );

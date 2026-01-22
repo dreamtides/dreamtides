@@ -60,7 +60,7 @@ fn send_shutdown_to_workers(config: &Config, state: &State, force: bool) -> Resu
             } else {
                 println!("  Sending Ctrl-C to worker '{}'...", worker_name);
                 if config.get_worker(worker_name).is_none() {
-                    tracing::warn!(
+                    tracing::error!(
                         worker = %worker_name,
                         "Worker exists in state but not in config during shutdown - state/config \
                          mismatch. Run 'llmc doctor --repair' after restart to fix."

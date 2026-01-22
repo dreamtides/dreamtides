@@ -12,7 +12,7 @@ use std::path::Path;
 use std::process::Command;
 
 use chrono::{TimeZone, Utc};
-use tracing::{debug, warn};
+use tracing::{debug, info};
 
 use crate::auto_mode::{auto_logging, heartbeat_thread};
 use crate::config::Config;
@@ -264,7 +264,7 @@ fn format_log_file(path: &Path, max_lines: usize) -> String {
             }
         }
         Err(e) => {
-            warn!(path = % path.display(), error = % e, "Failed to read log file");
+            info!(path = % path.display(), error = % e, "Failed to read log file");
             format!("(Failed to read: {})", e)
         }
     }

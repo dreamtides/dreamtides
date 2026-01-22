@@ -7,7 +7,7 @@ use std::time::{Duration, Instant};
 use std::{fs, thread};
 
 use anyhow::{Context, Result, bail};
-use tracing::{debug, error, info, warn};
+use tracing::{debug, error, info};
 
 use crate::auto_mode::heartbeat_thread;
 use crate::commands::overseer::OverseerDaemonOptions;
@@ -349,7 +349,7 @@ fn terminate_daemon_gracefully(expected: &ExpectedDaemon) {
             println!("✓ Daemon terminated gracefully");
         }
         Ok(TerminationResult::ForcefulKill) => {
-            warn!("Daemon required forceful kill");
+            info!("Daemon required forceful kill");
             println!("✓ Daemon terminated (required SIGKILL)");
         }
         Ok(TerminationResult::AlreadyGone) => {
@@ -374,7 +374,7 @@ fn is_failure_spiral(start_time: Instant, config: &OverseerConfig) -> bool {
     let cooldown = config.get_restart_cooldown();
 
     if elapsed < cooldown {
-        warn!(
+        error!(
             elapsed_secs = elapsed.as_secs(),
             cooldown_secs = cooldown.as_secs(),
             "Daemon failed within restart cooldown - failure spiral detected"
@@ -424,7 +424,7 @@ fn check_manual_intervention_needed() -> Result<bool> {
                     );
                 }
                 Err(e) => {
-                    warn!(path = %path.display(), error = %e, "Failed to read intervention file");
+                    error!(path = %path.display(), error = %e, "Failed to read intervention file");
                     println!(
                         "\n❌ MANUAL INTERVENTION REQUIRED\n\n\
                          File: {} (could not read: {})\n",

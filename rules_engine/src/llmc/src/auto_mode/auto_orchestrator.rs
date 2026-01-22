@@ -7,7 +7,7 @@ use std::time::{Duration, SystemTime, UNIX_EPOCH};
 use anyhow::{Context, Result, bail};
 use lattice::cli::color_theme;
 use tokio::sync::mpsc::Receiver;
-use tracing::{debug, error, info, warn};
+use tracing::{debug, error, info};
 
 use crate::auto_mode::auto_accept::{self, AutoAcceptResult};
 use crate::auto_mode::auto_config::{AutoConfig, ResolvedAutoConfig};
@@ -91,7 +91,7 @@ pub fn run_auto_mode(
     logger.log_daemon_shutdown(&instance_id, shutdown_reason);
     logger.flush();
     if let Err(e) = DaemonRegistration::remove() {
-        warn!("Failed to remove daemon registration: {}", e);
+        info!("Failed to remove daemon registration: {}", e);
     }
 
     result
@@ -223,7 +223,7 @@ fn run_orchestration_loop(
             ));
             break;
         } else if current_auto_worker_count < expected_auto_worker_count {
-            warn!(
+            error!(
                 expected = expected_auto_worker_count,
                 found = current_auto_worker_count,
                 iteration = iteration_count,
@@ -748,7 +748,7 @@ fn graceful_shutdown(_config: &Config, state: &mut State) -> Result<()> {
             }
             info!(worker = %worker_name, "Sending Ctrl-C to worker");
             if let Err(e) = tmux_sender.send_keys_raw(&worker.session_id, "C-c") {
-                warn!(worker = %worker_name, error = %e, "Failed to send Ctrl-C");
+                info!(worker = %worker_name, error = %e, "Failed to send Ctrl-C");
             }
         }
     }
@@ -762,7 +762,7 @@ fn graceful_shutdown(_config: &Config, state: &mut State) -> Result<()> {
             && session::session_exists(&worker.session_id)
         {
             if let Err(e) = session::kill_session(&worker.session_id) {
-                warn!(worker = %worker_name, error = %e, "Failed to kill session");
+                info!(worker = %worker_name, error = %e, "Failed to kill session");
             }
             // Preserve rebasing state for recovery
             if worker.status != WorkerStatus::Rebasing {

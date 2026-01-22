@@ -6,7 +6,7 @@ use std::path::Path;
 use std::time::{SystemTime, UNIX_EPOCH};
 
 use anyhow::{Context, Result};
-use tracing::{info, warn};
+use tracing::info;
 
 use crate::commands::add;
 use crate::config::Config;
@@ -87,7 +87,7 @@ pub fn start_auto_worker_session(worker: &WorkerRecord, config: &Config) -> Resu
             "Killing existing auto worker session to ensure clean state"
         );
         if let Err(e) = session::kill_session(&worker.session_id) {
-            warn!(
+            info!(
                 worker = %worker.name,
                 error = %e,
                 "Failed to kill existing session, attempting to create new one anyway"
