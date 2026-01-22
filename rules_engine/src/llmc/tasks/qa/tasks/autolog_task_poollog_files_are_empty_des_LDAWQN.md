@@ -4,14 +4,14 @@ name: autolog-task-poollog-files-are-empty-des
 description: auto.log and task_pool.log files are empty despite auto mode operation
 parent-id: LB6WQN
 task-type: bug
-priority: 3
+priority: 1
 labels:
-- llmc-auto
 - auto-mode
-- logging
 - bug
+- llmc-auto
+- logging
 created-at: 2026-01-22T03:06:01.330065Z
-updated-at: 2026-01-22T03:06:01.330065Z
+updated-at: 2026-01-22T05:11:50.109163Z
 ---
 
 # Bug: auto.log and task_pool.log Files Empty

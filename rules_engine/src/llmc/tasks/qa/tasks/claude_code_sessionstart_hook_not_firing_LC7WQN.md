@@ -4,14 +4,14 @@ name: claude-code-sessionstart-hook-not-firing
 description: Claude Code SessionStart hook not firing automatically for auto workers
 parent-id: LB6WQN
 task-type: bug
-priority: 2
+priority: 1
 labels:
-- llmc-auto
 - auto-mode
-- hooks
 - bug
+- hooks
+- llmc-auto
 created-at: 2026-01-22T03:02:27.377971Z
-updated-at: 2026-01-22T03:02:27.377971Z
+updated-at: 2026-01-22T05:11:40.369877Z
 ---
 
 # Bug: Claude Code SessionStart Hook Not Firing Automatically
