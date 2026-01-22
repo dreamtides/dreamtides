@@ -11,6 +11,7 @@ labels:
 - scenario
 - auto-mode
 - concurrency
+- llmc-auto
 blocked-by:
 - LH2WQN
 created-at: 2026-01-21T21:59:55.443775Z

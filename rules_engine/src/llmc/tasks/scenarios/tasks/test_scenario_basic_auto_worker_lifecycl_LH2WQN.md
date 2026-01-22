@@ -10,6 +10,7 @@ labels:
 - manual-test
 - scenario
 - auto-mode
+- llmc-auto
 created-at: 2026-01-21T21:59:20.029973Z
 updated-at: 2026-01-21T22:31:38.813068Z
 ---

@@ -10,6 +10,7 @@ labels:
 - manual-test
 - scenario
 - overseer
+- llmc-auto
 blocked-by:
 - LIAWQN
 created-at: 2026-01-21T22:04:42.982376Z

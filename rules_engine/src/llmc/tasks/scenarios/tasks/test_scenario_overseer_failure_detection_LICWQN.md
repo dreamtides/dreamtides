@@ -11,6 +11,7 @@ labels:
 - scenario
 - overseer
 - remediation
+- llmc-auto
 blocked-by:
 - LIBWQN
 created-at: 2026-01-21T22:05:41.880949Z

@@ -11,6 +11,7 @@ labels:
 - scenario
 - auto-mode
 - accept
+- llmc-auto
 blocked-by:
 - LH3WQN
 created-at: 2026-01-21T22:00:37.426141Z

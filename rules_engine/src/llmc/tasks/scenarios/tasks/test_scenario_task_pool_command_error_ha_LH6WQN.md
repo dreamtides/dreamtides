@@ -11,6 +11,7 @@ labels:
 - scenario
 - auto-mode
 - error-handling
+- llmc-auto
 blocked-by:
 - LH5WQN
 created-at: 2026-01-21T22:01:59.228753Z

@@ -11,6 +11,7 @@ labels:
 - scenario
 - auto-mode
 - dirty-repo
+- llmc-auto
 blocked-by:
 - LH7WQN
 created-at: 2026-01-21T22:03:45.116204Z

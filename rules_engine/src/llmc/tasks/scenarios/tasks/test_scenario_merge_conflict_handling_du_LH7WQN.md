@@ -11,6 +11,7 @@ labels:
 - scenario
 - auto-mode
 - merge-conflict
+- llmc-auto
 blocked-by:
 - LH6WQN
 created-at: 2026-01-21T22:02:47.025721Z

@@ -11,6 +11,7 @@ labels:
 - scenario
 - auto-mode
 - post-accept
+- llmc-auto
 blocked-by:
 - LH4WQN
 created-at: 2026-01-21T22:01:20.201938Z

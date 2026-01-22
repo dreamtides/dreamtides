@@ -11,6 +11,7 @@ labels:
 - scenario
 - overseer
 - failure-spiral
+- llmc-auto
 blocked-by:
 - LICWQN
 created-at: 2026-01-21T22:06:36.953507Z
