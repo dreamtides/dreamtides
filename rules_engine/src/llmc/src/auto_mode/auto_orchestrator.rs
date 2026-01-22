@@ -88,6 +88,7 @@ pub fn run_auto_mode(
         Err(e) => &format!("Error: {}", e),
     };
     logger.log_daemon_shutdown(&instance_id, shutdown_reason);
+    logger.flush();
     if let Err(e) = DaemonRegistration::remove() {
         warn!("Failed to remove daemon registration: {}", e);
     }

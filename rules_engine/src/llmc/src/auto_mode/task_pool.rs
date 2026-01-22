@@ -1,5 +1,4 @@
-// TODO: Remove this allow once task_pool is integrated with auto_orchestrator
-#![allow(dead_code)]
+#![allow(dead_code, reason = "TaskPoolError fields stored for diagnostic purposes")]
 
 use std::process::Command;
 use std::time::Instant;

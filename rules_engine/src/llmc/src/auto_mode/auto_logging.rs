@@ -1,6 +1,4 @@
-// TODO: Remove this allow once auto_logging is integrated with
-// auto_orchestrator
-#![allow(dead_code)]
+#![allow(dead_code, reason = "Some variants defined for API completeness")]
 
 use std::fs::{File, OpenOptions};
 use std::io::{BufWriter, Write};
