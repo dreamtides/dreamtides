@@ -14,8 +14,9 @@ labels:
 - llmc-auto
 blocked-by:
 - LH4WQN
+- LD4WQN
 created-at: 2026-01-21T22:01:20.201938Z
-updated-at: 2026-01-21T22:31:38.839311Z
+updated-at: 2026-01-22T06:40:36.990910Z
 ---
 
 # Test Scenario: Post-Accept Command Execution
