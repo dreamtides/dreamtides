@@ -27,9 +27,11 @@ task pool, and handles task completion with automatic acceptance.
 
 - LLMC installed and configured
 - No daemon or overseer currently running in your test directory
-- **IMPORTANT**: This test MUST run in an isolated LLMC instance, not `~/llmc`
 
 ## Environment Setup
+
+**This test MUST run in an isolated LLMC instance.** See
+`../isolated_test_environment.md` for complete setup instructions.
 
 **This test uses an isolated LLMC instance to avoid interfering with production
 work.**

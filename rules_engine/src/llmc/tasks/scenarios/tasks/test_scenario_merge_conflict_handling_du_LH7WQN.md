@@ -31,9 +31,24 @@ completing accept after worker resolves conflicts.
 ## Prerequisites
 
 - LLMC installed and configured
-- A clean LLMC workspace
 - No daemon currently running
 - Previous test scenario (LCDWQN) completed successfully
+
+## Environment Setup
+
+**This test MUST run in an isolated LLMC instance.** See
+`../isolated_test_environment.md` for complete setup instructions.
+
+```bash
+# Create isolated test environment
+export TEST_DIR="/tmp/llmc-conflict-test-$$"
+export LLMC_ROOT="$TEST_DIR"
+
+llmc init --source ~/Documents/GoogleDrive/dreamtides --target "$TEST_DIR"
+
+# Verify isolation
+llmc status
+```
 
 ## Differentiating Errors from Normal Operations
 
@@ -57,12 +72,12 @@ completing accept after worker resolves conflicts.
 
 ```bash
 # Ensure clean state
-cd ~/llmc
+cd $LLMC_ROOT
 llmc down --force 2>/dev/null || true
 llmc nuke --all --yes 2>/dev/null || true
 
 # Create test scripts directory
-mkdir -p ~/llmc/test_scripts
+mkdir -p $LLMC_ROOT/test_scripts
 
 # Create a file in master that will conflict
 cd ~/Documents/GoogleDrive/dreamtides
@@ -76,12 +91,12 @@ git commit -m "Add conflict test file"
 
 # Record commit for later cleanup
 CONFLICT_SETUP_COMMIT=$(git rev-parse HEAD)
-echo "$CONFLICT_SETUP_COMMIT" > ~/llmc/test_scripts/.setup_commit
+echo "$CONFLICT_SETUP_COMMIT" > $LLMC_ROOT/test_scripts/.setup_commit
 
 # Create task pool that modifies the same file
-cat > ~/llmc/test_scripts/conflict_pool.sh << 'EOF'
+cat > $LLMC_ROOT/test_scripts/conflict_pool.sh << 'EOF'
 #!/bin/bash
-MARKER=~/llmc/test_scripts/.task_issued
+MARKER=$LLMC_ROOT/test_scripts/.task_issued
 if [ ! -f "$MARKER" ]; then
     touch "$MARKER"
     cat << 'TASK'
@@ -92,13 +107,13 @@ else
     exit 0
 fi
 EOF
-chmod +x ~/llmc/test_scripts/conflict_pool.sh
+chmod +x $LLMC_ROOT/test_scripts/conflict_pool.sh
 
 # Configure auto mode
-cat >> ~/llmc/config.toml << 'EOF'
+cat >> $LLMC_ROOT/config.toml << 'EOF'
 
 [auto]
-task_pool_command = "~/llmc/test_scripts/conflict_pool.sh"
+task_pool_command = "$LLMC_ROOT/test_scripts/conflict_pool.sh"
 concurrency = 1
 EOF
 ```
@@ -110,7 +125,7 @@ EOF
 **Step 1.1**: Start auto mode to assign task.
 
 ```bash
-cd ~/llmc
+cd $LLMC_ROOT
 llmc up --auto &
 DAEMON_PID=$!
 
@@ -142,7 +157,7 @@ echo "Conflicting commit created on master"
 **Step 2.1**: Wait for worker to complete and conflict to be detected.
 
 ```bash
-cd ~/llmc
+cd $LLMC_ROOT
 
 # Monitor for rebasing state
 for i in {1..60}; do
@@ -221,7 +236,7 @@ git log --oneline -5
 **Step 4.1**: Check auto.log for conflict handling.
 
 ```bash
-cat ~/llmc/logs/auto.log | grep -i "conflict\|rebase\|resolv" | tail -20
+cat $LLMC_ROOT/logs/auto.log | grep -i "conflict\|rebase\|resolv" | tail -20
 ```
 
 **Verify**:
@@ -242,7 +257,7 @@ wait $DAEMON_PID 2>/dev/null
 
 # Reset for new test
 llmc reset auto-1 --yes 2>/dev/null || true
-rm -f ~/llmc/test_scripts/.task_issued
+rm -f $LLMC_ROOT/test_scripts/.task_issued
 
 # Create complex conflict that's hard to resolve
 cd ~/Documents/GoogleDrive/dreamtides
@@ -260,9 +275,9 @@ git add complex_conflict.txt
 git commit -m "Add complex file for conflict test"
 
 # Create task that heavily modifies the file
-cat > ~/llmc/test_scripts/conflict_pool.sh << 'EOF'
+cat > $LLMC_ROOT/test_scripts/conflict_pool.sh << 'EOF'
 #!/bin/bash
-MARKER=~/llmc/test_scripts/.task_issued
+MARKER=$LLMC_ROOT/test_scripts/.task_issued
 if [ ! -f "$MARKER" ]; then
     touch "$MARKER"
     cat << 'TASK'
@@ -312,7 +327,7 @@ git commit -m "Master: completely different structure"
 **Step 5.3**: Monitor complex conflict handling.
 
 ```bash
-cd ~/llmc
+cd $LLMC_ROOT
 
 for i in {1..120}; do
     STATUS=$(llmc status --json 2>/dev/null | jq -r '.workers[] | select(.name == "auto-1") | .status' 2>/dev/null)
@@ -346,13 +361,13 @@ kill -SIGINT $DAEMON_PID 2>/dev/null
 wait $DAEMON_PID 2>/dev/null
 
 # Remove test artifacts
-rm -rf ~/llmc/test_scripts
+rm -rf $LLMC_ROOT/test_scripts
 rm -f ~/Documents/GoogleDrive/dreamtides/conflict_test_file.txt
 rm -f ~/Documents/GoogleDrive/dreamtides/complex_conflict.txt
 
 # Reset git to before test
 cd ~/Documents/GoogleDrive/dreamtides
-SETUP_COMMIT=$(cat ~/llmc/test_scripts/.setup_commit 2>/dev/null)
+SETUP_COMMIT=$(cat $LLMC_ROOT/test_scripts/.setup_commit 2>/dev/null)
 [ -n "$SETUP_COMMIT" ] && git reset --hard ${SETUP_COMMIT}^ 2>/dev/null || true
 
 git checkout -- . 2>/dev/null || true

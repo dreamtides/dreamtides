@@ -28,9 +28,24 @@ non-zero exit codes and command hangs, triggering appropriate graceful shutdown.
 ## Prerequisites
 
 - LLMC installed and configured
-- A clean LLMC workspace
 - No daemon currently running
 - Previous test scenario (LCCWQN) completed successfully
+
+## Environment Setup
+
+**This test MUST run in an isolated LLMC instance.** See
+`../isolated_test_environment.md` for complete setup instructions.
+
+```bash
+# Create isolated test environment
+export TEST_DIR="/tmp/llmc-taskpool-error-test-$$"
+export LLMC_ROOT="$TEST_DIR"
+
+llmc init --source ~/Documents/GoogleDrive/dreamtides --target "$TEST_DIR"
+
+# Verify isolation
+llmc status
+```
 
 ## Differentiating Errors from Normal Operations
 
@@ -52,12 +67,12 @@ non-zero exit codes and command hangs, triggering appropriate graceful shutdown.
 
 ```bash
 # Ensure clean state
-cd ~/llmc
+cd $LLMC_ROOT
 llmc down --force 2>/dev/null || true
 llmc nuke --all --yes 2>/dev/null || true
 
 # Create test scripts directory
-mkdir -p ~/llmc/test_scripts
+mkdir -p $LLMC_ROOT/test_scripts
 ```
 
 ## Test Sequence
@@ -67,18 +82,18 @@ mkdir -p ~/llmc/test_scripts
 **Step 1.1**: Create task pool that fails immediately.
 
 ```bash
-cat > ~/llmc/test_scripts/failing_pool.sh << 'EOF'
+cat > $LLMC_ROOT/test_scripts/failing_pool.sh << 'EOF'
 #!/bin/bash
 echo "Task pool error: database connection failed" >&2
 exit 1
 EOF
-chmod +x ~/llmc/test_scripts/failing_pool.sh
+chmod +x $LLMC_ROOT/test_scripts/failing_pool.sh
 
 # Configure auto mode
-cat >> ~/llmc/config.toml << 'EOF'
+cat >> $LLMC_ROOT/config.toml << 'EOF'
 
 [auto]
-task_pool_command = "~/llmc/test_scripts/failing_pool.sh"
+task_pool_command = "$LLMC_ROOT/test_scripts/failing_pool.sh"
 concurrency = 1
 EOF
 ```
@@ -113,8 +128,8 @@ echo "Daemon exit code: $EXIT_CODE"
 **Step 1.3**: Check error logging.
 
 ```bash
-cat ~/llmc/logs/auto.log | tail -20
-cat ~/llmc/logs/task_pool.log | tail -10
+cat $LLMC_ROOT/logs/auto.log | tail -20
+cat $LLMC_ROOT/logs/task_pool.log | tail -10
 ```
 
 **Verify**:
@@ -130,9 +145,9 @@ cat ~/llmc/logs/task_pool.log | tail -10
 ```bash
 llmc down --force 2>/dev/null || true
 
-cat > ~/llmc/test_scripts/delayed_fail_pool.sh << 'EOF'
+cat > $LLMC_ROOT/test_scripts/delayed_fail_pool.sh << 'EOF'
 #!/bin/bash
-MARKER=~/llmc/test_scripts/.task_issued
+MARKER=$LLMC_ROOT/test_scripts/.task_issued
 if [ ! -f "$MARKER" ]; then
     touch "$MARKER"
     echo "Create a file called delayed_fail_test.txt containing 'test'. Do not create other files."
@@ -142,10 +157,10 @@ else
     exit 1
 fi
 EOF
-chmod +x ~/llmc/test_scripts/delayed_fail_pool.sh
+chmod +x $LLMC_ROOT/test_scripts/delayed_fail_pool.sh
 
 # Update config
-sed -i.bak 's|failing_pool.sh|delayed_fail_pool.sh|' ~/llmc/config.toml
+sed -i.bak 's|failing_pool.sh|delayed_fail_pool.sh|' $LLMC_ROOT/config.toml
 ```
 
 **Step 2.2**: Start daemon and observe behavior.
@@ -185,17 +200,17 @@ echo "Final exit code: $EXIT_CODE"
 
 ```bash
 llmc down --force 2>/dev/null || true
-rm -f ~/llmc/test_scripts/.task_issued
+rm -f $LLMC_ROOT/test_scripts/.task_issued
 
-cat > ~/llmc/test_scripts/empty_pool.sh << 'EOF'
+cat > $LLMC_ROOT/test_scripts/empty_pool.sh << 'EOF'
 #!/bin/bash
 # Return empty output with success - means no tasks available
 echo ""
 exit 0
 EOF
-chmod +x ~/llmc/test_scripts/empty_pool.sh
+chmod +x $LLMC_ROOT/test_scripts/empty_pool.sh
 
-sed -i.bak 's|delayed_fail_pool.sh|empty_pool.sh|' ~/llmc/config.toml
+sed -i.bak 's|delayed_fail_pool.sh|empty_pool.sh|' $LLMC_ROOT/config.toml
 ```
 
 **Step 3.2**: Verify daemon stays running with empty pool.
@@ -228,7 +243,7 @@ llmc status
 ```bash
 # Count task pool invocations over time
 sleep 30
-cat ~/llmc/logs/task_pool.log | wc -l
+cat $LLMC_ROOT/logs/task_pool.log | wc -l
 ```
 
 **Verify**:
@@ -245,15 +260,15 @@ kill -SIGINT $DAEMON_PID 2>/dev/null
 wait $DAEMON_PID 2>/dev/null
 llmc down --force 2>/dev/null || true
 
-cat > ~/llmc/test_scripts/partial_pool.sh << 'EOF'
+cat > $LLMC_ROOT/test_scripts/partial_pool.sh << 'EOF'
 #!/bin/bash
 echo -n "Create a file called"
 # Simulate crash mid-output
 exit 1
 EOF
-chmod +x ~/llmc/test_scripts/partial_pool.sh
+chmod +x $LLMC_ROOT/test_scripts/partial_pool.sh
 
-sed -i.bak 's|empty_pool.sh|partial_pool.sh|' ~/llmc/config.toml
+sed -i.bak 's|empty_pool.sh|partial_pool.sh|' $LLMC_ROOT/config.toml
 ```
 
 **Step 4.2**: Verify daemon handles partial output.
@@ -285,7 +300,7 @@ echo "Exit code: $?"
 ```bash
 llmc down --force 2>/dev/null || true
 
-sed -i.bak 's|partial_pool.sh|nonexistent_command.sh|' ~/llmc/config.toml
+sed -i.bak 's|partial_pool.sh|nonexistent_command.sh|' $LLMC_ROOT/config.toml
 ```
 
 **Step 5.2**: Verify error handling.
@@ -303,7 +318,7 @@ fi
 wait $DAEMON_PID 2>/dev/null
 echo "Exit code: $?"
 
-cat ~/llmc/logs/auto.log | tail -10
+cat $LLMC_ROOT/logs/auto.log | tail -10
 ```
 
 **Verify**:
@@ -320,11 +335,11 @@ kill -SIGINT $DAEMON_PID 2>/dev/null
 wait $DAEMON_PID 2>/dev/null
 
 # Remove test artifacts
-rm -rf ~/llmc/test_scripts
+rm -rf $LLMC_ROOT/test_scripts
 rm -f ~/Documents/GoogleDrive/dreamtides/delayed_fail_test.txt
 
 # Restore config (remove [auto] section or restore backup)
-mv ~/llmc/config.toml.bak ~/llmc/config.toml 2>/dev/null || true
+mv $LLMC_ROOT/config.toml.bak $LLMC_ROOT/config.toml 2>/dev/null || true
 
 # Clean up git
 cd ~/Documents/GoogleDrive/dreamtides

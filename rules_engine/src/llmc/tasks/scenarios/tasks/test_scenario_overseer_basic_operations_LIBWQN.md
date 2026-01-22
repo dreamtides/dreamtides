@@ -28,10 +28,25 @@ handles Ctrl-C shutdown.
 ## Prerequisites
 
 - LLMC installed and configured
-- A clean LLMC workspace
 - No daemon or overseer currently running
 - Previous test scenario (LCFWQN) completed successfully
 - Overseer configuration in config.toml
+
+## Environment Setup
+
+**This test MUST run in an isolated LLMC instance.** See
+`../isolated_test_environment.md` for complete setup instructions.
+
+```bash
+# Create isolated test environment
+export TEST_DIR="/tmp/llmc-overseer-basic-test-$$"
+export LLMC_ROOT="$TEST_DIR"
+
+llmc init --source ~/Documents/GoogleDrive/dreamtides --target "$TEST_DIR"
+
+# Verify isolation
+llmc status
+```
 
 ## Differentiating Errors from Normal Operations
 
@@ -56,7 +71,7 @@ handles Ctrl-C shutdown.
 
 ```bash
 # Ensure clean state
-cd ~/llmc
+cd $LLMC_ROOT
 llmc down --force 2>/dev/null || true
 llmc nuke --all --yes 2>/dev/null || true
 
@@ -64,10 +79,10 @@ llmc nuke --all --yes 2>/dev/null || true
 tmux kill-session -t llmc-overseer 2>/dev/null || true
 
 # Create test scripts
-mkdir -p ~/llmc/test_scripts
-cat > ~/llmc/test_scripts/overseer_pool.sh << 'EOF'
+mkdir -p $LLMC_ROOT/test_scripts
+cat > $LLMC_ROOT/test_scripts/overseer_pool.sh << 'EOF'
 #!/bin/bash
-COUNTER_FILE=~/llmc/test_scripts/.task_counter
+COUNTER_FILE=$LLMC_ROOT/test_scripts/.task_counter
 if [ ! -f "$COUNTER_FILE" ]; then
     echo "0" > "$COUNTER_FILE"
 fi
@@ -81,18 +96,18 @@ else
     exit 0
 fi
 EOF
-chmod +x ~/llmc/test_scripts/overseer_pool.sh
+chmod +x $LLMC_ROOT/test_scripts/overseer_pool.sh
 
 # Configure auto mode and overseer
-cat >> ~/llmc/config.toml << 'EOF'
+cat >> $LLMC_ROOT/config.toml << 'EOF'
 
 [auto]
-task_pool_command = "~/llmc/test_scripts/overseer_pool.sh"
+task_pool_command = "$LLMC_ROOT/test_scripts/overseer_pool.sh"
 concurrency = 1
 
 [overseer]
 remediation_prompt = """
-You are debugging LLMC. Check the logs in ~/llmc/logs/ to understand what went wrong.
+You are debugging LLMC. Check the logs in $LLMC_ROOT/logs/ to understand what went wrong.
 Common issues:
 - Git conflicts: check git status in worktrees
 - Session crashes: restart the affected session
@@ -113,7 +128,7 @@ EOF
 **Step 1.1**: Start overseer.
 
 ```bash
-cd ~/llmc
+cd $LLMC_ROOT
 llmc overseer &
 OVERSEER_PID=$!
 
@@ -129,7 +144,7 @@ sleep 10
 
 ```bash
 # Check daemon registration
-cat ~/llmc/.llmc/daemon.json | jq '.'
+cat $LLMC_ROOT/.llmc/daemon.json | jq '.'
 ```
 
 **Verify**:
@@ -142,14 +157,14 @@ cat ~/llmc/.llmc/daemon.json | jq '.'
 
 ```bash
 # Check initial heartbeat
-cat ~/llmc/.llmc/auto.heartbeat | jq '.'
-FIRST_TS=$(cat ~/llmc/.llmc/auto.heartbeat | jq '.timestamp_unix')
+cat $LLMC_ROOT/.llmc/auto.heartbeat | jq '.'
+FIRST_TS=$(cat $LLMC_ROOT/.llmc/auto.heartbeat | jq '.timestamp_unix')
 
 sleep 10
 
 # Check heartbeat updated
-cat ~/llmc/.llmc/auto.heartbeat | jq '.'
-SECOND_TS=$(cat ~/llmc/.llmc/auto.heartbeat | jq '.timestamp_unix')
+cat $LLMC_ROOT/.llmc/auto.heartbeat | jq '.'
+SECOND_TS=$(cat $LLMC_ROOT/.llmc/auto.heartbeat | jq '.timestamp_unix')
 
 if [ "$SECOND_TS" -gt "$FIRST_TS" ]; then
     echo "Heartbeat is being updated"
@@ -239,7 +254,7 @@ llmc status --json | jq '.overseer'
 ```bash
 # Check overseer is tailing daemon logs
 # (This is internal behavior, verify via overseer's behavior)
-cat ~/llmc/logs/auto.log | tail -5
+cat $LLMC_ROOT/logs/auto.log | tail -5
 ```
 
 **Verify**:
@@ -322,8 +337,8 @@ OVERSEER_PID=$!
 sleep 10
 
 # Record original daemon identity
-ORIGINAL_PID=$(cat ~/llmc/.llmc/daemon.json | jq '.pid')
-ORIGINAL_INSTANCE=$(cat ~/llmc/.llmc/daemon.json | jq -r '.instance_id')
+ORIGINAL_PID=$(cat $LLMC_ROOT/.llmc/daemon.json | jq '.pid')
+ORIGINAL_INSTANCE=$(cat $LLMC_ROOT/.llmc/daemon.json | jq -r '.instance_id')
 echo "Original: PID=$ORIGINAL_PID, Instance=$ORIGINAL_INSTANCE"
 
 # This would require external manipulation to test fully
@@ -346,7 +361,7 @@ wait $OVERSEER_PID 2>/dev/null
 tmux kill-session -t llmc-overseer 2>/dev/null || true
 
 # Remove test artifacts
-rm -rf ~/llmc/test_scripts
+rm -rf $LLMC_ROOT/test_scripts
 rm -f ~/Documents/GoogleDrive/dreamtides/overseer_test_*.txt
 
 # Clean up git

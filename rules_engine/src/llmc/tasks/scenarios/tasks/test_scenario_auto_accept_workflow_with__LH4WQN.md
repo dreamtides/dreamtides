@@ -30,9 +30,24 @@ performs a fast-forward merge.
 ## Prerequisites
 
 - LLMC installed and configured
-- A clean LLMC workspace
 - No daemon currently running
 - Previous test scenario (LCAWQN) completed successfully
+
+## Environment Setup
+
+**This test MUST run in an isolated LLMC instance.** See
+`../isolated_test_environment.md` for complete setup instructions.
+
+```bash
+# Create isolated test environment
+export TEST_DIR="/tmp/llmc-auto-accept-test-$$"
+export LLMC_ROOT="$TEST_DIR"
+
+llmc init --source ~/Documents/GoogleDrive/dreamtides --target "$TEST_DIR"
+
+# Verify isolation
+llmc status
+```
 
 ## Differentiating Errors from Normal Operations
 
@@ -56,15 +71,15 @@ performs a fast-forward merge.
 
 ```bash
 # Ensure clean state
-cd ~/llmc
+cd $LLMC_ROOT
 llmc down --force 2>/dev/null || true
 llmc nuke --all --yes 2>/dev/null || true
 
 # Create a task pool script
-mkdir -p ~/llmc/test_scripts
-cat > ~/llmc/test_scripts/accept_pool.sh << 'EOF'
+mkdir -p $LLMC_ROOT/test_scripts
+cat > $LLMC_ROOT/test_scripts/accept_pool.sh << 'EOF'
 #!/bin/bash
-MARKER=~/llmc/test_scripts/.accept_task_issued
+MARKER=$LLMC_ROOT/test_scripts/.accept_task_issued
 if [ ! -f "$MARKER" ]; then
     touch "$MARKER"
     cat << 'TASK'
@@ -82,20 +97,20 @@ else
     exit 0
 fi
 EOF
-chmod +x ~/llmc/test_scripts/accept_pool.sh
+chmod +x $LLMC_ROOT/test_scripts/accept_pool.sh
 
 # Configure auto mode
-cat >> ~/llmc/config.toml << 'EOF'
+cat >> $LLMC_ROOT/config.toml << 'EOF'
 
 [auto]
-task_pool_command = "~/llmc/test_scripts/accept_pool.sh"
+task_pool_command = "$LLMC_ROOT/test_scripts/accept_pool.sh"
 concurrency = 1
 EOF
 
 # Record current master HEAD for later verification
 cd ~/Documents/GoogleDrive/dreamtides
 MASTER_HEAD_BEFORE=$(git rev-parse HEAD)
-echo "$MASTER_HEAD_BEFORE" > ~/llmc/test_scripts/.master_head_before
+echo "$MASTER_HEAD_BEFORE" > $LLMC_ROOT/test_scripts/.master_head_before
 ```
 
 ## Test Sequence
@@ -105,7 +120,7 @@ echo "$MASTER_HEAD_BEFORE" > ~/llmc/test_scripts/.master_head_before
 **Step 1.1**: Start auto mode and let worker create multiple commits.
 
 ```bash
-cd ~/llmc
+cd $LLMC_ROOT
 llmc up --auto &
 DAEMON_PID=$!
 
@@ -122,8 +137,8 @@ for i in {1..60}; do
     echo "Worker status: $WORKER_STATUS"
 
     # Check commits in worktree
-    cd ~/llmc/.worktrees/auto-1 2>/dev/null && git log --oneline -5 2>/dev/null
-    cd ~/llmc
+    cd $LLMC_ROOT/.worktrees/auto-1 2>/dev/null && git log --oneline -5 2>/dev/null
+    cd $LLMC_ROOT
 
     if [ "$WORKER_STATUS" = "idle" ]; then
         echo "Task completed"
@@ -198,7 +213,7 @@ git log -1 --format="%an <%ae>"
 **Step 4.1**: Verify no merge commits.
 
 ```bash
-MASTER_HEAD_BEFORE=$(cat ~/llmc/test_scripts/.master_head_before)
+MASTER_HEAD_BEFORE=$(cat $LLMC_ROOT/test_scripts/.master_head_before)
 git log --oneline $MASTER_HEAD_BEFORE..HEAD
 ```
 
@@ -234,7 +249,7 @@ llmc status
 **Step 5.2**: Verify worktree is clean and at master.
 
 ```bash
-cd ~/llmc/.worktrees/auto-1
+cd $LLMC_ROOT/.worktrees/auto-1
 git status
 git log -1 --oneline
 cd ~/Documents/GoogleDrive/dreamtides
@@ -251,7 +266,7 @@ git log -1 --oneline
 **Step 6.1**: Check auto.log for accept operations.
 
 ```bash
-cat ~/llmc/logs/auto.log | grep -i "accept\|rebase\|squash\|merge" | tail -20
+cat $LLMC_ROOT/logs/auto.log | grep -i "accept\|rebase\|squash\|merge" | tail -20
 ```
 
 **Verify**:
@@ -269,7 +284,7 @@ kill -SIGINT $DAEMON_PID 2>/dev/null
 wait $DAEMON_PID 2>/dev/null
 
 # Remove test artifacts
-rm -rf ~/llmc/test_scripts
+rm -rf $LLMC_ROOT/test_scripts
 rm -f ~/Documents/GoogleDrive/dreamtides/accept_test_*.txt
 
 # Clean up git
@@ -278,7 +293,7 @@ git checkout -- . 2>/dev/null || true
 git clean -fd 2>/dev/null || true
 
 # Reset to before test
-MASTER_HEAD_BEFORE=$(cat ~/llmc/test_scripts/.master_head_before 2>/dev/null)
+MASTER_HEAD_BEFORE=$(cat $LLMC_ROOT/test_scripts/.master_head_before 2>/dev/null)
 [ -n "$MASTER_HEAD_BEFORE" ] && git reset --hard $MASTER_HEAD_BEFORE
 
 llmc down --force 2>/dev/null || true

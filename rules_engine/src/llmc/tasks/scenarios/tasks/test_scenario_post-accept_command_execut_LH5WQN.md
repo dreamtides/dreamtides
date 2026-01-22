@@ -30,9 +30,24 @@ and that failures trigger graceful shutdown.
 ## Prerequisites
 
 - LLMC installed and configured
-- A clean LLMC workspace
 - No daemon currently running
 - Previous test scenario (LCBWQN) completed successfully
+
+## Environment Setup
+
+**This test MUST run in an isolated LLMC instance.** See
+`../isolated_test_environment.md` for complete setup instructions.
+
+```bash
+# Create isolated test environment
+export TEST_DIR="/tmp/llmc-post-accept-test-$$"
+export LLMC_ROOT="$TEST_DIR"
+
+llmc init --source ~/Documents/GoogleDrive/dreamtides --target "$TEST_DIR"
+
+# Verify isolation
+llmc status
+```
 
 ## Differentiating Errors from Normal Operations
 
@@ -41,7 +56,7 @@ and that failures trigger graceful shutdown.
 - Post-accept command not executed
 - Daemon not blocking during post-accept execution
 - Non-zero exit from post-accept not triggering shutdown
-- Post-accept logs missing from `~/llmc/logs/post_accept.log`
+- Post-accept logs missing from `$LLMC_ROOT/logs/post_accept.log`
 - Next task assigned before post-accept completes
 
 **Normal operations:**
@@ -54,15 +69,15 @@ and that failures trigger graceful shutdown.
 
 ```bash
 # Ensure clean state
-cd ~/llmc
+cd $LLMC_ROOT
 llmc down --force 2>/dev/null || true
 llmc nuke --all --yes 2>/dev/null || true
 
 # Create task pool and post-accept scripts
-mkdir -p ~/llmc/test_scripts
-cat > ~/llmc/test_scripts/post_accept_pool.sh << 'EOF'
+mkdir -p $LLMC_ROOT/test_scripts
+cat > $LLMC_ROOT/test_scripts/post_accept_pool.sh << 'EOF'
 #!/bin/bash
-COUNTER_FILE=~/llmc/test_scripts/.task_counter
+COUNTER_FILE=$LLMC_ROOT/test_scripts/.task_counter
 if [ ! -f "$COUNTER_FILE" ]; then
     echo "0" > "$COUNTER_FILE"
 fi
@@ -76,10 +91,10 @@ else
     exit 0
 fi
 EOF
-chmod +x ~/llmc/test_scripts/post_accept_pool.sh
+chmod +x $LLMC_ROOT/test_scripts/post_accept_pool.sh
 
 # Create post-accept command that takes noticeable time
-cat > ~/llmc/test_scripts/post_accept.sh << 'EOF'
+cat > $LLMC_ROOT/test_scripts/post_accept.sh << 'EOF'
 #!/bin/bash
 echo "Post-accept starting at $(date)"
 echo "Running validation..."
@@ -98,15 +113,15 @@ else
     exit 1
 fi
 EOF
-chmod +x ~/llmc/test_scripts/post_accept.sh
+chmod +x $LLMC_ROOT/test_scripts/post_accept.sh
 
 # Configure auto mode with post_accept_command
-cat >> ~/llmc/config.toml << 'EOF'
+cat >> $LLMC_ROOT/config.toml << 'EOF'
 
 [auto]
-task_pool_command = "~/llmc/test_scripts/post_accept_pool.sh"
+task_pool_command = "$LLMC_ROOT/test_scripts/post_accept_pool.sh"
 concurrency = 1
-post_accept_command = "~/llmc/test_scripts/post_accept.sh"
+post_accept_command = "$LLMC_ROOT/test_scripts/post_accept.sh"
 EOF
 ```
 
@@ -146,7 +161,7 @@ sleep 10
 **Step 1.3**: Check post-accept logs.
 
 ```bash
-cat ~/llmc/logs/post_accept.log
+cat $LLMC_ROOT/logs/post_accept.log
 ```
 
 **Verify**:
@@ -162,7 +177,7 @@ cat ~/llmc/logs/post_accept.log
 
 ```bash
 # Check auto.log for blocking indication
-cat ~/llmc/logs/auto.log | grep -i "post.accept\|block\|wait" | tail -10
+cat $LLMC_ROOT/logs/auto.log | grep -i "post.accept\|block\|wait" | tail -10
 ```
 
 **Verify**:
@@ -183,7 +198,7 @@ for i in {1..60}; do
 done
 
 # Check timing in logs
-cat ~/llmc/logs/post_accept.log | grep "completed\|starting"
+cat $LLMC_ROOT/logs/post_accept.log | grep "completed\|starting"
 ```
 
 **Verify**:
@@ -200,14 +215,14 @@ kill -SIGINT $DAEMON_PID 2>/dev/null
 wait $DAEMON_PID 2>/dev/null
 
 # Modify post-accept to fail
-cat > ~/llmc/test_scripts/post_accept.sh << 'EOF'
+cat > $LLMC_ROOT/test_scripts/post_accept.sh << 'EOF'
 #!/bin/bash
 echo "Post-accept starting - will fail"
 exit 1
 EOF
 
 # Reset task counter for new task
-rm -f ~/llmc/test_scripts/.task_counter
+rm -f $LLMC_ROOT/test_scripts/.task_counter
 ```
 
 **Step 3.2**: Restart daemon and observe failure shutdown.
@@ -234,8 +249,8 @@ done
 **Step 3.3**: Check error logging.
 
 ```bash
-cat ~/llmc/logs/auto.log | tail -20
-cat ~/llmc/logs/post_accept.log | tail -10
+cat $LLMC_ROOT/logs/auto.log | tail -20
+cat $LLMC_ROOT/logs/post_accept.log | tail -10
 ```
 
 **Verify**:
@@ -251,9 +266,9 @@ cat ~/llmc/logs/post_accept.log | tail -10
 ```bash
 # Reset
 llmc down --force 2>/dev/null || true
-rm -f ~/llmc/test_scripts/.task_counter
+rm -f $LLMC_ROOT/test_scripts/.task_counter
 
-cat > ~/llmc/test_scripts/post_accept.sh << 'EOF'
+cat > $LLMC_ROOT/test_scripts/post_accept.sh << 'EOF'
 #!/bin/bash
 echo "Starting long validation..."
 sleep 30
@@ -299,7 +314,7 @@ kill -SIGINT $DAEMON_PID 2>/dev/null
 wait $DAEMON_PID 2>/dev/null
 
 # Remove test artifacts
-rm -rf ~/llmc/test_scripts
+rm -rf $LLMC_ROOT/test_scripts
 rm -f ~/Documents/GoogleDrive/dreamtides/post_accept_test_*.txt
 
 # Clean up git

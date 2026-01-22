@@ -30,9 +30,24 @@ conditions.
 ## Prerequisites
 
 - LLMC installed and configured
-- A clean LLMC workspace
 - No daemon currently running
 - Previous test scenario (LB7WQN) completed successfully
+
+## Environment Setup
+
+**This test MUST run in an isolated LLMC instance.** See
+`../isolated_test_environment.md` for complete setup instructions.
+
+```bash
+# Create isolated test environment
+export TEST_DIR="/tmp/llmc-concurrency-test-$$"
+export LLMC_ROOT="$TEST_DIR"
+
+llmc init --source ~/Documents/GoogleDrive/dreamtides --target "$TEST_DIR"
+
+# Verify isolation
+llmc status
+```
 
 ## Differentiating Errors from Normal Operations
 
@@ -56,15 +71,15 @@ conditions.
 
 ```bash
 # Ensure clean state
-cd ~/llmc
+cd $LLMC_ROOT
 llmc down --force 2>/dev/null || true
 llmc nuke --all --yes 2>/dev/null || true
 
 # Create a task pool that returns multiple tasks
-mkdir -p ~/llmc/test_scripts
-cat > ~/llmc/test_scripts/concurrent_pool.sh << 'EOF'
+mkdir -p $LLMC_ROOT/test_scripts
+cat > $LLMC_ROOT/test_scripts/concurrent_pool.sh << 'EOF'
 #!/bin/bash
-COUNTER_FILE=~/llmc/test_scripts/.task_counter
+COUNTER_FILE=$LLMC_ROOT/test_scripts/.task_counter
 if [ ! -f "$COUNTER_FILE" ]; then
     echo "0" > "$COUNTER_FILE"
 fi
@@ -79,13 +94,13 @@ else
     exit 0
 fi
 EOF
-chmod +x ~/llmc/test_scripts/concurrent_pool.sh
+chmod +x $LLMC_ROOT/test_scripts/concurrent_pool.sh
 
 # Configure auto mode with concurrency=2
-cat >> ~/llmc/config.toml << 'EOF'
+cat >> $LLMC_ROOT/config.toml << 'EOF'
 
 [auto]
-task_pool_command = "~/llmc/test_scripts/concurrent_pool.sh"
+task_pool_command = "$LLMC_ROOT/test_scripts/concurrent_pool.sh"
 concurrency = 2
 EOF
 ```
@@ -190,7 +205,7 @@ git log --format="%h %s" -10 | grep -i "concurrent_test"
 
 ```bash
 # Check logs to see task queuing behavior
-cat ~/llmc/logs/auto.log | grep -i "idle\|task\|assign" | tail -30
+cat $LLMC_ROOT/logs/auto.log | grep -i "idle\|task\|assign" | tail -30
 ```
 
 **Verify**:
@@ -230,7 +245,7 @@ echo "Exit code: $?"
 
 ```bash
 # Remove test artifacts
-rm -rf ~/llmc/test_scripts
+rm -rf $LLMC_ROOT/test_scripts
 rm -f ~/Documents/GoogleDrive/dreamtides/concurrent_test_*.txt
 
 # Clean up git

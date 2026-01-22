@@ -30,10 +30,25 @@ terminates with a clear error message requiring human intervention.
 ## Prerequisites
 
 - LLMC installed and configured
-- A clean LLMC workspace
 - No daemon or overseer currently running
 - Previous test scenario (LCHWQN) completed successfully
 - Overseer configuration with restart_cooldown_secs
+
+## Environment Setup
+
+**This test MUST run in an isolated LLMC instance.** See
+`../isolated_test_environment.md` for complete setup instructions.
+
+```bash
+# Create isolated test environment
+export TEST_DIR="/tmp/llmc-spiral-test-$$"
+export LLMC_ROOT="$TEST_DIR"
+
+llmc init --source ~/Documents/GoogleDrive/dreamtides --target "$TEST_DIR"
+
+# Verify isolation
+llmc status
+```
 
 ## Differentiating Errors from Normal Operations
 
@@ -56,29 +71,29 @@ terminates with a clear error message requiring human intervention.
 
 ```bash
 # Ensure clean state
-cd ~/llmc
+cd $LLMC_ROOT
 llmc down --force 2>/dev/null || true
 llmc nuke --all --yes 2>/dev/null || true
 tmux kill-session -t llmc-overseer 2>/dev/null || true
-rm -f ~/llmc/.llmc/manual_intervention_needed_*.txt
+rm -f $LLMC_ROOT/.llmc/manual_intervention_needed_*.txt
 
 # Create test scripts
-mkdir -p ~/llmc/test_scripts
+mkdir -p $LLMC_ROOT/test_scripts
 
 # Create task pool that always fails (simulates unfixable issue)
-cat > ~/llmc/test_scripts/spiral_pool.sh << 'EOF'
+cat > $LLMC_ROOT/test_scripts/spiral_pool.sh << 'EOF'
 #!/bin/bash
 # Always fail - simulates persistent infrastructure issue
 echo "ERROR: Network unreachable" >&2
 exit 1
 EOF
-chmod +x ~/llmc/test_scripts/spiral_pool.sh
+chmod +x $LLMC_ROOT/test_scripts/spiral_pool.sh
 
 # Configure with short cooldown for testing
-cat >> ~/llmc/config.toml << 'EOF'
+cat >> $LLMC_ROOT/config.toml << 'EOF'
 
 [auto]
-task_pool_command = "~/llmc/test_scripts/spiral_pool.sh"
+task_pool_command = "$LLMC_ROOT/test_scripts/spiral_pool.sh"
 concurrency = 1
 
 [overseer]
@@ -100,7 +115,7 @@ EOF
 **Step 1.1**: Start overseer with failing daemon.
 
 ```bash
-cd ~/llmc
+cd $LLMC_ROOT
 llmc overseer &
 OVERSEER_PID=$!
 
@@ -116,15 +131,15 @@ for i in {1..30}; do
     echo "=== Check $i ==="
 
     # Check daemon status
-    if [ -f ~/llmc/.llmc/daemon.json ]; then
-        DAEMON_PID=$(cat ~/llmc/.llmc/daemon.json | jq '.pid')
+    if [ -f $LLMC_ROOT/.llmc/daemon.json ]; then
+        DAEMON_PID=$(cat $LLMC_ROOT/.llmc/daemon.json | jq '.pid')
         if ! kill -0 $DAEMON_PID 2>/dev/null; then
             echo "Daemon has died"
         fi
     fi
 
     # Check for remediation activity
-    ls ~/llmc/logs/remediation_*.txt 2>/dev/null | head -3
+    ls $LLMC_ROOT/logs/remediation_*.txt 2>/dev/null | head -3
 
     sleep 3
 done
@@ -154,7 +169,7 @@ for i in {1..60}; do
     fi
 
     # Check for failure spiral log messages
-    grep -i "spiral\|cooldown\|repeated\|manual" ~/llmc/logs/auto.log 2>/dev/null | tail -5
+    grep -i "spiral\|cooldown\|repeated\|manual" $LLMC_ROOT/logs/auto.log 2>/dev/null | tail -5
 
     sleep 3
 done
@@ -185,7 +200,7 @@ echo "Overseer exit code: $EXIT_CODE"
 **Step 3.1**: Check final log messages.
 
 ```bash
-cat ~/llmc/logs/auto.log | tail -30
+cat $LLMC_ROOT/logs/auto.log | tail -30
 ```
 
 **Verify**:
@@ -197,11 +212,11 @@ cat ~/llmc/logs/auto.log | tail -30
 **Step 3.2**: Check remediation logs.
 
 ```bash
-ls -la ~/llmc/logs/remediation_*.txt
+ls -la $LLMC_ROOT/logs/remediation_*.txt
 
 # Should have one (or possibly two) remediation logs
 # NOT many (which would indicate infinite loop)
-REMEDIATION_COUNT=$(ls ~/llmc/logs/remediation_*.txt 2>/dev/null | wc -l)
+REMEDIATION_COUNT=$(ls $LLMC_ROOT/logs/remediation_*.txt 2>/dev/null | wc -l)
 echo "Remediation attempts: $REMEDIATION_COUNT"
 ```
 
@@ -216,13 +231,13 @@ echo "Remediation attempts: $REMEDIATION_COUNT"
 
 ```bash
 # Reset for new test
-rm -f ~/llmc/logs/remediation_*.txt
-rm -f ~/llmc/.llmc/manual_intervention_needed_*.txt
+rm -f $LLMC_ROOT/logs/remediation_*.txt
+rm -f $LLMC_ROOT/.llmc/manual_intervention_needed_*.txt
 
 # Create task pool that works once then the remediation creates manual intervention file
-cat > ~/llmc/test_scripts/spiral_pool.sh << 'EOF'
+cat > $LLMC_ROOT/test_scripts/spiral_pool.sh << 'EOF'
 #!/bin/bash
-MARKER=~/llmc/test_scripts/.spiral_task_done
+MARKER=$LLMC_ROOT/test_scripts/.spiral_task_done
 if [ ! -f "$MARKER" ]; then
     touch "$MARKER"
     echo "Create file spiral_test.txt with content 'test'. Do not create other files."
@@ -234,7 +249,7 @@ fi
 EOF
 
 # Create remediation prompt that will create manual intervention file
-cat > ~/llmc/config.toml.new << 'EOF'
+cat > $LLMC_ROOT/config.toml.new << 'EOF'
 # ... existing config ...
 
 [overseer]
@@ -256,8 +271,8 @@ EOF
 
 ```bash
 # Create manual intervention file directly to test detection
-mkdir -p ~/llmc/.llmc
-echo "Test: Network infrastructure is down" > ~/llmc/.llmc/manual_intervention_needed_test.txt
+mkdir -p $LLMC_ROOT/.llmc
+echo "Test: Network infrastructure is down" > $LLMC_ROOT/.llmc/manual_intervention_needed_test.txt
 
 llmc overseer &
 OVERSEER_PID=$!
@@ -283,7 +298,7 @@ echo "Exit code: $EXIT_CODE"
 **Step 4.3**: Check manual intervention message logged.
 
 ```bash
-cat ~/llmc/logs/auto.log | grep -i "manual\|intervention" | tail -10
+cat $LLMC_ROOT/logs/auto.log | grep -i "manual\|intervention" | tail -10
 ```
 
 **Verify**:
@@ -298,11 +313,11 @@ cat ~/llmc/logs/auto.log | grep -i "manual\|intervention" | tail -10
 
 ```bash
 # Clean up
-rm -f ~/llmc/.llmc/manual_intervention_needed_*.txt
-rm -f ~/llmc/test_scripts/.spiral_task_done
+rm -f $LLMC_ROOT/.llmc/manual_intervention_needed_*.txt
+rm -f $LLMC_ROOT/test_scripts/.spiral_task_done
 
 # Create always-failing pool
-cat > ~/llmc/test_scripts/spiral_pool.sh << 'EOF'
+cat > $LLMC_ROOT/test_scripts/spiral_pool.sh << 'EOF'
 #!/bin/bash
 exit 1
 EOF
@@ -313,8 +328,8 @@ OVERSEER_PID=$!
 # Track daemon start times
 START_TIMES=""
 for i in {1..10}; do
-    if [ -f ~/llmc/.llmc/daemon.json ]; then
-        START_TIME=$(cat ~/llmc/.llmc/daemon.json | jq '.start_time_unix')
+    if [ -f $LLMC_ROOT/.llmc/daemon.json ]; then
+        START_TIME=$(cat $LLMC_ROOT/.llmc/daemon.json | jq '.start_time_unix')
         echo "Daemon start time: $START_TIME"
         START_TIMES="$START_TIMES $START_TIME"
     fi
@@ -366,9 +381,9 @@ wait $OVERSEER_PID 2>/dev/null
 tmux kill-session -t llmc-overseer 2>/dev/null || true
 
 # Remove test artifacts
-rm -rf ~/llmc/test_scripts
+rm -rf $LLMC_ROOT/test_scripts
 rm -f ~/Documents/GoogleDrive/dreamtides/spiral_test.txt
-rm -f ~/llmc/.llmc/manual_intervention_needed_*.txt
+rm -f $LLMC_ROOT/.llmc/manual_intervention_needed_*.txt
 
 # Restore config
 # (Edit config.toml to remove test [auto] and [overseer] sections)

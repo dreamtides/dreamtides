@@ -29,10 +29,25 @@ remediation prompts, and executes remediation via Claude Code.
 ## Prerequisites
 
 - LLMC installed and configured
-- A clean LLMC workspace
 - No daemon or overseer currently running
 - Previous test scenario (LCGWQN) completed successfully
 - Overseer configuration with remediation_prompt
+
+## Environment Setup
+
+**This test MUST run in an isolated LLMC instance.** See
+`../isolated_test_environment.md` for complete setup instructions.
+
+```bash
+# Create isolated test environment
+export TEST_DIR="/tmp/llmc-remediation-test-$$"
+export LLMC_ROOT="$TEST_DIR"
+
+llmc init --source ~/Documents/GoogleDrive/dreamtides --target "$TEST_DIR"
+
+# Verify isolation
+llmc status
+```
 
 ## Differentiating Errors from Normal Operations
 
@@ -56,18 +71,18 @@ remediation prompts, and executes remediation via Claude Code.
 
 ```bash
 # Ensure clean state
-cd ~/llmc
+cd $LLMC_ROOT
 llmc down --force 2>/dev/null || true
 llmc nuke --all --yes 2>/dev/null || true
 tmux kill-session -t llmc-overseer 2>/dev/null || true
 
 # Create test scripts
-mkdir -p ~/llmc/test_scripts
+mkdir -p $LLMC_ROOT/test_scripts
 
 # Task pool that works initially
-cat > ~/llmc/test_scripts/remediation_pool.sh << 'EOF'
+cat > $LLMC_ROOT/test_scripts/remediation_pool.sh << 'EOF'
 #!/bin/bash
-MARKER=~/llmc/test_scripts/.task_issued
+MARKER=$LLMC_ROOT/test_scripts/.task_issued
 if [ ! -f "$MARKER" ]; then
     touch "$MARKER"
     echo "Create a file called remediation_test.txt containing 'test'. Do not create other files."
@@ -75,13 +90,13 @@ else
     exit 0
 fi
 EOF
-chmod +x ~/llmc/test_scripts/remediation_pool.sh
+chmod +x $LLMC_ROOT/test_scripts/remediation_pool.sh
 
 # Configure auto mode and overseer
-cat >> ~/llmc/config.toml << 'EOF'
+cat >> $LLMC_ROOT/config.toml << 'EOF'
 
 [auto]
-task_pool_command = "~/llmc/test_scripts/remediation_pool.sh"
+task_pool_command = "$LLMC_ROOT/test_scripts/remediation_pool.sh"
 concurrency = 1
 
 [overseer]
@@ -89,8 +104,8 @@ remediation_prompt = """
 You are debugging LLMC auto mode. A failure was detected.
 
 Check the following:
-1. ~/llmc/logs/auto.log for daemon errors
-2. ~/llmc/logs/task_pool.log for task pool issues
+1. $LLMC_ROOT/logs/auto.log for daemon errors
+2. $LLMC_ROOT/logs/task_pool.log for task pool issues
 3. Git status in worktrees for conflicts
 
 Common fixes:
@@ -116,7 +131,7 @@ EOF
 **Step 1.1**: Start overseer normally.
 
 ```bash
-cd ~/llmc
+cd $LLMC_ROOT
 llmc overseer &
 OVERSEER_PID=$!
 
@@ -128,11 +143,11 @@ sleep 15
 
 ```bash
 # Get daemon PID
-DAEMON_PID=$(cat ~/llmc/.llmc/daemon.json | jq '.pid')
+DAEMON_PID=$(cat $LLMC_ROOT/.llmc/daemon.json | jq '.pid')
 echo "Daemon PID: $DAEMON_PID"
 
 # Record current heartbeat
-cat ~/llmc/.llmc/auto.heartbeat | jq '.timestamp_unix'
+cat $LLMC_ROOT/.llmc/auto.heartbeat | jq '.timestamp_unix'
 
 # One way to simulate heartbeat failure: kill the daemon abruptly
 kill -9 $DAEMON_PID
@@ -148,7 +163,7 @@ for i in {1..30}; do
     echo "=== Check $i ==="
 
     # Check if overseer detected the failure
-    cat ~/llmc/logs/auto.log 2>/dev/null | tail -5
+    cat $LLMC_ROOT/logs/auto.log 2>/dev/null | tail -5
 
     # Check for remediation session activity
     tmux capture-pane -t llmc-overseer -p 2>/dev/null | tail -10
@@ -172,13 +187,13 @@ done
 sleep 30
 
 # Reset task marker
-rm -f ~/llmc/test_scripts/.task_issued
+rm -f $LLMC_ROOT/test_scripts/.task_issued
 
 # Modify task pool to trigger error
-cat > ~/llmc/test_scripts/remediation_pool.sh << 'EOF'
+cat > $LLMC_ROOT/test_scripts/remediation_pool.sh << 'EOF'
 #!/bin/bash
 # First call succeeds, second call errors
-COUNTER_FILE=~/llmc/test_scripts/.error_counter
+COUNTER_FILE=$LLMC_ROOT/test_scripts/.error_counter
 if [ ! -f "$COUNTER_FILE" ]; then
     echo "1" > "$COUNTER_FILE"
     echo "Create a file called log_error_test.txt. Do not create other files."
@@ -203,7 +218,7 @@ EOF
 
 for i in {1..60}; do
     # Check for ERROR in auto.log
-    if grep -i "error\|fatal" ~/llmc/logs/auto.log 2>/dev/null | tail -3; then
+    if grep -i "error\|fatal" $LLMC_ROOT/logs/auto.log 2>/dev/null | tail -3; then
         echo "Error logged"
     fi
 
@@ -226,10 +241,10 @@ done
 
 ```bash
 # Find recent remediation log
-ls -la ~/llmc/logs/remediation_*.txt 2>/dev/null | head -5
+ls -la $LLMC_ROOT/logs/remediation_*.txt 2>/dev/null | head -5
 
 # Read most recent remediation log
-REMEDIATION_LOG=$(ls -t ~/llmc/logs/remediation_*.txt 2>/dev/null | head -1)
+REMEDIATION_LOG=$(ls -t $LLMC_ROOT/logs/remediation_*.txt 2>/dev/null | head -1)
 if [ -n "$REMEDIATION_LOG" ]; then
     echo "=== Remediation Log ==="
     head -100 "$REMEDIATION_LOG"
@@ -292,8 +307,8 @@ fi
 ```bash
 for i in {1..60}; do
     # Check for new daemon registration
-    if [ -f ~/llmc/.llmc/daemon.json ]; then
-        NEW_PID=$(cat ~/llmc/.llmc/daemon.json | jq '.pid')
+    if [ -f $LLMC_ROOT/.llmc/daemon.json ]; then
+        NEW_PID=$(cat $LLMC_ROOT/.llmc/daemon.json | jq '.pid')
         if [ "$NEW_PID" != "$DAEMON_PID" ]; then
             echo "New daemon started with PID: $NEW_PID"
             break
@@ -314,7 +329,7 @@ done
 
 ```bash
 llmc status
-cat ~/llmc/.llmc/auto.heartbeat | jq '.'
+cat $LLMC_ROOT/.llmc/auto.heartbeat | jq '.'
 ```
 
 **Verify**:
@@ -328,7 +343,7 @@ cat ~/llmc/.llmc/auto.heartbeat | jq '.'
 **Step 6.1**: Examine full remediation log.
 
 ```bash
-REMEDIATION_LOG=$(ls -t ~/llmc/logs/remediation_*.txt 2>/dev/null | head -1)
+REMEDIATION_LOG=$(ls -t $LLMC_ROOT/logs/remediation_*.txt 2>/dev/null | head -1)
 if [ -n "$REMEDIATION_LOG" ]; then
     echo "=== Full Remediation Log ==="
     cat "$REMEDIATION_LOG"
@@ -372,7 +387,7 @@ wait $OVERSEER_PID 2>/dev/null
 tmux kill-session -t llmc-overseer 2>/dev/null || true
 
 # Remove test artifacts
-rm -rf ~/llmc/test_scripts
+rm -rf $LLMC_ROOT/test_scripts
 rm -f ~/Documents/GoogleDrive/dreamtides/remediation_test.txt
 rm -f ~/Documents/GoogleDrive/dreamtides/log_error_test.txt
 

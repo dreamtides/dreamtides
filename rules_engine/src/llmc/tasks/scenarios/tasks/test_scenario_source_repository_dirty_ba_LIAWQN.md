@@ -29,9 +29,24 @@ of immediate shutdown.
 ## Prerequisites
 
 - LLMC installed and configured
-- A clean LLMC workspace
 - No daemon currently running
 - Previous test scenario (LCEWQN) completed successfully
+
+## Environment Setup
+
+**This test MUST run in an isolated LLMC instance.** See
+`../isolated_test_environment.md` for complete setup instructions.
+
+```bash
+# Create isolated test environment
+export TEST_DIR="/tmp/llmc-dirty-repo-test-$$"
+export LLMC_ROOT="$TEST_DIR"
+
+llmc init --source ~/Documents/GoogleDrive/dreamtides --target "$TEST_DIR"
+
+# Verify isolation
+llmc status
+```
 
 ## Differentiating Errors from Normal Operations
 
@@ -54,15 +69,15 @@ of immediate shutdown.
 
 ```bash
 # Ensure clean state
-cd ~/llmc
+cd $LLMC_ROOT
 llmc down --force 2>/dev/null || true
 llmc nuke --all --yes 2>/dev/null || true
 
 # Create test scripts
-mkdir -p ~/llmc/test_scripts
-cat > ~/llmc/test_scripts/dirty_pool.sh << 'EOF'
+mkdir -p $LLMC_ROOT/test_scripts
+cat > $LLMC_ROOT/test_scripts/dirty_pool.sh << 'EOF'
 #!/bin/bash
-MARKER=~/llmc/test_scripts/.task_issued
+MARKER=$LLMC_ROOT/test_scripts/.task_issued
 if [ ! -f "$MARKER" ]; then
     touch "$MARKER"
     echo "Create a file called dirty_backoff_test.txt containing 'Test file'. Do not create other files."
@@ -70,13 +85,13 @@ else
     exit 0
 fi
 EOF
-chmod +x ~/llmc/test_scripts/dirty_pool.sh
+chmod +x $LLMC_ROOT/test_scripts/dirty_pool.sh
 
 # Configure auto mode
-cat >> ~/llmc/config.toml << 'EOF'
+cat >> $LLMC_ROOT/config.toml << 'EOF'
 
 [auto]
-task_pool_command = "~/llmc/test_scripts/dirty_pool.sh"
+task_pool_command = "$LLMC_ROOT/test_scripts/dirty_pool.sh"
 concurrency = 1
 EOF
 ```
@@ -88,7 +103,7 @@ EOF
 **Step 1.1**: Start auto mode and let task begin.
 
 ```bash
-cd ~/llmc
+cd $LLMC_ROOT
 llmc up --auto &
 DAEMON_PID=$!
 
@@ -107,7 +122,7 @@ echo "Source repo now has uncommitted changes"
 **Step 1.3**: Wait for worker to complete and observe backoff.
 
 ```bash
-cd ~/llmc
+cd $LLMC_ROOT
 
 # Monitor for needs_review then backoff message
 for i in {1..60}; do
@@ -115,7 +130,7 @@ for i in {1..60}; do
     echo "Worker status: $STATUS"
 
     # Check daemon output for backoff message
-    cat ~/llmc/logs/auto.log 2>/dev/null | grep -i "uncommitted\|retry\|backoff" | tail -3
+    cat $LLMC_ROOT/logs/auto.log 2>/dev/null | grep -i "uncommitted\|retry\|backoff" | tail -3
 
     if [ "$STATUS" = "needs_review" ]; then
         echo "Worker ready for accept - should trigger dirty repo check"
@@ -141,7 +156,7 @@ done
 echo "Monitoring backoff intervals (this takes several minutes)..."
 
 for i in {1..20}; do
-    cat ~/llmc/logs/auto.log 2>/dev/null | grep -i "retry in" | tail -5
+    cat $LLMC_ROOT/logs/auto.log 2>/dev/null | grep -i "retry in" | tail -5
 
     # Check if daemon still running
     if ! kill -0 $DAEMON_PID 2>/dev/null; then
@@ -163,7 +178,7 @@ done
 **Step 2.2**: Check state file for backoff persistence.
 
 ```bash
-cat ~/llmc/state.json | jq '.source_repo_dirty_retry_after_unix, .source_repo_dirty_backoff_secs'
+cat $LLMC_ROOT/state.json | jq '.source_repo_dirty_retry_after_unix, .source_repo_dirty_backoff_secs'
 ```
 
 **Verify**:
@@ -185,7 +200,7 @@ echo "Source repo is now clean"
 **Step 3.2**: Wait for accept to succeed.
 
 ```bash
-cd ~/llmc
+cd $LLMC_ROOT
 
 for i in {1..60}; do
     STATUS=$(llmc status --json 2>/dev/null | jq -r '.workers[] | select(.name == "auto-1") | .status' 2>/dev/null)
@@ -209,7 +224,7 @@ done
 **Step 3.3**: Verify backoff state cleared.
 
 ```bash
-cat ~/llmc/state.json | jq '.source_repo_dirty_retry_after_unix, .source_repo_dirty_backoff_secs'
+cat $LLMC_ROOT/state.json | jq '.source_repo_dirty_retry_after_unix, .source_repo_dirty_backoff_secs'
 ```
 
 **Verify**:
@@ -223,7 +238,7 @@ cat ~/llmc/state.json | jq '.source_repo_dirty_retry_after_unix, .source_repo_di
 
 ```bash
 # Reset for new test
-rm -f ~/llmc/test_scripts/.task_issued
+rm -f $LLMC_ROOT/test_scripts/.task_issued
 llmc reset auto-1 --yes 2>/dev/null || true
 
 # Create dirty file
@@ -231,7 +246,7 @@ cd ~/Documents/GoogleDrive/dreamtides
 echo "Another uncommitted file" > uncommitted2.txt
 
 # Restart daemon
-cd ~/llmc
+cd $LLMC_ROOT
 kill -SIGINT $DAEMON_PID 2>/dev/null
 wait $DAEMON_PID 2>/dev/null
 
@@ -241,8 +256,8 @@ DAEMON_PID=$!
 sleep 60
 
 # Note backoff state
-cat ~/llmc/state.json | jq '.source_repo_dirty_backoff_secs'
-BACKOFF_BEFORE=$(cat ~/llmc/state.json | jq '.source_repo_dirty_backoff_secs')
+cat $LLMC_ROOT/state.json | jq '.source_repo_dirty_backoff_secs'
+BACKOFF_BEFORE=$(cat $LLMC_ROOT/state.json | jq '.source_repo_dirty_backoff_secs')
 echo "Backoff before restart: $BACKOFF_BEFORE"
 
 # Restart daemon
@@ -257,7 +272,7 @@ sleep 10
 **Step 4.2**: Verify backoff state preserved.
 
 ```bash
-BACKOFF_AFTER=$(cat ~/llmc/state.json | jq '.source_repo_dirty_backoff_secs')
+BACKOFF_AFTER=$(cat $LLMC_ROOT/state.json | jq '.source_repo_dirty_backoff_secs')
 echo "Backoff after restart: $BACKOFF_AFTER"
 
 if [ "$BACKOFF_BEFORE" = "$BACKOFF_AFTER" ]; then
@@ -278,7 +293,7 @@ fi
 
 ```bash
 # Check current backoff
-cat ~/llmc/state.json | jq '.source_repo_dirty_backoff_secs'
+cat $LLMC_ROOT/state.json | jq '.source_repo_dirty_backoff_secs'
 ```
 
 **Note**: This test is time-consuming. For practical testing:
@@ -301,15 +316,15 @@ cd ~/Documents/GoogleDrive/dreamtides
 rm uncommitted2.txt
 
 # Stop daemon and reconfigure
-cd ~/llmc
+cd $LLMC_ROOT
 kill -SIGINT $DAEMON_PID 2>/dev/null
 wait $DAEMON_PID 2>/dev/null
 
-rm -f ~/llmc/test_scripts/.task_issued
+rm -f $LLMC_ROOT/test_scripts/.task_issued
 
-cat > ~/llmc/test_scripts/dirty_pool.sh << 'EOF'
+cat > $LLMC_ROOT/test_scripts/dirty_pool.sh << 'EOF'
 #!/bin/bash
-MARKER=~/llmc/test_scripts/.task_issued
+MARKER=$LLMC_ROOT/test_scripts/.task_issued
 if [ ! -f "$MARKER" ]; then
     touch "$MARKER"
     echo "Verify the README exists. Do not make any changes. Just confirm the file exists."
@@ -337,7 +352,7 @@ for i in {1..60}; do
     sleep 5
 done
 
-cat ~/llmc/state.json | jq '.source_repo_dirty_retry_after_unix, .source_repo_dirty_backoff_secs'
+cat $LLMC_ROOT/state.json | jq '.source_repo_dirty_retry_after_unix, .source_repo_dirty_backoff_secs'
 ```
 
 **Verify**:
@@ -353,7 +368,7 @@ kill -SIGINT $DAEMON_PID 2>/dev/null
 wait $DAEMON_PID 2>/dev/null
 
 # Remove test artifacts
-rm -rf ~/llmc/test_scripts
+rm -rf $LLMC_ROOT/test_scripts
 rm -f ~/Documents/GoogleDrive/dreamtides/dirty_backoff_test.txt
 rm -f ~/Documents/GoogleDrive/dreamtides/uncommitted*.txt
 
