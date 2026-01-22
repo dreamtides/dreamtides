@@ -234,26 +234,28 @@ fn create_claude_hook_settings_impl(
         .unwrap_or_else(|_| PathBuf::from("llmc"))
         .to_string_lossy()
         .to_string();
+    let llmc_root = config::get_llmc_root();
+    let llmc_root_str = llmc_root.to_string_lossy();
     let settings = serde_json::json!({
         "hooks": {
             "Stop": [{
                 "hooks": [{
                     "type": "command",
-                    "command": format!("{} hook stop --worker {}", llmc_bin, worker_name),
+                    "command": format!("LLMC_ROOT={} {} hook stop --worker {}", llmc_root_str, llmc_bin, worker_name),
                     "timeout": 5
                 }]
             }],
             "SessionStart": [{
                 "hooks": [{
                     "type": "command",
-                    "command": format!("{} hook session-start --worker {}", llmc_bin, worker_name),
+                    "command": format!("LLMC_ROOT={} {} hook session-start --worker {}", llmc_root_str, llmc_bin, worker_name),
                     "timeout": 5
                 }]
             }],
             "SessionEnd": [{
                 "hooks": [{
                     "type": "command",
-                    "command": format!("{} hook session-end --worker {}", llmc_bin, worker_name),
+                    "command": format!("LLMC_ROOT={} {} hook session-end --worker {}", llmc_root_str, llmc_bin, worker_name),
                     "timeout": 5
                 }]
             }]
@@ -265,6 +267,12 @@ fn create_claude_hook_settings_impl(
     if !silent {
         println!("Created Claude hook settings for worker '{}'", worker_name);
     }
+    tracing::info!(
+        worker = worker_name,
+        llmc_root = %llmc_root_str,
+        path = %settings_path.display(),
+        "Created Claude hook settings with LLMC_ROOT"
+    );
     Ok(())
 }
 /// Registers a project path in Serena's global config

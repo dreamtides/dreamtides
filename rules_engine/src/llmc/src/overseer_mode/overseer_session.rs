@@ -197,26 +197,28 @@ fn create_overseer_claude_hooks(project_dir: &Path) -> Result<()> {
         .unwrap_or_else(|_| PathBuf::from("llmc"))
         .to_string_lossy()
         .to_string();
+    let llmc_root = config::get_llmc_root();
+    let llmc_root_str = llmc_root.to_string_lossy();
     let settings = serde_json::json!({
         "hooks": {
             "Stop": [{
                 "hooks": [{
                     "type": "command",
-                    "command": format!("{} hook stop --worker overseer", llmc_bin),
+                    "command": format!("LLMC_ROOT={} {} hook stop --worker overseer", llmc_root_str, llmc_bin),
                     "timeout": 5
                 }]
             }],
             "SessionStart": [{
                 "hooks": [{
                     "type": "command",
-                    "command": format!("{} hook session-start --worker overseer", llmc_bin),
+                    "command": format!("LLMC_ROOT={} {} hook session-start --worker overseer", llmc_root_str, llmc_bin),
                     "timeout": 5
                 }]
             }],
             "SessionEnd": [{
                 "hooks": [{
                     "type": "command",
-                    "command": format!("{} hook session-end --worker overseer", llmc_bin),
+                    "command": format!("LLMC_ROOT={} {} hook session-end --worker overseer", llmc_root_str, llmc_bin),
                     "timeout": 5
                 }]
             }]
@@ -227,7 +229,8 @@ fn create_overseer_claude_hooks(project_dir: &Path) -> Result<()> {
     fs::write(&settings_path, content).context("Failed to write .claude/settings.json")?;
     tracing::info!(
         path = %settings_path.display(),
-        "Created Claude hook settings for overseer"
+        llmc_root = %llmc_root_str,
+        "Created Claude hook settings for overseer with LLMC_ROOT"
     );
     Ok(())
 }
