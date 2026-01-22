@@ -18,7 +18,8 @@ blocked-by:
 - LD5WQN
 - LD6WQN
 created-at: 2026-01-21T22:01:20.201938Z
-updated-at: 2026-01-22T07:32:57.548102Z
+updated-at: 2026-01-22T15:25:03.184648Z
+closed-at: 2026-01-22T15:25:03.184647Z
 ---
 
 # Test Scenario: Post-Accept Command Execution
