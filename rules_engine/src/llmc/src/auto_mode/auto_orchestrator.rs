@@ -558,6 +558,53 @@ fn process_completed_workers(
                             return Err(e.into());
                         }
                     }
+                    AutoAcceptResult::AcceptedWithCleanupFailure { commit_sha, cleanup_error } => {
+                        // Clear source repo dirty backoff - the accept itself succeeded
+                        state.source_repo_dirty_retry_after_unix = None;
+                        state.source_repo_dirty_backoff_secs = None;
+
+                        // Print success with warning about cleanup failure
+                        println!(
+                            "{}",
+                            color_theme::success(format!(
+                                "[{}] ✓ Changes accepted ({})",
+                                worker_name,
+                                &commit_sha[..8.min(commit_sha.len())]
+                            ))
+                        );
+                        eprintln!(
+                            "{}",
+                            color_theme::warning(format!(
+                                "[{}] ⚠ Worker cleanup failed: {}. Worker may need manual reset.",
+                                worker_name, cleanup_error
+                            ))
+                        );
+                        logger.log_task_completed(&worker_name, TaskResult::NeedsReview);
+                        warn!(
+                            worker = %worker_name,
+                            commit = %commit_sha,
+                            cleanup_error = %cleanup_error,
+                            "Worker changes accepted but cleanup failed - continuing with other workers"
+                        );
+
+                        // Still run post-accept command since the accept succeeded
+                        if let Err(e) = auto_accept::execute_post_accept_command(
+                            &worker_name,
+                            commit_sha,
+                            &auto_cfg,
+                            logger,
+                        ) {
+                            eprintln!(
+                                "{}",
+                                color_theme::error(format!(
+                                    "[{}] Post-accept command failed: {}",
+                                    worker_name, e
+                                ))
+                            );
+                            error!(worker = %worker_name, error = %e, "Post-accept command failed");
+                            return Err(e.into());
+                        }
+                    }
                     AutoAcceptResult::NoChanges => {
                         // Clear source repo dirty backoff on successful accept
                         state.source_repo_dirty_retry_after_unix = None;

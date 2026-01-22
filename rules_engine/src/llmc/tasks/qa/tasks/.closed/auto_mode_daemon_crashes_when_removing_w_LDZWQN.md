@@ -13,7 +13,8 @@ labels:
 blocking:
 - LH3WQN
 created-at: 2026-01-22T04:11:33.655427Z
-updated-at: 2026-01-22T04:12:10.109846Z
+updated-at: 2026-01-22T05:03:53.083604Z
+closed-at: 2026-01-22T05:03:53.083604Z
 ---
 
 # Bug: Auto mode daemon crashes when removing worktree after accept

@@ -1,5 +1,3 @@
-#![allow(dead_code)]
-
 use std::path::{Path, PathBuf};
 use std::process::Command;
 use std::time::Instant;
@@ -27,6 +25,10 @@ pub enum AutoAcceptResult {
     SourceRepoDirty,
     /// Rebase conflict occurred, worker is now in Rebasing state resolving it.
     RebaseConflict { conflicts: Vec<String> },
+    /// Worker changes were accepted but cleanup (worktree reset) failed.
+    /// The daemon should continue processing other workers; this worker may
+    /// need manual cleanup.
+    AcceptedWithCleanupFailure { commit_sha: String, cleanup_error: String },
 }
 
 /// Error during auto accept that should trigger daemon shutdown.
@@ -44,6 +46,18 @@ pub struct AutoAcceptError {
 /// 3. For `needs_review`: rebases, squashes, strips attribution, merges to
 ///    master
 /// 4. Updates stall detection timestamp
+///
+/// # Design: Separation of Critical and Cleanup Operations
+///
+/// This function distinguishes between **critical operations** (merging commits
+/// to master) and **cleanup operations** (resetting the worker worktree). If
+/// the critical operation succeeds but cleanup fails, we return
+/// `AcceptedWithCleanupFailure` rather than an error. This ensures the daemon
+/// continues processing other workers rather than crashing.
+///
+/// This design prevents a single cleanup failure from halting the entire auto
+/// mode pipeline. The worker may need manual cleanup, but the commit is safely
+/// merged.
 pub fn auto_accept_worker(
     worker_name: &str,
     state: &mut State,
@@ -350,8 +364,22 @@ fn accept_and_merge(
         "Successfully merged to master"
     );
 
-    // Reset worker to idle with fresh worktree
-    reset_worker_to_idle(worker_name, state, config, logger)?;
+    // Reset worker to idle with fresh worktree.
+    // This is cleanup - if it fails, we should NOT crash the daemon since
+    // the critical operation (merge to master) already succeeded.
+    if let Err(e) = reset_worker_to_idle(worker_name, state, config, logger) {
+        error!(
+            worker = %worker_name,
+            error = %e,
+            "Worker cleanup failed after successful accept. \
+             The commit was merged successfully but the worker may need manual cleanup."
+        );
+        auto_workers::record_task_completion(state);
+        return Ok(AutoAcceptResult::AcceptedWithCleanupFailure {
+            commit_sha: new_commit_sha,
+            cleanup_error: e.message,
+        });
+    }
 
     auto_workers::record_task_completion(state);
 

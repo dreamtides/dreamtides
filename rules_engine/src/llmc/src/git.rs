@@ -7,16 +7,23 @@ use anyhow::{Context, Result, bail};
 use regex::Regex;
 
 use crate::logging::git as logging_git;
+
 /// Maximum number of retries for git operations that encounter lock file errors
 const GIT_LOCK_RETRY_COUNT: u32 = 5;
 /// Delay between retries when a lock file is encountered (milliseconds)
 const GIT_LOCK_RETRY_DELAY_MS: u64 = 500;
+/// Maximum number of retries for directory removal operations
+const DIR_REMOVAL_RETRY_COUNT: u32 = 3;
+/// Delay between directory removal retries (milliseconds)
+const DIR_REMOVAL_RETRY_DELAY_MS: u64 = 500;
+
 /// Result of a rebase operation
 #[derive(Debug, Clone, PartialEq)]
 pub struct RebaseResult {
     pub success: bool,
     pub conflicts: Vec<String>,
 }
+
 /// Creates a new worktree at the specified path, checking out the given branch
 pub fn create_worktree(repo: &Path, branch: &str, worktree_path: &Path) -> Result<()> {
     let start = std::time::Instant::now();
@@ -58,6 +65,7 @@ pub fn create_worktree(repo: &Path, branch: &str, worktree_path: &Path) -> Resul
     }
     result
 }
+
 /// Removes the worktree at the specified path
 pub fn remove_worktree(repo: &Path, worktree_path: &Path, force: bool) -> Result<()> {
     let mut cmd = Command::new("git");
@@ -91,13 +99,7 @@ pub fn remove_worktree(repo: &Path, worktree_path: &Path, force: bool) -> Result
         }
         let _ = Command::new("git").arg("-C").arg(repo).arg("worktree").arg("prune").output();
         if worktree_path.exists() {
-            tracing::info!(
-                "Attempting manual removal of worktree directory: {}",
-                worktree_path.display()
-            );
-            std::fs::remove_dir_all(worktree_path).with_context(|| {
-                format!("Failed to manually remove worktree directory: {}", worktree_path.display())
-            })?;
+            remove_directory_with_retries(worktree_path)?;
             let prune_output = Command::new("git")
                 .arg("-C")
                 .arg(repo)
@@ -115,6 +117,7 @@ pub fn remove_worktree(repo: &Path, worktree_path: &Path, force: bool) -> Result
     }
     Ok(())
 }
+
 /// Creates a new branch at the specified start point
 pub fn create_branch(repo: &Path, name: &str, start_point: &str) -> Result<()> {
     let output = Command::new("git")
@@ -130,6 +133,7 @@ pub fn create_branch(repo: &Path, name: &str, start_point: &str) -> Result<()> {
     }
     Ok(())
 }
+
 /// Deletes a branch, optionally forcing deletion
 pub fn delete_branch(repo: &Path, name: &str, force: bool) -> Result<()> {
     let output = Command::new("git")
@@ -145,6 +149,7 @@ pub fn delete_branch(repo: &Path, name: &str, force: bool) -> Result<()> {
     }
     Ok(())
 }
+
 /// Checks if a branch exists
 pub fn branch_exists(repo: &Path, name: &str) -> bool {
     Command::new("git")
@@ -157,6 +162,7 @@ pub fn branch_exists(repo: &Path, name: &str) -> bool {
         .map(|output| output.status.success())
         .unwrap_or(false)
 }
+
 /// Gets the current branch name for a worktree
 pub fn get_current_branch(worktree: &Path) -> Result<String> {
     let output = Command::new("git")
@@ -172,6 +178,7 @@ pub fn get_current_branch(worktree: &Path) -> Result<String> {
     }
     Ok(String::from_utf8(output.stdout)?.trim().to_string())
 }
+
 /// Gets the commit SHA for a specific ref
 pub fn get_head_commit_of_ref(repo: &Path, ref_name: &str) -> Result<String> {
     let output = Command::new("git")
@@ -186,6 +193,7 @@ pub fn get_head_commit_of_ref(repo: &Path, ref_name: &str) -> Result<String> {
     }
     Ok(String::from_utf8(output.stdout)?.trim().to_string())
 }
+
 /// Gets the HEAD commit SHA for a worktree
 pub fn get_head_commit(worktree: &Path) -> Result<String> {
     let output = Command::new("git")
@@ -200,6 +208,7 @@ pub fn get_head_commit(worktree: &Path) -> Result<String> {
     }
     Ok(String::from_utf8(output.stdout)?.trim().to_string())
 }
+
 /// Gets the merge-base between two refs in a worktree
 pub fn get_merge_base(worktree: &Path, ref1: &str, ref2: &str) -> Result<String> {
     let output = Command::new("git")
@@ -215,6 +224,7 @@ pub fn get_merge_base(worktree: &Path, ref1: &str, ref2: &str) -> Result<String>
     }
     Ok(String::from_utf8(output.stdout)?.trim().to_string())
 }
+
 /// Checks if `ancestor` is an ancestor of `descendant`
 pub fn is_ancestor(worktree: &Path, ancestor: &str, descendant: &str) -> Result<bool> {
     let output = Command::new("git")
@@ -228,12 +238,14 @@ pub fn is_ancestor(worktree: &Path, ancestor: &str, descendant: &str) -> Result<
         .context("Failed to execute git merge-base --is-ancestor")?;
     Ok(output.status.success())
 }
+
 /// Checks if the worktree has commits ahead of the given ref
 pub fn has_commits_ahead_of(worktree: &Path, base_ref: &str) -> Result<bool> {
     let head = get_head_commit(worktree)?;
     let merge_base = get_merge_base(worktree, "HEAD", base_ref)?;
     Ok(head != merge_base)
 }
+
 /// Checks if there are uncommitted changes in the worktree
 pub fn has_uncommitted_changes(worktree: &Path) -> Result<bool> {
     let output = Command::new("git")
@@ -248,6 +260,7 @@ pub fn has_uncommitted_changes(worktree: &Path) -> Result<bool> {
     }
     Ok(!output.stdout.is_empty())
 }
+
 /// Checks if there are staged changes ready to be committed
 pub fn has_staged_changes(worktree: &Path) -> Result<bool> {
     let output = Command::new("git")
@@ -260,6 +273,7 @@ pub fn has_staged_changes(worktree: &Path) -> Result<bool> {
         .context("Failed to execute git diff --cached")?;
     Ok(!output.status.success())
 }
+
 /// Gets the commit message for a specific SHA
 pub fn get_commit_message(worktree: &Path, sha: &str) -> Result<String> {
     let output = Command::new("git")
@@ -276,6 +290,7 @@ pub fn get_commit_message(worktree: &Path, sha: &str) -> Result<String> {
     }
     Ok(String::from_utf8(output.stdout)?.trim().to_string())
 }
+
 /// Strips agent attribution patterns from commit messages
 pub fn strip_agent_attribution(message: &str) -> String {
     let patterns = ["🤖 Generated with [Claude Code]", "Generated with [Claude Code]"];
@@ -283,6 +298,7 @@ pub fn strip_agent_attribution(message: &str) -> String {
     let co_authored_regex = Regex::new(r"\n*Co-Authored-By: Claude[^\n]*").unwrap();
     co_authored_regex.replace_all(&result, "").trim().to_string()
 }
+
 /// Amends uncommitted changes to the most recent commit
 pub fn amend_uncommitted_changes(worktree: &Path) -> Result<()> {
     let add_output = Command::new("git")
@@ -334,6 +350,7 @@ pub fn create_uncommitted_changes_commit(worktree: &Path) -> Result<()> {
     }
     Ok(())
 }
+
 pub fn rebase_onto(worktree: &Path, target: &str) -> Result<RebaseResult> {
     let rebase_in_progress = is_rebase_in_progress(worktree);
     tracing::debug!(
@@ -443,6 +460,7 @@ pub fn rebase_onto(worktree: &Path, target: &str) -> Result<RebaseResult> {
     );
     Err(anyhow::anyhow!("Rebase failed after {} retries: {}", GIT_LOCK_RETRY_COUNT, error_msg))
 }
+
 /// Checks if a rebase is currently in progress
 pub fn is_rebase_in_progress(worktree: &Path) -> bool {
     let git_dir = match get_git_dir(worktree) {
@@ -458,6 +476,7 @@ pub fn is_rebase_in_progress(worktree: &Path) -> bool {
     };
     git_dir.join("rebase-merge").exists() || git_dir.join("rebase-apply").exists()
 }
+
 /// Forcefully removes rebase state directories (rebase-merge and rebase-apply).
 /// This is used as a fallback when `git rebase --abort` fails because git
 /// doesn't recognize the rebase state as valid.
@@ -485,11 +504,13 @@ pub fn force_cleanup_rebase_state(worktree: &Path) -> Result<()> {
     }
     Ok(())
 }
+
 /// Checks if worktree is clean (no uncommitted changes and no rebase in
 /// progress)
 pub fn is_worktree_clean(worktree: &Path) -> Result<bool> {
     Ok(!has_uncommitted_changes(worktree)? && !is_rebase_in_progress(worktree))
 }
+
 /// Gets the list of files with merge conflicts
 pub fn get_conflicted_files(worktree: &Path) -> Result<Vec<String>> {
     let output = Command::new("git")
@@ -505,6 +526,7 @@ pub fn get_conflicted_files(worktree: &Path) -> Result<Vec<String>> {
     }
     Ok(String::from_utf8(output.stdout)?.lines().map(str::to_string).collect())
 }
+
 pub fn abort_rebase(worktree: &Path) -> Result<()> {
     let before = logging_git::capture_state(worktree).ok();
     let start = std::time::Instant::now();
@@ -600,6 +622,7 @@ pub fn abort_rebase(worktree: &Path) -> Result<()> {
         error_msg
     ))
 }
+
 /// Squashes all commits since base into a single commit
 pub fn squash_commits(worktree: &Path, base: &str) -> Result<()> {
     let output = Command::new("git")
@@ -615,6 +638,7 @@ pub fn squash_commits(worktree: &Path, base: &str) -> Result<()> {
     }
     Ok(())
 }
+
 /// Performs a fast-forward merge of the specified branch
 pub fn fast_forward_merge(repo: &Path, branch: &str) -> Result<()> {
     let before = logging_git::capture_state(repo).ok();
@@ -655,6 +679,7 @@ pub fn fast_forward_merge(repo: &Path, branch: &str) -> Result<()> {
     }
     result
 }
+
 pub fn fetch_origin(repo: &Path) -> Result<()> {
     let start = std::time::Instant::now();
     let mut last_error: Option<String> = None;
@@ -715,6 +740,7 @@ pub fn fetch_origin(repo: &Path) -> Result<()> {
         error_msg
     ))
 }
+
 /// Fetches a specific ref from a local repository
 pub fn fetch_from_local(target_repo: &Path, source_repo: &Path, ref_name: &str) -> Result<()> {
     let start = std::time::Instant::now();
@@ -757,6 +783,7 @@ pub fn fetch_from_local(target_repo: &Path, source_repo: &Path, ref_name: &str) 
     }
     result
 }
+
 pub fn checkout_branch(repo: &Path, branch: &str) -> Result<()> {
     let mut last_error: Option<String> = None;
     for attempt in 0..=GIT_LOCK_RETRY_COUNT {
@@ -797,6 +824,7 @@ pub fn checkout_branch(repo: &Path, branch: &str) -> Result<()> {
         last_error.unwrap_or_else(|| "Unknown error".to_string())
     )
 }
+
 pub fn reset_to_ref(repo: &Path, ref_name: &str) -> Result<()> {
     let mut last_error: Option<String> = None;
     for attempt in 0..=GIT_LOCK_RETRY_COUNT {
@@ -837,6 +865,7 @@ pub fn reset_to_ref(repo: &Path, ref_name: &str) -> Result<()> {
         last_error.unwrap_or_else(|| "Unknown error".to_string())
     )
 }
+
 pub fn pull_rebase(worktree: &Path) -> Result<()> {
     for attempt in 0..=GIT_LOCK_RETRY_COUNT {
         if attempt > 0 {
@@ -905,12 +934,106 @@ pub fn pull_rebase(worktree: &Path) -> Result<()> {
         last_error.unwrap_or_else(|| "Unknown error".to_string())
     )
 }
+
+/// Removes a directory with retries and fallback to shell `rm -rf`.
+///
+/// This is used for worktree cleanup where files may be temporarily locked by
+/// build processes, file system caching, or other race conditions.
+///
+/// # Design: Retry with Backoff for Filesystem Operations
+///
+/// Filesystem operations like `remove_dir_all` can fail transiently due to:
+/// - Files being held open by build processes (e.g., cargo, rustc)
+/// - File system caching/flushing delays
+/// - Race conditions with LSP servers or other tools
+///
+/// This function implements a multi-level retry strategy:
+/// 1. Try `std::fs::remove_dir_all` with retries and delays
+/// 2. Fall back to shell `rm -rf` which handles some edge cases better
+/// 3. Log detailed state for debugging if all attempts fail
+fn remove_directory_with_retries(path: &Path) -> Result<()> {
+    tracing::info!("Attempting manual removal of directory: {}", path.display());
+
+    // Try std::fs::remove_dir_all with retries
+    let mut last_error: Option<std::io::Error> = None;
+    for attempt in 0..=DIR_REMOVAL_RETRY_COUNT {
+        if attempt > 0 {
+            tracing::debug!(
+                path = %path.display(),
+                attempt,
+                "Retrying directory removal after delay"
+            );
+            thread::sleep(Duration::from_millis(DIR_REMOVAL_RETRY_DELAY_MS));
+        }
+
+        match std::fs::remove_dir_all(path) {
+            Ok(()) => {
+                tracing::info!(
+                    path = %path.display(),
+                    attempts = attempt + 1,
+                    "Successfully removed directory"
+                );
+                return Ok(());
+            }
+            Err(e) => {
+                tracing::warn!(
+                    path = %path.display(),
+                    attempt,
+                    error = %e,
+                    "Directory removal attempt failed"
+                );
+                last_error = Some(e);
+            }
+        }
+    }
+
+    // Fallback: try shell rm -rf (more aggressive, handles some edge cases better)
+    tracing::info!(
+        path = %path.display(),
+        "Falling back to shell rm -rf after std::fs::remove_dir_all failed"
+    );
+
+    let rm_output =
+        Command::new("rm").arg("-rf").arg(path).output().context("Failed to execute rm -rf")?;
+
+    if rm_output.status.success() && !path.exists() {
+        tracing::info!(path = %path.display(), "Successfully removed directory via rm -rf");
+        return Ok(());
+    }
+
+    if !path.exists() {
+        // Directory is gone, success
+        tracing::info!(path = %path.display(), "Directory no longer exists after removal attempts");
+        return Ok(());
+    }
+
+    // Log detailed state for debugging
+    let contents: Vec<_> = std::fs::read_dir(path)
+        .map(|entries| {
+            entries.filter_map(|e| e.ok().map(|e| e.path().display().to_string())).collect()
+        })
+        .unwrap_or_default();
+
+    tracing::error!(
+        path = %path.display(),
+        remaining_contents = ?contents,
+        "Failed to remove directory after all attempts"
+    );
+
+    Err(last_error
+        .map(|e| anyhow::anyhow!("Failed to remove directory {}: {}", path.display(), e))
+        .unwrap_or_else(|| {
+            anyhow::anyhow!("Failed to remove directory {}: unknown error", path.display())
+        }))
+}
+
 /// Checks if a git error message indicates a lock file conflict
 fn is_lock_file_error(stderr: &str) -> bool {
     stderr.contains("index.lock': File exists")
         || stderr.contains("Unable to create")
             && (stderr.contains(".lock': File exists") || stderr.contains("lock file exists"))
 }
+
 /// Gets the actual git directory path for a worktree.
 /// In a worktree, `.git` is a file containing `gitdir: <path>`, not a
 /// directory.

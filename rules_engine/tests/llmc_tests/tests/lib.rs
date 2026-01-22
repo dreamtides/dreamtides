@@ -11,3 +11,4 @@ mod sound_tests;
 mod state_tests;
 mod tmux;
 mod worker_tests;
+mod worktree_removal_tests;
