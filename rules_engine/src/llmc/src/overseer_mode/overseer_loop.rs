@@ -70,11 +70,7 @@ pub fn run_overseer(config: &Config, daemon_options: &OverseerDaemonOptions) -> 
 
         if shutdown_count.load(Ordering::SeqCst) > 0 {
             info!("Shutdown requested during monitoring, terminating daemon");
-            terminate_daemon_gracefully(&daemon_handle.expected);
-            // Also kill the child process directly in case terminate_daemon_gracefully
-            // fails, and wait to reap the zombie process
-            let _ = daemon_handle.child.kill();
-            let _ = daemon_handle.child.wait();
+            terminate_daemon_gracefully(&daemon_handle.expected, Some(&mut daemon_handle.child));
             break;
         }
 
@@ -85,11 +81,7 @@ pub fn run_overseer(config: &Config, daemon_options: &OverseerDaemonOptions) -> 
         println!("⚠ Daemon failure detected: {}", failure_status.describe());
         info!(failure = ?failure_status, "Daemon failure detected");
 
-        terminate_daemon_gracefully(&daemon_handle.expected);
-        // Also kill the child process directly to ensure cleanup, and wait to
-        // reap the zombie process (otherwise kill(pid,0) will still return 0)
-        let _ = daemon_handle.child.kill();
-        let _ = daemon_handle.child.wait();
+        terminate_daemon_gracefully(&daemon_handle.expected, Some(&mut daemon_handle.child));
 
         if is_failure_spiral(daemon_start_time, &overseer_config) {
             error!("Failure spiral detected - daemon failed within cooldown period");
@@ -339,11 +331,15 @@ fn run_monitor_loop(
 }
 
 /// Terminates the daemon gracefully with full termination protocol.
-fn terminate_daemon_gracefully(expected: &ExpectedDaemon) {
+///
+/// If `child` is provided, it will be used to reap the zombie process after
+/// SIGKILL. This is necessary when the overseer is the parent of the daemon,
+/// because `kill(pid, 0)` returns 0 for zombie processes until they are reaped.
+fn terminate_daemon_gracefully(expected: &ExpectedDaemon, child: Option<&mut Child>) {
     info!(pid = expected.pid, "Initiating daemon termination");
     println!("Terminating daemon...");
 
-    match daemon_control::terminate_daemon(expected) {
+    match daemon_control::terminate_daemon(expected, child) {
         Ok(TerminationResult::GracefulShutdown) => {
             info!("Daemon terminated gracefully");
             println!("✓ Daemon terminated gracefully");

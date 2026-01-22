@@ -1,3 +1,4 @@
+use std::process::Child;
 use std::time::{Duration, Instant};
 use std::{fs, thread};
 
@@ -32,14 +33,20 @@ pub enum TerminationResult {
 /// 4. If still running, send SIGKILL
 /// 5. Verify process is fully terminated
 /// 6. Clean up stale registration files
-pub fn terminate_daemon(expected: &ExpectedDaemon) -> Result<TerminationResult> {
+///
+/// If `child` is provided, it will be used to reap the zombie process after
+/// SIGKILL, ensuring proper cleanup when the overseer is the parent process.
+pub fn terminate_daemon(
+    expected: &ExpectedDaemon,
+    child: Option<&mut Child>,
+) -> Result<TerminationResult> {
     info!(
         pid = expected.pid,
         instance_id = %expected.instance_id,
         "Starting daemon termination protocol"
     );
 
-    match verify_and_terminate(expected) {
+    match verify_and_terminate(expected, child) {
         Ok(result) => {
             cleanup_registration_files();
             info!(result = ?result, "Daemon termination complete");
@@ -119,7 +126,15 @@ pub fn cleanup_existing_sessions() -> Result<()> {
 }
 
 /// Verifies process identity and performs termination.
-fn verify_and_terminate(expected: &ExpectedDaemon) -> Result<TerminationResult> {
+///
+/// If `child` is provided, it will be used to reap the zombie process after
+/// SIGKILL. This is necessary when the calling process is the parent of the
+/// daemon, because `kill(pid, 0)` returns 0 for zombie processes until they
+/// are reaped via `wait()`.
+fn verify_and_terminate(
+    expected: &ExpectedDaemon,
+    mut child: Option<&mut Child>,
+) -> Result<TerminationResult> {
     if !is_process_running(expected.pid) {
         info!(pid = expected.pid, "Process already gone before termination");
         return Ok(TerminationResult::AlreadyGone);
@@ -137,7 +152,29 @@ fn verify_and_terminate(expected: &ExpectedDaemon) -> Result<TerminationResult> 
 
     let deadline = Instant::now() + Duration::from_secs(TERMINATION_GRACE_PERIOD_SECS);
     while Instant::now() < deadline {
-        if !is_process_running(expected.pid) {
+        // Try to reap the child if it has exited (avoids zombie state)
+        if let Some(ref mut c) = child {
+            match c.try_wait() {
+                Ok(Some(status)) => {
+                    info!(
+                        pid = expected.pid,
+                        exit_status = ?status,
+                        "Process terminated gracefully via SIGTERM (reaped child)"
+                    );
+                    return Ok(TerminationResult::GracefulShutdown);
+                }
+                Ok(None) => {
+                    // Child still running, continue waiting
+                }
+                Err(e) => {
+                    debug!(
+                        pid = expected.pid,
+                        error = %e,
+                        "Failed to check child status"
+                    );
+                }
+            }
+        } else if !is_process_running(expected.pid) {
             info!(pid = expected.pid, "Process terminated gracefully via SIGTERM");
             return Ok(TerminationResult::GracefulShutdown);
         }
@@ -151,7 +188,35 @@ fn verify_and_terminate(expected: &ExpectedDaemon) -> Result<TerminationResult> 
     );
     send_sigkill(expected.pid)?;
 
-    thread::sleep(Duration::from_secs(1));
+    // Allow a moment for the kernel to process the signal
+    thread::sleep(Duration::from_millis(100));
+
+    // If we have the child handle, use wait() to reap the zombie.
+    // This is critical because kill(pid, 0) returns 0 for zombie processes,
+    // making them appear "still running" until they are reaped by their parent.
+    if let Some(ref mut c) = child {
+        match c.wait() {
+            Ok(status) => {
+                info!(
+                    pid = expected.pid,
+                    exit_status = ?status,
+                    "Process terminated via SIGKILL (reaped child)"
+                );
+                return Ok(TerminationResult::ForcefulKill);
+            }
+            Err(e) => {
+                // wait() failed, fall back to kill(pid, 0) check
+                debug!(
+                    pid = expected.pid,
+                    error = %e,
+                    "Failed to wait on child, falling back to process check"
+                );
+            }
+        }
+    }
+
+    // Fallback: wait a bit more and check via kill(pid, 0)
+    thread::sleep(Duration::from_millis(900));
 
     if is_process_running(expected.pid) {
         let reason = format!("Process {} still running after SIGKILL", expected.pid);
