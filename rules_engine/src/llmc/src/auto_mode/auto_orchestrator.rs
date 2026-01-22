@@ -425,22 +425,51 @@ fn process_idle_workers(
                     ))
                 );
                 info!(worker = %worker_name, task_len = task.len(), "Assigning task to worker");
-                assign_task_to_worker(state, llmc_config, &worker_name, &task, logger)?;
+                if let Err(e) =
+                    assign_task_to_worker(state, llmc_config, &worker_name, &task, logger)
+                {
+                    // Task assignment failures are non-fatal. Log and continue
+                    // with next worker. This follows the "daemon never crashes"
+                    // principle from llmc.md.
+                    eprintln!(
+                        "{}",
+                        color_theme::error(format!(
+                            "[{}] Task assignment failed (will retry): {}",
+                            worker_name, e
+                        ))
+                    );
+                    error!(
+                        worker = %worker_name,
+                        error = %e,
+                        "Task assignment failed - continuing with next worker"
+                    );
+                    continue;
+                }
                 any_task_assigned = true;
             }
             TaskPoolResult::NoTasksAvailable => {
                 // No tasks available, skip this worker
             }
             TaskPoolResult::Error(e) => {
+                // Task pool errors are non-fatal. Log and continue - the daemon
+                // will retry on the next patrol cycle. This follows the "daemon
+                // never crashes" principle from llmc.md.
                 eprintln!(
                     "{}",
-                    color_theme::error(format!(
-                        "[{}] Task pool command failed: {}",
+                    color_theme::warning(format!(
+                        "[{}] Task pool command failed (will retry): {}",
                         worker_name, e
                     ))
                 );
-                error!(worker = %worker_name, error = %e, "Task pool command failed");
-                return Err(e.into());
+                error!(
+                    worker = %worker_name,
+                    error = %e,
+                    exit_code = ?e.exit_code,
+                    "Task pool command failed - continuing without task assignment"
+                );
+                // Break the loop since the same command will likely fail for
+                // other workers too. Next patrol cycle will retry.
+                break;
             }
         }
     }
@@ -583,7 +612,8 @@ fn process_completed_workers(
                         let source_repo = PathBuf::from(&llmc_config.repo.source);
                         auto_accept::release_task_pool_claims(&source_repo, logger);
 
-                        // Run post-accept command if configured
+                        // Run post-accept command if configured. Failures are
+                        // non-fatal since the commit was already merged.
                         debug!(
                             worker = %worker_name,
                             post_accept_command = ?auto_cfg.post_accept_command,
@@ -595,15 +625,22 @@ fn process_completed_workers(
                             &auto_cfg,
                             logger,
                         ) {
+                            // Post-accept failures are non-fatal. The commit was
+                            // already merged - we log and continue. This follows
+                            // the "daemon never crashes" principle from llmc.md.
                             eprintln!(
                                 "{}",
-                                color_theme::error(format!(
-                                    "[{}] Post-accept command failed: {}",
+                                color_theme::warning(format!(
+                                    "[{}] Post-accept command failed (commit already merged): {}",
                                     worker_name, e
                                 ))
                             );
-                            error!(worker = %worker_name, error = %e, "Post-accept command failed");
-                            return Err(e.into());
+                            error!(
+                                worker = %worker_name,
+                                commit = %commit_sha,
+                                error = %e,
+                                "Post-accept command failed - commit was already merged, continuing"
+                            );
                         }
                     }
                     AutoAcceptResult::AcceptedWithCleanupFailure { commit_sha, cleanup_error } => {
@@ -640,7 +677,8 @@ fn process_completed_workers(
                         let source_repo = PathBuf::from(&llmc_config.repo.source);
                         auto_accept::release_task_pool_claims(&source_repo, logger);
 
-                        // Still run post-accept command since the accept succeeded
+                        // Still run post-accept command since the accept succeeded.
+                        // Failures are non-fatal since the commit was already merged.
                         debug!(
                             worker = %worker_name,
                             post_accept_command = ?auto_cfg.post_accept_command,
@@ -652,15 +690,22 @@ fn process_completed_workers(
                             &auto_cfg,
                             logger,
                         ) {
+                            // Post-accept failures are non-fatal. The commit was
+                            // already merged - we log and continue. This follows
+                            // the "daemon never crashes" principle from llmc.md.
                             eprintln!(
                                 "{}",
-                                color_theme::error(format!(
-                                    "[{}] Post-accept command failed: {}",
+                                color_theme::warning(format!(
+                                    "[{}] Post-accept command failed (commit already merged): {}",
                                     worker_name, e
                                 ))
                             );
-                            error!(worker = %worker_name, error = %e, "Post-accept command failed");
-                            return Err(e.into());
+                            error!(
+                                worker = %worker_name,
+                                commit = %commit_sha,
+                                error = %e,
+                                "Post-accept command failed - commit was already merged, continuing"
+                            );
                         }
                     }
                     AutoAcceptResult::NoChanges => {
@@ -723,12 +768,23 @@ fn process_completed_workers(
                 }
             }
             Err(e) => {
+                // Auto accept errors are non-fatal for individual workers. The
+                // daemon continues processing other workers. This follows the
+                // "daemon never crashes" principle from llmc.md. The specific
+                // worker may need manual intervention (llmc reset).
                 eprintln!(
                     "{}",
-                    color_theme::error(format!("[{}] Auto accept failed: {}", worker_name, e))
+                    color_theme::error(format!(
+                        "[{}] Auto accept failed (will retry next cycle): {}",
+                        worker_name, e
+                    ))
                 );
-                error!(worker = %worker_name, error = %e, "Auto accept failed");
-                return Err(e.into());
+                error!(
+                    worker = %worker_name,
+                    error = %e,
+                    "Auto accept failed - continuing with other workers, will retry next cycle"
+                );
+                // Continue with other workers rather than crashing
             }
         }
     }
