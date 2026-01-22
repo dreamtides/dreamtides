@@ -5,7 +5,9 @@ use std::time::{SystemTime, UNIX_EPOCH};
 
 use anyhow::{Context, Result, bail};
 use serde::{Deserialize, Serialize};
+use tracing::trace;
 
+use crate::auto_mode::auto_workers;
 use crate::config::{self, Config};
 use crate::patrol::Patrol;
 /// Worker state machine states
@@ -223,6 +225,26 @@ impl State {
     /// Saves state to the given path with atomic writes and backup
     pub fn save(&self, path: &Path) -> Result<()> {
         validate_state(self)?;
+
+        let total_workers = self.workers.len();
+        let auto_worker_count =
+            self.workers.values().filter(|w| auto_workers::is_auto_worker(&w.name)).count();
+        let auto_worker_names: Vec<&str> = self
+            .workers
+            .values()
+            .filter(|w| auto_workers::is_auto_worker(&w.name))
+            .map(|w| w.name.as_str())
+            .collect();
+        trace!(
+            path = %path.display(),
+            total_workers,
+            auto_worker_count,
+            ?auto_worker_names,
+            auto_mode = self.auto_mode,
+            daemon_running = self.daemon_running,
+            "Saving state"
+        );
+
         if let Some(parent) = path.parent() {
             fs::create_dir_all(parent).with_context(|| {
                 format!("Failed to create state directory: {}", parent.display())

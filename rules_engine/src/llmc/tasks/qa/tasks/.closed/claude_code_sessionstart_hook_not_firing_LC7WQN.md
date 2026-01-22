@@ -11,7 +11,8 @@ labels:
 - hooks
 - llmc-auto
 created-at: 2026-01-22T03:02:27.377971Z
-updated-at: 2026-01-22T05:11:40.369877Z
+updated-at: 2026-01-22T05:43:25.446939Z
+closed-at: 2026-01-22T05:43:25.446939Z
 ---
 
 # Bug: Claude Code SessionStart Hook Not Firing Automatically

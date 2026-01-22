@@ -157,6 +157,7 @@ fn run_orchestration_loop(
     let mut iteration_count: u64 = 0;
     let loop_start_time = std::time::Instant::now();
     let mut waiting_for_tasks_printed = false;
+    let expected_auto_worker_count = auto_config.concurrency as usize;
 
     while !shutdown.load(Ordering::SeqCst) && shutdown_error.is_none() {
         thread::sleep(Duration::from_secs(1));
@@ -198,6 +199,36 @@ fn run_orchestration_loop(
             ?auto_worker_states,
             "Auto mode loop iteration"
         );
+
+        // Sanity check: detect if auto workers unexpectedly disappeared from state.
+        // This can happen if the state file is corrupted or overwritten by another
+        // process (e.g., a test running in the same LLMC root).
+        let current_auto_worker_count = auto_worker_states.len();
+        if current_auto_worker_count == 0 && expected_auto_worker_count > 0 {
+            error!(
+                expected = expected_auto_worker_count,
+                found = current_auto_worker_count,
+                iteration = iteration_count,
+                state_path = %state_path.display(),
+                "CRITICAL: Auto workers disappeared from state! This indicates state file \
+                 corruption, possibly from another process or a test overwriting state.json. \
+                 Check if any worker was running a task that modified the LLMC state file."
+            );
+            shutdown_error = Some(format!(
+                "Auto workers unexpectedly disappeared from state (expected {}, found {}). \
+                 State file may have been corrupted or overwritten by another process.",
+                expected_auto_worker_count, current_auto_worker_count
+            ));
+            break;
+        } else if current_auto_worker_count < expected_auto_worker_count {
+            warn!(
+                expected = expected_auto_worker_count,
+                found = current_auto_worker_count,
+                iteration = iteration_count,
+                state_path = %state_path.display(),
+                "Some auto workers are missing from state - possible state corruption"
+            );
+        }
 
         // Warn if workers are stuck in Offline state for too long (no SessionStart
         // hook)

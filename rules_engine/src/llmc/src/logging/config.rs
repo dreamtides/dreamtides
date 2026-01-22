@@ -1,9 +1,15 @@
+use std::path::PathBuf;
+
 use anyhow::{Context, Result};
 use tracing_subscriber::layer::SubscriberExt;
 use tracing_subscriber::util::SubscriberInitExt;
 use tracing_subscriber::{EnvFilter, Layer, fmt};
 
 use crate::logging::writer::SizeRotatingWriter;
+
+pub fn get_log_path() -> PathBuf {
+    crate::config::get_llmc_root().join("logs").join("llmc.jsonl")
+}
 
 pub fn init_logging(verbose: bool) -> Result<()> {
     let llmc_root = crate::config::get_llmc_root();

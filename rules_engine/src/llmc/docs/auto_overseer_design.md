@@ -179,6 +179,21 @@ their changes in the source repository.
 - Rebase failure during accept (after worker was ready)
 - State file corruption
 - Hook IPC failures
+- Auto workers unexpectedly disappear from state (see below)
+
+**State corruption detection:**
+
+The daemon monitors for state file corruption by tracking the expected number of
+auto workers. Each iteration of the main loop verifies that the loaded state
+contains the expected auto workers:
+
+- If all auto workers disappear (count goes from N to 0): immediate shutdown
+  with detailed error message indicating possible state file corruption
+- If some auto workers are missing (count decreases): warning logged
+- Common cause: A worker running a test that uses `LLMC_ROOT` incorrectly and
+  overwrites the production state file
+
+State saves include trace-level logging of worker counts to aid debugging.
 
 Shutdown sequence for hard failures:
 
@@ -458,6 +473,7 @@ Recovery classification:
 | # | Failure | Detection | Recovery | Type |
 |---|---------|-----------|----------|------|
 | 20 | state.json corruption | JSON parse error | Overseer runs `llmc doctor --rebuild` | AI |
+| 20a | state.json overwritten by test | Auto worker count drops to zero | Daemon shuts down with detailed error | AI |
 | 21 | config.toml syntax error | TOML parse error | Overseer fixes TOML syntax | AI |
 | 22 | Hook IPC socket failure | Socket operations fail | Overseer recreates socket | AI |
 | 23 | .llmc directory permissions | File operations fail | Overseer fixes permissions | AI |

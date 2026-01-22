@@ -58,9 +58,14 @@ pub struct LogTailer {
 ///
 /// Performs periodic health checks to detect daemon failures. The overseer
 /// uses this to decide when to terminate and remediate.
+///
+/// Monitors two log files:
+/// - `auto.log`: Auto-mode specific events (task assignments, accepts)
+/// - `llmc.jsonl`: Main daemon log including patrol warnings and errors
 pub struct HealthMonitor {
     config: OverseerConfig,
-    log_tailer: LogTailer,
+    auto_log_tailer: LogTailer,
+    main_log_tailer: LogTailer,
 }
 /// Reads the daemon registration and returns expected daemon info.
 ///
@@ -205,9 +210,11 @@ impl LogTailer {
 impl HealthMonitor {
     /// Creates a new health monitor with the given configuration.
     pub fn new(config: OverseerConfig) -> Self {
-        let log_path = auto_logging::auto_log_path();
-        let log_tailer = LogTailer::new(log_path);
-        HealthMonitor { config, log_tailer }
+        let auto_log_path = auto_logging::auto_log_path();
+        let auto_log_tailer = LogTailer::new(auto_log_path);
+        let main_log_path = crate::logging::config::get_log_path();
+        let main_log_tailer = LogTailer::new(main_log_path);
+        HealthMonitor { config, auto_log_tailer, main_log_tailer }
     }
 
     /// Performs a complete health check of the daemon.
@@ -298,9 +305,20 @@ impl HealthMonitor {
         None
     }
 
-    /// Checks for errors or warnings in the daemon log.
+    /// Checks for errors or warnings in daemon logs.
+    ///
+    /// Monitors both auto.log (auto-mode events) and llmc.jsonl (main daemon
+    /// log with patrol warnings). The main log is checked first since it
+    /// contains warnings about issues like unknown workers that indicate
+    /// state corruption.
     fn check_logs(&mut self) -> Option<HealthStatus> {
-        self.log_tailer.check_for_errors().map(|message| HealthStatus::LogError { message })
+        if let Some(message) = self.main_log_tailer.check_for_errors() {
+            return Some(HealthStatus::LogError { message });
+        }
+        if let Some(message) = self.auto_log_tailer.check_for_errors() {
+            return Some(HealthStatus::LogError { message });
+        }
+        None
     }
 
     /// Checks for stalled progress (no task completions within timeout).
