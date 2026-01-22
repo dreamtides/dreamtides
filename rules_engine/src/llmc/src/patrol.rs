@@ -65,7 +65,11 @@ pub fn handle_stop(
     }
 
     let Some(worker) = state.get_worker(worker_name) else {
-        tracing::warn!("Stop hook received for unknown worker '{}'", worker_name);
+        tracing::error!(
+            worker = %worker_name,
+            "Stop hook received for unknown worker - this indicates state file corruption or \
+             misconfigured hooks. Run 'llmc doctor --repair' to diagnose."
+        );
         return Ok(());
     };
     let current_status = worker.status;
@@ -77,19 +81,20 @@ pub fn handle_stop(
             let has_commits = match git::has_commits_ahead_of(&worktree_path, "origin/master") {
                 Ok(v) => v,
                 Err(e) => {
-                    tracing::warn!(
+                    tracing::error!(
                         worker = %worker_name,
                         error = %e,
-                        "Stop hook: failed to check commits ahead of origin/master"
+                        "Stop hook: failed to check commits - task completion detection may have \
+                         failed. Worker may be stuck in Working state. Check worktree integrity."
                     );
                     return Ok(());
                 }
             };
             let has_uncommitted = git::has_uncommitted_changes(&worktree_path)?;
             if !has_commits && !has_uncommitted {
-                tracing::warn!(
+                tracing::info!(
                     worker = %worker_name,
-                    "Stop hook: task completed without any commits, transitioning to NoChanges"
+                    "Stop hook: task completed without commits (e.g., review-only task), transitioning to NoChanges"
                 );
                 let transition = WorkerTransition::ToNoChanges;
                 if let Some(w) = state.get_worker_mut(worker_name) {
@@ -149,10 +154,13 @@ pub fn handle_stop(
             let current_sha = match git::get_head_commit(&worktree_path) {
                 Ok(sha) => sha,
                 Err(e) => {
-                    tracing::warn!(
-                        "Stop hook: failed to get HEAD for Reviewing worker '{}': {}",
-                        worker_name,
-                        e
+                    tracing::error!(
+                        worker = %worker_name,
+                        error = %e,
+                        worktree = %worktree_path.display(),
+                        "Stop hook: failed to get HEAD for Reviewing worker - git repository may \
+                         be corrupted. Run 'llmc reset {}' to recover.",
+                        worker_name
                     );
                     return Ok(());
                 }
@@ -355,11 +363,10 @@ impl Patrol {
                             // Before resetting, check if there's a rebase in progress
                             // which would indicate the worker was rebasing when daemon restarted
                             if git::is_rebase_in_progress(worktree_path) {
-                                tracing::warn!(
+                                tracing::info!(
                                     worker = %worker_name,
-                                    "Idle worker has diverged history AND active rebase - \
-                                     this indicates the worker was rebasing when daemon restarted. \
-                                     Transitioning to Rebasing state instead of resetting."
+                                    "Idle worker has diverged history with active rebase - \
+                                     restoring Rebasing state from before daemon restart"
                                 );
                                 if let Some(w) = state.get_worker_mut(&worker_name) {
                                     if let Err(e) =
@@ -392,9 +399,11 @@ impl Patrol {
                                 }
                                 Err(e) => {
                                     tracing::warn!(
-                                        "Failed to reset idle worker '{}' to origin/master: {}",
-                                        worker_name,
-                                        e
+                                        worker = %worker_name,
+                                        error = %e,
+                                        "Failed to reset idle worker to origin/master. Worker may \
+                                         have stale commits. Run 'llmc reset {}' to manually recover.",
+                                        worker_name
                                     );
                                 }
                             }
@@ -421,17 +430,23 @@ impl Patrol {
                     }
                     Ok(false) => {}
                     Err(e) => {
-                        tracing::warn!(
-                            "Failed to check commits ahead for '{}': {}",
-                            worker_name,
-                            e
+                        tracing::error!(
+                            worker = %worker_name,
+                            error = %e,
+                            "Failed to check commits ahead of master - worker state may be stale. \
+                             Completed work could go undetected. Check worktree at {}",
+                            worktree_path.display()
                         );
                     }
                 }
                 match git::is_worktree_clean(worktree_path) {
                     Ok(false) => {
                         tracing::warn!(
-                            "Worker '{}' is idle but has dirty worktree, marking as error",
+                            worker = %worker_name,
+                            worktree = %worktree_path.display(),
+                            "Worker is idle but has dirty worktree - possible uncommitted work. \
+                             Marking as error. Run 'llmc reset {}' to recover (will discard changes), \
+                             or manually commit/discard changes and run 'llmc doctor --repair'.",
                             worker_name
                         );
                         let transition =
@@ -443,10 +458,12 @@ impl Patrol {
                     }
                     Ok(true) => {}
                     Err(e) => {
-                        tracing::warn!(
-                            "Failed to check worktree cleanliness for '{}': {}",
-                            worker_name,
-                            e
+                        tracing::error!(
+                            worker = %worker_name,
+                            error = %e,
+                            worktree = %worktree_path.display(),
+                            "Failed to check worktree cleanliness - git status command failed. \
+                             Check if worktree exists and git repository is intact."
                         );
                     }
                 }
@@ -502,18 +519,22 @@ impl Patrol {
                         }
                         Ok(false) => {}
                         Err(e) => {
-                            tracing::warn!(
-                                "Failed to check worktree cleanliness for error worker '{}': {}",
-                                worker_name,
-                                e
+                            tracing::error!(
+                                worker = %worker_name,
+                                error = %e,
+                                worktree = %worktree_path.display(),
+                                "Failed to check worktree cleanliness for error worker - \
+                                 cannot determine recovery path. Check git repository integrity."
                             );
                         }
                     },
                     Err(e) => {
-                        tracing::warn!(
-                            "Failed to check commits ahead for error worker '{}': {}",
-                            worker_name,
-                            e
+                        tracing::error!(
+                            worker = %worker_name,
+                            error = %e,
+                            worktree = %worktree_path.display(),
+                            "Failed to check commits ahead for error worker - \
+                             cannot determine recovery path. Check git repository integrity."
                         );
                     }
                 }
@@ -621,20 +642,22 @@ impl Patrol {
                         }
                     }
                     Err(e) => {
-                        tracing::warn!(
+                        tracing::error!(
                             worker = %worker_name,
                             error = %e,
-                            "Failed to check commits ahead of origin/master"
+                            worktree = %worktree_path.display(),
+                            "Failed to check commits ahead of origin/master - worker completion \
+                             may not be detected. Check git repository integrity."
                         );
                     }
                 }
             }
             if worker_status != WorkerStatus::Rebasing && git::is_rebase_in_progress(worktree_path)
             {
-                tracing::warn!(
-                    "Worker '{}' has orphaned rebase state (status: {:?}), attempting cleanup",
-                    worker_name,
-                    worker_status
+                tracing::info!(
+                    worker = %worker_name,
+                    status = ?worker_status,
+                    "Orphaned rebase state detected, attempting automatic cleanup"
                 );
                 match git::abort_rebase(worktree_path) {
                     Ok(()) => {
@@ -744,9 +767,11 @@ impl Patrol {
                 continue;
             }
             let Some(self_review_config) = get_self_review_config(config) else {
-                tracing::warn!(
-                    "Worker '{}' has pending_self_review but no self_review config in defaults",
-                    worker_name
+                tracing::error!(
+                    worker = %worker_name,
+                    "Worker has pending_self_review but [defaults.self_review] section is \
+                     missing from config.toml. Add self_review config or disable self_review \
+                     for this worker."
                 );
                 continue;
             };
@@ -1041,10 +1066,11 @@ fn handle_session_start(
     }
 
     let Some(worker) = state.get_worker(worker_name) else {
-        tracing::warn!(
-            "SessionStart hook received for unknown worker '{}' (session: {})",
-            worker_name,
-            session_id
+        tracing::error!(
+            worker = %worker_name,
+            session_id = %session_id,
+            "SessionStart hook received for unknown worker - state file may be corrupted \
+             or hooks are misconfigured. Run 'llmc doctor --repair' to diagnose."
         );
         return Ok(());
     };
@@ -1096,10 +1122,11 @@ fn handle_session_end(
     }
 
     let Some(worker) = state.get_worker(worker_name) else {
-        tracing::warn!(
-            "SessionEnd hook received for unknown worker '{}' (reason: {})",
-            worker_name,
-            reason
+        tracing::error!(
+            worker = %worker_name,
+            reason = %reason,
+            "SessionEnd hook received for unknown worker - state file may be corrupted \
+             or hooks are misconfigured. Run 'llmc doctor --repair' to diagnose."
         );
         return Ok(());
     };
@@ -1150,7 +1177,10 @@ fn handle_session_end(
                 worker = %worker_name,
                 crash_count = w.crash_count,
                 reason = %reason,
-                "Worker crashed (non-logout SessionEnd)"
+                "Worker crashed (non-logout SessionEnd). Will auto-restart with exponential \
+                 backoff. Use 'llmc attach {}' to inspect or 'llmc reset {}' to force reset.",
+                worker_name,
+                worker_name
             );
         }
     }

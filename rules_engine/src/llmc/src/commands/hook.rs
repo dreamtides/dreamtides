@@ -28,10 +28,11 @@ pub async fn run_hook_stop(worker: &str) -> Result<()> {
             input
         }
         Err(e) => {
-            tracing::warn!(
+            tracing::info!(
                 worker = worker,
                 error = %e,
-                "Stop hook: failed to parse stdin JSON, using defaults"
+                "Stop hook: failed to parse stdin JSON, using defaults (this is normal \
+                 if Claude Code didn't provide JSON input)"
             );
             ClaudeHookInput::default()
         }
@@ -53,10 +54,11 @@ pub async fn run_hook_session_start(worker: &str) -> Result<()> {
     let input = match read_stdin_json() {
         Ok(input) => input,
         Err(e) => {
-            tracing::warn!(
+            tracing::info!(
                 worker = worker,
                 error = %e,
-                "SessionStart hook: failed to parse stdin JSON, using defaults"
+                "SessionStart hook: failed to parse stdin JSON, using defaults (this is \
+                 normal if Claude Code didn't provide JSON input)"
             );
             ClaudeHookInput::default()
         }
@@ -86,10 +88,11 @@ pub async fn run_hook_session_end(worker: &str, cli_reason: &str) -> Result<()> 
     let input = match read_stdin_json() {
         Ok(input) => input,
         Err(e) => {
-            tracing::warn!(
+            tracing::info!(
                 worker = worker,
                 error = %e,
-                "SessionEnd hook: failed to parse stdin JSON, using defaults"
+                "SessionEnd hook: failed to parse stdin JSON, using defaults (this is \
+                 normal if Claude Code didn't provide JSON input)"
             );
             ClaudeHookInput::default()
         }
@@ -118,13 +121,14 @@ async fn send_event_gracefully(
 
     if !socket_path.exists() {
         let elapsed_ms = start_time.elapsed().as_millis();
-        tracing::warn!(
+        tracing::info!(
             hook = hook_name,
             worker = worker,
             context = context,
             socket_path = %socket_path.display(),
             elapsed_ms = elapsed_ms,
-            "Hook skipped: daemon not running (socket not found)"
+            "Hook skipped: daemon not running (socket not found) - this is expected \
+             when llmc is not active"
         );
         return;
     }
@@ -141,7 +145,8 @@ async fn send_event_gracefully(
                     context = context,
                     error = err,
                     elapsed_ms = elapsed_ms,
-                    "Hook event rejected by daemon"
+                    "Hook event rejected by daemon - daemon received event but could not \
+                     process it. Check daemon logs for details."
                 );
             } else {
                 tracing::info!(
@@ -155,24 +160,28 @@ async fn send_event_gracefully(
         }
         Ok(Err(e)) => {
             let elapsed_ms = start_time.elapsed().as_millis();
-            tracing::warn!(
+            tracing::error!(
                 hook = hook_name,
                 worker = worker,
                 context = context,
                 error = %e,
                 elapsed_ms = elapsed_ms,
-                "Hook failed to send event to daemon"
+                socket_path = %socket_path.display(),
+                "Hook failed to send event to daemon - socket exists but connection failed. \
+                 Daemon may have crashed. Worker state changes may not be detected."
             );
         }
         Err(_) => {
             let elapsed_ms = start_time.elapsed().as_millis();
-            tracing::warn!(
+            tracing::error!(
                 hook = hook_name,
                 worker = worker,
                 context = context,
                 timeout_secs = CONNECT_TIMEOUT.as_secs(),
                 elapsed_ms = elapsed_ms,
-                "Hook timed out connecting to daemon"
+                socket_path = %socket_path.display(),
+                "Hook timed out connecting to daemon - daemon may be overloaded or frozen. \
+                 Worker state changes may not be detected. Consider restarting with 'llmc down && llmc up'."
             );
         }
     }

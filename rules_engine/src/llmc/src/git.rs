@@ -77,7 +77,11 @@ pub fn remove_worktree(repo: &Path, worktree_path: &Path, force: bool) -> Result
         cmd.arg(worktree_path).output().context("Failed to execute git worktree remove")?;
     if !output.status.success() {
         let stderr = String::from_utf8_lossy(&output.stderr);
-        tracing::warn!("git worktree remove failed: {}", stderr);
+        tracing::info!(
+            worktree = %worktree_path.display(),
+            error = %stderr,
+            "git worktree remove failed, attempting recovery"
+        );
         if !force {
             tracing::info!("Retrying worktree removal with --force");
             let force_output = Command::new("git")
@@ -92,9 +96,10 @@ pub fn remove_worktree(repo: &Path, worktree_path: &Path, force: bool) -> Result
             if force_output.status.success() {
                 return Ok(());
             }
-            tracing::warn!(
-                "git worktree remove --force also failed: {}",
-                String::from_utf8_lossy(&force_output.stderr)
+            tracing::info!(
+                worktree = %worktree_path.display(),
+                error = %String::from_utf8_lossy(&force_output.stderr),
+                "git worktree remove --force also failed, falling back to manual removal"
             );
         }
         let _ = Command::new("git").arg("-C").arg(repo).arg("worktree").arg("prune").output();
@@ -108,9 +113,9 @@ pub fn remove_worktree(repo: &Path, worktree_path: &Path, force: bool) -> Result
                 .output()
                 .context("Failed to execute git worktree prune")?;
             if !prune_output.status.success() {
-                tracing::warn!(
-                    "git worktree prune failed: {}",
-                    String::from_utf8_lossy(&prune_output.stderr)
+                tracing::info!(
+                    error = %String::from_utf8_lossy(&prune_output.stderr),
+                    "git worktree prune failed (non-fatal, continuing)"
                 );
             }
         }
@@ -365,7 +370,7 @@ pub fn rebase_onto(worktree: &Path, target: &str) -> Result<RebaseResult> {
             "Stale rebase state detected, cleaning up before starting new rebase"
         );
         if let Err(e) = abort_rebase(worktree) {
-            tracing::warn!(
+            tracing::info!(
                 operation = "git_operation", operation_type = "rebase", repo_path = %
                 worktree.display(), error = % e,
                 "Failed to abort stale rebase, will attempt to proceed anyway"
@@ -414,10 +419,10 @@ pub fn rebase_onto(worktree: &Path, target: &str) -> Result<RebaseResult> {
             return Ok(RebaseResult { success: false, conflicts });
         }
         if is_lock_file_error(&stderr) {
-            tracing::warn!(
+            tracing::info!(
                 operation = "git_operation", operation_type = "rebase", repo_path = %
                 worktree.display(), target, attempt, max_retries = GIT_LOCK_RETRY_COUNT,
-                "Git lock file detected, will retry"
+                "Git lock file detected, will retry automatically"
             );
             last_error = Some(stderr.to_string());
             continue;
@@ -425,7 +430,7 @@ pub fn rebase_onto(worktree: &Path, target: &str) -> Result<RebaseResult> {
         if stderr.contains("already a rebase-merge directory")
             || stderr.contains("already a rebase-apply directory")
         {
-            tracing::warn!(
+            tracing::info!(
                 operation = "git_operation", operation_type = "rebase", repo_path = %
                 worktree.display(), target, attempt,
                 "Stale rebase directory detected, attempting force cleanup and retry"
@@ -466,10 +471,11 @@ pub fn is_rebase_in_progress(worktree: &Path) -> bool {
     let git_dir = match get_git_dir(worktree) {
         Ok(dir) => dir,
         Err(e) => {
-            tracing::warn!(
-                "Failed to get git directory for {}: {}. Assuming no rebase in progress.",
-                worktree.display(),
-                e
+            tracing::info!(
+                worktree = %worktree.display(),
+                error = %e,
+                "Failed to get git directory, assuming no rebase in progress (if worktree \
+                 doesn't exist or isn't a git repo, this is expected)"
             );
             return false;
         }
@@ -550,25 +556,25 @@ pub fn abort_rebase(worktree: &Path) -> Result<()> {
         if output.status.success() {
             let after = logging_git::capture_state(worktree).ok();
             let duration_ms = start.elapsed().as_millis() as u64;
-            tracing::warn!(
+            tracing::info!(
                 operation = "git_operation", operation_type = "rebase_abort", repo_path =
                 % worktree.display(), duration_ms, ? before, ? after, result = "success",
-                retries = attempt, "Aborted rebase"
+                retries = attempt, "Successfully aborted rebase"
             );
             return Ok(());
         }
         let stderr = String::from_utf8_lossy(&output.stderr);
         if is_lock_file_error(&stderr) {
-            tracing::warn!(
+            tracing::info!(
                 operation = "git_operation", operation_type = "rebase_abort", repo_path =
                 % worktree.display(), attempt, max_retries = GIT_LOCK_RETRY_COUNT,
-                "Git lock file detected during rebase abort, will retry"
+                "Git lock file detected during rebase abort, will retry automatically"
             );
             last_error = Some(stderr.to_string());
             continue;
         }
         if stderr.contains("No rebase in progress") {
-            tracing::warn!(
+            tracing::info!(
                 operation = "git_operation", operation_type = "rebase_abort", repo_path =
                 % worktree.display(),
                 "Git says no rebase in progress, attempting force cleanup of rebase directories"
@@ -710,10 +716,10 @@ pub fn fetch_origin(repo: &Path) -> Result<()> {
         }
         let stderr = String::from_utf8_lossy(&output.stderr);
         if is_lock_file_error(&stderr) {
-            tracing::warn!(
+            tracing::info!(
                 operation = "git_operation", operation_type = "fetch", repo_path = % repo
                 .display(), remote = "origin", attempt, max_retries =
-                GIT_LOCK_RETRY_COUNT, "Git lock file detected, will retry"
+                GIT_LOCK_RETRY_COUNT, "Git lock file detected, will retry automatically"
             );
             last_error = Some(stderr.to_string());
             continue;
@@ -807,10 +813,10 @@ pub fn checkout_branch(repo: &Path, branch: &str) -> Result<()> {
         }
         let stderr = String::from_utf8_lossy(&output.stderr);
         if is_lock_file_error(&stderr) {
-            tracing::warn!(
+            tracing::info!(
                 operation = "git_operation", operation_type = "checkout", repo_path = %
                 repo.display(), branch, attempt, max_retries = GIT_LOCK_RETRY_COUNT,
-                "Git lock file detected during checkout, will retry"
+                "Git lock file detected during checkout, will retry automatically"
             );
             last_error = Some(stderr.to_string());
             continue;
@@ -848,10 +854,10 @@ pub fn reset_to_ref(repo: &Path, ref_name: &str) -> Result<()> {
         }
         let stderr = String::from_utf8_lossy(&output.stderr);
         if is_lock_file_error(&stderr) {
-            tracing::warn!(
+            tracing::info!(
                 operation = "git_operation", operation_type = "reset", repo_path = % repo
                 .display(), ref_name, attempt, max_retries = GIT_LOCK_RETRY_COUNT,
-                "Git lock file detected during reset, will retry"
+                "Git lock file detected during reset, will retry automatically"
             );
             last_error = Some(stderr.to_string());
             continue;
@@ -888,10 +894,10 @@ pub fn pull_rebase(worktree: &Path) -> Result<()> {
         }
         let stderr = String::from_utf8_lossy(&fetch_output.stderr);
         if is_lock_file_error(&stderr) && attempt < GIT_LOCK_RETRY_COUNT {
-            tracing::warn!(
+            tracing::info!(
                 operation = "git_operation", operation_type = "fetch", repo_path = %
                 worktree.display(), attempt, max_retries = GIT_LOCK_RETRY_COUNT,
-                "Git lock file detected during fetch, will retry"
+                "Git lock file detected during fetch, will retry automatically"
             );
             continue;
         }
@@ -918,10 +924,10 @@ pub fn pull_rebase(worktree: &Path) -> Result<()> {
         }
         let stderr = String::from_utf8_lossy(&rebase_output.stderr);
         if is_lock_file_error(&stderr) {
-            tracing::warn!(
+            tracing::info!(
                 operation = "git_operation", operation_type = "pull_rebase", repo_path =
                 % worktree.display(), attempt, max_retries = GIT_LOCK_RETRY_COUNT,
-                "Git lock file detected during rebase, will retry"
+                "Git lock file detected during rebase, will retry automatically"
             );
             last_error = Some(stderr.to_string());
             continue;
@@ -976,11 +982,11 @@ fn remove_directory_with_retries(path: &Path) -> Result<()> {
                 return Ok(());
             }
             Err(e) => {
-                tracing::warn!(
+                tracing::info!(
                     path = %path.display(),
                     attempt,
                     error = %e,
-                    "Directory removal attempt failed"
+                    "Directory removal attempt failed, will retry automatically"
                 );
                 last_error = Some(e);
             }

@@ -118,7 +118,13 @@ pub fn run_up(options: UpOptions) -> Result<()> {
             Some(rx)
         }
         Err(e) => {
-            tracing::warn!("Failed to start IPC listener (daemon continuing without hooks): {}", e);
+            tracing::error!(
+                error = %e,
+                socket_path = %socket_path.display(),
+                "Failed to start IPC listener - hooks will not work. Task completion \
+                 detection will rely on fallback polling (5 minute delay). Check if another \
+                 llmc instance is running or socket is stale."
+            );
             eprintln!(
                 "Warning: Failed to start IPC listener: {}\nDaemon will continue without hook support.",
                 e
@@ -524,10 +530,11 @@ fn start_worker(name: &str, config: &Config, state: &mut State, verbose: bool) -
             "Killing existing session to ensure clean state on startup"
         );
         if let Err(e) = session::kill_session(&worker_record.session_id) {
-            tracing::warn!(
+            tracing::info!(
                 worker = %name,
                 error = %e,
-                "Failed to kill existing session, attempting to create new one anyway"
+                "Failed to kill existing session, attempting to create new one anyway \
+                 (session may have already exited)"
             );
         }
     }
@@ -561,7 +568,12 @@ fn start_worker(name: &str, config: &Config, state: &mut State, verbose: bool) -
     let worker_mut = state.get_worker_mut(name).unwrap();
     if is_clean {
         if let Err(e) = worker::apply_transition(worker_mut, WorkerTransition::ToOffline) {
-            tracing::warn!("Failed to transition worker '{}' to Offline for hooks: {}", name, e);
+            tracing::info!(
+                worker = %name,
+                error = %e,
+                "Failed to apply state transition to Offline, setting status directly \
+                 (this is a workaround for invalid state machine transitions)"
+            );
             worker_mut.status = WorkerStatus::Offline;
         }
         if verbose {
@@ -581,7 +593,12 @@ fn start_worker(name: &str, config: &Config, state: &mut State, verbose: bool) -
             "Worker has active rebase in progress at startup, transitioning to Rebasing"
         );
         if let Err(e) = worker::apply_transition(worker_mut, WorkerTransition::ToRebasing) {
-            tracing::warn!("Failed to transition worker '{}' to Rebasing: {}", name, e);
+            tracing::info!(
+                worker = %name,
+                error = %e,
+                "Failed to apply state transition to Rebasing, setting status directly \
+                 (this is a workaround for invalid state machine transitions at startup)"
+            );
             worker_mut.status = WorkerStatus::Rebasing;
             worker_mut.last_activity_unix = unix_timestamp_now();
         }
@@ -608,7 +625,12 @@ fn start_worker(name: &str, config: &Config, state: &mut State, verbose: bool) -
         if let Err(e) = worker::apply_transition(worker_mut, WorkerTransition::ToError {
             reason: "Uncommitted changes at startup".to_string(),
         }) {
-            tracing::warn!("Failed to transition worker '{}' to Error: {}", name, e);
+            tracing::info!(
+                worker = %name,
+                error = %e,
+                "Failed to apply state transition to Error, setting status directly \
+                 (this is a workaround for invalid state machine transitions at startup)"
+            );
             worker_mut.status = WorkerStatus::Error;
             worker_mut.last_activity_unix = unix_timestamp_now();
         }
@@ -885,7 +907,12 @@ fn start_offline_workers(config: &mut Config, state: &mut State, verbose: bool) 
         match Config::load(&config_path) {
             Ok(new_config) => *config = new_config,
             Err(e) => {
-                tracing::warn!("Failed to reload config.toml (using existing): {}", e);
+                tracing::info!(
+                    error = %e,
+                    config_path = %config_path.display(),
+                    "Failed to reload config.toml, using existing config (this is \
+                     normal if config file is temporarily locked or has syntax errors)"
+                );
                 if verbose {
                     println!(
                         "  {}",
@@ -914,7 +941,12 @@ fn start_offline_workers(config: &mut Config, state: &mut State, verbose: bool) 
                 if let Some(worker_mut) = state.get_worker_mut(worker_name)
                     && let Err(e) = worker::apply_transition(worker_mut, WorkerTransition::ToIdle)
                 {
-                    tracing::warn!("Failed to transition worker '{}' to Idle: {}", worker_name, e);
+                    tracing::info!(
+                        worker = %worker_name,
+                        error = %e,
+                        "Failed to apply state transition to Idle, setting status directly \
+                         (session exists but state machine transition invalid)"
+                    );
                     worker_mut.status = WorkerStatus::Idle;
                     worker_mut.current_prompt.clear();
                     worker_mut.prompt_cmd = None;

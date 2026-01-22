@@ -100,8 +100,9 @@ pub fn spawn_ipc_listener(socket_path: PathBuf) -> Result<Receiver<HookMessage>>
                             Ok(Some(msg)) => {
                                 tracing::debug!("Received hook event: {:?}", msg.event);
                                 if tx.send(msg).await.is_err() {
-                                    tracing::warn!(
-                                        "Failed to send hook message to channel (receiver dropped)"
+                                    tracing::error!(
+                                        "Failed to send hook message to channel (receiver dropped) \
+                                         - daemon may be shutting down. Hook event will be lost."
                                     );
                                 }
                             }
@@ -109,7 +110,11 @@ pub fn spawn_ipc_listener(socket_path: PathBuf) -> Result<Receiver<HookMessage>>
                                 tracing::debug!("Connection closed without message");
                             }
                             Err(e) => {
-                                tracing::warn!("Error handling connection: {}", e);
+                                tracing::info!(
+                                    error = %e,
+                                    "Error handling IPC connection (this is usually transient \
+                                     and can be ignored unless it happens repeatedly)"
+                                );
                             }
                         }
                     });

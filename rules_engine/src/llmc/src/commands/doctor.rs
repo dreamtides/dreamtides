@@ -589,10 +589,12 @@ fn check_idle_workers_clean(report: &mut DoctorReport) -> Result<()> {
                     });
                 }
                 Err(e) => {
-                    tracing::warn!(
-                        "Failed to check worktree cleanliness for '{}': {}",
-                        worker.name,
-                        e
+                    tracing::error!(
+                        worker = %worker.name,
+                        error = %e,
+                        "Failed to check worktree cleanliness - git repository may be corrupted. \
+                         Run 'llmc reset {}' to recreate worktree.",
+                        worker.name
                     );
                 }
             }

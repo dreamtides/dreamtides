@@ -75,7 +75,11 @@ pub fn run_overseer(
         OverseerDaemonOptions { task_pool_command, concurrency, post_accept_command };
     let result = overseer_loop::run_overseer(&config, &daemon_options);
     if let Err(e) = OverseerRegistration::remove() {
-        tracing::warn!(error = %e, "Failed to remove overseer registration during cleanup");
+        tracing::info!(
+            error = %e,
+            "Failed to remove overseer registration during cleanup (non-fatal, \
+             stale registration will be cleaned up on next startup)"
+        );
     }
     result
 }

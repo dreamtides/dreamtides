@@ -51,7 +51,8 @@ pub fn is_overseer_session_healthy() -> bool {
             tracing::warn!(
                 session = &get_overseer_session_name(),
                 error = %e,
-                "Failed to capture overseer session pane"
+                "Failed to capture overseer session pane - session may be restarting or \
+                 may have crashed. Overseer health check will retry on next poll."
             );
             false
         }
