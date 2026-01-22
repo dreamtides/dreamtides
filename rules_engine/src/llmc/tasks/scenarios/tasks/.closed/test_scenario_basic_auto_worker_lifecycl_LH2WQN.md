@@ -12,7 +12,8 @@ labels:
 - auto-mode
 - llmc-auto
 created-at: 2026-01-21T21:59:20.029973Z
-updated-at: 2026-01-21T22:31:38.813068Z
+updated-at: 2026-01-22T03:06:54.418897Z
+closed-at: 2026-01-22T03:06:54.418897Z
 ---
 
 # Test Scenario: Basic Auto Worker Lifecycle
