@@ -11,7 +11,7 @@ use chrono::{DateTime, Utc};
 use serde::Serialize;
 use tracing::{error, info};
 
-use crate::config;
+use crate::config::{self, LlmcPaths};
 
 const MAX_LOG_SIZE: u64 = 50 * 1024 * 1024;
 
@@ -214,11 +214,18 @@ impl AutoLogger {
     /// Creates a new auto logger and initializes all log files.
     ///
     /// Creates the logs directory if it doesn't exist and opens/creates
-    /// the three dedicated log files.
+    /// the three dedicated log files. Uses LLMC_ROOT from the environment.
     pub fn new() -> Result<Self> {
-        let task_pool = LogWriter::new(task_pool_log_path())?;
-        let post_accept = LogWriter::new(post_accept_log_path())?;
-        let auto = LogWriter::new(auto_log_path())?;
+        Self::new_with_paths(&LlmcPaths::from_env())
+    }
+
+    /// Creates a new auto logger with explicit paths.
+    ///
+    /// Use this in tests to avoid depending on environment variables.
+    pub fn new_with_paths(paths: &LlmcPaths) -> Result<Self> {
+        let task_pool = LogWriter::new(paths.task_pool_log_path())?;
+        let post_accept = LogWriter::new(paths.post_accept_log_path())?;
+        let auto = LogWriter::new(paths.auto_log_path())?;
         Ok(Self {
             task_pool: Arc::new(Mutex::new(task_pool)),
             post_accept: Arc::new(Mutex::new(post_accept)),

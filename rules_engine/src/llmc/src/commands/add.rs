@@ -215,16 +215,33 @@ pub fn is_daemon_running() -> bool {
 }
 
 pub fn create_claude_hook_settings(worktree_path: &Path, worker_name: &str) -> Result<()> {
-    create_claude_hook_settings_impl(worktree_path, worker_name, false)
+    create_claude_hook_settings_with_root(worktree_path, worker_name, &config::get_llmc_root())
 }
 
 pub fn create_claude_hook_settings_silent(worktree_path: &Path, worker_name: &str) -> Result<()> {
-    create_claude_hook_settings_impl(worktree_path, worker_name, true)
+    create_claude_hook_settings_with_root_impl(
+        worktree_path,
+        worker_name,
+        &config::get_llmc_root(),
+        true,
+    )
 }
 
-fn create_claude_hook_settings_impl(
+/// Creates Claude hook settings with an explicit llmc_root.
+///
+/// Use this in tests to avoid depending on the LLMC_ROOT environment variable.
+pub fn create_claude_hook_settings_with_root(
     worktree_path: &Path,
     worker_name: &str,
+    llmc_root: &Path,
+) -> Result<()> {
+    create_claude_hook_settings_with_root_impl(worktree_path, worker_name, llmc_root, false)
+}
+
+fn create_claude_hook_settings_with_root_impl(
+    worktree_path: &Path,
+    worker_name: &str,
+    llmc_root: &Path,
     silent: bool,
 ) -> Result<()> {
     let claude_dir = worktree_path.join(".claude");
@@ -234,7 +251,6 @@ fn create_claude_hook_settings_impl(
         .unwrap_or_else(|_| PathBuf::from("llmc"))
         .to_string_lossy()
         .to_string();
-    let llmc_root = config::get_llmc_root();
     let llmc_root_str = llmc_root.to_string_lossy();
     let settings = serde_json::json!({
         "hooks": {

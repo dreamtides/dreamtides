@@ -1,13 +1,15 @@
 use std::fs;
+use std::path::PathBuf;
 
-use llmc::commands::add::create_claude_hook_settings;
+use llmc::commands::add::create_claude_hook_settings_with_root;
 use tempfile::TempDir;
 
 #[test]
 fn test_hook_settings_include_llmc_root_env_var() {
     let temp_dir = TempDir::new().expect("Failed to create temp dir");
     let worktree_path = temp_dir.path();
-    create_claude_hook_settings(worktree_path, "test-worker")
+    let llmc_root = PathBuf::from("/test/llmc/root");
+    create_claude_hook_settings_with_root(worktree_path, "test-worker", &llmc_root)
         .expect("Failed to create hook settings");
     let settings_path = worktree_path.join(".claude").join("settings.json");
     assert!(settings_path.exists(), "Settings file should exist at {}", settings_path.display());
@@ -21,29 +23,28 @@ fn test_hook_settings_include_llmc_root_env_var() {
 
 #[test]
 fn test_hook_settings_preserve_custom_llmc_root() {
-    let custom_root = "/tmp/custom-llmc-test-12345";
-    unsafe { std::env::set_var("LLMC_ROOT", custom_root) };
+    let custom_root = PathBuf::from("/tmp/custom-llmc-test-12345");
     let temp_dir = TempDir::new().expect("Failed to create temp dir");
     let worktree_path = temp_dir.path();
-    create_claude_hook_settings(worktree_path, "test-worker")
+    create_claude_hook_settings_with_root(worktree_path, "test-worker", &custom_root)
         .expect("Failed to create hook settings");
     let settings_path = worktree_path.join(".claude").join("settings.json");
     let content = fs::read_to_string(&settings_path).expect("Failed to read settings file");
-    let expected_prefix = format!("LLMC_ROOT={}", custom_root);
+    let expected_prefix = format!("LLMC_ROOT={}", custom_root.display());
     assert!(
         content.contains(&expected_prefix),
         "Hook settings should include LLMC_ROOT={} in command. Content:\n{}",
-        custom_root,
+        custom_root.display(),
         content
     );
-    unsafe { std::env::remove_var("LLMC_ROOT") };
 }
 
 #[test]
 fn test_hook_settings_all_hooks_include_llmc_root() {
     let temp_dir = TempDir::new().expect("Failed to create temp dir");
     let worktree_path = temp_dir.path();
-    create_claude_hook_settings(worktree_path, "test-worker")
+    let llmc_root = PathBuf::from("/test/llmc/root");
+    create_claude_hook_settings_with_root(worktree_path, "test-worker", &llmc_root)
         .expect("Failed to create hook settings");
     let settings_path = worktree_path.join(".claude").join("settings.json");
     let content = fs::read_to_string(&settings_path).expect("Failed to read settings file");

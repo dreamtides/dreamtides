@@ -8,8 +8,19 @@ use serde::{Deserialize, Serialize};
 
 use crate::auto_mode::auto_config::AutoConfig;
 use crate::overseer_mode::overseer_config::OverseerConfig;
+
 /// Valid Claude Code models
 const VALID_MODELS: &[&str] = &["haiku", "sonnet", "opus"];
+
+/// Provides access to LLMC paths derived from a root directory.
+///
+/// Use `LlmcPaths::from_env()` in production code to read from LLMC_ROOT.
+/// Use `LlmcPaths::new(root)` in tests with a temporary directory.
+#[derive(Debug, Clone)]
+pub struct LlmcPaths {
+    root: PathBuf,
+}
+
 /// Global LLMC configuration loaded from ~/llmc/config.toml
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Config {
@@ -23,6 +34,7 @@ pub struct Config {
     /// Configuration for the overseer supervisor process
     pub overseer: Option<OverseerConfig>,
 }
+
 /// Default values for worker configuration
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct DefaultsConfig {
@@ -38,11 +50,13 @@ pub struct DefaultsConfig {
     pub sound_on_review: bool,
     pub self_review: Option<SelfReviewConfig>,
 }
+
 /// Repository configuration
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct RepoConfig {
     pub source: String,
 }
+
 /// Per-worker configuration
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct WorkerConfig {
@@ -55,6 +69,7 @@ pub struct WorkerConfig {
     #[serde(default)]
     pub self_review: Option<bool>,
 }
+
 /// Configuration for the self-review prompt sent when a worker finishes a task
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SelfReviewConfig {
@@ -64,6 +79,7 @@ pub struct SelfReviewConfig {
     #[serde(default)]
     pub clear: bool,
 }
+
 /// Returns the LLMC root directory.
 ///
 /// The root directory is determined in the following order:
@@ -81,6 +97,7 @@ pub fn get_llmc_root() -> PathBuf {
         .expect("Could not determine home directory");
     PathBuf::from(home).join("llmc")
 }
+
 /// Returns the path to the config file (~/llmc/config.toml)
 pub fn get_config_path() -> PathBuf {
     get_llmc_root().join("config.toml")
@@ -128,6 +145,7 @@ pub fn get_worker_session_name(worker_name: &str) -> String {
 pub fn get_session_prefix_pattern() -> String {
     format!("{}-", get_session_prefix())
 }
+
 /// Validates a model string against known Claude Code models
 pub fn validate_model(model: &str) -> Result<()> {
     if !VALID_MODELS.contains(&model) {
@@ -140,12 +158,51 @@ pub fn validate_model(model: &str) -> Result<()> {
     }
     Ok(())
 }
+
+impl LlmcPaths {
+    /// Creates paths from an explicit root directory.
+    ///
+    /// Use this in tests to avoid depending on environment variables.
+    pub fn new(root: PathBuf) -> Self {
+        Self { root }
+    }
+
+    /// Creates paths by reading LLMC_ROOT from the environment.
+    ///
+    /// Falls back to `~/llmc` if LLMC_ROOT is not set.
+    pub fn from_env() -> Self {
+        Self::new(get_llmc_root())
+    }
+
+    /// Returns the path to the logs directory.
+    fn logs_dir(&self) -> PathBuf {
+        self.root.join("logs")
+    }
+
+    /// Returns the path to the task pool log file.
+    pub fn task_pool_log_path(&self) -> PathBuf {
+        self.logs_dir().join("task_pool.log")
+    }
+
+    /// Returns the path to the post accept log file.
+    pub fn post_accept_log_path(&self) -> PathBuf {
+        self.logs_dir().join("post_accept.log")
+    }
+
+    /// Returns the path to the auto log file.
+    pub fn auto_log_path(&self) -> PathBuf {
+        self.logs_dir().join("auto.log")
+    }
+}
+
 fn default_model() -> String {
     "sonnet".to_string()
 }
+
 fn default_skip_permissions() -> bool {
     true
 }
+
 fn default_allowed_tools() -> Vec<String> {
     vec![
         "Bash".to_string(),
@@ -156,15 +213,19 @@ fn default_allowed_tools() -> Vec<String> {
         "Grep".to_string(),
     ]
 }
+
 fn default_patrol_interval_secs() -> u32 {
     30
 }
+
 fn default_sound_on_review() -> bool {
     true
 }
+
 fn default_excluded_from_pool() -> bool {
     false
 }
+
 impl Default for DefaultsConfig {
     fn default() -> Self {
         DefaultsConfig {
@@ -177,6 +238,7 @@ impl Default for DefaultsConfig {
         }
     }
 }
+
 impl Config {
     /// Loads configuration from the given path
     pub fn load(path: &Path) -> Result<Config> {

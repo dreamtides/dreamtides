@@ -1,14 +1,12 @@
 use std::fs;
-use std::sync::Mutex;
 use std::time::Duration;
 
 use llmc::auto_mode::auto_logging::{
     AutoEvent, AutoLogEntry, AutoLogger, CommandResult, LogLevel, PostAcceptLogEntry,
-    TaskPoolLogEntry, TaskResult, post_accept_log_path, task_pool_log_path,
+    TaskPoolLogEntry, TaskResult,
 };
+use llmc::config::LlmcPaths;
 use tempfile::TempDir;
-
-static LLMC_ROOT_MUTEX: Mutex<()> = Mutex::new(());
 
 #[test]
 fn log_level_info_serializes_to_uppercase() {
@@ -240,13 +238,10 @@ fn command_result_stores_all_fields() {
 
 #[test]
 fn task_pool_log_writes_to_disk_immediately() {
-    let _guard = LLMC_ROOT_MUTEX.lock().unwrap();
-    let original_llmc_root = std::env::var("LLMC_ROOT").ok();
     let temp_dir = TempDir::new().expect("Failed to create temp dir");
-    let temp_path = temp_dir.path().to_string_lossy().to_string();
-    unsafe { std::env::set_var("LLMC_ROOT", &temp_path) };
-    let logger = AutoLogger::new().expect("Failed to create logger");
-    let log_path = task_pool_log_path();
+    let paths = LlmcPaths::new(temp_dir.path().to_path_buf());
+    let logger = AutoLogger::new_with_paths(&paths).expect("Failed to create logger");
+    let log_path = paths.task_pool_log_path();
     let cmd_result = CommandResult {
         command: "test command".to_string(),
         exit_code: 0,
@@ -262,10 +257,6 @@ fn task_pool_log_writes_to_disk_immediately() {
             e
         )
     });
-    match original_llmc_root {
-        Some(val) => unsafe { std::env::set_var("LLMC_ROOT", val) },
-        None => unsafe { std::env::remove_var("LLMC_ROOT") },
-    }
     assert!(
         content.contains("test command"),
         "task_pool.log should contain the logged command immediately after log call. File content: '{}'",
@@ -280,13 +271,10 @@ fn task_pool_log_writes_to_disk_immediately() {
 
 #[test]
 fn post_accept_log_writes_to_disk_immediately() {
-    let _guard = LLMC_ROOT_MUTEX.lock().unwrap();
-    let original_llmc_root = std::env::var("LLMC_ROOT").ok();
     let temp_dir = TempDir::new().expect("Failed to create temp dir");
-    let temp_path = temp_dir.path().to_string_lossy().to_string();
-    unsafe { std::env::set_var("LLMC_ROOT", &temp_path) };
-    let logger = AutoLogger::new().expect("Failed to create logger");
-    let log_path = post_accept_log_path();
+    let paths = LlmcPaths::new(temp_dir.path().to_path_buf());
+    let logger = AutoLogger::new_with_paths(&paths).expect("Failed to create logger");
+    let log_path = paths.post_accept_log_path();
     let cmd_result = CommandResult {
         command: "just review".to_string(),
         exit_code: 0,
@@ -302,10 +290,6 @@ fn post_accept_log_writes_to_disk_immediately() {
             e
         )
     });
-    match original_llmc_root {
-        Some(val) => unsafe { std::env::set_var("LLMC_ROOT", val) },
-        None => unsafe { std::env::remove_var("LLMC_ROOT") },
-    }
     assert!(
         content.contains("just review"),
         "post_accept.log should contain the logged command immediately after log call. File content: '{}'",
