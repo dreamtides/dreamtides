@@ -553,6 +553,11 @@ fn process_completed_workers(
 
         match auto_accept::auto_accept_worker(&worker_name, state, llmc_config, logger) {
             Ok(result) => {
+                info!(
+                    worker = %worker_name,
+                    result = ?result,
+                    "auto_accept_worker returned Ok with result"
+                );
                 // Reset retry count on successful completion
                 auto_failure::reset_retry_count(state, &worker_name);
 

@@ -483,6 +483,11 @@ fn accept_and_merge(
              The commit was merged successfully but the worker may need manual cleanup."
         );
         auto_workers::record_task_completion(state);
+        info!(
+            worker = %worker_name,
+            commit = %&new_commit_sha[..7.min(new_commit_sha.len())],
+            "accept_and_merge returning AcceptedWithCleanupFailure result"
+        );
         return Ok(AutoAcceptResult::AcceptedWithCleanupFailure {
             commit_sha: new_commit_sha,
             cleanup_error: e.message,
@@ -490,6 +495,12 @@ fn accept_and_merge(
     }
 
     auto_workers::record_task_completion(state);
+
+    info!(
+        worker = %worker_name,
+        commit = %&new_commit_sha[..7.min(new_commit_sha.len())],
+        "accept_and_merge returning Accepted result"
+    );
 
     Ok(AutoAcceptResult::Accepted { commit_sha: new_commit_sha })
 }
@@ -566,6 +577,8 @@ fn reset_worker_to_idle(
     })?;
 
     logger.log_worker_state_transition(worker_name, &old_status, "Idle");
+
+    info!(worker = %worker_name, "Worker reset to idle completed successfully");
 
     Ok(())
 }
