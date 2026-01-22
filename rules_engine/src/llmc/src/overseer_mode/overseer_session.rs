@@ -8,18 +8,23 @@ use std::{fs, thread};
 
 use anyhow::{Context, Result};
 
-use crate::config::Config;
+use crate::config::{self, Config};
 use crate::tmux::sender::TmuxSender;
 use crate::tmux::session;
 
-pub const OVERSEER_SESSION_NAME: &str = "llmc-overseer";
+/// Returns the overseer session name for this LLMC instance.
+///
+/// Uses the session prefix to ensure multiple LLMC instances don't conflict.
+pub fn get_overseer_session_name() -> String {
+    format!("{}-overseer", config::get_session_prefix())
+}
 
 /// Returns true if the given session name is the overseer session.
 ///
 /// This is used by other modules to exclude the overseer session from
 /// kill operations (e.g., `llmc down`, `llmc nuke --all`).
 pub fn is_overseer_session(session_name: &str) -> bool {
-    session_name == OVERSEER_SESSION_NAME
+    session_name == get_overseer_session_name()
 }
 
 /// Checks if the overseer TMUX session exists and is healthy.
@@ -28,15 +33,15 @@ pub fn is_overseer_session(session_name: &str) -> bool {
 /// 1. The TMUX session exists
 /// 2. The session has content (Claude Code is running)
 pub fn is_overseer_session_healthy() -> bool {
-    if !session::session_exists(OVERSEER_SESSION_NAME) {
-        tracing::debug!(session = OVERSEER_SESSION_NAME, "Overseer session does not exist");
+    if !session::session_exists(&get_overseer_session_name()) {
+        tracing::debug!(session = &get_overseer_session_name(), "Overseer session does not exist");
         return false;
     }
-    match session::capture_pane(OVERSEER_SESSION_NAME, 5) {
+    match session::capture_pane(&get_overseer_session_name(), 5) {
         Ok(content) => {
             let is_active = !content.trim().is_empty();
             tracing::debug!(
-                session = OVERSEER_SESSION_NAME,
+                session = &get_overseer_session_name(),
                 has_content = is_active,
                 "Overseer session health check"
             );
@@ -44,7 +49,7 @@ pub fn is_overseer_session_healthy() -> bool {
         }
         Err(e) => {
             tracing::warn!(
-                session = OVERSEER_SESSION_NAME,
+                session = &get_overseer_session_name(),
                 error = %e,
                 "Failed to capture overseer session pane"
             );
@@ -64,36 +69,43 @@ pub fn create_overseer_session(config: &Config) -> Result<()> {
         anyhow::bail!("Project directory does not exist: {}", project_dir.display());
     }
     tracing::info!(
-        session = OVERSEER_SESSION_NAME,
+        session = &get_overseer_session_name(),
         working_directory = %project_dir.display(),
         "Creating overseer TMUX session"
     );
     session::create_session(
-        OVERSEER_SESSION_NAME,
+        &get_overseer_session_name(),
         &project_dir,
         session::DEFAULT_SESSION_WIDTH,
         session::DEFAULT_SESSION_HEIGHT,
     )
     .with_context(|| {
-        format!("Failed to create overseer TMUX session '{}'", OVERSEER_SESSION_NAME)
+        format!("Failed to create overseer TMUX session '{}'", &get_overseer_session_name())
     })?;
     let llmc_root = crate::config::get_llmc_root();
-    session::set_env(OVERSEER_SESSION_NAME, "LLMC_OVERSEER", "true")?;
-    session::set_env(OVERSEER_SESSION_NAME, "LLMC_ROOT", llmc_root.to_str().unwrap_or_default())?;
+    session::set_env(&get_overseer_session_name(), "LLMC_OVERSEER", "true")?;
+    session::set_env(
+        &get_overseer_session_name(),
+        "LLMC_ROOT",
+        llmc_root.to_str().unwrap_or_default(),
+    )?;
     create_overseer_claude_hooks(&project_dir)?;
     thread::sleep(Duration::from_millis(500));
     let claude_cmd = build_overseer_claude_command(config);
     tracing::info!(
-        session = OVERSEER_SESSION_NAME,
+        session = &get_overseer_session_name(),
         command = %claude_cmd,
         "Starting Claude Code in overseer session"
     );
     let sender = TmuxSender::new();
-    sender.send(OVERSEER_SESSION_NAME, &claude_cmd).with_context(|| {
-        format!("Failed to send Claude command to overseer session '{}'", OVERSEER_SESSION_NAME)
+    sender.send(&get_overseer_session_name(), &claude_cmd).with_context(|| {
+        format!(
+            "Failed to send Claude command to overseer session '{}'",
+            &get_overseer_session_name()
+        )
     })?;
     tracing::info!(
-        session = OVERSEER_SESSION_NAME,
+        session = &get_overseer_session_name(),
         "Overseer session created and Claude Code started"
     );
     Ok(())
@@ -106,19 +118,19 @@ pub fn create_overseer_session(config: &Config) -> Result<()> {
 /// external help.
 pub fn ensure_overseer_session(config: &Config) -> Result<()> {
     if is_overseer_session_healthy() {
-        tracing::debug!(session = OVERSEER_SESSION_NAME, "Overseer session is healthy");
+        tracing::debug!(session = &get_overseer_session_name(), "Overseer session is healthy");
         return Ok(());
     }
-    if session::session_exists(OVERSEER_SESSION_NAME) {
+    if session::session_exists(&get_overseer_session_name()) {
         tracing::info!(
-            session = OVERSEER_SESSION_NAME,
+            session = &get_overseer_session_name(),
             "Overseer session exists but is unhealthy, killing and recreating"
         );
-        session::kill_session(OVERSEER_SESSION_NAME)?;
+        session::kill_session(&get_overseer_session_name())?;
         thread::sleep(Duration::from_millis(500));
     } else {
         tracing::info!(
-            session = OVERSEER_SESSION_NAME,
+            session = &get_overseer_session_name(),
             "Overseer session does not exist, creating"
         );
     }
@@ -129,9 +141,9 @@ pub fn ensure_overseer_session(config: &Config) -> Result<()> {
 ///
 /// This should only be called during overseer shutdown.
 pub fn kill_overseer_session() -> Result<()> {
-    if session::session_exists(OVERSEER_SESSION_NAME) {
-        tracing::info!(session = OVERSEER_SESSION_NAME, "Killing overseer TMUX session");
-        session::kill_session(OVERSEER_SESSION_NAME)?;
+    if session::session_exists(&get_overseer_session_name()) {
+        tracing::info!(session = &get_overseer_session_name(), "Killing overseer TMUX session");
+        session::kill_session(&get_overseer_session_name())?;
     }
     Ok(())
 }
@@ -140,16 +152,16 @@ pub fn kill_overseer_session() -> Result<()> {
 ///
 /// Used by the remediation executor to send prompts to Claude.
 pub fn send_to_overseer(message: &str) -> Result<()> {
-    if !session::session_exists(OVERSEER_SESSION_NAME) {
-        anyhow::bail!("Overseer session '{}' does not exist", OVERSEER_SESSION_NAME);
+    if !session::session_exists(&get_overseer_session_name()) {
+        anyhow::bail!("Overseer session '{}' does not exist", &get_overseer_session_name());
     }
     let sender = TmuxSender::new();
-    sender.send(OVERSEER_SESSION_NAME, message)
+    sender.send(&get_overseer_session_name(), message)
 }
 
 /// Sends a /clear command to the overseer session to reset Claude's context.
 pub fn clear_overseer_session() -> Result<()> {
-    tracing::info!(session = OVERSEER_SESSION_NAME, "Sending /clear to overseer session");
+    tracing::info!(session = &get_overseer_session_name(), "Sending /clear to overseer session");
     send_to_overseer("/clear")?;
     thread::sleep(Duration::from_secs(2));
     Ok(())
@@ -157,7 +169,7 @@ pub fn clear_overseer_session() -> Result<()> {
 
 /// Captures recent output from the overseer session.
 pub fn capture_overseer_output(lines: u32) -> Result<String> {
-    session::capture_pane(OVERSEER_SESSION_NAME, lines)
+    session::capture_pane(&get_overseer_session_name(), lines)
 }
 
 fn build_overseer_claude_command(config: &Config) -> String {

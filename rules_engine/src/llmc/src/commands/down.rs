@@ -3,7 +3,7 @@ use std::time::Duration;
 
 use anyhow::{Context, Result, bail};
 
-use crate::commands::console::CONSOLE_PREFIX;
+use crate::commands::console;
 use crate::config::{self, Config};
 use crate::overseer_mode::overseer_session;
 use crate::state::{self, State, WorkerStatus};
@@ -108,13 +108,13 @@ fn cleanup_orphaned_llmc_sessions(state: &State, kill_consoles: bool, json: bool
     let orphaned_sessions: Vec<String> = all_sessions
         .into_iter()
         .filter(|s| {
-            if !s.starts_with("llmc-") {
+            if !s.starts_with(&config::get_session_prefix_pattern()) {
                 return false;
             }
             if tracked_session_ids.contains(s) {
                 return false;
             }
-            if !kill_consoles && s.starts_with(CONSOLE_PREFIX) {
+            if !kill_consoles && s.starts_with(&console::get_console_prefix()) {
                 return false;
             }
             if overseer_session::is_overseer_session(s) {
@@ -125,7 +125,10 @@ fn cleanup_orphaned_llmc_sessions(state: &State, kill_consoles: bool, json: bool
         })
         .collect();
     let preserved_consoles: Vec<String> = if !kill_consoles {
-        session::list_sessions()?.into_iter().filter(|s| s.starts_with(CONSOLE_PREFIX)).collect()
+        session::list_sessions()?
+            .into_iter()
+            .filter(|s| s.starts_with(&console::get_console_prefix()))
+            .collect()
     } else {
         vec![]
     };

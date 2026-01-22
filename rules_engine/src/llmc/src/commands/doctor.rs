@@ -335,7 +335,7 @@ fn check_sessions(report: &mut DoctorReport, repair: bool) -> Result<()> {
     let sessions: HashSet<String> = match output {
         Ok(out) if out.status.success() => String::from_utf8_lossy(&out.stdout)
             .lines()
-            .filter(|line| line.starts_with("llmc-"))
+            .filter(|line| line.starts_with(&config::get_session_prefix_pattern()))
             .map(std::string::ToString::to_string)
             .collect(),
         _ => HashSet::new(),
@@ -345,7 +345,7 @@ fn check_sessions(report: &mut DoctorReport, repair: bool) -> Result<()> {
         let mut needs_save = false;
         #[expect(clippy::iter_over_hash_type)]
         for worker in state.workers.values_mut() {
-            let expected_session = format!("llmc-{}", worker.name);
+            let expected_session = config::get_worker_session_name(&worker.name);
             if sessions.contains(&expected_session) {
                 if worker.status == WorkerStatus::Offline {
                     if repair {
@@ -404,7 +404,8 @@ fn check_sessions(report: &mut DoctorReport, repair: bool) -> Result<()> {
         }
         #[expect(clippy::iter_over_hash_type)]
         for session_name in &sessions {
-            if let Some(worker_name) = session_name.strip_prefix("llmc-")
+            if let Some(worker_name) =
+                session_name.strip_prefix(&config::get_session_prefix_pattern())
                 && !state.workers.contains_key(worker_name)
             {
                 if overseer_session::is_overseer_session(session_name) {
@@ -778,7 +779,7 @@ fn run_rebuild() -> Result<()> {
     let sessions: HashSet<String> = match output {
         Ok(out) if out.status.success() => String::from_utf8_lossy(&out.stdout)
             .lines()
-            .filter(|line| line.starts_with("llmc-"))
+            .filter(|line| line.starts_with(&config::get_session_prefix_pattern()))
             .map(std::string::ToString::to_string)
             .collect(),
         _ => HashSet::new(),
@@ -797,7 +798,7 @@ fn run_rebuild() -> Result<()> {
     let now = SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs();
     for name in &worktrees {
         let worktree_path = worktrees_dir.join(name);
-        let session_name = format!("llmc-{}", name);
+        let session_name = config::get_worker_session_name(name);
         let has_session = sessions.contains(&session_name);
         let status = if has_session { WorkerStatus::Idle } else { WorkerStatus::Offline };
         let worktree_check = if worktree_path.exists() { "✓" } else { "✗" };

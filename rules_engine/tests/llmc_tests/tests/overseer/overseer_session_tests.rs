@@ -1,16 +1,28 @@
-use llmc::overseer_mode::overseer_session::{OVERSEER_SESSION_NAME, is_overseer_session};
+use llmc::overseer_mode::overseer_session::{get_overseer_session_name, is_overseer_session};
 
 #[test]
-fn overseer_session_name_is_llmc_overseer() {
+fn overseer_session_name_uses_session_prefix() {
+    let name = get_overseer_session_name();
+    assert!(
+        name.ends_with("-overseer"),
+        "Overseer session name should end with '-overseer', got: {}",
+        name
+    );
+}
+
+#[test]
+fn overseer_session_name_default_is_llmc_overseer() {
+    let name = get_overseer_session_name();
     assert_eq!(
-        OVERSEER_SESSION_NAME, "llmc-overseer",
-        "Overseer session name should be 'llmc-overseer'"
+        name, "llmc-overseer",
+        "Without LLMC_ROOT override, overseer session name should be 'llmc-overseer'"
     );
 }
 
 #[test]
 fn is_overseer_session_returns_true_for_overseer_name() {
-    let result = is_overseer_session("llmc-overseer");
+    let overseer_name = get_overseer_session_name();
+    let result = is_overseer_session(&overseer_name);
 
     assert!(result, "Should return true for the overseer session name");
 }

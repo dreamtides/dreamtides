@@ -6,8 +6,13 @@ use anyhow::{Context, Result, bail};
 use crate::config::{self, Config, WorkerConfig};
 use crate::tmux::sender::TmuxSender;
 use crate::tmux::session::{self, DEFAULT_SESSION_HEIGHT, DEFAULT_SESSION_WIDTH};
-/// Prefix for console session names
-pub const CONSOLE_PREFIX: &str = "llmc-console";
+
+/// Returns the console session prefix for this LLMC instance.
+///
+/// Uses the session prefix to ensure multiple LLMC instances don't conflict.
+pub fn get_console_prefix() -> String {
+    format!("{}-console", config::get_session_prefix())
+}
 /// Runs the console command, creating a new console session or attaching to an
 /// existing one
 pub fn run_console(name: Option<&str>) -> Result<()> {
@@ -71,18 +76,18 @@ pub fn run_console(name: Option<&str>) -> Result<()> {
 /// Lists all active console session names
 pub fn list_console_sessions() -> Result<Vec<String>> {
     let sessions = session::list_sessions()?;
-    Ok(sessions.into_iter().filter(|s| s.starts_with(CONSOLE_PREFIX)).collect())
+    Ok(sessions.into_iter().filter(|s| s.starts_with(&get_console_prefix())).collect())
 }
 /// Checks if a name refers to a console session
 pub fn is_console_name(name: &str) -> bool {
-    name.starts_with("console") || name.starts_with(CONSOLE_PREFIX)
+    name.starts_with("console") || name.starts_with(&get_console_prefix())
 }
 /// Normalizes a console name to the full session ID format
 pub fn normalize_console_name(name: &str) -> String {
-    if name.starts_with(CONSOLE_PREFIX) {
+    if name.starts_with(&get_console_prefix()) {
         name.to_string()
     } else if let Some(num) = name.strip_prefix("console") {
-        format!("{}{}", CONSOLE_PREFIX, num)
+        format!("{}{}", &get_console_prefix(), num)
     } else {
         name.to_string()
     }
@@ -92,13 +97,13 @@ fn find_next_console_name() -> Result<String> {
     let sessions = session::list_sessions()?;
     let mut max_num = 0;
     for session in sessions {
-        if let Some(num_str) = session.strip_prefix(CONSOLE_PREFIX)
+        if let Some(num_str) = session.strip_prefix(&get_console_prefix())
             && let Ok(num) = num_str.parse::<u32>()
         {
             max_num = max_num.max(num);
         }
     }
-    Ok(format!("{}{}", CONSOLE_PREFIX, max_num + 1))
+    Ok(format!("{}{}", &get_console_prefix(), max_num + 1))
 }
 fn build_claude_command(config: &WorkerConfig) -> String {
     let mut cmd = String::from("claude");

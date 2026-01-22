@@ -39,7 +39,7 @@ pub fn run_add(
             name
         );
     }
-    let session_id = format!("llmc-{}", name);
+    let session_id = config::get_worker_session_name(name);
     if session::session_exists(&session_id) {
         bail!(
             "A TMUX session named '{}' already exists.\n\
@@ -73,7 +73,7 @@ pub fn run_add(
         created_at_unix: now,
         last_activity_unix: now,
         commit_sha: None,
-        session_id: format!("llmc-{}", name),
+        session_id: config::get_worker_session_name(name),
         crash_count: 0,
         last_crash_unix: None,
         on_complete_sent_unix: None,
@@ -205,7 +205,9 @@ included_optional_tools: []
 pub fn is_daemon_running() -> bool {
     session::list_sessions()
         .ok()
-        .map(|sessions| sessions.iter().any(|s| s.starts_with("llmc-")))
+        .map(|sessions| {
+            sessions.iter().any(|s| s.starts_with(&config::get_session_prefix_pattern()))
+        })
         .unwrap_or(false)
 }
 

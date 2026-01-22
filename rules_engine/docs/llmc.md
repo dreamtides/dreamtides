@@ -55,6 +55,67 @@ synchronized with the master branch.
 ~/Documents/GoogleDrive/dreamtides/   # Master repository (source of truth)
 ```
 
+## Multiple LLMC Instances
+
+LLMC supports running multiple concurrent instances, each with its own isolated
+workspace, state, and TMUX sessions. This is useful for:
+
+- Running automated tests without interfering with production work
+- Having separate environments for different projects
+- Testing LLMC features in isolation
+
+### The LLMC_ROOT Environment Variable
+
+By default, LLMC uses `~/llmc` as the root directory. Set `LLMC_ROOT` to use a
+different location:
+
+```bash
+# Create an isolated test environment
+export LLMC_ROOT="/tmp/llmc-test-$$"
+llmc init --source ~/Documents/GoogleDrive/dreamtides --target "$LLMC_ROOT"
+
+# All subsequent llmc commands use this isolated instance
+llmc up
+llmc status
+```
+
+### Session Naming for Isolation
+
+LLMC automatically prefixes TMUX sessions to prevent conflicts between instances:
+
+- **Default instance** (`~/llmc`): Sessions use `llmc-` prefix (e.g., `llmc-adam`)
+- **Custom instances**: Sessions use `llmc-<dirname>-` prefix (e.g.,
+  `llmc-test-123-adam` for `LLMC_ROOT=/tmp/test-123`)
+
+This ensures that workers, overseer, and console sessions from different
+instances never collide.
+
+### Running Multiple Instances Safely
+
+Each LLMC instance is fully isolated:
+
+| Resource | Isolation |
+|----------|-----------|
+| State file (`state.json`) | Per-instance in `$LLMC_ROOT` |
+| Config file (`config.toml`) | Per-instance in `$LLMC_ROOT` |
+| Worktrees | Per-instance in `$LLMC_ROOT/.worktrees/` |
+| TMUX sessions | Prefixed with unique instance identifier |
+| IPC socket (`llmc.sock`) | Per-instance in `$LLMC_ROOT` |
+| State lock file | Per-instance in `$LLMC_ROOT` |
+| Logs | Per-instance in `$LLMC_ROOT/logs/` |
+
+**Important considerations:**
+
+1. **Source repository conflicts**: Multiple instances can share the same source
+   repository, but only one should accept changes to master at a time to avoid
+   merge conflicts.
+
+2. **No cross-instance communication**: Instances are completely independent.
+   Commands in one instance cannot affect another.
+
+3. **Cleanup**: When done with a test instance, ensure you run `llmc down` and
+   remove the directory to avoid orphaned TMUX sessions.
+
 ## Worker State Machine
 
 Each worker progresses through a well-defined state machine:
@@ -126,7 +187,7 @@ worker already completed self-review before the rebase started.
 
 ## Configuration
 
-Configuration is stored in `~/llmc/config.toml`:
+Configuration is stored in `$LLMC_ROOT/config.toml` (default: `~/llmc/config.toml`):
 
 ```toml
 [defaults]
@@ -206,7 +267,7 @@ with `#`).
 
 ## Data Model
 
-### State File (`~/llmc/state.json`)
+### State File (`$LLMC_ROOT/state.json`)
 
 The state file tracks all workers and their current status. Each worker record
 contains: name, worktree path, branch name, current status, active prompt text,
@@ -238,9 +299,12 @@ TMUX session identifier.
 
 ## TMUX Integration
 
-LLMC uses TMUX for persistent Claude Code sessions with session names following
-the pattern `llmc-<worker>` (e.g., `llmc-adam`). Sessions are created detached
-with the worker's worktree as the working directory.
+LLMC uses TMUX for persistent Claude Code sessions. Session names follow the
+pattern `<prefix>-<worker>` where the prefix depends on the LLMC instance (see
+"Multiple LLMC Instances" above). For the default `~/llmc` location, sessions
+use `llmc-adam`, `llmc-baker`, etc. For custom locations like `/tmp/test-123`,
+sessions use `llmc-test-123-adam`, `llmc-test-123-baker`, etc. Sessions are
+created detached with the worker's worktree as the working directory.
 
 ### Session Startup
 

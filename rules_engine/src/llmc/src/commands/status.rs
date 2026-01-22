@@ -5,7 +5,6 @@ use anyhow::{Result, bail};
 use serde::Serialize;
 
 use crate::auto_mode::heartbeat_thread;
-use crate::commands::console::CONSOLE_PREFIX;
 use crate::commands::{console, overseer};
 use crate::config::{self, Config};
 use crate::state::{self, State, WorkerRecord, WorkerStatus};
@@ -115,7 +114,10 @@ fn output_json(state: &State, config: &Config, now: u64) -> Result<()> {
         .unwrap_or_default()
         .into_iter()
         .map(|session_id| {
-            let name = session_id.strip_prefix(CONSOLE_PREFIX).unwrap_or(&session_id).to_string();
+            let name = session_id
+                .strip_prefix(&console::get_console_prefix())
+                .unwrap_or(&session_id)
+                .to_string();
             ConsoleStatusOutput { name, session_id }
         })
         .collect();
@@ -217,7 +219,8 @@ fn output_text(state: &State, config: &Config, now: u64) {
         let mut consoles = consoles;
         consoles.sort();
         for session_id in consoles {
-            let name = session_id.strip_prefix(CONSOLE_PREFIX).unwrap_or(&session_id);
+            let name =
+                session_id.strip_prefix(&console::get_console_prefix()).unwrap_or(&session_id);
             println!("console{:<12} active", name);
         }
     }

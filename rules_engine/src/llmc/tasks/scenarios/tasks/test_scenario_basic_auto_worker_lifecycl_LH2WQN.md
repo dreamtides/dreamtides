@@ -19,44 +19,59 @@ updated-at: 2026-01-21T22:31:38.813068Z
 ## Objective
 
 Verify that auto mode correctly creates auto workers, assigns tasks from the
-task pool,
-and handles task completion with automatic acceptance.
+task pool, and handles task completion with automatic acceptance.
 
 ## Prerequisites
 
 - LLMC installed and configured
-- A clean LLMC workspace (run `llmc nuke --all` if needed)
-- No daemon currently running (`llmc down`)
+- No daemon or overseer currently running in your test directory
+- **IMPORTANT**: This test MUST run in an isolated LLMC instance, not `~/llmc`
+
+## Environment Setup
+
+**This test uses an isolated LLMC instance to avoid interfering with production
+work.**
+
+```bash
+# Create isolated test environment
+export TEST_DIR="/tmp/llmc-auto-lifecycle-test-$$"
+export LLMC_ROOT="$TEST_DIR"
+
+echo "Creating isolated test environment at: $TEST_DIR"
+
+# Initialize the test instance
+llmc init --source ~/Documents/GoogleDrive/dreamtides --target "$TEST_DIR"
+
+# Verify isolation - should show no workers
+llmc status
+
+# All remaining commands in this test use $LLMC_ROOT implicitly
+```
 
 ## Differentiating Errors from Normal Operations
 
 **Error indicators to watch for:**
 
-- Any `ERROR` or `WARN` messages in `~/llmc/logs/auto.log`
+- Any `ERROR` or `WARN` messages in `$LLMC_ROOT/logs/auto.log`
 - Non-zero exit codes from `llmc up --auto`
 - Workers in `error` state in `llmc status`
-- Missing heartbeat file `~/llmc/.llmc/auto.heartbeat`
+- Missing heartbeat file `$LLMC_ROOT/.llmc/auto.heartbeat`
 - Daemon shutting down unexpectedly
 
 **Normal operations:**
 
-- Workers cycling through `idle` → `working` → `needs_review` → `idle`
+- Workers cycling through `idle` -> `working` -> `needs_review` -> `idle`
 - Empty task pool causing workers to wait (not an error)
 - Self-review prompts being sent
 
 ## Setup
 
 ```bash
-# Ensure clean state
-cd ~/llmc
-llmc down --force 2>/dev/null || true
-llmc nuke --all --yes 2>/dev/null || true
-
 # Create a simple task pool script that returns one task then empty
-mkdir -p ~/llmc/test_scripts
-cat > ~/llmc/test_scripts/task_pool.sh << 'EOF'
+mkdir -p "$LLMC_ROOT/test_scripts"
+cat > "$LLMC_ROOT/test_scripts/task_pool.sh" << 'EOF'
 #!/bin/bash
-MARKER=~/llmc/test_scripts/.task_issued
+MARKER="$LLMC_ROOT/test_scripts/.task_issued"
 if [ ! -f "$MARKER" ]; then
     touch "$MARKER"
     echo "Create a file called test_auto_task.txt in the root directory containing the text 'Hello from auto mode'. Do not create any other files."
@@ -65,13 +80,13 @@ else
     exit 0
 fi
 EOF
-chmod +x ~/llmc/test_scripts/task_pool.sh
+chmod +x "$LLMC_ROOT/test_scripts/task_pool.sh"
 
 # Add auto configuration to config.toml
-cat >> ~/llmc/config.toml << 'EOF'
+cat >> "$LLMC_ROOT/config.toml" << EOF
 
 [auto]
-task_pool_command = "~/llmc/test_scripts/task_pool.sh"
+task_pool_command = "$LLMC_ROOT/test_scripts/task_pool.sh"
 concurrency = 1
 EOF
 ```
@@ -91,9 +106,9 @@ sleep 5
 **Verify**:
 
 - Daemon starts without errors
-- `~/llmc/.llmc/daemon.json` exists and contains `pid`, `start_time_unix`,
+- `$LLMC_ROOT/.llmc/daemon.json` exists and contains `pid`, `start_time_unix`,
   `instance_id`
-- `~/llmc/.llmc/auto.heartbeat` exists and is being updated
+- `$LLMC_ROOT/.llmc/auto.heartbeat` exists and is being updated
 
 **Step 1.2**: Check auto worker creation.
 
@@ -115,7 +130,7 @@ llmc status
 # Wait for worker to complete (check status periodically)
 for i in {1..60}; do
     STATUS=$(llmc status --json 2>/dev/null | jq -r '.workers[] | select(.name == "auto-1") | .status' 2>/dev/null)
-    if [ "$STATUS" = "idle" ] && [ -f ~/llmc/test_scripts/.task_issued ]; then
+    if [ "$STATUS" = "idle" ] && [ -f "$LLMC_ROOT/test_scripts/.task_issued" ]; then
         echo "Task completed, worker back to idle"
         break
     fi
@@ -148,7 +163,7 @@ cat test_auto_task.txt
 **Step 3.1**: Check auto-specific logs.
 
 ```bash
-cat ~/llmc/logs/auto.log | tail -50
+cat "$LLMC_ROOT/logs/auto.log" | tail -50
 ```
 
 **Verify**:
@@ -160,7 +175,7 @@ cat ~/llmc/logs/auto.log | tail -50
 **Step 3.2**: Check task pool logs.
 
 ```bash
-cat ~/llmc/logs/task_pool.log | tail -20
+cat "$LLMC_ROOT/logs/task_pool.log" | tail -20
 ```
 
 **Verify**:
@@ -186,20 +201,18 @@ wait $DAEMON_PID 2>/dev/null
 ## Cleanup
 
 ```bash
-# Remove test artifacts
-rm -rf ~/llmc/test_scripts
-rm -f ~/Documents/GoogleDrive/dreamtides/test_auto_task.txt
-
-# Remove auto config (edit config.toml to remove [auto] section)
-# Or restore from backup
-
-# Clean up git
+# Clean up test artifacts in source repo
 cd ~/Documents/GoogleDrive/dreamtides
+rm -f test_auto_task.txt
 git checkout -- . 2>/dev/null || true
 git clean -fd 2>/dev/null || true
 
+# Remove isolated test environment
 llmc down --force 2>/dev/null || true
-llmc nuke --all --yes 2>/dev/null || true
+rm -rf "$TEST_DIR"
+
+# Unset environment variable
+unset LLMC_ROOT
 ```
 
 ## Expected Issues to Report

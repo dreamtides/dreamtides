@@ -64,8 +64,18 @@ pub struct SelfReviewConfig {
     #[serde(default)]
     pub clear: bool,
 }
-/// Returns the LLMC root directory (~/llmc)
+/// Returns the LLMC root directory.
+///
+/// The root directory is determined in the following order:
+/// 1. `LLMC_ROOT` environment variable (if set)
+/// 2. Default: `~/llmc`
+///
+/// This allows multiple LLMC instances to run in different directories
+/// simultaneously without interfering with each other.
 pub fn get_llmc_root() -> PathBuf {
+    if let Ok(llmc_root) = std::env::var("LLMC_ROOT") {
+        return PathBuf::from(llmc_root);
+    }
     let home = std::env::var("HOME")
         .or_else(|_| std::env::var("USERPROFILE"))
         .expect("Could not determine home directory");
@@ -74,6 +84,49 @@ pub fn get_llmc_root() -> PathBuf {
 /// Returns the path to the config file (~/llmc/config.toml)
 pub fn get_config_path() -> PathBuf {
     get_llmc_root().join("config.toml")
+}
+
+/// Returns the TMUX session prefix for this LLMC instance.
+///
+/// When using the default `~/llmc` root, returns just "llmc".
+/// When using a custom LLMC_ROOT, returns "llmc-<dirname>" where dirname
+/// is the last component of the LLMC root path. This ensures multiple
+/// LLMC instances don't conflict on TMUX session names.
+///
+/// Examples:
+/// - `~/llmc` -> "llmc" (default, backward compatible)
+/// - `/tmp/llmc-test` -> "llmc-llmc-test"
+/// - `~/projects/myproject-llmc` -> "llmc-myproject-llmc"
+pub fn get_session_prefix() -> String {
+    let llmc_root = get_llmc_root();
+    let home = std::env::var("HOME").or_else(|_| std::env::var("USERPROFILE")).unwrap_or_default();
+    let default_root = PathBuf::from(&home).join("llmc");
+
+    if llmc_root == default_root {
+        "llmc".to_string()
+    } else {
+        let dirname = llmc_root.file_name().and_then(|n| n.to_str()).unwrap_or("custom");
+        format!("llmc-{}", dirname)
+    }
+}
+
+/// Returns the TMUX session name for a worker in this LLMC instance.
+///
+/// Format: `<session_prefix>-<worker_name>`
+/// Examples:
+/// - Default: `llmc-adam`, `llmc-auto-1`
+/// - Custom LLMC_ROOT `/tmp/test-llmc`: `llmc-test-llmc-adam`
+pub fn get_worker_session_name(worker_name: &str) -> String {
+    format!("{}-{}", get_session_prefix(), worker_name)
+}
+
+/// Returns the prefix pattern used to identify all LLMC sessions for this
+/// instance.
+///
+/// This is `<session_prefix>-` and is used in `starts_with()` checks to find
+/// all sessions belonging to this LLMC instance.
+pub fn get_session_prefix_pattern() -> String {
+    format!("{}-", get_session_prefix())
 }
 /// Validates a model string against known Claude Code models
 pub fn validate_model(model: &str) -> Result<()> {

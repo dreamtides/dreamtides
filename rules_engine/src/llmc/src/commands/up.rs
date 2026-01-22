@@ -166,8 +166,10 @@ fn unix_timestamp_now() -> u64 {
 /// in the state file
 fn cleanup_orphaned_sessions(state: &State, force: bool, verbose: bool) -> Result<()> {
     let all_sessions = session::list_sessions()?;
-    let llmc_sessions: Vec<String> =
-        all_sessions.into_iter().filter(|s| s.starts_with("llmc-")).collect();
+    let llmc_sessions: Vec<String> = all_sessions
+        .into_iter()
+        .filter(|s| s.starts_with(&config::get_session_prefix_pattern()))
+        .collect();
     if llmc_sessions.is_empty() {
         return Ok(());
     }
@@ -392,7 +394,7 @@ fn start_worker_with_recovery(
         let session_id = state
             .get_worker(name)
             .map(|w| w.session_id.clone())
-            .unwrap_or_else(|| format!("llmc-{}", name));
+            .unwrap_or_else(|| config::get_worker_session_name(name));
         if session::session_exists(&session_id) {
             println!(
                 "    {}",

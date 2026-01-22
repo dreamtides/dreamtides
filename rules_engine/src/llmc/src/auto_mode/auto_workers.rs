@@ -171,7 +171,7 @@ fn create_auto_worker(state: &mut State, config: &Config, name: &str) -> Result<
         created_at_unix: now,
         last_activity_unix: now,
         commit_sha: None,
-        session_id: format!("llmc-{}", name),
+        session_id: config::get_worker_session_name(name),
         crash_count: 0,
         last_crash_unix: None,
         on_complete_sent_unix: None,

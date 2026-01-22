@@ -7,7 +7,7 @@ use tmux_interface::{
     CapturePane, HasSession, KillSession, ListSessions, NewSession, SetEnvironment, Tmux,
 };
 
-use crate::config::WorkerConfig;
+use crate::config::{self, WorkerConfig};
 use crate::tmux::sender::TmuxSender;
 /// Default TMUX session width (wide terminal to prevent message truncation)
 pub const DEFAULT_SESSION_WIDTH: u32 = 500;
@@ -141,7 +141,7 @@ pub fn start_worker_session(
 /// Checks if any LLMC sessions are running
 pub fn any_llmc_sessions_running() -> Result<bool> {
     let sessions = list_sessions()?;
-    Ok(sessions.iter().any(|s| s.starts_with("llmc-")))
+    Ok(sessions.iter().any(|s| s.starts_with(&config::get_session_prefix_pattern())))
 }
 fn build_claude_command(config: &WorkerConfig) -> String {
     let mut cmd = String::from("claude");
