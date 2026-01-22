@@ -15,7 +15,8 @@ labels:
 blocked-by:
 - LH3WQN
 created-at: 2026-01-21T22:00:37.426141Z
-updated-at: 2026-01-21T22:31:38.801638Z
+updated-at: 2026-01-22T06:28:57.173523Z
+closed-at: 2026-01-22T06:28:57.173523Z
 ---
 
 # Test Scenario: Auto Accept Workflow with Rebase and Squash
