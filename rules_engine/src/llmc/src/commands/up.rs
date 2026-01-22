@@ -479,11 +479,12 @@ fn start_worker(name: &str, config: &Config, state: &mut State, verbose: bool) -
              The worker exists in state.json but has no corresponding [workers.{}] section in config.toml.\n\n\
              To fix this:\n\
              1. Run 'llmc doctor --repair' to diagnose and fix the issue, or\n\
-             2. Manually add a [workers.{}] section to ~/llmc/config.toml, or\n\
+             2. Manually add a [workers.{}] section to {}, or\n\
              3. Run 'llmc nuke {}' and 'llmc add {}' to recreate the worker",
             name,
             name,
             name,
+            config::get_config_path().display(),
             name,
             name
         );
@@ -751,8 +752,9 @@ fn run_main_loop(
             eprintln!(
                 "{}",
                 color_theme::warning(format!(
-                    "⚠ Warning: {} consecutive errors in daemon main loop. Check logs at ~/llmc/logs/ for details.",
-                    consecutive_errors
+                    "⚠ Warning: {} consecutive errors in daemon main loop. Check logs at {}/logs/ for details.",
+                    consecutive_errors,
+                    config::get_llmc_root().display()
                 ))
             );
             tracing::warn!(

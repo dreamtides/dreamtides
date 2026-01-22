@@ -481,11 +481,11 @@ fn check_git_config(report: &mut DoctorReport) -> Result<()> {
         Ok(_) | Err(_) => {
             report.errors.push(DoctorError {
                 message: "Git origin remote not configured".to_string(),
-                details: Some(
+                details: Some(format!(
                     "Worker branches need origin to fetch updates. \
-                     Run 'git remote add origin <path>' in ~/llmc"
-                        .to_string(),
-                ),
+                     Run 'git remote add origin <path>' in {}",
+                    config::get_llmc_root().display()
+                )),
             });
         }
     }

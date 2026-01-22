@@ -46,7 +46,7 @@ pub fn run_init(source: Option<PathBuf>, target: Option<PathBuf>, force: bool) -
     copy_tabula_if_present(&source_dir, &target_dir)?;
     println!("\n✓ LLMC workspace initialized successfully!");
     println!("\nNext steps:");
-    println!("  1. Review and customize ~/llmc/config.toml");
+    println!("  1. Review and customize {}", target_dir.join("config.toml").display());
     println!("  2. Run 'llmc add <name>' to create workers");
     println!("  3. Run 'llmc up' to start the daemon");
     Ok(())

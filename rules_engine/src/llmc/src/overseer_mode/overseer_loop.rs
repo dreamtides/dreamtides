@@ -282,8 +282,9 @@ fn start_daemon_and_wait_for_registration(
     let _ = child.kill();
     bail!(
         "Daemon failed to register within {} seconds.\n\
-         Check logs at ~/llmc/logs/ for details.",
-        DAEMON_STARTUP_TIMEOUT_SECS
+         Check logs at {}/logs/ for details.",
+        DAEMON_STARTUP_TIMEOUT_SECS,
+        config::get_llmc_root().display()
     );
 }
 
