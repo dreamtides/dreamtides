@@ -9,7 +9,8 @@ labels:
 - llmc-auto
 - design-pattern
 created-at: 2026-01-22T04:37:05.221022Z
-updated-at: 2026-01-22T04:37:05.221022Z
+updated-at: 2026-01-22T05:59:20.389254Z
+closed-at: 2026-01-22T05:59:20.389254Z
 ---
 
 # Document Patrol Fallback Design Pattern
