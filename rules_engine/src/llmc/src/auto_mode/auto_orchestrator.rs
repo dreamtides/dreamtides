@@ -594,6 +594,10 @@ fn process_completed_workers(
                             error!(worker = %worker_name, error = %e, "Post-accept command failed");
                             return Err(e.into());
                         }
+
+                        // Release task pool claims (for lattice-based task pools)
+                        let source_repo = PathBuf::from(&llmc_config.repo.source);
+                        auto_accept::release_task_pool_claims(&source_repo, logger);
                     }
                     AutoAcceptResult::AcceptedWithCleanupFailure { commit_sha, cleanup_error } => {
                         // Clear source repo dirty backoff - the accept itself succeeded
@@ -646,6 +650,10 @@ fn process_completed_workers(
                             error!(worker = %worker_name, error = %e, "Post-accept command failed");
                             return Err(e.into());
                         }
+
+                        // Release task pool claims (for lattice-based task pools)
+                        let source_repo = PathBuf::from(&llmc_config.repo.source);
+                        auto_accept::release_task_pool_claims(&source_repo, logger);
                     }
                     AutoAcceptResult::NoChanges => {
                         // Clear source repo dirty backoff on successful accept
@@ -658,6 +666,10 @@ fn process_completed_workers(
                         );
                         logger.log_task_completed(&worker_name, TaskResult::NoChanges);
                         info!(worker = %worker_name, "Worker completed with no changes");
+
+                        // Release task pool claims (for lattice-based task pools)
+                        let source_repo = PathBuf::from(&llmc_config.repo.source);
+                        auto_accept::release_task_pool_claims(&source_repo, logger);
                     }
                     AutoAcceptResult::SourceRepoDirty => {
                         // Calculate exponential backoff
