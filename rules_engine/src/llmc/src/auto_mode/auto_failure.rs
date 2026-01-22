@@ -49,12 +49,18 @@ pub enum HardFailure {
     PostAcceptCommandFailed { message: String },
     /// Worker entered error state after patrol retries exhausted.
     WorkerRetriesExhausted { worker_name: String, retry_count: u32 },
+    /// Worker is in error state (may not have gone through retries).
+    WorkerInErrorState { worker_name: String, error_reason: Option<String> },
+    /// Worker not found in state during recovery attempt.
+    WorkerNotFound { worker_name: String },
     /// Rebase failed during auto accept workflow.
     RebaseFailure { worker_name: String, message: String },
     /// State file corruption detected.
     StateCorruption { message: String },
     /// Hook IPC communication failure.
     HookIpcFailure { message: String },
+    /// Recovery attempt failed with an error.
+    RecoveryFailed { worker_name: String, error: String },
 }
 
 /// Result of attempting to recover from a transient failure.
@@ -107,9 +113,8 @@ pub fn attempt_recovery(
 
     let Some(worker) = state.get_worker_mut(worker_name) else {
         error!(worker = %worker_name, "Worker not found during recovery attempt");
-        return Ok(RecoveryResult::EscalateToHardFailure(HardFailure::WorkerRetriesExhausted {
+        return Ok(RecoveryResult::EscalateToHardFailure(HardFailure::WorkerNotFound {
             worker_name: worker_name.clone(),
-            retry_count: 0,
         }));
     };
 
@@ -170,9 +175,9 @@ pub fn check_for_hard_failures(state: &State) -> Option<HardFailure> {
         if let Some(worker) = state.get_worker(worker_name)
             && worker.status == WorkerStatus::Error
         {
-            return Some(HardFailure::WorkerRetriesExhausted {
+            return Some(HardFailure::WorkerInErrorState {
                 worker_name: worker_name.clone(),
-                retry_count: worker.auto_retry_count,
+                error_reason: worker.error_reason.clone(),
             });
         }
     }
@@ -217,6 +222,16 @@ impl std::fmt::Display for HardFailure {
                     worker_name, retry_count
                 )
             }
+            Self::WorkerInErrorState { worker_name, error_reason } => {
+                if let Some(reason) = error_reason {
+                    write!(f, "Worker '{}' in error state: {}", worker_name, reason)
+                } else {
+                    write!(f, "Worker '{}' in error state", worker_name)
+                }
+            }
+            Self::WorkerNotFound { worker_name } => {
+                write!(f, "Worker '{}' not found in state", worker_name)
+            }
             Self::RebaseFailure { worker_name, message } => {
                 write!(f, "Rebase failure for worker '{}': {}", worker_name, message)
             }
@@ -225,6 +240,9 @@ impl std::fmt::Display for HardFailure {
             }
             Self::HookIpcFailure { message } => {
                 write!(f, "Hook IPC failure: {}", message)
+            }
+            Self::RecoveryFailed { worker_name, error } => {
+                write!(f, "Recovery failed for worker '{}': {}", worker_name, error)
             }
         }
     }

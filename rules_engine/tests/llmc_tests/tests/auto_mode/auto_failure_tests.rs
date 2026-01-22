@@ -166,15 +166,20 @@ fn check_for_hard_failures_detects_error_state() {
     state.add_worker(create_worker_record("auto-1", WorkerStatus::Working));
     let mut error_worker = create_worker_record("auto-2", WorkerStatus::Error);
     error_worker.auto_retry_count = 3;
+    error_worker.error_reason = Some("Test error reason".to_string());
     state.add_worker(error_worker);
     let result = check_for_hard_failures(&state);
     assert!(result.is_some(), "Should return Some when worker is in Error state");
     match result.unwrap() {
-        HardFailure::WorkerRetriesExhausted { worker_name, retry_count } => {
+        HardFailure::WorkerInErrorState { worker_name, error_reason } => {
             assert_eq!(worker_name, "auto-2", "Should identify the error worker");
-            assert_eq!(retry_count, 3, "Should include retry count");
+            assert_eq!(
+                error_reason,
+                Some("Test error reason".to_string()),
+                "Should include error reason"
+            );
         }
-        other => panic!("Expected WorkerRetriesExhausted, got {:?}", other),
+        other => panic!("Expected WorkerInErrorState, got {:?}", other),
     }
 }
 

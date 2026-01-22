@@ -855,9 +855,9 @@ fn handle_auto_failures(
                     error = %e,
                     "Recovery attempt failed with error"
                 );
-                return Some(HardFailure::WorkerRetriesExhausted {
+                return Some(HardFailure::RecoveryFailed {
                     worker_name: get_worker_name_from_failure(&failure),
-                    retry_count: 0,
+                    error: e.to_string(),
                 });
             }
         }

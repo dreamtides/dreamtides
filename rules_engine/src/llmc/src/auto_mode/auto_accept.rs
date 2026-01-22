@@ -291,7 +291,10 @@ fn accept_and_merge(
     logger: &AutoLogger,
 ) -> Result<AutoAcceptResult, AutoAcceptError> {
     let llmc_root = config::get_llmc_root();
-    let worker = state.get_worker(worker_name).unwrap();
+    let worker = state.get_worker(worker_name).ok_or_else(|| AutoAcceptError {
+        worker_name: worker_name.to_string(),
+        message: "Worker not found in state during accept_and_merge".to_string(),
+    })?;
     let worktree_path = PathBuf::from(&worker.worktree_path);
     let branch = worker.branch.clone();
 
@@ -513,7 +516,10 @@ fn reset_worker_to_idle(
     logger: &AutoLogger,
 ) -> Result<(), AutoAcceptError> {
     let llmc_root = config::get_llmc_root();
-    let worker = state.get_worker(worker_name).unwrap();
+    let worker = state.get_worker(worker_name).ok_or_else(|| AutoAcceptError {
+        worker_name: worker_name.to_string(),
+        message: "Worker not found in state during reset_worker_to_idle".to_string(),
+    })?;
     let worktree_path = PathBuf::from(&worker.worktree_path);
     let branch = worker.branch.clone();
     let old_status = format!("{:?}", worker.status);
@@ -568,7 +574,10 @@ fn reset_worker_to_idle(
     })?;
 
     // Update worker state
-    let worker_mut = state.get_worker_mut(worker_name).unwrap();
+    let worker_mut = state.get_worker_mut(worker_name).ok_or_else(|| AutoAcceptError {
+        worker_name: worker_name.to_string(),
+        message: "Worker not found in state during state transition".to_string(),
+    })?;
     worker::apply_transition(worker_mut, WorkerTransition::ToIdle).map_err(|e| {
         AutoAcceptError {
             worker_name: worker_name.to_string(),
