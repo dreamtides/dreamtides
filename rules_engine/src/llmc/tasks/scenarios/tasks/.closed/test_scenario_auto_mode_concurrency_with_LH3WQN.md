@@ -16,7 +16,8 @@ blocked-by:
 - LH2WQN
 - LDZWQN
 created-at: 2026-01-21T21:59:55.443775Z
-updated-at: 2026-01-22T04:12:10.099277Z
+updated-at: 2026-01-22T05:16:09.567900Z
+closed-at: 2026-01-22T05:16:09.567900Z
 ---
 
 # Test Scenario: Auto Mode Concurrency with Multiple Workers
