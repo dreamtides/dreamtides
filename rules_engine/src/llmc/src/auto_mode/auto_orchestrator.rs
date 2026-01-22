@@ -573,6 +573,11 @@ fn process_completed_workers(
                         info!(worker = %worker_name, commit = %commit_sha, "Worker changes accepted");
 
                         // Run post-accept command if configured
+                        debug!(
+                            worker = %worker_name,
+                            post_accept_command = ?auto_cfg.post_accept_command,
+                            "About to call execute_post_accept_command"
+                        );
                         if let Err(e) = auto_accept::execute_post_accept_command(
                             &worker_name,
                             commit_sha,
@@ -620,6 +625,11 @@ fn process_completed_workers(
                         );
 
                         // Still run post-accept command since the accept succeeded
+                        debug!(
+                            worker = %worker_name,
+                            post_accept_command = ?auto_cfg.post_accept_command,
+                            "About to call execute_post_accept_command (cleanup failed path)"
+                        );
                         if let Err(e) = auto_accept::execute_post_accept_command(
                             &worker_name,
                             commit_sha,

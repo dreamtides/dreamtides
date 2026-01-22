@@ -3,7 +3,7 @@ use std::process::Command;
 use std::time::Instant;
 
 use anyhow::{Context, Result, bail};
-use tracing::{error, info};
+use tracing::{debug, error, info};
 
 use crate::auto_mode::auto_config::AutoConfig;
 use crate::auto_mode::auto_logging::{AutoLogger, CommandResult};
@@ -98,6 +98,11 @@ pub fn execute_post_accept_command(
     logger: &AutoLogger,
 ) -> Result<(), AutoAcceptError> {
     let Some(command) = &auto_config.post_accept_command else {
+        debug!(
+            worker = %worker_name,
+            commit = %commit_sha,
+            "No post_accept_command configured, skipping"
+        );
         return Ok(());
     };
 

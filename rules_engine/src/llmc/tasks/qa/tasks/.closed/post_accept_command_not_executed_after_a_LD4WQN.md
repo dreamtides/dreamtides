@@ -12,7 +12,8 @@ labels:
 blocking:
 - LH5WQN
 created-at: 2026-01-22T06:39:47.701805Z
-updated-at: 2026-01-22T06:40:37.001322Z
+updated-at: 2026-01-22T07:21:14.892636Z
+closed-at: 2026-01-22T07:21:14.892635Z
 ---
 
 # Bug: post_accept_command Not Executed After Auto-Accept
