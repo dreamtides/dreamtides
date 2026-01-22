@@ -92,7 +92,9 @@ pub fn run_up(options: UpOptions) -> Result<()> {
                 "⚠ Previous daemon crash detected. Running enhanced recovery checks..."
             )
         );
-        tracing::warn!("Daemon crash detected: daemon_running flag was true on startup");
+        tracing::info!(
+            "Daemon crash detected: daemon_running flag was true on startup (recovery in progress)"
+        );
     }
     cleanup_orphaned_sessions(&state, force, verbose)?;
     println!("{}", color_theme::dim("Starting LLMC daemon..."));
@@ -383,7 +385,7 @@ fn start_worker_with_recovery(
             return Ok(());
         }
         Err(e) => {
-            tracing::warn!("Worker '{}' initial start failed: {}. Attempting recovery...", name, e);
+            tracing::info!("Worker '{}' initial start failed: {}. Attempting recovery...", name, e);
             println!(
                 "    {}",
                 color_theme::muted("Initial start failed, attempting self-healing recovery...")
@@ -401,7 +403,7 @@ fn start_worker_with_recovery(
                 color_theme::muted(format!("Killing stale session '{}'...", session_id))
             );
             if let Err(e) = session::kill_session(&session_id) {
-                tracing::warn!("Failed to kill stale session '{}': {}", session_id, e);
+                tracing::info!("Failed to kill stale session '{}': {}", session_id, e);
             }
             thread::sleep(Duration::from_millis(500));
         }
@@ -428,7 +430,7 @@ fn start_worker_with_recovery(
                 return Ok(());
             }
             Err(e) => {
-                tracing::warn!("Worker '{}' recovery attempt {} failed: {}", name, attempt, e);
+                tracing::info!("Worker '{}' recovery attempt {} failed: {}", name, attempt, e);
                 if attempt == MAX_RETRIES {
                     return Err(e);
                 }

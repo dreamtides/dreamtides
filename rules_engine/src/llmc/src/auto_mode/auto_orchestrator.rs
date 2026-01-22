@@ -238,7 +238,7 @@ fn run_orchestration_loop(
                 && iteration_count > 5
                 && pending_hook_events.is_empty()
             {
-                warn!(
+                info!(
                     worker = %name,
                     iteration = iteration_count,
                     elapsed_secs = loop_start_time.elapsed().as_secs(),
@@ -621,7 +621,7 @@ fn process_completed_workers(
                             ))
                         );
                         logger.log_task_completed(&worker_name, TaskResult::NeedsReview);
-                        warn!(
+                        info!(
                             worker = %worker_name,
                             commit = %commit_sha,
                             cleanup_error = %cleanup_error,
@@ -690,7 +690,7 @@ fn process_completed_workers(
                             "[{}] Source repository has uncommitted changes. Will retry in {} seconds.",
                             worker_name, next_backoff
                         );
-                        warn!(
+                        info!(
                             worker = %worker_name,
                             backoff_secs = next_backoff,
                             retry_after_unix = retry_after,
@@ -807,7 +807,7 @@ fn handle_auto_failures(
                 info!(failure = %failure, "Recovery successful");
             }
             Ok(RecoveryResult::RetryNeeded) => {
-                warn!(failure = %failure, "Recovery needs retry on next patrol cycle");
+                info!(failure = %failure, "Recovery needs retry on next patrol cycle");
             }
             Ok(RecoveryResult::EscalateToHardFailure(hard_failure)) => {
                 error!(
