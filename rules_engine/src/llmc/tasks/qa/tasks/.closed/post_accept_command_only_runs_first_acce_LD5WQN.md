@@ -12,7 +12,8 @@ labels:
 blocking:
 - LH5WQN
 created-at: 2026-01-22T07:27:46.243960Z
-updated-at: 2026-01-22T07:32:57.144469Z
+updated-at: 2026-01-22T14:19:15.760486Z
+closed-at: 2026-01-22T14:19:15.760485Z
 ---
 
 # Bug: post_accept_command only runs for first accept, skipped for subsequent accepts
