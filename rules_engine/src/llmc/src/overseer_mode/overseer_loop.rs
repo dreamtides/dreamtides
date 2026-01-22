@@ -1,7 +1,7 @@
 use std::io::{BufRead, BufReader};
 use std::process::{Child, Command, Stdio};
 use std::sync::Arc;
-use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::atomic::{AtomicU32, Ordering};
 use std::thread::JoinHandle;
 use std::time::{Duration, Instant};
 use std::{fs, thread};
@@ -33,11 +33,17 @@ pub fn run_overseer(config: &Config, daemon_options: &OverseerDaemonOptions) -> 
     let overseer_config = validate_overseer_config(config)?;
     info!("Starting overseer supervisor");
 
-    let shutdown = Arc::new(AtomicBool::new(false));
-    let shutdown_clone = Arc::clone(&shutdown);
+    let shutdown_count: Arc<AtomicU32> = Arc::new(AtomicU32::new(0));
+    let shutdown_clone: Arc<AtomicU32> = Arc::clone(&shutdown_count);
     ctrlc::set_handler(move || {
-        println!("\nReceived Ctrl-C, shutting down overseer...");
-        shutdown_clone.store(true, Ordering::SeqCst);
+        let count = shutdown_clone.fetch_add(1, Ordering::SeqCst) + 1;
+        if count == 1 {
+            println!("\nReceived Ctrl-C, shutting down overseer and daemon gracefully...");
+            println!("Press Ctrl-C again to force immediate termination.");
+        } else {
+            println!("\nReceived second Ctrl-C, forcing immediate termination...");
+            std::process::exit(130);
+        }
     })
     .context("Failed to set Ctrl-C handler")?;
 
@@ -47,21 +53,22 @@ pub fn run_overseer(config: &Config, daemon_options: &OverseerDaemonOptions) -> 
     let mut monitor = HealthMonitor::new(overseer_config.clone());
 
     loop {
-        if shutdown.load(Ordering::SeqCst) {
+        if shutdown_count.load(Ordering::SeqCst) > 0 {
             info!("Shutdown requested, terminating overseer");
             break;
         }
 
-        let mut daemon_handle = start_daemon_and_wait_for_registration(&shutdown, daemon_options)?;
+        let mut daemon_handle =
+            start_daemon_and_wait_for_registration(&shutdown_count, daemon_options)?;
         let daemon_start_time = Instant::now();
         println!(
             "✓ Daemon started (PID: {}, instance: {})",
             daemon_handle.expected.pid, daemon_handle.expected.instance_id
         );
 
-        let failure = run_monitor_loop(&mut monitor, &daemon_handle.expected, &shutdown);
+        let failure = run_monitor_loop(&mut monitor, &daemon_handle.expected, &shutdown_count);
 
-        if shutdown.load(Ordering::SeqCst) {
+        if shutdown_count.load(Ordering::SeqCst) > 0 {
             info!("Shutdown requested during monitoring, terminating daemon");
             terminate_daemon_gracefully(&daemon_handle.expected);
             // Also kill the child process directly in case terminate_daemon_gracefully
@@ -103,9 +110,9 @@ pub fn run_overseer(config: &Config, daemon_options: &OverseerDaemonOptions) -> 
         }
 
         println!("Entering remediation mode...");
-        run_remediation(&failure_status, config, &shutdown)?;
+        run_remediation(&failure_status, config, &shutdown_count)?;
 
-        if shutdown.load(Ordering::SeqCst) {
+        if shutdown_count.load(Ordering::SeqCst) > 0 {
             info!("Shutdown requested during remediation");
             break;
         }
@@ -170,7 +177,7 @@ fn validate_overseer_config(config: &Config) -> Result<OverseerConfig> {
 /// daemon output to the overseer's stdout, and waits for the daemon to register
 /// via heartbeat file.
 fn start_daemon_and_wait_for_registration(
-    shutdown: &Arc<AtomicBool>,
+    shutdown_count: &Arc<AtomicU32>,
     daemon_options: &OverseerDaemonOptions,
 ) -> Result<DaemonHandle> {
     info!("Starting daemon");
@@ -248,7 +255,7 @@ fn start_daemon_and_wait_for_registration(
 
     let deadline = Instant::now() + Duration::from_secs(DAEMON_STARTUP_TIMEOUT_SECS);
     while Instant::now() < deadline {
-        if shutdown.load(Ordering::SeqCst) {
+        if shutdown_count.load(Ordering::SeqCst) > 0 {
             // Clean up child process on shutdown
             let _ = child.kill();
             bail!("Shutdown requested during daemon startup");
@@ -289,27 +296,37 @@ fn start_daemon_and_wait_for_registration(
 }
 
 /// Runs the health monitoring loop until a failure is detected or shutdown.
+///
+/// The loop checks for shutdown every 100ms to ensure responsive Ctrl+C
+/// handling, while only performing expensive health checks every
+/// HEALTH_CHECK_INTERVAL_SECS.
 fn run_monitor_loop(
     monitor: &mut HealthMonitor,
     expected: &ExpectedDaemon,
-    shutdown: &Arc<AtomicBool>,
+    shutdown_count: &Arc<AtomicU32>,
 ) -> Option<HealthStatus> {
     info!(pid = expected.pid, "Entering health monitoring loop");
     println!("Monitoring daemon health (Ctrl-C to stop)...");
 
+    let health_check_interval = Duration::from_secs(HEALTH_CHECK_INTERVAL_SECS);
+    let shutdown_poll_interval = Duration::from_millis(100);
+    let mut last_health_check = Instant::now();
+
     loop {
-        if shutdown.load(Ordering::SeqCst) {
+        if shutdown_count.load(Ordering::SeqCst) > 0 {
             return None;
         }
 
-        thread::sleep(Duration::from_secs(HEALTH_CHECK_INTERVAL_SECS));
+        thread::sleep(shutdown_poll_interval);
 
-        let status = monitor.check_daemon_health(expected);
-        if !status.is_healthy() {
-            return Some(status);
+        if last_health_check.elapsed() >= health_check_interval {
+            last_health_check = Instant::now();
+            let status = monitor.check_daemon_health(expected);
+            if !status.is_healthy() {
+                return Some(status);
+            }
+            debug!("Health check passed");
         }
-
-        debug!("Health check passed");
     }
 }
 
@@ -419,14 +436,14 @@ fn check_manual_intervention_needed() -> Result<bool> {
 fn run_remediation(
     failure: &HealthStatus,
     config: &Config,
-    shutdown: &Arc<AtomicBool>,
+    shutdown_count: &Arc<AtomicU32>,
 ) -> Result<()> {
     info!(failure = ?failure, "Starting remediation");
 
     let prompt = remediation_prompt::build_remediation_prompt(failure, config);
     debug!(prompt_length = prompt.len(), "Built remediation prompt");
 
-    remediation_executor::execute_remediation(&prompt, config, shutdown)?;
+    remediation_executor::execute_remediation(&prompt, config, shutdown_count)?;
 
     info!("Remediation completed");
     Ok(())

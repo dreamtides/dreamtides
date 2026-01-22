@@ -70,5 +70,5 @@ When complete, please:
 
 1) If the test passed: Run `lat close <ID>` to mark the issue as complete
 2) If the test DID NOT pass: Run `lat claim --release <ID>` and then use
-  `lat dep <ID> <CREATED>` to make this task depend on your created task.
+  `lat dep add <ID> <CREATED>` to make this task depend on your created task.
 3) Create a git commit with a description of your work

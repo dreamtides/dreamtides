@@ -10,7 +10,7 @@ use std::fs::{self, File, OpenOptions};
 use std::io::Write;
 use std::path::PathBuf;
 use std::sync::Arc;
-use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::atomic::{AtomicU32, Ordering};
 use std::time::{Duration, Instant};
 
 use anyhow::{Context, Result, bail};
@@ -41,7 +41,7 @@ const POST_PROMPT_DELAY_SECS: u64 = 3;
 pub fn execute_remediation(
     prompt: &str,
     config: &Config,
-    shutdown: &Arc<AtomicBool>,
+    shutdown_count: &Arc<AtomicU32>,
 ) -> Result<()> {
     let timestamp = Utc::now().format("%Y%m%d_%H%M%S").to_string();
     let log_path = remediation_log_path(&timestamp);
@@ -65,8 +65,9 @@ pub fn execute_remediation(
 
     println!("Waiting for remediation to complete...");
     let completion_result = block_in_place(|| {
-        Handle::current()
-            .block_on(async { wait_for_completion(ipc_receiver, shutdown, &mut log_file).await })
+        Handle::current().block_on(async {
+            wait_for_completion(ipc_receiver, shutdown_count, &mut log_file).await
+        })
     });
 
     let elapsed = start_time.elapsed();
@@ -119,13 +120,13 @@ fn start_ipc_listener_for_remediation() -> Result<Receiver<HookMessage>> {
 /// Waits for a Stop event from the overseer or timeout.
 async fn wait_for_completion(
     mut receiver: Receiver<HookMessage>,
-    shutdown: &Arc<AtomicBool>,
+    shutdown_count: &Arc<AtomicU32>,
     log_file: &mut File,
 ) -> Result<bool> {
     let deadline = Instant::now() + Duration::from_secs(REMEDIATION_TIMEOUT_SECS);
 
     loop {
-        if shutdown.load(Ordering::SeqCst) {
+        if shutdown_count.load(Ordering::SeqCst) > 0 {
             return Ok(false);
         }
 

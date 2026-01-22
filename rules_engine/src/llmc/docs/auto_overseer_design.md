@@ -219,7 +219,8 @@ Shutdown sequence for hard failures:
   Code
 - Designed for unattended multi-day operation
 - Single point of control for autonomous LLMC operation
-- Terminated via Ctrl-C
+- Terminated via Ctrl-C (first Ctrl-C begins graceful shutdown of both overseer
+  and daemon; second Ctrl-C forces immediate termination)
 
 ### Architecture
 
@@ -398,7 +399,9 @@ When failure detected:
 
 ### CLI Interface
 
-- `llmc overseer`: Start overseer (foreground, Ctrl-C to stop)
+- `llmc overseer`: Start overseer (foreground)
+  - First Ctrl-C: Begin graceful shutdown (terminates daemon cleanly, then exits)
+  - Second Ctrl-C: Force immediate termination (exits process immediately)
 
 ---
 
