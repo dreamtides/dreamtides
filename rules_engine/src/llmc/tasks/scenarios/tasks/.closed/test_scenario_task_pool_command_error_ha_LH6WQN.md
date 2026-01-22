@@ -15,7 +15,8 @@ labels:
 blocked-by:
 - LH5WQN
 created-at: 2026-01-21T22:01:59.228753Z
-updated-at: 2026-01-21T22:31:38.850822Z
+updated-at: 2026-01-22T23:12:10.837139Z
+closed-at: 2026-01-22T23:12:10.837139Z
 ---
 
 # Test Scenario: Task Pool Command Error Handling
