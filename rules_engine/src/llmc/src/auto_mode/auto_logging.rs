@@ -172,6 +172,9 @@ impl LogWriter {
         self.writer
             .write_all(bytes)
             .with_context(|| format!("Failed to write to log file: {}", self.path.display()))?;
+        self.writer
+            .flush()
+            .with_context(|| format!("Failed to flush log file: {}", self.path.display()))?;
         self.current_size += bytes.len() as u64;
         if self.current_size >= MAX_LOG_SIZE {
             self.rotate()?;

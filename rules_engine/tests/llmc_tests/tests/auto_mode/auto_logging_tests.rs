@@ -1,9 +1,14 @@
+use std::fs;
+use std::sync::Mutex;
 use std::time::Duration;
 
 use llmc::auto_mode::auto_logging::{
-    AutoEvent, AutoLogEntry, CommandResult, LogLevel, PostAcceptLogEntry, TaskPoolLogEntry,
-    TaskResult,
+    AutoEvent, AutoLogEntry, AutoLogger, CommandResult, LogLevel, PostAcceptLogEntry,
+    TaskPoolLogEntry, TaskResult, post_accept_log_path, task_pool_log_path,
 };
+use tempfile::TempDir;
+
+static LLMC_ROOT_MUTEX: Mutex<()> = Mutex::new(());
 
 #[test]
 fn log_level_info_serializes_to_uppercase() {
@@ -231,4 +236,89 @@ fn command_result_stores_all_fields() {
     assert_eq!(result.duration.as_millis(), 100, "Duration should be stored");
     assert_eq!(result.stdout, "hello", "Stdout should be stored");
     assert_eq!(result.stderr, "", "Stderr should be stored");
+}
+
+#[test]
+fn task_pool_log_writes_to_disk_immediately() {
+    let _guard = LLMC_ROOT_MUTEX.lock().unwrap();
+    let original_llmc_root = std::env::var("LLMC_ROOT").ok();
+    let temp_dir = TempDir::new().expect("Failed to create temp dir");
+    let temp_path = temp_dir.path().to_string_lossy().to_string();
+    unsafe { std::env::set_var("LLMC_ROOT", &temp_path) };
+    let logger = AutoLogger::new().expect("Failed to create logger");
+    let log_path = task_pool_log_path();
+    let cmd_result = CommandResult {
+        command: "test command".to_string(),
+        exit_code: 0,
+        duration: Duration::from_millis(100),
+        stdout: "test output".to_string(),
+        stderr: "".to_string(),
+    };
+    logger.log_task_pool(&cmd_result);
+    let content = fs::read_to_string(&log_path).unwrap_or_else(|e| {
+        panic!(
+            "Failed to read {}: {}. Log entries should be written immediately.",
+            log_path.display(),
+            e
+        )
+    });
+    match original_llmc_root {
+        Some(val) => unsafe { std::env::set_var("LLMC_ROOT", val) },
+        None => unsafe { std::env::remove_var("LLMC_ROOT") },
+    }
+    assert!(
+        content.contains("test command"),
+        "task_pool.log should contain the logged command immediately after log call. File content: '{}'",
+        content
+    );
+    assert!(
+        content.contains("test output"),
+        "task_pool.log should contain stdout from logged entry. File content: '{}'",
+        content
+    );
+}
+
+#[test]
+fn post_accept_log_writes_to_disk_immediately() {
+    let _guard = LLMC_ROOT_MUTEX.lock().unwrap();
+    let original_llmc_root = std::env::var("LLMC_ROOT").ok();
+    let temp_dir = TempDir::new().expect("Failed to create temp dir");
+    let temp_path = temp_dir.path().to_string_lossy().to_string();
+    unsafe { std::env::set_var("LLMC_ROOT", &temp_path) };
+    let logger = AutoLogger::new().expect("Failed to create logger");
+    let log_path = post_accept_log_path();
+    let cmd_result = CommandResult {
+        command: "just review".to_string(),
+        exit_code: 0,
+        duration: Duration::from_millis(5000),
+        stdout: "All tests passed".to_string(),
+        stderr: "".to_string(),
+    };
+    logger.log_post_accept("auto-1", "abc123def", &cmd_result);
+    let content = fs::read_to_string(&log_path).unwrap_or_else(|e| {
+        panic!(
+            "Failed to read {}: {}. Log entries should be written immediately.",
+            log_path.display(),
+            e
+        )
+    });
+    match original_llmc_root {
+        Some(val) => unsafe { std::env::set_var("LLMC_ROOT", val) },
+        None => unsafe { std::env::remove_var("LLMC_ROOT") },
+    }
+    assert!(
+        content.contains("just review"),
+        "post_accept.log should contain the logged command immediately after log call. File content: '{}'",
+        content
+    );
+    assert!(
+        content.contains("abc123def"),
+        "post_accept.log should contain commit SHA from logged entry. File content: '{}'",
+        content
+    );
+    assert!(
+        content.contains("All tests passed"),
+        "post_accept.log should contain stdout from logged entry. File content: '{}'",
+        content
+    );
 }
