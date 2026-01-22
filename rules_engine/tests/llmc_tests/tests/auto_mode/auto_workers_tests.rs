@@ -24,6 +24,8 @@ fn create_worker_record(name: &str, status: WorkerStatus) -> WorkerRecord {
         pending_rebase_prompt: false,
         error_reason: None,
         auto_retry_count: 0,
+        api_error_count: 0,
+        last_api_error_unix: None,
     }
 }
 

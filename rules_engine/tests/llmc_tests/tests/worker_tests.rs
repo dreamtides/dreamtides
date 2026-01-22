@@ -89,6 +89,8 @@ fn test_apply_transition_to_idle_clears_state() {
         pending_rebase_prompt: false,
         error_reason: None,
         auto_retry_count: 0,
+        api_error_count: 0,
+        last_api_error_unix: None,
     };
     apply_transition(&mut worker, WorkerTransition::ToIdle).unwrap();
     assert_eq!(worker.status, WorkerStatus::Idle);
@@ -118,6 +120,8 @@ fn test_apply_transition_to_working_sets_prompt() {
         pending_rebase_prompt: false,
         error_reason: None,
         auto_retry_count: 0,
+        api_error_count: 0,
+        last_api_error_unix: None,
     };
     apply_transition(&mut worker, WorkerTransition::ToWorking {
         prompt: "Test prompt".to_string(),
@@ -150,6 +154,8 @@ fn test_apply_transition_to_needs_review_sets_commit_sha() {
         pending_rebase_prompt: false,
         error_reason: None,
         auto_retry_count: 0,
+        api_error_count: 0,
+        last_api_error_unix: None,
     };
     apply_transition(&mut worker, WorkerTransition::ToNeedsReview {
         commit_sha: "abc123".to_string(),
@@ -181,6 +187,8 @@ fn test_apply_transition_idle_to_needs_review() {
         pending_rebase_prompt: false,
         error_reason: None,
         auto_retry_count: 0,
+        api_error_count: 0,
+        last_api_error_unix: None,
     };
     apply_transition(&mut worker, WorkerTransition::ToNeedsReview {
         commit_sha: "abc123".to_string(),
@@ -212,6 +220,8 @@ fn test_apply_transition_none_does_nothing() {
         pending_rebase_prompt: false,
         error_reason: None,
         auto_retry_count: 0,
+        api_error_count: 0,
+        last_api_error_unix: None,
     };
     let old_status = worker.status;
     apply_transition(&mut worker, WorkerTransition::None).unwrap();
@@ -260,6 +270,8 @@ fn test_apply_transition_to_reviewing() {
         pending_rebase_prompt: false,
         error_reason: None,
         auto_retry_count: 0,
+        api_error_count: 0,
+        last_api_error_unix: None,
     };
     apply_transition(&mut worker, WorkerTransition::ToReviewing).unwrap();
     assert_eq!(worker.status, WorkerStatus::Reviewing);

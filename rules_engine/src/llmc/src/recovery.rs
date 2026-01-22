@@ -9,3 +9,13 @@ pub fn should_reset_crash_count(worker: &WorkerRecord, now_unix: u64) -> bool {
         false
     }
 }
+
+/// Reset API error count if appropriate (after 24 hours)
+pub fn should_reset_api_error_count(worker: &WorkerRecord, now_unix: u64) -> bool {
+    if let Some(last_api_error) = worker.last_api_error_unix {
+        let time_since_error = now_unix.saturating_sub(last_api_error);
+        time_since_error >= 24 * 60 * 60
+    } else {
+        false
+    }
+}

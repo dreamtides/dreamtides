@@ -14,4 +14,5 @@ pub mod recovery;
 pub mod sound;
 pub mod state;
 pub mod tmux;
+pub mod transcript_reader;
 pub mod worker;

@@ -181,6 +181,8 @@ fn create_auto_worker(state: &mut State, config: &Config, name: &str) -> Result<
         pending_rebase_prompt: false,
         error_reason: None,
         auto_retry_count: 0,
+        api_error_count: 0,
+        last_api_error_unix: None,
     };
     state.add_worker(worker_record);
     add_auto_worker_to_config(name, config)?;

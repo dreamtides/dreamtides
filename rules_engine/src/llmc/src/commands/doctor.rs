@@ -831,6 +831,8 @@ fn run_rebuild() -> Result<()> {
             pending_rebase_prompt: false,
             error_reason: None,
             auto_retry_count: 0,
+            api_error_count: 0,
+            last_api_error_unix: None,
         };
         workers.insert(name.clone(), worker);
     }

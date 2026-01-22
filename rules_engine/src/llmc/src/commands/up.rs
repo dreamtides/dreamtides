@@ -378,15 +378,18 @@ fn start_worker_with_recovery(
     match start_worker(name, config, state, verbose) {
         Ok(()) => {
             if let Some(worker_mut) = state.get_worker_mut(name)
-                && worker_mut.crash_count > 0
+                && (worker_mut.crash_count > 0 || worker_mut.api_error_count > 0)
             {
                 tracing::info!(
-                    "Worker '{}' started successfully, resetting crash count from {}",
+                    "Worker '{}' started successfully, resetting error counts (crash={}, api_error={})",
                     name,
-                    worker_mut.crash_count
+                    worker_mut.crash_count,
+                    worker_mut.api_error_count
                 );
                 worker_mut.crash_count = 0;
                 worker_mut.last_crash_unix = None;
+                worker_mut.api_error_count = 0;
+                worker_mut.last_api_error_unix = None;
             }
             return Ok(());
         }
@@ -432,6 +435,8 @@ fn start_worker_with_recovery(
                 if let Some(worker_mut) = state.get_worker_mut(name) {
                     worker_mut.crash_count = 0;
                     worker_mut.last_crash_unix = None;
+                    worker_mut.api_error_count = 0;
+                    worker_mut.last_api_error_unix = None;
                 }
                 return Ok(());
             }

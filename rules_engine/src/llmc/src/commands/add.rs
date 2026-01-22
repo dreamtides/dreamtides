@@ -83,6 +83,8 @@ pub fn run_add(
         pending_rebase_prompt: false,
         error_reason: None,
         auto_retry_count: 0,
+        api_error_count: 0,
+        last_api_error_unix: None,
     };
     state.add_worker(worker_record);
     state.save(&state_path)?;

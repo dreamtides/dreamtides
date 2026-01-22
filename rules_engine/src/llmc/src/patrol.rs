@@ -11,7 +11,7 @@ use crate::state::{self, State, WorkerStatus};
 use crate::tmux::sender::TmuxSender;
 use crate::tmux::session;
 use crate::worker::{self, WorkerTransition};
-use crate::{git, recovery, sound};
+use crate::{git, recovery, sound, transcript_reader};
 
 const OVERSEER_WORKER_NAME: &str = "overseer";
 
@@ -40,8 +40,15 @@ pub fn handle_hook_event(event: &HookEvent, state: &mut State, config: &Config) 
         HookEvent::SessionStart { worker, session_id, timestamp } => {
             handle_session_start(worker, session_id, *timestamp, state)?;
         }
-        HookEvent::SessionEnd { worker, reason, timestamp } => {
-            handle_session_end(worker, reason, *timestamp, state, config)?;
+        HookEvent::SessionEnd { worker, reason, timestamp, transcript_path } => {
+            handle_session_end(
+                worker,
+                reason,
+                *timestamp,
+                transcript_path.as_deref(),
+                state,
+                config,
+            )?;
         }
         HookEvent::Stop { worker, timestamp, .. } => {
             handle_stop(worker, *timestamp, state, config)?;
@@ -325,19 +332,26 @@ impl Patrol {
         let worker_names: Vec<String> = state.workers.keys().cloned().collect();
         for worker_name in worker_names {
             report.sessions_checked += 1;
-            if let Some(worker_mut) = state.get_worker_mut(&worker_name)
-                && recovery::should_reset_crash_count(
-                    worker_mut,
-                    SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs(),
-                )
-            {
-                tracing::info!(
-                    "Worker {} crash count expired (24h), resetting from {}",
-                    worker_name,
-                    worker_mut.crash_count
-                );
-                worker_mut.crash_count = 0;
-                worker_mut.last_crash_unix = None;
+            if let Some(worker_mut) = state.get_worker_mut(&worker_name) {
+                let now = SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs();
+                if recovery::should_reset_crash_count(worker_mut, now) {
+                    tracing::info!(
+                        "Worker {} crash count expired (24h), resetting from {}",
+                        worker_name,
+                        worker_mut.crash_count
+                    );
+                    worker_mut.crash_count = 0;
+                    worker_mut.last_crash_unix = None;
+                }
+                if recovery::should_reset_api_error_count(worker_mut, now) {
+                    tracing::info!(
+                        "Worker {} API error count expired (24h), resetting from {}",
+                        worker_name,
+                        worker_mut.api_error_count
+                    );
+                    worker_mut.api_error_count = 0;
+                    worker_mut.last_api_error_unix = None;
+                }
             }
         }
         Ok(())
@@ -1109,6 +1123,7 @@ fn handle_session_end(
     worker_name: &str,
     reason: &str,
     timestamp: u64,
+    transcript_path: Option<&str>,
     state: &mut State,
     _config: &Config,
 ) -> Result<()> {
@@ -1153,10 +1168,45 @@ fn handle_session_end(
 
     let is_crash = reason != "logout";
 
+    // Check transcript for API errors (500s, rate limits, etc.)
+    let api_error_info = transcript_path.and_then(|path| {
+        let path = Path::new(path);
+        match transcript_reader::scan_transcript_for_api_errors(path, 50) {
+            Ok(info) => {
+                if info.has_errors() {
+                    tracing::info!(
+                        worker = %worker_name,
+                        error_count = info.error_count,
+                        has_500_error = info.has_500_error,
+                        has_rate_limit = info.has_rate_limit_error,
+                        last_error = ?info.last_error_message,
+                        "Detected API errors in transcript"
+                    );
+                }
+                Some(info)
+            }
+            Err(e) => {
+                tracing::debug!(
+                    worker = %worker_name,
+                    error = %e,
+                    transcript_path = %path.display(),
+                    "Failed to scan transcript for API errors"
+                );
+                None
+            }
+        }
+    });
+
+    let is_api_error = api_error_info
+        .as_ref()
+        .map(|info| info.has_500_error || info.has_rate_limit_error)
+        .unwrap_or(false);
+
     tracing::info!(
         worker = %worker_name,
         reason = %reason,
         is_crash = is_crash,
+        is_api_error = is_api_error,
         "Worker offline via SessionEnd hook"
     );
 
@@ -1170,7 +1220,18 @@ fn handle_session_end(
             return Ok(());
         }
 
-        if is_crash {
+        if is_api_error {
+            // Track API errors separately - they get different backoff treatment
+            w.api_error_count = w.api_error_count.saturating_add(1);
+            w.last_api_error_unix = Some(timestamp);
+            tracing::warn!(
+                worker = %worker_name,
+                api_error_count = w.api_error_count,
+                reason = %reason,
+                "Worker session ended due to API error. Will retry with API-specific backoff. \
+                 Claude servers may be experiencing issues."
+            );
+        } else if is_crash {
             w.crash_count = w.crash_count.saturating_add(1);
             w.last_crash_unix = Some(timestamp);
             tracing::error!(

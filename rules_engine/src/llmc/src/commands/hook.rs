@@ -98,8 +98,13 @@ pub async fn run_hook_session_end(worker: &str, cli_reason: &str) -> Result<()> 
         }
     };
     let reason = input.reason.unwrap_or_else(|| cli_reason.to_string());
-    let event =
-        HookEvent::SessionEnd { worker: worker.to_string(), reason: reason.clone(), timestamp };
+    let transcript_path = input.transcript_path.clone();
+    let event = HookEvent::SessionEnd {
+        worker: worker.to_string(),
+        reason: reason.clone(),
+        timestamp,
+        transcript_path,
+    };
     send_event_gracefully(event, "session_end", worker, &reason, start_time).await;
     Ok(())
 }

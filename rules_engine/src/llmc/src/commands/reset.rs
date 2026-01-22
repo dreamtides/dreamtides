@@ -211,6 +211,8 @@ fn reset_worker(state: &mut State, llmc_root: &Path, worker: &str, yes: bool) ->
     worker_mut.last_activity_unix = SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs();
     worker_mut.crash_count = 0;
     worker_mut.last_crash_unix = None;
+    worker_mut.api_error_count = 0;
+    worker_mut.last_api_error_unix = None;
     worker_mut.error_reason = None;
     println!("  ✓ Reset state to Idle");
     let daemon_running = add::is_daemon_running();

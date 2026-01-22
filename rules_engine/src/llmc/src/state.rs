@@ -94,6 +94,13 @@ pub struct WorkerRecord {
     /// before escalating to hard failure.
     #[serde(default)]
     pub auto_retry_count: u32,
+    /// Number of API errors (500s, rate limits) detected via transcript.
+    /// Tracked separately from crash_count to enable API-specific backoff.
+    #[serde(default)]
+    pub api_error_count: u32,
+    /// Unix timestamp of last API error. Used for API-specific backoff timing.
+    #[serde(default)]
+    pub last_api_error_unix: Option<u64>,
 }
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct State {

@@ -135,15 +135,18 @@ pub fn apply_transition(worker: &mut WorkerRecord, transition: WorkerTransition)
         WorkerTransition::ToIdle
             | WorkerTransition::ToNeedsReview { .. }
             | WorkerTransition::ToNoChanges
-    ) && worker.crash_count > 0
+    ) && (worker.crash_count > 0 || worker.api_error_count > 0)
     {
         tracing::info!(
-            "Worker {} completed successfully, resetting crash count from {}",
+            "Worker {} completed successfully, resetting error counts (crash={}, api_error={})",
             worker.name,
-            worker.crash_count
+            worker.crash_count,
+            worker.api_error_count
         );
         worker.crash_count = 0;
         worker.last_crash_unix = None;
+        worker.api_error_count = 0;
+        worker.last_api_error_unix = None;
     }
     worker.status = new_status;
     worker.last_activity_unix = SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs();

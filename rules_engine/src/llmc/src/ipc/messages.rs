@@ -4,9 +4,23 @@ use uuid::Uuid;
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(tag = "type")]
 pub enum HookEvent {
-    SessionStart { worker: String, session_id: String, timestamp: u64 },
-    SessionEnd { worker: String, reason: String, timestamp: u64 },
-    Stop { worker: String, session_id: String, timestamp: u64 },
+    SessionStart {
+        worker: String,
+        session_id: String,
+        timestamp: u64,
+    },
+    SessionEnd {
+        worker: String,
+        reason: String,
+        timestamp: u64,
+        /// Path to Claude transcript file, used to detect API errors
+        transcript_path: Option<String>,
+    },
+    Stop {
+        worker: String,
+        session_id: String,
+        timestamp: u64,
+    },
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
