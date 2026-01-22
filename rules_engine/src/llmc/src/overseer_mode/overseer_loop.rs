@@ -72,8 +72,9 @@ pub fn run_overseer(config: &Config, daemon_options: &OverseerDaemonOptions) -> 
             info!("Shutdown requested during monitoring, terminating daemon");
             terminate_daemon_gracefully(&daemon_handle.expected);
             // Also kill the child process directly in case terminate_daemon_gracefully
-            // fails
+            // fails, and wait to reap the zombie process
             let _ = daemon_handle.child.kill();
+            let _ = daemon_handle.child.wait();
             break;
         }
 
@@ -85,8 +86,10 @@ pub fn run_overseer(config: &Config, daemon_options: &OverseerDaemonOptions) -> 
         info!(failure = ?failure_status, "Daemon failure detected");
 
         terminate_daemon_gracefully(&daemon_handle.expected);
-        // Also kill the child process directly to ensure cleanup
+        // Also kill the child process directly to ensure cleanup, and wait to
+        // reap the zombie process (otherwise kill(pid,0) will still return 0)
         let _ = daemon_handle.child.kill();
+        let _ = daemon_handle.child.wait();
 
         if is_failure_spiral(daemon_start_time, &overseer_config) {
             error!("Failure spiral detected - daemon failed within cooldown period");
@@ -123,6 +126,11 @@ pub fn run_overseer(config: &Config, daemon_options: &OverseerDaemonOptions) -> 
         }
 
         println!("\x1b[1;32m✓ Remediation complete. Restarting daemon...\x1b[0m");
+
+        // Reset log tailer positions to skip errors from the previous daemon's
+        // termination and from remediation itself. Without this, the health
+        // monitor would detect old WARN/ERROR logs as new failures.
+        monitor.reset_log_positions();
     }
 
     println!("✓ Overseer shutdown complete");

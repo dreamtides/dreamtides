@@ -207,6 +207,29 @@ impl LogTailer {
         }
         None
     }
+
+    /// Resets the tailer position to the current end of the file.
+    ///
+    /// Call this to skip any entries added since the last read and start
+    /// fresh from the current position. Useful when restarting monitoring
+    /// after a remediation cycle to avoid re-reading old error logs.
+    pub fn reset_position(&mut self) {
+        let (last_position, last_inode) = if self.path.exists() {
+            match fs::metadata(&self.path) {
+                Ok(metadata) => (metadata.len(), get_inode(&metadata)),
+                Err(_) => (0, None),
+            }
+        } else {
+            (0, None)
+        };
+        self.last_position = last_position;
+        self.last_inode = last_inode;
+        debug!(
+            path = %self.path.display(),
+            new_position = last_position,
+            "Log tailer position reset to end of file"
+        );
+    }
 }
 impl HealthMonitor {
     /// Creates a new health monitor with the given configuration.
@@ -345,6 +368,17 @@ impl HealthMonitor {
     /// Returns a reference to the overseer configuration.
     pub fn config(&self) -> &OverseerConfig {
         &self.config
+    }
+
+    /// Resets the log tailer positions to the current end of all log files.
+    ///
+    /// Call this before starting a new monitoring cycle after remediation.
+    /// This prevents the monitor from detecting old errors/warnings logged
+    /// during the previous daemon's termination or during remediation.
+    pub fn reset_log_positions(&mut self) {
+        info!("Resetting log tailer positions to skip previous errors");
+        self.auto_log_tailer.reset_position();
+        self.main_log_tailer.reset_position();
     }
 }
 /// Parses a JSON log entry to check if it's an ERROR or WARN level.
