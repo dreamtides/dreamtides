@@ -356,13 +356,65 @@ fn send_large_message(&self, session: &str, message: &str) -> Result<()> {
     // Paste from buffer
     tmux::paste_buffer(session, "-b", "prompt")?;
 
-    // Standard debounce and Enter
+    // Standard debounce and Enter with verification
     sleep(self.calculate_delay(message.len()));
-    tmux::send_keys(session, "Enter")?;
-
-    Ok(())
+    self.send_enter_and_verify(session)
 }
 ```
+
+### Input Verification Pattern (January 2026)
+
+A race condition can occur where the Enter key is sent before the paste operation
+fully completes, leaving input "stuck" in the Claude Code prompt without being
+submitted. This manifests as:
+
+- Pasted text visible (e.g., "[Pasted text #1 +72 lines]")
+- "bypass permissions on" prompt visible
+- Claude not processing (no "⏺ " or "Thinking" indicators)
+
+**Solution**: After sending Enter, verify the input was actually submitted:
+
+```rust
+fn send_enter_and_verify(&self, session: &str) -> Result<()> {
+    for verify_attempt in 0..self.verify_retry_count {
+        self.send_enter_with_retry(session)?;
+        sleep(Duration::from_millis(self.verify_retry_delay_ms));
+
+        if !self.is_input_stuck(session)? {
+            return Ok(());
+        }
+
+        // Log warning and retry
+        tracing::warn!("Input appears stuck, sending Enter again");
+    }
+    bail!("Input still stuck after {} verification attempts", self.verify_retry_count)
+}
+
+fn is_input_stuck(&self, session: &str) -> Result<bool> {
+    let content = capture_pane(session, 30)?;
+
+    // Indicators that input is stuck in the prompt
+    let stuck_indicators = ["[Pasted text", "bypass permissions on", "⏵⏵"];
+
+    // Indicators that Claude is processing (not stuck)
+    let processing_indicators = ["⏺ ", "Thinking", "● "];
+
+    let has_stuck = stuck_indicators.iter().any(|i| content.contains(i));
+    let has_processing = processing_indicators.iter().any(|i| content.contains(i));
+
+    Ok(has_stuck && !has_processing)
+}
+```
+
+**Configuration parameters** (added to TmuxSender):
+
+| Parameter | Default | Description |
+|-----------|---------|-------------|
+| `verify_retry_count` | 5 | Number of verification + retry attempts |
+| `verify_retry_delay_ms` | 500 | Delay between verification checks |
+
+This provides up to 5 additional Enter retries with verification, significantly
+improving reliability for large message sends in auto mode.
 
 ### Testing Methodology
 

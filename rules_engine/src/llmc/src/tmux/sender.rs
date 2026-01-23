@@ -4,9 +4,8 @@ use std::time::Duration;
 
 use anyhow::{Context, Result, bail};
 use tempfile::NamedTempFile;
-use tmux_interface::{LoadBuffer, PasteBuffer, SendKeys, Tmux};
+use tmux_interface::{CapturePane, LoadBuffer, PasteBuffer, SendKeys, Tmux};
 pub const LARGE_MESSAGE_THRESHOLD: usize = 1024;
-/// Handles reliable message sending to TMUX sessions with debouncing
 #[derive(Clone)]
 pub struct TmuxSender {
     /// Base delay in milliseconds (default: 500ms)
@@ -19,6 +18,10 @@ pub struct TmuxSender {
     pub enter_retry_count: u32,
     /// Delay between Enter retries (default: 200ms)
     pub enter_retry_delay_ms: u32,
+    /// Number of verification retries after Enter (default: 5)
+    pub verify_retry_count: u32,
+    /// Delay between verification checks (default: 500ms)
+    pub verify_retry_delay_ms: u32,
 }
 impl Default for TmuxSender {
     fn default() -> Self {
@@ -26,7 +29,6 @@ impl Default for TmuxSender {
     }
 }
 impl TmuxSender {
-    /// Creates a new TmuxSender with default timing parameters
     pub fn new() -> Self {
         Self {
             debounce_base_ms: 500,
@@ -34,6 +36,8 @@ impl TmuxSender {
             max_debounce_ms: 2000,
             enter_retry_count: 3,
             enter_retry_delay_ms: 200,
+            verify_retry_count: 5,
+            verify_retry_delay_ms: 500,
         }
     }
 
@@ -87,7 +91,6 @@ impl TmuxSender {
         Ok(())
     }
 
-    /// Sends a large message (>=1KB) using TMUX load-buffer method
     pub fn send_large_message(&self, session: &str, message: &str) -> Result<()> {
         let tmp = NamedTempFile::new().context("Failed to create temporary file")?;
         fs::write(tmp.path(), message).context("Failed to write message to temp file")?;
@@ -101,7 +104,7 @@ impl TmuxSender {
             .with_context(|| format!("Failed to paste buffer in session '{}'", session))?;
         let delay = self.calculate_delay(message.len());
         sleep(delay);
-        self.send_enter_with_retry(session)
+        self.send_enter_and_verify(session)
     }
 
     fn send_small_message(&self, session: &str, message: &str) -> Result<()> {
@@ -110,7 +113,7 @@ impl TmuxSender {
             .with_context(|| format!("Failed to send message to session '{}'", session))?;
         let delay = self.calculate_delay(message.len());
         sleep(delay);
-        self.send_enter_with_retry(session)
+        self.send_enter_and_verify(session)
     }
 
     fn send_enter_with_retry(&self, session: &str) -> Result<()> {
@@ -130,6 +133,42 @@ impl TmuxSender {
             self.enter_retry_count,
             session
         )
+    }
+
+    fn send_enter_and_verify(&self, session: &str) -> Result<()> {
+        for verify_attempt in 0..self.verify_retry_count {
+            self.send_enter_with_retry(session)?;
+            sleep(Duration::from_millis(self.verify_retry_delay_ms as u64));
+            if !self.is_input_stuck(session)? {
+                return Ok(());
+            }
+            tracing::warn!(
+                session_id = session,
+                attempt = verify_attempt + 1,
+                max_attempts = self.verify_retry_count,
+                "Input appears stuck, sending Enter again"
+            );
+        }
+        bail!(
+            "Input still stuck after {} verification attempts in session '{}'",
+            self.verify_retry_count,
+            session
+        )
+    }
+
+    fn is_input_stuck(&self, session: &str) -> Result<bool> {
+        let output =
+            Tmux::with_command(CapturePane::new().target_pane(session).stdout().start_line("-30"))
+                .output()
+                .with_context(|| format!("Failed to capture pane for session '{}'", session))?;
+        let content = output.to_string();
+        let stuck_indicators = ["[Pasted text", "bypass permissions on", "⏵⏵"];
+        let has_stuck_indicator =
+            stuck_indicators.iter().any(|indicator| content.contains(indicator));
+        let processing_indicators = ["⏺ ", "Thinking", "● "];
+        let has_processing_indicator =
+            processing_indicators.iter().any(|indicator| content.contains(indicator));
+        Ok(has_stuck_indicator && !has_processing_indicator)
     }
 
     pub fn calculate_delay(&self, message_len: usize) -> Duration {
