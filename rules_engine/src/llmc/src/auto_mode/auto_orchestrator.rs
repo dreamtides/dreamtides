@@ -14,6 +14,7 @@ use crate::auto_mode::auto_config::{AutoConfig, ResolvedAutoConfig};
 use crate::auto_mode::auto_failure::{self, HardFailure, RecoveryResult, TransientFailure};
 use crate::auto_mode::auto_logging::{AutoLogger, TaskResult};
 use crate::auto_mode::heartbeat_thread::{DaemonRegistration, HeartbeatThread};
+use crate::auto_mode::task_context::TaskContextConfig;
 use crate::auto_mode::{auto_logging, auto_workers, heartbeat_thread};
 use crate::config::Config;
 use crate::git;
@@ -65,6 +66,27 @@ pub fn run_auto_mode(
         "Starting auto mode daemon"
     );
 
+    // Load task context config (missing file is not an error)
+    let task_context = match &auto_config.context_config_path {
+        Some(path) if path.exists() => match TaskContextConfig::load(path) {
+            Ok(config) => {
+                info!(path = %path.display(), "Loaded task context config");
+                config
+            }
+            Err(e) => {
+                return Err(e.context("Failed to load task context config"));
+            }
+        },
+        Some(path) => {
+            info!(path = %path.display(), "Task context config not found, using defaults");
+            TaskContextConfig::default()
+        }
+        None => {
+            info!("No task context config path configured, using defaults");
+            TaskContextConfig::default()
+        }
+    };
+
     // Register daemon
     let log_file = auto_logging::auto_log_path().to_string_lossy().to_string();
     let registration = DaemonRegistration::new(&instance_id, &log_file);
@@ -78,6 +100,7 @@ pub fn run_auto_mode(
     let result = run_orchestration_loop(
         llmc_config,
         auto_config,
+        &task_context,
         &instance_id,
         &logger,
         shutdown.clone(),
@@ -103,6 +126,7 @@ pub fn run_auto_mode(
 fn run_orchestration_loop(
     llmc_config: &Config,
     auto_config: &ResolvedAutoConfig,
+    task_context: &TaskContextConfig,
     _instance_id: &str,
     logger: &AutoLogger,
     shutdown: Arc<AtomicBool>,
@@ -291,15 +315,20 @@ fn run_orchestration_loop(
         }
 
         // Process idle auto workers - assign tasks
-        let any_task_assigned =
-            match process_idle_workers(&mut state, llmc_config, auto_config, logger) {
-                Ok(assigned) => assigned,
-                Err(e) => {
-                    logger.log_error("process_idle_workers", &e.to_string());
-                    shutdown_error = Some(e.to_string());
-                    break;
-                }
-            };
+        let any_task_assigned = match process_idle_workers(
+            &mut state,
+            llmc_config,
+            auto_config,
+            task_context,
+            logger,
+        ) {
+            Ok(assigned) => assigned,
+            Err(e) => {
+                logger.log_error("process_idle_workers", &e.to_string());
+                shutdown_error = Some(e.to_string());
+                break;
+            }
+        };
 
         // Track when all workers are idle with no tasks available
         if any_task_assigned {
@@ -405,6 +434,7 @@ fn process_idle_workers(
     state: &mut State,
     _llmc_config: &Config,
     _auto_config: &ResolvedAutoConfig,
+    _task_context: &TaskContextConfig,
     _logger: &AutoLogger,
 ) -> Result<bool> {
     let idle_workers: Vec<String> =
@@ -430,13 +460,18 @@ fn process_idle_workers(
 /// hook fires after the session restarts (handled in patrol.rs). This prevents
 /// a race condition where the prompt could be sent before the new session is
 /// ready to receive input.
+///
+/// The `label` parameter is used to resolve label-specific prologue/epilogue
+/// context from the task context config.
 // Will be used in milestone-4 task discovery
 #[allow(dead_code, clippy::allow_attributes)]
 fn assign_task_to_worker(
     state: &mut State,
     _llmc_config: &Config,
+    task_context: &TaskContextConfig,
     worker_name: &str,
     task: &str,
+    label: Option<&str>,
     logger: &AutoLogger,
 ) -> Result<()> {
     let worker = state.get_worker(worker_name).context("Worker not found")?;
@@ -450,8 +485,12 @@ fn assign_task_to_worker(
     }
     git::pull_rebase(&worktree_path)?;
 
-    // Build prompt
-    let full_prompt = build_auto_prompt(&worktree_path, task)?;
+    // Resolve context for this task's label
+    let resolved = task_context.resolve(label);
+
+    // Build prompt with context injection
+    let full_prompt =
+        build_auto_prompt(&worktree_path, task, &resolved.prologue, &resolved.epilogue)?;
 
     // Send /clear to restart the session. The prompt will be sent when
     // SessionStart hook fires (handled in patrol.rs handle_session_start).
@@ -466,6 +505,7 @@ fn assign_task_to_worker(
     info!(
         worker = %worker_name,
         prompt_len = full_prompt.len(),
+        label = ?label,
         "Task queued, waiting for SessionStart after /clear"
     );
 
@@ -479,14 +519,25 @@ fn assign_task_to_worker(
     Ok(())
 }
 
-/// Builds the full prompt for an auto worker task.
-fn build_auto_prompt(worktree_path: &std::path::Path, task: &str) -> Result<String> {
+/// Builds the full prompt for an auto worker task with context injection.
+///
+/// The prompt structure is:
+/// 1. Standard preamble (worktree location, repo root, basic instructions)
+/// 2. Resolved prologue (if non-empty)
+/// 3. Task subject and description
+/// 4. Resolved epilogue (if non-empty)
+fn build_auto_prompt(
+    worktree_path: &std::path::Path,
+    task: &str,
+    prologue: &str,
+    epilogue: &str,
+) -> Result<String> {
     let repo_root = worktree_path
         .parent()
         .and_then(|p| p.parent())
         .context("Could not determine repository root")?;
 
-    let prompt = format!(
+    let mut prompt = format!(
         "You are working in: {}\n\
          Repository root: {}\n\
          \n\
@@ -494,12 +545,31 @@ fn build_auto_prompt(worktree_path: &std::path::Path, task: &str) -> Result<Stri
          Run validation commands before committing\n\
          Create a single commit with your changes\n\
          Do NOT push to remote\n\
-         \n\
-         {}",
+         \n",
         worktree_path.display(),
-        repo_root.display(),
-        task
+        repo_root.display()
     );
+
+    // Add prologue after preamble (if non-empty)
+    if !prologue.is_empty() {
+        prompt.push_str(prologue);
+        if !prologue.ends_with('\n') {
+            prompt.push('\n');
+        }
+        prompt.push('\n');
+    }
+
+    // Add task description
+    prompt.push_str(task);
+
+    // Add epilogue after task (if non-empty)
+    if !epilogue.is_empty() {
+        if !task.ends_with('\n') {
+            prompt.push('\n');
+        }
+        prompt.push('\n');
+        prompt.push_str(epilogue);
+    }
 
     Ok(prompt)
 }

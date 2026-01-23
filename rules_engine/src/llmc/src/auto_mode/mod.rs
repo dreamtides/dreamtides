@@ -6,4 +6,5 @@ pub mod auto_orchestrator;
 pub mod auto_workers;
 pub mod claude_tasks;
 pub mod heartbeat_thread;
+pub mod task_context;
 pub mod task_pool;
