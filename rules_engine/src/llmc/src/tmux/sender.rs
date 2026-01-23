@@ -113,7 +113,7 @@ impl TmuxSender {
             .with_context(|| format!("Failed to send message to session '{}'", session))?;
         let delay = self.calculate_delay(message.len());
         sleep(delay);
-        self.send_enter_and_verify(session)
+        self.send_enter_with_retry(session)
     }
 
     fn send_enter_with_retry(&self, session: &str) -> Result<()> {
@@ -162,13 +162,7 @@ impl TmuxSender {
                 .output()
                 .with_context(|| format!("Failed to capture pane for session '{}'", session))?;
         let content = output.to_string();
-        let stuck_indicators = ["[Pasted text", "bypass permissions on", "⏵⏵"];
-        let has_stuck_indicator =
-            stuck_indicators.iter().any(|indicator| content.contains(indicator));
-        let processing_indicators = ["⏺ ", "Thinking", "● "];
-        let has_processing_indicator =
-            processing_indicators.iter().any(|indicator| content.contains(indicator));
-        Ok(has_stuck_indicator && !has_processing_indicator)
+        Ok(content.contains("[Pasted text"))
     }
 
     pub fn calculate_delay(&self, message_len: usize) -> Duration {

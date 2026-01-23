@@ -393,16 +393,9 @@ fn send_enter_and_verify(&self, session: &str) -> Result<()> {
 fn is_input_stuck(&self, session: &str) -> Result<bool> {
     let content = capture_pane(session, 30)?;
 
-    // Indicators that input is stuck in the prompt
-    let stuck_indicators = ["[Pasted text", "bypass permissions on", "⏵⏵"];
-
-    // Indicators that Claude is processing (not stuck)
-    let processing_indicators = ["⏺ ", "Thinking", "● "];
-
-    let has_stuck = stuck_indicators.iter().any(|i| content.contains(i));
-    let has_processing = processing_indicators.iter().any(|i| content.contains(i));
-
-    Ok(has_stuck && !has_processing)
+    // "[Pasted text" only appears when text was pasted but not submitted.
+    // Once Enter is accepted, this indicator disappears.
+    Ok(content.contains("[Pasted text"))
 }
 ```
 
