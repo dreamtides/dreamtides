@@ -1,4 +1,4 @@
-use std::io::{BufRead, BufReader};
+use std::io::{BufRead, BufReader, Write};
 use std::process::{Child, Command, Stdio};
 use std::sync::Arc;
 use std::sync::atomic::{AtomicU32, Ordering};
@@ -35,17 +35,31 @@ pub fn run_overseer(config: &Config, daemon_options: &OverseerDaemonOptions) -> 
 
     let shutdown_count: Arc<AtomicU32> = Arc::new(AtomicU32::new(0));
     let shutdown_clone: Arc<AtomicU32> = Arc::clone(&shutdown_count);
+    // Register signal handler for both SIGINT (Ctrl-C) and SIGTERM (kill).
+    // The ctrlc crate with "termination" feature handles both signals.
     ctrlc::set_handler(move || {
         let count = shutdown_clone.fetch_add(1, Ordering::SeqCst) + 1;
+        // Use write! to stderr for more reliable output in signal context,
+        // and flush to ensure the message is visible immediately.
         if count == 1 {
-            println!("\nReceived Ctrl-C, shutting down overseer and daemon gracefully...");
-            println!("Press Ctrl-C again to force immediate termination.");
+            let _ = writeln!(
+                std::io::stderr(),
+                "\nReceived shutdown signal, shutting down overseer and daemon gracefully..."
+            );
+            let _ =
+                writeln!(std::io::stderr(), "Send signal again to force immediate termination.");
+            let _ = std::io::stderr().flush();
         } else {
-            println!("\nReceived second Ctrl-C, forcing immediate termination...");
+            let _ = writeln!(
+                std::io::stderr(),
+                "\nReceived second shutdown signal, forcing immediate termination..."
+            );
+            let _ = std::io::stderr().flush();
             std::process::exit(130);
         }
     })
-    .context("Failed to set Ctrl-C handler")?;
+    .context("Failed to set signal handler for SIGINT/SIGTERM")?;
+    info!("Signal handler registered for SIGINT and SIGTERM");
 
     overseer_session::ensure_overseer_session(config)?;
     println!("✓ Overseer Claude Code session ready");

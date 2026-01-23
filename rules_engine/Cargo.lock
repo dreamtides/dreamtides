@@ -2414,6 +2414,8 @@ dependencies = [
 name = "llmc_tests"
 version = "0.0.0"
 dependencies = [
+ "ctrlc",
+ "libc",
  "llmc",
  "serde_json",
  "tempfile",

@@ -1,3 +1,4 @@
+use std::io::Write;
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
@@ -139,11 +140,20 @@ pub fn run_up(options: UpOptions) -> Result<()> {
 
     let shutdown = Arc::new(AtomicBool::new(false));
     let shutdown_clone = Arc::clone(&shutdown);
+    // Register signal handler for both SIGINT (Ctrl-C) and SIGTERM (kill).
+    // The ctrlc crate with "termination" feature handles both signals.
     ctrlc::set_handler(move || {
-        println!("\n{}", color_theme::dim("Received Ctrl-C, shutting down gracefully..."));
+        // Use write! to stderr for more reliable output in signal context,
+        // and flush to ensure the message is visible immediately.
+        let _ = writeln!(
+            std::io::stderr(),
+            "\n{}",
+            color_theme::dim("Received shutdown signal, shutting down gracefully...")
+        );
+        let _ = std::io::stderr().flush();
         shutdown_clone.store(true, Ordering::SeqCst);
     })
-    .context("Failed to set Ctrl-C handler")?;
+    .context("Failed to set signal handler for SIGINT/SIGTERM")?;
 
     // Branch to either auto mode or normal mode
     if let Some(ref auto_cfg) = auto_config {

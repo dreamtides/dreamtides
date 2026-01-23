@@ -21,7 +21,7 @@ clap = { version = "4", features = ["derive"] }
 clap_complete = "4"
 convert_case = "0.8"
 criterion = { version = "0.5.1", features = ["html_reports"] }
-ctrlc = "3"
+ctrlc = { version = "3", features = ["termination"] }
 derive_more = { version = "1", features = ["full"] }
 ego-tree = "0.10"
 either = "1"

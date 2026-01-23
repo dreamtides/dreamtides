@@ -14,5 +14,7 @@ bench = false
 [dependencies]
 llmc = { path = "../../src/llmc" }
 
+ctrlc = { workspace = true }
+libc = { workspace = true }
 serde_json = { workspace = true }
 tempfile = { workspace = true }
