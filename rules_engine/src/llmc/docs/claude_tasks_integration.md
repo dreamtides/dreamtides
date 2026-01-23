@@ -550,25 +550,42 @@ field remains for transient failure recovery.
 **Goal:** Ensure all task-related errors trigger daemon shutdown per the
 fail-fast philosophy.
 
-**Current State:** The orchestration loop in `run_orchestration_loop()` (lines
-100-396) handles errors by setting `shutdown_error` and breaking the loop. The
-`process_idle_workers()` function returns `Result<bool>` where errors cause
-shutdown. Hard failures are handled in `auto_failure.rs` with
-`HardFailure::WorkerRetriesExhausted` triggering shutdown.
+**Status: IMPLEMENTED**
 
-**Changes Required:** Define a new error type `TaskError` in
-`auto_mode/claude_tasks.rs` with variants: `ParseError { path, source }`,
-`MissingField { path, field }`, `WriteError { path, source }`,
-`CircularDependency { task_ids }`, `MissingDependency { task_id, missing_id }`.
-Ensure all task file operations return `Result<_, TaskError>`. In
-`process_idle_workers()`, convert `TaskError` to `anyhow::Error` with context
-including the task file path and error details. This propagates up to the
-orchestration loop where it triggers shutdown. Update the overseer remediation
-prompt builder in `overseer_mode/remediation_prompt.rs` to include task-specific
-context when the shutdown was caused by a task error: extract the task ID and
-path from the error, include a snippet of the malformed file if it was a parse
-error, and suggest specific remediation actions (fix JSON syntax, remove
-circular dependency, etc.).
+**Implementation Summary:**
+
+1. Defined a comprehensive `TaskError` enum in `auto_mode/claude_tasks.rs` with
+   variants: `ParseError`, `MissingField`, `ReadError`, `WriteError`,
+   `CircularDependency`, `MissingDependency`, `DirectoryError`, and
+   `ClaimRaceLost`. Each variant includes the information needed for diagnosis.
+
+2. Added helper methods to `TaskError`:
+   - `path()`: Returns the file path associated with the error
+   - `task_id()`: Returns the task ID if applicable
+   - `raw_content()`: Returns the malformed file content for parse errors
+   - `remediation_hint()`: Returns a human-readable fix suggestion
+   - `to_error_context()`: Converts to `TaskErrorContext` for persistence
+
+3. Updated `task_discovery.rs` to use the new `TaskError` types:
+   - `discover_tasks()` returns `Result<Vec<ClaudeTask>, TaskError>`
+   - `build_dependency_graph()` returns `Result<DependencyGraph, TaskError>`
+   - Added dependency validation that detects missing dependencies
+
+4. Created `TaskErrorContext` struct in `auto_logging.rs` for persisting error
+   details. Added functions `persist_task_error_context()`,
+   `read_task_error_context()`, and `clear_task_error_context()`.
+
+5. Updated `process_idle_workers()` in `auto_orchestrator.rs` to:
+   - Persist task error context before converting to `anyhow::Error`
+   - Clear stale error context at daemon startup
+
+6. Updated `remediation_prompt.rs` to include a new `format_task_error_context()`
+   function that reads persisted task error information and formats it for the
+   overseer's remediation prompt, including:
+   - Error type and message
+   - File path and task ID (if applicable)
+   - Raw file content for parse errors (truncated)
+   - Suggested remediation actions
 
 ### Milestone 8: Integration and Testing
 

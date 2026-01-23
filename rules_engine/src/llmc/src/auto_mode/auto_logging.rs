@@ -108,6 +108,24 @@ pub struct AutoLogger {
     auto: Arc<Mutex<LogWriter>>,
 }
 
+/// Stored context for task-related errors, used by overseer remediation.
+///
+/// When a task error causes daemon shutdown, this context is persisted to disk
+/// so the overseer can include detailed remediation guidance in its prompt.
+#[derive(Debug, Clone, Serialize, serde::Deserialize)]
+pub struct TaskErrorContext {
+    pub timestamp: String,
+    pub error_type: String,
+    pub error_message: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub file_path: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub task_id: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub raw_content: Option<String>,
+    pub remediation_hint: String,
+}
+
 /// Returns the path to the logs directory.
 pub fn logs_dir() -> PathBuf {
     config::get_llmc_root().join("logs")
@@ -128,10 +146,80 @@ pub fn auto_log_path() -> PathBuf {
     logs_dir().join("auto.log")
 }
 
+/// Returns the path to the task error context file.
+pub fn task_error_context_path() -> PathBuf {
+    logs_dir().join("last_task_error.json")
+}
+
 /// Returns the current timestamp formatted for log entries.
 pub fn timestamp_now() -> String {
     let now: DateTime<Utc> = Utc::now();
     now.format("%Y-%m-%dT%H:%M:%S%.3fZ").to_string()
+}
+
+/// Persists task error context for overseer remediation.
+///
+/// Writes the error context to a JSON file that the overseer can read when
+/// building remediation prompts. This provides structured information about
+/// what went wrong and how to fix it.
+pub fn persist_task_error_context(context: &TaskErrorContext) {
+    let path = task_error_context_path();
+    if let Some(parent) = path.parent()
+        && let Err(e) = std::fs::create_dir_all(parent)
+    {
+        error!("Failed to create logs directory for task error context: {}", e);
+        return;
+    }
+    let json = match serde_json::to_string_pretty(context) {
+        Ok(j) => j,
+        Err(e) => {
+            error!("Failed to serialize task error context: {}", e);
+            return;
+        }
+    };
+    if let Err(e) = std::fs::write(&path, json) {
+        error!("Failed to write task error context to {}: {}", path.display(), e);
+    } else {
+        info!("Persisted task error context to {}", path.display());
+    }
+}
+
+/// Reads persisted task error context if it exists.
+///
+/// Returns None if the file doesn't exist or cannot be read.
+pub fn read_task_error_context() -> Option<TaskErrorContext> {
+    let path = task_error_context_path();
+    if !path.exists() {
+        return None;
+    }
+    let content = match std::fs::read_to_string(&path) {
+        Ok(c) => c,
+        Err(e) => {
+            info!("Failed to read task error context: {}", e);
+            return None;
+        }
+    };
+    match serde_json::from_str(&content) {
+        Ok(ctx) => Some(ctx),
+        Err(e) => {
+            info!("Failed to parse task error context: {}", e);
+            None
+        }
+    }
+}
+
+/// Clears the persisted task error context file.
+///
+/// Called when the daemon starts successfully to clear stale error context.
+pub fn clear_task_error_context() {
+    let path = task_error_context_path();
+    if path.exists() {
+        if let Err(e) = std::fs::remove_file(&path) {
+            info!("Failed to remove task error context file: {}", e);
+        } else {
+            info!("Cleared stale task error context file");
+        }
+    }
 }
 
 struct LogWriter {

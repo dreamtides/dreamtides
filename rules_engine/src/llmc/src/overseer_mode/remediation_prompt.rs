@@ -55,6 +55,7 @@ fn build_error_context_section(failure: &HealthStatus, config: &Config) -> Strin
     let mut section = String::from("# Error Context\n\n");
     section.push_str(&format_failure_type(failure));
     section.push_str("\n\n");
+    section.push_str(&format_task_error_context());
     section.push_str(&format_daemon_registration());
     section.push_str("\n\n");
     section.push_str(&format_worker_states());
@@ -127,6 +128,36 @@ fn format_failure_type(failure: &HealthStatus) -> String {
     }
     result
 }
+
+/// Formats task error context if available.
+///
+/// This function reads persisted task error information that was saved when a
+/// task-related error caused daemon shutdown. The context includes details
+/// about what went wrong and suggested remediation steps.
+fn format_task_error_context() -> String {
+    let Some(ctx) = auto_logging::read_task_error_context() else {
+        return String::new();
+    };
+    let mut result = String::from("## Task Error Details\n\n");
+    result.push_str(&format!("**Error Type:** {}\n\n", ctx.error_type));
+    result.push_str(&format!("**Error Message:**\n```\n{}\n```\n\n", ctx.error_message));
+    if let Some(ref path) = ctx.file_path {
+        result.push_str(&format!("**File Path:** `{}`\n\n", path));
+    }
+    if let Some(ref task_id) = ctx.task_id {
+        result.push_str(&format!("**Task ID:** {}\n\n", task_id));
+    }
+    if let Some(ref content) = ctx.raw_content {
+        result.push_str("**File Content (may be malformed):**\n");
+        result.push_str(&format!("```json\n{}\n```\n\n", truncate_string(content, 2000)));
+    }
+    result.push_str(&format!("**Suggested Remediation:**\n{}\n\n", ctx.remediation_hint));
+    result.push_str("**Timestamp:** ");
+    result.push_str(&ctx.timestamp);
+    result.push_str("\n\n");
+    result
+}
+
 /// Formats the daemon registration information.
 fn format_daemon_registration() -> String {
     let mut result = String::from("## Daemon Registration\n\n");

@@ -95,6 +95,9 @@ pub fn run_auto_mode(
     registration.write().context("Failed to write daemon registration")?;
     logger.log_daemon_startup(&instance_id, auto_config.concurrency);
 
+    // Clear any stale task error context from previous run
+    auto_logging::clear_task_error_context();
+
     // Start heartbeat thread
     let mut heartbeat = HeartbeatThread::start(&instance_id);
 
@@ -432,6 +435,7 @@ fn run_orchestration_loop(
 /// Processes idle auto workers by assigning tasks from the task pool.
 ///
 /// Returns `true` if any task was assigned to a worker, `false` otherwise.
+/// Task errors are persisted for overseer remediation before propagating.
 fn process_idle_workers(
     state: &mut State,
     llmc_config: &Config,
@@ -447,14 +451,20 @@ fn process_idle_workers(
     }
 
     let task_dir = auto_config.get_task_directory();
-    let tasks = task_discovery::discover_tasks(&task_dir)?;
+    let tasks = task_discovery::discover_tasks(&task_dir).map_err(|e| {
+        auto_logging::persist_task_error_context(&e.to_error_context());
+        anyhow::anyhow!("{}", e)
+    })?;
 
     if tasks.is_empty() {
         debug!("No tasks found in task directory");
         return Ok(false);
     }
 
-    let graph = task_discovery::build_dependency_graph(&tasks)?;
+    let graph = task_discovery::build_dependency_graph(&tasks).map_err(|e| {
+        auto_logging::persist_task_error_context(&e.to_error_context());
+        anyhow::anyhow!("{}", e)
+    })?;
     let eligible = task_discovery::get_eligible_tasks(&tasks, &graph);
 
     if eligible.is_empty() {

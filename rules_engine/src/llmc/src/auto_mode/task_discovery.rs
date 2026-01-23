@@ -2,10 +2,9 @@ use std::collections::{HashMap, HashSet};
 use std::fs;
 use std::path::Path;
 
-use anyhow::{Context, Result, bail};
 use tracing::info;
 
-use crate::auto_mode::claude_tasks::{ClaudeTask, TaskStatus};
+use crate::auto_mode::claude_tasks::{ClaudeTask, TaskError, TaskStatus};
 
 /// A dependency graph mapping task IDs to their dependencies.
 pub struct DependencyGraph {
@@ -15,21 +14,26 @@ pub struct DependencyGraph {
 /// Discovers all tasks from the task directory.
 ///
 /// Scans the directory for `.json` files and loads each as a `ClaudeTask`.
-/// Any file that fails to parse triggers an immediate error (fail-fast).
-pub fn discover_tasks(task_dir: &Path) -> Result<Vec<ClaudeTask>> {
+/// Any file that fails to parse triggers an immediate error (fail-fast) with
+/// structured error information for overseer remediation.
+pub fn discover_tasks(task_dir: &Path) -> Result<Vec<ClaudeTask>, TaskError> {
     if !task_dir.exists() {
         info!(dir = %task_dir.display(), "Task directory does not exist, returning empty list");
         return Ok(Vec::new());
     }
-    let entries = fs::read_dir(task_dir)
-        .with_context(|| format!("Failed to read task directory: {}", task_dir.display()))?;
+    let entries = fs::read_dir(task_dir).map_err(|e| TaskError::DirectoryError {
+        path: task_dir.to_path_buf(),
+        message: e.to_string(),
+    })?;
     let mut tasks = Vec::new();
     for entry in entries {
-        let entry = entry
-            .with_context(|| format!("Failed to read directory entry in {}", task_dir.display()))?;
+        let entry = entry.map_err(|e| TaskError::DirectoryError {
+            path: task_dir.to_path_buf(),
+            message: format!("Failed to read directory entry: {}", e),
+        })?;
         let path = entry.path();
         if path.extension().is_some_and(|ext| ext == "json") {
-            let task = ClaudeTask::load(&path)?;
+            let task = ClaudeTask::load_with_error(&path)?;
             tasks.push(task);
         }
     }
@@ -41,15 +45,24 @@ pub fn discover_tasks(task_dir: &Path) -> Result<Vec<ClaudeTask>> {
 ///
 /// Returns a map from task ID to set of task IDs that it depends on.
 /// Returns an error listing cycle members if circular dependencies are found.
-pub fn build_dependency_graph(tasks: &[ClaudeTask]) -> Result<DependencyGraph> {
+/// Also validates that all dependencies reference existing tasks.
+pub fn build_dependency_graph(tasks: &[ClaudeTask]) -> Result<DependencyGraph, TaskError> {
     let task_ids: HashSet<&str> = tasks.iter().map(|t| t.id.as_str()).collect();
     let mut graph: HashMap<&str, HashSet<&str>> = HashMap::new();
     for task in tasks {
+        for dep_id in &task.blocked_by {
+            if !task_ids.contains(dep_id.as_str()) {
+                return Err(TaskError::MissingDependency {
+                    task_id: task.id.clone(),
+                    missing_id: dep_id.clone(),
+                });
+            }
+        }
         let deps: HashSet<&str> = task.blocked_by.iter().map(String::as_str).collect();
         graph.insert(task.id.as_str(), deps);
     }
     if let Some(cycle) = detect_cycle(&graph, &task_ids) {
-        bail!("Circular dependency detected: {}", cycle.join(" -> "));
+        return Err(TaskError::CircularDependency { task_ids: cycle });
     }
     Ok(DependencyGraph {
         graph: graph
