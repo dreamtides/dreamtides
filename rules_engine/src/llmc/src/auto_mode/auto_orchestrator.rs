@@ -718,14 +718,26 @@ fn process_completed_workers(
                         state.source_repo_dirty_backoff_secs = None;
                         state.source_repo_dirty_retry_count = None;
 
-                        println!(
-                            "{}",
-                            color_theme::success(format!(
-                                "[{}] ✓ Changes accepted ({})",
+                        // Get task ID before it's cleared by complete_worker_task
+                        let task_id =
+                            state.get_worker(&worker_name).and_then(|w| w.active_task_id.clone());
+
+                        if let Some(ref tid) = task_id {
+                            println!(
+                                "[{}] {} Changes accepted ({}) {}",
                                 worker_name,
-                                &commit_sha[..8.min(commit_sha.len())]
-                            ))
-                        );
+                                color_theme::success(format!("#{}", tid)),
+                                &commit_sha[..8.min(commit_sha.len())],
+                                color_theme::success("✓")
+                            );
+                        } else {
+                            println!(
+                                "[{}] Changes accepted ({}) {}",
+                                worker_name,
+                                &commit_sha[..8.min(commit_sha.len())],
+                                color_theme::success("✓")
+                            );
+                        }
                         logger.log_task_completed(&worker_name, TaskResult::NeedsReview);
                         info!(worker = %worker_name, commit = %commit_sha, "Worker changes accepted");
 
@@ -765,15 +777,27 @@ fn process_completed_workers(
                         state.source_repo_dirty_backoff_secs = None;
                         state.source_repo_dirty_retry_count = None;
 
+                        // Get task ID before it's cleared by complete_worker_task
+                        let task_id =
+                            state.get_worker(&worker_name).and_then(|w| w.active_task_id.clone());
+
                         // Print success with warning about cleanup failure
-                        println!(
-                            "{}",
-                            color_theme::success(format!(
-                                "[{}] ✓ Changes accepted ({})",
+                        if let Some(ref tid) = task_id {
+                            println!(
+                                "[{}] {} Changes accepted ({}) {}",
                                 worker_name,
-                                &commit_sha[..8.min(commit_sha.len())]
-                            ))
-                        );
+                                color_theme::success(format!("#{}", tid)),
+                                &commit_sha[..8.min(commit_sha.len())],
+                                color_theme::success("✓")
+                            );
+                        } else {
+                            println!(
+                                "[{}] Changes accepted ({}) {}",
+                                worker_name,
+                                &commit_sha[..8.min(commit_sha.len())],
+                                color_theme::success("✓")
+                            );
+                        }
                         eprintln!(
                             "{}",
                             color_theme::warning(format!(
