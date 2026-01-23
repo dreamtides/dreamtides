@@ -848,6 +848,7 @@ fn run_rebuild() -> Result<()> {
             auto_mode: false,
             auto_workers: Vec::new(),
             last_task_completion_unix: None,
+            last_task_assignment_unix: None,
             source_repo_dirty_retry_after_unix: None,
             source_repo_dirty_backoff_secs: None,
             source_repo_dirty_retry_count: None,

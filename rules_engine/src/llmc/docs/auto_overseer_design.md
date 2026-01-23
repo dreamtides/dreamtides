@@ -308,8 +308,9 @@ Shutdown sequence for hard failures:
    - No thresholds or windowing - single warning/error means failure
 
 4. **Progress Tracking**
-   - Monitor for task completions
-   - Detect stalled state (no progress for stall_timeout_secs)
+   - Monitor for task completions AND task assignments
+   - Detect stalled state when no activity for stall_timeout_secs
+   - Activity = max(last_task_completion_unix, last_task_assignment_unix)
 
 #### Failure Detection
 
@@ -317,7 +318,7 @@ Shutdown sequence for hard failures:
 - Missing heartbeat for >heartbeat_timeout_secs
 - Daemon process terminated (PID no longer exists)
 - PID reuse detection (same PID, different start time or instance ID)
-- Stalled progress (no task completions for stall_timeout_secs)
+- Stalled progress (no task completions OR assignments for stall_timeout_secs)
 
 ### Daemon Termination Protocol
 
@@ -328,14 +329,16 @@ When failure detected:
 3. Wait grace period (30 seconds) for graceful shutdown
 4. If still running: send SIGKILL
 5. Verify daemon fully terminated
-6. Enter remediation mode
+6. For stalls: skip remediation, restart daemon directly
+7. For other failures: enter remediation mode
 
 ### Remediation
 
 #### Remediation Trigger
 
 - Daemon terminated (by overseer or self-terminated with error)
-- Overseer enters remediation mode
+- Overseer enters remediation mode for **non-stall failures only**
+- Stalls skip remediation - the worker is just reset and the daemon restarts
 
 #### Prompt Construction
 
@@ -533,6 +536,8 @@ failure spirals.
 - Add `auto_workers: Vec<String>` to track which workers are auto-managed
 - Add `overseer_active: bool` to indicate overseer presence
 - Add `last_task_completion_unix: Option<u64>` for stall detection
+- Add `last_task_assignment_unix: Option<u64>` for stall detection (stall
+  triggers only when both completion and assignment are older than timeout)
 - Add `source_repo_dirty_retry_after_unix: Option<u64>` for source repo dirty
   backoff timing
 - Add `source_repo_dirty_backoff_secs: Option<u64>` for current backoff value

@@ -127,6 +127,11 @@ pub struct State {
     /// overseer)
     #[serde(default)]
     pub last_task_completion_unix: Option<u64>,
+    /// Unix timestamp of the last task assignment (for stall detection in
+    /// overseer). A stall is only triggered if both last_task_completion_unix
+    /// AND last_task_assignment_unix are older than the stall timeout.
+    #[serde(default)]
+    pub last_task_assignment_unix: Option<u64>,
     /// Unix timestamp after which to retry accepting when source repo is dirty
     #[serde(default)]
     pub source_repo_dirty_retry_after_unix: Option<u64>,
@@ -226,6 +231,7 @@ impl State {
             auto_mode: false,
             auto_workers: Vec::new(),
             last_task_completion_unix: None,
+            last_task_assignment_unix: None,
             source_repo_dirty_retry_after_unix: None,
             source_repo_dirty_backoff_secs: None,
             source_repo_dirty_retry_count: None,

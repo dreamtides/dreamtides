@@ -104,20 +104,29 @@ pub fn run_overseer(config: &Config, daemon_options: &OverseerDaemonOptions) -> 
             bail!("Manual intervention required - see .llmc/manual_intervention_needed_*.txt");
         }
 
-        println!("\x1b[1;31m⚠ Entering remediation mode...\x1b[0m");
-        run_remediation(&failure_status, config, &shutdown_count)?;
+        // For stalls, skip remediation and just restart the daemon. A stall
+        // means a worker is taking too long, not that anything is broken.
+        // Remediation would be overkill - the right response is to reset the
+        // worker and restart.
+        if matches!(failure_status, HealthStatus::Stalled { .. }) {
+            info!("Stall detected - skipping remediation, restarting daemon directly");
+            println!("\x1b[1;33m⚠ Worker stalled - resetting and restarting daemon...\x1b[0m");
+        } else {
+            println!("\x1b[1;31m⚠ Entering remediation mode...\x1b[0m");
+            run_remediation(&failure_status, config, &shutdown_count)?;
 
-        if shutdown_count.load(Ordering::SeqCst) > 0 {
-            info!("Shutdown requested during remediation");
-            break;
+            if shutdown_count.load(Ordering::SeqCst) > 0 {
+                info!("Shutdown requested during remediation");
+                break;
+            }
+
+            if check_manual_intervention_needed()? {
+                error!("Manual intervention file created during remediation");
+                bail!("Manual intervention required - see .llmc/manual_intervention_needed_*.txt");
+            }
+
+            println!("\x1b[1;32m✓ Remediation complete. Restarting daemon...\x1b[0m");
         }
-
-        if check_manual_intervention_needed()? {
-            error!("Manual intervention file created during remediation");
-            bail!("Manual intervention required - see .llmc/manual_intervention_needed_*.txt");
-        }
-
-        println!("\x1b[1;32m✓ Remediation complete. Restarting daemon...\x1b[0m");
 
         // Reset log tailer positions to skip errors from the previous daemon's
         // termination and from remediation itself. Without this, the health

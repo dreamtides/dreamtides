@@ -345,7 +345,15 @@ impl HealthMonitor {
         None
     }
 
-    /// Checks for stalled progress (no task completions within timeout).
+    /// Checks for stalled progress (no activity within timeout).
+    ///
+    /// A stall is detected when BOTH of these conditions are true:
+    /// - No task has been completed within `stall_timeout_secs`
+    /// - No task has been assigned within `stall_timeout_secs`
+    ///
+    /// This prevents false stalls when a worker is actively working on a
+    /// long-running task. The stall timer effectively resets when a new task
+    /// is assigned.
     fn check_progress(&self) -> Option<HealthStatus> {
         let state_path = state::get_state_path();
         let state = match State::load(&state_path) {
@@ -355,9 +363,20 @@ impl HealthMonitor {
                 return None;
             }
         };
-        let last_completion = state.last_task_completion_unix?;
+
+        // Get the most recent activity timestamp (completion or assignment).
+        // If a task was just assigned, use that as the reference point.
+        let last_activity = match (state.last_task_completion_unix, state.last_task_assignment_unix)
+        {
+            (Some(completion), Some(assignment)) => Some(completion.max(assignment)),
+            (Some(completion), None) => Some(completion),
+            (None, Some(assignment)) => Some(assignment),
+            (None, None) => None,
+        };
+
+        let last_activity = last_activity?;
         let now = unix_timestamp_now();
-        let stall_secs = now.saturating_sub(last_completion);
+        let stall_secs = now.saturating_sub(last_activity);
         let stall_timeout = self.config.get_stall_timeout();
         if Duration::from_secs(stall_secs) > stall_timeout {
             return Some(HealthStatus::Stalled { stall_secs });

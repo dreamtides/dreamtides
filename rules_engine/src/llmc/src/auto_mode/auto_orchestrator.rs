@@ -499,6 +499,11 @@ fn assign_task_to_worker(
         "Task queued, waiting for SessionStart after /clear"
     );
 
+    // Update task assignment timestamp for stall detection in overseer.
+    // This prevents false stalls when a worker is actively working on a task.
+    state.last_task_assignment_unix =
+        Some(SystemTime::now().duration_since(UNIX_EPOCH).map(|d| d.as_secs()).unwrap_or(0));
+
     logger.log_task_assigned(worker_name, task);
 
     Ok(())
