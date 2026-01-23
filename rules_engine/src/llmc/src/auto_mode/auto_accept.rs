@@ -266,10 +266,9 @@ fn accept_and_merge(
             message: format!("Failed to send conflict prompt: {e}"),
         })?;
 
-        logger.log_accept_failure(
-            worker_name,
-            &format!("Rebase conflict - worker resolving: {}", rebase_result.conflicts.join(", ")),
-        );
+        // Note: We intentionally do NOT log this as an accept_failure because rebase
+        // conflicts are a normal recoverable workflow state. The worker will resolve
+        // the conflicts and the accept will be retried on the next iteration.
         return Ok(AutoAcceptResult::RebaseConflict { conflicts: rebase_result.conflicts });
     }
 
