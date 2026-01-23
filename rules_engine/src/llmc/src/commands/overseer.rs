@@ -84,6 +84,14 @@ pub fn run_overseer(
     result
 }
 
+pub fn is_process_alive(pid: u32) -> bool {
+    std::process::Command::new("kill")
+        .args(["-0", &pid.to_string()])
+        .output()
+        .map(|output| output.status.success())
+        .unwrap_or(false)
+}
+
 impl OverseerRegistration {
     fn new(instance_id: &str) -> Self {
         let start_time_unix = SystemTime::now()
@@ -131,14 +139,6 @@ impl OverseerRegistration {
         }
         Ok(())
     }
-}
-
-pub fn is_process_alive(pid: u32) -> bool {
-    std::process::Command::new("kill")
-        .args(["-0", &pid.to_string()])
-        .output()
-        .map(|output| output.status.success())
-        .unwrap_or(false)
 }
 
 fn validate_overseer_config(config: &Config) -> Result<()> {

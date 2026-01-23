@@ -10,7 +10,12 @@ use crate::state::{self, State};
 use crate::tmux::session;
 use crate::{config, git};
 /// Runs the nuke command, permanently removing a worker or console session
-pub fn run_nuke(name: Option<&str>, all: bool, json: bool) -> Result<()> {
+pub fn run_nuke(
+    name: Option<&str>,
+    all: bool,
+    allow_overseer_managed: bool,
+    json: bool,
+) -> Result<()> {
     let llmc_root = config::get_llmc_root();
     if !llmc_root.exists() {
         bail!(
@@ -32,6 +37,23 @@ pub fn run_nuke(name: Option<&str>, all: bool, json: bool) -> Result<()> {
         if name.is_some() {
             bail!("Cannot specify both --all and a worker name");
         }
+
+        // Check if an overseer is managing this instance (only for --all)
+        if !allow_overseer_managed
+            && let Ok(Some(registration)) = overseer::read_overseer_registration()
+            && overseer::is_process_alive(registration.pid)
+        {
+            bail!(
+                "An overseer is managing this LLMC instance (PID: {}).\n\n\
+                 Running 'llmc nuke --all' would disrupt autonomous operation.\n\n\
+                 If you're running a test scenario that needs to remove workers,\n\
+                 make sure LLMC_ROOT is set to your test instance, not the main instance.\n\n\
+                 To force nuke despite active overseer, use:\n\
+                   llmc nuke --all --allow-overseer-managed",
+                registration.pid
+            );
+        }
+
         let worker_names: Vec<_> = state.workers.keys().cloned().collect();
         if worker_names.is_empty() {
             if json {
