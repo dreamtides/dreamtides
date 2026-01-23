@@ -24,7 +24,6 @@ use crate::patrol::{self, Patrol};
 use crate::state::{self, State, WorkerStatus};
 use crate::tmux::sender::TmuxSender;
 use crate::tmux::session;
-use crate::worker::{self, WorkerTransition};
 
 const INITIAL_SOURCE_REPO_DIRTY_BACKOFF_SECS: u64 = 60;
 const MAX_SOURCE_REPO_DIRTY_BACKOFF_SECS: u64 = 3600;
@@ -450,6 +449,12 @@ fn process_idle_workers(
 }
 
 /// Assigns a task to an idle auto worker.
+///
+/// This function sends `/clear` to reset the Claude Code session and stores
+/// the task prompt as pending. The actual prompt is sent when the SessionStart
+/// hook fires after the session restarts (handled in patrol.rs). This prevents
+/// a race condition where the prompt could be sent before the new session is
+/// ready to receive input.
 fn assign_task_to_worker(
     state: &mut State,
     _llmc_config: &Config,
@@ -471,20 +476,23 @@ fn assign_task_to_worker(
     // Build prompt
     let full_prompt = build_auto_prompt(&worktree_path, task)?;
 
-    // Send to worker
+    // Send /clear to restart the session. The prompt will be sent when
+    // SessionStart hook fires (handled in patrol.rs handle_session_start).
+    // This prevents the race condition where the prompt is sent before the
+    // new session is ready to receive input.
     let tmux_sender = TmuxSender::new();
     tmux_sender.send(&session_id, "/clear")?;
-    tmux_sender.send(&session_id, &full_prompt)?;
 
-    // Update state
+    // Store the prompt as pending - it will be sent when SessionStart fires
     let worker_mut = state.get_worker_mut(worker_name).context("Worker not found")?;
-    worker::apply_transition(worker_mut, WorkerTransition::ToWorking {
-        prompt: full_prompt,
-        prompt_cmd: None,
-    })?;
+    worker_mut.pending_task_prompt = Some(full_prompt.clone());
+    info!(
+        worker = %worker_name,
+        prompt_len = full_prompt.len(),
+        "Task queued, waiting for SessionStart after /clear"
+    );
 
     logger.log_task_assigned(worker_name, task);
-    info!(worker = %worker_name, "Task assigned successfully");
 
     Ok(())
 }

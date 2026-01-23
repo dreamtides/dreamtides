@@ -833,6 +833,7 @@ fn run_rebuild() -> Result<()> {
             auto_retry_count: 0,
             api_error_count: 0,
             last_api_error_unix: None,
+            pending_task_prompt: None,
         };
         workers.insert(name.clone(), worker);
     }

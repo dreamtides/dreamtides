@@ -1089,6 +1089,8 @@ fn handle_session_start(
         return Ok(());
     };
 
+    let has_pending_task = worker.pending_task_prompt.is_some();
+
     if worker.status == WorkerStatus::Offline {
         tracing::info!(
             worker = %worker_name,
@@ -1104,9 +1106,38 @@ fn handle_session_start(
                 e
             );
         }
+    } else if has_pending_task {
+        let pending_prompt = worker.pending_task_prompt.clone().expect("Checked above");
+        tracing::info!(
+            worker = %worker_name,
+            session_id = %session_id,
+            prompt_len = pending_prompt.len(),
+            "SessionStart after /clear: sending pending task prompt"
+        );
+        let tmux_sender = TmuxSender::new();
+        if let Err(e) = tmux_sender.send(session_id, &pending_prompt) {
+            tracing::error!(
+                worker = %worker_name,
+                error = %e,
+                "Failed to send pending task prompt after SessionStart"
+            );
+            return Err(e);
+        }
+        if let Some(w) = state.get_worker_mut(worker_name) {
+            w.current_prompt = pending_prompt;
+            w.pending_task_prompt = None;
+            if let Err(e) = worker::apply_transition(w, WorkerTransition::ToWorking {
+                prompt: w.current_prompt.clone(),
+                prompt_cmd: None,
+            }) {
+                tracing::error!(
+                    "Failed to transition worker '{}' to Working after sending pending prompt: {}",
+                    worker_name,
+                    e
+                );
+            }
+        }
     } else {
-        // This is expected after /clear - the session restarts but the worker is still
-        // Working. Log at info level to help track these events for debugging.
         tracing::info!(
             worker = %worker_name,
             session_id = %session_id,

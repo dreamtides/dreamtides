@@ -13,7 +13,8 @@ labels:
 blocking:
 - LH7WQN
 created-at: 2026-01-23T04:33:29.642795Z
-updated-at: 2026-01-23T04:33:46.109019Z
+updated-at: 2026-01-23T05:40:25.855630Z
+closed-at: 2026-01-23T05:40:25.855630Z
 ---
 
 # Race Condition: Task Prompt Lost After /clear

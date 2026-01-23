@@ -26,6 +26,7 @@ fn create_worker_record(name: &str, status: WorkerStatus) -> WorkerRecord {
         auto_retry_count: 0,
         api_error_count: 0,
         last_api_error_unix: None,
+        pending_task_prompt: None,
     }
 }
 
@@ -133,4 +134,37 @@ fn record_task_completion_updates_timestamp() {
         .as_secs();
     let age = now.saturating_sub(completion_time);
     assert!(age < 5, "Completion timestamp should be within 5 seconds of now, age={}", age);
+}
+
+#[test]
+fn get_idle_auto_workers_excludes_pending_task_prompt() {
+    let mut state = State::new();
+    state.auto_workers = vec!["auto-1".to_string(), "auto-2".to_string(), "auto-3".to_string()];
+
+    let mut worker1 = create_worker_record("auto-1", WorkerStatus::Idle);
+    worker1.pending_task_prompt = None;
+    state.add_worker(worker1);
+
+    let mut worker2 = create_worker_record("auto-2", WorkerStatus::Idle);
+    worker2.pending_task_prompt = Some("Pending task".to_string());
+    state.add_worker(worker2);
+
+    let mut worker3 = create_worker_record("auto-3", WorkerStatus::Idle);
+    worker3.pending_task_prompt = None;
+    state.add_worker(worker3);
+
+    let idle_auto = llmc::auto_mode::auto_workers::get_idle_auto_workers(&state);
+    let names: Vec<&str> = idle_auto.iter().map(|w| w.name.as_str()).collect();
+
+    assert!(names.contains(&"auto-1"), "Should include idle auto-1 without pending prompt");
+    assert!(names.contains(&"auto-3"), "Should include idle auto-3 without pending prompt");
+    assert!(
+        !names.contains(&"auto-2"),
+        "Should NOT include auto-2 with pending_task_prompt - prevents race condition"
+    );
+    assert_eq!(
+        names.len(),
+        2,
+        "Should have exactly 2 idle auto workers (excluding one with pending prompt)"
+    );
 }

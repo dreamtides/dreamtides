@@ -26,6 +26,7 @@ fn create_test_worker(name: &str) -> WorkerRecord {
         auto_retry_count: 0,
         api_error_count: 0,
         last_api_error_unix: None,
+        pending_task_prompt: None,
     }
 }
 

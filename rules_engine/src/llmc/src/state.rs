@@ -101,6 +101,12 @@ pub struct WorkerRecord {
     /// Unix timestamp of last API error. Used for API-specific backoff timing.
     #[serde(default)]
     pub last_api_error_unix: Option<u64>,
+    /// Task prompt pending to be sent after session restarts (after /clear).
+    /// This field is set when a task is assigned but /clear is still
+    /// processing. When SessionStart fires for a worker with a pending
+    /// prompt, the prompt is sent and the worker transitions to Working.
+    #[serde(default)]
+    pub pending_task_prompt: Option<String>,
 }
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct State {

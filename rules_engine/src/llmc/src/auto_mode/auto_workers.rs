@@ -106,12 +106,19 @@ pub fn start_auto_worker_session(worker: &WorkerRecord, config: &Config) -> Resu
         .with_context(|| format!("Failed to start session for auto worker '{}'", worker.name))
 }
 
-/// Gets all idle auto workers from state.
+/// Gets all idle auto workers from state that are ready for new tasks.
+///
+/// This excludes workers that have a pending task prompt waiting to be sent
+/// after a session restart (via SessionStart hook).
 pub fn get_idle_auto_workers(state: &State) -> Vec<&WorkerRecord> {
     state
         .workers
         .values()
-        .filter(|w| is_auto_worker(&w.name) && w.status == WorkerStatus::Idle)
+        .filter(|w| {
+            is_auto_worker(&w.name)
+                && w.status == WorkerStatus::Idle
+                && w.pending_task_prompt.is_none()
+        })
         .collect()
 }
 
@@ -183,6 +190,7 @@ fn create_auto_worker(state: &mut State, config: &Config, name: &str) -> Result<
         auto_retry_count: 0,
         api_error_count: 0,
         last_api_error_unix: None,
+        pending_task_prompt: None,
     };
     state.add_worker(worker_record);
     add_auto_worker_to_config(name, config)?;

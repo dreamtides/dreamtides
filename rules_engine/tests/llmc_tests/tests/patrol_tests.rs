@@ -1,7 +1,8 @@
 use std::collections::HashMap;
 
 use llmc::config::{Config, DefaultsConfig, RepoConfig};
-use llmc::patrol::{PatrolReport, build_conflict_prompt, handle_stop};
+use llmc::ipc::messages::HookEvent;
+use llmc::patrol::{PatrolReport, build_conflict_prompt, handle_hook_event, handle_stop};
 use llmc::state::{State, WorkerRecord, WorkerStatus};
 
 fn create_test_worker(name: &str) -> WorkerRecord {
@@ -27,6 +28,7 @@ fn create_test_worker(name: &str) -> WorkerRecord {
         auto_retry_count: 0,
         api_error_count: 0,
         last_api_error_unix: None,
+        pending_task_prompt: None,
     }
 }
 
@@ -88,4 +90,60 @@ fn test_build_conflict_prompt() {
     assert!(prompt.contains("Fix the authentication bug"));
     assert!(prompt.contains("git rebase --continue"));
     assert!(prompt.contains("Successfully rebased and updated"));
+}
+
+#[test]
+fn test_session_start_offline_worker_transitions_to_idle() {
+    let mut state = State::new();
+    let mut worker = create_test_worker("auto-1");
+    worker.status = WorkerStatus::Offline;
+    state.add_worker(worker);
+    let config = create_test_config();
+
+    let event = HookEvent::SessionStart {
+        worker: "auto-1".to_string(),
+        session_id: "test-session".to_string(),
+        timestamp: 1234567890,
+    };
+
+    let result = handle_hook_event(&event, &mut state, &config);
+    assert!(result.is_ok(), "SessionStart hook should succeed");
+    assert_eq!(
+        state.get_worker("auto-1").unwrap().status,
+        WorkerStatus::Idle,
+        "Offline worker should transition to Idle on SessionStart"
+    );
+}
+
+#[test]
+fn test_session_start_with_pending_prompt_state_changes() {
+    let mut state = State::new();
+    let mut worker = create_test_worker("auto-1");
+    worker.status = WorkerStatus::Idle;
+    worker.pending_task_prompt = Some("Test task prompt".to_string());
+    state.add_worker(worker);
+    let config = create_test_config();
+
+    let event = HookEvent::SessionStart {
+        worker: "auto-1".to_string(),
+        session_id: "llmc-auto-1".to_string(),
+        timestamp: 1234567890,
+    };
+
+    let _result = handle_hook_event(&event, &mut state, &config);
+
+    let worker = state.get_worker("auto-1").unwrap();
+    assert!(
+        worker.pending_task_prompt.is_none(),
+        "pending_task_prompt should be cleared after SessionStart"
+    );
+    assert_eq!(
+        worker.current_prompt, "Test task prompt",
+        "current_prompt should be set from pending_task_prompt"
+    );
+    assert_eq!(
+        worker.status,
+        WorkerStatus::Working,
+        "Worker should transition to Working after pending prompt is sent"
+    );
 }
