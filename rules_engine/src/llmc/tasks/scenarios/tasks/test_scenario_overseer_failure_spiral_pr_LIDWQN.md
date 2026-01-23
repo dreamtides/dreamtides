@@ -14,8 +14,9 @@ labels:
 - llmc-auto
 blocked-by:
 - LICWQN
+- LEGWQN
 created-at: 2026-01-21T22:06:36.953507Z
-updated-at: 2026-01-21T22:31:38.834603Z
+updated-at: 2026-01-23T19:15:40.861385Z
 ---
 
 # Test Scenario: Overseer Failure Spiral Prevention
