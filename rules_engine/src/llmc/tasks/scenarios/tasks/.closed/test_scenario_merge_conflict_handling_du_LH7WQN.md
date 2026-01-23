@@ -18,7 +18,8 @@ blocked-by:
 - LEEWQN
 - LEBWQN
 created-at: 2026-01-21T22:02:47.025721Z
-updated-at: 2026-01-23T06:09:24.134620Z
+updated-at: 2026-01-23T06:46:04.325079Z
+closed-at: 2026-01-23T06:46:04.325079Z
 ---
 
 # Test Scenario: Merge Conflict Handling During Auto Accept
