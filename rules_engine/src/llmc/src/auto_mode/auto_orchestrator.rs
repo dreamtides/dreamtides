@@ -510,6 +510,12 @@ fn process_idle_workers(
                         logger,
                     )?;
 
+                    println!(
+                        "[{}] Assigned task {}",
+                        worker_name,
+                        color_theme::warning(format!("#{}", task.id))
+                    );
+
                     if let Some(lbl) = label {
                         active_labels.insert(lbl.to_string());
                     }
