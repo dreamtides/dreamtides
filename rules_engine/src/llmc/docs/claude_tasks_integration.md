@@ -592,26 +592,65 @@ fail-fast philosophy.
 **Goal:** Wire all components together, add integration tests, and perform
 manual validation.
 
-**Current State:** LLMC has an existing test infrastructure with integration
-tests. The `tests/` directory contains test modules. The daemon can be run in
-isolated mode using `LLMC_ROOT` environment variable to create independent test
-instances.
+**Status: IMPLEMENTED**
 
-**Changes Required:** Create `tests/claude_tasks_integration.rs` with
-integration tests using temporary directories for task files. Test task
-discovery: create a temp directory with valid task JSON files, call the
-discovery function through the public API (or a thin test wrapper), verify all
-tasks are returned. Test eligibility: create tasks with various status/owner/
-blockedBy combinations, verify filtering works correctly. Test selection: create
-multiple eligible tasks with different priorities and labels, verify selection
-order. Test claiming with simulated races: use multiple threads to claim the
-same task, verify exactly one succeeds. Test failure handling: set up a worker
-with an active task, simulate crash, verify task is released to pending. Test
-context injection: create a context config file, verify prompts include correct
-prologue/epilogue. For manual testing, create a `~/.claude/tasks/test-project/`
-directory with sample tasks, configure LLMC with `task_list_id = "test-project"`,
-run `llmc up`, and verify tasks are discovered, claimed, and completed in the
-expected order.
+**Implementation Summary:**
+
+Created `tests/llmc_tests/tests/auto_mode/claude_tasks_tests.rs` with 35 tests
+covering:
+
+1. **Task Discovery Tests:**
+   - `test_discover_tasks_finds_all_json_files`: Verifies all .json files found
+   - `test_discover_tasks_ignores_non_json_files`: Non-JSON files are skipped
+   - `test_discover_tasks_empty_directory`: Empty dirs return empty list
+   - `test_discover_tasks_nonexistent_directory`: Missing dirs return empty list
+   - `test_discover_tasks_invalid_json_fails`: Invalid JSON triggers error
+   - `test_discover_tasks_missing_field_fails`: Missing fields trigger error
+
+2. **Eligibility Tests:**
+   - `test_eligibility_filters_by_status`: Only pending tasks are eligible
+   - `test_eligibility_filters_by_owner`: Tasks with owners are excluded
+   - `test_eligibility_filters_by_blocked_by`: Blocked tasks are excluded
+
+3. **Selection Algorithm Tests:**
+   - `test_selection_by_priority`: Lower priority values selected first
+   - `test_selection_by_id_order`: Numeric IDs sorted correctly
+   - `test_selection_prefers_distinct_labels`: Distinct labels preferred
+   - `test_selection_unlabeled_is_distinct`: Unlabeled tasks are distinct
+   - `test_selection_falls_back_when_no_distinct`: Falls back to priority
+   - `test_selection_empty_returns_none`: Empty list returns None
+   - `test_get_active_labels`: Active labels collected correctly
+
+4. **Task Lifecycle Tests:**
+   - `test_claim_task_success`: Claim sets status and owner
+   - `test_complete_task_success`: Complete sets status, clears owner
+   - `test_release_task_success`: Release resets to pending
+   - `test_concurrent_claims_final_state_correct`: Race condition handling
+
+5. **Dependency Tests:**
+   - `test_circular_dependency_detected`: Cycles detected
+   - `test_self_dependency_detected`: Self-references detected
+   - `test_missing_dependency_detected`: Missing deps detected
+   - `test_dependency_chain`: Chain resolution works correctly
+
+6. **Context Injection Tests:**
+   - `test_context_config_load`: TOML config loads correctly
+   - `test_context_config_no_default`: Missing default handled
+
+7. **Task Metadata Tests:**
+   - `test_task_priority_default`: Default priority is 3
+   - `test_task_priority_from_metadata`: Priority extracted correctly
+   - `test_task_priority_clamped`: Values > 4 clamped to 4
+   - `test_task_label`: Label extracted from metadata
+   - `test_task_label_none`: Missing label returns None
+   - `test_task_save_load_roundtrip`: Save/load preserves all fields
+
+8. **Error Context Tests:**
+   - `test_error_context_parse_error`: Parse errors include context
+   - `test_error_context_missing_dependency`: Dependency errors tracked
+   - `test_error_context_circular_dependency`: Cycle errors tracked
+
+Also added `#[derive(Debug)]` to `DependencyGraph` for test assertions.
 
 ### Milestone 9: Cleanup and Documentation
 

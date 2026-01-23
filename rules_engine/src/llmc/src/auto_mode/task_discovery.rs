@@ -6,7 +6,7 @@ use tracing::info;
 
 use crate::auto_mode::claude_tasks::{ClaudeTask, TaskError, TaskStatus};
 
-/// A dependency graph mapping task IDs to their dependencies.
+#[derive(Debug)]
 pub struct DependencyGraph {
     graph: HashMap<String, Vec<String>>,
 }
