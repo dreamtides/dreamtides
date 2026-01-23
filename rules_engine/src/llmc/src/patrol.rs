@@ -1108,16 +1108,19 @@ fn handle_session_start(
         }
     } else if has_pending_task {
         let pending_prompt = worker.pending_task_prompt.clone().expect("Checked above");
+        let tmux_session = crate::config::get_worker_session_name(worker_name);
         tracing::info!(
             worker = %worker_name,
-            session_id = %session_id,
+            claude_session_id = %session_id,
+            tmux_session = %tmux_session,
             prompt_len = pending_prompt.len(),
-            "SessionStart after /clear: sending pending task prompt"
+            "SessionStart after /clear: sending pending task prompt to TMUX session"
         );
         let tmux_sender = TmuxSender::new();
-        if let Err(e) = tmux_sender.send(session_id, &pending_prompt) {
+        if let Err(e) = tmux_sender.send(&tmux_session, &pending_prompt) {
             tracing::error!(
                 worker = %worker_name,
+                tmux_session = %tmux_session,
                 error = %e,
                 "Failed to send pending task prompt after SessionStart"
             );

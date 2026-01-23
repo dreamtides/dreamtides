@@ -147,3 +147,25 @@ fn test_session_start_with_pending_prompt_state_changes() {
         "Worker should transition to Working after pending prompt is sent"
     );
 }
+
+#[test]
+fn test_tmux_session_name_format_differs_from_claude_uuid() {
+    let worker_name = "auto-1";
+    let tmux_session_name = llmc::config::get_worker_session_name(worker_name);
+    let claude_uuid = "a3eade4c-f6f1-4a15-a268-e9494d235cf0";
+    assert_ne!(
+        tmux_session_name, claude_uuid,
+        "TMUX session name should not equal Claude session UUID - TMUX session names are \
+         derived from worker names (e.g., 'llmc-auto-1'), not from Claude's session UUIDs"
+    );
+    assert!(
+        tmux_session_name.contains(worker_name),
+        "TMUX session name '{}' should contain worker name '{}'",
+        tmux_session_name,
+        worker_name
+    );
+    assert!(
+        !tmux_session_name.contains('-') || !tmux_session_name.contains("4a15"),
+        "TMUX session name should not look like a UUID (no segments like '-4a15-')"
+    );
+}

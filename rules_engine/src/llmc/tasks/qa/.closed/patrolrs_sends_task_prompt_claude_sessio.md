@@ -10,7 +10,8 @@ labels:
 blocking:
 - LH7WQN
 created-at: 2026-01-23T06:08:50.712096Z
-updated-at: 2026-01-23T06:09:24.169902Z
+updated-at: 2026-01-23T06:36:08.034990Z
+closed-at: 2026-01-23T06:36:08.034990Z
 ---
 
 # Bug: patrol.rs sends task prompt to wrong session ID
