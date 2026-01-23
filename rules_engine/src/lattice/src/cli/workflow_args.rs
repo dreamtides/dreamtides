@@ -50,6 +50,10 @@ pub struct ReadyArgs {
     #[arg(long)]
     pub include_claimed: bool,
 
+    /// Only show tasks from directories with no active claims.
+    #[arg(long)]
+    pub discrete: bool,
+
     /// Sort policy for ready work ordering.
     #[arg(long, value_enum, default_value_t)]
     pub sort: ReadySortPolicy,
@@ -134,6 +138,10 @@ pub struct PopArgs {
     /// Include backlog items (P4).
     #[arg(long)]
     pub include_backlog: bool,
+
+    /// Only show tasks from directories with no active claims.
+    #[arg(long)]
+    pub discrete: bool,
 
     /// Sort policy for ready work ordering.
     #[arg(long, value_enum, default_value_t)]

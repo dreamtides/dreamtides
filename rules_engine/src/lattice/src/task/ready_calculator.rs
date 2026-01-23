@@ -51,6 +51,10 @@ pub struct ReadyFilter {
     /// Include claimed tasks in results. Default: `false`.
     pub include_claimed: bool,
 
+    /// Exclude tasks in directories that have existing claims. Default:
+    /// `false`.
+    pub discrete: bool,
+
     /// Filter to descendants of this directory path.
     pub path_prefix: Option<String>,
 
@@ -91,6 +95,7 @@ pub struct ReadyTask {
 /// - Not blocked (all `blocked-by` tasks are closed)
 /// - Priority is not P4 (unless `include_backlog` is set)
 /// - Not claimed (unless `include_claimed` is set)
+/// - Not in a directory with an existing claim (if `discrete` is set)
 ///
 /// # Arguments
 ///
@@ -126,6 +131,19 @@ pub fn query_ready_tasks(
 
     debug!(count = rows.len(), "Ready query returned results before claim filtering");
 
+    let claimed_directories = if filter.discrete {
+        build_claimed_directories(conn, repo_root)?
+    } else {
+        std::collections::HashSet::new()
+    };
+
+    if filter.discrete {
+        debug!(
+            count = claimed_directories.len(),
+            "Built set of claimed directories for discrete filtering"
+        );
+    }
+
     let mut results = Vec::new();
     let limit = filter.limit.map(|l| l as usize);
 
@@ -155,6 +173,18 @@ pub fn query_ready_tasks(
 
         if claimed && !filter.include_claimed {
             debug!(id = document.id.as_str(), "Excluding claimed task");
+            continue;
+        }
+
+        if filter.discrete
+            && let Some(parent_dir) = parent_directory(&document.path)
+            && claimed_directories.contains(&parent_dir)
+        {
+            debug!(
+                id = document.id.as_str(),
+                parent_dir = parent_dir.as_str(),
+                "Excluding task: directory has existing claim (discrete mode)"
+            );
             continue;
         }
 
@@ -212,6 +242,12 @@ impl ReadyFilter {
     /// Includes claimed tasks in results.
     pub fn with_include_claimed(mut self) -> Self {
         self.include_claimed = true;
+        self
+    }
+
+    /// Excludes tasks in directories that have existing claims.
+    pub fn with_discrete(mut self) -> Self {
+        self.discrete = true;
         self
     }
 
@@ -389,4 +425,33 @@ fn remove_stale_entry(conn: &Connection, id: &str) -> Result<(), LatticeError> {
     document_queries::delete_by_id(conn, id)?;
     info!(id, "Removed stale entry from index");
     Ok(())
+}
+
+fn parent_directory(path: &str) -> Option<String> {
+    let path = std::path::Path::new(path);
+    path.parent().map(|p| p.to_string_lossy().into_owned())
+}
+
+fn build_claimed_directories(
+    conn: &Connection,
+    repo_root: &Path,
+) -> Result<std::collections::HashSet<String>, LatticeError> {
+    let claims = claim_operations::list_claims(repo_root)?;
+    let mut directories = std::collections::HashSet::new();
+
+    for claim in claims {
+        if let Some(doc) = document_queries::lookup_by_id(conn, claim.id.as_str())?
+            && let Some(parent_dir) = parent_directory(&doc.path)
+        {
+            debug!(
+                id = claim.id.as_str(),
+                path = doc.path.as_str(),
+                parent_dir = parent_dir.as_str(),
+                "Adding claimed directory"
+            );
+            directories.insert(parent_dir);
+        }
+    }
+
+    Ok(directories)
 }

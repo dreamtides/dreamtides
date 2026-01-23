@@ -49,6 +49,7 @@ fn default_args() -> ReadyArgs {
         pretty: false,
         include_backlog: false,
         include_claimed: false,
+        discrete: false,
         sort: ReadySortPolicy::Hybrid,
     }
 }

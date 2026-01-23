@@ -79,6 +79,11 @@ fn build_filter(context: &CommandContext, args: &PopArgs) -> LatticeResult<Ready
         debug!("Including backlog (P4) tasks");
     }
 
+    if args.discrete {
+        filter = filter.with_discrete();
+        debug!("Discrete mode: excluding directories with existing claims");
+    }
+
     filter = filter.with_limit(1);
     filter = filter.with_sort_policy(convert_sort_policy(args.sort));
     debug!(sort = ?args.sort, "Using sort policy");

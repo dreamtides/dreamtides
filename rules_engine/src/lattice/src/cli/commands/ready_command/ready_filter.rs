@@ -27,6 +27,12 @@ pub fn build_filter(conn: &Connection, args: &ReadyArgs) -> Result<ReadyFilter, 
         debug!("Including claimed tasks");
     }
 
+    // Handle --discrete
+    if args.discrete {
+        filter = filter.with_discrete();
+        debug!("Discrete mode: excluding directories with existing claims");
+    }
+
     // Handle --limit
     if let Some(limit) = args.limit {
         filter = filter.with_limit(limit as u32);

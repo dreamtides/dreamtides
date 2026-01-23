@@ -228,8 +228,9 @@ documents—providing full context for AI agents in a single call.
 
 **lat ready** - Shows work available to start: tasks that are not closed, have
 no open blockers, and are not claimed. Supports `--parent` for directory
-filtering, `--pretty` for visual tree display, and `--json` for full task
-details.
+filtering, `--pretty` for visual tree display, `--json` for full task
+details, and `--discrete` to only show tasks from directories with no active
+claims.
 
 **lat overview** - Provides repository-level context for AI agents. Shows the
 most critical documents based on view frequency, recency, and root document
@@ -250,7 +251,8 @@ outputs full context. Returns silently with exit code 0 if no ready tasks
 are available (no output to stdout or stderr). Supports `--json` output
 (recommended for programmatic use),
 `--dry-run` to preview without claiming, `--no-claim` to skip claiming,
-`--max-claims` to fail if too many active claims exist, and all filter options
+`--max-claims` to fail if too many active claims exist, `--discrete` to only
+consider tasks from directories with no active claims, and all filter options
 from `lat ready` (`--type`, `--priority`, `--label`, etc.).
 JSON output includes the complete ShowOutput structure with task metadata, body,
 composed context and acceptance criteria from ancestor templates, dependencies,
