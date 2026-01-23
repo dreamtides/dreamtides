@@ -63,6 +63,13 @@ are reported with clear, human-readable messages rather than stack traces. The
 system distinguishes between user errors (invalid input) and system errors
 (internal failures), following the HTTP 400/500 distinction in exit codes.
 
+Query operations implement lazy cleanup of stale index entries. When a document
+is queried from the index but its corresponding file no longer exists on disk,
+the stale entry is automatically removed from the index. This ensures that
+commands like `lat ready` always return valid, actionable results even if the
+index becomes inconsistent with the filesystem due to external changes or
+interrupted operations.
+
 Silent failure is treated as a critical design flaw. All operations log
 extensively to `.lattice/logs.jsonl`, capturing user operations, git
 operations, SQLite operations, and general observations about repository

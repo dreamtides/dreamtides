@@ -1,4 +1,5 @@
-use std::path::PathBuf;
+use std::fs;
+use std::path::{Path, PathBuf};
 
 use lattice::claim::claim_operations;
 use lattice::document::frontmatter_schema::TaskType;
@@ -17,14 +18,28 @@ fn create_test_db() -> rusqlite::Connection {
     conn
 }
 
+fn create_task_file(repo_root: &Path, path: &str, id: &str) {
+    let full_path = repo_root.join(path);
+    if let Some(parent) = full_path.parent() {
+        fs::create_dir_all(parent).expect("Failed to create parent directories");
+    }
+    let content = format!(
+        "---\nlattice-id: {}\nname: test-task\ndescription: Test task\n---\n\nTask body.",
+        id
+    );
+    fs::write(&full_path, content).expect("Failed to write task file");
+}
+
 fn insert_task(
     conn: &rusqlite::Connection,
+    repo_root: &Path,
     id: &str,
     path: &str,
     priority: u8,
     task_type: TaskType,
     created_at: Option<chrono::DateTime<chrono::Utc>>,
 ) {
+    create_task_file(repo_root, path, id);
     let doc = InsertDocument::new(
         id.to_string(),
         None,
@@ -58,8 +73,8 @@ fn query_ready_tasks_returns_open_non_blocked_tasks() {
     let conn = create_test_db();
     let temp_dir = TempDir::new().expect("Failed to create temp directory");
 
-    insert_task(&conn, "LAABCD", "api/tasks/task1.md", 2, TaskType::Task, None);
-    insert_task(&conn, "LBBCDE", "api/tasks/task2.md", 1, TaskType::Bug, None);
+    insert_task(&conn, temp_dir.path(), "LAABCD", "api/tasks/task1.md", 2, TaskType::Task, None);
+    insert_task(&conn, temp_dir.path(), "LBBCDE", "api/tasks/task2.md", 1, TaskType::Bug, None);
 
     let filter = ReadyFilter::new();
     let results = query_ready_tasks(&conn, temp_dir.path(), &filter).expect("Query should succeed");
@@ -75,8 +90,16 @@ fn query_ready_tasks_excludes_closed_tasks() {
     let conn = create_test_db();
     let temp_dir = TempDir::new().expect("Failed to create temp directory");
 
-    insert_task(&conn, "LCCDEF", "api/tasks/open.md", 2, TaskType::Task, None);
-    insert_task(&conn, "LDDEFG", "api/tasks/.closed/closed.md", 2, TaskType::Task, None);
+    insert_task(&conn, temp_dir.path(), "LCCDEF", "api/tasks/open.md", 2, TaskType::Task, None);
+    insert_task(
+        &conn,
+        temp_dir.path(),
+        "LDDEFG",
+        "api/tasks/.closed/closed.md",
+        2,
+        TaskType::Task,
+        None,
+    );
 
     let filter = ReadyFilter::new();
     let results = query_ready_tasks(&conn, temp_dir.path(), &filter).expect("Query should succeed");
@@ -90,8 +113,8 @@ fn query_ready_tasks_excludes_blocked_tasks() {
     let conn = create_test_db();
     let temp_dir = TempDir::new().expect("Failed to create temp directory");
 
-    insert_task(&conn, "LEEFGH", "api/tasks/blocker.md", 2, TaskType::Task, None);
-    insert_task(&conn, "LFFGHI", "api/tasks/blocked.md", 2, TaskType::Task, None);
+    insert_task(&conn, temp_dir.path(), "LEEFGH", "api/tasks/blocker.md", 2, TaskType::Task, None);
+    insert_task(&conn, temp_dir.path(), "LFFGHI", "api/tasks/blocked.md", 2, TaskType::Task, None);
     add_blocked_by(&conn, "LFFGHI", "LEEFGH");
 
     let filter = ReadyFilter::new();
@@ -106,8 +129,16 @@ fn query_ready_tasks_includes_task_when_blocker_is_closed() {
     let conn = create_test_db();
     let temp_dir = TempDir::new().expect("Failed to create temp directory");
 
-    insert_task(&conn, "LGGHIJ", "api/tasks/.closed/blocker.md", 2, TaskType::Task, None);
-    insert_task(&conn, "LHHIJK", "api/tasks/task.md", 2, TaskType::Task, None);
+    insert_task(
+        &conn,
+        temp_dir.path(),
+        "LGGHIJ",
+        "api/tasks/.closed/blocker.md",
+        2,
+        TaskType::Task,
+        None,
+    );
+    insert_task(&conn, temp_dir.path(), "LHHIJK", "api/tasks/task.md", 2, TaskType::Task, None);
     add_blocked_by(&conn, "LHHIJK", "LGGHIJ");
 
     let filter = ReadyFilter::new();
@@ -122,8 +153,8 @@ fn query_ready_tasks_excludes_p4_by_default() {
     let conn = create_test_db();
     let temp_dir = TempDir::new().expect("Failed to create temp directory");
 
-    insert_task(&conn, "LIIJKL", "api/tasks/medium.md", 2, TaskType::Task, None);
-    insert_task(&conn, "LJJKLM", "api/tasks/backlog.md", 4, TaskType::Task, None);
+    insert_task(&conn, temp_dir.path(), "LIIJKL", "api/tasks/medium.md", 2, TaskType::Task, None);
+    insert_task(&conn, temp_dir.path(), "LJJKLM", "api/tasks/backlog.md", 4, TaskType::Task, None);
 
     let filter = ReadyFilter::new();
     let results = query_ready_tasks(&conn, temp_dir.path(), &filter).expect("Query should succeed");
@@ -137,8 +168,8 @@ fn query_ready_tasks_includes_p4_with_include_backlog() {
     let conn = create_test_db();
     let temp_dir = TempDir::new().expect("Failed to create temp directory");
 
-    insert_task(&conn, "LKKLMN", "api/tasks/medium.md", 2, TaskType::Task, None);
-    insert_task(&conn, "LLLMNO", "api/tasks/backlog.md", 4, TaskType::Task, None);
+    insert_task(&conn, temp_dir.path(), "LKKLMN", "api/tasks/medium.md", 2, TaskType::Task, None);
+    insert_task(&conn, temp_dir.path(), "LLLMNO", "api/tasks/backlog.md", 4, TaskType::Task, None);
 
     let filter = ReadyFilter::new().with_include_backlog();
     let results = query_ready_tasks(&conn, temp_dir.path(), &filter).expect("Query should succeed");
@@ -154,7 +185,7 @@ fn query_ready_tasks_excludes_non_task_documents() {
     let conn = create_test_db();
     let temp_dir = TempDir::new().expect("Failed to create temp directory");
 
-    insert_task(&conn, "LMMNOP", "api/tasks/task.md", 2, TaskType::Task, None);
+    insert_task(&conn, temp_dir.path(), "LMMNOP", "api/tasks/task.md", 2, TaskType::Task, None);
 
     let kb_doc = InsertDocument::new(
         "LNNOPQ".to_string(),
@@ -188,9 +219,33 @@ fn query_ready_tasks_sorts_by_hybrid_policy_default() {
     let older = chrono::Utc::now() - chrono::Duration::days(5);
     let newer = chrono::Utc::now() - chrono::Duration::days(1);
 
-    insert_task(&conn, "LOOPQR", "api/tasks/p1old.md", 1, TaskType::Bug, Some(older));
-    insert_task(&conn, "LPPQRS", "api/tasks/p1new.md", 1, TaskType::Bug, Some(newer));
-    insert_task(&conn, "LQQRST", "api/tasks/p0old.md", 0, TaskType::Bug, Some(older));
+    insert_task(
+        &conn,
+        temp_dir.path(),
+        "LOOPQR",
+        "api/tasks/p1old.md",
+        1,
+        TaskType::Bug,
+        Some(older),
+    );
+    insert_task(
+        &conn,
+        temp_dir.path(),
+        "LPPQRS",
+        "api/tasks/p1new.md",
+        1,
+        TaskType::Bug,
+        Some(newer),
+    );
+    insert_task(
+        &conn,
+        temp_dir.path(),
+        "LQQRST",
+        "api/tasks/p0old.md",
+        0,
+        TaskType::Bug,
+        Some(older),
+    );
 
     let filter = ReadyFilter::new();
     let results = query_ready_tasks(&conn, temp_dir.path(), &filter).expect("Query should succeed");
@@ -206,9 +261,9 @@ fn query_ready_tasks_sorts_by_priority_policy() {
     let conn = create_test_db();
     let temp_dir = TempDir::new().expect("Failed to create temp directory");
 
-    insert_task(&conn, "LRRSTU", "api/tasks/p2.md", 2, TaskType::Task, None);
-    insert_task(&conn, "LSSTUV", "api/tasks/p0.md", 0, TaskType::Bug, None);
-    insert_task(&conn, "LTTUVW", "api/tasks/p1.md", 1, TaskType::Feature, None);
+    insert_task(&conn, temp_dir.path(), "LRRSTU", "api/tasks/p2.md", 2, TaskType::Task, None);
+    insert_task(&conn, temp_dir.path(), "LSSTUV", "api/tasks/p0.md", 0, TaskType::Bug, None);
+    insert_task(&conn, temp_dir.path(), "LTTUVW", "api/tasks/p1.md", 1, TaskType::Feature, None);
 
     let filter = ReadyFilter::new().with_sort_policy(ReadySortPolicy::Priority);
     let results = query_ready_tasks(&conn, temp_dir.path(), &filter).expect("Query should succeed");
@@ -228,9 +283,33 @@ fn query_ready_tasks_sorts_by_oldest_policy() {
     let middle = chrono::Utc::now() - chrono::Duration::days(5);
     let newest = chrono::Utc::now() - chrono::Duration::days(1);
 
-    insert_task(&conn, "LUUVWX", "api/tasks/new.md", 0, TaskType::Bug, Some(newest));
-    insert_task(&conn, "LVVWXY", "api/tasks/old.md", 2, TaskType::Task, Some(oldest));
-    insert_task(&conn, "LWWXYZ", "api/tasks/mid.md", 1, TaskType::Feature, Some(middle));
+    insert_task(
+        &conn,
+        temp_dir.path(),
+        "LUUVWX",
+        "api/tasks/new.md",
+        0,
+        TaskType::Bug,
+        Some(newest),
+    );
+    insert_task(
+        &conn,
+        temp_dir.path(),
+        "LVVWXY",
+        "api/tasks/old.md",
+        2,
+        TaskType::Task,
+        Some(oldest),
+    );
+    insert_task(
+        &conn,
+        temp_dir.path(),
+        "LWWXYZ",
+        "api/tasks/mid.md",
+        1,
+        TaskType::Feature,
+        Some(middle),
+    );
 
     let filter = ReadyFilter::new().with_sort_policy(ReadySortPolicy::Oldest);
     let results = query_ready_tasks(&conn, temp_dir.path(), &filter).expect("Query should succeed");
@@ -246,9 +325,17 @@ fn query_ready_tasks_filters_by_path_prefix() {
     let conn = create_test_db();
     let temp_dir = TempDir::new().expect("Failed to create temp directory");
 
-    insert_task(&conn, "LXXYZA", "api/tasks/task1.md", 2, TaskType::Task, None);
-    insert_task(&conn, "LYYZAB", "api/tasks/task2.md", 2, TaskType::Task, None);
-    insert_task(&conn, "LZZABC", "database/tasks/task.md", 2, TaskType::Task, None);
+    insert_task(&conn, temp_dir.path(), "LXXYZA", "api/tasks/task1.md", 2, TaskType::Task, None);
+    insert_task(&conn, temp_dir.path(), "LYYZAB", "api/tasks/task2.md", 2, TaskType::Task, None);
+    insert_task(
+        &conn,
+        temp_dir.path(),
+        "LZZABC",
+        "database/tasks/task.md",
+        2,
+        TaskType::Task,
+        None,
+    );
 
     let filter = ReadyFilter::new().with_path_prefix("api/");
     let results = query_ready_tasks(&conn, temp_dir.path(), &filter).expect("Query should succeed");
@@ -264,9 +351,9 @@ fn query_ready_tasks_filters_by_task_type() {
     let conn = create_test_db();
     let temp_dir = TempDir::new().expect("Failed to create temp directory");
 
-    insert_task(&conn, "LAABCE", "api/tasks/bug1.md", 2, TaskType::Bug, None);
-    insert_task(&conn, "LBBCDF", "api/tasks/bug2.md", 2, TaskType::Bug, None);
-    insert_task(&conn, "LCCDEG", "api/tasks/feat.md", 2, TaskType::Feature, None);
+    insert_task(&conn, temp_dir.path(), "LAABCE", "api/tasks/bug1.md", 2, TaskType::Bug, None);
+    insert_task(&conn, temp_dir.path(), "LBBCDF", "api/tasks/bug2.md", 2, TaskType::Bug, None);
+    insert_task(&conn, temp_dir.path(), "LCCDEG", "api/tasks/feat.md", 2, TaskType::Feature, None);
 
     let filter = ReadyFilter::new().with_task_type(TaskType::Bug);
     let results = query_ready_tasks(&conn, temp_dir.path(), &filter).expect("Query should succeed");
@@ -282,9 +369,9 @@ fn query_ready_tasks_respects_limit() {
     let conn = create_test_db();
     let temp_dir = TempDir::new().expect("Failed to create temp directory");
 
-    insert_task(&conn, "LDDEFH", "api/tasks/t1.md", 2, TaskType::Task, None);
-    insert_task(&conn, "LEEFGI", "api/tasks/t2.md", 2, TaskType::Task, None);
-    insert_task(&conn, "LFFGHJ", "api/tasks/t3.md", 2, TaskType::Task, None);
+    insert_task(&conn, temp_dir.path(), "LDDEFH", "api/tasks/t1.md", 2, TaskType::Task, None);
+    insert_task(&conn, temp_dir.path(), "LEEFGI", "api/tasks/t2.md", 2, TaskType::Task, None);
+    insert_task(&conn, temp_dir.path(), "LFFGHJ", "api/tasks/t3.md", 2, TaskType::Task, None);
 
     let filter = ReadyFilter::new().with_limit(2);
     let results = query_ready_tasks(&conn, temp_dir.path(), &filter).expect("Query should succeed");
@@ -295,10 +382,19 @@ fn query_ready_tasks_respects_limit() {
 #[test]
 fn count_ready_tasks_returns_correct_count() {
     let conn = create_test_db();
+    let temp_dir = TempDir::new().expect("Failed to create temp directory");
 
-    insert_task(&conn, "LGGHIK", "api/tasks/open1.md", 2, TaskType::Task, None);
-    insert_task(&conn, "LHHIJL", "api/tasks/open2.md", 1, TaskType::Bug, None);
-    insert_task(&conn, "LIIJKM", "api/tasks/.closed/closed.md", 2, TaskType::Task, None);
+    insert_task(&conn, temp_dir.path(), "LGGHIK", "api/tasks/open1.md", 2, TaskType::Task, None);
+    insert_task(&conn, temp_dir.path(), "LHHIJL", "api/tasks/open2.md", 1, TaskType::Bug, None);
+    insert_task(
+        &conn,
+        temp_dir.path(),
+        "LIIJKM",
+        "api/tasks/.closed/closed.md",
+        2,
+        TaskType::Task,
+        None,
+    );
 
     let filter = ReadyFilter::new();
     let count = count_ready_tasks(&conn, &filter).expect("Count should succeed");
@@ -309,10 +405,11 @@ fn count_ready_tasks_returns_correct_count() {
 #[test]
 fn count_ready_tasks_excludes_blocked_tasks() {
     let conn = create_test_db();
+    let temp_dir = TempDir::new().expect("Failed to create temp directory");
 
-    insert_task(&conn, "LJJKLN", "api/tasks/blocker.md", 2, TaskType::Task, None);
-    insert_task(&conn, "LKKLMO", "api/tasks/blocked.md", 2, TaskType::Task, None);
-    insert_task(&conn, "LLLMNP", "api/tasks/free.md", 2, TaskType::Task, None);
+    insert_task(&conn, temp_dir.path(), "LJJKLN", "api/tasks/blocker.md", 2, TaskType::Task, None);
+    insert_task(&conn, temp_dir.path(), "LKKLMO", "api/tasks/blocked.md", 2, TaskType::Task, None);
+    insert_task(&conn, temp_dir.path(), "LLLMNP", "api/tasks/free.md", 2, TaskType::Task, None);
     add_blocked_by(&conn, "LKKLMO", "LJJKLN");
 
     let filter = ReadyFilter::new();
@@ -326,8 +423,16 @@ fn query_ready_tasks_excludes_claimed_by_default() {
     let conn = create_test_db();
     let temp_dir = TempDir::new().expect("Failed to create temp directory");
 
-    insert_task(&conn, "LMMNOQ", "api/tasks/unclaimed.md", 2, TaskType::Task, None);
-    insert_task(&conn, "LNNOPR", "api/tasks/claimed.md", 2, TaskType::Task, None);
+    insert_task(
+        &conn,
+        temp_dir.path(),
+        "LMMNOQ",
+        "api/tasks/unclaimed.md",
+        2,
+        TaskType::Task,
+        None,
+    );
+    insert_task(&conn, temp_dir.path(), "LNNOPR", "api/tasks/claimed.md", 2, TaskType::Task, None);
 
     let id = LatticeId::parse("LNNOPR").expect("Valid ID");
     claim_operations::claim_task(temp_dir.path(), &id, &PathBuf::from("/work/path"))
@@ -345,8 +450,16 @@ fn query_ready_tasks_includes_claimed_with_include_claimed() {
     let conn = create_test_db();
     let temp_dir = TempDir::new().expect("Failed to create temp directory");
 
-    insert_task(&conn, "LOOPQS", "api/tasks/unclaimed.md", 2, TaskType::Task, None);
-    insert_task(&conn, "LPPQRT", "api/tasks/claimed.md", 2, TaskType::Task, None);
+    insert_task(
+        &conn,
+        temp_dir.path(),
+        "LOOPQS",
+        "api/tasks/unclaimed.md",
+        2,
+        TaskType::Task,
+        None,
+    );
+    insert_task(&conn, temp_dir.path(), "LPPQRT", "api/tasks/claimed.md", 2, TaskType::Task, None);
 
     let id = LatticeId::parse("LPPQRT").expect("Valid ID");
     claim_operations::claim_task(temp_dir.path(), &id, &PathBuf::from("/work/path"))

@@ -2,15 +2,15 @@ use std::path::Path;
 
 use rusqlite::Connection;
 use serde::Serialize;
-use tracing::{debug, info};
+use tracing::{debug, info, warn};
 
 use crate::claim::claim_operations;
 use crate::document::frontmatter_schema::TaskType;
 use crate::error::error_types::LatticeError;
 use crate::id::lattice_id::LatticeId;
 use crate::index::document_filter::{SortColumn, SortOrder};
-use crate::index::document_types;
 use crate::index::document_types::DocumentRow;
+use crate::index::{document_queries, document_types, label_queries, link_queries};
 use crate::task::task_priority::Priority;
 
 /// Sort policy for ready task results.
@@ -135,6 +135,19 @@ pub fn query_ready_tasks(
             && results.len() >= max
         {
             break;
+        }
+
+        // Self-healing: verify the document file actually exists on disk.
+        // If it doesn't, the index is stale and we need to clean it up.
+        let full_path = repo_root.join(&document.path);
+        if !full_path.exists() {
+            warn!(
+                id = document.id.as_str(),
+                path = document.path.as_str(),
+                "Stale index entry detected: file no longer exists, removing from index"
+            );
+            remove_stale_entry(conn, &document.id)?;
+            continue;
         }
 
         let id = LatticeId::parse(&document.id)?;
@@ -363,4 +376,17 @@ fn append_ready_sort(sql: &mut String, filter: &ReadyFilter) {
             sql.push_str(" ORDER BY created_at ASC");
         }
     }
+}
+
+/// Removes a stale entry from the index.
+///
+/// This is a self-healing mechanism: when we discover a document in the index
+/// that no longer exists on disk, we clean it up to prevent future errors.
+fn remove_stale_entry(conn: &Connection, id: &str) -> Result<(), LatticeError> {
+    link_queries::delete_by_source(conn, id)?;
+    link_queries::delete_by_target(conn, id)?;
+    label_queries::delete_for_document(conn, id)?;
+    document_queries::delete_by_id(conn, id)?;
+    info!(id, "Removed stale entry from index");
+    Ok(())
 }
