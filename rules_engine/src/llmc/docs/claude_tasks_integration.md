@@ -657,20 +657,45 @@ Also added `#[derive(Debug)]` to `DependencyGraph` for test assertions.
 **Goal:** Remove obsolete code, update documentation, and finalize the
 migration.
 
-**Current State:** The `task_pool.rs` module contains all the shell command
-execution logic. The `auto_config.rs` module has the `--task-pool-command` CLI
-handling. Various log messages reference "task pool". The `llmc.md` design
-document describes the task pool command system.
+**Status: IMPLEMENTED**
 
-**Changes Required:** Delete `auto_mode/task_pool.rs` entirely once all
-functionality is migrated and tested. Remove any imports of this module
-throughout the codebase. Update log messages in `auto_orchestrator.rs` to
-reference "task discovery" instead of "task pool". Update the auto mode logger
-in `auto_logger.rs` to log task file operations instead of command executions.
-Update `rules_engine/docs/llmc.md` to document the new task integration system,
-removing references to `task_pool_command` and adding sections on task file
-format, context injection, and the new configuration options. Add a
-`.claude/llmc_task_context.toml` example file to the dreamtides repository with
-appropriate labels for the project's different areas (rules engine, client,
-etc.). Update the CLAUDE.md instructions to mention task management with Claude
-Code's native task format instead of lattice.
+**Implementation Summary:**
+
+1. Deleted `auto_mode/task_pool.rs` entirely - the shell command execution logic
+   is no longer needed since tasks are discovered from filesystem.
+
+2. Removed all imports and references to `task_pool` module throughout codebase:
+   - Removed from `auto_mode/mod.rs`
+   - Removed `task_pool_tests.rs` test file
+
+3. Removed `release_task_pool_claims` and `release_all_task_pool_claims`
+   functions from `auto_accept.rs` - these were lattice-specific claim release
+   functions that are no longer needed.
+
+4. Removed calls to release functions from `auto_orchestrator.rs` in:
+   - `run_auto_mode()` shutdown sequence
+   - `process_completed_workers()` for Accepted, AcceptedWithCleanupFailure,
+     and NoChanges cases
+
+5. Removed `TaskPoolCommandFailed` variant from `HardFailure` enum in
+   `auto_failure.rs`.
+
+6. Renamed logging infrastructure:
+   - `TaskPoolLogEntry` -> `TaskDiscoveryLogEntry`
+   - `log_task_pool()` -> `log_task_discovery()`
+   - `task_pool_log_path()` -> `task_discovery_log_path()`
+   - Updated all doc comments to reference "task discovery"
+
+7. Updated `remediation_prompt.rs` to reference "Task Discovery Log"
+
+8. Updated `rules_engine/docs/llmc.md`:
+   - Added "Auto Mode Configuration" section with task_list_id, tasks_root,
+     context_config_path, concurrency, post_accept_command options
+   - Added "Context Injection Configuration" section
+   - Added "Claude Tasks Integration" section documenting task format,
+     selection algorithm, lifecycle, and error handling
+   - Updated "Daemon Error Handling" to reference task discovery errors
+   - Added claude_tasks_integration.md to appendices list
+
+9. Created `.claude/llmc_task_context.toml` example file with labels for
+   default, rules-engine, client, and docs areas.

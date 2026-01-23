@@ -180,8 +180,8 @@ impl LlmcPaths {
     }
 
     /// Returns the path to the task pool log file.
-    pub fn task_pool_log_path(&self) -> PathBuf {
-        self.logs_dir().join("task_pool.log")
+    pub fn task_discovery_log_path(&self) -> PathBuf {
+        self.logs_dir().join("task_discovery.log")
     }
 
     /// Returns the path to the post accept log file.

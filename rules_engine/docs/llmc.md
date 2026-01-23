@@ -247,6 +247,50 @@ The `[defaults.self_review]` section configures the self-review prompt:
 | `include_original` | bool | `false` | Include the original task prompt |
 | `clear` | bool | `false` | Send `/clear` before the self-review prompt |
 
+### Auto Mode Configuration
+
+The `[auto]` section configures automatic task execution mode:
+
+```toml
+[auto]
+task_list_id = "dreamtides"
+concurrency = 2
+post_accept_command = "just review"
+```
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `task_list_id` | string | required | Directory name in `~/.claude/tasks/` for task storage |
+| `tasks_root` | string | `~/.claude/tasks` | Root directory for task storage |
+| `context_config_path` | string | `.claude/llmc_task_context.toml` | Path to context config |
+| `concurrency` | u32 | `2` | Number of auto workers to run concurrently |
+| `post_accept_command` | string | none | Command to run after accepting changes |
+
+### Context Injection Configuration
+
+Context injection allows adding label-specific prologue and epilogue text to task
+descriptions. Configure in `.claude/llmc_task_context.toml`:
+
+```toml
+[default]
+prologue = """
+Follow all coding standards in CLAUDE.md.
+Run `just check` before completing.
+"""
+epilogue = "Remember to run tests."
+
+
+[ui]
+prologue = """
+This task involves UI components.
+Follow the component patterns in src/components/README.md.
+"""
+epilogue = "Ensure accessibility requirements are met."
+```
+
+Tasks with a matching `metadata.label` field receive the corresponding
+prologue/epilogue. Tasks without labels or with unlisted labels use `[default]`.
+
 ### Editor Integration
 
 Several commands open `$EDITOR` when a message or prompt is not provided on the
@@ -865,8 +909,8 @@ Error categories and their handling:
   shutdown with preserved worktree state for investigation.
 - **Worker failures**: After limited retry attempts (with backoff), persistent
   worker failures trigger daemon shutdown.
-- **Task pool errors**: Non-zero exit codes from the task pool command trigger
-  shutdown (except exit code 4 which indicates no tasks available).
+- **Task discovery errors**: Errors parsing task files, missing required fields,
+  circular dependencies, or missing dependency references trigger shutdown.
 - **Post-accept command errors**: Failures in the post-accept command trigger
   shutdown (though the commit has already been merged).
 
@@ -1044,8 +1088,51 @@ Key reference files in Gastown (`~/gastown`):
    starting a task. Always use relative paths like `@rules_engine/src/...`
    instead of absolute paths.
 
+## Claude Tasks Integration
+
+LLMC auto mode discovers tasks from Claude Code's native task file format in
+`~/.claude/tasks/<task_list_id>/`. Each task is a JSON file with:
+
+- `id`: Task identifier (matches filename)
+- `subject`: Brief imperative title
+- `description`: Detailed requirements
+- `status`: `pending`, `in_progress`, or `completed`
+- `blocks`/`blockedBy`: Dependency relationships
+- `owner`: Worker currently assigned (optional)
+- `metadata`: Contains `priority` (0-4, lower is higher) and `label` for context
+
+### Task Selection Algorithm
+
+When multiple tasks are eligible (pending, no owner, dependencies met):
+
+1. **Distinct Label Preference**: Select tasks with labels not currently being
+   worked on by other workers (reduces merge conflicts)
+2. **Priority**: Lower priority value wins
+3. **Creation Order**: Lowest numeric ID wins (FIFO within priority)
+
+### Task Lifecycle
+
+1. **Discovery**: LLMC scans task directory for `.json` files
+2. **Claim**: Sets `status: in_progress` and `owner: <worker-name>`
+3. **Completion**: Sets `status: completed` and clears owner
+4. **Failure Recovery**: On daemon shutdown, active tasks reset to `pending`
+
+Race conditions during claiming are handled via atomic file operations and
+verify-after-write pattern.
+
+### Error Handling
+
+Task-related errors trigger daemon shutdown per fail-fast philosophy:
+- Invalid JSON in task files
+- Missing required fields
+- Circular dependencies
+- Missing dependency references
+
+Error context is persisted for overseer remediation.
+
 ## Appendices
 
 - `llmc2-appendix-tmux.md`: TMUX integration details, debounce timing research
 - `llmc2-appendix-claude-state.md`: Claude state detection heuristics
 - `llmc2-appendix-error-recovery.md`: Detailed error recovery decision trees
+- `claude_tasks_integration.md`: Detailed Claude Tasks integration design

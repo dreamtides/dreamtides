@@ -24,11 +24,12 @@ pub struct CommandResult {
     pub stderr: String,
 }
 
-/// Log entry for task pool command executions.
+/// Log entry for task discovery executions.
 ///
-/// Logged to `logs/task_pool.log` for each `task_pool_command` invocation.
+/// Logged to `logs/task_discovery.log` for each `task_discovery_command`
+/// invocation.
 #[derive(Debug, Clone, Serialize)]
-pub struct TaskPoolLogEntry {
+pub struct TaskDiscoveryLogEntry {
     pub timestamp: String,
     pub level: LogLevel,
     pub command: String,
@@ -99,11 +100,11 @@ pub enum LogLevel {
 /// Handle for the auto mode logging system.
 ///
 /// Manages three dedicated log files for auto mode operations:
-/// - `task_pool.log`: Task pool command invocations
+/// - `task_discovery.log`: Task discovery invocations
 /// - `post_accept.log`: Post accept command invocations
 /// - `auto.log`: High-level auto mode events
 pub struct AutoLogger {
-    task_pool: Arc<Mutex<LogWriter>>,
+    task_discovery: Arc<Mutex<LogWriter>>,
     post_accept: Arc<Mutex<LogWriter>>,
     auto: Arc<Mutex<LogWriter>>,
 }
@@ -132,8 +133,8 @@ pub fn logs_dir() -> PathBuf {
 }
 
 /// Returns the path to the task pool log file.
-pub fn task_pool_log_path() -> PathBuf {
-    logs_dir().join("task_pool.log")
+pub fn task_discovery_log_path() -> PathBuf {
+    logs_dir().join("task_discovery.log")
 }
 
 /// Returns the path to the post accept log file.
@@ -311,18 +312,18 @@ impl AutoLogger {
     ///
     /// Use this in tests to avoid depending on environment variables.
     pub fn new_with_paths(paths: &LlmcPaths) -> Result<Self> {
-        let task_pool = LogWriter::new(paths.task_pool_log_path())?;
+        let task_discovery = LogWriter::new(paths.task_discovery_log_path())?;
         let post_accept = LogWriter::new(paths.post_accept_log_path())?;
         let auto = LogWriter::new(paths.auto_log_path())?;
         Ok(Self {
-            task_pool: Arc::new(Mutex::new(task_pool)),
+            task_discovery: Arc::new(Mutex::new(task_discovery)),
             post_accept: Arc::new(Mutex::new(post_accept)),
             auto: Arc::new(Mutex::new(auto)),
         })
     }
 
-    /// Logs a task pool command invocation.
-    pub fn log_task_pool(&self, result: &CommandResult) {
+    /// Logs a task discovery invocation.
+    pub fn log_task_discovery(&self, result: &CommandResult) {
         // Exit codes 0 and 4 (no ready tasks) are not errors.
         // Exit code 3 (claim limit exceeded) IS an error - indicates claim leak.
         let level = if result.exit_code == 0 || result.exit_code == 4 {
@@ -330,7 +331,7 @@ impl AutoLogger {
         } else {
             LogLevel::Error
         };
-        let entry = TaskPoolLogEntry {
+        let entry = TaskDiscoveryLogEntry {
             timestamp: timestamp_now(),
             level,
             command: result.command.clone(),
@@ -339,13 +340,13 @@ impl AutoLogger {
             stdout: result.stdout.clone(),
             stderr: result.stderr.clone(),
         };
-        if let Err(e) = self.write_task_pool_entry(&entry) {
-            error!("Failed to write to task_pool.log: {}. Continuing.", e);
+        if let Err(e) = self.write_task_discovery_entry(&entry) {
+            error!("Failed to write to task_discovery.log: {}. Continuing.", e);
         }
     }
 
-    fn write_task_pool_entry(&self, entry: &TaskPoolLogEntry) -> Result<()> {
-        let mut writer = self.task_pool.lock().unwrap();
+    fn write_task_discovery_entry(&self, entry: &TaskDiscoveryLogEntry) -> Result<()> {
+        let mut writer = self.task_discovery.lock().unwrap();
         writer.write_entry(entry)
     }
 
@@ -459,8 +460,8 @@ impl AutoLogger {
     ///
     /// Should be called before shutdown to ensure all entries are written.
     pub fn flush(&self) {
-        if let Err(e) = self.task_pool.lock().unwrap().flush() {
-            info!("Failed to flush task_pool.log: {}", e);
+        if let Err(e) = self.task_discovery.lock().unwrap().flush() {
+            info!("Failed to flush task_discovery.log: {}", e);
         }
         if let Err(e) = self.post_accept.lock().unwrap().flush() {
             info!("Failed to flush post_accept.log: {}", e);
@@ -474,7 +475,7 @@ impl AutoLogger {
 impl Clone for AutoLogger {
     fn clone(&self) -> Self {
         Self {
-            task_pool: Arc::clone(&self.task_pool),
+            task_discovery: Arc::clone(&self.task_discovery),
             post_accept: Arc::clone(&self.post_accept),
             auto: Arc::clone(&self.auto),
         }

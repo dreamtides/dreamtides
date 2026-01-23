@@ -114,7 +114,6 @@ pub fn run_auto_mode(
 
     // Cleanup on exit
     heartbeat.stop();
-    auto_accept::release_all_task_pool_claims(&logger);
     let shutdown_reason = match &result {
         Ok(()) => "Normal shutdown (Ctrl-C)",
         Err(e) => &format!("Error: {}", e),
@@ -730,11 +729,6 @@ fn process_completed_workers(
                             &auto_config.get_task_directory(),
                         );
 
-                        // Release task pool claims BEFORE post-accept command to ensure
-                        // claims are released even if post-accept fails
-                        let source_repo = PathBuf::from(&llmc_config.repo.source);
-                        auto_accept::release_task_pool_claims(&source_repo, logger);
-
                         // Run post-accept command if configured
                         debug!(
                             worker = %worker_name,
@@ -795,11 +789,6 @@ fn process_completed_workers(
                             &auto_config.get_task_directory(),
                         );
 
-                        // Release task pool claims BEFORE post-accept command to ensure
-                        // claims are released even if post-accept fails
-                        let source_repo = PathBuf::from(&llmc_config.repo.source);
-                        auto_accept::release_task_pool_claims(&source_repo, logger);
-
                         // Still run post-accept command since the accept succeeded
                         debug!(
                             worker = %worker_name,
@@ -842,10 +831,6 @@ fn process_completed_workers(
                             &worker_name,
                             &auto_config.get_task_directory(),
                         );
-
-                        // Release task pool claims (for lattice-based task pools)
-                        let source_repo = PathBuf::from(&llmc_config.repo.source);
-                        auto_accept::release_task_pool_claims(&source_repo, logger);
                     }
                     AutoAcceptResult::SourceRepoDirty => {
                         // Increment retry count and check if we've exceeded the limit

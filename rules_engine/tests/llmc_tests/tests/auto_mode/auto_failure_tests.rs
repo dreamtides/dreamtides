@@ -62,18 +62,6 @@ fn transient_failure_tmux_missing_display() {
 }
 
 #[test]
-fn hard_failure_task_pool_command_failed_display() {
-    let failure = HardFailure::TaskPoolCommandFailed { message: "Exit code 1".to_string() };
-    let display = format!("{}", failure);
-    assert!(display.contains("Exit code 1"), "Display should include error message: {}", display);
-    assert!(
-        display.to_lowercase().contains("task pool"),
-        "Display should mention task pool: {}",
-        display
-    );
-}
-
-#[test]
 fn hard_failure_post_accept_command_failed_display() {
     let failure = HardFailure::PostAcceptCommandFailed { message: "Tests failed".to_string() };
     let display = format!("{}", failure);
@@ -229,9 +217,9 @@ fn transient_failure_equality() {
 
 #[test]
 fn hard_failure_equality() {
-    let f1 = HardFailure::TaskPoolCommandFailed { message: "error".to_string() };
-    let f2 = HardFailure::TaskPoolCommandFailed { message: "error".to_string() };
-    let f3 = HardFailure::TaskPoolCommandFailed { message: "different".to_string() };
+    let f1 = HardFailure::PostAcceptCommandFailed { message: "error".to_string() };
+    let f2 = HardFailure::PostAcceptCommandFailed { message: "error".to_string() };
+    let f3 = HardFailure::PostAcceptCommandFailed { message: "different".to_string() };
     let f4 = HardFailure::StateCorruption { message: "error".to_string() };
     assert_eq!(f1, f2, "Same failure type and message should be equal");
     assert_ne!(f1, f3, "Different messages should not be equal");

@@ -3,7 +3,7 @@ use std::time::Duration;
 
 use llmc::auto_mode::auto_logging::{
     AutoEvent, AutoLogEntry, AutoLogger, CommandResult, LogLevel, PostAcceptLogEntry,
-    TaskPoolLogEntry, TaskResult,
+    TaskDiscoveryLogEntry, TaskResult,
 };
 use llmc::config::LlmcPaths;
 use tempfile::TempDir;
@@ -151,8 +151,8 @@ fn auto_event_error_serializes() {
 }
 
 #[test]
-fn task_pool_log_entry_serialization() {
-    let entry = TaskPoolLogEntry {
+fn task_discovery_log_entry_serialization() {
+    let entry = TaskDiscoveryLogEntry {
         timestamp: "2024-01-01T00:00:00.000Z".to_string(),
         level: LogLevel::Info,
         command: "lat dispatch --limit 1".to_string(),
@@ -168,8 +168,8 @@ fn task_pool_log_entry_serialization() {
 }
 
 #[test]
-fn task_pool_log_entry_with_error() {
-    let entry = TaskPoolLogEntry {
+fn task_discovery_log_entry_with_error() {
+    let entry = TaskDiscoveryLogEntry {
         timestamp: "2024-01-01T00:00:00.000Z".to_string(),
         level: LogLevel::Error,
         command: "lat dispatch --limit 1".to_string(),
@@ -237,11 +237,11 @@ fn command_result_stores_all_fields() {
 }
 
 #[test]
-fn task_pool_log_writes_to_disk_immediately() {
+fn task_discovery_log_writes_to_disk_immediately() {
     let temp_dir = TempDir::new().expect("Failed to create temp dir");
     let paths = LlmcPaths::new(temp_dir.path().to_path_buf());
     let logger = AutoLogger::new_with_paths(&paths).expect("Failed to create logger");
-    let log_path = paths.task_pool_log_path();
+    let log_path = paths.task_discovery_log_path();
     let cmd_result = CommandResult {
         command: "test command".to_string(),
         exit_code: 0,
@@ -249,7 +249,7 @@ fn task_pool_log_writes_to_disk_immediately() {
         stdout: "test output".to_string(),
         stderr: "".to_string(),
     };
-    logger.log_task_pool(&cmd_result);
+    logger.log_task_discovery(&cmd_result);
     let content = fs::read_to_string(&log_path).unwrap_or_else(|e| {
         panic!(
             "Failed to read {}: {}. Log entries should be written immediately.",
@@ -259,12 +259,12 @@ fn task_pool_log_writes_to_disk_immediately() {
     });
     assert!(
         content.contains("test command"),
-        "task_pool.log should contain the logged command immediately after log call. File content: '{}'",
+        "task_discovery.log should contain the logged command immediately after log call. File content: '{}'",
         content
     );
     assert!(
         content.contains("test output"),
-        "task_pool.log should contain stdout from logged entry. File content: '{}'",
+        "task_discovery.log should contain stdout from logged entry. File content: '{}'",
         content
     );
 }

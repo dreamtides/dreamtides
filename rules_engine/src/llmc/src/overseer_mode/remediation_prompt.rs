@@ -270,9 +270,9 @@ fn format_log_excerpts() -> String {
     result.push_str("### Daemon Log (auto.log)\n\n");
     result.push_str(&format_log_file(&daemon_log, DEFAULT_LOG_LINES));
     result.push_str("\n\n");
-    let task_pool_log = auto_logging::task_pool_log_path();
-    result.push_str("### Task Pool Log (task_pool.log)\n\n");
-    result.push_str(&format_log_file(&task_pool_log, DEFAULT_LOG_LINES));
+    let task_discovery_log = auto_logging::task_discovery_log_path();
+    result.push_str("### Task Discovery Log (task_discovery.log)\n\n");
+    result.push_str(&format_log_file(&task_discovery_log, DEFAULT_LOG_LINES));
     result.push_str("\n\n");
     let post_accept_log = auto_logging::post_accept_log_path();
     result.push_str("### Post Accept Log (post_accept.log)\n\n");

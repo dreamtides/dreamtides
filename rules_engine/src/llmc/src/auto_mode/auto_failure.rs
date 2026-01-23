@@ -43,8 +43,6 @@ pub enum TransientFailure {
 /// that require human intervention or AI remediation.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum HardFailure {
-    /// `task_pool_command` returned non-zero exit code.
-    TaskPoolCommandFailed { message: String },
     /// `post_accept_command` returned non-zero exit code.
     PostAcceptCommandFailed { message: String },
     /// Worker entered error state after patrol retries exhausted.
@@ -209,9 +207,6 @@ impl std::fmt::Display for TransientFailure {
 impl std::fmt::Display for HardFailure {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::TaskPoolCommandFailed { message } => {
-                write!(f, "Task pool command failed: {}", message)
-            }
             Self::PostAcceptCommandFailed { message } => {
                 write!(f, "Post-accept command failed: {}", message)
             }
