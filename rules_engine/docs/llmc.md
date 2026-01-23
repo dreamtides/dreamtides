@@ -208,6 +208,7 @@ clear = false
 
 [repo]
 source = "~/Documents/GoogleDrive/dreamtides"
+default_branch = "master"  # or "main" - auto-detected during llmc init
 
 [workers.adam]
 model = "opus"
@@ -246,6 +247,15 @@ The `[defaults.self_review]` section configures the self-review prompt:
 | `prompt` | string | required | The prompt sent to workers for self-review |
 | `include_original` | bool | `false` | Include the original task prompt |
 | `clear` | bool | `false` | Send `/clear` before the self-review prompt |
+
+### Repository Configuration
+
+The `[repo]` section configures the source repository:
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `source` | string | required | Path to the source repository |
+| `default_branch` | string | `"master"` | The default branch name (e.g., "main" or "master"). Auto-detected during `llmc init`. If the configured branch doesn't exist, LLMC will attempt to detect the correct branch at runtime. |
 
 ### Auto Mode Configuration
 

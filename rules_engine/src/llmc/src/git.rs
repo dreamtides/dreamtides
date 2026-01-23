@@ -168,6 +168,20 @@ pub fn branch_exists(repo: &Path, name: &str) -> bool {
         .unwrap_or(false)
 }
 
+/// Checks if a git ref exists (can be a branch, tag, or remote ref like
+/// "origin/main")
+pub fn ref_exists(repo: &Path, ref_name: &str) -> bool {
+    Command::new("git")
+        .arg("-C")
+        .arg(repo)
+        .arg("rev-parse")
+        .arg("--verify")
+        .arg(ref_name)
+        .output()
+        .map(|output| output.status.success())
+        .unwrap_or(false)
+}
+
 /// Gets the current branch name for a worktree
 pub fn get_current_branch(worktree: &Path) -> Result<String> {
     let output = Command::new("git")
@@ -939,6 +953,66 @@ pub fn pull_rebase(worktree: &Path) -> Result<()> {
         GIT_LOCK_RETRY_COUNT,
         last_error.unwrap_or_else(|| "Unknown error".to_string())
     )
+}
+
+/// Detects the default branch name for a repository.
+///
+/// This attempts to determine the default branch by:
+/// 1. First trying `git symbolic-ref refs/remotes/origin/HEAD` to get the
+///    remote's default branch
+/// 2. If that fails, falling back to checking which common branch names exist
+///    locally (main, master)
+///
+/// Returns "main" or "master" depending on what exists, or defaults to
+/// "master" if neither can be detected.
+pub fn detect_default_branch(repo: &Path) -> String {
+    // First try to get the remote's default branch
+    let output = Command::new("git")
+        .arg("-C")
+        .arg(repo)
+        .arg("symbolic-ref")
+        .arg("refs/remotes/origin/HEAD")
+        .output();
+    if let Ok(output) = output
+        && output.status.success()
+    {
+        let stdout = String::from_utf8_lossy(&output.stdout);
+        // Output is like "refs/remotes/origin/main" - extract the branch name
+        if let Some(branch) = stdout.trim().strip_prefix("refs/remotes/origin/") {
+            return branch.to_string();
+        }
+    }
+
+    // Fall back to checking which common branch names exist
+    if branch_exists(repo, "main") {
+        return "main".to_string();
+    }
+    if branch_exists(repo, "master") {
+        return "master".to_string();
+    }
+
+    // Check remote branches if local branches don't exist
+    let output = Command::new("git")
+        .arg("-C")
+        .arg(repo)
+        .arg("ls-remote")
+        .arg("--heads")
+        .arg("origin")
+        .output();
+    if let Ok(output) = output
+        && output.status.success()
+    {
+        let stdout = String::from_utf8_lossy(&output.stdout);
+        if stdout.contains("refs/heads/main") {
+            return "main".to_string();
+        }
+        if stdout.contains("refs/heads/master") {
+            return "master".to_string();
+        }
+    }
+
+    // Default to master for backwards compatibility
+    "master".to_string()
 }
 
 /// Removes a directory with retries and fallback to shell `rm -rf`.

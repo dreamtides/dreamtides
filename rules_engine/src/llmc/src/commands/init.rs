@@ -4,9 +4,9 @@ use std::process::Command;
 
 use anyhow::{Context, Result, bail};
 
-use crate::config;
 use crate::config::Config;
 use crate::state::State;
+use crate::{config, git};
 /// Initializes a new LLMC workspace
 pub fn run_init(source: Option<PathBuf>, target: Option<PathBuf>, force: bool) -> Result<()> {
     let target_dir = target.unwrap_or_else(config::get_llmc_root);
@@ -106,6 +106,9 @@ fn create_config_file(target: &Path, source: &Path) -> Result<()> {
     println!("Creating config.toml...");
     let config_path = target.join("config.toml");
     let source_str = source.to_string_lossy();
+    // Detect the default branch from the cloned repository
+    let default_branch = git::detect_default_branch(target);
+    println!("  Detected default branch: {}", default_branch);
     let config_content = format!(
         r#"[defaults]
 model = "opus"
@@ -116,13 +119,14 @@ skip_permissions = true
 
 [repo]
 source = "{}"
+default_branch = "{}"
 
 # Example worker configuration:
 # [workers.example]
 # model = "sonnet"
 # role_prompt = "You are Example, focused on..."
 "#,
-        source_str
+        source_str, default_branch
     );
     fs::write(&config_path, config_content).context("Failed to write config.toml")?;
     let _ = Config::load(&config_path)?;

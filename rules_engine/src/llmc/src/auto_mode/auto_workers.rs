@@ -5,7 +5,7 @@
 use std::path::Path;
 use std::time::{SystemTime, UNIX_EPOCH};
 
-use anyhow::{Context, Result};
+use anyhow::{Context, Result, bail};
 use tracing::info;
 
 use crate::commands::add;
@@ -202,11 +202,45 @@ fn create_auto_worker(state: &mut State, config: &Config, name: &str) -> Result<
 }
 
 /// Creates the git branch if it doesn't exist.
+///
+/// If the configured origin branch doesn't exist, this function will attempt
+/// to detect the actual default branch (e.g., "main" vs "master") and use
+/// that instead.
 fn create_branch_if_missing(repo: &Path, branch_name: &str, origin_branch: &str) -> Result<()> {
     if git::branch_exists(repo, branch_name) {
         return Ok(());
     }
-    git::create_branch(repo, branch_name, origin_branch)
+
+    // Check if the configured origin branch exists
+    let actual_origin_branch = if git::ref_exists(repo, origin_branch) {
+        origin_branch.to_string()
+    } else {
+        // Configured branch doesn't exist, try to detect the actual default
+        // branch
+        let detected = git::detect_default_branch(repo);
+        let detected_origin = format!("origin/{}", detected);
+        if git::ref_exists(repo, &detected_origin) {
+            info!(
+                configured = %origin_branch,
+                detected = %detected_origin,
+                "Configured origin branch not found, using detected default branch"
+            );
+            detected_origin
+        } else {
+            // Neither exists - fail with helpful message
+            bail!(
+                "Cannot create branch {}: neither configured origin branch '{}' nor \
+                 detected default branch 'origin/{}' exists. Please ensure your repository \
+                 has been cloned correctly and has a remote 'origin' with a default branch, \
+                 or set 'default_branch' in config.toml to match your repository's default branch.",
+                branch_name,
+                origin_branch,
+                detected
+            );
+        }
+    };
+
+    git::create_branch(repo, branch_name, &actual_origin_branch)
         .with_context(|| format!("Failed to create branch {}", branch_name))
 }
 
