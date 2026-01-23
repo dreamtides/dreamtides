@@ -403,15 +403,27 @@ The overseer prints colored messages to stdout to indicate remediation status:
 
 ### Failure Spiral Prevention
 
-- If daemon fails within `restart_cooldown_secs` (default: 60s) of last start:
-  - This is treated as a failure spiral
-  - Remediation does NOT repeat
-  - Overseer terminates with detailed error message
-  - Human intervention required
+**Critical invariant**: The first failure ALWAYS triggers remediation, regardless
+of how quickly the daemon failed. A failure spiral can only be detected AFTER at
+least one remediation attempt.
 
-- Rationale: Some failures are not code-fixable (disk full, network down, API
-  limits)
-- Prevents infinite loop of remediation attempts
+Detection logic:
+1. Daemon fails
+2. If no remediation has been attempted yet → run remediation (not a spiral)
+3. If remediation was attempted AND daemon ran less than `restart_cooldown_secs`
+   → failure spiral detected
+4. If daemon ran longer than `restart_cooldown_secs` → reset tracking, treat next
+   failure as "first" failure again
+
+When a failure spiral is detected:
+- Remediation does NOT repeat (already tried once)
+- Overseer terminates with detailed error message
+- Human intervention required
+
+Rationale: Some failures are not code-fixable (disk full, network down, API
+limits). By requiring at least one remediation attempt, we ensure Claude has a
+chance to fix the issue before declaring it unfixable. Prevents infinite loops
+while still attempting recovery.
 
 ### TMUX Session Protection
 

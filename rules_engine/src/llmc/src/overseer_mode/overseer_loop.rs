@@ -21,6 +21,21 @@ const HEALTH_CHECK_INTERVAL_SECS: u64 = 5;
 const DAEMON_STARTUP_TIMEOUT_SECS: u64 = 60;
 const DAEMON_STARTUP_POLL_INTERVAL_MS: u64 = 500;
 
+/// Tracks failure spiral state across daemon restarts.
+///
+/// A failure spiral is when the daemon fails repeatedly within a short time,
+/// indicating that remediation is not working. However, we must attempt
+/// remediation at least once before declaring a failure spiral - otherwise
+/// we would never try to fix the problem.
+///
+/// Design invariant: First failure should always attempt remediation.
+/// Only after at least one remediation attempt can a quick failure be
+/// considered a "spiral".
+pub struct FailureSpiralTracker {
+    cooldown: Duration,
+    remediation_attempted: bool,
+}
+
 /// Runs the overseer supervisor loop.
 ///
 /// The overseer:
@@ -65,6 +80,7 @@ pub fn run_overseer(config: &Config, daemon_options: &OverseerDaemonOptions) -> 
     println!("✓ Overseer Claude Code session ready");
 
     let mut monitor = HealthMonitor::new(overseer_config.clone());
+    let mut spiral_tracker = FailureSpiralTracker::new(overseer_config.get_restart_cooldown());
 
     loop {
         if shutdown_count.load(Ordering::SeqCst) > 0 {
@@ -97,8 +113,15 @@ pub fn run_overseer(config: &Config, daemon_options: &OverseerDaemonOptions) -> 
 
         terminate_daemon_gracefully(&daemon_handle.expected, Some(&mut daemon_handle.child));
 
-        if is_failure_spiral(daemon_start_time, &overseer_config) {
-            error!("Failure spiral detected - daemon failed within cooldown period");
+        let daemon_runtime = daemon_start_time.elapsed();
+
+        // Check for failure spiral ONLY after remediation has been attempted.
+        // This is critical: we must try to fix the problem at least once before
+        // declaring that remediation isn't working.
+        if spiral_tracker.should_detect_spiral(daemon_runtime) {
+            error!(
+                "Failure spiral detected - daemon failed within cooldown period after remediation"
+            );
             println!(
                 "\n❌ FAILURE SPIRAL DETECTED\n\n\
                  The daemon failed within {} seconds of the last restart.\n\
@@ -125,6 +148,7 @@ pub fn run_overseer(config: &Config, daemon_options: &OverseerDaemonOptions) -> 
         if matches!(failure_status, HealthStatus::Stalled { .. }) {
             info!("Stall detected - skipping remediation, restarting daemon directly");
             println!("\x1b[1;33m⚠ Worker stalled - resetting and restarting daemon...\x1b[0m");
+            spiral_tracker.record_stall_handled();
         } else {
             println!("\x1b[1;31m⚠ Entering remediation mode...\x1b[0m");
             run_remediation(&failure_status, config, &shutdown_count)?;
@@ -139,8 +163,14 @@ pub fn run_overseer(config: &Config, daemon_options: &OverseerDaemonOptions) -> 
                 bail!("Manual intervention required - see .llmc/manual_intervention_needed_*.txt");
             }
 
+            // Record that remediation was attempted - now future quick failures
+            // can be detected as failure spirals
+            spiral_tracker.record_remediation_attempt();
             println!("\x1b[1;32m✓ Remediation complete. Restarting daemon...\x1b[0m");
         }
+
+        // If daemon ran past cooldown, reset spiral tracking (had healthy period)
+        spiral_tracker.record_daemon_stopped(daemon_runtime);
 
         // Reset log tailer positions to skip errors from the previous daemon's
         // termination and from remediation itself. Without this, the health
@@ -150,6 +180,69 @@ pub fn run_overseer(config: &Config, daemon_options: &OverseerDaemonOptions) -> 
 
     println!("✓ Overseer shutdown complete");
     Ok(())
+}
+
+impl FailureSpiralTracker {
+    pub fn new(cooldown: Duration) -> Self {
+        Self { cooldown, remediation_attempted: false }
+    }
+
+    /// Records that remediation was attempted.
+    pub fn record_remediation_attempt(&mut self) {
+        self.remediation_attempted = true;
+    }
+
+    /// Records that a stall was handled (skipped remediation).
+    ///
+    /// Stalls skip remediation by design, so this does NOT count as a
+    /// remediation attempt for spiral detection purposes.
+    pub fn record_stall_handled(&mut self) {
+        // Intentionally does not set remediation_attempted
+    }
+
+    /// Records that the daemon stopped after running for the given duration.
+    ///
+    /// If the daemon ran longer than the cooldown period, the tracker resets
+    /// because the system had a healthy period - subsequent quick failures
+    /// should attempt remediation again before being considered a spiral.
+    pub fn record_daemon_stopped(&mut self, daemon_runtime: Duration) {
+        if daemon_runtime >= self.cooldown {
+            debug!(
+                runtime_secs = daemon_runtime.as_secs(),
+                cooldown_secs = self.cooldown.as_secs(),
+                "Daemon ran past cooldown - resetting spiral tracking"
+            );
+            self.remediation_attempted = false;
+        }
+    }
+
+    /// Checks if this failure should be detected as a failure spiral.
+    ///
+    /// Returns true only if:
+    /// 1. At least one remediation has been attempted
+    /// 2. The daemon failed within the cooldown period
+    pub fn should_detect_spiral(&self, daemon_runtime: Duration) -> bool {
+        if !self.remediation_attempted {
+            debug!("No remediation attempted yet - cannot be a failure spiral");
+            return false;
+        }
+
+        if daemon_runtime < self.cooldown {
+            error!(
+                elapsed_secs = daemon_runtime.as_secs(),
+                cooldown_secs = self.cooldown.as_secs(),
+                "Daemon failed within restart cooldown after remediation - failure spiral detected"
+            );
+            true
+        } else {
+            debug!(
+                elapsed_secs = daemon_runtime.as_secs(),
+                cooldown_secs = self.cooldown.as_secs(),
+                "Daemon ran longer than cooldown, not a failure spiral"
+            );
+            false
+        }
+    }
 }
 
 /// Handle to a running daemon process with output piping threads.
@@ -379,29 +472,6 @@ fn terminate_daemon_gracefully(expected: &ExpectedDaemon, child: Option<&mut Chi
             error!(error = %e, "Error during daemon termination");
             println!("⚠ Error during termination: {}", e);
         }
-    }
-}
-
-/// Checks if this is a failure spiral (daemon failed too quickly after
-/// restart).
-fn is_failure_spiral(start_time: Instant, config: &OverseerConfig) -> bool {
-    let elapsed = start_time.elapsed();
-    let cooldown = config.get_restart_cooldown();
-
-    if elapsed < cooldown {
-        error!(
-            elapsed_secs = elapsed.as_secs(),
-            cooldown_secs = cooldown.as_secs(),
-            "Daemon failed within restart cooldown - failure spiral detected"
-        );
-        true
-    } else {
-        debug!(
-            elapsed_secs = elapsed.as_secs(),
-            cooldown_secs = cooldown.as_secs(),
-            "Daemon ran longer than cooldown, not a failure spiral"
-        );
-        false
     }
 }
 

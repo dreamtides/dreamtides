@@ -12,7 +12,8 @@ labels:
 blocking:
 - LIDWQN
 created-at: 2026-01-23T19:15:26.195163Z
-updated-at: 2026-01-23T19:15:40.873718Z
+updated-at: 2026-01-23T19:25:26.824349Z
+closed-at: 2026-01-23T19:25:26.824349Z
 ---
 
 # Bug: Failure Spiral Detection Triggers Prematurely
