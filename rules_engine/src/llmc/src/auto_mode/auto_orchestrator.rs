@@ -15,7 +15,9 @@ use crate::auto_mode::auto_failure::{self, HardFailure, RecoveryResult, Transien
 use crate::auto_mode::auto_logging::{AutoLogger, TaskResult};
 use crate::auto_mode::heartbeat_thread::{DaemonRegistration, HeartbeatThread};
 use crate::auto_mode::task_context::TaskContextConfig;
-use crate::auto_mode::{auto_logging, auto_workers, heartbeat_thread};
+use crate::auto_mode::{
+    auto_logging, auto_workers, heartbeat_thread, task_discovery, task_selection,
+};
 use crate::config::Config;
 use crate::git;
 use crate::ipc::messages::HookMessage;
@@ -432,22 +434,60 @@ fn run_orchestration_loop(
 /// Returns `true` if any task was assigned to a worker, `false` otherwise.
 fn process_idle_workers(
     state: &mut State,
-    _llmc_config: &Config,
-    _auto_config: &ResolvedAutoConfig,
-    _task_context: &TaskContextConfig,
-    _logger: &AutoLogger,
+    llmc_config: &Config,
+    auto_config: &ResolvedAutoConfig,
+    task_context: &TaskContextConfig,
+    logger: &AutoLogger,
 ) -> Result<bool> {
     let idle_workers: Vec<String> =
         auto_workers::get_idle_auto_workers(state).iter().map(|w| w.name.clone()).collect();
 
-    let any_task_assigned = false;
+    if idle_workers.is_empty() {
+        return Ok(false);
+    }
 
-    // TODO(milestone-4): Implement task discovery and selection from Claude task
-    // files. For now, task assignment is disabled until task_discovery.rs is
-    // implemented. The old task_pool_command system has been removed in favor
-    // of direct task file integration.
-    for _worker_name in idle_workers {
-        // Task discovery not yet implemented - skip assignment
+    let task_dir = auto_config.get_task_directory();
+    let tasks = task_discovery::discover_tasks(&task_dir)?;
+
+    if tasks.is_empty() {
+        debug!("No tasks found in task directory");
+        return Ok(false);
+    }
+
+    let graph = task_discovery::build_dependency_graph(&tasks)?;
+    let eligible = task_discovery::get_eligible_tasks(&tasks, &graph);
+
+    if eligible.is_empty() {
+        debug!("No eligible tasks available");
+        return Ok(false);
+    }
+
+    let mut any_task_assigned = false;
+    let mut active_labels = task_discovery::get_active_labels(&tasks);
+
+    for worker_name in idle_workers {
+        let selected = task_selection::select_task(&eligible, &active_labels);
+        let Some(task) = selected else {
+            break;
+        };
+
+        let task_content = format!("{}\n\n{}", task.subject, task.description);
+        let label = task.get_label();
+
+        assign_task_to_worker(
+            state,
+            llmc_config,
+            task_context,
+            &worker_name,
+            &task_content,
+            label,
+            logger,
+        )?;
+
+        if let Some(lbl) = label {
+            active_labels.insert(lbl.to_string());
+        }
+        any_task_assigned = true;
     }
 
     Ok(any_task_assigned)
@@ -463,8 +503,6 @@ fn process_idle_workers(
 ///
 /// The `label` parameter is used to resolve label-specific prologue/epilogue
 /// context from the task context config.
-// Will be used in milestone-4 task discovery
-#[allow(dead_code, clippy::allow_attributes)]
 fn assign_task_to_worker(
     state: &mut State,
     _llmc_config: &Config,
