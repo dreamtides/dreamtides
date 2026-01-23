@@ -29,6 +29,8 @@ fn create_test_worker(name: &str) -> WorkerRecord {
         api_error_count: 0,
         last_api_error_unix: None,
         pending_task_prompt: None,
+        transcript_session_id: None,
+        transcript_path: None,
     }
 }
 
@@ -53,7 +55,7 @@ fn create_test_config() -> Config {
 fn test_handle_stop_unknown_worker() {
     let mut state = State::new();
     let config = create_test_config();
-    let result = handle_stop("unknown_worker", 12345, &mut state, &config);
+    let result = handle_stop("unknown_worker", 12345, None, &mut state, &config);
     assert!(result.is_ok());
 }
 
@@ -63,7 +65,7 @@ fn test_handle_stop_idle_worker_ignored() {
     let worker = create_test_worker("adam");
     state.add_worker(worker);
     let config = create_test_config();
-    let result = handle_stop("adam", 12345, &mut state, &config);
+    let result = handle_stop("adam", 12345, None, &mut state, &config);
     assert!(result.is_ok());
     assert_eq!(state.get_worker("adam").unwrap().status, WorkerStatus::Idle);
 }
@@ -104,6 +106,7 @@ fn test_session_start_offline_worker_transitions_to_idle() {
         worker: "auto-1".to_string(),
         session_id: "test-session".to_string(),
         timestamp: 1234567890,
+        transcript_path: None,
     };
 
     let result = handle_hook_event(&event, &mut state, &config);
@@ -128,6 +131,7 @@ fn test_session_start_with_pending_prompt_state_changes() {
         worker: "auto-1".to_string(),
         session_id: "llmc-auto-1".to_string(),
         timestamp: 1234567890,
+        transcript_path: None,
     };
 
     let _result = handle_hook_event(&event, &mut state, &config);

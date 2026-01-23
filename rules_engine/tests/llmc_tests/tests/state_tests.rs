@@ -27,6 +27,8 @@ fn create_test_worker(name: &str) -> WorkerRecord {
         api_error_count: 0,
         last_api_error_unix: None,
         pending_task_prompt: None,
+        transcript_session_id: None,
+        transcript_path: None,
     }
 }
 

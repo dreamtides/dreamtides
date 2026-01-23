@@ -108,6 +108,16 @@ pub struct WorkerRecord {
     /// prompt, the prompt is sent and the worker transitions to Working.
     #[serde(default)]
     pub pending_task_prompt: Option<String>,
+    /// Claude session ID for the current task. Captured from SessionStart hook
+    /// when a task begins. Used to identify the correct transcript file for
+    /// later archival.
+    #[serde(default)]
+    pub transcript_session_id: Option<String>,
+    /// Path to Claude transcript file for the current task. Captured from
+    /// SessionStart hook. On task completion or stall, this transcript is
+    /// copied to the logs directory for debugging and analysis.
+    #[serde(default)]
+    pub transcript_path: Option<String>,
 }
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct State {

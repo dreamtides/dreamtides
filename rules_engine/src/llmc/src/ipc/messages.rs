@@ -8,6 +8,9 @@ pub enum HookEvent {
         worker: String,
         session_id: String,
         timestamp: u64,
+        /// Path to Claude transcript file for the current session. Used to
+        /// capture the transcript for later analysis when task completes.
+        transcript_path: Option<String>,
     },
     SessionEnd {
         worker: String,
@@ -20,6 +23,8 @@ pub enum HookEvent {
         worker: String,
         session_id: String,
         timestamp: u64,
+        /// Path to Claude transcript file for archival on task completion
+        transcript_path: Option<String>,
     },
 }
 

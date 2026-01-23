@@ -11,7 +11,7 @@ use crate::state::{self, State, WorkerStatus};
 use crate::tmux::sender::TmuxSender;
 use crate::tmux::session;
 use crate::worker::{self, WorkerTransition};
-use crate::{git, recovery, sound, transcript_reader};
+use crate::{git, recovery, sound, transcript_logger, transcript_reader};
 
 const OVERSEER_WORKER_NAME: &str = "overseer";
 
@@ -37,8 +37,14 @@ pub struct PatrolReport {
 /// when workers come online, crash/shutdown, or complete their current task.
 pub fn handle_hook_event(event: &HookEvent, state: &mut State, config: &Config) -> Result<()> {
     match event {
-        HookEvent::SessionStart { worker, session_id, timestamp } => {
-            handle_session_start(worker, session_id, *timestamp, state)?;
+        HookEvent::SessionStart { worker, session_id, timestamp, transcript_path } => {
+            handle_session_start(
+                worker,
+                session_id,
+                *timestamp,
+                transcript_path.as_deref(),
+                state,
+            )?;
         }
         HookEvent::SessionEnd { worker, reason, timestamp, transcript_path } => {
             handle_session_end(
@@ -50,8 +56,8 @@ pub fn handle_hook_event(event: &HookEvent, state: &mut State, config: &Config) 
                 config,
             )?;
         }
-        HookEvent::Stop { worker, timestamp, .. } => {
-            handle_stop(worker, *timestamp, state, config)?;
+        HookEvent::Stop { worker, timestamp, transcript_path, .. } => {
+            handle_stop(worker, *timestamp, transcript_path.as_deref(), state, config)?;
         }
     }
     Ok(())
@@ -60,9 +66,24 @@ pub fn handle_hook_event(event: &HookEvent, state: &mut State, config: &Config) 
 pub fn handle_stop(
     worker_name: &str,
     _timestamp: u64,
+    transcript_path: Option<&str>,
     state: &mut State,
     config: &Config,
 ) -> Result<()> {
+    // If we receive a transcript path, update the worker's stored path
+    // (it may have changed during the session due to /clear commands)
+    if let Some(path) = transcript_path
+        && let Some(w) = state.get_worker_mut(worker_name)
+        && w.transcript_path.as_deref() != Some(path)
+    {
+        tracing::debug!(
+            worker = %worker_name,
+            old_path = ?w.transcript_path,
+            new_path = %path,
+            "Updating transcript path from Stop hook"
+        );
+        w.transcript_path = Some(path.to_string());
+    }
     if is_overseer_worker(worker_name) {
         tracing::debug!(
             worker = %worker_name,
@@ -83,6 +104,8 @@ pub fn handle_stop(
     let worktree_path = PathBuf::from(&worker.worktree_path);
     let self_review_enabled = worker.self_review;
     let stored_sha = worker.commit_sha.clone();
+    let transcript_session = worker.transcript_session_id.clone();
+    let transcript_file = worker.transcript_path.clone();
     match current_status {
         WorkerStatus::Working | WorkerStatus::Rejected => {
             let has_commits = match git::has_commits_ahead_of(&worktree_path, "origin/master") {
@@ -103,10 +126,19 @@ pub fn handle_stop(
                     worker = %worker_name,
                     "Stop hook: task completed without commits (e.g., review-only task), transitioning to NoChanges"
                 );
+                let _ = transcript_logger::archive_transcript(
+                    worker_name,
+                    transcript_file.as_deref(),
+                    transcript_session.as_deref(),
+                );
                 let transition = WorkerTransition::ToNoChanges;
                 if let Some(w) = state.get_worker_mut(worker_name) {
                     worker::apply_transition(w, transition)?;
                     w.pending_self_review = false;
+                    transcript_logger::clear_transcript_info(
+                        &mut w.transcript_session_id,
+                        &mut w.transcript_path,
+                    );
                 }
                 let _ = sound::play_bell(config);
                 return Ok(());
@@ -136,10 +168,19 @@ pub fn handle_stop(
                 commit_msg = %first_line,
                 "Stop hook: transitioning worker to NeedsReview"
             );
+            let _ = transcript_logger::archive_transcript(
+                worker_name,
+                transcript_file.as_deref(),
+                transcript_session.as_deref(),
+            );
             let transition = WorkerTransition::ToNeedsReview { commit_sha };
             if let Some(w) = state.get_worker_mut(worker_name) {
                 worker::apply_transition(w, transition)?;
                 w.commits_first_detected_unix = None;
+                transcript_logger::clear_transcript_info(
+                    &mut w.transcript_session_id,
+                    &mut w.transcript_path,
+                );
                 if self_review_enabled {
                     w.pending_self_review = true;
                     tracing::info!(
@@ -1068,6 +1109,7 @@ fn handle_session_start(
     worker_name: &str,
     session_id: &str,
     _timestamp: u64,
+    transcript_path: Option<&str>,
     state: &mut State,
 ) -> Result<()> {
     if is_overseer_worker(worker_name) {
@@ -1114,6 +1156,7 @@ fn handle_session_start(
             claude_session_id = %session_id,
             tmux_session = %tmux_session,
             prompt_len = pending_prompt.len(),
+            transcript_path = ?transcript_path,
             "SessionStart after /clear: sending pending task prompt to TMUX session"
         );
         let tmux_sender = TmuxSender::new();
@@ -1129,6 +1172,8 @@ fn handle_session_start(
         if let Some(w) = state.get_worker_mut(worker_name) {
             w.current_prompt = pending_prompt;
             w.pending_task_prompt = None;
+            w.transcript_session_id = Some(session_id.to_string());
+            w.transcript_path = transcript_path.map(str::to_string);
             if let Err(e) = worker::apply_transition(w, WorkerTransition::ToWorking {
                 prompt: w.current_prompt.clone(),
                 prompt_cmd: None,

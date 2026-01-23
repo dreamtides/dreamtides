@@ -191,6 +191,8 @@ fn create_auto_worker(state: &mut State, config: &Config, name: &str) -> Result<
         api_error_count: 0,
         last_api_error_unix: None,
         pending_task_prompt: None,
+        transcript_session_id: None,
+        transcript_path: None,
     };
     state.add_worker(worker_record);
     add_auto_worker_to_config(name, config)?;

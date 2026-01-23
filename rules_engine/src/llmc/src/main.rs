@@ -13,6 +13,7 @@ mod recovery;
 mod sound;
 mod state;
 mod tmux;
+mod transcript_logger;
 mod transcript_reader;
 mod worker;
 

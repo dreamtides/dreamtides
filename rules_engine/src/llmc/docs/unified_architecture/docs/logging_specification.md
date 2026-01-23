@@ -54,6 +54,34 @@ tracing::info!(
 | Git operation | DEBUG | operation_type, repo, duration_ms, result |
 | Git operation fail | ERROR | operation_type, repo, error, stderr |
 
+## Transcript Archival
+
+Claude Code transcripts are archived for deep-dive analysis of worker sessions:
+
+**Storage Location**: `$LLMC_ROOT/logs/transcripts/<worker>/<timestamp>_<session_id>.jsonl`
+
+**When Transcripts Are Archived**:
+- On task completion (worker transitions to Idle or NeedsReview via Stop hook)
+- On worker stall detection (session crash, timeout, or error)
+
+**WorkerRecord Fields**:
+- `transcript_session_id`: Claude session ID captured from SessionStart hook
+- `transcript_path`: Path to Claude's transcript file for the current session
+
+**Hook Data Flow**:
+1. `SessionStart` hook includes `transcript_path` from Claude Code
+2. Worker stores `transcript_session_id` and `transcript_path` when task begins
+3. `Stop` hook may include updated `transcript_path` (if Claude ran /clear)
+4. On completion, transcript is copied to archive location
+5. Fields are cleared for next task
+
+**Log Events**:
+| Operation | Level | Fields |
+|-----------|-------|--------|
+| Archive transcript | INFO | worker, source, dest, bytes |
+| Archive fail | ERROR | worker, source, error |
+| No transcript path | DEBUG | worker |
+
 ## Log File Rotation
 
 ```rust

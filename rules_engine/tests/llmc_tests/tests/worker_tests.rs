@@ -92,6 +92,8 @@ fn test_apply_transition_to_idle_clears_state() {
         api_error_count: 0,
         last_api_error_unix: None,
         pending_task_prompt: None,
+        transcript_session_id: None,
+        transcript_path: None,
     };
     apply_transition(&mut worker, WorkerTransition::ToIdle).unwrap();
     assert_eq!(worker.status, WorkerStatus::Idle);
@@ -124,6 +126,8 @@ fn test_apply_transition_to_working_sets_prompt() {
         api_error_count: 0,
         last_api_error_unix: None,
         pending_task_prompt: None,
+        transcript_session_id: None,
+        transcript_path: None,
     };
     apply_transition(&mut worker, WorkerTransition::ToWorking {
         prompt: "Test prompt".to_string(),
@@ -159,6 +163,8 @@ fn test_apply_transition_to_needs_review_sets_commit_sha() {
         api_error_count: 0,
         last_api_error_unix: None,
         pending_task_prompt: None,
+        transcript_session_id: None,
+        transcript_path: None,
     };
     apply_transition(&mut worker, WorkerTransition::ToNeedsReview {
         commit_sha: "abc123".to_string(),
@@ -193,6 +199,8 @@ fn test_apply_transition_idle_to_needs_review() {
         api_error_count: 0,
         last_api_error_unix: None,
         pending_task_prompt: None,
+        transcript_session_id: None,
+        transcript_path: None,
     };
     apply_transition(&mut worker, WorkerTransition::ToNeedsReview {
         commit_sha: "abc123".to_string(),
@@ -227,6 +235,8 @@ fn test_apply_transition_none_does_nothing() {
         api_error_count: 0,
         last_api_error_unix: None,
         pending_task_prompt: None,
+        transcript_session_id: None,
+        transcript_path: None,
     };
     let old_status = worker.status;
     apply_transition(&mut worker, WorkerTransition::None).unwrap();
@@ -278,6 +288,8 @@ fn test_apply_transition_to_reviewing() {
         api_error_count: 0,
         last_api_error_unix: None,
         pending_task_prompt: None,
+        transcript_session_id: None,
+        transcript_path: None,
     };
     apply_transition(&mut worker, WorkerTransition::ToReviewing).unwrap();
     assert_eq!(worker.status, WorkerStatus::Reviewing);

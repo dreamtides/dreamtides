@@ -38,8 +38,13 @@ pub async fn run_hook_stop(worker: &str) -> Result<()> {
         }
     };
     let session_id = input.session_id.unwrap_or_default();
-    let event =
-        HookEvent::Stop { worker: worker.to_string(), session_id: session_id.clone(), timestamp };
+    let transcript_path = input.transcript_path.clone();
+    let event = HookEvent::Stop {
+        worker: worker.to_string(),
+        session_id: session_id.clone(),
+        timestamp,
+        transcript_path,
+    };
     send_event_gracefully(event, "stop", worker, &session_id, start_time).await;
     Ok(())
 }
@@ -64,10 +69,12 @@ pub async fn run_hook_session_start(worker: &str) -> Result<()> {
         }
     };
     let session_id = input.session_id.unwrap_or_default();
+    let transcript_path = input.transcript_path.clone();
     let event = HookEvent::SessionStart {
         worker: worker.to_string(),
         session_id: session_id.clone(),
         timestamp,
+        transcript_path,
     };
     send_event_gracefully(event, "session_start", worker, &session_id, start_time).await;
     Ok(())
