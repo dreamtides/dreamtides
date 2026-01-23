@@ -641,32 +641,3 @@ commits:
 1. Check if the worktree has a `.serena/project.yml` file
 2. Verify the project is registered in `~/.serena/serena_config.yml`
 3. Ensure the `project_name` in the worktree differs from the master repo
-
----
-
-## Implementation Order
-
-Tasks should be implemented in this sequence:
-
-1. LDVWQN - Add module structure for auto_mode and overseer_mode
-2. LDCWQN - Add auto configuration parsing to config.rs
-3. LDFWQN - Implement heartbeat mechanism for auto mode daemon
-4. LDUWQN - Create dedicated log files for auto mode operations
-5. LDEWQN - Implement auto worker creation and lifecycle management
-6. LDGWQN - Implement task pool command execution
-7. LDHWQN - Implement auto accept workflow
-8. LDIWQN - Implement auto mode daemon main loop
-9. LDJWQN - Implement transient vs hard failure handling in auto mode
-10. LDDWQN - Add overseer configuration parsing
-11. LDKWQN - Implement overseer Claude Code session management
-12. LDLWQN - Implement daemon health monitoring for overseer
-13. LDMWQN - Implement daemon termination protocol for overseer
-14. LDNWQN - Implement remediation prompt construction
-15. LDOWQN - Implement remediation execution and logging
-16. LDPWQN - Implement overseer main loop with failure spiral detection
-17. LDTWQN - Integrate --auto flag into llmc up command
-18. LDSWQN - Add llmc overseer CLI command
-19. LDQWQN - Update llmc status to display auto workers and overseer state
-20. LDRWQN - Protect overseer TMUX session from kill operations
-21. LDWWQN - Write integration tests for auto mode
-22. LDXWQN - Write integration tests for overseer
