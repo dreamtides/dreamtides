@@ -174,8 +174,9 @@ fn run_orchestration_loop(
             }
         }
 
-        let lock_result = StateLock::acquire();
-        let Ok(_lock) = lock_result else {
+        // Acquire state lock. Use a named binding so we can explicitly drop it
+        // before sleeping, allowing other commands to modify state.json.
+        let Ok(state_lock) = StateLock::acquire() else {
             continue;
         };
 
@@ -359,6 +360,12 @@ fn run_orchestration_loop(
         if let Err(e) = state.save(&state_path) {
             error!("Failed to save state after patrol: {}", e);
         }
+
+        // Release the state lock before sleeping. This allows other LLMC commands
+        // (like `llmc reset`, `llmc start`, etc.) to acquire the lock and modify
+        // state.json while we're sleeping. We'll reload state fresh at the start
+        // of the next iteration and see any changes they made.
+        drop(state_lock);
 
         // Sleep for patrol interval (minus 1 second we already slept)
         let sleep_duration = patrol_interval.saturating_sub(Duration::from_secs(1));

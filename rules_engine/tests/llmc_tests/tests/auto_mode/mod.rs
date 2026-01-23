@@ -5,4 +5,5 @@ mod auto_logging_tests;
 mod auto_workers_tests;
 mod heartbeat_tests;
 mod post_accept_tests;
+mod state_sync_tests;
 mod task_pool_tests;

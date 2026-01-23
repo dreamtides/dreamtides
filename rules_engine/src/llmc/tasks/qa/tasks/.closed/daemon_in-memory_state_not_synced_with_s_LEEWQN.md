@@ -12,7 +12,8 @@ labels:
 blocking:
 - LH7WQN
 created-at: 2026-01-23T04:33:29.695242Z
-updated-at: 2026-01-23T04:33:46.931110Z
+updated-at: 2026-01-23T05:56:11.005120Z
+closed-at: 2026-01-23T05:56:11.005120Z
 ---
 
 # Daemon In-Memory State Desync with state.json

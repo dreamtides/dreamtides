@@ -9,6 +9,7 @@ use tracing::trace;
 
 use crate::auto_mode::auto_workers;
 use crate::config::{self, Config};
+use crate::lock::StateLock;
 use crate::patrol::Patrol;
 /// Worker state machine states
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
@@ -200,8 +201,13 @@ pub fn validate_state(state: &State) -> Result<()> {
 pub fn get_state_path() -> PathBuf {
     config::get_llmc_root().join("state.json")
 }
-/// Runs patrol to update worker states, then returns the updated state
+/// Runs patrol to update worker states, then returns the updated state.
+///
+/// This function acquires the state lock to prevent race conditions with the
+/// daemon. If the lock cannot be acquired (e.g., daemon is processing), the
+/// caller should fall back to loading raw state without patrol.
 pub fn load_state_with_patrol() -> Result<(State, super::config::Config)> {
+    let _lock = StateLock::acquire()?;
     let state_path = get_state_path();
     let mut state = State::load(&state_path)?;
     let config_path = config::get_config_path();
