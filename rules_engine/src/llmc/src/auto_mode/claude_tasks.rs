@@ -78,22 +78,53 @@ pub struct ClaudeTask {
 
 /// Claims a task for a worker with race prevention.
 ///
-/// Sets the task status to `InProgress` and owner to the given worker name,
-/// saves atomically, then re-reads the file to verify the owner matches. If
-/// verification fails (another process won the race), returns
+/// Re-reads the task from disk to verify it's still claimable (status=Pending,
+/// no owner), then sets status to `InProgress` and owner to the given worker
+/// name. After saving atomically, re-reads again to verify the claim succeeded.
+/// If the task is already claimed or verification fails, returns
 /// `TaskLifecycleError::ClaimRaceLost`.
 pub fn claim_task(
     task: &mut ClaudeTask,
     worker_name: &str,
     task_path: &Path,
 ) -> Result<(), TaskLifecycleError> {
-    task.status = TaskStatus::InProgress;
-    task.owner = Some(worker_name.to_string());
-    task.save(task_path).map_err(|e| TaskLifecycleError::ClaimRaceLost {
+    // First, re-read the task from disk to check current state.
+    // The in-memory task may be stale if another worker claimed it.
+    let current = ClaudeTask::load(task_path).map_err(|e| TaskLifecycleError::ClaimRaceLost {
+        task_id: task.id.clone(),
+        expected: worker_name.to_string(),
+        actual: format!("(read error: {})", e),
+    })?;
+
+    // Check if task is still claimable
+    if current.status != TaskStatus::Pending {
+        return Err(TaskLifecycleError::ClaimRaceLost {
+            task_id: task.id.clone(),
+            expected: worker_name.to_string(),
+            actual: format!("(status is {:?}, not Pending)", current.status),
+        });
+    }
+    if let Some(ref owner) = current.owner
+        && !owner.is_empty()
+    {
+        return Err(TaskLifecycleError::ClaimRaceLost {
+            task_id: task.id.clone(),
+            expected: worker_name.to_string(),
+            actual: owner.clone(),
+        });
+    }
+
+    // Update the current task (not the stale one) and save
+    let mut to_save = current;
+    to_save.status = TaskStatus::InProgress;
+    to_save.owner = Some(worker_name.to_string());
+    to_save.save(task_path).map_err(|e| TaskLifecycleError::ClaimRaceLost {
         task_id: task.id.clone(),
         expected: worker_name.to_string(),
         actual: format!("(write error: {})", e),
     })?;
+
+    // Re-read to verify our claim succeeded (in case of concurrent writers)
     let reread = ClaudeTask::load(task_path).map_err(|e| TaskLifecycleError::ClaimRaceLost {
         task_id: task.id.clone(),
         expected: worker_name.to_string(),
@@ -107,6 +138,11 @@ pub fn claim_task(
             actual: actual_owner.to_string(),
         });
     }
+
+    // Update the passed-in task to reflect the claimed state
+    task.status = TaskStatus::InProgress;
+    task.owner = Some(worker_name.to_string());
+
     info!(task_id = % task.id, worker = % worker_name, "Task claimed successfully");
     Ok(())
 }

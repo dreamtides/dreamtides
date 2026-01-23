@@ -178,6 +178,28 @@ fn run_orchestration_loop(
             }
         }
 
+        // Recovery: Clear stale pending_task_prompt from previous daemon runs.
+        // Workers may have pending prompts from a previous daemon that crashed or
+        // was killed before the prompts could be sent. Since we can't verify which
+        // task the prompt was for (active_task_id may be null), the safest approach
+        // is to clear the stale prompt and let the worker get a fresh task
+        // assignment through the normal claim_task flow.
+        for name in &worker_names {
+            if let Some(worker) = state.get_worker(name)
+                && worker.pending_task_prompt.is_some()
+            {
+                info!(
+                    worker = %name,
+                    "Clearing stale pending prompt from previous daemon run"
+                );
+                if let Some(w) = state.get_worker_mut(name) {
+                    w.pending_task_prompt = None;
+                    w.pending_prompt_cmd = None;
+                }
+            }
+        }
+        state.save(&state_path)?;
+
         println!(
             "{}",
             color_theme::success(format!("✓ {} auto worker(s) initialized", worker_names.len()))

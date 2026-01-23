@@ -1132,8 +1132,10 @@ When multiple tasks are eligible (pending, no owner, dependencies met):
 3. **Completion**: Sets `status: completed` and clears owner
 4. **Failure Recovery**: On daemon shutdown, active tasks reset to `pending`
 
-Race conditions during claiming are handled via atomic file operations and
-verify-after-write pattern.
+Race conditions during claiming are handled via read-verify-write-verify
+pattern: the task file is re-read before claiming to verify it's still eligible
+(status=Pending, no owner), then saved atomically and re-read again to confirm
+the claim succeeded.
 
 ### Error Handling
 
