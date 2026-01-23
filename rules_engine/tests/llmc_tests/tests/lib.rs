@@ -7,6 +7,7 @@ mod overseer;
 mod patrol_tests;
 mod remediation_executor_tests;
 mod remediation_prompt_tests;
+mod socket_tests;
 mod sound_tests;
 mod state_tests;
 mod tmux;

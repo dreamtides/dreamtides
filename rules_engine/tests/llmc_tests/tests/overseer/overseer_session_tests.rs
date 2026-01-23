@@ -149,3 +149,69 @@ fn overseer_hooks_all_hooks_include_llmc_root() {
         );
     }
 }
+
+#[test]
+fn overseer_hooks_use_remediation_socket() {
+    let temp_dir = TempDir::new().expect("Failed to create temp dir");
+    let project_dir = temp_dir.path();
+    let llmc_root = PathBuf::from("/test/llmc/root");
+    create_overseer_claude_hooks_with_root(project_dir, &llmc_root)
+        .expect("Failed to create overseer hooks");
+    let settings_path = project_dir.join(".claude").join("settings.json");
+    let content = fs::read_to_string(&settings_path).expect("Failed to read settings");
+    let parsed: serde_json::Value =
+        serde_json::from_str(&content).expect("Failed to parse settings JSON");
+    let hooks = parsed.get("hooks").expect("Settings should have 'hooks' key");
+    for hook_type in ["Stop", "SessionStart", "SessionEnd"] {
+        let hook_array = hooks.get(hook_type).expect(&format!("Should have {} hook", hook_type));
+        let hook_config = hook_array
+            .get(0)
+            .expect(&format!("{} hook should have at least one config", hook_type));
+        let inner_hooks = hook_config
+            .get("hooks")
+            .expect(&format!("{} hook config should have 'hooks' array", hook_type));
+        let hook_entry = inner_hooks
+            .get(0)
+            .expect(&format!("{} should have at least one hook entry", hook_type));
+        let command = hook_entry
+            .get("command")
+            .and_then(|v| v.as_str())
+            .expect(&format!("{} hook should have 'command' string", hook_type));
+        assert!(
+            command.contains("--socket /test/llmc/root/llmc_remediation.sock"),
+            "{} hook command should include remediation socket path. Got: {}",
+            hook_type,
+            command
+        );
+    }
+}
+
+#[test]
+fn overseer_hooks_regenerated_when_socket_path_changes() {
+    let temp_dir = TempDir::new().expect("Failed to create temp dir");
+    let project_dir = temp_dir.path();
+    let llmc_root = PathBuf::from("/test/llmc/root");
+    create_overseer_claude_hooks_with_root(project_dir, &llmc_root)
+        .expect("Failed to create overseer hooks");
+    let settings_path = project_dir.join(".claude").join("settings.json");
+    let content_before = fs::read_to_string(&settings_path).expect("Failed to read settings");
+    assert!(
+        content_before.contains("--socket /test/llmc/root/llmc_remediation.sock"),
+        "Initial hooks should have remediation socket. Content:\n{}",
+        content_before
+    );
+    let new_root = PathBuf::from("/new/llmc/root");
+    create_overseer_claude_hooks_with_root(project_dir, &new_root)
+        .expect("Failed to recreate hooks");
+    let content_after = fs::read_to_string(&settings_path).expect("Failed to read settings");
+    assert!(
+        content_after.contains("--socket /new/llmc/root/llmc_remediation.sock"),
+        "Updated hooks should have new remediation socket. Content:\n{}",
+        content_after
+    );
+    assert!(
+        !content_after.contains("--socket /test/llmc/root/llmc_remediation.sock"),
+        "Old socket path should be replaced. Content:\n{}",
+        content_after
+    );
+}

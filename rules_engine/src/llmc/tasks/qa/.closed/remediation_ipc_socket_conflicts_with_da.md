@@ -10,7 +10,8 @@ labels:
 blocking:
 - LICWQN
 created-at: 2026-01-23T14:09:04.133683Z
-updated-at: 2026-01-23T14:09:53.893145Z
+updated-at: 2026-01-23T14:41:23.649646Z
+closed-at: 2026-01-23T14:41:23.649645Z
 ---
 
 ## Bug Description

@@ -167,10 +167,14 @@ async fn main() -> Result<()> {
 
 async fn handle_hook_action(action: HookAction) -> Result<()> {
     match action {
-        HookAction::Stop { worker } => hook::run_hook_stop(&worker).await,
-        HookAction::SessionStart { worker } => hook::run_hook_session_start(&worker).await,
-        HookAction::SessionEnd { worker, reason } => {
-            hook::run_hook_session_end(&worker, &reason).await
+        HookAction::Stop { worker, socket } => {
+            hook::run_hook_stop(&worker, socket.as_deref()).await
+        }
+        HookAction::SessionStart { worker, socket } => {
+            hook::run_hook_session_start(&worker, socket.as_deref()).await
+        }
+        HookAction::SessionEnd { worker, reason, socket } => {
+            hook::run_hook_session_end(&worker, &reason, socket.as_deref()).await
         }
     }
 }

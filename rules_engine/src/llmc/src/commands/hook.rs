@@ -1,4 +1,5 @@
 use std::io::{self, BufRead};
+use std::path::{Path, PathBuf};
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 use anyhow::{Context, Result};
@@ -14,7 +15,7 @@ const CONNECT_TIMEOUT: Duration = Duration::from_secs(3);
 /// This is critical for state transitions: when Claude stops working, this
 /// hook fires and triggers the transition from Working -> NeedsReview (or
 /// Reviewing -> NeedsReview for self-review completion).
-pub async fn run_hook_stop(worker: &str) -> Result<()> {
+pub async fn run_hook_stop(worker: &str, socket_override: Option<&Path>) -> Result<()> {
     let start_time = std::time::Instant::now();
     let timestamp = get_timestamp();
     tracing::info!(worker = worker, timestamp = timestamp, "Stop hook invoked");
@@ -45,14 +46,14 @@ pub async fn run_hook_stop(worker: &str) -> Result<()> {
         timestamp,
         transcript_path,
     };
-    send_event_gracefully(event, "stop", worker, &session_id, start_time).await;
+    send_event_gracefully(event, "stop", worker, &session_id, start_time, socket_override).await;
     Ok(())
 }
 
 /// Handles SessionStart hooks - detects when Claude is ready to work.
 ///
 /// Fired when a worker's Claude session starts up successfully.
-pub async fn run_hook_session_start(worker: &str) -> Result<()> {
+pub async fn run_hook_session_start(worker: &str, socket_override: Option<&Path>) -> Result<()> {
     let start_time = std::time::Instant::now();
     let timestamp = get_timestamp();
     tracing::info!(worker = worker, timestamp = timestamp, "SessionStart hook invoked");
@@ -76,14 +77,19 @@ pub async fn run_hook_session_start(worker: &str) -> Result<()> {
         timestamp,
         transcript_path,
     };
-    send_event_gracefully(event, "session_start", worker, &session_id, start_time).await;
+    send_event_gracefully(event, "session_start", worker, &session_id, start_time, socket_override)
+        .await;
     Ok(())
 }
 
 /// Handles SessionEnd hooks - detects when Claude exits.
 ///
 /// Fired when a worker's Claude session ends (crash, shutdown, etc).
-pub async fn run_hook_session_end(worker: &str, cli_reason: &str) -> Result<()> {
+pub async fn run_hook_session_end(
+    worker: &str,
+    cli_reason: &str,
+    socket_override: Option<&Path>,
+) -> Result<()> {
     let start_time = std::time::Instant::now();
     let timestamp = get_timestamp();
     tracing::info!(
@@ -112,7 +118,7 @@ pub async fn run_hook_session_end(worker: &str, cli_reason: &str) -> Result<()> 
         timestamp,
         transcript_path,
     };
-    send_event_gracefully(event, "session_end", worker, &reason, start_time).await;
+    send_event_gracefully(event, "session_end", worker, &reason, start_time, socket_override).await;
     Ok(())
 }
 
@@ -128,8 +134,9 @@ async fn send_event_gracefully(
     worker: &str,
     context: &str,
     start_time: std::time::Instant,
+    socket_override: Option<&Path>,
 ) {
-    let socket_path = socket::get_socket_path();
+    let socket_path = socket_override.map(PathBuf::from).unwrap_or_else(socket::get_socket_path);
 
     if !socket_path.exists() {
         let elapsed_ms = start_time.elapsed().as_millis();

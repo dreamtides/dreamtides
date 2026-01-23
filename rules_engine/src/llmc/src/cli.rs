@@ -357,12 +357,18 @@ pub enum HookAction {
         /// Worker name
         #[arg(long)]
         worker: String,
+        /// Socket path to send the event to (defaults to $LLMC_ROOT/llmc.sock)
+        #[arg(long)]
+        socket: Option<std::path::PathBuf>,
     },
     /// Notify daemon of session start
     SessionStart {
         /// Worker name
         #[arg(long)]
         worker: String,
+        /// Socket path to send the event to (defaults to $LLMC_ROOT/llmc.sock)
+        #[arg(long)]
+        socket: Option<std::path::PathBuf>,
     },
     /// Notify daemon of session end
     SessionEnd {
@@ -372,6 +378,9 @@ pub enum HookAction {
         /// Reason for session end
         #[arg(long, default_value = "unknown")]
         reason: String,
+        /// Socket path to send the event to (defaults to $LLMC_ROOT/llmc.sock)
+        #[arg(long)]
+        socket: Option<std::path::PathBuf>,
     },
 }
 

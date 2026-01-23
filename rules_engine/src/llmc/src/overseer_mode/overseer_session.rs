@@ -175,27 +175,31 @@ pub fn capture_overseer_output(lines: u32) -> Result<String> {
 
 /// Creates Claude hook settings for the overseer with an explicit llmc_root.
 ///
-/// Use this in tests to avoid depending on the LLMC_ROOT environment variable.
+/// Uses the remediation socket path to avoid conflicts with the daemon's
+/// socket. Use this in tests to avoid depending on the LLMC_ROOT environment
+/// variable.
 pub fn create_overseer_claude_hooks_with_root(project_dir: &Path, llmc_root: &Path) -> Result<()> {
     let claude_dir = project_dir.join(".claude");
     let settings_path = claude_dir.join("settings.json");
     let llmc_root_str = llmc_root.to_string_lossy();
-    let expected_prefix = format!("LLMC_ROOT={}", llmc_root_str);
+    let remediation_socket = llmc_root.join("llmc_remediation.sock");
+    let remediation_socket_str = remediation_socket.to_string_lossy();
+    let expected_socket_arg = format!("--socket {}", remediation_socket_str);
     if settings_path.exists() {
         let content = fs::read_to_string(&settings_path)?;
-        if content.contains("llmc hook") && content.contains(&expected_prefix) {
+        if content.contains("llmc hook") && content.contains(&expected_socket_arg) {
             tracing::debug!(
                 path = %settings_path.display(),
                 llmc_root = %llmc_root_str,
-                "Overseer Claude hooks already configured with correct LLMC_ROOT"
+                "Overseer Claude hooks already configured with correct remediation socket"
             );
             return Ok(());
         }
         if content.contains("llmc hook") {
             tracing::info!(
                 path = %settings_path.display(),
-                expected_root = %llmc_root_str,
-                "Overseer Claude hooks exist but LLMC_ROOT doesn't match, regenerating"
+                expected_socket = %remediation_socket_str,
+                "Overseer Claude hooks exist but socket path doesn't match, regenerating"
             );
         }
     }
@@ -209,21 +213,21 @@ pub fn create_overseer_claude_hooks_with_root(project_dir: &Path, llmc_root: &Pa
             "Stop": [{
                 "hooks": [{
                     "type": "command",
-                    "command": format!("LLMC_ROOT={} {} hook stop --worker overseer", llmc_root_str, llmc_bin),
+                    "command": format!("LLMC_ROOT={} {} hook stop --worker overseer --socket {}", llmc_root_str, llmc_bin, remediation_socket_str),
                     "timeout": 5
                 }]
             }],
             "SessionStart": [{
                 "hooks": [{
                     "type": "command",
-                    "command": format!("LLMC_ROOT={} {} hook session-start --worker overseer", llmc_root_str, llmc_bin),
+                    "command": format!("LLMC_ROOT={} {} hook session-start --worker overseer --socket {}", llmc_root_str, llmc_bin, remediation_socket_str),
                     "timeout": 5
                 }]
             }],
             "SessionEnd": [{
                 "hooks": [{
                     "type": "command",
-                    "command": format!("LLMC_ROOT={} {} hook session-end --worker overseer", llmc_root_str, llmc_bin),
+                    "command": format!("LLMC_ROOT={} {} hook session-end --worker overseer --socket {}", llmc_root_str, llmc_bin, remediation_socket_str),
                     "timeout": 5
                 }]
             }]
@@ -235,7 +239,8 @@ pub fn create_overseer_claude_hooks_with_root(project_dir: &Path, llmc_root: &Pa
     tracing::info!(
         path = %settings_path.display(),
         llmc_root = %llmc_root_str,
-        "Created Claude hook settings for overseer with LLMC_ROOT"
+        remediation_socket = %remediation_socket_str,
+        "Created Claude hook settings for overseer with remediation socket"
     );
     Ok(())
 }

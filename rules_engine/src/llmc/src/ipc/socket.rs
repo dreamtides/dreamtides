@@ -23,6 +23,14 @@ pub fn get_socket_path() -> PathBuf {
     config::get_llmc_root().join("llmc.sock")
 }
 
+/// Returns the socket path for remediation IPC communication.
+///
+/// This is separate from the main daemon socket to prevent conflicts when
+/// remediation runs while daemon state might still exist on disk.
+pub fn get_remediation_socket_path() -> PathBuf {
+    config::get_llmc_root().join("llmc_remediation.sock")
+}
+
 pub async fn handle_connection(stream: UnixStream) -> Result<Option<HookMessage>> {
     let (reader, mut writer) = stream.into_split();
     let mut reader = BufReader::new(reader);

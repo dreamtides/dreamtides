@@ -105,12 +105,16 @@ pub fn remediation_log_path(timestamp: &str) -> PathBuf {
 }
 
 /// Starts an IPC listener for receiving remediation completion events.
+///
+/// Uses a separate socket path (`llmc_remediation.sock`) to avoid conflicts
+/// with the daemon's socket. The overseer's Claude hooks are configured to
+/// send events to this remediation socket.
 fn start_ipc_listener_for_remediation() -> Result<Receiver<HookMessage>> {
-    let socket_path = socket::get_socket_path();
+    let socket_path = socket::get_remediation_socket_path();
 
     if socket_path.exists() {
-        debug!(path = %socket_path.display(), "Removing existing socket");
-        fs::remove_file(&socket_path).context("Failed to remove existing socket")?;
+        debug!(path = %socket_path.display(), "Removing existing remediation socket");
+        fs::remove_file(&socket_path).context("Failed to remove existing remediation socket")?;
     }
 
     info!(path = %socket_path.display(), "Starting IPC listener for remediation");
