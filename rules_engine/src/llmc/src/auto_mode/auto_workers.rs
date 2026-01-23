@@ -193,6 +193,7 @@ fn create_auto_worker(state: &mut State, config: &Config, name: &str) -> Result<
         pending_task_prompt: None,
         transcript_session_id: None,
         transcript_path: None,
+        active_task_id: None,
     };
     state.add_worker(worker_record);
     add_auto_worker_to_config(name, config)?;

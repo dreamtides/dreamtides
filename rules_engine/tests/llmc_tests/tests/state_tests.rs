@@ -29,6 +29,7 @@ fn create_test_worker(name: &str) -> WorkerRecord {
         pending_task_prompt: None,
         transcript_session_id: None,
         transcript_path: None,
+        active_task_id: None,
     }
 }
 

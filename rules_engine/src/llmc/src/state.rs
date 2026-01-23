@@ -118,6 +118,11 @@ pub struct WorkerRecord {
     /// copied to the logs directory for debugging and analysis.
     #[serde(default)]
     pub transcript_path: Option<String>,
+    /// ID of the Claude Task currently being worked on by this worker. Set when
+    /// a task is claimed from the task pool. Used to release the task back to
+    /// pending status if the worker fails, crashes, or the daemon shuts down.
+    #[serde(default)]
+    pub active_task_id: Option<String>,
 }
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct State {

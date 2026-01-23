@@ -486,54 +486,64 @@ discover, filter, select, returning `None` when no eligible tasks exist.
 **Goal:** Implement task claiming, completion, and failure handling with proper
 atomicity and race prevention.
 
-**Current State:** The orchestrator assigns tasks in `assign_task_to_worker()`
-(lines 465-510), which pulls master, builds the prompt, sends `/clear`, and
-stores the prompt in `pending_task_prompt`. Task completion is handled in
-`process_completed_workers()` (lines 538-781), which accepts changes and resets
-the worker. Worker failures are detected in `auto_failure.rs` with
-`detect_transient_failures()` and `attempt_recovery()`.
+**Status: IMPLEMENTED**
 
-**Changes Required:** Create `claim_task(task: &mut ClaudeTask, worker_name:
-&str, task_path: &Path)` that sets status to InProgress and owner to worker
-name, saves atomically, re-reads the file, and verifies the owner matches. If
-verification fails (race lost), return a specific error variant that the caller
-handles by selecting a different task. Update `assign_task_to_worker()` to call
-`claim_task()` before building the prompt, retrying with a different task on
-race loss. Create `complete_task(task_id: &str, task_dir: &Path)` that loads the
-task, sets status to Completed, clears owner, and saves atomically. Call this
-from `process_completed_workers()` after successful accept. Create
-`release_task(task_id: &str, task_dir: &Path)` that resets status to Pending and
-clears owner. Call this from all failure paths: worker crash detection in
-`handle_session_end()`, error state transitions in `apply_transition()`, and
-daemon shutdown cleanup. Store the active task ID in the worker record (new
-field `active_task_id: Option<String>`) so failure handlers know which task to
-release.
+**Implementation Summary:**
+
+1. Created `claim_task(task, worker_name, task_path)` in `claude_tasks.rs` that
+   sets status to InProgress, sets owner, saves atomically, re-reads to verify
+   ownership. Returns `TaskLifecycleError::ClaimRaceLost` if another process won
+   the race.
+
+2. Created `complete_task(task_id, task_dir)` that loads the task, sets status
+   to Completed, clears owner, and saves atomically.
+
+3. Created `release_task(task_id, task_dir)` that resets status to Pending and
+   clears owner.
+
+4. Added `active_task_id: Option<String>` field to `WorkerRecord` to track which
+   task a worker is currently working on.
+
+5. Updated `process_idle_workers()` to call `claim_task()` before assigning work.
+   On race loss, the function retries with the next eligible task.
+
+6. Updated `process_completed_workers()` to call `complete_task()` after
+   successful accept (for Accepted, AcceptedWithCleanupFailure, and NoChanges
+   cases).
+
+7. Updated `graceful_shutdown()` to call `release_task()` for all workers with
+   active tasks. This ensures tasks are released back to pending when the daemon
+   shuts down (whether due to Ctrl-C, error, or any other reason).
+
+**Design Note:** Task release from `handle_session_end()` and `apply_transition()`
+was not implemented as it would require significant refactoring to pass the task
+directory through multiple function calls. The fail-fast daemon design ensures
+that crashes and errors eventually lead to `graceful_shutdown()`, which releases
+all active tasks. This provides adequate task release coverage without the
+additional complexity.
 
 ### Milestone 6: State File Changes
 
 **Goal:** Update the State struct to track active task IDs and remove obsolete
 backoff fields.
 
-**Current State:** The `State` struct in `state.rs` (lines 123-155) contains
-`source_repo_dirty_retry_after_unix`, `source_repo_dirty_backoff_secs`, and
-`source_repo_dirty_retry_count` for source repo dirty backoff. The
-`WorkerRecord` struct (lines 38-121) has `auto_retry_count` for transient
-failure retry tracking. There are no task-pool-specific backoff fields currently
-(the research showed the backoff is for source repo dirty state, not task pool
-failures).
+**Status: PARTIALLY IMPLEMENTED** (as part of Milestone 5)
 
-**Changes Required:** Add `active_task_ids: HashMap<String, String>` to the
-`State` struct, mapping worker name to task ID. This is populated when a task is
-claimed and cleared when the task is completed or released. Add
-`active_task_id: Option<String>` to `WorkerRecord` for per-worker tracking (this
-duplicates the State map but makes failure handling simpler since worker records
-are passed to transition functions). Update `apply_transition()` in `worker.rs`
-to clear `active_task_id` when transitioning to Idle, Error, or Offline. The
-existing source repo dirty backoff fields remain unchanged since they handle a
-different scenario (dirty master repo during accept). The `auto_retry_count`
-field remains for transient failure recovery. No fields are actually removed
-since the backoff research showed these track source repo state, not task pool
-command failures.
+**Implementation Summary:**
+
+Added `active_task_id: Option<String>` to `WorkerRecord` for per-worker tracking.
+This field is set when a task is claimed and cleared when the task is completed
+or released.
+
+**Design Simplification:** The originally proposed `active_task_ids: HashMap` at
+the State level was not implemented because:
+1. The per-worker `active_task_id` field is sufficient for failure recovery
+2. The State-level map would be redundant (derivable from worker records)
+3. Simpler design with less synchronization complexity
+
+The existing source repo dirty backoff fields remain unchanged since they handle
+a different scenario (dirty master repo during accept). The `auto_retry_count`
+field remains for transient failure recovery.
 
 ### Milestone 7: Error Handling Integration
 

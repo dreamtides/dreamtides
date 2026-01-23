@@ -836,6 +836,7 @@ fn run_rebuild() -> Result<()> {
             pending_task_prompt: None,
             transcript_session_id: None,
             transcript_path: None,
+            active_task_id: None,
         };
         workers.insert(name.clone(), worker);
     }

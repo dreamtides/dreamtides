@@ -16,7 +16,7 @@ use crate::auto_mode::auto_logging::{AutoLogger, TaskResult};
 use crate::auto_mode::heartbeat_thread::{DaemonRegistration, HeartbeatThread};
 use crate::auto_mode::task_context::TaskContextConfig;
 use crate::auto_mode::{
-    auto_logging, auto_workers, heartbeat_thread, task_discovery, task_selection,
+    auto_logging, auto_workers, claude_tasks, heartbeat_thread, task_discovery, task_selection,
 };
 use crate::config::Config;
 use crate::git;
@@ -416,7 +416,7 @@ fn run_orchestration_loop(
     {
         let _lock = StateLock::acquire()?;
         let mut state = State::load(&state_path)?;
-        graceful_shutdown(llmc_config, &mut state)?;
+        graceful_shutdown(llmc_config, auto_config, &mut state)?;
         state.daemon_running = false;
         auto_workers::clear_auto_mode_state(&mut state);
         state.save(&state_path)?;
@@ -466,28 +466,58 @@ fn process_idle_workers(
     let mut active_labels = task_discovery::get_active_labels(&tasks);
 
     for worker_name in idle_workers {
-        let selected = task_selection::select_task(&eligible, &active_labels);
-        let Some(task) = selected else {
-            break;
-        };
+        // Try to claim a task, handling race loss by trying the next best task
+        let mut remaining_eligible: Vec<_> = eligible.clone();
 
-        let task_content = format!("{}\n\n{}", task.subject, task.description);
-        let label = task.get_label();
+        loop {
+            let selected = task_selection::select_task(&remaining_eligible, &active_labels);
+            let Some(task) = selected else {
+                break;
+            };
 
-        assign_task_to_worker(
-            state,
-            llmc_config,
-            task_context,
-            &worker_name,
-            &task_content,
-            label,
-            logger,
-        )?;
+            // Clone the task for mutation during claim
+            let mut task_clone = task.clone();
+            let task_path = task_dir.join(format!("{}.json", task.id));
 
-        if let Some(lbl) = label {
-            active_labels.insert(lbl.to_string());
+            // Attempt to claim the task
+            match claude_tasks::claim_task(&mut task_clone, &worker_name, &task_path) {
+                Ok(()) => {
+                    // Claim succeeded - proceed with task assignment
+                    let task_content = format!("{}\n\n{}", task.subject, task.description);
+                    let label = task.get_label();
+
+                    // Store the task ID in the worker record for failure recovery
+                    if let Some(worker) = state.get_worker_mut(&worker_name) {
+                        worker.active_task_id = Some(task.id.clone());
+                    }
+
+                    assign_task_to_worker(
+                        state,
+                        llmc_config,
+                        task_context,
+                        &worker_name,
+                        &task_content,
+                        label,
+                        logger,
+                    )?;
+
+                    if let Some(lbl) = label {
+                        active_labels.insert(lbl.to_string());
+                    }
+                    any_task_assigned = true;
+                    break;
+                }
+                Err(claude_tasks::TaskLifecycleError::ClaimRaceLost { task_id, .. }) => {
+                    // Race lost - remove this task and try the next one
+                    info!(
+                        task_id = %task_id,
+                        worker = %worker_name,
+                        "Claim race lost, trying next eligible task"
+                    );
+                    remaining_eligible.retain(|t| t.id != task_id);
+                }
+            }
         }
-        any_task_assigned = true;
     }
 
     Ok(any_task_assigned)
@@ -683,6 +713,13 @@ fn process_completed_workers(
                         logger.log_task_completed(&worker_name, TaskResult::NeedsReview);
                         info!(worker = %worker_name, commit = %commit_sha, "Worker changes accepted");
 
+                        // Mark Claude Task as completed and clear active task ID
+                        complete_worker_task(
+                            state,
+                            &worker_name,
+                            &auto_config.get_task_directory(),
+                        );
+
                         // Release task pool claims BEFORE post-accept command to ensure
                         // claims are released even if post-accept fails
                         let source_repo = PathBuf::from(&llmc_config.repo.source);
@@ -741,6 +778,13 @@ fn process_completed_workers(
                             "Worker changes accepted but cleanup failed - continuing with other workers"
                         );
 
+                        // Mark Claude Task as completed and clear active task ID
+                        complete_worker_task(
+                            state,
+                            &worker_name,
+                            &auto_config.get_task_directory(),
+                        );
+
                         // Release task pool claims BEFORE post-accept command to ensure
                         // claims are released even if post-accept fails
                         let source_repo = PathBuf::from(&llmc_config.repo.source);
@@ -781,6 +825,13 @@ fn process_completed_workers(
                         );
                         logger.log_task_completed(&worker_name, TaskResult::NoChanges);
                         info!(worker = %worker_name, "Worker completed with no changes");
+
+                        // Mark Claude Task as completed and clear active task ID
+                        complete_worker_task(
+                            state,
+                            &worker_name,
+                            &auto_config.get_task_directory(),
+                        );
 
                         // Release task pool claims (for lattice-based task pools)
                         let source_repo = PathBuf::from(&llmc_config.repo.source);
@@ -863,14 +914,61 @@ fn process_completed_workers(
     Ok(())
 }
 
+/// Marks a worker's Claude Task as completed and clears the active task ID.
+fn complete_worker_task(state: &mut State, worker_name: &str, task_dir: &std::path::Path) {
+    let Some(worker) = state.get_worker_mut(worker_name) else {
+        return;
+    };
+    let Some(task_id) = worker.active_task_id.take() else {
+        return;
+    };
+    if let Err(e) = claude_tasks::complete_task(&task_id, task_dir) {
+        error!(
+            worker = %worker_name,
+            task_id = %task_id,
+            error = %e,
+            "Failed to mark task as completed"
+        );
+    }
+}
+
+/// Releases a worker's Claude Task back to pending status and clears the active
+/// task ID.
+fn release_worker_task(state: &mut State, worker_name: &str, task_dir: &std::path::Path) {
+    let Some(worker) = state.get_worker_mut(worker_name) else {
+        return;
+    };
+    let Some(task_id) = worker.active_task_id.take() else {
+        return;
+    };
+    if let Err(e) = claude_tasks::release_task(&task_id, task_dir) {
+        error!(
+            worker = %worker_name,
+            task_id = %task_id,
+            error = %e,
+            "Failed to release task back to pending"
+        );
+    }
+}
+
 /// Performs graceful shutdown of all auto workers.
-fn graceful_shutdown(_config: &Config, state: &mut State) -> Result<()> {
+fn graceful_shutdown(
+    _config: &Config,
+    auto_config: &ResolvedAutoConfig,
+    state: &mut State,
+) -> Result<()> {
     println!("{}", color_theme::dim("Shutting down auto workers..."));
     info!("Initiating graceful shutdown of auto workers");
     let tmux_sender = TmuxSender::new();
+    let task_dir = auto_config.get_task_directory();
 
     let auto_worker_names: Vec<String> =
         state.workers.keys().filter(|name| auto_workers::is_auto_worker(name)).cloned().collect();
+
+    // Release all active tasks back to pending status
+    for worker_name in &auto_worker_names {
+        release_worker_task(state, worker_name, &task_dir);
+    }
 
     // Send Ctrl-C to all auto workers
     for worker_name in &auto_worker_names {

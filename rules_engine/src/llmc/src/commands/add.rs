@@ -88,6 +88,7 @@ pub fn run_add(
         pending_task_prompt: None,
         transcript_session_id: None,
         transcript_path: None,
+        active_task_id: None,
     };
     state.add_worker(worker_record);
     state.save(&state_path)?;
