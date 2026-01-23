@@ -14,8 +14,10 @@ labels:
 - llmc-auto
 blocked-by:
 - LH6WQN
+- LEDWQN
+- LEEWQN
 created-at: 2026-01-21T22:02:47.025721Z
-updated-at: 2026-01-21T22:31:38.818295Z
+updated-at: 2026-01-23T04:33:46.919263Z
 ---
 
 # Test Scenario: Merge Conflict Handling During Auto Accept
