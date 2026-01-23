@@ -108,6 +108,11 @@ pub struct WorkerRecord {
     /// prompt, the prompt is sent and the worker transitions to Working.
     #[serde(default)]
     pub pending_task_prompt: Option<String>,
+    /// Command used to generate the pending task prompt (e.g., "bd show
+    /// dr-abc"). Stored alongside pending_task_prompt and used when
+    /// transitioning to Working.
+    #[serde(default)]
+    pub pending_prompt_cmd: Option<String>,
     /// Claude session ID for the current task. Captured from SessionStart hook
     /// when a task begins. Used to identify the correct transcript file for
     /// later archival.

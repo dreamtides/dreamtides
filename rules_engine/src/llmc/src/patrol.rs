@@ -1150,12 +1150,14 @@ fn handle_session_start(
         }
     } else if has_pending_task {
         let pending_prompt = worker.pending_task_prompt.clone().expect("Checked above");
+        let pending_prompt_cmd = worker.pending_prompt_cmd.clone();
         let tmux_session = crate::config::get_worker_session_name(worker_name);
         tracing::info!(
             worker = %worker_name,
             claude_session_id = %session_id,
             tmux_session = %tmux_session,
             prompt_len = pending_prompt.len(),
+            prompt_cmd = ?pending_prompt_cmd,
             transcript_path = ?transcript_path,
             "SessionStart after /clear: sending pending task prompt to TMUX session"
         );
@@ -1172,11 +1174,12 @@ fn handle_session_start(
         if let Some(w) = state.get_worker_mut(worker_name) {
             w.current_prompt = pending_prompt;
             w.pending_task_prompt = None;
+            w.pending_prompt_cmd = None;
             w.transcript_session_id = Some(session_id.to_string());
             w.transcript_path = transcript_path.map(str::to_string);
             if let Err(e) = worker::apply_transition(w, WorkerTransition::ToWorking {
                 prompt: w.current_prompt.clone(),
-                prompt_cmd: None,
+                prompt_cmd: pending_prompt_cmd,
             }) {
                 tracing::error!(
                     "Failed to transition worker '{}' to Working after sending pending prompt: {}",

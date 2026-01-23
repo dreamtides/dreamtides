@@ -29,6 +29,7 @@ fn create_test_worker(name: &str) -> WorkerRecord {
         api_error_count: 0,
         last_api_error_unix: None,
         pending_task_prompt: None,
+        pending_prompt_cmd: None,
         transcript_session_id: None,
         transcript_path: None,
         active_task_id: None,
@@ -125,6 +126,7 @@ fn test_session_start_with_pending_prompt_state_changes() {
     let mut worker = create_test_worker("auto-1");
     worker.status = WorkerStatus::Idle;
     worker.pending_task_prompt = Some("Test task prompt".to_string());
+    worker.pending_prompt_cmd = Some("bd show test-123".to_string());
     state.add_worker(worker);
     let config = create_test_config();
 
@@ -142,9 +144,18 @@ fn test_session_start_with_pending_prompt_state_changes() {
         worker.pending_task_prompt.is_none(),
         "pending_task_prompt should be cleared after SessionStart"
     );
+    assert!(
+        worker.pending_prompt_cmd.is_none(),
+        "pending_prompt_cmd should be cleared after SessionStart"
+    );
     assert_eq!(
         worker.current_prompt, "Test task prompt",
         "current_prompt should be set from pending_task_prompt"
+    );
+    assert_eq!(
+        worker.prompt_cmd,
+        Some("bd show test-123".to_string()),
+        "prompt_cmd should be set from pending_prompt_cmd"
     );
     assert_eq!(
         worker.status,

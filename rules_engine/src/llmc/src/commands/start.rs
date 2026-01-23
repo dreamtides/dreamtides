@@ -8,11 +8,11 @@ use regex::Regex;
 
 use crate::auto_mode::auto_workers;
 use crate::config::{self, Config};
+use crate::git;
 use crate::lock::StateLock;
 use crate::state::{State, WorkerRecord, WorkerStatus};
 use crate::tmux::sender::TmuxSender;
 use crate::tmux::session;
-use crate::{git, worker};
 /// Runs the start command, assigning a task to an idle worker
 pub fn run_start(
     worker: Option<String>,
@@ -103,27 +103,37 @@ pub fn run_start(
         full_prompt, "Full prompt content being sent to worker"
     );
     if json {
-        eprintln!("Sending prompt to worker '{}'...", worker_name);
+        eprintln!("Assigning task to worker '{}'...", worker_name);
     } else {
-        println!("Sending prompt to worker '{}'...", worker_name);
+        println!("Assigning task to worker '{}'...", worker_name);
     }
+
+    // Send /clear to restart the Claude session. The prompt will be sent when
+    // SessionStart hook fires (handled in patrol.rs handle_session_start).
+    // This prevents a race condition where the prompt could be sent before
+    // the new session is ready to receive input.
     let tmux_sender = TmuxSender::new();
     tmux_sender
         .send(&worker_record.session_id, "/clear")
         .with_context(|| format!("Failed to send /clear to worker '{}'", worker_name))?;
-    tmux_sender
-        .send(&worker_record.session_id, &full_prompt)
-        .with_context(|| format!("Failed to send prompt to worker '{}'", worker_name))?;
+
+    // Store the prompt as pending - it will be sent when SessionStart fires
     let worker_mut =
         state.get_worker_mut(&worker_name).expect("Worker disappeared after validation");
     worker_mut.self_review =
         self_review || config.get_worker(&worker_name).and_then(|c| c.self_review).unwrap_or(false);
-    worker::apply_transition(worker_mut, worker::WorkerTransition::ToWorking {
-        prompt: full_prompt,
-        prompt_cmd: prompt_cmd.clone(),
-    })?;
-    let self_review_enabled =
-        state.get_worker(&worker_name).map(|w| w.self_review).unwrap_or(false);
+    worker_mut.pending_task_prompt = Some(full_prompt.clone());
+    worker_mut.pending_prompt_cmd = prompt_cmd.clone();
+    let self_review_enabled = worker_mut.self_review;
+
+    tracing::info!(
+        worker = %worker_name,
+        prompt_len = full_prompt.len(),
+        prompt_cmd = ?prompt_cmd,
+        self_review = self_review_enabled,
+        "Task queued, waiting for SessionStart after /clear"
+    );
+
     let state_path = super::super::state::get_state_path();
     state.save(&state_path)?;
     tracing::info!(
@@ -131,22 +141,22 @@ pub fn run_start(
         worker = %worker_name,
         state_path = %state_path.display(),
         self_review = self_review_enabled,
-        "Worker started and state saved successfully"
+        "Worker task assigned, pending session restart"
     );
     if json {
         let worker_record = state.get_worker(&worker_name).unwrap();
         let output = crate::json_output::StartOutput {
             worker: worker_name,
-            status: "working".to_string(),
+            status: "starting".to_string(),
             self_review_enabled,
             worktree_path: worker_record.worktree_path.clone(),
             branch: worker_record.branch.clone(),
         };
         crate::json_output::print_json(&output);
     } else if self_review_enabled {
-        println!("✓ Worker '{}' started on task (self-review enabled)", worker_name);
+        println!("✓ Task assigned to worker '{}' (self-review enabled)", worker_name);
     } else {
-        println!("✓ Worker '{}' started on task", worker_name);
+        println!("✓ Task assigned to worker '{}'", worker_name);
     }
     Ok(())
 }

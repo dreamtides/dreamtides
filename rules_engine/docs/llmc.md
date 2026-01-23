@@ -341,6 +341,8 @@ TMUX session identifier.
 | `commits_first_detected_unix` | Option<u64> | When commits were first detected (for fallback timing) |
 | `pending_rebase_prompt` | bool | If true, rebase conflict prompt needs to be sent |
 | `error_reason` | Option<string> | Reason for entering error state (used to determine recovery behavior) |
+| `pending_task_prompt` | Option<string> | Task prompt pending to be sent after session restarts |
+| `pending_prompt_cmd` | Option<string> | Command used to generate the pending prompt |
 
 ## TMUX Integration
 
@@ -595,7 +597,10 @@ whitespace-only content aborts the operation.
 
 Selects worker (specified or first idle from pool), verifies idle state, pulls
 latest master into worktree, copies `Tabula.xlsm`, builds full prompt with
-preamble, sends `/clear` and prompt, updates state to `working`.
+preamble, sends `/clear` to restart the session, and stores the prompt as pending.
+When the SessionStart hook fires (after the session restarts), the prompt is sent
+and the worker transitions to `working`. This prevents a race condition where the
+prompt could be sent before the new session is ready to receive input.
 
 Flags:
 - `--worker`: Specify worker by exact name
