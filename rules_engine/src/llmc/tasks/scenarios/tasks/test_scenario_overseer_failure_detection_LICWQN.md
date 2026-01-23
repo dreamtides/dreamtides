@@ -14,8 +14,10 @@ labels:
 - llmc-auto
 blocked-by:
 - LIBWQN
+- LBVWQN
+- LBWWQN
 created-at: 2026-01-21T22:05:41.880949Z
-updated-at: 2026-01-21T22:31:38.829615Z
+updated-at: 2026-01-23T14:09:53.879062Z
 ---
 
 # Test Scenario: Overseer Failure Detection and Remediation
