@@ -142,7 +142,7 @@ impl TmuxSender {
             if !self.is_input_stuck(session)? {
                 return Ok(());
             }
-            tracing::warn!(
+            tracing::info!(
                 session_id = session,
                 attempt = verify_attempt + 1,
                 max_attempts = self.verify_retry_count,
