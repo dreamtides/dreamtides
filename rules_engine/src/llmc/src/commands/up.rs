@@ -29,22 +29,13 @@ pub struct UpOptions {
     pub verbose: bool,
     pub force: bool,
     pub auto: bool,
-    pub task_pool_command: Option<String>,
     pub concurrency: Option<u32>,
     pub post_accept_command: Option<String>,
 }
 
 /// Runs the up command, starting the LLMC daemon
 pub fn run_up(options: UpOptions) -> Result<()> {
-    let UpOptions {
-        no_patrol,
-        verbose,
-        force,
-        auto,
-        task_pool_command,
-        concurrency,
-        post_accept_command,
-    } = options;
+    let UpOptions { no_patrol, verbose, force, auto, concurrency, post_accept_command } = options;
     let llmc_root = config::get_llmc_root();
     if !llmc_root.exists() {
         bail!(
@@ -60,21 +51,19 @@ pub fn run_up(options: UpOptions) -> Result<()> {
     let auto_config = if auto {
         let resolved = ResolvedAutoConfig::resolve(
             config.auto.as_ref(),
-            task_pool_command.as_deref(),
+            &config.repo.source,
             concurrency,
             post_accept_command.as_deref(),
         );
         let Some(cfg) = resolved else {
             bail!(
-                "Auto mode requires a task pool command.\n\
-                 Either:\n\
-                 - Add [auto] section with task_pool_command in config.toml, or\n\
-                 - Use --task-pool-command <CMD> flag"
+                "Auto mode requires task_list_id configuration.\n\
+                 Add [auto] section with task_list_id in config.toml."
             );
         };
         tracing::info!(
-            "Auto mode enabled with task_pool_command={:?}, concurrency={}, post_accept_command={:?}",
-            cfg.task_pool_command,
+            "Auto mode enabled with task_list_id={:?}, concurrency={}, post_accept_command={:?}",
+            cfg.task_list_id,
             cfg.concurrency,
             cfg.post_accept_command
         );

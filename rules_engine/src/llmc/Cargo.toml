@@ -14,15 +14,16 @@ bench = false
 
 [dependencies]
 lattice = { path = "../lattice" }
-
 anyhow = { workspace = true }
 chrono = { workspace = true }
 clap = { workspace = true }
 ctrlc = { workspace = true }
+dirs = { workspace = true }
 libc = { workspace = true }
 regex = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
+shellexpand = { workspace = true }
 tempfile = { workspace = true }
 thiserror = { workspace = true }
 tmux_interface = { workspace = true }

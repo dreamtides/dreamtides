@@ -23,6 +23,7 @@ convert_case = "0.8"
 criterion = { version = "0.5.1", features = ["html_reports"] }
 ctrlc = { version = "3", features = ["termination"] }
 derive_more = { version = "1", features = ["full"] }
+dirs = "6"
 ego-tree = "0.10"
 either = "1"
 enum-iterator = "2"
@@ -62,6 +63,7 @@ serde_path_to_error = "0.1"
 serde_with = { version = "3" }
 serde_yaml = "0.9"
 sha2 = "0.10"
+shellexpand = "3"
 strum = { version = "0.27", features = ["derive"] }
 strum_macros = "0.27"
 syn = { version = "2", features = ["full", "visit", "visit-mut"] }

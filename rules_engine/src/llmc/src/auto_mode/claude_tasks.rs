@@ -1,5 +1,3 @@
-#![allow(dead_code)]
-
 use std::fs::{self, File};
 use std::io::Write;
 use std::path::Path;
@@ -8,6 +6,8 @@ use anyhow::{Context, Result};
 use serde::{Deserialize, Serialize};
 
 /// Status of a Claude Code task.
+// Will be used in milestone-4 task discovery
+#[allow(dead_code, clippy::allow_attributes)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum TaskStatus {
@@ -19,6 +19,8 @@ pub enum TaskStatus {
 /// A task in Claude Code's native task file format.
 ///
 /// Tasks are stored as JSON files in `~/.claude/tasks/<task_list_id>/`.
+// Will be used in milestone-4 task discovery
+#[allow(dead_code, clippy::allow_attributes)]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ClaudeTask {
@@ -38,6 +40,8 @@ pub struct ClaudeTask {
 
 impl ClaudeTask {
     /// Loads a task from the given JSON file path.
+    // Will be used in milestone-4 task discovery
+    #[allow(dead_code, clippy::allow_attributes)]
     pub fn load(path: &Path) -> Result<ClaudeTask> {
         let content = fs::read_to_string(path)
             .with_context(|| format!("Failed to read task file: {}", path.display()))?;
@@ -49,6 +53,8 @@ impl ClaudeTask {
     /// Saves the task to the given path with atomic writes.
     ///
     /// Uses temp file + fsync + rename pattern for atomicity.
+    // Will be used in milestone-4 task discovery
+    #[allow(dead_code, clippy::allow_attributes)]
     pub fn save(&self, path: &Path) -> Result<()> {
         if let Some(parent) = path.parent() {
             fs::create_dir_all(parent).with_context(|| {
@@ -81,6 +87,8 @@ impl ClaudeTask {
     /// Returns the task priority from metadata, defaulting to 3.
     ///
     /// Priority values are 0-4 (0 = highest urgency, 4 = lowest).
+    // Will be used in milestone-4 task discovery
+    #[allow(dead_code, clippy::allow_attributes)]
     pub fn get_priority(&self) -> u8 {
         self.metadata
             .as_ref()
@@ -93,6 +101,8 @@ impl ClaudeTask {
     /// Returns the task label from metadata, if present.
     ///
     /// Labels are used for context injection and concurrency optimization.
+    // Will be used in milestone-4 task discovery
+    #[allow(dead_code, clippy::allow_attributes)]
     pub fn get_label(&self) -> Option<&str> {
         self.metadata.as_ref().and_then(|m| m.get("label")).and_then(|v| v.as_str())
     }

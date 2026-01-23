@@ -165,7 +165,7 @@ fn test_auto_config_parsing() {
         source = "/path/to/repo"
 
         [auto]
-        task_pool_command = "lat next"
+        task_list_id = "my-project"
         concurrency = 3
         post_accept_command = "just test"
     "#;
@@ -173,7 +173,7 @@ fn test_auto_config_parsing() {
     file.write_all(toml.as_bytes()).unwrap();
     let config = Config::load(file.path()).unwrap();
     let auto = config.auto.as_ref().unwrap();
-    assert_eq!(auto.task_pool_command.as_deref(), Some("lat next"));
+    assert_eq!(auto.task_list_id.as_deref(), Some("my-project"));
     assert_eq!(auto.concurrency, 3);
     assert_eq!(auto.post_accept_command.as_deref(), Some("just test"));
 }
@@ -185,13 +185,13 @@ fn test_auto_config_defaults() {
         source = "/path/to/repo"
 
         [auto]
-        task_pool_command = "lat next"
+        task_list_id = "my-project"
     "#;
     let mut file = NamedTempFile::new().unwrap();
     file.write_all(toml.as_bytes()).unwrap();
     let config = Config::load(file.path()).unwrap();
     let auto = config.auto.as_ref().unwrap();
-    assert_eq!(auto.task_pool_command.as_deref(), Some("lat next"));
+    assert_eq!(auto.task_list_id.as_deref(), Some("my-project"));
     assert_eq!(auto.concurrency, 1);
     assert_eq!(auto.post_accept_command, None);
 }
@@ -220,19 +220,21 @@ fn test_auto_config_empty_section() {
     file.write_all(toml.as_bytes()).unwrap();
     let config = Config::load(file.path()).unwrap();
     let auto = config.auto.as_ref().unwrap();
-    assert_eq!(auto.task_pool_command, None);
+    assert_eq!(auto.task_list_id, None);
     assert_eq!(auto.concurrency, 1);
 }
 
 #[test]
 fn test_resolved_auto_config_from_toml() {
     let toml_config = AutoConfig {
-        task_pool_command: Some("lat next".to_string()),
+        task_list_id: Some("my-project".to_string()),
         concurrency: 3,
         post_accept_command: Some("just test".to_string()),
+        ..Default::default()
     };
-    let resolved = ResolvedAutoConfig::resolve(Some(&toml_config), None, None, None).unwrap();
-    assert_eq!(resolved.task_pool_command, "lat next");
+    let resolved =
+        ResolvedAutoConfig::resolve(Some(&toml_config), "/path/to/repo", None, None).unwrap();
+    assert_eq!(resolved.task_list_id, "my-project");
     assert_eq!(resolved.concurrency, 3);
     assert_eq!(resolved.post_accept_command, Some("just test".to_string()));
 }
@@ -240,54 +242,47 @@ fn test_resolved_auto_config_from_toml() {
 #[test]
 fn test_resolved_auto_config_cli_overrides() {
     let toml_config = AutoConfig {
-        task_pool_command: Some("lat next".to_string()),
+        task_list_id: Some("my-project".to_string()),
         concurrency: 3,
         post_accept_command: Some("just test".to_string()),
+        ..Default::default()
     };
     let resolved = ResolvedAutoConfig::resolve(
         Some(&toml_config),
-        Some("custom cmd"),
+        "/path/to/repo",
         Some(5),
         Some("custom post"),
     )
     .unwrap();
-    assert_eq!(resolved.task_pool_command, "custom cmd");
+    assert_eq!(resolved.task_list_id, "my-project");
     assert_eq!(resolved.concurrency, 5);
     assert_eq!(resolved.post_accept_command, Some("custom post".to_string()));
 }
 
 #[test]
-fn test_resolved_auto_config_cli_only() {
-    let resolved =
-        ResolvedAutoConfig::resolve(None, Some("cli cmd"), Some(2), Some("cli post")).unwrap();
-    assert_eq!(resolved.task_pool_command, "cli cmd");
-    assert_eq!(resolved.concurrency, 2);
-    assert_eq!(resolved.post_accept_command, Some("cli post".to_string()));
-}
-
-#[test]
-fn test_resolved_auto_config_missing_task_pool_command() {
-    let toml_config =
-        AutoConfig { task_pool_command: None, concurrency: 3, post_accept_command: None };
-    let resolved = ResolvedAutoConfig::resolve(Some(&toml_config), None, None, None);
+fn test_resolved_auto_config_missing_task_list_id() {
+    let toml_config = AutoConfig::default();
+    let resolved = ResolvedAutoConfig::resolve(Some(&toml_config), "/path/to/repo", None, None);
     assert!(resolved.is_none());
 }
 
 #[test]
-fn test_resolved_auto_config_no_config_no_cli() {
-    let resolved = ResolvedAutoConfig::resolve(None, None, None, None);
+fn test_resolved_auto_config_no_config() {
+    let resolved = ResolvedAutoConfig::resolve(None, "/path/to/repo", None, None);
     assert!(resolved.is_none());
 }
 
 #[test]
 fn test_resolved_auto_config_partial_cli_override() {
     let toml_config = AutoConfig {
-        task_pool_command: Some("lat next".to_string()),
+        task_list_id: Some("my-project".to_string()),
         concurrency: 3,
         post_accept_command: Some("just test".to_string()),
+        ..Default::default()
     };
-    let resolved = ResolvedAutoConfig::resolve(Some(&toml_config), None, Some(10), None).unwrap();
-    assert_eq!(resolved.task_pool_command, "lat next");
+    let resolved =
+        ResolvedAutoConfig::resolve(Some(&toml_config), "/path/to/repo", Some(10), None).unwrap();
+    assert_eq!(resolved.task_list_id, "my-project");
     assert_eq!(resolved.concurrency, 10);
     assert_eq!(resolved.post_accept_command, Some("just test".to_string()));
 }
@@ -295,7 +290,7 @@ fn test_resolved_auto_config_partial_cli_override() {
 #[test]
 fn test_auto_config_default() {
     let config = AutoConfig::default();
-    assert_eq!(config.task_pool_command, None);
+    assert_eq!(config.task_list_id, None);
     assert_eq!(config.concurrency, 1);
     assert_eq!(config.post_accept_command, None);
 }

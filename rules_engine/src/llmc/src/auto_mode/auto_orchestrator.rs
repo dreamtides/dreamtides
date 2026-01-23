@@ -14,7 +14,6 @@ use crate::auto_mode::auto_config::{AutoConfig, ResolvedAutoConfig};
 use crate::auto_mode::auto_failure::{self, HardFailure, RecoveryResult, TransientFailure};
 use crate::auto_mode::auto_logging::{AutoLogger, TaskResult};
 use crate::auto_mode::heartbeat_thread::{DaemonRegistration, HeartbeatThread};
-use crate::auto_mode::task_pool::{self, TaskPoolResult};
 use crate::auto_mode::{auto_logging, auto_workers, heartbeat_thread};
 use crate::config::Config;
 use crate::git;
@@ -46,9 +45,13 @@ pub fn run_auto_mode(
     let logger = AutoLogger::new().context("Failed to initialize auto mode logger")?;
 
     println!("{}", color_theme::dim("Auto mode configuration:"));
+    println!("  {}", color_theme::muted(format!("Task list ID: {}", auto_config.task_list_id)));
     println!(
         "  {}",
-        color_theme::muted(format!("Task pool command: {}", auto_config.task_pool_command))
+        color_theme::muted(format!(
+            "Task directory: {}",
+            auto_config.get_task_directory().display()
+        ))
     );
     println!("  {}", color_theme::muted(format!("Concurrency: {}", auto_config.concurrency)));
     if let Some(ref cmd) = auto_config.post_accept_command {
@@ -58,7 +61,7 @@ pub fn run_auto_mode(
     info!(
         instance_id = %instance_id,
         concurrency = auto_config.concurrency,
-        task_pool_command = %auto_config.task_pool_command,
+        task_list_id = %auto_config.task_list_id,
         "Starting auto mode daemon"
     );
 
@@ -400,56 +403,21 @@ fn run_orchestration_loop(
 /// Returns `true` if any task was assigned to a worker, `false` otherwise.
 fn process_idle_workers(
     state: &mut State,
-    llmc_config: &Config,
-    auto_config: &ResolvedAutoConfig,
-    logger: &AutoLogger,
+    _llmc_config: &Config,
+    _auto_config: &ResolvedAutoConfig,
+    _logger: &AutoLogger,
 ) -> Result<bool> {
     let idle_workers: Vec<String> =
         auto_workers::get_idle_auto_workers(state).iter().map(|w| w.name.clone()).collect();
 
-    let mut any_task_assigned = false;
+    let any_task_assigned = false;
 
-    for worker_name in idle_workers {
-        let task_result =
-            task_pool::execute_task_pool_command(&auto_config.task_pool_command, logger);
-
-        match task_result {
-            TaskPoolResult::Task(task) => {
-                // Skip the first line (task ID like "LDWWQN: task-name") and use the rest as
-                // task content
-                let task_content =
-                    task.lines().skip(1).collect::<Vec<_>>().join("\n").trim().to_string();
-                let task_preview: String = if task_content.is_empty() {
-                    task.chars().take(60).collect()
-                } else {
-                    task_content.chars().take(60).collect()
-                };
-                println!(
-                    "{}",
-                    color_theme::accent(format!(
-                        "[{}] Assigning task: {}...",
-                        worker_name, task_preview
-                    ))
-                );
-                info!(worker = %worker_name, task_len = task.len(), "Assigning task to worker");
-                assign_task_to_worker(state, llmc_config, &worker_name, &task, logger)?;
-                any_task_assigned = true;
-            }
-            TaskPoolResult::NoTasksAvailable => {
-                // No tasks available, skip this worker
-            }
-            TaskPoolResult::Error(e) => {
-                eprintln!(
-                    "{}",
-                    color_theme::error(format!(
-                        "[{}] Task pool command failed: {}",
-                        worker_name, e
-                    ))
-                );
-                error!(worker = %worker_name, error = %e, "Task pool command failed");
-                return Err(e.into());
-            }
-        }
+    // TODO(milestone-4): Implement task discovery and selection from Claude task
+    // files. For now, task assignment is disabled until task_discovery.rs is
+    // implemented. The old task_pool_command system has been removed in favor
+    // of direct task file integration.
+    for _worker_name in idle_workers {
+        // Task discovery not yet implemented - skip assignment
     }
 
     Ok(any_task_assigned)
@@ -462,6 +430,8 @@ fn process_idle_workers(
 /// hook fires after the session restarts (handled in patrol.rs). This prevents
 /// a race condition where the prompt could be sent before the new session is
 /// ready to receive input.
+// Will be used in milestone-4 task discovery
+#[allow(dead_code, clippy::allow_attributes)]
 fn assign_task_to_worker(
     state: &mut State,
     _llmc_config: &Config,
@@ -567,7 +537,12 @@ fn process_completed_workers(
 
         // Get auto config for post_accept_command
         let auto_cfg = AutoConfig {
-            task_pool_command: Some(auto_config.task_pool_command.clone()),
+            task_list_id: Some(auto_config.task_list_id.clone()),
+            tasks_root: Some(auto_config.tasks_root.to_string_lossy().to_string()),
+            context_config_path: auto_config
+                .context_config_path
+                .as_ref()
+                .map(|p| p.to_string_lossy().to_string()),
             concurrency: auto_config.concurrency,
             post_accept_command: auto_config.post_accept_command.clone(),
         };

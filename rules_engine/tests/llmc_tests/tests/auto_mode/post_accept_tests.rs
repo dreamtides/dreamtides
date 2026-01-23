@@ -10,9 +10,9 @@ use llmc::auto_mode::auto_config::AutoConfig;
 fn execute_post_accept_called_multiple_times_runs_each_time() {
     // Create a config with post_accept_command
     let auto_config_with_command = AutoConfig {
-        task_pool_command: Some("echo task".to_string()),
-        concurrency: 1,
+        task_list_id: Some("my-project".to_string()),
         post_accept_command: Some("echo test".to_string()),
+        ..Default::default()
     };
 
     // Verify the config has the command
@@ -23,15 +23,17 @@ fn execute_post_accept_called_multiple_times_runs_each_time() {
 
     // Clone the config to simulate what happens in process_completed_workers
     let first_config = AutoConfig {
-        task_pool_command: Some(auto_config_with_command.task_pool_command.clone().unwrap()),
+        task_list_id: auto_config_with_command.task_list_id.clone(),
         concurrency: auto_config_with_command.concurrency,
         post_accept_command: auto_config_with_command.post_accept_command.clone(),
+        ..Default::default()
     };
 
     let second_config = AutoConfig {
-        task_pool_command: Some(auto_config_with_command.task_pool_command.clone().unwrap()),
+        task_list_id: auto_config_with_command.task_list_id.clone(),
         concurrency: auto_config_with_command.concurrency,
         post_accept_command: auto_config_with_command.post_accept_command.clone(),
+        ..Default::default()
     };
 
     // Both configs should have the command
@@ -53,16 +55,18 @@ fn execute_post_accept_called_multiple_times_runs_each_time() {
 #[test]
 fn auto_config_clone_preserves_post_accept_command() {
     let original = AutoConfig {
-        task_pool_command: Some("task cmd".to_string()),
+        task_list_id: Some("my-project".to_string()),
         concurrency: 2,
         post_accept_command: Some("/path/to/script.sh".to_string()),
+        ..Default::default()
     };
 
     // Simulate the pattern used in process_completed_workers
     let cloned = AutoConfig {
-        task_pool_command: original.task_pool_command.clone(),
+        task_list_id: original.task_list_id.clone(),
         concurrency: original.concurrency,
         post_accept_command: original.post_accept_command.clone(),
+        ..Default::default()
     };
 
     assert_eq!(
@@ -74,15 +78,17 @@ fn auto_config_clone_preserves_post_accept_command() {
 #[test]
 fn auto_config_with_none_post_accept_stays_none() {
     let original = AutoConfig {
-        task_pool_command: Some("task cmd".to_string()),
+        task_list_id: Some("my-project".to_string()),
         concurrency: 1,
         post_accept_command: None,
+        ..Default::default()
     };
 
     let cloned = AutoConfig {
-        task_pool_command: original.task_pool_command.clone(),
+        task_list_id: original.task_list_id.clone(),
         concurrency: original.concurrency,
         post_accept_command: original.post_accept_command.clone(),
+        ..Default::default()
     };
 
     assert!(

@@ -3,13 +3,13 @@ use llmc::auto_mode::auto_config::{AutoConfig, ResolvedAutoConfig};
 
 #[test]
 fn auto_config_from_resolved_preserves_post_accept_command() {
-    let resolved = ResolvedAutoConfig::resolve(
-        None,
-        Some("lat pop"),
-        Some(2),
-        Some("/path/to/post_accept.sh"),
-    )
-    .expect("Should resolve config");
+    let config = AutoConfig {
+        task_list_id: Some("my-project".to_string()),
+        post_accept_command: Some("/path/to/post_accept.sh".to_string()),
+        ..Default::default()
+    };
+    let resolved = ResolvedAutoConfig::resolve(Some(&config), "/path/to/repo", Some(2), None)
+        .expect("Should resolve config");
 
     assert_eq!(
         resolved.post_accept_command,
@@ -18,7 +18,12 @@ fn auto_config_from_resolved_preserves_post_accept_command() {
     );
 
     let auto_cfg = AutoConfig {
-        task_pool_command: Some(resolved.task_pool_command.clone()),
+        task_list_id: Some(resolved.task_list_id.clone()),
+        tasks_root: Some(resolved.tasks_root.to_string_lossy().to_string()),
+        context_config_path: resolved
+            .context_config_path
+            .as_ref()
+            .map(|p| p.to_string_lossy().to_string()),
         concurrency: resolved.concurrency,
         post_accept_command: resolved.post_accept_command.clone(),
     };
@@ -32,7 +37,8 @@ fn auto_config_from_resolved_preserves_post_accept_command() {
 
 #[test]
 fn auto_config_from_resolved_with_none_post_accept_command() {
-    let resolved = ResolvedAutoConfig::resolve(None, Some("lat pop"), Some(2), None)
+    let config = AutoConfig { task_list_id: Some("my-project".to_string()), ..Default::default() };
+    let resolved = ResolvedAutoConfig::resolve(Some(&config), "/path/to/repo", Some(2), None)
         .expect("Should resolve config");
 
     assert_eq!(
@@ -41,7 +47,12 @@ fn auto_config_from_resolved_with_none_post_accept_command() {
     );
 
     let auto_cfg = AutoConfig {
-        task_pool_command: Some(resolved.task_pool_command.clone()),
+        task_list_id: Some(resolved.task_list_id.clone()),
+        tasks_root: Some(resolved.tasks_root.to_string_lossy().to_string()),
+        context_config_path: resolved
+            .context_config_path
+            .as_ref()
+            .map(|p| p.to_string_lossy().to_string()),
         concurrency: resolved.concurrency,
         post_accept_command: resolved.post_accept_command.clone(),
     };

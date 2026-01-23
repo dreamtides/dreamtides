@@ -218,10 +218,6 @@ fn start_daemon_and_wait_for_registration(
 
     // Use --force to clean up any stale sessions from previous runs
     let mut args = vec!["up".to_string(), "--auto".to_string(), "--force".to_string()];
-    if let Some(ref cmd) = daemon_options.task_pool_command {
-        args.push("--task-pool-command".to_string());
-        args.push(cmd.clone());
-    }
     if let Some(n) = daemon_options.concurrency {
         args.push("--concurrency".to_string());
         args.push(n.to_string());

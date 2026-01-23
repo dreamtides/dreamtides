@@ -45,11 +45,6 @@ pub enum Commands {
         #[arg(long)]
         auto: bool,
 
-        /// Shell command that prints a new task description to stdout (auto
-        /// mode)
-        #[arg(long)]
-        task_pool_command: Option<String>,
-
         /// Number of auto workers to run simultaneously (auto mode)
         #[arg(long)]
         concurrency: Option<u32>,
@@ -64,11 +59,6 @@ pub enum Commands {
     /// The overseer monitors the auto mode daemon, detects failures, and uses
     /// Claude Code to remediate issues. Requires [overseer] section in config.
     Overseer {
-        /// Shell command that prints a new task description to stdout (passed
-        /// to daemon)
-        #[arg(long)]
-        task_pool_command: Option<String>,
-
         /// Number of auto workers to run simultaneously (passed to daemon)
         #[arg(long)]
         concurrency: Option<u32>,

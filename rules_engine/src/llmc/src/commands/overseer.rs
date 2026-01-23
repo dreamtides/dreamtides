@@ -26,7 +26,6 @@ pub struct OverseerRegistration {
 /// CLI options passed to the overseer that will be forwarded to the daemon.
 #[derive(Debug, Clone, Default)]
 pub struct OverseerDaemonOptions {
-    pub task_pool_command: Option<String>,
     pub concurrency: Option<u32>,
     pub post_accept_command: Option<String>,
 }
@@ -54,11 +53,7 @@ pub fn read_overseer_registration() -> Result<Option<OverseerRegistration>> {
 /// This command starts the overseer supervisor process which manages the
 /// auto mode daemon. The overseer monitors the daemon, detects failures,
 /// and uses Claude Code to remediate issues.
-pub fn run_overseer(
-    task_pool_command: Option<String>,
-    concurrency: Option<u32>,
-    post_accept_command: Option<String>,
-) -> Result<()> {
+pub fn run_overseer(concurrency: Option<u32>, post_accept_command: Option<String>) -> Result<()> {
     let config_path = config::get_config_path();
     let config = Config::load(&config_path)?;
     validate_overseer_config(&config)?;
@@ -71,8 +66,7 @@ pub fn run_overseer(
         instance_id = %registration.instance_id,
         "Overseer registered"
     );
-    let daemon_options =
-        OverseerDaemonOptions { task_pool_command, concurrency, post_accept_command };
+    let daemon_options = OverseerDaemonOptions { concurrency, post_accept_command };
     let result = overseer_loop::run_overseer(&config, &daemon_options);
     if let Err(e) = OverseerRegistration::remove() {
         tracing::info!(

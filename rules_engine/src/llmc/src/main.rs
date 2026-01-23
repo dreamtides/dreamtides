@@ -67,24 +67,18 @@ async fn main() -> Result<()> {
 
     let result = match cli.command {
         Commands::Init { source, target, force } => init::run_init(source, target, force),
-        Commands::Up {
-            no_patrol,
-            force,
-            auto,
-            task_pool_command,
-            concurrency,
-            post_accept_command,
-        } => up::run_up(up::UpOptions {
-            no_patrol,
-            verbose: cli.verbose,
-            force,
-            auto,
-            task_pool_command,
-            concurrency,
-            post_accept_command,
-        }),
-        Commands::Overseer { task_pool_command, concurrency, post_accept_command } => {
-            overseer::run_overseer(task_pool_command, concurrency, post_accept_command)
+        Commands::Up { no_patrol, force, auto, concurrency, post_accept_command } => {
+            up::run_up(up::UpOptions {
+                no_patrol,
+                verbose: cli.verbose,
+                force,
+                auto,
+                concurrency,
+                post_accept_command,
+            })
+        }
+        Commands::Overseer { concurrency, post_accept_command } => {
+            overseer::run_overseer(concurrency, post_accept_command)
         }
         Commands::Down { force, kill_consoles, allow_overseer_managed, json } => {
             down::run_down(force, kill_consoles, allow_overseer_managed, json)
