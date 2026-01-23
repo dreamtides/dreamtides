@@ -158,11 +158,11 @@ pub fn apply_transition(worker: &mut WorkerRecord, transition: WorkerTransition)
     Ok(())
 }
 /// Resets a worker to clean idle state by discarding changes and resetting to
-/// origin/master
+/// origin branch
 pub fn reset_worker_to_clean_state(
     worker_name: &str,
     state: &mut State,
-    _config: &Config,
+    config: &Config,
 ) -> Result<Vec<String>> {
     let mut actions = Vec::new();
     let worker = state
@@ -180,9 +180,9 @@ pub fn reset_worker_to_clean_state(
         git::reset_to_ref(worktree_path, "HEAD").context("Failed to reset uncommitted changes")?;
         actions.push(format!("Discarded uncommitted changes for worker '{}'", worker_name));
     }
-    git::reset_to_ref(worktree_path, "origin/master")
-        .context("Failed to reset to origin/master")?;
-    actions.push(format!("Reset worker '{}' to origin/master", worker_name));
+    let origin_branch = config.repo.origin_branch();
+    git::reset_to_ref(worktree_path, &origin_branch).context("Failed to reset to origin branch")?;
+    actions.push(format!("Reset worker '{}' to {}", worker_name, origin_branch));
     let worker_mut = state.get_worker_mut(worker_name).unwrap();
     worker_mut.current_prompt.clear();
     worker_mut.commit_sha = None;

@@ -155,6 +155,7 @@ fn reset_worker(state: &mut State, llmc_root: &Path, worker: &str, yes: bool) ->
     let branch = worker_record.branch.clone();
     let config_path = config::get_config_path();
     let cfg = Config::load(&config_path)?;
+    let origin_branch = cfg.repo.origin_branch();
     let worker_config = cfg.workers.get(worker).cloned();
     if !yes && !confirm_reset(worker, &session_id, &worktree_path, &branch)? {
         tracing::info!("User cancelled reset operation for worker '{}'", worker);
@@ -185,7 +186,7 @@ fn reset_worker(state: &mut State, llmc_root: &Path, worker: &str, yes: bool) ->
     if git::branch_exists(llmc_root, &branch) {
         println!("    Branch already exists (reusing)");
     } else {
-        git::create_branch(llmc_root, &branch, "origin/master")?;
+        git::create_branch(llmc_root, &branch, &origin_branch)?;
     }
     println!("  Creating new worktree at {}...", worktree_path.display());
     if worktree_path.exists() {

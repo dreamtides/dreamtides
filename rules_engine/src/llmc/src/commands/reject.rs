@@ -21,7 +21,7 @@ pub fn run_reject(message: Option<String>, json: bool) -> Result<()> {
         );
     }
     let _lock = StateLock::acquire()?;
-    let (mut state, _config) = crate::state::load_state_with_patrol()?;
+    let (mut state, config) = crate::state::load_state_with_patrol()?;
     let worker_name = review::load_last_reviewed()?.ok_or_else(|| {
         anyhow::anyhow!("No previously reviewed worker found. Use 'llmc review' first.")
     })?;
@@ -41,7 +41,8 @@ pub fn run_reject(message: Option<String>, json: bool) -> Result<()> {
         Some(m) if !m.trim().is_empty() => m,
         Some(_) => bail!("Rejection message cannot be empty"),
         None => {
-            let diff = get_diff_for_editor(&worktree_path)?;
+            let origin_branch = config.repo.origin_branch();
+            let diff = get_diff_for_editor(&worktree_path, &origin_branch)?;
             let template = format!(
                 "# Rejection feedback for worker '{}'\n\
                  # Enter your feedback above the diff. Lines starting with '#' will be ignored.\n\
@@ -88,9 +89,9 @@ pub fn run_reject(message: Option<String>, json: bool) -> Result<()> {
     }
     Ok(())
 }
-fn get_diff_for_editor(worktree_path: &PathBuf) -> Result<String> {
+fn get_diff_for_editor(worktree_path: &PathBuf, origin_branch: &str) -> Result<String> {
     let current_branch = git::get_current_branch(worktree_path)?;
-    let range = format!("origin/master...{}", current_branch);
+    let range = format!("{}...{}", origin_branch, current_branch);
     let output = Command::new("git")
         .arg("-C")
         .arg(worktree_path)

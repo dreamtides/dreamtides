@@ -228,8 +228,9 @@ fn accept_and_merge(
 
     // Rebase onto origin/master
     info!(worker = %worker_name, "Rebasing onto origin/master");
+    let origin_branch = config.repo.origin_branch();
     let rebase_result =
-        git::rebase_onto(&worktree_path, "origin/master").map_err(|e| AutoAcceptError {
+        git::rebase_onto(&worktree_path, &origin_branch).map_err(|e| AutoAcceptError {
             worker_name: worker_name.to_string(),
             message: format!("Failed to rebase: {e}"),
         })?;
@@ -282,7 +283,7 @@ fn accept_and_merge(
 
     // Squash commits
     info!(worker = %worker_name, "Squashing commits");
-    git::squash_commits(&worktree_path, "origin/master").map_err(|e| AutoAcceptError {
+    git::squash_commits(&worktree_path, &origin_branch).map_err(|e| AutoAcceptError {
         worker_name: worker_name.to_string(),
         message: format!("Failed to squash commits: {e}"),
     })?;
@@ -315,9 +316,9 @@ fn accept_and_merge(
         worker_name: worker_name.to_string(),
         message: format!("Failed to checkout master: {e}"),
     })?;
-    git::reset_to_ref(&llmc_root, "origin/master").map_err(|e| AutoAcceptError {
+    git::reset_to_ref(&llmc_root, &origin_branch).map_err(|e| AutoAcceptError {
         worker_name: worker_name.to_string(),
-        message: format!("Failed to reset master to origin/master: {e}"),
+        message: format!("Failed to reset master to {origin_branch}: {e}"),
     })?;
 
     // Fast-forward merge to master
@@ -409,10 +410,11 @@ fn accept_and_merge(
 fn reset_worker_to_idle(
     worker_name: &str,
     state: &mut State,
-    _config: &Config,
+    config: &Config,
     logger: &AutoLogger,
 ) -> Result<(), AutoAcceptError> {
     let llmc_root = config::get_llmc_root();
+    let origin_branch = config.repo.origin_branch();
     let worker = state.get_worker(worker_name).ok_or_else(|| AutoAcceptError {
         worker_name: worker_name.to_string(),
         message: "Worker not found in state during reset_worker_to_idle".to_string(),
@@ -439,7 +441,7 @@ fn reset_worker_to_idle(
 
     // Recreate worker worktree
     let branch_name = format!("llmc/{}", worker_name);
-    git::create_branch(&llmc_root, &branch_name, "origin/master").map_err(|e| AutoAcceptError {
+    git::create_branch(&llmc_root, &branch_name, &origin_branch).map_err(|e| AutoAcceptError {
         worker_name: worker_name.to_string(),
         message: format!("Failed to create branch: {e}"),
     })?;

@@ -36,9 +36,10 @@ pub fn run_pick(worker: &str, json: bool) -> Result<()> {
     if !worktree_path.exists() {
         bail!("Worker '{}' worktree does not exist at: {}", worker, worktree_path.display());
     }
+    let origin_branch = config.repo.origin_branch();
     println!("Picking changes from worker '{}'...", worker);
     println!("Worktree: {}", worktree_path.display());
-    let has_commit = git::has_commits_ahead_of(&worktree_path, "origin/master").unwrap_or(false);
+    let has_commit = git::has_commits_ahead_of(&worktree_path, &origin_branch).unwrap_or(false);
     if !has_commit {
         println!("Worker has no commits ahead of master, creating initial commit...");
         println!("Staging all changes...");
@@ -91,8 +92,8 @@ pub fn run_pick(worker: &str, json: bool) -> Result<()> {
     }
     println!("Fetching latest master...");
     git::fetch_origin(&llmc_root)?;
-    println!("Rebasing onto origin/master...");
-    let rebase_result = git::rebase_onto(&worktree_path, "origin/master")?;
+    println!("Rebasing onto {}...", origin_branch);
+    let rebase_result = git::rebase_onto(&worktree_path, &origin_branch)?;
     if !rebase_result.success {
         println!("\n⚠ Rebase has conflicts!");
         println!("Conflicting files:");
@@ -108,8 +109,7 @@ pub fn run_pick(worker: &str, json: bool) -> Result<()> {
     let commit_message = git::get_commit_message(&worktree_path, "HEAD")?;
     let cleaned_message = git::strip_agent_attribution(&commit_message);
     println!("Squashing commits...");
-    let base_commit = "origin/master";
-    git::squash_commits(&worktree_path, base_commit)?;
+    git::squash_commits(&worktree_path, &origin_branch)?;
     if !git::has_staged_changes(&worktree_path)? {
         println!("\n✓ Worker's changes already incorporated into master");
         println!("  No new changes to pick - another worker likely made the same changes");
@@ -118,9 +118,9 @@ pub fn run_pick(worker: &str, json: bool) -> Result<()> {
     println!("Creating squashed commit...");
     create_commit(&worktree_path, &cleaned_message)?;
     let final_commit = git::get_head_commit(&worktree_path)?;
-    println!("Syncing local master with origin/master...");
+    println!("Syncing local master with {}...", origin_branch);
     git::checkout_branch(&llmc_root, "master")?;
-    git::reset_to_ref(&llmc_root, "origin/master")?;
+    git::reset_to_ref(&llmc_root, &origin_branch)?;
     let master_before = git::get_head_commit(&llmc_root)?;
     println!("Merging to master...");
     git::fast_forward_merge(&llmc_root, &worker_record.branch)?;
@@ -179,7 +179,7 @@ pub fn run_pick(worker: &str, json: bool) -> Result<()> {
     } else {
         println!("\n✓ Successfully picked changes from worker '{}'", worker);
         println!("  Final commit: {}", &final_commit[..7.min(final_commit.len())]);
-        println!("  Branch rebased onto origin/master and merged to source repository");
+        println!("  Branch rebased onto {} and merged to source repository", origin_branch);
     }
     Ok(())
 }

@@ -67,25 +67,30 @@ pub fn run_start(
     } else {
         println!("Pulling latest master into worker '{}'...", worker_name);
     }
-    if git::has_commits_ahead_of(&worktree_path, "origin/master")? {
+    let origin_branch = config.repo.origin_branch();
+    if git::has_commits_ahead_of(&worktree_path, &origin_branch)? {
         let stale_head = git::get_head_commit(&worktree_path)?;
         let stale_msg = git::get_commit_message(&worktree_path, &stale_head)
             .unwrap_or_else(|_| "<unknown>".to_string());
         let first_line = stale_msg.lines().next().unwrap_or("<empty>");
-        let origin_master = git::get_head_commit_of_ref(&worktree_path, "origin/master")?;
+        let origin_ref = git::get_head_commit_of_ref(&worktree_path, &origin_branch)?;
         tracing::info!(
-            worker = % worker_name, stale_commit_sha = % stale_head, stale_commit_msg = %
-            first_line, origin_master = % origin_master,
-            "Worker has stale commits from previous task, resetting to origin/master before starting new task"
+            worker = %worker_name,
+            stale_commit_sha = %stale_head,
+            stale_commit_msg = %first_line,
+            origin_ref = %origin_ref,
+            "Worker has stale commits from previous task, resetting to {} before starting new task",
+            origin_branch
         );
         if !json {
             println!(
-                "  Resetting worker to origin/master (removing stale commit: {} - {})",
+                "  Resetting worker to {} (removing stale commit: {} - {})",
+                origin_branch,
                 &stale_head[..8],
                 first_line
             );
         }
-        git::reset_to_ref(&worktree_path, "origin/master")?;
+        git::reset_to_ref(&worktree_path, &origin_branch)?;
     }
     git::pull_rebase(&worktree_path)?;
     copy_tabula_xlsm(&config, &worktree_path)?;

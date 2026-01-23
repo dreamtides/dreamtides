@@ -544,7 +544,7 @@ fn process_idle_workers(
 /// context from the task context config.
 fn assign_task_to_worker(
     state: &mut State,
-    _llmc_config: &Config,
+    llmc_config: &Config,
     task_context: &TaskContextConfig,
     worker_name: &str,
     task: &str,
@@ -554,11 +554,12 @@ fn assign_task_to_worker(
     let worker = state.get_worker(worker_name).context("Worker not found")?;
     let worktree_path = PathBuf::from(&worker.worktree_path);
     let session_id = worker.session_id.clone();
+    let origin_branch = llmc_config.repo.origin_branch();
 
     // Pull latest master
-    if git::has_commits_ahead_of(&worktree_path, "origin/master")? {
+    if git::has_commits_ahead_of(&worktree_path, &origin_branch)? {
         info!(worker = %worker_name, "Resetting stale commits before starting task");
-        git::reset_to_ref(&worktree_path, "origin/master")?;
+        git::reset_to_ref(&worktree_path, &origin_branch)?;
     }
     git::pull_rebase(&worktree_path)?;
 

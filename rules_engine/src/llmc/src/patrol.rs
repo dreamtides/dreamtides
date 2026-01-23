@@ -106,9 +106,10 @@ pub fn handle_stop(
     let stored_sha = worker.commit_sha.clone();
     let transcript_session = worker.transcript_session_id.clone();
     let transcript_file = worker.transcript_path.clone();
+    let origin_branch = config.repo.origin_branch();
     match current_status {
         WorkerStatus::Working | WorkerStatus::Rejected => {
-            let has_commits = match git::has_commits_ahead_of(&worktree_path, "origin/master") {
+            let has_commits = match git::has_commits_ahead_of(&worktree_path, &origin_branch) {
                 Ok(v) => v,
                 Err(e) => {
                     tracing::error!(
@@ -324,9 +325,10 @@ impl Patrol {
 
     fn run_patrol_impl(&self, state: &mut State, config: &Config) -> Result<PatrolReport> {
         let mut report = PatrolReport::default();
+        let origin_branch = config.repo.origin_branch();
         self.check_session_health(state, &mut report)?;
-        self.check_state_consistency(state, &mut report)?;
-        self.detect_state_transitions(state, &mut report)?;
+        self.check_state_consistency(state, &origin_branch, &mut report)?;
+        self.detect_state_transitions(state, &origin_branch, &mut report)?;
         if !report.transitions_applied.is_empty() {
             let state_path = state::get_state_path();
             if let Err(e) = state.save(&state_path) {
@@ -346,7 +348,7 @@ impl Patrol {
         self.send_pending_rebase_prompts(state)?;
         let transitioned_workers: std::collections::HashSet<String> =
             report.transitions_applied.iter().map(|(name, _)| name.clone()).collect();
-        self.rebase_pending_reviews(state, &transitioned_workers, &mut report)?;
+        self.rebase_pending_reviews(state, &origin_branch, &transitioned_workers, &mut report)?;
         if !report.rebases_triggered.is_empty() {
             let state_path = state::get_state_path();
             tracing::info!(
@@ -398,7 +400,12 @@ impl Patrol {
         Ok(())
     }
 
-    fn check_state_consistency(&self, state: &mut State, report: &mut PatrolReport) -> Result<()> {
+    fn check_state_consistency(
+        &self,
+        state: &mut State,
+        origin_branch: &str,
+        report: &mut PatrolReport,
+    ) -> Result<()> {
         let worker_names: Vec<String> = state.workers.keys().cloned().collect();
         for worker_name in worker_names {
             let (worker_status, worktree_path) = {
@@ -410,10 +417,10 @@ impl Patrol {
                 continue;
             }
             if worker_status == WorkerStatus::Idle {
-                match git::has_commits_ahead_of(worktree_path, "origin/master") {
+                match git::has_commits_ahead_of(worktree_path, origin_branch) {
                     Ok(true) => {
-                        let is_linear = git::is_ancestor(worktree_path, "origin/master", "HEAD")
-                            .unwrap_or(false);
+                        let is_linear =
+                            git::is_ancestor(worktree_path, origin_branch, "HEAD").unwrap_or(false);
                         if !is_linear {
                             // Before resetting, check if there's a rebase in progress
                             // which would indicate the worker was rebasing when daemon restarted
@@ -442,22 +449,26 @@ impl Patrol {
                                 continue;
                             }
                             tracing::info!(
-                                "Worker '{}' is idle with diverged history (origin/master not an ancestor of HEAD), resetting to origin/master",
-                                worker_name
+                                "Worker '{}' is idle with diverged history ({} not an ancestor of HEAD), resetting to {}",
+                                worker_name,
+                                origin_branch,
+                                origin_branch
                             );
-                            match git::reset_to_ref(worktree_path, "origin/master") {
+                            match git::reset_to_ref(worktree_path, origin_branch) {
                                 Ok(()) => {
                                     tracing::info!(
-                                        "Successfully reset idle worker '{}' to origin/master",
-                                        worker_name
+                                        "Successfully reset idle worker '{}' to {}",
+                                        worker_name,
+                                        origin_branch
                                     );
                                 }
                                 Err(e) => {
                                     tracing::error!(
                                         worker = %worker_name,
                                         error = %e,
-                                        "Failed to reset idle worker to origin/master. Worker may \
+                                        "Failed to reset idle worker to {}. Worker may \
                                          have stale commits. Run 'llmc reset {}' to manually recover.",
+                                        origin_branch,
                                         worker_name
                                     );
                                 }
@@ -524,7 +535,7 @@ impl Patrol {
                 }
             }
             if worker_status == WorkerStatus::Error {
-                match git::has_commits_ahead_of(worktree_path, "origin/master") {
+                match git::has_commits_ahead_of(worktree_path, origin_branch) {
                     Ok(true) => {
                         tracing::info!(
                             "Worker '{}' in error state has commits ahead of master, recovering to needs_review",
@@ -601,7 +612,7 @@ impl Patrol {
                 let now = SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs();
                 const FALLBACK_DELAY_SECS: u64 = 300;
 
-                match git::has_commits_ahead_of(worktree_path, "origin/master") {
+                match git::has_commits_ahead_of(worktree_path, origin_branch) {
                     Ok(true) => {
                         let commits_first_detected = state
                             .get_worker(&worker_name)
@@ -611,7 +622,8 @@ impl Patrol {
                             tracing::info!(
                                 worker = %worker_name,
                                 status = ?worker_status,
-                                "Commits first detected ahead of master, starting fallback timer"
+                                "Commits first detected ahead of {}, starting fallback timer",
+                                origin_branch
                             );
                             if let Some(w) = state.get_worker_mut(&worker_name) {
                                 w.commits_first_detected_unix = Some(now);
@@ -744,7 +756,12 @@ impl Patrol {
         Ok(())
     }
 
-    fn detect_state_transitions(&self, state: &mut State, report: &mut PatrolReport) -> Result<()> {
+    fn detect_state_transitions(
+        &self,
+        state: &mut State,
+        _origin_branch: &str,
+        report: &mut PatrolReport,
+    ) -> Result<()> {
         let worker_names: Vec<String> = state.workers.keys().cloned().collect();
         for worker_name in worker_names {
             let worker = state.get_worker(&worker_name).unwrap();
@@ -1001,6 +1018,7 @@ impl Patrol {
     fn rebase_pending_reviews(
         &self,
         state: &mut State,
+        origin_branch: &str,
         transitioned_workers: &std::collections::HashSet<String>,
         report: &mut PatrolReport,
     ) -> Result<()> {
@@ -1033,38 +1051,54 @@ impl Patrol {
                 );
                 continue;
             }
-            let has_commits_ahead = git::has_commits_ahead_of(&worktree_path, "origin/master")?;
+            let has_commits_ahead = git::has_commits_ahead_of(&worktree_path, origin_branch)?;
             let worker_head = git::get_head_commit(&worktree_path)?;
-            let origin_master_sha = git::get_head_commit_of_ref(&worktree_path, "origin/master")?;
+            let origin_branch_sha = git::get_head_commit_of_ref(&worktree_path, origin_branch)?;
             if !has_commits_ahead {
                 let expected_sha = worker.commit_sha.as_deref().unwrap_or("<none>");
                 tracing::info!(
-                    worker = % worker_name, worker_head = % worker_head, origin_master =
-                    % origin_master_sha, expected_commit_sha = % expected_sha,
-                    heads_match = (worker_head == origin_master_sha),
-                    "Worker is in needs_review but has no commits ahead of origin/master - work was already merged, resetting to idle"
+                    worker = %worker_name,
+                    worker_head = %worker_head,
+                    origin_ref = %origin_branch_sha,
+                    expected_commit_sha = %expected_sha,
+                    heads_match = (worker_head == origin_branch_sha),
+                    "Worker is in needs_review but has no commits ahead of {} - work was already merged, resetting to idle",
+                    origin_branch
                 );
                 let worker_mut = state.get_worker_mut(&worker_name).unwrap();
                 worker::apply_transition(worker_mut, WorkerTransition::ToIdle)?;
                 report.transitions_applied.push((worker_name.clone(), WorkerTransition::ToIdle));
                 continue;
             }
-            let merge_base = git::get_merge_base(&worktree_path, "HEAD", "origin/master")?;
+            let merge_base = git::get_merge_base(&worktree_path, "HEAD", origin_branch)?;
             tracing::debug!(
-                worker = % worker_name, worker_head = % worker_head, origin_master = %
-                origin_master_sha, merge_base = % merge_base,
+                worker = %worker_name,
+                worker_head = %worker_head,
+                origin_ref = %origin_branch_sha,
+                merge_base = %merge_base,
                 "Checking if rebase is needed"
             );
-            if merge_base == origin_master_sha {
-                tracing::debug!("Worker '{}' is already rebased onto origin/master", worker_name);
+            if merge_base == origin_branch_sha {
+                tracing::debug!(
+                    "Worker '{}' is already rebased onto {}",
+                    worker_name,
+                    origin_branch
+                );
                 continue;
             }
             tracing::info!(
-                worker = % worker_name, merge_base = % merge_base, origin_master = %
-                origin_master_sha,
+                worker = %worker_name,
+                merge_base = %merge_base,
+                origin_ref = %origin_branch_sha,
                 "Master has advanced - rebasing worker in needs_review"
             );
-            match self.trigger_rebase(&worker_name, &worktree_path, &session_id, state) {
+            match self.trigger_rebase(
+                &worker_name,
+                &worktree_path,
+                &session_id,
+                origin_branch,
+                state,
+            ) {
                 Ok(()) => {
                     report.rebases_triggered.push(worker_name.clone());
                 }
@@ -1081,6 +1115,7 @@ impl Patrol {
         worker_name: &str,
         worktree_path: &Path,
         session_id: &str,
+        origin_branch: &str,
         state: &mut State,
     ) -> Result<()> {
         let llmc_root = crate::config::get_llmc_root();
@@ -1092,7 +1127,7 @@ impl Patrol {
             );
             git::amend_uncommitted_changes(worktree_path)?;
         }
-        let rebase_result = git::rebase_onto(worktree_path, "origin/master")?;
+        let rebase_result = git::rebase_onto(worktree_path, origin_branch)?;
         if !rebase_result.success {
             let worker = state.get_worker_mut(worker_name).unwrap();
             worker::apply_transition(worker, WorkerTransition::ToRebasing)?;

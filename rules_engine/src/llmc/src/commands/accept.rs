@@ -60,10 +60,11 @@ pub fn run_accept(worker: Option<String>, force: bool, json: bool) -> Result<()>
     println!("Branch: {}", worker_record.branch);
     println!("Commit message:\n{}", commit_message.trim());
     println!("======================\n");
+    let origin_branch = config.repo.origin_branch();
     println!("Accepting changes from worker '{}'...", worker_name);
     git::fetch_origin(&llmc_root)?;
-    println!("Rebasing onto origin/master...");
-    let rebase_result = git::rebase_onto(&worktree_path, "origin/master")?;
+    println!("Rebasing onto {}...", origin_branch);
+    let rebase_result = git::rebase_onto(&worktree_path, &origin_branch)?;
     if !rebase_result.success {
         let worker_mut = state.get_worker_mut(&worker_name).unwrap();
         let original_task = worker_mut.current_prompt.clone();
@@ -93,8 +94,7 @@ pub fn run_accept(worker: Option<String>, force: bool, json: bool) -> Result<()>
     let commit_message = git::get_commit_message(&worktree_path, "HEAD")?;
     let cleaned_message = git::strip_agent_attribution(&commit_message);
     println!("Squashing commits...");
-    let base_commit = "origin/master";
-    git::squash_commits(&worktree_path, base_commit)?;
+    git::squash_commits(&worktree_path, &origin_branch)?;
     if !git::has_staged_changes(&worktree_path)? {
         println!("\n✓ Worker's changes already incorporated into master");
         println!("  No new changes to merge - another worker likely made the same changes");
@@ -105,7 +105,7 @@ pub fn run_accept(worker: Option<String>, force: bool, json: bool) -> Result<()>
         git::fetch_origin(&llmc_root)?;
         println!("Recreating worker worktree...");
         let branch_name = format!("llmc/{}", worker_name);
-        git::create_branch(&llmc_root, &branch_name, "origin/master")?;
+        git::create_branch(&llmc_root, &branch_name, &origin_branch)?;
         git::create_worktree(&llmc_root, &branch_name, &worktree_path)?;
         copy_tabula_to_worktree(&llmc_root, &worktree_path)?;
         let worker_mut = state.get_worker_mut(&worker_name).unwrap();
@@ -128,9 +128,9 @@ pub fn run_accept(worker: Option<String>, force: bool, json: bool) -> Result<()>
     println!("Creating squashed commit...");
     create_commit(&worktree_path, &cleaned_message)?;
     let new_commit_sha = git::get_head_commit(&worktree_path)?;
-    println!("Syncing local master with origin/master...");
+    println!("Syncing local master with {}...", origin_branch);
     git::checkout_branch(&llmc_root, "master")?;
-    git::reset_to_ref(&llmc_root, "origin/master")?;
+    git::reset_to_ref(&llmc_root, &origin_branch)?;
     let master_before = git::get_head_commit(&llmc_root)?;
     println!("Merging to master...");
     git::fast_forward_merge(&llmc_root, &worker_record.branch)?;
@@ -187,7 +187,7 @@ pub fn run_accept(worker: Option<String>, force: bool, json: bool) -> Result<()>
     git::fetch_origin(&llmc_root)?;
     println!("Recreating worker worktree...");
     let branch_name = format!("llmc/{}", worker_name);
-    git::create_branch(&llmc_root, &branch_name, "origin/master")?;
+    git::create_branch(&llmc_root, &branch_name, &origin_branch)?;
     git::create_worktree(&llmc_root, &branch_name, &worktree_path)?;
     copy_tabula_to_worktree(&llmc_root, &worktree_path)?;
     let worker_mut = state.get_worker_mut(&worker_name).unwrap();

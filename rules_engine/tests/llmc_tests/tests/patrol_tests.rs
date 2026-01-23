@@ -46,7 +46,7 @@ fn create_test_config() -> Config {
             sound_on_review: false,
             self_review: None,
         },
-        repo: RepoConfig { source: "/test".to_string() },
+        repo: RepoConfig { source: "/test".to_string(), default_branch: "master".to_string() },
         workers: HashMap::new(),
         auto: None,
         overseer: None,

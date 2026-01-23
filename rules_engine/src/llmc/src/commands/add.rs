@@ -52,12 +52,14 @@ pub fn run_add(
             session_id
         );
     }
+    let config = Config::load(&config::get_config_path())?;
+    let origin_branch = config.repo.origin_branch();
     println!("Adding worker: {}", name);
     println!("Fetching latest master...");
     git::fetch_origin(&llmc_root)?;
     let branch_name = format!("llmc/{}", name);
     let worktree_path = llmc_root.join(".worktrees").join(name);
-    create_branch(&llmc_root, &branch_name)?;
+    create_branch(&llmc_root, &branch_name, &origin_branch)?;
     create_worktree_for_worker(&llmc_root, &branch_name, &worktree_path)?;
     copy_tabula_to_worktree(&llmc_root, &worktree_path)?;
     create_serena_project(&worktree_path, name)?;
@@ -145,6 +147,8 @@ pub fn recreate_missing_worktree(
     worktree_path: &Path,
 ) -> Result<()> {
     let llmc_root = config::get_llmc_root();
+    let cfg = Config::load(&config::get_config_path())?;
+    let origin_branch = cfg.repo.origin_branch();
     tracing::info!(
         "Recreating missing worktree for worker '{}' at {}",
         worker_name,
@@ -153,7 +157,7 @@ pub fn recreate_missing_worktree(
     git::remove_worktree(&llmc_root, worktree_path, true)
         .context("Failed to remove stale worktree registration")?;
     git::fetch_origin(&llmc_root).context("Failed to fetch latest master")?;
-    create_branch(&llmc_root, branch_name)?;
+    create_branch(&llmc_root, branch_name, &origin_branch)?;
     create_worktree_for_worker(&llmc_root, branch_name, worktree_path)?;
     copy_tabula_to_worktree(&llmc_root, worktree_path)?;
     create_serena_project(worktree_path, worker_name)?;
@@ -339,13 +343,13 @@ fn validate_worker_name(name: &str) -> Result<()> {
     }
     Ok(())
 }
-fn create_branch(repo: &Path, branch_name: &str) -> Result<()> {
-    println!("Creating branch {} from origin/master...", branch_name);
+fn create_branch(repo: &Path, branch_name: &str, origin_branch: &str) -> Result<()> {
+    println!("Creating branch {} from {}...", branch_name, origin_branch);
     if git::branch_exists(repo, branch_name) {
         println!("  Branch already exists (reusing)");
         return Ok(());
     }
-    git::create_branch(repo, branch_name, "origin/master")?;
+    git::create_branch(repo, branch_name, origin_branch)?;
     Ok(())
 }
 fn create_worktree_for_worker(repo: &Path, branch_name: &str, worktree_path: &Path) -> Result<()> {

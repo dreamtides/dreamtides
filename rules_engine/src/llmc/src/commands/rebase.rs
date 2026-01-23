@@ -2,11 +2,12 @@ use std::path::PathBuf;
 
 use anyhow::{Context, Result, bail};
 
+use crate::config::{self, Config};
+use crate::git;
 use crate::lock::StateLock;
 use crate::state::{self, State};
 use crate::tmux::sender::TmuxSender;
 use crate::worker::{self, WorkerTransition};
-use crate::{config, git};
 
 /// Runs the rebase command, manually triggering a rebase for a worker
 pub fn run_rebase(worker: &str, json: bool) -> Result<()> {
@@ -20,6 +21,8 @@ pub fn run_rebase(worker: &str, json: bool) -> Result<()> {
     }
     let _lock = StateLock::acquire()?;
     let state_path = state::get_state_path();
+    let config_path = config::get_config_path();
+    let config = Config::load(&config_path)?;
     let mut state = State::load(&state_path)?;
     let worker_record = state.get_worker(worker).ok_or_else(|| {
         anyhow::anyhow!(
@@ -34,8 +37,9 @@ pub fn run_rebase(worker: &str, json: bool) -> Result<()> {
     println!("Fetching latest master...");
     git::fetch_origin(&llmc_root)
         .with_context(|| format!("Failed to fetch origin for worker '{}'", worker))?;
-    println!("Rebasing worker '{}' onto master...", worker);
-    let rebase_result = git::rebase_onto(&worktree_path, "origin/master")
+    let origin_branch = config.repo.origin_branch();
+    println!("Rebasing worker '{}' onto {}...", worker, origin_branch);
+    let rebase_result = git::rebase_onto(&worktree_path, &origin_branch)
         .with_context(|| format!("Failed to rebase worker '{}'", worker))?;
     if rebase_result.success {
         if json {

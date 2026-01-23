@@ -494,6 +494,9 @@ fn check_git_config(report: &mut DoctorReport) -> Result<()> {
 }
 fn check_worker_branches(report: &mut DoctorReport) -> Result<()> {
     let state_path = state::get_state_path();
+    let config_path = config::get_config_path();
+    let config = Config::load(&config_path)?;
+    let default_branch = &config.repo.default_branch;
     if let Ok(state) = State::load(&state_path) {
         let llmc_root = config::get_llmc_root();
         #[expect(clippy::iter_over_hash_type)]
@@ -510,7 +513,7 @@ fn check_worker_branches(report: &mut DoctorReport) -> Result<()> {
                             "fetch",
                             "--dry-run",
                             "origin",
-                            "master",
+                            default_branch,
                         ])
                         .output();
                     if let Ok(fetch_out) = fetch_check
@@ -518,8 +521,8 @@ fn check_worker_branches(report: &mut DoctorReport) -> Result<()> {
                     {
                         report.warnings.push(DoctorWarning {
                             message: format!(
-                                "Worker '{}' cannot fetch from origin/master",
-                                worker.name
+                                "Worker '{}' cannot fetch from origin/{}",
+                                worker.name, default_branch
                             ),
                             details: Some(String::from_utf8_lossy(&fetch_out.stderr).to_string()),
                         });

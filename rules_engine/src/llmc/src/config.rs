@@ -55,6 +55,10 @@ pub struct DefaultsConfig {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct RepoConfig {
     pub source: String,
+    /// The default branch name (e.g., "main" or "master").
+    /// If not specified, defaults to "master" for backwards compatibility.
+    #[serde(default = "default_branch")]
+    pub default_branch: String,
 }
 
 /// Per-worker configuration
@@ -157,6 +161,18 @@ pub fn validate_model(model: &str) -> Result<()> {
         );
     }
     Ok(())
+}
+
+fn default_branch() -> String {
+    "master".to_string()
+}
+
+impl RepoConfig {
+    /// Returns the origin reference for the default branch (e.g.,
+    /// "origin/main").
+    pub fn origin_branch(&self) -> String {
+        format!("origin/{}", self.default_branch)
+    }
 }
 
 impl LlmcPaths {

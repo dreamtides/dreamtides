@@ -159,7 +159,7 @@ fn create_auto_worker(state: &mut State, config: &Config, name: &str) -> Result<
     git::fetch_origin(&llmc_root).context("Failed to fetch origin")?;
     let branch_name = format!("llmc/{}", name);
     let worktree_path = llmc_root.join(".worktrees").join(name);
-    create_branch_if_missing(&llmc_root, &branch_name)?;
+    create_branch_if_missing(&llmc_root, &branch_name, &config.repo.origin_branch())?;
     create_worktree_if_missing(&llmc_root, &branch_name, &worktree_path)?;
     add::copy_tabula_to_worktree(&llmc_root, &worktree_path)?;
     add::create_serena_project(&worktree_path, name)?;
@@ -202,11 +202,11 @@ fn create_auto_worker(state: &mut State, config: &Config, name: &str) -> Result<
 }
 
 /// Creates the git branch if it doesn't exist.
-fn create_branch_if_missing(repo: &Path, branch_name: &str) -> Result<()> {
+fn create_branch_if_missing(repo: &Path, branch_name: &str, origin_branch: &str) -> Result<()> {
     if git::branch_exists(repo, branch_name) {
         return Ok(());
     }
-    git::create_branch(repo, branch_name, "origin/master")
+    git::create_branch(repo, branch_name, origin_branch)
         .with_context(|| format!("Failed to create branch {}", branch_name))
 }
 

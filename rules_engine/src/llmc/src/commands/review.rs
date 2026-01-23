@@ -99,10 +99,11 @@ pub fn run_review(
     }
     git::fetch_origin(&llmc_root)?;
 
-    let merge_base = git::get_merge_base(&worktree_path, "HEAD", "origin/master")?;
-    let origin_master_sha = git::get_head_commit_of_ref(&llmc_root, "origin/master")?;
+    let origin_branch = config.repo.origin_branch();
+    let merge_base = git::get_merge_base(&worktree_path, "HEAD", &origin_branch)?;
+    let origin_branch_sha = git::get_head_commit_of_ref(&llmc_root, &origin_branch)?;
 
-    if merge_base != origin_master_sha {
+    if merge_base != origin_branch_sha {
         if json {
             eprintln!("Worker needs rebase onto latest master. Rebasing...");
         } else {
@@ -118,7 +119,7 @@ pub fn run_review(
             git::amend_uncommitted_changes(&worktree_path)?;
         }
 
-        let rebase_result = git::rebase_onto(&worktree_path, "origin/master")?;
+        let rebase_result = git::rebase_onto(&worktree_path, &origin_branch)?;
 
         if !rebase_result.success {
             let (mut state, _) = super::super::state::load_state_with_patrol()?;
@@ -176,7 +177,7 @@ pub fn run_review(
     }
 
     if json {
-        let changed_files = get_changed_files(&worktree_path)?;
+        let changed_files = get_changed_files(&worktree_path, &origin_branch)?;
         let output = crate::json_output::ReviewOutput {
             worker: worker_name.clone(),
             status: format!("{:?}", worker_record.status).to_lowercase(),
@@ -185,7 +186,7 @@ pub fn run_review(
         };
         crate::json_output::print_json(&output);
     } else {
-        display_diff(&worktree_path, interface, name_only)?;
+        display_diff(&worktree_path, &origin_branch, interface, name_only)?;
 
         println!();
         println!("Commands:");
@@ -209,9 +210,9 @@ pub fn load_last_reviewed() -> Result<Option<String>> {
     Ok(Some(contents.trim().to_string()))
 }
 
-fn get_changed_files(worktree_path: &PathBuf) -> Result<Vec<String>> {
+fn get_changed_files(worktree_path: &PathBuf, origin_branch: &str) -> Result<Vec<String>> {
     let current_branch = git::get_current_branch(worktree_path)?;
-    let range = format!("origin/master...{}", current_branch);
+    let range = format!("{}...{}", origin_branch, current_branch);
 
     let output = std::process::Command::new("git")
         .arg("-C")
@@ -234,11 +235,12 @@ fn get_changed_files(worktree_path: &PathBuf) -> Result<Vec<String>> {
 
 fn display_diff(
     worktree_path: &PathBuf,
+    origin_branch: &str,
     interface: ReviewInterface,
     name_only: bool,
 ) -> Result<()> {
     let current_branch = git::get_current_branch(worktree_path)?;
-    let range = format!("origin/master...{}", current_branch);
+    let range = format!("{}...{}", origin_branch, current_branch);
 
     // If name_only flag is set, just show file names regardless of interface
     if name_only {
@@ -290,13 +292,13 @@ fn display_diff(
             println!();
             println!("To view the diff:");
             println!("  1. Open the Source Control panel (View → Source Control or Ctrl+Shift+G)");
-            println!("  2. The changes compared to origin/master will be shown");
+            println!("  2. The changes compared to {} will be shown", origin_branch);
             println!("  3. Click on any file to see its diff");
             println!();
             println!("Alternative ways to view changes:");
             println!("  • Command Palette (Ctrl+Shift+P or Cmd+Shift+P):");
             println!("    - Search 'Git: View File History' to see commit history");
-            println!("    - Search 'Git: Compare with...' then select 'origin/master'");
+            println!("    - Search 'Git: Compare with...' then select '{}'", origin_branch);
             println!("  • Timeline view (click clock icon in Explorer) shows file history");
             println!();
             println!("The worktree is on branch '{}' and includes all changes.", current_branch);
