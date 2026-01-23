@@ -311,10 +311,11 @@ fn accept_and_merge(
         message: format!("Failed to get HEAD commit: {e}"),
     })?;
 
-    // Sync local master with origin/master
-    git::checkout_branch(&llmc_root, "master").map_err(|e| AutoAcceptError {
+    // Sync local default branch with origin
+    let default_branch = &config.repo.default_branch;
+    git::checkout_branch(&llmc_root, default_branch).map_err(|e| AutoAcceptError {
         worker_name: worker_name.to_string(),
-        message: format!("Failed to checkout master: {e}"),
+        message: format!("Failed to checkout {default_branch}: {e}"),
     })?;
     git::reset_to_ref(&llmc_root, &origin_branch).map_err(|e| AutoAcceptError {
         worker_name: worker_name.to_string(),
@@ -356,9 +357,9 @@ fn accept_and_merge(
     // Update source repository
     // Note: We already checked for uncommitted changes at the start of this
     // function, so we can proceed directly to resetting.
-    git::checkout_branch(&source_repo, "master").map_err(|e| AutoAcceptError {
+    git::checkout_branch(&source_repo, default_branch).map_err(|e| AutoAcceptError {
         worker_name: worker_name.to_string(),
-        message: format!("Failed to checkout master in source repo: {e}"),
+        message: format!("Failed to checkout {default_branch} in source repo: {e}"),
     })?;
 
     git::reset_to_ref(&source_repo, &new_commit_sha).map_err(|e| AutoAcceptError {

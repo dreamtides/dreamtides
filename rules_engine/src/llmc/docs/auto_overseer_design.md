@@ -56,7 +56,7 @@ autonomous task execution pipeline.
 
 - `post_accept_command` (optional)
   - Shell command invoked after successfully rebasing a worker's changes onto
-    master
+    the default branch (configured via `[repo].default_branch`)
   - May be long-running (tests, validation, deployment)
   - Daemon blocks until completion before proceeding
   - Exit code non-zero: error condition, triggers shutdown
@@ -124,12 +124,12 @@ autonomous task execution pipeline.
 3. For each worker that has completed (needs_review or no_changes):
    - If no_changes: reset worker to idle, continue
    - Execute accept workflow:
-     - Rebase onto master
+     - Rebase onto origin/default_branch (configured via `[repo].default_branch`)
      - If rebase fails (conflict): transition worker to `rebasing` state, send
        conflict prompt, continue (worker resolves conflict, returns to
        `needs_review`, accept retried)
      - Squash commits, strip attribution
-     - Fast-forward merge to master
+     - Fast-forward merge to default branch
    - If `post_accept_command` configured:
      - Execute command
      - If non-zero exit: log warning, continue (commit already merged)

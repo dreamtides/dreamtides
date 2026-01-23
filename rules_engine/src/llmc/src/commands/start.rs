@@ -92,7 +92,7 @@ pub fn run_start(
         }
         git::reset_to_ref(&worktree_path, &origin_branch)?;
     }
-    git::pull_rebase(&worktree_path)?;
+    git::pull_rebase(&worktree_path, &config.repo.default_branch)?;
     copy_tabula_xlsm(&config, &worktree_path)?;
     copy_serena_config(&config, &worktree_path)?;
     let user_prompt = load_prompt_content(&prompt, &prompt_file, &prompt_cmd, json)?;

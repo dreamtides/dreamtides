@@ -886,7 +886,8 @@ pub fn reset_to_ref(repo: &Path, ref_name: &str) -> Result<()> {
     )
 }
 
-pub fn pull_rebase(worktree: &Path) -> Result<()> {
+pub fn pull_rebase(worktree: &Path, default_branch: &str) -> Result<()> {
+    let origin_branch = format!("origin/{}", default_branch);
     for attempt in 0..=GIT_LOCK_RETRY_COUNT {
         if attempt > 0 {
             tracing::debug!(
@@ -900,7 +901,7 @@ pub fn pull_rebase(worktree: &Path) -> Result<()> {
             .arg(worktree)
             .arg("fetch")
             .arg("origin")
-            .arg("master")
+            .arg(default_branch)
             .output()
             .context("Failed to execute git fetch")?;
         if fetch_output.status.success() {
@@ -930,7 +931,7 @@ pub fn pull_rebase(worktree: &Path) -> Result<()> {
             .arg("-C")
             .arg(worktree)
             .arg("rebase")
-            .arg("origin/master")
+            .arg(&origin_branch)
             .output()
             .context("Failed to execute git rebase")?;
         if rebase_output.status.success() {
@@ -946,10 +947,11 @@ pub fn pull_rebase(worktree: &Path) -> Result<()> {
             last_error = Some(stderr.to_string());
             continue;
         }
-        bail!("Failed to rebase onto origin/master: {}", stderr);
+        bail!("Failed to rebase onto {}: {}", origin_branch, stderr);
     }
     bail!(
-        "Failed to rebase onto origin/master after {} retries: {}",
+        "Failed to rebase onto {} after {} retries: {}",
+        origin_branch,
         GIT_LOCK_RETRY_COUNT,
         last_error.unwrap_or_else(|| "Unknown error".to_string())
     )

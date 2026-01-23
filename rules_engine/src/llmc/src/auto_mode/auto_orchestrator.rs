@@ -561,7 +561,7 @@ fn assign_task_to_worker(
         info!(worker = %worker_name, "Resetting stale commits before starting task");
         git::reset_to_ref(&worktree_path, &origin_branch)?;
     }
-    git::pull_rebase(&worktree_path)?;
+    git::pull_rebase(&worktree_path, &llmc_config.repo.default_branch)?;
 
     // Resolve context for this task's label
     let resolved = task_context.resolve(label);

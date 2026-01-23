@@ -128,8 +128,9 @@ pub fn run_accept(worker: Option<String>, force: bool, json: bool) -> Result<()>
     println!("Creating squashed commit...");
     create_commit(&worktree_path, &cleaned_message)?;
     let new_commit_sha = git::get_head_commit(&worktree_path)?;
-    println!("Syncing local master with {}...", origin_branch);
-    git::checkout_branch(&llmc_root, "master")?;
+    let default_branch = &config.repo.default_branch;
+    println!("Syncing local {} with {}...", default_branch, origin_branch);
+    git::checkout_branch(&llmc_root, default_branch)?;
     git::reset_to_ref(&llmc_root, &origin_branch)?;
     let master_before = git::get_head_commit(&llmc_root)?;
     println!("Merging to master...");
@@ -161,12 +162,13 @@ pub fn run_accept(worker: Option<String>, force: bool, json: bool) -> Result<()>
     let source_repo = PathBuf::from(&config.repo.source);
     git::fetch_from_local(&source_repo, &llmc_root, &new_commit_sha)?;
     println!("Updating source repository...");
-    git::checkout_branch(&source_repo, "master")?;
+    git::checkout_branch(&source_repo, default_branch)?;
     if git::has_uncommitted_changes(&source_repo)? {
         bail!(
-            "The master branch in source repository has uncommitted changes.\n\
+            "The {} branch in source repository has uncommitted changes.\n\
              This would result in data loss. Please commit or stash your changes first.\n\
              Repository: {}",
+            default_branch,
             source_repo.display()
         );
     }
