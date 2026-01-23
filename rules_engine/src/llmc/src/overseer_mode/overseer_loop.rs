@@ -324,6 +324,7 @@ fn start_daemon_and_wait_for_registration(
 
     let mut child = Command::new("llmc")
         .args(&args)
+        .env("FORCE_COLOR", "1")
         .stdout(Stdio::piped())
         .stderr(Stdio::piped())
         .spawn()

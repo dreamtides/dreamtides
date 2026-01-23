@@ -37,7 +37,11 @@ pub struct Styled<T> {
 
 /// Determines whether colors should be enabled for output.
 ///
-/// Returns `true` if all of the following are true:
+/// Returns `true` if any of the following are true:
+/// - The `FORCE_COLOR` environment variable is set (common convention for
+///   forcing colors in piped output)
+///
+/// Otherwise, returns `true` if all of the following are true:
 /// - The `LATTICE_NO_COLOR` environment variable is not set
 /// - The standard `NO_COLOR` environment variable is not set (per no-color.org)
 /// - Stdout is connected to a terminal (not piped)
@@ -46,6 +50,9 @@ pub struct Styled<T> {
 pub fn colors_enabled() -> bool {
     static COLORS_ENABLED: OnceLock<bool> = OnceLock::new();
     *COLORS_ENABLED.get_or_init(|| {
+        if env::var("FORCE_COLOR").is_ok() {
+            return true;
+        }
         let no_color_env = env::var("LATTICE_NO_COLOR").is_ok() || env::var("NO_COLOR").is_ok();
         let is_tty = std::io::stdout().is_terminal();
         !no_color_env && is_tty
