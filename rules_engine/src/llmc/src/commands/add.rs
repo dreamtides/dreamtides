@@ -212,7 +212,6 @@ included_optional_tools: []
 "#
     );
     fs::write(&project_yml, content).context("Failed to write .serena/project.yml")?;
-    println!("Created Serena project config: {}", project_name);
     register_serena_project(worktree_path)?;
     Ok(())
 }
@@ -327,7 +326,6 @@ fn register_serena_project(worktree_path: &Path) -> Result<()> {
         format!("{}\nprojects:\n- {}\n", content.trim_end(), worktree_str)
     };
     fs::write(&config_path, updated).context("Failed to update Serena config")?;
-    println!("Registered project with Serena: {}", worktree_str);
     Ok(())
 }
 fn validate_worker_name(name: &str) -> Result<()> {
