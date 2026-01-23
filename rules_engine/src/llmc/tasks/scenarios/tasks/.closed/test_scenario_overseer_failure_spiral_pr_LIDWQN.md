@@ -16,7 +16,8 @@ blocked-by:
 - LICWQN
 - LEGWQN
 created-at: 2026-01-21T22:06:36.953507Z
-updated-at: 2026-01-23T19:15:40.861385Z
+updated-at: 2026-01-23T19:42:49.652929Z
+closed-at: 2026-01-23T19:42:49.652929Z
 ---
 
 # Test Scenario: Overseer Failure Spiral Prevention
