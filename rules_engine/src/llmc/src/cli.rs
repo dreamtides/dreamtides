@@ -90,6 +90,13 @@ pub enum Commands {
         #[arg(long)]
         kill_consoles: bool,
 
+        /// Allow stopping workers even when an overseer is managing this
+        /// instance. By default, `llmc down` refuses to run when an overseer
+        /// is active to prevent accidental disruption of autonomous
+        /// operation.
+        #[arg(long)]
+        allow_overseer_managed: bool,
+
         /// Output in JSON format
         #[arg(long)]
         json: bool,
@@ -129,6 +136,12 @@ pub enum Commands {
         /// Remove all workers
         #[arg(long)]
         all: bool,
+
+        /// Allow nuking all workers even when an overseer is managing this
+        /// instance. Only required with --all; single worker nukes are always
+        /// allowed.
+        #[arg(long)]
+        allow_overseer_managed: bool,
 
         /// Output in JSON format
         #[arg(long)]

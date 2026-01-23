@@ -3,13 +3,18 @@ use std::time::Duration;
 
 use anyhow::{Context, Result, bail};
 
-use crate::commands::console;
+use crate::commands::{console, overseer};
 use crate::config::{self, Config};
 use crate::overseer_mode::overseer_session;
 use crate::state::{self, State, WorkerStatus};
 use crate::tmux::session;
 /// Runs the down command, stopping all worker sessions
-pub fn run_down(force: bool, kill_consoles: bool, json: bool) -> Result<()> {
+pub fn run_down(
+    force: bool,
+    kill_consoles: bool,
+    allow_overseer_managed: bool,
+    json: bool,
+) -> Result<()> {
     let llmc_root = config::get_llmc_root();
     if !llmc_root.exists() {
         bail!(
@@ -18,6 +23,24 @@ pub fn run_down(force: bool, kill_consoles: bool, json: bool) -> Result<()> {
             llmc_root.display()
         );
     }
+
+    // Check if an overseer is managing this instance
+    if !allow_overseer_managed {
+        if let Ok(Some(registration)) = overseer::read_overseer_registration() {
+            if overseer::is_process_alive(registration.pid) {
+                bail!(
+                    "An overseer is managing this LLMC instance (PID: {}).\n\n\
+                     Running 'llmc down' would disrupt autonomous operation.\n\n\
+                     If you're running a test scenario that needs to stop workers,\n\
+                     make sure LLMC_ROOT is set to your test instance, not the main instance.\n\n\
+                     To force shutdown despite active overseer, use:\n\
+                       llmc down --allow-overseer-managed [--force]",
+                    registration.pid
+                );
+            }
+        }
+    }
+
     let config_path = config::get_config_path();
     let config = Config::load(&config_path)?;
     let state_path = state::get_state_path();

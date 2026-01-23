@@ -4,7 +4,7 @@ use std::path::{Path, PathBuf};
 
 use anyhow::{Context, Result, bail};
 
-use crate::commands::console;
+use crate::commands::{console, overseer};
 use crate::lock::StateLock;
 use crate::state::{self, State};
 use crate::tmux::session;

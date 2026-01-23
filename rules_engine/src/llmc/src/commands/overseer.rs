@@ -133,7 +133,7 @@ impl OverseerRegistration {
     }
 }
 
-fn is_process_alive(pid: u32) -> bool {
+pub fn is_process_alive(pid: u32) -> bool {
     std::process::Command::new("kill")
         .args(["-0", &pid.to_string()])
         .output()

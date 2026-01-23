@@ -85,11 +85,15 @@ async fn main() -> Result<()> {
         Commands::Overseer { task_pool_command, concurrency, post_accept_command } => {
             overseer::run_overseer(task_pool_command, concurrency, post_accept_command)
         }
-        Commands::Down { force, kill_consoles, json } => down::run_down(force, kill_consoles, json),
+        Commands::Down { force, kill_consoles, allow_overseer_managed, json } => {
+            down::run_down(force, kill_consoles, allow_overseer_managed, json)
+        }
         Commands::Add { name, model, role_prompt, excluded_from_pool, self_review, json } => {
             add::run_add(&name, model, role_prompt, excluded_from_pool, self_review, json)
         }
-        Commands::Nuke { name, all, json } => nuke::run_nuke(name.as_deref(), all, json),
+        Commands::Nuke { name, all, allow_overseer_managed, json } => {
+            nuke::run_nuke(name.as_deref(), all, allow_overseer_managed, json)
+        }
         Commands::Status { json } => status::run_status(json),
         Commands::Start { worker, prefix, prompt, prompt_file, prompt_cmd, self_review, json } => {
             start::run_start(worker, prefix, prompt, prompt_file, prompt_cmd, self_review, json)
