@@ -1,0 +1,158 @@
+/* app_styles.css - Global TV application styles */
+
+:root {
+  /* Color palette - matches Excel table styles */
+  --tv-primary-bg: #ffffff;
+  --tv-header-bg: #4472c4;
+  --tv-header-text: #ffffff;
+  --tv-row-even: #d6dce5;
+  --tv-row-odd: #ffffff;
+  --tv-border-color: #8ea9db;
+  --tv-selection-bg: #bdd7ee;
+  --tv-focus-border: #2f5496;
+
+  /* Error states */
+  --tv-error-bg: #fce4e4;
+  --tv-error-border: #cc0000;
+  --tv-error-text: #cc0000;
+  --tv-warning-bg: #fff3cd;
+  --tv-warning-text: #856404;
+
+  /* Status indicators */
+  --tv-status-saving: #ffc107;
+  --tv-status-saved: #28a745;
+  --tv-status-error: #dc3545;
+
+  /* Spacing */
+  --tv-spacing-xs: 4px;
+  --tv-spacing-sm: 8px;
+  --tv-spacing-md: 16px;
+  --tv-spacing-lg: 24px;
+
+  /* Typography */
+  --tv-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    sans-serif;
+  --tv-font-size-sm: 12px;
+  --tv-font-size-md: 14px;
+  --tv-font-size-lg: 16px;
+
+  /* Base styles */
+  font-family: var(--tv-font-family);
+  font-size: var(--tv-font-size-md);
+  line-height: 1.5;
+  font-weight: 400;
+  color: #0f0f0f;
+  background-color: #f6f6f6;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-text-size-adjust: 100%;
+}
+
+/* Reset */
+html,
+body,
+#root {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* Main layout */
+.tv-app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+  font-family: var(--tv-font-family);
+}
+
+.tv-main-content {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Container for spreadsheet view */
+.container {
+  margin: 0;
+  padding: var(--tv-spacing-sm);
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+/* Loading state */
+.tv-loading,
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: var(--tv-spacing-lg);
+  font-size: var(--tv-font-size-lg);
+  color: #666;
+}
+
+/* Status bar */
+.status-bar {
+  height: 20px;
+  display: flex;
+  align-items: center;
+  padding: 0 var(--tv-spacing-xs);
+  font-size: var(--tv-font-size-sm);
+}
+
+.status {
+  padding: 2px var(--tv-spacing-sm);
+  border-radius: 3px;
+}
+
+.status.saving {
+  color: #666;
+}
+
+.status.saved {
+  color: var(--tv-status-saved);
+}
+
+.status.error {
+  color: var(--tv-status-error);
+}
+
+/* Generic error state (detailed in error_styles.css) */
+.tv-error-inline,
+.error {
+  padding: var(--tv-spacing-md);
+  background-color: var(--tv-error-bg);
+  border: 1px solid var(--tv-error-border);
+  color: var(--tv-error-text);
+  border-radius: 4px;
+  margin: var(--tv-spacing-md);
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  :root {
+    color: #f6f6f6;
+    background-color: #2f2f2f;
+  }
+
+  .status.saving {
+    color: #aaa;
+  }
+
+  .status.saved {
+    color: #81c784;
+  }
+
+  .tv-loading,
+  .loading {
+    color: #aaa;
+  }
+}

@@ -3,7 +3,6 @@ import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import { SpreadsheetView } from "./spreadsheet_view";
 import { TomlTableData } from "./UniverSpreadsheet";
-import "./App.css";
 
 export type { TomlTableData };
 
