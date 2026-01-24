@@ -1,32 +1,42 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
-import { UniverSpreadsheet, TomlTableData } from "./UniverSpreadsheet";
+import { SpreadsheetView } from "./spreadsheet_view";
+import { TomlTableData } from "./UniverSpreadsheet";
 import "./App.css";
+
+export type { TomlTableData };
 
 const FILE_PATH =
   "/Users/dthurn/Documents/GoogleDrive/dreamtides/rules_engine/tabula/dreamwell.toml";
 const TABLE_NAME = "dreamwell";
 const SAVE_DEBOUNCE_MS = 500;
 
-function App() {
-  const [data, setData] = useState<TomlTableData | undefined>(undefined);
+export type SyncState = "idle" | "loading" | "saving" | "saved" | "error";
+
+export function AppRoot() {
+  const [data, setData] = useState<TomlTableData | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
+  const [loading, setLoading] = useState(true);
+  const [saveStatus, setSaveStatus] = useState<SyncState>("idle");
   const saveTimeoutRef = useRef<number | null>(null);
   const isSavingRef = useRef(false);
 
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     try {
+      setLoading(true);
       const result = await invoke<TomlTableData>("load_toml_table", {
         filePath: FILE_PATH,
         tableName: TABLE_NAME,
       });
       setData(result);
+      setError(null);
     } catch (e) {
       setError(String(e));
+    } finally {
+      setLoading(false);
     }
-  };
+  }, []);
 
   const saveData = useCallback(async (newData: TomlTableData) => {
     if (isSavingRef.current) return;
@@ -81,26 +91,15 @@ function App() {
         clearTimeout(saveTimeoutRef.current);
       }
     };
-  }, []);
-
-  if (error) {
-    return <div className="error">Error loading TOML: {error}</div>;
-  }
+  }, [loadData]);
 
   return (
-    <main className="container">
-      <div className="status-bar">
-        {saveStatus === "saving" && <span className="status saving">Saving...</span>}
-        {saveStatus === "saved" && <span className="status saved">Saved</span>}
-        {saveStatus === "error" && <span className="status error">Save failed</span>}
-      </div>
-      <UniverSpreadsheet
-        height="calc(100vh - 30px)"
-        data={data}
-        onChange={handleChange}
-      />
-    </main>
+    <SpreadsheetView
+      data={data}
+      error={error}
+      loading={loading}
+      saveStatus={saveStatus}
+      onChange={handleChange}
+    />
   );
 }
-
-export default App;

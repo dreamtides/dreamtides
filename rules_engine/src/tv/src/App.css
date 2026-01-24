@@ -67,6 +67,11 @@ h1 {
   padding: 20px;
 }
 
+.loading {
+  padding: 20px;
+  color: #666;
+}
+
 @media (prefers-color-scheme: dark) {
   :root {
     color: #f6f6f6;
