@@ -160,6 +160,9 @@ properly releasing claims, which is a bug that requires investigation.
 - Worker Claude Code crashes → patrol restarts session (up to 2 retries with
   backoff)
 - TMUX session disappears → patrol recreates session
+- `/clear` command fails to execute (e.g., Claude's autocomplete menu intercepts
+  Enter key) → patrol detects stale pending prompts (>30 seconds) and resends
+  `/clear`
 - If patrol recovery succeeds, daemon continues normally
 - If patrol retries exhausted → daemon shuts down for overseer remediation
 
