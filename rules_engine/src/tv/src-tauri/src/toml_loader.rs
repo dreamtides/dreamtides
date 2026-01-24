@@ -1,8 +1,43 @@
 use std::collections::BTreeSet;
 use std::fs;
+use std::io::ErrorKind;
 use std::path::PathBuf;
+use std::time::Instant;
 
 use serde::{Deserialize, Serialize};
+
+#[derive(Debug, thiserror::Error)]
+pub enum TvError {
+    #[error("File not found: {path}")]
+    FileNotFound { path: String },
+
+    #[error("Permission denied reading file: {path}")]
+    PermissionDenied { path: String },
+
+    #[error("TOML parse error at line {line}: {message}")]
+    TomlParseError { line: Option<usize>, message: String },
+
+    #[error("Invalid UTF-8 content in file: {path}")]
+    InvalidUtf8 { path: String },
+
+    #[error("Table '{table_name}' not found in TOML file")]
+    TableNotFound { table_name: String },
+
+    #[error("'{table_name}' is not an array of tables")]
+    NotAnArrayOfTables { table_name: String },
+
+    #[error("Failed to write file {path}: {message}")]
+    WriteError { path: String, message: String },
+}
+
+impl Serialize for TvError {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(&self.to_string())
+    }
+}
 
 #[derive(Serialize, Deserialize)]
 pub struct TomlTableData {
@@ -10,19 +45,84 @@ pub struct TomlTableData {
     pub rows: Vec<Vec<serde_json::Value>>,
 }
 
+/// Loads a TOML file and extracts the specified table as spreadsheet data.
 #[tauri::command]
-pub fn load_toml_table(file_path: String, table_name: String) -> Result<TomlTableData, String> {
+pub fn load_toml_table(file_path: String, table_name: String) -> Result<TomlTableData, TvError> {
+    let start = Instant::now();
     let path = PathBuf::from(&file_path);
-    let content = fs::read_to_string(&path)
-        .map_err(|e| format!("Failed to read file {}: {}", file_path, e))?;
-    let value: toml::Value =
-        toml::from_str(&content).map_err(|e| format!("Failed to parse TOML: {}", e))?;
-    let table = value
-        .get(&table_name)
-        .ok_or_else(|| format!("Table '{}' not found in TOML file", table_name))?;
-    let array = table
-        .as_array()
-        .ok_or_else(|| format!("'{}' is not an array of tables", table_name))?;
+
+    let content = fs::read_to_string(&path).map_err(|e| match e.kind() {
+        ErrorKind::NotFound => {
+            tracing::error!(
+                component = "tv.toml",
+                file_path = %file_path,
+                error = "File not found",
+                "Load failed"
+            );
+            TvError::FileNotFound { path: file_path.clone() }
+        }
+        ErrorKind::PermissionDenied => {
+            tracing::error!(
+                component = "tv.toml",
+                file_path = %file_path,
+                error = "Permission denied",
+                "Load failed"
+            );
+            TvError::PermissionDenied { path: file_path.clone() }
+        }
+        ErrorKind::InvalidData => {
+            tracing::error!(
+                component = "tv.toml",
+                file_path = %file_path,
+                error = "Invalid UTF-8",
+                "Load failed"
+            );
+            TvError::InvalidUtf8 { path: file_path.clone() }
+        }
+        _ => {
+            tracing::error!(
+                component = "tv.toml",
+                file_path = %file_path,
+                error = %e,
+                "Load failed"
+            );
+            TvError::FileNotFound { path: file_path.clone() }
+        }
+    })?;
+
+    let value: toml::Value = toml::from_str(&content).map_err(|e| {
+        let line = e.span().map(|s| content[..s.start].lines().count());
+        tracing::error!(
+            component = "tv.toml",
+            file_path = %file_path,
+            error = %e,
+            line = ?line,
+            "TOML parse failed"
+        );
+        TvError::TomlParseError { line, message: e.message().to_string() }
+    })?;
+
+    let table = value.get(&table_name).ok_or_else(|| {
+        tracing::error!(
+            component = "tv.toml",
+            file_path = %file_path,
+            table_name = %table_name,
+            error = "Table not found",
+            "Load failed"
+        );
+        TvError::TableNotFound { table_name: table_name.clone() }
+    })?;
+
+    let array = table.as_array().ok_or_else(|| {
+        tracing::error!(
+            component = "tv.toml",
+            file_path = %file_path,
+            table_name = %table_name,
+            error = "Not an array of tables",
+            "Load failed"
+        );
+        TvError::NotAnArrayOfTables { table_name: table_name.clone() }
+    })?;
 
     let mut all_keys = BTreeSet::new();
     for item in array {
@@ -48,25 +148,80 @@ pub fn load_toml_table(file_path: String, table_name: String) -> Result<TomlTabl
         rows.push(row);
     }
 
+    let duration_ms = start.elapsed().as_millis() as u64;
+    tracing::info!(
+        component = "tv.toml",
+        file_path = %file_path,
+        rows = rows.len(),
+        duration_ms = duration_ms,
+        "File loaded"
+    );
+
     Ok(TomlTableData { headers, rows })
 }
 
+/// Saves spreadsheet data back to a TOML file, preserving formatting.
 #[tauri::command]
 pub fn save_toml_table(
     file_path: String,
     table_name: String,
     data: TomlTableData,
-) -> Result<(), String> {
+) -> Result<(), TvError> {
     let path = PathBuf::from(&file_path);
-    let content = fs::read_to_string(&path)
-        .map_err(|e| format!("Failed to read file {}: {}", file_path, e))?;
-    let mut doc: toml_edit::DocumentMut =
-        content.parse().map_err(|e| format!("Failed to parse TOML: {}", e))?;
+
+    let content = fs::read_to_string(&path).map_err(|e| match e.kind() {
+        ErrorKind::NotFound => {
+            tracing::error!(
+                component = "tv.toml",
+                file_path = %file_path,
+                error = "File not found",
+                "Save failed"
+            );
+            TvError::FileNotFound { path: file_path.clone() }
+        }
+        ErrorKind::PermissionDenied => {
+            tracing::error!(
+                component = "tv.toml",
+                file_path = %file_path,
+                error = "Permission denied",
+                "Save failed"
+            );
+            TvError::PermissionDenied { path: file_path.clone() }
+        }
+        _ => {
+            tracing::error!(
+                component = "tv.toml",
+                file_path = %file_path,
+                error = %e,
+                "Save failed"
+            );
+            TvError::FileNotFound { path: file_path.clone() }
+        }
+    })?;
+
+    let mut doc: toml_edit::DocumentMut = content.parse().map_err(|e: toml_edit::TomlError| {
+        tracing::error!(
+            component = "tv.toml",
+            file_path = %file_path,
+            error = %e,
+            "TOML parse failed during save"
+        );
+        TvError::TomlParseError { line: None, message: e.to_string() }
+    })?;
 
     let array = doc
         .get_mut(&table_name)
         .and_then(|v| v.as_array_of_tables_mut())
-        .ok_or_else(|| format!("Table '{}' not found or not an array of tables", table_name))?;
+        .ok_or_else(|| {
+            tracing::error!(
+                component = "tv.toml",
+                file_path = %file_path,
+                table_name = %table_name,
+                error = "Table not found or not an array of tables",
+                "Save failed"
+            );
+            TvError::TableNotFound { table_name: table_name.clone() }
+        })?;
 
     for (row_idx, row) in data.rows.iter().enumerate() {
         let Some(table) = array.get_mut(row_idx) else {
@@ -84,8 +239,21 @@ pub fn save_toml_table(
         }
     }
 
-    fs::write(&path, doc.to_string())
-        .map_err(|e| format!("Failed to write file {}: {}", file_path, e))?;
+    fs::write(&path, doc.to_string()).map_err(|e| {
+        tracing::error!(
+            component = "tv.toml",
+            file_path = %file_path,
+            error = %e,
+            "Write failed"
+        );
+        TvError::WriteError { path: file_path.clone(), message: e.to_string() }
+    })?;
+
+    tracing::info!(
+        component = "tv.toml",
+        file_path = %file_path,
+        "File saved"
+    );
 
     Ok(())
 }
