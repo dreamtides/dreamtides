@@ -28,7 +28,6 @@ a representative example of the array-of-tables format TV displays. Each
 - Support multiple TOML files as separate sheets in a single window
 
 ### Non-Goals
-- General-purpose spreadsheet functionality beyond TOML viewing
 - Multi-user collaboration or remote sync
 - Excel format import/export
 - Mobile or web deployment
@@ -581,21 +580,6 @@ via headless rendering.
 Test fixtures include sample TOML files covering edge cases like empty files,
 files with comments, sparse data, deeply nested structures, and large files.
 Fixtures are version controlled and documented.
-
-### Mocking Strategy
-File system operations use a trait-based abstraction allowing test mocks.
-Time-dependent operations accept a clock trait for deterministic testing.
-Network operations for image fetching use a mock HTTP client in tests.
-
-### Continuous Integration
-Tests run on every commit via CI. Test coverage reports track integration
-coverage of public API surface. Benchmark tests track performance regression
-for file operations and derived column computation.
-
-### Property Testing
-Critical file operations use property-based testing to verify round-trip
-preservation. Random TOML documents are generated, saved, and reloaded to
-verify no data loss or corruption.
 
 ## File Layout
 
