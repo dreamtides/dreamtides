@@ -55,7 +55,7 @@ variant containing styled spans.
 Input keys: ["rules_text", "variables"]
 Processing: Parse variables as key-value pairs, build FluentArgs, format
 through LocalizedStrings::format_display_string, parse HTML tags for styling
-Output: DerivedResult::RichText with bold/italic/color spans
+Output: DerivedResult::RichText with bold/italic/color spans for Univer
 
 ## Built-in Function: CardLookup
 

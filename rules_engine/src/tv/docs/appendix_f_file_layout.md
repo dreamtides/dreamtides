@@ -3,7 +3,7 @@
 ## Main Application (rules_engine/src/tv/)
 
 ### Root Configuration
-- package.json: NPM package definition with Univers and Tauri dependencies
+- package.json: NPM package definition with Univer and Tauri dependencies
 - pnpm-lock.yaml: Locked dependency versions for reproducible builds
 - pnpm-workspace.yaml: Workspace configuration for pnpm
 - tsconfig.json: TypeScript compiler configuration for frontend
@@ -14,7 +14,7 @@
 ### Frontend Source (src/)
 - main.tsx: React application entry point, mounts root component
 - app_root.tsx: Top-level component with state management and IPC setup
-- spreadsheet_view.tsx: Univers spreadsheet wrapper with data binding
+- spreadsheet_view.tsx: Univer spreadsheet wrapper with data binding
 - sheet_tabs.tsx: Multi-file tab navigation component
 - error_banner.tsx: Error display overlay component
 - status_indicator.tsx: Save/sync status display component
@@ -24,7 +24,7 @@
 
 ### Frontend Styles (src/styles/)
 - app_styles.css: Global application styles
-- spreadsheet_overrides.css: Univers styling customizations
+- spreadsheet_overrides.css: Univer styling customizations
 - error_styles.css: Error banner and indicator styles
 - tabs_styles.css: Sheet tab styling
 
@@ -33,9 +33,10 @@
 - appendix_a_metadata_schema.md: Metadata specification
 - appendix_b_derived_functions.md: Derived function architecture
 - appendix_c_sync_protocol.md: Bidirectional sync details
-- appendix_d_univers_integration.md: Univers integration details
+- appendix_d_univer_integration.md: Univer integration details
 - appendix_e_logging_specification.md: Logging format specification
 - appendix_f_file_layout.md: This file layout document
+- appendix_g_rules_text_preview.md: Rules text preview pipeline
 
 ### Tauri Backend (src-tauri/)
 
@@ -84,6 +85,8 @@
 - functions_mod.rs: Built-in function exports
 - image_url_function.rs: Image URL derivation from image number
 - rules_preview_function.rs: Fluent-based rules text rendering
+- style_tag_parser.rs: HTML-like style tag parsing for rich text
+- rich_text_builder.rs: Univer rich text structure generation
 - card_lookup_function.rs: Cross-table card name lookup
 
 #### Validation Module (src/validation/)

@@ -13,8 +13,8 @@ between file watcher events and user edits.
 
 ## Save Operation Sequence
 
-1. User edits a cell in Univers
-2. Univers emits sheet.mutation.set-range-values command
+1. User edits a cell in Univer
+2. Univer emits sheet.mutation.set-range-values command
 3. Frontend extracts changed cell coordinates and new value
 4. Frontend calls save_cell command with file path, row index, column key, value
 5. Backend acquires file lock (advisory on Unix, exclusive on Windows)
@@ -42,8 +42,8 @@ between file watcher events and user edits.
 9. Backend builds row data with JSON values for each cell
 10. Backend extracts metadata section for configuration
 11. Backend returns TomlTableData with headers, rows, metadata
-12. Frontend replaces Univers data source with new data
-13. Frontend applies metadata configuration to Univers settings
+12. Frontend replaces Univer data source with new data
+13. Frontend applies metadata configuration to Univer settings
 14. State returns to Idle
 
 ## Debouncing Strategy

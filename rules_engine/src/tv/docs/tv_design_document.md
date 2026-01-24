@@ -3,7 +3,7 @@
 ## Executive Summary
 
 TV is a desktop application for viewing and editing TOML files in a spreadsheet
-format, built with Tauri V2 and the Univers spreadsheet library. It replaces the
+format, built with Tauri V2 and the Univer spreadsheet library. It replaces the
 Excel-based workflow currently managed by tabula_cli, making TOML files the sole
 source of truth for game data. TV provides bidirectional synchronization between
 the spreadsheet UI and TOML files on disk, with emphasis on robustness, error
@@ -24,9 +24,8 @@ recovery, and format preservation.
 
 ### Non-Goals
 - General-purpose spreadsheet functionality beyond TOML viewing
-- Formula evaluation within the spreadsheet (formulas are Rust-derived)
 - Multi-user collaboration or remote sync
-- Excel format import/export (migration is one-time via tabula_cli)
+- Excel format import/export
 - Mobile or web deployment
 
 ## Architecture Overview
@@ -47,7 +46,7 @@ Maintains an in-memory representation of the current document state and handles
 conflict resolution when external changes occur.
 
 ### Layer 3: UI Layer (TypeScript Frontend)
-Renders the Univers spreadsheet with TOML data, handles user interactions,
+Renders the Univer spreadsheet with TOML data, handles user interactions,
 forwards cell changes to the backend, and displays error states. Manages
 sheet navigation for multi-file views.
 
@@ -56,6 +55,44 @@ Frontend and backend communicate via Tauri commands (request-response) and
 events (backend-to-frontend notifications). Commands handle data operations
 while events notify the frontend of file changes. All IPC uses strongly-typed
 JSON serialization with serde.
+
+## Prototype Migration Strategy
+
+The existing prototype in rules_engine/src/tv/ provides the foundation for the
+production implementation. Migration proceeds incrementally while keeping the
+application functional at each step.
+
+### Current Prototype Assets
+The prototype includes a working Tauri V2 setup with React frontend, Univer
+spreadsheet integration, basic TOML loading and saving via toml_edit, file
+watching with debouncing, and a simple bidirectional sync flow. These assets
+are preserved and extended rather than rewritten.
+
+### Migration Phases
+
+Phase 1 involves restructuring the Rust backend from flat files into the module
+hierarchy defined in the file layout appendix. The existing toml_loader.rs
+splits into the toml/ module with separate files for loading, writing, and
+metadata parsing. The file_watcher.rs moves into the sync/ module. New module
+files are created as stubs with the existing logic migrated in.
+
+Phase 2 extracts the frontend components from the monolithic App.tsx into
+separate files: app_root.tsx for state management, spreadsheet_view.tsx for
+Univer wrapper, and new components for error display and status. The
+UniverSpreadsheet.tsx component is preserved with minimal changes.
+
+Phase 3 adds the test crate tv_tests/ with fixtures and initial integration
+tests validating the restructured code matches prototype behavior. Tests
+verify TOML round-trip preservation, file watching, and sync behavior.
+
+Phase 4 implements new features incrementally: metadata parsing, derived
+columns, image rendering, validation rules, and multi-file support. Each
+feature is developed behind the existing working prototype functionality.
+
+### Preserving Working State
+At each migration step, the application remains runnable. Refactoring commits
+are separate from feature commits. The prototype's hardcoded file path is
+replaced with command-line argument parsing early in migration.
 
 ## TOML Structure and Metadata
 
@@ -90,7 +127,7 @@ tables, and any custom formatting the user has applied externally.
 ## Bidirectional Synchronization
 
 ### Write Path (UI to File)
-When the user edits a cell in Univers, the spreadsheet emits a command
+When the user edits a cell in Univer, the spreadsheet emits a command
 execution event. The frontend extracts the changed cell coordinates and value,
 then sends an update command to the backend. The backend locates the specific
 value in the TOML document and updates it in place using toml_edit, then
@@ -144,6 +181,17 @@ extending the function registry.
 
 ## Image Rendering
 
+### Univer Cell Image Support
+Univer supports inline cell images through the @univerjs/sheets-drawing-ui
+package and related drawing packages. Cell image support was added via the
+Facade API, allowing images to be inserted at specific cell positions using
+URLs or base64 data. Documentation is available at:
+https://univer.ai/guides/sheet/features/floating-images
+
+The insertImage method on FWorksheet accepts a URL and row/column position.
+Images can also be inserted via base64 data URIs. Cell images no longer
+support mixed layout with text in the same cell as of recent versions.
+
 ### Image Sources
 Images can come from HTTP/HTTPS URLs or local filesystem paths. The source
 is typically determined by a derived column function that constructs the URL
@@ -157,14 +205,21 @@ images are not cached and are read on demand.
 
 ### Rendering Pipeline
 Images are fetched asynchronously when a cell containing an image reference
-becomes visible. The frontend receives image data as base64-encoded strings
-via events and renders them within Univers cells using the library's image
-support. Images scale to fit cell dimensions while preserving aspect ratio.
+becomes visible. The backend downloads the image, validates it, and sends
+base64-encoded data to the frontend via an event. The frontend calls
+insertImage on the Univer sheet API to render the image in the target cell.
 
 ### Error Handling
 Failed image loads display a placeholder icon in the cell with a tooltip
 describing the error. Network timeouts, 404 responses, and invalid image
 formats are handled gracefully without affecting other cells or operations.
+
+### Performance Considerations
+Base64 encoding increases payload size by approximately 33%, which is
+acceptable for reasonably-sized card images. For very large images, the cache
+stores the original binary and streams to frontend on demand. Browser limits
+on data URLs (512MB on Chromium, 2GB on Safari) are not a concern for typical
+card artwork.
 
 ## UUID Generation
 
@@ -172,7 +227,7 @@ formats are handled gracefully without affecting other cells or operations.
 When a row is created or edited, the backend checks if an "id" column exists
 and if the cell is empty. If both conditions are true, a new UUIDv4 is
 generated and inserted into that cell. This matches existing tabula_cli
-behavior for seamless migration.
+behavior for seamless transition.
 
 ### Detection Logic
 Column detection is case-insensitive and handles variations like "ID", "Id",
@@ -195,7 +250,7 @@ is displayed in a derived preview column.
 ### Styling Application
 The preview rendering supports rich text styling including bold, italic,
 underline, and colored spans. Styling is specified via inline tags in the
-Fluent output. Univers rich text cells display the formatted result with
+Fluent output. Univer rich text cells display the formatted result with
 appropriate visual styling.
 
 ### Parser Integration
@@ -245,7 +300,7 @@ The filter panel allows filtering rows by column values. Filter types include
 text substring matching, exact value matching for enums, boolean checkbox
 matching, and numeric range matching. Multiple filters combine with AND logic.
 
-### Univers Integration
+### Univer Integration
 Sorting and filtering leverage the built-in UniverSheetsSortPlugin and
 UniverSheetsFilterPlugin. The backend provides the data and the frontend
 configures the plugins according to column metadata.
@@ -272,7 +327,7 @@ metadata and evaluated on each render.
 ## Multiple File Support
 
 ### Sheet Organization
-Each TOML file in the target directory becomes a separate sheet in Univers.
+Each TOML file in the target directory becomes a separate sheet in Univer.
 Sheet tabs at the bottom of the window allow navigation between files.
 The active sheet determines which file receives edits and is watched for
 changes.
@@ -440,7 +495,7 @@ with access to the library's public interface.
 File operation tests verify TOML loading, saving, and structure preservation.
 Sync tests verify bidirectional sync behavior including conflict scenarios.
 Derived column tests verify function registration and computation. Validation
-tests verify all validation rule types. UI tests verify Univers integration
+tests verify all validation rule types. UI tests verify Univer integration
 via headless rendering.
 
 ### Test Data
@@ -573,22 +628,22 @@ rules_engine/src/tv_tests/
     └── mock_clock.rs
 ```
 
-## Migration from tabula_cli
+## Transition from tabula_cli
 
-### Data Migration
+### TOML Compatibility
 Existing TOML files exported by tabula_cli are directly compatible with TV.
-No format conversion is required. Metadata sections are added automatically
-on first save with default settings.
+No format conversion is required. The files work immediately with TV, and
+metadata sections are added automatically on first configuration change.
 
 ### Feature Parity
 TV replicates core tabula_cli features: UUID generation, Fluent rules text
 processing, and spreadsheet display. Excel-specific features like macros and
-VBA are not migrated as they become unnecessary.
+VBA are not needed as TV operates directly on TOML.
 
 ### Deprecation Path
 After TV reaches production readiness, tabula_cli commands related to Excel
-become deprecated. The build-toml and build-xls commands are removed after
-migration period. Git hooks are updated to no longer require Excel round-trips.
+become deprecated. Git hooks are updated to no longer require Excel. The
+build-toml and build-xls commands are eventually removed.
 
 ## Dependencies
 
@@ -612,6 +667,7 @@ migration period. Git hooks are updated to no longer require Excel round-trips.
 ### TypeScript Frontend
 - @tauri-apps/api 2.x: Tauri JavaScript bindings
 - @univerjs/core and related packages 0.15.x: Spreadsheet library
+- @univerjs/sheets-drawing-ui: Cell image support
 - React 19.x: UI framework
 - RxJS 7.x: Reactive event handling
 
@@ -633,23 +689,8 @@ low-resolution preview during load.
 
 ### Memory Management
 Large files stream row data rather than loading entirely into memory.
-Image cache uses LRU eviction with configurable size limits. Univers
+Image cache uses LRU eviction with configurable size limits. Univer
 virtualization renders only visible cells.
-
-## Security Considerations
-
-### File Access
-TV accesses only files explicitly provided by the user or discovered in the
-configured tabula directory. No arbitrary file system access beyond these
-paths. Symlinks are followed with care to avoid directory traversal.
-
-### Network Access
-Image fetching validates URLs before connection. Only HTTPS is supported
-for remote images with HTTP rejected. SSL certificate validation is enforced.
-
-### Content Security
-TOML input is validated against expected schema. HTML-like content in Fluent
-output is escaped for display. No script execution in the Univers context.
 
 ## Follow-up Areas for Further Design Work
 
@@ -657,18 +698,18 @@ output is escaped for display. No script execution in the Univers context.
    configuration fields, their types, default values, and validation rules.
    Consider versioning the metadata format for future evolution.
 
-2. Specify the exact Univers plugin configuration and cell renderer
+2. Specify the exact Univer plugin configuration and cell renderer
    customizations needed for image display, rich text preview, checkbox
-   rendering, and dropdown menus. Document any Univers limitations discovered.
+   rendering, and dropdown menus. Document any Univer limitations discovered.
 
 3. Design the derived function API contract including input types, output
    types, error handling, cancellation, and timeout behavior. Define the
    registration mechanism and function discovery for extensibility.
 
 4. Detail the rules text preview rendering pipeline including Fluent template
-   loading, variable resolution, HTML tag parsing, and Univers rich text
+   loading, variable resolution, HTML tag parsing, and Univer rich text
    formatting. Document integration with existing ability parser code.
 
 5. Elaborate on the testing strategy for end-to-end scenarios including
-   headless Univers testing, Tauri window automation, and performance
+   headless Univer testing, Tauri window automation, and performance
    benchmarking. Define coverage targets and test data generation approaches.
