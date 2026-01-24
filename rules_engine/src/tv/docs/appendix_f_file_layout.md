@@ -37,6 +37,7 @@
 - appendix_e_logging_specification.md: Logging format specification
 - appendix_f_file_layout.md: This file layout document
 - appendix_g_rules_text_preview.md: Rules text preview pipeline
+- appendix_h_implementation_plan.md: Granular implementation tasks
 
 ### Tauri Backend (src-tauri/)
 
