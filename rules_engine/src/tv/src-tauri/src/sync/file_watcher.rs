@@ -8,12 +8,12 @@ use serde::Serialize;
 use tauri::{AppHandle, Emitter};
 
 #[derive(Clone, Serialize)]
-struct FileChangedPayload {
-    path: String,
+pub struct FileChangedPayload {
+    pub path: String,
 }
 
-#[tauri::command]
-pub fn start_file_watcher(app_handle: AppHandle, file_path: String) {
+/// Starts a file watcher in a background thread for the given file path.
+pub fn start_watcher(app_handle: AppHandle, file_path: String) {
     thread::spawn(move || {
         watch_file(app_handle, file_path);
     });
