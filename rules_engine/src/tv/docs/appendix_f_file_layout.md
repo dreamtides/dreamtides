@@ -20,6 +20,7 @@
 - status_indicator.tsx: Save/sync status display component
 - cell_renderers.tsx: Custom cell renderers for images, checkboxes, rich text
 - ipc_bridge.ts: Tauri command and event wrappers with TypeScript types
+- univer_config.ts: Univer plugin initialization and configuration helper
 - logger_frontend.ts: Frontend logging utilities with backend aggregation
 
 ### Frontend Styles (src/styles/)
@@ -133,6 +134,9 @@
 - large_table.toml: 1000+ row table for performance testing
 - invalid_syntax.toml: Intentionally malformed for error testing
 - unicode_content.toml: Non-ASCII content for encoding testing
+- images/: Test image files for image cache/fetch testing
+  - test_image.png: Valid PNG for happy path tests
+  - test_image.jpg: Valid JPEG for format tests
 
 ### Test Source (src/)
 - lib.rs: Test crate root with shared fixtures loading
@@ -161,6 +165,24 @@
 - rule_tests.rs: All validation rule type tests
 - dropdown_tests.rs: Enum dropdown behavior tests
 
+### Image Tests (src/image_tests/)
+- image_tests_mod.rs: Module organization
+- cache_tests.rs: Content-addressed cache behavior tests
+- fetch_tests.rs: HTTP fetching and error handling tests
+
+### UUID Tests (src/uuid_tests/)
+- uuid_tests_mod.rs: Module organization
+- generator_tests.rs: UUID generation and ID column detection tests
+
+### Row Operation Tests (src/row_operation_tests/)
+- row_operation_tests_mod.rs: Module organization
+- add_delete_tests.rs: Row insertion and deletion tests
+
+### Rules Preview Tests (src/rules_preview_tests/)
+- rules_preview_tests_mod.rs: Module organization
+- fluent_tests.rs: Fluent template processing tests
+- style_tag_tests.rs: HTML-like style tag parsing tests
+
 ### Integration Tests (src/integration_tests/)
 - integration_tests_mod.rs: Module organization
 - end_to_end_tests.rs: Full workflow integration tests
@@ -171,5 +193,6 @@
 - test_utils_mod.rs: Utility exports
 - mock_filesystem.rs: In-memory filesystem for isolated testing
 - mock_clock.rs: Controllable clock for time-dependent tests
+- mock_http_client.rs: Mock HTTP responses for image fetching tests
 - fixture_loader.rs: Test fixture file loading helpers
 - assertion_helpers.rs: Custom assertion macros for test readability

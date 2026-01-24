@@ -70,6 +70,24 @@ minimal initially; expand as components are added.
 
 Dependencies: Task 4
 
+### Task 4b: Configure Univer Plugins
+Review and configure Univer plugin initialization per Appendix D. Verify all
+required plugins are loaded in correct order: UniverRenderEnginePlugin through
+UniverSheetsConditionalFormattingUIPlugin. Create src/univer_config.ts with
+plugin configuration and initialization helper. Verify spreadsheet renders
+correctly with all plugins active. Document which plugins are deferred to
+later phases (drawing plugins for images in Phase 9).
+
+Dependencies: Task 4
+
+### Task 4c: Create Univer Style Overrides
+Create src/styles/spreadsheet_overrides.css for Univer-specific styling
+customizations. Override default Univer colors to match application theme.
+Style header row appearance, cell borders, and selection highlights.
+Ensure styles don't conflict with Univer's internal CSS.
+
+Dependencies: Task 4a
+
 ### Task 5: Create Error Display Component
 Create src/error_banner.tsx for displaying error states from the backend. Accept
 error message as prop. Style with appropriate warning colors. Position at top
@@ -79,8 +97,14 @@ Dependencies: Task 4
 
 ### Task 6: Create IPC Bridge Module
 Create src/ipc_bridge.ts with TypeScript wrappers for Tauri commands. Define
-typed interfaces for TomlTableData and error responses. Create event subscription
-helpers with proper cleanup. Replace raw invoke calls.
+typed interfaces matching the sync protocol (Appendix C):
+- TomlTableData: headers array, rows array, metadata object
+- CellUpdate: file path, row index, column key, new value
+- SyncState: Idle, Saving, Loading, Error
+- Event types: toml-file-changed, derived-value-computed, save-completed, error-occurred
+- Command types: load_file, save_cell, save_batch, start_watcher, stop_watcher
+Create event subscription helpers with proper cleanup using disposable pattern.
+Replace raw invoke calls throughout frontend.
 
 Dependencies: Task 4
 
@@ -91,6 +115,8 @@ Implement TvTestHarness with temp file creation, load_table, save_cell, and
 read_file_content methods. Define the FileSystem and Clock traits in the main
 TV library for dependency injection. Implement RealFileSystem for production use.
 Create initial test fixtures: simple_table.toml, with_comments.toml, sparse_data.toml.
+Add just commands to parent justfile: `just tv-test` to run tests, `just tv-dev`
+to start development server, `just tv-build` to build release binary.
 
 Dependencies: Task 1a
 
@@ -134,6 +160,24 @@ Dependencies: Task 8
 Add a saving flag to prevent file watcher reload during active saves. After
 save completes, check if file changed externally during save window. Implement
 file-wins conflict resolution. Emit sync state events to frontend.
+
+Dependencies: Task 9
+
+### Task 10a: Implement Sync State Machine
+Create sync/state_machine.rs implementing the four-state sync model from
+Appendix C: Idle, Saving, Loading, Error. Use atomic flags for thread-safe
+state transitions. Implement guards preventing invalid transitions (e.g.,
+cannot start save while loading). Emit state change events to frontend for
+status indicator updates.
+
+Dependencies: Task 10
+
+### Task 10b: Implement Value Converter
+Create toml/value_converter.rs for bidirectional JSON-TOML value conversion.
+Convert JavaScript values (string, number, boolean, null) to appropriate TOML
+types. Handle edge cases: NaN, Infinity become strings; arrays become TOML
+arrays; nested objects become inline tables. Preserve type information through
+round-trip conversion.
 
 Dependencies: Task 9
 
@@ -352,6 +396,16 @@ complete. Handle partial batch failure gracefully.
 
 Dependencies: Task 9
 
+### Task 23: Implement Row Operations Tests
+Write integration tests for row operations using TvTestHarness:
+- test_add_row_at_end: Add row, verify TOML array has new entry
+- test_add_row_at_position: Insert row at index, verify ordering preserved
+- test_delete_row: Remove row, verify TOML array updated
+- test_delete_last_row: Delete when single row, verify empty array handling
+- test_batch_paste: Paste multiple cells, verify single atomic write
+
+Dependencies: Task 22c
+
 ## Phase 6: UUID Generation
 
 ### Task 24: Implement UUID Generator
@@ -368,6 +422,15 @@ UUID into TOML document. Include generated UUID in save response so frontend
 can update cell display without reload.
 
 Dependencies: Task 24
+
+### Task 25a: Implement UUID Tests
+Write integration tests for UUID generation using TvTestHarness:
+- test_uuid_generated_for_empty_id: Create row with empty id, verify UUID populated
+- test_uuid_case_insensitive: Test "ID", "Id", "id" column name variations
+- test_uuid_not_overwritten: Edit row with existing UUID, verify UUID unchanged
+- test_uuid_in_save_response: Verify generated UUID returned to frontend
+
+Dependencies: Task 25
 
 ## Phase 7: Metadata Support
 
@@ -409,6 +472,16 @@ Allow format customization per column via metadata.
 
 Dependencies: Task 28
 
+### Task 29c: Implement Metadata Tests
+Write integration tests for metadata parsing and serialization:
+- test_parse_metadata_columns: Load with_metadata.toml, verify column config parsed
+- test_parse_metadata_validation: Verify validation rules extracted from metadata
+- test_metadata_defaults: Load file without metadata, verify defaults applied
+- test_metadata_round_trip: Load, modify column width, save, reload, verify preserved
+- test_metadata_forward_compat: Unknown metadata fields preserved on save
+
+Dependencies: Task 29b
+
 ## Phase 8: Derived Columns
 
 **Testing approach:** Create test implementations of DerivedFunction trait for
@@ -438,11 +511,21 @@ boundary. Prioritize visible rows for computation.
 Dependencies: Task 31
 
 ### Task 33: Add Generation Tracking
-Track row generation counters. Increment counter on any row edit. Tag computation
-requests with current generation. Discard computation results arriving for
-outdated generations. Ensure UI eventually shows correct value.
+Track row generation counters in derived/generation_tracker.rs. Increment
+counter on any row edit. Tag computation requests with current generation.
+Discard computation results arriving for outdated generations. Ensure UI
+eventually shows correct value.
 
 Dependencies: Task 32
+
+### Task 33a: Implement Result Cache
+Create derived/result_cache.rs for caching computed derived values. Cache key
+combines row index, generation counter, and function name. Implement LRU
+eviction when cache exceeds memory threshold. Invalidate entries when row
+generation changes. Cache persists only for session duration (not across
+restarts).
+
+Dependencies: Task 33
 
 ### Task 34: Add Frontend Derived Column Support
 Subscribe to derived-value-computed events. Update cell display when results
@@ -450,6 +533,17 @@ arrive. Show blank/loading indicator while pending. Show error styling with
 tooltip on failure. Handle all DerivedResult variants appropriately.
 
 Dependencies: Task 33
+
+### Task 34a: Implement Derived Column Tests
+Write integration tests for derived columns using test function implementations:
+- test_registry_register_lookup: Register function, verify lookup by name
+- test_registry_duplicate_panics: Verify duplicate registration fails at startup
+- test_executor_computes_value: Register test function, trigger compute, verify result
+- test_executor_catches_panic: Function that panics, verify error result returned
+- test_generation_discards_stale: Edit row twice rapidly, verify only latest result used
+Use MockClock to control timing for generation tests.
+
+Dependencies: Task 34
 
 ## Phase 9: Image Support
 
@@ -477,9 +571,12 @@ Dependencies: Task 35
 
 ### Task 36a: Configure Tauri Asset Protocol
 Configure tauri.conf.json to enable asset protocol for loading cached images.
-Add appropriate CSP rules for img-src. Set asset protocol scope to include
-app cache directory. This allows the frontend to load cached images directly
-via asset:// URLs without base64 encoding overhead.
+Add appropriate CSP rules for img-src allowing 'self', asset:, and
+http://asset.localhost. Set asset protocol scope to include $APPDATA and
+$CACHE directories. Configure capabilities/default.json with required
+permissions for file system access, shell commands, and IPC. This allows
+the frontend to load cached images directly via asset:// URLs without
+base64 encoding overhead.
 
 Dependencies: Task 13
 
@@ -502,6 +599,19 @@ loads (network timeout, 404, invalid format). Show error details in tooltip
 on hover. Ensure image errors don't affect other cells.
 
 Dependencies: Task 37
+
+### Task 38a: Implement Image Tests
+Write integration tests for image caching and fetching using MockHttpClient:
+- test_cache_miss_fetches: Request uncached URL, verify HTTP fetch occurs
+- test_cache_hit_no_fetch: Request cached URL twice, verify single HTTP fetch
+- test_cache_content_addressed: Same image from different URLs shares cache entry
+- test_fetch_timeout_error: MockHttpClient returns timeout, verify error result
+- test_fetch_404_error: MockHttpClient returns 404, verify error result
+- test_invalid_image_rejected: MockHttpClient returns non-image, verify validation fails
+- test_lru_eviction: Fill cache beyond limit, verify oldest entries evicted
+Include test images (PNG, JPEG) in fixtures/images/ directory.
+
+Dependencies: Task 38
 
 ## Phase 10: Validation
 
@@ -542,6 +652,18 @@ reflects current TOML boolean value.
 
 Dependencies: Task 39
 
+### Task 43a: Implement Validation Tests
+Write integration tests for validation rules:
+- test_enum_validation_pass: Value in allowed list, verify save succeeds
+- test_enum_validation_fail: Value not in list, verify TvError::ValidationFailed
+- test_range_validation: Numeric value within/outside bounds
+- test_pattern_validation: Text matching/not matching regex
+- test_required_validation: Empty value in required field rejected
+- test_type_validation_numeric: Non-numeric string in numeric column rejected
+- test_multiple_rules_combine: Column with multiple rules, all must pass
+
+Dependencies: Task 43
+
 ## Phase 11: Rules Text Preview
 
 ### Task 44: Implement Fluent Integration
@@ -579,6 +701,19 @@ italic, underline, and colored spans per the styled run list. Display syntax
 errors from ability parser with red underline or background styling.
 
 Dependencies: Task 46
+
+### Task 48a: Implement Rules Preview Tests
+Write integration tests for rules text preview:
+- test_variable_substitution: Simple {$var} replaced with value
+- test_fluent_term_expansion: Term reference like {-keyword(k: "Foresee")} expanded
+- test_style_tag_bold: <b>text</b> produces bold styled run
+- test_style_tag_color: <color=#FF0000>text</color> produces colored run
+- test_nested_style_tags: Nested bold/color tags produce combined styling
+- test_missing_variable_error: Missing variable shows error in output
+- test_invalid_fluent_syntax_error: Malformed expression shows error
+Include test cases from Appendix G example flow.
+
+Dependencies: Task 48
 
 ## Phase 12: Sorting and Filtering
 
@@ -685,14 +820,18 @@ rules_engine/tests/tv_tests/
 │   ├── with_metadata.toml
 │   ├── large_table.toml
 │   ├── invalid_syntax.toml
-│   └── unicode_content.toml
+│   ├── unicode_content.toml
+│   └── images/
+│       ├── test_image.png
+│       └── test_image.jpg
 ├── src/
 │   ├── lib.rs
 │   ├── toml_tests/
 │   │   ├── toml_tests_mod.rs
 │   │   ├── load_tests.rs
 │   │   ├── save_tests.rs
-│   │   └── preservation_tests.rs
+│   │   ├── preservation_tests.rs
+│   │   └── metadata_tests.rs
 │   ├── sync_tests/
 │   │   ├── sync_tests_mod.rs
 │   │   ├── watcher_tests.rs
@@ -704,13 +843,30 @@ rules_engine/tests/tv_tests/
 │   ├── validation_tests/
 │   │   ├── validation_tests_mod.rs
 │   │   └── rule_tests.rs
+│   ├── image_tests/
+│   │   ├── image_tests_mod.rs
+│   │   ├── cache_tests.rs
+│   │   └── fetch_tests.rs
+│   ├── uuid_tests/
+│   │   ├── uuid_tests_mod.rs
+│   │   └── generator_tests.rs
+│   ├── row_operation_tests/
+│   │   ├── row_operation_tests_mod.rs
+│   │   └── add_delete_tests.rs
+│   ├── rules_preview_tests/
+│   │   ├── rules_preview_tests_mod.rs
+│   │   ├── fluent_tests.rs
+│   │   └── style_tag_tests.rs
 │   └── integration_tests/
 │       ├── integration_tests_mod.rs
 │       └── end_to_end_tests.rs
 └── test_utils/
     ├── test_utils_mod.rs
     ├── mock_filesystem.rs
-    └── mock_clock.rs
+    ├── mock_clock.rs
+    ├── mock_http_client.rs
+    ├── fixture_loader.rs
+    └── assertion_helpers.rs
 ```
 
 ### Test Utilities Library
@@ -902,25 +1058,31 @@ Tests run via `just tv-test` which:
 - Task 1a (restructure modules) depends on Task 1
 - Task 3 depends on Task 1a
 - Task 4a (CSS styles) depends on Task 4
-- Task 7 (test crate setup) depends on Task 1a
+- Task 4b (Univer plugins) depends on Task 4
+- Task 4c (Univer style overrides) depends on Task 4a
+- Task 7 (test crate setup + just commands) depends on Task 1a
 - Task 7a (load tests) depends on Task 7
-- Task 7b (manual testing) depends on Tasks 1-6, 1a, 4a, 7a
+- Task 7b (manual testing) depends on Tasks 1-6, 1a, 4a-4c, 7a
 
 **Phase 2 - MVP 2 (Editable) - After MVP 1:**
 - Task 8 depends on Task 7b
 - Tasks 9, 10 sequential
+- Task 10a (state machine) depends on Task 10
+- Task 10b (value converter) depends on Task 9
 - Task 11 depends on Task 6
-- Task 12 depends on Tasks 10, 11
+- Task 12 depends on Tasks 10, 10a, 11
 - Task 13 (save tests) depends on Task 12
 - Task 13a (property tests) depends on Task 13
 - Task 13b (manual testing) depends on Tasks 13, 13a
 
 **Phase 3 - Error Robustness - After MVP 2:**
-- Tasks 14-17g can start after Task 13b
-- Task 17d depends on Task 32 (derived column executor)
-- Tasks 17e, 17f depend on Task 35 (image cache)
+- Tasks 14-17c, 17g can start after Task 13b
+- Task 17d depends on Task 32 (derived column executor) - implement after Phase 8
+- Tasks 17e, 17f depend on Task 35 (image cache) - implement after Phase 9
 - Task 17g (backend thread panic) depends on Task 15
 - Each error type should include a test using MockFileSystem
+- Note: Tasks 17d, 17e, 17f have cross-phase dependencies; implement them
+  after their respective phases complete rather than blocking Phase 3
 
 **Phase 4 - Multi-File Support - After MVP 2:**
 - Tasks 18-21 can start after Task 13b
@@ -929,24 +1091,27 @@ Tests run via `just tv-test` which:
 **Phase 5 - Row Operations - After MVP 2:**
 - Tasks 22-22c can start after Task 13b
 - Task 22c depends on Task 9
+- Task 23 (row operations tests) depends on Task 22c
 
 **Phase 6 - UUID Generation - After MVP 2:**
 - Tasks 24-25 can start after Task 13b
+- Task 25a (UUID tests) depends on Task 25
 
 **Phase 7 - Metadata Support - After MVP 2:**
 - Tasks 26-29b can start after Task 13b
+- Task 29c (metadata tests) depends on Task 29b
 
 **Phase 8-14 - Feature Phases - After Metadata:**
-- Derived Columns (Phase 8): Tasks 30-34
-- Image Support (Phase 9): Tasks 35-38, depends on Task 31
-- Validation (Phase 10): Tasks 39-43, depends on Task 27
-- Rules Preview (Phase 11): Tasks 44-48, depends on Task 31
+- Derived Columns (Phase 8): Tasks 30-34, 33a, 34a (tests)
+- Image Support (Phase 9): Tasks 35-38, 38a (tests), depends on Task 31
+- Validation (Phase 10): Tasks 39-43, 43a (tests), depends on Task 27
+- Rules Preview (Phase 11): Tasks 44-48, 48a (tests), depends on Task 31
 - Sorting/Filtering (Phase 12): Tasks 49-52, depends on Task 28
 - Styling (Phase 13): Tasks 53-55, depends on Task 28
 - Logging (Phase 14): Tasks 56-58, can start after Task 13b
 
 **Critical Path to Working MVP:**
-Task 1 → Task 1a → Task 3 → Task 7 → Task 7a → Task 7b → Task 8 → Task 9 → Task 10 → Task 12 → Task 13 → Task 13b
+Task 1 → Task 1a → Task 3 → Task 7 → Task 7a → Task 7b → Task 8 → Task 9 → Task 10 → Task 10a → Task 12 → Task 13 → Task 13b
 
 **Parallel Work Streams After MVP 2:**
 1. Error Robustness (Phase 3)
