@@ -32,12 +32,19 @@ pub fn run(paths: cli::AppPaths, _jsonl: bool) {
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
         .manage(paths)
+        .manage(sync::file_watcher::FileWatcherState::new())
         .invoke_handler(tauri::generate_handler![
             commands::load_command::load_toml_table,
             commands::save_command::save_toml_table,
             commands::watch_command::start_file_watcher,
+            commands::watch_command::stop_file_watcher,
             get_app_paths,
         ])
+        .on_window_event(|window, event| {
+            if let tauri::WindowEvent::CloseRequested { .. } = event {
+                sync::file_watcher::stop_all_watchers(window.app_handle());
+            }
+        })
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

@@ -22,6 +22,18 @@ pub enum TvError {
 
     #[error("Failed to write file {path}: {message}")]
     WriteError { path: String, message: String },
+
+    #[error("Failed to create file watcher: {message}")]
+    WatcherCreationFailed { message: String },
+
+    #[error("Failed to watch path {path}: {message}")]
+    WatchPathFailed { path: String, message: String },
+
+    #[error("File watcher error for {path}: {message}")]
+    WatcherError { path: String, message: String },
+
+    #[error("Failed to emit event: {message}")]
+    EventEmitFailed { message: String },
 }
 
 impl Serialize for TvError {
