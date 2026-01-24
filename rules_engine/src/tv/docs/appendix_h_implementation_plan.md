@@ -60,13 +60,32 @@ helpers with proper cleanup. Replace raw invoke calls.
 
 Dependencies: Task 4
 
-### Task 7: MVP 1 Integration Test
+### Task 7: Set Up Test Crate
+Create the tv_tests crate structure as defined in the Testing Strategy section.
+Implement TvTestHarness with temp file creation, load_table, save_cell, and
+read_file_content methods. Define the FileSystem and Clock traits in the main
+TV library for dependency injection. Implement RealFileSystem for production use.
+Create initial test fixtures: simple_table.toml, with_comments.toml, sparse_data.toml.
+
+Dependencies: Task 1
+
+### Task 7a: Implement Load Tests
+Write integration tests for the load path using TvTestHarness:
+- test_load_simple_table: Load basic array-of-tables, verify headers and row data
+- test_load_sparse_data: Load file with varying columns per row
+- test_load_file_not_found: Verify TvError::FileNotFound returned
+- test_load_parse_error: Verify TvError::TomlParseError with invalid_syntax.toml
+- test_load_unicode: Load unicode_content.toml, verify non-ASCII preserved
+
+Dependencies: Task 7
+
+### Task 7b: MVP 1 Manual Testing
 Create a manual testing checklist and verify: launch with no args loads default
 directory, launch with file path loads that file, launch with invalid path shows
 error, external file modification triggers reload, TOML parse error shows error
 banner.
 
-Dependencies: Tasks 1-6
+Dependencies: Tasks 1-6, 7a
 
 ## Phase 2: MVP Editable Viewer
 
@@ -107,17 +126,42 @@ errors without losing pending changes.
 
 Dependencies: Tasks 10, 11
 
-### Task 13: MVP 2 Integration Test
+### Task 13: Implement Save Tests
+Write integration tests for the save path using TvTestHarness:
+- test_save_cell_updates_value: Edit cell, verify TOML file contains new value
+- test_save_preserves_comments: Edit cell in with_comments.toml, verify comments remain
+- test_save_preserves_whitespace: Verify blank lines and formatting preserved
+- test_save_preserves_key_order: Verify keys remain in original order after save
+
+Add a MockFileSystem implementation for error injection tests:
+- test_save_permission_denied: MockFileSystem returns permission error, verify TvError
+- test_save_disk_full: MockFileSystem returns disk full error, verify TvError
+
+Dependencies: Task 12
+
+### Task 13a: Implement Preservation Property Tests
+Add proptest or quickcheck dependency. Write property-based tests:
+- prop_roundtrip_preserves_data: Generate random TOML, load, save, reload, verify equal
+- prop_comments_survive_edits: Generate TOML with comments, edit cells, verify comments
+- prop_whitespace_stable: Multiple save cycles don't accumulate whitespace changes
+
+Dependencies: Task 13
+
+### Task 13b: MVP 2 Manual Testing
 Create a manual testing checklist and verify: cell edit triggers save, TOML
 file reflects change, comments in TOML preserved after edit, concurrent external
 edit handled gracefully, save error displays without data loss.
 
-Dependencies: Task 12
+Dependencies: Tasks 13, 13a
 
 ## Phase 3: Error Robustness
 
 These tasks ensure the application handles error scenarios gracefully. The design
 document specifies 18 error scenarios; these tasks implement handling for all of them.
+
+**Testing approach:** Error scenarios use MockFileSystem for injection. Each error
+type should have at least one test verifying the error is detected, the correct
+TvError variant is returned, and any recovery behavior works as specified.
 
 ### Task 14: Create Error Types Module
 Create error/error_types.rs with TvError enum covering all failure modes:
@@ -203,6 +247,10 @@ Dependencies: Task 33
 
 ## Phase 4: Multi-File Support
 
+**Testing approach:** Use real temp directories with multiple TOML files to test
+discovery and filtering. Test watcher behavior by creating/deleting files in temp
+directories and verifying events are emitted correctly.
+
 ### Task 18: Implement File Discovery
 Create function to scan directory for TOML files. Filter to array-of-tables
 format by attempting parse. Sort alphabetically. Return list of valid file
@@ -228,6 +276,14 @@ Extend file watcher to monitor directory for new/removed files. Emit events
 when TOML files appear or disappear. Update sheet tabs accordingly.
 
 Dependencies: Task 20
+
+### Task 21a: Implement Sync Tests
+Write integration tests for file watching and sync behavior:
+- test_watcher_detects_external_change: Modify file externally, verify reload event
+- test_save_blocks_reload: Start save, modify file, complete save, verify no double-reload
+- test_conflict_resolution: External and internal edits concurrent, verify file-wins
+
+Dependencies: Task 21
 
 ## Phase 5: Row Operations
 
@@ -320,6 +376,12 @@ Dependencies: Task 28
 
 ## Phase 8: Derived Columns
 
+**Testing approach:** Create test implementations of DerivedFunction trait for
+testing the executor. Use deterministic test functions (e.g., one that concatenates
+input values) rather than testing production functions directly. Test generation
+tracking with a MockClock to control timing. Tests verify compute results, error
+handling, and stale result rejection.
+
 ### Task 30: Define Derived Function Trait
 Create DerivedFunction trait with name(), input_keys(), compute() methods.
 Define compute() as async for long-running operations. Create DerivedResult
@@ -355,6 +417,11 @@ tooltip on failure. Handle all DerivedResult variants appropriately.
 Dependencies: Task 33
 
 ## Phase 9: Image Support
+
+**Testing approach:** Define an HttpClient trait for network requests. MockHttpClient
+returns predetermined responses or errors for testing cache behavior, network
+timeouts, and invalid image handling. Use real temp files for cache storage tests
+to verify file-based operations. Include test images in fixtures/ directory.
 
 ### Task 35: Implement Image Cache
 Create content-addressed image cache in application data directory. Store by
@@ -620,14 +687,58 @@ Example:
 ```rust
 pub struct TvTestHarness {
     temp_dir: TempDir,
+    fs: Box<dyn FileSystem>,
 }
 
 impl TvTestHarness {
+    /// Create harness with real file system (most tests)
     pub fn new() -> Self { ... }
+
+    /// Create harness with mock file system (error injection tests)
+    pub fn with_mock_fs(mock: MockFileSystem) -> Self { ... }
+
     pub fn create_toml_file(&self, name: &str, content: &str) -> PathBuf { ... }
     pub fn load_table(&self, path: &Path) -> Result<TomlTableData, TvError> { ... }
     pub fn save_cell(&self, path: &Path, row: usize, col: &str, value: Value) -> Result<(), TvError> { ... }
     pub fn read_file_content(&self, path: &Path) -> String { ... }
+}
+```
+
+### Mock Implementations
+
+**MockFileSystem** - For error injection testing:
+```rust
+pub struct MockFileSystem {
+    read_result: Option<io::Result<String>>,
+    write_result: Option<io::Result<()>>,
+}
+
+impl MockFileSystem {
+    pub fn failing_read(error: io::Error) -> Self { ... }
+    pub fn failing_write(error: io::Error) -> Self { ... }
+}
+```
+
+**MockHttpClient** - For image fetching tests:
+```rust
+pub struct MockHttpClient {
+    responses: HashMap<String, MockResponse>,
+}
+
+impl MockHttpClient {
+    pub fn with_response(url: &str, status: u16, body: Vec<u8>) -> Self { ... }
+    pub fn with_timeout(url: &str) -> Self { ... }
+}
+```
+
+**MockClock** - For deterministic timing:
+```rust
+pub struct MockClock {
+    current_time: AtomicU64,
+}
+
+impl MockClock {
+    pub fn advance(&self, duration: Duration) { ... }
 }
 ```
 
@@ -751,32 +862,38 @@ Tests run via `just tv-test` which:
 - Tasks 1, 2 (backend, parallel)
 - Tasks 4, 5, 6 (frontend, parallel)
 - Task 3 depends on Task 1
-- Task 7 depends on all above
+- Task 7 (test crate setup) depends on Task 1
+- Task 7a (load tests) depends on Task 7
+- Task 7b (manual testing) depends on Tasks 1-6, 7a
 
 **Phase 2 - MVP 2 (Editable) - After MVP 1:**
-- Task 8 depends on Task 7
+- Task 8 depends on Task 7b
 - Tasks 9, 10 sequential
 - Task 11 depends on Task 6
 - Task 12 depends on Tasks 10, 11
-- Task 13 depends on Task 12
+- Task 13 (save tests) depends on Task 12
+- Task 13a (property tests) depends on Task 13
+- Task 13b (manual testing) depends on Tasks 13, 13a
 
 **Phase 3 - Error Robustness - After MVP 2:**
-- Tasks 14-17f can start after Task 13
+- Tasks 14-17f can start after Task 13b
 - Task 17d depends on Task 32 (derived column executor)
 - Tasks 17e, 17f depend on Task 35 (image cache)
+- Each error type should include a test using MockFileSystem
 
 **Phase 4 - Multi-File Support - After MVP 2:**
-- Tasks 18-21 can start after Task 13
+- Tasks 18-21 can start after Task 13b
+- Task 21a (sync tests) depends on Task 21
 
 **Phase 5 - Row Operations - After MVP 2:**
-- Tasks 22-22c can start after Task 13
+- Tasks 22-22c can start after Task 13b
 - Task 22c depends on Task 9
 
 **Phase 6 - UUID Generation - After MVP 2:**
-- Tasks 24-25 can start after Task 13
+- Tasks 24-25 can start after Task 13b
 
 **Phase 7 - Metadata Support - After MVP 2:**
-- Tasks 26-29b can start after Task 13
+- Tasks 26-29b can start after Task 13b
 
 **Phase 8-14 - Feature Phases - After Metadata:**
 - Derived Columns (Phase 8): Tasks 30-34
@@ -785,15 +902,21 @@ Tests run via `just tv-test` which:
 - Rules Preview (Phase 11): Tasks 44-48, depends on Task 31
 - Sorting/Filtering (Phase 12): Tasks 49-52, depends on Task 28
 - Styling (Phase 13): Tasks 53-55, depends on Task 28
-- Logging (Phase 14): Tasks 56-58, can start after Task 13
+- Logging (Phase 14): Tasks 56-58, can start after Task 13b
 
 **Critical Path to Working MVP:**
-Task 1 → Task 3 → Task 7 → Task 8 → Task 9 → Task 10 → Task 12 → Task 13
+Task 1 → Task 3 → Task 7 → Task 7a → Task 7b → Task 8 → Task 9 → Task 10 → Task 12 → Task 13 → Task 13b
 
 **Parallel Work Streams After MVP 2:**
 1. Error Robustness (Phase 3)
-2. Multi-File Support (Phase 4)
+2. Multi-File Support (Phase 4) + Sync Tests (Task 21a)
 3. Row Operations (Phase 5)
 4. UUID Generation (Phase 6)
 5. Metadata Support (Phase 7) - blocks many later phases
 6. Logging (Phase 14)
+
+**Testing Principles (see Testing Strategy section):**
+- All tests use TvTestHarness calling public library APIs
+- Real temp files for most tests; MockFileSystem for error injection
+- MockHttpClient for network operations; MockClock for timing
+- Property tests verify round-trip preservation

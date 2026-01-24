@@ -9,6 +9,11 @@ source of truth for game data. TV provides bidirectional synchronization between
 the spreadsheet UI and TOML files on disk, with emphasis on robustness, error
 recovery, and format preservation.
 
+**Example TOML file:** See [dreamwell.toml](../../../tabula/dreamwell.toml) for
+a representative example of the array-of-tables format TV displays. Each
+`[[dreamwell]]` entry becomes a spreadsheet row, with keys like `name`, `id`,
+`energy-produced`, and `rules-text` becoming columns.
+
 ## Goals and Non-Goals
 
 ### Goals
