@@ -1,0 +1,9 @@
+[[cards]]
+id = "abc"
+name = "Card One"
+# missing cost
+
+[[cards]]
+id = "def"
+cost = 5
+# missing name

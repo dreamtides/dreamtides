@@ -1,0 +1,13 @@
+[package]
+name = "tv_tests"
+version = "0.1.0"
+edition = "2021"
+
+[lints]
+workspace = true
+
+[dependencies]
+tv = { path = "../../src/tv/src-tauri" }
+
+tempfile = { workspace = true }
+toml = { workspace = true }

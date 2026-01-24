@@ -1,10 +1,12 @@
+use tauri::Manager;
+
 pub mod cli;
 #[path = "commands/commands_mod.rs"]
 mod commands;
 #[path = "derived/derived_mod.rs"]
 mod derived;
 #[path = "error/error_mod.rs"]
-mod error;
+pub mod error;
 #[path = "images/images_mod.rs"]
 mod images;
 #[path = "logging/logging_mod.rs"]
@@ -12,7 +14,9 @@ mod logging;
 #[path = "sync/sync_mod.rs"]
 mod sync;
 #[path = "toml/toml_mod.rs"]
-mod toml;
+pub mod toml;
+#[path = "traits/traits_mod.rs"]
+pub mod traits;
 #[path = "uuid/uuid_mod.rs"]
 mod uuid;
 #[path = "validation/validation_mod.rs"]

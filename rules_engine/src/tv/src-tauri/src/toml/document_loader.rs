@@ -1,12 +1,12 @@
 use std::collections::BTreeSet;
-use std::fs;
 use std::io::ErrorKind;
-use std::path::PathBuf;
+use std::path::Path;
 use std::time::Instant;
 
 use serde::{Deserialize, Serialize};
 
 use crate::error::error_types::TvError;
+use crate::traits::{FileSystem, RealFileSystem};
 
 #[derive(Serialize, Deserialize)]
 pub struct TomlTableData {
@@ -16,10 +16,18 @@ pub struct TomlTableData {
 
 /// Loads a TOML file and extracts the specified table as spreadsheet data.
 pub fn load_toml_document(file_path: &str, table_name: &str) -> Result<TomlTableData, TvError> {
-    let start = Instant::now();
-    let path = PathBuf::from(file_path);
+    load_toml_document_with_fs(&RealFileSystem, file_path, table_name)
+}
 
-    let content = fs::read_to_string(&path).map_err(|e| match e.kind() {
+/// Loads a TOML file using the provided filesystem implementation.
+pub fn load_toml_document_with_fs(
+    fs: &dyn FileSystem,
+    file_path: &str,
+    table_name: &str,
+) -> Result<TomlTableData, TvError> {
+    let start = Instant::now();
+
+    let content = fs.read_to_string(Path::new(file_path)).map_err(|e| match e.kind() {
         ErrorKind::NotFound => {
             tracing::error!(
                 component = "tv.toml",

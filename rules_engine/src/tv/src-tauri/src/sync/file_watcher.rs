@@ -221,6 +221,7 @@ fn run_watcher(
             let event_type = match event.kind {
                 DebouncedEventKind::Any => "modify",
                 DebouncedEventKind::AnyContinuous => "modify",
+                _ => "modify",
             };
 
             tracing::debug!(

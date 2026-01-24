@@ -106,7 +106,7 @@ fn scan_directory_for_toml(dir: &PathBuf) -> Result<Vec<PathBuf>, String> {
         .filter_map(|entry| entry.ok())
         .map(|entry| entry.path())
         .filter(|path| {
-            path.is_file() && path.extension().map_or(false, |ext| ext == "toml")
+            path.is_file() && path.extension().is_some_and(|ext| ext == "toml")
         })
         .collect();
     files.sort();

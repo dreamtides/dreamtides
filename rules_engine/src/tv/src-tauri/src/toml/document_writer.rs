@@ -1,9 +1,9 @@
-use std::fs;
 use std::io::ErrorKind;
-use std::path::PathBuf;
+use std::path::Path;
 
 use crate::error::error_types::TvError;
 use crate::toml::document_loader::TomlTableData;
+use crate::traits::{FileSystem, RealFileSystem};
 
 /// Saves spreadsheet data back to a TOML file, preserving formatting.
 pub fn save_toml_document(
@@ -11,9 +11,17 @@ pub fn save_toml_document(
     table_name: &str,
     data: &TomlTableData,
 ) -> Result<(), TvError> {
-    let path = PathBuf::from(file_path);
+    save_toml_document_with_fs(&RealFileSystem, file_path, table_name, data)
+}
 
-    let content = fs::read_to_string(&path).map_err(|e| match e.kind() {
+/// Saves spreadsheet data back to a TOML file using the provided filesystem.
+pub fn save_toml_document_with_fs(
+    fs: &dyn FileSystem,
+    file_path: &str,
+    table_name: &str,
+    data: &TomlTableData,
+) -> Result<(), TvError> {
+    let content = fs.read_to_string(Path::new(file_path)).map_err(|e| match e.kind() {
         ErrorKind::NotFound => {
             tracing::error!(
                 component = "tv.toml",
@@ -83,7 +91,7 @@ pub fn save_toml_document(
         }
     }
 
-    fs::write(&path, doc.to_string()).map_err(|e| {
+    fs.write(Path::new(file_path), &doc.to_string()).map_err(|e| {
         tracing::error!(
             component = "tv.toml",
             file_path = %file_path,

@@ -566,3 +566,9 @@ tv-clippy:
         echo "$output"
         exit 1
     fi
+
+tv-test *args='':
+    cargo test --manifest-path rules_engine/Cargo.toml -p tv_tests "$@"
+
+tv-build:
+    cd rules_engine/src/tv && pnpm tauri build
