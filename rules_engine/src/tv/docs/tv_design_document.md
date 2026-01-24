@@ -687,7 +687,6 @@ build-toml and build-xls commands are eventually removed.
 - tracing: Structured logging
 - reqwest: HTTP client for image fetching
 - image: Image decoding and validation
-- base64: Image encoding for frontend transport
 
 ### TypeScript Frontend
 - @tauri-apps/api 2.x: Tauri JavaScript bindings

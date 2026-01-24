@@ -103,7 +103,6 @@
 - images_mod.rs: Module declarations and image types
 - image_cache.rs: Content-addressed image cache management
 - image_fetcher.rs: HTTP image download with reqwest
-- image_encoder.rs: Base64 encoding for frontend transport
 - cache_cleanup.rs: LRU eviction and startup integrity check
 
 #### UUID Module (src/uuid/)
