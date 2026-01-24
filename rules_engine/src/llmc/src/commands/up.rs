@@ -625,7 +625,40 @@ fn start_worker(name: &str, config: &Config, state: &mut State, verbose: bool) -
                 ))
             );
         }
+    } else if !worker_mut.current_prompt.is_empty() {
+        // Worker had an active task when daemon shut down - uncommitted changes are
+        // expected. Set to Working state so they can continue where they left off.
+        // This happens when the daemon is gracefully shut down (Ctrl-C) while
+        // workers are actively implementing tasks. We set the status directly rather
+        // than using apply_transition because the worker already has all its state
+        // preserved (current_prompt, prompt_cmd, etc.) from before the shutdown.
+        tracing::info!(
+            worker = %name,
+            "Worker has uncommitted changes but had active task, setting status to Working"
+        );
+        worker_mut.status = WorkerStatus::Working;
+        worker_mut.last_activity_unix = unix_timestamp_now();
+        worker_mut.error_reason = None;
+        println!(
+            "  {}",
+            color_theme::dim(format!(
+                "Worker '{}' has uncommitted changes from previous task, resuming work",
+                name
+            ))
+        );
+        if verbose {
+            println!(
+                "    {}",
+                color_theme::muted(format!(
+                    "[verbose] Worker '{}' had active task '{}', marked as Working",
+                    name,
+                    worker_mut.current_prompt.chars().take(50).collect::<String>()
+                ))
+            );
+        }
     } else {
+        // Idle worker with uncommitted changes - this is suspicious and may indicate
+        // lost work or state corruption. Mark as Error for investigation.
         if let Err(e) = worker::apply_transition(worker_mut, WorkerTransition::ToError {
             reason: "Uncommitted changes at startup".to_string(),
         }) {
