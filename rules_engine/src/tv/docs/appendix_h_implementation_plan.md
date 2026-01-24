@@ -61,7 +61,8 @@ helpers with proper cleanup. Replace raw invoke calls.
 Dependencies: Task 4
 
 ### Task 7: Set Up Test Crate
-Create the tv_tests crate structure as defined in the Testing Strategy section.
+Create the tv_tests crate at rules_engine/tests/tv_tests/, following the existing
+test crate pattern (see rules_engine/tests/parser_v2_tests/ for reference).
 Implement TvTestHarness with temp file creation, load_table, save_cell, and
 read_file_content methods. Define the FileSystem and Clock traits in the main
 TV library for dependency injection. Implement RealFileSystem for production use.
@@ -639,7 +640,7 @@ Following this project's patterns and the design document file layout, create
 a test crate at:
 
 ```
-rules_engine/src/tv_tests/
+rules_engine/tests/tv_tests/
 ├── Cargo.toml
 ├── fixtures/
 │   ├── simple_table.toml
@@ -810,7 +811,7 @@ with actual file I/O, path handling, and permission behavior.
 
 ### Test Fixtures
 
-Test fixture files live in `rules_engine/src/tv_tests/fixtures/` as shown in
+Test fixture files live in `rules_engine/tests/tv_tests/fixtures/` as shown in
 the directory structure above. Each fixture tests specific scenarios:
 - `simple_table.toml` - Basic array of tables for happy path testing
 - `with_comments.toml` - TOML with inline and block comments for preservation tests

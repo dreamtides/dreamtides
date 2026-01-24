@@ -120,7 +120,7 @@
 - error_types.rs: Custom error enum with variants for all failure modes
 - recovery_handler.rs: Error recovery strategies and user notification
 
-## Test Suite (rules_engine/src/tv_tests/)
+## Test Suite (rules_engine/tests/tv_tests/)
 
 ### Configuration
 - Cargo.toml: Test crate dependencies including tv as dependency

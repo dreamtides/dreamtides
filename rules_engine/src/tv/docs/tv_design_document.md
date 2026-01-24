@@ -86,7 +86,7 @@ separate files: app_root.tsx for state management, spreadsheet_view.tsx for
 Univer wrapper, and new components for error display and status. The
 UniverSpreadsheet.tsx component is preserved with minimal changes.
 
-Phase 3 adds the test crate tv_tests/ with fixtures and initial integration
+Phase 3 adds the test crate rules_engine/tests/tv_tests/ with fixtures and initial integration
 tests validating the restructured code matches prototype behavior. Tests
 verify TOML round-trip preservation, file watching, and sync behavior.
 
@@ -669,45 +669,6 @@ rules_engine/src/tv/
 └── vite.config.ts
 ```
 
-### Test Directory Structure
-```
-rules_engine/src/tv_tests/
-├── Cargo.toml
-├── fixtures/
-│   ├── simple_table.toml
-│   ├── with_comments.toml
-│   ├── sparse_data.toml
-│   ├── with_metadata.toml
-│   ├── large_table.toml
-│   ├── invalid_syntax.toml
-│   └── unicode_content.toml
-├── src/
-│   ├── lib.rs
-│   ├── toml_tests/
-│   │   ├── toml_tests_mod.rs
-│   │   ├── load_tests.rs
-│   │   ├── save_tests.rs
-│   │   └── preservation_tests.rs
-│   ├── sync_tests/
-│   │   ├── sync_tests_mod.rs
-│   │   ├── watcher_tests.rs
-│   │   └── conflict_tests.rs
-│   ├── derived_tests/
-│   │   ├── derived_tests_mod.rs
-│   │   ├── registry_tests.rs
-│   │   └── executor_tests.rs
-│   ├── validation_tests/
-│   │   ├── validation_tests_mod.rs
-│   │   └── rule_tests.rs
-│   └── integration_tests/
-│       ├── integration_tests_mod.rs
-│       └── end_to_end_tests.rs
-└── test_utils/
-    ├── test_utils_mod.rs
-    ├── mock_filesystem.rs
-    └── mock_clock.rs
-```
-
 ## Transition from tabula_cli
 
 ### TOML Compatibility
@@ -750,46 +711,3 @@ build-toml and build-xls commands are eventually removed.
 - @univerjs/sheets-drawing-ui: Cell image support
 - React 19.x: UI framework
 - RxJS 7.x: Reactive event handling
-
-## Performance Considerations
-
-### File Operations
-Atomic writes with temp file and rename ensure file integrity. Write coalescing
-batches rapid changes to reduce I/O operations. Memory-mapped reading
-considered for large files.
-
-### Derived Columns
-Computation runs on a thread pool to avoid blocking the main thread. Results
-are cached until row data changes. Computation priority favors visible rows.
-
-### Image Loading
-Lazy loading defers image fetch until cells are visible. Parallel fetching
-with connection pooling improves throughput. Progressive rendering shows
-low-resolution preview during load.
-
-### Memory Management
-Large files stream row data rather than loading entirely into memory.
-Image cache uses LRU eviction with configurable size limits. Univer
-virtualization renders only visible cells.
-
-## Follow-up Areas for Further Design Work
-
-1. Define detailed schema for the [metadata] section including all supported
-   configuration fields, their types, default values, and validation rules.
-   Consider versioning the metadata format for future evolution.
-
-2. Specify the exact Univer plugin configuration and cell renderer
-   customizations needed for image display, rich text preview, checkbox
-   rendering, and dropdown menus. Document any Univer limitations discovered.
-
-3. Design the derived function API contract including input types, output
-   types, error handling, cancellation, and timeout behavior. Define the
-   registration mechanism and function discovery for extensibility.
-
-4. Detail the rules text preview rendering pipeline including Fluent template
-   loading, variable resolution, HTML tag parsing, and Univer rich text
-   formatting. Document integration with existing ability parser code.
-
-5. Elaborate on the testing strategy for end-to-end scenarios including
-   headless Univer testing, Tauri window automation, and performance
-   benchmarking. Define coverage targets and test data generation approaches.
