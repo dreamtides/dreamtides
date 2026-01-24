@@ -1,564 +1,545 @@
-# Appendix H: Implementation Plan
+# Appendix H: Implementation Plan (MVP-First)
 
 ## Overview
 
-This appendix breaks the TV implementation into granular tasks suitable for
-incremental development. Tasks are numbered and list dependencies to enable
-parallel work while avoiding merge conflicts. Setup and infrastructure tasks
-come first, followed by features in dependency order.
+This appendix breaks the TV implementation into granular tasks using an MVP-first
+strategy. The goal is to have a working, usable application as early as possible,
+then layer on additional features incrementally.
 
-## Phase 1: Project Setup and Infrastructure
+MVP 1: Read-only TOML viewer (load and display)
+MVP 2: Editable viewer (write changes back to TOML)
+Post-MVP: All other features (metadata, derived columns, images, etc.)
 
-### Task 1: Create tv_tests Crate Structure
-Create the test crate at rules_engine/src/tv_tests/ with Cargo.toml, src/lib.rs,
-and empty module directories. Add the crate to the workspace Cargo.toml. Create
-the fixtures/ directory with a single simple_table.toml test fixture. Verify
-the crate compiles and can import tv_lib as a dependency.
+## Phase 1: MVP Read-Only Viewer
 
-Dependencies: None
+These tasks produce a working read-only TOML viewer. The prototype already has
+most of this functionality; these tasks clean up and solidify it.
 
-### Task 2: Create Backend Module Directory Structure
-Create empty module directories under src-tauri/src/ for commands/, toml/,
-sync/, derived/, validation/, images/, uuid/, logging/, and error/. Add mod.rs
-files (named as *_mod.rs per naming convention) with empty module declarations.
-Update lib.rs to declare all top-level modules. Verify compilation succeeds.
+### Task 1: Stabilize Prototype Load Path
+Review and clean up the existing load_toml_table command. Ensure it handles
+errors gracefully (file not found, parse errors, permission denied). Add proper
+error types with Display implementations. Verify the frontend displays errors
+rather than crashing.
 
 Dependencies: None
 
-### Task 3: Create Error Types Module
-Implement error/error_types.rs with a comprehensive TvError enum covering all
-failure modes: TomlParseError, FileNotFound, PermissionDenied, WriteError,
-ValidationError, DerivedFunctionError, ImageFetchError, etc. Implement Display
-and Error traits. Add From implementations for common error types.
-
-Dependencies: Task 2
-
-### Task 4: Create Logging Infrastructure
-Implement logging/json_logger.rs with a custom tracing subscriber that outputs
-JSONL format. Include Pacific Time timestamps using chrono-tz. Implement
-logging/log_aggregator.rs with a Tauri command for frontend log ingestion.
-Add initialization function called from lib.rs during app startup.
-
-Dependencies: Task 2, Task 3
-
-### Task 5: Add Log Rotation Support
-Implement logging/log_rotation.rs with daily log file rotation. Create log
-files in the application data directory. Add cleanup of old log files based
-on configurable retention period. Integrate with the json_logger to write
-to both stdout and rotating log files.
-
-Dependencies: Task 4
-
-### Task 6: Create Command Line Argument Parsing
-Add clap dependency to Cargo.toml. Implement argument parsing in main.rs for
-optional file/directory path argument. Store parsed arguments in application
-state accessible to commands. Remove hardcoded file path from the prototype.
-Default to rules_engine/tabula/ when no argument provided.
-
-Dependencies: Task 2
-
-### Task 7: Implement Recovery Handler
-Implement error/recovery_handler.rs with strategies for recovering from
-various error states. Define RecoveryAction enum with variants like Retry,
-ShowError, EnterReadOnly, ReloadFile. Create function to map TvError to
-appropriate RecoveryAction. Add panic hook for backend thread panics.
-
-Dependencies: Task 3
-
-## Phase 2: TOML Layer
-
-### Task 8: Extract Document Loader
-Move TOML loading logic from toml_loader.rs to toml/document_loader.rs.
-Create TomlDocument struct wrapping toml_edit::DocumentMut. Implement load
-function taking file path, returning Result<TomlDocument, TvError>. Add
-method to extract table by name as TomlTableData.
-
-Dependencies: Task 3
-
-### Task 9: Extract Document Writer
-Move TOML saving logic to toml/document_writer.rs. Implement atomic write
-using temp file and rename. Create save_cell function taking document, row
-index, column key, and new value. Return Result indicating success or error.
-Preserve file structure using toml_edit mutation.
-
-Dependencies: Task 8
-
-### Task 10: Implement Structure Preserver
-Create toml/structure_preserver.rs with utilities for toml_edit operations.
-Implement find_value_mut to locate a specific cell value by table index and
-key. Implement update_value to change a value while preserving formatting.
-Add helper to detect and preserve inline table vs expanded table format.
-
-Dependencies: Task 8
-
-### Task 11: Implement Value Converter
-Create toml/value_converter.rs with bidirectional conversion between JSON
-and TOML types. Handle all primitive types: string, integer, float, boolean,
-null. Return None for complex types (arrays, objects) that cannot be cell
-values. Add unit tests in tv_tests for all conversion cases.
-
-Dependencies: Task 1, Task 8
-
-### Task 12: Implement Metadata Parser
-Create toml/metadata_parser.rs to parse the [metadata] section from TOML
-documents. Define Metadata struct with fields for all configuration options.
-Implement parse function returning Option<Metadata>. Handle missing metadata
-gracefully with defaults. Add validation for schema version.
-
-Dependencies: Task 8
-
-### Task 13: Add Metadata Serialization
-Extend metadata_parser.rs with serialization back to TOML. Implement function
-to update metadata section in TomlDocument. Create metadata section if it
-does not exist. Preserve existing metadata fields not being updated. Add
-tests for round-trip metadata preservation.
-
-Dependencies: Task 12
-
-### Task 14: Implement Load Command
-Create commands/load_command.rs with the load_toml_table Tauri command.
-Use document_loader to read file. Extract headers and rows. Parse metadata.
-Return TomlTableData struct to frontend. Add proper error handling with
-TvError conversion to user-friendly messages.
-
-Dependencies: Task 8, Task 12
-
-### Task 15: Implement Save Command
-Create commands/save_command.rs with save_cell Tauri command. Load document,
-apply cell update via structure_preserver, write via document_writer. Return
-success with any generated values. Handle concurrent access with file locking
-on Windows. Add debounce coordination with frontend.
-
-Dependencies: Task 9, Task 10, Task 11
-
-## Phase 3: Synchronization Layer
-
-### Task 16: Extract File Watcher
-Move file watching logic to sync/file_watcher.rs. Create FileWatcher struct
-managing notify watcher instance. Implement start method taking AppHandle
-and file path. Emit toml-file-changed events on modifications. Add stop
-method for cleanup. Handle watcher errors gracefully.
-
-Dependencies: Task 3
-
-### Task 17: Implement Watch Command
-Create commands/watch_command.rs with start_file_watcher Tauri command.
-Store active watchers in application state. Prevent duplicate watchers for
-same file. Return watcher ID for later reference. Add stop_file_watcher
-command to terminate watching.
-
-Dependencies: Task 16
-
-### Task 18: Implement Change Tracker
-Create sync/change_tracker.rs to track pending cell changes. Store changes
-in memory until save completes. Implement generation counter per row for
-staleness detection. Provide method to get pending changes for a file.
-Clear pending changes after successful save.
-
-Dependencies: Task 3
-
-### Task 19: Implement Sync State Machine
-Create sync/state_machine.rs with SyncState enum: Idle, Saving, Loading,
-Error. Implement state transitions with guards. Use atomic flags to prevent
-race conditions. Provide query methods for current state. Emit state change
-events for frontend status display.
-
-Dependencies: Task 18
-
-### Task 20: Implement Conflict Resolver
-Create sync/conflict_resolver.rs with logic for handling concurrent edits.
-Detect when file changed during save window. Implement file-wins strategy
-discarding local changes on conflict. Queue reload after conflict detection.
-Log conflicts for debugging.
-
-Dependencies: Task 19
-
-### Task 21: Integrate Sync Components
-Update load and save commands to use sync state machine. Coordinate file
-watcher events with sync state. Prevent reload during active save. Trigger
-reload after external change when idle. Update frontend event handling to
-respect sync state.
-
-Dependencies: Task 14, Task 15, Task 17, Task 19, Task 20
-
-## Phase 4: Frontend Restructuring
-
-### Task 22: Extract App Root Component
-Create src/app_root.tsx extracting state management from App.tsx. Move
-useState hooks for data, error, and status. Move useEffect for initialization.
-Move IPC event listeners. Keep App.tsx as thin wrapper rendering AppRoot.
-Verify existing functionality unchanged.
-
-Dependencies: None (frontend)
-
-### Task 23: Extract Spreadsheet View Component
-Create src/spreadsheet_view.tsx moving Univer-related code from App.tsx.
-Accept data and onChange as props. Encapsulate Univer initialization and
-cleanup. Export TomlTableData interface. Verify spreadsheet renders and
-edits propagate correctly.
-
-Dependencies: Task 22
-
-### Task 24: Create IPC Bridge Module
-Create src/ipc_bridge.ts with TypeScript wrappers for all Tauri commands.
-Define typed interfaces for command parameters and responses. Add error
-handling with typed error responses. Create event subscription helpers
-with proper cleanup. Replace raw invoke calls with bridge functions.
-
-Dependencies: Task 22
-
-### Task 25: Create Error Banner Component
-Create src/error_banner.tsx for displaying error states. Accept error
-message and optional details as props. Style with red background and
-warning icon. Add dismiss button for recoverable errors. Position at
-top of viewport overlaying spreadsheet.
-
-Dependencies: Task 22
-
-### Task 26: Create Status Indicator Component
-Create src/status_indicator.tsx showing sync status. Display Saving,
-Saved, or Error states with appropriate icons. Auto-dismiss Saved state
-after timeout. Position in corner of viewport. Subscribe to sync state
-events from backend.
-
-Dependencies: Task 22, Task 24
-
-### Task 27: Create Frontend Logger
-Create src/logger_frontend.ts with Logger class. Format log entries as
-JSON objects. Send logs to backend via log_message command. Include
-source file and line from stack traces. Mirror logs to browser console
-for development. Configure log level from environment.
-
-Dependencies: Task 4, Task 24
-
-### Task 28: Integrate Frontend Components
-Update app_root.tsx to use new components: SpreadsheetView, ErrorBanner,
-StatusIndicator. Wire up IPC bridge for all commands. Connect frontend
-logger. Verify complete application flow from load through edit to save.
-Remove deprecated code from prototype.
-
-Dependencies: Task 23, Task 24, Task 25, Task 26, Task 27
-
-## Phase 5: UUID Generation
-
-### Task 29: Implement UUID Generator
-Create uuid/uuid_generator.rs with ID column detection and UUID generation.
-Implement find_id_column searching for "id" column case-insensitively.
-Generate UUIDv4 strings. Return generated UUID or None if column missing
-or cell non-empty.
-
-Dependencies: Task 3
-
-### Task 30: Integrate UUID with Save Command
-Update save_command to call UUID generator before writing. Check if edited
-row needs UUID generation. Include generated UUID in save response. Update
-frontend to apply generated UUID to cell display without full reload.
-
-Dependencies: Task 15, Task 29
-
-## Phase 6: Derived Columns Infrastructure
-
-### Task 31: Define Derived Function Trait
-Create derived/derived_mod.rs with DerivedFunction trait definition. Define
-methods: name(), input_keys(), compute(), is_async(). Create DerivedResult
-enum with variants: Text, Number, Boolean, Image, RichText, Error. Document
-trait contract and usage.
-
-Dependencies: Task 3
-
-### Task 32: Implement Function Registry
-Create derived/function_registry.rs with FunctionRegistry struct. Store
-functions in HashMap by name. Implement register and lookup methods.
-Create global registry instance initialized at startup. Add error for
-duplicate registration.
-
-Dependencies: Task 31
-
-### Task 33: Implement Compute Executor
-Create derived/compute_executor.rs with async computation infrastructure.
-Create tokio thread pool for async functions. Implement task queuing with
-priority for visible rows. Track generation counters to discard stale
-results. Send results via Tauri events.
-
-Dependencies: Task 31, Task 32
-
-### Task 34: Implement Compute Command
-Create commands/compute_command.rs with Tauri command to trigger derived
-computation. Accept row index and column name. Look up function in registry.
-Execute computation and emit result event. Handle errors gracefully.
-
-Dependencies: Task 33
-
-### Task 35: Implement Generation Tracker
-Create derived/generation_tracker.rs to track row generations. Increment
-generation on any row edit. Store current generation with queued tasks.
-Compare generation when result arrives. Discard results for outdated
-generations.
-
-Dependencies: Task 33
-
-### Task 36: Add Frontend Derived Column Support
-Update spreadsheet_view.tsx to handle derived columns. Subscribe to
-derived-value-computed events. Update cell display when results arrive.
-Show blank cells while computation pending. Display error styling for
-failed computations.
-
-Dependencies: Task 28, Task 34
-
-## Phase 7: Image Support
-
-### Task 37: Implement Image Cache
-Create images/image_cache.rs with content-addressed cache. Store images
-by URL hash in application data directory. Implement get and put methods.
-Return cached image or None. Add cache size tracking for LRU eviction.
-
-Dependencies: Task 3
-
-### Task 38: Implement Image Fetcher
-Create images/image_fetcher.rs with async HTTP image download. Use reqwest
-with timeout configuration. Validate response content type. Decode image
-to verify validity. Return image bytes or error.
-
-Dependencies: Task 37
-
-### Task 39: Implement Image Encoder
-Create images/image_encoder.rs with base64 encoding for frontend transport.
-Encode image bytes to data URI format. Include content type in URI. Handle
-common formats: PNG, JPEG, GIF, WebP.
-
-Dependencies: Task 38
-
-### Task 40: Implement Image URL Derived Function
-Create derived/functions/image_url_function.rs implementing DerivedFunction.
-Read image_number from row data. Construct URL using configurable template.
-Fetch via image_fetcher, cache result, return base64-encoded image.
-Register in function registry.
-
-Dependencies: Task 32, Task 38, Task 39
-
-### Task 41: Add Frontend Image Cell Support
-Add @univerjs/sheets-drawing-ui package if not present. Update spreadsheet
-view to call insertImage for image-type derived results. Handle image
-load events. Display placeholder during load. Show error icon on failure.
-
-Dependencies: Task 36, Task 40
-
-## Phase 8: Rules Text Preview
-
-### Task 42: Implement Fluent Resource Loader
-Create derived/functions/fluent_loader.rs to load and cache strings.ftl.
-Parse into FluentResource at startup. Store in static or registry. Handle
-parse errors gracefully with descriptive messages.
-
-Dependencies: Task 32
-
-### Task 43: Implement Style Tag Parser
-Create derived/functions/style_tag_parser.rs with HTML-like tag parsing.
-Parse bold, italic, underline, color tags. Track nested style state.
-Generate StyledRun list with character positions. Handle malformed tags
-as literal text.
-
-Dependencies: Task 3
-
-### Task 44: Implement Rich Text Builder
-Create derived/functions/rich_text_builder.rs to build Univer rich text.
-Convert StyledRun list to Univer paragraph structure. Generate ICellData-
-compatible JSON. Handle all style combinations.
-
-Dependencies: Task 43
-
-### Task 45: Implement Rules Preview Function
-Create derived/functions/rules_preview_function.rs implementing DerivedFunction.
-Parse variables column to FluentArgs. Format through Fluent. Parse style
-tags. Build rich text. Return RichText result for Univer rendering.
-
-Dependencies: Task 42, Task 43, Task 44
-
-### Task 46: Add Frontend Rich Text Support
-Update spreadsheet view to handle RichText derived results. Set cell content
-using Univer rich text API. Apply paragraph structure with styled runs.
-Verify formatting renders correctly.
-
-Dependencies: Task 36, Task 45
-
-## Phase 9: Validation and Data Entry
-
-### Task 47: Implement Validation Rule Parser
-Create validation/rule_parser.rs to parse validation rules from metadata.
-Define ValidationRule struct with type, constraints, error message. Parse
-enum lists, numeric ranges, patterns. Return list of rules per column.
-
-Dependencies: Task 12
-
-### Task 48: Implement Type Validator
-Create validation/type_validator.rs with type checking functions. Validate
-string, integer, float, boolean constraints. Return validation result with
-error message if failed. Handle empty cells according to required flag.
-
-Dependencies: Task 47
-
-### Task 49: Implement Enum Validator
-Create validation/enum_validator.rs for enumeration validation. Check value
-against allowed list. Generate error message listing valid options. Support
-case-insensitive matching option.
-
-Dependencies: Task 47
-
-### Task 50: Integrate Validation with Save
-Update save_command to validate cell value before writing. Reject invalid
-values with descriptive error. Return validation errors to frontend. Keep
-cell in error state until corrected.
-
-Dependencies: Task 15, Task 48, Task 49
-
-### Task 51: Add Frontend Dropdown Support
-Configure Univer data validation for enum columns. Read enum values from
-metadata. Set up dropdown UI. Apply validation rule on cell edit. Display
-validation error styling for rejected values.
-
-Dependencies: Task 28, Task 47
-
-### Task 52: Add Frontend Checkbox Support
-Configure Univer data validation for boolean columns. Render checkbox UI.
-Toggle value on click. Trigger save on toggle. Apply validation for
-boolean-only columns.
-
-Dependencies: Task 28, Task 50
-
-## Phase 10: Multi-File Support
-
-### Task 53: Implement File Discovery
-Create function to scan directory for TOML files. Filter to array-of-tables
-format by attempting parse. Sort alphabetically. Return list of valid file
-paths. Handle symlinks appropriately.
-
-Dependencies: Task 8
-
-### Task 54: Create Sheet Tabs Component
-Create src/sheet_tabs.tsx with tab bar UI. Display tab for each file.
-Highlight active tab. Handle tab click to switch files. Show file name
-without extension as label.
-
-Dependencies: Task 22
-
-### Task 55: Implement Multi-Sheet State
-Update app_root to manage multiple sheets. Load all files on startup.
-Track active sheet for editing. Maintain separate sync state per file.
-Switch data source when tab clicked.
-
-Dependencies: Task 21, Task 53, Task 54
-
-### Task 56: Add Directory Watcher
-Extend file watcher to monitor directory for new files. Emit event when
-TOML file added or removed. Update sheet tabs when directory changes.
-Handle file rename as remove plus add.
-
-Dependencies: Task 16, Task 55
-
-## Phase 11: Styling and Formatting
-
-### Task 57: Implement Table Color Schemes
-Create color scheme definitions matching Excel table styles. Store scheme
-selection in metadata. Apply header and alternating row colors on load.
-Provide UI or metadata way to select scheme.
-
-Dependencies: Task 12
-
-### Task 58: Implement Conditional Formatting
-Create validation/conditional_format.rs to evaluate formatting rules.
-Parse rules from metadata. Evaluate conditions against cell values.
-Return style overrides for matching cells. Integrate with Univer
-conditional formatting plugin.
-
-Dependencies: Task 12, Task 28
-
-### Task 59: Implement Column Width Persistence
-Detect column width changes via Univer events. Update metadata with new
-widths. Apply widths from metadata on load. Handle auto-size for columns
-without explicit width.
-
-Dependencies: Task 13, Task 28
-
-### Task 60: Implement Frozen Panes
-Read freeze configuration from metadata. Apply to Univer on load. Detect
-freeze changes and update metadata. Default to frozen header row and ID
-column when not specified.
-
-Dependencies: Task 13, Task 28
-
-## Phase 12: Testing
-
-### Task 61: Create TOML Test Fixtures
-Create comprehensive test fixtures in tv_tests/fixtures/. Include files
-with comments, sparse data, metadata, unicode, large row counts, and
-intentional syntax errors. Document purpose of each fixture.
+### Task 2: Add Command Line Argument Parsing
+Add clap dependency. Implement argument parsing in main.rs for optional
+file/directory path argument. Remove hardcoded file path. Default to
+rules_engine/tabula/ when no argument provided. Verify launching with different
+paths works correctly.
+
+Dependencies: None
+
+### Task 3: Stabilize File Watcher
+Review the existing file_watcher.rs. Ensure it handles watcher errors gracefully
+(file deleted, permission changes). Verify debouncing works correctly. Add
+proper cleanup on window close. Test external file modification triggers reload.
 
 Dependencies: Task 1
 
-### Task 62: Write TOML Loading Tests
-Create toml_tests/load_tests.rs with integration tests. Test loading
-simple tables, sparse data, files with metadata. Verify header extraction.
-Test error handling for missing files and parse errors.
+### Task 4: Extract Frontend State Management
+Create src/app_root.tsx extracting state management from App.tsx. Move useState
+hooks for data and error state. Move useEffect for initialization. Move IPC
+event listeners. Keep App.tsx as thin wrapper. Verify read-only display still
+works.
 
-Dependencies: Task 14, Task 61
+Dependencies: None (frontend)
 
-### Task 63: Write TOML Preservation Tests
-Create toml_tests/preservation_tests.rs testing structure preservation.
-Load file, modify cell, save, reload. Verify comments preserved. Verify
-whitespace preserved. Verify key ordering preserved.
+### Task 5: Create Error Display Component
+Create src/error_banner.tsx for displaying error states from the backend. Accept
+error message as prop. Style with appropriate warning colors. Position at top
+of viewport. Update app_root to display errors from load failures.
 
-Dependencies: Task 15, Task 61
+Dependencies: Task 4
 
-### Task 64: Write Sync Tests
-Create sync_tests/ with watcher and conflict tests. Test file change
-detection. Test debouncing behavior. Test conflict resolution. Use mock
-filesystem for isolation.
+### Task 6: Create IPC Bridge Module
+Create src/ipc_bridge.ts with TypeScript wrappers for Tauri commands. Define
+typed interfaces for TomlTableData and error responses. Create event subscription
+helpers with proper cleanup. Replace raw invoke calls.
 
-Dependencies: Task 21, Task 61
+Dependencies: Task 4
 
-### Task 65: Write Derived Function Tests
-Create derived_tests/ with registry and executor tests. Test function
-registration. Test async computation. Test generation tracking and stale
-result discard. Test error handling.
+### Task 7: MVP 1 Integration Test
+Create a manual testing checklist and verify: launch with no args loads default
+directory, launch with file path loads that file, launch with invalid path shows
+error, external file modification triggers reload, TOML parse error shows error
+banner.
 
-Dependencies: Task 35, Task 61
+Dependencies: Tasks 1-6
 
-### Task 66: Write Validation Tests
-Create validation_tests/ testing all rule types. Test type validation.
-Test enum validation. Test range validation. Test integration with save
-command rejection.
+## Phase 2: MVP Editable Viewer
 
-Dependencies: Task 50, Task 61
+These tasks add the ability to edit cells and write changes back to TOML.
 
-### Task 67: Write End-to-End Tests
-Create integration_tests/end_to_end_tests.rs with full workflow tests.
-Test load, edit, save cycle. Test external file change handling. Test
-error recovery. Test multi-file scenarios.
+### Task 8: Review Save Path
+Review and clean up the existing save_toml_table command. Ensure atomic write
+using temp file and rename. Verify toml_edit preserves document structure
+(comments, whitespace, ordering). Add proper error handling for write failures.
 
-Dependencies: All previous tasks
+Dependencies: Task 7
+
+### Task 9: Implement Cell-Level Save
+Modify save command to update only the changed cell rather than rewriting the
+entire document. Use toml_edit's mutable access to locate and update specific
+values. Verify structure preservation with targeted updates.
+
+Dependencies: Task 8
+
+### Task 10: Add Save Coordination
+Add a saving flag to prevent file watcher reload during active saves. After
+save completes, check if file changed externally during save window. Implement
+file-wins conflict resolution. Emit sync state events to frontend.
+
+Dependencies: Task 9
+
+### Task 11: Create Status Indicator Component
+Create src/status_indicator.tsx showing sync status (Saving, Saved, Error).
+Display appropriate icons for each state. Auto-dismiss Saved state after
+timeout. Position in corner of viewport. Subscribe to sync state events.
+
+Dependencies: Task 6
+
+### Task 12: Wire Up Frontend Editing
+Ensure spreadsheet cell edits trigger the save command. Handle save responses
+including errors. Update status indicator based on save state. Display save
+errors without losing pending changes.
+
+Dependencies: Tasks 10, 11
+
+### Task 13: MVP 2 Integration Test
+Create a manual testing checklist and verify: cell edit triggers save, TOML
+file reflects change, comments in TOML preserved after edit, concurrent external
+edit handled gracefully, save error displays without data loss.
+
+Dependencies: Task 12
+
+## Phase 3: Error Robustness
+
+These tasks ensure the application handles error scenarios gracefully.
+
+### Task 14: Create Error Types Module
+Create error/error_types.rs with TvError enum covering failure modes:
+TomlParseError, FileNotFound, PermissionDenied, WriteError. Implement Display
+and Error traits. Add From implementations for common error types.
+
+Dependencies: Task 13
+
+### Task 15: Implement Error Recovery
+Define error recovery strategies: which errors allow continued editing in
+read-only mode, which require reload, which show permanent error state. Implement
+recovery logic in save and load paths.
+
+Dependencies: Task 14
+
+### Task 16: Handle File Deletion
+When watched file is deleted, enter read-only state with error banner. Preserve
+last known data. Monitor for file reappearance. Resume normal operation when
+file returns.
+
+Dependencies: Task 15
+
+### Task 17: Handle Permission Errors
+When file becomes unreadable, preserve last known data and show error. When
+file becomes unwritable, allow viewing but reject saves with error message.
+Queue pending changes for retry when permissions restore.
+
+Dependencies: Task 15
+
+## Phase 4: Multi-File Support
+
+### Task 18: Implement File Discovery
+Create function to scan directory for TOML files. Filter to array-of-tables
+format by attempting parse. Sort alphabetically. Return list of valid file
+paths.
+
+Dependencies: Task 13
+
+### Task 19: Create Sheet Tabs Component
+Create src/sheet_tabs.tsx with tab bar UI. Display tab for each file. Highlight
+active tab. Handle tab click to switch files. Show file name without extension.
+
+Dependencies: Task 4
+
+### Task 20: Implement Multi-Sheet State
+Update app_root to manage multiple sheets. Load all files on startup. Track
+active sheet for editing. Maintain separate file watcher per file. Switch
+data source when tab clicked.
+
+Dependencies: Tasks 18, 19
+
+### Task 21: Add Directory Watcher
+Extend file watcher to monitor directory for new/removed files. Emit events
+when TOML files appear or disappear. Update sheet tabs accordingly.
+
+Dependencies: Task 20
+
+## Phase 5: UUID Generation
+
+### Task 22: Implement UUID Generator
+Create uuid_generator.rs with ID column detection (case-insensitive). Generate
+UUIDv4 for empty ID cells. Return generated UUID or None if column missing or
+cell non-empty.
+
+Dependencies: Task 13
+
+### Task 23: Integrate UUID with Save
+Update save command to call UUID generator before writing. Include generated
+UUID in save response. Update frontend to apply generated UUID to display.
+
+Dependencies: Task 22
+
+## Phase 6: Metadata Support
+
+### Task 24: Define Metadata Schema
+Design the [metadata] section schema. Define TypeScript and Rust types for
+metadata structure. Document all supported fields, types, and defaults.
+
+Dependencies: Task 13
+
+### Task 25: Implement Metadata Parser
+Create metadata_parser.rs to parse [metadata] section. Return Option<Metadata>
+with defaults for missing fields. Handle missing section gracefully.
+
+Dependencies: Task 24
+
+### Task 26: Implement Metadata Serialization
+Add serialization back to TOML. Update metadata section in document. Create
+section if missing. Preserve unrecognized fields.
+
+Dependencies: Task 25
+
+### Task 27: Apply Column Widths from Metadata
+Read column widths from metadata on load. Apply to Univer. Detect width changes
+via Univer events. Update metadata. Save on change.
+
+Dependencies: Task 26
+
+## Phase 7: Derived Columns
+
+### Task 28: Define Derived Function Trait
+Create DerivedFunction trait with name(), input_keys(), compute() methods.
+Create DerivedResult enum with Text, Number, Error variants.
+
+Dependencies: Task 13
+
+### Task 29: Implement Function Registry
+Create FunctionRegistry storing functions by name. Implement register and lookup.
+Initialize global registry at startup.
+
+Dependencies: Task 28
+
+### Task 30: Implement Compute Executor
+Create async computation infrastructure with tokio. Queue computations. Send
+results via Tauri events. Handle errors gracefully.
+
+Dependencies: Task 29
+
+### Task 31: Add Generation Tracking
+Track row generation counters. Increment on row edit. Discard stale computation
+results. Ensure eventual correctness.
+
+Dependencies: Task 30
+
+### Task 32: Add Frontend Derived Column Support
+Subscribe to derived-value-computed events. Update cell display when results
+arrive. Show blank while pending. Show error styling on failure.
+
+Dependencies: Task 31
+
+## Phase 8: Image Support
+
+### Task 33: Implement Image Cache
+Create content-addressed image cache. Store by URL hash. Implement get/put.
+Add LRU eviction.
+
+Dependencies: Task 13
+
+### Task 34: Implement Image Fetcher
+Create async HTTP image download with reqwest. Validate response. Decode to
+verify validity.
+
+Dependencies: Task 33
+
+### Task 35: Implement Image Derived Function
+Create function implementing DerivedFunction. Construct URL from row data.
+Fetch, cache, return base64-encoded image.
+
+Dependencies: Tasks 34, 29
+
+### Task 36: Add Frontend Image Cell Support
+Use Univer sheets-drawing-ui for cell images. Call insertImage for image
+results. Display placeholder during load.
+
+Dependencies: Task 35
+
+## Phase 9: Validation
+
+### Task 37: Implement Validation Rule Parser
+Parse validation rules from metadata. Define ValidationRule struct with type,
+constraints, error message. Support enum, range, pattern rules.
+
+Dependencies: Task 25
+
+### Task 38: Implement Validators
+Create type and enum validators. Return validation result with error message.
+Handle required vs optional fields.
+
+Dependencies: Task 37
+
+### Task 39: Integrate Validation with Save
+Validate cell values before writing. Reject invalid values with error. Return
+validation errors to frontend.
+
+Dependencies: Task 38
+
+### Task 40: Add Frontend Dropdown Support
+Configure Univer data validation for enum columns. Read values from metadata.
+Set up dropdown UI.
+
+Dependencies: Task 37
+
+## Phase 10: Rules Text Preview
+
+### Task 41: Implement Fluent Integration
+Load strings.ftl. Parse into FluentResource. Store for template processing.
+
+Dependencies: Task 29
+
+### Task 42: Implement Style Tag Parser
+Parse HTML-like styling tags. Generate styled run list with character positions.
+
+Dependencies: Task 13
+
+### Task 43: Implement Rules Preview Function
+Create DerivedFunction for rules preview. Parse variables. Format through
+Fluent. Parse style tags. Return rich text result.
+
+Dependencies: Tasks 41, 42
+
+### Task 44: Add Frontend Rich Text Support
+Handle RichText derived results. Apply Univer rich text formatting.
+
+Dependencies: Task 43
+
+## Phase 11: Styling
+
+### Task 45: Implement Table Color Schemes
+Define color scheme presets. Store selection in metadata. Apply header and
+alternating row colors.
+
+Dependencies: Task 26
+
+### Task 46: Implement Conditional Formatting
+Parse formatting rules from metadata. Evaluate conditions. Return style
+overrides. Integrate with Univer.
+
+Dependencies: Task 26
+
+### Task 47: Implement Frozen Panes
+Read freeze configuration from metadata. Apply to Univer on load. Persist
+changes to metadata.
+
+Dependencies: Task 26
+
+## Phase 12: Logging
+
+### Task 48: Create JSON Logger
+Implement tracing subscriber outputting JSONL format. Include Pacific Time
+timestamps. Write to stdout and log file.
+
+Dependencies: Task 13
+
+### Task 49: Add Frontend Log Forwarding
+Create frontend logger. Format logs as JSON. Send to backend via command.
+Mirror to browser console.
+
+Dependencies: Task 48
+
+### Task 50: Add Log Rotation
+Implement daily log file rotation. Create logs in app data directory. Clean
+old logs based on retention period.
+
+Dependencies: Task 48
+
+---
+
+## Testing Strategy
+
+### Test Crate Structure
+
+Following this project's patterns, create a test crate at:
+
+```
+rules_engine/tests/tv_tests/
+├── Cargo.toml
+├── src/
+│   └── lib.rs          (exports test utilities as a library)
+└── tests/
+    ├── lib.rs          (declares test modules)
+    └── tv_tests/
+        ├── mod.rs
+        ├── load_tests.rs
+        ├── save_tests.rs
+        ├── sync_tests.rs
+        └── preservation_tests.rs
+```
+
+### Test Utilities Library
+
+The `src/lib.rs` exports a `TvTestHarness` that provides:
+- Methods to create temporary TOML files with specific content
+- Methods to call the public TV library functions (load, save)
+- Methods to simulate file system events
+- Methods to verify TOML file contents after operations
+
+Example:
+```rust
+pub struct TvTestHarness {
+    temp_dir: TempDir,
+}
+
+impl TvTestHarness {
+    pub fn new() -> Self { ... }
+    pub fn create_toml_file(&self, name: &str, content: &str) -> PathBuf { ... }
+    pub fn load_table(&self, path: &Path) -> Result<TomlTableData, TvError> { ... }
+    pub fn save_cell(&self, path: &Path, row: usize, col: &str, value: Value) -> Result<(), TvError> { ... }
+    pub fn read_file_content(&self, path: &Path) -> String { ... }
+}
+```
+
+### Public API Testing
+
+All tests call the public library API (the same functions the Tauri commands
+call internally). Tests do NOT test internal implementation functions.
+
+Example test:
+```rust
+#[test]
+fn test_load_simple_table() {
+    let harness = TvTestHarness::new();
+    let path = harness.create_toml_file("test.toml", r#"
+[[cards]]
+id = "abc-123"
+name = "Test Card"
+"#);
+
+    let table = harness.load_table(&path).unwrap();
+
+    assert_eq!(table.headers, vec!["id", "name"]);
+    assert_eq!(table.rows.len(), 1);
+    assert_eq!(table.rows[0]["id"], "abc-123");
+}
+```
+
+### Dependency Injection Strategy
+
+If external dependencies need to be abstracted for testing, use trait-based
+dependency injection at the library boundary. The TV library defines traits
+for external operations:
+
+```rust
+pub trait FileSystem {
+    fn read_to_string(&self, path: &Path) -> io::Result<String>;
+    fn write(&self, path: &Path, content: &str) -> io::Result<()>;
+    fn exists(&self, path: &Path) -> bool;
+}
+
+pub trait Clock {
+    fn now(&self) -> SystemTime;
+}
+```
+
+The library functions accept these traits as parameters or use a context struct:
+
+```rust
+pub fn load_toml_table(
+    fs: &impl FileSystem,
+    path: &Path,
+) -> Result<TomlTableData, TvError> { ... }
+```
+
+In production, the Tauri commands pass a `RealFileSystem` implementation.
+In tests, the harness can pass a `TestFileSystem` that operates on temp files
+or returns predetermined responses for error testing.
+
+### When to Use Fakes vs Real Dependencies
+
+**Use real file system for most tests:** Since TOML file operations are the
+core functionality, most tests should use real temp files. This catches issues
+with actual file I/O, path handling, and permission behavior.
+
+**Use fakes for:**
+- Error injection (simulate permission denied, disk full)
+- Deterministic time (if timestamp-dependent behavior needs testing)
+- Network operations (image fetching in derived columns)
+
+### Test Fixtures
+
+Create test fixture files at `tests/tv_tests/fixtures/`:
+- `simple_table.toml` - Basic array of tables
+- `with_comments.toml` - TOML with inline and block comments
+- `sparse_data.toml` - Rows with different column sets
+- `with_metadata.toml` - File including [metadata] section
+- `unicode_content.toml` - Non-ASCII text in values
+- `invalid_syntax.toml` - Intentionally malformed for error tests
+
+### Test Categories
+
+**Load tests** verify:
+- Simple table loading
+- Sparse data (different columns per row)
+- Error handling (file not found, parse error)
+- Unicode content
+- Large files
+
+**Save tests** verify:
+- Cell update modifies correct value
+- Comments preserved after save
+- Whitespace preserved after save
+- Key ordering preserved after save
+- Error handling (permission denied, disk full via fake)
+
+**Sync tests** verify:
+- File watcher detects external changes
+- Save coordination prevents reload during save
+- Conflict resolution (file-wins)
+
+**Preservation tests** verify:
+- Round-trip: load, save, reload produces identical data
+- Comments survive multiple edit cycles
+- Inline table format preserved
+- Property-based tests with random TOML documents
+
+### Continuous Integration
+
+Tests run via `just tv-test` which:
+1. Builds the tv_tests crate
+2. Runs all integration tests
+3. Reports coverage of public API surface
+
+---
 
 ## Task Dependency Summary
 
-Tasks with no dependencies (can start immediately):
-- Task 1, Task 2, Task 22
+**MVP 1 (Read-Only) - Can start immediately:**
+- Tasks 1, 2 (backend, parallel)
+- Tasks 4, 5, 6 (frontend, parallel)
+- Task 3 depends on Task 1
+- Task 7 depends on all above
 
-Frontend tasks (independent track after Task 22):
-- Task 22 → Task 23 → Task 28
-- Task 22 → Task 24 → Task 27, Task 28
-- Task 22 → Task 25, Task 26 → Task 28
+**MVP 2 (Editable) - After MVP 1:**
+- Task 8 depends on Task 7
+- Tasks 9, 10 sequential
+- Task 11 depends on Task 6
+- Task 12 depends on Tasks 10, 11
+- Task 13 depends on Task 12
 
-Backend infrastructure (early chain):
-- Task 2 → Task 3 → Task 4 → Task 5
-- Task 2 → Task 6
-- Task 3 → Task 7
+**Post-MVP - After MVP 2:**
+- Error Robustness (Tasks 14-17) can start after Task 13
+- Multi-File (Tasks 18-21) can start after Task 13
+- UUID (Tasks 22-23) can start after Task 13
+- Remaining phases depend on their listed prerequisites
 
-TOML layer (depends on infrastructure):
-- Task 3 → Task 8 → Task 9, Task 10, Task 11, Task 12
-- Task 12 → Task 13
-
-Sync layer (depends on TOML):
-- Task 8 → Task 16 → Task 17
-- Task 16 → Task 18 → Task 19 → Task 20 → Task 21
-
-Critical path to working prototype:
-Task 2 → Task 3 → Task 8 → Task 14, Task 15 → Task 21 → Task 28
+**Critical Path to Working Prototype:**
+Task 1 → Task 3 → Task 7 → Task 8 → Task 9 → Task 10 → Task 12 → Task 13
