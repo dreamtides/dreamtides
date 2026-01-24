@@ -367,25 +367,35 @@ Dependencies: Task 13
 ### Task 36: Implement Image Fetcher
 Create async HTTP image download with reqwest and connection pooling. Validate
 response status and content-type. Decode to verify image validity using the
-image crate. Support HTTP and HTTPS URLs. Also implement local filesystem
-image loading for file:// paths. Local images read directly without caching.
-Handle network timeouts gracefully.
+image crate. Support HTTP and HTTPS URLs. For local filesystem paths, read
+directly without caching. Handle network timeouts with configurable duration.
+Store fetched images in cache directory as binary files.
 
 Dependencies: Task 35
+
+### Task 36a: Configure Tauri Asset Protocol
+Configure tauri.conf.json to enable asset protocol for loading cached images.
+Add appropriate CSP rules for img-src. Set asset protocol scope to include
+app cache directory. This allows the frontend to load cached images directly
+via asset:// URLs without base64 encoding overhead.
+
+Dependencies: Task 13
 
 ### Task 37: Implement Image Derived Function
 Create function implementing DerivedFunction trait. Construct image URL from
 row data (e.g., from image number field). Check cache first. Fetch and cache
-on miss. Return base64-encoded image data for frontend transport.
+on miss. Return local cache file path for cached images, or error status.
+Frontend will convert path to asset URL.
 
-Dependencies: Tasks 36, 31
+Dependencies: Tasks 36, 36a, 31
 
 ### Task 38: Add Frontend Image Cell Support
-Use @univerjs/sheets-drawing-ui for cell images. Call insertImage API with
-base64 data URI. Display loading placeholder while fetch is pending. Display
-error placeholder icon for failed loads (network timeout, 404, invalid format).
-Show error details in tooltip on hover. Ensure image errors don't affect
-other cells or operations.
+Install @univerjs/sheets-drawing-ui and related drawing packages. Use
+convertFileSrc() from @tauri-apps/api/core to convert cache paths to asset
+URLs. Call FWorksheet.insertImage(assetUrl, column, row) to display images.
+Display loading placeholder while fetch is pending. Display error placeholder
+icon for failed loads (network timeout, 404, invalid format). Show error
+details in tooltip on hover. Ensure image errors don't affect other cells.
 
 Dependencies: Task 37
 

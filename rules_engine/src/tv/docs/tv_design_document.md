@@ -181,45 +181,119 @@ extending the function registry.
 
 ## Image Rendering
 
-### Univer Cell Image Support
-Univer supports inline cell images through the @univerjs/sheets-drawing-ui
-package and related drawing packages. Cell image support was added via the
-Facade API, allowing images to be inserted at specific cell positions using
-URLs or base64 data. Documentation is available at:
-https://univer.ai/guides/sheet/features/floating-images
+### Univer Image Types
+Univer supports two types of images in spreadsheets:
+- **Floating Images**: Positioned over cells, can be placed anywhere on the
+  sheet with pixel-level positioning
+- **Cell Images**: Embedded directly within cells (no mixed text/image layout)
 
-The insertImage method on FWorksheet accepts a URL and row/column position.
-Images can also be inserted via base64 data URIs. Cell images no longer
-support mixed layout with text in the same cell as of recent versions.
+TV uses floating images positioned at cell locations for displaying card
+artwork. This provides flexibility for sizing while maintaining cell alignment.
+
+### Required Packages
+Image support requires these additional Univer packages beyond the base setup:
+- @univerjs/drawing
+- @univerjs/drawing-ui
+- @univerjs/sheets-drawing
+- @univerjs/sheets-drawing-ui
+
+Or use the preset: @univerjs/preset-sheets-drawing
+
+### Univer Image API
+The Facade API provides multiple methods for inserting images:
+
+**Floating Images (FWorksheet methods):**
+- `insertImage(url, column, row, offsetX?, offsetY?)` - Insert from URL string
+- `insertImage(blobSource, column, row, offsetX?, offsetY?)` - Insert from
+  IFBlobSource (File/Blob converted to base64 internally)
+- `newOverGridImage()` - Builder pattern with chainable `.setSource()`,
+  `.setColumn()`, `.setRow()`, `.setWidth()`, `.setHeight()`, etc.
+
+**Cell Images (FRange method):**
+- `insertCellImageAsync(file: File | string)` - Insert from File object or URL
+
+**Supported Image Sources:**
+- HTTP/HTTPS URL strings (passed directly to Univer)
+- Base64 data URIs (`data:image/png;base64,...`)
+- File objects (from file inputs)
+- IFBlobSource objects (converted to base64 internally by Univer)
+
+**Not supported:** Direct `file://` URLs are not accepted by Univer's API.
+
+### Local Filesystem Images via Tauri Asset Protocol
+For local filesystem images, Tauri's asset protocol converts local paths to
+URLs loadable by the webview. This avoids base64 encoding overhead.
+
+**Configuration required in tauri.conf.json:**
+```json
+"app": {
+  "security": {
+    "csp": "default-src 'self' ipc: http://ipc.localhost; img-src 'self' asset: http://asset.localhost",
+    "assetProtocol": {
+      "enable": true,
+      "scope": {
+        "requireLiteralLeadingDot": false,
+        "allow": ["$APPDATA/**/*", "$CACHE/**/*"]
+      }
+    }
+  }
+}
+```
+
+**Usage:**
+```typescript
+import { convertFileSrc } from '@tauri-apps/api/core';
+const assetUrl = convertFileSrc('/path/to/cached/image.png');
+// Returns: http://asset.localhost/path/to/cached/image.png
+```
+
+The asset URL can then be passed directly to Univer's insertImage method.
 
 ### Image Sources
-Images can come from HTTP/HTTPS URLs or local filesystem paths. The source
-is typically determined by a derived column function that constructs the URL
-or path from row data such as an image number field.
+Images come from two sources:
+- **Remote URLs**: HTTP/HTTPS URLs for card artwork hosted externally
+- **Local cache**: Previously-fetched images stored in the app data directory
+
+The image source is determined by a derived column function that constructs
+the URL from row data such as an image number field.
 
 ### Caching Strategy
-Web images are cached locally in a content-addressed store using URL hash as
-the key. Cached images never expire and persist across application restarts.
-The cache directory lives within the application data folder. Local filesystem
-images are not cached and are read on demand.
+Remote images are cached locally in a content-addressed store:
+- Cache key: SHA-256 hash of the source URL
+- Storage: Binary files in the application cache directory
+- Expiration: Never (cache persists across restarts)
+- Eviction: LRU when cache size exceeds configurable limit
+
+For cached images, the Rust backend returns the local cache path. The frontend
+uses Tauri's `convertFileSrc()` to create an asset protocol URL, then passes
+this URL to Univer's insertImage method.
 
 ### Rendering Pipeline
-Images are fetched asynchronously when a cell containing an image reference
-becomes visible. The backend downloads the image, validates it, and sends
-base64-encoded data to the frontend via an event. The frontend calls
-insertImage on the Univer sheet API to render the image in the target cell.
+1. Cell with image reference becomes visible
+2. Frontend requests image via derived column system
+3. Backend checks cache for URL hash
+4. Cache hit: Return local file path
+5. Cache miss: Fetch from remote, validate, store in cache, return path
+6. Frontend converts path to asset URL via `convertFileSrc()`
+7. Frontend calls `insertImage(assetUrl, column, row)` on Univer
 
 ### Error Handling
 Failed image loads display a placeholder icon in the cell with a tooltip
-describing the error. Network timeouts, 404 responses, and invalid image
-formats are handled gracefully without affecting other cells or operations.
+describing the error. Error types include:
+- Network timeouts (configurable timeout duration)
+- HTTP errors (404, 403, 500, etc.)
+- Invalid image format (not decodable by image crate)
+- Corrupt cache entries (deleted and refetched)
+
+Image errors are isolated and don't affect other cells or operations.
 
 ### Performance Considerations
-Base64 encoding increases payload size by approximately 33%, which is
-acceptable for reasonably-sized card images. For very large images, the cache
-stores the original binary and streams to frontend on demand. Browser limits
-on data URLs (512MB on Chromium, 2GB on Safari) are not a concern for typical
-card artwork.
+Using the asset protocol instead of base64 avoids the ~33% size overhead of
+base64 encoding. The webview loads images directly from the filesystem via
+the asset protocol, which is efficient for large images.
+
+For remote images, the cache ensures each image is fetched only once. Cache
+files are stored as original binary format without re-encoding.
 
 ## UUID Generation
 
