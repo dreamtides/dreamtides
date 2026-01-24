@@ -194,6 +194,7 @@ fn run_orchestration_loop(
                 );
                 if let Some(w) = state.get_worker_mut(name) {
                     w.pending_task_prompt = None;
+                    w.pending_task_prompt_since_unix = None;
                     w.pending_prompt_cmd = None;
                 }
             }
@@ -608,6 +609,8 @@ fn assign_task_to_worker(
     // Store the prompt as pending - it will be sent when SessionStart fires
     let worker_mut = state.get_worker_mut(worker_name).context("Worker not found")?;
     worker_mut.pending_task_prompt = Some(full_prompt.clone());
+    worker_mut.pending_task_prompt_since_unix =
+        Some(SystemTime::now().duration_since(UNIX_EPOCH).map(|d| d.as_secs()).unwrap_or(0));
     info!(
         worker = %worker_name,
         prompt_len = full_prompt.len(),

@@ -346,6 +346,7 @@ impl Patrol {
         }
         self.send_pending_self_review_prompts(state, config)?;
         self.send_pending_rebase_prompts(state)?;
+        self.retry_stale_clear_commands(state)?;
         let transitioned_workers: std::collections::HashSet<String> =
             report.transitions_applied.iter().map(|(name, _)| name.clone()).collect();
         self.rebase_pending_reviews(state, &origin_branch, &transitioned_workers, &mut report)?;
@@ -980,6 +981,89 @@ impl Patrol {
         Ok(())
     }
 
+    /// Retries /clear commands that may have failed to execute.
+    ///
+    /// When a task is assigned, `/clear` is sent to reset the Claude session
+    /// and `pending_task_prompt` is set. The prompt is sent when SessionStart
+    /// fires after Claude restarts. However, sometimes `/clear` fails to
+    /// execute (e.g., Claude's autocomplete menu intercepts the Enter key).
+    ///
+    /// This method detects workers with stale pending prompts (waiting for
+    /// SessionStart for too long) and resends `/clear` to retry.
+    fn retry_stale_clear_commands(&self, state: &mut State) -> Result<()> {
+        const STALE_THRESHOLD_SECS: u64 = 30;
+
+        let now = SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs();
+        let worker_names: Vec<String> = state.workers.keys().cloned().collect();
+
+        for worker_name in worker_names {
+            let worker = state.get_worker(&worker_name).unwrap();
+
+            // Only check workers that have a pending task prompt
+            let Some(since_unix) = worker.pending_task_prompt_since_unix else {
+                continue;
+            };
+
+            // Only retry if the pending prompt is stale (waiting too long)
+            let elapsed = now.saturating_sub(since_unix);
+            if elapsed < STALE_THRESHOLD_SECS {
+                continue;
+            }
+
+            // Only retry if worker is still Idle (hasn't transitioned to Working)
+            if worker.status != WorkerStatus::Idle {
+                tracing::debug!(
+                    worker = %worker_name,
+                    status = ?worker.status,
+                    elapsed_secs = elapsed,
+                    "Worker has pending prompt but is not Idle, skipping retry"
+                );
+                continue;
+            }
+
+            tracing::warn!(
+                worker = %worker_name,
+                elapsed_secs = elapsed,
+                threshold_secs = STALE_THRESHOLD_SECS,
+                "/clear may have failed to execute - worker has pending prompt but \
+                 SessionStart hasn't fired. Resending /clear to retry."
+            );
+
+            // Resend /clear
+            let session_id = worker.session_id.clone();
+            let sender = TmuxSender::new();
+            if let Err(e) = sender.send(&session_id, "/clear") {
+                tracing::error!(
+                    worker = %worker_name,
+                    error = %e,
+                    "Failed to resend /clear"
+                );
+                continue;
+            }
+
+            // Update the timestamp to prevent immediate retry on next patrol
+            if let Some(w) = state.get_worker_mut(&worker_name) {
+                w.pending_task_prompt_since_unix = Some(now);
+            }
+
+            tracing::info!(
+                worker = %worker_name,
+                "Resent /clear successfully, waiting for SessionStart"
+            );
+
+            // Save state to persist the updated timestamp
+            let state_path = state::get_state_path();
+            if let Err(e) = state.save(&state_path) {
+                tracing::error!(
+                    "Failed to save state after resending /clear to '{}': {}",
+                    worker_name,
+                    e
+                );
+            }
+        }
+        Ok(())
+    }
+
     fn detect_rebasing_transition(
         &self,
         worker_name: &str,
@@ -1209,6 +1293,7 @@ fn handle_session_start(
         if let Some(w) = state.get_worker_mut(worker_name) {
             w.current_prompt = pending_prompt;
             w.pending_task_prompt = None;
+            w.pending_task_prompt_since_unix = None;
             w.pending_prompt_cmd = None;
             w.transcript_session_id = Some(session_id.to_string());
             w.transcript_path = transcript_path.map(str::to_string);

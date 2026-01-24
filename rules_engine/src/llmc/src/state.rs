@@ -108,6 +108,12 @@ pub struct WorkerRecord {
     /// prompt, the prompt is sent and the worker transitions to Working.
     #[serde(default)]
     pub pending_task_prompt: Option<String>,
+    /// Unix timestamp when pending_task_prompt was set. Used to detect stale
+    /// pending prompts where /clear may have failed to execute (e.g., Claude's
+    /// autocomplete menu intercepted the Enter key). If this timestamp is too
+    /// old, patrol will resend /clear to retry.
+    #[serde(default)]
+    pub pending_task_prompt_since_unix: Option<u64>,
     /// Command used to generate the pending task prompt (e.g., "bd show
     /// dr-abc"). Stored alongside pending_task_prompt and used when
     /// transitioning to Working.

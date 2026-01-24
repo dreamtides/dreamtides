@@ -2,6 +2,7 @@ use std::fs;
 use std::io::{self, Write};
 use std::path::{Path, PathBuf};
 use std::process::Command;
+use std::time::{SystemTime, UNIX_EPOCH};
 
 use anyhow::{Context, Result, bail};
 use regex::Regex;
@@ -128,6 +129,8 @@ pub fn run_start(
     worker_mut.self_review =
         self_review || config.get_worker(&worker_name).and_then(|c| c.self_review).unwrap_or(false);
     worker_mut.pending_task_prompt = Some(full_prompt.clone());
+    worker_mut.pending_task_prompt_since_unix =
+        Some(SystemTime::now().duration_since(UNIX_EPOCH).map(|d| d.as_secs()).unwrap_or(0));
     worker_mut.pending_prompt_cmd = prompt_cmd.clone();
     let self_review_enabled = worker_mut.self_review;
 
