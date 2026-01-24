@@ -835,14 +835,17 @@ rules_engine/tests/tv_tests/
 │   ├── sync_tests/
 │   │   ├── sync_tests_mod.rs
 │   │   ├── watcher_tests.rs
-│   │   └── conflict_tests.rs
+│   │   ├── conflict_tests.rs
+│   │   └── state_machine_tests.rs
 │   ├── derived_tests/
 │   │   ├── derived_tests_mod.rs
 │   │   ├── registry_tests.rs
-│   │   └── executor_tests.rs
+│   │   ├── executor_tests.rs
+│   │   └── generation_tests.rs
 │   ├── validation_tests/
 │   │   ├── validation_tests_mod.rs
-│   │   └── rule_tests.rs
+│   │   ├── rule_tests.rs
+│   │   └── dropdown_tests.rs
 │   ├── image_tests/
 │   │   ├── image_tests_mod.rs
 │   │   ├── cache_tests.rs
@@ -859,7 +862,9 @@ rules_engine/tests/tv_tests/
 │   │   └── style_tag_tests.rs
 │   └── integration_tests/
 │       ├── integration_tests_mod.rs
-│       └── end_to_end_tests.rs
+│       ├── end_to_end_tests.rs
+│       ├── multi_file_tests.rs
+│       └── recovery_tests.rs
 └── test_utils/
     ├── test_utils_mod.rs
     ├── mock_filesystem.rs
