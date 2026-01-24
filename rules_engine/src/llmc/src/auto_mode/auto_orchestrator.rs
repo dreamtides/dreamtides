@@ -7,7 +7,7 @@ use std::time::{Duration, SystemTime, UNIX_EPOCH};
 use anyhow::{Context, Result, bail};
 use lattice::cli::color_theme;
 use tokio::sync::mpsc::Receiver;
-use tracing::{debug, error, info};
+use tracing::{debug, error, info, warn};
 
 use crate::auto_mode::auto_accept::{self, AutoAcceptResult};
 use crate::auto_mode::auto_config::{AutoConfig, ResolvedAutoConfig};
@@ -979,11 +979,14 @@ fn complete_worker_task(state: &mut State, worker_name: &str, task_dir: &std::pa
         return;
     };
     if let Err(e) = claude_tasks::complete_task(&task_id, task_dir) {
-        error!(
+        // Use warn instead of error because the worker's main job (accepting code
+        // changes) already succeeded. The task file being missing is a bookkeeping
+        // issue, not a critical failure - it may have been deleted externally.
+        warn!(
             worker = %worker_name,
             task_id = %task_id,
             error = %e,
-            "Failed to mark task as completed"
+            "Failed to mark task as completed (task file may have been deleted externally)"
         );
     }
 }
@@ -998,11 +1001,13 @@ fn release_worker_task(state: &mut State, worker_name: &str, task_dir: &std::pat
         return;
     };
     if let Err(e) = claude_tasks::release_task(&task_id, task_dir) {
-        error!(
+        // Use warn instead of error because release failures are recoverable.
+        // The task file may have been deleted or modified externally.
+        warn!(
             worker = %worker_name,
             task_id = %task_id,
             error = %e,
-            "Failed to release task back to pending"
+            "Failed to release task back to pending (task file may have been deleted externally)"
         );
     }
 }
