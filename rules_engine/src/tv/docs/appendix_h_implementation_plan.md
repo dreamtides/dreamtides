@@ -23,28 +23,52 @@ rather than crashing.
 
 Dependencies: None
 
+### Task 1a: Restructure Backend Modules
+Restructure the Rust backend from flat files into the module hierarchy defined
+in the design document file layout. Split toml_loader.rs into the toml/ module
+with separate files: document_loader.rs, document_writer.rs, toml_mod.rs. Move
+file_watcher.rs into the sync/ module with sync_mod.rs. Create stub files for
+other modules (commands/, derived/, validation/, images/, uuid/, logging/,
+error/) with module declarations. Keep the application functional at each step;
+separate refactoring commits from feature commits.
+
+Dependencies: Task 1
+
 ### Task 2: Add Command Line Argument Parsing
 Add clap dependency. Implement argument parsing in main.rs for optional
 file/directory path argument. Remove hardcoded file path. Default to
-rules_engine/tabula/ when no argument provided. Verify launching with different
+rules_engine/tabula/ when no argument provided. Display error dialog and exit
+with non-zero exit code for invalid paths. Define exit codes: 0 for success,
+1 for invalid arguments, 2 for file errors. Support JSONL stdout logging for
+external log aggregation via --jsonl flag. Verify launching with different
 paths works correctly.
 
 Dependencies: None
 
 ### Task 3: Stabilize File Watcher
-Review the existing file_watcher.rs. Ensure it handles watcher errors gracefully
-(file deleted, permission changes). Verify debouncing works correctly. Add
-proper cleanup on window close. Test external file modification triggers reload.
+Review the existing file_watcher.rs (now in sync/ module). Ensure it handles
+watcher errors gracefully (file deleted, permission changes). Verify debouncing
+works correctly. Add proper cleanup on window close. Test external file
+modification triggers reload.
 
-Dependencies: Task 1
+Dependencies: Task 1a
 
 ### Task 4: Extract Frontend State Management
 Create src/app_root.tsx extracting state management from App.tsx. Move useState
 hooks for data and error state. Move useEffect for initialization. Move IPC
-event listeners. Keep App.tsx as thin wrapper. Verify read-only display still
-works.
+event listeners. Create src/spreadsheet_view.tsx as a thin wrapper around the
+Univer spreadsheet component, accepting data and event handlers as props. Keep
+App.tsx as thin wrapper rendering AppRoot. Verify read-only display still works.
 
 Dependencies: None (frontend)
+
+### Task 4a: Create CSS Styles Module
+Create src/styles/app_styles.css with base styling for the application. Define
+CSS variables for theming (colors, spacing, typography). Style the main layout
+container, error states, and status indicators. Import in main.tsx. Keep styles
+minimal initially; expand as components are added.
+
+Dependencies: Task 4
 
 ### Task 5: Create Error Display Component
 Create src/error_banner.tsx for displaying error states from the backend. Accept
@@ -68,7 +92,7 @@ read_file_content methods. Define the FileSystem and Clock traits in the main
 TV library for dependency injection. Implement RealFileSystem for production use.
 Create initial test fixtures: simple_table.toml, with_comments.toml, sparse_data.toml.
 
-Dependencies: Task 1
+Dependencies: Task 1a
 
 ### Task 7a: Implement Load Tests
 Write integration tests for the load path using TvTestHarness:
@@ -229,14 +253,14 @@ panic details including function name and row data. Handle invalid function
 name references in metadata by displaying error in column cells and logging
 the unrecognized name.
 
-Dependencies: Task 30
+Dependencies: Task 32
 
 ### Task 17e: Handle Image Cache Corruption
 Validate cached images on startup by checking file headers. Delete corrupt
 entries and log warnings. Handle corrupt entries discovered during load by
 deleting and refetching. Add cache integrity verification at application start.
 
-Dependencies: Task 33
+Dependencies: Task 35
 
 ### Task 17f: Handle Memory Pressure
 Monitor memory usage during large file operations. Implement LRU eviction for
@@ -244,7 +268,17 @@ image cache when memory threshold exceeded. Catch out-of-memory conditions
 and display error dialog with recovery options. Preserve critical application
 state during memory pressure events.
 
-Dependencies: Task 33
+Dependencies: Task 35
+
+### Task 17g: Handle Backend Thread Panic
+Install panic hooks at application startup to catch panics in background threads.
+Log panic details with backtrace information. Keep the main UI thread responsive
+when background threads panic. Display error state in the UI indicating which
+operation failed. For critical panics (e.g., file watcher thread), attempt
+automatic restart of the failed component. For unrecoverable panics, display
+error dialog suggesting application restart.
+
+Dependencies: Task 15
 
 ## Phase 4: Multi-File Support
 
@@ -458,12 +492,14 @@ Frontend will convert path to asset URL.
 Dependencies: Tasks 36, 36a, 31
 
 ### Task 38: Add Frontend Image Cell Support
-Install @univerjs/sheets-drawing-ui and related drawing packages. Use
-convertFileSrc() from @tauri-apps/api/core to convert cache paths to asset
-URLs. Call FWorksheet.insertImage(assetUrl, column, row) to display images.
-Display loading placeholder while fetch is pending. Display error placeholder
-icon for failed loads (network timeout, 404, invalid format). Show error
-details in tooltip on hover. Ensure image errors don't affect other cells.
+Install Univer drawing packages: @univerjs/drawing, @univerjs/drawing-ui,
+@univerjs/sheets-drawing, @univerjs/sheets-drawing-ui (or use the preset
+@univerjs/preset-sheets-drawing). Use convertFileSrc() from @tauri-apps/api/core
+to convert cache paths to asset URLs. Call FWorksheet.insertImage(assetUrl,
+column, row) to display floating images positioned at cells. Display loading
+placeholder while fetch is pending. Display error placeholder icon for failed
+loads (network timeout, 404, invalid format). Show error details in tooltip
+on hover. Ensure image errors don't affect other cells.
 
 Dependencies: Task 37
 
@@ -648,7 +684,8 @@ rules_engine/tests/tv_tests/
 │   ├── sparse_data.toml
 │   ├── with_metadata.toml
 │   ├── large_table.toml
-│   └── invalid_syntax.toml
+│   ├── invalid_syntax.toml
+│   └── unicode_content.toml
 ├── src/
 │   ├── lib.rs
 │   ├── toml_tests/
@@ -862,10 +899,12 @@ Tests run via `just tv-test` which:
 **Phase 1 - MVP 1 (Read-Only) - Can start immediately:**
 - Tasks 1, 2 (backend, parallel)
 - Tasks 4, 5, 6 (frontend, parallel)
-- Task 3 depends on Task 1
-- Task 7 (test crate setup) depends on Task 1
+- Task 1a (restructure modules) depends on Task 1
+- Task 3 depends on Task 1a
+- Task 4a (CSS styles) depends on Task 4
+- Task 7 (test crate setup) depends on Task 1a
 - Task 7a (load tests) depends on Task 7
-- Task 7b (manual testing) depends on Tasks 1-6, 7a
+- Task 7b (manual testing) depends on Tasks 1-6, 1a, 4a, 7a
 
 **Phase 2 - MVP 2 (Editable) - After MVP 1:**
 - Task 8 depends on Task 7b
@@ -877,9 +916,10 @@ Tests run via `just tv-test` which:
 - Task 13b (manual testing) depends on Tasks 13, 13a
 
 **Phase 3 - Error Robustness - After MVP 2:**
-- Tasks 14-17f can start after Task 13b
+- Tasks 14-17g can start after Task 13b
 - Task 17d depends on Task 32 (derived column executor)
 - Tasks 17e, 17f depend on Task 35 (image cache)
+- Task 17g (backend thread panic) depends on Task 15
 - Each error type should include a test using MockFileSystem
 
 **Phase 4 - Multi-File Support - After MVP 2:**
@@ -906,7 +946,7 @@ Tests run via `just tv-test` which:
 - Logging (Phase 14): Tasks 56-58, can start after Task 13b
 
 **Critical Path to Working MVP:**
-Task 1 → Task 3 → Task 7 → Task 7a → Task 7b → Task 8 → Task 9 → Task 10 → Task 12 → Task 13 → Task 13b
+Task 1 → Task 1a → Task 3 → Task 7 → Task 7a → Task 7b → Task 8 → Task 9 → Task 10 → Task 12 → Task 13 → Task 13b
 
 **Parallel Work Streams After MVP 2:**
 1. Error Robustness (Phase 3)
