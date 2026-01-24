@@ -600,7 +600,8 @@ rules_engine/src/tv_tests/
 │   ├── sparse_data.toml
 │   ├── with_metadata.toml
 │   ├── large_table.toml
-│   └── invalid_syntax.toml
+│   ├── invalid_syntax.toml
+│   └── unicode_content.toml
 ├── src/
 │   ├── lib.rs
 │   ├── toml_tests/

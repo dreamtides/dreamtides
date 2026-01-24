@@ -116,35 +116,90 @@ Dependencies: Task 12
 
 ## Phase 3: Error Robustness
 
-These tasks ensure the application handles error scenarios gracefully.
+These tasks ensure the application handles error scenarios gracefully. The design
+document specifies 18 error scenarios; these tasks implement handling for all of them.
 
 ### Task 14: Create Error Types Module
-Create error/error_types.rs with TvError enum covering failure modes:
-TomlParseError, FileNotFound, PermissionDenied, WriteError. Implement Display
-and Error traits. Add From implementations for common error types.
+Create error/error_types.rs with TvError enum covering all failure modes:
+TomlParseError, FileNotFound, PermissionDenied, WriteError, DiskFull,
+FileLocked, InvalidUtf8, MetadataCorrupt, DerivedFunctionError, ImageCacheError,
+MemoryPressure. Implement Display and Error traits. Add From implementations
+for common error types. Include user-friendly error messages for each variant.
 
 Dependencies: Task 13
 
 ### Task 15: Implement Error Recovery
-Define error recovery strategies: which errors allow continued editing in
-read-only mode, which require reload, which show permanent error state. Implement
-recovery logic in save and load paths.
+Define error recovery strategies for each error type: which errors allow
+continued editing in read-only mode (parse errors, permission denied on write),
+which require reload (external file changes), which show permanent error state
+(file deleted). Implement recovery logic in save and load paths. Add retry
+with exponential backoff for transient errors (file locked, network issues).
 
 Dependencies: Task 14
 
-### Task 16: Handle File Deletion
-When watched file is deleted, enter read-only state with error banner. Preserve
-last known data. Monitor for file reappearance. Resume normal operation when
-file returns.
+### Task 16: Handle File Deletion and Movement
+When watched file is deleted or moved, enter read-only state with error banner.
+Preserve last known data in memory. Monitor for file reappearance at original
+path. Add recovery dialog allowing user to specify new file path if file was
+renamed/moved. Resume normal operation when file returns or new path provided.
 
 Dependencies: Task 15
 
 ### Task 17: Handle Permission Errors
 When file becomes unreadable, preserve last known data and show error. When
 file becomes unwritable, allow viewing but reject saves with error message.
-Queue pending changes for retry when permissions restore.
+Queue pending changes for retry when permissions restore. Handle network drive
+disconnection as permission/not-found error with appropriate messaging.
 
 Dependencies: Task 15
+
+### Task 17a: Handle Disk Full and File Lock Errors
+Detect disk full errors during atomic write (temp file creation fails). Display
+specific error message about disk space. Preserve pending changes in memory.
+Handle file lock contention on Windows with retry and exponential backoff.
+Report failure after reasonable retry duration.
+
+Dependencies: Task 15
+
+### Task 17b: Handle Encoding and Large File Errors
+Detect invalid UTF-8 content during TOML parse and report encoding error with
+line/byte offset. Add configurable size limit warning for extremely large files.
+Display performance warning dialog before loading files exceeding threshold.
+Allow user to proceed or cancel.
+
+Dependencies: Task 15
+
+### Task 17c: Handle Corrupted Metadata
+When [metadata] section fails to parse but main data section parses successfully,
+proceed with default metadata settings. Log warning with parse error details.
+Add "Reset Metadata" action in error banner to clear corrupt metadata section
+and write clean defaults.
+
+Dependencies: Task 15
+
+### Task 17d: Handle Derived Function Errors
+Catch panics within derived function execution at the task boundary using
+catch_unwind. Display error state in affected cells without crashing. Log
+panic details including function name and row data. Handle invalid function
+name references in metadata by displaying error in column cells and logging
+the unrecognized name.
+
+Dependencies: Task 30
+
+### Task 17e: Handle Image Cache Corruption
+Validate cached images on startup by checking file headers. Delete corrupt
+entries and log warnings. Handle corrupt entries discovered during load by
+deleting and refetching. Add cache integrity verification at application start.
+
+Dependencies: Task 33
+
+### Task 17f: Handle Memory Pressure
+Monitor memory usage during large file operations. Implement LRU eviction for
+image cache when memory threshold exceeded. Catch out-of-memory conditions
+and display error dialog with recovery options. Preserve critical application
+state during memory pressure events.
+
+Dependencies: Task 33
 
 ## Phase 4: Multi-File Support
 
@@ -174,193 +229,328 @@ when TOML files appear or disappear. Update sheet tabs accordingly.
 
 Dependencies: Task 20
 
-## Phase 5: UUID Generation
+## Phase 5: Row Operations
 
-### Task 22: Implement UUID Generator
-Create uuid_generator.rs with ID column detection (case-insensitive). Generate
-UUIDv4 for empty ID cells. Return generated UUID or None if column missing or
-cell non-empty.
+These tasks implement adding and deleting rows in the spreadsheet.
+
+### Task 22: Implement Row Addition Backend
+Create command to add new row to TOML array. Insert empty table entry at
+specified position or end of array. Preserve document structure with toml_edit.
+Return new row index to frontend.
 
 Dependencies: Task 13
 
-### Task 23: Integrate UUID with Save
-Update save command to call UUID generator before writing. Include generated
-UUID in save response. Update frontend to apply generated UUID to display.
+### Task 22a: Implement Row Deletion Backend
+Create command to delete row from TOML array. Remove table entry at specified
+index. Shift subsequent rows. Preserve document structure. Handle deletion
+of last row gracefully.
 
-Dependencies: Task 22
+Dependencies: Task 13
 
-## Phase 6: Metadata Support
+### Task 22b: Add Frontend Row Operations
+Add row insertion UI (button or context menu). Add row deletion UI with
+confirmation for non-empty rows. Wire to backend commands. Refresh display
+after row operations.
 
-### Task 24: Define Metadata Schema
+Dependencies: Tasks 22, 22a
+
+### Task 22c: Implement Batch Edit Handling
+Collect multiple cell changes from paste operations into single batch. Apply
+all changes in one TOML write operation. Emit single sync event after batch
+complete. Handle partial batch failure gracefully.
+
+Dependencies: Task 9
+
+## Phase 6: UUID Generation
+
+### Task 24: Implement UUID Generator
+Create uuid_generator.rs with ID column detection (case-insensitive, handling
+"ID", "Id", "id" variations). Generate UUIDv4 for empty ID cells. Check runs
+on any cell edit within a row, not just row creation. Return generated UUID
+or None if column missing or cell already populated.
+
+Dependencies: Task 13
+
+### Task 25: Integrate UUID with Save
+Update save command to call UUID generator before writing. Insert generated
+UUID into TOML document. Include generated UUID in save response so frontend
+can update cell display without reload.
+
+Dependencies: Task 24
+
+## Phase 7: Metadata Support
+
+### Task 26: Define Metadata Schema
 Design the [metadata] section schema. Define TypeScript and Rust types for
 metadata structure. Document all supported fields, types, and defaults.
 
 Dependencies: Task 13
 
-### Task 25: Implement Metadata Parser
+### Task 27: Implement Metadata Parser
 Create metadata_parser.rs to parse [metadata] section. Return Option<Metadata>
 with defaults for missing fields. Handle missing section gracefully.
 
-Dependencies: Task 24
+Dependencies: Task 26
 
-### Task 26: Implement Metadata Serialization
+### Task 28: Implement Metadata Serialization
 Add serialization back to TOML. Update metadata section in document. Create
-section if missing. Preserve unrecognized fields.
+section if missing. Preserve unrecognized fields for forward compatibility.
 
-Dependencies: Task 25
+Dependencies: Task 27
 
-### Task 27: Apply Column Widths from Metadata
+### Task 29: Apply Column Widths from Metadata
 Read column widths from metadata on load. Apply to Univer. Detect width changes
 via Univer events. Update metadata. Save on change.
 
-Dependencies: Task 26
+Dependencies: Task 28
 
-## Phase 7: Derived Columns
-
-### Task 28: Define Derived Function Trait
-Create DerivedFunction trait with name(), input_keys(), compute() methods.
-Create DerivedResult enum with Text, Number, Error variants.
-
-Dependencies: Task 13
-
-### Task 29: Implement Function Registry
-Create FunctionRegistry storing functions by name. Implement register and lookup.
-Initialize global registry at startup.
+### Task 29a: Apply Additional Column Formatting
+Read column alignment (left, center, right) from metadata. Read text wrapping
+settings per column. Apply to Univer column configuration. Detect changes via
+Univer events and persist to metadata.
 
 Dependencies: Task 28
 
-### Task 30: Implement Compute Executor
-Create async computation infrastructure with tokio. Queue computations. Send
-results via Tauri events. Handle errors gracefully.
+### Task 29b: Apply Number and Date Formats
+Read number format strings from metadata (decimal places, thousands separator).
+Read date format strings for date columns. Apply to Univer cell formatting.
+Allow format customization per column via metadata.
 
-Dependencies: Task 29
+Dependencies: Task 28
 
-### Task 31: Add Generation Tracking
-Track row generation counters. Increment on row edit. Discard stale computation
-results. Ensure eventual correctness.
+## Phase 8: Derived Columns
+
+### Task 30: Define Derived Function Trait
+Create DerivedFunction trait with name(), input_keys(), compute() methods.
+Define compute() as async for long-running operations. Create DerivedResult
+enum with Text, Number, Image, RichText, Error variants.
+
+Dependencies: Task 13
+
+### Task 31: Implement Function Registry
+Create FunctionRegistry storing functions by name. Implement register and lookup.
+Initialize global registry at startup. Log registered functions for debugging.
 
 Dependencies: Task 30
 
-### Task 32: Add Frontend Derived Column Support
-Subscribe to derived-value-computed events. Update cell display when results
-arrive. Show blank while pending. Show error styling on failure.
+### Task 32: Implement Compute Executor
+Create async computation infrastructure with tokio thread pool. Queue computations
+by row. Send results via Tauri events as they complete. Catch panics at task
+boundary. Prioritize visible rows for computation.
 
 Dependencies: Task 31
 
-## Phase 8: Image Support
+### Task 33: Add Generation Tracking
+Track row generation counters. Increment counter on any row edit. Tag computation
+requests with current generation. Discard computation results arriving for
+outdated generations. Ensure UI eventually shows correct value.
 
-### Task 33: Implement Image Cache
-Create content-addressed image cache. Store by URL hash. Implement get/put.
-Add LRU eviction.
+Dependencies: Task 32
 
-Dependencies: Task 13
-
-### Task 34: Implement Image Fetcher
-Create async HTTP image download with reqwest. Validate response. Decode to
-verify validity.
+### Task 34: Add Frontend Derived Column Support
+Subscribe to derived-value-computed events. Update cell display when results
+arrive. Show blank/loading indicator while pending. Show error styling with
+tooltip on failure. Handle all DerivedResult variants appropriately.
 
 Dependencies: Task 33
 
-### Task 35: Implement Image Derived Function
-Create function implementing DerivedFunction. Construct URL from row data.
-Fetch, cache, return base64-encoded image.
+## Phase 9: Image Support
 
-Dependencies: Tasks 34, 29
+### Task 35: Implement Image Cache
+Create content-addressed image cache in application data directory. Store by
+URL hash as key. Implement get/put with file-based storage. Add LRU eviction
+when cache size exceeds configurable limit. Cache never expires; persist
+across restarts.
 
-### Task 36: Add Frontend Image Cell Support
-Use Univer sheets-drawing-ui for cell images. Call insertImage for image
-results. Display placeholder during load.
+Dependencies: Task 13
+
+### Task 36: Implement Image Fetcher
+Create async HTTP image download with reqwest and connection pooling. Validate
+response status and content-type. Decode to verify image validity using the
+image crate. Support HTTP and HTTPS URLs. Also implement local filesystem
+image loading for file:// paths. Local images read directly without caching.
+Handle network timeouts gracefully.
 
 Dependencies: Task 35
 
-## Phase 9: Validation
+### Task 37: Implement Image Derived Function
+Create function implementing DerivedFunction trait. Construct image URL from
+row data (e.g., from image number field). Check cache first. Fetch and cache
+on miss. Return base64-encoded image data for frontend transport.
 
-### Task 37: Implement Validation Rule Parser
+Dependencies: Tasks 36, 31
+
+### Task 38: Add Frontend Image Cell Support
+Use @univerjs/sheets-drawing-ui for cell images. Call insertImage API with
+base64 data URI. Display loading placeholder while fetch is pending. Display
+error placeholder icon for failed loads (network timeout, 404, invalid format).
+Show error details in tooltip on hover. Ensure image errors don't affect
+other cells or operations.
+
+Dependencies: Task 37
+
+## Phase 10: Validation
+
+### Task 39: Implement Validation Rule Parser
 Parse validation rules from metadata. Define ValidationRule struct with type,
-constraints, error message. Support enum, range, pattern rules.
+constraints, error message. Support validation types: enum (allowed value list),
+range (numeric min/max), pattern (regex), required (non-empty), type (numeric
+or boolean).
 
-Dependencies: Task 25
+Dependencies: Task 27
 
-### Task 38: Implement Validators
-Create type and enum validators. Return validation result with error message.
-Handle required vs optional fields.
+### Task 40: Implement Validators
+Create validators for each rule type. Return validation result with error
+message. Handle required vs optional fields. Validate cells on edit before
+save.
 
-Dependencies: Task 37
+Dependencies: Task 39
 
-### Task 39: Integrate Validation with Save
-Validate cell values before writing. Reject invalid values with error. Return
-validation errors to frontend.
+### Task 41: Integrate Validation with Save
+Validate cell values before writing to TOML. Reject invalid values with
+descriptive error message. Return validation errors to frontend. Keep cell
+in error state until corrected (red border, error icon).
 
-Dependencies: Task 38
+Dependencies: Task 40
 
-### Task 40: Add Frontend Dropdown Support
-Configure Univer data validation for enum columns. Read values from metadata.
-Set up dropdown UI.
+### Task 42: Add Frontend Dropdown Support
+Configure Univer data validation for enum columns. Read allowed values from
+metadata. Set up dropdown UI with type-ahead filtering. Reject values not in
+allowed list on commit.
 
-Dependencies: Task 37
+Dependencies: Task 39
 
-## Phase 10: Rules Text Preview
+### Task 43: Add Checkbox Cell Support
+Detect boolean columns from metadata or data type inference. Render boolean
+values as interactive checkboxes within cells using Univer cell rendering.
+Handle checkbox click to toggle value and trigger save. Ensure checkbox state
+reflects current TOML boolean value.
 
-### Task 41: Implement Fluent Integration
-Load strings.ftl. Parse into FluentResource. Store for template processing.
+Dependencies: Task 39
 
-Dependencies: Task 29
+## Phase 11: Rules Text Preview
 
-### Task 42: Implement Style Tag Parser
-Parse HTML-like styling tags. Generate styled run list with character positions.
+### Task 44: Implement Fluent Integration
+Load strings.ftl from rules_engine/l10n/. Parse into FluentResource. Store
+for template processing. Handle missing translation gracefully.
+
+Dependencies: Task 31
+
+### Task 45: Implement Style Tag Parser
+Parse HTML-like styling tags (bold, italic, underline, color spans). Generate
+styled run list with character positions for Univer rich text API.
 
 Dependencies: Task 13
 
-### Task 43: Implement Rules Preview Function
-Create DerivedFunction for rules preview. Parse variables. Format through
-Fluent. Parse style tags. Return rich text result.
+### Task 46: Implement Rules Preview Function
+Create DerivedFunction for rules preview. Parse variables from companion
+variables column in same row. Format through Fluent template system. Parse
+style tags for rich text output. Integrate with existing ability parser from
+rules_engine to validate syntax. Highlight parse errors with error styling
+at error location. Return rich text result with all variable substitutions.
 
-Dependencies: Tasks 41, 42
+Dependencies: Tasks 44, 45
 
-### Task 44: Add Frontend Rich Text Support
-Handle RichText derived results. Apply Univer rich text formatting.
+### Task 47: Implement Card Lookup Function
+Create DerivedFunction for card name lookups from UUID references. Accept
+cell value containing card UUID. Look up card name from cards.toml data.
+Return card name text or "Unknown Card" if UUID not found. Cache lookup
+results for performance.
 
-Dependencies: Task 43
+Dependencies: Task 31
 
-## Phase 11: Styling
+### Task 48: Add Frontend Rich Text Support
+Handle RichText derived results. Apply Univer rich text formatting with bold,
+italic, underline, and colored spans per the styled run list. Display syntax
+errors from ability parser with red underline or background styling.
 
-### Task 45: Implement Table Color Schemes
-Define color scheme presets. Store selection in metadata. Apply header and
-alternating row colors.
+Dependencies: Task 46
 
-Dependencies: Task 26
+## Phase 12: Sorting and Filtering
 
-### Task 46: Implement Conditional Formatting
-Parse formatting rules from metadata. Evaluate conditions. Return style
-overrides. Integrate with Univer.
+These tasks implement visual-only sorting and filtering that does not modify
+the underlying TOML file order.
 
-Dependencies: Task 26
+### Task 49: Implement Visual-Only Sort Backend
+Create sort state management that tracks current sort column and direction.
+Apply sort to row display order without modifying TOML array order. Implement
+sort comparators for text, numeric, and boolean columns. Optionally persist
+default sort state to metadata.
 
-### Task 47: Implement Frozen Panes
-Read freeze configuration from metadata. Apply to Univer on load. Persist
-changes to metadata.
+Dependencies: Task 28
 
-Dependencies: Task 26
+### Task 50: Configure Univer Sort Plugin
+Integrate UniverSheetsSortPlugin. Handle column header click to cycle through
+ascending, descending, and no sort. Display sort indicators in column headers.
+Emit sort state changes to backend for optional persistence.
 
-## Phase 12: Logging
+Dependencies: Task 49
 
-### Task 48: Create JSON Logger
+### Task 51: Implement Filter Backend
+Create filter state management supporting multiple concurrent filters. Implement
+filter types: text substring, exact value match for enums, boolean checkbox
+match, numeric range. Combine multiple filters with AND logic. Track filtered
+row visibility.
+
+Dependencies: Task 28
+
+### Task 52: Configure Univer Filter Plugin
+Integrate UniverSheetsFilterPlugin. Display filter UI in column headers. Connect
+filter changes to backend filter state. Update visible rows based on filter
+results. Optionally persist filter state to metadata.
+
+Dependencies: Task 51
+
+## Phase 13: Styling
+
+### Task 53: Implement Table Color Schemes
+Define color scheme presets matching Excel table styles. Each scheme includes
+header background, alternating row colors, accent colors for selection/focus.
+Store scheme selection in metadata. Apply colors via Univer cell styling API.
+Ensure alternating colors follow visual sort order, not data order.
+
+Dependencies: Task 28
+
+### Task 54: Implement Conditional Formatting
+Parse conditional formatting rules from metadata. Support conditions: value
+comparisons, text content matching, empty/non-empty checks. Styles include
+background color, font color, bold, italic. Evaluate rules on each render.
+Integrate with Univer cell styling.
+
+Dependencies: Task 28
+
+### Task 55: Implement Frozen Panes
+Read freeze configuration from metadata (frozen rows, frozen columns). Apply
+to Univer via freeze pane API on load. Detect user changes to freeze state.
+Persist changes to metadata. Default to freezing header row.
+
+Dependencies: Task 28
+
+## Phase 14: Logging
+
+### Task 56: Create JSON Logger
 Implement tracing subscriber outputting JSONL format. Include Pacific Time
-timestamps. Write to stdout and log file.
+timestamps using chrono with chrono-tz. Include component tags following
+hierarchical naming (e.g., "toml.loader", "sync.watcher"). Write to both
+stdout and log file. Default to INFO level for production. Support log levels:
+ERROR, WARN, INFO, DEBUG, TRACE.
 
 Dependencies: Task 13
 
-### Task 49: Add Frontend Log Forwarding
-Create frontend logger. Format logs as JSON. Send to backend via command.
-Mirror to browser console.
+### Task 57: Add Frontend Log Forwarding
+Create frontend logger module. Format logs as JSON with timestamp, level,
+component, message, and context fields. Send to backend via Tauri logging
+command. Also mirror to browser console for development. Aggregate with
+backend logs into unified stream.
 
-Dependencies: Task 48
+Dependencies: Task 56
 
-### Task 50: Add Log Rotation
-Implement daily log file rotation. Create logs in app data directory. Clean
-old logs based on retention period.
+### Task 58: Add Log Rotation
+Implement daily log file rotation. Create logs in application data directory.
+Compress old logs after rotation. Delete logs exceeding configurable retention
+period. Verify log directory exists at startup.
 
-Dependencies: Task 48
+Dependencies: Task 56
 
 ---
 
@@ -368,21 +558,44 @@ Dependencies: Task 48
 
 ### Test Crate Structure
 
-Following this project's patterns, create a test crate at:
+Following this project's patterns and the design document file layout, create
+a test crate at:
 
 ```
-rules_engine/tests/tv_tests/
+rules_engine/src/tv_tests/
 ├── Cargo.toml
+├── fixtures/
+│   ├── simple_table.toml
+│   ├── with_comments.toml
+│   ├── sparse_data.toml
+│   ├── with_metadata.toml
+│   ├── large_table.toml
+│   └── invalid_syntax.toml
 ├── src/
-│   └── lib.rs          (exports test utilities as a library)
-└── tests/
-    ├── lib.rs          (declares test modules)
-    └── tv_tests/
-        ├── mod.rs
-        ├── load_tests.rs
-        ├── save_tests.rs
-        ├── sync_tests.rs
-        └── preservation_tests.rs
+│   ├── lib.rs
+│   ├── toml_tests/
+│   │   ├── toml_tests_mod.rs
+│   │   ├── load_tests.rs
+│   │   ├── save_tests.rs
+│   │   └── preservation_tests.rs
+│   ├── sync_tests/
+│   │   ├── sync_tests_mod.rs
+│   │   ├── watcher_tests.rs
+│   │   └── conflict_tests.rs
+│   ├── derived_tests/
+│   │   ├── derived_tests_mod.rs
+│   │   ├── registry_tests.rs
+│   │   └── executor_tests.rs
+│   ├── validation_tests/
+│   │   ├── validation_tests_mod.rs
+│   │   └── rule_tests.rs
+│   └── integration_tests/
+│       ├── integration_tests_mod.rs
+│       └── end_to_end_tests.rs
+└── test_utils/
+    ├── test_utils_mod.rs
+    ├── mock_filesystem.rs
+    └── mock_clock.rs
 ```
 
 ### Test Utilities Library
@@ -476,13 +689,15 @@ with actual file I/O, path handling, and permission behavior.
 
 ### Test Fixtures
 
-Create test fixture files at `tests/tv_tests/fixtures/`:
-- `simple_table.toml` - Basic array of tables
-- `with_comments.toml` - TOML with inline and block comments
-- `sparse_data.toml` - Rows with different column sets
-- `with_metadata.toml` - File including [metadata] section
-- `unicode_content.toml` - Non-ASCII text in values
-- `invalid_syntax.toml` - Intentionally malformed for error tests
+Test fixture files live in `rules_engine/src/tv_tests/fixtures/` as shown in
+the directory structure above. Each fixture tests specific scenarios:
+- `simple_table.toml` - Basic array of tables for happy path testing
+- `with_comments.toml` - TOML with inline and block comments for preservation tests
+- `sparse_data.toml` - Rows with different column sets for header collection
+- `with_metadata.toml` - File including [metadata] section for metadata parsing
+- `large_table.toml` - Many rows for performance and memory testing
+- `invalid_syntax.toml` - Intentionally malformed for error handling tests
+- `unicode_content.toml` - Non-ASCII text in values for encoding tests
 
 ### Test Categories
 
@@ -522,24 +737,53 @@ Tests run via `just tv-test` which:
 
 ## Task Dependency Summary
 
-**MVP 1 (Read-Only) - Can start immediately:**
+**Phase 1 - MVP 1 (Read-Only) - Can start immediately:**
 - Tasks 1, 2 (backend, parallel)
 - Tasks 4, 5, 6 (frontend, parallel)
 - Task 3 depends on Task 1
 - Task 7 depends on all above
 
-**MVP 2 (Editable) - After MVP 1:**
+**Phase 2 - MVP 2 (Editable) - After MVP 1:**
 - Task 8 depends on Task 7
 - Tasks 9, 10 sequential
 - Task 11 depends on Task 6
 - Task 12 depends on Tasks 10, 11
 - Task 13 depends on Task 12
 
-**Post-MVP - After MVP 2:**
-- Error Robustness (Tasks 14-17) can start after Task 13
-- Multi-File (Tasks 18-21) can start after Task 13
-- UUID (Tasks 22-23) can start after Task 13
-- Remaining phases depend on their listed prerequisites
+**Phase 3 - Error Robustness - After MVP 2:**
+- Tasks 14-17f can start after Task 13
+- Task 17d depends on Task 32 (derived column executor)
+- Tasks 17e, 17f depend on Task 35 (image cache)
 
-**Critical Path to Working Prototype:**
+**Phase 4 - Multi-File Support - After MVP 2:**
+- Tasks 18-21 can start after Task 13
+
+**Phase 5 - Row Operations - After MVP 2:**
+- Tasks 22-22c can start after Task 13
+- Task 22c depends on Task 9
+
+**Phase 6 - UUID Generation - After MVP 2:**
+- Tasks 24-25 can start after Task 13
+
+**Phase 7 - Metadata Support - After MVP 2:**
+- Tasks 26-29b can start after Task 13
+
+**Phase 8-14 - Feature Phases - After Metadata:**
+- Derived Columns (Phase 8): Tasks 30-34
+- Image Support (Phase 9): Tasks 35-38, depends on Task 31
+- Validation (Phase 10): Tasks 39-43, depends on Task 27
+- Rules Preview (Phase 11): Tasks 44-48, depends on Task 31
+- Sorting/Filtering (Phase 12): Tasks 49-52, depends on Task 28
+- Styling (Phase 13): Tasks 53-55, depends on Task 28
+- Logging (Phase 14): Tasks 56-58, can start after Task 13
+
+**Critical Path to Working MVP:**
 Task 1 → Task 3 → Task 7 → Task 8 → Task 9 → Task 10 → Task 12 → Task 13
+
+**Parallel Work Streams After MVP 2:**
+1. Error Robustness (Phase 3)
+2. Multi-File Support (Phase 4)
+3. Row Operations (Phase 5)
+4. UUID Generation (Phase 6)
+5. Metadata Support (Phase 7) - blocks many later phases
+6. Logging (Phase 14)
