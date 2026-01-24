@@ -7,14 +7,18 @@ import "./App.css";
 
 export type { TomlTableData };
 
-const FILE_PATH =
-  "/Users/dthurn/Documents/GoogleDrive/dreamtides/rules_engine/tabula/dreamwell.toml";
-const TABLE_NAME = "dreamwell";
 const SAVE_DEBOUNCE_MS = 500;
 
 export type SyncState = "idle" | "loading" | "saving" | "saved" | "error";
 
+function extractTableName(filePath: string): string {
+  const fileName = filePath.split("/").pop() || filePath;
+  return fileName.replace(/\.toml$/, "");
+}
+
 export function AppRoot() {
+  const [filePath, setFilePath] = useState<string | null>(null);
+  const [tableName, setTableName] = useState<string | null>(null);
   const [data, setData] = useState<TomlTableData | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -22,12 +26,12 @@ export function AppRoot() {
   const saveTimeoutRef = useRef<number | null>(null);
   const isSavingRef = useRef(false);
 
-  const loadData = useCallback(async () => {
+  const loadData = useCallback(async (path: string, table: string) => {
     try {
       setLoading(true);
       const result = await invoke<TomlTableData>("load_toml_table", {
-        filePath: FILE_PATH,
-        tableName: TABLE_NAME,
+        filePath: path,
+        tableName: table,
       });
       setData(result);
       setError(null);
@@ -39,14 +43,14 @@ export function AppRoot() {
   }, []);
 
   const saveData = useCallback(async (newData: TomlTableData) => {
-    if (isSavingRef.current) return;
+    if (isSavingRef.current || !filePath || !tableName) return;
     isSavingRef.current = true;
     setSaveStatus("saving");
 
     try {
       await invoke("save_toml_table", {
-        filePath: FILE_PATH,
-        tableName: TABLE_NAME,
+        filePath,
+        tableName,
         data: newData,
       });
       setSaveStatus("saved");
@@ -57,7 +61,7 @@ export function AppRoot() {
     } finally {
       isSavingRef.current = false;
     }
-  }, []);
+  }, [filePath, tableName]);
 
   const handleChange = useCallback(
     (newData: TomlTableData) => {
@@ -72,16 +76,34 @@ export function AppRoot() {
   );
 
   useEffect(() => {
-    loadData();
+    const init = async () => {
+      try {
+        const paths = await invoke<string[]>("get_app_paths");
+        if (paths.length > 0) {
+          const path = paths[0];
+          const table = extractTableName(path);
+          setFilePath(path);
+          setTableName(table);
+          await loadData(path, table);
+          invoke("start_file_watcher", { filePath: path }).catch((e) =>
+            console.error("Failed to start file watcher:", e)
+          );
+        } else {
+          setError("No TOML files found");
+          setLoading(false);
+        }
+      } catch (e) {
+        setError(String(e));
+        setLoading(false);
+      }
+    };
 
-    invoke("start_file_watcher", { filePath: FILE_PATH }).catch((e) =>
-      console.error("Failed to start file watcher:", e)
-    );
+    init();
 
     const unlisten = listen<{ path: string }>("toml-file-changed", () => {
-      if (!isSavingRef.current) {
+      if (!isSavingRef.current && filePath && tableName) {
         console.log("File changed externally, reloading...");
-        loadData();
+        loadData(filePath, tableName);
       }
     });
 
