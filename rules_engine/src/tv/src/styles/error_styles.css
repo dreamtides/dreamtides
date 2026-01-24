@@ -1,6 +1,78 @@
 /* error_styles.css - Error banner and indicator styles */
-/* Full implementation in Task 5 */
 
 .tv-error-banner {
-  /* Placeholder - implemented in Task 5 */
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  padding: var(--tv-spacing-md);
+  background-color: var(--tv-error-bg);
+  border-bottom: 2px solid var(--tv-error-border);
+  color: var(--tv-error-text);
+  z-index: 1000;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.tv-error-banner.tv-warning {
+  background-color: var(--tv-warning-bg);
+  border-color: #ffc107;
+  color: var(--tv-warning-text);
+}
+
+.tv-error-icon {
+  font-size: 24px;
+  margin-right: var(--tv-spacing-md);
+  flex-shrink: 0;
+}
+
+.tv-error-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--tv-spacing-sm);
+}
+
+.tv-error-message {
+  font-size: var(--tv-font-size-md);
+  font-weight: 500;
+}
+
+.tv-error-actions {
+  display: flex;
+  gap: var(--tv-spacing-sm);
+}
+
+.tv-error-action-btn {
+  padding: var(--tv-spacing-xs) var(--tv-spacing-sm);
+  background-color: transparent;
+  border: 1px solid currentColor;
+  border-radius: 4px;
+  color: inherit;
+  cursor: pointer;
+  font-size: var(--tv-font-size-sm);
+}
+
+.tv-error-action-btn:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+.tv-error-dismiss {
+  padding: var(--tv-spacing-xs);
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  font-size: 18px;
+  opacity: 0.7;
+}
+
+.tv-error-dismiss:hover {
+  opacity: 1;
+}
+
+/* Push main content down when banner is visible */
+.tv-app.has-error .tv-main-content {
+  padding-top: 60px;
 }

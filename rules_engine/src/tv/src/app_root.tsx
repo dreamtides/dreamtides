@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import { SpreadsheetView } from "./spreadsheet_view";
+import { ErrorBanner } from "./error_banner";
 import { TomlTableData } from "./UniverSpreadsheet";
 
 export type { TomlTableData };
@@ -114,13 +115,31 @@ export function AppRoot() {
     };
   }, [loadData]);
 
+  const handleRetry = useCallback(() => {
+    if (filePath && tableName) {
+      loadData(filePath, tableName);
+    }
+  }, [filePath, tableName, loadData]);
+
   return (
-    <SpreadsheetView
-      data={data}
-      error={error}
-      loading={loading}
-      saveStatus={saveStatus}
-      onChange={handleChange}
-    />
+    <div className={`tv-app ${error ? "has-error" : ""}`}>
+      {error && (
+        <ErrorBanner
+          message={error}
+          errorType="error"
+          onDismiss={() => setError(null)}
+          actions={[{ label: "Retry", onClick: handleRetry }]}
+        />
+      )}
+      <div className="tv-main-content">
+        <SpreadsheetView
+          data={data}
+          error={null}
+          loading={loading}
+          saveStatus={saveStatus}
+          onChange={handleChange}
+        />
+      </div>
+    </div>
   );
 }
