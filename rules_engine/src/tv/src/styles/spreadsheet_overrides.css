@@ -1,0 +1,72 @@
+/* spreadsheet_overrides.css - Univer styling customizations for TV */
+
+/*
+ * Override Univer's default colors to match TV theme.
+ * Use CSS specificity to override without !important when possible.
+ * Classes discovered via browser DevTools inspection.
+ *
+ * Note: Univer class names may change between versions. If styles stop
+ * applying, inspect the DOM to find updated class names.
+ */
+
+/* Header row styling */
+.univer-sheet-container .univer-row-header,
+.univer-sheet-container .univer-column-header {
+  background-color: var(--tv-header-bg);
+  color: var(--tv-header-text);
+  font-weight: 600;
+}
+
+/* Cell borders */
+.univer-sheet-container .univer-cell {
+  border-color: var(--tv-border-color);
+}
+
+/* Selection highlight */
+.univer-sheet-container .univer-selection-area {
+  background-color: var(--tv-selection-bg);
+  border-color: var(--tv-focus-border);
+}
+
+/* Focused cell */
+.univer-sheet-container .univer-active-cell {
+  border: 2px solid var(--tv-focus-border);
+}
+
+/* Alternating row colors (if not handled by Univer conditional formatting) */
+.univer-sheet-container .univer-row:nth-child(even) {
+  background-color: var(--tv-row-even);
+}
+
+.univer-sheet-container .univer-row:nth-child(odd) {
+  background-color: var(--tv-row-odd);
+}
+
+/* Scrollbar styling for consistency */
+.univer-sheet-container ::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+.univer-sheet-container ::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.univer-sheet-container ::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 5px;
+}
+
+.univer-sheet-container ::-webkit-scrollbar-thumb:hover {
+  background: #a1a1a1;
+}
+
+/* Hide elements not needed for TV */
+/* Example: Hide formula bar if not using formulas */
+/* .univer-formula-bar { display: none; } */
+
+/* Ensure sheet fills container */
+.univer-sheet-container {
+  width: 100%;
+  height: 100%;
+}
