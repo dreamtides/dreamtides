@@ -40,40 +40,247 @@ Required plugins in load order:
 
 ## Image Rendering Support
 
-Univer supports cell images through the @univerjs/sheets-drawing-ui package.
-This feature was added via GitHub PR #4036 and refined in PR #4729 which added
-the cell image Facade API.
+Univer supports two types of images in spreadsheets:
+- **Floating Images (Over-Grid Images)**: Positioned over cells with pixel-level
+  control, can span multiple cells
+- **Cell Images**: Embedded directly within individual cells
+
+TV uses floating images positioned at cell locations for card artwork display.
 
 ### Required Packages for Images
 - @univerjs/drawing: Core drawing functionality
 - @univerjs/drawing-ui: Drawing UI layer
 - @univerjs/sheets-drawing: Sheet-specific drawing support
-- @univerjs/sheets-drawing-ui: Cell image insertion and rendering
+- @univerjs/sheets-drawing-ui: Image insertion and rendering facade
 
-### Image Insertion API
-The Facade API provides the insertImage method on FWorksheet:
+Or use the preset: @univerjs/preset-sheets-drawing
 
-Import the facade extension: import '@univerjs/sheets-drawing-ui/facade'
-Get the active sheet: const sheet = univerAPI.getActiveWorkbook().getActiveSheet()
-Insert image: sheet.insertImage(urlOrBase64, rowIndex, columnIndex)
+### Source Code References
+Key facade files in @univerjs/sheets-drawing-ui/src/facade/:
+- f-worksheet.ts: FWorksheet image methods (insertImage, getImages, etc.)
+- f-over-grid-image.ts: FOverGridImage class and FOverGridImageBuilder
+- f-range.ts: FRange.insertCellImageAsync for cell images
+- f-event.ts: Image-related events (insert, update, delete)
 
-The method accepts either a URL string or a base64 data URI. The image renders
-within the target cell, scaling to fit the cell dimensions.
+GitHub: https://github.com/dream-num/univer/tree/dev/packages/sheets-drawing-ui/src/facade
+
+### ImageSourceType Enum
+Defined in @univerjs/core (packages/core/src/services/image-io/image-io.service.ts):
+
+```typescript
+enum ImageSourceType {
+    URL = 'URL',      // HTTP/HTTPS URL string
+    UUID = 'UUID',    // Univer image hosting service ID
+    BASE64 = 'BASE64' // Data URI: data:image/png;base64,...
+}
+```
+
+Access via: univerAPI.Enum.ImageSourceType.URL
+
+### Floating Image API (FWorksheet)
+
+**Simple Insertion:**
+```typescript
+// Import facade extension
+import '@univerjs/sheets-drawing-ui/facade';
+
+// Insert at specific cell (column 5, row 5 = F6)
+const result = await sheet.insertImage(url, 5, 5);
+
+// Insert with pixel offset from cell origin
+const result = await sheet.insertImage(url, 5, 5, 10, 10);
+
+// Insert from IFBlobSource (File/Blob converted to base64 internally)
+const result = await sheet.insertImage(blobSource, 5, 5);
+```
+
+**Builder Pattern (Recommended for Control):**
+```typescript
+const image = await sheet.newOverGridImage()
+    .setSource(url, univerAPI.Enum.ImageSourceType.URL)
+    .setColumn(5)
+    .setRow(5)
+    .setWidth(200)    // pixels
+    .setHeight(150)   // pixels
+    .setColumnOffset(10)  // pixel offset from cell
+    .setRowOffset(10)
+    .setRotate(0)     // rotation in degrees
+    .setAnchorType(anchorType)  // position behavior
+    .buildAsync();
+
+sheet.insertImages([image]);
+```
+
+**FOverGridImageBuilder Methods:**
+- setSource(source: string, sourceType?: ImageSourceType)
+- setColumn(column: number) / setRow(row: number)
+- setColumnOffset(offset: number) / setRowOffset(offset: number)
+- setWidth(width: number) / setHeight(height: number)
+- setRotate(angle: number)
+- setAnchorType(anchorType: SheetDrawingAnchorType)
+- setCropTop/Left/Right/Bottom(percent: number)
+- buildAsync(): Promise<ISheetImage>
+
+**Managing Images:**
+```typescript
+// Get all images
+const images: FOverGridImage[] = sheet.getImages();
+
+// Get image by ID
+const image = sheet.getImageById('drawingId');
+
+// Update images
+const updatedImage = await image.toBuilder()
+    .setWidth(100)
+    .setHeight(50)
+    .buildAsync();
+sheet.updateImages([updatedImage]);
+
+// Delete images
+sheet.deleteImages([image]);
+
+// Get currently selected images
+const activeImages = sheet.getActiveImages();
+```
+
+### Cell Image API (FRange)
+
+For images embedded directly in cells:
+
+```typescript
+const range = sheet.getRange('A10');
+
+// Insert from URL
+const result = await range.insertCellImageAsync(url);
+
+// Insert from File object
+const result = await range.insertCellImageAsync(file);
+```
+
+Internally uses:
+- controller.insertCellImageByUrl(url, location) for URL strings
+- controller.insertCellImageByFile(file, location) for File objects
+
+### Image Events
+
+Subscribe to image lifecycle events:
+
+```typescript
+// Before insertion (can cancel)
+univerAPI.addEvent(univerAPI.Event.BeforeOverGridImageInsert, (params) => {
+    const { workbook, insertImageParams } = params;
+    params.cancel = true; // Cancel insertion
+});
+
+// After insertion
+univerAPI.addEvent(univerAPI.Event.OverGridImageInserted, (params) => {
+    const { workbook, images } = params;
+});
+
+// Before/after update
+univerAPI.addEvent(univerAPI.Event.BeforeOverGridImageChange, callback);
+univerAPI.addEvent(univerAPI.Event.OverGridImageChanged, callback);
+
+// Before/after deletion
+univerAPI.addEvent(univerAPI.Event.BeforeOverGridImageRemove, callback);
+univerAPI.addEvent(univerAPI.Event.OverGridImageRemoved, callback);
+```
+
+Deprecated callback methods (use events instead):
+- sheet.onImageInserted(callback)
+- sheet.onImageDeleted(callback)
+- sheet.onImageChanged(callback)
+
+### Supported Image Sources
+
+1. **URL Strings (ImageSourceType.URL)**
+   - HTTP/HTTPS URLs: `https://example.com/image.png`
+   - Loaded asynchronously by browser
+   - Subject to CORS restrictions for cross-origin URLs
+
+2. **Base64 Data URIs (ImageSourceType.BASE64)**
+   - Format: `data:image/png;base64,iVBORw0KGgo...`
+   - No CORS restrictions
+   - ~33% larger than binary
+
+3. **IFBlobSource Objects**
+   - Wrapper for File/Blob types
+   - Converted to base64 internally by Univer
+   - Use for file input handling
+
+4. **UUID (ImageSourceType.UUID)**
+   - For Univer's cloud image hosting service
+   - Not applicable to TV
+
+**NOT Supported:**
+- `file://` URLs are not directly supported
+- Use Tauri's asset protocol (convertFileSrc) to convert local paths
+
+### Tauri Asset Protocol Integration
+
+For local filesystem images in a Tauri app:
+
+```typescript
+import { convertFileSrc } from '@tauri-apps/api/core';
+
+// Convert local path to asset URL
+const localPath = '/path/to/cached/image.png';
+const assetUrl = convertFileSrc(localPath);
+// Returns: http://asset.localhost/path/to/cached/image.png
+
+// Pass to Univer (recognized as regular URL)
+await sheet.insertImage(assetUrl, column, row);
+```
+
+Required tauri.conf.json configuration:
+```json
+{
+  "app": {
+    "security": {
+      "csp": "default-src 'self' ipc: http://ipc.localhost; img-src 'self' asset: http://asset.localhost",
+      "assetProtocol": {
+        "enable": true,
+        "scope": {
+          "requireLiteralLeadingDot": false,
+          "allow": ["$APPDATA/**/*", "$CACHE/**/*"]
+        }
+      }
+    }
+  }
+}
+```
 
 ### Image Limitations
-Cell images no longer support mixed layout with text in the same cell. This
-was changed in PR #4729 to simplify the rendering model. A cell contains
-either text content or an image, not both.
 
-Performance issues with many cell images on initial render have been addressed
-in recent versions. The rendering pipeline now handles large numbers of images
-more efficiently through lazy loading.
+**Cell Images:**
+- No mixed layout with text in same cell (removed in PR #4729)
+- A cell contains either text content OR an image, not both
+
+**Floating Images:**
+- Can overlap cells freely
+- Support rotation, cropping, and transforms
+- Performance optimized for many images via lazy loading
 
 ### Browser Data URL Limits
-Base64-encoded images use data URLs which have browser-specific limits:
+Base64-encoded images use data URLs with browser-specific limits:
 - Chromium/Firefox: 512MB limit
 - Safari (WebKit): 2GB limit
-These limits are far beyond typical card artwork sizes and are not a concern.
+These limits are far beyond typical card artwork sizes.
+
+### Batch Save Images
+
+Save multiple images to filesystem:
+
+```typescript
+// Save all images from ranges
+await sheet.saveCellImagesAsync({
+    useCellAddress: true,      // Use A1, B2 in filename
+    useColumnIndex: 2          // Use column C values in filename
+}, [range1, range2]);
+
+// Single range
+await range.saveCellImagesAsync(options);
+```
 
 ## Data Binding
 
@@ -148,13 +355,13 @@ and ignore events that occur during loading. This prevents save-on-load cycles.
 ## Cell Rendering Customization
 
 ### Image Cells
-Image cells use the Univer drawing layer via insertImage. The backend sends
-image data as base64-encoded strings. The frontend calls insertImage with
-the data URI and target cell coordinates. Images automatically scale to fit
-cell dimensions while preserving aspect ratio.
+See the detailed "Image Rendering Support" section above for comprehensive
+documentation. Key points for TV:
 
-For URL-based images, the backend can pass the URL directly if cross-origin
-access is permitted. Otherwise, the backend fetches and encodes the image.
+- Use floating images (FWorksheet.insertImage) positioned at cell locations
+- For cached local images, use Tauri's convertFileSrc() to create asset URLs
+- For remote images, cache on backend then serve via asset protocol
+- Use the builder pattern (newOverGridImage) for precise size/position control
 
 ### Checkbox Cells
 Univer's data validation plugin supports checkbox rendering. Configure a
