@@ -96,7 +96,7 @@ fn build_prompt_formats_log_error_failure() {
     let error_message = "Worker entered error state: git rebase failed";
     let failure = HealthStatus::LogError { message: error_message.to_string() };
     let prompt = remediation_prompt::build_remediation_prompt(&failure, &config);
-    assert!(prompt.contains("Error/Warning in Logs"), "Prompt should describe LogError failure");
+    assert!(prompt.contains("Error in Logs"), "Prompt should describe LogError failure");
     assert!(prompt.contains(error_message), "Prompt should include the error message");
 }
 

@@ -96,10 +96,10 @@ fn format_failure_type(failure: &HealthStatus) -> String {
             ));
         }
         HealthStatus::LogError { message } => {
-            result.push_str("Status: **Error/Warning in Logs**\n\n");
+            result.push_str("Status: **Error in Logs**\n\n");
             result.push_str(&format!(
-                "An ERROR or WARN level log entry was detected:\n\n```\n{}\n```\n\n\
-                 The daemon shuts down on any error/warning to allow investigation.\n\
+                "An ERROR level log entry was detected:\n\n```\n{}\n```\n\n\
+                 The daemon shuts down on errors to allow investigation.\n\
                  Review the full logs below for context.",
                 message
             ));

@@ -25,7 +25,7 @@ pub enum HealthStatus {
     ProcessGone,
     /// Heartbeat file is missing or timestamp is stale.
     HeartbeatStale { age_secs: u64 },
-    /// Error or warning detected in daemon logs.
+    /// Error detected in daemon logs (WARN level is ignored).
     LogError { message: String },
     /// No task completions for longer than the stall timeout.
     Stalled { stall_secs: u64 },
@@ -97,7 +97,7 @@ impl HealthStatus {
                 format!("Heartbeat is stale ({}s old)", age_secs)
             }
             HealthStatus::LogError { message } => {
-                format!("Error/warning in logs: {}", message)
+                format!("Error in logs: {}", message)
             }
             HealthStatus::Stalled { stall_secs } => {
                 format!("No task completions for {}s", stall_secs)
@@ -329,12 +329,12 @@ impl HealthMonitor {
         None
     }
 
-    /// Checks for errors or warnings in daemon logs.
+    /// Checks for errors in daemon logs (WARN level is ignored).
     ///
     /// Monitors both auto.log (auto-mode events) and llmc.jsonl (main daemon
-    /// log with patrol warnings). The main log is checked first since it
-    /// contains warnings about issues like unknown workers that indicate
-    /// state corruption.
+    /// log). Only ERROR level logs trigger failure detection - WARN level logs
+    /// are intentionally ignored since they indicate transient issues that
+    /// patrol handles automatically without requiring overseer remediation.
     fn check_logs(&mut self) -> Option<HealthStatus> {
         if let Some(message) = self.main_log_tailer.check_for_errors() {
             return Some(HealthStatus::LogError { message });
@@ -400,9 +400,11 @@ impl HealthMonitor {
         self.main_log_tailer.reset_position();
     }
 }
-/// Parses a JSON log entry to check if it's an ERROR or WARN level.
+/// Parses a JSON log entry to check if it's an ERROR level.
 ///
-/// Returns the log message if it's an error/warning, None otherwise.
+/// Returns the log message if it's an error, None otherwise. WARN level logs
+/// are intentionally ignored - they indicate transient issues that patrol
+/// handles automatically. Only ERROR logs trigger overseer remediation.
 fn parse_log_level_error(line: &str) -> Option<String> {
     #[derive(Deserialize)]
     struct LogEntry {
@@ -412,7 +414,7 @@ fn parse_log_level_error(line: &str) -> Option<String> {
     }
     let entry: LogEntry = serde_json::from_str(line).ok()?;
     let level = entry.level.to_uppercase();
-    if level == "ERROR" || level == "WARN" {
+    if level == "ERROR" {
         let message = entry
             .event
             .map(|e| {

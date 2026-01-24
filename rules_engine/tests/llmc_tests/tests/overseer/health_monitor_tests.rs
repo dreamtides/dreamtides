@@ -241,7 +241,7 @@ fn log_tailer_check_for_errors_detects_error_level() {
 }
 
 #[test]
-fn log_tailer_check_for_errors_detects_warn_level() {
+fn log_tailer_check_for_errors_ignores_warn_level() {
     let dir = TempDir::new().expect("Failed to create temp dir");
     let log_path = dir.path().join("test.log");
 
@@ -254,7 +254,7 @@ fn log_tailer_check_for_errors_detects_warn_level() {
 
     let error = tailer.check_for_errors();
 
-    assert!(error.is_some(), "Should detect WARN level log");
+    assert!(error.is_none(), "Should ignore WARN level log (only ERROR triggers remediation)");
 }
 
 #[test]

@@ -308,8 +308,9 @@ Shutdown sequence for hard failures:
 
 3. **Log Monitoring**
    - Tail daemon log file
-   - ANY ERROR or WARN level entry triggers immediate failure handling
-   - No thresholds or windowing - single warning/error means failure
+   - ERROR level entries trigger immediate failure handling
+   - WARN level entries are ignored (transient issues handled by patrol)
+   - No thresholds or windowing - single error means failure
 
 4. **Progress Tracking**
    - Monitor for task completions AND task assignments
@@ -318,7 +319,7 @@ Shutdown sequence for hard failures:
 
 #### Failure Detection
 
-- Any ERROR or WARN in daemon logs
+- Any ERROR in daemon logs (WARN is ignored)
 - Missing heartbeat for >heartbeat_timeout_secs
 - Daemon process terminated (PID no longer exists)
 - PID reuse detection (same PID, different start time or instance ID)
