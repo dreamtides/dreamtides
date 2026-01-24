@@ -1,15 +1,12 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { invoke } from "@tauri-apps/api/core";
-import { listen } from "@tauri-apps/api/event";
 import { SpreadsheetView } from "./spreadsheet_view";
 import { ErrorBanner } from "./error_banner";
-import { TomlTableData } from "./UniverSpreadsheet";
+import * as ipc from "./ipc_bridge";
+import type { TomlTableData, SyncState } from "./ipc_bridge";
 
-export type { TomlTableData };
+export type { TomlTableData, SyncState };
 
 const SAVE_DEBOUNCE_MS = 500;
-
-export type SyncState = "idle" | "loading" | "saving" | "saved" | "error";
 
 function extractTableName(filePath: string): string {
   const fileName = filePath.split("/").pop() || filePath;
@@ -29,10 +26,7 @@ export function AppRoot() {
   const loadData = useCallback(async (path: string, table: string) => {
     try {
       setLoading(true);
-      const result = await invoke<TomlTableData>("load_toml_table", {
-        filePath: path,
-        tableName: table,
-      });
+      const result = await ipc.loadTomlTable(path, table);
       setData(result);
       setError(null);
     } catch (e) {
@@ -42,26 +36,25 @@ export function AppRoot() {
     }
   }, []);
 
-  const saveData = useCallback(async (newData: TomlTableData) => {
-    if (isSavingRef.current || !filePath || !tableName) return;
-    isSavingRef.current = true;
-    setSaveStatus("saving");
+  const saveData = useCallback(
+    async (newData: TomlTableData) => {
+      if (isSavingRef.current || !filePath || !tableName) return;
+      isSavingRef.current = true;
+      setSaveStatus("saving");
 
-    try {
-      await invoke("save_toml_table", {
-        filePath,
-        tableName,
-        data: newData,
-      });
-      setSaveStatus("saved");
-      setTimeout(() => setSaveStatus("idle"), 1500);
-    } catch (e) {
-      console.error("Save error:", e);
-      setSaveStatus("error");
-    } finally {
-      isSavingRef.current = false;
-    }
-  }, [filePath, tableName]);
+      try {
+        await ipc.saveTomlTable(filePath, tableName, newData);
+        setSaveStatus("saved");
+        setTimeout(() => setSaveStatus("idle"), 1500);
+      } catch (e) {
+        console.error("Save error:", e);
+        setSaveStatus("error");
+      } finally {
+        isSavingRef.current = false;
+      }
+    },
+    [filePath, tableName]
+  );
 
   const handleChange = useCallback(
     (newData: TomlTableData) => {
@@ -78,14 +71,14 @@ export function AppRoot() {
   useEffect(() => {
     const init = async () => {
       try {
-        const paths = await invoke<string[]>("get_app_paths");
+        const paths = await ipc.getAppPaths();
         if (paths.length > 0) {
           const path = paths[0];
           const table = extractTableName(path);
           setFilePath(path);
           setTableName(table);
           await loadData(path, table);
-          invoke("start_file_watcher", { filePath: path }).catch((e) =>
+          ipc.startFileWatcher(path).catch((e) =>
             console.error("Failed to start file watcher:", e)
           );
         } else {
@@ -100,7 +93,7 @@ export function AppRoot() {
 
     init();
 
-    const unlisten = listen<{ path: string }>("toml-file-changed", () => {
+    const fileChangedSub = ipc.onFileChanged(() => {
       if (!isSavingRef.current && filePath && tableName) {
         console.log("File changed externally, reloading...");
         loadData(filePath, tableName);
@@ -108,7 +101,7 @@ export function AppRoot() {
     });
 
     return () => {
-      unlisten.then((fn) => fn());
+      fileChangedSub.dispose();
       if (saveTimeoutRef.current) {
         clearTimeout(saveTimeoutRef.current);
       }

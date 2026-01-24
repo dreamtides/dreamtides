@@ -1,5 +1,5 @@
-import { UniverSpreadsheet, TomlTableData } from "./UniverSpreadsheet";
-import { SyncState } from "./app_root";
+import { UniverSpreadsheet } from "./UniverSpreadsheet";
+import type { TomlTableData, SyncState } from "./ipc_bridge";
 
 interface SpreadsheetViewProps {
   data: TomlTableData | null;

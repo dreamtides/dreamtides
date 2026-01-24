@@ -7,11 +7,7 @@ import {
   disposeUniverInstance,
   UniverInstance,
 } from "./univer_config";
-
-export interface TomlTableData {
-  headers: string[];
-  rows: (string | number | boolean | null)[][];
-}
+import type { TomlTableData } from "./ipc_bridge";
 
 export interface UniverSpreadsheetHandle {
   getData: () => TomlTableData | null;
