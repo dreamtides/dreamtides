@@ -147,6 +147,7 @@ Three categories of conditions:
 - Task pool returns "no ready tasks" (exit 4) → wait for tasks
 - Source repository has uncommitted changes → exponential backoff with retry limit (see below)
 - Rebase conflict during accept → worker transitions to `rebasing`, resolves
+- Orphaned in_progress tasks (no owner) → automatically reset to pending (see below)
 
 These are normal conditions during autonomous operation, not errors. The daemon
 continues running without logging errors or triggering remediation.
@@ -185,6 +186,25 @@ exponential backoff with a retry limit:
 This allows the daemon to wait while a developer commits or stashes their
 changes, but eventually gives up so the overseer can investigate if the issue
 persists.
+
+**Orphaned task recovery:**
+
+Tasks can become orphaned (status `in_progress` without an owner) when task
+files are externally modified, such as when the task directory is synced via
+git or cloud storage. This is an invalid state: a task cannot be in progress
+without someone working on it.
+
+The daemon automatically recovers orphaned tasks during task discovery:
+
+- When discovering tasks, checks for any with `status: in_progress` and no
+  owner
+- Resets such tasks to `status: pending` and saves the corrected state
+- Logs a warning for each recovered task
+- Continues normal operation (not an error condition)
+
+This ensures that external modifications to task files don't permanently block
+the task queue. Tasks that were in progress when externally modified will
+simply be re-queued for assignment.
 
 **Hard failures** (immediate shutdown):
 
@@ -519,6 +539,7 @@ Recovery classification:
 | 21 | config.toml syntax error | TOML parse error | Overseer fixes TOML syntax | AI |
 | 22 | Hook IPC socket failure | Socket operations fail | Overseer recreates socket | AI |
 | 23 | .llmc directory permissions | File operations fail | Overseer fixes permissions | AI |
+| 23a | Task files externally modified | Task in_progress without owner | Daemon resets orphaned tasks to pending | AUTO |
 
 ### Overseer-Level Failures
 
@@ -533,7 +554,7 @@ Recovery classification:
 
 | Type | Count | Scope |
 |------|-------|-------|
-| AUTO | 5 | Empty task pool, single worker/session crash (patrol recovers), overseer session crash, rebase conflicts during accept |
+| AUTO | 6 | Empty task pool, single worker/session crash (patrol recovers), overseer session crash, rebase conflicts during accept, orphaned task recovery |
 | AUTO→AI | 1 | Source repo dirty (auto retry with limit, then AI remediation) |
 | AI | 17 | Repeated crashes, severe conflicts, config errors, claim limit exceeded, most operational failures |
 | HUMAN | 6 | Resource exhaustion, network, failure spirals |

@@ -473,7 +473,7 @@ fn process_idle_workers(
     }
 
     let task_dir = auto_config.get_task_directory();
-    let tasks = task_discovery::discover_tasks(&task_dir).map_err(|e| {
+    let mut tasks = task_discovery::discover_tasks(&task_dir).map_err(|e| {
         auto_logging::persist_task_error_context(&e.to_error_context());
         anyhow::anyhow!("{}", e)
     })?;
@@ -482,6 +482,10 @@ fn process_idle_workers(
         debug!("No tasks found in task directory");
         return Ok(false);
     }
+
+    // Recover any orphaned tasks (in_progress without owner) that may have
+    // been caused by external task file modifications (e.g., git sync)
+    task_discovery::recover_orphaned_tasks(&task_dir, &mut tasks);
 
     let graph = task_discovery::build_dependency_graph(&tasks).map_err(|e| {
         auto_logging::persist_task_error_context(&e.to_error_context());

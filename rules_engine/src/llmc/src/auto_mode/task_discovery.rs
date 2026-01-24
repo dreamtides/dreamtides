@@ -2,7 +2,7 @@ use std::collections::{HashMap, HashSet};
 use std::fs;
 use std::path::Path;
 
-use tracing::info;
+use tracing::{info, warn};
 
 use crate::auto_mode::claude_tasks::{ClaudeTask, TaskError, TaskStatus};
 
@@ -39,6 +39,43 @@ pub fn discover_tasks(task_dir: &Path) -> Result<Vec<ClaudeTask>, TaskError> {
     }
     info!(count = tasks.len(), dir = %task_dir.display(), "Discovered tasks");
     Ok(tasks)
+}
+
+/// Recovers orphaned tasks that are in_progress without an owner.
+///
+/// This can happen when task files are externally modified (e.g., git sync)
+/// after LLMC has updated them. Tasks in `in_progress` status without an
+/// owner are invalid and should be reset to `pending`.
+///
+/// Returns the count of tasks recovered.
+pub fn recover_orphaned_tasks(task_dir: &Path, tasks: &mut [ClaudeTask]) -> usize {
+    let mut recovered = 0;
+    for task in tasks.iter_mut() {
+        if task.status == TaskStatus::InProgress && task.owner.as_ref().is_none_or(String::is_empty)
+        {
+            warn!(
+                task_id = %task.id,
+                subject = %task.subject,
+                "Recovering orphaned in_progress task (no owner) - resetting to pending"
+            );
+            task.status = TaskStatus::Pending;
+            task.owner = None;
+            let task_path = task_dir.join(format!("{}.json", task.id));
+            if let Err(e) = task.save(&task_path) {
+                warn!(
+                    task_id = %task.id,
+                    error = %e,
+                    "Failed to save recovered task"
+                );
+            } else {
+                recovered += 1;
+            }
+        }
+    }
+    if recovered > 0 {
+        info!(count = recovered, "Recovered orphaned tasks");
+    }
+    recovered
 }
 
 /// Builds a dependency graph and validates for circular dependencies.
