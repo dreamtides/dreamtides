@@ -89,6 +89,7 @@ pub fn run_add(
         last_api_error_unix: None,
         pending_task_prompt: None,
         pending_task_prompt_since_unix: None,
+        pending_clear_retry_count: 0,
         pending_prompt_cmd: None,
         transcript_session_id: None,
         transcript_path: None,

@@ -989,9 +989,13 @@ impl Patrol {
     /// execute (e.g., Claude's autocomplete menu intercepts the Enter key).
     ///
     /// This method detects workers with stale pending prompts (waiting for
-    /// SessionStart for too long) and resends `/clear` to retry.
+    /// SessionStart for too long) and resends `/clear` to retry. Retries are
+    /// logged at INFO level to avoid triggering overseer remediation for
+    /// transient issues. Only when the maximum retry limit is exceeded does
+    /// this return an error, which triggers daemon shutdown and remediation.
     fn retry_stale_clear_commands(&self, state: &mut State) -> Result<()> {
         const STALE_THRESHOLD_SECS: u64 = 30;
+        const MAX_CLEAR_RETRIES: u32 = 3;
 
         let now = SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs();
         let worker_names: Vec<String> = state.workers.keys().cloned().collect();
@@ -1021,16 +1025,37 @@ impl Patrol {
                 continue;
             }
 
-            tracing::warn!(
+            let retry_count = worker.pending_clear_retry_count;
+            let session_id = worker.session_id.clone();
+
+            // Check if we've exceeded the max retry limit
+            if retry_count >= MAX_CLEAR_RETRIES {
+                tracing::error!(
+                    worker = %worker_name,
+                    retry_count = retry_count,
+                    max_retries = MAX_CLEAR_RETRIES,
+                    "/clear retry limit exceeded - worker's pending prompt never received \
+                     SessionStart after multiple retries. Shutting down for remediation."
+                );
+                anyhow::bail!(
+                    "/clear retry limit exceeded for worker '{}' after {} attempts",
+                    worker_name,
+                    retry_count
+                );
+            }
+
+            // Log at INFO level for transient retries (doesn't trigger overseer)
+            tracing::info!(
                 worker = %worker_name,
                 elapsed_secs = elapsed,
                 threshold_secs = STALE_THRESHOLD_SECS,
+                retry_count = retry_count + 1,
+                max_retries = MAX_CLEAR_RETRIES,
                 "/clear may have failed to execute - worker has pending prompt but \
                  SessionStart hasn't fired. Resending /clear to retry."
             );
 
             // Resend /clear
-            let session_id = worker.session_id.clone();
             let sender = TmuxSender::new();
             if let Err(e) = sender.send(&session_id, "/clear") {
                 tracing::error!(
@@ -1041,9 +1066,10 @@ impl Patrol {
                 continue;
             }
 
-            // Update the timestamp to prevent immediate retry on next patrol
+            // Update the timestamp and increment retry count
             if let Some(w) = state.get_worker_mut(&worker_name) {
                 w.pending_task_prompt_since_unix = Some(now);
+                w.pending_clear_retry_count += 1;
             }
 
             tracing::info!(
@@ -1051,7 +1077,7 @@ impl Patrol {
                 "Resent /clear successfully, waiting for SessionStart"
             );
 
-            // Save state to persist the updated timestamp
+            // Save state to persist the updated timestamp and retry count
             let state_path = state::get_state_path();
             if let Err(e) = state.save(&state_path) {
                 tracing::error!(
@@ -1294,6 +1320,7 @@ fn handle_session_start(
             w.current_prompt = pending_prompt;
             w.pending_task_prompt = None;
             w.pending_task_prompt_since_unix = None;
+            w.pending_clear_retry_count = 0;
             w.pending_prompt_cmd = None;
             w.transcript_session_id = Some(session_id.to_string());
             w.transcript_path = transcript_path.map(str::to_string);

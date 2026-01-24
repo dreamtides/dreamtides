@@ -611,6 +611,7 @@ fn assign_task_to_worker(
     worker_mut.pending_task_prompt = Some(full_prompt.clone());
     worker_mut.pending_task_prompt_since_unix =
         Some(SystemTime::now().duration_since(UNIX_EPOCH).map(|d| d.as_secs()).unwrap_or(0));
+    worker_mut.pending_clear_retry_count = 0;
     info!(
         worker = %worker_name,
         prompt_len = full_prompt.len(),

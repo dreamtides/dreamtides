@@ -162,9 +162,10 @@ properly releasing claims, which is a bug that requires investigation.
 - TMUX session disappears → patrol recreates session
 - `/clear` command fails to execute (e.g., Claude's autocomplete menu intercepts
   Enter key) → patrol detects stale pending prompts (>30 seconds) and resends
-  `/clear`
+  `/clear` (up to 3 retries, logged at INFO level to avoid triggering overseer)
 - If patrol recovery succeeds, daemon continues normally
-- If patrol retries exhausted → daemon shuts down for overseer remediation
+- If patrol retries exhausted → daemon shuts down for overseer remediation (ERROR
+  level log triggers overseer)
 
 **Source repository dirty handling:**
 

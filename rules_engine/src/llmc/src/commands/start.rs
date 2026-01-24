@@ -131,6 +131,7 @@ pub fn run_start(
     worker_mut.pending_task_prompt = Some(full_prompt.clone());
     worker_mut.pending_task_prompt_since_unix =
         Some(SystemTime::now().duration_since(UNIX_EPOCH).map(|d| d.as_secs()).unwrap_or(0));
+    worker_mut.pending_clear_retry_count = 0;
     worker_mut.pending_prompt_cmd = prompt_cmd.clone();
     let self_review_enabled = worker_mut.self_review;
 

@@ -114,6 +114,12 @@ pub struct WorkerRecord {
     /// old, patrol will resend /clear to retry.
     #[serde(default)]
     pub pending_task_prompt_since_unix: Option<u64>,
+    /// Number of times /clear has been retried for this worker. Incremented by
+    /// patrol when it detects a stale pending prompt and resends /clear. Reset
+    /// to 0 when SessionStart fires (indicating /clear succeeded). If this
+    /// exceeds the max retry limit, the daemon shuts down for remediation.
+    #[serde(default)]
+    pub pending_clear_retry_count: u32,
     /// Command used to generate the pending task prompt (e.g., "bd show
     /// dr-abc"). Stored alongside pending_task_prompt and used when
     /// transitioning to Working.
