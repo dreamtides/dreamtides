@@ -1,9 +1,11 @@
-use std::io::ErrorKind;
 use std::path::Path;
+use std::time::Instant;
 
-use crate::error::error_types::TvError;
+use crate::error::error_types::{map_io_error_for_read, TvError};
 use crate::toml::document_loader::TomlTableData;
-use crate::traits::{FileSystem, RealFileSystem};
+use crate::traits::{AtomicWriteError, FileSystem, RealFileSystem};
+
+const TEMP_FILE_PREFIX: &str = ".tv_save_";
 
 /// Saves spreadsheet data back to a TOML file, preserving formatting.
 pub fn save_toml_document(
@@ -14,6 +16,65 @@ pub fn save_toml_document(
     save_toml_document_with_fs(&RealFileSystem, file_path, table_name, data)
 }
 
+/// Cleans up orphaned temp files from previous crashes.
+pub fn cleanup_orphaned_temp_files(dir_path: &str) -> Result<usize, TvError> {
+    cleanup_orphaned_temp_files_with_fs(&RealFileSystem, dir_path)
+}
+
+/// Cleans up orphaned temp files using the provided filesystem.
+pub fn cleanup_orphaned_temp_files_with_fs(
+    fs: &dyn FileSystem,
+    dir_path: &str,
+) -> Result<usize, TvError> {
+    let dir = Path::new(dir_path);
+    if !fs.exists(dir) {
+        return Ok(0);
+    }
+
+    let temp_files = fs.read_dir_temp_files(dir, TEMP_FILE_PREFIX).map_err(|e| {
+        tracing::warn!(
+            component = "tv.toml",
+            dir_path = %dir_path,
+            error = %e,
+            "Failed to scan for orphaned temp files"
+        );
+        TvError::WriteError { path: dir_path.to_string(), message: e.to_string() }
+    })?;
+
+    let mut removed_count = 0;
+    for temp_file in temp_files {
+        match fs.remove_file(&temp_file) {
+            Ok(()) => {
+                removed_count += 1;
+                tracing::debug!(
+                    component = "tv.toml",
+                    file_path = %temp_file.display(),
+                    "Removed orphaned temp file"
+                );
+            }
+            Err(e) => {
+                tracing::warn!(
+                    component = "tv.toml",
+                    file_path = %temp_file.display(),
+                    error = %e,
+                    "Failed to remove orphaned temp file"
+                );
+            }
+        }
+    }
+
+    if removed_count > 0 {
+        tracing::info!(
+            component = "tv.toml",
+            dir_path = %dir_path,
+            removed_count = removed_count,
+            "Cleaned up orphaned temp files"
+        );
+    }
+
+    Ok(removed_count)
+}
+
 /// Saves spreadsheet data back to a TOML file using the provided filesystem.
 pub fn save_toml_document_with_fs(
     fs: &dyn FileSystem,
@@ -21,34 +82,16 @@ pub fn save_toml_document_with_fs(
     table_name: &str,
     data: &TomlTableData,
 ) -> Result<(), TvError> {
-    let content = fs.read_to_string(Path::new(file_path)).map_err(|e| match e.kind() {
-        ErrorKind::NotFound => {
-            tracing::error!(
-                component = "tv.toml",
-                file_path = %file_path,
-                error = "File not found",
-                "Save failed"
-            );
-            TvError::FileNotFound { path: file_path.to_string() }
-        }
-        ErrorKind::PermissionDenied => {
-            tracing::error!(
-                component = "tv.toml",
-                file_path = %file_path,
-                error = "Permission denied",
-                "Save failed"
-            );
-            TvError::PermissionDenied { path: file_path.to_string() }
-        }
-        _ => {
-            tracing::error!(
-                component = "tv.toml",
-                file_path = %file_path,
-                error = %e,
-                "Save failed"
-            );
-            TvError::FileNotFound { path: file_path.to_string() }
-        }
+    let start = Instant::now();
+
+    let content = fs.read_to_string(Path::new(file_path)).map_err(|e| {
+        tracing::error!(
+            component = "tv.toml",
+            file_path = %file_path,
+            error = %e,
+            "Read failed during save"
+        );
+        map_io_error_for_read(&e, file_path)
     })?;
 
     let mut doc: toml_edit::DocumentMut = content.parse().map_err(|e: toml_edit::TomlError| {
@@ -91,23 +134,67 @@ pub fn save_toml_document_with_fs(
         }
     }
 
-    fs.write(Path::new(file_path), &doc.to_string()).map_err(|e| {
-        tracing::error!(
-            component = "tv.toml",
-            file_path = %file_path,
-            error = %e,
-            "Write failed"
-        );
-        TvError::WriteError { path: file_path.to_string(), message: e.to_string() }
+    let output = doc.to_string();
+
+    fs.write_atomic(Path::new(file_path), &output).map_err(|e| {
+        map_atomic_write_error(e, file_path)
     })?;
 
+    let duration_ms = start.elapsed().as_millis() as u64;
     tracing::info!(
         component = "tv.toml",
         file_path = %file_path,
+        duration_ms = duration_ms,
         "File saved"
     );
 
     Ok(())
+}
+
+fn map_atomic_write_error(error: AtomicWriteError, file_path: &str) -> TvError {
+    match error {
+        AtomicWriteError::TempFileCreate(e) => {
+            tracing::error!(
+                component = "tv.toml",
+                file_path = %file_path,
+                error = %e,
+                "Failed to create temp file for atomic write"
+            );
+            crate::error::error_types::map_io_error_for_write(&e, file_path)
+        }
+        AtomicWriteError::Write(e) => {
+            tracing::error!(
+                component = "tv.toml",
+                file_path = %file_path,
+                error = %e,
+                "Failed to write content to temp file"
+            );
+            crate::error::error_types::map_io_error_for_write(&e, file_path)
+        }
+        AtomicWriteError::Sync(e) => {
+            tracing::error!(
+                component = "tv.toml",
+                file_path = %file_path,
+                error = %e,
+                "Failed to sync temp file"
+            );
+            crate::error::error_types::map_io_error_for_write(&e, file_path)
+        }
+        AtomicWriteError::Rename { source, temp_path } => {
+            tracing::error!(
+                component = "tv.toml",
+                file_path = %file_path,
+                temp_path = %temp_path,
+                error = %source,
+                "Atomic rename failed"
+            );
+            TvError::AtomicRenameFailed {
+                temp_path,
+                target_path: file_path.to_string(),
+                message: source.to_string(),
+            }
+        }
+    }
 }
 
 fn json_to_toml_edit_value(value: &serde_json::Value) -> Option<toml_edit::Item> {

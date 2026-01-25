@@ -1,3 +1,5 @@
+use std::collections::HashSet;
+
 use tauri::Manager;
 
 pub mod cli;
@@ -31,8 +33,32 @@ fn get_app_paths(state: tauri::State<cli::AppPaths>) -> Vec<String> {
         .collect()
 }
 
+fn cleanup_temp_files_on_startup(paths: &cli::AppPaths) {
+    let mut directories = HashSet::new();
+    for file in &paths.files {
+        if let Some(parent) = file.parent() {
+            directories.insert(parent.to_path_buf());
+        }
+    }
+
+    for dir in directories {
+        if let Err(e) = toml::document_writer::cleanup_orphaned_temp_files(
+            &dir.to_string_lossy(),
+        ) {
+            tracing::warn!(
+                component = "tv.toml",
+                dir = %dir.display(),
+                error = %e,
+                "Failed to clean up orphaned temp files"
+            );
+        }
+    }
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run(paths: cli::AppPaths, _jsonl: bool) {
+    cleanup_temp_files_on_startup(&paths);
+
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
         .manage(paths)
