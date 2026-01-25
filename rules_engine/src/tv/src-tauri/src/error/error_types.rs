@@ -85,9 +85,6 @@ pub enum TvError {
 
     #[error("Failed to emit event: {message}")]
     EventEmitFailed { message: String },
-
-    #[error("Validation failed for column '{column}': {message}")]
-    ValidationFailed { column: String, message: String },
 }
 
 impl TvError {
