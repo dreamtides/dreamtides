@@ -53,6 +53,25 @@ export interface SaveResult {
   error?: string;
 }
 
+export interface BatchCellUpdate {
+  rowIndex: number;
+  columnKey: string;
+  value: unknown;
+}
+
+export interface FailedUpdate {
+  rowIndex: number;
+  columnKey: string;
+  reason: string;
+}
+
+export interface SaveBatchResult {
+  success: boolean;
+  appliedCount: number;
+  failedCount: number;
+  failedUpdates: FailedUpdate[];
+}
+
 // ============ Event Payloads ============
 
 export interface FileChangedPayload {
@@ -117,6 +136,18 @@ export async function saveCell(
     rowIndex,
     columnKey,
     value,
+  });
+}
+
+export async function saveBatch(
+  filePath: string,
+  tableName: string,
+  updates: BatchCellUpdate[]
+): Promise<SaveBatchResult> {
+  return invoke<SaveBatchResult>("save_batch", {
+    filePath,
+    tableName,
+    updates,
   });
 }
 

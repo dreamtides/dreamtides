@@ -1,6 +1,6 @@
 use crate::error::error_types::TvError;
 use crate::toml::document_loader::TomlTableData;
-use crate::toml::document_writer::{self, CellUpdate, SaveCellResult};
+use crate::toml::document_writer::{self, CellUpdate, SaveBatchResult, SaveCellResult};
 
 /// Tauri command to save spreadsheet data back to a TOML file.
 #[tauri::command]
@@ -23,4 +23,14 @@ pub fn save_cell(
 ) -> Result<SaveCellResult, TvError> {
     let update = CellUpdate { row_index, column_key, value };
     document_writer::save_cell(&file_path, &table_name, &update)
+}
+
+/// Tauri command to save multiple cell updates in a single atomic write.
+#[tauri::command]
+pub fn save_batch(
+    file_path: String,
+    table_name: String,
+    updates: Vec<CellUpdate>,
+) -> Result<SaveBatchResult, TvError> {
+    document_writer::save_batch(&file_path, &table_name, &updates)
 }
