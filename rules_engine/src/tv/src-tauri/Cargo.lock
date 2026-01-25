@@ -4395,6 +4395,7 @@ dependencies = [
  "fluent-bundle",
  "notify",
  "notify-debouncer-mini",
+ "regex",
  "serde",
  "serde_json",
  "tauri",

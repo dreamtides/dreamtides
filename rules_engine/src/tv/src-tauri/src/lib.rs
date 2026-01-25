@@ -22,7 +22,7 @@ pub mod traits;
 #[path = "uuid/uuid_mod.rs"]
 mod uuid;
 #[path = "validation/validation_mod.rs"]
-mod validation;
+pub mod validation;
 
 #[tauri::command]
 fn get_app_paths(state: tauri::State<cli::AppPaths>) -> Vec<String> {
