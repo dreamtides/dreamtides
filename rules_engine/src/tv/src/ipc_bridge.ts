@@ -72,6 +72,46 @@ export interface SaveBatchResult {
   failedUpdates: FailedUpdate[];
 }
 
+// ============ Rich Text Types ============
+
+export interface UniverRichText {
+  p: Paragraph[];
+}
+
+export interface Paragraph {
+  ts: TextRun[];
+}
+
+export interface TextRun {
+  t: string;
+  s?: TextStyle;
+}
+
+export interface TextStyle {
+  bl?: number;
+  it?: number;
+  ul?: UnderlineStyle;
+  cl?: FontColor;
+}
+
+export interface UnderlineStyle {
+  s: number;
+}
+
+export interface FontColor {
+  rgb: string;
+}
+
+// ============ Derived Result Types ============
+
+export type DerivedResultValue =
+  | { type: "text"; value: string }
+  | { type: "number"; value: number }
+  | { type: "boolean"; value: boolean }
+  | { type: "image"; value: string }
+  | { type: "richText"; value: UniverRichText }
+  | { type: "error"; value: string };
+
 // ============ Event Payloads ============
 
 export interface FileChangedPayload {

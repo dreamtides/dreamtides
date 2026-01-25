@@ -2,6 +2,8 @@ use std::collections::HashMap;
 
 use serde::{Deserialize, Serialize};
 
+use crate::derived::rich_text_converter;
+
 /// The result of a derived column computation.
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub enum DerivedResult {
@@ -17,6 +19,41 @@ pub enum DerivedResult {
     RichText(Vec<StyledSpan>),
     /// Error with message
     Error(String),
+}
+
+impl DerivedResult {
+    /// Converts this result to a JSON value suitable for the frontend.
+    pub fn to_frontend_value(&self) -> serde_json::Value {
+        match self {
+            DerivedResult::Text(s) => serde_json::json!({
+                "type": "text",
+                "value": s
+            }),
+            DerivedResult::Number(n) => serde_json::json!({
+                "type": "number",
+                "value": n
+            }),
+            DerivedResult::Boolean(b) => serde_json::json!({
+                "type": "boolean",
+                "value": b
+            }),
+            DerivedResult::Image(url) => serde_json::json!({
+                "type": "image",
+                "value": url
+            }),
+            DerivedResult::RichText(spans) => {
+                let rich_text = rich_text_converter::styled_spans_to_univer_rich_text(spans);
+                serde_json::json!({
+                    "type": "richText",
+                    "value": rich_text
+                })
+            }
+            DerivedResult::Error(msg) => serde_json::json!({
+                "type": "error",
+                "value": msg
+            }),
+        }
+    }
 }
 
 /// A styled span for rich text output.
