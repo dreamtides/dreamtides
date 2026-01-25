@@ -10,6 +10,40 @@ export type { TomlTableData, SyncState };
 
 const SAVE_DEBOUNCE_MS = 500;
 
+/**
+ * Compares two TomlTableData objects for equality.
+ * Returns true if headers and all cell values are identical.
+ */
+function isDataEqual(a: TomlTableData, b: TomlTableData): boolean {
+  // Compare headers
+  if (a.headers.length !== b.headers.length) return false;
+  for (let i = 0; i < a.headers.length; i++) {
+    if (a.headers[i] !== b.headers[i]) return false;
+  }
+
+  // Compare rows
+  if (a.rows.length !== b.rows.length) return false;
+  for (let rowIdx = 0; rowIdx < a.rows.length; rowIdx++) {
+    const rowA = a.rows[rowIdx];
+    const rowB = b.rows[rowIdx];
+    if (rowA.length !== rowB.length) return false;
+    for (let colIdx = 0; colIdx < rowA.length; colIdx++) {
+      const cellA = rowA[colIdx];
+      const cellB = rowB[colIdx];
+      // Compare values, treating null and undefined as equal
+      if (cellA !== cellB) {
+        // Handle null/undefined equivalence
+        if ((cellA === null || cellA === undefined) && (cellB === null || cellB === undefined)) {
+          continue;
+        }
+        return false;
+      }
+    }
+  }
+
+  return true;
+}
+
 interface SheetInfo {
   id: string;
   path: string;
@@ -35,6 +69,8 @@ export function AppRoot() {
   const saveTimeoutRef = useRef<number | null>(null);
   const isSavingRef = useRef<Record<string, boolean>>({});
   const watchersStartedRef = useRef<Set<string>>(new Set());
+  // Track last known data for each sheet to detect actual changes
+  const lastKnownDataRef = useRef<Record<string, TomlTableData>>({});
 
   const loadSingleFile = useCallback(async (path: string, tableName: string): Promise<TomlTableData | null> => {
     try {
@@ -69,6 +105,11 @@ export function AppRoot() {
       return;
     }
 
+    // Store last known data for change detection
+    for (const sheet of validSheets) {
+      lastKnownDataRef.current[sheet.id] = sheet.data;
+    }
+
     setMultiSheetData({ sheets: validSheets });
     if (!activeSheetId && validSheets.length > 0) {
       setActiveSheetId(validSheets[0].id);
@@ -83,6 +124,9 @@ export function AppRoot() {
 
     const data = await loadSingleFile(sheetInfo.path, sheetInfo.tableName);
     if (!data) return;
+
+    // Update last known data for change detection
+    lastKnownDataRef.current[sheetId] = data;
 
     setMultiSheetData((prev) => {
       if (!prev) return prev;
@@ -108,6 +152,8 @@ export function AppRoot() {
 
       try {
         await ipc.saveTomlTable(sheetInfo.path, sheetInfo.tableName, newData);
+        // Update last known data after successful save
+        lastKnownDataRef.current[sheetId] = newData;
         setSaveStatus("saved");
         setTimeout(() => setSaveStatus("idle"), 1500);
       } catch (e) {
@@ -122,6 +168,14 @@ export function AppRoot() {
 
   const handleChange = useCallback(
     (newData: TomlTableData, sheetId: string) => {
+      // Check if data actually changed - Univer fires set-range-values on cell
+      // selection, not just on actual value changes
+      const lastKnown = lastKnownDataRef.current[sheetId];
+      if (lastKnown && isDataEqual(lastKnown, newData)) {
+        // Data hasn't changed, skip save
+        return;
+      }
+
       if (saveTimeoutRef.current) {
         clearTimeout(saveTimeoutRef.current);
       }
