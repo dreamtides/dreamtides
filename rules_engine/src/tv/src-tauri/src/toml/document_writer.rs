@@ -321,7 +321,7 @@ pub fn save_batch_with_fs(
                 column_key: update.column_key.clone(),
                 reason: format!("Row index {} out of bounds (max: {})", update.row_index, array_len.saturating_sub(1)),
             });
-        } else if !update.value.is_null() && json_to_toml_edit_value(&update.value).is_none() {
+        } else if !update.value.is_null() && value_converter::json_to_toml_edit(&update.value).is_none() {
             failed_updates.push(FailedUpdate {
                 row_index: update.row_index,
                 column_key: update.column_key.clone(),
@@ -355,7 +355,7 @@ pub fn save_batch_with_fs(
         let table = array.get_mut(update.row_index).ok_or_else(|| {
             panic!("Row index {} should be valid after validation", update.row_index)
         })?;
-        if let Some(new_value) = json_to_toml_edit_value(&update.value) {
+        if let Some(new_value) = value_converter::json_to_toml_edit(&update.value) {
             table[&update.column_key] = new_value;
         } else if update.value.is_null() {
             table.remove(&update.column_key);
