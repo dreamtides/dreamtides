@@ -36,6 +36,20 @@ export interface DerivedColumnConfig {
   inputs?: string[];
 }
 
+// ============ Sort State ============
+
+export type SortDirection = "ascending" | "descending";
+
+export interface SortState {
+  column: string;
+  direction: SortDirection;
+}
+
+export interface SortStateResponse {
+  column: string | null;
+  direction: SortDirection | null;
+}
+
 // ============ Sync State ============
 
 export type SyncState = "idle" | "saving" | "loading" | "saved" | "error";
@@ -207,6 +221,32 @@ export async function stopFileWatcher(filePath: string): Promise<void> {
 
 export async function getAppPaths(): Promise<string[]> {
   return invoke<string[]>("get_app_paths");
+}
+
+export async function getSortState(
+  filePath: string,
+  tableName: string
+): Promise<SortStateResponse> {
+  return invoke<SortStateResponse>("get_sort_state", { filePath, tableName });
+}
+
+export async function setSortState(
+  filePath: string,
+  tableName: string,
+  sort: SortState | null
+): Promise<SortStateResponse> {
+  return invoke<SortStateResponse>("set_sort_state", {
+    filePath,
+    tableName,
+    sort,
+  });
+}
+
+export async function clearSortState(
+  filePath: string,
+  tableName: string
+): Promise<SortStateResponse> {
+  return invoke<SortStateResponse>("clear_sort_state", { filePath, tableName });
 }
 
 // ============ Events ============
