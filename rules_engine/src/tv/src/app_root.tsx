@@ -4,87 +4,164 @@ import { ErrorBanner } from "./error_banner";
 import { StatusIndicator } from "./status_indicator";
 import * as ipc from "./ipc_bridge";
 import type { TomlTableData, SyncState } from "./ipc_bridge";
+import type { MultiSheetData, SheetData } from "./UniverSpreadsheet";
 
 export type { TomlTableData, SyncState };
 
 const SAVE_DEBOUNCE_MS = 500;
+
+interface SheetInfo {
+  id: string;
+  path: string;
+  tableName: string;
+}
 
 function extractTableName(filePath: string): string {
   const fileName = filePath.split("/").pop() || filePath;
   return fileName.replace(/\.toml$/, "");
 }
 
+function generateSheetId(filePath: string): string {
+  return `sheet-${filePath.replace(/[^a-zA-Z0-9]/g, "-")}`;
+}
+
 export function AppRoot() {
-  const [filePath, setFilePath] = useState<string | null>(null);
-  const [tableName, setTableName] = useState<string | null>(null);
-  const [data, setData] = useState<TomlTableData | null>(null);
+  const [sheets, setSheets] = useState<SheetInfo[]>([]);
+  const [multiSheetData, setMultiSheetData] = useState<MultiSheetData | null>(null);
+  const [activeSheetId, setActiveSheetId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [saveStatus, setSaveStatus] = useState<SyncState>("idle");
   const saveTimeoutRef = useRef<number | null>(null);
-  const isSavingRef = useRef(false);
+  const isSavingRef = useRef<Record<string, boolean>>({});
+  const watchersStartedRef = useRef<Set<string>>(new Set());
 
-  const loadData = useCallback(async (path: string, table: string) => {
+  const loadSingleFile = useCallback(async (path: string, tableName: string): Promise<TomlTableData | null> => {
     try {
-      setLoading(true);
-      const result = await ipc.loadTomlTable(path, table);
-      setData(result);
-      setError(null);
+      return await ipc.loadTomlTable(path, tableName);
     } catch (e) {
-      setError(String(e));
-    } finally {
-      setLoading(false);
+      console.error(`Failed to load ${path}:`, e);
+      return null;
     }
   }, []);
 
+  const loadAllFiles = useCallback(async (sheetInfos: SheetInfo[]): Promise<void> => {
+    setLoading(true);
+    const loadPromises = sheetInfos.map(async (info): Promise<SheetData | null> => {
+      const data = await loadSingleFile(info.path, info.tableName);
+      if (data) {
+        return {
+          id: info.id,
+          name: info.tableName,
+          path: info.path,
+          data,
+        };
+      }
+      return null;
+    });
+
+    const results = await Promise.all(loadPromises);
+    const validSheets = results.filter((s): s is SheetData => s !== null);
+
+    if (validSheets.length === 0) {
+      setError("Failed to load any TOML files");
+      setLoading(false);
+      return;
+    }
+
+    setMultiSheetData({ sheets: validSheets });
+    if (!activeSheetId && validSheets.length > 0) {
+      setActiveSheetId(validSheets[0].id);
+    }
+    setError(null);
+    setLoading(false);
+  }, [loadSingleFile, activeSheetId]);
+
+  const reloadSheet = useCallback(async (sheetId: string) => {
+    const sheetInfo = sheets.find((s) => s.id === sheetId);
+    if (!sheetInfo) return;
+
+    const data = await loadSingleFile(sheetInfo.path, sheetInfo.tableName);
+    if (!data) return;
+
+    setMultiSheetData((prev) => {
+      if (!prev) return prev;
+      const newSheets = prev.sheets.map((s) =>
+        s.id === sheetId ? { ...s, data } : s
+      );
+      return { sheets: newSheets };
+    });
+  }, [sheets, loadSingleFile]);
+
+  const getActiveSheetInfo = useCallback((): SheetInfo | undefined => {
+    return sheets.find((s) => s.id === activeSheetId);
+  }, [sheets, activeSheetId]);
+
   const saveData = useCallback(
-    async (newData: TomlTableData) => {
-      if (isSavingRef.current || !filePath || !tableName) return;
-      isSavingRef.current = true;
+    async (newData: TomlTableData, sheetId: string) => {
+      const sheetInfo = sheets.find((s) => s.id === sheetId);
+      if (!sheetInfo) return;
+
+      if (isSavingRef.current[sheetId]) return;
+      isSavingRef.current[sheetId] = true;
       setSaveStatus("saving");
 
       try {
-        await ipc.saveTomlTable(filePath, tableName, newData);
+        await ipc.saveTomlTable(sheetInfo.path, sheetInfo.tableName, newData);
         setSaveStatus("saved");
         setTimeout(() => setSaveStatus("idle"), 1500);
       } catch (e) {
         console.error("Save error:", e);
         setSaveStatus("error");
       } finally {
-        isSavingRef.current = false;
+        isSavingRef.current[sheetId] = false;
       }
     },
-    [filePath, tableName]
+    [sheets]
   );
 
   const handleChange = useCallback(
-    (newData: TomlTableData) => {
+    (newData: TomlTableData, sheetId: string) => {
       if (saveTimeoutRef.current) {
         clearTimeout(saveTimeoutRef.current);
       }
       saveTimeoutRef.current = window.setTimeout(() => {
-        saveData(newData);
+        saveData(newData, sheetId);
       }, SAVE_DEBOUNCE_MS);
     },
     [saveData]
   );
 
+  const handleActiveSheetChanged = useCallback((sheetId: string) => {
+    setActiveSheetId(sheetId);
+  }, []);
+
   useEffect(() => {
     const init = async () => {
       try {
         const paths = await ipc.getAppPaths();
-        if (paths.length > 0) {
-          const path = paths[0];
-          const table = extractTableName(path);
-          setFilePath(path);
-          setTableName(table);
-          await loadData(path, table);
-          ipc.startFileWatcher(path).catch((e) =>
-            console.error("Failed to start file watcher:", e)
-          );
-        } else {
+        if (paths.length === 0) {
           setError("No TOML files found");
           setLoading(false);
+          return;
+        }
+
+        const sheetInfos: SheetInfo[] = paths.map((path) => ({
+          id: generateSheetId(path),
+          path,
+          tableName: extractTableName(path),
+        }));
+
+        setSheets(sheetInfos);
+        await loadAllFiles(sheetInfos);
+
+        for (const info of sheetInfos) {
+          if (!watchersStartedRef.current.has(info.path)) {
+            ipc.startFileWatcher(info.path).catch((e) =>
+              console.error(`Failed to start file watcher for ${info.path}:`, e)
+            );
+            watchersStartedRef.current.add(info.path);
+          }
         }
       } catch (e) {
         setError(String(e));
@@ -93,12 +170,20 @@ export function AppRoot() {
     };
 
     init();
+  }, [loadAllFiles]);
 
-    const fileChangedSub = ipc.onFileChanged(() => {
-      if (!isSavingRef.current && filePath && tableName) {
-        console.log("File changed externally, reloading...");
-        loadData(filePath, tableName);
+  useEffect(() => {
+    const fileChangedSub = ipc.onFileChanged((payload) => {
+      const sheetInfo = sheets.find((s) => s.path === payload.path);
+      if (!sheetInfo) return;
+
+      if (isSavingRef.current[sheetInfo.id]) {
+        console.log(`Ignoring file change for ${payload.path} during save`);
+        return;
       }
+
+      console.log(`File changed externally: ${payload.path}, reloading sheet...`);
+      reloadSheet(sheetInfo.id);
     });
 
     const syncStateSub = ipc.onSyncStateChanged((payload) => {
@@ -107,8 +192,9 @@ export function AppRoot() {
 
     const conflictSub = ipc.onSyncConflict((payload) => {
       console.log("Conflict detected:", payload.message);
-      if (filePath && tableName) {
-        loadData(filePath, tableName);
+      const sheetInfo = sheets.find((s) => s.path === payload.filePath);
+      if (sheetInfo) {
+        reloadSheet(sheetInfo.id);
       }
     });
 
@@ -116,17 +202,27 @@ export function AppRoot() {
       fileChangedSub.dispose();
       syncStateSub.dispose();
       conflictSub.dispose();
+    };
+  }, [sheets, reloadSheet]);
+
+  useEffect(() => {
+    return () => {
       if (saveTimeoutRef.current) {
         clearTimeout(saveTimeoutRef.current);
       }
+      for (const path of watchersStartedRef.current) {
+        ipc.stopFileWatcher(path).catch((e) =>
+          console.error(`Failed to stop file watcher for ${path}:`, e)
+        );
+      }
     };
-  }, [loadData]);
+  }, []);
 
   const handleRetry = useCallback(() => {
-    if (filePath && tableName) {
-      loadData(filePath, tableName);
+    if (sheets.length > 0) {
+      loadAllFiles(sheets);
     }
-  }, [filePath, tableName, loadData]);
+  }, [sheets, loadAllFiles]);
 
   return (
     <div className={`tv-app ${error ? "has-error" : ""}`}>
@@ -140,11 +236,12 @@ export function AppRoot() {
       )}
       <div className="tv-main-content">
         <SpreadsheetView
-          data={data}
+          multiSheetData={multiSheetData}
           error={null}
           loading={loading}
           saveStatus={saveStatus}
           onChange={handleChange}
+          onActiveSheetChanged={handleActiveSheetChanged}
         />
       </div>
       <StatusIndicator

@@ -1,20 +1,23 @@
 import { UniverSpreadsheet } from "./UniverSpreadsheet";
 import type { TomlTableData, SyncState } from "./ipc_bridge";
+import type { MultiSheetData } from "./UniverSpreadsheet";
 
 interface SpreadsheetViewProps {
-  data: TomlTableData | null;
+  multiSheetData?: MultiSheetData | null;
   error: string | null;
   loading: boolean;
   saveStatus: SyncState;
-  onChange: (data: TomlTableData) => void;
+  onChange: (data: TomlTableData, sheetId: string) => void;
+  onActiveSheetChanged?: (sheetId: string) => void;
 }
 
 export function SpreadsheetView({
-  data,
+  multiSheetData,
   error,
   loading,
   saveStatus,
   onChange,
+  onActiveSheetChanged,
 }: SpreadsheetViewProps) {
   if (loading) {
     return <div className="loading">Loading...</div>;
@@ -37,8 +40,9 @@ export function SpreadsheetView({
       </div>
       <UniverSpreadsheet
         height="calc(100vh - 30px)"
-        data={data ?? undefined}
+        multiSheetData={multiSheetData ?? undefined}
         onChange={onChange}
+        onActiveSheetChanged={onActiveSheetChanged}
       />
     </main>
   );
