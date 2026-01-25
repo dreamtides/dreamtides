@@ -105,6 +105,10 @@ export const UniverSpreadsheet = forwardRef<
   const isLoadingRef = useRef(false);
   // Track if we've initialized with multi-sheet data
   const isMultiSheetRef = useRef(false);
+  // Track whether initial workbook creation has completed (data already in cellData)
+  const initialLoadCompleteRef = useRef(false);
+  // Track last known data for each sheet to detect actual changes
+  const lastMultiSheetDataRef = useRef<MultiSheetData | null>(null);
 
   onChangeRef.current = onChange;
   onActiveSheetChangedRef.current = onActiveSheetChanged;
@@ -187,8 +191,16 @@ export const UniverSpreadsheet = forwardRef<
     // Check if we have multi-sheet data to initialize with
     if (multiSheetData && multiSheetData.sheets.length > 0) {
       isMultiSheetRef.current = true;
+      // Store headers for all sheets
+      headersMapRef.current.clear();
+      for (const sheetData of multiSheetData.sheets) {
+        headersMapRef.current.set(sheetData.id, sheetData.data.headers);
+      }
       const workbookData = buildMultiSheetWorkbook(multiSheetData);
       instance.univerAPI.createWorkbook(workbookData);
+      // Mark initial load as complete - data is already in cellData, no need to repopulate
+      initialLoadCompleteRef.current = true;
+      lastMultiSheetDataRef.current = multiSheetData;
       logInfo("Workbook initialized with multiple sheets", {
         sheetCount: multiSheetData.sheets.length,
         sheetNames: multiSheetData.sheets.map((s) => s.name),
@@ -249,21 +261,27 @@ export const UniverSpreadsheet = forwardRef<
     isLoadingRef.current = true;
     headersRef.current = data.headers;
 
-    data.headers.forEach((header, colIndex) => {
-      const colLetter = getColumnLetter(colIndex);
-      const range = sheet.getRange(`${colLetter}1`);
-      range?.setValue(header);
-      range?.setFontWeight("bold");
-    });
+    const numColumns = data.headers.length;
+    if (numColumns > 0) {
+      // Set headers row using batch operation
+      const headerRange = sheet.getRange(0, 0, 1, numColumns);
+      if (headerRange) {
+        headerRange.setValues([data.headers]);
+        headerRange.setFontWeight("bold");
+      }
 
-    data.rows.forEach((row, rowIndex) => {
-      row.forEach((cellValue, colIndex) => {
-        const colLetter = getColumnLetter(colIndex);
-        const cellAddress = `${colLetter}${rowIndex + 2}`;
-        const displayValue = cellValue === null ? "" : cellValue;
-        sheet.getRange(cellAddress)?.setValue(displayValue);
-      });
-    });
+      // Set data rows using a single batch operation
+      if (data.rows.length > 0) {
+        const dataRange = sheet.getRange(1, 0, data.rows.length, numColumns);
+        if (dataRange) {
+          // Convert null values to empty strings for display
+          const displayRows = data.rows.map((row) =>
+            row.map((cellValue) => (cellValue === null ? "" : cellValue))
+          );
+          dataRange.setValues(displayRows);
+        }
+      }
+    }
 
     isLoadingRef.current = false;
   }, [data]);
@@ -276,6 +294,12 @@ export const UniverSpreadsheet = forwardRef<
     const workbook = univerAPIRef.current.getActiveWorkbook();
     if (!workbook) return;
 
+    // Skip if this is the initial load - data was already set via cellData in buildMultiSheetWorkbook
+    if (initialLoadCompleteRef.current && lastMultiSheetDataRef.current === multiSheetData) {
+      logDebug("Skipping multi-sheet update - same data reference as initial load");
+      return;
+    }
+
     isLoadingRef.current = true;
     isMultiSheetRef.current = true;
 
@@ -285,18 +309,47 @@ export const UniverSpreadsheet = forwardRef<
       headersMapRef.current.set(sheetData.id, sheetData.data.headers);
     }
 
-    // If workbook was already created with multi-sheet data, update cell contents
-    // Otherwise, this is handled by initial workbook creation
+    // Find sheets that actually changed (for reload optimization)
+    const previousData = lastMultiSheetDataRef.current;
+    const changedSheetIds = new Set<string>();
+
+    if (previousData) {
+      for (const sheetData of multiSheetData.sheets) {
+        const prevSheet = previousData.sheets.find(s => s.id === sheetData.id);
+        if (!prevSheet || !isSheetDataEqual(prevSheet.data, sheetData.data)) {
+          changedSheetIds.add(sheetData.id);
+        }
+      }
+    } else {
+      // No previous data, all sheets need updating
+      for (const sheetData of multiSheetData.sheets) {
+        changedSheetIds.add(sheetData.id);
+      }
+    }
+
+    // Only update sheets that actually changed, using batch operations
     for (const sheetData of multiSheetData.sheets) {
+      if (!changedSheetIds.has(sheetData.id)) {
+        logDebug("Skipping unchanged sheet", { sheetId: sheetData.id, sheetName: sheetData.name });
+        continue;
+      }
+
       const sheet = workbook.getSheetBySheetId(sheetData.id);
       if (!sheet) {
         logDebug("Sheet not found, skipping update", { sheetId: sheetData.id });
         continue;
       }
 
-      populateSheetData(sheet, sheetData.data);
+      logDebug("Updating changed sheet with batch operation", {
+        sheetId: sheetData.id,
+        sheetName: sheetData.name,
+        rowCount: sheetData.data.rows.length,
+        columnCount: sheetData.data.headers.length,
+      });
+      populateSheetDataBatch(sheet, sheetData.data);
     }
 
+    lastMultiSheetDataRef.current = multiSheetData;
     isLoadingRef.current = false;
   }, [multiSheetData]);
 
@@ -386,34 +439,67 @@ function buildMultiSheetWorkbook(multiSheetData: MultiSheetData): IWorkbookData 
 
 /** Sheet interface matching FWorksheet facade methods we use */
 interface SheetFacade {
-  getRange(address: string): {
-    setValue(value: unknown): void;
+  getRange(
+    startRow: number,
+    startColumn: number,
+    numRows: number,
+    numColumns: number
+  ): {
+    setValues(values: unknown[][]): void;
     setFontWeight(weight: string): void;
   } | null;
 }
 
 /**
- * Populate a sheet with TomlTableData.
- * Used for updating sheet contents after initial creation.
+ * Compare two TomlTableData objects for equality.
  */
-function populateSheetData(sheet: SheetFacade, data: TomlTableData): void {
+function isSheetDataEqual(a: TomlTableData, b: TomlTableData): boolean {
+  // Compare headers
+  if (a.headers.length !== b.headers.length) return false;
+  for (let i = 0; i < a.headers.length; i++) {
+    if (a.headers[i] !== b.headers[i]) return false;
+  }
+
+  // Compare rows
+  if (a.rows.length !== b.rows.length) return false;
+  for (let rowIdx = 0; rowIdx < a.rows.length; rowIdx++) {
+    const rowA = a.rows[rowIdx];
+    const rowB = b.rows[rowIdx];
+    if (rowA.length !== rowB.length) return false;
+    for (let colIdx = 0; colIdx < rowA.length; colIdx++) {
+      if (rowA[colIdx] !== rowB[colIdx]) return false;
+    }
+  }
+
+  return true;
+}
+
+/**
+ * Populate a sheet with TomlTableData using batch operations.
+ * Uses setValues() to set all cells in a single API call per region.
+ */
+function populateSheetDataBatch(sheet: SheetFacade, data: TomlTableData): void {
   if (!sheet) return;
 
-  // Set headers with bold styling
-  data.headers.forEach((header, colIndex) => {
-    const colLetter = getColumnLetter(colIndex);
-    const range = sheet.getRange(`${colLetter}1`);
-    range?.setValue(header);
-    range?.setFontWeight("bold");
-  });
+  const numColumns = data.headers.length;
+  if (numColumns === 0) return;
 
-  // Set data rows
-  data.rows.forEach((row, rowIndex) => {
-    row.forEach((cellValue, colIndex) => {
-      const colLetter = getColumnLetter(colIndex);
-      const cellAddress = `${colLetter}${rowIndex + 2}`;
-      const displayValue = cellValue === null ? "" : cellValue;
-      sheet.getRange(cellAddress)?.setValue(displayValue);
-    });
-  });
+  // Set headers row using batch operation
+  const headerRange = sheet.getRange(0, 0, 1, numColumns);
+  if (headerRange) {
+    headerRange.setValues([data.headers]);
+    headerRange.setFontWeight("bold");
+  }
+
+  // Set data rows using a single batch operation
+  if (data.rows.length > 0) {
+    const dataRange = sheet.getRange(1, 0, data.rows.length, numColumns);
+    if (dataRange) {
+      // Convert null values to empty strings for display
+      const displayRows = data.rows.map((row) =>
+        row.map((cellValue) => (cellValue === null ? "" : cellValue))
+      );
+      dataRange.setValues(displayRows);
+    }
+  }
 }
