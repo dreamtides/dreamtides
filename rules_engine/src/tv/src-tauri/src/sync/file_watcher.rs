@@ -10,6 +10,7 @@ use serde::Serialize;
 use tauri::{AppHandle, Emitter, Manager};
 
 use crate::error::error_types::TvError;
+use crate::sync::save_coordinator;
 
 #[derive(Clone, Serialize)]
 pub struct FileChangedPayload {
@@ -223,6 +224,16 @@ fn run_watcher(
                 DebouncedEventKind::AnyContinuous => "modify",
                 _ => "modify",
             };
+
+            if save_coordinator::is_saving(&app_handle, &file_path) {
+                tracing::debug!(
+                    component = "tv.sync",
+                    file_path = %file_path,
+                    event_type = %event_type,
+                    "Ignoring file change event during active save"
+                );
+                continue;
+            }
 
             tracing::debug!(
                 component = "tv.sync",

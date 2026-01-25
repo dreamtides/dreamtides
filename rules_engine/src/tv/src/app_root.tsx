@@ -101,8 +101,21 @@ export function AppRoot() {
       }
     });
 
+    const syncStateSub = ipc.onSyncStateChanged((payload) => {
+      console.log("Sync state changed:", payload.state);
+    });
+
+    const conflictSub = ipc.onSyncConflict((payload) => {
+      console.log("Conflict detected:", payload.message);
+      if (filePath && tableName) {
+        loadData(filePath, tableName);
+      }
+    });
+
     return () => {
       fileChangedSub.dispose();
+      syncStateSub.dispose();
+      conflictSub.dispose();
       if (saveTimeoutRef.current) {
         clearTimeout(saveTimeoutRef.current);
       }

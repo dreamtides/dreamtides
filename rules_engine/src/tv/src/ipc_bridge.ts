@@ -87,6 +87,11 @@ export interface SyncErrorPayload {
   message: string;
 }
 
+export interface SyncConflictPayload {
+  filePath: string;
+  message: string;
+}
+
 // ============ Commands ============
 
 export async function loadTomlTable(
@@ -232,6 +237,24 @@ export function onSyncError(
   let unlisten: UnlistenFn | null = null;
 
   listen<SyncErrorPayload>("sync-error", (event) => {
+    callback(event.payload);
+  }).then((fn) => {
+    unlisten = fn;
+  });
+
+  return {
+    dispose: () => {
+      if (unlisten) unlisten();
+    },
+  };
+}
+
+export function onSyncConflict(
+  callback: (payload: SyncConflictPayload) => void
+): Disposable {
+  let unlisten: UnlistenFn | null = null;
+
+  listen<SyncConflictPayload>("sync-conflict-detected", (event) => {
     callback(event.payload);
   }).then((fn) => {
     unlisten = fn;
