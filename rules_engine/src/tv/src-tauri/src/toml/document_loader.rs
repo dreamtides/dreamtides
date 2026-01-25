@@ -6,6 +6,7 @@ use std::time::Instant;
 use serde::{Deserialize, Serialize};
 
 use crate::error::error_types::TvError;
+use crate::toml::value_converter;
 use crate::traits::{FileSystem, RealFileSystem};
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -115,7 +116,8 @@ pub fn load_toml_document_with_fs(
         let mut row = Vec::new();
         if let Some(tbl) = item.as_table() {
             for header in &headers {
-                let val = tbl.get(header).map_or(serde_json::Value::Null, toml_value_to_json);
+                let val =
+                    tbl.get(header).map_or(serde_json::Value::Null, value_converter::toml_to_json);
                 row.push(val);
             }
         }
@@ -132,23 +134,4 @@ pub fn load_toml_document_with_fs(
     );
 
     Ok(TomlTableData { headers, rows })
-}
-
-pub fn toml_value_to_json(value: &toml::Value) -> serde_json::Value {
-    match value {
-        toml::Value::String(s) => serde_json::Value::String(s.clone()),
-        toml::Value::Integer(i) => serde_json::Value::Number((*i).into()),
-        toml::Value::Float(f) => serde_json::Number::from_f64(*f)
-            .map_or(serde_json::Value::Null, serde_json::Value::Number),
-        toml::Value::Boolean(b) => serde_json::Value::Bool(*b),
-        toml::Value::Array(arr) => {
-            serde_json::Value::Array(arr.iter().map(toml_value_to_json).collect())
-        }
-        toml::Value::Table(tbl) => {
-            let map: serde_json::Map<String, serde_json::Value> =
-                tbl.iter().map(|(k, v)| (k.clone(), toml_value_to_json(v))).collect();
-            serde_json::Value::Object(map)
-        }
-        toml::Value::Datetime(dt) => serde_json::Value::String(dt.to_string()),
-    }
 }

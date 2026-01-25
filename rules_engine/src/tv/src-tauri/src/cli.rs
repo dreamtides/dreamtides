@@ -11,7 +11,9 @@ pub mod exit_codes {
 #[command(name = "tv")]
 #[command(about = "TOML Viewer - Spreadsheet editor for TOML files")]
 pub struct Args {
-    #[arg(help = "Path to TOML file or directory to open. Defaults to rules_engine/tabula/ when not provided")]
+    #[arg(
+        help = "Path to TOML file or directory to open. Defaults to rules_engine/tabula/ when not provided"
+    )]
     pub path: Option<PathBuf>,
 
     #[arg(long, help = "Output logs in JSONL format to stdout")]
@@ -41,23 +43,15 @@ pub fn resolve_paths(args: &Args) -> Result<AppPaths, String> {
             }
 
             if path.is_file() {
-                Ok(AppPaths {
-                    files: vec![path.clone()],
-                })
+                Ok(AppPaths { files: vec![path.clone()] })
             } else if path.is_dir() {
                 let files = scan_directory_for_toml(path)?;
                 if files.is_empty() {
-                    return Err(format!(
-                        "No TOML files found in directory: {}",
-                        path.display()
-                    ));
+                    return Err(format!("No TOML files found in directory: {}", path.display()));
                 }
                 Ok(AppPaths { files })
             } else {
-                Err(format!(
-                    "Path is neither a file nor a directory: {}",
-                    path.display()
-                ))
+                Err(format!("Path is neither a file nor a directory: {}", path.display()))
             }
         }
         None => {
@@ -83,10 +77,8 @@ pub fn resolve_paths(args: &Args) -> Result<AppPaths, String> {
 fn get_default_tabula_path() -> Result<PathBuf, String> {
     let exe_path =
         std::env::current_exe().map_err(|e| format!("Failed to get executable path: {}", e))?;
-    let mut search_path = exe_path
-        .parent()
-        .ok_or("Failed to get executable directory")?
-        .to_path_buf();
+    let mut search_path =
+        exe_path.parent().ok_or("Failed to get executable directory")?.to_path_buf();
     loop {
         let tabula_path = search_path.join("rules_engine").join("tabula");
         if tabula_path.exists() {
@@ -105,9 +97,7 @@ fn scan_directory_for_toml(dir: &PathBuf) -> Result<Vec<PathBuf>, String> {
     let mut files: Vec<PathBuf> = entries
         .filter_map(|entry| entry.ok())
         .map(|entry| entry.path())
-        .filter(|path| {
-            path.is_file() && path.extension().is_some_and(|ext| ext == "toml")
-        })
+        .filter(|path| path.is_file() && path.extension().is_some_and(|ext| ext == "toml"))
         .collect();
     files.sort();
     Ok(files)

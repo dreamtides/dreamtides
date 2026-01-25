@@ -131,10 +131,7 @@ pub fn stop_all_watchers(app_handle: &AppHandle) {
                 "Watcher stopped during cleanup"
             );
         }
-        tracing::info!(
-            component = "tv.sync",
-            "All file watchers stopped"
-        );
+        tracing::info!(component = "tv.sync", "All file watchers stopped");
     }
 }
 
@@ -178,7 +175,8 @@ fn run_watcher(
         for result in rx {
             match result {
                 Ok(events) => {
-                    let mut collected = debounced_events_clone.lock().unwrap_or_else(|e| e.into_inner());
+                    let mut collected =
+                        debounced_events_clone.lock().unwrap_or_else(|e| e.into_inner());
                     collected.extend(events);
                 }
                 Err(e) => {
@@ -248,8 +246,10 @@ fn run_watcher(
                     file_path = %file_path,
                     "Watched file no longer exists"
                 );
-                let payload =
-                    FileChangedPayload { file_path: file_path.clone(), event_type: "delete".to_string() };
+                let payload = FileChangedPayload {
+                    file_path: file_path.clone(),
+                    event_type: "delete".to_string(),
+                };
                 if let Err(e) = app_handle.emit("toml-file-changed", payload) {
                     tracing::error!(
                         component = "tv.sync",
@@ -261,8 +261,10 @@ fn run_watcher(
                 continue;
             }
 
-            let payload =
-                FileChangedPayload { file_path: file_path.clone(), event_type: event_type.to_string() };
+            let payload = FileChangedPayload {
+                file_path: file_path.clone(),
+                event_type: event_type.to_string(),
+            };
 
             if let Err(e) = app_handle.emit("toml-file-changed", payload) {
                 tracing::error!(

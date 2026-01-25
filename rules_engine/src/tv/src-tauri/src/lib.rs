@@ -26,11 +26,7 @@ mod validation;
 
 #[tauri::command]
 fn get_app_paths(state: tauri::State<cli::AppPaths>) -> Vec<String> {
-    state
-        .files
-        .iter()
-        .map(|p| p.to_string_lossy().to_string())
-        .collect()
+    state.files.iter().map(|p| p.to_string_lossy().to_string()).collect()
 }
 
 fn cleanup_temp_files_on_startup(paths: &cli::AppPaths) {
@@ -42,9 +38,7 @@ fn cleanup_temp_files_on_startup(paths: &cli::AppPaths) {
     }
 
     for dir in directories {
-        if let Err(e) = toml::document_writer::cleanup_orphaned_temp_files(
-            &dir.to_string_lossy(),
-        ) {
+        if let Err(e) = toml::document_writer::cleanup_orphaned_temp_files(&dir.to_string_lossy()) {
             tracing::warn!(
                 component = "tv.toml",
                 dir = %dir.display(),

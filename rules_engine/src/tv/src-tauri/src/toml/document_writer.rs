@@ -5,6 +5,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::error::error_types::{map_io_error_for_read, TvError};
 use crate::toml::document_loader::TomlTableData;
+use crate::toml::value_converter;
 use crate::traits::{AtomicWriteError, FileSystem, RealFileSystem};
 
 const TEMP_FILE_PREFIX: &str = ".tv_save_";
@@ -124,10 +125,8 @@ pub fn save_toml_document_with_fs(
         TvError::TomlParseError { line: None, message: e.to_string() }
     })?;
 
-    let array = doc
-        .get_mut(table_name)
-        .and_then(|v| v.as_array_of_tables_mut())
-        .ok_or_else(|| {
+    let array =
+        doc.get_mut(table_name).and_then(|v| v.as_array_of_tables_mut()).ok_or_else(|| {
             tracing::error!(
                 component = "tv.toml",
                 file_path = %file_path,
@@ -146,7 +145,7 @@ pub fn save_toml_document_with_fs(
         for (col_idx, header) in data.headers.iter().enumerate() {
             if let Some(json_val) = row.get(col_idx) {
                 if let Some(existing) = table.get_mut(header) {
-                    if let Some(new_val) = json_to_toml_edit_value(json_val) {
+                    if let Some(new_val) = value_converter::json_to_toml_edit(json_val) {
                         *existing = new_val;
                     }
                 }
@@ -156,9 +155,8 @@ pub fn save_toml_document_with_fs(
 
     let output = doc.to_string();
 
-    fs.write_atomic(Path::new(file_path), &output).map_err(|e| {
-        map_atomic_write_error(e, file_path)
-    })?;
+    fs.write_atomic(Path::new(file_path), &output)
+        .map_err(|e| map_atomic_write_error(e, file_path))?;
 
     let duration_ms = start.elapsed().as_millis() as u64;
     tracing::info!(
@@ -217,19 +215,6 @@ fn map_atomic_write_error(error: AtomicWriteError, file_path: &str) -> TvError {
     }
 }
 
-fn json_to_toml_edit_value(value: &serde_json::Value) -> Option<toml_edit::Item> {
-    match value {
-        serde_json::Value::Null => None,
-        serde_json::Value::Bool(b) => Some(toml_edit::value(*b)),
-        serde_json::Value::Number(n) => n
-            .as_i64()
-            .map(toml_edit::value)
-            .or_else(|| n.as_f64().map(toml_edit::value)),
-        serde_json::Value::String(s) => Some(toml_edit::value(s.as_str())),
-        serde_json::Value::Array(_) | serde_json::Value::Object(_) => None,
-    }
-}
-
 /// Saves a single cell update to the TOML file, preserving document structure.
 pub fn save_cell(
     file_path: &str,
@@ -268,10 +253,8 @@ pub fn save_cell_with_fs(
         TvError::TomlParseError { line: None, message: e.to_string() }
     })?;
 
-    let array = doc
-        .get_mut(table_name)
-        .and_then(|v| v.as_array_of_tables_mut())
-        .ok_or_else(|| {
+    let array =
+        doc.get_mut(table_name).and_then(|v| v.as_array_of_tables_mut()).ok_or_else(|| {
             tracing::error!(
                 component = "tv.toml",
                 file_path = %file_path,
@@ -294,19 +277,16 @@ pub fn save_cell_with_fs(
         TvError::RowNotFound { table_name: table_name.to_string(), row_index: update.row_index }
     })?;
 
-    // Update the cell value
-    if let Some(new_value) = json_to_toml_edit_value(&update.value) {
+    if let Some(new_value) = value_converter::json_to_toml_edit(&update.value) {
         table[&update.column_key] = new_value;
     } else if update.value.is_null() {
-        // Remove the key if the value is null
         table.remove(&update.column_key);
     }
 
     let output = doc.to_string();
 
-    fs.write_atomic(Path::new(file_path), &output).map_err(|e| {
-        map_atomic_write_error(e, file_path)
-    })?;
+    fs.write_atomic(Path::new(file_path), &output)
+        .map_err(|e| map_atomic_write_error(e, file_path))?;
 
     let duration_ms = start.elapsed().as_millis() as u64;
     tracing::info!(
