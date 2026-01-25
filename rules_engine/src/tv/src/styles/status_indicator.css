@@ -1,0 +1,118 @@
+/* status_indicator.css - Sync status indicator styles */
+
+.tv-status-indicator {
+  position: fixed;
+  bottom: var(--tv-spacing-md);
+  right: var(--tv-spacing-md);
+  display: flex;
+  align-items: center;
+  gap: var(--tv-spacing-sm);
+  padding: var(--tv-spacing-sm) var(--tv-spacing-md);
+  border-radius: 4px;
+  font-size: var(--tv-font-size-md);
+  font-family: var(--tv-font-family);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  transition:
+    opacity 0.2s ease-in-out,
+    transform 0.2s ease-in-out;
+}
+
+.tv-status-indicator--idle,
+.tv-status-indicator--saved {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+  border: 1px solid #a5d6a7;
+}
+
+.tv-status-indicator--saving {
+  background-color: #e3f2fd;
+  color: #1565c0;
+  border: 1px solid #90caf9;
+}
+
+.tv-status-indicator--loading {
+  background-color: #fff3e0;
+  color: #e65100;
+  border: 1px solid #ffcc80;
+}
+
+.tv-status-indicator--error {
+  background-color: var(--tv-error-bg);
+  color: var(--tv-error-text);
+  border: 1px solid var(--tv-error-border);
+}
+
+.tv-status-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  font-size: 16px;
+}
+
+.tv-status-icon--saving,
+.tv-status-icon--loading {
+  animation: tv-status-spin 1s linear infinite;
+}
+
+@keyframes tv-status-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.tv-status-indicator__text {
+  max-width: 300px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tv-status-indicator__dismiss {
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  font-size: 18px;
+  line-height: 1;
+  padding: 0 var(--tv-spacing-xs);
+  margin-left: var(--tv-spacing-sm);
+  opacity: 0.7;
+}
+
+.tv-status-indicator__dismiss:hover {
+  opacity: 1;
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .tv-status-indicator--idle,
+  .tv-status-indicator--saved {
+    background-color: #1b5e20;
+    color: #a5d6a7;
+    border-color: #2e7d32;
+  }
+
+  .tv-status-indicator--saving {
+    background-color: #0d47a1;
+    color: #90caf9;
+    border-color: #1565c0;
+  }
+
+  .tv-status-indicator--loading {
+    background-color: #e65100;
+    color: #fff3e0;
+    border-color: #ff9800;
+  }
+
+  .tv-status-indicator--error {
+    background-color: #b71c1c;
+    color: #ffcdd2;
+    border-color: #c62828;
+  }
+}

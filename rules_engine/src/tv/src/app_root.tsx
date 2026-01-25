@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { SpreadsheetView } from "./spreadsheet_view";
 import { ErrorBanner } from "./error_banner";
+import { StatusIndicator } from "./status_indicator";
 import * as ipc from "./ipc_bridge";
 import type { TomlTableData, SyncState } from "./ipc_bridge";
 
@@ -133,6 +134,10 @@ export function AppRoot() {
           onChange={handleChange}
         />
       </div>
+      <StatusIndicator
+        syncState={saveStatus}
+        autoHideDelay={2000}
+      />
     </div>
   );
 }

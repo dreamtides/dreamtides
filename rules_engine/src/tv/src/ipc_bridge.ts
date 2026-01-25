@@ -78,6 +78,15 @@ export interface ErrorPayload {
   filePath?: string;
 }
 
+export interface SyncStateChangedPayload {
+  state: SyncState;
+  timestamp: number;
+}
+
+export interface SyncErrorPayload {
+  message: string;
+}
+
 // ============ Commands ============
 
 export async function loadTomlTable(
@@ -171,6 +180,42 @@ export function onError(
   let unlisten: UnlistenFn | null = null;
 
   listen<ErrorPayload>("error-occurred", (event) => {
+    callback(event.payload);
+  }).then((fn) => {
+    unlisten = fn;
+  });
+
+  return {
+    dispose: () => {
+      if (unlisten) unlisten();
+    },
+  };
+}
+
+export function onSyncStateChanged(
+  callback: (payload: SyncStateChangedPayload) => void
+): Disposable {
+  let unlisten: UnlistenFn | null = null;
+
+  listen<SyncStateChangedPayload>("sync-state-changed", (event) => {
+    callback(event.payload);
+  }).then((fn) => {
+    unlisten = fn;
+  });
+
+  return {
+    dispose: () => {
+      if (unlisten) unlisten();
+    },
+  };
+}
+
+export function onSyncError(
+  callback: (payload: SyncErrorPayload) => void
+): Disposable {
+  let unlisten: UnlistenFn | null = null;
+
+  listen<SyncErrorPayload>("sync-error", (event) => {
     callback(event.payload);
   }).then((fn) => {
     unlisten = fn;
