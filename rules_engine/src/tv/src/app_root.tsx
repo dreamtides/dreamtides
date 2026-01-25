@@ -174,15 +174,15 @@ export function AppRoot() {
 
   useEffect(() => {
     const fileChangedSub = ipc.onFileChanged((payload) => {
-      const sheetInfo = sheets.find((s) => s.path === payload.path);
+      const sheetInfo = sheets.find((s) => s.path === payload.file_path);
       if (!sheetInfo) return;
 
       if (isSavingRef.current[sheetInfo.id]) {
-        console.log(`Ignoring file change for ${payload.path} during save`);
+        console.log(`Ignoring file change for ${payload.file_path} during save`);
         return;
       }
 
-      console.log(`File changed externally: ${payload.path}, reloading sheet...`);
+      console.log(`File changed externally: ${payload.file_path}, reloading sheet...`);
       reloadSheet(sheetInfo.id);
     });
 

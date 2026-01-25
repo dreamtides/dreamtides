@@ -115,7 +115,8 @@ export type DerivedResultValue =
 // ============ Event Payloads ============
 
 export interface FileChangedPayload {
-  path: string;
+  file_path: string;
+  event_type: string;
 }
 
 export interface DerivedValuePayload {
