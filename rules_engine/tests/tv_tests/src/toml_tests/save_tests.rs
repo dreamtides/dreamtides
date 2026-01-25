@@ -1,7 +1,11 @@
+use std::path::PathBuf;
+
 use serde_json::json;
 use tv_lib::error::error_types::TvError;
-use tv_lib::toml::document_writer::CellUpdate;
+use tv_lib::toml::document_loader::TomlTableData;
+use tv_lib::toml::document_writer::{cleanup_orphaned_temp_files_with_fs, CellUpdate};
 
+use crate::test_utils::mock_filesystem::MockFileSystem;
 use crate::test_utils::test_utils_mod::TvTestHarness;
 
 #[test]
@@ -516,4 +520,106 @@ keep = "stay"
     assert!(!content.contains("optional1"));
     assert!(!content.contains("optional2"));
     assert!(content.contains("keep = \"stay\""));
+}
+
+#[test]
+fn test_save_table_basic() {
+    let harness = TvTestHarness::new();
+    let path = harness.create_toml_file(
+        "table_save.toml",
+        r#"[[cards]]
+id = "card-1"
+name = "First Card"
+cost = 1
+
+[[cards]]
+id = "card-2"
+name = "Second Card"
+cost = 2
+"#,
+    );
+
+    let mut table = harness.load_table(&path, "cards").expect("Should load table");
+
+    let name_idx = table.headers.iter().position(|h| h == "name").unwrap();
+    table.rows[0][name_idx] = json!("Modified First");
+    table.rows[1][name_idx] = json!("Modified Second");
+
+    harness.save_table(&path, "cards", &table).expect("Should save table");
+
+    let content = harness.read_file_content(&path);
+    assert!(content.contains("Modified First"));
+    assert!(content.contains("Modified Second"));
+    assert!(!content.contains("First Card"));
+    assert!(!content.contains("Second Card"));
+}
+
+#[test]
+fn test_save_table_preserves_structure() {
+    let harness = TvTestHarness::new();
+    let original = r#"# Header comment
+
+[[cards]]
+id = "card-1"
+name = "First"
+"#;
+    let path = harness.create_toml_file("structure.toml", original);
+
+    let mut table = harness.load_table(&path, "cards").unwrap();
+    let name_idx = table.headers.iter().position(|h| h == "name").unwrap();
+    table.rows[0][name_idx] = json!("Updated");
+
+    harness.save_table(&path, "cards", &table).unwrap();
+
+    let content = harness.read_file_content(&path);
+    assert!(content.contains("# Header comment"));
+    assert!(content.contains("Updated"));
+}
+
+#[test]
+fn test_save_table_table_not_found() {
+    let harness = TvTestHarness::new();
+    let path = harness.create_toml_file(
+        "wrong.toml",
+        r#"[[items]]
+id = "item-1"
+"#,
+    );
+
+    let table = TomlTableData { headers: vec!["id".to_string()], rows: vec![vec![json!("new")]] };
+
+    let result = harness.save_table(&path, "cards", &table);
+    match result {
+        Err(TvError::TableNotFound { table_name }) => {
+            assert_eq!(table_name, "cards");
+        }
+        other => panic!("Expected TableNotFound error, got: {other:?}"),
+    }
+}
+
+#[test]
+fn test_cleanup_orphaned_temp_files_removes_temp_files() {
+    let mock = MockFileSystem::new().with_temp_files(vec![
+        PathBuf::from("/tmp/.tv_save_abc123"),
+        PathBuf::from("/tmp/.tv_save_def456"),
+    ]);
+
+    let result = cleanup_orphaned_temp_files_with_fs(&mock, "/tmp");
+    assert_eq!(result.unwrap(), 2, "Should remove 2 temp files");
+}
+
+#[test]
+fn test_cleanup_orphaned_temp_files_no_temp_files() {
+    let mock = MockFileSystem::new();
+
+    let result = cleanup_orphaned_temp_files_with_fs(&mock, "/tmp");
+    assert_eq!(result.unwrap(), 0, "Should return 0 when no temp files");
+}
+
+#[test]
+fn test_cleanup_orphaned_temp_files_dir_not_exists() {
+    let mock = MockFileSystem::new().with_exists(false);
+
+    let result = cleanup_orphaned_temp_files_with_fs(&mock, "/nonexistent");
+    assert_eq!(result.unwrap(), 0, "Should return 0 for nonexistent directory");
 }

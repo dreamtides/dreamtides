@@ -57,6 +57,11 @@ impl MockFileSystem {
         self.exists_result = exists;
         self
     }
+
+    pub fn with_temp_files(self, files: Vec<PathBuf>) -> Self {
+        *self.temp_files.lock().unwrap_or_else(|e| panic!("Lock poisoned: {e}")) = files;
+        self
+    }
 }
 
 impl Default for MockFileSystem {
