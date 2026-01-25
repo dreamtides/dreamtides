@@ -7,6 +7,9 @@ pub enum TvError {
     #[error("File not found: {path}")]
     FileNotFound { path: String },
 
+    #[error("Invalid sync state transition from {from_state} to {to_state} for file: {file_path}")]
+    InvalidStateTransition { file_path: String, from_state: String, to_state: String },
+
     #[error("Permission denied reading file: {path}")]
     PermissionDenied { path: String },
 

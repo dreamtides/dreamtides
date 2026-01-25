@@ -57,7 +57,7 @@ pub fn run(paths: cli::AppPaths, _jsonl: bool) {
         .plugin(tauri_plugin_opener::init())
         .manage(paths)
         .manage(sync::file_watcher::FileWatcherState::new())
-        .manage(sync::save_coordinator::SaveCoordinatorState::new())
+        .manage(sync::state_machine::SyncStateMachineState::new())
         .invoke_handler(tauri::generate_handler![
             commands::load_command::load_toml_table,
             commands::save_command::save_toml_table,

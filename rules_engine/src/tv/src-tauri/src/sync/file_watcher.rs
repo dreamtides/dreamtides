@@ -10,7 +10,7 @@ use serde::Serialize;
 use tauri::{AppHandle, Emitter, Manager};
 
 use crate::error::error_types::TvError;
-use crate::sync::save_coordinator;
+use crate::sync::state_machine;
 
 #[derive(Clone, Serialize)]
 pub struct FileChangedPayload {
@@ -223,7 +223,7 @@ fn run_watcher(
                 _ => "modify",
             };
 
-            if save_coordinator::is_saving(&app_handle, &file_path) {
+            if state_machine::is_busy(&app_handle, &file_path) {
                 tracing::debug!(
                     component = "tv.sync",
                     file_path = %file_path,
