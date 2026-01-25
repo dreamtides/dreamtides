@@ -1,1 +1,2 @@
-// Stub module for Phase 8: Derived functions
+pub mod card_lookup;
+pub mod derived_types;

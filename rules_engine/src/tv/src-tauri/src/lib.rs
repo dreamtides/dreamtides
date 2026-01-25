@@ -6,7 +6,7 @@ pub mod cli;
 #[path = "commands/commands_mod.rs"]
 mod commands;
 #[path = "derived/derived_mod.rs"]
-mod derived;
+pub mod derived;
 #[path = "error/error_mod.rs"]
 pub mod error;
 #[path = "images/images_mod.rs"]

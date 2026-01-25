@@ -1,3 +1,5 @@
+#[cfg(test)]
+mod derived_tests;
 mod test_utils;
 #[cfg(test)]
 mod toml_tests;
