@@ -4,7 +4,8 @@ use tempfile::TempDir;
 use tv_lib::error::error_types::TvError;
 use tv_lib::toml::document_loader::{load_toml_document_with_fs, TomlTableData};
 use tv_lib::toml::document_writer::{
-    save_cell_with_fs, save_toml_document_with_fs, CellUpdate, SaveCellResult,
+    save_batch_with_fs, save_cell_with_fs, save_toml_document_with_fs, CellUpdate, SaveBatchResult,
+    SaveCellResult,
 };
 use tv_lib::traits::{FileSystem, RealFileSystem};
 
@@ -81,6 +82,20 @@ impl TvTestHarness {
             path.to_str().unwrap_or_else(|| panic!("Invalid path: {path:?}")),
             table_name,
             &update,
+        )
+    }
+
+    pub fn save_batch(
+        &self,
+        path: &Path,
+        table_name: &str,
+        updates: &[CellUpdate],
+    ) -> Result<SaveBatchResult, TvError> {
+        save_batch_with_fs(
+            &*self.fs,
+            path.to_str().unwrap_or_else(|| panic!("Invalid path: {path:?}")),
+            table_name,
+            updates,
         )
     }
 }

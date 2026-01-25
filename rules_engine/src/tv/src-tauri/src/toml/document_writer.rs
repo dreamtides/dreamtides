@@ -224,6 +224,164 @@ pub fn save_cell(
     save_cell_with_fs(&RealFileSystem, file_path, table_name, update)
 }
 
+/// Result of a batch save operation.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct SaveBatchResult {
+    pub success: bool,
+    pub applied_count: usize,
+    pub failed_count: usize,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    pub failed_updates: Vec<FailedUpdate>,
+}
+
+/// Information about a failed cell update within a batch.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct FailedUpdate {
+    pub row_index: usize,
+    pub column_key: String,
+    pub reason: String,
+}
+
+/// Saves multiple cell updates to the TOML file in a single atomic write.
+pub fn save_batch(
+    file_path: &str,
+    table_name: &str,
+    updates: &[CellUpdate],
+) -> Result<SaveBatchResult, TvError> {
+    save_batch_with_fs(&RealFileSystem, file_path, table_name, updates)
+}
+
+/// Saves multiple cell updates using the provided filesystem.
+pub fn save_batch_with_fs(
+    fs: &dyn FileSystem,
+    file_path: &str,
+    table_name: &str,
+    updates: &[CellUpdate],
+) -> Result<SaveBatchResult, TvError> {
+    let start = Instant::now();
+
+    tracing::info!(
+        component = "tv.toml",
+        file_path = %file_path,
+        cell_count = updates.len(),
+        "Starting batch save"
+    );
+
+    if updates.is_empty() {
+        return Ok(SaveBatchResult {
+            success: true,
+            applied_count: 0,
+            failed_count: 0,
+            failed_updates: Vec::new(),
+        });
+    }
+
+    let content = fs.read_to_string(Path::new(file_path)).map_err(|e| {
+        tracing::error!(
+            component = "tv.toml",
+            file_path = %file_path,
+            error = %e,
+            "Read failed during batch save"
+        );
+        map_io_error_for_read(&e, file_path)
+    })?;
+
+    let mut doc: toml_edit::DocumentMut = content.parse().map_err(|e: toml_edit::TomlError| {
+        tracing::error!(
+            component = "tv.toml",
+            file_path = %file_path,
+            error = %e,
+            "TOML parse failed during batch save"
+        );
+        TvError::TomlParseError { line: None, message: e.to_string() }
+    })?;
+
+    let array = doc
+        .get_mut(table_name)
+        .and_then(|v| v.as_array_of_tables_mut())
+        .ok_or_else(|| {
+            tracing::error!(
+                component = "tv.toml",
+                file_path = %file_path,
+                table_name = %table_name,
+                error = "Table not found or not an array of tables",
+                "Batch save failed"
+            );
+            TvError::TableNotFound { table_name: table_name.to_string() }
+        })?;
+
+    let array_len = array.len();
+    let mut failed_updates = Vec::new();
+    for update in updates {
+        if update.row_index >= array_len {
+            failed_updates.push(FailedUpdate {
+                row_index: update.row_index,
+                column_key: update.column_key.clone(),
+                reason: format!("Row index {} out of bounds (max: {})", update.row_index, array_len.saturating_sub(1)),
+            });
+        } else if !update.value.is_null() && json_to_toml_edit_value(&update.value).is_none() {
+            failed_updates.push(FailedUpdate {
+                row_index: update.row_index,
+                column_key: update.column_key.clone(),
+                reason: "Unsupported value type".to_string(),
+            });
+        }
+    }
+
+    if !failed_updates.is_empty() {
+        tracing::warn!(
+            component = "tv.toml",
+            file_path = %file_path,
+            failed_count = failed_updates.len(),
+            "Batch rejected due to validation failure"
+        );
+        return Ok(SaveBatchResult {
+            success: false,
+            applied_count: 0,
+            failed_count: failed_updates.len(),
+            failed_updates,
+        });
+    }
+
+    for update in updates {
+        tracing::debug!(
+            component = "tv.toml",
+            row_index = update.row_index,
+            column_key = %update.column_key,
+            "Applying cell update"
+        );
+        let table = array.get_mut(update.row_index).ok_or_else(|| {
+            panic!("Row index {} should be valid after validation", update.row_index)
+        })?;
+        if let Some(new_value) = json_to_toml_edit_value(&update.value) {
+            table[&update.column_key] = new_value;
+        } else if update.value.is_null() {
+            table.remove(&update.column_key);
+        }
+    }
+
+    fs.write_atomic(Path::new(file_path), &doc.to_string()).map_err(|e| {
+        map_atomic_write_error(e, file_path)
+    })?;
+
+    tracing::info!(
+        component = "tv.toml",
+        file_path = %file_path,
+        cell_count = updates.len(),
+        duration_ms = start.elapsed().as_millis() as u64,
+        "Batch saved"
+    );
+
+    Ok(SaveBatchResult {
+        success: true,
+        applied_count: updates.len(),
+        failed_count: 0,
+        failed_updates: Vec::new(),
+    })
+}
+
 /// Saves a single cell update using the provided filesystem.
 pub fn save_cell_with_fs(
     fs: &dyn FileSystem,

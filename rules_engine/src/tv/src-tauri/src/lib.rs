@@ -62,6 +62,7 @@ pub fn run(paths: cli::AppPaths, _jsonl: bool) {
             commands::load_command::load_toml_table,
             commands::save_command::save_toml_table,
             commands::save_command::save_cell,
+            commands::save_command::save_batch,
             commands::watch_command::start_file_watcher,
             commands::watch_command::stop_file_watcher,
             get_app_paths,

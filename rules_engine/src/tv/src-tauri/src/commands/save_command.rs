@@ -3,7 +3,7 @@ use tauri::AppHandle;
 use crate::error::error_types::TvError;
 use crate::sync::save_coordinator;
 use crate::toml::document_loader::TomlTableData;
-use crate::toml::document_writer::{self, CellUpdate, SaveCellResult};
+use crate::toml::document_writer::{self, CellUpdate, SaveBatchResult, SaveCellResult};
 
 /// Tauri command to save spreadsheet data back to a TOML file.
 #[tauri::command]
@@ -38,4 +38,14 @@ pub fn save_cell(
     let _ = save_coordinator::end_save(&app_handle, &file_path, result.is_ok());
 
     result
+}
+
+/// Tauri command to save multiple cell updates in a single atomic write.
+#[tauri::command]
+pub fn save_batch(
+    file_path: String,
+    table_name: String,
+    updates: Vec<CellUpdate>,
+) -> Result<SaveBatchResult, TvError> {
+    document_writer::save_batch(&file_path, &table_name, &updates)
 }
