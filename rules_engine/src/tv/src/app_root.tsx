@@ -1,12 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { SpreadsheetView } from "./spreadsheet_view";
 import { ErrorBanner } from "./error_banner";
-import { StatusIndicator } from "./status_indicator";
 import * as ipc from "./ipc_bridge";
-import type { TomlTableData, SyncState } from "./ipc_bridge";
+import type { TomlTableData } from "./ipc_bridge";
 import type { MultiSheetData, SheetData } from "./UniverSpreadsheet";
 
-export type { TomlTableData, SyncState };
+export type { TomlTableData };
 
 const SAVE_DEBOUNCE_MS = 500;
 
@@ -65,7 +64,6 @@ export function AppRoot() {
   const [activeSheetId, setActiveSheetId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-  const [saveStatus, setSaveStatus] = useState<SyncState>("idle");
   const saveTimeoutRef = useRef<number | null>(null);
   const isSavingRef = useRef<Record<string, boolean>>({});
   const watchersStartedRef = useRef<Set<string>>(new Set());
@@ -148,17 +146,13 @@ export function AppRoot() {
 
       if (isSavingRef.current[sheetId]) return;
       isSavingRef.current[sheetId] = true;
-      setSaveStatus("saving");
 
       try {
         await ipc.saveTomlTable(sheetInfo.path, sheetInfo.tableName, newData);
         // Update last known data after successful save
         lastKnownDataRef.current[sheetId] = newData;
-        setSaveStatus("saved");
-        setTimeout(() => setSaveStatus("idle"), 1500);
       } catch (e) {
         console.error("Save error:", e);
-        setSaveStatus("error");
       } finally {
         isSavingRef.current[sheetId] = false;
       }
@@ -293,15 +287,10 @@ export function AppRoot() {
           multiSheetData={multiSheetData}
           error={null}
           loading={loading}
-          saveStatus={saveStatus}
           onChange={handleChange}
           onActiveSheetChanged={handleActiveSheetChanged}
         />
       </div>
-      <StatusIndicator
-        syncState={saveStatus}
-        autoHideDelay={2000}
-      />
     </div>
   );
 }

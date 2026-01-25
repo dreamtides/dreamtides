@@ -1,12 +1,11 @@
 import { UniverSpreadsheet } from "./UniverSpreadsheet";
-import type { TomlTableData, SyncState } from "./ipc_bridge";
+import type { TomlTableData } from "./ipc_bridge";
 import type { MultiSheetData } from "./UniverSpreadsheet";
 
 interface SpreadsheetViewProps {
   multiSheetData?: MultiSheetData | null;
   error: string | null;
   loading: boolean;
-  saveStatus: SyncState;
   onChange: (data: TomlTableData, sheetId: string) => void;
   onActiveSheetChanged?: (sheetId: string) => void;
 }
@@ -15,7 +14,6 @@ export function SpreadsheetView({
   multiSheetData,
   error,
   loading,
-  saveStatus,
   onChange,
   onActiveSheetChanged,
 }: SpreadsheetViewProps) {
@@ -29,17 +27,8 @@ export function SpreadsheetView({
 
   return (
     <main className="container">
-      <div className="status-bar">
-        {saveStatus === "saving" && (
-          <span className="status saving">Saving...</span>
-        )}
-        {saveStatus === "saved" && <span className="status saved">Saved</span>}
-        {saveStatus === "error" && (
-          <span className="status error">Save failed</span>
-        )}
-      </div>
       <UniverSpreadsheet
-        height="calc(100vh - 30px)"
+        height="100vh"
         multiSheetData={multiSheetData ?? undefined}
         onChange={onChange}
         onActiveSheetChanged={onActiveSheetChanged}

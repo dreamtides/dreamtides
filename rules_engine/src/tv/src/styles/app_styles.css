@@ -99,32 +99,6 @@ body,
   color: #666;
 }
 
-/* Status bar */
-.status-bar {
-  height: 20px;
-  display: flex;
-  align-items: center;
-  padding: 0 var(--tv-spacing-xs);
-  font-size: var(--tv-font-size-sm);
-}
-
-.status {
-  padding: 2px var(--tv-spacing-sm);
-  border-radius: 3px;
-}
-
-.status.saving {
-  color: #666;
-}
-
-.status.saved {
-  color: var(--tv-status-saved);
-}
-
-.status.error {
-  color: var(--tv-status-error);
-}
-
 /* Generic error state (detailed in error_styles.css) */
 .tv-error-inline,
 .error {
@@ -141,14 +115,6 @@ body,
   :root {
     color: #f6f6f6;
     background-color: #2f2f2f;
-  }
-
-  .status.saving {
-    color: #aaa;
-  }
-
-  .status.saved {
-    color: #81c784;
   }
 
   .tv-loading,
