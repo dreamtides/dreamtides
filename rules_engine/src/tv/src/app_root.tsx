@@ -69,6 +69,9 @@ export function AppRoot() {
   const watchersStartedRef = useRef<Set<string>>(new Set());
   // Track last known data for each sheet to detect actual changes
   const lastKnownDataRef = useRef<Record<string, TomlTableData>>({});
+  // Ref to track activeSheetId without causing effect re-runs
+  const activeSheetIdRef = useRef<string | null>(null);
+  activeSheetIdRef.current = activeSheetId;
 
   const loadSingleFile = useCallback(async (path: string, tableName: string): Promise<TomlTableData | null> => {
     try {
@@ -109,12 +112,12 @@ export function AppRoot() {
     }
 
     setMultiSheetData({ sheets: validSheets });
-    if (!activeSheetId && validSheets.length > 0) {
+    if (!activeSheetIdRef.current && validSheets.length > 0) {
       setActiveSheetId(validSheets[0].id);
     }
     setError(null);
     setLoading(false);
-  }, [loadSingleFile, activeSheetId]);
+  }, [loadSingleFile]);
 
   const reloadSheet = useCallback(async (sheetId: string) => {
     const sheetInfo = sheets.find((s) => s.id === sheetId);
