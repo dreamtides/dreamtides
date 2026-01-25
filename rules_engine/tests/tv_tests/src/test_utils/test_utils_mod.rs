@@ -1,10 +1,12 @@
+use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 
 use tempfile::TempDir;
 use tv_lib::error::error_types::TvError;
 use tv_lib::toml::document_loader::{load_toml_document_with_fs, TomlTableData};
 use tv_lib::toml::document_writer::{
-    save_batch_with_fs, save_cell_with_fs, save_toml_document_with_fs, CellUpdate, SaveBatchResult,
+    add_row_with_fs, delete_row_with_fs, save_batch_with_fs, save_cell_with_fs,
+    save_toml_document_with_fs, AddRowResult, CellUpdate, DeleteRowResult, SaveBatchResult,
     SaveCellResult,
 };
 use tv_lib::traits::{FileSystem, RealFileSystem};
@@ -96,6 +98,36 @@ impl TvTestHarness {
             path.to_str().unwrap_or_else(|| panic!("Invalid path: {path:?}")),
             table_name,
             updates,
+        )
+    }
+
+    pub fn add_row(
+        &self,
+        path: &Path,
+        table_name: &str,
+        position: Option<usize>,
+        initial_values: Option<HashMap<String, serde_json::Value>>,
+    ) -> Result<AddRowResult, TvError> {
+        add_row_with_fs(
+            &*self.fs,
+            path.to_str().unwrap_or_else(|| panic!("Invalid path: {path:?}")),
+            table_name,
+            position,
+            initial_values,
+        )
+    }
+
+    pub fn delete_row(
+        &self,
+        path: &Path,
+        table_name: &str,
+        row_index: usize,
+    ) -> Result<DeleteRowResult, TvError> {
+        delete_row_with_fs(
+            &*self.fs,
+            path.to_str().unwrap_or_else(|| panic!("Invalid path: {path:?}")),
+            table_name,
+            row_index,
         )
     }
 }
