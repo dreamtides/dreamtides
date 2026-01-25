@@ -104,7 +104,7 @@ name = missing quotes
     let result = harness.load_table(&path, "cards");
 
     match result {
-        Err(TvError::TomlParseError { line, message }) => {
+        Err(TvError::TomlParseError { line, message, .. }) => {
             assert!(line.is_some(), "Parse error should include line number");
             assert!(!message.is_empty(), "Parse error should include message");
         }

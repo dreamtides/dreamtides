@@ -45,7 +45,7 @@ pub fn load_toml_document_with_fs(
                 error = "Permission denied",
                 "Load failed"
             );
-            TvError::PermissionDenied { path: file_path.to_string() }
+            TvError::PermissionDenied { path: file_path.to_string(), operation: "read".to_string() }
         }
         ErrorKind::InvalidData => {
             tracing::error!(
@@ -54,7 +54,7 @@ pub fn load_toml_document_with_fs(
                 error = "Invalid UTF-8",
                 "Load failed"
             );
-            TvError::InvalidUtf8 { path: file_path.to_string() }
+            TvError::InvalidUtf8 { path: file_path.to_string(), byte_offset: None }
         }
         _ => {
             tracing::error!(
@@ -76,7 +76,7 @@ pub fn load_toml_document_with_fs(
             line = ?line,
             "TOML parse failed"
         );
-        TvError::TomlParseError { line, message: e.message().to_string() }
+        TvError::TomlParseError { path: file_path.to_string(), line, message: e.message().to_string() }
     })?;
 
     let table = value.get(table_name).ok_or_else(|| {

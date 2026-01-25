@@ -122,7 +122,7 @@ pub fn save_toml_document_with_fs(
             error = %e,
             "TOML parse failed during save"
         );
-        TvError::TomlParseError { line: None, message: e.to_string() }
+        TvError::TomlParseError { path: file_path.to_string(), line: None, message: e.to_string() }
     })?;
 
     let array =
@@ -299,7 +299,7 @@ pub fn save_batch_with_fs(
             error = %e,
             "TOML parse failed during batch save"
         );
-        TvError::TomlParseError { line: None, message: e.to_string() }
+        TvError::TomlParseError { path: file_path.to_string(), line: None, message: e.to_string() }
     })?;
 
     let array = doc
@@ -356,9 +356,9 @@ pub fn save_batch_with_fs(
             column_key = %update.column_key,
             "Applying cell update"
         );
-        let table = array.get_mut(update.row_index).ok_or_else(|| {
+        let table = array.get_mut(update.row_index).unwrap_or_else(|| {
             panic!("Row index {} should be valid after validation", update.row_index)
-        })?;
+        });
         // Use type-preserving conversion to maintain boolean types when the
         // spreadsheet library returns 0/1 instead of false/true
         if let Some(existing) = table.get(&update.column_key) {
@@ -422,7 +422,7 @@ pub fn save_cell_with_fs(
             error = %e,
             "TOML parse failed during cell save"
         );
-        TvError::TomlParseError { line: None, message: e.to_string() }
+        TvError::TomlParseError { path: file_path.to_string(), line: None, message: e.to_string() }
     })?;
 
     let array =
@@ -527,7 +527,7 @@ pub fn add_row_with_fs(
             error = %e,
             "TOML parse failed during add row"
         );
-        TvError::TomlParseError { line: None, message: e.to_string() }
+        TvError::TomlParseError { path: file_path.to_string(), line: None, message: e.to_string() }
     })?;
 
     let array =
@@ -644,7 +644,7 @@ pub fn delete_row_with_fs(
             error = %e,
             "TOML parse failed during delete row"
         );
-        TvError::TomlParseError { line: None, message: e.to_string() }
+        TvError::TomlParseError { path: file_path.to_string(), line: None, message: e.to_string() }
     })?;
 
     let array =
