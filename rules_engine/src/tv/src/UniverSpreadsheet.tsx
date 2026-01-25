@@ -1,6 +1,6 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef } from "react";
 import { Univer, IWorkbookData } from "@univerjs/core";
-import { FUniver } from "@univerjs/core/facade";
+import { FUniver, FWorksheet } from "@univerjs/core/facade";
 
 import {
   createUniverInstance,
@@ -198,6 +198,24 @@ export const UniverSpreadsheet = forwardRef<
       }
       const workbookData = buildMultiSheetWorkbook(multiSheetData);
       instance.univerAPI.createWorkbook(workbookData);
+
+      // Apply checkbox validation to boolean columns in all sheets
+      const workbook = instance.univerAPI.getActiveWorkbook();
+      if (workbook) {
+        for (const sheetData of multiSheetData.sheets) {
+          const sheet = workbook.getSheetBySheetId(sheetData.id);
+          if (sheet) {
+            const booleanColumns = detectBooleanColumns(sheetData.data);
+            applyCheckboxValidation(
+              instance.univerAPI,
+              sheet,
+              sheetData.data,
+              booleanColumns
+            );
+          }
+        }
+      }
+
       // Mark initial load as complete - data is already in cellData, no need to repopulate
       initialLoadCompleteRef.current = true;
       lastMultiSheetDataRef.current = multiSheetData;
@@ -255,8 +273,9 @@ export const UniverSpreadsheet = forwardRef<
     // Skip if we're in multi-sheet mode
     if (isMultiSheetRef.current) return;
 
-    const sheet = univerAPIRef.current?.getActiveWorkbook()?.getActiveSheet();
-    if (!sheet || !data) return;
+    const univerAPI = univerAPIRef.current;
+    const sheet = univerAPI?.getActiveWorkbook()?.getActiveSheet();
+    if (!univerAPI || !sheet || !data) return;
 
     isLoadingRef.current = true;
     headersRef.current = data.headers;
@@ -281,6 +300,10 @@ export const UniverSpreadsheet = forwardRef<
           dataRange.setValues(displayRows);
         }
       }
+
+      // Apply checkbox validation to boolean columns
+      const booleanColumns = detectBooleanColumns(data);
+      applyCheckboxValidation(univerAPI, sheet, data, booleanColumns);
     }
 
     isLoadingRef.current = false;
@@ -347,6 +370,15 @@ export const UniverSpreadsheet = forwardRef<
         columnCount: sheetData.data.headers.length,
       });
       populateSheetDataBatch(sheet, sheetData.data);
+
+      // Apply checkbox validation to boolean columns after updating data
+      const booleanColumns = detectBooleanColumns(sheetData.data);
+      applyCheckboxValidation(
+        univerAPIRef.current!,
+        sheet,
+        sheetData.data,
+        booleanColumns
+      );
     }
 
     lastMultiSheetDataRef.current = multiSheetData;
@@ -500,6 +532,74 @@ function populateSheetDataBatch(sheet: SheetFacade, data: TomlTableData): void {
         row.map((cellValue) => (cellValue === null ? "" : cellValue))
       );
       dataRange.setValues(displayRows);
+    }
+  }
+}
+
+/**
+ * Detect columns that contain only boolean values (or nulls).
+ * Returns an array of column indices that should be rendered as checkboxes.
+ */
+function detectBooleanColumns(data: TomlTableData): number[] {
+  const booleanColumns: number[] = [];
+
+  for (let colIdx = 0; colIdx < data.headers.length; colIdx++) {
+    let hasNonNullValue = false;
+    let allBoolean = true;
+
+    for (const row of data.rows) {
+      const value = row[colIdx];
+      if (value === null || value === undefined) {
+        continue;
+      }
+      hasNonNullValue = true;
+      if (typeof value !== "boolean") {
+        allBoolean = false;
+        break;
+      }
+    }
+
+    if (hasNonNullValue && allBoolean) {
+      booleanColumns.push(colIdx);
+    }
+  }
+
+  return booleanColumns;
+}
+
+/**
+ * Apply checkbox data validation to boolean columns.
+ * Uses Univer's data validation API to render checkboxes for boolean values.
+ */
+function applyCheckboxValidation(
+  univerAPI: FUniver,
+  sheet: FWorksheet,
+  data: TomlTableData,
+  booleanColumns: number[]
+): void {
+  if (booleanColumns.length === 0 || data.rows.length === 0) {
+    return;
+  }
+
+  for (const colIdx of booleanColumns) {
+    const colLetter = getColumnLetter(colIdx);
+    const startRow = 2;
+    const endRow = data.rows.length + 1;
+    const rangeAddress = `${colLetter}${startRow}:${colLetter}${endRow}`;
+    const range = sheet.getRange(rangeAddress);
+
+    if (range) {
+      const rule = univerAPI
+        .newDataValidation()
+        .requireCheckbox()
+        .setOptions({ allowBlank: true, showErrorMessage: false })
+        .build();
+      range.setDataValidation(rule);
+
+      logDebug("Applied checkbox validation to column", {
+        column: data.headers[colIdx],
+        range: rangeAddress,
+      });
     }
   }
 }
