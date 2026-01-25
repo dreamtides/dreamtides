@@ -145,7 +145,11 @@ pub fn save_toml_document_with_fs(
         for (col_idx, header) in data.headers.iter().enumerate() {
             if let Some(json_val) = row.get(col_idx) {
                 if let Some(existing) = table.get_mut(header) {
-                    if let Some(new_val) = value_converter::json_to_toml_edit(json_val) {
+                    // Use type-preserving conversion to maintain boolean types when the
+                    // spreadsheet library returns 0/1 instead of false/true
+                    if let Some(new_val) =
+                        value_converter::json_to_toml_edit_preserving_type(json_val, existing)
+                    {
                         *existing = new_val;
                     }
                 }
@@ -355,7 +359,17 @@ pub fn save_batch_with_fs(
         let table = array.get_mut(update.row_index).ok_or_else(|| {
             panic!("Row index {} should be valid after validation", update.row_index)
         })?;
-        if let Some(new_value) = value_converter::json_to_toml_edit(&update.value) {
+        // Use type-preserving conversion to maintain boolean types when the
+        // spreadsheet library returns 0/1 instead of false/true
+        if let Some(existing) = table.get(&update.column_key) {
+            if let Some(new_value) =
+                value_converter::json_to_toml_edit_preserving_type(&update.value, existing)
+            {
+                table[&update.column_key] = new_value;
+            } else if update.value.is_null() {
+                table.remove(&update.column_key);
+            }
+        } else if let Some(new_value) = value_converter::json_to_toml_edit(&update.value) {
             table[&update.column_key] = new_value;
         } else if update.value.is_null() {
             table.remove(&update.column_key);
@@ -435,10 +449,18 @@ pub fn save_cell_with_fs(
         TvError::RowNotFound { table_name: table_name.to_string(), row_index: update.row_index }
     })?;
 
-    if let Some(new_value) = value_converter::json_to_toml_edit(&update.value) {
+    // Use type-preserving conversion to maintain boolean types when the
+    // spreadsheet library returns 0/1 instead of false/true
+    if let Some(existing) = table.get(&update.column_key) {
+        if let Some(new_value) =
+            value_converter::json_to_toml_edit_preserving_type(&update.value, existing)
+        {
+            table[&update.column_key] = new_value;
+        } else if update.value.is_null() {
+            table.remove(&update.column_key);
+        }
+    } else if let Some(new_value) = value_converter::json_to_toml_edit(&update.value) {
         table[&update.column_key] = new_value;
-    } else if update.value.is_null() {
-        table.remove(&update.column_key);
     }
 
     let output = doc.to_string();
@@ -677,4 +699,396 @@ pub fn delete_row_with_fs(
     );
 
     Ok(DeleteRowResult { success: true, deleted_index: row_index })
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::collections::HashMap;
+    use std::io;
+    use std::path::{Path, PathBuf};
+    use std::sync::Mutex;
+
+    struct MockFileSystem {
+        contents: Mutex<HashMap<PathBuf, String>>,
+    }
+
+    impl MockFileSystem {
+        fn new() -> Self {
+            Self { contents: Mutex::new(HashMap::new()) }
+        }
+
+        fn set_content(&self, path: &str, content: &str) {
+            self.contents.lock().unwrap().insert(PathBuf::from(path), content.to_string());
+        }
+
+        fn get_content(&self, path: &str) -> Option<String> {
+            self.contents.lock().unwrap().get(&PathBuf::from(path)).cloned()
+        }
+    }
+
+    impl FileSystem for MockFileSystem {
+        fn read_to_string(&self, path: &Path) -> io::Result<String> {
+            self.contents
+                .lock()
+                .unwrap()
+                .get(path)
+                .cloned()
+                .ok_or_else(|| io::Error::new(io::ErrorKind::NotFound, "File not found"))
+        }
+
+        fn write(&self, path: &Path, content: &str) -> io::Result<()> {
+            self.contents.lock().unwrap().insert(path.to_path_buf(), content.to_string());
+            Ok(())
+        }
+
+        fn write_atomic(&self, path: &Path, content: &str) -> Result<(), AtomicWriteError> {
+            self.contents.lock().unwrap().insert(path.to_path_buf(), content.to_string());
+            Ok(())
+        }
+
+        fn exists(&self, path: &Path) -> bool {
+            self.contents.lock().unwrap().contains_key(path)
+        }
+
+        fn read_dir_temp_files(
+            &self,
+            _dir: &Path,
+            _prefix: &str,
+        ) -> io::Result<Vec<std::path::PathBuf>> {
+            Ok(Vec::new())
+        }
+
+        fn remove_file(&self, path: &Path) -> io::Result<()> {
+            self.contents.lock().unwrap().remove(path);
+            Ok(())
+        }
+    }
+
+    #[test]
+    fn test_delete_row_preserves_boolean_types() {
+        let fs = MockFileSystem::new();
+        let toml_content = r#"[[cards]]
+name = "Card 1"
+is-fast = false
+art-owned = true
+
+[[cards]]
+name = "Card 2"
+is-fast = true
+art-owned = false
+"#;
+        fs.set_content("/test.toml", toml_content);
+
+        // Delete the first row
+        let result = delete_row_with_fs(&fs, "/test.toml", "cards", 0);
+        assert!(result.is_ok());
+
+        let saved_content = fs.get_content("/test.toml").unwrap();
+
+        // Check that booleans are preserved as booleans, not converted to integers
+        assert!(
+            saved_content.contains("is-fast = true"),
+            "Expected 'is-fast = true' but got:\n{}",
+            saved_content
+        );
+        assert!(
+            saved_content.contains("art-owned = false"),
+            "Expected 'art-owned = false' but got:\n{}",
+            saved_content
+        );
+        // Ensure no integer conversion happened
+        assert!(
+            !saved_content.contains("is-fast = 1"),
+            "Boolean was converted to integer:\n{}",
+            saved_content
+        );
+        assert!(
+            !saved_content.contains("is-fast = 0"),
+            "Boolean was converted to integer:\n{}",
+            saved_content
+        );
+    }
+
+    #[test]
+    fn test_add_row_preserves_boolean_types_in_existing_rows() {
+        let fs = MockFileSystem::new();
+        let toml_content = r#"[[cards]]
+name = "Card 1"
+is-fast = false
+art-owned = true
+"#;
+        fs.set_content("/test.toml", toml_content);
+
+        // Add a new row at the end
+        let result = add_row_with_fs(&fs, "/test.toml", "cards", None, None);
+        assert!(result.is_ok());
+
+        let saved_content = fs.get_content("/test.toml").unwrap();
+
+        // Check that original booleans are preserved
+        assert!(
+            saved_content.contains("is-fast = false"),
+            "Expected 'is-fast = false' but got:\n{}",
+            saved_content
+        );
+        assert!(
+            saved_content.contains("art-owned = true"),
+            "Expected 'art-owned = true' but got:\n{}",
+            saved_content
+        );
+        // Ensure no integer conversion happened
+        assert!(
+            !saved_content.contains("is-fast = 0"),
+            "Boolean was converted to integer:\n{}",
+            saved_content
+        );
+        assert!(
+            !saved_content.contains("art-owned = 1"),
+            "Boolean was converted to integer:\n{}",
+            saved_content
+        );
+    }
+
+    #[test]
+    fn test_save_toml_document_preserves_boolean_types() {
+        let fs = MockFileSystem::new();
+        let toml_content = r#"[[cards]]
+name = "Card 1"
+is-fast = false
+art-owned = true
+
+[[cards]]
+name = "Card 2"
+is-fast = true
+art-owned = false
+"#;
+        fs.set_content("/test.toml", toml_content);
+
+        // Create TomlTableData with JSON values
+        let data = TomlTableData {
+            headers: vec![
+                "name".to_string(),
+                "is-fast".to_string(),
+                "art-owned".to_string(),
+            ],
+            rows: vec![
+                vec![
+                    serde_json::json!("Card 1"),
+                    serde_json::json!(false),
+                    serde_json::json!(true),
+                ],
+                vec![
+                    serde_json::json!("Card 2"),
+                    serde_json::json!(true),
+                    serde_json::json!(false),
+                ],
+            ],
+        };
+
+        let result = save_toml_document_with_fs(&fs, "/test.toml", "cards", &data);
+        assert!(result.is_ok());
+
+        let saved_content = fs.get_content("/test.toml").unwrap();
+
+        // Check that booleans are preserved as booleans
+        assert!(
+            saved_content.contains("is-fast = false"),
+            "Expected 'is-fast = false' but got:\n{}",
+            saved_content
+        );
+        assert!(
+            saved_content.contains("is-fast = true"),
+            "Expected 'is-fast = true' but got:\n{}",
+            saved_content
+        );
+        assert!(
+            saved_content.contains("art-owned = true"),
+            "Expected 'art-owned = true' but got:\n{}",
+            saved_content
+        );
+        assert!(
+            saved_content.contains("art-owned = false"),
+            "Expected 'art-owned = false' but got:\n{}",
+            saved_content
+        );
+        // Ensure no integer conversion happened
+        assert!(
+            !saved_content.contains("= 0"),
+            "Boolean was converted to integer 0:\n{}",
+            saved_content
+        );
+        assert!(
+            !saved_content.contains("= 1"),
+            "Boolean was converted to integer 1:\n{}",
+            saved_content
+        );
+    }
+
+    #[test]
+    fn test_save_toml_document_converts_integers_back_to_booleans() {
+        // This test simulates the actual bug: spreadsheet libraries like Univer
+        // convert boolean values to integers (true -> 1, false -> 0) internally.
+        // When we save, we should convert them back to booleans if the original
+        // TOML value was a boolean.
+        let fs = MockFileSystem::new();
+        let toml_content = r#"[[cards]]
+name = "Card 1"
+is-fast = false
+art-owned = true
+
+[[cards]]
+name = "Card 2"
+is-fast = true
+art-owned = false
+"#;
+        fs.set_content("/test.toml", toml_content);
+
+        // Simulate spreadsheet returning integers instead of booleans
+        // (this is the bug we're fixing)
+        let data = TomlTableData {
+            headers: vec![
+                "name".to_string(),
+                "is-fast".to_string(),
+                "art-owned".to_string(),
+            ],
+            rows: vec![
+                vec![
+                    serde_json::json!("Card 1"),
+                    serde_json::json!(0), // false as integer
+                    serde_json::json!(1), // true as integer
+                ],
+                vec![
+                    serde_json::json!("Card 2"),
+                    serde_json::json!(1), // true as integer
+                    serde_json::json!(0), // false as integer
+                ],
+            ],
+        };
+
+        let result = save_toml_document_with_fs(&fs, "/test.toml", "cards", &data);
+        assert!(result.is_ok());
+
+        let saved_content = fs.get_content("/test.toml").unwrap();
+
+        // Integers should be converted back to booleans because the original
+        // TOML values were booleans
+        assert!(
+            saved_content.contains("is-fast = false"),
+            "Expected 'is-fast = false' but got:\n{}",
+            saved_content
+        );
+        assert!(
+            saved_content.contains("is-fast = true"),
+            "Expected 'is-fast = true' but got:\n{}",
+            saved_content
+        );
+        assert!(
+            saved_content.contains("art-owned = true"),
+            "Expected 'art-owned = true' but got:\n{}",
+            saved_content
+        );
+        assert!(
+            saved_content.contains("art-owned = false"),
+            "Expected 'art-owned = false' but got:\n{}",
+            saved_content
+        );
+        // Ensure no integer values remain
+        assert!(
+            !saved_content.contains("= 0"),
+            "Integer 0 should have been converted to boolean false:\n{}",
+            saved_content
+        );
+        assert!(
+            !saved_content.contains("= 1"),
+            "Integer 1 should have been converted to boolean true:\n{}",
+            saved_content
+        );
+    }
+
+    #[test]
+    fn test_save_cell_converts_integer_back_to_boolean() {
+        let fs = MockFileSystem::new();
+        let toml_content = r#"[[cards]]
+name = "Card 1"
+is-fast = false
+"#;
+        fs.set_content("/test.toml", toml_content);
+
+        // Simulate spreadsheet returning integer instead of boolean
+        let update = CellUpdate {
+            row_index: 0,
+            column_key: "is-fast".to_string(),
+            value: serde_json::json!(1), // true as integer
+        };
+
+        let result = save_cell_with_fs(&fs, "/test.toml", "cards", &update);
+        assert!(result.is_ok());
+
+        let saved_content = fs.get_content("/test.toml").unwrap();
+
+        // Should be converted back to boolean
+        assert!(
+            saved_content.contains("is-fast = true"),
+            "Expected 'is-fast = true' but got:\n{}",
+            saved_content
+        );
+        assert!(
+            !saved_content.contains("is-fast = 1"),
+            "Integer should have been converted to boolean:\n{}",
+            saved_content
+        );
+    }
+
+    #[test]
+    fn test_save_batch_converts_integers_back_to_booleans() {
+        let fs = MockFileSystem::new();
+        let toml_content = r#"[[cards]]
+name = "Card 1"
+is-fast = false
+art-owned = true
+"#;
+        fs.set_content("/test.toml", toml_content);
+
+        // Simulate spreadsheet returning integers instead of booleans
+        let updates = vec![
+            CellUpdate {
+                row_index: 0,
+                column_key: "is-fast".to_string(),
+                value: serde_json::json!(1), // true as integer
+            },
+            CellUpdate {
+                row_index: 0,
+                column_key: "art-owned".to_string(),
+                value: serde_json::json!(0), // false as integer
+            },
+        ];
+
+        let result = save_batch_with_fs(&fs, "/test.toml", "cards", &updates);
+        assert!(result.is_ok());
+
+        let saved_content = fs.get_content("/test.toml").unwrap();
+
+        // Should be converted back to booleans
+        assert!(
+            saved_content.contains("is-fast = true"),
+            "Expected 'is-fast = true' but got:\n{}",
+            saved_content
+        );
+        assert!(
+            saved_content.contains("art-owned = false"),
+            "Expected 'art-owned = false' but got:\n{}",
+            saved_content
+        );
+        assert!(
+            !saved_content.contains("= 0"),
+            "Integer should have been converted to boolean:\n{}",
+            saved_content
+        );
+        assert!(
+            !saved_content.contains("= 1"),
+            "Integer should have been converted to boolean:\n{}",
+            saved_content
+        );
+    }
 }

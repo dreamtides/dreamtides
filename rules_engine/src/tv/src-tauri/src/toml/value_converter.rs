@@ -27,6 +27,34 @@ pub fn json_to_toml_edit(value: &serde_json::Value) -> Option<toml_edit::Item> {
     }
 }
 
+/// Converts a JSON value to a toml_edit Item, preserving the type of an existing
+/// TOML value when possible.
+///
+/// This is important for round-trip preservation: spreadsheet libraries like Univer
+/// may convert boolean values to integers (true -> 1, false -> 0). When the original
+/// TOML value was a boolean, we convert numeric 0/1 back to boolean false/true.
+pub fn json_to_toml_edit_preserving_type(
+    value: &serde_json::Value,
+    existing: &toml_edit::Item,
+) -> Option<toml_edit::Item> {
+    // If the existing value is a boolean and the new value is a number (0 or 1),
+    // convert the number back to boolean to preserve the original type.
+    if let toml_edit::Item::Value(toml_edit::Value::Boolean(_)) = existing {
+        if let serde_json::Value::Number(n) = value {
+            if let Some(i) = n.as_i64() {
+                if i == 0 {
+                    return Some(toml_edit::value(false));
+                } else if i == 1 {
+                    return Some(toml_edit::value(true));
+                }
+            }
+        }
+    }
+
+    // Fall back to standard conversion
+    json_to_toml_edit(value)
+}
+
 /// Converts a JSON value to a toml::Value for general use.
 pub fn json_to_toml_value(value: &serde_json::Value) -> Option<toml::Value> {
     match value {
@@ -369,6 +397,66 @@ mod tests {
             assert!(f.is_infinite() && f.is_sign_positive());
         } else {
             panic!("Expected float Infinity");
+        }
+    }
+
+    #[test]
+    fn test_preserving_type_converts_1_to_true_when_existing_is_bool() {
+        let existing = toml_edit::value(true);
+        let json_val = serde_json::json!(1);
+        let result = json_to_toml_edit_preserving_type(&json_val, &existing).unwrap();
+        if let toml_edit::Item::Value(toml_edit::Value::Boolean(b)) = result {
+            assert!(*b.value());
+        } else {
+            panic!("Expected boolean true, got {:?}", result);
+        }
+    }
+
+    #[test]
+    fn test_preserving_type_converts_0_to_false_when_existing_is_bool() {
+        let existing = toml_edit::value(false);
+        let json_val = serde_json::json!(0);
+        let result = json_to_toml_edit_preserving_type(&json_val, &existing).unwrap();
+        if let toml_edit::Item::Value(toml_edit::Value::Boolean(b)) = result {
+            assert!(!*b.value());
+        } else {
+            panic!("Expected boolean false, got {:?}", result);
+        }
+    }
+
+    #[test]
+    fn test_preserving_type_keeps_integer_when_existing_is_integer() {
+        let existing = toml_edit::value(42);
+        let json_val = serde_json::json!(1);
+        let result = json_to_toml_edit_preserving_type(&json_val, &existing).unwrap();
+        if let toml_edit::Item::Value(toml_edit::Value::Integer(i)) = result {
+            assert_eq!(*i.value(), 1);
+        } else {
+            panic!("Expected integer 1, got {:?}", result);
+        }
+    }
+
+    #[test]
+    fn test_preserving_type_keeps_bool_when_json_is_bool() {
+        let existing = toml_edit::value(true);
+        let json_val = serde_json::json!(false);
+        let result = json_to_toml_edit_preserving_type(&json_val, &existing).unwrap();
+        if let toml_edit::Item::Value(toml_edit::Value::Boolean(b)) = result {
+            assert!(!*b.value());
+        } else {
+            panic!("Expected boolean false, got {:?}", result);
+        }
+    }
+
+    #[test]
+    fn test_preserving_type_falls_back_for_non_01_integers() {
+        let existing = toml_edit::value(true);
+        let json_val = serde_json::json!(42);
+        let result = json_to_toml_edit_preserving_type(&json_val, &existing).unwrap();
+        if let toml_edit::Item::Value(toml_edit::Value::Integer(i)) = result {
+            assert_eq!(*i.value(), 42);
+        } else {
+            panic!("Expected integer 42, got {:?}", result);
         }
     }
 }
