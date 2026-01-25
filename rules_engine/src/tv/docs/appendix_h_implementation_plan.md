@@ -862,9 +862,7 @@ rules_engine/tests/tv_tests/
 │   │   └── style_tag_tests.rs
 │   └── integration_tests/
 │       ├── integration_tests_mod.rs
-│       ├── end_to_end_tests.rs
-│       ├── multi_file_tests.rs
-│       └── recovery_tests.rs
+│       └── end_to_end_tests.rs
 └── test_utils/
     ├── test_utils_mod.rs
     ├── mock_filesystem.rs

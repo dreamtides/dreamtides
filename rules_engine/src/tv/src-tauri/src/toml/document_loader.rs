@@ -8,7 +8,7 @@ use serde::{Deserialize, Serialize};
 use crate::error::error_types::TvError;
 use crate::traits::{FileSystem, RealFileSystem};
 
-#[derive(Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct TomlTableData {
     pub headers: Vec<String>,
     pub rows: Vec<Vec<serde_json::Value>>,

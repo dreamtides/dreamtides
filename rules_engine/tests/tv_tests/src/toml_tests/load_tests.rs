@@ -20,35 +20,16 @@ cost = 5
 "#,
     );
 
-    let table = harness
-        .load_table(&path, "cards")
-        .expect("Should load valid TOML file");
+    let table = harness.load_table(&path, "cards").expect("Should load valid TOML file");
 
     assert_eq!(table.rows.len(), 2, "Should have 2 rows");
     assert_eq!(table.headers.len(), 3, "Should have 3 columns: id, name, cost");
-    assert!(
-        table.headers.contains(&"id".to_string()),
-        "Headers should contain 'id'"
-    );
-    assert!(
-        table.headers.contains(&"name".to_string()),
-        "Headers should contain 'name'"
-    );
-    assert!(
-        table.headers.contains(&"cost".to_string()),
-        "Headers should contain 'cost'"
-    );
+    assert!(table.headers.contains(&"id".to_string()), "Headers should contain 'id'");
+    assert!(table.headers.contains(&"name".to_string()), "Headers should contain 'name'");
+    assert!(table.headers.contains(&"cost".to_string()), "Headers should contain 'cost'");
 
-    let id_idx = table
-        .headers
-        .iter()
-        .position(|h| h == "id")
-        .expect("id column should exist");
-    assert_eq!(
-        table.rows[0][id_idx].as_str(),
-        Some("abc-123"),
-        "First row id should be 'abc-123'"
-    );
+    let id_idx = table.headers.iter().position(|h| h == "id").expect("id column should exist");
+    assert_eq!(table.rows[0][id_idx].as_str(), Some("abc-123"), "First row id should be 'abc-123'");
     assert_eq!(
         table.rows[1][id_idx].as_str(),
         Some("def-456"),
@@ -72,19 +53,14 @@ cost = 5
 "#,
     );
 
-    let table = harness
-        .load_table(&path, "cards")
-        .expect("Should load sparse TOML file");
+    let table = harness.load_table(&path, "cards").expect("Should load sparse TOML file");
 
     assert_eq!(
         table.headers.len(),
         3,
         "Headers should include all keys from all rows: id, name, cost"
     );
-    assert!(
-        table.headers.contains(&"id".to_string()),
-        "Headers should contain 'id'"
-    );
+    assert!(table.headers.contains(&"id".to_string()), "Headers should contain 'id'");
     assert!(
         table.headers.contains(&"name".to_string()),
         "Headers should contain 'name' from first row"
@@ -149,15 +125,10 @@ description = "Описание карты 🎴"
 "#,
     );
 
-    let table = harness
-        .load_table(&path, "cards")
-        .expect("Should load unicode TOML file");
+    let table = harness.load_table(&path, "cards").expect("Should load unicode TOML file");
 
-    let name_idx = table
-        .headers
-        .iter()
-        .position(|h| h == "name")
-        .expect("name column should exist");
+    let name_idx =
+        table.headers.iter().position(|h| h == "name").expect("name column should exist");
     let desc_idx = table
         .headers
         .iter()
@@ -191,10 +162,7 @@ id = "abc"
 
     match result {
         Err(TvError::TableNotFound { table_name }) => {
-            assert_eq!(
-                table_name, "cards",
-                "Error should include the requested table name"
-            );
+            assert_eq!(table_name, "cards", "Error should include the requested table name");
         }
         other => panic!("Expected TableNotFound error, got: {other:?}"),
     }
