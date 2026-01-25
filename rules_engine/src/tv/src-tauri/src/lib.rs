@@ -51,6 +51,7 @@ fn cleanup_temp_files_on_startup(paths: &cli::AppPaths) {
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run(paths: cli::AppPaths, _jsonl: bool) {
+    derived::function_registry::initialize_global_registry();
     cleanup_temp_files_on_startup(&paths);
 
     tauri::Builder::default()
