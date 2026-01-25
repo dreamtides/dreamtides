@@ -1,7 +1,6 @@
 use tv_lib::derived::derived_types::StyledSpan;
 use tv_lib::derived::rich_text_converter::{
-    styled_spans_to_univer_rich_text, FontColor, Paragraph, TextRun, TextStyle, UnderlineStyle,
-    UniverRichText,
+    styled_spans_to_univer_rich_text, FontColor, UnderlineStyle,
 };
 
 #[test]
