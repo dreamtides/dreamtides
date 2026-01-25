@@ -22,6 +22,9 @@ pub enum TvError {
     #[error("'{table_name}' is not an array of tables")]
     NotAnArrayOfTables { table_name: String },
 
+    #[error("Row {row_index} not found in table '{table_name}'")]
+    RowNotFound { table_name: String, row_index: usize },
+
     #[error("Failed to write file {path}: {message}")]
     WriteError { path: String, message: String },
 

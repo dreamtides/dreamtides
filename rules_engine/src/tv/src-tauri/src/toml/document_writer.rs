@@ -1,11 +1,31 @@
 use std::path::Path;
 use std::time::Instant;
 
+use serde::{Deserialize, Serialize};
+
 use crate::error::error_types::{map_io_error_for_read, TvError};
 use crate::toml::document_loader::TomlTableData;
 use crate::traits::{AtomicWriteError, FileSystem, RealFileSystem};
 
 const TEMP_FILE_PREFIX: &str = ".tv_save_";
+
+/// Represents a single cell update request.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct CellUpdate {
+    pub row_index: usize,
+    pub column_key: String,
+    pub value: serde_json::Value,
+}
+
+/// Result of a cell save operation.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct SaveCellResult {
+    pub success: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub generated_values: Option<std::collections::HashMap<String, serde_json::Value>>,
+}
 
 /// Saves spreadsheet data back to a TOML file, preserving formatting.
 pub fn save_toml_document(
@@ -208,4 +228,95 @@ fn json_to_toml_edit_value(value: &serde_json::Value) -> Option<toml_edit::Item>
         serde_json::Value::String(s) => Some(toml_edit::value(s.as_str())),
         serde_json::Value::Array(_) | serde_json::Value::Object(_) => None,
     }
+}
+
+/// Saves a single cell update to the TOML file, preserving document structure.
+pub fn save_cell(
+    file_path: &str,
+    table_name: &str,
+    update: &CellUpdate,
+) -> Result<SaveCellResult, TvError> {
+    save_cell_with_fs(&RealFileSystem, file_path, table_name, update)
+}
+
+/// Saves a single cell update using the provided filesystem.
+pub fn save_cell_with_fs(
+    fs: &dyn FileSystem,
+    file_path: &str,
+    table_name: &str,
+    update: &CellUpdate,
+) -> Result<SaveCellResult, TvError> {
+    let start = Instant::now();
+
+    let content = fs.read_to_string(Path::new(file_path)).map_err(|e| {
+        tracing::error!(
+            component = "tv.toml",
+            file_path = %file_path,
+            error = %e,
+            "Read failed during cell save"
+        );
+        map_io_error_for_read(&e, file_path)
+    })?;
+
+    let mut doc: toml_edit::DocumentMut = content.parse().map_err(|e: toml_edit::TomlError| {
+        tracing::error!(
+            component = "tv.toml",
+            file_path = %file_path,
+            error = %e,
+            "TOML parse failed during cell save"
+        );
+        TvError::TomlParseError { line: None, message: e.to_string() }
+    })?;
+
+    let array = doc
+        .get_mut(table_name)
+        .and_then(|v| v.as_array_of_tables_mut())
+        .ok_or_else(|| {
+            tracing::error!(
+                component = "tv.toml",
+                file_path = %file_path,
+                table_name = %table_name,
+                error = "Table not found or not an array of tables",
+                "Cell save failed"
+            );
+            TvError::TableNotFound { table_name: table_name.to_string() }
+        })?;
+
+    let table = array.get_mut(update.row_index).ok_or_else(|| {
+        tracing::error!(
+            component = "tv.toml",
+            file_path = %file_path,
+            table_name = %table_name,
+            row_index = update.row_index,
+            error = "Row index out of bounds",
+            "Cell save failed"
+        );
+        TvError::RowNotFound { table_name: table_name.to_string(), row_index: update.row_index }
+    })?;
+
+    // Update the cell value
+    if let Some(new_value) = json_to_toml_edit_value(&update.value) {
+        table[&update.column_key] = new_value;
+    } else if update.value.is_null() {
+        // Remove the key if the value is null
+        table.remove(&update.column_key);
+    }
+
+    let output = doc.to_string();
+
+    fs.write_atomic(Path::new(file_path), &output).map_err(|e| {
+        map_atomic_write_error(e, file_path)
+    })?;
+
+    let duration_ms = start.elapsed().as_millis() as u64;
+    tracing::info!(
+        component = "tv.toml",
+        file_path = %file_path,
+        row_index = update.row_index,
+        column_key = %update.column_key,
+        duration_ms = duration_ms,
+        "Cell saved"
+    );
+
+    Ok(SaveCellResult { success: true, generated_values: None })
 }

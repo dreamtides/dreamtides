@@ -3,7 +3,9 @@ use std::path::{Path, PathBuf};
 use tempfile::TempDir;
 use tv_lib::error::error_types::TvError;
 use tv_lib::toml::document_loader::{load_toml_document_with_fs, TomlTableData};
-use tv_lib::toml::document_writer::save_toml_document_with_fs;
+use tv_lib::toml::document_writer::{
+    save_cell_with_fs, save_toml_document_with_fs, CellUpdate, SaveCellResult,
+};
 use tv_lib::traits::{FileSystem, RealFileSystem};
 
 use crate::test_utils::mock_filesystem::MockFileSystem;
@@ -63,6 +65,23 @@ impl TvTestHarness {
     pub fn read_file_content(&self, path: &Path) -> String {
         std::fs::read_to_string(path)
             .unwrap_or_else(|e| panic!("Failed to read file {}: {e}", path.display()))
+    }
+
+    pub fn save_cell(
+        &self,
+        path: &Path,
+        table_name: &str,
+        row_index: usize,
+        column_key: &str,
+        value: serde_json::Value,
+    ) -> Result<SaveCellResult, TvError> {
+        let update = CellUpdate { row_index, column_key: column_key.to_string(), value };
+        save_cell_with_fs(
+            &*self.fs,
+            path.to_str().unwrap_or_else(|| panic!("Invalid path: {path:?}")),
+            table_name,
+            &update,
+        )
     }
 }
 

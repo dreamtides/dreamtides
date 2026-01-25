@@ -104,6 +104,22 @@ export async function saveTomlTable(
   return invoke("save_toml_table", { filePath, tableName, data });
 }
 
+export async function saveCell(
+  filePath: string,
+  tableName: string,
+  rowIndex: number,
+  columnKey: string,
+  value: unknown
+): Promise<SaveResult> {
+  return invoke<SaveResult>("save_cell", {
+    filePath,
+    tableName,
+    rowIndex,
+    columnKey,
+    value,
+  });
+}
+
 export async function startFileWatcher(filePath: string): Promise<void> {
   return invoke("start_file_watcher", { filePath });
 }

@@ -66,6 +66,7 @@ pub fn run(paths: cli::AppPaths, _jsonl: bool) {
         .invoke_handler(tauri::generate_handler![
             commands::load_command::load_toml_table,
             commands::save_command::save_toml_table,
+            commands::save_command::save_cell,
             commands::watch_command::start_file_watcher,
             commands::watch_command::stop_file_watcher,
             get_app_paths,
