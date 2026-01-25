@@ -21,6 +21,8 @@ tauri-build = { version = "2", features = [] }
 chrono = { version = "0.4", features = ["serde"] }
 chrono-tz = "0.10"
 clap = { version = "4", features = ["derive"] }
+fluent = "0.17"
+fluent-bundle = "0.16"
 notify = "6"
 notify-debouncer-mini = "0.4"
 serde = { version = "1", features = ["derive"] }

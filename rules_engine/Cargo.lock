@@ -7253,6 +7253,8 @@ dependencies = [
  "chrono",
  "chrono-tz",
  "clap",
+ "fluent",
+ "fluent-bundle",
  "notify",
  "notify-debouncer-mini",
  "serde",
