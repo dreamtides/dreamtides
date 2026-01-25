@@ -547,6 +547,9 @@ prune-remote-branches:
 tv-dev:
     cd ./rules_engine/src/tv && pnpm tauri dev
 
+tv-cards:
+    cd ./rules_engine/src/tv && pnpm tauri dev -- -- ~/Documents/GoogleDrive/dreamtides/rules_engine/tabula/cards.toml
+
 tv-check:
     #!/usr/bin/env bash
     output=$(cargo check --manifest-path rules_engine/src/tv/src-tauri/Cargo.toml 2>&1)

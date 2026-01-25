@@ -337,9 +337,10 @@ paths.
 
 Dependencies: Task 13
 
-### Task 19: Create Sheet Tabs Component
-Create src/sheet_tabs.tsx with tab bar UI. Display tab for each file. Highlight
-active tab. Handle tab click to switch files. Show file name without extension.
+### Task 19: Configure Univer Multi-Sheet Mode
+Update UniverSpreadsheet.tsx to support multi-sheet workbooks. Create workbook
+with multiple sheets via IWorkbookData, one per TOML file. Use Univer's built-in
+tab bar for navigation. Listen for ActiveSheetChanged events.
 
 Dependencies: Task 4
 

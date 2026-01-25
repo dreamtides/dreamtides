@@ -15,7 +15,6 @@
 - main.tsx: React application entry point, mounts root component
 - app_root.tsx: Top-level component with state management and IPC setup
 - spreadsheet_view.tsx: Univer spreadsheet wrapper with data binding
-- sheet_tabs.tsx: Multi-file tab navigation component
 - error_banner.tsx: Error display overlay component
 - status_indicator.tsx: Save/sync status display component
 - cell_renderers.tsx: Custom cell renderers for images, checkboxes, rich text
@@ -27,7 +26,6 @@
 - app_styles.css: Global application styles
 - spreadsheet_overrides.css: Univer styling customizations
 - error_styles.css: Error banner and indicator styles
-- tabs_styles.css: Sheet tab styling
 
 ### Documentation (docs/)
 - tv_design_document.md: Main technical design document

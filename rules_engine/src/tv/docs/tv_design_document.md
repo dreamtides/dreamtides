@@ -592,7 +592,6 @@ rules_engine/src/tv/
 │   ├── main.tsx
 │   ├── app_root.tsx
 │   ├── spreadsheet_view.tsx
-│   ├── sheet_tabs.tsx
 │   ├── error_banner.tsx
 │   ├── status_indicator.tsx
 │   └── styles/
