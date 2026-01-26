@@ -2,6 +2,8 @@ use std::collections::HashSet;
 
 use tauri::Manager;
 
+use crate::derived::compute_executor::ComputeExecutorState;
+
 pub mod cli;
 #[path = "commands/commands_mod.rs"]
 mod commands;
@@ -51,11 +53,35 @@ fn cleanup_temp_files_on_startup(paths: &cli::AppPaths) {
     }
 }
 
+fn initialize_compute_executor() -> ComputeExecutorState {
+    let state = ComputeExecutorState::new();
+    if let Err(e) = state.initialize(None) {
+        tracing::error!(
+            component = "tv.derived.executor",
+            error = %e,
+            "Failed to initialize compute executor"
+        );
+    }
+    state
+}
+
+fn stop_compute_executor(app_handle: &tauri::AppHandle) {
+    if let Some(state) = app_handle.try_state::<ComputeExecutorState>() {
+        state.stop();
+        tracing::info!(
+            component = "tv.derived.executor",
+            "Compute executor stopped"
+        );
+    }
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run(paths: cli::AppPaths, _jsonl: bool) {
     derived::fluent_integration::initialize_fluent_resource();
     derived::function_registry::initialize_global_registry();
     cleanup_temp_files_on_startup(&paths);
+
+    let executor_state = initialize_compute_executor();
 
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
@@ -63,6 +89,7 @@ pub fn run(paths: cli::AppPaths, _jsonl: bool) {
         .manage(sync::file_watcher::FileWatcherState::new())
         .manage(sync::state_machine::SyncStateMachineState::new())
         .manage(sort::sort_state::SortStateManager::new())
+        .manage(executor_state)
         .invoke_handler(tauri::generate_handler![
             commands::load_command::load_toml_table,
             commands::save_command::save_toml_table,
@@ -73,11 +100,30 @@ pub fn run(paths: cli::AppPaths, _jsonl: bool) {
             commands::sort_command::clear_sort_state,
             commands::watch_command::start_file_watcher,
             commands::watch_command::stop_file_watcher,
+            commands::derived_command::compute_derived,
+            commands::derived_command::compute_derived_batch,
+            commands::derived_command::update_lookup_context,
+            commands::derived_command::increment_row_generation,
+            commands::derived_command::clear_computation_queue,
+            commands::derived_command::get_computation_queue_length,
             get_app_paths,
         ])
+        .setup(|app| {
+            // Start the compute executor after setup
+            let app_handle = app.handle().clone();
+            if let Some(state) = app_handle.try_state::<ComputeExecutorState>() {
+                state.start(app_handle.clone());
+                tracing::info!(
+                    component = "tv.derived.executor",
+                    "Compute executor started"
+                );
+            }
+            Ok(())
+        })
         .on_window_event(|window, event| {
             if let tauri::WindowEvent::CloseRequested { .. } = event {
                 sync::file_watcher::stop_all_watchers(window.app_handle());
+                stop_compute_executor(window.app_handle());
             }
         })
         .run(tauri::generate_context!())
