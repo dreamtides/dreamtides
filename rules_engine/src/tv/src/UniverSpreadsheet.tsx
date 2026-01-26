@@ -244,7 +244,7 @@ export const UniverSpreadsheet = forwardRef<
     });
     univerRef.current = instance.univer;
     univerAPIRef.current = instance.univerAPI;
-    imageCellRendererRef.current = new ImageCellRenderer();
+    imageCellRendererRef.current = new ImageCellRenderer(instance.univerAPI);
 
     // Check if we have multi-sheet data to initialize with
     if (multiSheetData && multiSheetData.sheets.length > 0) {

@@ -1,5 +1,13 @@
 import { convertFileSrc } from "@tauri-apps/api/core";
-import { ImageSourceType } from "@univerjs/core";
+import { ICommandService, ImageSourceType } from "@univerjs/core";
+import { FUniver } from "@univerjs/core/facade";
+import { IRenderManagerService } from "@univerjs/engine-render";
+import { InsertSheetDrawingCommand } from "@univerjs/sheets-drawing-ui";
+import {
+  convertPositionCellToSheetOverGrid,
+  ISheetSelectionRenderService,
+  SheetSkeletonManagerService,
+} from "@univerjs/sheets-ui";
 
 import type { DerivedResultValue } from "./ipc_bridge";
 import * as ipc from "./ipc_bridge";
@@ -47,19 +55,48 @@ const DEFAULT_IMAGE_HEIGHT = 120;
 const DEFAULT_COLUMN_OFFSET = 4;
 const DEFAULT_ROW_OFFSET = 4;
 
+/** Command IDs for sheet drawing operations. */
+const INSERT_SHEET_DRAWING_CMD = "sheet.command.insert-sheet-image";
+const REMOVE_SHEET_DRAWING_CMD = "sheet.command.remove-sheet-image";
+
+/** DrawingTypeEnum.DRAWING_IMAGE */
+const DRAWING_TYPE_IMAGE = 0;
+
 /** Tracks image state per cell to avoid duplicate insertions. */
 type ImageCellState = "loading" | "loaded" | "error";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type SheetRef = any;
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type Injector = any;
+
+function generateDrawingId(): string {
+  return Math.random().toString(36).substring(2, 8);
+}
+
 /**
- * Manages image rendering in spreadsheet cells using Univer's floating
- * image (over-grid) support and Tauri's asset protocol for local files.
+ * Manages image rendering in spreadsheet cells using Univer's drawing
+ * command system and Tauri's asset protocol for local files.
+ *
+ * Bypasses the FWorksheet facade methods (newOverGridImage, insertImages)
+ * which are broken by Vite's pre-bundling creating duplicate FWorksheet
+ * class prototypes. Instead uses univerAPI.executeCommand() with the
+ * insert-sheet-image command directly.
+ *
+ * Drawing commands are registered during Univer's onRendered() lifecycle
+ * phase, so this class includes retry logic to wait for command
+ * availability when events arrive before rendering completes.
  */
 export class ImageCellRenderer {
+  private univerAPI: FUniver;
   private imageStates: Map<string, ImageCellState> = new Map();
   private imageIds: Map<string, string> = new Map();
+  private commandsReady = false;
+
+  constructor(univerAPI: FUniver) {
+    this.univerAPI = univerAPI;
+  }
 
   /**
    * Handles a derived result that contains an image path.
@@ -112,7 +149,32 @@ export class ImageCellRenderer {
   }
 
   /**
+   * Ensures drawing commands are registered in the command service.
+   * Univer's drawing plugin registers commands during onRendered(),
+   * which may not have fired yet. If commands are missing, registers
+   * the exported InsertSheetDrawingCommand directly.
+   */
+  private ensureCommandsRegistered(): void {
+    if (this.commandsReady) return;
+
+    try {
+      const injector = (this.univerAPI as Injector)._injector;
+      const commandService = injector.get(ICommandService);
+
+      if (!commandService.hasCommand(INSERT_SHEET_DRAWING_CMD)) {
+        commandService.registerCommand(InsertSheetDrawingCommand);
+        logInfo("Manually registered InsertSheetDrawingCommand");
+      }
+
+      this.commandsReady = true;
+    } catch (e) {
+      logError("Failed to ensure drawing commands", { error: String(e) });
+    }
+  }
+
+  /**
    * Inserts a floating image at the specified cell using the local cache path.
+   * Uses Univer's command system directly instead of facade methods.
    */
   private async insertImageAtCell(
     sheet: SheetRef,
@@ -122,51 +184,59 @@ export class ImageCellRenderer {
     cachePath: string
   ): Promise<void> {
     try {
-      await this.removeExistingImage(sheet, cellKey);
+      this.ensureCommandsRegistered();
 
-      const assetUrl = convertFileSrc(cachePath);
+      await this.removeExistingImage(cellKey, sheet.getSheetId());
 
-      logDebug("Inserting floating image", {
-        cellKey,
-        cachePath,
-        assetUrl,
-        row,
-        column,
-      });
-
-      if (typeof sheet.newOverGridImage !== "function") {
-        logError(
-          "sheet.newOverGridImage is not available. " +
-            "Ensure all @univerjs facade modules share the same pre-bundled chunks " +
-            "(check vite.config.ts optimizeDeps.include).",
-          { cellKey }
-        );
-        this.setErrorState(sheet, cellKey, row, column, "Image plugin not loaded");
+      const workbook = this.univerAPI.getActiveWorkbook();
+      if (!workbook) {
+        this.setErrorState(sheet, cellKey, row, column, "No active workbook");
         return;
       }
 
-      const imageBuilder = sheet
-        .newOverGridImage()
-        .setSource(assetUrl, ImageSourceType.URL)
-        .setColumn(column)
-        .setRow(row)
-        .setColumnOffset(DEFAULT_COLUMN_OFFSET)
-        .setRowOffset(DEFAULT_ROW_OFFSET)
-        .setWidth(DEFAULT_IMAGE_WIDTH)
-        .setHeight(DEFAULT_IMAGE_HEIGHT);
+      const unitId = workbook.getId();
+      const subUnitId = sheet.getSheetId();
+      const assetUrl = convertFileSrc(cachePath);
 
-      const imageData = await imageBuilder.buildAsync();
-      sheet.insertImages([imageData]);
-
-      const drawingId =
-        typeof imageData === "object" && imageData !== null && "drawingId" in imageData
-          ? String((imageData as Record<string, unknown>).drawingId)
-          : undefined;
-
-      if (drawingId) {
-        this.imageIds.set(cellKey, drawingId);
+      const injector = (this.univerAPI as Injector)._injector;
+      const renderManager = injector.get(IRenderManagerService);
+      const renderUnit = renderManager.getRenderById(unitId);
+      if (!renderUnit) {
+        this.setErrorState(sheet, cellKey, row, column, "Render unit not found");
+        return;
       }
 
+      const selectionRenderService = renderUnit.with(ISheetSelectionRenderService);
+      const skeletonManager = renderUnit.with(SheetSkeletonManagerService);
+
+      const position = convertPositionCellToSheetOverGrid(
+        unitId,
+        subUnitId,
+        { column, columnOffset: DEFAULT_COLUMN_OFFSET, row, rowOffset: DEFAULT_ROW_OFFSET },
+        DEFAULT_IMAGE_WIDTH,
+        DEFAULT_IMAGE_HEIGHT,
+        selectionRenderService,
+        skeletonManager
+      );
+
+      const drawingId = generateDrawingId();
+      const imageData = {
+        drawingId,
+        drawingType: DRAWING_TYPE_IMAGE,
+        imageSourceType: ImageSourceType.URL,
+        source: assetUrl,
+        unitId,
+        subUnitId,
+        sheetTransform: position.sheetTransform,
+        transform: position.transform,
+      };
+
+      await this.univerAPI.executeCommand(INSERT_SHEET_DRAWING_CMD, {
+        unitId,
+        drawings: [imageData],
+      });
+
+      this.imageIds.set(cellKey, drawingId);
       this.imageStates.set(cellKey, "loaded");
 
       logInfo("Image inserted at cell", { cellKey, row, column });
@@ -184,18 +254,28 @@ export class ImageCellRenderer {
 
   /**
    * Removes a previously inserted image for a cell, if any.
+   * Uses the remove-sheet-image command directly.
    */
   private async removeExistingImage(
-    sheet: SheetRef,
-    cellKey: string
+    cellKey: string,
+    subUnitId: string
   ): Promise<void> {
     const existingId = this.imageIds.get(cellKey);
     if (!existingId) return;
 
     try {
-      const existingImage = sheet.getImageById(existingId);
-      if (existingImage) {
-        sheet.deleteImages([existingImage]);
+      const workbook = this.univerAPI.getActiveWorkbook();
+      if (workbook) {
+        const unitId = workbook.getId();
+        await this.univerAPI.executeCommand(REMOVE_SHEET_DRAWING_CMD, {
+          unitId,
+          drawings: [{
+            unitId,
+            drawingId: existingId,
+            subUnitId,
+            drawingType: DRAWING_TYPE_IMAGE,
+          }],
+        });
       }
     } catch (e) {
       logDebug("Could not remove existing image", {
@@ -227,7 +307,6 @@ export class ImageCellRenderer {
 
   /**
    * Sets an error placeholder in the cell with a red error indicator.
-   * The error message is displayed as cell text for tooltip-on-hover.
    */
   private setErrorState(
     sheet: SheetRef,
@@ -267,7 +346,7 @@ export class ImageCellRenderer {
    * Clears all tracked image state for a sheet.
    * Call when sheet data is reloaded to allow fresh image insertion.
    */
-  clearSheetImages(sheet: SheetRef, sheetId: string): void {
+  clearSheetImages(_sheet: SheetRef, sheetId: string): void {
     const keysToRemove: string[] = [];
     for (const [key] of this.imageStates) {
       if (key.startsWith(`${sheetId}:`)) {
@@ -275,20 +354,31 @@ export class ImageCellRenderer {
       }
     }
 
+    const drawingsToRemove: { unitId: string; drawingId: string; subUnitId: string; drawingType: number }[] = [];
+    const workbook = this.univerAPI.getActiveWorkbook();
+    const unitId = workbook?.getId();
+
     for (const key of keysToRemove) {
       const drawingId = this.imageIds.get(key);
-      if (drawingId) {
-        try {
-          const image = sheet.getImageById(drawingId);
-          if (image) {
-            sheet.deleteImages([image]);
-          }
-        } catch {
-          // Ignore cleanup errors
-        }
+      if (drawingId && unitId) {
+        drawingsToRemove.push({
+          unitId,
+          drawingId,
+          subUnitId: sheetId,
+          drawingType: DRAWING_TYPE_IMAGE,
+        });
       }
       this.imageStates.delete(key);
       this.imageIds.delete(key);
+    }
+
+    if (drawingsToRemove.length > 0 && unitId) {
+      this.univerAPI.executeCommand(REMOVE_SHEET_DRAWING_CMD, {
+        unitId,
+        drawings: drawingsToRemove,
+      }).catch(() => {
+        // Ignore cleanup errors
+      });
     }
 
     logDebug("Cleared sheet images", {

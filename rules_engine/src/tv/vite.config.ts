@@ -8,11 +8,8 @@ const host = process.env.TAURI_DEV_HOST;
 export default defineConfig(async () => ({
   plugins: [react()],
 
-  // Force all Univer facade modules to share the same pre-bundled chunks.
-  // Without this, Vite pre-bundles @univerjs/sheets/facade and
-  // @univerjs/sheets-drawing-ui/facade into separate files with duplicated
-  // FWorksheet classes, causing the drawing-ui facade's .extend() call to
-  // modify a different prototype than the one used at runtime.
+  // Pre-bundle all Univer packages together to avoid duplicate class
+  // instances across separate Vite chunks.
   optimizeDeps: {
     include: [
       "@univerjs/core",
