@@ -1,4 +1,5 @@
 mod card_lookup_tests;
+mod executor_tests;
 mod fluent_integration_tests;
 mod generation_tracker_tests;
 mod registry_tests;
