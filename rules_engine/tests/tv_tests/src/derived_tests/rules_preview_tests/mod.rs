@@ -1,3 +1,4 @@
+mod end_to_end_tests;
 mod fluent_tests;
 
 use std::collections::HashMap;
