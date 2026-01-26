@@ -45,6 +45,59 @@ pub struct DerivedValueComputedPayload {
     pub generation: u64,
 }
 
+/// Tauri-managed state for the compute executor.
+pub struct ComputeExecutorState {
+    executor: RwLock<Option<ComputeExecutor>>,
+}
+
+/// Executes a single derived function computation, catching panics at the
+/// task boundary and converting them to `DerivedResult::Error`.
+pub fn execute_computation(
+    function_name: &str,
+    row_data: &RowData,
+    context: &LookupContext,
+) -> DerivedResult {
+    let result = global_registry().with_function(function_name, |function| {
+        let panic_result = panic::catch_unwind(AssertUnwindSafe(|| {
+            function.compute(row_data, context)
+        }));
+
+        match panic_result {
+            Ok(result) => result,
+            Err(panic_info) => {
+                let panic_message = if let Some(s) = panic_info.downcast_ref::<&str>() {
+                    s.to_string()
+                } else if let Some(s) = panic_info.downcast_ref::<String>() {
+                    s.clone()
+                } else {
+                    "Unknown panic".to_string()
+                };
+
+                tracing::error!(
+                    component = "tv.derived.executor",
+                    function_name = %function_name,
+                    panic_message = %panic_message,
+                    "Derived function panicked"
+                );
+
+                DerivedResult::Error(format!("Function panicked: {panic_message}"))
+            }
+        }
+    });
+
+    match result {
+        Some(r) => r,
+        None => {
+            tracing::error!(
+                component = "tv.derived.executor",
+                function_name = %function_name,
+                "Derived function not found"
+            );
+            DerivedResult::Error(format!("Function not found: {function_name}"))
+        }
+    }
+}
+
 /// Manages async computation of derived column values.
 ///
 /// The executor maintains a queue of computation requests and processes them
@@ -327,60 +380,6 @@ impl Drop for ComputeExecutor {
     }
 }
 
-/// Executes a single computation, catching panics at the task boundary.
-fn execute_computation(
-    function_name: &str,
-    row_data: &RowData,
-    context: &LookupContext,
-) -> DerivedResult {
-    // Look up the function in the registry
-    let result = global_registry().with_function(function_name, |function| {
-        // Catch panics from the derived function
-        let panic_result = panic::catch_unwind(AssertUnwindSafe(|| {
-            function.compute(row_data, context)
-        }));
-
-        match panic_result {
-            Ok(result) => result,
-            Err(panic_info) => {
-                let panic_message = if let Some(s) = panic_info.downcast_ref::<&str>() {
-                    s.to_string()
-                } else if let Some(s) = panic_info.downcast_ref::<String>() {
-                    s.clone()
-                } else {
-                    "Unknown panic".to_string()
-                };
-
-                tracing::error!(
-                    component = "tv.derived.executor",
-                    function_name = %function_name,
-                    panic_message = %panic_message,
-                    "Derived function panicked"
-                );
-
-                DerivedResult::Error(format!("Function panicked: {panic_message}"))
-            }
-        }
-    });
-
-    match result {
-        Some(r) => r,
-        None => {
-            tracing::error!(
-                component = "tv.derived.executor",
-                function_name = %function_name,
-                "Derived function not found"
-            );
-            DerivedResult::Error(format!("Function not found: {function_name}"))
-        }
-    }
-}
-
-/// Tauri-managed state for the compute executor.
-pub struct ComputeExecutorState {
-    executor: RwLock<Option<ComputeExecutor>>,
-}
-
 impl ComputeExecutorState {
     /// Creates a new uninitialized executor state.
     pub fn new() -> Self {
@@ -444,131 +443,3 @@ impl Default for ComputeExecutorState {
     }
 }
 
-#[cfg(test)]
-mod tests {
-    use std::collections::HashMap;
-
-    use super::*;
-
-    fn make_row_key(row: usize) -> RowKey {
-        RowKey::new("/test/file.toml", "cards", row)
-    }
-
-    fn make_request(row: usize, visible: bool) -> ComputationRequest {
-        ComputationRequest {
-            row_key: make_row_key(row),
-            function_name: "card_lookup".to_string(),
-            row_data: HashMap::new(),
-            generation: 1,
-            is_visible: visible,
-        }
-    }
-
-    #[test]
-    fn test_executor_creation() {
-        let executor = ComputeExecutor::new(Some(2)).unwrap();
-        assert!(!executor.is_running());
-        assert_eq!(executor.queue_len(), 0);
-    }
-
-    #[test]
-    fn test_queue_visible_row_priority() {
-        let executor = ComputeExecutor::new(Some(1)).unwrap();
-
-        // Queue offscreen row first
-        executor.queue_computation(make_request(0, false));
-        // Queue visible row second
-        executor.queue_computation(make_request(1, true));
-
-        // Visible row should be at front
-        let queue = executor.queue.lock().unwrap();
-        assert_eq!(queue.len(), 2);
-        assert!(queue.front().unwrap().is_visible);
-        assert_eq!(queue.front().unwrap().row_key.row_index, 1);
-    }
-
-    #[test]
-    fn test_queue_batch() {
-        let executor = ComputeExecutor::new(Some(1)).unwrap();
-
-        let requests = vec![
-            make_request(0, false),
-            make_request(1, true),
-            make_request(2, false),
-            make_request(3, true),
-        ];
-
-        executor.queue_batch(requests);
-
-        // Should have 4 items, with visible ones at front
-        let queue = executor.queue.lock().unwrap();
-        assert_eq!(queue.len(), 4);
-
-        // First two should be visible (order may vary between them)
-        assert!(queue[0].is_visible);
-        assert!(queue[1].is_visible);
-        // Last two should be offscreen
-        assert!(!queue[2].is_visible);
-        assert!(!queue[3].is_visible);
-    }
-
-    #[test]
-    fn test_clear_queue() {
-        let executor = ComputeExecutor::new(Some(1)).unwrap();
-
-        executor.queue_computation(make_request(0, true));
-        executor.queue_computation(make_request(1, false));
-        assert_eq!(executor.queue_len(), 2);
-
-        executor.clear_queue();
-        assert_eq!(executor.queue_len(), 0);
-    }
-
-    #[test]
-    fn test_execute_computation_function_not_found() {
-        let row_data = HashMap::new();
-        let context = LookupContext::new();
-
-        let result = execute_computation("nonexistent_function", &row_data, &context);
-
-        match result {
-            DerivedResult::Error(msg) => {
-                assert!(msg.contains("not found"), "Error should mention not found: {msg}");
-            }
-            _ => panic!("Expected error result"),
-        }
-    }
-
-    #[test]
-    fn test_executor_state_initialize() {
-        let state = ComputeExecutorState::new();
-        assert!(state.with_executor(|_| ()).is_none());
-
-        state.initialize(Some(1)).unwrap();
-        assert!(state.with_executor(|_| ()).is_some());
-
-        // Second initialization should be a no-op
-        state.initialize(Some(2)).unwrap();
-    }
-
-    #[test]
-    fn test_generation_tracker_integration() {
-        let executor = ComputeExecutor::new(Some(1)).unwrap();
-        let tracker = executor.generation_tracker();
-
-        let key = make_row_key(0);
-        let gen = tracker.increment_generation(key.clone());
-
-        // Queue a request with current generation
-        let request = ComputationRequest {
-            row_key: key.clone(),
-            function_name: "test".to_string(),
-            row_data: HashMap::new(),
-            generation: gen,
-            is_visible: true,
-        };
-        executor.queue_computation(request);
-
-        assert_eq!(executor.queue_len(), 1);
-    }
-}

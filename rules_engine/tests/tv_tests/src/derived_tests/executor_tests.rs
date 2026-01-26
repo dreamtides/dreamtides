@@ -1,9 +1,10 @@
 use std::collections::HashMap;
 
 use tv_lib::derived::compute_executor::{
-    ComputationRequest, ComputeExecutor, ComputeExecutorState,
+    execute_computation, ComputationRequest, ComputeExecutor, ComputeExecutorState,
 };
-use tv_lib::derived::derived_types::{LookupContext, RowData};
+use tv_lib::derived::derived_types::{DerivedFunction, DerivedResult, LookupContext, RowData};
+use tv_lib::derived::function_registry::{global_registry, initialize_global_registry};
 use tv_lib::derived::generation_tracker::RowKey;
 
 fn make_row_key(row: usize) -> RowKey {
@@ -38,6 +39,35 @@ fn make_request_with_data(row: usize, data: RowData) -> ComputationRequest {
         generation: 1,
         is_visible: true,
     }
+}
+
+fn ensure_registry_initialized() {
+    initialize_global_registry();
+}
+
+struct PanickingTestFunction;
+
+impl DerivedFunction for PanickingTestFunction {
+    fn name(&self) -> &'static str {
+        "test_panic_function"
+    }
+
+    fn input_keys(&self) -> Vec<&'static str> {
+        vec![]
+    }
+
+    fn compute(&self, _inputs: &RowData, _context: &LookupContext) -> DerivedResult {
+        panic!("Intentional test panic");
+    }
+}
+
+static REGISTER_PANICKING_FUNCTION: std::sync::Once = std::sync::Once::new();
+
+fn ensure_panicking_function_registered() {
+    ensure_registry_initialized();
+    REGISTER_PANICKING_FUNCTION.call_once(|| {
+        global_registry().register(Box::new(PanickingTestFunction));
+    });
 }
 
 #[test]
@@ -86,12 +116,8 @@ fn test_queue_multiple_requests() {
 #[test]
 fn test_visible_rows_get_priority_over_offscreen() {
     let executor = ComputeExecutor::new(Some(1)).expect("Should create executor");
-
-    // Queue offscreen row first, then visible row
     executor.queue_computation(make_request(0, false));
     executor.queue_computation(make_request(1, true));
-
-    // Visible row should be at front of queue (priority)
     assert_eq!(executor.queue_len(), 2, "Queue should have 2 items");
 }
 
@@ -209,7 +235,6 @@ fn test_set_lookup_context() {
     cards.insert("card-1".to_string(), row);
     context.add_table("cards", cards);
 
-    // Setting lookup context should not panic
     executor.set_lookup_context(context);
 }
 
@@ -217,7 +242,6 @@ fn test_set_lookup_context() {
 fn test_set_lookup_context_multiple_times() {
     let executor = ComputeExecutor::new(Some(1)).expect("Should create executor");
 
-    // Set context multiple times
     executor.set_lookup_context(LookupContext::new());
     executor.set_lookup_context(LookupContext::new());
 
@@ -306,7 +330,6 @@ fn test_executor_state_double_initialize_is_safe() {
     state.initialize(Some(1)).expect("First initialization should succeed");
     state.initialize(Some(2)).expect("Second initialization should also succeed");
 
-    // Executor should still be accessible
     assert!(
         state.with_executor(|_| ()).is_some(),
         "State should still have an executor after double init"
@@ -327,14 +350,12 @@ fn test_executor_state_with_executor_mut_callback() {
     let state = ComputeExecutorState::new();
     state.initialize(Some(1)).expect("Should initialize executor");
 
-    // Queue a computation via mutable access
     let result = state.with_executor_mut(|exec| {
         exec.queue_computation(make_request(0, true));
         exec.queue_len()
     });
     assert_eq!(result, Some(1), "Should have queued 1 item");
 
-    // Verify via read access
     let queue_len = state.with_executor(|exec| exec.queue_len());
     assert_eq!(queue_len, Some(1), "Queue length should still be 1");
 }
@@ -344,7 +365,6 @@ fn test_executor_state_stop_before_start() {
     let state = ComputeExecutorState::new();
     state.initialize(Some(1)).expect("Should initialize executor");
 
-    // Stopping before starting should not panic
     state.stop();
 }
 
@@ -371,7 +391,6 @@ fn test_executor_queue_and_clear_via_state() {
     let state = ComputeExecutorState::new();
     state.initialize(Some(1)).expect("Should initialize executor");
 
-    // Queue some items
     state.with_executor(|exec| {
         exec.queue_computation(make_request(0, true));
         exec.queue_computation(make_request(1, false));
@@ -380,7 +399,6 @@ fn test_executor_queue_and_clear_via_state() {
     let len = state.with_executor(|exec| exec.queue_len());
     assert_eq!(len, Some(2), "Should have 2 queued items");
 
-    // Clear via executor
     state.with_executor(|exec| exec.clear_queue());
 
     let len = state.with_executor(|exec| exec.queue_len());
@@ -550,4 +568,129 @@ fn test_queue_request_for_different_tables() {
     executor.queue_computation(request1);
     executor.queue_computation(request2);
     assert_eq!(executor.queue_len(), 2, "Requests for different tables should both be queued");
+}
+
+#[test]
+fn test_execute_computation_function_not_found() {
+    ensure_registry_initialized();
+    let row_data = HashMap::new();
+    let context = LookupContext::new();
+
+    let result = execute_computation("nonexistent_function", &row_data, &context);
+
+    match result {
+        DerivedResult::Error(msg) => {
+            assert!(msg.contains("not found"), "Error should mention not found: {msg}");
+        }
+        _ => panic!("Expected error result for nonexistent function"),
+    }
+}
+
+#[test]
+fn test_executor_computes_value() {
+    ensure_registry_initialized();
+    let mut row_data: RowData = HashMap::new();
+    row_data.insert("image_number".to_string(), serde_json::json!("42"));
+    let context = LookupContext::new();
+
+    let result = execute_computation("image_url", &row_data, &context);
+
+    match result {
+        DerivedResult::Image(url) => {
+            assert!(url.contains("42"), "Image URL should contain the image number: {url}");
+        }
+        other => panic!("Expected Image result, got {other:?}"),
+    }
+}
+
+#[test]
+fn test_executor_computes_value_with_numeric_input() {
+    ensure_registry_initialized();
+    let mut row_data: RowData = HashMap::new();
+    row_data.insert("image_number".to_string(), serde_json::json!(99));
+    let context = LookupContext::new();
+
+    let result = execute_computation("image_url", &row_data, &context);
+
+    match result {
+        DerivedResult::Image(url) => {
+            assert!(url.contains("99"), "Image URL should contain the number: {url}");
+        }
+        other => panic!("Expected Image result, got {other:?}"),
+    }
+}
+
+#[test]
+fn test_executor_computes_empty_value_for_missing_input() {
+    ensure_registry_initialized();
+    let row_data: RowData = HashMap::new();
+    let context = LookupContext::new();
+
+    let result = execute_computation("image_url", &row_data, &context);
+
+    match result {
+        DerivedResult::Text(text) => {
+            assert!(text.is_empty(), "Missing input should produce empty text: {text}");
+        }
+        other => panic!("Expected empty Text result, got {other:?}"),
+    }
+}
+
+#[test]
+fn test_executor_catches_panic() {
+    ensure_panicking_function_registered();
+    let row_data: RowData = HashMap::new();
+    let context = LookupContext::new();
+
+    let result = execute_computation("test_panic_function", &row_data, &context);
+
+    match result {
+        DerivedResult::Error(msg) => {
+            assert!(msg.contains("panicked"), "Error should mention panic: {msg}");
+            assert!(
+                msg.contains("Intentional test panic"),
+                "Error should contain panic message: {msg}"
+            );
+        }
+        other => panic!("Expected Error result from panicking function, got {other:?}"),
+    }
+}
+
+#[test]
+fn test_executor_catches_panic_returns_error_not_crash() {
+    ensure_panicking_function_registered();
+    let row_data: RowData = HashMap::new();
+    let context = LookupContext::new();
+
+    let result = execute_computation("test_panic_function", &row_data, &context);
+    assert!(
+        matches!(result, DerivedResult::Error(_)),
+        "Panicking function should produce Error variant, not crash"
+    );
+
+    let result2 = execute_computation("image_url", &row_data, &context);
+    assert!(
+        !matches!(result2, DerivedResult::Error(ref msg) if msg.contains("panic")),
+        "Subsequent computations should work normally after a panic"
+    );
+}
+
+#[test]
+fn test_generation_tracker_integration_with_executor() {
+    let executor = ComputeExecutor::new(Some(1)).expect("Should create executor");
+    let tracker = executor.generation_tracker();
+
+    let key = make_row_key(0);
+    let gen = tracker.increment_generation(key.clone());
+
+    let request = ComputationRequest {
+        row_key: key.clone(),
+        function_name: "test".to_string(),
+        row_data: HashMap::new(),
+        generation: gen,
+        is_visible: true,
+    };
+    executor.queue_computation(request);
+
+    assert_eq!(executor.queue_len(), 1, "Request should be queued");
 }
