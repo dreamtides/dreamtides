@@ -31,6 +31,12 @@ import SheetsUIEnUS from "@univerjs/sheets-ui/locale/en-US";
 import SheetsEnUS from "@univerjs/sheets/locale/en-US";
 import { UniverUIPlugin } from "@univerjs/ui";
 import UIEnUS from "@univerjs/ui/locale/en-US";
+import { UniverDrawingPlugin } from "@univerjs/drawing";
+import { UniverDrawingUIPlugin } from "@univerjs/drawing-ui";
+import DrawingUIEnUS from "@univerjs/drawing-ui/locale/en-US";
+import { UniverSheetsDrawingPlugin } from "@univerjs/sheets-drawing";
+import { UniverSheetsDrawingUIPlugin } from "@univerjs/sheets-drawing-ui";
+import SheetsDrawingUIEnUS from "@univerjs/sheets-drawing-ui/locale/en-US";
 
 import "@univerjs/design/lib/index.css";
 import "@univerjs/ui/lib/index.css";
@@ -42,6 +48,8 @@ import "@univerjs/sheets-filter-ui/lib/index.css";
 import "@univerjs/sheets-conditional-formatting-ui/lib/index.css";
 import "@univerjs/sheets-data-validation-ui/lib/index.css";
 import "@univerjs/sheets-sort-ui/lib/index.css";
+import "@univerjs/drawing-ui/lib/index.css";
+import "@univerjs/sheets-drawing-ui/lib/index.css";
 
 import "@univerjs/engine-formula/facade";
 import "@univerjs/ui/facade";
@@ -54,11 +62,7 @@ import "@univerjs/sheets-filter/facade";
 import "@univerjs/sheets-conditional-formatting/facade";
 import "@univerjs/sheets-data-validation/facade";
 import "@univerjs/sheets-sort/facade";
-
-// Drawing plugins - Add in Phase 9 (Task 38)
-// Required packages: @univerjs/drawing, @univerjs/drawing-ui,
-//                   @univerjs/sheets-drawing, @univerjs/sheets-drawing-ui
-// Or preset: @univerjs/preset-sheets-drawing
+import "@univerjs/sheets-drawing-ui/facade";
 
 export interface UniverConfig {
   container: HTMLElement;
@@ -87,7 +91,9 @@ export function createUniverInstance(config: UniverConfig): UniverInstance {
         SheetsFilterUIEnUS,
         SheetsConditionalFormattingUIEnUS,
         SheetsDataValidationUIEnUS,
-        SheetsSortUIEnUS
+        SheetsSortUIEnUS,
+        DrawingUIEnUS,
+        SheetsDrawingUIEnUS
       ),
     },
   });
@@ -127,6 +133,14 @@ export function createUniverInstance(config: UniverConfig): UniverInstance {
   univer.registerPlugin(UniverDataValidationPlugin);
   univer.registerPlugin(UniverSheetsDataValidationPlugin);
   univer.registerPlugin(UniverSheetsDataValidationUIPlugin);
+
+  // Drawing support for images (Phase 9)
+  // Note: Drawing plugin types require explicit casting due to Univer's
+  // protected _injector field not being recognized across package boundaries.
+  univer.registerPlugin(UniverDrawingPlugin as never);
+  univer.registerPlugin(UniverDrawingUIPlugin as never);
+  univer.registerPlugin(UniverSheetsDrawingPlugin as never);
+  univer.registerPlugin(UniverSheetsDrawingUIPlugin as never);
 
   const univerAPI = FUniver.newAPI(univer);
 

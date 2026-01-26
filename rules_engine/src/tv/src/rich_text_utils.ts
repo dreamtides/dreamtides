@@ -35,7 +35,9 @@ export function derivedResultToCellData(result: DerivedResultValue): UniverCellD
     case "boolean":
       return { v: result.value };
     case "image":
-      return { v: result.value };
+      // Image cells are rendered as floating images by ImageCellRenderer.
+      // Set a placeholder value indicating the image path for display.
+      return { v: "[Image]" };
     case "richText":
       return richTextToCellData(result.value);
     case "error":
@@ -99,6 +101,14 @@ export function derivedResultToPlainText(result: DerivedResultValue): string {
     case "error":
       return `Error: ${result.value}`;
   }
+}
+
+/**
+ * Returns true if the derived result represents an image that should be
+ * rendered as a floating image rather than as cell text.
+ */
+export function isImageResult(result: DerivedResultValue): boolean {
+  return result.type === "image" && result.value.length > 0;
 }
 
 /**

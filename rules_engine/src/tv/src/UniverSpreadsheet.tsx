@@ -10,6 +10,7 @@ import {
 import type { TomlTableData, EnumValidationInfo, DerivedColumnInfo, DerivedResultValue } from "./ipc_bridge";
 import * as ipc from "./ipc_bridge";
 import { derivedResultToCellData } from "./rich_text_utils";
+import { ImageCellRenderer } from "./image_cell_renderer";
 
 // Component logging tag: tv.ui.sheets
 const LOG_TAG = "tv.ui.sheets";
@@ -127,6 +128,8 @@ export const UniverSpreadsheet = forwardRef<
   const lastMultiSheetDataRef = useRef<MultiSheetData | null>(null);
   // Track enum validation rules per sheet (by file path)
   const enumRulesRef = useRef<Map<string, EnumValidationInfo[]>>(new Map());
+  // Image cell renderer for floating image support
+  const imageCellRendererRef = useRef<ImageCellRenderer | null>(null);
 
   onChangeRef.current = onChange;
   onActiveSheetChangedRef.current = onActiveSheetChanged;
@@ -205,6 +208,7 @@ export const UniverSpreadsheet = forwardRef<
     });
     univerRef.current = instance.univer;
     univerAPIRef.current = instance.univerAPI;
+    imageCellRendererRef.current = new ImageCellRenderer();
 
     // Check if we have multi-sheet data to initialize with
     if (multiSheetData && multiSheetData.sheets.length > 0) {
@@ -310,8 +314,60 @@ export const UniverSpreadsheet = forwardRef<
       }
     );
 
+    // Listen for derived value computed events to handle image results
+    const derivedValueSub = ipc.onDerivedValueComputed((payload) => {
+      const result = payload.result;
+      if (!result || result.type !== "image") return;
+
+      const workbook = instance.univerAPI.getActiveWorkbook();
+      if (!workbook) return;
+
+      // Find the sheet matching the derived value's file path
+      const matchingSheetData = multiSheetData?.sheets.find(
+        (s) => s.path === payload.file_path
+      );
+
+      const sheet = matchingSheetData
+        ? workbook.getSheetBySheetId(matchingSheetData.id)
+        : workbook.getActiveSheet();
+      if (!sheet) return;
+
+      const sheetId = sheet.getSheetId();
+      const renderer = imageCellRendererRef.current;
+      if (!renderer) return;
+
+      // Row index from derived value is 0-based data row, add 1 for header row offset
+      const displayRow = payload.row_index + 1;
+
+      // Find the column index for the derived function name in headers
+      const headers = headersMapRef.current.get(sheetId) ?? headersRef.current;
+      const colIdx = headers.indexOf(payload.function_name);
+      if (colIdx === -1) {
+        logDebug("Image derived function column not found in headers", {
+          functionName: payload.function_name,
+          headers,
+        });
+        return;
+      }
+
+      renderer
+        .handleImageResult(sheet, sheetId, displayRow, colIdx, result)
+        .catch((e) => {
+          logDebug("Image render from derived value failed", {
+            error: String(e),
+            rowIndex: payload.row_index,
+            functionName: payload.function_name,
+          });
+        });
+    });
+
     return () => {
       activeSheetDisposable.dispose();
+      derivedValueSub.dispose();
+      if (imageCellRendererRef.current) {
+        imageCellRendererRef.current.clearAll();
+        imageCellRendererRef.current = null;
+      }
       disposeUniverInstance(instance);
       univerRef.current = null;
       univerAPIRef.current = null;
@@ -411,6 +467,11 @@ export const UniverSpreadsheet = forwardRef<
       if (!sheet) {
         logDebug("Sheet not found, skipping update", { sheetId: sheetData.id });
         continue;
+      }
+
+      // Clear existing images for this sheet before repopulating data
+      if (imageCellRendererRef.current) {
+        imageCellRendererRef.current.clearSheetImages(sheet, sheetData.id);
       }
 
       logDebug("Updating changed sheet with batch operation", {
