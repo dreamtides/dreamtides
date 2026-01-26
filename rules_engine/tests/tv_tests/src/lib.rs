@@ -10,6 +10,8 @@ mod filter_tests;
 mod image_tests;
 #[cfg(test)]
 mod logging_tests;
+#[cfg(test)]
+mod sort_tests;
 mod test_utils;
 #[cfg(test)]
 mod toml_tests;
