@@ -545,9 +545,18 @@ prune-remote-branches:
     done
 
 tv-dev:
+    #!/usr/bin/env bash
+    # Kill stale processes from a previous run. The deeply-nested process tree
+    # (just → pnpm → tauri CLI → pnpm → vite) does not reliably propagate
+    # SIGINT to all children on Ctrl+C, leaving orphaned Vite and TV processes.
+    lsof -ti :1420 | xargs kill 2>/dev/null || true
+    pkill -f 'target/debug/tv' 2>/dev/null || true
     cd ./rules_engine/src/tv && pnpm tauri dev
 
 tv-cards:
+    #!/usr/bin/env bash
+    lsof -ti :1420 | xargs kill 2>/dev/null || true
+    pkill -f 'target/debug/tv' 2>/dev/null || true
     cd ./rules_engine/src/tv && pnpm tauri dev -- -- ~/Documents/GoogleDrive/dreamtides/rules_engine/tabula/cards.toml
 
 tv-check:
