@@ -255,6 +255,70 @@ fn test_derived_function_trait_implementation() {
 }
 
 #[test]
+fn test_card_lookup_empty_reference() {
+    let function = CardLookupFunction::new();
+    let context = LookupContext::new();
+
+    let mut inputs: RowData = HashMap::new();
+    inputs.insert("referenced_card_id".to_string(), serde_json::json!(""));
+
+    let result = function.compute(&inputs, &context);
+    assert_eq!(result, DerivedResult::Text(String::new()));
+}
+
+#[test]
+fn test_card_lookup_null_reference() {
+    let function = CardLookupFunction::new();
+    let context = LookupContext::new();
+
+    let mut inputs: RowData = HashMap::new();
+    inputs.insert("referenced_card_id".to_string(), serde_json::Value::Null);
+
+    let result = function.compute(&inputs, &context);
+    assert_eq!(result, DerivedResult::Text(String::new()));
+}
+
+#[test]
+fn test_card_lookup_missing_reference_field() {
+    let function = CardLookupFunction::new();
+    let context = LookupContext::new();
+
+    let inputs: RowData = HashMap::new();
+
+    let result = function.compute(&inputs, &context);
+    assert_eq!(result, DerivedResult::Text(String::new()));
+}
+
+#[test]
+fn test_card_lookup_invalid_type() {
+    let function = CardLookupFunction::new();
+    let context = LookupContext::new();
+
+    let mut inputs: RowData = HashMap::new();
+    inputs.insert("referenced_card_id".to_string(), serde_json::json!(12345));
+
+    let result = function.compute(&inputs, &context);
+    match result {
+        DerivedResult::Error(msg) => {
+            assert!(
+                msg.contains("Invalid card reference type"),
+                "Error should mention invalid type: {msg}"
+            );
+        }
+        _ => panic!("Expected error result for invalid type, got: {result:?}"),
+    }
+}
+
+#[test]
+fn test_card_lookup_default_constructor() {
+    let function = CardLookupFunction::default();
+
+    assert_eq!(function.name(), "card_lookup");
+    assert_eq!(function.input_keys(), vec!["referenced_card_id"]);
+    assert!(!function.is_async());
+}
+
+#[test]
 fn test_clear_cache() {
     let harness = TvTestHarness::new();
     let path = harness.create_toml_file(
