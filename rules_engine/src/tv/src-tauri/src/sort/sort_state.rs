@@ -30,10 +30,29 @@ impl SortStateManager {
     ) -> Option<SortState> {
         let key = format!("{file_path}::{table_name}");
         let mut states = self.states.write().ok()?;
-        match state {
-            Some(s) => states.insert(key, s),
-            None => states.remove(&key),
-        }
+        let previous = match state {
+            Some(ref s) => {
+                tracing::debug!(
+                    component = "tv.sort",
+                    file_path = %file_path,
+                    table_name = %table_name,
+                    column = %s.column,
+                    direction = ?s.direction,
+                    "Sort state updated"
+                );
+                states.insert(key, s.clone())
+            }
+            None => {
+                tracing::debug!(
+                    component = "tv.sort",
+                    file_path = %file_path,
+                    table_name = %table_name,
+                    "Sort state cleared"
+                );
+                states.remove(&key)
+            }
+        };
+        previous
     }
 
     pub fn clear_sort_state(&self, file_path: &str, table_name: &str) {
@@ -44,14 +63,28 @@ impl SortStateManager {
         if let Ok(mut mappings) = self.row_mappings.write() {
             mappings.remove(&key);
         }
+        tracing::debug!(
+            component = "tv.sort",
+            file_path = %file_path,
+            table_name = %table_name,
+            "Sort state and row mapping cleared"
+        );
     }
 
     /// Stores a display-to-original row index mapping for a sorted table.
     pub fn set_row_mapping(&self, file_path: &str, table_name: &str, mapping: Vec<usize>) {
         let key = format!("{file_path}::{table_name}");
+        let mapping_len = mapping.len();
         if let Ok(mut mappings) = self.row_mappings.write() {
             mappings.insert(key, mapping);
         }
+        tracing::debug!(
+            component = "tv.sort",
+            file_path = %file_path,
+            table_name = %table_name,
+            row_count = mapping_len,
+            "Row mapping stored"
+        );
     }
 
     /// Returns the display-to-original row index mapping, if a sort is active.
@@ -77,10 +110,19 @@ impl Default for SortStateManager {
     }
 }
 
+/// Computes sorted row indices for the given table data and sort state.
 pub fn apply_sort(data: &TomlTableData, sort_state: &SortState) -> Vec<usize> {
     let column_index = match data.headers.iter().position(|h| h == &sort_state.column) {
         Some(idx) => idx,
-        None => return (0..data.rows.len()).collect(),
+        None => {
+            tracing::warn!(
+                component = "tv.sort",
+                column = %sort_state.column,
+                direction = ?sort_state.direction,
+                "Sort column not found in headers, returning identity order"
+            );
+            return (0..data.rows.len()).collect();
+        }
     };
 
     let mut indices: Vec<usize> = (0..data.rows.len()).collect();
@@ -100,9 +142,18 @@ pub fn apply_sort(data: &TomlTableData, sort_state: &SortState) -> Vec<usize> {
         }
     });
 
+    tracing::debug!(
+        component = "tv.sort",
+        column = %sort_state.column,
+        direction = ?sort_state.direction,
+        row_count = data.rows.len(),
+        "Sort applied"
+    );
+
     indices
 }
 
+/// Reorders table rows according to the given index mapping.
 pub fn reorder_rows(data: &TomlTableData, indices: &[usize]) -> Vec<Vec<serde_json::Value>> {
     indices.iter().filter_map(|&idx| data.rows.get(idx).cloned()).collect()
 }
@@ -122,6 +173,7 @@ pub fn apply_sort_to_data_with_mapping(
     }
 }
 
+/// Sorts table data according to the sort state, discarding the index mapping.
 pub fn apply_sort_to_data(data: TomlTableData, sort_state: Option<&SortState>) -> TomlTableData {
     apply_sort_to_data_with_mapping(data, sort_state).0
 }
