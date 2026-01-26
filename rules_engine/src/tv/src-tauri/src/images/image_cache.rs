@@ -1,3 +1,7 @@
+// This module provides infrastructure for Tasks 36-38. The types and functions
+// are intentionally not yet used until image fetching is implemented.
+#![allow(dead_code)]
+
 use std::collections::HashMap;
 use std::fs::{self, File};
 use std::io::{Read, Write};
@@ -224,12 +228,12 @@ impl ImageCache {
             return Ok(None);
         };
 
-        let mut file = File::open(&path).map_err(|e| TvError::FileNotFound {
+        let mut file = File::open(&path).map_err(|_e| TvError::FileNotFound {
             path: path.to_string_lossy().to_string(),
         })?;
 
         let mut data = Vec::new();
-        file.read_to_end(&mut data).map_err(|e| TvError::ImageCacheCorrupt {
+        file.read_to_end(&mut data).map_err(|_e| TvError::ImageCacheCorrupt {
             cache_key: Self::url_to_cache_key(url),
         })?;
 
