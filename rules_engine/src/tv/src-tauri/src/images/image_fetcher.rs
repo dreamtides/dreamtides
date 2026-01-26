@@ -5,6 +5,7 @@ use std::time::Duration;
 
 use tokio::sync::Semaphore;
 
+use crate::derived::function_registry;
 use crate::error::error_types::TvError;
 use crate::images::image_cache::ImageCache;
 
@@ -144,10 +145,14 @@ impl ImageFetcherState {
     }
 
     /// Initializes the fetcher with the given cache directory.
+    ///
+    /// Also registers the image derived function with the global function
+    /// registry, since it requires access to the shared image cache.
     pub fn initialize(&self, cache_dir: &std::path::Path) -> Result<(), TvError> {
-        let cache = ImageCache::new(cache_dir)?;
+        let cache = Arc::new(ImageCache::new(cache_dir)?);
         cache.validate_integrity()?;
-        let fetcher = ImageFetcher::new(Arc::new(cache))?;
+        function_registry::register_image_derived_function(Arc::clone(&cache));
+        let fetcher = ImageFetcher::new(cache)?;
         if let Ok(mut guard) = self.fetcher.write() {
             *guard = Some(Arc::new(fetcher));
         }

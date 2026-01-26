@@ -1,9 +1,11 @@
 use std::collections::HashMap;
-use std::sync::{OnceLock, RwLock};
+use std::sync::{Arc, OnceLock, RwLock};
 
 use crate::derived::card_lookup::CardLookupFunction;
 use crate::derived::derived_types::DerivedFunction;
+use crate::derived::image_derived::ImageDerivedFunction;
 use crate::derived::image_url::ImageUrlFunction;
+use crate::images::image_cache::ImageCache;
 
 /// Global function registry storing all registered derived functions.
 static GLOBAL_REGISTRY: OnceLock<FunctionRegistry> = OnceLock::new();
@@ -91,4 +93,24 @@ pub fn initialize_global_registry() {
 /// Panics if the registry has not been initialized via `initialize_global_registry`.
 pub fn global_registry() -> &'static FunctionRegistry {
     GLOBAL_REGISTRY.get().expect("Global function registry not initialized. Call initialize_global_registry() first.")
+}
+
+/// Registers the image derived function with the global registry.
+///
+/// This must be called after the image cache is initialized, since the
+/// function requires access to the cache for fetching and storing images.
+pub fn register_image_derived_function(cache: Arc<ImageCache>) {
+    let registry = global_registry();
+    if registry.contains("image_derived") {
+        tracing::debug!(
+            component = "tv.derived.registry",
+            "Image derived function already registered"
+        );
+        return;
+    }
+    registry.register(Box::new(ImageDerivedFunction::new(cache)));
+    tracing::info!(
+        component = "tv.derived.registry",
+        "Registered image derived function"
+    );
 }
