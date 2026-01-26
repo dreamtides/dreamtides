@@ -3,7 +3,15 @@ use tv_lib::error::error_types::TvError;
 use tv_lib::validation::validation_rules::{ValidationRule, ValueType};
 use tv_lib::validation::validators::validate;
 
+use crate::test_utils::fixture_loader::load_fixture;
 use crate::test_utils::test_utils_mod::TvTestHarness;
+
+fn load_validation_fixture() -> (TvTestHarness, std::path::PathBuf) {
+    let harness = TvTestHarness::new();
+    let content = load_fixture("with_validation.toml");
+    let path = harness.create_toml_file("with_validation.toml", &content);
+    (harness, path)
+}
 
 #[test]
 fn test_type_validation_integer_pass() {
@@ -610,4 +618,281 @@ max = 10
     let table = harness.load_table(&path, "cards").unwrap();
     let idx = table.headers.iter().position(|h| h == "cost").unwrap();
     assert_eq!(table.rows[0][idx], json!(7), "New value should be saved");
+}
+
+// ============================================================================
+// Fixture-based integration tests using with_validation.toml
+// ============================================================================
+
+#[test]
+fn test_fixture_enum_validation_pass() {
+    let (harness, path) = load_validation_fixture();
+
+    let result = harness.save_cell(&path, "items", 0, "card_type", json!("Event"));
+    assert!(result.is_ok(), "Saving allowed enum value 'Event' should succeed: {result:?}");
+
+    let table = harness.load_table(&path, "items").unwrap();
+    let idx = table.headers.iter().position(|h| h == "card_type").unwrap();
+    assert_eq!(table.rows[0][idx].as_str(), Some("Event"), "Saved enum value should persist");
+}
+
+#[test]
+fn test_fixture_enum_validation_fail() {
+    let (harness, path) = load_validation_fixture();
+
+    let result = harness.save_cell(&path, "items", 0, "card_type", json!("Artifact"));
+    match result {
+        Err(TvError::ValidationFailed { column, row, message }) => {
+            assert_eq!(column, "card_type");
+            assert_eq!(row, 0);
+            assert!(
+                message.contains("Artifact"),
+                "Error should reference the rejected value, got: {message}"
+            );
+        }
+        other => panic!("Expected ValidationFailed for disallowed enum value, got: {other:?}"),
+    }
+
+    let table = harness.load_table(&path, "items").unwrap();
+    let idx = table.headers.iter().position(|h| h == "card_type").unwrap();
+    assert_eq!(
+        table.rows[0][idx].as_str(),
+        Some("Character"),
+        "Original value should be preserved after rejected save"
+    );
+}
+
+#[test]
+fn test_fixture_range_validation() {
+    let (harness, path) = load_validation_fixture();
+
+    let result = harness.save_cell(&path, "items", 0, "rarity", json!(4));
+    assert!(result.is_ok(), "Value 4 within range [1,5] should pass: {result:?}");
+
+    let result = harness.save_cell(&path, "items", 0, "rarity", json!(1));
+    assert!(result.is_ok(), "Value 1 at min boundary should pass: {result:?}");
+
+    let result = harness.save_cell(&path, "items", 0, "rarity", json!(5));
+    assert!(result.is_ok(), "Value 5 at max boundary should pass: {result:?}");
+
+    let result = harness.save_cell(&path, "items", 0, "rarity", json!(0));
+    assert!(result.is_err(), "Value 0 below min=1 should be rejected");
+
+    let result = harness.save_cell(&path, "items", 0, "rarity", json!(6));
+    assert!(result.is_err(), "Value 6 above max=5 should be rejected");
+}
+
+#[test]
+fn test_fixture_pattern_validation() {
+    let (harness, path) = load_validation_fixture();
+
+    let result = harness.save_cell(&path, "items", 0, "id", json!("card-42"));
+    assert!(
+        result.is_ok(),
+        "Value 'card-42' matching pattern '^[a-z]+-[0-9]+$' should pass: {result:?}"
+    );
+
+    let result = harness.save_cell(&path, "items", 0, "id", json!("CARD-1"));
+    assert!(result.is_err(), "Value 'CARD-1' with uppercase should fail lowercase-only pattern");
+
+    let result = harness.save_cell(&path, "items", 0, "id", json!("no-numbers"));
+    assert!(result.is_err(), "Value 'no-numbers' without digits should fail pattern");
+}
+
+#[test]
+fn test_fixture_required_validation() {
+    let (harness, path) = load_validation_fixture();
+
+    let result = harness.save_cell(&path, "items", 0, "name", json!("New Name"));
+    assert!(result.is_ok(), "Non-empty name should pass required validation: {result:?}");
+
+    let result = harness.save_cell(&path, "items", 0, "name", json!(""));
+    assert!(result.is_err(), "Empty string for required field 'name' should be rejected");
+
+    let result = harness.save_cell(&path, "items", 0, "name", serde_json::Value::Null);
+    assert!(result.is_err(), "Null for required field 'name' should be rejected");
+}
+
+#[test]
+fn test_fixture_type_validation_numeric() {
+    let harness = TvTestHarness::new();
+    let path = harness.create_toml_file(
+        "type_numeric_fixture.toml",
+        r#"[[items]]
+id = "test-1"
+cost = 5
+
+[metadata]
+schema_version = 1
+
+[[metadata.validation_rules]]
+column = "cost"
+type = "integer"
+"#,
+    );
+
+    let result = harness.save_cell(&path, "items", 0, "cost", json!(10));
+    assert!(result.is_ok(), "Integer value should pass integer type validation: {result:?}");
+
+    let result = harness.save_cell(&path, "items", 0, "cost", json!("not a number"));
+    match result {
+        Err(TvError::ValidationFailed { column, row, message }) => {
+            assert_eq!(column, "cost");
+            assert_eq!(row, 0);
+            assert!(message.contains("not a valid integer"), "Message: {message}");
+        }
+        other => panic!("Expected ValidationFailed for non-numeric string, got: {other:?}"),
+    }
+}
+
+#[test]
+fn test_fixture_type_validation_boolean() {
+    let harness = TvTestHarness::new();
+    let path = harness.create_toml_file(
+        "type_boolean_fixture.toml",
+        r#"[[items]]
+id = "test-1"
+active = true
+
+[metadata]
+schema_version = 1
+
+[[metadata.validation_rules]]
+column = "active"
+type = "boolean"
+"#,
+    );
+
+    let result = harness.save_cell(&path, "items", 0, "active", json!(false));
+    assert!(result.is_ok(), "Boolean false should pass boolean validation: {result:?}");
+
+    let result = harness.save_cell(&path, "items", 0, "active", json!("true"));
+    match result {
+        Err(TvError::ValidationFailed { column, row, message }) => {
+            assert_eq!(column, "active");
+            assert_eq!(row, 0);
+            assert!(message.contains("not a valid boolean"), "Message: {message}");
+        }
+        other => panic!("Expected ValidationFailed for string 'true', got: {other:?}"),
+    }
+}
+
+#[test]
+fn test_fixture_multiple_rules_combine() {
+    let harness = TvTestHarness::new();
+    let path = harness.create_toml_file(
+        "multi_rules_fixture.toml",
+        r#"[[items]]
+id = "test-1"
+rarity = 3
+
+[metadata]
+schema_version = 1
+
+[[metadata.validation_rules]]
+column = "rarity"
+type = "required"
+
+[[metadata.validation_rules]]
+column = "rarity"
+type = "integer"
+
+[[metadata.validation_rules]]
+column = "rarity"
+type = "range"
+min = 1
+max = 5
+"#,
+    );
+
+    let result = harness.save_cell(&path, "items", 0, "rarity", json!(4));
+    assert!(result.is_ok(), "Integer 4 in range [1,5] should pass all three rules: {result:?}");
+
+    let result = harness.save_cell(&path, "items", 0, "rarity", json!("abc"));
+    assert!(result.is_err(), "Non-integer string should fail type validation");
+
+    let result = harness.save_cell(&path, "items", 0, "rarity", json!(10));
+    assert!(result.is_err(), "Integer 10 should fail range validation (max=5)");
+
+    let result = harness.save_cell(&path, "items", 0, "rarity", json!(""));
+    assert!(result.is_err(), "Empty string should fail required validation");
+}
+
+#[test]
+fn test_fixture_validation_error_message() {
+    let (harness, path) = load_validation_fixture();
+
+    let result = harness.save_cell(&path, "items", 0, "card_type", json!("Spell"));
+    match result {
+        Err(TvError::ValidationFailed { column, row, message }) => {
+            assert_eq!(column, "card_type", "Error should reference the column name");
+            assert_eq!(row, 0, "Error should reference the row index");
+            assert!(
+                message.contains("Spell") || message.contains("card_type"),
+                "Error message should contain rule details, got: {message}"
+            );
+        }
+        other => panic!("Expected ValidationFailed error, got: {other:?}"),
+    }
+
+    let result = harness.save_cell(&path, "items", 0, "rarity", json!(99));
+    match result {
+        Err(TvError::ValidationFailed { column, message, .. }) => {
+            assert_eq!(column, "rarity", "Error should reference the column name");
+            assert!(
+                message.contains("greater than maximum") || message.contains("99"),
+                "Error message should describe the violation, got: {message}"
+            );
+        }
+        other => panic!("Expected ValidationFailed error, got: {other:?}"),
+    }
+
+    let result = harness.save_cell(&path, "items", 0, "name", json!(""));
+    match result {
+        Err(TvError::ValidationFailed { column, message, .. }) => {
+            assert_eq!(column, "name", "Error should reference the column name");
+            assert!(
+                message.contains("required"),
+                "Error message should mention required, got: {message}"
+            );
+        }
+        other => panic!("Expected ValidationFailed error, got: {other:?}"),
+    }
+
+    let result = harness.save_cell(&path, "items", 0, "id", json!("BAD"));
+    match result {
+        Err(TvError::ValidationFailed { column, message, .. }) => {
+            assert_eq!(column, "id", "Error should reference the column name");
+            assert!(
+                message.contains("does not match pattern"),
+                "Error message should mention pattern mismatch, got: {message}"
+            );
+        }
+        other => panic!("Expected ValidationFailed error, got: {other:?}"),
+    }
+}
+
+#[test]
+fn test_fixture_validation_rules_parsed_from_fixture() {
+    let (harness, path) = load_validation_fixture();
+
+    let rules = harness.parse_validation_rules(&path).unwrap();
+    assert_eq!(rules.len(), 4, "Fixture should contain exactly 4 validation rules");
+
+    assert!(
+        matches!(&rules[0], ValidationRule::Enum { column, .. } if column == "card_type"),
+        "First rule should be enum for card_type"
+    );
+    assert!(
+        matches!(&rules[1], ValidationRule::Range { column, .. } if column == "rarity"),
+        "Second rule should be range for rarity"
+    );
+    assert!(
+        matches!(&rules[2], ValidationRule::Required { column, .. } if column == "name"),
+        "Third rule should be required for name"
+    );
+    assert!(
+        matches!(&rules[3], ValidationRule::Pattern { column, .. } if column == "id"),
+        "Fourth rule should be pattern for id"
+    );
 }

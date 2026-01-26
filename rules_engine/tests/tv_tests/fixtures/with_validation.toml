@@ -1,0 +1,29 @@
+[[items]]
+id = "test-1"
+card_type = "Character"
+rarity = 3
+name = "Test Card"
+active = true
+
+[metadata]
+schema_version = 1
+
+[[metadata.validation_rules]]
+column = "card_type"
+type = "enum"
+enum = ["Character", "Event"]
+
+[[metadata.validation_rules]]
+column = "rarity"
+type = "range"
+min = 1
+max = 5
+
+[[metadata.validation_rules]]
+column = "name"
+type = "required"
+
+[[metadata.validation_rules]]
+column = "id"
+type = "pattern"
+pattern = "^[a-z]+-[0-9]+$"
