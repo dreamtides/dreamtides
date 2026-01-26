@@ -217,7 +217,13 @@ Image support requires these additional Univer packages beyond the base setup:
 Or use the preset: @univerjs/preset-sheets-drawing
 
 ### Univer Image API
-The Facade API provides multiple methods for inserting images:
+The Facade API provides multiple methods for inserting images.
+
+**NOTE**: The facade methods listed below (e.g. `insertImage`,
+`newOverGridImage`) are broken under Vite pre-bundling due to class prototype
+duplication. TV uses a command-based workaround instead — see
+`image_cell_renderer.ts` and [Appendix D](appendix_d_univer_integration.md)
+§ "Vite Pre-Bundling Compatibility" for details.
 
 **Floating Images (FWorksheet methods):**
 - `insertImage(url, column, row, offsetX?, offsetY?)` - Insert from URL string
@@ -706,3 +712,9 @@ build-toml and build-xls commands are eventually removed.
 - @univerjs/sheets-drawing-ui: Cell image support
 - React 19.x: UI framework
 - RxJS 7.x: Reactive event handling
+
+**IMPORTANT**: All `@univerjs/*` packages must be pinned to the same exact
+version. Vite's dependency pre-bundling can duplicate Univer class prototypes
+and DI tokens, breaking the facade mixin system and dependency injection at
+runtime. See [Appendix D: Univer Integration](appendix_d_univer_integration.md)
+§ "Vite Pre-Bundling Compatibility" for detailed symptoms and workarounds.
