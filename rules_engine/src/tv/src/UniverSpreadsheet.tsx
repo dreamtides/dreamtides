@@ -130,6 +130,11 @@ export const UniverSpreadsheet = forwardRef<
   const enumRulesRef = useRef<Map<string, EnumValidationInfo[]>>(new Map());
   // Image cell renderer for floating image support
   const imageCellRendererRef = useRef<ImageCellRenderer | null>(null);
+  // Ref to track current multiSheetData for use in event callbacks
+  const multiSheetDataRef = useRef<MultiSheetData | undefined>(multiSheetData);
+  multiSheetDataRef.current = multiSheetData;
+  // Suppress sort event persistence during initial sort state restoration
+  const isRestoringSortRef = useRef(false);
 
   onChangeRef.current = onChange;
   onActiveSheetChangedRef.current = onActiveSheetChanged;
@@ -270,6 +275,57 @@ export const UniverSpreadsheet = forwardRef<
       };
       loadEnumRulesAsync();
 
+      // Restore sort indicators from persisted backend sort state
+      const restoreSortStateAsync = async () => {
+        const workbook = instance.univerAPI.getActiveWorkbook();
+        if (!workbook) return;
+
+        isRestoringSortRef.current = true;
+        try {
+          for (const sheetData of multiSheetData.sheets) {
+            try {
+              const sortResponse = await ipc.getSortState(
+                sheetData.path,
+                sheetData.name
+              );
+              if (!sortResponse.column || !sortResponse.direction) continue;
+
+              const colIndex = sheetData.data.headers.indexOf(
+                sortResponse.column
+              );
+              if (colIndex === -1) {
+                logDebug("Persisted sort column not found in headers", {
+                  column: sortResponse.column,
+                  sheetId: sheetData.id,
+                });
+                continue;
+              }
+
+              const sheet = workbook.getSheetBySheetId(sheetData.id);
+              if (!sheet) continue;
+
+              const ascending = sortResponse.direction === "ascending";
+              sheet.sort(colIndex, ascending);
+              logInfo("Restored sort indicator", {
+                sheetId: sheetData.id,
+                sheetName: sheetData.name,
+                column: sortResponse.column,
+                ascending,
+              });
+            } catch (e) {
+              logDebug("Failed to restore sort state", {
+                sheetId: sheetData.id,
+                path: sheetData.path,
+                error: String(e),
+              });
+            }
+          }
+        } finally {
+          isRestoringSortRef.current = false;
+        }
+      };
+      restoreSortStateAsync();
+
       // Mark initial load as complete - data is already in cellData, no need to repopulate
       initialLoadCompleteRef.current = true;
       lastMultiSheetDataRef.current = multiSheetData;
@@ -311,6 +367,58 @@ export const UniverSpreadsheet = forwardRef<
         if (onActiveSheetChangedRef.current) {
           onActiveSheetChangedRef.current(sheetId);
         }
+      }
+    );
+
+    // Listen for sort events to persist sort state to backend
+    const sortDisposable = instance.univerAPI.addEvent(
+      instance.univerAPI.Event.SheetRangeSorted,
+      (params: { worksheet: { getSheetId: () => string }; sortColumn: { column: number; ascending: boolean }[] }) => {
+        if (isRestoringSortRef.current) return;
+
+        const sheetId = params.worksheet.getSheetId();
+        const sheets = multiSheetDataRef.current?.sheets;
+        const sheetData = sheets?.find((s) => s.id === sheetId);
+        if (!sheetData) {
+          logDebug("Sort event for unknown sheet", { sheetId });
+          return;
+        }
+
+        const headers = headersMapRef.current.get(sheetId) ?? [];
+        if (params.sortColumn.length === 0) {
+          ipc.clearSortState(sheetData.path, sheetData.name).catch((e) => {
+            logDebug("Failed to clear sort state", { error: String(e) });
+          });
+          logInfo("Sort cleared", { sheetId, sheetName: sheetData.name });
+          return;
+        }
+
+        const sortSpec = params.sortColumn[0];
+        const columnName = headers[sortSpec.column];
+        if (!columnName) {
+          logDebug("Sort column index out of range", {
+            columnIndex: sortSpec.column,
+            headerCount: headers.length,
+          });
+          return;
+        }
+
+        const direction: ipc.SortDirection = sortSpec.ascending
+          ? "ascending"
+          : "descending";
+        ipc.setSortState(sheetData.path, sheetData.name, {
+          column: columnName,
+          direction,
+        }).catch((e) => {
+          logDebug("Failed to persist sort state", { error: String(e) });
+        });
+
+        logInfo("Sort applied", {
+          sheetId,
+          sheetName: sheetData.name,
+          column: columnName,
+          direction,
+        });
       }
     );
 
@@ -363,6 +471,7 @@ export const UniverSpreadsheet = forwardRef<
 
     return () => {
       activeSheetDisposable.dispose();
+      sortDisposable.dispose();
       derivedValueSub.dispose();
       if (imageCellRendererRef.current) {
         imageCellRendererRef.current.clearAll();
