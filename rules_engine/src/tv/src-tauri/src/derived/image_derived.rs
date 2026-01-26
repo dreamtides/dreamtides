@@ -1,8 +1,10 @@
 use std::io::Cursor;
 use std::sync::Arc;
+use std::thread;
 
 use crate::derived::derived_types::{DerivedFunction, DerivedResult, LookupContext, RowData};
 use crate::images::image_cache::ImageCache;
+use crate::images::image_fetcher::{browser_headers, DOWNLOAD_DELAY};
 
 /// Default URL template for image lookup.
 /// Uses `{image_number}` as placeholder for the image identifier.
@@ -33,6 +35,7 @@ impl ImageDerivedFunction {
     pub fn with_template(cache: Arc<ImageCache>, template: impl Into<String>) -> Self {
         let client = reqwest::blocking::Client::builder()
             .timeout(std::time::Duration::from_secs(DEFAULT_FETCH_TIMEOUT_SECS))
+            .default_headers(browser_headers())
             .build()
             .expect("Failed to create blocking HTTP client");
         Self { url_template: template.into(), cache, client }
@@ -106,6 +109,7 @@ impl ImageDerivedFunction {
                     size = bytes.len(),
                     "Image fetched and cached"
                 );
+                thread::sleep(DOWNLOAD_DELAY);
                 DerivedResult::Image(cached_path.to_string_lossy().to_string())
             }
             Err(e) => DerivedResult::Error(format!(

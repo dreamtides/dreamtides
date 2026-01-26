@@ -3,6 +3,9 @@ use std::path::{Path, PathBuf};
 use std::sync::Arc;
 use std::time::Duration;
 
+use reqwest::header::{
+    HeaderMap, HeaderValue, ACCEPT, ACCEPT_ENCODING, ACCEPT_LANGUAGE, REFERER, USER_AGENT,
+};
 use tokio::sync::Semaphore;
 
 use crate::derived::function_registry;
@@ -15,11 +18,33 @@ const DEFAULT_FETCH_TIMEOUT: Duration = Duration::from_secs(30);
 /// Default maximum concurrent fetches.
 const DEFAULT_MAX_CONCURRENT_FETCHES: usize = 4;
 
+/// Delay between consecutive remote image downloads to avoid overwhelming servers.
+pub const DOWNLOAD_DELAY: Duration = Duration::from_millis(200);
+
 /// Content-type prefixes that indicate valid image responses.
 const IMAGE_CONTENT_TYPE_PREFIX: &str = "image/";
 
 /// Content-type value for binary octet-stream (accepted as potentially valid).
 const OCTET_STREAM_CONTENT_TYPE: &str = "application/octet-stream";
+
+/// Returns browser-like HTTP headers for image download requests.
+pub fn browser_headers() -> HeaderMap {
+    let mut headers = HeaderMap::new();
+    headers.insert(
+        USER_AGENT,
+        HeaderValue::from_static(
+            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+        ),
+    );
+    headers.insert(
+        ACCEPT,
+        HeaderValue::from_static("image/avif,image/webp,image/apng,image/*,*/*;q=0.8"),
+    );
+    headers.insert(ACCEPT_LANGUAGE, HeaderValue::from_static("en-US,en;q=0.9"));
+    headers.insert(ACCEPT_ENCODING, HeaderValue::from_static("gzip, deflate, br"));
+    headers.insert(REFERER, HeaderValue::from_static("https://www.google.com/"));
+    headers
+}
 
 /// Async image fetcher with HTTP support, image validation, and cache integration.
 ///
@@ -46,6 +71,7 @@ impl ImageFetcher {
     ) -> Result<Self, TvError> {
         let client = reqwest::Client::builder()
             .timeout(timeout)
+            .default_headers(browser_headers())
             .pool_max_idle_per_host(max_concurrent)
             .build()
             .map_err(|e| TvError::ImageFetchError {
@@ -164,6 +190,8 @@ impl ImageFetcher {
             size = bytes.len(),
             "Image fetched and cached"
         );
+
+        tokio::time::sleep(DOWNLOAD_DELAY).await;
 
         Ok(cached_path)
     }
