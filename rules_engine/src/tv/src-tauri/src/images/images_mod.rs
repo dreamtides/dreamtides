@@ -1,1 +1,1 @@
-// Stub module for Phase 9: Images
+pub mod image_cache;
