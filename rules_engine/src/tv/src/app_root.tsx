@@ -402,11 +402,16 @@ export function AppRoot() {
       }
     });
 
+    const derivedFailedSub = ipc.onDerivedFunctionFailed((payload) => {
+      setError(`Derived column function "${payload.function_name}" failed: ${payload.error}`);
+    });
+
     return () => {
       fileChangedSub.dispose();
       derivedValueSub.dispose();
       syncStateSub.dispose();
       conflictSub.dispose();
+      derivedFailedSub.dispose();
     };
   }, [sheets, reloadSheet]);
 

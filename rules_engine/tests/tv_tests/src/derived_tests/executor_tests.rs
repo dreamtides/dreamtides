@@ -576,9 +576,9 @@ fn test_execute_computation_function_not_found() {
     let row_data = HashMap::new();
     let context = LookupContext::new();
 
-    let result = execute_computation("nonexistent_function", &row_data, &context);
+    let outcome = execute_computation("nonexistent_function", &row_data, &context);
 
-    match result {
+    match outcome.result {
         DerivedResult::Error(msg) => {
             assert!(msg.contains("not found"), "Error should mention not found: {msg}");
         }
@@ -593,9 +593,9 @@ fn test_executor_computes_value() {
     row_data.insert("image_number".to_string(), serde_json::json!("42"));
     let context = LookupContext::new();
 
-    let result = execute_computation("image_url", &row_data, &context);
+    let outcome = execute_computation("image_url", &row_data, &context);
 
-    match result {
+    match outcome.result {
         DerivedResult::Image(url) => {
             assert!(url.contains("42"), "Image URL should contain the image number: {url}");
         }
@@ -610,9 +610,9 @@ fn test_executor_computes_value_with_numeric_input() {
     row_data.insert("image_number".to_string(), serde_json::json!(99));
     let context = LookupContext::new();
 
-    let result = execute_computation("image_url", &row_data, &context);
+    let outcome = execute_computation("image_url", &row_data, &context);
 
-    match result {
+    match outcome.result {
         DerivedResult::Image(url) => {
             assert!(url.contains("99"), "Image URL should contain the number: {url}");
         }
@@ -626,9 +626,9 @@ fn test_executor_computes_empty_value_for_missing_input() {
     let row_data: RowData = HashMap::new();
     let context = LookupContext::new();
 
-    let result = execute_computation("image_url", &row_data, &context);
+    let outcome = execute_computation("image_url", &row_data, &context);
 
-    match result {
+    match outcome.result {
         DerivedResult::Text(text) => {
             assert!(text.is_empty(), "Missing input should produce empty text: {text}");
         }
@@ -642,9 +642,10 @@ fn test_executor_catches_panic() {
     let row_data: RowData = HashMap::new();
     let context = LookupContext::new();
 
-    let result = execute_computation("test_panic_function", &row_data, &context);
+    let outcome = execute_computation("test_panic_function", &row_data, &context);
+    assert!(outcome.panicked, "Should report panic");
 
-    match result {
+    match outcome.result {
         DerivedResult::Error(msg) => {
             assert!(msg.contains("panicked"), "Error should mention panic: {msg}");
             assert!(
@@ -662,15 +663,15 @@ fn test_executor_catches_panic_returns_error_not_crash() {
     let row_data: RowData = HashMap::new();
     let context = LookupContext::new();
 
-    let result = execute_computation("test_panic_function", &row_data, &context);
+    let outcome = execute_computation("test_panic_function", &row_data, &context);
     assert!(
-        matches!(result, DerivedResult::Error(_)),
+        matches!(outcome.result, DerivedResult::Error(_)),
         "Panicking function should produce Error variant, not crash"
     );
 
-    let result2 = execute_computation("image_url", &row_data, &context);
+    let outcome2 = execute_computation("image_url", &row_data, &context);
     assert!(
-        !matches!(result2, DerivedResult::Error(ref msg) if msg.contains("panic")),
+        !matches!(outcome2.result, DerivedResult::Error(ref msg) if msg.contains("panic")),
         "Subsequent computations should work normally after a panic"
     );
 }

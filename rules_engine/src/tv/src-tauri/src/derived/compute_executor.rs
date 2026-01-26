@@ -1,4 +1,4 @@
-use std::collections::VecDeque;
+use std::collections::{HashMap, VecDeque};
 use std::panic::{self, AssertUnwindSafe};
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, Mutex, RwLock};
@@ -50,20 +50,28 @@ pub struct ComputeExecutorState {
     executor: RwLock<Option<ComputeExecutor>>,
 }
 
+/// Result of a single derived function computation.
+#[derive(Debug)]
+pub struct ComputationOutcome {
+    /// The computed result.
+    pub result: DerivedResult,
+    /// Whether the function panicked during execution.
+    pub panicked: bool,
+}
+
 /// Executes a single derived function computation, catching panics at the
 /// task boundary and converting them to `DerivedResult::Error`.
 pub fn execute_computation(
     function_name: &str,
     row_data: &RowData,
     context: &LookupContext,
-) -> DerivedResult {
+) -> ComputationOutcome {
     let result = global_registry().with_function(function_name, |function| {
-        let panic_result = panic::catch_unwind(AssertUnwindSafe(|| {
-            function.compute(row_data, context)
-        }));
+        let panic_result =
+            panic::catch_unwind(AssertUnwindSafe(|| function.compute(row_data, context)));
 
         match panic_result {
-            Ok(result) => result,
+            Ok(result) => ComputationOutcome { result, panicked: false },
             Err(panic_info) => {
                 let panic_message = if let Some(s) = panic_info.downcast_ref::<&str>() {
                     s.to_string()
@@ -73,28 +81,20 @@ pub fn execute_computation(
                     "Unknown panic".to_string()
                 };
 
-                tracing::error!(
-                    component = "tv.derived.executor",
-                    function_name = %function_name,
-                    panic_message = %panic_message,
-                    "Derived function panicked"
-                );
-
-                DerivedResult::Error(format!("Function panicked: {panic_message}"))
+                ComputationOutcome {
+                    result: DerivedResult::Error(format!("Function panicked: {panic_message}")),
+                    panicked: true,
+                }
             }
         }
     });
 
     match result {
-        Some(r) => r,
-        None => {
-            tracing::error!(
-                component = "tv.derived.executor",
-                function_name = %function_name,
-                "Derived function not found"
-            );
-            DerivedResult::Error(format!("Function not found: {function_name}"))
-        }
+        Some(outcome) => outcome,
+        None => ComputationOutcome {
+            result: DerivedResult::Error(format!("Function not found: {function_name}")),
+            panicked: false,
+        },
     }
 }
 
@@ -116,6 +116,9 @@ pub struct ComputeExecutor {
     is_running: Arc<AtomicBool>,
     /// Channel to send shutdown signals.
     shutdown_tx: Option<mpsc::Sender<()>>,
+    /// Functions that have permanently failed (e.g. due to panic).
+    /// Maps function name to error message.
+    failed_functions: Arc<Mutex<HashMap<String, String>>>,
 }
 
 impl ComputeExecutor {
@@ -147,6 +150,7 @@ impl ComputeExecutor {
             lookup_context: Arc::new(RwLock::new(LookupContext::new())),
             is_running: Arc::new(AtomicBool::new(false)),
             shutdown_tx: None,
+            failed_functions: Arc::new(Mutex::new(HashMap::new())),
         })
     }
 
@@ -243,6 +247,7 @@ impl ComputeExecutor {
         let generation_tracker = Arc::clone(&self.generation_tracker);
         let lookup_context = Arc::clone(&self.lookup_context);
         let is_running = Arc::clone(&self.is_running);
+        let failed_functions = Arc::clone(&self.failed_functions);
 
         self.runtime.spawn(async move {
             tracing::info!(
@@ -280,20 +285,67 @@ impl ComputeExecutor {
                             continue;
                         }
 
-                        // Execute the computation on a blocking thread to avoid
-                        // tokio runtime nesting issues (e.g. reqwest::blocking
-                        // creates its own runtime internally).
-                        let ctx_ref = Arc::clone(&lookup_context);
-                        let fn_name = req.function_name.clone();
-                        let row_data = req.row_data.clone();
-                        let result = tokio::task::spawn_blocking(move || {
-                            let context = ctx_ref.read().expect("Lookup context lock poisoned");
-                            execute_computation(&fn_name, &row_data, &context)
-                        })
-                        .await
-                        .unwrap_or_else(|e| {
-                            DerivedResult::Error(format!("Computation task failed: {e}"))
-                        });
+                        // Check if this function has permanently failed
+                        let cached_error = {
+                            let failed = failed_functions
+                                .lock()
+                                .expect("Failed functions lock poisoned");
+                            failed.get(&req.function_name).cloned()
+                        };
+
+                        let result = if let Some(error_msg) = cached_error {
+                            // Function already failed; emit cached error without executing
+                            DerivedResult::Error(error_msg)
+                        } else {
+                            // Execute the computation on a blocking thread to avoid
+                            // tokio runtime nesting issues (e.g. reqwest::blocking
+                            // creates its own runtime internally).
+                            let ctx_ref = Arc::clone(&lookup_context);
+                            let fn_name = req.function_name.clone();
+                            let row_data = req.row_data.clone();
+                            let outcome = tokio::task::spawn_blocking(move || {
+                                let context =
+                                    ctx_ref.read().expect("Lookup context lock poisoned");
+                                execute_computation(&fn_name, &row_data, &context)
+                            })
+                            .await
+                            .unwrap_or_else(|e| ComputationOutcome {
+                                result: DerivedResult::Error(format!(
+                                    "Computation task failed: {e}"
+                                )),
+                                panicked: false,
+                            });
+
+                            if outcome.panicked {
+                                let error_msg = match &outcome.result {
+                                    DerivedResult::Error(msg) => msg.clone(),
+                                    _ => "Unknown error".to_string(),
+                                };
+                                let mut failed = failed_functions
+                                    .lock()
+                                    .expect("Failed functions lock poisoned");
+                                failed.insert(req.function_name.clone(), error_msg.clone());
+
+                                tracing::error!(
+                                    component = "tv.derived.executor",
+                                    function_name = %req.function_name,
+                                    error = %error_msg,
+                                    "Derived function panicked; skipping all future invocations"
+                                );
+
+                                // Emit a dedicated event so the frontend can show
+                                // a single error banner.
+                                let _ = app_handle.emit(
+                                    "derived-function-failed",
+                                    serde_json::json!({
+                                        "function_name": req.function_name,
+                                        "error": error_msg,
+                                    }),
+                                );
+                            }
+
+                            outcome.result
+                        };
 
                         // Check again if result is still current before emitting
                         if !generation_tracker.is_generation_current(&req.row_key, req.generation) {

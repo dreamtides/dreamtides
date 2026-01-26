@@ -404,6 +404,11 @@ export interface SyncConflictPayload {
   message: string;
 }
 
+export interface DerivedFunctionFailedPayload {
+  function_name: string;
+  error: string;
+}
+
 // ============ Commands ============
 
 export async function loadTomlTable(
@@ -872,6 +877,24 @@ export function onSyncConflict(
   let unlisten: UnlistenFn | null = null;
 
   listen<SyncConflictPayload>("sync-conflict-detected", (event) => {
+    callback(event.payload);
+  }).then((fn) => {
+    unlisten = fn;
+  });
+
+  return {
+    dispose: () => {
+      if (unlisten) unlisten();
+    },
+  };
+}
+
+export function onDerivedFunctionFailed(
+  callback: (payload: DerivedFunctionFailedPayload) => void
+): Disposable {
+  let unlisten: UnlistenFn | null = null;
+
+  listen<DerivedFunctionFailedPayload>("derived-function-failed", (event) => {
     callback(event.payload);
   }).then((fn) => {
     unlisten = fn;
