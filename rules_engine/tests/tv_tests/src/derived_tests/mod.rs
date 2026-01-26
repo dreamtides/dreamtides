@@ -2,6 +2,7 @@ mod card_lookup_tests;
 mod executor_tests;
 mod fluent_integration_tests;
 mod generation_tracker_tests;
+mod image_derived_tests;
 mod registry_tests;
 mod result_cache_tests;
 mod rich_text_converter_tests;
