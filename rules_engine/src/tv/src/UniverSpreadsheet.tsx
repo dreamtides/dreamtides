@@ -7,7 +7,7 @@ import {
   disposeUniverInstance,
   UniverInstance,
 } from "./univer_config";
-import type { TomlTableData, EnumValidationInfo, DerivedColumnInfo, DerivedResultValue, ResolvedTableStyle } from "./ipc_bridge";
+import type { TomlTableData, EnumValidationInfo, DerivedColumnInfo, DerivedResultValue, ResolvedTableStyle, CellFormatResult } from "./ipc_bridge";
 import * as ipc from "./ipc_bridge";
 import { derivedResultToCellData } from "./rich_text_utils";
 import { ImageCellRenderer } from "./image_cell_renderer";
@@ -137,6 +137,8 @@ export const UniverSpreadsheet = forwardRef<
   const isRestoringSortRef = useRef(false);
   // Track resolved table styles per sheet path
   const tableStylesRef = useRef<Map<string, ResolvedTableStyle>>(new Map());
+  // Track conditional formatting results per sheet path
+  const conditionalFormatsRef = useRef<Map<string, CellFormatResult[]>>(new Map());
 
   onChangeRef.current = onChange;
   onActiveSheetChangedRef.current = onActiveSheetChanged;
@@ -359,6 +361,44 @@ export const UniverSpreadsheet = forwardRef<
         }
       };
       loadTableStylesAsync();
+
+      // Load and apply conditional formatting for all sheets
+      const loadConditionalFormattingAsync = async () => {
+        const workbook = instance.univerAPI.getActiveWorkbook();
+        if (!workbook) return;
+
+        for (const sheetData of multiSheetData.sheets) {
+          try {
+            const rowsAsJson = sheetData.data.rows.map((row) =>
+              row.map((cell) => (cell === null ? null : cell))
+            );
+            const results = await ipc.getConditionalFormatting(
+              sheetData.path,
+              sheetData.data.headers,
+              rowsAsJson
+            );
+            if (results.length === 0) continue;
+
+            conditionalFormatsRef.current.set(sheetData.path, results);
+            const sheet = workbook.getSheetBySheetId(sheetData.id);
+            if (sheet) {
+              applyConditionalFormatting(sheet, results);
+              logInfo("Applied conditional formatting", {
+                sheetId: sheetData.id,
+                sheetName: sheetData.name,
+                matchCount: results.length,
+              });
+            }
+          } catch (e) {
+            logDebug("Failed to load conditional formatting", {
+              sheetId: sheetData.id,
+              path: sheetData.path,
+              error: String(e),
+            });
+          }
+        }
+      };
+      loadConditionalFormattingAsync();
 
       // Mark initial load as complete - data is already in cellData, no need to repopulate
       initialLoadCompleteRef.current = true;
@@ -650,6 +690,31 @@ export const UniverSpreadsheet = forwardRef<
       if (cachedStyle) {
         applyTableStyle(sheet, sheetData.data, cachedStyle);
       }
+
+      // Re-evaluate and apply conditional formatting after data update
+      const reevaluateConditionalFormatting = async () => {
+        try {
+          const rowsAsJson = sheetData.data.rows.map((row) =>
+            row.map((cell) => (cell === null ? null : cell))
+          );
+          const results = await ipc.getConditionalFormatting(
+            sheetData.path,
+            sheetData.data.headers,
+            rowsAsJson
+          );
+          conditionalFormatsRef.current.set(sheetData.path, results);
+          const ws = workbook.getSheetBySheetId(sheetData.id);
+          if (ws && results.length > 0) {
+            applyConditionalFormatting(ws, results);
+          }
+        } catch (e) {
+          logDebug("Failed to re-evaluate conditional formatting", {
+            sheetId: sheetData.id,
+            error: String(e),
+          });
+        }
+      };
+      reevaluateConditionalFormatting();
     }
 
     lastMultiSheetDataRef.current = multiSheetData;
@@ -1119,6 +1184,43 @@ function applyTableStyle(
         if (colRange) {
           colRange.setBackgroundColor(accentBg + "33");
         }
+      }
+    }
+  }
+}
+
+/**
+ * Applies conditional formatting results to cells in a sheet.
+ * Each result specifies a row, column index, and style to apply.
+ * Conditional formatting runs after table color scheme application
+ * so that conditional styles override base table styling.
+ */
+function applyConditionalFormatting(
+  sheet: FWorksheet,
+  results: CellFormatResult[]
+): void {
+  for (const result of results) {
+    const cellRow = result.row + 1; // +1 for header row
+    const range = sheet.getRange(cellRow, result.col_index, 1, 1);
+    if (!range) continue;
+
+    if (result.style.background_color) {
+      range.setBackgroundColor(result.style.background_color);
+    }
+    if (result.style.font_color) {
+      range.setFontColor(result.style.font_color);
+    }
+    if (result.style.bold === true) {
+      range.setFontWeight("bold");
+    }
+    if (result.style.italic === true) {
+      range.setFontStyle("italic");
+    }
+    if (result.style.underline === true) {
+      // Underline via setUnderline if available on FRange; cast to access optional API
+      const rangeAny = range as unknown as Record<string, unknown>;
+      if (typeof rangeAny.setUnderline === "function") {
+        (rangeAny.setUnderline as (v: boolean) => void)(true);
       }
     }
   }

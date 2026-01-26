@@ -1,5 +1,6 @@
 use crate::error::error_types::TvError;
 use crate::toml::color_schemes::{self, ColorPalette};
+use crate::toml::conditional_formatting::{self, CellFormatResult};
 use crate::toml::metadata_parser;
 use crate::toml::metadata_types::TableStyle;
 
@@ -56,6 +57,44 @@ pub fn get_table_style(file_path: String) -> Result<Option<ResolvedTableStyle>, 
 #[tauri::command]
 pub fn get_available_color_schemes() -> Vec<String> {
     color_schemes::available_schemes().into_iter().map(String::from).collect()
+}
+
+/// Tauri command to evaluate conditional formatting rules for a TOML file.
+#[tauri::command]
+pub fn get_conditional_formatting(
+    file_path: String,
+    headers: Vec<String>,
+    rows: Vec<Vec<serde_json::Value>>,
+) -> Result<Vec<CellFormatResult>, TvError> {
+    tracing::debug!(
+        component = "tv.commands.style",
+        file_path = %file_path,
+        row_count = rows.len(),
+        "Evaluating conditional formatting"
+    );
+
+    let rules = metadata_parser::parse_conditional_formatting_from_file(&file_path)?;
+
+    if rules.is_empty() {
+        tracing::debug!(
+            component = "tv.commands.style",
+            file_path = %file_path,
+            "No conditional formatting rules found"
+        );
+        return Ok(Vec::new());
+    }
+
+    let results = conditional_formatting::evaluate_rules(&rules, &headers, &rows);
+
+    tracing::debug!(
+        component = "tv.commands.style",
+        file_path = %file_path,
+        rule_count = rules.len(),
+        result_count = results.len(),
+        "Conditional formatting evaluated"
+    );
+
+    Ok(results)
 }
 
 fn resolve_palette(style: &TableStyle) -> Option<ColorPalette> {

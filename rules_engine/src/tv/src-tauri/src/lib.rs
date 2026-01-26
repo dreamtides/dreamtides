@@ -141,6 +141,7 @@ pub fn run(paths: cli::AppPaths, jsonl: bool) {
             commands::validation_command::get_enum_validation_rules,
             commands::style_command::get_table_style,
             commands::style_command::get_available_color_schemes,
+            commands::style_command::get_conditional_formatting,
             commands::image_command::fetch_image,
             commands::log_command::log_message,
             get_app_paths,

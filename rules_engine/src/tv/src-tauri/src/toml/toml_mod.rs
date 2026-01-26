@@ -1,4 +1,5 @@
 pub mod color_schemes;
+pub mod conditional_formatting;
 pub mod document_loader;
 pub mod document_writer;
 pub mod metadata_parser;

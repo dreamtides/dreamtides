@@ -618,6 +618,25 @@ export async function getAvailableColorSchemes(): Promise<string[]> {
   return invoke<string[]>("get_available_color_schemes");
 }
 
+export interface CellFormatResult {
+  row: number;
+  column: string;
+  col_index: number;
+  style: FormatStyle;
+}
+
+export async function getConditionalFormatting(
+  filePath: string,
+  headers: string[],
+  rows: unknown[][]
+): Promise<CellFormatResult[]> {
+  return invoke<CellFormatResult[]>("get_conditional_formatting", {
+    filePath,
+    headers,
+    rows,
+  });
+}
+
 // ============ Logging Commands ============
 
 export interface FrontendLogMessage {
