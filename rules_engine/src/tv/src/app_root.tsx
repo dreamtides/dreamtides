@@ -9,6 +9,19 @@ export type { TomlTableData };
 
 const SAVE_DEBOUNCE_MS = 500;
 
+function isBooleanNumericEqual(
+  a: string | number | boolean | null,
+  b: string | number | boolean | null
+): boolean {
+  if (typeof a === "boolean" && typeof b === "number") {
+    return (a === true && b === 1) || (a === false && b === 0);
+  }
+  if (typeof a === "number" && typeof b === "boolean") {
+    return (a === 1 && b === true) || (a === 0 && b === false);
+  }
+  return false;
+}
+
 /**
  * Compares two TomlTableData objects for equality.
  * Returns true if headers and all cell values are identical.
@@ -29,10 +42,13 @@ function isDataEqual(a: TomlTableData, b: TomlTableData): boolean {
     for (let colIdx = 0; colIdx < rowA.length; colIdx++) {
       const cellA = rowA[colIdx];
       const cellB = rowB[colIdx];
-      // Compare values, treating null and undefined as equal
+      // Compare values, treating null and undefined as equal,
+      // and boolean/numeric equivalence (true===1, false===0) for checkbox cells
       if (cellA !== cellB) {
-        // Handle null/undefined equivalence
         if ((cellA === null || cellA === undefined) && (cellB === null || cellB === undefined)) {
+          continue;
+        }
+        if (isBooleanNumericEqual(cellA, cellB)) {
           continue;
         }
         return false;

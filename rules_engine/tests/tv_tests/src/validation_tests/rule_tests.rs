@@ -157,7 +157,7 @@ fn test_type_validation_boolean_string_false_fail() {
 }
 
 #[test]
-fn test_type_validation_boolean_integer_fail() {
+fn test_type_validation_boolean_accepts_numeric_0_and_1() {
     let rule = ValidationRule::Type {
         column: "active".to_string(),
         value_type: ValueType::Boolean,
@@ -165,7 +165,13 @@ fn test_type_validation_boolean_integer_fail() {
     };
 
     let result = validate(&rule, &json!(1));
-    assert!(!result.valid, "Integer 1 should fail boolean type validation");
+    assert!(result.valid, "Integer 1 should pass boolean type validation (checkbox true)");
+
+    let result = validate(&rule, &json!(0));
+    assert!(result.valid, "Integer 0 should pass boolean type validation (checkbox false)");
+
+    let result = validate(&rule, &json!(2));
+    assert!(!result.valid, "Integer 2 should fail boolean type validation");
 }
 
 #[test]

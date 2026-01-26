@@ -194,7 +194,9 @@ fn validate_type(
             value.is_i64() || value.is_u64() || matches!(value.as_f64(), Some(f) if f.fract() == 0.0)
         }
         ValueType::Float => value.is_f64() || value.is_i64() || value.is_u64(),
-        ValueType::Boolean => value.is_boolean(),
+        ValueType::Boolean => {
+            value.is_boolean() || matches!(value.as_i64(), Some(0) | Some(1))
+        }
     };
 
     if type_matches {

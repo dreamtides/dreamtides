@@ -1,5 +1,5 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef } from "react";
-import { Univer, IWorkbookData } from "@univerjs/core";
+import { Univer, IWorkbookData, CellValueType } from "@univerjs/core";
 import { FUniver, FWorksheet } from "@univerjs/core/facade";
 
 import {
@@ -709,9 +709,13 @@ export const UniverSpreadsheet = forwardRef<
       if (data.rows.length > 0) {
         const dataRange = sheet.getRange(1, 0, data.rows.length, numColumns);
         if (dataRange) {
-          // Convert null values to empty strings for display
+          // Convert null values to empty strings and booleans to 1/0 for display
           const displayRows = data.rows.map((row) =>
-            row.map((cellValue) => (cellValue === null ? "" : cellValue))
+            row.map((cellValue) => {
+              if (cellValue === null) return "";
+              if (typeof cellValue === "boolean") return cellValue ? 1 : 0;
+              return cellValue;
+            })
           );
           dataRange.setValues(displayRows);
         }
@@ -990,7 +994,14 @@ function buildMultiSheetWorkbook(multiSheetData: MultiSheetData): IWorkbookData 
       cellData[rowIndex + 1] = {};
       row.forEach((cellValue, colIndex) => {
         if (cellValue !== null) {
-          cellData[rowIndex + 1][colIndex] = { v: cellValue };
+          if (typeof cellValue === "boolean") {
+            cellData[rowIndex + 1][colIndex] = {
+              v: cellValue ? 1 : 0,
+              t: CellValueType.BOOLEAN,
+            };
+          } else {
+            cellData[rowIndex + 1][colIndex] = { v: cellValue };
+          }
         }
       });
     });
@@ -1077,9 +1088,13 @@ function populateSheetDataBatch(sheet: SheetFacade, data: TomlTableData): void {
   if (data.rows.length > 0) {
     const dataRange = sheet.getRange(1, 0, data.rows.length, numColumns);
     if (dataRange) {
-      // Convert null values to empty strings for display
+      // Convert null values to empty strings and booleans to 1/0 for display
       const displayRows = data.rows.map((row) =>
-        row.map((cellValue) => (cellValue === null ? "" : cellValue))
+        row.map((cellValue) => {
+          if (cellValue === null) return "";
+          if (typeof cellValue === "boolean") return cellValue ? 1 : 0;
+          return cellValue;
+        })
       );
       dataRange.setValues(displayRows);
     }
