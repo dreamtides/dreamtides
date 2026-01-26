@@ -3,6 +3,7 @@ use std::sync::{OnceLock, RwLock};
 
 use crate::derived::card_lookup::CardLookupFunction;
 use crate::derived::derived_types::DerivedFunction;
+use crate::derived::image_url::ImageUrlFunction;
 
 /// Global function registry storing all registered derived functions.
 static GLOBAL_REGISTRY: OnceLock<FunctionRegistry> = OnceLock::new();
@@ -73,6 +74,7 @@ pub fn initialize_global_registry() {
     let registry = GLOBAL_REGISTRY.get_or_init(|| {
         let registry = FunctionRegistry::new();
         registry.register(Box::new(CardLookupFunction::new()));
+        registry.register(Box::new(ImageUrlFunction::new()));
         tracing::info!(
             component = "tv.derived.registry",
             function_count = registry.list_functions().len(),
