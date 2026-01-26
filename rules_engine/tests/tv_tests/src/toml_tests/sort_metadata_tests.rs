@@ -373,6 +373,121 @@ fn test_row_mapping_per_file_isolation() {
 }
 
 #[test]
+fn test_sort_by_string_descending() {
+    let data = TomlTableData {
+        headers: vec!["name".to_string(), "age".to_string(), "active".to_string()],
+        rows: vec![
+            vec![serde_json::json!("Charlie"), serde_json::json!(30), serde_json::json!(true)],
+            vec![serde_json::json!("Alice"), serde_json::json!(25), serde_json::json!(false)],
+            vec![serde_json::json!("Bob"), serde_json::json!(35), serde_json::json!(true)],
+        ],
+    };
+
+    let sort_state = SortState::descending("name".to_string());
+    let indices = apply_sort(&data, &sort_state);
+    assert_eq!(indices, vec![0, 2, 1]);
+}
+
+#[test]
+fn test_sort_by_number_column() {
+    let data = TomlTableData {
+        headers: vec!["name".to_string(), "age".to_string()],
+        rows: vec![
+            vec![serde_json::json!("Charlie"), serde_json::json!(30)],
+            vec![serde_json::json!("Alice"), serde_json::json!(25)],
+            vec![serde_json::json!("Bob"), serde_json::json!(35)],
+        ],
+    };
+
+    let sort_state = SortState::ascending("age".to_string());
+    let indices = apply_sort(&data, &sort_state);
+    assert_eq!(indices, vec![1, 0, 2]);
+}
+
+#[test]
+fn test_sort_by_boolean_column() {
+    let data = TomlTableData {
+        headers: vec!["name".to_string(), "active".to_string()],
+        rows: vec![
+            vec![serde_json::json!("Charlie"), serde_json::json!(true)],
+            vec![serde_json::json!("Alice"), serde_json::json!(false)],
+            vec![serde_json::json!("Bob"), serde_json::json!(true)],
+        ],
+    };
+
+    let sort_state = SortState::ascending("active".to_string());
+    let indices = apply_sort(&data, &sort_state);
+    assert_eq!(indices, vec![1, 0, 2]);
+}
+
+#[test]
+fn test_sort_nonexistent_column_returns_identity() {
+    let data = TomlTableData {
+        headers: vec!["name".to_string()],
+        rows: vec![vec![serde_json::json!("Charlie")], vec![serde_json::json!("Alice")], vec![
+            serde_json::json!("Bob"),
+        ]],
+    };
+
+    let sort_state = SortState::ascending("nonexistent".to_string());
+    let indices = apply_sort(&data, &sort_state);
+    assert_eq!(indices, vec![0, 1, 2]);
+}
+
+#[test]
+fn test_reorder_rows_by_indices() {
+    let data = TomlTableData {
+        headers: vec!["name".to_string()],
+        rows: vec![vec![serde_json::json!("Charlie")], vec![serde_json::json!("Alice")], vec![
+            serde_json::json!("Bob"),
+        ]],
+    };
+
+    let indices = vec![2, 0, 1];
+    let reordered = reorder_rows(&data, &indices);
+    assert_eq!(reordered[0][0], serde_json::json!("Bob"));
+    assert_eq!(reordered[1][0], serde_json::json!("Charlie"));
+    assert_eq!(reordered[2][0], serde_json::json!("Alice"));
+}
+
+#[test]
+fn test_apply_sort_to_data_sorts_rows() {
+    let data = TomlTableData {
+        headers: vec!["name".to_string()],
+        rows: vec![vec![serde_json::json!("Charlie")], vec![serde_json::json!("Alice")], vec![
+            serde_json::json!("Bob"),
+        ]],
+    };
+
+    let sort_state = SortState::ascending("name".to_string());
+    let sorted = apply_sort_to_data(data, Some(&sort_state));
+    assert_eq!(sorted.rows[0][0], serde_json::json!("Alice"));
+    assert_eq!(sorted.rows[1][0], serde_json::json!("Bob"));
+    assert_eq!(sorted.rows[2][0], serde_json::json!("Charlie"));
+}
+
+#[test]
+fn test_cell_value_nulls_sort_last() {
+    let null = CellValue::Null;
+    let number = CellValue::Integer(5);
+    assert!(null > number);
+}
+
+#[test]
+fn test_cell_value_integer_vs_float_ordering() {
+    let i = CellValue::Integer(5);
+    let f = CellValue::Float(5.5);
+    assert!(i < f);
+}
+
+#[test]
+fn test_cell_value_boolean_ordering() {
+    let t = CellValue::Boolean(true);
+    let f = CellValue::Boolean(false);
+    assert!(f < t);
+}
+
+#[test]
 fn test_row_mapping_end_to_end_sort_and_translate() {
     let manager = SortStateManager::new();
 

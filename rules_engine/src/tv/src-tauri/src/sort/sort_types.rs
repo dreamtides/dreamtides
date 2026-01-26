@@ -1,3 +1,5 @@
+use std::cmp::Ordering;
+
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Default)]
@@ -78,15 +80,13 @@ impl CellValue {
 }
 
 impl PartialOrd for CellValue {
-    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         Some(self.cmp_values(other))
     }
 }
 
 impl CellValue {
-    pub fn cmp_values(&self, other: &Self) -> std::cmp::Ordering {
-        use std::cmp::Ordering;
-
+    pub fn cmp_values(&self, other: &Self) -> Ordering {
         match (self, other) {
             (CellValue::Null, CellValue::Null) => Ordering::Equal,
             (CellValue::Null, _) => Ordering::Greater,
@@ -105,3 +105,4 @@ impl CellValue {
         }
     }
 }
+

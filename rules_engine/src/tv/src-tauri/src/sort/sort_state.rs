@@ -125,3 +125,4 @@ pub fn apply_sort_to_data_with_mapping(
 pub fn apply_sort_to_data(data: TomlTableData, sort_state: Option<&SortState>) -> TomlTableData {
     apply_sort_to_data_with_mapping(data, sort_state).0
 }
+
