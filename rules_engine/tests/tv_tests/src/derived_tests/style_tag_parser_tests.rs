@@ -1,4 +1,7 @@
 use tv_lib::derived::derived_types::StyledSpan;
+use tv_lib::derived::rich_text_converter::{
+    styled_spans_to_univer_rich_text, FontColor, UnderlineStyle,
+};
 use tv_lib::derived::style_tag_parser::parse_style_tags;
 
 #[test]
@@ -277,4 +280,121 @@ fn test_styled_span_plain_helper() {
     assert!(!span.italic);
     assert!(!span.underline);
     assert!(span.color.is_none());
+}
+
+#[test]
+fn test_empty_tags_produce_no_empty_spans() {
+    let result = parse_style_tags("<b></b>plain");
+    assert_eq!(result.len(), 1);
+    assert_eq!(result[0].text, "plain");
+    assert!(!result[0].bold);
+}
+
+#[test]
+fn test_adjacent_different_styles() {
+    let result = parse_style_tags("<b>bold</b><i>italic</i><u>underline</u>");
+    assert_eq!(result.len(), 3);
+    assert_eq!(result[0].text, "bold");
+    assert!(result[0].bold);
+    assert!(!result[0].italic);
+    assert!(!result[0].underline);
+    assert_eq!(result[1].text, "italic");
+    assert!(!result[1].bold);
+    assert!(result[1].italic);
+    assert!(!result[1].underline);
+    assert_eq!(result[2].text, "underline");
+    assert!(!result[2].bold);
+    assert!(!result[2].italic);
+    assert!(result[2].underline);
+}
+
+#[test]
+fn test_all_styles_combined() {
+    let result = parse_style_tags("<b><i><u><color=#FF0000>all styles</color></u></i></b>");
+    assert_eq!(result.len(), 1);
+    assert_eq!(result[0].text, "all styles");
+    assert!(result[0].bold);
+    assert!(result[0].italic);
+    assert!(result[0].underline);
+    assert_eq!(result[0].color, Some("FF0000".to_string()));
+}
+
+#[test]
+fn test_only_tags_no_text() {
+    let result = parse_style_tags("<b></b><i></i>");
+    assert!(result.is_empty());
+}
+
+#[test]
+fn test_end_to_end_univer_output() {
+    let spans = parse_style_tags("<color=#AA00FF>Foresee</color> 3. Draw a card.");
+    let rich_text = styled_spans_to_univer_rich_text(&spans);
+
+    assert_eq!(rich_text.p.len(), 1);
+    assert_eq!(rich_text.p[0].ts.len(), 2);
+
+    let colored_run = &rich_text.p[0].ts[0];
+    assert_eq!(colored_run.t, "Foresee");
+    assert_eq!(colored_run.s.cl, Some(FontColor { rgb: "AA00FF".to_string() }));
+    assert!(colored_run.s.bl.is_none());
+
+    let plain_run = &rich_text.p[0].ts[1];
+    assert_eq!(plain_run.t, " 3. Draw a card.");
+    assert!(plain_run.s.is_empty());
+}
+
+#[test]
+fn test_end_to_end_bold_italic_univer() {
+    let spans = parse_style_tags("<b>Materialized:</b> <i>Gain 2 energy.</i>");
+    let rich_text = styled_spans_to_univer_rich_text(&spans);
+
+    assert_eq!(rich_text.p[0].ts.len(), 3);
+    assert_eq!(rich_text.p[0].ts[0].t, "Materialized:");
+    assert_eq!(rich_text.p[0].ts[0].s.bl, Some(1));
+    assert!(rich_text.p[0].ts[0].s.it.is_none());
+    assert_eq!(rich_text.p[0].ts[1].t, " ");
+    assert!(rich_text.p[0].ts[1].s.is_empty());
+    assert_eq!(rich_text.p[0].ts[2].t, "Gain 2 energy.");
+    assert_eq!(rich_text.p[0].ts[2].s.it, Some(1));
+    assert!(rich_text.p[0].ts[2].s.bl.is_none());
+}
+
+#[test]
+fn test_end_to_end_all_styles_univer() {
+    let spans = parse_style_tags("<b><i><u><color=#2E7D32>styled</color></u></i></b>");
+    let rich_text = styled_spans_to_univer_rich_text(&spans);
+
+    assert_eq!(rich_text.p[0].ts.len(), 1);
+    let run = &rich_text.p[0].ts[0];
+    assert_eq!(run.t, "styled");
+    assert_eq!(run.s.bl, Some(1));
+    assert_eq!(run.s.it, Some(1));
+    assert_eq!(run.s.ul, Some(UnderlineStyle { s: 1 }));
+    assert_eq!(run.s.cl, Some(FontColor { rgb: "2E7D32".to_string() }));
+}
+
+#[test]
+fn test_end_to_end_json_serialization() {
+    let spans = parse_style_tags("<b>Bold</b> text");
+    let rich_text = styled_spans_to_univer_rich_text(&spans);
+    let json = serde_json::to_value(&rich_text).unwrap();
+
+    assert_eq!(json["p"][0]["ts"][0]["t"], "Bold");
+    assert_eq!(json["p"][0]["ts"][0]["s"]["bl"], 1);
+    assert_eq!(json["p"][0]["ts"][1]["t"], " text");
+}
+
+#[test]
+fn test_multiple_consecutive_angle_brackets() {
+    let result = parse_style_tags("a << b >> c");
+    assert_eq!(result.len(), 1);
+    assert_eq!(result[0].text, "a << b >> c");
+}
+
+#[test]
+fn test_color_tag_with_quotes_not_supported() {
+    let result = parse_style_tags("<color=\"#FF0000\">text</color>");
+    assert_eq!(result.len(), 1);
+    assert!(result[0].text.contains("text"));
+    assert!(result[0].color.is_none());
 }
