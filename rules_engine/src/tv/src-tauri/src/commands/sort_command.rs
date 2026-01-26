@@ -82,6 +82,33 @@ pub fn clear_sort_state(
     SortStateResponse { column: None, direction: None }
 }
 
+#[tauri::command]
+pub fn get_sort_row_mapping(
+    state: State<SortStateManager>,
+    file_path: String,
+    table_name: String,
+) -> Vec<usize> {
+    let mapping = state.get_row_mapping(&file_path, &table_name);
+    tracing::debug!(
+        component = "tv.commands.sort",
+        file_path = %file_path,
+        table_name = %table_name,
+        has_mapping = mapping.is_some(),
+        "Get sort row mapping"
+    );
+    mapping.unwrap_or_default()
+}
+
+#[tauri::command]
+pub fn translate_row_index(
+    state: State<SortStateManager>,
+    file_path: String,
+    table_name: String,
+    display_index: usize,
+) -> usize {
+    state.display_to_original(&file_path, &table_name, display_index)
+}
+
 fn persist_sort_to_metadata(file_path: &str, sort_state: Option<&SortState>) {
     let sort_config = sort_state.map(|s| {
         let ascending = s.direction == SortDirection::Ascending;

@@ -1,4 +1,6 @@
-use tv_lib::sort::sort_state::{apply_sort, apply_sort_to_data, reorder_rows, SortStateManager};
+use tv_lib::sort::sort_state::{
+    apply_sort, apply_sort_to_data, apply_sort_to_data_with_mapping, reorder_rows, SortStateManager,
+};
 use tv_lib::sort::sort_types::{CellValue, SortDirection, SortState};
 use tv_lib::toml::document_loader::TomlTableData;
 use tv_lib::toml::metadata_parser::parse_sort_config_from_content;
@@ -277,4 +279,122 @@ fn test_cell_value_case_insensitive_string_sort() {
 fn test_sort_direction_toggle() {
     assert_eq!(SortDirection::Ascending.toggle(), SortDirection::Descending);
     assert_eq!(SortDirection::Descending.toggle(), SortDirection::Ascending);
+}
+
+#[test]
+fn test_row_mapping_stored_and_retrieved() {
+    let manager = SortStateManager::new();
+    assert!(manager.get_row_mapping("/test.toml", "cards").is_none());
+
+    manager.set_row_mapping("/test.toml", "cards", vec![2, 0, 1]);
+    assert_eq!(manager.get_row_mapping("/test.toml", "cards"), Some(vec![2, 0, 1]));
+}
+
+#[test]
+fn test_display_to_original_translates_correctly() {
+    let manager = SortStateManager::new();
+    manager.set_row_mapping("/test.toml", "cards", vec![2, 0, 1]);
+
+    assert_eq!(manager.display_to_original("/test.toml", "cards", 0), 2);
+    assert_eq!(manager.display_to_original("/test.toml", "cards", 1), 0);
+    assert_eq!(manager.display_to_original("/test.toml", "cards", 2), 1);
+}
+
+#[test]
+fn test_display_to_original_passthrough_without_mapping() {
+    let manager = SortStateManager::new();
+
+    assert_eq!(manager.display_to_original("/test.toml", "cards", 0), 0);
+    assert_eq!(manager.display_to_original("/test.toml", "cards", 5), 5);
+}
+
+#[test]
+fn test_display_to_original_passthrough_out_of_bounds() {
+    let manager = SortStateManager::new();
+    manager.set_row_mapping("/test.toml", "cards", vec![2, 0, 1]);
+
+    assert_eq!(manager.display_to_original("/test.toml", "cards", 10), 10);
+}
+
+#[test]
+fn test_clear_sort_state_also_clears_row_mapping() {
+    let manager = SortStateManager::new();
+    manager.set_sort_state("/test.toml", "cards", Some(SortState::ascending("name".to_string())));
+    manager.set_row_mapping("/test.toml", "cards", vec![2, 0, 1]);
+
+    manager.clear_sort_state("/test.toml", "cards");
+    assert!(manager.get_sort_state("/test.toml", "cards").is_none());
+    assert!(manager.get_row_mapping("/test.toml", "cards").is_none());
+}
+
+#[test]
+fn test_apply_sort_to_data_with_mapping_returns_indices() {
+    let data = TomlTableData {
+        headers: vec!["name".to_string(), "cost".to_string()],
+        rows: vec![
+            vec![serde_json::json!("Charlie"), serde_json::json!(3)],
+            vec![serde_json::json!("Alice"), serde_json::json!(1)],
+            vec![serde_json::json!("Bob"), serde_json::json!(2)],
+        ],
+    };
+
+    let sort_state = SortState::ascending("name".to_string());
+    let (sorted, mapping) = apply_sort_to_data_with_mapping(data, Some(&sort_state));
+
+    assert_eq!(sorted.rows[0][0], serde_json::json!("Alice"));
+    assert_eq!(sorted.rows[1][0], serde_json::json!("Bob"));
+    assert_eq!(sorted.rows[2][0], serde_json::json!("Charlie"));
+
+    let mapping = mapping.expect("Expected mapping for sorted data");
+    assert_eq!(mapping, vec![1, 2, 0]);
+}
+
+#[test]
+fn test_apply_sort_to_data_with_mapping_none_returns_no_mapping() {
+    let data = TomlTableData {
+        headers: vec!["name".to_string()],
+        rows: vec![vec![serde_json::json!("Charlie")], vec![serde_json::json!("Alice")]],
+    };
+
+    let (result, mapping) = apply_sort_to_data_with_mapping(data, None);
+    assert_eq!(result.rows[0][0], serde_json::json!("Charlie"));
+    assert!(mapping.is_none());
+}
+
+#[test]
+fn test_row_mapping_per_file_isolation() {
+    let manager = SortStateManager::new();
+    manager.set_row_mapping("/file_a.toml", "cards", vec![2, 0, 1]);
+    manager.set_row_mapping("/file_b.toml", "cards", vec![1, 0]);
+
+    assert_eq!(manager.get_row_mapping("/file_a.toml", "cards"), Some(vec![2, 0, 1]));
+    assert_eq!(manager.get_row_mapping("/file_b.toml", "cards"), Some(vec![1, 0]));
+    assert!(manager.get_row_mapping("/file_c.toml", "cards").is_none());
+}
+
+#[test]
+fn test_row_mapping_end_to_end_sort_and_translate() {
+    let manager = SortStateManager::new();
+
+    let data = TomlTableData {
+        headers: vec!["name".to_string(), "cost".to_string()],
+        rows: vec![
+            vec![serde_json::json!("Charlie"), serde_json::json!(3)],
+            vec![serde_json::json!("Alice"), serde_json::json!(1)],
+            vec![serde_json::json!("Bob"), serde_json::json!(2)],
+        ],
+    };
+
+    let sort_state = SortState::ascending("name".to_string());
+    let (sorted, mapping) = apply_sort_to_data_with_mapping(data, Some(&sort_state));
+    manager.set_row_mapping("/test.toml", "cards", mapping.unwrap());
+
+    assert_eq!(sorted.rows[0][0], serde_json::json!("Alice"));
+    assert_eq!(manager.display_to_original("/test.toml", "cards", 0), 1);
+
+    assert_eq!(sorted.rows[1][0], serde_json::json!("Bob"));
+    assert_eq!(manager.display_to_original("/test.toml", "cards", 1), 2);
+
+    assert_eq!(sorted.rows[2][0], serde_json::json!("Charlie"));
+    assert_eq!(manager.display_to_original("/test.toml", "cards", 2), 0);
 }

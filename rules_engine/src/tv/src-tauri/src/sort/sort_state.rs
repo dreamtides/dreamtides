@@ -6,11 +6,15 @@ use crate::toml::document_loader::TomlTableData;
 
 pub struct SortStateManager {
     states: RwLock<HashMap<String, SortState>>,
+    row_mappings: RwLock<HashMap<String, Vec<usize>>>,
 }
 
 impl SortStateManager {
     pub fn new() -> Self {
-        Self { states: RwLock::new(HashMap::new()) }
+        Self {
+            states: RwLock::new(HashMap::new()),
+            row_mappings: RwLock::new(HashMap::new()),
+        }
     }
 
     pub fn get_sort_state(&self, file_path: &str, table_name: &str) -> Option<SortState> {
@@ -37,6 +41,33 @@ impl SortStateManager {
         if let Ok(mut states) = self.states.write() {
             states.remove(&key);
         }
+        if let Ok(mut mappings) = self.row_mappings.write() {
+            mappings.remove(&key);
+        }
+    }
+
+    /// Stores a display-to-original row index mapping for a sorted table.
+    pub fn set_row_mapping(&self, file_path: &str, table_name: &str, mapping: Vec<usize>) {
+        let key = format!("{file_path}::{table_name}");
+        if let Ok(mut mappings) = self.row_mappings.write() {
+            mappings.insert(key, mapping);
+        }
+    }
+
+    /// Returns the display-to-original row index mapping, if a sort is active.
+    pub fn get_row_mapping(&self, file_path: &str, table_name: &str) -> Option<Vec<usize>> {
+        let key = format!("{file_path}::{table_name}");
+        self.row_mappings.read().ok()?.get(&key).cloned()
+    }
+
+    /// Translates a display row index to the original TOML row index.
+    pub fn display_to_original(&self, file_path: &str, table_name: &str, display_index: usize) -> usize {
+        let key = format!("{file_path}::{table_name}");
+        self.row_mappings
+            .read()
+            .ok()
+            .and_then(|mappings| mappings.get(&key).and_then(|m| m.get(display_index).copied()))
+            .unwrap_or(display_index)
     }
 }
 
@@ -76,15 +107,23 @@ pub fn reorder_rows(data: &TomlTableData, indices: &[usize]) -> Vec<Vec<serde_js
     indices.iter().filter_map(|&idx| data.rows.get(idx).cloned()).collect()
 }
 
-pub fn apply_sort_to_data(data: TomlTableData, sort_state: Option<&SortState>) -> TomlTableData {
+/// Sorts table data and returns both the sorted data and the display-to-original index mapping.
+pub fn apply_sort_to_data_with_mapping(
+    data: TomlTableData,
+    sort_state: Option<&SortState>,
+) -> (TomlTableData, Option<Vec<usize>>) {
     match sort_state {
         Some(state) => {
             let indices = apply_sort(&data, state);
             let sorted_rows = reorder_rows(&data, &indices);
-            TomlTableData { headers: data.headers, rows: sorted_rows }
+            (TomlTableData { headers: data.headers, rows: sorted_rows }, Some(indices))
         }
-        None => data,
+        None => (data, None),
     }
+}
+
+pub fn apply_sort_to_data(data: TomlTableData, sort_state: Option<&SortState>) -> TomlTableData {
+    apply_sort_to_data_with_mapping(data, sort_state).0
 }
 
 #[cfg(test)]
@@ -175,5 +214,77 @@ mod tests {
 
         manager.clear_sort_state("/path/file.toml", "cards");
         assert!(manager.get_sort_state("/path/file.toml", "cards").is_none());
+    }
+
+    #[test]
+    fn test_row_mapping_storage() {
+        let manager = SortStateManager::new();
+
+        assert!(manager.get_row_mapping("/path/file.toml", "cards").is_none());
+
+        manager.set_row_mapping("/path/file.toml", "cards", vec![2, 0, 1]);
+        assert_eq!(manager.get_row_mapping("/path/file.toml", "cards"), Some(vec![2, 0, 1]));
+    }
+
+    #[test]
+    fn test_display_to_original_with_mapping() {
+        let manager = SortStateManager::new();
+        manager.set_row_mapping("/path/file.toml", "cards", vec![2, 0, 1]);
+
+        assert_eq!(manager.display_to_original("/path/file.toml", "cards", 0), 2);
+        assert_eq!(manager.display_to_original("/path/file.toml", "cards", 1), 0);
+        assert_eq!(manager.display_to_original("/path/file.toml", "cards", 2), 1);
+    }
+
+    #[test]
+    fn test_display_to_original_without_mapping() {
+        let manager = SortStateManager::new();
+
+        assert_eq!(manager.display_to_original("/path/file.toml", "cards", 0), 0);
+        assert_eq!(manager.display_to_original("/path/file.toml", "cards", 5), 5);
+    }
+
+    #[test]
+    fn test_display_to_original_out_of_bounds() {
+        let manager = SortStateManager::new();
+        manager.set_row_mapping("/path/file.toml", "cards", vec![2, 0, 1]);
+
+        assert_eq!(manager.display_to_original("/path/file.toml", "cards", 10), 10);
+    }
+
+    #[test]
+    fn test_clear_sort_state_clears_row_mapping() {
+        let manager = SortStateManager::new();
+        let state = SortState::ascending("name".to_string());
+
+        manager.set_sort_state("/path/file.toml", "cards", Some(state));
+        manager.set_row_mapping("/path/file.toml", "cards", vec![2, 0, 1]);
+
+        manager.clear_sort_state("/path/file.toml", "cards");
+        assert!(manager.get_sort_state("/path/file.toml", "cards").is_none());
+        assert!(manager.get_row_mapping("/path/file.toml", "cards").is_none());
+    }
+
+    #[test]
+    fn test_apply_sort_to_data_with_mapping() {
+        let data = make_test_data();
+        let sort_state = SortState::ascending("name".to_string());
+        let (sorted, mapping) = apply_sort_to_data_with_mapping(data, Some(&sort_state));
+
+        assert_eq!(sorted.rows[0][0], json!("Alice"));
+        assert_eq!(sorted.rows[1][0], json!("Bob"));
+        assert_eq!(sorted.rows[2][0], json!("Charlie"));
+
+        let mapping = mapping.unwrap();
+        assert_eq!(mapping, vec![1, 2, 0]);
+    }
+
+    #[test]
+    fn test_apply_sort_to_data_with_mapping_no_sort() {
+        let data = make_test_data();
+        let (unsorted, mapping) = apply_sort_to_data_with_mapping(data, None);
+
+        assert_eq!(unsorted.rows[0][0], json!("Charlie"));
+        assert!(mapping.is_none());
     }
 }

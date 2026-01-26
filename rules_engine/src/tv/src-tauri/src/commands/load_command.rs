@@ -1,7 +1,7 @@
 use tauri::{AppHandle, State};
 
 use crate::error::error_types::TvError;
-use crate::sort::sort_state::{apply_sort_to_data, SortStateManager};
+use crate::sort::sort_state::{apply_sort_to_data_with_mapping, SortStateManager};
 use crate::sort::sort_types::{SortDirection, SortState};
 use crate::sync::state_machine;
 use crate::toml::document_loader::{self, TomlTableData};
@@ -40,7 +40,11 @@ pub fn load_toml_table(
                 "Applying sort to loaded data"
             );
         }
-        apply_sort_to_data(data, sort_state.as_ref())
+        let (sorted_data, mapping) = apply_sort_to_data_with_mapping(data, sort_state.as_ref());
+        if let Some(indices) = mapping {
+            sort_state_manager.set_row_mapping(&file_path, &table_name, indices);
+        }
+        sorted_data
     })
 }
 

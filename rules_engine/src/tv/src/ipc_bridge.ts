@@ -485,6 +485,25 @@ export async function clearSortState(
   return invoke<SortStateResponse>("clear_sort_state", { filePath, tableName });
 }
 
+export async function getSortRowMapping(
+  filePath: string,
+  tableName: string
+): Promise<number[]> {
+  return invoke<number[]>("get_sort_row_mapping", { filePath, tableName });
+}
+
+export async function translateRowIndex(
+  filePath: string,
+  tableName: string,
+  displayIndex: number
+): Promise<number> {
+  return invoke<number>("translate_row_index", {
+    filePath,
+    tableName,
+    displayIndex,
+  });
+}
+
 // ============ Image Commands ============
 
 /**

@@ -117,6 +117,8 @@ pub fn run(paths: cli::AppPaths, jsonl: bool) {
             commands::sort_command::get_sort_state,
             commands::sort_command::set_sort_state,
             commands::sort_command::clear_sort_state,
+            commands::sort_command::get_sort_row_mapping,
+            commands::sort_command::translate_row_index,
             commands::watch_command::start_file_watcher,
             commands::watch_command::stop_file_watcher,
             commands::derived_command::compute_derived,
