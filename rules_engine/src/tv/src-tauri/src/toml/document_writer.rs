@@ -5,8 +5,11 @@ use serde::{Deserialize, Serialize};
 
 use crate::error::error_types::{map_io_error_for_read, TvError};
 use crate::toml::document_loader::TomlTableData;
+use crate::toml::metadata_parser;
 use crate::toml::value_converter;
 use crate::traits::{AtomicWriteError, FileSystem, RealFileSystem};
+use crate::validation::validation_rules::ValidationRule;
+use crate::validation::validators;
 
 const TEMP_FILE_PREFIX: &str = ".tv_save_";
 
@@ -264,6 +267,17 @@ pub fn save_batch_with_fs(
     table_name: &str,
     updates: &[CellUpdate],
 ) -> Result<SaveBatchResult, TvError> {
+    save_batch_with_fs_and_rules(fs, file_path, table_name, updates, None)
+}
+
+/// Saves multiple cell updates with optional validation rules.
+pub fn save_batch_with_fs_and_rules(
+    fs: &dyn FileSystem,
+    file_path: &str,
+    table_name: &str,
+    updates: &[CellUpdate],
+    rules: Option<&[ValidationRule]>,
+) -> Result<SaveBatchResult, TvError> {
     let start = Instant::now();
 
     tracing::info!(
@@ -291,6 +305,12 @@ pub fn save_batch_with_fs(
         );
         map_io_error_for_read(&e, file_path)
     })?;
+
+    let validation_rules = match rules {
+        Some(r) => r.to_vec(),
+        None => metadata_parser::parse_validation_rules_from_content(&content, file_path)
+            .unwrap_or_default(),
+    };
 
     let mut doc: toml_edit::DocumentMut = content.parse().map_err(|e: toml_edit::TomlError| {
         tracing::error!(
@@ -323,14 +343,40 @@ pub fn save_batch_with_fs(
             failed_updates.push(FailedUpdate {
                 row_index: update.row_index,
                 column_key: update.column_key.clone(),
-                reason: format!("Row index {} out of bounds (max: {})", update.row_index, array_len.saturating_sub(1)),
+                reason: format!(
+                    "Row index {} out of bounds (max: {})",
+                    update.row_index,
+                    array_len.saturating_sub(1)
+                ),
             });
-        } else if !update.value.is_null() && value_converter::json_to_toml_edit(&update.value).is_none() {
+        } else if !update.value.is_null()
+            && value_converter::json_to_toml_edit(&update.value).is_none()
+        {
             failed_updates.push(FailedUpdate {
                 row_index: update.row_index,
                 column_key: update.column_key.clone(),
                 reason: "Unsupported value type".to_string(),
             });
+        } else {
+            let results = validators::validate_all(&validation_rules, &update.column_key, &update.value);
+            if let Some(error) = validators::first_error(&results) {
+                tracing::warn!(
+                    component = "tv.toml.validation",
+                    column = %update.column_key,
+                    row = update.row_index,
+                    rule_type = %error.rule_type,
+                    error = ?error.error_message,
+                    "Validation failed in batch"
+                );
+                failed_updates.push(FailedUpdate {
+                    row_index: update.row_index,
+                    column_key: update.column_key.clone(),
+                    reason: error
+                        .error_message
+                        .clone()
+                        .unwrap_or_else(|| "Validation failed".to_string()),
+                });
+            }
         }
     }
 
@@ -359,8 +405,6 @@ pub fn save_batch_with_fs(
         let table = array.get_mut(update.row_index).unwrap_or_else(|| {
             panic!("Row index {} should be valid after validation", update.row_index)
         });
-        // Use type-preserving conversion to maintain boolean types when the
-        // spreadsheet library returns 0/1 instead of false/true
         if let Some(existing) = table.get(&update.column_key) {
             if let Some(new_value) =
                 value_converter::json_to_toml_edit_preserving_type(&update.value, existing)
@@ -403,6 +447,17 @@ pub fn save_cell_with_fs(
     table_name: &str,
     update: &CellUpdate,
 ) -> Result<SaveCellResult, TvError> {
+    save_cell_with_fs_and_rules(fs, file_path, table_name, update, None)
+}
+
+/// Saves a single cell update with optional validation rules.
+pub fn save_cell_with_fs_and_rules(
+    fs: &dyn FileSystem,
+    file_path: &str,
+    table_name: &str,
+    update: &CellUpdate,
+    rules: Option<&[ValidationRule]>,
+) -> Result<SaveCellResult, TvError> {
     let start = Instant::now();
 
     let content = fs.read_to_string(Path::new(file_path)).map_err(|e| {
@@ -414,6 +469,18 @@ pub fn save_cell_with_fs(
         );
         map_io_error_for_read(&e, file_path)
     })?;
+
+    let validation_rules = match rules {
+        Some(r) => r.to_vec(),
+        None => metadata_parser::parse_validation_rules_from_content(&content, file_path)
+            .unwrap_or_default(),
+    };
+
+    if let Some(error) =
+        validate_cell_value(&validation_rules, &update.column_key, &update.value, update.row_index)
+    {
+        return Err(error);
+    }
 
     let mut doc: toml_edit::DocumentMut = content.parse().map_err(|e: toml_edit::TomlError| {
         tracing::error!(
@@ -449,8 +516,6 @@ pub fn save_cell_with_fs(
         TvError::RowNotFound { table_name: table_name.to_string(), row_index: update.row_index }
     })?;
 
-    // Use type-preserving conversion to maintain boolean types when the
-    // spreadsheet library returns 0/1 instead of false/true
     if let Some(existing) = table.get(&update.column_key) {
         if let Some(new_value) =
             value_converter::json_to_toml_edit_preserving_type(&update.value, existing)
@@ -479,6 +544,31 @@ pub fn save_cell_with_fs(
     );
 
     Ok(SaveCellResult { success: true, generated_values: None })
+}
+
+fn validate_cell_value(
+    rules: &[ValidationRule],
+    column: &str,
+    value: &serde_json::Value,
+    row_index: usize,
+) -> Option<TvError> {
+    let results = validators::validate_all(rules, column, value);
+    if let Some(error) = validators::first_error(&results) {
+        tracing::warn!(
+            component = "tv.toml.validation",
+            column = %column,
+            row = row_index,
+            rule_type = %error.rule_type,
+            error = ?error.error_message,
+            "Validation failed"
+        );
+        return Some(TvError::ValidationFailed {
+            column: column.to_string(),
+            row: row_index,
+            message: error.error_message.clone().unwrap_or_else(|| "Validation failed".to_string()),
+        });
+    }
+    None
 }
 
 /// Result of a row add operation.
