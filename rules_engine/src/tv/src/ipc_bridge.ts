@@ -485,6 +485,19 @@ export async function clearSortState(
   return invoke<SortStateResponse>("clear_sort_state", { filePath, tableName });
 }
 
+// ============ Validation Commands ============
+
+export interface EnumValidationInfo {
+  column: string;
+  allowed_values: string[];
+}
+
+export async function getEnumValidationRules(
+  filePath: string
+): Promise<EnumValidationInfo[]> {
+  return invoke<EnumValidationInfo[]>("get_enum_validation_rules", { filePath });
+}
+
 // ============ Events ============
 
 export type Disposable = { dispose: () => void };

@@ -7,7 +7,8 @@ import {
   disposeUniverInstance,
   UniverInstance,
 } from "./univer_config";
-import type { TomlTableData } from "./ipc_bridge";
+import type { TomlTableData, EnumValidationInfo } from "./ipc_bridge";
+import * as ipc from "./ipc_bridge";
 
 // Component logging tag: tv.ui.sheets
 const LOG_TAG = "tv.ui.sheets";
@@ -109,6 +110,8 @@ export const UniverSpreadsheet = forwardRef<
   const initialLoadCompleteRef = useRef(false);
   // Track last known data for each sheet to detect actual changes
   const lastMultiSheetDataRef = useRef<MultiSheetData | null>(null);
+  // Track enum validation rules per sheet (by file path)
+  const enumRulesRef = useRef<Map<string, EnumValidationInfo[]>>(new Map());
 
   onChangeRef.current = onChange;
   onActiveSheetChangedRef.current = onActiveSheetChanged;
@@ -215,6 +218,38 @@ export const UniverSpreadsheet = forwardRef<
           }
         }
       }
+
+      // Load enum validation rules and apply dropdown validation for all sheets
+      const loadEnumRulesAsync = async () => {
+        const workbook = instance.univerAPI.getActiveWorkbook();
+        if (!workbook) return;
+
+        for (const sheetData of multiSheetData.sheets) {
+          try {
+            const enumRules = await ipc.getEnumValidationRules(sheetData.path);
+            enumRulesRef.current.set(sheetData.path, enumRules);
+
+            if (enumRules.length > 0) {
+              const sheet = workbook.getSheetBySheetId(sheetData.id);
+              if (sheet) {
+                applyDropdownValidation(
+                  instance.univerAPI,
+                  sheet,
+                  sheetData.data,
+                  enumRules
+                );
+              }
+            }
+          } catch (e) {
+            logDebug("Failed to load enum validation rules", {
+              sheetId: sheetData.id,
+              path: sheetData.path,
+              error: String(e),
+            });
+          }
+        }
+      };
+      loadEnumRulesAsync();
 
       // Mark initial load as complete - data is already in cellData, no need to repopulate
       initialLoadCompleteRef.current = true;
@@ -379,6 +414,17 @@ export const UniverSpreadsheet = forwardRef<
         sheetData.data,
         booleanColumns
       );
+
+      // Apply dropdown validation from cached enum rules
+      const cachedEnumRules = enumRulesRef.current.get(sheetData.path);
+      if (cachedEnumRules && cachedEnumRules.length > 0) {
+        applyDropdownValidation(
+          univerAPIRef.current!,
+          sheet,
+          sheetData.data,
+          cachedEnumRules
+        );
+      }
     }
 
     lastMultiSheetDataRef.current = multiSheetData;
@@ -599,6 +645,56 @@ function applyCheckboxValidation(
       logDebug("Applied checkbox validation to column", {
         column: data.headers[colIdx],
         range: rangeAddress,
+      });
+    }
+  }
+}
+
+/**
+ * Apply dropdown (list) data validation to enum columns.
+ * Uses Univer's data validation API to render dropdowns for enum values with type-ahead filtering.
+ */
+function applyDropdownValidation(
+  univerAPI: FUniver,
+  sheet: FWorksheet,
+  data: TomlTableData,
+  enumRules: EnumValidationInfo[]
+): void {
+  if (enumRules.length === 0 || data.rows.length === 0) {
+    return;
+  }
+
+  for (const rule of enumRules) {
+    const colIdx = data.headers.indexOf(rule.column);
+    if (colIdx === -1) {
+      logDebug("Enum column not found in headers, skipping dropdown validation", {
+        column: rule.column,
+      });
+      continue;
+    }
+
+    const colLetter = getColumnLetter(colIdx);
+    const startRow = 2;
+    const endRow = data.rows.length + 1;
+    const rangeAddress = `${colLetter}${startRow}:${colLetter}${endRow}`;
+    const range = sheet.getRange(rangeAddress);
+
+    if (range) {
+      const validationRule = univerAPI
+        .newDataValidation()
+        .requireValueInList(rule.allowed_values, true)
+        .setOptions({
+          allowBlank: true,
+          showErrorMessage: true,
+          error: `Value must be one of: ${rule.allowed_values.join(", ")}`,
+        })
+        .build();
+      range.setDataValidation(validationRule);
+
+      logDebug("Applied dropdown validation to column", {
+        column: rule.column,
+        range: rangeAddress,
+        allowedValues: rule.allowed_values,
       });
     }
   }

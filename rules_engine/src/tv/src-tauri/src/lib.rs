@@ -106,6 +106,8 @@ pub fn run(paths: cli::AppPaths, _jsonl: bool) {
             commands::derived_command::increment_row_generation,
             commands::derived_command::clear_computation_queue,
             commands::derived_command::get_computation_queue_length,
+            commands::validation_command::get_validation_rules,
+            commands::validation_command::get_enum_validation_rules,
             get_app_paths,
         ])
         .setup(|app| {
