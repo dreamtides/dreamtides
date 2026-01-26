@@ -1,5 +1,9 @@
+mod boolean_preservation_tests;
 mod load_tests;
+mod metadata_serializer_tests;
+mod metadata_types_tests;
 mod preservation_tests;
 mod row_operation_tests;
 mod save_tests;
 mod sort_metadata_tests;
+mod value_converter_tests;
