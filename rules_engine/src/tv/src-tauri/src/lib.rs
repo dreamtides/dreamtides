@@ -13,7 +13,7 @@ pub mod derived;
 #[path = "error/error_mod.rs"]
 pub mod error;
 #[path = "images/images_mod.rs"]
-mod images;
+pub mod images;
 #[path = "logging/logging_mod.rs"]
 pub mod logging;
 #[path = "sort/sort_mod.rs"]
