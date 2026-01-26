@@ -69,6 +69,13 @@ impl FilterStateManager {
     /// Returns true if a specific row is visible under the current filter.
     pub fn is_row_visible(&self, file_path: &str, table_name: &str, row_index: usize) -> bool {
         let key = format!("{file_path}::{table_name}");
+        if let Some(hidden) =
+            self.hidden_rows.read().ok().and_then(|h| h.get(&key).cloned())
+        {
+            if hidden.contains(&row_index) {
+                return false;
+            }
+        }
         self.visibility
             .read()
             .ok()
