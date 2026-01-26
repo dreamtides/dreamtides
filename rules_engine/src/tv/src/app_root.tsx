@@ -100,7 +100,12 @@ export function AppRoot() {
     try {
       return await ipc.loadTomlTable(path, tableName);
     } catch (e) {
-      logger.error("Failed to load file", { path, error: String(e) });
+      const msg = String(e);
+      if (msg.includes("not found") || msg.includes("not an array of tables")) {
+        logger.warn("Skipping incompatible file", { path, error: msg });
+      } else {
+        logger.error("Failed to load file", { path, error: msg });
+      }
       return null;
     }
   }, []);
