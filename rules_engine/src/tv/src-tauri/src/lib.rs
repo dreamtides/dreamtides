@@ -130,6 +130,8 @@ pub fn run(paths: cli::AppPaths, jsonl: bool) {
             commands::derived_command::get_derived_columns_config,
             commands::validation_command::get_validation_rules,
             commands::validation_command::get_enum_validation_rules,
+            commands::style_command::get_table_style,
+            commands::style_command::get_available_color_schemes,
             commands::image_command::fetch_image,
             commands::log_command::log_message,
             get_app_paths,

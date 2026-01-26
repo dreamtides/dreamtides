@@ -7,7 +7,7 @@ import {
   disposeUniverInstance,
   UniverInstance,
 } from "./univer_config";
-import type { TomlTableData, EnumValidationInfo, DerivedColumnInfo, DerivedResultValue } from "./ipc_bridge";
+import type { TomlTableData, EnumValidationInfo, DerivedColumnInfo, DerivedResultValue, ResolvedTableStyle } from "./ipc_bridge";
 import * as ipc from "./ipc_bridge";
 import { derivedResultToCellData } from "./rich_text_utils";
 import { ImageCellRenderer } from "./image_cell_renderer";
@@ -135,6 +135,8 @@ export const UniverSpreadsheet = forwardRef<
   multiSheetDataRef.current = multiSheetData;
   // Suppress sort event persistence during initial sort state restoration
   const isRestoringSortRef = useRef(false);
+  // Track resolved table styles per sheet path
+  const tableStylesRef = useRef<Map<string, ResolvedTableStyle>>(new Map());
 
   onChangeRef.current = onChange;
   onActiveSheetChangedRef.current = onActiveSheetChanged;
@@ -325,6 +327,38 @@ export const UniverSpreadsheet = forwardRef<
         }
       };
       restoreSortStateAsync();
+
+      // Load and apply table color schemes for all sheets
+      const loadTableStylesAsync = async () => {
+        const workbook = instance.univerAPI.getActiveWorkbook();
+        if (!workbook) return;
+
+        for (const sheetData of multiSheetData.sheets) {
+          try {
+            const style = await ipc.getTableStyle(sheetData.path);
+            if (!style) continue;
+
+            tableStylesRef.current.set(sheetData.path, style);
+            const sheet = workbook.getSheetBySheetId(sheetData.id);
+            if (sheet) {
+              applyTableStyle(sheet, sheetData.data, style);
+              logInfo("Applied table color scheme", {
+                sheetId: sheetData.id,
+                sheetName: sheetData.name,
+                colorScheme: style.palette ? "resolved" : "none",
+                showRowStripes: style.show_row_stripes,
+              });
+            }
+          } catch (e) {
+            logDebug("Failed to load table style", {
+              sheetId: sheetData.id,
+              path: sheetData.path,
+              error: String(e),
+            });
+          }
+        }
+      };
+      loadTableStylesAsync();
 
       // Mark initial load as complete - data is already in cellData, no need to repopulate
       initialLoadCompleteRef.current = true;
@@ -609,6 +643,12 @@ export const UniverSpreadsheet = forwardRef<
           sheetData.data,
           cachedEnumRules
         );
+      }
+
+      // Re-apply cached table style after data update
+      const cachedStyle = tableStylesRef.current.get(sheetData.path);
+      if (cachedStyle) {
+        applyTableStyle(sheet, sheetData.data, cachedStyle);
       }
     }
 
@@ -1021,5 +1061,65 @@ function applyDerivedResultToCell(
     // Reset font color to default for non-error results
     range.setFontColor("#000000");
     logDebug("Applied derived result", { row, col, type: result.type });
+  }
+}
+
+/**
+ * Applies a resolved table style (color scheme, row stripes, header styling)
+ * to a sheet. Colors follow visual (display) row order, not data order,
+ * so alternating stripes remain consistent after sorting.
+ */
+function applyTableStyle(
+  sheet: FWorksheet,
+  data: TomlTableData,
+  style: ResolvedTableStyle
+): void {
+  const numColumns = data.headers.length;
+  if (numColumns === 0) return;
+
+  const headerBg = style.header_background ?? style.palette?.header_background;
+  const headerFontColor = style.palette?.header_font_color;
+
+  // Apply header row styling
+  const headerRange = sheet.getRange(0, 0, 1, numColumns);
+  if (headerRange) {
+    if (style.header_bold) {
+      headerRange.setFontWeight("bold");
+    }
+    if (headerBg) {
+      headerRange.setBackgroundColor(headerBg);
+    }
+    if (headerFontColor) {
+      headerRange.setFontColor(headerFontColor);
+    }
+  }
+
+  // Apply alternating row stripe colors
+  if (style.show_row_stripes && style.palette && data.rows.length > 0) {
+    const evenBg = style.palette.row_even_background;
+    const oddBg = style.palette.row_odd_background;
+
+    for (let displayRow = 0; displayRow < data.rows.length; displayRow++) {
+      const cellRow = displayRow + 1;
+      const rowRange = sheet.getRange(cellRow, 0, 1, numColumns);
+      if (rowRange) {
+        rowRange.setBackgroundColor(displayRow % 2 === 0 ? evenBg : oddBg);
+      }
+    }
+  }
+
+  // Apply alternating column stripe colors
+  if (style.show_column_stripes && style.palette && data.rows.length > 0) {
+    const evenBg = style.palette.row_even_background;
+    const accentBg = style.palette.accent_color;
+
+    for (let colIdx = 0; colIdx < numColumns; colIdx++) {
+      if (colIdx % 2 === 1) {
+        const colRange = sheet.getRange(1, colIdx, data.rows.length, 1);
+        if (colRange) {
+          colRange.setBackgroundColor(accentBg + "33");
+        }
+      }
+    }
   }
 }

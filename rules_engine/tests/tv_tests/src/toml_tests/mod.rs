@@ -1,4 +1,5 @@
 mod boolean_preservation_tests;
+mod color_scheme_tests;
 mod load_tests;
 mod metadata_serializer_tests;
 mod metadata_types_tests;

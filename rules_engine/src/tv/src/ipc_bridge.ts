@@ -590,6 +590,34 @@ export async function getEnumValidationRules(
   return invoke<EnumValidationInfo[]>("get_enum_validation_rules", { filePath });
 }
 
+// ============ Style Commands ============
+
+export interface ColorPalette {
+  header_background: string;
+  header_font_color: string;
+  row_even_background: string;
+  row_odd_background: string;
+  accent_color: string;
+}
+
+export interface ResolvedTableStyle {
+  palette: ColorPalette | null;
+  show_row_stripes: boolean;
+  show_column_stripes: boolean;
+  header_bold: boolean;
+  header_background: string | null;
+}
+
+export async function getTableStyle(
+  filePath: string
+): Promise<ResolvedTableStyle | null> {
+  return invoke<ResolvedTableStyle | null>("get_table_style", { filePath });
+}
+
+export async function getAvailableColorSchemes(): Promise<string[]> {
+  return invoke<string[]>("get_available_color_schemes");
+}
+
 // ============ Logging Commands ============
 
 export interface FrontendLogMessage {
