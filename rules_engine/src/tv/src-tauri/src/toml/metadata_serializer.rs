@@ -11,6 +11,68 @@ use crate::toml::metadata_types::{
 use crate::traits::{AtomicWriteError, FileSystem, RealFileSystem};
 use crate::validation::validation_rules::{ValidationRule, ValueType};
 
+/// Updates only the sort configuration in the metadata section of a TOML file.
+pub fn update_sort_config(file_path: &str, sort_config: Option<&SortConfig>) -> Result<(), TvError> {
+    update_sort_config_with_fs(&RealFileSystem, file_path, sort_config)
+}
+
+/// Updates only the sort configuration using the provided filesystem.
+pub fn update_sort_config_with_fs(
+    fs: &dyn FileSystem,
+    file_path: &str,
+    sort_config: Option<&SortConfig>,
+) -> Result<(), TvError> {
+    let content = fs.read_to_string(Path::new(file_path)).map_err(|e| {
+        tracing::error!(
+            component = "tv.toml.metadata",
+            file_path = %file_path,
+            error = %e,
+            "Read failed during sort config update"
+        );
+        map_io_error_for_read(&e, file_path)
+    })?;
+
+    let mut doc: DocumentMut = content.parse().map_err(|e: toml_edit::TomlError| {
+        tracing::error!(
+            component = "tv.toml.metadata",
+            file_path = %file_path,
+            error = %e,
+            "TOML parse failed during sort config update"
+        );
+        TvError::TomlParseError { path: file_path.to_string(), line: None, message: e.to_string() }
+    })?;
+
+    let metadata_table = doc.entry("metadata").or_insert_with(|| {
+        let mut table = Table::new();
+        table.insert("schema_version", value(1i64));
+        Item::Table(table)
+    });
+
+    if let Some(table) = metadata_table.as_table_mut() {
+        match sort_config {
+            Some(config) => {
+                table.insert("sort", Item::Table(serialize_sort_config(config)));
+            }
+            None => {
+                table.remove("sort");
+            }
+        }
+    }
+
+    fs.write_atomic(Path::new(file_path), &doc.to_string()).map_err(|e| {
+        map_atomic_write_error(e, file_path)
+    })?;
+
+    tracing::info!(
+        component = "tv.toml.metadata",
+        file_path = %file_path,
+        has_sort = sort_config.is_some(),
+        "Sort config updated in metadata"
+    );
+
+    Ok(())
+}
+
 /// Serializes metadata and writes it to the TOML file, preserving document structure.
 pub fn save_metadata(file_path: &str, metadata: &Metadata) -> Result<(), TvError> {
     save_metadata_with_fs(&RealFileSystem, file_path, metadata)

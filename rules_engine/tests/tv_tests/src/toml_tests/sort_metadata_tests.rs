@@ -1,0 +1,280 @@
+use tv_lib::sort::sort_state::{apply_sort, apply_sort_to_data, reorder_rows, SortStateManager};
+use tv_lib::sort::sort_types::{CellValue, SortDirection, SortState};
+use tv_lib::toml::document_loader::TomlTableData;
+use tv_lib::toml::metadata_parser::parse_sort_config_from_content;
+use tv_lib::toml::metadata_serializer::update_sort_config_with_fs;
+use tv_lib::toml::metadata_types::SortConfig;
+
+use crate::test_utils::mock_filesystem::MockFileSystem;
+
+#[test]
+fn test_parse_sort_config_ascending() {
+    let content = r#"
+[[cards]]
+id = "card-1"
+
+[metadata]
+schema_version = 1
+
+[metadata.sort]
+column = "name"
+"#;
+
+    let result = parse_sort_config_from_content(content, "test.toml").unwrap();
+    let config = result.expect("Expected sort config to be present");
+    assert_eq!(config.column, "name");
+    assert!(config.ascending);
+}
+
+#[test]
+fn test_parse_sort_config_descending() {
+    let content = r#"
+[[cards]]
+id = "card-1"
+
+[metadata]
+schema_version = 1
+
+[metadata.sort]
+column = "cost"
+ascending = false
+"#;
+
+    let result = parse_sort_config_from_content(content, "test.toml").unwrap();
+    let config = result.expect("Expected sort config to be present");
+    assert_eq!(config.column, "cost");
+    assert!(!config.ascending);
+}
+
+#[test]
+fn test_parse_sort_config_missing_metadata() {
+    let content = r#"
+[[cards]]
+id = "card-1"
+"#;
+
+    let result = parse_sort_config_from_content(content, "test.toml").unwrap();
+    assert!(result.is_none());
+}
+
+#[test]
+fn test_parse_sort_config_missing_sort_section() {
+    let content = r#"
+[[cards]]
+id = "card-1"
+
+[metadata]
+schema_version = 1
+"#;
+
+    let result = parse_sort_config_from_content(content, "test.toml").unwrap();
+    assert!(result.is_none());
+}
+
+#[test]
+fn test_parse_sort_config_missing_column() {
+    let content = r#"
+[[cards]]
+id = "card-1"
+
+[metadata]
+schema_version = 1
+
+[metadata.sort]
+ascending = true
+"#;
+
+    let result = parse_sort_config_from_content(content, "test.toml").unwrap();
+    assert!(result.is_none());
+}
+
+#[test]
+fn test_update_sort_config_adds_sort_section() {
+    let fs = MockFileSystem::with_read_and_write(
+        r#"[[cards]]
+name = "Card 1"
+"#,
+    );
+    let sort_config = SortConfig::ascending("name");
+
+    let result = update_sort_config_with_fs(&fs, "/test.toml", Some(&sort_config));
+    assert!(result.is_ok());
+
+    let saved = fs.last_written_content().unwrap();
+    assert!(saved.contains("[metadata]"), "Expected [metadata] section in:\n{saved}");
+    assert!(saved.contains("column = \"name\""), "Expected column = \"name\" in:\n{saved}");
+}
+
+#[test]
+fn test_update_sort_config_descending() {
+    let fs = MockFileSystem::with_read_and_write(
+        r#"[[cards]]
+name = "Card 1"
+"#,
+    );
+    let sort_config = SortConfig::descending("cost");
+
+    let result = update_sort_config_with_fs(&fs, "/test.toml", Some(&sort_config));
+    assert!(result.is_ok());
+
+    let saved = fs.last_written_content().unwrap();
+    assert!(saved.contains("column = \"cost\""), "Expected column = \"cost\" in:\n{saved}");
+    assert!(saved.contains("ascending = false"), "Expected ascending = false in:\n{saved}");
+}
+
+#[test]
+fn test_update_sort_config_removes_sort() {
+    let fs = MockFileSystem::with_read_and_write(
+        r#"[[cards]]
+name = "Card 1"
+
+[metadata]
+schema_version = 1
+
+[metadata.sort]
+column = "name"
+"#,
+    );
+
+    let result = update_sort_config_with_fs(&fs, "/test.toml", None);
+    assert!(result.is_ok());
+
+    let saved = fs.last_written_content().unwrap();
+    assert!(!saved.contains("[metadata.sort]"), "Expected no sort section in:\n{saved}");
+    assert!(saved.contains("[metadata]"), "Expected metadata section preserved in:\n{saved}");
+}
+
+#[test]
+fn test_update_sort_config_preserves_other_metadata() {
+    let fs = MockFileSystem::with_read_and_write(
+        r#"[[cards]]
+name = "Card 1"
+
+[metadata]
+schema_version = 1
+
+[[metadata.columns]]
+key = "id"
+width = 300
+"#,
+    );
+    let sort_config = SortConfig::ascending("name");
+
+    let result = update_sort_config_with_fs(&fs, "/test.toml", Some(&sort_config));
+    assert!(result.is_ok());
+
+    let saved = fs.last_written_content().unwrap();
+    assert!(saved.contains("key = \"id\""), "Expected column config preserved in:\n{saved}");
+    assert!(saved.contains("width = 300"), "Expected width preserved in:\n{saved}");
+    assert!(saved.contains("column = \"name\""), "Expected sort config in:\n{saved}");
+}
+
+#[test]
+fn test_sort_state_manager_per_file() {
+    let manager = SortStateManager::new();
+    let state_a = SortState::ascending("name".to_string());
+    let state_b = SortState::descending("cost".to_string());
+
+    manager.set_sort_state("/file_a.toml", "cards", Some(state_a.clone()));
+    manager.set_sort_state("/file_b.toml", "cards", Some(state_b.clone()));
+
+    assert_eq!(manager.get_sort_state("/file_a.toml", "cards"), Some(state_a));
+    assert_eq!(manager.get_sort_state("/file_b.toml", "cards"), Some(state_b));
+    assert!(manager.get_sort_state("/file_c.toml", "cards").is_none());
+}
+
+#[test]
+fn test_apply_sort_preserves_original_data() {
+    let data = TomlTableData {
+        headers: vec!["name".to_string(), "cost".to_string()],
+        rows: vec![
+            vec![serde_json::json!("Charlie"), serde_json::json!(3)],
+            vec![serde_json::json!("Alice"), serde_json::json!(1)],
+            vec![serde_json::json!("Bob"), serde_json::json!(2)],
+        ],
+    };
+
+    let sort_state = SortState::ascending("name".to_string());
+    let indices = apply_sort(&data, &sort_state);
+    assert_eq!(indices, vec![1, 2, 0]);
+
+    assert_eq!(data.rows[0][0], serde_json::json!("Charlie"));
+    assert_eq!(data.rows[1][0], serde_json::json!("Alice"));
+    assert_eq!(data.rows[2][0], serde_json::json!("Bob"));
+}
+
+#[test]
+fn test_apply_sort_to_data_none_returns_unchanged() {
+    let data = TomlTableData {
+        headers: vec!["name".to_string()],
+        rows: vec![vec![serde_json::json!("Charlie")], vec![serde_json::json!("Alice")]],
+    };
+
+    let result = apply_sort_to_data(data, None);
+    assert_eq!(result.rows[0][0], serde_json::json!("Charlie"));
+    assert_eq!(result.rows[1][0], serde_json::json!("Alice"));
+}
+
+#[test]
+fn test_sort_with_null_values() {
+    let data = TomlTableData {
+        headers: vec!["name".to_string()],
+        rows: vec![vec![serde_json::json!("Bob")], vec![serde_json::json!(null)], vec![
+            serde_json::json!("Alice"),
+        ]],
+    };
+
+    let sort_state = SortState::ascending("name".to_string());
+    let indices = apply_sort(&data, &sort_state);
+    let reordered = reorder_rows(&data, &indices);
+
+    assert_eq!(reordered[0][0], serde_json::json!("Alice"));
+    assert_eq!(reordered[1][0], serde_json::json!("Bob"));
+    assert_eq!(reordered[2][0], serde_json::json!(null));
+}
+
+#[test]
+fn test_sort_mixed_types() {
+    let data = TomlTableData {
+        headers: vec!["value".to_string()],
+        rows: vec![
+            vec![serde_json::json!("text")],
+            vec![serde_json::json!(42)],
+            vec![serde_json::json!(true)],
+            vec![serde_json::json!(null)],
+        ],
+    };
+
+    let sort_state = SortState::ascending("value".to_string());
+    let indices = apply_sort(&data, &sort_state);
+    let reordered = reorder_rows(&data, &indices);
+
+    assert_eq!(reordered[0][0], serde_json::json!(true));
+    assert_eq!(reordered[1][0], serde_json::json!(42));
+    assert_eq!(reordered[2][0], serde_json::json!("text"));
+    assert_eq!(reordered[3][0], serde_json::json!(null));
+}
+
+#[test]
+fn test_cell_value_numeric_comparison() {
+    let int_val = CellValue::Integer(5);
+    let float_val = CellValue::Float(3.7);
+    assert!(int_val > float_val);
+
+    let same_int = CellValue::Integer(3);
+    let same_float = CellValue::Float(3.0);
+    assert_eq!(same_int.cmp_values(&same_float), std::cmp::Ordering::Equal);
+}
+
+#[test]
+fn test_cell_value_case_insensitive_string_sort() {
+    let upper = CellValue::String("Banana".to_string());
+    let lower = CellValue::String("apple".to_string());
+    assert!(lower < upper);
+}
+
+#[test]
+fn test_sort_direction_toggle() {
+    assert_eq!(SortDirection::Ascending.toggle(), SortDirection::Descending);
+    assert_eq!(SortDirection::Descending.toggle(), SortDirection::Ascending);
+}

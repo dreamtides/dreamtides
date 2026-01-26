@@ -10,6 +10,8 @@ pub struct MockFileSystem {
     atomic_write_result: Mutex<Option<Result<(), AtomicWriteError>>>,
     temp_files: Mutex<Vec<PathBuf>>,
     exists_result: bool,
+    stored_content: Mutex<Option<String>>,
+    last_written: Mutex<Option<String>>,
 }
 
 impl MockFileSystem {
@@ -20,6 +22,8 @@ impl MockFileSystem {
             atomic_write_result: Mutex::new(Some(Ok(()))),
             temp_files: Mutex::new(Vec::new()),
             exists_result: true,
+            stored_content: Mutex::new(None),
+            last_written: Mutex::new(None),
         }
     }
 
@@ -30,7 +34,28 @@ impl MockFileSystem {
             atomic_write_result: Mutex::new(Some(Ok(()))),
             temp_files: Mutex::new(Vec::new()),
             exists_result: true,
+            stored_content: Mutex::new(None),
+            last_written: Mutex::new(None),
         }
+    }
+
+    /// Creates a mock that supports a read followed by an atomic write,
+    /// capturing the written content for later inspection.
+    pub fn with_read_and_write(content: &str) -> Self {
+        Self {
+            read_result: Mutex::new(None),
+            write_result: Mutex::new(None),
+            atomic_write_result: Mutex::new(None),
+            temp_files: Mutex::new(Vec::new()),
+            exists_result: true,
+            stored_content: Mutex::new(Some(content.to_string())),
+            last_written: Mutex::new(None),
+        }
+    }
+
+    /// Returns the content from the last atomic write, if any.
+    pub fn last_written_content(&self) -> Option<String> {
+        self.last_written.lock().unwrap_or_else(|e| panic!("Lock poisoned: {e}")).clone()
     }
 
     pub fn failing_read(error: io::Error) -> Self {
@@ -40,6 +65,8 @@ impl MockFileSystem {
             atomic_write_result: Mutex::new(Some(Ok(()))),
             temp_files: Mutex::new(Vec::new()),
             exists_result: true,
+            stored_content: Mutex::new(None),
+            last_written: Mutex::new(None),
         }
     }
 
@@ -50,6 +77,8 @@ impl MockFileSystem {
             atomic_write_result: Mutex::new(Some(Ok(()))),
             temp_files: Mutex::new(Vec::new()),
             exists_result: true,
+            stored_content: Mutex::new(None),
+            last_written: Mutex::new(None),
         }
     }
 
@@ -72,6 +101,12 @@ impl Default for MockFileSystem {
 
 impl FileSystem for MockFileSystem {
     fn read_to_string(&self, _path: &Path) -> io::Result<String> {
+        if let Some(ref content) =
+            *self.stored_content.lock().unwrap_or_else(|e| panic!("Lock poisoned: {e}"))
+        {
+            return Ok(content.clone());
+        }
+
         self.read_result
             .lock()
             .unwrap_or_else(|e| panic!("Lock poisoned: {e}"))
@@ -89,14 +124,17 @@ impl FileSystem for MockFileSystem {
             .unwrap_or_else(|| panic!("MockFileSystem: write called but no result configured"))
     }
 
-    fn write_atomic(&self, _path: &Path, _content: &str) -> Result<(), AtomicWriteError> {
-        self.atomic_write_result
-            .lock()
-            .unwrap_or_else(|e| panic!("Lock poisoned: {e}"))
-            .take()
-            .unwrap_or_else(|| {
-                panic!("MockFileSystem: write_atomic called but no result configured")
-            })
+    fn write_atomic(&self, _path: &Path, content: &str) -> Result<(), AtomicWriteError> {
+        *self.last_written.lock().unwrap_or_else(|e| panic!("Lock poisoned: {e}")) =
+            Some(content.to_string());
+
+        if let Some(result) =
+            self.atomic_write_result.lock().unwrap_or_else(|e| panic!("Lock poisoned: {e}")).take()
+        {
+            return result;
+        }
+
+        Ok(())
     }
 
     fn exists(&self, _path: &Path) -> bool {

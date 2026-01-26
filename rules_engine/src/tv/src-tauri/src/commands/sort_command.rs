@@ -2,6 +2,7 @@ use tauri::State;
 
 use crate::sort::sort_state::SortStateManager;
 use crate::sort::sort_types::{SortDirection, SortState};
+use crate::toml::metadata_types::SortConfig;
 
 #[derive(serde::Deserialize)]
 pub struct SetSortRequest {
@@ -60,6 +61,7 @@ pub fn set_sort_state(
     );
 
     state.set_sort_state(&file_path, &table_name, new_state.clone());
+    persist_sort_to_metadata(&file_path, new_state.as_ref());
     SortStateResponse::from(new_state)
 }
 
@@ -76,5 +78,22 @@ pub fn clear_sort_state(
         "Clear sort state"
     );
     state.clear_sort_state(&file_path, &table_name);
+    persist_sort_to_metadata(&file_path, None);
     SortStateResponse { column: None, direction: None }
+}
+
+fn persist_sort_to_metadata(file_path: &str, sort_state: Option<&SortState>) {
+    let sort_config = sort_state.map(|s| {
+        let ascending = s.direction == SortDirection::Ascending;
+        SortConfig { column: s.column.clone(), ascending }
+    });
+
+    if let Err(e) = crate::toml::metadata_serializer::update_sort_config(file_path, sort_config.as_ref()) {
+        tracing::warn!(
+            component = "tv.commands.sort",
+            file_path = %file_path,
+            error = %e,
+            "Failed to persist sort state to metadata"
+        );
+    }
 }
