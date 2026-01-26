@@ -370,9 +370,11 @@ export interface FileChangedPayload {
 }
 
 export interface DerivedValuePayload {
-  rowIndex: number;
-  columnKey: string;
-  value: unknown;
+  file_path: string;
+  table_name: string;
+  row_index: number;
+  function_name: string;
+  result: DerivedResultValue;
   generation: number;
 }
 
@@ -516,6 +518,63 @@ export async function translateRowIndex(
  */
 export async function fetchImage(url: string): Promise<string> {
   return invoke<string>("fetch_image", { url });
+}
+
+// ============ Derived Column Commands ============
+
+export interface DerivedColumnInfo {
+  name: string;
+  function: string;
+  position?: number;
+  width: number;
+  inputs: string[];
+}
+
+export interface ComputeDerivedRequest {
+  file_path: string;
+  table_name: string;
+  row_index: number;
+  function_name: string;
+  row_data: Record<string, unknown>;
+  is_visible: boolean;
+}
+
+export interface ComputeDerivedBatchRequest {
+  requests: ComputeDerivedRequest[];
+}
+
+export async function getDerivedColumnsConfig(
+  filePath: string
+): Promise<DerivedColumnInfo[]> {
+  return invoke<DerivedColumnInfo[]>("get_derived_columns_config", { filePath });
+}
+
+export async function computeDerived(
+  request: ComputeDerivedRequest
+): Promise<void> {
+  return invoke("compute_derived", { request });
+}
+
+export async function computeDerivedBatch(
+  batch: ComputeDerivedBatchRequest
+): Promise<void> {
+  return invoke("compute_derived_batch", { batch });
+}
+
+export async function incrementRowGeneration(
+  filePath: string,
+  tableName: string,
+  rowIndex: number
+): Promise<number> {
+  return invoke<number>("increment_row_generation", {
+    filePath,
+    tableName,
+    rowIndex,
+  });
+}
+
+export async function clearComputationQueue(): Promise<void> {
+  return invoke("clear_computation_queue");
 }
 
 // ============ Validation Commands ============

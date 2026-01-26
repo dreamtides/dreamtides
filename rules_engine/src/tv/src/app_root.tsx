@@ -2,8 +2,8 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { SpreadsheetView } from "./spreadsheet_view";
 import { ErrorBanner } from "./error_banner";
 import * as ipc from "./ipc_bridge";
-import type { TomlTableData } from "./ipc_bridge";
-import type { MultiSheetData, SheetData } from "./UniverSpreadsheet";
+import type { TomlTableData, DerivedValuePayload } from "./ipc_bridge";
+import type { MultiSheetData, SheetData, DerivedColumnState } from "./UniverSpreadsheet";
 
 export type { TomlTableData };
 
@@ -64,6 +64,10 @@ export function AppRoot() {
   const [activeSheetId, setActiveSheetId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [derivedColumnState, setDerivedColumnState] = useState<DerivedColumnState>({
+    configs: {},
+    values: {},
+  });
   const saveTimeoutRef = useRef<number | null>(null);
   const isSavingRef = useRef<Record<string, boolean>>({});
   const watchersStartedRef = useRef<Set<string>>(new Set());
@@ -79,6 +83,44 @@ export function AppRoot() {
     } catch (e) {
       console.error(`Failed to load ${path}:`, e);
       return null;
+    }
+  }, []);
+
+  const loadDerivedColumnsForSheet = useCallback(async (sheetInfo: SheetInfo, data: TomlTableData) => {
+    try {
+      const configs = await ipc.getDerivedColumnsConfig(sheetInfo.path);
+      if (configs.length === 0) return;
+
+      setDerivedColumnState((prev) => ({
+        ...prev,
+        configs: { ...prev.configs, [sheetInfo.id]: configs },
+      }));
+
+      // Build row data and trigger batch computation
+      const requests: ipc.ComputeDerivedRequest[] = [];
+      for (let rowIndex = 0; rowIndex < data.rows.length; rowIndex++) {
+        const rowData: Record<string, unknown> = {};
+        for (let colIdx = 0; colIdx < data.headers.length; colIdx++) {
+          rowData[data.headers[colIdx]] = data.rows[rowIndex][colIdx];
+        }
+
+        for (const config of configs) {
+          requests.push({
+            file_path: sheetInfo.path,
+            table_name: sheetInfo.tableName,
+            row_index: rowIndex,
+            function_name: config.function,
+            row_data: rowData,
+            is_visible: rowIndex < 50,
+          });
+        }
+      }
+
+      if (requests.length > 0) {
+        await ipc.computeDerivedBatch({ requests });
+      }
+    } catch (e) {
+      console.error(`Failed to load derived columns for ${sheetInfo.path}:`, e);
     }
   }, []);
 
@@ -117,7 +159,15 @@ export function AppRoot() {
     }
     setError(null);
     setLoading(false);
-  }, [loadSingleFile]);
+
+    // Load derived column configs and trigger computations for all sheets
+    for (const sheet of validSheets) {
+      const info = sheetInfos.find((s) => s.id === sheet.id);
+      if (info) {
+        loadDerivedColumnsForSheet(info, sheet.data);
+      }
+    }
+  }, [loadSingleFile, loadDerivedColumnsForSheet]);
 
   const reloadSheet = useCallback(async (sheetId: string) => {
     const sheetInfo = sheets.find((s) => s.id === sheetId);
@@ -136,7 +186,10 @@ export function AppRoot() {
       );
       return { sheets: newSheets };
     });
-  }, [sheets, loadSingleFile]);
+
+    // Re-trigger derived column computations for reloaded sheet
+    loadDerivedColumnsForSheet(sheetInfo, data);
+  }, [sheets, loadSingleFile, loadDerivedColumnsForSheet]);
 
   const getActiveSheetInfo = useCallback((): SheetInfo | undefined => {
     return sheets.find((s) => s.id === activeSheetId);
@@ -237,6 +290,29 @@ export function AppRoot() {
       reloadSheet(sheetInfo.id);
     });
 
+    const derivedValueSub = ipc.onDerivedValueComputed((payload: DerivedValuePayload) => {
+      const sheetInfo = sheets.find((s) => s.path === payload.file_path);
+      if (!sheetInfo) return;
+
+      setDerivedColumnState((prev) => {
+        const sheetValues = prev.values[sheetInfo.id] ?? {};
+        const rowValues = sheetValues[payload.row_index] ?? {};
+        return {
+          ...prev,
+          values: {
+            ...prev.values,
+            [sheetInfo.id]: {
+              ...sheetValues,
+              [payload.row_index]: {
+                ...rowValues,
+                [payload.function_name]: payload.result,
+              },
+            },
+          },
+        };
+      });
+    });
+
     const syncStateSub = ipc.onSyncStateChanged((payload) => {
       console.log("Sync state changed:", payload.state);
     });
@@ -251,6 +327,7 @@ export function AppRoot() {
 
     return () => {
       fileChangedSub.dispose();
+      derivedValueSub.dispose();
       syncStateSub.dispose();
       conflictSub.dispose();
     };
@@ -292,6 +369,7 @@ export function AppRoot() {
           loading={loading}
           onChange={handleChange}
           onActiveSheetChanged={handleActiveSheetChanged}
+          derivedColumnState={derivedColumnState}
         />
       </div>
     </div>

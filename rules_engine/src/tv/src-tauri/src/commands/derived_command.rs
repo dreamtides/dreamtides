@@ -1,11 +1,13 @@
 use std::collections::HashMap;
 
+use serde::Serialize;
 use tauri::{AppHandle, State};
 
 use crate::derived::compute_executor::{ComputationRequest, ComputeExecutorState};
 use crate::derived::derived_types::{LookupContext, RowData};
 use crate::derived::generation_tracker::RowKey;
 use crate::error::error_types::TvError;
+use crate::toml::metadata_parser;
 
 /// Request to compute a derived column value.
 #[derive(Debug, Clone, serde::Deserialize)]
@@ -218,4 +220,45 @@ pub fn get_computation_queue_length(executor_state: State<ComputeExecutorState>)
     let length = executor_state.with_executor(|executor| executor.queue_len()).unwrap_or(0);
 
     Ok(length)
+}
+
+/// Frontend-facing derived column configuration.
+#[derive(Debug, Clone, Serialize)]
+pub struct DerivedColumnInfo {
+    /// Display name for the column header.
+    pub name: String,
+    /// Registered function name to compute values.
+    pub function: String,
+    /// Column position (0-indexed), if specified.
+    pub position: Option<usize>,
+    /// Column width in pixels.
+    pub width: u32,
+    /// Input field names passed to the function.
+    pub inputs: Vec<String>,
+}
+
+/// Tauri command to get derived column configurations from a file's metadata.
+#[tauri::command]
+pub fn get_derived_columns_config(file_path: String) -> Result<Vec<DerivedColumnInfo>, TvError> {
+    let configs = metadata_parser::parse_derived_columns_from_file(&file_path)?;
+
+    let result: Vec<DerivedColumnInfo> = configs
+        .into_iter()
+        .map(|c| DerivedColumnInfo {
+            name: c.name,
+            function: c.function,
+            position: c.position,
+            width: c.width,
+            inputs: c.inputs,
+        })
+        .collect();
+
+    tracing::debug!(
+        component = "tv.commands.derived",
+        file_path = %file_path,
+        column_count = result.len(),
+        "Retrieved derived column configs"
+    );
+
+    Ok(result)
 }

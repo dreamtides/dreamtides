@@ -7,8 +7,9 @@ import {
   disposeUniverInstance,
   UniverInstance,
 } from "./univer_config";
-import type { TomlTableData, EnumValidationInfo } from "./ipc_bridge";
+import type { TomlTableData, EnumValidationInfo, DerivedColumnInfo, DerivedResultValue } from "./ipc_bridge";
 import * as ipc from "./ipc_bridge";
+import { derivedResultToCellData } from "./rich_text_utils";
 
 // Component logging tag: tv.ui.sheets
 const LOG_TAG = "tv.ui.sheets";
@@ -33,6 +34,17 @@ function logInfo(message: string, data?: unknown): void {
     timestamp: new Date().toISOString(),
   };
   console.info(JSON.stringify(entry));
+}
+
+/**
+ * Tracks derived column configurations and computed values per sheet.
+ *
+ * configs: Maps sheet ID to its derived column configurations.
+ * values: Maps sheet ID -> row index -> function name -> computed result.
+ */
+export interface DerivedColumnState {
+  configs: Record<string, DerivedColumnInfo[]>;
+  values: Record<string, Record<number, Record<string, DerivedResultValue>>>;
 }
 
 /**
@@ -78,6 +90,8 @@ interface UniverSpreadsheetProps {
   onChange?: (data: TomlTableData, sheetId: string) => void;
   /** Called when the active sheet changes */
   onActiveSheetChanged?: (sheetId: string) => void;
+  /** Derived column configurations and computed values */
+  derivedColumnState?: DerivedColumnState;
 }
 
 export const UniverSpreadsheet = forwardRef<
@@ -91,6 +105,7 @@ export const UniverSpreadsheet = forwardRef<
     multiSheetData,
     onChange,
     onActiveSheetChanged,
+    derivedColumnState,
   },
   ref
 ) {
@@ -431,6 +446,71 @@ export const UniverSpreadsheet = forwardRef<
     isLoadingRef.current = false;
   }, [multiSheetData]);
 
+  // Handle derived column value updates
+  useEffect(() => {
+    if (!derivedColumnState) return;
+    if (!univerAPIRef.current) return;
+
+    const workbook = univerAPIRef.current.getActiveWorkbook();
+    if (!workbook) return;
+
+    for (const [sheetId, configs] of Object.entries(derivedColumnState.configs)) {
+      if (configs.length === 0) continue;
+
+      const sheet = workbook.getSheetBySheetId(sheetId);
+      if (!sheet) continue;
+
+      const headers = headersMapRef.current.get(sheetId) ?? headersRef.current;
+      if (headers.length === 0) continue;
+
+      const sheetValues = derivedColumnState.values[sheetId];
+      if (!sheetValues) continue;
+
+      isLoadingRef.current = true;
+
+      for (const config of configs) {
+        const derivedColIndex = getDerivedColumnIndex(config, headers.length, configs);
+
+        // Set header for derived column (row 0)
+        const headerRange = sheet.getRange(0, derivedColIndex, 1, 1);
+        if (headerRange) {
+          headerRange.setValues([[config.name]]);
+          headerRange.setFontWeight("bold");
+        }
+
+        // Update each row with computed values
+        for (const [rowIndexStr, rowValues] of Object.entries(sheetValues)) {
+          const rowIndex = parseInt(rowIndexStr, 10);
+          const result = rowValues[config.function];
+          if (!result) continue;
+
+          const cellRow = rowIndex + 1; // +1 for header row
+          applyDerivedResultToCell(sheet, cellRow, derivedColIndex, result);
+        }
+
+        // Show loading indicator for rows without results
+        if (multiSheetData) {
+          const sheetData = multiSheetData.sheets.find((s) => s.id === sheetId);
+          if (sheetData) {
+            for (let rowIndex = 0; rowIndex < sheetData.data.rows.length; rowIndex++) {
+              const rowValues = sheetValues[rowIndex];
+              if (!rowValues || !rowValues[config.function]) {
+                const cellRow = rowIndex + 1;
+                const range = sheet.getRange(cellRow, derivedColIndex, 1, 1);
+                if (range) {
+                  range.setValues([[""]]);
+                  range.setFontColor("#999999");
+                }
+              }
+            }
+          }
+        }
+      }
+
+      isLoadingRef.current = false;
+    }
+  }, [derivedColumnState, multiSheetData]);
+
   return (
     <div
       ref={containerRef}
@@ -697,5 +777,79 @@ function applyDropdownValidation(
         allowedValues: rule.allowed_values,
       });
     }
+  }
+}
+
+/**
+ * Calculates the column index for a derived column.
+ * If the config has an explicit position, uses that. Otherwise appends
+ * after all data columns plus any prior derived columns without positions.
+ */
+function getDerivedColumnIndex(
+  config: DerivedColumnInfo,
+  dataColumnCount: number,
+  allConfigs: DerivedColumnInfo[]
+): number {
+  if (config.position !== undefined && config.position !== null) {
+    return config.position;
+  }
+
+  // Place after all data columns plus prior derived columns without explicit position
+  let offset = 0;
+  for (const c of allConfigs) {
+    if (c.name === config.name) break;
+    if (c.position === undefined || c.position === null) {
+      offset++;
+    }
+  }
+  return dataColumnCount + offset;
+}
+
+/**
+ * Applies a derived result value to a specific cell in the spreadsheet.
+ * Handles all DerivedResult variants: text, number, boolean, image,
+ * richText, and error. Error results display with red font color.
+ */
+function applyDerivedResultToCell(
+  sheet: FWorksheet,
+  row: number,
+  col: number,
+  result: DerivedResultValue
+): void {
+  const range = sheet.getRange(row, col, 1, 1);
+  if (!range) return;
+
+  const cellData = derivedResultToCellData(result);
+
+  if (result.type === "richText" && cellData.p) {
+    // Rich text requires setting the paragraph structure
+    // Use setValues with the plain text first, then apply formatting
+    const plainText = cellData.p.flatMap((p) => p.ts.map((r) => r.t)).join("");
+    range.setValues([[plainText]]);
+    // Apply rich text styling via individual text runs
+    for (const paragraph of cellData.p) {
+      for (const run of paragraph.ts) {
+        if (run.s) {
+          if (run.s.bl) range.setFontWeight("bold");
+          if (run.s.it) range.setFontStyle("italic");
+          if (run.s.cl) range.setFontColor(run.s.cl.rgb);
+        }
+      }
+    }
+    logDebug("Applied rich text derived result", { row, col });
+  } else if (result.type === "error") {
+    range.setValues([[`Error: ${result.value}`]]);
+    range.setFontColor("#FF0000");
+    logDebug("Applied error derived result", { row, col, error: result.value });
+  } else if (result.type === "image") {
+    range.setValues([[`[Image: ${result.value}]`]]);
+    range.setFontColor("#0066CC");
+    logDebug("Applied image derived result", { row, col, url: result.value });
+  } else {
+    const value = cellData.v !== undefined ? cellData.v : "";
+    range.setValues([[value]]);
+    // Reset font color to default for non-error results
+    range.setFontColor("#000000");
+    logDebug("Applied derived result", { row, col, type: result.type });
   }
 }

@@ -127,6 +127,7 @@ pub fn run(paths: cli::AppPaths, jsonl: bool) {
             commands::derived_command::increment_row_generation,
             commands::derived_command::clear_computation_queue,
             commands::derived_command::get_computation_queue_length,
+            commands::derived_command::get_derived_columns_config,
             commands::validation_command::get_validation_rules,
             commands::validation_command::get_enum_validation_rules,
             commands::image_command::fetch_image,
