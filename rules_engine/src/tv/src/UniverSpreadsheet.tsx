@@ -1,6 +1,7 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef } from "react";
 import { Univer, IWorkbookData, CellValueType } from "@univerjs/core";
-import { FUniver, FWorksheet } from "@univerjs/core/facade";
+import { FUniver } from "@univerjs/core/facade";
+import { FWorksheet } from "@univerjs/sheets/facade";
 
 import {
   createUniverInstance,
@@ -977,7 +978,7 @@ function getColumnLetter(index: number): string {
 function buildMultiSheetWorkbook(
   multiSheetData: MultiSheetData,
   derivedConfigs?: Record<string, DerivedColumnInfo[]>
-): IWorkbookData {
+): Partial<IWorkbookData> {
   // Sort sheets alphabetically by name for consistent tab order
   const sortedSheets = [...multiSheetData.sheets].sort((a, b) =>
     a.name.localeCompare(b.name)
@@ -997,7 +998,7 @@ function buildMultiSheetWorkbook(
     const columnCount = Math.max(sheetData.data.headers.length + dataOffset + 1, 26);
 
     // Build cell data
-    const cellData: Record<number, Record<number, { v: unknown; s?: { bl?: number } }>> = {};
+    const cellData: Record<number, Record<number, { v: unknown; t?: CellValueType; s?: { bl?: number } }>> = {};
 
     // Header row (row 0) with display-formatted names and bold styling
     cellData[0] = {};
@@ -1076,19 +1077,6 @@ function buildMultiSheetWorkbook(
   };
 }
 
-/** Sheet interface matching FWorksheet facade methods we use */
-interface SheetFacade {
-  getRange(
-    startRow: number,
-    startColumn: number,
-    numRows: number,
-    numColumns: number
-  ): {
-    setValues(values: unknown[][]): void;
-    setFontWeight(weight: string): void;
-  } | null;
-}
-
 /**
  * Compare two TomlTableData objects for equality.
  */
@@ -1117,7 +1105,7 @@ function isSheetDataEqual(a: TomlTableData, b: TomlTableData): boolean {
  * Populate a sheet with TomlTableData using batch operations.
  * Uses setValues() to set all cells in a single API call per region.
  */
-function populateSheetDataBatch(sheet: SheetFacade, data: TomlTableData, dataOffset: number = 0): void {
+function populateSheetDataBatch(sheet: FWorksheet, data: TomlTableData, dataOffset: number = 0): void {
   if (!sheet) return;
 
   const numColumns = data.headers.length;
@@ -1204,7 +1192,7 @@ function applyCheckboxValidation(
       const rule = univerAPI
         .newDataValidation()
         .requireCheckbox()
-        .setOptions({ allowBlank: true, showErrorMessage: false })
+        .setOptions({ showErrorMessage: false })
         .build();
       range.setDataValidation(rule);
 
@@ -1251,7 +1239,6 @@ function applyDropdownValidation(
         .newDataValidation()
         .requireValueInList(rule.allowed_values, true)
         .setOptions({
-          allowBlank: true,
           showErrorMessage: true,
           error: `Value must be one of: ${rule.allowed_values.join(", ")}`,
         })
@@ -1398,7 +1385,6 @@ function applyTableStyle(
 
   // Apply alternating column stripe colors
   if (style.show_column_stripes && style.palette && data.rows.length > 0) {
-    const evenBg = style.palette.row_even_background;
     const accentBg = style.palette.accent_color;
 
     for (let colIdx = 0; colIdx < numColumns; colIdx++) {

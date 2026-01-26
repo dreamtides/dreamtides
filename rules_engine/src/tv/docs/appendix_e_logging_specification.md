@@ -38,14 +38,17 @@ thread panic.
 WARN: Recoverable issues that may indicate problems. Examples: deprecated
 metadata version, slow operation, retried operation.
 
-INFO: Significant state changes and operation completions. Examples: file
-loaded, file saved, watcher started, derived column computed.
+INFO: App lifecycle events and significant state changes. Examples: logging
+initialized, executor created/stopped, watcher started/stopped, function
+registry initialized.
 
-DEBUG: Detailed operation tracing for development. Examples: cache hit/miss,
-event received, state transition, function entry/exit.
+DEBUG: Per-operation tracing for development. Examples: file loaded, file
+saved, cell saved, row added/deleted, sort/filter state changes, event
+received, state transition.
 
-TRACE: Verbose debugging for deep investigation. Examples: byte-level file
-operations, per-cell iteration, network packet details.
+TRACE: Hot-path and per-cell debugging. Examples: cache hit/miss, derived
+value emitted, generation tracking, stale computation skipped, queue
+operations.
 
 ## Component Hierarchy
 
@@ -62,38 +65,58 @@ Components follow a hierarchical naming convention:
 
 ## Backend Logging
 
-Rust backend uses the tracing crate with a custom JSON subscriber. The
-subscriber formats events according to this specification. Spans are
-logged as separate enter/exit events with matching span IDs.
+Rust backend uses the tracing crate with a dual-layer subscriber
+architecture composed onto a single Registry:
 
-Initialization configures log level from environment variable TV_LOG_LEVEL
-or defaults to INFO for release builds and DEBUG for debug builds.
+**File layer.** Always uses JSON format with ANSI disabled. Writes only to
+the log file. Every line on disk is valid JSON, parseable by jq.
+
+**Stdout layer.** Uses compact format with ANSI colors enabled. Writes only
+to stdout. Provides human-readable terminal output during development.
+
+Each layer has its own EnvFilter. The default filter string includes
+suppressions for noisy third-party crates:
+`info,hyper=warn,reqwest=warn,tao=warn,wry=warn,tauri=warn` (release) or
+`debug,...` (debug builds). The TV_LOG_LEVEL environment variable overrides
+the default when set.
 
 ## Frontend Logging
 
-TypeScript frontend defines a Logger class wrapping console methods. Each
-log call constructs a JSON object and sends to backend via log_message
-command. Backend aggregates frontend logs into the unified stream.
+TypeScript frontend uses a centralized Logger class from logger_frontend.ts.
+Each module creates a Logger with a component name (e.g., `tv.ui.app`,
+`tv.ui.images`, `tv.ui.spreadsheet`, `tv.ui.richtext`). Log calls send
+structured entries to the backend via the log_message Tauri command, where
+log_aggregator.rs ingests them into the tracing system.
 
-Frontend logs include source information from error stacks when available.
-Browser console also receives logs for development convenience.
+Console mirror output is suppressed in production builds
+(`import.meta.env.PROD`). In development, logs are mirrored to the browser
+console for convenience.
+
+Global error capture is installed at app startup in main.tsx:
+- `window.addEventListener("error", ...)` catches uncaught synchronous
+  exceptions with message, filename, line/column, and stack trace.
+- `window.addEventListener("unhandledrejection", ...)` catches unhandled
+  promise rejections with reason and stack trace.
+Both handlers use a Logger with component `tv.ui.global`.
 
 ## Log Output Destinations
 
-Logs write to two destinations:
-1. Standard output for terminal viewing during development
-2. Log file in application data directory for persistent storage
+Two independent tracing layers write to separate destinations:
+
+1. **File layer** — JSON format, no ANSI codes. Writes to the log file.
+   This layer is unconditional and always active.
+2. **Stdout layer** — Compact format with ANSI colors. Writes to stdout
+   for human-readable terminal output during development.
 
 Log file path: ~/Library/Application Support/tv/logs/tv_YYYY-MM-DD.jsonl
-
-Stdout is disabled when running as a background process. Log file is always
-enabled.
 
 ## Log Rotation
 
 Log files rotate at midnight Pacific Time. Filename includes date for easy
-identification. Files older than the retention period are deleted on startup.
-Default retention is 7 days, configurable via environment variable.
+identification. The `cleanup_old_logs()` function runs at the end of
+`initialize()` and deletes files older than the retention period. Default
+retention is 7 days, configurable via the `TV_LOG_RETENTION_DAYS` environment
+variable. Deletion failures are logged at WARN level.
 
 Old log files are not compressed to allow easy grep and jq processing. Disk
 space is traded for accessibility.
@@ -119,9 +142,10 @@ fetch 5000ms. Performance logs enable identifying slow operations.
 ## Example Log Entries
 
 ```json
-{"ts":"2024-01-15T14:30:45.123-08:00","level":"INFO","component":"tv.toml","msg":"File loaded","file_path":"/path/to/cards.toml","rows":523,"duration_ms":45}
-{"ts":"2024-01-15T14:30:46.456-08:00","level":"DEBUG","component":"tv.sync","msg":"Watcher event received","file_path":"/path/to/cards.toml","event_type":"modify"}
-{"ts":"2024-01-15T14:30:47.789-08:00","level":"ERROR","component":"tv.toml","msg":"Parse failed","file_path":"/path/to/cards.toml","error":"expected string at line 42"}
+{"ts":"2024-01-15T14:30:45.123-08:00","level":"INFO","component":"tv.logging","msg":"Logging initialized","log_file":"/path/to/logs/tv_2024-01-15.jsonl"}
+{"ts":"2024-01-15T14:30:45.456-08:00","level":"DEBUG","component":"tv.toml","msg":"File loaded","file_path":"/path/to/cards.toml","rows":523,"duration_ms":45}
+{"ts":"2024-01-15T14:30:46.789-08:00","level":"ERROR","component":"tv.toml","msg":"Parse failed","file_path":"/path/to/cards.toml","error":"expected string at line 42"}
+{"ts":"2024-01-15T14:30:47.012-08:00","level":"ERROR","component":"tv.ui.global","msg":"Uncaught exception","frontend_ts":"2024-01-15T14:30:47.010-08:00","message":"Cannot read properties of undefined","filename":"app_root.tsx","lineno":42}
 ```
 
 ## Log Analysis

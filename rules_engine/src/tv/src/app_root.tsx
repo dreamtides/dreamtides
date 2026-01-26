@@ -251,10 +251,6 @@ export function AppRoot() {
     }
   }, [sheets, loadSingleFile, triggerDerivedComputations]);
 
-  const getActiveSheetInfo = useCallback((): SheetInfo | undefined => {
-    return sheets.find((s) => s.id === activeSheetId);
-  }, [sheets, activeSheetId]);
-
   const saveData = useCallback(
     async (newData: TomlTableData, sheetId: string) => {
       const sheetInfo = sheets.find((s) => s.id === sheetId);

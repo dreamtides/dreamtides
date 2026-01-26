@@ -53,6 +53,10 @@ function shouldLog(level: LogLevel): boolean {
 }
 
 function mirrorToConsole(level: LogLevel, component: string, msg: string, context?: Record<string, unknown>): void {
+  if (import.meta.env.PROD) {
+    return;
+  }
+
   const prefix = `[${component}]`;
   const args: unknown[] = context ? [prefix, msg, context] : [prefix, msg];
 
