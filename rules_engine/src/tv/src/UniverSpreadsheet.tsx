@@ -252,6 +252,20 @@ export const UniverSpreadsheet = forwardRef<
       const workbookData = buildMultiSheetWorkbook(multiSheetData);
       instance.univerAPI.createWorkbook(workbookData);
 
+      // Ensure bold header styling is applied to all sheets after workbook creation
+      const initWorkbook = instance.univerAPI.getActiveWorkbook();
+      if (initWorkbook) {
+        for (const sheetData of multiSheetData.sheets) {
+          const sheet = initWorkbook.getSheetBySheetId(sheetData.id);
+          if (sheet && sheetData.data.headers.length > 0) {
+            const headerRange = sheet.getRange(0, 0, 1, sheetData.data.headers.length);
+            if (headerRange) {
+              headerRange.setFontWeight("bold");
+            }
+          }
+        }
+      }
+
       // Activate the restored sheet if specified
       if (initialActiveSheetId) {
         const wb = instance.univerAPI.getActiveWorkbook();
@@ -684,10 +698,10 @@ export const UniverSpreadsheet = forwardRef<
 
     const numColumns = data.headers.length;
     if (numColumns > 0) {
-      // Set headers row using batch operation
+      // Set headers row using batch operation with display-formatted names
       const headerRange = sheet.getRange(0, 0, 1, numColumns);
       if (headerRange) {
-        headerRange.setValues([data.headers]);
+        headerRange.setValues([data.headers.map(formatHeaderForDisplay)]);
         headerRange.setFontWeight("bold");
       }
 
@@ -910,6 +924,25 @@ export const UniverSpreadsheet = forwardRef<
   );
 });
 
+/** Known acronyms that should be fully uppercased in display headers. */
+const HEADER_ACRONYMS = new Set(["id", "fx", "url", "uuid", "hp", "ui"]);
+
+/**
+ * Converts a TOML key to a display-friendly header name.
+ * Splits on hyphens and underscores, title-cases each word,
+ * and fully uppercases known acronyms.
+ */
+function formatHeaderForDisplay(key: string): string {
+  return key
+    .split(/[-_]/)
+    .map((word) =>
+      HEADER_ACRONYMS.has(word.toLowerCase())
+        ? word.toUpperCase()
+        : word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+    )
+    .join(" ");
+}
+
 function getColumnLetter(index: number): string {
   let result = "";
   let n = index;
@@ -941,12 +974,15 @@ function buildMultiSheetWorkbook(multiSheetData: MultiSheetData): IWorkbookData 
     const columnCount = Math.max(sheetData.data.headers.length + 1, 26);
 
     // Build cell data
-    const cellData: Record<number, Record<number, { v: unknown }>> = {};
+    const cellData: Record<number, Record<number, { v: unknown; s?: { bl?: number } }>> = {};
 
-    // Header row (row 0)
+    // Header row (row 0) with display-formatted names and bold styling
     cellData[0] = {};
     sheetData.data.headers.forEach((header, colIndex) => {
-      cellData[0][colIndex] = { v: header };
+      cellData[0][colIndex] = {
+        v: formatHeaderForDisplay(header),
+        s: { bl: 1 },
+      };
     });
 
     // Data rows (starting at row 1)
@@ -1030,10 +1066,10 @@ function populateSheetDataBatch(sheet: SheetFacade, data: TomlTableData): void {
   const numColumns = data.headers.length;
   if (numColumns === 0) return;
 
-  // Set headers row using batch operation
+  // Set headers row using batch operation with display-formatted names
   const headerRange = sheet.getRange(0, 0, 1, numColumns);
   if (headerRange) {
-    headerRange.setValues([data.headers]);
+    headerRange.setValues([data.headers.map(formatHeaderForDisplay)]);
     headerRange.setFontWeight("bold");
   }
 
