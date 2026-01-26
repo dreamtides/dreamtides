@@ -529,3 +529,167 @@ fn test_validation_result_has_correct_metadata() {
     assert_eq!(result.column, "card_type");
     assert_eq!(result.rule_type, "enum");
 }
+
+#[test]
+fn test_rule_type_name_enum() {
+    let rule =
+        ValidationRule::Enum { column: "col".to_string(), allowed_values: vec![], message: None };
+    assert_eq!(rule.rule_type_name(), "enum");
+}
+
+#[test]
+fn test_rule_type_name_range() {
+    let rule =
+        ValidationRule::Range { column: "col".to_string(), min: None, max: None, message: None };
+    assert_eq!(rule.rule_type_name(), "range");
+}
+
+#[test]
+fn test_rule_type_name_pattern() {
+    let rule = ValidationRule::Pattern {
+        column: "col".to_string(),
+        pattern: ".*".to_string(),
+        message: None,
+    };
+    assert_eq!(rule.rule_type_name(), "pattern");
+}
+
+#[test]
+fn test_rule_type_name_required() {
+    let rule = ValidationRule::Required { column: "col".to_string(), message: None };
+    assert_eq!(rule.rule_type_name(), "required");
+}
+
+#[test]
+fn test_rule_type_name_type() {
+    let rule = ValidationRule::Type {
+        column: "col".to_string(),
+        value_type: ValueType::Boolean,
+        message: None,
+    };
+    assert_eq!(rule.rule_type_name(), "type");
+}
+
+#[test]
+fn test_describe_enum() {
+    let rule = ValidationRule::Enum {
+        column: "card_type".to_string(),
+        allowed_values: vec!["Character".to_string(), "Event".to_string()],
+        message: None,
+    };
+    assert_eq!(rule.describe(), "Must be one of: Character, Event");
+}
+
+#[test]
+fn test_describe_range_both_bounds() {
+    let rule = ValidationRule::Range {
+        column: "cost".to_string(),
+        min: Some(0.0),
+        max: Some(10.0),
+        message: None,
+    };
+    assert_eq!(rule.describe(), "Must be between 0 and 10");
+}
+
+#[test]
+fn test_describe_range_min_only() {
+    let rule = ValidationRule::Range {
+        column: "cost".to_string(),
+        min: Some(0.0),
+        max: None,
+        message: None,
+    };
+    assert_eq!(rule.describe(), "Must be at least 0");
+}
+
+#[test]
+fn test_describe_range_max_only() {
+    let rule = ValidationRule::Range {
+        column: "cost".to_string(),
+        min: None,
+        max: Some(100.0),
+        message: None,
+    };
+    assert_eq!(rule.describe(), "Must be at most 100");
+}
+
+#[test]
+fn test_describe_pattern() {
+    let rule = ValidationRule::Pattern {
+        column: "id".to_string(),
+        pattern: r"^[A-Z]{2}-\d{3}$".to_string(),
+        message: None,
+    };
+    assert!(rule.describe().contains(r"^[A-Z]{2}-\d{3}$"));
+}
+
+#[test]
+fn test_describe_required() {
+    let rule = ValidationRule::Required { column: "name".to_string(), message: None };
+    assert_eq!(rule.describe(), "This field is required");
+}
+
+#[test]
+fn test_describe_type() {
+    let rule = ValidationRule::Type {
+        column: "active".to_string(),
+        value_type: ValueType::Boolean,
+        message: None,
+    };
+    assert_eq!(rule.describe(), "Must be a boolean value");
+}
+
+#[test]
+fn test_display_value_type() {
+    assert_eq!(format!("{}", ValueType::String), "string");
+    assert_eq!(format!("{}", ValueType::Integer), "integer");
+    assert_eq!(format!("{}", ValueType::Float), "float");
+    assert_eq!(format!("{}", ValueType::Boolean), "boolean");
+}
+
+#[test]
+fn test_display_validation_rule_enum() {
+    let rule = ValidationRule::Enum {
+        column: "card_type".to_string(),
+        allowed_values: vec!["Character".to_string(), "Event".to_string()],
+        message: None,
+    };
+    assert_eq!(format!("{rule}"), "enum(card_type: [Character, Event])");
+}
+
+#[test]
+fn test_display_validation_rule_range() {
+    let rule = ValidationRule::Range {
+        column: "cost".to_string(),
+        min: Some(0.0),
+        max: Some(10.0),
+        message: None,
+    };
+    assert_eq!(format!("{rule}"), "range(cost: 0..10)");
+}
+
+#[test]
+fn test_display_validation_rule_pattern() {
+    let rule = ValidationRule::Pattern {
+        column: "id".to_string(),
+        pattern: r"^\d+$".to_string(),
+        message: None,
+    };
+    assert_eq!(format!("{rule}"), r"pattern(id: /^\d+$/)");
+}
+
+#[test]
+fn test_display_validation_rule_required() {
+    let rule = ValidationRule::Required { column: "name".to_string(), message: None };
+    assert_eq!(format!("{rule}"), "required(name)");
+}
+
+#[test]
+fn test_display_validation_rule_type() {
+    let rule = ValidationRule::Type {
+        column: "active".to_string(),
+        value_type: ValueType::Boolean,
+        message: None,
+    };
+    assert_eq!(format!("{rule}"), "type(active: boolean)");
+}

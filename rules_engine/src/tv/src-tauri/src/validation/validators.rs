@@ -3,46 +3,53 @@ use serde_json::Value;
 
 use crate::validation::validation_rules::{ValidationResult, ValidationRule, ValueType};
 
+/// Validates a value against a single validation rule.
 pub fn validate(rule: &ValidationRule, value: &Value) -> ValidationResult {
+    let column = rule.column();
+    let rule_type = rule.rule_type_name();
     match rule {
-        ValidationRule::Enum { column, allowed_values, message } => {
-            validate_enum(column, allowed_values, message.as_deref(), value)
+        ValidationRule::Enum { allowed_values, message, .. } => {
+            validate_enum(column, rule_type, allowed_values, message.as_deref(), value)
         }
-        ValidationRule::Range { column, min, max, message } => {
-            validate_range(column, *min, *max, message.as_deref(), value)
+        ValidationRule::Range { min, max, message, .. } => {
+            validate_range(column, rule_type, *min, *max, message.as_deref(), value)
         }
-        ValidationRule::Pattern { column, pattern, message } => {
-            validate_pattern(column, pattern, message.as_deref(), value)
+        ValidationRule::Pattern { pattern, message, .. } => {
+            validate_pattern(column, rule_type, pattern, message.as_deref(), value)
         }
-        ValidationRule::Required { column, message } => {
-            validate_required(column, message.as_deref(), value)
+        ValidationRule::Required { message, .. } => {
+            validate_required(column, rule_type, message.as_deref(), value)
         }
-        ValidationRule::Type { column, value_type, message } => {
-            validate_type(column, *value_type, message.as_deref(), value)
+        ValidationRule::Type { value_type, message, .. } => {
+            validate_type(column, rule_type, *value_type, message.as_deref(), value)
         }
     }
 }
 
+/// Validates a value against all rules that apply to the given column.
 pub fn validate_all(rules: &[ValidationRule], column: &str, value: &Value) -> Vec<ValidationResult> {
     rules.iter().filter(|r| r.column() == column).map(|r| validate(r, value)).collect()
 }
 
+/// Returns true if all validation results are valid.
 pub fn is_valid(results: &[ValidationResult]) -> bool {
     results.iter().all(|r| r.valid)
 }
 
+/// Returns the first validation failure, if any.
 pub fn first_error(results: &[ValidationResult]) -> Option<&ValidationResult> {
     results.iter().find(|r| !r.valid)
 }
 
 fn validate_enum(
     column: &str,
+    rule_type: &str,
     allowed_values: &[String],
     custom_message: Option<&str>,
     value: &Value,
 ) -> ValidationResult {
     if value.is_null() {
-        return ValidationResult::success(column, "enum");
+        return ValidationResult::success(column, rule_type);
     }
 
     let string_value = match value {
@@ -51,7 +58,7 @@ fn validate_enum(
     };
 
     if allowed_values.contains(&string_value) {
-        ValidationResult::success(column, "enum")
+        ValidationResult::success(column, rule_type)
     } else {
         let message = custom_message.map(String::from).unwrap_or_else(|| {
             format!(
@@ -60,19 +67,20 @@ fn validate_enum(
                 allowed_values.join(", ")
             )
         });
-        ValidationResult::failure(column, "enum", message)
+        ValidationResult::failure(column, rule_type, message)
     }
 }
 
 fn validate_range(
     column: &str,
+    rule_type: &str,
     min: Option<f64>,
     max: Option<f64>,
     custom_message: Option<&str>,
     value: &Value,
 ) -> ValidationResult {
     if value.is_null() {
-        return ValidationResult::success(column, "range");
+        return ValidationResult::success(column, rule_type);
     }
 
     let number = match value {
@@ -84,16 +92,16 @@ fn validate_range(
     let Some(num) = number else {
         let message = custom_message
             .map(String::from)
-            .unwrap_or_else(|| format!("Value '{}' is not a valid number", value));
-        return ValidationResult::failure(column, "range", message);
+            .unwrap_or_else(|| format!("Value '{value}' is not a valid number"));
+        return ValidationResult::failure(column, rule_type, message);
     };
 
     if let Some(min_val) = min {
         if num < min_val {
             let message = custom_message
                 .map(String::from)
-                .unwrap_or_else(|| format!("Value {} is less than minimum {}", num, min_val));
-            return ValidationResult::failure(column, "range", message);
+                .unwrap_or_else(|| format!("Value {num} is less than minimum {min_val}"));
+            return ValidationResult::failure(column, rule_type, message);
         }
     }
 
@@ -101,22 +109,23 @@ fn validate_range(
         if num > max_val {
             let message = custom_message
                 .map(String::from)
-                .unwrap_or_else(|| format!("Value {} is greater than maximum {}", num, max_val));
-            return ValidationResult::failure(column, "range", message);
+                .unwrap_or_else(|| format!("Value {num} is greater than maximum {max_val}"));
+            return ValidationResult::failure(column, rule_type, message);
         }
     }
 
-    ValidationResult::success(column, "range")
+    ValidationResult::success(column, rule_type)
 }
 
 fn validate_pattern(
     column: &str,
+    rule_type: &str,
     pattern: &str,
     custom_message: Option<&str>,
     value: &Value,
 ) -> ValidationResult {
     if value.is_null() {
-        return ValidationResult::success(column, "pattern");
+        return ValidationResult::success(column, rule_type);
     }
 
     let string_value = match value {
@@ -129,23 +138,28 @@ fn validate_pattern(
         Err(e) => {
             return ValidationResult::failure(
                 column,
-                "pattern",
-                format!("Invalid regex pattern '{}': {}", pattern, e),
+                rule_type,
+                format!("Invalid regex pattern '{pattern}': {e}"),
             );
         }
     };
 
     if regex.is_match(&string_value) {
-        ValidationResult::success(column, "pattern")
+        ValidationResult::success(column, rule_type)
     } else {
         let message = custom_message
             .map(String::from)
-            .unwrap_or_else(|| format!("Value '{}' does not match pattern '{}'", string_value, pattern));
-        ValidationResult::failure(column, "pattern", message)
+            .unwrap_or_else(|| format!("Value '{string_value}' does not match pattern '{pattern}'"));
+        ValidationResult::failure(column, rule_type, message)
     }
 }
 
-fn validate_required(column: &str, custom_message: Option<&str>, value: &Value) -> ValidationResult {
+fn validate_required(
+    column: &str,
+    rule_type: &str,
+    custom_message: Option<&str>,
+    value: &Value,
+) -> ValidationResult {
     let is_empty = match value {
         Value::Null => true,
         Value::String(s) => s.trim().is_empty(),
@@ -157,20 +171,21 @@ fn validate_required(column: &str, custom_message: Option<&str>, value: &Value) 
     if is_empty {
         let message =
             custom_message.map(String::from).unwrap_or_else(|| "This field is required".to_string());
-        ValidationResult::failure(column, "required", message)
+        ValidationResult::failure(column, rule_type, message)
     } else {
-        ValidationResult::success(column, "required")
+        ValidationResult::success(column, rule_type)
     }
 }
 
 fn validate_type(
     column: &str,
+    rule_type: &str,
     expected_type: ValueType,
     custom_message: Option<&str>,
     value: &Value,
 ) -> ValidationResult {
     if value.is_null() {
-        return ValidationResult::success(column, "type");
+        return ValidationResult::success(column, rule_type);
     }
 
     let type_matches = match expected_type {
@@ -183,17 +198,11 @@ fn validate_type(
     };
 
     if type_matches {
-        ValidationResult::success(column, "type")
+        ValidationResult::success(column, rule_type)
     } else {
-        let message = custom_message.map(String::from).unwrap_or_else(|| {
-            let type_name = match expected_type {
-                ValueType::String => "string",
-                ValueType::Integer => "integer",
-                ValueType::Float => "number",
-                ValueType::Boolean => "boolean",
-            };
-            format!("Value '{}' is not a valid {}", value, type_name)
-        });
-        ValidationResult::failure(column, "type", message)
+        let message = custom_message
+            .map(String::from)
+            .unwrap_or_else(|| format!("Value '{value}' is not a valid {expected_type}"));
+        ValidationResult::failure(column, rule_type, message)
     }
 }
