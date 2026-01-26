@@ -1,5 +1,5 @@
 use std::io::Cursor;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::sync::Arc;
 use std::time::Duration;
 
@@ -14,6 +14,12 @@ const DEFAULT_FETCH_TIMEOUT: Duration = Duration::from_secs(30);
 
 /// Default maximum concurrent fetches.
 const DEFAULT_MAX_CONCURRENT_FETCHES: usize = 4;
+
+/// Content-type prefixes that indicate valid image responses.
+const IMAGE_CONTENT_TYPE_PREFIX: &str = "image/";
+
+/// Content-type value for binary octet-stream (accepted as potentially valid).
+const OCTET_STREAM_CONTENT_TYPE: &str = "application/octet-stream";
 
 /// Async image fetcher with HTTP support, image validation, and cache integration.
 ///
@@ -40,6 +46,7 @@ impl ImageFetcher {
     ) -> Result<Self, TvError> {
         let client = reqwest::Client::builder()
             .timeout(timeout)
+            .pool_max_idle_per_host(max_concurrent)
             .build()
             .map_err(|e| TvError::ImageFetchError {
                 url: String::new(),
@@ -53,13 +60,48 @@ impl ImageFetcher {
         })
     }
 
-    /// Fetches an image by URL, returning the local cache file path.
+    /// Fetches an image by URL or local path, returning a local file path.
     ///
-    /// Checks the cache first and returns immediately on hit. On cache miss,
-    /// fetches the image over HTTP, validates it, stores it in the cache,
-    /// and returns the cached file path. Uses a semaphore to limit concurrent
-    /// network requests.
+    /// For local filesystem paths, reads and validates the file directly
+    /// without caching. For remote URLs, checks the cache first and returns
+    /// immediately on hit. On cache miss, fetches the image over HTTP,
+    /// validates the response content-type and image data, stores it in the
+    /// cache, and returns the cached file path. Uses a semaphore to limit
+    /// concurrent network requests.
     pub async fn fetch(&self, url: &str) -> Result<PathBuf, TvError> {
+        if is_local_path(url) {
+            return self.fetch_local(url);
+        }
+
+        self.fetch_remote(url).await
+    }
+
+    /// Reads a local filesystem image directly without caching.
+    fn fetch_local(&self, path_str: &str) -> Result<PathBuf, TvError> {
+        let path = Path::new(path_str);
+        if !path.exists() {
+            return Err(TvError::FileNotFound { path: path_str.to_string() });
+        }
+
+        let data = std::fs::read(path).map_err(|e| TvError::ImageFetchError {
+            url: path_str.to_string(),
+            message: format!("Failed to read local file: {e}"),
+        })?;
+
+        validate_image_data(path_str, &data)?;
+
+        tracing::debug!(
+            component = "tv.images.fetcher",
+            path = %path_str,
+            size = data.len(),
+            "Read local image file"
+        );
+
+        Ok(path.to_path_buf())
+    }
+
+    /// Fetches an image from a remote HTTP/HTTPS URL with caching.
+    async fn fetch_remote(&self, url: &str) -> Result<PathBuf, TvError> {
         if let Some(cached_path) = self.cache.get(url) {
             tracing::debug!(
                 component = "tv.images.fetcher",
@@ -104,6 +146,8 @@ impl ImageFetcher {
                 message: format!("HTTP {status}"),
             });
         }
+
+        validate_content_type(url, &response)?;
 
         let bytes = response.bytes().await.map_err(|e| TvError::ImageFetchError {
             url: url.to_string(),
@@ -174,6 +218,36 @@ impl Default for ImageFetcherState {
     fn default() -> Self {
         Self::new()
     }
+}
+
+/// Returns true if the given string looks like a local filesystem path
+/// rather than an HTTP/HTTPS URL.
+fn is_local_path(url: &str) -> bool {
+    !url.starts_with("http://") && !url.starts_with("https://")
+}
+
+/// Validates the HTTP response content-type header indicates an image.
+///
+/// Accepts responses with `image/*` content types, `application/octet-stream`,
+/// or missing content-type headers (falling back to image data validation).
+fn validate_content_type(url: &str, response: &reqwest::Response) -> Result<(), TvError> {
+    let Some(content_type) = response.headers().get(reqwest::header::CONTENT_TYPE) else {
+        return Ok(());
+    };
+
+    let content_type_str = content_type.to_str().unwrap_or("");
+    let lower = content_type_str.to_ascii_lowercase();
+    if lower.starts_with(IMAGE_CONTENT_TYPE_PREFIX)
+        || lower.starts_with(OCTET_STREAM_CONTENT_TYPE)
+        || lower.is_empty()
+    {
+        return Ok(());
+    }
+
+    Err(TvError::ImageFetchError {
+        url: url.to_string(),
+        message: format!("Unexpected content-type: {content_type_str}"),
+    })
 }
 
 /// Validates that the provided bytes represent a decodable image format.

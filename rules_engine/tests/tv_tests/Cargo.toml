@@ -12,4 +12,5 @@ tv = { path = "../../src/tv/src-tauri" }
 proptest = { workspace = true }
 serde_json = { workspace = true }
 tempfile = { workspace = true }
+tokio = { workspace = true }
 toml = { workspace = true }
