@@ -79,27 +79,39 @@ pub fn load_toml_document_with_fs(
         TvError::TomlParseError { path: file_path.to_string(), line, message: e.message().to_string() }
     })?;
 
-    let table = value.get(table_name).ok_or_else(|| {
-        tracing::error!(
-            component = "tv.toml",
-            file_path = %file_path,
-            table_name = %table_name,
-            error = "Table not found",
-            "Load failed"
-        );
-        TvError::TableNotFound { table_name: table_name.to_string() }
-    })?;
+    let resolved_name = table_name.replace('-', "_");
+    let table = value
+        .get(table_name)
+        .or_else(|| value.get(&resolved_name))
+        .ok_or_else(|| {
+            tracing::warn!(
+                component = "tv.toml",
+                file_path = %file_path,
+                table_name = %table_name,
+                "Skipping file: no matching array-of-tables key found"
+            );
+            TvError::TableNotFound { table_name: table_name.to_string() }
+        })?;
 
     let array = table.as_array().ok_or_else(|| {
-        tracing::error!(
+        tracing::warn!(
             component = "tv.toml",
             file_path = %file_path,
             table_name = %table_name,
-            error = "Not an array of tables",
-            "Load failed"
+            "Skipping file: value is not an array"
         );
         TvError::NotAnArrayOfTables { table_name: table_name.to_string() }
     })?;
+
+    if !array.is_empty() && !array.iter().any(|item| item.is_table()) {
+        tracing::warn!(
+            component = "tv.toml",
+            file_path = %file_path,
+            table_name = %table_name,
+            "Skipping file: array does not contain tables"
+        );
+        return Err(TvError::NotAnArrayOfTables { table_name: table_name.to_string() });
+    }
 
     let mut seen = HashSet::new();
     let mut headers = Vec::new();
