@@ -1,1 +1,1 @@
-// Stub module for Phase 14: Logging
+pub mod json_logger;

@@ -15,7 +15,7 @@ pub mod error;
 #[path = "images/images_mod.rs"]
 mod images;
 #[path = "logging/logging_mod.rs"]
-mod logging;
+pub mod logging;
 #[path = "sort/sort_mod.rs"]
 pub mod sort;
 #[path = "sync/sync_mod.rs"]
@@ -93,7 +93,8 @@ fn stop_compute_executor(app_handle: &tauri::AppHandle) {
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
-pub fn run(paths: cli::AppPaths, _jsonl: bool) {
+pub fn run(paths: cli::AppPaths, jsonl: bool) {
+    logging::json_logger::initialize(jsonl);
     derived::fluent_integration::initialize_fluent_resource();
     derived::function_registry::initialize_global_registry();
     cleanup_temp_files_on_startup(&paths);
