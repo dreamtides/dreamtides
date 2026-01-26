@@ -801,6 +801,207 @@ cost = 1
 }
 
 #[test]
+fn test_save_table_null_removes_key_from_existing_row() {
+    let harness = TvTestHarness::new();
+    let path = harness.create_toml_file(
+        "table_null.toml",
+        r#"[[cards]]
+id = "card-1"
+name = "First Card"
+optional = "remove me"
+
+[[cards]]
+id = "card-2"
+name = "Second Card"
+optional = "keep this"
+"#,
+    );
+
+    let mut table = harness.load_table(&path, "cards").expect("Should load table");
+    let optional_idx = table.headers.iter().position(|h| h == "optional").unwrap();
+    table.rows[0][optional_idx] = serde_json::Value::Null;
+
+    harness.save_table(&path, "cards", &table).expect("Should save table");
+
+    let content = harness.read_file_content(&path);
+    assert!(content.contains("id = \"card-1\""), "First row id should remain");
+    assert!(content.contains("name = \"First Card\""), "First row name should remain");
+    assert!(content.matches("optional").count() == 1, "Only second row should have 'optional' key");
+    assert!(content.contains("optional = \"keep this\""), "Second row optional should remain");
+}
+
+#[test]
+fn test_save_table_all_nulls_removes_row() {
+    let harness = TvTestHarness::new();
+    let path = harness.create_toml_file(
+        "remove_row.toml",
+        r#"[[cards]]
+id = "card-1"
+name = "First"
+
+[[cards]]
+id = "card-2"
+name = "Second"
+
+[[cards]]
+id = "card-3"
+name = "Third"
+"#,
+    );
+
+    let mut table = harness.load_table(&path, "cards").expect("Should load table");
+    assert_eq!(table.rows.len(), 3);
+
+    // Clear all values in the second row
+    for col_idx in 0..table.headers.len() {
+        table.rows[1][col_idx] = serde_json::Value::Null;
+    }
+
+    harness.save_table(&path, "cards", &table).expect("Should save table");
+
+    let reloaded = harness.load_table(&path, "cards").expect("Should reload table");
+    assert_eq!(reloaded.rows.len(), 2, "Should have 2 rows after removing empty row");
+
+    let id_idx = reloaded.headers.iter().position(|h| h == "id").unwrap();
+    assert_eq!(reloaded.rows[0][id_idx].as_str(), Some("card-1"));
+    assert_eq!(reloaded.rows[1][id_idx].as_str(), Some("card-3"));
+}
+
+#[test]
+fn test_save_table_fewer_rows_removes_excess() {
+    let harness = TvTestHarness::new();
+    let path = harness.create_toml_file(
+        "fewer_rows.toml",
+        r#"[[cards]]
+id = "card-1"
+name = "First"
+
+[[cards]]
+id = "card-2"
+name = "Second"
+
+[[cards]]
+id = "card-3"
+name = "Third"
+"#,
+    );
+
+    let mut table = harness.load_table(&path, "cards").expect("Should load table");
+    assert_eq!(table.rows.len(), 3);
+
+    // Frontend sends only 2 rows (last row was cleared and trimmed)
+    table.rows.pop();
+
+    harness.save_table(&path, "cards", &table).expect("Should save table");
+
+    let reloaded = harness.load_table(&path, "cards").expect("Should reload table");
+    assert_eq!(reloaded.rows.len(), 2, "Should have 2 rows after removing excess");
+
+    let id_idx = reloaded.headers.iter().position(|h| h == "id").unwrap();
+    assert_eq!(reloaded.rows[0][id_idx].as_str(), Some("card-1"));
+    assert_eq!(reloaded.rows[1][id_idx].as_str(), Some("card-2"));
+
+    let content = harness.read_file_content(&path);
+    assert!(!content.contains("card-3"), "Third card should be removed from file");
+}
+
+#[test]
+fn test_save_table_clear_last_row_removes_it() {
+    let harness = TvTestHarness::new();
+    let path = harness.create_toml_file(
+        "clear_last.toml",
+        r#"[[cards]]
+id = "card-1"
+name = "First"
+
+[[cards]]
+id = "card-2"
+name = "Second"
+"#,
+    );
+
+    // Simulate: user clears all cells in the last row, frontend trims trailing
+    // empty rows and sends only 1 row.
+    let table = TomlTableData {
+        headers: vec!["id".to_string(), "name".to_string()],
+        rows: vec![vec![json!("card-1"), json!("First")]],
+    };
+
+    harness.save_table(&path, "cards", &table).expect("Should save table");
+
+    let reloaded = harness.load_table(&path, "cards").expect("Should reload table");
+    assert_eq!(reloaded.rows.len(), 1, "Should have 1 row after clearing last");
+    let id_idx = reloaded.headers.iter().position(|h| h == "id").unwrap();
+    assert_eq!(reloaded.rows[0][id_idx].as_str(), Some("card-1"));
+}
+
+#[test]
+fn test_save_table_clear_middle_row_removes_it() {
+    let harness = TvTestHarness::new();
+    let path = harness.create_toml_file(
+        "clear_middle.toml",
+        r#"[[cards]]
+id = "card-1"
+name = "First"
+
+[[cards]]
+id = "card-2"
+name = "Second"
+
+[[cards]]
+id = "card-3"
+name = "Third"
+"#,
+    );
+
+    // Simulate: user clears all cells in the middle row. Frontend includes
+    // the empty row (all nulls) in the data.
+    let table = TomlTableData {
+        headers: vec!["id".to_string(), "name".to_string()],
+        rows: vec![
+            vec![json!("card-1"), json!("First")],
+            vec![serde_json::Value::Null, serde_json::Value::Null],
+            vec![json!("card-3"), json!("Third")],
+        ],
+    };
+
+    harness.save_table(&path, "cards", &table).expect("Should save table");
+
+    let reloaded = harness.load_table(&path, "cards").expect("Should reload table");
+    assert_eq!(reloaded.rows.len(), 2, "Should have 2 rows after removing middle");
+
+    let id_idx = reloaded.headers.iter().position(|h| h == "id").unwrap();
+    assert_eq!(reloaded.rows[0][id_idx].as_str(), Some("card-1"));
+    assert_eq!(reloaded.rows[1][id_idx].as_str(), Some("card-3"));
+}
+
+#[test]
+fn test_save_table_preserves_unknown_keys_on_partial_clear() {
+    let harness = TvTestHarness::new();
+    let path = harness.create_toml_file(
+        "unknown_keys.toml",
+        r#"[[cards]]
+id = "card-1"
+name = "First"
+hidden = "not in headers"
+"#,
+    );
+
+    // Frontend only knows about id and name, not hidden
+    let table = TomlTableData {
+        headers: vec!["id".to_string(), "name".to_string()],
+        rows: vec![vec![json!("card-1"), serde_json::Value::Null]],
+    };
+
+    harness.save_table(&path, "cards", &table).expect("Should save table");
+
+    let content = harness.read_file_content(&path);
+    assert!(content.contains("id = \"card-1\""), "id should remain");
+    assert!(!content.contains("name"), "name should be removed");
+    assert!(content.contains("hidden = \"not in headers\""), "Unknown key should be preserved");
+}
+
+#[test]
 fn test_cleanup_orphaned_temp_files_removes_temp_files() {
     let mock = MockFileSystem::new().with_temp_files(vec![
         PathBuf::from("/tmp/.tv_save_abc123"),

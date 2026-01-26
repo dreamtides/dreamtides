@@ -150,7 +150,9 @@ pub fn save_toml_document_with_fs(
 
             for (col_idx, header) in data.headers.iter().enumerate() {
                 if let Some(json_val) = row.get(col_idx) {
-                    if let Some(existing) = table.get_mut(header) {
+                    if json_val.is_null() {
+                        table.remove(header);
+                    } else if let Some(existing) = table.get_mut(header) {
                         // Use type-preserving conversion to maintain boolean types when the
                         // spreadsheet library returns 0/1 instead of false/true
                         if let Some(new_val) =
@@ -158,10 +160,8 @@ pub fn save_toml_document_with_fs(
                         {
                             *existing = new_val;
                         }
-                    } else if !json_val.is_null() {
-                        if let Some(toml_val) = value_converter::json_to_toml_edit(json_val) {
-                            table.insert(header, toml_val);
-                        }
+                    } else if let Some(toml_val) = value_converter::json_to_toml_edit(json_val) {
+                        table.insert(header, toml_val);
                     }
                 }
             }
@@ -184,6 +184,48 @@ pub fn save_toml_document_with_fs(
                 "New row appended during save"
             );
         }
+    }
+
+    // Remove empty rows (all keys cleared) and excess rows (frontend sent fewer
+    // rows than exist in TOML, e.g. when the user cleared the last row).
+    let mut needs_rebuild = data.rows.len() < existing_len;
+    if !needs_rebuild {
+        for row_idx in 0..existing_len.min(data.rows.len()) {
+            if let Some(table) = array.get(row_idx) {
+                if table.is_empty() {
+                    needs_rebuild = true;
+                    break;
+                }
+            }
+        }
+    }
+
+    if needs_rebuild {
+        let mut new_array = toml_edit::ArrayOfTables::new();
+        for i in 0..array.len() {
+            if i >= data.rows.len() && i < existing_len {
+                tracing::info!(
+                    component = "tv.toml",
+                    file_path = %file_path,
+                    row_index = i,
+                    "Removing excess row during save"
+                );
+                continue;
+            }
+            if let Some(table) = array.get(i) {
+                if table.is_empty() {
+                    tracing::info!(
+                        component = "tv.toml",
+                        file_path = %file_path,
+                        row_index = i,
+                        "Removing empty row during save"
+                    );
+                    continue;
+                }
+                new_array.push(table.clone());
+            }
+        }
+        doc[table_name] = toml_edit::Item::ArrayOfTables(new_array);
     }
 
     let output = doc.to_string();

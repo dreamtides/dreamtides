@@ -165,11 +165,17 @@ export const UniverSpreadsheet = forwardRef<
 
     if (headers.length === 0) return null;
 
+    // Determine minimum rows to scan: use the last known data row count so we
+    // don't stop early when a middle row is cleared.
+    const knownSheetData = multiSheetDataRef.current?.sheets.find(
+      (s) => s.id === currentSheetId
+    );
+    const minRows = knownSheetData?.data.rows.length ?? 0;
+
     const rows: (string | number | boolean | null)[][] = [];
     let rowIndex = 2;
-    let hasData = true;
 
-    while (hasData) {
+    for (;;) {
       const row: (string | number | boolean | null)[] = [];
       let rowHasContent = false;
 
@@ -186,12 +192,23 @@ export const UniverSpreadsheet = forwardRef<
         }
       }
 
-      if (rowHasContent) {
-        rows.push(row);
-        rowIndex++;
-      } else {
-        hasData = false;
+      // Stop at the first empty row only after we have scanned at least
+      // minRows rows. This ensures clearing a middle row doesn't truncate
+      // all subsequent data.
+      if (!rowHasContent && rows.length >= minRows) {
+        break;
       }
+
+      rows.push(row);
+      rowIndex++;
+    }
+
+    // Trim trailing empty rows
+    while (
+      rows.length > 0 &&
+      rows[rows.length - 1].every((v) => v === null)
+    ) {
+      rows.pop();
     }
 
     return { headers, rows };
