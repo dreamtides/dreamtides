@@ -3,6 +3,7 @@ use std::collections::HashSet;
 use tauri::Manager;
 
 use crate::derived::compute_executor::ComputeExecutorState;
+use crate::filter::filter_state::FilterStateManager;
 use crate::images::image_fetcher::ImageFetcherState;
 
 pub mod cli;
@@ -12,6 +13,8 @@ mod commands;
 pub mod derived;
 #[path = "error/error_mod.rs"]
 pub mod error;
+#[path = "filter/filter_mod.rs"]
+pub mod filter;
 #[path = "images/images_mod.rs"]
 pub mod images;
 #[path = "logging/logging_mod.rs"]
@@ -107,6 +110,7 @@ pub fn run(paths: cli::AppPaths, jsonl: bool) {
         .manage(sync::file_watcher::FileWatcherState::new())
         .manage(sync::state_machine::SyncStateMachineState::new())
         .manage(sort::sort_state::SortStateManager::new())
+        .manage(FilterStateManager::new())
         .manage(executor_state)
         .manage(ImageFetcherState::new())
         .invoke_handler(tauri::generate_handler![
@@ -128,6 +132,11 @@ pub fn run(paths: cli::AppPaths, jsonl: bool) {
             commands::derived_command::clear_computation_queue,
             commands::derived_command::get_computation_queue_length,
             commands::derived_command::get_derived_columns_config,
+            commands::filter_command::get_filter_state,
+            commands::filter_command::set_filter_state,
+            commands::filter_command::clear_filter_state,
+            commands::filter_command::get_filter_visibility,
+            commands::filter_command::is_row_visible,
             commands::validation_command::get_validation_rules,
             commands::validation_command::get_enum_validation_rules,
             commands::style_command::get_table_style,

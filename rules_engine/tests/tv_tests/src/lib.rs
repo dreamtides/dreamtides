@@ -5,6 +5,8 @@ mod derived_tests;
 #[cfg(test)]
 mod error_tests;
 #[cfg(test)]
+mod filter_tests;
+#[cfg(test)]
 mod image_tests;
 #[cfg(test)]
 mod logging_tests;
