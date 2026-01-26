@@ -4,6 +4,7 @@ use std::path::PathBuf;
 use chrono::{NaiveDate, Utc};
 use chrono_tz::America::Los_Angeles;
 use tracing::Level;
+use tracing_subscriber::filter::LevelFilter;
 use tracing_subscriber::fmt::time::FormatTime;
 use tracing_subscriber::fmt::MakeWriter;
 use tracing_subscriber::prelude::*;
@@ -22,18 +23,18 @@ pub fn initialize() {
         .with_target(false)
         .with_current_span(false)
         .with_span_list(false)
-        .with_writer(file_writer);
+        .with_writer(file_writer)
+        .with_filter(build_env_filter());
 
     let stdout_layer = tracing_subscriber::fmt::layer()
         .compact()
         .with_timer(PacificTime)
         .with_target(false)
-        .with_writer(std::io::stdout);
+        .with_writer(std::io::stdout)
+        .with_filter(LevelFilter::ERROR);
 
     Registry::default()
-        .with(build_env_filter())
         .with(file_layer)
-        .with(build_env_filter())
         .with(stdout_layer)
         .init();
 
