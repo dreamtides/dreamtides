@@ -139,6 +139,33 @@ impl TvTestHarness {
             path.to_str().unwrap_or_else(|| panic!("Invalid path: {path:?}")),
         )
     }
+
+    /// Extracts enum validation rules from metadata, returning column names
+    /// and their allowed values. Mirrors the backend
+    /// `get_enum_validation_rules` command logic.
+    pub fn parse_enum_validation_rules(
+        &self,
+        path: &Path,
+    ) -> Result<Vec<EnumValidationInfo>, TvError> {
+        let rules = self.parse_validation_rules(path)?;
+        Ok(rules
+            .into_iter()
+            .filter_map(|rule| {
+                if let ValidationRule::Enum { column, allowed_values, .. } = rule {
+                    Some(EnumValidationInfo { column, allowed_values })
+                } else {
+                    None
+                }
+            })
+            .collect())
+    }
+}
+
+/// Enum validation info for dropdown support testing.
+#[derive(Debug, Clone, PartialEq)]
+pub struct EnumValidationInfo {
+    pub column: String,
+    pub allowed_values: Vec<String>,
 }
 
 impl Default for TvTestHarness {
