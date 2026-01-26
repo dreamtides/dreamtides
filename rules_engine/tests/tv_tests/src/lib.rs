@@ -2,6 +2,8 @@
 mod derived_tests;
 #[cfg(test)]
 mod image_tests;
+#[cfg(test)]
+mod logging_tests;
 mod test_utils;
 #[cfg(test)]
 mod toml_tests;
