@@ -1,4 +1,4 @@
-use std::collections::BTreeSet;
+use std::collections::HashSet;
 use std::io::ErrorKind;
 use std::path::Path;
 use std::time::Instant;
@@ -101,16 +101,17 @@ pub fn load_toml_document_with_fs(
         TvError::NotAnArrayOfTables { table_name: table_name.to_string() }
     })?;
 
-    let mut all_keys = BTreeSet::new();
+    let mut seen = HashSet::new();
+    let mut headers = Vec::new();
     for item in array {
         if let Some(tbl) = item.as_table() {
             for key in tbl.keys() {
-                all_keys.insert(key.clone());
+                if seen.insert(key.clone()) {
+                    headers.push(key.clone());
+                }
             }
         }
     }
-
-    let headers: Vec<String> = all_keys.into_iter().collect();
     let mut rows = Vec::new();
     for item in array {
         let mut row = Vec::new();
