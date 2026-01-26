@@ -131,6 +131,7 @@ pub fn run(paths: cli::AppPaths, jsonl: bool) {
             commands::validation_command::get_validation_rules,
             commands::validation_command::get_enum_validation_rules,
             commands::image_command::fetch_image,
+            commands::log_command::log_message,
             get_app_paths,
         ])
         .setup(|app| {

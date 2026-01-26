@@ -590,6 +590,22 @@ export async function getEnumValidationRules(
   return invoke<EnumValidationInfo[]>("get_enum_validation_rules", { filePath });
 }
 
+// ============ Logging Commands ============
+
+export interface FrontendLogMessage {
+  ts: string;
+  level: string;
+  component: string;
+  msg: string;
+  context?: Record<string, unknown>;
+}
+
+export async function logMessage(
+  message: FrontendLogMessage
+): Promise<void> {
+  return invoke("log_message", { message });
+}
+
 // ============ Events ============
 
 export type Disposable = { dispose: () => void };
