@@ -282,6 +282,85 @@ await sheet.saveCellImagesAsync({
 await range.saveCellImagesAsync(options);
 ```
 
+## Vite Pre-Bundling Compatibility
+
+**CRITICAL**: Univer's architecture is fragile under Vite's dependency
+pre-bundling. Two issues have caused significant debugging time and must be
+guarded against.
+
+### Version Alignment
+
+All `@univerjs/*` packages MUST be pinned to the exact same version in
+package.json. Even a minor patch mismatch (e.g. core at 0.15.2 while drawing
+packages are at 0.15.3) causes the dependency injection (DI) system
+(`@wendellhu/redi`) to fail at runtime with opaque errors like:
+
+    [redi]: Expect 1 dependency item(s) for id "z" but get 0.
+
+This happens because a newer plugin may depend on services or DI tokens
+introduced in the newer release that do not exist in the older core. The
+errors are difficult to diagnose because redi uses minified identifiers in
+its error messages, giving no indication of which service is missing.
+
+When upgrading, always update every `@univerjs/*` dependency together to the
+same version. Pin exact versions (e.g. `"0.15.3"`) rather than using caret
+ranges (`"^0.15.3"`) to prevent the package manager from resolving different
+patch versions for different packages.
+
+### Facade Mixin Duplication
+
+Univer's Facade API uses a class-extension mixin pattern:
+
+```typescript
+// Inside @univerjs/sheets-drawing-ui/facade:
+FWorksheet.extend(DrawingMixin);
+```
+
+This call adds methods like `newOverGridImage()` and `insertImages()` onto the
+`FWorksheet` prototype. However, Vite's pre-bundling can create separate
+JavaScript module copies of the same class. When this happens, the `.extend()`
+call modifies one copy of `FWorksheet` while the runtime uses a different copy,
+resulting in `newOverGridImage is not a function` errors.
+
+To mitigate this, `vite.config.ts` lists all drawing-related Univer packages in
+`optimizeDeps.include`, which encourages Vite to share code across pre-bundled
+chunks. However, this is not a complete fix — Vite may still create separate
+chunks that duplicate class prototypes.
+
+### Command Bypass Workaround
+
+Because of the facade mixin issue, `ImageCellRenderer` bypasses the FWorksheet
+facade entirely and uses Univer's command system directly:
+
+1. It imports `InsertSheetDrawingCommand` from `@univerjs/sheets-drawing-ui`
+2. It gets `ICommandService` from the injector
+3. If the drawing plugin's `onRendered()` lifecycle has not yet registered the
+   command, it manually registers `InsertSheetDrawingCommand`
+4. It calls `univerAPI.executeCommand("sheet.command.insert-sheet-image", ...)`
+   with manually constructed image data
+
+This approach also requires computing image positions via internal render
+services (`IRenderManagerService`, `ISheetSelectionRenderService`,
+`SheetSkeletonManagerService`) and the `convertPositionCellToSheetOverGrid()`
+utility from `@univerjs/sheets-ui`.
+
+### Drawing Command Timing
+
+The `UniverSheetsDrawingUIPlugin` registers its commands (including
+`sheet.command.insert-sheet-image`) during the `onRendered()` lifecycle phase,
+which fires only after the first render frame completes. Events from the Tauri
+backend (e.g. derived value results containing image paths) can arrive before
+this phase. The `ImageCellRenderer.ensureCommandsRegistered()` method handles
+this by checking `hasCommand()` and manually registering the command if needed.
+
+### Summary of Pitfalls
+
+| Problem | Symptom | Fix |
+|---------|---------|-----|
+| Version mismatch across `@univerjs/*` packages | `[redi]: Expect N dependency item(s) for id "x" but get 0` | Pin all packages to the same exact version |
+| Vite duplicates FWorksheet prototype | `newOverGridImage is not a function` | Bypass facade; use `executeCommand()` directly |
+| Drawing commands not registered yet | `[CommandService]: command "..." is not registered` | Call `ensureCommandsRegistered()` before use |
+
 ## Data Binding
 
 Univer receives data through its FUniver facade API. Data is structured as

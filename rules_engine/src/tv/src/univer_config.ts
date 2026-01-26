@@ -51,6 +51,10 @@ import "@univerjs/sheets-sort-ui/lib/index.css";
 import "@univerjs/drawing-ui/lib/index.css";
 import "@univerjs/sheets-drawing-ui/lib/index.css";
 
+// Facade side-effect imports add methods to FWorkbook/FWorksheet prototypes
+// via FBase.extend(). Vite pre-bundling can break this by creating duplicate
+// class prototypes — the extend() runs on one copy while runtime uses another.
+// See image_cell_renderer.ts for the workaround and appendix_d for details.
 import "@univerjs/engine-formula/facade";
 import "@univerjs/ui/facade";
 import "@univerjs/docs-ui/facade";
@@ -135,8 +139,13 @@ export function createUniverInstance(config: UniverConfig): UniverInstance {
   univer.registerPlugin(UniverSheetsDataValidationUIPlugin);
 
   // Drawing support for images (Phase 9)
-  // Note: Drawing plugin types require explicit casting due to Univer's
-  // protected _injector field not being recognized across package boundaries.
+  // IMPORTANT: All @univerjs/* packages must be at the same version.
+  // A version mismatch (e.g. drawing at 0.15.3 vs core at 0.15.2) causes
+  // silent DI resolution failures at runtime. See appendix_d_univer_integration.md.
+  //
+  // The `as never` casts are needed because TypeScript cannot see the
+  // protected _injector field across package boundaries. This is a
+  // compile-time-only cast with no runtime effect.
   univer.registerPlugin(UniverDrawingPlugin as never);
   univer.registerPlugin(UniverDrawingUIPlugin as never);
   univer.registerPlugin(UniverSheetsDrawingPlugin as never);

@@ -8,8 +8,12 @@ const host = process.env.TAURI_DEV_HOST;
 export default defineConfig(async () => ({
   plugins: [react()],
 
-  // Pre-bundle all Univer packages together to avoid duplicate class
-  // instances across separate Vite chunks.
+  // IMPORTANT: Vite pre-bundling can duplicate Univer class prototypes across
+  // separate chunks. This breaks the facade mixin pattern (FWorksheet.extend())
+  // and causes "X is not a function" errors at runtime. Listing packages here
+  // encourages Vite to share code across pre-bundled chunks. Even with this
+  // setting, the facade may still break — see image_cell_renderer.ts for the
+  // command-based workaround and appendix_d_univer_integration.md for details.
   optimizeDeps: {
     include: [
       "@univerjs/core",
