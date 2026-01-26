@@ -75,6 +75,11 @@ pub fn parse_sort_config_from_content(
     Ok(Some(SortConfig { column, ascending }))
 }
 
+/// Parses the metadata.validation_rules section from a TOML file using the real filesystem.
+pub fn parse_validation_rules_from_file(file_path: &str) -> Result<Vec<ValidationRule>, TvError> {
+    parse_validation_rules_with_fs(&RealFileSystem, file_path)
+}
+
 /// Parses the metadata.validation_rules section from a TOML file and returns
 /// a list of ValidationRule instances.
 pub fn parse_validation_rules_with_fs(
@@ -313,6 +318,17 @@ fn parse_single_rule(
             Ok(ValidationRule::Pattern { column, pattern, message })
         }
         "required" => Ok(ValidationRule::Required { column, message }),
+        "type" => {
+            let value_type = table
+                .get("value_type")
+                .and_then(|v| v.as_str())
+                .ok_or_else(|| TvError::MetadataCorrupt {
+                    path: file_path.to_string(),
+                    message: format!("validation_rules[{}] of type 'type' missing 'value_type' field", idx),
+                })?;
+            let value_type = parse_value_type(value_type, file_path, idx)?;
+            Ok(ValidationRule::Type { column, value_type, message })
+        }
         "string" => Ok(ValidationRule::Type { column, value_type: ValueType::String, message }),
         "integer" => Ok(ValidationRule::Type { column, value_type: ValueType::Integer, message }),
         "float" => Ok(ValidationRule::Type { column, value_type: ValueType::Float, message }),
@@ -320,6 +336,19 @@ fn parse_single_rule(
         other => Err(TvError::MetadataCorrupt {
             path: file_path.to_string(),
             message: format!("validation_rules[{}] has unknown type '{}'", idx, other),
+        }),
+    }
+}
+
+fn parse_value_type(value_type: &str, file_path: &str, idx: usize) -> Result<ValueType, TvError> {
+    match value_type {
+        "string" => Ok(ValueType::String),
+        "integer" => Ok(ValueType::Integer),
+        "float" => Ok(ValueType::Float),
+        "boolean" => Ok(ValueType::Boolean),
+        other => Err(TvError::MetadataCorrupt {
+            path: file_path.to_string(),
+            message: format!("validation_rules[{}] has unknown value_type '{}'", idx, other),
         }),
     }
 }

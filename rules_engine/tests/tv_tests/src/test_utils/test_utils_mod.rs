@@ -9,7 +9,9 @@ use tv_lib::toml::document_writer::{
     save_toml_document_with_fs, AddRowResult, CellUpdate, DeleteRowResult, SaveBatchResult,
     SaveCellResult,
 };
+use tv_lib::toml::metadata_parser;
 use tv_lib::traits::{FileSystem, RealFileSystem};
+use tv_lib::validation::validation_rules::ValidationRule;
 
 use crate::test_utils::mock_filesystem::MockFileSystem;
 
@@ -128,6 +130,13 @@ impl TvTestHarness {
             path.to_str().unwrap_or_else(|| panic!("Invalid path: {path:?}")),
             table_name,
             row_index,
+        )
+    }
+
+    pub fn parse_validation_rules(&self, path: &Path) -> Result<Vec<ValidationRule>, TvError> {
+        metadata_parser::parse_validation_rules_with_fs(
+            &*self.fs,
+            path.to_str().unwrap_or_else(|| panic!("Invalid path: {path:?}")),
         )
     }
 }
