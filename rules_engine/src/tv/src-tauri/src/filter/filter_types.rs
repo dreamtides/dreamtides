@@ -61,3 +61,40 @@ pub fn matches_condition(cell_value: &CellValue, condition: &FilterCondition) ->
         },
     }
 }
+
+/// Represents the active filter state for a single column.
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct ColumnFilterState {
+    pub column: String,
+    pub condition: FilterConditionState,
+}
+
+impl ColumnFilterState {
+    pub fn contains(column: impl Into<String>, substring: impl Into<String>) -> Self {
+        Self { column: column.into(), condition: FilterConditionState::Contains(substring.into()) }
+    }
+
+    pub fn equals(column: impl Into<String>, value: serde_json::Value) -> Self {
+        Self { column: column.into(), condition: FilterConditionState::Equals(value) }
+    }
+
+    pub fn values(column: impl Into<String>, values: Vec<serde_json::Value>) -> Self {
+        Self { column: column.into(), condition: FilterConditionState::Values(values) }
+    }
+}
+
+/// Filter condition for runtime filter state.
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum FilterConditionState {
+    /// Text contains substring (case-insensitive).
+    Contains(String),
+    /// Exact value match.
+    Equals(serde_json::Value),
+    /// Numeric range.
+    Range { min: Option<f64>, max: Option<f64> },
+    /// Boolean value match.
+    Boolean(bool),
+    /// Set of allowed values (Univer filter sends these).
+    Values(Vec<serde_json::Value>),
+}

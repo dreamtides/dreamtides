@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 use std::sync::RwLock;
 
-use crate::filter::filter_types::{matches_condition, FilterState};
+use crate::filter::filter_types::{matches_condition, ColumnFilterState, FilterConditionState, FilterState};
 use crate::sort::sort_types::CellValue;
 use crate::toml::document_loader::TomlTableData;
 use crate::toml::metadata_types::ColumnFilter;
@@ -9,6 +9,8 @@ use crate::toml::metadata_types::ColumnFilter;
 pub struct FilterStateManager {
     states: RwLock<HashMap<String, FilterState>>,
     visibility: RwLock<HashMap<String, Vec<bool>>>,
+    filter_states: RwLock<HashMap<String, Vec<ColumnFilterState>>>,
+    hidden_rows: RwLock<HashMap<String, Vec<usize>>>,
 }
 
 impl FilterStateManager {
@@ -16,6 +18,8 @@ impl FilterStateManager {
         Self {
             states: RwLock::new(HashMap::new()),
             visibility: RwLock::new(HashMap::new()),
+            filter_states: RwLock::new(HashMap::new()),
+            hidden_rows: RwLock::new(HashMap::new()),
         }
     }
 
@@ -70,6 +74,53 @@ impl FilterStateManager {
             .ok()
             .and_then(|vis| vis.get(&key).and_then(|v| v.get(row_index).copied()))
             .unwrap_or(true)
+    }
+
+    /// Returns the active filters for a given file and table.
+    pub fn get_filters(&self, file_path: &str, table_name: &str) -> Vec<ColumnFilterState> {
+        let key = format!("{file_path}::{table_name}");
+        self.filter_states.read().ok().and_then(|s| s.get(&key).cloned()).unwrap_or_default()
+    }
+
+    /// Sets the active filters for a given file and table.
+    pub fn set_filters(&self, file_path: &str, table_name: &str, filters: Vec<ColumnFilterState>) {
+        let key = format!("{file_path}::{table_name}");
+        if let Ok(mut states) = self.filter_states.write() {
+            if filters.is_empty() {
+                states.remove(&key);
+            } else {
+                states.insert(key, filters);
+            }
+        }
+    }
+
+    /// Clears all filters for a given file and table.
+    pub fn clear_filters(&self, file_path: &str, table_name: &str) {
+        let key = format!("{file_path}::{table_name}");
+        if let Ok(mut states) = self.filter_states.write() {
+            states.remove(&key);
+        }
+        if let Ok(mut hidden) = self.hidden_rows.write() {
+            hidden.remove(&key);
+        }
+    }
+
+    /// Stores the set of hidden (filtered-out) row indices.
+    pub fn set_hidden_rows(&self, file_path: &str, table_name: &str, rows: Vec<usize>) {
+        let key = format!("{file_path}::{table_name}");
+        if let Ok(mut hidden) = self.hidden_rows.write() {
+            if rows.is_empty() {
+                hidden.remove(&key);
+            } else {
+                hidden.insert(key, rows);
+            }
+        }
+    }
+
+    /// Returns the set of hidden row indices, if any filter is active.
+    pub fn get_hidden_rows(&self, file_path: &str, table_name: &str) -> Vec<usize> {
+        let key = format!("{file_path}::{table_name}");
+        self.hidden_rows.read().ok().and_then(|h| h.get(&key).cloned()).unwrap_or_default()
     }
 }
 
@@ -152,4 +203,99 @@ pub fn apply_filter_to_data(
     filter_state: Option<&FilterState>,
 ) -> TomlTableData {
     apply_filter_to_data_with_visibility(data, filter_state).0
+}
+
+/// Applies filters to table data and returns the indices of rows that should be hidden.
+pub fn compute_hidden_rows(data: &TomlTableData, filters: &[ColumnFilterState]) -> Vec<usize> {
+    if filters.is_empty() {
+        return Vec::new();
+    }
+
+    let mut hidden = Vec::new();
+
+    for (row_idx, row) in data.rows.iter().enumerate() {
+        let mut visible = true;
+        for filter in filters {
+            let col_idx = match data.headers.iter().position(|h| h == &filter.column) {
+                Some(idx) => idx,
+                None => continue,
+            };
+
+            let cell_value = row.get(col_idx).unwrap_or(&serde_json::Value::Null);
+            if !matches_filter(cell_value, &filter.condition) {
+                visible = false;
+                break;
+            }
+        }
+        if !visible {
+            hidden.push(row_idx);
+        }
+    }
+
+    hidden
+}
+
+/// Returns the visible row indices after applying filters.
+pub fn compute_visible_rows(data: &TomlTableData, filters: &[ColumnFilterState]) -> Vec<usize> {
+    if filters.is_empty() {
+        return (0..data.rows.len()).collect();
+    }
+
+    let hidden = compute_hidden_rows(data, filters);
+    (0..data.rows.len()).filter(|idx| !hidden.contains(idx)).collect()
+}
+
+fn matches_filter(value: &serde_json::Value, condition: &FilterConditionState) -> bool {
+    match condition {
+        FilterConditionState::Contains(substring) => {
+            let text = value_to_string(value);
+            text.to_lowercase().contains(&substring.to_lowercase())
+        }
+        FilterConditionState::Equals(expected) => value == expected,
+        FilterConditionState::Range { min, max } => {
+            let num = value_to_f64(value);
+            match num {
+                Some(n) => {
+                    min.is_none_or(|m| n >= m) && max.is_none_or(|m| n <= m)
+                }
+                None => false,
+            }
+        }
+        FilterConditionState::Boolean(expected) => match value {
+            serde_json::Value::Bool(b) => b == expected,
+            _ => false,
+        },
+        FilterConditionState::Values(allowed) => {
+            if allowed.is_empty() {
+                return true;
+            }
+            allowed.iter().any(|a| values_match(value, a))
+        }
+    }
+}
+
+fn values_match(value: &serde_json::Value, allowed: &serde_json::Value) -> bool {
+    if value == allowed {
+        return true;
+    }
+    value_to_string(value) == value_to_string(allowed)
+}
+
+fn value_to_string(value: &serde_json::Value) -> String {
+    match value {
+        serde_json::Value::Null => String::new(),
+        serde_json::Value::Bool(b) => b.to_string(),
+        serde_json::Value::Number(n) => n.to_string(),
+        serde_json::Value::String(s) => s.clone(),
+        serde_json::Value::Array(arr) => format!("{arr:?}"),
+        serde_json::Value::Object(obj) => format!("{obj:?}"),
+    }
+}
+
+fn value_to_f64(value: &serde_json::Value) -> Option<f64> {
+    match value {
+        serde_json::Value::Number(n) => n.as_f64(),
+        serde_json::Value::String(s) => s.parse::<f64>().ok(),
+        _ => None,
+    }
 }

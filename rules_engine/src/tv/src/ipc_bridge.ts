@@ -506,6 +506,71 @@ export async function translateRowIndex(
   });
 }
 
+// ============ Filter State ============
+
+export type FilterConditionState =
+  | { contains: string }
+  | { equals: unknown }
+  | { range: { min?: number; max?: number } }
+  | { boolean: boolean }
+  | { values: unknown[] };
+
+export interface ColumnFilterState {
+  column: string;
+  condition: FilterConditionState;
+}
+
+export interface SetFilterRequest {
+  column: string;
+  condition: FilterConditionState;
+}
+
+export interface FilterStateResponse {
+  filters: ColumnFilterState[];
+  hidden_rows: number[];
+}
+
+export async function getFilterState(
+  filePath: string,
+  tableName: string
+): Promise<FilterStateResponse> {
+  return invoke<FilterStateResponse>("get_filter_state", { filePath, tableName });
+}
+
+export async function setFilterState(
+  filePath: string,
+  tableName: string,
+  filters: SetFilterRequest[]
+): Promise<FilterStateResponse> {
+  return invoke<FilterStateResponse>("set_filter_state", {
+    filePath,
+    tableName,
+    filters,
+  });
+}
+
+export async function clearFilterState(
+  filePath: string,
+  tableName: string
+): Promise<FilterStateResponse> {
+  return invoke<FilterStateResponse>("clear_filter_state", { filePath, tableName });
+}
+
+export async function setHiddenRows(
+  filePath: string,
+  tableName: string,
+  hiddenRows: number[]
+): Promise<void> {
+  return invoke("set_hidden_rows", { filePath, tableName, hiddenRows });
+}
+
+export async function getHiddenRows(
+  filePath: string,
+  tableName: string
+): Promise<number[]> {
+  return invoke<number[]>("get_hidden_rows", { filePath, tableName });
+}
+
 // ============ Image Commands ============
 
 /**

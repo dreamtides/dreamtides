@@ -137,6 +137,8 @@ pub fn run(paths: cli::AppPaths, jsonl: bool) {
             commands::filter_command::clear_filter_state,
             commands::filter_command::get_filter_visibility,
             commands::filter_command::is_row_visible,
+            commands::filter_command::set_hidden_rows,
+            commands::filter_command::get_hidden_rows,
             commands::validation_command::get_validation_rules,
             commands::validation_command::get_enum_validation_rules,
             commands::style_command::get_table_style,

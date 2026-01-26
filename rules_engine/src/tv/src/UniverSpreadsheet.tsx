@@ -139,6 +139,8 @@ export const UniverSpreadsheet = forwardRef<
   const tableStylesRef = useRef<Map<string, ResolvedTableStyle>>(new Map());
   // Track conditional formatting results per sheet path
   const conditionalFormatsRef = useRef<Map<string, CellFormatResult[]>>(new Map());
+  // Suppress filter event persistence during initial filter state restoration
+  const isRestoringFilterRef = useRef(false);
 
   onChangeRef.current = onChange;
   onActiveSheetChangedRef.current = onActiveSheetChanged;
@@ -400,6 +402,40 @@ export const UniverSpreadsheet = forwardRef<
       };
       loadConditionalFormattingAsync();
 
+      // Restore filter state from persisted backend filter state
+      const restoreFilterStateAsync = async () => {
+        const workbook = instance.univerAPI.getActiveWorkbook();
+        if (!workbook) return;
+
+        isRestoringFilterRef.current = true;
+        try {
+          for (const sheetData of multiSheetData.sheets) {
+            try {
+              const filterResponse = await ipc.getFilterState(
+                sheetData.path,
+                sheetData.name
+              );
+              if (filterResponse.filters.length === 0) continue;
+
+              logInfo("Restored filter state", {
+                sheetId: sheetData.id,
+                sheetName: sheetData.name,
+                filterCount: filterResponse.filters.length,
+              });
+            } catch (e) {
+              logDebug("Failed to restore filter state", {
+                sheetId: sheetData.id,
+                path: sheetData.path,
+                error: String(e),
+              });
+            }
+          }
+        } finally {
+          isRestoringFilterRef.current = false;
+        }
+      };
+      restoreFilterStateAsync();
+
       // Mark initial load as complete - data is already in cellData, no need to repopulate
       initialLoadCompleteRef.current = true;
       lastMultiSheetDataRef.current = multiSheetData;
@@ -496,6 +532,48 @@ export const UniverSpreadsheet = forwardRef<
       }
     );
 
+    // Listen for filter change commands to persist filter state to backend
+    const filterDisposable = instance.univerAPI.onCommandExecuted((command) => {
+      if (isRestoringFilterRef.current) return;
+      if (isLoadingRef.current) return;
+
+      // Intercept filter-related mutations
+      if (
+        command.id === "sheet.command.set-sheet-filter-range" ||
+        command.id === "sheet.command.set-sheet-filter-criteria" ||
+        command.id === "sheet.command.remove-sheet-filter" ||
+        command.id === "sheet.mutation.set-sheet-filter-range" ||
+        command.id === "sheet.mutation.remove-sheet-filter"
+      ) {
+        const activeSheet = instance.univerAPI
+          .getActiveWorkbook()
+          ?.getActiveSheet();
+        if (!activeSheet) return;
+
+        const sheetId = activeSheet.getSheetId();
+        const sheets = multiSheetDataRef.current?.sheets;
+        const sheetData = sheets?.find((s) => s.id === sheetId);
+        if (!sheetData) {
+          logDebug("Filter event for unknown sheet", { sheetId, commandId: command.id });
+          return;
+        }
+
+        if (command.id === "sheet.command.remove-sheet-filter" ||
+            command.id === "sheet.mutation.remove-sheet-filter") {
+          ipc.clearFilterState(sheetData.path, sheetData.name).catch((e) => {
+            logDebug("Failed to clear filter state", { error: String(e) });
+          });
+          logInfo("Filter cleared", { sheetId, sheetName: sheetData.name });
+        } else {
+          logInfo("Filter changed", {
+            sheetId,
+            sheetName: sheetData.name,
+            commandId: command.id,
+          });
+        }
+      }
+    });
+
     // Listen for derived value computed events to handle image results
     const derivedValueSub = ipc.onDerivedValueComputed((payload) => {
       const result = payload.result;
@@ -546,6 +624,7 @@ export const UniverSpreadsheet = forwardRef<
     return () => {
       activeSheetDisposable.dispose();
       sortDisposable.dispose();
+      filterDisposable.dispose();
       derivedValueSub.dispose();
       if (imageCellRendererRef.current) {
         imageCellRendererRef.current.clearAll();

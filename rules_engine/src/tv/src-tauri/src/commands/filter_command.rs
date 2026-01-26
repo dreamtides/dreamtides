@@ -135,6 +135,32 @@ pub fn is_row_visible(
     state.is_row_visible(&file_path, &table_name, row_index)
 }
 
+#[tauri::command]
+pub fn set_hidden_rows(
+    state: State<FilterStateManager>,
+    file_path: String,
+    table_name: String,
+    hidden_rows: Vec<usize>,
+) {
+    tracing::debug!(
+        component = "tv.commands.filter",
+        file_path = %file_path,
+        table_name = %table_name,
+        hidden_count = hidden_rows.len(),
+        "Set hidden rows"
+    );
+    state.set_hidden_rows(&file_path, &table_name, hidden_rows);
+}
+
+#[tauri::command]
+pub fn get_hidden_rows(
+    state: State<FilterStateManager>,
+    file_path: String,
+    table_name: String,
+) -> Vec<usize> {
+    state.get_hidden_rows(&file_path, &table_name)
+}
+
 fn persist_filter_to_metadata(file_path: &str, filter_state: Option<&FilterState>) {
     let filter_config = filter_state.map(|s| FilterConfig {
         filters: s.filters.clone(),
