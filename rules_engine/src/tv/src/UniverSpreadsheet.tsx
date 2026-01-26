@@ -1361,9 +1361,9 @@ function applyDerivedResultToCell(
     range.setFontColor("#FF0000");
     logDebug("Applied error derived result", { row, col, error: result.value });
   } else if (result.type === "image") {
-    range.setValues([[`[Image: ${result.value}]`]]);
-    range.setFontColor("#0066CC");
-    logDebug("Applied image derived result", { row, col, url: result.value });
+    // Image results are handled by ImageCellRenderer via the
+    // derived-value-computed event listener, not via cell text.
+    return;
   } else {
     const value = cellData.v !== undefined ? cellData.v : "";
     range.setValues([[value]]);

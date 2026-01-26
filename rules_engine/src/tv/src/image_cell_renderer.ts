@@ -134,6 +134,17 @@ export class ImageCellRenderer {
         column,
       });
 
+      if (typeof sheet.newOverGridImage !== "function") {
+        logError(
+          "sheet.newOverGridImage is not available. " +
+            "Ensure all @univerjs facade modules share the same pre-bundled chunks " +
+            "(check vite.config.ts optimizeDeps.include).",
+          { cellKey }
+        );
+        this.setErrorState(sheet, cellKey, row, column, "Image plugin not loaded");
+        return;
+      }
+
       const imageBuilder = sheet
         .newOverGridImage()
         .setSource(assetUrl, ImageSourceType.URL)
