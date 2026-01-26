@@ -124,7 +124,7 @@ export function AppRoot() {
     }
   }, []);
 
-  const loadAllFiles = useCallback(async (sheetInfos: SheetInfo[]): Promise<void> => {
+  const loadAllFiles = useCallback(async (sheetInfos: SheetInfo[], restoredSheetId?: string): Promise<void> => {
     setLoading(true);
     const loadPromises = sheetInfos.map(async (info): Promise<SheetData | null> => {
       const data = await loadSingleFile(info.path, info.tableName);
@@ -155,7 +155,10 @@ export function AppRoot() {
 
     setMultiSheetData({ sheets: validSheets });
     if (!activeSheetIdRef.current && validSheets.length > 0) {
-      setActiveSheetId(validSheets[0].id);
+      const initialId = restoredSheetId && validSheets.some((s) => s.id === restoredSheetId)
+        ? restoredSheetId
+        : validSheets[0].id;
+      setActiveSheetId(initialId);
     }
     setError(null);
     setLoading(false);
@@ -238,7 +241,13 @@ export function AppRoot() {
 
   const handleActiveSheetChanged = useCallback((sheetId: string) => {
     setActiveSheetId(sheetId);
-  }, []);
+    const sheetInfo = sheets.find((s) => s.id === sheetId);
+    if (sheetInfo) {
+      ipc.saveViewState(sheetInfo.path).catch((e) =>
+        console.error("Failed to save view state:", e)
+      );
+    }
+  }, [sheets]);
 
   useEffect(() => {
     const init = async () => {
@@ -257,7 +266,21 @@ export function AppRoot() {
         }));
 
         setSheets(sheetInfos);
-        await loadAllFiles(sheetInfos);
+
+        let restoredSheetId: string | undefined;
+        try {
+          const viewState = await ipc.loadViewState();
+          if (viewState.active_sheet_path) {
+            const match = sheetInfos.find((s) => s.path === viewState.active_sheet_path);
+            if (match) {
+              restoredSheetId = match.id;
+            }
+          }
+        } catch (e) {
+          console.error("Failed to load view state:", e);
+        }
+
+        await loadAllFiles(sheetInfos, restoredSheetId);
 
         for (const info of sheetInfos) {
           if (!watchersStartedRef.current.has(info.path)) {
@@ -370,6 +393,7 @@ export function AppRoot() {
           onChange={handleChange}
           onActiveSheetChanged={handleActiveSheetChanged}
           derivedColumnState={derivedColumnState}
+          initialActiveSheetId={activeSheetId ?? undefined}
         />
       </div>
     </div>

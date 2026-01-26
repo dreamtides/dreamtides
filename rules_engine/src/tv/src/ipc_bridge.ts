@@ -737,6 +737,22 @@ export async function logMessage(
   return invoke("log_message", { message });
 }
 
+// ============ View State Commands ============
+
+export interface ViewState {
+  active_sheet_path: string | null;
+}
+
+export async function loadViewState(): Promise<ViewState> {
+  return invoke<ViewState>("load_view_state");
+}
+
+export async function saveViewState(
+  activeSheetPath: string | null
+): Promise<void> {
+  return invoke("save_view_state", { activeSheetPath });
+}
+
 // ============ Events ============
 
 export type Disposable = { dispose: () => void };

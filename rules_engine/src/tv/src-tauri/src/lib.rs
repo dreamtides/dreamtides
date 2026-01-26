@@ -31,6 +31,8 @@ pub mod traits;
 mod uuid;
 #[path = "validation/validation_mod.rs"]
 pub mod validation;
+#[path = "view_state/view_state_mod.rs"]
+pub mod view_state;
 
 #[tauri::command]
 fn get_app_paths(state: tauri::State<cli::AppPaths>) -> Vec<String> {
@@ -147,6 +149,8 @@ pub fn run(paths: cli::AppPaths, jsonl: bool) {
             commands::style_command::get_conditional_formatting,
             commands::image_command::fetch_image,
             commands::log_command::log_message,
+            commands::view_state_command::load_view_state,
+            commands::view_state_command::save_view_state,
             get_app_paths,
         ])
         .setup(|app| {

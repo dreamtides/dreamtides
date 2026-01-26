@@ -120,6 +120,19 @@ Metadata categories include:
 - Table styling: color scheme selection, header formatting
 - Sort and filter state: default sort column and direction
 
+### Local View State
+TV maintains a lightweight `.tv_view_state.json` file alongside the TOML data
+files for persisting local UI state across sessions. This is distinct from the
+per-file TOML metadata which stores spreadsheet configuration (column widths,
+sort state, etc.) within each TOML file.
+
+The view state file stores cross-file UI preferences such as the most recently
+viewed sheet. The file is placed in the parent directory of the opened TOML
+files, derived from the first entry in AppPaths. The JSON schema contains an
+`active_sheet_path` field holding the absolute path of the last active sheet.
+On restore, the path is matched against available sheets; if the path no longer
+exists in the available sheets, the first sheet is used as a fallback.
+
 ### Structure Preservation Strategy
 All file writes use toml_edit::DocumentMut to parse and modify the document
 in place. The save operation reads the current file, parses it with toml_edit,

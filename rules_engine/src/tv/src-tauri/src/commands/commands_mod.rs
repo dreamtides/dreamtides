@@ -7,4 +7,5 @@ pub mod save_command;
 pub mod sort_command;
 pub mod style_command;
 pub mod validation_command;
+pub mod view_state_command;
 pub mod watch_command;

@@ -93,6 +93,8 @@ interface UniverSpreadsheetProps {
   onActiveSheetChanged?: (sheetId: string) => void;
   /** Derived column configurations and computed values */
   derivedColumnState?: DerivedColumnState;
+  /** Sheet ID to activate on initial workbook creation */
+  initialActiveSheetId?: string;
 }
 
 export const UniverSpreadsheet = forwardRef<
@@ -107,6 +109,7 @@ export const UniverSpreadsheet = forwardRef<
     onChange,
     onActiveSheetChanged,
     derivedColumnState,
+    initialActiveSheetId,
   },
   ref
 ) {
@@ -248,6 +251,20 @@ export const UniverSpreadsheet = forwardRef<
       }
       const workbookData = buildMultiSheetWorkbook(multiSheetData);
       instance.univerAPI.createWorkbook(workbookData);
+
+      // Activate the restored sheet if specified
+      if (initialActiveSheetId) {
+        const wb = instance.univerAPI.getActiveWorkbook();
+        if (wb) {
+          const targetSheet = wb.getSheetBySheetId(initialActiveSheetId);
+          if (targetSheet) {
+            wb.setActiveSheet(targetSheet);
+            logInfo("Restored active sheet from view state", {
+              sheetId: initialActiveSheetId,
+            });
+          }
+        }
+      }
 
       // Apply checkbox validation to boolean columns in all sheets
       const workbook = instance.univerAPI.getActiveWorkbook();

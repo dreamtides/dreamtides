@@ -9,6 +9,7 @@ interface SpreadsheetViewProps {
   onChange: (data: TomlTableData, sheetId: string) => void;
   onActiveSheetChanged?: (sheetId: string) => void;
   derivedColumnState?: DerivedColumnState;
+  initialActiveSheetId?: string;
 }
 
 export function SpreadsheetView({
@@ -18,6 +19,7 @@ export function SpreadsheetView({
   onChange,
   onActiveSheetChanged,
   derivedColumnState,
+  initialActiveSheetId,
 }: SpreadsheetViewProps) {
   if (loading) {
     return <div className="loading">Loading...</div>;
@@ -35,6 +37,7 @@ export function SpreadsheetView({
         onChange={onChange}
         onActiveSheetChanged={onActiveSheetChanged}
         derivedColumnState={derivedColumnState}
+        initialActiveSheetId={initialActiveSheetId}
       />
     </main>
   );
