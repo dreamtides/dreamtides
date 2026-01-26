@@ -118,6 +118,7 @@ pub fn run(paths: cli::AppPaths, jsonl: bool) {
             commands::save_command::save_toml_table,
             commands::save_command::save_cell,
             commands::save_command::save_batch,
+            commands::save_command::add_row,
             commands::sort_command::get_sort_state,
             commands::sort_command::set_sort_state,
             commands::sort_command::clear_sort_state,

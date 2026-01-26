@@ -1,9 +1,11 @@
+use std::collections::HashMap;
+
 use tauri::AppHandle;
 
 use crate::error::error_types::TvError;
 use crate::sync::state_machine;
 use crate::toml::document_loader::TomlTableData;
-use crate::toml::document_writer::{self, CellUpdate, SaveBatchResult, SaveCellResult};
+use crate::toml::document_writer::{self, AddRowResult, CellUpdate, SaveBatchResult, SaveCellResult};
 
 /// Tauri command to save spreadsheet data back to a TOML file.
 #[tauri::command]
@@ -51,6 +53,23 @@ pub fn save_batch(
     state_machine::begin_save(&app_handle, &file_path)?;
 
     let result = document_writer::save_batch(&file_path, &table_name, &updates);
+    let _ = state_machine::end_save(&app_handle, &file_path, result.is_ok());
+
+    result
+}
+
+/// Tauri command to add a new row to the TOML array-of-tables.
+#[tauri::command]
+pub fn add_row(
+    app_handle: AppHandle,
+    file_path: String,
+    table_name: String,
+    position: Option<usize>,
+    initial_values: Option<HashMap<String, serde_json::Value>>,
+) -> Result<AddRowResult, TvError> {
+    state_machine::begin_save(&app_handle, &file_path)?;
+
+    let result = document_writer::add_row(&file_path, &table_name, position, initial_values);
     let _ = state_machine::end_save(&app_handle, &file_path, result.is_ok());
 
     result

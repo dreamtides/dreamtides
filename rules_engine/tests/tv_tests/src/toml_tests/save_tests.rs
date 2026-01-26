@@ -598,6 +598,153 @@ id = "item-1"
 }
 
 #[test]
+fn test_save_table_appends_new_rows() {
+    let harness = TvTestHarness::new();
+    let path = harness.create_toml_file(
+        "append_rows.toml",
+        r#"[[cards]]
+id = "card-1"
+name = "First Card"
+cost = 1
+
+[[cards]]
+id = "card-2"
+name = "Second Card"
+cost = 2
+"#,
+    );
+
+    let mut table = harness.load_table(&path, "cards").expect("Should load table");
+    assert_eq!(table.rows.len(), 2);
+
+    let id_idx = table.headers.iter().position(|h| h == "id").unwrap();
+    let name_idx = table.headers.iter().position(|h| h == "name").unwrap();
+    let cost_idx = table.headers.iter().position(|h| h == "cost").unwrap();
+
+    let mut new_row = vec![serde_json::Value::Null; table.headers.len()];
+    new_row[id_idx] = json!("card-3");
+    new_row[name_idx] = json!("Third Card");
+    new_row[cost_idx] = json!(3);
+    table.rows.push(new_row);
+
+    harness.save_table(&path, "cards", &table).expect("Should save table with new row");
+
+    let reloaded = harness.load_table(&path, "cards").expect("Should reload table");
+    assert_eq!(reloaded.rows.len(), 3, "Table should have 3 rows after save");
+
+    let id_idx = reloaded.headers.iter().position(|h| h == "id").unwrap();
+    let name_idx = reloaded.headers.iter().position(|h| h == "name").unwrap();
+    let cost_idx = reloaded.headers.iter().position(|h| h == "cost").unwrap();
+
+    assert_eq!(reloaded.rows[2][id_idx].as_str(), Some("card-3"));
+    assert_eq!(reloaded.rows[2][name_idx].as_str(), Some("Third Card"));
+    assert_eq!(reloaded.rows[2][cost_idx].as_i64(), Some(3));
+}
+
+#[test]
+fn test_save_table_appends_new_row_with_nulls() {
+    let harness = TvTestHarness::new();
+    let path = harness.create_toml_file(
+        "append_nulls.toml",
+        r#"[[cards]]
+id = "card-1"
+name = "First Card"
+cost = 1
+"#,
+    );
+
+    let mut table = harness.load_table(&path, "cards").expect("Should load table");
+
+    let id_idx = table.headers.iter().position(|h| h == "id").unwrap();
+    let cost_idx = table.headers.iter().position(|h| h == "cost").unwrap();
+
+    let mut new_row = vec![serde_json::Value::Null; table.headers.len()];
+    new_row[id_idx] = json!("card-2");
+    new_row[cost_idx] = json!(5);
+    table.rows.push(new_row);
+
+    harness.save_table(&path, "cards", &table).expect("Should save table with partial new row");
+
+    let reloaded = harness.load_table(&path, "cards").expect("Should reload table");
+    assert_eq!(reloaded.rows.len(), 2);
+
+    let id_idx = reloaded.headers.iter().position(|h| h == "id").unwrap();
+    let cost_idx = reloaded.headers.iter().position(|h| h == "cost").unwrap();
+
+    assert_eq!(reloaded.rows[1][id_idx].as_str(), Some("card-2"));
+    assert_eq!(reloaded.rows[1][cost_idx].as_i64(), Some(5));
+}
+
+#[test]
+fn test_save_table_appends_multiple_new_rows() {
+    let harness = TvTestHarness::new();
+    let path = harness.create_toml_file(
+        "append_multi.toml",
+        r#"[[cards]]
+id = "card-1"
+name = "First"
+"#,
+    );
+
+    let mut table = harness.load_table(&path, "cards").expect("Should load table");
+
+    let id_idx = table.headers.iter().position(|h| h == "id").unwrap();
+    let name_idx = table.headers.iter().position(|h| h == "name").unwrap();
+
+    for (id, name) in [("card-2", "Second"), ("card-3", "Third"), ("card-4", "Fourth")] {
+        let mut new_row = vec![serde_json::Value::Null; table.headers.len()];
+        new_row[id_idx] = json!(id);
+        new_row[name_idx] = json!(name);
+        table.rows.push(new_row);
+    }
+
+    harness.save_table(&path, "cards", &table).expect("Should save table");
+
+    let reloaded = harness.load_table(&path, "cards").expect("Should reload table");
+    assert_eq!(reloaded.rows.len(), 4);
+
+    let id_idx = reloaded.headers.iter().position(|h| h == "id").unwrap();
+    assert_eq!(reloaded.rows[0][id_idx].as_str(), Some("card-1"));
+    assert_eq!(reloaded.rows[1][id_idx].as_str(), Some("card-2"));
+    assert_eq!(reloaded.rows[2][id_idx].as_str(), Some("card-3"));
+    assert_eq!(reloaded.rows[3][id_idx].as_str(), Some("card-4"));
+}
+
+#[test]
+fn test_save_table_appends_row_preserves_existing() {
+    let harness = TvTestHarness::new();
+    let original = r#"# Header comment
+
+[[cards]]
+# First card
+id = "card-1"
+name = "Original"
+"#;
+    let path = harness.create_toml_file("append_preserve.toml", original);
+
+    let mut table = harness.load_table(&path, "cards").expect("Should load table");
+
+    let id_idx = table.headers.iter().position(|h| h == "id").unwrap();
+    let name_idx = table.headers.iter().position(|h| h == "name").unwrap();
+
+    let mut new_row = vec![serde_json::Value::Null; table.headers.len()];
+    new_row[id_idx] = json!("card-2");
+    new_row[name_idx] = json!("New Card");
+    table.rows.push(new_row);
+
+    harness.save_table(&path, "cards", &table).expect("Should save table");
+
+    let content = harness.read_file_content(&path);
+    assert!(content.contains("# Header comment"), "Header comment should be preserved");
+    assert!(content.contains("# First card"), "First card comment should be preserved");
+    assert!(content.contains("\"Original\""), "Original value should be preserved");
+    assert!(content.contains("\"New Card\""), "New card should be added");
+
+    let reloaded = harness.load_table(&path, "cards").expect("Should reload table");
+    assert_eq!(reloaded.rows.len(), 2);
+}
+
+#[test]
 fn test_cleanup_orphaned_temp_files_removes_temp_files() {
     let mock = MockFileSystem::new().with_temp_files(vec![
         PathBuf::from("/tmp/.tv_save_abc123"),

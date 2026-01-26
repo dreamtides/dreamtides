@@ -140,23 +140,45 @@ pub fn save_toml_document_with_fs(
             TvError::TableNotFound { table_name: table_name.to_string() }
         })?;
 
-    for (row_idx, row) in data.rows.iter().enumerate() {
-        let Some(table) = array.get_mut(row_idx) else {
-            break;
-        };
+    let existing_len = array.len();
 
-        for (col_idx, header) in data.headers.iter().enumerate() {
-            if let Some(json_val) = row.get(col_idx) {
-                if let Some(existing) = table.get_mut(header) {
-                    // Use type-preserving conversion to maintain boolean types when the
-                    // spreadsheet library returns 0/1 instead of false/true
-                    if let Some(new_val) =
-                        value_converter::json_to_toml_edit_preserving_type(json_val, existing)
-                    {
-                        *existing = new_val;
+    for (row_idx, row) in data.rows.iter().enumerate() {
+        if row_idx < existing_len {
+            let Some(table) = array.get_mut(row_idx) else {
+                break;
+            };
+
+            for (col_idx, header) in data.headers.iter().enumerate() {
+                if let Some(json_val) = row.get(col_idx) {
+                    if let Some(existing) = table.get_mut(header) {
+                        // Use type-preserving conversion to maintain boolean types when the
+                        // spreadsheet library returns 0/1 instead of false/true
+                        if let Some(new_val) =
+                            value_converter::json_to_toml_edit_preserving_type(json_val, existing)
+                        {
+                            *existing = new_val;
+                        }
                     }
                 }
             }
+        } else {
+            let mut new_table = toml_edit::Table::new();
+            for (col_idx, header) in data.headers.iter().enumerate() {
+                if let Some(json_val) = row.get(col_idx) {
+                    if !json_val.is_null() {
+                        if let Some(toml_val) = value_converter::json_to_toml_edit(json_val) {
+                            new_table.insert(header, toml_val);
+                        }
+                    }
+                }
+            }
+            array.push(new_table);
+            tracing::info!(
+                component = "tv.toml",
+                file_path = %file_path,
+                row_index = row_idx,
+                "New row appended during save"
+            );
         }
     }
 

@@ -449,6 +449,25 @@ export async function saveBatch(
   });
 }
 
+export interface AddRowResult {
+  success: boolean;
+  rowIndex: number;
+}
+
+export async function addRow(
+  filePath: string,
+  tableName: string,
+  position?: number,
+  initialValues?: Record<string, unknown>
+): Promise<AddRowResult> {
+  return invoke<AddRowResult>("add_row", {
+    filePath,
+    tableName,
+    position: position ?? null,
+    initialValues: initialValues ?? null,
+  });
+}
+
 export async function startFileWatcher(filePath: string): Promise<void> {
   return invoke("start_file_watcher", { filePath });
 }
