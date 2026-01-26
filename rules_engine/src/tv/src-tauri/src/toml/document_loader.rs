@@ -126,7 +126,7 @@ pub fn load_toml_document_with_fs(
     }
 
     let duration_ms = start.elapsed().as_millis() as u64;
-    tracing::info!(
+    tracing::debug!(
         component = "tv.toml",
         file_path = %file_path,
         rows = rows.len(),

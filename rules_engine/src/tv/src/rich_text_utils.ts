@@ -1,17 +1,7 @@
 import type { DerivedResultValue, UniverRichText } from "./ipc_bridge";
+import { createLogger } from "./logger_frontend";
 
-const LOG_TAG = "tv.ui.richtext";
-
-function logDebug(message: string, data?: unknown): void {
-  const entry = {
-    level: "DEBUG",
-    component: LOG_TAG,
-    message,
-    data,
-    timestamp: new Date().toISOString(),
-  };
-  console.debug(JSON.stringify(entry));
-}
+const logger = createLogger("tv.ui.richtext");
 
 /**
  * Univer ICellData structure for rich text cells.
@@ -49,7 +39,7 @@ export function derivedResultToCellData(result: DerivedResultValue): UniverCellD
  * Converts UniverRichText to ICellData with paragraph structure.
  */
 function richTextToCellData(richText: UniverRichText): UniverCellData {
-  logDebug("Converting rich text to cell data", { paragraphs: richText.p.length });
+  logger.debug("Converting rich text to cell data", { paragraphs: richText.p.length });
   return {
     p: richText.p,
   };

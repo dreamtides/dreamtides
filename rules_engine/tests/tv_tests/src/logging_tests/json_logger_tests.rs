@@ -73,6 +73,6 @@ fn test_log_file_path_parent_is_logs_directory() {
 }
 
 #[test]
-fn test_initialize_jsonl_mode() {
-    json_logger::initialize(true);
+fn test_initialize() {
+    json_logger::initialize();
 }

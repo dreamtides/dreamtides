@@ -7,7 +7,7 @@ fn main() {
 
     let args = Args::parse();
     match resolve_paths(&args) {
-        Ok(paths) => tv_lib::run(paths, args.jsonl),
+        Ok(paths) => tv_lib::run(paths),
         Err(e) => {
             eprintln!("Error: {}", e);
             std::process::exit(exit_codes::INVALID_ARGUMENTS);

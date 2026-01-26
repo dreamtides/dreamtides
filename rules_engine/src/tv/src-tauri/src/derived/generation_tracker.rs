@@ -54,7 +54,7 @@ impl GenerationTracker {
         let new_gen = self.global_counter.fetch_add(1, Ordering::SeqCst);
         self.generations.write().expect("Generation tracker lock poisoned").insert(key.clone(), new_gen);
 
-        tracing::debug!(
+        tracing::trace!(
             component = "tv.derived.generation_tracker",
             file_path = %key.file_path,
             table_name = %key.table_name,
@@ -75,7 +75,7 @@ impl GenerationTracker {
         let is_current = current == generation;
 
         if !is_current {
-            tracing::debug!(
+            tracing::trace!(
                 component = "tv.derived.generation_tracker",
                 file_path = %key.file_path,
                 table_name = %key.table_name,
@@ -95,7 +95,7 @@ impl GenerationTracker {
     pub fn clear_generation(&self, key: &RowKey) {
         self.generations.write().expect("Generation tracker lock poisoned").remove(key);
 
-        tracing::debug!(
+        tracing::trace!(
             component = "tv.derived.generation_tracker",
             file_path = %key.file_path,
             table_name = %key.table_name,
@@ -116,7 +116,7 @@ impl GenerationTracker {
             generations.remove(key);
         }
 
-        tracing::debug!(
+        tracing::trace!(
             component = "tv.derived.generation_tracker",
             file_path = %file_path,
             rows_cleared = keys_to_remove.len(),
@@ -137,7 +137,7 @@ impl GenerationTracker {
             generations.remove(key);
         }
 
-        tracing::debug!(
+        tracing::trace!(
             component = "tv.derived.generation_tracker",
             file_path = %file_path,
             table_name = %table_name,

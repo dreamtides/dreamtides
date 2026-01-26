@@ -48,7 +48,7 @@ impl ImageDerivedFunction {
     fn fetch_and_cache(&self, url: &str) -> DerivedResult {
         // Check cache first
         if let Some(cached_path) = self.cache.get(url) {
-            tracing::debug!(
+            tracing::trace!(
                 component = "tv.derived.image",
                 url = %url,
                 "Image cache hit"

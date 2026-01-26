@@ -11,41 +11,9 @@ import {
 
 import type { DerivedResultValue } from "./ipc_bridge";
 import * as ipc from "./ipc_bridge";
+import { createLogger } from "./logger_frontend";
 
-const LOG_TAG = "tv.ui.images";
-
-function logDebug(message: string, data?: unknown): void {
-  const entry = {
-    level: "DEBUG",
-    component: LOG_TAG,
-    message,
-    data,
-    timestamp: new Date().toISOString(),
-  };
-  console.debug(JSON.stringify(entry));
-}
-
-function logInfo(message: string, data?: unknown): void {
-  const entry = {
-    level: "INFO",
-    component: LOG_TAG,
-    message,
-    data,
-    timestamp: new Date().toISOString(),
-  };
-  console.info(JSON.stringify(entry));
-}
-
-function logError(message: string, data?: unknown): void {
-  const entry = {
-    level: "ERROR",
-    component: LOG_TAG,
-    message,
-    data,
-    timestamp: new Date().toISOString(),
-  };
-  console.error(JSON.stringify(entry));
-}
+const logger = createLogger("tv.ui.images");
 
 /** Default image dimensions in pixels for floating images. */
 const DEFAULT_IMAGE_WIDTH = 120;
@@ -143,7 +111,7 @@ export class ImageCellRenderer {
       await this.insertImageAtCell(sheet, cellKey, row, column, cachePath);
     } catch (e) {
       const errorMessage = e instanceof Error ? e.message : String(e);
-      logError("Image fetch failed", { cellKey, imageUrl, error: errorMessage });
+      logger.error("Image fetch failed", { cellKey, imageUrl, error: errorMessage });
       this.setErrorState(sheet, cellKey, row, column, errorMessage);
     }
   }
@@ -163,12 +131,12 @@ export class ImageCellRenderer {
 
       if (!commandService.hasCommand(INSERT_SHEET_DRAWING_CMD)) {
         commandService.registerCommand(InsertSheetDrawingCommand);
-        logInfo("Manually registered InsertSheetDrawingCommand");
+        logger.info("Manually registered InsertSheetDrawingCommand");
       }
 
       this.commandsReady = true;
     } catch (e) {
-      logError("Failed to ensure drawing commands", { error: String(e) });
+      logger.error("Failed to ensure drawing commands", { error: String(e) });
     }
   }
 
@@ -239,10 +207,10 @@ export class ImageCellRenderer {
       this.imageIds.set(cellKey, drawingId);
       this.imageStates.set(cellKey, "loaded");
 
-      logInfo("Image inserted at cell", { cellKey, row, column });
+      logger.info("Image inserted at cell", { cellKey, row, column });
     } catch (e) {
       const errorMessage = e instanceof Error ? e.message : String(e);
-      logError("Failed to insert image at cell", {
+      logger.error("Failed to insert image at cell", {
         cellKey,
         row,
         column,
@@ -278,7 +246,7 @@ export class ImageCellRenderer {
         });
       }
     } catch (e) {
-      logDebug("Could not remove existing image", {
+      logger.debug("Could not remove existing image", {
         cellKey,
         drawingId: existingId,
         error: String(e),
@@ -328,7 +296,7 @@ export class ImageCellRenderer {
         range.setFontColor("#CC0000");
       }
     } catch (e) {
-      logError("Failed to set error state in cell", {
+      logger.error("Failed to set error state in cell", {
         cellKey,
         error: String(e),
       });
@@ -381,7 +349,7 @@ export class ImageCellRenderer {
       });
     }
 
-    logDebug("Cleared sheet images", {
+    logger.debug("Cleared sheet images", {
       sheetId,
       clearedCount: keysToRemove.length,
     });

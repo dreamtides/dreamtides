@@ -11,31 +11,9 @@ import type { TomlTableData, EnumValidationInfo, DerivedColumnInfo, DerivedResul
 import * as ipc from "./ipc_bridge";
 import { derivedResultToCellData } from "./rich_text_utils";
 import { ImageCellRenderer } from "./image_cell_renderer";
+import { createLogger } from "./logger_frontend";
 
-// Component logging tag: tv.ui.sheets
-const LOG_TAG = "tv.ui.sheets";
-
-function logDebug(message: string, data?: unknown): void {
-  const entry = {
-    level: "DEBUG",
-    component: LOG_TAG,
-    message,
-    data,
-    timestamp: new Date().toISOString(),
-  };
-  console.debug(JSON.stringify(entry));
-}
-
-function logInfo(message: string, data?: unknown): void {
-  const entry = {
-    level: "INFO",
-    component: LOG_TAG,
-    message,
-    data,
-    timestamp: new Date().toISOString(),
-  };
-  console.info(JSON.stringify(entry));
-}
+const logger = createLogger("tv.ui.spreadsheet");
 
 /**
  * Tracks derived column configurations and computed values per sheet.
@@ -286,7 +264,7 @@ export const UniverSpreadsheet = forwardRef<
           const targetSheet = wb.getSheetBySheetId(initialActiveSheetId);
           if (targetSheet) {
             wb.setActiveSheet(targetSheet);
-            logInfo("Restored active sheet from view state", {
+            logger.info("Restored active sheet from view state", {
               sheetId: initialActiveSheetId,
             });
           }
@@ -336,7 +314,7 @@ export const UniverSpreadsheet = forwardRef<
               }
             }
           } catch (e) {
-            logDebug("Failed to load enum validation rules", {
+            logger.debug("Failed to load enum validation rules", {
               sheetId: sheetData.id,
               path: sheetData.path,
               error: String(e),
@@ -365,7 +343,7 @@ export const UniverSpreadsheet = forwardRef<
                 sortResponse.column
               );
               if (colIndex === -1) {
-                logDebug("Persisted sort column not found in headers", {
+                logger.debug("Persisted sort column not found in headers", {
                   column: sortResponse.column,
                   sheetId: sheetData.id,
                 });
@@ -378,14 +356,14 @@ export const UniverSpreadsheet = forwardRef<
               const restoreOffset = dataColumnOffsetMapRef.current.get(sheetData.id) ?? 0;
               const ascending = sortResponse.direction === "ascending";
               sheet.sort(colIndex + restoreOffset, ascending);
-              logInfo("Restored sort indicator", {
+              logger.info("Restored sort indicator", {
                 sheetId: sheetData.id,
                 sheetName: sheetData.name,
                 column: sortResponse.column,
                 ascending,
               });
             } catch (e) {
-              logDebug("Failed to restore sort state", {
+              logger.debug("Failed to restore sort state", {
                 sheetId: sheetData.id,
                 path: sheetData.path,
                 error: String(e),
@@ -413,7 +391,7 @@ export const UniverSpreadsheet = forwardRef<
             if (sheet) {
               const offset = dataColumnOffsetMapRef.current.get(sheetData.id) ?? 0;
               applyTableStyle(sheet, sheetData.data, style, offset);
-              logInfo("Applied table color scheme", {
+              logger.info("Applied table color scheme", {
                 sheetId: sheetData.id,
                 sheetName: sheetData.name,
                 colorScheme: style.palette ? "resolved" : "none",
@@ -421,7 +399,7 @@ export const UniverSpreadsheet = forwardRef<
               });
             }
           } catch (e) {
-            logDebug("Failed to load table style", {
+            logger.debug("Failed to load table style", {
               sheetId: sheetData.id,
               path: sheetData.path,
               error: String(e),
@@ -453,14 +431,14 @@ export const UniverSpreadsheet = forwardRef<
             if (sheet) {
               const offset = dataColumnOffsetMapRef.current.get(sheetData.id) ?? 0;
               applyConditionalFormatting(sheet, results, offset);
-              logInfo("Applied conditional formatting", {
+              logger.info("Applied conditional formatting", {
                 sheetId: sheetData.id,
                 sheetName: sheetData.name,
                 matchCount: results.length,
               });
             }
           } catch (e) {
-            logDebug("Failed to load conditional formatting", {
+            logger.debug("Failed to load conditional formatting", {
               sheetId: sheetData.id,
               path: sheetData.path,
               error: String(e),
@@ -485,13 +463,13 @@ export const UniverSpreadsheet = forwardRef<
               );
               if (filterResponse.filters.length === 0) continue;
 
-              logInfo("Restored filter state", {
+              logger.info("Restored filter state", {
                 sheetId: sheetData.id,
                 sheetName: sheetData.name,
                 filterCount: filterResponse.filters.length,
               });
             } catch (e) {
-              logDebug("Failed to restore filter state", {
+              logger.debug("Failed to restore filter state", {
                 sheetId: sheetData.id,
                 path: sheetData.path,
                 error: String(e),
@@ -507,14 +485,14 @@ export const UniverSpreadsheet = forwardRef<
       // Mark initial load as complete - data is already in cellData, no need to repopulate
       initialLoadCompleteRef.current = true;
       lastMultiSheetDataRef.current = multiSheetData;
-      logInfo("Workbook initialized with multiple sheets", {
+      logger.info("Workbook initialized with multiple sheets", {
         sheetCount: multiSheetData.sheets.length,
         sheetNames: multiSheetData.sheets.map((s) => s.name),
       });
     } else {
       // Legacy single-sheet mode: create empty workbook
       instance.univerAPI.createWorkbook({});
-      logDebug("Workbook initialized in single-sheet mode");
+      logger.debug("Workbook initialized in single-sheet mode");
     }
 
     // Listen for cell value changes
@@ -541,7 +519,7 @@ export const UniverSpreadsheet = forwardRef<
       (event) => {
         const { activeSheet } = event;
         const sheetId = activeSheet.getSheetId();
-        logDebug("Active sheet changed", { sheetId, sheetName: activeSheet.getSheetName() });
+        logger.debug("Active sheet changed", { sheetId, sheetName: activeSheet.getSheetName() });
         if (onActiveSheetChangedRef.current) {
           onActiveSheetChangedRef.current(sheetId);
         }
@@ -558,16 +536,16 @@ export const UniverSpreadsheet = forwardRef<
         const sheets = multiSheetDataRef.current?.sheets;
         const sheetData = sheets?.find((s) => s.id === sheetId);
         if (!sheetData) {
-          logDebug("Sort event for unknown sheet", { sheetId });
+          logger.debug("Sort event for unknown sheet", { sheetId });
           return;
         }
 
         const headers = headersMapRef.current.get(sheetId) ?? [];
         if (params.sortColumn.length === 0) {
           ipc.clearSortState(sheetData.path, sheetData.name).catch((e) => {
-            logDebug("Failed to clear sort state", { error: String(e) });
+            logger.debug("Failed to clear sort state", { error: String(e) });
           });
-          logInfo("Sort cleared", { sheetId, sheetName: sheetData.name });
+          logger.info("Sort cleared", { sheetId, sheetName: sheetData.name });
           return;
         }
 
@@ -575,7 +553,7 @@ export const UniverSpreadsheet = forwardRef<
         const sortOffset = dataColumnOffsetMapRef.current.get(sheetId) ?? 0;
         const columnName = headers[sortSpec.column - sortOffset];
         if (!columnName) {
-          logDebug("Sort column index out of range", {
+          logger.debug("Sort column index out of range", {
             columnIndex: sortSpec.column,
             headerCount: headers.length,
           });
@@ -589,10 +567,10 @@ export const UniverSpreadsheet = forwardRef<
           column: columnName,
           direction,
         }).catch((e) => {
-          logDebug("Failed to persist sort state", { error: String(e) });
+          logger.debug("Failed to persist sort state", { error: String(e) });
         });
 
-        logInfo("Sort applied", {
+        logger.info("Sort applied", {
           sheetId,
           sheetName: sheetData.name,
           column: columnName,
@@ -623,18 +601,18 @@ export const UniverSpreadsheet = forwardRef<
         const sheets = multiSheetDataRef.current?.sheets;
         const sheetData = sheets?.find((s) => s.id === sheetId);
         if (!sheetData) {
-          logDebug("Filter event for unknown sheet", { sheetId, commandId: command.id });
+          logger.debug("Filter event for unknown sheet", { sheetId, commandId: command.id });
           return;
         }
 
         if (command.id === "sheet.command.remove-sheet-filter" ||
             command.id === "sheet.mutation.remove-sheet-filter") {
           ipc.clearFilterState(sheetData.path, sheetData.name).catch((e) => {
-            logDebug("Failed to clear filter state", { error: String(e) });
+            logger.debug("Failed to clear filter state", { error: String(e) });
           });
-          logInfo("Filter cleared", { sheetId, sheetName: sheetData.name });
+          logger.info("Filter cleared", { sheetId, sheetName: sheetData.name });
         } else {
-          logInfo("Filter changed", {
+          logger.info("Filter changed", {
             sheetId,
             sheetName: sheetData.name,
             commandId: command.id,
@@ -673,7 +651,7 @@ export const UniverSpreadsheet = forwardRef<
       const sheetConfigs = currentDerivedState?.configs[sheetId];
       const derivedConfig = sheetConfigs?.find(c => c.function === payload.function_name);
       if (!derivedConfig) {
-        logDebug("Image derived function config not found", {
+        logger.debug("Image derived function config not found", {
           functionName: payload.function_name,
           sheetId,
         });
@@ -686,7 +664,7 @@ export const UniverSpreadsheet = forwardRef<
       renderer
         .handleImageResult(sheet, sheetId, displayRow, colIdx, result)
         .catch((e) => {
-          logDebug("Image render from derived value failed", {
+          logger.debug("Image render from derived value failed", {
             error: String(e),
             rowIndex: payload.row_index,
             functionName: payload.function_name,
@@ -764,7 +742,7 @@ export const UniverSpreadsheet = forwardRef<
 
     // Skip if this is the initial load - data was already set via cellData in buildMultiSheetWorkbook
     if (initialLoadCompleteRef.current && lastMultiSheetDataRef.current === multiSheetData) {
-      logDebug("Skipping multi-sheet update - same data reference as initial load");
+      logger.debug("Skipping multi-sheet update - same data reference as initial load");
       return;
     }
 
@@ -800,13 +778,13 @@ export const UniverSpreadsheet = forwardRef<
     // Only update sheets that actually changed, using batch operations
     for (const sheetData of multiSheetData.sheets) {
       if (!changedSheetIds.has(sheetData.id)) {
-        logDebug("Skipping unchanged sheet", { sheetId: sheetData.id, sheetName: sheetData.name });
+        logger.debug("Skipping unchanged sheet", { sheetId: sheetData.id, sheetName: sheetData.name });
         continue;
       }
 
       const sheet = workbook.getSheetBySheetId(sheetData.id);
       if (!sheet) {
-        logDebug("Sheet not found, skipping update", { sheetId: sheetData.id });
+        logger.debug("Sheet not found, skipping update", { sheetId: sheetData.id });
         continue;
       }
 
@@ -817,7 +795,7 @@ export const UniverSpreadsheet = forwardRef<
 
       const sheetOffset = dataColumnOffsetMapRef.current.get(sheetData.id) ?? 0;
 
-      logDebug("Updating changed sheet with batch operation", {
+      logger.debug("Updating changed sheet with batch operation", {
         sheetId: sheetData.id,
         sheetName: sheetData.name,
         rowCount: sheetData.data.rows.length,
@@ -872,7 +850,7 @@ export const UniverSpreadsheet = forwardRef<
             applyConditionalFormatting(ws, results, cfOffset);
           }
         } catch (e) {
-          logDebug("Failed to re-evaluate conditional formatting", {
+          logger.debug("Failed to re-evaluate conditional formatting", {
             sheetId: sheetData.id,
             error: String(e),
           });
@@ -1081,7 +1059,7 @@ function buildMultiSheetWorkbook(
     }
     sheets[sheetData.id] = sheetConfig as IWorkbookData["sheets"][string];
 
-    logDebug("Sheet created", {
+    logger.debug("Sheet created", {
       sheetId: sheetData.id,
       sheetName: sheetData.name,
       rowCount: sheetData.data.rows.length,
@@ -1230,7 +1208,7 @@ function applyCheckboxValidation(
         .build();
       range.setDataValidation(rule);
 
-      logDebug("Applied checkbox validation to column", {
+      logger.debug("Applied checkbox validation to column", {
         column: data.headers[colIdx],
         range: rangeAddress,
       });
@@ -1256,7 +1234,7 @@ function applyDropdownValidation(
   for (const rule of enumRules) {
     const colIdx = data.headers.indexOf(rule.column);
     if (colIdx === -1) {
-      logDebug("Enum column not found in headers, skipping dropdown validation", {
+      logger.debug("Enum column not found in headers, skipping dropdown validation", {
         column: rule.column,
       });
       continue;
@@ -1280,7 +1258,7 @@ function applyDropdownValidation(
         .build();
       range.setDataValidation(validationRule);
 
-      logDebug("Applied dropdown validation to column", {
+      logger.debug("Applied dropdown validation to column", {
         column: rule.column,
         range: rangeAddress,
         allowedValues: rule.allowed_values,
@@ -1355,11 +1333,11 @@ function applyDerivedResultToCell(
         }
       }
     }
-    logDebug("Applied rich text derived result", { row, col });
+    logger.debug("Applied rich text derived result", { row, col });
   } else if (result.type === "error") {
     range.setValues([[`Error: ${result.value}`]]);
     range.setFontColor("#FF0000");
-    logDebug("Applied error derived result", { row, col, error: result.value });
+    logger.debug("Applied error derived result", { row, col, error: result.value });
   } else if (result.type === "image") {
     // Image results are handled by ImageCellRenderer via the
     // derived-value-computed event listener, not via cell text.
@@ -1369,7 +1347,7 @@ function applyDerivedResultToCell(
     range.setValues([[value]]);
     // Reset font color to default for non-error results
     range.setFontColor("#000000");
-    logDebug("Applied derived result", { row, col, type: result.type });
+    logger.debug("Applied derived result", { row, col, type: result.type });
   }
 }
 

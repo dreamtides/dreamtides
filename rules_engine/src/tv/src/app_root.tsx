@@ -4,8 +4,11 @@ import { ErrorBanner } from "./error_banner";
 import * as ipc from "./ipc_bridge";
 import type { TomlTableData, DerivedValuePayload } from "./ipc_bridge";
 import type { MultiSheetData, SheetData, DerivedColumnState } from "./UniverSpreadsheet";
+import { createLogger } from "./logger_frontend";
 
 export type { TomlTableData };
+
+const logger = createLogger("tv.ui.app");
 
 const SAVE_DEBOUNCE_MS = 500;
 
@@ -97,7 +100,7 @@ export function AppRoot() {
     try {
       return await ipc.loadTomlTable(path, tableName);
     } catch (e) {
-      console.error(`Failed to load ${path}:`, e);
+      logger.error("Failed to load file", { path, error: String(e) });
       return null;
     }
   }, []);
@@ -136,7 +139,7 @@ export function AppRoot() {
         await ipc.computeDerivedBatch({ requests });
       }
     } catch (e) {
-      console.error(`Failed to trigger derived computations for ${sheetInfo.path}:`, e);
+      logger.error("Failed to trigger derived computations", { path: sheetInfo.path, error: String(e) });
     }
   }, []);
 
@@ -181,7 +184,7 @@ export function AppRoot() {
             allDerivedConfigs[sheet.id] = configs;
           }
         } catch (e) {
-          console.error(`Failed to load derived columns for ${sheet.path}:`, e);
+          logger.error("Failed to load derived columns", { path: sheet.path, error: String(e) });
         }
       })
     );
@@ -244,7 +247,7 @@ export function AppRoot() {
         triggerDerivedComputations(sheetInfo, data, configs);
       }
     } catch (e) {
-      console.error(`Failed to reload derived columns for ${sheetInfo.path}:`, e);
+      logger.error("Failed to reload derived columns", { path: sheetInfo.path, error: String(e) });
     }
   }, [sheets, loadSingleFile, triggerDerivedComputations]);
 
@@ -265,7 +268,7 @@ export function AppRoot() {
         // Update last known data after successful save
         lastKnownDataRef.current[sheetId] = newData;
       } catch (e) {
-        console.error("Save error:", e);
+        logger.error("Save error", { error: String(e) });
       } finally {
         isSavingRef.current[sheetId] = false;
       }
@@ -298,7 +301,7 @@ export function AppRoot() {
     const sheetInfo = sheets.find((s) => s.id === sheetId);
     if (sheetInfo) {
       ipc.saveViewState(sheetInfo.path).catch((e) =>
-        console.error("Failed to save view state:", e)
+        logger.error("Failed to save view state", { error: String(e) })
       );
     }
   }, [sheets]);
@@ -331,7 +334,7 @@ export function AppRoot() {
             }
           }
         } catch (e) {
-          console.error("Failed to load view state:", e);
+          logger.error("Failed to load view state", { error: String(e) });
         }
 
         await loadAllFiles(sheetInfos, restoredSheetId);
@@ -339,7 +342,7 @@ export function AppRoot() {
         for (const info of sheetInfos) {
           if (!watchersStartedRef.current.has(info.path)) {
             ipc.startFileWatcher(info.path).catch((e) =>
-              console.error(`Failed to start file watcher for ${info.path}:`, e)
+              logger.error("Failed to start file watcher", { path: info.path, error: String(e) })
             );
             watchersStartedRef.current.add(info.path);
           }
@@ -359,11 +362,11 @@ export function AppRoot() {
       if (!sheetInfo) return;
 
       if (isSavingRef.current[sheetInfo.id]) {
-        console.log(`Ignoring file change for ${payload.file_path} during save`);
+        logger.debug("Ignoring file change during save", { filePath: payload.file_path });
         return;
       }
 
-      console.log(`File changed externally: ${payload.file_path}, reloading sheet...`);
+      logger.info("File changed externally, reloading sheet", { filePath: payload.file_path });
       reloadSheet(sheetInfo.id);
     });
 
@@ -391,11 +394,11 @@ export function AppRoot() {
     });
 
     const syncStateSub = ipc.onSyncStateChanged((payload) => {
-      console.log("Sync state changed:", payload.state);
+      logger.info("Sync state changed", { state: payload.state });
     });
 
     const conflictSub = ipc.onSyncConflict((payload) => {
-      console.log("Conflict detected:", payload.message);
+      logger.info("Conflict detected", { message: payload.message });
       const sheetInfo = sheets.find((s) => s.path === payload.filePath);
       if (sheetInfo) {
         reloadSheet(sheetInfo.id);
@@ -422,7 +425,7 @@ export function AppRoot() {
       }
       for (const path of watchersStartedRef.current) {
         ipc.stopFileWatcher(path).catch((e) =>
-          console.error(`Failed to stop file watcher for ${path}:`, e)
+          logger.error("Failed to stop file watcher", { path, error: String(e) })
         );
       }
     };

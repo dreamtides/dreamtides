@@ -177,7 +177,7 @@ pub fn save_toml_document_with_fs(
                 }
             }
             array.push(new_table);
-            tracing::info!(
+            tracing::debug!(
                 component = "tv.toml",
                 file_path = %file_path,
                 row_index = row_idx,
@@ -204,7 +204,7 @@ pub fn save_toml_document_with_fs(
         let mut new_array = toml_edit::ArrayOfTables::new();
         for i in 0..array.len() {
             if i >= data.rows.len() && i < existing_len {
-                tracing::info!(
+                tracing::debug!(
                     component = "tv.toml",
                     file_path = %file_path,
                     row_index = i,
@@ -214,7 +214,7 @@ pub fn save_toml_document_with_fs(
             }
             if let Some(table) = array.get(i) {
                 if table.is_empty() {
-                    tracing::info!(
+                    tracing::debug!(
                         component = "tv.toml",
                         file_path = %file_path,
                         row_index = i,
@@ -234,7 +234,7 @@ pub fn save_toml_document_with_fs(
         .map_err(|e| map_atomic_write_error(e, file_path))?;
 
     let duration_ms = start.elapsed().as_millis() as u64;
-    tracing::info!(
+    tracing::debug!(
         component = "tv.toml",
         file_path = %file_path,
         duration_ms = duration_ms,
@@ -348,7 +348,7 @@ pub fn save_batch_with_fs_and_rules(
 ) -> Result<SaveBatchResult, TvError> {
     let start = Instant::now();
 
-    tracing::info!(
+    tracing::debug!(
         component = "tv.toml",
         file_path = %file_path,
         cell_count = updates.len(),
@@ -492,7 +492,7 @@ pub fn save_batch_with_fs_and_rules(
         map_atomic_write_error(e, file_path)
     })?;
 
-    tracing::info!(
+    tracing::debug!(
         component = "tv.toml",
         file_path = %file_path,
         cell_count = updates.len(),
@@ -602,7 +602,7 @@ pub fn save_cell_with_fs_and_rules(
         .map_err(|e| map_atomic_write_error(e, file_path))?;
 
     let duration_ms = start.elapsed().as_millis() as u64;
-    tracing::info!(
+    tracing::debug!(
         component = "tv.toml",
         file_path = %file_path,
         row_index = update.row_index,
@@ -748,7 +748,7 @@ pub fn add_row_with_fs(
         .map_err(|e| map_atomic_write_error(e, file_path))?;
 
     let duration_ms = start.elapsed().as_millis() as u64;
-    tracing::info!(
+    tracing::debug!(
         component = "tv.toml",
         file_path = %file_path,
         row_index = insert_index,
@@ -848,7 +848,7 @@ pub fn delete_row_with_fs(
         .map_err(|e| map_atomic_write_error(e, file_path))?;
 
     let duration_ms = start.elapsed().as_millis() as u64;
-    tracing::info!(
+    tracing::debug!(
         component = "tv.toml",
         file_path = %file_path,
         row_index = row_index,

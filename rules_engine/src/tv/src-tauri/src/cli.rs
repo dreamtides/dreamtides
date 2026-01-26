@@ -16,8 +16,6 @@ pub struct Args {
     )]
     pub path: Option<PathBuf>,
 
-    #[arg(long, help = "Output logs in JSONL format to stdout")]
-    pub jsonl: bool,
 }
 
 #[derive(Debug, Clone)]

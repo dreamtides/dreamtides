@@ -1,7 +1,7 @@
 use std::io;
 use std::path::PathBuf;
 
-use chrono::Utc;
+use chrono::{NaiveDate, Utc};
 use chrono_tz::America::Los_Angeles;
 use tracing::Level;
 use tracing_subscriber::fmt::time::FormatTime;
@@ -9,37 +9,41 @@ use tracing_subscriber::fmt::MakeWriter;
 use tracing_subscriber::prelude::*;
 use tracing_subscriber::{EnvFilter, Registry};
 
-/// Initializes the tracing subscriber with JSONL or compact output.
-pub fn initialize(jsonl: bool) {
+/// Initializes the tracing subscriber with dual layers: JSON file and compact stdout.
+pub fn initialize() {
     let log_path = log_file_path();
-    let writer = FileAndStdout::new(&log_path);
-    let filter = build_env_filter();
+    let file_writer = FileWriter::new(&log_path);
 
-    if jsonl {
-        let json_layer = tracing_subscriber::fmt::layer()
-            .json()
-            .with_timer(PacificTime)
-            .with_target(false)
-            .with_current_span(false)
-            .with_span_list(false)
-            .with_writer(writer)
-            .flatten_event(true);
-        Registry::default().with(filter).with(json_layer).init();
-    } else {
-        let compact_layer = tracing_subscriber::fmt::layer()
-            .with_timer(PacificTime)
-            .with_target(false)
-            .with_writer(writer)
-            .compact();
-        Registry::default().with(filter).with(compact_layer).init();
-    }
+    let file_layer = tracing_subscriber::fmt::layer()
+        .json()
+        .with_ansi(false)
+        .flatten_event(true)
+        .with_timer(PacificTime)
+        .with_target(false)
+        .with_current_span(false)
+        .with_span_list(false)
+        .with_writer(file_writer);
+
+    let stdout_layer = tracing_subscriber::fmt::layer()
+        .compact()
+        .with_timer(PacificTime)
+        .with_target(false)
+        .with_writer(std::io::stdout);
+
+    Registry::default()
+        .with(build_env_filter())
+        .with(file_layer)
+        .with(build_env_filter())
+        .with(stdout_layer)
+        .init();
 
     tracing::info!(
         component = "tv.logging",
         log_file = %log_path.display(),
-        jsonl_mode = jsonl,
         "Logging initialized"
     );
+
+    cleanup_old_logs();
 }
 
 /// Returns the path for today's log file.
@@ -71,16 +75,64 @@ fn default_log_level() -> Level {
 }
 
 fn build_env_filter() -> EnvFilter {
-    let default_level = default_log_level();
-    EnvFilter::try_from_env("TV_LOG_LEVEL")
-        .unwrap_or_else(|_| EnvFilter::new(default_level.as_str()))
+    EnvFilter::try_from_env("TV_LOG_LEVEL").unwrap_or_else(|_| {
+        EnvFilter::new(format!(
+            "{},hyper=warn,reqwest=warn,tao=warn,wry=warn,tauri=warn",
+            default_log_level().as_str().to_lowercase()
+        ))
+    })
 }
 
-struct FileAndStdout {
+fn cleanup_old_logs() {
+    let log_dir = log_file_path()
+        .parent()
+        .map(|p| p.to_path_buf())
+        .unwrap_or_else(|| PathBuf::from("."));
+
+    let retention_days: i64 = std::env::var("TV_LOG_RETENTION_DAYS")
+        .ok()
+        .and_then(|v| v.parse().ok())
+        .unwrap_or(7);
+
+    let today = Utc::now().with_timezone(&Los_Angeles).date_naive();
+
+    let entries = match std::fs::read_dir(&log_dir) {
+        Ok(e) => e,
+        Err(_) => return,
+    };
+
+    for entry in entries.flatten() {
+        let file_name = entry.file_name();
+        let Some(name) = file_name.to_str() else {
+            continue;
+        };
+
+        let Some(date_str) = name.strip_prefix("tv_").and_then(|s| s.strip_suffix(".jsonl")) else {
+            continue;
+        };
+
+        let Ok(file_date) = NaiveDate::parse_from_str(date_str, "%Y-%m-%d") else {
+            continue;
+        };
+
+        if (today - file_date).num_days() > retention_days {
+            if let Err(e) = std::fs::remove_file(entry.path()) {
+                tracing::warn!(
+                    component = "tv.logging",
+                    file = %entry.path().display(),
+                    error = %e,
+                    "Failed to delete old log file"
+                );
+            }
+        }
+    }
+}
+
+struct FileWriter {
     file: Option<std::fs::File>,
 }
 
-impl FileAndStdout {
+impl FileWriter {
     fn new(log_path: &PathBuf) -> Self {
         if let Some(parent) = log_path.parent() {
             let _ = std::fs::create_dir_all(parent);
@@ -97,33 +149,33 @@ impl FileAndStdout {
     }
 }
 
-struct DualWriter {
+struct FileOnlyWriter {
     file: Option<std::fs::File>,
 }
 
-impl io::Write for DualWriter {
+impl io::Write for FileOnlyWriter {
     fn write(&mut self, buf: &[u8]) -> io::Result<usize> {
-        let _ = io::Write::write(&mut io::stdout(), buf);
         if let Some(ref mut file) = self.file {
-            let _ = io::Write::write(file, buf);
+            io::Write::write(file, buf)
+        } else {
+            Ok(buf.len())
         }
-        Ok(buf.len())
     }
 
     fn flush(&mut self) -> io::Result<()> {
-        let _ = io::Write::flush(&mut io::stdout());
         if let Some(ref mut file) = self.file {
-            let _ = io::Write::flush(file);
+            io::Write::flush(file)
+        } else {
+            Ok(())
         }
-        Ok(())
     }
 }
 
-impl<'a> MakeWriter<'a> for FileAndStdout {
-    type Writer = DualWriter;
+impl<'a> MakeWriter<'a> for FileWriter {
+    type Writer = FileOnlyWriter;
 
     fn make_writer(&'a self) -> Self::Writer {
-        DualWriter {
+        FileOnlyWriter {
             file: self.file.as_ref().and_then(|f| f.try_clone().ok()),
         }
     }

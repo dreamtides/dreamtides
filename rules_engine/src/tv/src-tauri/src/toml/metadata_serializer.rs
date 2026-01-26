@@ -63,7 +63,7 @@ pub fn update_sort_config_with_fs(
         map_atomic_write_error(e, file_path)
     })?;
 
-    tracing::info!(
+    tracing::debug!(
         component = "tv.toml.metadata",
         file_path = %file_path,
         has_sort = sort_config.is_some(),
@@ -128,7 +128,7 @@ pub fn update_filter_config_with_fs(
         map_atomic_write_error(e, file_path)
     })?;
 
-    tracing::info!(
+    tracing::debug!(
         component = "tv.toml.metadata",
         file_path = %file_path,
         has_filter = filter_config.is_some(),
@@ -178,7 +178,7 @@ pub fn save_metadata_with_fs(
         map_atomic_write_error(e, file_path)
     })?;
 
-    tracing::info!(
+    tracing::debug!(
         component = "tv.toml.metadata",
         file_path = %file_path,
         "Metadata saved"

@@ -3,11 +3,11 @@ use std::path::PathBuf;
 use tv_lib::cli::{exit_codes, AppPaths, Args};
 
 fn args_with_path(path: PathBuf) -> Args {
-    Args { path: Some(path), jsonl: false }
+    Args { path: Some(path) }
 }
 
 fn args_none() -> Args {
-    Args { path: None, jsonl: false }
+    Args { path: None }
 }
 
 #[test]
@@ -204,24 +204,21 @@ fn test_app_paths_empty() {
 
 #[test]
 fn test_args_debug_format() {
-    let args = Args { path: Some(PathBuf::from("/test.toml")), jsonl: true };
+    let args = Args { path: Some(PathBuf::from("/test.toml")) };
     let debug = format!("{args:?}");
     assert!(debug.contains("test.toml"), "Debug output should contain path: {debug}");
-    assert!(debug.contains("jsonl"), "Debug output should contain jsonl: {debug}");
 }
 
 #[test]
-fn test_args_path_none_jsonl_false() {
+fn test_args_path_none() {
     let args = args_none();
     assert!(args.path.is_none());
-    assert!(!args.jsonl);
 }
 
 #[test]
-fn test_args_path_some_jsonl_true() {
-    let args = Args { path: Some(PathBuf::from("/data.toml")), jsonl: true };
+fn test_args_path_some() {
+    let args = Args { path: Some(PathBuf::from("/data.toml")) };
     assert_eq!(args.path, Some(PathBuf::from("/data.toml")));
-    assert!(args.jsonl);
 }
 
 #[test]

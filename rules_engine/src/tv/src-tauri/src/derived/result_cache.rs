@@ -72,7 +72,7 @@ impl ResultCache {
             let entry = self.entries.get_mut(&key).expect("Key confirmed present");
             entry.access_order = self.access_counter;
 
-            tracing::debug!(
+            tracing::trace!(
                 component = "tv.derived.result_cache",
                 file_path = %row_key.file_path,
                 table_name = %row_key.table_name,
@@ -84,7 +84,7 @@ impl ResultCache {
 
             Some(&self.entries[&key].result)
         } else {
-            tracing::debug!(
+            tracing::trace!(
                 component = "tv.derived.result_cache",
                 file_path = %row_key.file_path,
                 table_name = %row_key.table_name,
@@ -125,7 +125,7 @@ impl ResultCache {
         self.access_counter += 1;
         self.entries.insert(key, CacheEntry { result, access_order: self.access_counter });
 
-        tracing::debug!(
+        tracing::trace!(
             component = "tv.derived.result_cache",
             file_path = %row_key.file_path,
             table_name = %row_key.table_name,

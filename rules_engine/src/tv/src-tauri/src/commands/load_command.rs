@@ -104,7 +104,7 @@ fn restore_sort_state_from_metadata(
             };
             let sort_state = SortState::new(sort_config.column.clone(), direction);
             sort_state_manager.set_sort_state(file_path, table_name, Some(sort_state));
-            tracing::info!(
+            tracing::debug!(
                 component = "tv.commands.load",
                 file_path = %file_path,
                 table_name = %table_name,
@@ -161,7 +161,7 @@ fn restore_filter_state_from_metadata(
                 filter_state_manager.set_filters(file_path, table_name, filter_states);
             }
 
-            tracing::info!(
+            tracing::debug!(
                 component = "tv.commands.load",
                 file_path = %file_path,
                 table_name = %table_name,

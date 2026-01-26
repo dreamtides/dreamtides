@@ -179,7 +179,7 @@ impl ComputeExecutor {
         if request.is_visible {
             // Visible rows get priority - add to front
             queue.push_front(request.clone());
-            tracing::debug!(
+            tracing::trace!(
                 component = "tv.derived.executor",
                 file_path = %request.row_key.file_path,
                 table_name = %request.row_key.table_name,
@@ -190,7 +190,7 @@ impl ComputeExecutor {
         } else {
             // Offscreen rows go to the back
             queue.push_back(request.clone());
-            tracing::debug!(
+            tracing::trace!(
                 component = "tv.derived.executor",
                 file_path = %request.row_key.file_path,
                 table_name = %request.row_key.table_name,
@@ -275,7 +275,7 @@ impl ComputeExecutor {
                     Some(req) => {
                         // Check if the request is still current
                         if !generation_tracker.is_generation_current(&req.row_key, req.generation) {
-                            tracing::debug!(
+                            tracing::trace!(
                                 component = "tv.derived.executor",
                                 file_path = %req.row_key.file_path,
                                 table_name = %req.row_key.table_name,
@@ -349,7 +349,7 @@ impl ComputeExecutor {
 
                         // Check again if result is still current before emitting
                         if !generation_tracker.is_generation_current(&req.row_key, req.generation) {
-                            tracing::debug!(
+                            tracing::trace!(
                                 component = "tv.derived.executor",
                                 file_path = %req.row_key.file_path,
                                 table_name = %req.row_key.table_name,
@@ -376,7 +376,7 @@ impl ComputeExecutor {
                                 "Failed to emit derived value event"
                             );
                         } else {
-                            tracing::debug!(
+                            tracing::trace!(
                                 component = "tv.derived.executor",
                                 file_path = %req.row_key.file_path,
                                 table_name = %req.row_key.table_name,
