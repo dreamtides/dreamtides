@@ -1,4 +1,6 @@
 #[cfg(test)]
+mod cli_tests;
+#[cfg(test)]
 mod derived_tests;
 #[cfg(test)]
 mod error_tests;
