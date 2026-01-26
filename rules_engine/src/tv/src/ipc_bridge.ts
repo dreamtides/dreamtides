@@ -485,6 +485,20 @@ export async function clearSortState(
   return invoke<SortStateResponse>("clear_sort_state", { filePath, tableName });
 }
 
+// ============ Image Commands ============
+
+/**
+ * Fetches an image by URL and returns the local cache file path.
+ *
+ * On cache hit, returns immediately. On cache miss, fetches the image
+ * over HTTP, validates it, stores it in the content-addressed cache,
+ * and returns the cached file path. The returned path should be converted
+ * to an asset URL using `convertFileSrc()` before passing to Univer.
+ */
+export async function fetchImage(url: string): Promise<string> {
+  return invoke<string>("fetch_image", { url });
+}
+
 // ============ Validation Commands ============
 
 export interface EnumValidationInfo {

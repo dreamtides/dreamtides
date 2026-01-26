@@ -1,7 +1,3 @@
-// This module provides infrastructure for Tasks 36-38. The types and functions
-// are intentionally not yet used until image fetching is implemented.
-#![allow(dead_code)]
-
 use std::collections::HashMap;
 use std::fs::{self, File};
 use std::io::{Read, Write};
@@ -52,6 +48,7 @@ impl CacheMetadata {
     }
 }
 
+#[allow(dead_code)]
 impl ImageCache {
     /// Creates a new image cache in the specified application data directory.
     pub fn new(app_data_dir: &Path) -> Result<Self, TvError> {
@@ -383,6 +380,7 @@ impl ImageCache {
 
 /// Result of cache integrity validation.
 #[derive(Debug, Clone)]
+#[allow(dead_code)]
 pub struct ValidationResult {
     pub orphaned_files_removed: usize,
     pub missing_entries_removed: usize,

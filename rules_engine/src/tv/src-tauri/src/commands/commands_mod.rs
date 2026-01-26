@@ -1,4 +1,5 @@
 pub mod derived_command;
+pub mod image_command;
 pub mod load_command;
 pub mod save_command;
 pub mod sort_command;

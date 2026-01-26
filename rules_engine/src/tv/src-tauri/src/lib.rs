@@ -3,6 +3,7 @@ use std::collections::HashSet;
 use tauri::Manager;
 
 use crate::derived::compute_executor::ComputeExecutorState;
+use crate::images::image_fetcher::ImageFetcherState;
 
 pub mod cli;
 #[path = "commands/commands_mod.rs"]
@@ -65,6 +66,22 @@ fn initialize_compute_executor() -> ComputeExecutorState {
     state
 }
 
+fn initialize_image_fetcher(app_handle: &tauri::AppHandle) {
+    if let Some(state) = app_handle.try_state::<ImageFetcherState>() {
+        let cache_dir = app_handle
+            .path()
+            .app_cache_dir()
+            .unwrap_or_else(|_| std::path::PathBuf::from(".tv_cache"));
+        if let Err(e) = state.initialize(&cache_dir) {
+            tracing::error!(
+                component = "tv.images.fetcher",
+                error = %e,
+                "Failed to initialize image fetcher"
+            );
+        }
+    }
+}
+
 fn stop_compute_executor(app_handle: &tauri::AppHandle) {
     if let Some(state) = app_handle.try_state::<ComputeExecutorState>() {
         state.stop();
@@ -90,6 +107,7 @@ pub fn run(paths: cli::AppPaths, _jsonl: bool) {
         .manage(sync::state_machine::SyncStateMachineState::new())
         .manage(sort::sort_state::SortStateManager::new())
         .manage(executor_state)
+        .manage(ImageFetcherState::new())
         .invoke_handler(tauri::generate_handler![
             commands::load_command::load_toml_table,
             commands::save_command::save_toml_table,
@@ -108,11 +126,13 @@ pub fn run(paths: cli::AppPaths, _jsonl: bool) {
             commands::derived_command::get_computation_queue_length,
             commands::validation_command::get_validation_rules,
             commands::validation_command::get_enum_validation_rules,
+            commands::image_command::fetch_image,
             get_app_paths,
         ])
         .setup(|app| {
-            // Start the compute executor after setup
             let app_handle = app.handle().clone();
+
+            // Start the compute executor after setup
             if let Some(state) = app_handle.try_state::<ComputeExecutorState>() {
                 state.start(app_handle.clone());
                 tracing::info!(
@@ -120,6 +140,10 @@ pub fn run(paths: cli::AppPaths, _jsonl: bool) {
                     "Compute executor started"
                 );
             }
+
+            // Initialize the image fetcher with the app cache directory
+            initialize_image_fetcher(&app_handle);
+
             Ok(())
         })
         .on_window_event(|window, event| {
