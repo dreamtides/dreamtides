@@ -745,6 +745,62 @@ name = "Original"
 }
 
 #[test]
+fn test_save_existing_row_inserts_new_keys() {
+    let harness = TvTestHarness::new();
+    let path = harness.create_toml_file(
+        "incremental_row.toml",
+        r#"[[cards]]
+id = "card-1"
+name = "First Card"
+cost = 1
+"#,
+    );
+
+    let mut table = harness.load_table(&path, "cards").expect("Should load table");
+    assert_eq!(table.rows.len(), 1);
+
+    let id_idx = table.headers.iter().position(|h| h == "id").unwrap();
+
+    // First save: append a new row with only the id column set (simulates first
+    // debounce firing after typing only one value in a new row)
+    let mut partial_row = vec![serde_json::Value::Null; table.headers.len()];
+    partial_row[id_idx] = json!("card-2");
+    table.rows.push(partial_row);
+    harness.save_table(&path, "cards", &table).expect("First save should succeed");
+
+    let after_first = harness.load_table(&path, "cards").expect("Should reload after first save");
+    assert_eq!(after_first.rows.len(), 2);
+    let id_idx = after_first.headers.iter().position(|h| h == "id").unwrap();
+    assert_eq!(after_first.rows[1][id_idx].as_str(), Some("card-2"));
+
+    // Second save: same row now has additional columns filled in (simulates the
+    // next debounce firing after the user typed more values in the same row)
+    let mut table2 = after_first;
+    let name_idx = table2.headers.iter().position(|h| h == "name").unwrap();
+    let cost_idx = table2.headers.iter().position(|h| h == "cost").unwrap();
+    table2.rows[1][name_idx] = json!("Second Card");
+    table2.rows[1][cost_idx] = json!(2);
+    harness.save_table(&path, "cards", &table2).expect("Second save should succeed");
+
+    let reloaded = harness.load_table(&path, "cards").expect("Should reload after second save");
+    assert_eq!(reloaded.rows.len(), 2);
+    let id_idx = reloaded.headers.iter().position(|h| h == "id").unwrap();
+    let name_idx = reloaded.headers.iter().position(|h| h == "name").unwrap();
+    let cost_idx = reloaded.headers.iter().position(|h| h == "cost").unwrap();
+    assert_eq!(reloaded.rows[1][id_idx].as_str(), Some("card-2"));
+    assert_eq!(
+        reloaded.rows[1][name_idx].as_str(),
+        Some("Second Card"),
+        "New key 'name' should be inserted into existing row"
+    );
+    assert_eq!(
+        reloaded.rows[1][cost_idx].as_i64(),
+        Some(2),
+        "New key 'cost' should be inserted into existing row"
+    );
+}
+
+#[test]
 fn test_cleanup_orphaned_temp_files_removes_temp_files() {
     let mock = MockFileSystem::new().with_temp_files(vec![
         PathBuf::from("/tmp/.tv_save_abc123"),

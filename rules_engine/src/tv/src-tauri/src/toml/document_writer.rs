@@ -158,6 +158,10 @@ pub fn save_toml_document_with_fs(
                         {
                             *existing = new_val;
                         }
+                    } else if !json_val.is_null() {
+                        if let Some(toml_val) = value_converter::json_to_toml_edit(json_val) {
+                            table.insert(header, toml_val);
+                        }
                     }
                 }
             }
