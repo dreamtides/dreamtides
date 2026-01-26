@@ -10,7 +10,7 @@ subtype = "Ancient"
 is-fast = false
 spark = 4
 image-number = 2521694543
-rarity = "Uncommon"
+rarity = "Rare"
 art-owned = true
 card-number = 1
 
@@ -200,7 +200,7 @@ subtype = "Warrior"
 is-fast = false
 spark = 0
 image-number = 1047769090
-rarity = "Legendary"
+rarity = "Common"
 art-owned = true
 card-number = 12
 
@@ -3680,3 +3680,16 @@ image-number = 1486924805
 rarity = "Special"
 art-owned = true
 card-number = 222
+
+[metadata]
+schema_version = 1
+
+[[metadata.validation_rules]]
+column = "card-type"
+type = "enum"
+enum = ["Character", "Event"]
+
+[[metadata.validation_rules]]
+column = "rarity"
+type = "enum"
+enum = ["Common", "Uncommon", "Rare", "Legendary", "Special"]
