@@ -192,6 +192,10 @@ pub struct DerivedColumnConfig {
     /// Input field names passed to the function.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub inputs: Vec<String>,
+
+    /// URL template for image-related derived functions.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub url_template: Option<String>,
 }
 
 impl DerivedColumnConfig {
@@ -203,6 +207,7 @@ impl DerivedColumnConfig {
             position: None,
             width: default_column_width(),
             inputs: Vec::new(),
+            url_template: None,
         }
     }
 

@@ -280,11 +280,20 @@ impl ComputeExecutor {
                             continue;
                         }
 
-                        // Execute the computation
-                        let context = lookup_context.read().expect("Lookup context lock poisoned");
-                        let result =
-                            execute_computation(&req.function_name, &req.row_data, &context);
-                        drop(context);
+                        // Execute the computation on a blocking thread to avoid
+                        // tokio runtime nesting issues (e.g. reqwest::blocking
+                        // creates its own runtime internally).
+                        let ctx_ref = Arc::clone(&lookup_context);
+                        let fn_name = req.function_name.clone();
+                        let row_data = req.row_data.clone();
+                        let result = tokio::task::spawn_blocking(move || {
+                            let context = ctx_ref.read().expect("Lookup context lock poisoned");
+                            execute_computation(&fn_name, &row_data, &context)
+                        })
+                        .await
+                        .unwrap_or_else(|e| {
+                            DerivedResult::Error(format!("Computation task failed: {e}"))
+                        });
 
                         // Check again if result is still current before emitting
                         if !generation_tracker.is_generation_current(&req.row_key, req.generation) {

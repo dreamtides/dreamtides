@@ -612,6 +612,7 @@ export interface DerivedColumnInfo {
   position?: number;
   width: number;
   inputs: string[];
+  url_template?: string | null;
 }
 
 export interface ComputeDerivedRequest {

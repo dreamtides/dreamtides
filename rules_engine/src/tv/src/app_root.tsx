@@ -102,17 +102,14 @@ export function AppRoot() {
     }
   }, []);
 
-  const loadDerivedColumnsForSheet = useCallback(async (sheetInfo: SheetInfo, data: TomlTableData) => {
+  const triggerDerivedComputations = useCallback(async (
+    sheetInfo: SheetInfo,
+    data: TomlTableData,
+    configs: ipc.DerivedColumnInfo[],
+  ) => {
     try {
-      const configs = await ipc.getDerivedColumnsConfig(sheetInfo.path);
       if (configs.length === 0) return;
 
-      setDerivedColumnState((prev) => ({
-        ...prev,
-        configs: { ...prev.configs, [sheetInfo.id]: configs },
-      }));
-
-      // Build row data and trigger batch computation
       const requests: ipc.ComputeDerivedRequest[] = [];
       for (let rowIndex = 0; rowIndex < data.rows.length; rowIndex++) {
         const rowData: Record<string, unknown> = {};
@@ -121,6 +118,9 @@ export function AppRoot() {
         }
 
         for (const config of configs) {
+          if (config.url_template) {
+            rowData["__url_template"] = config.url_template;
+          }
           requests.push({
             file_path: sheetInfo.path,
             table_name: sheetInfo.tableName,
@@ -136,7 +136,7 @@ export function AppRoot() {
         await ipc.computeDerivedBatch({ requests });
       }
     } catch (e) {
-      console.error(`Failed to load derived columns for ${sheetInfo.path}:`, e);
+      console.error(`Failed to trigger derived computations for ${sheetInfo.path}:`, e);
     }
   }, []);
 
@@ -169,6 +169,32 @@ export function AppRoot() {
       lastKnownDataRef.current[sheet.id] = sheet.data;
     }
 
+    // Pre-load derived column configs before building the workbook so
+    // positioned derived columns (e.g., image at position 0) can reserve
+    // space in the column layout.
+    const allDerivedConfigs: Record<string, ipc.DerivedColumnInfo[]> = {};
+    await Promise.all(
+      validSheets.map(async (sheet) => {
+        try {
+          const configs = await ipc.getDerivedColumnsConfig(sheet.path);
+          if (configs.length > 0) {
+            allDerivedConfigs[sheet.id] = configs;
+          }
+        } catch (e) {
+          console.error(`Failed to load derived columns for ${sheet.path}:`, e);
+        }
+      })
+    );
+
+    // Set derived configs before multiSheetData so they are available
+    // when UniverSpreadsheet first mounts and builds the workbook.
+    if (Object.keys(allDerivedConfigs).length > 0) {
+      setDerivedColumnState((prev) => ({
+        ...prev,
+        configs: { ...prev.configs, ...allDerivedConfigs },
+      }));
+    }
+
     setMultiSheetData({ sheets: validSheets });
     if (!activeSheetIdRef.current && validSheets.length > 0) {
       const initialId = restoredSheetId && validSheets.some((s) => s.id === restoredSheetId)
@@ -179,14 +205,15 @@ export function AppRoot() {
     setError(null);
     setLoading(false);
 
-    // Load derived column configs and trigger computations for all sheets
+    // Trigger derived column computations for all sheets
     for (const sheet of validSheets) {
       const info = sheetInfos.find((s) => s.id === sheet.id);
-      if (info) {
-        loadDerivedColumnsForSheet(info, sheet.data);
+      const configs = allDerivedConfigs[sheet.id];
+      if (info && configs) {
+        triggerDerivedComputations(info, sheet.data, configs);
       }
     }
-  }, [loadSingleFile, loadDerivedColumnsForSheet]);
+  }, [loadSingleFile, triggerDerivedComputations]);
 
   const reloadSheet = useCallback(async (sheetId: string) => {
     const sheetInfo = sheets.find((s) => s.id === sheetId);
@@ -207,8 +234,19 @@ export function AppRoot() {
     });
 
     // Re-trigger derived column computations for reloaded sheet
-    loadDerivedColumnsForSheet(sheetInfo, data);
-  }, [sheets, loadSingleFile, loadDerivedColumnsForSheet]);
+    try {
+      const configs = await ipc.getDerivedColumnsConfig(sheetInfo.path);
+      if (configs.length > 0) {
+        setDerivedColumnState((prev) => ({
+          ...prev,
+          configs: { ...prev.configs, [sheetId]: configs },
+        }));
+        triggerDerivedComputations(sheetInfo, data, configs);
+      }
+    } catch (e) {
+      console.error(`Failed to reload derived columns for ${sheetInfo.path}:`, e);
+    }
+  }, [sheets, loadSingleFile, triggerDerivedComputations]);
 
   const getActiveSheetInfo = useCallback((): SheetInfo | undefined => {
     return sheets.find((s) => s.id === activeSheetId);

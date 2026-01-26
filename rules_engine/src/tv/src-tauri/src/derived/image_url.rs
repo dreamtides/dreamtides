@@ -28,8 +28,8 @@ impl ImageUrlFunction {
         Self { url_template: template.into() }
     }
 
-    fn construct_url(&self, image_number: &str) -> String {
-        self.url_template.replace("{image_number}", image_number)
+    fn construct_url(template: &str, image_number: &str) -> String {
+        template.replace("{image_number}", image_number)
     }
 }
 
@@ -49,10 +49,19 @@ impl DerivedFunction for ImageUrlFunction {
     }
 
     fn compute(&self, inputs: &RowData, _context: &LookupContext) -> DerivedResult {
-        let image_number = match inputs.get("image_number") {
+        let template = inputs
+            .get("__url_template")
+            .and_then(|v| v.as_str())
+            .unwrap_or(&self.url_template);
+
+        let image_value = inputs
+            .get("image-number")
+            .or_else(|| inputs.get("image_number"));
+
+        let image_number = match image_value {
             Some(serde_json::Value::String(s)) => s.as_str(),
             Some(serde_json::Value::Number(n)) => {
-                return DerivedResult::Image(self.construct_url(&n.to_string()));
+                return DerivedResult::Image(Self::construct_url(template, &n.to_string()));
             }
             Some(serde_json::Value::Null) | None => {
                 return DerivedResult::Text(String::new());
@@ -69,7 +78,7 @@ impl DerivedFunction for ImageUrlFunction {
             return DerivedResult::Text(String::new());
         }
 
-        DerivedResult::Image(self.construct_url(image_number))
+        DerivedResult::Image(Self::construct_url(template, image_number))
     }
 
     fn is_async(&self) -> bool {

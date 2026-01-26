@@ -38,8 +38,8 @@ impl ImageDerivedFunction {
         Self { url_template: template.into(), cache, client }
     }
 
-    fn construct_url(&self, image_number: &str) -> String {
-        self.url_template.replace("{image_number}", image_number)
+    fn construct_url(&self, template: &str, image_number: &str) -> String {
+        template.replace("{image_number}", image_number)
     }
 
     fn fetch_and_cache(&self, url: &str) -> DerivedResult {
@@ -125,10 +125,19 @@ impl DerivedFunction for ImageDerivedFunction {
     }
 
     fn compute(&self, inputs: &RowData, _context: &LookupContext) -> DerivedResult {
-        let image_number = match inputs.get("image_number") {
+        let template = inputs
+            .get("__url_template")
+            .and_then(|v| v.as_str())
+            .unwrap_or(&self.url_template);
+
+        let image_value = inputs
+            .get("image-number")
+            .or_else(|| inputs.get("image_number"));
+
+        let image_number = match image_value {
             Some(serde_json::Value::String(s)) => s.as_str(),
             Some(serde_json::Value::Number(n)) => {
-                let url = self.construct_url(&n.to_string());
+                let url = self.construct_url(template, &n.to_string());
                 return self.fetch_and_cache(&url);
             }
             Some(serde_json::Value::Null) | None => {
@@ -146,7 +155,7 @@ impl DerivedFunction for ImageDerivedFunction {
             return DerivedResult::Text(String::new());
         }
 
-        let url = self.construct_url(image_number);
+        let url = self.construct_url(template, image_number);
         self.fetch_and_cache(&url)
     }
 

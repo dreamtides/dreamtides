@@ -235,6 +235,8 @@ pub struct DerivedColumnInfo {
     pub width: u32,
     /// Input field names passed to the function.
     pub inputs: Vec<String>,
+    /// URL template for image-related derived functions.
+    pub url_template: Option<String>,
 }
 
 /// Tauri command to get derived column configurations from a file's metadata.
@@ -250,6 +252,7 @@ pub fn get_derived_columns_config(file_path: String) -> Result<Vec<DerivedColumn
             position: c.position,
             width: c.width,
             inputs: c.inputs,
+            url_template: c.url_template,
         })
         .collect();
 
