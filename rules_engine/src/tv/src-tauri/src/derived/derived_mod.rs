@@ -6,6 +6,7 @@ pub mod function_registry;
 pub mod generation_tracker;
 pub mod image_derived;
 pub mod image_url;
+pub mod result_cache;
 pub mod rich_text_converter;
 pub mod rules_preview;
 pub mod style_tag_parser;
