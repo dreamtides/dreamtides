@@ -13,16 +13,18 @@ pub fn initialize_fluent_resource() {
         match FluentResource::try_new(ftl_source.to_string()) {
             Ok(resource) => {
                 tracing::info!(
-                    component = "tv.derived.fluent",
-                    "Loaded Fluent resource from strings.ftl"
+                    component = "derived.rules_preview",
+                    "Loaded FluentResource from strings.ftl"
                 );
                 Arc::new(resource)
             }
             Err((resource, errors)) => {
-                tracing::warn!(
-                    component = "tv.derived.fluent",
-                    errors = %format_fluent_errors(&errors.into_iter().map(FluentError::ParserError).collect::<Vec<_>>()),
-                    "Fluent resource loaded with parse errors"
+                let error_vec: Vec<FluentError> =
+                    errors.into_iter().map(FluentError::ParserError).collect();
+                tracing::error!(
+                    component = "derived.rules_preview",
+                    errors = %format_fluent_errors(&error_vec),
+                    "Fluent parse errors in strings.ftl"
                 );
                 Arc::new(resource)
             }
@@ -37,6 +39,13 @@ pub fn global_fluent_resource() -> Option<&'static Arc<FluentResource>> {
 
 /// Formats an expression using the global Fluent resource and provided arguments.
 pub fn format_expression(expression: &str, args: &FluentArgs) -> Result<String, String> {
+    tracing::debug!(
+        component = "derived.rules_preview",
+        expression_len = expression.len(),
+        arg_count = args.iter().count(),
+        "Formatting Fluent expression"
+    );
+
     let Some(resource) = global_fluent_resource() else {
         return Err("Fluent resource not initialized".to_string());
     };
@@ -54,6 +63,12 @@ pub fn format_expression(expression: &str, args: &FluentArgs) -> Result<String, 
         Err((_, errors)) => {
             let error_vec: Vec<FluentError> =
                 errors.into_iter().map(FluentError::ParserError).collect();
+            tracing::error!(
+                component = "derived.rules_preview",
+                expression = expression,
+                errors = %format_fluent_errors(&error_vec),
+                "Failed to parse Fluent expression"
+            );
             return Err(format!("Failed to parse expression: {}", format_fluent_errors(&error_vec)));
         }
     };
@@ -77,6 +92,12 @@ pub fn format_expression(expression: &str, args: &FluentArgs) -> Result<String, 
     let formatted = bundle.format_pattern(pattern, Some(args), &mut errors);
 
     if !errors.is_empty() {
+        tracing::warn!(
+            component = "derived.rules_preview",
+            expression = expression,
+            errors = %format_fluent_errors(&errors),
+            "Missing variable or term references during Fluent formatting"
+        );
         return Err(format!("Fluent formatting errors: {}", format_fluent_errors(&errors)));
     }
 

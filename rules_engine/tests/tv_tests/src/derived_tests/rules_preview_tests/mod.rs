@@ -1,3 +1,5 @@
+mod fluent_tests;
+
 use std::collections::HashMap;
 
 use tv_lib::derived::derived_types::{DerivedFunction, DerivedResult, LookupContext, RowData};
