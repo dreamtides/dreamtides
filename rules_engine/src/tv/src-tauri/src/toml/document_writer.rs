@@ -8,6 +8,7 @@ use crate::toml::document_loader::TomlTableData;
 use crate::toml::metadata_parser;
 use crate::toml::value_converter;
 use crate::traits::{AtomicWriteError, FileSystem, RealFileSystem};
+use crate::uuid::uuid_generator;
 use crate::validation::validation_rules::ValidationRule;
 use crate::validation::validators;
 
@@ -20,6 +21,13 @@ pub struct CellUpdate {
     pub row_index: usize,
     pub column_key: String,
     pub value: serde_json::Value,
+}
+
+/// Result of a table save operation.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct SaveTableResult {
+    pub uuids_generated: bool,
 }
 
 /// Result of a cell save operation.
@@ -36,7 +44,7 @@ pub fn save_toml_document(
     file_path: &str,
     table_name: &str,
     data: &TomlTableData,
-) -> Result<(), TvError> {
+) -> Result<SaveTableResult, TvError> {
     save_toml_document_with_fs(&RealFileSystem, file_path, table_name, data)
 }
 
@@ -105,7 +113,7 @@ pub fn save_toml_document_with_fs(
     file_path: &str,
     table_name: &str,
     data: &TomlTableData,
-) -> Result<(), TvError> {
+) -> Result<SaveTableResult, TvError> {
     let start = Instant::now();
 
     let content = fs.read_to_string(Path::new(file_path)).map_err(|e| {
@@ -228,6 +236,11 @@ pub fn save_toml_document_with_fs(
         doc[table_name] = toml_edit::Item::ArrayOfTables(new_array);
     }
 
+    let uuids_generated = doc
+        .get_mut(table_name)
+        .and_then(|v| v.as_array_of_tables_mut())
+        .is_some_and(|array| uuid_generator::ensure_uuids(array, &data.headers));
+
     let output = doc.to_string();
 
     fs.write_atomic(Path::new(file_path), &output)
@@ -238,10 +251,11 @@ pub fn save_toml_document_with_fs(
         component = "tv.toml",
         file_path = %file_path,
         duration_ms = duration_ms,
+        uuids_generated = uuids_generated,
         "File saved"
     );
 
-    Ok(())
+    Ok(SaveTableResult { uuids_generated })
 }
 
 fn map_atomic_write_error(error: AtomicWriteError, file_path: &str) -> TvError {

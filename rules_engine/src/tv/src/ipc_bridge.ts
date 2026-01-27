@@ -430,12 +430,16 @@ export async function loadTomlTable(
   return invoke<TomlTableData>("load_toml_table", { filePath, tableName });
 }
 
+export interface SaveTableResult {
+  uuidsGenerated: boolean;
+}
+
 export async function saveTomlTable(
   filePath: string,
   tableName: string,
   data: TomlTableData,
-): Promise<void> {
-  return invoke("save_toml_table", { filePath, tableName, data });
+): Promise<SaveTableResult> {
+  return invoke<SaveTableResult>("save_toml_table", { filePath, tableName, data });
 }
 
 export async function saveCell(

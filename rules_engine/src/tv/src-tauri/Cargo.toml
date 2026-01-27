@@ -41,4 +41,5 @@ toml = { version = "0.8", features = ["preserve_order"] }
 toml_edit = "0.22"
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["json", "env-filter"] }
+uuid = { version = "1", features = ["v4"] }
 

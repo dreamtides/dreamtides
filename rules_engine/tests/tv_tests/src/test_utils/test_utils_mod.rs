@@ -7,7 +7,7 @@ use tv_lib::toml::document_loader::{load_toml_document_with_fs, TomlTableData};
 use tv_lib::toml::document_writer::{
     add_row_with_fs, delete_row_with_fs, save_batch_with_fs, save_cell_with_fs,
     save_toml_document_with_fs, AddRowResult, CellUpdate, DeleteRowResult, SaveBatchResult,
-    SaveCellResult,
+    SaveCellResult, SaveTableResult,
 };
 use tv_lib::toml::metadata_parser;
 use tv_lib::traits::{FileSystem, RealFileSystem};
@@ -58,7 +58,7 @@ impl TvTestHarness {
         path: &Path,
         table_name: &str,
         data: &TomlTableData,
-    ) -> Result<(), TvError> {
+    ) -> Result<SaveTableResult, TvError> {
         save_toml_document_with_fs(
             &*self.fs,
             path.to_str().unwrap_or_else(|| panic!("Invalid path: {path:?}")),

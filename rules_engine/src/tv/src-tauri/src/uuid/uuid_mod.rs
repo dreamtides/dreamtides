@@ -1,1 +1,1 @@
-// Stub module for Phase 6: UUID generation
+pub mod uuid_generator;

@@ -5,7 +5,9 @@ use tauri::AppHandle;
 use crate::error::error_types::TvError;
 use crate::sync::state_machine;
 use crate::toml::document_loader::TomlTableData;
-use crate::toml::document_writer::{self, AddRowResult, CellUpdate, SaveBatchResult, SaveCellResult};
+use crate::toml::document_writer::{
+    self, AddRowResult, CellUpdate, SaveBatchResult, SaveCellResult, SaveTableResult,
+};
 
 /// Tauri command to save spreadsheet data back to a TOML file.
 #[tauri::command]
@@ -14,7 +16,7 @@ pub fn save_toml_table(
     file_path: String,
     table_name: String,
     data: TomlTableData,
-) -> Result<(), TvError> {
+) -> Result<SaveTableResult, TvError> {
     state_machine::begin_save(&app_handle, &file_path)?;
 
     let result = document_writer::save_toml_document(&file_path, &table_name, &data);

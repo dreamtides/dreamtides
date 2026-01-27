@@ -29,7 +29,7 @@ pub mod toml;
 #[path = "traits/traits_mod.rs"]
 pub mod traits;
 #[path = "uuid/uuid_mod.rs"]
-mod uuid;
+pub mod uuid;
 #[path = "validation/validation_mod.rs"]
 pub mod validation;
 #[path = "view_state/view_state_mod.rs"]

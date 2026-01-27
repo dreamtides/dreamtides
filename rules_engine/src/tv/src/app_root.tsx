@@ -343,10 +343,19 @@ export function AppRoot() {
       try {
         const previousData = lastKnownDataRef.current[sheetId];
 
-        await ipc.saveTomlTable(sheetInfo.path, sheetInfo.tableName, newData);
-        lastKnownDataRef.current[sheetId] = newData;
+        const saveResult = await ipc.saveTomlTable(sheetInfo.path, sheetInfo.tableName, newData);
         // Record save time so file watcher can suppress self-triggered reloads
         lastSaveTimeRef.current[sheetId] = Date.now();
+
+        // If UUIDs were auto-generated during save, reload the sheet from
+        // disk so the frontend picks up the new id values.
+        if (saveResult.uuidsGenerated) {
+          logger.info("UUIDs generated during save, reloading sheet", { sheetId });
+          await reloadSheet(sheetId);
+          return;
+        }
+
+        lastKnownDataRef.current[sheetId] = newData;
 
         const rowCountChanged = !previousData ||
           previousData.rows.length !== newData.rows.length;
@@ -395,7 +404,7 @@ export function AppRoot() {
         isSavingRef.current[sheetId] = false;
       }
     },
-    [sheets, triggerDerivedComputations]
+    [sheets, reloadSheet, triggerDerivedComputations]
   );
 
   const handleChange = useCallback(
