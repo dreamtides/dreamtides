@@ -1245,7 +1245,7 @@ function buildMultiSheetWorkbook(
       columnCount,
       cellData,
       defaultStyle: {
-        ht: HorizontalAlign.CENTER,
+        ht: HorizontalAlign.LEFT,
         vt: VerticalAlign.MIDDLE,
         tb: WrapStrategy.WRAP,
       },
