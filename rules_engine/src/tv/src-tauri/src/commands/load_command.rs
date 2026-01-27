@@ -3,7 +3,7 @@ use tauri::{AppHandle, State};
 use crate::error::error_types::TvError;
 use crate::filter::filter_state::FilterStateManager;
 use crate::filter::filter_types::{ColumnFilterState, FilterConditionState, FilterState};
-use crate::sort::sort_state::{self, SortStateManager};
+use crate::sort::sort_state::SortStateManager;
 use crate::sort::sort_types::{SortDirection, SortState};
 use crate::sync::state_machine;
 use crate::toml::document_loader::{self, TomlTableData};
@@ -33,14 +33,6 @@ pub fn load_toml_table(
 
     let result = document_loader::load_toml_document(&file_path, &table_name);
     state_machine::end_load(&app_handle, &file_path, result.is_ok());
-
-    if let Ok(ref data) = result {
-        if let Some(sort) = sort_state_manager.get_sort_state(&file_path, &table_name) {
-            let indices = sort_state::apply_sort(data, &sort);
-            sort_state_manager.set_row_mapping(&file_path, &table_name, indices);
-        }
-    }
-
     result
 }
 

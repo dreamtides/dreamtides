@@ -386,7 +386,7 @@ export class ImageCellRenderer {
    * Clears all tracked image state for a sheet.
    * Call when sheet data is reloaded to allow fresh image insertion.
    */
-  clearSheetImages(_sheet: SheetRef, sheetId: string): void {
+  async clearSheetImages(_sheet: SheetRef, sheetId: string): Promise<void> {
     const keysToRemove: string[] = [];
     for (const [key] of this.imageStates) {
       if (key.startsWith(`${sheetId}:`)) {
@@ -413,12 +413,14 @@ export class ImageCellRenderer {
     }
 
     if (drawingsToRemove.length > 0 && unitId) {
-      this.univerAPI.executeCommand(REMOVE_SHEET_DRAWING_CMD, {
-        unitId,
-        drawings: drawingsToRemove,
-      }).catch(() => {
+      try {
+        await this.univerAPI.executeCommand(REMOVE_SHEET_DRAWING_CMD, {
+          unitId,
+          drawings: drawingsToRemove,
+        });
+      } catch {
         // Ignore cleanup errors
-      });
+      }
     }
 
     logger.debug("Cleared sheet images", {
