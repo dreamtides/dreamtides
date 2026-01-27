@@ -1,5 +1,6 @@
 use std::collections::HashSet;
 
+use tauri::menu::{Menu, MenuItem, MenuItemKind, Submenu};
 use tauri::Manager;
 
 use crate::derived::compute_executor::ComputeExecutorState;
@@ -108,6 +109,33 @@ pub fn run(paths: cli::AppPaths) {
 
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
+        .menu(|app_handle| {
+            let menu = Menu::default(app_handle)?;
+            let dev_tools = MenuItem::with_id(
+                app_handle,
+                "dev_tools",
+                "Developer Tools",
+                true,
+                Some("CmdOrCtrl+Alt+I"),
+            )?;
+            for item in menu.items()? {
+                if let MenuItemKind::Submenu(ref submenu) = item {
+                    if submenu.text().unwrap_or_default() == "View" {
+                        submenu.append(&dev_tools)?;
+                        return Ok(menu);
+                    }
+                }
+            }
+            menu.append(&Submenu::with_items(app_handle, "View", true, &[&dev_tools])?)?;
+            Ok(menu)
+        })
+        .on_menu_event(|app_handle, event| {
+            if event.id() == "dev_tools" {
+                if let Some(window) = app_handle.get_webview_window("main") {
+                    window.open_devtools();
+                }
+            }
+        })
         .manage(paths)
         .manage(sync::file_watcher::FileWatcherState::new())
         .manage(sync::state_machine::SyncStateMachineState::new())
