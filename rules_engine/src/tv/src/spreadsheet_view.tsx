@@ -40,7 +40,7 @@ export function SpreadsheetView({
   return (
     <main className="container">
       <UniverSpreadsheet
-        height="100vh"
+        height="100%"
         multiSheetData={multiSheetData ?? undefined}
         onChange={onChange}
         onActiveSheetChanged={onActiveSheetChanged}
