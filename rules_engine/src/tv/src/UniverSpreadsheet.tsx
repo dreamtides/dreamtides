@@ -501,12 +501,14 @@ export const UniverSpreadsheet = forwardRef<
       logger.debug("Workbook initialized in single-sheet mode");
     }
 
-    // Listen for cell value changes
+    // Listen for cell value changes and row removal
     instance.univerAPI.onCommandExecuted((command) => {
       if (isLoadingRef.current) return;
       if (
         command.id === "sheet.mutation.set-range-values" ||
-        command.id === "sheet.command.set-range-values"
+        command.id === "sheet.command.set-range-values" ||
+        command.id === "sheet.mutation.remove-rows" ||
+        command.id === "sheet.command.remove-row"
       ) {
         const activeSheet = instance.univerAPI
           .getActiveWorkbook()
