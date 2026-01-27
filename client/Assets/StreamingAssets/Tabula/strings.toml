@@ -640,3 +640,9 @@ id = "1dd37348-a684-4f5f-a8e3-87ecb7354c85"
 name = "token-type-reclaim-ability"
 description = "Card type for a reclaim ability card"
 en-us = "Reclaim Ability"
+
+[metadata]
+schema_version = 1
+
+[metadata.table_style]
+color_scheme = "black"

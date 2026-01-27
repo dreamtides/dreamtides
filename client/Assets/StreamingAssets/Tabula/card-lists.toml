@@ -153,3 +153,9 @@ list-name = "Core 11"
 list-type = "BaseCardId"
 card-id = "1d41a21a-1beb-4e56-8d7f-be29c4a9d43d"
 copies = 4
+
+[metadata]
+schema_version = 1
+
+[metadata.table_style]
+color_scheme = "gray"

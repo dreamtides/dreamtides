@@ -426,3 +426,9 @@ card-type = "Character"
 is-fast = false
 spark = 1
 image-number = 1200949264
+
+[metadata]
+schema_version = 1
+
+[metadata.table_style]
+color_scheme = "blue_light"

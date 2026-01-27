@@ -219,3 +219,9 @@ effect-trigger = "DrawCards"
 card-trail-targets = "ForEachTarget"
 card-trail-address = "Assets/ThirdParty/Hovl Studio/AAA Projectiles Vol 1/Prefabs/Dreamtides/Projectile 5 red.prefab"
 trail-duration-milliseconds = 1500
+
+[metadata]
+schema_version = 1
+
+[metadata.table_style]
+color_scheme = "yellow"

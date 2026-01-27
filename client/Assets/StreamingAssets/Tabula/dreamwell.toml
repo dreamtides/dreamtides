@@ -61,3 +61,9 @@ rules-text = "Put the {top-n-cards} of your deck into your void."
 variables = "to-void: 3"
 phase = 1
 image-number = 2421338077
+
+[metadata]
+schema_version = 1
+
+[metadata.table_style]
+color_scheme = "orange"

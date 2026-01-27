@@ -122,6 +122,38 @@ pub fn resolve_color_scheme(name: &str) -> Option<ColorPalette> {
             row_font_color: "#000000".to_string(),
             accent_color: "#FF0000".to_string(),
         }),
+        "black" => Some(ColorPalette {
+            header_background: "#333333".to_string(),
+            header_font_color: "#FFFFFF".to_string(),
+            row_even_background: "#E0E0E0".to_string(),
+            row_odd_background: "#FFFFFF".to_string(),
+            row_font_color: "#000000".to_string(),
+            accent_color: "#333333".to_string(),
+        }),
+        "orange" => Some(ColorPalette {
+            header_background: "#ED7D31".to_string(),
+            header_font_color: "#FFFFFF".to_string(),
+            row_even_background: "#FCE4D6".to_string(),
+            row_odd_background: "#FFFFFF".to_string(),
+            row_font_color: "#000000".to_string(),
+            accent_color: "#ED7D31".to_string(),
+        }),
+        "gray" => Some(ColorPalette {
+            header_background: "#A5A5A5".to_string(),
+            header_font_color: "#FFFFFF".to_string(),
+            row_even_background: "#EDEDED".to_string(),
+            row_odd_background: "#FFFFFF".to_string(),
+            row_font_color: "#000000".to_string(),
+            accent_color: "#A5A5A5".to_string(),
+        }),
+        "yellow" => Some(ColorPalette {
+            header_background: "#FFC000".to_string(),
+            header_font_color: "#000000".to_string(),
+            row_even_background: "#FFF2CC".to_string(),
+            row_odd_background: "#FFFFFF".to_string(),
+            row_font_color: "#000000".to_string(),
+            accent_color: "#FFC000".to_string(),
+        }),
         _ => None,
     }
 }
@@ -142,5 +174,9 @@ pub fn available_schemes() -> Vec<&'static str> {
         "gold_light",
         "purple_light",
         "red_light",
+        "black",
+        "orange",
+        "gray",
+        "yellow",
     ]
 }
