@@ -3708,3 +3708,15 @@ default_height = 100
 [[metadata.columns]]
 key = "name"
 width = 200
+
+[[metadata.columns]]
+key = "rules-text"
+width = 275
+
+[[metadata.columns]]
+key = "id"
+width = 140
+
+[[metadata.columns]]
+key = "preview"
+width = 250
