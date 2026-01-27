@@ -455,7 +455,7 @@ pub enum FilterCondition {
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Default)]
 #[serde(default)]
 pub struct RowConfig {
-    /// Height in pixels for the header row. Defaults to 30.
+    /// Height in pixels for the header row. Defaults to 40.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub header_height: Option<u32>,
 

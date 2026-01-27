@@ -226,7 +226,7 @@ export type FilterCondition =
  * Row-specific configuration.
  */
 export interface RowConfig {
-  /** Height in pixels for the header row. Defaults to 30. */
+  /** Height in pixels for the header row. Defaults to 40. */
   header_height?: number;
   /** Default height in pixels for all data rows. */
   default_height?: number;
@@ -271,7 +271,10 @@ export interface ScrollPosition {
 // Legacy interface for backwards compatibility
 /** @deprecated Use Metadata instead */
 export interface TomlMetadata {
-  columns?: Record<string, { width?: number; alignment?: Alignment; wrap?: boolean }>;
+  columns?: Record<
+    string,
+    { width?: number; alignment?: Alignment; wrap?: boolean }
+  >;
   validation?: Record<string, ValidationRule[]>;
   derived?: Record<string, { function: string; inputs?: string[] }>;
 }
@@ -417,7 +420,7 @@ export interface DerivedFunctionFailedPayload {
 
 export async function loadTomlTable(
   filePath: string,
-  tableName: string
+  tableName: string,
 ): Promise<TomlTableData> {
   return invoke<TomlTableData>("load_toml_table", { filePath, tableName });
 }
@@ -425,7 +428,7 @@ export async function loadTomlTable(
 export async function saveTomlTable(
   filePath: string,
   tableName: string,
-  data: TomlTableData
+  data: TomlTableData,
 ): Promise<void> {
   return invoke("save_toml_table", { filePath, tableName, data });
 }
@@ -435,7 +438,7 @@ export async function saveCell(
   tableName: string,
   rowIndex: number,
   columnKey: string,
-  value: unknown
+  value: unknown,
 ): Promise<SaveResult> {
   return invoke<SaveResult>("save_cell", {
     filePath,
@@ -449,7 +452,7 @@ export async function saveCell(
 export async function saveBatch(
   filePath: string,
   tableName: string,
-  updates: BatchCellUpdate[]
+  updates: BatchCellUpdate[],
 ): Promise<SaveBatchResult> {
   return invoke<SaveBatchResult>("save_batch", {
     filePath,
@@ -467,7 +470,7 @@ export async function addRow(
   filePath: string,
   tableName: string,
   position?: number,
-  initialValues?: Record<string, unknown>
+  initialValues?: Record<string, unknown>,
 ): Promise<AddRowResult> {
   return invoke<AddRowResult>("add_row", {
     filePath,
@@ -491,7 +494,7 @@ export async function getAppPaths(): Promise<string[]> {
 
 export async function getSortState(
   filePath: string,
-  tableName: string
+  tableName: string,
 ): Promise<SortStateResponse> {
   return invoke<SortStateResponse>("get_sort_state", { filePath, tableName });
 }
@@ -499,7 +502,7 @@ export async function getSortState(
 export async function setSortState(
   filePath: string,
   tableName: string,
-  sort: SortState | null
+  sort: SortState | null,
 ): Promise<SortStateResponse> {
   return invoke<SortStateResponse>("set_sort_state", {
     filePath,
@@ -510,14 +513,14 @@ export async function setSortState(
 
 export async function clearSortState(
   filePath: string,
-  tableName: string
+  tableName: string,
 ): Promise<SortStateResponse> {
   return invoke<SortStateResponse>("clear_sort_state", { filePath, tableName });
 }
 
 export async function getSortRowMapping(
   filePath: string,
-  tableName: string
+  tableName: string,
 ): Promise<number[]> {
   return invoke<number[]>("get_sort_row_mapping", { filePath, tableName });
 }
@@ -525,7 +528,7 @@ export async function getSortRowMapping(
 export async function translateRowIndex(
   filePath: string,
   tableName: string,
-  displayIndex: number
+  displayIndex: number,
 ): Promise<number> {
   return invoke<number>("translate_row_index", {
     filePath,
@@ -560,15 +563,18 @@ export interface FilterStateResponse {
 
 export async function getFilterState(
   filePath: string,
-  tableName: string
+  tableName: string,
 ): Promise<FilterStateResponse> {
-  return invoke<FilterStateResponse>("get_filter_state", { filePath, tableName });
+  return invoke<FilterStateResponse>("get_filter_state", {
+    filePath,
+    tableName,
+  });
 }
 
 export async function setFilterState(
   filePath: string,
   tableName: string,
-  filters: SetFilterRequest[]
+  filters: SetFilterRequest[],
 ): Promise<FilterStateResponse> {
   return invoke<FilterStateResponse>("set_filter_state", {
     filePath,
@@ -579,22 +585,25 @@ export async function setFilterState(
 
 export async function clearFilterState(
   filePath: string,
-  tableName: string
+  tableName: string,
 ): Promise<FilterStateResponse> {
-  return invoke<FilterStateResponse>("clear_filter_state", { filePath, tableName });
+  return invoke<FilterStateResponse>("clear_filter_state", {
+    filePath,
+    tableName,
+  });
 }
 
 export async function setHiddenRows(
   filePath: string,
   tableName: string,
-  hiddenRows: number[]
+  hiddenRows: number[],
 ): Promise<void> {
   return invoke("set_hidden_rows", { filePath, tableName, hiddenRows });
 }
 
 export async function getHiddenRows(
   filePath: string,
-  tableName: string
+  tableName: string,
 ): Promise<number[]> {
   return invoke<number[]>("get_hidden_rows", { filePath, tableName });
 }
@@ -638,19 +647,21 @@ export interface ComputeDerivedBatchRequest {
 }
 
 export async function getDerivedColumnsConfig(
-  filePath: string
+  filePath: string,
 ): Promise<DerivedColumnInfo[]> {
-  return invoke<DerivedColumnInfo[]>("get_derived_columns_config", { filePath });
+  return invoke<DerivedColumnInfo[]>("get_derived_columns_config", {
+    filePath,
+  });
 }
 
 export async function computeDerived(
-  request: ComputeDerivedRequest
+  request: ComputeDerivedRequest,
 ): Promise<void> {
   return invoke("compute_derived", { request });
 }
 
 export async function computeDerivedBatch(
-  batch: ComputeDerivedBatchRequest
+  batch: ComputeDerivedBatchRequest,
 ): Promise<void> {
   return invoke("compute_derived_batch", { batch });
 }
@@ -658,7 +669,7 @@ export async function computeDerivedBatch(
 export async function incrementRowGeneration(
   filePath: string,
   tableName: string,
-  rowIndex: number
+  rowIndex: number,
 ): Promise<number> {
   return invoke<number>("increment_row_generation", {
     filePath,
@@ -674,7 +685,7 @@ export async function clearComputationQueue(): Promise<void> {
 // ============ Row Config Commands ============
 
 export async function getRowConfig(
-  filePath: string
+  filePath: string,
 ): Promise<RowConfig | null> {
   return invoke<RowConfig | null>("get_row_config", { filePath });
 }
@@ -682,7 +693,7 @@ export async function getRowConfig(
 // ============ Column Config Commands ============
 
 export async function getColumnConfigs(
-  filePath: string
+  filePath: string,
 ): Promise<ColumnConfig[]> {
   return invoke<ColumnConfig[]>("get_column_configs", { filePath });
 }
@@ -690,17 +701,25 @@ export async function getColumnConfigs(
 export async function setColumnWidth(
   filePath: string,
   columnKey: string,
-  width: number
+  width: number,
 ): Promise<void> {
-  return invoke("set_column_width", { filePath, columnKey, width: Math.round(width) });
+  return invoke("set_column_width", {
+    filePath,
+    columnKey,
+    width: Math.round(width),
+  });
 }
 
 export async function setDerivedColumnWidth(
   filePath: string,
   columnName: string,
-  width: number
+  width: number,
 ): Promise<void> {
-  return invoke("set_derived_column_width", { filePath, columnName, width: Math.round(width) });
+  return invoke("set_derived_column_width", {
+    filePath,
+    columnName,
+    width: Math.round(width),
+  });
 }
 
 // ============ Validation Commands ============
@@ -711,9 +730,11 @@ export interface EnumValidationInfo {
 }
 
 export async function getEnumValidationRules(
-  filePath: string
+  filePath: string,
 ): Promise<EnumValidationInfo[]> {
-  return invoke<EnumValidationInfo[]>("get_enum_validation_rules", { filePath });
+  return invoke<EnumValidationInfo[]>("get_enum_validation_rules", {
+    filePath,
+  });
 }
 
 // ============ Style Commands ============
@@ -735,7 +756,7 @@ export interface ResolvedTableStyle {
 }
 
 export async function getTableStyle(
-  filePath: string
+  filePath: string,
 ): Promise<ResolvedTableStyle | null> {
   return invoke<ResolvedTableStyle | null>("get_table_style", { filePath });
 }
@@ -754,7 +775,7 @@ export interface CellFormatResult {
 export async function getConditionalFormatting(
   filePath: string,
   headers: string[],
-  rows: unknown[][]
+  rows: unknown[][],
 ): Promise<CellFormatResult[]> {
   return invoke<CellFormatResult[]>("get_conditional_formatting", {
     filePath,
@@ -773,9 +794,7 @@ export interface FrontendLogMessage {
   context?: Record<string, unknown>;
 }
 
-export async function logMessage(
-  message: FrontendLogMessage
-): Promise<void> {
+export async function logMessage(message: FrontendLogMessage): Promise<void> {
   return invoke("log_message", { message });
 }
 
@@ -790,7 +809,7 @@ export async function loadViewState(): Promise<ViewState> {
 }
 
 export async function saveViewState(
-  activeSheetPath: string | null
+  activeSheetPath: string | null,
 ): Promise<void> {
   return invoke("save_view_state", { activeSheetPath });
 }
@@ -800,7 +819,7 @@ export async function saveViewState(
 export type Disposable = { dispose: () => void };
 
 export function onFileChanged(
-  callback: (payload: FileChangedPayload) => void
+  callback: (payload: FileChangedPayload) => void,
 ): Disposable {
   let unlisten: UnlistenFn | null = null;
 
@@ -818,7 +837,7 @@ export function onFileChanged(
 }
 
 export function onDerivedValueComputed(
-  callback: (payload: DerivedValuePayload) => void
+  callback: (payload: DerivedValuePayload) => void,
 ): Disposable {
   let unlisten: UnlistenFn | null = null;
 
@@ -836,7 +855,7 @@ export function onDerivedValueComputed(
 }
 
 export function onSaveCompleted(
-  callback: (payload: SaveCompletedPayload) => void
+  callback: (payload: SaveCompletedPayload) => void,
 ): Disposable {
   let unlisten: UnlistenFn | null = null;
 
@@ -853,9 +872,7 @@ export function onSaveCompleted(
   };
 }
 
-export function onError(
-  callback: (payload: ErrorPayload) => void
-): Disposable {
+export function onError(callback: (payload: ErrorPayload) => void): Disposable {
   let unlisten: UnlistenFn | null = null;
 
   listen<ErrorPayload>("error-occurred", (event) => {
@@ -872,7 +889,7 @@ export function onError(
 }
 
 export function onSyncStateChanged(
-  callback: (payload: SyncStateChangedPayload) => void
+  callback: (payload: SyncStateChangedPayload) => void,
 ): Disposable {
   let unlisten: UnlistenFn | null = null;
 
@@ -890,7 +907,7 @@ export function onSyncStateChanged(
 }
 
 export function onSyncError(
-  callback: (payload: SyncErrorPayload) => void
+  callback: (payload: SyncErrorPayload) => void,
 ): Disposable {
   let unlisten: UnlistenFn | null = null;
 
@@ -908,7 +925,7 @@ export function onSyncError(
 }
 
 export function onSyncConflict(
-  callback: (payload: SyncConflictPayload) => void
+  callback: (payload: SyncConflictPayload) => void,
 ): Disposable {
   let unlisten: UnlistenFn | null = null;
 
@@ -926,7 +943,7 @@ export function onSyncConflict(
 }
 
 export function onDerivedFunctionFailed(
-  callback: (payload: DerivedFunctionFailedPayload) => void
+  callback: (payload: DerivedFunctionFailedPayload) => void,
 ): Disposable {
   let unlisten: UnlistenFn | null = null;
 

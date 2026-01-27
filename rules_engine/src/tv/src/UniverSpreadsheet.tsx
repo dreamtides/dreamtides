@@ -1,5 +1,12 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef } from "react";
-import { Univer, IWorkbookData, CellValueType, HorizontalAlign, VerticalAlign, WrapStrategy } from "@univerjs/core";
+import {
+  Univer,
+  IWorkbookData,
+  CellValueType,
+  HorizontalAlign,
+  VerticalAlign,
+  WrapStrategy,
+} from "@univerjs/core";
 import { FUniver } from "@univerjs/core/facade";
 import { FWorksheet } from "@univerjs/sheets/facade";
 
@@ -8,7 +15,16 @@ import {
   disposeUniverInstance,
   UniverInstance,
 } from "./univer_config";
-import type { TomlTableData, EnumValidationInfo, DerivedColumnInfo, DerivedResultValue, ResolvedTableStyle, CellFormatResult, RowConfig, ColumnConfig } from "./ipc_bridge";
+import type {
+  TomlTableData,
+  EnumValidationInfo,
+  DerivedColumnInfo,
+  DerivedResultValue,
+  ResolvedTableStyle,
+  CellFormatResult,
+  RowConfig,
+  ColumnConfig,
+} from "./ipc_bridge";
 import * as ipc from "./ipc_bridge";
 import { derivedResultToCellData } from "./rich_text_utils";
 import { ImageCellRenderer } from "./image_cell_renderer";
@@ -96,7 +112,7 @@ export const UniverSpreadsheet = forwardRef<
     rowConfigs,
     columnConfigs,
   },
-  ref
+  ref,
 ) {
   const containerRef = useRef<HTMLDivElement>(null);
   const univerRef = useRef<Univer | null>(null);
@@ -126,7 +142,9 @@ export const UniverSpreadsheet = forwardRef<
   // Track resolved table styles per sheet path
   const tableStylesRef = useRef<Map<string, ResolvedTableStyle>>(new Map());
   // Track conditional formatting results per sheet path
-  const conditionalFormatsRef = useRef<Map<string, CellFormatResult[]>>(new Map());
+  const conditionalFormatsRef = useRef<Map<string, CellFormatResult[]>>(
+    new Map(),
+  );
   // Suppress filter event persistence during initial filter state restoration
   const isRestoringFilterRef = useRef(false);
   const derivedColumnStateRef = useRef(derivedColumnState);
@@ -155,13 +173,13 @@ export const UniverSpreadsheet = forwardRef<
 
     const currentSheetId = sheet.getSheetId();
     const headers = isMultiSheetRef.current
-      ? headersMapRef.current.get(currentSheetId) ?? []
+      ? (headersMapRef.current.get(currentSheetId) ?? [])
       : headersRef.current;
 
     if (headers.length === 0) return null;
 
     const knownSheetData = multiSheetDataRef.current?.sheets.find(
-      (s) => s.id === currentSheetId
+      (s) => s.id === currentSheetId,
     );
     const minRows = knownSheetData?.data.rows.length ?? 0;
 
@@ -173,7 +191,12 @@ export const UniverSpreadsheet = forwardRef<
     const readRowCount = maxRows - 1;
     if (readRowCount <= 0) return { headers, rows: [] };
 
-    const dataRange = sheet.getRange(1, dataOffset, readRowCount, headers.length);
+    const dataRange = sheet.getRange(
+      1,
+      dataOffset,
+      readRowCount,
+      headers.length,
+    );
     if (!dataRange) return { headers, rows: [] };
 
     let allValues: ReturnType<typeof dataRange.getValues>;
@@ -210,10 +233,7 @@ export const UniverSpreadsheet = forwardRef<
     }
 
     // Trim trailing empty rows
-    while (
-      rows.length > 0 &&
-      rows[rows.length - 1].every((v) => v === null)
-    ) {
+    while (rows.length > 0 && rows[rows.length - 1].every((v) => v === null)) {
       rows.pop();
     }
 
@@ -259,7 +279,12 @@ export const UniverSpreadsheet = forwardRef<
         dataColumnOffsetMapRef.current.set(sheetData.id, offset);
       }
 
-      const workbookData = buildMultiSheetWorkbook(multiSheetData, derivedColumnState?.configs, rowConfigs, columnConfigs);
+      const workbookData = buildMultiSheetWorkbook(
+        multiSheetData,
+        derivedColumnState?.configs,
+        rowConfigs,
+        columnConfigs,
+      );
       instance.univerAPI.createWorkbook(workbookData);
 
       // Ensure bold header styling is applied to all sheets after workbook creation
@@ -268,8 +293,14 @@ export const UniverSpreadsheet = forwardRef<
         for (const sheetData of multiSheetData.sheets) {
           const sheet = initWorkbook.getSheetBySheetId(sheetData.id);
           if (sheet && sheetData.data.headers.length > 0) {
-            const offset = dataColumnOffsetMapRef.current.get(sheetData.id) ?? 0;
-            const headerRange = sheet.getRange(0, offset, 1, sheetData.data.headers.length);
+            const offset =
+              dataColumnOffsetMapRef.current.get(sheetData.id) ?? 0;
+            const headerRange = sheet.getRange(
+              0,
+              offset,
+              1,
+              sheetData.data.headers.length,
+            );
             if (headerRange) {
               headerRange.setFontWeight("bold");
             }
@@ -298,13 +329,14 @@ export const UniverSpreadsheet = forwardRef<
           const sheet = workbook.getSheetBySheetId(sheetData.id);
           if (sheet) {
             const booleanColumns = detectBooleanColumns(sheetData.data);
-            const offset = dataColumnOffsetMapRef.current.get(sheetData.id) ?? 0;
+            const offset =
+              dataColumnOffsetMapRef.current.get(sheetData.id) ?? 0;
             applyCheckboxValidation(
               instance.univerAPI,
               sheet,
               sheetData.data,
               booleanColumns,
-              offset
+              offset,
             );
           }
         }
@@ -323,13 +355,14 @@ export const UniverSpreadsheet = forwardRef<
             if (enumRules.length > 0) {
               const sheet = workbook.getSheetBySheetId(sheetData.id);
               if (sheet) {
-                const offset = dataColumnOffsetMapRef.current.get(sheetData.id) ?? 0;
+                const offset =
+                  dataColumnOffsetMapRef.current.get(sheetData.id) ?? 0;
                 applyDropdownValidation(
                   instance.univerAPI,
                   sheet,
                   sheetData.data,
                   enumRules,
-                  offset
+                  offset,
                 );
               }
             }
@@ -355,12 +388,12 @@ export const UniverSpreadsheet = forwardRef<
             try {
               const sortResponse = await ipc.getSortState(
                 sheetData.path,
-                sheetData.name
+                sheetData.name,
               );
               if (!sortResponse.column || !sortResponse.direction) continue;
 
               const colIndex = sheetData.data.headers.indexOf(
-                sortResponse.column
+                sortResponse.column,
               );
               if (colIndex === -1) {
                 logger.debug("Persisted sort column not found in headers", {
@@ -373,7 +406,8 @@ export const UniverSpreadsheet = forwardRef<
               const sheet = workbook.getSheetBySheetId(sheetData.id);
               if (!sheet) continue;
 
-              const restoreOffset = dataColumnOffsetMapRef.current.get(sheetData.id) ?? 0;
+              const restoreOffset =
+                dataColumnOffsetMapRef.current.get(sheetData.id) ?? 0;
               const ascending = sortResponse.direction === "ascending";
               sheet.sort(colIndex + restoreOffset, ascending);
               logger.info("Restored sort indicator", {
@@ -409,7 +443,8 @@ export const UniverSpreadsheet = forwardRef<
             tableStylesRef.current.set(sheetData.path, style);
             const sheet = workbook.getSheetBySheetId(sheetData.id);
             if (sheet) {
-              const offset = dataColumnOffsetMapRef.current.get(sheetData.id) ?? 0;
+              const offset =
+                dataColumnOffsetMapRef.current.get(sheetData.id) ?? 0;
               applyTableStyle(sheet, sheetData.data, style, offset);
               logger.info("Applied table color scheme", {
                 sheetId: sheetData.id,
@@ -437,19 +472,20 @@ export const UniverSpreadsheet = forwardRef<
         for (const sheetData of multiSheetData.sheets) {
           try {
             const rowsAsJson = sheetData.data.rows.map((row) =>
-              row.map((cell) => (cell === null ? null : cell))
+              row.map((cell) => (cell === null ? null : cell)),
             );
             const results = await ipc.getConditionalFormatting(
               sheetData.path,
               sheetData.data.headers,
-              rowsAsJson
+              rowsAsJson,
             );
             if (results.length === 0) continue;
 
             conditionalFormatsRef.current.set(sheetData.path, results);
             const sheet = workbook.getSheetBySheetId(sheetData.id);
             if (sheet) {
-              const offset = dataColumnOffsetMapRef.current.get(sheetData.id) ?? 0;
+              const offset =
+                dataColumnOffsetMapRef.current.get(sheetData.id) ?? 0;
               applyConditionalFormatting(sheet, results, offset);
               logger.info("Applied conditional formatting", {
                 sheetId: sheetData.id,
@@ -479,7 +515,7 @@ export const UniverSpreadsheet = forwardRef<
             try {
               const filterResponse = await ipc.getFilterState(
                 sheetData.path,
-                sheetData.name
+                sheetData.name,
               );
               if (filterResponse.filters.length === 0) continue;
 
@@ -539,17 +575,23 @@ export const UniverSpreadsheet = forwardRef<
       (event) => {
         const { activeSheet } = event;
         const sheetId = activeSheet.getSheetId();
-        logger.debug("Active sheet changed", { sheetId, sheetName: activeSheet.getSheetName() });
+        logger.debug("Active sheet changed", {
+          sheetId,
+          sheetName: activeSheet.getSheetName(),
+        });
         if (onActiveSheetChangedRef.current) {
           onActiveSheetChangedRef.current(sheetId);
         }
-      }
+      },
     );
 
     // Listen for sort events to persist sort state to backend
     const sortDisposable = instance.univerAPI.addEvent(
       instance.univerAPI.Event.SheetRangeSorted,
-      (params: { worksheet: { getSheetId: () => string }; sortColumn: { column: number; ascending: boolean }[] }) => {
+      (params: {
+        worksheet: { getSheetId: () => string };
+        sortColumn: { column: number; ascending: boolean }[];
+      }) => {
         if (isRestoringSortRef.current) return;
 
         const sheetId = params.worksheet.getSheetId();
@@ -583,12 +625,14 @@ export const UniverSpreadsheet = forwardRef<
         const direction: ipc.SortDirection = sortSpec.ascending
           ? "ascending"
           : "descending";
-        ipc.setSortState(sheetData.path, sheetData.name, {
-          column: columnName,
-          direction,
-        }).catch((e) => {
-          logger.debug("Failed to persist sort state", { error: String(e) });
-        });
+        ipc
+          .setSortState(sheetData.path, sheetData.name, {
+            column: columnName,
+            direction,
+          })
+          .catch((e) => {
+            logger.debug("Failed to persist sort state", { error: String(e) });
+          });
 
         logger.info("Sort applied", {
           sheetId,
@@ -596,7 +640,7 @@ export const UniverSpreadsheet = forwardRef<
           column: columnName,
           direction,
         });
-      }
+      },
     );
 
     // Listen for filter change commands to persist filter state to backend
@@ -621,12 +665,17 @@ export const UniverSpreadsheet = forwardRef<
         const sheets = multiSheetDataRef.current?.sheets;
         const sheetData = sheets?.find((s) => s.id === sheetId);
         if (!sheetData) {
-          logger.debug("Filter event for unknown sheet", { sheetId, commandId: command.id });
+          logger.debug("Filter event for unknown sheet", {
+            sheetId,
+            commandId: command.id,
+          });
           return;
         }
 
-        if (command.id === "sheet.command.remove-sheet-filter" ||
-            command.id === "sheet.mutation.remove-sheet-filter") {
+        if (
+          command.id === "sheet.command.remove-sheet-filter" ||
+          command.id === "sheet.mutation.remove-sheet-filter"
+        ) {
           ipc.clearFilterState(sheetData.path, sheetData.name).catch((e) => {
             logger.debug("Failed to clear filter state", { error: String(e) });
           });
@@ -644,17 +693,27 @@ export const UniverSpreadsheet = forwardRef<
     // Listen for column width changes to persist to TOML metadata.
     // Handles both drag-resize (set-worksheet-col-width mutation) and
     // double-click auto-fit (set-col-auto-width command).
-    const colWidthDebounceTimers = new Map<string, ReturnType<typeof setTimeout>>();
+    const colWidthDebounceTimers = new Map<
+      string,
+      ReturnType<typeof setTimeout>
+    >();
 
-    const persistColumnWidth = (filePath: string, col: number, width: number, sheetId: string) => {
+    const persistColumnWidth = (
+      filePath: string,
+      col: number,
+      width: number,
+      sheetId: string,
+    ) => {
       const headers = headersMapRef.current.get(sheetId) ?? [];
       const offset = dataColumnOffsetMapRef.current.get(sheetId) ?? 0;
       const derivedConfigs = derivedColumnStateRef.current?.configs[sheetId];
       const roundedWidth = Math.round(width);
 
       // Check if this column is a derived column
-      const derivedConfig = derivedConfigs?.find((c) =>
-        getDerivedColumnIndex(c, headers.length, derivedConfigs, offset) === col
+      const derivedConfig = derivedConfigs?.find(
+        (c) =>
+          getDerivedColumnIndex(c, headers.length, derivedConfigs, offset) ===
+          col,
       );
 
       if (derivedConfig) {
@@ -666,14 +725,16 @@ export const UniverSpreadsheet = forwardRef<
           debounceKey,
           setTimeout(() => {
             colWidthDebounceTimers.delete(debounceKey);
-            ipc.setDerivedColumnWidth(filePath, derivedConfig.name, roundedWidth).catch((e) => {
-              logger.debug("Failed to persist derived column width", {
-                columnName: derivedConfig.name,
-                width: roundedWidth,
-                error: String(e),
+            ipc
+              .setDerivedColumnWidth(filePath, derivedConfig.name, roundedWidth)
+              .catch((e) => {
+                logger.debug("Failed to persist derived column width", {
+                  columnName: derivedConfig.name,
+                  width: roundedWidth,
+                  error: String(e),
+                });
               });
-            });
-          }, 300)
+          }, 300),
         );
         return;
       }
@@ -699,61 +760,67 @@ export const UniverSpreadsheet = forwardRef<
               error: String(e),
             });
           });
-        }, 300)
+        }, 300),
       );
     };
 
-    const colWidthDisposable = instance.univerAPI.onCommandExecuted((command) => {
-      if (isLoadingRef.current) return;
+    const colWidthDisposable = instance.univerAPI.onCommandExecuted(
+      (command) => {
+        if (isLoadingRef.current) return;
 
-      if (command.id === "sheet.mutation.set-worksheet-col-width") {
-        // Drag-resize: width is in the mutation params
-        const activeSheet = instance.univerAPI
-          .getActiveWorkbook()
-          ?.getActiveSheet();
-        if (!activeSheet) return;
+        if (command.id === "sheet.mutation.set-worksheet-col-width") {
+          // Drag-resize: width is in the mutation params
+          const activeSheet = instance.univerAPI
+            .getActiveWorkbook()
+            ?.getActiveSheet();
+          if (!activeSheet) return;
 
-        const sheetId = activeSheet.getSheetId();
-        const sheets = multiSheetDataRef.current?.sheets;
-        const sheetData = sheets?.find((s) => s.id === sheetId);
-        if (!sheetData) return;
+          const sheetId = activeSheet.getSheetId();
+          const sheets = multiSheetDataRef.current?.sheets;
+          const sheetData = sheets?.find((s) => s.id === sheetId);
+          if (!sheetData) return;
 
-        const params = command.params as {
-          ranges?: Array<{ startColumn: number; endColumn: number }>;
-          colWidth?: number;
-        } | undefined;
-        if (!params?.ranges || params.colWidth === undefined) return;
+          const params = command.params as
+            | {
+                ranges?: Array<{ startColumn: number; endColumn: number }>;
+                colWidth?: number;
+              }
+            | undefined;
+          if (!params?.ranges || params.colWidth === undefined) return;
 
-        for (const range of params.ranges) {
-          for (let col = range.startColumn; col <= range.endColumn; col++) {
-            persistColumnWidth(sheetData.path, col, params.colWidth, sheetId);
+          for (const range of params.ranges) {
+            for (let col = range.startColumn; col <= range.endColumn; col++) {
+              persistColumnWidth(sheetData.path, col, params.colWidth, sheetId);
+            }
+          }
+        } else if (command.id === "sheet.command.set-col-auto-width") {
+          // Double-click auto-fit: read resulting widths from the sheet
+          const activeSheet = instance.univerAPI
+            .getActiveWorkbook()
+            ?.getActiveSheet();
+          if (!activeSheet) return;
+
+          const sheetId = activeSheet.getSheetId();
+          const sheets = multiSheetDataRef.current?.sheets;
+          const sheetData = sheets?.find((s) => s.id === sheetId);
+          if (!sheetData) return;
+
+          const params = command.params as
+            | {
+                ranges?: Array<{ startColumn: number; endColumn: number }>;
+              }
+            | undefined;
+          if (!params?.ranges) return;
+
+          for (const range of params.ranges) {
+            for (let col = range.startColumn; col <= range.endColumn; col++) {
+              const width = activeSheet.getColumnWidth(col);
+              persistColumnWidth(sheetData.path, col, width, sheetId);
+            }
           }
         }
-      } else if (command.id === "sheet.command.set-col-auto-width") {
-        // Double-click auto-fit: read resulting widths from the sheet
-        const activeSheet = instance.univerAPI
-          .getActiveWorkbook()
-          ?.getActiveSheet();
-        if (!activeSheet) return;
-
-        const sheetId = activeSheet.getSheetId();
-        const sheets = multiSheetDataRef.current?.sheets;
-        const sheetData = sheets?.find((s) => s.id === sheetId);
-        if (!sheetData) return;
-
-        const params = command.params as {
-          ranges?: Array<{ startColumn: number; endColumn: number }>;
-        } | undefined;
-        if (!params?.ranges) return;
-
-        for (const range of params.ranges) {
-          for (let col = range.startColumn; col <= range.endColumn; col++) {
-            const width = activeSheet.getColumnWidth(col);
-            persistColumnWidth(sheetData.path, col, width, sheetId);
-          }
-        }
-      }
-    });
+      },
+    );
 
     // Listen for derived value computed events to handle image results
     const derivedValueSub = ipc.onDerivedValueComputed((payload) => {
@@ -765,7 +832,7 @@ export const UniverSpreadsheet = forwardRef<
 
       // Find the sheet matching the derived value's file path
       const matchingSheetData = multiSheetData?.sheets.find(
-        (s) => s.path === payload.file_path
+        (s) => s.path === payload.file_path,
       );
 
       const sheet = matchingSheetData
@@ -783,7 +850,9 @@ export const UniverSpreadsheet = forwardRef<
       // Find the column index for the derived function from config position
       const currentDerivedState = derivedColumnStateRef.current;
       const sheetConfigs = currentDerivedState?.configs[sheetId];
-      const derivedConfig = sheetConfigs?.find(c => c.function === payload.function_name);
+      const derivedConfig = sheetConfigs?.find(
+        (c) => c.function === payload.function_name,
+      );
       if (!derivedConfig) {
         logger.debug("Image derived function config not found", {
           functionName: payload.function_name,
@@ -793,14 +862,26 @@ export const UniverSpreadsheet = forwardRef<
       }
       const headers = headersMapRef.current.get(sheetId) ?? headersRef.current;
       const colOffset = dataColumnOffsetMapRef.current.get(sheetId) ?? 0;
-      const colIdx = getDerivedColumnIndex(derivedConfig, headers.length, sheetConfigs!, colOffset);
+      const colIdx = getDerivedColumnIndex(
+        derivedConfig,
+        headers.length,
+        sheetConfigs!,
+        colOffset,
+      );
 
       const currentRowConfigs = rowConfigsRef.current;
       const sheetRowConfig = currentRowConfigs?.[sheetId];
       const rowHeight = sheetRowConfig?.default_height ?? undefined;
 
       renderer
-        .handleImageResult(sheet, sheetId, displayRow, colIdx, result, rowHeight)
+        .handleImageResult(
+          sheet,
+          sheetId,
+          displayRow,
+          colIdx,
+          result,
+          rowHeight,
+        )
         .catch((e) => {
           logger.debug("Image render from derived value failed", {
             error: String(e),
@@ -861,7 +942,7 @@ export const UniverSpreadsheet = forwardRef<
               if (cellValue === null) return "";
               if (typeof cellValue === "boolean") return cellValue ? 1 : 0;
               return cellValue;
-            })
+            }),
           );
           dataRange.setValues(displayRows);
         }
@@ -884,8 +965,13 @@ export const UniverSpreadsheet = forwardRef<
     if (!workbook) return;
 
     // Skip if this is the initial load - data was already set via cellData in buildMultiSheetWorkbook
-    if (initialLoadCompleteRef.current && lastMultiSheetDataRef.current === multiSheetData) {
-      logger.debug("Skipping multi-sheet update - same data reference as initial load");
+    if (
+      initialLoadCompleteRef.current &&
+      lastMultiSheetDataRef.current === multiSheetData
+    ) {
+      logger.debug(
+        "Skipping multi-sheet update - same data reference as initial load",
+      );
       return;
     }
 
@@ -897,7 +983,10 @@ export const UniverSpreadsheet = forwardRef<
     for (const sheetData of multiSheetData.sheets) {
       headersMapRef.current.set(sheetData.id, sheetData.data.headers);
       const configs = derivedColumnStateRef.current?.configs[sheetData.id];
-      dataColumnOffsetMapRef.current.set(sheetData.id, computeDataColumnOffset(configs));
+      dataColumnOffsetMapRef.current.set(
+        sheetData.id,
+        computeDataColumnOffset(configs),
+      );
     }
 
     // Find sheets that actually changed (for reload optimization)
@@ -906,7 +995,9 @@ export const UniverSpreadsheet = forwardRef<
 
     if (previousData) {
       for (const sheetData of multiSheetData.sheets) {
-        const prevSheet = previousData.sheets.find(s => s.id === sheetData.id);
+        const prevSheet = previousData.sheets.find(
+          (s) => s.id === sheetData.id,
+        );
         if (!prevSheet || !isSheetDataEqual(prevSheet.data, sheetData.data)) {
           changedSheetIds.add(sheetData.id);
         }
@@ -921,13 +1012,18 @@ export const UniverSpreadsheet = forwardRef<
     // Only update sheets that actually changed, using batch operations
     for (const sheetData of multiSheetData.sheets) {
       if (!changedSheetIds.has(sheetData.id)) {
-        logger.debug("Skipping unchanged sheet", { sheetId: sheetData.id, sheetName: sheetData.name });
+        logger.debug("Skipping unchanged sheet", {
+          sheetId: sheetData.id,
+          sheetName: sheetData.name,
+        });
         continue;
       }
 
       const sheet = workbook.getSheetBySheetId(sheetData.id);
       if (!sheet) {
-        logger.debug("Sheet not found, skipping update", { sheetId: sheetData.id });
+        logger.debug("Sheet not found, skipping update", {
+          sheetId: sheetData.id,
+        });
         continue;
       }
 
@@ -954,7 +1050,7 @@ export const UniverSpreadsheet = forwardRef<
         sheet,
         sheetData.data,
         booleanColumns,
-        sheetOffset
+        sheetOffset,
       );
 
       // Apply dropdown validation from cached enum rules
@@ -965,7 +1061,7 @@ export const UniverSpreadsheet = forwardRef<
           sheet,
           sheetData.data,
           cachedEnumRules,
-          sheetOffset
+          sheetOffset,
         );
       }
 
@@ -979,17 +1075,18 @@ export const UniverSpreadsheet = forwardRef<
       const reevaluateConditionalFormatting = async () => {
         try {
           const rowsAsJson = sheetData.data.rows.map((row) =>
-            row.map((cell) => (cell === null ? null : cell))
+            row.map((cell) => (cell === null ? null : cell)),
           );
           const results = await ipc.getConditionalFormatting(
             sheetData.path,
             sheetData.data.headers,
-            rowsAsJson
+            rowsAsJson,
           );
           conditionalFormatsRef.current.set(sheetData.path, results);
           const ws = workbook.getSheetBySheetId(sheetData.id);
           if (ws && results.length > 0) {
-            const cfOffset = dataColumnOffsetMapRef.current.get(sheetData.id) ?? 0;
+            const cfOffset =
+              dataColumnOffsetMapRef.current.get(sheetData.id) ?? 0;
             applyConditionalFormatting(ws, results, cfOffset);
           }
         } catch (e) {
@@ -1014,7 +1111,9 @@ export const UniverSpreadsheet = forwardRef<
     const workbook = univerAPIRef.current.getActiveWorkbook();
     if (!workbook) return;
 
-    for (const [sheetId, configs] of Object.entries(derivedColumnState.configs)) {
+    for (const [sheetId, configs] of Object.entries(
+      derivedColumnState.configs,
+    )) {
       if (configs.length === 0) continue;
 
       const sheet = workbook.getSheetBySheetId(sheetId);
@@ -1031,7 +1130,12 @@ export const UniverSpreadsheet = forwardRef<
       const derivedOffset = dataColumnOffsetMapRef.current.get(sheetId) ?? 0;
 
       for (const config of configs) {
-        const derivedColIndex = getDerivedColumnIndex(config, headers.length, configs, derivedOffset);
+        const derivedColIndex = getDerivedColumnIndex(
+          config,
+          headers.length,
+          configs,
+          derivedOffset,
+        );
 
         // Set header for derived column (row 0)
         const headerRange = sheet.getRange(0, derivedColIndex, 1, 1);
@@ -1054,7 +1158,11 @@ export const UniverSpreadsheet = forwardRef<
         if (multiSheetData) {
           const sheetData = multiSheetData.sheets.find((s) => s.id === sheetId);
           if (sheetData) {
-            for (let rowIndex = 0; rowIndex < sheetData.data.rows.length; rowIndex++) {
+            for (
+              let rowIndex = 0;
+              rowIndex < sheetData.data.rows.length;
+              rowIndex++
+            ) {
               const rowValues = sheetValues[rowIndex];
               if (!rowValues || !rowValues[config.function]) {
                 const cellRow = rowIndex + 1;
@@ -1098,7 +1206,7 @@ function formatHeaderForDisplay(key: string): string {
     .map((word) =>
       HEADER_ACRONYMS.has(word.toLowerCase())
         ? word.toUpperCase()
-        : word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+        : word.charAt(0).toUpperCase() + word.slice(1).toLowerCase(),
     )
     .join(" ");
 }
@@ -1121,11 +1229,11 @@ function buildMultiSheetWorkbook(
   multiSheetData: MultiSheetData,
   derivedConfigs?: Record<string, DerivedColumnInfo[]>,
   rowConfigs?: Record<string, RowConfig>,
-  columnConfigs?: Record<string, ColumnConfig[]>
+  columnConfigs?: Record<string, ColumnConfig[]>,
 ): Partial<IWorkbookData> {
   // Sort sheets alphabetically by name for consistent tab order
   const sortedSheets = [...multiSheetData.sheets].sort((a, b) =>
-    a.name.localeCompare(b.name)
+    a.name.localeCompare(b.name),
   );
 
   const sheets: Record<string, IWorkbookData["sheets"][string]> = {};
@@ -1139,10 +1247,16 @@ function buildMultiSheetWorkbook(
 
     // Calculate required dimensions
     const rowCount = sheetData.data.rows.length + 1 + 100; // +1 for header row, +100 blank rows at bottom
-    const columnCount = Math.max(sheetData.data.headers.length + dataOffset + 1, 26);
+    const columnCount = Math.max(
+      sheetData.data.headers.length + dataOffset + 1,
+      26,
+    );
 
     // Build cell data
-    const cellData: Record<number, Record<number, { v: unknown; t?: CellValueType; s?: { bl?: number } }>> = {};
+    const cellData: Record<
+      number,
+      Record<number, { v: unknown; t?: CellValueType; s?: { bl?: number } }>
+    > = {};
 
     // Header row (row 0) with display-formatted names and bold styling
     cellData[0] = {};
@@ -1186,7 +1300,11 @@ function buildMultiSheetWorkbook(
     const columnData: Record<number, { w: number }> = {};
     if (configs) {
       for (const config of configs) {
-        if (config.position !== undefined && config.position !== null && config.width) {
+        if (
+          config.position !== undefined &&
+          config.position !== null &&
+          config.width
+        ) {
           columnData[config.position] = { w: config.width };
         }
       }
@@ -1207,8 +1325,8 @@ function buildMultiSheetWorkbook(
     const rowConfig = rowConfigs?.[sheetData.id];
     const rowData: Record<number, { h: number; hd?: number }> = {};
 
-    // Header row (row 0) always gets an explicit height, defaulting to 30px
-    const headerH = rowConfig?.header_height ?? 30;
+    // Header row (row 0) always gets an explicit height, defaulting to 40px
+    const headerH = rowConfig?.header_height ?? 40;
     rowData[0] = { h: headerH };
 
     if (rowConfig) {
@@ -1306,7 +1424,11 @@ function isSheetDataEqual(a: TomlTableData, b: TomlTableData): boolean {
  * Populate a sheet with TomlTableData using batch operations.
  * Uses setValues() to set all cells in a single API call per region.
  */
-function populateSheetDataBatch(sheet: FWorksheet, data: TomlTableData, dataOffset: number = 0): void {
+function populateSheetDataBatch(
+  sheet: FWorksheet,
+  data: TomlTableData,
+  dataOffset: number = 0,
+): void {
   if (!sheet) return;
 
   const numColumns = data.headers.length;
@@ -1321,7 +1443,12 @@ function populateSheetDataBatch(sheet: FWorksheet, data: TomlTableData, dataOffs
 
   // Set data rows using a single batch operation
   if (data.rows.length > 0) {
-    const dataRange = sheet.getRange(1, dataOffset, data.rows.length, numColumns);
+    const dataRange = sheet.getRange(
+      1,
+      dataOffset,
+      data.rows.length,
+      numColumns,
+    );
     if (dataRange) {
       // Convert null values to empty strings and booleans to 1/0 for display
       const displayRows = data.rows.map((row) =>
@@ -1329,7 +1456,7 @@ function populateSheetDataBatch(sheet: FWorksheet, data: TomlTableData, dataOffs
           if (cellValue === null) return "";
           if (typeof cellValue === "boolean") return cellValue ? 1 : 0;
           return cellValue;
-        })
+        }),
       );
       dataRange.setValues(displayRows);
     }
@@ -1376,7 +1503,7 @@ function applyCheckboxValidation(
   sheet: FWorksheet,
   data: TomlTableData,
   booleanColumns: number[],
-  dataOffset: number = 0
+  dataOffset: number = 0,
 ): void {
   if (booleanColumns.length === 0 || data.rows.length === 0) {
     return;
@@ -1414,7 +1541,7 @@ function applyDropdownValidation(
   sheet: FWorksheet,
   data: TomlTableData,
   enumRules: EnumValidationInfo[],
-  dataOffset: number = 0
+  dataOffset: number = 0,
 ): void {
   if (enumRules.length === 0 || data.rows.length === 0) {
     return;
@@ -1423,9 +1550,12 @@ function applyDropdownValidation(
   for (const rule of enumRules) {
     const colIdx = data.headers.indexOf(rule.column);
     if (colIdx === -1) {
-      logger.debug("Enum column not found in headers, skipping dropdown validation", {
-        column: rule.column,
-      });
+      logger.debug(
+        "Enum column not found in headers, skipping dropdown validation",
+        {
+          column: rule.column,
+        },
+      );
       continue;
     }
 
@@ -1464,7 +1594,7 @@ function getDerivedColumnIndex(
   config: DerivedColumnInfo,
   dataColumnCount: number,
   allConfigs: DerivedColumnInfo[],
-  dataOffset: number = 0
+  dataOffset: number = 0,
 ): number {
   if (config.position !== undefined && config.position !== null) {
     return config.position;
@@ -1485,9 +1615,12 @@ function getDerivedColumnIndex(
  * Computes the number of spreadsheet columns occupied by positioned derived
  * columns. Data columns are shifted right by this amount.
  */
-function computeDataColumnOffset(configs: DerivedColumnInfo[] | undefined): number {
+function computeDataColumnOffset(
+  configs: DerivedColumnInfo[] | undefined,
+): number {
   if (!configs) return 0;
-  return configs.filter(c => c.position !== undefined && c.position !== null).length;
+  return configs.filter((c) => c.position !== undefined && c.position !== null)
+    .length;
 }
 
 /**
@@ -1499,7 +1632,7 @@ function applyDerivedResultToCell(
   sheet: FWorksheet,
   row: number,
   col: number,
-  result: DerivedResultValue
+  result: DerivedResultValue,
 ): void {
   const range = sheet.getRange(row, col, 1, 1);
   if (!range) return;
@@ -1525,7 +1658,11 @@ function applyDerivedResultToCell(
   } else if (result.type === "error") {
     range.setValues([[`Error: ${result.value}`]]);
     range.setFontColor("#FF0000");
-    logger.debug("Applied error derived result", { row, col, error: result.value });
+    logger.debug("Applied error derived result", {
+      row,
+      col,
+      error: result.value,
+    });
   } else if (result.type === "image") {
     // Image results are handled by ImageCellRenderer via the
     // derived-value-computed event listener, not via cell text.
@@ -1548,7 +1685,7 @@ function applyTableStyle(
   sheet: FWorksheet,
   data: TomlTableData,
   style: ResolvedTableStyle,
-  dataOffset: number = 0
+  dataOffset: number = 0,
 ): void {
   const numColumns = data.headers.length + dataOffset;
   if (numColumns === 0) return;
@@ -1608,7 +1745,7 @@ function applyTableStyle(
 function applyConditionalFormatting(
   sheet: FWorksheet,
   results: CellFormatResult[],
-  dataOffset: number = 0
+  dataOffset: number = 0,
 ): void {
   for (const result of results) {
     const cellRow = result.row + 1; // +1 for header row
