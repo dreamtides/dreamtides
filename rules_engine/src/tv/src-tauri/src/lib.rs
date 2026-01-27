@@ -1,7 +1,7 @@
 use std::collections::HashSet;
 
-use tauri::menu::{Menu, MenuItem, MenuItemKind, Submenu};
-use tauri::Manager;
+use tauri::menu::{CheckMenuItem, Menu, MenuItem, MenuItemKind, Submenu};
+use tauri::{Emitter, Manager};
 
 use crate::derived::compute_executor::ComputeExecutorState;
 use crate::filter::filter_state::FilterStateManager;
@@ -118,21 +118,57 @@ pub fn run(paths: cli::AppPaths) {
                 true,
                 Some("CmdOrCtrl+Alt+I"),
             )?;
+            let disable_autosave = CheckMenuItem::with_id(
+                app_handle,
+                "disable_autosave",
+                "Disable Auto-Save",
+                true,
+                false,
+                None::<&str>,
+            )?;
             for item in menu.items()? {
                 if let MenuItemKind::Submenu(ref submenu) = item {
                     if submenu.text().unwrap_or_default() == "View" {
                         submenu.append(&dev_tools)?;
+                        submenu.append(&disable_autosave)?;
                         return Ok(menu);
                     }
                 }
             }
-            menu.append(&Submenu::with_items(app_handle, "View", true, &[&dev_tools])?)?;
+            menu.append(&Submenu::with_items(
+                app_handle,
+                "View",
+                true,
+                &[&dev_tools, &disable_autosave],
+            )?)?;
             Ok(menu)
         })
         .on_menu_event(|app_handle, event| {
             if event.id() == "dev_tools" {
                 if let Some(window) = app_handle.get_webview_window("main") {
                     window.open_devtools();
+                }
+            } else if event.id() == "disable_autosave" {
+                // CheckMenuItem automatically toggles its checked state on click.
+                // Read the current state and emit it to the frontend.
+                if let Some(window) = app_handle.get_webview_window("main") {
+                    if let Some(menu) = window.menu() {
+                        if let Some(MenuItemKind::Check(check_item)) = menu.get("disable_autosave") {
+                            let disabled = check_item.is_checked().unwrap_or(false);
+                            tracing::info!(
+                                component = "tv.menu",
+                                auto_save_disabled = disabled,
+                                "Auto-save toggled"
+                            );
+                            if let Err(e) = app_handle.emit("autosave-disabled-changed", disabled) {
+                                tracing::error!(
+                                    component = "tv.menu",
+                                    error = %e,
+                                    "Failed to emit autosave-disabled-changed event"
+                                );
+                            }
+                        }
+                    }
                 }
             }
         })

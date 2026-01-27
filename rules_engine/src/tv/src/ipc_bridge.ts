@@ -973,3 +973,21 @@ export function onDerivedFunctionFailed(
     },
   };
 }
+
+export function onAutosaveDisabledChanged(
+  callback: (disabled: boolean) => void,
+): Disposable {
+  let unlisten: UnlistenFn | null = null;
+
+  listen<boolean>("autosave-disabled-changed", (event) => {
+    callback(event.payload);
+  }).then((fn) => {
+    unlisten = fn;
+  });
+
+  return {
+    dispose: () => {
+      if (unlisten) unlisten();
+    },
+  };
+}

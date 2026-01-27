@@ -140,6 +140,8 @@ export function AppRoot() {
   // Ref to track activeSheetId without causing effect re-runs
   const activeSheetIdRef = useRef<string | null>(null);
   activeSheetIdRef.current = activeSheetId;
+  // When true, changes apply only in the UI layer and are not persisted to TOML files
+  const autoSaveDisabledRef = useRef(false);
 
   const loadSingleFile = useCallback(async (path: string, tableName: string): Promise<TomlTableData | null> => {
     try {
@@ -406,6 +408,11 @@ export function AppRoot() {
         return;
       }
 
+      if (autoSaveDisabledRef.current) {
+        logger.info("Auto-save disabled, skipping save to TOML", { sheetId });
+        return;
+      }
+
       if (saveTimeoutRef.current) {
         clearTimeout(saveTimeoutRef.current);
       }
@@ -562,6 +569,16 @@ export function AppRoot() {
       derivedFailedSub.dispose();
     };
   }, [sheets, reloadSheet]);
+
+  useEffect(() => {
+    const autosaveSub = ipc.onAutosaveDisabledChanged((disabled) => {
+      autoSaveDisabledRef.current = disabled;
+      logger.info("Auto-save disabled state changed", { disabled });
+    });
+    return () => {
+      autosaveSub.dispose();
+    };
+  }, []);
 
   useEffect(() => {
     return () => {
