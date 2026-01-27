@@ -3,7 +3,7 @@ import { SpreadsheetView } from "./spreadsheet_view";
 import { ErrorBanner } from "./error_banner";
 import * as ipc from "./ipc_bridge";
 import type { TomlTableData, DerivedValuePayload, RowConfig, ColumnConfig } from "./ipc_bridge";
-import type { MultiSheetData, SheetData, DerivedColumnState } from "./UniverSpreadsheet";
+import type { MultiSheetData, SheetData, DerivedColumnState } from "./spreadsheet_types";
 import { createLogger } from "./logger_frontend";
 
 export type { TomlTableData };

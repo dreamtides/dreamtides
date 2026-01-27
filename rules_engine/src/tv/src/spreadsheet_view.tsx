@@ -1,6 +1,6 @@
 import { UniverSpreadsheet } from "./UniverSpreadsheet";
 import type { TomlTableData, RowConfig, ColumnConfig } from "./ipc_bridge";
-import type { MultiSheetData, DerivedColumnState } from "./UniverSpreadsheet";
+import type { MultiSheetData, DerivedColumnState } from "./spreadsheet_types";
 
 interface SpreadsheetViewProps {
   multiSheetData?: MultiSheetData | null;
