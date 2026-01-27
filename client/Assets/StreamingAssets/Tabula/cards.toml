@@ -3698,9 +3698,13 @@ enum = ["Common", "Uncommon", "Rare", "Legendary", "Special"]
 name = "image"
 function = "image_derived"
 position = 0
-width = 120
+width = 160
 inputs = ["image_number"]
 url_template = "https://www.shutterstock.com/image-illustration/-260nw-{image_number}.jpg"
 
 [metadata.rows]
 default_height = 100
+
+[[metadata.columns]]
+key = "name"
+width = 200
