@@ -112,7 +112,7 @@ export function applyDropdownValidation(
     if (range) {
       const validationRule = univerAPI
         .newDataValidation()
-        .requireValueInList(rule.allowed_values, true)
+        .requireValueInList(rule.allowed_values, false)
         .setOptions({
           showErrorMessage: true,
           error: `Value must be one of: ${rule.allowed_values.join(", ")}`,
