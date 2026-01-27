@@ -22,6 +22,9 @@ const DEFAULT_IMAGE_HEIGHT = 120;
 const DEFAULT_COLUMN_OFFSET = 4;
 const DEFAULT_ROW_OFFSET = 4;
 
+/** Padding subtracted from row height to prevent images from touching cell edges. */
+const IMAGE_PADDING = 8;
+
 /** Command IDs for sheet drawing operations. */
 const INSERT_SHEET_DRAWING_CMD = "sheet.command.insert-sheet-image";
 const REMOVE_SHEET_DRAWING_CMD = "sheet.command.remove-sheet-image";
@@ -69,19 +72,22 @@ export class ImageCellRenderer {
   /**
    * Handles a derived result that contains an image path.
    * Converts the local cache path to an asset URL and inserts a floating
-   * image at the specified cell position.
+   * image at the specified cell position. When rowHeight is provided,
+   * the image is sized to fit within the row height while preserving
+   * its native aspect ratio.
    */
   async handleImageResult(
     sheet: SheetRef,
     sheetId: string,
     row: number,
     column: number,
-    result: DerivedResultValue
+    result: DerivedResultValue,
+    rowHeight?: number
   ): Promise<void> {
     const cellKey = `${sheetId}:${row}:${column}`;
 
     if (result.type === "image") {
-      await this.insertImageAtCell(sheet, cellKey, row, column, result.value);
+      await this.insertImageAtCell(sheet, cellKey, row, column, result.value, rowHeight);
     } else if (result.type === "error") {
       this.setErrorState(sheet, cellKey, row, column, result.value);
     }
@@ -153,15 +159,50 @@ export class ImageCellRenderer {
   }
 
   /**
+   * Loads an image from a URL to determine its natural dimensions.
+   * Returns { width, height } or null if the image fails to load.
+   */
+  private loadImageDimensions(
+    url: string
+  ): Promise<{ width: number; height: number } | null> {
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.onload = () => resolve({ width: img.naturalWidth, height: img.naturalHeight });
+      img.onerror = () => resolve(null);
+      img.src = url;
+    });
+  }
+
+  /**
+   * Calculates image display dimensions to fit within the given row height
+   * while preserving the native aspect ratio. Subtracts padding from the
+   * available height to prevent the image from touching cell edges.
+   */
+  private calculateImageDimensions(
+    naturalWidth: number,
+    naturalHeight: number,
+    rowHeight: number
+  ): { width: number; height: number } {
+    const availableHeight = rowHeight - IMAGE_PADDING;
+    if (availableHeight <= 0 || naturalHeight <= 0) {
+      return { width: DEFAULT_IMAGE_WIDTH, height: DEFAULT_IMAGE_HEIGHT };
+    }
+    const aspectRatio = naturalWidth / naturalHeight;
+    return { width: Math.round(availableHeight * aspectRatio), height: availableHeight };
+  }
+
+  /**
    * Inserts a floating image at the specified cell using the local cache path.
    * Uses Univer's command system directly instead of facade methods.
+   * When rowHeight is specified, the image is sized to fit within that height.
    */
   private async insertImageAtCell(
     sheet: SheetRef,
     cellKey: string,
     row: number,
     column: number,
-    cachePath: string
+    cachePath: string,
+    rowHeight?: number
   ): Promise<void> {
     try {
       const ready = await this.waitForCommandsReady();
@@ -182,6 +223,21 @@ export class ImageCellRenderer {
       const subUnitId = sheet.getSheetId();
       const assetUrl = convertFileSrc(cachePath);
 
+      // Determine image dimensions: fit within row height if specified
+      let imageWidth = DEFAULT_IMAGE_WIDTH;
+      let imageHeight = DEFAULT_IMAGE_HEIGHT;
+      if (rowHeight) {
+        const dims = await this.loadImageDimensions(assetUrl);
+        if (dims) {
+          const fitted = this.calculateImageDimensions(dims.width, dims.height, rowHeight);
+          imageWidth = fitted.width;
+          imageHeight = fitted.height;
+        } else {
+          imageHeight = rowHeight - IMAGE_PADDING;
+          imageWidth = imageHeight;
+        }
+      }
+
       const injector = (this.univerAPI as Injector)._injector;
       const renderManager = injector.get(IRenderManagerService);
       const renderUnit = renderManager.getRenderById(unitId);
@@ -197,8 +253,8 @@ export class ImageCellRenderer {
         unitId,
         subUnitId,
         { column, columnOffset: DEFAULT_COLUMN_OFFSET, row, rowOffset: DEFAULT_ROW_OFFSET },
-        DEFAULT_IMAGE_WIDTH,
-        DEFAULT_IMAGE_HEIGHT,
+        imageWidth,
+        imageHeight,
         selectionRenderService,
         skeletonManager
       );
@@ -223,7 +279,7 @@ export class ImageCellRenderer {
       this.imageIds.set(cellKey, drawingId);
       this.imageStates.set(cellKey, "loaded");
 
-      logger.info("Image inserted at cell", { cellKey, row, column });
+      logger.info("Image inserted at cell", { cellKey, row, column, imageWidth, imageHeight });
     } catch (e) {
       const errorMessage = e instanceof Error ? e.message : String(e);
       logger.error("Failed to insert image at cell", {

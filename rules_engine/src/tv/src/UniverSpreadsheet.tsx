@@ -8,7 +8,7 @@ import {
   disposeUniverInstance,
   UniverInstance,
 } from "./univer_config";
-import type { TomlTableData, EnumValidationInfo, DerivedColumnInfo, DerivedResultValue, ResolvedTableStyle, CellFormatResult } from "./ipc_bridge";
+import type { TomlTableData, EnumValidationInfo, DerivedColumnInfo, DerivedResultValue, ResolvedTableStyle, CellFormatResult, RowConfig } from "./ipc_bridge";
 import * as ipc from "./ipc_bridge";
 import { derivedResultToCellData } from "./rich_text_utils";
 import { ImageCellRenderer } from "./image_cell_renderer";
@@ -74,6 +74,8 @@ interface UniverSpreadsheetProps {
   derivedColumnState?: DerivedColumnState;
   /** Sheet ID to activate on initial workbook creation */
   initialActiveSheetId?: string;
+  /** Row configurations per sheet ID (default_height, per-row overrides) */
+  rowConfigs?: Record<string, RowConfig>;
 }
 
 export const UniverSpreadsheet = forwardRef<
@@ -89,6 +91,7 @@ export const UniverSpreadsheet = forwardRef<
     onActiveSheetChanged,
     derivedColumnState,
     initialActiveSheetId,
+    rowConfigs,
   },
   ref
 ) {
@@ -125,6 +128,8 @@ export const UniverSpreadsheet = forwardRef<
   const isRestoringFilterRef = useRef(false);
   const derivedColumnStateRef = useRef(derivedColumnState);
   derivedColumnStateRef.current = derivedColumnState;
+  const rowConfigsRef = useRef(rowConfigs);
+  rowConfigsRef.current = rowConfigs;
   const dataColumnOffsetMapRef = useRef<Map<string, number>>(new Map());
 
   onChangeRef.current = onChange;
@@ -240,7 +245,7 @@ export const UniverSpreadsheet = forwardRef<
         dataColumnOffsetMapRef.current.set(sheetData.id, offset);
       }
 
-      const workbookData = buildMultiSheetWorkbook(multiSheetData, derivedColumnState?.configs);
+      const workbookData = buildMultiSheetWorkbook(multiSheetData, derivedColumnState?.configs, rowConfigs);
       instance.univerAPI.createWorkbook(workbookData);
 
       // Ensure bold header styling is applied to all sheets after workbook creation
@@ -662,8 +667,12 @@ export const UniverSpreadsheet = forwardRef<
       const colOffset = dataColumnOffsetMapRef.current.get(sheetId) ?? 0;
       const colIdx = getDerivedColumnIndex(derivedConfig, headers.length, sheetConfigs!, colOffset);
 
+      const currentRowConfigs = rowConfigsRef.current;
+      const sheetRowConfig = currentRowConfigs?.[sheetId];
+      const rowHeight = sheetRowConfig?.default_height ?? undefined;
+
       renderer
-        .handleImageResult(sheet, sheetId, displayRow, colIdx, result)
+        .handleImageResult(sheet, sheetId, displayRow, colIdx, result, rowHeight)
         .catch((e) => {
           logger.debug("Image render from derived value failed", {
             error: String(e),
@@ -977,7 +986,8 @@ function getColumnLetter(index: number): string {
  */
 function buildMultiSheetWorkbook(
   multiSheetData: MultiSheetData,
-  derivedConfigs?: Record<string, DerivedColumnInfo[]>
+  derivedConfigs?: Record<string, DerivedColumnInfo[]>,
+  rowConfigs?: Record<string, RowConfig>
 ): Partial<IWorkbookData> {
   // Sort sheets alphabetically by name for consistent tab order
   const sortedSheets = [...multiSheetData.sheets].sort((a, b) =>
@@ -1048,6 +1058,36 @@ function buildMultiSheetWorkbook(
       }
     }
 
+    // Apply row height configuration from metadata
+    const rowConfig = rowConfigs?.[sheetData.id];
+    const rowData: Record<number, { h: number; hd?: number }> = {};
+    if (rowConfig) {
+      const defaultH = rowConfig.default_height;
+      if (defaultH) {
+        // Apply default height to all data rows (row 0 is header, data starts at row 1)
+        for (let r = 0; r <= sheetData.data.rows.length; r++) {
+          rowData[r] = { h: defaultH };
+        }
+      }
+      // Apply per-row overrides (row indices are 0-indexed data rows, offset +1 for header)
+      if (rowConfig.heights) {
+        for (const rh of rowConfig.heights) {
+          rowData[rh.row + 1] = { h: rh.height };
+        }
+      }
+      // Mark hidden rows
+      if (rowConfig.hidden) {
+        for (const hiddenRow of rowConfig.hidden) {
+          const r = hiddenRow + 1;
+          if (rowData[r]) {
+            rowData[r].hd = 1;
+          } else {
+            rowData[r] = { h: rowConfig.default_height ?? 24, hd: 1 };
+          }
+        }
+      }
+    }
+
     const sheetConfig: Record<string, unknown> = {
       id: sheetData.id,
       name: sheetData.name,
@@ -1055,6 +1095,12 @@ function buildMultiSheetWorkbook(
       columnCount,
       cellData,
     };
+    if (rowConfig?.default_height) {
+      sheetConfig.defaultRowHeight = rowConfig.default_height;
+    }
+    if (Object.keys(rowData).length > 0) {
+      sheetConfig.rowData = rowData;
+    }
     if (Object.keys(columnData).length > 0) {
       sheetConfig.columnData = columnData;
     }

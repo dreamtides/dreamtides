@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { SpreadsheetView } from "./spreadsheet_view";
 import { ErrorBanner } from "./error_banner";
 import * as ipc from "./ipc_bridge";
-import type { TomlTableData, DerivedValuePayload } from "./ipc_bridge";
+import type { TomlTableData, DerivedValuePayload, RowConfig } from "./ipc_bridge";
 import type { MultiSheetData, SheetData, DerivedColumnState } from "./UniverSpreadsheet";
 import { createLogger } from "./logger_frontend";
 
@@ -87,6 +87,7 @@ export function AppRoot() {
     configs: {},
     values: {},
   });
+  const [rowConfigs, setRowConfigs] = useState<Record<string, RowConfig>>({});
   const saveTimeoutRef = useRef<number | null>(null);
   const isSavingRef = useRef<Record<string, boolean>>({});
   const watchersStartedRef = useRef<Set<string>>(new Set());
@@ -177,10 +178,10 @@ export function AppRoot() {
       lastKnownDataRef.current[sheet.id] = sheet.data;
     }
 
-    // Pre-load derived column configs before building the workbook so
-    // positioned derived columns (e.g., image at position 0) can reserve
-    // space in the column layout.
+    // Pre-load derived column configs and row configs before building
+    // the workbook so they are available during initial workbook creation.
     const allDerivedConfigs: Record<string, ipc.DerivedColumnInfo[]> = {};
+    const allRowConfigs: Record<string, RowConfig> = {};
     await Promise.all(
       validSheets.map(async (sheet) => {
         try {
@@ -191,16 +192,27 @@ export function AppRoot() {
         } catch (e) {
           logger.error("Failed to load derived columns", { path: sheet.path, error: String(e) });
         }
+        try {
+          const rowConfig = await ipc.getRowConfig(sheet.path);
+          if (rowConfig) {
+            allRowConfigs[sheet.id] = rowConfig;
+          }
+        } catch (e) {
+          logger.error("Failed to load row config", { path: sheet.path, error: String(e) });
+        }
       })
     );
 
-    // Set derived configs before multiSheetData so they are available
-    // when UniverSpreadsheet first mounts and builds the workbook.
+    // Set derived configs and row configs before multiSheetData so they
+    // are available when UniverSpreadsheet first mounts and builds the workbook.
     if (Object.keys(allDerivedConfigs).length > 0) {
       setDerivedColumnState((prev) => ({
         ...prev,
         configs: { ...prev.configs, ...allDerivedConfigs },
       }));
+    }
+    if (Object.keys(allRowConfigs).length > 0) {
+      setRowConfigs((prev) => ({ ...prev, ...allRowConfigs }));
     }
 
     setMultiSheetData({ sheets: validSheets });
@@ -457,6 +469,7 @@ export function AppRoot() {
           onActiveSheetChanged={handleActiveSheetChanged}
           derivedColumnState={derivedColumnState}
           initialActiveSheetId={activeSheetId ?? undefined}
+          rowConfigs={rowConfigs}
         />
       </div>
     </div>

@@ -455,6 +455,10 @@ pub enum FilterCondition {
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Default)]
 #[serde(default)]
 pub struct RowConfig {
+    /// Default height in pixels for all data rows. Applied uniformly when set.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub default_height: Option<u32>,
+
     /// Height overrides by row index.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub heights: Vec<RowHeight>,

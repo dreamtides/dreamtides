@@ -3701,3 +3701,6 @@ position = 0
 width = 120
 inputs = ["image_number"]
 url_template = "https://www.shutterstock.com/image-illustration/-260nw-{image_number}.jpg"
+
+[metadata.rows]
+default_height = 100

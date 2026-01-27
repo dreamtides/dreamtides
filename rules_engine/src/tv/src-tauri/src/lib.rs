@@ -148,6 +148,7 @@ pub fn run(paths: cli::AppPaths) {
             commands::style_command::get_available_color_schemes,
             commands::style_command::get_conditional_formatting,
             commands::image_command::fetch_image,
+            commands::row_command::get_row_config,
             commands::log_command::log_message,
             commands::view_state_command::load_view_state,
             commands::view_state_command::save_view_state,

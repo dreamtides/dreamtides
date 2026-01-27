@@ -226,6 +226,8 @@ export type FilterCondition =
  * Row-specific configuration.
  */
 export interface RowConfig {
+  /** Default height in pixels for all data rows. */
+  default_height?: number;
   /** Height overrides by row. */
   heights?: RowHeight[];
   /** Hidden row indices. */
@@ -665,6 +667,14 @@ export async function incrementRowGeneration(
 
 export async function clearComputationQueue(): Promise<void> {
   return invoke("clear_computation_queue");
+}
+
+// ============ Row Config Commands ============
+
+export async function getRowConfig(
+  filePath: string
+): Promise<RowConfig | null> {
+  return invoke<RowConfig | null>("get_row_config", { filePath });
 }
 
 // ============ Validation Commands ============
