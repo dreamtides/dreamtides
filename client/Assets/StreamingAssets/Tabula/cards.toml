@@ -3684,6 +3684,9 @@ card-number = 222
 [metadata]
 schema_version = 1
 
+[metadata.table_style]
+color_scheme = "blue_light"
+
 [[metadata.validation_rules]]
 column = "card-type"
 type = "enum"

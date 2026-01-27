@@ -744,6 +744,7 @@ export interface ColorPalette {
   header_font_color: string;
   row_even_background: string;
   row_odd_background: string;
+  row_font_color: string;
   accent_color: string;
 }
 

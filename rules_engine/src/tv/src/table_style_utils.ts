@@ -37,16 +37,18 @@ export function applyTableStyle(
     }
   }
 
-  // Apply alternating row stripe colors
+  // Apply alternating row stripe colors and row font color
   if (style.show_row_stripes && style.palette && data.rows.length > 0) {
     const evenBg = style.palette.row_even_background;
     const oddBg = style.palette.row_odd_background;
+    const rowFontColor = style.palette.row_font_color;
 
     for (let displayRow = 0; displayRow < data.rows.length; displayRow++) {
       const cellRow = displayRow + 1;
       const rowRange = sheet.getRange(cellRow, 0, 1, numColumns);
       if (rowRange) {
         rowRange.setBackgroundColor(displayRow % 2 === 0 ? evenBg : oddBg);
+        rowRange.setFontColor(rowFontColor);
       }
     }
   }
