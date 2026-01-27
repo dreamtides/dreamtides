@@ -60,6 +60,8 @@ export interface UniverSpreadsheetProps {
   onChange?: (data: TomlTableData, sheetId: string) => void;
   /** Called when the active sheet changes */
   onActiveSheetChanged?: (sheetId: string) => void;
+  /** Called when the user reorders sheet tabs via drag */
+  onSheetOrderChanged?: (sheetNames: string[]) => void;
   /** Derived column configurations and computed values */
   derivedColumnState?: DerivedColumnState;
   /** Sheet ID to activate on initial workbook creation */
@@ -68,4 +70,6 @@ export interface UniverSpreadsheetProps {
   rowConfigs?: Record<string, RowConfig>;
   /** Column configurations per sheet ID (widths from metadata) */
   columnConfigs?: Record<string, ColumnConfig[]>;
+  /** Persisted sheet order (filenames without .toml extension) for tab ordering */
+  persistedSheetOrder?: string[];
 }

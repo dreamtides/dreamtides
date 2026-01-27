@@ -19,18 +19,56 @@ import { createLogger } from "./logger_frontend";
 const logger = createLogger("tv.ui.workbook_builder");
 
 /**
+ * Apply sheet ordering: use persisted order if available, falling back to
+ * alphabetical sort for any sheets not listed in the persisted order.
+ */
+function applySheetOrder(
+  sheets: MultiSheetData["sheets"],
+  persistedOrder?: string[],
+): MultiSheetData["sheets"] {
+  if (!persistedOrder || persistedOrder.length === 0) {
+    // No persisted order: fall back to alphabetical sort
+    return [...sheets].sort((a, b) => a.name.localeCompare(b.name));
+  }
+
+  // Build a map from filename to sheet for fast lookup
+  const sheetByName = new Map(sheets.map((s) => [s.name, s]));
+  const ordered: MultiSheetData["sheets"] = [];
+  const seen = new Set<string>();
+
+  // First, add sheets in persisted order
+  for (const name of persistedOrder) {
+    const sheet = sheetByName.get(name);
+    if (sheet) {
+      ordered.push(sheet);
+      seen.add(name);
+    }
+  }
+
+  // Then, append any new sheets not in persisted order (alphabetically)
+  const remaining = sheets
+    .filter((s) => !seen.has(s.name))
+    .sort((a, b) => a.name.localeCompare(b.name));
+  ordered.push(...remaining);
+
+  return ordered;
+}
+
+/**
  * Build IWorkbookData from MultiSheetData.
- * Creates a workbook with multiple sheets, sorted alphabetically by name.
+ * Creates a workbook with multiple sheets, ordered by persisted sheet order
+ * or alphabetically by name if no persisted order exists.
  */
 export function buildMultiSheetWorkbook(
   multiSheetData: MultiSheetData,
   derivedConfigs?: Record<string, DerivedColumnInfo[]>,
   rowConfigs?: Record<string, RowConfig>,
   columnConfigs?: Record<string, ColumnConfig[]>,
+  persistedSheetOrder?: string[],
 ): Partial<IWorkbookData> {
-  // Sort sheets alphabetically by name for consistent tab order
-  const sortedSheets = [...multiSheetData.sheets].sort((a, b) =>
-    a.name.localeCompare(b.name),
+  const sortedSheets = applySheetOrder(
+    multiSheetData.sheets,
+    persistedSheetOrder,
   );
 
   const sheets: Record<string, IWorkbookData["sheets"][string]> = {};

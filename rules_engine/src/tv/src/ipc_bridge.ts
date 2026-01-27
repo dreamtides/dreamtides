@@ -814,6 +814,20 @@ export async function saveViewState(
   return invoke("save_view_state", { activeSheetPath });
 }
 
+// ============ Sheet Order Commands ============
+
+export interface SheetOrder {
+  order: string[];
+}
+
+export async function loadSheetOrder(): Promise<SheetOrder> {
+  return invoke<SheetOrder>("load_sheet_order");
+}
+
+export async function saveSheetOrder(order: string[]): Promise<void> {
+  return invoke("save_sheet_order", { order });
+}
+
 // ============ Events ============
 
 export type Disposable = { dispose: () => void };

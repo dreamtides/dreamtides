@@ -129,6 +129,7 @@ export function AppRoot() {
   });
   const [rowConfigs, setRowConfigs] = useState<Record<string, RowConfig>>({});
   const [columnConfigs, setColumnConfigs] = useState<Record<string, ColumnConfig[]>>({});
+  const [persistedSheetOrder, setPersistedSheetOrder] = useState<string[] | undefined>(undefined);
   const saveTimeoutRef = useRef<number | null>(null);
   const isSavingRef = useRef<Record<string, boolean>>({});
   const watchersStartedRef = useRef<Set<string>>(new Set());
@@ -425,6 +426,13 @@ export function AppRoot() {
     }
   }, [sheets]);
 
+  const handleSheetOrderChanged = useCallback((sheetNames: string[]) => {
+    setPersistedSheetOrder(sheetNames);
+    ipc.saveSheetOrder(sheetNames).catch((e) =>
+      logger.error("Failed to save sheet order", { error: String(e) })
+    );
+  }, []);
+
   useEffect(() => {
     const init = async () => {
       try {
@@ -454,6 +462,15 @@ export function AppRoot() {
           }
         } catch (e) {
           logger.error("Failed to load view state", { error: String(e) });
+        }
+
+        try {
+          const sheetOrder = await ipc.loadSheetOrder();
+          if (sheetOrder.order.length > 0) {
+            setPersistedSheetOrder(sheetOrder.order);
+          }
+        } catch (e) {
+          logger.error("Failed to load sheet order", { error: String(e) });
         }
 
         await loadAllFiles(sheetInfos, restoredSheetId);
@@ -582,10 +599,12 @@ export function AppRoot() {
           loading={loading}
           onChange={handleChange}
           onActiveSheetChanged={handleActiveSheetChanged}
+          onSheetOrderChanged={handleSheetOrderChanged}
           derivedColumnState={derivedColumnState}
           initialActiveSheetId={activeSheetId ?? undefined}
           rowConfigs={rowConfigs}
           columnConfigs={columnConfigs}
+          persistedSheetOrder={persistedSheetOrder}
         />
       </div>
     </div>

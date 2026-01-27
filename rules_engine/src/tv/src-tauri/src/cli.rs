@@ -89,13 +89,23 @@ fn get_default_tabula_path() -> Result<PathBuf, String> {
     Err("Could not find rules_engine/tabula directory relative to executable".to_string())
 }
 
+/// Files excluded from directory scanning because they store TV application
+/// metadata rather than user-editable spreadsheet data.
+const EXCLUDED_FILENAMES: &[&str] = &["sheets.toml"];
+
 fn scan_directory_for_toml(dir: &PathBuf) -> Result<Vec<PathBuf>, String> {
     let entries = std::fs::read_dir(dir)
         .map_err(|e| format!("Failed to read directory {}: {}", dir.display(), e))?;
     let mut files: Vec<PathBuf> = entries
         .filter_map(|entry| entry.ok())
         .map(|entry| entry.path())
-        .filter(|path| path.is_file() && path.extension().is_some_and(|ext| ext == "toml"))
+        .filter(|path| {
+            path.is_file()
+                && path.extension().is_some_and(|ext| ext == "toml")
+                && !path
+                    .file_name()
+                    .is_some_and(|n| EXCLUDED_FILENAMES.contains(&n.to_string_lossy().as_ref()))
+        })
         .collect();
     files.sort();
     Ok(files)

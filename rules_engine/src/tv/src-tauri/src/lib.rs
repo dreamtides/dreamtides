@@ -155,6 +155,8 @@ pub fn run(paths: cli::AppPaths) {
             commands::log_command::log_message,
             commands::view_state_command::load_view_state,
             commands::view_state_command::save_view_state,
+            commands::sheet_order_command::load_sheet_order,
+            commands::sheet_order_command::save_sheet_order,
             get_app_paths,
         ])
         .setup(|app| {

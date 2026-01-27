@@ -57,10 +57,12 @@ export const UniverSpreadsheet = forwardRef<
     multiSheetData,
     onChange,
     onActiveSheetChanged,
+    onSheetOrderChanged,
     derivedColumnState,
     initialActiveSheetId,
     rowConfigs,
     columnConfigs,
+    persistedSheetOrder,
   },
   ref,
 ) {
@@ -73,6 +75,7 @@ export const UniverSpreadsheet = forwardRef<
   const headersRef = useRef<string[]>([]);
   const onChangeRef = useRef(onChange);
   const onActiveSheetChangedRef = useRef(onActiveSheetChanged);
+  const onSheetOrderChangedRef = useRef(onSheetOrderChanged);
   const isLoadingRef = useRef(false);
   // Track if we've initialized with multi-sheet data
   const isMultiSheetRef = useRef(false);
@@ -107,6 +110,7 @@ export const UniverSpreadsheet = forwardRef<
 
   onChangeRef.current = onChange;
   onActiveSheetChangedRef.current = onActiveSheetChanged;
+  onSheetOrderChangedRef.current = onSheetOrderChanged;
 
   /**
    * Extract data from a specific sheet or the active sheet.
@@ -234,6 +238,7 @@ export const UniverSpreadsheet = forwardRef<
         derivedColumnState?.configs,
         rowConfigs,
         columnConfigs,
+        persistedSheetOrder,
       );
       instance.univerAPI.createWorkbook(workbookData);
 
@@ -533,6 +538,36 @@ export const UniverSpreadsheet = forwardRef<
         });
         if (onActiveSheetChangedRef.current) {
           onActiveSheetChangedRef.current(sheetId);
+        }
+      },
+    );
+
+    // Listen for sheet tab reorder (drag) events to persist sheet order
+    const sheetMovedDisposable = instance.univerAPI.addEvent(
+      instance.univerAPI.Event.SheetMoved,
+      () => {
+        // Read the current sheet order from the workbook after the move
+        const workbook = instance.univerAPI.getActiveWorkbook();
+        if (!workbook) return;
+
+        const sheets = multiSheetDataRef.current?.sheets;
+        if (!sheets) return;
+
+        // Get the workbook's sheetOrder array which reflects the new tab order.
+        // The facade getSheets() method returns sheets in display order.
+        const orderedSheets = workbook.getSheets();
+        const sheetNames: string[] = [];
+        for (const ws of orderedSheets) {
+          const sheetId = ws.getSheetId();
+          const sheetData = sheets.find((s) => s.id === sheetId);
+          if (sheetData) {
+            sheetNames.push(sheetData.name);
+          }
+        }
+
+        logger.info("Sheet tabs reordered", { order: sheetNames });
+        if (onSheetOrderChangedRef.current) {
+          onSheetOrderChangedRef.current(sheetNames);
         }
       },
     );
@@ -845,6 +880,7 @@ export const UniverSpreadsheet = forwardRef<
 
     return () => {
       activeSheetDisposable.dispose();
+      sheetMovedDisposable.dispose();
       sortDisposable.dispose();
       filterDisposable.dispose();
       colWidthDisposable.dispose();
