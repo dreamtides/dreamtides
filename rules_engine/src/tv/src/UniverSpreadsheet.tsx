@@ -632,86 +632,116 @@ export const UniverSpreadsheet = forwardRef<
       }
     });
 
-    // Listen for column width changes to persist to TOML metadata
+    // Listen for column width changes to persist to TOML metadata.
+    // Handles both drag-resize (set-worksheet-col-width mutation) and
+    // double-click auto-fit (set-col-auto-width command).
     const colWidthDebounceTimers = new Map<string, ReturnType<typeof setTimeout>>();
-    const colWidthDisposable = instance.univerAPI.onCommandExecuted((command) => {
-      if (isLoadingRef.current) return;
-      if (command.id !== "sheet.mutation.set-worksheet-col-width") return;
 
-      const activeSheet = instance.univerAPI
-        .getActiveWorkbook()
-        ?.getActiveSheet();
-      if (!activeSheet) return;
-
-      const sheetId = activeSheet.getSheetId();
-      const sheets = multiSheetDataRef.current?.sheets;
-      const sheetData = sheets?.find((s) => s.id === sheetId);
-      if (!sheetData) return;
-
+    const persistColumnWidth = (filePath: string, col: number, width: number, sheetId: string) => {
       const headers = headersMapRef.current.get(sheetId) ?? [];
       const offset = dataColumnOffsetMapRef.current.get(sheetId) ?? 0;
       const derivedConfigs = derivedColumnStateRef.current?.configs[sheetId];
+      const roundedWidth = Math.round(width);
 
-      // Extract column index and width from the command params
-      const params = command.params as {
-        ranges?: Array<{ startColumn: number; endColumn: number }>;
-        colWidth?: number;
-      } | undefined;
-      if (!params?.ranges || params.colWidth === undefined) return;
+      // Check if this column is a derived column
+      const derivedConfig = derivedConfigs?.find((c) =>
+        getDerivedColumnIndex(c, headers.length, derivedConfigs, offset) === col
+      );
 
-      for (const range of params.ranges) {
-        for (let col = range.startColumn; col <= range.endColumn; col++) {
-          const width = Math.round(params.colWidth);
+      if (derivedConfig) {
+        const debounceKey = `${filePath}:derived:${derivedConfig.name}`;
+        const existing = colWidthDebounceTimers.get(debounceKey);
+        if (existing) clearTimeout(existing);
 
-          // Check if this column is a derived column
-          const derivedConfig = derivedConfigs?.find((c) =>
-            getDerivedColumnIndex(c, headers.length, derivedConfigs, offset) === col
-          );
-
-          if (derivedConfig) {
-            const debounceKey = `${sheetData.path}:derived:${derivedConfig.name}`;
-            const existing = colWidthDebounceTimers.get(debounceKey);
-            if (existing) clearTimeout(existing);
-
-            colWidthDebounceTimers.set(
-              debounceKey,
-              setTimeout(() => {
-                colWidthDebounceTimers.delete(debounceKey);
-                ipc.setDerivedColumnWidth(sheetData.path, derivedConfig.name, width).catch((e) => {
-                  logger.debug("Failed to persist derived column width", {
-                    columnName: derivedConfig.name,
-                    width,
-                    error: String(e),
-                  });
-                });
-              }, 300)
-            );
-            continue;
-          }
-
-          // Otherwise treat as a data column
-          const dataColIndex = col - offset;
-          if (dataColIndex < 0 || dataColIndex >= headers.length) continue;
-
-          const columnKey = headers[dataColIndex];
-          const debounceKey = `${sheetData.path}:${columnKey}`;
-
-          const existing = colWidthDebounceTimers.get(debounceKey);
-          if (existing) clearTimeout(existing);
-
-          colWidthDebounceTimers.set(
-            debounceKey,
-            setTimeout(() => {
-              colWidthDebounceTimers.delete(debounceKey);
-              ipc.setColumnWidth(sheetData.path, columnKey, width).catch((e) => {
-                logger.debug("Failed to persist column width", {
-                  columnKey,
-                  width,
-                  error: String(e),
-                });
+        colWidthDebounceTimers.set(
+          debounceKey,
+          setTimeout(() => {
+            colWidthDebounceTimers.delete(debounceKey);
+            ipc.setDerivedColumnWidth(filePath, derivedConfig.name, roundedWidth).catch((e) => {
+              logger.debug("Failed to persist derived column width", {
+                columnName: derivedConfig.name,
+                width: roundedWidth,
+                error: String(e),
               });
-            }, 300)
-          );
+            });
+          }, 300)
+        );
+        return;
+      }
+
+      // Otherwise treat as a data column
+      const dataColIndex = col - offset;
+      if (dataColIndex < 0 || dataColIndex >= headers.length) return;
+
+      const columnKey = headers[dataColIndex];
+      const debounceKey = `${filePath}:${columnKey}`;
+
+      const existing = colWidthDebounceTimers.get(debounceKey);
+      if (existing) clearTimeout(existing);
+
+      colWidthDebounceTimers.set(
+        debounceKey,
+        setTimeout(() => {
+          colWidthDebounceTimers.delete(debounceKey);
+          ipc.setColumnWidth(filePath, columnKey, roundedWidth).catch((e) => {
+            logger.debug("Failed to persist column width", {
+              columnKey,
+              width: roundedWidth,
+              error: String(e),
+            });
+          });
+        }, 300)
+      );
+    };
+
+    const colWidthDisposable = instance.univerAPI.onCommandExecuted((command) => {
+      if (isLoadingRef.current) return;
+
+      if (command.id === "sheet.mutation.set-worksheet-col-width") {
+        // Drag-resize: width is in the mutation params
+        const activeSheet = instance.univerAPI
+          .getActiveWorkbook()
+          ?.getActiveSheet();
+        if (!activeSheet) return;
+
+        const sheetId = activeSheet.getSheetId();
+        const sheets = multiSheetDataRef.current?.sheets;
+        const sheetData = sheets?.find((s) => s.id === sheetId);
+        if (!sheetData) return;
+
+        const params = command.params as {
+          ranges?: Array<{ startColumn: number; endColumn: number }>;
+          colWidth?: number;
+        } | undefined;
+        if (!params?.ranges || params.colWidth === undefined) return;
+
+        for (const range of params.ranges) {
+          for (let col = range.startColumn; col <= range.endColumn; col++) {
+            persistColumnWidth(sheetData.path, col, params.colWidth, sheetId);
+          }
+        }
+      } else if (command.id === "sheet.command.set-col-auto-width") {
+        // Double-click auto-fit: read resulting widths from the sheet
+        const activeSheet = instance.univerAPI
+          .getActiveWorkbook()
+          ?.getActiveSheet();
+        if (!activeSheet) return;
+
+        const sheetId = activeSheet.getSheetId();
+        const sheets = multiSheetDataRef.current?.sheets;
+        const sheetData = sheets?.find((s) => s.id === sheetId);
+        if (!sheetData) return;
+
+        const params = command.params as {
+          ranges?: Array<{ startColumn: number; endColumn: number }>;
+        } | undefined;
+        if (!params?.ranges) return;
+
+        for (const range of params.ranges) {
+          for (let col = range.startColumn; col <= range.endColumn; col++) {
+            const width = activeSheet.getColumnWidth(col);
+            persistColumnWidth(sheetData.path, col, width, sheetId);
+          }
         }
       }
     });
