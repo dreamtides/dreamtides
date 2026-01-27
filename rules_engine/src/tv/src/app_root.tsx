@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { SpreadsheetView } from "./spreadsheet_view";
 import { ErrorBanner } from "./error_banner";
 import * as ipc from "./ipc_bridge";
-import type { TomlTableData, DerivedValuePayload, RowConfig } from "./ipc_bridge";
+import type { TomlTableData, DerivedValuePayload, RowConfig, ColumnConfig } from "./ipc_bridge";
 import type { MultiSheetData, SheetData, DerivedColumnState } from "./UniverSpreadsheet";
 import { createLogger } from "./logger_frontend";
 
@@ -88,6 +88,7 @@ export function AppRoot() {
     values: {},
   });
   const [rowConfigs, setRowConfigs] = useState<Record<string, RowConfig>>({});
+  const [columnConfigs, setColumnConfigs] = useState<Record<string, ColumnConfig[]>>({});
   const saveTimeoutRef = useRef<number | null>(null);
   const isSavingRef = useRef<Record<string, boolean>>({});
   const watchersStartedRef = useRef<Set<string>>(new Set());
@@ -182,6 +183,7 @@ export function AppRoot() {
     // the workbook so they are available during initial workbook creation.
     const allDerivedConfigs: Record<string, ipc.DerivedColumnInfo[]> = {};
     const allRowConfigs: Record<string, RowConfig> = {};
+    const allColumnConfigs: Record<string, ColumnConfig[]> = {};
     await Promise.all(
       validSheets.map(async (sheet) => {
         try {
@@ -200,6 +202,14 @@ export function AppRoot() {
         } catch (e) {
           logger.error("Failed to load row config", { path: sheet.path, error: String(e) });
         }
+        try {
+          const colConfigs = await ipc.getColumnConfigs(sheet.path);
+          if (colConfigs.length > 0) {
+            allColumnConfigs[sheet.id] = colConfigs;
+          }
+        } catch (e) {
+          logger.error("Failed to load column configs", { path: sheet.path, error: String(e) });
+        }
       })
     );
 
@@ -213,6 +223,9 @@ export function AppRoot() {
     }
     if (Object.keys(allRowConfigs).length > 0) {
       setRowConfigs((prev) => ({ ...prev, ...allRowConfigs }));
+    }
+    if (Object.keys(allColumnConfigs).length > 0) {
+      setColumnConfigs((prev) => ({ ...prev, ...allColumnConfigs }));
     }
 
     setMultiSheetData({ sheets: validSheets });
@@ -470,6 +483,7 @@ export function AppRoot() {
           derivedColumnState={derivedColumnState}
           initialActiveSheetId={activeSheetId ?? undefined}
           rowConfigs={rowConfigs}
+          columnConfigs={columnConfigs}
         />
       </div>
     </div>

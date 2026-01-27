@@ -1,5 +1,5 @@
 import { UniverSpreadsheet } from "./UniverSpreadsheet";
-import type { TomlTableData, RowConfig } from "./ipc_bridge";
+import type { TomlTableData, RowConfig, ColumnConfig } from "./ipc_bridge";
 import type { MultiSheetData, DerivedColumnState } from "./UniverSpreadsheet";
 
 interface SpreadsheetViewProps {
@@ -11,6 +11,7 @@ interface SpreadsheetViewProps {
   derivedColumnState?: DerivedColumnState;
   initialActiveSheetId?: string;
   rowConfigs?: Record<string, RowConfig>;
+  columnConfigs?: Record<string, ColumnConfig[]>;
 }
 
 export function SpreadsheetView({
@@ -22,6 +23,7 @@ export function SpreadsheetView({
   derivedColumnState,
   initialActiveSheetId,
   rowConfigs,
+  columnConfigs,
 }: SpreadsheetViewProps) {
   if (loading) {
     return <div className="loading">Loading...</div>;
@@ -41,6 +43,7 @@ export function SpreadsheetView({
         derivedColumnState={derivedColumnState}
         initialActiveSheetId={initialActiveSheetId}
         rowConfigs={rowConfigs}
+        columnConfigs={columnConfigs}
       />
     </main>
   );

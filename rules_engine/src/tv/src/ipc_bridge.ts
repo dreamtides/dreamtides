@@ -677,6 +677,22 @@ export async function getRowConfig(
   return invoke<RowConfig | null>("get_row_config", { filePath });
 }
 
+// ============ Column Config Commands ============
+
+export async function getColumnConfigs(
+  filePath: string
+): Promise<ColumnConfig[]> {
+  return invoke<ColumnConfig[]>("get_column_configs", { filePath });
+}
+
+export async function setColumnWidth(
+  filePath: string,
+  columnKey: string,
+  width: number
+): Promise<void> {
+  return invoke("set_column_width", { filePath, columnKey, width: Math.round(width) });
+}
+
 // ============ Validation Commands ============
 
 export interface EnumValidationInfo {

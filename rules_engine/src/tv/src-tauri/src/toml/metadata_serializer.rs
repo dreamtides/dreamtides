@@ -138,6 +138,112 @@ pub fn update_filter_config_with_fs(
     Ok(())
 }
 
+/// Updates the width of a single column in the metadata.columns array.
+pub fn update_column_width(file_path: &str, column_key: &str, width: u32) -> Result<(), TvError> {
+    update_column_width_with_fs(&RealFileSystem, file_path, column_key, width)
+}
+
+/// Updates a single column's width using the provided filesystem.
+pub fn update_column_width_with_fs(
+    fs: &dyn FileSystem,
+    file_path: &str,
+    column_key: &str,
+    width: u32,
+) -> Result<(), TvError> {
+    let content = fs.read_to_string(Path::new(file_path)).map_err(|e| {
+        tracing::error!(
+            component = "tv.toml.metadata",
+            file_path = %file_path,
+            error = %e,
+            "Read failed during column width update"
+        );
+        map_io_error_for_read(&e, file_path)
+    })?;
+
+    let mut doc: DocumentMut = content.parse().map_err(|e: toml_edit::TomlError| {
+        tracing::error!(
+            component = "tv.toml.metadata",
+            file_path = %file_path,
+            error = %e,
+            "TOML parse failed during column width update"
+        );
+        TvError::TomlParseError { path: file_path.to_string(), line: None, message: e.to_string() }
+    })?;
+
+    let metadata_table = doc.entry("metadata").or_insert_with(|| {
+        let mut table = Table::new();
+        table.insert("schema_version", value(1i64));
+        Item::Table(table)
+    });
+
+    if let Some(table) = metadata_table.as_table_mut() {
+        let columns = table
+            .entry("columns")
+            .or_insert(Item::ArrayOfTables(ArrayOfTables::new()));
+
+        if let Some(array) = columns.as_array_of_tables_mut() {
+            // Find existing entry for this column key
+            let mut found = false;
+            for entry in array.iter_mut() {
+                let is_match = entry.get("key").and_then(|v| v.as_str()) == Some(column_key);
+                if is_match {
+                    found = true;
+                    if width == 100 {
+                        entry.remove("width");
+                        // Remove the entry entirely if only the key field remains
+                        if entry.len() == 1 && entry.contains_key("key") {
+                            // Mark for removal — handled below
+                        }
+                    } else {
+                        entry.insert("width", value(width as i64));
+                    }
+                    break;
+                }
+            }
+
+            if !found && width != 100 {
+                let mut new_entry = Table::new();
+                new_entry.insert("key", value(column_key));
+                new_entry.insert("width", value(width as i64));
+                array.push(new_entry);
+            }
+
+            // Remove entries that only have the key field (all defaults)
+            remove_default_only_columns(array);
+        }
+    }
+
+    fs.write_atomic(Path::new(file_path), &doc.to_string()).map_err(|e| {
+        map_atomic_write_error(e, file_path)
+    })?;
+
+    tracing::debug!(
+        component = "tv.toml.metadata",
+        file_path = %file_path,
+        column_key = %column_key,
+        width = width,
+        "Column width updated in metadata"
+    );
+
+    Ok(())
+}
+
+/// Removes column entries from the array that only contain the key field (all other fields are defaults).
+fn remove_default_only_columns(array: &mut ArrayOfTables) {
+    // Collect indices to remove (entries with only the "key" field)
+    let mut indices_to_remove = Vec::new();
+    for (i, entry) in array.iter().enumerate() {
+        if entry.len() == 1 && entry.contains_key("key") {
+            indices_to_remove.push(i);
+        }
+    }
+
+    // Remove in reverse order to preserve indices
+    for i in indices_to_remove.into_iter().rev() {
+        array.remove(i);
+    }
+}
+
 /// Serializes metadata and writes it to the TOML file, preserving document structure.
 pub fn save_metadata(file_path: &str, metadata: &Metadata) -> Result<(), TvError> {
     save_metadata_with_fs(&RealFileSystem, file_path, metadata)

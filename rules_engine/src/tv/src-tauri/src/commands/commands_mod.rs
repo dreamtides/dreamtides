@@ -1,3 +1,4 @@
+pub mod column_command;
 pub mod derived_command;
 pub mod filter_command;
 pub mod image_command;

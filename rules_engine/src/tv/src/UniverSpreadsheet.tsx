@@ -8,7 +8,7 @@ import {
   disposeUniverInstance,
   UniverInstance,
 } from "./univer_config";
-import type { TomlTableData, EnumValidationInfo, DerivedColumnInfo, DerivedResultValue, ResolvedTableStyle, CellFormatResult, RowConfig } from "./ipc_bridge";
+import type { TomlTableData, EnumValidationInfo, DerivedColumnInfo, DerivedResultValue, ResolvedTableStyle, CellFormatResult, RowConfig, ColumnConfig } from "./ipc_bridge";
 import * as ipc from "./ipc_bridge";
 import { derivedResultToCellData } from "./rich_text_utils";
 import { ImageCellRenderer } from "./image_cell_renderer";
@@ -76,6 +76,8 @@ interface UniverSpreadsheetProps {
   initialActiveSheetId?: string;
   /** Row configurations per sheet ID (default_height, per-row overrides) */
   rowConfigs?: Record<string, RowConfig>;
+  /** Column configurations per sheet ID (widths from metadata) */
+  columnConfigs?: Record<string, ColumnConfig[]>;
 }
 
 export const UniverSpreadsheet = forwardRef<
@@ -92,6 +94,7 @@ export const UniverSpreadsheet = forwardRef<
     derivedColumnState,
     initialActiveSheetId,
     rowConfigs,
+    columnConfigs,
   },
   ref
 ) {
@@ -130,6 +133,8 @@ export const UniverSpreadsheet = forwardRef<
   derivedColumnStateRef.current = derivedColumnState;
   const rowConfigsRef = useRef(rowConfigs);
   rowConfigsRef.current = rowConfigs;
+  const columnConfigsRef = useRef(columnConfigs);
+  columnConfigsRef.current = columnConfigs;
   const dataColumnOffsetMapRef = useRef<Map<string, number>>(new Map());
 
   onChangeRef.current = onChange;
@@ -245,7 +250,7 @@ export const UniverSpreadsheet = forwardRef<
         dataColumnOffsetMapRef.current.set(sheetData.id, offset);
       }
 
-      const workbookData = buildMultiSheetWorkbook(multiSheetData, derivedColumnState?.configs, rowConfigs);
+      const workbookData = buildMultiSheetWorkbook(multiSheetData, derivedColumnState?.configs, rowConfigs, columnConfigs);
       instance.univerAPI.createWorkbook(workbookData);
 
       // Ensure bold header styling is applied to all sheets after workbook creation
@@ -627,6 +632,61 @@ export const UniverSpreadsheet = forwardRef<
       }
     });
 
+    // Listen for column width changes to persist to TOML metadata
+    const colWidthDebounceTimers = new Map<string, ReturnType<typeof setTimeout>>();
+    const colWidthDisposable = instance.univerAPI.onCommandExecuted((command) => {
+      if (isLoadingRef.current) return;
+      if (command.id !== "sheet.mutation.set-worksheet-col-width") return;
+
+      const activeSheet = instance.univerAPI
+        .getActiveWorkbook()
+        ?.getActiveSheet();
+      if (!activeSheet) return;
+
+      const sheetId = activeSheet.getSheetId();
+      const sheets = multiSheetDataRef.current?.sheets;
+      const sheetData = sheets?.find((s) => s.id === sheetId);
+      if (!sheetData) return;
+
+      const headers = headersMapRef.current.get(sheetId) ?? [];
+      const offset = dataColumnOffsetMapRef.current.get(sheetId) ?? 0;
+
+      // Extract column index and width from the command params
+      const params = command.params as {
+        ranges?: Array<{ startColumn: number; endColumn: number }>;
+        colWidth?: number;
+      } | undefined;
+      if (!params?.ranges || params.colWidth === undefined) return;
+
+      for (const range of params.ranges) {
+        for (let col = range.startColumn; col <= range.endColumn; col++) {
+          const dataColIndex = col - offset;
+          if (dataColIndex < 0 || dataColIndex >= headers.length) continue;
+
+          const columnKey = headers[dataColIndex];
+          const width = Math.round(params.colWidth);
+          const debounceKey = `${sheetData.path}:${columnKey}`;
+
+          const existing = colWidthDebounceTimers.get(debounceKey);
+          if (existing) clearTimeout(existing);
+
+          colWidthDebounceTimers.set(
+            debounceKey,
+            setTimeout(() => {
+              colWidthDebounceTimers.delete(debounceKey);
+              ipc.setColumnWidth(sheetData.path, columnKey, width).catch((e) => {
+                logger.debug("Failed to persist column width", {
+                  columnKey,
+                  width,
+                  error: String(e),
+                });
+              });
+            }, 300)
+          );
+        }
+      }
+    });
+
     // Listen for derived value computed events to handle image results
     const derivedValueSub = ipc.onDerivedValueComputed((payload) => {
       const result = payload.result;
@@ -686,6 +746,11 @@ export const UniverSpreadsheet = forwardRef<
       activeSheetDisposable.dispose();
       sortDisposable.dispose();
       filterDisposable.dispose();
+      colWidthDisposable.dispose();
+      for (const timer of colWidthDebounceTimers.values()) {
+        clearTimeout(timer);
+      }
+      colWidthDebounceTimers.clear();
       derivedValueSub.dispose();
       if (imageCellRendererRef.current) {
         imageCellRendererRef.current.clearAll();
@@ -987,7 +1052,8 @@ function getColumnLetter(index: number): string {
 function buildMultiSheetWorkbook(
   multiSheetData: MultiSheetData,
   derivedConfigs?: Record<string, DerivedColumnInfo[]>,
-  rowConfigs?: Record<string, RowConfig>
+  rowConfigs?: Record<string, RowConfig>,
+  columnConfigs?: Record<string, ColumnConfig[]>
 ): Partial<IWorkbookData> {
   // Sort sheets alphabetically by name for consistent tab order
   const sortedSheets = [...multiSheetData.sheets].sort((a, b) =>
@@ -1054,6 +1120,17 @@ function buildMultiSheetWorkbook(
       for (const config of configs) {
         if (config.position !== undefined && config.position !== null && config.width) {
           columnData[config.position] = { w: config.width };
+        }
+      }
+    }
+
+    // Apply persisted column widths from metadata
+    const sheetColumnConfigs = columnConfigs?.[sheetData.id];
+    if (sheetColumnConfigs) {
+      for (const colConfig of sheetColumnConfigs) {
+        const headerIndex = sheetData.data.headers.indexOf(colConfig.key);
+        if (headerIndex !== -1 && colConfig.width && colConfig.width !== 100) {
+          columnData[headerIndex + dataOffset] = { w: colConfig.width };
         }
       }
     }
