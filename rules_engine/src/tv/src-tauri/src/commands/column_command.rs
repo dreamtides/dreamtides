@@ -42,3 +42,23 @@ pub fn set_column_width(
 
     Ok(())
 }
+
+/// Tauri command to update a derived column's width in the TOML file.
+#[tauri::command]
+pub fn set_derived_column_width(
+    file_path: String,
+    column_name: String,
+    width: u32,
+) -> Result<(), TvError> {
+    tracing::info!(
+        component = "tv.commands.column",
+        file_path = %file_path,
+        column_name = %column_name,
+        width = width,
+        "Setting derived column width"
+    );
+
+    metadata_serializer::update_derived_column_width(&file_path, &column_name, width)?;
+
+    Ok(())
+}

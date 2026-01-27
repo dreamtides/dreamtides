@@ -693,6 +693,14 @@ export async function setColumnWidth(
   return invoke("set_column_width", { filePath, columnKey, width: Math.round(width) });
 }
 
+export async function setDerivedColumnWidth(
+  filePath: string,
+  columnName: string,
+  width: number
+): Promise<void> {
+  return invoke("set_derived_column_width", { filePath, columnName, width: Math.round(width) });
+}
+
 // ============ Validation Commands ============
 
 export interface EnumValidationInfo {

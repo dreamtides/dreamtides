@@ -650,6 +650,7 @@ export const UniverSpreadsheet = forwardRef<
 
       const headers = headersMapRef.current.get(sheetId) ?? [];
       const offset = dataColumnOffsetMapRef.current.get(sheetId) ?? 0;
+      const derivedConfigs = derivedColumnStateRef.current?.configs[sheetId];
 
       // Extract column index and width from the command params
       const params = command.params as {
@@ -660,11 +661,39 @@ export const UniverSpreadsheet = forwardRef<
 
       for (const range of params.ranges) {
         for (let col = range.startColumn; col <= range.endColumn; col++) {
+          const width = Math.round(params.colWidth);
+
+          // Check if this column is a derived column
+          const derivedConfig = derivedConfigs?.find((c) =>
+            getDerivedColumnIndex(c, headers.length, derivedConfigs, offset) === col
+          );
+
+          if (derivedConfig) {
+            const debounceKey = `${sheetData.path}:derived:${derivedConfig.name}`;
+            const existing = colWidthDebounceTimers.get(debounceKey);
+            if (existing) clearTimeout(existing);
+
+            colWidthDebounceTimers.set(
+              debounceKey,
+              setTimeout(() => {
+                colWidthDebounceTimers.delete(debounceKey);
+                ipc.setDerivedColumnWidth(sheetData.path, derivedConfig.name, width).catch((e) => {
+                  logger.debug("Failed to persist derived column width", {
+                    columnName: derivedConfig.name,
+                    width,
+                    error: String(e),
+                  });
+                });
+              }, 300)
+            );
+            continue;
+          }
+
+          // Otherwise treat as a data column
           const dataColIndex = col - offset;
           if (dataColIndex < 0 || dataColIndex >= headers.length) continue;
 
           const columnKey = headers[dataColIndex];
-          const width = Math.round(params.colWidth);
           const debounceKey = `${sheetData.path}:${columnKey}`;
 
           const existing = colWidthDebounceTimers.get(debounceKey);

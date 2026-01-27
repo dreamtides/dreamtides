@@ -151,6 +151,7 @@ pub fn run(paths: cli::AppPaths) {
             commands::row_command::get_row_config,
             commands::column_command::get_column_configs,
             commands::column_command::set_column_width,
+            commands::column_command::set_derived_column_width,
             commands::log_command::log_message,
             commands::view_state_command::load_view_state,
             commands::view_state_command::save_view_state,
