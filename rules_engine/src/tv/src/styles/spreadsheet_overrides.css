@@ -61,9 +61,21 @@
   background: #a1a1a1;
 }
 
-/* Hide elements not needed for TV */
-/* Example: Hide formula bar if not using formulas */
-/* .univer-formula-bar { display: none; } */
+/* Hide elements not needed for TV.
+ * The formula bar is hidden via `formulaBar: false` in the sheets-ui plugin
+ * config, and nonfunctional menu items are hidden via the DISABLED_MENU_ITEMS
+ * MenuConfig passed to each UI plugin. The CSS rules below cover structural
+ * elements that cannot be hidden through plugin configuration alone. */
+
+/* Hide the "+" add-sheet button on the sheet tab bar */
+[data-u-comp="sheet-bar-append-button"] {
+  display: none !important;
+}
+
+/* Fallback: hide formula bar via CSS in case the plugin config is ignored */
+[data-u-comp="formula-bar"] {
+  display: none !important;
+}
 
 /* Ensure sheet fills container */
 .univer-sheet-container {

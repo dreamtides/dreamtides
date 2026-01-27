@@ -37,6 +37,7 @@ import DrawingUIEnUS from "@univerjs/drawing-ui/locale/en-US";
 import { UniverSheetsDrawingPlugin } from "@univerjs/sheets-drawing";
 import { UniverSheetsDrawingUIPlugin } from "@univerjs/sheets-drawing-ui";
 import SheetsDrawingUIEnUS from "@univerjs/sheets-drawing-ui/locale/en-US";
+import { DISABLED_MENU_ITEMS } from "./disabled_menu_items";
 
 import "@univerjs/design/lib/index.css";
 import "@univerjs/ui/lib/index.css";
@@ -105,7 +106,10 @@ export function createUniverInstance(config: UniverConfig): UniverInstance {
   // Core plugins - load order matters!
   univer.registerPlugin(UniverRenderEnginePlugin);
   univer.registerPlugin(UniverFormulaEnginePlugin);
-  univer.registerPlugin(UniverUIPlugin, { container: config.container });
+  univer.registerPlugin(UniverUIPlugin, {
+    container: config.container,
+    menu: DISABLED_MENU_ITEMS,
+  });
 
   // Document support for rich text cells
   univer.registerPlugin(UniverDocsPlugin);
@@ -113,11 +117,16 @@ export function createUniverInstance(config: UniverConfig): UniverInstance {
 
   // Core spreadsheet functionality
   univer.registerPlugin(UniverSheetsPlugin);
-  univer.registerPlugin(UniverSheetsUIPlugin);
+  univer.registerPlugin(UniverSheetsUIPlugin, {
+    menu: DISABLED_MENU_ITEMS,
+    formulaBar: false,
+  });
 
   // Formula support
   univer.registerPlugin(UniverSheetsFormulaPlugin);
-  univer.registerPlugin(UniverSheetsFormulaUIPlugin);
+  univer.registerPlugin(UniverSheetsFormulaUIPlugin, {
+    menu: DISABLED_MENU_ITEMS,
+  });
 
   // Number formatting
   univer.registerPlugin(UniverSheetsNumfmtPlugin);
@@ -149,7 +158,10 @@ export function createUniverInstance(config: UniverConfig): UniverInstance {
   univer.registerPlugin(UniverDrawingPlugin as never);
   univer.registerPlugin(UniverDrawingUIPlugin as never);
   univer.registerPlugin(UniverSheetsDrawingPlugin as never);
-  univer.registerPlugin(UniverSheetsDrawingUIPlugin as never);
+  univer.registerPlugin(
+    UniverSheetsDrawingUIPlugin as never,
+    { menu: DISABLED_MENU_ITEMS } as never
+  );
 
   const univerAPI = FUniver.newAPI(univer);
 
