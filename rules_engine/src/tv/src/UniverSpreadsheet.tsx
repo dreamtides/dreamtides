@@ -1027,7 +1027,7 @@ export const UniverSpreadsheet = forwardRef<
         // Set header for derived column (row 0)
         const headerRange = sheet.getRange(0, derivedColIndex, 1, 1);
         if (headerRange) {
-          headerRange.setValues([[config.name]]);
+          headerRange.setValues([[formatHeaderForDisplay(config.name)]]);
           headerRange.setFontWeight("bold");
         }
 
