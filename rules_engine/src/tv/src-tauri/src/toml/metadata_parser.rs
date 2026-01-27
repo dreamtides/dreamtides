@@ -982,9 +982,11 @@ fn parse_single_column_config(
         .unwrap_or(100);
 
     let bold = table.get("bold").and_then(|v| v.as_bool()).unwrap_or(false);
+    let frozen = table.get("frozen").and_then(|v| v.as_bool()).unwrap_or(false);
 
     let mut config = ColumnConfig::new(key).with_width(width);
     config.bold = bold;
+    config.frozen = frozen;
     Ok(config)
 }
 
