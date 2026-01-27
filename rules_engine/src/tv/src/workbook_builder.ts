@@ -114,18 +114,40 @@ export function buildMultiSheetWorkbook(
       }
     }
 
+    // Build a set of bold column indices from column configs
+    const boldColumnIndices = new Set<number>();
+    if (sheetColumnConfigs) {
+      for (const colConfig of sheetColumnConfigs) {
+        if (colConfig.bold) {
+          const headerIndex = sheetData.data.headers.indexOf(colConfig.key);
+          if (headerIndex !== -1) {
+            boldColumnIndices.add(headerIndex);
+          }
+        }
+      }
+    }
+
     // Data rows (starting at row 1), shifted by data offset
     sheetData.data.rows.forEach((row, rowIndex) => {
       cellData[rowIndex + 1] = {};
       row.forEach((cellValue, colIndex) => {
         if (cellValue !== null) {
+          const isBold = boldColumnIndices.has(colIndex);
           if (typeof cellValue === "boolean") {
-            cellData[rowIndex + 1][colIndex + dataOffset] = {
+            const cell: { v: unknown; t?: CellValueType; s?: { bl?: number } } = {
               v: cellValue ? 1 : 0,
               t: CellValueType.BOOLEAN,
             };
+            if (isBold) {
+              cell.s = { bl: 1 };
+            }
+            cellData[rowIndex + 1][colIndex + dataOffset] = cell;
           } else {
-            cellData[rowIndex + 1][colIndex + dataOffset] = { v: cellValue };
+            const cell: { v: unknown; s?: { bl?: number } } = { v: cellValue };
+            if (isBold) {
+              cell.s = { bl: 1 };
+            }
+            cellData[rowIndex + 1][colIndex + dataOffset] = cell;
           }
         }
       });

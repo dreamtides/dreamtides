@@ -1031,6 +1031,27 @@ export const UniverSpreadsheet = forwardRef<
       });
       populateSheetDataBatch(sheet, sheetData.data, sheetOffset);
 
+      // Apply bold styling to columns configured with bold = true
+      const sheetColConfigs = columnConfigsRef.current?.[sheetData.id];
+      if (sheetColConfigs) {
+        for (const colConfig of sheetColConfigs) {
+          if (colConfig.bold) {
+            const headerIndex = sheetData.data.headers.indexOf(colConfig.key);
+            if (headerIndex !== -1 && sheetData.data.rows.length > 0) {
+              const boldRange = sheet.getRange(
+                1,
+                headerIndex + sheetOffset,
+                sheetData.data.rows.length,
+                1,
+              );
+              if (boldRange) {
+                boldRange.setFontWeight("bold");
+              }
+            }
+          }
+        }
+      }
+
       // Apply checkbox validation to boolean columns after updating data
       const booleanColumns = detectBooleanColumns(sheetData.data);
       applyCheckboxValidation(

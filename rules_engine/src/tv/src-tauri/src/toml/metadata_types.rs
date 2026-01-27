@@ -114,6 +114,10 @@ pub struct ColumnConfig {
     #[serde(default)]
     pub hidden: bool,
 
+    /// Render cell values in bold text. Defaults to false.
+    #[serde(default)]
+    pub bold: bool,
+
     /// Number or date format pattern (e.g., "#,##0.00", "yyyy-mm-dd").
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub format: Option<String>,
@@ -132,6 +136,7 @@ impl Default for ColumnConfig {
             wrap: false,
             frozen: false,
             hidden: false,
+            bold: false,
             format: None,
         }
     }

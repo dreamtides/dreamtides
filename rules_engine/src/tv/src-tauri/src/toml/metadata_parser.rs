@@ -976,7 +976,11 @@ fn parse_single_column_config(
         .map(|i| i as u32)
         .unwrap_or(100);
 
-    Ok(ColumnConfig::new(key).with_width(width))
+    let bold = table.get("bold").and_then(|v| v.as_bool()).unwrap_or(false);
+
+    let mut config = ColumnConfig::new(key).with_width(width);
+    config.bold = bold;
+    Ok(config)
 }
 
 fn parse_single_row_height(

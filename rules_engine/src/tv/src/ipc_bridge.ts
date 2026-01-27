@@ -60,6 +60,8 @@ export interface ColumnConfig {
   frozen?: boolean;
   /** Hide this column from view. Defaults to false. */
   hidden?: boolean;
+  /** Render cell values in bold text. Defaults to false. */
+  bold?: boolean;
   /** Number or date format pattern (e.g., "#,##0.00", "yyyy-mm-dd"). */
   format?: string;
 }

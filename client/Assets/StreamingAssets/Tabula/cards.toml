@@ -3711,6 +3711,7 @@ default_height = 100
 [[metadata.columns]]
 key = "name"
 width = 200
+bold = true
 
 [[metadata.columns]]
 key = "rules-text"
