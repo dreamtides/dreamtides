@@ -108,6 +108,7 @@ export function createUniverInstance(config: UniverConfig): UniverInstance {
   univer.registerPlugin(UniverFormulaEnginePlugin);
   univer.registerPlugin(UniverUIPlugin, {
     container: config.container,
+    header: false,
     menu: DISABLED_MENU_ITEMS,
   });
 
