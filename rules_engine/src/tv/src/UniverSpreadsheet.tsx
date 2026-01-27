@@ -1,5 +1,5 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef } from "react";
-import { Univer, IWorkbookData, CellValueType } from "@univerjs/core";
+import { Univer, IWorkbookData, CellValueType, HorizontalAlign, VerticalAlign, WrapStrategy } from "@univerjs/core";
 import { FUniver } from "@univerjs/core/facade";
 import { FWorksheet } from "@univerjs/sheets/facade";
 
@@ -1244,6 +1244,11 @@ function buildMultiSheetWorkbook(
       rowCount,
       columnCount,
       cellData,
+      defaultStyle: {
+        ht: HorizontalAlign.CENTER,
+        vt: VerticalAlign.MIDDLE,
+        tb: WrapStrategy.WRAP,
+      },
     };
     if (rowConfig?.default_height) {
       sheetConfig.defaultRowHeight = rowConfig.default_height;
