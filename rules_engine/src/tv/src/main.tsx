@@ -1,3 +1,4 @@
+import React from "react";
 import ReactDOM from "react-dom/client";
 import { AppRoot } from "./app_root";
 import { createLogger } from "./logger_frontend";
@@ -25,5 +26,7 @@ window.addEventListener("unhandledrejection", (event) => {
 });
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
-  <AppRoot />,
+  <React.StrictMode>
+    <AppRoot />
+  </React.StrictMode>,
 );
