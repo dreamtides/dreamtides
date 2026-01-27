@@ -62,6 +62,46 @@ function isDataEqual(a: TomlTableData, b: TomlTableData): boolean {
   return true;
 }
 
+/**
+ * Returns row indices where oldData and newData differ.
+ * Used to trigger derived computations only for changed rows after save.
+ */
+function getChangedRowIndices(
+  oldData: TomlTableData,
+  newData: TomlTableData
+): number[] {
+  const changed: number[] = [];
+  const maxRows = Math.max(oldData.rows.length, newData.rows.length);
+  for (let i = 0; i < maxRows; i++) {
+    const oldRow = oldData.rows[i];
+    const newRow = newData.rows[i];
+    if (!oldRow || !newRow) {
+      changed.push(i);
+      continue;
+    }
+    const maxCols = Math.max(oldRow.length, newRow.length);
+    let rowChanged = false;
+    for (let j = 0; j < maxCols; j++) {
+      const a = j < oldRow.length ? (oldRow[j] ?? null) : null;
+      const b = j < newRow.length ? (newRow[j] ?? null) : null;
+      if (a !== b) {
+        if ((a === null || a === undefined) && (b === null || b === undefined)) {
+          continue;
+        }
+        if (isBooleanNumericEqual(a, b)) {
+          continue;
+        }
+        rowChanged = true;
+        break;
+      }
+    }
+    if (rowChanged) {
+      changed.push(i);
+    }
+  }
+  return changed;
+}
+
 interface SheetInfo {
   id: string;
   path: string;
@@ -118,12 +158,18 @@ export function AppRoot() {
     sheetInfo: SheetInfo,
     data: TomlTableData,
     configs: ipc.DerivedColumnInfo[],
+    rowIndices?: number[],
   ) => {
     try {
       if (configs.length === 0) return;
 
+      const indicesToCompute = rowIndices
+        ?? Array.from({ length: data.rows.length }, (_, i) => i);
+
       const requests: ipc.ComputeDerivedRequest[] = [];
-      for (let rowIndex = 0; rowIndex < data.rows.length; rowIndex++) {
+      for (const rowIndex of indicesToCompute) {
+        if (rowIndex >= data.rows.length) continue;
+
         const rowData: Record<string, unknown> = {};
         for (let colIdx = 0; colIdx < data.headers.length; colIdx++) {
           rowData[data.headers[colIdx]] = data.rows[rowIndex][colIdx];
@@ -257,14 +303,6 @@ export function AppRoot() {
     const data = await loadSingleFile(sheetInfo.path, sheetInfo.tableName);
     if (!data) return;
 
-    // Skip update if data hasn't actually changed (e.g. reload triggered
-    // by our own save or an irrelevant file system event).
-    const lastKnown = lastKnownDataRef.current[sheetId];
-    if (lastKnown && isDataEqual(lastKnown, data)) {
-      logger.debug("Reload skipped, data unchanged", { sheetId });
-      return;
-    }
-
     // Update last known data for change detection
     lastKnownDataRef.current[sheetId] = data;
 
@@ -300,18 +338,61 @@ export function AppRoot() {
       isSavingRef.current[sheetId] = true;
 
       try {
+        const previousData = lastKnownDataRef.current[sheetId];
+
         await ipc.saveTomlTable(sheetInfo.path, sheetInfo.tableName, newData);
-        // Update last known data after successful save
         lastKnownDataRef.current[sheetId] = newData;
         // Record save time so file watcher can suppress self-triggered reloads
         lastSaveTimeRef.current[sheetId] = Date.now();
+
+        const rowCountChanged = !previousData ||
+          previousData.rows.length !== newData.rows.length;
+
+        // When the row count changes, update multiSheetData so the Univer
+        // useEffect can re-apply validation (checkboxes, dropdowns) with
+        // the expanded range covering the new rows.
+        if (rowCountChanged) {
+          setMultiSheetData((prev) => {
+            if (!prev) return prev;
+            return {
+              sheets: prev.sheets.map((s) =>
+                s.id === sheetId ? { ...s, data: newData } : s
+              ),
+            };
+          });
+        }
+
+        // Trigger derived computations for changed rows. When the row count
+        // changed, re-trigger all rows because the multiSheetData useEffect
+        // clears existing images during repopulation. When only values
+        // changed, compute only the affected rows.
+        const changedRows = rowCountChanged
+          ? undefined
+          : getChangedRowIndices(previousData!, newData);
+
+        if (!changedRows || changedRows.length > 0) {
+          try {
+            const configs = await ipc.getDerivedColumnsConfig(sheetInfo.path);
+            if (configs.length > 0) {
+              setDerivedColumnState((prev) => ({
+                ...prev,
+                configs: { ...prev.configs, [sheetId]: configs },
+              }));
+              triggerDerivedComputations(sheetInfo, newData, configs, changedRows);
+            }
+          } catch (e) {
+            logger.error("Failed to trigger post-save derived computations", {
+              error: String(e),
+            });
+          }
+        }
       } catch (e) {
         logger.error("Save error", { error: String(e) });
       } finally {
         isSavingRef.current[sheetId] = false;
       }
     },
-    [sheets]
+    [sheets, triggerDerivedComputations]
   );
 
   const handleChange = useCallback(
