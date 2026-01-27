@@ -2,7 +2,6 @@ import { convertFileSrc } from "@tauri-apps/api/core";
 import { ICommandService, ImageSourceType } from "@univerjs/core";
 import { FUniver } from "@univerjs/core/facade";
 import { IRenderManagerService } from "@univerjs/engine-render";
-import { InsertSheetDrawingCommand } from "@univerjs/sheets-drawing-ui";
 import {
   convertPositionCellToSheetOverGrid,
   ISheetSelectionRenderService,
@@ -53,8 +52,9 @@ function generateDrawingId(): string {
  * insert-sheet-image command directly.
  *
  * Drawing commands are registered during Univer's onRendered() lifecycle
- * phase, so this class includes retry logic to wait for command
- * availability when events arrive before rendering completes.
+ * phase. When image results arrive before onRendered() fires, this class
+ * polls until the commands become available rather than registering them
+ * manually (which would race with the plugin's lifecycle registration).
  */
 export class ImageCellRenderer {
   private univerAPI: FUniver;
@@ -117,26 +117,38 @@ export class ImageCellRenderer {
   }
 
   /**
-   * Ensures drawing commands are registered in the command service.
-   * Univer's drawing plugin registers commands during onRendered(),
-   * which may not have fired yet. If commands are missing, registers
-   * the exported InsertSheetDrawingCommand directly.
+   * Waits for the drawing plugin's onRendered() lifecycle to register
+   * the insert-sheet-image command. Derived image results can arrive
+   * before onRendered() fires, so this polls until the command is
+   * available rather than registering it manually (which would race
+   * with the plugin and cause a duplicate registration error).
    */
-  private ensureCommandsRegistered(): void {
-    if (this.commandsReady) return;
+  private async waitForCommandsReady(): Promise<boolean> {
+    if (this.commandsReady) return true;
 
     try {
       const injector = (this.univerAPI as Injector)._injector;
       const commandService = injector.get(ICommandService);
 
-      if (!commandService.hasCommand(INSERT_SHEET_DRAWING_CMD)) {
-        commandService.registerCommand(InsertSheetDrawingCommand);
-        logger.info("Manually registered InsertSheetDrawingCommand");
+      if (commandService.hasCommand(INSERT_SHEET_DRAWING_CMD)) {
+        this.commandsReady = true;
+        return true;
       }
 
-      this.commandsReady = true;
+      for (let i = 0; i < 50; i++) {
+        await new Promise((resolve) => setTimeout(resolve, 100));
+        if (commandService.hasCommand(INSERT_SHEET_DRAWING_CMD)) {
+          this.commandsReady = true;
+          logger.info("Drawing commands became available", { waitMs: (i + 1) * 100 });
+          return true;
+        }
+      }
+
+      logger.error("Timed out waiting for drawing commands");
+      return false;
     } catch (e) {
-      logger.error("Failed to ensure drawing commands", { error: String(e) });
+      logger.error("Failed to check drawing commands", { error: String(e) });
+      return false;
     }
   }
 
@@ -152,7 +164,11 @@ export class ImageCellRenderer {
     cachePath: string
   ): Promise<void> {
     try {
-      this.ensureCommandsRegistered();
+      const ready = await this.waitForCommandsReady();
+      if (!ready) {
+        this.setErrorState(sheet, cellKey, row, column, "Drawing commands not available");
+        return;
+      }
 
       await this.removeExistingImage(cellKey, sheet.getSheetId());
 
