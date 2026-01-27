@@ -168,11 +168,14 @@ export const UniverSpreadsheet = forwardRef<
     const minRows = knownSheetData?.data.rows.length ?? 0;
 
     const dataOffset = dataColumnOffsetMapRef.current.get(currentSheetId) ?? 0;
+    const maxRows = sheet.getMaxRows();
 
     const rows: (string | number | boolean | null)[][] = [];
     let rowIndex = 2;
 
     for (;;) {
+      if (rowIndex > maxRows) break;
+
       const row: (string | number | boolean | null)[] = [];
       let rowHasContent = false;
 
