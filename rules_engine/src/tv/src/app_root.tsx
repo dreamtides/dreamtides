@@ -94,6 +94,8 @@ export function AppRoot() {
   const watchersStartedRef = useRef<Set<string>>(new Set());
   // Track last known data for each sheet to detect actual changes
   const lastKnownDataRef = useRef<Record<string, TomlTableData>>({});
+  // Track save completion timestamps to suppress self-triggered file watcher reloads
+  const lastSaveTimeRef = useRef<Record<string, number>>({});
   // Ref to track activeSheetId without causing effect re-runs
   const activeSheetIdRef = useRef<string | null>(null);
   activeSheetIdRef.current = activeSheetId;
@@ -255,6 +257,14 @@ export function AppRoot() {
     const data = await loadSingleFile(sheetInfo.path, sheetInfo.tableName);
     if (!data) return;
 
+    // Skip update if data hasn't actually changed (e.g. reload triggered
+    // by our own save or an irrelevant file system event).
+    const lastKnown = lastKnownDataRef.current[sheetId];
+    if (lastKnown && isDataEqual(lastKnown, data)) {
+      logger.debug("Reload skipped, data unchanged", { sheetId });
+      return;
+    }
+
     // Update last known data for change detection
     lastKnownDataRef.current[sheetId] = data;
 
@@ -293,6 +303,8 @@ export function AppRoot() {
         await ipc.saveTomlTable(sheetInfo.path, sheetInfo.tableName, newData);
         // Update last known data after successful save
         lastKnownDataRef.current[sheetId] = newData;
+        // Record save time so file watcher can suppress self-triggered reloads
+        lastSaveTimeRef.current[sheetId] = Date.now();
       } catch (e) {
         logger.error("Save error", { error: String(e) });
       } finally {
@@ -389,6 +401,15 @@ export function AppRoot() {
 
       if (isSavingRef.current[sheetInfo.id]) {
         logger.debug("Ignoring file change during save", { filePath: payload.file_path });
+        return;
+      }
+
+      // Suppress self-triggered reloads: the file watcher fires ~500-1000ms
+      // after our own save completes, at which point isSavingRef is already
+      // false. Use the save timestamp to detect and skip these events.
+      const lastSave = lastSaveTimeRef.current[sheetInfo.id] ?? 0;
+      if (Date.now() - lastSave < 1500) {
+        logger.debug("Ignoring file change shortly after save", { filePath: payload.file_path });
         return;
       }
 

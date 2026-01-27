@@ -142,7 +142,7 @@ export const UniverSpreadsheet = forwardRef<
 
   /**
    * Extract data from a specific sheet or the active sheet.
-   * @param sheetId Optional sheet ID. If not provided, uses active sheet.
+   * Uses a single batch getValues() call instead of per-cell reads.
    */
   const extractDataFromSheet = (sheetId?: string): TomlTableData | null => {
     const workbook = univerAPIRef.current?.getActiveWorkbook();
@@ -160,8 +160,6 @@ export const UniverSpreadsheet = forwardRef<
 
     if (headers.length === 0) return null;
 
-    // Determine minimum rows to scan: use the last known data row count so we
-    // don't stop early when a middle row is cleared.
     const knownSheetData = multiSheetDataRef.current?.sheets.find(
       (s) => s.id === currentSheetId
     );
@@ -170,19 +168,31 @@ export const UniverSpreadsheet = forwardRef<
     const dataOffset = dataColumnOffsetMapRef.current.get(currentSheetId) ?? 0;
     const maxRows = sheet.getMaxRows();
 
+    // Read all data rows in a single batch call instead of cell-by-cell.
+    // Row 0 is the header row, data starts at row 1.
+    const readRowCount = maxRows - 1;
+    if (readRowCount <= 0) return { headers, rows: [] };
+
+    const dataRange = sheet.getRange(1, dataOffset, readRowCount, headers.length);
+    if (!dataRange) return { headers, rows: [] };
+
+    let allValues: ReturnType<typeof dataRange.getValues>;
+    try {
+      allValues = dataRange.getValues();
+    } catch {
+      return { headers, rows: [] };
+    }
+    if (!allValues) return { headers, rows: [] };
+
     const rows: (string | number | boolean | null)[][] = [];
-    let rowIndex = 2;
 
-    for (;;) {
-      if (rowIndex > maxRows) break;
-
+    for (let r = 0; r < allValues.length; r++) {
+      const rowValues = allValues[r];
       const row: (string | number | boolean | null)[] = [];
       let rowHasContent = false;
 
-      for (let colIndex = 0; colIndex < headers.length; colIndex++) {
-        const colLetter = getColumnLetter(colIndex + dataOffset);
-        const cellAddress = `${colLetter}${rowIndex}`;
-        const cellValue = sheet.getRange(cellAddress)?.getValue();
+      for (let c = 0; c < headers.length; c++) {
+        const cellValue = c < rowValues.length ? rowValues[c] : null;
 
         if (cellValue !== undefined && cellValue !== null && cellValue !== "") {
           rowHasContent = true;
@@ -192,15 +202,11 @@ export const UniverSpreadsheet = forwardRef<
         }
       }
 
-      // Stop at the first empty row only after we have scanned at least
-      // minRows rows. This ensures clearing a middle row doesn't truncate
-      // all subsequent data.
       if (!rowHasContent && rows.length >= minRows) {
         break;
       }
 
       rows.push(row);
-      rowIndex++;
     }
 
     // Trim trailing empty rows
