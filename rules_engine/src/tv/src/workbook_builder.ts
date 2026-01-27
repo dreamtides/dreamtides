@@ -114,6 +114,9 @@ export function buildMultiSheetWorkbook(
       }
     }
 
+    // Resolve per-column configs for this sheet
+    const sheetColumnConfigs = columnConfigs?.[sheetData.id];
+
     // Build a set of bold column indices from column configs
     const boldColumnIndices = new Set<number>();
     if (sheetColumnConfigs) {
@@ -168,7 +171,6 @@ export function buildMultiSheetWorkbook(
     }
 
     // Apply persisted column widths from metadata
-    const sheetColumnConfigs = columnConfigs?.[sheetData.id];
     if (sheetColumnConfigs) {
       for (const colConfig of sheetColumnConfigs) {
         const headerIndex = sheetData.data.headers.indexOf(colConfig.key);
