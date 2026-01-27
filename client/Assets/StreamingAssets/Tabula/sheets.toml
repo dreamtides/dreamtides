@@ -1,0 +1,9 @@
+order = [
+    "cards",
+    "dreamwell",
+    "card-fx",
+    "card-lists",
+    "strings",
+    "test-cards",
+    "test-dreamwell",
+]
