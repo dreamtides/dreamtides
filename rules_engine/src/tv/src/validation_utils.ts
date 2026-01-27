@@ -68,6 +68,12 @@ export function applyCheckboxValidation(
         .build();
       range.setDataValidation(rule);
 
+      // Explicitly set vertical alignment and wrap on checkbox cells.
+      // The sheet defaultStyle sets these, but Univer's data validation
+      // renderer does not inherit sheet-level defaults.
+      range.setVerticalAlignment("middle");
+      range.setWrap(true);
+
       logger.debug("Applied checkbox validation to column", {
         column: data.headers[colIdx],
         range: rangeAddress,
@@ -119,6 +125,12 @@ export function applyDropdownValidation(
         })
         .build();
       range.setDataValidation(validationRule);
+
+      // Explicitly set vertical alignment and wrap on dropdown cells.
+      // The sheet defaultStyle sets these, but Univer's dropdown renderer
+      // does not inherit sheet-level defaults for data validation cells.
+      range.setVerticalAlignment("middle");
+      range.setWrap(true);
 
       logger.debug("Applied dropdown validation to column", {
         column: rule.column,
