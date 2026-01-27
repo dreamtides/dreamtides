@@ -830,6 +830,11 @@ pub fn parse_row_config_from_content(
         return Ok(None);
     };
 
+    let header_height = rows_table
+        .get("header_height")
+        .and_then(|v| v.as_integer())
+        .map(|i| i as u32);
+
     let default_height = rows_table
         .get("default_height")
         .and_then(|v| v.as_integer())
@@ -872,7 +877,7 @@ pub fn parse_row_config_from_content(
         "Parsed row config from metadata"
     );
 
-    Ok(Some(RowConfig { default_height, heights, hidden }))
+    Ok(Some(RowConfig { header_height, default_height, heights, hidden }))
 }
 
 /// Parses the metadata.columns section from a TOML file using the real filesystem.

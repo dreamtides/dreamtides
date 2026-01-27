@@ -1197,11 +1197,16 @@ function buildMultiSheetWorkbook(
     // Apply row height configuration from metadata
     const rowConfig = rowConfigs?.[sheetData.id];
     const rowData: Record<number, { h: number; hd?: number }> = {};
+
+    // Header row (row 0) always gets an explicit height, defaulting to 30px
+    const headerH = rowConfig?.header_height ?? 30;
+    rowData[0] = { h: headerH };
+
     if (rowConfig) {
       const defaultH = rowConfig.default_height;
       if (defaultH) {
-        // Apply default height to all data rows (row 0 is header, data starts at row 1)
-        for (let r = 0; r <= sheetData.data.rows.length; r++) {
+        // Apply default height to data rows only (row 1 onward)
+        for (let r = 1; r <= sheetData.data.rows.length; r++) {
           rowData[r] = { h: defaultH };
         }
       }

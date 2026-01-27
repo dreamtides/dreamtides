@@ -779,6 +779,9 @@ fn serialize_filter_condition(condition: &FilterCondition) -> Value {
 
 fn serialize_row_config(rows: &RowConfig) -> Table {
     let mut table = Table::new();
+    if let Some(h) = rows.header_height {
+        table.insert("header_height", value(h as i64));
+    }
     if let Some(h) = rows.default_height {
         table.insert("default_height", value(h as i64));
     }

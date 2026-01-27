@@ -226,6 +226,8 @@ export type FilterCondition =
  * Row-specific configuration.
  */
 export interface RowConfig {
+  /** Height in pixels for the header row. Defaults to 30. */
+  header_height?: number;
   /** Default height in pixels for all data rows. */
   default_height?: number;
   /** Height overrides by row. */
