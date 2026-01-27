@@ -1138,7 +1138,7 @@ function buildMultiSheetWorkbook(
     const dataOffset = computeDataColumnOffset(configs);
 
     // Calculate required dimensions
-    const rowCount = Math.max(sheetData.data.rows.length + 2, 100); // +1 for header, +1 for buffer
+    const rowCount = sheetData.data.rows.length + 1 + 100; // +1 for header row, +100 blank rows at bottom
     const columnCount = Math.max(sheetData.data.headers.length + dataOffset + 1, 26);
 
     // Build cell data
