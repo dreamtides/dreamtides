@@ -59,6 +59,14 @@ pub fn matches_condition(cell_value: &CellValue, condition: &FilterCondition) ->
             CellValue::Boolean(b) => b == expected,
             _ => false,
         },
+        FilterCondition::Values(allowed) => {
+            if allowed.is_empty() {
+                return true;
+            }
+            allowed
+                .iter()
+                .any(|v| matches_condition(cell_value, &FilterCondition::Equals(v.clone())))
+        }
     }
 }
 

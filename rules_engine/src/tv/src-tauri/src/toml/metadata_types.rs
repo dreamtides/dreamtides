@@ -454,6 +454,8 @@ pub enum FilterCondition {
     Range { min: Option<f64>, max: Option<f64> },
     /// Boolean value.
     Boolean(bool),
+    /// Set of allowed values (from Univer checkbox-based filter dropdowns).
+    Values(Vec<serde_json::Value>),
 }
 
 /// Row-specific configuration.

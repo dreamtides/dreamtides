@@ -459,7 +459,9 @@ export const UniverSpreadsheet = forwardRef<
       };
       loadConditionalFormattingAsync();
 
-      // Restore filter state from persisted backend filter state
+      // Restore persisted filter criteria for each sheet.
+      // The filter range itself is set via workbook resources in
+      // buildMultiSheetWorkbook, so dropdown arrows are already present.
       const restoreFilterStateAsync = async () => {
         const workbook = instance.univerAPI.getActiveWorkbook();
         if (!workbook) return;
@@ -472,7 +474,36 @@ export const UniverSpreadsheet = forwardRef<
                 sheetData.path,
                 sheetData.name,
               );
-              if (filterResponse.filters.length === 0) continue;
+              if (
+                !filterResponse.active ||
+                filterResponse.filters.length === 0
+              )
+                continue;
+
+              const sheet = workbook.getSheetBySheetId(sheetData.id);
+              if (!sheet) continue;
+
+              const filter = sheet.getFilter();
+              if (!filter) continue;
+
+              const headers = sheetData.data.headers;
+              const offset =
+                dataColumnOffsetMapRef.current.get(sheetData.id) ?? 0;
+
+              for (const savedFilter of filterResponse.filters) {
+                const colIndex = headers.indexOf(savedFilter.column);
+                if (colIndex === -1) continue;
+
+                if ("values" in savedFilter.condition) {
+                  const values = savedFilter.condition.values as unknown[];
+                  filter.setColumnFilterCriteria(colIndex + offset, {
+                    colId: colIndex,
+                    filters: {
+                      filters: values.map((v) => String(v)),
+                    },
+                  });
+                }
+              }
 
               logger.info("Restored filter state", {
                 sheetId: sheetData.id,
@@ -666,7 +697,95 @@ export const UniverSpreadsheet = forwardRef<
           ipc.clearFilterState(sheetData.path, sheetData.name).catch((e) => {
             logger.debug("Failed to clear filter state", { error: String(e) });
           });
-          logger.info("Filter cleared", { sheetId, sheetName: sheetData.name });
+          logger.info("Filter cleared", {
+            sheetId,
+            sheetName: sheetData.name,
+          });
+
+          // Re-create filter so dropdown arrows remain visible.
+          // Use setTimeout to defer until after the current command finishes.
+          const capturedSheetId = sheetId;
+          setTimeout(() => {
+            isRestoringFilterRef.current = true;
+            try {
+              const wb = instance.univerAPI.getActiveWorkbook();
+              if (!wb) return;
+              const ws = wb.getSheetBySheetId(capturedSheetId);
+              if (!ws) return;
+              const headers =
+                headersMapRef.current.get(capturedSheetId) ?? [];
+              const offset =
+                dataColumnOffsetMapRef.current.get(capturedSheetId) ?? 0;
+              const currentSheetData =
+                multiSheetDataRef.current?.sheets.find(
+                  (s) => s.id === capturedSheetId,
+                );
+              const rowCount = currentSheetData?.data.rows.length ?? 0;
+              if (headers.length > 0) {
+                const filterRange = ws.getRange(
+                  0,
+                  offset,
+                  rowCount + 1,
+                  headers.length,
+                );
+                if (filterRange) {
+                  filterRange.createFilter();
+                }
+              }
+            } finally {
+              isRestoringFilterRef.current = false;
+            }
+          }, 0);
+        } else if (
+          command.id === "sheet.command.set-sheet-filter-criteria"
+        ) {
+          // Read all column filter criteria and persist to backend
+          const filter = activeSheet.getFilter();
+          if (!filter) return;
+
+          const headers = headersMapRef.current.get(sheetId) ?? [];
+          const offset =
+            dataColumnOffsetMapRef.current.get(sheetId) ?? 0;
+
+          const filterRequests: ipc.ColumnFilterRequest[] = [];
+          for (let i = 0; i < headers.length; i++) {
+            const criteria = filter.getColumnFilterCriteria(i + offset);
+            if (!criteria) continue;
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const filtersObj = (criteria as any).filters;
+            if (!filtersObj?.filters || filtersObj.filters.length === 0)
+              continue;
+            filterRequests.push({
+              column: headers[i],
+              condition: {
+                values: filtersObj.filters.map((v: string) => {
+                  // Try to parse as number or boolean
+                  if (v === "true") return true;
+                  if (v === "false") return false;
+                  const n = Number(v);
+                  if (!isNaN(n) && v !== "") return n;
+                  return v;
+                }),
+              },
+            });
+          }
+
+          ipc
+            .setFilterState(sheetData.path, sheetData.name, {
+              filters: filterRequests,
+              active: filterRequests.length > 0,
+            })
+            .catch((e) => {
+              logger.debug("Failed to persist filter state", {
+                error: String(e),
+              });
+            });
+
+          logger.info("Filter criteria persisted", {
+            sheetId,
+            sheetName: sheetData.name,
+            filterCount: filterRequests.length,
+          });
         } else {
           logger.info("Filter changed", {
             sheetId,
@@ -1106,6 +1225,29 @@ export const UniverSpreadsheet = forwardRef<
         }
       };
       reevaluateConditionalFormatting();
+
+      // Re-create auto-filter so dropdown arrows survive data reload
+      if (sheetData.data.headers.length > 0) {
+        const existingFilter = sheet.getFilter();
+        if (!existingFilter) {
+          try {
+            const filterRange = sheet.getRange(
+              0,
+              sheetOffset,
+              sheetData.data.rows.length + 1,
+              sheetData.data.headers.length,
+            );
+            if (filterRange) {
+              filterRange.createFilter();
+            }
+          } catch (e) {
+            logger.debug("Failed to re-create auto-filter on data reload", {
+              sheetId: sheetData.id,
+              error: String(e),
+            });
+          }
+        }
+      }
     }
 
     lastMultiSheetDataRef.current = multiSheetData;

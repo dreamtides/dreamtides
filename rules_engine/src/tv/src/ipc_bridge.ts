@@ -222,7 +222,8 @@ export type FilterCondition =
   | { contains: string }
   | { equals: unknown }
   | { range: { min?: number; max?: number } }
-  | { boolean: boolean };
+  | { boolean: boolean }
+  | { values: unknown[] };
 
 /**
  * Row-specific configuration.
@@ -560,9 +561,19 @@ export interface SetFilterRequest {
   condition: FilterConditionState;
 }
 
+export interface SetFilterStateRequest {
+  filters: ColumnFilterRequest[];
+  active: boolean;
+}
+
+export interface ColumnFilterRequest {
+  column: string;
+  condition: FilterCondition;
+}
+
 export interface FilterStateResponse {
-  filters: ColumnFilterState[];
-  hidden_rows: number[];
+  filters: { column: string; condition: FilterCondition }[];
+  active: boolean;
 }
 
 export async function getFilterState(
@@ -578,12 +589,12 @@ export async function getFilterState(
 export async function setFilterState(
   filePath: string,
   tableName: string,
-  filters: SetFilterRequest[],
+  filter: SetFilterStateRequest | null,
 ): Promise<FilterStateResponse> {
   return invoke<FilterStateResponse>("set_filter_state", {
     filePath,
     tableName,
-    filters,
+    filter,
   });
 }
 

@@ -223,5 +223,9 @@ trail-duration-milliseconds = 1500
 [metadata]
 schema_version = 1
 
+[metadata.rows]
+default_height = 100
+frozen_rows = 1
+
 [metadata.table_style]
 color_scheme = "yellow"

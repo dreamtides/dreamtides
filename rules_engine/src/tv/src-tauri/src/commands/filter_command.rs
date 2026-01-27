@@ -2,7 +2,7 @@ use tauri::State;
 
 use crate::filter::filter_state::FilterStateManager;
 use crate::filter::filter_types::FilterState;
-use crate::toml::metadata_types::{ColumnFilter, FilterCondition, FilterConfig};
+use crate::toml::metadata_types::{ColumnFilter, FilterCondition};
 
 #[derive(serde::Deserialize)]
 pub struct SetFilterRequest {
@@ -87,7 +87,6 @@ pub fn set_filter_state(
     );
 
     state.set_filter_state(&file_path, &table_name, new_state.clone());
-    persist_filter_to_metadata(&file_path, new_state.as_ref());
     FilterStateResponse::from(new_state)
 }
 
@@ -104,7 +103,6 @@ pub fn clear_filter_state(
         "Clear filter state"
     );
     state.clear_filter_state(&file_path, &table_name);
-    persist_filter_to_metadata(&file_path, None);
     FilterStateResponse { filters: Vec::new(), active: false }
 }
 
@@ -161,20 +159,3 @@ pub fn get_hidden_rows(
     state.get_hidden_rows(&file_path, &table_name)
 }
 
-fn persist_filter_to_metadata(file_path: &str, filter_state: Option<&FilterState>) {
-    let filter_config = filter_state.map(|s| FilterConfig {
-        filters: s.filters.clone(),
-        active: s.active,
-    });
-
-    if let Err(e) =
-        crate::toml::metadata_serializer::update_filter_config(file_path, filter_config.as_ref())
-    {
-        tracing::warn!(
-            component = "tv.commands.filter",
-            file_path = %file_path,
-            error = %e,
-            "Failed to persist filter state to metadata"
-        );
-    }
-}

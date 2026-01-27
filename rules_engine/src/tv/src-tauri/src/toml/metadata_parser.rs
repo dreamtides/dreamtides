@@ -296,6 +296,15 @@ fn parse_filter_condition(
         return Ok(FilterCondition::Boolean(b));
     }
 
+    if let Some(val) = table.get("values") {
+        let arr = val.as_array().ok_or_else(|| TvError::MetadataCorrupt {
+            path: file_path.to_string(),
+            message: format!("filter.filters[{idx}].condition.values is not an array"),
+        })?;
+        let values: Vec<serde_json::Value> = arr.iter().map(toml_value_to_json).collect();
+        return Ok(FilterCondition::Values(values));
+    }
+
     Err(TvError::MetadataCorrupt {
         path: file_path.to_string(),
         message: format!("filter.filters[{idx}].condition has no recognized condition type"),

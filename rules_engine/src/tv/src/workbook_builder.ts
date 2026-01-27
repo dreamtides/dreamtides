@@ -269,10 +269,34 @@ export function buildMultiSheetWorkbook(
     });
   }
 
+  // Build filter resource so dropdown arrows appear on all column headers.
+  // Setting this in the initial workbook data avoids timing issues with the
+  // filter plugin's command registration.
+  const filterResource: Record<string, { ref: { startRow: number; startColumn: number; endRow: number; endColumn: number } }> = {};
+  for (const sheetData of sortedSheets) {
+    if (sheetData.data.headers.length > 0 && sheetData.data.rows.length > 0) {
+      const offset = computeDataColumnOffset(derivedConfigs?.[sheetData.id]);
+      filterResource[sheetData.id] = {
+        ref: {
+          startRow: 0,
+          startColumn: offset,
+          endRow: sheetData.data.rows.length,
+          endColumn: offset + sheetData.data.headers.length - 1,
+        },
+      };
+    }
+  }
+
   return {
     id: "tv-workbook",
     name: "TV Workbook",
     sheets,
     sheetOrder,
+    resources: [
+      {
+        name: "SHEET_FILTER_PLUGIN" as const,
+        data: JSON.stringify(filterResource),
+      },
+    ],
   };
 }

@@ -773,6 +773,13 @@ fn serialize_filter_condition(condition: &FilterCondition) -> Value {
         FilterCondition::Boolean(b) => {
             inline.insert("boolean", Value::Boolean(toml_edit::Formatted::new(*b)));
         }
+        FilterCondition::Values(vals) => {
+            let mut arr = Array::new();
+            for v in vals {
+                arr.push(json_value_to_toml_value(v));
+            }
+            inline.insert("values", Value::Array(arr));
+        }
     }
     Value::InlineTable(inline)
 }
