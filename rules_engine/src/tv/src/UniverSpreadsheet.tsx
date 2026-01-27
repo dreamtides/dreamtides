@@ -107,6 +107,9 @@ export const UniverSpreadsheet = forwardRef<
   const columnConfigsRef = useRef(columnConfigs);
   columnConfigsRef.current = columnConfigs;
   const dataColumnOffsetMapRef = useRef<Map<string, number>>(new Map());
+  const originalToDisplayMapRef = useRef<Map<string, Map<number, number>>>(
+    new Map(),
+  );
 
   onChangeRef.current = onChange;
   onActiveSheetChangedRef.current = onActiveSheetChanged;
@@ -217,6 +220,86 @@ export const UniverSpreadsheet = forwardRef<
     univerRef.current = instance.univer;
     univerAPIRef.current = instance.univerAPI;
     imageCellRendererRef.current = new ImageCellRenderer(instance.univerAPI);
+
+    const updateSortMapping = async (
+      path: string,
+      name: string,
+      sheetId: string,
+    ) => {
+      try {
+        const mapping = await ipc.getSortRowMapping(path, name);
+        if (mapping.length > 0) {
+          const inverse = new Map<number, number>();
+          for (let display = 0; display < mapping.length; display++) {
+            inverse.set(mapping[display], display);
+          }
+          originalToDisplayMapRef.current.set(sheetId, inverse);
+        } else {
+          originalToDisplayMapRef.current.delete(sheetId);
+        }
+      } catch (e) {
+        logger.debug("Failed to fetch sort row mapping", {
+          error: String(e),
+        });
+        originalToDisplayMapRef.current.delete(sheetId);
+      }
+    };
+
+    const reinsertImagesForSheet = (sheetId: string) => {
+      const renderer = imageCellRendererRef.current;
+      if (!renderer) return;
+
+      const wb = instance.univerAPI.getActiveWorkbook();
+      if (!wb) return;
+      const ws = wb.getSheetBySheetId(sheetId);
+      if (!ws) return;
+
+      renderer.clearSheetImages(ws, sheetId);
+
+      const inverseMap = originalToDisplayMapRef.current.get(sheetId);
+      const currentDerivedState = derivedColumnStateRef.current;
+      const sheetValues = currentDerivedState?.values[sheetId];
+      const sheetConfigs = currentDerivedState?.configs[sheetId];
+      if (!sheetValues || !sheetConfigs) return;
+
+      const headers = headersMapRef.current.get(sheetId) ?? [];
+      const colOffset = dataColumnOffsetMapRef.current.get(sheetId) ?? 0;
+      const sheetRowConfig = rowConfigsRef.current?.[sheetId];
+      const rowHeight = sheetRowConfig?.default_height ?? undefined;
+
+      for (const [rowIndexStr, rowValues] of Object.entries(sheetValues)) {
+        const originalRowIndex = parseInt(rowIndexStr, 10);
+        const displayIndex =
+          inverseMap?.get(originalRowIndex) ?? originalRowIndex;
+        const displayRow = displayIndex + 1;
+
+        for (const config of sheetConfigs) {
+          const result = rowValues[config.function];
+          if (!result || result.type !== "image") continue;
+
+          const colIdx = getDerivedColumnIndex(
+            config,
+            headers.length,
+            sheetConfigs,
+            colOffset,
+          );
+          renderer
+            .handleImageResult(
+              ws,
+              sheetId,
+              displayRow,
+              colIdx,
+              result,
+              rowHeight,
+            )
+            .catch((e) => {
+              logger.debug("Image re-insert after sort failed", {
+                error: String(e),
+              });
+            });
+        }
+      }
+    };
 
     // Check if we have multi-sheet data to initialize with
     if (multiSheetData && multiSheetData.sheets.length > 0) {
@@ -365,6 +448,11 @@ export const UniverSpreadsheet = forwardRef<
                 dataColumnOffsetMapRef.current.get(sheetData.id) ?? 0;
               const ascending = sortResponse.direction === "ascending";
               sheet.sort(colIndex + restoreOffset, ascending);
+              await updateSortMapping(
+                sheetData.path,
+                sheetData.name,
+                sheetData.id,
+              );
               logger.info("Restored sort indicator", {
                 sheetId: sheetData.id,
                 sheetName: sheetData.name,
@@ -625,6 +713,8 @@ export const UniverSpreadsheet = forwardRef<
           ipc.clearSortState(sheetData.path, sheetData.name).catch((e) => {
             logger.debug("Failed to clear sort state", { error: String(e) });
           });
+          originalToDisplayMapRef.current.delete(sheetId);
+          reinsertImagesForSheet(sheetId);
           logger.info("Sort cleared", { sheetId, sheetName: sheetData.name });
           return;
         }
@@ -648,8 +738,14 @@ export const UniverSpreadsheet = forwardRef<
             column: columnName,
             direction,
           })
+          .then(() =>
+            updateSortMapping(sheetData.path, sheetData.name, sheetId),
+          )
+          .then(() => reinsertImagesForSheet(sheetId))
           .catch((e) => {
-            logger.debug("Failed to persist sort state", { error: String(e) });
+            logger.debug("Failed to persist sort state or update images", {
+              error: String(e),
+            });
           });
 
         logger.info("Sort applied", {
@@ -950,8 +1046,11 @@ export const UniverSpreadsheet = forwardRef<
       const renderer = imageCellRendererRef.current;
       if (!renderer) return;
 
-      // Row index from derived value is 0-based data row, add 1 for header row offset
-      const displayRow = payload.row_index + 1;
+      // Translate data row index to display row using sort mapping
+      const inverseMap = originalToDisplayMapRef.current.get(sheetId);
+      const displayIndex =
+        inverseMap?.get(payload.row_index) ?? payload.row_index;
+      const displayRow = displayIndex + 1;
 
       // Find the column index for the derived function from config position
       const currentDerivedState = derivedColumnStateRef.current;

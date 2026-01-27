@@ -1,7 +1,8 @@
 use tauri::State;
 
-use crate::sort::sort_state::SortStateManager;
+use crate::sort::sort_state::{self, SortStateManager};
 use crate::sort::sort_types::{SortDirection, SortState};
+use crate::toml::document_loader;
 
 #[derive(serde::Deserialize)]
 pub struct SetSortRequest {
@@ -60,6 +61,24 @@ pub fn set_sort_state(
     );
 
     state.set_sort_state(&file_path, &table_name, new_state.clone());
+
+    if let Some(ref sort_state_val) = new_state {
+        match document_loader::load_toml_document(&file_path, &table_name) {
+            Ok(data) => {
+                let indices = sort_state::apply_sort(&data, sort_state_val);
+                state.set_row_mapping(&file_path, &table_name, indices);
+            }
+            Err(e) => {
+                tracing::warn!(
+                    component = "tv.commands.sort",
+                    file_path = %file_path,
+                    error = %e,
+                    "Failed to load data for sort row mapping computation"
+                );
+            }
+        }
+    }
+
     SortStateResponse::from(new_state)
 }
 
