@@ -3720,3 +3720,11 @@ width = 140
 [[metadata.columns]]
 key = "preview"
 width = 250
+
+[[metadata.columns]]
+key = "card-type"
+width = 150
+
+[[metadata.columns]]
+key = "rarity"
+width = 125
