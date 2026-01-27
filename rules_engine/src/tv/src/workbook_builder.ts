@@ -215,6 +215,20 @@ export function buildMultiSheetWorkbook(
       }
     }
 
+    // Compute freeze pane configuration from metadata
+    const frozenRows = rowConfig?.frozen_rows ?? 0;
+    let frozenColumns = 0;
+    if (sheetColumnConfigs) {
+      for (const colConfig of sheetColumnConfigs) {
+        if (colConfig.frozen) {
+          const headerIndex = sheetData.data.headers.indexOf(colConfig.key);
+          if (headerIndex !== -1) {
+            frozenColumns = Math.max(frozenColumns, headerIndex + dataOffset + 1);
+          }
+        }
+      }
+    }
+
     const sheetConfig: Record<string, unknown> = {
       id: sheetData.id,
       name: sheetData.name,
@@ -227,6 +241,14 @@ export function buildMultiSheetWorkbook(
         tb: WrapStrategy.WRAP,
       },
     };
+    if (frozenRows > 0 || frozenColumns > 0) {
+      sheetConfig.freeze = {
+        startRow: frozenRows,
+        startColumn: frozenColumns,
+        xSplit: frozenColumns,
+        ySplit: frozenRows,
+      };
+    }
     if (rowConfig?.default_height) {
       sheetConfig.defaultRowHeight = rowConfig.default_height;
     }

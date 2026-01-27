@@ -3707,11 +3707,13 @@ url_template = "https://www.shutterstock.com/image-illustration/-260nw-{image_nu
 
 [metadata.rows]
 default_height = 100
+frozen_rows = 1
 
 [[metadata.columns]]
 key = "name"
 width = 200
 bold = true
+frozen = true
 
 [[metadata.columns]]
 key = "rules-text"

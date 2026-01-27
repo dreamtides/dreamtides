@@ -232,6 +232,8 @@ export interface RowConfig {
   header_height?: number;
   /** Default height in pixels for all data rows. */
   default_height?: number;
+  /** Number of rows to freeze at the top, including the header row. Defaults to 0. */
+  frozen_rows?: number;
   /** Height overrides by row. */
   heights?: RowHeight[];
   /** Hidden row indices. */

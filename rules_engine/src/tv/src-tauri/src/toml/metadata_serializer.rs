@@ -785,6 +785,9 @@ fn serialize_row_config(rows: &RowConfig) -> Table {
     if let Some(h) = rows.default_height {
         table.insert("default_height", value(h as i64));
     }
+    if let Some(f) = rows.frozen_rows {
+        table.insert("frozen_rows", value(f as i64));
+    }
     if !rows.heights.is_empty() {
         table.insert("heights", Item::ArrayOfTables(serialize_row_heights(&rows.heights)));
     }

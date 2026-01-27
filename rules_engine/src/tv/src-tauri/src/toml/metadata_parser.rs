@@ -840,6 +840,11 @@ pub fn parse_row_config_from_content(
         .and_then(|v| v.as_integer())
         .map(|i| i as u32);
 
+    let frozen_rows = rows_table
+        .get("frozen_rows")
+        .and_then(|v| v.as_integer())
+        .map(|i| i as u32);
+
     let heights = match rows_table.get("heights").and_then(|v| v.as_array()) {
         Some(arr) => {
             let mut result = Vec::new();
@@ -877,7 +882,7 @@ pub fn parse_row_config_from_content(
         "Parsed row config from metadata"
     );
 
-    Ok(Some(RowConfig { header_height, default_height, heights, hidden }))
+    Ok(Some(RowConfig { header_height, default_height, frozen_rows, heights, hidden }))
 }
 
 /// Parses the metadata.columns section from a TOML file using the real filesystem.

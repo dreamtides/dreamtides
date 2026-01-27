@@ -468,6 +468,11 @@ pub struct RowConfig {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub default_height: Option<u32>,
 
+    /// Number of rows to freeze at the top, including the header row.
+    /// For example, 1 freezes only the header row. Defaults to 0 (no freeze).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub frozen_rows: Option<u32>,
+
     /// Height overrides by row index.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub heights: Vec<RowHeight>,
