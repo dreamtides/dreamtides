@@ -2,54 +2,70 @@
 name = "Dreamwell Produce 0"
 id = "146ae27e-a8ac-4f3c-aef2-cf2211e4bcfe"
 energy-produced = 0
-rules-text = " "
+rules-text = ""
 phase = 1
 image-number = 1963305268
+variables = ""
+prompts = ""
 
 [[test-dreamwell]]
 name = "Dreamwell Produce 1"
 id = "ee7b0367-f7c3-46c3-94db-b29cfd8dc2d2"
 energy-produced = 1
-rules-text = " "
+rules-text = ""
 image-number = 1963305268
+phase = ""
+variables = ""
+prompts = ""
 
 [[test-dreamwell]]
 name = "Dreamwell Produce 2 Starter"
 id = "308fd4c0-ca98-4bfa-a9be-c29b36a145fd"
 energy-produced = 2
-rules-text = " "
+rules-text = ""
 phase = 0
 image-number = 1963305268
+variables = ""
+prompts = ""
 
 [[test-dreamwell]]
 name = "Dreamwell Foresee"
 id = "40c77ea8-a021-4bc6-8970-0853c03f3fe0"
 energy-produced = 1
-rules-text = "{-Foresee(n:1)}."
+rules-text = "{Foresee}."
+variables = "foresee: 1"
 phase = 1
 image-number = 1897537165
+prompts = ""
 
 [[test-dreamwell]]
 name = "Dreamwell Gain Points"
 id = "d386663c-9e9f-4b8e-b410-f3467e39801b"
 energy-produced = 1
-rules-text = "Gain {-gained-points(n: 2)}."
+rules-text = "Gain {points}."
+variables = "points: 2"
 phase = 1
 image-number = 1789989917
+prompts = ""
 
 [[test-dreamwell]]
 name = "Dreamwell Gain Energy"
 id = "107c3b3f-6131-4ff8-afcb-f0ce4188848f"
 energy-produced = 1
-rules-text = "Gain {-gained-energy(e: 1)}."
+rules-text = "Gain {e}."
+variables = "e: 1"
 phase = 1
 image-number = 1786390154
+prompts = ""
 
 [[test-dreamwell]]
 name = "Dreamwell Draw Discard"
 id = "40e4381f-12f7-46b9-ae50-67b3195781b1"
 energy-produced = 1
-rules-text = "Draw {-drawn-cards(n: 1)}. Discard {-discarded-cards(n: 1)}."
+rules-text = "Draw {cards}. Discard {discards}."
+variables = """
+cards: 1
+discards: 1"""
 prompts = "Select a card to discard."
 phase = 1
 image-number = 1011222385
@@ -58,9 +74,11 @@ image-number = 1011222385
 name = "Dreamwell Mill 3"
 id = "a2cdf115-8e1a-455e-a118-123f6f36c7ba"
 energy-produced = 1
-rules-text = "Put the top {-count(n: 3)} cards of your deck into your void."
+rules-text = "Put the {top-n-cards} of your deck into your void."
+variables = "to-void: 3"
 phase = 1
 image-number = 2421338077
+prompts = ""
 
 [metadata]
 schema_version = 1

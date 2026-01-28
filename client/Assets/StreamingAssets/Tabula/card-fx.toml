@@ -230,6 +230,36 @@ frozen_rows = 1
 [metadata.table_style]
 color_scheme = "yellow"
 
+[[metadata.validation_rules]]
+column = "effect-type"
+type = "enum"
+enum = ["FireProjectile", "DissolveTargets", "ReverseDissolveTargets", "DisplayEffect", "SetCardTrail"]
+
+[[metadata.validation_rules]]
+column = "effect-trigger"
+type = "enum"
+enum = ["ApplyTargetedEffect", "DrawCards", "ActivatedAbility", "SelectedTargetsForCard"]
+
+[[metadata.validation_rules]]
+column = "projectile-source"
+type = "enum"
+enum = ["ThisCard", "ForEachTarget", "ControllerDeck"]
+
+[[metadata.validation_rules]]
+column = "projectile-target"
+type = "enum"
+enum = ["ThisCard", "ForEachTarget", "ControllerDeck"]
+
+[[metadata.validation_rules]]
+column = "effect-target"
+type = "enum"
+enum = ["ThisCard", "ForEachTarget", "ControllerDeck"]
+
+[[metadata.validation_rules]]
+column = "card-trail-targets"
+type = "enum"
+enum = ["ThisCard", "ForEachTarget", "ControllerDeck"]
+
 [[metadata.derived_columns]]
 name = "image"
 function = "image_lookup"

@@ -164,6 +164,16 @@ frozen_rows = 1
 [metadata.table_style]
 color_scheme = "gray"
 
+[[metadata.validation_rules]]
+column = "list-type"
+type = "enum"
+enum = ["BaseCardId", "DreamwellCardId"]
+
+[[metadata.validation_rules]]
+column = "list-name"
+type = "enum"
+enum = ["Core 11", "Dreamwell Basic 5", "Test Dreamwell Basic 5", "Test Dreamwell No Abilities"]
+
 [[metadata.derived_columns]]
 name = "image"
 function = "image_lookup"

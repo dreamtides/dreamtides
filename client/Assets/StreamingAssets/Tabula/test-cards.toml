@@ -535,6 +535,11 @@ column = "rarity"
 type = "enum"
 enum = ["Common", "Uncommon", "Rare", "Legendary", "Special"]
 
+[[metadata.validation_rules]]
+column = "subtype"
+type = "enum"
+enum = ["Agent", "Ancient", "Avatar", "Child", "Detective", "Enigma", "Explorer", "Guide", "Hacker", "Mage", "Monster", "Musician", "Outsider", "Renegade", "Robot", "Spirit Animal", "Super", "Survivor", "Synth", "Tinkerer", "Trooper", "Visionary", "Visitor", "Warrior"]
+
 [[metadata.derived_columns]]
 name = "image"
 function = "image_derived"
@@ -579,3 +584,7 @@ width = 150
 [[metadata.columns]]
 key = "rarity"
 width = 125
+
+[[metadata.columns]]
+key = "subtype"
+width = 127
