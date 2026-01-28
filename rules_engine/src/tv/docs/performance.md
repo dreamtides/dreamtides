@@ -1,16 +1,20 @@
 # TV Performance Analysis Report
 
-**Date:** 2026-01-28
-**Updated:** 2026-01-28 14:56 (with enhanced logging verification)
-**Data Source:** `~/Library/Application Support/tv/logs/tv_2026-01-28.jsonl` and `tv_perf_2026-01-28.jsonl`
+**Date:** 2026-01-28 **Updated:** 2026-01-28 14:56 (with enhanced logging
+verification) **Data Source:** `~/Library/Application
+Support/tv/logs/tv_2026-01-28.jsonl` and `tv_perf_2026-01-28.jsonl`
 
 ## Executive Summary
 
-TV exhibits significant UI freezes (700-1700ms) after cell edits. The primary causes are:
+TV exhibits significant UI freezes (700-1700ms) after cell edits. The primary
+causes are:
 
-1. **False conflict detection** - Every save triggers spurious "external change" detection (CONFIRMED)
-2. **Cascading operations** - Each false conflict triggers reload → getDerivedColumnsConfig → derived computations
-3. **File watcher detecting self-modifications** - Watcher emits events for our own saves
+1. **False conflict detection** - Every save triggers spurious "external change"
+   detection (CONFIRMED)
+2. **Cascading operations** - Each false conflict triggers reload →
+   getDerivedColumnsConfig → derived computations
+3. **File watcher detecting self-modifications** - Watcher emits events for our
+   own saves
 
 ## Latest Findings (Post-Instrumentation)
 
@@ -23,7 +27,9 @@ Enhanced backend logging confirmed the root causes:
 14:56:30.803  get_derived_columns_config: total=25ms (parse=25ms)
 ```
 
-The backend operations are fast (~25-50ms). The 600-1400ms delays observed from the frontend were caused by **cascading operations triggered by false conflict detection**, not slow backend code.
+The backend operations are fast (~25-50ms). The 600-1400ms delays observed from
+the frontend were caused by **cascading operations triggered by false conflict
+detection**, not slow backend code.
 
 ### False Conflict Detection Confirmed
 
@@ -35,7 +41,8 @@ The backend operations are fast (~25-50ms). The 600-1400ms delays observed from 
               external_change_detected=true
 ```
 
-The mtime increased by ~4 seconds because **we wrote the file**. The conflict detection logic incorrectly flags this as an external change.
+The mtime increased by ~4 seconds because **we wrote the file**. The conflict
+detection logic incorrectly flags this as an external change.
 
 ### File Watcher Detecting Self-Modifications
 
@@ -44,7 +51,8 @@ The mtime increased by ~4 seconds because **we wrote the file**. The conflict de
 14:56:31.315  File watcher event will be emitted (T+619ms after save)
 ```
 
-The file watcher is emitting events for modifications we made, causing additional reload cycles.
+The file watcher is emitting events for modifications we made, causing
+additional reload cycles.
 
 ## Symptom Timeline
 
@@ -67,7 +75,8 @@ T+1200ms   saveData total: 700-1700ms (due to cascading operations)
 
 ### Observed Behavior (Before Instrumentation)
 
-The `getDerivedColumnsConfig` IPC call consistently took **600-1400ms** as observed from frontend perf logs:
+The `getDerivedColumnsConfig` IPC call consistently took **600-1400ms** as
+observed from frontend perf logs:
 ```
 14:39:00.740  getDerivedColumnsConfig: 603ms
 14:39:03.284  getDerivedColumnsConfig: 661ms
@@ -85,16 +94,22 @@ Backend logging reveals the actual execution time is only **25ms**:
 
 ### Root Cause (Clarified)
 
-The 600-1400ms delays were **not** caused by slow backend parsing. They were caused by:
+The 600-1400ms delays were **not** caused by slow backend parsing. They were
+caused by:
 
-1. **Cascading from false conflict detection**: The conflict triggers a reload, which blocks subsequent IPC calls
-2. **Multiple calls per save**: The function is called twice per save cycle (once in save path, once in reload path)
-3. **JavaScript main thread blocking**: Univer spreadsheet operations during reload block the event loop
+1. **Cascading from false conflict detection**: The conflict triggers a reload,
+   which blocks subsequent IPC calls
+2. **Multiple calls per save**: The function is called twice per save cycle
+   (once in save path, once in reload path)
+3. **JavaScript main thread blocking**: Univer spreadsheet operations during
+   reload block the event loop
 
 ### Architectural Problem
 
-`getDerivedColumnsConfig` is called on **every save** at line 477 of `app_root.tsx`, but:
-- The derived column configs rarely change (only when metadata section is edited)
+`getDerivedColumnsConfig` is called on **every save** at line 477 of
+`app_root.tsx`, but:
+- The derived column configs rarely change (only when metadata section is
+  edited)
 - The configs are already available in React state from initial load
 - Each call re-reads and re-parses the entire 78KB TOML file
 
@@ -119,7 +134,8 @@ Only refresh configs when:
 
 ### Observed Behavior
 
-Every `File saved` event is immediately followed by `Conflict detected` with `external_change_detected=true`:
+Every `File saved` event is immediately followed by `Conflict detected` with
+`external_change_detected=true`:
 
 ```
 14:56:30.648  begin_save: mtime_before_save_ms=1769640986612
@@ -135,10 +151,12 @@ The mtime increased by 4069ms because **our save operation updated the file**.
 ### Root Cause (Verified)
 
 In `state_machine.rs`, `check_for_external_changes()` compares:
-- `mtime_before`: File modification time recorded when save began (before we wrote)
+- `mtime_before`: File modification time recorded when save began (before we
+  wrote)
 - `current_mtime`: File modification time after save completed (after we wrote)
 
-The logic `current_mtime > mtime_before` will **always be true** after a successful save because our save operation updates the file's mtime.
+The logic `current_mtime > mtime_before` will **always be true** after a
+successful save because our save operation updates the file's mtime.
 
 ```rust
 // state_machine.rs - the bug
@@ -159,7 +177,8 @@ Each false conflict:
 
 ### Recommendation
 
-**Option A**: Record the mtime immediately after writing, then compare against that:
+**Option A**: Record the mtime immediately after writing, then compare against
+that:
 ```rust
 // In end_save(), after atomic write completes:
 let mtime_after_our_save = get_file_mtime(&path);
@@ -167,9 +186,11 @@ let mtime_after_our_save = get_file_mtime(&path);
 // external_change = current_mtime > mtime_after_our_save
 ```
 
-**Option B**: Skip conflict detection entirely for self-initiated saves. The file watcher already handles external changes.
+**Option B**: Skip conflict detection entirely for self-initiated saves. The
+file watcher already handles external changes.
 
-**Option C**: Use file content hash instead of mtime to detect actual content changes.
+**Option C**: Use file content hash instead of mtime to detect actual content
+changes.
 
 ## Issue 3: File Watcher Detecting Self-Modifications
 
@@ -185,16 +206,19 @@ The file watcher emits events 500-600ms after our own save completes:
 
 ### Root Cause
 
-The file watcher uses `notify-debouncer-mini` with 500ms debouncing. When we save a file:
+The file watcher uses `notify-debouncer-mini` with 500ms debouncing. When we
+save a file:
 1. Our atomic write modifies the file
 2. The OS notifies the watcher
 3. After 500ms debounce, the watcher emits the event
-4. The `is_busy()` check in `file_watcher.rs:227` returns `false` because the save already completed
+4. The `is_busy()` check in `file_watcher.rs:227` returns `false` because the
+   save already completed
 5. The watcher emits a `toml-file-changed` event for our own modification
 
 ### Impact
 
-This causes a second reload cycle after the false-conflict-triggered reload, compounding the performance issue.
+This causes a second reload cycle after the false-conflict-triggered reload,
+compounding the performance issue.
 
 ### Recommendation
 
@@ -230,7 +254,8 @@ Likely causes:
 
 ### Recommendation
 
-Audit event listener registration in `app_root.tsx` to ensure single subscription.
+Audit event listener registration in `app_root.tsx` to ensure single
+subscription.
 
 ## Issue 5: File System Latency (Minor)
 
@@ -250,7 +275,8 @@ This is acceptable and **not** the primary cause of the 600-1400ms delays.
 
 ### Recommendation
 
-Low priority. The primary issues are the cascading operations from false conflict detection.
+Low priority. The primary issues are the cascading operations from false
+conflict detection.
 
 ## Performance Logging Adequacy
 
@@ -274,8 +300,8 @@ After this analysis, the following logging was added:
 | `get_derived_columns_config` | `tv.commands.derived` | `parse_duration_ms`, `total_duration_ms` |
 | `parse_derived_columns_with_fs` | `tv.toml.metadata.derived` | `read_duration_ms`, `parse_duration_ms`, `content_bytes` |
 | `save_toml_document` | `tv.toml` | `read_duration_ms`, `parse_duration_ms`, `write_duration_ms`, `content_bytes`, `output_bytes` |
-| `check_for_external_changes` | `tv.sync.state_machine` | `mtime_before_ms`, `mtime_after_ms`, `external_change_detected` |
-| `begin_save` | `tv.sync.state_machine` | `mtime_before_save_ms` |
+| `begin_save` | `tv.sync.state_machine` | `from_state` |
+| `end_save` | `tv.sync.state_machine` | `success`, `final_state` |
 | File watcher events | `tv.sync.watcher` | `event_timestamp_ms` |
 
 ### Remaining Logging Gaps
@@ -289,24 +315,44 @@ After this analysis, the following logging was added:
 
 ## Recommended Fixes (Priority Order)
 
-### P0: Fix False Conflict Detection (Root Cause)
+### P0: Fix False Conflict Detection (Root Cause) ✅ FIXED
 
-The conflict detection logic incorrectly flags self-modifications. This is the **primary cause** of the cascading performance issues.
+**Status:** Implemented on 2026-01-28
 
-**Problem:** `check_for_external_changes()` compares mtime before save to mtime after save. Since our save updates the mtime, this always returns `true`.
+**Solution:** Removed false positive conflict detection entirely from
+`end_save()`. The mtime-based conflict detection was fundamentally flawed
+because it always detected our own write as a "conflict".
 
-**Fix options:**
-1. Record mtime after our write completes, compare against that for future checks
-2. Skip conflict detection for self-initiated saves entirely
-3. Use content hash instead of mtime
+**Changes made:**
+- Modified `end_save()` in `state_machine.rs` to skip conflict detection
+- Removed `check_for_external_changes()`, `emit_conflict_detected()`, and
+  `ConflictDetectedPayload` (all now dead code)
+- Removed `mtime_before_operation` field from `FileSyncState` struct
 
-**Fix location:** `state_machine.rs:304-330`
+**Why this is safe:**
+1. The frontend's `saveData()` (lines 474-498 in `app_root.tsx`) already
+   explicitly calls `getDerivedColumnsConfig()` and `triggerDerivedComputations()`
+   after every successful save. Derived columns will continue to update.
+2. The file watcher system handles genuine external changes. The frontend has
+   1500ms self-save suppression (`lastSaveTimeRef`) to avoid reacting to watcher
+   events from our own saves.
+3. The old conflict detection couldn't reliably detect true concurrent external
+   writes anyway - it only compared mtimes, and by the time we checked, we had
+   already overwritten the file.
+
+**Previous problem:** `check_for_external_changes()` compared mtime before save
+to mtime after save. Since our save updates the mtime, this always returned
+`true`, causing false positive conflict detection on every successful save.
+
+**Previous fix location:** `state_machine.rs:304-330` (code now removed)
 
 ### P1: Suppress File Watcher During Save Window
 
-The file watcher detects our own modifications and triggers additional reload cycles.
+The file watcher detects our own modifications and triggers additional reload
+cycles.
 
-**Problem:** The 500ms debounce means watcher events arrive after `is_busy()` returns false.
+**Problem:** The 500ms debounce means watcher events arrive after `is_busy()`
+returns false.
 
 **Fix options:**
 1. Extend busy window to 600ms after save
@@ -331,7 +377,9 @@ Audit and fix the triple conflict event subscription.
 
 ## Risk Analysis: Protecting Derived Column Functionality
 
-**CRITICAL**: The derived column system has had **9+ significant bugs** in the past month. Any performance fix must be implemented with extreme care to avoid breaking this fragile feature.
+**CRITICAL**: The derived column system has had **9+ significant bugs** in the
+past month. Any performance fix must be implemented with extreme care to avoid
+breaking this fragile feature.
 
 ### Historical Bug Timeline
 
@@ -349,15 +397,21 @@ Audit and fix the triple conflict event subscription.
 
 ### The Critical Bug That Almost Shipped (Jan 26)
 
-**Commit `dde657e0`** fixed a bug where derived columns **completely stopped updating** after the UI freeze fix was applied. The root cause:
+**Commit `dde657e0`** fixed a bug where derived columns **completely stopped
+updating** after the UI freeze fix was applied. The root cause:
 
-> The derived column system had an **implicit dependency** on the reload-after-save cycle. When we suppressed self-triggered reloads to fix the UI freeze, we also removed the **only mechanism** that was triggering derived computations.
+> The derived column system had an **implicit dependency** on the
+> reload-after-save cycle. When we suppressed self-triggered reloads to fix the
+> UI freeze, we also removed the **only mechanism** that was triggering derived
+> computations.
 
-**Lesson**: The current (buggy) behavior may be **load-bearing**. Features may depend on side effects we intend to remove.
+**Lesson**: The current (buggy) behavior may be **load-bearing**. Features may
+depend on side effects we intend to remove.
 
 ### Invariants That Must Be Preserved
 
-Based on deep-dive analysis of the codebase, these invariants are **critical for derived column correctness**:
+Based on deep-dive analysis of the codebase, these invariants are **critical for
+derived column correctness**:
 
 | Invariant | Location | What Breaks If Violated |
 |-----------|----------|-------------------------|
@@ -386,7 +440,8 @@ The conflict detection triggers a reload, which triggers:
 - Images will not re-render
 
 **Mitigation:**
-- [ ] Keep `triggerDerivedComputations()` call after save (already exists at line 486)
+- [ ] Keep `triggerDerivedComputations()` call after save (already exists at
+  line 486)
 - [ ] Verify `updateLookupContext()` is called when row count changes
 - [ ] Add integration test: edit cell → verify derived column updates
 - [ ] Add integration test: add row → verify new row gets derived values
@@ -395,7 +450,8 @@ The conflict detection triggers a reload, which triggers:
 
 **Risk Level: MEDIUM**
 
-The file watcher is the **only detection mechanism** for external changes. If suppression window is too long:
+The file watcher is the **only detection mechanism** for external changes. If
+suppression window is too long:
 - Rapid external edits (e.g., from another tool) won't trigger reload
 - Derived columns will show stale values
 - User may overwrite external changes
@@ -407,8 +463,10 @@ The file watcher is the **only detection mechanism** for external changes. If su
 **Mitigation:**
 - [ ] Use timestamp-based suppression, not state-based
 - [ ] Keep suppression window minimal (600ms, not longer)
-- [ ] Add integration test: external edit during save window → verify reload happens
-- [ ] Add integration test: external edit after save window → verify reload happens
+- [ ] Add integration test: external edit during save window → verify reload
+  happens
+- [ ] Add integration test: external edit after save window → verify reload
+  happens
 
 #### P2: Cache getDerivedColumnsConfig Results
 
@@ -432,7 +490,8 @@ The configs only change when metadata section is edited. Caching is safe **if**:
 
 **Risk Level: LOW**
 
-Triple event subscription is purely a performance issue. Fixing it should not affect correctness.
+Triple event subscription is purely a performance issue. Fixing it should not
+affect correctness.
 
 **Mitigation:**
 - [ ] Audit `useEffect` cleanup functions in `app_root.tsx`
@@ -442,13 +501,15 @@ Triple event subscription is purely a performance issue. Fixing it should not af
 
 **Current Bug (Not Yet Fixed):**
 
-When `reloadSheet()` is called, the generation tracker is **NOT cleared or incremented**:
+When `reloadSheet()` is called, the generation tracker is **NOT cleared or
+incremented**:
 - Old in-flight computations have generation N
 - New computations also get generation N (same row, no edit)
 - Both pass `is_generation_current()` validation
 - Race condition: whichever finishes last wins
 
-**Impact**: After reload, derived columns may briefly show stale values before correct values arrive.
+**Impact**: After reload, derived columns may briefly show stale values before
+correct values arrive.
 
 **This bug is SEPARATE from the performance issues** but should be tracked:
 - [ ] Consider calling `increment_generation()` for all rows on reload
@@ -538,10 +599,11 @@ grep "stale" ~/Library/Application\ Support/tv/logs/tv_*.jsonl | tail -20
 After implementing fixes, verify improvement by checking:
 
 ```bash
-# Check for false conflict detection (should show external_change_detected=false after fix)
-grep "external_change_detected" ~/Library/Application\ Support/tv/logs/tv_*.jsonl | tail -20
+# P0 FIXED: Conflict detection removed entirely, no more "external_change_detected" logs
+# To verify: there should be no sync-conflict-detected events during normal saves
+grep "sync-conflict-detected" ~/Library/Application\ Support/tv/logs/tv_*.jsonl | tail -20
 
-# Check file watcher events (should not fire immediately after saves)
+# Check file watcher events (should not fire immediately after saves, still P1)
 grep "File watcher event" ~/Library/Application\ Support/tv/logs/tv_*.jsonl | tail -20
 
 # Check backend timing (should remain fast)
@@ -550,19 +612,20 @@ grep "get_derived_columns_config completed" ~/Library/Application\ Support/tv/lo
 # Check File saved timing breakdown
 grep "File saved" ~/Library/Application\ Support/tv/logs/tv_*.jsonl | tail -20
 
-# Check frontend saveData total timing
+# Check frontend saveData total timing (should be <200ms after P0 fix)
 grep "saveData total" ~/Library/Application\ Support/tv/logs/tv_perf_*.jsonl | tail -20
 ```
 
 ### Target Metrics After Fixes
 
-| Metric | Current | Target |
-|--------|---------|--------|
-| `external_change_detected` | Always `true` | `false` for self-saves |
-| File watcher events after save | 2 events at +500ms | 0 events |
-| `get_derived_columns_config` calls per save | 2 | 0 (use cache) |
-| `saveData total` (frontend) | 700-1700ms | <200ms |
-| Backend `File saved` | 47ms | 47ms (already fast) |
+| Metric | Before P0 Fix | After P0 Fix | Target |
+|--------|---------------|--------------|--------|
+| `external_change_detected` | Always `true` | N/A (removed) | ✅ Fixed |
+| Conflict-triggered reloads | 1 per save | 0 | ✅ Fixed |
+| File watcher events after save | 2 events at +500ms | 2 events (suppressed by frontend) | P1 |
+| `get_derived_columns_config` calls per save | 2 | 1 | P2: 0 (use cache) |
+| `saveData total` (frontend) | 700-1700ms | Expected <200ms | Verify after P0 |
+| Backend `File saved` | 47ms | 47ms | Already fast |
 
 ## Appendix: Log Inspection Commands
 
@@ -594,7 +657,9 @@ grep -E "Saving state|File saved|external_change|watcher event" ~/Library/Applic
 
 ## Appendix: Sample Log Trace (Post-Instrumentation)
 
-A single cell edit now produces this log trace:
+### Before P0 Fix
+
+A single cell edit produced this problematic log trace:
 
 ```
 14:56:30.648 [tv.sync.state_machine] Transitioned to Saving state
@@ -607,7 +672,7 @@ A single cell edit now produces this log trace:
 14:56:30.697 [tv.sync.state_machine] Checked for external changes after save
              mtime_before_ms=1769640986612
              mtime_after_ms=1769640990681
-             external_change_detected=true  ← BUG: false positive
+             external_change_detected=true  ← BUG: false positive (FIXED in P0)
 
 14:56:30.802 [tv.toml.metadata.derived] Parsed derived columns from file
              read=0ms, parse=25ms, content_bytes=77556
@@ -616,5 +681,31 @@ A single cell edit now produces this log trace:
              parse=25ms, total=25ms
 
 14:56:31.210 [tv.sync.watcher] File watcher event will be emitted
-             event_timestamp_ms=1769640991210  ← BUG: self-modification detected
+             event_timestamp_ms=1769640991210  ← Still fires (P1), but frontend suppresses
+```
+
+### After P0 Fix
+
+Expected log trace for a single cell edit:
+
+```
+14:56:30.648 [tv.sync.state_machine] Transitioned to Saving state
+             from_state=idle
+
+14:56:30.696 [tv.toml] File saved
+             duration_ms=47, read=0ms, parse=26ms, write=15ms
+             content_bytes=77576, output_bytes=77556
+
+14:56:30.697 [tv.sync.state_machine] Save operation completed
+             success=true, final_state=idle
+             (No conflict detection - removed in P0 fix)
+
+14:56:30.802 [tv.toml.metadata.derived] Parsed derived columns from file
+             read=0ms, parse=25ms, content_bytes=77556
+
+14:56:30.803 [tv.commands.derived] get_derived_columns_config completed
+             parse=25ms, total=25ms
+
+14:56:31.210 [tv.sync.watcher] File watcher event will be emitted
+             (Frontend suppresses via lastSaveTimeRef - within 1500ms window)
 ```

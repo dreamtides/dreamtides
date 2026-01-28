@@ -61,21 +61,13 @@ pub struct SyncStateChangedPayload {
     pub timestamp: u64,
 }
 
-#[derive(Clone, Serialize)]
-#[serde(rename_all = "camelCase")]
-pub struct ConflictDetectedPayload {
-    pub file_path: String,
-    pub message: String,
-}
-
 struct FileSyncState {
     state: AtomicU8,
-    mtime_before_operation: Mutex<Option<SystemTime>>,
 }
 
 impl FileSyncState {
     fn new() -> Self {
-        Self { state: AtomicU8::new(STATE_IDLE), mtime_before_operation: Mutex::new(None) }
+        Self { state: AtomicU8::new(STATE_IDLE) }
     }
 
     fn get_state(&self) -> SyncState {
@@ -157,13 +149,6 @@ pub fn begin_save(app_handle: &AppHandle, file_path: &str) -> Result<(), TvError
         });
     }
 
-    let mtime = get_file_mtime(&path);
-    let mtime_ms = mtime
-        .and_then(|t| t.duration_since(SystemTime::UNIX_EPOCH).ok())
-        .map(|d| d.as_millis())
-        .unwrap_or(0);
-    *file_state.mtime_before_operation.lock().unwrap_or_else(|e| e.into_inner()) = mtime;
-
     drop(states);
 
     emit_sync_state(app_handle, file_path, SyncState::Saving);
@@ -172,7 +157,6 @@ pub fn begin_save(app_handle: &AppHandle, file_path: &str) -> Result<(), TvError
         component = "tv.sync.state_machine",
         file_path = %file_path,
         from_state = %current.as_str(),
-        mtime_before_save_ms = %mtime_ms,
         "Transitioned to Saving state"
     );
 
@@ -180,6 +164,17 @@ pub fn begin_save(app_handle: &AppHandle, file_path: &str) -> Result<(), TvError
 }
 
 /// Completes a save operation, transitioning to Idle or Error based on success.
+///
+/// Note: We do NOT check for external changes here. The previous implementation
+/// compared the file mtime before save to the mtime after save, but this always
+/// detected our own write as a "conflict" since we just modified the file. This
+/// caused false positive conflict detection on every successful save, triggering
+/// unnecessary reload cycles.
+///
+/// External file changes are reliably detected by the file watcher system. If
+/// an external editor modifies the file after our save completes, the watcher
+/// will emit a `toml-file-changed` event. The frontend has self-save suppression
+/// (1500ms window) to avoid reacting to watcher events from our own saves.
 pub fn end_save(
     app_handle: &AppHandle,
     file_path: &str,
@@ -188,52 +183,29 @@ pub fn end_save(
     let state = app_handle.state::<SyncStateMachineState>();
     let path = PathBuf::from(file_path);
 
-    let external_change_detected: bool;
     let final_state: SyncState;
 
     {
         let states = state.file_states.lock().unwrap_or_else(|e| e.into_inner());
         if let Some(file_state) = states.get(&path) {
-            let mtime_before =
-                *file_state.mtime_before_operation.lock().unwrap_or_else(|e| e.into_inner());
-
-            external_change_detected =
-                if success { check_for_external_changes(&path, mtime_before) } else { false };
-
             final_state = if success { SyncState::Idle } else { SyncState::Error };
-
             file_state.force_state(final_state);
         } else {
-            external_change_detected = false;
             final_state = SyncState::Idle;
         }
     }
 
     emit_sync_state(app_handle, file_path, final_state);
 
-    if external_change_detected {
-        emit_conflict_detected(
-            app_handle,
-            file_path,
-            "File was modified externally during save. Reload recommended.",
-        );
-        tracing::warn!(
-            component = "tv.sync.state_machine",
-            file_path = %file_path,
-            "External modification detected during save window"
-        );
-    }
-
     tracing::debug!(
         component = "tv.sync.state_machine",
         file_path = %file_path,
         success = success,
-        external_change = external_change_detected,
         final_state = %final_state.as_str(),
         "Save operation completed"
     );
 
-    Ok(external_change_detected)
+    Ok(false)
 }
 
 /// Attempts to transition to the Loading state from Idle or Error.
@@ -302,43 +274,6 @@ pub fn end_load(app_handle: &AppHandle, file_path: &str, success: bool) {
     );
 }
 
-fn get_file_mtime(path: &Path) -> Option<SystemTime> {
-    std::fs::metadata(path).ok().and_then(|m| m.modified().ok())
-}
-
-fn check_for_external_changes(path: &Path, mtime_before: Option<SystemTime>) -> bool {
-    let Some(before) = mtime_before else {
-        tracing::debug!(
-            component = "tv.sync.state_machine",
-            file_path = %path.display(),
-            "No mtime_before recorded, skipping external change check"
-        );
-        return false;
-    };
-
-    let Some(current_mtime) = get_file_mtime(path) else {
-        tracing::debug!(
-            component = "tv.sync.state_machine",
-            file_path = %path.display(),
-            "Could not get current mtime, skipping external change check"
-        );
-        return false;
-    };
-
-    let changed = current_mtime > before;
-
-    tracing::info!(
-        component = "tv.sync.state_machine",
-        file_path = %path.display(),
-        mtime_before_ms = %before.duration_since(SystemTime::UNIX_EPOCH).map(|d| d.as_millis()).unwrap_or(0),
-        mtime_after_ms = %current_mtime.duration_since(SystemTime::UNIX_EPOCH).map(|d| d.as_millis()).unwrap_or(0),
-        external_change_detected = changed,
-        "Checked for external changes after save"
-    );
-
-    changed
-}
-
 fn emit_sync_state(app_handle: &AppHandle, file_path: &str, state: SyncState) {
     let timestamp = SystemTime::now()
         .duration_since(SystemTime::UNIX_EPOCH)
@@ -353,20 +288,6 @@ fn emit_sync_state(app_handle: &AppHandle, file_path: &str, state: SyncState) {
             file_path = %file_path,
             error = %e,
             "Failed to emit sync state event"
-        );
-    }
-}
-
-fn emit_conflict_detected(app_handle: &AppHandle, file_path: &str, message: &str) {
-    let payload =
-        ConflictDetectedPayload { file_path: file_path.to_string(), message: message.to_string() };
-
-    if let Err(e) = app_handle.emit("sync-conflict-detected", payload) {
-        tracing::error!(
-            component = "tv.sync.state_machine",
-            file_path = %file_path,
-            error = %e,
-            "Failed to emit conflict detected event"
         );
     }
 }
