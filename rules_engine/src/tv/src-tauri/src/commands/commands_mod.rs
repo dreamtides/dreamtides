@@ -4,6 +4,7 @@ pub mod filter_command;
 pub mod image_command;
 pub mod load_command;
 pub mod log_command;
+pub mod permission_command;
 pub mod row_command;
 pub mod save_command;
 pub mod sheet_order_command;

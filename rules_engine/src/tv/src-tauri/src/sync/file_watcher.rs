@@ -10,6 +10,7 @@ use serde::Serialize;
 use tauri::{AppHandle, Emitter, Manager};
 
 use crate::error::error_types::TvError;
+use crate::error::permission_recovery::{self, PermissionState};
 use crate::sync::state_machine;
 
 #[derive(Clone, Serialize)]
@@ -246,6 +247,20 @@ fn run_watcher(
                     file_path = %file_path,
                     "Watched file no longer exists"
                 );
+
+                // Update permission state to unreadable (file may have been deleted
+                // or network drive disconnected)
+                let message = permission_recovery::get_permission_error_message(
+                    PermissionState::Unreadable,
+                    &file_path,
+                );
+                permission_recovery::set_permission_state(
+                    &app_handle,
+                    &file_path,
+                    PermissionState::Unreadable,
+                    &message,
+                );
+
                 let payload = FileChangedPayload {
                     file_path: file_path.clone(),
                     event_type: "delete".to_string(),
@@ -259,6 +274,40 @@ fn run_watcher(
                     );
                 }
                 continue;
+            }
+
+            // Check if permissions have changed (file might have been restored or
+            // permissions modified)
+            let current_perm = permission_recovery::detect_permission_state(path);
+            let previous_perm = permission_recovery::get_permission_state(&app_handle, &file_path);
+
+            if current_perm != previous_perm {
+                let message =
+                    permission_recovery::get_permission_error_message(current_perm, &file_path);
+                permission_recovery::set_permission_state(
+                    &app_handle,
+                    &file_path,
+                    current_perm,
+                    &message,
+                );
+
+                // If permissions were restored to ReadWrite, try to apply pending updates
+                if current_perm == PermissionState::ReadWrite
+                    && previous_perm != PermissionState::ReadWrite
+                {
+                    let pending_count =
+                        permission_recovery::get_pending_update_count(&app_handle, &file_path);
+                    if pending_count > 0 {
+                        tracing::info!(
+                            component = "tv.sync",
+                            file_path = %file_path,
+                            pending_count = pending_count,
+                            "Permissions restored, attempting to apply pending updates"
+                        );
+                        // Note: actual retry will be triggered by frontend upon receiving
+                        // the permission state change event
+                    }
+                }
             }
 
             let payload = FileChangedPayload {

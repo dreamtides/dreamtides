@@ -418,6 +418,17 @@ export interface SyncConflictPayload {
   message: string;
 }
 
+// ============ Permission State ============
+
+export type PermissionState = "read_write" | "read_only" | "unreadable";
+
+export interface PermissionStateChangedPayload {
+  filePath: string;
+  state: PermissionState;
+  message: string;
+  pendingUpdateCount: number;
+}
+
 export interface DerivedFunctionFailedPayload {
   function_name: string;
   error: string;
@@ -859,6 +870,34 @@ export async function saveViewState(
   return invoke("save_view_state", { activeSheetPath });
 }
 
+// ============ Permission Commands ============
+
+export async function getPermissionState(
+  filePath: string,
+): Promise<PermissionState> {
+  return invoke<PermissionState>("get_permission_state", { filePath });
+}
+
+export async function getPendingUpdateCount(filePath: string): Promise<number> {
+  return invoke<number>("get_pending_update_count", { filePath });
+}
+
+export async function retryPendingUpdates(filePath: string): Promise<number> {
+  return invoke<number>("retry_pending_updates", { filePath });
+}
+
+export async function checkPermissionState(
+  filePath: string,
+): Promise<PermissionStateChangedPayload> {
+  return invoke<PermissionStateChangedPayload>("check_permission_state", {
+    filePath,
+  });
+}
+
+export async function clearPermissionState(filePath: string): Promise<void> {
+  return invoke("clear_permission_state", { filePath });
+}
+
 // ============ Sheet Order Commands ============
 
 export interface SheetOrder {
@@ -1007,6 +1046,24 @@ export function onDerivedFunctionFailed(
   let unlisten: UnlistenFn | null = null;
 
   listen<DerivedFunctionFailedPayload>("derived-function-failed", (event) => {
+    callback(event.payload);
+  }).then((fn) => {
+    unlisten = fn;
+  });
+
+  return {
+    dispose: () => {
+      if (unlisten) unlisten();
+    },
+  };
+}
+
+export function onPermissionStateChanged(
+  callback: (payload: PermissionStateChangedPayload) => void,
+): Disposable {
+  let unlisten: UnlistenFn | null = null;
+
+  listen<PermissionStateChangedPayload>("permission-state-changed", (event) => {
     callback(event.payload);
   }).then((fn) => {
     unlisten = fn;

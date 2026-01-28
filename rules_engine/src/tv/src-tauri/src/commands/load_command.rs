@@ -1,6 +1,7 @@
 use tauri::{AppHandle, State};
 
 use crate::error::error_types::TvError;
+use crate::error::permission_recovery;
 use crate::filter::filter_state::FilterStateManager;
 use crate::filter::filter_types::{ColumnFilterState, FilterConditionState, FilterState};
 use crate::sort::sort_state::SortStateManager;
@@ -32,6 +33,18 @@ pub fn load_toml_table(
     restore_filter_state_from_metadata(&filter_state_manager, &file_path, &table_name);
 
     let result = document_loader::load_toml_document(&file_path, &table_name);
+
+    // Handle permission errors by updating permission state
+    if let Err(ref e) = result {
+        permission_recovery::handle_permission_error(&app_handle, &file_path, e);
+    } else {
+        // On successful load, check and update write permissions
+        let perm_state =
+            permission_recovery::detect_permission_state(std::path::Path::new(&file_path));
+        let message = permission_recovery::get_permission_error_message(perm_state, &file_path);
+        permission_recovery::set_permission_state(&app_handle, &file_path, perm_state, &message);
+    }
+
     state_machine::end_load(&app_handle, &file_path, result.is_ok());
     result
 }

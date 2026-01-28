@@ -4,6 +4,7 @@ use tauri::menu::{CheckMenuItem, Menu, MenuItem, MenuItemKind};
 use tauri::{Emitter, Manager};
 
 use crate::derived::compute_executor::ComputeExecutorState;
+use crate::error::permission_recovery::PermissionRecoveryState;
 use crate::filter::filter_state::FilterStateManager;
 use crate::images::image_fetcher::ImageFetcherState;
 
@@ -190,6 +191,7 @@ pub fn run(paths: cli::AppPaths) {
         .manage(FilterStateManager::new())
         .manage(executor_state)
         .manage(ImageFetcherState::new())
+        .manage(PermissionRecoveryState::new())
         .invoke_handler(tauri::generate_handler![
             commands::load_command::load_toml_table,
             commands::save_command::save_toml_table,
@@ -233,6 +235,11 @@ pub fn run(paths: cli::AppPaths) {
             commands::view_state_command::save_view_state,
             commands::sheet_order_command::load_sheet_order,
             commands::sheet_order_command::save_sheet_order,
+            commands::permission_command::get_permission_state,
+            commands::permission_command::get_pending_update_count,
+            commands::permission_command::retry_pending_updates,
+            commands::permission_command::check_permission_state,
+            commands::permission_command::clear_permission_state,
             get_app_paths,
         ])
         .setup(|app| {

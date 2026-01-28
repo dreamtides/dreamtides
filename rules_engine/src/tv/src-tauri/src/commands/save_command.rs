@@ -3,6 +3,7 @@ use std::collections::HashMap;
 use tauri::AppHandle;
 
 use crate::error::error_types::TvError;
+use crate::error::permission_recovery::{self, PermissionState};
 use crate::sync::state_machine;
 use crate::toml::document_loader::TomlTableData;
 use crate::toml::document_writer::{
@@ -35,10 +36,49 @@ pub fn save_cell(
     column_key: String,
     value: serde_json::Value,
 ) -> Result<SaveCellResult, TvError> {
+    // Check if file is in read-only mode due to permission issues
+    let permission_state = permission_recovery::get_permission_state(&app_handle, &file_path);
+    if permission_state == PermissionState::ReadOnly {
+        // Queue the update for later retry
+        let update = CellUpdate { row_index, column_key: column_key.clone(), value };
+        permission_recovery::queue_pending_update(&app_handle, &file_path, &table_name, update);
+
+        tracing::warn!(
+            component = "tv.commands.save",
+            file_path = %file_path,
+            row_index = row_index,
+            column_key = %column_key,
+            "Save rejected due to read-only permissions, update queued"
+        );
+
+        return Err(TvError::PermissionDenied {
+            path: file_path,
+            operation: "write".to_string(),
+        });
+    }
+
     state_machine::begin_save(&app_handle, &file_path)?;
 
-    let update = CellUpdate { row_index, column_key, value };
+    let update = CellUpdate { row_index, column_key: column_key.clone(), value: value.clone() };
     let result = document_writer::save_cell(&file_path, &table_name, &update);
+
+    // Handle permission errors by updating state and queueing the update
+    if let Err(ref e) = result {
+        if matches!(e, TvError::PermissionDenied { .. }) {
+            let new_state = permission_recovery::handle_permission_error(&app_handle, &file_path, e);
+            if new_state == PermissionState::ReadOnly {
+                let update_to_queue =
+                    CellUpdate { row_index, column_key, value };
+                permission_recovery::queue_pending_update(
+                    &app_handle,
+                    &file_path,
+                    &table_name,
+                    update_to_queue,
+                );
+            }
+        }
+    }
+
     let _ = state_machine::end_save(&app_handle, &file_path, result.is_ok());
 
     result
@@ -52,9 +92,53 @@ pub fn save_batch(
     table_name: String,
     updates: Vec<CellUpdate>,
 ) -> Result<SaveBatchResult, TvError> {
+    // Check if file is in read-only mode due to permission issues
+    let permission_state = permission_recovery::get_permission_state(&app_handle, &file_path);
+    if permission_state == PermissionState::ReadOnly {
+        // Queue all updates for later retry
+        for update in &updates {
+            permission_recovery::queue_pending_update(
+                &app_handle,
+                &file_path,
+                &table_name,
+                update.clone(),
+            );
+        }
+
+        tracing::warn!(
+            component = "tv.commands.save",
+            file_path = %file_path,
+            update_count = updates.len(),
+            "Batch save rejected due to read-only permissions, updates queued"
+        );
+
+        return Err(TvError::PermissionDenied {
+            path: file_path,
+            operation: "write".to_string(),
+        });
+    }
+
     state_machine::begin_save(&app_handle, &file_path)?;
 
     let result = document_writer::save_batch(&file_path, &table_name, &updates);
+
+    // Handle permission errors by updating state and queueing updates
+    if let Err(ref e) = result {
+        if matches!(e, TvError::PermissionDenied { .. }) {
+            let new_state = permission_recovery::handle_permission_error(&app_handle, &file_path, e);
+            if new_state == PermissionState::ReadOnly {
+                for update in &updates {
+                    permission_recovery::queue_pending_update(
+                        &app_handle,
+                        &file_path,
+                        &table_name,
+                        update.clone(),
+                    );
+                }
+            }
+        }
+    }
+
     let _ = state_machine::end_save(&app_handle, &file_path, result.is_ok());
 
     result

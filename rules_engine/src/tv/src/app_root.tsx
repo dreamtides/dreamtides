@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { SpreadsheetView } from "./spreadsheet_view";
 import { ErrorBanner } from "./error_banner";
 import * as ipc from "./ipc_bridge";
-import type { TomlTableData, DerivedValuePayload, RowConfig, ColumnConfig } from "./ipc_bridge";
+import type { TomlTableData, DerivedValuePayload, RowConfig, ColumnConfig, PermissionState, PermissionStateChangedPayload } from "./ipc_bridge";
 import type { MultiSheetData, SheetData, DerivedColumnState } from "./spreadsheet_types";
 import { createLogger } from "./logger_frontend";
 
@@ -130,6 +130,8 @@ export function AppRoot() {
   const [rowConfigs, setRowConfigs] = useState<Record<string, RowConfig>>({});
   const [columnConfigs, setColumnConfigs] = useState<Record<string, ColumnConfig[]>>({});
   const [persistedSheetOrder, setPersistedSheetOrder] = useState<string[] | undefined>(undefined);
+  const [permissionStates, setPermissionStates] = useState<Record<string, PermissionState>>({});
+  const [permissionError, setPermissionError] = useState<string | null>(null);
   const saveTimeoutRef = useRef<number | null>(null);
   const isSavingRef = useRef<Record<string, boolean>>({});
   const watchersStartedRef = useRef<Set<string>>(new Set());
@@ -497,8 +499,17 @@ export function AppRoot() {
 
         totalTimer.stop({ success: true });
       } catch (e) {
-        logger.error("Save error", { error: String(e) });
-        totalTimer.stop({ error: String(e) });
+        const errorMsg = String(e);
+        // Check if this is a permission error - these are handled via the
+        // permission state change event, so don't show a generic error
+        if (errorMsg.includes("Permission denied") || errorMsg.includes("permission denied")) {
+          logger.warn("Save failed due to permissions", { error: errorMsg });
+          totalTimer.stop({ permissionError: true });
+        } else {
+          logger.error("Save error", { error: errorMsg });
+          setError(`Failed to save: ${errorMsg}`);
+          totalTimer.stop({ error: errorMsg });
+        }
       } finally {
         isSavingRef.current[sheetId] = false;
       }
@@ -686,12 +697,62 @@ export function AppRoot() {
       setError(`Derived column function "${payload.function_name}" failed: ${payload.error}`);
     });
 
+    const permissionSub = ipc.onPermissionStateChanged((payload: PermissionStateChangedPayload) => {
+      const sheetInfo = sheets.find((s) => s.path === payload.filePath);
+      if (!sheetInfo) return;
+
+      setPermissionStates((prev) => ({
+        ...prev,
+        [sheetInfo.id]: payload.state,
+      }));
+
+      if (payload.state === "read_only") {
+        setPermissionError(payload.message);
+        logger.warn("File became read-only", {
+          filePath: payload.filePath,
+          pendingUpdates: payload.pendingUpdateCount,
+        });
+      } else if (payload.state === "unreadable") {
+        setPermissionError(payload.message);
+        logger.warn("File became unreadable", {
+          filePath: payload.filePath,
+        });
+      } else if (payload.state === "read_write") {
+        // Permissions restored - clear the error and try to apply pending updates
+        setPermissionError(null);
+        if (payload.pendingUpdateCount > 0) {
+          logger.info("Permissions restored, retrying pending updates", {
+            filePath: payload.filePath,
+            pendingUpdates: payload.pendingUpdateCount,
+          });
+          ipc.retryPendingUpdates(payload.filePath)
+            .then((appliedCount) => {
+              if (appliedCount > 0) {
+                logger.info("Applied pending updates after permission restore", {
+                  filePath: payload.filePath,
+                  appliedCount,
+                });
+                // Reload the sheet to reflect the applied changes
+                reloadSheet(sheetInfo.id);
+              }
+            })
+            .catch((e) => {
+              logger.error("Failed to retry pending updates", {
+                filePath: payload.filePath,
+                error: String(e),
+              });
+            });
+        }
+      }
+    });
+
     return () => {
       fileChangedSub.dispose();
       derivedValueSub.dispose();
       syncStateSub.dispose();
       conflictSub.dispose();
       derivedFailedSub.dispose();
+      permissionSub.dispose();
     };
   }, [sheets, reloadSheet]);
 
@@ -724,9 +785,38 @@ export function AppRoot() {
     }
   }, [sheets, loadAllFiles]);
 
+  const handleRetryPermissions = useCallback(async () => {
+    for (const sheet of sheets) {
+      try {
+        const result = await ipc.checkPermissionState(sheet.path);
+        if (result.state === "read_write" && result.pendingUpdateCount > 0) {
+          await ipc.retryPendingUpdates(sheet.path);
+          await reloadSheet(sheet.id);
+        }
+      } catch (e) {
+        logger.error("Failed to check/retry permissions", {
+          path: sheet.path,
+          error: String(e),
+        });
+      }
+    }
+    setPermissionError(null);
+  }, [sheets, reloadSheet]);
+
+  const hasPermissionError = permissionError !== null;
+  const hasError = error !== null || hasPermissionError;
+
   return (
-    <div className={`tv-app ${error ? "has-error" : ""}`}>
-      {error && (
+    <div className={`tv-app ${hasError ? "has-error" : ""}`}>
+      {permissionError && (
+        <ErrorBanner
+          message={permissionError}
+          errorType="warning"
+          onDismiss={() => setPermissionError(null)}
+          actions={[{ label: "Retry", onClick: handleRetryPermissions }]}
+        />
+      )}
+      {error && !permissionError && (
         <ErrorBanner
           message={error}
           errorType="error"
