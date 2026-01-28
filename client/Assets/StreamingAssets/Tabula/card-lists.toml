@@ -163,3 +163,27 @@ frozen_rows = 1
 
 [metadata.table_style]
 color_scheme = "gray"
+
+[[metadata.derived_columns]]
+name = "image"
+function = "image_lookup"
+position = 0
+width = 160
+inputs = ["card_id"]
+url_template = "https://www.shutterstock.com/image-illustration/-260nw-{image_number}.jpg"
+frozen = true
+
+[[metadata.derived_columns]]
+name = "card-name"
+function = "card_lookup"
+position = 1
+width = 180
+inputs = ["card_id"]
+
+[[metadata.columns]]
+key = "list-type"
+width = 130
+
+[[metadata.columns]]
+key = "list-name"
+width = 200

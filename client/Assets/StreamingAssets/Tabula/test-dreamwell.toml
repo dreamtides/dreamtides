@@ -71,3 +71,36 @@ frozen_rows = 1
 
 [metadata.table_style]
 color_scheme = "orange"
+
+[[metadata.derived_columns]]
+name = "image"
+function = "image_derived"
+position = 0
+width = 160
+inputs = ["image_number"]
+url_template = "https://www.shutterstock.com/image-illustration/-260nw-{image_number}.jpg"
+frozen = true
+
+[[metadata.derived_columns]]
+name = "rules preview"
+function = "rules_preview"
+position = 6
+width = 300
+inputs = ["rules-text", "variables"]
+
+[[metadata.columns]]
+key = "name"
+width = 200
+bold = true
+
+[[metadata.columns]]
+key = "rules-text"
+width = 275
+
+[[metadata.columns]]
+key = "id"
+width = 140
+
+[[metadata.columns]]
+key = "preview"
+width = 250

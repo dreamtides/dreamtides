@@ -230,6 +230,22 @@ frozen_rows = 1
 [metadata.table_style]
 color_scheme = "yellow"
 
+[[metadata.derived_columns]]
+name = "image"
+function = "image_lookup"
+position = 0
+width = 160
+inputs = ["card_id"]
+url_template = "https://www.shutterstock.com/image-illustration/-260nw-{image_number}.jpg"
+frozen = true
+
+[[metadata.derived_columns]]
+name = "card-name"
+function = "card_lookup"
+position = 1
+width = 180
+inputs = ["card_id"]
+
 [[metadata.columns]]
 key = "card-id"
 width = 140
@@ -289,19 +305,3 @@ width = 150
 [[metadata.columns]]
 key = "card-trail-address"
 width = 200
-
-[[metadata.derived_columns]]
-name = "image"
-function = "image_lookup"
-position = 0
-width = 160
-inputs = ["card_id"]
-url_template = "https://www.shutterstock.com/image-illustration/-260nw-{image_number}.jpg"
-frozen = true
-
-[[metadata.derived_columns]]
-name = "card-name"
-function = "card_lookup"
-position = 1
-width = 180
-inputs = ["card_id"]

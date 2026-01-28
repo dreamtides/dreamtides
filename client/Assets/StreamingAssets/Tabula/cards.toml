@@ -3429,7 +3429,7 @@ frozen = true
 [[metadata.derived_columns]]
 name = "rules preview"
 function = "rules_preview"
-position = 4
+position = 6
 width = 300
 inputs = ["rules-text", "variables"]
 

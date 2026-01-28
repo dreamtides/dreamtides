@@ -2,12 +2,14 @@
 name = "Test Vanilla Character"
 id = "253ee0ca-f973-4d9f-ad37-abe548bc674f"
 energy-cost = 2
-rules-text = " "
+rules-text = ""
 card-type = "Character"
 subtype = "Musician"
 is-fast = false
 spark = 5
 image-number = 1794244540
+prompts = ""
+variables = ""
 
 [[test-cards]]
 name = "Test Dissolve"
@@ -18,6 +20,9 @@ prompts = "Choose an enemy character to {dissolve}."
 card-type = "Event"
 is-fast = true
 image-number = 1907487244
+subtype = ""
+spark = ""
+variables = ""
 
 [[test-cards]]
 name = "Test Counterspell"
@@ -28,6 +33,9 @@ prompts = "Choose an enemy card to {prevent}."
 card-type = "Event"
 is-fast = true
 image-number = 1282908322
+subtype = ""
+spark = ""
+variables = ""
 
 [[test-cards]]
 name = "Test Counterspell Unless Pays"
@@ -39,6 +47,8 @@ prompts = "Choose an event to {prevent}."
 card-type = "Event"
 is-fast = true
 image-number = 2123360837
+subtype = ""
+spark = ""
 
 [[test-cards]]
 name = "Test Variable Energy Draw"
@@ -47,9 +57,11 @@ energy-cost = 2
 rules-text = "Pay 1 or more {energy-symbol}: Draw {cards} for each {energy-symbol} spent."
 variables = "cards: 1"
 prompts = "Pay one or more ‎: Draw {-drawn-cards(n:1)} for each ‎ spent."
-card-type = "Pay one or more ‎."
+card-type = "Event"
 is-fast = true
 image-number = 489056605
+subtype = ""
+spark = ""
 
 [[test-cards]]
 name = "Test Trigger Gain Spark On Play Card Enemy Turn"
@@ -61,6 +73,8 @@ card-type = "Character"
 is-fast = true
 spark = 1
 image-number = 403770319
+subtype = ""
+prompts = ""
 
 [[test-cards]]
 name = "Test Fast Multi Activated Ability Draw Card Character"
@@ -74,6 +88,8 @@ card-type = "Character"
 is-fast = false
 spark = 2
 image-number = 1794244540
+subtype = ""
+prompts = ""
 
 [[test-cards]]
 name = "Test Return One Or Two Void Event Cards To Hand"
@@ -85,6 +101,8 @@ prompts = "Choose up to 2 events in your void to return."
 card-type = "Event"
 is-fast = false
 image-number = 644603677
+subtype = ""
+spark = ""
 
 [[test-cards]]
 name = "Test Modal Return To Hand Or Draw Two"
@@ -102,6 +120,8 @@ prompts = "Choose an enemy character to return to hand."
 card-type = "Event"
 is-fast = true
 image-number = 1200949264
+subtype = ""
+spark = ""
 
 [[test-cards]]
 name = "Test Prevent Event Which Could Dissolve Ally"
@@ -112,6 +132,9 @@ prompts = "Choose an event to {prevent}."
 card-type = "Event"
 is-fast = true
 image-number = 1621160806
+subtype = ""
+spark = ""
+variables = ""
 
 [[test-cards]]
 name = "Test Foresee One Draw Reclaim"
@@ -128,6 +151,9 @@ reclaim: 3"""
 card-type = "Event"
 is-fast = true
 image-number = 1328168243
+subtype = ""
+spark = ""
+prompts = ""
 
 [[test-cards]]
 name = "Test Counterspell Character"
@@ -138,6 +164,9 @@ prompts = "Choose an enemy character to {prevent}."
 card-type = "Event"
 is-fast = true
 image-number = 1239919309
+subtype = ""
+spark = ""
+variables = ""
 
 [[test-cards]]
 name = "Test Named Dissolve"
@@ -148,6 +177,9 @@ prompts = "Choose an enemy character to {dissolve}."
 card-type = "Event"
 is-fast = true
 image-number = 1907487244
+subtype = ""
+spark = ""
+variables = ""
 
 [[test-cards]]
 name = "Test Draw One"
@@ -158,6 +190,9 @@ variables = "cards: 1"
 card-type = "Event"
 is-fast = true
 image-number = 489056605
+subtype = ""
+spark = ""
+prompts = ""
 
 [[test-cards]]
 name = "Test Trigger Gain Spark When Materialize Another Character"
@@ -169,6 +204,8 @@ card-type = "Character"
 is-fast = false
 spark = 5
 image-number = 403770319
+subtype = ""
+prompts = ""
 
 [[test-cards]]
 name = "Test Trigger Gain Two Spark On Play Card Enemy Turn"
@@ -180,6 +217,8 @@ card-type = "Character"
 is-fast = true
 spark = 5
 image-number = 403770319
+subtype = ""
+prompts = ""
 
 [[test-cards]]
 name = "Test Activated Ability Draw Card"
@@ -193,6 +232,8 @@ card-type = "Character"
 is-fast = false
 spark = 3
 image-number = 1794244540
+subtype = ""
+prompts = ""
 
 [[test-cards]]
 name = "Test Multi Activated Ability Draw Card Character"
@@ -206,6 +247,8 @@ card-type = "Character"
 is-fast = false
 spark = 3
 image-number = 1794244540
+subtype = ""
+prompts = ""
 
 [[test-cards]]
 name = "Test Fast Activated Ability Draw Card Character"
@@ -219,6 +262,8 @@ card-type = "Character"
 is-fast = false
 spark = 3
 image-number = 1794244540
+subtype = ""
+prompts = ""
 
 [[test-cards]]
 name = "Test Activated Ability Dissolve Character"
@@ -231,6 +276,7 @@ card-type = "Character"
 is-fast = false
 spark = 4
 image-number = 1794244540
+subtype = ""
 
 [[test-cards]]
 name = "Test Dual Activated Ability Character"
@@ -249,6 +295,8 @@ card-type = "Character"
 is-fast = false
 spark = 3
 image-number = 1794244540
+subtype = ""
+prompts = ""
 
 [[test-cards]]
 name = "Test Foresee One"
@@ -259,6 +307,9 @@ variables = "foresee: 1"
 card-type = "Event"
 is-fast = true
 image-number = 489056605
+subtype = ""
+spark = ""
+prompts = ""
 
 [[test-cards]]
 name = "Test Foresee Two"
@@ -269,6 +320,9 @@ variables = "foresee: 2"
 card-type = "Event"
 is-fast = true
 image-number = 489056605
+subtype = ""
+spark = ""
+prompts = ""
 
 [[test-cards]]
 name = "Test Foresee One Draw A Card"
@@ -281,6 +335,9 @@ cards: 1"""
 card-type = "Event"
 is-fast = true
 image-number = 1328168243
+subtype = ""
+spark = ""
+prompts = ""
 
 [[test-cards]]
 name = "Test Draw One Reclaim"
@@ -296,6 +353,9 @@ reclaim: 1"""
 card-type = "Event"
 is-fast = true
 image-number = 1328168243
+subtype = ""
+spark = ""
+prompts = ""
 
 [[test-cards]]
 name = "Test Foresee One Reclaim"
@@ -311,6 +371,9 @@ reclaim: 3"""
 card-type = "Event"
 is-fast = true
 image-number = 1328168243
+subtype = ""
+spark = ""
+prompts = ""
 
 [[test-cards]]
 name = "Test Return Void Card To Hand"
@@ -321,6 +384,9 @@ prompts = "Choose a card in your void."
 card-type = "Event"
 is-fast = true
 image-number = 1328168243
+subtype = ""
+spark = ""
+variables = ""
 
 [[test-cards]]
 name = "Test Modal Draw One Or Draw Two"
@@ -338,6 +404,9 @@ cards2: 2"""
 card-type = "Event"
 is-fast = false
 image-number = 1200949264
+subtype = ""
+spark = ""
+prompts = ""
 
 [[test-cards]]
 name = "Test Modal Draw One Or Dissolve Enemy"
@@ -355,6 +424,8 @@ prompts = "Choose an enemy character to {dissolve}."
 card-type = "Event"
 is-fast = true
 image-number = 1200949264
+subtype = ""
+spark = ""
 
 [[test-cards]]
 name = "Test Return To Hand"
@@ -365,6 +436,9 @@ prompts = "Choose an enemy character to return to hand."
 card-type = "Event"
 is-fast = true
 image-number = 1200949264
+subtype = ""
+spark = ""
+variables = ""
 
 [[test-cards]]
 name = "Test Gain Points"
@@ -375,6 +449,9 @@ variables = "points: 2"
 card-type = "Event"
 is-fast = false
 image-number = 1200949264
+subtype = ""
+spark = ""
+prompts = ""
 
 [[test-cards]]
 name = "Test Gain Energy"
@@ -385,6 +462,9 @@ variables = "e: 1"
 card-type = "Event"
 is-fast = false
 image-number = 1200949264
+subtype = ""
+spark = ""
+prompts = ""
 
 [[test-cards]]
 name = "Test Deck To Void"
@@ -395,6 +475,9 @@ variables = "to-void: 3"
 card-type = "Event"
 is-fast = false
 image-number = 1200949264
+subtype = ""
+spark = ""
+prompts = ""
 
 [[test-cards]]
 name = "Test Discard"
@@ -405,6 +488,9 @@ variables = "discards: 1"
 card-type = "Event"
 is-fast = false
 image-number = 1200949264
+subtype = ""
+spark = ""
+prompts = ""
 
 [[test-cards]]
 name = "Test Discard Two"
@@ -415,6 +501,9 @@ variables = "discards: 2"
 card-type = "Event"
 is-fast = false
 image-number = 1200949264
+subtype = ""
+spark = ""
+prompts = ""
 
 [[test-cards]]
 name = "Test Materialized Draw Card"
@@ -426,13 +515,67 @@ card-type = "Character"
 is-fast = false
 spark = 1
 image-number = 1200949264
+subtype = ""
+prompts = ""
+
 
 [metadata]
 schema_version = 1
+
+[metadata.table_style]
+color_scheme = "blue_light"
+
+[[metadata.validation_rules]]
+column = "card-type"
+type = "enum"
+enum = ["Character", "Event"]
+
+[[metadata.validation_rules]]
+column = "rarity"
+type = "enum"
+enum = ["Common", "Uncommon", "Rare", "Legendary", "Special"]
+
+[[metadata.derived_columns]]
+name = "image"
+function = "image_derived"
+position = 0
+width = 160
+inputs = ["image_number"]
+url_template = "https://www.shutterstock.com/image-illustration/-260nw-{image_number}.jpg"
+frozen = true
+
+[[metadata.derived_columns]]
+name = "rules preview"
+function = "rules_preview"
+position = 6
+width = 300
+inputs = ["rules-text", "variables"]
 
 [metadata.rows]
 default_height = 100
 frozen_rows = 1
 
-[metadata.table_style]
-color_scheme = "blue_light"
+[[metadata.columns]]
+key = "name"
+width = 200
+bold = true
+
+[[metadata.columns]]
+key = "rules-text"
+width = 275
+
+[[metadata.columns]]
+key = "id"
+width = 140
+
+[[metadata.columns]]
+key = "preview"
+width = 250
+
+[[metadata.columns]]
+key = "card-type"
+width = 150
+
+[[metadata.columns]]
+key = "rarity"
+width = 125
