@@ -581,6 +581,45 @@ Log files rotate daily with a configurable retention period. Old logs are
 compressed and eventually deleted. The log directory lives within the
 application data folder.
 
+## Debugging
+
+### Log File Location
+Log files are stored in the application support directory:
+- macOS: `~/Library/Application Support/tv/logs/`
+- Windows: `%APPDATA%\tv\logs\`
+- Linux: `~/.local/share/tv/logs/`
+
+Log files are named by date: `tv_YYYY-MM-DD.jsonl`. A separate performance
+log file `tv_perf_YYYY-MM-DD.jsonl` tracks timing-sensitive operations.
+
+### Viewing Logs
+View recent log entries:
+```bash
+tail -100 ~/Library/Application\ Support/tv/logs/tv_$(date +%Y-%m-%d).jsonl
+```
+
+Search for specific components or events:
+```bash
+grep -i "filter" ~/Library/Application\ Support/tv/logs/tv_*.jsonl
+grep "tv.ui.images" ~/Library/Application\ Support/tv/logs/tv_*.jsonl
+grep "ERROR" ~/Library/Application\ Support/tv/logs/tv_*.jsonl
+```
+
+### Common Debug Scenarios
+When debugging image display issues, search for `tv.ui.images` component logs
+to trace image insertion, removal, and position calculations. Filter-related
+issues can be diagnosed by searching for `filter` to see which Univer commands
+are being detected.
+
+For file sync issues, search for `tv.sync` component logs. For derived column
+computation issues, search for `tv.derived` logs.
+
+### Adding Debug Logging
+Frontend logging uses the `createLogger` function from `logger_frontend.ts`.
+Backend logging uses the `tracing` crate with the custom JSON formatter.
+Both frontend and backend logs are unified into the same log file with
+component tags distinguishing the source.
+
 ## Testing Strategy
 
 ### Integration Test Architecture
