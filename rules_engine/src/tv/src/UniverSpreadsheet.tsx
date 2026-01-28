@@ -198,14 +198,8 @@ export const UniverSpreadsheet = forwardRef<
         let cellValue: string | number | boolean | null = null;
         if (rawCellValue instanceof RichTextValue) {
           const text = rawCellValue.toPlainText().replace(/\r\n/g, "\n").replace(/\r/g, "\n");
-          if (text) {
-            cellValue = text;
-          }
-        } else if (
-          rawCellValue !== undefined &&
-          rawCellValue !== null &&
-          rawCellValue !== ""
-        ) {
+          cellValue = text;
+        } else if (rawCellValue !== undefined && rawCellValue !== null) {
           cellValue = rawCellValue as string | number | boolean;
         }
 

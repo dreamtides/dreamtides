@@ -1027,3 +1027,121 @@ fn test_cleanup_orphaned_temp_files_dir_not_exists() {
     let result = cleanup_orphaned_temp_files_with_fs(&mock, "/nonexistent");
     assert_eq!(result.unwrap(), 0, "Should return 0 for nonexistent directory");
 }
+
+#[test]
+fn test_save_cell_preserves_empty_string() {
+    let harness = TvTestHarness::new();
+    let path = harness.create_toml_file(
+        "empty_string.toml",
+        r#"[[cards]]
+id = "card-1"
+name = "Original Name"
+description = "Some description"
+"#,
+    );
+
+    harness.save_cell(&path, "cards", 0, "name", json!("")).unwrap();
+
+    let content = harness.read_file_content(&path);
+    assert!(content.contains("name = \"\""), "Empty string should be preserved in file: {content}");
+    assert!(content.contains("id = \"card-1\""), "Other keys should remain: {content}");
+    assert!(
+        content.contains("description = \"Some description\""),
+        "Other keys should remain: {content}"
+    );
+
+    let table = harness.load_table(&path, "cards").unwrap();
+    let name_idx = table.headers.iter().position(|h| h == "name").unwrap();
+    assert_eq!(table.rows[0][name_idx].as_str(), Some(""), "Empty string should be reloadable");
+}
+
+#[test]
+fn test_save_batch_preserves_empty_strings() {
+    let harness = TvTestHarness::new();
+    let path = harness.create_toml_file(
+        "batch_empty_string.toml",
+        r#"[[cards]]
+id = "card-1"
+name = "First"
+description = "Desc 1"
+
+[[cards]]
+id = "card-2"
+name = "Second"
+description = "Desc 2"
+"#,
+    );
+
+    let updates = vec![
+        CellUpdate { row_index: 0, column_key: "name".to_string(), value: json!("") },
+        CellUpdate { row_index: 1, column_key: "description".to_string(), value: json!("") },
+    ];
+
+    harness.save_batch(&path, "cards", &updates).unwrap();
+
+    let content = harness.read_file_content(&path);
+    assert!(content.matches("name = \"\"").count() >= 1, "Empty name should be preserved");
+    assert!(
+        content.matches("description = \"\"").count() >= 1,
+        "Empty description should be preserved"
+    );
+
+    let table = harness.load_table(&path, "cards").unwrap();
+    let name_idx = table.headers.iter().position(|h| h == "name").unwrap();
+    let desc_idx = table.headers.iter().position(|h| h == "description").unwrap();
+    assert_eq!(table.rows[0][name_idx].as_str(), Some(""), "First row name should be empty string");
+    assert_eq!(
+        table.rows[1][desc_idx].as_str(),
+        Some(""),
+        "Second row description should be empty string"
+    );
+}
+
+#[test]
+fn test_save_table_preserves_empty_strings() {
+    let harness = TvTestHarness::new();
+    let path = harness.create_toml_file(
+        "table_empty_string.toml",
+        r#"[[cards]]
+id = "card-1"
+name = "Original"
+"#,
+    );
+
+    let table = TomlTableData {
+        headers: vec!["id".to_string(), "name".to_string()],
+        rows: vec![vec![json!("card-1"), json!("")]],
+    };
+
+    harness.save_table(&path, "cards", &table).unwrap();
+
+    let content = harness.read_file_content(&path);
+    assert!(content.contains("name = \"\""), "Empty string should be preserved in file: {content}");
+
+    let reloaded = harness.load_table(&path, "cards").unwrap();
+    let name_idx = reloaded.headers.iter().position(|h| h == "name").unwrap();
+    assert_eq!(reloaded.rows[0][name_idx].as_str(), Some(""), "Empty string should round-trip");
+}
+
+#[test]
+fn test_empty_string_is_different_from_null() {
+    let harness = TvTestHarness::new();
+    let path = harness.create_toml_file(
+        "empty_vs_null.toml",
+        r#"[[cards]]
+id = "card-1"
+empty_field = ""
+present_field = "value"
+"#,
+    );
+
+    harness.save_cell(&path, "cards", 0, "present_field", serde_json::Value::Null).unwrap();
+
+    let content = harness.read_file_content(&path);
+    assert!(content.contains("empty_field = \"\""), "Empty string field should remain: {content}");
+    assert!(!content.contains("present_field"), "Null value should remove key: {content}");
+
+    let table = harness.load_table(&path, "cards").unwrap();
+    let empty_idx = table.headers.iter().position(|h| h == "empty_field").unwrap();
+    assert_eq!(table.rows[0][empty_idx].as_str(), Some(""), "Empty string should still be present");
+}
