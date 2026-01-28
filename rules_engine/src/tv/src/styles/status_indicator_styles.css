@@ -1,0 +1,105 @@
+/* status_indicator_styles.css - Sync status indicator styles */
+
+.tv-status-indicator {
+  position: fixed;
+  bottom: var(--tv-spacing-md);
+  right: var(--tv-spacing-md);
+  display: flex;
+  align-items: center;
+  gap: var(--tv-spacing-xs);
+  padding: var(--tv-spacing-xs) var(--tv-spacing-sm);
+  border-radius: 4px;
+  font-size: var(--tv-font-size-sm);
+  font-weight: 500;
+  z-index: 999;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  transition: opacity 0.2s ease-in-out;
+}
+
+.tv-status-icon {
+  font-size: 14px;
+}
+
+.tv-status-label {
+  white-space: nowrap;
+}
+
+/* Saving state - yellow/amber */
+.tv-status-saving {
+  background-color: #fff3cd;
+  color: #856404;
+  border: 1px solid var(--tv-status-saving);
+}
+
+.tv-status-saving .tv-status-icon {
+  animation: tv-pulse 1s ease-in-out infinite;
+}
+
+/* Loading state - blue */
+.tv-status-loading {
+  background-color: #cce5ff;
+  color: #004085;
+  border: 1px solid #b8daff;
+}
+
+.tv-status-loading .tv-status-icon {
+  animation: tv-spin 1s linear infinite;
+}
+
+/* Saved state - green */
+.tv-status-saved {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid var(--tv-status-saved);
+}
+
+/* Error state - red */
+.tv-status-error {
+  background-color: var(--tv-error-bg);
+  color: var(--tv-error-text);
+  border: 1px solid var(--tv-status-error);
+}
+
+/* Animations */
+@keyframes tv-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@keyframes tv-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .tv-status-saving {
+    background-color: #4a3f00;
+    color: #ffc107;
+  }
+
+  .tv-status-loading {
+    background-color: #001a33;
+    color: #66b3ff;
+    border-color: #004085;
+  }
+
+  .tv-status-saved {
+    background-color: #0d3018;
+    color: #28a745;
+  }
+
+  .tv-status-error {
+    background-color: #3d0a0a;
+    color: #dc3545;
+  }
+}

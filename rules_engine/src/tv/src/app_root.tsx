@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { SpreadsheetView } from "./spreadsheet_view";
 import { ErrorBanner } from "./error_banner";
+import { StatusIndicator } from "./status_indicator";
 import * as ipc from "./ipc_bridge";
 import type { TomlTableData, DerivedValuePayload, RowConfig, ColumnConfig, PermissionState, PermissionStateChangedPayload } from "./ipc_bridge";
 import type { MultiSheetData, SheetData, DerivedColumnState } from "./spreadsheet_types";
@@ -839,6 +840,7 @@ export function AppRoot() {
           persistedSheetOrder={persistedSheetOrder}
         />
       </div>
+      <StatusIndicator />
     </div>
   );
 }
