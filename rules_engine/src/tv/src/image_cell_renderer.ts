@@ -1,7 +1,8 @@
 import { convertFileSrc } from "@tauri-apps/api/core";
-import { ICommandService, ImageSourceType } from "@univerjs/core";
+import { ICommandService, ImageSourceType, type Injector } from "@univerjs/core";
 import { FUniver } from "@univerjs/core/facade";
 import { IRenderManagerService } from "@univerjs/engine-render";
+import { FWorksheet } from "@univerjs/sheets/facade";
 import {
   convertPositionCellToSheetOverGrid,
   ISheetSelectionRenderService,
@@ -35,12 +36,6 @@ const DRAWING_TYPE_IMAGE = 0;
 /** Tracks image state per cell to avoid duplicate insertions. */
 type ImageCellState = "loading" | "loaded" | "error";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type SheetRef = any;
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type Injector = any;
-
 function generateDrawingId(): string {
   return Math.random().toString(36).substring(2, 8);
 }
@@ -64,9 +59,17 @@ export class ImageCellRenderer {
   private imageStates: Map<string, ImageCellState> = new Map();
   private imageIds: Map<string, string> = new Map();
   private commandsReady = false;
+  private cachedInjector: Injector | null = null;
 
   constructor(univerAPI: FUniver) {
     this.univerAPI = univerAPI;
+  }
+
+  private getInjector(sheet: FWorksheet): Injector {
+    if (!this.cachedInjector) {
+      this.cachedInjector = sheet.getInject();
+    }
+    return this.cachedInjector;
   }
 
   /**
@@ -77,7 +80,7 @@ export class ImageCellRenderer {
    * its native aspect ratio.
    */
   async handleImageResult(
-    sheet: SheetRef,
+    sheet: FWorksheet,
     sheetId: string,
     row: number,
     column: number,
@@ -98,7 +101,7 @@ export class ImageCellRenderer {
    * Sets a loading placeholder while the fetch is in progress.
    */
   async fetchAndInsertImage(
-    sheet: SheetRef,
+    sheet: FWorksheet,
     sheetId: string,
     row: number,
     column: number,
@@ -129,11 +132,11 @@ export class ImageCellRenderer {
    * available rather than registering it manually (which would race
    * with the plugin and cause a duplicate registration error).
    */
-  private async waitForCommandsReady(): Promise<boolean> {
+  private async waitForCommandsReady(sheet: FWorksheet): Promise<boolean> {
     if (this.commandsReady) return true;
 
     try {
-      const injector = (this.univerAPI as Injector)._injector;
+      const injector = this.getInjector(sheet);
       const commandService = injector.get(ICommandService);
 
       if (commandService.hasCommand(INSERT_SHEET_DRAWING_CMD)) {
@@ -197,7 +200,7 @@ export class ImageCellRenderer {
    * When rowHeight is specified, the image is sized to fit within that height.
    */
   private async insertImageAtCell(
-    sheet: SheetRef,
+    sheet: FWorksheet,
     cellKey: string,
     row: number,
     column: number,
@@ -205,7 +208,7 @@ export class ImageCellRenderer {
     rowHeight?: number
   ): Promise<void> {
     try {
-      const ready = await this.waitForCommandsReady();
+      const ready = await this.waitForCommandsReady(sheet);
       if (!ready) {
         this.setErrorState(sheet, cellKey, row, column, "Drawing commands not available");
         return;
@@ -238,7 +241,7 @@ export class ImageCellRenderer {
         }
       }
 
-      const injector = (this.univerAPI as Injector)._injector;
+      const injector = this.getInjector(sheet);
       const renderManager = injector.get(IRenderManagerService);
       const renderUnit = renderManager.getRenderById(unitId);
       if (!renderUnit) {
@@ -332,7 +335,7 @@ export class ImageCellRenderer {
    * Sets a loading placeholder in the cell while the image is being fetched.
    */
   private setLoadingState(
-    sheet: SheetRef,
+    sheet: FWorksheet,
     cellKey: string,
     row: number,
     column: number
@@ -349,7 +352,7 @@ export class ImageCellRenderer {
    * Sets an error placeholder in the cell with a red error indicator.
    */
   private setErrorState(
-    sheet: SheetRef,
+    sheet: FWorksheet,
     cellKey: string,
     row: number,
     column: number,
@@ -386,7 +389,7 @@ export class ImageCellRenderer {
    * Clears all tracked image state for a sheet.
    * Call when sheet data is reloaded to allow fresh image insertion.
    */
-  async clearSheetImages(_sheet: SheetRef, sheetId: string): Promise<void> {
+  async clearSheetImages(_sheet: FWorksheet, sheetId: string): Promise<void> {
     const keysToRemove: string[] = [];
     for (const [key] of this.imageStates) {
       if (key.startsWith(`${sheetId}:`)) {
