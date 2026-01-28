@@ -327,6 +327,212 @@ Audit and fix the triple conflict event subscription.
 
 **Fix location:** `app_root.tsx` useEffect hooks
 
+---
+
+## Risk Analysis: Protecting Derived Column Functionality
+
+**CRITICAL**: The derived column system has had **9+ significant bugs** in the past month. Any performance fix must be implemented with extreme care to avoid breaking this fragile feature.
+
+### Historical Bug Timeline
+
+| Date | Bug | Root Cause | Severity |
+|------|-----|------------|----------|
+| Jan 25 | Boolean values corrupted to integers | TOML round-trip type loss | Medium |
+| Jan 26 | Panicking function floods logs | No circuit breaker | Low |
+| Jan 26 | Floating image API unavailable | Vite module deduplication | High |
+| Jan 26 | UI freezes 700-1400ms after edit | Self-triggered reload cascade | High |
+| Jan 26 | **Derived columns stop updating after save** | Implicit dependency on reload cycle | **Critical** |
+| Jan 27 | Images don't reposition after sort | No coordinate translation | High |
+| Jan 27 | Images stack after sort | Backend/frontend sort disagreement | High |
+| Jan 27 | Blank columns with non-contiguous positions | Column mapping gaps | Medium |
+| Jan 28 | Images don't reposition after filter | Wrong Univer command IDs | High |
+
+### The Critical Bug That Almost Shipped (Jan 26)
+
+**Commit `dde657e0`** fixed a bug where derived columns **completely stopped updating** after the UI freeze fix was applied. The root cause:
+
+> The derived column system had an **implicit dependency** on the reload-after-save cycle. When we suppressed self-triggered reloads to fix the UI freeze, we also removed the **only mechanism** that was triggering derived computations.
+
+**Lesson**: The current (buggy) behavior may be **load-bearing**. Features may depend on side effects we intend to remove.
+
+### Invariants That Must Be Preserved
+
+Based on deep-dive analysis of the codebase, these invariants are **critical for derived column correctness**:
+
+| Invariant | Location | What Breaks If Violated |
+|-----------|----------|-------------------------|
+| Generation tracking | `generation_tracker.rs` | Stale results overwrite fresh data |
+| Double generation check | `compute_executor.rs:277,351` | Race conditions during edits |
+| Lookup context sync | `app_root.tsx:295-327, 358-376` | CardLookup returns "Unknown Card" |
+| Coordinate translation | `derived_column_utils.ts` | Images at wrong positions after sort/filter |
+| Column mapping | `buildColumnMapping()` | Gaps or collisions in column layout |
+| Explicit update triggers | `app_root.tsx:474-492` | Derived values never refresh |
+
+### Risk Assessment for Each Proposed Fix
+
+#### P0: Fix False Conflict Detection
+
+**Risk Level: HIGH**
+
+The conflict detection triggers a reload, which triggers:
+1. `reloadSheet()` → updates `multiSheetData`
+2. `getDerivedColumnsConfig()` → refreshes column configs
+3. `triggerDerivedComputations()` → recomputes all derived values
+4. `updateLookupContext()` → syncs cross-table references
+
+**If we suppress conflict detection without adding explicit triggers:**
+- Derived columns will stop updating (repeat of Jan 26 bug)
+- Lookup context will become stale
+- Images will not re-render
+
+**Mitigation:**
+- [ ] Keep `triggerDerivedComputations()` call after save (already exists at line 486)
+- [ ] Verify `updateLookupContext()` is called when row count changes
+- [ ] Add integration test: edit cell → verify derived column updates
+- [ ] Add integration test: add row → verify new row gets derived values
+
+#### P1: Suppress File Watcher During Save Window
+
+**Risk Level: MEDIUM**
+
+The file watcher is the **only detection mechanism** for external changes. If suppression window is too long:
+- Rapid external edits (e.g., from another tool) won't trigger reload
+- Derived columns will show stale values
+- User may overwrite external changes
+
+**If we suppress incorrectly:**
+- External changes to `cards.toml` from text editor won't be detected
+- Multi-tool workflows will break
+
+**Mitigation:**
+- [ ] Use timestamp-based suppression, not state-based
+- [ ] Keep suppression window minimal (600ms, not longer)
+- [ ] Add integration test: external edit during save window → verify reload happens
+- [ ] Add integration test: external edit after save window → verify reload happens
+
+#### P2: Cache getDerivedColumnsConfig Results
+
+**Risk Level: LOW-MEDIUM**
+
+The configs only change when metadata section is edited. Caching is safe **if**:
+- Cache is invalidated on genuine external file change
+- Cache is invalidated on explicit metadata edit (rare)
+
+**If cache is never invalidated:**
+- New derived columns added to metadata won't appear
+- Removed derived columns will persist as ghosts
+- Column position changes won't apply
+
+**Mitigation:**
+- [ ] Invalidate cache on `reloadSheet()` (external change path)
+- [ ] Invalidate cache if file content hash changes
+- [ ] Add integration test: add derived column to metadata → verify it appears
+
+#### P3: Deduplicate Event Listeners
+
+**Risk Level: LOW**
+
+Triple event subscription is purely a performance issue. Fixing it should not affect correctness.
+
+**Mitigation:**
+- [ ] Audit `useEffect` cleanup functions in `app_root.tsx`
+- [ ] Verify React StrictMode behavior in development
+
+### Known Race Condition: Generation Tracker on Reload
+
+**Current Bug (Not Yet Fixed):**
+
+When `reloadSheet()` is called, the generation tracker is **NOT cleared or incremented**:
+- Old in-flight computations have generation N
+- New computations also get generation N (same row, no edit)
+- Both pass `is_generation_current()` validation
+- Race condition: whichever finishes last wins
+
+**Impact**: After reload, derived columns may briefly show stale values before correct values arrive.
+
+**This bug is SEPARATE from the performance issues** but should be tracked:
+- [ ] Consider calling `increment_generation()` for all rows on reload
+- [ ] Or: clear pending queue on reload start
+
+### Dependency Map: What Triggers Derived Computations
+
+```
+                    ┌─────────────────────────────────────┐
+                    │     Derived Column Computation      │
+                    │        Entry Points                 │
+                    └─────────────────────────────────────┘
+                                     ▲
+         ┌───────────────────────────┼───────────────────────────┐
+         │                           │                           │
+    ┌────┴────┐                ┌─────┴─────┐              ┌──────┴──────┐
+    │ Initial │                │   After   │              │   After     │
+    │  Load   │                │   Save    │              │  Reload     │
+    └────┬────┘                └─────┬─────┘              └──────┬──────┘
+         │                           │                           │
+    loadAllFiles()              saveData()                 reloadSheet()
+    line 213-330               line 393-510               line 340-391
+         │                           │                           │
+         └───────────────────────────┴───────────────────────────┘
+                                     │
+                    triggerDerivedComputations()
+                         line 176-211
+                                     │
+                    ipc.computeDerivedBatch()
+                                     │
+                    ┌────────────────┴────────────────┐
+                    │   BACKEND: ComputeExecutor     │
+                    │   - Queue request              │
+                    │   - Check generation (before)  │
+                    │   - Execute function           │
+                    │   - Check generation (after)   │
+                    │   - Emit result event          │
+                    └─────────────────────────────────┘
+```
+
+**Key Insight**: If ANY of these paths is broken, derived columns stop working.
+
+### Pre-Implementation Checklist
+
+Before implementing any performance fix:
+
+- [ ] Write integration tests for:
+  - [ ] Cell edit → derived column updates within 1 second
+  - [ ] Row add → new row gets derived values
+  - [ ] Sort → images reposition correctly
+  - [ ] Filter → images hide/show correctly
+  - [ ] External file change → derived columns refresh
+  - [ ] Rapid edits → no stale values persist
+
+- [ ] Verify these paths still trigger derived computations:
+  - [ ] `saveData()` success path
+  - [ ] `reloadSheet()` path
+  - [ ] Initial `loadAllFiles()` path
+
+- [ ] Monitor in testing:
+  - [ ] Generation validation rejection rate (should be low)
+  - [ ] Derived computation queue depth (should drain)
+  - [ ] Result event delivery (should match requests)
+
+### Post-Implementation Verification
+
+After implementing fixes:
+
+```bash
+# Verify derived computations are still triggered
+grep "triggerDerivedComputations" ~/Library/Application\ Support/tv/logs/tv_*.jsonl | tail -20
+
+# Verify generation tracking is working
+grep "Queued derived computation" ~/Library/Application\ Support/tv/logs/tv_*.jsonl | tail -20
+
+# Verify results are being delivered
+grep "derived-value-computed" ~/Library/Application\ Support/tv/logs/tv_*.jsonl | tail -20
+
+# Check for generation validation rejections (should be rare)
+grep "stale" ~/Library/Application\ Support/tv/logs/tv_*.jsonl | tail -20
+```
+
+---
+
 ## Monitoring After Fixes
 
 After implementing fixes, verify improvement by checking:
