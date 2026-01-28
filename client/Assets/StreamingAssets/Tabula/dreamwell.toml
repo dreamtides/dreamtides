@@ -2,7 +2,8 @@
 name = "Dawning Horizon"
 id = "bc143c3c-f149-4506-813f-1aa8dd54e370"
 energy-produced = 2
-rules-text = " "
+rules-text = ""
+variables = ""
 phase = 0
 image-number = 1963305268
 
@@ -10,7 +11,6 @@ image-number = 1963305268
 name = "Sunrise Cavern"
 id = "1dda2551-c972-4db2-81c0-9dc95ac8b27c"
 energy-produced = 2
-rules-text = " "
 phase = 0
 image-number = 565499323
 
@@ -71,3 +71,35 @@ frozen_rows = 1
 
 [metadata.table_style]
 color_scheme = "orange"
+
+[[metadata.derived_columns]]
+name = "image"
+function = "image_derived"
+position = 0
+width = 160
+inputs = ["image_number"]
+url_template = "https://www.shutterstock.com/image-illustration/-260nw-{image_number}.jpg"
+
+[[metadata.derived_columns]]
+name = "rules preview"
+function = "rules_preview"
+position = 6
+width = 300
+inputs = ["rules-text", "variables"]
+
+[[metadata.columns]]
+key = "name"
+width = 200
+bold = true
+
+[[metadata.columns]]
+key = "rules-text"
+width = 275
+
+[[metadata.columns]]
+key = "id"
+width = 140
+
+[[metadata.columns]]
+key = "preview"
+width = 250
