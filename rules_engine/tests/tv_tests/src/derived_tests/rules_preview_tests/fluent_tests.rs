@@ -152,11 +152,8 @@ fn test_double_newline_expression() {
     match result {
         DerivedResult::RichText(spans) => {
             let full_text: String = spans.iter().map(|s| s.text.as_str()).collect();
-            assert!(
-                !full_text.contains('\n'),
-                "Preview should not contain newlines: {full_text:?}"
-            );
             assert!(full_text.contains("Draw"), "Should contain 'Draw': {full_text}");
+            assert!(full_text.contains('\n'), "Should preserve newlines: {full_text:?}");
             assert!(full_text.contains("Reclaim"), "Should contain 'Reclaim': {full_text}");
         }
         DerivedResult::Error(msg) => panic!("Expected RichText, got Error: {msg}"),
@@ -175,11 +172,8 @@ fn test_single_newline_expression() {
     match result {
         DerivedResult::RichText(spans) => {
             let full_text: String = spans.iter().map(|s| s.text.as_str()).collect();
-            assert!(
-                !full_text.contains('\n'),
-                "Preview should not contain newlines: {full_text:?}"
-            );
             assert!(full_text.contains("Line one."), "Should contain first line: {full_text}");
+            assert!(full_text.contains('\n'), "Should preserve newlines: {full_text:?}");
             assert!(full_text.contains("Line two."), "Should contain second line: {full_text}");
         }
         other => panic!("Expected RichText, got: {other:?}"),

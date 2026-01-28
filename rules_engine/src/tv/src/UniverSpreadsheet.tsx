@@ -17,7 +17,10 @@ import type {
 import * as ipc from "./ipc_bridge";
 import { formatHeaderForDisplay } from "./header_utils";
 import { buildMultiSheetWorkbook } from "./workbook_builder";
-import { isSheetDataEqual, populateSheetDataBatch } from "./sheet_data_utils";
+import {
+  isSheetDataEqual,
+  populateSheetDataBatch,
+} from "./sheet_data_utils";
 import {
   detectBooleanColumns,
   applyCheckboxValidation,
@@ -1524,7 +1527,6 @@ export const UniverSpreadsheet = forwardRef<
 
           const cellRow = rowIndex + 1; // +1 for header row
           applyDerivedResultToCell(
-            univerAPIRef.current!,
             sheet,
             cellRow,
             derivedColIndex,

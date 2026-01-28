@@ -1,9 +1,9 @@
-import { FUniver } from "@univerjs/core/facade";
 import { FWorksheet } from "@univerjs/sheets/facade";
 
 import type {
   DerivedColumnInfo,
   DerivedResultValue,
+  TextRun,
   TextStyle,
 } from "./ipc_bridge";
 import { derivedResultToCellData } from "./rich_text_utils";
@@ -128,7 +128,6 @@ export function getDerivedColumnIndex(
  * richText, and error. Error results display with red font color.
  */
 export function applyDerivedResultToCell(
-  univerAPI: FUniver,
   sheet: FWorksheet,
   row: number,
   col: number,
@@ -138,27 +137,15 @@ export function applyDerivedResultToCell(
   if (!range) return;
 
   if (result.type === "richText") {
-    // Build rich text using insertText (unstyled) + setStyle to work around
-    // a Univer RichTextBuilder bug where insertText(text, style) calculates
-    // textRun st/ed indices using the document-absolute insertion position
-    // instead of fragment-relative indices, causing style offsets to shift
-    // by the length of previously inserted text.
+    // Build IDocumentData manually rather than using RichTextBuilder,
+    // because the builder's insertParagraph() produces incorrect paragraph
+    // metadata when interleaved with insertText() calls.
+    // In Univer's document model: \r = paragraph break, \r\n = document end.
     const allRuns = result.value.p.flatMap((p) => p.ts);
-    const plainText = allRuns.map((r) => r.t).join("");
-    const richText = univerAPI.newRichText();
-    richText.insertText(plainText);
-    let offset = 0;
-    for (const run of allRuns) {
-      if (run.s) {
-        const ts = toUniverTextStyle(run.s);
-        if (ts) {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          richText.setStyle(offset, offset + run.t.length, ts as any);
-        }
-      }
-      offset += run.t.length;
-    }
-    range.setRichTextValueForCell(richText);
+    const docData = buildRichTextDocumentData(allRuns);
+    // setRichTextValueForCell accepts raw IDocumentData directly
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    range.setRichTextValueForCell(docData as any);
     logger.debug("Applied rich text derived result", { row, col });
   } else if (result.type === "error") {
     range.setValues([[`Error: ${result.value}`]]);
@@ -192,4 +179,56 @@ function toUniverTextStyle(
   if (style.ul) result.ul = { s: style.ul.s };
   if (style.cl) result.cl = { rgb: `#${style.cl.rgb}` };
   return result;
+}
+
+/**
+ * Builds Univer IDocumentData directly from text runs, handling \n
+ * characters by converting them to \r paragraph breaks. In Univer's
+ * document model: \r = paragraph break, \n = section end. The document
+ * always ends with \r\n. Each \r must have a corresponding entry in the
+ * paragraphs array.
+ */
+function buildRichTextDocumentData(
+  allRuns: TextRun[],
+): Record<string, unknown> {
+  let dataStream = "";
+  const textRuns: { st: number; ed: number; ts: Record<string, unknown> }[] =
+    [];
+  const paragraphs: { startIndex: number }[] = [];
+
+  for (const run of allRuns) {
+    const ts = run.s ? toUniverTextStyle(run.s) : undefined;
+    const parts = run.t.split("\n");
+    for (let i = 0; i < parts.length; i++) {
+      if (i > 0) {
+        dataStream += "\r";
+        paragraphs.push({ startIndex: dataStream.length - 1 });
+      }
+      if (parts[i].length > 0) {
+        const start = dataStream.length;
+        dataStream += parts[i];
+        if (ts) {
+          textRuns.push({ st: start, ed: dataStream.length, ts });
+        }
+      }
+    }
+  }
+
+  // Document must end with \r\n; the final \r is the last paragraph break.
+  dataStream += "\r\n";
+  paragraphs.push({ startIndex: dataStream.length - 2 });
+
+  return {
+    id: "",
+    body: {
+      dataStream,
+      paragraphs,
+      textRuns,
+      sectionBreaks: [],
+      customBlocks: [],
+      customRanges: [],
+      tables: [],
+    },
+    documentStyle: {},
+  };
 }
