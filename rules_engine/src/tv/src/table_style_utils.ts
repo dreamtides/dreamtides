@@ -6,6 +6,7 @@ import type {
   CellFormatResult,
 } from "./ipc_bridge";
 import type { ColumnMapping } from "./derived_column_utils";
+import { hasUnderlineMethod } from "./spreadsheet_types";
 
 /**
  * Applies a resolved table style (color scheme, row stripes, header styling)
@@ -101,11 +102,8 @@ export function applyConditionalFormatting(
     if (result.style.italic === true) {
       range.setFontStyle("italic");
     }
-    if (result.style.underline === true) {
-      const rangeAny = range as unknown as Record<string, unknown>;
-      if (typeof rangeAny.setUnderline === "function") {
-        (rangeAny.setUnderline as (v: boolean) => void)(true);
-      }
+    if (result.style.underline === true && hasUnderlineMethod(range)) {
+      range.setUnderline(true);
     }
   }
 }

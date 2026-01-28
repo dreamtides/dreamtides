@@ -1,3 +1,5 @@
+import type { FRange } from "@univerjs/sheets/facade";
+
 import type {
   TomlTableData,
   DerivedColumnInfo,
@@ -5,6 +7,27 @@ import type {
   RowConfig,
   ColumnConfig,
 } from "./ipc_bridge";
+
+/**
+ * Extended FRange interface with optional methods that may not be available
+ * in all Univer contexts or versions. The setUnderline method is not part of
+ * the standard FRange interface but may be provided by some Univer plugins.
+ */
+export interface ExtendedRange extends FRange {
+  setUnderline?: (value: boolean) => void;
+}
+
+/**
+ * Type guard to check if a range has the setUnderline method available.
+ */
+export function hasUnderlineMethod(
+  range: FRange,
+): range is ExtendedRange & { setUnderline: (value: boolean) => void } {
+  return (
+    "setUnderline" in range &&
+    typeof (range as ExtendedRange).setUnderline === "function"
+  );
+}
 
 /**
  * Tracks derived column configurations and computed values per sheet.
