@@ -3,193 +3,202 @@
 ## Main Application (rules_engine/src/tv/)
 
 ### Root Configuration
-- package.json: NPM package definition with Univer and Tauri dependencies
-- pnpm-lock.yaml: Locked dependency versions for reproducible builds
-- pnpm-workspace.yaml: Workspace configuration for pnpm
-- tsconfig.json: TypeScript compiler configuration for frontend
-- tsconfig.node.json: TypeScript configuration for Node tooling
-- vite.config.ts: Vite bundler configuration with Tauri integration
-- index.html: HTML entry point loaded by Tauri webview
+- package.json: NPM package with Univer (23 packages) and Tauri dependencies
+- pnpm-lock.yaml: Locked dependency versions
+- tsconfig.json: TypeScript compiler configuration
+- vite.config.ts: Vite bundler with Tauri integration
+- index.html: HTML entry point for Tauri webview
 
 ### Frontend Source (src/)
-- main.tsx: React application entry point, mounts root component
-- app_root.tsx: Top-level component with state management and IPC setup
-- spreadsheet_view.tsx: Univer spreadsheet wrapper with data binding
-- error_banner.tsx: Error display overlay component
-- status_indicator.tsx: Save/sync status display component
-- cell_renderers.tsx: Custom cell renderers for images, checkboxes, rich text
-- ipc_bridge.ts: Tauri command and event wrappers with TypeScript types
-- univer_config.ts: Univer plugin initialization and configuration helper
-- logger_frontend.ts: Frontend logging utilities with backend aggregation
+
+**React Components:**
+- main.tsx: React entry point, error boundary setup
+- app_root.tsx: Top-level state management, multi-sheet coordination, IPC setup
+- spreadsheet_view.tsx: Loading/error state wrapper
+- UniverSpreadsheet.tsx: Univer lifecycle, data binding, event handling
+- error_banner.tsx: Dismissable error/warning overlay
+
+**IPC and Configuration:**
+- ipc_bridge.ts: ~35 Tauri commands, 11 event listeners, TypeScript types
+- univer_config.ts: Univer instance creation, 14 plugin registrations
+- disabled_menu_items.ts: 118 hidden Univer menu items
+- spreadsheet_types.ts: TypeScript type definitions
+
+**Spreadsheet Utilities:**
+- workbook_builder.ts: Multi-sheet workbook construction, sheet ordering
+- sheet_data_utils.ts: Data population, change detection, row comparison
+- derived_column_utils.ts: Column mapping, position calculation
+- validation_utils.ts: Checkbox/dropdown validation via Univer API
+- table_style_utils.ts: Color schemes, conditional formatting
+- header_utils.ts: Header formatting, column letter conversion
+- rich_text_utils.ts: Derived result to Univer rich text conversion
+- image_cell_renderer.ts: Floating image rendering via direct commands
+
+**Logging:**
+- logger_frontend.ts: Frontend logging with backend aggregation
 
 ### Frontend Styles (src/styles/)
 - app_styles.css: Global application styles
-- spreadsheet_overrides.css: Univer styling customizations
-- error_styles.css: Error banner and indicator styles
 
 ### Documentation (docs/)
 - tv_design_document.md: Main technical design document
 - appendix_a_metadata_schema.md: Metadata specification
 - appendix_b_derived_functions.md: Derived function architecture
 - appendix_c_sync_protocol.md: Bidirectional sync details
-- appendix_d_univer_integration.md: Univer integration details
+- appendix_d_univer_integration.md: Univer integration and workarounds
 - appendix_e_logging_specification.md: Logging format specification
 - appendix_f_file_layout.md: This file layout document
 - appendix_g_rules_text_preview.md: Rules text preview pipeline
-- appendix_h_implementation_plan.md: Granular implementation tasks
+- appendix_h_implementation_plan.md: Implementation tasks
 
-### Tauri Backend (src-tauri/)
-
-#### Configuration
-- Cargo.toml: Rust package definition with dependencies
-- Cargo.lock: Locked Rust dependency versions
-- tauri.conf.json: Tauri application configuration
-- build.rs: Tauri build script
-- capabilities/default.json: Tauri permissions configuration
-
-#### Rust Source (src/)
-- main.rs: Binary entry point, calls lib run function
-- lib.rs: Library entry with Tauri builder and command registration
-
-#### Commands Module (src/commands/)
-- commands_mod.rs: Module declarations and re-exports
-- load_command.rs: Load file Tauri command implementation
-- save_command.rs: Save cell Tauri command implementation
-- watch_command.rs: Start watcher Tauri command implementation
-- compute_command.rs: Trigger derived computation command
-- log_command.rs: Frontend log aggregation command
-
-#### TOML Module (src/toml/)
-- toml_mod.rs: Module declarations and public types
-- document_loader.rs: TOML file reading and parsing
-- document_writer.rs: TOML file atomic writing
-- metadata_parser.rs: Metadata section extraction and validation
-- structure_preserver.rs: toml_edit operations for format preservation
-- value_converter.rs: JSON to TOML value conversion
-
-#### Sync Module (src/sync/)
-- sync_mod.rs: Module declarations and sync state types
-- file_watcher.rs: notify-based file watching with debouncing
-- change_tracker.rs: Track pending changes and generation counters
-- conflict_resolver.rs: Handle concurrent edit conflicts
-- state_machine.rs: Sync state transitions and guards
-
-#### Derived Module (src/derived/)
-- derived_mod.rs: Module declarations and trait definitions
-- function_registry.rs: Function registration and lookup
-- compute_executor.rs: Async computation task execution
-- generation_tracker.rs: Row generation counter management
-- result_cache.rs: Computed value caching with LRU eviction
-
-#### Derived Functions (src/derived/functions/)
-- functions_mod.rs: Built-in function exports
-- image_url_function.rs: Image URL derivation from image number
-- rules_preview_function.rs: Fluent-based rules text rendering
-- style_tag_parser.rs: HTML-like style tag parsing for rich text
-- rich_text_builder.rs: Univer rich text structure generation
-- card_lookup_function.rs: Cross-table card name lookup
-
-#### Validation Module (src/validation/)
-- validation_mod.rs: Module declarations and rule types
-- rule_parser.rs: Parse validation rules from metadata
-- type_validator.rs: Type constraint checking
-- enum_validator.rs: Enumeration constraint checking
-- range_validator.rs: Numeric range checking
-- pattern_validator.rs: Regex pattern matching
-
-#### Images Module (src/images/)
-- images_mod.rs: Module declarations and image types
-- image_cache.rs: Content-addressed image cache management
-- image_fetcher.rs: HTTP image download with reqwest
-- cache_cleanup.rs: LRU eviction and startup integrity check
-
-#### UUID Module (src/uuid/)
-- uuid_mod.rs: Module declarations
-- uuid_generator.rs: UUID v4 generation and ID column detection
-
-#### Logging Module (src/logging/)
-- logging_mod.rs: Module declarations and initialization
-- json_logger.rs: Custom tracing subscriber for JSONL output
-- log_aggregator.rs: Frontend log aggregation and formatting
-- log_rotation.rs: Date-based log file rotation
-
-#### Error Module (src/error/)
-- error_mod.rs: Module declarations and error types
-- error_types.rs: Custom error enum with variants for all failure modes
-- recovery_handler.rs: Error recovery strategies and user notification
-
-## Test Suite (rules_engine/tests/tv_tests/)
+## Tauri Backend (src-tauri/)
 
 ### Configuration
-- Cargo.toml: Test crate dependencies including tv as dependency
+- Cargo.toml: Rust package with dependencies
+- Cargo.lock: Locked Rust dependency versions
+- tauri.conf.json: Tauri app configuration, asset protocol, CSP
+- build.rs: Tauri build script
+- capabilities/default.json: Tauri permissions
 
-### Test Fixtures (fixtures/)
-- simple_table.toml: Basic array of tables for happy path testing
-- with_comments.toml: File with inline and standalone comments
-- sparse_data.toml: Tables with missing fields in some entries
-- with_metadata.toml: File with complete metadata section
-- large_table.toml: 1000+ row table for performance testing
-- invalid_syntax.toml: Intentionally malformed for error testing
-- unicode_content.toml: Non-ASCII content for encoding testing
-- images/: Test image files for image cache/fetch testing
-  - test_image.png: Valid PNG for happy path tests
-  - test_image.jpg: Valid JPEG for format tests
+### Rust Source (src/)
 
-### Test Source (src/)
-- lib.rs: Test crate root with shared fixtures loading
+**Entry Points:**
+- main.rs: Binary entry point
+- lib.rs: Tauri builder with 43 command registrations, state initialization
+- cli.rs: Command-line argument parsing, AppPaths
 
-### TOML Tests (src/toml_tests/)
-- toml_tests_mod.rs: Module organization
-- load_tests.rs: File loading and parsing tests
-- save_tests.rs: File writing and atomic save tests
-- preservation_tests.rs: Comment and whitespace preservation tests
-- metadata_tests.rs: Metadata parsing and serialization tests
+### Commands Module (src/commands/)
 
-### Sync Tests (src/sync_tests/)
-- sync_tests_mod.rs: Module organization
-- watcher_tests.rs: File watcher behavior tests
-- conflict_tests.rs: Concurrent edit conflict resolution tests
-- state_machine_tests.rs: Sync state transition tests
+**File Operations:**
+- load_command.rs: `load_toml_table` with sort/filter state restoration
+- save_command.rs: `save_cell`, `save_batch`, `save_toml_table`, `add_row`
+- watch_command.rs: `start_file_watcher`, `stop_file_watcher`
 
-### Derived Tests (src/derived_tests/)
-- derived_tests_mod.rs: Module organization
-- registry_tests.rs: Function registration and lookup tests
-- executor_tests.rs: Async computation execution tests
-- generation_tests.rs: Generation counter and staleness tests
+**Derived Columns:**
+- derived_command.rs: `compute_derived`, `compute_derived_batch`,
+  `update_lookup_context`, `increment_row_generation`, `clear_computation_queue`,
+  `get_computation_queue_length`, `get_derived_columns_config`
 
-### Validation Tests (src/validation_tests/)
-- validation_tests_mod.rs: Module organization
-- rule_tests.rs: All validation rule type tests
-- dropdown_tests.rs: Enum dropdown behavior tests
+**Sort/Filter:**
+- sort_command.rs: `get_sort_state`, `set_sort_state`, `clear_sort_state`,
+  `get_sort_row_mapping`, `translate_row_index`
+- filter_command.rs: `get_filter_state`, `set_filter_state`, `clear_filter_state`,
+  `get_filter_visibility`, `is_row_visible`, `set_hidden_rows`, `get_hidden_rows`
 
-### Image Tests (src/image_tests/)
-- image_tests_mod.rs: Module organization
-- cache_tests.rs: Content-addressed cache behavior tests
-- fetch_tests.rs: HTTP fetching and error handling tests
+**Validation/Styling:**
+- validation_command.rs: `get_validation_rules`, `get_enum_validation_rules`
+- style_command.rs: `get_table_style`, `get_available_color_schemes`,
+  `get_conditional_formatting`
 
-### UUID Tests (src/uuid_tests/)
-- uuid_tests_mod.rs: Module organization
-- generator_tests.rs: UUID generation and ID column detection tests
+**Configuration:**
+- column_command.rs: `get_column_configs`, `set_column_width`,
+  `set_derived_column_width`
+- row_command.rs: `get_row_config`
 
-### Row Operation Tests (src/row_operation_tests/)
-- row_operation_tests_mod.rs: Module organization
-- add_delete_tests.rs: Row insertion and deletion tests
+**Images:**
+- image_command.rs: `fetch_image` (async)
 
-### Rules Preview Tests (src/rules_preview_tests/)
-- rules_preview_tests_mod.rs: Module organization
-- fluent_tests.rs: Fluent template processing tests
-- style_tag_tests.rs: HTML-like style tag parsing tests
+**Logging/State:**
+- log_command.rs: `log_message`, `log_perf`
+- view_state_command.rs: `load_view_state`, `save_view_state`
+- sheet_order_command.rs: `load_sheet_order`, `save_sheet_order`
 
-### Integration Tests (src/integration_tests/)
-- integration_tests_mod.rs: Module organization
-- end_to_end_tests.rs: Full workflow integration tests
-- multi_file_tests.rs: Multiple sheet scenario tests
-- recovery_tests.rs: Error recovery scenario tests
+### TOML Module (src/toml/)
 
-### Test Utilities (test_utils/)
-- test_utils_mod.rs: Utility exports
-- mock_filesystem.rs: In-memory filesystem for isolated testing
-- mock_clock.rs: Controllable clock for time-dependent tests
-- mock_http_client.rs: Mock HTTP responses for image fetching tests
-- fixture_loader.rs: Test fixture file loading helpers
-- assertion_helpers.rs: Custom assertion macros for test readability
+- document_loader.rs: TOML file reading, array-of-tables extraction, header
+  collection from sparse data
+- document_writer.rs: Atomic writes via temp file + rename, cell-level updates,
+  batch updates, UUID integration, boolean type preservation
+- metadata_parser.rs: Parse all metadata categories (~36KB): validation rules,
+  derived columns, conditional formatting, table style, column/row configs,
+  sort/filter state
+- metadata_serializer.rs: Serialize configs to TOML (~30KB): sort state, filter
+  state, column widths
+- metadata_types.rs: Type definitions for metadata schema v1
+- value_converter.rs: JSON<->TOML value conversion with type preservation
+- color_schemes.rs: Predefined color scheme definitions (15+ schemes)
+- conditional_formatting.rs: Condition evaluation (equals, contains, greater_than,
+  less_than, is_empty, not_empty, matches)
+
+### Sync Module (src/sync/)
+
+- file_watcher.rs: notify-debouncer-mini integration, 500ms debounce, per-file
+  watcher threads, event aggregation
+- state_machine.rs: Idle/Saving/Loading/Error states, atomic transitions,
+  conflict detection via mtime comparison
+
+### Derived Module (src/derived/)
+
+**Core Infrastructure:**
+- function_registry.rs: Global `OnceLock<FunctionRegistry>`, `DerivedFunction`
+  trait, registration and lookup
+- compute_executor.rs: Async tokio execution, priority queue (visible rows
+  first), result event emission, `ComputeExecutorState`
+- generation_tracker.rs: Per-row generation counters for staleness detection
+- result_cache.rs: LRU cache for computed values
+
+**Built-in Functions:**
+- image_derived.rs: Image fetch with caching, returns local cache path
+- image_url.rs: Simple URL construction from image number
+- image_lookup.rs: Cross-table card ID resolution with image fetch
+- card_lookup.rs: Cross-table card name lookup by UUID
+- rules_preview.rs: Fluent template processing with rich text output
+- fluent_integration.rs: Fluent locale data loading from rules_engine
+- rich_text_converter.rs: Univer rich text structure generation
+- style_tag_parser.rs: HTML-like tag parsing for styled text
+
+### Validation Module (src/validation/)
+
+- validation_rules.rs: Rule type enum (Enum, Range, Pattern, Required, Type),
+  `ValueType` enum
+- validators.rs: `validate()`, `validate_all()`, `first_error()` functions for
+  all rule types
+
+### Images Module (src/images/)
+
+- image_cache.rs: SHA-256 content-addressed cache, LRU eviction at 100MB,
+  metadata persistence in `cache_metadata.json`, startup integrity validation
+- image_fetcher.rs: Async HTTP fetch with reqwest, semaphore concurrency (4),
+  30s timeout, format validation via `image` crate, browser-like headers
+
+### Sort Module (src/sort/)
+
+- sort_state.rs: `SortStateManager`, bidirectional index mapping
+  (display<->original), comparison logic for mixed types
+- sort_types.rs: `SortState`, `SortDirection` (Ascending/Descending),
+  `CellValue` enum
+
+### Filter Module (src/filter/)
+
+- filter_state.rs: `FilterStateManager`, visibility computation with AND logic,
+  hidden row tracking
+- filter_types.rs: `FilterState`, `FilterConditionState` (Contains, Equals,
+  Range, Boolean, Values)
+
+### View State Module (src/view_state/)
+
+- view_state_types.rs: `ViewState` struct with `active_sheet_path`, JSON
+  persistence to `.tv_view_state.json`
+- sheet_order.rs: `SheetOrder` persistence to `sheets.toml`
+
+### UUID Module (src/uuid/)
+
+- uuid_generator.rs: `ensure_uuids()` function, case-insensitive "id" column
+  detection, UUIDv4 generation
+
+### Logging Module (src/logging/)
+
+- json_logger.rs: Custom tracing subscriber, JSONL output, Pacific Time
+  timestamps, component tags
+- log_aggregator.rs: Frontend log aggregation, unified log stream
+
+### Error Module (src/error/)
+
+- error_types.rs: `TvError` enum with variants: FileNotFound, InvalidToml,
+  SaveFailed, WatcherError, ValidationFailed, ImageFetchError, ImageCacheError,
+  DerivedComputationError, BackendThreadPanic, SyncConflict, InvalidArguments
+
+### Traits Module (src/traits/)
+
+- traits_mod.rs: `FileSystem` trait (for testing with mock filesystem),
+  `Clock` trait, `RealFileSystem`, `RealClock` implementations
