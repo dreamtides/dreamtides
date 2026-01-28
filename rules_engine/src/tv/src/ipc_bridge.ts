@@ -916,198 +916,86 @@ export async function saveSheetOrder(order: string[]): Promise<void> {
 
 export type Disposable = { dispose: () => void };
 
-export function onFileChanged(
-  callback: (payload: FileChangedPayload) => void,
-): Disposable {
-  let unlisten: UnlistenFn | null = null;
+/**
+ * Generic factory function for creating event listeners.
+ * Reduces code duplication for the common pattern of subscribing to Tauri events.
+ *
+ * @param eventName The Tauri event name to listen for
+ * @returns A function that accepts a callback and returns a Disposable
+ */
+function createEventListener<T>(
+  eventName: string,
+): (callback: (payload: T) => void) => Disposable {
+  return (callback) => {
+    let unlisten: UnlistenFn | null = null;
 
-  listen<FileChangedPayload>("toml-file-changed", (event) => {
-    callback(event.payload);
-  }).then((fn) => {
-    unlisten = fn;
-  });
+    listen<T>(eventName, (event) => {
+      callback(event.payload);
+    }).then((fn) => {
+      unlisten = fn;
+    });
 
-  return {
-    dispose: () => {
-      if (unlisten) unlisten();
-    },
+    return {
+      dispose: () => {
+        if (unlisten) unlisten();
+      },
+    };
   };
 }
 
-export function onDerivedValueComputed(
-  callback: (payload: DerivedValuePayload) => void,
-): Disposable {
-  let unlisten: UnlistenFn | null = null;
+/**
+ * Special factory for events that don't pass payload to callback.
+ * Used for events like "open-find-dialog" where only the trigger matters.
+ */
+function createVoidEventListener(
+  eventName: string,
+): (callback: () => void) => Disposable {
+  return (callback) => {
+    let unlisten: UnlistenFn | null = null;
 
-  listen<DerivedValuePayload>("derived-value-computed", (event) => {
-    callback(event.payload);
-  }).then((fn) => {
-    unlisten = fn;
-  });
+    listen<void>(eventName, () => {
+      callback();
+    }).then((fn) => {
+      unlisten = fn;
+    });
 
-  return {
-    dispose: () => {
-      if (unlisten) unlisten();
-    },
+    return {
+      dispose: () => {
+        if (unlisten) unlisten();
+      },
+    };
   };
 }
 
-export function onSaveCompleted(
-  callback: (payload: SaveCompletedPayload) => void,
-): Disposable {
-  let unlisten: UnlistenFn | null = null;
+export const onFileChanged =
+  createEventListener<FileChangedPayload>("toml-file-changed");
 
-  listen<SaveCompletedPayload>("save-completed", (event) => {
-    callback(event.payload);
-  }).then((fn) => {
-    unlisten = fn;
-  });
+export const onDerivedValueComputed =
+  createEventListener<DerivedValuePayload>("derived-value-computed");
 
-  return {
-    dispose: () => {
-      if (unlisten) unlisten();
-    },
-  };
-}
+export const onSaveCompleted =
+  createEventListener<SaveCompletedPayload>("save-completed");
 
-export function onError(callback: (payload: ErrorPayload) => void): Disposable {
-  let unlisten: UnlistenFn | null = null;
+export const onError =
+  createEventListener<ErrorPayload>("error-occurred");
 
-  listen<ErrorPayload>("error-occurred", (event) => {
-    callback(event.payload);
-  }).then((fn) => {
-    unlisten = fn;
-  });
+export const onSyncStateChanged =
+  createEventListener<SyncStateChangedPayload>("sync-state-changed");
 
-  return {
-    dispose: () => {
-      if (unlisten) unlisten();
-    },
-  };
-}
+export const onSyncError =
+  createEventListener<SyncErrorPayload>("sync-error");
 
-export function onSyncStateChanged(
-  callback: (payload: SyncStateChangedPayload) => void,
-): Disposable {
-  let unlisten: UnlistenFn | null = null;
+export const onSyncConflict =
+  createEventListener<SyncConflictPayload>("sync-conflict-detected");
 
-  listen<SyncStateChangedPayload>("sync-state-changed", (event) => {
-    callback(event.payload);
-  }).then((fn) => {
-    unlisten = fn;
-  });
+export const onDerivedFunctionFailed =
+  createEventListener<DerivedFunctionFailedPayload>("derived-function-failed");
 
-  return {
-    dispose: () => {
-      if (unlisten) unlisten();
-    },
-  };
-}
+export const onPermissionStateChanged =
+  createEventListener<PermissionStateChangedPayload>("permission-state-changed");
 
-export function onSyncError(
-  callback: (payload: SyncErrorPayload) => void,
-): Disposable {
-  let unlisten: UnlistenFn | null = null;
+export const onAutosaveDisabledChanged =
+  createEventListener<boolean>("autosave-disabled-changed");
 
-  listen<SyncErrorPayload>("sync-error", (event) => {
-    callback(event.payload);
-  }).then((fn) => {
-    unlisten = fn;
-  });
-
-  return {
-    dispose: () => {
-      if (unlisten) unlisten();
-    },
-  };
-}
-
-export function onSyncConflict(
-  callback: (payload: SyncConflictPayload) => void,
-): Disposable {
-  let unlisten: UnlistenFn | null = null;
-
-  listen<SyncConflictPayload>("sync-conflict-detected", (event) => {
-    callback(event.payload);
-  }).then((fn) => {
-    unlisten = fn;
-  });
-
-  return {
-    dispose: () => {
-      if (unlisten) unlisten();
-    },
-  };
-}
-
-export function onDerivedFunctionFailed(
-  callback: (payload: DerivedFunctionFailedPayload) => void,
-): Disposable {
-  let unlisten: UnlistenFn | null = null;
-
-  listen<DerivedFunctionFailedPayload>("derived-function-failed", (event) => {
-    callback(event.payload);
-  }).then((fn) => {
-    unlisten = fn;
-  });
-
-  return {
-    dispose: () => {
-      if (unlisten) unlisten();
-    },
-  };
-}
-
-export function onPermissionStateChanged(
-  callback: (payload: PermissionStateChangedPayload) => void,
-): Disposable {
-  let unlisten: UnlistenFn | null = null;
-
-  listen<PermissionStateChangedPayload>("permission-state-changed", (event) => {
-    callback(event.payload);
-  }).then((fn) => {
-    unlisten = fn;
-  });
-
-  return {
-    dispose: () => {
-      if (unlisten) unlisten();
-    },
-  };
-}
-
-export function onAutosaveDisabledChanged(
-  callback: (disabled: boolean) => void,
-): Disposable {
-  let unlisten: UnlistenFn | null = null;
-
-  listen<boolean>("autosave-disabled-changed", (event) => {
-    callback(event.payload);
-  }).then((fn) => {
-    unlisten = fn;
-  });
-
-  return {
-    dispose: () => {
-      if (unlisten) unlisten();
-    },
-  };
-}
-
-export function onOpenFindDialog(
-  callback: () => void,
-): Disposable {
-  let unlisten: UnlistenFn | null = null;
-
-  listen<void>("open-find-dialog", () => {
-    callback();
-  }).then((fn) => {
-    unlisten = fn;
-  });
-
-  return {
-    dispose: () => {
-      if (unlisten) unlisten();
-    },
-  };
-}
+export const onOpenFindDialog =
+  createVoidEventListener("open-find-dialog");
