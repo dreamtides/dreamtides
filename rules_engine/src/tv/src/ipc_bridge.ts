@@ -420,7 +420,7 @@ export interface SyncConflictPayload {
 
 // ============ Permission State ============
 
-export type PermissionState = "read_write" | "read_only" | "unreadable";
+export type PermissionState = "read_write" | "read_only" | "unreadable" | "deleted";
 
 export interface PermissionStateChangedPayload {
   filePath: string;

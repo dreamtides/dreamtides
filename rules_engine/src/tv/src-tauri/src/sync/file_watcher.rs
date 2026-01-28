@@ -242,24 +242,26 @@ fn run_watcher(
             );
 
             if !path.exists() {
+                // Check if file was previously marked as deleted - if so, it's still
+                // missing, no need to emit another event
+                if permission_recovery::is_file_deleted(&app_handle, &file_path) {
+                    tracing::debug!(
+                        component = "tv.sync.deletion",
+                        file_path = %file_path,
+                        "File still missing, continuing to monitor for reappearance"
+                    );
+                    continue;
+                }
+
                 tracing::warn!(
-                    component = "tv.sync",
+                    component = "tv.sync.deletion",
                     file_path = %file_path,
-                    "Watched file no longer exists"
+                    "Watched file has been deleted or moved"
                 );
 
-                // Update permission state to unreadable (file may have been deleted
-                // or network drive disconnected)
-                let message = permission_recovery::get_permission_error_message(
-                    PermissionState::Unreadable,
-                    &file_path,
-                );
-                permission_recovery::set_permission_state(
-                    &app_handle,
-                    &file_path,
-                    PermissionState::Unreadable,
-                    &message,
-                );
+                // Mark the file as deleted (not just unreadable - this provides
+                // more specific handling and tracks deletion time)
+                permission_recovery::mark_file_deleted(&app_handle, &file_path);
 
                 let payload = FileChangedPayload {
                     file_path: file_path.clone(),
@@ -267,13 +269,37 @@ fn run_watcher(
                 };
                 if let Err(e) = app_handle.emit("toml-file-changed", payload) {
                     tracing::error!(
-                        component = "tv.sync",
+                        component = "tv.sync.deletion",
                         file_path = %file_path,
                         error = %e,
                         "Failed to emit file delete event"
                     );
                 }
                 continue;
+            }
+
+            // Check if file has reappeared after being deleted
+            if permission_recovery::check_file_reappearance(&app_handle, &file_path) {
+                tracing::info!(
+                    component = "tv.sync.deletion",
+                    file_path = %file_path,
+                    "File has reappeared after deletion, triggering reload"
+                );
+
+                let payload = FileChangedPayload {
+                    file_path: file_path.clone(),
+                    event_type: "restored".to_string(),
+                };
+                if let Err(e) = app_handle.emit("toml-file-changed", payload) {
+                    tracing::error!(
+                        component = "tv.sync.deletion",
+                        file_path = %file_path,
+                        error = %e,
+                        "Failed to emit file restored event"
+                    );
+                }
+                // Don't continue - we want to check permissions and emit the
+                // regular change event as well for the reload to happen
             }
 
             // Check if permissions have changed (file might have been restored or

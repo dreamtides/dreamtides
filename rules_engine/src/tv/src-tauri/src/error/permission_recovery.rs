@@ -10,7 +10,7 @@ use crate::toml::document_writer::CellUpdate;
 
 /// Tracks the permission state for a file (readable and writable).
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "snake_case")]
 pub enum PermissionState {
     /// File is both readable and writable.
     ReadWrite,
@@ -18,6 +18,8 @@ pub enum PermissionState {
     ReadOnly,
     /// File is not readable (preserve last known data).
     Unreadable,
+    /// File has been deleted (preserve last known data, monitor for reappearance).
+    Deleted,
 }
 
 impl PermissionState {
@@ -26,6 +28,7 @@ impl PermissionState {
             PermissionState::ReadWrite => "read_write",
             PermissionState::ReadOnly => "read_only",
             PermissionState::Unreadable => "unreadable",
+            PermissionState::Deleted => "deleted",
         }
     }
 }
@@ -42,11 +45,13 @@ pub struct PendingUpdate {
 struct FilePermissionState {
     permission: PermissionState,
     pending_updates: Vec<PendingUpdate>,
+    /// Timestamp when the file was detected as deleted (for reappearance detection).
+    deleted_at: Option<std::time::Instant>,
 }
 
 impl Default for FilePermissionState {
     fn default() -> Self {
-        Self { permission: PermissionState::ReadWrite, pending_updates: Vec::new() }
+        Self { permission: PermissionState::ReadWrite, pending_updates: Vec::new(), deleted_at: None }
     }
 }
 
@@ -290,6 +295,13 @@ pub fn get_permission_error_message(state: PermissionState, file_path: &str) -> 
                 file_name
             )
         }
+        PermissionState::Deleted => {
+            format!(
+                "File '{}' has been deleted or moved. The last known data is preserved. \
+                 Monitoring for file reappearance or specify a new file path.",
+                file_name
+            )
+        }
     }
 }
 
@@ -363,4 +375,120 @@ pub fn clear_permission_state(app_handle: &AppHandle, file_path: &str) {
         file_path = %file_path,
         "Permission state cleared"
     );
+}
+
+/// Marks a file as deleted and records the deletion timestamp.
+pub fn mark_file_deleted(app_handle: &AppHandle, file_path: &str) {
+    let Some(state) = app_handle.try_state::<PermissionRecoveryState>() else {
+        return;
+    };
+
+    let path = PathBuf::from(file_path);
+    let pending_count: usize;
+    let old_state: PermissionState;
+
+    {
+        let mut states = state.file_states.lock().unwrap_or_else(|e| e.into_inner());
+        let file_state = states.entry(path).or_default();
+        old_state = file_state.permission;
+        file_state.permission = PermissionState::Deleted;
+        file_state.deleted_at = Some(std::time::Instant::now());
+        pending_count = file_state.pending_updates.len();
+    }
+
+    if old_state != PermissionState::Deleted {
+        tracing::warn!(
+            component = "tv.error.deletion",
+            file_path = %file_path,
+            previous_state = %old_state.as_str(),
+            pending_updates = pending_count,
+            "File marked as deleted"
+        );
+
+        let message = get_permission_error_message(PermissionState::Deleted, file_path);
+        emit_permission_state_changed(
+            app_handle,
+            file_path,
+            PermissionState::Deleted,
+            &message,
+            pending_count,
+        );
+    }
+}
+
+/// Checks if a file was previously deleted and has now reappeared.
+/// If so, clears the deleted state and emits an event.
+/// Returns true if the file was restored from a deleted state.
+pub fn check_file_reappearance(app_handle: &AppHandle, file_path: &str) -> bool {
+    let path_obj = Path::new(file_path);
+    if !path_obj.exists() {
+        return false;
+    }
+
+    let Some(state) = app_handle.try_state::<PermissionRecoveryState>() else {
+        return false;
+    };
+
+    let path = PathBuf::from(file_path);
+    let was_deleted: bool;
+    let pending_count: usize;
+
+    {
+        let mut states = state.file_states.lock().unwrap_or_else(|e| e.into_inner());
+        let Some(file_state) = states.get_mut(&path) else {
+            return false;
+        };
+
+        if file_state.permission != PermissionState::Deleted {
+            return false;
+        }
+
+        was_deleted = true;
+        let elapsed = file_state.deleted_at.map(|t| t.elapsed().as_secs()).unwrap_or(0);
+        pending_count = file_state.pending_updates.len();
+
+        tracing::info!(
+            component = "tv.error.deletion",
+            file_path = %file_path,
+            seconds_since_deletion = elapsed,
+            pending_updates = pending_count,
+            "File has reappeared after deletion"
+        );
+
+        let new_state = detect_permission_state(path_obj);
+        file_state.permission = new_state;
+        file_state.deleted_at = None;
+    }
+
+    if was_deleted {
+        let new_state = detect_permission_state(path_obj);
+        let message = if new_state == PermissionState::ReadWrite {
+            format!(
+                "File '{}' has been restored.",
+                path_obj.file_name().map(|n| n.to_string_lossy()).unwrap_or_default()
+            )
+        } else {
+            get_permission_error_message(new_state, file_path)
+        };
+
+        emit_permission_state_changed(app_handle, file_path, new_state, &message, pending_count);
+    }
+
+    was_deleted
+}
+
+/// Returns true if the file is currently marked as deleted.
+pub fn is_file_deleted(app_handle: &AppHandle, file_path: &str) -> bool {
+    get_permission_state(app_handle, file_path) == PermissionState::Deleted
+}
+
+/// Returns the time in seconds since the file was deleted, or None if not deleted.
+pub fn get_deletion_elapsed_secs(app_handle: &AppHandle, file_path: &str) -> Option<u64> {
+    let Some(state) = app_handle.try_state::<PermissionRecoveryState>() else {
+        return None;
+    };
+
+    let path = PathBuf::from(file_path);
+    let states = state.file_states.lock().unwrap_or_else(|e| e.into_inner());
+    states.get(&path).and_then(|s| s.deleted_at.map(|t| t.elapsed().as_secs()))
 }

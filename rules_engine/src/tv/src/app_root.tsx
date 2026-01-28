@@ -641,6 +641,20 @@ export function AppRoot() {
       const sheetInfo = sheets.find((s) => s.path === payload.file_path);
       if (!sheetInfo) return;
 
+      // Handle file deletion events
+      if (payload.event_type === "delete") {
+        logger.warn("File has been deleted", { filePath: payload.file_path });
+        // Don't reload - the permission state change event will handle the UI update
+        return;
+      }
+
+      // Handle file restoration events
+      if (payload.event_type === "restored") {
+        logger.info("File has been restored, reloading sheet", { filePath: payload.file_path });
+        reloadSheet(sheetInfo.id);
+        return;
+      }
+
       if (isSavingRef.current[sheetInfo.id]) {
         logger.debug("Ignoring file change during save", { filePath: payload.file_path });
         return;
@@ -718,18 +732,24 @@ export function AppRoot() {
         logger.warn("File became unreadable", {
           filePath: payload.filePath,
         });
+      } else if (payload.state === "deleted") {
+        setPermissionError(payload.message);
+        logger.warn("File has been deleted or moved", {
+          filePath: payload.filePath,
+          pendingUpdates: payload.pendingUpdateCount,
+        });
       } else if (payload.state === "read_write") {
-        // Permissions restored - clear the error and try to apply pending updates
+        // File is accessible again - clear the error and try to apply pending updates
         setPermissionError(null);
         if (payload.pendingUpdateCount > 0) {
-          logger.info("Permissions restored, retrying pending updates", {
+          logger.info("File restored, retrying pending updates", {
             filePath: payload.filePath,
             pendingUpdates: payload.pendingUpdateCount,
           });
           ipc.retryPendingUpdates(payload.filePath)
             .then((appliedCount) => {
               if (appliedCount > 0) {
-                logger.info("Applied pending updates after permission restore", {
+                logger.info("Applied pending updates after file restore", {
                   filePath: payload.filePath,
                   appliedCount,
                 });
@@ -743,6 +763,9 @@ export function AppRoot() {
                 error: String(e),
               });
             });
+        } else {
+          // File was restored but no pending updates - reload to get fresh data
+          reloadSheet(sheetInfo.id);
         }
       }
     });
