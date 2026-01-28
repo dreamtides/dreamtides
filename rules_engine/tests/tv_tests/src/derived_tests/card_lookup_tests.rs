@@ -250,7 +250,7 @@ fn test_derived_function_trait_implementation() {
     let function = CardLookupFunction::new();
 
     assert_eq!(function.name(), "card_lookup");
-    assert_eq!(function.input_keys(), vec!["referenced_card_id"]);
+    assert_eq!(function.input_keys(), vec!["card_id"]);
     assert!(!function.is_async());
 }
 
@@ -314,7 +314,7 @@ fn test_card_lookup_default_constructor() {
     let function = CardLookupFunction::default();
 
     assert_eq!(function.name(), "card_lookup");
-    assert_eq!(function.input_keys(), vec!["referenced_card_id"]);
+    assert_eq!(function.input_keys(), vec!["card_id"]);
     assert!(!function.is_async());
 }
 

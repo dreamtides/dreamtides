@@ -70,12 +70,16 @@ impl DerivedFunction for CardLookupFunction {
     }
 
     fn input_keys(&self) -> Vec<&'static str> {
-        vec!["referenced_card_id"]
+        vec!["card_id"]
     }
 
     fn compute(&self, inputs: &RowData, context: &LookupContext) -> DerivedResult {
-        // Get the referenced card ID from inputs
-        let uuid = match inputs.get("referenced_card_id") {
+        let card_id_value = inputs
+            .get("card-id")
+            .or_else(|| inputs.get("card_id"))
+            .or_else(|| inputs.get("referenced_card_id"));
+
+        let uuid = match card_id_value {
             Some(serde_json::Value::String(s)) => s.as_str(),
             Some(serde_json::Value::Null) | None => {
                 return DerivedResult::Text(String::new());
