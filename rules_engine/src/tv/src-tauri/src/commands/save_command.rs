@@ -27,6 +27,11 @@ pub fn save_toml_table(
     let result = document_writer::save_toml_document(&TvConfig::default(), &file_path, &table_name, &data);
     let _ = state_machine::end_save(&app_handle, &file_path, result.is_ok());
 
+    if result.is_ok() {
+        let column_keys: Vec<&str> = data.headers.iter().map(|s| s.as_str()).collect();
+        trigger_ability_parse_if_needed(&app_handle, &file_path, &column_keys);
+    }
+
     result
 }
 
