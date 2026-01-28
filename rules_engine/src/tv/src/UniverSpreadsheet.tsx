@@ -1,5 +1,6 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef } from "react";
-import { Univer, RichTextValue } from "@univerjs/core";
+import { Univer, RichTextValue, CellValue, Nullable } from "@univerjs/core";
+import type { IFilterColumn } from "@univerjs/sheets-filter";
 import { FUniver } from "@univerjs/core/facade";
 
 import {
@@ -172,8 +173,7 @@ export const UniverSpreadsheet = forwardRef<
 
     // Use includeRichText=true so cells with document data (p) return
     // RichTextValue objects instead of null.
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let allValues: any[][];
+    let allValues: (Nullable<RichTextValue | CellValue>)[][];
     try {
       allValues = dataRange.getValues(true);
     } catch {
@@ -1001,10 +1001,10 @@ export const UniverSpreadsheet = forwardRef<
           for (let i = 0; i < headers.length; i++) {
             const visualCol = mapping.dataToVisual[i];
             if (visualCol === undefined) continue;
-            const criteria = filter.getColumnFilterCriteria(visualCol);
+            const criteria: Nullable<IFilterColumn> =
+              filter.getColumnFilterCriteria(visualCol);
             if (!criteria) continue;
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const filtersObj = (criteria as any).filters;
+            const filtersObj = criteria.filters;
             if (!filtersObj?.filters || filtersObj.filters.length === 0)
               continue;
             filterRequests.push({
