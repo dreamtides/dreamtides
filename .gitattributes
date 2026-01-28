@@ -1,4 +1,4 @@
 client/Assets/StreamingAssets/TabulaData.xlsm filter=lfs diff=lfs merge=lfs -text
 
-# Use bd merge for beads JSONL files
-.beads/issues.jsonl merge=beads
+# Parsed abilities JSON is generated and should not appear in diffs
+client/Assets/StreamingAssets/Tabula/parsed_abilities.json binary

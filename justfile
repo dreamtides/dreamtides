@@ -1,12 +1,12 @@
 set positional-arguments
 
-code-review: check-format build workspace-lints clippy style-validator test unity-tests
+code-review: check-format build workspace-lints clippy style-validator test unity-tests verify-parsed-abilities
 
 # Run this before pushing
 code-review-rsync: rsync-for-review
     cd ~/dreamtides_tests && just code-review || (osascript -e 'display dialog "Review failed" with icon stop'; exit 1)
 
-review: check-snapshots check-format build clippy style-validator test tv-check tv-clippy
+review: check-snapshots check-format build clippy style-validator test tv-check tv-clippy verify-parsed-abilities
 
 check:
     #!/usr/bin/env bash
@@ -290,6 +290,19 @@ parser *args='':
 
 parser-release *args='':
   cargo run --manifest-path rules_engine/Cargo.toml --release --bin "parser_v2" -- "$@"
+
+parse-abilities:
+  cargo run --manifest-path rules_engine/Cargo.toml --bin "parser_v2" -- parse-abilities --directory rules_engine/tabula --output rules_engine/tabula/parsed_abilities.json
+
+verify-parsed-abilities:
+  #!/usr/bin/env bash
+  output=$(cargo run --manifest-path rules_engine/Cargo.toml --bin "parser_v2" -- verify-abilities --directory rules_engine/tabula --input rules_engine/tabula/parsed_abilities.json 2>&1)
+  if [ $? -eq 0 ]; then
+      echo "Parsed abilities verification passed"
+  else
+      echo "$output"
+      exit 1
+  fi
 
 llmc *args='':
   @cargo run --manifest-path rules_engine/Cargo.toml -p llmc -- "$@"

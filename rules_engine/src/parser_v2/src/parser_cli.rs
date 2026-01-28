@@ -1,11 +1,12 @@
 use std::fs;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 use ariadne::{Color, Label, Report, ReportKind, Source};
 use chumsky::error::Rich;
 use chumsky::span::{SimpleSpan, Span};
 use chumsky::Parser as ChumskyParser;
 use clap::{Parser, Subcommand, ValueEnum};
+use parser_v2::ability_directory_parser;
 use parser_v2::error::parser_errors::ParserError;
 use parser_v2::error::{parser_diagnostics, parser_error_suggestions};
 use parser_v2::lexer::lexer_token::Token;
@@ -38,6 +39,12 @@ use serde::{Deserialize, Serialize};
 
   # Parse all cards from TOML file
   parser_v2 parse-file --input tabula/cards.toml --output parsed_cards.json
+
+  # Parse abilities from all TOML files in a directory
+  parser_v2 parse-abilities --directory tabula --output parsed_abilities.json
+
+  # Verify a parsed abilities JSON file matches the TOML source
+  parser_v2 verify-abilities --directory tabula --input parsed_abilities.json
 
   # Verify all cards can be lexed and variables resolved
   parser_v2 verify tabula/cards.toml
@@ -82,6 +89,22 @@ enum Command {
         output: PathBuf,
     },
 
+    ParseAbilities {
+        #[arg(short, long)]
+        directory: PathBuf,
+
+        #[arg(short, long, default_value = "parsed_abilities.json")]
+        output: PathBuf,
+    },
+
+    VerifyAbilities {
+        #[arg(short, long)]
+        directory: PathBuf,
+
+        #[arg(short, long)]
+        input: PathBuf,
+    },
+
     Verify {
         input: PathBuf,
     },
@@ -117,6 +140,12 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
         }
         Command::ParseFile { input, output } => {
             parse_file_command(&input, &output)?;
+        }
+        Command::ParseAbilities { directory, output } => {
+            parse_abilities_command(&directory, &output)?;
+        }
+        Command::VerifyAbilities { directory, input } => {
+            verify_abilities_command(&directory, &input)?;
         }
         Command::Verify { input } => {
             verify_command(&input)?;
@@ -182,6 +211,51 @@ fn parse_command(
     }
 
     Ok(())
+}
+
+fn parse_abilities_command(
+    directory: &Path,
+    output: &Path,
+) -> Result<(), Box<dyn std::error::Error>> {
+    let results = ability_directory_parser::parse_abilities_from_directory(directory)?;
+    let output_content = serde_json::to_string(&results)?;
+    fs::write(output, output_content)?;
+    println!("Parsed abilities for {} cards to {}", results.len(), output.display());
+    Ok(())
+}
+
+fn verify_abilities_command(
+    directory: &Path,
+    input: &Path,
+) -> Result<(), Box<dyn std::error::Error>> {
+    let expected = ability_directory_parser::parse_abilities_from_directory(directory)?;
+    let expected_json = serde_json::to_string(&expected)?;
+
+    let actual_json = fs::read_to_string(input)?;
+
+    if expected_json == actual_json {
+        println!("✓ {} is up to date ({} cards)", input.display(), expected.len());
+        Ok(())
+    } else {
+        let expected_parsed: serde_json::Value = serde_json::from_str(&expected_json)?;
+        let actual_parsed: serde_json::Value = serde_json::from_str(&actual_json)?;
+
+        if expected_parsed == actual_parsed {
+            println!(
+                "✓ {} matches but has different formatting ({} cards)",
+                input.display(),
+                expected.len()
+            );
+            Ok(())
+        } else {
+            eprintln!(
+                "✗ {} does not match parsed abilities from {}",
+                input.display(),
+                directory.display()
+            );
+            Err("Verification failed: JSON file does not match parsed abilities".into())
+        }
+    }
 }
 
 fn parse_file_command(input: &PathBuf, output: &PathBuf) -> Result<(), Box<dyn std::error::Error>> {
