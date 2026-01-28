@@ -9,31 +9,18 @@ use crate::filter::filter_state::FilterStateManager;
 use crate::images::image_fetcher::ImageFetcherState;
 
 pub mod cli;
-#[path = "commands/commands_mod.rs"]
 mod commands;
-#[path = "derived/derived_mod.rs"]
 pub mod derived;
-#[path = "error/error_mod.rs"]
 pub mod error;
-#[path = "filter/filter_mod.rs"]
 pub mod filter;
-#[path = "images/images_mod.rs"]
 pub mod images;
-#[path = "logging/logging_mod.rs"]
 pub mod logging;
-#[path = "sort/sort_mod.rs"]
 pub mod sort;
-#[path = "sync/sync_mod.rs"]
 mod sync;
-#[path = "toml/toml_mod.rs"]
 pub mod toml;
-#[path = "traits/traits_mod.rs"]
 pub mod traits;
-#[path = "uuid/uuid_mod.rs"]
 pub mod uuid;
-#[path = "validation/validation_mod.rs"]
 pub mod validation;
-#[path = "view_state/view_state_mod.rs"]
 pub mod view_state;
 
 #[tauri::command]

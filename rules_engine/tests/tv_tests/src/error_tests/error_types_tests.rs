@@ -719,7 +719,7 @@ fn test_tv_error_serializes_complex_variant() {
 
 #[test]
 fn test_load_nonexistent_file_returns_file_not_found() {
-    let harness = crate::test_utils::test_utils_mod::TvTestHarness::new();
+    let harness = crate::test_utils::harness::TvTestHarness::new();
     let nonexistent = harness.temp_dir().join("does_not_exist.toml");
 
     let result = harness.load_table(&nonexistent, "cards");
@@ -731,7 +731,7 @@ fn test_load_nonexistent_file_returns_file_not_found() {
 
 #[test]
 fn test_load_invalid_toml_returns_parse_error() {
-    let harness = crate::test_utils::test_utils_mod::TvTestHarness::new();
+    let harness = crate::test_utils::harness::TvTestHarness::new();
     let path = harness.create_toml_file("bad.toml", "this is not valid [[ toml {{");
 
     let result = harness.load_table(&path, "cards");
@@ -743,7 +743,7 @@ fn test_load_invalid_toml_returns_parse_error() {
 
 #[test]
 fn test_load_missing_table_returns_table_not_found() {
-    let harness = crate::test_utils::test_utils_mod::TvTestHarness::new();
+    let harness = crate::test_utils::harness::TvTestHarness::new();
     let path = harness.create_toml_file(
         "valid.toml",
         r#"
@@ -761,7 +761,7 @@ name = "Test"
 
 #[test]
 fn test_save_cell_to_nonexistent_file_returns_error() {
-    let harness = crate::test_utils::test_utils_mod::TvTestHarness::new();
+    let harness = crate::test_utils::harness::TvTestHarness::new();
     let nonexistent = harness.temp_dir().join("missing.toml");
 
     let result = harness.save_cell(&nonexistent, "cards", 0, "name", serde_json::json!("Test"));
@@ -770,7 +770,7 @@ fn test_save_cell_to_nonexistent_file_returns_error() {
 
 #[test]
 fn test_save_cell_invalid_row_returns_error() {
-    let harness = crate::test_utils::test_utils_mod::TvTestHarness::new();
+    let harness = crate::test_utils::harness::TvTestHarness::new();
     let path = harness.create_toml_file(
         "small.toml",
         r#"
@@ -787,7 +787,7 @@ name = "Only Card"
 
 #[test]
 fn test_delete_row_out_of_bounds_returns_error() {
-    let harness = crate::test_utils::test_utils_mod::TvTestHarness::new();
+    let harness = crate::test_utils::harness::TvTestHarness::new();
     let path = harness.create_toml_file(
         "small.toml",
         r#"
@@ -804,7 +804,7 @@ name = "Only Card"
 
 #[test]
 fn test_load_non_array_table_returns_not_array_error() {
-    let harness = crate::test_utils::test_utils_mod::TvTestHarness::new();
+    let harness = crate::test_utils::harness::TvTestHarness::new();
     let path = harness.create_toml_file(
         "plain_table.toml",
         r#"
@@ -827,7 +827,7 @@ fn test_mock_fs_read_failure_produces_correct_error() {
         io::ErrorKind::PermissionDenied,
         "access denied",
     ));
-    let harness = crate::test_utils::test_utils_mod::TvTestHarness::with_mock_fs(mock);
+    let harness = crate::test_utils::harness::TvTestHarness::with_mock_fs(mock);
     let path = harness.temp_dir().join("test.toml");
 
     let result = harness.load_table(&path, "cards");

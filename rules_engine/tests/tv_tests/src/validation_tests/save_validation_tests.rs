@@ -2,7 +2,7 @@ use serde_json::json;
 use tv_lib::error::error_types::TvError;
 use tv_lib::toml::document_writer::CellUpdate;
 
-use crate::test_utils::test_utils_mod::TvTestHarness;
+use crate::test_utils::harness::TvTestHarness;
 
 #[test]
 fn test_save_cell_with_enum_validation_pass() {

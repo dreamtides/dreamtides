@@ -1,6 +1,6 @@
 use tv_lib::error::error_types::TvError;
 
-use crate::test_utils::test_utils_mod::TvTestHarness;
+use crate::test_utils::harness::TvTestHarness;
 
 #[test]
 fn test_load_simple_table() {

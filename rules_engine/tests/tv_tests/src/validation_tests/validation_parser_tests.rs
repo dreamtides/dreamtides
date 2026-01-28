@@ -1,7 +1,7 @@
 use tv_lib::toml::metadata::parse_validation_rules_from_content;
 use tv_lib::validation::validation_rules::{ValidationRule, ValueType};
 
-use crate::test_utils::test_utils_mod::TvTestHarness;
+use crate::test_utils::harness::TvTestHarness;
 
 #[test]
 fn test_parse_enum_rule() {

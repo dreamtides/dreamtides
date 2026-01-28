@@ -4,7 +4,7 @@ use tv_lib::validation::validation_rules::{ValidationRule, ValueType};
 use tv_lib::validation::validators::validate;
 
 use crate::test_utils::fixture_loader::load_fixture;
-use crate::test_utils::test_utils_mod::TvTestHarness;
+use crate::test_utils::harness::TvTestHarness;
 
 fn load_validation_fixture() -> (TvTestHarness, std::path::PathBuf) {
     let harness = TvTestHarness::new();

@@ -2,7 +2,7 @@ use serde_json::json;
 use tv_lib::toml::document_loader::TomlTableData;
 use tv_lib::toml::document_writer::CellUpdate;
 
-use crate::test_utils::test_utils_mod::TvTestHarness;
+use crate::test_utils::harness::TvTestHarness;
 
 #[test]
 fn test_delete_row_preserves_boolean_types() {

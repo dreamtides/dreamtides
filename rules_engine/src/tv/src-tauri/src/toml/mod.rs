@@ -4,7 +4,6 @@ pub mod color_schemes;
 pub mod conditional_formatting;
 pub mod document_loader;
 pub mod document_writer;
-#[path = "metadata/metadata_mod.rs"]
 pub mod metadata;
 pub mod metadata_serializer;
 pub mod metadata_types;

@@ -1,6 +1,6 @@
 use serde_json::json;
 
-use crate::test_utils::test_utils_mod::TvTestHarness;
+use crate::test_utils::harness::TvTestHarness;
 
 #[test]
 fn test_enum_rules_extracted_for_dropdown() {

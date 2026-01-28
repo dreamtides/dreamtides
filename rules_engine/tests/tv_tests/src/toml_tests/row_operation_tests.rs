@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use serde_json::json;
 use tv_lib::error::error_types::TvError;
 
-use crate::test_utils::test_utils_mod::TvTestHarness;
+use crate::test_utils::harness::TvTestHarness;
 
 #[test]
 fn test_add_row_at_end() {

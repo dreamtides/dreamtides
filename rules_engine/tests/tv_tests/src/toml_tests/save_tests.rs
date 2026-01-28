@@ -5,8 +5,8 @@ use tv_lib::error::error_types::TvError;
 use tv_lib::toml::document_loader::TomlTableData;
 use tv_lib::toml::document_writer::{cleanup_orphaned_temp_files_with_fs, CellUpdate};
 
+use crate::test_utils::harness::TvTestHarness;
 use crate::test_utils::mock_filesystem::MockFileSystem;
-use crate::test_utils::test_utils_mod::TvTestHarness;
 
 #[test]
 fn test_save_cell_updates_value() {

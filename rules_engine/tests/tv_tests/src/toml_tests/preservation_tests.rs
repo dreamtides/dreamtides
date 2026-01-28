@@ -1,7 +1,7 @@
 use proptest::prelude::*;
 use serde_json::json;
 
-use crate::test_utils::test_utils_mod::TvTestHarness;
+use crate::test_utils::harness::TvTestHarness;
 
 fn valid_key() -> impl Strategy<Value = String> {
     "[a-z][a-z0-9_]{0,15}".prop_map(|s| s.to_string())

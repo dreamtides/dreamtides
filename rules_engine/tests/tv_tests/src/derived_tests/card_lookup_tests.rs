@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use tv_lib::derived::card_lookup::CardLookupFunction;
 use tv_lib::derived::derived_types::{DerivedFunction, DerivedResult, LookupContext, RowData};
 
-use crate::test_utils::test_utils_mod::TvTestHarness;
+use crate::test_utils::harness::TvTestHarness;
 
 /// Helper to create a LookupContext from a loaded TOML table.
 fn create_context_from_toml(harness: &TvTestHarness, path: &std::path::Path) -> LookupContext {
