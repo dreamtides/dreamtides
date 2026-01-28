@@ -14,6 +14,7 @@ import type {
 import type { MultiSheetData } from "./spreadsheet_types";
 import { formatHeaderForDisplay } from "./header_utils";
 import { buildColumnMapping, type ColumnMapping } from "./derived_column_utils";
+import { stringToDocumentData } from "./sheet_data_utils";
 import { createLogger } from "./logger_frontend";
 
 const logger = createLogger("tv.ui.workbook_builder");
@@ -92,7 +93,10 @@ export function buildMultiSheetWorkbook(
     // Build cell data
     const cellData: Record<
       number,
-      Record<number, { v: unknown; t?: CellValueType; s?: { bl?: number } }>
+      Record<
+        number,
+        { v?: unknown; p?: unknown; t?: CellValueType; s?: { bl?: number } }
+      >
     > = {};
 
     // Header row (row 0) with display-formatted names and bold styling
@@ -148,8 +152,18 @@ export function buildMultiSheetWorkbook(
               cell.s = { bl: 1 };
             }
             cellData[rowIndex + 1][visualCol] = cell;
+          } else if (
+            typeof cellValue === "string" &&
+            cellValue.includes("\n")
+          ) {
+            cellData[rowIndex + 1][visualCol] = {
+              v: cellValue,
+              p: stringToDocumentData(cellValue, isBold),
+            };
           } else {
-            const cell: { v: unknown; s?: { bl?: number } } = { v: cellValue };
+            const cell: { v?: unknown; s?: { bl?: number } } = {
+              v: cellValue,
+            };
             if (isBold) {
               cell.s = { bl: 1 };
             }

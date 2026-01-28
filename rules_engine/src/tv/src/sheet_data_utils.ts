@@ -8,6 +8,52 @@ import {
 } from "./derived_column_utils";
 
 /**
+ * Build an IDocumentData object from a plain string, converting \n to
+ * paragraph breaks so Univer renders line breaks in the cell.
+ */
+export function stringToDocumentData(
+  text: string,
+  bold?: boolean,
+): Record<string, unknown> {
+  let dataStream = "";
+  const textRuns: { st: number; ed: number; ts: Record<string, unknown> }[] =
+    [];
+  const paragraphs: { startIndex: number }[] = [];
+
+  const parts = text.split("\n");
+  for (let i = 0; i < parts.length; i++) {
+    if (i > 0) {
+      dataStream += "\r";
+      paragraphs.push({ startIndex: dataStream.length - 1 });
+    }
+    if (parts[i].length > 0) {
+      const start = dataStream.length;
+      dataStream += parts[i];
+      if (bold) {
+        textRuns.push({ st: start, ed: dataStream.length, ts: { bl: 1 } });
+      }
+    }
+  }
+
+  dataStream += "\r\n";
+  paragraphs.push({ startIndex: dataStream.length - 2 });
+
+  return {
+    id: "",
+    body: {
+      dataStream,
+      paragraphs,
+      textRuns,
+      sectionBreaks: [],
+      customBlocks: [],
+      customRanges: [],
+      tables: [],
+    },
+    documentStyle: {},
+  };
+}
+
+/**
  * Compare two TomlTableData objects for equality.
  */
 export function isSheetDataEqual(a: TomlTableData, b: TomlTableData): boolean {
@@ -76,6 +122,21 @@ export function populateSheetDataBatch(
           return segRow;
         });
         dataRange.setValues(displayRows);
+      }
+    }
+
+    for (let rowIndex = 0; rowIndex < data.rows.length; rowIndex++) {
+      const row = data.rows[rowIndex];
+      for (let colIndex = 0; colIndex < row.length; colIndex++) {
+        const cellValue = row[colIndex];
+        if (typeof cellValue === "string" && cellValue.includes("\n")) {
+          const visualCol = mapping.dataToVisual[colIndex];
+          const range = sheet.getRange(rowIndex + 1, visualCol, 1, 1);
+          if (range) {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            range.setRichTextValueForCell(stringToDocumentData(cellValue) as any);
+          }
+        }
       }
     }
   }

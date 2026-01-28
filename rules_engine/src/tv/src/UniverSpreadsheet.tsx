@@ -1,5 +1,5 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef } from "react";
-import { Univer } from "@univerjs/core";
+import { Univer, RichTextValue } from "@univerjs/core";
 import { FUniver } from "@univerjs/core/facade";
 
 import {
@@ -170,9 +170,12 @@ export const UniverSpreadsheet = forwardRef<
     );
     if (!dataRange) return { headers, rows: [] };
 
-    let allValues: ReturnType<typeof dataRange.getValues>;
+    // Use includeRichText=true so cells with document data (p) return
+    // RichTextValue objects instead of null.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let allValues: any[][];
     try {
-      allValues = dataRange.getValues();
+      allValues = dataRange.getValues(true);
     } catch {
       return { headers, rows: [] };
     }
@@ -187,14 +190,28 @@ export const UniverSpreadsheet = forwardRef<
 
       for (let c = 0; c < headers.length; c++) {
         const rangeRelCol = mapping.dataToVisual[c] - firstDataCol;
-        const cellValue =
+        const rawCellValue =
           rangeRelCol >= 0 && rangeRelCol < rowValues.length
             ? rowValues[rangeRelCol]
             : null;
 
-        if (cellValue !== undefined && cellValue !== null && cellValue !== "") {
+        let cellValue: string | number | boolean | null = null;
+        if (rawCellValue instanceof RichTextValue) {
+          const text = rawCellValue.toPlainText().replace(/\r\n/g, "\n").replace(/\r/g, "\n");
+          if (text) {
+            cellValue = text;
+          }
+        } else if (
+          rawCellValue !== undefined &&
+          rawCellValue !== null &&
+          rawCellValue !== ""
+        ) {
+          cellValue = rawCellValue as string | number | boolean;
+        }
+
+        if (cellValue !== null) {
           rowHasContent = true;
-          row.push(cellValue as string | number | boolean);
+          row.push(cellValue);
         } else {
           row.push(null);
         }
