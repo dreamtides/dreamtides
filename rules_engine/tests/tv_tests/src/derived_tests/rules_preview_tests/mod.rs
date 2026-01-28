@@ -17,7 +17,7 @@ fn create_empty_context() -> LookupContext {
 
 fn make_inputs(rules_text: &str, variables: &str) -> RowData {
     let mut inputs: RowData = HashMap::new();
-    inputs.insert("rules_text".to_string(), serde_json::json!(rules_text));
+    inputs.insert("rules-text".to_string(), serde_json::json!(rules_text));
     inputs.insert("variables".to_string(), serde_json::json!(variables));
     inputs
 }
@@ -31,7 +31,7 @@ fn test_function_name() {
 #[test]
 fn test_input_keys() {
     let function = RulesPreviewFunction::new();
-    assert_eq!(function.input_keys(), vec!["rules_text", "variables"]);
+    assert_eq!(function.input_keys(), vec!["rules-text", "variables"]);
 }
 
 #[test]
@@ -75,7 +75,7 @@ fn test_null_rules_text() {
     let context = create_empty_context();
 
     let mut inputs: RowData = HashMap::new();
-    inputs.insert("rules_text".to_string(), serde_json::Value::Null);
+    inputs.insert("rules-text".to_string(), serde_json::Value::Null);
 
     let result = function.compute(&inputs, &context);
     assert_eq!(result, DerivedResult::Text(String::new()));
@@ -99,7 +99,7 @@ fn test_invalid_rules_text_type() {
     let context = create_empty_context();
 
     let mut inputs: RowData = HashMap::new();
-    inputs.insert("rules_text".to_string(), serde_json::json!(42));
+    inputs.insert("rules-text".to_string(), serde_json::json!(42));
 
     let result = function.compute(&inputs, &context);
     match result {
@@ -117,7 +117,7 @@ fn test_invalid_variables_type() {
     let context = create_empty_context();
 
     let mut inputs: RowData = HashMap::new();
-    inputs.insert("rules_text".to_string(), serde_json::json!("Hello"));
+    inputs.insert("rules-text".to_string(), serde_json::json!("Hello"));
     inputs.insert("variables".to_string(), serde_json::json!(42));
 
     let result = function.compute(&inputs, &context);
@@ -136,7 +136,7 @@ fn test_null_variables_treated_as_empty() {
     let context = create_empty_context();
 
     let mut inputs: RowData = HashMap::new();
-    inputs.insert("rules_text".to_string(), serde_json::json!("Hello world."));
+    inputs.insert("rules-text".to_string(), serde_json::json!("Hello world."));
     inputs.insert("variables".to_string(), serde_json::Value::Null);
 
     let result = function.compute(&inputs, &context);
@@ -156,7 +156,7 @@ fn test_missing_variables_field() {
     let context = create_empty_context();
 
     let mut inputs: RowData = HashMap::new();
-    inputs.insert("rules_text".to_string(), serde_json::json!("Plain text output."));
+    inputs.insert("rules-text".to_string(), serde_json::json!("Plain text output."));
 
     let result = function.compute(&inputs, &context);
     match result {

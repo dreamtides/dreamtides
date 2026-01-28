@@ -29,11 +29,11 @@ impl DerivedFunction for RulesPreviewFunction {
     }
 
     fn input_keys(&self) -> Vec<&'static str> {
-        vec!["rules_text", "variables"]
+        vec!["rules-text", "variables"]
     }
 
     fn compute(&self, inputs: &RowData, _context: &LookupContext) -> DerivedResult {
-        let rules_text = match inputs.get("rules_text") {
+        let rules_text = match inputs.get("rules-text") {
             Some(serde_json::Value::String(s)) => s.as_str(),
             Some(serde_json::Value::Null) | None => return DerivedResult::Text(String::new()),
             Some(other) => {

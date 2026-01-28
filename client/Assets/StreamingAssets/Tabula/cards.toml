@@ -3705,6 +3705,13 @@ width = 160
 inputs = ["image_number"]
 url_template = "https://www.shutterstock.com/image-illustration/-260nw-{image_number}.jpg"
 
+[[metadata.derived_columns]]
+name = "rules preview"
+function = "rules_preview"
+position = 1
+width = 300
+inputs = ["rules-text", "variables"]
+
 [metadata.rows]
 default_height = 100
 frozen_rows = 1

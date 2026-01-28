@@ -14,7 +14,7 @@ fn create_empty_context() -> LookupContext {
 
 fn make_inputs(rules_text: &str, variables: &str) -> RowData {
     let mut inputs: RowData = HashMap::new();
-    inputs.insert("rules_text".to_string(), serde_json::json!(rules_text));
+    inputs.insert("rules-text".to_string(), serde_json::json!(rules_text));
     inputs.insert("variables".to_string(), serde_json::json!(variables));
     inputs
 }
@@ -283,7 +283,7 @@ fn test_to_frontend_value_for_error_result() {
     let context = create_empty_context();
 
     let mut inputs: RowData = HashMap::new();
-    inputs.insert("rules_text".to_string(), serde_json::json!(42));
+    inputs.insert("rules-text".to_string(), serde_json::json!(42));
 
     let result = function.compute(&inputs, &context);
     let frontend = result.to_frontend_value();
@@ -299,7 +299,7 @@ fn test_to_frontend_value_for_error_result() {
 fn test_default_trait_creates_function() {
     let function = RulesPreviewFunction::default();
     assert_eq!(function.name(), "rules_preview");
-    assert_eq!(function.input_keys(), vec!["rules_text", "variables"]);
+    assert_eq!(function.input_keys(), vec!["rules-text", "variables"]);
     assert!(!function.is_async());
 }
 
@@ -413,7 +413,7 @@ fn test_array_type_rules_text_returns_error() {
     let context = create_empty_context();
 
     let mut inputs: RowData = HashMap::new();
-    inputs.insert("rules_text".to_string(), serde_json::json!([1, 2, 3]));
+    inputs.insert("rules-text".to_string(), serde_json::json!([1, 2, 3]));
 
     let result = function.compute(&inputs, &context);
     match result {
@@ -431,7 +431,7 @@ fn test_object_type_rules_text_returns_error() {
     let context = create_empty_context();
 
     let mut inputs: RowData = HashMap::new();
-    inputs.insert("rules_text".to_string(), serde_json::json!({"key": "value"}));
+    inputs.insert("rules-text".to_string(), serde_json::json!({"key": "value"}));
 
     let result = function.compute(&inputs, &context);
     match result {
@@ -449,7 +449,7 @@ fn test_boolean_type_rules_text_returns_error() {
     let context = create_empty_context();
 
     let mut inputs: RowData = HashMap::new();
-    inputs.insert("rules_text".to_string(), serde_json::json!(true));
+    inputs.insert("rules-text".to_string(), serde_json::json!(true));
 
     let result = function.compute(&inputs, &context);
     match result {
@@ -467,7 +467,7 @@ fn test_array_type_variables_returns_error() {
     let context = create_empty_context();
 
     let mut inputs: RowData = HashMap::new();
-    inputs.insert("rules_text".to_string(), serde_json::json!("text"));
+    inputs.insert("rules-text".to_string(), serde_json::json!("text"));
     inputs.insert("variables".to_string(), serde_json::json!(["a", "b"]));
 
     let result = function.compute(&inputs, &context);

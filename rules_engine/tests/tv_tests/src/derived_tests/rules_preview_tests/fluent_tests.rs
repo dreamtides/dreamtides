@@ -14,7 +14,7 @@ fn create_empty_context() -> LookupContext {
 
 fn make_inputs(rules_text: &str, variables: &str) -> RowData {
     let mut inputs: RowData = HashMap::new();
-    inputs.insert("rules_text".to_string(), serde_json::json!(rules_text));
+    inputs.insert("rules-text".to_string(), serde_json::json!(rules_text));
     inputs.insert("variables".to_string(), serde_json::json!(variables));
     inputs
 }
