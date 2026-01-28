@@ -5,8 +5,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::error::error_types::{map_io_error_for_read, TvError};
 use crate::toml::document_loader::TomlTableData;
-use crate::toml::metadata_parser;
-use crate::toml::value_converter;
+use crate::toml::{metadata_parser, value_converter};
 use crate::traits::{AtomicWriteError, FileSystem, RealFileSystem};
 use crate::uuid::uuid_generator;
 use crate::validation::validation_rules::ValidationRule;
@@ -404,10 +403,8 @@ pub fn save_batch_with_fs_and_rules(
         TvError::TomlParseError { path: file_path.to_string(), line: None, message: e.to_string() }
     })?;
 
-    let array = doc
-        .get_mut(table_name)
-        .and_then(|v| v.as_array_of_tables_mut())
-        .ok_or_else(|| {
+    let array =
+        doc.get_mut(table_name).and_then(|v| v.as_array_of_tables_mut()).ok_or_else(|| {
             tracing::error!(
                 component = "tv.toml",
                 file_path = %file_path,
@@ -440,7 +437,8 @@ pub fn save_batch_with_fs_and_rules(
                 reason: "Unsupported value type".to_string(),
             });
         } else {
-            let results = validators::validate_all(&validation_rules, &update.column_key, &update.value);
+            let results =
+                validators::validate_all(&validation_rules, &update.column_key, &update.value);
             if let Some(error) = validators::first_error(&results) {
                 tracing::warn!(
                     component = "tv.toml.validation",
@@ -502,9 +500,8 @@ pub fn save_batch_with_fs_and_rules(
         }
     }
 
-    fs.write_atomic(Path::new(file_path), &doc.to_string()).map_err(|e| {
-        map_atomic_write_error(e, file_path)
-    })?;
+    fs.write_atomic(Path::new(file_path), &doc.to_string())
+        .map_err(|e| map_atomic_write_error(e, file_path))?;
 
     tracing::debug!(
         component = "tv.toml",
@@ -727,7 +724,10 @@ pub fn add_row_with_fs(
             error = "Insert position out of bounds",
             "Add row failed"
         );
-        return Err(TvError::RowNotFound { table_name: table_name.to_string(), row_index: insert_index });
+        return Err(TvError::RowNotFound {
+            table_name: table_name.to_string(),
+            row_index: insert_index,
+        });
     }
 
     // Create new table with initial values

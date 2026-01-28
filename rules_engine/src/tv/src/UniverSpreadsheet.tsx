@@ -25,8 +25,10 @@ import {
 } from "./validation_utils";
 import {
   getDerivedColumnIndex,
-  computeDataColumnOffset,
+  buildColumnMapping,
   applyDerivedResultToCell,
+  EMPTY_MAPPING,
+  type ColumnMapping,
 } from "./derived_column_utils";
 import { applyTableStyle, applyConditionalFormatting } from "./table_style_utils";
 import { ImageCellRenderer } from "./image_cell_renderer";
@@ -106,7 +108,7 @@ export const UniverSpreadsheet = forwardRef<
   rowConfigsRef.current = rowConfigs;
   const columnConfigsRef = useRef(columnConfigs);
   columnConfigsRef.current = columnConfigs;
-  const dataColumnOffsetMapRef = useRef<Map<string, number>>(new Map());
+  const columnMappingRef = useRef<Map<string, ColumnMapping>>(new Map());
   const originalToDisplayMapRef = useRef<Map<string, Map<number, number>>>(
     new Map(),
   );
@@ -118,7 +120,8 @@ export const UniverSpreadsheet = forwardRef<
 
   /**
    * Extract data from a specific sheet or the active sheet.
-   * Uses a single batch getValues() call instead of per-cell reads.
+   * Reads a range covering all data columns and extracts values
+   * using the column mapping to handle non-contiguous layouts.
    */
   const extractDataFromSheet = (sheetId?: string): TomlTableData | null => {
     const workbook = univerAPIRef.current?.getActiveWorkbook();
@@ -141,7 +144,10 @@ export const UniverSpreadsheet = forwardRef<
     );
     const minRows = knownSheetData?.data.rows.length ?? 0;
 
-    const dataOffset = dataColumnOffsetMapRef.current.get(currentSheetId) ?? 0;
+    const mapping =
+      columnMappingRef.current.get(currentSheetId) ?? EMPTY_MAPPING;
+    if (mapping.dataToVisual.length === 0) return { headers, rows: [] };
+
     const maxRows = sheet.getMaxRows();
 
     // Read all data rows in a single batch call instead of cell-by-cell.
@@ -149,11 +155,15 @@ export const UniverSpreadsheet = forwardRef<
     const readRowCount = maxRows - 1;
     if (readRowCount <= 0) return { headers, rows: [] };
 
+    const firstDataCol = mapping.dataToVisual[0];
+    const lastDataCol = mapping.dataToVisual[mapping.dataToVisual.length - 1];
+    const rangeWidth = lastDataCol - firstDataCol + 1;
+
     const dataRange = sheet.getRange(
       1,
-      dataOffset,
+      firstDataCol,
       readRowCount,
-      headers.length,
+      rangeWidth,
     );
     if (!dataRange) return { headers, rows: [] };
 
@@ -173,7 +183,11 @@ export const UniverSpreadsheet = forwardRef<
       let rowHasContent = false;
 
       for (let c = 0; c < headers.length; c++) {
-        const cellValue = c < rowValues.length ? rowValues[c] : null;
+        const rangeRelCol = mapping.dataToVisual[c] - firstDataCol;
+        const cellValue =
+          rangeRelCol >= 0 && rangeRelCol < rowValues.length
+            ? rowValues[rangeRelCol]
+            : null;
 
         if (cellValue !== undefined && cellValue !== null && cellValue !== "") {
           rowHasContent = true;
@@ -235,9 +249,15 @@ export const UniverSpreadsheet = forwardRef<
       if (!sheetData) return null;
 
       const headers = headersMapRef.current.get(sheetId) ?? [];
-      const offset = dataColumnOffsetMapRef.current.get(sheetId) ?? 0;
+      const mapping =
+        columnMappingRef.current.get(sheetId) ?? EMPTY_MAPPING;
       const originalRows = sheetData.data.rows;
-      if (originalRows.length === 0 || headers.length === 0) return null;
+      if (
+        originalRows.length === 0 ||
+        headers.length === 0 ||
+        mapping.dataToVisual.length === 0
+      )
+        return null;
 
       const normalize = (val: unknown): string => {
         if (val === null || val === undefined || val === "") return "";
@@ -245,11 +265,16 @@ export const UniverSpreadsheet = forwardRef<
         return String(val);
       };
 
+      const firstDataCol = mapping.dataToVisual[0];
+      const lastDataCol =
+        mapping.dataToVisual[mapping.dataToVisual.length - 1];
+      const rangeWidth = lastDataCol - firstDataCol + 1;
+
       const dataRange = ws.getRange(
         1,
-        offset,
+        firstDataCol,
         originalRows.length,
-        headers.length,
+        rangeWidth,
       );
       if (!dataRange) return null;
 
@@ -266,7 +291,8 @@ export const UniverSpreadsheet = forwardRef<
         const row = gridValues[d];
         let fp = "";
         for (let c = 0; c < headers.length; c++) {
-          fp += `|${normalize(c < row.length ? row[c] : null)}`;
+          const rangeRelCol = mapping.dataToVisual[c] - firstDataCol;
+          fp += `|${normalize(rangeRelCol >= 0 && rangeRelCol < row.length ? row[rangeRelCol] : null)}`;
         }
         displayFingerprints.push(fp);
       }
@@ -313,8 +339,8 @@ export const UniverSpreadsheet = forwardRef<
       const sheetConfigs = currentDerivedState?.configs[sheetId];
       if (!sheetValues || !sheetConfigs) return;
 
-      const headers = headersMapRef.current.get(sheetId) ?? [];
-      const colOffset = dataColumnOffsetMapRef.current.get(sheetId) ?? 0;
+      const mapping =
+        columnMappingRef.current.get(sheetId) ?? EMPTY_MAPPING;
       const sheetRowConfig = rowConfigsRef.current?.[sheetId];
       const rowHeight = sheetRowConfig?.default_height ?? undefined;
 
@@ -330,9 +356,8 @@ export const UniverSpreadsheet = forwardRef<
 
           const colIdx = getDerivedColumnIndex(
             config,
-            headers.length,
             sheetConfigs,
-            colOffset,
+            mapping,
           );
           renderer
             .handleImageResult(
@@ -360,11 +385,13 @@ export const UniverSpreadsheet = forwardRef<
       for (const sheetData of multiSheetData.sheets) {
         headersMapRef.current.set(sheetData.id, sheetData.data.headers);
       }
-      // Compute and store data column offsets per sheet
+      // Compute and store column mappings per sheet
       for (const sheetData of multiSheetData.sheets) {
         const configs = derivedColumnState?.configs[sheetData.id];
-        const offset = computeDataColumnOffset(configs);
-        dataColumnOffsetMapRef.current.set(sheetData.id, offset);
+        columnMappingRef.current.set(
+          sheetData.id,
+          buildColumnMapping(configs, sheetData.data.headers.length),
+        );
       }
 
       const workbookData = buildMultiSheetWorkbook(
@@ -382,13 +409,19 @@ export const UniverSpreadsheet = forwardRef<
         for (const sheetData of multiSheetData.sheets) {
           const sheet = initWorkbook.getSheetBySheetId(sheetData.id);
           if (sheet && sheetData.data.headers.length > 0) {
-            const offset =
-              dataColumnOffsetMapRef.current.get(sheetData.id) ?? 0;
+            const mapping =
+              columnMappingRef.current.get(sheetData.id) ?? EMPTY_MAPPING;
+            const firstCol =
+              mapping.dataToVisual.length > 0 ? mapping.dataToVisual[0] : 0;
+            const lastCol =
+              mapping.dataToVisual.length > 0
+                ? mapping.dataToVisual[mapping.dataToVisual.length - 1]
+                : 0;
             const headerRange = sheet.getRange(
               0,
-              offset,
+              firstCol,
               1,
-              sheetData.data.headers.length,
+              lastCol - firstCol + 1,
             );
             if (headerRange) {
               headerRange.setFontWeight("bold");
@@ -418,14 +451,14 @@ export const UniverSpreadsheet = forwardRef<
           const sheet = workbook.getSheetBySheetId(sheetData.id);
           if (sheet) {
             const booleanColumns = detectBooleanColumns(sheetData.data);
-            const offset =
-              dataColumnOffsetMapRef.current.get(sheetData.id) ?? 0;
+            const mapping =
+              columnMappingRef.current.get(sheetData.id) ?? EMPTY_MAPPING;
             applyCheckboxValidation(
               instance.univerAPI,
               sheet,
               sheetData.data,
               booleanColumns,
-              offset,
+              mapping,
             );
           }
         }
@@ -444,14 +477,14 @@ export const UniverSpreadsheet = forwardRef<
             if (enumRules.length > 0) {
               const sheet = workbook.getSheetBySheetId(sheetData.id);
               if (sheet) {
-                const offset =
-                  dataColumnOffsetMapRef.current.get(sheetData.id) ?? 0;
+                const mapping =
+                  columnMappingRef.current.get(sheetData.id) ?? EMPTY_MAPPING;
                 applyDropdownValidation(
                   instance.univerAPI,
                   sheet,
                   sheetData.data,
                   enumRules,
-                  offset,
+                  mapping,
                 );
               }
             }
@@ -495,10 +528,12 @@ export const UniverSpreadsheet = forwardRef<
               const sheet = workbook.getSheetBySheetId(sheetData.id);
               if (!sheet) continue;
 
-              const restoreOffset =
-                dataColumnOffsetMapRef.current.get(sheetData.id) ?? 0;
+              const mapping =
+                columnMappingRef.current.get(sheetData.id) ?? EMPTY_MAPPING;
+              const visualCol = mapping.dataToVisual[colIndex];
+              if (visualCol === undefined) continue;
               const ascending = sortResponse.direction === "ascending";
-              sheet.sort(colIndex + restoreOffset, ascending);
+              sheet.sort(visualCol, ascending);
               const restoreMapping = buildMappingFromGrid(sheetData.id);
               if (restoreMapping) {
                 originalToDisplayMapRef.current.set(
@@ -539,9 +574,9 @@ export const UniverSpreadsheet = forwardRef<
             tableStylesRef.current.set(sheetData.path, style);
             const sheet = workbook.getSheetBySheetId(sheetData.id);
             if (sheet) {
-              const offset =
-                dataColumnOffsetMapRef.current.get(sheetData.id) ?? 0;
-              applyTableStyle(sheet, sheetData.data, style, offset);
+              const mapping =
+                columnMappingRef.current.get(sheetData.id) ?? EMPTY_MAPPING;
+              applyTableStyle(sheet, sheetData.data, style, mapping);
               logger.info("Applied table color scheme", {
                 sheetId: sheetData.id,
                 sheetName: sheetData.name,
@@ -580,9 +615,9 @@ export const UniverSpreadsheet = forwardRef<
             conditionalFormatsRef.current.set(sheetData.path, results);
             const sheet = workbook.getSheetBySheetId(sheetData.id);
             if (sheet) {
-              const offset =
-                dataColumnOffsetMapRef.current.get(sheetData.id) ?? 0;
-              applyConditionalFormatting(sheet, results, offset);
+              const mapping =
+                columnMappingRef.current.get(sheetData.id) ?? EMPTY_MAPPING;
+              applyConditionalFormatting(sheet, results, mapping);
               logger.info("Applied conditional formatting", {
                 sheetId: sheetData.id,
                 sheetName: sheetData.name,
@@ -628,16 +663,19 @@ export const UniverSpreadsheet = forwardRef<
               if (!filter) continue;
 
               const headers = sheetData.data.headers;
-              const offset =
-                dataColumnOffsetMapRef.current.get(sheetData.id) ?? 0;
+              const mapping =
+                columnMappingRef.current.get(sheetData.id) ?? EMPTY_MAPPING;
 
               for (const savedFilter of filterResponse.filters) {
                 const colIndex = headers.indexOf(savedFilter.column);
                 if (colIndex === -1) continue;
 
+                const visualCol = mapping.dataToVisual[colIndex];
+                if (visualCol === undefined) continue;
+
                 if ("values" in savedFilter.condition) {
                   const values = savedFilter.condition.values as unknown[];
-                  filter.setColumnFilterCriteria(colIndex + offset, {
+                  filter.setColumnFilterCriteria(visualCol, {
                     colId: colIndex,
                     filters: {
                       filters: values.map((v) => String(v)),
@@ -776,8 +814,11 @@ export const UniverSpreadsheet = forwardRef<
         }
 
         const sortSpec = params.sortColumn[0];
-        const sortOffset = dataColumnOffsetMapRef.current.get(sheetId) ?? 0;
-        const columnName = headers[sortSpec.column - sortOffset];
+        const mapping =
+          columnMappingRef.current.get(sheetId) ?? EMPTY_MAPPING;
+        const dataColIndex = mapping.visualToData.get(sortSpec.column);
+        const columnName =
+          dataColIndex !== undefined ? headers[dataColIndex] : undefined;
         if (!columnName) {
           logger.debug("Sort column index out of range", {
             columnIndex: sortSpec.column,
@@ -789,9 +830,9 @@ export const UniverSpreadsheet = forwardRef<
         const direction: SortDirection = sortSpec.ascending
           ? "ascending"
           : "descending";
-        const mapping = buildMappingFromGrid(sheetId);
-        if (mapping) {
-          originalToDisplayMapRef.current.set(sheetId, mapping);
+        const gridMapping = buildMappingFromGrid(sheetId);
+        if (gridMapping) {
+          originalToDisplayMapRef.current.set(sheetId, gridMapping);
         } else {
           originalToDisplayMapRef.current.delete(sheetId);
         }
@@ -874,19 +915,25 @@ export const UniverSpreadsheet = forwardRef<
               if (!ws) return;
               const headers =
                 headersMapRef.current.get(capturedSheetId) ?? [];
-              const offset =
-                dataColumnOffsetMapRef.current.get(capturedSheetId) ?? 0;
+              const mapping =
+                columnMappingRef.current.get(capturedSheetId) ?? EMPTY_MAPPING;
               const currentSheetData =
                 multiSheetDataRef.current?.sheets.find(
                   (s) => s.id === capturedSheetId,
                 );
               const rowCount = currentSheetData?.data.rows.length ?? 0;
-              if (headers.length > 0) {
+              if (
+                headers.length > 0 &&
+                mapping.dataToVisual.length > 0
+              ) {
+                const firstCol = mapping.dataToVisual[0];
+                const lastCol =
+                  mapping.dataToVisual[mapping.dataToVisual.length - 1];
                 const filterRange = ws.getRange(
                   0,
-                  offset,
+                  firstCol,
                   rowCount + 1,
-                  headers.length,
+                  lastCol - firstCol + 1,
                 );
                 if (filterRange) {
                   filterRange.createFilter();
@@ -904,12 +951,14 @@ export const UniverSpreadsheet = forwardRef<
           if (!filter) return;
 
           const headers = headersMapRef.current.get(sheetId) ?? [];
-          const offset =
-            dataColumnOffsetMapRef.current.get(sheetId) ?? 0;
+          const mapping =
+            columnMappingRef.current.get(sheetId) ?? EMPTY_MAPPING;
 
           const filterRequests: ipc.ColumnFilterRequest[] = [];
           for (let i = 0; i < headers.length; i++) {
-            const criteria = filter.getColumnFilterCriteria(i + offset);
+            const visualCol = mapping.dataToVisual[i];
+            if (visualCol === undefined) continue;
+            const criteria = filter.getColumnFilterCriteria(visualCol);
             if (!criteria) continue;
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const filtersObj = (criteria as any).filters;
@@ -971,15 +1020,15 @@ export const UniverSpreadsheet = forwardRef<
       sheetId: string,
     ) => {
       const headers = headersMapRef.current.get(sheetId) ?? [];
-      const offset = dataColumnOffsetMapRef.current.get(sheetId) ?? 0;
+      const mapping =
+        columnMappingRef.current.get(sheetId) ?? EMPTY_MAPPING;
       const derivedConfigs = derivedColumnStateRef.current?.configs[sheetId];
       const roundedWidth = Math.round(width);
 
       // Check if this column is a derived column
       const derivedConfig = derivedConfigs?.find(
         (c) =>
-          getDerivedColumnIndex(c, headers.length, derivedConfigs, offset) ===
-          col,
+          getDerivedColumnIndex(c, derivedConfigs, mapping) === col,
       );
 
       if (derivedConfig) {
@@ -1005,9 +1054,9 @@ export const UniverSpreadsheet = forwardRef<
         return;
       }
 
-      // Otherwise treat as a data column
-      const dataColIndex = col - offset;
-      if (dataColIndex < 0 || dataColIndex >= headers.length) return;
+      // Otherwise treat as a data column via reverse mapping
+      const dataColIndex = mapping.visualToData.get(col);
+      if (dataColIndex === undefined || dataColIndex >= headers.length) return;
 
       const columnKey = headers[dataColIndex];
       const debounceKey = `${filePath}:${columnKey}`;
@@ -1130,13 +1179,12 @@ export const UniverSpreadsheet = forwardRef<
         });
         return;
       }
-      const headers = headersMapRef.current.get(sheetId) ?? headersRef.current;
-      const colOffset = dataColumnOffsetMapRef.current.get(sheetId) ?? 0;
+      const mapping =
+        columnMappingRef.current.get(sheetId) ?? EMPTY_MAPPING;
       const colIdx = getDerivedColumnIndex(
         derivedConfig,
-        headers.length,
         sheetConfigs!,
-        colOffset,
+        mapping,
       );
 
       const currentRowConfigs = rowConfigsRef.current;
@@ -1221,7 +1269,7 @@ export const UniverSpreadsheet = forwardRef<
 
       // Apply checkbox validation to boolean columns
       const booleanColumns = detectBooleanColumns(data);
-      applyCheckboxValidation(univerAPI, sheet, data, booleanColumns);
+      applyCheckboxValidation(univerAPI, sheet, data, booleanColumns, EMPTY_MAPPING);
     }
 
     isLoadingRef.current = false;
@@ -1249,14 +1297,14 @@ export const UniverSpreadsheet = forwardRef<
     isLoadingRef.current = true;
     isMultiSheetRef.current = true;
 
-    // Update headers map and data column offsets for all sheets
+    // Update headers map and column mappings for all sheets
     headersMapRef.current.clear();
     for (const sheetData of multiSheetData.sheets) {
       headersMapRef.current.set(sheetData.id, sheetData.data.headers);
       const configs = derivedColumnStateRef.current?.configs[sheetData.id];
-      dataColumnOffsetMapRef.current.set(
+      columnMappingRef.current.set(
         sheetData.id,
-        computeDataColumnOffset(configs),
+        buildColumnMapping(configs, sheetData.data.headers.length),
       );
     }
 
@@ -1303,16 +1351,16 @@ export const UniverSpreadsheet = forwardRef<
         imageCellRendererRef.current.clearSheetImages(sheet, sheetData.id);
       }
 
-      const sheetOffset = dataColumnOffsetMapRef.current.get(sheetData.id) ?? 0;
+      const sheetMapping =
+        columnMappingRef.current.get(sheetData.id) ?? EMPTY_MAPPING;
 
       logger.debug("Updating changed sheet with batch operation", {
         sheetId: sheetData.id,
         sheetName: sheetData.name,
         rowCount: sheetData.data.rows.length,
         columnCount: sheetData.data.headers.length,
-        dataOffset: sheetOffset,
       });
-      populateSheetDataBatch(sheet, sheetData.data, sheetOffset);
+      populateSheetDataBatch(sheet, sheetData.data, sheetMapping);
 
       // Apply bold styling to columns configured with bold = true
       const sheetColConfigs = columnConfigsRef.current?.[sheetData.id];
@@ -1321,14 +1369,17 @@ export const UniverSpreadsheet = forwardRef<
           if (colConfig.bold) {
             const headerIndex = sheetData.data.headers.indexOf(colConfig.key);
             if (headerIndex !== -1 && sheetData.data.rows.length > 0) {
-              const boldRange = sheet.getRange(
-                1,
-                headerIndex + sheetOffset,
-                sheetData.data.rows.length,
-                1,
-              );
-              if (boldRange) {
-                boldRange.setFontWeight("bold");
+              const visualCol = sheetMapping.dataToVisual[headerIndex];
+              if (visualCol !== undefined) {
+                const boldRange = sheet.getRange(
+                  1,
+                  visualCol,
+                  sheetData.data.rows.length,
+                  1,
+                );
+                if (boldRange) {
+                  boldRange.setFontWeight("bold");
+                }
               }
             }
           }
@@ -1342,7 +1393,7 @@ export const UniverSpreadsheet = forwardRef<
         sheet,
         sheetData.data,
         booleanColumns,
-        sheetOffset,
+        sheetMapping,
       );
 
       // Apply dropdown validation from cached enum rules
@@ -1353,14 +1404,14 @@ export const UniverSpreadsheet = forwardRef<
           sheet,
           sheetData.data,
           cachedEnumRules,
-          sheetOffset,
+          sheetMapping,
         );
       }
 
       // Re-apply cached table style after data update
       const cachedStyle = tableStylesRef.current.get(sheetData.path);
       if (cachedStyle) {
-        applyTableStyle(sheet, sheetData.data, cachedStyle, sheetOffset);
+        applyTableStyle(sheet, sheetData.data, cachedStyle, sheetMapping);
       }
 
       // Re-evaluate and apply conditional formatting after data update
@@ -1377,9 +1428,9 @@ export const UniverSpreadsheet = forwardRef<
           conditionalFormatsRef.current.set(sheetData.path, results);
           const ws = workbook.getSheetBySheetId(sheetData.id);
           if (ws && results.length > 0) {
-            const cfOffset =
-              dataColumnOffsetMapRef.current.get(sheetData.id) ?? 0;
-            applyConditionalFormatting(ws, results, cfOffset);
+            const cfMapping =
+              columnMappingRef.current.get(sheetData.id) ?? EMPTY_MAPPING;
+            applyConditionalFormatting(ws, results, cfMapping);
           }
         } catch (e) {
           logger.debug("Failed to re-evaluate conditional formatting", {
@@ -1391,15 +1442,21 @@ export const UniverSpreadsheet = forwardRef<
       reevaluateConditionalFormatting();
 
       // Re-create auto-filter so dropdown arrows survive data reload
-      if (sheetData.data.headers.length > 0) {
+      if (
+        sheetData.data.headers.length > 0 &&
+        sheetMapping.dataToVisual.length > 0
+      ) {
         const existingFilter = sheet.getFilter();
         if (!existingFilter) {
           try {
+            const firstCol = sheetMapping.dataToVisual[0];
+            const lastCol =
+              sheetMapping.dataToVisual[sheetMapping.dataToVisual.length - 1];
             const filterRange = sheet.getRange(
               0,
-              sheetOffset,
+              firstCol,
               sheetData.data.rows.length + 1,
-              sheetData.data.headers.length,
+              lastCol - firstCol + 1,
             );
             if (filterRange) {
               filterRange.createFilter();
@@ -1442,14 +1499,14 @@ export const UniverSpreadsheet = forwardRef<
 
       isLoadingRef.current = true;
 
-      const derivedOffset = dataColumnOffsetMapRef.current.get(sheetId) ?? 0;
+      const mapping =
+        columnMappingRef.current.get(sheetId) ?? EMPTY_MAPPING;
 
       for (const config of configs) {
         const derivedColIndex = getDerivedColumnIndex(
           config,
-          headers.length,
           configs,
-          derivedOffset,
+          mapping,
         );
 
         // Set header for derived column (row 0)

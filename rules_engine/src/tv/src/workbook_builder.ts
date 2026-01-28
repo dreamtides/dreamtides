@@ -13,7 +13,7 @@ import type {
 } from "./ipc_bridge";
 import type { MultiSheetData } from "./spreadsheet_types";
 import { formatHeaderForDisplay } from "./header_utils";
-import { computeDataColumnOffset } from "./derived_column_utils";
+import { buildColumnMapping, type ColumnMapping } from "./derived_column_utils";
 import { createLogger } from "./logger_frontend";
 
 const logger = createLogger("tv.ui.workbook_builder");
@@ -73,19 +73,21 @@ export function buildMultiSheetWorkbook(
 
   const sheets: Record<string, IWorkbookData["sheets"][string]> = {};
   const sheetOrder: string[] = [];
+  const sheetMappings = new Map<string, ColumnMapping>();
 
   for (const sheetData of sortedSheets) {
     sheetOrder.push(sheetData.id);
 
     const configs = derivedConfigs?.[sheetData.id];
-    const dataOffset = computeDataColumnOffset(configs);
+    const mapping = buildColumnMapping(
+      configs,
+      sheetData.data.headers.length,
+    );
+    sheetMappings.set(sheetData.id, mapping);
 
     // Calculate required dimensions
     const rowCount = sheetData.data.rows.length + 1 + 100; // +1 for header row, +100 blank rows at bottom
-    const columnCount = Math.max(
-      sheetData.data.headers.length + dataOffset + 1,
-      26,
-    );
+    const columnCount = Math.max(mapping.totalVisualColumns + 1, 26);
 
     // Build cell data
     const cellData: Record<
@@ -96,7 +98,7 @@ export function buildMultiSheetWorkbook(
     // Header row (row 0) with display-formatted names and bold styling
     cellData[0] = {};
     sheetData.data.headers.forEach((header, colIndex) => {
-      cellData[0][colIndex + dataOffset] = {
+      cellData[0][mapping.dataToVisual[colIndex]] = {
         v: formatHeaderForDisplay(header),
         s: { bl: 1 },
       };
@@ -130,11 +132,12 @@ export function buildMultiSheetWorkbook(
       }
     }
 
-    // Data rows (starting at row 1), shifted by data offset
+    // Data rows (starting at row 1), placed at mapped visual columns
     sheetData.data.rows.forEach((row, rowIndex) => {
       cellData[rowIndex + 1] = {};
       row.forEach((cellValue, colIndex) => {
         if (cellValue !== null) {
+          const visualCol = mapping.dataToVisual[colIndex];
           const isBold = boldColumnIndices.has(colIndex);
           if (typeof cellValue === "boolean") {
             const cell: { v: unknown; t?: CellValueType; s?: { bl?: number } } = {
@@ -144,13 +147,13 @@ export function buildMultiSheetWorkbook(
             if (isBold) {
               cell.s = { bl: 1 };
             }
-            cellData[rowIndex + 1][colIndex + dataOffset] = cell;
+            cellData[rowIndex + 1][visualCol] = cell;
           } else {
             const cell: { v: unknown; s?: { bl?: number } } = { v: cellValue };
             if (isBold) {
               cell.s = { bl: 1 };
             }
-            cellData[rowIndex + 1][colIndex + dataOffset] = cell;
+            cellData[rowIndex + 1][visualCol] = cell;
           }
         }
       });
@@ -175,7 +178,9 @@ export function buildMultiSheetWorkbook(
       for (const colConfig of sheetColumnConfigs) {
         const headerIndex = sheetData.data.headers.indexOf(colConfig.key);
         if (headerIndex !== -1 && colConfig.width && colConfig.width !== 100) {
-          columnData[headerIndex + dataOffset] = { w: colConfig.width };
+          columnData[mapping.dataToVisual[headerIndex]] = {
+            w: colConfig.width,
+          };
         }
       }
     }
@@ -223,7 +228,10 @@ export function buildMultiSheetWorkbook(
         if (colConfig.frozen) {
           const headerIndex = sheetData.data.headers.indexOf(colConfig.key);
           if (headerIndex !== -1) {
-            frozenColumns = Math.max(frozenColumns, headerIndex + dataOffset + 1);
+            frozenColumns = Math.max(
+              frozenColumns,
+              mapping.dataToVisual[headerIndex] + 1,
+            );
           }
         }
       }
@@ -265,7 +273,6 @@ export function buildMultiSheetWorkbook(
       sheetName: sheetData.name,
       rowCount: sheetData.data.rows.length,
       columnCount: sheetData.data.headers.length,
-      dataOffset,
     });
   }
 
@@ -275,13 +282,16 @@ export function buildMultiSheetWorkbook(
   const filterResource: Record<string, { ref: { startRow: number; startColumn: number; endRow: number; endColumn: number } }> = {};
   for (const sheetData of sortedSheets) {
     if (sheetData.data.headers.length > 0 && sheetData.data.rows.length > 0) {
-      const offset = computeDataColumnOffset(derivedConfigs?.[sheetData.id]);
+      const mapping = sheetMappings.get(sheetData.id)!;
+      const firstDataCol = mapping.dataToVisual[0];
+      const lastDataCol =
+        mapping.dataToVisual[sheetData.data.headers.length - 1];
       filterResource[sheetData.id] = {
         ref: {
           startRow: 0,
-          startColumn: offset,
+          startColumn: firstDataCol,
           endRow: sheetData.data.rows.length,
-          endColumn: offset + sheetData.data.headers.length - 1,
+          endColumn: lastDataCol,
         },
       };
     }

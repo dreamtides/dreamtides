@@ -5,6 +5,7 @@ import type {
   ResolvedTableStyle,
   CellFormatResult,
 } from "./ipc_bridge";
+import type { ColumnMapping } from "./derived_column_utils";
 
 /**
  * Applies a resolved table style (color scheme, row stripes, header styling)
@@ -15,9 +16,9 @@ export function applyTableStyle(
   sheet: FWorksheet,
   data: TomlTableData,
   style: ResolvedTableStyle,
-  dataOffset: number = 0,
+  mapping: ColumnMapping,
 ): void {
-  const numColumns = data.headers.length + dataOffset;
+  const numColumns = mapping.totalVisualColumns;
   if (numColumns === 0) return;
 
   const headerBg = style.header_background ?? style.palette?.header_background;
@@ -77,11 +78,15 @@ export function applyTableStyle(
 export function applyConditionalFormatting(
   sheet: FWorksheet,
   results: CellFormatResult[],
-  dataOffset: number = 0,
+  mapping: ColumnMapping,
 ): void {
   for (const result of results) {
     const cellRow = result.row + 1; // +1 for header row
-    const range = sheet.getRange(cellRow, result.col_index + dataOffset, 1, 1);
+    const visualCol =
+      result.col_index < mapping.dataToVisual.length
+        ? mapping.dataToVisual[result.col_index]
+        : result.col_index;
+    const range = sheet.getRange(cellRow, visualCol, 1, 1);
     if (!range) continue;
 
     if (result.style.background_color) {
@@ -97,7 +102,6 @@ export function applyConditionalFormatting(
       range.setFontStyle("italic");
     }
     if (result.style.underline === true) {
-      // Underline via setUnderline if available on FRange; cast to access optional API
       const rangeAny = range as unknown as Record<string, unknown>;
       if (typeof rangeAny.setUnderline === "function") {
         (rangeAny.setUnderline as (v: boolean) => void)(true);

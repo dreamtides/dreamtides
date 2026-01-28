@@ -11,6 +11,93 @@ import { createLogger } from "./logger_frontend";
 
 const logger = createLogger("tv.ui.derived");
 
+export interface ColumnMapping {
+  dataToVisual: number[];
+  visualToData: Map<number, number>;
+  reservedPositions: Set<number>;
+  totalVisualColumns: number;
+}
+
+export interface ContiguousSegment {
+  dataStart: number;
+  visualStart: number;
+  length: number;
+}
+
+/**
+ * Builds a mapping between data column indices and visual column indices,
+ * placing data columns at the first available positions not reserved by
+ * positioned derived columns.
+ */
+export function buildColumnMapping(
+  configs: DerivedColumnInfo[] | undefined,
+  dataColumnCount: number,
+): ColumnMapping {
+  const reservedPositions = new Set<number>();
+  if (configs) {
+    for (const c of configs) {
+      if (c.position !== undefined && c.position !== null) {
+        reservedPositions.add(c.position);
+      }
+    }
+  }
+
+  const dataToVisual: number[] = [];
+  let visual = 0;
+  for (let dataIdx = 0; dataIdx < dataColumnCount; dataIdx++) {
+    while (reservedPositions.has(visual)) visual++;
+    dataToVisual.push(visual);
+    visual++;
+  }
+
+  const visualToData = new Map<number, number>();
+  for (let i = 0; i < dataToVisual.length; i++) {
+    visualToData.set(dataToVisual[i], i);
+  }
+
+  let totalVisualColumns =
+    dataToVisual.length > 0 ? dataToVisual[dataToVisual.length - 1] + 1 : 0;
+  for (const pos of reservedPositions) {
+    totalVisualColumns = Math.max(totalVisualColumns, pos + 1);
+  }
+
+  return { dataToVisual, visualToData, reservedPositions, totalVisualColumns };
+}
+
+/**
+ * Splits the data-to-visual mapping into contiguous segments for efficient
+ * batch read/write operations on the spreadsheet grid.
+ */
+export function getContiguousSegments(
+  mapping: ColumnMapping,
+): ContiguousSegment[] {
+  if (mapping.dataToVisual.length === 0) return [];
+  const segments: ContiguousSegment[] = [];
+  let segStart = 0;
+  for (let i = 1; i <= mapping.dataToVisual.length; i++) {
+    if (
+      i === mapping.dataToVisual.length ||
+      mapping.dataToVisual[i] !== mapping.dataToVisual[i - 1] + 1
+    ) {
+      segments.push({
+        dataStart: segStart,
+        visualStart: mapping.dataToVisual[segStart],
+        length: i - segStart,
+      });
+      segStart = i;
+    }
+  }
+  return segments;
+}
+
+/** Empty mapping constant for fallback when no mapping is available. */
+export const EMPTY_MAPPING: ColumnMapping = {
+  dataToVisual: [],
+  visualToData: new Map(),
+  reservedPositions: new Set(),
+  totalVisualColumns: 0,
+};
+
 /**
  * Calculates the column index for a derived column.
  * If the config has an explicit position, uses that. Otherwise appends
@@ -18,15 +105,13 @@ const logger = createLogger("tv.ui.derived");
  */
 export function getDerivedColumnIndex(
   config: DerivedColumnInfo,
-  dataColumnCount: number,
   allConfigs: DerivedColumnInfo[],
-  dataOffset: number = 0,
+  mapping: ColumnMapping,
 ): number {
   if (config.position !== undefined && config.position !== null) {
     return config.position;
   }
 
-  // Place after all data columns (including offset) plus prior derived columns without explicit position
   let offset = 0;
   for (const c of allConfigs) {
     if (c.name === config.name) break;
@@ -34,19 +119,7 @@ export function getDerivedColumnIndex(
       offset++;
     }
   }
-  return dataOffset + dataColumnCount + offset;
-}
-
-/**
- * Computes the number of spreadsheet columns occupied by positioned derived
- * columns. Data columns are shifted right by this amount.
- */
-export function computeDataColumnOffset(
-  configs: DerivedColumnInfo[] | undefined,
-): number {
-  if (!configs) return 0;
-  return configs.filter((c) => c.position !== undefined && c.position !== null)
-    .length;
+  return mapping.totalVisualColumns + offset;
 }
 
 /**

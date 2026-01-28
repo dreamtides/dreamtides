@@ -4,6 +4,7 @@ import { FWorksheet } from "@univerjs/sheets/facade";
 import type { TomlTableData, EnumValidationInfo } from "./ipc_bridge";
 import { getColumnLetter } from "./header_utils";
 import { createLogger } from "./logger_frontend";
+import type { ColumnMapping } from "./derived_column_utils";
 
 const logger = createLogger("tv.ui.validation");
 
@@ -47,14 +48,16 @@ export function applyCheckboxValidation(
   sheet: FWorksheet,
   data: TomlTableData,
   booleanColumns: number[],
-  dataOffset: number = 0,
+  mapping: ColumnMapping,
 ): void {
   if (booleanColumns.length === 0 || data.rows.length === 0) {
     return;
   }
 
   for (const colIdx of booleanColumns) {
-    const colLetter = getColumnLetter(colIdx + dataOffset);
+    const visualCol = mapping.dataToVisual[colIdx];
+    if (visualCol === undefined) continue;
+    const colLetter = getColumnLetter(visualCol);
     const startRow = 2;
     const endRow = data.rows.length + 1;
     const rangeAddress = `${colLetter}${startRow}:${colLetter}${endRow}`;
@@ -68,9 +71,6 @@ export function applyCheckboxValidation(
         .build();
       range.setDataValidation(rule);
 
-      // Explicitly set vertical alignment and wrap on checkbox cells.
-      // The sheet defaultStyle sets these, but Univer's data validation
-      // renderer does not inherit sheet-level defaults.
       range.setVerticalAlignment("middle");
       range.setWrap(true);
 
@@ -91,7 +91,7 @@ export function applyDropdownValidation(
   sheet: FWorksheet,
   data: TomlTableData,
   enumRules: EnumValidationInfo[],
-  dataOffset: number = 0,
+  mapping: ColumnMapping,
 ): void {
   if (enumRules.length === 0 || data.rows.length === 0) {
     return;
@@ -109,7 +109,9 @@ export function applyDropdownValidation(
       continue;
     }
 
-    const colLetter = getColumnLetter(colIdx + dataOffset);
+    const visualCol = mapping.dataToVisual[colIdx];
+    if (visualCol === undefined) continue;
+    const colLetter = getColumnLetter(visualCol);
     const startRow = 2;
     const endRow = data.rows.length + 1;
     const rangeAddress = `${colLetter}${startRow}:${colLetter}${endRow}`;
@@ -126,9 +128,6 @@ export function applyDropdownValidation(
         .build();
       range.setDataValidation(validationRule);
 
-      // Explicitly set vertical alignment and wrap on dropdown cells.
-      // The sheet defaultStyle sets these, but Univer's dropdown renderer
-      // does not inherit sheet-level defaults for data validation cells.
       range.setVerticalAlignment("middle");
       range.setWrap(true);
 
