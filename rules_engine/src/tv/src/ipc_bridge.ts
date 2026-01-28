@@ -814,8 +814,20 @@ export interface FrontendLogMessage {
   context?: Record<string, unknown>;
 }
 
+export interface FrontendPerfLogEntry {
+  ts: string;
+  component: string;
+  operation: string;
+  duration_ms: number;
+  context?: Record<string, unknown>;
+}
+
 export async function logMessage(message: FrontendLogMessage): Promise<void> {
   return invoke("log_message", { message });
+}
+
+export async function logPerf(entry: FrontendPerfLogEntry): Promise<void> {
+  return invoke("log_perf", { entry });
 }
 
 // ============ View State Commands ============

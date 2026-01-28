@@ -334,16 +334,35 @@ export function AppRoot() {
 
   const saveData = useCallback(
     async (newData: TomlTableData, sheetId: string) => {
-      const sheetInfo = sheets.find((s) => s.id === sheetId);
-      if (!sheetInfo) return;
+      const totalTimer = logger.startPerfTimer("saveData total", {
+        sheetId,
+        rowCount: newData.rows.length,
+        columnCount: newData.headers.length,
+      });
 
-      if (isSavingRef.current[sheetId]) return;
+      const sheetInfo = sheets.find((s) => s.id === sheetId);
+      if (!sheetInfo) {
+        totalTimer.stop({ aborted: "sheet not found" });
+        return;
+      }
+
+      if (isSavingRef.current[sheetId]) {
+        totalTimer.stop({ aborted: "already saving" });
+        return;
+      }
       isSavingRef.current[sheetId] = true;
 
       try {
         const previousData = lastKnownDataRef.current[sheetId];
 
+        const saveTimer = logger.startPerfTimer("IPC saveTomlTable", {
+          sheetId,
+          path: sheetInfo.path,
+          rowCount: newData.rows.length,
+        });
         const saveResult = await ipc.saveTomlTable(sheetInfo.path, sheetInfo.tableName, newData);
+        saveTimer.stop({ uuidsGenerated: saveResult.uuidsGenerated });
+
         // Record save time so file watcher can suppress self-triggered reloads
         lastSaveTimeRef.current[sheetId] = Date.now();
 
@@ -352,6 +371,7 @@ export function AppRoot() {
         if (saveResult.uuidsGenerated) {
           logger.info("UUIDs generated during save, reloading sheet", { sheetId });
           await reloadSheet(sheetId);
+          totalTimer.stop({ reloadedForUuids: true });
           return;
         }
 
@@ -364,6 +384,11 @@ export function AppRoot() {
         // useEffect can re-apply validation (checkboxes, dropdowns) with
         // the expanded range covering the new rows.
         if (rowCountChanged) {
+          const stateUpdateTimer = logger.startPerfTimer("setMultiSheetData for row count change", {
+            sheetId,
+            previousRowCount: previousData?.rows.length ?? 0,
+            newRowCount: newData.rows.length,
+          });
           setMultiSheetData((prev) => {
             if (!prev) return prev;
             return {
@@ -372,25 +397,41 @@ export function AppRoot() {
               ),
             };
           });
+          stateUpdateTimer.stop();
         }
 
         // Trigger derived computations for changed rows. When the row count
         // changed, re-trigger all rows because the multiSheetData useEffect
         // clears existing images during repopulation. When only values
         // changed, compute only the affected rows.
+        const changedRowsTimer = logger.startPerfTimer("getChangedRowIndices", {
+          sheetId,
+          rowCountChanged,
+        });
         const changedRows = rowCountChanged
           ? undefined
           : getChangedRowIndices(previousData!, newData);
+        changedRowsTimer.stop({ changedRowCount: changedRows?.length ?? "all" });
 
         if (!changedRows || changedRows.length > 0) {
           try {
+            const derivedConfigTimer = logger.startPerfTimer("getDerivedColumnsConfig", { sheetId });
             const configs = await ipc.getDerivedColumnsConfig(sheetInfo.path);
+            derivedConfigTimer.stop({ configCount: configs.length });
+
             if (configs.length > 0) {
               setDerivedColumnState((prev) => ({
                 ...prev,
                 configs: { ...prev.configs, [sheetId]: configs },
               }));
+
+              const derivedTimer = logger.startPerfTimer("triggerDerivedComputations", {
+                sheetId,
+                rowCount: changedRows?.length ?? newData.rows.length,
+                configCount: configs.length,
+              });
               triggerDerivedComputations(sheetInfo, newData, configs, changedRows);
+              derivedTimer.stop();
             }
           } catch (e) {
             logger.error("Failed to trigger post-save derived computations", {
@@ -398,8 +439,11 @@ export function AppRoot() {
             });
           }
         }
+
+        totalTimer.stop({ success: true });
       } catch (e) {
         logger.error("Save error", { error: String(e) });
+        totalTimer.stop({ error: String(e) });
       } finally {
         isSavingRef.current[sheetId] = false;
       }
@@ -409,16 +453,31 @@ export function AppRoot() {
 
   const handleChange = useCallback(
     (newData: TomlTableData, sheetId: string) => {
+      const perfTimer = logger.startPerfTimer("handleChange", {
+        sheetId,
+        rowCount: newData.rows.length,
+        columnCount: newData.headers.length,
+      });
+
       // Check if data actually changed - Univer fires set-range-values on cell
       // selection, not just on actual value changes
+      const comparisonTimer = logger.startPerfTimer("isDataEqual comparison", {
+        sheetId,
+        rowCount: newData.rows.length,
+      });
       const lastKnown = lastKnownDataRef.current[sheetId];
-      if (lastKnown && isDataEqual(lastKnown, newData)) {
+      const dataUnchanged = lastKnown && isDataEqual(lastKnown, newData);
+      comparisonTimer.stop({ dataUnchanged });
+
+      if (dataUnchanged) {
         // Data hasn't changed, skip save
+        perfTimer.stop({ skipped: "data unchanged" });
         return;
       }
 
       if (autoSaveDisabledRef.current) {
         logger.info("Auto-save disabled, skipping save to TOML", { sheetId });
+        perfTimer.stop({ skipped: "autosave disabled" });
         return;
       }
 
@@ -428,6 +487,8 @@ export function AppRoot() {
       saveTimeoutRef.current = window.setTimeout(() => {
         saveData(newData, sheetId);
       }, SAVE_DEBOUNCE_MS);
+
+      perfTimer.stop({ scheduled: true });
     },
     [saveData]
   );

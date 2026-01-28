@@ -745,14 +745,33 @@ export const UniverSpreadsheet = forwardRef<
         command.id === "sheet.mutation.remove-rows" ||
         command.id === "sheet.command.remove-row"
       ) {
+        const perfTimer = logger.startPerfTimer("onCommandExecuted", {
+          commandId: command.id,
+        });
+
         const activeSheet = instance.univerAPI
           .getActiveWorkbook()
           ?.getActiveSheet();
         const sheetId = activeSheet?.getSheetId() ?? "";
+
+        const extractTimer = logger.startPerfTimer("extractDataFromSheet", {
+          sheetId,
+          commandId: command.id,
+        });
         const newData = extractDataFromSheet(sheetId);
+        extractTimer.stop({ rowCount: newData?.rows.length ?? 0, columnCount: newData?.headers.length ?? 0 });
+
         if (newData && onChangeRef.current) {
+          const onChangeTimer = logger.startPerfTimer("onChange callback", {
+            sheetId,
+            rowCount: newData.rows.length,
+            columnCount: newData.headers.length,
+          });
           onChangeRef.current(newData, sheetId);
+          onChangeTimer.stop();
         }
+
+        perfTimer.stop({ sheetId });
       }
     });
 

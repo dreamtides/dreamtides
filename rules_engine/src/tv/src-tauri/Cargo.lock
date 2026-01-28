@@ -4788,6 +4788,7 @@ dependencies = [
  "notify",
  "notify-debouncer-mini",
  "num_cpus",
+ "parking_lot",
  "regex",
  "reqwest",
  "serde",

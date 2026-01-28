@@ -1,14 +1,19 @@
 use std::io;
 use std::path::PathBuf;
+use std::sync::OnceLock;
 
 use chrono::{NaiveDate, Utc};
 use chrono_tz::America::Los_Angeles;
+use parking_lot::Mutex;
 use tracing::Level;
 use tracing_subscriber::filter::LevelFilter;
 use tracing_subscriber::fmt::time::FormatTime;
 use tracing_subscriber::fmt::MakeWriter;
 use tracing_subscriber::prelude::*;
 use tracing_subscriber::{EnvFilter, Registry};
+
+/// Global performance log file writer.
+static PERF_LOG_WRITER: OnceLock<Mutex<Option<std::fs::File>>> = OnceLock::new();
 
 /// Initializes the tracing subscriber with dual layers: JSON file and compact stdout.
 pub fn initialize() {
@@ -38,24 +43,72 @@ pub fn initialize() {
         .with(stdout_layer)
         .init();
 
+    // Initialize performance log file
+    let perf_path = perf_log_file_path();
+    initialize_perf_log(&perf_path);
+
     tracing::info!(
         component = "tv.logging",
         log_file = %log_path.display(),
+        perf_log_file = %perf_path.display(),
         "Logging initialized"
     );
 
     cleanup_old_logs();
 }
 
-/// Returns the path for today's log file.
+/// Returns the path for today's main log file.
 pub fn log_file_path() -> PathBuf {
     let now = Utc::now().with_timezone(&Los_Angeles);
     let date_str = now.format("%Y-%m-%d").to_string();
-    let log_dir = dirs::data_dir()
+    log_dir().join(format!("tv_{date_str}.jsonl"))
+}
+
+/// Returns the path for today's performance log file.
+pub fn perf_log_file_path() -> PathBuf {
+    let now = Utc::now().with_timezone(&Los_Angeles);
+    let date_str = now.format("%Y-%m-%d").to_string();
+    log_dir().join(format!("tv_perf_{date_str}.jsonl"))
+}
+
+/// Returns the log directory path.
+fn log_dir() -> PathBuf {
+    dirs::data_dir()
         .unwrap_or_else(|| PathBuf::from("."))
         .join("tv")
-        .join("logs");
-    log_dir.join(format!("tv_{date_str}.jsonl"))
+        .join("logs")
+}
+
+/// Initializes the performance log file writer.
+fn initialize_perf_log(perf_path: &PathBuf) {
+    if let Some(parent) = perf_path.parent() {
+        let _ = std::fs::create_dir_all(parent);
+    }
+    let file = std::fs::OpenOptions::new()
+        .create(true)
+        .append(true)
+        .open(perf_path)
+        .ok();
+    if file.is_none() {
+        eprintln!(
+            "Warning: Could not open performance log file at {}",
+            perf_path.display()
+        );
+    }
+    let _ = PERF_LOG_WRITER.set(Mutex::new(file));
+}
+
+/// Writes a performance log entry to the dedicated performance log file.
+/// This is separate from the main tracing log to allow focused analysis
+/// of frontend performance metrics without noise from other log entries.
+pub fn write_perf_log(entry: &serde_json::Value) {
+    let writer = PERF_LOG_WRITER.get_or_init(|| Mutex::new(None));
+    let mut guard = writer.lock();
+    if let Some(ref mut file) = *guard {
+        let _ = serde_json::to_writer(&mut *file, entry);
+        let _ = io::Write::write_all(file, b"\n");
+        let _ = io::Write::flush(file);
+    }
 }
 
 struct PacificTime;
@@ -108,7 +161,12 @@ fn cleanup_old_logs() {
             continue;
         };
 
-        let Some(date_str) = name.strip_prefix("tv_").and_then(|s| s.strip_suffix(".jsonl")) else {
+        // Handle both main log files (tv_YYYY-MM-DD.jsonl) and perf log files (tv_perf_YYYY-MM-DD.jsonl)
+        let date_str = if let Some(s) = name.strip_prefix("tv_perf_").and_then(|s| s.strip_suffix(".jsonl")) {
+            s
+        } else if let Some(s) = name.strip_prefix("tv_").and_then(|s| s.strip_suffix(".jsonl")) {
+            s
+        } else {
             continue;
         };
 

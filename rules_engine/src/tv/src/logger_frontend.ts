@@ -12,6 +12,15 @@ interface LogEntry {
   context?: Record<string, unknown>;
 }
 
+/** Performance log entry sent to the backend for the dedicated perf log file. */
+interface PerfLogEntry {
+  ts: string;
+  component: string;
+  operation: string;
+  duration_ms: number;
+  context?: Record<string, unknown>;
+}
+
 const LOG_LEVEL_PRIORITY: Record<LogLevel, number> = {
   ERROR: 0,
   WARN: 1,
@@ -21,6 +30,9 @@ const LOG_LEVEL_PRIORITY: Record<LogLevel, number> = {
 };
 
 let currentLogLevel: LogLevel = "INFO";
+
+/** Whether performance logging is enabled. */
+let perfLoggingEnabled = true;
 
 function isPacificDaylightTime(date: Date): boolean {
   const jan = new Date(date.getFullYear(), 0, 1).getTimezoneOffset();
@@ -85,6 +97,12 @@ function sendToBackend(entry: LogEntry): void {
   });
 }
 
+function sendPerfToBackend(entry: PerfLogEntry): void {
+  invoke("log_perf", { entry }).catch(() => {
+    // Silently ignore backend send failures to avoid recursive logging
+  });
+}
+
 function log(level: LogLevel, component: string, msg: string, context?: Record<string, unknown>): void {
   if (!shouldLog(level)) {
     return;
@@ -113,6 +131,16 @@ export function setLogLevel(level: LogLevel): void {
 /** Returns the current minimum log level. */
 export function getLogLevel(): LogLevel {
   return currentLogLevel;
+}
+
+/** Enables or disables performance logging. */
+export function setPerfLoggingEnabled(enabled: boolean): void {
+  perfLoggingEnabled = enabled;
+}
+
+/** Returns whether performance logging is enabled. */
+export function isPerfLoggingEnabled(): boolean {
+  return perfLoggingEnabled;
 }
 
 /** Creates a logger bound to a specific component name. */
@@ -145,5 +173,127 @@ export class Logger {
 
   trace(msg: string, context?: Record<string, unknown>): void {
     log("TRACE", this.component, msg, context);
+  }
+
+  /**
+   * Starts a performance timer for measuring operation duration.
+   * Returns a PerfTimer that should be stopped when the operation completes.
+   *
+   * @param operation - Name of the operation being measured
+   * @param context - Optional additional context about the operation
+   * @returns A PerfTimer instance to stop when the operation completes
+   */
+  startPerfTimer(operation: string, context?: Record<string, unknown>): PerfTimer {
+    return new PerfTimer(this.component, operation, context);
+  }
+
+  /**
+   * Logs a performance metric directly without using a timer.
+   * Useful when duration is already known or computed externally.
+   *
+   * @param operation - Name of the operation being measured
+   * @param durationMs - Duration of the operation in milliseconds
+   * @param context - Optional additional context about the operation
+   */
+  perf(operation: string, durationMs: number, context?: Record<string, unknown>): void {
+    if (!perfLoggingEnabled) {
+      return;
+    }
+
+    if (!import.meta.env.PROD) {
+      const prefix = `[${this.component}]`;
+      const args: unknown[] = context
+        ? [prefix, operation, `${durationMs.toFixed(2)}ms`, context]
+        : [prefix, operation, `${durationMs.toFixed(2)}ms`];
+      console.debug(...args);
+    }
+
+    const entry: PerfLogEntry = {
+      ts: formatPacificTimestamp(),
+      component: this.component,
+      operation,
+      duration_ms: durationMs,
+    };
+    if (context !== undefined) {
+      entry.context = context;
+    }
+
+    sendPerfToBackend(entry);
+  }
+}
+
+/**
+ * A performance timer for measuring operation duration with millisecond precision.
+ * Created via Logger.startPerfTimer() and stopped via stop().
+ */
+export class PerfTimer {
+  private readonly component: string;
+  private readonly operation: string;
+  private readonly context?: Record<string, unknown>;
+  private readonly startTime: number;
+  private stopped = false;
+
+  constructor(component: string, operation: string, context?: Record<string, unknown>) {
+    this.component = component;
+    this.operation = operation;
+    this.context = context;
+    this.startTime = performance.now();
+  }
+
+  /**
+   * Stops the timer and logs the elapsed duration.
+   * Can optionally add or override context values.
+   *
+   * @param additionalContext - Optional additional context to merge with initial context
+   * @returns The elapsed duration in milliseconds
+   */
+  stop(additionalContext?: Record<string, unknown>): number {
+    if (this.stopped) {
+      return 0;
+    }
+    this.stopped = true;
+
+    const durationMs = performance.now() - this.startTime;
+
+    if (!perfLoggingEnabled) {
+      return durationMs;
+    }
+
+    const mergedContext =
+      this.context || additionalContext
+        ? { ...this.context, ...additionalContext }
+        : undefined;
+
+    if (!import.meta.env.PROD) {
+      const prefix = `[${this.component}]`;
+      const args: unknown[] = mergedContext
+        ? [prefix, this.operation, `${durationMs.toFixed(2)}ms`, mergedContext]
+        : [prefix, this.operation, `${durationMs.toFixed(2)}ms`];
+      console.debug(...args);
+    }
+
+    const entry: PerfLogEntry = {
+      ts: formatPacificTimestamp(),
+      component: this.component,
+      operation: this.operation,
+      duration_ms: durationMs,
+    };
+    if (mergedContext !== undefined) {
+      entry.context = mergedContext;
+    }
+
+    sendPerfToBackend(entry);
+
+    return durationMs;
+  }
+
+  /**
+   * Returns the elapsed time without stopping the timer.
+   * Useful for intermediate measurements.
+   *
+   * @returns The elapsed duration in milliseconds
+   */
+  elapsed(): number {
+    return performance.now() - this.startTime;
   }
 }

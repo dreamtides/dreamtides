@@ -228,6 +228,7 @@ pub fn run(paths: cli::AppPaths) {
             commands::column_command::set_column_width,
             commands::column_command::set_derived_column_width,
             commands::log_command::log_message,
+            commands::log_command::log_perf,
             commands::view_state_command::load_view_state,
             commands::view_state_command::save_view_state,
             commands::sheet_order_command::load_sheet_order,
