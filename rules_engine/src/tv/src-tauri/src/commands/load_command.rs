@@ -35,6 +35,14 @@ pub fn load_toml_table(
 
     let result = document_loader::load_toml_document(&TvConfig::default(), &file_path, &table_name);
 
+    // Check if this is a "skipped file" scenario (expected, not a real error).
+    // Files that are not array-of-tables format are intentionally skipped and
+    // should not show as errors in the UI status indicator.
+    let is_skipped = matches!(
+        &result,
+        Err(TvError::TableNotFound { .. }) | Err(TvError::NotAnArrayOfTables { .. })
+    );
+
     // Handle permission errors by updating permission state
     if let Err(ref e) = result {
         permission_recovery::handle_permission_error(&app_handle, &file_path, e);
@@ -46,7 +54,9 @@ pub fn load_toml_table(
         permission_recovery::set_permission_state(&app_handle, &file_path, perm_state, &message);
     }
 
-    state_machine::end_load(&app_handle, &file_path, result.is_ok());
+    // Treat skipped files as successful for state machine purposes so we
+    // transition to Idle (not Error) and don't show an error indicator.
+    state_machine::end_load(&app_handle, &file_path, result.is_ok() || is_skipped);
     result
 }
 
