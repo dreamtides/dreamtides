@@ -1,4 +1,4 @@
-use tv_lib::toml::metadata_parser::parse_validation_rules_from_content;
+use tv_lib::toml::metadata::parse_validation_rules_from_content;
 use tv_lib::validation::validation_rules::{ValidationRule, ValueType};
 
 use crate::test_utils::test_utils_mod::TvTestHarness;

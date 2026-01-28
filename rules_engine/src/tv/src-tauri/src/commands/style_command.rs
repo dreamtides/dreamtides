@@ -1,7 +1,7 @@
 use crate::error::error_types::TvError;
 use crate::toml::color_schemes::{self, ColorPalette};
 use crate::toml::conditional_formatting::{self, CellFormatResult};
-use crate::toml::metadata_parser;
+use crate::toml::metadata;
 use crate::toml::metadata_types::TableStyle;
 
 /// Response combining the resolved color palette with table style flags.
@@ -23,7 +23,7 @@ pub fn get_table_style(file_path: String) -> Result<Option<ResolvedTableStyle>, 
         "Loading table style"
     );
 
-    let table_style = metadata_parser::parse_table_style_from_file(&file_path)?;
+    let table_style = metadata::parse_table_style_from_file(&file_path)?;
 
     let Some(style) = table_style else {
         tracing::debug!(
@@ -73,7 +73,7 @@ pub fn get_conditional_formatting(
         "Evaluating conditional formatting"
     );
 
-    let rules = metadata_parser::parse_conditional_formatting_from_file(&file_path)?;
+    let rules = metadata::parse_conditional_formatting_from_file(&file_path)?;
 
     if rules.is_empty() {
         tracing::debug!(

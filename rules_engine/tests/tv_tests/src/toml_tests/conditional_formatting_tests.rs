@@ -1,5 +1,5 @@
 use tv_lib::toml::conditional_formatting::{evaluate_condition, evaluate_rules};
-use tv_lib::toml::metadata_parser::parse_conditional_formatting_from_content;
+use tv_lib::toml::metadata::parse_conditional_formatting_from_content;
 use tv_lib::toml::metadata_serializer::save_metadata_with_fs;
 use tv_lib::toml::metadata_types::{ConditionalFormatRule, FormatCondition, FormatStyle, Metadata};
 

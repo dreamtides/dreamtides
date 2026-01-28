@@ -2,7 +2,7 @@ use std::path::Path;
 use std::time::Instant;
 
 use crate::error::error_types::{map_io_error_for_read, TvError};
-use crate::toml::{metadata_parser, value_converter};
+use crate::toml::{metadata, value_converter};
 use crate::toml::writer_types::{CellUpdate, SaveCellResult};
 use crate::traits::{AtomicWriteError, FileSystem, RealFileSystem};
 use crate::validation::validation_rules::ValidationRule;
@@ -49,7 +49,7 @@ pub fn save_cell_with_fs_and_rules(
 
     let validation_rules = match rules {
         Some(r) => r.to_vec(),
-        None => metadata_parser::parse_validation_rules_from_content(&content, file_path)
+        None => metadata::parse_validation_rules_from_content(&content, file_path)
             .unwrap_or_default(),
     };
 

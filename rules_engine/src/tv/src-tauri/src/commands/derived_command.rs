@@ -7,7 +7,7 @@ use crate::derived::compute_executor::{ComputationRequest, ComputeExecutorState}
 use crate::derived::derived_types::{LookupContext, RowData};
 use crate::derived::generation_tracker::RowKey;
 use crate::error::error_types::TvError;
-use crate::toml::metadata_parser;
+use crate::toml::metadata;
 
 /// Request to compute a derived column value.
 #[derive(Debug, Clone, serde::Deserialize)]
@@ -244,7 +244,7 @@ pub struct DerivedColumnInfo {
 /// Tauri command to get derived column configurations from a file's metadata.
 #[tauri::command]
 pub fn get_derived_columns_config(file_path: String) -> Result<Vec<DerivedColumnInfo>, TvError> {
-    let configs = metadata_parser::parse_derived_columns_from_file(&file_path)?;
+    let configs = metadata::parse_derived_columns_from_file(&file_path)?;
 
     let result: Vec<DerivedColumnInfo> = configs
         .into_iter()

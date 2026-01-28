@@ -1,6 +1,6 @@
 use crate::error::error_types::TvError;
 use crate::toml::metadata_types::ColumnConfig;
-use crate::toml::{metadata_parser, metadata_serializer};
+use crate::toml::{metadata, metadata_serializer};
 
 /// Tauri command to get the column configurations for a TOML file.
 #[tauri::command]
@@ -11,7 +11,7 @@ pub fn get_column_configs(file_path: String) -> Result<Vec<ColumnConfig>, TvErro
         "Loading column configs"
     );
 
-    let configs = metadata_parser::parse_column_configs_from_file(&file_path)?;
+    let configs = metadata::parse_column_configs_from_file(&file_path)?;
 
     tracing::debug!(
         component = "tv.commands.column",

@@ -1,5 +1,5 @@
 use tv_lib::toml::color_schemes::{available_schemes, resolve_color_scheme};
-use tv_lib::toml::metadata_parser::parse_table_style_from_content;
+use tv_lib::toml::metadata::parse_table_style_from_content;
 use tv_lib::toml::metadata_serializer::save_metadata_with_fs;
 use tv_lib::toml::metadata_types::{Metadata, TableStyle};
 

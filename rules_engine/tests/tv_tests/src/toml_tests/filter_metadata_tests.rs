@@ -1,7 +1,7 @@
 use tv_lib::filter::filter_state::{compute_hidden_rows, compute_visible_rows, FilterStateManager};
 use tv_lib::filter::filter_types::{ColumnFilterState, FilterConditionState};
 use tv_lib::toml::document_loader::TomlTableData;
-use tv_lib::toml::metadata_parser::parse_filter_config_from_content;
+use tv_lib::toml::metadata::parse_filter_config_from_content;
 use tv_lib::toml::metadata_serializer::update_filter_config_with_fs;
 use tv_lib::toml::metadata_types::{ColumnFilter, FilterCondition, FilterConfig};
 

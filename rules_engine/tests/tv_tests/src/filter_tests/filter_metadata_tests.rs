@@ -1,4 +1,4 @@
-use tv_lib::toml::metadata_parser::parse_filter_config_from_content;
+use tv_lib::toml::metadata::parse_filter_config_from_content;
 use tv_lib::toml::metadata_serializer::update_filter_config_with_fs;
 use tv_lib::toml::metadata_types::{ColumnFilter, FilterCondition, FilterConfig};
 

@@ -3,7 +3,7 @@ use tv_lib::sort::sort_state::{
 };
 use tv_lib::sort::sort_types::{CellValue, SortDirection, SortState};
 use tv_lib::toml::document_loader::TomlTableData;
-use tv_lib::toml::metadata_parser::parse_sort_config_from_content;
+use tv_lib::toml::metadata::parse_sort_config_from_content;
 use tv_lib::toml::metadata_serializer::update_sort_config_with_fs;
 use tv_lib::toml::metadata_types::SortConfig;
 

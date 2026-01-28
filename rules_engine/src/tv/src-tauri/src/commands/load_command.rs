@@ -8,7 +8,7 @@ use crate::sort::sort_state::SortStateManager;
 use crate::sort::sort_types::{SortDirection, SortState};
 use crate::sync::state_machine;
 use crate::toml::document_loader::{self, TomlTableData};
-use crate::toml::metadata_parser;
+use crate::toml::metadata;
 use crate::toml::metadata_types::FilterCondition;
 
 /// Tauri command to load a TOML table as spreadsheet data.
@@ -58,7 +58,7 @@ fn restore_sort_state_from_metadata(
         return;
     }
 
-    match metadata_parser::parse_sort_config_from_file(file_path) {
+    match metadata::parse_sort_config_from_file(file_path) {
         Ok(Some(sort_config)) => {
             let direction = if sort_config.ascending {
                 SortDirection::Ascending
@@ -97,7 +97,7 @@ fn restore_filter_state_from_metadata(
         return;
     }
 
-    match metadata_parser::parse_filter_config_from_file(file_path) {
+    match metadata::parse_filter_config_from_file(file_path) {
         Ok(Some(filter_config)) => {
             let filter_state = FilterState::new(filter_config.filters.clone(), filter_config.active);
             filter_state_manager.set_filter_state(file_path, table_name, Some(filter_state));
