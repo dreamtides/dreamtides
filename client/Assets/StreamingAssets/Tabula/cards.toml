@@ -3424,6 +3424,7 @@ position = 0
 width = 160
 inputs = ["image_number"]
 url_template = "https://www.shutterstock.com/image-illustration/-260nw-{image_number}.jpg"
+frozen = true
 
 [[metadata.derived_columns]]
 name = "rules preview"
@@ -3440,7 +3441,6 @@ frozen_rows = 1
 key = "name"
 width = 200
 bold = true
-frozen = true
 
 [[metadata.columns]]
 key = "rules-text"

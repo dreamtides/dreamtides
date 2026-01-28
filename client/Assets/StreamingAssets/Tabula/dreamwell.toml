@@ -2,8 +2,6 @@
 name = "Dawning Horizon"
 id = "bc143c3c-f149-4506-813f-1aa8dd54e370"
 energy-produced = 2
-rules-text = ""
-variables = ""
 phase = 0
 image-number = 1963305268
 
@@ -79,6 +77,7 @@ position = 0
 width = 160
 inputs = ["image_number"]
 url_template = "https://www.shutterstock.com/image-illustration/-260nw-{image_number}.jpg"
+frozen = true
 
 [[metadata.derived_columns]]
 name = "rules preview"
