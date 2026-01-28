@@ -36,7 +36,9 @@ export function StatusIndicator({
   useEffect(() => {
     const subscription = ipc.onSyncStateChanged((payload) => {
       setSyncState(payload.state);
-      setVisible(payload.state !== "idle");
+      // Don't show indicator for idle or saving states - saving indicator
+      // was explicitly decided against to avoid visual noise during edits
+      setVisible(payload.state !== "idle" && payload.state !== "saving");
 
       if (dismissTimeoutRef.current) {
         clearTimeout(dismissTimeoutRef.current);
