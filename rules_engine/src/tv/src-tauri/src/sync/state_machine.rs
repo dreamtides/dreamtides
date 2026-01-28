@@ -158,16 +158,21 @@ pub fn begin_save(app_handle: &AppHandle, file_path: &str) -> Result<(), TvError
     }
 
     let mtime = get_file_mtime(&path);
+    let mtime_ms = mtime
+        .and_then(|t| t.duration_since(SystemTime::UNIX_EPOCH).ok())
+        .map(|d| d.as_millis())
+        .unwrap_or(0);
     *file_state.mtime_before_operation.lock().unwrap_or_else(|e| e.into_inner()) = mtime;
 
     drop(states);
 
     emit_sync_state(app_handle, file_path, SyncState::Saving);
 
-    tracing::debug!(
+    tracing::info!(
         component = "tv.sync.state_machine",
         file_path = %file_path,
         from_state = %current.as_str(),
+        mtime_before_save_ms = %mtime_ms,
         "Transitioned to Saving state"
     );
 
@@ -303,14 +308,35 @@ fn get_file_mtime(path: &Path) -> Option<SystemTime> {
 
 fn check_for_external_changes(path: &Path, mtime_before: Option<SystemTime>) -> bool {
     let Some(before) = mtime_before else {
+        tracing::debug!(
+            component = "tv.sync.state_machine",
+            file_path = %path.display(),
+            "No mtime_before recorded, skipping external change check"
+        );
         return false;
     };
 
     let Some(current_mtime) = get_file_mtime(path) else {
+        tracing::debug!(
+            component = "tv.sync.state_machine",
+            file_path = %path.display(),
+            "Could not get current mtime, skipping external change check"
+        );
         return false;
     };
 
-    current_mtime > before
+    let changed = current_mtime > before;
+
+    tracing::info!(
+        component = "tv.sync.state_machine",
+        file_path = %path.display(),
+        mtime_before_ms = %before.duration_since(SystemTime::UNIX_EPOCH).map(|d| d.as_millis()).unwrap_or(0),
+        mtime_after_ms = %current_mtime.duration_since(SystemTime::UNIX_EPOCH).map(|d| d.as_millis()).unwrap_or(0),
+        external_change_detected = changed,
+        "Checked for external changes after save"
+    );
+
+    changed
 }
 
 fn emit_sync_state(app_handle: &AppHandle, file_path: &str, state: SyncState) {

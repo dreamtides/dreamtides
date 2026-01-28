@@ -15,11 +15,26 @@ pub fn parse_derived_columns_with_fs(
     fs: &dyn FileSystem,
     file_path: &str,
 ) -> Result<Vec<DerivedColumnConfig>, TvError> {
+    let read_start = std::time::Instant::now();
     let content = fs.read_to_string(Path::new(file_path)).map_err(|_| {
         TvError::FileNotFound { path: file_path.to_string() }
     })?;
+    let read_duration_ms = read_start.elapsed().as_millis();
 
-    parse_derived_columns_from_content(&content, file_path)
+    let parse_start = std::time::Instant::now();
+    let result = parse_derived_columns_from_content(&content, file_path);
+    let parse_duration_ms = parse_start.elapsed().as_millis();
+
+    tracing::info!(
+        component = "tv.toml.metadata.derived",
+        file_path = %file_path,
+        content_bytes = content.len(),
+        read_duration_ms = %read_duration_ms,
+        parse_duration_ms = %parse_duration_ms,
+        "Parsed derived columns from file"
+    );
+
+    result
 }
 
 /// Parses derived column configurations from TOML content string.

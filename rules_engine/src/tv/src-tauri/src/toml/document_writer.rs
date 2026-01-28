@@ -36,6 +36,7 @@ pub fn save_toml_document(
 ) -> Result<SaveTableResult, TvError> {
     let start = Instant::now();
 
+    let read_start = Instant::now();
     let content = config.fs().read_to_string(Path::new(file_path)).map_err(|e| {
         tracing::error!(
             component = "tv.toml",
@@ -45,7 +46,9 @@ pub fn save_toml_document(
         );
         map_io_error_for_read(&e, file_path)
     })?;
+    let read_duration_ms = read_start.elapsed().as_millis();
 
+    let parse_start = Instant::now();
     let mut doc: toml_edit::DocumentMut = content.parse().map_err(|e: toml_edit::TomlError| {
         tracing::error!(
             component = "tv.toml",
@@ -55,6 +58,7 @@ pub fn save_toml_document(
         );
         TvError::TomlParseError { path: file_path.to_string(), line: None, message: e.to_string() }
     })?;
+    let parse_duration_ms = parse_start.elapsed().as_millis();
 
     let array =
         doc.get_mut(table_name).and_then(|v| v.as_array_of_tables_mut()).ok_or_else(|| {
@@ -163,14 +167,21 @@ pub fn save_toml_document(
 
     let output = doc.to_string();
 
+    let write_start = Instant::now();
     config.fs().write_atomic(Path::new(file_path), &output)
         .map_err(|e| map_atomic_write_error(e, file_path))?;
+    let write_duration_ms = write_start.elapsed().as_millis();
 
     let duration_ms = start.elapsed().as_millis() as u64;
     tracing::debug!(
         component = "tv.toml",
         file_path = %file_path,
         duration_ms = duration_ms,
+        read_duration_ms = %read_duration_ms,
+        parse_duration_ms = %parse_duration_ms,
+        write_duration_ms = %write_duration_ms,
+        content_bytes = content.len(),
+        output_bytes = output.len(),
         uuids_generated = uuids_generated,
         "File saved"
     );

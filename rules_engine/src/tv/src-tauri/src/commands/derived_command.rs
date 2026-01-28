@@ -244,7 +244,11 @@ pub struct DerivedColumnInfo {
 /// Tauri command to get derived column configurations from a file's metadata.
 #[tauri::command]
 pub fn get_derived_columns_config(file_path: String) -> Result<Vec<DerivedColumnInfo>, TvError> {
+    let command_start = std::time::Instant::now();
+
+    let parse_start = std::time::Instant::now();
     let configs = metadata::parse_derived_columns_from_file(&file_path)?;
+    let parse_duration_ms = parse_start.elapsed().as_millis();
 
     let result: Vec<DerivedColumnInfo> = configs
         .into_iter()
@@ -259,11 +263,15 @@ pub fn get_derived_columns_config(file_path: String) -> Result<Vec<DerivedColumn
         })
         .collect();
 
-    tracing::debug!(
+    let total_duration_ms = command_start.elapsed().as_millis();
+
+    tracing::info!(
         component = "tv.commands.derived",
         file_path = %file_path,
         column_count = result.len(),
-        "Retrieved derived column configs"
+        parse_duration_ms = %parse_duration_ms,
+        total_duration_ms = %total_duration_ms,
+        "get_derived_columns_config completed"
     );
 
     Ok(result)

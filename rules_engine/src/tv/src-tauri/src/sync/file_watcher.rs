@@ -224,21 +224,29 @@ fn run_watcher(
                 _ => "modify",
             };
 
-            if state_machine::is_busy(&app_handle, &file_path) {
-                tracing::debug!(
-                    component = "tv.sync",
+            let is_busy = state_machine::is_busy(&app_handle, &file_path);
+            let event_timestamp_ms = std::time::SystemTime::now()
+                .duration_since(std::time::SystemTime::UNIX_EPOCH)
+                .map(|d| d.as_millis())
+                .unwrap_or(0);
+
+            if is_busy {
+                tracing::info!(
+                    component = "tv.sync.watcher",
                     file_path = %file_path,
                     event_type = %event_type,
-                    "Ignoring file change event during active save"
+                    event_timestamp_ms = %event_timestamp_ms,
+                    "Ignoring file change event during active save/load"
                 );
                 continue;
             }
 
-            tracing::debug!(
-                component = "tv.sync",
+            tracing::info!(
+                component = "tv.sync.watcher",
                 file_path = %file_path,
                 event_type = %event_type,
-                "Watcher event received"
+                event_timestamp_ms = %event_timestamp_ms,
+                "File watcher event will be emitted"
             );
 
             if !path.exists() {
