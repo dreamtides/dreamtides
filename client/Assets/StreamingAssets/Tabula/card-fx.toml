@@ -229,3 +229,63 @@ frozen_rows = 1
 
 [metadata.table_style]
 color_scheme = "yellow"
+
+[[metadata.columns]]
+key = "card-id"
+width = 140
+
+[[metadata.columns]]
+key = "effect-type"
+width = 170
+
+[[metadata.columns]]
+key = "effect-trigger"
+width = 170
+
+[[metadata.columns]]
+key = "projectile-source"
+width = 170
+
+[[metadata.columns]]
+key = "projectile-target"
+width = 170
+
+[[metadata.columns]]
+key = "projectile-address"
+width = 200
+
+[[metadata.columns]]
+key = "projectile-fire-sound"
+width = 200
+
+[[metadata.columns]]
+key = "projectile-impact-sound"
+width = 200
+
+[[metadata.columns]]
+key = "dissolve-material"
+width = 200
+
+[[metadata.columns]]
+key = "dissolve-sound"
+width = 200
+
+[[metadata.columns]]
+key = "effect-address"
+width = 200
+
+[[metadata.columns]]
+key = "effect-sound"
+width = 200
+
+[[metadata.columns]]
+key = "effect-target"
+width = 170
+
+[[metadata.columns]]
+key = "card-trail-targets"
+width = 150
+
+[[metadata.columns]]
+key = "card-trail-address"
+width = 200

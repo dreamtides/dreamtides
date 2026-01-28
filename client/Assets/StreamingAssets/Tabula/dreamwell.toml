@@ -47,7 +47,6 @@ rules-text = "Draw {cards}. Discard {discards}."
 variables = """
 cards: 1
 discards: 1"""
-prompts = "Select a card to discard."
 phase = 1
 image-number = 1011222385
 
