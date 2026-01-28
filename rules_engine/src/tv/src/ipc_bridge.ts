@@ -81,6 +81,8 @@ export interface DerivedColumnConfig {
   position?: number;
   /** Column width in pixels. Defaults to 100. */
   width?: number;
+  /** Freeze this column in place. Defaults to false. */
+  frozen?: boolean;
   /** Input field names passed to the function. */
   inputs?: string[];
 }
@@ -648,6 +650,7 @@ export interface DerivedColumnInfo {
   function: string;
   position?: number;
   width: number;
+  frozen: boolean;
   inputs: string[];
   url_template?: string | null;
 }

@@ -194,6 +194,10 @@ pub struct DerivedColumnConfig {
     #[serde(default = "default_column_width")]
     pub width: u32,
 
+    /// Freeze this column in place. Defaults to false.
+    #[serde(default)]
+    pub frozen: bool,
+
     /// Input field names passed to the function.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub inputs: Vec<String>,
@@ -211,6 +215,7 @@ impl DerivedColumnConfig {
             function: function.into(),
             position: None,
             width: default_column_width(),
+            frozen: false,
             inputs: Vec::new(),
             url_template: None,
         }
@@ -231,6 +236,12 @@ impl DerivedColumnConfig {
     /// Builder method to set position.
     pub fn with_position(mut self, position: usize) -> Self {
         self.position = Some(position);
+        self
+    }
+
+    /// Builder method to set frozen state.
+    pub fn with_frozen(mut self, frozen: bool) -> Self {
+        self.frozen = frozen;
         self
     }
 }

@@ -234,9 +234,14 @@ export function buildMultiSheetWorkbook(
       }
     }
 
-    // Compute freeze pane configuration from metadata
+    // Compute freeze pane configuration from metadata.
+    // Frozen columns can be specified on both data columns and derived columns.
+    // The freeze pane freezes all columns from index 0 up to the highest
+    // frozen column index (inclusive).
     const frozenRows = rowConfig?.frozen_rows ?? 0;
     let frozenColumns = 0;
+
+    // Check data columns for frozen attribute
     if (sheetColumnConfigs) {
       for (const colConfig of sheetColumnConfigs) {
         if (colConfig.frozen) {
@@ -247,6 +252,15 @@ export function buildMultiSheetWorkbook(
               mapping.dataToVisual[headerIndex] + 1,
             );
           }
+        }
+      }
+    }
+
+    // Check derived columns for frozen attribute
+    if (configs) {
+      for (const config of configs) {
+        if (config.frozen && config.position !== undefined && config.position !== null) {
+          frozenColumns = Math.max(frozenColumns, config.position + 1);
         }
       }
     }

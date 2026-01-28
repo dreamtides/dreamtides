@@ -233,6 +233,8 @@ pub struct DerivedColumnInfo {
     pub position: Option<usize>,
     /// Column width in pixels.
     pub width: u32,
+    /// Freeze this column in place.
+    pub frozen: bool,
     /// Input field names passed to the function.
     pub inputs: Vec<String>,
     /// URL template for image-related derived functions.
@@ -251,6 +253,7 @@ pub fn get_derived_columns_config(file_path: String) -> Result<Vec<DerivedColumn
             function: c.function,
             position: c.position,
             width: c.width,
+            frozen: c.frozen,
             inputs: c.inputs,
             url_template: c.url_template,
         })

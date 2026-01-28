@@ -442,9 +442,11 @@ fn parse_single_derived_column(
         .map(|arr| arr.iter().filter_map(|v| v.as_str().map(String::from)).collect())
         .unwrap_or_default();
 
+    let frozen = table.get("frozen").and_then(|v| v.as_bool()).unwrap_or(false);
+
     let url_template = table.get("url_template").and_then(|v| v.as_str()).map(String::from);
 
-    Ok(DerivedColumnConfig { name, function, position, width, inputs, url_template })
+    Ok(DerivedColumnConfig { name, function, position, width, frozen, inputs, url_template })
 }
 
 fn parse_single_rule(
