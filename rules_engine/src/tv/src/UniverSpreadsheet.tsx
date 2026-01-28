@@ -901,12 +901,14 @@ export const UniverSpreadsheet = forwardRef<
       if (isLoadingRef.current) return;
 
       // Intercept filter-related mutations
+      // Note: Command IDs use "set-filter-criteria" not "set-sheet-filter-criteria"
       if (
-        command.id === "sheet.command.set-sheet-filter-range" ||
-        command.id === "sheet.command.set-sheet-filter-criteria" ||
-        command.id === "sheet.command.remove-sheet-filter" ||
-        command.id === "sheet.mutation.set-sheet-filter-range" ||
-        command.id === "sheet.mutation.remove-sheet-filter"
+        command.id === "sheet.command.set-filter-range" ||
+        command.id === "sheet.command.set-filter-criteria" ||
+        command.id === "sheet.command.remove-filter" ||
+        command.id === "sheet.mutation.set-filter-range" ||
+        command.id === "sheet.mutation.set-filter-criteria" ||
+        command.id === "sheet.mutation.remove-filter"
       ) {
         const activeSheet = instance.univerAPI
           .getActiveWorkbook()
@@ -925,8 +927,8 @@ export const UniverSpreadsheet = forwardRef<
         }
 
         if (
-          command.id === "sheet.command.remove-sheet-filter" ||
-          command.id === "sheet.mutation.remove-sheet-filter"
+          command.id === "sheet.command.remove-filter" ||
+          command.id === "sheet.mutation.remove-filter"
         ) {
           ipc.clearFilterState(sheetData.path, sheetData.name).catch((e) => {
             logger.debug("Failed to clear filter state", { error: String(e) });
@@ -976,8 +978,16 @@ export const UniverSpreadsheet = forwardRef<
               isRestoringFilterRef.current = false;
             }
           }, 0);
+
+          // Re-insert images after filter is cleared.
+          // Wait for Univer to process the filter removal.
+          const capturedSheetIdForImages = sheetId;
+          setTimeout(() => {
+            reinsertImagesForSheet(capturedSheetIdForImages);
+          }, 100);
         } else if (
-          command.id === "sheet.command.set-sheet-filter-criteria"
+          command.id === "sheet.command.set-filter-criteria" ||
+          command.id === "sheet.mutation.set-filter-criteria"
         ) {
           // Read all column filter criteria and persist to backend
           const filter = activeSheet.getFilter();
@@ -1028,6 +1038,15 @@ export const UniverSpreadsheet = forwardRef<
             sheetName: sheetData.name,
             filterCount: filterRequests.length,
           });
+
+          // Re-insert images after filter criteria change.
+          // Filtering changes which rows are visible, but floating images
+          // remain at their original pixel coordinates. Wait for Univer
+          // to process the filter before recalculating image positions.
+          const capturedSheetIdForImages = sheetId;
+          setTimeout(() => {
+            reinsertImagesForSheet(capturedSheetIdForImages);
+          }, 100);
         } else {
           logger.info("Filter changed", {
             sheetId,
