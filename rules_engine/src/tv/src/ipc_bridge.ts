@@ -704,6 +704,16 @@ export async function clearComputationQueue(): Promise<void> {
   return invoke("clear_computation_queue");
 }
 
+export interface UpdateLookupContextRequest {
+  tables: Record<string, Record<string, Record<string, unknown>>>;
+}
+
+export async function updateLookupContext(
+  request: UpdateLookupContextRequest,
+): Promise<void> {
+  return invoke("update_lookup_context", { request });
+}
+
 // ============ Row Config Commands ============
 
 export async function getRowConfig(

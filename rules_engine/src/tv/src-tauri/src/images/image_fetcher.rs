@@ -218,12 +218,13 @@ impl ImageFetcherState {
 
     /// Initializes the fetcher with the given cache directory.
     ///
-    /// Also registers the image derived function with the global function
-    /// registry, since it requires access to the shared image cache.
+    /// Also registers the image-related derived functions with the global
+    /// function registry, since they require access to the shared image cache.
     pub fn initialize(&self, cache_dir: &std::path::Path) -> Result<(), TvError> {
         let cache = Arc::new(ImageCache::new(cache_dir)?);
         cache.validate_integrity()?;
         function_registry::register_image_derived_function(Arc::clone(&cache));
+        function_registry::register_image_lookup_function(Arc::clone(&cache));
         let fetcher = ImageFetcher::new(cache)?;
         if let Ok(mut guard) = self.fetcher.write() {
             *guard = Some(Arc::new(fetcher));

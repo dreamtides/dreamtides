@@ -289,3 +289,12 @@ width = 150
 [[metadata.columns]]
 key = "card-trail-address"
 width = 200
+
+[[metadata.derived_columns]]
+name = "image"
+function = "image_lookup"
+position = 0
+width = 160
+inputs = ["card_id"]
+url_template = "https://www.shutterstock.com/image-illustration/-260nw-{image_number}.jpg"
+frozen = true

@@ -289,6 +289,41 @@ export function AppRoot() {
     setError(null);
     setLoading(false);
 
+    // Build and send lookup context for cross-table references.
+    // Each table is indexed by row ID for efficient lookup.
+    const lookupContextTables: Record<string, Record<string, Record<string, unknown>>> = {};
+    for (const sheet of validSheets) {
+      const idIndex = sheet.data.headers.indexOf("id");
+      if (idIndex === -1) continue;
+
+      const tableRows: Record<string, Record<string, unknown>> = {};
+      for (const row of sheet.data.rows) {
+        const id = row[idIndex];
+        if (typeof id !== "string" || !id) continue;
+
+        const rowData: Record<string, unknown> = {};
+        for (let i = 0; i < sheet.data.headers.length; i++) {
+          rowData[sheet.data.headers[i]] = row[i];
+        }
+        tableRows[id] = rowData;
+      }
+
+      if (Object.keys(tableRows).length > 0) {
+        lookupContextTables[sheet.name] = tableRows;
+      }
+    }
+
+    if (Object.keys(lookupContextTables).length > 0) {
+      try {
+        await ipc.updateLookupContext({ tables: lookupContextTables });
+        logger.info("Updated lookup context", {
+          tableCount: Object.keys(lookupContextTables).length,
+        });
+      } catch (e) {
+        logger.error("Failed to update lookup context", { error: String(e) });
+      }
+    }
+
     // Trigger derived column computations for all sheets
     for (const sheet of validSheets) {
       const info = sheetInfos.find((s) => s.id === sheet.id);
@@ -316,6 +351,26 @@ export function AppRoot() {
       );
       return { sheets: newSheets };
     });
+
+    // Update lookup context for this sheet if it has an id column
+    const idIndex = data.headers.indexOf("id");
+    if (idIndex !== -1) {
+      const tableRows: Record<string, Record<string, unknown>> = {};
+      for (const row of data.rows) {
+        const id = row[idIndex];
+        if (typeof id !== "string" || !id) continue;
+        const rowData: Record<string, unknown> = {};
+        for (let i = 0; i < data.headers.length; i++) {
+          rowData[data.headers[i]] = row[i];
+        }
+        tableRows[id] = rowData;
+      }
+      if (Object.keys(tableRows).length > 0) {
+        ipc.updateLookupContext({ tables: { [sheetInfo.tableName]: tableRows } }).catch((e) =>
+          logger.error("Failed to update lookup context on reload", { error: String(e) })
+        );
+      }
+    }
 
     // Re-trigger derived column computations for reloaded sheet
     try {

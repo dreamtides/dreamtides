@@ -5,6 +5,7 @@ pub mod fluent_integration;
 pub mod function_registry;
 pub mod generation_tracker;
 pub mod image_derived;
+pub mod image_lookup;
 pub mod image_url;
 pub mod result_cache;
 pub mod rich_text_converter;

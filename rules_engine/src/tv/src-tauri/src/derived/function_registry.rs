@@ -4,6 +4,7 @@ use std::sync::{Arc, OnceLock, RwLock};
 use crate::derived::card_lookup::CardLookupFunction;
 use crate::derived::derived_types::DerivedFunction;
 use crate::derived::image_derived::ImageDerivedFunction;
+use crate::derived::image_lookup::ImageLookupFunction;
 use crate::derived::image_url::ImageUrlFunction;
 use crate::derived::rules_preview::RulesPreviewFunction;
 use crate::images::image_cache::ImageCache;
@@ -114,5 +115,26 @@ pub fn register_image_derived_function(cache: Arc<ImageCache>) {
     tracing::info!(
         component = "tv.derived.registry",
         "Registered image derived function"
+    );
+}
+
+/// Registers the image lookup function with the global registry.
+///
+/// This must be called after the image cache is initialized, since the
+/// function requires access to the cache for fetching and storing images.
+/// The image_lookup function looks up images via cross-table card ID references.
+pub fn register_image_lookup_function(cache: Arc<ImageCache>) {
+    let registry = global_registry();
+    if registry.contains("image_lookup") {
+        tracing::debug!(
+            component = "tv.derived.registry",
+            "Image lookup function already registered"
+        );
+        return;
+    }
+    registry.register(Box::new(ImageLookupFunction::new(cache)));
+    tracing::info!(
+        component = "tv.derived.registry",
+        "Registered image lookup function"
     );
 }
