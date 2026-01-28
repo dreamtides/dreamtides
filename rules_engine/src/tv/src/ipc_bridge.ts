@@ -1011,3 +1011,21 @@ export function onAutosaveDisabledChanged(
     },
   };
 }
+
+export function onOpenFindDialog(
+  callback: () => void,
+): Disposable {
+  let unlisten: UnlistenFn | null = null;
+
+  listen<void>("open-find-dialog", () => {
+    callback();
+  }).then((fn) => {
+    unlisten = fn;
+  });
+
+  return {
+    dispose: () => {
+      if (unlisten) unlisten();
+    },
+  };
+}

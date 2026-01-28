@@ -1578,6 +1578,15 @@ export const UniverSpreadsheet = forwardRef<
     }
   }, [derivedColumnState, multiSheetData]);
 
+  useEffect(() => {
+    const sub = ipc.onOpenFindDialog(() => {
+      if (univerAPIRef.current) {
+        univerAPIRef.current.executeCommand("ui.operation.open-find-dialog");
+      }
+    });
+    return () => sub.dispose();
+  }, []);
+
   return (
     <div
       ref={containerRef}

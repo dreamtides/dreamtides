@@ -1,6 +1,6 @@
 use std::collections::HashSet;
 
-use tauri::menu::{CheckMenuItem, Menu, MenuItem, MenuItemKind, Submenu};
+use tauri::menu::{CheckMenuItem, Menu, MenuItem, MenuItemKind};
 use tauri::{Emitter, Manager};
 
 use crate::derived::compute_executor::ComputeExecutorState;
@@ -111,6 +111,13 @@ pub fn run(paths: cli::AppPaths) {
         .plugin(tauri_plugin_opener::init())
         .menu(|app_handle| {
             let menu = Menu::default(app_handle)?;
+            let find_in_sheet = MenuItem::with_id(
+                app_handle,
+                "find_in_sheet",
+                "Find in Sheet",
+                true,
+                Some("CmdOrCtrl+F"),
+            )?;
             let dev_tools = MenuItem::with_id(
                 app_handle,
                 "dev_tools",
@@ -128,23 +135,27 @@ pub fn run(paths: cli::AppPaths) {
             )?;
             for item in menu.items()? {
                 if let MenuItemKind::Submenu(ref submenu) = item {
-                    if submenu.text().unwrap_or_default() == "View" {
+                    let text = submenu.text().unwrap_or_default();
+                    if text == "Edit" {
+                        submenu.append(&find_in_sheet)?;
+                    } else if text == "View" {
                         submenu.append(&dev_tools)?;
                         submenu.append(&disable_autosave)?;
-                        return Ok(menu);
                     }
                 }
             }
-            menu.append(&Submenu::with_items(
-                app_handle,
-                "View",
-                true,
-                &[&dev_tools, &disable_autosave],
-            )?)?;
             Ok(menu)
         })
         .on_menu_event(|app_handle, event| {
-            if event.id() == "dev_tools" {
+            if event.id() == "find_in_sheet" {
+                if let Err(e) = app_handle.emit("open-find-dialog", ()) {
+                    tracing::error!(
+                        component = "tv.menu",
+                        error = %e,
+                        "Failed to emit open-find-dialog event"
+                    );
+                }
+            } else if event.id() == "dev_tools" {
                 if let Some(window) = app_handle.get_webview_window("main") {
                     window.open_devtools();
                 }

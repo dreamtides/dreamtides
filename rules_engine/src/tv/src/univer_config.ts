@@ -34,9 +34,13 @@ import UIEnUS from "@univerjs/ui/locale/en-US";
 import { UniverDrawingPlugin } from "@univerjs/drawing";
 import { UniverDrawingUIPlugin } from "@univerjs/drawing-ui";
 import DrawingUIEnUS from "@univerjs/drawing-ui/locale/en-US";
+import { UniverFindReplacePlugin } from "@univerjs/find-replace";
+import FindReplaceEnUS from "@univerjs/find-replace/locale/en-US";
 import { UniverSheetsDrawingPlugin } from "@univerjs/sheets-drawing";
 import { UniverSheetsDrawingUIPlugin } from "@univerjs/sheets-drawing-ui";
 import SheetsDrawingUIEnUS from "@univerjs/sheets-drawing-ui/locale/en-US";
+import { UniverSheetsFindReplacePlugin } from "@univerjs/sheets-find-replace";
+import SheetsFindReplaceEnUS from "@univerjs/sheets-find-replace/locale/en-US";
 import { DISABLED_MENU_ITEMS } from "./disabled_menu_items";
 
 import "@univerjs/design/lib/index.css";
@@ -51,6 +55,7 @@ import "@univerjs/sheets-data-validation-ui/lib/index.css";
 import "@univerjs/sheets-sort-ui/lib/index.css";
 import "@univerjs/drawing-ui/lib/index.css";
 import "@univerjs/sheets-drawing-ui/lib/index.css";
+import "@univerjs/find-replace/lib/index.css";
 
 // Facade side-effect imports add methods to FWorkbook/FWorksheet prototypes
 // via FBase.extend(). Vite pre-bundling can break this by creating duplicate
@@ -68,6 +73,7 @@ import "@univerjs/sheets-conditional-formatting/facade";
 import "@univerjs/sheets-data-validation/facade";
 import "@univerjs/sheets-sort/facade";
 import "@univerjs/sheets-drawing-ui/facade";
+import "@univerjs/sheets-find-replace/facade";
 
 export interface UniverConfig {
   container: HTMLElement;
@@ -98,7 +104,9 @@ export function createUniverInstance(config: UniverConfig): UniverInstance {
         SheetsDataValidationUIEnUS,
         SheetsSortUIEnUS,
         DrawingUIEnUS,
-        SheetsDrawingUIEnUS
+        SheetsDrawingUIEnUS,
+        FindReplaceEnUS,
+        SheetsFindReplaceEnUS
       ),
     },
   });
@@ -163,6 +171,10 @@ export function createUniverInstance(config: UniverConfig): UniverInstance {
     UniverSheetsDrawingUIPlugin as never,
     { menu: DISABLED_MENU_ITEMS } as never
   );
+
+  // Find and replace
+  univer.registerPlugin(UniverFindReplacePlugin);
+  univer.registerPlugin(UniverSheetsFindReplacePlugin);
 
   const univerAPI = FUniver.newAPI(univer);
 
