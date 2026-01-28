@@ -3708,7 +3708,7 @@ url_template = "https://www.shutterstock.com/image-illustration/-260nw-{image_nu
 [[metadata.derived_columns]]
 name = "rules preview"
 function = "rules_preview"
-position = 1
+position = 4
 width = 300
 inputs = ["rules-text", "variables"]
 
