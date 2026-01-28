@@ -37,7 +37,7 @@ sha2 = "0.10"
 tauri = { version = "2", features = ["devtools", "protocol-asset"] }
 tauri-plugin-opener = "2"
 thiserror = "2"
-tokio = { version = "1", features = ["rt-multi-thread", "sync", "time"] }
+tokio = { version = "1", features = ["rt-multi-thread", "sync", "time", "process"] }
 toml = { version = "0.8", features = ["preserve_order"] }
 toml_edit = "0.22"
 tracing = "0.1"

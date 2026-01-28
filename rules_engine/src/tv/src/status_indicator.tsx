@@ -37,7 +37,9 @@ export function StatusIndicator({
     const subscription = ipc.onSyncStateChanged((payload) => {
       setSyncState(payload.state);
       // Don't show indicator for idle or saving states - saving indicator
-      // was explicitly decided against to avoid visual noise during edits
+      // was explicitly decided against to avoid visual noise during edits.
+      // Similarly, ability parsing runs silently in the background without
+      // any visual status indication to avoid distracting the user.
       setVisible(payload.state !== "idle" && payload.state !== "saving");
 
       if (dismissTimeoutRef.current) {

@@ -434,6 +434,22 @@ export interface DerivedFunctionFailedPayload {
   error: string;
 }
 
+// ============ Ability Parser Event Payloads ============
+
+export interface AbilityParseStartedPayload {
+  directory: string;
+}
+
+export interface AbilityParseCompletedPayload {
+  directory: string;
+  duration_ms: number;
+}
+
+export interface AbilityParseFailedPayload {
+  directory: string;
+  error: string;
+}
+
 // ============ Commands ============
 
 export async function loadTomlTable(
@@ -999,3 +1015,12 @@ export const onAutosaveDisabledChanged =
 
 export const onOpenFindDialog =
   createVoidEventListener("open-find-dialog");
+
+export const onAbilityParseStarted =
+  createEventListener<AbilityParseStartedPayload>("ability-parse-started");
+
+export const onAbilityParseCompleted =
+  createEventListener<AbilityParseCompletedPayload>("ability-parse-completed");
+
+export const onAbilityParseFailed =
+  createEventListener<AbilityParseFailedPayload>("ability-parse-failed");
