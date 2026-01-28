@@ -3,9 +3,14 @@ points-symbol = <color=#F57F17>⍟</color>
 fast-symbol = ↯
 
 e = <color=#00838F>{$e}●</color>
+e1 = <color=#00838F>{$e1}●</color>
+e2 = <color=#00838F>{$e2}●</color>
+e3 = <color=#00838F>{$e3}●</color>
 mode1-cost = <color=#00838F>{$mode1-cost}●</color>
 mode2-cost = <color=#00838F>{$mode2-cost}●</color>
 points = <color=#F57F17>{$points}⍟</color>
+points1 = <color=#F57F17>{$points1}⍟</color>
+points2 = <color=#F57F17>{$points2}⍟</color>
 
 maximum-energy = {$max} maximum {energy-symbol}
 
@@ -52,12 +57,42 @@ cards =
       [one] a card
       *[other] { $cards } cards
   }
+cards1 =
+  {
+    $cards1 ->
+      [one] a card
+      *[other] { $cards1 } cards
+  }
+cards2 =
+  {
+    $cards2 ->
+      [one] a card
+      *[other] { $cards2 } cards
+  }
+cards3 =
+  {
+    $cards3 ->
+      [one] a card
+      *[other] { $cards3 } cards
+  }
 
 discards =
   {
     $discards ->
       [one] a card
       *[other] { $discards } cards
+  }
+discards1 =
+  {
+    $discards1 ->
+      [one] a card
+      *[other] { $discards1 } cards
+  }
+discards2 =
+  {
+    $discards2 ->
+      [one] a card
+      *[other] { $discards2 } cards
   }
 
 top-n-cards =
