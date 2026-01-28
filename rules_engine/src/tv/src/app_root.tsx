@@ -131,7 +131,7 @@ export function AppRoot() {
   const [rowConfigs, setRowConfigs] = useState<Record<string, RowConfig>>({});
   const [columnConfigs, setColumnConfigs] = useState<Record<string, ColumnConfig[]>>({});
   const [persistedSheetOrder, setPersistedSheetOrder] = useState<string[] | undefined>(undefined);
-  const [permissionStates, setPermissionStates] = useState<Record<string, PermissionState>>({});
+  const [_permissionStates, setPermissionStates] = useState<Record<string, PermissionState>>({});
   const [permissionError, setPermissionError] = useState<string | null>(null);
   const saveTimeoutRef = useRef<number | null>(null);
   const isSavingRef = useRef<Record<string, boolean>>({});
@@ -332,7 +332,7 @@ export function AppRoot() {
       const info = sheetInfos.find((s) => s.id === sheet.id);
       const configs = allDerivedConfigs[sheet.id];
       if (info && configs) {
-        triggerDerivedComputations(info, sheet.data, configs);
+        void triggerDerivedComputations(info, sheet.data, configs);
       }
     }
   }, [loadSingleFile, triggerDerivedComputations]);
@@ -383,7 +383,7 @@ export function AppRoot() {
           ...prev,
           configs: { ...prev.configs, [sheetId]: configs },
         }));
-        triggerDerivedComputations(sheetInfo, data, configs);
+        void triggerDerivedComputations(sheetInfo, data, configs);
       }
     } catch (e) {
       logger.error("Failed to reload derived columns", { path: sheetInfo.path, error: String(e) });
@@ -468,7 +468,7 @@ export function AppRoot() {
         });
         const changedRows = rowCountChanged
           ? undefined
-          : getChangedRowIndices(previousData!, newData);
+          : getChangedRowIndices(previousData, newData);
         changedRowsTimer.stop({ changedRowCount: changedRows?.length ?? "all" });
 
         if (!changedRows || changedRows.length > 0) {
@@ -488,7 +488,7 @@ export function AppRoot() {
                 rowCount: changedRows?.length ?? newData.rows.length,
                 configCount: configs.length,
               });
-              triggerDerivedComputations(sheetInfo, newData, configs, changedRows);
+              void triggerDerivedComputations(sheetInfo, newData, configs, changedRows);
               derivedTimer.stop();
             }
           } catch (e) {
@@ -552,7 +552,7 @@ export function AppRoot() {
         clearTimeout(saveTimeoutRef.current);
       }
       saveTimeoutRef.current = window.setTimeout(() => {
-        saveData(newData, sheetId);
+        void saveData(newData, sheetId);
       }, SAVE_DEBOUNCE_MS);
 
       perfTimer.stop({ scheduled: true });
@@ -633,7 +633,7 @@ export function AppRoot() {
       }
     };
 
-    init();
+    void init();
   }, [loadAllFiles]);
 
   useEffect(() => {
@@ -651,7 +651,7 @@ export function AppRoot() {
       // Handle file restoration events
       if (payload.event_type === "restored") {
         logger.info("File has been restored, reloading sheet", { filePath: payload.file_path });
-        reloadSheet(sheetInfo.id);
+        void reloadSheet(sheetInfo.id);
         return;
       }
 
@@ -670,7 +670,7 @@ export function AppRoot() {
       }
 
       logger.info("File changed externally, reloading sheet", { filePath: payload.file_path });
-      reloadSheet(sheetInfo.id);
+      void reloadSheet(sheetInfo.id);
     });
 
     const derivedValueSub = ipc.onDerivedValueComputed((payload: DerivedValuePayload) => {
@@ -704,7 +704,7 @@ export function AppRoot() {
       logger.info("Conflict detected", { message: payload.message });
       const sheetInfo = sheets.find((s) => s.path === payload.filePath);
       if (sheetInfo) {
-        reloadSheet(sheetInfo.id);
+        void reloadSheet(sheetInfo.id);
       }
     });
 
@@ -754,7 +754,7 @@ export function AppRoot() {
                   appliedCount,
                 });
                 // Reload the sheet to reflect the applied changes
-                reloadSheet(sheetInfo.id);
+                void reloadSheet(sheetInfo.id);
               }
             })
             .catch((e) => {
@@ -765,7 +765,7 @@ export function AppRoot() {
             });
         } else {
           // File was restored but no pending updates - reload to get fresh data
-          reloadSheet(sheetInfo.id);
+          void reloadSheet(sheetInfo.id);
         }
       }
     });
@@ -805,7 +805,7 @@ export function AppRoot() {
 
   const handleRetry = useCallback(() => {
     if (sheets.length > 0) {
-      loadAllFiles(sheets);
+      void loadAllFiles(sheets);
     }
   }, [sheets, loadAllFiles]);
 
@@ -837,7 +837,7 @@ export function AppRoot() {
           message={permissionError}
           errorType="warning"
           onDismiss={() => setPermissionError(null)}
-          actions={[{ label: "Retry", onClick: handleRetryPermissions }]}
+          actions={[{ label: "Retry", onClick: () => { void handleRetryPermissions(); } }]}
         />
       )}
       {error && !permissionError && (

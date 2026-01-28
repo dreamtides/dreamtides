@@ -575,6 +575,13 @@ tv-check:
         echo "$output"
         exit 1
     fi
+    output=$(cd rules_engine/src/tv && npx eslint src/ 2>&1)
+    if [ $? -eq 0 ]; then
+        echo "TV ESLint check passed"
+    else
+        echo "$output"
+        exit 1
+    fi
 
 tv-clippy:
     #!/usr/bin/env bash

@@ -8,17 +8,18 @@ import "./styles/spreadsheet_overrides.css";
 const logger = createLogger("tv.ui.global");
 
 window.addEventListener("error", (event) => {
+  const errorObj = event.error as Error | undefined;
   logger.error("Uncaught exception", {
     message: event.message,
     filename: event.filename,
     lineno: event.lineno,
     colno: event.colno,
-    stack: event.error?.stack,
+    stack: errorObj?.stack,
   });
 });
 
 window.addEventListener("unhandledrejection", (event) => {
-  const reason = event.reason;
+  const reason: unknown = event.reason;
   logger.error("Unhandled promise rejection", {
     reason: reason instanceof Error ? reason.message : String(reason),
     stack: reason instanceof Error ? reason.stack : undefined,

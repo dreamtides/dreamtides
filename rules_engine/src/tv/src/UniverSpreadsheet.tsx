@@ -276,7 +276,8 @@ export const UniverSpreadsheet = forwardRef<
       const normalize = (val: unknown): string => {
         if (val === null || val === undefined || val === "") return "";
         if (typeof val === "boolean") return val ? "1" : "0";
-        return String(val);
+        if (typeof val === "string" || typeof val === "number") return String(val);
+        return "";
       };
 
       const firstDataCol = mapping.dataToVisual[0];
@@ -511,7 +512,7 @@ export const UniverSpreadsheet = forwardRef<
           }
         }
       };
-      loadEnumRulesAsync();
+      void loadEnumRulesAsync();
 
       // Restore sort indicators from persisted backend sort state
       const restoreSortStateAsync = async () => {
@@ -573,7 +574,7 @@ export const UniverSpreadsheet = forwardRef<
           isRestoringSortRef.current = false;
         }
       };
-      restoreSortStateAsync();
+      void restoreSortStateAsync();
 
       // Load and apply table color schemes for all sheets
       const loadTableStylesAsync = async () => {
@@ -607,7 +608,7 @@ export const UniverSpreadsheet = forwardRef<
           }
         }
       };
-      loadTableStylesAsync();
+      void loadTableStylesAsync();
 
       // Load and apply conditional formatting for all sheets
       const loadConditionalFormattingAsync = async () => {
@@ -647,7 +648,7 @@ export const UniverSpreadsheet = forwardRef<
           }
         }
       };
-      loadConditionalFormattingAsync();
+      void loadConditionalFormattingAsync();
 
       // Restore persisted filter criteria for each sheet.
       // The filter range itself is set via workbook resources in
@@ -688,7 +689,7 @@ export const UniverSpreadsheet = forwardRef<
                 if (visualCol === undefined) continue;
 
                 if ("values" in savedFilter.condition) {
-                  const values = savedFilter.condition.values as unknown[];
+                  const values = savedFilter.condition.values;
                   filter.setColumnFilterCriteria(visualCol, {
                     colId: colIndex,
                     filters: {
@@ -715,7 +716,7 @@ export const UniverSpreadsheet = forwardRef<
           isRestoringFilterRef.current = false;
         }
       };
-      restoreFilterStateAsync();
+      void restoreFilterStateAsync();
 
       // Mark initial load as complete - data is already in cellData, no need to repopulate
       initialLoadCompleteRef.current = true;
@@ -839,7 +840,7 @@ export const UniverSpreadsheet = forwardRef<
           });
           originalToDisplayMapRef.current.delete(sheetId);
           sortPendingRef.current = true;
-          reinsertImagesForSheet(sheetId).finally(() => {
+          void reinsertImagesForSheet(sheetId).finally(() => {
             sortPendingRef.current = false;
           });
           logger.info("Sort cleared", { sheetId, sheetName: sheetData.name });
@@ -882,7 +883,7 @@ export const UniverSpreadsheet = forwardRef<
           });
 
         sortPendingRef.current = true;
-        reinsertImagesForSheet(sheetId).finally(() => {
+        void reinsertImagesForSheet(sheetId).finally(() => {
           sortPendingRef.current = false;
         });
 
@@ -983,7 +984,7 @@ export const UniverSpreadsheet = forwardRef<
           // Wait for Univer to process the filter removal.
           const capturedSheetIdForImages = sheetId;
           setTimeout(() => {
-            reinsertImagesForSheet(capturedSheetIdForImages);
+            void reinsertImagesForSheet(capturedSheetIdForImages);
           }, 100);
         } else if (
           command.id === "sheet.command.set-filter-criteria" ||
@@ -1045,7 +1046,7 @@ export const UniverSpreadsheet = forwardRef<
           // to process the filter before recalculating image positions.
           const capturedSheetIdForImages = sheetId;
           setTimeout(() => {
-            reinsertImagesForSheet(capturedSheetIdForImages);
+            void reinsertImagesForSheet(capturedSheetIdForImages);
           }, 100);
         } else {
           logger.info("Filter changed", {
@@ -1400,7 +1401,7 @@ export const UniverSpreadsheet = forwardRef<
 
       // Clear existing images for this sheet before repopulating data
       if (imageCellRendererRef.current) {
-        imageCellRendererRef.current.clearSheetImages(sheet, sheetData.id);
+        void imageCellRendererRef.current.clearSheetImages(sheet, sheetData.id);
       }
 
       const sheetMapping =
@@ -1440,24 +1441,27 @@ export const UniverSpreadsheet = forwardRef<
 
       // Apply checkbox validation to boolean columns after updating data
       const booleanColumns = detectBooleanColumns(sheetData.data);
-      applyCheckboxValidation(
-        univerAPIRef.current!,
-        sheet,
-        sheetData.data,
-        booleanColumns,
-        sheetMapping,
-      );
-
-      // Apply dropdown validation from cached enum rules
-      const cachedEnumRules = enumRulesRef.current.get(sheetData.path);
-      if (cachedEnumRules && cachedEnumRules.length > 0) {
-        applyDropdownValidation(
-          univerAPIRef.current!,
+      const univerAPI = univerAPIRef.current;
+      if (univerAPI) {
+        applyCheckboxValidation(
+          univerAPI,
           sheet,
           sheetData.data,
-          cachedEnumRules,
+          booleanColumns,
           sheetMapping,
         );
+
+        // Apply dropdown validation from cached enum rules
+        const cachedEnumRules = enumRulesRef.current.get(sheetData.path);
+        if (cachedEnumRules && cachedEnumRules.length > 0) {
+          applyDropdownValidation(
+            univerAPI,
+            sheet,
+            sheetData.data,
+            cachedEnumRules,
+            sheetMapping,
+          );
+        }
       }
 
       // Re-apply cached table style after data update
@@ -1491,7 +1495,7 @@ export const UniverSpreadsheet = forwardRef<
           });
         }
       };
-      reevaluateConditionalFormatting();
+      void reevaluateConditionalFormatting();
 
       // Re-create auto-filter so dropdown arrows survive data reload
       if (
@@ -1613,7 +1617,7 @@ export const UniverSpreadsheet = forwardRef<
   useEffect(() => {
     const sub = ipc.onOpenFindDialog(() => {
       if (univerAPIRef.current) {
-        univerAPIRef.current.executeCommand("ui.operation.open-find-dialog");
+        void univerAPIRef.current.executeCommand("ui.operation.open-find-dialog");
       }
     });
     return () => sub.dispose();

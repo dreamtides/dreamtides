@@ -929,7 +929,7 @@ function createEventListener<T>(
   return (callback) => {
     let unlisten: UnlistenFn | null = null;
 
-    listen<T>(eventName, (event) => {
+    void listen<T>(eventName, (event) => {
       callback(event.payload);
     }).then((fn) => {
       unlisten = fn;
@@ -953,7 +953,7 @@ function createVoidEventListener(
   return (callback) => {
     let unlisten: UnlistenFn | null = null;
 
-    listen<void>(eventName, () => {
+    void listen<void>(eventName, () => {
       callback();
     }).then((fn) => {
       unlisten = fn;

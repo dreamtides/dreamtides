@@ -260,7 +260,7 @@ pub fn check_file_readable(path: &Path) -> bool {
 
 /// Checks if a file is writable by attempting to open it for writing.
 pub fn check_file_writable(path: &Path) -> bool {
-    std::fs::OpenOptions::new().write(true).append(true).open(path).is_ok()
+    std::fs::OpenOptions::new().append(true).open(path).is_ok()
 }
 
 /// Determines the permission state for a file based on filesystem checks.
@@ -484,10 +484,7 @@ pub fn is_file_deleted(app_handle: &AppHandle, file_path: &str) -> bool {
 
 /// Returns the time in seconds since the file was deleted, or None if not deleted.
 pub fn get_deletion_elapsed_secs(app_handle: &AppHandle, file_path: &str) -> Option<u64> {
-    let Some(state) = app_handle.try_state::<PermissionRecoveryState>() else {
-        return None;
-    };
-
+    let state = app_handle.try_state::<PermissionRecoveryState>()?;
     let path = PathBuf::from(file_path);
     let states = state.file_states.lock().unwrap_or_else(|e| e.into_inner());
     states.get(&path).and_then(|s| s.deleted_at.map(|t| t.elapsed().as_secs()))
