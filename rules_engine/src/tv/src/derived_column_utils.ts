@@ -1,6 +1,11 @@
+import { FUniver } from "@univerjs/core/facade";
 import { FWorksheet } from "@univerjs/sheets/facade";
 
-import type { DerivedColumnInfo, DerivedResultValue } from "./ipc_bridge";
+import type {
+  DerivedColumnInfo,
+  DerivedResultValue,
+  TextStyle,
+} from "./ipc_bridge";
 import { derivedResultToCellData } from "./rich_text_utils";
 import { createLogger } from "./logger_frontend";
 
@@ -50,6 +55,7 @@ export function computeDataColumnOffset(
  * richText, and error. Error results display with red font color.
  */
 export function applyDerivedResultToCell(
+  univerAPI: FUniver,
   sheet: FWorksheet,
   row: number,
   col: number,
@@ -58,23 +64,28 @@ export function applyDerivedResultToCell(
   const range = sheet.getRange(row, col, 1, 1);
   if (!range) return;
 
-  const cellData = derivedResultToCellData(result);
-
-  if (result.type === "richText" && cellData.p) {
-    // Rich text requires setting the paragraph structure
-    // Use setValues with the plain text first, then apply formatting
-    const plainText = cellData.p.flatMap((p) => p.ts.map((r) => r.t)).join("");
-    range.setValues([[plainText]]);
-    // Apply rich text styling via individual text runs
-    for (const paragraph of cellData.p) {
-      for (const run of paragraph.ts) {
-        if (run.s) {
-          if (run.s.bl) range.setFontWeight("bold");
-          if (run.s.it) range.setFontStyle("italic");
-          if (run.s.cl) range.setFontColor(run.s.cl.rgb);
+  if (result.type === "richText") {
+    // Build rich text using insertText (unstyled) + setStyle to work around
+    // a Univer RichTextBuilder bug where insertText(text, style) calculates
+    // textRun st/ed indices using the document-absolute insertion position
+    // instead of fragment-relative indices, causing style offsets to shift
+    // by the length of previously inserted text.
+    const allRuns = result.value.p.flatMap((p) => p.ts);
+    const plainText = allRuns.map((r) => r.t).join("");
+    const richText = univerAPI.newRichText();
+    richText.insertText(plainText);
+    let offset = 0;
+    for (const run of allRuns) {
+      if (run.s) {
+        const ts = toUniverTextStyle(run.s);
+        if (ts) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          richText.setStyle(offset, offset + run.t.length, ts as any);
         }
       }
+      offset += run.t.length;
     }
+    range.setRichTextValueForCell(richText);
     logger.debug("Applied rich text derived result", { row, col });
   } else if (result.type === "error") {
     range.setValues([[`Error: ${result.value}`]]);
@@ -89,10 +100,23 @@ export function applyDerivedResultToCell(
     // derived-value-computed event listener, not via cell text.
     return;
   } else {
+    const cellData = derivedResultToCellData(result);
     const value = cellData.v !== undefined ? cellData.v : "";
     range.setValues([[value]]);
     // Reset font color to default for non-error results
     range.setFontColor("#000000");
     logger.debug("Applied derived result", { row, col, type: result.type });
   }
+}
+
+function toUniverTextStyle(
+  style: TextStyle,
+): Record<string, unknown> | undefined {
+  if (!style.bl && !style.it && !style.ul && !style.cl) return undefined;
+  const result: Record<string, unknown> = {};
+  if (style.bl) result.bl = style.bl;
+  if (style.it) result.it = style.it;
+  if (style.ul) result.ul = { s: style.ul.s };
+  if (style.cl) result.cl = { rgb: `#${style.cl.rgb}` };
+  return result;
 }

@@ -1466,7 +1466,13 @@ export const UniverSpreadsheet = forwardRef<
           if (!result) continue;
 
           const cellRow = rowIndex + 1; // +1 for header row
-          applyDerivedResultToCell(sheet, cellRow, derivedColIndex, result);
+          applyDerivedResultToCell(
+            univerAPIRef.current!,
+            sheet,
+            cellRow,
+            derivedColIndex,
+            result,
+          );
         }
 
         // Show loading indicator for rows without results
