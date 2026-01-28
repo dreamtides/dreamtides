@@ -1,3 +1,4 @@
+import type { IDocumentData, ITextRun, IParagraph, ITextStyle } from "@univerjs/core";
 import { FWorksheet } from "@univerjs/sheets/facade";
 
 import type {
@@ -143,9 +144,7 @@ export function applyDerivedResultToCell(
     // In Univer's document model: \r = paragraph break, \r\n = document end.
     const allRuns = result.value.p.flatMap((p) => p.ts);
     const docData = buildRichTextDocumentData(allRuns);
-    // setRichTextValueForCell accepts raw IDocumentData directly
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    range.setRichTextValueForCell(docData as any);
+    range.setRichTextValueForCell(docData);
     logger.debug("Applied rich text derived result", { row, col });
   } else if (result.type === "error") {
     range.setValues([[`Error: ${result.value}`]]);
@@ -169,11 +168,9 @@ export function applyDerivedResultToCell(
   }
 }
 
-function toUniverTextStyle(
-  style: TextStyle,
-): Record<string, unknown> | undefined {
+function toUniverTextStyle(style: TextStyle): ITextStyle | undefined {
   if (!style.bl && !style.it && !style.ul && !style.cl) return undefined;
-  const result: Record<string, unknown> = {};
+  const result: ITextStyle = {};
   if (style.bl) result.bl = style.bl;
   if (style.it) result.it = style.it;
   if (style.ul) result.ul = { s: style.ul.s };
@@ -188,13 +185,10 @@ function toUniverTextStyle(
  * always ends with \r\n. Each \r must have a corresponding entry in the
  * paragraphs array.
  */
-function buildRichTextDocumentData(
-  allRuns: TextRun[],
-): Record<string, unknown> {
+function buildRichTextDocumentData(allRuns: TextRun[]): IDocumentData {
   let dataStream = "";
-  const textRuns: { st: number; ed: number; ts: Record<string, unknown> }[] =
-    [];
-  const paragraphs: { startIndex: number }[] = [];
+  const textRuns: ITextRun[] = [];
+  const paragraphs: IParagraph[] = [];
 
   for (const run of allRuns) {
     const ts = run.s ? toUniverTextStyle(run.s) : undefined;

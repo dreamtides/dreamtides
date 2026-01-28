@@ -1,3 +1,4 @@
+import type { IDocumentData, ITextRun, IParagraph } from "@univerjs/core";
 import { FWorksheet } from "@univerjs/sheets/facade";
 
 import type { TomlTableData } from "./ipc_bridge";
@@ -14,11 +15,10 @@ import {
 export function stringToDocumentData(
   text: string,
   bold?: boolean,
-): Record<string, unknown> {
+): IDocumentData {
   let dataStream = "";
-  const textRuns: { st: number; ed: number; ts: Record<string, unknown> }[] =
-    [];
-  const paragraphs: { startIndex: number }[] = [];
+  const textRuns: ITextRun[] = [];
+  const paragraphs: IParagraph[] = [];
 
   const parts = text.split("\n");
   for (let i = 0; i < parts.length; i++) {
@@ -133,8 +133,7 @@ export function populateSheetDataBatch(
           const visualCol = mapping.dataToVisual[colIndex];
           const range = sheet.getRange(rowIndex + 1, visualCol, 1, 1);
           if (range) {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            range.setRichTextValueForCell(stringToDocumentData(cellValue) as any);
+            range.setRichTextValueForCell(stringToDocumentData(cellValue));
           }
         }
       }
