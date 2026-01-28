@@ -47,6 +47,12 @@ impl DerivedFunction for RulesPreviewFunction {
             return DerivedResult::Text(String::new());
         }
 
+        // Normalize newlines to spaces for preview rendering. TOML multi-line
+        // strings use newlines for readability, but Univer's rich text builder
+        // cannot handle \n characters in text runs.
+        let rules_text = normalize_newlines(rules_text);
+        let rules_text = rules_text.as_str();
+
         let variables_text = match inputs.get("variables") {
             Some(serde_json::Value::String(s)) => s.as_str(),
             Some(serde_json::Value::Null) | None => "",
@@ -78,6 +84,27 @@ impl DerivedFunction for RulesPreviewFunction {
     fn is_async(&self) -> bool {
         false
     }
+}
+
+/// Replaces newline sequences with a single space and collapses runs of
+/// whitespace so that TOML multi-line strings produce clean single-line
+/// preview text.
+fn normalize_newlines(text: &str) -> String {
+    let replaced = text.replace('\n', " ");
+    let mut result = String::with_capacity(replaced.len());
+    let mut prev_space = false;
+    for ch in replaced.chars() {
+        if ch == ' ' {
+            if !prev_space {
+                result.push(' ');
+            }
+            prev_space = true;
+        } else {
+            result.push(ch);
+            prev_space = false;
+        }
+    }
+    result.trim().to_string()
 }
 
 fn json_type_name(value: &serde_json::Value) -> &'static str {

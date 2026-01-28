@@ -137,3 +137,51 @@ fn test_multiline_expression() {
         other => panic!("Expected RichText, got: {other:?}"),
     }
 }
+
+#[test]
+fn test_double_newline_expression() {
+    setup();
+    let function = RulesPreviewFunction::new();
+    let context = create_empty_context();
+    let inputs = make_inputs(
+        "Draw {cards}. Discard {discards}.\n\n{ReclaimForCost}",
+        "cards: 2\ndiscards: 2\nreclaim: 2",
+    );
+
+    let result = function.compute(&inputs, &context);
+    match result {
+        DerivedResult::RichText(spans) => {
+            let full_text: String = spans.iter().map(|s| s.text.as_str()).collect();
+            assert!(
+                !full_text.contains('\n'),
+                "Preview should not contain newlines: {full_text:?}"
+            );
+            assert!(full_text.contains("Draw"), "Should contain 'Draw': {full_text}");
+            assert!(full_text.contains("Reclaim"), "Should contain 'Reclaim': {full_text}");
+        }
+        DerivedResult::Error(msg) => panic!("Expected RichText, got Error: {msg}"),
+        other => panic!("Expected RichText, got: {other:?}"),
+    }
+}
+
+#[test]
+fn test_single_newline_expression() {
+    setup();
+    let function = RulesPreviewFunction::new();
+    let context = create_empty_context();
+    let inputs = make_inputs("Line one.\nLine two.", "");
+
+    let result = function.compute(&inputs, &context);
+    match result {
+        DerivedResult::RichText(spans) => {
+            let full_text: String = spans.iter().map(|s| s.text.as_str()).collect();
+            assert!(
+                !full_text.contains('\n'),
+                "Preview should not contain newlines: {full_text:?}"
+            );
+            assert!(full_text.contains("Line one."), "Should contain first line: {full_text}");
+            assert!(full_text.contains("Line two."), "Should contain second line: {full_text}");
+        }
+        other => panic!("Expected RichText, got: {other:?}"),
+    }
+}
