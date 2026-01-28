@@ -6,6 +6,7 @@ dreamtides.json
 log.json
 search_graph.dot
 CLAUDE.md
+!rules_engine/src/tv/src-tauri/CLAUDE.md
 .claude
 release_builds
 client_secret.json
