@@ -282,11 +282,11 @@ width = 140
 
 [[metadata.columns]]
 key = "effect-type"
-width = 170
+width = 197
 
 [[metadata.columns]]
 key = "effect-trigger"
-width = 170
+width = 198
 
 [[metadata.columns]]
 key = "projectile-source"
