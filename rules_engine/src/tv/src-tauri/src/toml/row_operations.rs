@@ -5,22 +5,12 @@ use crate::error::error_types::{map_io_error_for_read, TvError};
 use crate::toml::cell_writer::map_atomic_write_error;
 use crate::toml::value_converter;
 use crate::toml::writer_types::{AddRowResult, DeleteRowResult};
-use crate::traits::{FileSystem, RealFileSystem};
+use crate::traits::TvConfig;
 
 /// Adds a new row to the TOML array at the specified position.
 /// If position is None, appends to the end.
 pub fn add_row(
-    file_path: &str,
-    table_name: &str,
-    position: Option<usize>,
-    initial_values: Option<std::collections::HashMap<String, serde_json::Value>>,
-) -> Result<AddRowResult, TvError> {
-    add_row_with_fs(&RealFileSystem, file_path, table_name, position, initial_values)
-}
-
-/// Adds a new row using the provided filesystem.
-pub fn add_row_with_fs(
-    fs: &dyn FileSystem,
+    config: &TvConfig,
     file_path: &str,
     table_name: &str,
     position: Option<usize>,
@@ -28,7 +18,7 @@ pub fn add_row_with_fs(
 ) -> Result<AddRowResult, TvError> {
     let start = Instant::now();
 
-    let content = fs.read_to_string(Path::new(file_path)).map_err(|e| {
+    let content = config.fs().read_to_string(Path::new(file_path)).map_err(|e| {
         tracing::error!(
             component = "tv.toml",
             file_path = %file_path,
@@ -107,7 +97,7 @@ pub fn add_row_with_fs(
 
     doc[table_name] = toml_edit::Item::ArrayOfTables(new_array);
 
-    fs.write_atomic(Path::new(file_path), &doc.to_string())
+    config.fs().write_atomic(Path::new(file_path), &doc.to_string())
         .map_err(|e| map_atomic_write_error(e, file_path))?;
 
     let duration_ms = start.elapsed().as_millis() as u64;
@@ -124,23 +114,14 @@ pub fn add_row_with_fs(
 
 /// Deletes a row from the TOML array at the specified index.
 pub fn delete_row(
-    file_path: &str,
-    table_name: &str,
-    row_index: usize,
-) -> Result<DeleteRowResult, TvError> {
-    delete_row_with_fs(&RealFileSystem, file_path, table_name, row_index)
-}
-
-/// Deletes a row using the provided filesystem.
-pub fn delete_row_with_fs(
-    fs: &dyn FileSystem,
+    config: &TvConfig,
     file_path: &str,
     table_name: &str,
     row_index: usize,
 ) -> Result<DeleteRowResult, TvError> {
     let start = Instant::now();
 
-    let content = fs.read_to_string(Path::new(file_path)).map_err(|e| {
+    let content = config.fs().read_to_string(Path::new(file_path)).map_err(|e| {
         tracing::error!(
             component = "tv.toml",
             file_path = %file_path,
@@ -199,7 +180,7 @@ pub fn delete_row_with_fs(
 
     doc[table_name] = toml_edit::Item::ArrayOfTables(new_array);
 
-    fs.write_atomic(Path::new(file_path), &doc.to_string())
+    config.fs().write_atomic(Path::new(file_path), &doc.to_string())
         .map_err(|e| map_atomic_write_error(e, file_path))?;
 
     let duration_ms = start.elapsed().as_millis() as u64;

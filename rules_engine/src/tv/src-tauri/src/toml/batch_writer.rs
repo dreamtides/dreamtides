@@ -5,32 +5,23 @@ use crate::error::error_types::{map_io_error_for_read, TvError};
 use crate::toml::cell_writer::map_atomic_write_error;
 use crate::toml::writer_types::{CellUpdate, FailedUpdate, SaveBatchResult};
 use crate::toml::{metadata, value_converter};
-use crate::traits::{FileSystem, RealFileSystem};
+use crate::traits::TvConfig;
 use crate::validation::validation_rules::ValidationRule;
 use crate::validation::validators;
 
 /// Saves multiple cell updates to the TOML file in a single atomic write.
 pub fn save_batch(
+    config: &TvConfig,
     file_path: &str,
     table_name: &str,
     updates: &[CellUpdate],
 ) -> Result<SaveBatchResult, TvError> {
-    save_batch_with_fs(&RealFileSystem, file_path, table_name, updates)
-}
-
-/// Saves multiple cell updates using the provided filesystem.
-pub fn save_batch_with_fs(
-    fs: &dyn FileSystem,
-    file_path: &str,
-    table_name: &str,
-    updates: &[CellUpdate],
-) -> Result<SaveBatchResult, TvError> {
-    save_batch_with_fs_and_rules(fs, file_path, table_name, updates, None)
+    save_batch_with_rules(config, file_path, table_name, updates, None)
 }
 
 /// Saves multiple cell updates with optional validation rules.
-pub fn save_batch_with_fs_and_rules(
-    fs: &dyn FileSystem,
+pub fn save_batch_with_rules(
+    config: &TvConfig,
     file_path: &str,
     table_name: &str,
     updates: &[CellUpdate],
@@ -54,7 +45,7 @@ pub fn save_batch_with_fs_and_rules(
         });
     }
 
-    let content = fs.read_to_string(Path::new(file_path)).map_err(|e| {
+    let content = config.fs().read_to_string(Path::new(file_path)).map_err(|e| {
         tracing::error!(
             component = "tv.toml",
             file_path = %file_path,
@@ -177,7 +168,7 @@ pub fn save_batch_with_fs_and_rules(
         }
     }
 
-    fs.write_atomic(Path::new(file_path), &doc.to_string())
+    config.fs().write_atomic(Path::new(file_path), &doc.to_string())
         .map_err(|e| map_atomic_write_error(e, file_path))?;
 
     tracing::debug!(

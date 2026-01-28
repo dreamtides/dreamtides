@@ -4,10 +4,10 @@ use tv_lib::sort::sort_state::{
 use tv_lib::sort::sort_types::{CellValue, SortDirection, SortState};
 use tv_lib::toml::document_loader::TomlTableData;
 use tv_lib::toml::metadata::parse_sort_config_from_content;
-use tv_lib::toml::metadata_serializer::update_sort_config_with_fs;
+use tv_lib::toml::metadata_serializer::update_sort_config;
 use tv_lib::toml::metadata_types::SortConfig;
 
-use crate::test_utils::mock_filesystem::MockFileSystem;
+use crate::test_utils::mock_filesystem::{MockFileSystem, MockTestConfig};
 
 #[test]
 fn test_parse_sort_config_ascending() {
@@ -92,41 +92,41 @@ ascending = true
 
 #[test]
 fn test_update_sort_config_adds_sort_section() {
-    let fs = MockFileSystem::with_read_and_write(
+    let mock = MockTestConfig::new(MockFileSystem::with_read_and_write(
         r#"[[cards]]
 name = "Card 1"
 "#,
-    );
+    ));
     let sort_config = SortConfig::ascending("name");
 
-    let result = update_sort_config_with_fs(&fs, "/test.toml", Some(&sort_config));
+    let result = update_sort_config(&mock.config(), "/test.toml", Some(&sort_config));
     assert!(result.is_ok());
 
-    let saved = fs.last_written_content().unwrap();
+    let saved = mock.last_written_content().unwrap();
     assert!(saved.contains("[metadata]"), "Expected [metadata] section in:\n{saved}");
     assert!(saved.contains("column = \"name\""), "Expected column = \"name\" in:\n{saved}");
 }
 
 #[test]
 fn test_update_sort_config_descending() {
-    let fs = MockFileSystem::with_read_and_write(
+    let mock = MockTestConfig::new(MockFileSystem::with_read_and_write(
         r#"[[cards]]
 name = "Card 1"
 "#,
-    );
+    ));
     let sort_config = SortConfig::descending("cost");
 
-    let result = update_sort_config_with_fs(&fs, "/test.toml", Some(&sort_config));
+    let result = update_sort_config(&mock.config(), "/test.toml", Some(&sort_config));
     assert!(result.is_ok());
 
-    let saved = fs.last_written_content().unwrap();
+    let saved = mock.last_written_content().unwrap();
     assert!(saved.contains("column = \"cost\""), "Expected column = \"cost\" in:\n{saved}");
     assert!(saved.contains("ascending = false"), "Expected ascending = false in:\n{saved}");
 }
 
 #[test]
 fn test_update_sort_config_removes_sort() {
-    let fs = MockFileSystem::with_read_and_write(
+    let mock = MockTestConfig::new(MockFileSystem::with_read_and_write(
         r#"[[cards]]
 name = "Card 1"
 
@@ -136,19 +136,19 @@ schema_version = 1
 [metadata.sort]
 column = "name"
 "#,
-    );
+    ));
 
-    let result = update_sort_config_with_fs(&fs, "/test.toml", None);
+    let result = update_sort_config(&mock.config(), "/test.toml", None);
     assert!(result.is_ok());
 
-    let saved = fs.last_written_content().unwrap();
+    let saved = mock.last_written_content().unwrap();
     assert!(!saved.contains("[metadata.sort]"), "Expected no sort section in:\n{saved}");
     assert!(saved.contains("[metadata]"), "Expected metadata section preserved in:\n{saved}");
 }
 
 #[test]
 fn test_update_sort_config_preserves_other_metadata() {
-    let fs = MockFileSystem::with_read_and_write(
+    let mock = MockTestConfig::new(MockFileSystem::with_read_and_write(
         r#"[[cards]]
 name = "Card 1"
 
@@ -159,13 +159,13 @@ schema_version = 1
 key = "id"
 width = 300
 "#,
-    );
+    ));
     let sort_config = SortConfig::ascending("name");
 
-    let result = update_sort_config_with_fs(&fs, "/test.toml", Some(&sort_config));
+    let result = update_sort_config(&mock.config(), "/test.toml", Some(&sort_config));
     assert!(result.is_ok());
 
-    let saved = fs.last_written_content().unwrap();
+    let saved = mock.last_written_content().unwrap();
     assert!(saved.contains("key = \"id\""), "Expected column config preserved in:\n{saved}");
     assert!(saved.contains("width = 300"), "Expected width preserved in:\n{saved}");
     assert!(saved.contains("column = \"name\""), "Expected sort config in:\n{saved}");

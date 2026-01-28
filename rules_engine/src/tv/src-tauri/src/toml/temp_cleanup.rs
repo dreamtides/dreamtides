@@ -1,26 +1,18 @@
 use std::path::Path;
 
 use crate::error::error_types::TvError;
-use crate::traits::{FileSystem, RealFileSystem};
+use crate::traits::TvConfig;
 
 const TEMP_FILE_PREFIX: &str = ".tv_save_";
 
 /// Cleans up orphaned temp files from previous crashes.
-pub fn cleanup_orphaned_temp_files(dir_path: &str) -> Result<usize, TvError> {
-    cleanup_orphaned_temp_files_with_fs(&RealFileSystem, dir_path)
-}
-
-/// Cleans up orphaned temp files using the provided filesystem.
-pub fn cleanup_orphaned_temp_files_with_fs(
-    fs: &dyn FileSystem,
-    dir_path: &str,
-) -> Result<usize, TvError> {
+pub fn cleanup_orphaned_temp_files(config: &TvConfig, dir_path: &str) -> Result<usize, TvError> {
     let dir = Path::new(dir_path);
-    if !fs.exists(dir) {
+    if !config.fs().exists(dir) {
         return Ok(0);
     }
 
-    let temp_files = fs.read_dir_temp_files(dir, TEMP_FILE_PREFIX).map_err(|e| {
+    let temp_files = config.fs().read_dir_temp_files(dir, TEMP_FILE_PREFIX).map_err(|e| {
         tracing::warn!(
             component = "tv.toml",
             dir_path = %dir_path,
@@ -32,7 +24,7 @@ pub fn cleanup_orphaned_temp_files_with_fs(
 
     let mut removed_count = 0;
     for temp_file in temp_files {
-        match fs.remove_file(&temp_file) {
+        match config.fs().remove_file(&temp_file) {
             Ok(()) => {
                 removed_count += 1;
                 tracing::debug!(

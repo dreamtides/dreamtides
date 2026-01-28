@@ -1,27 +1,27 @@
-use tv_lib::toml::metadata_serializer::save_metadata_with_fs;
+use tv_lib::toml::metadata_serializer::save_metadata;
 use tv_lib::toml::metadata_types::{
     Alignment, AppSettings, ColumnConfig, ConditionalFormatRule, DerivedColumnConfig,
     FormatCondition, FormatStyle, Metadata, ScrollPosition, SortConfig, TableStyle,
 };
 use tv_lib::validation::validation_rules::ValidationRule;
 
-use crate::test_utils::mock_filesystem::MockFileSystem;
+use crate::test_utils::mock_filesystem::{MockFileSystem, MockTestConfig};
 
 #[test]
 fn test_save_metadata_creates_section_if_missing() {
-    let fs = MockFileSystem::with_read_and_write(
+    let mock_config = MockTestConfig::new(MockFileSystem::with_read_and_write(
         r#"[[cards]]
 name = "Card 1"
 "#,
-    );
+    ));
 
     let mut metadata = Metadata::new();
     metadata.columns.push(ColumnConfig::new("name").with_width(200));
 
-    let result = save_metadata_with_fs(&fs, "/test.toml", &metadata);
+    let result = save_metadata(&mock_config.config(), "/test.toml", &metadata);
     assert!(result.is_ok());
 
-    let saved = fs.last_written_content().unwrap();
+    let saved = mock_config.last_written_content().unwrap();
     assert!(saved.contains("[metadata]"), "Expected [metadata] section in:\n{saved}");
     assert!(saved.contains("schema_version = 1"), "Expected schema_version in:\n{saved}");
     assert!(saved.contains("[[metadata.columns]]"), "Expected columns in:\n{saved}");
@@ -29,7 +29,7 @@ name = "Card 1"
 
 #[test]
 fn test_save_metadata_updates_existing_section() {
-    let fs = MockFileSystem::with_read_and_write(
+    let mock_config = MockTestConfig::new(MockFileSystem::with_read_and_write(
         r#"[[cards]]
 name = "Card 1"
 
@@ -40,22 +40,22 @@ schema_version = 1
 key = "id"
 width = 100
 "#,
-    );
+    ));
 
     let mut metadata = Metadata::new();
     metadata.columns.push(ColumnConfig::new("name").with_width(300));
 
-    let result = save_metadata_with_fs(&fs, "/test.toml", &metadata);
+    let result = save_metadata(&mock_config.config(), "/test.toml", &metadata);
     assert!(result.is_ok());
 
-    let saved = fs.last_written_content().unwrap();
+    let saved = mock_config.last_written_content().unwrap();
     assert!(saved.contains("width = 300"), "Expected width = 300 in:\n{saved}");
     assert!(saved.contains("key = \"name\""), "Expected key = \"name\" in:\n{saved}");
 }
 
 #[test]
 fn test_save_metadata_preserves_unknown_fields() {
-    let fs = MockFileSystem::with_read_and_write(
+    let mock_config = MockTestConfig::new(MockFileSystem::with_read_and_write(
         r#"[[cards]]
 name = "Card 1"
 
@@ -64,14 +64,14 @@ schema_version = 1
 unknown_future_field = "preserve me"
 another_unknown = 42
 "#,
-    );
+    ));
 
     let metadata = Metadata::new();
 
-    let result = save_metadata_with_fs(&fs, "/test.toml", &metadata);
+    let result = save_metadata(&mock_config.config(), "/test.toml", &metadata);
     assert!(result.is_ok());
 
-    let saved = fs.last_written_content().unwrap();
+    let saved = mock_config.last_written_content().unwrap();
     assert!(
         saved.contains("unknown_future_field = \"preserve me\""),
         "Expected unknown_future_field preserved in:\n{saved}",
@@ -84,7 +84,8 @@ another_unknown = 42
 
 #[test]
 fn test_save_metadata_round_trip_columns() {
-    let fs = MockFileSystem::with_read_and_write("[[cards]]\nname = \"Card 1\"\n");
+    let mock_config =
+        MockTestConfig::new(MockFileSystem::with_read_and_write("[[cards]]\nname = \"Card 1\"\n"));
 
     let mut metadata = Metadata::new();
     metadata.columns.push(
@@ -92,10 +93,10 @@ fn test_save_metadata_round_trip_columns() {
     );
     metadata.columns.push(ColumnConfig::new("name").with_width(200));
 
-    let result = save_metadata_with_fs(&fs, "/test.toml", &metadata);
+    let result = save_metadata(&mock_config.config(), "/test.toml", &metadata);
     assert!(result.is_ok());
 
-    let saved = fs.last_written_content().unwrap();
+    let saved = mock_config.last_written_content().unwrap();
     assert!(saved.contains("key = \"id\""), "Expected id column in:\n{saved}");
     assert!(saved.contains("width = 300"), "Expected width 300 in:\n{saved}");
     assert!(saved.contains("alignment = \"center\""), "Expected alignment in:\n{saved}");
@@ -106,7 +107,8 @@ fn test_save_metadata_round_trip_columns() {
 
 #[test]
 fn test_save_metadata_validation_rules() {
-    let fs = MockFileSystem::with_read_and_write("[[cards]]\nname = \"Card 1\"\n");
+    let mock_config =
+        MockTestConfig::new(MockFileSystem::with_read_and_write("[[cards]]\nname = \"Card 1\"\n"));
 
     let mut metadata = Metadata::new();
     metadata.validation_rules.push(ValidationRule::Enum {
@@ -121,10 +123,10 @@ fn test_save_metadata_validation_rules() {
         message: None,
     });
 
-    let result = save_metadata_with_fs(&fs, "/test.toml", &metadata);
+    let result = save_metadata(&mock_config.config(), "/test.toml", &metadata);
     assert!(result.is_ok());
 
-    let saved = fs.last_written_content().unwrap();
+    let saved = mock_config.last_written_content().unwrap();
     assert!(
         saved.contains("[[metadata.validation_rules]]"),
         "Expected validation_rules in:\n{saved}",
@@ -135,15 +137,16 @@ fn test_save_metadata_validation_rules() {
 
 #[test]
 fn test_save_metadata_sort_config() {
-    let fs = MockFileSystem::with_read_and_write("[[cards]]\nname = \"Card 1\"\n");
+    let mock_config =
+        MockTestConfig::new(MockFileSystem::with_read_and_write("[[cards]]\nname = \"Card 1\"\n"));
 
     let mut metadata = Metadata::new();
     metadata.sort = Some(SortConfig::descending("name"));
 
-    let result = save_metadata_with_fs(&fs, "/test.toml", &metadata);
+    let result = save_metadata(&mock_config.config(), "/test.toml", &metadata);
     assert!(result.is_ok());
 
-    let saved = fs.last_written_content().unwrap();
+    let saved = mock_config.last_written_content().unwrap();
     assert!(saved.contains("[metadata.sort]"), "Expected sort section in:\n{saved}");
     assert!(saved.contains("column = \"name\""), "Expected column = \"name\" in:\n{saved}");
     assert!(saved.contains("ascending = false"), "Expected ascending = false in:\n{saved}");
@@ -151,22 +154,23 @@ fn test_save_metadata_sort_config() {
 
 #[test]
 fn test_save_metadata_table_style() {
-    let fs = MockFileSystem::with_read_and_write("[[cards]]\nname = \"Card 1\"\n");
+    let mock_config =
+        MockTestConfig::new(MockFileSystem::with_read_and_write("[[cards]]\nname = \"Card 1\"\n"));
 
     let mut metadata = Metadata::new();
     metadata.table_style = Some(TableStyle::new().with_color_scheme("blue_light"));
 
-    let result = save_metadata_with_fs(&fs, "/test.toml", &metadata);
+    let result = save_metadata(&mock_config.config(), "/test.toml", &metadata);
     assert!(result.is_ok());
 
-    let saved = fs.last_written_content().unwrap();
+    let saved = mock_config.last_written_content().unwrap();
     assert!(saved.contains("[metadata.table_style]"), "Expected table_style section in:\n{saved}");
     assert!(saved.contains("color_scheme = \"blue_light\""), "Expected color_scheme in:\n{saved}");
 }
 
 #[test]
 fn test_save_metadata_preserves_card_data() {
-    let fs = MockFileSystem::with_read_and_write(
+    let mock_config = MockTestConfig::new(MockFileSystem::with_read_and_write(
         r#"[[cards]]
 name = "Card 1"
 id = "abc-123"
@@ -175,14 +179,14 @@ id = "abc-123"
 name = "Card 2"
 id = "def-456"
 "#,
-    );
+    ));
 
     let metadata = Metadata::new();
 
-    let result = save_metadata_with_fs(&fs, "/test.toml", &metadata);
+    let result = save_metadata(&mock_config.config(), "/test.toml", &metadata);
     assert!(result.is_ok());
 
-    let saved = fs.last_written_content().unwrap();
+    let saved = mock_config.last_written_content().unwrap();
     assert!(saved.contains("name = \"Card 1\""), "Expected Card 1 preserved in:\n{saved}");
     assert!(saved.contains("name = \"Card 2\""), "Expected Card 2 preserved in:\n{saved}");
     assert!(saved.contains("id = \"abc-123\""), "Expected abc-123 preserved in:\n{saved}");
@@ -191,7 +195,8 @@ id = "def-456"
 
 #[test]
 fn test_save_metadata_derived_columns() {
-    let fs = MockFileSystem::with_read_and_write("[[cards]]\nname = \"Card 1\"\n");
+    let mock_config =
+        MockTestConfig::new(MockFileSystem::with_read_and_write("[[cards]]\nname = \"Card 1\"\n"));
 
     let mut metadata = Metadata::new();
     metadata.derived_columns.push(
@@ -201,10 +206,10 @@ fn test_save_metadata_derived_columns() {
             .with_position(5),
     );
 
-    let result = save_metadata_with_fs(&fs, "/test.toml", &metadata);
+    let result = save_metadata(&mock_config.config(), "/test.toml", &metadata);
     assert!(result.is_ok());
 
-    let saved = fs.last_written_content().unwrap();
+    let saved = mock_config.last_written_content().unwrap();
     assert!(
         saved.contains("[[metadata.derived_columns]]"),
         "Expected derived_columns in:\n{saved}",
@@ -217,7 +222,8 @@ fn test_save_metadata_derived_columns() {
 
 #[test]
 fn test_save_metadata_conditional_formatting() {
-    let fs = MockFileSystem::with_read_and_write("[[cards]]\nname = \"Card 1\"\n");
+    let mock_config =
+        MockTestConfig::new(MockFileSystem::with_read_and_write("[[cards]]\nname = \"Card 1\"\n"));
 
     let mut metadata = Metadata::new();
     metadata.conditional_formatting.push(ConditionalFormatRule::new(
@@ -226,10 +232,10 @@ fn test_save_metadata_conditional_formatting() {
         FormatStyle::new().with_background_color("#FFD700").with_bold(true),
     ));
 
-    let result = save_metadata_with_fs(&fs, "/test.toml", &metadata);
+    let result = save_metadata(&mock_config.config(), "/test.toml", &metadata);
     assert!(result.is_ok());
 
-    let saved = fs.last_written_content().unwrap();
+    let saved = mock_config.last_written_content().unwrap();
     assert!(
         saved.contains("[[metadata.conditional_formatting]]"),
         "Expected conditional_formatting in:\n{saved}",
@@ -239,7 +245,8 @@ fn test_save_metadata_conditional_formatting() {
 
 #[test]
 fn test_save_metadata_app_settings() {
-    let fs = MockFileSystem::with_read_and_write("[[cards]]\nname = \"Card 1\"\n");
+    let mock_config =
+        MockTestConfig::new(MockFileSystem::with_read_and_write("[[cards]]\nname = \"Card 1\"\n"));
 
     let mut metadata = Metadata::new();
     metadata.app_settings = Some(AppSettings {
@@ -248,10 +255,10 @@ fn test_save_metadata_app_settings() {
         zoom_level: 1.5,
     });
 
-    let result = save_metadata_with_fs(&fs, "/test.toml", &metadata);
+    let result = save_metadata(&mock_config.config(), "/test.toml", &metadata);
     assert!(result.is_ok());
 
-    let saved = fs.last_written_content().unwrap();
+    let saved = mock_config.last_written_content().unwrap();
     assert!(
         saved.contains("[metadata.app_settings]"),
         "Expected app_settings section in:\n{saved}",
@@ -265,15 +272,16 @@ fn test_save_metadata_app_settings() {
 
 #[test]
 fn test_default_values_not_serialized() {
-    let fs = MockFileSystem::with_read_and_write("[[cards]]\nname = \"Card 1\"\n");
+    let mock_config =
+        MockTestConfig::new(MockFileSystem::with_read_and_write("[[cards]]\nname = \"Card 1\"\n"));
 
     let mut metadata = Metadata::new();
     metadata.columns.push(ColumnConfig::new("name"));
 
-    let result = save_metadata_with_fs(&fs, "/test.toml", &metadata);
+    let result = save_metadata(&mock_config.config(), "/test.toml", &metadata);
     assert!(result.is_ok());
 
-    let saved = fs.last_written_content().unwrap();
+    let saved = mock_config.last_written_content().unwrap();
     assert!(!saved.contains("width = 100"), "Default width should not be serialized in:\n{saved}");
     assert!(
         !saved.contains("alignment = \"left\""),

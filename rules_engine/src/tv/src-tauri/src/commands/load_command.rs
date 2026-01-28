@@ -10,6 +10,7 @@ use crate::sync::state_machine;
 use crate::toml::document_loader::{self, TomlTableData};
 use crate::toml::metadata;
 use crate::toml::metadata_types::FilterCondition;
+use crate::traits::TvConfig;
 
 /// Tauri command to load a TOML table as spreadsheet data.
 #[tauri::command]
@@ -32,7 +33,7 @@ pub fn load_toml_table(
     restore_sort_state_from_metadata(&sort_state_manager, &file_path, &table_name);
     restore_filter_state_from_metadata(&filter_state_manager, &file_path, &table_name);
 
-    let result = document_loader::load_toml_document(&file_path, &table_name);
+    let result = document_loader::load_toml_document(&TvConfig::default(), &file_path, &table_name);
 
     // Handle permission errors by updating permission state
     if let Err(ref e) = result {

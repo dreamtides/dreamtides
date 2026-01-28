@@ -14,16 +14,14 @@ use crate::error::error_types::{map_io_error_for_read, TvError};
 use crate::toml::cell_writer::map_atomic_write_error;
 use crate::toml::document_loader::TomlTableData;
 use crate::toml::value_converter;
-use crate::traits::{FileSystem, RealFileSystem};
+use crate::traits::TvConfig;
 use crate::uuid::uuid_generator;
 
 // Re-export types and functions for backwards compatibility
-pub use crate::toml::batch_writer::{save_batch, save_batch_with_fs, save_batch_with_fs_and_rules};
-pub use crate::toml::cell_writer::{save_cell, save_cell_with_fs, save_cell_with_fs_and_rules};
-pub use crate::toml::row_operations::{
-    add_row, add_row_with_fs, delete_row, delete_row_with_fs,
-};
-pub use crate::toml::temp_cleanup::{cleanup_orphaned_temp_files, cleanup_orphaned_temp_files_with_fs};
+pub use crate::toml::batch_writer::{save_batch, save_batch_with_rules};
+pub use crate::toml::cell_writer::{save_cell, save_cell_with_rules};
+pub use crate::toml::row_operations::{add_row, delete_row};
+pub use crate::toml::temp_cleanup::cleanup_orphaned_temp_files;
 pub use crate::toml::writer_types::{
     AddRowResult, CellUpdate, DeleteRowResult, FailedUpdate, SaveBatchResult, SaveCellResult,
     SaveTableResult,
@@ -31,23 +29,14 @@ pub use crate::toml::writer_types::{
 
 /// Saves spreadsheet data back to a TOML file, preserving formatting.
 pub fn save_toml_document(
-    file_path: &str,
-    table_name: &str,
-    data: &TomlTableData,
-) -> Result<SaveTableResult, TvError> {
-    save_toml_document_with_fs(&RealFileSystem, file_path, table_name, data)
-}
-
-/// Saves spreadsheet data back to a TOML file using the provided filesystem.
-pub fn save_toml_document_with_fs(
-    fs: &dyn FileSystem,
+    config: &TvConfig,
     file_path: &str,
     table_name: &str,
     data: &TomlTableData,
 ) -> Result<SaveTableResult, TvError> {
     let start = Instant::now();
 
-    let content = fs.read_to_string(Path::new(file_path)).map_err(|e| {
+    let content = config.fs().read_to_string(Path::new(file_path)).map_err(|e| {
         tracing::error!(
             component = "tv.toml",
             file_path = %file_path,
@@ -174,7 +163,7 @@ pub fn save_toml_document_with_fs(
 
     let output = doc.to_string();
 
-    fs.write_atomic(Path::new(file_path), &output)
+    config.fs().write_atomic(Path::new(file_path), &output)
         .map_err(|e| map_atomic_write_error(e, file_path))?;
 
     let duration_ms = start.elapsed().as_millis() as u64;

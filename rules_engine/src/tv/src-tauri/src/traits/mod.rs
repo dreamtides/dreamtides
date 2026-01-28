@@ -1,7 +1,36 @@
+use std::any::Any;
 use std::fs::{File, OpenOptions};
 use std::io::{self, Write};
 use std::path::Path;
+use std::sync::Arc;
 use std::time::SystemTime;
+
+/// Configuration for TV dependency injection.
+///
+/// This struct provides access to external dependencies that can be swapped out
+/// for testing. Use `TvConfig::default()` in production code and create custom
+/// configurations with mock implementations for tests.
+pub struct TvConfig {
+    fs: Arc<dyn FileSystem>,
+}
+
+impl TvConfig {
+    /// Creates a new TvConfig with the given filesystem implementation.
+    pub fn new(fs: Arc<dyn FileSystem>) -> Self {
+        Self { fs }
+    }
+
+    /// Returns a reference to the filesystem implementation.
+    pub fn fs(&self) -> &dyn FileSystem {
+        &*self.fs
+    }
+}
+
+impl Default for TvConfig {
+    fn default() -> Self {
+        Self { fs: Arc::new(RealFileSystem) }
+    }
+}
 
 pub trait FileSystem: Send + Sync {
     fn read_to_string(&self, path: &Path) -> io::Result<String>;
@@ -10,6 +39,9 @@ pub trait FileSystem: Send + Sync {
     fn exists(&self, path: &Path) -> bool;
     fn read_dir_temp_files(&self, dir: &Path, prefix: &str) -> io::Result<Vec<std::path::PathBuf>>;
     fn remove_file(&self, path: &Path) -> io::Result<()>;
+
+    /// Returns self as Any for downcasting in tests.
+    fn as_any(&self) -> &dyn Any;
 }
 
 pub trait Clock: Send + Sync {
@@ -84,6 +116,10 @@ impl FileSystem for RealFileSystem {
 
     fn remove_file(&self, path: &Path) -> io::Result<()> {
         std::fs::remove_file(path)
+    }
+
+    fn as_any(&self) -> &dyn Any {
+        self
     }
 }
 

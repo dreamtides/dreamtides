@@ -7,6 +7,7 @@ use tauri::{AppHandle, Emitter, Manager};
 
 use crate::error::error_types::TvError;
 use crate::toml::document_writer::CellUpdate;
+use crate::traits::TvConfig;
 
 /// Tracks the permission state for a file (readable and writable).
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
@@ -207,6 +208,7 @@ pub fn retry_pending_updates(
 
     for pending_update in pending {
         let result = crate::toml::document_writer::save_cell(
+            &TvConfig::default(),
             file_path,
             &pending_update.table_name,
             &pending_update.update,

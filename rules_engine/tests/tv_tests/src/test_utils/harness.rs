@@ -1,42 +1,46 @@
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
+use std::sync::Arc;
 
 use tempfile::TempDir;
 use tv_lib::error::error_types::TvError;
-use tv_lib::toml::document_loader::{load_toml_document_with_fs, TomlTableData};
+use tv_lib::toml::document_loader::{load_toml_document, TomlTableData};
 use tv_lib::toml::document_writer::{
-    add_row_with_fs, delete_row_with_fs, save_batch_with_fs, save_cell_with_fs,
-    save_toml_document_with_fs, AddRowResult, CellUpdate, DeleteRowResult, SaveBatchResult,
-    SaveCellResult, SaveTableResult,
+    add_row, delete_row, save_batch, save_cell, save_toml_document, AddRowResult, CellUpdate,
+    DeleteRowResult, SaveBatchResult, SaveCellResult, SaveTableResult,
 };
 use tv_lib::toml::metadata;
-use tv_lib::traits::{FileSystem, RealFileSystem};
+use tv_lib::traits::TvConfig;
 use tv_lib::validation::validation_rules::ValidationRule;
 
 use crate::test_utils::mock_filesystem::MockFileSystem;
 
 pub struct TvTestHarness {
     temp_dir: TempDir,
-    fs: Box<dyn FileSystem>,
+    config: TvConfig,
 }
 
 impl TvTestHarness {
     pub fn new() -> Self {
         Self {
             temp_dir: TempDir::new().unwrap_or_else(|e| panic!("Failed to create temp dir: {e}")),
-            fs: Box::new(RealFileSystem),
+            config: TvConfig::default(),
         }
     }
 
     pub fn with_mock_fs(mock: MockFileSystem) -> Self {
         Self {
             temp_dir: TempDir::new().unwrap_or_else(|e| panic!("Failed to create temp dir: {e}")),
-            fs: Box::new(mock),
+            config: TvConfig::new(Arc::new(mock)),
         }
     }
 
     pub fn temp_dir(&self) -> &Path {
         self.temp_dir.path()
+    }
+
+    pub fn config(&self) -> &TvConfig {
+        &self.config
     }
 
     pub fn create_toml_file(&self, name: &str, content: &str) -> PathBuf {
@@ -46,8 +50,8 @@ impl TvTestHarness {
     }
 
     pub fn load_table(&self, path: &Path, table_name: &str) -> Result<TomlTableData, TvError> {
-        load_toml_document_with_fs(
-            &*self.fs,
+        load_toml_document(
+            &self.config,
             path.to_str().unwrap_or_else(|| panic!("Invalid path: {path:?}")),
             table_name,
         )
@@ -59,8 +63,8 @@ impl TvTestHarness {
         table_name: &str,
         data: &TomlTableData,
     ) -> Result<SaveTableResult, TvError> {
-        save_toml_document_with_fs(
-            &*self.fs,
+        save_toml_document(
+            &self.config,
             path.to_str().unwrap_or_else(|| panic!("Invalid path: {path:?}")),
             table_name,
             data,
@@ -81,8 +85,8 @@ impl TvTestHarness {
         value: serde_json::Value,
     ) -> Result<SaveCellResult, TvError> {
         let update = CellUpdate { row_index, column_key: column_key.to_string(), value };
-        save_cell_with_fs(
-            &*self.fs,
+        save_cell(
+            &self.config,
             path.to_str().unwrap_or_else(|| panic!("Invalid path: {path:?}")),
             table_name,
             &update,
@@ -95,8 +99,8 @@ impl TvTestHarness {
         table_name: &str,
         updates: &[CellUpdate],
     ) -> Result<SaveBatchResult, TvError> {
-        save_batch_with_fs(
-            &*self.fs,
+        save_batch(
+            &self.config,
             path.to_str().unwrap_or_else(|| panic!("Invalid path: {path:?}")),
             table_name,
             updates,
@@ -110,8 +114,8 @@ impl TvTestHarness {
         position: Option<usize>,
         initial_values: Option<HashMap<String, serde_json::Value>>,
     ) -> Result<AddRowResult, TvError> {
-        add_row_with_fs(
-            &*self.fs,
+        add_row(
+            &self.config,
             path.to_str().unwrap_or_else(|| panic!("Invalid path: {path:?}")),
             table_name,
             position,
@@ -125,8 +129,8 @@ impl TvTestHarness {
         table_name: &str,
         row_index: usize,
     ) -> Result<DeleteRowResult, TvError> {
-        delete_row_with_fs(
-            &*self.fs,
+        delete_row(
+            &self.config,
             path.to_str().unwrap_or_else(|| panic!("Invalid path: {path:?}")),
             table_name,
             row_index,
@@ -135,7 +139,7 @@ impl TvTestHarness {
 
     pub fn parse_validation_rules(&self, path: &Path) -> Result<Vec<ValidationRule>, TvError> {
         metadata::parse_validation_rules_with_fs(
-            &*self.fs,
+            self.config.fs(),
             path.to_str().unwrap_or_else(|| panic!("Invalid path: {path:?}")),
         )
     }

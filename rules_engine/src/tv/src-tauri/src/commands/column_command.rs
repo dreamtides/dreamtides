@@ -1,6 +1,7 @@
 use crate::error::error_types::TvError;
 use crate::toml::metadata_types::ColumnConfig;
 use crate::toml::{metadata, metadata_serializer};
+use crate::traits::TvConfig;
 
 /// Tauri command to get the column configurations for a TOML file.
 #[tauri::command]
@@ -38,7 +39,7 @@ pub fn set_column_width(
         "Setting column width"
     );
 
-    metadata_serializer::update_column_width(&file_path, &column_key, width)?;
+    metadata_serializer::update_column_width(&TvConfig::default(), &file_path, &column_key, width)?;
 
     Ok(())
 }
@@ -58,7 +59,7 @@ pub fn set_derived_column_width(
         "Setting derived column width"
     );
 
-    metadata_serializer::update_derived_column_width(&file_path, &column_name, width)?;
+    metadata_serializer::update_derived_column_width(&TvConfig::default(), &file_path, &column_name, width)?;
 
     Ok(())
 }

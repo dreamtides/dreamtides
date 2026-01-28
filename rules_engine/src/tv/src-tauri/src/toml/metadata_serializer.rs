@@ -8,21 +8,16 @@ use crate::toml::metadata_types::{
     FilterCondition, FilterConfig, FormatCondition, FormatStyle, Metadata, RowConfig, RowHeight,
     ScrollPosition, SortConfig, TableStyle,
 };
-use crate::traits::{AtomicWriteError, FileSystem, RealFileSystem};
+use crate::traits::{AtomicWriteError, TvConfig};
 use crate::validation::validation_rules::{ValidationRule, ValueType};
 
 /// Updates only the sort configuration in the metadata section of a TOML file.
-pub fn update_sort_config(file_path: &str, sort_config: Option<&SortConfig>) -> Result<(), TvError> {
-    update_sort_config_with_fs(&RealFileSystem, file_path, sort_config)
-}
-
-/// Updates only the sort configuration using the provided filesystem.
-pub fn update_sort_config_with_fs(
-    fs: &dyn FileSystem,
+pub fn update_sort_config(
+    config: &TvConfig,
     file_path: &str,
     sort_config: Option<&SortConfig>,
 ) -> Result<(), TvError> {
-    let content = fs.read_to_string(Path::new(file_path)).map_err(|e| {
+    let content = config.fs().read_to_string(Path::new(file_path)).map_err(|e| {
         tracing::error!(
             component = "tv.toml.metadata",
             file_path = %file_path,
@@ -59,7 +54,7 @@ pub fn update_sort_config_with_fs(
         }
     }
 
-    fs.write_atomic(Path::new(file_path), &doc.to_string()).map_err(|e| {
+    config.fs().write_atomic(Path::new(file_path), &doc.to_string()).map_err(|e| {
         map_atomic_write_error(e, file_path)
     })?;
 
@@ -75,19 +70,11 @@ pub fn update_sort_config_with_fs(
 
 /// Updates only the filter configuration in the metadata section of a TOML file.
 pub fn update_filter_config(
+    config: &TvConfig,
     file_path: &str,
     filter_config: Option<&FilterConfig>,
 ) -> Result<(), TvError> {
-    update_filter_config_with_fs(&RealFileSystem, file_path, filter_config)
-}
-
-/// Updates only the filter configuration using the provided filesystem.
-pub fn update_filter_config_with_fs(
-    fs: &dyn FileSystem,
-    file_path: &str,
-    filter_config: Option<&FilterConfig>,
-) -> Result<(), TvError> {
-    let content = fs.read_to_string(Path::new(file_path)).map_err(|e| {
+    let content = config.fs().read_to_string(Path::new(file_path)).map_err(|e| {
         tracing::error!(
             component = "tv.toml.metadata",
             file_path = %file_path,
@@ -124,7 +111,7 @@ pub fn update_filter_config_with_fs(
         }
     }
 
-    fs.write_atomic(Path::new(file_path), &doc.to_string()).map_err(|e| {
+    config.fs().write_atomic(Path::new(file_path), &doc.to_string()).map_err(|e| {
         map_atomic_write_error(e, file_path)
     })?;
 
@@ -139,18 +126,13 @@ pub fn update_filter_config_with_fs(
 }
 
 /// Updates the width of a single column in the metadata.columns array.
-pub fn update_column_width(file_path: &str, column_key: &str, width: u32) -> Result<(), TvError> {
-    update_column_width_with_fs(&RealFileSystem, file_path, column_key, width)
-}
-
-/// Updates a single column's width using the provided filesystem.
-pub fn update_column_width_with_fs(
-    fs: &dyn FileSystem,
+pub fn update_column_width(
+    config: &TvConfig,
     file_path: &str,
     column_key: &str,
     width: u32,
 ) -> Result<(), TvError> {
-    let content = fs.read_to_string(Path::new(file_path)).map_err(|e| {
+    let content = config.fs().read_to_string(Path::new(file_path)).map_err(|e| {
         tracing::error!(
             component = "tv.toml.metadata",
             file_path = %file_path,
@@ -213,7 +195,7 @@ pub fn update_column_width_with_fs(
         }
     }
 
-    fs.write_atomic(Path::new(file_path), &doc.to_string()).map_err(|e| {
+    config.fs().write_atomic(Path::new(file_path), &doc.to_string()).map_err(|e| {
         map_atomic_write_error(e, file_path)
     })?;
 
@@ -230,21 +212,12 @@ pub fn update_column_width_with_fs(
 
 /// Updates the width of a single derived column in the metadata.derived_columns array.
 pub fn update_derived_column_width(
+    config: &TvConfig,
     file_path: &str,
     column_name: &str,
     width: u32,
 ) -> Result<(), TvError> {
-    update_derived_column_width_with_fs(&RealFileSystem, file_path, column_name, width)
-}
-
-/// Updates a single derived column's width using the provided filesystem.
-pub fn update_derived_column_width_with_fs(
-    fs: &dyn FileSystem,
-    file_path: &str,
-    column_name: &str,
-    width: u32,
-) -> Result<(), TvError> {
-    let content = fs.read_to_string(Path::new(file_path)).map_err(|e| {
+    let content = config.fs().read_to_string(Path::new(file_path)).map_err(|e| {
         tracing::error!(
             component = "tv.toml.metadata",
             file_path = %file_path,
@@ -297,7 +270,7 @@ pub fn update_derived_column_width_with_fs(
         }
     }
 
-    fs.write_atomic(Path::new(file_path), &doc.to_string()).map_err(|e| {
+    config.fs().write_atomic(Path::new(file_path), &doc.to_string()).map_err(|e| {
         map_atomic_write_error(e, file_path)
     })?;
 
@@ -329,17 +302,8 @@ fn remove_default_only_columns(array: &mut ArrayOfTables) {
 }
 
 /// Serializes metadata and writes it to the TOML file, preserving document structure.
-pub fn save_metadata(file_path: &str, metadata: &Metadata) -> Result<(), TvError> {
-    save_metadata_with_fs(&RealFileSystem, file_path, metadata)
-}
-
-/// Serializes metadata using the provided filesystem.
-pub fn save_metadata_with_fs(
-    fs: &dyn FileSystem,
-    file_path: &str,
-    metadata: &Metadata,
-) -> Result<(), TvError> {
-    let content = fs.read_to_string(Path::new(file_path)).map_err(|e| {
+pub fn save_metadata(config: &TvConfig, file_path: &str, metadata: &Metadata) -> Result<(), TvError> {
+    let content = config.fs().read_to_string(Path::new(file_path)).map_err(|e| {
         tracing::error!(
             component = "tv.toml.metadata",
             file_path = %file_path,
@@ -364,7 +328,7 @@ pub fn save_metadata_with_fs(
     let metadata_table = serialize_metadata_to_table(metadata, &existing_unknown_fields);
     doc["metadata"] = Item::Table(metadata_table);
 
-    fs.write_atomic(Path::new(file_path), &doc.to_string()).map_err(|e| {
+    config.fs().write_atomic(Path::new(file_path), &doc.to_string()).map_err(|e| {
         map_atomic_write_error(e, file_path)
     })?;
 

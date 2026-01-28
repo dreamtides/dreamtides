@@ -1,9 +1,9 @@
 use tv_lib::toml::color_schemes::{available_schemes, resolve_color_scheme};
 use tv_lib::toml::metadata::parse_table_style_from_content;
-use tv_lib::toml::metadata_serializer::save_metadata_with_fs;
+use tv_lib::toml::metadata_serializer::save_metadata;
 use tv_lib::toml::metadata_types::{Metadata, TableStyle};
 
-use crate::test_utils::mock_filesystem::MockFileSystem;
+use crate::test_utils::mock_filesystem::{MockFileSystem, MockTestConfig};
 
 #[test]
 fn test_resolve_blue_light_scheme() {
@@ -188,7 +188,8 @@ color_scheme = "gray_classic"
 
 #[test]
 fn test_save_and_parse_table_style_roundtrip() {
-    let fs = MockFileSystem::with_read_and_write("[[cards]]\nname = \"Card 1\"\n");
+    let mock_config =
+        MockTestConfig::new(MockFileSystem::with_read_and_write("[[cards]]\nname = \"Card 1\"\n"));
 
     let mut metadata = Metadata::new();
     metadata.table_style = Some(TableStyle {
@@ -199,9 +200,9 @@ fn test_save_and_parse_table_style_roundtrip() {
         header_background: Some("#123456".to_string()),
     });
 
-    save_metadata_with_fs(&fs, "/test.toml", &metadata).unwrap();
+    save_metadata(&mock_config.config(), "/test.toml", &metadata).unwrap();
 
-    let saved = fs.last_written_content().unwrap();
+    let saved = mock_config.last_written_content().unwrap();
     let parsed = parse_table_style_from_content(&saved, "/test.toml").unwrap();
     let style = parsed.expect("Expected table style after roundtrip");
 
@@ -214,14 +215,15 @@ fn test_save_and_parse_table_style_roundtrip() {
 
 #[test]
 fn test_save_table_style_only_non_defaults() {
-    let fs = MockFileSystem::with_read_and_write("[[cards]]\nname = \"Card 1\"\n");
+    let mock_config =
+        MockTestConfig::new(MockFileSystem::with_read_and_write("[[cards]]\nname = \"Card 1\"\n"));
 
     let mut metadata = Metadata::new();
     metadata.table_style = Some(TableStyle::new().with_color_scheme("blue_light"));
 
-    save_metadata_with_fs(&fs, "/test.toml", &metadata).unwrap();
+    save_metadata(&mock_config.config(), "/test.toml", &metadata).unwrap();
 
-    let saved = fs.last_written_content().unwrap();
+    let saved = mock_config.last_written_content().unwrap();
     assert!(saved.contains("color_scheme = \"blue_light\""), "Expected color_scheme in:\n{saved}");
     assert!(
         !saved.contains("show_row_stripes"),

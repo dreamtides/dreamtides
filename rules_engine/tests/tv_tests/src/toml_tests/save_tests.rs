@@ -3,10 +3,10 @@ use std::path::PathBuf;
 use serde_json::json;
 use tv_lib::error::error_types::TvError;
 use tv_lib::toml::document_loader::TomlTableData;
-use tv_lib::toml::document_writer::{cleanup_orphaned_temp_files_with_fs, CellUpdate};
+use tv_lib::toml::document_writer::{cleanup_orphaned_temp_files, CellUpdate};
 
 use crate::test_utils::harness::TvTestHarness;
-use crate::test_utils::mock_filesystem::MockFileSystem;
+use crate::test_utils::mock_filesystem::{MockFileSystem, MockTestConfig};
 
 #[test]
 fn test_save_cell_updates_value() {
@@ -1007,24 +1007,27 @@ fn test_cleanup_orphaned_temp_files_removes_temp_files() {
         PathBuf::from("/tmp/.tv_save_abc123"),
         PathBuf::from("/tmp/.tv_save_def456"),
     ]);
+    let mock_config = MockTestConfig::new(mock);
 
-    let result = cleanup_orphaned_temp_files_with_fs(&mock, "/tmp");
+    let result = cleanup_orphaned_temp_files(&mock_config.config(), "/tmp");
     assert_eq!(result.unwrap(), 2, "Should remove 2 temp files");
 }
 
 #[test]
 fn test_cleanup_orphaned_temp_files_no_temp_files() {
     let mock = MockFileSystem::new();
+    let mock_config = MockTestConfig::new(mock);
 
-    let result = cleanup_orphaned_temp_files_with_fs(&mock, "/tmp");
+    let result = cleanup_orphaned_temp_files(&mock_config.config(), "/tmp");
     assert_eq!(result.unwrap(), 0, "Should return 0 when no temp files");
 }
 
 #[test]
 fn test_cleanup_orphaned_temp_files_dir_not_exists() {
     let mock = MockFileSystem::new().with_exists(false);
+    let mock_config = MockTestConfig::new(mock);
 
-    let result = cleanup_orphaned_temp_files_with_fs(&mock, "/nonexistent");
+    let result = cleanup_orphaned_temp_files(&mock_config.config(), "/nonexistent");
     assert_eq!(result.unwrap(), 0, "Should return 0 for nonexistent directory");
 }
 

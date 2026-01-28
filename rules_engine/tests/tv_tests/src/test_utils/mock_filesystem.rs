@@ -1,8 +1,9 @@
+use std::any::Any;
 use std::io;
 use std::path::{Path, PathBuf};
-use std::sync::Mutex;
+use std::sync::{Arc, Mutex};
 
-use tv_lib::traits::{AtomicWriteError, FileSystem};
+use tv_lib::traits::{AtomicWriteError, FileSystem, TvConfig};
 
 pub struct MockFileSystem {
     read_result: Mutex<Option<io::Result<String>>>,
@@ -147,5 +148,33 @@ impl FileSystem for MockFileSystem {
 
     fn remove_file(&self, _path: &Path) -> io::Result<()> {
         Ok(())
+    }
+
+    fn as_any(&self) -> &dyn Any {
+        self
+    }
+}
+
+/// Test helper that wraps a MockFileSystem and TvConfig together.
+/// Allows calling operations on the config while still being able to
+/// inspect the mock's state afterward.
+pub struct MockTestConfig {
+    mock: Arc<MockFileSystem>,
+}
+
+impl MockTestConfig {
+    /// Creates a new test config from a MockFileSystem.
+    pub fn new(mock: MockFileSystem) -> Self {
+        Self { mock: Arc::new(mock) }
+    }
+
+    /// Returns a TvConfig using the mock filesystem.
+    pub fn config(&self) -> TvConfig {
+        TvConfig::new(self.mock.clone())
+    }
+
+    /// Returns the content from the last atomic write, if any.
+    pub fn last_written_content(&self) -> Option<String> {
+        self.mock.last_written_content()
     }
 }

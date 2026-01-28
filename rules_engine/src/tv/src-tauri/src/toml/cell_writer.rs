@@ -4,32 +4,23 @@ use std::time::Instant;
 use crate::error::error_types::{map_io_error_for_read, TvError};
 use crate::toml::{metadata, value_converter};
 use crate::toml::writer_types::{CellUpdate, SaveCellResult};
-use crate::traits::{AtomicWriteError, FileSystem, RealFileSystem};
+use crate::traits::{AtomicWriteError, TvConfig};
 use crate::validation::validation_rules::ValidationRule;
 use crate::validation::validators;
 
 /// Saves a single cell update to the TOML file, preserving document structure.
 pub fn save_cell(
+    config: &TvConfig,
     file_path: &str,
     table_name: &str,
     update: &CellUpdate,
 ) -> Result<SaveCellResult, TvError> {
-    save_cell_with_fs(&RealFileSystem, file_path, table_name, update)
-}
-
-/// Saves a single cell update using the provided filesystem.
-pub fn save_cell_with_fs(
-    fs: &dyn FileSystem,
-    file_path: &str,
-    table_name: &str,
-    update: &CellUpdate,
-) -> Result<SaveCellResult, TvError> {
-    save_cell_with_fs_and_rules(fs, file_path, table_name, update, None)
+    save_cell_with_rules(config, file_path, table_name, update, None)
 }
 
 /// Saves a single cell update with optional validation rules.
-pub fn save_cell_with_fs_and_rules(
-    fs: &dyn FileSystem,
+pub fn save_cell_with_rules(
+    config: &TvConfig,
     file_path: &str,
     table_name: &str,
     update: &CellUpdate,
@@ -37,7 +28,7 @@ pub fn save_cell_with_fs_and_rules(
 ) -> Result<SaveCellResult, TvError> {
     let start = Instant::now();
 
-    let content = fs.read_to_string(Path::new(file_path)).map_err(|e| {
+    let content = config.fs().read_to_string(Path::new(file_path)).map_err(|e| {
         tracing::error!(
             component = "tv.toml",
             file_path = %file_path,
@@ -107,7 +98,7 @@ pub fn save_cell_with_fs_and_rules(
 
     let output = doc.to_string();
 
-    fs.write_atomic(Path::new(file_path), &output)
+    config.fs().write_atomic(Path::new(file_path), &output)
         .map_err(|e| map_atomic_write_error(e, file_path))?;
 
     let duration_ms = start.elapsed().as_millis() as u64;

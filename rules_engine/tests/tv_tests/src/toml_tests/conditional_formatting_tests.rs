@@ -1,9 +1,9 @@
 use tv_lib::toml::conditional_formatting::{evaluate_condition, evaluate_rules};
 use tv_lib::toml::metadata::parse_conditional_formatting_from_content;
-use tv_lib::toml::metadata_serializer::save_metadata_with_fs;
+use tv_lib::toml::metadata_serializer::save_metadata;
 use tv_lib::toml::metadata_types::{ConditionalFormatRule, FormatCondition, FormatStyle, Metadata};
 
-use crate::test_utils::mock_filesystem::MockFileSystem;
+use crate::test_utils::mock_filesystem::{MockFileSystem, MockTestConfig};
 
 #[test]
 fn test_parse_conditional_formatting_equals_string() {
@@ -409,7 +409,8 @@ fn test_evaluate_rules_multiple_columns() {
 
 #[test]
 fn test_save_and_parse_conditional_formatting_roundtrip() {
-    let fs = MockFileSystem::with_read_and_write("[[cards]]\nname = \"Card 1\"\n");
+    let mock_config =
+        MockTestConfig::new(MockFileSystem::with_read_and_write("[[cards]]\nname = \"Card 1\"\n"));
 
     let mut metadata = Metadata::new();
     metadata.conditional_formatting = vec![
@@ -425,9 +426,9 @@ fn test_save_and_parse_conditional_formatting_roundtrip() {
         ),
     ];
 
-    save_metadata_with_fs(&fs, "/test.toml", &metadata).unwrap();
+    save_metadata(&mock_config.config(), "/test.toml", &metadata).unwrap();
 
-    let saved = fs.last_written_content().unwrap();
+    let saved = mock_config.last_written_content().unwrap();
     let parsed = parse_conditional_formatting_from_content(&saved, "/test.toml").unwrap();
 
     assert_eq!(parsed.len(), 2);

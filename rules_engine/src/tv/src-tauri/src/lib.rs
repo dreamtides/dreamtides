@@ -37,7 +37,7 @@ fn cleanup_temp_files_on_startup(paths: &cli::AppPaths) {
     }
 
     for dir in directories {
-        if let Err(e) = toml::document_writer::cleanup_orphaned_temp_files(&dir.to_string_lossy()) {
+        if let Err(e) = toml::document_writer::cleanup_orphaned_temp_files(&traits::TvConfig::default(), &dir.to_string_lossy()) {
             tracing::warn!(
                 component = "tv.toml",
                 dir = %dir.display(),

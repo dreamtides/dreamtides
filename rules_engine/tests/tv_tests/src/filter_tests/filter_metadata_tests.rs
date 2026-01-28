@@ -1,6 +1,9 @@
+use std::sync::Arc;
+
 use tv_lib::toml::metadata::parse_filter_config_from_content;
-use tv_lib::toml::metadata_serializer::update_filter_config_with_fs;
+use tv_lib::toml::metadata_serializer::update_filter_config;
 use tv_lib::toml::metadata_types::{ColumnFilter, FilterCondition, FilterConfig};
+use tv_lib::traits::TvConfig;
 
 use crate::test_utils::mock_filesystem::MockFileSystem;
 
@@ -219,15 +222,22 @@ fn test_update_filter_config_adds_filter_section() {
 name = "Card 1"
 "#,
     );
+    let config = TvConfig::new(Arc::new(fs));
     let filter_config = FilterConfig {
         filters: vec![ColumnFilter::new("name", FilterCondition::Contains("fire".to_string()))],
         active: true,
     };
 
-    let result = update_filter_config_with_fs(&fs, "/test.toml", Some(&filter_config));
+    let result = update_filter_config(&config, "/test.toml", Some(&filter_config));
     assert!(result.is_ok());
 
-    let saved = fs.last_written_content().unwrap();
+    let saved = config
+        .fs()
+        .as_any()
+        .downcast_ref::<MockFileSystem>()
+        .unwrap()
+        .last_written_content()
+        .unwrap();
     assert!(saved.contains("[metadata]"), "Expected [metadata] section in:\n{saved}");
     assert!(saved.contains("column = \"name\""), "Expected column = \"name\" in:\n{saved}");
     assert!(saved.contains("active = true"), "Expected active = true in:\n{saved}");
@@ -252,11 +262,18 @@ column = "name"
 contains = "fire"
 "#,
     );
+    let config = TvConfig::new(Arc::new(fs));
 
-    let result = update_filter_config_with_fs(&fs, "/test.toml", None);
+    let result = update_filter_config(&config, "/test.toml", None);
     assert!(result.is_ok());
 
-    let saved = fs.last_written_content().unwrap();
+    let saved = config
+        .fs()
+        .as_any()
+        .downcast_ref::<MockFileSystem>()
+        .unwrap()
+        .last_written_content()
+        .unwrap();
     assert!(!saved.contains("[metadata.filter]"), "Expected no filter section in:\n{saved}");
     assert!(saved.contains("[metadata]"), "Expected metadata section preserved in:\n{saved}");
 }
@@ -274,15 +291,22 @@ schema_version = 1
 column = "name"
 "#,
     );
+    let config = TvConfig::new(Arc::new(fs));
     let filter_config = FilterConfig {
         filters: vec![ColumnFilter::new("active", FilterCondition::Boolean(true))],
         active: true,
     };
 
-    let result = update_filter_config_with_fs(&fs, "/test.toml", Some(&filter_config));
+    let result = update_filter_config(&config, "/test.toml", Some(&filter_config));
     assert!(result.is_ok());
 
-    let saved = fs.last_written_content().unwrap();
+    let saved = config
+        .fs()
+        .as_any()
+        .downcast_ref::<MockFileSystem>()
+        .unwrap()
+        .last_written_content()
+        .unwrap();
     assert!(saved.contains("column = \"name\""), "Expected sort config preserved in:\n{saved}");
     assert!(saved.contains("active = true"), "Expected filter active in:\n{saved}");
 }

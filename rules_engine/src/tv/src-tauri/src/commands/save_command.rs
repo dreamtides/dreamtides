@@ -9,6 +9,7 @@ use crate::toml::document_loader::TomlTableData;
 use crate::toml::document_writer::{
     self, AddRowResult, CellUpdate, SaveBatchResult, SaveCellResult, SaveTableResult,
 };
+use crate::traits::TvConfig;
 
 /// Tauri command to save spreadsheet data back to a TOML file.
 #[tauri::command]
@@ -20,7 +21,7 @@ pub fn save_toml_table(
 ) -> Result<SaveTableResult, TvError> {
     state_machine::begin_save(&app_handle, &file_path)?;
 
-    let result = document_writer::save_toml_document(&file_path, &table_name, &data);
+    let result = document_writer::save_toml_document(&TvConfig::default(), &file_path, &table_name, &data);
     let _ = state_machine::end_save(&app_handle, &file_path, result.is_ok());
 
     result
@@ -60,7 +61,7 @@ pub fn save_cell(
     state_machine::begin_save(&app_handle, &file_path)?;
 
     let update = CellUpdate { row_index, column_key: column_key.clone(), value: value.clone() };
-    let result = document_writer::save_cell(&file_path, &table_name, &update);
+    let result = document_writer::save_cell(&TvConfig::default(), &file_path, &table_name, &update);
 
     // Handle permission errors by updating state and queueing the update
     if let Err(ref e) = result {
@@ -120,7 +121,7 @@ pub fn save_batch(
 
     state_machine::begin_save(&app_handle, &file_path)?;
 
-    let result = document_writer::save_batch(&file_path, &table_name, &updates);
+    let result = document_writer::save_batch(&TvConfig::default(), &file_path, &table_name, &updates);
 
     // Handle permission errors by updating state and queueing updates
     if let Err(ref e) = result {
@@ -155,7 +156,7 @@ pub fn add_row(
 ) -> Result<AddRowResult, TvError> {
     state_machine::begin_save(&app_handle, &file_path)?;
 
-    let result = document_writer::add_row(&file_path, &table_name, position, initial_values);
+    let result = document_writer::add_row(&TvConfig::default(), &file_path, &table_name, position, initial_values);
     let _ = state_machine::end_save(&app_handle, &file_path, result.is_ok());
 
     result

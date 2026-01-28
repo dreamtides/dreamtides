@@ -1,6 +1,5 @@
 use crate::error::error_types::TvError;
 use crate::toml::metadata;
-use crate::traits::RealFileSystem;
 use crate::validation::validation_rules::ValidationRule;
 
 #[tauri::command]
@@ -11,7 +10,7 @@ pub fn get_validation_rules(file_path: String) -> Result<Vec<ValidationRule>, Tv
         "Loading validation rules"
     );
 
-    let rules = metadata::parse_validation_rules_with_fs(&RealFileSystem, &file_path)?;
+    let rules = metadata::parse_validation_rules_from_file(&file_path)?;
 
     tracing::debug!(
         component = "tv.commands.validation",
@@ -31,7 +30,7 @@ pub fn get_enum_validation_rules(file_path: String) -> Result<Vec<EnumValidation
         "Loading enum validation rules for dropdown support"
     );
 
-    let rules = metadata::parse_validation_rules_with_fs(&RealFileSystem, &file_path)?;
+    let rules = metadata::parse_validation_rules_from_file(&file_path)?;
 
     let enum_rules: Vec<EnumValidationInfo> = rules
         .into_iter()

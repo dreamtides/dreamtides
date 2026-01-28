@@ -2,10 +2,10 @@ use tv_lib::filter::filter_state::{compute_hidden_rows, compute_visible_rows, Fi
 use tv_lib::filter::filter_types::{ColumnFilterState, FilterConditionState};
 use tv_lib::toml::document_loader::TomlTableData;
 use tv_lib::toml::metadata::parse_filter_config_from_content;
-use tv_lib::toml::metadata_serializer::update_filter_config_with_fs;
+use tv_lib::toml::metadata_serializer::update_filter_config;
 use tv_lib::toml::metadata_types::{ColumnFilter, FilterCondition, FilterConfig};
 
-use crate::test_utils::mock_filesystem::MockFileSystem;
+use crate::test_utils::mock_filesystem::{MockFileSystem, MockTestConfig};
 
 #[test]
 fn test_parse_filter_config_with_contains() {
@@ -178,20 +178,20 @@ condition = { min = 2, max = 8 }
 
 #[test]
 fn test_update_filter_config_adds_filter_section() {
-    let fs = MockFileSystem::with_read_and_write(
+    let mock_config = MockTestConfig::new(MockFileSystem::with_read_and_write(
         r#"[[cards]]
 name = "Card 1"
 "#,
-    );
+    ));
     let filter_config = FilterConfig {
         filters: vec![ColumnFilter::new("name", FilterCondition::Contains("fire".to_string()))],
         active: true,
     };
 
-    let result = update_filter_config_with_fs(&fs, "/test.toml", Some(&filter_config));
+    let result = update_filter_config(&mock_config.config(), "/test.toml", Some(&filter_config));
     assert!(result.is_ok());
 
-    let saved = fs.last_written_content().unwrap();
+    let saved = mock_config.last_written_content().unwrap();
     assert!(saved.contains("[metadata]"), "Expected [metadata] section in:\n{saved}");
     assert!(saved.contains("active = true"), "Expected active = true in:\n{saved}");
     assert!(saved.contains("column = \"name\""), "Expected column = \"name\" in:\n{saved}");
@@ -199,7 +199,7 @@ name = "Card 1"
 
 #[test]
 fn test_update_filter_config_removes_filter() {
-    let fs = MockFileSystem::with_read_and_write(
+    let mock_config = MockTestConfig::new(MockFileSystem::with_read_and_write(
         r#"[[cards]]
 name = "Card 1"
 
@@ -213,19 +213,19 @@ active = true
 column = "name"
 condition = { contains = "fire" }
 "#,
-    );
+    ));
 
-    let result = update_filter_config_with_fs(&fs, "/test.toml", None);
+    let result = update_filter_config(&mock_config.config(), "/test.toml", None);
     assert!(result.is_ok());
 
-    let saved = fs.last_written_content().unwrap();
+    let saved = mock_config.last_written_content().unwrap();
     assert!(!saved.contains("[metadata.filter]"), "Expected no filter section in:\n{saved}");
     assert!(saved.contains("[metadata]"), "Expected metadata section preserved in:\n{saved}");
 }
 
 #[test]
 fn test_update_filter_config_preserves_other_metadata() {
-    let fs = MockFileSystem::with_read_and_write(
+    let mock_config = MockTestConfig::new(MockFileSystem::with_read_and_write(
         r#"[[cards]]
 name = "Card 1"
 
@@ -235,16 +235,16 @@ schema_version = 1
 [metadata.sort]
 column = "name"
 "#,
-    );
+    ));
     let filter_config = FilterConfig {
         filters: vec![ColumnFilter::new("cost", FilterCondition::Boolean(true))],
         active: true,
     };
 
-    let result = update_filter_config_with_fs(&fs, "/test.toml", Some(&filter_config));
+    let result = update_filter_config(&mock_config.config(), "/test.toml", Some(&filter_config));
     assert!(result.is_ok());
 
-    let saved = fs.last_written_content().unwrap();
+    let saved = mock_config.last_written_content().unwrap();
     assert!(saved.contains("column = \"name\""), "Expected sort config preserved in:\n{saved}");
     assert!(saved.contains("active = true"), "Expected filter config in:\n{saved}");
 }
