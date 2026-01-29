@@ -352,3 +352,328 @@ Migration happens in two phases: **Preparation** and **Cutover**.
 - Parallel paths create maintenance burden
 - Clean cut makes rollback decision clear
 - Thorough prep work reduces cutover risk
+
+## Implementation Plan
+
+This section breaks the migration into discrete tasks sized for a single AI agent
+context window. Each task leaves the codebase in a working state with passing tests.
+
+---
+
+### Task 1: Create tabula_data_v2 Crate Skeleton
+
+Create the new crate with foundational types and module structure.
+
+**Deliverables:**
+- Create `src/tabula_data_v2/Cargo.toml` with dependencies
+- Create `src/tabula_data_v2/src/lib.rs` with module declarations
+- Implement `tabula_error.rs` with `TabulaError` enum (all error variants)
+- Implement `card_definition_raw.rs` with unified `CardDefinitionRaw` struct
+- Add crate to workspace `Cargo.toml`
+
+**Key Files for Context:**
+- `src/tabula_data/src/card_definitions/base_card_definition_raw.rs:8-61` (existing raw struct)
+- `src/tabula_data/src/card_definitions/dreamwell_card_definition.rs:58-82` (dreamwell raw)
+- `client/Assets/StreamingAssets/Tabula/test-cards.toml` (TOML format reference)
+
+**Validation:** `just check` passes, new crate compiles
+
+---
+
+### Task 2: Implement TOML and Fluent Loading
+
+Add file loading utilities for TOML card files and Fluent strings.
+
+**Deliverables:**
+- Implement `toml_loader.rs`:
+  - `CardsFile`, `DreamwellFile`, `CardEffectsFile`, `CardListsFile` wrapper structs
+  - `load_toml<T>(path)` generic function
+  - Android asset loading with `#[cfg(target_os = "android")]`
+- Implement `fluent_loader.rs`:
+  - `FluentStrings` struct with `FluentBundle`
+  - `load(path)` and `format(id, args)` methods
+  - `StringContext` enum (Interface vs CardText)
+
+**Key Files for Context:**
+- `src/tabula_data/src/localized_strings.rs:1-150` (existing Fluent implementation)
+- `src/tabula_data/src/tabula_table.rs:1-50` (existing Table wrapper)
+- `src/state_provider/src/state_provider.rs:213-276` (Android loading pattern)
+- `client/Assets/StreamingAssets/Tabula/strings.ftl` (Fluent format reference)
+
+**Validation:** Unit tests for loading test TOML files pass
+
+---
+
+### Task 3: Implement Card Definition Types and Builders
+
+Create the final `CardDefinition` and `DreamwellCardDefinition` types with builders.
+
+**Deliverables:**
+- Implement `card_definition.rs`:
+  - `CardDefinition` struct (no `is_test_card`, no `displayed_abilities`)
+  - Fields: `base_card_id`, `displayed_name`, `energy_cost`, `abilities`,
+    `displayed_rules_text`, `displayed_prompts`, `card_type`, `card_subtype`,
+    `is_fast`, `spark`, `rarity`, `image`
+- Implement `dreamwell_definition.rs`:
+  - `DreamwellCardDefinition` struct (no `is_test_card`, no `displayed_abilities`)
+  - Fields: `base_card_id`, `displayed_name`, `energy_produced`, `abilities`,
+    `displayed_rules_text`, `displayed_prompts`, `phase`, `image`
+- Implement `card_definition_builder.rs`:
+  - `build_card(raw, abilities) -> Result<CardDefinition, TabulaError>`
+  - `build_dreamwell(raw, abilities) -> Result<DreamwellCardDefinition, TabulaError>`
+  - Validation for required fields, error reporting with card context
+
+**Key Files for Context:**
+- `src/tabula_data/src/card_definitions/card_definition.rs:17-71` (existing struct)
+- `src/tabula_data/src/card_definitions/card_definition_builder.rs:20-253` (existing builder)
+- `src/ability_data/src/ability.rs:13-42` (Ability enum definition)
+
+**Validation:** Unit tests for building cards from raw data pass
+
+---
+
+### Task 4: Implement CardEffectRow and CardListRow
+
+Port the effect and list row types, removing `TabulaValue` wrapper.
+
+**Deliverables:**
+- Implement `card_effect_row.rs`:
+  - `CardEffectRow` struct with direct types (no `TabulaValue<T>`)
+  - Custom deserializers for address types that parse from strings
+- Implement `card_list_row.rs`:
+  - `CardListRow` struct matching TOML format
+
+**Key Files for Context:**
+- `src/tabula_data/src/card_effect_definitions/card_effect_row.rs:12-66` (existing)
+- `src/tabula_data/src/card_list_data/card_list_row.rs:6-11` (existing)
+- `src/tabula_data/src/tabula_primitives.rs:11-74` (TabulaValue to remove)
+- `client/Assets/StreamingAssets/Tabula/card-fx.toml` (effect format)
+- `client/Assets/StreamingAssets/Tabula/card-lists.toml` (list format)
+
+**Validation:** Unit tests for deserializing effect and list TOML pass
+
+---
+
+### Task 5: Implement Tabula Struct and Loading Logic
+
+Create the main `Tabula` struct that orchestrates loading from all sources.
+
+**Deliverables:**
+- Implement `tabula_struct.rs`:
+  - `TabulaSource` enum (`Production`, `Test`)
+  - `Tabula` struct with `strings`, `cards`, `dreamwell_cards`, `card_lists`, `card_effects`
+  - `Tabula::load(source, path) -> Result<Self, Vec<TabulaError>>`
+- Implement `ability_parser.rs`:
+  - `load_parsed_abilities(path) -> BTreeMap<Uuid, Vec<Ability>>`
+  - Load from `parsed_abilities.json` file
+
+**Key Files for Context:**
+- `src/tabula_data/src/tabula.rs:30-81` (existing Tabula struct and build)
+- `client/Assets/StreamingAssets/Tabula/parsed_abilities.json` (ability cache)
+
+**Validation:** Integration test that loads full test Tabula passes
+
+---
+
+### Task 6: Add Code Generation to tabula_cli
+
+Extend the existing `tabula_cli` with a `generate` command for code generation.
+
+**Deliverables:**
+- Add `commands/generate.rs`:
+  - `tabula generate [OUTPUT_DIR]` command
+  - Generate `test_card.rs` from `test-cards.toml`
+  - Generate `card_lists.rs` from `card-lists.toml`
+  - Generate `string_id.rs` from `strings.ftl`
+  - Generate `effect_types.rs`, `trigger_types.rs`, `predicate_types.rs`
+- Update `main.rs` to include generate command
+
+**Key Files for Context:**
+- `src/old_tabula_cli/src/tabula_codegen.rs:1-150` (existing codegen logic)
+- `src/tabula_ids/src/test_card.rs` (target format)
+- `src/tabula_ids/src/card_lists.rs` (target format)
+- `src/tabula_ids/src/string_id.rs` (target format)
+
+**Validation:** Generated files match expected format, `just check` passes
+
+---
+
+### Task 7: Create Display Text Helper Module
+
+Create a helper module in `display` crate for rendering abilities on-demand using
+`parser_v2` serializers. This prepares for the DisplayedAbility removal.
+
+**Deliverables:**
+- Create `src/display/src/rendering/ability_text.rs`:
+  - `render_abilities(abilities: &[Ability]) -> String` (replaces `get_displayed_text`)
+  - `render_ability_at_index(abilities: &[Ability], index: usize) -> String`
+  - `render_modal_choices(abilities: &[Ability]) -> Vec<String>`
+  - Helper functions matching current `DisplayedAbility` usage patterns
+- Add module to `src/display/src/rendering/mod.rs`
+
+**Key Files for Context:**
+- `src/display/src/rendering/card_rendering.rs:187-214` (`get_displayed_text` function)
+- `src/display/src/rendering/card_rendering.rs:515-538` (`displayed_effect_text`)
+- `src/display/src/rendering/modal_effect_prompt_rendering.rs:117-139` (modal extraction)
+- `src/parser_v2/src/serializer/ability_serializer.rs:17-91` (serializer API)
+- `src/parser_v2/src/serializer/effect_serializer.rs:798-978` (effect serializer)
+
+**Validation:** New helper module compiles, unit tests pass
+
+---
+
+### Task 8: Migrate display Crate to V2
+
+Replace all `DisplayedAbility` usage in display crate with on-demand serialization.
+
+**Deliverables:**
+- Update `card_rendering.rs`:
+  - Replace `definition.displayed_abilities` with `ability_text::render_*` calls
+  - Update `ability_token_text()` to use serializers
+  - Update `rules_text()` to use new helpers
+- Update `dreamwell_card_rendering.rs`:
+  - Replace `card.definition.displayed_abilities` usage
+- Update `modal_effect_prompt_rendering.rs`:
+  - Replace `DisplayedAbility` pattern matching with serializer calls
+- Update `animations.rs`:
+  - Replace `displayed_abilities` access
+- Update `ability_help_text.rs`:
+  - Use `displayed_rules_text` field or serialize from abilities
+- Update imports from `tabula_data` to `tabula_data_v2`
+
+**Key Files for Context:**
+- `src/display/src/rendering/card_rendering.rs:88-148` (DisplayedAbility usage)
+- `src/display/src/rendering/dreamwell_card_rendering.rs:81` (dreamwell display)
+- `src/display/src/rendering/modal_effect_prompt_rendering.rs:61-139` (modal handling)
+- `src/ability_data/src/ability.rs:46-72` (DisplayedAbility definition to remove)
+
+**Validation:** Display crate compiles with V2, visual rendering tests pass
+
+---
+
+### Task 9: Migrate battle_state and battle_queries Crates
+
+Update the core battle state crates to use tabula_data_v2.
+
+**Deliverables:**
+- Update `battle_state`:
+  - `battle_card_definitions.rs`: Change `CardDefinition` import
+  - `dreamwell_data.rs`: Change `DreamwellCardDefinition` import
+  - `battle_state.rs`: Change `Tabula` import
+  - Remove any `is_test_card` access (none found in exploration)
+- Update `battle_queries`:
+  - `card_abilities.rs`: Change `CardDefinition` import
+  - `build_named_abilities.rs`: Change import
+  - `card.rs`: Change import
+  - Verify `definition.abilities` access still works (it should)
+
+**Key Files for Context:**
+- `src/battle_state/src/battle/battle_card_definitions.rs:8` (CardDefinition import)
+- `src/battle_state/src/battle_cards/dreamwell_data.rs:8-9` (imports)
+- `src/battle_queries/src/battle_card_queries/card_abilities.rs:13,32-40` (ability building)
+
+**Validation:** `just check` passes, battle state tests pass
+
+---
+
+### Task 10: Migrate battle_mutations, game_creation, quest_state Crates
+
+Update the remaining game logic crates to use tabula_data_v2.
+
+**Deliverables:**
+- Update `battle_mutations`:
+  - `battle_deck.rs`: Change `CardDefinition` import
+  - `apply_debug_battle_action.rs`: Change `tabula.cards` access pattern
+- Update `game_creation`:
+  - `new_battle.rs`: Change `Tabula` import
+  - `new_test_battle.rs`: Change `Tabula` import, use `TabulaSource::Test`
+- Update `quest_state`:
+  - `deck.rs`: Change `CardDefinition` and `Tabula` imports
+  - Verify `tabula.cards.get()` access still works
+
+**Key Files for Context:**
+- `src/battle_mutations/src/card_mutations/battle_deck.rs:21,101-109` (CardDefinition)
+- `src/game_creation/src/new_test_battle.rs:33-70` (Tabula usage)
+- `src/quest_state/src/quest/deck.rs:3-4,29-36` (deck building)
+
+**Validation:** `just check` passes, game creation tests pass
+
+---
+
+### Task 11: Migrate rules_engine, ai_matchup, state_provider
+
+Update the top-level crates and state management to use tabula_data_v2.
+
+**Deliverables:**
+- Update `rules_engine`:
+  - `engine.rs`: Change any Tabula-related imports
+  - `deserialize_save_file.rs`: Verify save file compatibility
+- Update `ai_matchup`:
+  - `run_matchup.rs`: Use `TabulaSource::Test` for test matchups
+- Update `state_provider`:
+  - `state_provider.rs`: Load V2 Tabula from TOML files (not tabula.json)
+  - `test_state_provider.rs`: Use `TabulaSource::Test`
+  - Remove `tabula.json` loading code
+
+**Key Files for Context:**
+- `src/rules_engine/src/deserialize_save_file.rs:31-39` (save file loading)
+- `src/ai_matchup/src/run_matchup.rs:149-159` (matchup creation)
+- `src/state_provider/src/state_provider.rs:213-266` (Tabula loading)
+- `src/state_provider/src/test_state_provider.rs:63-105` (test loading)
+
+**Validation:** Full test suite passes (`just test`), AI matchups work
+
+---
+
+### Task 12: Cleanup - Remove V1 Artifacts
+
+Remove all deprecated code and rename V2 to final names.
+
+**Deliverables:**
+- Delete `src/tabula_data/` crate entirely
+- Delete `src/old_tabula_cli/` crate entirely
+- Delete `client/Assets/StreamingAssets/tabula.json`
+- Rename `tabula_data_v2` → `tabula_data` (update all Cargo.toml paths)
+- Rename `tabula_ids` → `tabula_generated` (optional, per design doc)
+- Remove `DisplayedAbility` enum from `ability_data` crate
+- Update workspace Cargo.toml to remove old crates
+
+**Key Files for Context:**
+- `rules_engine/Cargo.toml` (workspace members)
+- `src/ability_data/src/ability.rs:46-72` (DisplayedAbility to delete)
+
+**Validation:** Full test suite passes, `just review` passes
+
+---
+
+## Task Dependencies
+
+```
+Task 1 (crate skeleton)
+    ↓
+Task 2 (TOML/Fluent loading)
+    ↓
+Task 3 (card definition types)
+    ↓
+Task 4 (effect/list rows)
+    ↓
+Task 5 (Tabula struct)
+    ↓
+Task 6 (code generation) ──────────────────────────┐
+    ↓                                              │
+Task 7 (display helper module)                     │
+    ↓                                              │
+Task 8 (migrate display) ←─────────────────────────┤
+    ↓                                              │
+Task 9 (migrate battle_state/queries) ←────────────┤
+    ↓                                              │
+Task 10 (migrate mutations/creation/quest) ←───────┤
+    ↓                                              │
+Task 11 (migrate engine/matchup/provider) ←────────┘
+    ↓
+Task 12 (cleanup)
+```
+
+Tasks 1-6 can proceed sequentially as preparation work.
+Tasks 7-11 form the single-pass cutover and should be completed together.
+Task 12 is the final cleanup after all tests pass
