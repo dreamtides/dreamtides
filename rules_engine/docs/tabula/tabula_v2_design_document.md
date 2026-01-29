@@ -11,7 +11,7 @@ and generating code from the new CLI system.
 **Primary Goals:**
 
 1. Remove `old_tabula_cli` and all v1 tabula crates
-2. Remove all use of `rules_engine/tabula.json`
+2. Remove all use of `tabula.json`
 3. Remove `is_test_card` distinction from tabula data structures
 4. Rework tabula_data to use TOML and FTL tabula system
 5. Rework tabula_ids & code generation to use new tabula system
@@ -32,13 +32,13 @@ and generating code from the new CLI system.
 │  │ Raw (unified)   │  │ Loader          │  │ CardListRow      │     │
 │  └────────┬────────┘  └────────┬────────┘  └────────┬─────────┘     │
 │           │                    │                     │              │
-│           ▼                    ▼                     ▼              │
+│           ▼                    ▼                     ▼           │
 │  ┌─────────────────────────────────────────────────────────────┐    │
 │  │                    PARSER_V2 Integration                     │   │
 │  │  Runtime ability parsing with cached parser instance         │   │
 │  └─────────────────────────────────────────────────────────────┘    │
 │           │                                                         │
-│           ▼                                                         │
+│           ▼                                                        │
 │  ┌─────────────────────────────────────────────────────────────┐    │
 │  │                    Final Card Definitions                   │    │
 │  │  CardDefinition, DreamwellCardDefinition, etc.              │    │
@@ -48,8 +48,8 @@ and generating code from the new CLI system.
                                   ▼
 ┌─────────────────────────────────────────────────────────────────────┐
 │                     TABULA_IDS (renamed: TABULA_GENERATED)          │
-│  Generated enums: CardEffectRowType, CardEffectRowTrigger, etc.    │
-│  Generated constants: TestCard IDs, StringId enum, CardList enums  │
+│  Generated enums: CardEffectRowType, CardEffectRowTrigger, etc.     │
+│  Generated constants: TestCard IDs, StringId enum, CardList enums   │
 └─────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -73,7 +73,7 @@ src/tabula_data_v2/
 │   ├── tabula_struct.rs            # Main Tabula struct
 │   └── tabula_error.rs             # Error types with location info
 
-src/tabula_generated/                # Renamed from tabula_ids (milestone 9)
+src/tabula_generated/               # Renamed from tabula_ids (milestone 9)
 ├── Cargo.toml
 ├── src/
 │   ├── lib.rs                      # Module declarations only
@@ -144,28 +144,9 @@ The `TabulaValue<T>` wrapper should be **removed**. Instead:
 
 ### 3. Runtime Ability Parsing
 
-Card abilities are parsed at game start using `parser_v2`:
-
-```rust
-pub struct AbilityParser {
-    parser: BoxedParser<...>,  // Cached parser instance
-}
-
-impl AbilityParser {
-    pub fn new() -> Self {
-        Self { parser: ability_parser::ability_parser().boxed() }
-    }
-
-    pub fn parse(&self, rules_text: &str, variables: &str) -> Result<Vec<Ability>> {
-        // 1. Parse variable bindings
-        // 2. Lex the rules text
-        // 3. Resolve variables
-        // 4. Parse abilities
-    }
-}
-```
-
-The parser is created once and reused for all cards.
+Card abilities are defined in `tabula/parsed_abilities.json`, which maps
+card UUIDs to card ability lists. Tabula loads this file at startup to
+resolve card abilities.
 
 ### 4. Fluent String System
 
