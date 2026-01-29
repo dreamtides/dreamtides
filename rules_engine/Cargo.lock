@@ -6176,6 +6176,7 @@ dependencies = [
  "fluent",
  "fluent-bundle",
  "serde",
+ "strum",
  "thiserror 2.0.12",
  "toml",
  "uuid",

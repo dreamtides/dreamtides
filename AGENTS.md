@@ -8,8 +8,7 @@ Please use `just` commands instead of `cargo`, e.g. `just fmt`, `just check`,
 
 
 - Prefer writing code inline (when possible) to creating new variables via "let" statements
-- DO NOT add inline comments to code. Add a short doc comment to top-level public functions.
-- DO NOT delete existing inline comments
+- Add a short doc comment to top-level public functions, fields, and types. Don't add inline comments.
 - DO NOT fully-qualify names in code ever
 - Function calls and enum values have exactly one qualifier, struct names and enum types have
   zero qualifiers:
@@ -88,8 +87,6 @@ Dreamtides:
 
 Rules engine Rust source code lives in the `rules_engine/` directory.
 Client source code lives in the `client/` directory.
-
-Your current working directory is `rules_engine/`. The `justfile` and similar are located in the parent directory.
 
 Card data lives in `rules_engine/tabula/cards.toml`. Do NOT read this file directly, it is much too large.
 

@@ -71,6 +71,22 @@ pub struct CardEffectRowRaw {
     pub dissolve_color: Option<String>,
     /// Sound for dissolve effects.
     pub dissolve_sound: Option<String>,
+    /// Target for display effects.
+    pub effect_target: Option<String>,
+    /// Asset path for display effect prefab.
+    pub effect_address: Option<String>,
+    /// Duration of the display effect in milliseconds.
+    pub effect_duration_milliseconds: Option<i64>,
+    /// Scale multiplier for display effects.
+    pub effect_scale: Option<f64>,
+    /// Sound for display effects.
+    pub effect_sound: Option<String>,
+    /// Target objects for card trail effects.
+    pub card_trail_targets: Option<String>,
+    /// Asset path for card trail prefab.
+    pub card_trail_address: Option<String>,
+    /// Duration of the card trail in milliseconds.
+    pub trail_duration_milliseconds: Option<i64>,
 }
 
 /// Wrapper for deserializing card effect arrays from TOML files using
