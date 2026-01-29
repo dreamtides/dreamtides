@@ -48,8 +48,7 @@ and generating code from the new CLI system.
                                   ▼
 ┌─────────────────────────────────────────────────────────────────────┐
 │                     TABULA_IDS (renamed: TABULA_GENERATED)          │
-│  Generated enums: CardEffectRowType, CardEffectRowTrigger, etc.     │
-│  Generated constants: TestCard IDs, StringId enum, CardList enums   │
+│  Generated constants: TestCard IDs, StringId enum                   │
 └─────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -78,11 +77,7 @@ src/tabula_generated/               # Renamed from tabula_ids (milestone 9)
 ├── src/
 │   ├── lib.rs                      # Module declarations only
 │   ├── test_card.rs                # Generated test card constants
-│   ├── card_lists.rs               # Generated card list enums/consts
-│   ├── string_id.rs                # Generated from strings.ftl
-│   ├── effect_types.rs             # Generated CardEffectRowType enum
-│   ├── trigger_types.rs            # Generated CardEffectRowTrigger enum
-│   └── predicate_types.rs          # Generated CardEffectRowObjectPredicate enum
+│   └── string_id.rs                # Generated from strings.ftl
 ```
 
 ## Core Design Decisions
@@ -233,11 +228,11 @@ via `tabula generate [OUTPUT_DIR]` (default: `src/tabula_generated/src/`):
 | Source | Generated File | Contents |
 |--------|---------------|----------|
 | `test-cards.toml` | `test_card.rs` | `pub const TEST_*: BaseCardId` |
-| `card-lists.toml` | `card_lists.rs` | Enums and const arrays |
 | `strings.ftl` | `string_id.rs` | `pub enum StringId { ... }` |
-| `effect-types.toml` | `effect_types.rs` | `pub enum CardEffectRowType` |
-| `trigger-types.toml` | `trigger_types.rs` | `pub enum CardEffectRowTrigger` |
-| `predicate-types.toml` | `predicate_types.rs` | `pub enum CardEffectRowObjectPredicate` |
+
+Note: `card_lists.rs`, `effect_types.rs`, `trigger_types.rs`, and
+`predicate_types.rs` are not generated - these types live directly in the
+`tabula_data` crate as hand-written code.
 
 ### 8. Error Handling
 
@@ -290,7 +285,7 @@ format - we serialize the final `CardDefinition`, not the raw TOML data.
 | `card_definition_builder.rs` | `card_definition_builder.rs` | Simplified builders |
 | `card_definition.rs` | `card_definition.rs` | Remove `is_test_card` |
 | `dreamwell_card_definition.rs` | `dreamwell_definition.rs` | Remove raw type, remove `is_test_card` |
-| `card_effect_row.rs` | `card_effect_row.rs` | Move enums to generated |
+| `card_effect_row.rs` | `card_effect_row.rs` | Keep enums in tabula_data |
 | `card_list_row.rs` | `card_list_row.rs` | Minimal changes |
 | `localized_strings.rs` | `fluent_loader.rs` | Complete rewrite |
 | `tabula_primitives.rs` | (deleted) | Remove TabulaValue |
@@ -483,15 +478,12 @@ Extend the existing `tabula_cli` with a `generate` command for code generation.
 - Add `commands/generate.rs`:
   - `tabula generate [OUTPUT_DIR]` command
   - Generate `test_card.rs` from `test-cards.toml`
-  - Generate `card_lists.rs` from `card-lists.toml`
   - Generate `string_id.rs` from `strings.ftl`
-  - Generate `effect_types.rs`, `trigger_types.rs`, `predicate_types.rs`
 - Update `main.rs` to include generate command
 
 **Key Files for Context:**
 - `src/old_tabula_cli/src/tabula_codegen.rs:1-150` (existing codegen logic)
 - `src/tabula_ids/src/test_card.rs` (target format)
-- `src/tabula_ids/src/card_lists.rs` (target format)
 - `src/tabula_ids/src/string_id.rs` (target format)
 
 **Validation:** Generated files match expected format, `just check` passes
