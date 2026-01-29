@@ -1,0 +1,20 @@
+[package]
+name = "tabula_data_v2"
+version = "0.0.0"
+edition = "2024"
+
+[lints]
+workspace = true
+
+[lib]
+test = false
+doctest = false
+bench = false
+
+[dependencies]
+core_data = { path = "../core_data" }
+
+serde = { workspace = true }
+thiserror = { workspace = true }
+toml = { workspace = true }
+uuid = { workspace = true }

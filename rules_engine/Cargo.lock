@@ -6168,6 +6168,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "tabula_data_v2"
+version = "0.0.0"
+dependencies = [
+ "core_data",
+ "serde",
+ "thiserror 2.0.12",
+ "toml",
+ "uuid",
+]
+
+[[package]]
 name = "tabula_ids"
 version = "0.0.0"
 dependencies = [
