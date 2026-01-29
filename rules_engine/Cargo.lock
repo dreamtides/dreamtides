@@ -6172,10 +6172,13 @@ name = "tabula_data_v2"
 version = "0.0.0"
 dependencies = [
  "core_data",
+ "fluent",
+ "fluent-bundle",
  "serde",
  "thiserror 2.0.12",
  "toml",
  "uuid",
+ "zip 4.6.1",
 ]
 
 [[package]]
