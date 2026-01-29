@@ -10,6 +10,7 @@ use zip::ZipArchive;
 
 use crate::card_definition_raw::CardDefinitionRaw;
 use crate::tabula_error::TabulaError;
+
 /// Wrapper for deserializing card arrays from TOML files using `[[cards]]`
 /// syntax.
 #[derive(Debug, Deserialize)]
@@ -17,6 +18,7 @@ pub struct CardsFile {
     /// The array of raw card definitions.
     pub cards: Vec<CardDefinitionRaw>,
 }
+
 /// Wrapper for deserializing test card arrays from TOML files using
 /// `[[test-cards]]` syntax.
 #[derive(Debug, Deserialize)]
@@ -25,6 +27,7 @@ pub struct TestCardsFile {
     /// The array of raw test card definitions.
     pub test_cards: Vec<CardDefinitionRaw>,
 }
+
 /// Wrapper for deserializing dreamwell card arrays from TOML files using
 /// `[[dreamwell]]` syntax.
 #[derive(Debug, Deserialize)]
@@ -32,6 +35,7 @@ pub struct DreamwellFile {
     /// The array of raw dreamwell card definitions.
     pub dreamwell: Vec<CardDefinitionRaw>,
 }
+
 /// Wrapper for deserializing test dreamwell card arrays from TOML files using
 /// `[[test-dreamwell]]` syntax.
 #[derive(Debug, Deserialize)]
@@ -40,6 +44,7 @@ pub struct TestDreamwellFile {
     /// The array of raw test dreamwell card definitions.
     pub test_dreamwell: Vec<CardDefinitionRaw>,
 }
+
 /// Raw representation of a card effect row from TOML.
 #[derive(Debug, Clone, Deserialize)]
 #[serde(rename_all = "kebab-case")]
@@ -67,6 +72,7 @@ pub struct CardEffectRowRaw {
     /// Sound for dissolve effects.
     pub dissolve_sound: Option<String>,
 }
+
 /// Wrapper for deserializing card effect arrays from TOML files using
 /// `[[card-fx]]` syntax.
 #[derive(Debug, Deserialize)]
@@ -75,6 +81,7 @@ pub struct CardEffectsFile {
     /// The array of card effect rows.
     pub card_fx: Vec<CardEffectRowRaw>,
 }
+
 /// Raw representation of a card list row from TOML.
 #[derive(Debug, Clone, Deserialize)]
 #[serde(rename_all = "kebab-case")]
@@ -88,6 +95,7 @@ pub struct CardListRowRaw {
     /// The number of copies of this card in the list.
     pub copies: i32,
 }
+
 /// Wrapper for deserializing card list arrays from TOML files using
 /// `[[card-lists]]` syntax.
 #[derive(Debug, Deserialize)]
@@ -96,6 +104,7 @@ pub struct CardListsFile {
     /// The array of card list rows.
     pub card_lists: Vec<CardListRowRaw>,
 }
+
 /// Loads and parses a TOML file from the filesystem into the specified type.
 ///
 /// On Android, this function automatically handles loading from APK assets
@@ -104,6 +113,7 @@ pub fn load_toml<T: DeserializeOwned>(path: &Path) -> Result<T, TabulaError> {
     let contents = read_file_contents(path)?;
     parse_toml(&contents, path)
 }
+
 /// Reads file contents as a string, handling Android APK paths.
 fn read_file_contents(path: &Path) -> Result<String, TabulaError> {
     let path_str = path.to_string_lossy();
@@ -113,6 +123,7 @@ fn read_file_contents(path: &Path) -> Result<String, TabulaError> {
         read_filesystem_file(path)
     }
 }
+
 /// Reads a file from the standard filesystem.
 fn read_filesystem_file(path: &Path) -> Result<String, TabulaError> {
     fs::read_to_string(path).map_err(|e| TabulaError::TomlParse {
@@ -121,6 +132,7 @@ fn read_filesystem_file(path: &Path) -> Result<String, TabulaError> {
         message: format!("Failed to read file: {e}"),
     })
 }
+
 /// Reads a file from an Android APK archive.
 ///
 /// Handles jar:file: URLs in the format:
@@ -167,6 +179,7 @@ fn read_android_asset(jar_url: &str, path: &Path) -> Result<String, TabulaError>
         message: format!("Invalid UTF-8 in file: {e}"),
     })
 }
+
 /// On non-Android platforms, jar:file: URLs are not supported.
 #[cfg(not(target_os = "android"))]
 fn read_android_asset(jar_url: &str, path: &Path) -> Result<String, TabulaError> {
@@ -176,6 +189,7 @@ fn read_android_asset(jar_url: &str, path: &Path) -> Result<String, TabulaError>
         message: format!("Android jar:file: URLs not supported on this platform: {jar_url}"),
     })
 }
+
 /// Parses a TOML string into the specified type.
 fn parse_toml<T: DeserializeOwned>(contents: &str, path: &Path) -> Result<T, TabulaError> {
     toml::from_str(contents).map_err(|e| {

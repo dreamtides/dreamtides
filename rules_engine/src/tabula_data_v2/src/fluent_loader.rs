@@ -1,7 +1,7 @@
 use std::fs;
 #[cfg(target_os = "android")]
 use std::io::Read;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use std::sync::Arc;
 
 use fluent::FluentBundle;
@@ -10,6 +10,7 @@ use fluent_bundle::{FluentArgs, FluentError, FluentResource};
 use zip::ZipArchive;
 
 use crate::tabula_error::TabulaError;
+
 /// Describes the context in which a string is used.
 ///
 /// Used to correctly determine formatting for colored elements and other
@@ -21,14 +22,19 @@ pub enum StringContext {
     /// String is used in card text (rules text, abilities, etc.).
     CardText,
 }
+
 /// A collection of localized strings loaded from Fluent FTL files.
 ///
 /// Wraps a `FluentBundle` and provides methods for formatting localized
 /// strings with variable substitution.
 #[derive(Debug)]
 pub struct FluentStrings {
+    /// The loaded Fluent resource.
     resource: Arc<FluentResource>,
+    /// The path this resource was loaded from, for error reporting.
+    source_path: PathBuf,
 }
+
 /// Loads Fluent strings from an FTL file at the specified path.
 ///
 /// On Android, this function automatically handles loading from APK assets
@@ -43,8 +49,9 @@ pub fn load(path: &Path) -> Result<FluentStrings, TabulaError> {
             message: format!("Failed to parse FTL file: {message}"),
         }
     })?;
-    Ok(FluentStrings { resource: Arc::new(resource) })
+    Ok(FluentStrings { resource: Arc::new(resource), source_path: path.to_path_buf() })
 }
+
 /// Reads file contents as a string, handling Android APK paths.
 fn read_file_contents(path: &Path) -> Result<String, TabulaError> {
     let path_str = path.to_string_lossy();
@@ -54,6 +61,7 @@ fn read_file_contents(path: &Path) -> Result<String, TabulaError> {
         read_filesystem_file(path)
     }
 }
+
 /// Reads a file from the standard filesystem.
 fn read_filesystem_file(path: &Path) -> Result<String, TabulaError> {
     fs::read_to_string(path).map_err(|e| TabulaError::FluentError {
@@ -62,6 +70,7 @@ fn read_filesystem_file(path: &Path) -> Result<String, TabulaError> {
         message: format!("Failed to read file: {e}"),
     })
 }
+
 /// Reads a file from an Android APK archive.
 ///
 /// Handles jar:file: URLs in the format:
@@ -108,6 +117,7 @@ fn read_android_asset(jar_url: &str, path: &Path) -> Result<String, TabulaError>
         message: format!("Invalid UTF-8 in file: {e}"),
     })
 }
+
 /// On non-Android platforms, jar:file: URLs are not supported.
 #[cfg(not(target_os = "android"))]
 fn read_android_asset(jar_url: &str, path: &Path) -> Result<String, TabulaError> {
@@ -117,6 +127,7 @@ fn read_android_asset(jar_url: &str, path: &Path) -> Result<String, TabulaError>
         message: format!("Android jar:file: URLs not supported on this platform: {jar_url}"),
     })
 }
+
 impl StringContext {
     /// Returns the Fluent variable key for this context.
     pub fn key(&self) -> &'static str {
@@ -126,6 +137,7 @@ impl StringContext {
         }
     }
 }
+
 impl FluentStrings {
     /// Formats a localized string with the given message ID and arguments.
     ///
@@ -136,7 +148,7 @@ impl FluentStrings {
         id: &str,
         context: StringContext,
         args: FluentArgs,
-    ) -> Result<String, String> {
+    ) -> Result<String, TabulaError> {
         self.format_with_resource(id, context, args, None)
     }
 
@@ -150,27 +162,51 @@ impl FluentStrings {
         context: StringContext,
         mut args: FluentArgs,
         additional_resource: Option<Arc<FluentResource>>,
-    ) -> Result<String, String> {
+    ) -> Result<String, TabulaError> {
         args.set("context", context.key());
         let mut bundle = FluentBundle::default();
         bundle.set_use_isolating(false);
         if bundle.add_resource(self.resource.clone()).is_err() {
-            return Err("ERR3: Add Resource Failed".to_string());
+            return Err(TabulaError::FluentError {
+                file: self.source_path.clone(),
+                message_id: id.to_string(),
+                message: "Failed to add resource to bundle".to_string(),
+            });
         }
         if let Some(additional) = additional_resource
             && bundle.add_resource(additional).is_err()
         {
-            return Err("ERR3: Add Resource Failed".to_string());
+            return Err(TabulaError::FluentError {
+                file: self.source_path.clone(),
+                message_id: id.to_string(),
+                message: "Failed to add additional resource to bundle".to_string(),
+            });
         }
         let Some(msg) = bundle.get_message(id) else {
-            return Err(format!("ERR4: Missing Message '{id}'"));
+            return Err(TabulaError::FluentError {
+                file: self.source_path.clone(),
+                message_id: id.to_string(),
+                message: format!("Message '{id}' not found"),
+            });
         };
         let Some(pattern) = msg.value() else {
-            return Err(format!("ERR5: Missing Value for '{id}'"));
+            return Err(TabulaError::FluentError {
+                file: self.source_path.clone(),
+                message_id: id.to_string(),
+                message: format!("Message '{id}' has no value"),
+            });
         };
         let mut errors = vec![];
         let out = bundle.format_pattern(pattern, Some(&args), &mut errors).into_owned();
-        if errors.is_empty() { Ok(out) } else { Err(format_error_details(&errors)) }
+        if errors.is_empty() {
+            Ok(out)
+        } else {
+            Err(TabulaError::FluentError {
+                file: self.source_path.clone(),
+                message_id: id.to_string(),
+                message: format_error_details(&errors),
+            })
+        }
     }
 
     /// Formats a string for display using Fluent placeable resolution.
@@ -182,32 +218,37 @@ impl FluentStrings {
         s: &str,
         context: StringContext,
         args: FluentArgs,
-    ) -> Result<String, String> {
+    ) -> Result<String, TabulaError> {
         if s.trim().is_empty() {
             return Ok(s.to_string());
         }
         let ftl = format!("tmp-for-display = {s}");
         let temp_res = FluentResource::try_new(ftl).map_err(|(_, errors)| {
             let message = errors.iter().map(ToString::to_string).collect::<Vec<_>>().join("; ");
-            format!("ERR7: Fluent Parser Error: {message}")
+            TabulaError::FluentError {
+                file: self.source_path.clone(),
+                message_id: "tmp-for-display".to_string(),
+                message: format!("Failed to parse display string: {message}"),
+            }
         })?;
         self.format_with_resource("tmp-for-display", context, args, Some(Arc::new(temp_res)))
     }
 }
+
 fn format_error_details(errors: &[FluentError]) -> String {
     let mut parts: Vec<String> = Vec::new();
     for e in errors {
         match e {
             FluentError::Overriding { kind, id } => {
-                parts.push(format!("ERR6: Fluent Formatting Error: Overriding {kind} id={id}"));
+                parts.push(format!("Overriding {kind} with id '{id}'"));
             }
             FluentError::ParserError(pe) => {
-                parts.push(format!("ERR7: Fluent Parser Error: {pe}"));
+                parts.push(format!("Parser error: {pe}"));
             }
             FluentError::ResolverError(re) => {
-                parts.push(format!("ERR8: Fluent Resolver Error: {re}"));
+                parts.push(format!("Resolver error: {re}"));
             }
         }
     }
-    if parts.is_empty() { "ERR6: Fluent Formatting Error".to_string() } else { parts.join(" | ") }
+    if parts.is_empty() { "Unknown formatting error".to_string() } else { parts.join("; ") }
 }
