@@ -2,7 +2,7 @@ use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicU8, Ordering};
 use std::sync::Mutex;
-use std::time::SystemTime;
+use std::time::{Duration, Instant, SystemTime};
 
 use serde::Serialize;
 use tauri::{AppHandle, Emitter, Manager};
@@ -63,11 +63,12 @@ pub struct SyncStateChangedPayload {
 
 struct FileSyncState {
     state: AtomicU8,
+    last_save_completed: Mutex<Option<Instant>>,
 }
 
 impl FileSyncState {
     fn new() -> Self {
-        Self { state: AtomicU8::new(STATE_IDLE) }
+        Self { state: AtomicU8::new(STATE_IDLE), last_save_completed: Mutex::new(None) }
     }
 
     fn get_state(&self) -> SyncState {
@@ -82,6 +83,16 @@ impl FileSyncState {
 
     fn force_state(&self, state: SyncState) {
         self.state.store(state.to_u8(), Ordering::SeqCst);
+    }
+
+    fn record_save_completion(&self) {
+        let mut last_save = self.last_save_completed.lock().unwrap_or_else(|e| e.into_inner());
+        *last_save = Some(Instant::now());
+    }
+
+    fn was_recently_saved(&self, window: Duration) -> bool {
+        let last_save = self.last_save_completed.lock().unwrap_or_else(|e| e.into_inner());
+        last_save.map(|t| t.elapsed() < window).unwrap_or(false)
     }
 }
 
@@ -119,6 +130,28 @@ pub fn is_busy(app_handle: &AppHandle, file_path: &str) -> bool {
     states
         .get(&path)
         .map(|s| matches!(s.get_state(), SyncState::Saving | SyncState::Loading))
+        .unwrap_or(false)
+}
+
+const RECENT_SAVE_WINDOW_MS: u64 = 600;
+
+/// Checks if a file was saved recently (within 600ms).
+///
+/// This is used to suppress file watcher events that are triggered by our own
+/// save operations. The file watcher uses a 500ms debounce, so events from our
+/// own saves typically arrive 500-600ms after the save completes. By tracking
+/// the save completion time, we can suppress these self-triggered events while
+/// still detecting genuine external changes that occur after the window.
+pub fn was_recently_saved(app_handle: &AppHandle, file_path: &str) -> bool {
+    let Some(state) = app_handle.try_state::<SyncStateMachineState>() else {
+        return false;
+    };
+
+    let path = PathBuf::from(file_path);
+    let states = state.file_states.lock().unwrap_or_else(|e| e.into_inner());
+    states
+        .get(&path)
+        .map(|s| s.was_recently_saved(Duration::from_millis(RECENT_SAVE_WINDOW_MS)))
         .unwrap_or(false)
 }
 
@@ -190,6 +223,9 @@ pub fn end_save(
         if let Some(file_state) = states.get(&path) {
             final_state = if success { SyncState::Idle } else { SyncState::Error };
             file_state.force_state(final_state);
+            if success {
+                file_state.record_save_completion();
+            }
         } else {
             final_state = SyncState::Idle;
         }

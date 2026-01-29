@@ -225,6 +225,7 @@ fn run_watcher(
             };
 
             let is_busy = state_machine::is_busy(&app_handle, &file_path);
+            let was_recently_saved = state_machine::was_recently_saved(&app_handle, &file_path);
             let event_timestamp_ms = std::time::SystemTime::now()
                 .duration_since(std::time::SystemTime::UNIX_EPOCH)
                 .map(|d| d.as_millis())
@@ -237,6 +238,17 @@ fn run_watcher(
                     event_type = %event_type,
                     event_timestamp_ms = %event_timestamp_ms,
                     "Ignoring file change event during active save/load"
+                );
+                continue;
+            }
+
+            if was_recently_saved {
+                tracing::info!(
+                    component = "tv.sync.watcher",
+                    file_path = %file_path,
+                    event_type = %event_type,
+                    event_timestamp_ms = %event_timestamp_ms,
+                    "Ignoring file change event within 600ms of save completion (self-modification)"
                 );
                 continue;
             }

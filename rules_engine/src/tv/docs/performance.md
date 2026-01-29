@@ -346,20 +346,32 @@ to mtime after save. Since our save updates the mtime, this always returned
 
 **Previous fix location:** `state_machine.rs:304-330` (code now removed)
 
-### P1: Suppress File Watcher During Save Window
+### P1: Suppress File Watcher During Save Window ✅ FIXED
 
-The file watcher detects our own modifications and triggers additional reload
-cycles.
+**Status:** Implemented on 2026-01-28
 
-**Problem:** The 500ms debounce means watcher events arrive after `is_busy()`
-returns false.
+**Solution:** Track "recently saved" timestamps per file (Option 2). When a save
+completes successfully, record the current `Instant` in the `FileSyncState`.
+The file watcher checks `was_recently_saved()` and suppresses events within
+600ms of save completion.
 
-**Fix options:**
-1. Extend busy window to 600ms after save
-2. Track "recently saved" timestamps per file
-3. Temporarily stop watcher during save
+**Why this is safe:**
+1. Uses timestamp-based suppression, not state-based - avoids state machine
+   complexity
+2. The 600ms window is minimal - just enough to cover the 500ms debounce plus
+   a small buffer
+3. Genuine external changes that occur after the 600ms window are still detected
+4. The frontend still has its own 1500ms self-save suppression as a backup
 
-**Fix location:** `file_watcher.rs:227-235`
+**Changes made:**
+- Added `last_save_completed: Mutex<Option<Instant>>` to `FileSyncState` struct
+- Added `record_save_completion()` method, called in `end_save()` on success
+- Added `was_recently_saved(window: Duration)` method to check recency
+- Added `was_recently_saved()` public function in `state_machine.rs`
+- Modified `file_watcher.rs` to check `was_recently_saved()` in addition to
+  `is_busy()`, suppressing events within the 600ms window
+
+**Fix location:** `state_machine.rs:64-96,136-156` and `file_watcher.rs:228,245-254`
 
 ### P2: Cache getDerivedColumnsConfig Results
 
@@ -603,8 +615,8 @@ After implementing fixes, verify improvement by checking:
 # To verify: there should be no sync-conflict-detected events during normal saves
 grep "sync-conflict-detected" ~/Library/Application\ Support/tv/logs/tv_*.jsonl | tail -20
 
-# Check file watcher events (should not fire immediately after saves, still P1)
-grep "File watcher event" ~/Library/Application\ Support/tv/logs/tv_*.jsonl | tail -20
+# P1 FIXED: Check file watcher suppression logs (should show "Ignoring...self-modification")
+grep "self-modification" ~/Library/Application\ Support/tv/logs/tv_*.jsonl | tail -20
 
 # Check backend timing (should remain fast)
 grep "get_derived_columns_config completed" ~/Library/Application\ Support/tv/logs/tv_*.jsonl | tail -20
@@ -618,13 +630,13 @@ grep "saveData total" ~/Library/Application\ Support/tv/logs/tv_perf_*.jsonl | t
 
 ### Target Metrics After Fixes
 
-| Metric | Before P0 Fix | After P0 Fix | Target |
-|--------|---------------|--------------|--------|
+| Metric | Before Fixes | After P0+P1 Fixes | Target |
+|--------|--------------|-------------------|--------|
 | `external_change_detected` | Always `true` | N/A (removed) | ✅ Fixed |
 | Conflict-triggered reloads | 1 per save | 0 | ✅ Fixed |
-| File watcher events after save | 2 events at +500ms | 2 events (suppressed by frontend) | P1 |
+| File watcher events after save | 2 events emitted | 0 events emitted (suppressed by 600ms window) | ✅ Fixed |
 | `get_derived_columns_config` calls per save | 2 | 1 | P2: 0 (use cache) |
-| `saveData total` (frontend) | 700-1700ms | Expected <200ms | Verify after P0 |
+| `saveData total` (frontend) | 700-1700ms | Expected <200ms | Verify after fixes |
 | Backend `File saved` | 47ms | 47ms | Already fast |
 
 ## Appendix: Log Inspection Commands
@@ -684,7 +696,7 @@ A single cell edit produced this problematic log trace:
              event_timestamp_ms=1769640991210  ← Still fires (P1), but frontend suppresses
 ```
 
-### After P0 Fix
+### After P0+P1 Fixes
 
 Expected log trace for a single cell edit:
 
@@ -706,6 +718,7 @@ Expected log trace for a single cell edit:
 14:56:30.803 [tv.commands.derived] get_derived_columns_config completed
              parse=25ms, total=25ms
 
-14:56:31.210 [tv.sync.watcher] File watcher event will be emitted
-             (Frontend suppresses via lastSaveTimeRef - within 1500ms window)
+14:56:31.210 [tv.sync.watcher] Ignoring file change event within 600ms of save
+             completion (self-modification)
+             (Backend suppresses via was_recently_saved() - P1 fix)
 ```
