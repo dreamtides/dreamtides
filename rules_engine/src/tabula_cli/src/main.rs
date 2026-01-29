@@ -7,7 +7,7 @@ use tabula_cli::commands::git_setup::Hook;
 use tabula_cli::commands::rebuild_images::rebuild;
 use tabula_cli::commands::validate::runner;
 use tabula_cli::commands::{
-    build_toml, build_xls, git_setup, repair, server, server_install, strip_images,
+    build_toml, build_xls, generate, git_setup, repair, server, server_install, strip_images,
 };
 
 #[derive(Parser)]
@@ -90,6 +90,12 @@ enum Commands {
         auto: bool,
     },
 
+    #[command(about = "Generate Rust code from TOML/FTL source files")]
+    Generate {
+        #[arg(help = "Output directory for generated files (default: src/tabula_generated/src/)")]
+        output_dir: Option<PathBuf>,
+    },
+
     #[command(about = "Configure Git for the tabula workflow")]
     GitSetup,
 
@@ -157,6 +163,7 @@ fn run() -> Result<()> {
         Commands::RebuildImages { xlsm_path, from_urls, auto } => {
             rebuild::rebuild_images(xlsm_path, from_urls, auto)?;
         }
+        Commands::Generate { output_dir } => generate::generate(output_dir)?,
         Commands::GitSetup => git_setup::git_setup()?,
         Commands::ServerInstall => server_install::server_install()?,
         Commands::Server { host, port, max_payload_bytes, once } => {

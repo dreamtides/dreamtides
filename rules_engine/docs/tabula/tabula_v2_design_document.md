@@ -351,9 +351,20 @@ Migration happens in two phases: **Preparation** and **Cutover**.
 ## Implementation Plan
 
 This section breaks the migration into discrete tasks sized for a single AI agent
-context window. Each task leaves the codebase in a working state with passing tests.
+context window.
+
+**Important:** This migration has three waves:
+- **Wave 1 (Preparation):** Tasks 1-7 build `tabula_data_v2` in isolation and create
+  the display helper module. Each task should leave `just check` passing.
+- **Wave 2 (Migration):** Tasks 8-15 migrate dependent crates in dependency order.
+  **Code will NOT compile until Task 15 is complete.** Do not run `just check` during
+  these tasks.
+- **Wave 3 (Test Fixes):** Tasks 16-20 fix test failures after the migration compiles.
+  **Tests will NOT pass until Task 20 is complete.**
 
 ---
+
+## Wave 1: Preparation (Build tabula_data_v2)
 
 ### Task 1: Create tabula_data_v2 Crate Skeleton
 
@@ -395,7 +406,7 @@ Add file loading utilities for TOML card files and Fluent strings.
 - `src/state_provider/src/state_provider.rs:213-276` (Android loading pattern)
 - `client/Assets/StreamingAssets/Tabula/strings.ftl` (Fluent format reference)
 
-**Validation:** Unit tests for loading test TOML files pass
+**Validation:** `just check` passes, unit tests for loading test TOML files pass
 
 ---
 
@@ -423,7 +434,7 @@ Create the final `CardDefinition` and `DreamwellCardDefinition` types with build
 - `src/tabula_data/src/card_definitions/card_definition_builder.rs:20-253` (existing builder)
 - `src/ability_data/src/ability.rs:13-42` (Ability enum definition)
 
-**Validation:** Unit tests for building cards from raw data pass
+**Validation:** `just check` passes, unit tests for building cards from raw data pass
 
 ---
 
@@ -445,7 +456,7 @@ Port the effect and list row types, removing `TabulaValue` wrapper.
 - `client/Assets/StreamingAssets/Tabula/card-fx.toml` (effect format)
 - `client/Assets/StreamingAssets/Tabula/card-lists.toml` (list format)
 
-**Validation:** Unit tests for deserializing effect and list TOML pass
+**Validation:** `just check` passes, unit tests for deserializing effect and list TOML pass
 
 ---
 
@@ -466,7 +477,7 @@ Create the main `Tabula` struct that orchestrates loading from all sources.
 - `src/tabula_data/src/tabula.rs:30-81` (existing Tabula struct and build)
 - `client/Assets/StreamingAssets/Tabula/parsed_abilities.json` (ability cache)
 
-**Validation:** Integration test that loads full test Tabula passes
+**Validation:** `just check` passes, integration test that loads full test Tabula passes
 
 ---
 
@@ -486,14 +497,15 @@ Extend the existing `tabula_cli` with a `generate` command for code generation.
 - `src/tabula_ids/src/test_card.rs` (target format)
 - `src/tabula_ids/src/string_id.rs` (target format)
 
-**Validation:** Generated files match expected format, `just check` passes
+**Validation:** `just check` passes, generated files match expected format
 
 ---
 
 ### Task 7: Create Display Text Helper Module
 
 Create a helper module in `display` crate for rendering abilities on-demand using
-`parser_v2` serializers. This prepares for the DisplayedAbility removal.
+`parser_v2` serializers. This prepares for the `DisplayedAbility` removal by providing
+the new rendering infrastructure while code still compiles.
 
 **Deliverables:**
 - Create `src/display/src/rendering/ability_text.rs`:
@@ -502,6 +514,7 @@ Create a helper module in `display` crate for rendering abilities on-demand usin
   - `render_modal_choices(abilities: &[Ability]) -> Vec<String>`
   - Helper functions matching current `DisplayedAbility` usage patterns
 - Add module to `src/display/src/rendering/mod.rs`
+- Write unit tests for the new helper functions
 
 **Key Files for Context:**
 - `src/display/src/rendering/card_rendering.rs:187-214` (`get_displayed_text` function)
@@ -510,13 +523,129 @@ Create a helper module in `display` crate for rendering abilities on-demand usin
 - `src/parser_v2/src/serializer/ability_serializer.rs:17-91` (serializer API)
 - `src/parser_v2/src/serializer/effect_serializer.rs:798-978` (effect serializer)
 
-**Validation:** New helper module compiles, unit tests pass
+**Validation:** `just check` passes, new helper module compiles, unit tests pass
 
 ---
 
-### Task 8: Migrate display Crate to V2
+## Wave 2: Migration (Switch Dependent Crates to V2)
 
-Replace all `DisplayedAbility` usage in display crate with on-demand serialization.
+**IMPORTANT:** During Wave 2, code will NOT compile. Do not run `just check` or
+expect compilation to succeed until Task 15 is complete. Each task changes imports
+that create cascading type mismatches until all crates are migrated.
+
+---
+
+### Task 8: Migrate quest_state and state_provider (Layer 2)
+
+These crates depend only on `tabula_data` with no game logic dependencies.
+
+**Note:** Tasks 8-14 must be completed together. Code will not compile until Task 15.
+
+**Deliverables:**
+- Update `quest_state`:
+  - `deck.rs`: Change `CardDefinition` and `Tabula` imports to `tabula_data_v2`
+  - Update `Cargo.toml` to depend on `tabula_data_v2` instead of `tabula_data`
+- Update `state_provider`:
+  - `state_provider.rs`: Change `Tabula`, `LocalizedStrings` imports to `tabula_data_v2`
+  - `test_state_provider.rs`: Change imports, use `TabulaSource::Test`
+  - `display_state_provider.rs`: Change imports if needed
+  - Update `Cargo.toml` to depend on `tabula_data_v2` instead of `tabula_data`
+  - Remove `tabula.json` loading code, load from TOML files directly
+
+**Key Files for Context:**
+- `src/quest_state/src/quest/deck.rs:3-4,29-36` (deck building)
+- `src/state_provider/src/state_provider.rs:213-266` (Tabula loading)
+- `src/state_provider/src/test_state_provider.rs:63-105` (test loading)
+
+**Validation:** None - code will not compile until Wave 2 is complete
+
+---
+
+### Task 9: Migrate battle_state (Layer 3)
+
+Core battle state depends on `quest_state` and `tabula_data`.
+
+**Deliverables:**
+- Update `battle_state`:
+  - `battle_card_definitions.rs`: Change `CardDefinition` import to `tabula_data_v2`
+  - `dreamwell_data.rs`: Change `DreamwellCardDefinition` import to `tabula_data_v2`
+  - `battle_state.rs`: Change `Tabula` import to `tabula_data_v2`
+  - Update any other files with `tabula_data` imports
+  - Update `Cargo.toml` to depend on `tabula_data_v2` instead of `tabula_data`
+  - Remove any `is_test_card` access
+
+**Key Files for Context:**
+- `src/battle_state/src/battle/battle_card_definitions.rs:8` (CardDefinition import)
+- `src/battle_state/src/battle_cards/dreamwell_data.rs:8-9` (imports)
+- `src/battle_state/src/battle/battle_state.rs` (Tabula usage)
+
+**Validation:** None - code will not compile until Wave 2 is complete
+
+---
+
+### Task 10: Migrate battle_queries (Layer 4)
+
+Battle queries depend on `battle_state`.
+
+**Deliverables:**
+- Update `battle_queries`:
+  - `card_abilities.rs`: Change `CardDefinition` import to `tabula_data_v2`
+  - `build_named_abilities.rs`: Change import to `tabula_data_v2`
+  - `card.rs`: Change import to `tabula_data_v2`
+  - Update any other files with `tabula_data` imports
+  - Update `Cargo.toml` to depend on `tabula_data_v2` instead of `tabula_data`
+
+**Key Files for Context:**
+- `src/battle_queries/src/battle_card_queries/card_abilities.rs:13,32-40` (ability building)
+- `src/battle_queries/src/battle_card_queries/card.rs` (card queries)
+- `src/battle_queries/src/battle_card_queries/build_named_abilities.rs` (named abilities)
+
+**Validation:** None - code will not compile until Wave 2 is complete
+
+---
+
+### Task 11: Migrate battle_mutations (Layer 5)
+
+Battle mutations depend on `battle_queries` and `battle_state`.
+
+**Deliverables:**
+- Update `battle_mutations`:
+  - `battle_deck.rs`: Change `CardDefinition` import to `tabula_data_v2`
+  - `apply_debug_battle_action.rs`: Change `tabula.cards` access pattern
+  - Update any other files with `tabula_data` imports
+  - Update `Cargo.toml` to depend on `tabula_data_v2` instead of `tabula_data`
+
+**Key Files for Context:**
+- `src/battle_mutations/src/card_mutations/battle_deck.rs:21,101-109` (CardDefinition)
+- `src/battle_mutations/src/apply_debug_battle_action.rs` (debug actions)
+
+**Validation:** None - code will not compile until Wave 2 is complete
+
+---
+
+### Task 12: Migrate game_creation (Layer 6)
+
+Game creation depends on all battle crates.
+
+**Deliverables:**
+- Update `game_creation`:
+  - `new_battle.rs`: Change `Tabula` import to `tabula_data_v2`
+  - `new_test_battle.rs`: Change `Tabula` import to `tabula_data_v2`, use `TabulaSource::Test`
+  - Update any other files with `tabula_data` imports
+  - Update `Cargo.toml` to depend on `tabula_data_v2` instead of `tabula_data`
+
+**Key Files for Context:**
+- `src/game_creation/src/new_battle.rs` (battle creation)
+- `src/game_creation/src/new_test_battle.rs:33-70` (test battle creation)
+
+**Validation:** None - code will not compile until Wave 2 is complete
+
+---
+
+### Task 13: Migrate display (Layer 7)
+
+Display crate depends on all battle layers and state_provider. Uses the
+`ability_text` helper module created in Task 7.
 
 **Deliverables:**
 - Update `card_rendering.rs`:
@@ -531,141 +660,235 @@ Replace all `DisplayedAbility` usage in display crate with on-demand serializati
   - Replace `displayed_abilities` access
 - Update `ability_help_text.rs`:
   - Use `displayed_rules_text` field or serialize from abilities
-- Update imports from `tabula_data` to `tabula_data_v2`
+- Update all imports from `tabula_data` to `tabula_data_v2`
+- Update `Cargo.toml` to depend on `tabula_data_v2` instead of `tabula_data`
 
 **Key Files for Context:**
-- `src/display/src/rendering/card_rendering.rs:88-148` (DisplayedAbility usage)
+- `src/display/src/rendering/card_rendering.rs:88-148,187-214,515-538` (DisplayedAbility usage)
 - `src/display/src/rendering/dreamwell_card_rendering.rs:81` (dreamwell display)
 - `src/display/src/rendering/modal_effect_prompt_rendering.rs:61-139` (modal handling)
-- `src/ability_data/src/ability.rs:46-72` (DisplayedAbility definition to remove)
+- `src/parser_v2/src/serializer/ability_serializer.rs:17-91` (serializer API)
 
-**Validation:** Display crate compiles with V2, visual rendering tests pass
-
----
-
-### Task 9: Migrate battle_state and battle_queries Crates
-
-Update the core battle state crates to use tabula_data_v2.
-
-**Deliverables:**
-- Update `battle_state`:
-  - `battle_card_definitions.rs`: Change `CardDefinition` import
-  - `dreamwell_data.rs`: Change `DreamwellCardDefinition` import
-  - `battle_state.rs`: Change `Tabula` import
-  - Remove any `is_test_card` access (none found in exploration)
-- Update `battle_queries`:
-  - `card_abilities.rs`: Change `CardDefinition` import
-  - `build_named_abilities.rs`: Change import
-  - `card.rs`: Change import
-  - Verify `definition.abilities` access still works (it should)
-
-**Key Files for Context:**
-- `src/battle_state/src/battle/battle_card_definitions.rs:8` (CardDefinition import)
-- `src/battle_state/src/battle_cards/dreamwell_data.rs:8-9` (imports)
-- `src/battle_queries/src/battle_card_queries/card_abilities.rs:13,32-40` (ability building)
-
-**Validation:** `just check` passes, battle state tests pass
+**Validation:** None - code will not compile until Wave 2 is complete
 
 ---
 
-### Task 10: Migrate battle_mutations, game_creation, quest_state Crates
+### Task 14: Migrate rules_engine and ai_matchup (Layer 8)
 
-Update the remaining game logic crates to use tabula_data_v2.
-
-**Deliverables:**
-- Update `battle_mutations`:
-  - `battle_deck.rs`: Change `CardDefinition` import
-  - `apply_debug_battle_action.rs`: Change `tabula.cards` access pattern
-- Update `game_creation`:
-  - `new_battle.rs`: Change `Tabula` import
-  - `new_test_battle.rs`: Change `Tabula` import, use `TabulaSource::Test`
-- Update `quest_state`:
-  - `deck.rs`: Change `CardDefinition` and `Tabula` imports
-  - Verify `tabula.cards.get()` access still works
-
-**Key Files for Context:**
-- `src/battle_mutations/src/card_mutations/battle_deck.rs:21,101-109` (CardDefinition)
-- `src/game_creation/src/new_test_battle.rs:33-70` (Tabula usage)
-- `src/quest_state/src/quest/deck.rs:3-4,29-36` (deck building)
-
-**Validation:** `just check` passes, game creation tests pass
-
----
-
-### Task 11: Migrate rules_engine, ai_matchup, state_provider
-
-Update the top-level crates and state management to use tabula_data_v2.
+Top-level crates that depend on everything else.
 
 **Deliverables:**
 - Update `rules_engine`:
-  - `engine.rs`: Change any Tabula-related imports
-  - `deserialize_save_file.rs`: Verify save file compatibility
+  - `engine.rs`: Change any Tabula-related imports to `tabula_data_v2`
+  - `deserialize_save_file.rs`: Change imports, verify save file compatibility
+  - Update any other files with `tabula_data` imports
+  - Update `Cargo.toml` to depend on `tabula_data_v2` instead of `tabula_data`
 - Update `ai_matchup`:
-  - `run_matchup.rs`: Use `TabulaSource::Test` for test matchups
-- Update `state_provider`:
-  - `state_provider.rs`: Load V2 Tabula from TOML files (not tabula.json)
-  - `test_state_provider.rs`: Use `TabulaSource::Test`
-  - Remove `tabula.json` loading code
+  - `run_matchup.rs`: Change imports to `tabula_data_v2`, use `TabulaSource::Test`
+  - Update `Cargo.toml` to depend on `tabula_data_v2` instead of `tabula_data`
 
 **Key Files for Context:**
 - `src/rules_engine/src/deserialize_save_file.rs:31-39` (save file loading)
 - `src/ai_matchup/src/run_matchup.rs:149-159` (matchup creation)
-- `src/state_provider/src/state_provider.rs:213-266` (Tabula loading)
-- `src/state_provider/src/test_state_provider.rs:63-105` (test loading)
 
-**Validation:** Full test suite passes (`just test`), AI matchups work
+**Validation:** None - code will not compile until Wave 2 is complete
 
 ---
 
-### Task 12: Cleanup - Remove V1 Artifacts
+### Task 15: Cleanup - Remove V1 and Rename V2
 
-Remove all deprecated code and rename V2 to final names.
+Remove `tabula_data` crate and rename `tabula_data_v2` to `tabula_data`.
 
 **Deliverables:**
 - Delete `src/tabula_data/` crate entirely
 - Delete `src/old_tabula_cli/` crate entirely
 - Delete `client/Assets/StreamingAssets/tabula.json`
-- Rename `tabula_data_v2` → `tabula_data` (update all Cargo.toml paths)
+- Rename `tabula_data_v2` → `tabula_data`:
+  - Rename directory `src/tabula_data_v2/` to `src/tabula_data/`
+  - Update `Cargo.toml` name from `tabula_data_v2` to `tabula_data`
+  - Update all dependent crate `Cargo.toml` paths
+  - Update all `use tabula_data_v2::` to `use tabula_data::`
 - Rename `tabula_ids` → `tabula_generated` (optional, per design doc)
 - Remove `DisplayedAbility` enum from `ability_data` crate
-- Update workspace Cargo.toml to remove old crates
+- Update workspace `Cargo.toml` to remove old crates
 
 **Key Files for Context:**
 - `rules_engine/Cargo.toml` (workspace members)
 - `src/ability_data/src/ability.rs:46-72` (DisplayedAbility to delete)
 
-**Validation:** Full test suite passes, `just review` passes
+**Validation:** `just check` passes - code now compiles. Tests may still fail.
+
+---
+
+## Wave 3: Fix Test Failures
+
+**IMPORTANT:** During Wave 3, tests will NOT pass until Task 19 is complete. Each task
+fixes a subset of test failures. Run the specific tests mentioned in each task to
+verify progress.
+
+---
+
+### Task 16: Fix tabula_data_v2 Tests
+
+Fix any test failures in the tabula loading and builder tests.
+
+**Test Files:**
+- `tests/tabula_data_v2_tests/tests/tabula_loading_tests.rs`
+  - `load_production_source_succeeds`
+  - `load_test_source_succeeds`
+  - `load_fails_on_missing_strings_file`
+  - `load_fails_on_missing_abilities_file`
+  - `load_fails_on_invalid_card`
+  - `load_lenient_succeeds_with_invalid_card`
+- `tests/tabula_data_v2_tests/tests/builder_tests.rs`
+  - `build_card_character_succeeds`
+  - `build_card_event_succeeds`
+  - `build_card_variable_energy_cost`
+  - `build_card_with_abilities`
+  - `build_dreamwell_succeeds`
+- `tests/tabula_data_v2_tests/tests/card_effect_row_tests.rs`
+- `tests/tabula_data_v2_tests/tests/card_list_row_tests.rs`
+
+**Run:** `just battle-test tabula_loading` and `just battle-test builder_tests`
+
+**Validation:** All tabula_data_v2 tests pass
+
+---
+
+### Task 17: Fix battle_tests Basic Tests
+
+Fix test failures in basic battle mechanics tests.
+
+**Test Files:**
+- `tests/battle_tests/basic_tests/basic_battle_actions_tests.rs`
+- `tests/battle_tests/basic_tests/turn_sequence_tests.rs`
+- `tests/battle_tests/basic_tests/dreamwell_tests.rs`
+- `tests/battle_tests/basic_tests/battle_limits_tests.rs`
+- `tests/battle_tests/basic_tests/stack_interaction_tests.rs`
+- `tests/battle_tests/basic_tests/undo_tests.rs`
+- `tests/battle_tests/basic_tests/test_helpers.rs`
+
+**Run:** `just battle-test basic_battle_actions` and similar for each file
+
+**Validation:** All basic battle tests pass
+
+---
+
+### Task 18: Fix battle_tests Effect Tests
+
+Fix test failures in card effect tests.
+
+**Test Files:**
+- `tests/battle_tests/effect_tests/draw_card_effect_tests.rs`
+- `tests/battle_tests/effect_tests/dissolve_effect_tests.rs`
+- `tests/battle_tests/effect_tests/gain_energy_effect_tests.rs`
+- `tests/battle_tests/effect_tests/gain_points_effect_tests.rs`
+- `tests/battle_tests/effect_tests/discard_cards_tests.rs`
+- `tests/battle_tests/effect_tests/foresee_tests.rs`
+- `tests/battle_tests/effect_tests/counterspell_tests.rs`
+- `tests/battle_tests/effect_tests/return_to_hand_effect_tests.rs`
+- `tests/battle_tests/effect_tests/return_from_void_to_hand_tests.rs`
+- `tests/battle_tests/effect_tests/return_up_to_count_void_to_hand_tests.rs`
+- `tests/battle_tests/effect_tests/put_cards_from_deck_into_void_tests.rs`
+- `tests/battle_tests/effect_tests/prevent_dissolve_this_turn_tests.rs`
+
+**Run:** `just battle-test draw_card_effect` and similar for each file
+
+**Validation:** All effect tests pass
+
+---
+
+### Task 19: Fix battle_tests Ability and Property Tests
+
+Fix test failures in ability-related tests and property tests.
+
+**Test Files:**
+- `tests/battle_tests/basic_tests/activated_ability_tests.rs`
+- `tests/battle_tests/basic_tests/triggered_ability_tests.rs`
+- `tests/battle_tests/basic_tests/modal_effect_tests.rs`
+- `tests/battle_tests/basic_tests/persistent_card_effect_tests.rs`
+- `tests/battle_tests/static_ability_tests/reclaim_tests.rs`
+- `tests/battle_tests/property_tests/battle_determinism_tests.rs`
+- `tests/battle_tests/basic_tests/basic_uct_search_tests.rs`
+- `tests/battle_tests/basic_tests/outcome_simulation_tests.rs`
+
+**Run:** `just battle-test activated_ability` and similar for each file
+
+**Validation:** All ability and property tests pass
+
+---
+
+### Task 20: Fix Display and Integration Tests
+
+Fix test failures in display, messaging, and integration tests.
+
+**Test Files:**
+- `tests/battle_tests/basic_tests/battle_display_action_tests.rs`
+- `tests/battle_tests/basic_tests/prompt_message_tests.rs`
+- `tests/battle_tests/basic_tests/enemy_message_tests.rs`
+- `tests/battle_tests/basic_tests/duplicate_action_prevention_tests.rs`
+- Any remaining test failures from `tests/tabula_cli_tests/`
+- Any remaining test failures from `tests/parser_v2_tests/`
+
+**Run:** `just test` to run all tests
+
+**Validation:** `just review` passes - all tests pass, code compiles, lints clean
 
 ---
 
 ## Task Dependencies
 
 ```
-Task 1 (crate skeleton)
-    ↓
-Task 2 (TOML/Fluent loading)
-    ↓
-Task 3 (card definition types)
-    ↓
-Task 4 (effect/list rows)
-    ↓
-Task 5 (Tabula struct)
-    ↓
-Task 6 (code generation) ──────────────────────────┐
-    ↓                                              │
-Task 7 (display helper module)                     │
-    ↓                                              │
-Task 8 (migrate display) ←─────────────────────────┤
-    ↓                                              │
-Task 9 (migrate battle_state/queries) ←────────────┤
-    ↓                                              │
-Task 10 (migrate mutations/creation/quest) ←───────┤
-    ↓                                              │
-Task 11 (migrate engine/matchup/provider) ←────────┘
-    ↓
-Task 12 (cleanup)
+Wave 1: Preparation (code compiles after each task)
+┌─────────────────────────────────────────────────────┐
+│ Task 1 (crate skeleton)                             │
+│     ↓                                               │
+│ Task 2 (TOML/Fluent loading)                        │
+│     ↓                                               │
+│ Task 3 (card definition types)                      │
+│     ↓                                               │
+│ Task 4 (effect/list rows)                           │
+│     ↓                                               │
+│ Task 5 (Tabula struct)                              │
+│     ↓                                               │
+│ Task 6 (code generation)                            │
+│     ↓                                               │
+│ Task 7 (display helper module)                      │
+└─────────────────────────────────────────────────────┘
+                        ↓
+Wave 2: Migration (code does NOT compile until Task 15)
+┌─────────────────────────────────────────────────────┐
+│ Task 8 (quest_state, state_provider - layer 2)      │
+│     ↓                                               │
+│ Task 9 (battle_state - layer 3)                     │
+│     ↓                                               │
+│ Task 10 (battle_queries - layer 4)                  │
+│     ↓                                               │
+│ Task 11 (battle_mutations - layer 5)                │
+│     ↓                                               │
+│ Task 12 (game_creation - layer 6)                   │
+│     ↓                                               │
+│ Task 13 (display - layer 7)                         │
+│     ↓                                               │
+│ Task 14 (rules_engine, ai_matchup - layer 8)        │
+│     ↓                                               │
+│ Task 15 (cleanup, rename v2 → v1)                   │
+└─────────────────────────────────────────────────────┘
+                        ↓
+              `just check` now passes
+                        ↓
+Wave 3: Test Fixes (tests do NOT pass until Task 20)
+┌─────────────────────────────────────────────────────┐
+│ Task 16 (tabula_data tests)                         │
+│     ↓                                               │
+│ Task 17 (basic battle tests)                        │
+│     ↓                                               │
+│ Task 18 (effect tests)                              │
+│     ↓                                               │
+│ Task 19 (ability/property tests)                    │
+│     ↓                                               │
+│ Task 20 (display/integration tests)                 │
+└─────────────────────────────────────────────────────┘
+                        ↓
+              `just review` now passes
 ```
-
-Tasks 1-6 can proceed sequentially as preparation work.
-Tasks 7-11 form the single-pass cutover and should be completed together.
-Task 12 is the final cleanup after all tests pass

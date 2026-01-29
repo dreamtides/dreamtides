@@ -6126,6 +6126,7 @@ dependencies = [
  "serde",
  "serde_json",
  "sha2",
+ "tabula_data_v2",
  "tempfile",
  "tokio",
  "toml",
@@ -6194,6 +6195,14 @@ dependencies = [
  "tabula_data_v2",
  "tempfile",
  "toml",
+ "uuid",
+]
+
+[[package]]
+name = "tabula_generated"
+version = "0.0.0"
+dependencies = [
+ "core_data",
  "uuid",
 ]
 
