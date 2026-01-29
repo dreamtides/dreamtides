@@ -4,20 +4,24 @@ use anyhow::Result;
 
 use crate::server::model::{Change, ChangedRange};
 use crate::server::server_workbook_snapshot::WorkbookSnapshot;
+
 pub trait Listener: Send + Sync {
     fn name(&self) -> &str;
     fn run(&self, snapshot: &WorkbookSnapshot, context: &ListenerContext)
     -> Result<ListenerResult>;
 }
+
 pub struct ListenerContext {
     pub request_id: String,
     pub workbook_path: String,
     pub changed_range: Option<ChangedRange>,
 }
+
 pub struct ListenerResult {
     pub changes: Vec<Change>,
     pub warnings: Vec<String>,
 }
+
 pub fn run_listeners(
     listeners: &[Box<dyn Listener>],
     snapshot: &WorkbookSnapshot,
@@ -40,6 +44,7 @@ pub fn run_listeners(
     all_warnings.extend(conflict_warnings);
     ListenerResult { changes: resolved_changes, warnings: all_warnings }
 }
+
 fn resolve_conflicts(changes: &[Change]) -> (Vec<Change>, Vec<String>) {
     let mut value_changes = BTreeMap::new();
     let mut formatting_changes: Vec<Change> = Vec::new();

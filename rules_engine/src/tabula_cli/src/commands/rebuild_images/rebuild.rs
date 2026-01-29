@@ -11,6 +11,7 @@ use zip::{CompressionMethod, ZipArchive, ZipWriter};
 use crate::commands::rebuild_images::url::UrlDownloader;
 use crate::commands::rebuild_images::{cache, url};
 use crate::core::paths;
+
 pub fn rebuild_images(xlsm_path: Option<PathBuf>, from_urls: bool, auto: bool) -> Result<()> {
     let source = resolve_xlsm_path(xlsm_path)?;
     if from_urls && auto {
@@ -31,6 +32,7 @@ pub fn rebuild_images(xlsm_path: Option<PathBuf>, from_urls: bool, auto: bool) -
         cache::rebuild_from_cache(&source)
     }
 }
+
 pub fn rebuild_images_from_urls_with_downloader(
     xlsm_path: Option<PathBuf>,
     downloader: &UrlDownloader,
@@ -38,18 +40,21 @@ pub fn rebuild_images_from_urls_with_downloader(
     let source = resolve_xlsm_path(xlsm_path)?;
     url::rebuild_from_urls_with_downloader(&source, downloader)
 }
+
 #[derive(Clone)]
 pub(super) struct FileRecord {
     pub name: String,
     pub data: Vec<u8>,
     pub compression: CompressionMethod,
 }
+
 pub(super) fn resolve_xlsm_path(xlsm_path: Option<PathBuf>) -> Result<PathBuf> {
     match xlsm_path {
         Some(path) => Ok(path),
         None => paths::default_xlsm_path(),
     }
 }
+
 pub(super) fn read_zip(path: &Path) -> Result<(Vec<FileRecord>, Vec<String>)> {
     let file = fs::File::open(path)
         .with_context(|| format!("Cannot open spreadsheet at {}", path.display()))?;
@@ -81,6 +86,7 @@ pub(super) fn read_zip(path: &Path) -> Result<(Vec<FileRecord>, Vec<String>)> {
     }
     Ok((records, file_order))
 }
+
 pub(super) fn write_zip(
     path: &Path,
     records: Vec<FileRecord>,
@@ -113,6 +119,7 @@ pub(super) fn write_zip(
     temp.persist(path)?;
     Ok(())
 }
+
 fn start_entry(
     writer: &mut ZipWriter<std::fs::File>,
     name: &str,
@@ -125,6 +132,7 @@ fn start_entry(
     writer.start_file(name, options)?;
     Ok(())
 }
+
 fn start_dir(writer: &mut ZipWriter<std::fs::File>, name: &str) -> Result<()> {
     let time =
         zip::DateTime::from_date_and_time(1980, 1, 1, 0, 0, 0).context("Invalid ZIP timestamp")?;

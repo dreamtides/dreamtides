@@ -4,6 +4,7 @@ use ability_data::variable_value::VariableValue;
 use crate::serializer::predicate_serializer;
 use crate::variables::parser_bindings::VariableBindings;
 use crate::variables::parser_substitutions;
+
 pub fn serialize_trigger_event(trigger: &TriggerEvent, bindings: &mut VariableBindings) -> String {
     match trigger {
         TriggerEvent::Keywords(keywords) if keywords.len() == 1 => {
@@ -132,6 +133,7 @@ pub fn serialize_trigger_event(trigger: &TriggerEvent, bindings: &mut VariableBi
         }
     }
 }
+
 pub fn serialize_keyword(keyword: &TriggerKeyword) -> String {
     match keyword {
         TriggerKeyword::Judgment => "Judgment".to_string(),

@@ -7,12 +7,14 @@ use crate::serializer::{
     trigger_serializer,
 };
 use crate::variables::parser_bindings::VariableBindings;
+
 /// Result of serializing an ability, containing both the text and variable
 /// bindings.
 pub struct SerializedAbility {
     pub text: String,
     pub variables: VariableBindings,
 }
+
 /// Serializes an ability into its rules text and variable bindings.
 pub fn serialize_ability(ability: &Ability) -> SerializedAbility {
     let mut variables = VariableBindings::new();
@@ -89,6 +91,7 @@ pub fn serialize_ability(ability: &Ability) -> SerializedAbility {
     };
     SerializedAbility { text, variables }
 }
+
 fn serialize_named_ability(named: &NamedAbility, variables: &mut VariableBindings) -> String {
     match named {
         NamedAbility::Reclaim(_) => "{ReclaimForCost}".to_string(),

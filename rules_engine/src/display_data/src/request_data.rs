@@ -11,6 +11,7 @@ use crate::client_log_request::{ClientLogRequest, ClientLogResponse};
 use crate::command::CommandSequence;
 
 pub type RequestId = Uuid;
+
 pub type IntegrationTestId = Uuid;
 
 #[derive(Copy, Clone, Debug, Serialize, Deserialize, JsonSchema)]

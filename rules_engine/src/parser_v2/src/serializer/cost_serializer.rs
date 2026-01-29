@@ -5,6 +5,7 @@ use ability_data::variable_value::VariableValue;
 use crate::serializer::predicate_serializer;
 use crate::variables::parser_bindings::VariableBindings;
 use crate::variables::parser_substitutions;
+
 pub fn serialize_cost(cost: &Cost, bindings: &mut VariableBindings) -> String {
     match cost {
         Cost::AbandonCharactersCount { target, count } => match count {
@@ -132,6 +133,7 @@ pub fn serialize_cost(cost: &Cost, bindings: &mut VariableBindings) -> String {
         }
     }
 }
+
 pub fn serialize_trigger_cost(cost: &Cost, bindings: &mut VariableBindings) -> String {
     match cost {
         Cost::Energy(_) => format!("pay {}", serialize_cost(cost, bindings)),

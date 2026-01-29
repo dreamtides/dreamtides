@@ -8,9 +8,11 @@ use fluent_bundle::{FluentArgs, FluentError, FluentResource, FluentValue};
 use crate::server::listener_runner::{Listener, ListenerContext, ListenerResult};
 use crate::server::model::{Change, Span};
 use crate::server::server_workbook_snapshot::{CellValue, WorkbookSnapshot};
+
 pub struct FluentRulesTextListener {
     resource: Arc<FluentResource>,
 }
+
 impl FluentRulesTextListener {
     pub fn with_ftl(ftl_source: &str) -> Result<Self> {
         let resource = FluentResource::try_new(ftl_source.to_string()).map_err(|(_, errors)| {
@@ -25,6 +27,7 @@ impl FluentRulesTextListener {
         Self::with_ftl(include_str!("../../../../../tabula/strings.ftl"))
     }
 }
+
 impl Listener for FluentRulesTextListener {
     fn name(&self) -> &str {
         "fluent_rules_text"
@@ -176,13 +179,16 @@ impl Listener for FluentRulesTextListener {
         Ok(ListenerResult { changes, warnings })
     }
 }
+
 fn find_column_index(columns: &[String], name: &str) -> Option<usize> {
     let normalized_name = normalize_column_name(name);
     columns.iter().position(|col| normalize_column_name(col) == normalized_name)
 }
+
 fn normalize_column_name(name: &str) -> String {
     name.trim().replace(['\u{00A0}', '\u{202F}'], " ").to_lowercase()
 }
+
 fn parse_fluent_args(cell_value: Option<&CellValue>) -> Result<FluentArgs<'_>> {
     let mut args = FluentArgs::new();
     let variables_text = match cell_value {
@@ -207,6 +213,7 @@ fn parse_fluent_args(cell_value: Option<&CellValue>) -> Result<FluentArgs<'_>> {
     }
     Ok(args)
 }
+
 #[derive(Clone, Debug, PartialEq, Eq)]
 struct StyleState {
     bold: bool,
@@ -214,6 +221,7 @@ struct StyleState {
     underline: bool,
     color: Option<String>,
 }
+
 #[derive(Clone, Debug, PartialEq, Eq)]
 struct StyledRun {
     start: usize,
@@ -223,6 +231,7 @@ struct StyledRun {
     underline: bool,
     color: Option<String>,
 }
+
 #[derive(Clone, Debug, PartialEq, Eq)]
 struct StyledText {
     text: String,
@@ -234,6 +243,7 @@ struct StyledText {
     ununderline_spans: Vec<Span>,
     color_spans: Vec<(String, Vec<Span>)>,
 }
+
 #[derive(Clone, Debug, PartialEq, Eq)]
 enum HtmlTag {
     BoldStart,
@@ -245,6 +255,7 @@ enum HtmlTag {
     ColorStart(String),
     ColorEnd,
 }
+
 fn apply_simple_html_styles(text: &str) -> StyledText {
     let mut output = String::new();
     let mut runs = Vec::new();
@@ -425,6 +436,7 @@ fn apply_simple_html_styles(text: &str) -> StyledText {
         color_spans: color_spans.into_iter().collect(),
     }
 }
+
 fn parse_simple_html_tag(tag: &str) -> Option<HtmlTag> {
     let trimmed = tag.trim();
     let lower = trimmed.to_ascii_lowercase();
@@ -458,6 +470,7 @@ fn parse_simple_html_tag(tag: &str) -> Option<HtmlTag> {
     }
     None
 }
+
 fn expand_plain_variables(expression: &str) -> String {
     let mut result = String::with_capacity(expression.len());
     let mut chars = expression.chars().peekable();
@@ -497,6 +510,7 @@ fn expand_plain_variables(expression: &str) -> String {
     }
     result
 }
+
 fn build_temp_message(expression: &str) -> String {
     let expanded = expand_plain_variables(expression);
     let normalized = expanded.replace("\r\n", "\n").replace('\r', "\n");
@@ -517,6 +531,7 @@ fn build_temp_message(expression: &str) -> String {
     }
     temp
 }
+
 fn format_fluent_expression(
     resource: &Arc<FluentResource>,
     expression: &str,
@@ -553,6 +568,7 @@ fn format_fluent_expression(
     }
     Ok(formatted.into_owned())
 }
+
 fn format_fluent_errors(errors: &[FluentError]) -> String {
     errors
         .iter()
@@ -564,6 +580,7 @@ fn format_fluent_errors(errors: &[FluentError]) -> String {
         .collect::<Vec<_>>()
         .join("; ")
 }
+
 fn col_index_to_letter(col: u32) -> String {
     let mut result = String::new();
     let mut n = col + 1;

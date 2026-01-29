@@ -145,6 +145,76 @@ impl CodeOrderChecker {
     }
 }
 
+/// Analyzes spacing requirements between items.
+/// Returns a list of line numbers (0-indexed) where blank lines need to be
+/// inserted AFTER.
+fn analyze_spacing(syntax: &File, lines: &[&str]) -> Vec<usize> {
+    let mut insert_after: Vec<usize> = Vec::new();
+
+    // Track item boundaries and categories
+    let mut prev_item_end_line: Option<usize> = None;
+    let mut prev_category: Option<ItemCategory> = None;
+
+    for item in &syntax.items {
+        let span = item.span();
+        let start_line = span.start().line.saturating_sub(1);
+        let end_line = span.end().line.saturating_sub(1);
+
+        if matches!(item, Item::Use(_))
+            || (matches!(item, Item::Mod(_)) && !CodeOrderChecker::is_test_module(item))
+        {
+            prev_item_end_line = Some(end_line);
+            prev_category = None;
+            continue;
+        }
+
+        let category = if CodeOrderChecker::is_test_module(item) {
+            ItemCategory::TestModule
+        } else if CodeOrderChecker::is_thread_local(item) {
+            ItemCategory::ThreadLocal
+        } else {
+            CodeOrderChecker::categorize_item(item)
+        };
+
+        // Check if we need a blank line before this item
+        let needs_blank_line = if prev_item_end_line.is_some() {
+            if let Some(prev_cat) = prev_category {
+                // Between two code items: need blank line unless both are constants
+                let is_const =
+                    matches!(category, ItemCategory::PrivateConst | ItemCategory::PublicConst);
+                let prev_is_const =
+                    matches!(prev_cat, ItemCategory::PrivateConst | ItemCategory::PublicConst);
+                !is_const || !prev_is_const
+            } else {
+                // After use statements: always need blank line
+                true
+            }
+        } else {
+            false
+        };
+
+        if needs_blank_line {
+            if let Some(prev_end) = prev_item_end_line {
+                // Check if there's already a blank line
+                // A blank line exists if there's at least one empty line between prev_end and
+                // start_line
+                let has_blank = (prev_end + 1 < start_line)
+                    && (prev_end + 1..start_line)
+                        .any(|i| i < lines.len() && lines[i].trim().is_empty());
+
+                if !has_blank {
+                    insert_after.push(prev_end);
+                }
+            }
+        }
+
+        prev_item_end_line = Some(end_line);
+        prev_category = Some(category);
+    }
+
+    insert_after
+}
+
 pub fn check_file(path: &Path) -> Result<Vec<StyleViolation>> {
     let content = std::fs::read_to_string(path)
         .with_context(|| format!("Failed to read file: {}", path.display()))?;
@@ -154,6 +224,20 @@ pub fn check_file(path: &Path) -> Result<Vec<StyleViolation>> {
 
     let mut checker = CodeOrderChecker::new(path.to_path_buf());
     checker.check_file(&syntax);
+
+    // Check spacing by analyzing where blank lines are needed
+    let lines: Vec<&str> = content.lines().collect();
+    let insertions = analyze_spacing(&syntax, &lines);
+
+    if !insertions.is_empty() {
+        checker.violations.push(StyleViolation {
+            file: path.to_path_buf(),
+            line: 1,
+            column: 1,
+            kind: ViolationKind::CodeSpacing,
+            path_str: "file has incorrect spacing between code elements".to_string(),
+        });
+    }
 
     Ok(checker.violations().to_vec())
 }
@@ -166,71 +250,22 @@ pub fn fix_file(path: &Path) -> Result<()> {
         .with_context(|| format!("Failed to parse file: {}", path.display()))?;
 
     let lines: Vec<&str> = content.lines().collect();
+    let insertions = analyze_spacing(&syntax, &lines);
 
-    let mut categorized_items: Vec<(ItemCategory, String)> = Vec::new();
-    let mut use_and_mod_items: Vec<String> = Vec::new();
-    let mut test_modules: Vec<String> = Vec::new();
-
-    for item in &syntax.items {
-        let span = item.span();
-        let start_line = span.start().line.saturating_sub(1);
-        let end_line = span.end().line.saturating_sub(1);
-
-        let item_text = if start_line == end_line {
-            lines[start_line].to_string()
-        } else {
-            lines[start_line..=end_line.min(lines.len().saturating_sub(1))].join("\n")
-        };
-
-        if CodeOrderChecker::is_test_module(item) {
-            test_modules.push(item_text);
-        } else if matches!(item, Item::Use(_) | Item::Mod(_)) {
-            use_and_mod_items.push(item_text);
-        } else if CodeOrderChecker::is_thread_local(item) {
-            categorized_items.push((ItemCategory::ThreadLocal, item_text));
-        } else {
-            categorized_items.push((CodeOrderChecker::categorize_item(item), item_text));
-        }
+    if insertions.is_empty() {
+        return Ok(());
     }
 
-    categorized_items.sort_by_key(|(category, _)| *category);
-
+    // Build the output by inserting blank lines at the specified locations
+    // This ONLY adds blank lines - it never removes or modifies any existing
+    // content
     let mut output = String::new();
-
-    for item_str in &use_and_mod_items {
-        output.push_str(item_str.trim());
+    for (i, line) in lines.iter().enumerate() {
+        output.push_str(line);
         output.push('\n');
-    }
 
-    if !use_and_mod_items.is_empty() && !categorized_items.is_empty() {
-        output.push('\n');
-    }
-
-    for (i, (category, item_str)) in categorized_items.iter().enumerate() {
-        if i > 0 {
-            let prev_category = categorized_items[i - 1].0;
-            let is_const =
-                matches!(category, ItemCategory::PrivateConst | ItemCategory::PublicConst);
-            let prev_is_const =
-                matches!(prev_category, ItemCategory::PrivateConst | ItemCategory::PublicConst);
-
-            if !is_const || !prev_is_const {
-                output.push('\n');
-            }
-        }
-        output.push_str(item_str.trim());
-        output.push('\n');
-    }
-
-    if !test_modules.is_empty() {
-        if !categorized_items.is_empty() {
-            output.push('\n');
-        }
-        for (i, item_str) in test_modules.iter().enumerate() {
-            if i > 0 {
-                output.push('\n');
-            }
-            output.push_str(item_str.trim());
+        // If this line needs a blank line after it, insert one
+        if insertions.contains(&i) {
             output.push('\n');
         }
     }

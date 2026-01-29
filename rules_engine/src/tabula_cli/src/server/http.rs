@@ -21,6 +21,7 @@ use crate::server::listeners::partial_formatting::PartialFormattingListener;
 use crate::server::model::{Response, ResponseStatus};
 use crate::server::server_config::ServerConfig;
 use crate::server::{serialization, server_workbook_snapshot};
+
 pub async fn serve(config: ServerConfig) -> Result<()> {
     let (shutdown_tx, shutdown_rx) = oneshot::channel();
     let state = Arc::new(ServerState {
@@ -40,6 +41,7 @@ pub async fn serve(config: ServerConfig) -> Result<()> {
         .with_context(|| format!("Server failed on {addr}"))?;
     Ok(())
 }
+
 async fn handle_notify(State(state): State<Arc<ServerState>>, body: Bytes) -> impl IntoResponse {
     let response = match serialization::parse_request(&body) {
         Ok(request) => {
@@ -119,6 +121,7 @@ async fn handle_notify(State(state): State<Arc<ServerState>>, body: Bytes) -> im
     let serialized = serialization::serialize_response(&response);
     (StatusCode::OK, [(header::CONTENT_TYPE, "text/plain; charset=utf-8")], serialized)
 }
+
 async fn shutdown_signal(once: bool, shutdown_rx: Receiver<()>) {
     if once {
         let _ = shutdown_rx.await;
@@ -126,6 +129,7 @@ async fn shutdown_signal(once: bool, shutdown_rx: Receiver<()>) {
         future::pending::<()>().await;
     }
 }
+
 fn build_listeners() -> Vec<Box<dyn super::listener_runner::Listener>> {
     let mut listeners: Vec<Box<dyn super::listener_runner::Listener>> = vec![
         Box::new(ConditionalFormattingListener),
@@ -142,6 +146,7 @@ fn build_listeners() -> Vec<Box<dyn super::listener_runner::Listener>> {
     }
     listeners
 }
+
 struct ServerState {
     once: bool,
     shutdown: Mutex<Option<Sender<()>>>,

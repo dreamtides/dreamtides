@@ -4,26 +4,31 @@ use std::marker::PhantomData;
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 
 use crate::battle::card_id::{CardId, CardIdType};
+
 #[derive(Clone, PartialEq, Eq, Hash)]
 pub struct CardSet<T> {
     bits: u128,
     _marker: PhantomData<T>,
 }
+
 /// Iterator for CardSet that yields card IDs in order from lowest to highest.
 pub struct CardSetIter<T> {
     bits: u128,
     _marker: PhantomData<T>,
 }
+
 impl<T: CardIdType> fmt::Debug for CardSet<T> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "CardSet(0b{:0128b})", self.bits)
     }
 }
+
 impl<T: CardIdType> Default for CardSet<T> {
     fn default() -> Self {
         Self::new()
     }
 }
+
 impl<T: CardIdType> Iterator for CardSetIter<T> {
     type Item = T;
 
@@ -43,12 +48,14 @@ impl<T: CardIdType> Iterator for CardSetIter<T> {
         (count, Some(count))
     }
 }
+
 impl<T: CardIdType> ExactSizeIterator for CardSetIter<T> {
     #[inline]
     fn len(&self) -> usize {
         self.bits.count_ones() as usize
     }
 }
+
 impl<T: CardIdType> IntoIterator for &CardSet<T> {
     type IntoIter = CardSetIter<T>;
     type Item = T;
@@ -58,6 +65,7 @@ impl<T: CardIdType> IntoIterator for &CardSet<T> {
         CardSetIter { bits: self.bits, _marker: PhantomData }
     }
 }
+
 impl<T: CardIdType> IntoIterator for CardSet<T> {
     type IntoIter = CardSetIter<T>;
     type Item = T;
@@ -67,6 +75,7 @@ impl<T: CardIdType> IntoIterator for CardSet<T> {
         CardSetIter { bits: self.bits, _marker: PhantomData }
     }
 }
+
 impl<T: CardIdType> FromIterator<T> for CardSet<T> {
     #[inline]
     fn from_iter<I: IntoIterator<Item = T>>(iter: I) -> Self {
@@ -75,6 +84,7 @@ impl<T: CardIdType> FromIterator<T> for CardSet<T> {
         set
     }
 }
+
 impl<T: CardIdType> Extend<T> for CardSet<T> {
     #[inline]
     fn extend<I: IntoIterator<Item = T>>(&mut self, iter: I) {
@@ -85,6 +95,7 @@ impl<T: CardIdType> Extend<T> for CardSet<T> {
         }
     }
 }
+
 impl<T: CardIdType> Serialize for CardSet<T> {
     fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
         let mut vec = Vec::with_capacity(self.len());
@@ -94,6 +105,7 @@ impl<T: CardIdType> Serialize for CardSet<T> {
         vec.serialize(serializer)
     }
 }
+
 impl<'de, T: CardIdType> Deserialize<'de> for CardSet<T> {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
         let raw: Vec<u64> = Vec::<u64>::deserialize(deserializer)?;
@@ -107,6 +119,7 @@ impl<'de, T: CardIdType> Deserialize<'de> for CardSet<T> {
         Ok(set)
     }
 }
+
 impl<T: CardIdType> CardSet<T> {
     #[inline(always)]
     pub fn new() -> Self {
@@ -266,6 +279,7 @@ impl<T: CardIdType> CardSet<T> {
         CardSet { bits: self.bits, _marker: PhantomData }
     }
 }
+
 #[cfg(test)]
 mod tests {
     use crate::battle::card_id::{CharacterId, HandCardId};

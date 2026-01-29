@@ -7,12 +7,14 @@ use toml::{Table, Value};
 
 use crate::commands::validate::runner;
 use crate::core::{column_names, toml_data};
+
 #[derive(Clone)]
 struct ParsedTomlTable {
     normalized_name: String,
     source_name: String,
     value: Value,
 }
+
 pub(super) fn compare_toml_dirs(
     original: &Path,
     roundtrip: &Path,
@@ -49,6 +51,7 @@ pub(super) fn compare_toml_dirs(
     }
     Ok(())
 }
+
 fn load_toml_tables(dir: &Path) -> Result<BTreeMap<String, ParsedTomlTable>> {
     let entries = fs::read_dir(dir)
         .with_context(|| format!("Cannot open TOML directory {}", dir.display()))?;
@@ -81,6 +84,7 @@ fn load_toml_tables(dir: &Path) -> Result<BTreeMap<String, ParsedTomlTable>> {
     }
     Ok(tables)
 }
+
 fn compare_toml_values(
     expected: &ParsedTomlTable,
     actual: &ParsedTomlTable,
@@ -152,6 +156,7 @@ fn compare_toml_values(
         }
     }
 }
+
 fn compare_table_row(
     table_name: &str,
     row_idx: usize,
@@ -207,6 +212,7 @@ fn compare_table_row(
     }
     Ok(())
 }
+
 fn format_value(value: &Value) -> String {
     value.to_string()
 }

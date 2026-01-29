@@ -5,6 +5,7 @@ use std::path::{Path, PathBuf};
 use anyhow::{Context, Result};
 use convert_case::{Case, Casing};
 use tabula_data_v2::toml_loader::{self, TestCardsFile, TestDreamwellFile};
+
 /// Generates code from TOML/FTL source files into the tabula_generated crate.
 pub fn generate(output_dir: Option<PathBuf>) -> Result<()> {
     let output = output_dir.unwrap_or_else(default_output_dir);
@@ -15,6 +16,7 @@ pub fn generate(output_dir: Option<PathBuf>) -> Result<()> {
     println!("Code generation complete. Output: {}", output.display());
     Ok(())
 }
+
 /// Returns the default output directory for generated code.
 fn default_output_dir() -> PathBuf {
     PathBuf::from(env!("CARGO_MANIFEST_DIR"))
@@ -22,6 +24,7 @@ fn default_output_dir() -> PathBuf {
         .expect("parent dir")
         .join("tabula_generated/src")
 }
+
 /// Returns the path to the Tabula source files.
 fn tabula_source_dir() -> PathBuf {
     PathBuf::from(env!("CARGO_MANIFEST_DIR"))
@@ -33,6 +36,7 @@ fn tabula_source_dir() -> PathBuf {
         .expect("great-grandparent dir")
         .join("client/Assets/StreamingAssets/Tabula")
 }
+
 /// Generates test_cards.rs from test-cards.toml and test-dreamwell.toml.
 fn generate_test_cards(tabula_dir: &Path, output_dir: &Path) -> Result<()> {
     let test_cards_path = tabula_dir.join("test-cards.toml");
@@ -119,6 +123,7 @@ fn generate_test_cards(tabula_dir: &Path, output_dir: &Path) -> Result<()> {
     println!("Generated: {}", output_path.display());
     Ok(())
 }
+
 /// Generates string_id.rs from strings.ftl.
 fn generate_string_ids(tabula_dir: &Path, output_dir: &Path) -> Result<()> {
     let strings_path = tabula_dir.join("strings.ftl");
@@ -165,6 +170,7 @@ fn generate_string_ids(tabula_dir: &Path, output_dir: &Path) -> Result<()> {
     println!("Generated: {}", output_path.display());
     Ok(())
 }
+
 /// Converts a string to the specified case, replacing non-alphanumeric
 /// characters with spaces first.
 fn cleaned_to_case(input: &str, case: Case) -> String {

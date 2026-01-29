@@ -68,7 +68,6 @@ pub const CORE_11: &[BaseCardId] = &[
     BaseCardId(uuid!("1d41a21a-1beb-4e56-8d7f-be29c4a9d43d")),
     BaseCardId(uuid!("1d41a21a-1beb-4e56-8d7f-be29c4a9d43d")),
 ];
-
 pub const DREAMWELL_BASIC_5: &[DreamwellCardId] = &[
     DreamwellCardId(uuid!("bc143c3c-f149-4506-813f-1aa8dd54e370")),
     DreamwellCardId(uuid!("1dda2551-c972-4db2-81c0-9dc95ac8b27c")),
@@ -78,7 +77,6 @@ pub const DREAMWELL_BASIC_5: &[DreamwellCardId] = &[
     DreamwellCardId(uuid!("8e5b3423-b8e1-4e1c-9e3e-5281190c4713")),
     DreamwellCardId(uuid!("e2c10a87-e92f-4170-9bbf-c288abcf9f9b")),
 ];
-
 pub const TEST_DREAMWELL_BASIC_5: &[DreamwellCardId] = &[
     DreamwellCardId(uuid!("308fd4c0-ca98-4bfa-a9be-c29b36a145fd")),
     DreamwellCardId(uuid!("308fd4c0-ca98-4bfa-a9be-c29b36a145fd")),
@@ -88,7 +86,6 @@ pub const TEST_DREAMWELL_BASIC_5: &[DreamwellCardId] = &[
     DreamwellCardId(uuid!("40e4381f-12f7-46b9-ae50-67b3195781b1")),
     DreamwellCardId(uuid!("a2cdf115-8e1a-455e-a118-123f6f36c7ba")),
 ];
-
 pub const TEST_DREAMWELL_NO_ABILITIES: &[DreamwellCardId] = &[
     DreamwellCardId(uuid!("308fd4c0-ca98-4bfa-a9be-c29b36a145fd")),
     DreamwellCardId(uuid!("308fd4c0-ca98-4bfa-a9be-c29b36a145fd")),

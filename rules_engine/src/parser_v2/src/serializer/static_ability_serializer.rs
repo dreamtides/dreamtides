@@ -8,6 +8,7 @@ use crate::serializer::{
 };
 use crate::variables::parser_bindings::VariableBindings;
 use crate::variables::parser_substitutions;
+
 pub fn serialize_static_ability(
     static_ability: &StaticAbility,
     bindings: &mut VariableBindings,
@@ -57,6 +58,7 @@ pub fn serialize_static_ability(
         }
     }
 }
+
 pub fn serialize_standard_static_ability(
     ability: &StandardStaticAbility,
     bindings: &mut VariableBindings,

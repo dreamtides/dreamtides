@@ -3,7 +3,9 @@ use anyhow::{Context, Result};
 use crate::server::listener_runner::{Listener, ListenerContext, ListenerResult};
 use crate::server::model::{Change, Span};
 use crate::server::server_workbook_snapshot::{CellValue, WorkbookSnapshot};
+
 pub struct PartialFormattingListener;
+
 impl Listener for PartialFormattingListener {
     fn name(&self) -> &str {
         "partial_formatting"
@@ -48,6 +50,7 @@ impl Listener for PartialFormattingListener {
         Ok(ListenerResult { changes, warnings: vec![] })
     }
 }
+
 fn find_jackalope_spans(text: &str) -> Vec<Span> {
     const JACKALOPE: &str = "jackalope";
     let text_lower = text.to_lowercase();
@@ -71,12 +74,14 @@ fn find_jackalope_spans(text: &str) -> Vec<Span> {
     }
     spans
 }
+
 struct CellRange {
     start_row: u32,
     start_col: u32,
     end_row: u32,
     end_col: u32,
 }
+
 fn parse_a1_range(range_str: &str) -> Result<CellRange> {
     let parts: Vec<&str> = range_str.split(':').collect();
     if parts.len() != 2 {
@@ -91,6 +96,7 @@ fn parse_a1_range(range_str: &str) -> Result<CellRange> {
         end_col: start_col.max(end_col),
     })
 }
+
 fn parse_cell_ref(cell_ref: &str) -> Result<(u32, u32)> {
     let mut col_letters = String::new();
     let mut row_digits = String::new();
@@ -110,6 +116,7 @@ fn parse_cell_ref(cell_ref: &str) -> Result<(u32, u32)> {
     let row = row_digits.parse::<u32>().context("Invalid row number")?;
     Ok((row, col))
 }
+
 fn column_index(text: &str) -> Result<u32> {
     let mut value = 0u32;
     for ch in text.chars() {
@@ -120,6 +127,7 @@ fn column_index(text: &str) -> Result<u32> {
     }
     Ok(value)
 }
+
 fn cell_in_range(cell_ref: &str, range: &CellRange) -> Result<bool> {
     let (row, col) = parse_cell_ref(cell_ref)?;
     Ok(row >= range.start_row

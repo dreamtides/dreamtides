@@ -7,7 +7,9 @@ use serde::Deserialize;
 
 use crate::commands::rebuild_images::rebuild::{self, FileRecord};
 use crate::core::paths;
+
 const MANIFEST_FILENAME: &str = "_xlsm_manifest.json";
+
 pub fn rebuild_from_cache(source: &Path) -> Result<()> {
     let git_root = paths::git_root_for(source)?;
     let image_cache_dir = paths::image_cache_dir_for(&git_root);
@@ -26,25 +28,30 @@ pub fn rebuild_from_cache(source: &Path) -> Result<()> {
     }
     rebuild::write_zip(source, updated_records, &file_order)
 }
+
 #[derive(Deserialize)]
 struct ImageInfo {
     hash: String,
     size: usize,
 }
+
 #[derive(Deserialize)]
 struct Manifest {
     version: u32,
     file_order: Vec<String>,
     images: BTreeMap<String, ImageInfo>,
 }
+
 fn manifest_path_for(cache_dir: &Path) -> PathBuf {
     cache_dir.join(MANIFEST_FILENAME)
 }
+
 fn read_manifest(path: &Path) -> Result<Manifest> {
     let data =
         fs::read(path).with_context(|| format!("Cannot open manifest file {}", path.display()))?;
     serde_json::from_slice(&data).context("Failed to parse manifest file")
 }
+
 fn restore_records(
     records: (Vec<FileRecord>, Vec<String>),
     manifest: &Manifest,
@@ -91,6 +98,7 @@ fn restore_records(
     }
     Ok((updated, file_order, restored))
 }
+
 fn is_optional_entry(name: &str) -> bool {
     name == "xl/calcChain.xml"
 }

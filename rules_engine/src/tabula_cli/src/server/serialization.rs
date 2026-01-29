@@ -4,6 +4,7 @@ use sha2::{Digest, Sha256};
 use crate::server::model::{
     Change, ChangedRange, HorizontalAlignment, PROTOCOL_VERSION, Request, Response, ResponseStatus,
 };
+
 pub fn parse_request(body: &[u8]) -> Result<Request> {
     let text = std::str::from_utf8(body).context("Request body is not valid UTF-8")?;
     let mut request_id = None;
@@ -56,6 +57,7 @@ pub fn parse_request(body: &[u8]) -> Result<Request> {
         changed_range,
     })
 }
+
 pub fn serialize_response(response: &Response) -> String {
     let mut lines = vec![PROTOCOL_VERSION.to_string()];
     if let Some(ref request_id) = response.request_id {
@@ -79,6 +81,7 @@ pub fn serialize_response(response: &Response) -> String {
     }
     lines.join("\n") + "\n"
 }
+
 pub fn compute_changeset_id(
     workbook_path: &str,
     workbook_mtime: i64,
@@ -95,6 +98,7 @@ pub fn compute_changeset_id(
     let hash = hasher.finalize();
     format!("{hash:x}")
 }
+
 fn serialize_change(change: &Change) -> String {
     match change {
         Change::SetBold { sheet, cell, bold } => {
@@ -277,6 +281,7 @@ fn serialize_change(change: &Change) -> String {
         }
     }
 }
+
 fn percent_encode(s: &str) -> String {
     let mut encoded = String::new();
     for byte in s.bytes() {
@@ -291,6 +296,7 @@ fn percent_encode(s: &str) -> String {
     }
     encoded
 }
+
 fn percent_decode(s: &str) -> Result<String> {
     let mut decoded = Vec::new();
     let mut bytes = s.bytes();

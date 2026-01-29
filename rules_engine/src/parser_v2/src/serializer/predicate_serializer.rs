@@ -4,6 +4,7 @@ use text_formatting::FormattedText;
 
 use crate::serializer::{serializer_utils, text_formatting};
 use crate::variables::parser_bindings::VariableBindings;
+
 pub fn serialize_predicate(predicate: &Predicate, bindings: &mut VariableBindings) -> String {
     match predicate {
         Predicate::This => "this character".to_string(),
@@ -37,6 +38,7 @@ pub fn serialize_predicate(predicate: &Predicate, bindings: &mut VariableBinding
         }
     }
 }
+
 pub fn serialize_predicate_plural(
     predicate: &Predicate,
     bindings: &mut VariableBindings,
@@ -70,6 +72,7 @@ pub fn serialize_predicate_plural(
         }
     }
 }
+
 pub fn predicate_base_text(predicate: &Predicate, bindings: &mut VariableBindings) -> String {
     match predicate {
         Predicate::This => "this character".to_string(),
@@ -102,18 +105,21 @@ pub fn predicate_base_text(predicate: &Predicate, bindings: &mut VariableBinding
         }
     }
 }
+
 pub fn serialize_your_predicate(
     card_predicate: &CardPredicate,
     bindings: &mut VariableBindings,
 ) -> String {
     your_predicate_formatted(card_predicate, bindings).without_article()
 }
+
 pub fn serialize_enemy_predicate(
     card_predicate: &CardPredicate,
     bindings: &mut VariableBindings,
 ) -> String {
     enemy_predicate_formatted(card_predicate, bindings).without_article()
 }
+
 pub fn serialize_card_predicate(
     card_predicate: &CardPredicate,
     bindings: &mut VariableBindings,
@@ -194,6 +200,7 @@ pub fn serialize_card_predicate(
         }
     }
 }
+
 pub fn serialize_card_predicate_plural(
     card_predicate: &CardPredicate,
     bindings: &mut VariableBindings,
@@ -274,6 +281,7 @@ pub fn serialize_card_predicate_plural(
         }
     }
 }
+
 pub fn serialize_fast_target(
     card_predicate: &CardPredicate,
     bindings: &mut VariableBindings,
@@ -351,6 +359,7 @@ pub fn serialize_fast_target(
         }
     }
 }
+
 pub fn serialize_for_each_predicate(
     predicate: &Predicate,
     bindings: &mut VariableBindings,
@@ -409,6 +418,7 @@ pub fn serialize_for_each_predicate(
         predicate => format!("each {}", predicate_base_text(predicate, bindings)),
     }
 }
+
 fn your_predicate_formatted(
     card_predicate: &CardPredicate,
     bindings: &mut VariableBindings,
@@ -486,6 +496,7 @@ fn your_predicate_formatted(
         )),
     }
 }
+
 fn enemy_predicate_formatted(
     card_predicate: &CardPredicate,
     bindings: &mut VariableBindings,
@@ -562,6 +573,7 @@ fn enemy_predicate_formatted(
         )),
     }
 }
+
 fn serialize_your_predicate_plural(
     card_predicate: &CardPredicate,
     bindings: &mut VariableBindings,
@@ -642,6 +654,7 @@ fn serialize_your_predicate_plural(
         }
     }
 }
+
 fn serialize_enemy_predicate_plural(
     card_predicate: &CardPredicate,
     bindings: &mut VariableBindings,

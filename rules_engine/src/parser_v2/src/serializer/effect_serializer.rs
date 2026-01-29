@@ -12,6 +12,7 @@ use crate::serializer::{
 };
 use crate::variables::parser_bindings::VariableBindings;
 use crate::variables::parser_substitutions;
+
 pub fn serialize_standard_effect(
     effect: &StandardEffect,
     bindings: &mut VariableBindings,
@@ -795,6 +796,7 @@ pub fn serialize_standard_effect(
         }
     }
 }
+
 pub fn serialize_effect(effect: &Effect, bindings: &mut VariableBindings) -> String {
     match effect {
         Effect::Effect(standard_effect) => serialize_standard_effect(standard_effect, bindings),
@@ -976,6 +978,7 @@ pub fn serialize_effect(effect: &Effect, bindings: &mut VariableBindings) -> Str
         }
     }
 }
+
 pub fn serialize_for_count_expression(
     quantity_expression: &QuantityExpression,
     bindings: &mut VariableBindings,
@@ -1041,6 +1044,7 @@ pub fn serialize_for_count_expression(
         }
     }
 }
+
 fn serialize_allied_card_predicate(
     card_predicate: &CardPredicate,
     bindings: &mut VariableBindings,
@@ -1058,6 +1062,7 @@ fn serialize_allied_card_predicate(
         }
     }
 }
+
 fn serialize_cards_in_void_gain_reclaim_this_turn(
     count: &CollectionExpression,
     predicate: &CardPredicate,

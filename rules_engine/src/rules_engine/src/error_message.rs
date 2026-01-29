@@ -16,6 +16,7 @@ pub fn display_error_message(message: impl Into<String>) -> CommandSequence {
         UpdateScreenOverlayCommand { screen_overlay: overlay },
     )))
 }
+
 fn render_message(text: String) -> impl Component {
     PanelComponent::builder()
         .title("Error".to_string())

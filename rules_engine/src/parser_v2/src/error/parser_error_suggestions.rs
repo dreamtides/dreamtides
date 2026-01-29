@@ -1,4 +1,5 @@
 use crate::variables::parser_substitutions;
+
 static PARSER_WORDS: &[&str] = &[
     "abandon",
     "a",
@@ -74,15 +75,19 @@ static PARSER_WORDS: &[&str] = &[
     "you",
     "your",
 ];
+
 pub fn suggest_directive(name: &str) -> Option<Vec<String>> {
     find_suggestions(name, parser_substitutions::directive_names().collect())
 }
+
 pub fn suggest_variable(name: &str) -> Option<Vec<String>> {
     find_suggestions(name, parser_substitutions::variable_names().collect())
 }
+
 pub fn suggest_word(word: &str) -> Option<Vec<String>> {
     find_suggestions(word, PARSER_WORDS.to_vec())
 }
+
 fn find_suggestions(input: &str, candidates: Vec<&str>) -> Option<Vec<String>> {
     let mut matches: Vec<(usize, &str)> = candidates
         .iter()
@@ -112,6 +117,7 @@ fn find_suggestions(input: &str, candidates: Vec<&str>) -> Option<Vec<String>> {
         Some(suggestions)
     }
 }
+
 fn levenshtein(a: &str, b: &str) -> usize {
     let a_chars: Vec<char> = a.chars().collect();
     let b_chars: Vec<char> = b.chars().collect();
@@ -136,6 +142,7 @@ fn levenshtein(a: &str, b: &str) -> usize {
     }
     previous_row[b_len]
 }
+
 #[cfg(test)]
 mod tests {
     use crate::error::parser_error_suggestions::*;

@@ -18,7 +18,6 @@ use serde::Serialize;
 use serde::de::DeserializeOwned;
 use tracing::{debug, error, info, info_span};
 
-// Custom error type for better error handling
 pub enum AppError {
     BadRequest(String),
     Internal(String),

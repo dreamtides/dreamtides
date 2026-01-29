@@ -27,6 +27,7 @@ pub enum ViolationKind {
     WorkspaceDependencyNotUsed,
     TestFileNamingConvention,
     SuperOrSelfImport,
+    CodeSpacing,
 }
 
 impl ViolationKind {
@@ -76,6 +77,9 @@ impl ViolationKind {
             }
             ViolationKind::SuperOrSelfImport => {
                 "use super:: or self:: import not permitted (use crate:: instead)"
+            }
+            ViolationKind::CodeSpacing => {
+                "incorrect spacing between code elements (should have exactly one blank line between items, except consecutive constants)"
             }
         }
     }

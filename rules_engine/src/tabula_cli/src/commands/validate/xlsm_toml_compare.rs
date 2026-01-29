@@ -7,12 +7,14 @@ use toml::{Table, Value};
 
 use crate::commands::validate::runner;
 use crate::core::{column_names, excel_reader, toml_data};
+
 #[derive(Clone)]
 struct ParsedTomlTable {
     normalized_name: String,
     source_name: String,
     value: Value,
 }
+
 pub(super) fn compare_xlsm_to_toml(
     xlsm_path: &Path,
     toml_dir: &Path,
@@ -60,6 +62,7 @@ pub(super) fn compare_xlsm_to_toml(
     }
     Ok(())
 }
+
 fn load_toml_tables(dir: &Path) -> Result<BTreeMap<String, ParsedTomlTable>> {
     let entries = fs::read_dir(dir)
         .with_context(|| format!("Cannot open TOML directory {}", dir.display()))?;
@@ -92,6 +95,7 @@ fn load_toml_tables(dir: &Path) -> Result<BTreeMap<String, ParsedTomlTable>> {
     }
     Ok(tables)
 }
+
 fn extract_xlsm_tables(xlsm_path: &Path) -> Result<BTreeMap<String, ParsedTomlTable>> {
     let table_infos = excel_reader::extract_tables(xlsm_path)?;
     let mut tables = BTreeMap::new();
@@ -116,6 +120,7 @@ fn extract_xlsm_tables(xlsm_path: &Path) -> Result<BTreeMap<String, ParsedTomlTa
     }
     Ok(tables)
 }
+
 fn compare_tables(
     toml_table: &ParsedTomlTable,
     xlsm_table: &ParsedTomlTable,
@@ -188,6 +193,7 @@ fn compare_tables(
         }
     }
 }
+
 fn compare_table_row(
     table_name: &str,
     row_idx: usize,
@@ -245,6 +251,7 @@ fn compare_table_row(
     }
     Ok(())
 }
+
 fn format_value(value: &Value) -> String {
     value.to_string()
 }

@@ -11,12 +11,14 @@ use umya_spreadsheet::structs::{
 use umya_spreadsheet::{DataValidationValues, Worksheet};
 
 use crate::commands::validate::runner::{self, ValidateConfig};
+
 #[derive(Clone)]
 pub(super) struct WorkbookSnapshot {
     sheets: Vec<String>,
     tables: BTreeMap<String, TableSnapshot>,
     sheet_snapshots: BTreeMap<String, SheetSnapshot>,
 }
+
 #[derive(Clone)]
 struct TableSnapshot {
     name: String,
@@ -26,6 +28,7 @@ struct TableSnapshot {
     columns: Vec<String>,
     style_name: Option<String>,
 }
+
 #[derive(Clone)]
 struct SheetSnapshot {
     name: String,
@@ -35,18 +38,21 @@ struct SheetSnapshot {
     conditionals: BTreeSet<ConditionalFormattingSnapshot>,
     cell_alignment: BTreeMap<String, CellAlignmentSnapshot>,
 }
+
 #[derive(Clone, PartialEq, Eq, PartialOrd, Ord)]
 struct ColumnDimensionSnapshot {
     width: String,
     hidden: bool,
     best_fit: bool,
 }
+
 #[derive(Clone, PartialEq, Eq, PartialOrd, Ord)]
 struct RowDimensionSnapshot {
     height: String,
     hidden: bool,
     custom: bool,
 }
+
 #[derive(Clone, PartialEq, Eq, PartialOrd, Ord)]
 struct DataValidationSnapshot {
     sqref: String,
@@ -62,11 +68,13 @@ struct DataValidationSnapshot {
     formula1: String,
     formula2: String,
 }
+
 #[derive(Clone, PartialEq, Eq, PartialOrd, Ord)]
 struct ConditionalFormattingSnapshot {
     sqref: String,
     rules: Vec<ConditionalRuleSnapshot>,
 }
+
 #[derive(Clone, PartialEq, Eq, PartialOrd, Ord)]
 struct ConditionalRuleSnapshot {
     r#type: String,
@@ -76,12 +84,14 @@ struct ConditionalRuleSnapshot {
     formula: Vec<String>,
     text: String,
 }
+
 #[derive(Clone, PartialEq, Eq, PartialOrd, Ord)]
 struct CellAlignmentSnapshot {
     horizontal: Option<HorizontalAlignmentValues>,
     vertical: Option<VerticalAlignmentValues>,
     wrap_text: bool,
 }
+
 pub(super) fn compare_workbooks(
     original: &Path,
     roundtrip: &Path,
@@ -95,6 +105,7 @@ pub(super) fn compare_workbooks(
     compare_sheet_snapshots(&original_snapshot, &roundtrip_snapshot, config, errors)?;
     Ok(())
 }
+
 fn build_snapshot(path: &Path) -> Result<WorkbookSnapshot> {
     let book = xlsx::read(path)
         .with_context(|| format!("Cannot open spreadsheet at {}", path.display()))?;
@@ -133,6 +144,7 @@ fn build_snapshot(path: &Path) -> Result<WorkbookSnapshot> {
     }
     Ok(WorkbookSnapshot { sheets, tables, sheet_snapshots })
 }
+
 fn compare_sheet_order(
     expected: &WorkbookSnapshot,
     actual: &WorkbookSnapshot,
@@ -170,6 +182,7 @@ fn compare_sheet_order(
     }
     Ok(())
 }
+
 fn compare_tables(
     expected: &WorkbookSnapshot,
     actual: &WorkbookSnapshot,
@@ -257,6 +270,7 @@ fn compare_tables(
     }
     Ok(())
 }
+
 fn compare_sheet_snapshots(
     expected: &WorkbookSnapshot,
     actual: &WorkbookSnapshot,
@@ -293,6 +307,7 @@ fn compare_sheet_snapshots(
     }
     Ok(())
 }
+
 fn collect_columns(sheet: &Worksheet) -> BTreeMap<u32, ColumnDimensionSnapshot> {
     let mut result = BTreeMap::new();
     for column in sheet.get_column_dimensions() {
@@ -305,6 +320,7 @@ fn collect_columns(sheet: &Worksheet) -> BTreeMap<u32, ColumnDimensionSnapshot> 
     }
     result
 }
+
 fn collect_rows(sheet: &Worksheet) -> BTreeMap<u32, RowDimensionSnapshot> {
     let mut result = BTreeMap::new();
     for row in sheet.get_row_dimensions() {
@@ -317,6 +333,7 @@ fn collect_rows(sheet: &Worksheet) -> BTreeMap<u32, RowDimensionSnapshot> {
     }
     result
 }
+
 fn collect_data_validations(sheet: &Worksheet) -> BTreeSet<DataValidationSnapshot> {
     let mut set = BTreeSet::new();
     if let Some(validations) = sheet.get_data_validations() {
@@ -326,6 +343,7 @@ fn collect_data_validations(sheet: &Worksheet) -> BTreeSet<DataValidationSnapsho
     }
     set
 }
+
 fn validation_snapshot(validation: &DataValidation) -> DataValidationSnapshot {
     DataValidationSnapshot {
         sqref: validation.get_sequence_of_references().get_sqref().clone(),
@@ -342,6 +360,7 @@ fn validation_snapshot(validation: &DataValidation) -> DataValidationSnapshot {
         formula2: validation.get_formula2().to_string(),
     }
 }
+
 fn collect_conditionals(sheet: &Worksheet) -> BTreeSet<ConditionalFormattingSnapshot> {
     let mut set = BTreeSet::new();
     for cf in sheet.get_conditional_formatting_collection() {
@@ -354,6 +373,7 @@ fn collect_conditionals(sheet: &Worksheet) -> BTreeSet<ConditionalFormattingSnap
     }
     set
 }
+
 fn rule_snapshot(rule: &ConditionalFormattingRule) -> ConditionalRuleSnapshot {
     let formula =
         rule.get_formula().map(umya_spreadsheet::Formula::get_address_str).unwrap_or_default();
@@ -366,6 +386,7 @@ fn rule_snapshot(rule: &ConditionalFormattingRule) -> ConditionalRuleSnapshot {
         text: rule.get_text().to_string(),
     }
 }
+
 fn collect_alignment(sheet: &Worksheet) -> BTreeMap<String, CellAlignmentSnapshot> {
     let mut map = BTreeMap::new();
     let mut cells: Vec<_> = sheet.get_collection_to_hashmap().iter().collect();
@@ -382,6 +403,7 @@ fn collect_alignment(sheet: &Worksheet) -> BTreeMap<String, CellAlignmentSnapsho
     }
     map
 }
+
 fn compare_column_dimensions(
     expected: &SheetSnapshot,
     actual: &SheetSnapshot,
@@ -450,6 +472,7 @@ fn compare_column_dimensions(
     }
     Ok(())
 }
+
 fn compare_row_dimensions(
     expected: &SheetSnapshot,
     actual: &SheetSnapshot,
@@ -509,6 +532,7 @@ fn compare_row_dimensions(
     }
     Ok(())
 }
+
 fn compare_data_validations(
     expected: &SheetSnapshot,
     actual: &SheetSnapshot,
@@ -545,6 +569,7 @@ fn compare_data_validations(
     }
     Ok(())
 }
+
 fn compare_conditionals(
     expected: &SheetSnapshot,
     actual: &SheetSnapshot,
@@ -581,6 +606,7 @@ fn compare_conditionals(
     }
     Ok(())
 }
+
 fn compare_alignment(
     expected: &SheetSnapshot,
     actual: &SheetSnapshot,
@@ -626,6 +652,7 @@ fn compare_alignment(
     }
     Ok(())
 }
+
 fn describe_alignment(alignment: &CellAlignmentSnapshot) -> String {
     let horiz = alignment
         .horizontal
