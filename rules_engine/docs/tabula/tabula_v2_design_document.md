@@ -132,7 +132,9 @@ pub struct CardDefinitionRaw {
 ```
 
 The `build()` methods validate that required fields exist for each target type
-and fail with descriptive errors if unexpected fields are present.
+and fail with descriptive errors if unexpected fields are present. TOML files use
+`[[cards]]` array-of-tables syntax, requiring wrapper structs like `CardsFile`
+for deserialization.
 
 ### 2. No TabulaValue Wrapper
 
@@ -142,11 +144,11 @@ The `TabulaValue<T>` wrapper should be **removed**. Instead:
   strings or integers
 - Convert at build time, not deserialization time
 
-### 3. Runtime Ability Parsing
+### 3. Pre-Parsed Abilities
 
-Card abilities are defined in `tabula/parsed_abilities.json`, which maps
-card UUIDs to card ability lists. Tabula loads this file at startup to
-resolve card abilities.
+Card abilities are pre-parsed and stored in `tabula/parsed_abilities.json`, which
+maps card UUIDs to parsed `Ability` lists. Tabula loads this file at startup to
+resolve card abilities. The TOML files use variable syntax like `rules-text = "Draw {cards}."` with `variables = "cards: 2"`, but parsing happens at build time via `tabula_cli`.
 
 ### 4. Fluent String System
 
@@ -225,7 +227,8 @@ impl Tabula {
 
 ### 7. Code Generation Strategy
 
-Code generation moves to `tabula_cli` with outputs in `tabula_generated`:
+Code generation moves to `tabula_cli` with outputs in `tabula_generated`. Run
+via `tabula generate [OUTPUT_DIR]` (default: `src/tabula_generated/src/`):
 
 | Source | Generated File | Contents |
 |--------|---------------|----------|
@@ -265,7 +268,8 @@ fn load_tabula_raw_android(streaming_assets_path: &str) -> Result<String> {
 }
 ```
 
-For V2, this becomes loading multiple files:
+For V2, this becomes loading multiple files with `#[cfg(target_os = "android")]`
+gated `load_from_assets()` vs desktop `load_from_path()` methods:
 ```rust
 fn load_toml_android(path: &str) -> Result<String> { ... }
 fn load_ftl_android(path: &str) -> Result<String> { ... }
@@ -322,14 +326,18 @@ Migration happens in two phases: **Preparation** and **Cutover**.
 - V2 is tested independently but not yet used by other crates
 - **Critical Prep Work:**
   - Audit all existing tests to ensure they only use test cards (not production
-    cards)
-  - Review all code that uses `tabula_data` to plan the migration
+    cards). Use `tabula check-test-cards` to identify missing test cards.
+  - Review all code that uses `tabula_data` to plan the migration. Use grep to
+    find `DisplayedAbility`, `spanned_abilities`, and `is_test_card` usages.
   - Document all API differences between V1 and V2
   - Create migration checklists for each dependent crate
   - Validate V2 parser produces correct output for all production cards
 
 **Phase 2: Single-Pass Cutover**
-- Update ALL dependent crates in a single migration pass
+- Update ALL dependent crates in a single migration pass: `battle_state`,
+  `battle_queries`, `battle_mutations`, `display`, `game_creation`, `quest_state`,
+  `rules_engine`, `ai_matchup`
+- Migrate `DisplayedAbility` usages to on-demand serializer calls
 - No feature flags or gradual rollout
 - All imports change from `tabula_data` to `tabula_data_v2` at once
 - Run full test suite after migration
