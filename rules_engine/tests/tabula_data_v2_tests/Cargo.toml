@@ -1,0 +1,19 @@
+[package]
+name = "tabula_data_v2_tests"
+version = "0.0.0"
+edition = "2024"
+
+[lints]
+workspace = true
+
+[lib]
+test = false
+doctest = false
+bench = false
+
+[dependencies]
+ability_data = { path = "../../src/ability_data" }
+tabula_data_v2 = { path = "../../src/tabula_data_v2" }
+
+toml = { workspace = true }
+uuid = { workspace = true }

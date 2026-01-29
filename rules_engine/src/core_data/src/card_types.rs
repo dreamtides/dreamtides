@@ -3,7 +3,9 @@ use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use strum::{Display, EnumString};
 
-#[derive(Debug, Hash, Serialize, Deserialize, JsonSchema, Copy, Clone, Eq, PartialEq)]
+#[derive(
+    Debug, Hash, Serialize, Deserialize, JsonSchema, Copy, Clone, Eq, PartialEq, EnumString,
+)]
 pub enum CardType {
     Character,
     Event,

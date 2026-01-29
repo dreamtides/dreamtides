@@ -6171,6 +6171,7 @@ dependencies = [
 name = "tabula_data_v2"
 version = "0.0.0"
 dependencies = [
+ "ability_data",
  "core_data",
  "fluent",
  "fluent-bundle",
@@ -6179,6 +6180,16 @@ dependencies = [
  "toml",
  "uuid",
  "zip 4.6.1",
+]
+
+[[package]]
+name = "tabula_data_v2_tests"
+version = "0.0.0"
+dependencies = [
+ "ability_data",
+ "tabula_data_v2",
+ "toml",
+ "uuid",
 ]
 
 [[package]]

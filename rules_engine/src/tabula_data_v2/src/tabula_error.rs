@@ -27,4 +27,8 @@ pub enum TabulaError {
     /// Failed to load or format a Fluent localization string.
     #[error("Fluent error for message '{message_id}' in {file}: {message}")]
     FluentError { file: PathBuf, message_id: String, message: String },
+
+    /// A field value was invalid or could not be parsed.
+    #[error("Invalid value for field '{field}' in {file}: {message}")]
+    InvalidField { file: PathBuf, card_id: Option<Uuid>, field: &'static str, message: String },
 }
