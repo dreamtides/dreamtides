@@ -6176,6 +6176,7 @@ dependencies = [
  "fluent",
  "fluent-bundle",
  "serde",
+ "serde_json",
  "strum",
  "thiserror 2.0.12",
  "toml",
@@ -6188,7 +6189,10 @@ name = "tabula_data_v2_tests"
 version = "0.0.0"
 dependencies = [
  "ability_data",
+ "core_data",
+ "serde_json",
  "tabula_data_v2",
+ "tempfile",
  "toml",
  "uuid",
 ]

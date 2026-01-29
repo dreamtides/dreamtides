@@ -25,8 +25,6 @@ fn raw_card_character() -> CardDefinitionRaw {
         variables: None,
         image_number: Some(12345),
         rarity: Some("Common".to_string()),
-        art_owned: None,
-        card_number: None,
         energy_produced: None,
         is_fast: Some(false),
     }
@@ -46,8 +44,6 @@ fn raw_card_event() -> CardDefinitionRaw {
         variables: None,
         image_number: Some(67890),
         rarity: Some("Rare".to_string()),
-        art_owned: None,
-        card_number: None,
         energy_produced: None,
         is_fast: Some(true),
     }
@@ -67,8 +63,6 @@ fn raw_dreamwell_card() -> CardDefinitionRaw {
         variables: None,
         image_number: Some(11111),
         rarity: None,
-        art_owned: None,
-        card_number: None,
         energy_produced: Some(3),
         is_fast: None,
     }
