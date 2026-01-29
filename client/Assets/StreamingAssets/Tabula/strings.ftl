@@ -1,27 +1,36 @@
+# Core game symbols used throughout card text
 energy-symbol = <color=#00838F>●</color>
 points-symbol = <color=#F57F17>⍟</color>
 fast-symbol = ↯
 
+# Energy cost/value formatters with colored symbol (e.g., "2●")
 e = <color=#00838F>{$e}●</color>
 e1 = <color=#00838F>{$e1}●</color>
 e2 = <color=#00838F>{$e2}●</color>
 e3 = <color=#00838F>{$e3}●</color>
 mode1-cost = <color=#00838F>{$mode1-cost}●</color>
 mode2-cost = <color=#00838F>{$mode2-cost}●</color>
+
+# Points value formatters with colored symbol (e.g., "3⍟")
 points = <color=#F57F17>{$points}⍟</color>
 points1 = <color=#F57F17>{$points1}⍟</color>
 points2 = <color=#F57F17>{$points2}⍟</color>
 
+# Used for cards that modify maximum energy pool
 maximum-energy = {$max} maximum {energy-symbol}
 
+# Trigger ability prefixes - displayed at start of triggered ability text
 -trigger = ▸ <b>{$trigger}:</b>
 Materialized = {-trigger(trigger: "Materialized")}
 Judgment = {-trigger(trigger: "Judgment")}
 Dissolved = {-trigger(trigger: "Dissolved")}
 MaterializedJudgment = {-trigger(trigger: "Materialized, Judgment")}
 MaterializedDissolved = {-trigger(trigger: "Materialized, Dissolved")}
+
+# Phase name reference used in card text (e.g., "trigger an additional Judgment phase")
 JudgmentPhaseName = <b>Judgment</b>
 
+# Game keyword formatting - purple colored text for game mechanics
 -keyword = <color=#AA00FF>{$k}</color>
 
 dissolve = {-keyword(k: "dissolve")}
@@ -42,15 +51,20 @@ kindle = {-keyword(k: "kindle")} {$k}
 Kindle = {-keyword(k: "Kindle")} {$k}
 foresee = {-keyword(k: "foresee")} {$foresee}
 Foresee = {-keyword(k: "Foresee")} {$foresee}
+
+# Fast keyword with lightning bolt symbol
 fast = <b>↯fast</b>
 Fast = <b>↯Fast</b>
 
+# Reclaim ability with energy cost shown (e.g., "reclaim 2●")
 reclaim-for-cost = {-keyword(k: "reclaim")} <color=#00838F>{$reclaim}●</color>
 ReclaimForCost = {-keyword(k: "Reclaim")} <color=#00838F>{$reclaim}●</color>
 
+# Modal card formatting
 ChooseOne = <b>Choose One:</b>
 bullet = •
 
+# Card count with article (e.g., "a card" or "2 cards") - used for draw/discard effects
 cards =
   {
     $cards ->
@@ -76,6 +90,7 @@ cards3 =
       *[other] { $cards3 } cards
   }
 
+# Discard count with article - separate from 'cards' to allow different variable names
 discards =
   {
     $discards ->
@@ -95,6 +110,7 @@ discards2 =
       *[other] { $discards2 } cards
   }
 
+# For effects that move cards from deck to void (e.g., "Put the top 3 cards of your deck into your void")
 top-n-cards =
   {
     $to-void ->
@@ -102,6 +118,7 @@ top-n-cards =
       *[other] top { $to-void } cards
   }
 
+# Card count with numeral instead of article (e.g., "1 card" not "a card") - used for conditions like "When you play 2 cards"
 cards-numeral =
   {
     $cards ->
@@ -109,12 +126,16 @@ cards-numeral =
       *[other] { $cards } cards
   }
 
+# Spark value passthrough - used in rules like "spark {s} or less"
 s = { $s }
 
+# Spark keyword for ability text
 spark = spark
 
+# Generic count passthrough for numeric conditions
 count = { $count }
 
+# Ally count with article (e.g., "an ally" or "2 allies") - used for targeting/conditions
 count-allies =
   {
     $allies ->
@@ -122,6 +143,7 @@ count-allies =
       *[other] { $allies } allies
   }
 
+# Allied character count with subtype (e.g., "an allied warrior" or "2 allied warriors")
 count-allied-subtype =
   {
     $allies ->
@@ -129,6 +151,7 @@ count-allied-subtype =
       *[other] { $allies } allied {plural-subtype}
   }
 
+# Figment token formatting - gold colored, bold, underlined
 -figment = <color=#F57F17><b><u>{$f} Figment</u></color></b>
 
 -figments-plural = <color=#F57F17><b><u>{$f} Figments</u></color></b>
@@ -158,8 +181,10 @@ n-figments =
       *[other] { text-number } {figments}
   }
 
+# Character subtype formatting - green colored, bold (e.g., "warrior", "ancient")
 -type = <color=#2E7D32><b>{$value}</b></color>
 
+# Subtype with lowercase article (e.g., "a warrior", "an ancient") - handles a/an correctly
 a-subtype =
   {
     $subtype ->
@@ -186,6 +211,7 @@ a-subtype =
       *[other] Error: Unknown 'a-subtype' for type: { $subtype }
   }
 
+# Subtype with capitalized article for sentence start (e.g., "A warrior", "An ancient")
 ASubtype =
   {
     $subtype ->
@@ -212,6 +238,7 @@ ASubtype =
       *[other] Error: Unknown 'ASubtype' for type: { $subtype }
   }
 
+# Subtype without article (e.g., "warrior", "ancient") - for use after "allied" or other modifiers
 subtype =
   {
     $subtype ->
@@ -238,6 +265,7 @@ subtype =
       *[other] Error: Unknown 'type' for type: { $subtype }
   }
 
+# Plural subtype (e.g., "warriors", "children") - note irregular plurals like child→children
 plural-subtype =
   {
     $subtype ->
@@ -264,6 +292,7 @@ plural-subtype =
       *[other] Error: Unknown 'plural-type' for type: { $subtype }
   }
 
+# Convert number to word (1→"one", 2→"two", etc.) - falls back to numeral for 10+
 text-number =
   {
     $number ->
@@ -279,6 +308,7 @@ text-number =
       *[other] { $number }
   }
 
+# Turn duration with repetition (e.g., "this turn", "this turn twice", "this turn three times")
 this-turn-times =
   {
     $number ->
@@ -287,6 +317,7 @@ this-turn-times =
       *[other] this turn {text-number} times
   }
 
+# Multiplier effect (e.g., "Double", "Triple") - falls back to "Multiply by X" for 6+
 MultiplyBy =
   {
     $number ->
@@ -297,6 +328,7 @@ MultiplyBy =
       *[other] Multiply by { $number }
   }
 
+# Copy count with article (e.g., "a copy", "two copies")
 copies =
   {
     $number ->
@@ -304,6 +336,7 @@ copies =
       *[other] { text-number } copies
   }
 
+# Random character targeting (e.g., "a random character", "two random characters")
 n-random-characters =
   {
     $number ->
@@ -311,6 +344,7 @@ n-random-characters =
       *[other] { text-number } random characters
   }
 
+# Optional event targeting (e.g., "an event", "one or two events", "up to 3 events")
 up-to-n-events  =
   {
     $number ->
@@ -319,6 +353,7 @@ up-to-n-events  =
       *[other] up to { $number } events
   }
 
+# Optional ally targeting (e.g., "an ally", "one or two allies", "up to 3 allies")
 up-to-n-allies  =
   {
     $number ->
@@ -327,6 +362,7 @@ up-to-n-allies  =
       *[other] up to { $number } allies
   }
 
+# Pronoun agreement for variable counts (e.g., "banish it" vs "banish them")
 it-or-them =
   {
     $number ->
