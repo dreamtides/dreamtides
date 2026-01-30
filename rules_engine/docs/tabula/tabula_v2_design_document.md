@@ -166,7 +166,7 @@ impl FluentStrings {
 
 The `DisplayedAbility` struct is deleted. Instead of storing display-ready text,
 UI strings are rendered on-demand using the serializer system from
-`parser_v2/src/serializer`.
+`parser_v2/src/serializer/ability_serializer`.
 
 **Storage Decision:** CardDefinition stores only the parsed `Ability` enum:
 
@@ -177,30 +177,57 @@ pub struct CardDefinition {
 }
 ```
 
-**Rendering UI Strings:** When displaying cards in the UI, use the appropriate
-serializer:
+**Serializer API:** The ability serializer provides three main functions:
 
 ```rust
-use parser_v2::serializer::ability_serializer;
-use parser_v2::serializer::effect_serializer;
-use parser_v2::serializer::predicate_serializer;
-use parser_v2::serializer::trigger_serializer;
+use parser_v2::serializer::ability_serializer::{
+    self, SerializedAbility, serialize_ability, serialize_ability_effect,
+    serialize_modal_choices
+};
 
-// Render full ability text
-let displayed = ability_serializer::serialize_ability(&ability);
-println!("{}", displayed.text);  // The rules text to display
-// displayed.variables contains the VariableBindings for {placeholder} substitution
+/// Result of serializing an ability
+pub struct SerializedAbility {
+    pub text: String,              // Text with placeholders like "Draw {cards}."
+    pub variables: VariableBindings, // Maps placeholders to values: { "cards" -> 2 }
+}
 
-// Render just an effect (e.g., for an activated ability)
-let mut bindings = VariableBindings::new();
-let effect_text = effect_serializer::serialize_effect(&effect, &mut bindings);
+// Serialize a full ability (cost + effect for activated, trigger + effect for triggered, etc.)
+let serialized: SerializedAbility = serialize_ability(&ability);
 
-// Render a predicate for a UI label (e.g., "target an ally")
-let predicate_text = predicate_serializer::serialize_predicate(&predicate, &mut bindings);
+// Serialize just the effect portion (no cost) - used for token cards on the stack
+let serialized: SerializedAbility = serialize_ability_effect(&ability);
 
-// Render a trigger for display
-let trigger_text = trigger_serializer::serialize_trigger_event(&trigger, &mut bindings);
+// Extract modal effect choices - used for modal prompt UI
+let choices: BTreeMap<ModelEffectChoiceIndex, SerializedAbility> =
+    serialize_modal_choices(&abilities);
 ```
+
+**Rendering Flow:** The serializer produces text with Fluent placeholders and
+variable bindings. The display layer passes both to Fluent for final output:
+
+```rust
+// Step 1: Serialize the ability
+let serialized = ability_serializer::serialize_ability(&ability);
+// serialized.text = "Draw {cards}."
+// serialized.variables = { "cards" -> 2 }
+
+// Step 2: Convert VariableBindings to FluentArgs
+let fluent_args = serialized.variables.to_fluent_args();
+
+// Step 3: Format with Fluent to produce final display text
+let display_text = tabula.strings.format_display_string(
+    &serialized.text,
+    StringContext::CardText,
+    fluent_args,
+);
+// display_text = "Draw 2 cards."
+```
+
+**Key Principle:** The serializer reproduces the *exact* original card text from
+the TOML file. It does not add any formatting - all formatting (bullets, colons,
+line heights, indents) comes from the serializer output, not from the display
+layer. If the serializer output differs from the original card text, that is a
+bug in the serializer.
 
 ### 6. Test Card Replacement Strategy
 
@@ -354,8 +381,9 @@ This section breaks the migration into discrete tasks sized for a single AI agen
 context window.
 
 **Important:** This migration has three waves:
-- **Wave 1 (Preparation):** Tasks 1-7 build `tabula_data_v2` in isolation and create
-  the display helper module. Each task should leave `just check` passing.
+- **Wave 1 (Preparation):** Tasks 1-7 build `tabula_data_v2` in isolation and extend
+  the `parser_v2` serializers for display use cases. Each task should leave `just check`
+  passing.
 - **Wave 2 (Migration):** Tasks 8-15 migrate dependent crates in dependency order.
   **Code will NOT compile until Task 15 is complete.** Do not run `just check` during
   these tasks.
@@ -501,28 +529,56 @@ Extend the existing `tabula_cli` with a `generate` command for code generation.
 
 ---
 
-### Task 7: Create Display Text Helper Module
+### Task 7: Extend Ability Serializer for Display Use Cases
 
-Create a helper module in `display` crate for rendering abilities on-demand using
-`parser_v2` serializers. This prepares for the `DisplayedAbility` removal by providing
-the new rendering infrastructure while code still compiles.
+Extend `parser_v2/src/serializer/ability_serializer.rs` with additional functions
+needed by the display layer. The display crate will use these serializers directly
+(no intermediate helper module).
 
 **Deliverables:**
-- Create `src/display/src/rendering/ability_text.rs`:
-  - `render_abilities(abilities: &[Ability]) -> String` (replaces `get_displayed_text`)
-  - `render_ability_at_index(abilities: &[Ability], index: usize) -> String`
-  - `render_modal_choices(abilities: &[Ability]) -> Vec<String>`
-  - Helper functions matching current `DisplayedAbility` usage patterns
-- Add module to `src/display/src/rendering/mod.rs`
+- Add to `ability_serializer.rs`:
+  - `serialize_ability_effect(ability: &Ability) -> SerializedAbility`
+    - For event/activated abilities: returns only the effect text (no cost)
+    - For triggered/static/named abilities: returns the full ability text
+    - Used by `ability_token_text()` for token cards on the stack
+  - `serialize_modal_choices(abilities: &[Ability]) -> BTreeMap<ModelEffectChoiceIndex, SerializedAbility>`
+    - Extracts each modal choice's effect text from Event/Activated abilities
+    - Used by `modal_effect_prompt_rendering` for modal choice cards
+- Make necessary serializer modules public in `parser_v2/src/serializer/mod.rs`
+
+**Current Display Usage Patterns to Support:**
+
+1. **Full card rules text** (`card_rendering::rules_text`):
+   ```rust
+   // For each ability, serialize and join with newlines
+   for ability in &definition.abilities {
+       let serialized = ability_serializer::serialize_ability(ability);
+       // Pass serialized.text and serialized.variables to Fluent
+   }
+   ```
+
+2. **Token card text** (`card_rendering::ability_token_text`):
+   ```rust
+   // For triggered/activated abilities on the stack, show effect without cost
+   let serialized = ability_serializer::serialize_ability_effect(&ability);
+   ```
+
+3. **Modal choice descriptions** (`modal_effect_prompt_rendering`):
+   ```rust
+   // Extract each modal choice for display on separate cards
+   let choices = ability_serializer::serialize_modal_choices(&definition.abilities);
+   for (index, serialized) in choices {
+       // Each choice becomes a separate card in the UI
+   }
+   ```
 
 **Key Files for Context:**
-- `src/display/src/rendering/card_rendering.rs:187-214` (`get_displayed_text` function)
-- `src/display/src/rendering/card_rendering.rs:515-538` (`displayed_effect_text`)
-- `src/display/src/rendering/modal_effect_prompt_rendering.rs:117-139` (modal extraction)
-- `src/parser_v2/src/serializer/ability_serializer.rs:17-91` (serializer API)
-- `src/parser_v2/src/serializer/effect_serializer.rs:798-978` (effect serializer)
+- `src/parser_v2/src/serializer/ability_serializer.rs` (add new functions here)
+- `src/display/src/rendering/card_rendering.rs:86-100` (`ability_token_text`)
+- `src/display/src/rendering/card_rendering.rs:102-148` (`rules_text`)
+- `src/display/src/rendering/modal_effect_prompt_rendering.rs:61-75` (`modal_effect_descriptions`)
 
-**Validation:** `just check` passes, new helper module compiles, tests pass
+**Validation:** `just check` passes, `just review` passes
 
 ---
 
@@ -644,29 +700,67 @@ Game creation depends on all battle crates.
 ### Task 13: Migrate display (Layer 7)
 
 Display crate depends on all battle layers and state_provider. Uses the
-`ability_text` helper module created in Task 7.
+ability serializers from `parser_v2` directly (see Task 7).
 
 **Deliverables:**
+
+- Add `parser_v2` to `display/Cargo.toml` dependencies
+
 - Update `card_rendering.rs`:
-  - Replace `definition.displayed_abilities` with `ability_text::render_*` calls
-  - Update `ability_token_text()` to use serializers
-  - Update `rules_text()` to use new helpers
-- Update `dreamwell_card_rendering.rs`:
-  - Replace `card.definition.displayed_abilities` usage
+  - Delete `get_displayed_text()` function - replace with serializer calls
+  - Delete `displayed_effect_text()` function - no longer needed
+  - Update `rules_text()`:
+    ```rust
+    // OLD: get_displayed_text(&definition.displayed_abilities)
+    // NEW: serialize each ability and join
+    for ability in &definition.abilities {
+        let serialized = ability_serializer::serialize_ability(ability);
+        let formatted = tabula.strings.format_display_string(
+            &serialized.text,
+            StringContext::CardText,
+            serialized.variables.to_fluent_args(),
+        );
+    }
+    ```
+  - Update `ability_token_text()`:
+    ```rust
+    // OLD: pattern match on DisplayedAbility to extract effect
+    // NEW: use serialize_ability_effect
+    let ability = &definition.abilities[ability_number.0];
+    let serialized = ability_serializer::serialize_ability_effect(ability);
+    tabula.strings.format_display_string(&serialized.text, ...)
+    ```
+
 - Update `modal_effect_prompt_rendering.rs`:
-  - Replace `DisplayedAbility` pattern matching with serializer calls
+  - Update `modal_effect_descriptions()`:
+    ```rust
+    // OLD: all_modal_effect_descriptions(abilities) returning DisplayedModalEffectChoice
+    // NEW: use serialize_modal_choices
+    let choices = ability_serializer::serialize_modal_choices(abilities);
+    choices.values().map(|s| tabula.strings.format_display_string(&s.text, ...))
+    ```
+  - Delete `all_modal_effect_descriptions()` and `effect_modal_effect_descriptions()`
+
+- Update `dreamwell_card_rendering.rs`:
+  - Update `rules_text()` to use serializer (same pattern as card_rendering)
+
 - Update `animations.rs`:
-  - Replace `displayed_abilities` access
+  - Update `SelectModalEffectChoice` handler to use new `modal_effect_descriptions()`
+
 - Update `ability_help_text.rs`:
-  - Use `displayed_rules_text` field or serialize from abilities
+  - Use `definition.abilities` with serializers instead of `displayed_abilities`
+
 - Update all imports from `tabula_data` to `tabula_data_v2`
 - Update `Cargo.toml` to depend on `tabula_data_v2` instead of `tabula_data`
 
 **Key Files for Context:**
-- `src/display/src/rendering/card_rendering.rs:88-148,187-214,515-538` (DisplayedAbility usage)
-- `src/display/src/rendering/dreamwell_card_rendering.rs:81` (dreamwell display)
+- `src/display/src/rendering/card_rendering.rs:86-148` (ability_token_text, rules_text)
+- `src/display/src/rendering/card_rendering.rs:187-214` (get_displayed_text to delete)
+- `src/display/src/rendering/card_rendering.rs:515-538` (displayed_effect_text to delete)
+- `src/display/src/rendering/dreamwell_card_rendering.rs:79-85` (rules_text)
 - `src/display/src/rendering/modal_effect_prompt_rendering.rs:61-139` (modal handling)
-- `src/parser_v2/src/serializer/ability_serializer.rs:17-91` (serializer API)
+- `src/display/src/rendering/animations.rs:209-222` (SelectModalEffectChoice)
+- `src/parser_v2/src/serializer/ability_serializer.rs` (serializer API)
 
 **Validation:** None - code will not compile until Wave 2 is complete
 
@@ -852,7 +946,7 @@ Wave 1: Preparation (code compiles after each task)
 │     ↓                                               │
 │ Task 6 (code generation)                            │
 │     ↓                                               │
-│ Task 7 (display helper module)                      │
+│ Task 7 (extend ability serializer)                  │
 └─────────────────────────────────────────────────────┘
                         ↓
 Wave 2: Migration (code does NOT compile until Task 15)

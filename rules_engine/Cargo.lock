@@ -1612,6 +1612,7 @@ dependencies = [
  "fluent",
  "logging",
  "masonry",
+ "parser_v2",
  "quest_state",
  "schemars 1.0.2",
  "serde",

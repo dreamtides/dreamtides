@@ -1,4 +1,7 @@
+use std::collections::BTreeMap;
+
 use ability_data::ability::Ability;
+use ability_data::effect::{Effect, ModelEffectChoiceIndex};
 use ability_data::named_ability::NamedAbility;
 use ability_data::trigger_event::TriggerEvent;
 
@@ -90,6 +93,55 @@ pub fn serialize_ability(ability: &Ability) -> SerializedAbility {
         ),
     };
     SerializedAbility { text, variables }
+}
+
+/// Serializes just the effect portion of an ability, without any costs.
+///
+/// For event/activated abilities, returns only the effect text.
+/// For triggered/static/named abilities, returns the full ability text.
+pub fn serialize_ability_effect(ability: &Ability) -> SerializedAbility {
+    let mut variables = VariableBindings::new();
+    let text = match ability {
+        Ability::Event(event) => serializer_utils::capitalize_first_letter(
+            &effect_serializer::serialize_effect(&event.effect, &mut variables),
+        ),
+        Ability::Activated(activated) => serializer_utils::capitalize_first_letter(
+            &effect_serializer::serialize_effect(&activated.effect, &mut variables),
+        ),
+        _ => return serialize_ability(ability),
+    };
+    SerializedAbility { text, variables }
+}
+
+/// Extracts and serializes each modal effect choice from a list of abilities.
+///
+/// Returns a map from choice index to serialized effect text.
+pub fn serialize_modal_choices(
+    abilities: &[Ability],
+) -> BTreeMap<ModelEffectChoiceIndex, SerializedAbility> {
+    let mut result = BTreeMap::new();
+    let mut current_index = 0usize;
+    for ability in abilities {
+        let effect = match ability {
+            Ability::Event(event) => Some(&event.effect),
+            Ability::Activated(activated) => Some(&activated.effect),
+            _ => None,
+        };
+        if let Some(Effect::Modal(choices)) = effect {
+            for choice in choices {
+                let mut variables = VariableBindings::new();
+                let text = serializer_utils::capitalize_first_letter(
+                    &effect_serializer::serialize_effect(&choice.effect, &mut variables),
+                );
+                result.insert(ModelEffectChoiceIndex(current_index), SerializedAbility {
+                    text,
+                    variables,
+                });
+                current_index += 1;
+            }
+        }
+    }
+    result
 }
 
 fn serialize_named_ability(named: &NamedAbility, variables: &mut VariableBindings) -> String {
