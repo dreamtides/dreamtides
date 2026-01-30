@@ -313,6 +313,9 @@ llmc-watch:
 tabula *args='':
   cargo run --manifest-path rules_engine/Cargo.toml -p tabula_cli -- "$@"
 
+tabula-generate:
+  cargo run --manifest-path rules_engine/Cargo.toml -p tabula_cli -- generate
+
 tabula-validate:
   #!/usr/bin/env bash
   spreadsheet="client/Assets/StreamingAssets/Tabula.xlsm"

@@ -1,5 +1,6 @@
 format_code_in_doc_comments = true
 group_imports = "StdExternalCrate"
+ignore = ["src/tabula_generated/"]
 imports_granularity = "Module"
 newline_style = "Unix"
 normalize_comments = true
