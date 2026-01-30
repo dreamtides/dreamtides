@@ -6,7 +6,6 @@ use tabula_generated::test_card;
 use test_utils::battle::test_battle::TestBattle;
 use test_utils::battle::test_player::TestPlayer;
 use test_utils::session::test_session_prelude::*;
-use ui_components::icon;
 
 #[test]
 fn draw_card_for_each_energy_spent() {
@@ -190,7 +189,7 @@ fn energy_prompt_rules_text_shows_energy_spent_on_stack() {
     let rules_text = s.user_client.cards.get_revealed(&energy_prompt_id).rules_text.clone();
     assert_display_string_contains!(
         rules_text,
-        format!("(3{} paid)", icon::ENERGY),
+        "(<color=#00838F>3●</color> paid)",
         "Rules text should show 3 energy paid in parentheses, but got: '{}'",
         rules_text
     );

@@ -143,10 +143,8 @@ pub fn rules_text(builder: &ResponseBuilder, battle: &BattleState, card_id: Card
         return format!(
             "{} <b><color=\"blue\">{}</color></b>",
             formatted,
-            builder.string_with_args(
-                StringId::CardRulesTextEnergyPaid,
-                fluent_args!("energy" => energy.0)
-            )
+            builder
+                .string_with_args(StringId::CardRulesTextEnergyPaid, fluent_args!("e" => energy.0))
         );
     }
 

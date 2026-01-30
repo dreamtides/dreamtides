@@ -87,7 +87,7 @@ fn apply_event_effects(battle: &mut BattleState, item: &StackItemState, card_id:
     // Execute event abilities
     apply_effect::execute_event_abilities(
         battle,
-        &effect_source_fn,
+        effect_source_fn,
         &ability_list.event_abilities,
         item.targets.as_ref(),
         item.modal_choice,

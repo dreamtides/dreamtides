@@ -9,7 +9,7 @@ pub fn choice_label(builder: &ResponseBuilder, label: PromptChoiceLabel) -> Stri
             builder.string_with_args(string_id, FluentArgs::new())
         }
         PromptChoiceLabel::StringWithEnergy(string_id, energy) => {
-            builder.string_with_args(string_id, fluent_args!("energy" => energy))
+            builder.string_with_args(string_id, fluent_args!("e" => energy))
         }
     }
 }
