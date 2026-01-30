@@ -40,23 +40,6 @@ pub const DREAMWELL_BASIC_5: &[DreamwellCardId] = &[
     DreamwellCardId(uuid!("e2c10a87-e92f-4170-9bbf-c288abcf9f9b")),
 ];
 
-/// Identifies a predefined list of dreamwell_card_id cards.
-#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
-pub enum DreamwellCardIdList {
-    TestDreamwellNoAbilities,
-    TestDreamwellBasic5,
-    DreamwellBasic5,
-}
-
-/// Returns the card IDs for the given dreamwell_card_id list.
-pub fn dreamwell_card_id_list(list: DreamwellCardIdList) -> &'static [DreamwellCardId] {
-    match list {
-        DreamwellCardIdList::TestDreamwellNoAbilities => TEST_DREAMWELL_NO_ABILITIES,
-        DreamwellCardIdList::TestDreamwellBasic5 => TEST_DREAMWELL_BASIC_5,
-        DreamwellCardIdList::DreamwellBasic5 => DREAMWELL_BASIC_5,
-    }
-}
-
 pub const CORE_11: &[BaseCardId] = &[
     BaseCardId(uuid!("36c2a4e1-3212-4933-979a-73f109f9b256")),
     BaseCardId(uuid!("36c2a4e1-3212-4933-979a-73f109f9b256")),
@@ -123,10 +106,27 @@ pub const CORE_11: &[BaseCardId] = &[
     BaseCardId(uuid!("716aa6ec-ddac-488c-aafe-e9a997335c58")),
 ];
 
+/// Identifies a predefined list of dreamwell_card_id cards.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub enum DreamwellCardIdList {
+    TestDreamwellNoAbilities,
+    TestDreamwellBasic5,
+    DreamwellBasic5,
+}
+
 /// Identifies a predefined list of base_card_id cards.
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
 pub enum BaseCardIdList {
     Core11,
+}
+
+/// Returns the card IDs for the given dreamwell_card_id list.
+pub fn dreamwell_card_id_list(list: DreamwellCardIdList) -> &'static [DreamwellCardId] {
+    match list {
+        DreamwellCardIdList::TestDreamwellNoAbilities => TEST_DREAMWELL_NO_ABILITIES,
+        DreamwellCardIdList::TestDreamwellBasic5 => TEST_DREAMWELL_BASIC_5,
+        DreamwellCardIdList::DreamwellBasic5 => DREAMWELL_BASIC_5,
+    }
 }
 
 /// Returns the card IDs for the given base_card_id list.
