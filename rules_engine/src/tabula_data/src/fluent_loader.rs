@@ -6,16 +6,11 @@ use std::sync::Arc;
 
 use fluent::FluentBundle;
 use fluent_bundle::{FluentArgs, FluentError, FluentResource};
-use serde::{Deserialize, Serialize};
-use uuid::Uuid;
+use tabula_generated::string_id::StringId;
 #[cfg(target_os = "android")]
 use zip::ZipArchive;
 
 use crate::tabula_error::TabulaError;
-
-/// Identifier for a localized string in the string table.
-#[derive(Debug, Copy, Clone, Eq, PartialEq, Hash, Serialize, Deserialize)]
-pub struct StringId(pub Uuid);
 
 /// Describes the context in which a string is used.
 ///
@@ -242,12 +237,9 @@ impl FluentStrings {
 
     /// Formats a localized string using a [StringId].
     ///
-    /// This method converts the StringId's UUID to a hyphenated string format
-    /// and uses it as the Fluent message ID. Returns the formatted string
-    /// or an empty string if formatting fails.
+    /// Returns the formatted string or an empty string if formatting fails.
     pub fn format_pattern(&self, id: StringId, context: StringContext, args: FluentArgs) -> String {
-        let message_id = id.0.hyphenated().to_string();
-        self.format(&message_id, context, args).unwrap_or_default()
+        self.format(id.identifier(), context, args).unwrap_or_default()
     }
 }
 
@@ -271,9 +263,6 @@ fn format_error_details(errors: &[FluentError]) -> String {
 
 impl Default for FluentStrings {
     fn default() -> Self {
-        // Create an empty FluentResource for use with #[serde(skip)] fields.
-        // This value should never be accessed - the Tabula is reconstructed
-        // after deserialization.
         let resource =
             FluentResource::try_new(String::new()).expect("Empty FTL string should always parse");
         Self { resource: Arc::new(resource), source_path: PathBuf::new() }

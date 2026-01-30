@@ -4,7 +4,7 @@ use battle_state::actions::debug_battle_action::DebugBattleAction;
 use battle_state::battle_player::battle_player_state::PlayerType;
 use core_data::identifiers::BattleId;
 use core_data::types::PlayerName;
-use tabula_ids::card_lists::DreamwellCardIdList;
+use tabula_generated::card_lists::DreamwellCardIdList;
 use uuid::Uuid;
 
 use crate::battle::test_player::TestPlayer;

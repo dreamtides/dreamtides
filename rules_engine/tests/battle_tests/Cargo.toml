@@ -24,7 +24,7 @@ game_creation = { path = "../../src/game_creation" }
 quest_state = { path = "../../src/quest_state" }
 rules_engine = { path = "../../src/rules_engine" }
 state_provider = { path = "../../src/state_provider" }
-tabula_ids = { path = "../../src/tabula_ids" }
+tabula_generated = { path = "../../src/tabula_generated" }
 test_utils = { path = "../../src/test_utils" }
 ui_components = { path = "../../src/ui_components" }
 logging = { path = "../../src/logging" }

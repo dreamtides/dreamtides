@@ -93,6 +93,8 @@ pub enum StringId {
     DecrementEnergyPromptButton,
     HideStackButton,
     ShowStackButton,
+    ShowBattlefieldButton,
+    HideBattlefieldButton,
     CardRulesTextEnergyPaid,
     CardRulesTextReclaimed,
     CardRulesTextAnchored,
@@ -121,7 +123,7 @@ pub enum StringId {
 
 impl StringId {
     /// Returns the Fluent message identifier for this string.
-    pub fn identifier(self) -> &'static str {
+    pub fn as_str(self) -> &'static str {
         match self {
             StringId::EnergySymbol => "energy-symbol",
             StringId::PointsSymbol => "points-symbol",
@@ -200,12 +202,8 @@ impl StringId {
             StringId::DeclinePromptButton => "decline-prompt-button",
             StringId::PayEnergyPromptButton => "pay-energy-prompt-button",
             StringId::PayEnergyAddtionalCostButton => "pay-energy-addtional-cost-button",
-            StringId::PrimaryButtonSubmitVoidCardTargets => {
-                "primary-button-submit-void-card-targets"
-            }
-            StringId::PrimaryButtonSubmitHandCardTargets => {
-                "primary-button-submit-hand-card-targets"
-            }
+            StringId::PrimaryButtonSubmitVoidCardTargets => "primary-button-submit-void-card-targets",
+            StringId::PrimaryButtonSubmitHandCardTargets => "primary-button-submit-hand-card-targets",
             StringId::PrimaryButtonSubmitDeckCardOrder => "primary-button-submit-deck-card-order",
             StringId::PrimaryButtonResolveStack => "primary-button-resolve-stack",
             StringId::PrimaryButtonEndTurn => "primary-button-end-turn",
@@ -214,17 +212,15 @@ impl StringId {
             StringId::DecrementEnergyPromptButton => "decrement-energy-prompt-button",
             StringId::HideStackButton => "hide-stack-button",
             StringId::ShowStackButton => "show-stack-button",
+            StringId::ShowBattlefieldButton => "show-battlefield-button",
+            StringId::HideBattlefieldButton => "hide-battlefield-button",
             StringId::CardRulesTextEnergyPaid => "card-rules-text-energy-paid",
             StringId::CardRulesTextReclaimed => "card-rules-text-reclaimed",
             StringId::CardRulesTextAnchored => "card-rules-text-anchored",
             StringId::ModalEffectChoiceCardName => "modal-effect-choice-card-name",
             StringId::CharacterAbilityCardName => "character-ability-card-name",
-            StringId::HandSizeLimitExceededWarningMessage => {
-                "hand-size-limit-exceeded-warning-message"
-            }
-            StringId::CharacterLimitExceededWarningMessage => {
-                "character-limit-exceeded-warning-message"
-            }
+            StringId::HandSizeLimitExceededWarningMessage => "hand-size-limit-exceeded-warning-message",
+            StringId::CharacterLimitExceededWarningMessage => "character-limit-exceeded-warning-message",
             StringId::CombinedLimitWarningMessage => "combined-limit-warning-message",
             StringId::ErrorMessagePanelTitle => "error-message-panel-title",
             StringId::CardTypeCharacter => "card-type-character",

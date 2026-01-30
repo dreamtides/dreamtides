@@ -560,7 +560,7 @@ dependencies = [
  "rand 0.9.0",
  "rand_xoshiro",
  "tabula_data",
- "tabula_ids",
+ "tabula_generated",
  "tracing",
 ]
 
@@ -586,7 +586,7 @@ dependencies = [
  "strum",
  "strum_macros",
  "tabula_data",
- "tabula_ids",
+ "tabula_generated",
  "tracing",
 ]
 
@@ -610,7 +610,7 @@ dependencies = [
  "strum",
  "strum_macros",
  "tabula_data",
- "tabula_ids",
+ "tabula_generated",
  "uuid",
 ]
 
@@ -636,7 +636,7 @@ dependencies = [
  "serde",
  "serde_json",
  "state_provider",
- "tabula_ids",
+ "tabula_generated",
  "test_utils",
  "tokio",
  "ui_components",
@@ -660,7 +660,7 @@ dependencies = [
  "rand_xoshiro",
  "serde_json",
  "state_provider",
- "tabula_ids",
+ "tabula_generated",
  "uuid",
 ]
 
@@ -1619,7 +1619,7 @@ dependencies = [
  "state_provider",
  "strum",
  "tabula_data",
- "tabula_ids",
+ "tabula_generated",
  "tracing",
  "tracing-subscriber",
  "ui_components",
@@ -1638,7 +1638,7 @@ dependencies = [
  "schemars 1.0.2",
  "serde",
  "strum",
- "tabula_ids",
+ "tabula_generated",
  "ui_components",
  "uuid",
 ]
@@ -2190,7 +2190,7 @@ dependencies = [
  "rand_xoshiro",
  "serde",
  "tabula_data",
- "tabula_ids",
+ "tabula_generated",
  "user_state",
  "uuid",
 ]
@@ -4687,7 +4687,7 @@ dependencies = [
  "schemars 1.0.2",
  "serde",
  "tabula_data",
- "tabula_ids",
+ "tabula_generated",
  "user_state",
 ]
 
@@ -5177,7 +5177,7 @@ dependencies = [
  "serde_json",
  "state_provider",
  "tabula_data",
- "tabula_ids",
+ "tabula_generated",
  "tokio",
  "tracing",
  "tracing-subscriber",
@@ -5204,7 +5204,7 @@ dependencies = [
  "serde_json",
  "state_provider",
  "tabula_data",
- "tabula_ids",
+ "tabula_generated",
  "tracing",
  "tracing-subscriber",
  "uuid",
@@ -6029,6 +6029,7 @@ dependencies = [
  "serde",
  "serde_json",
  "strum",
+ "tabula_generated",
  "thiserror 2.0.12",
  "toml",
  "uuid",
@@ -6055,17 +6056,6 @@ dependencies = [
  "core_data",
  "schemars 1.0.2",
  "serde",
- "uuid",
-]
-
-[[package]]
-name = "tabula_ids"
-version = "0.0.0"
-dependencies = [
- "core_data",
- "schemars 1.0.2",
- "serde",
- "tabula_data",
  "uuid",
 ]
 
@@ -6423,7 +6413,7 @@ dependencies = [
  "schemars 1.0.2",
  "serde",
  "state_provider",
- "tabula_ids",
+ "tabula_generated",
  "tokio",
  "tracing",
  "tracing-subscriber",

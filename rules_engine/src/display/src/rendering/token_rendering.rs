@@ -21,7 +21,7 @@ use display_data::card_view::{
 };
 use display_data::object_position::{ObjectPosition, Position};
 use fluent::fluent_args;
-use tabula_ids::string_id;
+use tabula_generated::string_id::StringId;
 use ui_components::icon;
 
 use crate::core::adapter;
@@ -74,7 +74,7 @@ pub fn trigger_card_view(
             })
             .image(card_rendering::card_image(battle, character_card_id))
             .name(card_rendering::card_name(battle, character_card_id))
-            .card_type(builder.string(string_id::TOKEN_TYPE_TRIGGERED_ABILITY))
+            .card_type(builder.string(StringId::TokenTypeTriggeredAbility))
             .rules_text(card_rendering::ability_token_text(
                 builder,
                 &definition,
@@ -269,7 +269,7 @@ fn activated_ability_card_view(
 
     let character_name = card_rendering::card_name(battle, character_card_id);
     let ability_name = builder.string_with_args(
-        string_id::CHARACTER_ABILITY_CARD_NAME,
+        StringId::CharacterAbilityCardName,
         fluent_args!("character-name" => character_name),
     );
 
@@ -304,7 +304,7 @@ fn activated_ability_card_view(
             .card_type(format!(
                 "{} {}",
                 if is_fast { format!("{} ", icon::FAST) } else { "".to_string() },
-                builder.string(string_id::TOKEN_TYPE_ACTIVATED_ABILITY)
+                builder.string(StringId::TokenTypeActivatedAbility)
             ))
             .rules_text(card_rendering::ability_token_text(
                 builder,
@@ -372,7 +372,7 @@ fn void_card_token_view(
             .card_type(format!(
                 "{} {}",
                 icon::FAST,
-                builder.string(string_id::TOKEN_TYPE_RECLAIM_ABILITY)
+                builder.string(StringId::TokenTypeReclaimAbility)
             ))
             .cost(
                 from_void_with_cost

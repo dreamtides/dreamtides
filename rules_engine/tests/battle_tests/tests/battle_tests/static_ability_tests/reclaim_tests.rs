@@ -1,7 +1,7 @@
 use core_data::numerics::Energy;
 use display_data::battle_view::DisplayPlayer;
 use display_data::card_view::CardPrefab;
-use tabula_ids::test_card;
+use tabula_generated::test_card;
 use test_utils::battle::test_battle::TestBattle;
 use test_utils::battle::test_player::TestPlayer;
 use test_utils::session::test_session_prelude::*;

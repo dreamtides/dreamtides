@@ -3,7 +3,7 @@ use core_data::numerics::Energy;
 use core_data::types::PlayerName;
 use display_data::battle_view::DisplayPlayer;
 use display_data::command::GameMessageType;
-use tabula_ids::test_card;
+use tabula_generated::test_card;
 use test_utils::battle::test_battle::TestBattle;
 use test_utils::session::test_session_prelude::*;
 

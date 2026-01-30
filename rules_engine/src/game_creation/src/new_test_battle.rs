@@ -31,8 +31,8 @@ use quest_state::quest::quest_state::QuestState;
 use rand::SeedableRng;
 use rand_xoshiro::Xoshiro256PlusPlus;
 use tabula_data::tabula::Tabula;
-use tabula_ids::card_lists::BaseCardIdList;
-use tabula_ids::{card_lists, test_card};
+use tabula_generated::card_lists::BaseCardIdList;
+use tabula_generated::{card_lists, test_card};
 use user_state::user::user_state::UserState;
 use uuid::Uuid;
 
@@ -194,7 +194,6 @@ fn create_test_deck(tabula: &Tabula, name: TestDeckName) -> Deck {
                 2,
             );
             deck.insert_copies(tabula, test_card::TEST_MODAL_RETURN_TO_HAND_OR_DRAW_TWO, 2);
-            deck.insert_copies(tabula, test_card::TEST_PREVENT_DISSOLVE_THIS_TURN, 2);
             deck.insert_copies(tabula, test_card::TEST_FORESEE_ONE_DRAW_RECLAIM, 3);
             deck.insert_copies(tabula, test_card::TEST_COUNTERSPELL_CHARACTER, 2);
         }

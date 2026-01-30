@@ -6,7 +6,7 @@ use core_data::identifiers::BaseCardId;
 use core_data::types::PlayerName;
 use masonry::flex_enums::{FlexAlign, FlexDirection, FlexJustify};
 use masonry::flex_style::FlexStyle;
-use tabula_ids::test_card;
+use tabula_generated::test_card;
 use ui_components::box_component::BoxComponent;
 use ui_components::button_component::ButtonComponent;
 use ui_components::component::Component;

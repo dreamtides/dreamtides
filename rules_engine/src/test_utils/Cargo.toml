@@ -27,7 +27,7 @@ logging = { path = "../logging" }
 masonry = { path = "../masonry" }
 rules_engine = { path = "../rules_engine" }
 state_provider = { path = "../state_provider" }
-tabula_ids = { path = "../tabula_ids" }
+tabula_generated = { path = "../tabula_generated" }
 ui_components = { path = "../ui_components" }
 
 bon = { workspace = true }

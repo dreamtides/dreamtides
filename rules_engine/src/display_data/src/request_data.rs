@@ -3,7 +3,7 @@ use battle_state::battle_player::battle_player_state::{PlayerType, TestDeckName}
 use core_data::identifiers::{BattleId, UserId};
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
-use tabula_ids::card_lists::DreamwellCardIdList;
+use tabula_generated::card_lists::DreamwellCardIdList;
 use ui_components::display_properties::DisplayProperties;
 use uuid::Uuid;
 

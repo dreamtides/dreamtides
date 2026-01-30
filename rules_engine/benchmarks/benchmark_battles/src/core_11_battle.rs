@@ -19,7 +19,7 @@ use game_creation::new_test_battle;
 use state_provider::display_state_provider::DisplayStateProvider;
 use state_provider::state_provider::StateProvider;
 use state_provider::test_state_provider::TestStateProvider;
-use tabula_ids::card_lists::DreamwellCardIdList;
+use tabula_generated::card_lists::DreamwellCardIdList;
 use uuid::Uuid;
 
 static BATTLE_ONCE: OnceLock<BattleState> = OnceLock::new();

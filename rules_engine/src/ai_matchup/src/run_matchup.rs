@@ -18,7 +18,7 @@ use serde_json::from_str;
 use state_provider::display_state_provider::DisplayStateProvider;
 use state_provider::state_provider::StateProvider;
 use state_provider::test_state_provider::TestStateProvider;
-use tabula_ids::card_lists::DreamwellCardIdList;
+use tabula_generated::card_lists::DreamwellCardIdList;
 use tracing::{debug, subscriber};
 use tracing_subscriber::layer::SubscriberExt;
 use tracing_subscriber::{EnvFilter, Layer};

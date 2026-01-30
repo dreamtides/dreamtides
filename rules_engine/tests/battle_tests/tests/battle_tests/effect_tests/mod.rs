@@ -5,7 +5,6 @@ mod draw_card_effect_tests;
 mod foresee_tests;
 mod gain_energy_effect_tests;
 mod gain_points_effect_tests;
-mod prevent_dissolve_this_turn_tests;
 mod put_cards_from_deck_into_void_tests;
 mod return_from_void_to_hand_tests;
 mod return_to_hand_effect_tests;

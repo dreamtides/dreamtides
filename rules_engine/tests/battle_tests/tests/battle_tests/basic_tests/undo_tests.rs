@@ -3,7 +3,7 @@ use battle_state::actions::battle_actions::BattleAction;
 use core_data::numerics::{Energy, Points, Spark};
 use core_data::types::PlayerName;
 use display_data::battle_view::DisplayPlayer;
-use tabula_ids::test_card;
+use tabula_generated::test_card;
 use test_utils::battle::test_battle::TestBattle;
 use test_utils::battle::test_player::TestPlayer;
 use test_utils::session::test_session_battle_extension::TestPlayCard;

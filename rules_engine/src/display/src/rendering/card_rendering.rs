@@ -33,7 +33,7 @@ use parser_v2::variables::parser_bindings::VariableBindings;
 use tabula_data::card_definition::CardDefinition;
 use tabula_data::fluent_loader::StringContext;
 use tabula_data::tabula_error::TabulaError;
-use tabula_ids::string_id;
+use tabula_generated::string_id::StringId;
 use ui_components::box_component::BoxComponent;
 use ui_components::component::Component;
 use ui_components::icon;
@@ -144,7 +144,7 @@ pub fn rules_text(builder: &ResponseBuilder, battle: &BattleState, card_id: Card
             "{} <b><color=\"blue\">{}</color></b>",
             formatted,
             builder.string_with_args(
-                string_id::CARD_RULES_TEXT_ENERGY_PAID,
+                StringId::CardRulesTextEnergyPaid,
                 fluent_args!("energy" => energy.0)
             )
         );
@@ -153,14 +153,14 @@ pub fn rules_text(builder: &ResponseBuilder, battle: &BattleState, card_id: Card
     if is_on_stack_from_void(battle, card_id) {
         return format!(
             "{formatted} <b><color=\"blue\">{}</color></b>",
-            builder.string(string_id::CARD_RULES_TEXT_RECLAIMED)
+            builder.string(StringId::CardRulesTextReclaimed)
         );
     }
 
     if apply_card_fx::is_anchored(battle, card_id) {
         return format!(
             "{formatted} <b><color=\"blue\">{}</color></b>",
-            builder.string(string_id::CARD_RULES_TEXT_ANCHORED)
+            builder.string(StringId::CardRulesTextAnchored)
         );
     }
 
@@ -251,7 +251,7 @@ fn revealed_card_view(builder: &ResponseBuilder, context: &CardViewContext) -> R
     } else if card_properties::base_energy_cost(battle, card_id).is_some() {
         Some(card_properties::converted_energy_cost(battle, card_id).to_string())
     } else {
-        Some(builder.string(string_id::ASTERISK_ICON))
+        Some(builder.string(StringId::AsteriskIcon))
     };
 
     RevealedCardView {
@@ -358,40 +358,41 @@ fn can_select_order_action(legal_actions: &LegalActions, card_id: CardId) -> Opt
 
 fn card_type(builder: &ResponseBuilder, battle: &BattleState, card_id: CardId) -> String {
     let definition = card::get_definition(battle, card_id);
-    let type_string = if let Some(subtype) = definition.card_subtype {
-        match subtype {
-            CardSubtype::Ancient => string_id::CARD_SUBTYPE_ANCIENT,
-            CardSubtype::Child => string_id::CARD_SUBTYPE_CHILD,
-            CardSubtype::Detective => string_id::CARD_SUBTYPE_DETECTIVE,
-            CardSubtype::Explorer => string_id::CARD_SUBTYPE_EXPLORER,
-            CardSubtype::Hacker => string_id::CARD_SUBTYPE_HACKER,
-            CardSubtype::Mage => string_id::CARD_SUBTYPE_MAGE,
-            CardSubtype::Monster => string_id::CARD_SUBTYPE_MONSTER,
-            CardSubtype::Musician => string_id::CARD_SUBTYPE_MUSICIAN,
-            CardSubtype::Outsider => string_id::CARD_SUBTYPE_OUTSIDER,
-            CardSubtype::Renegade => string_id::CARD_SUBTYPE_RENEGADE,
-            CardSubtype::SpiritAnimal => string_id::CARD_SUBTYPE_SPIRIT_ANIMAL,
-            CardSubtype::Super => string_id::CARD_SUBTYPE_SUPER,
-            CardSubtype::Survivor => string_id::CARD_SUBTYPE_SURVIVOR,
-            CardSubtype::Synth => string_id::CARD_SUBTYPE_SYNTH,
-            CardSubtype::Tinkerer => string_id::CARD_SUBTYPE_TINKERER,
-            CardSubtype::Trooper => string_id::CARD_SUBTYPE_TROOPER,
-            CardSubtype::Visionary => string_id::CARD_SUBTYPE_VISIONARY,
-            CardSubtype::Visitor => string_id::CARD_SUBTYPE_VISITOR,
-            CardSubtype::Warrior => string_id::CARD_SUBTYPE_WARRIOR,
-            CardSubtype::Enigma => string_id::CARD_SUBTYPE_ENIGMA,
-        }
+    let result = if let Some(subtype) = definition.card_subtype {
+        let subtype_key = match subtype {
+            CardSubtype::Ancient => "ancient",
+            CardSubtype::Child => "child",
+            CardSubtype::Detective => "detective",
+            CardSubtype::Enigma => "enigma",
+            CardSubtype::Explorer => "explorer",
+            CardSubtype::Hacker => "hacker",
+            CardSubtype::Mage => "mage",
+            CardSubtype::Monster => "monster",
+            CardSubtype::Musician => "musician",
+            CardSubtype::Outsider => "outsider",
+            CardSubtype::Renegade => "renegade",
+            CardSubtype::SpiritAnimal => "spirit-animal",
+            CardSubtype::Super => "super",
+            CardSubtype::Survivor => "survivor",
+            CardSubtype::Synth => "synth",
+            CardSubtype::Tinkerer => "tinkerer",
+            CardSubtype::Trooper => "trooper",
+            CardSubtype::Visionary => "visionary",
+            CardSubtype::Visitor => "visitor",
+            CardSubtype::Warrior => "warrior",
+        };
+        builder.string_with_args(StringId::Subtype, fluent_args!["subtype" => subtype_key])
     } else {
-        match definition.card_type {
-            CardType::Character => string_id::CARD_TYPE_CHARACTER,
-            CardType::Event => string_id::CARD_TYPE_EVENT,
-            CardType::Dreamsign => string_id::CARD_TYPE_DREAMSIGN,
-            CardType::Dreamcaller => string_id::CARD_TYPE_DREAMCALLER,
-            CardType::Dreamwell => string_id::CARD_TYPE_DREAMWELL,
-        }
+        let type_string = match definition.card_type {
+            CardType::Character => StringId::CardTypeCharacter,
+            CardType::Event => StringId::CardTypeEvent,
+            CardType::Dreamsign => StringId::CardTypeDreamsign,
+            CardType::Dreamcaller => StringId::CardTypeDreamcaller,
+            CardType::Dreamwell => StringId::CardTypeDreamwell,
+        };
+        builder.string(type_string)
     };
 
-    let result = builder.string(type_string);
     if card_properties::is_fast(battle, card_id) { format!("\u{f0e7} {result}") } else { result }
 }
 

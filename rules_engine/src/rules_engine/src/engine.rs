@@ -30,7 +30,7 @@ use game_creation::new_battle;
 use rand::RngCore;
 use state_provider::state_provider::{DefaultStateProvider, PollResult, StateProvider};
 use state_provider::test_state_provider::TestStateProvider;
-use tabula_ids::card_lists::DreamwellCardIdList;
+use tabula_generated::card_lists::DreamwellCardIdList;
 use tokio::task;
 use tracing::{Level, debug, error, info, instrument, warn};
 use ui_components::display_properties;

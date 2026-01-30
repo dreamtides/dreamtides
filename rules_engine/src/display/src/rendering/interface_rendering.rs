@@ -19,7 +19,7 @@ use masonry::dimension::{FlexInsets, SafeAreaInsets};
 use masonry::flex_enums::{FlexAlign, FlexJustify, FlexPosition};
 use masonry::flex_style::FlexStyle;
 use tabula_data::fluent_loader::StringContext;
-use tabula_ids::string_id;
+use tabula_generated::string_id::StringId;
 use ui_components::box_component::{BoxComponent, BoxComponentBuilder, Named};
 use ui_components::button_component::ButtonComponent;
 use ui_components::component::Component;
@@ -44,11 +44,11 @@ pub fn interface_view(builder: &ResponseBuilder, battle: &BattleState) -> Interf
             has_open_panels: has_panel,
             screen_overlay: overlay_builder.build().flex_node(),
             dev_button: Some(ButtonView {
-                label: builder.string(string_id::DEV_MENU_BUTTON),
+                label: builder.string(StringId::DevMenuButton),
                 action: None,
             }),
             undo_button: Some(ButtonView {
-                label: builder.string(string_id::UNDO_ICON),
+                label: builder.string(StringId::UndoIcon),
                 action: None,
             }),
             ..Default::default()
@@ -75,11 +75,11 @@ pub fn interface_view(builder: &ResponseBuilder, battle: &BattleState) -> Interf
         increment_button: increment_button(builder, battle),
         decrement_button: decrement_button(builder, battle),
         dev_button: Some(ButtonView {
-            label: builder.string(string_id::DEV_MENU_BUTTON),
+            label: builder.string(StringId::DevMenuButton),
             action: Some(BattleDisplayAction::OpenPanel(PanelAddress::Developer).into()),
         }),
         undo_button: Some(ButtonView {
-            label: builder.string(string_id::UNDO_ICON),
+            label: builder.string(StringId::UndoIcon),
             action: can_undo(builder, battle).then_some(GameAction::Undo(builder.act_for_player())),
         }),
         browser: card_browser_view(builder),
@@ -140,21 +140,15 @@ fn get_prompt_message_from_source(battle: &BattleState, prompt: &PromptData) -> 
 
 fn get_generic_prompt_message(builder: &ResponseBuilder, prompt_type: &PromptType) -> String {
     match prompt_type {
-        PromptType::ChooseCharacter { .. } => builder.string(string_id::PROMPT_CHOOSE_CHARACTER),
-        PromptType::ChooseStackCard { .. } => builder.string(string_id::PROMPT_SELECT_STACK_CARD),
-        PromptType::ChooseVoidCard { .. } => builder.string(string_id::PROMPT_SELECT_FROM_VOID),
-        PromptType::ChooseHandCards { .. } => builder.string(string_id::PROMPT_SELECT_FROM_HAND),
-        PromptType::Choose { .. } => builder.string(string_id::PROMPT_SELECT_OPTION),
-        PromptType::ChooseEnergyValue { .. } => {
-            builder.string(string_id::PROMPT_CHOOSE_ENERGY_AMOUNT)
-        }
-        PromptType::SelectDeckCardOrder { .. } => {
-            builder.string(string_id::PROMPT_SELECT_CARD_ORDER)
-        }
-        PromptType::ModalEffect(_) => builder.string(string_id::PROMPT_PICK_MODE),
-        PromptType::ChooseActivatedAbility { .. } => {
-            builder.string(string_id::PROMPT_SELECT_OPTION)
-        }
+        PromptType::ChooseCharacter { .. } => builder.string(StringId::PromptChooseCharacter),
+        PromptType::ChooseStackCard { .. } => builder.string(StringId::PromptSelectStackCard),
+        PromptType::ChooseVoidCard { .. } => builder.string(StringId::PromptSelectFromVoid),
+        PromptType::ChooseHandCards { .. } => builder.string(StringId::PromptSelectFromHand),
+        PromptType::Choose { .. } => builder.string(StringId::PromptSelectOption),
+        PromptType::ChooseEnergyValue { .. } => builder.string(StringId::PromptChooseEnergyAmount),
+        PromptType::SelectDeckCardOrder { .. } => builder.string(StringId::PromptSelectCardOrder),
+        PromptType::ModalEffect(_) => builder.string(StringId::PromptPickMode),
+        PromptType::ChooseActivatedAbility { .. } => builder.string(StringId::PromptSelectOption),
     }
 }
 
@@ -185,7 +179,7 @@ fn primary_action_button(
         {
             return Some(ButtonView {
                 label: builder.string_with_args(
-                    string_id::PAY_ENERGY_ADDTIONAL_COST_BUTTON,
+                    StringId::PayEnergyAddtionalCostButton,
                     fluent_args!("energy" => current),
                 ),
                 action: Some(BattleAction::SelectEnergyAdditionalCost(current).into()),
@@ -195,32 +189,32 @@ fn primary_action_button(
 
     if legal_actions.contains(BattleAction::SubmitVoidCardTargets, ForPlayer::Human) {
         Some(ButtonView {
-            label: builder.string(string_id::PRIMARY_BUTTON_SUBMIT_VOID_CARD_TARGETS),
+            label: builder.string(StringId::PrimaryButtonSubmitVoidCardTargets),
             action: Some(BattleAction::SubmitVoidCardTargets.into()),
         })
     } else if legal_actions.contains(BattleAction::SubmitHandCardTargets, ForPlayer::Human) {
         Some(ButtonView {
-            label: builder.string(string_id::PRIMARY_BUTTON_SUBMIT_HAND_CARD_TARGETS),
+            label: builder.string(StringId::PrimaryButtonSubmitHandCardTargets),
             action: Some(BattleAction::SubmitHandCardTargets.into()),
         })
     } else if legal_actions.contains(BattleAction::SubmitDeckCardOrder, ForPlayer::Human) {
         Some(ButtonView {
-            label: builder.string(string_id::PRIMARY_BUTTON_SUBMIT_DECK_CARD_ORDER),
+            label: builder.string(StringId::PrimaryButtonSubmitDeckCardOrder),
             action: Some(BattleAction::SubmitDeckCardOrder.into()),
         })
     } else if legal_actions.contains(BattleAction::PassPriority, ForPlayer::Human) {
         Some(ButtonView {
-            label: builder.string(string_id::PRIMARY_BUTTON_RESOLVE_STACK),
+            label: builder.string(StringId::PrimaryButtonResolveStack),
             action: Some(BattleAction::PassPriority.into()),
         })
     } else if legal_actions.contains(BattleAction::EndTurn, ForPlayer::Human) {
         Some(ButtonView {
-            label: builder.string(string_id::PRIMARY_BUTTON_END_TURN),
+            label: builder.string(StringId::PrimaryButtonEndTurn),
             action: Some(BattleAction::EndTurn.into()),
         })
     } else if legal_actions.contains(BattleAction::StartNextTurn, ForPlayer::Human) {
         Some(ButtonView {
-            label: builder.string(string_id::PRIMARY_BUTTON_START_NEXT_TURN),
+            label: builder.string(StringId::PrimaryButtonStartNextTurn),
             action: Some(BattleAction::StartNextTurn.into()),
         })
     } else {
@@ -254,7 +248,7 @@ fn increment_button(builder: &ResponseBuilder, battle: &BattleState) -> Option<B
         let current =
             display_state::get_selected_energy_additional_cost(builder).unwrap_or(*minimum);
         return Some(ButtonView {
-            label: builder.string(string_id::INCREMENT_ENERGY_PROMPT_BUTTON),
+            label: builder.string(StringId::IncrementEnergyPromptButton),
             action: if current + Energy(1) <= *maximum {
                 Some(
                     BattleDisplayAction::SetSelectedEnergyAdditionalCost(current + Energy(1))
@@ -277,7 +271,7 @@ fn decrement_button(builder: &ResponseBuilder, battle: &BattleState) -> Option<B
         let current =
             display_state::get_selected_energy_additional_cost(builder).unwrap_or(*minimum);
         return Some(ButtonView {
-            label: builder.string(string_id::DECREMENT_ENERGY_PROMPT_BUTTON),
+            label: builder.string(StringId::DecrementEnergyPromptButton),
             action: if current > Energy(0) && current - Energy(1) >= *minimum {
                 Some(
                     BattleDisplayAction::SetSelectedEnergyAdditionalCost(current - Energy(1))
@@ -324,9 +318,9 @@ fn render_show_battlefield_button(
     }
 
     let label = if display_state::is_battlefield_shown(builder) {
-        builder.string(string_id::HIDE_BATTLEFIELD_BUTTON)
+        builder.string(StringId::HideBattlefieldButton)
     } else {
-        builder.string(string_id::SHOW_BATTLEFIELD_BUTTON)
+        builder.string(StringId::ShowBattlefieldButton)
     };
 
     Some(

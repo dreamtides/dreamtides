@@ -8,8 +8,9 @@ use display_data::battle_view::{BattleView, DisplayPlayer};
 use display_data::command::{Command, CommandSequence, ParallelCommandGroup, UpdateBattleCommand};
 use fluent::FluentArgs;
 use state_provider::display_state_provider::{DisplayState, DisplayStateProvider};
-use tabula_data::fluent_loader::{StringContext, StringId};
+use tabula_data::fluent_loader::StringContext;
 use tabula_data::tabula::Tabula;
+use tabula_generated::string_id::StringId;
 
 /// Primary builder used to render game state.
 pub struct ResponseBuilder {

@@ -451,6 +451,12 @@ hide-stack-button = {eye-icon}
 # Button to show the stack after hiding it
 show-stack-button = {eye-slash-icon}
 
+# Button to show the battlefield (synonym for hide-stack)
+show-battlefield-button = {eye-icon}
+
+# Button to hide the battlefield (synonym for show-stack)
+hide-battlefield-button = {eye-slash-icon}
+
 # Addition to card rules text showing how much energy was spent on a card with a variable energy cost
 card-rules-text-energy-paid = ({e} paid)
 

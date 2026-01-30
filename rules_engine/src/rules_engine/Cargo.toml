@@ -27,7 +27,7 @@ masonry = { path = "../masonry" }
 quest_state = { path = "../quest_state" }
 state_provider = { path = "../state_provider" }
 tabula_data = { path = "../tabula_data" }
-tabula_ids = { path = "../tabula_ids" }
+tabula_generated = { path = "../tabula_generated" }
 ui_components = { path = "../ui_components" }
 
 backtrace = { workspace = true }

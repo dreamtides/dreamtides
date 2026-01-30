@@ -3,7 +3,7 @@ use display_data::battle_view::DisplayPlayer;
 use display_data::card_view::{CardPrefab, CardView};
 use display_data::command::{Command, GameObjectId};
 use display_data::object_position::Position;
-use tabula_ids::test_card;
+use tabula_generated::test_card;
 use test_utils::battle::test_battle::TestBattle;
 use test_utils::battle::test_player::TestPlayer;
 use test_utils::session::test_session_prelude::*;

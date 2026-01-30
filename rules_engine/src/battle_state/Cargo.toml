@@ -16,7 +16,7 @@ ai_data = { path = "../ai_data" }
 core_data = { path = "../core_data" }
 quest_state = { path = "../quest_state" }
 tabula_data = { path = "../tabula_data" }
-tabula_ids = { path = "../tabula_ids" }
+tabula_generated = { path = "../tabula_generated" }
 
 bit-vec = { workspace = true }
 enum-iterator = { workspace = true }

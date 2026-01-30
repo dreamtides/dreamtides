@@ -10,7 +10,7 @@ use display_data::request_data::{
 };
 use rules_engine::engine;
 use state_provider::test_state_provider::TestStateProvider;
-use tabula_ids::card_lists::DreamwellCardIdList;
+use tabula_generated::card_lists::DreamwellCardIdList;
 use uuid::Uuid;
 
 use crate::client::test_client::TestClient;

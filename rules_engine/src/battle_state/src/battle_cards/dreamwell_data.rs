@@ -7,7 +7,7 @@ use serde::de::Deserializer;
 use serde::{Deserialize, Serialize};
 use tabula_data::dreamwell_definition::DreamwellCardDefinition;
 use tabula_data::tabula::Tabula;
-use tabula_ids::card_lists::{self, DreamwellCardIdList};
+use tabula_generated::card_lists::{self, DreamwellCardIdList};
 
 use crate::battle_cards::ability_list::AbilityData;
 

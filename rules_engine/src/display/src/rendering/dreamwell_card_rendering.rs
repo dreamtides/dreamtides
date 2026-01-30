@@ -8,7 +8,7 @@ use display_data::card_view::{
 use display_data::object_position::{ObjectPosition, Position};
 use parser_v2::serializer::ability_serializer;
 use tabula_data::fluent_loader::StringContext;
-use tabula_ids::string_id;
+use tabula_generated::string_id::StringId;
 
 use crate::core::adapter;
 use crate::core::response_builder::ResponseBuilder;
@@ -58,7 +58,7 @@ fn dreamwell_card_view(
             cost: None,
             produced: Some(card.produced_energy.to_string()),
             spark: None,
-            card_type: builder.string(string_id::CARD_TYPE_DREAMWELL),
+            card_type: builder.string(StringId::CardTypeDreamwell),
             rules_text: rules_text(builder, card),
             outline_color: None,
             info_zoom_data: None,

@@ -17,7 +17,7 @@ ai_data = { path = "../ai_data" }
 battle_state = { path = "../battle_state" }
 core_data = { path = "../core_data" }
 masonry = { path = "../masonry" }
-tabula_ids = { path = "../tabula_ids" }
+tabula_generated = { path = "../tabula_generated" }
 ui_components = { path = "../ui_components" }
 
 bon = { workspace = true }

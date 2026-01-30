@@ -15,7 +15,7 @@ use display_data::object_position::{ObjectPosition, Position};
 use fluent::fluent_args;
 use parser_v2::serializer::ability_serializer;
 use tabula_data::fluent_loader::StringContext;
-use tabula_ids::string_id;
+use tabula_generated::string_id::StringId;
 
 use crate::core::adapter;
 use crate::core::response_builder::ResponseBuilder;
@@ -89,7 +89,7 @@ fn modal_effect_card_view(
         .id(adapter::modal_effect_choice_client_id(card_id, index))
         .image(card_rendering::card_image(battle, card_id))
         .name(builder.string_with_args(
-            string_id::MODAL_EFFECT_CHOICE_CARD_NAME,
+            StringId::ModalEffectChoiceCardName,
             fluent_args!("number" => index.value() + 1),
         ))
         .position(ObjectPosition { position: Position::Browser, sorting_key: index.value() as u32 })

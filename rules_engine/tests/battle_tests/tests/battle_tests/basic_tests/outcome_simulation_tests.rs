@@ -1,6 +1,6 @@
 use core_data::numerics::{Energy, Spark};
 use display_data::battle_view::DisplayPlayer;
-use tabula_ids::test_card;
+use tabula_generated::test_card;
 use test_utils::battle::test_battle::TestBattle;
 use test_utils::battle::test_player::TestPlayer;
 use test_utils::client::test_interface_view;

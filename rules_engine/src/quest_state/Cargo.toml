@@ -14,7 +14,7 @@ bench = false
 [dependencies]
 core_data = { path = "../core_data" }
 tabula_data = { path = "../tabula_data" }
-tabula_ids = { path = "../tabula_ids" }
+tabula_generated = { path = "../tabula_generated" }
 user_state = { path = "../user_state" }
 
 schemars = { workspace = true }

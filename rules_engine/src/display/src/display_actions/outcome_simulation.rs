@@ -15,7 +15,7 @@ use core_data::types::PlayerName;
 use display_data::battle_view::{BattlePreviewView, PlayerPreviewView};
 use display_data::card_view::CardPreviewView;
 use masonry::flex_node::FlexNode;
-use tabula_ids::string_id;
+use tabula_generated::string_id::StringId;
 use tracing_subscriber::EnvFilter;
 use tracing_subscriber::layer::SubscriberExt;
 use ui_components::component::Component;
@@ -216,7 +216,7 @@ fn get_preview_cards(
 
 fn hand_size_limit_exceeded_message(builder: &ResponseBuilder) -> impl Component {
     InterfaceMessage::builder()
-        .text(builder.string(string_id::HAND_SIZE_LIMIT_EXCEEDED_WARNING_MESSAGE))
+        .text(builder.string(StringId::HandSizeLimitExceededWarningMessage))
         .anchor_position(AnchorPosition::Top)
         .temporary(false)
         .build()
@@ -224,7 +224,7 @@ fn hand_size_limit_exceeded_message(builder: &ResponseBuilder) -> impl Component
 
 fn character_limit_message(builder: &ResponseBuilder) -> impl Component {
     InterfaceMessage::builder()
-        .text(builder.string(string_id::CHARACTER_LIMIT_EXCEEDED_WARNING_MESSAGE))
+        .text(builder.string(StringId::CharacterLimitExceededWarningMessage))
         .anchor_position(AnchorPosition::Top)
         .temporary(false)
         .build()
@@ -232,7 +232,7 @@ fn character_limit_message(builder: &ResponseBuilder) -> impl Component {
 
 fn combined_limit_messages(builder: &ResponseBuilder) -> impl Component {
     InterfaceMessage::builder()
-        .text(builder.string(string_id::COMBINED_LIMIT_WARNING_MESSAGE))
+        .text(builder.string(StringId::CombinedLimitWarningMessage))
         .anchor_position(AnchorPosition::Top)
         .temporary(false)
         .build()
