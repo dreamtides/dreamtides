@@ -4,7 +4,7 @@ use std::path::{Path, PathBuf};
 
 use anyhow::{Context, Result};
 use convert_case::{Case, Casing};
-use tabula_data_v2::toml_loader::{self, TestCardsFile, TestDreamwellFile};
+use tabula_data::toml_loader::{self, TestCardsFile, TestDreamwellFile};
 
 /// Generates code from TOML/FTL source files into the tabula_generated crate.
 pub fn generate(output_dir: Option<PathBuf>) -> Result<()> {

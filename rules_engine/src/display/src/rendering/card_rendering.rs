@@ -1,7 +1,8 @@
 use std::collections::HashMap;
 
-use ability_data::ability::{Ability, DisplayedAbility, DisplayedAbilityEffect};
+use ability_data::ability::Ability;
 use ability_data::effect::{Effect, ModelEffectChoiceIndex};
+use ability_data::variable_value::VariableValue;
 use action_data::game_action_data::GameAction;
 use battle_queries::battle_card_queries::{card, card_properties, valid_target_queries};
 use battle_queries::legal_action_queries::legal_actions;
@@ -23,11 +24,15 @@ use core_data::types::{CardFacing, PlayerName};
 use display_data::card_view::{
     CardActions, CardPrefab, CardView, DisplayImage, InfoZoomData, InfoZoomIcon, RevealedCardView,
 };
-use fluent::fluent_args;
+use fluent::types::FluentNumber;
+use fluent::{FluentArgs, FluentValue, fluent_args};
 use masonry::flex_enums::FlexDirection;
 use masonry::flex_style::FlexStyle;
-use tabula_data::card_definitions::card_definition::CardDefinition;
-use tabula_data::localized_strings::StringContext;
+use parser_v2::serializer::ability_serializer;
+use parser_v2::variables::parser_bindings::VariableBindings;
+use tabula_data::card_definition::CardDefinition;
+use tabula_data::fluent_loader::StringContext;
+use tabula_data::tabula_error::TabulaError;
 use tabula_ids::string_id;
 use ui_components::box_component::BoxComponent;
 use ui_components::component::Component;
@@ -82,37 +87,52 @@ pub fn card_name(battle: &BattleState, card_id: CardId) -> String {
     card::get_definition(battle, card_id).displayed_name.clone()
 }
 
+/// Converts [VariableBindings] to Fluent [FluentArgs] for string formatting.
+pub fn to_fluent_args(bindings: &VariableBindings) -> FluentArgs<'static> {
+    let mut args = FluentArgs::new();
+    // Note: VariableBindings doesn't expose iteration, so we use known variable
+    // names from the serializer. The serializer uses specific variable names
+    // for each effect.
+    for name in ["cards", "discards", "e", "p", "s", "n", "k", "count", "amount"] {
+        if let Some(value) = bindings.get(name) {
+            let fluent_value: FluentValue<'static> = match value {
+                VariableValue::Integer(n) => FluentValue::Number(FluentNumber::from(*n as f64)),
+                VariableValue::Subtype(subtype) => FluentValue::String(subtype.to_string().into()),
+                VariableValue::Figment(figment) => FluentValue::String(figment.to_string().into()),
+            };
+            args.set(String::from(name), fluent_value);
+        }
+    }
+    args
+}
+
 /// Returns the rules text for the given ability, without including any costs.
 pub fn ability_token_text(
     builder: &ResponseBuilder,
     definition: &CardDefinition,
     ability_number: AbilityNumber,
 ) -> String {
-    let ability = &definition.displayed_abilities[ability_number.0];
-    let text = match ability {
-        DisplayedAbility::Event { event } => displayed_effect_text(&event.effect),
-        DisplayedAbility::Static { text } => text.clone(),
-        DisplayedAbility::Activated { effect, .. } => displayed_effect_text(effect),
-        DisplayedAbility::Triggered { text } => text.clone(),
-        DisplayedAbility::Named { name } => name.clone(),
-    };
-    builder.tabula().strings.format_display_string(&text, StringContext::CardText, fluent_args![])
+    let ability = &definition.abilities[ability_number.0];
+    let serialized = ability_serializer::serialize_ability_effect(ability);
+    let args = to_fluent_args(&serialized.variables);
+    builder
+        .tabula()
+        .strings
+        .format_display_string(&serialized.text, StringContext::CardText, args)
+        .unwrap_or_default()
 }
 
 pub fn rules_text(builder: &ResponseBuilder, battle: &BattleState, card_id: CardId) -> String {
     let definition = card::get_definition(battle, card_id);
-    let mut formatted = builder.tabula().strings.format_display_string(
-        &get_displayed_text(&definition.displayed_abilities),
-        StringContext::CardText,
-        fluent_args![],
-    );
+    let mut formatted =
+        serialize_abilities_text(builder, &definition.abilities).unwrap_or_default();
 
     if let Some(stack_item) = battle.cards.stack_item(StackCardId(card_id))
         && let Some(ModelEffectChoiceIndex(index)) = stack_item.modal_choice
     {
         formatted = modal_effect_prompt_rendering::modal_effect_descriptions(
             builder,
-            &definition.displayed_abilities,
+            &definition.abilities,
         )[index]
             .clone();
     }
@@ -184,33 +204,29 @@ pub fn build_info_zoom_data(
     }
 }
 
-pub fn get_displayed_text(abilities: &[DisplayedAbility]) -> String {
+/// Serializes abilities using the ability serializer and formats with Fluent.
+fn serialize_abilities_text(
+    builder: &ResponseBuilder,
+    abilities: &[Ability],
+) -> Result<String, TabulaError> {
     // Tags must use Fluent "quoted string" syntax to avoid breaking parsing.
-    let colon = "{\"<size=130%>:</size>\"}";
     let line_height_25 = "{\"<line-height=25%>\"}";
     let end_line_height = "{\"</line-height>\"}";
 
-    abilities
+    let formatted: Result<Vec<_>, _> = abilities
         .iter()
-        .map(|ability| match ability {
-            DisplayedAbility::Event { event } => {
-                let effect = displayed_effect_text(&event.effect);
-                if let Some(additional_cost) = &event.additional_cost {
-                    format!("{additional_cost}{colon} {effect}")
-                } else {
-                    effect
-                }
-            }
-            DisplayedAbility::Static { text } => text.clone(),
-            DisplayedAbility::Activated { cost, effect } => {
-                let effect_text = displayed_effect_text(effect);
-                format!("{cost}{colon} {effect_text}")
-            }
-            DisplayedAbility::Triggered { text } => text.clone(),
-            DisplayedAbility::Named { name } => name.clone(),
+        .map(|ability| {
+            let serialized = ability_serializer::serialize_ability(ability);
+            let args = to_fluent_args(&serialized.variables);
+            builder.tabula().strings.format_display_string(
+                &serialized.text,
+                StringContext::CardText,
+                args,
+            )
         })
-        .collect::<Vec<_>>()
-        .join(&format!("\n{line_height_25}\n{end_line_height}"))
+        .collect();
+
+    Ok(formatted?.join(&format!("\n{line_height_25}\n{end_line_height}")))
 }
 
 fn revealed_card_view(builder: &ResponseBuilder, context: &CardViewContext) -> RevealedCardView {
@@ -510,31 +526,6 @@ fn get_targeting_icons(battle: &BattleState, card_id: CardId) -> Vec<InfoZoomIco
     }
 
     icons.into_values().collect()
-}
-
-fn displayed_effect_text(effect: &DisplayedAbilityEffect) -> String {
-    let colon = "{\"<size=130%>:</size>\"}";
-    let indent = "{\"<indent=0.75em>\"}";
-    let end_indent = "{\"</indent>\"}";
-    let bullet = "{bullet}";
-
-    match effect {
-        DisplayedAbilityEffect::Effect(text) => text.clone(),
-        DisplayedAbilityEffect::Modal(choices) => {
-            let lines = choices
-                .iter()
-                .map(|c| {
-                    if c.cost.is_empty() {
-                        format!("{bullet} {indent}{}{end_indent}", c.effect,)
-                    } else {
-                        format!("{bullet} {indent}{}{colon} {}{end_indent}", c.cost, c.effect)
-                    }
-                })
-                .collect::<Vec<_>>()
-                .join("\n");
-            format!("{choose}\n{}", lines, choose = "{choose-one}")
-        }
-    }
 }
 
 /// Returns the appropriate targeting color based on card ownership

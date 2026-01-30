@@ -1,4 +1,4 @@
-use ability_data::ability::{DisplayedAbility, DisplayedAbilityEffect, DisplayedModalEffectChoice};
+use ability_data::ability::Ability;
 use ability_data::effect::ModelEffectChoiceIndex;
 use action_data::game_action_data::GameAction;
 use battle_queries::battle_card_queries::card;
@@ -13,7 +13,8 @@ use core_data::numerics::Energy;
 use display_data::card_view::{CardActions, CardView};
 use display_data::object_position::{ObjectPosition, Position};
 use fluent::fluent_args;
-use tabula_data::localized_strings::StringContext;
+use parser_v2::serializer::ability_serializer;
+use tabula_data::fluent_loader::StringContext;
 use tabula_ids::string_id;
 
 use crate::core::adapter;
@@ -38,7 +39,7 @@ pub fn cards(builder: &ResponseBuilder, battle: &BattleState) -> Vec<CardView> {
     }
 
     let definition = card::get_definition(battle, card_id);
-    let descriptions = modal_effect_descriptions(builder, &definition.displayed_abilities);
+    let descriptions = modal_effect_descriptions(builder, &definition.abilities);
     modal
         .choices
         .iter()
@@ -58,18 +59,16 @@ pub fn cards(builder: &ResponseBuilder, battle: &BattleState) -> Vec<CardView> {
 
 /// [String]s for the descriptions of the choices in an active modal effect
 /// prompt, if any.
-pub fn modal_effect_descriptions(
-    builder: &ResponseBuilder,
-    abilities: &[DisplayedAbility],
-) -> Vec<String> {
-    all_modal_effect_descriptions(abilities)
-        .iter()
-        .map(|choice| {
-            builder.tabula().strings.format_display_string(
-                &choice.effect,
-                StringContext::CardText,
-                fluent_args![],
-            )
+pub fn modal_effect_descriptions(builder: &ResponseBuilder, abilities: &[Ability]) -> Vec<String> {
+    ability_serializer::serialize_modal_choices(abilities)
+        .values()
+        .map(|serialized| {
+            let args = card_rendering::to_fluent_args(&serialized.variables);
+            builder
+                .tabula()
+                .strings
+                .format_display_string(&serialized.text, StringContext::CardText, args)
+                .unwrap_or_default()
         })
         .collect()
 }
@@ -112,28 +111,4 @@ fn modal_effect_card_view(
         .build();
 
     token_rendering::token_card_view(view)
-}
-
-fn all_modal_effect_descriptions(
-    abilities: &[DisplayedAbility],
-) -> Vec<DisplayedModalEffectChoice> {
-    let mut result = vec![];
-    for ability in abilities {
-        match ability {
-            DisplayedAbility::Event { event } => {
-                result.extend(effect_modal_effect_descriptions(&event.effect));
-            }
-            DisplayedAbility::Activated { effect, .. } => {
-                result.extend(effect_modal_effect_descriptions(effect));
-            }
-            _ => {}
-        }
-    }
-    result
-}
-
-fn effect_modal_effect_descriptions(
-    effect: &DisplayedAbilityEffect,
-) -> Vec<DisplayedModalEffectChoice> {
-    if let DisplayedAbilityEffect::Modal(choices) = effect { choices.clone() } else { vec![] }
 }

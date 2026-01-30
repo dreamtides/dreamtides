@@ -6,7 +6,7 @@ use ability_data::static_ability::{PlayFromVoid, StandardStaticAbility, StaticAb
 use battle_state::battle_cards::ability_list::{AbilityData, AbilityList};
 use core_data::identifiers::AbilityNumber;
 use core_data::numerics::Energy;
-use tabula_data::card_definitions::card_definition::CardDefinition;
+use tabula_data::card_definition::CardDefinition;
 
 /// Expands a named ability into its constituent abilities.
 pub fn build(

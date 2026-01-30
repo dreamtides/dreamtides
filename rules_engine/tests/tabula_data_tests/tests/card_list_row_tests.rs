@@ -1,7 +1,7 @@
 use std::path::PathBuf;
 
-use tabula_data_v2::card_list_row::{CardListType, build_card_list_row};
-use tabula_data_v2::toml_loader::CardListRowRaw;
+use tabula_data::card_list_row::{CardListType, build_card_list_row};
+use tabula_data::toml_loader::CardListRowRaw;
 
 fn test_file() -> PathBuf {
     PathBuf::from("test.toml")

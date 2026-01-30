@@ -18,7 +18,7 @@ doctest = false
 bench = false
 
 [dependencies]
-tabula_data_v2 = { path = "../tabula_data_v2" }
+tabula_data = { path = "../tabula_data" }
 
 anyhow = { workspace = true }
 axum = { workspace = true }

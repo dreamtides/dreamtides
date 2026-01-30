@@ -5,7 +5,7 @@ use core_data::identifiers::AbilityNumber;
 use core_data::numerics::Energy;
 use serde::de::Deserializer;
 use serde::{Deserialize, Serialize};
-use tabula_data::card_definitions::dreamwell_card_definition::DreamwellCardDefinition;
+use tabula_data::dreamwell_definition::DreamwellCardDefinition;
 use tabula_data::tabula::Tabula;
 use tabula_ids::card_lists::{self, DreamwellCardIdList};
 

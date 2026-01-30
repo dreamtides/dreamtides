@@ -18,7 +18,7 @@ use fluent::{FluentArgs, fluent_args};
 use masonry::dimension::{FlexInsets, SafeAreaInsets};
 use masonry::flex_enums::{FlexAlign, FlexJustify, FlexPosition};
 use masonry::flex_style::FlexStyle;
-use tabula_data::localized_strings::StringContext;
+use tabula_data::fluent_loader::StringContext;
 use tabula_ids::string_id;
 use ui_components::box_component::{BoxComponent, BoxComponentBuilder, Named};
 use ui_components::button_component::ButtonComponent;
@@ -131,11 +131,11 @@ fn get_prompt_message_from_source(battle: &BattleState, prompt: &PromptData) -> 
         }
     };
 
-    Some(battle.tabula.strings.format_display_string(
-        &prompt,
-        StringContext::Interface,
-        FluentArgs::default(),
-    ))
+    battle
+        .tabula
+        .strings
+        .format_display_string(&prompt, StringContext::Interface, FluentArgs::default())
+        .ok()
 }
 
 fn get_generic_prompt_message(builder: &ResponseBuilder, prompt_type: &PromptType) -> String {

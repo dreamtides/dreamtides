@@ -6,8 +6,8 @@ use display_data::card_view::{
     CardActions, CardEffects, CardPrefab, CardView, DisplayImage, RevealedCardView,
 };
 use display_data::object_position::{ObjectPosition, Position};
-use fluent::fluent_args;
-use tabula_data::localized_strings::StringContext;
+use parser_v2::serializer::ability_serializer;
+use tabula_data::fluent_loader::StringContext;
 use tabula_ids::string_id;
 
 use crate::core::adapter;
@@ -77,9 +77,22 @@ fn dreamwell_card_view(
 }
 
 fn rules_text(builder: &ResponseBuilder, card: &DreamwellCard) -> String {
-    builder.tabula().strings.format_display_string(
-        &card_rendering::get_displayed_text(&card.definition.displayed_abilities),
-        StringContext::CardText,
-        fluent_args![],
-    )
+    // Tags must use Fluent "quoted string" syntax to avoid breaking parsing.
+    let line_height_25 = "{\"<line-height=25%>\"}";
+    let end_line_height = "{\"</line-height>\"}";
+
+    card.definition
+        .abilities
+        .iter()
+        .map(|ability| {
+            let serialized = ability_serializer::serialize_ability(ability);
+            let args = card_rendering::to_fluent_args(&serialized.variables);
+            builder
+                .tabula()
+                .strings
+                .format_display_string(&serialized.text, StringContext::CardText, args)
+                .unwrap_or_default()
+        })
+        .collect::<Vec<_>>()
+        .join(&format!("\n{line_height_25}\n{end_line_height}"))
 }

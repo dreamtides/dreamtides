@@ -1,6 +1,6 @@
 use core_data::identifiers::BaseCardId;
 use serde::{Deserialize, Serialize};
-use tabula_data::card_definitions::card_definition::CardDefinition;
+use tabula_data::card_definition::CardDefinition;
 use tabula_data::tabula::Tabula;
 
 #[derive(Copy, Clone, Debug, Eq, PartialEq, Hash, PartialOrd, Ord, Serialize, Deserialize)]

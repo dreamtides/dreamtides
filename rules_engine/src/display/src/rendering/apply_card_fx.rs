@@ -12,7 +12,7 @@ use display_data::command::{
     SetCardTrailCommand,
 };
 use masonry::flex_style::FlexVector3;
-use tabula_data::card_effect_definitions::card_effect_row::{
+use tabula_data::card_effect_row::{
     CardEffectRow, CardEffectRowObjectPredicate, CardEffectRowTrigger, CardEffectRowType,
 };
 use tracing::warn;
@@ -175,7 +175,7 @@ fn fire_projectile(
     animation_targets: &[ClientCardId],
 ) {
     let projectile_address = match &row.projectile_address {
-        Some(a) => a.as_ref().clone(),
+        Some(a) => a.clone(),
         None => {
             warn!(?row.card_id, "Missing projectile_address for FireProjectile effect");
             return;
@@ -218,8 +218,8 @@ fn fire_projectile(
                 .target_id(t.clone())
                 .projectile(projectile_address.clone())
                 .build();
-            cmd.fire_sound = row.projectile_fire_sound.as_ref().map(|v| v.as_ref().clone());
-            cmd.impact_sound = row.projectile_impact_sound.as_ref().map(|v| v.as_ref().clone());
+            cmd.fire_sound = row.projectile_fire_sound.clone();
+            cmd.impact_sound = row.projectile_impact_sound.clone();
             builder.push(Command::FireProjectile(cmd));
         }
     }
@@ -232,14 +232,14 @@ fn dissolve_targets(
     reverse: bool,
 ) {
     let material = match &row.dissolve_material {
-        Some(m) => m.as_ref().clone(),
+        Some(m) => m.clone(),
         None => {
             warn!(?row.card_id, "Missing dissolve_material for dissolve effect");
             return;
         }
     };
     let color = match &row.dissolve_color {
-        Some(c) => *c.as_ref(),
+        Some(c) => *c,
         None => {
             warn!(?row.card_id, "Missing dissolve_color for dissolve effect");
             return;
@@ -253,7 +253,7 @@ fn dissolve_targets(
             .reverse(reverse)
             .keep_dissolve_material(false)
             .build();
-        cmd.sound = row.dissolve_sound.as_ref().map(|v| v.as_ref().clone());
+        cmd.sound = row.dissolve_sound.clone();
         if reverse {
             builder.run_with_next_battle_view(Command::DissolveCard(cmd));
         } else {
@@ -288,14 +288,14 @@ fn display_effect(
         return;
     }
     let effect_address = match &row.effect_address {
-        Some(e) => e.as_ref().clone(),
+        Some(e) => e.clone(),
         None => {
             warn!(?row.card_id, "Missing effect_address for DisplayEffect effect");
             return;
         }
     };
     let duration = match &row.effect_duration_milliseconds {
-        Some(d) => *d.as_ref(),
+        Some(d) => *d,
         None => {
             warn!(?row.card_id, "Missing effect_duration_milliseconds for DisplayEffect effect; defaulting to 500ms");
             Milliseconds::new(500)
@@ -311,7 +311,7 @@ fn display_effect(
             effect: effect_address.clone(),
             duration,
             scale: FlexVector3::new(scale as f32, scale as f32, scale as f32),
-            sound: row.effect_sound.as_ref().map(|v| v.as_ref().clone()),
+            sound: row.effect_sound.clone(),
         }));
     }
 }
@@ -333,14 +333,14 @@ fn set_card_trail(
         return;
     }
     let trail = match &row.card_trail_address {
-        Some(t) => t.as_ref().clone(),
+        Some(t) => t.clone(),
         None => {
             warn!(?row.card_id, "Missing card_trail_address for SetCardTrail effect");
             return;
         }
     };
     let duration = match &row.trail_duration_milliseconds {
-        Some(d) => *d.as_ref(),
+        Some(d) => *d,
         None => {
             warn!(?row.card_id, "Missing trail_duration_milliseconds for SetCardTrail effect");
             return;

@@ -1,5 +1,5 @@
 use std::collections::HashMap;
-use std::fs::File;
+use std::path::Path;
 use std::sync::{Arc, Mutex, OnceLock, RwLock};
 use std::time::Instant;
 
@@ -8,9 +8,7 @@ use core_data::identifiers::{BattleId, UserId};
 use core_data::initialization_error::{ErrorCode, InitializationError};
 use core_data::types::PlayerName;
 use database::save_file::SaveFile;
-use serde_json;
-use tabula_data::localized_strings::LanguageId;
-use tabula_data::tabula::{self, Tabula, TabulaBuildContext, TabulaRaw};
+use tabula_data::tabula::{Tabula, TabulaSource};
 use uuid::Uuid;
 
 use crate::display_state_provider::{DisplayState, DisplayStateProvider};
@@ -74,28 +72,24 @@ impl StateProvider for TestStateProvider {
             }
             return Ok(());
         }
-        let tabula_path = format!("{streaming_assets_path}/tabula.json");
-        let ctx = TabulaBuildContext { current_language: LanguageId::EnglishUnitedStates };
-        let build_from_file = |path: &str| -> Result<Tabula, Vec<InitializationError>> {
-            let file = File::open(path).map_err(|e| {
-                vec![InitializationError::with_details(
-                    ErrorCode::IOError,
-                    "Failed to open tabula.json",
-                    e.to_string(),
-                )]
-            })?;
-            let raw: TabulaRaw = serde_json::from_reader(file).map_err(|e| {
-                vec![InitializationError::with_details(
-                    ErrorCode::JsonError,
-                    "Failed to parse tabula.json",
-                    e.to_string(),
-                )]
-            })?;
-            tabula::build(&ctx, &raw)
+        let load_tabula = |dir: &Path| -> Result<Tabula, Vec<InitializationError>> {
+            Tabula::load(TabulaSource::Test, dir).map_err(|errors| {
+                errors
+                    .into_iter()
+                    .map(|e| {
+                        InitializationError::with_details(
+                            ErrorCode::IOError,
+                            "Tabula loading error",
+                            format!("{e}"),
+                        )
+                    })
+                    .collect()
+            })
         };
-        let built = match build_from_file(&tabula_path) {
+        let tabula_dir = Path::new(streaming_assets_path).join("Tabula");
+        let built = match load_tabula(&tabula_dir) {
             Ok(t) => t,
-            Err(_) => build_from_file("tabula.json")?,
+            Err(_) => load_tabula(Path::new("tabula"))?,
         };
         let arc = GLOBAL_TABULA.get_or_init(|| Arc::new(built));
         if let Ok(mut guard) = self.inner.tabula.write() {

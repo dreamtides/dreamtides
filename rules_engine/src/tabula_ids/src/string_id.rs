@@ -1,4 +1,4 @@
-use tabula_data::localized_strings::StringId;
+use tabula_data::fluent_loader::StringId;
 use uuid::uuid;
 
 /// Energy icon

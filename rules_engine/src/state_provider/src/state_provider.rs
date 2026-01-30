@@ -1,8 +1,6 @@
 use std::collections::HashMap;
-use std::fs::File;
-use std::io::{Cursor, Read};
 use std::panic::{RefUnwindSafe, UnwindSafe};
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicUsize, Ordering};
 use std::sync::{Arc, Condvar, LazyLock, Mutex, RwLock};
 use std::time::Instant;
@@ -16,12 +14,9 @@ use database::save_file::SaveFile;
 use database::save_file_io;
 use display_data::command::CommandSequence;
 use display_data::request_data::{PollResponseType, RequestId};
-use serde_json;
-use tabula_data::localized_strings::LanguageId;
-use tabula_data::tabula::{self, Tabula, TabulaBuildContext, TabulaRaw};
+use tabula_data::tabula::{Tabula, TabulaSource};
 use tracing::instrument;
 use uuid::Uuid;
-use zip::ZipArchive;
 
 use crate::display_state_provider::{DisplayState, DisplayStateProvider};
 
@@ -148,93 +143,6 @@ impl DefaultStateProvider {
     }
 }
 
-/// Loads tabula.json from an APK jar style URL on Android.
-///
-/// Example: jar:file:///.../base.apk!/assets/tabula.json
-///
-/// This is almostly certainly the wrong way to do this. I hope one day to learn
-/// the correct method of fetching resources on android.
-fn load_tabula_raw_android(jar_url: &str) -> Result<TabulaRaw, Vec<InitializationError>> {
-    let without_prefix = jar_url.strip_prefix("jar:file:").ok_or_else(|| {
-        vec![InitializationError::with_details(
-            ErrorCode::IOError,
-            "Android jar URL missing jar:file: prefix",
-            jar_url.to_string(),
-        )]
-    })?;
-    let bang_index = without_prefix.find("!/").ok_or_else(|| {
-        vec![InitializationError::with_details(
-            ErrorCode::IOError,
-            "Malformed Android jar URL for tabula.json",
-            jar_url.to_string(),
-        )]
-    })?;
-    let (apk_path, entry_path_with_slash) = without_prefix.split_at(bang_index);
-    let entry_path = &entry_path_with_slash[2..];
-    let mut file = File::open(apk_path).map_err(|e| {
-        vec![InitializationError::with_details(
-            ErrorCode::IOError,
-            "Failed to open base.apk while reading tabula.json",
-            e.to_string(),
-        )]
-    })?;
-    let mut zip = ZipArchive::new(&mut file).map_err(|e| {
-        vec![InitializationError::with_details(
-            ErrorCode::IOError,
-            "Failed to read APK zip while reading tabula.json",
-            e.to_string(),
-        )]
-    })?;
-    let mut zip_file = zip.by_name(entry_path).map_err(|e| {
-        vec![InitializationError::with_details(
-            ErrorCode::IOError,
-            "tabula.json not found inside APK",
-            e.to_string(),
-        )]
-    })?;
-    let mut buf = Vec::new();
-    zip_file.read_to_end(&mut buf).map_err(|e| {
-        vec![InitializationError::with_details(
-            ErrorCode::IOError,
-            "Failed to read tabula.json from APK",
-            e.to_string(),
-        )]
-    })?;
-    serde_json::from_reader(Cursor::new(buf)).map_err(|e| {
-        vec![InitializationError::with_details(
-            ErrorCode::JsonError,
-            "Failed to parse tabula.json",
-            e.to_string(),
-        )]
-    })
-}
-
-/// Loads tabula.json directly from the filesystem (non-Android platforms)
-fn load_tabula_raw_filesystem(path: &str) -> Result<TabulaRaw, Vec<InitializationError>> {
-    let file = File::open(path).map_err(|e| {
-        vec![InitializationError::with_details(
-            ErrorCode::IOError,
-            "Failed to open tabula.json",
-            e.to_string(),
-        )]
-    })?;
-    serde_json::from_reader(file).map_err(|e| {
-        vec![InitializationError::with_details(
-            ErrorCode::JsonError,
-            "Failed to parse tabula.json",
-            e.to_string(),
-        )]
-    })
-}
-
-fn load_tabula_raw(tabula_path: &str) -> Result<TabulaRaw, Vec<InitializationError>> {
-    if tabula_path.starts_with("jar:file:") {
-        load_tabula_raw_android(tabula_path)
-    } else {
-        load_tabula_raw_filesystem(tabula_path)
-    }
-}
-
 impl StateProvider for DefaultStateProvider {
     fn initialize(
         &self,
@@ -243,20 +151,27 @@ impl StateProvider for DefaultStateProvider {
     ) -> Result<(), Vec<InitializationError>> {
         let mut dir_guard = PERSISTENT_DATA_DIR.lock().unwrap();
         *dir_guard = Some(PathBuf::from(persistent_data_path));
-        let tabula_path = format!("{streaming_assets_path}/tabula.json");
-        let ctx = TabulaBuildContext { current_language: LanguageId::EnglishUnitedStates };
-        let raw: TabulaRaw = match load_tabula_raw(&tabula_path) {
-            Ok(r) => r,
-            Err(e) => {
+        let tabula_dir = Path::new(streaming_assets_path).join("Tabula");
+        let tabula = match Tabula::load(TabulaSource::Production, &tabula_dir) {
+            Ok(t) => t,
+            Err(errors) => {
                 let formatted =
-                    e.iter().map(InitializationError::format).collect::<Vec<_>>().join("\n");
+                    errors.iter().map(|e| format!("{e}")).collect::<Vec<_>>().join("\n");
                 if let Ok(mut guard) = INITIALIZATION_ERROR.lock() {
                     *guard = Some(formatted.clone());
                 }
-                return Err(e);
+                return Err(errors
+                    .into_iter()
+                    .map(|e| {
+                        InitializationError::with_details(
+                            ErrorCode::IOError,
+                            "Tabula loading error",
+                            format!("{e}"),
+                        )
+                    })
+                    .collect());
             }
         };
-        let tabula = tabula::build(&ctx, &raw)?;
         let mut guard = TABULA_DATA.write().unwrap();
         *guard = Some(Arc::new(tabula));
         if let Ok(mut guard) = INITIALIZATION_ERROR.lock() {

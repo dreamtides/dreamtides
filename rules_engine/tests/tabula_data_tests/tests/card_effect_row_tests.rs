@@ -1,9 +1,9 @@
 use std::path::PathBuf;
 
-use tabula_data_v2::card_effect_row::{
+use tabula_data::card_effect_row::{
     CardEffectRowObjectPredicate, CardEffectRowTrigger, CardEffectRowType, build_card_effect_row,
 };
-use tabula_data_v2::toml_loader::CardEffectRowRaw;
+use tabula_data::toml_loader::CardEffectRowRaw;
 
 fn test_file() -> PathBuf {
     PathBuf::from("test.toml")

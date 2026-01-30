@@ -3,7 +3,7 @@ use std::fs;
 use std::path::Path;
 
 use ability_data::ability::Ability;
-use tabula_data_v2::tabula::{Tabula, TabulaSource};
+use tabula_data::tabula::{Tabula, TabulaSource};
 use uuid::Uuid;
 
 /// Creates a minimal test fixture directory with all required files.

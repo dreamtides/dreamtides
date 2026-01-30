@@ -1,9 +1,9 @@
 use std::path::PathBuf;
 
 use ability_data::ability::Ability;
-use tabula_data_v2::card_definition_builder;
-use tabula_data_v2::card_definition_raw::CardDefinitionRaw;
-use tabula_data_v2::tabula_error::TabulaError;
+use tabula_data::card_definition_builder;
+use tabula_data::card_definition_raw::CardDefinitionRaw;
+use tabula_data::tabula_error::TabulaError;
 use toml::Value as TomlValue;
 use uuid::Uuid;
 

@@ -5,7 +5,7 @@ use core_data::types::PlayerName;
 use quest_state::quest::deck::QuestDeckCardId;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
-use tabula_data::card_definitions::card_definition::CardDefinition;
+use tabula_data::card_definition::CardDefinition;
 
 use crate::battle::all_cards::CreatedCard;
 use crate::battle_cards::ability_list::AbilityList;

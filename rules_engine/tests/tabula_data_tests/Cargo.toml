@@ -1,5 +1,5 @@
 [package]
-name = "tabula_data_v2_tests"
+name = "tabula_data_tests"
 version = "0.0.0"
 edition = "2024"
 
@@ -14,7 +14,7 @@ bench = false
 [dependencies]
 ability_data = { path = "../../src/ability_data" }
 core_data = { path = "../../src/core_data" }
-tabula_data_v2 = { path = "../../src/tabula_data_v2" }
+tabula_data = { path = "../../src/tabula_data" }
 
 serde_json = { workspace = true }
 tempfile = { workspace = true }
