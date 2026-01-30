@@ -21,21 +21,5 @@ bench = false
 tabula_data = { path = "../tabula_data" }
 
 anyhow = { workspace = true }
-axum = { workspace = true }
-calamine = { workspace = true }
-chrono = { workspace = true }
 clap = { workspace = true }
 convert_case = { workspace = true }
-fluent = { workspace = true }
-fluent-bundle = { workspace = true }
-reqwest = { workspace = true }
-roxmltree = { workspace = true }
-serde = { workspace = true }
-serde_json = { workspace = true }
-sha2 = { workspace = true }
-tempfile = { workspace = true }
-tokio = { workspace = true }
-toml = { features = ["preserve_order"], workspace = true }
-umya-spreadsheet = { workspace = true }
-uuid = { workspace = true }
-zip = { workspace = true }
