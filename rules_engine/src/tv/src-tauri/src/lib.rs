@@ -1,16 +1,12 @@
 use std::collections::HashSet;
-use std::sync::Arc;
 
 use tauri::menu::{CheckMenuItem, Menu, MenuItem, MenuItemKind};
 use tauri::{Emitter, Manager};
 
-use crate::ability_parser::ability_parser_state::AbilityParserState;
 use crate::derived::compute_executor::ComputeExecutorState;
 use crate::error::permission_recovery::PermissionRecoveryState;
 use crate::filter::filter_state::FilterStateManager;
 use crate::images::image_fetcher::ImageFetcherState;
-
-pub mod ability_parser;
 pub mod cli;
 mod commands;
 pub mod derived;
@@ -182,7 +178,6 @@ pub fn run(paths: cli::AppPaths) {
         .manage(executor_state)
         .manage(ImageFetcherState::new())
         .manage(PermissionRecoveryState::new())
-        .manage(Arc::new(AbilityParserState::new()))
         .invoke_handler(tauri::generate_handler![
             commands::load_command::load_toml_table,
             commands::save_command::save_toml_table,
@@ -247,15 +242,6 @@ pub fn run(paths: cli::AppPaths) {
 
             // Initialize the image fetcher with the app cache directory
             initialize_image_fetcher(&app_handle);
-
-            // Start the ability parser background task
-            if let Some(state) = app_handle.try_state::<Arc<AbilityParserState>>() {
-                Arc::clone(&state).start_background_task(app_handle.clone());
-                tracing::info!(
-                    component = "tv.ability_parser",
-                    "Ability parser background task started"
-                );
-            }
 
             Ok(())
         })

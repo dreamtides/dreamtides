@@ -1,10 +1,7 @@
 use std::collections::HashMap;
-use std::path::Path;
-use std::sync::Arc;
 
-use tauri::{AppHandle, Manager};
+use tauri::AppHandle;
 
-use crate::ability_parser::ability_parser_state::AbilityParserState;
 use crate::error::error_types::TvError;
 use crate::error::permission_recovery::{self, PermissionState};
 use crate::sync::state_machine;
@@ -26,11 +23,6 @@ pub fn save_toml_table(
 
     let result = document_writer::save_toml_document(&TvConfig::default(), &file_path, &table_name, &data);
     let _ = state_machine::end_save(&app_handle, &file_path, result.is_ok());
-
-    if result.is_ok() {
-        let column_keys: Vec<&str> = data.headers.iter().map(|s| s.as_str()).collect();
-        trigger_ability_parse_if_needed(&app_handle, &file_path, &column_keys);
-    }
 
     result
 }
@@ -89,10 +81,6 @@ pub fn save_cell(
     }
 
     let _ = state_machine::end_save(&app_handle, &file_path, result.is_ok());
-
-    if result.is_ok() {
-        trigger_ability_parse_if_needed(&app_handle, &file_path, &[&column_key]);
-    }
 
     result
 }
@@ -154,11 +142,6 @@ pub fn save_batch(
 
     let _ = state_machine::end_save(&app_handle, &file_path, result.is_ok());
 
-    if result.as_ref().is_ok_and(|r| r.success) {
-        let column_keys: Vec<&str> = updates.iter().map(|u| u.column_key.as_str()).collect();
-        trigger_ability_parse_if_needed(&app_handle, &file_path, &column_keys);
-    }
-
     result
 }
 
@@ -177,17 +160,4 @@ pub fn add_row(
     let _ = state_machine::end_save(&app_handle, &file_path, result.is_ok());
 
     result
-}
-
-fn trigger_ability_parse_if_needed(app_handle: &AppHandle, file_path: &str, column_keys: &[&str]) {
-    let has_ability_column = column_keys.iter().any(|key| AbilityParserState::is_ability_column(key));
-
-    if !has_ability_column {
-        return;
-    }
-
-    if let Some(state) = app_handle.try_state::<Arc<AbilityParserState>>() {
-        state.set_tabula_directory(Path::new(file_path));
-        state.trigger_parse();
-    }
 }

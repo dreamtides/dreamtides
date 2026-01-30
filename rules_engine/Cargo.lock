@@ -6420,7 +6420,6 @@ dependencies = [
  "notify-debouncer-mini",
  "num_cpus",
  "parking_lot",
- "parser_v2",
  "regex",
  "reqwest",
  "schemars 1.0.2",

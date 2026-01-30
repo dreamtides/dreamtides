@@ -21,7 +21,6 @@ tauri-build = { version = "2", features = [] }
 # Internal dependencies
 ability_data = { path = "../../ability_data" }
 core_data = { path = "../../core_data" }
-parser_v2 = { path = "../../parser_v2" }
 
 # External dependencies
 chrono = { version = "0.4", features = ["serde"] }
