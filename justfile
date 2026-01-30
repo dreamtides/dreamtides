@@ -1,12 +1,12 @@
 set positional-arguments
 
-code-review: check-format build workspace-lints clippy style-validator test unity-tests verify-parsed-abilities
+code-review: check-format build workspace-lints tabula-check clippy style-validator test unity-tests
 
 # Run this before pushing
 code-review-rsync: rsync-for-review
     cd ~/dreamtides_tests && just code-review || (osascript -e 'display dialog "Review failed" with icon stop'; exit 1)
 
-review: check-snapshots check-format build clippy style-validator test tv-check tv-clippy verify-parsed-abilities
+review: check-snapshots check-format build tabula-check clippy style-validator test tv-check tv-clippy
 
 check:
     #!/usr/bin/env bash
@@ -331,6 +331,16 @@ tabula-validate:
   output=$(cargo run --manifest-path rules_engine/Cargo.toml -p tabula_cli -- validate --strip-images 2>&1)
   if [ $? -eq 0 ]; then
       echo "Tabula validation passed"
+  else
+      echo "$output"
+      exit 1
+  fi
+
+tabula-check:
+  #!/usr/bin/env bash
+  output=$(cargo run --manifest-path rules_engine/Cargo.toml -p tabula_cli -- check 2>&1)
+  if [ $? -eq 0 ]; then
+      echo "Tabula check passed"
   else
       echo "$output"
       exit 1
