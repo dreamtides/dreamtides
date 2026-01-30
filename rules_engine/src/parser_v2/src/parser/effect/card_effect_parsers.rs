@@ -126,14 +126,20 @@ pub fn return_from_void_to_hand<'a>(
             .ignore_then(up_to_n_events())
             .then_ignore(words(&["from", "your", "void", "to", "your", "hand"]))
             .map(|count| StandardEffect::ReturnUpToCountFromYourVoidToHand {
-                target: Predicate::Any(CardPredicate::Event),
+                target: Predicate::YourVoid(CardPredicate::Event),
                 count,
             }),
         word("return")
-            .ignore_then(article().or_not())
-            .ignore_then(predicate_parser::predicate_parser())
+            .ignore_then(words(&["this", "character"]))
             .then_ignore(words(&["from", "your", "void", "to", "your", "hand"]))
-            .map(|target| StandardEffect::ReturnFromYourVoidToHand { target }),
+            .map(|_| StandardEffect::ReturnFromYourVoidToHand { target: Predicate::This }),
+        word("return")
+            .ignore_then(article().or_not())
+            .ignore_then(card_predicate_parser::parser())
+            .then_ignore(words(&["from", "your", "void", "to", "your", "hand"]))
+            .map(|card_pred| StandardEffect::ReturnFromYourVoidToHand {
+                target: Predicate::YourVoid(card_pred),
+            }),
     ))
     .boxed()
 }

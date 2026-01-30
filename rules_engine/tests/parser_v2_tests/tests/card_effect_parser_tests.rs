@@ -402,7 +402,7 @@ fn test_materialized_return_character_from_void_to_hand() {
         Materialized,
       ]),
       effect: Effect(ReturnFromYourVoidToHand(
-        target: Any(Character),
+        target: YourVoid(Character),
       )),
     ))
     "###,
@@ -436,7 +436,7 @@ fn test_you_may_return_character_from_void_draw_cards() {
       effect: List([
         EffectWithOptions(
           effect: ReturnFromYourVoidToHand(
-            target: Any(Character),
+            target: YourVoid(Character),
           ),
           optional: true,
         ),
@@ -713,7 +713,7 @@ fn test_return_up_to_n_events_from_void_to_hand() {
     assert_ron_snapshot!(result, @r###"
     Event(EventAbility(
       effect: Effect(ReturnUpToCountFromYourVoidToHand(
-        target: Any(Event),
+        target: YourVoid(Event),
         count: 3,
       )),
     ))

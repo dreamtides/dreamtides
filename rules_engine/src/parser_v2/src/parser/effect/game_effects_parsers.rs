@@ -91,18 +91,21 @@ pub fn counterspell<'a>(
 ) -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
     directive("prevent")
         .ignore_then(words(&["a", "played"]))
-        .ignore_then(predicate_parser::predicate_parser())
-        .map(|target| StandardEffect::Counterspell { target })
+        .ignore_then(card_predicate_parser::parser())
+        .map(|card_pred| StandardEffect::Counterspell { target: Predicate::Enemy(card_pred) })
 }
 
 pub fn counterspell_unless_pays_cost<'a>(
 ) -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
     directive("prevent")
         .ignore_then(words(&["a", "played"]))
-        .ignore_then(predicate_parser::predicate_parser())
+        .ignore_then(card_predicate_parser::parser())
         .then_ignore(words(&["unless", "the", "opponent", "pays"]))
         .then(cost_parser::cost_parser())
-        .map(|(target, cost)| StandardEffect::CounterspellUnlessPaysCost { target, cost })
+        .map(|(card_pred, cost)| StandardEffect::CounterspellUnlessPaysCost {
+            target: Predicate::Enemy(card_pred),
+            cost,
+        })
 }
 
 pub fn dissolve_each_character<'a>(

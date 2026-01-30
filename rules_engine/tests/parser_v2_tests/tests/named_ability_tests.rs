@@ -219,9 +219,9 @@ fn test_abandon_ally_alternate_cost_materialized_dissolve_enemy() {
 }
 
 #[test]
-fn test_banish_from_hand_alternate_cost_prevent_enemy_card() {
+fn test_banish_from_hand_alternate_cost_prevent_card() {
     let result = parse_abilities(
-        "{Banish} a card from hand: Play this event for {e}.\n\n{Prevent} a played enemy card.",
+        "{Banish} a card from hand: Play this event for {e}.\n\n{Prevent} a played card.",
         "e: 0",
     );
     assert_eq!(result.len(), 2);
@@ -256,7 +256,7 @@ fn test_lose_maximum_energy_alternate_cost_prevent_card() {
     assert_ron_snapshot!(result[1], @r###"
     Event(EventAbility(
       effect: Effect(Counterspell(
-        target: Any(Card),
+        target: Enemy(Card),
       )),
     ))
     "###);

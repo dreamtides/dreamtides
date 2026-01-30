@@ -114,7 +114,7 @@ fn test_prevent_a_card() {
     assert_ron_snapshot!(result, @r###"
     Event(EventAbility(
       effect: Effect(Counterspell(
-        target: Any(Card),
+        target: Enemy(Card),
       )),
     ))
     "###);
@@ -126,7 +126,7 @@ fn test_prevent_event_unless_opponent_pays() {
     assert_ron_snapshot!(result, @r###"
     Event(EventAbility(
       effect: Effect(CounterspellUnlessPaysCost(
-        target: Any(Event),
+        target: Enemy(Event),
         cost: Energy(Energy(1)),
       )),
     ))
@@ -287,7 +287,7 @@ fn test_prevent_a_played_fast_card() {
     assert_ron_snapshot!(result, @r###"
     Event(EventAbility(
       effect: Effect(Counterspell(
-        target: Any(Fast(
+        target: Enemy(Fast(
           target: Card,
         )),
       )),
@@ -301,7 +301,7 @@ fn test_prevent_a_played_character() {
     assert_ron_snapshot!(result, @r###"
     Event(EventAbility(
       effect: Effect(Counterspell(
-        target: Any(Character),
+        target: Enemy(Character),
       )),
     ))
     "###);
@@ -317,7 +317,7 @@ fn test_materialized_prevent_played_card_with_cost() {
         Materialized,
       ]),
       effect: Effect(Counterspell(
-        target: Any(CardWithCost(
+        target: Enemy(CardWithCost(
           target: Card,
           cost_operator: OrLess,
           cost: Energy(3),
@@ -336,7 +336,7 @@ fn test_prevent_played_card_put_on_top_of_opponent_deck() {
       effect: List([
         EffectWithOptions(
           effect: Counterspell(
-            target: Any(Card),
+            target: Enemy(Card),
           ),
           optional: false,
         ),
@@ -622,18 +622,6 @@ fn test_discover_fast_subtype_with_spark_general() {
         predicate: Fast(
           target: CharacterWithSpark(Spark(1), OrLess),
         ),
-      )),
-    ))
-    "###);
-}
-
-#[test]
-fn test_prevent_a_played_enemy_card() {
-    let result = parse_ability("{Prevent} a played enemy card.", "");
-    assert_ron_snapshot!(result, @r###"
-    Event(EventAbility(
-      effect: Effect(Counterspell(
-        target: Enemy(Card),
       )),
     ))
     "###);
@@ -1161,7 +1149,7 @@ fn test_prevent_played_event_which_could_dissolve_ally() {
     assert_ron_snapshot!(result, @r###"
     Event(EventAbility(
       effect: Effect(Counterspell(
-        target: Any(CouldDissolve(
+        target: Enemy(CouldDissolve(
           target: Another(Character),
         )),
       )),

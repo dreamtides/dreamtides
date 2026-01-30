@@ -417,7 +417,7 @@ fn test_fast_abandon_this_character_prevent_played_event() {
         ),
       ],
       effect: Effect(Counterspell(
-        target: Any(Event),
+        target: Enemy(Event),
       )),
       options: Some(ActivatedAbilityOptions(
         is_fast: true,

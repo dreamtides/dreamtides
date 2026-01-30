@@ -997,7 +997,7 @@ energy-cost = 5
 rules-text = """
 {Banish} a card from hand: Play this event for {e}.
 
-{Prevent} a played enemy card."""
+{Prevent} a played card."""
 variables = "e: 0"
 card-type = "Event"
 is-fast = true
