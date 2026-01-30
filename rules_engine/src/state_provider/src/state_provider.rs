@@ -7,6 +7,7 @@ use std::time::Instant;
 
 use battle_state::actions::battle_actions::BattleAction;
 use battle_state::battle::battle_state::{BattleState, RequestContext};
+use battle_state::battle_player::battle_player_state::TestDeckName;
 use core_data::identifiers::{BattleId, UserId};
 use core_data::initialization_error::{ErrorCode, InitializationError};
 use core_data::types::PlayerName;
@@ -15,6 +16,7 @@ use database::save_file_io;
 use display_data::command::CommandSequence;
 use display_data::request_data::{PollResponseType, RequestId};
 use tabula_data::tabula::{Tabula, TabulaSource};
+use tabula_generated::card_lists::DreamwellCardIdList;
 use tracing::instrument;
 use uuid::Uuid;
 
@@ -111,6 +113,16 @@ pub trait StateProvider:
     }
 
     fn set_initialization_error(&self, _error: String) {}
+
+    /// Returns the default dreamwell card list for new battles.
+    fn default_dreamwell_list(&self) -> DreamwellCardIdList {
+        DreamwellCardIdList::DreamwellBasic5
+    }
+
+    /// Returns the default deck name for new battles.
+    fn default_deck_name(&self) -> TestDeckName {
+        TestDeckName::Core11
+    }
 }
 
 #[derive(Debug, Clone)]

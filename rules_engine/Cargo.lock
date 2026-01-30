@@ -5811,6 +5811,7 @@ dependencies = [
  "serde",
  "serde_json",
  "tabula_data",
+ "tabula_generated",
  "tracing",
  "uuid",
  "zip 4.6.1",

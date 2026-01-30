@@ -4,11 +4,13 @@ use std::sync::{Arc, Mutex, OnceLock, RwLock};
 use std::time::Instant;
 
 use battle_state::battle::battle_state::{BattleState, RequestContext};
+use battle_state::battle_player::battle_player_state::TestDeckName;
 use core_data::identifiers::{BattleId, UserId};
 use core_data::initialization_error::{ErrorCode, InitializationError};
 use core_data::types::PlayerName;
 use database::save_file::SaveFile;
 use tabula_data::tabula::{Tabula, TabulaSource};
+use tabula_generated::card_lists::DreamwellCardIdList;
 use uuid::Uuid;
 
 use crate::display_state_provider::{DisplayState, DisplayStateProvider};
@@ -268,6 +270,14 @@ impl StateProvider for TestStateProvider {
 
     fn should_panic_on_error(&self) -> bool {
         true
+    }
+
+    fn default_dreamwell_list(&self) -> DreamwellCardIdList {
+        DreamwellCardIdList::TestDreamwellBasic5
+    }
+
+    fn default_deck_name(&self) -> TestDeckName {
+        TestDeckName::Vanilla
     }
 }
 

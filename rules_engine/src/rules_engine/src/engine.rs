@@ -13,9 +13,7 @@ use battle_queries::macros::write_tracing_event;
 use battle_state::battle::animation_data::AnimationData;
 use battle_state::battle::battle_state::{BattleState, RequestContext};
 use battle_state::battle_cards::dreamwell_data::Dreamwell;
-use battle_state::battle_player::battle_player_state::{
-    CreateBattlePlayer, PlayerType, TestDeckName,
-};
+use battle_state::battle_player::battle_player_state::{CreateBattlePlayer, PlayerType};
 use core_data::identifiers::{BattleId, QuestId, UserId};
 use core_data::initialization_error::InitializationError;
 use core_data::types::PlayerName;
@@ -30,7 +28,6 @@ use game_creation::new_battle;
 use rand::RngCore;
 use state_provider::state_provider::{DefaultStateProvider, PollResult, StateProvider};
 use state_provider::test_state_provider::TestStateProvider;
-use tabula_generated::card_lists::DreamwellCardIdList;
 use tokio::task;
 use tracing::{Level, debug, error, info, instrument, warn};
 use ui_components::display_properties;
@@ -348,7 +345,8 @@ fn load_battle_from_provider<P: StateProvider + 'static>(
             let enemy =
                 configuration.enemy.as_ref().cloned().unwrap_or(DEFAULT_AI_OPPONENT.clone());
 
-            let deck_name = configuration.deck_override.unwrap_or(TestDeckName::Core11);
+            let deck_name =
+                configuration.deck_override.unwrap_or_else(|| provider.default_deck_name());
             let new_battle = new_battle::create_and_start(
                 battle_id,
                 provider.tabula(),
@@ -357,7 +355,7 @@ fn load_battle_from_provider<P: StateProvider + 'static>(
                     &provider.tabula(),
                     configuration
                         .dreamwell_override
-                        .unwrap_or(DreamwellCardIdList::DreamwellBasic5),
+                        .unwrap_or_else(|| provider.default_dreamwell_list()),
                 ),
                 CreateBattlePlayer { player_type: PlayerType::User(user_id), deck_name },
                 CreateBattlePlayer { player_type: enemy, deck_name },

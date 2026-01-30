@@ -15,6 +15,7 @@ core_data = { path = "../core_data" }
 database = { path = "../database" }
 display_data = { path = "../display_data" }
 tabula_data = { path = "../tabula_data" }
+tabula_generated = { path = "../tabula_generated" }
 
 serde = { workspace = true }
 serde_json = { workspace = true }
