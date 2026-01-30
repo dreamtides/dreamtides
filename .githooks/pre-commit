@@ -1,31 +1,28 @@
 #!/bin/sh
 #
-# Pre-commit hook to regenerate parsed_abilities.json from TOML files
+# Pre-commit hook to regenerate code from Tabula source files
 #
 
 # Get the repository root
 REPO_ROOT="$(git rev-parse --show-toplevel)"
 
-# Check if any tabula TOML files are being committed
-TOML_CHANGES=$(git diff --cached --name-only -- '*.toml' | grep -E '^rules_engine/tabula/' || true)
+# Check if any tabula TOML or FTL files are being committed
+TOML_CHANGES=$(git diff --cached --name-only -- '*.toml' '*.ftl' | grep -E '^rules_engine/tabula/' || true)
 
 if [ -n "$TOML_CHANGES" ]; then
-    echo "Tabula TOML files changed, regenerating parsed_abilities.json..."
+    echo "Tabula files changed, regenerating..."
 
-    # Run parse-abilities
-    if ! cargo run --manifest-path "$REPO_ROOT/rules_engine/Cargo.toml" --bin "parser_v2" -- \
-        parse-abilities \
-        --directory "$REPO_ROOT/rules_engine/tabula" \
-        --output "$REPO_ROOT/rules_engine/tabula/parsed_abilities.json" 2>&1; then
-        echo "Error: Failed to parse abilities" >&2
+    # Run tabula generate
+    if ! cargo run --manifest-path "$REPO_ROOT/rules_engine/Cargo.toml" -p tabula_cli -- generate 2>&1; then
+        echo "Error: tabula generate failed" >&2
         exit 1
     fi
 
-    # Stage the generated file if it changed
-    if ! git diff --quiet -- "$REPO_ROOT/rules_engine/tabula/parsed_abilities.json"; then
+    # Stage generated files if changed
+    git diff --quiet -- "$REPO_ROOT/rules_engine/tabula/parsed_abilities.json" || \
         git add "$REPO_ROOT/rules_engine/tabula/parsed_abilities.json"
-        echo "Staged updated parsed_abilities.json"
-    fi
+    git diff --quiet -- "$REPO_ROOT/rules_engine/src/tabula_generated/src/" || \
+        git add "$REPO_ROOT/rules_engine/src/tabula_generated/src/"
 fi
 
 exit 0

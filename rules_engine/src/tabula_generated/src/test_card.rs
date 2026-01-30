@@ -6,7 +6,7 @@ use uuid::uuid;
 pub const TEST_VANILLA_CHARACTER: BaseCardId = BaseCardId(uuid!("253ee0ca-f973-4d9f-ad37-abe548bc674f"));
 /// {Dissolve} an enemy character.
 pub const TEST_DISSOLVE: BaseCardId = BaseCardId(uuid!("d4854b6e-5274-4f6a-8a60-a1ea1c15e9a6"));
-/// {Prevent} a played enemy card.
+/// {Prevent} a played card.
 pub const TEST_COUNTERSPELL: BaseCardId = BaseCardId(uuid!("aad836b0-3ece-477c-b923-b099360f0115"));
 /// {Prevent} a played event unless the opponent pays {e}.
 pub const TEST_COUNTERSPELL_UNLESS_PAYS: BaseCardId = BaseCardId(uuid!("76b6d00c-5a28-4ee3-9655-e4fea1d8a4d8"));
@@ -14,7 +14,7 @@ pub const TEST_COUNTERSPELL_UNLESS_PAYS: BaseCardId = BaseCardId(uuid!("76b6d00c
 pub const TEST_VARIABLE_ENERGY_DRAW: BaseCardId = BaseCardId(uuid!("e06a8cfe-483f-42c0-aac8-9c12b21b3f99"));
 /// When you play a card during the opponent's turn, this character gains +{s} spark.
 pub const TEST_TRIGGER_GAIN_SPARK_ON_PLAY_CARD_ENEMY_TURN: BaseCardId = BaseCardId(uuid!("86ee5ad7-b60b-4596-af8c-7a495022ac61"));
-/// {e}: Draw {cards}.
+/// {fast} {e}: Draw {cards}.
 pub const TEST_FAST_MULTI_ACTIVATED_ABILITY_DRAW_CARD_CHARACTER: BaseCardId = BaseCardId(uuid!("d8a8541f-5b00-4d91-9518-aa8ae70ea450"));
 /// Return {up-to-n-events} from your void to your hand.
 pub const TEST_RETURN_ONE_OR_TWO_VOID_EVENT_CARDS_TO_HAND: BaseCardId = BaseCardId(uuid!("559e62a0-7ead-4136-8bd4-6cc58db4bef7"));
@@ -24,21 +24,21 @@ pub const TEST_MODAL_RETURN_TO_HAND_OR_DRAW_TWO: BaseCardId = BaseCardId(uuid!("
 pub const TEST_PREVENT_EVENT_WHICH_COULD_DISSOLVE_ALLY: BaseCardId = BaseCardId(uuid!("a9f3e4c7-2b1d-4e8a-9c3f-5d7b8e2a1c4d"));
 /// {Foresee}. Draw {cards}.  {ReclaimForCost}
 pub const TEST_FORESEE_ONE_DRAW_RECLAIM: BaseCardId = BaseCardId(uuid!("de21db6c-54b4-4bff-b1d6-5a4711ef5ed8"));
-/// {Prevent} a played enemy character.
+/// {Prevent} a played character.
 pub const TEST_COUNTERSPELL_CHARACTER: BaseCardId = BaseCardId(uuid!("86ed0d3f-320b-49d0-b022-cd94aa07edbd"));
 /// {Dissolve} an enemy character.
 pub const TEST_NAMED_DISSOLVE: BaseCardId = BaseCardId(uuid!("3c1dbdc7-702e-4748-af3c-4fd837bcb404"));
 /// Draw {cards}.
 pub const TEST_DRAW_ONE: BaseCardId = BaseCardId(uuid!("68f90d08-9b51-424e-90d1-d15ddd1ece93"));
-/// When you {materialize} a character, this character gains +{s} spark.
+/// When you {materialize} an ally, this character gains +{s} spark.
 pub const TEST_TRIGGER_GAIN_SPARK_WHEN_MATERIALIZE_ANOTHER_CHARACTER: BaseCardId = BaseCardId(uuid!("91c9ed93-5faf-4178-aec9-d631bbcf5d6a"));
 /// When you play a card during the opponent's turn, this character gains +{s} spark.
 pub const TEST_TRIGGER_GAIN_TWO_SPARK_ON_PLAY_CARD_ENEMY_TURN: BaseCardId = BaseCardId(uuid!("82759c0b-5161-4f6f-91b3-d42c2b4e0f9f"));
-/// {e}: Draw {cards}.
+/// {e}, once per turn: Draw {cards}.
 pub const TEST_ACTIVATED_ABILITY_DRAW_CARD: BaseCardId = BaseCardId(uuid!("8dfeb2c1-2d72-411c-a8cc-7f84ca532c63"));
 /// {e}: Draw {cards}.
 pub const TEST_MULTI_ACTIVATED_ABILITY_DRAW_CARD_CHARACTER: BaseCardId = BaseCardId(uuid!("56f944bb-333b-4e2c-9c8c-2068f41998c2"));
-/// {e}: Draw {cards}.
+/// {fast} {e}, once per turn: Draw {cards}.
 pub const TEST_FAST_ACTIVATED_ABILITY_DRAW_CARD_CHARACTER: BaseCardId = BaseCardId(uuid!("44aa4a1a-e8c6-4969-94bc-5fdbe010395e"));
 /// {e}: {Dissolve} an enemy character.
 pub const TEST_ACTIVATED_ABILITY_DISSOLVE_CHARACTER: BaseCardId = BaseCardId(uuid!("785e0341-fdd8-4e05-acb4-cbceed70ea6c"));

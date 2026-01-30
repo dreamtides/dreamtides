@@ -18,8 +18,13 @@ doctest = false
 bench = false
 
 [dependencies]
+parser_v2 = { path = "../parser_v2" }
 tabula_data = { path = "../tabula_data" }
 
 anyhow = { workspace = true }
 clap = { workspace = true }
 convert_case = { workspace = true }
+ctrlc = { workspace = true }
+notify = { workspace = true }
+notify-debouncer-mini = { workspace = true }
+serde_json = { workspace = true }
