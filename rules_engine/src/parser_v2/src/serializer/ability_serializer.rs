@@ -4,6 +4,7 @@ use ability_data::ability::Ability;
 use ability_data::effect::{Effect, ModelEffectChoiceIndex};
 use ability_data::named_ability::NamedAbility;
 use ability_data::trigger_event::TriggerEvent;
+use ability_data::variable_value::VariableValue;
 
 use crate::serializer::{
     cost_serializer, effect_serializer, serializer_utils, static_ability_serializer,
@@ -146,7 +147,12 @@ pub fn serialize_modal_choices(
 
 fn serialize_named_ability(named: &NamedAbility, variables: &mut VariableBindings) -> String {
     match named {
-        NamedAbility::Reclaim(_) => "{ReclaimForCost}".to_string(),
+        NamedAbility::Reclaim(cost) => {
+            if let Some(energy_cost) = cost {
+                variables.insert("reclaim".to_string(), VariableValue::Integer(energy_cost.0));
+            }
+            "{ReclaimForCost}".to_string()
+        }
         NamedAbility::ReclaimForCost(cost) => {
             format!(
                 "{{Reclaim}} -- {}",

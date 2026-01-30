@@ -78,4 +78,9 @@ impl VariableBindings {
     pub fn insert(&mut self, name: String, value: VariableValue) {
         self.bindings.insert(name, value);
     }
+
+    /// Returns an iterator over all variable bindings.
+    pub fn iter(&self) -> impl Iterator<Item = (&String, &VariableValue)> {
+        self.bindings.iter()
+    }
 }

@@ -90,18 +90,13 @@ pub fn card_name(battle: &BattleState, card_id: CardId) -> String {
 /// Converts [VariableBindings] to Fluent [FluentArgs] for string formatting.
 pub fn to_fluent_args(bindings: &VariableBindings) -> FluentArgs<'static> {
     let mut args = FluentArgs::new();
-    // Note: VariableBindings doesn't expose iteration, so we use known variable
-    // names from the serializer. The serializer uses specific variable names
-    // for each effect.
-    for name in ["cards", "discards", "e", "p", "s", "n", "k", "count", "amount"] {
-        if let Some(value) = bindings.get(name) {
-            let fluent_value: FluentValue<'static> = match value {
-                VariableValue::Integer(n) => FluentValue::Number(FluentNumber::from(*n as f64)),
-                VariableValue::Subtype(subtype) => FluentValue::String(subtype.to_string().into()),
-                VariableValue::Figment(figment) => FluentValue::String(figment.to_string().into()),
-            };
-            args.set(String::from(name), fluent_value);
-        }
+    for (name, value) in bindings.iter() {
+        let fluent_value: FluentValue<'static> = match value {
+            VariableValue::Integer(n) => FluentValue::Number(FluentNumber::from(*n as f64)),
+            VariableValue::Subtype(subtype) => FluentValue::String(subtype.to_string().into()),
+            VariableValue::Figment(figment) => FluentValue::String(figment.to_string().into()),
+        };
+        args.set(name.clone(), fluent_value);
     }
     args
 }
