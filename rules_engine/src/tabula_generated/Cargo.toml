@@ -14,4 +14,6 @@ bench = false
 [dependencies]
 core_data = { path = "../core_data" }
 
+schemars = { workspace = true }
+serde = { workspace = true }
 uuid = { workspace = true }

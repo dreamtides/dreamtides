@@ -6053,6 +6053,8 @@ name = "tabula_generated"
 version = "0.0.0"
 dependencies = [
  "core_data",
+ "schemars 1.0.2",
+ "serde",
  "uuid",
 ]
 
