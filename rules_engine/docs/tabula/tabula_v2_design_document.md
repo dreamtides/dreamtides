@@ -514,7 +514,6 @@ the new rendering infrastructure while code still compiles.
   - `render_modal_choices(abilities: &[Ability]) -> Vec<String>`
   - Helper functions matching current `DisplayedAbility` usage patterns
 - Add module to `src/display/src/rendering/mod.rs`
-- Write unit tests for the new helper functions
 
 **Key Files for Context:**
 - `src/display/src/rendering/card_rendering.rs:187-214` (`get_displayed_text` function)
@@ -523,7 +522,7 @@ the new rendering infrastructure while code still compiles.
 - `src/parser_v2/src/serializer/ability_serializer.rs:17-91` (serializer API)
 - `src/parser_v2/src/serializer/effect_serializer.rs:798-978` (effect serializer)
 
-**Validation:** `just check` passes, new helper module compiles, unit tests pass
+**Validation:** `just check` passes, new helper module compiles, tests pass
 
 ---
 
