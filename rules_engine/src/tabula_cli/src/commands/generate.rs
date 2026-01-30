@@ -159,10 +159,10 @@ fn generate_string_ids(tabula_dir: &Path, output_dir: &Path) -> Result<()> {
     }
     out.push_str("}\n");
 
-    // Generate as_str method
+    // Generate identifier method
     out.push_str("\nimpl StringId {\n");
     out.push_str("    /// Returns the Fluent message identifier for this string.\n");
-    out.push_str("    pub fn as_str(self) -> &'static str {\n");
+    out.push_str("    pub fn identifier(self) -> &'static str {\n");
     out.push_str("        match self {\n");
     for variant_name in &insertion_order {
         let message_id = &variant_to_message[variant_name];

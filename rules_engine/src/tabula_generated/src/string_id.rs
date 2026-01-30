@@ -123,7 +123,7 @@ pub enum StringId {
 
 impl StringId {
     /// Returns the Fluent message identifier for this string.
-    pub fn as_str(self) -> &'static str {
+    pub fn identifier(self) -> &'static str {
         match self {
             StringId::EnergySymbol => "energy-symbol",
             StringId::PointsSymbol => "points-symbol",
