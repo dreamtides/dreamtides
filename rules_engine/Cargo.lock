@@ -4062,48 +4062,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "parser"
-version = "0.0.0"
-dependencies = [
- "ability_data",
- "ariadne",
- "chumsky",
- "core_data",
-]
-
-[[package]]
-name = "parser_benchmarks"
-version = "0.0.0"
-dependencies = [
- "ai_agents",
- "ai_data",
- "battle_mutations",
- "battle_queries",
- "battle_state",
- "core_data",
- "criterion",
- "game_creation",
- "logging",
- "parser",
- "rand 0.9.0",
- "rand_xoshiro",
- "state_provider",
- "tracing",
- "tracing-subscriber",
- "uuid",
-]
-
-[[package]]
-name = "parser_cli"
-version = "0.0.0"
-dependencies = [
- "ariadne",
- "clap",
- "parser",
- "ron 0.8.1",
-]
-
-[[package]]
 name = "parser_v2"
 version = "0.1.0"
 dependencies = [
