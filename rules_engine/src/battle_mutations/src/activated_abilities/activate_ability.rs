@@ -50,7 +50,7 @@ pub fn execute(
                 .options
                 .as_ref()
                 .map(|options| options.is_multi)
-                .unwrap_or(false);
+                .unwrap_or(true);
 
             // Check if this ability can be used (not already used this turn for non-multi
             // abilities)

@@ -80,7 +80,7 @@ prompts = ""
 name = "Test Fast Multi Activated Ability Draw Card Character"
 id = "d8a8541f-5b00-4d91-9518-aa8ae70ea450"
 energy-cost = 2
-rules-text = "{e}: Draw {cards}."
+rules-text = "{fast} {e}: Draw {cards}."
 variables = """
 e: 3
 cards: 1"""
@@ -224,7 +224,7 @@ prompts = ""
 name = "Test Activated Ability Draw Card"
 id = "8dfeb2c1-2d72-411c-a8cc-7f84ca532c63"
 energy-cost = 2
-rules-text = "{e}: Draw {cards}."
+rules-text = "{e}, once per turn: Draw {cards}."
 variables = """
 e: 1
 cards: 1"""
@@ -254,7 +254,7 @@ prompts = ""
 name = "Test Fast Activated Ability Draw Card Character"
 id = "44aa4a1a-e8c6-4969-94bc-5fdbe010395e"
 energy-cost = 0
-rules-text = "{e}: Draw {cards}."
+rules-text = "{fast} {e}, once per turn: Draw {cards}."
 variables = """
 e: 1
 cards: 1"""

@@ -24,7 +24,6 @@ fn hand_size_limit_exceeded_gains_energy() {
 
     s.play_card_from_hand(DisplayPlayer::User, &draw_id);
     s.click_increment_button(DisplayPlayer::User);
-    s.click_increment_button(DisplayPlayer::User);
     s.click_primary_button(DisplayPlayer::User, "Spend");
 
     assert_eq!(

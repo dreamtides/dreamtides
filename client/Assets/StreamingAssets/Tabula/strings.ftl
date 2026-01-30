@@ -188,26 +188,26 @@ n-figments =
 a-subtype =
   {
     $subtype ->
-      [ancient] an {-type(value: "ancient")}
-      [child] a {-type(value: "child")}
-      [detective] a {-type(value: "detective")}
-      [enigma] an {-type(value: "enigma")}
-      [explorer] an {-type(value: "explorer")}
-      [hacker] a {-type(value: "hacker")}
-      [mage] a {-type(value: "mage")}
-      [monster] a {-type(value: "monster")}
-      [musician] a {-type(value: "musician")}
-      [outsider] an {-type(value: "outsider")}
-      [renegade] a {-type(value: "renegade")}
-      [spirit-animal] a {-type(value: "spirit animal")}
-      [super] a {-type(value: "super")}
-      [survivor] a {-type(value: "survivor")}
-      [synth] a {-type(value: "synth")}
-      [tinkerer] a {-type(value: "tinkerer")}
-      [trooper] a {-type(value: "trooper")}
-      [visionary] a {-type(value: "visionary")}
-      [visitor] a {-type(value: "visitor")}
-      [warrior] a {-type(value: "warrior")}
+      [ancient] an {-type(value: "Ancient")}
+      [child] a {-type(value: "Child")}
+      [detective] a {-type(value: "Detective")}
+      [enigma] an {-type(value: "Enigma")}
+      [explorer] an {-type(value: "Explorer")}
+      [hacker] a {-type(value: "Hacker")}
+      [mage] a {-type(value: "Mage")}
+      [monster] a {-type(value: "Monster")}
+      [musician] a {-type(value: "Musician")}
+      [outsider] an {-type(value: "Outsider")}
+      [renegade] a {-type(value: "Renegade")}
+      [spirit-animal] a {-type(value: "Spirit Animal")}
+      [super] a {-type(value: "Super")}
+      [survivor] a {-type(value: "Survivor")}
+      [synth] a {-type(value: "Synth")}
+      [tinkerer] a {-type(value: "Tinkerer")}
+      [trooper] a {-type(value: "Trooper")}
+      [visionary] a {-type(value: "Visionary")}
+      [visitor] a {-type(value: "Visitor")}
+      [warrior] a {-type(value: "Warrior")}
       *[other] Error: Unknown 'a-subtype' for type: { $subtype }
   }
 
@@ -215,26 +215,26 @@ a-subtype =
 ASubtype =
   {
     $subtype ->
-      [ancient] An {-type(value: "ancient")}
-      [child] An {-type(value: "child")}
-      [detective] An {-type(value: "detective")}
-      [enigma] An {-type(value: "enigma")}
-      [explorer] An {-type(value: "explorer")}
-      [hacker] An {-type(value: "hacker")}
-      [mage] An {-type(value: "mage")}
-      [monster] An {-type(value: "monster")}
-      [musician] An {-type(value: "musician")}
-      [outsider] An {-type(value: "outsider")}
-      [renegade] An {-type(value: "renegade")}
-      [spirit-animal] An {-type(value: "spirit animal")}
-      [super] An {-type(value: "super")}
-      [survivor] An {-type(value: "survivor")}
-      [synth] An {-type(value: "synth")}
-      [tinkerer] An {-type(value: "tinkerer")}
-      [trooper] An {-type(value: "trooper")}
-      [visionary] An {-type(value: "visionary")}
-      [visitor] An {-type(value: "visitor")}
-      [warrior] An {-type(value: "warrior")}
+      [ancient] An {-type(value: "Ancient")}
+      [child] A {-type(value: "Child")}
+      [detective] A {-type(value: "Detective")}
+      [enigma] An {-type(value: "Enigma")}
+      [explorer] An {-type(value: "Explorer")}
+      [hacker] A {-type(value: "Hacker")}
+      [mage] A {-type(value: "Mage")}
+      [monster] A {-type(value: "Monster")}
+      [musician] A {-type(value: "Musician")}
+      [outsider] An {-type(value: "Outsider")}
+      [renegade] A {-type(value: "Renegade")}
+      [spirit-animal] A {-type(value: "Spirit Animal")}
+      [super] A {-type(value: "Super")}
+      [survivor] A {-type(value: "Survivor")}
+      [synth] A {-type(value: "Synth")}
+      [tinkerer] A {-type(value: "Tinkerer")}
+      [trooper] A {-type(value: "Trooper")}
+      [visionary] A {-type(value: "Visionary")}
+      [visitor] A {-type(value: "Visitor")}
+      [warrior] A {-type(value: "Warrior")}
       *[other] Error: Unknown 'ASubtype' for type: { $subtype }
   }
 
@@ -242,26 +242,26 @@ ASubtype =
 subtype =
   {
     $subtype ->
-      [ancient] {-type(value: "ancient")}
-      [child] {-type(value: "child")}
-      [detective] {-type(value: "detective")}
-      [enigma] {-type(value: "enigma")}
-      [explorer] {-type(value: "explorer")}
-      [hacker] {-type(value: "hacker")}
-      [mage] {-type(value: "mage")}
-      [monster] {-type(value: "monster")}
-      [musician] {-type(value: "musician")}
-      [outsider] {-type(value: "outsider")}
-      [renegade] {-type(value: "renegade")}
-      [spirit-animal] {-type(value: "spirit animal")}
-      [super] {-type(value: "super")}
-      [survivor] {-type(value: "survivor")}
-      [synth] {-type(value: "synth")}
-      [tinkerer] {-type(value: "tinkerer")}
-      [trooper] {-type(value: "trooper")}
-      [visionary] {-type(value: "visionary")}
-      [visitor] {-type(value: "visitor")}
-      [warrior] {-type(value: "warrior")}
+      [ancient] {-type(value: "Ancient")}
+      [child] {-type(value: "Child")}
+      [detective] {-type(value: "Detective")}
+      [enigma] {-type(value: "Enigma")}
+      [explorer] {-type(value: "Explorer")}
+      [hacker] {-type(value: "Hacker")}
+      [mage] {-type(value: "Mage")}
+      [monster] {-type(value: "Monster")}
+      [musician] {-type(value: "Musician")}
+      [outsider] {-type(value: "Outsider")}
+      [renegade] {-type(value: "Renegade")}
+      [spirit-animal] {-type(value: "Spirit Animal")}
+      [super] {-type(value: "Super")}
+      [survivor] {-type(value: "Survivor")}
+      [synth] {-type(value: "Synth")}
+      [tinkerer] {-type(value: "Tinkerer")}
+      [trooper] {-type(value: "Trooper")}
+      [visionary] {-type(value: "Visionary")}
+      [visitor] {-type(value: "Visitor")}
+      [warrior] {-type(value: "Warrior")}
       *[other] Error: Unknown 'type' for type: { $subtype }
   }
 
@@ -269,26 +269,26 @@ subtype =
 plural-subtype =
   {
     $subtype ->
-      [ancient] {-type(value: "ancients")}
-      [child] {-type(value: "children")}
-      [detective] {-type(value: "detectives")}
-      [enigma] {-type(value: "enigmas")}
-      [explorer] {-type(value: "explorers")}
-      [hacker] {-type(value: "hackers")}
-      [mage] {-type(value: "mages")}
-      [monster] {-type(value: "monsters")}
-      [musician] {-type(value: "musicians")}
-      [outsider] {-type(value: "outsiders")}
-      [renegade] {-type(value: "renegades")}
-      [spirit-animal] {-type(value: "spirit animals")}
-      [super] {-type(value: "supers")}
-      [survivor] {-type(value: "survivors")}
-      [synth] {-type(value: "synths")}
-      [tinker] {-type(value: "tinkerers")}
-      [trooper] {-type(value: "troopers")}
-      [visionary] {-type(value: "visionaries")}
-      [visitor] {-type(value: "visitors")}
-      [warrior] {-type(value: "warriors")}
+      [ancient] {-type(value: "Ancients")}
+      [child] {-type(value: "Children")}
+      [detective] {-type(value: "Detectives")}
+      [enigma] {-type(value: "Enigmas")}
+      [explorer] {-type(value: "Explorers")}
+      [hacker] {-type(value: "Hackers")}
+      [mage] {-type(value: "Mages")}
+      [monster] {-type(value: "Monsters")}
+      [musician] {-type(value: "Musicians")}
+      [outsider] {-type(value: "Outsiders")}
+      [renegade] {-type(value: "Renegades")}
+      [spirit-animal] {-type(value: "Spirit Animals")}
+      [super] {-type(value: "Supers")}
+      [survivor] {-type(value: "Survivors")}
+      [synth] {-type(value: "Synths")}
+      [tinker] {-type(value: "Tinkerers")}
+      [trooper] {-type(value: "Troopers")}
+      [visionary] {-type(value: "Visionaries")}
+      [visitor] {-type(value: "Visitors")}
+      [warrior] {-type(value: "Warriors")}
       *[other] Error: Unknown 'plural-type' for type: { $subtype }
   }
 

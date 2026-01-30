@@ -115,7 +115,7 @@ pub fn all_user_character_activated_abilities(
                 ActivatedAbilityId { character_id, ability_number: ability.ability_number };
 
             let options = ability.ability.options.as_ref();
-            let is_multi = options.map(|options| options.is_multi).unwrap_or(false);
+            let is_multi = options.map(|options| options.is_multi).unwrap_or(true);
 
             // If the ability is not multi-use and has already been activated
             // this turn cycle, don't show it.

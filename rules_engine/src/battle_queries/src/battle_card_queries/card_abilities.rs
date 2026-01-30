@@ -275,8 +275,14 @@ fn event_effect_predicates(list: &AbilityList) -> Vec<EventEffectPredicate<'_>> 
 }
 
 fn compute_event_additional_cost_restriction(list: &AbilityList) -> Option<CanPlayRestriction> {
-    let costs: Vec<&Cost> =
-        list.event_abilities.iter().filter_map(|a| a.ability.additional_cost.as_ref()).collect();
+    // Check both event abilities' additional_cost and activated abilities' costs
+    // (activated abilities on event cards represent additional costs)
+    let costs: Vec<&Cost> = list
+        .event_abilities
+        .iter()
+        .filter_map(|a| a.ability.additional_cost.as_ref())
+        .chain(list.activated_abilities.iter().flat_map(|a| a.ability.costs.iter()))
+        .collect();
 
     let cost = match costs[..] {
         [] => return Some(CanPlayRestriction::Unrestricted),

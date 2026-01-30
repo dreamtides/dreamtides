@@ -180,7 +180,7 @@ fn primary_action_button(
             return Some(ButtonView {
                 label: builder.string_with_args(
                     StringId::PayEnergyAddtionalCostButton,
-                    fluent_args!("energy" => current),
+                    fluent_args!("e" => current),
                 ),
                 action: Some(BattleAction::SelectEnergyAdditionalCost(current).into()),
             });

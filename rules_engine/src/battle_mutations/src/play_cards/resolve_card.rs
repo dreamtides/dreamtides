@@ -77,17 +77,34 @@ fn resolve_stack_card(battle: &mut BattleState, item: &StackItemState, card_id: 
 }
 
 fn apply_event_effects(battle: &mut BattleState, item: &StackItemState, card_id: StackCardId) {
+    let ability_list = card::ability_list(battle, card_id);
+    let effect_source_fn = |ability_number| EffectSource::Event {
+        controller: item.controller,
+        stack_card_id: card_id,
+        ability_number,
+    };
+
+    // Execute event abilities
     apply_effect::execute_event_abilities(
         battle,
-        |ability_number| EffectSource::Event {
-            controller: item.controller,
-            stack_card_id: card_id,
-            ability_number,
-        },
-        &card::ability_list(battle, card_id).event_abilities,
+        &effect_source_fn,
+        &ability_list.event_abilities,
         item.targets.as_ref(),
         item.modal_choice,
     );
+
+    // Activated abilities on event cards represent additional costs with effects
+    // that execute when the card resolves
+    for data in &ability_list.activated_abilities {
+        let source = effect_source_fn(data.ability_number);
+        apply_effect::execute(
+            battle,
+            source,
+            &data.ability.effect,
+            item.targets.as_ref(),
+            item.modal_choice,
+        );
+    }
 }
 
 fn resolve_activated_ability(

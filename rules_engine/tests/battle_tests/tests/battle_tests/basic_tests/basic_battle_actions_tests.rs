@@ -184,7 +184,7 @@ fn cards_in_hand_properties() {
 
     assert_eq!(character_revealed.numeric_spark(), Some(Spark(5)), "test character spark");
     assert!(character_revealed.name.contains("Character"), "character name");
-    assert_eq!(character_revealed.card_type, "Musician", "character type");
+    assert!(character_revealed.card_type.contains("Musician"), "character type");
 
     assert_eq!(event_revealed.numeric_spark(), None, "event card should have no spark");
     assert!(event_revealed.name.contains("Dissolve"), "event name");

@@ -11,7 +11,10 @@ use core_data::types::PlayerName;
 /// Adds a prompt for the controller of the `card_id` card to pay additional
 /// costs for this card, if any.
 pub fn add(battle: &mut BattleState, controller: PlayerName, card_id: StackCardId) {
-    for data in &card::ability_list(battle, card_id).event_abilities {
+    let ability_list = card::ability_list(battle, card_id);
+
+    // Check event abilities for additional costs
+    for data in &ability_list.event_abilities {
         if let Some(additional_cost) = &data.ability.additional_cost {
             let source = EffectSource::Event {
                 controller,
@@ -24,6 +27,29 @@ pub fn add(battle: &mut BattleState, controller: PlayerName, card_id: StackCardI
             return;
         }
     }
+
+    // Activated abilities on event cards represent additional costs that must be
+    // paid immediately
+    for data in &ability_list.activated_abilities {
+        for cost in &data.ability.costs {
+            if requires_prompt(cost) {
+                let source = EffectSource::Event {
+                    controller,
+                    stack_card_id: card_id,
+                    ability_number: data.ability_number,
+                };
+                let prompt_data = create_prompt_for_cost(battle, controller, source, cost);
+                battle_trace!("Adding additional cost prompt for activated ability", battle);
+                battle.prompts.push_back(prompt_data);
+                return;
+            }
+        }
+    }
+}
+
+/// Returns true if this cost requires an interactive prompt to pay.
+fn requires_prompt(cost: &Cost) -> bool {
+    matches!(cost, Cost::SpendOneOrMoreEnergy)
 }
 
 fn create_prompt_for_cost(

@@ -47,6 +47,6 @@ impl ActivatedAbility {
     }
 
     pub fn is_multi(&self) -> bool {
-        self.options.as_ref().map(|o| o.is_multi).unwrap_or_default()
+        self.options.as_ref().map(|o| o.is_multi).unwrap_or(true)
     }
 }

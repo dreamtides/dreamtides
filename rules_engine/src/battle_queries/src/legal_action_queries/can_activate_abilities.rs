@@ -38,7 +38,7 @@ pub fn for_player(
                 .options
                 .as_ref()
                 .map(|options| options.is_multi)
-                .unwrap_or(false);
+                .unwrap_or(true);
 
             if !is_multi
                 && battle
