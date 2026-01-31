@@ -27,16 +27,21 @@ pub enum CardType {
     Display,
 )]
 pub enum CardSubtype {
+    Agent,
     Ancient,
+    Avatar,
     Child,
     Detective,
     Explorer,
+    Guide,
     Hacker,
     Mage,
     Monster,
     Musician,
     Outsider,
     Renegade,
+    Robot,
+    #[strum(serialize = "Spirit Animal")]
     SpiritAnimal,
     Super,
     Survivor,
@@ -54,16 +59,20 @@ pub enum CardSubtype {
 impl CardSubtype {
     pub fn from_variable(variable: &str) -> Option<CardSubtype> {
         match variable {
+            "agent" => Some(CardSubtype::Agent),
             "ancient" => Some(CardSubtype::Ancient),
+            "avatar" => Some(CardSubtype::Avatar),
             "child" => Some(CardSubtype::Child),
             "detective" => Some(CardSubtype::Detective),
             "explorer" => Some(CardSubtype::Explorer),
+            "guide" => Some(CardSubtype::Guide),
             "hacker" => Some(CardSubtype::Hacker),
             "mage" => Some(CardSubtype::Mage),
             "monster" => Some(CardSubtype::Monster),
             "musician" => Some(CardSubtype::Musician),
             "outsider" => Some(CardSubtype::Outsider),
             "renegade" => Some(CardSubtype::Renegade),
+            "robot" => Some(CardSubtype::Robot),
             "spirit-animal" => Some(CardSubtype::SpiritAnimal),
             "super" => Some(CardSubtype::Super),
             "survivor" => Some(CardSubtype::Survivor),

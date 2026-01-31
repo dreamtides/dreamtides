@@ -115,3 +115,55 @@ fn dissolve_card_command() {
 
     assert!(s.user_client.cards.enemy_void().contains(&target_id), "target dissolved to void");
 }
+
+#[test]
+fn prevent_event_which_could_dissolve_ally() {
+    let mut s = TestBattle::builder().connect();
+    let counterspell_id =
+        s.add_to_hand(DisplayPlayer::User, test_card::TEST_PREVENT_EVENT_WHICH_COULD_DISSOLVE_ALLY);
+    let user_character_id =
+        s.add_to_battlefield(DisplayPlayer::User, test_card::TEST_VANILLA_CHARACTER);
+    s.end_turn_remove_opponent_hand(DisplayPlayer::User);
+
+    // Enemy plays a dissolve targeting user's character
+    s.create_and_play(DisplayPlayer::Enemy, test_card::TEST_DISSOLVE);
+
+    // User counters with the "prevent event which could dissolve ally" card
+    s.play_card_from_hand(DisplayPlayer::User, &counterspell_id);
+
+    // The dissolve should be prevented
+    assert!(
+        s.user_client.cards.stack_cards().is_empty(),
+        "stack should be empty after cards resolve"
+    );
+    assert_eq!(
+        s.user_client.cards.user_battlefield().len(),
+        1,
+        "user's character should still be on battlefield"
+    );
+    assert!(
+        s.user_client.cards.user_battlefield().contains(&user_character_id),
+        "user's character should not have been dissolved"
+    );
+}
+
+#[test]
+fn prevent_event_which_could_dissolve_ally_does_not_affect_non_dissolve() {
+    let mut s = TestBattle::builder().connect();
+    let counterspell_id =
+        s.add_to_hand(DisplayPlayer::User, test_card::TEST_PREVENT_EVENT_WHICH_COULD_DISSOLVE_ALLY);
+    s.add_to_battlefield(DisplayPlayer::User, test_card::TEST_VANILLA_CHARACTER);
+    s.end_turn_remove_opponent_hand(DisplayPlayer::User);
+
+    // Enemy plays a draw card (not a dissolve effect)
+    s.create_and_play(DisplayPlayer::Enemy, test_card::TEST_DRAW_ONE);
+
+    // The counterspell should NOT be playable because the enemy card is not a
+    // dissolve
+    let card_view = s.user_client.cards.card_map.get(&counterspell_id).expect("card should exist");
+    let revealed = card_view.view.revealed.as_ref().expect("card should be revealed");
+    assert!(
+        revealed.actions.can_play.is_none(),
+        "prevent event which could dissolve ally should not be playable for non-dissolve cards"
+    );
+}

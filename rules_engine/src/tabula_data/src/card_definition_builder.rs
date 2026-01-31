@@ -122,7 +122,7 @@ fn parse_card_subtype(
         return Ok(None);
     };
 
-    if subtype_str.is_empty() {
+    if subtype_str.is_empty() || subtype_str == "*" {
         return Ok(None);
     }
 
@@ -195,7 +195,7 @@ fn parse_phase(
 
 fn build_sprite_address(image_number: i64) -> SpriteAddress {
     SpriteAddress::new(format!(
-        "Assets/ThirdParty/GameAssets/CardImages/Base/shutterstock_{image_number}.png"
+        "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_{image_number}.png"
     ))
 }
 

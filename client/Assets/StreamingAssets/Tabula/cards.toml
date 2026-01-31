@@ -1233,7 +1233,7 @@ variables = """
 allies: 3
 cards: 1"""
 card-type = "Character"
-subtype = '\*'
+subtype = '*'
 is-fast = false
 spark = 2
 image-number = 2191235661
@@ -3586,7 +3586,7 @@ art-owned = true
 card-number = 221
 rules-text = ""
 variables = ""
-card-type = ""
+card-type = "Event"
 subtype = ""
 spark = ""
 

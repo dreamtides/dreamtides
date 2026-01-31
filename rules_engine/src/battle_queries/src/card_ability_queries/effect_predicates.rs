@@ -6,7 +6,7 @@ use battle_state::core::effect_source::EffectSource;
 use core_data::card_types::CardType;
 
 use crate::battle_card_queries::card_properties;
-use crate::card_ability_queries::effect_queries;
+use crate::card_ability_queries::{could_dissolve, effect_queries};
 
 /// Flags for querying cards matching a character targeting predicate.
 #[derive(Debug, Clone, Copy, Default)]
@@ -40,6 +40,13 @@ pub fn matching_characters(
         }
         Predicate::Enemy(card_predicate) => {
             let battlefield = battle.cards.battlefield(source.controller().opponent()).clone();
+            on_battlefield(battle, source, battlefield, card_predicate)
+        }
+        Predicate::Another(card_predicate) => {
+            let mut battlefield = battle.cards.battlefield(source.controller()).clone();
+            if let Some(id) = source.card_id() {
+                battlefield.remove(CharacterId(id));
+            }
             on_battlefield(battle, source, battlefield, card_predicate)
         }
         Predicate::YourVoid(_) | Predicate::EnemyVoid(_) => CardSet::default(),
@@ -125,7 +132,7 @@ fn on_battlefield(
 /// Returns all stack cards from `collection` which match a `predicate`.
 fn on_stack(
     battle: &BattleState,
-    _source: EffectSource,
+    source: EffectSource,
     collection: CardSet<StackCardId>,
     predicate: &CardPredicate,
 ) -> CardSet<StackCardId> {
@@ -148,6 +155,9 @@ fn on_stack(
                 }
             }
             characters
+        }
+        CardPredicate::CouldDissolve { target } => {
+            could_dissolve::filter_could_dissolve(battle, source, collection, target)
         }
         _ => todo!("Implement {:?}", predicate),
     }

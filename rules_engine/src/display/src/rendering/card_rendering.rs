@@ -353,17 +353,21 @@ fn card_type(builder: &ResponseBuilder, battle: &BattleState, card_id: CardId) -
     let definition = card::get_definition(battle, card_id);
     let result = if let Some(subtype) = definition.card_subtype {
         let subtype_key = match subtype {
+            CardSubtype::Agent => "agent",
             CardSubtype::Ancient => "ancient",
+            CardSubtype::Avatar => "avatar",
             CardSubtype::Child => "child",
             CardSubtype::Detective => "detective",
             CardSubtype::Enigma => "enigma",
             CardSubtype::Explorer => "explorer",
+            CardSubtype::Guide => "guide",
             CardSubtype::Hacker => "hacker",
             CardSubtype::Mage => "mage",
             CardSubtype::Monster => "monster",
             CardSubtype::Musician => "musician",
             CardSubtype::Outsider => "outsider",
             CardSubtype::Renegade => "renegade",
+            CardSubtype::Robot => "robot",
             CardSubtype::SpiritAnimal => "spirit-animal",
             CardSubtype::Super => "super",
             CardSubtype::Survivor => "survivor",
