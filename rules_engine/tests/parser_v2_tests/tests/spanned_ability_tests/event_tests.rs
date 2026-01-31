@@ -1,12 +1,10 @@
-use ability_data::ability::Ability;
-use ability_data::ability::EventAbility;
+use ability_data::ability::{Ability, EventAbility};
 use ability_data::cost::Cost;
 use ability_data::effect::Effect;
 use ability_data::standard_effect::StandardEffect;
 use core_data::numerics::Energy;
 use parser_v2::builder::parser_display;
-use parser_v2::builder::parser_spans::SpannedAbility;
-use parser_v2::builder::parser_spans::SpannedEffect;
+use parser_v2::builder::parser_spans::{SpannedAbility, SpannedEffect};
 use parser_v2::lexer::lexer_tokenize;
 use parser_v2_tests::test_helpers::*;
 

@@ -1,5 +1,4 @@
-use parser_v2::builder::parser_spans::SpannedAbility;
-use parser_v2::builder::parser_spans::SpannedEffect;
+use parser_v2::builder::parser_spans::{SpannedAbility, SpannedEffect};
 use parser_v2_tests::test_helpers::*;
 
 #[test]

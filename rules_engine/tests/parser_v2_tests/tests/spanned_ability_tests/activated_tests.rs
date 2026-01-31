@@ -4,8 +4,7 @@ use ability_data::cost::Cost;
 use ability_data::effect::Effect;
 use ability_data::standard_effect::StandardEffect;
 use core_data::numerics::Energy;
-use parser_v2::builder::parser_spans::SpannedAbility;
-use parser_v2::builder::parser_spans::SpannedEffect;
+use parser_v2::builder::parser_spans::{SpannedAbility, SpannedEffect};
 use parser_v2_tests::test_helpers::*;
 
 #[test]
@@ -279,10 +278,7 @@ fn test_spanned_banish_void_with_min_count_reclaim_this_character() {
         panic!("Expected Activated ability");
     };
 
-    assert_eq!(
-        activated.cost.text,
-        "{Banish} your void with {count} or more cards"
-    );
+    assert_eq!(activated.cost.text, "{Banish} your void with {count} or more cards");
     assert_valid_span(&activated.cost.span);
 
     let SpannedEffect::Effect(effect) = activated.effect else {

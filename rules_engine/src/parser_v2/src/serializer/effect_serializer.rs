@@ -572,10 +572,22 @@ pub fn serialize_standard_effect(
             }
         }
         StandardEffect::ReturnFromYourVoidToHand { target } => {
-            format!(
-                "return {} from your void to your hand.",
-                predicate_serializer::serialize_predicate(target, bindings)
-            )
+            // For YourVoid predicates, don't add "from your void" again since it's
+            // already part of the predicate text
+            match target {
+                Predicate::YourVoid(card_predicate) => {
+                    format!(
+                        "return {} from your void to your hand.",
+                        predicate_serializer::serialize_card_predicate(card_predicate, bindings)
+                    )
+                }
+                _ => {
+                    format!(
+                        "return {} from your void to your hand.",
+                        predicate_serializer::serialize_predicate(target, bindings)
+                    )
+                }
+            }
         }
         StandardEffect::ReturnUpToCountFromYourVoidToHand { count, .. } => {
             if let Some(var_name) = parser_substitutions::directive_to_integer_variable(
@@ -1069,56 +1081,62 @@ pub fn serialize_for_count_expression(
         QuantityExpression::PlayedThisTurn(predicate) => {
             format!(
                 "{} you have played this turn",
-                text_formatting::card_predicate_base_text(predicate).plural()
+                text_formatting::card_predicate_base_text(predicate).without_article()
             )
         }
         QuantityExpression::AbandonedThisTurn(CardPredicate::Character) => {
-            "allies abandoned this turn".to_string()
+            "ally abandoned this turn".to_string()
         }
         QuantityExpression::AbandonedThisTurn(CardPredicate::CharacterType(_)) => {
             "allied {subtype} abandoned this turn".to_string()
         }
         QuantityExpression::AbandonedThisWay(CardPredicate::Character) => {
-            "allies abandoned".to_string()
+            "ally abandoned".to_string()
         }
         QuantityExpression::AbandonedThisWay(CardPredicate::CharacterType(_)) => {
             "allied {subtype} abandoned".to_string()
         }
         QuantityExpression::ReturnedToHandThisWay(CardPredicate::Character) => {
-            "allies returned".to_string()
+            "ally returned".to_string()
         }
         QuantityExpression::ReturnedToHandThisWay(CardPredicate::CharacterType(_)) => {
             "allied {subtype} returned".to_string()
         }
         QuantityExpression::ReturnedToHandThisWay(predicate) => {
-            format!("{} returned", text_formatting::card_predicate_base_text(predicate).plural())
+            format!(
+                "{} returned",
+                text_formatting::card_predicate_base_text(predicate).without_article()
+            )
         }
         QuantityExpression::AbandonedThisTurn(predicate) => {
             format!(
                 "{} abandoned this turn",
-                text_formatting::card_predicate_base_text(predicate).plural()
+                text_formatting::card_predicate_base_text(predicate).without_article()
             )
         }
         QuantityExpression::AbandonedThisWay(predicate) => {
-            format!("{} abandoned", text_formatting::card_predicate_base_text(predicate).plural())
+            format!(
+                "{} abandoned",
+                text_formatting::card_predicate_base_text(predicate).without_article()
+            )
         }
         QuantityExpression::ForEachEnergySpentOnThisCard => "{energy-symbol} spent".to_string(),
         QuantityExpression::CardsDrawnThisTurn(predicate) => {
             format!(
                 "{} you have drawn this turn",
-                text_formatting::card_predicate_base_text(predicate).plural()
+                text_formatting::card_predicate_base_text(predicate).without_article()
             )
         }
         QuantityExpression::DiscardedThisTurn(predicate) => {
             format!(
                 "{} you have discarded this turn",
-                text_formatting::card_predicate_base_text(predicate).plural()
+                text_formatting::card_predicate_base_text(predicate).without_article()
             )
         }
         QuantityExpression::DissolvedThisTurn(predicate) => {
             format!(
                 "{} which dissolved this turn",
-                text_formatting::card_predicate_base_text(predicate).plural()
+                text_formatting::card_predicate_base_text(predicate).without_article()
             )
         }
     }

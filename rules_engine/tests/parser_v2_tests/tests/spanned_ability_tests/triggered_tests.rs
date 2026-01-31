@@ -1,5 +1,4 @@
-use parser_v2::builder::parser_spans::SpannedAbility;
-use parser_v2::builder::parser_spans::SpannedEffect;
+use parser_v2::builder::parser_spans::{SpannedAbility, SpannedEffect};
 use parser_v2_tests::test_helpers::*;
 
 #[test]
@@ -917,9 +916,10 @@ fn test_spanned_banish_from_hand_alternate_cost_prevent_enemy_card() {
 
 #[test]
 fn test_spanned_when_you_play_a_character_materialize_figment() {
-    let SpannedAbility::Triggered(triggered) =
-        parse_spanned_ability("When you play a character, {materialize} {a-figment}.", "figment: shadow")
-    else {
+    let SpannedAbility::Triggered(triggered) = parse_spanned_ability(
+        "When you play a character, {materialize} {a-figment}.",
+        "figment: shadow",
+    ) else {
         panic!("Expected Triggered ability");
     };
 
