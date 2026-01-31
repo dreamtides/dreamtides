@@ -1,7 +1,35 @@
-Please follow all of the "code style" and "validating changes" rules below at all times.
+# PROJECT CONTEXT
 
-Please use `just` commands instead of `cargo`, e.g. `just fmt`, `just check`,
-`just-clippy`, `just-test`, `just parser-test`
+
+This project is an implementation of a rules engine for the 'Dreamtides'
+card game. Dreamtides is a game similar to TCGs like 'Magic: the Gathering'.
+Players put 'character' cards into play and use one-time 'event' cards to affect
+the game. Cards are played using a resource called 'energy'. Characters have a
+value called 'spark' that lets them generate victory 'points'. Playing a character
+is called 'materializing' it and destroying it is called 'dissolving' it.
+Dissolved characters and played events go the discard pile, which is called the
+'void'. Playing one game or match of Dreamtides is known as a 'battle'.
+
+A few relevant keywords:
+
+- Reclaim: Play from void (discard pile)
+- Kindle: Add spark to your leftmost character
+- Foresee: Look at top N of deck and reorder or put in void
+- Prevent: Stop a card from resolving (counterspell)
+
+
+# ACCEPTANCE CRITERIA
+
+
+Please follow this checklist after completing any task:
+
+1) Add error handling where appropriate. Consider edge cases.
+2) Add tests where appropriate. Rust tests live in rules_engine/tests/ and
+   always test crate public APIs. Test error cases.
+3) Add logging where appropriate. Follow existing logging conventions.
+4) Run `just fmt` to apply formatting rules.
+5) Run `just review` to run clippy, validate style, and run unit tests
+6) Create a git commit with a detailed description of your work. 
 
 
 # CODE STYLE
@@ -30,48 +58,19 @@ Please use `just` commands instead of `cargo`, e.g. `just fmt`, `just check`,
 - Do not write code only used by tests. Test against real public API.
 
 
-# VALIDATING CHANGES
+# JUST COMMANDS
 
 
 - After completing work, please always run "just fmt" to apply rustfmt
   formatting rules
+- Please use `just` commands instead of `cargo`, e.g. `just fmt`, `just check`,
+  `just-clippy`, `just-test`, `just parser-test`
 - Run `just check` to type check code
 - Run `just clippy` to check for lint warnings
 - After writing a test, use `just battle-test <TEST NAME>` to run it
 - After completing work, please ALWAYS run `just review` to validate changes
 - Do not print a summary of changes after completing work.
 - Prefer the `just` commands over `cargo` commands since they have project-specific rules
-
-
-# PROJECT CONTEXT
-
-
-This project is an implementation of a rules engine for the 'Dreamtides'
-card game. Dreamtides is a game similar to TCGs like 'Magic: the Gathering'.
-Players put 'character' cards into play and use one-time 'event' cards to affect
-the game. Cards are played using a resource called 'energy'. Characters have a
-value called 'spark' that lets them generate victory 'points'. Playing a character
-is called 'materializing' it and destroying it is called 'dissolving' it.
-Dissolved characters and played events go the discard pile, which is called the
-'void'. Playing one game or match of Dreamtides is known as a 'battle'.
-
-A few relevant keywords:
-
-- Reclaim: Play from void (discard pile)
-- Kindle: Add spark to your leftmost character
-- Foresee: Look at top N of deck and reorder or put in void
-- Prevent: Stop a card from resolving (counterspell)
-
-
-# ADDITIONAL DOCUMENTATION
-
-
-More task-specification documentation is available:
-
-- Development environment setup: `rules_engine/docs/environment_setup.md`
-- Adding new battle effects: `rules_engine/docs/adding_new_effects.md`
-- Adding new trigger conditions: `rules_engine/docs/adding_new_triggers.md`
-- Running benchmarks: `rules_engine/docs/benchmarks.md`
 
 
 # CODE STRUCTURE
@@ -89,11 +88,3 @@ Rules engine Rust source code lives in the `rules_engine/` directory.
 Client source code lives in the `client/` directory.
 
 Card data lives in `rules_engine/tabula/cards.toml`. Do NOT read this file directly, it is much too large.
-
-
-# TASKS
-
-
-When ending a session or when you discover work outside of the scope of the current session,
-please track it via the `TaskCreate` tool. When asked to work on a task, please use TaskUpdate
-to mark it as in progress, then mark it as completed when you finish.
