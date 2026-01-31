@@ -153,12 +153,7 @@ fn test_round_trip_when_you_discard_a_card_kindle() {
 
 #[test]
 fn test_round_trip_when_you_discard_this_character_materialize_it() {
-    assert_round_trip_with_expected(
-        "When you discard this character, {materialize} it.",
-        "",
-        "When you discard this character, {Materialize} it.",
-        "",
-    );
+    assert_round_trip("When you discard this character, {materialize} it.", "");
 }
 
 #[test]

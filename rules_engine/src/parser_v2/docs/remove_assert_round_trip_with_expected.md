@@ -48,19 +48,19 @@ These tests have correct serializer output. The input form should be rejected by
 
 ### Category C: Input is Correct, Serializer Wrong - Don't Capitalize After Trigger Cost
 
-The serializer is incorrectly capitalizing keywords that appear after "You may" or trigger costs. These should remain lowercase.
+The serializer was incorrectly capitalizing keywords that appear after "You may" or trigger costs. These should remain lowercase.
 
 | # | Test | Input (correct) | Output (wrong) | Status |
 |---|------|-----------------|----------------|--------|
-| 5 | `test_round_trip_when_you_discard_this_character_materialize_it` | `{materialize} it` | `{Materialize} it` | Still needs fix |
+| ~~5~~ | ~~`test_round_trip_when_you_discard_this_character_materialize_it`~~ | ~~`{materialize} it`~~ | ~~`{Materialize} it`~~ | **FIXED** - Fix 1 |
 | ~~7~~ | ~~`test_round_trip_materialized_you_may_banish_ally_then_materialize_it`~~ | ~~`{banish}...{materialize}`~~ | ~~`{Banish}...{Materialize}`~~ | **FIXED** - Now single effect |
 | ~~9~~ | ~~`test_round_trip_judgment_you_may_banish_ally_then_materialize_it`~~ | ~~`{banish}...{materialize}`~~ | ~~`{Banish}...{Materialize}`~~ | **FIXED** - Now single effect |
-| 10 | `test_round_trip_judgment_you_may_discard_dissolve_enemy` | `{dissolve}` | `{Dissolve}` | Still needs fix |
-| 11 | `test_round_trip_judgment_banish_cards_from_your_void_to_dissolve_enemy_with_cost` | `{banish}...{dissolve}` | `{Banish}...{Dissolve}` | Still needs fix |
-| 12 | `test_round_trip_judgment_banish_cards_from_opponent_void_to_gain_energy` | `{banish}` | `{Banish}` | Still needs fix |
+| ~~10~~ | ~~`test_round_trip_judgment_you_may_discard_dissolve_enemy`~~ | ~~`{dissolve}`~~ | ~~`{Dissolve}`~~ | **FIXED** - Fix 1 |
+| ~~11~~ | ~~`test_round_trip_judgment_banish_cards_from_your_void_to_dissolve_enemy_with_cost`~~ | ~~`{banish}...{dissolve}`~~ | ~~`{Banish}...{Dissolve}`~~ | **FIXED** - Fix 1 |
+| ~~12~~ | ~~`test_round_trip_judgment_banish_cards_from_opponent_void_to_gain_energy`~~ | ~~`{banish}`~~ | ~~`{Banish}`~~ | **FIXED** - Fix 1 |
 | ~~14~~ | ~~`test_round_trip_judgment_pay_to_banish_allies_then_materialize`~~ | ~~`{banish}...{materialize}`~~ | ~~`{Banish}...{Materialize}`~~ | **FIXED** - Now single effect |
 
-**Root cause**: The serializer capitalizes effects after keyword triggers (`{Judgment}`, `{Materialized}`), but it should NOT capitalize when the effect follows "You may" or a trigger cost like "pay {e} to".
+**Root cause**: The serializer capitalizes effects after keyword triggers (`{Judgment}`, `{Materialized}`), but it should NOT capitalize when the effect follows "You may" or a trigger cost like "pay {e} to". **FIXED** in Fix 1.
 
 ### Category D: Input is Correct, Serializer Wrong - Compound Effect Joining
 
@@ -92,32 +92,22 @@ The serializer is incorrectly capitalizing keywords that appear after "You may" 
 
 ### Fix 1: Don't Capitalize After "You may" or Trigger Costs
 
-**Status**: ❌ **Needs Implementation** (previous attempt failed)
+**Status**: ✅ **IMPLEMENTED**
 
-**Problem**: Currently capitalizes effects after keyword triggers unconditionally. Should NOT capitalize when effect follows:
+**Problem**: Serializer was capitalizing effects after keyword triggers unconditionally. Should NOT capitalize when effect follows:
 - "You may"
 - A trigger cost like "pay {e} to" or "discard a card to"
 
-**Affects tests**: #5, #10, #11, #12 (reduced from 7 due to BanishThenMaterialize fix)
+**Affected tests**: #5, #10, #11, #12 (reduced from 7 due to BanishThenMaterialize fix)
 
-**Location in `ability_serializer.rs:44-48`**:
-```rust
-// CURRENT (wrong for "You may" cases):
-if is_keyword_trigger {
-    result.push(' ');
-    result.push_str(&serializer_utils::capitalize_first_letter(
-        &effect_serializer::serialize_effect(&triggered.effect, &mut variables),
-    ));
-}
-```
+**Solution implemented**:
+Added `lowercase_leading_keyword()` helper function to `serializer_utils.rs` that lowercases the first `{Keyword}` in a string. Modified `effect_serializer.rs` to use this function in the `Effect::WithOptions` and `Effect::List` branches when `optional=true` or `trigger_cost=Some`.
 
-**Correct approach:**
-In `ability_serializer.rs`, when serializing keyword trigger effects:
-1. Check if the effect text starts with "you may" (case-insensitive)
-2. If yes, capitalize just the first letter ("you" → "You") but leave keywords in the effect lowercase
-3. If no, use the existing `capitalize_first_letter` behavior
-
-This preserves all existing test behavior while fixing only the specific "You may" cases.
+**Files modified**:
+- `serializer_utils.rs` - Added `lowercase_leading_keyword()` function
+- `effect_serializer.rs` - Applied lowercase in WithOptions and List branches
+- `triggered_ability_round_trip_tests.rs` - Converted test #5 to `assert_round_trip`
+- `judgment_ability_round_trip_tests.rs` - Converted tests #10, #11, #12 to `assert_round_trip`
 
 ### Fix 2: Compound Effect Joining with "and"
 
@@ -240,7 +230,7 @@ After serializer fixes and parser rejections are in place, update card text in `
 ## Implementation Order
 
 1. ~~**Fix banish-then-materialize** (Fix 3)~~ ✅ **DONE** - Implemented as single effect
-2. **Fix serializer capitalization** (Fix 1) - affects 4 tests - **NEEDS IMPLEMENTATION**
+2. ~~**Fix serializer capitalization** (Fix 1)~~ ✅ **DONE** - 4 tests now use `assert_round_trip`
 3. **Fix compound effect joining** (Fix 2) - affects 1 test
 4. **Fix {a-subtype} preservation** (Fix 4) - affects 1 test
 5. **Fix "this turn" preservation** (Fix 5) - affects 1 test
@@ -259,11 +249,11 @@ After serializer fixes and parser rejections are in place, update card text in `
 |----------|---------------|-------|-----------|
 | A: Update card text, reject in parser | 3 | 0 | 3 |
 | B: Hard to reject | 1 | 0 | 1 |
-| C: Don't capitalize after trigger cost | 7 | 3 | 4 |
+| C: Don't capitalize after trigger cost | 7 | 7 | 0 |
 | D: Compound effect joining | 2 | 1 | 1 |
 | E: Specific serializer bugs | 2 | 0 | 2 |
 | F: "then" consistency | 3 | 0 | 3 |
-| **Total** | **18** | **4** | **14** |
+| **Total** | **18** | **8** | **10** |
 
 ---
 

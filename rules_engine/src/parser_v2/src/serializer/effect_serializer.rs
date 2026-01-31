@@ -841,16 +841,26 @@ pub fn serialize_effect(effect: &Effect, bindings: &mut VariableBindings) -> Str
                 result.push_str(&condition_serializer::serialize_condition(condition, bindings));
                 result.push(' ');
             }
+            let needs_lowercase = options.optional || options.trigger_cost.is_some();
             if options.optional {
                 result.push_str("you may ");
             }
             if let Some(trigger_cost) = &options.trigger_cost {
-                result.push_str(&format!(
-                    "{} to ",
-                    cost_serializer::serialize_trigger_cost(trigger_cost, bindings)
-                ));
+                let cost_str = cost_serializer::serialize_trigger_cost(trigger_cost, bindings);
+                let cost_str = if options.optional {
+                    serializer_utils::lowercase_leading_keyword(&cost_str)
+                } else {
+                    cost_str
+                };
+                result.push_str(&format!("{} to ", cost_str));
             }
-            result.push_str(&serialize_standard_effect(&options.effect, bindings));
+            let effect_str = serialize_standard_effect(&options.effect, bindings);
+            let effect_str = if needs_lowercase {
+                serializer_utils::lowercase_leading_keyword(&effect_str)
+            } else {
+                effect_str
+            };
+            result.push_str(&effect_str);
             result
         }
         Effect::List(effects) => {
@@ -860,10 +870,16 @@ pub fn serialize_effect(effect: &Effect, bindings: &mut VariableBindings) -> Str
             if all_optional && all_have_trigger_cost && !effects.is_empty() {
                 let effect_strings: Vec<String> = effects
                     .iter()
-                    .map(|e| {
-                        serialize_standard_effect(&e.effect, bindings)
+                    .enumerate()
+                    .map(|(i, e)| {
+                        let s = serialize_standard_effect(&e.effect, bindings)
                             .trim_end_matches('.')
-                            .to_string()
+                            .to_string();
+                        if i == 0 {
+                            serializer_utils::lowercase_leading_keyword(&s)
+                        } else {
+                            s
+                        }
                     })
                     .collect();
                 let mut result = String::new();
@@ -877,20 +893,25 @@ pub fn serialize_effect(effect: &Effect, bindings: &mut VariableBindings) -> Str
                 }
                 result.push_str("you may ");
                 if let Some(trigger_cost) = &effects[0].trigger_cost {
-                    result.push_str(&format!(
-                        "{} to ",
-                        cost_serializer::serialize_trigger_cost(trigger_cost, bindings)
-                    ));
+                    let cost_str = cost_serializer::serialize_trigger_cost(trigger_cost, bindings);
+                    let cost_str = serializer_utils::lowercase_leading_keyword(&cost_str);
+                    result.push_str(&format!("{} to ", cost_str));
                 }
                 result.push_str(&format!("{}.", effect_strings.join(" and ")));
                 result
             } else if !all_optional && all_have_trigger_cost && !effects.is_empty() {
                 let effect_strings: Vec<String> = effects
                     .iter()
-                    .map(|e| {
-                        serialize_standard_effect(&e.effect, bindings)
+                    .enumerate()
+                    .map(|(i, e)| {
+                        let s = serialize_standard_effect(&e.effect, bindings)
                             .trim_end_matches('.')
-                            .to_string()
+                            .to_string();
+                        if i == 0 {
+                            serializer_utils::lowercase_leading_keyword(&s)
+                        } else {
+                            s
+                        }
                     })
                     .collect();
                 let mut result = String::new();
@@ -913,10 +934,16 @@ pub fn serialize_effect(effect: &Effect, bindings: &mut VariableBindings) -> Str
             } else if all_optional && !effects.is_empty() {
                 let effect_strings: Vec<String> = effects
                     .iter()
-                    .map(|e| {
-                        serialize_standard_effect(&e.effect, bindings)
+                    .enumerate()
+                    .map(|(i, e)| {
+                        let s = serialize_standard_effect(&e.effect, bindings)
                             .trim_end_matches('.')
-                            .to_string()
+                            .to_string();
+                        if i == 0 {
+                            serializer_utils::lowercase_leading_keyword(&s)
+                        } else {
+                            s
+                        }
                     })
                     .collect();
                 let mut result = String::new();

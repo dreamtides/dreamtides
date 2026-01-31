@@ -170,10 +170,8 @@ fn test_round_trip_judgment_you_may_discard_draw_gain_points() {
 
 #[test]
 fn test_round_trip_judgment_you_may_discard_dissolve_enemy() {
-    assert_round_trip_with_expected(
+    assert_round_trip(
         "{Judgment} You may discard a card to {dissolve} an enemy with spark {s} or less.",
-        "s: 2",
-        "{Judgment} You may discard a card to {Dissolve} an enemy with spark {s} or less.",
         "s: 2",
     );
 }
@@ -264,20 +262,16 @@ fn test_round_trip_materialized_card_with_cost_in_void_gains_reclaim() {
 
 #[test]
 fn test_round_trip_judgment_banish_cards_from_your_void_to_dissolve_enemy_with_cost() {
-    assert_round_trip_with_expected(
+    assert_round_trip(
         "{Judgment} You may {banish} {cards} from your void to {dissolve} an enemy with cost {e} or less.",
-        "cards: 3, e: 2",
-        "{Judgment} You may {Banish} {cards} from your void to {Dissolve} an enemy with cost {e} or less.",
         "cards: 3, e: 2",
     );
 }
 
 #[test]
 fn test_round_trip_judgment_banish_cards_from_opponent_void_to_gain_energy() {
-    assert_round_trip_with_expected(
+    assert_round_trip(
         "{Judgment} You may {banish} {cards} from the opponent's void to gain {e}.",
-        "cards: 1, e: 1",
-        "{Judgment} You may {Banish} {cards} from the opponent's void to gain {e}.",
         "cards: 1, e: 1",
     );
 }
