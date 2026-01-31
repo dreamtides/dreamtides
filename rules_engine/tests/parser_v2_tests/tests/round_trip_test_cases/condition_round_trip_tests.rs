@@ -3,10 +3,7 @@ use parser_v2_tests::test_helpers::*;
 // Tests for PredicateCount with count = 1 (single allied subtype)
 #[test]
 fn test_round_trip_with_an_allied_subtype_gain_energy() {
-    assert_round_trip(
-        "{Judgment} With an allied {subtype}, gain {e}.",
-        "subtype: warrior, e: 2",
-    );
+    assert_round_trip("{Judgment} With an allied {subtype}, gain {e}.", "subtype: warrior, e: 2");
 }
 
 #[test]

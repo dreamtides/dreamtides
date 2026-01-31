@@ -58,10 +58,7 @@ fn test_round_trip_energy_discard_kindle() {
 
 #[test]
 fn test_round_trip_energy_banish_reclaim_this_character() {
-    assert_round_trip(
-        "{e}, {Banish} another card in your void: {Reclaim} this character.",
-        "e: 1",
-    );
+    assert_round_trip("{e}, {Banish} another card in your void: {Reclaim} this character.", "e: 1");
 }
 
 #[test]
@@ -126,10 +123,7 @@ fn test_round_trip_abandon_allies_draw_cards_for_each_allied_subtype_abandoned()
 
 #[test]
 fn test_round_trip_abandon_ally_gain_energy_equal_to_cost() {
-    assert_round_trip(
-        "Abandon an ally: Gain {energy-symbol} equal to that character's cost.",
-        "",
-    );
+    assert_round_trip("Abandon an ally: Gain {energy-symbol} equal to that character's cost.", "");
 }
 
 #[test]

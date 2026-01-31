@@ -44,10 +44,7 @@ fn test_round_trip_when_you_materialize_an_allied_subtype_that_character_gains_s
 
 #[test]
 fn test_round_trip_once_per_turn_when_you_materialize_a_character_gain_energy() {
-    assert_round_trip(
-        "Once per turn, when you {materialize} a character, gain {e}.",
-        "e: 1",
-    );
+    assert_round_trip("Once per turn, when you {materialize} a character, gain {e}.", "e: 1");
 }
 
 #[test]
@@ -68,18 +65,12 @@ fn test_round_trip_once_per_turn_when_you_materialize_a_subtype_draw_cards() {
 
 #[test]
 fn test_round_trip_once_per_turn_when_you_play_a_fast_card_draw_cards() {
-    assert_round_trip(
-        "Once per turn, when you play a {fast} card, draw {cards}.",
-        "cards: 2",
-    );
+    assert_round_trip("Once per turn, when you play a {fast} card, draw {cards}.", "cards: 2");
 }
 
 #[test]
 fn test_round_trip_when_you_play_a_fast_card_this_character_gains_spark() {
-    assert_round_trip(
-        "When you play a {fast} card, this character gains +{s} spark.",
-        "s: 2",
-    );
+    assert_round_trip("When you play a {fast} card, this character gains +{s} spark.", "s: 2");
 }
 
 #[test]
@@ -119,18 +110,12 @@ fn test_round_trip_when_an_ally_is_banished_kindle() {
 
 #[test]
 fn test_round_trip_when_an_ally_is_banished_this_character_gains_spark() {
-    assert_round_trip(
-        "When an ally is {banished}, this character gains +{s} spark.",
-        "s: 2",
-    );
+    assert_round_trip("When an ally is {banished}, this character gains +{s} spark.", "s: 2");
 }
 
 #[test]
 fn test_round_trip_when_you_play_a_subtype_draw_cards() {
-    assert_round_trip(
-        "When you play {a-subtype}, draw {cards}.",
-        "subtype: warrior, cards: 2",
-    );
+    assert_round_trip("When you play {a-subtype}, draw {cards}.", "subtype: warrior, cards: 2");
 }
 
 #[test]
@@ -153,12 +138,7 @@ fn test_round_trip_when_you_discard_a_card_kindle() {
 
 #[test]
 fn test_round_trip_when_you_discard_this_character_materialize_it() {
-    assert_round_trip_with_expected(
-        "When you discard this character, {materialize} it.",
-        "",
-        "When you discard this character, {Materialize} it.",
-        "",
-    );
+    assert_round_trip("When you discard this character, {materialize} it.", "");
 }
 
 #[test]
@@ -181,10 +161,7 @@ fn test_round_trip_when_you_play_cards_in_turn_reclaim_this_character() {
 
 #[test]
 fn test_round_trip_when_you_abandon_an_ally_this_character_gains_spark() {
-    assert_round_trip(
-        "When you abandon an ally, this character gains +{s} spark.",
-        "s: 2",
-    );
+    assert_round_trip("When you abandon an ally, this character gains +{s} spark.", "s: 2");
 }
 
 #[test]
@@ -262,10 +239,7 @@ fn test_round_trip_dissolved_draw_cards() {
 
 #[test]
 fn test_round_trip_once_per_turn_play_fast_character_gain_energy() {
-    assert_round_trip(
-        "Once per turn, when you play a {fast} character, gain {e}.",
-        "e: 1",
-    );
+    assert_round_trip("Once per turn, when you play a {fast} character, gain {e}.", "e: 1");
 }
 
 #[test]
@@ -310,10 +284,7 @@ fn test_round_trip_when_you_play_card_during_opponent_turn_this_character_gains_
 
 #[test]
 fn test_round_trip_when_you_play_a_character_materialize_figment() {
-    assert_round_trip(
-        "When you play a character, {Materialize} {a-figment}.",
-        "figment: shadow",
-    );
+    assert_round_trip("When you play a character, {Materialize} {a-figment}.", "figment: shadow");
 }
 
 #[test]

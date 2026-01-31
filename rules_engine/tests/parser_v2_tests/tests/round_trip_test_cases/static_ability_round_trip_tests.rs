@@ -2,18 +2,12 @@ use parser_v2_tests::test_helpers::*;
 
 #[test]
 fn test_round_trip_event_costs_if_character_dissolved() {
-    assert_round_trip(
-        "This event costs {e} if a character dissolved this turn.",
-        "e: 1",
-    );
+    assert_round_trip("This event costs {e} if a character dissolved this turn.", "e: 1");
 }
 
 #[test]
 fn test_round_trip_character_costs_if_discarded_card_this_turn() {
-    assert_round_trip(
-        "This character costs {e} if you have discarded a card this turn.",
-        "e: 1",
-    );
+    assert_round_trip("This character costs {e} if you have discarded a card this turn.", "e: 1");
 }
 
 #[test]
@@ -39,10 +33,7 @@ fn test_round_trip_lose_maximum_energy_play_for_alternate_cost() {
 
 #[test]
 fn test_round_trip_additional_cost_to_play() {
-    assert_round_trip(
-        "To play this card, return an ally with cost {e} or more to hand.",
-        "e: 4",
-    );
+    assert_round_trip("To play this card, return an ally with cost {e} or more to hand.", "e: 4");
 }
 
 #[test]
@@ -91,10 +82,7 @@ fn test_round_trip_spark_equal_to_allied_subtype() {
 
 #[test]
 fn test_round_trip_spark_equal_to_cards_in_void() {
-    assert_round_trip(
-        "This character's spark is equal to the number of cards in your void.",
-        "",
-    );
+    assert_round_trip("This character's spark is equal to the number of cards in your void.", "");
 }
 
 #[test]
@@ -156,10 +144,7 @@ fn test_round_trip_play_from_void_for_cost() {
 
 #[test]
 fn test_round_trip_play_from_void_with_additional_cost() {
-    assert_round_trip(
-        "Return an ally to hand: Play this card from your void for {e}.",
-        "e: 0",
-    );
+    assert_round_trip("Return an ally to hand: Play this card from your void for {e}.", "e: 0");
 }
 
 #[test]
@@ -180,16 +165,10 @@ fn test_round_trip_play_from_void_with_cost_then_banish() {
 
 #[test]
 fn test_round_trip_play_from_void_then_gain_spark() {
-    assert_round_trip(
-        "Play this card from your void for {e}, then gain +{s} spark.",
-        "e: 0, s: 1",
-    );
+    assert_round_trip("Play this card from your void for {e}, then gain +{s} spark.", "e: 0, s: 1");
 }
 
 #[test]
 fn test_round_trip_play_from_void_then_dissolve_enemy() {
-    assert_round_trip(
-        "Play this card from your void for {e}, then {Dissolve} an enemy.",
-        "e: 0",
-    );
+    assert_round_trip("Play this card from your void for {e}, then {Dissolve} an enemy.", "e: 0");
 }

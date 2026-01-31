@@ -52,10 +52,7 @@ fn test_round_trip_materialized_judgment_kindle() {
 
 #[test]
 fn test_round_trip_materialized_gain_control_enemy_with_cost_or_less() {
-    assert_round_trip(
-        "{Materialized} Gain control of an enemy with cost {e} or less.",
-        "e: 2",
-    );
+    assert_round_trip("{Materialized} Gain control of an enemy with cost {e} or less.", "e: 2");
 }
 
 #[test]
@@ -96,10 +93,7 @@ fn test_round_trip_materialized_you_may_return_ally_to_hand() {
 
 #[test]
 fn test_round_trip_materialized_return_character_from_void_to_hand() {
-    assert_round_trip(
-        "{Materialized} Return a character from your void to your hand.",
-        "",
-    );
+    assert_round_trip("{Materialized} Return a character from your void to your hand.", "");
 }
 
 #[test]
@@ -109,10 +103,7 @@ fn test_round_trip_materialized_discover_fast_event() {
 
 #[test]
 fn test_round_trip_judgment_return_this_from_void_to_hand() {
-    assert_round_trip(
-        "{Judgment} Return this character from your void to your hand.",
-        "",
-    );
+    assert_round_trip("{Judgment} Return this character from your void to your hand.", "");
 }
 
 #[test]
@@ -138,18 +129,12 @@ fn test_round_trip_judgment_you_may_pay_to_have_each_allied_gain_spark() {
 
 #[test]
 fn test_round_trip_dissolved_you_may_pay_to_return_this_to_hand() {
-    assert_round_trip(
-        "{Dissolved} You may pay {e} to return this character to your hand.",
-        "e: 1",
-    );
+    assert_round_trip("{Dissolved} You may pay {e} to return this character to your hand.", "e: 1");
 }
 
 #[test]
 fn test_round_trip_materialized_prevent_played_card_with_cost() {
-    assert_round_trip(
-        "{Materialized} {Prevent} a played card with cost {e} or less.",
-        "e: 3",
-    );
+    assert_round_trip("{Materialized} {Prevent} a played card with cost {e} or less.", "e: 3");
 }
 
 #[test]
@@ -173,17 +158,14 @@ fn test_round_trip_judgment_you_may_discard_dissolve_enemy() {
     assert_round_trip_with_expected(
         "{Judgment} You may discard a card to {dissolve} an enemy with spark {s} or less.",
         "s: 2",
-        "{Judgment} You may discard a card to {Dissolve} an enemy with spark {s} or less.",
+        "{Judgment} You may discard a card to {dissolve} an enemy with spark {s} or less.",
         "s: 2",
     );
 }
 
 #[test]
 fn test_round_trip_judgment_gain_energy_for_each_allied_subtype() {
-    assert_round_trip(
-        "{Judgment} Gain {e} for each allied {subtype}.",
-        "subtype: warrior, e: 1",
-    );
+    assert_round_trip("{Judgment} Gain {e} for each allied {subtype}.", "subtype: warrior, e: 1");
 }
 
 #[test]
@@ -240,10 +222,7 @@ fn test_round_trip_materialized_discard_chosen_card_from_opponent_hand_they_draw
 
 #[test]
 fn test_round_trip_materialized_draw_cards_for_each_ally_abandoned_this_turn() {
-    assert_round_trip(
-        "{Materialized} Draw {cards} for each ally abandoned this turn.",
-        "cards: 2",
-    );
+    assert_round_trip("{Materialized} Draw {cards} for each ally abandoned this turn.", "cards: 2");
 }
 
 #[test]
@@ -267,7 +246,7 @@ fn test_round_trip_judgment_banish_cards_from_your_void_to_dissolve_enemy_with_c
     assert_round_trip_with_expected(
         "{Judgment} You may {banish} {cards} from your void to {dissolve} an enemy with cost {e} or less.",
         "cards: 3, e: 2",
-        "{Judgment} You may {Banish} {cards} from your void to {Dissolve} an enemy with cost {e} or less.",
+        "{Judgment} You may {banish} {cards} from your void to {dissolve} an enemy with cost {e} or less.",
         "cards: 3, e: 2",
     );
 }
@@ -277,7 +256,7 @@ fn test_round_trip_judgment_banish_cards_from_opponent_void_to_gain_energy() {
     assert_round_trip_with_expected(
         "{Judgment} You may {banish} {cards} from the opponent's void to gain {e}.",
         "cards: 1, e: 1",
-        "{Judgment} You may {Banish} {cards} from the opponent's void to gain {e}.",
+        "{Judgment} You may {banish} {cards} from the opponent's void to gain {e}.",
         "cards: 1, e: 1",
     );
 }
@@ -304,18 +283,12 @@ fn test_round_trip_judgment_pay_to_banish_allies_then_materialize() {
 
 #[test]
 fn test_round_trip_materialized_banish_enemy_until_character_leaves_play() {
-    assert_round_trip(
-        "{Materialized} {Banish} an enemy until this character leaves play.",
-        "",
-    );
+    assert_round_trip("{Materialized} {Banish} an enemy until this character leaves play.", "");
 }
 
 #[test]
 fn test_round_trip_materialized_banish_enemy_until_next_main_phase() {
-    assert_round_trip(
-        "{Materialized} {Banish} an enemy until your next main phase.",
-        "",
-    );
+    assert_round_trip("{Materialized} {Banish} an enemy until your next main phase.", "");
 }
 
 #[test]
@@ -346,10 +319,7 @@ fn test_round_trip_materialized_disable_activated_abilities() {
 
 #[test]
 fn test_round_trip_materialized_draw_subtype() {
-    assert_round_trip(
-        "{Materialized} Draw {a-subtype} from your deck.",
-        "subtype: warrior",
-    );
+    assert_round_trip("{Materialized} Draw {a-subtype} from your deck.", "subtype: warrior");
 }
 
 #[test]

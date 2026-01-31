@@ -7,5 +7,5 @@ mod judgment_ability_round_trip_tests;
 mod predicate_serialization_round_trip_tests;
 mod quantity_expression_round_trip_tests;
 mod static_ability_round_trip_tests;
-mod triggered_ability_round_trip_tests;
 mod trigger_serializer_round_trip_tests;
+mod triggered_ability_round_trip_tests;

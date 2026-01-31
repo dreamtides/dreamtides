@@ -43,9 +43,14 @@ pub fn serialize_ability(ability: &Ability) -> SerializedAbility {
             let is_keyword_trigger = matches!(triggered.trigger, TriggerEvent::Keywords(_));
             if is_keyword_trigger {
                 result.push(' ');
-                result.push_str(&serializer_utils::capitalize_first_letter(
-                    &effect_serializer::serialize_effect(&triggered.effect, &mut variables),
-                ));
+                let effect = effect_serializer::serialize_effect(&triggered.effect, &mut variables);
+                // Don't capitalize if the effect starts with "you may" - the effect
+                // after "you may" should remain lowercase
+                if effect.to_lowercase().starts_with("you may") {
+                    result.push_str(&serializer_utils::capitalize_first_letter(&effect));
+                } else {
+                    result.push_str(&serializer_utils::capitalize_first_keyword_or_letter(&effect));
+                }
             } else {
                 result.push_str(&effect_serializer::serialize_effect(
                     &triggered.effect,
@@ -54,7 +59,7 @@ pub fn serialize_ability(ability: &Ability) -> SerializedAbility {
             }
             result
         }
-        Ability::Event(event) => serializer_utils::capitalize_first_letter(
+        Ability::Event(event) => serializer_utils::capitalize_first_keyword_or_letter(
             &effect_serializer::serialize_effect(&event.effect, &mut variables),
         ),
         Ability::Activated(activated) => {
@@ -83,13 +88,13 @@ pub fn serialize_ability(ability: &Ability) -> SerializedAbility {
                 result.push_str(", once per turn");
             }
             result.push_str(": ");
-            result.push_str(&serializer_utils::capitalize_first_letter(
+            result.push_str(&serializer_utils::capitalize_first_keyword_or_letter(
                 &effect_serializer::serialize_effect(&activated.effect, &mut variables),
             ));
             result
         }
         Ability::Named(named) => serialize_named_ability(named, &mut variables),
-        Ability::Static(static_ability) => serializer_utils::capitalize_first_letter(
+        Ability::Static(static_ability) => serializer_utils::capitalize_first_keyword_or_letter(
             &static_ability_serializer::serialize_static_ability(static_ability, &mut variables),
         ),
     };
@@ -103,10 +108,10 @@ pub fn serialize_ability(ability: &Ability) -> SerializedAbility {
 pub fn serialize_ability_effect(ability: &Ability) -> SerializedAbility {
     let mut variables = VariableBindings::new();
     let text = match ability {
-        Ability::Event(event) => serializer_utils::capitalize_first_letter(
+        Ability::Event(event) => serializer_utils::capitalize_first_keyword_or_letter(
             &effect_serializer::serialize_effect(&event.effect, &mut variables),
         ),
-        Ability::Activated(activated) => serializer_utils::capitalize_first_letter(
+        Ability::Activated(activated) => serializer_utils::capitalize_first_keyword_or_letter(
             &effect_serializer::serialize_effect(&activated.effect, &mut variables),
         ),
         _ => return serialize_ability(ability),
@@ -131,7 +136,7 @@ pub fn serialize_modal_choices(
         if let Some(Effect::Modal(choices)) = effect {
             for choice in choices {
                 let mut variables = VariableBindings::new();
-                let text = serializer_utils::capitalize_first_letter(
+                let text = serializer_utils::capitalize_first_keyword_or_letter(
                     &effect_serializer::serialize_effect(&choice.effect, &mut variables),
                 );
                 result.insert(ModelEffectChoiceIndex(current_index), SerializedAbility {
