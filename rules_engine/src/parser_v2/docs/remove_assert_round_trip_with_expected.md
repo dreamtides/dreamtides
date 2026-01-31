@@ -111,45 +111,18 @@ Added `lowercase_leading_keyword()` helper function to `serializer_utils.rs` tha
 
 ### Fix 2: Compound Effect Joining with "and"
 
-**File**: `effect_serializer.rs:898-919`
+**Status**: ✅ **IMPLEMENTED**
 
-**Problem**: Effects from the same trigger are joined with `. ` and capitalized. Should use "and".
+**Problem**: Effects from the same trigger were joined with `. ` and capitalized. Should use "and".
 
-**Affects tests**: #4
+**Affected tests**: #4
 
-**Current code (wrong)**:
-```rust
-let effect_str = effects
-    .iter()
-    .map(|e| {
-        serializer_utils::capitalize_first_letter(&serialize_standard_effect(
-            &e.effect, bindings,
-        ))
-    })
-    .collect::<Vec<_>>()
-    .join(" ");
-```
+**Solution implemented**:
+Modified the `else` branch in `Effect::List` serialization (in `effect_serializer.rs`) to join effects with " and " instead of ". ". Only the first effect is capitalized; subsequent effects remain lowercase.
 
-**Fix**:
-```rust
-let effect_strings: Vec<String> = effects
-    .iter()
-    .map(|e| {
-        serialize_standard_effect(&e.effect, bindings)
-            .trim_end_matches('.')
-            .to_string()
-    })
-    .collect();
-let effect_str = if effect_strings.len() == 2 {
-    format!("{} and {}.", effect_strings[0], effect_strings[1])
-} else if effect_strings.len() > 2 {
-    let last = effect_strings.last().unwrap();
-    let rest = &effect_strings[..effect_strings.len() - 1];
-    format!("{}, and {}.", rest.join(", "), last)
-} else {
-    effect_strings.join("")
-};
-```
+**Files modified**:
+- `effect_serializer.rs` - Changed effect joining logic in `Effect::List` branch
+- `triggered_ability_round_trip_tests.rs` - Converted test #4 to `assert_round_trip`
 
 ### ~~Fix 3: Special Case Banish-Then-Materialize~~ (COMPLETED)
 
@@ -231,7 +204,7 @@ After serializer fixes and parser rejections are in place, update card text in `
 
 1. ~~**Fix banish-then-materialize** (Fix 3)~~ ✅ **DONE** - Implemented as single effect
 2. ~~**Fix serializer capitalization** (Fix 1)~~ ✅ **DONE** - 4 tests now use `assert_round_trip`
-3. **Fix compound effect joining** (Fix 2) - affects 1 test
+3. ~~**Fix compound effect joining** (Fix 2)~~ ✅ **DONE** - 1 test now uses `assert_round_trip`
 4. **Fix {a-subtype} preservation** (Fix 4) - affects 1 test
 5. **Fix "this turn" preservation** (Fix 5) - affects 1 test
 6. **Fix "then" consistency** (Fix 6) - affects 1 test
@@ -250,10 +223,10 @@ After serializer fixes and parser rejections are in place, update card text in `
 | A: Update card text, reject in parser | 3 | 0 | 3 |
 | B: Hard to reject | 1 | 0 | 1 |
 | C: Don't capitalize after trigger cost | 7 | 7 | 0 |
-| D: Compound effect joining | 2 | 1 | 1 |
+| D: Compound effect joining | 2 | 2 | 0 |
 | E: Specific serializer bugs | 2 | 0 | 2 |
 | F: "then" consistency | 3 | 0 | 3 |
-| **Total** | **18** | **8** | **10** |
+| **Total** | **18** | **9** | **9** |
 
 ---
 

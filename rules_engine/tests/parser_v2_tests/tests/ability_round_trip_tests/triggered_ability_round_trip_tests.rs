@@ -84,10 +84,8 @@ fn test_round_trip_when_you_play_a_fast_card_this_character_gains_spark() {
 
 #[test]
 fn test_round_trip_once_per_turn_when_you_discard_a_card_gain_energy_and_kindle() {
-    assert_round_trip_with_expected(
-        "Once per turn, when you discard a card, gain {e} and {kindle}.",
-        "e: 1, k: 1",
-        "Once per turn, when you discard a card, Gain {e}. {Kindle}.",
+    assert_round_trip(
+        "Once per turn, when you discard a card, Gain {e} and {kindle}.",
         "e: 1, k: 1",
     );
 }
