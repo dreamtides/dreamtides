@@ -97,24 +97,17 @@ test-verbose:
     RUST_MIN_STACK=8388608 cargo test --manifest-path rules_engine/Cargo.toml -- $TEST_THREADS
 
 battle-test *args='':
-    cargo test --manifest-path rules_engine/Cargo.toml -p battle_tests "$@"
+    ./rules_engine/scripts/run_cargo_test.sh battle_tests "$@"
 
 parser-test *args='':
     #!/usr/bin/env bash
-    # Detect low-memory environment
+    # Detect low-memory environment and set test threads
     if [ -n "${LOW_MEMORY:-}" ] || [ -f /.dockerenv ] || [ "$(uname -s)" = "Linux" ]; then
-        TEST_THREADS="--test-threads=1"
-    else
-        TEST_THREADS=""
+        export CARGO_TEST_THREADS=1
     fi
-    output=$(RUST_MIN_STACK=8388608 cargo test -q --manifest-path rules_engine/Cargo.toml -p parser_v2_tests -- $TEST_THREADS "$@" 2>&1)
-    exit_code=$?
-    if [ $exit_code -eq 0 ]; then
-        echo "Success"
-    else
-        echo "$output" | grep -v "^running 0 tests$" | grep -v "^test result: ok\." | sed '/^$/N;/^\n$/D'
-        exit 1
-    fi
+    export RUST_MIN_STACK=8388608
+    export CARGO_TEST_QUIET=1
+    ./rules_engine/scripts/run_cargo_test.sh parser_v2_tests "$@"
 
 parser-test-insta *args='':
     #!/usr/bin/env bash
@@ -130,7 +123,7 @@ lat *args='':
     cargo run --manifest-path rules_engine/Cargo.toml --bin lat -- "$@"
 
 lattice-test *args='':
-    cargo test --manifest-path rules_engine/Cargo.toml -p lattice_tests "$@"
+    ./rules_engine/scripts/run_cargo_test.sh lattice_tests "$@"
 
 lattice-bench *args='':
     cargo criterion --manifest-path rules_engine/Cargo.toml -p lattice_benchmarks -- "$@"
@@ -620,7 +613,7 @@ tv-clippy:
     fi
 
 tv-test *args='':
-    cargo test --manifest-path rules_engine/Cargo.toml -p tv_tests "$@"
+    ./rules_engine/scripts/run_cargo_test.sh tv_tests "$@"
 
 tv-build:
     cd rules_engine/src/tv && pnpm tauri build
