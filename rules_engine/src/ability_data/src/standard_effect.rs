@@ -22,6 +22,7 @@ pub enum StandardEffect {
     BanishCharacter { target: Predicate },
     BanishCharacterUntilLeavesPlay { target: Predicate, until_leaves: Predicate },
     BanishCollection { target: Predicate, count: CollectionExpression },
+    BanishThenMaterialize { target: Predicate, count: CollectionExpression },
     BanishEnemyVoid,
     BanishUntilNextMain { target: Predicate },
     BanishWhenLeavesPlay { target: Predicate },

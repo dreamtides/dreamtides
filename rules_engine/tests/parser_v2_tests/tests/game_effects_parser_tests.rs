@@ -237,20 +237,13 @@ fn test_materialized_you_may_banish_ally_then_materialize_it() {
       trigger: Keywords([
         Materialized,
       ]),
-      effect: List([
-        EffectWithOptions(
-          effect: BanishCharacter(
-            target: Another(Character),
-          ),
-          optional: true,
+      effect: WithOptions(EffectWithOptions(
+        effect: BanishThenMaterialize(
+          target: Another(Character),
+          count: Exactly(1),
         ),
-        EffectWithOptions(
-          effect: MaterializeCharacter(
-            target: It,
-          ),
-          optional: true,
-        ),
-      ]),
+        optional: true,
+      )),
     ))
     "###);
 }
@@ -263,20 +256,13 @@ fn test_judgment_you_may_banish_ally_then_materialize_it() {
       trigger: Keywords([
         Judgment,
       ]),
-      effect: List([
-        EffectWithOptions(
-          effect: BanishCharacter(
-            target: Another(Character),
-          ),
-          optional: true,
+      effect: WithOptions(EffectWithOptions(
+        effect: BanishThenMaterialize(
+          target: Another(Character),
+          count: Exactly(1),
         ),
-        EffectWithOptions(
-          effect: MaterializeCharacter(
-            target: It,
-          ),
-          optional: true,
-        ),
-      ]),
+        optional: true,
+      )),
     ))
     "###);
 }
@@ -814,24 +800,79 @@ fn test_judgment_you_may_pay_energy_to_banish_up_to_n_allies_then_materialize_th
       trigger: Keywords([
         Judgment,
       ]),
-      effect: ListWithOptions(ListWithOptions(
-        effects: [
-          EffectWithOptions(
-            effect: BanishCollection(
-              target: Another(Character),
-              count: UpTo(2),
-            ),
-            optional: true,
-          ),
-          EffectWithOptions(
-            effect: MaterializeCollection(
-              target: Them,
-              count: All,
-            ),
-            optional: true,
-          ),
-        ],
+      effect: WithOptions(EffectWithOptions(
+        effect: BanishThenMaterialize(
+          target: Another(Character),
+          count: UpTo(2),
+        ),
+        optional: true,
         trigger_cost: Some(Energy(Energy(1))),
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_materialized_banish_ally_with_spark_then_materialize_it() {
+    let result = parse_ability(
+        "{Materialized} {Banish} an ally with spark {s} or less, then {materialize} it.",
+        "s: 2",
+    );
+    assert_ron_snapshot!(result, @r###"
+    Triggered(TriggeredAbility(
+      trigger: Keywords([
+        Materialized,
+      ]),
+      effect: Effect(BanishThenMaterialize(
+        target: Another(CharacterWithSpark(Spark(2), OrLess)),
+        count: Exactly(1),
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_materialized_banish_any_number_of_allies_then_materialize_them() {
+    let result =
+        parse_ability("{Materialized} {Banish} any number of allies, then {materialize} them.", "");
+    assert_ron_snapshot!(result, @r###"
+    Triggered(TriggeredAbility(
+      trigger: Keywords([
+        Materialized,
+      ]),
+      effect: Effect(BanishThenMaterialize(
+        target: Another(Character),
+        count: AnyNumberOf,
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_banish_up_to_n_allies_then_materialize_them() {
+    let result =
+        parse_ability("{Banish} {up-to-n-allies}, then {materialize} {it-or-them}.", "number: 3");
+    assert_ron_snapshot!(result, @r###"
+    Event(EventAbility(
+      effect: Effect(BanishThenMaterialize(
+        target: Another(Character),
+        count: UpTo(3),
+      )),
+    ))
+    "###);
+}
+
+#[test]
+fn test_you_may_banish_ally_then_materialize_it() {
+    let result = parse_ability("You may {banish} an ally, then {materialize} it.", "");
+    assert_ron_snapshot!(result, @r###"
+    Event(EventAbility(
+      effect: WithOptions(EffectWithOptions(
+        effect: BanishThenMaterialize(
+          target: Another(Character),
+          count: Exactly(1),
+        ),
+        optional: true,
       )),
     ))
     "###);

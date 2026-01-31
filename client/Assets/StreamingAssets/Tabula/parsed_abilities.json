@@ -1114,26 +1114,19 @@
           ]
         },
         "effect": {
-          "List": [
-            {
-              "effect": {
-                "BanishCharacter": {
-                  "target": {
-                    "Another": "Character"
-                  }
+          "WithOptions": {
+            "effect": {
+              "BanishThenMaterialize": {
+                "target": {
+                  "Another": "Character"
+                },
+                "count": {
+                  "Exactly": 1
                 }
-              },
-              "optional": true
+              }
             },
-            {
-              "effect": {
-                "MaterializeCharacter": {
-                  "target": "It"
-                }
-              },
-              "optional": true
-            }
-          ]
+            "optional": true
+          }
         }
       }
     }
@@ -1886,30 +1879,16 @@
     {
       "Event": {
         "effect": {
-          "List": [
-            {
-              "effect": {
-                "BanishCollection": {
-                  "target": {
-                    "Another": "Character"
-                  },
-                  "count": {
-                    "UpTo": 2
-                  }
-                }
+          "Effect": {
+            "BanishThenMaterialize": {
+              "target": {
+                "Another": "Character"
               },
-              "optional": false
-            },
-            {
-              "effect": {
-                "MaterializeCollection": {
-                  "target": "Them",
-                  "count": "All"
-                }
-              },
-              "optional": false
+              "count": {
+                "UpTo": 2
+              }
             }
-          ]
+          }
         }
       }
     }
@@ -2289,31 +2268,18 @@
           ]
         },
         "effect": {
-          "ListWithOptions": {
-            "effects": [
-              {
-                "effect": {
-                  "BanishCollection": {
-                    "target": {
-                      "Another": "Character"
-                    },
-                    "count": {
-                      "UpTo": 2
-                    }
-                  }
+          "WithOptions": {
+            "effect": {
+              "BanishThenMaterialize": {
+                "target": {
+                  "Another": "Character"
                 },
-                "optional": true
-              },
-              {
-                "effect": {
-                  "MaterializeCollection": {
-                    "target": "Them",
-                    "count": "All"
-                  }
-                },
-                "optional": true
+                "count": {
+                  "UpTo": 2
+                }
               }
-            ],
+            },
+            "optional": true,
             "trigger_cost": {
               "Energy": 3
             }
@@ -4274,27 +4240,14 @@
           ]
         },
         "effect": {
-          "List": [
-            {
-              "effect": {
-                "BanishCollection": {
-                  "target": {
-                    "Another": "Character"
-                  },
-                  "count": "AnyNumberOf"
-                }
+          "Effect": {
+            "BanishThenMaterialize": {
+              "target": {
+                "Another": "Character"
               },
-              "optional": false
-            },
-            {
-              "effect": {
-                "MaterializeCharacter": {
-                  "target": "Them"
-                }
-              },
-              "optional": false
+              "count": "AnyNumberOf"
             }
-          ]
+          }
         }
       }
     }
@@ -4733,31 +4686,21 @@
           ]
         },
         "effect": {
-          "List": [
-            {
-              "effect": {
-                "BanishCharacter": {
-                  "target": {
-                    "Another": {
-                      "CharacterWithSpark": [
-                        2,
-                        "OrLess"
-                      ]
-                    }
-                  }
+          "Effect": {
+            "BanishThenMaterialize": {
+              "target": {
+                "Another": {
+                  "CharacterWithSpark": [
+                    2,
+                    "OrLess"
+                  ]
                 }
               },
-              "optional": false
-            },
-            {
-              "effect": {
-                "MaterializeCharacter": {
-                  "target": "It"
-                }
-              },
-              "optional": false
+              "count": {
+                "Exactly": 1
+              }
             }
-          ]
+          }
         }
       }
     }
@@ -4838,26 +4781,19 @@
           ]
         },
         "effect": {
-          "List": [
-            {
-              "effect": {
-                "BanishCharacter": {
-                  "target": {
-                    "Another": "Character"
-                  }
+          "WithOptions": {
+            "effect": {
+              "BanishThenMaterialize": {
+                "target": {
+                  "Another": "Character"
+                },
+                "count": {
+                  "Exactly": 1
                 }
-              },
-              "optional": true
+              }
             },
-            {
-              "effect": {
-                "MaterializeCharacter": {
-                  "target": "It"
-                }
-              },
-              "optional": true
-            }
-          ]
+            "optional": true
+          }
         }
       }
     }

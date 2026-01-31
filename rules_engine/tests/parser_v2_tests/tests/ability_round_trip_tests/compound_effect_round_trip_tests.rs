@@ -137,3 +137,31 @@ fn test_round_trip_abandon_ally_play_character_for_alternate_cost() {
 fn test_round_trip_banish_ally_materialize_at_end_of_turn() {
     assert_round_trip("{Banish} an ally. {Materialize} it at end of turn.", "");
 }
+
+#[test]
+fn test_round_trip_banish_ally_then_materialize_it() {
+    assert_round_trip("{Banish} an ally, then {materialize} it.", "");
+}
+
+#[test]
+fn test_round_trip_banish_any_number_of_allies_then_materialize_them() {
+    assert_round_trip("{Banish} any number of allies, then {materialize} them.", "");
+}
+
+#[test]
+fn test_round_trip_banish_up_to_n_allies_then_materialize_them() {
+    assert_round_trip(
+        "{Banish} {up-to-n-allies}, then {materialize} {it-or-them}.",
+        "number: 2",
+    );
+}
+
+#[test]
+fn test_round_trip_you_may_banish_ally_then_materialize_it() {
+    assert_round_trip("You may {banish} an ally, then {materialize} it.", "");
+}
+
+#[test]
+fn test_round_trip_judgment_you_may_banish_ally_then_materialize_it() {
+    assert_round_trip("{Judgment} You may {banish} an ally, then {materialize} it.", "");
+}

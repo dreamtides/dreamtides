@@ -22,6 +22,7 @@ pub fn get_character_target_predicate(effect: &StandardEffect) -> Option<&Predic
         StandardEffect::BanishCharacterUntilLeavesPlay { target, .. } => Some(target),
         StandardEffect::BanishUntilNextMain { target } => Some(target),
         StandardEffect::BanishCollection { target, .. } => Some(target),
+        StandardEffect::BanishThenMaterialize { target, .. } => Some(target),
         StandardEffect::Copy { target } => Some(target),
         StandardEffect::DisableActivatedAbilitiesWhileInPlay { target } => Some(target),
         StandardEffect::DissolveCharacter { target } => Some(target),

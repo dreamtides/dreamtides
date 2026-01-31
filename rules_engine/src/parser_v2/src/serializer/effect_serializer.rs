@@ -406,6 +406,41 @@ pub fn serialize_standard_effect(
             "{Banish} {cards} from the opponent's void.".to_string()
         }
         StandardEffect::BanishEnemyVoid => "{Banish} the opponent's void.".to_string(),
+        StandardEffect::BanishThenMaterialize { target, count } => {
+            match count {
+                CollectionExpression::Exactly(1) => {
+                    format!(
+                        "{{Banish}} {}, then {{materialize}} it.",
+                        predicate_serializer::serialize_predicate(target, bindings)
+                    )
+                }
+                CollectionExpression::AnyNumberOf => {
+                    format!(
+                        "{{Banish}} any number of {}, then {{materialize}} them.",
+                        predicate_serializer::serialize_predicate_plural(target, bindings)
+                    )
+                }
+                CollectionExpression::UpTo(n) => {
+                    if let Some(var_name) =
+                        parser_substitutions::directive_to_integer_variable("up-to-n-allies")
+                    {
+                        bindings.insert(var_name.to_string(), VariableValue::Integer(*n));
+                    }
+                    if let Some(var_name) =
+                        parser_substitutions::directive_to_integer_variable("it-or-them")
+                    {
+                        bindings.insert(var_name.to_string(), VariableValue::Integer(*n));
+                    }
+                    "{Banish} {up-to-n-allies}, then {materialize} {it-or-them}.".to_string()
+                }
+                _ => {
+                    format!(
+                        "{{Banish}} {}, then {{materialize}} them.",
+                        predicate_serializer::serialize_predicate(target, bindings)
+                    )
+                }
+            }
+        }
         StandardEffect::BanishCharacterUntilLeavesPlay { target, until_leaves } => {
             format!(
                 "{{Banish}} {} until {} leaves play.",

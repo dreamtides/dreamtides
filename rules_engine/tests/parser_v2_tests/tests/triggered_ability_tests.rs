@@ -827,21 +827,10 @@ fn test_materialized_banish_any_number_of_allies_then_materialize_them() {
       trigger: Keywords([
         Materialized,
       ]),
-      effect: List([
-        EffectWithOptions(
-          effect: BanishCollection(
-            target: Another(Character),
-            count: AnyNumberOf,
-          ),
-          optional: false,
-        ),
-        EffectWithOptions(
-          effect: MaterializeCharacter(
-            target: Them,
-          ),
-          optional: false,
-        ),
-      ]),
+      effect: Effect(BanishThenMaterialize(
+        target: Another(Character),
+        count: AnyNumberOf,
+      )),
     ))
     "###);
 }

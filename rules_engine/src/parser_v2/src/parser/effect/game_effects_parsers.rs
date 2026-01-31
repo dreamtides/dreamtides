@@ -31,6 +31,9 @@ pub fn parser<'a>() -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserEx
                 .boxed(),
             choice((
                 banish_cards_from_opponent_void(),
+                banish_up_to_n_then_materialize(),
+                banish_collection_then_materialize(),
+                banish_then_materialize(),
                 banish_up_to_n(),
                 banish_collection(),
                 banish_character_until_leaves_play(),
@@ -330,6 +333,55 @@ pub fn prevent_that_card<'a>(
     directive("prevent")
         .ignore_then(words(&["that", "card"]))
         .to(StandardEffect::Counterspell { target: Predicate::That })
+}
+
+/// Parses "{banish} an ally, then {materialize} it" as a single effect.
+pub fn banish_then_materialize<'a>(
+) -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
+    directive("banish")
+        .ignore_then(article())
+        .ignore_then(predicate_parser::predicate_parser())
+        .then_ignore(comma())
+        .then_ignore(word("then"))
+        .then_ignore(directive("materialize"))
+        .then_ignore(word("it"))
+        .map(|target| StandardEffect::BanishThenMaterialize {
+            target,
+            count: CollectionExpression::Exactly(1),
+        })
+}
+
+/// Parses "{Banish} any number of allies, then {materialize} them" as a single
+/// effect.
+pub fn banish_collection_then_materialize<'a>(
+) -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
+    directive("banish")
+        .ignore_then(words(&["any", "number", "of"]))
+        .ignore_then(predicate_parser::predicate_parser())
+        .then_ignore(comma())
+        .then_ignore(word("then"))
+        .then_ignore(directive("materialize"))
+        .then_ignore(word("them"))
+        .map(|target| StandardEffect::BanishThenMaterialize {
+            target,
+            count: CollectionExpression::AnyNumberOf,
+        })
+}
+
+/// Parses "{banish} {up-to-n-allies}, then {materialize} {it-or-them}" as a
+/// single effect.
+pub fn banish_up_to_n_then_materialize<'a>(
+) -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
+    directive("banish")
+        .ignore_then(up_to_n_allies())
+        .then_ignore(comma())
+        .then_ignore(word("then"))
+        .then_ignore(directive("materialize"))
+        .then_ignore(it_or_them_count())
+        .map(|count| StandardEffect::BanishThenMaterialize {
+            target: Predicate::Another(CardPredicate::Character),
+            count: CollectionExpression::UpTo(count),
+        })
 }
 
 fn counterspell_effects<'a>(

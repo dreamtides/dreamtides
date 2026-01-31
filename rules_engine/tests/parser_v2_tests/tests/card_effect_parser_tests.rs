@@ -639,22 +639,10 @@ fn test_banish_up_to_n_then_materialize_them() {
         parse_ability("{Banish} {up-to-n-allies}, then {materialize} {it-or-them}.", "number: 2");
     assert_ron_snapshot!(result, @r###"
     Event(EventAbility(
-      effect: List([
-        EffectWithOptions(
-          effect: BanishCollection(
-            target: Another(Character),
-            count: UpTo(2),
-          ),
-          optional: false,
-        ),
-        EffectWithOptions(
-          effect: MaterializeCollection(
-            target: Them,
-            count: All,
-          ),
-          optional: false,
-        ),
-      ]),
+      effect: Effect(BanishThenMaterialize(
+        target: Another(Character),
+        count: UpTo(2),
+      )),
     ))
     "###);
 }
@@ -671,20 +659,10 @@ fn test_materialized_judgment_banish_ally_with_spark_then_materialize_it() {
         Materialized,
         Judgment,
       ]),
-      effect: List([
-        EffectWithOptions(
-          effect: BanishCharacter(
-            target: Another(CharacterWithSpark(Spark(2), OrLess)),
-          ),
-          optional: false,
-        ),
-        EffectWithOptions(
-          effect: MaterializeCharacter(
-            target: It,
-          ),
-          optional: false,
-        ),
-      ]),
+      effect: Effect(BanishThenMaterialize(
+        target: Another(CharacterWithSpark(Spark(2), OrLess)),
+        count: Exactly(1),
+      )),
     ))
     "###);
 }
