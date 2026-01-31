@@ -7,17 +7,26 @@ fn test_round_trip_dissolve_ally_that_is_not_subtype() {
 
 #[test]
 fn test_round_trip_abandon_ally_with_materialized_ability() {
-    assert_round_trip("Abandon an ally with a {materialized} ability: Gain {e}.", "e: 2");
+    assert_round_trip(
+        "Abandon an ally with a {materialized} ability: Gain {e}.",
+        "e: 2",
+    );
 }
 
 #[test]
 fn test_round_trip_abandon_ally_with_activated_ability() {
-    assert_round_trip("Abandon an ally with an activated ability: Draw {cards}.", "cards: 1");
+    assert_round_trip(
+        "Abandon an ally with an activated ability: Draw {cards}.",
+        "cards: 1",
+    );
 }
 
 #[test]
 fn test_round_trip_when_materialize_fast_ally_draw_cards() {
-    assert_round_trip("When you {materialize} a fast ally, draw {cards}.", "cards: 1");
+    assert_round_trip(
+        "When you {materialize} a fast ally, draw {cards}.",
+        "cards: 1",
+    );
 }
 
 #[test]
@@ -32,7 +41,10 @@ fn test_round_trip_dissolve_fast_ally_with_cost() {
 
 #[test]
 fn test_round_trip_dissolve_all_allies_that_are_not_subtype() {
-    assert_round_trip("{Dissolve} all allies that are not {a-subtype}.", "subtype: warrior");
+    assert_round_trip(
+        "{Dissolve} all allies that are not {a-subtype}.",
+        "subtype: warrior",
+    );
 }
 
 #[test]
@@ -86,12 +98,18 @@ fn test_round_trip_dissolve_enemy_with_spark_compared_to_abandoned_count() {
 
 #[test]
 fn test_round_trip_when_materialize_fast_enemy_gain_energy() {
-    assert_round_trip("When the opponent {materializes} a fast enemy, gain {e}.", "e: 1");
+    assert_round_trip(
+        "When the opponent {materializes} a fast enemy, gain {e}.",
+        "e: 1",
+    );
 }
 
 #[test]
 fn test_round_trip_dissolve_character_that_is_not_subtype() {
-    assert_round_trip("{Dissolve} a character that is not {a-subtype}.", "subtype: warrior");
+    assert_round_trip(
+        "{Dissolve} a character that is not {a-subtype}.",
+        "subtype: warrior",
+    );
 }
 
 #[test]
@@ -222,7 +240,7 @@ fn test_round_trip_dissolve_all_allies_with_activated_ability() {
 }
 
 #[test]
-fn test_round_trip_dissolve_all_allies_that_are_not_plural_subtype() {
+fn test_round_trip_dissolve_all_allies_that_are_not_subtype() {
     assert_round_trip("{Dissolve} all allies that are not {plural-subtype}.", "subtype: warrior");
 }
 
@@ -342,7 +360,10 @@ fn test_round_trip_dissolve_all_allies_with_cost_compared_to_void_count() {
 
 #[test]
 fn test_round_trip_when_materialize_fast_fast_character() {
-    assert_round_trip("When you {materialize} a {fast} fast character, gain {e}.", "e: 1");
+    assert_round_trip(
+        "When you {materialize} a {fast} fast character, gain {e}.",
+        "e: 1",
+    );
 }
 
 #[test]
@@ -362,7 +383,10 @@ fn test_round_trip_gain_energy_for_each_card_in_enemy_void() {
 
 #[test]
 fn test_round_trip_gain_energy_for_each_character_in_enemy_void() {
-    assert_round_trip("Gain {e} for each character in the opponent's void.", "e: 1");
+    assert_round_trip(
+        "Gain {e} for each character in the opponent's void.",
+        "e: 1",
+    );
 }
 
 #[test]
@@ -387,7 +411,10 @@ fn test_round_trip_gain_energy_for_each_allied_event() {
 
 #[test]
 fn test_round_trip_gain_energy_for_each_enemy_subtype() {
-    assert_round_trip("Gain {e} for each enemy {subtype}.", "e: 1, subtype: warrior");
+    assert_round_trip(
+        "Gain {e} for each enemy {subtype}.",
+        "e: 1, subtype: warrior",
+    );
 }
 
 #[test]
@@ -407,12 +434,18 @@ fn test_round_trip_gain_energy_for_each_other_character() {
 
 #[test]
 fn test_round_trip_gain_energy_for_each_other_subtype() {
-    assert_round_trip("Gain {e} for each other {subtype}.", "e: 1, subtype: warrior");
+    assert_round_trip(
+        "Gain {e} for each other {subtype}.",
+        "e: 1, subtype: warrior",
+    );
 }
 
 #[test]
 fn test_round_trip_gain_energy_for_each_subtype_in_your_void() {
-    assert_round_trip("Gain {e} for each {subtype} in your void.", "e: 1, subtype: warrior");
+    assert_round_trip(
+        "Gain {e} for each {subtype} in your void.",
+        "e: 1, subtype: warrior",
+    );
 }
 
 #[test]

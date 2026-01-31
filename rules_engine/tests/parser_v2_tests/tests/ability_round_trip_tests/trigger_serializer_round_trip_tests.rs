@@ -27,7 +27,10 @@ fn test_round_trip_materialized_dissolved_combined_trigger() {
 
 #[test]
 fn test_round_trip_judgment_with_complex_effect() {
-    assert_round_trip("{Judgment} Draw {cards}, then discard {discards}.", "cards: 2, discards: 1");
+    assert_round_trip(
+        "{Judgment} Draw {cards}, then discard {discards}.",
+        "cards: 2, discards: 1",
+    );
 }
 
 #[test]
@@ -52,12 +55,18 @@ fn test_round_trip_dissolved_with_multiple_effects() {
 
 #[test]
 fn test_round_trip_materialized_judgment_with_targeting() {
-    assert_round_trip("{MaterializedJudgment} This character gains +{s} spark.", "s: 2");
+    assert_round_trip(
+        "{MaterializedJudgment} This character gains +{s} spark.",
+        "s: 2",
+    );
 }
 
 #[test]
 fn test_round_trip_materialized_dissolved_with_each_effect() {
-    assert_round_trip("{MaterializedDissolved} Each player draws {cards}.", "cards: 1");
+    assert_round_trip(
+        "{MaterializedDissolved} Each player draws {cards}.",
+        "cards: 1",
+    );
 }
 
 #[test]
@@ -148,25 +157,40 @@ fn test_round_trip_materialized_with_discover() {
 
 #[test]
 fn test_round_trip_dissolved_with_return_to_hand() {
-    assert_round_trip("{Dissolved} Return this character to your hand.", "");
+    assert_round_trip(
+        "{Dissolved} Return this character to your hand.",
+        "",
+    );
 }
 
 #[test]
 fn test_round_trip_judgment_with_for_each() {
-    assert_round_trip("{Judgment} Gain {e} for each ally.", "e: 1");
+    assert_round_trip(
+        "{Judgment} Gain {e} for each ally.",
+        "e: 1",
+    );
 }
 
 #[test]
 fn test_round_trip_materialized_with_until_condition() {
-    assert_round_trip("{Materialized} This character gains +{s} spark until end of turn.", "s: 1");
+    assert_round_trip(
+        "{Materialized} This character gains +{s} spark until end of turn.",
+        "s: 1",
+    );
 }
 
 #[test]
 fn test_round_trip_materialized_judgment_with_count_condition() {
-    assert_round_trip("{MaterializedJudgment} With {count-allies}, gain {e}.", "allies: 3, e: 2");
+    assert_round_trip(
+        "{MaterializedJudgment} With {count-allies}, gain {e}.",
+        "allies: 3, e: 2",
+    );
 }
 
 #[test]
 fn test_round_trip_dissolved_with_all_players() {
-    assert_round_trip("{Dissolved} Each player gains {e}.", "e: 1");
+    assert_round_trip(
+        "{Dissolved} Each player gains {e}.",
+        "e: 1",
+    );
 }

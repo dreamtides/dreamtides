@@ -92,16 +92,32 @@ The serializer is incorrectly capitalizing keywords that appear after "You may" 
 
 ### Fix 1: Don't Capitalize After "You may" or Trigger Costs
 
-**Status**: ✅ **Implemented**
+**Status**: ❌ **Needs Implementation** (previous attempt failed)
 
-**Changes made:**
-1. Changed all action keywords in `effect_serializer.rs` to lowercase (`{dissolve}`, `{banish}`, `{materialize}`, etc.)
-2. Added `capitalize_first_keyword_or_letter()` function in `serializer_utils.rs` that capitalizes keywords inside curly braces
-3. Updated `ability_serializer.rs` to use `capitalize_first_keyword_or_letter()` for keyword triggers, but only `capitalize_first_letter()` when the effect starts with "you may"
+**Problem**: Currently capitalizes effects after keyword triggers unconditionally. Should NOT capitalize when effect follows:
+- "You may"
+- A trigger cost like "pay {e} to" or "discard a card to"
 
-**Tests fixed:**
-- #5 (`test_round_trip_when_you_discard_this_character_materialize_it`) - now uses `assert_round_trip`
-- #10, #11, #12 - text assertion passes, but have unrelated variable binding issues (serializer not extracting variables correctly)
+**Affects tests**: #5, #10, #11, #12 (reduced from 7 due to BanishThenMaterialize fix)
+
+**Location in `ability_serializer.rs:44-48`**:
+```rust
+// CURRENT (wrong for "You may" cases):
+if is_keyword_trigger {
+    result.push(' ');
+    result.push_str(&serializer_utils::capitalize_first_letter(
+        &effect_serializer::serialize_effect(&triggered.effect, &mut variables),
+    ));
+}
+```
+
+**Correct approach:**
+In `ability_serializer.rs`, when serializing keyword trigger effects:
+1. Check if the effect text starts with "you may" (case-insensitive)
+2. If yes, capitalize just the first letter ("you" → "You") but leave keywords in the effect lowercase
+3. If no, use the existing `capitalize_first_letter` behavior
+
+This preserves all existing test behavior while fixing only the specific "You may" cases.
 
 ### Fix 2: Compound Effect Joining with "and"
 
@@ -221,19 +237,10 @@ After serializer fixes and parser rejections are in place, update card text in `
 
 ---
 
-## Test Infrastructure
-
-### Setup Required
-1. Rename `ability_round_trip_tests/` to `round_trip_test_cases/`
-2. Create `ability_round_trip_tests.rs` with `mod round_trip_test_cases;`
-3. Fix duplicate test name `test_round_trip_dissolve_all_allies_that_are_not_subtype` in `predicate_serialization_round_trip_tests.rs` (lines 43 and 243)
-
----
-
 ## Implementation Order
 
 1. ~~**Fix banish-then-materialize** (Fix 3)~~ ✅ **DONE** - Implemented as single effect
-2. ~~**Fix serializer capitalization** (Fix 1)~~ ✅ **DONE** - Keywords now lowercase, capitalized by ability_serializer when needed
+2. **Fix serializer capitalization** (Fix 1) - affects 4 tests - **NEEDS IMPLEMENTATION**
 3. **Fix compound effect joining** (Fix 2) - affects 1 test
 4. **Fix {a-subtype} preservation** (Fix 4) - affects 1 test
 5. **Fix "this turn" preservation** (Fix 5) - affects 1 test
@@ -252,11 +259,32 @@ After serializer fixes and parser rejections are in place, update card text in `
 |----------|---------------|-------|-----------|
 | A: Update card text, reject in parser | 3 | 0 | 3 |
 | B: Hard to reject | 1 | 0 | 1 |
-| C: Don't capitalize after trigger cost | 7 | 7 | 0 |
+| C: Don't capitalize after trigger cost | 7 | 3 | 4 |
 | D: Compound effect joining | 2 | 1 | 1 |
 | E: Specific serializer bugs | 2 | 0 | 2 |
 | F: "then" consistency | 3 | 0 | 3 |
-| **Total** | **18** | **8** | **10** |
+| **Total** | **18** | **4** | **14** |
+
+---
+
+## Lessons Learned
+
+### Failed Approach: Making All Keywords Lowercase
+
+**What was attempted:**
+Changed all action keywords in `effect_serializer.rs` to lowercase (`{dissolve}`, `{banish}`, etc.) with the idea that `ability_serializer.rs` would capitalize them when needed.
+
+**Why it failed:**
+1. This broke 263 existing round-trip tests that expected capitalized keywords
+2. The existing tests use `assert_round_trip` which expects input == output
+3. Changing default serialization behavior has a massive blast radius
+4. The fix was supposed to affect only 4 tests but ended up breaking hundreds
+
+**Key insight:**
+When fixing serializer bugs, prefer **targeted fixes** that only change behavior for the specific problematic cases. Don't change the default behavior that all other tests depend on.
+
+**Correct approach for Fix 1:**
+Instead of changing `effect_serializer.rs` to output lowercase keywords, modify `ability_serializer.rs` to detect when an effect starts with "you may" and handle that case specially - capitalizing only the "y" in "you" rather than potentially capitalizing a keyword that follows later in the string.
 
 ---
 

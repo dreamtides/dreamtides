@@ -7,7 +7,10 @@ fn test_round_trip_until_end_of_turn_when_you_play_event_copy_it() {
 
 #[test]
 fn test_round_trip_multiply_your_energy() {
-    assert_round_trip("{MultiplyBy} the amount of {energy-symbol} you have.", "number: 2");
+    assert_round_trip(
+        "{MultiplyBy} the amount of {energy-symbol} you have.",
+        "number: 2",
+    );
 }
 
 #[test]
@@ -28,12 +31,18 @@ fn test_round_trip_materialize_random_subtype_from_deck() {
 
 #[test]
 fn test_round_trip_until_end_of_turn_when_you_play_a_character_draw_cards() {
-    assert_round_trip("Until end of turn, when you play a character, draw {cards}.", "cards: 2");
+    assert_round_trip(
+        "Until end of turn, when you play a character, draw {cards}.",
+        "cards: 2",
+    );
 }
 
 #[test]
 fn test_round_trip_until_end_of_turn_when_an_ally_leaves_play_gain_energy() {
-    assert_round_trip("Until end of turn, when an ally leaves play, gain {e}.", "e: 1");
+    assert_round_trip(
+        "Until end of turn, when an ally leaves play, gain {e}.",
+        "e: 1",
+    );
 }
 
 #[test]
@@ -54,12 +63,18 @@ fn test_round_trip_materialized_draw_cards_for_each_allied_subtype() {
 
 #[test]
 fn test_round_trip_score_points_for_each_card_played_this_turn() {
-    assert_round_trip("Gain {points} for each card you have played this turn.", "points: 3");
+    assert_round_trip(
+        "Gain {points} for each card you have played this turn.",
+        "points: 3",
+    );
 }
 
 #[test]
 fn test_round_trip_draw_cards_for_each_card_played_this_turn() {
-    assert_round_trip("Draw {cards} for each card you have played this turn.", "cards: 2");
+    assert_round_trip(
+        "Draw {cards} for each card you have played this turn.",
+        "cards: 2",
+    );
 }
 
 #[test]
@@ -142,7 +157,10 @@ fn test_round_trip_discard_chosen_card_with_cost_from_opponent_hand() {
 
 #[test]
 fn test_round_trip_prevent_event_unless_opponent_pays() {
-    assert_round_trip("{Prevent} a played event unless the opponent pays {e}.", "e: 1");
+    assert_round_trip(
+        "{Prevent} a played event unless the opponent pays {e}.",
+        "e: 1",
+    );
 }
 
 #[test]
@@ -162,22 +180,34 @@ fn test_round_trip_discover_fast_subtype() {
 
 #[test]
 fn test_round_trip_discover_fast_character_with_spark() {
-    assert_round_trip("{Discover} a {fast} character with spark {s} or less.", "s: 2");
+    assert_round_trip(
+        "{Discover} a {fast} character with spark {s} or less.",
+        "s: 2",
+    );
 }
 
 #[test]
 fn test_round_trip_discover_fast_card_with_cost() {
-    assert_round_trip("{Discover} a {fast} character with cost {e} or less.", "e: 3");
+    assert_round_trip(
+        "{Discover} a {fast} character with cost {e} or less.",
+        "e: 3",
+    );
 }
 
 #[test]
 fn test_round_trip_return_up_to_n_events_from_void_to_hand() {
-    assert_round_trip("Return {up-to-n-events} from your void to your hand.", "number: 3");
+    assert_round_trip(
+        "Return {up-to-n-events} from your void to your hand.",
+        "number: 3",
+    );
 }
 
 #[test]
 fn test_round_trip_event_in_void_gains_reclaim_this_turn() {
-    assert_round_trip("An event in your void gains {reclaim-for-cost} this turn.", "reclaim: 0");
+    assert_round_trip(
+        "An event in your void gains {reclaim-for-cost} this turn.",
+        "reclaim: 0",
+    );
 }
 
 #[test]
@@ -197,7 +227,10 @@ fn test_round_trip_discover_character_with_activated_ability() {
 
 #[test]
 fn test_round_trip_materialize_n_figments() {
-    assert_round_trip("{Materialize} {n-figments}.", "figment: celestial, number: 2");
+    assert_round_trip(
+        "{Materialize} {n-figments}.",
+        "figment: celestial, number: 2",
+    );
 }
 
 #[test]
@@ -210,7 +243,10 @@ fn test_round_trip_materialize_a_figment_for_each_card_played_this_turn() {
 
 #[test]
 fn test_round_trip_materialize_a_figment_for_each_ally() {
-    assert_round_trip("{Materialize} {a-figment} for each ally.", "figment: shadow");
+    assert_round_trip(
+        "{Materialize} {a-figment} for each ally.",
+        "figment: shadow",
+    );
 }
 
 #[test]
@@ -249,7 +285,10 @@ fn test_round_trip_materialize_copies_equal_to_energy_spent() {
 
 #[test]
 fn test_round_trip_copy_next_event() {
-    assert_round_trip("Copy the next event you play {this-turn-times}.", "number: 2");
+    assert_round_trip(
+        "Copy the next event you play {this-turn-times}.",
+        "number: 2",
+    );
 }
 
 #[test]
@@ -302,7 +341,10 @@ fn test_round_trip_trigger_additional_judgment_phase() {
 
 #[test]
 fn test_round_trip_copy_next_fast_character() {
-    assert_round_trip("Copy the next {fast} character you play {this-turn-times}.", "number: 1");
+    assert_round_trip(
+        "Copy the next {fast} character you play {this-turn-times}.",
+        "number: 1",
+    );
 }
 
 #[test]
@@ -368,7 +410,10 @@ fn test_round_trip_modal_return_enemy_or_draw_cards() {
 
 #[test]
 fn test_round_trip_prevent_played_event_which_could_dissolve_ally() {
-    assert_round_trip("{Prevent} a played event which could {dissolve} an ally.", "");
+    assert_round_trip(
+        "{Prevent} a played event which could {dissolve} an ally.",
+        "",
+    );
 }
 
 #[test]
@@ -393,7 +438,10 @@ fn test_round_trip_put_a_card_from_void_on_top_of_deck() {
 
 #[test]
 fn test_round_trip_put_up_to_n_cards_from_void_on_top_of_deck() {
-    assert_round_trip("Put {up-to-n-cards} cards from your void on top of your deck.", "number: 3");
+    assert_round_trip(
+        "Put {up-to-n-cards} cards from your void on top of your deck.",
+        "number: 3",
+    );
 }
 
 #[test]
@@ -460,17 +508,26 @@ fn test_round_trip_enemy_cannot_be_dissolved_this_turn() {
 
 #[test]
 fn test_round_trip_banish_enemy_opponent_gains_points_equal_to_its_spark() {
-    assert_round_trip("{Banish} an enemy. The opponent gains points equal to its spark.", "");
+    assert_round_trip(
+        "{Banish} an enemy. The opponent gains points equal to its spark.",
+        "",
+    );
 }
 
 #[test]
 fn test_round_trip_dissolve_it_opponent_gains_points_equal_to_its_spark() {
-    assert_round_trip("{Dissolve} it. The opponent gains points equal to its spark.", "");
+    assert_round_trip(
+        "{Dissolve} it. The opponent gains points equal to its spark.",
+        "",
+    );
 }
 
 #[test]
 fn test_round_trip_dissolve_ally_opponent_loses_points() {
-    assert_round_trip("{Dissolve} an ally. The opponent loses {points}.", "points: 2");
+    assert_round_trip(
+        "{Dissolve} an ally. The opponent loses {points}.",
+        "points: 2",
+    );
 }
 
 #[test]
@@ -490,7 +547,10 @@ fn test_round_trip_this_character_gains_aegis_this_turn() {
 
 #[test]
 fn test_round_trip_ally_gains_spark_until_next_main_for_each_ally() {
-    assert_round_trip("An ally gains +{s} spark until your next main phase for each ally.", "s: 1");
+    assert_round_trip(
+        "An ally gains +{s} spark until your next main phase for each ally.",
+        "s: 1",
+    );
 }
 
 #[test]

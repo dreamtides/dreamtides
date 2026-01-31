@@ -110,5 +110,8 @@ fn test_round_trip_materialize_any_number_of_allies() {
 
 #[test]
 fn test_round_trip_materialize_any_number_of_allied_subtype() {
-    assert_round_trip("{Materialize} any number of allied {plural-subtype}.", "subtype: warrior");
+    assert_round_trip(
+        "{Materialize} any number of allied {plural-subtype}.",
+        "subtype: warrior",
+    );
 }
