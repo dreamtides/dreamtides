@@ -52,7 +52,7 @@ fn test_abandon_ally_gain_spark() {
 #[ignore = "Round-trip mismatch"]
 #[test]
 fn test_pay_energy_discard_kindle() {
-    assert_round_trip("{e}, Discard {discards}: {kindle}.", "e: 1\ndiscards: 1\nk: 2");
+    assert_round_trip("{e}, Discard {discards}: {Kindle}.", "e: 1\ndiscards: 1\nk: 2");
 }
 
 #[test]

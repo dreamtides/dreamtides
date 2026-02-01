@@ -361,9 +361,9 @@ fn test_when_an_ally_is_dissolved_gain_energy() {
 }
 
 #[test]
-fn test_dissolved_subtype_in_void_gains_reclaim() {
+fn test_dissolved_a_subtype_in_void_gains_reclaim() {
     let result = parse_ability(
-        "{Dissolved} {a-subtype} in your void gains {reclaim} equal to its cost.",
+        "{Dissolved} {ASubtype} in your void gains {reclaim} equal to its cost.",
         "subtype: warrior",
     );
     assert_ron_snapshot!(result, @r###"

@@ -2792,7 +2792,7 @@ card-number = 171
 name = "Emberwatch Veteran"
 id = "4a558573-ddf0-478e-b5ac-75401cbc74f7"
 energy-cost = 1
-rules-text = "{e}, Discard {discards}: {kindle}."
+rules-text = "{e}, Discard {discards}: {Kindle}."
 variables = """
 e: 1
 discards: 1

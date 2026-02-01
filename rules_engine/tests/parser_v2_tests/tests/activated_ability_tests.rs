@@ -202,7 +202,7 @@ fn test_energy_gain_spark_for_each_allied_subtype() {
 
 #[test]
 fn test_energy_discard_kindle() {
-    let result = parse_ability("{e}, Discard {discards}: {kindle}.", "e: 1, discards: 2, k: 2");
+    let result = parse_ability("{e}, Discard {discards}: {Kindle}.", "e: 1, discards: 2, k: 2");
     assert_ron_snapshot!(result, @r###"
     Activated(ActivatedAbility(
       costs: [
@@ -480,9 +480,9 @@ fn test_pay_one_or_more_dissolve_each_character() {
 }
 
 #[test]
-fn test_spend_one_or_more_energy_draw_for_each_energy_spent() {
+fn test_pay_one_or_more_energy_draw() {
     let result = parse_ability(
-        "Spend 1 or more {energy-symbol}: Draw {cards} for each {energy-symbol} spent.",
+        "Pay 1 or more {energy-symbol}: Draw {cards} for each {energy-symbol} spent.",
         "cards: 2",
     );
     assert_ron_snapshot!(result, @r###"
