@@ -12,7 +12,11 @@ pub fn serialize_predicate(predicate: &Predicate, bindings: &mut VariableBinding
         Predicate::Them => "them".to_string(),
         Predicate::It => "it".to_string(),
         Predicate::Your(card_predicate) => {
-            your_predicate_formatted(card_predicate, bindings).with_article()
+            if is_generic_card_type(card_predicate) {
+                serialize_card_predicate(card_predicate, bindings)
+            } else {
+                your_predicate_formatted(card_predicate, bindings).with_article()
+            }
         }
         Predicate::Another(card_predicate) => {
             your_predicate_formatted(card_predicate, bindings).with_article()
@@ -79,12 +83,24 @@ pub fn predicate_base_text(predicate: &Predicate, bindings: &mut VariableBinding
         Predicate::That => "that character".to_string(),
         Predicate::Them => "them".to_string(),
         Predicate::It => "it".to_string(),
-        Predicate::Your(card_predicate) => serialize_your_predicate(card_predicate, bindings),
+        Predicate::Your(card_predicate) => {
+            if is_generic_card_type(card_predicate) {
+                text_formatting::card_predicate_base_text(card_predicate).without_article()
+            } else {
+                serialize_your_predicate(card_predicate, bindings)
+            }
+        }
         Predicate::Another(card_predicate) => serialize_your_predicate(card_predicate, bindings),
         Predicate::Any(card_predicate) => {
             text_formatting::card_predicate_base_text(card_predicate).without_article()
         }
-        Predicate::Enemy(card_predicate) => serialize_enemy_predicate(card_predicate, bindings),
+        Predicate::Enemy(card_predicate) => {
+            if is_non_character_card_type(card_predicate) {
+                text_formatting::card_predicate_base_text(card_predicate).without_article()
+            } else {
+                serialize_enemy_predicate(card_predicate, bindings)
+            }
+        }
         Predicate::YourVoid(card_predicate) => {
             format!(
                 "{} in your void",
@@ -669,4 +685,18 @@ fn serialize_enemy_predicate_plural(
             format!("enemy {}", serialize_card_predicate_plural(card_predicate, bindings))
         }
     }
+}
+
+/// Returns true if the card predicate is a generic type (Card, Character,
+/// Event) without any modifiers. These are serialized without ownership
+/// qualifiers for round-trip compatibility.
+fn is_generic_card_type(card_predicate: &CardPredicate) -> bool {
+    matches!(card_predicate, CardPredicate::Card | CardPredicate::Character | CardPredicate::Event)
+}
+
+/// Returns true if the card predicate is Card or Event (not Character).
+/// For Enemy predicates with these types, we omit the "enemy" prefix
+/// since "enemy card" and "enemy event" are not natural in card text.
+fn is_non_character_card_type(card_predicate: &CardPredicate) -> bool {
+    matches!(card_predicate, CardPredicate::Card | CardPredicate::Event)
 }

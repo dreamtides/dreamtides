@@ -32,7 +32,6 @@ fn test_discard_trigger_gain_reclaim_equal_cost() {
     );
 }
 
-#[ignore = "Round-trip mismatch"]
 #[test]
 fn test_discard_trigger_gain_points() {
     assert_round_trip("When you discard a card, gain {points}.", "points: 1");
@@ -140,7 +139,6 @@ fn test_materialize_subtype_trigger_that_character_gains_spark() {
     );
 }
 
-#[ignore = "Round-trip mismatch"]
 #[test]
 fn test_materialize_character_trigger_gain_spark() {
     assert_round_trip(

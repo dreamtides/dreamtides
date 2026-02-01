@@ -162,7 +162,6 @@ fn test_banish_ally_materialize_at_end_of_turn() {
 // Prevent effects
 // ============================================================================
 
-#[ignore = "Round-trip mismatch"]
 #[test]
 fn test_prevent_played_card() {
     assert_round_trip("{Prevent} a played card.", "");
