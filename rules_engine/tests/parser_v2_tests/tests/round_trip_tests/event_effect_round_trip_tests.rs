@@ -2,9 +2,6 @@
 //!
 //! Tests simple one-shot effects like dissolve, banish, prevent,
 //! draw, discard, discover, reclaim, gain energy/points, kindle, etc.
-//!
-//! GENERATED FILE - Do not edit manually.
-//! Regenerate with: python scripts/generate_round_trip_tests.py
 
 use parser_v2_tests::test_helpers::*;
 

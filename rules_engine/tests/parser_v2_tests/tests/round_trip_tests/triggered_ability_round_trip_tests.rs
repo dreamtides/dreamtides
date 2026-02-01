@@ -2,9 +2,6 @@
 //!
 //! Tests abilities that trigger on events like "When you...",
 //! "Once per turn, when...", "At the end of...", etc.
-//!
-//! GENERATED FILE - Do not edit manually.
-//! Regenerate with: python scripts/generate_round_trip_tests.py
 
 use parser_v2_tests::test_helpers::*;
 

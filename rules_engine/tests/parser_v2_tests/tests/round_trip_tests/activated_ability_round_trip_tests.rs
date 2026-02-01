@@ -2,9 +2,6 @@
 //!
 //! Tests abilities with cost: effect patterns, including energy costs,
 //! abandon costs, discard costs, and other activation requirements.
-//!
-//! GENERATED FILE - Do not edit manually.
-//! Regenerate with: python scripts/generate_round_trip_tests.py
 
 use parser_v2_tests::test_helpers::*;
 

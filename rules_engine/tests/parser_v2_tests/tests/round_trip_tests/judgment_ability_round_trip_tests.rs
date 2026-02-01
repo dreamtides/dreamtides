@@ -1,9 +1,6 @@
 //! Round-trip tests for Judgment phase abilities.
 //!
 //! Tests abilities that trigger during the Judgment phase.
-//!
-//! GENERATED FILE - Do not edit manually.
-//! Regenerate with: python scripts/generate_round_trip_tests.py
 
 use parser_v2_tests::test_helpers::*;
 
