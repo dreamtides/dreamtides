@@ -110,17 +110,3 @@ pub fn assert_round_trip(expected_text: &str, vars: &str) {
     assert_eq!(expected_text, serialized.text);
     assert_eq!(VariableBindings::parse(vars).unwrap(), serialized.variables);
 }
-
-/// Asserts that an ability round-trips to the provided expected text and
-/// variable bindings.
-pub fn assert_round_trip_with_expected(
-    input: &str,
-    vars: &str,
-    expected_text: &str,
-    expected_vars: &str,
-) {
-    let parsed = parse_ability(input, vars);
-    let serialized = ability_serializer::serialize_ability(&parsed);
-    assert_eq!(expected_text, serialized.text);
-    assert_eq!(VariableBindings::parse(expected_vars).unwrap(), serialized.variables);
-}
