@@ -8,7 +8,6 @@
 
 use parser_v2_tests::test_helpers::*;
 
-#[ignore = "Round-trip mismatch"]
 #[test]
 fn test_play_count_trigger_reclaim_self() {
     assert_round_trip(
@@ -17,7 +16,6 @@ fn test_play_count_trigger_reclaim_self() {
     );
 }
 
-#[ignore = "Round-trip mismatch"]
 #[test]
 fn test_discard_self_trigger_materialize() {
     assert_round_trip("When you discard this character, {materialize} it.", "");
@@ -37,7 +35,6 @@ fn test_discard_trigger_gain_points() {
     assert_round_trip("When you discard a card, gain {points}.", "points: 1");
 }
 
-#[ignore = "Round-trip mismatch"]
 #[test]
 fn test_discard_trigger_kindle() {
     assert_round_trip("When you discard a card, {kindle}.", "k: 1");
