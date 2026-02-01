@@ -153,7 +153,7 @@ pub fn serialize_standard_static_ability(
         StandardStaticAbility::OncePerTurnPlayFromVoid { matching } => {
             format!(
                 "once per turn, you may play {} from your void.",
-                text_formatting::card_predicate_base_text(matching).without_article()
+                predicate_serializer::serialize_card_predicate(matching, bindings)
             )
         }
         StandardStaticAbility::RevealTopCardOfYourDeck => {

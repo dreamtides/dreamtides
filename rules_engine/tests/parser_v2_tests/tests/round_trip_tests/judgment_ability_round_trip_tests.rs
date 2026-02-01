@@ -58,8 +58,8 @@ fn test_judgment_may_discard_to_draw_and_gain_points() {
 #[test]
 fn test_judgment_may_discard_to_dissolve_by_spark() {
     assert_round_trip(
-        "{Judgment} You may discard a card to {dissolve} an enemy with spark {s} or less.",
-        "s: 1",
+        "{Judgment} You may discard {discards} to {dissolve} an enemy with spark {s} or less.",
+        "s: 1\ndiscards: 1",
     );
 }
 

@@ -132,7 +132,7 @@ fn test_pay_energy_draw_per_energy_spent() {
 
 #[test]
 fn test_abandon_or_discard_dissolve_enemy() {
-    assert_round_trip("Abandon an ally or discard a card: {Dissolve} an enemy.", "");
+    assert_round_trip("Abandon an ally or discard {discards}: {Dissolve} an enemy.", "discards: 1");
 }
 
 #[test]

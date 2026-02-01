@@ -9,6 +9,12 @@ use crate::variables::parser_substitutions;
 pub fn serialize_cost(cost: &Cost, bindings: &mut VariableBindings) -> String {
     match cost {
         Cost::AbandonCharactersCount { target, count } => match count {
+            CollectionExpression::AnyNumberOf => {
+                format!(
+                    "abandon any number of {}",
+                    predicate_serializer::serialize_predicate_plural(target, bindings)
+                )
+            }
             CollectionExpression::Exactly(1) => {
                 format!("abandon {}", predicate_serializer::serialize_predicate(target, bindings))
             }
@@ -22,17 +28,12 @@ pub fn serialize_cost(cost: &Cost, bindings: &mut VariableBindings) -> String {
             }
             _ => "abandon {count-allies}".to_string(),
         },
-        Cost::DiscardCards { target, count } => {
-            if *count == 1 {
-                format!("discard {}", predicate_serializer::serialize_predicate(target, bindings))
-            } else {
-                if let Some(var_name) =
-                    parser_substitutions::directive_to_integer_variable("discards")
-                {
-                    bindings.insert(var_name.to_string(), VariableValue::Integer(*count));
-                }
-                "discard {discards}".to_string()
+        Cost::DiscardCards { count, .. } => {
+            if let Some(var_name) = parser_substitutions::directive_to_integer_variable("discards")
+            {
+                bindings.insert(var_name.to_string(), VariableValue::Integer(*count));
             }
+            "discard {discards}".to_string()
         }
         Cost::DiscardHand => "discard your hand".to_string(),
         Cost::Energy(energy) => {

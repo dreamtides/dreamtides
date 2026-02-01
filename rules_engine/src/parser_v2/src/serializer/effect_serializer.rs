@@ -80,7 +80,7 @@ pub fn serialize_standard_effect(
         StandardEffect::DiscardCardFromEnemyHand { predicate } => {
             format!(
                 "discard a chosen {} from the opponent's hand.",
-                text_formatting::card_predicate_base_text(predicate).without_article()
+                predicate_serializer::serialize_card_predicate_without_article(predicate, bindings)
             )
         }
         StandardEffect::DiscardCardFromEnemyHandThenTheyDraw { predicate } => {
@@ -691,14 +691,14 @@ pub fn serialize_standard_effect(
             }
         }
         StandardEffect::MaterializeRandomFromDeck { count, predicate } => {
-            if let Some(var_name) = parser_substitutions::directive_to_integer_variable(
-                "n-random-characters",
-            ) {
+            if let Some(var_name) =
+                parser_substitutions::directive_to_integer_variable("n-random-characters")
+            {
                 bindings.insert(var_name.to_string(), VariableValue::Integer(*count));
             }
             format!(
                 "{{materialize}} {{n-random-characters}} {} from your deck.",
-                text_formatting::card_predicate_base_text(predicate).without_article()
+                predicate_serializer::serialize_cost_constraint_only(predicate, bindings)
             )
         }
         StandardEffect::MultiplyYourEnergy { multiplier } => {

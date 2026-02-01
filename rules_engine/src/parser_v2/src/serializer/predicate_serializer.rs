@@ -271,6 +271,35 @@ pub fn serialize_card_predicate_without_article(
     }
 }
 
+/// Serialize only the cost constraint part of a card predicate.
+///
+/// This is used when the base card type is already implied by context (e.g.,
+/// `{n-random-characters}` already says "characters", so we only need
+/// "with cost {e} or less").
+pub fn serialize_cost_constraint_only(
+    card_predicate: &CardPredicate,
+    bindings: &mut VariableBindings,
+) -> String {
+    match card_predicate {
+        CardPredicate::CardWithCost { target, cost_operator, cost } => {
+            if let Some(var_name) = parser_substitutions::directive_to_integer_variable("e") {
+                bindings.insert(var_name.to_string(), VariableValue::Integer(cost.0));
+            }
+            // If target is a generic type, skip it
+            if is_generic_card_type(target) {
+                format!("with cost {{e}}{}", serializer_utils::serialize_operator(cost_operator))
+            } else {
+                format!(
+                    "{} with cost {{e}}{}",
+                    serialize_card_predicate_without_article(target, bindings),
+                    serializer_utils::serialize_operator(cost_operator)
+                )
+            }
+        }
+        _ => serialize_card_predicate_without_article(card_predicate, bindings),
+    }
+}
+
 pub fn serialize_card_predicate_plural(
     card_predicate: &CardPredicate,
     bindings: &mut VariableBindings,
