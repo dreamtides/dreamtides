@@ -4,7 +4,29 @@
 
 This document outlines a comprehensive plan to fix all round-trip test failures in the parser_v2 codebase, enabling the removal of all `#[ignore = "Round-trip mismatch"]` annotations. The goal is to ensure that `parse(text) -> serialize(ast) == text` for all valid card ability texts.
 
-## Current State
+## Project Status: Partially Complete
+
+**Summary:** The round-trip test fix project reduced failing tests from 116 to 31. The remaining 31 tests involve complex parser/serializer patterns that would require significant refactoring.
+
+**Final Numbers:**
+- Total round-trip tests: 224
+- Passing tests: 193
+- Ignored tests: 31 (down from ~116)
+- Pass rate: 86%
+
+**What was fixed:**
+- Effect joining with "and" for compound effects (Fix 2)
+- BanishThenMaterialize standard effect parsing (Fix 3)
+- Keyword capitalization after "You may" and trigger costs (Fix 1)
+- Operator serialization for round-trip compatibility
+- Effect joining with period separation for independent effects
+- Test data issues with unused variables
+- Various predicate serialization bugs
+
+**What remains:**
+The 31 remaining tests involve complex patterns that would require more invasive changes to the AST structure or would have broad compatibility impacts. See "Remaining Issues Analysis" section below.
+
+## Current State (Historical)
 
 There are approximately **116 failing tests** in the round-trip test suite (in `round_trip_tests/`).
 
@@ -501,3 +523,107 @@ just tabula-generate
 1. All tests in `round_trip_tests/` pass without `#[ignore]` annotations
 2. `just review` passes
 3. No regression in existing passing tests
+
+---
+
+## Remaining Issues Analysis (31 Tests)
+
+The following 31 tests remain ignored. They are categorized by the type of issue:
+
+### Category A: Variable Bindings Lost (6 tests)
+
+Tests where the serializer doesn't include all variables from the original input:
+
+| Test | Issue |
+|------|-------|
+| `test_choose_one_return_or_draw` | Mode costs `mode1-cost`, `mode2-cost` not preserved |
+| `test_conditional_cost_if_dissolved` | Variable `e` not in output |
+| `test_materialized_dissolve_with_abandon_cost` | Variable `e` not in output |
+| `test_with_allied_subtype_play_from_hand_or_void` | Variable `subtype` not in output |
+| `test_play_event_trigger_copy` | Variable `e` not in output |
+| `test_pay_energy_discard_kindle` | Variable `discards` serializes as "a card" |
+
+**Root cause:** Some patterns parse variables but serialize to constant forms.
+
+### Category B: Plural/Singular Mismatch (4 tests)
+
+| Test | Input | Output |
+|------|-------|--------|
+| `test_spark_equals_subtype_count` | `{plural-subtype}` | `{subtype}` |
+| `test_subtype_gains_spark_equal_count` | `{plural-subtype}` | `{subtype}` |
+| `test_reveal_top_card_play_characters_from_top` | `characters` | `character` |
+| `test_judgment_triggers_on_materialize` | `allies` | `ally` |
+
+**Root cause:** Serializer doesn't preserve plural forms.
+
+### Category C: Effect Joining Style (6 tests)
+
+Different joining patterns: `, then` vs `. ` vs ` and `:
+
+| Test | Input Uses | Output Uses |
+|------|------------|-------------|
+| `test_pay_variable_energy_draw_per_energy` | `, then discard` | `. Discard` |
+| `test_may_return_character_from_void_draw` | `. Draw` | `, then draw` |
+| `test_judgment_draw_then_discard` | `, then discard` | `. Discard` |
+| `test_materialized_discard_then_draw` | `, then draw` | `. Draw` |
+| `test_judgment_pay_to_kindle_and_banish_opponent_void` | `and {banish}` | `, then {banish}` |
+| `test_return_all_but_one_ally_draw_per_returned` | Structural issue |
+
+**Root cause:** Effect joining is context-dependent but serializer uses fixed rules.
+
+### Category D: Predicate Serialization Issues (8 tests)
+
+Issues with how predicates are serialized:
+
+| Test | Input | Output |
+|------|-------|--------|
+| `test_banish_non_subtype_enemy` | `non-{subtype}` | `is not {a-subtype}` |
+| `test_prevent_dissolve_event` | `a played event which could {dissolve} an ally` | `a played enemy event which could {dissolve} ally` |
+| `test_prevent_played_character` | `a played character` | `a played enemy` |
+| `test_materialized_prevent_played_card_by_cost` | `a played card` | `a played enemy` |
+| `test_require_return_ally_to_play` | `an ally` | `a character` |
+| `test_conditional_cost_if_discarded` | `This character` | `This event` |
+| `test_discard_chosen_from_opponent_hand_by_cost` | `cost {e} or less` | cost predicate lost |
+| `test_dissolve_by_energy_paid` | `each character` | `all characters` |
+
+**Root cause:** AST doesn't distinguish between semantically equivalent forms.
+
+### Category E: Cost/Count Expression Issues (4 tests)
+
+| Test | Input | Output |
+|------|-------|--------|
+| `test_materialize_random_characters_from_deck` | `cost {e} or less` | cost predicate lost |
+| `test_play_from_void_by_cost` | `a character with cost {e}` | `character` (no cost) |
+| `test_abandon_any_allies_draw_per_abandoned` | `any number of allies` | `{count-allies}` |
+| `test_materialized_card_gains_reclaim_for_cost` | `cost {e} or less` and `{reclaim-for-cost}` | different form |
+
+**Root cause:** Complex cost predicates not always preserved.
+
+### Category F: Temporal/Conditional Keywords (2 tests)
+
+| Test | Input | Output |
+|------|-------|--------|
+| `test_subtype_in_void_allies_have_spark` | `If this card is in` | `While this card is in` |
+| `test_judgment_may_discard_to_draw_and_gain_points` | Complex "You may" structure | Incorrectly restructured |
+
+**Root cause:** Parser collapses different temporal keywords to same AST.
+
+### Category G: Compound Ability Structure (1 test)
+
+| Test | Issue |
+|------|-------|
+| `test_prevent_dissolve_event` (static version) | Complex triggered prevention with "that card" reference |
+
+**Root cause:** Complex ability structure with cross-references.
+
+---
+
+## Recommendations for Future Work
+
+1. **AST Enrichment:** Add variants to preserve original text forms (e.g., `Predicate::Generic` vs `Predicate::Your`)
+
+2. **Canonical Form Documentation:** Document which input forms are "canonical" and which are alternatives that serialize differently
+
+3. **Test Strategy:** Consider whether round-trip tests should test semantic equivalence (parse both and compare AST) rather than string equality
+
+4. **Priority:** The 193 passing tests cover the most common patterns. The 31 remaining represent edge cases or stylistic variations.
