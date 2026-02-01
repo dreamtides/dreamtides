@@ -99,10 +99,27 @@ pub fn predicate_base_text(predicate: &Predicate, bindings: &mut VariableBinding
             text_formatting::card_predicate_base_text(card_predicate).without_article()
         }
         Predicate::Enemy(card_predicate) => {
-            if is_non_character_card_type(card_predicate) {
-                text_formatting::card_predicate_base_text(card_predicate).without_article()
-            } else {
-                serialize_enemy_predicate(card_predicate, bindings)
+            // For Prevent/Counterspell contexts, serialize without "enemy" prefix
+            // since "enemy" is implicit for played cards being countered.
+            match card_predicate {
+                // Generic card types return base text without article
+                _ if is_generic_card_type(card_predicate) => {
+                    text_formatting::card_predicate_base_text(card_predicate).without_article()
+                }
+                // CouldDissolve: serialize without "enemy" prefix but include
+                // the full inner target (with article)
+                CardPredicate::CouldDissolve { target } => {
+                    format!(
+                        "event which could {{dissolve}} {}",
+                        serialize_predicate(target, bindings)
+                    )
+                }
+                // CardWithCost: serialize the card type without "enemy" prefix
+                CardPredicate::CardWithCost { .. } => {
+                    serialize_card_predicate_without_article(card_predicate, bindings)
+                }
+                // Other complex predicates: use enemy serialization
+                _ => serialize_enemy_predicate(card_predicate, bindings),
             }
         }
         Predicate::YourVoid(card_predicate) => {
@@ -769,11 +786,4 @@ fn serialize_your_predicate_or_canonical(
 /// qualifiers for round-trip compatibility.
 fn is_generic_card_type(card_predicate: &CardPredicate) -> bool {
     matches!(card_predicate, CardPredicate::Card | CardPredicate::Character | CardPredicate::Event)
-}
-
-/// Returns true if the card predicate is Card or Event (not Character).
-/// For Enemy predicates with these types, we omit the "enemy" prefix
-/// since "enemy card" and "enemy event" are not natural in card text.
-fn is_non_character_card_type(card_predicate: &CardPredicate) -> bool {
-    matches!(card_predicate, CardPredicate::Card | CardPredicate::Event)
 }
