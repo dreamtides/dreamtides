@@ -606,7 +606,7 @@ pub fn serialize_standard_effect(
         StandardEffect::ReturnRandomFromYourVoidToPlay { predicate } => {
             format!(
                 "{{reclaim}} a random {}.",
-                predicate_serializer::serialize_card_predicate(predicate, bindings)
+                predicate_serializer::serialize_card_predicate_without_article(predicate, bindings)
             )
         }
         StandardEffect::PutOnTopOfEnemyDeck { target } => {

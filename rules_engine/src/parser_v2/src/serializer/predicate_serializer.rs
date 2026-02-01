@@ -15,6 +15,9 @@ pub fn serialize_predicate(predicate: &Predicate, bindings: &mut VariableBinding
         Predicate::Your(card_predicate) => {
             if is_generic_card_type(card_predicate) {
                 serialize_card_predicate(card_predicate, bindings)
+            } else if let CardPredicate::CharacterType(subtype) = card_predicate {
+                bindings.insert("subtype".to_string(), VariableValue::Subtype(*subtype));
+                "{a-subtype}".to_string()
             } else {
                 your_predicate_formatted(card_predicate, bindings).with_article()
             }
@@ -181,7 +184,8 @@ pub fn serialize_card_predicate(
             bindings.insert("subtype".to_string(), VariableValue::Subtype(*subtype));
             "a character that is not {a-subtype}".to_string()
         }
-        CardPredicate::CharacterWithSpark(_, operator) => {
+        CardPredicate::CharacterWithSpark(spark, operator) => {
+            bindings.insert("s".to_string(), VariableValue::Integer(spark.0));
             format!(
                 "a character with spark {{s}}{}",
                 serializer_utils::serialize_operator(operator)
@@ -221,6 +225,35 @@ pub fn serialize_card_predicate(
     }
 }
 
+/// Serialize a card predicate without the article.
+///
+/// Use this when the caller already provides an article, like "a random".
+pub fn serialize_card_predicate_without_article(
+    card_predicate: &CardPredicate,
+    bindings: &mut VariableBindings,
+) -> String {
+    match card_predicate {
+        CardPredicate::Card | CardPredicate::Character | CardPredicate::Event => {
+            text_formatting::card_predicate_base_text(card_predicate).without_article()
+        }
+        CardPredicate::CharacterType(subtype) => {
+            bindings.insert("subtype".to_string(), VariableValue::Subtype(*subtype));
+            "{subtype}".to_string()
+        }
+        CardPredicate::CardWithCost { target, cost_operator, cost } => {
+            if let Some(var_name) = parser_substitutions::directive_to_integer_variable("e") {
+                bindings.insert(var_name.to_string(), VariableValue::Integer(cost.0));
+            }
+            format!(
+                "{} with cost {{e}}{}",
+                serialize_card_predicate_without_article(target, bindings),
+                serializer_utils::serialize_operator(cost_operator)
+            )
+        }
+        _ => serialize_card_predicate(card_predicate, bindings),
+    }
+}
+
 pub fn serialize_card_predicate_plural(
     card_predicate: &CardPredicate,
     bindings: &mut VariableBindings,
@@ -237,7 +270,8 @@ pub fn serialize_card_predicate_plural(
             bindings.insert("subtype".to_string(), VariableValue::Subtype(*subtype));
             "characters that are not {plural-subtype}".to_string()
         }
-        CardPredicate::CharacterWithSpark(_, operator) => {
+        CardPredicate::CharacterWithSpark(spark, operator) => {
+            bindings.insert("s".to_string(), VariableValue::Integer(spark.0));
             format!("characters with spark {{s}}{}", serializer_utils::serialize_operator(operator))
         }
         CardPredicate::CharacterWithCostComparedToControlled { target, count_matching, .. } => {
@@ -318,7 +352,8 @@ pub fn serialize_fast_target(
             bindings.insert("subtype".to_string(), VariableValue::Subtype(*subtype));
             "character that is not {a-subtype}".to_string()
         }
-        CardPredicate::CharacterWithSpark(_spark, operator) => {
+        CardPredicate::CharacterWithSpark(spark, operator) => {
+            bindings.insert("s".to_string(), VariableValue::Integer(spark.0));
             format!("character with spark {{s}}{}", serializer_utils::serialize_operator(operator))
         }
         CardPredicate::CharacterWithCostComparedToControlled { target, count_matching, .. } => {
@@ -432,10 +467,12 @@ pub fn serialize_for_each_predicate(
         }
         Predicate::EnemyVoid(CardPredicate::Event) => "event in the opponent's void".to_string(),
         Predicate::Your(CardPredicate::Event) => "allied event".to_string(),
-        Predicate::Another(CardPredicate::CharacterWithSpark(_, operator)) => {
+        Predicate::Another(CardPredicate::CharacterWithSpark(spark, operator)) => {
+            bindings.insert("s".to_string(), VariableValue::Integer(spark.0));
             format!("ally with spark {{s}}{}", serializer_utils::serialize_operator(operator))
         }
-        Predicate::Your(CardPredicate::CharacterWithSpark(_, operator)) => {
+        Predicate::Your(CardPredicate::CharacterWithSpark(spark, operator)) => {
+            bindings.insert("s".to_string(), VariableValue::Integer(spark.0));
             format!("ally with spark {{s}}{}", serializer_utils::serialize_operator(operator))
         }
         predicate => format!("each {}", predicate_base_text(predicate, bindings)),
@@ -458,10 +495,13 @@ fn your_predicate_formatted(
             bindings.insert("subtype".to_string(), VariableValue::Subtype(*subtype));
             FormattedText::new("ally that is not {a-subtype}")
         }
-        CardPredicate::CharacterWithSpark(_, operator) => FormattedText::new(&format!(
-            "ally with spark {{s}}{}",
-            serializer_utils::serialize_operator(operator)
-        )),
+        CardPredicate::CharacterWithSpark(spark, operator) => {
+            bindings.insert("s".to_string(), VariableValue::Integer(spark.0));
+            FormattedText::new(&format!(
+                "ally with spark {{s}}{}",
+                serializer_utils::serialize_operator(operator)
+            ))
+        }
         CardPredicate::CharacterWithMaterializedAbility => {
             FormattedText::new("ally with a {materialized} ability")
         }
@@ -469,7 +509,7 @@ fn your_predicate_formatted(
             FormattedText::new("ally with an activated ability")
         }
         CardPredicate::Fast { target } => {
-            FormattedText::new(&format!("fast {}", serialize_your_predicate(target, bindings)))
+            FormattedText::new(&format!("{{fast}} {}", serialize_fast_target(target, bindings)))
         }
         CardPredicate::CardWithCost { target, cost_operator, cost } => {
             if let Some(var_name) = parser_substitutions::directive_to_integer_variable("e") {
@@ -477,7 +517,7 @@ fn your_predicate_formatted(
             }
             FormattedText::new(&format!(
                 "{} with cost {{e}}{}",
-                serialize_your_predicate(target, bindings),
+                serialize_your_predicate_or_canonical(target, bindings),
                 serializer_utils::serialize_operator(cost_operator)
             ))
         }
@@ -540,10 +580,13 @@ fn enemy_predicate_formatted(
             bindings.insert("subtype".to_string(), VariableValue::Subtype(*subtype));
             FormattedText::new("enemy that is not {a-subtype}")
         }
-        CardPredicate::CharacterWithSpark(_, operator) => FormattedText::new(&format!(
-            "enemy with spark {{s}}{}",
-            serializer_utils::serialize_operator(operator)
-        )),
+        CardPredicate::CharacterWithSpark(spark, operator) => {
+            bindings.insert("s".to_string(), VariableValue::Integer(spark.0));
+            FormattedText::new(&format!(
+                "enemy with spark {{s}}{}",
+                serializer_utils::serialize_operator(operator)
+            ))
+        }
         CardPredicate::CharacterWithMaterializedAbility => {
             FormattedText::new("enemy with a {materialized} ability")
         }
@@ -597,7 +640,7 @@ fn enemy_predicate_formatted(
             ))
         }
         CardPredicate::Fast { target } => {
-            FormattedText::new(&format!("fast {}", serialize_enemy_predicate(target, bindings)))
+            FormattedText::new(&format!("{{fast}} {}", serialize_fast_target(target, bindings)))
         }
         CardPredicate::Event => FormattedText::new("enemy event"),
         CardPredicate::CouldDissolve { target } => FormattedText::new(&format!(
@@ -620,13 +663,14 @@ fn serialize_your_predicate_plural(
             "allied {plural-subtype}".to_string()
         }
         CardPredicate::Fast { target } => {
-            format!("allied fast {}", serialize_card_predicate_plural(target, bindings))
+            format!("{{fast}} {}", serialize_card_predicate_plural(target, bindings))
         }
         CardPredicate::NotCharacterType(subtype) => {
             bindings.insert("subtype".to_string(), VariableValue::Subtype(*subtype));
             "allies that are not {plural-subtype}".to_string()
         }
-        CardPredicate::CharacterWithSpark(_, operator) => {
+        CardPredicate::CharacterWithSpark(spark, operator) => {
+            bindings.insert("s".to_string(), VariableValue::Integer(spark.0));
             format!("allies with spark {{s}}{}", serializer_utils::serialize_operator(operator))
         }
         CardPredicate::CharacterWithMaterializedAbility => {
@@ -704,6 +748,19 @@ fn serialize_enemy_predicate_plural(
         _ => {
             format!("enemy {}", serialize_card_predicate_plural(card_predicate, bindings))
         }
+    }
+}
+
+/// Serialize a card predicate, using canonical form (character, card, event)
+/// for basic types instead of possessive form (ally, your card, your event).
+fn serialize_your_predicate_or_canonical(
+    card_predicate: &CardPredicate,
+    bindings: &mut VariableBindings,
+) -> String {
+    if is_generic_card_type(card_predicate) {
+        text_formatting::card_predicate_base_text(card_predicate).without_article()
+    } else {
+        serialize_your_predicate(card_predicate, bindings)
     }
 }
 

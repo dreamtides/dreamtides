@@ -125,11 +125,9 @@ fn test_has_all_character_types() {
     assert_round_trip("Has all character types.", "");
 }
 
-#[ignore = "Round-trip mismatch"]
 #[test]
 fn test_characters_in_hand_have_fast() {
-    // Note: This is tested in combination with a triggered ability
-    assert_round_trip("Characters in your hand have {fast}.", "e: 1");
+    assert_round_trip("Characters in your hand have {fast}.", "");
 }
 
 #[test]

@@ -64,13 +64,11 @@ fn test_dissolve_enemy_opponent_gains_points() {
     assert_round_trip("{Dissolve} an enemy. The opponent gains {points}.", "points: 3");
 }
 
-#[ignore = "Round-trip mismatch"]
 #[test]
 fn test_dissolve_enemy_by_spark_or_less() {
     assert_round_trip("{Dissolve} an enemy with spark {s} or less.", "s: 1");
 }
 
-#[ignore = "Round-trip mismatch"]
 #[test]
 fn test_dissolve_enemy_by_spark_or_more() {
     assert_round_trip("{Dissolve} an enemy with spark {s} or more.", "s: 3");
@@ -164,7 +162,6 @@ fn test_prevent_played_event_unless_pay() {
     assert_round_trip("{Prevent} a played event unless the opponent pays {e}.", "e: 2");
 }
 
-#[ignore = "Round-trip mismatch"]
 #[test]
 fn test_prevent_played_fast_card() {
     assert_round_trip("{Prevent} a played {fast} card.", "");

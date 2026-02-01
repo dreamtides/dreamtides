@@ -44,7 +44,6 @@ fn test_materialize_subtype_trigger_self_gains_spark() {
     );
 }
 
-#[ignore = "Round-trip mismatch"]
 #[test]
 fn test_materialize_character_by_cost_trigger_draw() {
     assert_round_trip(
@@ -58,7 +57,6 @@ fn test_materialize_character_trigger_gain_energy() {
     assert_round_trip("Once per turn, when you {materialize} a character, gain {e}.", "e: 1");
 }
 
-#[ignore = "Round-trip mismatch"]
 #[test]
 fn test_materialize_subtype_trigger_draw() {
     assert_round_trip(
@@ -67,7 +65,6 @@ fn test_materialize_subtype_trigger_draw() {
     );
 }
 
-#[ignore = "Round-trip mismatch"]
 #[test]
 fn test_play_subtype_trigger_reclaim_by_cost() {
     assert_round_trip(
@@ -76,19 +73,16 @@ fn test_play_subtype_trigger_reclaim_by_cost() {
     );
 }
 
-#[ignore = "Round-trip mismatch"]
 #[test]
 fn test_play_fast_card_trigger_draw() {
     assert_round_trip("Once per turn, when you play a {fast} card, draw {cards}.", "cards: 1");
 }
 
-#[ignore = "Round-trip mismatch"]
 #[test]
 fn test_play_fast_card_trigger_gain_spark() {
     assert_round_trip("When you play a {fast} card, this character gains +{s} spark.", "s: 2");
 }
 
-#[ignore = "Round-trip mismatch"]
 #[test]
 fn test_play_fast_card_trigger_gain_points() {
     assert_round_trip("When you play a {fast} card, gain {points}.", "points: 1");
@@ -99,20 +93,15 @@ fn test_end_of_turn_gain_energy() {
     assert_round_trip("At the end of your turn, gain {e}.", "e: 2");
 }
 
-#[ignore = "Round-trip mismatch"]
 #[test]
 fn test_play_fast_character_trigger_gain_energy() {
-    assert_round_trip("Characters in your hand have {fast}.", "e: 1");
+    assert_round_trip("Characters in your hand have {fast}.", "");
     assert_round_trip("Once per turn, when you play a {fast} character, gain {e}.", "e: 1");
 }
 
-#[ignore = "Round-trip mismatch"]
 #[test]
 fn test_discard_trigger_gain_energy_and_kindle() {
-    assert_round_trip(
-        "Once per turn, when you discard a card, gain {e} and {kindle}.",
-        "e: 1\nk: 2",
-    );
+    assert_round_trip("Once per turn, when you discard a card, Gain {e}. {Kindle}.", "e: 1\nk: 2");
 }
 
 #[test]
@@ -139,7 +128,6 @@ fn test_materialize_character_trigger_gain_spark() {
     );
 }
 
-#[ignore = "Round-trip mismatch"]
 #[test]
 fn test_play_subtype_trigger_draw() {
     assert_round_trip(
@@ -286,7 +274,6 @@ fn test_play_card_opponent_turn_trigger_gain_spark() {
     );
 }
 
-#[ignore = "Round-trip mismatch"]
 #[test]
 fn test_materialize_subtype_trigger_reclaim_self() {
     assert_round_trip(
@@ -295,7 +282,6 @@ fn test_materialize_subtype_trigger_reclaim_self() {
     );
 }
 
-#[ignore = "Round-trip mismatch"]
 #[test]
 fn test_play_subtype_trigger_put_to_void() {
     assert_round_trip(

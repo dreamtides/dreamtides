@@ -55,7 +55,6 @@ fn test_judgment_may_discard_to_draw_and_gain_points() {
     );
 }
 
-#[ignore = "Round-trip mismatch"]
 #[test]
 fn test_judgment_may_discard_to_dissolve_by_spark() {
     assert_round_trip(
@@ -191,7 +190,6 @@ fn test_judgment_with_allied_subtype_gain_energy() {
     );
 }
 
-#[ignore = "Round-trip mismatch"]
 #[test]
 fn test_judgment_banish_ally_by_spark_then_materialize() {
     assert_round_trip(
