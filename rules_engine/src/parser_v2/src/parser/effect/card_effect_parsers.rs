@@ -237,10 +237,9 @@ pub fn cards_in_void_gain_reclaim<'a>(
                 words(&["equal", "to", "its", "cost"]),
             ))),
         )))
-        .then_ignore(words(&["this", "turn"]).or_not())
-        .map(|(count, predicate)| StandardEffect::CardsInVoidGainReclaimThisTurn {
-            count,
-            predicate,
+        .then(words(&["this", "turn"]).or_not().map(|opt| opt.is_some()))
+        .map(|((count, predicate), until_end_of_turn)| {
+            StandardEffect::CardsInVoidGainReclaimThisTurn { count, predicate, until_end_of_turn }
         })
         .boxed()
 }

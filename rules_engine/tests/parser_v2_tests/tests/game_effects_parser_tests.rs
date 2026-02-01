@@ -954,6 +954,7 @@ fn test_materialized_event_in_void_gains_reclaim() {
       effect: Effect(CardsInVoidGainReclaimThisTurn(
         count: Exactly(1),
         predicate: Event,
+        until_end_of_turn: true,
       )),
     ))
     "###);

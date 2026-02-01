@@ -157,7 +157,8 @@
                   "cost_operator": "OrLess",
                   "cost": 3
                 }
-              }
+              },
+              "until_end_of_turn": false
             }
           }
         }
@@ -386,7 +387,8 @@
           "Effect": {
             "CardsInVoidGainReclaimThisTurn": {
               "count": "All",
-              "predicate": "Card"
+              "predicate": "Card",
+              "until_end_of_turn": true
             }
           }
         }
@@ -877,7 +879,8 @@
               "count": {
                 "Exactly": 1
               },
-              "predicate": "Event"
+              "predicate": "Event",
+              "until_end_of_turn": true
             }
           }
         }
@@ -3303,7 +3306,8 @@
               "count": {
                 "Exactly": 1
               },
-              "predicate": "Event"
+              "predicate": "Event",
+              "until_end_of_turn": true
             }
           }
         }
@@ -5603,7 +5607,8 @@
               },
               "predicate": {
                 "CharacterType": "Survivor"
-              }
+              },
+              "until_end_of_turn": false
             }
           }
         }

@@ -374,6 +374,7 @@ fn test_dissolved_a_subtype_in_void_gains_reclaim() {
       effect: Effect(CardsInVoidGainReclaimThisTurn(
         count: Exactly(1),
         predicate: CharacterType(Warrior),
+        until_end_of_turn: false,
       )),
     ))
     "###);
@@ -393,6 +394,7 @@ fn test_dissolved_capitalized_subtype_directive_in_void_gains_reclaim() {
       effect: Effect(CardsInVoidGainReclaimThisTurn(
         count: Exactly(1),
         predicate: CharacterType(Survivor),
+        until_end_of_turn: false,
       )),
     ))
     "###);

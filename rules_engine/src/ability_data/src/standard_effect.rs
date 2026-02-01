@@ -16,85 +16,262 @@ use crate::triggered_ability::TriggeredAbility;
 #[derive(Debug, Clone, Serialize, Deserialize, EnumDiscriminants)]
 #[strum_discriminants(derive(Display))]
 pub enum StandardEffect {
-    AbandonAndGainEnergyForSpark { target: Predicate, energy_per_spark: Energy },
-    AbandonAtEndOfTurn { target: Predicate },
-    BanishCardsFromEnemyVoid { count: u32 },
-    BanishCharacter { target: Predicate },
-    BanishCharacterUntilLeavesPlay { target: Predicate, until_leaves: Predicate },
-    BanishCollection { target: Predicate, count: CollectionExpression },
-    BanishThenMaterialize { target: Predicate, count: CollectionExpression },
+    AbandonAndGainEnergyForSpark {
+        target: Predicate,
+        energy_per_spark: Energy,
+    },
+    AbandonAtEndOfTurn {
+        target: Predicate,
+    },
+    BanishCardsFromEnemyVoid {
+        count: u32,
+    },
+    BanishCharacter {
+        target: Predicate,
+    },
+    BanishCharacterUntilLeavesPlay {
+        target: Predicate,
+        until_leaves: Predicate,
+    },
+    BanishCollection {
+        target: Predicate,
+        count: CollectionExpression,
+    },
+    BanishThenMaterialize {
+        target: Predicate,
+        count: CollectionExpression,
+    },
     BanishEnemyVoid,
-    BanishUntilNextMain { target: Predicate },
-    BanishWhenLeavesPlay { target: Predicate },
-    CardsInVoidGainReclaimThisTurn { count: CollectionExpression, predicate: CardPredicate },
-    Copy { target: Predicate },
-    CopyNextPlayed { matching: Predicate, times: Option<u32> },
-    Counterspell { target: Predicate },
-    CounterspellUnlessPaysCost { target: Predicate, cost: Cost },
-    CreateStaticAbilityUntilEndOfTurn { ability: Box<StandardStaticAbility> },
-    CreateTriggerUntilEndOfTurn { trigger: Box<TriggeredAbility> },
-    DisableActivatedAbilitiesWhileInPlay { target: Predicate },
-    DiscardCardFromEnemyHand { predicate: CardPredicate },
-    DiscardCardFromEnemyHandThenTheyDraw { predicate: CardPredicate },
-    DiscardCards { count: u32 },
-    Discover { predicate: CardPredicate },
-    DiscoverAndThenMaterialize { predicate: CardPredicate },
-    DissolveCharacter { target: Predicate },
-    DissolveCharactersCount { target: Predicate, count: CollectionExpression },
-    DissolveCharactersQuantity { target: Predicate, quantity: QuantityExpression },
-    MultiplyYourEnergy { multiplier: u32 },
-    DrawCards { count: u32 },
-    DrawCardsForEach { count: u32, for_each: QuantityExpression },
-    DrawMatchingCard { predicate: CardPredicate },
-    EachMatchingGainsSpark { each: CardPredicate, gains: Spark },
-    EachMatchingGainsSparkForEach { each: CardPredicate, gains: Spark, for_each: CardPredicate },
-    EachPlayerAbandonsCharacters { matching: CardPredicate, count: u32 },
-    EachPlayerDiscardCards { count: u32 },
-    EachPlayerShufflesHandAndVoidIntoDeckAndDraws { count: u32 },
-    EnemyGainsPoints { count: u32 },
+    BanishUntilNextMain {
+        target: Predicate,
+    },
+    BanishWhenLeavesPlay {
+        target: Predicate,
+    },
+    CardsInVoidGainReclaimThisTurn {
+        count: CollectionExpression,
+        predicate: CardPredicate,
+        until_end_of_turn: bool,
+    },
+    Copy {
+        target: Predicate,
+    },
+    CopyNextPlayed {
+        matching: Predicate,
+        times: Option<u32>,
+    },
+    Counterspell {
+        target: Predicate,
+    },
+    CounterspellUnlessPaysCost {
+        target: Predicate,
+        cost: Cost,
+    },
+    CreateStaticAbilityUntilEndOfTurn {
+        ability: Box<StandardStaticAbility>,
+    },
+    CreateTriggerUntilEndOfTurn {
+        trigger: Box<TriggeredAbility>,
+    },
+    DisableActivatedAbilitiesWhileInPlay {
+        target: Predicate,
+    },
+    DiscardCardFromEnemyHand {
+        predicate: CardPredicate,
+    },
+    DiscardCardFromEnemyHandThenTheyDraw {
+        predicate: CardPredicate,
+    },
+    DiscardCards {
+        count: u32,
+    },
+    Discover {
+        predicate: CardPredicate,
+    },
+    DiscoverAndThenMaterialize {
+        predicate: CardPredicate,
+    },
+    DissolveCharacter {
+        target: Predicate,
+    },
+    DissolveCharactersCount {
+        target: Predicate,
+        count: CollectionExpression,
+    },
+    DissolveCharactersQuantity {
+        target: Predicate,
+        quantity: QuantityExpression,
+    },
+    MultiplyYourEnergy {
+        multiplier: u32,
+    },
+    DrawCards {
+        count: u32,
+    },
+    DrawCardsForEach {
+        count: u32,
+        for_each: QuantityExpression,
+    },
+    DrawMatchingCard {
+        predicate: CardPredicate,
+    },
+    EachMatchingGainsSpark {
+        each: CardPredicate,
+        gains: Spark,
+    },
+    EachMatchingGainsSparkForEach {
+        each: CardPredicate,
+        gains: Spark,
+        for_each: CardPredicate,
+    },
+    EachPlayerAbandonsCharacters {
+        matching: CardPredicate,
+        count: u32,
+    },
+    EachPlayerDiscardCards {
+        count: u32,
+    },
+    EachPlayerShufflesHandAndVoidIntoDeckAndDraws {
+        count: u32,
+    },
+    EnemyGainsPoints {
+        count: u32,
+    },
     EnemyGainsPointsEqualToItsSpark,
-    EnemyLosesPoints { count: u32 },
-    Foresee { count: u32 },
-    GainControl { target: Predicate },
-    GainEnergy { gains: Energy },
-    GainEnergyEqualToCost { target: Predicate },
-    GainEnergyForEach { gains: Energy, for_each: Predicate },
-    GainPoints { gains: Points },
-    GainPointsForEach { gain: Points, for_count: QuantityExpression },
-    GainsAegisThisTurn { target: Predicate },
-    GainsReclaimUntilEndOfTurn { target: Predicate, cost: Option<Energy> },
-    GainsSpark { target: Predicate, gains: Spark },
-    GainsSparkForQuantity { target: Predicate, gains: Spark, for_quantity: QuantityExpression },
-    GainsSparkUntilYourNextMainForEach { target: Predicate, gains: Spark, for_each: Predicate },
+    EnemyLosesPoints {
+        count: u32,
+    },
+    Foresee {
+        count: u32,
+    },
+    GainControl {
+        target: Predicate,
+    },
+    GainEnergy {
+        gains: Energy,
+    },
+    GainEnergyEqualToCost {
+        target: Predicate,
+    },
+    GainEnergyForEach {
+        gains: Energy,
+        for_each: Predicate,
+    },
+    GainPoints {
+        gains: Points,
+    },
+    GainPointsForEach {
+        gain: Points,
+        for_count: QuantityExpression,
+    },
+    GainsAegisThisTurn {
+        target: Predicate,
+    },
+    GainsReclaimUntilEndOfTurn {
+        target: Predicate,
+        cost: Option<Energy>,
+    },
+    GainsSpark {
+        target: Predicate,
+        gains: Spark,
+    },
+    GainsSparkForQuantity {
+        target: Predicate,
+        gains: Spark,
+        for_quantity: QuantityExpression,
+    },
+    GainsSparkUntilYourNextMainForEach {
+        target: Predicate,
+        gains: Spark,
+        for_each: Predicate,
+    },
     GainTwiceThatMuchEnergyInstead,
-    Kindle { amount: Spark },
-    LosePoints { loses: Points },
-    MaterializeCharacter { target: Predicate },
-    MaterializeCharacterAtEndOfTurn { target: Predicate },
-    MaterializeCharacterFromVoid { target: CardPredicate },
-    MaterializeCollection { target: Predicate, count: CollectionExpression },
-    MaterializeFigments { figment: FigmentType, count: u32 },
-    MaterializeFigmentsQuantity { figment: FigmentType, count: u32, quantity: QuantityExpression },
-    MaterializeRandomFromDeck { count: u32, predicate: CardPredicate },
-    MaterializeSilentCopy { target: Predicate, count: u32, quantity: QuantityExpression },
+    Kindle {
+        amount: Spark,
+    },
+    LosePoints {
+        loses: Points,
+    },
+    MaterializeCharacter {
+        target: Predicate,
+    },
+    MaterializeCharacterAtEndOfTurn {
+        target: Predicate,
+    },
+    MaterializeCharacterFromVoid {
+        target: CardPredicate,
+    },
+    MaterializeCollection {
+        target: Predicate,
+        count: CollectionExpression,
+    },
+    MaterializeFigments {
+        figment: FigmentType,
+        count: u32,
+    },
+    MaterializeFigmentsQuantity {
+        figment: FigmentType,
+        count: u32,
+        quantity: QuantityExpression,
+    },
+    MaterializeRandomFromDeck {
+        count: u32,
+        predicate: CardPredicate,
+    },
+    MaterializeSilentCopy {
+        target: Predicate,
+        count: u32,
+        quantity: QuantityExpression,
+    },
     NoEffect,
-    OpponentPaysCost { cost: Cost },
-    PayCost { cost: Cost },
-    PreventDissolveThisTurn { target: Predicate },
-    PutCardsFromVoidOnTopOfDeck { count: u32, matching: CardPredicate },
-    PutCardsFromYourDeckIntoVoid { count: u32 },
-    PutOnTopOfEnemyDeck { target: Predicate },
-    ReturnFromYourVoidToHand { target: Predicate },
-    ReturnFromYourVoidToPlay { target: Predicate },
-    ReturnRandomFromYourVoidToPlay { predicate: CardPredicate },
-    ReturnToHand { target: Predicate },
-    ReturnUpToCountFromYourVoidToHand { target: Predicate, count: u32 },
-    SparkBecomes { collection: CollectionExpression, matching: CardPredicate, spark: Spark },
+    OpponentPaysCost {
+        cost: Cost,
+    },
+    PayCost {
+        cost: Cost,
+    },
+    PreventDissolveThisTurn {
+        target: Predicate,
+    },
+    PutCardsFromVoidOnTopOfDeck {
+        count: u32,
+        matching: CardPredicate,
+    },
+    PutCardsFromYourDeckIntoVoid {
+        count: u32,
+    },
+    PutOnTopOfEnemyDeck {
+        target: Predicate,
+    },
+    ReturnFromYourVoidToHand {
+        target: Predicate,
+    },
+    ReturnFromYourVoidToPlay {
+        target: Predicate,
+    },
+    ReturnRandomFromYourVoidToPlay {
+        predicate: CardPredicate,
+    },
+    ReturnToHand {
+        target: Predicate,
+    },
+    ReturnUpToCountFromYourVoidToHand {
+        target: Predicate,
+        count: u32,
+    },
+    SparkBecomes {
+        collection: CollectionExpression,
+        matching: CardPredicate,
+        spark: Spark,
+    },
     SpendAllEnergyDissolveEnemy,
     SpendAllEnergyDrawAndDiscard,
     TakeExtraTurn,
     ThenMaterializeIt,
     TriggerAdditionalJudgmentPhaseAtEndOfTurn,
-    TriggerJudgmentAbility { matching: Predicate, collection: CollectionExpression },
+    TriggerJudgmentAbility {
+        matching: Predicate,
+        collection: CollectionExpression,
+    },
     YouWinTheGame,
 }

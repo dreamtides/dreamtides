@@ -733,6 +733,7 @@ fn test_materialized_card_with_cost_in_void_gains_reclaim() {
           cost_operator: OrLess,
           cost: Energy(3),
         ),
+        until_end_of_turn: false,
       )),
     ))
     "###);
@@ -747,6 +748,7 @@ fn test_event_in_void_gains_reclaim_this_turn() {
       effect: Effect(CardsInVoidGainReclaimThisTurn(
         count: Exactly(1),
         predicate: Event,
+        until_end_of_turn: true,
       )),
     ))
     "###);
@@ -763,6 +765,7 @@ fn test_all_cards_in_void_gain_reclaim_equal_to_cost() {
       effect: Effect(CardsInVoidGainReclaimThisTurn(
         count: All,
         predicate: Card,
+        until_end_of_turn: true,
       )),
     ))
     "###);

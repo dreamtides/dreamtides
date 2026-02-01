@@ -61,7 +61,6 @@ fn test_materialized_dissolve_with_abandon_cost() {
     assert_round_trip("{Materialized} {Dissolve} an enemy.", "e: 0");
 }
 
-#[ignore = "Round-trip mismatch"]
 #[test]
 fn test_materialized_give_event_reclaim_equal_cost() {
     assert_round_trip(
