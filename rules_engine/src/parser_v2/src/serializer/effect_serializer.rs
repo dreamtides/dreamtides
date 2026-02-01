@@ -638,7 +638,7 @@ pub fn serialize_standard_effect(
             "each player shuffles their hand and void into their deck and then draws {cards}."
                 .to_string()
         }
-        StandardEffect::CardsInVoidGainReclaimThisTurn { count, predicate, until_end_of_turn } => {
+        StandardEffect::CardsInVoidGainReclaim { count, predicate, this_turn: until_end_of_turn } => {
             serialize_cards_in_void_gain_reclaim_this_turn(
                 count,
                 predicate,

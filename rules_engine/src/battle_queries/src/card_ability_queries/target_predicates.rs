@@ -46,7 +46,7 @@ pub fn get_character_target_predicate(effect: &StandardEffect) -> Option<&Predic
         StandardEffect::BanishCardsFromEnemyVoid { .. } => None,
         StandardEffect::BanishEnemyVoid => None,
         StandardEffect::BanishWhenLeavesPlay { .. } => None,
-        StandardEffect::CardsInVoidGainReclaimThisTurn { .. } => None,
+        StandardEffect::CardsInVoidGainReclaim { .. } => None,
         StandardEffect::CopyNextPlayed { .. } => None,
         StandardEffect::Counterspell { .. } => None,
         StandardEffect::CounterspellUnlessPaysCost { .. } => None,

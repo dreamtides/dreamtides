@@ -48,10 +48,10 @@ pub enum StandardEffect {
     BanishWhenLeavesPlay {
         target: Predicate,
     },
-    CardsInVoidGainReclaimThisTurn {
+    CardsInVoidGainReclaim {
         count: CollectionExpression,
         predicate: CardPredicate,
-        until_end_of_turn: bool,
+        this_turn: bool,
     },
     Copy {
         target: Predicate,
