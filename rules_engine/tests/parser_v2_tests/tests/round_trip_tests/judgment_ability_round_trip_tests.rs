@@ -41,7 +41,7 @@ fn test_judgment_draw_then_discard() {
 #[test]
 fn test_judgment_draw_opponent_gains_points() {
     assert_round_trip(
-        "{Judgment} Draw {cards}. The opponent gains {points}.",
+        "{Judgment} Draw {cards}, then the opponent gains {points}.",
         "cards: 1\npoints: 2",
     );
 }

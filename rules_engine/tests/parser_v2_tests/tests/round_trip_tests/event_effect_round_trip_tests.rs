@@ -232,7 +232,7 @@ fn test_return_character_to_hand_draw() {
 #[test]
 fn test_may_return_character_from_void_draw() {
     assert_round_trip(
-        "You may return a character from your void to your hand. Draw {cards}.",
+        "You may return a character from your void to your hand, then draw {cards}.",
         "cards: 1",
     );
 }

@@ -13,6 +13,16 @@ use crate::serializer::{
 use crate::variables::parser_bindings::VariableBindings;
 use crate::variables::parser_substitutions;
 
+/// Context for effect serialization to determine joining behavior.
+#[derive(Clone, Copy, PartialEq, Eq, Default)]
+pub enum AbilityContext {
+    /// Triggered ability - use `, then` for mandatory effect lists.
+    Triggered,
+    /// Event or other ability - use `. ` for mandatory effect lists.
+    #[default]
+    Event,
+}
+
 pub fn serialize_standard_effect(
     effect: &StandardEffect,
     bindings: &mut VariableBindings,
@@ -849,7 +859,22 @@ pub fn serialize_standard_effect(
     }
 }
 
+/// Serializes an effect using the default event context.
 pub fn serialize_effect(effect: &Effect, bindings: &mut VariableBindings) -> String {
+    serialize_effect_with_context(effect, bindings, AbilityContext::Event)
+}
+
+/// Serializes an effect with explicit ability context.
+///
+/// The context determines joining behavior for mandatory effect lists:
+/// - Triggered: use `, then` (e.g., "{Judgment} Draw {cards}, then discard
+///   {discards}.")
+/// - Event: use `. ` (e.g., "Draw {cards}. Discard {discards}.")
+pub fn serialize_effect_with_context(
+    effect: &Effect,
+    bindings: &mut VariableBindings,
+    context: AbilityContext,
+) -> String {
     match effect {
         Effect::Effect(standard_effect) => serialize_standard_effect(standard_effect, bindings),
         Effect::WithOptions(options) => {
@@ -984,15 +1009,34 @@ pub fn serialize_effect(effect: &Effect, bindings: &mut VariableBindings) -> Str
                         result.push(' ');
                     }
                 }
-                let effect_strings: Vec<String> = effects
-                    .iter()
-                    .map(|e| {
-                        let s = serialize_standard_effect(&e.effect, bindings);
-                        let s = s.trim_end_matches('.');
-                        format!("{}.", serializer_utils::capitalize_first_letter(s))
-                    })
-                    .collect();
-                result.push_str(&effect_strings.join(" "));
+                // For mandatory effect lists, use different joining based on context
+                if context == AbilityContext::Triggered {
+                    let effect_strings: Vec<String> = effects
+                        .iter()
+                        .enumerate()
+                        .map(|(i, e)| {
+                            let s = serialize_standard_effect(&e.effect, bindings)
+                                .trim_end_matches('.')
+                                .to_string();
+                            if i == 0 {
+                                serializer_utils::capitalize_first_letter(&s)
+                            } else {
+                                s
+                            }
+                        })
+                        .collect();
+                    result.push_str(&format!("{}.", effect_strings.join(", then ")));
+                } else {
+                    let effect_strings: Vec<String> = effects
+                        .iter()
+                        .map(|e| {
+                            let s = serialize_standard_effect(&e.effect, bindings);
+                            let s = s.trim_end_matches('.');
+                            format!("{}.", serializer_utils::capitalize_first_letter(s))
+                        })
+                        .collect();
+                    result.push_str(&effect_strings.join(" "));
+                }
                 result
             }
         }
@@ -1046,9 +1090,10 @@ pub fn serialize_effect(effect: &Effect, bindings: &mut VariableBindings) -> Str
                 result.push_str(&format!(
                     "{}: {}",
                     cost_var,
-                    serializer_utils::capitalize_first_letter(&serialize_effect(
+                    serializer_utils::capitalize_first_letter(&serialize_effect_with_context(
                         &choice.effect,
-                        bindings
+                        bindings,
+                        context
                     ))
                 ));
             }

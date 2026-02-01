@@ -71,7 +71,10 @@ fn test_materialized_give_event_reclaim_equal_cost() {
 
 #[test]
 fn test_materialized_draw_discard_with_reclaim() {
-    assert_round_trip("{Materialized} Draw {cards}. Discard {discards}.", "cards: 1\ndiscards: 1");
+    assert_round_trip(
+        "{Materialized} Draw {cards}, then discard {discards}.",
+        "cards: 1\ndiscards: 1",
+    );
     assert_round_trip("{ReclaimForCost}", "reclaim: 3");
 }
 

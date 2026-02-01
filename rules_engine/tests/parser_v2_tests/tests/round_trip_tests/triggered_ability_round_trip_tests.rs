@@ -101,7 +101,10 @@ fn test_play_fast_character_trigger_gain_energy() {
 
 #[test]
 fn test_discard_trigger_gain_energy_and_kindle() {
-    assert_round_trip("Once per turn, when you discard a card, Gain {e}. {Kindle}.", "e: 1\nk: 2");
+    assert_round_trip(
+        "Once per turn, when you discard a card, Gain {e}, then {kindle}.",
+        "e: 1\nk: 2",
+    );
 }
 
 #[test]

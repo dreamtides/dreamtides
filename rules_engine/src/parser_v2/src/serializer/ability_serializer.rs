@@ -6,6 +6,7 @@ use ability_data::named_ability::NamedAbility;
 use ability_data::trigger_event::TriggerEvent;
 use ability_data::variable_value::VariableValue;
 
+use crate::serializer::effect_serializer::AbilityContext;
 use crate::serializer::{
     cost_serializer, effect_serializer, serializer_utils, static_ability_serializer,
     trigger_serializer,
@@ -44,12 +45,17 @@ pub fn serialize_ability(ability: &Ability) -> SerializedAbility {
             if is_keyword_trigger {
                 result.push(' ');
                 result.push_str(&serializer_utils::capitalize_first_letter(
-                    &effect_serializer::serialize_effect(&triggered.effect, &mut variables),
+                    &effect_serializer::serialize_effect_with_context(
+                        &triggered.effect,
+                        &mut variables,
+                        AbilityContext::Triggered,
+                    ),
                 ));
             } else {
-                result.push_str(&effect_serializer::serialize_effect(
+                result.push_str(&effect_serializer::serialize_effect_with_context(
                     &triggered.effect,
                     &mut variables,
+                    AbilityContext::Triggered,
                 ));
             }
             result
@@ -84,7 +90,11 @@ pub fn serialize_ability(ability: &Ability) -> SerializedAbility {
             }
             result.push_str(": ");
             result.push_str(&serializer_utils::capitalize_first_letter(
-                &effect_serializer::serialize_effect(&activated.effect, &mut variables),
+                &effect_serializer::serialize_effect_with_context(
+                    &activated.effect,
+                    &mut variables,
+                    AbilityContext::Triggered,
+                ),
             ));
             result
         }
