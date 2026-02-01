@@ -9,15 +9,6 @@ pub fn predicate_parser<'a>() -> impl Parser<'a, ParserInput<'a>, Predicate, Par
     choice((specific_predicates(), general_predicates())).boxed()
 }
 
-/// Predicate parser that excludes bare subtype.
-///
-/// Use this after an article to reject patterns like `a {subtype}` which
-/// should use `{a-subtype}` instead.
-pub fn predicate_parser_without_bare_subtype<'a>(
-) -> impl Parser<'a, ParserInput<'a>, Predicate, ParserExtra<'a>> + Clone {
-    choice((specific_predicates(), general_predicates_without_bare_subtype())).boxed()
-}
-
 fn specific_predicates<'a>() -> impl Parser<'a, ParserInput<'a>, Predicate, ParserExtra<'a>> + Clone
 {
     choice((
@@ -36,18 +27,6 @@ fn general_predicates<'a>() -> impl Parser<'a, ParserInput<'a>, Predicate, Parse
         any_fast_card_parser(),
         choice((your_void_parser(), enemy_void_parser())).boxed(),
         any_card_predicate_parser(),
-        any_basic_predicates(),
-    ))
-    .boxed()
-}
-
-fn general_predicates_without_bare_subtype<'a>(
-) -> impl Parser<'a, ParserInput<'a>, Predicate, ParserExtra<'a>> + Clone {
-    choice((
-        played_card_predicate(),
-        any_fast_card_parser(),
-        choice((your_void_parser(), enemy_void_parser())).boxed(),
-        any_card_predicate_parser_without_bare_subtype(),
         any_basic_predicates(),
     ))
     .boxed()
@@ -141,11 +120,6 @@ fn played_card_predicate<'a>(
 fn any_card_predicate_parser<'a>(
 ) -> impl Parser<'a, ParserInput<'a>, Predicate, ParserExtra<'a>> + Clone {
     card_predicate_parser::parser().map(Predicate::Any)
-}
-
-fn any_card_predicate_parser_without_bare_subtype<'a>(
-) -> impl Parser<'a, ParserInput<'a>, Predicate, ParserExtra<'a>> + Clone {
-    card_predicate_parser::parser_without_bare_subtype().map(Predicate::Any)
 }
 
 fn another_parser<'a>() -> impl Parser<'a, ParserInput<'a>, Predicate, ParserExtra<'a>> + Clone {

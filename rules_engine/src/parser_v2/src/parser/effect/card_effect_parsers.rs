@@ -5,8 +5,8 @@ use chumsky::prelude::*;
 use core_data::numerics::{Energy, Points};
 
 use crate::parser::parser_helpers::{
-    article, cards, directive, discards, energy, period, points, reclaim_cost,
-    sentence_start_subtype, top_n_cards, up_to_n_events, word, words, ParserExtra, ParserInput,
+    article, cards, directive, discards, energy, period, points, reclaim_cost, subtype,
+    top_n_cards, up_to_n_events, word, words, ParserExtra, ParserInput,
 };
 use crate::parser::{card_predicate_parser, predicate_parser, quantity_expression_parser};
 
@@ -222,7 +222,7 @@ pub fn cards_in_void_gain_reclaim<'a>(
         article()
             .ignore_then(card_predicate_parser::parser())
             .map(|predicate| (CollectionExpression::Exactly(1), predicate)),
-        sentence_start_subtype().map(|subtype_value| {
+        subtype().map(|subtype_value| {
             (CollectionExpression::Exactly(1), CardPredicate::CharacterType(subtype_value))
         }),
     ));

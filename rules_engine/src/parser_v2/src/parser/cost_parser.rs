@@ -63,20 +63,16 @@ pub fn banish_cards_from_enemy_void_cost<'a>(
 
 pub fn abandon_cost_single<'a>() -> impl Parser<'a, ParserInput<'a>, Cost, ParserExtra<'a>> + Clone
 {
-    word("abandon")
-        .ignore_then(article())
-        .ignore_then(predicate_parser::predicate_parser_without_bare_subtype())
-        .map(|target| Cost::AbandonCharactersCount {
-            target,
-            count: CollectionExpression::Exactly(1),
-        })
+    word("abandon").ignore_then(article()).ignore_then(predicate_parser::predicate_parser()).map(
+        |target| Cost::AbandonCharactersCount { target, count: CollectionExpression::Exactly(1) },
+    )
 }
 
 pub fn abandon_cost_for_trigger<'a>(
 ) -> impl Parser<'a, ParserInput<'a>, Cost, ParserExtra<'a>> + Clone {
     word("abandon")
         .ignore_then(choice((
-            article().ignore_then(predicate_parser::predicate_parser_without_bare_subtype()),
+            article().ignore_then(predicate_parser::predicate_parser()),
             card_predicate_parser::parser().map(Predicate::Any),
         )))
         .map(|target| Cost::AbandonCharactersCount {
@@ -93,9 +89,7 @@ pub fn discard_cost<'a>() -> impl Parser<'a, ParserInput<'a>, Cost, ParserExtra<
     word("discard")
         .ignore_then(choice((
             discards().map(|count| (Predicate::Any(CardPredicate::Card), count)),
-            article()
-                .ignore_then(predicate_parser::predicate_parser_without_bare_subtype())
-                .map(|target| (target, 1)),
+            article().ignore_then(predicate_parser::predicate_parser()).map(|target| (target, 1)),
         )))
         .map(|(target, count)| Cost::DiscardCards { target, count })
 }
