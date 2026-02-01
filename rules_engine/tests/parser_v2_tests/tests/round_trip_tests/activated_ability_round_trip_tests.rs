@@ -44,7 +44,6 @@ fn test_abandon_ally_gain_spark() {
     assert_round_trip("Abandon an ally: This character gains +{s} spark.", "s: 1");
 }
 
-#[ignore = "Round-trip mismatch"]
 #[test]
 fn test_pay_energy_discard_kindle() {
     assert_round_trip("{e}, Discard {discards}: {Kindle}.", "e: 1\ndiscards: 1\nk: 2");
@@ -158,7 +157,6 @@ fn test_fast_abandon_self_prevent_event() {
     assert_round_trip("{Fast} -- Abandon this character: {Prevent} a played event.", "");
 }
 
-#[ignore = "Round-trip mismatch"]
 #[test]
 fn test_abandon_any_allies_draw_per_abandoned() {
     assert_round_trip(
@@ -167,7 +165,6 @@ fn test_abandon_any_allies_draw_per_abandoned() {
     );
 }
 
-#[ignore = "Round-trip mismatch"]
 #[test]
 fn test_return_all_but_one_ally_draw_per_returned() {
     assert_round_trip(
@@ -176,7 +173,6 @@ fn test_return_all_but_one_ally_draw_per_returned() {
     );
 }
 
-#[ignore = "Round-trip mismatch"]
 #[test]
 fn test_pay_variable_energy_draw_per_energy() {
     assert_round_trip("Pay 1 or more {energy-symbol}: Draw {cards} for each {energy-symbol} spent, then discard {discards}.", "cards: 1\ndiscards: 2");

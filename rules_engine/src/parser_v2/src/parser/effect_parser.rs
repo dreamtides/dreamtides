@@ -167,7 +167,8 @@ fn optional_effect_with_trigger_cost_parser<'a>(
                         .into_iter()
                         .map(|effect| EffectWithOptions {
                             effect,
-                            optional: true,
+                            optional: true, /* Mark effects as optional when using "you may X to
+                                             * Y and Z" pattern */
                             trigger_cost: None,
                             condition: None,
                         })

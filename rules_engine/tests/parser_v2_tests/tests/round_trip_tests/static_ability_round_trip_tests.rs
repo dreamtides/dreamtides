@@ -10,7 +10,6 @@ fn test_conditional_cost_if_discarded() {
     assert_round_trip("This character costs {e} if you have discarded a card this turn.", "e: 1");
 }
 
-#[ignore = "Round-trip mismatch"]
 #[test]
 fn test_play_from_void_by_cost() {
     assert_round_trip(
@@ -24,7 +23,6 @@ fn test_spark_equals_void_count() {
     assert_round_trip("This character's spark is equal to the number of cards in your void.", "");
 }
 
-#[ignore = "Round-trip mismatch"]
 #[test]
 fn test_prevent_dissolve_event() {
     assert_round_trip(

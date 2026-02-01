@@ -99,7 +99,7 @@ pub fn serialize_cost(cost: &Cost, bindings: &mut VariableBindings) -> String {
             CollectionExpression::AllButOne => {
                 format!(
                     "return all but one {} to hand",
-                    predicate_serializer::serialize_predicate(target, bindings)
+                    predicate_serializer::predicate_base_text(target, bindings)
                 )
             }
             CollectionExpression::All => {

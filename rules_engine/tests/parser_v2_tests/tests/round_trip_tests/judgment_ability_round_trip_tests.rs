@@ -32,7 +32,6 @@ fn test_judgment_banish_from_void_to_dissolve() {
     assert_round_trip("{Judgment} You may {banish} {cards} from your void to {dissolve} an enemy with cost {e} or less.", "cards: 3\ne: 2");
 }
 
-#[ignore = "Round-trip mismatch"]
 #[test]
 fn test_judgment_draw_then_discard() {
     assert_round_trip("{Judgment} Draw {cards}, then discard {discards}.", "cards: 1\ndiscards: 1");
@@ -46,7 +45,6 @@ fn test_judgment_draw_opponent_gains_points() {
     );
 }
 
-#[ignore = "Round-trip mismatch"]
 #[test]
 fn test_judgment_may_discard_to_draw_and_gain_points() {
     assert_round_trip(
@@ -63,7 +61,6 @@ fn test_judgment_may_discard_to_dissolve_by_spark() {
     );
 }
 
-#[ignore = "Round-trip mismatch"]
 #[test]
 fn test_judgment_pay_to_kindle_and_banish_opponent_void() {
     assert_round_trip(

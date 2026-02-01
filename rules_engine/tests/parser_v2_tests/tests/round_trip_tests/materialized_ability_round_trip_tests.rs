@@ -4,7 +4,6 @@
 
 use parser_v2_tests::test_helpers::*;
 
-#[ignore = "Round-trip mismatch"]
 #[test]
 fn test_materialized_discard_then_draw() {
     assert_round_trip(
@@ -43,7 +42,6 @@ fn test_materialized_foresee() {
     assert_round_trip("{Materialized} {Foresee}.", "foresee: 2");
 }
 
-#[ignore = "Round-trip mismatch"]
 #[test]
 fn test_materialized_prevent_played_card_by_cost() {
     assert_round_trip("{Materialized} {Prevent} a played card with cost {e} or less.", "e: 2");

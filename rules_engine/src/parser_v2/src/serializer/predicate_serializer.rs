@@ -197,7 +197,7 @@ pub fn serialize_card_predicate(
             )
         }
         CardPredicate::CouldDissolve { target } => {
-            format!("an event which could {{dissolve}} {}", predicate_base_text(target, bindings))
+            format!("an event which could {{dissolve}} {}", serialize_predicate(target, bindings))
         }
         CardPredicate::NotCharacterType(subtype) => {
             bindings.insert("subtype".to_string(), VariableValue::Subtype(*subtype));
@@ -698,8 +698,8 @@ fn enemy_predicate_formatted(
         }
         CardPredicate::Event => FormattedText::new("enemy event"),
         CardPredicate::CouldDissolve { target } => FormattedText::new(&format!(
-            "enemy event which could {{dissolve}} {}",
-            predicate_base_text(target, bindings)
+            "event which could {{dissolve}} {}",
+            serialize_predicate(target, bindings)
         )),
     }
 }

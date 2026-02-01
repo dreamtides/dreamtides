@@ -301,10 +301,15 @@ pub fn serialize_standard_effect(
             }
         }
         StandardEffect::Counterspell { target } => {
-            format!(
-                "{{prevent}} a played {}.",
-                predicate_serializer::predicate_base_text(target, bindings)
-            )
+            // For "that card" references, don't add "a played" prefix
+            if matches!(target, Predicate::That | Predicate::It) {
+                "{prevent} that card.".to_string()
+            } else {
+                format!(
+                    "{{prevent}} a played {}.",
+                    predicate_serializer::predicate_base_text(target, bindings)
+                )
+            }
         }
         StandardEffect::CounterspellUnlessPaysCost { target, cost } => {
             format!(
@@ -1055,18 +1060,33 @@ pub fn serialize_effect_with_context(
                 result.push_str(&condition_serializer::serialize_condition(condition, bindings));
                 result.push(' ');
             }
+            let has_shared_trigger_cost = list_with_options.trigger_cost.is_some();
+            // Check if this is an optional action (parsed from "you may X to Y and Z")
+            // by checking if ALL effects are optional AND there's a shared trigger_cost.
+            // When all effects are optional with a shared cost, output "you may" once
+            // at the start instead of for each effect.
+            let all_effects_optional =
+                list_with_options.effects.iter().all(|e| e.optional && e.trigger_cost.is_none());
+            let is_optional_with_shared_cost = has_shared_trigger_cost && all_effects_optional;
+            if is_optional_with_shared_cost {
+                result.push_str("you may ");
+            }
             if let Some(trigger_cost) = &list_with_options.trigger_cost {
-                result.push_str(&format!(
-                    "{} to ",
-                    cost_serializer::serialize_trigger_cost(trigger_cost, bindings)
-                ));
+                let cost_str = cost_serializer::serialize_trigger_cost(trigger_cost, bindings);
+                let cost_str = if is_optional_with_shared_cost {
+                    serializer_utils::lowercase_leading_keyword(&cost_str)
+                } else {
+                    cost_str
+                };
+                result.push_str(&format!("{} to ", cost_str));
             }
             let effect_strings: Vec<String> = list_with_options
                 .effects
                 .iter()
                 .map(|e| {
                     let mut effect_str = String::new();
-                    if e.optional {
+                    // When using shared optional cost, don't add "you may" to individual effects
+                    if e.optional && !is_optional_with_shared_cost {
                         effect_str.push_str("you may ");
                     }
                     if let Some(trigger_cost) = &e.trigger_cost {
@@ -1087,7 +1107,9 @@ pub fn serialize_effect_with_context(
                     effect_str
                 })
                 .collect();
-            result.push_str(&format!("{}.", effect_strings.join(", then ")));
+            // Use " and " when effects share a common trigger cost
+            let joiner = if has_shared_trigger_cost { " and " } else { ", then " };
+            result.push_str(&format!("{}.", effect_strings.join(joiner)));
             result
         }
         Effect::Modal(choices) => {

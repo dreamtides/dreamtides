@@ -160,13 +160,11 @@ fn test_prevent_played_fast_card() {
     assert_round_trip("{Prevent} a played {fast} card.", "");
 }
 
-#[ignore = "Round-trip mismatch"]
 #[test]
 fn test_prevent_dissolve_event() {
     assert_round_trip("{Prevent} a played event which could {dissolve} an ally.", "");
 }
 
-#[ignore = "Round-trip mismatch"]
 #[test]
 fn test_prevent_played_character() {
     assert_round_trip("{Prevent} a played character.", "");
@@ -207,7 +205,6 @@ fn test_discard_draw() {
     assert_round_trip("Discard {discards}. Draw {cards}.", "discards: 1\ncards: 2");
 }
 
-#[ignore = "Round-trip mismatch"]
 #[test]
 fn test_discard_chosen_from_opponent_hand_by_cost() {
     assert_round_trip(
@@ -226,7 +223,6 @@ fn test_return_character_to_hand_draw() {
     assert_round_trip("Return an enemy or ally to hand. Draw {cards}.", "cards: 1");
 }
 
-#[ignore = "Round-trip mismatch"]
 #[test]
 fn test_may_return_character_from_void_draw() {
     assert_round_trip(
@@ -399,7 +395,6 @@ fn test_materialize_multiple_figments() {
     assert_round_trip("{Materialize} {n-figments}.", "number: 3\nfigment: radiant");
 }
 
-#[ignore = "Round-trip mismatch"]
 #[test]
 fn test_materialize_random_characters_from_deck() {
     assert_round_trip(

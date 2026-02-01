@@ -7,9 +7,11 @@ This document outlines a comprehensive plan to fix all 31 remaining round-trip t
 ## Current Status
 
 - **Total round-trip tests:** 224
-- **Passing tests:** 193
-- **Ignored tests:** 31
-- **Pass rate:** 86%
+- **Passing tests:** 224
+- **Ignored tests:** 0
+- **Pass rate:** 100%
+
+**COMPLETED:** All round-trip tests now pass. The `#[ignore = "Round-trip mismatch"]` annotations have been removed.
 
 ---
 
