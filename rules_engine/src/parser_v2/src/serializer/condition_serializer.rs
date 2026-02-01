@@ -37,7 +37,12 @@ pub fn serialize_condition(condition: &Condition, bindings: &mut VariableBinding
             "while you have {count} or more cards in your void,".to_string()
         }
         Condition::DissolvedThisTurn { .. } => "if a character dissolved this turn".to_string(),
-        Condition::PredicateCount { count: 1, .. } => "with an allied {subtype},".to_string(),
+        Condition::PredicateCount { count: 1, predicate } => {
+            if let Predicate::Another(CardPredicate::CharacterType(subtype)) = predicate {
+                bindings.insert("subtype".to_string(), VariableValue::Subtype(*subtype));
+            }
+            "with an allied {subtype},".to_string()
+        }
         Condition::PredicateCount { count, predicate } => {
             format!(
                 "with {predicate},",

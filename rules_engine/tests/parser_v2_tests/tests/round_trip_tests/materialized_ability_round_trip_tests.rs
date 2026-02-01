@@ -54,11 +54,10 @@ fn test_materialized_gain_control_by_cost() {
     assert_round_trip("{Materialized} Gain control of an enemy with cost {e} or less.", "e: 2");
 }
 
-#[ignore = "Round-trip mismatch"]
 #[test]
 fn test_materialized_dissolve_with_abandon_cost() {
     assert_round_trip("Abandon an ally: Play this character for {e}, then abandon it.", "e: 0");
-    assert_round_trip("{Materialized} {Dissolve} an enemy.", "e: 0");
+    assert_round_trip("{Materialized} {Dissolve} an enemy.", "");
 }
 
 #[test]

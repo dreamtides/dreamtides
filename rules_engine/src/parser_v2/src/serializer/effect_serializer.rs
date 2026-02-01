@@ -1086,7 +1086,17 @@ pub fn serialize_effect_with_context(
             for (index, choice) in choices.iter().enumerate() {
                 result.push('\n');
                 result.push_str("{bullet} ");
-                let cost_var = if index == 0 { "{mode1-cost}" } else { "{mode2-cost}" };
+                let (cost_var, cost_directive) = if index == 0 {
+                    ("{mode1-cost}", "mode1-cost")
+                } else {
+                    ("{mode2-cost}", "mode2-cost")
+                };
+                if let Some(var_name) =
+                    parser_substitutions::directive_to_integer_variable(cost_directive)
+                {
+                    bindings
+                        .insert(var_name.to_string(), VariableValue::Integer(choice.energy_cost.0));
+                }
                 result.push_str(&format!(
                     "{}: {}",
                     cost_var,

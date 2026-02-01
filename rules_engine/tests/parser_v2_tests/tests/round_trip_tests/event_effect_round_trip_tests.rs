@@ -414,7 +414,6 @@ fn test_materialize_random_characters_from_deck() {
 // Choose one effects
 // ============================================================================
 
-#[ignore = "Round-trip mismatch"]
 #[test]
 fn test_choose_one_return_or_draw() {
     assert_round_trip("{ChooseOne}\n{bullet} {mode1-cost}: Return an enemy to hand.\n{bullet} {mode2-cost}: Draw {cards}.", "mode1-cost: 2\nmode2-cost: 3\ncards: 2");

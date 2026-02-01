@@ -95,7 +95,6 @@ fn test_only_play_from_void() {
     assert_round_trip("You may only play this character from your void.", "");
 }
 
-#[ignore = "Round-trip mismatch"]
 #[test]
 fn test_with_allied_subtype_play_from_hand_or_void() {
     assert_round_trip(
@@ -104,11 +103,10 @@ fn test_with_allied_subtype_play_from_hand_or_void() {
     );
 }
 
-#[ignore = "Round-trip mismatch"]
 #[test]
 fn test_conditional_cost_if_dissolved() {
-    assert_round_trip("{Dissolve} an enemy. Draw {cards}.", "cards: 1\ne: 1");
-    assert_round_trip("This event costs {e} if a character dissolved this turn.", "cards: 1\ne: 1");
+    assert_round_trip("{Dissolve} an enemy. Draw {cards}.", "cards: 1");
+    assert_round_trip("This event costs {e} if a character dissolved this turn.", "e: 1");
 }
 
 #[test]

@@ -218,11 +218,10 @@ fn test_play_event_trigger_foresee() {
     assert_round_trip("When you play an event, {foresee}.", "foresee: 1");
 }
 
-#[ignore = "Round-trip mismatch"]
 #[test]
 fn test_play_event_trigger_copy() {
     assert_round_trip("Events cost you {e} more.", "e: 2");
-    assert_round_trip("When you play an event from your hand, copy it.", "e: 2");
+    assert_round_trip("When you play an event from your hand, copy it.", "");
 }
 
 #[test]
