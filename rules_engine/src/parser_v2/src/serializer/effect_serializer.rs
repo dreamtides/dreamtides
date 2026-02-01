@@ -334,6 +334,15 @@ pub fn serialize_standard_effect(
                         bindings)
                     )
                 }
+                CollectionExpression::Each => {
+                    format!(
+                        "{{dissolve}} each {}.",
+                        predicate_serializer::serialize_card_predicate_without_article(
+                            target.any_card_predicate().unwrap_or(&CardPredicate::Character),
+                            bindings
+                        )
+                    )
+                }
                 CollectionExpression::Exactly(n) => {
                     format!(
                         "{{dissolve}} {} {}.", n,
@@ -1285,6 +1294,13 @@ fn serialize_cards_in_void_gain_reclaim_this_turn(
         CollectionExpression::EachOther => {
             format!(
                 "Each other card in your void gains {{reclaim}} equal to its cost{}",
+                this_turn_suffix
+            )
+        }
+        CollectionExpression::Each => {
+            format!(
+                "each {} in your void gains {{reclaim}} equal to its cost{}.",
+                predicate_serializer::serialize_card_predicate_without_article(predicate, bindings),
                 this_turn_suffix
             )
         }

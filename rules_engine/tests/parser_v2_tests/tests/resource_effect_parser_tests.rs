@@ -133,6 +133,7 @@ fn test_dissolve_enemy_draw_cards_with_cost_reduction() {
       Static(WithOptions(StaticAbilityWithOptions(
         ability: PlayForAlternateCost(AlternateCost(
           energy_cost: Energy(1),
+          card_type: Some(Event),
         )),
         condition: Some(DissolvedThisTurn(
           predicate: Any(Character),

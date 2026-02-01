@@ -5,7 +5,6 @@
 
 use parser_v2_tests::test_helpers::*;
 
-#[ignore = "Round-trip mismatch"]
 #[test]
 fn test_conditional_cost_if_discarded() {
     assert_round_trip("This character costs {e} if you have discarded a card this turn.", "e: 1");
@@ -52,13 +51,9 @@ fn test_spark_equals_subtype_count() {
     );
 }
 
-#[ignore = "Round-trip mismatch"]
 #[test]
 fn test_require_return_ally_to_play() {
-    assert_round_trip(
-        "To play this card, return an ally with cost {e} or more to hand.",
-        "e: 3\ncards: 1",
-    );
+    assert_round_trip("To play this card, return an ally with cost {e} or more to hand.", "e: 3");
 }
 
 #[test]

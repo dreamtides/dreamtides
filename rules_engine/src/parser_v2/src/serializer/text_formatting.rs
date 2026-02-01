@@ -35,6 +35,18 @@ impl FormattedText {
         Self { base: base.to_string(), plural: format!("{}s", base), starts_with_vowel_sound }
     }
 
+    /// Creates a new FormattedText with explicit non-vowel article treatment.
+    ///
+    /// Use this when the text doesn't start with a vowel sound
+    /// (e.g., "non-warrior enemy" uses "a" not "an").
+    pub fn new_non_vowel(base: &str) -> Self {
+        Self {
+            base: base.to_string(),
+            plural: format!("{}s", base),
+            starts_with_vowel_sound: false,
+        }
+    }
+
     pub fn with_plural(base: &str, plural: &str) -> Self {
         let starts_with_vowel_sound = base.starts_with(['a', 'e', 'i', 'o', 'u']);
         Self { base: base.to_string(), plural: plural.to_string(), starts_with_vowel_sound }

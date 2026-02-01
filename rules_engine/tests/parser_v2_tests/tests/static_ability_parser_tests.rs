@@ -53,6 +53,7 @@ fn test_banish_from_hand_play_for_alternate_cost() {
     Static(StaticAbility(PlayForAlternateCost(AlternateCost(
       energy_cost: Energy(0),
       additional_cost: Some(BanishFromHand(Any(Card))),
+      card_type: Some(Event),
     ))))
     "###);
 }
@@ -74,6 +75,7 @@ fn test_abandon_ally_play_character_for_alternate_cost() {
           count: Exactly(1),
         ),
       ))),
+      card_type: Some(Character),
     ))))
     "###);
 }
@@ -184,6 +186,7 @@ fn test_character_costs_if_discarded_card_this_turn() {
     Static(WithOptions(StaticAbilityWithOptions(
       ability: PlayForAlternateCost(AlternateCost(
         energy_cost: Energy(1),
+        card_type: Some(Character),
       )),
       condition: Some(CardsDiscardedThisTurn(
         count: 1,
@@ -203,6 +206,7 @@ fn test_character_costs_if_discarded_character_this_turn() {
     Static(WithOptions(StaticAbilityWithOptions(
       ability: PlayForAlternateCost(AlternateCost(
         energy_cost: Energy(1),
+        card_type: Some(Character),
       )),
       condition: Some(CardsDiscardedThisTurn(
         count: 1,
@@ -222,6 +226,7 @@ fn test_character_costs_if_discarded_subtype_this_turn() {
     Static(WithOptions(StaticAbilityWithOptions(
       ability: PlayForAlternateCost(AlternateCost(
         energy_cost: Energy(1),
+        card_type: Some(Character),
       )),
       condition: Some(CardsDiscardedThisTurn(
         count: 1,
@@ -238,6 +243,7 @@ fn test_lose_maximum_energy_play_for_alternate_cost() {
     Static(StaticAbility(PlayForAlternateCost(AlternateCost(
       energy_cost: Energy(0),
       additional_cost: Some(LoseMaximumEnergy(1)),
+      card_type: Some(Event),
     ))))
     "###);
 }

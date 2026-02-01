@@ -105,3 +105,14 @@ pub enum Operator<T> {
     OrMore,
     HigherBy(T),
 }
+
+impl Predicate {
+    /// Returns the inner CardPredicate for Predicate::Any, or None for other
+    /// variants.
+    pub fn any_card_predicate(&self) -> Option<&CardPredicate> {
+        match self {
+            Predicate::Any(p) => Some(p),
+            _ => None,
+        }
+    }
+}

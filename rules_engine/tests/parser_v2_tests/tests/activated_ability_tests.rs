@@ -473,7 +473,7 @@ fn test_pay_one_or_more_dissolve_each_character() {
           target: Character,
           spark_operator: OrLess,
         )),
-        count: All,
+        count: Each,
       )),
     ))
     "###);

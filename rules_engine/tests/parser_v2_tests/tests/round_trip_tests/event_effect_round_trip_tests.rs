@@ -105,7 +105,6 @@ fn test_dissolve_enemy_draw() {
     assert_round_trip("{Dissolve} an enemy. Draw {cards}.", "cards: 1");
 }
 
-#[ignore = "Round-trip mismatch"]
 #[test]
 fn test_dissolve_by_energy_paid() {
     assert_round_trip("Pay 1 or more {energy-symbol}: {Dissolve} each character with spark less than the amount of {energy-symbol} paid.", "");
@@ -126,7 +125,6 @@ fn test_banish_enemy_by_cost() {
     assert_round_trip("{Banish} an enemy with cost {e} or less.", "e: 2");
 }
 
-#[ignore = "Round-trip mismatch"]
 #[test]
 fn test_banish_non_subtype_enemy() {
     assert_round_trip("{Banish} a non-{subtype} enemy.", "subtype: warrior");

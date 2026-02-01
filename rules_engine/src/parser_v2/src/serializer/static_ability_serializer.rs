@@ -104,12 +104,16 @@ pub fn serialize_standard_static_ability(
             format!("To play this card, {}.", cost_serializer::serialize_cost(cost, bindings))
         }
         StandardStaticAbility::PlayForAlternateCost(alt_cost) => {
+            use ability_data::static_ability::CardTypeContext;
             if let Some(var_name) = parser_substitutions::directive_to_integer_variable("e") {
                 bindings
                     .insert(var_name.to_string(), VariableValue::Integer(alt_cost.energy_cost.0));
             }
+            let card_type = match alt_cost.card_type {
+                Some(CardTypeContext::Character) => "character",
+                Some(CardTypeContext::Event) | None => "event",
+            };
             if let Some(cost) = &alt_cost.additional_cost {
-                let card_type = if alt_cost.if_you_do.is_some() { "character" } else { "event" };
                 let base = format!(
                     "{}: Play this {} for {{e}}",
                     serializer_utils::capitalize_first_letter(&cost_serializer::serialize_cost(
@@ -123,7 +127,7 @@ pub fn serialize_standard_static_ability(
                     format!("{}.", base)
                 }
             } else {
-                "this event costs {e}".to_string()
+                format!("this {} costs {{e}}", card_type)
             }
         }
         StandardStaticAbility::CharactersInHandHaveFast => {

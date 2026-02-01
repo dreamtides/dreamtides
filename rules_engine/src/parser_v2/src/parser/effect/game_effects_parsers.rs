@@ -118,7 +118,7 @@ pub fn dissolve_each_character<'a>(
         .ignore_then(card_predicate_parser::parser())
         .map(|predicate| StandardEffect::DissolveCharactersCount {
             target: Predicate::Any(predicate),
-            count: CollectionExpression::All,
+            count: CollectionExpression::Each,
         })
 }
 

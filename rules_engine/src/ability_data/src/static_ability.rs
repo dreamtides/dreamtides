@@ -81,6 +81,14 @@ pub struct PlayFromHandOrVoidForCost {
     pub if_you_do: Option<Effect>,
 }
 
+/// Indicates whether an ability applies to characters or events.
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, Default)]
+pub enum CardTypeContext {
+    #[default]
+    Event,
+    Character,
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct AlternateCost {
     pub energy_cost: Energy,
@@ -88,6 +96,9 @@ pub struct AlternateCost {
     pub additional_cost: Option<Cost>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub if_you_do: Option<Effect>,
+    /// The card type this ability applies to (character vs event).
+    #[serde(skip_serializing_if = "Option::is_none", default)]
+    pub card_type: Option<CardTypeContext>,
 }
 
 impl StaticAbility {

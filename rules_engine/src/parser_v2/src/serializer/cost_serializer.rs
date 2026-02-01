@@ -134,6 +134,12 @@ pub fn serialize_cost(cost: &Cost, bindings: &mut VariableBindings) -> String {
                     predicate_serializer::serialize_predicate_plural(target, bindings)
                 )
             }
+            CollectionExpression::Each => {
+                format!(
+                    "return each {} to hand",
+                    predicate_serializer::serialize_predicate(target, bindings)
+                )
+            }
         },
         Cost::SpendOneOrMoreEnergy => "pay 1 or more {energy-symbol}".to_string(),
         Cost::BanishAllCardsFromYourVoid => "{Banish} your void".to_string(),

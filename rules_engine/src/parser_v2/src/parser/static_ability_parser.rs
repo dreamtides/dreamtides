@@ -4,8 +4,8 @@ use ability_data::effect::Effect;
 use ability_data::predicate::{CardPredicate, Predicate};
 use ability_data::standard_effect::StandardEffect;
 use ability_data::static_ability::{
-    AlternateCost, PlayFromHandOrVoidForCost, StandardStaticAbility, StaticAbility,
-    StaticAbilityWithOptions,
+    AlternateCost, CardTypeContext, PlayFromHandOrVoidForCost, StandardStaticAbility,
+    StaticAbility, StaticAbilityWithOptions,
 };
 use chumsky::prelude::*;
 use core_data::numerics::{Energy, Spark};
@@ -167,6 +167,7 @@ fn abandon_ally_play_character_for_alternate_cost<'a>(
                         count: CollectionExpression::Exactly(1),
                     },
                 })),
+                card_type: Some(CardTypeContext::Character),
             })
         })
 }
@@ -176,15 +177,19 @@ fn play_for_alternate_cost<'a>(
     choice((cost_parser::lose_maximum_energy_cost(), cost_parser::banish_from_hand_cost()))
         .then_ignore(colon())
         .then_ignore(words(&["play", "this"]))
-        .then_ignore(choice((word("character"), word("event"))))
+        .then(choice((
+            word("character").to(CardTypeContext::Character),
+            word("event").to(CardTypeContext::Event),
+        )))
         .then_ignore(word("for"))
         .then(energy())
         .then_ignore(period())
-        .map(|(additional_cost, e)| {
+        .map(|((additional_cost, card_type), e)| {
             StandardStaticAbility::PlayForAlternateCost(AlternateCost {
                 energy_cost: Energy(e),
                 additional_cost: Some(additional_cost),
                 if_you_do: None,
+                card_type: Some(card_type),
             })
         })
 }
@@ -192,14 +197,18 @@ fn play_for_alternate_cost<'a>(
 fn simple_alternate_cost<'a>(
 ) -> impl Parser<'a, ParserInput<'a>, StandardStaticAbility, ParserExtra<'a>> + Clone {
     word("this")
-        .ignore_then(choice((word("character"), word("event"))))
+        .ignore_then(choice((
+            word("character").to(CardTypeContext::Character),
+            word("event").to(CardTypeContext::Event),
+        )))
         .then_ignore(word("costs"))
-        .ignore_then(energy())
-        .map(|e| {
+        .then(energy())
+        .map(|(card_type, e)| {
             StandardStaticAbility::PlayForAlternateCost(AlternateCost {
                 energy_cost: Energy(e),
                 additional_cost: None,
                 if_you_do: None,
+                card_type: Some(card_type),
             })
         })
 }

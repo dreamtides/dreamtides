@@ -173,6 +173,7 @@ fn test_banish_from_hand_alternate_cost_dissolve_enemy() {
     Static(StaticAbility(PlayForAlternateCost(AlternateCost(
       energy_cost: Energy(0),
       additional_cost: Some(BanishFromHand(Any(Card))),
+      card_type: Some(Event),
     ))))
     "###);
     assert_ron_snapshot!(result[1], @r###"
@@ -204,6 +205,7 @@ fn test_abandon_ally_alternate_cost_materialized_dissolve_enemy() {
           count: Exactly(1),
         ),
       ))),
+      card_type: Some(Character),
     ))))
     "###);
     assert_ron_snapshot!(result[1], @r###"
@@ -229,6 +231,7 @@ fn test_banish_from_hand_alternate_cost_prevent_card() {
     Static(StaticAbility(PlayForAlternateCost(AlternateCost(
       energy_cost: Energy(0),
       additional_cost: Some(BanishFromHand(Any(Card))),
+      card_type: Some(Event),
     ))))
     "###);
     assert_ron_snapshot!(result[1], @r###"
@@ -251,6 +254,7 @@ fn test_lose_maximum_energy_alternate_cost_prevent_card() {
     Static(StaticAbility(PlayForAlternateCost(AlternateCost(
       energy_cost: Energy(0),
       additional_cost: Some(LoseMaximumEnergy(1)),
+      card_type: Some(Event),
     ))))
     "###);
     assert_ron_snapshot!(result[1], @r###"
