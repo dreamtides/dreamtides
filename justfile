@@ -1,12 +1,12 @@
 set positional-arguments
 
-code-review: check-format build workspace-lints tabula-check clippy style-validator test unity-tests
+code-review: check-format build workspace-lints clippy style-validator test unity-tests
 
 # Run this before pushing
 code-review-rsync: rsync-for-review
     cd ~/dreamtides_tests && just code-review || (osascript -e 'display dialog "Review failed" with icon stop'; exit 1)
 
-review: check-snapshots check-format build tabula-check clippy style-validator test tv-check tv-clippy
+review: check-snapshots check-format build clippy style-validator test tv-check tv-clippy
 
 check:
     #!/usr/bin/env bash
@@ -65,7 +65,7 @@ watch:
 watch-release:
     cargo watch -C rules_engine -x "run --release --bin dev_server" --ignore dreamtides.json
 
-test:
+test: tabula-check
     #!/usr/bin/env bash
     # Set RUST_MIN_STACK for parser_v2 tests which need extra stack space for
     # deep Chumsky parser hierarchies. Limit test parallelism to prevent memory
