@@ -2,477 +2,384 @@
 
 ## Overview
 
-This document outlines a comprehensive plan to fix all round-trip test failures in the parser_v2 codebase, enabling the removal of all `#[ignore = "Round-trip mismatch"]` annotations. The goal is to ensure that `parse(text) -> serialize(ast) == text` for all valid card ability texts.
+This document outlines a comprehensive plan to fix all 31 remaining round-trip test failures, enabling removal of all `#[ignore = "Round-trip mismatch"]` annotations. The goal is `parse(text) -> serialize(ast) == text` for all valid card ability texts.
 
-## Project Status: Partially Complete
+## Current Status
 
-**Summary:** The round-trip test fix project reduced failing tests from 116 to 31. The remaining 31 tests involve complex parser/serializer patterns that would require significant refactoring.
-
-**Final Numbers:**
-- Total round-trip tests: 224
-- Passing tests: 193
-- Ignored tests: 31 (down from ~116)
-- Pass rate: 86%
-
-**What was fixed:**
-- Effect joining with "and" for compound effects (Fix 2)
-- BanishThenMaterialize standard effect parsing (Fix 3)
-- Keyword capitalization after "You may" and trigger costs (Fix 1)
-- Operator serialization for round-trip compatibility
-- Effect joining with period separation for independent effects
-- Test data issues with unused variables
-- Various predicate serialization bugs
-
-**What remains:**
-The 31 remaining tests involve complex patterns that would require more invasive changes to the AST structure or would have broad compatibility impacts. See "Remaining Issues Analysis" section below.
-
-## Current State (Historical)
-
-There are approximately **116 failing tests** in the round-trip test suite (in `round_trip_tests/`).
+- **Total round-trip tests:** 224
+- **Passing tests:** 193
+- **Ignored tests:** 31
+- **Pass rate:** 86%
 
 ---
 
-## Completed Fixes
+## Canonical Patterns (Validated from cards.toml)
 
-### Fix 1: Don't Capitalize After "You may" or Trigger Costs (DONE)
+### Effect Joining Rules
 
-**Problem**: Serializer was capitalizing effects after keyword triggers unconditionally. Should NOT capitalize when effect follows:
-- "You may"
-- A trigger cost like "pay {e} to" or "discard a card to"
+| Pattern | When to Use | Example |
+|---------|-------------|---------|
+| `, then` | Sequential effects in triggered abilities | `"{Judgment} Draw {cards}, then discard {discards}."` |
+| `. ` | Independent effects in event abilities | `"Draw {cards}. The opponent gains {points}."` |
+| ` and ` | Multiple effects from same cost/condition | `"Pay {e} to {kindle} and {banish} {cards}..."` |
 
-**Solution implemented**: Added `lowercase_leading_keyword()` helper function to `serializer_utils.rs` that lowercases the first `{Keyword}` in a string. Modified `effect_serializer.rs` to use this function in the `Effect::WithOptions` and `Effect::List` branches when `optional=true` or `trigger_cost=Some`.
+**Key insight:** Event abilities use periods for independent effects. Triggered abilities use `, then` for sequential effects. Shared-cost effects use ` and `.
 
-**Files modified**:
-- `serializer_utils.rs` - Added `lowercase_leading_keyword()` function
-- `effect_serializer.rs` - Applied lowercase in WithOptions and List branches
+### "enemy" Usage
 
-### Fix 2: Compound Effect Joining with "and" (DONE)
+- **Correct:** `"an enemy"` (standalone noun for opponent's characters)
+- **Wrong:** `"enemy card"`, `"enemy character"`, `"enemy event"`
+- **Implicit:** `{Prevent}` always targets opponent's cards - never add "enemy"
 
-**Problem**: Effects from the same trigger were joined with `. ` and capitalized. Should use "and".
+### Count Directives
 
-**Solution implemented**: Modified the `else` branch in `Effect::List` serialization (in `effect_serializer.rs`) to join effects with " and " instead of ". ". Only the first effect is capitalized; subsequent effects remain lowercase.
+- `{count-allies}` - References `$allies` variable for specific counts (e.g., "Abandon {count-allies}:")
+- `"any number of"` - Player chooses freely, no fixed count (e.g., "Abandon any number of allies:")
 
-### Fix 3: BanishThenMaterialize Standard Effect (DONE)
+### "discard a card" Usage
 
-The "banish X, then materialize it/them" pattern is now parsed as a **single `BanishThenMaterialize` standard effect** instead of two separate effects. Implemented in commit `cffbc794`.
-
-**What changed:**
-- Added `BanishThenMaterialize { target: Predicate, count: CollectionExpression }` to `StandardEffect` enum
-- Added parsers: `banish_then_materialize()`, `banish_collection_then_materialize()`, `banish_up_to_n_then_materialize()`
-- Added serializer support in `effect_serializer.rs`
-
-**Supported patterns:**
-| Pattern | Example | CollectionExpression |
-|---------|---------|---------------------|
-| Single target | `{banish} an ally, then {materialize} it` | `Exactly(1)` |
-| Any number | `{Banish} any number of allies, then {materialize} them` | `AnyNumberOf` |
-| Up to N | `{banish} {up-to-n-allies}, then {materialize} {it-or-them}` | `UpTo(n)` |
+- **Allowed in triggers:** `"When you discard a card, {kindle}."` (describes game event)
+- **Allowed in costs:** `"discard a card to {dissolve}..."` (describes cost)
+- **Not allowed in effects:** Always use `"Discard {discards}."` with variable binding
 
 ---
 
-## Root Cause Analysis
+## The 31 Failing Tests - Categorized Fixes
 
-After running the failing tests and analyzing the actual mismatches, I've identified **8 distinct categories** of failures:
+### Category A: Effect Joining (7 tests)
 
-### Category 1: Keyword Capitalization (HIGH IMPACT - ~40% of failures)
+**Problem:** Serializer uses wrong join separator for triggered ability effects.
 
-**Pattern**: Lowercase keyword directives become capitalized.
+| Test | Input (Correct) | Output (Wrong) | Fix Type |
+|------|-----------------|----------------|----------|
+| `test_judgment_draw_then_discard` | `", then discard"` | `". Discard"` | Serializer |
+| `test_materialized_discard_then_draw` | `", then draw"` | `". Draw"` | Serializer |
+| `test_pay_variable_energy_draw_per_energy` | `", then discard"` | `". Discard"` | Serializer |
+| `test_judgment_pay_to_kindle_and_banish` | `" and {banish}"` | `", then {banish}"` | Serializer |
+| `test_may_return_character_from_void_draw` | `". Draw"` | `", then draw"` | Template |
+| `test_judgment_may_discard_to_draw_and_gain` | `"to draw and gain"` | broken parse | Parser |
+| `test_return_all_but_one_ally_draw_per_returned` | structural | `"all but one an ally"` | Serializer |
 
-| Input | Output | Status |
-|-------|--------|--------|
-| `{kindle}` | `{Kindle}` | SERIALIZER BUG |
-| `{reclaim}` | `{Reclaim}` | SERIALIZER BUG |
-| `{materialize}` | `{Materialize}` | SERIALIZER BUG |
-| `{dissolve}` | `{Dissolve}` | SERIALIZER BUG |
-| `{banish}` | `{Banish}` | SERIALIZER BUG |
-| `{prevent}` | `{Prevent}` | SERIALIZER BUG |
-| `{foresee}` | `{Foresee}` | SERIALIZER BUG |
+**Root cause:** `effect_serializer.rs:977-997` joins mandatory `Effect::List` with `. ` instead of `, then`.
 
-**Root Cause**: The effect serializers in `effect_serializer.rs` output capitalized keywords unconditionally (e.g., `"{Kindle}."` at line 182, `"{Foresee}."` at line 174). The `ability_serializer.rs` then capitalizes the first letter of the effect, but the keyword is already capitalized.
+**Fix for serializer:**
+```rust
+// In Effect::List else branch (mandatory effects)
+// Change from: effect_strings.join(" ")  (with periods on each)
+// To: effect_strings.join(", then ")
+```
 
-**Example Test Failures**:
-- `test_discard_trigger_kindle`: `"When you discard a card, {kindle}."` → `"When you discard a your card, {Kindle}."`
-- `test_play_count_trigger_reclaim_self`: `"{reclaim} this character."` → `"{Reclaim} this character."`
-- `test_discard_self_trigger_materialize`: `"{materialize} it."` → `"{Materialize} it."`
-
-**Files Involved**:
-- `rules_engine/src/parser_v2/src/serializer/effect_serializer.rs:168-183` (Foresee, Kindle)
-- All `StandardEffect` serialization that uses keywords
-
-**Fix Strategy**:
-1. Output lowercase keywords in `serialize_standard_effect()` for effects that start with keywords
-2. Let `ability_serializer.rs` handle capitalization based on position in sentence
-3. This requires careful coordination with Fix 1 (already implemented) which lowercases keywords after "you may"
-
-**Decision Point**: Should the canonical form be lowercase (`{kindle}`) or uppercase (`{Kindle}`)?
-- **Recommendation**: Lowercase is canonical in input; serializer should match input form based on context.
+**Fix for `test_may_return_character_from_void_draw`:** Update test template to use `, then`:
+```
+// From: "You may return a character from your void to your hand. Draw {cards}."
+// To:   "You may return a character from your void to your hand, then draw {cards}."
+```
 
 ---
 
-### Category 2: Predicate Ownership/Scope Errors (HIGH IMPACT - ~25% of failures)
+### Category B: Prevent Adds Spurious "enemy" (4 tests)
 
-**Pattern**: Generic predicates get explicit ownership added incorrectly.
+**Problem:** Serializer outputs "a played enemy" instead of "a played character/card".
 
-| Input | Output | Issue |
-|-------|--------|-------|
-| `a card` | `a your card` | Adds incorrect "your" |
-| `a character` | `an ally` | Canonicalizes to "ally" |
-| `a played card` | `a played enemy card` | Adds incorrect "enemy" |
+| Test | Input (Correct) | Output (Wrong) |
+|------|-----------------|----------------|
+| `test_prevent_played_character` | `"a played character"` | `"a played enemy"` |
+| `test_prevent_dissolve_event` | `"a played event...an ally"` | `"a played enemy event...ally"` |
+| `test_materialized_prevent_played_card_by_cost` | `"a played card"` | `"a played enemy"` |
 
-**Root Cause**: The parser parses "a card" as `Predicate::Your(CardPredicate::Card)` but the serializer outputs "a your card" instead of "a card". Similarly, "a character" parses to `Predicate::Ally(CardPredicate::Character)` which serializes as "an ally".
+**Root cause:** `effect_serializer.rs:293-305` uses `predicate_base_text()` which calls `serialize_enemy_predicate()`, adding "enemy".
 
-**Example Test Failures**:
-- `test_discard_trigger_gain_points`: `"When you discard a card, gain {points}."` → `"When you discard a your card, gain {points}."`
-- `test_materialize_character_trigger_gain_spark`: `"a character"` → `"an ally"`
-- `test_prevent_played_card`: `"a played card"` → `"a played enemy card"`
+**Fix location:** `predicate_serializer.rs` - `predicate_base_text()` function.
 
-**Files Involved**:
-- `rules_engine/src/parser_v2/src/serializer/predicate_serializer.rs:8-40` (`serialize_predicate()`)
-- `rules_engine/src/parser_v2/src/parser/predicate_parser.rs` (parsing logic)
-
-**Fix Strategy**:
-1. **Option A (Serializer Fix)**: Add special cases in `serialize_predicate()` to omit "your" for generic cards:
-   - `Predicate::Your(CardPredicate::Card)` → `"a card"` (not `"a your card"`)
-   - `Predicate::Your(CardPredicate::Character)` → `"a character"` (not `"a your character"`)
-
-2. **Option B (Parser Fix)**: Parse "a card" to a new `Predicate::AnyCard` variant that serializes correctly
-
-3. **Option C (Both)**: Add `Predicate::Generic(CardPredicate)` variant for unqualified predicates
-
-**Recommendation**: Option A is simplest. The serializer should recognize that `Your(Card)` in the context of "a card" should serialize without "your".
+**Fix approach:** For Counterspell/Prevent context, don't use "enemy" prefix:
+```rust
+// In predicate_base_text(), for Predicate::Enemy:
+// Return "character", "event", or "card" instead of "enemy", "enemy event", etc.
+// The "enemy" is implicit for Prevent effects.
+```
 
 ---
 
-### Category 3: Operator Serialization (MEDIUM IMPACT - ~10% of failures)
+### Category C: Cost/Count Serialization (5 tests)
 
-**Pattern**: Missing or extra operators in cost/spark comparisons.
+**Problem:** Serializer converts variable templates to literals or loses predicates.
 
-| Input | Output | Issue |
-|-------|--------|-------|
-| `cost {e}` | `cost {e} exactly` | Adds unnecessary "exactly" |
-| `cost {e} higher` | `cost {e} or more` | Wrong operator |
+| Test | Input | Output | Issue |
+|------|-------|--------|-------|
+| `test_pay_energy_discard_kindle` | `"Discard {discards}"` | `"Discard a card"` | Variable lost |
+| `test_abandon_any_allies_draw_per_abandoned` | `"any number of allies"` | `"{count-allies}"` | Wrong directive |
+| `test_discard_chosen_from_opponent_hand_by_cost` | `"cost {e} or less"` | predicate lost | Predicate lost |
+| `test_materialize_random_characters_from_deck` | `"cost {e} or less"` | predicate lost | Predicate lost |
+| `test_play_from_void_by_cost` | `"cost {e} or less"` | predicate lost | Predicate lost |
 
-**Example Test Failures**:
-- `test_discover_card_by_cost`: `"a card with cost {e}."` → `"a card with cost {e} exactly."`
+**Fix 1 - Discard cost (cost_serializer.rs:25-36):**
+```rust
+// Current: if *count == 1 { format!("discard {}", serialize_predicate(...)) }
+// Fix: Always use variable template:
+Cost::DiscardCards { target, count } => {
+    bindings.insert("discards".to_string(), VariableValue::Integer(*count));
+    "discard {discards}".to_string()
+}
+```
 
-**Root Cause**: The `Operator::Exactly` variant serializes to `"{value} exactly"` but the parser accepts both `"cost {e}"` and `"cost {e} exactly"` as `Exactly`. The serializer always outputs the explicit form.
+**Fix 2 - "any number of" (cost_serializer.rs:11-24):**
+```rust
+// Add explicit case for AnyNumberOf:
+CollectionExpression::AnyNumberOf => {
+    format!("abandon any number of {}",
+        predicate_serializer::serialize_predicate_plural(target, bindings))
+}
+```
 
-**Files Involved**:
-- `rules_engine/src/parser_v2/src/serializer/serializer_utils.rs:22-30` (`serialize_operator()`)
-- `rules_engine/src/parser_v2/src/parser/predicate_suffix_parser.rs`
-
-**Fix Strategy**:
-1. Make `Operator::Exactly` serialize to just `"{value}"` without "exactly"
-2. Or add a flag to distinguish "implicit exactly" from "explicit exactly"
-
-**Recommendation**: Treat bare `cost {e}` as the canonical form. Modify `serialize_operator()` to not append "exactly".
-
----
-
-### Category 4: Variable Binding Preservation (MEDIUM IMPACT - ~8% of failures)
-
-**Pattern**: Input variables not present in serialized output.
-
-**Example Test Failures**:
-- `test_abandon_allies_count_reclaim_self`: Input has `allies: 2` but serialized output doesn't bind `allies`
-- `test_judgment_draw_one`: Input has `e: 3, cards: 1` but output only has `cards: 1`
-
-**Root Cause**: The test input specifies variables that aren't actually used in the ability text. For example, `test_judgment_draw_one` passes `e: 3` but the ability text `"{Judgment} Draw {cards}."` doesn't use `{e}`.
-
-**Files Involved**:
-- Test files themselves (incorrect test data)
-- `rules_engine/tests/parser_v2_tests/src/test_helpers.rs:107-112`
-
-**Fix Strategy**:
-1. **Fix test data**: Remove unused variables from test inputs
-2. **Stricter validation**: Error if input specifies variables not used in text
-
-**Recommendation**: Fix test data. The serializer correctly only outputs variables that are used.
+**Fix 3 - Cost predicates:** Investigate why cost predicates are lost in `MaterializeFromDeck` and `DiscardFromOpponentHand` serialization.
 
 ---
 
-### Category 5: Effect Joining and Punctuation (MEDIUM IMPACT - ~7% of failures)
+### Category D: Plural Form Lost (4 tests)
 
-**Pattern**: Effects joined incorrectly or with wrong punctuation.
+**Problem:** Serializer outputs singular where plural is required.
 
-| Input | Output | Issue |
-|-------|--------|-------|
-| `X. Put it Y.` | `X and put it Y.` | Uses "and" instead of ". " |
-| `X, then Y.` | `X. Y.` | Uses ". " instead of ", then" |
+| Test | Input | Output |
+|------|-------|--------|
+| `test_spark_equals_subtype_count` | `"{plural-subtype}"` | `"{subtype}"` |
+| `test_subtype_gains_spark_equal_count` | `"{plural-subtype}"` | `"{subtype}"` |
+| `test_judgment_triggers_on_materialize` | `"allies"` | `"ally"` |
+| `test_reveal_top_card_play_characters_from_top` | `"characters"` | `"character"` |
 
-**Example Test Failures**:
-- `test_prevent_played_card_put_on_deck`: `"{Prevent} a played card. Put it on top of..."` → `"{Prevent} a played enemy card and put it on top of..."`
+**Root cause:** Serializer uses singular form in counting contexts.
 
-**Root Cause**: The `Effect::List` serialization in `effect_serializer.rs:878-1010` uses different joining strategies based on effect types, but doesn't match the original input form.
-
-**Files Involved**:
-- `rules_engine/src/parser_v2/src/serializer/effect_serializer.rs:878-1010`
-
-**Remaining Fix (Fix 6)**: Don't insert ", then" inconsistently. Use `. ` consistently for independent effects.
+**Fix:** In `predicate_serializer.rs`, detect counting contexts ("number of", "each") and use `{plural-subtype}` or plural nouns.
 
 ---
 
-### Category 6: Article and Subtype Directive Issues (LOW IMPACT - ~5% of failures)
+### Category E: Variable Binding Issues (5 tests)
 
-**Pattern**: Article directives lose their article form.
+**Problem:** Test provides variables that serializer doesn't preserve.
 
-| Input | Output | Issue |
-|-------|--------|-------|
-| `{a-subtype}` | `{subtype}` | Loses "a-" prefix |
-| `{ASubtype}` | `{a-subtype}` | Wrong capitalization |
+| Test | Missing Variables | Root Cause |
+|------|-------------------|------------|
+| `test_choose_one_return_or_draw` | `mode1-cost`, `mode2-cost` | Modal cost serialization |
+| `test_conditional_cost_if_dissolved` | `e` | Conditional cost not bound |
+| `test_materialized_dissolve_with_abandon_cost` | `e` | Unused in text |
+| `test_with_allied_subtype_play_from_hand_or_void` | `subtype` | Not serialized |
+| `test_play_event_trigger_copy` | `e` | Unused in text |
 
-**Files Involved**:
-- `rules_engine/src/parser_v2/src/serializer/predicate_serializer.rs:123-201`
-
-**Remaining Fix (Fix 4)**: Preserve `{a-subtype}` article in `predicate_serializer.rs`.
-
-**Also**: "higher" becomes "or more" - check `serializer_utils.rs` for `Operator::HigherBy` serialization.
-
----
-
-### Category 7: "this turn" Temporal Modifier (LOW IMPACT - ~3% of failures)
-
-**Pattern**: "this turn" phrase dropped from temporal effects.
-
-| Input | Output | Issue |
-|-------|--------|-------|
-| `gains {reclaim}...this turn.` | `gains {reclaim}...` | Missing "this turn" |
-
-**Files Involved**:
-- `rules_engine/src/parser_v2/src/serializer/effect_serializer.rs` (GainsReclaimUntilEndOfTurn)
-
-**Remaining Fix (Fix 5)**: Check `CardsInVoidGainReclaimThisTurn` serialization - some cases may be missing "this turn".
+**Fix approach:**
+1. For unused variables: Remove from test input (test data error)
+2. For modal costs: Fix modal serializer to preserve `{mode1-cost}`, `{mode2-cost}`
+3. For conditional costs: Fix to preserve `{e}` in conditional cost expressions
 
 ---
 
-### Category 8: Parser Acceptance of Non-Canonical Forms (LOW IMPACT - ~2% of failures)
+### Category F: Predicate Form Issues (4 tests)
 
-**Pattern**: Parser accepts multiple input forms that should be rejected.
+| Test | Input | Output | Fix |
+|------|-------|--------|-----|
+| `test_banish_non_subtype_enemy` | `"non-{subtype}"` | `"is not {a-subtype}"` | Serializer |
+| `test_require_return_ally_to_play` | `"an ally"` | `"a character"` | Serializer |
+| `test_conditional_cost_if_discarded` | `"This character"` | `"This event"` | Parser/Serializer |
+| `test_dissolve_by_energy_paid` | `"each character"` | `"all characters"` | Template or Serializer |
 
-| Input | Canonical | Status |
-|-------|-----------|--------|
-| `Spend 1 or more...` | `Pay 1 or more...` | REJECT "Spend" |
-| `a {subtype}` | `{a-subtype}` | REJECT literal "a" before variable |
-| `{a-subtype}` in dissolved subject | `{ASubtype}` | REJECT lowercase in subject position |
+**Fix for `non-{subtype}`:** Add special case in predicate serializer to output `"non-{subtype}"` instead of `"that is not {a-subtype}"`.
 
----
-
-## Remaining Serializer Fixes
-
-### Fix 4: Preserve `{a-subtype}` Article
-
-**File**: `predicate_serializer.rs`
-
-**Problem**: `{a-subtype}` becomes `{subtype}`, losing the article.
-
-**Also**: "higher" becomes "or more" - check `serializer_utils.rs` for `Operator::HigherBy` serialization.
-
-### Fix 5: Preserve "this turn" for Reclaim Until End of Turn
-
-**File**: `effect_serializer.rs`
-
-**Problem**: The "this turn" phrase is dropped for reclaim-until-end-of-turn effects.
-
-**Location**: Check `CardsInVoidGainReclaimThisTurn` serialization - some cases may be missing "this turn".
-
-### Fix 6: Don't Insert "then" Inconsistently
-
-**File**: `effect_serializer.rs`
-
-**Problem**: Some patterns insert ", then" but others use `. ` for similar patterns.
-
-**Decision**: Use `. ` consistently. Find where ", then" is being inserted and change to `. `.
+**Fix for `each` vs `all`:** Decide canonical form. If `all` is canonical, update test template. If `each` is canonical, fix serializer.
 
 ---
 
-## Parser Rejections Required
+### Category G: Temporal/Structural (2 tests)
 
-### Rejection 1: `a {subtype}` Pattern
+| Test | Input | Output | Issue |
+|------|-------|--------|-------|
+| `test_subtype_in_void_allies_have_spark` | `"If this card is in"` | `"While this card is in"` | Parser collapses keywords |
+| `test_materialized_card_gains_reclaim_for_cost` | `"{reclaim-for-cost}"` | `"{reclaim} equal to its cost"` | Directive expansion |
 
-**File**: Investigate where this is parsed
-
-**Change**: Reject literal "a" followed by `{subtype}` variable. Must use `{a-subtype}`.
-
-### Rejection 2: "Spend" Keyword
-
-**File**: `cost_parser.rs`
-
-**Change**: Remove "spend" as alternative to "pay". Only accept "pay".
-
-### Rejection 3: `{a-subtype}` in Dissolved Subject Position
-
-**File**: Investigate dissolved trigger parsing
-
-**Change**: In `{Dissolved} {a-subtype} in your void...`, the subject should use `{ASubtype}` not `{a-subtype}`.
-
----
-
-## Card Text Updates Required
-
-After serializer fixes and parser rejections are in place, update card text in `cards.toml`:
-
-1. `a {subtype}` → `{a-subtype}` where applicable
-2. `Spend` → `Pay`
-3. `{kindle}` → `{Kindle}` at sentence start (if any)
-4. `{a-subtype}` → `{ASubtype}` in dissolved subject position
-5. `X, then Y` → `X. Y.` for independent effects
-
-**Note**: Do NOT read cards.toml directly - it's too large. Use grep to find specific patterns.
+**Fix:** These require either AST changes to distinguish "If" vs "While", or template updates to use canonical form.
 
 ---
 
 ## Implementation Plan
 
-### Phase 1: Fix Predicate Serialization (Highest Impact)
+### Phase 1: Effect Joining Fix (HIGH PRIORITY - 7 tests)
 
-**Files to modify**:
-- `rules_engine/src/parser_v2/src/serializer/predicate_serializer.rs`
+**File:** `effect_serializer.rs:977-997`
 
-**Changes**:
-1. In `serialize_predicate()`, add special handling for common generic patterns:
-   - `Predicate::Your(CardPredicate::Card)` in "discard" context → `"a card"`
-   - `Predicate::Your(CardPredicate::Character)` in "materialize" context → `"a character"`
-   - `Predicate::Allied(CardPredicate::Character)` → check if original was "a character"
+**Change:** In the `else` branch for mandatory `Effect::List`, use `, then` joining:
+```rust
+// Current:
+let effect_strings: Vec<String> = effects.iter().map(|e| {
+    let s = serialize_standard_effect(&e.effect, bindings);
+    format!("{}.", capitalize_first_letter(s.trim_end_matches('.')))
+}).collect();
+result.push_str(&effect_strings.join(" "));
 
-2. Consider adding a `Predicate::Generic(CardPredicate)` variant to distinguish:
-   - "a card" (any card) from "a your card" (explicitly your card)
-   - "a character" from "an ally"
+// Fixed:
+let effect_strings: Vec<String> = effects.iter().enumerate().map(|(i, e)| {
+    let s = serialize_standard_effect(&e.effect, bindings)
+        .trim_end_matches('.').to_string();
+    if i == 0 { capitalize_first_letter(&s) } else { s }
+}).collect();
+result.push_str(&format!("{}.", effect_strings.join(", then ")));
+```
 
-**Tests to verify**: `test_discard_trigger_kindle`, `test_discard_trigger_gain_points`, `test_materialize_character_trigger_gain_spark`
+**Template update:** `test_may_return_character_from_void_draw` should use `, then` pattern.
 
-### Phase 2: Fix Keyword Capitalization
-
-**Files to modify**:
-- `rules_engine/src/parser_v2/src/serializer/effect_serializer.rs`
-- `rules_engine/src/parser_v2/src/serializer/ability_serializer.rs`
-
-**Changes**:
-1. Change `serialize_standard_effect()` to output lowercase keywords:
-   - `"{Kindle}."` → `"{kindle}."`
-   - `"{Foresee}."` → `"{foresee}."`
-   - `"{Dissolve} an enemy."` → `"{dissolve} an enemy."`
-
-2. Modify `serialize_ability()` to capitalize appropriately based on position:
-   - Sentence start → capitalize first letter (may capitalize `{k}` to `{K}`)
-   - After trigger → lowercase
-   - After "you may" → lowercase (already implemented in Fix 1)
-
-**Alternative Approach**: Keep serializer outputting capitalized keywords, but modify the test expectations and card text to use capitalized keywords as canonical. This is a larger blast radius but simpler code change.
-
-**Tests to verify**: `test_play_count_trigger_reclaim_self`, `test_discard_self_trigger_materialize`, `test_discard_trigger_kindle`
-
-### Phase 3: Fix Operator Serialization
-
-**Files to modify**:
-- `rules_engine/src/parser_v2/src/serializer/serializer_utils.rs`
-
-**Changes**:
-1. Modify `serialize_operator()` for `Operator::Exactly`:
-   - Current: `"{value} exactly"`
-   - New: `"{value}"` (implicit exactly)
-
-2. Or add `Operator::ImplicitExactly` vs `Operator::ExplicitExactly` distinction in AST
-
-**Tests to verify**: `test_discover_card_by_cost`
-
-### Phase 4: Fix Effect Joining (Fix 6)
-
-**Files to modify**:
-- `rules_engine/src/parser_v2/src/serializer/effect_serializer.rs`
-
-**Changes**:
-1. In `Effect::List` serialization, standardize joining:
-   - Independent effects: `. ` (period space)
-   - Related effects on same target: `, then` or `and`
-
-2. Track effect relationships through parsing to preserve original joining style
-
-**Tests to verify**: `test_prevent_played_card_put_on_deck`
-
-### Phase 5: Fix Remaining Serializer Issues
-
-- **Fix 4**: Preserve `{a-subtype}` article in `predicate_serializer.rs`
-- **Fix 5**: Preserve "this turn" for reclaim effects in `effect_serializer.rs`
-
-### Phase 6: Add Parser Rejections
-
-- **Rejection 1**: `a {subtype}` → require `{a-subtype}`
-- **Rejection 2**: `Spend` → require `Pay`
-- **Rejection 3**: `{a-subtype}` in dissolved subject position → require `{ASubtype}`
-
-### Phase 7: Fix Test Data and Card Text
-
-1. Remove unused variables from test inputs
-2. Update card text in `cards.toml` where canonical form differs
+**Tests fixed:** 5-6 tests
 
 ---
 
-## Decision Points Requiring Clarification
+### Phase 2: Prevent/Counterspell Fix (HIGH PRIORITY - 4 tests)
 
-### Decision 1: Canonical Keyword Capitalization
+**File:** `predicate_serializer.rs`
 
-**Question**: Should the canonical form of keyword directives be lowercase (`{kindle}`) or capitalized (`{Kindle}`)?
+**Change:** In `predicate_base_text()`, when handling `Predicate::Enemy` for played card context, return the card type without "enemy":
+```rust
+Predicate::Enemy(card_predicate) => {
+    // For played card contexts, don't add "enemy" - it's implicit
+    match card_predicate {
+        CardPredicate::Character => "character".to_string(),
+        CardPredicate::Card => "card".to_string(),
+        CardPredicate::Event => "event".to_string(),
+        // ... handle other cases
+    }
+}
+```
 
-**Option A**: Lowercase is canonical
-- Pro: Matches current test inputs
-- Pro: More natural for in-sentence usage
-- Con: Requires serializer changes
-
-**Option B**: Capitalized is canonical
-- Pro: Matches current serializer output
-- Pro: Keywords are proper nouns in game terminology
-- Con: Requires updating all card text and tests
-
-**Recommendation**: Choose Option A (lowercase canonical). The serializer should adapt to context.
-
-### Decision 2: Generic vs Explicit Predicates
-
-**Question**: How should `"a card"` be represented in the AST?
-
-**Option A**: Keep `Predicate::Your(CardPredicate::Card)`, fix serializer
-- Pro: Smaller AST change
-- Con: Loses semantic distinction
-
-**Option B**: Add `Predicate::Generic(CardPredicate)`
-- Pro: Preserves semantic meaning
-- Con: Larger AST change, needs parser updates
-
-**Recommendation**: Start with Option A; consider Option B if needed for other features.
-
-### Decision 3: Operator Defaults
-
-**Question**: Should `cost {e}` imply "exactly" or should operator always be explicit?
-
-**Option A**: Implicit "exactly" is default
-- Pro: Matches card text style
-- Con: Ambiguous meaning
-
-**Option B**: Require explicit operators
-- Pro: Clear semantics
-- Con: Verbose card text
-
-**Recommendation**: Option A - implicit "exactly" matches natural card text.
+**Tests fixed:** 4 tests
 
 ---
 
-## Lessons Learned
+### Phase 3: Cost Serialization Fix (HIGH PRIORITY - 5 tests)
 
-### Failed Approach: Making All Keywords Lowercase
+**File:** `cost_serializer.rs`
 
-**What was attempted:**
-Changed all action keywords in `effect_serializer.rs` to lowercase (`{dissolve}`, `{banish}`, etc.) with the idea that `ability_serializer.rs` would capitalize them when needed.
+**Change 1:** Always use variable template for discard costs:
+```rust
+Cost::DiscardCards { target, count } => {
+    if let Some(var_name) = parser_substitutions::directive_to_integer_variable("discards") {
+        bindings.insert(var_name.to_string(), VariableValue::Integer(*count));
+    }
+    "discard {discards}".to_string()
+}
+```
 
-**Why it failed:**
-1. This broke 263 existing round-trip tests that expected capitalized keywords
-2. The existing tests use `assert_round_trip` which expects input == output
-3. Changing default serialization behavior has a massive blast radius
-4. The fix was supposed to affect only 4 tests but ended up breaking hundreds
+**Change 2:** Add `AnyNumberOf` case:
+```rust
+Cost::AbandonCharactersCount { target, count } => match count {
+    CollectionExpression::AnyNumberOf => {
+        format!("abandon any number of {}",
+            predicate_serializer::serialize_predicate_plural(target, bindings))
+    }
+    // ... existing cases
+}
+```
 
-**Key insight:**
-When fixing serializer bugs, prefer **targeted fixes** that only change behavior for the specific problematic cases. Don't change the default behavior that all other tests depend on.
+**Change 3:** Investigate cost predicate loss in `MaterializeFromDeck` and related effects.
 
-**Correct approach for Fix 1:**
-Instead of changing `effect_serializer.rs` to output lowercase keywords, modify `ability_serializer.rs` to detect when an effect starts with "you may" and handle that case specially - capitalizing only the "y" in "you" rather than potentially capitalizing a keyword that follows later in the string.
+**Tests fixed:** 3-5 tests
+
+---
+
+### Phase 4: Plural Form Fix (MEDIUM PRIORITY - 4 tests)
+
+**File:** `predicate_serializer.rs`
+
+**Change:** Track context for counting expressions and use plural forms:
+- `"the number of allied {plural-subtype}"` - use plural directive
+- `"allies"` in counting context - use plural noun
+
+**Tests fixed:** 4 tests
+
+---
+
+### Phase 5: Variable Binding Fix (MEDIUM PRIORITY - 5 tests)
+
+**Files:** Various serializers + test files
+
+**Changes:**
+1. Fix modal cost serialization to preserve `{mode1-cost}`, `{mode2-cost}`
+2. Remove unused variables from test inputs where appropriate
+3. Fix conditional cost serialization
+
+**Tests fixed:** 5 tests
+
+---
+
+### Phase 6: Predicate Form Fix (LOW PRIORITY - 4 tests)
+
+**File:** `predicate_serializer.rs`
+
+**Changes:**
+1. Add `"non-{subtype}"` serialization pattern
+2. Decide `"each"` vs `"all"` canonical form
+3. Fix `"an ally"` vs `"a character"` context
+
+**Tests fixed:** 4 tests
+
+---
+
+### Phase 7: Template Updates (LOW PRIORITY - 2 tests)
+
+**Files:** Test templates
+
+**Changes:**
+1. `test_subtype_in_void_allies_have_spark`: Use `"While"` if that's canonical
+2. `test_materialized_card_gains_reclaim_for_cost`: Use expanded form if that's canonical
+
+**Tests fixed:** 2 tests
+
+---
+
+## Detailed Test Fixes
+
+### Tests Requiring Serializer Changes
+
+| Test | Category | File to Modify | Change |
+|------|----------|----------------|--------|
+| `test_judgment_draw_then_discard` | Joining | `effect_serializer.rs` | Use `, then` for mandatory list |
+| `test_materialized_discard_then_draw` | Joining | `effect_serializer.rs` | Use `, then` for mandatory list |
+| `test_pay_variable_energy_draw_per_energy` | Joining | `effect_serializer.rs` | Use `, then` for mandatory list |
+| `test_judgment_pay_to_kindle_and_banish` | Joining | `effect_serializer.rs` | Use ` and ` for shared cost |
+| `test_prevent_played_character` | Prevent | `predicate_serializer.rs` | Don't add "enemy" |
+| `test_prevent_dissolve_event` | Prevent | `predicate_serializer.rs` | Don't add "enemy" |
+| `test_materialized_prevent_played_card_by_cost` | Prevent | `predicate_serializer.rs` | Don't add "enemy" |
+| `test_pay_energy_discard_kindle` | Cost | `cost_serializer.rs` | Use variable template |
+| `test_abandon_any_allies_draw_per_abandoned` | Cost | `cost_serializer.rs` | Handle AnyNumberOf |
+| `test_spark_equals_subtype_count` | Plural | `predicate_serializer.rs` | Use plural directive |
+| `test_subtype_gains_spark_equal_count` | Plural | `predicate_serializer.rs` | Use plural directive |
+| `test_judgment_triggers_on_materialize` | Plural | `predicate_serializer.rs` | Use plural noun |
+| `test_banish_non_subtype_enemy` | Predicate | `predicate_serializer.rs` | Use `non-{subtype}` form |
+| `test_return_all_but_one_ally_draw_per_returned` | Predicate | `predicate_serializer.rs` | Fix article insertion |
+
+### Tests Requiring Template Changes
+
+| Test | Current Input | Proposed Change |
+|------|---------------|-----------------|
+| `test_may_return_character_from_void_draw` | `". Draw {cards}."` | `", then draw {cards}."` |
+| `test_dissolve_by_energy_paid` | `"each character"` | `"all characters"` (if canonical) |
+| `test_subtype_in_void_allies_have_spark` | `"If this card is in"` | `"While this card is in"` |
+| `test_materialized_card_gains_reclaim_for_cost` | `"{reclaim-for-cost}"` | Use expanded form |
+
+### Tests Requiring Test Data Fixes
+
+| Test | Issue | Fix |
+|------|-------|-----|
+| `test_materialized_dissolve_with_abandon_cost` | Unused `e` variable | Remove from test |
+| `test_play_event_trigger_copy` | Unused `e` variable | Remove from test |
+
+### Tests Requiring Investigation
+
+| Test | Issue | Investigation Needed |
+|------|-------|---------------------|
+| `test_discard_chosen_from_opponent_hand_by_cost` | Cost predicate lost | Check effect serializer |
+| `test_materialize_random_characters_from_deck` | Cost predicate lost | Check effect serializer |
+| `test_play_from_void_by_cost` | Cost predicate lost | Check static ability serializer |
+| `test_conditional_cost_if_discarded` | `"character"` → `"event"` | Check card type context |
+| `test_judgment_may_discard_to_draw_and_gain` | Parse structure broken | Check parser for "you may X to Y and Z" |
+| `test_choose_one_return_or_draw` | Mode costs not preserved | Check modal serializer |
+| `test_with_allied_subtype_play_from_hand_or_void` | Subtype not serialized | Check conditional play serializer |
+| `test_reveal_top_card_play_characters_from_top` | Plural lost | Check play permission serializer |
+| `test_require_return_ally_to_play` | `"ally"` → `"character"` | Check cost predicate serializer |
+| `test_conditional_cost_if_dissolved` | Variable `e` lost | Check conditional cost serializer |
 
 ---
 
@@ -480,16 +387,11 @@ Instead of changing `effect_serializer.rs` to output lowercase keywords, modify 
 
 | File | Purpose |
 |------|---------|
-| `effect_serializer.rs` | Serializes effects, compound effect joining |
-| `ability_serializer.rs` | Serializes abilities, calls capitalize_first_letter |
-| `serializer_utils.rs` | Contains capitalize_first_letter, operator serialization |
-| `predicate_serializer.rs` | Serializes predicates including {a-subtype} |
-| `trigger_serializer.rs` | Serializes triggers like Judgment, Materialized |
-| `cost_parser.rs` | Parses costs, contains "spend"/"pay" |
-| `parser_helpers.rs` | Contains directive() parser helper |
-| `test_helpers.rs` | Contains assert_round_trip functions |
-| `standard_effect.rs` | Contains BanishThenMaterialize and other effect variants |
-| `game_effects_parsers.rs` | Contains banish_then_materialize() and related parsers |
+| `effect_serializer.rs` | Effect joining, standard effect serialization |
+| `predicate_serializer.rs` | Predicate serialization, plural forms |
+| `cost_serializer.rs` | Cost serialization including discard, abandon |
+| `ability_serializer.rs` | Top-level ability serialization |
+| `serializer_utils.rs` | Helper functions |
 
 ---
 
@@ -497,7 +399,7 @@ Instead of changing `effect_serializer.rs` to output lowercase keywords, modify 
 
 ```bash
 # Run all round-trip tests (including ignored)
-cargo test --package parser_v2_tests --test round_trip_tests -- --ignored
+cargo test --package parser_v2_tests --test round_trip_tests -- --ignored --nocapture
 
 # Run specific test
 cargo test --package parser_v2_tests --test round_trip_tests test_name -- --ignored --nocapture
@@ -505,125 +407,15 @@ cargo test --package parser_v2_tests --test round_trip_tests test_name -- --igno
 # Run non-ignored tests only
 cargo test --package parser_v2_tests --test round_trip_tests
 
-# Run parser tests
-just parser-test
-
-# Format and validate
-just fmt
+# Full validation
 just review
-
-# Regenerate tabula after parser changes
-just tabula-generate
 ```
 
 ---
 
 ## Success Criteria
 
-1. All tests in `round_trip_tests/` pass without `#[ignore]` annotations
-2. `just review` passes
-3. No regression in existing passing tests
-
----
-
-## Remaining Issues Analysis (31 Tests)
-
-The following 31 tests remain ignored. They are categorized by the type of issue:
-
-### Category A: Variable Bindings Lost (6 tests)
-
-Tests where the serializer doesn't include all variables from the original input:
-
-| Test | Issue |
-|------|-------|
-| `test_choose_one_return_or_draw` | Mode costs `mode1-cost`, `mode2-cost` not preserved |
-| `test_conditional_cost_if_dissolved` | Variable `e` not in output |
-| `test_materialized_dissolve_with_abandon_cost` | Variable `e` not in output |
-| `test_with_allied_subtype_play_from_hand_or_void` | Variable `subtype` not in output |
-| `test_play_event_trigger_copy` | Variable `e` not in output |
-| `test_pay_energy_discard_kindle` | Variable `discards` serializes as "a card" |
-
-**Root cause:** Some patterns parse variables but serialize to constant forms.
-
-### Category B: Plural/Singular Mismatch (4 tests)
-
-| Test | Input | Output |
-|------|-------|--------|
-| `test_spark_equals_subtype_count` | `{plural-subtype}` | `{subtype}` |
-| `test_subtype_gains_spark_equal_count` | `{plural-subtype}` | `{subtype}` |
-| `test_reveal_top_card_play_characters_from_top` | `characters` | `character` |
-| `test_judgment_triggers_on_materialize` | `allies` | `ally` |
-
-**Root cause:** Serializer doesn't preserve plural forms.
-
-### Category C: Effect Joining Style (6 tests)
-
-Different joining patterns: `, then` vs `. ` vs ` and `:
-
-| Test | Input Uses | Output Uses |
-|------|------------|-------------|
-| `test_pay_variable_energy_draw_per_energy` | `, then discard` | `. Discard` |
-| `test_may_return_character_from_void_draw` | `. Draw` | `, then draw` |
-| `test_judgment_draw_then_discard` | `, then discard` | `. Discard` |
-| `test_materialized_discard_then_draw` | `, then draw` | `. Draw` |
-| `test_judgment_pay_to_kindle_and_banish_opponent_void` | `and {banish}` | `, then {banish}` |
-| `test_return_all_but_one_ally_draw_per_returned` | Structural issue |
-
-**Root cause:** Effect joining is context-dependent but serializer uses fixed rules.
-
-### Category D: Predicate Serialization Issues (8 tests)
-
-Issues with how predicates are serialized:
-
-| Test | Input | Output |
-|------|-------|--------|
-| `test_banish_non_subtype_enemy` | `non-{subtype}` | `is not {a-subtype}` |
-| `test_prevent_dissolve_event` | `a played event which could {dissolve} an ally` | `a played enemy event which could {dissolve} ally` |
-| `test_prevent_played_character` | `a played character` | `a played enemy` |
-| `test_materialized_prevent_played_card_by_cost` | `a played card` | `a played enemy` |
-| `test_require_return_ally_to_play` | `an ally` | `a character` |
-| `test_conditional_cost_if_discarded` | `This character` | `This event` |
-| `test_discard_chosen_from_opponent_hand_by_cost` | `cost {e} or less` | cost predicate lost |
-| `test_dissolve_by_energy_paid` | `each character` | `all characters` |
-
-**Root cause:** AST doesn't distinguish between semantically equivalent forms.
-
-### Category E: Cost/Count Expression Issues (4 tests)
-
-| Test | Input | Output |
-|------|-------|--------|
-| `test_materialize_random_characters_from_deck` | `cost {e} or less` | cost predicate lost |
-| `test_play_from_void_by_cost` | `a character with cost {e}` | `character` (no cost) |
-| `test_abandon_any_allies_draw_per_abandoned` | `any number of allies` | `{count-allies}` |
-| `test_materialized_card_gains_reclaim_for_cost` | `cost {e} or less` and `{reclaim-for-cost}` | different form |
-
-**Root cause:** Complex cost predicates not always preserved.
-
-### Category F: Temporal/Conditional Keywords (2 tests)
-
-| Test | Input | Output |
-|------|-------|--------|
-| `test_subtype_in_void_allies_have_spark` | `If this card is in` | `While this card is in` |
-| `test_judgment_may_discard_to_draw_and_gain_points` | Complex "You may" structure | Incorrectly restructured |
-
-**Root cause:** Parser collapses different temporal keywords to same AST.
-
-### Category G: Compound Ability Structure (1 test)
-
-| Test | Issue |
-|------|-------|
-| `test_prevent_dissolve_event` (static version) | Complex triggered prevention with "that card" reference |
-
-**Root cause:** Complex ability structure with cross-references.
-
----
-
-## Recommendations for Future Work
-
-1. **AST Enrichment:** Add variants to preserve original text forms (e.g., `Predicate::Generic` vs `Predicate::Your`)
-
-2. **Canonical Form Documentation:** Document which input forms are "canonical" and which are alternatives that serialize differently
-
-3. **Test Strategy:** Consider whether round-trip tests should test semantic equivalence (parse both and compare AST) rather than string equality
-
-4. **Priority:** The 193 passing tests cover the most common patterns. The 31 remaining represent edge cases or stylistic variations.
+1. All 31 ignored tests pass
+2. No regression in 193 passing tests
+3. `just review` passes
+4. cards.toml validates correctly
