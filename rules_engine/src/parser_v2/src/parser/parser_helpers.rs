@@ -98,6 +98,39 @@ pub fn subtype<'a>() -> impl Parser<'a, ParserInput<'a>, CardSubtype, ParserExtr
     }
 }
 
+/// Parses a subtype directive at sentence-start position.
+///
+/// Rejects `{a-subtype}` directive to enforce use of `{ASubtype}` at sentence
+/// start. This ensures round-trip consistency.
+pub fn sentence_start_subtype<'a>(
+) -> impl Parser<'a, ParserInput<'a>, CardSubtype, ParserExtra<'a>> + Clone {
+    select! {
+        (ResolvedToken::Subtype { directive, subtype }, _) if directive != "a-subtype" => subtype
+    }
+}
+
+/// Parses a subtype directive that includes an article.
+///
+/// Only accepts `{a-subtype}` directive, rejecting bare `{subtype}`. Use this
+/// after a literal article to reject patterns like `a {subtype}`.
+pub fn subtype_with_article<'a>(
+) -> impl Parser<'a, ParserInput<'a>, CardSubtype, ParserExtra<'a>> + Clone {
+    select! {
+        (ResolvedToken::Subtype { directive, subtype }, _) if directive == "a-subtype" => subtype
+    }
+}
+
+/// Parses a subtype directive excluding bare `{subtype}`.
+///
+/// Accepts `{a-subtype}`, `{ASubtype}`, `{plural-subtype}`, etc., but rejects
+/// bare `{subtype}`. Use this after a literal article.
+pub fn subtype_excluding_bare<'a>(
+) -> impl Parser<'a, ParserInput<'a>, CardSubtype, ParserExtra<'a>> + Clone {
+    select! {
+        (ResolvedToken::Subtype { directive, subtype }, _) if directive != "subtype" => subtype
+    }
+}
+
 pub fn figment<'a>() -> impl Parser<'a, ParserInput<'a>, FigmentType, ParserExtra<'a>> + Clone {
     select! {
         (ResolvedToken::Figment { figment_type, .. }, _) => figment_type

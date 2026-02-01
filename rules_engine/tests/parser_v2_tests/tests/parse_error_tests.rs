@@ -2,7 +2,7 @@ use chumsky::Parser;
 use parser_v2::error::parser_diagnostics;
 use parser_v2::error::parser_errors::ParserError;
 use parser_v2::lexer::lexer_tokenize;
-use parser_v2::parser::predicate_parser;
+use parser_v2::parser::{ability_parser, predicate_parser};
 use parser_v2::variables::parser_bindings::VariableBindings;
 use parser_v2::variables::parser_substitutions;
 
@@ -251,4 +251,53 @@ fn test_draw_then_discard_missing_variable_suggests_fix() {
 
     assert!(formatted.contains("cards"));
     assert!(formatted.contains("not found"));
+}
+
+#[test]
+fn test_reject_spend_keyword_in_cost() {
+    // "Spend 1 or more..." should be rejected; must use "Pay 1 or more..."
+    let input = "Spend 1 or more {energy-symbol}: Draw {cards}.";
+    let lex_result = lexer_tokenize::lex(input).unwrap();
+    let bindings = VariableBindings::parse("e: 1, cards: 2").unwrap();
+    let resolved = parser_substitutions::resolve_variables(&lex_result.tokens, &bindings).unwrap();
+
+    let parser = ability_parser::ability_parser();
+    let result = parser.parse(&resolved).into_result();
+
+    assert!(result.is_err(), "Parser should reject 'Spend' keyword, requiring 'Pay' instead");
+}
+
+#[test]
+fn test_reject_literal_a_before_subtype_directive() {
+    // "a {subtype}" should be rejected; must use "{a-subtype}"
+    let input = "Discard a {subtype}.";
+    let lex_result = lexer_tokenize::lex(input).unwrap();
+    let bindings = VariableBindings::parse("subtype: warrior").unwrap();
+    let resolved = parser_substitutions::resolve_variables(&lex_result.tokens, &bindings).unwrap();
+
+    let parser = ability_parser::ability_parser();
+    let result = parser.parse(&resolved).into_result();
+
+    assert!(
+        result.is_err(),
+        "Parser should reject literal 'a' before {{subtype}}, requiring {{a-subtype}} instead"
+    );
+}
+
+#[test]
+fn test_reject_a_subtype_in_dissolved_subject_position() {
+    // "{a-subtype}" in subject position after {Dissolved} should be rejected;
+    // must use "{ASubtype}"
+    let input = "{Dissolved} {a-subtype} in your void gains {reclaim} equal to its cost.";
+    let lex_result = lexer_tokenize::lex(input).unwrap();
+    let bindings = VariableBindings::parse("subtype: warrior").unwrap();
+    let resolved = parser_substitutions::resolve_variables(&lex_result.tokens, &bindings).unwrap();
+
+    let parser = ability_parser::ability_parser();
+    let result = parser.parse(&resolved).into_result();
+
+    assert!(
+        result.is_err(),
+        "Parser should reject {{a-subtype}} in dissolved subject position, requiring {{ASubtype}}"
+    );
 }
