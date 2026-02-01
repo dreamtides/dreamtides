@@ -371,10 +371,10 @@ fn test_dissolved_a_subtype_in_void_gains_reclaim() {
       trigger: Keywords([
         Dissolved,
       ]),
-      effect: Effect(CardsInVoidGainReclaimThisTurn(
+      effect: Effect(CardsInVoidGainReclaim(
         count: Exactly(1),
         predicate: CharacterType(Warrior),
-        until_end_of_turn: false,
+        this_turn: false,
       )),
     ))
     "###);
@@ -391,10 +391,10 @@ fn test_dissolved_capitalized_subtype_directive_in_void_gains_reclaim() {
       trigger: Keywords([
         Dissolved,
       ]),
-      effect: Effect(CardsInVoidGainReclaimThisTurn(
+      effect: Effect(CardsInVoidGainReclaim(
         count: Exactly(1),
         predicate: CharacterType(Survivor),
-        until_end_of_turn: false,
+        this_turn: false,
       )),
     ))
     "###);

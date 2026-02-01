@@ -951,10 +951,10 @@ fn test_materialized_event_in_void_gains_reclaim() {
       trigger: Keywords([
         Materialized,
       ]),
-      effect: Effect(CardsInVoidGainReclaimThisTurn(
+      effect: Effect(CardsInVoidGainReclaim(
         count: Exactly(1),
         predicate: Event,
-        until_end_of_turn: true,
+        this_turn: true,
       )),
     ))
     "###);
