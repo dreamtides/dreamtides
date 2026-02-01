@@ -49,7 +49,6 @@ fn test_materialized_prevent_played_card_by_cost() {
     assert_round_trip("{Materialized} {Prevent} a played card with cost {e} or less.", "e: 2");
 }
 
-#[ignore = "Round-trip mismatch"]
 #[test]
 fn test_materialized_gain_control_by_cost() {
     assert_round_trip("{Materialized} Gain control of an enemy with cost {e} or less.", "e: 2");
@@ -91,7 +90,6 @@ fn test_materialized_discover_fast_event() {
     assert_round_trip("{Materialized} {Discover} a {fast} event.", "");
 }
 
-#[ignore = "Round-trip mismatch"]
 #[test]
 fn test_materialized_copy_event_multiple_times() {
     assert_round_trip(

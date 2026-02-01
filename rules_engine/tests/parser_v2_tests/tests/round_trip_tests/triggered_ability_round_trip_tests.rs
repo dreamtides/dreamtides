@@ -18,7 +18,6 @@ fn test_discard_self_trigger_materialize() {
     assert_round_trip("When you discard this character, {materialize} it.", "");
 }
 
-#[ignore = "Round-trip mismatch"]
 #[test]
 fn test_discard_trigger_gain_reclaim_equal_cost() {
     assert_round_trip(
@@ -54,7 +53,6 @@ fn test_materialize_character_by_cost_trigger_draw() {
     );
 }
 
-#[ignore = "Round-trip mismatch"]
 #[test]
 fn test_materialize_character_trigger_gain_energy() {
     assert_round_trip("Once per turn, when you {materialize} a character, gain {e}.", "e: 1");
@@ -155,7 +153,6 @@ fn test_ally_banished_trigger_gain_spark() {
     assert_round_trip("When an ally is {banished}, this character gains +{s} spark.", "s: 1");
 }
 
-#[ignore = "Round-trip mismatch"]
 #[test]
 fn test_ally_banished_trigger_kindle() {
     assert_round_trip("When an ally is {banished}, {kindle}.", "k: 1");
@@ -190,7 +187,6 @@ fn test_abandon_ally_trigger_gain_spark() {
     assert_round_trip("When you abandon an ally, this character gains +{s} spark.", "s: 1");
 }
 
-#[ignore = "Round-trip mismatch"]
 #[test]
 fn test_abandon_allies_count_trigger_dissolve() {
     assert_round_trip(
@@ -199,19 +195,16 @@ fn test_abandon_allies_count_trigger_dissolve() {
     );
 }
 
-#[ignore = "Round-trip mismatch"]
 #[test]
 fn test_abandon_character_trigger_gain_points() {
     assert_round_trip("When you abandon a character, gain {points}.", "points: 1");
 }
 
-#[ignore = "Round-trip mismatch"]
 #[test]
 fn test_abandon_ally_trigger_kindle() {
     assert_round_trip("When you abandon an ally, {kindle}.", "k: 2");
 }
 
-#[ignore = "Round-trip mismatch"]
 #[test]
 fn test_abandon_character_trigger_draw() {
     assert_round_trip("When you abandon a character, draw {cards}.", "cards: 1");
@@ -225,13 +218,11 @@ fn test_event_to_void_trigger_gain_spark() {
     );
 }
 
-#[ignore = "Round-trip mismatch"]
 #[test]
 fn test_play_event_trigger_gain_energy() {
     assert_round_trip("When you play an event, gain {e}.", "e: 1");
 }
 
-#[ignore = "Round-trip mismatch"]
 #[test]
 fn test_play_event_trigger_foresee() {
     assert_round_trip("When you play an event, {foresee}.", "foresee: 1");
@@ -244,13 +235,11 @@ fn test_play_event_trigger_copy() {
     assert_round_trip("When you play an event from your hand, copy it.", "e: 2");
 }
 
-#[ignore = "Round-trip mismatch"]
 #[test]
 fn test_until_end_of_turn_play_event_trigger_copy() {
     assert_round_trip("Until end of turn, when you play an event, copy it.", "");
 }
 
-#[ignore = "Round-trip mismatch"]
 #[test]
 fn test_materialize_character_trigger_judgment() {
     assert_round_trip(
@@ -259,7 +248,6 @@ fn test_materialize_character_trigger_judgment() {
     );
 }
 
-#[ignore = "Round-trip mismatch"]
 #[test]
 fn test_until_end_of_turn_play_character_trigger_draw() {
     assert_round_trip("Until end of turn, when you play a character, draw {cards}.", "cards: 1");
@@ -280,7 +268,6 @@ fn test_draw_count_in_void_trigger_reclaim() {
     assert_round_trip("When you draw {cards-numeral} in a turn, if this card is in your void, it gains {reclaim-for-cost} this turn.", "cards: 2\nreclaim: 1");
 }
 
-#[ignore = "Round-trip mismatch"]
 #[test]
 fn test_play_character_trigger_materialize_figment() {
     assert_round_trip("When you play a character, {materialize} {a-figment}.", "figment: halcyon");
@@ -291,7 +278,6 @@ fn test_materialize_ally_trigger_gain_energy() {
     assert_round_trip("When you {materialize} an ally, gain {e}.", "e: 1");
 }
 
-#[ignore = "Round-trip mismatch"]
 #[test]
 fn test_play_card_opponent_turn_trigger_gain_spark() {
     assert_round_trip(

@@ -982,30 +982,12 @@ pub fn serialize_effect(effect: &Effect, bindings: &mut VariableBindings) -> Str
                 let effect_strings: Vec<String> = effects
                     .iter()
                     .map(|e| {
-                        serialize_standard_effect(&e.effect, bindings)
-                            .trim_end_matches('.')
-                            .to_string()
+                        let s = serialize_standard_effect(&e.effect, bindings);
+                        let s = s.trim_end_matches('.');
+                        format!("{}.", serializer_utils::capitalize_first_letter(s))
                     })
                     .collect();
-                let effect_str = if effect_strings.len() == 2 {
-                    format!(
-                        "{} and {}.",
-                        serializer_utils::capitalize_first_letter(&effect_strings[0]),
-                        effect_strings[1]
-                    )
-                } else if effect_strings.len() > 2 {
-                    let first = serializer_utils::capitalize_first_letter(&effect_strings[0]);
-                    let middle = &effect_strings[1..effect_strings.len() - 1];
-                    let last = effect_strings.last().unwrap();
-                    format!("{}, {}, and {}.", first, middle.join(", "), last)
-                } else {
-                    effect_strings
-                        .into_iter()
-                        .map(|s| serializer_utils::capitalize_first_letter(&s))
-                        .collect::<Vec<_>>()
-                        .join(" ")
-                };
-                result.push_str(&effect_str);
+                result.push_str(&effect_strings.join(" "));
                 result
             }
         }

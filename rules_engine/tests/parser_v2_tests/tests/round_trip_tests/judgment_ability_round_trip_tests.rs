@@ -27,7 +27,6 @@ fn test_judgment_gain_energy() {
     assert_round_trip("{Judgment} Gain {e}.", "e: 1");
 }
 
-#[ignore = "Round-trip mismatch"]
 #[test]
 fn test_judgment_banish_from_void_to_dissolve() {
     assert_round_trip("{Judgment} You may {banish} {cards} from your void to {dissolve} an enemy with cost {e} or less.", "cards: 3\ne: 2");
@@ -39,7 +38,6 @@ fn test_judgment_draw_then_discard() {
     assert_round_trip("{Judgment} Draw {cards}, then discard {discards}.", "cards: 1\ndiscards: 1");
 }
 
-#[ignore = "Round-trip mismatch"]
 #[test]
 fn test_judgment_draw_opponent_gains_points() {
     assert_round_trip(

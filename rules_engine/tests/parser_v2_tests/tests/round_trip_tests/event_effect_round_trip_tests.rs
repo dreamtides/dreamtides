@@ -54,13 +54,11 @@ fn test_dissolve_all_characters() {
     assert_round_trip("{Dissolve} all characters.", "");
 }
 
-#[ignore = "Round-trip mismatch"]
 #[test]
 fn test_dissolve_enemy_lose_points() {
     assert_round_trip("{Dissolve} an enemy. You lose {points}.", "points: 4");
 }
 
-#[ignore = "Round-trip mismatch"]
 #[test]
 fn test_dissolve_enemy_opponent_gains_points() {
     assert_round_trip("{Dissolve} an enemy. The opponent gains {points}.", "points: 3");
@@ -161,7 +159,6 @@ fn test_prevent_played_card() {
     assert_round_trip("{Prevent} a played card.", "");
 }
 
-#[ignore = "Round-trip mismatch"]
 #[test]
 fn test_prevent_played_event_unless_pay() {
     assert_round_trip("{Prevent} a played event unless the opponent pays {e}.", "e: 2");
@@ -185,7 +182,6 @@ fn test_prevent_played_character() {
     assert_round_trip("{Prevent} a played character.", "");
 }
 
-#[ignore = "Round-trip mismatch"]
 #[test]
 fn test_prevent_played_card_put_on_deck() {
     assert_round_trip("{Prevent} a played card. Put it on top of the opponent's deck.", "");
@@ -212,13 +208,11 @@ fn test_draw_discard_with_reclaim() {
     assert_round_trip("{ReclaimForCost}", "cards: 2\ndiscards: 2\nreclaim :2");
 }
 
-#[ignore = "Round-trip mismatch"]
 #[test]
 fn test_draw_discard() {
     assert_round_trip("Draw {cards}. Discard {discards}.", "cards: 3\ndiscards: 2");
 }
 
-#[ignore = "Round-trip mismatch"]
 #[test]
 fn test_discard_draw() {
     assert_round_trip("Discard {discards}. Draw {cards}.", "discards: 1\ncards: 2");
@@ -238,7 +232,6 @@ fn test_discard_chosen_character_from_opponent_hand() {
     assert_round_trip("Discard a chosen character from the opponent's hand.", "");
 }
 
-#[ignore = "Round-trip mismatch"]
 #[test]
 fn test_return_character_to_hand_draw() {
     assert_round_trip("Return an enemy or ally to hand. Draw {cards}.", "cards: 1");
@@ -263,7 +256,6 @@ fn test_return_events_from_void() {
     assert_round_trip("Return {up-to-n-events} from your void to your hand.", "number: 2");
 }
 
-#[ignore = "Round-trip mismatch"]
 #[test]
 fn test_put_top_cards_to_void_draw() {
     assert_round_trip(
@@ -319,13 +311,11 @@ fn test_multiply_draw() {
     );
 }
 
-#[ignore = "Round-trip mismatch"]
 #[test]
 fn test_gain_energy_draw() {
     assert_round_trip("Gain {e}. Draw {cards}.", "e: 2\ncards: 1");
 }
 
-#[ignore = "Round-trip mismatch"]
 #[test]
 fn test_draw_discard_gain_energy() {
     assert_round_trip("Draw {cards}. Discard {discards}. Gain {e}.", "cards: 2\ndiscards: 2\ne: 2");
