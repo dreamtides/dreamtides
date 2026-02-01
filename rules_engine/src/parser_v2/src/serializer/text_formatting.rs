@@ -13,7 +13,9 @@ pub fn card_predicate_base_text(predicate: &CardPredicate) -> FormattedText {
         CardPredicate::Card => FormattedText::new("card"),
         CardPredicate::Character => FormattedText::new("character"),
         CardPredicate::Event => FormattedText::new("event"),
-        CardPredicate::CharacterType(_) => FormattedText::new("{subtype}"),
+        CardPredicate::CharacterType(_) => {
+            FormattedText::with_plural("{subtype}", "{plural-subtype}")
+        }
         CardPredicate::NotCharacterType(_) => {
             FormattedText::new("character that is not {a-subtype}")
         }

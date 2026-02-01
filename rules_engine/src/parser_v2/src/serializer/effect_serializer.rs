@@ -245,7 +245,7 @@ pub fn serialize_standard_effect(
             format!(
                 "each {} gains spark equal to the number of {}.",
                 serialize_allied_card_predicate(each, bindings),
-                serialize_allied_card_predicate(for_each, bindings)
+                serialize_allied_card_predicate_plural(for_each, bindings)
             )
         }
         StandardEffect::GainsSparkForQuantity { target, gains, for_quantity } => {
@@ -1188,6 +1188,22 @@ fn serialize_allied_card_predicate(
                 "allied {}",
                 text_formatting::card_predicate_base_text(card_predicate).without_article()
             )
+        }
+    }
+}
+
+/// Serialize an allied card predicate in plural form for counting contexts.
+fn serialize_allied_card_predicate_plural(
+    card_predicate: &CardPredicate,
+    bindings: &mut VariableBindings,
+) -> String {
+    match card_predicate {
+        CardPredicate::CharacterType(subtype) => {
+            bindings.insert("subtype".to_string(), VariableValue::Subtype(*subtype));
+            "allied {plural-subtype}".to_string()
+        }
+        _ => {
+            format!("allied {}", text_formatting::card_predicate_base_text(card_predicate).plural())
         }
     }
 }

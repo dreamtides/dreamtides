@@ -243,7 +243,6 @@ fn test_until_end_of_turn_play_character_trigger_draw() {
     assert_round_trip("Until end of turn, when you play a character, draw {cards}.", "cards: 1");
 }
 
-#[ignore = "Round-trip mismatch"]
 #[test]
 fn test_judgment_triggers_on_materialize() {
     assert_round_trip(

@@ -165,19 +165,19 @@ pub fn serialize_standard_static_ability(
         StandardStaticAbility::YouMayPlayFromTopOfDeck { matching } => {
             format!(
                 "you may play {} from the top of your deck.",
-                text_formatting::card_predicate_base_text(matching).without_article()
+                text_formatting::card_predicate_base_text(matching).plural()
             )
         }
         StandardStaticAbility::JudgmentTriggersWhenMaterialized { predicate } => {
             format!(
                 "the '{{Judgment}}' ability of {} triggers when you {{materialize}} them.",
-                predicate_serializer::predicate_base_text(predicate, bindings)
+                predicate_serializer::serialize_predicate_plural(predicate, bindings)
             )
         }
         StandardStaticAbility::SparkEqualToPredicateCount { predicate } => {
             format!(
                 "this character's spark is equal to the number of {}.",
-                predicate_serializer::predicate_base_text(predicate, bindings)
+                predicate_serializer::serialize_predicate_plural(predicate, bindings)
             )
         }
         StandardStaticAbility::PlayOnlyFromVoid => {

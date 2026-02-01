@@ -235,7 +235,6 @@ fn test_dissolved_subtype_gains_reclaim() {
     );
 }
 
-#[ignore = "Round-trip mismatch"]
 #[test]
 fn test_reveal_top_card_play_characters_from_top() {
     assert_round_trip("Reveal the top card of your deck.", "");

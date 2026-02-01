@@ -44,7 +44,6 @@ fn test_opponent_events_cost_more() {
     assert_round_trip("The opponent's events cost {e} more.", "e: 1");
 }
 
-#[ignore = "Round-trip mismatch"]
 #[test]
 fn test_spark_equals_subtype_count() {
     assert_round_trip(
@@ -136,7 +135,6 @@ fn test_events_cost_more_with_copy() {
     assert_round_trip("Events cost you {e} more.", "e: 2");
 }
 
-#[ignore = "Round-trip mismatch"]
 #[test]
 fn test_subtype_gains_spark_equal_count() {
     assert_round_trip(
