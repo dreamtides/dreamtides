@@ -31,13 +31,17 @@ pub fn capitalize_first_letter(s: &str) -> String {
 }
 
 /// Serializes an operator to its string representation.
+///
+/// Returns a string with a leading space for non-empty operators. This allows
+/// format strings like `"cost {e}{}"` to work correctly for all operators,
+/// producing `"cost {e}"` for Exactly and `"cost {e} or less"` for OrLess.
 pub fn serialize_operator<T>(operator: &Operator<T>) -> String {
     match operator {
-        Operator::OrLess => "or less".to_string(),
-        Operator::OrMore => "or more".to_string(),
-        Operator::Exactly => "exactly".to_string(),
-        Operator::LowerBy(_) => "lower".to_string(),
-        Operator::HigherBy(_) => "higher".to_string(),
+        Operator::OrLess => " or less".to_string(),
+        Operator::OrMore => " or more".to_string(),
+        Operator::Exactly => String::new(),
+        Operator::LowerBy(_) => " lower".to_string(),
+        Operator::HigherBy(_) => " higher".to_string(),
     }
 }
 

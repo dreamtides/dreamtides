@@ -12,7 +12,6 @@ use parser_v2_tests::test_helpers::*;
 // Discover effects
 // ============================================================================
 
-#[ignore = "Round-trip mismatch"]
 #[test]
 fn test_discover_card_by_cost() {
     assert_round_trip("{Discover} a card with cost {e}.", "e: 2");
@@ -82,7 +81,6 @@ fn test_dissolve_enemy_by_spark_or_more() {
     assert_round_trip("{Dissolve} an enemy with spark {s} or more.", "s: 3");
 }
 
-#[ignore = "Round-trip mismatch"]
 #[test]
 fn test_dissolve_enemy_by_cost_or_less() {
     assert_round_trip("{Dissolve} an enemy with cost {e} or less.", "e: 2");
@@ -134,7 +132,6 @@ fn test_dissolve_enemy_with_reclaim_cost() {
 // Banish effects
 // ============================================================================
 
-#[ignore = "Round-trip mismatch"]
 #[test]
 fn test_banish_enemy_by_cost() {
     assert_round_trip("{Banish} an enemy with cost {e} or less.", "e: 2");

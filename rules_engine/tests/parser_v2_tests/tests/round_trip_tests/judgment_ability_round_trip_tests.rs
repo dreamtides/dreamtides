@@ -182,7 +182,6 @@ fn test_judgment_draw_one() {
     assert_round_trip("{Judgment} Draw {cards}.", "e: 3\ncards: 1");
 }
 
-#[ignore = "Round-trip mismatch"]
 #[test]
 fn test_judgment_may_abandon_subtype_to_discover_and_materialize() {
     assert_round_trip("{Judgment} You may abandon {a-subtype} to {discover} {a-subtype} with cost {e} higher and {materialize} it.", "subtype: warrior\ne: 1");
