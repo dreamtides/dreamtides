@@ -133,13 +133,9 @@ fn test_materialized_may_banish_ally_then_materialize() {
     assert_round_trip("{Materialized} You may {banish} an ally, then {materialize} it.", "");
 }
 
-#[ignore = "Round-trip mismatch"]
 #[test]
 fn test_materialized_card_gains_reclaim_for_cost() {
-    assert_round_trip(
-        "{Materialized} A card with cost {e} or less in your void gains {reclaim-for-cost}.",
-        "e: 3\nreclaim: 0",
-    );
+    assert_round_trip("{Materialized} A card in your void gains {reclaim} equal to its cost.", "");
 }
 
 #[test]

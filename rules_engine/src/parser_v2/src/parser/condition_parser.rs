@@ -69,7 +69,8 @@ fn discarded_this_turn<'a>() -> impl Parser<'a, ParserInput<'a>, Condition, Pars
 
 fn this_card_is_in_your_void<'a>(
 ) -> impl Parser<'a, ParserInput<'a>, Condition, ParserExtra<'a>> + Clone {
-    words(&["if", "this", "card", "is", "in", "your", "void"])
+    choice((word("if"), word("while")))
+        .ignore_then(words(&["this", "card", "is", "in", "your", "void"]))
         .then_ignore(comma())
         .to(Condition::ThisCardIsInYourVoid)
 }

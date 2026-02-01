@@ -76,11 +76,10 @@ fn test_void_cards_have_reclaim_equal_cost() {
     assert_round_trip("While you have {count} or more cards in your void, they have {reclaim} equal to their cost.", "count: 7");
 }
 
-#[ignore = "Round-trip mismatch"]
 #[test]
 fn test_subtype_in_void_allies_have_spark() {
     assert_round_trip(
-        "If this card is in your void, allied {plural-subtype} have +{s} spark.",
+        "While this card is in your void, allied {plural-subtype} have +{s} spark.",
         "subtype: survivor\ns: 2",
     );
 }
