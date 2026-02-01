@@ -1149,10 +1149,13 @@ fn serialize_cards_in_void_gain_reclaim_this_turn(
 ) -> String {
     match count {
         CollectionExpression::Exactly(1) => {
-            format!(
-                "{} in your void gains {{reclaim}} equal to its cost.",
+            let predicate_text = if let CardPredicate::CharacterType(subtype) = predicate {
+                bindings.insert("subtype".to_string(), VariableValue::Subtype(*subtype));
+                "{ASubtype}".to_string()
+            } else {
                 text_formatting::card_predicate_base_text(predicate).capitalized_with_article()
-            )
+            };
+            format!("{} in your void gains {{reclaim}} equal to its cost.", predicate_text)
         }
         CollectionExpression::Exactly(n) => {
             format!(

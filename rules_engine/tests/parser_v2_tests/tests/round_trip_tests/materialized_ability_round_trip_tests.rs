@@ -231,7 +231,6 @@ fn test_dissolved_may_pay_return_to_hand() {
     assert_round_trip("{Dissolved} You may pay {e} to return this character to your hand.", "e: 1");
 }
 
-#[ignore = "Round-trip mismatch"]
 #[test]
 fn test_dissolved_subtype_gains_reclaim() {
     assert_round_trip(
