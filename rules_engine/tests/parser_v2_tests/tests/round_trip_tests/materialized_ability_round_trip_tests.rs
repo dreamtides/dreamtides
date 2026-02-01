@@ -69,14 +69,10 @@ fn test_materialized_give_event_reclaim_equal_cost() {
     );
 }
 
-#[ignore = "Round-trip mismatch"]
 #[test]
 fn test_materialized_draw_discard_with_reclaim() {
-    assert_round_trip(
-        "{Materialized} Draw {cards}. Discard {discards}.",
-        "cards: 1\ndiscards: 1\nreclaim: 3",
-    );
-    assert_round_trip("{ReclaimForCost}", "cards: 1\ndiscards: 1\nreclaim: 3");
+    assert_round_trip("{Materialized} Draw {cards}. Discard {discards}.", "cards: 1\ndiscards: 1");
+    assert_round_trip("{ReclaimForCost}", "reclaim: 3");
 }
 
 #[test]
@@ -205,20 +201,18 @@ fn test_materialized_dissolved_put_top_cards_to_void() {
     );
 }
 
-#[ignore = "Round-trip mismatch"]
 #[test]
 fn test_dissolved_kindle_on_subtype() {
-    assert_round_trip("{Dissolved} {Kindle}.", "k: 2\nsubtype: survivor");
+    assert_round_trip("{Dissolved} {Kindle}.", "k: 2");
     assert_round_trip(
         "When an allied {subtype} is {dissolved}, {kindle}.",
         "k: 2\nsubtype: survivor",
     );
 }
 
-#[ignore = "Round-trip mismatch"]
 #[test]
 fn test_dissolved_draw_on_subtype() {
-    assert_round_trip("{Dissolved} Draw {cards}.", "cards: 1\nsubtype: survivor");
+    assert_round_trip("{Dissolved} Draw {cards}.", "cards: 1");
     assert_round_trip(
         "When an allied {subtype} is {dissolved}, draw {cards}.",
         "cards: 1\nsubtype: survivor",

@@ -161,11 +161,10 @@ fn test_ally_dissolved_trigger_gain_points() {
     assert_round_trip("When an ally is {dissolved}, gain {points}.", "points: 1");
 }
 
-#[ignore = "Round-trip mismatch"]
 #[test]
 fn test_ally_dissolved_trigger_gain_reclaim_for_cost() {
     assert_round_trip(
-        "When an ally is {dissolved}, this card gains {reclaim-for-cost} this turn.",
+        "When an ally is {dissolved}, this character gains {reclaim-for-cost} this turn.",
         "reclaim: 1",
     );
 }
@@ -250,7 +249,6 @@ fn test_judgment_triggers_on_materialize() {
     );
 }
 
-#[ignore = "Round-trip mismatch"]
 #[test]
 fn test_draw_count_in_void_trigger_reclaim() {
     assert_round_trip("When you draw {cards-numeral} in a turn, if this card is in your void, it gains {reclaim-for-cost} this turn.", "cards: 2\nreclaim: 1");

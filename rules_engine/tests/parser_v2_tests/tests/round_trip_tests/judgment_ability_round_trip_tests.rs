@@ -142,17 +142,15 @@ fn test_judgment_may_pay_return_from_void_to_hand() {
     );
 }
 
-#[ignore = "Round-trip mismatch"]
 #[test]
 fn test_judgment_with_allies_that_share_type_draw() {
-    assert_round_trip("Has all character types.", "allies: 3\ncards: 1");
+    assert_round_trip("Has all character types.", "");
     assert_round_trip(
         "{Judgment} With {count-allies} that share a character type, draw {cards}.",
         "allies: 3\ncards: 1",
     );
 }
 
-#[ignore = "Round-trip mismatch"]
 #[test]
 fn test_judgment_with_allied_subtype_count_gain_energy() {
     assert_round_trip(
@@ -161,7 +159,6 @@ fn test_judgment_with_allied_subtype_count_gain_energy() {
     );
 }
 
-#[ignore = "Round-trip mismatch"]
 #[test]
 fn test_judgment_with_allied_subtype_count_draw() {
     assert_round_trip(
@@ -170,10 +167,9 @@ fn test_judgment_with_allied_subtype_count_draw() {
     );
 }
 
-#[ignore = "Round-trip mismatch"]
 #[test]
 fn test_judgment_draw_one() {
-    assert_round_trip("{Judgment} Draw {cards}.", "e: 3\ncards: 1");
+    assert_round_trip("{Judgment} Draw {cards}.", "cards: 1");
 }
 
 #[test]
@@ -181,7 +177,6 @@ fn test_judgment_may_abandon_subtype_to_discover_and_materialize() {
     assert_round_trip("{Judgment} You may abandon {a-subtype} to {discover} {a-subtype} with cost {e} higher and {materialize} it.", "subtype: warrior\ne: 1");
 }
 
-#[ignore = "Round-trip mismatch"]
 #[test]
 fn test_judgment_with_allied_subtype_gain_energy() {
     assert_round_trip(

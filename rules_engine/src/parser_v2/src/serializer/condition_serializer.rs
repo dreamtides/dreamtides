@@ -40,11 +40,11 @@ pub fn serialize_condition(condition: &Condition, bindings: &mut VariableBinding
         Condition::PredicateCount { count: 1, .. } => "with an allied {subtype},".to_string(),
         Condition::PredicateCount { count, predicate } => {
             format!(
-                "with {count} {predicate},",
+                "with {predicate},",
                 predicate = serialize_predicate_count(*count, predicate, bindings)
             )
         }
-        Condition::ThisCardIsInYourVoid => "if this card is in your void, ".to_string(),
+        Condition::ThisCardIsInYourVoid => "if this card is in your void,".to_string(),
     }
 }
 
@@ -54,12 +54,9 @@ fn serialize_predicate_count(
     bindings: &mut VariableBindings,
 ) -> String {
     match predicate {
-        Predicate::Another(CardPredicate::CharacterType(_)) => {
-            if let Some(var_name) =
-                parser_substitutions::directive_to_integer_variable("count-allied-subtype")
-            {
-                bindings.insert(var_name.to_string(), VariableValue::Integer(count));
-            }
+        Predicate::Another(CardPredicate::CharacterType(subtype)) => {
+            bindings.insert("allies".to_string(), VariableValue::Integer(count));
+            bindings.insert("subtype".to_string(), VariableValue::Subtype(*subtype));
             "{count-allied-subtype}".to_string()
         }
         Predicate::Another(CardPredicate::Character) => {

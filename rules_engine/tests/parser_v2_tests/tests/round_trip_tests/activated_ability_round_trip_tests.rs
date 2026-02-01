@@ -5,7 +5,6 @@
 
 use parser_v2_tests::test_helpers::*;
 
-#[ignore = "Round-trip mismatch"]
 #[test]
 fn test_abandon_allies_count_reclaim_self() {
     assert_round_trip("Abandon {count-allies}: {Reclaim} this character.", "allies: 2");
@@ -24,7 +23,6 @@ fn test_pay_energy_banish_card_reclaim_self() {
     assert_round_trip("{e}, {Banish} another card in your void: {Reclaim} this character.", "e: 2");
 }
 
-#[ignore = "Round-trip mismatch"]
 #[test]
 fn test_pay_energy_abandon_ally_by_spark_draw() {
     assert_round_trip(
@@ -137,25 +135,22 @@ fn test_abandon_or_discard_dissolve_enemy() {
     assert_round_trip("Abandon an ally or discard a card: {Dissolve} an enemy.", "");
 }
 
-#[ignore = "Round-trip mismatch"]
 #[test]
 fn test_banish_from_hand_play_for_zero_prevent() {
     assert_round_trip("{Banish} a card from hand: Play this event for {e}.", "e: 0");
-    assert_round_trip("{Prevent} a played card.", "e: 0");
+    assert_round_trip("{Prevent} a played card.", "");
 }
 
-#[ignore = "Round-trip mismatch"]
 #[test]
 fn test_lose_max_energy_play_for_zero_prevent() {
     assert_round_trip("Lose {maximum-energy}: Play this event for {e}.", "max: 1\ne: 0");
-    assert_round_trip("{Prevent} a played card.", "max: 1\ne: 0");
+    assert_round_trip("{Prevent} a played card.", "");
 }
 
-#[ignore = "Round-trip mismatch"]
 #[test]
 fn test_banish_from_hand_play_for_zero_dissolve() {
     assert_round_trip("{Banish} a card from hand: Play this event for {e}.", "e: 0");
-    assert_round_trip("{Dissolve} an enemy.", "e: 0");
+    assert_round_trip("{Dissolve} an enemy.", "");
 }
 
 #[test]

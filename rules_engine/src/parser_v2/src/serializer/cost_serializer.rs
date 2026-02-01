@@ -12,6 +12,14 @@ pub fn serialize_cost(cost: &Cost, bindings: &mut VariableBindings) -> String {
             CollectionExpression::Exactly(1) => {
                 format!("abandon {}", predicate_serializer::serialize_predicate(target, bindings))
             }
+            CollectionExpression::Exactly(n) => {
+                if let Some(var_name) =
+                    parser_substitutions::directive_to_integer_variable("count-allies")
+                {
+                    bindings.insert(var_name.to_string(), VariableValue::Integer(*n));
+                }
+                "abandon {count-allies}".to_string()
+            }
             _ => "abandon {count-allies}".to_string(),
         },
         Cost::DiscardCards { target, count } => {
