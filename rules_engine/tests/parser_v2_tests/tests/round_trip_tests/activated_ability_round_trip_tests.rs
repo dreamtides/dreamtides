@@ -161,7 +161,6 @@ fn test_banish_from_hand_play_for_zero_dissolve() {
     assert_round_trip("{Dissolve} an enemy.", "e: 0");
 }
 
-#[ignore = "Round-trip mismatch"]
 #[test]
 fn test_fast_abandon_self_prevent_event() {
     assert_round_trip("{Fast} -- Abandon this character: {Prevent} a played event.", "");

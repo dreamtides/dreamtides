@@ -135,7 +135,6 @@ fn test_characters_in_hand_have_fast() {
     assert_round_trip("Characters in your hand have {fast}.", "e: 1");
 }
 
-#[ignore = "Round-trip mismatch"]
 #[test]
 fn test_events_cost_more_with_copy() {
     // Note: This is tested in combination with a triggered ability
