@@ -8,10 +8,45 @@ This document outlines a comprehensive plan to fix all round-trip test failures 
 
 There are approximately **116 failing tests** in the round-trip test suite (in `round_trip_tests/`).
 
-An existing planning document exists at `rules_engine/src/parser_v2/docs/remove_assert_round_trip_with_expected.md` tracking 18 specific test failures. Several fixes from that document have been implemented:
-- **Fix 1** (DONE): Don't capitalize keywords after "you may" or trigger costs
-- **Fix 2** (DONE): Join compound effects with "and" instead of `. `
-- **Fix 3** (DONE): Parse "banish X, then materialize Y" as single `BanishThenMaterialize` effect
+---
+
+## Completed Fixes
+
+### Fix 1: Don't Capitalize After "You may" or Trigger Costs (DONE)
+
+**Problem**: Serializer was capitalizing effects after keyword triggers unconditionally. Should NOT capitalize when effect follows:
+- "You may"
+- A trigger cost like "pay {e} to" or "discard a card to"
+
+**Solution implemented**: Added `lowercase_leading_keyword()` helper function to `serializer_utils.rs` that lowercases the first `{Keyword}` in a string. Modified `effect_serializer.rs` to use this function in the `Effect::WithOptions` and `Effect::List` branches when `optional=true` or `trigger_cost=Some`.
+
+**Files modified**:
+- `serializer_utils.rs` - Added `lowercase_leading_keyword()` function
+- `effect_serializer.rs` - Applied lowercase in WithOptions and List branches
+
+### Fix 2: Compound Effect Joining with "and" (DONE)
+
+**Problem**: Effects from the same trigger were joined with `. ` and capitalized. Should use "and".
+
+**Solution implemented**: Modified the `else` branch in `Effect::List` serialization (in `effect_serializer.rs`) to join effects with " and " instead of ". ". Only the first effect is capitalized; subsequent effects remain lowercase.
+
+### Fix 3: BanishThenMaterialize Standard Effect (DONE)
+
+The "banish X, then materialize it/them" pattern is now parsed as a **single `BanishThenMaterialize` standard effect** instead of two separate effects. Implemented in commit `cffbc794`.
+
+**What changed:**
+- Added `BanishThenMaterialize { target: Predicate, count: CollectionExpression }` to `StandardEffect` enum
+- Added parsers: `banish_then_materialize()`, `banish_collection_then_materialize()`, `banish_up_to_n_then_materialize()`
+- Added serializer support in `effect_serializer.rs`
+
+**Supported patterns:**
+| Pattern | Example | CollectionExpression |
+|---------|---------|---------------------|
+| Single target | `{banish} an ally, then {materialize} it` | `Exactly(1)` |
+| Any number | `{Banish} any number of allies, then {materialize} them` | `AnyNumberOf` |
+| Up to N | `{banish} {up-to-n-allies}, then {materialize} {it-or-them}` | `UpTo(n)` |
+
+---
 
 ## Root Cause Analysis
 
@@ -45,7 +80,7 @@ After running the failing tests and analyzing the actual mismatches, I've identi
 **Fix Strategy**:
 1. Output lowercase keywords in `serialize_standard_effect()` for effects that start with keywords
 2. Let `ability_serializer.rs` handle capitalization based on position in sentence
-3. This requires careful coordination with Fix 1 from the existing doc (already implemented) which lowercases keywords after "you may"
+3. This requires careful coordination with Fix 1 (already implemented) which lowercases keywords after "you may"
 
 **Decision Point**: Should the canonical form be lowercase (`{kindle}`) or uppercase (`{Kindle}`)?
 - **Recommendation**: Lowercase is canonical in input; serializer should match input form based on context.
@@ -151,12 +186,7 @@ After running the failing tests and analyzing the actual mismatches, I've identi
 **Files Involved**:
 - `rules_engine/src/parser_v2/src/serializer/effect_serializer.rs:878-1010`
 
-**Fix Strategy**:
-1. Standardize on `. ` separation for truly independent effects
-2. Use "and" only for tightly coupled effects (e.g., "draw and discard")
-3. Preserve ", then" for sequential actions
-
-**Recommendation**: See existing doc's Fix 6 for `. ` vs ", then" consistency.
+**Remaining Fix (Fix 6)**: Don't insert ", then" inconsistently. Use `. ` consistently for independent effects.
 
 ---
 
@@ -172,7 +202,9 @@ After running the failing tests and analyzing the actual mismatches, I've identi
 **Files Involved**:
 - `rules_engine/src/parser_v2/src/serializer/predicate_serializer.rs:123-201`
 
-**Fix Strategy**: See existing doc's Fix 4 - preserve `{a-subtype}` article.
+**Remaining Fix (Fix 4)**: Preserve `{a-subtype}` article in `predicate_serializer.rs`.
+
+**Also**: "higher" becomes "or more" - check `serializer_utils.rs` for `Operator::HigherBy` serialization.
 
 ---
 
@@ -187,7 +219,7 @@ After running the failing tests and analyzing the actual mismatches, I've identi
 **Files Involved**:
 - `rules_engine/src/parser_v2/src/serializer/effect_serializer.rs` (GainsReclaimUntilEndOfTurn)
 
-**Fix Strategy**: See existing doc's Fix 5.
+**Remaining Fix (Fix 5)**: Check `CardsInVoidGainReclaimThisTurn` serialization - some cases may be missing "this turn".
 
 ---
 
@@ -199,8 +231,71 @@ After running the failing tests and analyzing the actual mismatches, I've identi
 |-------|-----------|--------|
 | `Spend 1 or more...` | `Pay 1 or more...` | REJECT "Spend" |
 | `a {subtype}` | `{a-subtype}` | REJECT literal "a" before variable |
+| `{a-subtype}` in dissolved subject | `{ASubtype}` | REJECT lowercase in subject position |
 
-**Fix Strategy**: See existing doc's Rejection 1, 2, 3.
+---
+
+## Remaining Serializer Fixes
+
+### Fix 4: Preserve `{a-subtype}` Article
+
+**File**: `predicate_serializer.rs`
+
+**Problem**: `{a-subtype}` becomes `{subtype}`, losing the article.
+
+**Also**: "higher" becomes "or more" - check `serializer_utils.rs` for `Operator::HigherBy` serialization.
+
+### Fix 5: Preserve "this turn" for Reclaim Until End of Turn
+
+**File**: `effect_serializer.rs`
+
+**Problem**: The "this turn" phrase is dropped for reclaim-until-end-of-turn effects.
+
+**Location**: Check `CardsInVoidGainReclaimThisTurn` serialization - some cases may be missing "this turn".
+
+### Fix 6: Don't Insert "then" Inconsistently
+
+**File**: `effect_serializer.rs`
+
+**Problem**: Some patterns insert ", then" but others use `. ` for similar patterns.
+
+**Decision**: Use `. ` consistently. Find where ", then" is being inserted and change to `. `.
+
+---
+
+## Parser Rejections Required
+
+### Rejection 1: `a {subtype}` Pattern
+
+**File**: Investigate where this is parsed
+
+**Change**: Reject literal "a" followed by `{subtype}` variable. Must use `{a-subtype}`.
+
+### Rejection 2: "Spend" Keyword
+
+**File**: `cost_parser.rs`
+
+**Change**: Remove "spend" as alternative to "pay". Only accept "pay".
+
+### Rejection 3: `{a-subtype}` in Dissolved Subject Position
+
+**File**: Investigate dissolved trigger parsing
+
+**Change**: In `{Dissolved} {a-subtype} in your void...`, the subject should use `{ASubtype}` not `{a-subtype}`.
+
+---
+
+## Card Text Updates Required
+
+After serializer fixes and parser rejections are in place, update card text in `cards.toml`:
+
+1. `a {subtype}` → `{a-subtype}` where applicable
+2. `Spend` → `Pay`
+3. `{kindle}` → `{Kindle}` at sentence start (if any)
+4. `{a-subtype}` → `{ASubtype}` in dissolved subject position
+5. `X, then Y` → `X. Y.` for independent effects
+
+**Note**: Do NOT read cards.toml directly - it's too large. Use grep to find specific patterns.
 
 ---
 
@@ -213,11 +308,9 @@ After running the failing tests and analyzing the actual mismatches, I've identi
 
 **Changes**:
 1. In `serialize_predicate()`, add special handling for common generic patterns:
-   ```
-   Predicate::Your(CardPredicate::Card) in "discard" context → "a card"
-   Predicate::Your(CardPredicate::Character) in "materialize" context → "a character"
-   Predicate::Allied(CardPredicate::Character) → check if original was "a character"
-   ```
+   - `Predicate::Your(CardPredicate::Card)` in "discard" context → `"a card"`
+   - `Predicate::Your(CardPredicate::Character)` in "materialize" context → `"a character"`
+   - `Predicate::Allied(CardPredicate::Character)` → check if original was "a character"
 
 2. Consider adding a `Predicate::Generic(CardPredicate)` variant to distinguish:
    - "a card" (any card) from "a your card" (explicitly your card)
@@ -260,7 +353,7 @@ After running the failing tests and analyzing the actual mismatches, I've identi
 
 **Tests to verify**: `test_discover_card_by_cost`
 
-### Phase 4: Fix Effect Joining
+### Phase 4: Fix Effect Joining (Fix 6)
 
 **Files to modify**:
 - `rules_engine/src/parser_v2/src/serializer/effect_serializer.rs`
@@ -274,21 +367,19 @@ After running the failing tests and analyzing the actual mismatches, I've identi
 
 **Tests to verify**: `test_prevent_played_card_put_on_deck`
 
-### Phase 5: Fix Remaining Issues
+### Phase 5: Fix Remaining Serializer Issues
 
-**From existing doc**:
-- Fix 4: Preserve `{a-subtype}` article
-- Fix 5: Preserve "this turn" for reclaim effects
-- Fix 6: Consistent ", then" vs ". " handling
+- **Fix 4**: Preserve `{a-subtype}` article in `predicate_serializer.rs`
+- **Fix 5**: Preserve "this turn" for reclaim effects in `effect_serializer.rs`
 
-**Parser rejections**:
-- Rejection 1: `a {subtype}` → require `{a-subtype}`
-- Rejection 2: `Spend` → require `Pay`
-- Rejection 3: `{a-subtype}` in dissolved subject position → require `{ASubtype}`
+### Phase 6: Add Parser Rejections
 
-### Phase 6: Fix Test Data
+- **Rejection 1**: `a {subtype}` → require `{a-subtype}`
+- **Rejection 2**: `Spend` → require `Pay`
+- **Rejection 3**: `{a-subtype}` in dissolved subject position → require `{ASubtype}`
 
-**Changes**:
+### Phase 7: Fix Test Data and Card Text
+
 1. Remove unused variables from test inputs
 2. Update card text in `cards.toml` where canonical form differs
 
@@ -342,17 +433,41 @@ After running the failing tests and analyzing the actual mismatches, I've identi
 
 ---
 
+## Lessons Learned
+
+### Failed Approach: Making All Keywords Lowercase
+
+**What was attempted:**
+Changed all action keywords in `effect_serializer.rs` to lowercase (`{dissolve}`, `{banish}`, etc.) with the idea that `ability_serializer.rs` would capitalize them when needed.
+
+**Why it failed:**
+1. This broke 263 existing round-trip tests that expected capitalized keywords
+2. The existing tests use `assert_round_trip` which expects input == output
+3. Changing default serialization behavior has a massive blast radius
+4. The fix was supposed to affect only 4 tests but ended up breaking hundreds
+
+**Key insight:**
+When fixing serializer bugs, prefer **targeted fixes** that only change behavior for the specific problematic cases. Don't change the default behavior that all other tests depend on.
+
+**Correct approach for Fix 1:**
+Instead of changing `effect_serializer.rs` to output lowercase keywords, modify `ability_serializer.rs` to detect when an effect starts with "you may" and handle that case specially - capitalizing only the "y" in "you" rather than potentially capitalizing a keyword that follows later in the string.
+
+---
+
 ## File Reference
 
-| File | Purpose | Phase |
-|------|---------|-------|
-| `serializer/predicate_serializer.rs` | Predicate → text | 1 |
-| `serializer/effect_serializer.rs` | Effect → text | 2, 4 |
-| `serializer/ability_serializer.rs` | Ability → text | 2 |
-| `serializer/serializer_utils.rs` | Operators, utilities | 3 |
-| `parser/predicate_parser.rs` | Text → predicate AST | 1 (if Option B) |
-| `parser/cost_parser.rs` | Reject "Spend" | 5 |
-| `test_helpers.rs` | Round-trip assertion | - |
+| File | Purpose |
+|------|---------|
+| `effect_serializer.rs` | Serializes effects, compound effect joining |
+| `ability_serializer.rs` | Serializes abilities, calls capitalize_first_letter |
+| `serializer_utils.rs` | Contains capitalize_first_letter, operator serialization |
+| `predicate_serializer.rs` | Serializes predicates including {a-subtype} |
+| `trigger_serializer.rs` | Serializes triggers like Judgment, Materialized |
+| `cost_parser.rs` | Parses costs, contains "spend"/"pay" |
+| `parser_helpers.rs` | Contains directive() parser helper |
+| `test_helpers.rs` | Contains assert_round_trip functions |
+| `standard_effect.rs` | Contains BanishThenMaterialize and other effect variants |
+| `game_effects_parsers.rs` | Contains banish_then_materialize() and related parsers |
 
 ---
 
@@ -368,8 +483,15 @@ cargo test --package parser_v2_tests --test round_trip_tests test_name -- --igno
 # Run non-ignored tests only
 cargo test --package parser_v2_tests --test round_trip_tests
 
-# Full validation
+# Run parser tests
+just parser-test
+
+# Format and validate
+just fmt
 just review
+
+# Regenerate tabula after parser changes
+just tabula-generate
 ```
 
 ---
