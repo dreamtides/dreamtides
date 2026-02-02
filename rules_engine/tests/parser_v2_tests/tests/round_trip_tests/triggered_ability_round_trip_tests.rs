@@ -252,7 +252,7 @@ fn test_judgment_triggers_on_materialize() {
 
 #[test]
 fn test_draw_count_in_void_trigger_reclaim() {
-    assert_round_trip("When you draw {cards-numeral} in a turn, if this card is in your void, it gains {reclaim-for-cost} this turn.", "cards: 2\nreclaim: 1");
+    assert_round_trip("When you draw {cards-numeral} in a turn, while this card is in your void, it gains {reclaim-for-cost} this turn.", "cards: 2\nreclaim: 1");
 }
 
 #[test]

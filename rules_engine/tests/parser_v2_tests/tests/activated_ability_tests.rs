@@ -458,9 +458,9 @@ fn test_pay_one_or_more_energy_draw_for_each_energy_spent() {
 }
 
 #[test]
-fn test_pay_one_or_more_dissolve_each_character() {
+fn test_pay_one_or_more_dissolve_all_characters() {
     let result = parse_ability(
-        "Pay 1 or more {energy-symbol}: {Dissolve} each character with spark less than the amount of {energy-symbol} paid.",
+        "Pay 1 or more {energy-symbol}: {Dissolve} all characters with spark less than the amount of {energy-symbol} paid.",
         ""
     );
     assert_ron_snapshot!(result, @r###"
@@ -473,7 +473,7 @@ fn test_pay_one_or_more_dissolve_each_character() {
           target: Character,
           spark_operator: OrLess,
         )),
-        count: Each,
+        count: All,
       )),
     ))
     "###);

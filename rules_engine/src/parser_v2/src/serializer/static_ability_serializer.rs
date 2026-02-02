@@ -1,5 +1,5 @@
 use ability_data::condition::Condition;
-use ability_data::static_ability::{StandardStaticAbility, StaticAbility};
+use ability_data::static_ability::{CardTypeContext, StandardStaticAbility, StaticAbility};
 use ability_data::variable_value::VariableValue;
 
 use crate::serializer::{
@@ -104,14 +104,14 @@ pub fn serialize_standard_static_ability(
             format!("To play this card, {}.", cost_serializer::serialize_cost(cost, bindings))
         }
         StandardStaticAbility::PlayForAlternateCost(alt_cost) => {
-            use ability_data::static_ability::CardTypeContext;
             if let Some(var_name) = parser_substitutions::directive_to_integer_variable("e") {
                 bindings
                     .insert(var_name.to_string(), VariableValue::Integer(alt_cost.energy_cost.0));
             }
             let card_type = match alt_cost.card_type {
                 Some(CardTypeContext::Character) => "character",
-                Some(CardTypeContext::Event) | None => "event",
+                Some(CardTypeContext::Event) => "event",
+                None => "card",
             };
             if let Some(cost) = &alt_cost.additional_cost {
                 let base = format!(

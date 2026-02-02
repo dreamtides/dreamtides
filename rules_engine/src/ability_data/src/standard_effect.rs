@@ -52,6 +52,7 @@ pub enum StandardEffect {
         count: CollectionExpression,
         predicate: CardPredicate,
         this_turn: bool,
+        cost: Option<Energy>,
     },
     Copy {
         target: Predicate,

@@ -5,6 +5,7 @@ use ability_data::quantity_expression_data::QuantityExpression;
 use ability_data::standard_effect::StandardEffect;
 use ability_data::trigger_event::TriggerEvent;
 use ability_data::variable_value::VariableValue;
+use core_data::numerics::Energy;
 
 use crate::serializer::{
     condition_serializer, cost_serializer, predicate_serializer, serializer_utils,
@@ -339,15 +340,6 @@ pub fn serialize_standard_effect(
                         bindings)
                     )
                 }
-                CollectionExpression::Each => {
-                    format!(
-                        "{{dissolve}} each {}.",
-                        predicate_serializer::serialize_card_predicate_without_article(
-                            target.any_card_predicate().unwrap_or(&CardPredicate::Character),
-                            bindings
-                        )
-                    )
-                }
                 CollectionExpression::Exactly(n) => {
                     format!(
                         "{{dissolve}} {} {}.", n,
@@ -662,11 +654,12 @@ pub fn serialize_standard_effect(
             "each player shuffles their hand and void into their deck and then draws {cards}."
                 .to_string()
         }
-        StandardEffect::CardsInVoidGainReclaim { count, predicate, this_turn: until_end_of_turn } => {
+        StandardEffect::CardsInVoidGainReclaim { count, predicate, this_turn: until_end_of_turn, cost } => {
             serialize_cards_in_void_gain_reclaim_this_turn(
                 count,
                 predicate,
                 *until_end_of_turn,
+                cost,
                 bindings,
             )
         }
@@ -1253,9 +1246,30 @@ fn serialize_cards_in_void_gain_reclaim_this_turn(
     count: &CollectionExpression,
     predicate: &CardPredicate,
     until_end_of_turn: bool,
+    cost: &Option<Energy>,
     bindings: &mut VariableBindings,
 ) -> String {
     let this_turn_suffix = if until_end_of_turn { " this turn" } else { "" };
+    let (reclaim_directive, reclaim_suffix) = if let Some(energy_cost) = cost {
+        if let Some(var_name) =
+            parser_substitutions::directive_to_integer_variable("reclaim-for-cost")
+        {
+            bindings.insert(var_name.to_string(), VariableValue::Integer(energy_cost.0));
+        }
+        ("{reclaim-for-cost}", "")
+    } else {
+        ("{reclaim}", " equal to its cost")
+    };
+    let (reclaim_directive_plural, reclaim_suffix_plural) = if let Some(energy_cost) = cost {
+        if let Some(var_name) =
+            parser_substitutions::directive_to_integer_variable("reclaim-for-cost")
+        {
+            bindings.insert(var_name.to_string(), VariableValue::Integer(energy_cost.0));
+        }
+        ("{reclaim-for-cost}", "")
+    } else {
+        ("{reclaim}", " equal to their cost")
+    };
     match count {
         CollectionExpression::Exactly(1) => {
             let predicate_text = if let CardPredicate::CharacterType(subtype) = predicate {
@@ -1265,65 +1279,68 @@ fn serialize_cards_in_void_gain_reclaim_this_turn(
                 text_formatting::card_predicate_base_text(predicate).capitalized_with_article()
             };
             format!(
-                "{} in your void gains {{reclaim}} equal to its cost{}.",
-                predicate_text, this_turn_suffix
+                "{} in your void gains {}{}{}.",
+                predicate_text, reclaim_directive, reclaim_suffix, this_turn_suffix
             )
         }
         CollectionExpression::Exactly(n) => {
             format!(
-                "{} {} in your void gain {{reclaim}} equal to their cost{}.",
+                "{} {} in your void gain {}{}{}.",
                 n,
                 predicate_serializer::serialize_card_predicate_plural(predicate, bindings),
+                reclaim_directive_plural,
+                reclaim_suffix_plural,
                 this_turn_suffix
             )
         }
         CollectionExpression::All => {
             format!(
-                "all cards currently in your void gain {{reclaim}} equal to their cost{}.",
-                this_turn_suffix
+                "all cards currently in your void gain {}{}{}.",
+                reclaim_directive_plural, reclaim_suffix_plural, this_turn_suffix
             )
         }
         CollectionExpression::AllButOne => {
             format!(
-                "all but one {} in your void gain {{reclaim}} equal to their cost{}.",
+                "all but one {} in your void gain {}{}{}.",
                 predicate_serializer::serialize_card_predicate_plural(predicate, bindings),
+                reclaim_directive_plural,
+                reclaim_suffix_plural,
                 this_turn_suffix
             )
         }
         CollectionExpression::UpTo(n) => {
             format!(
-                "up to {} {} in your void gain {{reclaim}} equal to their cost{}.",
+                "up to {} {} in your void gain {}{}{}.",
                 n,
                 predicate_serializer::serialize_card_predicate_plural(predicate, bindings),
+                reclaim_directive_plural,
+                reclaim_suffix_plural,
                 this_turn_suffix
             )
         }
         CollectionExpression::AnyNumberOf => {
             format!(
-                "any number of {} in your void gain {{reclaim}} equal to their cost{}.",
+                "any number of {} in your void gain {}{}{}.",
                 predicate_serializer::serialize_card_predicate_plural(predicate, bindings),
+                reclaim_directive_plural,
+                reclaim_suffix_plural,
                 this_turn_suffix
             )
         }
         CollectionExpression::OrMore(n) => {
             format!(
-                "{} or more {} in your void gain {{reclaim}} equal to their cost{}.",
+                "{} or more {} in your void gain {}{}{}.",
                 n,
                 predicate_serializer::serialize_card_predicate_plural(predicate, bindings),
+                reclaim_directive_plural,
+                reclaim_suffix_plural,
                 this_turn_suffix
             )
         }
         CollectionExpression::EachOther => {
             format!(
-                "Each other card in your void gains {{reclaim}} equal to its cost{}",
-                this_turn_suffix
-            )
-        }
-        CollectionExpression::Each => {
-            format!(
-                "each {} in your void gains {{reclaim}} equal to its cost{}.",
-                predicate_serializer::serialize_card_predicate_without_article(predicate, bindings),
-                this_turn_suffix
+                "Each other card in your void gains {}{}{}",
+                reclaim_directive, reclaim_suffix, this_turn_suffix
             )
         }
     }

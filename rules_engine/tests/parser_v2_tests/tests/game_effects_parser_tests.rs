@@ -955,6 +955,7 @@ fn test_materialized_event_in_void_gains_reclaim() {
         count: Exactly(1),
         predicate: Event,
         this_turn: true,
+        cost: None,
       )),
     ))
     "###);

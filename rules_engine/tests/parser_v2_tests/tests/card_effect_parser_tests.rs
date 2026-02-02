@@ -734,6 +734,7 @@ fn test_materialized_card_with_cost_in_void_gains_reclaim() {
           cost: Energy(3),
         ),
         this_turn: false,
+        cost: Some(Energy(0)),
       )),
     ))
     "###);
@@ -749,6 +750,7 @@ fn test_event_in_void_gains_reclaim_this_turn() {
         count: Exactly(1),
         predicate: Event,
         this_turn: true,
+        cost: Some(Energy(0)),
       )),
     ))
     "###);
@@ -766,6 +768,7 @@ fn test_all_cards_in_void_gain_reclaim_equal_to_cost() {
         count: All,
         predicate: Card,
         this_turn: true,
+        cost: None,
       )),
     ))
     "###);

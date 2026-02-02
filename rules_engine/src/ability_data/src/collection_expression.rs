@@ -6,9 +6,6 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum CollectionExpression {
     All,
-    /// Similar to All but serialized as "each {singular}" instead of "all
-    /// {plural}".
-    Each,
     EachOther,
     AnyNumberOf,
     AllButOne,

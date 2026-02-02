@@ -158,7 +158,8 @@
                   "cost": 3
                 }
               },
-              "this_turn": false
+              "this_turn": false,
+              "cost": 0
             }
           }
         }
@@ -388,7 +389,8 @@
             "CardsInVoidGainReclaim": {
               "count": "All",
               "predicate": "Card",
-              "this_turn": true
+              "this_turn": true,
+              "cost": null
             }
           }
         }
@@ -880,7 +882,8 @@
                 "Exactly": 1
               },
               "predicate": "Event",
-              "this_turn": true
+              "this_turn": true,
+              "cost": 0
             }
           }
         }
@@ -3310,7 +3313,8 @@
                 "Exactly": 1
               },
               "predicate": "Event",
-              "this_turn": true
+              "this_turn": true,
+              "cost": null
             }
           }
         }
@@ -5540,7 +5544,7 @@
                   }
                 }
               },
-              "count": "Each"
+              "count": "All"
             }
           }
         }
@@ -5613,7 +5617,8 @@
               "predicate": {
                 "CharacterType": "Survivor"
               },
-              "this_turn": false
+              "this_turn": false,
+              "cost": null
             }
           }
         }

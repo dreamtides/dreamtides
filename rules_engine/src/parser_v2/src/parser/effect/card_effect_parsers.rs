@@ -227,21 +227,28 @@ pub fn cards_in_void_gain_reclaim<'a>(
         }),
     ));
 
+    let reclaim_type = choice((
+        reclaim_cost().map(|cost| Some(Energy(cost))),
+        directive("reclaim")
+            .then_ignore(choice((
+                words(&["equal", "to", "their", "cost"]),
+                words(&["equal", "to", "its", "cost"]),
+            )))
+            .to(None),
+    ));
+
     count_and_predicate
         .then_ignore(words(&["in", "your", "void"]))
         .then_ignore(choice((word("gain"), word("gains"))))
-        .then_ignore(choice((
-            reclaim_cost().ignored(),
-            directive("reclaim").then_ignore(choice((
-                words(&["equal", "to", "their", "cost"]),
-                words(&["equal", "to", "its", "cost"]),
-            ))),
-        )))
+        .then(reclaim_type)
         .then(words(&["this", "turn"]).or_not().map(|opt| opt.is_some()))
-        .map(|((count, predicate), until_end_of_turn)| StandardEffect::CardsInVoidGainReclaim {
-            count,
-            predicate,
-            this_turn: until_end_of_turn,
+        .map(|(((count, predicate), cost), until_end_of_turn)| {
+            StandardEffect::CardsInVoidGainReclaim {
+                count,
+                predicate,
+                this_turn: until_end_of_turn,
+                cost,
+            }
         })
         .boxed()
 }

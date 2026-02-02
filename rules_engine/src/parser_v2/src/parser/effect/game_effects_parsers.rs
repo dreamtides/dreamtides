@@ -113,13 +113,12 @@ pub fn counterspell_unless_pays_cost<'a>(
 
 pub fn dissolve_each_character<'a>(
 ) -> impl Parser<'a, ParserInput<'a>, StandardEffect, ParserExtra<'a>> + Clone {
-    directive("dissolve")
-        .ignore_then(word("each"))
-        .ignore_then(card_predicate_parser::parser())
-        .map(|predicate| StandardEffect::DissolveCharactersCount {
+    directive("dissolve").ignore_then(word("all")).ignore_then(card_predicate_parser::parser()).map(
+        |predicate| StandardEffect::DissolveCharactersCount {
             target: Predicate::Any(predicate),
-            count: CollectionExpression::Each,
-        })
+            count: CollectionExpression::All,
+        },
+    )
 }
 
 pub fn dissolve_all_characters<'a>(

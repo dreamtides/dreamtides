@@ -1405,7 +1405,7 @@ variables = ""
 name = "Eternal Sentry"
 id = "511e8751-95d0-4d09-9f60-48fa53f14a13"
 energy-cost = 4
-rules-text = "When you draw {cards-numeral} in a turn, if this card is in your void, it gains {reclaim-for-cost} this turn."
+rules-text = "When you draw {cards-numeral} in a turn, while this card is in your void, it gains {reclaim-for-cost} this turn."
 variables = """
 cards: 2
 reclaim: 1"""
@@ -2666,7 +2666,7 @@ spark = ""
 name = "Burst of Obliteration"
 id = "f841dd11-102c-42b2-b85a-492930189fbd"
 energy-cost = 3
-rules-text = "Pay 1 or more {energy-symbol}: {Dissolve} each character with spark less than the amount of {energy-symbol} paid."
+rules-text = "Pay 1 or more {energy-symbol}: {Dissolve} all characters with spark less than the amount of {energy-symbol} paid."
 card-type = "Event"
 is-fast = false
 image-number = 2299755789
@@ -3018,7 +3018,7 @@ variables = ""
 name = "Soulkindler"
 id = "7d20f2bb-50b5-418a-a435-da13a13ad257"
 energy-cost = 2
-rules-text = "If this card is in your void, allied {plural-subtype} have +{s} spark."
+rules-text = "While this card is in your void, allied {plural-subtype} have +{s} spark."
 variables = """
 subtype: survivor
 s: 2"""

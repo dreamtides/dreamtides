@@ -375,6 +375,7 @@ fn test_dissolved_a_subtype_in_void_gains_reclaim() {
         count: Exactly(1),
         predicate: CharacterType(Warrior),
         this_turn: false,
+        cost: None,
       )),
     ))
     "###);
@@ -395,6 +396,7 @@ fn test_dissolved_capitalized_subtype_directive_in_void_gains_reclaim() {
         count: Exactly(1),
         predicate: CharacterType(Survivor),
         this_turn: false,
+        cost: None,
       )),
     ))
     "###);
@@ -975,9 +977,9 @@ fn test_has_all_character_types_and_judgment_with_allies() {
 }
 
 #[test]
-fn test_when_you_draw_cards_in_turn_if_in_void_gains_reclaim() {
+fn test_when_you_draw_cards_in_turn_while_in_void_gains_reclaim() {
     let result = parse_ability(
-        "When you draw {cards-numeral} in a turn, if this card is in your void, it gains {reclaim-for-cost} this turn.",
+        "When you draw {cards-numeral} in a turn, while this card is in your void, it gains {reclaim-for-cost} this turn.",
         "cards: 3, reclaim: 2",
     );
     assert_ron_snapshot!(result, @r###"

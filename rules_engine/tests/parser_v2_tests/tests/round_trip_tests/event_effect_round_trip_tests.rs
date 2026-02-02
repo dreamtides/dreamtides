@@ -107,7 +107,7 @@ fn test_dissolve_enemy_draw() {
 
 #[test]
 fn test_dissolve_by_energy_paid() {
-    assert_round_trip("Pay 1 or more {energy-symbol}: {Dissolve} each character with spark less than the amount of {energy-symbol} paid.", "");
+    assert_round_trip("Pay 1 or more {energy-symbol}: {Dissolve} all characters with spark less than the amount of {energy-symbol} paid.", "");
 }
 
 #[test]

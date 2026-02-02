@@ -49,7 +49,7 @@ pub fn serialize_condition(condition: &Condition, bindings: &mut VariableBinding
                 predicate = serialize_predicate_count(*count, predicate, bindings)
             )
         }
-        Condition::ThisCardIsInYourVoid => "if this card is in your void,".to_string(),
+        Condition::ThisCardIsInYourVoid => "while this card is in your void,".to_string(),
     }
 }
 
