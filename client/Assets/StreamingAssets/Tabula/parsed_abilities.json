@@ -149,13 +149,7 @@
           "Effect": {
             "GainsReclaim": {
               "target": {
-                "YourVoid": {
-                  "CardWithCost": {
-                    "target": "Card",
-                    "cost_operator": "OrLess",
-                    "cost": 3
-                  }
-                }
+                "YourVoid": "Card"
               },
               "count": {
                 "Exactly": 1

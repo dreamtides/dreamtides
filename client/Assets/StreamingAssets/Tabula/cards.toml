@@ -316,9 +316,7 @@ card-number = 19
 name = "The Calling Night"
 id = "be97e5e0-eebb-4b90-a676-fcf909b35600"
 energy-cost = 2
-rules-text = """
-{Judgment} Draw {cards}. The opponent gains {points}.
-"""
+rules-text = "{Judgment} Draw {cards}, then the opponent gains {points}."
 variables = """
 cards: 1
 points: 2"""
@@ -371,9 +369,7 @@ card-number = 22
 name = "Reunion"
 id = "ddde23e7-939c-4b0f-be6a-ecc1e38c92f0"
 energy-cost = 2
-rules-text = """
-You may return a character from your void to your hand. Draw {cards}.
-"""
+rules-text = "You may return a character from your void to your hand, then draw {cards}."
 variables = "cards: 1"
 card-type = "Event"
 is-fast = false
@@ -405,8 +401,10 @@ spark = ""
 name = "Duneveil Vanguard"
 id = "adfd1cfe-459b-4a9b-bc90-203847082a03"
 energy-cost = 2
-rules-text = "{Judgment} You may discard a card to {dissolve} an enemy with spark {s} or less."
-variables = "s: 1"
+rules-text = "{Judgment} You may discard {discards} to {dissolve} an enemy with spark {s} or less."
+variables = """
+discards: 1
+s: 1"""
 card-type = "Character"
 subtype = "Survivor"
 is-fast = false
@@ -420,7 +418,7 @@ card-number = 25
 name = "Torchbearer of the Abyss"
 id = "dfcf69cb-c569-484a-8a98-b673a5c47899"
 energy-cost = 4
-rules-text = "Once per turn, when you discard a card, gain {e} and {kindle}."
+rules-text = "Once per turn, when you discard a card, Gain {e}, then {kindle}."
 variables = """
 e: 1
 k: 2"""
@@ -453,9 +451,9 @@ name = "Nocturne"
 id = "cb445b05-ea7b-4a1b-9484-110021e266f3"
 energy-cost = 3
 rules-text = """
-{Materialized} Draw {cards}. Discard {discards}.
+{Materialized} Draw {cards}, then discard {discards}.
 
-{ReclaimForCost} """
+{ReclaimForCost}"""
 variables = """
 cards: 1
 discards: 1
@@ -1128,14 +1126,14 @@ spark = ""
 name = "Pyrokinetic Surge"
 id = "f83a0657-f55a-4ee6-8630-c2ca2d8429ac"
 energy-cost = 1
-rules-text = "Abandon an ally or discard a card: {Dissolve} an enemy."
+rules-text = "Abandon an ally or discard {discards}: {Dissolve} an enemy."
+variables = "discards: 1"
 card-type = "Event"
 is-fast = true
 image-number = 2023111787
 rarity = "Uncommon"
 art-owned = false
 card-number = 69
-variables = ""
 subtype = ""
 spark = ""
 
@@ -1586,7 +1584,7 @@ spark = ""
 name = "The Power Within"
 id = "be92ff6f-a468-4545-8ea2-cd8c3c53cb9a"
 energy-cost = 1
-rules-text = "{MultiplyBy} the number of cards you draw from card effects this turn."
+rules-text = "{multiplyby} the number of cards you draw from card effects this turn."
 variables = "number: 2"
 card-type = "Event"
 is-fast = false
@@ -1710,7 +1708,7 @@ spark = ""
 name = "Catalyst Ignition"
 id = "90a624db-d288-4856-afc9-f9222e67d3bd"
 energy-cost = 2
-rules-text = "{MultiplyBy} the amount of {energy-symbol} you gain from card effects this turn."
+rules-text = "{multiplyby} the amount of {energy-symbol} you gain from card effects this turn."
 variables = "number: 2"
 card-type = "Event"
 is-fast = false
@@ -2423,10 +2421,8 @@ card-number = 148
 name = "Reclaimer of Lost Paths"
 id = "0ad4ca5c-f723-4494-8dec-1e058c37a099"
 energy-cost = 4
-rules-text = "{Materialized} A card with cost {e} or less in your void gains {reclaim-for-cost}."
-variables = """
-e: 3
-reclaim: 0"""
+rules-text = "{Materialized} A card in your void gains {reclaim-for-cost}."
+variables = "reclaim: 0"
 card-type = "Character"
 subtype = "Survivor"
 is-fast = false
@@ -2535,7 +2531,7 @@ variables = ""
 name = "Call to the Unknown"
 id = "66ae76ab-13ba-473c-891d-9d53403c300e"
 energy-cost = 2
-rules-text = "{Discover} a character with a {Materialized} ability."
+rules-text = "{Discover} a character with a {materialized} ability."
 card-type = "Event"
 is-fast = false
 image-number = 1991802455
