@@ -281,7 +281,7 @@ fn test_multiply_energy() {
 #[test]
 fn test_multiply_energy_gain() {
     assert_round_trip(
-        "{multiplyby} the amount of {energy-symbol} you gain from card effects this turn.",
+        "{MultiplyBy} the amount of {energy-symbol} you gain from card effects this turn.",
         "number: 2",
     );
 }
@@ -289,7 +289,7 @@ fn test_multiply_energy_gain() {
 #[test]
 fn test_multiply_draw() {
     assert_round_trip(
-        "{multiplyby} the number of cards you draw from card effects this turn.",
+        "{MultiplyBy} the number of cards you draw from card effects this turn.",
         "number: 2",
     );
 }

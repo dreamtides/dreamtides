@@ -1276,7 +1276,9 @@ fn serialize_void_gains_reclaim(
                 bindings.insert("subtype".to_string(), VariableValue::Subtype(*subtype));
                 "{ASubtype}".to_string()
             } else {
-                text_formatting::card_predicate_base_text(predicate).capitalized_with_article()
+                serializer_utils::capitalize_first_letter(
+                    &predicate_serializer::serialize_card_predicate(predicate, bindings),
+                )
             };
             format!(
                 "{} in your void gains {}{}{}.",
