@@ -31,8 +31,10 @@ fn test_when_ally_dissolved_gains_reclaim_for_cost() {
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
       trigger: Dissolved(Another(Character)),
-      effect: Effect(GainsReclaimUntilEndOfTurn(
+      effect: Effect(GainsReclaim(
         target: This,
+        count: Exactly(1),
+        this_turn: true,
         cost: Some(Energy(3)),
       )),
     ))
@@ -951,9 +953,9 @@ fn test_materialized_event_in_void_gains_reclaim() {
       trigger: Keywords([
         Materialized,
       ]),
-      effect: Effect(CardsInVoidGainReclaim(
+      effect: Effect(GainsReclaim(
+        target: YourVoid(Event),
         count: Exactly(1),
-        predicate: Event,
         this_turn: true,
         cost: None,
       )),
@@ -1152,8 +1154,10 @@ fn test_when_you_discard_card_it_gains_reclaim_equal_to_cost() {
     assert_ron_snapshot!(result, @r###"
     Triggered(TriggeredAbility(
       trigger: Discard(Your(Card)),
-      effect: Effect(GainsReclaimUntilEndOfTurn(
+      effect: Effect(GainsReclaim(
         target: It,
+        count: Exactly(1),
+        this_turn: true,
         cost: None,
       )),
     ))

@@ -167,7 +167,7 @@ fn test_ally_dissolved_trigger_gain_points() {
 #[test]
 fn test_ally_dissolved_trigger_gain_reclaim_for_cost() {
     assert_round_trip(
-        "When an ally is {dissolved}, this character gains {reclaim-for-cost} this turn.",
+        "When an ally is {dissolved}, this card gains {reclaim-for-cost} this turn.",
         "reclaim: 1",
     );
 }

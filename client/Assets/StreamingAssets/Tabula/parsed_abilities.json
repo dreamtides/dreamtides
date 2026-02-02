@@ -147,16 +147,18 @@
         },
         "effect": {
           "Effect": {
-            "CardsInVoidGainReclaim": {
+            "GainsReclaim": {
+              "target": {
+                "YourVoid": {
+                  "CardWithCost": {
+                    "target": "Card",
+                    "cost_operator": "OrLess",
+                    "cost": 3
+                  }
+                }
+              },
               "count": {
                 "Exactly": 1
-              },
-              "predicate": {
-                "CardWithCost": {
-                  "target": "Card",
-                  "cost_operator": "OrLess",
-                  "cost": 3
-                }
               },
               "this_turn": false,
               "cost": 0
@@ -386,9 +388,11 @@
       "Event": {
         "effect": {
           "Effect": {
-            "CardsInVoidGainReclaim": {
+            "GainsReclaim": {
+              "target": {
+                "YourVoid": "Card"
+              },
               "count": "All",
-              "predicate": "Card",
               "this_turn": true,
               "cost": null
             }
@@ -863,8 +867,12 @@
         },
         "effect": {
           "Effect": {
-            "GainsReclaimUntilEndOfTurn": {
+            "GainsReclaim": {
               "target": "It",
+              "count": {
+                "Exactly": 1
+              },
+              "this_turn": true,
               "cost": null
             }
           }
@@ -877,11 +885,13 @@
       "Event": {
         "effect": {
           "Effect": {
-            "CardsInVoidGainReclaim": {
+            "GainsReclaim": {
+              "target": {
+                "YourVoid": "Event"
+              },
               "count": {
                 "Exactly": 1
               },
-              "predicate": "Event",
               "this_turn": true,
               "cost": 0
             }
@@ -1515,8 +1525,12 @@
         "effect": {
           "WithOptions": {
             "effect": {
-              "GainsReclaimUntilEndOfTurn": {
+              "GainsReclaim": {
                 "target": "It",
+                "count": {
+                  "Exactly": 1
+                },
+                "this_turn": true,
                 "cost": 1
               }
             },
@@ -3308,11 +3322,13 @@
         },
         "effect": {
           "Effect": {
-            "CardsInVoidGainReclaim": {
+            "GainsReclaim": {
+              "target": {
+                "YourVoid": "Event"
+              },
               "count": {
                 "Exactly": 1
               },
-              "predicate": "Event",
               "this_turn": true,
               "cost": null
             }
@@ -4820,8 +4836,12 @@
         },
         "effect": {
           "Effect": {
-            "GainsReclaimUntilEndOfTurn": {
+            "GainsReclaim": {
               "target": "This",
+              "count": {
+                "Exactly": 1
+              },
+              "this_turn": true,
               "cost": 1
             }
           }
@@ -5610,12 +5630,14 @@
         },
         "effect": {
           "Effect": {
-            "CardsInVoidGainReclaim": {
+            "GainsReclaim": {
+              "target": {
+                "YourVoid": {
+                  "CharacterType": "Survivor"
+                }
+              },
               "count": {
                 "Exactly": 1
-              },
-              "predicate": {
-                "CharacterType": "Survivor"
               },
               "this_turn": false,
               "cost": null

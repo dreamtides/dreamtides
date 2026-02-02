@@ -48,9 +48,9 @@ pub enum StandardEffect {
     BanishWhenLeavesPlay {
         target: Predicate,
     },
-    CardsInVoidGainReclaim {
+    GainsReclaim {
+        target: Predicate,
         count: CollectionExpression,
-        predicate: CardPredicate,
         this_turn: bool,
         cost: Option<Energy>,
     },
@@ -167,10 +167,6 @@ pub enum StandardEffect {
     },
     GainsAegisThisTurn {
         target: Predicate,
-    },
-    GainsReclaimUntilEndOfTurn {
-        target: Predicate,
-        cost: Option<Energy>,
     },
     GainsSpark {
         target: Predicate,

@@ -200,13 +200,20 @@ pub fn gains_reclaim_for_cost_this_turn<'a>(
             .ignore_then(word("gains"))
             .ignore_then(directive("reclaim"))
             .ignore_then(words(&["equal", "to", "its", "cost", "this", "turn"]))
-            .to(StandardEffect::GainsReclaimUntilEndOfTurn { target: Predicate::It, cost: None }),
+            .to(StandardEffect::GainsReclaim {
+                target: Predicate::It,
+                count: CollectionExpression::Exactly(1),
+                this_turn: true,
+                cost: None,
+            }),
         predicate_parser::predicate_parser()
             .then_ignore(word("gains"))
             .then(reclaim_cost())
             .then_ignore(words(&["this", "turn"]))
-            .map(|(target, cost)| StandardEffect::GainsReclaimUntilEndOfTurn {
+            .map(|(target, cost)| StandardEffect::GainsReclaim {
                 target,
+                count: CollectionExpression::Exactly(1),
+                this_turn: true,
                 cost: Some(Energy(cost)),
             }),
     ))
@@ -242,13 +249,11 @@ pub fn cards_in_void_gain_reclaim<'a>(
         .then_ignore(choice((word("gain"), word("gains"))))
         .then(reclaim_type)
         .then(words(&["this", "turn"]).or_not().map(|opt| opt.is_some()))
-        .map(|(((count, predicate), cost), until_end_of_turn)| {
-            StandardEffect::CardsInVoidGainReclaim {
-                count,
-                predicate,
-                this_turn: until_end_of_turn,
-                cost,
-            }
+        .map(|(((count, predicate), cost), until_end_of_turn)| StandardEffect::GainsReclaim {
+            target: Predicate::YourVoid(predicate),
+            count,
+            this_turn: until_end_of_turn,
+            cost,
         })
         .boxed()
 }

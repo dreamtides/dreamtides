@@ -726,13 +726,13 @@ fn test_materialized_card_with_cost_in_void_gains_reclaim() {
       trigger: Keywords([
         Materialized,
       ]),
-      effect: Effect(CardsInVoidGainReclaim(
-        count: Exactly(1),
-        predicate: CardWithCost(
+      effect: Effect(GainsReclaim(
+        target: YourVoid(CardWithCost(
           target: Card,
           cost_operator: OrLess,
           cost: Energy(3),
-        ),
+        )),
+        count: Exactly(1),
         this_turn: false,
         cost: Some(Energy(0)),
       )),
@@ -746,9 +746,9 @@ fn test_event_in_void_gains_reclaim_this_turn() {
         parse_ability("An event in your void gains {reclaim-for-cost} this turn.", "reclaim: 0");
     assert_ron_snapshot!(result, @r###"
     Event(EventAbility(
-      effect: Effect(CardsInVoidGainReclaim(
+      effect: Effect(GainsReclaim(
+        target: YourVoid(Event),
         count: Exactly(1),
-        predicate: Event,
         this_turn: true,
         cost: Some(Energy(0)),
       )),
@@ -764,9 +764,9 @@ fn test_all_cards_in_void_gain_reclaim_equal_to_cost() {
     );
     assert_ron_snapshot!(result, @r###"
     Event(EventAbility(
-      effect: Effect(CardsInVoidGainReclaim(
+      effect: Effect(GainsReclaim(
+        target: YourVoid(Card),
         count: All,
-        predicate: Card,
         this_turn: true,
         cost: None,
       )),
