@@ -1,0 +1,281 @@
+# Example Card Translations
+# Demonstrates the phraselet system in action
+
+# ============================================================================
+# SAMPLE CARDS WITH FULL RUSSIAN TRANSLATIONS
+# ============================================================================
+
+[card.mystic_scholar]
+name_en = "Mystic Scholar"
+name_ru = "Мистический Учёный"
+type = "character"
+cost = 3
+spark = 2
+
+[card.mystic_scholar.ability.materialized]
+trigger_en = "When this character is materialized"
+trigger_ru = "{@when_materialized}"
+# Output: "Когда этот персонаж материализован"
+
+effect_en = "Draw 2 cards."
+effect_ru = "{@draw_cards количество=2}"
+# Output: "Возьмите 2 карты."
+
+full_text_ru = """
+Когда этот персонаж материализован, возьмите 2 карты.
+"""
+
+# ----------------------------------------------------------------------------
+
+[card.spark_infusion]
+name_en = "Spark Infusion"
+name_ru = "Вливание Искры"
+type = "event"
+cost = 2
+
+[card.spark_infusion.effect]
+effect_en = "Target ally gains 3 spark."
+effect_ru = "{chain:nom|adj:целевой|noun:союзник} получает {количество|искра:acc количество=3}."
+# Output: "Целевой союзник получает 3 искры."
+
+# Note: союзник is masculine animate, so forms work correctly
+
+# ----------------------------------------------------------------------------
+
+[card.void_reclaimer]
+name_en = "Void Reclaimer"
+name_ru = "Возвращающий из Пустоты"
+type = "character"
+cost = 4
+spark = 1
+
+[card.void_reclaimer.ability.materialized]
+trigger_en = "When this character is materialized"
+trigger_ru = "{@when_materialized}"
+
+effect_en = "Return up to 2 cards from your void to your hand."
+effect_ru = "Верните до {максимум|карта:gen максимум=2} из вашей пустоты в вашу руку."
+# Output: "Верните до 2 карт из вашей пустоты в вашу руку."
+
+# Note: "до 2" requires genitive, and "2" triggers gen_sg → "карт"
+# Actually "до 2 карт" - "до" governs genitive, "2" also requires gen_sg
+# But Russian says "до двух карт" with genitive plural after "до N"
+# Let me correct:
+
+effect_ru_corrected = "Верните до 2 карт из вашей пустоты в вашу руку."
+# "до 2 карт" - "до" + number + gen_pl is natural Russian
+
+# ----------------------------------------------------------------------------
+
+[card.kindle_master]
+name_en = "Kindle Master"
+name_ru = "Мастер Разжигания"
+type = "character"
+cost = 5
+spark = 3
+
+[card.kindle_master.ability.start_of_turn]
+trigger_en = "At the start of your turn"
+trigger_ru = "{@start_of_turn}"
+# Output: "В начале вашего хода"
+
+effect_en = "Kindle 2."
+effect_ru = "{@kindle_description количество=2}"
+# Output: "Добавьте 2 искры вашему самому левому персонажу."
+
+# Alternative shorter form for keyword reminder text:
+effect_ru_short = "Разжечь 2. _(Добавьте 2 искры вашему самому левому персонажу.)_"
+
+# ----------------------------------------------------------------------------
+
+[card.foresight]
+name_en = "Foresight"
+name_ru = "Предвидение"
+type = "event"
+cost = 1
+
+[card.foresight.effect]
+effect_en = "Foresee 3."
+effect_ru = "{@foresee_description количество=3}"
+# Output: "Посмотрите 3 карты сверху колоды. Положите любое количество в пустоту, остальные — в любом порядке сверху колоды."
+
+# Keyword with reminder text:
+effect_ru_keyword = "Предвидение 3. _(Посмотрите 3 карты сверху вашей колоды...)_"
+
+# ----------------------------------------------------------------------------
+
+[card.dissolution]
+name_en = "Dissolution"
+name_ru = "Развеивание"
+type = "event"
+cost = 3
+
+[card.dissolution.effect]
+effect_en = "Dissolve target character."
+effect_ru = "{@dissolve_target}"
+# Output: "Развейте целевого персонажа."
+
+# ----------------------------------------------------------------------------
+
+[card.spark_thief]
+name_en = "Spark Thief"
+name_ru = "Похититель Искр"
+type = "character"
+cost = 3
+spark = 1
+
+[card.spark_thief.ability.materialized]
+trigger_en = "When this character is materialized"
+trigger_ru = "{@when_materialized}"
+
+effect_en = "Target character with spark 2 or more loses 2 spark. This character gains 2 spark."
+effect_ru = """
+{chain:nom|adj:целевой|noun:персонаж} с искрой 2 или больше теряет 2 искры.
+{chain:nom|adj:этот|noun:персонаж} получает 2 искры.
+"""
+# Output:
+# "Целевой персонаж с искрой 2 или больше теряет 2 искры.
+#  Этот персонаж получает 2 искры."
+
+# ----------------------------------------------------------------------------
+
+[card.mass_draw]
+name_en = "Mass Draw"
+name_ru = "Массовое Взятие"
+type = "event"
+cost = 5
+
+[card.mass_draw.effect]
+effect_en = "Each player draws 3 cards."
+effect_ru = "Каждый игрок берёт {количество|карта:acc количество=3}."
+# Output: "Каждый игрок берёт 3 карты."
+
+# Note: берёт (3sg present) agrees with "игрок" (singular)
+
+# ----------------------------------------------------------------------------
+
+[card.conditional_striker]
+name_en = "Conditional Striker"
+name_ru = "Условный Боец"
+type = "character"
+cost = 4
+spark = 2
+
+[card.conditional_striker.ability.attack]
+trigger_en = "When this character attacks"
+trigger_ru = "Когда {chain:nom|adj:этот|noun:персонаж} атакует"
+
+effect_en = "If you control an ally with spark 3 or more, draw a card."
+effect_ru = """
+Если вы контролируете {chain:acc|adj:|noun:союзник} с искрой 3 или больше, возьмите карту.
+"""
+# Simpler version without empty adj:
+effect_ru_v2 = "Если вы контролируете союзника с искрой 3 или больше, возьмите карту."
+
+# Note: союзника is accusative of союзник (animate masculine)
+
+# ----------------------------------------------------------------------------
+
+[card.prevention_ward]
+name_en = "Prevention Ward"
+name_ru = "Охранное Заклятие"
+type = "event"
+cost = 2
+
+[card.prevention_ward.effect]
+effect_en = "Prevent target event from resolving."
+effect_ru = "Отмените {chain:acc|adj:целевой|noun:событие}."
+# Output: "Отмените целевое событие."
+
+# Note: событие is neuter, so целевой → целевое (neuter nom/acc)
+
+# ============================================================================
+# NUMERIC EXAMPLES - Demonstrating plural agreement
+# ============================================================================
+
+[example.numbers]
+# Demonstrating the plural rule patterns
+
+[example.numbers.карта]
+# "card" - feminine
+num_1 = "1 карта"      # nom_sg (ends in 1, not 11)
+num_2 = "2 карты"      # gen_sg (ends in 2-4, not 12-14)
+num_3 = "3 карты"      # gen_sg
+num_4 = "4 карты"      # gen_sg
+num_5 = "5 карт"       # gen_pl (ends in 5-9, 0)
+num_10 = "10 карт"     # gen_pl
+num_11 = "11 карт"     # gen_pl (special case: 11-14 always gen_pl)
+num_12 = "12 карт"     # gen_pl
+num_21 = "21 карта"    # nom_sg (ends in 1, not 11)
+num_22 = "22 карты"    # gen_sg (ends in 2, not 12)
+num_25 = "25 карт"     # gen_pl
+num_100 = "100 карт"   # gen_pl
+num_101 = "101 карта"  # nom_sg
+num_111 = "111 карт"   # gen_pl (ends in 11)
+
+[example.numbers.союзник]
+# "ally" - masculine animate
+num_1 = "1 союзник"
+num_2 = "2 союзника"
+num_5 = "5 союзников"
+num_11 = "11 союзников"
+num_21 = "21 союзник"
+
+[example.numbers.очко]
+# "point" - neuter
+num_1 = "1 очко"
+num_2 = "2 очка"
+num_5 = "5 очков"
+num_11 = "11 очков"
+num_21 = "21 очко"
+
+# ============================================================================
+# CASE USAGE EXAMPLES
+# ============================================================================
+
+[example.cases]
+# Demonstrating when each case is used
+
+nominative = """
+Subject of sentence:
+- Этот персонаж получает искру.
+  (This character gains spark.)
+- Карта уходит в пустоту.
+  (The card goes to the void.)
+"""
+
+genitive = """
+Possession, "of", after numbers 2-4 and 5+:
+- искра персонажа (the character's spark)
+- 5 карт (5 cards)
+- из колоды (from the deck - "из" governs genitive)
+"""
+
+dative = """
+Indirect object, "to":
+- Добавьте искру вашему персонажу.
+  (Add spark to your character.)
+- Нанесите урон противнику.
+  (Deal damage to the opponent.)
+"""
+
+accusative = """
+Direct object:
+- Возьмите карту. (Draw a card.)
+- Развейте целевого персонажа. (Dissolve target character.)
+  Note: animate masculine acc = genitive
+- Положите карту в пустоту. (Put a card into the void.)
+"""
+
+instrumental = """
+"With", "by means of":
+- персонаж с искрой 3 (a character with spark 3)
+- атакуйте этим персонажем (attack with this character)
+"""
+
+prepositional = """
+Location (always with prepositions):
+- на поле боя (on the battlefield)
+- в пустоте (in the void)
+- в руке (in hand)
+"""

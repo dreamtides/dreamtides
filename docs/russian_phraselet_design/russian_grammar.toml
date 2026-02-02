@@ -1,0 +1,85 @@
+# Russian Grammar Definition File
+# Defines grammatical categories and rules for the phraselet system
+
+[meta]
+language = "ru"
+name = "Русский"
+fallback = "en"
+
+# ============================================================================
+# GRAMMATICAL CATEGORIES
+# ============================================================================
+
+[grammar.case]
+# Russian has 6 grammatical cases
+values = [
+    "nom",   # именительный (nominative) - subject
+    "gen",   # родительный (genitive) - possession, after numbers 5+
+    "dat",   # дательный (dative) - indirect object
+    "acc",   # винительный (accusative) - direct object
+    "inst",  # творительный (instrumental) - means/with
+    "prep",  # предложный (prepositional) - location, about
+]
+default = "nom"
+
+[grammar.gender]
+values = ["m", "f", "n"]  # masculine, feminine, neuter
+default = "m"
+
+[grammar.number]
+values = ["sg", "pl"]
+default = "sg"
+
+[grammar.animacy]
+# Affects accusative case for masculine nouns
+values = ["anim", "inanim"]
+default = "inanim"
+
+# ============================================================================
+# PLURAL RULES (Russian numeric agreement)
+# ============================================================================
+
+# Russian has complex plural rules based on the last digits:
+# - 1 (except 11): singular nominative
+# - 2-4 (except 12-14): genitive singular
+# - 0, 5-20, and all ending in 11-14: genitive plural
+
+[grammar.plural_rules]
+# Pattern: [remainder_100, form_key]
+# Checked in order, first match wins
+
+[[grammar.plural_rules.patterns]]
+# Numbers ending in 11-14 always take genitive plural
+range = { mod100 = [11, 12, 13, 14] }
+form = "gen_pl"
+
+[[grammar.plural_rules.patterns]]
+# Numbers ending in 1 (but not 11) take nominative singular
+range = { mod10 = [1] }
+form = "nom_sg"
+
+[[grammar.plural_rules.patterns]]
+# Numbers ending in 2-4 (but not 12-14) take genitive singular
+range = { mod10 = [2, 3, 4] }
+form = "gen_sg"
+
+[[grammar.plural_rules.patterns]]
+# Everything else takes genitive plural
+range = { default = true }
+form = "gen_pl"
+
+# ============================================================================
+# AGREEMENT RULES
+# ============================================================================
+
+# Adjectives agree with nouns in case, gender, and number
+[grammar.agreement.adjective_noun]
+propagate = ["case", "gender", "number"]
+
+# Verbs agree with subjects in gender (past tense) and number
+[grammar.agreement.verb_subject]
+propagate = ["gender", "number"]
+
+# Participles agree like adjectives
+[grammar.agreement.participle_noun]
+propagate = ["case", "gender", "number"]
