@@ -294,7 +294,10 @@ phraselet! {
 
 ### Standard Transform Library
 
-Phraselet provides language-specific transforms for common patterns:
+Phraselet provides language-specific transforms for common patterns. Transforms
+are scoped to the language file—`@un` in `es.phr.rs` uses Spanish rules, while
+`@un` in `fr.phr.rs` uses French rules. The language is inferred from the
+filename.
 
 | Transform | Languages | Reads Tags | Effect |
 |-----------|-----------|------------|--------|
