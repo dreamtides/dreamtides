@@ -131,6 +131,24 @@ phraselet! {
 Here `{counting:other}` means "use the 'other' (plural) variant of whatever
 phrase `counting` refers to."
 
+**Dynamic selection with numbers:**
+
+Selection also works when both the phrase and selector are parameters:
+
+```rust
+phraselet! {
+    character = { one: "character", other: "characters" };
+    card = { one: "card", other: "cards" };
+
+    draw_things(n, thing) = "Draw {n} {thing:n}.";
+}
+// draw_things(1, character) → "Draw 1 character."
+// draw_things(3, card) → "Draw 3 cards."
+```
+
+The phrase parameter `thing` carries its variants, and `:n` selects based on the
+number at runtime.
+
 ---
 
 ## Metadata Tags
@@ -289,21 +307,26 @@ Phraselet provides language-specific transforms for common patterns:
 
 See **APPENDIX_STDLIB.md** for complete documentation of transforms per language.
 
-### Transforms on Dynamic Values
+### Transforms on Phrase Parameters
 
-Transforms work on any displayable value, not just phrase references. For
-untagged runtime strings, transforms use heuristics:
+Transforms read metadata from phrase parameters, enabling abstraction:
 
 ```rust
 phraselet! {
-    // subtype is a runtime string like "Warrior" or "Ancient"
-    not_subtype(subtype) = "that is not {@a subtype}";
+    card = "card" :a;
+    event = "event" :an;
+    ally = "ally" :an;
+
+    // thing is a phrase parameter - @a reads its :a/:an tag
+    play(thing) = "Play {@a thing}.";
 }
-// subtype="Warrior" → "that is not a Warrior"
-// subtype="Ancient" → "that is not an Ancient" (heuristic: starts with vowel)
+// play(card) → "Play a card."
+// play(event) → "Play an event."
+// play(ally) → "Play an ally."
 ```
 
-For predictable behavior with edge cases, define phrases with explicit tags.
+For untagged runtime strings, transforms fall back to heuristics. Define phrases
+with explicit tags for predictable behavior.
 
 ---
 
@@ -504,6 +527,12 @@ pub enum Gendered {
     Carta,
 }
 ```
+
+**Phrase references carry metadata:**
+
+When a phrase is passed as a parameter, it carries its variants and tags. This
+enables selection (`{thing:n}`) and transforms (`{@a thing}`) to work on the
+parameter's actual phrase, not just its text.
 
 **Conflicting usage is an error:**
 
