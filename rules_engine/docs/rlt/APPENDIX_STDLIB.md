@@ -1,10 +1,10 @@
-# Appendix: Phraselet Standard Library
+# Appendix: RLT Standard Library
 
-This appendix documents the standard transforms and metadata tags provided by Phraselet for the world's most widely-spoken languages.
+This appendix documents the standard transforms and metadata tags provided by RLT for the world's most widely-spoken languages.
 
 ## Overview
 
-Phraselet provides three categories of transforms:
+RLT provides three categories of transforms:
 
 1. **Universal transforms**: Work on any text in any language
 2. **Language-family transforms**: Shared across related languages
@@ -33,20 +33,20 @@ These transforms work identically in all languages:
 **Metadata tags**:
 | Tag | Purpose |
 |-----|---------|
-| `:a` | Use "a" as indefinite article |
-| `:an` | Use "an" as indefinite article |
+| `:a` | Use "a" as indefinite article (required for `@a`) |
+| `:an` | Use "an" as indefinite article (required for `@a`) |
 
 **Transforms**:
 | Transform | Reads | Effect |
 |-----------|-------|--------|
-| `@a` | `:a`, `:an` | Prepend indefinite article |
+| `@a` | `:a`, `:an` (required) | Prepend indefinite article; errors if tag missing |
 | `@the` | - | Prepend "the" |
 
 **Plural categories**: `one`, `other`
 
 ```rust
-// en.phr.rs
-phraselet! {
+// en.rlt.rs
+rlt! {
     card = "card" :a;
     event = "event" :an;
     ally = "ally" :an;
@@ -86,15 +86,15 @@ phraselet! {
 **Plural categories**: `other` (no plural distinction)
 
 ```rust
-// zh_cn.phr.rs
-phraselet! {
-    牌 = "牌" :zhang;
-    角色 = "角色" :ge;
-    玩家 = "玩家" :ming;
+// zh_cn.rlt.rs
+rlt! {
+    pai = "牌" :zhang;
+    jue_se = "角色" :ge;
+    wan_jia = "玩家" :ming;
 
     // @count inserts number + measure word
-    draw(n) = "抽{@count n 牌}";     // n=3 → "抽3张牌"
-    summon(n) = "召唤{@count n 角色}"; // n=2 → "召唤2个角色"
+    draw(n) = "抽{@count n pai}";       // n=3 → "抽3张牌"
+    summon(n) = "召唤{@count n jue_se}"; // n=2 → "召唤2个角色"
 }
 ```
 
@@ -113,12 +113,12 @@ phraselet! {
 **Plural categories**: `one`, `other`
 
 ```rust
-// hi.phr.rs
-phraselet! {
-    कार्ड = "कार्ड" :masc;      // card
-    घटना = "घटना" :fem;        // event
+// hi.rlt.rs
+rlt! {
+    card = "कार्ड" :masc;
+    event = "घटना" :fem;
 
-    कार्ड = {
+    card = {
         dir.one: "कार्ड",
         dir.other: "कार्ड",
         obl.one: "कार्ड",
@@ -148,19 +148,19 @@ phraselet! {
 **Plural categories**: `one`, `other`
 
 ```rust
-// es.phr.rs
-phraselet! {
-    carta = "carta" :fem;
-    enemigo = "enemigo" :masc;
+// es.rlt.rs
+rlt! {
+    card = "carta" :fem;
+    enemy = "enemigo" :masc;
 
-    carta = { one: "carta", other: "cartas" };
-    enemigo = { one: "enemigo", other: "enemigos" };
+    card = { one: "carta", other: "cartas" };
+    enemy = { one: "enemigo", other: "enemigos" };
 
-    destruido = { masc: "destruido", fem: "destruida" };
+    destroyed = { masc: "destruido", fem: "destruida" };
 
-    draw_one = "Roba {@un carta}.";         // → "Roba una carta."
-    the_enemy = "{@el enemigo}";            // → "el enemigo"
-    destroy(x) = "{x} fue {destruido:x}.";  // → "carta fue destruida."
+    draw_one = "Roba {@un card}.";           // → "Roba una carta."
+    the_enemy = "{@el enemy}";               // → "el enemigo"
+    destroy(x) = "{x} fue {destroyed:x}.";   // → "carta fue destruida."
 }
 ```
 
@@ -188,16 +188,18 @@ phraselet! {
 **Plural categories**: `one`, `other`
 
 ```rust
-// fr.phr.rs
-phraselet! {
-    carte = "carte" :fem;
-    ennemi = "ennemi" :masc :vowel;
-    ami = "ami" :masc :vowel;
+// fr.rlt.rs
+rlt! {
+    card = "carte" :fem;
+    enemy = "ennemi" :masc :vowel;
+    friend = "ami" :masc :vowel;
+    void = "vide" :masc;
+    hand = "main" :fem;
 
-    the_card = "{@le carte}";     // → "la carte"
-    the_enemy = "{@le ennemi}";   // → "l'ennemi" (elision)
-    from_void = "{@de vide}";     // → "du vide"
-    to_hand = "{@a main}";        // → "à la main"
+    the_card = "{@le card}";      // → "la carte"
+    the_enemy = "{@le enemy}";    // → "l'ennemi" (elision)
+    from_void = "{@de void}";     // → "du vide"
+    to_hand = "{@a hand}";        // → "à la main"
 }
 ```
 
@@ -223,11 +225,11 @@ phraselet! {
 **Plural categories**: `zero`, `one`, `two`, `few`, `many`, `other`
 
 ```rust
-// ar.phr.rs
-phraselet! {
-    بطاقة = "بطاقة" :fem :moon;  // card
+// ar.rlt.rs
+rlt! {
+    card = "بطاقة" :fem :moon;
 
-    بطاقة = {
+    card = {
         one: "بطاقة",
         two: "بطاقتان",
         few: "بطاقات",
@@ -281,14 +283,16 @@ phraselet! {
 **Plural categories**: `one`, `other`
 
 ```rust
-// pt_br.phr.rs
-phraselet! {
-    carta = "carta" :fem;
-    inimigo = "inimigo" :masc;
+// pt_br.rlt.rs
+rlt! {
+    card = "carta" :fem;
+    enemy = "inimigo" :masc;
+    void = "vazio" :masc;
+    hand = "mão" :fem;
 
-    the_card = "{@o carta}";     // → "a carta"
-    from_void = "{@de vazio}";   // → "do vazio"
-    in_hand = "{@em mão}";       // → "na mão"
+    the_card = "{@o card}";      // → "a carta"
+    from_void = "{@de void}";    // → "do vazio"
+    in_hand = "{@em hand}";      // → "na mão"
 }
 ```
 
@@ -312,12 +316,12 @@ phraselet! {
 **Case variants**: `nom`, `acc`, `gen`, `dat`, `ins`, `prep`
 
 ```rust
-// ru.phr.rs
-phraselet! {
-    карта = "карта" :fem :inan;
-    союзник = "союзник" :masc :anim;
+// ru.rlt.rs
+rlt! {
+    card = "карта" :fem :inan;
+    ally = "союзник" :masc :anim;
 
-    карта = {
+    card = {
         nom.one: "карта",
         nom.few: "карты",
         nom.many: "карт",
@@ -356,12 +360,12 @@ phraselet! {
 **Plural categories**: `other` (no plural distinction)
 
 ```rust
-// ja.phr.rs
-phraselet! {
-    カード = "カード" :mai;
-    キャラクター = "キャラクター" :nin;
+// ja.rlt.rs
+rlt! {
+    card = "カード" :mai;
+    character = "キャラクター" :nin;
 
-    draw(n) = "{@count n カード}を引く";  // n=3 → "3枚のカードを引く"
+    draw(n) = "{@count n card}を引く";  // n=3 → "3枚のカードを引く"
 }
 ```
 
@@ -389,13 +393,13 @@ phraselet! {
 **Case variants**: `nom`, `acc`, `dat`, `gen`
 
 ```rust
-// de.phr.rs
-phraselet! {
-    Karte = "Karte" :fem;
-    Charakter = "Charakter" :masc;
-    Ereignis = "Ereignis" :neut;
+// de.rlt.rs
+rlt! {
+    karte = "Karte" :fem;
+    charakter = "Charakter" :masc;
+    ereignis = "Ereignis" :neut;
 
-    Karte = {
+    karte = {
         nom.one: "Karte",
         nom.other: "Karten",
         acc.one: "Karte",
@@ -406,8 +410,8 @@ phraselet! {
         gen.other: "Karten",
     };
 
-    the_card = "{@der:nom Karte}";  // → "die Karte"
-    a_char = "{@ein:acc Charakter}"; // → "einen Charakter"
+    the_card = "{@der:nom karte}";  // → "die Karte"
+    a_char = "{@ein:acc charakter}"; // → "einen Charakter"
 }
 ```
 
@@ -434,12 +438,12 @@ phraselet! {
 **Plural categories**: `other` (no plural distinction)
 
 ```rust
-// ko.phr.rs
-phraselet! {
-    카드 = "카드" :jang;
-    캐릭터 = "캐릭터" :myeong;
+// ko.rlt.rs
+rlt! {
+    card = "카드" :jang;
+    character = "캐릭터" :myeong;
 
-    draw(n) = "{@count n 카드}를 뽑는다";  // n=3 → "카드 3장을 뽑는다"
+    draw(n) = "{@count n card}를 뽑는다";  // n=3 → "카드 3장을 뽑는다"
 }
 ```
 
@@ -488,13 +492,14 @@ phraselet! {
 **Plural categories**: `one`, `other`
 
 ```rust
-// tr.phr.rs
-phraselet! {
-    kart = "kart" :back;
-    el = "el" :front;
+// tr.rlt.rs
+rlt! {
+    card = "kart" :back;
+    hand = "el" :front;
+    void = "boşluk" :back;
 
-    to_hand = "{@dat el}";    // → "ele"
-    from_void = "{@abl boşluk}"; // → "boşluktan"
+    to_hand = "{@dat hand}";     // → "ele"
+    from_void = "{@abl void}";   // → "boşluktan"
 }
 ```
 
@@ -523,15 +528,15 @@ phraselet! {
 **Plural categories**: `one`, `other`
 
 ```rust
-// it.phr.rs
-phraselet! {
-    carta = "carta" :fem;
-    studente = "studente" :masc :s_imp;
-    amico = "amico" :masc :vowel;
+// it.rlt.rs
+rlt! {
+    card = "carta" :fem;
+    student = "studente" :masc :s_imp;
+    friend = "amico" :masc :vowel;
 
-    the_card = "{@il carta}";      // → "la carta"
-    the_student = "{@il studente}"; // → "lo studente"
-    the_friend = "{@il amico}";    // → "l'amico"
+    the_card = "{@il card}";       // → "la carta"
+    the_student = "{@il student}"; // → "lo studente"
+    the_friend = "{@il friend}";   // → "l'amico"
 }
 ```
 
@@ -554,12 +559,12 @@ phraselet! {
 **Case variants**: `nom`, `acc`, `gen`, `dat`, `ins`, `loc`, `voc`
 
 ```rust
-// pl.phr.rs
-phraselet! {
-    karta = "karta" :fem;
-    wróg = "wróg" :masc_anim;
+// pl.rlt.rs
+rlt! {
+    card = "karta" :fem;
+    enemy = "wróg" :masc_anim;
 
-    karta = {
+    card = {
         nom.one: "karta",
         nom.few: "karty",
         nom.many: "kart",
@@ -604,13 +609,13 @@ phraselet! {
 **Plural categories**: `one`, `other`
 
 ```rust
-// nl.phr.rs
-phraselet! {
-    kaart = "kaart" :de;
-    karakter = "karakter" :het;
+// nl.rlt.rs
+rlt! {
+    card = "kaart" :de;
+    character = "karakter" :het;
 
-    the_card = "{@de kaart}";       // → "de kaart"
-    the_char = "{@de karakter}";    // → "het karakter"
+    the_card = "{@de card}";        // → "de kaart"
+    the_char = "{@de character}";   // → "het karakter"
 }
 ```
 
@@ -651,11 +656,11 @@ phraselet! {
 **Plural categories**: `other` (context-dependent)
 
 ```rust
-// id.phr.rs
-phraselet! {
-    kartu = "kartu";
+// id.rlt.rs
+rlt! {
+    card = "kartu";
 
-    all_cards = "semua {@plural kartu}";  // → "semua kartu-kartu"
+    all_cards = "semua {@plural card}";  // → "semua kartu-kartu"
 }
 ```
 
@@ -678,12 +683,12 @@ phraselet! {
 **Plural categories**: `one`, `other`
 
 ```rust
-// fa.phr.rs
-phraselet! {
-    کارت = "کارت";
-    دست = "دست" :vowel;
+// fa.rlt.rs
+rlt! {
+    card = "کارت";
+    hand = "دست" :vowel;
 
-    card_of_player = "{@ezafe کارت} بازیکن";  // → "کارت‌ِ بازیکن"
+    card_of_player = "{@ezafe card} بازیکن";  // → "کارت‌ِ بازیکن"
 }
 ```
 
@@ -708,11 +713,11 @@ phraselet! {
 **Plural categories**: `one`, `few`, `other`
 
 ```rust
-// ro.phr.rs
-phraselet! {
-    carte = "carte" :fem;
+// ro.rlt.rs
+rlt! {
+    card = "carte" :fem;
 
-    the_card = "{@def carte}";  // → "cartea"
+    the_card = "{@def card}";  // → "cartea"
 }
 ```
 
@@ -783,6 +788,18 @@ phraselet! {
 ---
 
 ## Design Notes
+
+### Required Metadata Tags
+
+Metadata-driven transforms require their expected tags to be present. Using `@a`
+on a phrase without `:a` or `:an` produces a runtime error, not a guess based on
+phonetics. This prevents silent incorrect output (e.g., "a uniform" is correct
+but heuristics would suggest "an uniform"; "an hour" is correct but heuristics
+would suggest "a hour").
+
+Similarly, `@the` in German requires `:masc`/`:fem`/`:neut`, `@count` in Chinese
+requires a measure word tag like `:zhang`/`:ge`, etc. Always define phrases with
+the tags required by the transforms that will be applied to them.
 
 ### Languages Without Special Transforms
 

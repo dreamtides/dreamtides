@@ -1,28 +1,28 @@
-# Phraselet
+# RLT
 
-A localization DSL embedded in Rust via macros.
+The Rust Language Toolkit: a localization DSL embedded in Rust via macros.
 
 ## Overview
 
-Phraselet files are valid Rust source files with a `.phr.rs` extension. They
-contain a `phraselet!` macro invocation that defines phrases for a single
+RLT files are valid Rust source files with a `.rlt.rs` extension. They
+contain an `rlt!` macro invocation that defines phrases for a single
 language.
 
 ```rust
-// en.phr.rs
-phraselet! {
+// en.rlt.rs
+rlt! {
     hello = "Hello, world!";
 }
 ```
 
-The macro generates strongly-typed Rust functions, with errors caught at compile
-time.
+The macro generates Rust functions with compile-time validation of phrase and
+parameter names. Parameter values are dynamically typed at runtime.
 
 ---
 
 ## Primitives
 
-Phraselet has four primitives: **phrase**, **parameter**, **variant**, and
+RLT has four primitives: **phrase**, **parameter**, **variant**, and
 **selection**.
 
 ### Phrase
@@ -30,7 +30,7 @@ Phraselet has four primitives: **phrase**, **parameter**, **variant**, and
 A phrase has a name and produces text.
 
 ```rust
-phraselet! {
+rlt! {
     hello = "Hello, world!";
     goodbye = "Goodbye!";
 }
@@ -42,7 +42,7 @@ Phrases can accept values. Parameters are declared in parentheses and
 interpolated with `{}`.
 
 ```rust
-phraselet! {
+rlt! {
     greet(name) = "Hello, {name}!";
     damage(amount, target) = "Deal {amount} damage to {target}.";
 }
@@ -53,7 +53,7 @@ phraselet! {
 A phrase can have multiple forms. Variants are declared in braces after `=`.
 
 ```rust
-phraselet! {
+rlt! {
     card = {
         one: "card",
         other: "cards",
@@ -64,7 +64,7 @@ phraselet! {
 Variants can be multi-dimensional using dot notation:
 
 ```rust
-phraselet! {
+rlt! {
     card = {
         nom.one: "карта",
         nom.few: "карты",
@@ -83,17 +83,17 @@ The `:` operator selects a variant.
 Literal selection uses a variant name directly:
 
 ```rust
-phraselet! {
+rlt! {
     all_cards = "All {card:other}.";
     take_one = "Возьмите {card:acc.one}.";
 }
 ```
 
-Derived selection uses a parameter. For numbers, Phraselet maps to CLDR plural
+Derived selection uses a parameter. For numbers, RLT maps to CLDR plural
 categories (`one`, `two`, `few`, `many`, `other`):
 
 ```rust
-phraselet! {
+rlt! {
     draw(n) = "Draw {n} {card:n}.";
 }
 // n=1 → "Draw 1 card."
@@ -103,7 +103,7 @@ phraselet! {
 Multi-dimensional selection chains with multiple `:` operators:
 
 ```rust
-phraselet! {
+rlt! {
     draw(n) = "Возьмите {n} {card:acc:n}.";
 }
 // n=1 → "Возьмите 1 карту."
@@ -116,7 +116,7 @@ When a phrase takes another phrase as a parameter, you can select variants from
 it:
 
 ```rust
-phraselet! {
+rlt! {
     character = {
         one: "character",
         other: "characters",
@@ -136,7 +136,7 @@ phrase `counting` refers to."
 Selection also works when both the phrase and selector are parameters:
 
 ```rust
-phraselet! {
+rlt! {
     character = { one: "character", other: "characters" };
     card = { one: "card", other: "cards" };
 
@@ -153,14 +153,16 @@ number at runtime.
 
 ## Metadata Tags
 
-A phrase can declare metadata tags using `:` after its definition. Tags serve two purposes:
+A phrase can declare metadata tags using `:` after its definition. Tags serve
+two purposes:
+
 1. **Selection**: Other phrases can select variants based on the tag
 2. **Transforms**: Transforms can read tags to determine behavior
 
 ```rust
-phraselet! {
-    carta = "carta" :fem;
-    personaje = "personaje" :masc;
+rlt! {
+    card = "carta" :fem;
+    character = "personaje" :masc;
 }
 ```
 
@@ -169,7 +171,7 @@ phraselet! {
 Phrases can have multiple tags for different purposes:
 
 ```rust
-phraselet! {
+rlt! {
     // English: article hint for @a transform
     card = "card" :a;
     event = "event" :an;
@@ -183,27 +185,27 @@ phraselet! {
     ereignis = "Ereignis" :neut;
 
     // Chinese: measure word category for @count transform
-    牌 = "牌" :zhang;
-    角色 = "角色" :ge;
+    pai = "牌" :zhang;
+    jue_se = "角色" :ge;
 }
 ```
 
 **Selection based on tags:**
 
 ```rust
-phraselet! {
-    carta = "carta" :fem;
-    personaje = "personaje" :masc;
+rlt! {
+    card = "carta" :fem;
+    character = "personaje" :masc;
 
-    destruido = {
+    destroyed = {
         masc: "destruido",
         fem: "destruida",
     };
 
-    destroyed(thing) = "{thing} fue {destruido:thing}.";
+    destroy(thing) = "{thing} fue {destroyed:thing}.";
 }
-// thing=carta     → "carta fue destruida."
-// thing=personaje → "personaje fue destruido."
+// thing=card      → "carta fue destruida."
+// thing=character → "personaje fue destruido."
 ```
 
 ---
@@ -214,7 +216,7 @@ The `@` operator applies a transform. Transforms are prefix operations that
 modify text.
 
 ```rust
-phraselet! {
+rlt! {
     card = "card";
 
     draw_one = "Draw {@a card}.";        // → "Draw a card."
@@ -226,7 +228,7 @@ phraselet! {
 Transforms combine with selection:
 
 ```rust
-phraselet! {
+rlt! {
     card = {
         one: "card",
         other: "cards",
@@ -242,19 +244,19 @@ phraselet! {
 
 These transforms work on any text in any language:
 
-| Transform | Effect |
-|-----------|--------|
-| `@cap` | Capitalize first letter |
-| `@upper` | All uppercase |
-| `@lower` | All lowercase |
+| Transform | Effect                   |
+| --------- | ------------------------ |
+| `@cap`    | Capitalize first letter  |
+| `@upper`  | All uppercase            |
+| `@lower`  | All lowercase            |
 
 ### Metadata-Driven Transforms
 
 Language-specific transforms read metadata tags to determine behavior:
 
 ```rust
-// en.phr.rs
-phraselet! {
+// en.rlt.rs
+rlt! {
     card = "card" :a;
     event = "event" :an;
     hour = "hour" :an;      // silent h
@@ -265,57 +267,59 @@ phraselet! {
 }
 ```
 
-The `@a` transform:
-1. Checks if the argument has `:a` or `:an` tag → uses that
-2. Falls back to phonetic heuristics for untagged text
+The `@a` transform reads the `:a` or `:an` tag from its argument. If no tag is
+present, it produces a **runtime error**. This ensures predictable results—
+phonetic heuristics would silently produce wrong output for words like "uniform"
+(uses "a" despite starting with a vowel) or "hour" (uses "an" despite starting
+with a consonant).
 
 This pattern applies to other language-specific transforms:
 
 ```rust
-// de.phr.rs - German definite articles
-phraselet! {
-    Karte = "Karte" :fem;
-    Charakter = "Charakter" :masc;
-    Ereignis = "Ereignis" :neut;
+// de.rlt.rs - German definite articles
+rlt! {
+    karte = "Karte" :fem;
+    charakter = "Charakter" :masc;
+    ereignis = "Ereignis" :neut;
 
     // @the reads :masc/:fem/:neut → der/die/das
-    destroy_card = "Zerstöre {@the Karte}.";  // → "Zerstöre die Karte."
+    destroy_card = "Zerstöre {@the karte}.";  // → "Zerstöre die Karte."
 }
 
-// zh_cn.phr.rs - Chinese measure words
-phraselet! {
-    牌 = "牌" :zhang;
-    角色 = "角色" :ge;
+// zh_cn.rlt.rs - Chinese measure words
+rlt! {
+    pai = "牌" :zhang;
+    jue_se = "角色" :ge;
 
     // @count reads measure word tags
-    draw(n) = "抽{@count n 牌}";  // → "抽3张牌"
+    draw(n) = "抽{@count n pai}";  // → "抽3张牌"
 }
 ```
 
 ### Standard Transform Library
 
-Phraselet provides language-specific transforms for common patterns. Transforms
-are scoped to the language file—`@un` in `es.phr.rs` uses Spanish rules, while
-`@un` in `fr.phr.rs` uses French rules. The language is inferred from the
-filename.
+RLT provides language-specific transforms for common patterns. Transforms are
+scoped to the language file—`@un` in `es.rlt.rs` uses Spanish rules, while `@un`
+in `fr.rlt.rs` uses French rules. The language is inferred from the filename.
 
-| Transform | Languages | Reads Tags | Effect |
-|-----------|-----------|------------|--------|
-| `@a` | English | `:a`, `:an` | Indefinite article (a/an) |
-| `@the` | Germanic, Romance | `:masc`, `:fem`, `:neut` | Definite article |
-| `@un` | Romance | `:masc`, `:fem` | Indefinite article |
-| `@contract` | French, Italian, Portuguese | article + preposition | Contraction (de+le→du) |
-| `@elide` | French, Italian | `:vowel` | Vowel elision (le→l') |
-| `@count` | Chinese, Japanese, Korean | `:zhang`, `:ge`, etc. | Measure word insertion |
+| Transform   | Languages                      | Reads Tags                   | Effect                       |
+| ----------- | ------------------------------ | ---------------------------- | ---------------------------- |
+| `@a`        | English                        | `:a`, `:an`                  | Indefinite article (a/an)    |
+| `@the`      | Germanic, Romance              | `:masc`, `:fem`, `:neut`     | Definite article             |
+| `@un`       | Romance                        | `:masc`, `:fem`              | Indefinite article           |
+| `@contract` | French, Italian, Portuguese    | article + preposition        | Contraction (de+le→du)       |
+| `@elide`    | French, Italian                | `:vowel`                     | Vowel elision (le→l')        |
+| `@count`    | Chinese, Japanese, Korean      | `:zhang`, `:ge`, etc.        | Measure word insertion       |
 
-See **APPENDIX_STDLIB.md** for complete documentation of transforms per language.
+See **APPENDIX_STDLIB.md** for complete documentation of transforms per
+language.
 
 ### Transforms on Phrase Parameters
 
 Transforms read metadata from phrase parameters, enabling abstraction:
 
 ```rust
-phraselet! {
+rlt! {
     card = "card" :a;
     event = "event" :an;
     ally = "ally" :an;
@@ -328,8 +332,8 @@ phraselet! {
 // play(ally) → "Play an ally."
 ```
 
-For untagged runtime strings, transforms fall back to heuristics. Define phrases
-with explicit tags for predictable behavior.
+All phrases passed to metadata-driven transforms must have the required tags.
+Passing an untagged phrase or a raw string to `@a` produces a runtime error.
 
 ---
 
@@ -363,8 +367,8 @@ apply dynamic rules.
 ### Pluralization (English)
 
 ```rust
-// en.phr.rs
-phraselet! {
+// en.rlt.rs
+rlt! {
     card = {
         one: "card",
         other: "cards",
@@ -379,8 +383,8 @@ phraselet! {
 Russian has three plural categories:
 
 ```rust
-// ru.phr.rs
-phraselet! {
+// ru.rlt.rs
+rlt! {
     card = {
         one: "карта",
         few: "карты",
@@ -398,8 +402,8 @@ phraselet! {
 ### Case + Number (Russian)
 
 ```rust
-// ru.phr.rs
-phraselet! {
+// ru.rlt.rs
+rlt! {
     card = {
         nom.one: "карта",
         nom.few: "карты",
@@ -420,35 +424,35 @@ phraselet! {
 ### Gender Agreement (Spanish)
 
 ```rust
-// es.phr.rs
-phraselet! {
-    carta = "carta" :fem;
-    enemigo = "enemigo" :masc;
+// es.rlt.rs
+rlt! {
+    card = "carta" :fem;
+    enemy = "enemigo" :masc;
 
-    destruido = {
+    destroyed = {
         masc: "destruido",
         fem: "destruida",
     };
 
-    destroy(target) = "{@cap target} fue {destruido:target}.";
+    destroy(target) = "{@cap target} fue {destroyed:target}.";
 }
-// target=carta   → "Carta fue destruida."
-// target=enemigo → "Enemigo fue destruido."
+// target=card  → "Carta fue destruida."
+// target=enemy → "Enemigo fue destruido."
 ```
 
 ### Measure Words (Chinese)
 
 ```rust
-// zh-CN.phr.rs
-phraselet! {
+// zh-CN.rlt.rs
+rlt! {
     card = "牌";
     character = "角色";
 
-    张(n, thing) = "{n}张{thing}";
-    个(n, thing) = "{n}个{thing}";
+    zhang(n, thing) = "{n}张{thing}";
+    ge(n, thing) = "{n}个{thing}";
 
-    draw(n) = "抽{张(n, card)}。";
-    summon(n) = "召唤{个(n, character)}。";
+    draw(n) = "抽{zhang(n, card)}。";
+    summon(n) = "召唤{ge(n, character)}。";
 }
 // draw(3)   → "抽3张牌。"
 // summon(2) → "召唤2个角色。"
@@ -457,8 +461,8 @@ phraselet! {
 ### Articles (English)
 
 ```rust
-// en.phr.rs
-phraselet! {
+// en.rlt.rs
+rlt! {
     card = "card";
     event = "event";
     ally = "ally";
@@ -473,17 +477,17 @@ phraselet! {
 
 ## File Structure
 
-Each language has its own `.phr.rs` file:
+Each language has its own `.rlt.rs` file:
 
 ```
 src/
   localization/
     mod.rs
-    en.phr.rs      # English (source)
-    zh_cn.phr.rs   # Simplified Chinese
-    ru.phr.rs      # Russian
-    es.phr.rs      # Spanish
-    pt_br.phr.rs   # Portuguese (Brazil)
+    en.rlt.rs      # English (source)
+    zh_cn.rlt.rs   # Simplified Chinese
+    ru.rlt.rs      # Russian
+    es.rlt.rs      # Spanish
+    pt_br.rlt.rs   # Portuguese (Brazil)
 ```
 
 The source language defines the contract. Other languages must define the same
@@ -491,68 +495,37 @@ phrase names with the same parameters.
 
 ---
 
-## Type Inference
+## Runtime Values
 
-Parameters don't need type annotations. Phraselet infers types from how
-parameters are used.
-
-**Inference rules:**
-
-| Usage | Inferred type | Rust type |
-|-------|---------------|-----------|
-| `{card:n}` with plural variants | Numeric | `i64` |
-| `{destruido:x}` with inherent selector | Phrase reference | Generated enum |
-| `{name}` interpolation only | Displayable | `impl Display` |
-
-**Example:**
+All parameters accept a `Value` type that can represent numbers, strings, or
+phrase references. Type checking happens at runtime.
 
 ```rust
-phraselet! {
-    card = { one: "card", other: "cards" };
-    carta = "carta" :fem;
-    destruido = { masc: "destruido", fem: "destruida" };
-
-    draw(n) = "Draw {n} {card:n}.";              // n: i64
-    greet(name) = "Hello, {name}!";              // name: impl Display
-    destroy(target) = "{destruido:target}";      // target: phrase with :fem/:masc
-}
+// All of these work:
+en::draw(3);                    // number
+en::draw("3");                  // string (converted to display)
+en::greet("World");             // string
+en::destroy(es::card());        // phrase reference
 ```
 
-**Generated Rust:**
+**Runtime behavior:**
 
-```rust
-pub fn draw(n: i64) -> String { ... }
-pub fn greet(name: impl std::fmt::Display) -> String { ... }
-pub fn destroy(target: Gendered) -> String { ... }
+| Operation              | Value Type      | Behavior                                    |
+| ---------------------- | --------------- | ------------------------------------------- |
+| `{x}`                  | Any             | Display the value                           |
+| `{card:x}` (plural)    | Number          | Select plural category (one/few/many/other) |
+| `{card:x}` (plural)    | String          | Parse as number, or use "other" as fallback |
+| `{card:x}` (plural)    | Phrase          | Use "other" as fallback                     |
+| `{destroyed:x}` (tags) | Phrase          | Look up tag, select matching variant        |
+| `{destroyed:x}` (tags) | String/Number   | Use first variant as fallback               |
+| `{@a x}`               | Phrase with tag | Use the tag                                 |
+| `{@a x}`               | Other           | **Runtime error** (missing required tag)    |
 
-// Enum for phrases with :fem/:masc selectors
-pub enum Gendered {
-    Carta,
-}
-```
-
-**Phrase references carry metadata:**
-
-When a phrase is passed as a parameter, it carries its variants and tags. This
-enables selection (`{thing:n}`) and transforms (`{@a thing}`) to work on the
-parameter's actual phrase, not just its text.
-
-**Conflicting usage is an error:**
-
-```rust
-phraselet! {
-    foo(x) = "{card:x} {destruido:x}";  // x used for both plural and gender?
-}
-```
-
-```
-error: parameter 'x' has conflicting usage
-  --> en.phr.rs:2:15
-   |
-2  |     foo(x) = "{card:x} {destruido:x}";
-   |               ^^^^^^^^ plural selection (requires numeric)
-   |                        ^^^^^^^^^^^^^ gender selection (requires phrase)
-```
+This design prioritizes simplicity and flexibility over strict type safety.
+Selection operations use fallback behavior—the system always produces *some*
+output, even if the value type doesn't match the expected usage. However,
+metadata-driven transforms (like `@a`) produce runtime errors when required
+tags are missing, ensuring predictable results.
 
 ---
 
@@ -561,8 +534,8 @@ error: parameter 'x' has conflicting usage
 Given:
 
 ```rust
-// en.phr.rs
-phraselet! {
+// en.rlt.rs
+rlt! {
     card = {
         one: "card",
         other: "cards",
@@ -572,12 +545,12 @@ phraselet! {
 }
 ```
 
-Phraselet generates:
+RLT generates:
 
 ```rust
 pub mod en {
-    pub fn draw(n: i64) -> String {
-        // ...
+    pub fn draw(n: impl Into<Value>) -> String {
+        // Runtime plural selection based on n's value
     }
 }
 ```
@@ -592,39 +565,52 @@ let msg = en::draw(3);  // "Draw 3 cards."
 
 **Variant accessors:**
 
-For phrases with variants, Phraselet generates accessor functions for each
-variant:
+For phrases with variants, RLT generates accessor functions for each variant:
 
 ```rust
-// Phraselet definition:
+// RLT definition:
 card = {
     one: "card",
     other: "cards",
 };
 
 // Generated Rust:
-pub fn card() -> &'static str { "card" }        // Default (first variant)
-pub fn card_one() -> &'static str { "card" }
-pub fn card_other() -> &'static str { "cards" }
+pub fn card() -> PhraseRef { ... }          // Default (first variant)
+pub fn card_one() -> PhraseRef { ... }
+pub fn card_other() -> PhraseRef { ... }
+```
+
+The `PhraseRef` type carries the phrase's text, variants, and tags:
+
+```rust
+pub struct PhraseRef {
+    text: &'static str,
+    variants: &'static [(&'static str, &'static str)],
+    tags: &'static [&'static str],
+}
+
+impl std::fmt::Display for PhraseRef {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text)
+    }
+}
 ```
 
 This allows Rust code to access specific variants when needed:
 
 ```rust
 // Use default (singular)
-let singular = en::card();  // "card"
+let singular = en::card();  // displays as "card"
 
 // Use explicit plural
-let plural = en::card_other();  // "cards"
+let plural = en::card_other();  // displays as "cards"
 ```
 
 **Passing phrase references:**
 
-For parameters that require a phrase (inferred from inherent selector usage):
-
 ```rust
-// es.phr.rs
-phraselet! {
+// es.rlt.rs
+rlt! {
     carta = "carta" :fem;
     enemigo = "enemigo" :masc;
     destruido = { masc: "destruido", fem: "destruida" };
@@ -636,8 +622,8 @@ phraselet! {
 ```rust
 use localization::es;
 
-let msg = es::destroy(es::Gendered::Carta);    // "carta fue destruida."
-let msg = es::destroy(es::Gendered::Enemigo);  // "enemigo fue destruido."
+let msg = es::destroy(es::carta());    // "carta fue destruida."
+let msg = es::destroy(es::enemigo());  // "enemigo fue destruido."
 ```
 
 **Multi-language support:**
@@ -653,17 +639,20 @@ let msg = messages::draw(Language::Ru, 3);  // "Возьмите 3 карты."
 
 ## Compile-Time Errors
 
+RLT validates phrase and parameter *names* at compile time. Type mismatches are
+handled at runtime with fallback behavior.
+
 **Unknown phrase:**
 
 ```rust
-phraselet! {
+rlt! {
     draw(n) = "Draw {n} {cards:n}.";  // typo
 }
 ```
 
 ```
 error: unknown phrase 'cards'
-  --> en.phr.rs:2:28
+  --> en.rlt.rs:2:28
    |
 2  |     draw(n) = "Draw {n} {cards:n}.";
    |                          ^^^^^ not defined
@@ -671,11 +660,29 @@ error: unknown phrase 'cards'
    = help: did you mean 'card'?
 ```
 
+**Unknown parameter:**
+
+```rust
+rlt! {
+    draw(n) = "Draw {count} {card:n}.";  // 'count' not declared
+}
+```
+
+```
+error: unknown parameter 'count'
+  --> en.rlt.rs:2:18
+   |
+2  |     draw(n) = "Draw {count} {card:n}.";
+   |                      ^^^^^ not in parameter list
+   |
+   = help: declared parameters: n
+```
+
 **Missing variant:**
 
 ```rust
-// ru.phr.rs
-phraselet! {
+// ru.rlt.rs
+rlt! {
     card = {
         one: "карта",
         other: "карт",  // missing 'few'
@@ -685,37 +692,41 @@ phraselet! {
 
 ```
 error: missing variant 'few' for phrase 'card'
-  --> ru.phr.rs:2:5
+  --> ru.rlt.rs:2:5
    |
    = note: Russian requires: one, few, many
 ```
 
-**Wrong parameter type in calling code:**
+**Invalid selector:**
 
 ```rust
-en::draw("three")
+rlt! {
+    take = "{card:accusative}";  // 'accusative' not a variant of card
+}
 ```
 
 ```
-error[E0308]: mismatched types
-  --> src/main.rs:5:14
+error: phrase 'card' has no variant 'accusative'
+  --> en.rlt.rs:2:17
    |
-5  |     en::draw("three")
-   |              ^^^^^^^ expected `i64`, found `&str`
+2  |     take = "{card:accusative}";
+   |                   ^^^^^^^^^^ variant not defined
+   |
+   = note: available variants: one, other
 ```
 
 **Missing phrase in translation:**
 
-A build script validates all `.phr.rs` files together:
+A build script validates all `.rlt.rs` files together:
 
 ```
-error: phrase 'draw' not defined in ru.phr.rs
-  --> en.phr.rs:5:5
+error: phrase 'draw' not defined in ru.rlt.rs
+  --> en.rlt.rs:5:5
    |
 5  |     draw(n) = "Draw {n} {card:n}.";
    |     ^^^^ defined in source language
    |
-   = help: add to ru.phr.rs:
+   = help: add to ru.rlt.rs:
    |     draw(n) = "...";
 ```
 
@@ -723,17 +734,16 @@ error: phrase 'draw' not defined in ru.phr.rs
 
 ## Design Philosophy
 
-**Logic in Rust, text in Phraselet.**
+**Logic in Rust, text in RLT.**
 
-Phraselet provides atomic text pieces. Complex branching logic stays in Rust
-code:
+RLT provides atomic text pieces. Complex branching logic stays in Rust code:
 
 ```rust
 // Rust code handles the logic
 match predicate {
     Predicate::Your(card_predicate) => {
         if is_character(card_predicate) {
-            en::ally()  // Phraselet provides the text
+            en::ally()  // RLT provides the text
         } else {
             en::your_card()
         }
@@ -744,15 +754,15 @@ match predicate {
 }
 ```
 
-This separation keeps Phraselet files simple and translator-friendly, while
-allowing arbitrarily complex composition logic in Rust.
+This separation keeps RLT files simple and translator-friendly, while allowing
+arbitrarily complex composition logic in Rust.
 
 **Keywords and formatting are just phrases.**
 
 There's no special keyword syntax. Define phrases that return formatted text:
 
 ```rust
-phraselet! {
+rlt! {
     dissolve = "<k>dissolve</k>";
     materialized = "<k>materialized</k>";
     energy_symbol = "<e>●</e>";
@@ -764,17 +774,25 @@ phraselet! {
 
 The formatting markup is part of the phrase text and gets interpolated normally.
 
+**Dynamic typing for simplicity.**
+
+Parameters are dynamically typed to keep the RLT syntax simple and
+translator-friendly. The runtime handles type mismatches gracefully with
+fallback behavior rather than errors. This trades strict type safety for ease
+of use—translators don't need to understand Rust's type system.
+
 ---
 
 ## Summary
 
-| Primitive | Syntax | Purpose |
-|-----------|--------|---------|
-| Phrase | `name = "text";` | Define text |
-| Parameter | `name(p) = "{p}";` | Accept values |
-| Variant | `name = { a: "x", b: "y" };` | Multiple forms |
-| Selection | `{phrase:selector}` | Choose a variant |
-| Metadata tag | `name = "text" :tag;` | Attach metadata for selection/transforms |
-| Transform | `{@transform phrase}` | Modify text |
+| Primitive    | Syntax                         | Purpose                                 |
+| ------------ | ------------------------------ | --------------------------------------- |
+| Phrase       | `name = "text";`               | Define text                             |
+| Parameter    | `name(p) = "{p}";`             | Accept values                           |
+| Variant      | `name = { a: "x", b: "y" };`   | Multiple forms                          |
+| Selection    | `{phrase:selector}`            | Choose a variant                        |
+| Metadata tag | `name = "text" :tag;`          | Attach metadata for selection/transforms|
+| Transform    | `{@transform phrase}`          | Modify text                             |
 
-Four primitives, Rust-compatible syntax, compile-time type checking.
+Four primitives, Rust-compatible syntax, compile-time name checking, runtime
+value handling.
