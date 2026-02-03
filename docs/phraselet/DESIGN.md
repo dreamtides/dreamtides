@@ -309,84 +309,26 @@ For predictable behavior with edge cases, define phrases with explicit tags.
 
 ## Selection vs Transforms
 
-Selection (`:`) and transforms (`@`) are complementary mechanisms. Understanding
-when to use each is key to effective Phraselet usage.
-
-### The Core Difference
-
-| Aspect | Selection (`:`) | Transform (`@`) |
-|--------|-----------------|-----------------|
-| Purpose | Choose among predefined variants | Compute new text |
-| Output | One of the phrase's variants | Derived/modified text |
-| Logic | Defined in Phraselet (variants) | Defined in Rust (transform impl) |
-| Nature | Declarative: "use form X" | Procedural: "apply operation" |
-
-### Linguistic Intuition
-
-The distinction maps to a linguistic reality:
-
-- **Selection**: A word *has* multiple forms (singular/plural, case endings).
-  These are inherent to the word itself.
-
-- **Transforms**: An operation *adds to* or *modifies* text. Articles, measure
-  words, and capitalization are external to the word.
+**Selection** (`:`) chooses among predefined variants. Use for inherent word
+forms: singular/plural, grammatical case, gender agreement.
 
 ```rust
-// Selection: "card" has inherent plural form "cards"
 card = { one: "card", other: "cards" };
-draw(n) = "Draw {card:n}.";  // Chooses "card" or "cards"
+draw(n) = "Draw {card:n}.";  // Picks "card" or "cards"
+```
 
-// Transform: "a" is added to "card", not part of it
+**Transforms** (`@`) compute new text. Use for external operations: adding
+articles, capitalization, contractions, measure words.
+
+```rust
 card = "card" :a;
 draw_one = "Draw {@a card}.";  // Produces "a card"
 ```
 
-### When to Use Selection
-
-Use selection when a phrase has **inherent grammatical variants**:
-
-| Pattern | Example |
-|---------|---------|
-| Singular/plural | `card = { one: "card", other: "cards" };` |
-| Grammatical case | `card = { nom: "карта", acc: "карту", gen: "карты" };` |
-| Gender agreement | `destruido = { masc: "destruido", fem: "destruida" };` |
-
-The variants are predefined text that you choose between.
-
-### When to Use Transforms
-
-Use transforms when you need to **compute or derive text**:
-
-| Pattern | Example | Why not selection? |
-|---------|---------|-------------------|
-| Add article | `{@a card}` → "a card" | Would need redundant variants for every noun |
-| Capitalize | `{@cap card}` → "Card" | Would need case variants for every phrase |
-| Elision | `{@le ami}` → "l'ami" | Requires runtime phonetic inspection |
-| Contractions | `{@de le}` → "du" | Combines two words dynamically |
-| Measure words | `{@count 3 牌}` → "3张牌" | Number is a parameter, not predefined |
-
-Transforms can do things selection cannot: inspect text, combine elements, and
-apply language-specific rules.
-
-### Why Both Are Needed
-
-**Selection-only would be verbose:**
-
-```rust
-// Every noun would need article variants
-card = { bare: "card", a: "a card", the: "the card" };  // Redundant!
-```
-
-**Transform-only would be awkward:**
-
-```rust
-// Pluralization would need a transform with two forms
-draw(n) = "Draw {@plural n card cards}.";  // Clunky
-```
-
-The two mechanisms handle different linguistic phenomena elegantly:
-- Selection for **inflection** (word-internal changes)
-- Transforms for **syntax** (word-external additions)
+The distinction reflects linguistics: selection handles **inflection** (word-
+internal changes), transforms handle **syntax** (word-external additions).
+Transforms can do things selection cannot—inspect phonetics, combine elements,
+apply dynamic rules.
 
 ---
 
