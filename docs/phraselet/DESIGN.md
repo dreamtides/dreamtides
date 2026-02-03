@@ -4,7 +4,9 @@ A localization DSL embedded in Rust via macros.
 
 ## Overview
 
-Phraselet files are valid Rust source files with a `.phr.rs` extension. They contain a `phraselet!` macro invocation that defines phrases for a single language.
+Phraselet files are valid Rust source files with a `.phr.rs` extension. They
+contain a `phraselet!` macro invocation that defines phrases for a single
+language.
 
 ```rust
 // en.phr.rs
@@ -13,13 +15,15 @@ phraselet! {
 }
 ```
 
-The macro generates strongly-typed Rust functions, with errors caught at compile time.
+The macro generates strongly-typed Rust functions, with errors caught at compile
+time.
 
 ---
 
 ## Primitives
 
-Phraselet has four primitives: **phrase**, **parameter**, **variant**, and **selection**.
+Phraselet has four primitives: **phrase**, **parameter**, **variant**, and
+**selection**.
 
 ### Phrase
 
@@ -34,7 +38,8 @@ phraselet! {
 
 ### Parameter
 
-Phrases can accept values. Parameters are declared in parentheses and interpolated with `{}`.
+Phrases can accept values. Parameters are declared in parentheses and
+interpolated with `{}`.
 
 ```rust
 phraselet! {
@@ -84,7 +89,8 @@ phraselet! {
 }
 ```
 
-Derived selection uses a parameter. For numbers, Phraselet maps to CLDR plural categories (`one`, `two`, `few`, `many`, `other`):
+Derived selection uses a parameter. For numbers, Phraselet maps to CLDR plural
+categories (`one`, `two`, `few`, `many`, `other`):
 
 ```rust
 phraselet! {
@@ -106,7 +112,8 @@ phraselet! {
 
 **Selection on phrase parameters:**
 
-When a phrase takes another phrase as a parameter, you can select variants from it:
+When a phrase takes another phrase as a parameter, you can select variants from
+it:
 
 ```rust
 phraselet! {
@@ -121,13 +128,16 @@ phraselet! {
 // counting=character → "... allied characters"
 ```
 
-Here `{counting:other}` means "use the 'other' (plural) variant of whatever phrase `counting` refers to."
+Here `{counting:other}` means "use the 'other' (plural) variant of whatever
+phrase `counting` refers to."
 
 ---
 
-## Inherent Selectors
+## Metadata Tags
 
-A phrase can declare an inherent selector using `:` after its definition. This is metadata that other phrases can select on.
+A phrase can declare metadata tags using `:` after its definition. Tags serve two purposes:
+1. **Selection**: Other phrases can select variants based on the tag
+2. **Transforms**: Transforms can read tags to determine behavior
 
 ```rust
 phraselet! {
@@ -136,7 +146,31 @@ phraselet! {
 }
 ```
 
-Another phrase can then select based on this:
+**Multiple tags:**
+
+Phrases can have multiple tags for different purposes:
+
+```rust
+phraselet! {
+    // English: article hint for @a transform
+    card = "card" :a;
+    event = "event" :an;
+    ally = "ally" :an;
+    uniform = "uniform" :a;   // phonetic exception (not "an uniform")
+    hour = "hour" :an;        // silent h exception
+
+    // German: grammatical gender for article transforms
+    Karte = "Karte" :fem;
+    Charakter = "Charakter" :masc;
+    Ereignis = "Ereignis" :neut;
+
+    // Chinese: measure word category for @count transform
+    牌 = "牌" :zhang;
+    角色 = "角色" :ge;
+}
+```
+
+**Selection based on tags:**
 
 ```rust
 phraselet! {
@@ -158,7 +192,8 @@ phraselet! {
 
 ## Transforms
 
-The `@` operator applies a transform. Transforms are prefix operations that modify text.
+The `@` operator applies a transform. Transforms are prefix operations that
+modify text.
 
 ```rust
 phraselet! {
@@ -185,20 +220,79 @@ phraselet! {
 // n=3 → "Draw 3 Cards."
 ```
 
-Standard transforms:
+### Universal Transforms
+
+These transforms work on any text in any language:
 
 | Transform | Effect |
 |-----------|--------|
 | `@cap` | Capitalize first letter |
 | `@upper` | All uppercase |
 | `@lower` | All lowercase |
-| `@a` | Prepend "a" or "an" (English) |
 
-Languages define their own transforms as appropriate.
+### Metadata-Driven Transforms
 
-**Transforms on dynamic values:**
+Language-specific transforms read metadata tags to determine behavior:
 
-The `@a` transform (and others) work on any displayable value, not just phrase references. This is useful when parameters contain runtime strings:
+```rust
+// en.phr.rs
+phraselet! {
+    card = "card" :a;
+    event = "event" :an;
+    hour = "hour" :an;      // silent h
+    uniform = "uniform" :a;  // phonetic exception
+
+    draw_one = "Draw {@a card}.";   // → "Draw a card."
+    play_one = "Play {@a event}.";  // → "Play an event."
+}
+```
+
+The `@a` transform:
+1. Checks if the argument has `:a` or `:an` tag → uses that
+2. Falls back to phonetic heuristics for untagged text
+
+This pattern applies to other language-specific transforms:
+
+```rust
+// de.phr.rs - German definite articles
+phraselet! {
+    Karte = "Karte" :fem;
+    Charakter = "Charakter" :masc;
+    Ereignis = "Ereignis" :neut;
+
+    // @the reads :masc/:fem/:neut → der/die/das
+    destroy_card = "Zerstöre {@the Karte}.";  // → "Zerstöre die Karte."
+}
+
+// zh_cn.phr.rs - Chinese measure words
+phraselet! {
+    牌 = "牌" :zhang;
+    角色 = "角色" :ge;
+
+    // @count reads measure word tags
+    draw(n) = "抽{@count n 牌}";  // → "抽3张牌"
+}
+```
+
+### Standard Transform Library
+
+Phraselet provides language-specific transforms for common patterns:
+
+| Transform | Languages | Reads Tags | Effect |
+|-----------|-----------|------------|--------|
+| `@a` | English | `:a`, `:an` | Indefinite article (a/an) |
+| `@the` | Germanic, Romance | `:masc`, `:fem`, `:neut` | Definite article |
+| `@un` | Romance | `:masc`, `:fem` | Indefinite article |
+| `@contract` | French, Italian, Portuguese | article + preposition | Contraction (de+le→du) |
+| `@elide` | French, Italian | `:vowel` | Vowel elision (le→l') |
+| `@count` | Chinese, Japanese, Korean | `:zhang`, `:ge`, etc. | Measure word insertion |
+
+See **APPENDIX_STDLIB.md** for complete documentation of transforms per language.
+
+### Transforms on Dynamic Values
+
+Transforms work on any displayable value, not just phrase references. For
+untagged runtime strings, transforms use heuristics:
 
 ```rust
 phraselet! {
@@ -206,10 +300,10 @@ phraselet! {
     not_subtype(subtype) = "that is not {@a subtype}";
 }
 // subtype="Warrior" → "that is not a Warrior"
-// subtype="Ancient" → "that is not an Ancient"
+// subtype="Ancient" → "that is not an Ancient" (heuristic: starts with vowel)
 ```
 
-The transform inspects the rendered text at runtime and applies the appropriate modification.
+For predictable behavior with edge cases, define phrases with explicit tags.
 
 ---
 
@@ -341,13 +435,15 @@ src/
     pt_br.phr.rs   # Portuguese (Brazil)
 ```
 
-The source language defines the contract. Other languages must define the same phrase names with the same parameters.
+The source language defines the contract. Other languages must define the same
+phrase names with the same parameters.
 
 ---
 
 ## Type Inference
 
-Parameters don't need type annotations. Phraselet infers types from how parameters are used.
+Parameters don't need type annotations. Phraselet infers types from how
+parameters are used.
 
 **Inference rules:**
 
@@ -439,7 +535,8 @@ let msg = en::draw(3);  // "Draw 3 cards."
 
 **Variant accessors:**
 
-For phrases with variants, Phraselet generates accessor functions for each variant:
+For phrases with variants, Phraselet generates accessor functions for each
+variant:
 
 ```rust
 // Phraselet definition:
@@ -571,7 +668,8 @@ error: phrase 'draw' not defined in ru.phr.rs
 
 **Logic in Rust, text in Phraselet.**
 
-Phraselet provides atomic text pieces. Complex branching logic stays in Rust code:
+Phraselet provides atomic text pieces. Complex branching logic stays in Rust
+code:
 
 ```rust
 // Rust code handles the logic
@@ -589,7 +687,8 @@ match predicate {
 }
 ```
 
-This separation keeps Phraselet files simple and translator-friendly, while allowing arbitrarily complex composition logic in Rust.
+This separation keeps Phraselet files simple and translator-friendly, while
+allowing arbitrarily complex composition logic in Rust.
 
 **Keywords and formatting are just phrases.**
 
@@ -618,7 +717,7 @@ The formatting markup is part of the phrase text and gets interpolated normally.
 | Parameter | `name(p) = "{p}";` | Accept values |
 | Variant | `name = { a: "x", b: "y" };` | Multiple forms |
 | Selection | `{phrase:selector}` | Choose a variant |
-| Inherent selector | `name = "text" :tag;` | Attach metadata |
+| Metadata tag | `name = "text" :tag;` | Attach metadata for selection/transforms |
 | Transform | `{@transform phrase}` | Modify text |
 
 Four primitives, Rust-compatible syntax, compile-time type checking.
