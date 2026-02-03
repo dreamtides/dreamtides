@@ -43,19 +43,19 @@ phraselet! {
     // BASE CARD TYPES
     //==========================================================================
 
-    card: {
-        one = "card",
-        other = "cards",
+    card = {
+        one: "card",
+        other: "cards",
     };
 
-    character: {
-        one = "character",
-        other = "characters",
+    character = {
+        one: "character",
+        other: "characters",
     };
 
-    event: {
-        one = "event",
-        other = "events",
+    event = {
+        one: "event",
+        other: "events",
     };
 
     //==========================================================================
@@ -63,53 +63,53 @@ phraselet! {
     //==========================================================================
     // "Your character" becomes "ally", "enemy character" becomes "enemy"
 
-    ally: {
-        one = "ally",
-        other = "allies",
+    ally = {
+        one: "ally",
+        other: "allies",
     };
 
-    your_card: {
-        one = "your card",
-        other = "your cards",
+    your_card = {
+        one: "your card",
+        other: "your cards",
     };
 
-    your_event: {
-        one = "your event",
-        other = "your events",
+    your_event = {
+        one: "your event",
+        other: "your events",
     };
 
-    enemy: {
-        one = "enemy",
-        other = "enemies",
+    enemy = {
+        one: "enemy",
+        other: "enemies",
     };
 
-    enemy_card: {
-        one = "enemy card",
-        other = "enemy cards",
+    enemy_card = {
+        one: "enemy card",
+        other: "enemy cards",
     };
 
-    enemy_event: {
-        one = "enemy event",
-        other = "enemy events",
+    enemy_event = {
+        one: "enemy event",
+        other: "enemy events",
     };
 
     //==========================================================================
     // PRONOUNS
     //==========================================================================
 
-    this_character: {
-        one = "this character",
-        other = "these characters",
+    this_character = {
+        one: "this character",
+        other: "these characters",
     };
 
-    that_character: {
-        one = "that character",
-        other = "those characters",
+    that_character = {
+        one: "that character",
+        other: "those characters",
     };
 
-    it: {
-        one = "it",
-        other = "them",
+    it = {
+        one: "it",
+        other: "them",
     };
 
     them = "them";
@@ -151,14 +151,14 @@ phraselet! {
     // SPECIAL PREDICATES
     //==========================================================================
 
-    with_materialized_ability: {
-        one = "with a {materialized} ability",
-        other = "with {materialized} abilities",
+    with_materialized_ability = {
+        one: "with a {materialized} ability",
+        other: "with {materialized} abilities",
     };
 
-    with_activated_ability: {
-        one = "with an activated ability",
-        other = "with activated abilities",
+    with_activated_ability = {
+        one: "with an activated ability",
+        other: "with activated abilities",
     };
 
     fast_prefix = "{fast}";
@@ -361,9 +361,9 @@ For phrases with variants, Phraselet generates accessor functions:
 
 ```rust
 // Phraselet definition:
-card: {
-    one = "card",
-    other = "cards",
+card = {
+    one: "card",
+    other: "cards",
 };
 
 // Generated Rust:
@@ -388,45 +388,45 @@ phraselet! {
     // Cases: nom (nominative), acc (accusative), gen (genitive), etc.
     // Numbers: one, few, many
 
-    card: {
-        nom.one = "карта",
-        nom.few = "карты",
-        nom.many = "карт",
-        acc.one = "карту",
-        acc.few = "карты",
-        acc.many = "карт",
-        gen.one = "карты",
-        gen.few = "карт",
-        gen.many = "карт",
+    card = {
+        nom.one: "карта",
+        nom.few: "карты",
+        nom.many: "карт",
+        acc.one: "карту",
+        acc.few: "карты",
+        acc.many: "карт",
+        gen.one: "карты",
+        gen.few: "карт",
+        gen.many: "карт",
     };
 
-    character: {
-        nom.one = "персонаж",
-        nom.few = "персонажа",
-        nom.many = "персонажей",
-        acc.one = "персонажа",
-        acc.few = "персонажей",
-        acc.many = "персонажей",
+    character = {
+        nom.one: "персонаж",
+        nom.few: "персонажа",
+        nom.many: "персонажей",
+        acc.one: "персонажа",
+        acc.few: "персонажей",
+        acc.many: "персонажей",
         // ...
     };
 
-    ally: {
-        nom.one = "союзник",
-        nom.few = "союзника",
-        nom.many = "союзников",
-        acc.one = "союзника",  // animate masculine uses genitive
-        acc.few = "союзников",
-        acc.many = "союзников",
+    ally = {
+        nom.one: "союзник",
+        nom.few: "союзника",
+        nom.many: "союзников",
+        acc.one: "союзника",  // animate masculine uses genitive
+        acc.few: "союзников",
+        acc.many: "союзников",
         // ...
     };
 
-    enemy: {
-        nom.one = "враг",
-        nom.few = "врага",
-        nom.many = "врагов",
-        acc.one = "врага",
-        acc.few = "врагов",
-        acc.many = "врагов",
+    enemy = {
+        nom.one: "враг",
+        nom.few: "врага",
+        nom.many: "врагов",
+        acc.one: "врага",
+        acc.few: "врагов",
+        acc.many: "врагов",
         // ...
     };
 

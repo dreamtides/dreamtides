@@ -230,9 +230,9 @@ Unlike English (singular/plural) or Russian (case/number/gender), Chinese nouns 
 
 ```rust
 // English needs variants
-card: {
-    one = "card",
-    other = "cards",
+card = {
+    one: "card",
+    other: "cards",
 };
 
 // Chinese doesn't

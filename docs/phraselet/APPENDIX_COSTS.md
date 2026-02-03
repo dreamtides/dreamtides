@@ -206,52 +206,52 @@ phraselet! {
     // BASE TYPES WITH CASE + NUMBER
     //==========================================================================
 
-    card: {
-        nom.one = "карта",
-        nom.few = "карты",
-        nom.many = "карт",
-        acc.one = "карту",
-        acc.few = "карты",
-        acc.many = "карт",
-        gen.one = "карты",
-        gen.few = "карт",
-        gen.many = "карт",
+    card = {
+        nom.one: "карта",
+        nom.few: "карты",
+        nom.many: "карт",
+        acc.one: "карту",
+        acc.few: "карты",
+        acc.many: "карт",
+        gen.one: "карты",
+        gen.few: "карт",
+        gen.many: "карт",
     };
 
-    character: {
-        nom.one = "персонаж",
-        nom.few = "персонажа",
-        nom.many = "персонажей",
-        acc.one = "персонажа",
-        acc.few = "персонажей",
-        acc.many = "персонажей",
-        gen.one = "персонажа",
-        gen.few = "персонажей",
-        gen.many = "персонажей",
+    character = {
+        nom.one: "персонаж",
+        nom.few: "персонажа",
+        nom.many: "персонажей",
+        acc.one: "персонажа",
+        acc.few: "персонажей",
+        acc.many: "персонажей",
+        gen.one: "персонажа",
+        gen.few: "персонажей",
+        gen.many: "персонажей",
     };
 
-    ally: {
-        nom.one = "союзник",
-        nom.few = "союзника",
-        nom.many = "союзников",
-        acc.one = "союзника",
-        acc.few = "союзников",
-        acc.many = "союзников",
-        gen.one = "союзника",
-        gen.few = "союзников",
-        gen.many = "союзников",
+    ally = {
+        nom.one: "союзник",
+        nom.few: "союзника",
+        nom.many: "союзников",
+        acc.one: "союзника",
+        acc.few: "союзников",
+        acc.many: "союзников",
+        gen.one: "союзника",
+        gen.few: "союзников",
+        gen.many: "союзников",
     };
 
-    enemy: {
-        nom.one = "враг",
-        nom.few = "врага",
-        nom.many = "врагов",
-        acc.one = "врага",
-        acc.few = "врагов",
-        acc.many = "врагов",
-        gen.one = "врага",
-        gen.few = "врагов",
-        gen.many = "врагов",
+    enemy = {
+        nom.one: "враг",
+        nom.few: "врага",
+        nom.many: "врагов",
+        acc.one: "врага",
+        acc.few: "врагов",
+        acc.many: "врагов",
+        gen.one: "врага",
+        gen.few: "врагов",
+        gen.many: "врагов",
     };
 }
 ```

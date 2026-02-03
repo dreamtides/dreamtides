@@ -45,13 +45,13 @@ phraselet! {
 
 ### Variant
 
-A phrase can have multiple forms. Variants are declared in braces after the name.
+A phrase can have multiple forms. Variants are declared in braces after `=`.
 
 ```rust
 phraselet! {
-    card: {
-        one = "card",
-        other = "cards",
+    card = {
+        one: "card",
+        other: "cards",
     };
 }
 ```
@@ -60,13 +60,13 @@ Variants can be multi-dimensional using dot notation:
 
 ```rust
 phraselet! {
-    card: {
-        nom.one = "карта",
-        nom.few = "карты",
-        nom.many = "карт",
-        acc.one = "карту",
-        acc.few = "карты",
-        acc.many = "карт",
+    card = {
+        nom.one: "карта",
+        nom.few: "карты",
+        nom.many: "карт",
+        acc.one: "карту",
+        acc.few: "карты",
+        acc.many: "карт",
     };
 }
 ```
@@ -110,9 +110,9 @@ When a phrase takes another phrase as a parameter, you can select variants from 
 
 ```rust
 phraselet! {
-    character: {
-        one = "character",
-        other = "characters",
+    character = {
+        one: "character",
+        other: "characters",
     };
 
     with_cost_less_than_allies(base, counting) =
@@ -143,9 +143,9 @@ phraselet! {
     carta = "carta" :fem;
     personaje = "personaje" :masc;
 
-    destruido: {
-        masc = "destruido",
-        fem = "destruida",
+    destruido = {
+        masc: "destruido",
+        fem: "destruida",
     };
 
     destroyed(thing) = "{thing} fue {destruido:thing}.";
@@ -174,9 +174,9 @@ Transforms combine with selection:
 
 ```rust
 phraselet! {
-    card: {
-        one = "card",
-        other = "cards",
+    card = {
+        one: "card",
+        other: "cards",
     };
 
     draw(n) = "Draw {n} {@cap card:n}.";
@@ -220,9 +220,9 @@ The transform inspects the rendered text at runtime and applies the appropriate 
 ```rust
 // en.phr.rs
 phraselet! {
-    card: {
-        one = "card",
-        other = "cards",
+    card = {
+        one: "card",
+        other: "cards",
     };
 
     draw(n) = "Draw {n} {card:n}.";
@@ -236,10 +236,10 @@ Russian has three plural categories:
 ```rust
 // ru.phr.rs
 phraselet! {
-    card: {
-        one = "карта",
-        few = "карты",
-        many = "карт",
+    card = {
+        one: "карта",
+        few: "карты",
+        many: "карт",
     };
 
     draw(n) = "Возьмите {n} {card:n}.";
@@ -255,16 +255,16 @@ phraselet! {
 ```rust
 // ru.phr.rs
 phraselet! {
-    card: {
-        nom.one = "карта",
-        nom.few = "карты",
-        nom.many = "карт",
-        acc.one = "карту",
-        acc.few = "карты",
-        acc.many = "карт",
-        gen.one = "карты",
-        gen.few = "карт",
-        gen.many = "карт",
+    card = {
+        nom.one: "карта",
+        nom.few: "карты",
+        nom.many: "карт",
+        acc.one: "карту",
+        acc.few: "карты",
+        acc.many: "карт",
+        gen.one: "карты",
+        gen.few: "карт",
+        gen.many: "карт",
     };
 
     draw(n) = "Возьмите {n} {card:acc:n}.";
@@ -280,9 +280,9 @@ phraselet! {
     carta = "carta" :fem;
     enemigo = "enemigo" :masc;
 
-    destruido: {
-        masc = "destruido",
-        fem = "destruida",
+    destruido = {
+        masc: "destruido",
+        fem: "destruida",
     };
 
     destroy(target) = "{@cap target} fue {destruido:target}.";
@@ -361,9 +361,9 @@ Parameters don't need type annotations. Phraselet infers types from how paramete
 
 ```rust
 phraselet! {
-    card: { one = "card", other = "cards" };
+    card = { one: "card", other: "cards" };
     carta = "carta" :fem;
-    destruido: { masc = "destruido", fem = "destruida" };
+    destruido = { masc: "destruido", fem: "destruida" };
 
     draw(n) = "Draw {n} {card:n}.";              // n: i64
     greet(name) = "Hello, {name}!";              // name: impl Display
@@ -410,9 +410,9 @@ Given:
 ```rust
 // en.phr.rs
 phraselet! {
-    card: {
-        one = "card",
-        other = "cards",
+    card = {
+        one: "card",
+        other: "cards",
     };
 
     draw(n) = "Draw {n} {card:n}.";
@@ -443,9 +443,9 @@ For phrases with variants, Phraselet generates accessor functions for each varia
 
 ```rust
 // Phraselet definition:
-card: {
-    one = "card",
-    other = "cards",
+card = {
+    one: "card",
+    other: "cards",
 };
 
 // Generated Rust:
@@ -473,7 +473,7 @@ For parameters that require a phrase (inferred from inherent selector usage):
 phraselet! {
     carta = "carta" :fem;
     enemigo = "enemigo" :masc;
-    destruido: { masc = "destruido", fem = "destruida" };
+    destruido = { masc: "destruido", fem: "destruida" };
 
     destroy(target) = "{target} fue {destruido:target}.";
 }
@@ -522,9 +522,9 @@ error: unknown phrase 'cards'
 ```rust
 // ru.phr.rs
 phraselet! {
-    card: {
-        one = "карта",
-        other = "карт",  // missing 'few'
+    card = {
+        one: "карта",
+        other: "карт",  // missing 'few'
     };
 }
 ```
@@ -616,7 +616,7 @@ The formatting markup is part of the phrase text and gets interpolated normally.
 |-----------|--------|---------|
 | Phrase | `name = "text";` | Define text |
 | Parameter | `name(p) = "{p}";` | Accept values |
-| Variant | `name: { a = "x", b = "y" };` | Multiple forms |
+| Variant | `name = { a: "x", b: "y" };` | Multiple forms |
 | Selection | `{phrase:selector}` | Choose a variant |
 | Inherent selector | `name = "text" :tag;` | Attach metadata |
 | Transform | `{@transform phrase}` | Modify text |
