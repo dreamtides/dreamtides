@@ -773,3 +773,37 @@ The result:
 3. **Word order** is fully controlled by the translator's phrase templates
 4. **Rust remains language-agnostic** — it identifies semantic contexts, RLF
    handles all presentation
+
+---
+
+## Appendix: Phrase Transformation with `:from`
+
+For patterns like character subtypes that need formatting while preserving
+case/gender/number metadata, use `:from` metadata inheritance:
+
+```rust
+// ru.rlf
+ancient = :masc :anim {
+    nom.one: "Древний",
+    nom.other: "Древние",
+    acc.one: "Древнего",
+    acc.other: "Древних",
+    gen.one: "Древнего",
+    gen.other: "Древних",
+};
+
+// :from(s) inherits all tags and variants
+subtype(s) = :from(s) "<color=#2E7D32><b>{s}</b></color>";
+
+// Templates can select any case/number from the inherited variants
+dissolve_subtype(s) = "Растворите {subtype(s):acc.one}.";
+// ancient → "Растворите <b>Древнего</b>."
+
+all_subtypes(s) = "все {subtype(s):nom.other}";
+// ancient → "все <b>Древние</b>"
+```
+
+The `:from(s)` modifier evaluates the template for every variant in `s`,
+producing a `Phrase` with the same case/number structure as the source.
+This enables the same "define once, use everywhere" pattern without losing
+Russian's complex grammatical information.

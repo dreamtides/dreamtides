@@ -675,3 +675,29 @@ the RLF files where translators can control it directly.
 This approach scales to any language: add a new `.rlf` file with appropriate
 tags and phrase templates, and the same Rust serializer produces grammatically
 correct output automatically.
+
+---
+
+## Appendix: Phrase Transformation with `:from`
+
+For patterns like character subtypes where formatting needs to wrap phrases
+while preserving gender, use `:from` metadata inheritance:
+
+```rust
+// es.rlf
+ancient = :masc { one: "Ancestral", other: "Ancestrales" };
+child = :masc { one: "Niño", other: "Niños" };
+mage = :masc { one: "Mago", other: "Magos" };
+
+// :from(s) inherits :masc/:fem tag and one/other variants
+subtype(s) = :from(s) "<color=#2E7D32><b>{s}</b></color>";
+
+// Now @un can read the inherited gender tag
+dissolve_subtype(s) = "Disuelve {@un subtype(s)}.";
+// ancient → "Disuelve un <b>Ancestral</b>."
+// child → "Disuelve un <b>Niño</b>."
+```
+
+This enables the same "define once, use everywhere" pattern for subtypes that
+would otherwise require separate definitions for each article/gender/number
+combination.

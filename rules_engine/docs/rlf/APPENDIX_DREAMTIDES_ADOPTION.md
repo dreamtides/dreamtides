@@ -206,72 +206,97 @@ rlf! {
 
 ---
 
-### Challenge: Large Select Expressions
+### Subtypes with Phrase-Returning Phrases
 
-The subtype mappings have many variants:
+The subtype mappings demonstrate RLF's `:from` metadata inheritance feature.
+
+**Current Fluent (verbose, duplicated):**
 
 ```ftl
+# 4 separate select expressions, each with ~20 variants = 80+ definitions
 a-subtype =
-  {
-    $subtype ->
+  { $subtype ->
       [ancient] an {-type(value: "Ancient")}
       [child] a {-type(value: "Child")}
-      [detective] a {-type(value: "Detective")}
-      # ... 17 more variants
-      *[other] Error: Unknown 'a-subtype' for type: { $subtype }
+      # ... 17 more
   }
+
+ASubtype = { ... }      # duplicated with capitalized articles
+subtype = { ... }       # duplicated without articles
+plural-subtype = { ... } # duplicated with plurals
 ```
 
-**RLF equivalent:**
+**RLF with `:from` (concise, single source of truth):**
+
 ```rust
 rlf! {
-    a_subtype = {
-        ancient: "an <color=#2E7D32><b>Ancient</b></color>",
-        child: "a <color=#2E7D32><b>Child</b></color>",
-        detective: "a <color=#2E7D32><b>Detective</b></color>",
-        // ... 17 more
-    };
+    // Each subtype defined once with article tag and plural variant
+    ancient = :an { one: "Ancient", other: "Ancients" };
+    child = :a { one: "Child", other: "Children" };
+    detective = :a { one: "Detective", other: "Detectives" };
+    enigma = :an { one: "Enigma", other: "Enigmas" };
+    explorer = :an { one: "Explorer", other: "Explorers" };
+    hacker = :a { one: "Hacker", other: "Hackers" };
+    mage = :a { one: "Mage", other: "Mages" };
+    monster = :a { one: "Monster", other: "Monsters" };
+    musician = :a { one: "Musician", other: "Musicians" };
+    outsider = :an { one: "Outsider", other: "Outsiders" };
+    renegade = :a { one: "Renegade", other: "Renegades" };
+    spirit_animal = :a { one: "Spirit Animal", other: "Spirit Animals" };
+    super_ = :a { one: "Super", other: "Supers" };
+    survivor = :a { one: "Survivor", other: "Survivors" };
+    synth = :a { one: "Synth", other: "Synths" };
+    tinkerer = :a { one: "Tinkerer", other: "Tinkerers" };
+    trooper = :a { one: "Trooper", other: "Troopers" };
+    visionary = :a { one: "Visionary", other: "Visionaries" };
+    visitor = :a { one: "Visitor", other: "Visitors" };
+    warrior = :a { one: "Warrior", other: "Warriors" };
+
+    // Single function handles formatting + metadata inheritance
+    subtype(s) = :from(s) "<color=#2E7D32><b>{s}</b></color>";
 }
 ```
 
-This is verbose but functional. However, the current system uses:
-1. A private helper `-type(value)` for formatting
-2. Different articles (a/an) per subtype
+**How `:from(s)` works:**
 
-**RLF improvement:**
-```rust
-rlf! {
-    subtype_fmt(name) = "<color=#2E7D32><b>{name}</b></color>";
+The `:from(param)` modifier causes the phrase to:
+1. Inherit tags from the parameter (`:an` from `ancient`)
+2. Evaluate the template for each variant of the parameter
+3. Return a `Phrase` with inherited metadata
 
-    // Use tags for article selection
-    ancient = :an "{subtype_fmt(\"Ancient\")}";
-    child = :a "{subtype_fmt(\"Child\")}";
-    detective = :a "{subtype_fmt(\"Detective\")}";
-
-    // Programmatic lookup
-    a_subtype(subtype) = "{@a subtype}";
-}
-```
-
-**Dynamic phrase lookup by string key:**
-
-In `a_subtype(subtype)`, if `subtype` comes from data as a string `"ancient"`, you
-need to resolve it to a `Phrase` before passing to the template. This is already
-supported via the interpreter API:
+This enables natural composition in templates:
 
 ```rust
-// String from data (e.g., TOML file)
-let subtype_name = "ancient";
-
-// Look up phrase by name
-let subtype_phrase = locale.interpreter().get_phrase(locale.language(), subtype_name)?;
-
-// Pass Phrase to template
-strings::a_subtype(&locale, subtype_phrase)
+// In card templates
+"Dissolve {@a subtype(s)}."        // → "Dissolve an <b>Ancient</b>."
+"Dissolve all {subtype(s):other}." // → "Dissolve all <b>Ancients</b>."
+"{@cap @a subtype(s)}"             // → "An <b>Ancient</b>"
 ```
 
-This two-step process (string → `Phrase` → template) is explicit and avoids ambiguity
-between literal strings and phrase references.
+**Caller responsibility:**
+
+Per the "Pass Phrase, not String" principle, callers resolve subtype keys to
+Phrases before passing:
+
+```rust
+// In serializer
+let s = strings::ancient(locale);  // Phrase with :an tag, one/other variants
+let formatted = strings::subtype(locale, s);  // Phrase with formatting + inherited metadata
+strings::dissolve_target(locale, formatted)
+```
+
+For data-driven templates (card TOML), the serializer resolves names before
+calling the interpreter:
+
+```rust
+// Card data: variables = "s: ancient"
+let s_key = card.variables.get("s")?;  // "ancient" (String)
+let s_phrase = locale.interpreter().get_phrase(locale.language(), s_key)?;  // Phrase
+let params = params!{ "s" => s_phrase };
+locale.interpreter().eval_str(&card.rules_text, locale.language(), params)?
+```
+
+**Reduction:** ~80 Fluent definitions → ~21 RLF definitions (20 subtypes + 1 function)
 
 ---
 
@@ -430,13 +455,14 @@ locale.interpreter().eval_str(&serialized.text, locale.language(), params)?
 
 ## Summary
 
-No design issues were identified. All Dreamtides patterns are supported:
+All Dreamtides patterns are supported:
 
 - **Static UI strings** → `rlf!` macro with typed functions
 - **Runtime templates** → `interpreter.eval_str()` (params work like phrase parameters)
 - **Dynamic phrase lookup** → `interpreter.get_phrase(lang, name)`
 - **Auto-capitalization** → uppercase phrase reference (e.g., `{Card}` → `{@cap card}`)
 - **Multiple phrase instances** → `{cards(n1)}... {cards(n2)}` with different param names
+- **Phrase transformation** → `:from(param)` for metadata inheritance (subtypes, figments)
 
 ## Additional Observations
 

@@ -172,6 +172,7 @@ name = "simple phrase";
 name = :tag "tagged phrase";
 name = :tag1 :tag2 { key1: "variant1", key2: "variant2" };
 name(param1, param2) = "template with {param1} and {param2}";
+name(p) = :from(p) "wrapper around {p}";
 ```
 
 ---
@@ -229,6 +230,19 @@ For parameter-based selectors:
 
 Before resolving a phrase, the evaluator checks if the phrase name exists in the
 current stack. If found, it returns a `CyclicReference` error.
+
+### Metadata Inheritance (`:from`)
+
+When a phrase has `:from(param)`, evaluation produces a `Phrase` instead of a
+simple string:
+
+1. **Read source metadata**: Get tags and variants from the parameter phrase
+2. **Evaluate per variant**: Run the template once for each variant of the source
+3. **Inherit tags**: Copy tags from the source phrase to the result
+4. **Return Phrase**: The result is a `Phrase` with computed variants and inherited tags
+
+This enables phrase composition where transforms like `@a` can read inherited
+tags and selectors like `:other` can access inherited variants.
 
 ---
 
@@ -320,7 +334,7 @@ impl RlfInterpreter {
         template: &str,
         language: &str,
         params: HashMap<String, Value>,
-    ) -> Result<String, EvalError>;
+    ) -> Result<Phrase, EvalError>;
 
     /// Call a phrase by name with arguments.
     pub fn call_phrase(
@@ -328,9 +342,9 @@ impl RlfInterpreter {
         language: &str,
         name: &str,
         args: &[Value],
-    ) -> Result<String, EvalError>;
+    ) -> Result<Phrase, EvalError>;
 
-    /// Get a phrase as a Phrase value.
+    /// Get a phrase as a Phrase value (parameterless phrases only).
     pub fn get_phrase(
         &self,
         language: &str,
@@ -343,9 +357,9 @@ impl RlfInterpreter {
         id: u64,
         language: &str,
         args: &[Value],
-    ) -> Result<String, EvalError>;
+    ) -> Result<Phrase, EvalError>;
 
-    /// Get a phrase by PhraseId.
+    /// Get a phrase by PhraseId (parameterless phrases only).
     pub fn get_phrase_by_id(
         &self,
         id: u64,
@@ -360,6 +374,10 @@ impl RlfInterpreter {
     ) -> Result<usize, LoadError>;
 }
 ```
+
+**Note:** All evaluation methods return `Phrase`. For phrases without `:from` or
+declared variants/tags, the `Phrase` has empty variants and tags, behaving like
+a string when displayed.
 
 ### EvalError
 

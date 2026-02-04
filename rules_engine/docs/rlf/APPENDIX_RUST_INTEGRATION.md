@@ -694,7 +694,7 @@ pub fn card(locale: &Locale) -> Phrase {
 }
 
 /// Evaluates the "draw" phrase.
-pub fn draw(locale: &Locale, n: impl Into<Value>) -> String {
+pub fn draw(locale: &Locale, n: impl Into<Value>) -> Phrase {
     locale.interpreter()
         .call_phrase(locale.language(), "draw", &[n.into()])
         .expect("phrase 'draw' should exist")
@@ -810,6 +810,52 @@ play_event = "Play {@an event}.";
 
 // Interpreter maps @an to the same transform function as @a
 ```
+
+---
+
+## Metadata Inheritance Evaluation
+
+The `:from(param)` modifier enables phrase-returning phrases. The interpreter
+handles this by evaluating the template multiple times:
+
+```rust
+// RLF:
+ancient = :an { one: "Ancient", other: "Ancients" };
+subtype(s) = :from(s) "<color=#2E7D32><b>{s}</b></color>";
+
+// Interpreter logic for subtype(ancient):
+fn eval_phrase_with_from(
+    template: &Template,
+    from_param: &str,
+    params: &HashMap<String, Value>,
+) -> Phrase {
+    let source = params.get(from_param).expect("param exists").as_phrase();
+
+    // Inherit tags
+    let tags = source.tags.clone();
+
+    // Evaluate template for each variant
+    let mut variants = HashMap::new();
+    for (key, variant_text) in &source.variants {
+        let mut variant_params = params.clone();
+        variant_params.insert(from_param.to_string(), Value::String(variant_text.clone()));
+        let result = eval_template(template, &variant_params);
+        variants.insert(key.clone(), result);
+    }
+
+    // Default text uses the source's default text
+    let text = {
+        let mut default_params = params.clone();
+        default_params.insert(from_param.to_string(), Value::String(source.text.clone()));
+        eval_template(template, &default_params)
+    };
+
+    Phrase { text, variants, tags }
+}
+```
+
+This enables composition patterns like `{@a subtype(s)}` where `@a` reads the
+inherited tag and `:other` selectors access inherited variants.
 
 ---
 
@@ -1050,7 +1096,7 @@ Because RLF uses proc-macros, rust-analyzer provides:
 
 | Type | Purpose | Size |
 |------|---------|------|
-| `Phrase` | Returned by parameterless phrase functions; carries text, variants, tags | Heap-allocated |
+| `Phrase` | Returned by all phrase functions; carries text, variants, tags | Heap-allocated |
 | `Value` | Runtime parameter type; accepts numbers, strings, phrases | Enum (24 bytes typical) |
 | `PhraseId` | Serializable reference to any phrase; resolve with `call()` | 8 bytes, `Copy` |
 

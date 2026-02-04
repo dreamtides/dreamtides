@@ -258,6 +258,69 @@ destroy(thing) = "{thing} fue {destroyed:thing}.";
 
 ---
 
+## Metadata Inheritance
+
+The `:from(param)` modifier causes a phrase to inherit tags and variants from
+a parameter. This enables **phrase-returning phrases**—functions that transform
+one phrase into another while preserving grammatical metadata.
+
+```rust
+rlf! {
+    ancient = :an { one: "Ancient", other: "Ancients" };
+    child = :a { one: "Child", other: "Children" };
+
+    // :from(s) inherits tags and variants from parameter s
+    subtype(s) = :from(s) "<color=#2E7D32><b>{s}</b></color>";
+}
+```
+
+**How `:from(s)` works:**
+
+1. Read tags from `s` (e.g., `[:an]` from `ancient`)
+2. Read variants from `s` (e.g., `{one: "Ancient", other: "Ancients"}`)
+3. Evaluate template once per variant, substituting `{s}` with that variant's text
+4. Return a `Phrase` with inherited tags and computed variants
+
+**Evaluation of `subtype(ancient)`:**
+
+| Step | Action | Result |
+|------|--------|--------|
+| 1 | Read `ancient.tags` | `["an"]` |
+| 2 | Evaluate with `s:one` | `"<color=#2E7D32><b>Ancient</b></color>"` |
+| 3 | Evaluate with `s:other` | `"<color=#2E7D32><b>Ancients</b></color>"` |
+| 4 | Return Phrase | Tags: `["an"]`, variants: `{one: "...", other: "..."}` |
+
+**Usage in templates:**
+
+```rust
+rlf! {
+    dissolve_subtype(s) = "Dissolve {@a subtype(s)}.";
+    dissolve_all(s) = "Dissolve all {subtype(s):other}.";
+}
+// dissolve_subtype(ancient) → "Dissolve an <b>Ancient</b>."
+// dissolve_all(ancient) → "Dissolve all <b>Ancients</b>."
+```
+
+The `@a` transform reads the inherited `:an` tag; the `:other` selector accesses
+the inherited variant. This enables composition without losing grammatical
+information.
+
+**Caller responsibility:** Per the "Pass Phrase, not String" principle, callers
+must pass actual `Phrase` values, not string keys:
+
+```rust
+// Correct: pass Phrase
+let ancient = strings::ancient(locale);
+strings::dissolve_subtype(locale, ancient)
+
+// For data-driven templates, resolve the name first
+let key = "ancient";  // from card data
+let phrase = locale.interpreter().get_phrase(locale.language(), key)?;
+strings::dissolve_subtype(locale, phrase)
+```
+
+---
+
 ## Transforms
 
 The `@` operator applies a transform. Transforms modify text and apply
@@ -381,64 +444,17 @@ draw(n) = "Возьмите {n} {card:n}.";
 The `Locale` object manages language selection and translation data:
 
 ```rust
-pub struct Locale {
-    /// Current language code (e.g., "en", "ru", "es")
-    current_language: String,
-
-    /// The source language code (typically "en")
-    source_language: &'static str,
-
-    /// Interpreter with loaded translations
-    interpreter: RlfInterpreter,
-}
-
-impl Locale {
-    /// Create a new locale with the source language selected.
-    pub fn new() -> Self;
-
-    /// Create a locale with a specific language selected.
-    pub fn with_language(language: &str) -> Self;
-
-    /// Get the current language.
-    pub fn language(&self) -> &str;
-
-    /// Set the current language.
-    pub fn set_language(&mut self, language: &str);
-
-    /// Check if the current language is the source language.
-    pub fn is_source(&self) -> bool;
-
-    /// Load translations from a file.
-    pub fn load_translations(&mut self, language: &str, path: impl AsRef<Path>) -> Result<(), LoadError>;
-
-    /// Load translations from embedded data.
-    pub fn load_translations_str(&mut self, language: &str, content: &str) -> Result<(), LoadError>;
-
-    /// Reload translations for a language (clears existing and reloads from original source).
-    pub fn reload_translations(&mut self, language: &str) -> Result<(), LoadError>;
-}
-```
-
-**Typical initialization:**
-
-```rust
 fn setup_localization() -> Locale {
     let mut locale = Locale::new();
-
-    // Register source language phrases (from macro-embedded data)
     strings::register_source_phrases(locale.interpreter_mut());
-
-    // Load translation files
     locale.load_translations("ru", "assets/localization/ru.rlf")?;
     locale.load_translations("es", "assets/localization/es.rlf")?;
-    locale.load_translations("zh_cn", "assets/localization/zh_cn.rlf")?;
-
-    // Set initial language from user preferences
     locale.set_language(&user_preferences.language);
-
     locale
 }
 ```
+
+See **APPENDIX_RUNTIME_INTERPRETER.md** for complete API documentation.
 
 ---
 
@@ -467,7 +483,7 @@ pub fn card(locale: &Locale) -> Phrase {
 }
 
 /// Evaluates the "draw" phrase with parameter n.
-pub fn draw(locale: &Locale, n: impl Into<Value>) -> String {
+pub fn draw(locale: &Locale, n: impl Into<Value>) -> Phrase {
     locale.interpreter()
         .call_phrase(locale.language(), "draw", &[n.into()])
         .expect("phrase 'draw' should exist")
@@ -497,6 +513,10 @@ fn render_card_text(locale: &Locale) {
     // Russian: "Возьмите 3 карты."
 }
 ```
+
+**Note:** All phrase functions return `Phrase`. For phrases without `:from` or
+declared variants/tags, the returned `Phrase` has empty variants and tags,
+behaving like a simple string.
 
 ---
 
@@ -593,7 +613,7 @@ returns `Result` for testing and tooling; see **APPENDIX_RUST_INTEGRATION.md**.
 
 ## Phrase Type
 
-Phrases without parameters return a `Phrase` that carries metadata:
+All phrase functions return a `Phrase` that carries metadata:
 
 ```rust
 pub struct Phrase {
@@ -737,6 +757,7 @@ rlf eval --lang ru --param n=3 --template "Draw {n} {card:n}."
 | Variant      | `name = { a: "x", b: "y" };`   | Multiple forms                          |
 | Selection    | `{phrase:selector}`            | Choose a variant                        |
 | Metadata tag | `name = :tag "text";`          | Attach metadata                         |
+| Inheritance  | `name(p) = :from(p) "{p}";`    | Inherit tags/variants from parameter    |
 | Transform    | `{@transform:ctx phrase}`      | Modify text                             |
 
 | File Type        | Extension    | Purpose                               |
@@ -746,7 +767,7 @@ rlf eval --lang ru --param n=3 --template "Draw {n} {card:n}."
 
 | Type             | Purpose                                | Size / Traits                       |
 | ---------------- | -------------------------------------- | ----------------------------------- |
-| `Phrase`         | Text with variants and tags            | Heap-allocated                      |
+| `Phrase`         | Returned by all phrase functions       | Heap-allocated                      |
 | `PhraseId`       | Serializable reference to a phrase     | 8 bytes, `Copy`, `Serialize`        |
 | `Value`          | Runtime parameter (number/string/phrase) | Enum                              |
 
