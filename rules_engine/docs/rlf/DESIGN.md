@@ -272,6 +272,9 @@ rlf! {
 }
 ```
 
+**Automatic capitalization:** Referencing a phrase with an uppercase first letter
+applies `@cap` automatically: `{Card}` is equivalent to `{@cap card}`.
+
 Transforms combine with selection:
 
 ```rust
@@ -494,6 +497,20 @@ fn render_card_text(locale: &Locale) {
     // Russian: "Возьмите 3 карты."
 }
 ```
+
+---
+
+## Runtime Templates
+
+For data-driven content (templates stored in data files), use the interpreter directly:
+
+```rust
+let template = "Draw {cards(n)} for each {target}.";
+let params = hashmap!{ "n" => 2, "target" => strings::ally(&locale) };
+locale.interpreter().eval_str(template, locale.language(), params)?
+```
+
+Parameters work identically to phrase parameters. See **APPENDIX_RUNTIME_INTERPRETER.md**.
 
 ---
 
